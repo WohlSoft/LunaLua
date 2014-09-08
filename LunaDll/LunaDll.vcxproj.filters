@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\GameRAM">
+      <UniqueIdentifier>{53b6d2da-2ccf-483c-a0b7-c7301a732898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MOBs">
+      <UniqueIdentifier>{4e1a9b08-0646-4194-9542-2e8736ef9f77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Layers">
+      <UniqueIdentifier>{8e5067c6-18b1-4ec1-b541-292815675ff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Keyboard">
+      <UniqueIdentifier>{8597f246-c284-4e04-850c-840eba701fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Misc">
+      <UniqueIdentifier>{31594c82-2c70-47d7-8f94-aeab75eb2906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LevelCodes">
+      <UniqueIdentifier>{5c5967e6-b4e1-419a-a995-ed2a01e18c54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{c5f40672-3206-43b1-9cc9-bde849893bf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Death Counter">
+      <UniqueIdentifier>{9c3f331d-cd02-4afd-94a7-771d65d59a82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Level">
+      <UniqueIdentifier>{c31949cd-0cd9-44c1-87c4-fff0d3ddbbc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AutoCode">
+      <UniqueIdentifier>{c9bf9cf4-9398-45ed-b4fb-b1b7de72c151}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sound">
+      <UniqueIdentifier>{d6fe9def-e865-4338-ab71-7753b0a6df67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AutoCode\Commands">
+      <UniqueIdentifier>{35e56b17-c07a-44c7-90bc-9504bff9570f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Blocks">
+      <UniqueIdentifier>{9a41ec4b-a9a3-495c-9bbb-f2b5ebb12f3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SMBX Events">
+      <UniqueIdentifier>{d5827348-ca72-43fd-979d-608a4a883bd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{7355c692-c445-440b-81d2-6abe60fd7051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{67f9a4bb-3fcd-447c-aff3-da17f6ed4c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CustomSprites">
+      <UniqueIdentifier>{964b4b3e-3507-4d37-8826-0e95cac2998f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CustomSprites\SpriteFuncs">
+      <UniqueIdentifier>{c8aabf8d-5bc6-42b4-9791-c2bfc7d35eaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\RenderOps">
+      <UniqueIdentifier>{bc8d7f50-4c07-47e3-9677-38aa03081cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CustomSprites\Hitbox">
+      <UniqueIdentifier>{a0baf83b-5d12-413f-9ea1-0d4108d7c0fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PerformanceTimer">
+      <UniqueIdentifier>{f1f71b76-ea37-465a-9e66-873a202fe7bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CellManager">
+      <UniqueIdentifier>{09b072dc-ab35-4c99-af25-ddfcb6524686}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerMOB.h">
+      <Filter>Header Files\MOBs</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCs.h">
+      <Filter>Header Files\MOBs</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Header Files\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Header Files\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="MiscFuncs.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelCodes.h">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggerZone.h">
+      <Filter>Header Files\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathCounter.h">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderString.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathRecord.h">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Autocode.h">
+      <Filter>Header Files\AutoCode</Filter>
+    </ClInclude>
+    <ClInclude Include="AutocodeManager.h">
+      <Filter>Header Files\AutoCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Blocks.h">
+      <Filter>Header Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXEvents.h">
+      <Filter>Header Files\SMBX Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="BMPBox.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="CSprite.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteFuncs.h">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderBitmapOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderRectOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteComponent.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="Hitbox.h">
+      <Filter>Header Files\CustomSprites\Hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="CSpriteManager.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="CellManager.h">
+      <Filter>Header Files\CellManager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Header Files\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFuncs.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerMOB.cpp">
+      <Filter>Header Files\MOBs</Filter>
+    </ClCompile>
+    <ClCompile Include="dlltestlvlCode.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="JosephStaleknight-CurtainTortoise.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Docopoper-AbstractAssault.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Kil-DemosBrain.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathCounter.cpp">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathRecord.cpp">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Header Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Header Files\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="EuroShellRandD.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="AutocodeManager.cpp">
+      <Filter>Header Files\AutoCode</Filter>
+    </ClCompile>
+    <ClCompile Include="Autocode.cpp">
+      <Filter>Header Files\AutoCode</Filter>
+    </ClCompile>
+    <ClCompile Include="NPCs.cpp">
+      <Filter>Header Files\MOBs</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Header Files\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="AC_HeartSystem.cpp">
+      <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Blocks.cpp">
+      <Filter>Header Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXEvent.cpp">
+      <Filter>Header Files\SMBX Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Header Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Docopoper-Calleoca.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="SAJewers-Snowboardin.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Talkhaus-Science_Final_Battle.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="AC_LunaControl.cpp">
+      <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Header Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="CSprite.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteDrawFuncs.cpp">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderBitmapOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="CSpriteManager.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="BMPBox.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderRectOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteBehaviorFuncs.cpp">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="Hitbox.cpp">
+      <Filter>Header Files\CustomSprites\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteComponent.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="CellManager.cpp">
+      <Filter>Header Files\CellManager</Filter>
+    </ClCompile>
+    <ClCompile Include="EnumCmd.cpp">
+      <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="GenComp.cpp">
+      <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scratch.txt">
+      <Filter>Header Files\Misc</Filter>
+    </None>
+  </ItemGroup>
+</Project>

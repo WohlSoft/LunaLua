@@ -1,0 +1,264 @@
+// Ignore this file
+
+Address   Section   Type        Name                                     Comments
+00401304  .text     Label       gAnimationSpeed
+00401330  .text     Label       cnTickIncAmt
+004061D0  .text     Label       cnMaxRunSpeed
+00406580  .text     Label       cnGeneratorTiming
+004242D0  .text     Label       BitBlt
+00424364  .text     Label       DllFunctionCall
+004243B0  .text     Label       HResultCheckObj
+00424444  .text     Label       DllFunctionCall
+00424520  .text     Label       GetKeyState
+00424748  .text     Label       GetActiveWindow
+00424790  .text     Label       GetTickCount
+008BE410  .text     Label       InitGame
+008C2720  .text     Label       InitTonOfUnknown
+008C278F  .text     Label       pSomeFloatTable
+008CA210  .text     Label       RunFrame
+008D8F40  .text     Label       LoadLevel
+008DE080  .text     Label       EndLevel
+008E6F70  .text     Label       DrawFrame
+008F8260  .text     Label       InitSomething
+008FE2A0  .text     Label       InitSomething
+0094F680  .text     Label       InitGDIRelated
+00951F50  .text     Label       PrintToScreen
+00992F50  .text     Label       TestMOBCollision()
+00A06090  .text     Label       UpdateNPCs
+00A096E9  .text     Label       NoNPCs
+00A621A0  .text     Label       RunSpecifiedEvents/
+00A73FD0  .text     Label       GrinderSinkingFunc
+00A74910  .text     Label       UpdatePlayers
+00A7563A  .text     Label       more than 1 player
+00AA6710  .text     Label       UpdateLayers
+00AA69AE  .text     Label       title screen or no players
+00AA7EF5  .text     Label       no layer/
+00ABA390  .text     Label       LoadGraphics
+00ACD220  .text     Label       LoadCustomGifs/
+00B20870  .text     Label       ReadNPCTxts
+00B25010  .data     Label       pImportantObj
+00B25028  .data     Label       BitBltRelated
+00B25068  .data     Label       pVkeyTable
+00B250A0  .data     Label       pVkeyTable/
+00B25130  .data     Label       CheckMe
+00B25134  .data     Label       bLevelEditing
+00B253C4  .data     Label       pCopiedKeys//
+00B253C6  .data     Label       CopyKey1
+00B253C8  .data     Label       CopyKey2
+00B253CA  .data     Label       CopyKey3
+00B253CC  .data     Label       CopyKey4
+00B253CE  .data     Label       CopyKey5
+00B253D0  .data     Label       CopyKey6
+00B253D2  .data     Label       CopyKey7
+00B253D4  .data     Label       CopyKey8
+00B253D6  .data     Label       CopyKey9
+00B253D8  .data     Label       CopyKey10
+00B253DA  .data     Label       CopyKey11
+00B257D4  .data     Label       pSectionBoundaries
+00B257F0  .data     Label       pSectionStuff
+00B25956  .data     Label       UnkLayerMov
+00B2595A  .data     Label       NPCCount
+00B2595E  .data     Label       NumOfPlayers
+00B259E8  .data     Label       pMobsList/
+00B25A20  .data     Label       pPlayerObjList
+00B25C34  .data     Label       pSpriteSettingsUnk
+00B25D14  .data     Label       pSpriteNoCollisionTable
+00B25E64  .data     Label       pSpriteSomethingTable
+00B25EF0  .data     Label       pSpriteSettings4
+00B25F0C  .data     Label       pSpriteSettings5
+00B2B930  .data     Label       pSomething
+00B2B9E4  .data     Label       bRunGame
+00B2BA68  .data     Label       pSomeTable
+00B2BA84  .data     Label       pSomeTable
+00B2C59C  .data     Label       bDeathState/
+00B2C59E  .data     Label       LevelEndState
+00B2C5A0  .data     Label       LevelEndTimer
+00B2C5A4  .data     Label       pCurLvlName/
+00B2C5AC  .data     Label       fpLives
+00B2C5D4  .data     Label       Unknown
+00B2C5EC  .data     Label       pSectionUnk
+00B2C614  .data     Label       LevelEditor//
+00B2C61C  .data     Label       wszPath
+00B2C620  .data     Label       bTitleScreen/
+00B2C62E  .data     Label       UnkDecTimer
+00B2C66C  .data     Label       UnkEvents
+00B2C670  .data     Label       TransitioningFrameCounter
+00B2C67C  .data     Label       ActiveFrameCounter
+00B2C680  .data     Label       FPActiveFrameCounter
+00B2C690  .data     Label       DFPSubtractTickAmt
+00B2C6B0  .data     Label       pLayers
+00B2C6CC  .data     Label       pSomeText
+00B2C6DC  .data     Label       MaxJumpTable
+00B2C6FC  .data     Label       SmallDemoHeight
+00B2C706  .data     Label       BigDemoHeight
+00B2C74C  .data     Label       BigDemoDUckHeight
+00B2C87C  .data     Label       Unk
+00B2C896  .data     Label       Unk
+00B2C8B4  .data     Label       bOnlyPlayersActive
+00B2C8BA  .data     Label       ConstantCoinStream/
+00B2D72C  .data     Label       DFPTickCount
+00B2D738  .data     Label       DFPLastTickAmt
+00B2D740  .data     Label       bBattleMode
+00B2D760  .data     Label       BattleModeRelated1
+00B2F1D8  .data     Label       fpBitBlt
+00B2F304  .data     Label       pGraphicsObj/
+0040BDD8  .text     Export      <ModuleEntryPoint>
+00401000  .text     Import      &MSVBVM60.__vbaVarSub
+00401004  .text     Import      &MSVBVM60.__vbaStrI2
+00401008  .text     Import      &MSVBVM60.__vbaR8ForNextCheck
+0040100C  .text     Import      &MSVBVM60._CIcos
+00401010  .text     Import      &MSVBVM60._adj_fptan
+00401014  .text     Import      &MSVBVM60.__vbaVarMove
+00401018  .text     Import      &MSVBVM60.__vbaVarVargNofree
+0040101C  .text     Import      &MSVBVM60.__vbaFreeVar
+00401020  .text     Import      &MSVBVM60.__vbaLateIdCall
+00401024  .text     Import      &MSVBVM60.__vbaLenBstr
+00401028  .text     Import      &MSVBVM60.__vbaStrVarMove
+00401030  .text     Import      &MSVBVM60.__vbaFreeVarList
+00401034  .text     Import      &MSVBVM60.__vbaEnd
+00401038  .text     Import      &MSVBVM60._adj_fdiv_m64
+0040103C  .text     Import      &MSVBVM60.__vbaFreeObjList
+00401044  .text     Import      &MSVBVM60._adj_fprem1
+00401048  .text     Import      &MSVBVM60.__vbaRecAnsiToUni
+00401050  .text     Import      &MSVBVM60.__vbaCopyBytes
+00401054  .text     Import      &MSVBVM60.__vbaStrCat
+00401058  .text     Import      &MSVBVM60.__vbaVarCmpNe
+0040105C  .text     Import      &MSVBVM60.__vbaLsetFixstr
+00401060  .text     Import      &MSVBVM60.__vbaWriteFile
+00401064  .text     Import      &MSVBVM60.__vbaRecDestruct
+00401068  .text     Import      &MSVBVM60.__vbaSetSystemError
+0040106C  .text     Import      &MSVBVM60.__vbaLenBstrB
+00401070  .text     Import      &MSVBVM60.__vbaHresultCheckObj
+00401074  .text     Import      &MSVBVM60.__vbaLenVar
+00401078  .text     Import      &MSVBVM60._adj_fdiv_m32
+0040107C  .text     Import      &MSVBVM60.__vbaVarTstLe
+00401080  .text     Import      &MSVBVM60.__vbaAryDestruct
+00401084  .text     Import      &MSVBVM60.__vbaExitProc
+00401088  .text     Import      &MSVBVM60.__vbaVarForInit
+0040108C  .text     Import      &MSVBVM60.__vbaStrBool
+00401094  .text     Import      &MSVBVM60.__vbaBoolStr
+004010A0  .text     Import      &MSVBVM60.__vbaObjSet
+004010A4  .text     Import      &MSVBVM60.__vbaOnError
+004010AC  .text     Import      &MSVBVM60._adj_fdiv_m16i
+004010B0  .text     Import      &MSVBVM60.__vbaObjSetAddref
+004010B4  .text     Import      &MSVBVM60._adj_fdivr_m16i
+004010BC  .text     Import      &MSVBVM60.__vbaFpR4
+004010C4  .text     Import      &MSVBVM60.__vbaBoolVar
+004010C8  .text     Import      &MSVBVM60.__vbaVarTstLt
+004010CC  .text     Import      &MSVBVM60.__vbaFpR8
+004010D0  .text     Import      &MSVBVM60.__vbaBoolVarNull
+004010D4  .text     Import      &MSVBVM60._CIsin
+004010E4  .text     Import      &MSVBVM60.__vbaChkstk
+004010E8  .text     Import      &MSVBVM60.__vbaFileClose
+004010EC  .text     Import      &MSVBVM60.EVENT_SINK_AddRef
+004010F4  .text     Import      &MSVBVM60.__vbaGenerateBoundsError
+004010F8  .text     Import      &MSVBVM60.__vbaStrCmp
+004010FC  .text     Import      &MSVBVM60.__vbaVarTstEq
+00401100  .text     Import      &MSVBVM60.__vbaAryConstruct2
+00401104  .text     Import      &MSVBVM60.__vbaR4Str
+00401108  .text     Import      &MSVBVM60.__vbaObjVar
+0040110C  .text     Import      &MSVBVM60.__vbaI2I4
+00401110  .text     Import      &MSVBVM60.DllFunctionCall
+00401114  .text     Import      &MSVBVM60.__vbaVarLateMemSt
+00401118  .text     Import      &MSVBVM60.__vbaVarOr
+0040111C  .text     Import      &MSVBVM60.__vbaStrR4
+00401120  .text     Import      &MSVBVM60._adj_fpatan
+00401124  .text     Import      &MSVBVM60.__vbaR4Var
+00401128  .text     Import      &MSVBVM60.__vbaFixstrConstruct
+0040112C  .text     Import      &MSVBVM60.__vbaLateIdCallLd
+00401130  .text     Import      &MSVBVM60.__vbaStrR8
+00401134  .text     Import      &MSVBVM60.__vbaRecUniToAnsi
+00401138  .text     Import      &MSVBVM60.EVENT_SINK_Release
+00401140  .text     Import      &MSVBVM60._CIsqrt
+00401144  .text     Import      &MSVBVM60.__vbaVarAnd
+00401148  .text     Import      &MSVBVM60.EVENT_SINK_QueryInterface
+0040114C  .text     Import      &MSVBVM60.__vbaVarMul
+00401150  .text     Import      &MSVBVM60.__vbaExceptHandler
+00401154  .text     Import      &MSVBVM60.__vbaStrToUnicode
+00401158  .text     Import      &MSVBVM60.__vbaInputFile
+0040115C  .text     Import      &MSVBVM60._adj_fprem
+00401160  .text     Import      &MSVBVM60._adj_fdivr_m64
+00401164  .text     Import      &MSVBVM60.__vbaI2Str
+0040116C  .text     Import      &MSVBVM60.__vbaFPException
+00401170  .text     Import      &MSVBVM60.__vbaStrVarVal
+00401174  .text     Import      &MSVBVM60.__vbaVarCat
+0040117C  .text     Import      &MSVBVM60.__vbaI2Var
+00401180  .text     Import      &MSVBVM60.__vbaStopExe
+0040118C  .text     Import      &MSVBVM60._CIlog
+00401190  .text     Import      &MSVBVM60.__vbaErrorOverflow
+00401194  .text     Import      &MSVBVM60.__vbaFileOpen
+00401198  .text     Import      &MSVBVM60.__vbaInStr
+0040119C  .text     Import      &MSVBVM60.__vbaR8Str
+004011A0  .text     Import      &MSVBVM60.__vbaNew2
+004011A8  .text     Import      &MSVBVM60._adj_fdiv_m32i
+004011AC  .text     Import      &MSVBVM60._adj_fdivr_m32i
+004011B0  .text     Import      &MSVBVM60.__vbaStrCopy
+004011B4  .text     Import      &MSVBVM60.__vbaI4Str
+004011B8  .text     Import      &MSVBVM60.__vbaFreeStrList
+004011BC  .text     Import      &MSVBVM60._adj_fdivr_m32
+004011C0  .text     Import      &MSVBVM60.__vbaR8Var
+004011C4  .text     Import      &MSVBVM60.__vbaPowerR8
+004011C8  .text     Import      &MSVBVM60._adj_fdiv_r
+004011D0  .text     Import      &MSVBVM60.__vbaVarTstNe
+004011D8  .text     Import      &MSVBVM60.__vbaI4Var
+004011DC  .text     Import      &MSVBVM60.__vbaVarCmpEq
+004011E0  .text     Import      &MSVBVM60.__vbaLateMemCall
+004011E4  .text     Import      &MSVBVM60.__vbaVarAdd
+004011E8  .text     Import      &MSVBVM60.__vbaStrToAnsi
+004011EC  .text     Import      &MSVBVM60.__vbaVarDup
+004011F8  .text     Import      &MSVBVM60.__vbaFpI2
+004011FC  .text     Import      &MSVBVM60.__vbaVarLateMemCallLd
+00401200  .text     Import      &MSVBVM60.__vbaVarTstGe
+00401208  .text     Import      &MSVBVM60.__vbaFpI4
+00401210  .text     Import      &MSVBVM60.__vbaR8IntI2
+00401214  .text     Import      &MSVBVM60._CIatan
+0040121C  .text     Import      &MSVBVM60.__vbaStrMove
+00401224  .text     Import      &MSVBVM60._allmul
+00401228  .text     Import      &MSVBVM60.__vbaLateIdSt
+0040122C  .text     Import      &MSVBVM60._CItan
+00401230  .text     Import      &MSVBVM60.__vbaFPInt
+00401234  .text     Import      &MSVBVM60.__vbaVarForNext
+00401238  .text     Import      &MSVBVM60.__vbaFpCSngR8
+0040123C  .text     Import      &MSVBVM60._CIexp
+00401240  .text     Import      &MSVBVM60.__vbaFreeObj
+00401244  .text     Import      &MSVBVM60.__vbaRecAssign
+00401248  .text     Import      &MSVBVM60.__vbaFreeStr
+00B41053  .NewIT    Import      &LunaDll.TestFunc
+0040102C  .text     Import      &MSVBVM60.#696                           MSVBVM60.rtcCharValueBstr
+00401040  .text     Import      &MSVBVM60.#516                           MSVBVM60.rtcAnsiValueBstr
+0040104C  .text     Import      &MSVBVM60.#518                           MSVBVM60.rtcLowerCaseVar
+00401090  .text     Import      &MSVBVM60.#593                           MSVBVM60.rtcRandomNext
+00401098  .text     Import      &MSVBVM60.#300                           MSVBVM60.GetMem2
+0040109C  .text     Import      &MSVBVM60.#594                           MSVBVM60.rtcRandomize
+004010A8  .text     Import      &MSVBVM60.#595                           MSVBVM60.rtcMsgBox
+004010B8  .text     Import      &MSVBVM60.#598                           MSVBVM60.rtcDoEvents
+004010C0  .text     Import      &MSVBVM60.#306                           MSVBVM60.PutMem2
+004010D8  .text     Import      &MSVBVM60.#709                           MSVBVM60.rtcInStrRev
+004010DC  .text     Import      &MSVBVM60.#631                           MSVBVM60.rtcMidCharBstr
+004010E0  .text     Import      &MSVBVM60.#632                           MSVBVM60.rtcMidCharVar
+004010F0  .text     Import      &MSVBVM60.#528                           MSVBVM60.rtcUpperCaseVar
+0040113C  .text     Import      &MSVBVM60.#600                           MSVBVM60.rtcShell
+00401168  .text     Import      &MSVBVM60.#608                           MSVBVM60.rtcVarBstrFromAnsi
+00401178  .text     Import      &MSVBVM60.#535                           MSVBVM60.rtcGetTimer
+00401184  .text     Import      &MSVBVM60.#537                           MSVBVM60.rtcBstrFromAnsi
+00401188  .text     Import      &MSVBVM60.#645                           MSVBVM60.rtcDir
+004011A4  .text     Import      &MSVBVM60.#571                           MSVBVM60.rtcEndOfFile
+004011CC  .text     Import      &MSVBVM60.#100                           MSVBVM60.ThunRTMain
+004011D4  .text     Import      &MSVBVM60.#579                           MSVBVM60.rtcGetFileAttr
+004011F0  .text     Import      &MSVBVM60.#613                           MSVBVM60.rtcVarStrFromVar
+004011F4  .text     Import      &MSVBVM60.#614                           MSVBVM60.rtcSqr
+00401204  .text     Import      &MSVBVM60.#616                           MSVBVM60.rtcLeftCharBstr
+0040120C  .text     Import      &MSVBVM60.#617                           MSVBVM60.rtcLeftCharVar
+00401218  .text     Import      &MSVBVM60.#618                           MSVBVM60.rtcRightCharBstr
+00401220  .text     Import      &MSVBVM60.#619                           MSVBVM60.rtcRightCharVar
+0040124C  .text     Import      &MSVBVM60.#581                           MSVBVM60.rtcR8ValFromBstr
+00400000            Analyser    <STRUCT IMAGE_DOS_HEADER>
+004000B8            Analyser    <STRUCT IMAGE_NT_SIGNATURE>
+004000BC            Analyser    <STRUCT IMAGE_FILE_HEADER>
+004000D0            Analyser    <STRUCT IMAGE_OPTIONAL_HEADER>
+00400130            Analyser    <STRUCT IMAGE_DATA_DIRECTORY>
+004001B0            Analyser    <STRUCT IMAGE_SECTION_HEADER>
+004001D8            Analyser    <STRUCT IMAGE_SECTION_HEADER>
+00400200            Analyser    <STRUCT IMAGE_SECTION_HEADER>
+00400228            Analyser    <STRUCT IMAGE_SECTION_HEADER>
+00400250            Analyser    <STRUCT IMAGE_SECTION_HEADER>

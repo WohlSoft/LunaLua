@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8D1C2797-8D37-4EA9-BCD9-F3262F89B66C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>LunaDll</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <AssemblerOutput>All</AssemblerOutput>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Autocode.h" />
+    <ClInclude Include="AutocodeManager.h" />
+    <ClInclude Include="Blocks.h" />
+    <ClInclude Include="CellManager.h" />
+    <ClInclude Include="CSprite.h" />
+    <ClInclude Include="CSpriteManager.h" />
+    <ClInclude Include="DeathCounter.h" />
+    <ClInclude Include="DeathRecord.h" />
+    <ClInclude Include="Defines.h" />
+    <ClInclude Include="BMPBox.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hitbox.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Layer.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelCodes.h" />
+    <ClInclude Include="Logging.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="MiscFuncs.h" />
+    <ClInclude Include="NPCs.h" />
+    <ClInclude Include="PlayerMOB.h" />
+    <ClInclude Include="RenderBitmapOp.h" />
+    <ClInclude Include="Rendering.h" />
+    <ClInclude Include="RenderOp.h" />
+    <ClInclude Include="RenderRectOp.h" />
+    <ClInclude Include="RenderString.h" />
+    <ClInclude Include="SMBXEvents.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="SpriteFuncs.h" />
+    <ClInclude Include="TriggerZone.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AC_HeartSystem.cpp" />
+    <ClCompile Include="AC_LunaControl.cpp" />
+    <ClCompile Include="Autocode.cpp" />
+    <ClCompile Include="AutocodeManager.cpp" />
+    <ClCompile Include="Blocks.cpp" />
+    <ClCompile Include="CellManager.cpp" />
+    <ClCompile Include="CSprite.cpp" />
+    <ClCompile Include="CSpriteManager.cpp" />
+    <ClCompile Include="DeathCounter.cpp" />
+    <ClCompile Include="DeathRecord.cpp" />
+    <ClCompile Include="dlltestlvlCode.cpp" />
+    <ClCompile Include="Docopoper-AbstractAssault.lvl.cpp" />
+    <ClCompile Include="Docopoper-Calleoca.cpp" />
+    <ClCompile Include="EnumCmd.cpp" />
+    <ClCompile Include="EuroShellRandD.lvl.cpp" />
+    <ClCompile Include="BMPBox.cpp" />
+    <ClCompile Include="GenComp.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hitbox.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="JosephStaleknight-CurtainTortoise.lvl.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Kil-DemosBrain.cpp" />
+    <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MiscFuncs.cpp" />
+    <ClCompile Include="NPCs.cpp" />
+    <ClCompile Include="PlayerMOB.cpp" />
+    <ClCompile Include="RenderBitmapOp.cpp" />
+    <ClCompile Include="Rendering.cpp" />
+    <ClCompile Include="RenderRectOp.cpp" />
+    <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp" />
+    <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp" />
+    <ClCompile Include="SAJewers-Snowboardin.cpp" />
+    <ClCompile Include="SMBXEvent.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SpriteBehaviorFuncs.cpp" />
+    <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="SpriteDrawFuncs.cpp" />
+    <ClCompile Include="Talkhaus-Science_Final_Battle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scratch.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

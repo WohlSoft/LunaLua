@@ -1,0 +1,42 @@
+#include "Blocks.h"
+
+Block* Blocks::Get(int index) {
+	if(GM_BLOCKS_PTR == 0 || index < 0 || index > GM_BLOCK_COUNT) {
+		return NULL;
+	} else {
+		return &((GetBase())[index]);
+	}
+}
+
+bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
+	char* dbg = "COLLISION TEST DBG";
+	Block* blocks = Blocks::GetBase();
+	Block* block = 0;
+	double playerX = demo->CurXPos - 0.20;
+	double playerY = demo->CurYPos - 0.20;
+	double playerX2 = demo->CurXPos + demo->Width + 0.20;
+	double playerY2 = demo->CurYPos + demo->Height + 0.20;
+
+	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
+		if(blocks[i].BlockType == type) {
+			block = &blocks[i];
+
+			if(playerX > block->XPos + block->W ||
+				playerX2 < block->XPos  ||
+				playerY > block->YPos + block->H ||
+				playerY2 < block->YPos)
+				continue;
+
+			if(TestCollision(demo, block) == sought)
+				return true;
+		}
+	}
+	return false; // no collision
+}
+
+
+int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
+	typedef int colfunc(void*, void*);
+	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
+	return f(&pMobPOS->CurXPos, &pBlockPOS->XPos);
+}
