@@ -35,6 +35,7 @@ dlldata.c
 *.ilk
 *.meta
 *.obj
+*.o
 *.pch
 *.pdb
 *.pgc
@@ -172,3 +173,35 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+*.slo
+*.lo
+*.o
+*.a
+*.la
+*.lai
+*.so
+*.dll
+*.dylib
+
+# Qt-es
+
+*.pro.user
+*.pro.user.*
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Makefile
+*-build-*
+*build-*
+bin
+
+# ignore Qt-Makefile
+*.Debug
+*.Release
+
+#git related
+
++*.swp
+*.db
+*_plugin_import.cpp
