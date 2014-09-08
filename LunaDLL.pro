@@ -1,7 +1,12 @@
 TEMPLATE = lib
-CONFIG += console
+
+CONFIG += static
 CONFIG -= app_bundle
 CONFIG -= qt
+
+TARGET = LunaDLL
+
+DEFINES += LunaDLL
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
@@ -36,7 +41,6 @@ SOURCES += \
     LunaDll/NPCs.cpp \
     LunaDll/PerformanceTimer.cpp \
     LunaDll/PlayerMOB.cpp \
-    LunaDll/PngRender.cpp \
     LunaDll/RenderBitmapOp.cpp \
     LunaDll/Rendering.cpp \
     LunaDll/RenderRectOp.cpp \
@@ -76,7 +80,6 @@ HEADERS += \
     LunaDll/NPCs.h \
     LunaDll/PerformanceTimer.h \
     LunaDll/PlayerMOB.h \
-    LunaDll/PngRender.h \
     LunaDll/RenderBitmapOp.h \
     LunaDll/Rendering.h \
     LunaDll/RenderOp.h \
