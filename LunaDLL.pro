@@ -1,12 +1,14 @@
 TEMPLATE = lib
 
-CONFIG += static
+CONFIG += dll
 CONFIG -= app_bundle
 CONFIG -= qt
 
 TARGET = LunaDLL
+OBJECTS_DIR = release/obj
 
 DEFINES += LunaDLL
+DEFINES += -DX_EXPORT=Q_DECL_EXPORT
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
@@ -53,8 +55,6 @@ SOURCES += \
     LunaDll/SpriteComponent.cpp \
     LunaDll/SpriteDrawFuncs.cpp \
     LunaDll/Talkhaus-Science_Final_Battle.cpp
-
-OTHER_FILES +=
 
 HEADERS += \
     LunaDll/Autocode.h \
