@@ -5,10 +5,15 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 TARGET = LunaDLL
-OBJECTS_DIR = release/obj
+#OBJECTS_DIR = release/obj
 
-DEFINES += LunaDLL
-DEFINES += -DX_EXPORT=Q_DECL_EXPORT
+DEFINES += LunaDLL_LIBRARY LunaDLL_EXPORTS _USRDLL
+DEFINES += DX_EXPORT=Q_DECL_EXPORT
+
+INCLUDEPATH = LunaDLL
+
+LIBS += kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib \
+ oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib Gdiplus.lib odbccp32.lib
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
@@ -90,4 +95,7 @@ HEADERS += \
     LunaDll/SpriteComponent.h \
     LunaDll/SpriteFuncs.h \
     LunaDll/TriggerZone.h
+
+OTHER_FILES += \
+    LunaDll/scratch.txt
 
