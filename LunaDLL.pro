@@ -52,7 +52,6 @@ SOURCES += \
     LunaDll/Main.cpp \
     LunaDll/MiscFuncs.cpp \
     LunaDll/NPCs.cpp \
-    LunaDll/PerformanceTimer.cpp \
     LunaDll/PlayerMOB.cpp \
     LunaDll/RenderBitmapOp.cpp \
     LunaDll/Rendering.cpp \
@@ -60,7 +59,6 @@ SOURCES += \
     LunaDll/SAJewers-QraestoliaCaverns.lvl.cpp \
     LunaDll/SAJewers-Snowboardin.cpp \
     LunaDll/SMBXEvent.cpp \
-    LunaDll/SMBXEvents.cpp \
     LunaDll/Sound.cpp \
     LunaDll/SpriteBehaviorFuncs.cpp \
     LunaDll/SpriteComponent.cpp \
@@ -89,7 +87,6 @@ HEADERS += \
     LunaDll/Main.h \
     LunaDll/MiscFuncs.h \
     LunaDll/NPCs.h \
-    LunaDll/PerformanceTimer.h \
     LunaDll/PlayerMOB.h \
     LunaDll/RenderBitmapOp.h \
     LunaDll/Rendering.h \
