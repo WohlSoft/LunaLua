@@ -17,6 +17,9 @@
 #include "Input.h"
 #include "SMBXEvents.h"
 
+//Lua Part
+#include "LuaMain/LunaLuaMain.h"
+
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 {
@@ -52,6 +55,8 @@ int OnLvlLoad() {
 
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
+
+    LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
 
 	if(gLunaEnabled) {
 

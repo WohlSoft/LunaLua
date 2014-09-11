@@ -49,7 +49,7 @@ void AutocodeManager::ReadFile(wstring dir_path) {
 	wstring full_path = dir_path.append(Level::GetName());	
 	full_path = removeExtension(full_path);
 	full_path = full_path.append(L"\\");
-	full_path = full_path.append(AUTOCODE_FNAME);	
+    full_path = full_path.append(AUTOCODE_FNAME);
 
 	wifstream code_file(full_path, ios::binary|ios::in);	
 	if(code_file.is_open() == false) {

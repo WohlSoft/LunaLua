@@ -11,6 +11,7 @@
 #include "Level.h"
 #include <windows.h>
 #include <time.h>
+#include "LuaMain/LunaLuaMain.h"
 
 using namespace std;
 
@@ -886,7 +887,7 @@ void Autocode::Do(bool init) {
 		// DEBUG
 		case AT_DebugPrint: {
 
-            gLunaRender.SafePrint(L"WOHLHABEND NETWORKS FORK", 3, 50, 200);
+            gLunaRender.SafePrint(L"WOHLHABEND NETWORKS FORKI", 3, 50, 200);
 
 			gLunaRender.SafePrint(L"LUNADLL VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250);
 			//gLunaRender.SafePrint(, 3, 340, 250);

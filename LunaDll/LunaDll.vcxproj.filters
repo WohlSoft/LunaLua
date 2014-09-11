@@ -79,6 +79,9 @@
     <Filter Include="Header Files\CellManager">
       <UniqueIdentifier>{09b072dc-ab35-4c99-af25-ddfcb6524686}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lua">
+      <UniqueIdentifier>{88865528-ba56-4172-91e3-0e8425085401}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -176,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="CellManager.h">
       <Filter>Header Files\CellManager</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaMain\LunaLuaMain.h">
+      <Filter>Header Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -304,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="GenComp.cpp">
       <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LunaLuaMain.cpp">
+      <Filter>Header Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

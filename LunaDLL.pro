@@ -10,7 +10,7 @@ TARGET = LunaDLL
 DEFINES += LunaDLL_LIBRARY LunaDLL_EXPORTS _USRDLL
 DEFINES += DX_EXPORT=Q_DECL_EXPORT NDEBUG _WINDOWS _USRDLL LUNADLL_EXPORTS
 
-INCLUDEPATH += LunaDLL LunaDll/libs/luabind-include/luabind
+INCLUDEPATH += LunaDLL LunaDll/libs/luabind-include
 
 CONFIG += create_prl
 CONFIG += link_prl
@@ -18,8 +18,8 @@ CONFIG += link_prl
 LIBS += kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib Gdiplus.lib
 LIBS += -L$$PWD/LunaDll/libs/luabind-lib/ -llibluabind
 
-INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include/luabind
-DEPENDPATH += $$PWD/LunaDll/libs/luabind-include/luabind
+INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include
+DEPENDPATH += $$PWD/LunaDll/libs/luabind-include
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
@@ -65,7 +65,8 @@ SOURCES += \
     LunaDll/SpriteBehaviorFuncs.cpp \
     LunaDll/SpriteComponent.cpp \
     LunaDll/SpriteDrawFuncs.cpp \
-    LunaDll/Talkhaus-Science_Final_Battle.cpp
+    LunaDll/Talkhaus-Science_Final_Battle.cpp \
+    LunaDll/LuaMain/LunaLuaMain.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -100,7 +101,8 @@ HEADERS += \
     LunaDll/Sound.h \
     LunaDll/SpriteComponent.h \
     LunaDll/SpriteFuncs.h \
-    LunaDll/TriggerZone.h
+    LunaDll/TriggerZone.h \
+    LunaDll/LuaMain/LunaLuaMain.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt

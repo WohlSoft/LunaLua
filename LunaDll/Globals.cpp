@@ -97,7 +97,7 @@ void InitGlobals() {
 	gDeathCounter.TryLoadStats();
 	if(gDeathCounter.mStatFileOK == false)
 		gDeathCounter.mEnabled = false;
-
+	
 	/// Init autocode manager	
 	HMODULE hModule = GetModuleHandleW(NULL);
 	WCHAR path[MAX_PATH];
