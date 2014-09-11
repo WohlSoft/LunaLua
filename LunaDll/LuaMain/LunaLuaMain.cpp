@@ -39,7 +39,6 @@ void LunaLua::init(wstring main_path)
 	std::wstring wluacode((std::istreambuf_iterator<wchar_t>(code_file)), std::istreambuf_iterator<wchar_t>());
     code_file.close();
     std::string luacode = utf8_encode(wluacode);
-    windowDebug(luacode.c_str());
     int errcode = luaL_dostring(mainState, luacode.c_str());
     
 	using namespace luabind;
@@ -49,7 +48,6 @@ void LunaLua::init(wstring main_path)
 	];
 
     if(errcode == 0){
-        dbg(L"Fine!");
     }else{
         dbg(L"Error");
         return;
@@ -61,7 +59,6 @@ void LunaLua::init(wstring main_path)
 	catch (error& e)
 	{
 		object error_msg(from_stack(e.state(), -1));
-		windowDebug(e.what());
         windowDebug(object_cast<const char*>(error_msg));
 	}
 
