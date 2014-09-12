@@ -68,7 +68,7 @@ void LunaLua::init(wstring main_path)
     if(!(errcode == 0)){
         object error_msg(from_stack(mainState, -1));
         windowDebug(object_cast<const char*>(error_msg));
-        lua_pop(GetLua(), 1);
+        lua_pop(mainState, 1);
         TryClose();
         return;
     }
@@ -82,7 +82,7 @@ void LunaLua::init(wstring main_path)
 	{
         object error_msg(from_stack(mainState, -1));
         windowDebug(object_cast<const char*>(error_msg));
-        lua_pop(GetLua(), 1);
+        lua_pop(mainState, 1);
         TryClose();
 	}
 }
