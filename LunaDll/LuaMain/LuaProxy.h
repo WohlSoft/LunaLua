@@ -7,3 +7,6 @@
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 
+namespace LuaProxy {
+    void windowDebug(const char* debugText);
+}

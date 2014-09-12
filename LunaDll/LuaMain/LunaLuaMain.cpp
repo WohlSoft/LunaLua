@@ -2,7 +2,9 @@
 #include "../Level.h"
 #include "../MiscFuncs.h"
 #include "../PlayerMOB.h"
+
 #include "LuaHelper.h"
+#include "LuaProxy.h"
 #include <string>
 
 
@@ -16,10 +18,6 @@ std::string utf8_encode(const std::wstring &wstr)
 
 void dbg(std::wstring txt){
     MessageBoxW(0, txt.c_str(), L"Debug", 0);
-}
-
-void windowDebug(const char* debugText){
-    MessageBoxA(0, debugText, "Debug", 0);
 }
 
 void windowError(const char* errorText){
@@ -62,12 +60,12 @@ void LunaLua::init(wstring main_path)
     
 	module(mainState)
 	[
-        def("windowDebug", &windowDebug)
+        def("windowDebug", &LuaProxy::windowDebug)
 	];
 
     if(!(errcode == 0)){
         object error_msg(from_stack(mainState, -1));
-        windowDebug(object_cast<const char*>(error_msg));
+        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         lua_pop(mainState, 1);
         TryClose();
         return;
@@ -81,7 +79,7 @@ void LunaLua::init(wstring main_path)
 	catch (error& e)
 	{
         object error_msg(from_stack(mainState, -1));
-        windowDebug(object_cast<const char*>(error_msg));
+        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         lua_pop(mainState, 1);
         TryClose();
 	}
@@ -93,6 +91,7 @@ void LunaLua::TryClose()
 {
     if(mainState)
         lua_close(mainState);
+    mainState = 0;
 }
 
 
@@ -116,7 +115,9 @@ void LunaLua::Do()
     }
     catch (luabind::error& e)
 	{
-        luabind::object error_msg(luabind::from_stack(e.state(), -1));
-        windowDebug(luabind::object_cast<const char*>(error_msg));
+		luabind::object error_msg(luabind::from_stack(mainState, -1));
+		LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
+		lua_pop(mainState, 1);
+		TryClose();
     }
 }
