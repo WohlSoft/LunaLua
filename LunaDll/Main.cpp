@@ -123,6 +123,7 @@ int TestFunc() {
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
 
+	LunaLua::Do();
 	if(gLunaEnabled) {
 
 		// Update lag timer		

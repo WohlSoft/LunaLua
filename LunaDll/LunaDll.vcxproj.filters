@@ -183,6 +183,9 @@
     <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>Header Files\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LuaHelper.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -312,6 +315,9 @@
       <Filter>Header Files\AutoCode\Commands</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LunaLuaMain.cpp">
+      <Filter>Header Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaHelper.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>

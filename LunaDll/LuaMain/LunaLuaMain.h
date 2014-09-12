@@ -10,4 +10,6 @@
 namespace LunaLua{
 	static lua_State* mainState = 0;
     void init(std::wstring main_path);
+    void Do();
+    void TryClose();
 }

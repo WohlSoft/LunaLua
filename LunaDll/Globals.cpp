@@ -5,6 +5,7 @@
 #include "Shlwapi.h"
 #include <time.h>
 #include "Logging.h"
+#include "LuaMain/LunaLuaMain.h"
 
 // Global settings
 bool gLunaEnabled;
@@ -122,6 +123,7 @@ void ResetFreeGlob() {
 
 /// CLEAN UP
 void CleanUp() {
+    LunaLua::TryClose();
 	if(gpFreeGlob)
 		delete[] gpFreeGlob;
 }

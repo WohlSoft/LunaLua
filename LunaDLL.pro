@@ -64,7 +64,9 @@ SOURCES += \
     LunaDll/SpriteComponent.cpp \
     LunaDll/SpriteDrawFuncs.cpp \
     LunaDll/Talkhaus-Science_Final_Battle.cpp \
-    LunaDll/LuaMain/LunaLuaMain.cpp
+    LunaDll/LuaMain/LunaLuaMain.cpp \
+    LunaDll/LuaMain/LuaHelper.cpp \
+    LunaDll/LuaMain/LuaProxy.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -99,7 +101,9 @@ HEADERS += \
     LunaDll/SpriteComponent.h \
     LunaDll/SpriteFuncs.h \
     LunaDll/TriggerZone.h \
-    LunaDll/LuaMain/LunaLuaMain.h
+    LunaDll/LuaMain/LunaLuaMain.h \
+    LunaDll/LuaMain/LuaHelper.h \
+    LunaDll/LuaMain/LuaProxy.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
