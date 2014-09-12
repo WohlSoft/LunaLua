@@ -60,13 +60,30 @@ void LunaLua::init(wstring main_path)
     
 	module(mainState)
 	[
-        def("windowDebug", &LuaProxy::windowDebug)
+        def("windowDebug", &LuaProxy::windowDebug),
+        def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
+        def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
+        class_<RECT>("RECT")
+            .def_readwrite("left", &RECT::left)
+            .def_readwrite("top", &RECT::top)
+            .def_readwrite("right", &RECT::right)
+            .def_readwrite("bottom", &RECT::bottom),
+
+        class_<LuaProxy::Player>("Player")
+            .def(constructor<>())
+            .def("kill", &LuaProxy::Player::kill)
+            .def("harm", &LuaProxy::Player::harm)
+            .property("screen", &LuaProxy::Player::screen)
+            .property("section", &LuaProxy::Player::section)
+            .property("x", &LuaProxy::Player::x, &LuaProxy::Player::setX)
+            .property("y", &LuaProxy::Player::y, &LuaProxy::Player::setY)
+            .property("speedX", &LuaProxy::Player::speedX, &LuaProxy::Player::setSpeedX)
+            .property("speedY", &LuaProxy::Player::speedY, &LuaProxy::Player::setSpeedY)
 	];
 
     if(!(errcode == 0)){
         object error_msg(from_stack(mainState, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
-        lua_pop(mainState, 1);
         TryClose();
         return;
     }
@@ -80,7 +97,6 @@ void LunaLua::init(wstring main_path)
 	{
         object error_msg(from_stack(mainState, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
-        lua_pop(mainState, 1);
         TryClose();
 	}
 }
@@ -98,7 +114,7 @@ void LunaLua::TryClose()
 void LunaLua::Do()
 {
     PlayerMOB* demo = Player::Get(1);
-    if(demo == 0)
+    if(demo == 0 || mainState == 0)
         return;
 
     try
@@ -117,7 +133,6 @@ void LunaLua::Do()
 	{
 		luabind::object error_msg(luabind::from_stack(mainState, -1));
 		LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
-		lua_pop(mainState, 1);
 		TryClose();
     }
 }
