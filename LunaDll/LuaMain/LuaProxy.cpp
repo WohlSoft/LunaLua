@@ -92,4 +92,26 @@ void LuaProxy::Player::setSpeedY(double speedY)
     ::Player::Get(1)->CurXSpeed = speedY;
 }
 
+int LuaProxy::Player::powerup()
+{
+    return (int)::Player::Get(1)->CurrentPowerup;
+}
+
+void LuaProxy::Player::setPowerup(int powerup)
+{
+    if(powerup > 0 && powerup < 9)
+        ::Player::Get(1)->CurrentPowerup = powerup;
+}
+
+int LuaProxy::Player::reservePowerup()
+{
+    return (int)::Player::Get(1)->PowerupBoxContents;
+}
+
+void LuaProxy::Player::setReservePowerup(int reservePowerup)
+{
+    if(reservePowerup >= 0)
+        ::Player::Get(1)->PowerupBoxContents = reservePowerup;
+}
+
 

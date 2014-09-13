@@ -28,5 +28,9 @@ namespace LuaProxy {
         void setSpeedX(double speedX);
         double speedY();
         void setSpeedY(double speedY);
+        int powerup();
+        void setPowerup(int powerup);
+        int reservePowerup();
+        void setReservePowerup(int reservePowerup);
     };
 }

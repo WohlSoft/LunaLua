@@ -40,6 +40,8 @@ void LunaLua::init(wstring main_path)
     lua_call(mainState,0,0);
     lua_pushcfunction(mainState, luaopen_debug);
     lua_call(mainState,0,0);
+    lua_pushcfunction(mainState, luaopen_os);
+    lua_call(mainState,0,0);
 
 
 	wstring full_path = main_path.append(Level::GetName());	
@@ -56,8 +58,32 @@ void LunaLua::init(wstring main_path)
 	std::wstring wluacode((std::istreambuf_iterator<wchar_t>(code_file)), std::istreambuf_iterator<wchar_t>());
     code_file.close();
     std::string luacode = utf8_encode(wluacode);
+
+    //remove nearly all os code
+    object _G = globals(mainState);
+    object osTable = _G["os"];
+    osTable["execute"] = object();
+    osTable["exit"] = object();
+    osTable["getenv"] = object();
+    osTable["remove"] = object();
+    osTable["rename"] = object();
+    osTable["setlocal"] = object();
+    osTable["tmpname"] = object();
+
     int errcode = luaL_loadbuffer(mainState, luacode.c_str(), luacode.length(), "lunadll.lua")  || lua_pcall(mainState, 0, LUA_MULTRET, 0);
     
+
+    //constants
+	_G["NONE"] = 0;
+    _G["SMALL"] = 1;
+    _G["BIG"] = 2;
+    _G["FIREFLOWER"] = 3;
+    _G["LEAF"] = 4;
+    _G["TANOOKIE"] = 5;
+    _G["HAMMER"] = 6;
+    _G["ICE"] = 7;
+	_G["INVISIBLE"] = 8;
+
 	module(mainState)
 	[
         def("windowDebug", &LuaProxy::windowDebug),
@@ -79,7 +105,12 @@ void LunaLua::init(wstring main_path)
             .property("y", &LuaProxy::Player::y, &LuaProxy::Player::setY)
             .property("speedX", &LuaProxy::Player::speedX, &LuaProxy::Player::setSpeedX)
             .property("speedY", &LuaProxy::Player::speedY, &LuaProxy::Player::setSpeedY)
+            .property("powerup", &LuaProxy::Player::powerup, &LuaProxy::Player::setPowerup)
+            .property("reservePowerup", &LuaProxy::Player::reservePowerup, &LuaProxy::Player::setReservePowerup)
+
 	];
+
+	_G["player"] = new LuaProxy::Player();
 
     if(!(errcode == 0)){
         object error_msg(from_stack(mainState, -1));
