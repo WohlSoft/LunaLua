@@ -95,6 +95,11 @@ void LunaLua::init(wstring main_path)
             .def_readwrite("right", &RECT::right)
             .def_readwrite("bottom", &RECT::bottom),
 
+        class_<LuaProxy::NPC>("NPC")
+            .def(constructor<int>())
+            .property("id", &LuaProxy::NPC::id)
+            .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection),
+
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
             .def("kill", &LuaProxy::Player::kill)
@@ -107,6 +112,7 @@ void LunaLua::init(wstring main_path)
             .property("speedY", &LuaProxy::Player::speedY, &LuaProxy::Player::setSpeedY)
             .property("powerup", &LuaProxy::Player::powerup, &LuaProxy::Player::setPowerup)
             .property("reservePowerup", &LuaProxy::Player::reservePowerup, &LuaProxy::Player::setReservePowerup)
+            .property("holdingNPC", &LuaProxy::Player::holdingNPC)
 
 	];
 
@@ -139,6 +145,7 @@ void LunaLua::TryClose()
     if(mainState)
         lua_close(mainState);
     mainState = 0;
+    lastSection = -1;
 }
 
 
@@ -152,6 +159,20 @@ void LunaLua::Do()
     {
         if(LuaHelper::is_function(mainState, "onLoop")){
             luabind::call_function<void>(mainState, "onLoop");
+        }
+
+        if(lastSection != demo->CurrentSection){
+            std::string curSecLoop = "onLoadSection";
+
+            if(LuaHelper::is_function(mainState, curSecLoop.c_str())){
+                luabind::call_function<void>(mainState, curSecLoop.c_str()); //onLoadSection
+            }
+
+            curSecLoop = curSecLoop.append(std::to_string((long long)demo->CurrentSection));
+            if(LuaHelper::is_function(mainState, curSecLoop.c_str())){
+                luabind::call_function<void>(mainState, curSecLoop.c_str()); //onLoadSection#
+            }
+            lastSection = demo->CurrentSection;
         }
 
         std::string curSecLoop = "onLoopSection";

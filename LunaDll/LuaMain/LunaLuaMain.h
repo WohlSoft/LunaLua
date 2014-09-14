@@ -8,6 +8,7 @@
 #include <luabind/detail/call_function.hpp>
 
 namespace LunaLua{
+    int lastSection;
 	static lua_State* mainState = 0;
     void init(std::wstring main_path);
     void Do();

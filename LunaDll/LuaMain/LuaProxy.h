@@ -13,6 +13,16 @@ namespace LuaProxy {
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
 
+    class NPC{
+    public:
+        NPC (int index);
+        int id();
+        int direction();
+        void setDirection(int direction);
+    private:
+        int m_index;
+    };
+
     class Player{
     public:
         Player ();
@@ -32,5 +42,8 @@ namespace LuaProxy {
         void setPowerup(int powerup);
         int reservePowerup();
         void setReservePowerup(int reservePowerup);
+        luabind::object holdingNPC(lua_State *L);
     };
+
+
 }

@@ -2,6 +2,8 @@
 #include "../Rendering.h"
 #include "../Globals.h"
 #include "../PlayerMOB.h"
+#include "../NPCs.h"
+
 
 
 std::wstring utf8_decode(const std::string &str)
@@ -114,4 +116,33 @@ void LuaProxy::Player::setReservePowerup(int reservePowerup)
         ::Player::Get(1)->PowerupBoxContents = reservePowerup;
 }
 
+luabind::object LuaProxy::Player::holdingNPC(lua_State *L)
+{
 
+    if(::Player::Get(1)->HeldNPCIndex != 0) {
+        return luabind::object(L, new NPC(::Player::Get(1)->HeldNPCIndex));
+    }
+
+    return luabind::object();
+}
+
+
+LuaProxy::NPC::NPC(int index)
+{
+    m_index = index;
+}
+
+int LuaProxy::NPC::id()
+{
+    return (int)::NPC::Get(m_index)->Identity;
+}
+
+int LuaProxy::NPC::direction()
+{
+    return (int)::NPC::Get(m_index)->FacingDirection;
+}
+
+void LuaProxy::NPC::setDirection(int direction)
+{
+    ::NPC::Get(m_index)->FacingDirection = (float)direction;
+}
