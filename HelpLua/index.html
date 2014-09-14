@@ -1,0 +1,486 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;	
+}
+
+h1 {
+	text-align: center;	
+}
+
+.over_title {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+#content {
+	margin: auto 20px 50px 20px;	
+}
+
+.code {	
+	font-family: "Courier New", Courier, monospace;
+	width: 100%;
+	height: 100%;
+}
+
+#eventwrapper {
+	color: #000;
+	background-color: #9FFFB0;
+}
+
+#classwrapper {
+	color: #000;
+	background-color: #DFF4A8;
+}
+
+#globalwrapper {
+	color: #000;
+	background-color: #F9AAA8;
+}
+
+#constantwrapper {
+	color: #000;
+	background-color: #A38EFF;
+}
+
+</style>
+<title>Lunadll for Lua Reference</title>
+</head>
+<body>
+<h1>LunaDll for Lua Tutorial/Reference</h1><br /><br />
+
+<div id="content">
+	<div id="eventwrapper">
+	<p class="over_title">Events:</p>
+    <p>Events are called by Lunadll if they exsist in the lua code.</p>
+    <hr />
+    <table border="1" width="100%">
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>function onLoad()</p>
+   	        <p>&nbsp;</p>
+    	    <p>end</p>
+          </div>
+        </td>
+        <td><p><b>onLoad</b> is called when the level editor or the game engine loads the level.</p></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>function onLoop()</p>
+   	        <p>&nbsp;</p>
+    	    <p>end</p>
+          </div>
+        </td>
+        <td>On each frame while the game runs <b>onLoop</b> is called.</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>function onLoopSection#()</p>
+   	        <p>&nbsp;</p>
+    	    <p>end</p>
+          </div>
+        </td>
+        <td>On each frame while the game runs in the specific section # <b>onLoopSection#</b> is called. Replace # with the sectionnumber 0-20. </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>function onLoadSection()</p>
+   	        <p>&nbsp;</p>
+    	    <p>end</p>
+          </div>
+        </td>
+        <td>In the first frameloop of a new section <b>onLoadSection</b> is called. </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>function onLoadSection#()</p>
+   	        <p>&nbsp;</p>
+    	    <p>end</p>
+          </div>
+        </td>
+        <td>In the first frameloop of  section # <b>onLoadSection#</b> is called.  Replace # with the sectionnumber 0-20.</td>
+      </tr>
+    </table>
+    </div>
+    
+    <hr />
+    <br></br>
+  <div id="classwrapper">
+    <p class="over_title">Classes:</p>
+    <p>Classes are holding a bunch of functions, fields, ect... for a specific object type.
+    They can be constructed or returned by a global function.</p>
+    <p><b>NOTE:</b> The square brackets &quot;[]&quot; are used to indicate the return-type/param and are not part of the actual code. In lua, variables are defined without a variable-type.</p>
+    <table border="1" width="100%">
+      <tr>
+        <th colspan="2">The <u>RECT</u> Structure</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>myRect = RECT()</p>
+          </div>
+        </td>
+        <td><p>Constructs a new RECT structure.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myRect.left</p>
+        </div></td>
+        <td>The &quot;left&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myRect.top</p>
+        </div></td>
+        <td>The &quot;top&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myRect.right</p>
+        </div></td>
+        <td>The &quot;right&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myRect.bottom</p>
+        </div></td>
+        <td>The &quot;bottom&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>This class provides fields to save &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot; as a int value. It is common used by other classes.</p></tr>
+    </table>
+    <br />
+    <table border="1" width="100%">
+      <tr>
+        <th colspan="2">The <u>NPC</u> Structure</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>myNPC = NPC([int] arrayindex)</p>
+          </div>
+        </td>
+        <td><p>Constructs a new NPC via internal arrayindex.</p>
+        <p>NOTE: Do not construct directly. Use function &quot;<strong>npcs()</strong>&quot; or &quot;<strong>findnpcs([int],[int])</strong>&quot; instead!</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myNPC.x</p>
+        </div></td>
+        <td>The x value of the npc.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myNPC.y</p>
+        </div></td>
+        <td>The y value of the npc.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myNPC.speedX</p>
+        </div></td>
+        <td>The x speed value of the npc.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myNPC.speedY</p>
+        </div></td>
+        <td>The y speed value of the npc.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myNPC.id</p>
+        </div></td>
+        <td>The npc-id of the npc.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] myNPC.direction</p>
+        </div></td>
+        <td><p>The face direction of the npc.</p>
+        <p><strong>NOTE:</strong> Setting the direction of a npc, resets the monumentum of the npc. You can modify the speedX value if you want to set your own monumentum.</p></td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>This class provides fields and functions to modify the npc. It is <strong>not recommended</strong> to save this class for later, as the internal arrayindex changes when enemies get killed. </p></tr>
+    </table>
+    <br /><br />
+    <table border="1" width="100%">
+      <tr>
+        <th colspan="2">The <u>Player</u> Class</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td>
+          <div class="code">
+    	    <p>player = Player()</p>
+          </div>
+        </td>
+        <td><p>Constructs a new Player class. All constructed players will always point to the first player.</p>
+        <p><b>NOTE:</b> It is recommended to use the constant &quot;<strong>player</strong>&quot; instead of constructing an own one. </p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>player:kill()</p>
+        </div></td>
+        <td>Kills the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>player:harm()</p>
+        </div></td>
+        <td>Harms the player (get a fake hit)</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] player.x</p>
+        </div></td>
+        <td>The x value of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] player.y</p>
+        </div></td>
+        <td>The y value of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] player.speedX</p>
+        </div></td>
+        <td>The x speed value of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] player.speedY</p>
+        </div></td>
+        <td>The y speed value of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] player.powerup</p>
+        </div></td>
+        <td>The powerup value of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] player.reservePowerup</p>
+        </div></td>
+        <td>The npc-id of the reserve powerup box.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int(readonly)] player.section</p></div></td>
+        <td>The current section of the player.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[class RECT(readonly)] player.screen</p>
+        </div></td>
+        <td>The player RECT to the screen.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[class NPC(readonly) or nil] player.holdingNPC</p>
+        </div></td>
+        <td>If the player holds the npc, it returns the NPC</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>This class provides fields and functions to modify the player/character.</p>
+          <p><b>NOTE</b>: It is recommended to use the constant &quot;<strong>player</strong>&quot; instead of constructing an own one.           </p></tr>
+    </table>
+    </div>
+	<p><br />
+	  <br />
+      <div id="globalwrapper">
+  <span class="over_title">Global functions:</span></p>
+  <p>Functions which can be globally accessed. They don't need any class to run.</p>
+    <hr />
+    <table border="1" width="100%">
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>windowDebug([string] text)</p>
+        </div></td>
+        <td><p>Displays a message box with the text provided.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>printText([string] text, [int] x, [int] y)</p>
+        </div></td>
+        <td>Displays text at x,y with the font-type 3.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>printText([string] text, [int] font-type, [int] x, [int y]</p>
+        </div></td>
+        <td>Displays text at x,y with the font-type of your choice.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[int] totalNPC()</p>
+        </div></td>
+        <td>Returns the number of NPCs in this level.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[NPC (array)] npcs()</p>
+        </div></td>
+        <td>Returns an array with all NPCs in this level.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[NPC (array)] findnpcs([int] npc-id, [int] section)</p>
+        </div></td>
+        <td>Returns an array filtered to npc-id and/or section. Use -1 or FIND_ANY to skip one of either filter.</td>
+      </tr>
+    </table>
+    </div>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <div id="constantwrapper">
+    <p><span class="over_title">Constants:</span></p>
+    <p>Constants are variables which hold values for specifc functions.</p>
+    <hr />
+    <table border="1" width="100%">
+      <tr>
+        <th>Constant</th>
+        <th>Recommended use</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIND_ANY</p>
+        </div></td>
+        <td><div class="code">
+          <p>function npcread</p>
+        </div></td>
+        <td><p>Ignores the filter of npcread</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>DIR_RIGHT</p>
+        </div></td>
+        <td><div class="code">
+          <p>myNPC.direction</p>
+        </div></td>
+        <td>Direction right</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>DIR_RANDOM</p></div></td>
+        <td><div class="code">
+          <p>myNPC.direction</p>
+        </div></td>
+        <td>Direction random</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>DIR_LEFT</p></div></td>
+        <td><div class="code">
+          <p>myNPC.direction</p>
+        </div></td>
+        <td>Direction left</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_SMALL</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>No powerup/Small</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_BIG</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Mushroom powerup/Big</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_FIREFLOWER</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Fireflower powerup</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_LEAF</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Leaf powerup</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_TANOOKIE</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Tanookie powerup</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_HAMMER</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Hammer powerup</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>PLAYER_ICE</p>
+        </div></td>
+        <td><div class="code">
+          <p>player.powerup</p>
+        </div></td>
+        <td>Ice powerup</td>
+      </tr>
+    </table>
+    <p><br />
+  </p>
+  </div>
+	<p></p>
+</div>
+
+
+</body>
+</html>
