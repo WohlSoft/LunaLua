@@ -120,7 +120,7 @@ luabind::object LuaProxy::Player::holdingNPC(lua_State *L)
 {
 
     if(::Player::Get(1)->HeldNPCIndex != 0) {
-        return luabind::object(L, new NPC(::Player::Get(1)->HeldNPCIndex));
+        return luabind::object(L, new NPC(::Player::Get(1)->HeldNPCIndex-1));
     }
 
     return luabind::object();
@@ -134,15 +134,125 @@ LuaProxy::NPC::NPC(int index)
 
 int LuaProxy::NPC::id()
 {
+    if(!isValid())
+        return 0;
     return (int)::NPC::Get(m_index)->Identity;
 }
 
-int LuaProxy::NPC::direction()
+float LuaProxy::NPC::direction()
 {
-    return (int)::NPC::Get(m_index)->FacingDirection;
+    if(!isValid())
+        return 0;
+    return ::NPC::Get(m_index)->FacingDirection;
 }
 
-void LuaProxy::NPC::setDirection(int direction)
+void LuaProxy::NPC::setDirection(float direction)
 {
-    ::NPC::Get(m_index)->FacingDirection = (float)direction;
+    if(!isValid())
+        return;
+
+    NPCMOB* npc =  ::NPC::Get(m_index);
+    setSpeedX(0.0);
+    npc->FacingDirection = direction;
+}
+
+double LuaProxy::NPC::x()
+{
+    if(!isValid())
+        return 0;
+    return ::NPC::Get(m_index)->Xpos;
+}
+
+void LuaProxy::NPC::setX(double x)
+{
+    if(!isValid())
+        return;
+    ::NPC::Get(m_index)->Xpos = x;
+}
+
+double LuaProxy::NPC::y()
+{
+    if(!isValid())
+        return 0;
+    return ::NPC::Get(m_index)->Ypos;
+}
+
+void LuaProxy::NPC::setY(double y)
+{
+    if(!isValid())
+        return;
+    ::NPC::Get(m_index)->Ypos;
+}
+
+double LuaProxy::NPC::speedX()
+{
+    if(!isValid())
+        return 0;
+    return *((double*)((&(*(byte*)::NPC::Get(m_index))) + 0x98));
+}
+
+void LuaProxy::NPC::setSpeedX(double speedX)
+{
+    if(!isValid())
+        return;
+    double* ptr=(double*)((&(*(byte*)::NPC::Get(m_index))) + 0x98);
+    *ptr = speedX;
+}
+
+double LuaProxy::NPC::speedY()
+{
+    if(!isValid())
+        return 0;
+    return *((double*)((&(*(byte*)::NPC::Get(m_index))) + 0xA0));
+}
+
+void LuaProxy::NPC::setSpeedY(double speedY)
+{
+    if(!isValid())
+        return;
+    double* ptr=(double*)((&(*(byte*)::NPC::Get(m_index))) + 0xA0);
+    *ptr = speedY;
+}
+
+bool LuaProxy::NPC::isValid()
+{
+    return !(m_index < 0 || m_index > GM_NPCS_COUNT);
+}
+
+
+int LuaProxy::totalNPCs()
+{
+    return (int)GM_NPCS_COUNT;
+}
+
+
+luabind::object LuaProxy::npcs(lua_State *L)
+{
+    luabind::object vnpcs = luabind::newtable(L);
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        vnpcs[i] = new LuaProxy::NPC(i);
+    }
+    return vnpcs;
+}
+
+
+luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
+{
+    luabind::object vnpcs = luabind::newtable(L);
+    int r = 0;
+
+    bool anyID = (ID == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc = NULL;
+
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = ::NPC::Get(i);
+        if(thisnpc->Identity == ID || anyID) {
+            if(::NPC::GetSection(thisnpc) == section || anySec) {
+                vnpcs[r] = LuaProxy::NPC(i);
+                ++r;
+            }
+        }
+    }
+    return vnpcs;
 }

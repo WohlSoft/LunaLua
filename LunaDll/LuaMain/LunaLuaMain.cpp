@@ -74,21 +74,28 @@ void LunaLua::init(wstring main_path)
     
 
     //constants
-	_G["NONE"] = 0;
-    _G["SMALL"] = 1;
-    _G["BIG"] = 2;
-    _G["FIREFLOWER"] = 3;
-    _G["LEAF"] = 4;
-    _G["TANOOKIE"] = 5;
-    _G["HAMMER"] = 6;
-    _G["ICE"] = 7;
-	_G["INVISIBLE"] = 8;
+    _G["PLAYER_SMALL"] = 1;
+    _G["PLAYER_BIG"] = 2;
+    _G["PLAYER_FIREFLOWER"] = 3;
+    _G["PLAYER_LEAF"] = 4;
+    _G["PLAYER_TANOOKIE"] = 5;
+    _G["PLAYER_HAMMER"] = 6;
+    _G["PLAYER_ICE"] = 7;
+
+    _G["FIND_ANY"] = -1;
+
+    _G["DIR_RIGHT"] = 1;
+    _G["DIR_RANDOM"] = 0;
+    _G["DIR_LEFT"] = -1;
 
 	module(mainState)
 	[
         def("windowDebug", &LuaProxy::windowDebug),
         def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
         def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
+        def("totalNPC", &LuaProxy::totalNPCs),
+        def("npcs", &LuaProxy::npcs),
+        def("findnpcs", &LuaProxy::findNPCs),
         class_<RECT>("RECT")
             .def_readwrite("left", &RECT::left)
             .def_readwrite("top", &RECT::top)
@@ -98,7 +105,11 @@ void LunaLua::init(wstring main_path)
         class_<LuaProxy::NPC>("NPC")
             .def(constructor<int>())
             .property("id", &LuaProxy::NPC::id)
-            .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection),
+            .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
+            .property("x", &LuaProxy::NPC::x, &LuaProxy::NPC::setX)
+            .property("y", &LuaProxy::NPC::y, &LuaProxy::NPC::setY)
+            .property("speedX", &LuaProxy::NPC::speedX, &LuaProxy::NPC::setSpeedX)
+            .property("speedY", &LuaProxy::NPC::speedY, &LuaProxy::NPC::setSpeedY),
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
@@ -147,7 +158,6 @@ void LunaLua::TryClose()
     mainState = 0;
     lastSection = -1;
 }
-
 
 void LunaLua::Do()
 {

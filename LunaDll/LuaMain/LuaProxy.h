@@ -12,14 +12,26 @@ namespace LuaProxy {
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
+    int totalNPCs();
+    luabind::object npcs(lua_State *L);
+    luabind::object findNPCs(int ID, int section, lua_State *L);
 
     class NPC{
     public:
         NPC (int index);
         int id();
-        int direction();
-        void setDirection(int direction);
+        float direction();
+        void setDirection(float direction);
+        double x();
+        void setX(double x);
+        double y();
+        void setY(double y);
+        double speedX();
+        void setSpeedX(double speedX);
+        double speedY();
+        void setSpeedY(double speedY);
     private:
+        bool isValid();
         int m_index;
     };
 
