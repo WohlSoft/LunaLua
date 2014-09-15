@@ -475,10 +475,117 @@ h1 {
         <td>Ice powerup</td>
       </tr>
     </table>
+    </div>
+    <p>&nbsp;</p>
+    <p><span class="over_title">Examples:</span></p>
+  <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>function onLoop()<br />
+            &#160;&#160;allNPCs = findnpcs(20,player.section)<br />
+            &#160;&#160;for k,v in pairs(allNPCs) do<br />
+            &#160;&#160;&#160;&#160;if(v.direction == DIR_RIGHT)then<br />
+            &#160;&#160;&#160;&#160;&#160;&#160;v.speedX = 5<br />
+            &#160;&#160;&#160;&#160;else<br />
+          &#160;&#160;&#160;&#160;&#160;&#160;v.speedX = -5</p>
+          <p>&#160;&#160;&#160;&#160;end<br />
+            &#160;&#160;end<br />
+            end<br />
+          </p>
+        </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Info: Makes every blue Shy-Guy running super fast.</p>
+        </td>
+      </tr>
+    </table>
+	<p></p><br />
+  <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>i = 0</p>
+          <p>function onLoad()<br />
+            &#160;&#160;i = 0<br />
+            end</p>
+          <p>function onLoop()<br />
+            &#160;&#160;i = i + 1<br />
+            &#160;&#160;if(i % 100 == 0)then<br />
+            &#160;&#160;&#160;&#160;allNPCs = findnpcs(20,player.section)<br />
+            &#160;&#160;&#160;&#160;for k,v in pairs(allNPCs) do<br />
+            &#160;&#160;&#160;&#160;&#160;&#160;v.speedY = -8<br />
+            &#160;&#160;&#160;&#160;end<br />
+            &#160;&#160;end<br />
+            end<br />
+          </p>
+</div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>Info: Makes every blue Shy-Guy jump every 100 frames.</p>
+        </td>
+      </tr>
+    </table>
     <p><br />
-  </p>
-  </div>
-	<p></p>
+    </p>
+  <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>function onLoop()<br />
+			&#160;&#160;if(player.y &gt; -200320)then<br />
+			&#160;&#160;&#160;&#160;player.speedY = -10<br />
+			&#160;&#160;end<br />
+			end<br />
+          </p>
+</div></td>
+      </tr>
+      <tr>
+        <td><p>Info: Let the player jump up when it reaches a specific y-value.</p></td>
+      </tr>
+    </table>
+    <p><br />
+    </p>
+  <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>i = 0</p>
+          <p>function onLoad()<br />
+            &#160;&#160;i = 0<br />
+            end</p>
+          <p>function onLoop()<br />
+            &#160;&#160;printText(&quot;RUNNING &quot;..tostring(i)..&quot; FRAMES&quot;, 30, 30)<br />
+            &#160;&#160;printText(&quot;PLAYER COOR &quot;..tostring(player.x)..&quot; &quot;..tostring(player.y), 30, 60)<br />
+          end</p>
+</div></td>
+      </tr>
+      <tr>
+        <td><p>Info: Let the player jump up when it reaches a specific y-value.</p></td>
+      </tr>
+    </table>
+    <p><br />
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>i = 0</p>
+          <p>function onLoad()<br />
+            &#160;&#160;i = 0<br />
+            end</p>
+          <p>function onLoop()<br />
+            &#160;&#160;i = i + 1<br />
+            &#160;&#160;if(i % 200 == 0)then<br />
+            &#160;&#160;&#160;&#160;player.powerup = math.random(1,7)<br />
+            &#160;&#160;end<br />
+          end<br />
+        </p>
+</div></td>
+      </tr>
+      <tr>
+        <td><p>Info: A new powerup every 200 frames (powerup roulett)</p></td>
+      </tr>
+    </table>
 </div>
 
 

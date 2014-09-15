@@ -91,7 +91,7 @@ double LuaProxy::Player::speedY()
 
 void LuaProxy::Player::setSpeedY(double speedY)
 {
-    ::Player::Get(1)->CurXSpeed = speedY;
+    ::Player::Get(1)->CurYSpeed = speedY;
 }
 
 int LuaProxy::Player::powerup()
