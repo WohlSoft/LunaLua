@@ -66,7 +66,15 @@ SOURCES += \
     LunaDll/Talkhaus-Science_Final_Battle.cpp \
     LunaDll/LuaMain/LunaLuaMain.cpp \
     LunaDll/LuaMain/LuaHelper.cpp \
-    LunaDll/LuaMain/LuaProxy.cpp
+    LunaDll/LuaMain/LuaProxy.cpp \
+    LunaDll/CGUIContainer.cpp \
+    LunaDll/GameboyRPG.cpp \
+    LunaDll/KilArmoryCode.cpp \
+    LunaDll/Minigames.cpp \
+    LunaDll/PerformanceTimer.cpp \
+    LunaDll/PngRender.cpp \
+    LunaDll/RenderEffectOp.cpp \
+    LunaDll/SMBXEvents.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -103,7 +111,94 @@ HEADERS += \
     LunaDll/TriggerZone.h \
     LunaDll/LuaMain/LunaLuaMain.h \
     LunaDll/LuaMain/LuaHelper.h \
-    LunaDll/LuaMain/LuaProxy.h
+    LunaDll/LuaMain/LuaProxy.h \
+    LunaDll/libs/luabind-include/luabind/detail/calc_arity.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/call.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/call_function.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/call_member.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/call_operator_iterate.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/class_cache.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/class_registry.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/class_rep.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/compute_score.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/constructor.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/conversion_storage.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/convert_to_lua.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/debug.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/decorate_type.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/deduce_signature.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/enum_maker.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/format_signature.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/garbage_collector.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/has_get_pointer.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/inheritance.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/instance_holder.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/is_indirect_const.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/link_compatibility.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/make_instance.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/most_derived.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/object_call.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/object_funs.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/object_rep.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/open.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/operator_id.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/other.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/pcall.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/pointee_sizeof.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/pointee_typeid.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/policy.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/primitives.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/property.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/ref.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/signature_match.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/stack_utils.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/typetraits.hpp \
+    LunaDll/libs/luabind-include/luabind/detail/yes_no.hpp \
+    LunaDll/libs/luabind-include/luabind/adopt_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/back_reference.hpp \
+    LunaDll/libs/luabind-include/luabind/back_reference_fwd.hpp \
+    LunaDll/libs/luabind-include/luabind/class.hpp \
+    LunaDll/libs/luabind-include/luabind/class_info.hpp \
+    LunaDll/libs/luabind-include/luabind/config.hpp \
+    LunaDll/libs/luabind-include/luabind/container_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/copy_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/dependency_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/discard_result_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/error.hpp \
+    LunaDll/libs/luabind-include/luabind/exception_handler.hpp \
+    LunaDll/libs/luabind-include/luabind/from_stack.hpp \
+    LunaDll/libs/luabind-include/luabind/function.hpp \
+    LunaDll/libs/luabind-include/luabind/get_main_thread.hpp \
+    LunaDll/libs/luabind-include/luabind/get_pointer.hpp \
+    LunaDll/libs/luabind-include/luabind/handle.hpp \
+    LunaDll/libs/luabind-include/luabind/iterator_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/lua_include.hpp \
+    LunaDll/libs/luabind-include/luabind/luabind.hpp \
+    LunaDll/libs/luabind-include/luabind/make_function.hpp \
+    LunaDll/libs/luabind-include/luabind/nil.hpp \
+    LunaDll/libs/luabind-include/luabind/object.hpp \
+    LunaDll/libs/luabind-include/luabind/open.hpp \
+    LunaDll/libs/luabind-include/luabind/operator.hpp \
+    LunaDll/libs/luabind-include/luabind/out_value_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/prefix.hpp \
+    LunaDll/libs/luabind-include/luabind/raw_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/return_reference_to_policy.hpp \
+    LunaDll/libs/luabind-include/luabind/scope.hpp \
+    LunaDll/libs/luabind-include/luabind/shared_ptr_converter.hpp \
+    LunaDll/libs/luabind-include/luabind/tag_function.hpp \
+    LunaDll/libs/luabind-include/luabind/typeid.hpp \
+    LunaDll/libs/luabind-include/luabind/value_wrapper.hpp \
+    LunaDll/libs/luabind-include/luabind/version.hpp \
+    LunaDll/libs/luabind-include/luabind/weak_ref.hpp \
+    LunaDll/libs/luabind-include/luabind/wrapper_base.hpp \
+    LunaDll/libs/luabind-include/luabind/yield_policy.hpp \
+    LunaDll/CGUI.h \
+    LunaDll/CGUIContainer.h \
+    LunaDll/GameboyRPG.h \
+    LunaDll/Minigames.h \
+    LunaDll/PerformanceTimer.h \
+    LunaDll/PngRender.h \
+    LunaDll/RenderEffectOp.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
