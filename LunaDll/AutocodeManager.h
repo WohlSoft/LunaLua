@@ -26,7 +26,7 @@ struct AutocodeManager {
 	// Management funcs
 	void Clear(bool clear_global_codes);
 	void ForceExpire(int section);
-	void CleanExpired();	
+	void ClearExpired();	
 	void DeleteEvent(std::wstring event_reference_name);		// Look up event with given name and expire it
 	void DoEvents(bool init);
 	void ActivateCustomEvents(int new_section, int eventcode);
@@ -35,6 +35,7 @@ struct AutocodeManager {
 
 	// Variable bank funcs
 	double GetVar(std::wstring var_name);		// returns 0 if var doesn't exist in bank
+	bool VarExists(std::wstring var_name);
 	bool VarOperation(std::wstring var_name, double value, OPTYPE operation_to_do);
 
 	// Members

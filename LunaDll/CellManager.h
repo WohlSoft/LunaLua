@@ -59,7 +59,7 @@ public:
 	Cell* FindCell(int bucket_index, int x, int y);			// Finds cell in given bucket, or returns null
 
 	void GetObjectsOfInterest(list<CellObj>* objlist, double x, double y, int w, int h);	// Get objs that might be intersecting a rectangle
-	void GetUniqueObjs(list<CellObj>* objlist, double x, double y);		// Get objs from cell (don't add any that are already in the list)
+	void GetUniqueObjs(list<CellObj>* objlist, double cellx, double celly);		// Get objs from cell (don't add any that are already in the list)
 
 	static void SortByNearest(list<CellObj>* objlist, double cx, double cy); // Sort a list of cell objects by which is closest to cx/cy
 

@@ -16,8 +16,6 @@
 #include <math.h>
 #include "Input.h"
 #include "SMBXEvents.h"
-
-//Lua Part
 #include "LuaMain/LunaLuaMain.h"
 
 // Standard DLL loader main
@@ -56,7 +54,7 @@ int OnLvlLoad() {
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
 
-    LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
+	LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
 
 	if(gLunaEnabled) {
 
@@ -80,50 +78,19 @@ int OnLvlLoad() {
 	return 0;
 }
 
-// *EXPORT* HUD Hook -- Runs each time the HUD is drawn.
-int HUDHook() {		
-
-	if(gLunaEnabled) {
-		OnHUDDraw();
-	}
-
-	// Restore some code the hook overwrote
-	__asm {
-		MOV AX, WORD PTR DS: 0x00B25130
-		CMP AX, 5
-		MOV BX, 0
-	}
-
-	// Overwrite return address? (skip hud drawing)
-	if(gSkipSMBXHUD) {
-		__asm {
-			MOV DWORD PTR DS: [ESP+8], 0x00987C10
-		}	
-	}
-	return *(WORD*)0x00B25130;
-}
-
-void OnHUDDraw() {
-
-	if(gShowDemoCounter)
-		gDeathCounter.Draw();
-
-	gSpriteMan.RunSprites();
-	gLunaRender.RenderAll();
-}
-
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc() {
 	
 	// Clean up
-	gLunaRender.ClearAll();
-	gAutoMan.CleanExpired();
+	gLunaRender.ClearExpired();
+	gAutoMan.ClearExpired();
 
 	// Update inputs
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
 
 	LunaLua::Do();
+
 	if(gLunaEnabled) {
 
 		// Update lag timer		
@@ -141,6 +108,38 @@ int TestFunc() {
 	}
 	return 0;
 };
+
+// *EXPORT* HUD Hook -- Runs each time the HUD is drawn.
+int HUDHook() {		
+
+	if(gLunaEnabled) {
+		OnHUDDraw();
+	}
+
+	// Overwrite return address? (skip hud drawing)
+	if(gSkipSMBXHUD) {
+		__asm {
+			MOV DWORD PTR DS: [ESP+8], 0x00987C10
+		}	
+	}
+
+	// Restore some code the hook overwrote
+	__asm {
+		MOV AX, WORD PTR DS: 0x00B25130
+		CMP AX, 5
+		MOV BX, 0
+	}
+	return *(WORD*)0x00B25130;
+}
+
+void OnHUDDraw() {
+
+	if(gShowDemoCounter)
+		gDeathCounter.Draw();
+
+	gSpriteMan.RunSprites();
+	gLunaRender.RenderAll();
+}
 
 
 // TEST CODE - This code will run every frame everywhere, making for easy testing
@@ -196,6 +195,10 @@ void LevelFrameCode() {
 
 	case EuroShellRandD:
 		//EuroShellRandDCode();
+		break;
+
+	case ThouStartsANewVideo:
+		KilArmoryCode();
 		break;
 
 	case Invalid:
@@ -273,6 +276,14 @@ void InitLevel() {
 		Player::FilterToSmall(Player::Get(1));
 		Player::FilterMount(Player::Get(1));
 		Player::FilterReservePowerup(Player::Get(1));
+	}
+
+	else if(curlvl == L"LUNA12-thou_starts_a_new_video.lvl") {
+		gLevelEnum = ThouStartsANewVideo;
+		Player::FilterToBig(Player::Get(1));
+		Player::FilterMount(Player::Get(1));
+		Player::FilterReservePowerup(Player::Get(1));
+		Player::Get(1)->Identity = 1;
 	}
 
 }

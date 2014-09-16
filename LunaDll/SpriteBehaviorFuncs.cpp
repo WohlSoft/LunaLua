@@ -6,6 +6,7 @@
 #include "MiscFuncs.h"
 #include "CellManager.h"
 #include "Blocks.h"
+#include <math.h>
 
 using namespace std;
 
@@ -55,6 +56,105 @@ void SpriteFunc::PlayerHoldingSprite(CSprite* me, SpriteComponent* obj) {
 			Activate((int)obj->data4, me);
 		}
 	}
+}
+
+// SET SPRITE VAR
+void SpriteFunc::SetSpriteVar(CSprite* me, SpriteComponent* obj) {
+	if(obj->data5.length() > 0) {		
+		me->SetCustomVar(obj->data5, (OPTYPE)(int)obj->data2, obj->data3);
+	}
+}
+
+// IF SPRITE VAR
+void SpriteFunc::IfSpriteVar(CSprite* me, SpriteComponent* obj) {
+	if(obj->data5.length() > 0) {
+		if(me->CustomVarExists(obj->data5)) {
+
+			double var_val = me->GetCustomVar(obj->data5);
+			double check_against = obj->data3;
+			double component_to_activate = obj->data4;
+
+			switch((COMPARETYPE)(int)obj->data2) {
+			case CMPT_EQUALS:
+				if(var_val == check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			case CMPT_GREATER:
+				if(var_val > check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			case CMPT_LESS:
+				if(var_val < check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+// IF LUNA VAR
+void SpriteFunc::IfLunaVar(CSprite* me, SpriteComponent* obj) {
+	if(obj->data5.length() > 0) {
+		if(gAutoMan.VarExists(obj->data5)) {			
+			double var_val = gAutoMan.GetVar(obj->data5);
+			double check_against = obj->data3;
+			double component_to_activate = obj->data4;
+
+			switch((COMPARETYPE)(int)obj->data2) {
+			case CMPT_EQUALS:
+				if(var_val == check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			case CMPT_GREATER:
+				if(var_val > check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			case CMPT_LESS:
+				if(var_val < check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+// RANDOM COMPONENT
+void SpriteFunc::RandomComponent(CSprite* me, SpriteComponent* obj) {
+	int choice = rand() % 4;
+	switch(choice) {
+		case 0:
+			Activate((int)obj->data1, me);
+			break;
+		case 1:
+			Activate((int)obj->data2, me);
+			break;
+		case 2:
+			Activate((int)obj->data3, me);
+			break;
+		case 3:
+			Activate((int)obj->data4, me);
+			break;
+		}		
+}
+
+// RANDOM COMPONENT RANGE
+void SpriteFunc::RandomComponentRange(CSprite* me, SpriteComponent* obj) {
+	int val1 = (int)obj->data1;
+	int val2 = (int)obj->data2;
+	if(val1 < val2) { // rule out bad values
+		int diff = val2 - val1;
+		int choice = rand() % diff;
+		Activate(val1 + choice, me);		
+	}
+}
+
+// DIE
+void SpriteFunc::Die(CSprite* me, SpriteComponent* obj) {
+	me->Die();
 }
 
 // DECCELERATE
@@ -129,13 +229,35 @@ void SpriteFunc::AccelToPlayer(CSprite* me, SpriteComponent* obj) {
 	}
 }
 
+// APPLY VARIABLE GRAVITY
+void SpriteFunc::ApplyVariableGravity(CSprite* me, SpriteComponent* obj) {
+	double var = gAutoMan.GetVar(obj->data5);		
+	if(obj->data2 == 0) {// x
+		me->m_Xspd += var;
+	}
+	else { // y
+		me->m_Yspd += var;
+	}
+}
+
 // ON PLAYER COLLIDE
 void SpriteFunc::OnPlayerCollide(CSprite* me, SpriteComponent* obj) {
 	PlayerMOB* demo = Player::Get(1);
 
 	if(demo) {				
-		if(me->m_Hitbox.Test((int)demo->CurXPos, (int)demo->CurYPos, (int)demo->Width, (int)demo->Height)) {		
-				Activate((int)obj->data4, me);				
+		if(obj->data2 == 0) { // player normal hitbox
+			if(me->m_Hitbox.Test((int)demo->CurXPos, (int)demo->CurYPos, (int)demo->Width, (int)demo->Height)) {		
+				Activate((int)obj->data4, me);
+			}
+		}
+		else { // special small circle hitbox
+			double extent = obj->data2 / 2;
+
+			double cx = demo->CurXPos + (demo->Width / 2);
+			double cy = demo->CurYPos + (demo->Height / 2);
+			if(me->m_Hitbox.Test((int)cx, (int)cy, (int)extent)) {		
+				Activate((int)obj->data4, me);
+			}
 		}
 	}
 }
@@ -147,8 +269,15 @@ void SpriteFunc::OnPlayerDistance(CSprite* me, SpriteComponent* obj) {
 		double xdist = abs(demo->CurXPos - me->m_Xpos);
 		double ydist = abs(demo->CurYPos - me->m_Ypos);		
 
-		if(xdist + ydist >= obj->data1)
-			Activate((int)obj->data4, me);
+		// Checking farness or nearness?
+		if(obj->data2 == 0) { 
+			if(xdist + ydist >= obj->data1)
+				Activate((int)obj->data4, me);
+		}
+		else {
+			if(xdist + ydist <= obj->data1)
+				Activate((int)obj->data4, me);
+		}
 	}
 }
 
@@ -160,7 +289,8 @@ void SpriteFunc::PhaseMove(CSprite* me, SpriteComponent* obj) {
 
 // BUMP MOVE
 void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
-	double energy_loss_percent = obj->data2;
+	double energy_loss_mod = (100 - obj->data2) / 100;
+
 	me->m_Xpos += me->m_Xspd;
 	me->m_Ypos += me->m_Yspd;
 
@@ -175,37 +305,51 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 	gCellMan.GetObjectsOfInterest(&nearby_list, me->m_Hitbox.CalcLeft(), 
 												me->m_Hitbox.CalcTop(), 
 												(int)me->m_Hitbox.W,
-												(int)me->m_Hitbox.H);	
+												(int)me->m_Hitbox.H);
 
-	gCellMan.SortByNearest(&nearby_list, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY());
-
-	for each(CellObj cellobj in nearby_list) {		
+	// Get all blocks being collided with into collide_list
+	list<CellObj> collide_list;	
+	for each(CellObj cellobj in nearby_list) {
+		bool collide = false;
 		if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 			Block* block = (Block*)cellobj.pObj;
-			if(!block->IsHidden && !block->IsInvisible) {
-				bool collide = me->m_Hitbox.Test((int)block->XPos, (int)block->YPos, (int)block->W, (int)block->H);				
-
-				// Force sprite out if colliding with block, and reverse speed
+			if(!block->IsHidden && !block->IsInvisible) {				
+				collide = me->m_Hitbox.Test((int)block->XPos, (int)block->YPos, (int)block->W, (int)block->H);				
 				if(collide) {
+					collide_list.push_back(cellobj);
+				}
+			}
+		}
+	}
+
+	// Sort the blocks by distance to find the best one
+	gCellMan.SortByNearest(&collide_list, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY());	
+	
+	// Force sprite out of block if colliding with block, and reverse speed according to energy_loss_mod
+	if(collide_list.size() > 0) {
+		for each(CellObj cellobj in collide_list) {		
+			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
+				Block* block = (Block*)cellobj.pObj;
+				if(!block->IsHidden && !block->IsInvisible 
+					&& me->m_Hitbox.Test((int)block->XPos, (int)block->YPos, (int)block->W, (int)block->H)) {
 					double sprite_bot = me->m_Hitbox.CalcBottom();
 					double sprite_right = me->m_Hitbox.CalcRight();
 					double sprite_top = me->m_Hitbox.CalcTop();
 					double sprite_left = me->m_Hitbox.CalcLeft();
 
-					if(false) { // for debugging
+					if(false) { // debugging
 						double* pCameraY = (double*)GM_CAMERA_Y;
 						double camtop = -pCameraY[1];
 						double* pCameraX = (double*)GM_CAMERA_X;
 						double camleft = -pCameraX[1];
-						RenderRectOp debug_rect;
-						debug_rect.color = COLOR;
+						//debug_rect.color = COLOR;
 						COLOR += 0x55000055;
-						debug_rect.m_FramesLeft = 1;
-						debug_rect.x1 = block->XPos - camleft;
-						debug_rect.y1 = block->YPos - camtop;
-						debug_rect.x2 = (block->XPos + block->W) - camleft;
-						debug_rect.y2 = (block->YPos + block->H) - camtop;
-						debug_rect.Draw(&gLunaRender);
+						//debug_rect.m_FramesLeft = 1;
+						//debug_rect.x1 = block->XPos - camleft;
+						//debug_rect.y1 = block->YPos - camtop;
+						//debug_rect.x2 = (block->XPos + block->W) - camleft;
+						//debug_rect.y2 = (block->YPos + block->H) - camtop;
+						//debug_rect.Draw(&gLunaRender);
 					}
 
 					if(me->m_CollisionCode == -1) { // default solid collision
@@ -217,27 +361,30 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 						// Determine best direction to free sprite
 						// Top collision, push sprite up and out
 						if(block_topcol <= block_botcol && block_topcol <= block_leftcol && 
-							block_topcol <= block_rightcol && !collided_top) {							
-							me->m_Ypos = (block->YPos - me->m_Hitbox.H) - 1;							
-							me->m_Yspd = -me->m_Yspd;							
+							block_topcol <= block_rightcol && !collided_top) {
+							me->m_Ypos = (block->YPos - me->m_Hitbox.H) - 1;
+							me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
 							collided_top = true;
 						} 
+
 						// Bot collision, push sprite down
 						else if(block_botcol <= block_leftcol && block_botcol <= block_rightcol && !collided_right) {							
-							me->m_Ypos = ((block->YPos + block->H) - me->m_Hitbox.Top_off) + 1;								
-							me->m_Yspd = -me->m_Yspd;							
+							me->m_Ypos = ((block->YPos + block->H) - me->m_Hitbox.Top_off) + 1;							
+							me->m_Yspd = -(me->m_Yspd * energy_loss_mod);							
 							collided_bot = true;
 						}
+
 						// Left collision, push sprite left
 						else if(block_leftcol <= block_rightcol && !collided_left) {							
 							me->m_Xpos = (block->XPos - me->m_Hitbox.W) - 1;							
-							me->m_Xspd = -me->m_Xspd;							
-							collided_left = true;							
+							me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
+							collided_left = true;
 						}
+
 						// Right collision, push sprite right
 						else if(!collided_right){							
 							me->m_Xpos = ((block->XPos + block->W) - me->m_Hitbox.Left_off) + 1;				
-							me->m_Xspd = -me->m_Xspd;						
+							me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
 							collided_right = true;
 						}
 					}
@@ -247,20 +394,57 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 	}
 }
 
+// CRASH MOVE
+void SpriteFunc::CrashMove(CSprite* me, SpriteComponent* obj) {
+	me->m_Xpos += me->m_Xspd;
+	me->m_Ypos += me->m_Yspd;
+
+	list<CellObj> collide_list;
+	gCellMan.GetObjectsOfInterest(&collide_list, me->m_Hitbox.CalcLeft(), 
+												me->m_Hitbox.CalcTop(), 
+												(int)me->m_Hitbox.W,
+												(int)me->m_Hitbox.H);
+	if(collide_list.size() > 0) {		
+		for each(CellObj cellobj in collide_list) {		
+			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
+				Block* block = (Block*)cellobj.pObj;
+				if(!block->IsHidden && !block->IsInvisible 
+					&& me->m_Hitbox.Test((int)block->XPos, (int)block->YPos, (int)block->W, (int)block->H)) {						
+						me->Die();
+				}
+			}
+		}
+	}
+}
+
 // SET X SPEED
 void SpriteFunc::SetXSpeed(CSprite* me, SpriteComponent* obj) {
-	me->m_Xspd = obj->data1;
-	gLunaRender.SafePrint(L"SETTING X", 3, 400, 300);
+	me->m_Xspd = obj->data1;	
 }
 
 // SET Y SPEED
 void SpriteFunc::SetYSpeed(CSprite* me, SpriteComponent* obj) {
-	me->m_Yspd = obj->data1;
-	gLunaRender.SafePrint(L"SETTING Y", 3, 400, 320);
+	me->m_Yspd = obj->data1;	
+}
+
+// SET ALWAYS PROCESS
+void SpriteFunc::SetAlwaysProcess(CSprite* me, SpriteComponent* obj) {
+	me->m_AlwaysProcess = (bool)obj->data1;
+}
+
+// SET VISIBLE
+void SpriteFunc::SetVisible(CSprite* me, SpriteComponent* obj) {
+	me->m_Visible = (bool)obj->data1;
 }
 
 // SET HITBOX
 void SpriteFunc::SetHitbox(CSprite* me, SpriteComponent* obj) {
+	if(obj->data5.find(L"circle") != std::wstring::npos) {
+		me->m_Hitbox.CollisionType = 1;
+	}
+	else {
+		me->m_Hitbox.CollisionType = 0;
+	}
 	me->m_Hitbox.Left_off = (short)obj->data1;
 	me->m_Hitbox.Top_off = (short)obj->data2;
 	me->m_Hitbox.W = (short)obj->data3;
@@ -281,17 +465,80 @@ void SpriteFunc::TeleportNearPlayer(CSprite* me, SpriteComponent* obj) {
 	}
 }
 
+// TELEPORT TO
+void SpriteFunc::TeleportTo(CSprite* me, SpriteComponent* obj) {
+	me->m_Xpos = obj->data1;
+	me->m_Ypos = obj->data2;
+}
+
 // TRIGGER LUNA EVENT -- Trigger a lunadll script event (such as #1000)
-void SpriteFunc::TriggerLunaEvent(CSprite* me, SpriteComponent* comp) {
-	//Render::Print(L"ABOUT TO TRIGGER", 3, 300,360);
-	if(comp->data1 > 21)
-		gAutoMan.ActivateCustomEvents(0, (int)comp->data1);
+void SpriteFunc::TriggerLunaEvent(CSprite* me, SpriteComponent* obj) {	
+	if(obj->data1 > 21)
+		gAutoMan.ActivateCustomEvents(0, (int)obj->data1);
 }
 
 // HARM PLAYER
 void SpriteFunc::HarmPlayer(CSprite* me, SpriteComponent* obj) {	
 	int player = 1;
 	Player::Harm(&player);
+}
+
+// GENERATE IN RADIUS
+void SpriteFunc::GenerateInRadius(CSprite* me, SpriteComponent* obj) {
+	double rand_x; double rand_y;	
+	RandomPointInRadius(&rand_x, &rand_y, me->m_Hitbox.CenterX(), me->m_Hitbox.CenterY(), (int)obj->data3);
+
+	CSpriteRequest req;
+	req.type = 0;
+	req.img_resource_code = (int)obj->data2;
+	req.x = (int)rand_x;
+	req.y = (int)rand_y;
+	req.time = (int)obj->data4;
+	req.str = obj->data5;
+	req.spawned = true;
+
+	gSpriteMan.InstantiateSprite(&req, false);
+}
+
+// GENERATE AT ANGLE
+void SpriteFunc::GenerateAtAngle(CSprite* me, SpriteComponent* obj) {
+	double angle = me->GetCustomVar(CVAR_GEN_ANGLE);
+	double speed = obj->data3;
+
+	double vx = cos(angle) * speed;					// vector x speed
+	double vy = sin(angle) * speed;					// vector y speed
+	double gx = me->m_Hitbox.CenterX() + (vx * 2);	// generation point
+	double gy = me->m_Hitbox.CenterY() + (vy * 2);	// generation point
+
+	CSpriteRequest req;
+	req.type = 0;
+	req.img_resource_code = (int)obj->data2;
+	req.x = (int)gx;
+	req.y = (int)gy;
+	req.time = (int)obj->data4;
+	req.str = obj->data5;
+
+	req.x_speed = vx;
+	req.y_speed = vy;
+	req.spawned = true;
+
+	gSpriteMan.InstantiateSprite(&req, false);
+}
+
+// SPRITE TIMER
+void SpriteFunc::SpriteTimer(CSprite* me, SpriteComponent* obj) {
+	bool repeat = (bool)obj->data3;
+	int timer = (int)obj->run_time;
+	if(timer == 1 || timer == 0) {
+		if(timer == 1)
+			obj->expired = true;
+		Activate((int)obj->data4, me);
+
+		if(repeat) {
+			obj->expired = false;
+			obj->run_time = obj->org_time;
+		}
+	}
 }
 
 // BASIC ANIMATE
@@ -328,4 +575,43 @@ void SpriteFunc::BasicAnimate(CSprite* me, SpriteComponent* obj) {
 			me->m_AnimationFrame = 0;		
 		}
 	}
+}
+
+// ANIMATE FLOAT
+void SpriteFunc::AnimateFloat(CSprite* me, SpriteComponent* obj) {
+	double speed = obj->data1;
+	double x_mag = obj->data2;
+	double y_mag = obj->data3;
+	if(speed != 0 && (x_mag != 0 || y_mag != 0)) {
+		double frame_val = me->m_FrameCounter / speed;
+		if(x_mag != 0) {
+			me->m_GfxXOffset = (int)(cos(frame_val) * x_mag);
+		}
+		if(y_mag != 0) {
+			me->m_GfxYOffset = (int)(sin(frame_val) * y_mag);
+		}
+	}
+}
+
+// BLINK
+void SpriteFunc::Blink(CSprite* me, SpriteComponent* obj) {
+	int mod = (int)obj->run_time % (int)obj->data1;
+	if(mod == 0) {
+		me->m_Visible = (bool)obj->data2;
+	}
+	else {
+		me->m_Visible = (bool)(obj->data2 == 0 ? 1 : 0);
+	}
+}
+
+// SPRITE DEBUG
+void SpriteFunc::SpriteDebug(CSprite* me, SpriteComponent* obj) {
+	gLunaRender.DebugPrint(L"XPOS - ", me->m_Xpos);
+	gLunaRender.DebugPrint(L"YPOS - ", me->m_Ypos);
+	gLunaRender.DebugPrint(L"XSPD - ", me->m_Xspd);
+	gLunaRender.DebugPrint(L"YSPD - ", me->m_Yspd);
+	gLunaRender.DebugPrint(L"FRAME - ", me->m_AnimationFrame);
+	gLunaRender.DebugPrint(L"VISIBLE - ", me->m_Visible);
+	gLunaRender.DebugPrint(L"CVARS - ", me->m_CustomVars.size());
+	gLunaRender.DebugPrint(L"BEHAVIORS - ", me->m_BehavComponents.size());
 }

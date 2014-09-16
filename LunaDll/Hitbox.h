@@ -32,5 +32,5 @@ struct Hitbox {
 	short Top_off;			// Offset from 0,0 on sprite
 	short W;				// Width
 	short H;				// Height
-	char CollisionType;	// TODO
+	char CollisionType;		// 0 = square aabb  1 = circle/dist
 };

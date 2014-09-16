@@ -24,7 +24,8 @@ enum LvlEnum {
 	EuroShellRandD,
 	Calleoca,
 	Science,
-	Snowbordin
+	Snowbordin,
+	ThouStartsANewVideo,
 };
 
 // Add function declarations for specific level functions here (unless the level doesn't need its own)
@@ -35,6 +36,7 @@ void CurtainTortoiseCode();
 void AbstractAssaultCode();
 void DemosBrainCode();
 void EuroShellRandDCode();
+void KilArmoryCode();
 void CalleocaCode();
 void CalleocaInitCode();
 void ScienceBattle::ScienceCode();

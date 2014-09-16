@@ -49,7 +49,7 @@ void AutocodeManager::ReadFile(wstring dir_path) {
 	wstring full_path = dir_path.append(Level::GetName());	
 	full_path = removeExtension(full_path);
 	full_path = full_path.append(L"\\");
-    full_path = full_path.append(AUTOCODE_FNAME);
+	full_path = full_path.append(AUTOCODE_FNAME);	
 
 	wifstream code_file(full_path, ios::binary|ios::in);	
 	if(code_file.is_open() == false) {
@@ -294,7 +294,7 @@ void AutocodeManager::DeleteEvent(std::wstring ref_name) {
 }
 
 // CLEAN EXPIRED - Don't call this while iterating over codes
-void AutocodeManager::CleanExpired() {
+void AutocodeManager::ClearExpired() {
 	char* dbg = "CLEAN EXPIRED DBG";
 	std::list<Autocode*>::iterator iter = m_Autocodes.begin();
 	std::list<Autocode*>::iterator end  = m_Autocodes.end();
@@ -391,7 +391,9 @@ bool AutocodeManager::VarOperation(std::wstring var_name, double value, OPTYPE o
 		if(m_UserVars.find(var_name) == m_UserVars.end()) {
 			m_UserVars[var_name] = 0;
 		}
-				
+		
+		double var_val = m_UserVars[var_name];
+
 		// Do the operation
 		OPTYPE oper = operation_to_do;
 		switch(oper) {
@@ -399,21 +401,21 @@ bool AutocodeManager::VarOperation(std::wstring var_name, double value, OPTYPE o
 			m_UserVars[var_name] = value;
 			return true;
 		case OP_Add:			
-			m_UserVars[var_name] = m_UserVars[var_name] + value;
+			m_UserVars[var_name] = var_val + value;
 			return true;
 		case OP_Sub:
-			m_UserVars[var_name] = m_UserVars[var_name] - value;
+			m_UserVars[var_name] = var_val - value;
 			return true;
 		case OP_Mult:
-			m_UserVars[var_name] = m_UserVars[var_name] * value;
+			m_UserVars[var_name] =var_val * value;
 			return true;
 		case OP_Div:
 			if(value == 0)
 				return false;
-			m_UserVars[var_name] = m_UserVars[var_name] / value;
+			m_UserVars[var_name] = var_val / value;
 			return true;
 		case OP_XOR:
-			m_UserVars[var_name] = (int)m_UserVars[var_name] ^ (int)value;
+			m_UserVars[var_name] = (int)var_val ^ (int)value;
 			return true;
 		default:
 			return true;
@@ -422,8 +424,14 @@ bool AutocodeManager::VarOperation(std::wstring var_name, double value, OPTYPE o
 	return false;
 }
 
+// VAR EXISTS
+bool AutocodeManager::VarExists(std::wstring var_name) {
+	return m_UserVars.find(var_name) == m_UserVars.end() ? false : true;
+}
+
+// GET VAR
 double AutocodeManager::GetVar(std::wstring var_name) {
-	if(m_UserVars.find(var_name) == m_UserVars.end())
+	if(!VarExists(var_name))
 		return 0;
 
 	return m_UserVars[var_name];

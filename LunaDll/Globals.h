@@ -2,6 +2,7 @@
 
 #pragma once
 #pragma warning(disable: 4731)
+#pragma warning(disable: 4800)
 #pragma warning(disable: 4996) //localtime
 #include "LevelCodes.h"
 #include "Rendering.h"
@@ -18,6 +19,7 @@
 extern bool		gLunaEnabled;
 extern bool		gShowDemoCounter;
 extern bool		gSkipSMBXHUD;
+extern bool		gPrintErrorsToScreen;
 
 /// General use globals - These are all defined in Globals.cpp ///
 extern int		gFrames;
@@ -39,6 +41,10 @@ extern int		gLastRunPress;
 extern int		gRunTapped;
 
 extern int		gCurrentMainPlayer;
+
+extern HDC		ghMemDC;		// General-use screen-compatible DC
+extern HBITMAP	ghGeneralDIB;	// General-use screen-sized DIB
+extern DWORD*	gpScreenBits;	// Pointer to screen bits for general use DIB
 
 // Key status
 extern short	gNumpad4;

@@ -7,13 +7,13 @@
 
 // STATIC DRAW - Simply draw the sprite at its absolute screen coordinates
 //				 by registering a new bitmap render operation
-void SpriteFunc::StaticDraw(CSprite* me) {
+void SpriteFunc::StaticDraw(CSprite* me) {	
 	if(me != NULL && me->m_Visible) {
-		if(me->m_AnimationFrame < me->m_GfxRects.size()) { // Frame should be less than size of GfxRect container	
+		if(me->m_AnimationFrame < me->m_GfxRects.size()) { // Frame should be less than size of GfxRect container			
 			RenderBitmapOp* op = new RenderBitmapOp();
 			op->m_FramesLeft = 1;
-			op->x = me->m_Xpos;
-			op->y = me->m_Ypos;
+			op->x = me->m_Xpos + me->m_GfxXOffset;
+			op->y = me->m_Ypos + me->m_GfxYOffset;
 			op->sx1 = me->m_GfxRects[me->m_AnimationFrame].left;
 			op->sy1 = me->m_GfxRects[me->m_AnimationFrame].top;
 			op->sx2 = me->m_GfxRects[me->m_AnimationFrame].right;
@@ -34,6 +34,8 @@ void SpriteFunc::RelativeDraw(CSprite* me) {
 			double cy = 0;				// camera y (top left of screen)
 			double sx = me->m_Xpos;		// sprite x position (top left of sprite)
 			double sy = me->m_Ypos;		// sprite y position (top left of sprite)
+			sx +=  me->m_GfxXOffset;
+			sy +=  me->m_GfxYOffset;
 
 			// Calc screen draw position based on camera position
 			Render::CalcCameraPos(&cx, &cy);
@@ -49,7 +51,7 @@ void SpriteFunc::RelativeDraw(CSprite* me) {
 			op->sy1 = me->m_GfxRects[me->m_AnimationFrame].top;
 			op->sx2 = me->m_GfxRects[me->m_AnimationFrame].right;
 			op->sy2 = me->m_GfxRects[me->m_AnimationFrame].bottom;
-			op->img_resource_code = me->m_ImgResCode;
+			op->img_resource_code = me->m_ImgResCode;			
 
 			gLunaRender.AddOp(op);	
 			return;

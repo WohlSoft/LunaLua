@@ -9,8 +9,14 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		wchar_t command[100];
 		ZeroMemory(command, 100 * sizeof(wchar_t));
 		int success = swscanf(wbuf, L" %[^,] ,", &command);
-		if(!success)
+		if(!success) {
+			// Bad or mistyped command?
+			wstring line = wstring(wbuf);
+			if(line.size() > 10) {
+				PrintSyntaxError(line);
+			}
 			return AT_Invalid;
+		}
 
 		if(wcscmp(command, L"FilterToSmall") == 0)
 			return AT_FilterToSmall;
@@ -150,6 +156,18 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"DeccelerateLayerY") == 0)
 			return AT_DeccelerateLayerY;
 
+		if(wcscmp(command, L"SetAllBlocksID") == 0)
+			return AT_SetAllBlocksID;
+
+		if(wcscmp(command, L"SwapAllBlocks") == 0)
+			return AT_SwapAllBlocks;
+
+		if(wcscmp(command, L"ShowAllBlocks") == 0)
+			return AT_ShowAllBlocks;
+
+		if(wcscmp(command, L"HideAllBlocks") == 0)
+			return AT_HideAllBlocks;
+
 
 		if(wcscmp(command, L"PushScreenBoundary") == 0)
 			return AT_PushScreenBoundary;
@@ -238,11 +256,32 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"PlayerHoldingSprite") == 0)
 			return AT_PlayerHoldingSprite;
 
+		if(wcscmp(command, L"RandomComponent") == 0)
+			return AT_RandomComponent;
+
+		if(wcscmp(command, L"RandomComponentRange") == 0)
+			return AT_RandomComponentRange;
+
+		if(wcscmp(command, L"SetSpriteVar") == 0)
+			return AT_SetSpriteVar;
+
+		if(wcscmp(command, L"IfSpriteVar") == 0)
+			return AT_IfSpriteVar;
+
+		if(wcscmp(command, L"IfLunaVar") == 0)
+			return AT_IfLunaVar;
+
+		if(wcscmp(command, L"Die") == 0)
+			return AT_Die;
+
 		if(wcscmp(command, L"Deccelerate") == 0)
 			return AT_Deccelerate;
 
 		if(wcscmp(command, L"AccelToPlayer") == 0)
 			return AT_AccelToPlayer;
+
+		if(wcscmp(command, L"ApplyVariableGravity") == 0)
+			return AT_ApplyVariableGravity;
 
 		if(wcscmp(command, L"PhaseMove") == 0)
 			return AT_PhaseMove;
@@ -250,11 +289,20 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"BumpMove") == 0)
 			return AT_BumpMove;
 
+		if(wcscmp(command, L"CrashMove") == 0)
+			return AT_CrashMove;
+
 		if(wcscmp(command, L"SetXSpeed") == 0)
 			return AT_SetXSpeed;
 
 		if(wcscmp(command, L"SetYSpeed") == 0)
 			return AT_SetYSpeed;
+
+		if(wcscmp(command, L"SetAlwaysProcess") == 0)
+			return AT_SetAlwaysProcess;
+
+		if(wcscmp(command, L"SetVisible") == 0)
+			return AT_SetVisible;
 
 		if(wcscmp(command, L"SetHitbox") == 0)
 			return AT_SetHitbox;
@@ -262,14 +310,38 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"TeleportNearPlayer") == 0)
 			return AT_TeleportNearPlayer;
 
+		if(wcscmp(command, L"TeleportTo") == 0)
+			return AT_TeleportTo;
+
 		if(wcscmp(command, L"HarmPlayer") == 0)
 			return AT_HarmPlayer;
+
+		if(wcscmp(command, L"GenerateInRadius") == 0)
+			return AT_GenerateInRadius;
+
+		if(wcscmp(command, L"GenerateAtAngle") == 0)
+			return AT_GenerateAtAngle;
 
 		if(wcscmp(command, L"BasicAnimate") == 0)
 			return AT_BasicAnimate;
 
+		if(wcscmp(command, L"Blink") == 0)
+			return AT_Blink;
+
+		if(wcscmp(command, L"AnimateFloat") == 0)
+			return AT_AnimateFloat;
+
+		if(wcscmp(command, L"TriggerLunaEvent") == 0)
+			return AT_TriggerLunaEvent;
+
 		if(wcscmp(command, L"HarmPlayer") == 0)
 			return AT_HarmPlayer;
+
+		if(wcscmp(command, L"SpriteTimer") == 0)
+			return AT_SpriteTimer;
+
+		if(wcscmp(command, L"SpriteDebug") == 0)
+			return AT_SpriteDebug;
 
 
 		if(wcscmp(command, L"StaticDraw") == 0)
@@ -278,5 +350,14 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"RelativeDraw") == 0)
 			return AT_RelativeDraw;
 	}
+
+	if(wbuf) {
+		// Nothing matched. Bad or mistyped command?
+		wstring line = wstring(wbuf);
+		if(line.size() > 10) {
+			PrintSyntaxError(line);
+		}
+	}
+
 	return AT_Invalid;
 }

@@ -49,6 +49,8 @@
 // 0x+118	f	= Direction faced
 //
 // 0x+124	w	= Unknown
+// 0x+128	dw	= Ofscreen flag (0xFFFFFFFF = offscreen)
+// 0x+12A	w	= Ofscreen countdown timer?
 // 0x+12C	w	= Unknown grabbing-related
 // 0x+12E	w	= 
 

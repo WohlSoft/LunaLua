@@ -4,6 +4,7 @@
 #include "MiscFuncs.h"
 #include "BMPBox.h"
 #include "RenderOp.h"
+#include "RenderRectOp.h"
 #include "PlayerMOB.h"
 
 using namespace std;
@@ -69,6 +70,14 @@ bool Renderer::DeleteImage(int resource_code) {
 		return true;
 	}
 	return false;
+}
+
+// IS ON SCREEN
+bool Render::IsOnScreen(double x, double y, double w, double h) {
+	double cam_x; double cam_y;
+	CalcCameraPos(&cam_x, &cam_y);
+
+	return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x+800, (int)cam_y+600, (int)x, (int)y, (int)x+(int)w, (int)y+(int)h);
 }
 
 // CALC CAMERA POS
@@ -154,6 +163,7 @@ void Renderer::SafePrint(RenderString str) {
 void Renderer::DrawOp(RenderOp* op) {
 	if(op->m_FramesLeft < 1) 
 		return;
+	op->m_LastRenderedOn = gFrames;
 	op->Draw(this);
 	op->m_FramesLeft--;
 }
@@ -165,36 +175,35 @@ void Renderer::RenderAll() {
 
 	// Do render ops
 	for (std::list<RenderOp*>::iterator iter = RenderOperations.begin(), end = RenderOperations.end();	iter != end; ++iter) {
+		if((*iter)->m_LastRenderedOn == gFrames && (*iter)->m_PerCycleOnly)
+			continue;
 		DrawOp((*iter));
 	}
 
 	// Format debug messages and enter them into renderstring list
-	int dbg_x = 350;
+	int dbg_x = 325;
 	int dbg_y = 160;
 	for each(std::wstring dbg in DebugMessages) {
-		SafePrint(RenderString(dbg, 3, (float)dbg_x, (float)dbg_y));
+		Render::Print(dbg, 3, (float)dbg_x, (float)dbg_y);
 		dbg_y += 20;
 		if(dbg_y > 560) {
 			dbg_y = 160;
 			dbg_x += 190;
 		}
 	}
+	this->DebugMessages.clear();
 
 	for (std::list<RenderString>::iterator iter = RenderStrings.begin(), end = RenderStrings.end();	iter != end; ++iter) {				
-		Render::Print((*iter).mString, (*iter).mFontType, (*iter).x, (*iter).y);
+		Render::Print((*iter).m_String, (*iter).m_FontType, (*iter).m_X, (*iter).m_Y);
+		(*iter).m_FramesLeft--;
 	}
-
-	// old version
-	//while(RenderStrings.empty() == false) {
-		//RenderString cur_string = RenderStrings.back();
-		//Render::Print(cur_string.mString, cur_string.mFontType, cur_string.x, cur_string.y);
-		//RenderStrings.pop_back();
-	//}
 }
 
-// CLEAR EXPIRED -- Delete render ops with no display frames left
+// CLEAR EXPIRED -- Delete render ops & strings with no display frames left
 //				 -- Don't call this while iterating over renderops
 void Renderer::ClearExpired() {
+
+	// Clear expired render operations
 	std::list<RenderOp*>::iterator iter = RenderOperations.begin();
 	std::list<RenderOp*>::iterator end = RenderOperations.end();
 
@@ -205,6 +214,18 @@ void Renderer::ClearExpired() {
 			iter = RenderOperations.erase(iter);
 		} else {
 			++iter;
+		}
+	}	
+
+	// Clear expired print strings
+	std::list<RenderString>::iterator str_iter = RenderStrings.begin();
+	std::list<RenderString>::iterator str_end = RenderStrings.end();
+
+	while(str_iter != str_end) {
+		if(str_iter->m_FramesLeft <= 0) {			
+			str_iter = RenderStrings.erase(str_iter);
+		} else {
+			++str_iter;
 		}
 	}
 }
@@ -227,4 +248,20 @@ void Renderer::DebugPrint(std::wstring message) {
 
 void Renderer::DebugPrint(std::wstring message, double val) {
 	this->DebugMessages.push_back(message + L" " + to_wstring((long long) val));
+}
+
+// DEBUG RELATIVE RECT
+void Renderer::DebugRelativeRect(int x, int y, int w, int h, DWORD color) {
+	RenderRectOp* p_Op = new RenderRectOp;
+	double camtop;
+	double camleft;
+	Render::CalcCameraPos(&camleft, &camtop);
+	p_Op->color = color;
+	p_Op->m_FramesLeft = 1;
+	p_Op->m_PerCycleOnly = false;
+	p_Op->x1 = x - camleft;
+	p_Op->y1 = y - camtop;
+	p_Op->x2 = (x + w) - camleft;
+	p_Op->y2 = (y + h) - camtop;
+	AddOp(p_Op);
 }

@@ -19,6 +19,7 @@ struct DeathCounter {
 	void Draw();
 	void Recount();
 	void ClearRecords();
+	void DumpAllToFile(std::wstring file_name);			// Dump all death counter records to a file in main directory
 
 	void PrintDebug();
 

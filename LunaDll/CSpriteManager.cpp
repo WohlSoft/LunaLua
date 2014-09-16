@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "BMPBox.h"
 #include "PlayerMOB.h"
+#include "MiscFuncs.h"
 
 // RESET SPRITE MANAGER
 void CSpriteManager::ResetSpriteManager() {
@@ -12,7 +13,7 @@ void CSpriteManager::ResetSpriteManager() {
 }
 
 // INSTANTIATE SPRITE -- Instantiate a new sprite
-void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
+void CSpriteManager::InstantiateSprite(CSpriteRequest* req, bool center_coords) {
 	CSprite* spr = NULL;
 
 	// For built in sprites
@@ -22,7 +23,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 		// STATIC SPRITE
 		case BST_Static: {
 			spr = new CSprite;
-			BasicInit(spr, req);		
+			BasicInit(spr, req, center_coords);		
 			spr->m_StaticScreenPos = true;						
 			spr->AddDrawComponent(&SpriteFunc::StaticDraw);			
 			break;
@@ -31,7 +32,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 		// NORMAL SPRITE
 		case BST_Normal: {
 			spr = new CSprite;
-			BasicInit(spr, req);
+			BasicInit(spr, req, center_coords);
 			spr->AddDrawComponent(&SpriteFunc::RelativeDraw);			
 			break;
 					   }
@@ -39,7 +40,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 		// ITEM SPRITE
 		case BST_Item: {
 			spr = new CSprite;
-			BasicInit(spr, req);
+			BasicInit(spr, req, center_coords);
 			spr->AddDrawComponent(&SpriteFunc::RelativeDraw);
 
 			// Add collectible event # if applicable
@@ -49,7 +50,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 				comp.func = SpriteFunc::PlayerCollectible;							
 				spr->AddBehaviorComponent(comp);
 
-				if(comp.data1 > 21) {						// Add trigger event on death
+				if(str_arg > 21) {						// Add trigger event on death
 					comp.func = SpriteFunc::TriggerLunaEvent;	
 					comp.data1 = str_arg;
 					spr->AddDeathComponent(comp);
@@ -75,7 +76,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 			if(m_SpriteBlueprints.find(L"__DefaultPhanto") == m_SpriteBlueprints.end()) {
 				spr = new CSprite;
 				SpriteComponent comp;
-				BasicInit(spr, req);
+				BasicInit(spr, req, center_coords);
 				spr->AddDrawComponent(&SpriteFunc::RelativeDraw);
 
 				// Always Decelerate
@@ -144,7 +145,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 			from_bp->m_Xpos = req->x;
 			from_bp->m_Ypos = req->y;
 			from_bp->SetImageResource(req->img_resource_code);
-			InitializeDimensions(from_bp);	
+			InitializeDimensions(from_bp, center_coords);	
 			if(req->time != 0)
 				from_bp->MakeLimitedLifetime(req->time);
 			spr = from_bp;
@@ -158,16 +159,19 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req) {
 			AddSprite(spr);
 		}
 	}
-	// Else, insantiate custom sprite?
+	// Else, instantiate custom sprite?
 	else if(req != NULL && req->type == BST_Custom) {
 		CSprite* from_bp = CopyFromBlueprint(const_cast<wchar_t*>(req->str.c_str()));
 		if(from_bp != NULL) {
 			from_bp->m_Xpos = req->x;
 			from_bp->m_Ypos = req->y;
+			from_bp->m_Xspd = req->x_speed;
+			from_bp->m_Yspd = req->y_speed;
 			from_bp->SetImageResource(req->img_resource_code);
-			InitializeDimensions(from_bp);	
+			InitializeDimensions(from_bp, center_coords);	
 			if(req->time != 0)
 				from_bp->MakeLimitedLifetime(req->time);
+			from_bp->Birth();
 			AddSprite(from_bp);
 		}
 	}
@@ -197,17 +201,31 @@ void CSpriteManager::AddSprite(CSprite* spr) {
 
 // RUN SPRITES -- Run each sprite
 void CSpriteManager::RunSprites() {
-	ClearInvalidSprites();	
+	ClearInvalidSprites();		
+	PlayerMOB* demo = Player::Get(1);
 
-	if(GM_PAUSE_OPEN == 0) {
-		for (std::list<CSprite*>::iterator iter = m_SpriteList.begin();	iter != m_SpriteList.end(); ++iter) {
-			(*iter)->Process();
+	if(demo) {
+		// Process each
+		if(GM_PAUSE_OPEN == 0) {
+			for (std::list<CSprite*>::iterator iter = m_SpriteList.begin();	iter != m_SpriteList.end(); ++iter) {			
+				if(!(*iter)->m_Invalidated) {// Don't process invalids					
+					if(ComputeLevelSection((int)(*iter)->m_Xpos, (int)(*iter)->m_Ypos) == demo->CurrentSection+1 || 
+						(*iter)->m_AlwaysProcess || (*iter)->m_StaticScreenPos) { // Valid level section to process in?
+						(*iter)->Process();						
+					}
+				}
+			}
+		}
+
+		// Draw each
+		for (std::list<CSprite*>::iterator iter = m_SpriteList.begin();	iter != m_SpriteList.end(); ++iter) {			
+			if(!(*iter)->m_Invalidated) { 
+				if((*iter)->m_StaticScreenPos || Render::IsOnScreen((*iter)->m_Xpos, (*iter)->m_Ypos, (*iter)->m_Wd, (*iter)->m_Ht)) {
+					(*iter)->Draw();
+				}
+			}
 		}
 	}
-
-	for (std::list<CSprite*>::iterator iter = m_SpriteList.begin();	iter != m_SpriteList.end(); ++iter) {
-		(*iter)->Draw();
-	}	
 }
 
 // CLEAR INVALID SPRITES -- Cleans up any sprites set to be deleted
@@ -235,23 +253,22 @@ void CSpriteManager::ClearAllSprites() {
 }
 
 // BASIC INIT
-void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq) {
+void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) {
 	spr->m_Xpos = pReq->x;
 	spr->m_Ypos = pReq->y;			
-	spr->m_StaticScreenPos = false;
+	//spr->m_StaticScreenPos = false;
 	spr->SetImageResource(pReq->img_resource_code);
-	InitializeDimensions(spr);	
+	InitializeDimensions(spr, center);	
 	if(pReq->time != 0)
 		spr->MakeLimitedLifetime(pReq->time);
 }
 
 // INITIALIZE DIMENSIONS -- Resets sprite hitbox according to image. Needs img code set and image loaded
-void CSpriteManager::InitializeDimensions(CSprite* spr) {
+void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
 
 	BMPBox* box = gLunaRender.LoadedImages[spr->m_ImgResCode];
 
-	if(box != NULL) {
-		Render::Print(L"INITIALIZING HITBOX", 3, 300,300);
+	if(box != NULL) {		
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;
@@ -268,8 +285,13 @@ void CSpriteManager::InitializeDimensions(CSprite* spr) {
 		spr->m_Hitbox.Top_off = 0;
 		spr->m_Hitbox.W = (short)rect.right;
 		spr->m_Hitbox.H = (short)rect.bottom;
-		spr->m_Hitbox.CollisionType = 1;
+		spr->m_Hitbox.CollisionType = 0;
 		spr->m_Hitbox.pParent = spr;
+
+		if(center_coords) { // Fix to generate with x/y as center instead of minimum left/top
+			spr->m_Xpos -= spr->m_Wd / 2;
+			spr->m_Ypos -= spr->m_Ht / 2;
+		}
 	}
 }
 

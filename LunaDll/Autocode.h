@@ -69,7 +69,12 @@ enum AutocodeType {
 	AT_AccelerateLayerX,		//1: Layer #2: Max speed	3:				4:			5: Active time	6: Speed
 	AT_AccelerateLayerY,		//1: Layer #2: Max speed	3:				4:			5: Active time	6: Speed
 	AT_DeccelerateLayerX,		//1: Layer #2: Deccel to	3: 				4:			5: Active time	6: Speed
-	AT_DeccelerateLayerY,		//1: Layer #2: Deccel to	3:				4:			5: Active time	6: Speed
+	AT_DeccelerateLayerY,		//1: Layer #2: Deccel to	3:				4:			5: Active time	6: Speed	
+
+	AT_SetAllBlocksID,			//1: Type	2: Set to		3:				4:			5: Active time	6:
+	AT_SwapAllBlocks,			//1: Type 1	2: Type 2		3:				4:			5: Active time	6:
+	AT_ShowAllBlocks,			//1: Type 1	2:				3:				4:			5: Active time	6:
+	AT_HideAllBlocks,			//1: Type 1	2:				3:				4:			5: Active time	6:
 
 	AT_PushScreenBoundary,		//1: Section2: UDLR			3:				4:			5: Active time	6: Speed
 	AT_SnapSectionBounds,		//1: Section2: Target X		3: Target Y		4:			5: Active time	6:
@@ -108,27 +113,51 @@ enum AutocodeType {
 	AT_PlaceSprite,				//1: Type	2: ImgResource	3: Xpos			4: Ypos		5: Sprite time	6:
 
 	// Sprite components //
-	AT_OnPlayerCollide = 10000,	//1:		2:				3:				4: Event	5: Active time  6:	
-	AT_OnPlayerDistance,		//1: Dist	2:				3:				4: Event	5: Active time  6:
-	AT_WaitForPlayer,			//1: Offset	2: Value		3: Comparison	4: Event	5: Active time	6: Type (b, w, dw, f, qw/df)
-	AT_PlayerHoldingSprite,		//1: Type	2:				3:				4: Event	5: Active time  6: 
+	AT_OnPlayerCollide = 10000,	//1:		2: Player small circle hitbox? 3: 4: Comp	5: Active time  6:
+	AT_OnPlayerDistance,		//1: Dist	2: far/close	3:				4: Comp		5: Active time  6:	
+	AT_WaitForPlayer,			//1: Offset	2: Value		3: Comparison	4: Comp		5: Active time	6: Type (b, w, dw, f, qw/df)
+	AT_PlayerHoldingSprite,		//1: Type	2:				3:				4: Comp		5: Active time  6:
+
+	AT_RandomComponent,			//1: choice 2: choice		3: choice		4: choice	5: Active time	6:
+	AT_RandomComponentRange,	//1: start	2: end			3:				4:			5: Active time	6:
+
+	AT_SetSpriteVar,			//1: 		2: Op			3: Value		4:			5: Active time	6: 
+	AT_IfSpriteVar,				//1:		2: CompareType	3: Value		4: Event	5: Active time	6:
+	AT_IfLunaVar,				//1:		2: CompareType	3: Value		4: Event	5: Active time	6:
+
+	AT_Die,						//1:		2:				3:				4:			5: Active time  6: 
 
 	AT_Deccelerate,				//1: X rate	2: Y rate		3: Minimum		4:			5: Active time  6:
 	//AT_Accelerate				//1: X rate	2: Y rate		3: Maximum		4:			5: Active time  6: Option
-	AT_AccelToPlayer,			//1: X rate	2: Y rate		3: Maximum		4:			5: Active time  6:	
+	AT_AccelToPlayer,			//1: X rate	2: Y rate		3: Maximum		4:			5: Active time  6:
+	AT_ApplyVariableGravity,	//1:		2: 0=x 1=y		3:				4:			5: Active time	6: Name of lunadll variable
+
 	AT_TeleportNearPlayer,		//1: Radius	2:				3:				4:			5: Active time  6:
+	AT_TeleportTo,				//1: x		2: y			3:				4:			5: Active time  6:
 
 	AT_PhaseMove,				//1:		2:				3:				4:			5: Active time  6:
-	AT_BumpMove,				//1: NRGLoss% 2:			3:				4:			5: Active time  6:
+	AT_BumpMove,				//1:		2: NRGLoss%		3:				4:			5: Active time  6:
+	AT_CrashMove,				//1:		2:				3:				4:			5: Active time  6:
 
 	AT_SetXSpeed,				//1: Speed	2:				3:				4:			5: Active time  6:
 	AT_SetYSpeed,				//1: Speed	2:				3:				4:			5: Active time  6:
-
-	AT_SetHitbox,				//1: Left	2: Up			3: Right		4: Down		5: Active time
+	AT_SetAlwaysProcess,		//1: Off/On
+	AT_SetVisible,				//1: Off/On
+	AT_SetHitbox,				//1: LeftOff2: Top offset	3: Width		4: Height	5: Active time	6: option
 
 	AT_BasicAnimate,			//1: Height 2: Speed
+	AT_Blink,					//1: Speed	2: Reverse		3:				4:			5: Active time  6:
+	AT_AnimateFloat,			//1: Speed	2: X magnitude	3: Y magnitude
 
+	AT_TriggerLunaEvent,		//1: Event	2:				3:				4:			5: Active time  6:
 	AT_HarmPlayer,				//1:		2:				3:				4:			5: Active time  6:
+
+	AT_GenerateInRadius,		//1:    	2: ImgResource	3: Radius		4: SprTime	5: Active time  6: Sprite blueprint name
+	AT_GenerateAtAngle,			//1:		2: ImgResource	3: Speed		4: SprTime	5: Active time  6: Sprite blueprint name
+
+	AT_SpriteTimer,				//1:		2:				3: Repeat		4: Comp		5: Active time  6:
+
+	AT_SpriteDebug,				//1:		2:				3: Repeat		4: Comp		5: Active time  6:
 
 	AT_StaticDraw,
 	AT_RelativeDraw

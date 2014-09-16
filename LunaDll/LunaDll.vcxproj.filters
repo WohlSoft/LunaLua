@@ -79,8 +79,14 @@
     <Filter Include="Header Files\CellManager">
       <UniqueIdentifier>{09b072dc-ab35-4c99-af25-ddfcb6524686}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Minigames">
+      <UniqueIdentifier>{2f91a5ba-ae47-418a-b9ff-ac359a032c1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minigames\CGUI">
+      <UniqueIdentifier>{4b967018-632b-43a0-8477-923c7a17613e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\Lua">
-      <UniqueIdentifier>{88865528-ba56-4172-91e3-0e8425085401}</UniqueIdentifier>
+      <UniqueIdentifier>{73ab09f3-d5ee-4d34-bb48-e256fd1a29e8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -180,13 +186,22 @@
     <ClInclude Include="CellManager.h">
       <Filter>Header Files\CellManager</Filter>
     </ClInclude>
-    <ClInclude Include="LuaMain\LunaLuaMain.h">
-      <Filter>Header Files\Lua</Filter>
+    <ClInclude Include="RenderEffectOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="Minigames.h">
+      <Filter>Header Files\Minigames</Filter>
+    </ClInclude>
+    <ClInclude Include="CGUI.h">
+      <Filter>Header Files\Minigames\CGUI</Filter>
     </ClInclude>
     <ClInclude Include="LuaMain\LuaHelper.h">
       <Filter>Header Files\Lua</Filter>
     </ClInclude>
     <ClInclude Include="LuaMain\LuaProxy.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>Header Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>
@@ -317,13 +332,22 @@
     <ClCompile Include="GenComp.cpp">
       <Filter>Header Files\AutoCode\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LunaLuaMain.cpp">
-      <Filter>Header Files\Lua</Filter>
+    <ClCompile Include="KilArmoryCode.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderEffectOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="CGUIContainer.cpp">
+      <Filter>Header Files\Minigames\CGUI</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxy.cpp">
+      <Filter>Header Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LunaLuaMain.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>

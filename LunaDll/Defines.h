@@ -50,6 +50,10 @@ enum PRIORITY {
 // General
 #define GM_SCRN_HDC			*(DWORD*)0x00B25028
 
+// Frame counters
+#define GM_TRANS_FRAMECT	*(DWORD*)0x00B2C670
+//#define GM_ACTIVE_FRAMECT	*(DWORD*)0x00B2C67C  Float?
+
 // MOB Related memory
 #define GM_NPCS_PTR			*(DWORD*)0x00B259E8	// +0xAD58 + 0x20  to NPCs
 #define GM_NPCS_COUNT		*(WORD*)0x00B2595A 
@@ -98,9 +102,12 @@ enum PRIORITY {
 #define GM_VKEY_TABLE_PTR	*(DWORD*)0x00B25068 
 #define GM_INPUTSTR_BUF_PTR	*(DWORD*)0x00B2C898
 
+// Saves
+#define GM_CUR_SAVE_SLOT	*(WORD*)0x00B2C62A		// 1 2 or 3
+
 // Cheats
 #define GM_PLAYER_INVULN	*(WORD*)0x00B2C8C0		// 0xFFFF = invuln
-#define GM_CHEATED			*(DWORD*)0x00B2C8C4		// 0xFFFF = cheated
+#define GM_CHEATED			*(WORD*)0x00B2C8C4		// 0xFFFF = cheated
 
 
 /////////////////////

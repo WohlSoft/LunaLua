@@ -6,6 +6,11 @@
 RenderBitmapOp::RenderBitmapOp() {
 	x = 0;
 	y = 0;
+	sx1 = 0;
+	sy1 = 0;
+	sx2 = 0;
+	sy2 = 0;
+	m_PerCycleOnly = false;
 }
 
 // DRAW

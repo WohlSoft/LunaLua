@@ -1,4 +1,6 @@
 #include "DeathRecord.h"
+#include <iomanip>
+
 using namespace std;
 
 void DeathRecord::Save(fstream* openfile) {
@@ -38,4 +40,14 @@ void DeathRecord::Load(fstream* openfile) {
 
 	// Read death count	
 	openfile->read((char*)&Deaths, sizeof(int));	
+}
+
+// WRITE TEXT
+void DeathRecord::WriteText(std::wofstream* open_file) {
+	*open_file << left << setw(51) << this->LevelName << setw(3)  << L" -" << setw(7) << this->Deaths;
+}
+
+// BY FEWER DEATHS - For sorting based on fewest deaths
+bool DeathRecords::by_fewer_deaths(DeathRecord* pLHS, DeathRecord* pRHS) {
+	return pLHS->Deaths < pRHS->Deaths;
 }

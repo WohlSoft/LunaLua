@@ -11,7 +11,6 @@
 #include "Level.h"
 #include <windows.h>
 #include <time.h>
-#include "LuaMain/LunaLuaMain.h"
 
 using namespace std;
 
@@ -66,11 +65,8 @@ Autocode* Autocode::MakeCopy() {
 Autocode::~Autocode() {
 }
 
-// <!> EnumerizeCommand() func moved to its own file
-
 // DO - Perform autocodes for this section. Only does init codes if "init" is set
 void Autocode::Do(bool init) {
-	char* dbg = "AC_Do";
 
 	// Is it expired?
 	if(Expired || !Activated)
@@ -88,6 +84,7 @@ void Autocode::Do(bool init) {
 	// Run this code if "always" section, or if current section is a match, or forced by init
 	if((BYTE)ActiveSection == (BYTE)0xFF || demo->CurrentSection == ActiveSection || init) {
 
+		int pretick_len = (int)this->Length;
 		this->SelfTick();
 
 		// Run specified autocode
@@ -100,27 +97,22 @@ void Autocode::Do(bool init) {
 
 		// FILTERS
 		case AT_FilterToSmall: {
-			PlayerMOB* demo = Player::Get(1);
 			Player::FilterToSmall(demo);
 			break;		
 							}	
 		case AT_FilterToBig: {
-			PlayerMOB* demo = Player::Get(1);
 			Player::FilterToBig(demo);
 			break;		
 						  }	
 		case AT_FilterToFire: {
-			PlayerMOB* demo = Player::Get(1);
 			Player::FilterToFire(demo);
 			break;		
 						   }
 		case AT_FilterMount: {
-			PlayerMOB* demo = Player::Get(1);
 			Player::FilterMount(demo);
 			break;		
 						  }	
 		case AT_FilterReservePowerup: {
-			PlayerMOB* demo = Player::Get(1);
 			Player::FilterReservePowerup(demo);
 			break;		
 								   }
@@ -332,7 +324,7 @@ void Autocode::Do(bool init) {
 							   }
 
 		case AT_TriggerRandomRange: {
-			if(Target > Param1 || Param1 < Target || Target == Param1) // rule out bad values
+			if(Target >= Param1) // rule out bad values
 				break;
 			int diff = (int)Param1 - (int)Target;
 			int choice = rand() % diff;
@@ -536,8 +528,11 @@ void Autocode::Do(bool init) {
 			// Check if the value meets the criteria and activate event if so
 			switch((COMPARETYPE)(int)Param1) {
 			case CMPT_EQUALS:
-				if(varval == Param2)
+				//gLunaRender.DebugPrint(MyString, varval);
+				if(varval == Param2) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param3);
+					//gLunaRender.DebugPrint(L"EQUALED", Param3);
+				}
 				break;
 			case CMPT_GREATER:
 				if(varval > Param2)
@@ -751,6 +746,25 @@ void Autocode::Do(bool init) {
 			}
 			break;
 								   }
+		
+		// BLOCK MODIFIERS
+		case AT_SetAllBlocksID: {
+			Blocks::SetAll((int)Target, (int)Param1);
+			break;
+								}
+
+		case AT_SwapAllBlocks: {
+			Blocks::SwapAll((int)Target, (int)Param1);
+			break;
+							   }
+		case AT_ShowAllBlocks: {
+			Blocks::ShowAll((int)Target);
+			break;
+							   }
+		case AT_HideAllBlocks: {
+			Blocks::HideAll((int)Target);
+			break;
+							   }
 
 
 		case AT_PushScreenBoundary: {
@@ -886,10 +900,7 @@ void Autocode::Do(bool init) {
 
 		// DEBUG
 		case AT_DebugPrint: {
-
-            gLunaRender.SafePrint(L"WOHLHABEND NETWORKS FORK", 3, 50, 200);
-
-			gLunaRender.SafePrint(L"LUNADLL VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250);
+            gLunaRender.SafePrint(L"LUNADLL (WITH LUA) VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250);
 			//gLunaRender.SafePrint(, 3, 340, 250);
 
 			gLunaRender.SafePrint(L"GLOBL-" + std::to_wstring((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300);
@@ -959,7 +970,7 @@ void Autocode::Do(bool init) {
 							pSpr->AddBehaviorComponent(GenerateComponent(pComponent));
 							break;
 						case BPAT_Draw:
-							pSpr->AddDrawComponent(GetDrawFunc(pComponent));
+							pSpr->AddDrawComponent(GetDrawFunc(pComponent));							
 							break;
 						case BPAT_Birth:
 							pSpr->AddBirthComponent(GenerateComponent(pComponent));
@@ -984,9 +995,9 @@ void Autocode::Do(bool init) {
 			req.img_resource_code = (int)Param1;
 			req.x = (int)Param2;
 			req.y = (int)Param3;
-			req.time = (int)Length;
+			req.time = pretick_len;
 			req.str = MyString;
-			gSpriteMan.InstantiateSprite(&req);
+			gSpriteMan.InstantiateSprite(&req, false);
 
 			Expired = true;
 			break;

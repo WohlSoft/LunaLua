@@ -6,7 +6,7 @@ class RenderRectOp : public RenderOp {
 public:
 	RenderRectOp() : x1(0), y1(0), x2(0), y2(0), color(0xFFFFFFFF) {   };
 
-	void Draw(Renderer* renderer);
+	void Draw(Renderer* renderer); 
 
 	double x1;
 	double y1;

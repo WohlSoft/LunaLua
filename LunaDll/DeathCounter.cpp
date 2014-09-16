@@ -73,14 +73,13 @@ bool DeathCounter::TryLoadStats() {
 }
 
 // UPDATE DEATHS - Determine if the main player has died and update death counter state if so
-void DeathCounter::UpdateDeaths(bool write_save) {
-	std::wstring debuginfo(L"UpdateDeaths");
+void DeathCounter::UpdateDeaths(bool write_save) {	
 
 	PlayerMOB* demo = Player::Get(1);
 	if(demo == 0) return;
 	
-	// For now, we'll assume the player died if player 1's death timer is at exactly 50 frames
-	if(demo->DeathTimer == 50) {
+	// For now, we'll assume the player died if player 1's death timer is at exactly 3 frames
+	if(demo->DeathTimer == 3) {
 		std::wstring curlvl = Level::GetName();
 		AddDeath(curlvl, 1);
 		if(write_save) {
@@ -240,4 +239,41 @@ void DeathCounter::PrintDebug() {
 		}		
 	}
 	
+}
+
+// DUMP ALL TO FILE
+void DeathCounter::DumpAllToFile(std::wstring file_name) {
+	int tempint = 0;
+	wofstream out_file(file_name, ios::out|ios::trunc);
+
+	// Create file if not existing
+	if(out_file.is_open() == false) {
+		out_file.open(file_name, ios::out);
+		out_file << L" *** DEATH RECORDS FILE ***" << endl;
+		out_file.flush();	
+		out_file.close();
+		out_file.open(file_name, ios::in|ios::out);;
+	}
+
+	// If create failed, get out
+	if(!out_file.is_open() || !out_file.good()) 
+		return;	
+
+	// Get all the records into a list
+	list<DeathRecord*> records;
+	for each(DeathRecord* pRec in mDeathRecords)
+		records.push_back(pRec);
+
+	// Sort em	
+	records.sort(DeathRecords::by_fewer_deaths);
+
+	// Write em
+	for each(DeathRecord* pRec in records) {
+		pRec->WriteText(&out_file);
+		out_file << endl;
+	}
+
+	// Clean up
+	out_file.flush();
+	out_file.close();
 }

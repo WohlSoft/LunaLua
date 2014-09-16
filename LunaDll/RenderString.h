@@ -6,21 +6,23 @@ struct RenderString {
 
 	// Quick ctor
 	RenderString() {		
-		mFontType = 1;
-		x = 400;
-		y = 400;
+		m_FontType = 1;
+		m_X = 400;
+		m_Y = 400;
+		m_FramesLeft = 1;
 	}
 
 	RenderString(std::wstring str, int font_type, float X, float Y) {
-		mString = str;
-		mFontType = font_type;
-		x = X;
-		y = Y;
+		m_String = str;
+		m_FontType = font_type;
+		m_X = X;
+		m_Y = Y;
+		m_FramesLeft = 1;
 	}
 
-	std::wstring mString;
-	int	mFontType;
-	float x;
-	float y;
-
+	std::wstring m_String;
+	int	m_FontType;
+	float m_X;
+	float m_Y;
+	int m_FramesLeft;
 };

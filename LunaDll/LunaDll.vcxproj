@@ -74,6 +74,8 @@
       <AssemblerOutput>All</AssemblerOutput>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -89,6 +91,7 @@
     <ClInclude Include="AutocodeManager.h" />
     <ClInclude Include="Blocks.h" />
     <ClInclude Include="CellManager.h" />
+    <ClInclude Include="CGUI.h" />
     <ClInclude Include="CSprite.h" />
     <ClInclude Include="CSpriteManager.h" />
     <ClInclude Include="DeathCounter.h" />
@@ -107,10 +110,12 @@
     <ClInclude Include="LuaMain\LuaProxy.h" />
     <ClInclude Include="LuaMain\LunaLuaMain.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="Minigames.h" />
     <ClInclude Include="MiscFuncs.h" />
     <ClInclude Include="NPCs.h" />
     <ClInclude Include="PlayerMOB.h" />
     <ClInclude Include="RenderBitmapOp.h" />
+    <ClInclude Include="RenderEffectOp.h" />
     <ClInclude Include="Rendering.h" />
     <ClInclude Include="RenderOp.h" />
     <ClInclude Include="RenderRectOp.h" />
@@ -128,6 +133,7 @@
     <ClCompile Include="AutocodeManager.cpp" />
     <ClCompile Include="Blocks.cpp" />
     <ClCompile Include="CellManager.cpp" />
+    <ClCompile Include="CGUIContainer.cpp" />
     <ClCompile Include="CSprite.cpp" />
     <ClCompile Include="CSpriteManager.cpp" />
     <ClCompile Include="DeathCounter.cpp" />
@@ -145,6 +151,7 @@
     <ClCompile Include="JosephStaleknight-CurtainTortoise.lvl.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Kil-DemosBrain.cpp" />
+    <ClCompile Include="KilArmoryCode.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -156,6 +163,7 @@
     <ClCompile Include="NPCs.cpp" />
     <ClCompile Include="PlayerMOB.cpp" />
     <ClCompile Include="RenderBitmapOp.cpp" />
+    <ClCompile Include="RenderEffectOp.cpp" />
     <ClCompile Include="Rendering.cpp" />
     <ClCompile Include="RenderRectOp.cpp" />
     <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp" />

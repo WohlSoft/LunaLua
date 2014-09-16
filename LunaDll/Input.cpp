@@ -9,6 +9,7 @@ using namespace std;
 #define TOGGLE_DEMO_COUNTER_CHT L"toggledemocounter"
 #define DELETE_ALL_RECORDS_CHT L"formatcdrive"
 #define LUNA_DEBUG_CHT L"lunadebug"
+#define DUMP_DEATH_COUNT_FILE L"countdemos"
 
 // CHECK SPECIAL CHEATS -- Check for special lunadll management strings in the buffer
 void Input::CheckSpecialCheats() {	
@@ -59,13 +60,21 @@ void Input::CheckSpecialCheats() {
 		std::wstring none = L"__null";
 		Autocode* ac = new Autocode(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
 		gAutoMan.m_CustomCodes.push_back(ac);
-		SMBXSound::PlaySFX(2);
+		SMBXSound::PlaySFX(14);
 		ClearInputStringBuffer();
 		return;
 	}
-	
-}
 
+	//death count dump
+	org_len = curbuf.length();
+	sought_len = wcslen(DUMP_DEATH_COUNT_FILE);
+	if(org_len >= sought_len && curbuf.substr(org_len - sought_len, sought_len) == DUMP_DEATH_COUNT_FILE) {
+		gDeathCounter.DumpAllToFile(L"democount.txt");
+		SMBXSound::PlaySFX(15);
+		ClearInputStringBuffer();
+		return;
+	}
+}
 
 // UPDATE INPUT TASKS -- Update key presses, etc
 void Input::UpdateInputTasks() {

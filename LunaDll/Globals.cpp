@@ -5,12 +5,12 @@
 #include "Shlwapi.h"
 #include <time.h>
 #include "Logging.h"
-#include "LuaMain/LunaLuaMain.h"
 
 // Global settings
 bool gLunaEnabled;
 bool gShowDemoCounter;
 bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
+bool gPrintErrorsToScreen;
 
 // Global variables
 int	gFrames;
@@ -32,6 +32,10 @@ int gLastRunPress;
 int gRunTapped;
 
 int	gCurrentMainPlayer;
+
+HDC	ghMemDC;			// General use screen-compatible DC
+HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
+DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
 short gNumpad4;
 short gNumpad8;
@@ -59,6 +63,7 @@ void InitGlobals() {
 	gLunaEnabled = true;
 	gShowDemoCounter = false;
 	gSkipSMBXHUD = false;
+	gPrintErrorsToScreen = true;
 	gLogger.m_Enabled = false;
 	gCellMan.Reset();
 
@@ -89,6 +94,21 @@ void InitGlobals() {
 
 	srand((int)time(NULL));
 
+	// Get compatible handle for screen
+	ghMemDC = CreateCompatibleDC(NULL);
+
+	BITMAPINFO bmi;
+	memset(&bmi, 0, sizeof(BITMAPINFO));
+	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmi.bmiHeader.biWidth = 800;
+	bmi.bmiHeader.biHeight = -600;
+	bmi.bmiHeader.biPlanes = 1;
+	bmi.bmiHeader.biBitCount = 32;
+	bmi.bmiHeader.biCompression = BI_RGB;
+	gpScreenBits = 0;
+
+	ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
+
 	// Allocate 40k bytes of free mem
 	gpFreeGlob = NULL;
 	gpFreeGlob = new int[10000];
@@ -98,7 +118,7 @@ void InitGlobals() {
 	gDeathCounter.TryLoadStats();
 	if(gDeathCounter.mStatFileOK == false)
 		gDeathCounter.mEnabled = false;
-	
+
 	/// Init autocode manager	
 	HMODULE hModule = GetModuleHandleW(NULL);
 	WCHAR path[MAX_PATH];
@@ -123,7 +143,9 @@ void ResetFreeGlob() {
 
 /// CLEAN UP
 void CleanUp() {
-    LunaLua::TryClose();
 	if(gpFreeGlob)
 		delete[] gpFreeGlob;
+	if(ghMemDC)
+		DeleteObject(ghMemDC);
+		DeleteObject(ghGeneralDIB);
 }

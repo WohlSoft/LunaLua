@@ -8,8 +8,7 @@ Block* Blocks::Get(int index) {
 	}
 }
 
-bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
-	char* dbg = "COLLISION TEST DBG";
+bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {	
 	Block* blocks = Blocks::GetBase();
 	Block* block = 0;
 	double playerX = demo->CurXPos - 0.20;
@@ -34,9 +33,50 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 	return false; // no collision
 }
 
-
+// TEST COLLISION (SMBX BUILTIN)
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
 	typedef int colfunc(void*, void*);
 	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
 	return f(&pMobPOS->CurXPos, &pBlockPOS->XPos);
+}
+
+// SET ALL
+void Blocks::SetAll(int type1, int type2) {
+	Block* blocks = Blocks::GetBase();	
+	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
+		if(blocks[i].BlockType == type1) {
+			blocks[i].BlockType = type2;
+		}
+	}
+}
+
+// SWAP ALL
+void Blocks::SwapAll(int type1, int type2) {
+	Block* blocks = Blocks::GetBase();	
+	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
+		if(blocks[i].BlockType == type1) {
+			blocks[i].BlockType = type2;
+		}
+		else if(blocks[i].BlockType == type2) {
+			blocks[i].BlockType = type1;
+		}
+	}
+}
+
+void Blocks::ShowAll(int type) {
+	Block* blocks = Blocks::GetBase();	
+	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
+		if(blocks[i].BlockType == type) {
+			blocks[i].IsHidden = 0;
+		}		
+	}
+}
+
+void Blocks::HideAll(int type) {
+	Block* blocks = Blocks::GetBase();	
+	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
+		if(blocks[i].BlockType == type) {
+			blocks[i].IsHidden = 0xFFFF;
+		}		
+	}
 }

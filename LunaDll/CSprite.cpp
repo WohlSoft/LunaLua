@@ -1,5 +1,9 @@
 #include "CSprite.h"
 #include "Rendering.h"
+#include "Globals.h"
+#include "RenderOp.h"
+#include "RenderRectOp.h"
+#include "SpriteFuncs.h"
 
 // CTOR
 CSprite::CSprite() {
@@ -17,8 +21,13 @@ void CSprite::Init() {
 	m_Invalidated = false;
 	m_LimitedFrameLife = false;
 	m_AnimationSet = false;
+	m_AlwaysProcess = false;
 	m_FramesLeft = 0;	
 	m_DrawPriorityLevel = 1;
+	m_OffscreenCount = 0;
+	m_FrameCounter = 0;
+	m_GfxXOffset = 0;
+	m_GfxYOffset = 0;
 	m_Xpos = 0;
 	m_Ypos = 0;
 	m_Ht = 0;
@@ -60,10 +69,13 @@ void CSprite::AddBehaviorComponent(SpriteComponent comp) {
 		m_BehavComponents.push_back(comp);
 }
 
-// ADD DRAW -- Add a draw component to sprite
+// ADD DRAW -- Add a draw component to sprite. Updates m_StaticScreenPos if static drawing detected.
 void CSprite::AddDrawComponent(pfnSprDraw func) {
 	if(func != NULL)
-	m_DrawFuncs.push_back(func);
+		m_DrawFuncs.push_back(func);
+	if(func == SpriteFunc::StaticDraw) {
+		m_StaticScreenPos = true;
+	}	
 }
 
 // ADD DEATH -- Add a death function to sprite
@@ -86,19 +98,23 @@ void CSprite::MakeLimitedLifetime(int new_lifetime) {
 }
 
 // BIRTH -- Run the birth components
-void CSprite::Birth() {
-	for (std::list<SpriteComponent>::iterator iter = m_BirthComponents.begin(); iter != m_BirthComponents.end(); ++iter) {
-		(*iter).func(this, &(*iter));
+void CSprite::Birth() {	
+	if(!m_Birthed) {
+		for (std::list<SpriteComponent>::iterator iter = m_BirthComponents.begin(); iter != m_BirthComponents.end(); ++iter) {
+			(*iter).func(this, &(*iter));
+		}
 	}
 	m_Birthed = true;
 }
 
-// PROCESS -- Call all of the running behavior components
+// PROCESS -- Process 1 frame of lifetime. Call all of the running behavior components
 void CSprite::Process() {
 	ClearExpiredComponents();
 
 	if(m_Birthed == false)
 		Birth();
+
+	m_FrameCounter++;
 
 	for (std::list<SpriteComponent>::iterator iter = m_BehavComponents.begin(); iter != m_BehavComponents.end(); ++iter) {
 		(*iter).func(this, &(*iter));
@@ -108,7 +124,7 @@ void CSprite::Process() {
 	// Die?
 	if(this->m_LimitedFrameLife == true) {
 		this->m_FramesLeft--;
-		if(m_FramesLeft <= 0) {
+		if(m_FramesLeft <= 0 && !m_Died) {
 			Die();
 		}
 	}
@@ -119,13 +135,72 @@ void CSprite::Draw() {
 	for (std::list<pfnSprDraw>::iterator iter = m_DrawFuncs.begin(); iter != m_DrawFuncs.end(); ++iter) {
 		(*iter)(this);
 	}
+	if(false) { //debug
+		RenderRectOp op;
+		op.x1 = m_Xpos; op.y1 = m_Ypos;
+		op.x2 = m_Xpos + m_Wd; op.y2 = m_Xpos + m_Ht; 
+		op.m_FramesLeft = 1;
+		op.Draw(&gLunaRender);
+	}
 }
 
 // DIE -- Run the death components
-void CSprite::Die() {
+void CSprite::Die() {	
 	for (std::list<SpriteComponent>::iterator iter = m_DeathComponents.begin(); iter != m_DeathComponents.end(); ++iter) {
 		(*iter).func(this, &(*iter));
 	}
 	m_Died = true;
 	m_Invalidated = true;
+}
+
+// SET CUSTOM VAR
+void CSprite::SetCustomVar(wstring var_name, OPTYPE operation_to_do, double value) {
+	if(var_name.length() > 0) {
+		// Create var if doesn't exist
+		if(m_CustomVars.find(var_name) == m_CustomVars.end()) {
+			m_CustomVars[var_name] = 0;
+		}
+
+		double var_val = m_CustomVars[var_name];
+
+		// Do the operation
+		OPTYPE oper = operation_to_do;
+		switch(oper) {
+		case OP_Assign: 			
+			m_CustomVars[var_name] = value;
+			break;
+		case OP_Add:			
+			m_CustomVars[var_name] = var_val + value;
+			break;
+		case OP_Sub:
+			m_CustomVars[var_name] = var_val - value;
+			break;
+		case OP_Mult:
+			m_CustomVars[var_name] = var_val * value;
+			break;
+		case OP_Div:
+			if(value == 0)
+				break;
+			m_CustomVars[var_name] = var_val / value;
+			break;
+		case OP_XOR:
+			m_CustomVars[var_name] = (int)var_val ^ (int)value;
+			break;
+		default:
+			break;
+		}
+	}		
+}
+
+// CUSTOM VAR EXISTS
+bool CSprite::CustomVarExists(wstring var_name) {
+	return m_CustomVars.find(var_name) == m_CustomVars.end() ? false : true;
+}
+
+// GET CUSTOM VAR
+double CSprite::GetCustomVar(wstring var_name) {
+	if(m_CustomVars.find(var_name) == m_CustomVars.end()) {
+		return 0;
+	}
+	return m_CustomVars[var_name];
 }

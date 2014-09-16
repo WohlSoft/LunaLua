@@ -26,26 +26,62 @@ pfnSprFunc Autocode::GetSpriteFunc(Autocode* pAC) {
 		return SpriteFunc::WaitForPlayer;
 	case AT_PlayerHoldingSprite:
 		return SpriteFunc::PlayerHoldingSprite;
+	case AT_RandomComponent:
+		return SpriteFunc::RandomComponent;
+	case AT_RandomComponentRange:
+		return SpriteFunc::RandomComponentRange;
+	case AT_SetSpriteVar:
+		return SpriteFunc::SetSpriteVar;
+	case AT_IfSpriteVar:
+		return SpriteFunc::IfSpriteVar;
+	case AT_IfLunaVar:
+		return SpriteFunc::IfLunaVar;
+	case AT_Die:
+		return SpriteFunc::Die;
 	case AT_Deccelerate:
 		return SpriteFunc::Deccelerate;
 	case AT_AccelToPlayer:
 		return SpriteFunc::AccelToPlayer;
+	case AT_ApplyVariableGravity:
+		return SpriteFunc::ApplyVariableGravity;
 	case AT_PhaseMove:
 		return SpriteFunc::PhaseMove;
 	case AT_BumpMove:
 		return SpriteFunc::BumpMove;
+	case AT_CrashMove:
+		return SpriteFunc::CrashMove;
 	case AT_SetXSpeed:
 		return SpriteFunc::SetXSpeed;
 	case AT_SetYSpeed:
 		return SpriteFunc::SetYSpeed;
+	case AT_SetAlwaysProcess:
+		return SpriteFunc::SetAlwaysProcess;
+	case AT_SetVisible:
+		return SpriteFunc::SetVisible;
 	case AT_SetHitbox:
 		return SpriteFunc::SetHitbox;
 	case AT_TeleportNearPlayer:
 		return SpriteFunc::TeleportNearPlayer;
+	case AT_TeleportTo:
+		return SpriteFunc::TeleportTo;
+	case AT_GenerateInRadius:
+		return SpriteFunc::GenerateInRadius;
+	case AT_GenerateAtAngle:
+		return SpriteFunc::GenerateAtAngle;
 	case AT_BasicAnimate:
 		return SpriteFunc::BasicAnimate;
+	case AT_Blink:
+		return SpriteFunc::Blink;
+	case AT_AnimateFloat:
+		return SpriteFunc::AnimateFloat;
+	case AT_TriggerLunaEvent:
+		return SpriteFunc::TriggerLunaEvent;
 	case AT_HarmPlayer:
-		return SpriteFunc::HarmPlayer;
+		return SpriteFunc::HarmPlayer;	
+	case AT_SpriteTimer:
+		return SpriteFunc::SpriteTimer;
+	case AT_SpriteDebug:
+		return SpriteFunc::SpriteDebug;
 	default:
 		return NULL;
 	}

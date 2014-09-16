@@ -485,6 +485,15 @@ int ToSection(int coord) {
 	}
 }
 
+void RandomPointInRadius(double* ox, double* oy, double cx, double cy, int radius) {	
+	double phase1 = rand() % 360;
+	double phase2 = rand() % 360;
+	double xoff = sin(phase1) * radius;
+	double yoff = cos(phase2) * radius;
+	*ox = cx + xoff;
+	*oy = cy + yoff;
+}
+
 bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, int D2) {
 	bool rightcol = true;
 	bool leftcol = true;
@@ -503,6 +512,19 @@ bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, i
 	if(rightcol == false || leftcol == false || upcol == false || downcol == false)
 		return false;
 	return true;
+}
+
+void PrintSyntaxError(wstring errored_line) {
+		static int errors = 0;
+		errors += 25;
+		RenderString render_str;
+		render_str.m_FontType = 2;
+		render_str.m_FramesLeft = 440;
+		render_str.m_String = errored_line;
+		render_str.m_String += L"- SYNTAX ERROR";
+		render_str.m_X = 125;
+		render_str.m_Y = (float)(errors % 600);
+		gLunaRender.SafePrint(render_str);
 }
 
 bool SegmentIntersectRectangle(double a_rectangleMinX,

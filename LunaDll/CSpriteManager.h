@@ -32,11 +32,11 @@ class CSprite;
 // Basic manager class for sprites
 struct CSpriteManager {
 
-	void ResetSpriteManager();							// Will be called on level load to re-init everything
+	void ResetSpriteManager();											// Will be called on level load to re-init everything
 
-	void BasicInit(CSprite* spr, CSpriteRequest* req);	// Quickly set frequently-used sprite attributes
-	void InitializeDimensions(CSprite* spr);			// Set hitbox and dimensions to size of image
-	void InstantiateSprite(CSpriteRequest* req);		// Officially place sprite in level (m_SpriteList)
+	void BasicInit(CSprite* spr, CSpriteRequest* req, bool center);		// Quickly set frequently-used sprite attributes
+	void InitializeDimensions(CSprite* spr, bool center_coords);		// Set hitbox and dimensions to size of image
+	void InstantiateSprite(CSpriteRequest* req, bool center_coords);	// Officially place sprite in level (m_SpriteList)
 
 	void AddBlueprint(const wchar_t* blueprint_name, CSprite* spr);
 	CSprite* CopyFromBlueprint(wchar_t* blueprint_name);// Generate new sprite based on blueprint
