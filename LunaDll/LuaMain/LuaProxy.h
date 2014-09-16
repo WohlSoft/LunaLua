@@ -16,6 +16,22 @@ namespace LuaProxy {
     luabind::object npcs(lua_State *L);
     luabind::object findNPCs(int ID, int section, lua_State *L);
 
+    struct RECTd{
+        double left;
+        double top;
+        double right;
+        double bottom;
+    };
+
+    class Section{
+    public:
+        Section (int sectionNum);
+        RECTd boundary();
+        void setBoundary(RECTd boundary);
+    private:
+        int m_secNum;
+    };
+
     class NPC{
     public:
         NPC (int index);
@@ -39,6 +55,7 @@ namespace LuaProxy {
     public:
         Player ();
         int section();
+        Section sectionObj();
         void kill();
         void harm(); //untested
         RECT screen();

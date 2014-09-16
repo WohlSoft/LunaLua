@@ -102,6 +102,16 @@ void LunaLua::init(wstring main_path)
             .def_readwrite("right", &RECT::right)
             .def_readwrite("bottom", &RECT::bottom),
 
+        class_<LuaProxy::RECTd>("RECTd")
+            .def_readwrite("left", &LuaProxy::RECTd::left)
+            .def_readwrite("top", &LuaProxy::RECTd::top)
+            .def_readwrite("right", &LuaProxy::RECTd::right)
+            .def_readwrite("bottom", &LuaProxy::RECTd::bottom),
+
+        class_<LuaProxy::Section>("Section")
+            .def(constructor<int>())
+            .property("boundary", &LuaProxy::Section::boundary, &LuaProxy::Section::setBoundary),
+
         class_<LuaProxy::NPC>("NPC")
             .def(constructor<int>())
             .property("id", &LuaProxy::NPC::id)
@@ -117,6 +127,7 @@ void LunaLua::init(wstring main_path)
             .def("harm", &LuaProxy::Player::harm)
             .property("screen", &LuaProxy::Player::screen)
             .property("section", &LuaProxy::Player::section)
+            .property("sectionObj", &LuaProxy::Player::sectionObj)
             .property("x", &LuaProxy::Player::x, &LuaProxy::Player::setX)
             .property("y", &LuaProxy::Player::y, &LuaProxy::Player::setY)
             .property("speedX", &LuaProxy::Player::speedX, &LuaProxy::Player::setSpeedX)
