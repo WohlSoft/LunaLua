@@ -170,10 +170,81 @@ h1 {
       <tr>
         <td colspan="2"><p>This class provides fields to save &quot;left&quot;, &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot; as a int value. It is common used by other classes.</p></tr>
     </table>
-    <br />
+    <p>&nbsp;</p>
+    <table width="100%" border="1">
+      <tr>
+        <th colspan="2">The <u>RECTd</u> Structure</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>myRect = RECTd()</p>
+        </div></td>
+        <td><p>Constructs a new RECT structure.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myRect.left</p>
+        </div></td>
+        <td>The &quot;left&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myRect.top</p>
+        </div></td>
+        <td>The &quot;top&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myRect.right</p>
+        </div></td>
+        <td>The &quot;right&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double] myRect.bottom</p>
+        </div></td>
+        <td>The &quot;bottom&quot; value of the RECT structure.</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>Same as RECT, just with double values.</p></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <p><br />
+    </p>
     <table border="1" width="100%">
       <tr>
-        <th colspan="2">The <u>NPC</u> Structure</th>
+        <th colspan="2">The <u>Section</u> Class</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>mySection = Section([int] sectionnum)</p>
+        </div></td>
+        <td><p>Constructs a new section class by the sectionnumber.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[RECTd] myNPC.boundary</p>
+        </div></td>
+        <td>Holds the values for the section boundaries.</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>This class provides fields and functions to modify the section.</p></td>
+      </tr>
+    </table>
+    <p><br />
+  </p>
+    <table border="1" width="100%">
+      <tr>
+        <th colspan="2">The <u>NPC</u> Class</th>
       </tr>
       <tr>
         <th>Function Signature</th>
@@ -224,6 +295,18 @@ h1 {
         </div></td>
         <td><p>The face direction of the npc.</p>
         <p><strong>NOTE:</strong> Setting the direction of a npc, resets the monumentum of the npc. You can modify the speedX value if you want to set your own monumentum.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>myNPC:mem([hex/int] address-offset, [int] datatype, [any] value)</p>
+        </div></td>
+        <td>Sets a NPC offset-address to a specfic value. See constants for datatypes.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[any] myNPC:mem([hex/int] address, [int] datatype)</p>
+        </div></td>
+        <td>Gets a specfic value by NPC offset-address. See constants for datatypes.</td>
       </tr>
       <tr>
         <td colspan="2"><p>This class provides fields and functions to modify the npc. It is <strong>not recommended</strong> to save this class for later, as the internal arrayindex changes when enemies get killed. </p></tr>
@@ -301,6 +384,12 @@ h1 {
       </tr>
       <tr>
         <td><div class="code">
+          <p>[Section(readonly)] player.sectionObj</p>
+        </div></td>
+        <td>Returns the current section in a section object.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
           <p>[class RECT(readonly)] player.screen</p>
         </div></td>
         <td>The player RECT to the screen.</td>
@@ -310,6 +399,18 @@ h1 {
           <p>[class NPC(readonly) or nil] player.holdingNPC</p>
         </div></td>
         <td>If the player holds the npc, it returns the NPC</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>player:mem([hex/int] address-offset, [int] datatype, [any] value)</p>
+        </div></td>
+        <td>Sets a player offset-address to a specfic value. See constants for datatypes.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[any] player:mem([hex/int] address, [int] datatype)</p>
+        </div></td>
+        <td>Gets a specfic value by player offset-address. See constants for datatypes.</td>
       </tr>
       <tr>
         <td colspan="2"><p>This class provides fields and functions to modify the player/character.</p>
@@ -362,6 +463,17 @@ h1 {
           <p>[NPC (array)] findnpcs([int] npc-id, [int] section)</p>
         </div></td>
         <td>Returns an array filtered to npc-id and/or section. Use -1 or FIND_ANY to skip one of either filter.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>mem([hex/int] address, [int] datatype, [any] value)</p>
+        </div></td>
+        <td>Sets a global address to a specfic value. See constants for datatypes.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[any] mem([hex/int] address, [int] datatype)</p></div></td>
+        <td>Gets a specfic value by address. See constants for datatypes.</td>
       </tr>
     </table>
     </div>
@@ -473,6 +585,61 @@ h1 {
           <p>player.powerup</p>
         </div></td>
         <td>Ice powerup</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIELD_BYTE</p>
+        </div></td>
+        <td><div class="code">
+          <p>function mem</p>
+          <p>player:mem</p>
+          <p>myNPC:mem</p>
+        </div></td>
+        <td>Byte field data type</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIELD_WORD</p>
+        </div></td>
+        <td><div class="code">
+          <p>function mem</p>
+          <p>player:mem</p>
+          <p>myNPC:mem</p>
+        </div></td>
+        <td>Word field data type</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIELD_DWORD</p>
+        </div></td>
+        <td><div class="code">
+          <p>function mem</p>
+          <p>player:mem</p>
+          <p>myNPC:mem</p>
+        </div></td>
+        <td>DWord field data type</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIELD_FLOAT</p>
+        </div></td>
+        <td><div class="code">
+          <p>function mem</p>
+          <p>player:mem</p>
+          <p>myNPC:mem</p>
+        </div></td>
+        <td>Float field data type</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>FIELD_DFLOAT</p>
+        </div></td>
+        <td><div class="code">
+          <p>function mem</p>
+          <p>player:mem</p>
+          <p>myNPC:mem</p>
+        </div></td>
+        <td>DFloat field data type</td>
       </tr>
     </table>
     </div>

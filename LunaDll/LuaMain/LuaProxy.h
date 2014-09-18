@@ -9,12 +9,24 @@
 #include <luabind/detail/call_function.hpp>
 
 namespace LuaProxy {
+    enum L_FIELDTYPE{
+        LFT_INVALID = 0,
+        LFT_BYTE = 1,
+        LFT_WORD = 2,
+        LFT_DWORD = 3,
+        LFT_FLOAT = 4,
+        LFT_DFLOAT = 5,
+        LFT_STRING = 6
+    };
+
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
     int totalNPCs();
     luabind::object npcs(lua_State *L);
     luabind::object findNPCs(int ID, int section, lua_State *L);
+    void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+    luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 
     struct RECTd{
         double left;
@@ -46,6 +58,8 @@ namespace LuaProxy {
         void setSpeedX(double speedX);
         double speedY();
         void setSpeedY(double speedY);
+        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+        luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
     private:
         bool isValid();
         int m_index;
@@ -72,6 +86,8 @@ namespace LuaProxy {
         int reservePowerup();
         void setReservePowerup(int reservePowerup);
         luabind::object holdingNPC(lua_State *L);
+        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+        luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
     };
 
 

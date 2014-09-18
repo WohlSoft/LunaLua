@@ -88,11 +88,20 @@ void LunaLua::init(wstring main_path)
     _G["DIR_RANDOM"] = 0;
     _G["DIR_LEFT"] = -1;
 
+    _G["FIELD_BYTE"] = 1;
+    _G["FIELD_WORD"] = 2;
+    _G["FIELD_DWORD"] = 3;
+    _G["FIELD_FLOAT"] = 4;
+    _G["FIELD_DFLOAT"] = 5;
+    _G["FIELD_STRING"] = 6;
+
 	module(mainState)
 	[
         def("windowDebug", &LuaProxy::windowDebug),
         def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
         def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
+        def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object)) &LuaProxy::mem),
+        def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
         def("totalNPC", &LuaProxy::totalNPCs),
         def("npcs", &LuaProxy::npcs),
         def("findnpcs", &LuaProxy::findNPCs),
@@ -114,6 +123,8 @@ void LunaLua::init(wstring main_path)
 
         class_<LuaProxy::NPC>("NPC")
             .def(constructor<int>())
+            .def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::NPC::mem))
+            .def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::NPC::mem))
             .property("id", &LuaProxy::NPC::id)
             .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
             .property("x", &LuaProxy::NPC::x, &LuaProxy::NPC::setX)
@@ -123,6 +134,8 @@ void LunaLua::init(wstring main_path)
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
+			.def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Player::mem))
+			.def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
             .def("kill", &LuaProxy::Player::kill)
             .def("harm", &LuaProxy::Player::harm)
             .property("screen", &LuaProxy::Player::screen)

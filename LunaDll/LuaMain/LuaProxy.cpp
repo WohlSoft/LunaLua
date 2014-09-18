@@ -3,6 +3,7 @@
 #include "../Globals.h"
 #include "../PlayerMOB.h"
 #include "../NPCs.h"
+#include "../MiscFuncs.h"
 
 
 
@@ -131,6 +132,41 @@ luabind::object LuaProxy::Player::holdingNPC(lua_State *L)
     return luabind::object();
 }
 
+void LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+{
+    int iftype = (int)ftype;
+    if(iftype >= 1 && iftype <= 5){
+        PlayerMOB* pPlayer = ::Player::Get(1);
+        void* ptr = ((&(*(byte*)pPlayer)) + offset);
+        MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+    }
+}
+
+luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
+{
+    int iftype = (int)ftype;
+    double val = 0;
+    if(iftype >= 1 && iftype <= 5){
+        PlayerMOB* pPlayer = ::Player::Get(1);
+        void* ptr = ((&(*(byte*)pPlayer)) + offset);
+        val = GetMem((int)ptr, (FIELDTYPE)ftype);
+    }
+    switch (ftype) {
+    case LFT_BYTE:
+        return luabind::object(L, (byte)val);
+    case LFT_WORD:
+        return luabind::object(L, (short)val);
+    case LFT_DWORD:
+        return luabind::object(L, (int)val);
+    case LFT_FLOAT:
+        return luabind::object(L, (float)val);
+    case LFT_DFLOAT:
+        return luabind::object(L, (double)val);
+    default:
+        return luabind::object();
+    }
+}
+
 
 LuaProxy::NPC::NPC(int index)
 {
@@ -219,6 +255,41 @@ void LuaProxy::NPC::setSpeedY(double speedY)
     *ptr = speedY;
 }
 
+void LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+{
+    int iftype = (int)ftype;
+    if(iftype >= 1 && iftype <= 5){
+        NPCMOB* mnpc = ::NPC::Get(m_index);
+        void* ptr = ((&(*(byte*)mnpc)) + offset);
+        MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+    }
+}
+
+luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State* L)
+{
+    int iftype = (int)ftype;
+    double val = 0;
+    if(iftype >= 1 && iftype <= 5){
+        NPCMOB* mnpc = ::NPC::Get(m_index);
+        void* ptr = ((&(*(byte*)mnpc)) + offset);
+        val = GetMem((int)ptr, (FIELDTYPE)ftype);
+    }
+    switch (ftype) {
+    case LFT_BYTE:
+        return luabind::object(L, (byte)val);
+    case LFT_WORD:
+        return luabind::object(L, (short)val);
+    case LFT_DWORD:
+        return luabind::object(L, (int)val);
+    case LFT_FLOAT:
+        return luabind::object(L, (float)val);
+    case LFT_DFLOAT:
+        return luabind::object(L, (double)val);
+    default:
+        return luabind::object();
+    }
+}
+
 bool LuaProxy::NPC::isValid()
 {
     return !(m_index < 0 || m_index > GM_NPCS_COUNT);
@@ -290,4 +361,39 @@ void LuaProxy::Section::setBoundary(LuaProxy::RECTd boundary)
     boundtable[1] = boundary.top;
     boundtable[2] = boundary.bottom;
     boundtable[3] = boundary.right;
+}
+
+
+void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+{
+    int iftype = (int)ftype;
+    if(iftype >= 1 && iftype <= 5){
+        void* ptr = ((&(*(byte*)mem)));
+        MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+    }
+}
+
+
+luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
+{
+    int iftype = (int)ftype;
+    double val = 0;
+    if(iftype >= 1 && iftype <= 5){
+        void* ptr = ((&(*(byte*)mem)));
+        val = GetMem((int)ptr, (FIELDTYPE)ftype);
+    }
+    switch (ftype) {
+    case LFT_BYTE:
+        return luabind::object(L, (byte)val);
+    case LFT_WORD:
+        return luabind::object(L, (short)val);
+    case LFT_DWORD:
+        return luabind::object(L, (int)val);
+    case LFT_FLOAT:
+        return luabind::object(L, (float)val);
+    case LFT_DFLOAT:
+        return luabind::object(L, (double)val);
+    default:
+        return luabind::object();
+    }
 }
