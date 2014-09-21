@@ -24,43 +24,40 @@ void windowError(const char* errorText){
     MessageBoxA(0, errorText, "Error", 0);
 }
 
-void LunaLua::init(wstring main_path)
+void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
 {
-    TryClose();
+    TryCloseState(L);
 
-    mainState = luaL_newstate();
-	luabind::open(mainState);
-    lua_pushcfunction(mainState, luaopen_base);
-    lua_call(mainState,0,0);
-    lua_pushcfunction(mainState, luaopen_math);
-    lua_call(mainState,0,0);
-    lua_pushcfunction(mainState, luaopen_string);
-    lua_call(mainState,0,0);
-    lua_pushcfunction(mainState, luaopen_table);
-    lua_call(mainState,0,0);
-    lua_pushcfunction(mainState, luaopen_debug);
-    lua_call(mainState,0,0);
-    lua_pushcfunction(mainState, luaopen_os);
-    lua_call(mainState,0,0);
+    L = luaL_newstate();
+    luabind::open(L);
+    lua_pushcfunction(L, luaopen_base);
+    lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_math);
+    lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_string);
+    lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_table);
+    lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_debug);
+    lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_os);
+    lua_call(L,0,0);
 
 
-	wstring full_path = main_path.append(Level::GetName());	
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\lunadll.lua");
-
-	wifstream code_file(full_path, ios::binary|ios::in);
+    wifstream code_file(main_path, ios::binary|ios::in);
     if(!code_file.is_open()){
         code_file.close();
         return;
     }
+
     using namespace luabind;
 
-	std::wstring wluacode((std::istreambuf_iterator<wchar_t>(code_file)), std::istreambuf_iterator<wchar_t>());
+    std::wstring wluacode((std::istreambuf_iterator<wchar_t>(code_file)), std::istreambuf_iterator<wchar_t>());
     code_file.close();
     std::string luacode = utf8_encode(wluacode);
 
     //remove nearly all os code
-    object _G = globals(mainState);
+    object _G = globals(L);
     object osTable = _G["os"];
     osTable["execute"] = object();
     osTable["exit"] = object();
@@ -70,8 +67,22 @@ void LunaLua::init(wstring main_path)
     osTable["setlocal"] = object();
     osTable["tmpname"] = object();
 
-    int errcode = luaL_loadbuffer(mainState, luacode.c_str(), luacode.length(), "lunadll.lua")  || lua_pcall(mainState, 0, LUA_MULTRET, 0);
-    
+    //reset data
+    LuaProxy::playerUPressing = 0;
+    LuaProxy::playerDPressing = 0;
+    LuaProxy::playerLPressing = 0;
+    LuaProxy::playerRPressing = 0;
+    LuaProxy::playerJPressing = 0;
+    LuaProxy::playerSJPressing = 0;
+    LuaProxy::playerXPressing = 0;
+    LuaProxy::playerRNPressing = 0;
+    LuaProxy::playerSELPressing = 0;
+    LuaProxy::playerSTRPressing = 0;
+    LuaProxy::playerJumping = 0;
+
+
+    int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), "lunadll.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
+
 
     //constants
     _G["PLAYER_SMALL"] = 1;
@@ -95,8 +106,22 @@ void LunaLua::init(wstring main_path)
     _G["FIELD_DFLOAT"] = 5;
     _G["FIELD_STRING"] = 6;
 
-	module(mainState)
-	[
+    _G["KEY_UP"] = 0;
+    _G["KEY_DOWN"] = 1;
+    _G["KEY_LEFT"] = 2;
+    _G["KEY_RIGHT"] = 3;
+    _G["KEY_JUMP"] = 4;
+    _G["KEY_SPINJUMP"] = 5;
+    _G["KEY_X"] = 6;
+    _G["KEY_RUN"] = 7;
+    _G["KEY_SEL"] = 8;
+    _G["KEY_STR"] = 9;
+
+
+
+
+    module(L)
+    [
         def("windowDebug", &LuaProxy::windowDebug),
         def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
         def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
@@ -134,8 +159,8 @@ void LunaLua::init(wstring main_path)
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
-			.def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Player::mem))
-			.def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
+            .def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Player::mem))
+            .def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
             .def("kill", &LuaProxy::Player::kill)
             .def("harm", &LuaProxy::Player::harm)
             .property("screen", &LuaProxy::Player::screen)
@@ -149,76 +174,115 @@ void LunaLua::init(wstring main_path)
             .property("reservePowerup", &LuaProxy::Player::reservePowerup, &LuaProxy::Player::setReservePowerup)
             .property("holdingNPC", &LuaProxy::Player::holdingNPC)
 
-	];
+    ];
 
-	_G["player"] = new LuaProxy::Player();
+    _G["player"] = new LuaProxy::Player();
+
 
     if(!(errcode == 0)){
-        object error_msg(from_stack(mainState, -1));
+        object error_msg(from_stack(L, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         TryClose();
         return;
     }
-	try
-	{
-        if(LuaHelper::is_function(mainState, "onLoad")){
-            luabind::call_function<void>(mainState, "onLoad");
+    try
+    {
+        if(LuaHelper::is_function(L, "onLoad")){
+            luabind::call_function<void>(L, "onLoad");
         }
-	}
-	catch (error& e)
-	{
-        object error_msg(from_stack(mainState, -1));
+    }
+    catch (error& e)
+    {
+        object error_msg(from_stack(L, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         TryClose();
-	}
+    }
 }
 
-
-
-void LunaLua::TryClose()
+void LunaLua::init(wstring main_path)
 {
-    if(mainState)
-        lua_close(mainState);
-    mainState = 0;
-    lastSection = -1;
+	wstring globalPath = main_path;
+	globalPath = globalPath.append(L"lunaworld.lua");
+	initCodeFile(mainStateGlobal, globalPath);
+    wstring full_path = main_path.append(Level::GetName());
+    full_path = removeExtension(full_path);
+    full_path = full_path.append(L"\\lunadll.lua");
+    
+    initCodeFile(mainState, full_path);
+    
 }
 
-void LunaLua::Do()
+
+void LunaLua::DoCodeFile(lua_State *L)
 {
     PlayerMOB* demo = Player::Get(1);
-    if(demo == 0 || mainState == 0)
+    if(demo == 0 || L == 0)
         return;
 
     try
     {
-        if(LuaHelper::is_function(mainState, "onLoop")){
-            luabind::call_function<void>(mainState, "onLoop");
+        if(LuaHelper::is_function(L, "onLoop")){
+            luabind::call_function<void>(L, "onLoop");
         }
-
         if(lastSection != demo->CurrentSection){
             std::string curSecLoop = "onLoadSection";
 
-            if(LuaHelper::is_function(mainState, curSecLoop.c_str())){
-                luabind::call_function<void>(mainState, curSecLoop.c_str()); //onLoadSection
+            if(LuaHelper::is_function(L, curSecLoop.c_str())){
+                luabind::call_function<void>(L, curSecLoop.c_str()); //onLoadSection
             }
-
             curSecLoop = curSecLoop.append(std::to_string((long long)demo->CurrentSection));
-            if(LuaHelper::is_function(mainState, curSecLoop.c_str())){
-                luabind::call_function<void>(mainState, curSecLoop.c_str()); //onLoadSection#
+            if(LuaHelper::is_function(L, curSecLoop.c_str())){
+                luabind::call_function<void>(L, curSecLoop.c_str()); //onLoadSection#
             }
-            lastSection = demo->CurrentSection;
-        }
 
+        }
         std::string curSecLoop = "onLoopSection";
         curSecLoop = curSecLoop.append(std::to_string((long long)demo->CurrentSection));
-        if(LuaHelper::is_function(mainState, curSecLoop.c_str())){
-            luabind::call_function<void>(mainState, curSecLoop.c_str());
+        if(LuaHelper::is_function(L, curSecLoop.c_str())){
+            luabind::call_function<void>(L, curSecLoop.c_str());
         }
+        LuaProxy::processKeyboardEvents(L);
+        LuaProxy::processJumpEvent(L);
     }
     catch (luabind::error& e)
-	{
-		luabind::object error_msg(luabind::from_stack(mainState, -1));
-		LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
-		TryClose();
+    {
+        luabind::object error_msg(luabind::from_stack(L, -1));
+        LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
+        TryClose();
     }
 }
+
+
+void LunaLua::Do()
+{
+    PlayerMOB* demo = Player::Get(1);
+    if(demo == 0)
+        return;
+
+	DoCodeFile(mainStateGlobal);
+    DoCodeFile(mainState);
+    
+    LuaProxy::finishEventHandling();
+
+    lastSection = demo->CurrentSection;
+}
+
+
+void LunaLua::TryClose()
+{
+    TryCloseState(mainState);
+    TryCloseState(mainStateGlobal);
+    lastSection = -1;
+}
+
+
+void LunaLua::TryCloseState(lua_State* L)
+{
+    if(L)
+        lua_close(L);
+
+    L = 0;
+}
+
+
+

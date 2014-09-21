@@ -1,4 +1,5 @@
 #include "LuaProxy.h"
+#include "LuaHelper.h"
 #include "../Rendering.h"
 #include "../Globals.h"
 #include "../PlayerMOB.h"
@@ -396,4 +397,77 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
     default:
         return luabind::object();
     }
+}
+
+char LuaProxy::pressTest(short oldp, short newp)
+{
+    if(oldp == 0 && newp == -1)
+        return 1;
+
+    if(oldp == -1 && oldp == 0)
+        return -1;
+
+    return 0;
+}
+
+void LuaProxy::processKeyboardEvent(short oldp, short newp, int index, lua_State *L)
+{
+    char pTest = pressTest(oldp, newp);
+    if(pTest == 1){
+        if(LuaHelper::is_function(L, "onKeyDown")){
+            luabind::call_function<void>(L, "onKeyDown", index);
+        }
+    }else if(pTest == -1){
+        if(LuaHelper::is_function(L, "onKeyUp")){
+            luabind::call_function<void>(L, "onKeyUp", index);
+        }
+    }
+}
+
+void LuaProxy::processKeyboardEvents(lua_State* L)
+{
+    PlayerMOB* player = ::Player::Get(1);
+    processKeyboardEvent(playerUPressing, player->UKeyState, 0, L);
+    processKeyboardEvent(playerDPressing, player->DKeyState, 1, L);
+    processKeyboardEvent(playerLPressing, player->LKeyState, 2, L);
+    processKeyboardEvent(playerRPressing, player->RKeyState, 3, L);
+    processKeyboardEvent(playerJPressing, player->JKeyState, 4, L);
+    processKeyboardEvent(playerSJPressing, player->SJKeyState, 5, L);
+    processKeyboardEvent(playerXPressing, player->XKeyState, 6, L);
+    processKeyboardEvent(playerRNPressing, player->RNKeyState, 7, L);
+    processKeyboardEvent(playerSELPressing, player->SELKeyState, 8, L);
+    processKeyboardEvent(playerSTRPressing, player->STRKeyState, 9, L);
+}
+
+
+
+void LuaProxy::processJumpEvent(lua_State *L)
+{
+    PlayerMOB* player = ::Player::Get(1);
+    if(playerJumping == 0 && player->HasJumped == -1){
+        if(LuaHelper::is_function(L, "onJump")){
+            luabind::call_function<void>(L, "onJump");
+        }
+    }else if(playerJumping == -1 && player->HasJumped == 0){
+        if(LuaHelper::is_function(L, "onJumpEnd")){
+            luabind::call_function<void>(L, "onJumpEnd");
+        }
+    }
+}
+
+
+void LuaProxy::finishEventHandling()
+{
+    PlayerMOB* player = ::Player::Get(1);
+    playerUPressing = player->UKeyState;
+    playerDPressing = player->DKeyState;
+    playerLPressing = player->LKeyState;
+    playerRPressing = player->RKeyState;
+    playerJPressing = player->JKeyState;
+    playerSJPressing = player->SJKeyState;
+    playerXPressing = player->XKeyState;
+    playerRNPressing = player->RNKeyState;
+    playerSELPressing = player->SELKeyState;
+    playerSTRPressing = player->STRKeyState;
+    playerJumping = player->HasJumped;
 }

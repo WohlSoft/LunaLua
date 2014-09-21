@@ -28,6 +28,24 @@ namespace LuaProxy {
     void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 
+    static short playerUPressing;
+    static short playerDPressing;
+    static short playerLPressing;
+    static short playerRPressing;
+    static short playerJPressing;
+    static short playerSJPressing;
+    static short playerXPressing;
+    static short playerRNPressing;
+    static short playerSELPressing;
+    static short playerSTRPressing;
+    static short playerJumping;
+
+    char pressTest(short oldp, short newp);
+    void processKeyboardEvent(short oldp, short newp, int index, lua_State *L);
+    void processKeyboardEvents(lua_State *L);
+    void processJumpEvent(lua_State *L);
+    void finishEventHandling();
+
     struct RECTd{
         double left;
         double top;
