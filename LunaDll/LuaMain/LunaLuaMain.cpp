@@ -24,7 +24,7 @@ void windowError(const char* errorText){
     MessageBoxA(0, errorText, "Error", 0);
 }
 
-void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
+void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckName)
 {
     TryCloseState(L);
 
@@ -81,7 +81,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
     LuaProxy::playerJumping = 0;
 
 
-    int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), "lunadll.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
+    int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), chunckName)  || lua_pcall(L, 0, LUA_MULTRET, 0);
 
 
     //constants
@@ -130,6 +130,9 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
         def("totalNPC", &LuaProxy::totalNPCs),
         def("npcs", &LuaProxy::npcs),
         def("findnpcs", &LuaProxy::findNPCs),
+        def("triggerEvent", &LuaProxy::triggerEvent),
+        def("playSFX", &LuaProxy::playSFX),
+
         class_<RECT>("RECT")
             .def_readwrite("left", &RECT::left)
             .def_readwrite("top", &RECT::top)
@@ -159,6 +162,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
+            .def(constructor<int>())
             .def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Player::mem))
             .def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
             .def("kill", &LuaProxy::Player::kill)
@@ -173,10 +177,15 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path)
             .property("powerup", &LuaProxy::Player::powerup, &LuaProxy::Player::setPowerup)
             .property("reservePowerup", &LuaProxy::Player::reservePowerup, &LuaProxy::Player::setReservePowerup)
             .property("holdingNPC", &LuaProxy::Player::holdingNPC)
-
+            .property("isValid", &LuaProxy::Player::isValid)
     ];
 
     _G["player"] = new LuaProxy::Player();
+    LuaProxy::Player* pl = new LuaProxy::Player(2);
+    if(pl->isValid())
+        _G["player2"] = pl;
+    else
+        delete pl;
 
 
     if(!(errcode == 0)){
@@ -203,12 +212,15 @@ void LunaLua::init(wstring main_path)
 {
 	wstring globalPath = main_path;
 	globalPath = globalPath.append(L"lunaworld.lua");
-	initCodeFile(mainStateGlobal, globalPath);
+    initCodeFile(mainStateGlobal, globalPath, "lunaworld.lua");
+	if(!mainStateGlobal)
+		return;
+
     wstring full_path = main_path.append(Level::GetName());
     full_path = removeExtension(full_path);
     full_path = full_path.append(L"\\lunadll.lua");
     
-    initCodeFile(mainState, full_path);
+    initCodeFile(mainState, full_path, "lunadll.lua");
     
 }
 
@@ -276,7 +288,7 @@ void LunaLua::TryClose()
 }
 
 
-void LunaLua::TryCloseState(lua_State* L)
+void LunaLua::TryCloseState(lua_State* &L)
 {
     if(L)
         lua_close(L);

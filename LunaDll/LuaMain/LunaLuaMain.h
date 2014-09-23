@@ -11,10 +11,10 @@ namespace LunaLua{
     int lastSection;
 	static lua_State* mainState = 0;
     static lua_State* mainStateGlobal = 0;
-    void initCodeFile(lua_State* &L, std::wstring main_path);
+    void initCodeFile(lua_State* &L, std::wstring main_path, const char *chunckName);
     void init(std::wstring main_path);
     void DoCodeFile(lua_State* L);
     void Do();
-    void TryCloseState(lua_State* L);
+    void TryCloseState(lua_State *&L);
     void TryClose();
 }

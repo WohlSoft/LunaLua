@@ -27,6 +27,8 @@ namespace LuaProxy {
     luabind::object findNPCs(int ID, int section, lua_State *L);
     void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+    void triggerEvent(const char* evName);
+    void playSFX(int index);
 
     static short playerUPressing;
     static short playerDPressing;
@@ -86,6 +88,7 @@ namespace LuaProxy {
     class Player{
     public:
         Player ();
+        Player (int index);
         int section();
         Section sectionObj();
         void kill();
@@ -106,6 +109,9 @@ namespace LuaProxy {
         luabind::object holdingNPC(lua_State *L);
         void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+        bool isValid();
+    private:
+        int m_index;
     };
 
 

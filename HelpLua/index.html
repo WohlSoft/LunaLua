@@ -117,6 +117,39 @@ h1 {
         </td>
         <td>In the first frameloop of  section # <b>onLoadSection#</b> is called.  Replace # with the sectionnumber 0-20.</td>
       </tr>
+      <tr>
+        <td><div class="code">
+          <p>function onJump()</p>
+          <p>&nbsp;</p>
+          <p>end</p>
+        </div></td>
+        <td>When the player starts to jump, <b>onJump</b> is called.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>function onJumpEnd()</p>
+          <p>&nbsp;</p>
+          <p>end</p>
+        </div></td>
+        <td>When the player hits the surface (jump ends), <b>onJumpEnd</b> is called.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>function onKeyDown([int] keycode)</p>
+          <p>&nbsp;</p>
+          <p>end</p>
+<p>&nbsp;</p>
+</div></td>
+        <td>When a key is getting hit, <b>onKeyDown</b> is called. Keycode can be compared with the constants.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>function onKeyUp([int] keycode)</p>
+          <p>&nbsp;</p>
+          <p>end</p>
+        </div></td>
+        <td>When a key is getting released, <b>onKeyUp</b> is called. Keycode can be compared with the constants.</td>
+      </tr>
     </table>
     </div>
     
@@ -321,13 +354,19 @@ h1 {
         <th>Info</th>
       </tr>
       <tr>
+        <td><div class="code">
+          <p>player = Player()</p>
+        </div></td>
+        <td><p>Constructs a new Player class. All constructed players will always point to the first player.</p>
+          <p><b>NOTE:</b> It is recommended to use the constant &quot;<strong>player</strong>&quot; and/or &quot;<strong>player2</strong>&quot; (for second player) instead of constructing an own one. </p></td>
+      </tr>
+      <tr>
         <td>
           <div class="code">
-    	    <p>player = Player()</p>
+    	    <p>player = Player([int] playerindex)</p>
           </div>
         </td>
-        <td><p>Constructs a new Player class. All constructed players will always point to the first player.</p>
-        <p><b>NOTE:</b> It is recommended to use the constant &quot;<strong>player</strong>&quot; instead of constructing an own one. </p></td>
+        <td><p>Constructs a player with the specific playerindex. To check if valid use if(player.isValid)! Player 1 has playerindex = 1 and Player 2 has playerindex = 2</p></td>
       </tr>
       <tr>
         <td><div class="code">
@@ -413,6 +452,12 @@ h1 {
         <td>Gets a specfic value by player offset-address. See constants for datatypes.</td>
       </tr>
       <tr>
+        <td><div class="code">
+          <p>[boolean] player.isValid</p>
+        </div></td>
+        <td>If this instance is valid. Good for checking if a second player exsist. </td>
+      </tr>
+      <tr>
         <td colspan="2"><p>This class provides fields and functions to modify the player/character.</p>
           <p><b>NOTE</b>: It is recommended to use the constant &quot;<strong>player</strong>&quot; instead of constructing an own one.           </p></tr>
     </table>
@@ -475,6 +520,18 @@ h1 {
           <p>[any] mem([hex/int] address, [int] datatype)</p></div></td>
         <td>Gets a specfic value by address. See constants for datatypes.</td>
       </tr>
+      <tr>
+        <td><div class="code">
+          <p>playSFX([int] soundid)</p>
+        </div></td>
+        <td>Plays the given sound by sound-id.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>triggerEvent([string] eventname)</p>
+        </div></td>
+        <td>Runs a event by eventname.</td>
+      </tr>
     </table>
     </div>
     <p>&nbsp;</p>
@@ -488,6 +545,24 @@ h1 {
         <th>Constant</th>
         <th>Recommended use</th>
         <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>player</p>
+        </div></td>
+        <td><div class="code">
+          <p>---</p>
+        </div></td>
+        <td><p>An instance of player 1</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>player2</p>
+        </div></td>
+        <td><div class="code">
+          <p>---</p>
+        </div></td>
+        <td><p>An instance of player 2. (Only if 2-player mode) You can check with 'if(player2)then' to be sure if a second player exsist.</p></td>
       </tr>
       <tr>
         <td><div class="code">
@@ -640,6 +715,96 @@ h1 {
           <p>myNPC:mem</p>
         </div></td>
         <td>DFloat field data type</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_UP</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Up key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_DOWN</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Down key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_LEFT</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Left key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_RIGHT</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Right key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_JUMP</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Jump key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_SPINJUMP</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Spinjump key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_X</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>x key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_RUN</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Run key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_SEL</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Sel key</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>KEY_STR</p>
+        </div></td>
+        <td><div class="code">
+          <p>keycode</p>
+        </div></td>
+        <td>Str key</td>
       </tr>
     </table>
     </div>

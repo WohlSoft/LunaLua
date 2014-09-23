@@ -5,6 +5,8 @@
 #include "../PlayerMOB.h"
 #include "../NPCs.h"
 #include "../MiscFuncs.h"
+#include "../SMBXEvents.h"
+#include "../Sound.h"
 
 
 
@@ -31,103 +33,106 @@ void LuaProxy::print(const char *text, int type, int x, int y)
     gLunaRender.SafePrint(utf8_decode(std::string(text)), type, (float)x, (float)y);
 }
 
-LuaProxy::Player::Player()
+LuaProxy::Player::Player() : m_index(1)
+{}
+
+LuaProxy::Player::Player(int index) : m_index(index)
 {}
 
 int LuaProxy::Player::section()
 {
-    return (int)::Player::Get(1)->CurrentSection;
+    return (int)::Player::Get(m_index)->CurrentSection;
 }
 
 LuaProxy::Section LuaProxy::Player::sectionObj()
 {
-    return Section((int)::Player::Get(1)->CurrentSection);
+    return Section((int)::Player::Get(m_index)->CurrentSection);
 }
 
 void LuaProxy::Player::kill()
 {
-    int tempint = 1;
+    int tempint = m_index;
     ::Player::Kill(&tempint);
 }
 
 void LuaProxy::Player::harm()
 {
-    int tempint = 1;
+    int tempint = m_index;
     ::Player::Harm(&tempint);
 }
 
 RECT LuaProxy::Player::screen()
 {
-    return ::Player::GetScreenPosition(::Player::Get(1));
+    return ::Player::GetScreenPosition(::Player::Get(m_index));
 }
 
 double LuaProxy::Player::x()
 {
-    return ::Player::Get(1)->CurXPos;
+    return ::Player::Get(m_index)->CurXPos;
 }
 
 void LuaProxy::Player::setX(double x)
 {
-    ::Player::Get(1)->CurXPos = x;
+    ::Player::Get(m_index)->CurXPos = x;
 }
 
 double LuaProxy::Player::y()
 {
-    return ::Player::Get(1)->CurYPos;
+    return ::Player::Get(m_index)->CurYPos;
 }
 
 void LuaProxy::Player::setY(double y)
 {
-    ::Player::Get(1)->CurYPos = y;
+    ::Player::Get(m_index)->CurYPos = y;
 }
 
 double LuaProxy::Player::speedX()
 {
-    return ::Player::Get(1)->CurXSpeed;
+    return ::Player::Get(m_index)->CurXSpeed;
 }
 
 void LuaProxy::Player::setSpeedX(double speedX)
 {
-    ::Player::Get(1)->CurXSpeed = speedX;
+    ::Player::Get(m_index)->CurXSpeed = speedX;
 }
 
 double LuaProxy::Player::speedY()
 {
-    return ::Player::Get(1)->CurYSpeed;
+    return ::Player::Get(m_index)->CurYSpeed;
 }
 
 void LuaProxy::Player::setSpeedY(double speedY)
 {
-    ::Player::Get(1)->CurYSpeed = speedY;
+    ::Player::Get(m_index)->CurYSpeed = speedY;
 }
 
 int LuaProxy::Player::powerup()
 {
-    return (int)::Player::Get(1)->CurrentPowerup;
+    return (int)::Player::Get(m_index)->CurrentPowerup;
 }
 
 void LuaProxy::Player::setPowerup(int powerup)
 {
     if(powerup > 0 && powerup < 9)
-        ::Player::Get(1)->CurrentPowerup = powerup;
+        ::Player::Get(m_index)->CurrentPowerup = powerup;
 }
 
 int LuaProxy::Player::reservePowerup()
 {
-    return (int)::Player::Get(1)->PowerupBoxContents;
+    return (int)::Player::Get(m_index)->PowerupBoxContents;
 }
 
 void LuaProxy::Player::setReservePowerup(int reservePowerup)
 {
     if(reservePowerup >= 0)
-        ::Player::Get(1)->PowerupBoxContents = reservePowerup;
+        ::Player::Get(m_index)->PowerupBoxContents = reservePowerup;
 }
 
 luabind::object LuaProxy::Player::holdingNPC(lua_State *L)
 {
 
-    if(::Player::Get(1)->HeldNPCIndex != 0) {
-        return luabind::object(L, new NPC(::Player::Get(1)->HeldNPCIndex-1));
+    if(::Player::Get(m_index)->HeldNPCIndex != 0) {
+        return luabind::object(L, new NPC(::Player::Get(m_index)->HeldNPCIndex-1));
     }
 
     return luabind::object();
@@ -137,7 +142,7 @@ void LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::obj
 {
     int iftype = (int)ftype;
     if(iftype >= 1 && iftype <= 5){
-        PlayerMOB* pPlayer = ::Player::Get(1);
+        PlayerMOB* pPlayer = ::Player::Get(m_index);
         void* ptr = ((&(*(byte*)pPlayer)) + offset);
         MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
     }
@@ -148,7 +153,7 @@ luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, l
     int iftype = (int)ftype;
     double val = 0;
     if(iftype >= 1 && iftype <= 5){
-        PlayerMOB* pPlayer = ::Player::Get(1);
+        PlayerMOB* pPlayer = ::Player::Get(m_index);
         void* ptr = ((&(*(byte*)pPlayer)) + offset);
         val = GetMem((int)ptr, (FIELDTYPE)ftype);
     }
@@ -166,6 +171,11 @@ luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, l
     default:
         return luabind::object();
     }
+}
+
+bool LuaProxy::Player::isValid()
+{
+    return ::Player::Get(m_index) != 0;
 }
 
 
@@ -470,4 +480,17 @@ void LuaProxy::finishEventHandling()
     playerSELPressing = player->SELKeyState;
     playerSTRPressing = player->STRKeyState;
     playerJumping = player->HasJumped;
+}
+
+
+void LuaProxy::triggerEvent(const char *evName)
+{
+    SMBXEvents::TriggerEvent(utf8_decode(std::string(evName)), 0);
+
+}
+
+
+void LuaProxy::playSFX(int index)
+{
+    SMBXSound::PlaySFX(index);
 }
