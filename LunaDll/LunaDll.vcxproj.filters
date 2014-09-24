@@ -88,6 +88,9 @@
     <Filter Include="Header Files\Lua">
       <UniqueIdentifier>{73ab09f3-d5ee-4d34-bb48-e256fd1a29e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UserSaves">
+      <UniqueIdentifier>{5ffce8e1-f367-4b21-ad3e-e2b529b20551}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -203,6 +206,9 @@
     </ClInclude>
     <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="UserSaving.h">
+      <Filter>Header Files\UserSaves</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -349,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LunaLuaMain.cpp">
       <Filter>Header Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="UserSaving.cpp">
+      <Filter>Header Files\UserSaves</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

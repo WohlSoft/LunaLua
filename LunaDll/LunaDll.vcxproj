@@ -54,6 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(LUA_DEV)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -125,6 +126,7 @@
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="SpriteFuncs.h" />
     <ClInclude Include="TriggerZone.h" />
+    <ClInclude Include="UserSaving.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AC_HeartSystem.cpp" />
@@ -175,6 +177,7 @@
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="SpriteDrawFuncs.cpp" />
     <ClCompile Include="Talkhaus-Science_Final_Battle.cpp" />
+    <ClCompile Include="UserSaving.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scratch.txt" />
