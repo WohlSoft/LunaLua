@@ -7,6 +7,8 @@
 #include "../MiscFuncs.h"
 #include "../SMBXEvents.h"
 #include "../Sound.h"
+#include "../Level.h"
+
 
 
 
@@ -24,13 +26,18 @@ void LuaProxy::windowDebug(const char *debugText){
 
 void LuaProxy::print(const char *text, int x, int y)
 {
-    gLunaRender.SafePrint(utf8_decode(std::string(text)), 3, (float)x, (float)y);
+    LuaProxy::print(text, 3, x, y);
 }
 
 
 void LuaProxy::print(const char *text, int type, int x, int y)
 {
-    gLunaRender.SafePrint(utf8_decode(std::string(text)), type, (float)x, (float)y);
+    std::wstring txt = utf8_decode(std::string(text));
+    if(type==3)
+        for (wstring::iterator it = txt.begin(); it != txt.end(); ++it)
+            *it = towupper(*it);
+
+    gLunaRender.SafePrint(txt, type, (float)x, (float)y);
 }
 
 LuaProxy::Player::Player() : m_index(1)
@@ -420,66 +427,84 @@ char LuaProxy::pressTest(short oldp, short newp)
     return 0;
 }
 
-void LuaProxy::processKeyboardEvent(short oldp, short newp, int index, lua_State *L)
+void LuaProxy::processKeyboardEvent(short oldp, short newp, int index, int playerIndex, lua_State *L)
 {
     char pTest = pressTest(oldp, newp);
     if(pTest == 1){
         if(LuaHelper::is_function(L, "onKeyDown")){
-            luabind::call_function<void>(L, "onKeyDown", index);
+            luabind::call_function<void>(L, "onKeyDown", index, playerIndex);
         }
     }else if(pTest == -1){
         if(LuaHelper::is_function(L, "onKeyUp")){
-            luabind::call_function<void>(L, "onKeyUp", index);
+            luabind::call_function<void>(L, "onKeyUp", index, playerIndex);
         }
     }
 }
 
 void LuaProxy::processKeyboardEvents(lua_State* L)
 {
-    PlayerMOB* player = ::Player::Get(1);
-    processKeyboardEvent(playerUPressing, player->UKeyState, 0, L);
-    processKeyboardEvent(playerDPressing, player->DKeyState, 1, L);
-    processKeyboardEvent(playerLPressing, player->LKeyState, 2, L);
-    processKeyboardEvent(playerRPressing, player->RKeyState, 3, L);
-    processKeyboardEvent(playerJPressing, player->JKeyState, 4, L);
-    processKeyboardEvent(playerSJPressing, player->SJKeyState, 5, L);
-    processKeyboardEvent(playerXPressing, player->XKeyState, 6, L);
-    processKeyboardEvent(playerRNPressing, player->RNKeyState, 7, L);
-    processKeyboardEvent(playerSELPressing, player->SELKeyState, 8, L);
-    processKeyboardEvent(playerSTRPressing, player->STRKeyState, 9, L);
+    for(int i = 1; i <= 2; ++i){
+        PlayerMOB* player = ::Player::Get(i);
+        LuaEventData* evData = getEvData(i);
+        if(player && evData){
+            processKeyboardEvent(evData->playerUPressing, player->UKeyState, 0, i, L);
+            processKeyboardEvent(evData->playerDPressing, player->DKeyState, 1, i, L);
+            processKeyboardEvent(evData->playerLPressing, player->LKeyState, 2, i, L);
+            processKeyboardEvent(evData->playerRPressing, player->RKeyState, 3, i, L);
+            processKeyboardEvent(evData->playerJPressing, player->JKeyState, 4, i, L);
+            processKeyboardEvent(evData->playerSJPressing, player->SJKeyState, 5, i, L);
+            processKeyboardEvent(evData->playerXPressing, player->XKeyState, 6, i, L);
+            processKeyboardEvent(evData->playerRNPressing, player->RNKeyState, 7, i, L);
+            processKeyboardEvent(evData->playerSELPressing, player->SELKeyState, 8, i, L);
+            processKeyboardEvent(evData->playerSTRPressing, player->STRKeyState, 9, i, L);
+        }
+    }
 }
 
 
 
 void LuaProxy::processJumpEvent(lua_State *L)
 {
-    PlayerMOB* player = ::Player::Get(1);
-    if(playerJumping == 0 && player->HasJumped == -1){
-        if(LuaHelper::is_function(L, "onJump")){
-            luabind::call_function<void>(L, "onJump");
-        }
-    }else if(playerJumping == -1 && player->HasJumped == 0){
-        if(LuaHelper::is_function(L, "onJumpEnd")){
-            luabind::call_function<void>(L, "onJumpEnd");
+    for(int i = 1; i <= 2; ++i){
+        PlayerMOB* player = ::Player::Get(i);
+        LuaEventData* evData = getEvData(i);
+        if(player && evData){
+            if(evData->playerJumping == 0 && player->HasJumped == -1){
+                if(LuaHelper::is_function(L, "onJump")){
+                    luabind::call_function<void>(L, "onJump", i);
+                }
+            }else if(evData->playerJumping == -1 && player->HasJumped == 0){
+                if(LuaHelper::is_function(L, "onJumpEnd")){
+                    luabind::call_function<void>(L, "onJumpEnd", i);
+                }
+            }
         }
     }
+
 }
 
 
 void LuaProxy::finishEventHandling()
 {
-    PlayerMOB* player = ::Player::Get(1);
-    playerUPressing = player->UKeyState;
-    playerDPressing = player->DKeyState;
-    playerLPressing = player->LKeyState;
-    playerRPressing = player->RKeyState;
-    playerJPressing = player->JKeyState;
-    playerSJPressing = player->SJKeyState;
-    playerXPressing = player->XKeyState;
-    playerRNPressing = player->RNKeyState;
-    playerSELPressing = player->SELKeyState;
-    playerSTRPressing = player->STRKeyState;
-    playerJumping = player->HasJumped;
+    for(int i = 1; i <= 2; ++i){
+        PlayerMOB* player = ::Player::Get(i);
+        LuaEventData* evData = getEvData(i);
+        if(player && evData){
+            evData->playerUPressing = player->UKeyState;
+            evData->playerDPressing = player->DKeyState;
+            evData->playerLPressing = player->LKeyState;
+            evData->playerRPressing = player->RKeyState;
+            evData->playerJPressing = player->JKeyState;
+            evData->playerSJPressing = player->SJKeyState;
+            evData->playerXPressing = player->XKeyState;
+            evData->playerRNPressing = player->RNKeyState;
+            evData->playerSELPressing = player->SELKeyState;
+            evData->playerSTRPressing = player->STRKeyState;
+            evData->playerJumping = player->HasJumped;
+        }
+
+    }
+
 }
 
 
@@ -493,4 +518,26 @@ void LuaProxy::triggerEvent(const char *evName)
 void LuaProxy::playSFX(int index)
 {
     SMBXSound::PlaySFX(index);
+}
+
+
+LuaProxy::LuaEventData *LuaProxy::getEvData(int playerIndex)
+{
+    if(playerIndex==1)
+        return &evPlayer1;
+    if(playerIndex==2)
+        return &evPlayer2;
+
+    return 0;
+}
+
+
+void LuaProxy::playSFX(const char *filename)
+{
+    wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+    wstring full_path = world_dir.append(Level::GetName());
+    full_path = removeExtension(full_path);
+    full_path = full_path.append(L"\\"); // < path into level folder
+    full_path = full_path + utf8_decode(filename);
+    PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 }
