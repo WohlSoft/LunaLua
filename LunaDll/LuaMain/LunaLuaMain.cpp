@@ -68,17 +68,29 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
     osTable["tmpname"] = object();
 
     //reset data
-    LuaProxy::playerUPressing = 0;
-    LuaProxy::playerDPressing = 0;
-    LuaProxy::playerLPressing = 0;
-    LuaProxy::playerRPressing = 0;
-    LuaProxy::playerJPressing = 0;
-    LuaProxy::playerSJPressing = 0;
-    LuaProxy::playerXPressing = 0;
-    LuaProxy::playerRNPressing = 0;
-    LuaProxy::playerSELPressing = 0;
-    LuaProxy::playerSTRPressing = 0;
-    LuaProxy::playerJumping = 0;
+    LuaProxy::evPlayer1.playerUPressing = 0;
+    LuaProxy::evPlayer1.playerDPressing = 0;
+    LuaProxy::evPlayer1.playerLPressing = 0;
+    LuaProxy::evPlayer1.playerRPressing = 0;
+    LuaProxy::evPlayer1.playerJPressing = 0;
+    LuaProxy::evPlayer1.playerSJPressing = 0;
+    LuaProxy::evPlayer1.playerXPressing = 0;
+    LuaProxy::evPlayer1.playerRNPressing = 0;
+    LuaProxy::evPlayer1.playerSELPressing = 0;
+    LuaProxy::evPlayer1.playerSTRPressing = 0;
+    LuaProxy::evPlayer1.playerJumping = 0;
+
+    LuaProxy::evPlayer2.playerUPressing = 0;
+    LuaProxy::evPlayer2.playerDPressing = 0;
+    LuaProxy::evPlayer2.playerLPressing = 0;
+    LuaProxy::evPlayer2.playerRPressing = 0;
+    LuaProxy::evPlayer2.playerJPressing = 0;
+    LuaProxy::evPlayer2.playerSJPressing = 0;
+    LuaProxy::evPlayer2.playerXPressing = 0;
+    LuaProxy::evPlayer2.playerRNPressing = 0;
+    LuaProxy::evPlayer2.playerSELPressing = 0;
+    LuaProxy::evPlayer2.playerSTRPressing = 0;
+    LuaProxy::evPlayer2.playerJumping = 0;
 
 
     int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), chunckName)  || lua_pcall(L, 0, LUA_MULTRET, 0);
@@ -131,7 +143,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
         def("npcs", &LuaProxy::npcs),
         def("findnpcs", &LuaProxy::findNPCs),
         def("triggerEvent", &LuaProxy::triggerEvent),
-        def("playSFX", &LuaProxy::playSFX),
+        def("playSFX", (void(*)(int))&LuaProxy::playSFX),
 
         class_<RECT>("RECT")
             .def_readwrite("left", &RECT::left)

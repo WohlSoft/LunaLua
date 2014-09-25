@@ -60,7 +60,7 @@ h1 {
 <div id="content">
 	<div id="eventwrapper">
 	<p class="over_title">Events:</p>
-    <p>Events are called by Lunadll if they exsist in the lua code.</p>
+    <p>Events are called by Lunadll if they exsist in the lua code. Note: Not all parameters have to be set, you can just ignore them, if you want to. But the order is always the same. So if you need parameter 2 you have to write parameter 1 too!</p>
     <hr />
     <table border="1" width="100%">
       <tr>
@@ -119,36 +119,40 @@ h1 {
       </tr>
       <tr>
         <td><div class="code">
-          <p>function onJump()</p>
+          <p>function onJump([int] playerIndex)</p>
           <p>&nbsp;</p>
           <p>end</p>
         </div></td>
-        <td>When the player starts to jump, <b>onJump</b> is called.</td>
+        <td><p>When the player starts to jump, <b>onJump</b> is called.</p>
+        <p>playerIndex is the index of the player (Player 1: playerIndex = 1; Player 2: playerIndex = 2).</p></td>
       </tr>
       <tr>
         <td><div class="code">
-          <p>function onJumpEnd()</p>
+          <p>function onJumpEnd([int] playerIndex)</p>
           <p>&nbsp;</p>
           <p>end</p>
         </div></td>
-        <td>When the player hits the surface (jump ends), <b>onJumpEnd</b> is called.</td>
+        <td><p>When the player hits the surface (jump ends), <b>onJumpEnd</b> is called.</p>
+        <p>playerIndex is the index of the player (Player 1: playerIndex = 1; Player 2: playerIndex = 2).</p></td>
       </tr>
       <tr>
         <td><div class="code">
-          <p>function onKeyDown([int] keycode)</p>
+          <p>function onKeyDown([int] keycode, [int] playerIndex)</p>
           <p>&nbsp;</p>
           <p>end</p>
 <p>&nbsp;</p>
 </div></td>
-        <td>When a key is getting hit, <b>onKeyDown</b> is called. Keycode can be compared with the constants.</td>
+        <td><p>When a key is getting hit, <b>onKeyDown</b> is called. Keycode can be compared with the constants.</p>
+        <p>playerIndex is the index of the player (Player 1: playerIndex = 1; Player 2: playerIndex = 2).</p></td>
       </tr>
       <tr>
         <td><div class="code">
-          <p>function onKeyUp([int] keycode)</p>
+          <p>function onKeyUp([int] keycode, [int] playerIndex)</p>
           <p>&nbsp;</p>
           <p>end</p>
         </div></td>
-        <td>When a key is getting released, <b>onKeyUp</b> is called. Keycode can be compared with the constants.</td>
+        <td><p>When a key is getting released, <b>onKeyUp</b> is called. Keycode can be compared with the constants.</p>
+        <p>playerIndex is the index of the player (Player 1: playerIndex = 1; Player 2: playerIndex = 2).</p></td>
       </tr>
     </table>
     </div>
