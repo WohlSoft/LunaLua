@@ -43,12 +43,12 @@ int OnLvlLoad() {
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
 
-	// Clean up possible leftovers
+	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gLunaRender.ClearAll();
-	//gSpriteMan.ClearAllSprites();
 	gSpriteMan.ResetSpriteManager();
 	gCellMan.Reset();
+	gSavedVarBank.ClearBank();	
 	Input::ResetAll();
 
 	// Update renderer stuff
@@ -64,6 +64,11 @@ int OnLvlLoad() {
 
 		// Try to load world codes		
 		gAutoMan.ReadWorld(std::wstring((wchar_t*)GM_FULLDIR));
+
+		// Init var bank
+		gSavedVarBank.TryLoadWorldVars();
+		gSavedVarBank.CheckSaveDeletion();
+		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init
@@ -84,6 +89,7 @@ int TestFunc() {
 	// Clean up
 	gLunaRender.ClearExpired();
 	gAutoMan.ClearExpired();
+	gSavedVarBank.CheckSaveDeletion();
 
 	// Update inputs
 	Input::CheckSpecialCheats();
@@ -91,16 +97,15 @@ int TestFunc() {
 
 	LunaLua::Do();
 
-	if(gLunaEnabled) {
-
-		// Update lag timer		
+	if(gLunaEnabled) {	
 
 		// Run autocode
 		gAutoMan.DoEvents(false);
 
 		// Update some stuff
 		gFrames++;	
-		gDeathCounter.UpdateDeaths(true);		
+		gDeathCounter.UpdateDeaths(true);
+		gSavedVarBank.SaveIfNeeded();
 
 		// Run any framecode
 		TestFrameCode();
@@ -144,6 +149,13 @@ void OnHUDDraw() {
 
 // TEST CODE - This code will run every frame everywhere, making for easy testing
 void TestFrameCode() {
+
+	/// DEBUG STUFF//
+
+	//- Uncomment to test variable bank
+	//for each(pair<wstring, double> kvp in gSavedVarBank.m_VarBank) {
+	//	gLunaRender.DebugPrint(kvp.first, kvp.second);
+	//}
 
 	//static double bgX = 0;
 	//double** pBGs = (double **)0x00B2B984;

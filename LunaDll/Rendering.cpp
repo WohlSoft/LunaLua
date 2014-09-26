@@ -184,7 +184,7 @@ void Renderer::RenderAll() {
 	int dbg_x = 325;
 	int dbg_y = 160;
 	for each(std::wstring dbg in DebugMessages) {
-		Render::Print(dbg, 3, (float)dbg_x, (float)dbg_y);
+		Render::Print(dbg, 4, (float)dbg_x, (float)dbg_y);
 		dbg_y += 20;
 		if(dbg_y > 560) {
 			dbg_y = 160;

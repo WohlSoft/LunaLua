@@ -116,6 +116,12 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		if(wcscmp(command, L"CompareVar") == 0)
 			return AT_CompareVar;
 
+		if(wcscmp(command, L"BankVar") == 0)
+			return AT_BankVar;
+
+		if(wcscmp(command, L"WriteBank") == 0)
+			return AT_WriteBank;
+
 
 		if(wcscmp(command, L"LunaControl") == 0)
 			return AT_LunaControl;

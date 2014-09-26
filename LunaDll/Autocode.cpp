@@ -457,8 +457,7 @@ void Autocode::Do(bool init) {
 			break;
 						}
 
-		case AT_LoadPlayerVar: {
-			char* dbg = "LOAD PLAYER VAR DEBUG";
+		case AT_LoadPlayerVar: {			
 			if(!this->ReferenceOK() || Param1 > (0x184 * 99))
 				break;
 			if(ftype == FT_INVALID) {
@@ -585,6 +584,19 @@ void Autocode::Do(bool init) {
 			}
 			break;
 						 }
+
+		case AT_BankVar: {
+			if(MyString.length() > 0) {
+				gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
+			}
+			break;
+						 }
+
+		case AT_WriteBank: {
+			gSavedVarBank.WriteBank();
+			break;
+						   }
+
 
 		// LUNA CONTROL
 		case AT_LunaControl: {

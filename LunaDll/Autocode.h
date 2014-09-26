@@ -54,6 +54,8 @@ enum AutocodeType {
 	AT_IfVar,					//1:		2: CompareType	3: Value		4: Event	5: Active time	6: 
 	AT_CompareVar,				//$Var 1	1:	2:CompareType 3:			4: Event	5: ActiveTime	6: Var 2
 	AT_ShowVar,					//1:		2: Xpos			3: Ypos			4: Font #	5: Active time	6: Base text
+	AT_BankVar,					//1:		2:				3:				4:			5: Active time	6: Name of luna var
+	AT_WriteBank,				//1:		2:				3:				4:			5:				6:
 
 	AT_LunaControl,				//1: Action	2: Value		3:				4:			5: Active time	6:	
 

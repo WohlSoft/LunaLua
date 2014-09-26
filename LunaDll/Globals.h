@@ -12,6 +12,7 @@
 #include "CSprite.h"
 #include "CSpriteManager.h"
 #include "CellManager.h"
+#include "UserSaving.h"
 
 #pragma comment (lib, "Msimg32.lib")
 
@@ -56,12 +57,13 @@ extern short	gNumpad6;
 extern LvlEnum	gLevelEnum;
 
 // Misc
-extern Renderer			gLunaRender;
-extern DeathCounter		gDeathCounter;
-extern AutocodeManager	gAutoMan;
-extern CSpriteManager	gSpriteMan;
-extern Logger			gLogger;
-extern CellManager		gCellMan;
+extern Renderer				gLunaRender;
+extern DeathCounter			gDeathCounter;
+extern AutocodeManager		gAutoMan;
+extern CSpriteManager		gSpriteMan;
+extern Logger				gLogger;
+extern CellManager			gCellMan;
+extern SavedVariableBank	gSavedVarBank;
 
 /// Functions ///
 void InitGlobals();

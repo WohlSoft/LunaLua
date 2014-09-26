@@ -5,6 +5,7 @@
 #include "Shlwapi.h"
 #include <time.h>
 #include "Logging.h"
+#include "UserSaving.h"
 
 // Global settings
 bool gLunaEnabled;
@@ -56,6 +57,8 @@ Logger gLogger;
 CSpriteManager gSpriteMan;
 
 CellManager gCellMan;
+
+SavedVariableBank gSavedVarBank;
 
 /// INIT GLOBALS
 void InitGlobals() {
