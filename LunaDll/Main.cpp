@@ -54,9 +54,10 @@ int OnLvlLoad() {
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
 
-	LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
+
 
 	if(gLunaEnabled) {
+        LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
 
 		// Load autocode
 		gAutoMan.Clear(false);		
@@ -95,9 +96,10 @@ int TestFunc() {
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
 
-	LunaLua::Do();
+
 
 	if(gLunaEnabled) {	
+        LunaLua::Do();
 
 		// Run autocode
 		gAutoMan.DoEvents(false);

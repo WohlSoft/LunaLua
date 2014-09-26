@@ -74,7 +74,8 @@ SOURCES += \
     LunaDll/PerformanceTimer.cpp \
     LunaDll/PngRender.cpp \
     LunaDll/RenderEffectOp.cpp \
-    LunaDll/SMBXEvents.cpp
+    LunaDll/SMBXEvents.cpp \
+    LunaDll/UserSaving.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -198,7 +199,8 @@ HEADERS += \
     LunaDll/Minigames.h \
     LunaDll/PerformanceTimer.h \
     LunaDll/PngRender.h \
-    LunaDll/RenderEffectOp.h
+    LunaDll/RenderEffectOp.h \
+    LunaDll/UserSaving.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
