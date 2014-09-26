@@ -31,6 +31,14 @@ namespace LuaProxy {
     void playSFX(int index);
     void playSFX(const char* filename);
 
+    namespace SaveBankProxy {
+        void setValue(const char* key, double value);
+        luabind::object getValue(const char* key, lua_State *L);
+        bool isValueSet(const char* key);
+        luabind::object values(lua_State* L);
+        void save();
+    }
+
     struct LuaEventData{
         short playerUPressing;
         short playerDPressing;

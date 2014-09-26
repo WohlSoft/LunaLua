@@ -20,6 +20,14 @@ std::wstring utf8_decode(const std::string &str)
     return wstrTo;
 }
 
+std::string utf8_encode(const std::wstring &wstr)
+{
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo( size_needed, 0 );
+    WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+
 void LuaProxy::windowDebug(const char *debugText){
     MessageBoxA(0, debugText, "Debug", 0);
 }
@@ -540,4 +548,45 @@ void LuaProxy::playSFX(const char *filename)
     full_path = full_path.append(L"\\"); // < path into level folder
     full_path = full_path + utf8_decode(filename);
     PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
+}
+
+
+void LuaProxy::SaveBankProxy::setValue(const char *key, double value)
+{
+    gSavedVarBank.SetVar(utf8_decode(std::string(key)), value);
+}
+
+
+luabind::object LuaProxy::SaveBankProxy::getValue(const char *key, lua_State* L)
+{
+    wstring wkey = utf8_decode(std::string(key));
+    if(!gSavedVarBank.VarExists(wkey))
+        return luabind::object();
+
+    return luabind::object(L, gSavedVarBank.GetVar(wkey));
+}
+
+
+bool LuaProxy::SaveBankProxy::isValueSet(const char *key)
+{
+    return gSavedVarBank.VarExists(utf8_decode(std::string(key)));
+}
+
+
+luabind::object LuaProxy::SaveBankProxy::values(lua_State *L)
+{
+    luabind::object valTable = luabind::newtable(L);
+
+    map<wstring, double> cpMap;
+    gSavedVarBank.CopyBank(&cpMap);
+    for(map<wstring, double>::iterator it = cpMap.begin(); it != cpMap.end(); ++it) {
+        valTable[utf8_encode(it->first.c_str())] = it->second;
+    }
+	return valTable;
+}
+
+
+void LuaProxy::SaveBankProxy::save()
+{
+    gSavedVarBank.WriteBank();
 }

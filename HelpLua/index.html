@@ -531,12 +531,63 @@ h1 {
         <td>Plays the given sound by sound-id.</td>
       </tr>
       <tr>
+        <td><div class="code">
+          <p>playSFX([string] soundfile)</p>
+        </div></td>
+        <td>Plays the given sound by soundfile.</td>
+      </tr>
+      <tr>
         <td height="25"><div class="code">
           <p>triggerEvent([string] eventname)</p>
         </div></td>
         <td>Runs a event by eventname.</td>
       </tr>
     </table>
+    <p>&nbsp;</p>
+    <table width="100%" border="1">
+      <tr>
+        <th colspan="2">Group: UserData</th>
+      </tr>
+      <tr>
+        <th>Function Signature</th>
+        <th>Info</th>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>UserData.setValue([string] key, [double] value)</p>
+        </div></td>
+        <td><p>Sets a double value by the given key.</p></td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[double/nil] UserData.getValue([string] key)</p>
+        </div></td>
+        <td>Returns the value by the given key. If the value doesn't exsist, nil is returned.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[table] UserData.values()</p>
+        </div></td>
+        <td>Returns a copy of all values with the keys.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>[boolean] UserData.isValueSet([string] key)</p>
+        </div></td>
+        <td>Returns true if the value exsist.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>UserData.save()</p>
+        </div></td>
+        <td>Saves the variable bank into the file.</td>
+      </tr>
+      <tr>
+        <td colspan="2"><p>This funtion group provides functions to load/save [double] values into the variable bank. You can then save it for later use, even after the game restarted.</p>
+        <p><strong>NOTE:</strong> Don't forget to save! It doesn't save automatically! Call UserData.save() for saving into the file.</p></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
     </div>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
@@ -920,6 +971,34 @@ h1 {
       </tr>
       <tr>
         <td><p>Info: A new powerup every 200 frames (powerup roulett)</p></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p><br />
+    </p>
+    <table border="1" width="100%">
+      <tr>
+        <td><div class="code">
+          <p>function onLoop()<br />
+&#160;&#160;if(UserData.getValue(&quot;jump-counter&quot;))then<br />
+&#160;&#160;&#160;&#160;printText(&quot;Jumps: &quot;..tostring(UserData.values()[&quot;jump-counter&quot;]), 30, 160) -- values()[value-Name] can be used too, to get the a value<br />
+&#160;&#160;end<br />
+end</p>
+          <p>function onJump(plIndex)<br />
+            &#160;&#160;if(UserData.getValue(&quot;jump-counter&quot;))then<br />
+            &#160;&#160;&#160;&#160;UserData.setValue(&quot;jump-counter&quot;, UserData.getValue(&quot;jump-counter&quot;)+1)<br />
+            &#160;&#160;else<br />
+            &#160;&#160;&#160;&#160;UserData.setValue(&quot;jump-counter&quot;, 1)<br />
+            &#160;&#160;end<br />
+            &#160;&#160;UserData.save()<br />
+          end</p>
+          <p><br />
+          </p>
+        </div></td>
+      </tr>
+      <tr>
+        <td><p>Info: A jump-counter with the new variable bank!</p></td>
       </tr>
     </table>
 </div>

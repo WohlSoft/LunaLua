@@ -145,6 +145,14 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
         def("triggerEvent", &LuaProxy::triggerEvent),
         def("playSFX", (void(*)(int))&LuaProxy::playSFX),
 
+        namespace_("UserData")[
+            def("setValue", &LuaProxy::SaveBankProxy::setValue),
+            def("getValue", &LuaProxy::SaveBankProxy::getValue),
+            def("isValueSet", &LuaProxy::SaveBankProxy::isValueSet),
+            def("values", &LuaProxy::SaveBankProxy::values),
+            def("save", &LuaProxy::SaveBankProxy::save)
+        ],
+
         class_<RECT>("RECT")
             .def_readwrite("left", &RECT::left)
             .def_readwrite("top", &RECT::top)
