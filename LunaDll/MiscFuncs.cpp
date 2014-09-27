@@ -275,6 +275,11 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((byte*)address) < (byte)value;
 			break;
 						  }
+
+		case CMPT_NOTEQ: {
+			return *((byte*)address) != (byte)value;
+			break;
+						  }
 		}
 		break;
 				  }

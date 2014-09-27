@@ -102,9 +102,7 @@ enum AutocodeType {
 	AT_MemAssign,				//1: Addr	2: Value		3: Operation	4:			5: Active time	6: Type (b, w, dw, f, qw/df)
 
 	AT_DebugPrint,				//1:		2:				3:				4:			5: Active time	6:
-	AT_DebugWindow,				//1:		2:				3:				4:			5:				6: Text
-	
-	AT_SMB2Rules,				//1:		2:				3:				4:			5: Active time	6:
+	AT_DebugWindow,				//1:		2:				3:				4:			5:				6: Text	
 
 	AT_CollisionScan,			//1:		2:				3:				4:			5: Active time	6:
 

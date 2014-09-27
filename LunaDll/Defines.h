@@ -28,7 +28,8 @@ enum OPTYPE {
 enum COMPARETYPE {
 	CMPT_EQUALS = 0,
 	CMPT_GREATER = 1,
-	CMPT_LESS = 2
+	CMPT_LESS = 2,
+	CMPT_NOTEQ =3
 };
 
 enum DIRECTION {
@@ -141,3 +142,5 @@ enum PRIORITY {
 #define GF_TRIGGER_EVENT	0x00AA42D0			// Arg1 = wchar_t** name of event to start, Arg2 = Int* Unknown (0 or -1)
 
 #define GF_BITBLT_CALL		0x004242D0			// Arg1
+
+#define GF_NPC_KILL			0x00A315A0			// Arg1 = int* Killed NPC index  Arg2 = NPCMOB* Killer NPC

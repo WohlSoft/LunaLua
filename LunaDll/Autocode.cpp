@@ -526,12 +526,9 @@ void Autocode::Do(bool init) {
 
 			// Check if the value meets the criteria and activate event if so
 			switch((COMPARETYPE)(int)Param1) {
-			case CMPT_EQUALS:
-				//gLunaRender.DebugPrint(MyString, varval);
-				if(varval == Param2) {
-					gAutoMan.ActivateCustomEvents(0, (int)Param3);
-					//gLunaRender.DebugPrint(L"EQUALED", Param3);
-				}
+			case CMPT_EQUALS:				
+				if(varval == Param2) 
+					gAutoMan.ActivateCustomEvents(0, (int)Param3);									
 				break;
 			case CMPT_GREATER:
 				if(varval > Param2)
@@ -541,6 +538,10 @@ void Autocode::Do(bool init) {
 				if(varval < Param2)
 					gAutoMan.ActivateCustomEvents(0, (int)Param3);
 				break;
+			case CMPT_NOTEQ:
+				if(varval != Param2) 
+					gAutoMan.ActivateCustomEvents(0, (int)Param3);									
+				break;
 			default:
 				break;
 			}
@@ -549,12 +550,13 @@ void Autocode::Do(bool init) {
 
 		case AT_CompareVar: {
 			if(ReferenceOK()) {
-				if(gAutoMan.m_UserVars.find(MyRef) !=  gAutoMan.m_UserVars.end()
+				COMPARETYPE compare_type = (COMPARETYPE)(int)Param1;
+				if(compare_type == CMPT_NOTEQ || gAutoMan.m_UserVars.find(MyRef) !=  gAutoMan.m_UserVars.end()
 					&& gAutoMan.m_UserVars.find(MyString) !=  gAutoMan.m_UserVars.end()) {
 					double var1 = gAutoMan.m_UserVars[MyRef];
 					double var2 = gAutoMan.m_UserVars[MyString];
 
-					switch((COMPARETYPE)(int)Param1) {
+					switch(compare_type) {
 					case CMPT_EQUALS:
 						if(var1 == var2)
 							gAutoMan.ActivateCustomEvents(0, (int)Param3);
@@ -565,6 +567,10 @@ void Autocode::Do(bool init) {
 						break;
 					case CMPT_LESS:
 						if(var1 < var2)
+							gAutoMan.ActivateCustomEvents(0, (int)Param3);
+						break;
+					case CMPT_NOTEQ:
+						if(var1 != var2)
 							gAutoMan.ActivateCustomEvents(0, (int)Param3);
 						break;
 					default:

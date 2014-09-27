@@ -87,6 +87,10 @@ void SpriteFunc::IfSpriteVar(CSprite* me, SpriteComponent* obj) {
 				if(var_val < check_against)
 					Activate((int)component_to_activate, me);
 				break;
+			case CMPT_NOTEQ:
+				if(var_val != check_against)
+					Activate((int)component_to_activate, me);
+				break;
 			default:
 				break;
 			}
@@ -113,6 +117,10 @@ void SpriteFunc::IfLunaVar(CSprite* me, SpriteComponent* obj) {
 				break;
 			case CMPT_LESS:
 				if(var_val < check_against)
+					Activate((int)component_to_activate, me);
+				break;
+			case CMPT_NOTEQ:
+				if(var_val != check_against)
 					Activate((int)component_to_activate, me);
 				break;
 			default:
