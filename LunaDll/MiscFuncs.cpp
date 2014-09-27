@@ -385,6 +385,12 @@ double GetMem(int addr, FIELDTYPE ftype) {
 	return 0;
 }
 
+void InitIfMissing(std::map<std::wstring, double>* pMap, std::wstring sought_key, double init_val) {
+	if(pMap->find(sought_key) == pMap->end()) {
+		(*pMap)[sought_key] = init_val;
+	}
+}
+
 int ComputeLevelSection(int x, int y) {	
 	int x_sec = ToSection(x);
 	int y_sec = ToSection(y);

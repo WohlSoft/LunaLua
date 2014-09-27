@@ -451,7 +451,7 @@ void Autocode::Do(bool init) {
 			if(ReferenceOK()) {				
 				gAutoMan.VarOperation(MyRef, Param2, (OPTYPE)(int)Param1);
 			}
-			else { //if(gAutoMan.m_UserVars.find(MyString) != gAutoMan.m_UserVars.end())				
+			else { 
 				gAutoMan.VarOperation(MyString, Param2, (OPTYPE)(int)Param1);
 			}			
 			break;
@@ -513,8 +513,7 @@ void Autocode::Do(bool init) {
 
 		case AT_IfVar: {
 			if(!ReferenceOK()) {	
-				if(gAutoMan.m_UserVars.find(MyString) == gAutoMan.m_UserVars.end())
-					break; // Var doesn't exist
+				InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);// Initalize var if not existing
 			}
 			double varval;
 			if(ReferenceOK()) {
@@ -551,8 +550,10 @@ void Autocode::Do(bool init) {
 		case AT_CompareVar: {
 			if(ReferenceOK()) {
 				COMPARETYPE compare_type = (COMPARETYPE)(int)Param1;
-				if(compare_type == CMPT_NOTEQ || gAutoMan.m_UserVars.find(MyRef) !=  gAutoMan.m_UserVars.end()
-					&& gAutoMan.m_UserVars.find(MyString) !=  gAutoMan.m_UserVars.end()) {
+				if(true) {
+					InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);						
+					InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
+
 					double var1 = gAutoMan.m_UserVars[MyRef];
 					double var2 = gAutoMan.m_UserVars[MyString];
 
