@@ -248,7 +248,7 @@ void LuaProxy::NPC::setY(double y)
 {
     if(!isValid())
         return;
-    ::NPC::Get(m_index)->Ypos;
+    ::NPC::Get(m_index)->Ypos = y;
 }
 
 double LuaProxy::NPC::speedX()

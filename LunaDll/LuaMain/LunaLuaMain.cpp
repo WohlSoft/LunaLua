@@ -144,6 +144,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
         def("findnpcs", &LuaProxy::findNPCs),
         def("triggerEvent", &LuaProxy::triggerEvent),
         def("playSFX", (void(*)(int))&LuaProxy::playSFX),
+        def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
 
         namespace_("UserData")[
             def("setValue", &LuaProxy::SaveBankProxy::setValue),
