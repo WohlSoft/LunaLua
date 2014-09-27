@@ -24,7 +24,7 @@ void windowError(const char* errorText){
     MessageBoxA(0, errorText, "Error", 0);
 }
 
-void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckName)
+void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, const char* chunckName)
 {
     TryCloseState(L);
 
@@ -50,11 +50,25 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
         return;
     }
 
+    bool lapiEnabled = true;
+    wifstream lapi_file(lapi_path, ios::binary|ios::in);
+    if(!lapi_file.is_open()){
+        lapi_file.close();
+        lapiEnabled = false;
+    }
+
     using namespace luabind;
 
     std::wstring wluacode((std::istreambuf_iterator<wchar_t>(code_file)), std::istreambuf_iterator<wchar_t>());
     code_file.close();
     std::string luacode = utf8_encode(wluacode);
+
+    std::string lapicode;
+    if(lapiEnabled){
+        std::wstring wlapicode((std::istreambuf_iterator<wchar_t>(lapi_file)), std::istreambuf_iterator<wchar_t>());
+        lapi_file.close();
+        lapicode = utf8_encode(wlapicode);
+    }
 
     //remove nearly all os code
     object _G = globals(L);
@@ -209,12 +223,25 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
         delete pl;
 
 
+
+
     if(!(errcode == 0)){
         object error_msg(from_stack(L, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         TryClose();
         return;
     }
+
+    if(lapiEnabled){
+        int lapierrcode = luaL_loadbuffer(L, lapicode.c_str(), lapicode.length(), "lapi.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
+        if(!(lapierrcode == 0)){
+            object error_msg(from_stack(L, -1));
+            LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+            TryClose();
+            return;
+        }
+    }
+
     try
     {
         if(LuaHelper::is_function(L, "onLoad")){
@@ -231,9 +258,14 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, const char* chunckN
 
 void LunaLua::init(wstring main_path)
 {
+    wstring lapi = main_path;
+    lapi = lapi.substr(0, lapi.find_last_of(L"\\"));
+    lapi = lapi.substr(0, lapi.find_last_of(L"\\"));
+    lapi = lapi.substr(0, lapi.find_last_of(L"\\")+1);
+    lapi = lapi.append(L"lapi.lua");
 	wstring globalPath = main_path;
 	globalPath = globalPath.append(L"lunaworld.lua");
-    initCodeFile(mainStateGlobal, globalPath, "lunaworld.lua");
+    initCodeFile(mainStateGlobal, globalPath, lapi, "lunaworld.lua");
 	if(!mainStateGlobal)
 		return;
 
@@ -241,7 +273,7 @@ void LunaLua::init(wstring main_path)
     full_path = removeExtension(full_path);
     full_path = full_path.append(L"\\lunadll.lua");
     
-    initCodeFile(mainState, full_path, "lunadll.lua");
+    initCodeFile(mainState, full_path, lapi, "lunadll.lua");
     
 }
 
