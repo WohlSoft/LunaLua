@@ -28,6 +28,8 @@ bool SegmentIntersectRectangle(double a_rectangleMinX, double a_rectangleMinY, d
 
 void PrintSyntaxError(wstring errored_line);
 
+void InitIfMissing(std::map<std::wstring, double>* map, std::wstring sought_key, double init_val);	// Init a map value if key doesn't exist
+
 static inline double round(double val)
 {    
     return floor(val + 0.5);

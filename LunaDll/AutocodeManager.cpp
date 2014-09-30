@@ -335,7 +335,7 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode) {
 				newcode->Activated = true;
 				newcode->ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
 				newcode->Length = (*iter)->m_OriginalTime;
-				m_CustomCodes.push_back(newcode);
+				m_CustomCodes.push_front(newcode);
 			}
 
 		}
@@ -348,7 +348,7 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode) {
 				newcode->Activated = true;
 				newcode->ActiveSection = (new_section < 1000 ? (new_section - 1) : new_section);
 				newcode->Length = (*iter)->m_OriginalTime;
-				m_CustomCodes.push_back(newcode);
+				m_CustomCodes.push_front(newcode);
 			}
 
 		}
@@ -388,9 +388,7 @@ Autocode* AutocodeManager::FindMatching(int section, wstring soughtstr) {
 bool AutocodeManager::VarOperation(std::wstring var_name, double value, OPTYPE operation_to_do) {
 	if(var_name.length() > 0) {
 		// Create var if doesn't exist
-		if(m_UserVars.find(var_name) == m_UserVars.end()) {
-			m_UserVars[var_name] = 0;
-		}
+		InitIfMissing(&gAutoMan.m_UserVars, var_name, 0);
 		
 		double var_val = m_UserVars[var_name];
 

@@ -275,6 +275,11 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((byte*)address) < (byte)value;
 			break;
 						  }
+
+		case CMPT_NOTEQ: {
+			return *((byte*)address) != (byte)value;
+			break;
+						  }
 		}
 		break;
 				  }
@@ -378,6 +383,12 @@ double GetMem(int addr, FIELDTYPE ftype) {
 		return *((double*)addr);
 	}
 	return 0;
+}
+
+void InitIfMissing(std::map<std::wstring, double>* pMap, std::wstring sought_key, double init_val) {
+	if(pMap->find(sought_key) == pMap->end()) {
+		(*pMap)[sought_key] = init_val;
+	}
 }
 
 int ComputeLevelSection(int x, int y) {	
