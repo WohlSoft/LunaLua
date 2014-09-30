@@ -30,6 +30,11 @@ namespace LuaProxy {
     void triggerEvent(const char* evName);
     void playSFX(int index);
     void playSFX(const char* filename);
+    void playMusic(int section);
+    void loadImage(const char* filename, int resNumber, int transColor);
+    void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
+    void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
+    void placeSprite(int type, int imgResource, int xPos, int yPos);
 
     namespace SaveBankProxy {
         void setValue(const char* key, double value);

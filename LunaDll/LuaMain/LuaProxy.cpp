@@ -8,7 +8,8 @@
 #include "../SMBXEvents.h"
 #include "../Sound.h"
 #include "../Level.h"
-
+#include "../CSprite.h"
+#include "../CSpriteManager.h"
 
 
 
@@ -590,3 +591,42 @@ void LuaProxy::SaveBankProxy::save()
 {
     gSavedVarBank.WriteBank();
 }
+
+
+void LuaProxy::playMusic(int section)
+{
+    SMBXSound::PlayMusic(section);
+}
+
+
+void LuaProxy::loadImage(const char *filename, int resNumber, int transColor)
+{
+    gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
+}
+
+
+void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra, int time)
+{
+    CSpriteRequest req;
+    req.type = type;
+    req.img_resource_code = imgResource;
+    req.x = xPos;
+    req.y = yPos;
+    req.time = time;
+    req.str = utf8_decode(std::string(extra));
+    gSpriteMan.InstantiateSprite(&req, false);
+}
+
+void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra)
+{
+    placeSprite(type, imgResource, xPos, yPos, extra, 0);
+}
+
+
+void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos)
+{
+    placeSprite(type, imgResource, xPos, yPos, "");
+}
+
+
+

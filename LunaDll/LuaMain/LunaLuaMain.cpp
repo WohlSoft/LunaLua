@@ -159,6 +159,11 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("triggerEvent", &LuaProxy::triggerEvent),
         def("playSFX", (void(*)(int))&LuaProxy::playSFX),
         def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
+        def("playMusic", &LuaProxy::playMusic),
+        def("loadImage", &LuaProxy::loadImage),
+        def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
+        def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),
+        def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::placeSprite),
 
         namespace_("UserData")[
             def("setValue", &LuaProxy::SaveBankProxy::setValue),
