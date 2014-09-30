@@ -51,6 +51,18 @@ h1 {
 	background-color: #A38EFF;
 }
 
+#lapis {
+	color: #000;
+	background-color: #FFC286;
+	padding: 0px 30px;
+}
+
+#lapis #lapisglobalwrapper {
+	color: #000;
+	background-color: #F9AAA8;
+}
+
+
 </style>
 <title>Lunadll for Lua Reference</title>
 </head>
@@ -542,6 +554,37 @@ h1 {
         </div></td>
         <td>Runs a event by eventname.</td>
       </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>playMusic([int] section)</p>
+        </div></td>
+        <td>Plays the music for <strong>section</strong>.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>loadImage([string] filename, [int] resourceNumber, [hex/int] transperentColor)</p>
+        </div></td>
+        <td><p>Loads a image by filename into resourceNumber.</p>
+        <p>&nbsp;</p></td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>placeSprite([int] type, [int] imgResource, [int] xPos, [int] yPos)</p>
+        </div></td>
+        <td>Places a image/sprite by resource-number imgResource at xPos, yPos.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>placeSprite([int] type, [int] imgResource, [int] xPos, [int] yPos, [string] extra)</p>
+        </div></td>
+        <td>Places a image/sprite by resource-number imgResource at xPos, yPos. Extra string data field provided. Leave a empty string if not used.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>placeSprite([int] type, [int] imgResource, [int] xPos, [int] yPos, [string] extra, [int] time)</p>
+        </div></td>
+        <td>Places a image/sprite by resource-number imgResource at xPos, yPos. Extra string data field provided. Leave a empty string if not used. You can set the time if needed.</td>
+      </tr>
     </table>
     <p>&nbsp;</p>
     <table width="100%" border="1">
@@ -587,7 +630,6 @@ h1 {
         <p><strong>NOTE:</strong> Don't forget to save! It doesn't save automatically! Call UserData.save() for saving into the file.</p></td>
       </tr>
     </table>
-    <p>&nbsp;</p>
     </div>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
@@ -862,6 +904,50 @@ h1 {
         <td>Str key</td>
       </tr>
     </table>
+    </div>
+    <br />
+    <div id="lapis">
+      <div align="center">
+        <p class="over_title">lapi.lua - Helper class written in lua</p>
+        
+      </div>
+      <p>&nbsp;</p>
+      <p>This is just a helper class. Even without it Lunadll+Lua can run, but may break codes which require this class to run!</p>
+      <p><br />
+      </p>
+      <div id="lapisglobalwrapper"> <span class="over_title">Global functions/features:</span>
+        </p>
+        <p>Functions/Features which can be globally accessed. They don't need any class to run.</p>
+        <hr />
+        <table border="1" width="100%">
+          <tr>
+            <th>Function Signature</th>
+            <th>Info</th>
+          </tr>
+          <tr>
+            <td><div class="code">
+              <p>uservar[[string]key] = [double] value</p>
+            </div></td>
+            <td><p>A fast way to set a variable in the variable bank.</p>
+            <p><strong>Example</strong>:</p>
+            <div class="code">
+              <p>uservar[&quot;Jumpcounter&quot;] = uservar[&quot;Jumpcounter&quot;] + 1</p>
+            </div>
+            <p>&nbsp;</p></td>
+          </tr>
+          <tr>
+            <td><div class="code">
+              <p>[double] value = uservar[[string]key]</p>
+            </div></td>
+            <td><p>A fast way to get a variable in the variable bank. If value doesn't exsist 0 is returned, <strong>not nil</strong>!</p>
+            <p><strong>Example</strong>:</p>
+            <div class="code">
+              <p>uservar[&quot;Jumpcounter&quot;] = uservar[&quot;Jumpcounter&quot;] + 1</p>
+            </div></td>
+          </tr>
+        </table>
+      </div>
+      <br />
     </div>
     <p>&nbsp;</p>
     <p><span class="over_title">Examples:</span></p>
