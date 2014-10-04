@@ -1,0 +1,157 @@
+struct PlayerMOB {
+	short	ToadDoubleJReady;
+	short	SparklingEffect;
+	short	UnknownCTRLLock1;
+	short	UnknownCTRLLock2;
+	short	QuicksandEffectTimer;
+	short	OnSlipperyGround;
+
+	short	IsAFairy;
+	short	FairyAlreadyInvoked;
+	short	FairyFramesLeft;			// +0x10
+	short	SheathHasKey;
+	short	SheathAttackCooldown;
+	short	Hearts;
+
+	short	PeachHoverAvailable;
+	short	PressingHoverButton;
+	short	PeachHoverTimer;
+	short	Unused1;
+	short	PeachHoverTrembleSpeed;		// +0x20
+	short	PeachHoverTrembleDir;
+
+	short	ItemPullupTimer;
+	float	ItemPullupMomentumSave;
+
+	short	Unused2;
+
+	short	UnkClimbing1;
+	short	UnkClimbing2;				// +0x30
+	short	UnkClimbing3;
+
+	short	WaterState;
+	short	IsInWater;
+	short	WaterStrokeTimer;
+
+	short	UnknownHoverTimer;
+	short	SlidingState;
+	short	SlidingGroundPuffs;
+
+	short	ClimbingState;				// +0x40
+
+	short	UnknownTimer;
+	short	UnknownFlag;
+	short	UnknownPowerupState;
+	short	SlopeRelated;
+
+	short	TanookiStatueActive;
+	short	TanookiMorphCooldown;
+	short	TanookiActiveFrameCount;
+	
+	short	IsSpinjumping;				// +0x50
+	short	SpinjumpStateCounter;
+	short	SpinjumpLandDirection;		// (will face this direction when landing)
+
+	short	CurrentKillCombo;
+	short	GroundSlidingPuffsState;
+	short	WarpNearby;					// (1 = pipe, 2 = instant, 3 = door)
+	short	Unknown5C;
+	short	Unknown5E;
+	
+	short	HasJumped;					// +0x60
+
+	char	padding[0x58];				//pad to next
+
+	double	CurXPos;					// offset +0xC0
+	double	CurYPos;
+	double	Height;
+	double	Width;
+	double	CurXSpeed;
+	double	CurYSpeed;
+
+	short	Identity;
+
+	short	UKeyState;
+	short	DKeyState;
+	short	LKeyState;
+	short	RKeyState;
+	short	JKeyState;
+	short	SJKeyState;
+	short	XKeyState;
+	short	RNKeyState;
+	short	SELKeyState;
+	short	STRKeyState;
+
+	short	FacingDirection;			// offset x106
+
+	short	MountType;
+	short	MountColor;
+	short	MountState;
+	short	MountHeightOffset;
+	short	MountGfxIndex;
+
+	short	CurrentPowerup;
+	short	CurrentPlayerSprite;
+	short	Unused116;
+	float	GfxMirrorX;
+	short	UpwardJumpingForce;
+	short	JumpButtonHeld;
+	short	SpinjumpButtonHeld;
+	short	ForcedAnimationState;
+	float	Unknown124;
+	float	Unknown128;
+
+	short	DownButtonMirror;
+	short	InDuckingPosition;
+	short	SelectButtonMirror;
+	short	Unknown132;
+	short	DownButtonTapped;
+	short	Unknown136;
+	float	XMomentumPush;
+
+	short	DeathState;
+	short	DeathTimer;
+
+	short	BlinkTimer;
+	short	BlinkState;
+	short	Unknown144;
+
+	short	LayerStateStanding;
+	short	LayerStateLeftContact;
+	short	LayerStateTopContact;
+	short	LayerStateRightContact;
+	short	PushedByMovingLayer;
+	short	Unused150;
+	short	Unused152;
+
+	short	HeldNPCIndex;
+	short	Unknown156;
+	short	PowerupBoxContents;
+
+	short	CurrentSection;
+	short	WarpTimer;
+	short	Unknown15E;
+
+	short	ProjectileTimer1;
+	short	ProjectileTimer2;
+	short	TailswipeTimer;
+	short	Unknown166;
+
+	float	TakeoffSpeed;
+	short	CanFly;
+	short	IsFlying;
+	short	FlightTimeRemaining;
+	short	HoldingFlightRunButton;
+	short	HoldingFlightButton;
+
+	short	NPCBeingStoodOnIndex;
+	short	Unknown178;
+
+	short	Unknown17A;
+	short	Unused17C;
+	short	Unused17E;
+	short	Unused180;
+	short	Unused182;
+	short	Unused184;
+
+};
