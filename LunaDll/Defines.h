@@ -113,7 +113,6 @@ enum PRIORITY {
 #define GM_PLAYER_INVULN	*(WORD*)0x00B2C8C0		// 0xFFFF = invuln
 #define GM_CHEATED			*(WORD*)0x00B2C8C4		// 0xFFFF = cheated
 
-
 /////////////////////
 ///  -Functions-  ///
 /////////////////////

@@ -42,6 +42,8 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     lua_call(L,0,0);
     lua_pushcfunction(L, luaopen_os);
     lua_call(L,0,0);
+	lua_pushcfunction(L, luaopen_package);
+	lua_call(L,0,0);
 
 
     wifstream code_file(main_path, ios::binary|ios::in);
@@ -388,11 +390,18 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
 
 void LunaLua::init(wstring main_path)
 {
-    wstring lapi = main_path;
-    lapi = lapi.substr(0, lapi.find_last_of(L"\\"));
-    lapi = lapi.substr(0, lapi.find_last_of(L"\\"));
-    lapi = lapi.substr(0, lapi.find_last_of(L"\\")+1);
-    lapi = lapi.append(L"lapi.lua");
+    HMODULE hModule = GetModuleHandleW(NULL);
+    WCHAR path[MAX_PATH];
+    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+    for(int i = count; i > 3; i--) {
+        if(path[i] == L'\\') {
+            path[i] = 0;
+            break;
+        }
+    }
+
+	wstring lapi = path;
+    lapi = lapi.append(L"\\lapi.lua");
 	wstring globalPath = main_path;
 	globalPath = globalPath.append(L"lunaworld.lua");
     initCodeFile(mainStateGlobal, globalPath, lapi, "lunaworld.lua");
