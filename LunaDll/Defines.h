@@ -113,6 +113,19 @@ enum PRIORITY {
 #define GM_PLAYER_INVULN	*(WORD*)0x00B2C8C0		// 0xFFFF = invuln
 #define GM_CHEATED			*(WORD*)0x00B2C8C4		// 0xFFFF = cheated
 
+// Miscs
+#define GM_GRAVITY          *(WORD*)0x00B2C6F4      // 12 = default, 0 = non-falling
+#define GM_JUMPHIGHT        *(WORD*)0x00B2C6DC      // 20 = default, higher number = higher jumps
+#define GM_EARTHQUAKE       *(WORD*)0x00B250AC      // 0 = default, higher number = bigger shaking, slowly resets to 0
+
+#define GM_MARIO_VS_LUIGI_T *(WORD*)0x00B2D760      // 0 = default, if higher than 0 then display text "Mario VS Luigi"
+#define GM_WINS_T           *(WORD*)0x00B2D762      // 0 = default, if higher than 0 then display text "WINS!"
+
+//Hitbox
+#define GM_HITBOX_H_PTR     *(WORD*)0x00B2C6FC      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
+#define GM_HITBOX_H_D_PTR   *(WORD*)0x00B2C742      // hitbox heights while ducking
+#define GM_HITBOX_W_PTR     *(WORD*)0x00B2C788      // hitbox widths
+
 /////////////////////
 ///  -Functions-  ///
 /////////////////////
