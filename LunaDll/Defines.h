@@ -156,3 +156,5 @@ enum PRIORITY {
 #define GF_BITBLT_CALL		0x004242D0			// Arg1
 
 #define GF_NPC_KILL			0x00A315A0			// Arg1 = int* Killed NPC index  Arg2 = NPCMOB* Killer NPC
+
+#define GF_NPC_TO_COINS     0x00A3C580          // No Args, Does convert every NPC to coins (Like player would win)

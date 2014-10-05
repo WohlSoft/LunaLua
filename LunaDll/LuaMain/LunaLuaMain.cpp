@@ -456,9 +456,20 @@ void LunaLua::DoCodeFile(lua_State *L)
     }
 }
 
+//debug stuff
+//int cCounter = 0;
 
 void LunaLua::Do()
 {
+    //debug stuff
+//    cCounter++;
+//    if(cCounter % 100 == 0){
+//        typedef int coinfunc(void);
+//        coinfunc* f = (coinfunc*)0x00A3C580;
+//        f();
+//    }
+
+
     PlayerMOB* demo = Player::Get(1);
     if(demo == 0)
         return;
