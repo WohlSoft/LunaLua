@@ -1,4 +1,4 @@
-TEMPLATE = lib
+TEMPLATE = vclib
 
 CONFIG += dll
 CONFIG -= app_bundle
@@ -11,12 +11,14 @@ DEFINES += LunaDLL_LIBRARY LunaDLL_EXPORTS _USRDLL
 DEFINES += DX_EXPORT=Q_DECL_EXPORT NDEBUG _WINDOWS _USRDLL LUNADLL_EXPORTS
 
 INCLUDEPATH += LunaDLL LunaDll/libs/luabind-include
+INCLUDEPATH += %ProgramFiles%\\Lua\\5.1\\include
 
 CONFIG += create_prl
 CONFIG += link_prl
 
 LIBS += kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib Gdiplus.lib
 LIBS += -L$$PWD/LunaDll/libs/luabind-lib/ -llibluabind
+LIBS += -L%ProgramFiles%\\Lua\\5.1\\lib
 
 INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include
 DEPENDPATH += $$PWD/LunaDll/libs/luabind-include
