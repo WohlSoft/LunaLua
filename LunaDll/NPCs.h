@@ -35,7 +35,7 @@
 // 0x+98	qw	= X speed
 // 0x+A0	qw	= Y speed
 
-// 0x+E2	w	= Sprite GFX index   // x011C = lakitu
+// 0x+E2	w	= Sprite GFX index/Identity   // x011C = lakitu
 // 0x+E4	w	= Animation frame
 
 // 0x+E8	f	= Animation timer
@@ -47,6 +47,7 @@
 // 0x+110	f	= Lakitu throw timer
 
 // 0x+118	f	= Direction faced
+// 0x+122   w   = Kill/Kill effect (0 = No kill/ 1-9 Kill effect with kill)
 // 0x+124	w	= Unknown
 // 0x+128	dw	= Ofscreen flag (0xFFFFFFFF = offscreen)
 // 0x+12A	w	= Ofscreen countdown timer?

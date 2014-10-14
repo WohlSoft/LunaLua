@@ -35,6 +35,15 @@ namespace LuaProxy {
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
     void placeSprite(int type, int imgResource, int xPos, int yPos);
+    unsigned short gravity();
+    void gravity(unsigned short value);
+    unsigned short earthquake();
+    void earthquake(unsigned short value);
+    unsigned short jumpheight();
+    void jumpheight(unsigned short value);
+    unsigned short jumpheightBounce();
+    void jumpheightBounce(unsigned short value);
+
 
     namespace SaveBankProxy {
         void setValue(const char* key, double value);
@@ -100,6 +109,8 @@ namespace LuaProxy {
         double speedY();
         void setSpeedY(double speedY);
         void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+        void kill();
+        void kill(int killEffectID);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
     private:
         bool isValid();
@@ -382,5 +393,15 @@ namespace LuaProxy {
         int m_index;
     };
 
+
+    class Block
+    {
+    public:
+        Block(int index);
+        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+        luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+    private:
+        int m_index;
+    };
 
 }

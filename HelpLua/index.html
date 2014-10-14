@@ -358,6 +358,24 @@ h1 {
         <td>Gets a specfic value by NPC offset-address. See constants for datatypes.</td>
       </tr>
       <tr>
+        <td><div class="code">
+          <p>myNPC:kill()</p>
+        </div></td>
+        <td>Kills the npc with the standard kill animation.</td>
+      </tr>
+      <tr>
+        <td><div class="code">
+          <p>myNPC:kill([int] killanimation)</p>
+        </div></td>
+        <td><p>Kills the npc with the kill animation of your choice.</p>
+        <p>Known ids are:</p>
+        <p>1 - Standard kill animation</p>
+        <p>6 - Lava kill</p>
+        <p>8 - Spin jump kill</p>
+        <p>9 - dissapear (no animation)</p>
+        <p>10 - Link kill (like link would kill this npc)</p></td>
+      </tr>
+      <tr>
         <td colspan="2"><p>This class provides fields and functions to modify the npc. It is <strong>not recommended</strong> to save this class for later, as the internal arrayindex changes when enemies get killed. </p></tr>
     </table>
     <br /><br />
@@ -590,6 +608,54 @@ h1 {
           <p>placeSprite([int] type, [int] imgResource, [int] xPos, [int] yPos, [string] extra, [int] time)</p>
         </div></td>
         <td>Places a image/sprite by resource-number imgResource at xPos, yPos. Extra string data field provided. Leave a empty string if not used. You can set the time if needed.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>[int] gravity()</p>
+        </div></td>
+        <td>Returns the gravity in this level. 12 = Default</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>gravity([int] value)</p>
+        </div></td>
+        <td>Sets the gravity in this level. 12 = Default</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>[int] earthquake()</p>
+        </div></td>
+        <td>Returns the earthquake-effect in this level. 0 = No earth quake. Resets to 0 after a time. Higher number = Higher earthquake-effect.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>earthquake([int] value)</p>
+        </div></td>
+        <td>Sets the earthquake-effect in this level. 0 = No earth quake. Resets to 0 after a time. Higher number = Higher earthquake-effect.</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>[int] jumpheight()</p>
+        </div></td>
+        <td>Returns the jumpheight-factor of every character. 20 = Default</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>jumpheight([int] value)</p>
+        </div></td>
+        <td>Sets the jumpheight-factor of every character. 20 = Default</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>[int] jumpheightBounce()</p>
+        </div></td>
+        <td>Returns the jumpheight-factor (when bounced off from a npc) of every character. 20 = Default</td>
+      </tr>
+      <tr>
+        <td height="25"><div class="code">
+          <p>jumpheightBounce([int] value)</p>
+        </div></td>
+        <td>Sets the jumpheight-factor (when bounced off from a npc) of every character. 20 = Default</td>
       </tr>
     </table>
     <p>&nbsp;</p>

@@ -59,6 +59,8 @@ enum PRIORITY {
 #define GM_NPCS_PTR			*(DWORD*)0x00B259E8	// +0xAD58 + 0x20  to NPCs
 #define GM_NPCS_COUNT		*(WORD*)0x00B2595A 
 #define GM_PLAYERS_PTR		*(DWORD*)0x00B25A20
+#define GM_PLAYERS_COUNT    *(WORD*)0x00B2595E;
+#define GM_EDIT_PLAYERS_PTR *(DWORD*)0x00CF74D8 // Editor Template player
 
 // HUD stuff
 #define GM_STAR_COUNT		*(DWORD*)0x00B251E0
@@ -68,6 +70,7 @@ enum PRIORITY {
 // States
 #define GM_FREEZWITCH_ACTIV *(WORD*)0x00B2C8B4
 #define GM_PAUSE_OPEN		*(WORD*)0x00B250E2
+#define GM_CUR_MENUCHOICE   *(WORD*)0x00B2C880      // Current menu choice
 
 // Camera
 #define GM_CAMERA_X			*(DWORD*)0x00B2B984
@@ -111,15 +114,22 @@ enum PRIORITY {
 
 // Cheats
 #define GM_PLAYER_INVULN	*(WORD*)0x00B2C8C0		// 0xFFFF = invuln
+#define GM_PLAYER_INFJUMP   *(WORD*)0x00B2C8AC      // 0xFFFF = infinite jumps
 #define GM_CHEATED			*(WORD*)0x00B2C8C4		// 0xFFFF = cheated
 
 // Miscs
 #define GM_GRAVITY          *(WORD*)0x00B2C6F4      // 12 = default, 0 = non-falling
 #define GM_JUMPHIGHT        *(WORD*)0x00B2C6DC      // 20 = default, higher number = higher jumps
+#define GM_JUMPHIGHT_BOUNCE *(WORD*)0x00B2C6E2      // Same as normal jumphight, but from NPC
 #define GM_EARTHQUAKE       *(WORD*)0x00B250AC      // 0 = default, higher number = bigger shaking, slowly resets to 0
 
 #define GM_MARIO_VS_LUIGI_T *(WORD*)0x00B2D760      // 0 = default, if higher than 0 then display text "Mario VS Luigi"
 #define GM_WINS_T           *(WORD*)0x00B2D762      // 0 = default, if higher than 0 then display text "WINS!"
+
+#define GM_WINNING          *(WORD*)0x00B2C59E      // 0 = not winning, if higher than 0 then winning by this win-type
+#define GM_LEAVE_LEVEL      *(WORD*)0x00B2C5B4      // 0xFFFF = leave current level
+
+#define GM_UNK_OV_DATABLOCK *(DWORD*)0x00B25164     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
 //Hitbox
 #define GM_HITBOX_H_PTR     *(WORD*)0x00B2C6FC      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)

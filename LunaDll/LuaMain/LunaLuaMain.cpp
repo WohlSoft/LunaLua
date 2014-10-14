@@ -2,6 +2,7 @@
 #include "../Level.h"
 #include "../MiscFuncs.h"
 #include "../PlayerMOB.h"
+#include "../NPCs.h"
 
 #include "LuaHelper.h"
 #include "LuaProxy.h"
@@ -166,6 +167,15 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
         def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),
         def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::placeSprite),
+        def("gravity", (unsigned short(*)())&LuaProxy::gravity),
+        def("gravity", (void(*)(unsigned short))&LuaProxy::gravity),
+        def("earthquake", (unsigned short(*)())&LuaProxy::earthquake),
+        def("earthquake", (void(*)(unsigned short))&LuaProxy::earthquake),
+        def("jumpheight", (unsigned short(*)())&LuaProxy::jumpheight),
+        def("jumpheight", (void(*)(unsigned short))&LuaProxy::jumpheight),
+        def("jumpheightBounce", (unsigned short(*)())&LuaProxy::jumpheightBounce),
+        def("jumpheightBounce", (void(*)(unsigned short))&LuaProxy::jumpheightBounce),
+
 
         namespace_("UserData")[
             def("setValue", &LuaProxy::SaveBankProxy::setValue),
@@ -195,6 +205,8 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .def(constructor<int>())
             .def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::NPC::mem))
             .def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::NPC::mem))
+            .def("kill", static_cast<void (LuaProxy::NPC::*)()>(&LuaProxy::NPC::kill))
+            .def("kill", static_cast<void (LuaProxy::NPC::*)(int)>(&LuaProxy::NPC::kill))
             .property("id", &LuaProxy::NPC::id)
             .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
             .property("x", &LuaProxy::NPC::x, &LuaProxy::NPC::setX)
@@ -343,8 +355,12 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .property("Unused17E", &LuaProxy::Player::unused17E, &LuaProxy::Player::setUnused17E)
             .property("Unused180", &LuaProxy::Player::unused180, &LuaProxy::Player::setUnused180)
             .property("Unused182", &LuaProxy::Player::unused182, &LuaProxy::Player::setUnused182)
-            .property("Unused184", &LuaProxy::Player::unused184, &LuaProxy::Player::setUnused184)
+            .property("Unused184", &LuaProxy::Player::unused184, &LuaProxy::Player::setUnused184),
 
+        class_<LuaProxy::Block>("Block")
+            .def(constructor<int>())
+            .def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Block::mem))
+            .def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Block::mem))
     ];
 
     _G["player"] = new LuaProxy::Player();
@@ -457,18 +473,51 @@ void LunaLua::DoCodeFile(lua_State *L)
 }
 
 //debug stuff
-//int cCounter = 0;
+#define __DEBUG_IDA 0
+
+#if __DEBUG_IDA
+/*int cCounter = 0;
+
+struct debugXYStruct{
+    double x;
+    double y;
+};*/
+
+#endif
+
 
 void LunaLua::Do()
 {
     //debug stuff
-//    cCounter++;
-//    if(cCounter % 100 == 0){
-//        typedef int coinfunc(void);
-//        coinfunc* f = (coinfunc*)0x00A3C580;
-//        f();
-//    }
+#if __DEBUG_IDA
+    //cCounter++;
+    //NPCMOB* mNPC = NPC::GetFirstMatch(-1,-1);
+    //if(cCounter % 600 == 0){
+        /*typedef int somefunc();
+		somefunc* f = (somefunc*)0x00A621A0;
+        f();
+        PlayerMOB* mPlayer = Player::Get(1);
+        typedef int somecoinfunc(int, int, int, int, int);
+        int a = 3;
+        int b = 1;
+        int c = 0;
+        int d = 0;
+        somecoinfunc* f = (somecoinfunc*)0x009E7380;
+        debugXYStruct debg;
+        debg.x = mPlayer->CurXPos;
+        debg.y = mPlayer->CurYPos;
 
+        f((int)&a,(int)&debg,(int)&b,(int)&c,(int)&d);
+
+        mNPC->Ypos = mNPC->Ypos - 32.0;
+        a = 11;
+        b = 1065353216;
+        f((int)&a,(int)&mNPC->Xpos,(int)&b,(int)&c,(int)&d);
+
+		*(WORD*)((&(*(byte*)mNPC)) + 290) = 1;
+        //f((int)&a,(int)&mNPC->Xpos,(int)&b,(int)&c,(int)&d);*/
+    //}
+#endif
 
     PlayerMOB* demo = Player::Get(1);
     if(demo == 0)

@@ -158,7 +158,7 @@
 //+0x152	w	= Unused152
 
 //+0x154	w	= Index of sprite being held (index to a specific sprite object that was generated only, -1 = can't carry anything)
-//+0x156	w	= Unknown156, usually reset to 0
+//+0x156	w	= Player can grab anything setting (0xFFFF = can grab anything)
 //+0x158	w	= Powerup box contents (0 = no item)
 //
 // - SECTIONS
