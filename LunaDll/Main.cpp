@@ -57,8 +57,6 @@ int OnLvlLoad() {
 
 
 	if(gLunaEnabled) {
-        LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
-
 		// Load autocode
 		gAutoMan.Clear(false);		
 		gAutoMan.ReadFile(std::wstring((wchar_t*)GM_FULLDIR));
@@ -70,6 +68,8 @@ int OnLvlLoad() {
 		gSavedVarBank.TryLoadWorldVars();
 		gSavedVarBank.CheckSaveDeletion();
 		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
+
+        LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init

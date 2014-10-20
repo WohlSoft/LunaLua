@@ -53,37 +53,30 @@ namespace LuaProxy {
         void save();
     }
 
-    struct LuaEventData{
-        short playerUPressing;
-        short playerDPressing;
-        short playerLPressing;
-        short playerRPressing;
-        short playerJPressing;
-        short playerSJPressing;
-        short playerXPressing;
-        short playerRNPressing;
-        short playerSELPressing;
-        short playerSTRPressing;
-        short playerJumping;
-    };
-
-    static LuaEventData evPlayer1;
-    static LuaEventData evPlayer2;
-
-    LuaEventData* getEvData(int playerIndex);
-
-    char pressTest(short oldp, short newp);
-    void processKeyboardEvent(short oldp, short newp, int index, int playerIndex, lua_State *L);
-    void processKeyboardEvents(lua_State *L);
-    void processJumpEvent(lua_State *L);
-    void finishEventHandling();
-
     struct RECTd{
         double left;
         double top;
         double right;
         double bottom;
     };
+
+    RECT newRECT(){
+        RECT r;
+        r.bottom = 0;
+        r.left = 0;
+        r.right = 0;
+        r.top = 0;
+        return r;
+    }
+
+    RECTd newRECTd(){
+        RECTd r;
+        r.bottom = 0.0;
+        r.left = 0.0;
+        r.right = 0.0;
+        r.top = 0.0;
+        return r;
+    }
 
     class Section{
     public:

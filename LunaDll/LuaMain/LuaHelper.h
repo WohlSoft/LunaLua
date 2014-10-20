@@ -8,5 +8,6 @@
 #include <luabind/detail/call_function.hpp>
 
 namespace LuaHelper {
+    luabind::object getEventCallbase(lua_State* base);
     bool is_function(struct lua_State * luaState, const char * fname);
 }

@@ -6,6 +6,7 @@
 
 #include "LuaHelper.h"
 #include "LuaProxy.h"
+#include "LuaEvents.h"
 #include <string>
 
 
@@ -50,14 +51,19 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     wifstream code_file(main_path, ios::binary|ios::in);
     if(!code_file.is_open()){
         code_file.close();
+        TryCloseState(L);
         return;
     }
 
-    bool lapiEnabled = true;
+
     wifstream lapi_file(lapi_path, ios::binary|ios::in);
     if(!lapi_file.is_open()){
         lapi_file.close();
-        lapiEnabled = false;
+        windowError("Since v0.3 the LuaScriptsLib-Folder with\
+                    all its content is required.\
+                    Be sure you installed everything correctly!");
+        TryClose();
+        return;
     }
 
     using namespace luabind;
@@ -67,12 +73,13 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     std::string luacode = utf8_encode(wluacode);
 
     std::string lapicode;
-    if(lapiEnabled){
-        std::wstring wlapicode((std::istreambuf_iterator<wchar_t>(lapi_file)), std::istreambuf_iterator<wchar_t>());
-        lapi_file.close();
-        lapicode = utf8_encode(wlapicode);
-    }
+    lapiData lapicodeData;
 
+    std::wstring wlapicode((std::istreambuf_iterator<wchar_t>(lapi_file)), std::istreambuf_iterator<wchar_t>());
+    lapi_file.close();
+    lapicode = utf8_encode(wlapicode);
+
+    //HARDCODED API LOAD START ==========================
     //remove nearly all os code
     object _G = globals(L);
     object osTable = _G["os"];
@@ -85,32 +92,33 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     osTable["tmpname"] = object();
 
     //reset data
-    LuaProxy::evPlayer1.playerUPressing = 0;
-    LuaProxy::evPlayer1.playerDPressing = 0;
-    LuaProxy::evPlayer1.playerLPressing = 0;
-    LuaProxy::evPlayer1.playerRPressing = 0;
-    LuaProxy::evPlayer1.playerJPressing = 0;
-    LuaProxy::evPlayer1.playerSJPressing = 0;
-    LuaProxy::evPlayer1.playerXPressing = 0;
-    LuaProxy::evPlayer1.playerRNPressing = 0;
-    LuaProxy::evPlayer1.playerSELPressing = 0;
-    LuaProxy::evPlayer1.playerSTRPressing = 0;
-    LuaProxy::evPlayer1.playerJumping = 0;
+    LuaEvents::evPlayer1.playerUPressing = 0;
+    LuaEvents::evPlayer1.playerDPressing = 0;
+    LuaEvents::evPlayer1.playerLPressing = 0;
+    LuaEvents::evPlayer1.playerRPressing = 0;
+    LuaEvents::evPlayer1.playerJPressing = 0;
+    LuaEvents::evPlayer1.playerSJPressing = 0;
+    LuaEvents::evPlayer1.playerXPressing = 0;
+    LuaEvents::evPlayer1.playerRNPressing = 0;
+    LuaEvents::evPlayer1.playerSELPressing = 0;
+    LuaEvents::evPlayer1.playerSTRPressing = 0;
+    LuaEvents::evPlayer1.playerJumping = 0;
+    LuaEvents::evPlayer1.section = -1;
 
-    LuaProxy::evPlayer2.playerUPressing = 0;
-    LuaProxy::evPlayer2.playerDPressing = 0;
-    LuaProxy::evPlayer2.playerLPressing = 0;
-    LuaProxy::evPlayer2.playerRPressing = 0;
-    LuaProxy::evPlayer2.playerJPressing = 0;
-    LuaProxy::evPlayer2.playerSJPressing = 0;
-    LuaProxy::evPlayer2.playerXPressing = 0;
-    LuaProxy::evPlayer2.playerRNPressing = 0;
-    LuaProxy::evPlayer2.playerSELPressing = 0;
-    LuaProxy::evPlayer2.playerSTRPressing = 0;
-    LuaProxy::evPlayer2.playerJumping = 0;
+    LuaEvents::evPlayer2.playerUPressing = 0;
+    LuaEvents::evPlayer2.playerDPressing = 0;
+    LuaEvents::evPlayer2.playerLPressing = 0;
+    LuaEvents::evPlayer2.playerRPressing = 0;
+    LuaEvents::evPlayer2.playerJPressing = 0;
+    LuaEvents::evPlayer2.playerSJPressing = 0;
+    LuaEvents::evPlayer2.playerXPressing = 0;
+    LuaEvents::evPlayer2.playerRNPressing = 0;
+    LuaEvents::evPlayer2.playerSELPressing = 0;
+    LuaEvents::evPlayer2.playerSTRPressing = 0;
+    LuaEvents::evPlayer2.playerJumping = 0;
+    LuaEvents::evPlayer2.section = -1;
 
 
-    int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), chunckName)  || lua_pcall(L, 0, LUA_MULTRET, 0);
 
 
     //constants
@@ -196,6 +204,9 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .def_readwrite("top", &LuaProxy::RECTd::top)
             .def_readwrite("right", &LuaProxy::RECTd::right)
             .def_readwrite("bottom", &LuaProxy::RECTd::bottom),
+
+        def("newRECT", &LuaProxy::newRECT),
+        def("newRECTd", &LuaProxy::newRECTd),
 
         class_<LuaProxy::Section>("Section")
             .def(constructor<int>())
@@ -370,8 +381,51 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     else
         delete pl;
 
+    std::string path =  std::string(object_cast<const char*>(_G["package"]["path"]));
+    path = path.append(";./LuaScriptsLib/?.lua");
+    _G["package"]["path"] = path.c_str();
+
+    //HARDCODED API LOAD END ==========================
+
+    //LAPI LOAD START ==========================
+    bool errLapi = false;
+    int lapierrcode = luaL_loadbuffer(L, lapicode.c_str(), lapicode.length(), "main.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
+    if(!(lapierrcode == 0)){
+        object error_msg(from_stack(L, -1));
+        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+        errLapi = true;
+    }
+
+    if(errLapi){
+        TryClose();
+        return;
+    }
+
+    const char* initFunc = object_cast<const char*>(_G["__lapiInit"]);
+    lapicodeData.lapiEventTable = std::string(object_cast<const char*>(_G["__lapiEventMgr"]));
+	
+    try
+    {
+        if(LuaHelper::is_function(L, initFunc)){
+            luabind::call_function<void>(L, initFunc);
+        }
+    }
+    catch (error& e)
+    {
+        object error_msg(from_stack(L, -1));
+        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+        errLapi = true;
+    }
+    if(errLapi){
+        TryClose();
+        return;
+    }
+    extraLapiData[L] = lapicodeData;
+    //LAPI LOAD END ==========================
 
 
+    //INIT SCRIPT FILE START ==========================
+    int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), chunckName)  || lua_pcall(L, 0, LUA_MULTRET, 0);
 
     if(!(errcode == 0)){
         object error_msg(from_stack(L, -1));
@@ -380,28 +434,22 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         return;
     }
 
-    if(lapiEnabled){
-        int lapierrcode = luaL_loadbuffer(L, lapicode.c_str(), lapicode.length(), "lapi.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
-        if(!(lapierrcode == 0)){
-            object error_msg(from_stack(L, -1));
-            LuaProxy::windowDebug(object_cast<const char*>(error_msg));
-            TryClose();
-            return;
-        }
-    }
+    luabind::object evTable = LuaHelper::getEventCallbase(L);
+    bool err = false;
 
     try
     {
-        if(LuaHelper::is_function(L, "onLoad")){
-            luabind::call_function<void>(L, "onLoad");
-        }
+        luabind::call_function<void>(evTable["onLoad"]);
     }
     catch (error& e)
     {
         object error_msg(from_stack(L, -1));
         LuaProxy::windowDebug(object_cast<const char*>(error_msg));
-        TryClose();
+        err = true;
     }
+    if(err)
+        TryClose();
+    //INIT SCRIPT FILE END ==========================
 }
 
 void LunaLua::init(wstring main_path)
@@ -417,7 +465,7 @@ void LunaLua::init(wstring main_path)
     }
 
 	wstring lapi = path;
-    lapi = lapi.append(L"\\lapi.lua");
+    lapi = lapi.append(L"\\LuaScriptsLib\\main.lua");
 	wstring globalPath = main_path;
 	globalPath = globalPath.append(L"lunaworld.lua");
     initCodeFile(mainStateGlobal, globalPath, lapi, "lunaworld.lua");
@@ -439,37 +487,22 @@ void LunaLua::DoCodeFile(lua_State *L)
     if(demo == 0 || L == 0)
         return;
 
+    luabind::object evTable = LuaHelper::getEventCallbase(L);
+    bool err = false;
+
     try
     {
-        if(LuaHelper::is_function(L, "onLoop")){
-            luabind::call_function<void>(L, "onLoop");
-        }
-        if(lastSection != demo->CurrentSection){
-            std::string curSecLoop = "onLoadSection";
-
-            if(LuaHelper::is_function(L, curSecLoop.c_str())){
-                luabind::call_function<void>(L, curSecLoop.c_str()); //onLoadSection
-            }
-            curSecLoop = curSecLoop.append(std::to_string((long long)demo->CurrentSection));
-            if(LuaHelper::is_function(L, curSecLoop.c_str())){
-                luabind::call_function<void>(L, curSecLoop.c_str()); //onLoadSection#
-            }
-
-        }
-        std::string curSecLoop = "onLoopSection";
-        curSecLoop = curSecLoop.append(std::to_string((long long)demo->CurrentSection));
-        if(LuaHelper::is_function(L, curSecLoop.c_str())){
-            luabind::call_function<void>(L, curSecLoop.c_str());
-        }
-        LuaProxy::processKeyboardEvents(L);
-        LuaProxy::processJumpEvent(L);
+        luabind::call_function<void>(evTable["onLoop"]);
+        LuaEvents::proccesEvents(L);
     }
     catch (luabind::error& e)
     {
         luabind::object error_msg(luabind::from_stack(L, -1));
         LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
-        TryClose();
+        err = true;
     }
+    if(err)
+        TryClose();
 }
 
 //debug stuff
@@ -526,17 +559,8 @@ void LunaLua::Do()
 	DoCodeFile(mainStateGlobal);
     DoCodeFile(mainState);
     
-    LuaProxy::finishEventHandling();
+    LuaEvents::finishEventHandling();
 
-    lastSection = demo->CurrentSection;
-}
-
-
-void LunaLua::TryClose()
-{
-    TryCloseState(mainState);
-    TryCloseState(mainStateGlobal);
-    lastSection = -1;
 }
 
 
@@ -545,7 +569,15 @@ void LunaLua::TryCloseState(lua_State* &L)
     if(L)
         lua_close(L);
 
+	extraLapiData.erase(L);
     L = 0;
+}
+
+void LunaLua::TryClose()
+{
+    extraLapiData.clear();
+    TryCloseState(mainState);
+    TryCloseState(mainStateGlobal);
 }
 
 

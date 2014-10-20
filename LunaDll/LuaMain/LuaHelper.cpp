@@ -1,5 +1,14 @@
 #include "LuaHelper.h"
 
+#include "LunaLuaMain.h"
+
+luabind::object LuaHelper::getEventCallbase(lua_State *base)
+{
+    luabind::object _G = luabind::globals(base);
+    std::string strEventTable = LunaLua::extraLapiData[base].lapiEventTable;
+    return _G[strEventTable.c_str()];
+}
+
 
 bool LuaHelper::is_function(lua_State *luaState, const char *fname)
 {
@@ -12,3 +21,5 @@ bool LuaHelper::is_function(lua_State *luaState, const char *fname)
     }
     return false;
 }
+
+

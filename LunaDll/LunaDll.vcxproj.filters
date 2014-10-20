@@ -210,6 +210,9 @@
     <ClInclude Include="UserSaving.h">
       <Filter>Header Files\UserSaves</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LuaEvents.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="UserSaving.cpp">
       <Filter>Header Files\UserSaves</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaEvents.cpp">
+      <Filter>Header Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
