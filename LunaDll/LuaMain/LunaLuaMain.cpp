@@ -487,18 +487,17 @@ void LunaLua::DoCodeFile(lua_State *L)
     if(demo == 0 || L == 0)
         return;
 
-    luabind::object evTable = LuaHelper::getEventCallbase(L);
     bool err = false;
 
     try
     {
-        luabind::call_function<void>(evTable["onLoop"]);
+        luabind::object evTable = LuaHelper::getEventCallbase(L);
+        luabind::object cl = evTable["onLoop"];
+        luabind::call_function<void>(cl);
         LuaEvents::proccesEvents(L);
     }
     catch (luabind::error& e)
     {
-        luabind::object error_msg(luabind::from_stack(L, -1));
-        LuaProxy::windowDebug(luabind::object_cast<const char*>(error_msg));
         err = true;
     }
     if(err)
