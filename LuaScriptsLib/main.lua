@@ -33,6 +33,8 @@ function loadAPI(api)
 end
 
 function registerEvent(apiName, event, eventHandler, beforeMainCall)
+	eventHandler = eventHandler or event
+	beforeMainCall = beforeMainCall or true
 	if(__loadedAPIs[apiName])then
 		if(beforeMainCall)then
 			if(not eventManager.eventHosterBefore[event])then

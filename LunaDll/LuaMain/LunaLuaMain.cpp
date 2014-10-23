@@ -428,23 +428,23 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
     int errcode = luaL_loadbuffer(L, luacode.c_str(), luacode.length(), chunckName)  || lua_pcall(L, 0, LUA_MULTRET, 0);
 
     if(!(errcode == 0)){
-        object error_msg(from_stack(L, -1));
-        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+        {
+            object error_msg(from_stack(L, -1));
+            LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+        }
         TryClose();
         return;
     }
 
-    luabind::object evTable = LuaHelper::getEventCallbase(L);
     bool err = false;
 
     try
     {
+        luabind::object evTable = LuaHelper::getEventCallbase(L);
         luabind::call_function<void>(evTable["onLoad"]);
     }
     catch (error& e)
     {
-        object error_msg(from_stack(L, -1));
-        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
         err = true;
     }
     if(err)
