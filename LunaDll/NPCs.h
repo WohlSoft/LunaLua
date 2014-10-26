@@ -47,8 +47,8 @@
 // 0x+110	f	= Lakitu throw timer
 
 // 0x+118	f	= Direction faced
-// 0x+122   w   = Kill/Kill effect (0 = No kill/ 1-9 Kill effect with kill)
-// 0x+124	w	= Unknown
+// 0x+122	w	= Kill/Kill effect (0 = No kill/ 1-? Kill effect with kill)
+// 0x+124	w	= Unknown (same effect as 0x+128; -1 = offscreen)
 // 0x+128	dw	= Ofscreen flag (0xFFFFFFFF = offscreen)
 // 0x+12A	w	= Ofscreen countdown timer?
 // 0x+12C	w	= Unknown grabbing-related
