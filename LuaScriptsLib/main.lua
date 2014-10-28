@@ -25,11 +25,11 @@ end
 
 function loadAPI(api)
 	local loadedAPI = require(api)
-	_G[api] = loadedAPI
 	__loadedAPIs[api] = loadedAPI
 	if(type(loadedAPI["onInitAPI"])=="function")then
 		loadedAPI.onInitAPI()
 	end
+	return loadedAPI
 end
 
 function registerEvent(apiName, event, eventHandler, beforeMainCall)

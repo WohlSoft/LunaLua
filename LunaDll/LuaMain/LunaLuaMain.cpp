@@ -496,13 +496,11 @@ void LunaLua::init(wstring main_path)
 	wstring globalPath = main_path;
 	globalPath = globalPath.append(L"lunaworld.lua");
     initCodeFile(mainStateGlobal, globalPath, lapi, "lunaworld.lua");
-	if(!mainStateGlobal)
-		return;
 
     wstring full_path = main_path.append(Level::GetName());
     full_path = removeExtension(full_path);
     full_path = full_path.append(L"\\lunadll.lua");
-    
+
     initCodeFile(mainState, full_path, lapi, "lunadll.lua");
     
 }

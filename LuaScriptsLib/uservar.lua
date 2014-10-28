@@ -12,5 +12,4 @@ uservar = setmetatable({}, {
 		return 0
 	end
 })
-Döner
 return uservar
