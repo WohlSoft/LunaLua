@@ -25,6 +25,8 @@ namespace LuaProxy {
     int totalNPCs();
     luabind::object npcs(lua_State *L);
     luabind::object findNPCs(int ID, int section, lua_State *L);
+    luabind::object blocks(lua_State *L);
+    luabind::object findblocks(int ID, lua_State *L);
     void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
     void triggerEvent(const char* evName);
@@ -43,6 +45,18 @@ namespace LuaProxy {
     void jumpheight(unsigned short value);
     unsigned short jumpheightBounce();
     void jumpheightBounce(unsigned short value);
+
+    //for runAnimation
+    struct coorStruct{
+        double x;
+        double y;
+        double a1;
+        double a2;
+    };
+
+    void runAnimation(int id, double x, double y, int extraData);
+
+    void npcToCoins();
 
 
     namespace SaveBankProxy {
@@ -78,6 +92,15 @@ namespace LuaProxy {
         return r;
     }
 
+    class VBStr{
+    public:
+        VBStr (wchar_t* ptr);
+        std::string str();
+        void setStr(std::string str);
+    private:
+        wchar_t* m_wcharptr;
+    };
+
     class Section{
     public:
         Section (int sectionNum);
@@ -105,6 +128,12 @@ namespace LuaProxy {
         void kill();
         void kill(int killEffectID);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+        VBStr attachedLayerName();
+        VBStr activateEventName();
+        VBStr deathEventName();
+        VBStr talkEventName();
+        VBStr noMoreObjInLayer();
+        VBStr msg();
     private:
         bool isValid();
         int m_index;
@@ -382,6 +411,8 @@ namespace LuaProxy {
         void setUnused182(short var_unused182);
         short unused184();
         void setUnused184(short var_unused184);
+        //internal use
+        int getIndex();
     private:
         int m_index;
     };
@@ -393,7 +424,23 @@ namespace LuaProxy {
         Block(int index);
         void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+        double x();
+        void setX(double x);
+        double y();
+        void setY(double y);
+        double speedX();
+        void setSpeedX(double speedX);
+        double speedY();
+        void setSpeedY(double speedY);
+        short id();
+        void setId(short id);
+        bool slippery();
+        void setSlippery(bool slippery);
+        bool invisible();
+        void setInvisible(bool invisible);
+        int collidesWith(Player* player);
     private:
+        bool isValid();
         int m_index;
     };
 

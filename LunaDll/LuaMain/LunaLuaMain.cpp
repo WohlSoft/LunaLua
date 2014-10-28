@@ -81,79 +81,80 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
 
     //HARDCODED API LOAD START ==========================
     //remove nearly all os code
-    object _G = globals(L);
-    object osTable = _G["os"];
-    osTable["execute"] = object();
-    osTable["exit"] = object();
-    osTable["getenv"] = object();
-    osTable["remove"] = object();
-    osTable["rename"] = object();
-    osTable["setlocal"] = object();
-    osTable["tmpname"] = object();
+    {
+        object _G = globals(L);
+        object osTable = _G["os"];
+        osTable["execute"] = object();
+        osTable["exit"] = object();
+        osTable["getenv"] = object();
+        osTable["remove"] = object();
+        osTable["rename"] = object();
+        osTable["setlocal"] = object();
+        osTable["tmpname"] = object();
 
-    //reset data
-    LuaEvents::evPlayer1.playerUPressing = 0;
-    LuaEvents::evPlayer1.playerDPressing = 0;
-    LuaEvents::evPlayer1.playerLPressing = 0;
-    LuaEvents::evPlayer1.playerRPressing = 0;
-    LuaEvents::evPlayer1.playerJPressing = 0;
-    LuaEvents::evPlayer1.playerSJPressing = 0;
-    LuaEvents::evPlayer1.playerXPressing = 0;
-    LuaEvents::evPlayer1.playerRNPressing = 0;
-    LuaEvents::evPlayer1.playerSELPressing = 0;
-    LuaEvents::evPlayer1.playerSTRPressing = 0;
-    LuaEvents::evPlayer1.playerJumping = 0;
-    LuaEvents::evPlayer1.section = -1;
+        //reset data
+        LuaEvents::evPlayer1.playerUPressing = 0;
+        LuaEvents::evPlayer1.playerDPressing = 0;
+        LuaEvents::evPlayer1.playerLPressing = 0;
+        LuaEvents::evPlayer1.playerRPressing = 0;
+        LuaEvents::evPlayer1.playerJPressing = 0;
+        LuaEvents::evPlayer1.playerSJPressing = 0;
+        LuaEvents::evPlayer1.playerXPressing = 0;
+        LuaEvents::evPlayer1.playerRNPressing = 0;
+        LuaEvents::evPlayer1.playerSELPressing = 0;
+        LuaEvents::evPlayer1.playerSTRPressing = 0;
+        LuaEvents::evPlayer1.playerJumping = 0;
+        LuaEvents::evPlayer1.section = -1;
 
-    LuaEvents::evPlayer2.playerUPressing = 0;
-    LuaEvents::evPlayer2.playerDPressing = 0;
-    LuaEvents::evPlayer2.playerLPressing = 0;
-    LuaEvents::evPlayer2.playerRPressing = 0;
-    LuaEvents::evPlayer2.playerJPressing = 0;
-    LuaEvents::evPlayer2.playerSJPressing = 0;
-    LuaEvents::evPlayer2.playerXPressing = 0;
-    LuaEvents::evPlayer2.playerRNPressing = 0;
-    LuaEvents::evPlayer2.playerSELPressing = 0;
-    LuaEvents::evPlayer2.playerSTRPressing = 0;
-    LuaEvents::evPlayer2.playerJumping = 0;
-    LuaEvents::evPlayer2.section = -1;
-
-
+        LuaEvents::evPlayer2.playerUPressing = 0;
+        LuaEvents::evPlayer2.playerDPressing = 0;
+        LuaEvents::evPlayer2.playerLPressing = 0;
+        LuaEvents::evPlayer2.playerRPressing = 0;
+        LuaEvents::evPlayer2.playerJPressing = 0;
+        LuaEvents::evPlayer2.playerSJPressing = 0;
+        LuaEvents::evPlayer2.playerXPressing = 0;
+        LuaEvents::evPlayer2.playerRNPressing = 0;
+        LuaEvents::evPlayer2.playerSELPressing = 0;
+        LuaEvents::evPlayer2.playerSTRPressing = 0;
+        LuaEvents::evPlayer2.playerJumping = 0;
+        LuaEvents::evPlayer2.section = -1;
 
 
-    //constants
-    _G["PLAYER_SMALL"] = 1;
-    _G["PLAYER_BIG"] = 2;
-    _G["PLAYER_FIREFLOWER"] = 3;
-    _G["PLAYER_LEAF"] = 4;
-    _G["PLAYER_TANOOKIE"] = 5;
-    _G["PLAYER_HAMMER"] = 6;
-    _G["PLAYER_ICE"] = 7;
 
-    _G["FIND_ANY"] = -1;
 
-    _G["DIR_RIGHT"] = 1;
-    _G["DIR_RANDOM"] = 0;
-    _G["DIR_LEFT"] = -1;
+        //constants
+        _G["PLAYER_SMALL"] = 1;
+        _G["PLAYER_BIG"] = 2;
+        _G["PLAYER_FIREFLOWER"] = 3;
+        _G["PLAYER_LEAF"] = 4;
+        _G["PLAYER_TANOOKIE"] = 5;
+        _G["PLAYER_HAMMER"] = 6;
+        _G["PLAYER_ICE"] = 7;
 
-    _G["FIELD_BYTE"] = 1;
-    _G["FIELD_WORD"] = 2;
-    _G["FIELD_DWORD"] = 3;
-    _G["FIELD_FLOAT"] = 4;
-    _G["FIELD_DFLOAT"] = 5;
-    _G["FIELD_STRING"] = 6;
+        _G["FIND_ANY"] = -1;
 
-    _G["KEY_UP"] = 0;
-    _G["KEY_DOWN"] = 1;
-    _G["KEY_LEFT"] = 2;
-    _G["KEY_RIGHT"] = 3;
-    _G["KEY_JUMP"] = 4;
-    _G["KEY_SPINJUMP"] = 5;
-    _G["KEY_X"] = 6;
-    _G["KEY_RUN"] = 7;
-    _G["KEY_SEL"] = 8;
-    _G["KEY_STR"] = 9;
+        _G["DIR_RIGHT"] = 1;
+        _G["DIR_RANDOM"] = 0;
+        _G["DIR_LEFT"] = -1;
 
+        _G["FIELD_BYTE"] = 1;
+        _G["FIELD_WORD"] = 2;
+        _G["FIELD_DWORD"] = 3;
+        _G["FIELD_FLOAT"] = 4;
+        _G["FIELD_DFLOAT"] = 5;
+        _G["FIELD_STRING"] = 6;
+
+        _G["KEY_UP"] = 0;
+        _G["KEY_DOWN"] = 1;
+        _G["KEY_LEFT"] = 2;
+        _G["KEY_RIGHT"] = 3;
+        _G["KEY_JUMP"] = 4;
+        _G["KEY_SPINJUMP"] = 5;
+        _G["KEY_X"] = 6;
+        _G["KEY_RUN"] = 7;
+        _G["KEY_SEL"] = 8;
+        _G["KEY_STR"] = 9;
+    }
 
 
 
@@ -183,6 +184,10 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("jumpheight", (void(*)(unsigned short))&LuaProxy::jumpheight),
         def("jumpheightBounce", (unsigned short(*)())&LuaProxy::jumpheightBounce),
         def("jumpheightBounce", (void(*)(unsigned short))&LuaProxy::jumpheightBounce),
+        def("runAnimation", &LuaProxy::runAnimation),
+        def("npcToCoins", &LuaProxy::npcToCoins),
+        def("blocks", &LuaProxy::blocks),
+        def("findblocks", &LuaProxy::findblocks),
 
 
         namespace_("UserData")[
@@ -223,7 +228,13 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .property("x", &LuaProxy::NPC::x, &LuaProxy::NPC::setX)
             .property("y", &LuaProxy::NPC::y, &LuaProxy::NPC::setY)
             .property("speedX", &LuaProxy::NPC::speedX, &LuaProxy::NPC::setSpeedX)
-            .property("speedY", &LuaProxy::NPC::speedY, &LuaProxy::NPC::setSpeedY),
+            .property("speedY", &LuaProxy::NPC::speedY, &LuaProxy::NPC::setSpeedY)
+            .property("attachedLayerName", &LuaProxy::NPC::attachedLayerName)
+            .property("activateEventName", &LuaProxy::NPC::activateEventName)
+            .property("deathEventName", &LuaProxy::NPC::deathEventName)
+            .property("noMoreObjInLayer", &LuaProxy::NPC::noMoreObjInLayer)
+            .property("talkEventName", &LuaProxy::NPC::talkEventName)
+            .property("msg", &LuaProxy::NPC::msg),
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
@@ -372,19 +383,31 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .def(constructor<int>())
             .def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Block::mem))
             .def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Block::mem))
+            .def("collidesWith", &LuaProxy::Block::collidesWith)
+            .property("x", &LuaProxy::Block::x, &LuaProxy::Block::setX)
+            .property("y", &LuaProxy::Block::y, &LuaProxy::Block::setY)
+            .property("speedX", &LuaProxy::Block::speedX, &LuaProxy::Block::setSpeedX)
+            .property("speedY", &LuaProxy::Block::speedY, &LuaProxy::Block::setSpeedY)
+            .property("id", &LuaProxy::Block::id, &LuaProxy::Block::setId)
+            .property("invisible", &LuaProxy::Block::invisible, &LuaProxy::Block::setInvisible)
+            .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery),
+
+        class_<LuaProxy::VBStr>("VBStr")
+            .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
     ];
+    {
+        object _G = globals(L);
+        _G["player"] = new LuaProxy::Player();
+        LuaProxy::Player* pl = new LuaProxy::Player(2);
+        if(pl->isValid())
+            _G["player2"] = pl;
+        else
+            delete pl;
 
-    _G["player"] = new LuaProxy::Player();
-    LuaProxy::Player* pl = new LuaProxy::Player(2);
-    if(pl->isValid())
-        _G["player2"] = pl;
-    else
-        delete pl;
-
-    std::string path =  std::string(object_cast<const char*>(_G["package"]["path"]));
-    path = path.append(";./LuaScriptsLib/?.lua");
-    _G["package"]["path"] = path.c_str();
-
+        std::string path =  std::string(object_cast<const char*>(_G["package"]["path"]));
+        path = path.append(";./LuaScriptsLib/?.lua");
+        _G["package"]["path"] = path.c_str();
+    }
     //HARDCODED API LOAD END ==========================
 
     //LAPI LOAD START ==========================
@@ -401,20 +424,24 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         return;
     }
 
-    const char* initFunc = object_cast<const char*>(_G["__lapiInit"]);
-    lapicodeData.lapiEventTable = std::string(object_cast<const char*>(_G["__lapiEventMgr"]));
+    {
+        object _G = globals(L);
+        const char* initFunc = object_cast<const char*>(_G["__lapiInit"]);
+        lapicodeData.lapiEventTable = std::string(object_cast<const char*>(_G["__lapiEventMgr"]));
+
 	
-    try
-    {
-        if(LuaHelper::is_function(L, initFunc)){
-            luabind::call_function<void>(L, initFunc);
+        try
+        {
+            if(LuaHelper::is_function(L, initFunc)){
+                luabind::call_function<void>(L, initFunc);
+            }
         }
-    }
-    catch (error& e)
-    {
-        object error_msg(from_stack(L, -1));
-        LuaProxy::windowDebug(object_cast<const char*>(error_msg));
-        errLapi = true;
+        catch (error& e)
+        {
+            object error_msg(from_stack(L, -1));
+            LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+            errLapi = true;
+        }
     }
     if(errLapi){
         TryClose();

@@ -12,14 +12,17 @@
 
 // +0x2C	pt  = wchar_t* Activate event layer name
 // +0x30	pt	= wchar_t* Death event layer name
-// +0x34	pt	= ptr to unknown string
+// +0x34	pt	= wchar_t* Talk event name?
 // +0x38	pt	= wchar_t* No More Objs event layer name
 
 // +0x3C	pt	= wchar_t* Attached layer name?
 
+// 0x+40	w	= Unknown (some sort of hide value if -1)
 // 0x+44	w	= Activated / interacted with player flag
 // 0x+46	w	= Friendly (on = 0xFFFF)
 // 0x+48	w	= Don't Move (on = 0xFFFF)
+
+// 0x+4C	pt	= wchar_t* NPC Message text
 
 // 0x+64	w	= Is a generator
 // 0x+68	f	= Generator delay setting

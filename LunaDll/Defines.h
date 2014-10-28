@@ -167,4 +167,7 @@ enum PRIORITY {
 
 #define GF_NPC_KILL			0x00A315A0			// Arg1 = int* Killed NPC index  Arg2 = NPCMOB* Killer NPC
 
-#define GF_NPC_TO_COINS     0x00A3C580          // No Args, Does convert every NPC to coins (Like player would win)
+#define GF_NPC_TO_COINS		0x00A3C580			// No Args, Does convert every NPC to coins (Like player would win)
+
+#define GF_RUN_ANIM			0x009E7380			// Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
+
