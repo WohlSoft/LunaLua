@@ -6,7 +6,7 @@
 #include <string>
 
 // -- NPC structure -- ( 0x158 bytes )
-// 0x+00	pt	= wchar_t* Attached layer name?
+// 0x+00	pt	= wchar_t* Attached layer name
 // 0x+04	w	= Unknown
 // 0x+06	w	= Unknown decrementing timer
 
@@ -14,8 +14,7 @@
 // +0x30	pt	= wchar_t* Death event layer name
 // +0x34	pt	= wchar_t* Talk event name?
 // +0x38	pt	= wchar_t* No More Objs event layer name
-
-// +0x3C	pt	= wchar_t* Attached layer name?
+// +0x3C	pt	= wchar_t* Layer name
 
 // 0x+40	w	= Unknown (some sort of hide value if -1)
 // 0x+44	w	= Activated / interacted with player flag

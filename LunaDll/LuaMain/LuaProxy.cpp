@@ -392,6 +392,16 @@ LuaProxy::VBStr LuaProxy::NPC::msg()
     return VBStr(ptr);
 }
 
+LuaProxy::VBStr LuaProxy::NPC::layerName()
+{
+    if(!isValid())
+        return VBStr(0);
+
+    NPCMOB* thisnpc = ::NPC::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x3C);
+    return VBStr(ptr);
+}
+
 bool LuaProxy::NPC::isValid()
 {
     return !(m_index < 0 || m_index > GM_NPCS_COUNT);

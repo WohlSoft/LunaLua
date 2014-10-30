@@ -234,7 +234,8 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .property("deathEventName", &LuaProxy::NPC::deathEventName)
             .property("noMoreObjInLayer", &LuaProxy::NPC::noMoreObjInLayer)
             .property("talkEventName", &LuaProxy::NPC::talkEventName)
-            .property("msg", &LuaProxy::NPC::msg),
+            .property("msg", &LuaProxy::NPC::msg)
+            .property("layerName", &LuaProxy::NPC::layerName),
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())

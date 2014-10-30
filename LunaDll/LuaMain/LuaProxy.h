@@ -134,6 +134,7 @@ namespace LuaProxy {
         VBStr talkEventName();
         VBStr noMoreObjInLayer();
         VBStr msg();
+        VBStr layerName();
     private:
         bool isValid();
         int m_index;
