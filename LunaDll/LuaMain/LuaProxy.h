@@ -45,6 +45,11 @@ namespace LuaProxy {
     void jumpheight(unsigned short value);
     unsigned short jumpheightBounce();
     void jumpheightBounce(unsigned short value);
+    luabind::object findlayer(const char* layername, lua_State *L);
+
+    void exitLevel();
+    unsigned short winState();
+    void winState(unsigned short value);
 
     //for runAnimation
     struct coorStruct{
@@ -101,6 +106,19 @@ namespace LuaProxy {
         wchar_t* m_wcharptr;
     };
 
+    class Layer{
+    public:
+        Layer (int layerIndex);
+        VBStr layerName();
+        float speedX();
+        void setSpeedX(float speedX);
+        float speedY();
+        void setSpeedY(float speedY);
+        void stop();
+    private:
+        int m_layerIndex;
+    };
+
     class Section{
     public:
         Section (int sectionNum);
@@ -129,12 +147,14 @@ namespace LuaProxy {
         void kill(int killEffectID);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
         VBStr attachedLayerName();
+        luabind::object attachedLayerObj(lua_State *L);
         VBStr activateEventName();
         VBStr deathEventName();
         VBStr talkEventName();
         VBStr noMoreObjInLayer();
         VBStr msg();
         VBStr layerName();
+        luabind::object layerObj(lua_State *L);
     private:
         bool isValid();
         int m_index;
@@ -440,6 +460,8 @@ namespace LuaProxy {
         bool invisible();
         void setInvisible(bool invisible);
         int collidesWith(Player* player);
+        VBStr layerName();
+        luabind::object layerObj(lua_State* L);
     private:
         bool isValid();
         int m_index;

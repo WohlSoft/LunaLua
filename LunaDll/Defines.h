@@ -101,6 +101,10 @@ enum PRIORITY {
 #define GM_SEC_BG_ARRAY		*(DOUBLE*)0x00B258B8
 #define GM_BG_XPOS_PTR		*(DOUBLE*)0x00B2B984
 
+// Animations
+#define GM_ANIM_COUNT		*(WORD*)0x00B2595C
+#define GM_ANIM_PTR			*(WORD*)0x00B259CC
+
 // Sound
 #define GM_MUSIC_PATHS_PTR	*(DWORD*)0x00B257B8 
 #define GM_SEC_MUSIC_TBL_P	*(DWORD*)0x00B25828		// 21 shorts containing music # for each section

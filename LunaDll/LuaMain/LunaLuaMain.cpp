@@ -188,6 +188,10 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("npcToCoins", &LuaProxy::npcToCoins),
         def("blocks", &LuaProxy::blocks),
         def("findblocks", &LuaProxy::findblocks),
+        def("findlayer", &LuaProxy::findlayer),
+        def("exitLevel", &LuaProxy::exitLevel),
+        def("winState", (unsigned short(*)())&LuaProxy::winState),
+        def("winState", (void(*)(unsigned short))&LuaProxy::winState),
 
 
         namespace_("UserData")[
@@ -213,6 +217,13 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("newRECT", &LuaProxy::newRECT),
         def("newRECTd", &LuaProxy::newRECTd),
 
+        class_<LuaProxy::Layer>("Layer")
+            .def(constructor<int>())
+            .def("stop", &LuaProxy::Layer::stop)
+            .property("speedX", &LuaProxy::Layer::speedX, &LuaProxy::Layer::setSpeedX)
+            .property("speedY", &LuaProxy::Layer::speedY, &LuaProxy::Layer::setSpeedY)
+            .property("layerName", &LuaProxy::Layer::layerName),
+
         class_<LuaProxy::Section>("Section")
             .def(constructor<int>())
             .property("boundary", &LuaProxy::Section::boundary, &LuaProxy::Section::setBoundary),
@@ -235,7 +246,9 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .property("noMoreObjInLayer", &LuaProxy::NPC::noMoreObjInLayer)
             .property("talkEventName", &LuaProxy::NPC::talkEventName)
             .property("msg", &LuaProxy::NPC::msg)
-            .property("layerName", &LuaProxy::NPC::layerName),
+            .property("layerName", &LuaProxy::NPC::layerName)
+            .property("attachedLayerObj", &LuaProxy::NPC::attachedLayerObj)
+            .property("layerObj", &LuaProxy::NPC::layerObj),
 
         class_<LuaProxy::Player>("Player")
             .def(constructor<>())
@@ -391,7 +404,9 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .property("speedY", &LuaProxy::Block::speedY, &LuaProxy::Block::setSpeedY)
             .property("id", &LuaProxy::Block::id, &LuaProxy::Block::setId)
             .property("invisible", &LuaProxy::Block::invisible, &LuaProxy::Block::setInvisible)
-            .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery),
+            .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery)
+            .property("layerName", &LuaProxy::Block::layerName)
+            .property("layerObj", &LuaProxy::Block::layerObj),
 
         class_<LuaProxy::VBStr>("VBStr")
             .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
@@ -437,7 +452,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
                 luabind::call_function<void>(L, initFunc);
             }
         }
-        catch (error& e)
+        catch (error& /*e*/)
         {
             object error_msg(from_stack(L, -1));
             LuaProxy::windowDebug(object_cast<const char*>(error_msg));
@@ -471,7 +486,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         luabind::object evTable = LuaHelper::getEventCallbase(L);
         luabind::call_function<void>(evTable["onLoad"]);
     }
-    catch (error& e)
+    catch (error& /*e*/)
     {
         err = true;
     }
@@ -522,7 +537,7 @@ void LunaLua::DoCodeFile(lua_State *L)
         luabind::call_function<void>(cl);
         LuaEvents::proccesEvents(L);
     }
-    catch (luabind::error& e)
+    catch (luabind::error& /*e*/)
     {
         err = true;
     }

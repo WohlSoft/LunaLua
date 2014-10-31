@@ -11,6 +11,7 @@
 #include "../CSprite.h"
 #include "../CSpriteManager.h"
 #include "../Blocks.h"
+#include "../Layer.h"
 
 
 
@@ -342,6 +343,16 @@ LuaProxy::VBStr LuaProxy::NPC::attachedLayerName()
     return VBStr(ptr);
 }
 
+luabind::object LuaProxy::NPC::attachedLayerObj(lua_State *L)
+{
+    if(!isValid())
+        return luabind::object();
+
+    NPCMOB* thisnpc = ::NPC::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)));
+    return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
+}
+
 LuaProxy::VBStr LuaProxy::NPC::activateEventName()
 {
     if(!isValid())
@@ -400,6 +411,16 @@ LuaProxy::VBStr LuaProxy::NPC::layerName()
     NPCMOB* thisnpc = ::NPC::Get(m_index);
     wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x3C);
     return VBStr(ptr);
+}
+
+luabind::object LuaProxy::NPC::layerObj(lua_State *L)
+{
+    if(!isValid())
+        return luabind::object();
+
+    NPCMOB* thisnpc = ::NPC::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x3C);
+    return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
 }
 
 bool LuaProxy::NPC::isValid()
@@ -2067,6 +2088,26 @@ int LuaProxy::Block::collidesWith(LuaProxy::Player *player)
     return ::Blocks::TestCollision(tarPlayer, tarBlock);
 }
 
+LuaProxy::VBStr LuaProxy::Block::layerName()
+{
+    if(!isValid())
+        return VBStr(0);
+
+    ::Block* thisblock = ::Blocks::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
+    return VBStr(ptr);
+}
+
+luabind::object LuaProxy::Block::layerObj(lua_State *L)
+{
+    if(!isValid())
+        return luabind::object();
+
+    ::Block* thisblock = ::Blocks::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
+    return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
+}
+
 bool LuaProxy::Block::isValid()
 {
     return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
@@ -2142,4 +2183,86 @@ void LuaProxy::VBStr::setStr(std::string str)
     std::wstring trimmedStr = utf8_decode(str.substr(0, len));
     const wchar_t* newWStr = trimmedStr.c_str();
     wcscpy(m_wcharptr, newWStr);
+}
+
+
+LuaProxy::Layer::Layer(int layerIndex)
+{
+    m_layerIndex = layerIndex;
+}
+
+LuaProxy::VBStr LuaProxy::Layer::layerName()
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return VBStr(thislayer->ptLayerName);
+}
+
+float LuaProxy::Layer::speedX()
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return (thislayer->xSpeed == 0.0001f ? 0 : thislayer->xSpeed);
+}
+
+void LuaProxy::Layer::setSpeedX(float speedX)
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::SetXSpeed(thislayer, speedX);
+}
+
+float LuaProxy::Layer::speedY()
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return (thislayer->ySpeed == 0.0001f ? 0 : thislayer->ySpeed);
+}
+
+void LuaProxy::Layer::setSpeedY(float speedY)
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::SetYSpeed(thislayer, speedY);
+}
+
+void LuaProxy::Layer::stop()
+{
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::Stop(thislayer);
+}
+
+
+
+luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
+{
+    for(int i = 1; i < 100; ++i){
+        LayerControl* ctrl = ::Layer::Get(i);
+        if(ctrl){
+            std::wstring tarLayerName = utf8_decode(std::string(layername));
+            if(!ctrl->ptLayerName)
+				continue;
+			std::wstring sourceLayerName(ctrl->ptLayerName);
+            if(tarLayerName == sourceLayerName){
+                return luabind::object(L, new Layer(i));
+            }
+        }
+    }
+    return luabind::object();
+}
+
+
+void LuaProxy::exitLevel()
+{
+    GM_LEAVE_LEVEL = 0xFFFF;
+}
+
+
+
+
+
+unsigned short LuaProxy::winState()
+{
+    return GM_WINNING;
+}
+
+
+void LuaProxy::winState(unsigned short value)
+{
+    GM_WINNING = value;
 }
