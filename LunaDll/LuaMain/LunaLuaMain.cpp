@@ -192,7 +192,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("exitLevel", &LuaProxy::exitLevel),
         def("winState", (unsigned short(*)())&LuaProxy::winState),
         def("winState", (void(*)(unsigned short))&LuaProxy::winState),
-
+        def("animations", &LuaProxy::animations),
 
         namespace_("UserData")[
             def("setValue", &LuaProxy::SaveBankProxy::setValue),
@@ -216,6 +216,16 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
 
         def("newRECT", &LuaProxy::newRECT),
         def("newRECTd", &LuaProxy::newRECTd),
+
+        class_<LuaProxy::Animation>("Animation")
+            .def(constructor<int>())
+            .property("id", &LuaProxy::Animation::id, &LuaProxy::Animation::setId)
+            .property("x", &LuaProxy::Animation::x, &LuaProxy::Animation::setX)
+            .property("y", &LuaProxy::Animation::y, &LuaProxy::Animation::setY)
+            .property("speedX", &LuaProxy::Animation::speedX, &LuaProxy::Animation::setSpeedX)
+            .property("speedY", &LuaProxy::Animation::speedY, &LuaProxy::Animation::setSpeedY)
+            .property("width", &LuaProxy::Animation::width, &LuaProxy::Animation::setWidth)
+            .property("height", &LuaProxy::Animation::height, &LuaProxy::Animation::setHeight),
 
         class_<LuaProxy::Layer>("Layer")
             .def(constructor<int>())

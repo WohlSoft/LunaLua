@@ -94,6 +94,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Autocode.h" />
     <ClInclude Include="AutocodeManager.h" />
     <ClInclude Include="Blocks.h" />
@@ -138,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="AC_HeartSystem.cpp" />
     <ClCompile Include="AC_LunaControl.cpp" />
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Autocode.cpp" />
     <ClCompile Include="AutocodeManager.cpp" />
     <ClCompile Include="Blocks.cpp" />

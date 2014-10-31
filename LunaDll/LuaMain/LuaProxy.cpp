@@ -12,6 +12,7 @@
 #include "../CSpriteManager.h"
 #include "../Blocks.h"
 #include "../Layer.h"
+#include "../Animation.h"
 
 
 
@@ -2265,4 +2266,119 @@ unsigned short LuaProxy::winState()
 void LuaProxy::winState(unsigned short value)
 {
     GM_WINNING = value;
+}
+
+
+LuaProxy::Animation::Animation(int animationIndex)
+{
+    m_animationIndex = animationIndex;
+}
+
+short LuaProxy::Animation::id()
+{
+    if(!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->animationID;
+}
+
+void LuaProxy::Animation::setId(short id)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->animationID = id;
+}
+
+double LuaProxy::Animation::x()
+{
+    if(!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->XPos;
+}
+
+void LuaProxy::Animation::setX(double x)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->XPos = x;
+}
+
+double LuaProxy::Animation::y()
+{
+    if(!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->YPos;
+}
+
+void LuaProxy::Animation::setY(double y)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->YPos = y;
+}
+
+double LuaProxy::Animation::speedX()
+{
+    if(!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->XSpeed;
+}
+
+void LuaProxy::Animation::setSpeedX(double speedX)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->XSpeed = speedX;
+}
+
+double LuaProxy::Animation::speedY()
+{
+    if(!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->YSpeed;
+}
+
+void LuaProxy::Animation::setSpeedY(double speedY)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->YSpeed = speedY;
+}
+
+double LuaProxy::Animation::height()
+{
+    return ::Animations::Get(m_animationIndex)->Height;
+}
+
+void LuaProxy::Animation::setHeight(double height)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->Height = height;
+}
+
+double LuaProxy::Animation::width()
+{
+    return ::Animations::Get(m_animationIndex)->Width;
+}
+
+void LuaProxy::Animation::setWidth(double width)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->Width = width;
+}
+
+bool LuaProxy::Animation::isValid()
+{
+    return !(m_animationIndex < 0 || m_animationIndex > GM_NPCS_COUNT);
+}
+
+
+luabind::object LuaProxy::animations(lua_State *L)
+{
+    luabind::object vanimations = luabind::newtable(L);
+    for(int i = 0; i < GM_ANIM_COUNT; i++) {
+        vanimations[i] = new LuaProxy::Animation(i);
+    }
+    return vanimations;
 }

@@ -50,6 +50,7 @@ namespace LuaProxy {
     void exitLevel();
     unsigned short winState();
     void winState(unsigned short value);
+    luabind::object animations(lua_State* L);
 
     //for runAnimation
     struct coorStruct{
@@ -104,6 +105,28 @@ namespace LuaProxy {
         void setStr(std::string str);
     private:
         wchar_t* m_wcharptr;
+    };
+
+    class Animation{
+    public:
+        Animation (int animationIndex);
+        short id();
+        void setId(short id);
+        double x();
+        void setX(double x);
+        double y();
+        void setY(double y);
+        double speedX();
+        void setSpeedX(double speedX);
+        double speedY();
+        void setSpeedY(double speedY);
+        double height();
+        void setHeight(double height);
+        double width();
+        void setWidth(double width);
+    private:
+        bool isValid();
+        int m_animationIndex;
     };
 
     class Layer{

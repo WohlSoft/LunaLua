@@ -91,6 +91,9 @@
     <Filter Include="Header Files\UserSaves">
       <UniqueIdentifier>{5ffce8e1-f367-4b21-ad3e-e2b529b20551}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{70bdd782-5d49-4a55-a8d9-a470fd505f4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -212,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="LuaMain\LuaEvents.h">
       <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -364,6 +370,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaEvents.cpp">
       <Filter>Header Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Header Files\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
