@@ -103,7 +103,7 @@ enum PRIORITY {
 
 // Animations
 #define GM_ANIM_COUNT		*(WORD*)0x00B2595C
-#define GM_ANIM_PTR			*(WORD*)0x00B259CC
+#define GM_ANIM_PTR			*(DWORD*)0x00B259CC
 
 // Sound
 #define GM_MUSIC_PATHS_PTR	*(DWORD*)0x00B257B8 
