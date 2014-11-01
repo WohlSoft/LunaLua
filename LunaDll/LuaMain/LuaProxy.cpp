@@ -2115,7 +2115,7 @@ bool LuaProxy::Block::isValid()
 }
 
 
-void LuaProxy::runAnimation(int id, double x, double y, int extraData)
+void LuaProxy::runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData)
 {
     typedef int animationFunc(int, int, int, int, int);
     animationFunc* f = (animationFunc*)GF_RUN_ANIM;
@@ -2123,8 +2123,10 @@ void LuaProxy::runAnimation(int id, double x, double y, int extraData)
     coorStruct tmp;
     tmp.x = x;
     tmp.y = y;
-    tmp.a1 = 0;
-	tmp.a2 = 0;
+    tmp.Height = height;
+    tmp.Width = width;
+    tmp.XSpeed = speedX;
+    tmp.YSpeed = speedY;
     int a4 = 0;
     int a5 = 0;
     f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
@@ -2274,18 +2276,53 @@ LuaProxy::Animation::Animation(int animationIndex)
     m_animationIndex = animationIndex;
 }
 
+void LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+{
+    int iftype = (int)ftype;
+    if(iftype >= 1 && iftype <= 5){
+        SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
+        void* ptr = ((&(*(byte*)manimation)) + offset);
+        MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+    }
+}
+
+luabind::object LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
+{
+    int iftype = (int)ftype;
+    double val = 0;
+    if(iftype >= 1 && iftype <= 5){
+        SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
+        void* ptr = ((&(*(byte*)manimation)) + offset);
+        val = GetMem((int)ptr, (FIELDTYPE)ftype);
+    }
+    switch (ftype) {
+    case LFT_BYTE:
+        return luabind::object(L, (byte)val);
+    case LFT_WORD:
+        return luabind::object(L, (short)val);
+    case LFT_DWORD:
+        return luabind::object(L, (int)val);
+    case LFT_FLOAT:
+        return luabind::object(L, (float)val);
+    case LFT_DFLOAT:
+        return luabind::object(L, (double)val);
+    default:
+        return luabind::object();
+    }
+}
+
 short LuaProxy::Animation::id()
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->animationID;
+    return ::Animations::Get(m_animationIndex)->AnimationID;
 }
 
 void LuaProxy::Animation::setId(short id)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->animationID = id;
+    ::Animations::Get(m_animationIndex)->AnimationID = id;
 }
 
 double LuaProxy::Animation::x()
@@ -2346,6 +2383,8 @@ void LuaProxy::Animation::setSpeedY(double speedY)
 
 double LuaProxy::Animation::height()
 {
+    if(!isValid())
+        return 0;
     return ::Animations::Get(m_animationIndex)->Height;
 }
 
@@ -2358,6 +2397,8 @@ void LuaProxy::Animation::setHeight(double height)
 
 double LuaProxy::Animation::width()
 {
+    if(!isValid())
+        return 0;
     return ::Animations::Get(m_animationIndex)->Width;
 }
 
@@ -2366,6 +2407,19 @@ void LuaProxy::Animation::setWidth(double width)
     if(!isValid())
         return;
     ::Animations::Get(m_animationIndex)->Width = width;
+}
+
+short LuaProxy::Animation::timer()
+{
+    return ::Animations::Get(m_animationIndex)->Timer;
+}
+
+void LuaProxy::Animation::setTimer(short timer)
+{
+    if(!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->Timer = timer;
+
 }
 
 bool LuaProxy::Animation::isValid()
@@ -2381,4 +2435,40 @@ luabind::object LuaProxy::animations(lua_State *L)
         vanimations[i] = new LuaProxy::Animation(i);
     }
     return vanimations;
+}
+
+
+void LuaProxy::runAnimation(int id, double x, double y, double height, double width, int extraData)
+{
+    typedef int animationFunc(int, int, int, int, int);
+    animationFunc* f = (animationFunc*)GF_RUN_ANIM;
+
+    coorStruct tmp;
+    tmp.x = x;
+    tmp.y = y;
+    tmp.Height = height;
+    tmp.Width = width;
+    tmp.XSpeed = 0;
+    tmp.YSpeed = 0;
+    int a4 = 0;
+    int a5 = 0;
+    f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
+}
+
+
+void LuaProxy::runAnimation(int id, double x, double y, int extraData)
+{
+    typedef int animationFunc(int, int, int, int, int);
+    animationFunc* f = (animationFunc*)GF_RUN_ANIM;
+
+    coorStruct tmp;
+    tmp.x = x;
+    tmp.y = y;
+    tmp.Height = 0;
+    tmp.Width = 0;
+    tmp.XSpeed = 0;
+    tmp.YSpeed = 0;
+    int a4 = 0;
+    int a5 = 0;
+    f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
 }

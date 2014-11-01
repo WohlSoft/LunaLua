@@ -56,10 +56,13 @@ namespace LuaProxy {
     struct coorStruct{
         double x;
         double y;
-        double a1;
-        double a2;
+        double Height;
+        double Width;
+        double XSpeed;
+        double YSpeed;
     };
-
+    void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
+    void runAnimation(int id, double x, double y, double height, double width, int extraData);
     void runAnimation(int id, double x, double y, int extraData);
 
     void npcToCoins();
@@ -110,6 +113,8 @@ namespace LuaProxy {
     class Animation{
     public:
         Animation (int animationIndex);
+        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+        luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
         short id();
         void setId(short id);
         double x();
@@ -124,6 +129,8 @@ namespace LuaProxy {
         void setHeight(double height);
         double width();
         void setWidth(double width);
+        short timer();
+        void setTimer(short timer);
     private:
         bool isValid();
         int m_animationIndex;

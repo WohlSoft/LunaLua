@@ -184,7 +184,9 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("jumpheight", (void(*)(unsigned short))&LuaProxy::jumpheight),
         def("jumpheightBounce", (unsigned short(*)())&LuaProxy::jumpheightBounce),
         def("jumpheightBounce", (void(*)(unsigned short))&LuaProxy::jumpheightBounce),
-        def("runAnimation", &LuaProxy::runAnimation),
+        def("runAnimation", (void(*)(int, double, double, double, double, double, double,int))&LuaProxy::runAnimation),
+        def("runAnimation", (void(*)(int, double, double, double, double, int))&LuaProxy::runAnimation),
+        def("runAnimation", (void(*)(int, double, double, int))&LuaProxy::runAnimation),
         def("npcToCoins", &LuaProxy::npcToCoins),
         def("blocks", &LuaProxy::blocks),
         def("findblocks", &LuaProxy::findblocks),
@@ -219,13 +221,16 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
 
         class_<LuaProxy::Animation>("Animation")
             .def(constructor<int>())
+            .def("mem", static_cast<void (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Animation::mem))
+            .def("mem", static_cast<luabind::object (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Animation::mem))
             .property("id", &LuaProxy::Animation::id, &LuaProxy::Animation::setId)
             .property("x", &LuaProxy::Animation::x, &LuaProxy::Animation::setX)
             .property("y", &LuaProxy::Animation::y, &LuaProxy::Animation::setY)
             .property("speedX", &LuaProxy::Animation::speedX, &LuaProxy::Animation::setSpeedX)
             .property("speedY", &LuaProxy::Animation::speedY, &LuaProxy::Animation::setSpeedY)
             .property("width", &LuaProxy::Animation::width, &LuaProxy::Animation::setWidth)
-            .property("height", &LuaProxy::Animation::height, &LuaProxy::Animation::setHeight),
+            .property("height", &LuaProxy::Animation::height, &LuaProxy::Animation::setHeight)
+            .property("timer", &LuaProxy::Animation::timer, &LuaProxy::Animation::setTimer),
 
         class_<LuaProxy::Layer>("Layer")
             .def(constructor<int>())
