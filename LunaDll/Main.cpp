@@ -18,6 +18,8 @@
 #include "SMBXEvents.h"
 #include "LuaMain/LunaLuaMain.h"
 
+void resetDefines();
+
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 {
@@ -42,6 +44,7 @@ int OnLvlLoad() {
 
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
+    resetDefines();
 
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
@@ -301,3 +304,16 @@ void InitLevel() {
 	}
 
 }
+
+
+void resetDefines(){
+    VASM_END_ANIM = 11;
+    VASM_END_COINSOUND = 14;
+    VASM_END_COINVAL = 1;
+
+    GM_GRAVITY = 12;
+    GM_JUMPHIGHT = 20;
+    GM_JUMPHIGHT_BOUNCE = 20;
+}
+
+

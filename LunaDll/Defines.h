@@ -141,6 +141,16 @@ enum PRIORITY {
 #define GM_HITBOX_W_PTR     *(WORD*)0x00B2C788      // hitbox widths
 
 /////////////////////
+///  -Assembly-   ///
+/////////////////////
+
+//VASM = value is assembly code
+//npcToCoins ending Animation Settings
+#define VASM_END_ANIM       *(BYTE*)0x00A3C86E      // = 11
+#define VASM_END_COINSOUND  *(BYTE*)0x00A3C87F      // = 14
+#define VASM_END_COINVAL    *(BYTE*)0x00A3C891      // = 1
+
+/////////////////////
 ///  -Functions-  ///
 /////////////////////
 
