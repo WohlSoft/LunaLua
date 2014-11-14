@@ -2188,6 +2188,26 @@ void LuaProxy::VBStr::setStr(std::string str)
     wcscpy(m_wcharptr, newWStr);
 }
 
+int LuaProxy::VBStr::length()
+{
+    if(!m_wcharptr)
+        return 0;
+    return (*(((short*)m_wcharptr) - 2)/2);
+}
+
+void LuaProxy::VBStr::setLength(int len)
+{
+    if(!m_wcharptr)
+        return;
+    *(((short*)m_wcharptr) - 2) = len*2;
+}
+
+void LuaProxy::VBStr::clear()
+{
+    *(((short*)m_wcharptr) - 2) = (int)0;
+    *(short*)m_wcharptr = (short)0;
+}
+
 
 LuaProxy::Layer::Layer(int layerIndex)
 {
@@ -2471,4 +2491,10 @@ void LuaProxy::runAnimation(int id, double x, double y, int extraData)
     int a4 = 0;
     int a5 = 0;
     f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
+}
+
+
+LuaProxy::VBStr LuaProxy::getInput()
+{
+    return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
 }

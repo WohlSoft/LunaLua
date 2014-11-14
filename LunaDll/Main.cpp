@@ -84,6 +84,10 @@ int OnLvlLoad() {
 		// Recount deaths
 		gDeathCounter.Recount();
 	}
+
+    //PGE DBG STUFF
+    //readAndWriteNPCSettings();
+
 	return 0;
 }
 

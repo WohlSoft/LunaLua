@@ -195,6 +195,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
         def("winState", (unsigned short(*)())&LuaProxy::winState),
         def("winState", (void(*)(unsigned short))&LuaProxy::winState),
         def("animations", &LuaProxy::animations),
+        def("getInput", &LuaProxy::getInput),
 
         namespace_("UserData")[
             def("setValue", &LuaProxy::SaveBankProxy::setValue),
@@ -425,6 +426,8 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
 
         class_<LuaProxy::VBStr>("VBStr")
             .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
+            .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
+            .def("clear", &LuaProxy::VBStr::clear)
     ];
     {
         object _G = globals(L);

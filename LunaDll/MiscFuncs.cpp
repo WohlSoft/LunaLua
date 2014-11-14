@@ -615,4 +615,96 @@ bool SegmentIntersectRectangle(double a_rectangleMinX,
     }
 
     return true;
-  }
+}
+
+#define NPC_SETTING_DATA(hex, index) std::to_string((long long)(((short*)hex)[index]))
+#define WRITE_NPC_DATA(hex, index) NPC_SETTING_DATA(hex, index) << ";"
+
+void readAndWriteNPCSettings()
+{
+    ofstream settingsOutput("npcsettings.csv");
+    if(!settingsOutput)
+        return;
+
+
+    settingsOutput << "ID:;";
+    settingsOutput << "GFX Offset X:;";
+    settingsOutput << "GFX Offset Y:;";
+    settingsOutput << "Width:;";
+    settingsOutput << "Height;";
+    settingsOutput << "GFX Width:;";
+    settingsOutput << "GFX Height:;";
+    settingsOutput << "Unknown [0xB26DDC]:;";
+    settingsOutput << "Npc Block:;";
+    settingsOutput << "Npc Block Top:;";
+    settingsOutput << "Is Interactable NPC:;";
+    settingsOutput << "Is Coin:;";
+    settingsOutput << "Is Vine:;";
+    settingsOutput << "Is Collectable Goal:;";
+    settingsOutput << "Unknown [0xB27E52]:;";
+    settingsOutput << "Unknown [0xB280AC]:;";
+    settingsOutput << "Jumphurt:;";
+    settingsOutput << "No Block Collision:;";
+    settingsOutput << "Score:;";
+    settingsOutput << "Player Block Top:;";
+    settingsOutput << "Grab Top:;";
+    settingsOutput << "Cliff Turn:;";
+    settingsOutput << "No hurt:;";
+    settingsOutput << "Player Block:;";
+    settingsOutput << "Unknown [0xB295D6]:;";
+    settingsOutput << "Grab Side:;";
+    settingsOutput << "Is Shoe NPC:;";
+    settingsOutput << "Is Yoshi NPC:;";
+    settingsOutput << "Unknown [0xB29F3E]:;";
+    settingsOutput << "No Yoshi:;";
+    settingsOutput << "Foreground:;";
+    settingsOutput << "Unknown [0xB2A64C]:;";
+    settingsOutput << "Unknown [0xB2A8A6]:;";
+    settingsOutput << "Is Vegetable NPC:;";
+    settingsOutput << "Speed:;";
+    settingsOutput << "No Fireball:;";
+    settingsOutput << "No Iceball:;";
+    settingsOutput << "No Gravity:;";
+    settingsOutput << "\n";
+    for(int i = 0; i <= 300; ++i){
+        settingsOutput << std::to_string((long long)i) << ";";
+        settingsOutput << WRITE_NPC_DATA(0xB25FC0,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2621A,i);
+        settingsOutput << WRITE_NPC_DATA(0xB26474,i);
+        settingsOutput << WRITE_NPC_DATA(0xB266CE,i);
+        settingsOutput << WRITE_NPC_DATA(0xB26928,i);
+        settingsOutput << WRITE_NPC_DATA(0xB26B82,i);
+        settingsOutput << WRITE_NPC_DATA(0xB26DDC,i);
+        settingsOutput << WRITE_NPC_DATA(0xB27036,i);
+        settingsOutput << WRITE_NPC_DATA(0xB27290,i);
+        settingsOutput << WRITE_NPC_DATA(0xB274EA,i);
+        settingsOutput << WRITE_NPC_DATA(0xB27744,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2799E,i);
+        settingsOutput << WRITE_NPC_DATA(0xB27BF8,i);
+        settingsOutput << WRITE_NPC_DATA(0xB27E52,i);
+        settingsOutput << WRITE_NPC_DATA(0xB280AC,i);
+        settingsOutput << WRITE_NPC_DATA(0xB28306,i);
+        settingsOutput << WRITE_NPC_DATA(0xB28560,i);
+        settingsOutput << WRITE_NPC_DATA(0xB287BA,i);
+        settingsOutput << WRITE_NPC_DATA(0xB28A14,i);
+        settingsOutput << WRITE_NPC_DATA(0xB28C6E,i);
+        settingsOutput << WRITE_NPC_DATA(0xB28EC8,i);
+        settingsOutput << WRITE_NPC_DATA(0xB29122,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2937C,i);
+        settingsOutput << WRITE_NPC_DATA(0xB295D6,i);
+        settingsOutput << WRITE_NPC_DATA(0xB29830,i);
+        settingsOutput << WRITE_NPC_DATA(0xB29A8A,i);
+        settingsOutput << WRITE_NPC_DATA(0xB29CE4,i);
+        settingsOutput << WRITE_NPC_DATA(0xB29F3E,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2A198,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2A3F2,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2A64C,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2A8A6,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2AB00,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2AD5C,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2B210,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2B46A,i);
+        settingsOutput << WRITE_NPC_DATA(0xB2B6C4,i);
+        settingsOutput << "\n";
+    }
+}

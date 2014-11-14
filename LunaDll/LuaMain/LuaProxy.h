@@ -52,6 +52,7 @@ namespace LuaProxy {
     void winState(unsigned short value);
     luabind::object animations(lua_State* L);
 
+
     //for runAnimation
     struct coorStruct{
         double x;
@@ -106,6 +107,9 @@ namespace LuaProxy {
         VBStr (wchar_t* ptr);
         std::string str();
         void setStr(std::string str);
+        int length();
+        void setLength(int len);
+        void clear();
     private:
         wchar_t* m_wcharptr;
     };
@@ -496,5 +500,8 @@ namespace LuaProxy {
         bool isValid();
         int m_index;
     };
+
+    //more functions:
+    VBStr getInput();
 
 }

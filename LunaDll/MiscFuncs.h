@@ -44,3 +44,6 @@ static inline float roundf(float val)
 {    
     return (float)floor(val + 0.5);
 }
+
+//PGE Debug stuff: 
+void readAndWriteNPCSettings();
