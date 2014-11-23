@@ -87,6 +87,7 @@ int OnLvlLoad() {
 
     //PGE DBG STUFF
     //readAndWriteNPCSettings();
+    //overwriteFunc();
 
 	return 0;
 }

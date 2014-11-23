@@ -2,6 +2,9 @@
 #include "Layer.h"
 #include <math.h>
 
+#define PATCH_FUNC(ptr, func) *((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
+
+
 void NumpadLayerControl1(LayerControl* sought_layer);
 
 void InfiniteFlying(int player);
@@ -47,3 +50,8 @@ static inline float roundf(float val)
 
 //PGE Debug stuff: 
 void readAndWriteNPCSettings();
+
+
+void overwriteFunc();
+
+extern void hookLoadWorld(BSTR* path);

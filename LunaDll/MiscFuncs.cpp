@@ -708,3 +708,22 @@ void readAndWriteNPCSettings()
         settingsOutput << "\n";
     }
 }
+
+
+void hookLoadWorld(BSTR *path)
+{
+    MessageBoxA(NULL, "HI", "HIYA!", NULL);
+}
+
+
+void overwriteFunc()
+{
+	//typedef void wordLoadFunc(BSTR* path);
+    MessageBoxA(NULL, "HI", "Patched", NULL);
+    //*(wordLoadFunc**)0x008CDE70 = (wordLoadFunc*)(((DWORD)&hookLoadWorld) - 0x008CDE70 - 4);
+	PATCH_FUNC(0x008CDE6F,&hookLoadWorld);
+    //*(wordLoadFunc**)0x00A76414 = (wordLoadFunc*)(((DWORD)&hookLoadWorld) - 0x00A76414 - 4);
+    PATCH_FUNC(0x00A76413,&hookLoadWorld);
+	//*(wordLoadFunc**)0x00A767CE = (wordLoadFunc*)(((DWORD)&hookLoadWorld) - 0x00A767CE - 4);
+	PATCH_FUNC(0x00A767CD,&hookLoadWorld);
+}
