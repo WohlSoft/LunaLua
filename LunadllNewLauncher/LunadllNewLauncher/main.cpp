@@ -2,7 +2,8 @@
 #include <QApplication>
 
 
-Q_DECL_EXPORT void run(){
+Q_DECL_EXPORT void run()
+{
     int n = 0;
     QApplication a(n, 0);
     MainWindow w;
@@ -12,11 +13,11 @@ Q_DECL_EXPORT void run(){
     return;
 }
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+//int main(int argc, char *argv[])
+//{
+//    QApplication a(argc, argv);
+//    MainWindow w;
+//    w.show();
 
-    return a.exec();
-}
+//    return a.exec();
+//}

@@ -12,7 +12,10 @@ TARGET = LunadllNewLauncher
 TEMPLATE = lib
 
 CONFIG += c++11
-CONFIG += static
+CONFIG += sharedlib
+
+
+DEFINES += LunadllNewLauncher
 
 
 SOURCES += main.cpp\
