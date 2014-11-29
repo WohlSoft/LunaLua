@@ -129,6 +129,7 @@
     <ClInclude Include="RenderOp.h" />
     <ClInclude Include="RenderRectOp.h" />
     <ClInclude Include="RenderString.h" />
+    <ClInclude Include="RuntimeHook.h" />
     <ClInclude Include="SMBXEvents.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpriteComponent.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="RenderEffectOp.cpp" />
     <ClCompile Include="Rendering.cpp" />
     <ClCompile Include="RenderRectOp.cpp" />
+    <ClCompile Include="RuntimeHook.cpp" />
     <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp" />
     <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp" />
     <ClCompile Include="SAJewers-Snowboardin.cpp" />

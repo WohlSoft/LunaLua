@@ -75,29 +75,7 @@ void LuaEvents::processJumpEvent(lua_State *L)
 }
 
 
-void LuaEvents::finishEventHandling()
-{
-    for(int i = 1; i <= 2; ++i){
-        PlayerMOB* player = ::Player::Get(i);
-        LuaEventData* evData = getEvData(i);
-        if(player && evData){
-            evData->playerUPressing = player->UKeyState;
-            evData->playerDPressing = player->DKeyState;
-            evData->playerLPressing = player->LKeyState;
-            evData->playerRPressing = player->RKeyState;
-            evData->playerJPressing = player->JKeyState;
-            evData->playerSJPressing = player->SJKeyState;
-            evData->playerXPressing = player->XKeyState;
-            evData->playerRNPressing = player->RNKeyState;
-            evData->playerSELPressing = player->SELKeyState;
-            evData->playerSTRPressing = player->STRKeyState;
-            evData->playerJumping = player->HasJumped;
-            evData->section = player->CurrentSection;
-        }
 
-    }
-
-}
 
 
 
@@ -116,6 +94,7 @@ void LuaEvents::proccesEvents(lua_State *L)
     processKeyboardEvents(L);
     processJumpEvent(L);
     processSectionEvents(L);
+	processSMBXEvents(L);
 }
 
 
@@ -140,4 +119,37 @@ void LuaEvents::processSectionEvents(lua_State *L)
     }
 }
 
+
+void LuaEvents::processSMBXEvents(lua_State *L)
+{
+	luabind::object evTable = LuaHelper::getEventCallbase(L);
+	for(int i = 0; i < SMBXEventQueue.size(); ++i){
+		SMBXEventQueueItem& item = SMBXEventQueue[i];
+		luabind::call_function<void>(evTable["onSMBXEvent"], item.event, item.callType, item.unkVal);
+	}
+}
+
+//CLEANUP
+void LuaEvents::finishEventHandling()
+{
+	for(int i = 1; i <= 2; ++i){
+		PlayerMOB* player = ::Player::Get(i);
+		LuaEventData* evData = getEvData(i);
+		if(player && evData){
+			evData->playerUPressing = player->UKeyState;
+			evData->playerDPressing = player->DKeyState;
+			evData->playerLPressing = player->LKeyState;
+			evData->playerRPressing = player->RKeyState;
+			evData->playerJPressing = player->JKeyState;
+			evData->playerSJPressing = player->SJKeyState;
+			evData->playerXPressing = player->XKeyState;
+			evData->playerRNPressing = player->RNKeyState;
+			evData->playerSELPressing = player->SELKeyState;
+			evData->playerSTRPressing = player->STRKeyState;
+			evData->playerJumping = player->HasJumped;
+			evData->section = player->CurrentSection;
+		}
+	}
+	SMBXEventQueue.clear();
+}
 

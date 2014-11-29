@@ -23,6 +23,14 @@ namespace LuaEvents {
         short section;
     };
 
+	struct SMBXEventQueueItem{
+		std::string event;
+		int unkVal;
+		int callType;
+	};
+	std::vector<SMBXEventQueueItem> SMBXEventQueue;
+
+
     static LuaEventData evPlayer1;
     static LuaEventData evPlayer2;
 
@@ -34,5 +42,6 @@ namespace LuaEvents {
     void processJumpEvent(lua_State *L);
     void processSectionEvents(lua_State *L);
     void proccesEvents(lua_State *L);
+	void processSMBXEvents(lua_State *L);
     void finishEventHandling();
 }

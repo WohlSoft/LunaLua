@@ -17,6 +17,7 @@
 #include "Input.h"
 #include "SMBXEvents.h"
 #include "LuaMain/LunaLuaMain.h"
+#include "RuntimeHook.h"
 
 void resetDefines();
 
@@ -27,6 +28,7 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		InitGlobals();
+		TrySkipPatch();
 		break;
 	case DLL_THREAD_ATTACH:
 		break;

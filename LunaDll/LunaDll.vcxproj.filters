@@ -219,6 +219,9 @@
     <ClInclude Include="Animation.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="RuntimeHook.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -373,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="Animation.cpp">
       <Filter>Header Files\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeHook.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

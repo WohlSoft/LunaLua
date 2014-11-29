@@ -2,7 +2,6 @@
 #include "Layer.h"
 #include <math.h>
 
-#define PATCH_FUNC(ptr, func) *((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
 
 
 void NumpadLayerControl1(LayerControl* sought_layer);
@@ -52,6 +51,3 @@ static inline float roundf(float val)
 void readAndWriteNPCSettings();
 
 
-void overwriteFunc();
-
-extern void hookLoadWorld(BSTR* path);
