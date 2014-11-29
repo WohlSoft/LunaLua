@@ -205,7 +205,6 @@ extern void InitHook()
 		*(WORD*)(0xB2C684) = (settings.disableFrameskip ? 0 : -1);
 	}else{
 		*(WORD*)(0xB25046) = 0; //set run to true
-		MessageBoxA(NULL, "stop", "stop", NULL);
 		void (*exitCall)(void);
 		exitCall = (void(*)(void))0x8D6BB0;
 		exitCall();
