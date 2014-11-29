@@ -15,6 +15,14 @@ void TrySkipPatch();
 //Hooks
 extern void InitHook();
 
+//Libs
+extern HMODULE newLauncherLib = 0;
+
+struct resultStruct{
+	int result;
+	bool disableFrameskip;
+	bool NoSound;
+};
 
 
 

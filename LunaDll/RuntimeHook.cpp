@@ -153,5 +153,64 @@ void TrySkipPatch()
 
 extern void InitHook()
 {
-	MessageBoxA(NULL, "This would be a replacement towards a new launcher :D!", "TODO: Some Replacement", NULL);
+	typedef bool (*RunProc)(void);
+	typedef void (*GetPromptResultProc)(void*);
+	typedef void (*FreeVarsProc)(void);
+	newLauncherLib = LoadLibraryA("LunadllNewLauncher.dll");
+	if(!newLauncherLib){
+		std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
+		errMsg += std::to_string((long long)GetLastError());
+		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+		return;
+	}
+	RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
+	if(!hRunProc){
+		std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+		errMsg += std::to_string((long long)GetLastError());
+		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+		FreeLibrary(newLauncherLib);
+		newLauncherLib = NULL;
+		return;
+	}
+	GetPromptResultProc hPrompt = (GetPromptResultProc)GetProcAddress(newLauncherLib, "GetPromptResult");
+	if(!hRunProc){
+		std::string errMsg = "Failed to load 'GetPromptResult' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+		errMsg += std::to_string((long long)GetLastError());
+		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+		FreeLibrary(newLauncherLib);
+		newLauncherLib = NULL;
+		return;
+	}
+	FreeVarsProc hFreeVarsProc = (FreeVarsProc)GetProcAddress(newLauncherLib, "FreeVars");
+	if(!hRunProc){
+		std::string errMsg = "Failed to load 'FreeVars' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+		errMsg += std::to_string((long long)GetLastError());
+		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+		FreeLibrary(newLauncherLib);
+		newLauncherLib = NULL;
+		return;
+	}
+	hRunProc();
+	resultStruct settings;
+	hPrompt((void*)&settings);
+	hFreeVarsProc();
+	FreeLibrary(newLauncherLib);
+	newLauncherLib = NULL;
+
+	if(settings.result){
+		if(settings.result == 2){
+			*(WORD*)(0xB25134) = -1;
+		}
+		*(WORD*)(0xB2D734) = (settings.NoSound ? -1 : 0);
+		*(WORD*)(0xB2C684) = (settings.disableFrameskip ? 0 : -1);
+	}else{
+		*(WORD*)(0xB25046) = 0; //set run to true
+		MessageBoxA(NULL, "stop", "stop", NULL);
+		void (*exitCall)(void);
+		exitCall = (void(*)(void))0x8D6BB0;
+		exitCall();
+		std::exit(0);
+	}
+	
+
 }

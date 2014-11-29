@@ -21,6 +21,8 @@
 
 void resetDefines();
 
+#define PATCHIT
+
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 {
@@ -28,7 +30,9 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		InitGlobals();
+#ifdef PATCHIT
 		TrySkipPatch();
+#endif // PATCHIT
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
