@@ -12,14 +12,14 @@ MainWindow::MainWindow(QWidget *parent) :
     selType(0)
 {
     ui->setupUi(this);
-    QList<QToolBar *> toolbars = findChildren<QToolBar *>();
-    for(int i = 0; i < toolbars.size(); ++i){
-        toolbars[i]->hide();
-    }
-    QList<QStatusBar *> statusbars = findChildren<QStatusBar *>();
-    for(int i = 0; i < statusbars.size(); ++i){
-        statusbars[i]->hide();
-    }
+//    QList<QToolBar *> toolbars = findChildren<QToolBar *>();
+//    for(int i = 0; i < toolbars.size(); ++i){
+//        toolbars[i]->hide();
+//    }
+//    QList<QStatusBar *> statusbars = findChildren<QStatusBar *>();
+//    for(int i = 0; i < statusbars.size(); ++i){
+//        statusbars[i]->hide();
+//    }
 }
 
 MainWindow::~MainWindow()
