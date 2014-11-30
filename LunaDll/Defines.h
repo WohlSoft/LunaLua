@@ -140,6 +140,11 @@ enum PRIORITY {
 #define GM_HITBOX_H_D_PTR   *(WORD*)0x00B2C742      // hitbox heights while ducking
 #define GM_HITBOX_W_PTR     *(WORD*)0x00B2C788      // hitbox widths
 
+//Startup Config:
+#define GM_RUNGAME			*(WORD*)0x00B25134
+#define GM_NOSOUND			*(WORD*)0x00B2D734
+#define GM_FRAMESKIP		*(WORD*)0x00B2C684
+
 /////////////////////
 ///  -Assembly-   ///
 /////////////////////

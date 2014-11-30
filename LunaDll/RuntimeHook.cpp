@@ -149,6 +149,7 @@ void TrySkipPatch()
 	memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
 	*(WORD*)(0xB25046) = -1; //set run to true
 	PATCH_FUNC(0x8BED00, &InitHook);
+	PATCH_FUNC(0x8D6BB6, &forceTermination);
 }
 
 extern void InitHook()
@@ -199,17 +200,23 @@ extern void InitHook()
 
 	if(settings.result){
 		if(settings.result == 2){
-			*(WORD*)(0xB25134) = -1;
+			GM_RUNGAME = -1;
 		}
-		*(WORD*)(0xB2D734) = (settings.NoSound ? -1 : 0);
-		*(WORD*)(0xB2C684) = (settings.disableFrameskip ? 0 : -1);
-	}else{
-		*(WORD*)(0xB25046) = 0; //set run to true
-		void (*exitCall)(void);
-		exitCall = (void(*)(void))0x8D6BB0;
-		exitCall();
-		std::exit(0);
+		GM_NOSOUND = (settings.NoSound ? -1 : 0);
+		GM_FRAMESKIP = (settings.disableFrameskip ? 0 : -1);
+		return;
 	}
+	GM_RUNGAME = 0; //set run to false
+	/*void (*exitCall)(void);
+	exitCall = (void(*)(void))0x8D6BB0;
+	exitCall();*/
+	_exit(0);
+	
 	
 
+}
+
+extern void forceTermination()
+{
+	_exit(0);
 }

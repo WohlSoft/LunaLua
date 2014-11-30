@@ -17,7 +17,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Super Mario Bros. X - Version 1.3.0.2. DRAFT www.SuperMarioBrosX.org</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/resource/smbxIcon.png</normaloff>:/resource/smbxIcon.png</iconset>
   </property>
   <property name="animated">
    <bool>true</bool>
@@ -123,6 +127,8 @@
    <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

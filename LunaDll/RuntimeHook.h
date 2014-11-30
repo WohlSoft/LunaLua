@@ -14,6 +14,7 @@ void TrySkipPatch();
 
 //Hooks
 extern void InitHook();
+extern void forceTermination();
 
 //Libs
 extern HMODULE newLauncherLib = 0;
