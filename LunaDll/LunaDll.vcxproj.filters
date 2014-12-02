@@ -94,6 +94,9 @@
     <Filter Include="Header Files\Animation">
       <UniqueIdentifier>{70bdd782-5d49-4a55-a8d9-a470fd505f4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\INIReader">
+      <UniqueIdentifier>{5269dd47-723b-4f06-94a5-5ae087f667a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -221,6 +224,12 @@
     </ClInclude>
     <ClInclude Include="RuntimeHook.h">
       <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\ini-reader\ini.h">
+      <Filter>Header Files\INIReader</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\ini-reader\INIReader.h">
+      <Filter>Header Files\INIReader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -379,6 +388,12 @@
     </ClCompile>
     <ClCompile Include="RuntimeHook.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\ini-reader\ini.c">
+      <Filter>Header Files\INIReader</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\ini-reader\INIReader.cpp">
+      <Filter>Header Files\INIReader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

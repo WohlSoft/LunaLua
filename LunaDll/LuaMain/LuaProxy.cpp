@@ -14,6 +14,8 @@
 #include "../Layer.h"
 #include "../Animation.h"
 
+#include "../libs/ini-reader/INIReader.h"
+
 
 
 std::wstring utf8_decode(const std::string &str)
@@ -78,6 +80,33 @@ void LuaProxy::Player::harm()
 {
     int tempint = m_index;
     ::Player::Harm(&tempint);
+}
+
+void loadHitboxes(const char *ini_file)
+{
+	INIReader hitBoxFile(ini_file);
+		    if (hitBoxFile.ParseError() < 0){
+		        return;
+		    }
+
+    //Parser of hitbox properties from PGE Calibrator INI File
+
+			//Frames X and Y on playable character sprite from 0 to 9
+
+			//hitBoxFile.Get("frame-y-x", "used", "false");
+		//if(used==false) --> skip this frame
+		//{
+				//Size of hitbox
+			//hitBoxFile.Get("frame-y-x", "width", "default value");
+			//hitBoxFile.Get("frame-y-x", "height", "default value");
+				//Offset relative to
+			//hitBoxFile.Get("frame-y-x", "offsetX", "default value");
+			//hitBoxFile.Get("frame-y-x", "offsetY", "default value");
+				//Later will be available grab offset x and grab offset y
+			//hitBoxFile.Get("frame-y-x", "grabOffsetX", "default value");
+			//hitBoxFile.Get("frame-y-x", "grabOffsetY", "default value");
+		//}
+
 }
 
 RECT LuaProxy::Player::screen()

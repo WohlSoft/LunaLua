@@ -202,6 +202,7 @@ namespace LuaProxy {
         Section sectionObj();
         void kill();
         void harm(); //untested
+		void loadHitboxes(const char *ini_file);
         RECT screen();
         double x();
         void setX(double x);

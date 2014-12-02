@@ -113,6 +113,8 @@
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelCodes.h" />
+    <ClInclude Include="libs\ini-reader\ini.h" />
+    <ClInclude Include="libs\ini-reader\INIReader.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="LuaMain\LuaEvents.h" />
     <ClInclude Include="LuaMain\LuaHelper.h" />
@@ -166,6 +168,8 @@
     <ClCompile Include="KilArmoryCode.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="libs\ini-reader\ini.c" />
+    <ClCompile Include="libs\ini-reader\INIReader.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="LuaMain\LuaEvents.cpp" />
     <ClCompile Include="LuaMain\LuaHelper.cpp" />
