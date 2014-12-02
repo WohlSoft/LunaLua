@@ -82,7 +82,9 @@ void LuaProxy::Player::harm()
     ::Player::Harm(&tempint);
 }
 
-void loadHitboxes(const char *ini_file)
+//type - Player's state/powerup
+//ini_file - path to INI-file which contains the hitbox redefinations
+void LuaProxy::Player::loadHitboxes(int type, const char *ini_file)
 {
 	INIReader hitBoxFile(ini_file);
 		    if (hitBoxFile.ParseError() < 0){
