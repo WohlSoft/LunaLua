@@ -54,6 +54,106 @@ void LuaProxy::print(const char *text, int type, int x, int y)
     gLunaRender.SafePrint(txt, type, (float)x, (float)y);
 }
 
+//type - Player's state/powerup
+//ini_file - path to INI-file which contains the hitbox redefinations
+void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
+{
+	if( (_powerup < 1) || (_powerup>7)) return;
+	if(( _character < 1) || (_character > 5)) return;
+
+	int powerup = _powerup-1;
+	int character = _character-1;
+
+	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+    wstring full_path = world_dir.append(Level::GetName());
+    full_path = removeExtension(full_path);
+    full_path = full_path.append(L"\\"); // < path into level folder
+    full_path = full_path + utf8_decode(ini_file);
+
+	std::wstring ws = full_path;
+	std::string s;
+    const std::locale locale("");
+    typedef std::codecvt<wchar_t, char, std::mbstate_t> converter_type;
+    const converter_type& converter = std::use_facet<converter_type>(locale);
+    std::vector<char> to(ws.length() * converter.max_length());
+    std::mbstate_t state;
+    const wchar_t* from_next;
+    char* to_next;
+    const converter_type::result result = converter.out(state,
+		full_path.data(), full_path.data() + full_path.length(),
+		from_next, &to[0], &to[0] + to.size(), to_next);
+    if (result == converter_type::ok || result == converter_type::noconv)
+	{
+      s = std::string(&to[0], to_next);
+    }
+
+	
+	INIReader hitBoxFile( s.c_str() );
+		if (hitBoxFile.ParseError() < 0)
+		{
+			MessageBoxA(0, std::string(s+"\n\nError of read INI file").c_str(), "Error", 0);
+		    return;
+		}
+
+
+		short *hitbox_width = (short *)(0xB2C788);
+		short *hitbox_height = (short *)(0xB2C6FC);
+		short *hitbox_height_duck = (short *)(0xB2C742);
+		
+
+    //Parser of hitbox properties from PGE Calibrator INI File
+
+			//Frames X and Y on playable character sprite from 0 to 9
+
+			//hitBoxFile.Get("frame-y-x", "used", "false");
+		//if(used==false) --> skip this frame
+		//{
+				//Size of hitbox
+			//hitBoxFile.Get("frame-x-x", "width", "default value");
+			//hitBoxFile.Get("frame-x-x", "height", "default value");
+				//Offset relative to
+			//hitBoxFile.Get("frame-x-x", "offsetX", "default value");
+			//hitBoxFile.Get("frame-x-x", "offsetY", "default value");
+				//Later will be available grab offset x and grab offset y
+			//hitBoxFile.Get("frame-x-x", "grabOffsetX", "default value");
+			//hitBoxFile.Get("frame-x-x", "grabOffsetY", "default value");
+		//}
+		std::string width = "0";
+		std::string height = "0";
+		std::string height_duck = "0";
+
+		switch(character)
+		{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+				//normal
+				width = hitBoxFile.Get("frame-5-0", "width", "-1");
+				height = hitBoxFile.Get("frame-5-0", "height", "-1");
+				//duck
+				height_duck = hitBoxFile.Get("frame-5-6", "height", "-1");
+			break;
+		case 4:
+				//normal
+				width = hitBoxFile.Get("frame-5-0", "width", "-1");
+				height = hitBoxFile.Get("frame-5-0", "height", "-1");
+				//duck
+				height_duck = hitBoxFile.Get("frame-5-4", "height", "-1");
+			break;
+		default:
+			MessageBoxA(0, "Wrong character ID", "Error", 0);
+			return;
+		}
+
+		if(atoi(width.c_str()) > 1)
+			hitbox_width[powerup*5+character] = (short)atoi(width.c_str());
+		if(atoi(height.c_str()) > 1)
+			hitbox_height[powerup*5+character] = (short)atoi(height.c_str());
+		if(atoi(height_duck.c_str()) > 1)
+			hitbox_height_duck[powerup*5+character] = (short)atoi(height_duck.c_str());
+}
+
 LuaProxy::Player::Player() : m_index(1)
 {}
 
@@ -80,35 +180,6 @@ void LuaProxy::Player::harm()
 {
     int tempint = m_index;
     ::Player::Harm(&tempint);
-}
-
-//type - Player's state/powerup
-//ini_file - path to INI-file which contains the hitbox redefinations
-void LuaProxy::Player::loadHitboxes(int type, const char *ini_file)
-{
-	INIReader hitBoxFile(ini_file);
-		    if (hitBoxFile.ParseError() < 0){
-		        return;
-		    }
-
-    //Parser of hitbox properties from PGE Calibrator INI File
-
-			//Frames X and Y on playable character sprite from 0 to 9
-
-			//hitBoxFile.Get("frame-y-x", "used", "false");
-		//if(used==false) --> skip this frame
-		//{
-				//Size of hitbox
-			//hitBoxFile.Get("frame-y-x", "width", "default value");
-			//hitBoxFile.Get("frame-y-x", "height", "default value");
-				//Offset relative to
-			//hitBoxFile.Get("frame-y-x", "offsetX", "default value");
-			//hitBoxFile.Get("frame-y-x", "offsetY", "default value");
-				//Later will be available grab offset x and grab offset y
-			//hitBoxFile.Get("frame-y-x", "grabOffsetX", "default value");
-			//hitBoxFile.Get("frame-y-x", "grabOffsetY", "default value");
-		//}
-
 }
 
 RECT LuaProxy::Player::screen()

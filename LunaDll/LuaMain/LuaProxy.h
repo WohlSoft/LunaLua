@@ -52,6 +52,8 @@ namespace LuaProxy {
     void winState(unsigned short value);
     luabind::object animations(lua_State* L);
 
+	//Load hitbox values for playable character
+	void loadHitboxes(int _character, int _powerup, const char *ini_file);
 
     //for runAnimation
     struct coorStruct{
@@ -202,7 +204,6 @@ namespace LuaProxy {
         Section sectionObj();
         void kill();
         void harm(); //untested
-		void loadHitboxes(int type, const char *ini_file);
         RECT screen();
         double x();
         void setX(double x);
