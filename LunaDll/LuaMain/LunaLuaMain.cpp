@@ -273,6 +273,7 @@ void LunaLua::initCodeFile(lua_State *&L, wstring main_path, wstring lapi_path, 
             .def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
             .def("kill", &LuaProxy::Player::kill)
             .def("harm", &LuaProxy::Player::harm)
+			.def("loadHitboxes", &LuaProxy::Player::loadHitboxes)
             .property("screen", &LuaProxy::Player::screen)
             .property("section", &LuaProxy::Player::section)
             .property("sectionObj", &LuaProxy::Player::sectionObj)
