@@ -15,3 +15,5 @@ Also you need download:
 - Lua for Windows https://code.google.com/p/luaforwindows/
 
 Before build, you need unpack the Boost archive and copy "boost" directory into %ProgramFiles%\Microsoft Visual Studio 10.0\VC\include
+
+Note: recommended version of boost is 1.56. When you will install 1.57, you will have some compilation issues.
