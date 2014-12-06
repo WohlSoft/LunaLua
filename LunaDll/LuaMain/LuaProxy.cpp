@@ -128,18 +128,12 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 		case 1:
 		case 2:
 		case 3:
-				//normal
-				width = hitBoxFile.Get("frame-5-0", "width", "-1");
-				height = hitBoxFile.Get("frame-5-0", "height", "-1");
-				//duck
-				height_duck = hitBoxFile.Get("frame-5-6", "height", "-1");
-			break;
 		case 4:
 				//normal
-				width = hitBoxFile.Get("frame-5-0", "width", "-1");
-				height = hitBoxFile.Get("frame-5-0", "height", "-1");
+				width = hitBoxFile.Get("common", "width", "-1");
+				height = hitBoxFile.Get("common", "height", "-1");
 				//duck
-				height_duck = hitBoxFile.Get("frame-5-4", "height", "-1");
+				height_duck = hitBoxFile.Get("common", "height-duck", "-1");
 			break;
 		default:
 			MessageBoxA(0, "Wrong character ID", "Error", 0);
