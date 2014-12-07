@@ -37,6 +37,8 @@ static inline double round(double val)
     return floor(val + 0.5);
 }
 
+
+
 static inline const wchar_t* const BoolToString(bool b)
 {
   return b ? L"TRUE" : L"FALSE";

@@ -21,7 +21,7 @@
 
 void resetDefines();
 
-#define PATCHIT
+//#define PATCHIT
 
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
@@ -317,14 +317,88 @@ void InitLevel() {
 }
 
 
-void resetDefines(){
-    VASM_END_ANIM = 11;
-    VASM_END_COINSOUND = 14;
-    VASM_END_COINVAL = 1;
+using namespace std;
+vector<wstring> wsplit( wstring str, wchar_t delimiter )
+{
+	vector<wstring> ret;
+	while ( true )
+	{
+		size_t pos = str.find_first_of( delimiter );
+		wstring cur = str.substr( 0, pos );
+		ret.push_back( cur );
+		if ( pos == wstring::npos )
+			break;
+		str = str.substr( pos + 1 );
+	}
+	return ret;
+}
 
-    GM_GRAVITY = 12;
-    GM_JUMPHIGHT = 20;
-    GM_JUMPHIGHT_BOUNCE = 20;
+#include <sstream>
+void resetDefines(){
+	VASM_END_ANIM = 11;
+	VASM_END_COINSOUND = 14;
+	VASM_END_COINVAL = 1;
+
+	GM_GRAVITY = 12;
+	GM_JUMPHIGHT = 20;
+	GM_JUMPHIGHT_BOUNCE = 20;
+
+
+	HMODULE hModule = GetModuleHandleW(NULL);
+	WCHAR path[MAX_PATH];
+	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+	for(int i = count; i > 3; i--) {
+		if(path[i] == L'\\') {
+			path[i] = 0;
+			break;
+		}
+	}
+
+	wstring resetDefinies = path;
+	resetDefinies = resetDefinies.append(L"\\resetdefines.txt");
+	wifstream rdef(resetDefinies, ios::binary|ios::in);
+	if(!rdef.is_open()){
+		return;
+	}
+
+	std::wstring wrdefCode((std::istreambuf_iterator<wchar_t>(rdef)), std::istreambuf_iterator<wchar_t>());
+	rdef.close();
+
+	vector<wstring> lines = wsplit(wrdefCode, L'\n');
+	for(int i = 0; i < lines.size(); ++i){
+		wstring rdefLine = lines[i];
+		vector<wstring> reDef = wsplit(rdefLine, L'\t');
+		vector<wstring> clReDef;
+		for(int j = 0; j < reDef.size(); ++j){
+			if(reDef[j].length()){
+				clReDef.push_back(reDef[j]);
+			}
+		}
+		if(clReDef.size() < 3)
+			continue;
+
+
+		DWORD addr;
+		wstring addrType;
+		double val;
+
+		addr = wcstoul(clReDef[0].c_str(), NULL, 16);
+		addrType = clReDef[1];
+		val = wcstod(clReDef[2].c_str(), NULL);
+
+		if(addrType == L"b"){
+			*(BYTE*)addr = (BYTE)val;
+		}else if(addrType == L"w"){
+			*(WORD*)addr = (WORD)val;
+		}else if(addrType == L"dw"){
+			*(DWORD*)addr = (DWORD)val;
+		}else if(addrType == L"f"){
+			*(float*)addr = (float)val;
+		}else if(addrType == L"df"){
+			*(double*)addr = val;
+		}
+	}
+
 }
 
 
