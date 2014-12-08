@@ -29,6 +29,7 @@ extern "C" Q_DECL_EXPORT bool run()
     MainWindow w;
     w.show();
     a.exec();
+    a.quit();
     return true;
 }
 
