@@ -21,7 +21,7 @@
 
 void resetDefines();
 
-//#define PATCHIT
+#define PATCHIT 1
 
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
@@ -30,7 +30,7 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		InitGlobals();
-#ifdef PATCHIT
+#if PATCHIT
 		TrySkipPatch();
 #endif // PATCHIT
 		break;
@@ -318,21 +318,6 @@ void InitLevel() {
 
 
 using namespace std;
-vector<wstring> wsplit( wstring str, wchar_t delimiter )
-{
-	vector<wstring> ret;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( delimiter );
-		wstring cur = str.substr( 0, pos );
-		ret.push_back( cur );
-		if ( pos == wstring::npos )
-			break;
-		str = str.substr( pos + 1 );
-	}
-	return ret;
-}
-
 #include <sstream>
 void resetDefines(){
 	VASM_END_ANIM = 11;
@@ -365,11 +350,11 @@ void resetDefines(){
 	rdef.close();
 
 	vector<wstring> lines = wsplit(wrdefCode, L'\n');
-	for(int i = 0; i < lines.size(); ++i){
+	for(int i = 0; i < (int)lines.size(); ++i){
 		wstring rdefLine = lines[i];
 		vector<wstring> reDef = wsplit(rdefLine, L'\t');
 		vector<wstring> clReDef;
-		for(int j = 0; j < reDef.size(); ++j){
+		for(int j = 0; j < (int)reDef.size(); ++j){
 			if(reDef[j].length()){
 				clReDef.push_back(reDef[j]);
 			}

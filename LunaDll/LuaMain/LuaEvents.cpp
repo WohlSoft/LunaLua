@@ -123,7 +123,7 @@ void LuaEvents::processSectionEvents(lua_State *L)
 void LuaEvents::processSMBXEvents(lua_State *L)
 {
 	luabind::object evTable = LuaHelper::getEventCallbase(L);
-	for(int i = 0; i < SMBXEventQueue.size(); ++i){
+	for(int i = 0; i < (int)SMBXEventQueue.size(); ++i){
 		SMBXEventQueueItem& item = SMBXEventQueue[i];
 		luabind::call_function<void>(evTable["onSMBXEvent"], item.event, item.callType, item.unkVal);
 	}

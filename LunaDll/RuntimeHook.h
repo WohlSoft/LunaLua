@@ -1,5 +1,6 @@
 #pragma once
 #include "Defines.h"
+#include "Globals.h"
 #pragma comment(lib, "comsuppw.lib")
 
 #define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
@@ -8,7 +9,11 @@
 #define PATCH_JMP(dest, source) *(BYTE*)source = 0xE9;\
 	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
 
+#define COMBOOL(b) (b ? -1 : 0)
+
 typedef int SMBXTrigger(BSTR*, int*);
+
+void ParseArgs(const std::vector<std::string>& args);
 
 void TrySkipPatch();
 

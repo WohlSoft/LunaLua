@@ -60,6 +60,8 @@ CellManager gCellMan;
 
 SavedVariableBank gSavedVarBank;
 
+startUpSettings gStartupSettings;
+
 /// INIT GLOBALS
 void InitGlobals() {
 	char* dbg = "GLOBAL INIT DBG";
@@ -94,6 +96,13 @@ void InitGlobals() {
 	gNumpad6 = 0;
 
 	gLevelEnum = Invalid;
+
+	//startup settings default
+	gStartupSettings.patch = false;
+	gStartupSettings.noSound = false;
+	gStartupSettings.frameskip = true;
+	gStartupSettings.game = false;
+	gStartupSettings.lvlEditor = false;
 
 	srand((int)time(NULL));
 
@@ -151,4 +160,43 @@ void CleanUp() {
 	if(ghMemDC)
 		DeleteObject(ghMemDC);
 		DeleteObject(ghGeneralDIB);
+}
+
+std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
+{
+	vector<std::wstring> ret;
+	while ( true )
+	{
+		size_t pos = str.find_first_of( delimiter );
+		std::wstring cur = str.substr( 0, pos );
+		ret.push_back( cur );
+		if ( pos == std::wstring::npos )
+			break;
+		str = str.substr( pos + 1 );
+	}
+	return ret;
+}
+
+std::vector<std::string> split(std::string str, char delimiter)
+{
+	vector<std::string> ret;
+	while ( true )
+	{
+		size_t pos = str.find_first_of( delimiter );
+		std::string cur = str.substr( 0, pos );
+		ret.push_back( cur );
+		if ( pos == std::string::npos )
+			break;
+		str = str.substr( pos + 1 );
+	}
+	return ret;
+}
+
+bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
+{
+	for(int i = 0; i < (int)vecStr.size(); ++i){
+		if(vecStr[i] == find)
+			return true;
+	}
+	return false;
 }

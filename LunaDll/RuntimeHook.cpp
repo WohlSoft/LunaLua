@@ -140,77 +140,110 @@ void record_SMBXTrigger(wchar_t* trigger, int unkVal, int type)
 	}
 }
 
+void ParseArgs(const std::vector<std::string>& args)
+{
+	if(vecStrFind(args, std::string("--patch")))
+		gStartupSettings.patch = true;
+
+	if(vecStrFind(args, std::string("--game")))
+		gStartupSettings.game = true;
+
+	if(vecStrFind(args, std::string("--leveleditor")))
+		gStartupSettings.lvlEditor = true;
+
+	if(vecStrFind(args, std::string("--noframeskip")))
+		gStartupSettings.frameskip = false;
+
+	if(vecStrFind(args, std::string("--nosound")))
+		gStartupSettings.noSound = true;
+}
 
 
 void TrySkipPatch()
 {
-	//PATCH_JMP(0x008BED22,0x008BECF2);
-	//*(BYTE*)(0x8BECF7) = 0x90;
-	memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
-	*(WORD*)(0xB25046) = -1; //set run to true
-	PATCH_FUNC(0x8BED00, &InitHook);
-	PATCH_FUNC(0x8D6BB6, &forceTermination);
+	ParseArgs(split(std::string(GetCommandLineA()), ' '));
+
+	if(gStartupSettings.patch){
+		memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
+		*(WORD*)(0xB25046) = -1; //set run to true
+		PATCH_FUNC(0x8BED00, &InitHook);
+		PATCH_FUNC(0x8D6BB6, &forceTermination);
+	}
 }
 
 extern void InitHook()
 {
-	typedef bool (*RunProc)(void);
-	typedef void (*GetPromptResultProc)(void*);
-	typedef void (*FreeVarsProc)(void);
-	newLauncherLib = LoadLibraryA("LunadllNewLauncher.dll");
-	if(!newLauncherLib){
-		std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
-		errMsg += std::to_string((long long)GetLastError());
-		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-		return;
-	}
-	RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
-	if(!hRunProc){
-		std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
-		errMsg += std::to_string((long long)GetLastError());
-		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-		FreeLibrary(newLauncherLib);
-		newLauncherLib = NULL;
-		return;
-	}
-	GetPromptResultProc hPrompt = (GetPromptResultProc)GetProcAddress(newLauncherLib, "GetPromptResult");
-	if(!hRunProc){
-		std::string errMsg = "Failed to load 'GetPromptResult' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
-		errMsg += std::to_string((long long)GetLastError());
-		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-		FreeLibrary(newLauncherLib);
-		newLauncherLib = NULL;
-		return;
-	}
-	FreeVarsProc hFreeVarsProc = (FreeVarsProc)GetProcAddress(newLauncherLib, "FreeVars");
-	if(!hRunProc){
-		std::string errMsg = "Failed to load 'FreeVars' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
-		errMsg += std::to_string((long long)GetLastError());
-		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-		FreeLibrary(newLauncherLib);
-		newLauncherLib = NULL;
-		return;
-	}
-	hRunProc();
-	resultStruct settings;
-	hPrompt((void*)&settings);
-	hFreeVarsProc();
-	FreeLibrary(newLauncherLib);
-	newLauncherLib = NULL;
-
-	if(settings.result){
-		if(settings.result == 2){
-			GM_RUNGAME = -1;
+	
+	if(!gStartupSettings.game&&!gStartupSettings.lvlEditor){
+		typedef bool (*RunProc)(void);
+		typedef void (*GetPromptResultProc)(void*);
+		typedef void (*FreeVarsProc)(void);
+		newLauncherLib = LoadLibraryA("LunadllNewLauncher.dll");
+		if(!newLauncherLib){
+			std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			return;
 		}
-		GM_NOSOUND = (settings.NoSound ? -1 : 0);
-		GM_FRAMESKIP = (settings.disableFrameskip ? 0 : -1);
-		return;
+		RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
+		if(!hRunProc){
+			std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newLauncherLib);
+			newLauncherLib = NULL;
+			return;
+		}
+		GetPromptResultProc hPrompt = (GetPromptResultProc)GetProcAddress(newLauncherLib, "GetPromptResult");
+		if(!hRunProc){
+			std::string errMsg = "Failed to load 'GetPromptResult' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newLauncherLib);
+			newLauncherLib = NULL;
+			return;
+		}
+		FreeVarsProc hFreeVarsProc = (FreeVarsProc)GetProcAddress(newLauncherLib, "FreeVars");
+		if(!hRunProc){
+			std::string errMsg = "Failed to load 'FreeVars' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newLauncherLib);
+			newLauncherLib = NULL;
+			return;
+		}
+		hRunProc();
+		resultStruct settings;
+		hPrompt((void*)&settings);
+		hFreeVarsProc();
+		FreeLibrary(newLauncherLib);
+		newLauncherLib = NULL;
+		
+		if(settings.result){
+			if(settings.result == 2){
+				GM_ISLEVELEDITORMODE = -1;
+			}
+			GM_NOSOUND = COMBOOL(settings.NoSound);
+			GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);
+			return;
+		}
+
+		GM_ISLEVELEDITORMODE = 0; //set run to false
+		_exit(0);
+	}else{
+		GM_ISLEVELEDITORMODE = COMBOOL(gStartupSettings.lvlEditor);
+		GM_ISGAME = COMBOOL(gStartupSettings.game);
+		GM_FRAMESKIP = COMBOOL(gStartupSettings.frameskip);
+		GM_NOSOUND = COMBOOL(gStartupSettings.noSound);
 	}
-	GM_RUNGAME = 0; //set run to false
+	
+
+	
+	
 	/*void (*exitCall)(void);
 	exitCall = (void(*)(void))0x8D6BB0;
 	exitCall();*/
-	_exit(0);
+	
 	
 	
 
@@ -220,3 +253,4 @@ extern void forceTermination()
 {
 	_exit(0);
 }
+

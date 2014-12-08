@@ -16,11 +16,20 @@
 
 #pragma comment (lib, "Msimg32.lib")
 
+struct startUpSettings{
+	bool patch;
+	bool game;
+	bool lvlEditor;
+	bool frameskip;
+	bool noSound;
+};
+
 /// Global settings
 extern bool		gLunaEnabled;
 extern bool		gShowDemoCounter;
 extern bool		gSkipSMBXHUD;
 extern bool		gPrintErrorsToScreen;
+extern startUpSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///
 extern int		gFrames;
@@ -69,3 +78,8 @@ extern SavedVariableBank	gSavedVarBank;
 void InitGlobals();
 void ResetFreeGlob();
 void CleanUp();
+
+/// HELPER FUNCTIONS ///
+std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
+std::vector<std::string> split( std::string str, char delimiter);
+bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
