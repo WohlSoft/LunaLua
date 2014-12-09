@@ -99,9 +99,11 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 		short *hitbox_width = (short *)(0xB2C788);
 		short *hitbox_height = (short *)(0xB2C6FC);
 		short *hitbox_height_duck = (short *)(0xB2C742);
-		
+		short *hitbox_grab_offset_X = (short *)(0xB2C7CE);
+		short *hitbox_grab_offset_Y = (short *)(0xB2C814);
 
-    //Parser of hitbox properties from PGE Calibrator INI File
+
+		//Parser of hitbox properties from PGE Calibrator INI File
 
 			//Frames X and Y on playable character sprite from 0 to 9
 
@@ -118,9 +120,11 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 			//hitBoxFile.Get("frame-x-x", "grabOffsetX", "default value");
 			//hitBoxFile.Get("frame-x-x", "grabOffsetY", "default value");
 		//}
-		std::string width = "0";
-		std::string height = "0";
-		std::string height_duck = "0";
+		std::string width = "";
+		std::string height = "";
+		std::string height_duck = "";
+		std::string grab_offset_x = "";
+		std::string grab_offset_y = "";
 
 		switch(character)
 		{
@@ -130,22 +134,30 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 		case 3:
 		case 4:
 				//normal
-				width = hitBoxFile.Get("common", "width", "-1");
-				height = hitBoxFile.Get("common", "height", "-1");
+				width = hitBoxFile.Get("common", "width", "");
+				height = hitBoxFile.Get("common", "height", "");
 				//duck
-				height_duck = hitBoxFile.Get("common", "height-duck", "-1");
+				height_duck = hitBoxFile.Get("common", "height-duck", "");
+
+				//grab offsets
+				grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
+				grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
 			break;
 		default:
 			MessageBoxA(0, "Wrong character ID", "Error", 0);
 			return;
 		}
 
-		if(atoi(width.c_str()) > 1)
+		if( !width.empty() )
 			hitbox_width[powerup*5+character] = (short)atoi(width.c_str());
-		if(atoi(height.c_str()) > 1)
+		if( !height.empty() )
 			hitbox_height[powerup*5+character] = (short)atoi(height.c_str());
-		if(atoi(height_duck.c_str()) > 1)
+		if( !height_duck.empty() )
 			hitbox_height_duck[powerup*5+character] = (short)atoi(height_duck.c_str());
+		if( !grab_offset_x.empty() )
+			hitbox_grab_offset_X[powerup*5+character] = (short)atoi(grab_offset_x.c_str());
+		if( !grab_offset_y.empty() )
+			hitbox_grab_offset_Y[powerup*5+character] = (short)atoi(grab_offset_y.c_str());
 }
 
 LuaProxy::Player::Player() : m_index(1)
