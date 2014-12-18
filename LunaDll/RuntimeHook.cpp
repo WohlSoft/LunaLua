@@ -168,6 +168,9 @@ void TrySkipPatch()
 		*(WORD*)(0xB25046) = -1; //set run to true
 		PATCH_FUNC(0x8BED00, &InitHook);
 		PATCH_FUNC(0x8D6BB6, &forceTermination);
+		PATCH_FUNC(0x8C11D5, &DbgTestHook);
+		PATCH_FUNC(0x8C16F7, &DbgWorldTestHook);
+		//8C11D5
 	}
 }
 
@@ -249,8 +252,28 @@ extern void InitHook()
 
 }
 
+long long dbglongTest = 0;
+
 extern void forceTermination()
 {
 	_exit(0);
+}
+
+extern int DbgTestHook()
+{
+	MessageBoxA(NULL, "Dbg Test Hook", "DBG", NULL);
+	short plValue = GM_PLAYERS_COUNT;
+	__asm {
+		MOV EAX, 1
+		MOV CX, plValue
+	}
+}
+
+extern DWORD DbgWorldTestHook()
+{
+	dbglongTest++;
+	if(dbglongTest % 650 == 0)
+		MessageBoxA(NULL, "running", "running", NULL);
+	return GetTickCount();
 }
 

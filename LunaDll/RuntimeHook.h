@@ -20,6 +20,11 @@ void TrySkipPatch();
 //Hooks
 extern void InitHook();
 extern void forceTermination();
+extern int DbgTestHook();
+extern DWORD DbgWorldTestHook();
+
+//DBG
+extern long long dbglongTest;
 
 //Libs
 extern HMODULE newLauncherLib = 0;
