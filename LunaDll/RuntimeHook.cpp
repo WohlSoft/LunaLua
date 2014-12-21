@@ -223,10 +223,9 @@ extern void InitHook()
 		newLauncherLib = NULL;
 		
 		if(settings.result){
+			GM_ISGAME = -1;
 			if(settings.result == 2){
 				GM_ISLEVELEDITORMODE = -1;
-			}else{
-				GM_ISGAME = -1;
 			}
 			GM_NOSOUND = COMBOOL(settings.NoSound);
 			GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);
