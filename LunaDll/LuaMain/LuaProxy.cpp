@@ -2606,3 +2606,23 @@ LuaProxy::VBStr LuaProxy::getInput()
 {
     return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
 }
+
+std::string LuaProxy::getSMBXPath()
+{
+	HMODULE hModule = GetModuleHandleW(NULL);
+	WCHAR path[MAX_PATH];
+	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+	for(int i = count; i > 3; i--) {
+		if(path[i] == L'\\') {
+			path[i] = 0;
+			break;
+		}
+	}
+
+	return utf8_encode(wstring(path));
+}
+
+void LuaProxy::hud(bool activate)
+{
+	gSkipSMBXHUD = !activate;
+}

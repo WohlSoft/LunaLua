@@ -19,6 +19,9 @@ namespace LuaProxy {
         LFT_STRING = 6
     };
 
+	//undocumented
+	std::string getSMBXPath();
+
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
@@ -46,12 +49,10 @@ namespace LuaProxy {
     unsigned short jumpheightBounce();
     void jumpheightBounce(unsigned short value);
     luabind::object findlayer(const char* layername, lua_State *L);
-
     void exitLevel();
     unsigned short winState();
     void winState(unsigned short value);
     luabind::object animations(lua_State* L);
-
 	//Load hitbox values for playable character
 	void loadHitboxes(int _character, int _powerup, const char *ini_file);
 
@@ -69,6 +70,7 @@ namespace LuaProxy {
     void runAnimation(int id, double x, double y, int extraData);
 
     void npcToCoins();
+	void hud(bool activate);
 
 
     namespace SaveBankProxy {

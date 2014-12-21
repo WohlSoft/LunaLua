@@ -130,7 +130,7 @@ int getSMBXTriggerEventTrigger(BSTR* trigger, int* unkVal)
 
 void record_SMBXTrigger(wchar_t* trigger, int unkVal, int type)
 {
-	if(LunaLua::mainState || LunaLua::mainStateGlobal){
+	if(LunaLua::mainStateV2){
 		LuaEvents::SMBXEventQueueItem i;
 		
 		i.event = utf8_encode(std::wstring(trigger));
@@ -168,8 +168,8 @@ void TrySkipPatch()
 		*(WORD*)(0xB25046) = -1; //set run to true
 		PATCH_FUNC(0x8BED00, &InitHook);
 		PATCH_FUNC(0x8D6BB6, &forceTermination);
-		PATCH_FUNC(0x8C11D5, &DbgTestHook);
-		PATCH_FUNC(0x8C16F7, &DbgWorldTestHook);
+		//PATCH_FUNC(0x8C11D5, &DbgTestHook);
+		//PATCH_FUNC(0x8C16F7, &DbgWorldTestHook);
 		//8C11D5
 	}
 }
@@ -225,6 +225,8 @@ extern void InitHook()
 		if(settings.result){
 			if(settings.result == 2){
 				GM_ISLEVELEDITORMODE = -1;
+			}else{
+				GM_ISGAME = -1;
 			}
 			GM_NOSOUND = COMBOOL(settings.NoSound);
 			GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);

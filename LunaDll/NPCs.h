@@ -25,6 +25,7 @@
 
 // 0x+64	w	= Is a generator
 // 0x+68	f	= Generator delay setting
+// 0x+6A	w	- Generator firing rate
 // 0x+6C	f	= Generator delay countdown
 // 0x+70	w	= Direction to generate NPC?
 // 0x+72	w	= Which layer to spawn NPC on
@@ -36,6 +37,8 @@
 // 0x+90	qw	= h/w?
 // 0x+98	qw	= X speed
 // 0x+A0	qw	= Y speed
+// 0x+AC	dw	= Spawn X
+// 0x+B4	dw	= Spawn Y
 
 // 0x+E2	w	= Sprite GFX index/Identity   // x011C = lakitu
 // 0x+E4	w	= Animation frame
