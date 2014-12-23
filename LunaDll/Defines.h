@@ -50,6 +50,7 @@ enum PRIORITY {
 
 // General
 #define GM_SCRN_HDC			*(DWORD*)0x00B25028
+#define GM_MODE_INTRO		*(WORD*)0x00B2C89C
 
 // Frame counters
 #define GM_TRANS_FRAMECT	*(DWORD*)0x00B2C670

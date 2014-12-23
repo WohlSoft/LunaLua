@@ -168,8 +168,11 @@ void TrySkipPatch()
 		*(WORD*)(0xB25046) = -1; //set run to true
 		PATCH_FUNC(0x8BED00, &InitHook);
 		PATCH_FUNC(0x8D6BB6, &forceTermination);
-		//PATCH_FUNC(0x8C11D5, &DbgTestHook);
-		//PATCH_FUNC(0x8C16F7, &DbgWorldTestHook);
+		PATCH_FUNC(0x8C11D5, &LoadWorld);
+		PATCH_FUNC(0x8C16F7, &WorldLoop);
+
+		PATCH_FUNC(0x933443, &prTest);
+
 		//8C11D5
 	}
 }
@@ -260,9 +263,9 @@ extern void forceTermination()
 	_exit(0);
 }
 
-extern int DbgTestHook()
+extern int LoadWorld()
 {
-	MessageBoxA(NULL, "Dbg Test Hook", "DBG", NULL);
+	LunaLua::initWorld(std::wstring((wchar_t*)GM_FULLDIR));
 	short plValue = GM_PLAYERS_COUNT;
 	__asm {
 		MOV EAX, 1
@@ -270,11 +273,18 @@ extern int DbgTestHook()
 	}
 }
 
-extern DWORD DbgWorldTestHook()
+extern DWORD WorldLoop()
 {
-	dbglongTest++;
-	if(dbglongTest % 650 == 0)
-		MessageBoxA(NULL, "running", "running", NULL);
+	LunaLua::DoWorld();
 	return GetTickCount();
 }
+
+extern void prTest(wchar_t** tarString, int* type, float* x, float* y)
+{
+	Render::Print(std::wstring(*tarString), *type, *x, *y);
+	Render::Print(std::wstring(L"LUNALUA V0.4"), 3, 5, 576);
+	//MessageBoxA(NULL, "test1", "test1", NULL);
+}
+
+
 

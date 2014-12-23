@@ -20,8 +20,9 @@ void TrySkipPatch();
 //Hooks
 extern void InitHook();
 extern void forceTermination();
-extern int DbgTestHook();
-extern DWORD DbgWorldTestHook();
+extern int LoadWorld();
+extern DWORD WorldLoop();
+extern void prTest(wchar_t** tarString, int* type, float* x, float* y);
 
 //DBG
 extern long long dbglongTest;
