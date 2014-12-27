@@ -13,17 +13,23 @@ TEMPLATE = lib
 CONFIG += c++11
 CONFIG += sharedlib
 
+QMAKE_CXXFLAGS = -std=c++11 
+LIBS += -pthread
+
 
 DEFINES += LunadllNewLauncher
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    asyncdebugger.cpp
 
 HEADERS  += mainwindow.h \
-    setting.h
+    setting.h \
+    asyncdebugger.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    asyncdebugger.ui
 
 RESOURCES += \
     res.qrc

@@ -2,6 +2,7 @@
 #include "LuaMain/LunaLuaMain.h"
 #include "LuaMain/LuaEvents.h"
 #include <comutil.h>
+#include "Input.h"
 
 std::string utf8_encode(const std::wstring &wstr)
 {
@@ -156,6 +157,9 @@ void ParseArgs(const std::vector<std::string>& args)
 
 	if(vecStrFind(args, std::string("--nosound")))
 		gStartupSettings.noSound = true;
+
+	if(vecStrFind(args, std::string("--debugger")))
+		gStartupSettings.debugger = true;
 }
 
 
@@ -166,15 +170,18 @@ void TrySkipPatch()
 	if(gStartupSettings.patch){
 		memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
 		*(WORD*)(0xB25046) = -1; //set run to true
+		
 		PATCH_FUNC(0x8BED00, &InitHook);
-		PATCH_FUNC(0x8D6BB6, &forceTermination);
-		PATCH_FUNC(0x8C11D5, &LoadWorld);
-		PATCH_FUNC(0x8C16F7, &WorldLoop);
 
-		PATCH_FUNC(0x933443, &prTest);
-
+		//PATCH_FUNC(0x933443, &prTest);
+		
 		//8C11D5
 	}
+	PATCH_FUNC(0x8D6BB6, &forceTermination);
+	PATCH_FUNC(0x8C11D5, &LoadWorld);
+	PATCH_FUNC(0x8C16F7, &WorldLoop);
+	PATCH_FUNC(0x932353, &printLunaLuaVersion);
+	PATCH_FUNC(0x9090F5, &renderTest);
 }
 
 extern void InitHook()
@@ -243,8 +250,39 @@ extern void InitHook()
 		GM_FRAMESKIP = COMBOOL(gStartupSettings.frameskip);
 		GM_NOSOUND = COMBOOL(gStartupSettings.noSound);
 	}
-	
 
+	if(gStartupSettings.debugger){
+		newDebugger = LoadLibraryA("LunadllNewLauncher.dll");
+		if(!newDebugger){
+			std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			newDebugger = NULL;
+			return;
+		}
+		runAsyncDebuggerProc = (void(*)(void))GetProcAddress(newDebugger, "runAsyncDebugger");
+		asyncBitBltProc = (int (*)(HDC, int, int, int, int, HDC, int, int, unsigned int))GetProcAddress(newDebugger, "asyncBitBlt@36");
+		if(!runAsyncDebuggerProc){
+			std::string errMsg = "Failed to load 'runAsyncDebugger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newDebugger);
+			newDebugger = NULL;
+			return;
+		}
+		if(!asyncBitBltProc){
+			std::string errMsg = "Failed to load 'asyncBitBlt' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newDebugger);
+			newDebugger = NULL;
+			return;
+		}
+		//PATCH_JMP(0x4242D0, &bitBltHook);
+		
+		*(void**)0xB2F1D8 = (void*)asyncBitBltProc;
+		runAsyncDebuggerProc();
+	}
 	
 	
 	/*void (*exitCall)(void);
@@ -265,7 +303,28 @@ extern void forceTermination()
 
 extern int LoadWorld()
 {
+	resetDefines();
+
+	gSkipSMBXHUD = false;
+	gIsOverworld = true;
+	gLunaRender.ClearAll();
+	gSpriteMan.ResetSpriteManager();
+	gCellMan.Reset();
+	gSavedVarBank.ClearBank();	
+	Input::ResetAll();
+
+	gLunaRender.ReloadScreenHDC();
+
+	// Init var bank
+	gSavedVarBank.TryLoadWorldVars();
+	gSavedVarBank.CheckSaveDeletion();
+	gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
+
 	LunaLua::initWorld(std::wstring((wchar_t*)GM_FULLDIR));
+
+	// Recount deaths
+	gDeathCounter.Recount();
+
 	short plValue = GM_PLAYERS_COUNT;
 	__asm {
 		MOV EAX, 1
@@ -275,15 +334,46 @@ extern int LoadWorld()
 
 extern DWORD WorldLoop()
 {
+
+	gSavedVarBank.CheckSaveDeletion();
+
+	// Update inputs
+	Input::CheckSpecialCheats();
+	Input::UpdateInputTasks();	
+
 	LunaLua::DoWorld();
+
+	gSavedVarBank.SaveIfNeeded();
+
 	return GetTickCount();
 }
 
-extern void prTest(wchar_t** tarString, int* type, float* x, float* y)
+extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
 {
-	Render::Print(std::wstring(*tarString), *type, *x, *y);
-	Render::Print(std::wstring(L"LUNALUA V0.4"), 3, 5, 576);
-	//MessageBoxA(NULL, "test1", "test1", NULL);
+	if(newDebugger){
+		//asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+	}
+	return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
+{
+	Render::Print(std::wstring(L"LUNALUA V0.5 BETA"), 3, 5, 5);
+	if(newDebugger){
+		return asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+	}
+	return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+extern void* renderTest()
+{
+	if(gShowDemoCounter)
+		gDeathCounter.Draw();
+
+	gSpriteMan.RunSprites();
+	gLunaRender.RenderAll();
+
+	return (void*)0xB25010;
 }
 
 

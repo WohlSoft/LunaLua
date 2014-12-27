@@ -670,6 +670,14 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 		[
 			def("getSMBXPath", &LuaProxy::getSMBXPath),
 			def("windowDebug", &LuaProxy::windowDebug),
+			def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
+			def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
+			def("loadImage", &LuaProxy::loadImage),
+			def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
+			def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),
+			def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::placeSprite),
+			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object)) &LuaProxy::mem),
+			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
 			class_<LuaProxy::VBStr>("VBStr")
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
@@ -725,6 +733,8 @@ void LunaLua::DoWorld()
 void LunaLua::DoCodeWorldFile(lua_State* L)
 {
 	bool err = false;
+	if(L == 0)
+		return;
 
 	try
 	{

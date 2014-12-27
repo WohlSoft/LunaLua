@@ -12,6 +12,7 @@ bool gLunaEnabled;
 bool gShowDemoCounter;
 bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
 bool gPrintErrorsToScreen;
+bool gIsOverworld;
 
 // Global variables
 int	gFrames;
@@ -63,13 +64,15 @@ SavedVariableBank gSavedVarBank;
 startUpSettings gStartupSettings;
 
 /// INIT GLOBALS
-void InitGlobals() {
+void InitGlobals()
+{
 	char* dbg = "GLOBAL INIT DBG";
 	gLunaEnabled = true;
 	gShowDemoCounter = false;
 	gSkipSMBXHUD = false;
 	gPrintErrorsToScreen = true;
 	gLogger.m_Enabled = false;
+	gIsOverworld = false;
 	gCellMan.Reset();
 
 	gFrames = 0;
@@ -103,6 +106,7 @@ void InitGlobals() {
 	gStartupSettings.frameskip = true;
 	gStartupSettings.game = false;
 	gStartupSettings.lvlEditor = false;
+	gStartupSettings.debugger = false;
 
 	srand((int)time(NULL));
 
@@ -199,4 +203,74 @@ bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
 			return true;
 	}
 	return false;
+}
+
+
+using namespace std;
+#include <sstream>
+void resetDefines(){
+	VASM_END_ANIM = 11;
+	VASM_END_COINSOUND = 14;
+	VASM_END_COINVAL = 1;
+
+	GM_GRAVITY = 12;
+	GM_JUMPHIGHT = 20;
+	GM_JUMPHIGHT_BOUNCE = 20;
+
+
+	HMODULE hModule = GetModuleHandleW(NULL);
+	WCHAR path[MAX_PATH];
+	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+	for(int i = count; i > 3; i--) {
+		if(path[i] == L'\\') {
+			path[i] = 0;
+			break;
+		}
+	}
+
+	wstring resetDefinies = path;
+	resetDefinies = resetDefinies.append(L"\\resetdefines.txt");
+	wifstream rdef(resetDefinies, ios::binary|ios::in);
+	if(!rdef.is_open()){
+		return;
+	}
+
+	std::wstring wrdefCode((std::istreambuf_iterator<wchar_t>(rdef)), std::istreambuf_iterator<wchar_t>());
+	rdef.close();
+
+	vector<wstring> lines = wsplit(wrdefCode, L'\n');
+	for(int i = 0; i < (int)lines.size(); ++i){
+		wstring rdefLine = lines[i];
+		vector<wstring> reDef = wsplit(rdefLine, L'\t');
+		vector<wstring> clReDef;
+		for(int j = 0; j < (int)reDef.size(); ++j){
+			if(reDef[j].length()){
+				clReDef.push_back(reDef[j]);
+			}
+		}
+		if(clReDef.size() < 3)
+			continue;
+
+
+		DWORD addr;
+		wstring addrType;
+		double val;
+
+		addr = wcstoul(clReDef[0].c_str(), NULL, 16);
+		addrType = clReDef[1];
+		val = wcstod(clReDef[2].c_str(), NULL);
+
+		if(addrType == L"b"){
+			*(BYTE*)addr = (BYTE)val;
+		}else if(addrType == L"w"){
+			*(WORD*)addr = (WORD)val;
+		}else if(addrType == L"dw"){
+			*(DWORD*)addr = (DWORD)val;
+		}else if(addrType == L"f"){
+			*(float*)addr = (float)val;
+		}else if(addrType == L"df"){
+			*(double*)addr = val;
+		}
+	}
+
 }

@@ -37,10 +37,13 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int 
 
 	// Concoct full filepath
 	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = world_dir.append(Level::GetName());	
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
+	wstring full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));	
+	if(!gIsOverworld){
+		full_path = removeExtension(full_path);
+		full_path = full_path.append(L"\\"); // < path into level folder
+	}
 	full_path = full_path + filename;
+	//MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
 	
 	// Create and store the image resource
 	BMPBox* pNewbox = new BMPBox(full_path, m_hScreenDC);

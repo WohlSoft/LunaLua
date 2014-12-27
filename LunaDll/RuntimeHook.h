@@ -6,7 +6,10 @@
 #define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
 	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
 
-#define PATCH_JMP(dest, source) *(BYTE*)source = 0xE9;\
+#define PATCH_JMP(ptr, func) *(BYTE*)ptr = 0xE9;\
+	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
+
+#define PATCH_JMPOLD(ptr, func) *(BYTE*)source = 0xE9;\
 	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
 
 #define COMBOOL(b) (b ? -1 : 0)
@@ -20,15 +23,32 @@ void TrySkipPatch();
 //Hooks
 extern void InitHook();
 extern void forceTermination();
+
+
+//The World Load Code
 extern int LoadWorld();
+//The World Loop Code
 extern DWORD WorldLoop();
+//The World Render Code
+extern void* renderTest();
+
 extern void prTest(wchar_t** tarString, int* type, float* x, float* y);
+extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
+extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
+
 
 //DBG
 extern long long dbglongTest;
 
 //Libs
 extern HMODULE newLauncherLib = 0;
+
+
+extern HMODULE newDebugger = 0;
+
+//DBG Procs
+void (*runAsyncDebuggerProc)(void);
+int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
 
 struct resultStruct{
 	int result;

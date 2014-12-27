@@ -3,10 +3,17 @@
 #include <QApplication>
 #include <QtCore>
 #include <QMessageBox>
+//#include <QThread>
 
 #include <Windows.h>
+#include <thread>
 
-extern resultStruct* Settings = 0;
+#include "asyncdebugger.h"
+
+resultStruct* Settings = 0;
+AsyncDebugger* asyncDebuggerWnd = 0;
+QApplication* asyncApp = 0;
+std::thread* thr = 0;
 
 extern "C" Q_DECL_EXPORT bool run()
 {
@@ -35,18 +42,64 @@ extern "C" Q_DECL_EXPORT bool run()
 
 extern "C" Q_DECL_EXPORT void GetPromptResult(void* setting){
     memcpy(setting, Settings, sizeof(resultStruct));
-    //MessageBoxA(NULL, QString::number(*(int*)Settings).toStdString().c_str(), "dbg", NULL);
 }
 
 extern "C" Q_DECL_EXPORT void FreeVars(){
     delete Settings;
 }
 
-//int main(int argc, char *argv[])
-//{
-//    QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
+void initAndRunAsyncDebugger(){
+    char pathBuf[500];
+    HMODULE hModule = GetModuleHandleA(NULL);
+    if(!hModule)
+        return;
 
-//    return a.exec();
-//}
+    if(!GetModuleFileNameA(hModule, pathBuf, sizeof(pathBuf)))
+        return;
+
+    QApplication::addLibraryPath( QFileInfo( pathBuf ).dir().path() );
+
+    Settings = new resultStruct;
+
+    char* myBuffer = pathBuf;
+
+    int n = 1;
+    QApplication a(n, &myBuffer);
+    asyncDebuggerWnd = new AsyncDebugger();
+    asyncDebuggerWnd->show();
+    a.exec();
+    a.quit();
+    delete asyncDebuggerWnd;
+    asyncDebuggerWnd = 0;
+    return;
+}
+
+extern "C" Q_DECL_EXPORT void runAsyncDebugger(){
+    thr = new std::thread(&initAndRunAsyncDebugger);
+    thr->detach();
+}
+
+extern "C" Q_DECL_EXPORT __stdcall WINBOOL asyncBitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop){
+    if(asyncDebuggerWnd){
+        if(!asyncDebuggerWnd->skipCatching()){
+            SetForegroundWindow((HWND)asyncDebuggerWnd->winId());
+            AsyncDebugger::bitbltData data;
+            data.hdcDest = hdcDest,
+            data.nXDest = nXDest;
+            data.nYDest = nYDest;
+            data.nWidth = nWidth;
+            data.nHeight = nHeight;
+            data.hdcSrc = hdcSrc;
+            data.nXSrc = nXSrc;
+            data.nYSrc = nYSrc;
+            data.dwRop = dwRop;
+            asyncDebuggerWnd->setRunningText("Not Running");
+            asyncDebuggerWnd->setData(data);
+            asyncDebuggerWnd->update();
+            while(!asyncDebuggerWnd->getState()){};
+            asyncDebuggerWnd->setState(0);
+            asyncDebuggerWnd->setRunningText("Running");
+         }
+    }
+    return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
