@@ -1,5 +1,5 @@
 #include "MusicManager.h"
-#include "../MiscFuncs.h"
+#include "../Globals.h"
 
 std::string MusicManager::chunksList[91]=
 {
