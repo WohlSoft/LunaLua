@@ -121,6 +121,7 @@
     <ClInclude Include="LuaMain\LuaProxy.h" />
     <ClInclude Include="LuaMain\LunaLuaMain.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="mciEmulator.h" />
     <ClInclude Include="Minigames.h" />
     <ClInclude Include="MiscFuncs.h" />
     <ClInclude Include="NPCs.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="LuaMain\LuaProxy.cpp" />
     <ClCompile Include="LuaMain\LunaLuaMain.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="mciEmulator.cpp" />
     <ClCompile Include="MiscFuncs.cpp" />
     <ClCompile Include="NPCs.cpp" />
     <ClCompile Include="PlayerMOB.cpp" />

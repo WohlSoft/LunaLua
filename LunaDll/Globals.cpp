@@ -6,6 +6,8 @@
 #include <time.h>
 #include "Logging.h"
 #include "UserSaving.h"
+#include <cctype>
+
 
 // Global settings
 bool gLunaEnabled;
@@ -60,6 +62,8 @@ CSpriteManager gSpriteMan;
 CellManager gCellMan;
 
 SavedVariableBank gSavedVarBank;
+
+MciEmulator gMciEmulator;
 
 startUpSettings gStartupSettings;
 
@@ -274,4 +278,11 @@ void resetDefines(){
 		}
 	}
 
+}
+
+bool is_number(const std::string& s)
+{
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
 }

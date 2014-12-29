@@ -13,6 +13,7 @@
 #include "CSpriteManager.h"
 #include "CellManager.h"
 #include "UserSaving.h"
+#include "mciEmulator.h"
 
 #pragma comment (lib, "Msimg32.lib")
 
@@ -76,6 +77,7 @@ extern CSpriteManager		gSpriteMan;
 extern Logger				gLogger;
 extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
+extern MciEmulator			gMciEmulator;
 
 /// Functions ///
 void InitGlobals();
@@ -87,3 +89,4 @@ std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
 void resetDefines();
+bool is_number(const std::string& s);
