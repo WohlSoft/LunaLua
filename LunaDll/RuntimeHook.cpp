@@ -429,7 +429,10 @@ extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_eco
 			}
 		}
 	}
-	MCIERROR ret = mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+
+	//Swap to restore old code or to use emulator
+	//MCIERROR ret = mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+	MCIERROR ret = gMciEmulator.mciEmulate(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
 	
 	if(lpstrReturnString == 0){
 		doLogOutput = false;
