@@ -205,3 +205,5 @@ bin
 +*.swp
 *.db
 *_plugin_import.cpp
+
+!/LunaDll/libs/sdl

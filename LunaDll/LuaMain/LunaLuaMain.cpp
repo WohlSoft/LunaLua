@@ -108,7 +108,6 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 
 
 
-
 		//constants
 		_G["PLAYER_SMALL"] = 1;
 		_G["PLAYER_BIG"] = 2;
@@ -161,6 +160,11 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 			def("triggerEvent", &LuaProxy::triggerEvent),
 			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
 			def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
+			def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
+			def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
+			def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
+			def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
+			def("MusicStop", (void(*)())&LuaProxy::MusicStop),
 			def("playMusic", &LuaProxy::playMusic),
 			def("loadImage", &LuaProxy::loadImage),
 			def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),

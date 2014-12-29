@@ -46,8 +46,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(ProgramFiles)\Lua\5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(ProgramFiles)\Lua\5.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(ProgramFiles)\Lua\5.1\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(ProgramFiles)\Lua\5.1\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -87,7 +87,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
@@ -132,6 +132,7 @@
     <ClInclude Include="RenderRectOp.h" />
     <ClInclude Include="RenderString.h" />
     <ClInclude Include="RuntimeHook.h" />
+    <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
     <ClInclude Include="SMBXEvents.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpriteComponent.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp" />
     <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp" />
     <ClCompile Include="SAJewers-Snowboardin.cpp" />
+    <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
     <ClCompile Include="SMBXEvent.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpriteBehaviorFuncs.cpp" />
