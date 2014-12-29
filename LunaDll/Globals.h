@@ -90,3 +90,10 @@ std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
 void resetDefines();
 bool is_number(const std::string& s);
+
+//String manupulation things
+void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
+void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
+void RemoveSubStr(std::string& sInput, const std::string& sub);
+std::vector<std::string> splitCmdArgs( std::string str);
+
