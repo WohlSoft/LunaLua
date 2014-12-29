@@ -8,6 +8,8 @@
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 
+std::string wstr2str(const std::wstring &wstr);
+
 namespace LuaProxy {
     enum L_FIELDTYPE{
         LFT_INVALID = 0,
@@ -35,6 +37,11 @@ namespace LuaProxy {
     void triggerEvent(const char* evName);
     void playSFX(int index);
     void playSFX(const char* filename);
+	void playSFXSDL(const char* filename);
+	void MusicOpen(const char *filename);
+	void MusicPlay();
+	void MusicPlayFadeIn(int ms);
+	void MusicStop();
     void playMusic(int section);
     void loadImage(const char* filename, int resNumber, int transColor);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);

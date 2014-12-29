@@ -97,6 +97,9 @@
     <Filter Include="Header Files\INIReader">
       <UniqueIdentifier>{5269dd47-723b-4f06-94a5-5ae087f667a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MusicPlayer">
+      <UniqueIdentifier>{93991f96-d10e-48c6-9e09-9c8bc9d6c451}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -230,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="libs\ini-reader\INIReader.h">
       <Filter>Header Files\INIReader</Filter>
+    </ClInclude>
+    <ClInclude Include="SdlMusic\SdlMusPlayer.h">
+      <Filter>Header Files\MusicPlayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -394,6 +400,9 @@
     </ClCompile>
     <ClCompile Include="libs\ini-reader\INIReader.cpp">
       <Filter>Header Files\INIReader</Filter>
+    </ClCompile>
+    <ClCompile Include="SdlMusic\SdlMusPlayer.cpp">
+      <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
