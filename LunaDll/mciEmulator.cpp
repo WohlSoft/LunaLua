@@ -1,4 +1,5 @@
 #include "mciEmulator.h"
+#include "SdlMusic/MusicManager.h"
 #include <vector>
 #include "Globals.h"
 
@@ -19,17 +20,21 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 	if(spCmd.size() == 2){
 		if(spCmd[0] == "pause" && spCmd[1] == "all"){
 			//Add pause code
+			MusicManager::pause();
 
 		}else if(spCmd[0] == "close"){
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
+				
 				//remove registration
 				registeredFiles.erase(it);
+				MusicManager::close();
 			}
 		}else if(spCmd[0] == "stop"){
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				//do stop code
+				MusicManager::stop(spCmd[1]);
 			}
 		}
 	}else if(spCmd.size() == 3){
@@ -37,9 +42,9 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				if(spCmd[2] == "Position"){
-
+					strcpy(lpstrReturnString, "6187");
 				}else if(spCmd[2] == "Length"){
-
+					strcpy(lpstrReturnString, "5845896");
 				}
 			}
 		}
@@ -50,10 +55,12 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			snFile.fileName = std::string(spCmd[1]);
 			snFile.volume = 400;
 			registeredFiles[spCmd[3]] = snFile;
+			/******/MusicManager::addSound(spCmd[3], snFile.fileName);/******/
 		}else if(spCmd[0] == "play" && spCmd[2] == "from"){
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				//play code
+				MusicManager::play(spCmd[1]);
 			}
 		}
 	}else if(spCmd.size() == 5){
@@ -61,6 +68,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			if(registeredFiles.find(spCmd[1])!=registeredFiles.end()){
 				if(is_number(spCmd[4])){
 					//set audio volume
+					/******/MusicManager::setVolume(atoi(spCmd[4].c_str()));/******/
 					registeredFiles[spCmd[1]].volume = atoi(spCmd[4].c_str());
 				}
 			}

@@ -23,42 +23,46 @@ int PGE_MusPlayer::sRate=44100;
 
 void PGE_MusPlayer::MUS_stopMusic()
 {
+	if(!PGE_SDL_Manager::isInit) return;
     Mix_HaltMusic();
 }
 
 void PGE_MusPlayer::MUS_playMusic()
 {
-    if(play_mus)
-    {
-        //qDebug() << QString("Play Music (SDL2_mixer)");
-        if(Mix_PlayMusic(play_mus, -1)==-1)
-        {
-			MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-            //qDebug() << QString("Mix_PlayMusic: %1").arg(Mix_GetError());
-            // well, there's no music, but most games don't break without music...
-        }
-
-        //qDebug() << QString("Music is %1").arg(Mix_PlayingMusic()==1?"Playing":"Silence");
-    }
-    else
-    {
-        MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-    }
+	if(!PGE_SDL_Manager::isInit) return;
+	if(play_mus)
+	{
+		if(Mix_PausedMusic()==0)
+		{
+			if(Mix_PlayMusic(play_mus, -1)==-1)
+			{
+				MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+			}
+		}
+		else
+			Mix_ResumeMusic();
+	}
+	else
+	{
+		MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+	}
 }
 
 void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 {
+	if(!PGE_SDL_Manager::isInit) return;
 	if(play_mus)
     {
-        //qDebug() << QString("Play Music (SDL2_mixer)");
-        if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
-        {
-			MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-            //qDebug() << QString("Mix_PlayMusic: %1").arg(Mix_GetError());
-            // well, there's no music, but most games don't break without music...
-        }
+		if(Mix_PausedMusic()==0)
+		{
+	        if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
+			{
+				MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+			}
+		}
+		else
+			Mix_ResumeMusic();
 
-        //qDebug() << QString("Music is %1").arg(Mix_PlayingMusic()==1?"Playing":"Silence");
     }
     else
     {
@@ -66,9 +70,15 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
     }
 }
 
+void PGE_MusPlayer::MUS_pauseMusic()
+{
+	if(!PGE_SDL_Manager::isInit) return;
+    Mix_PauseMusic();
+}
+
+
 void PGE_MusPlayer::MUS_changeVolume(int vlm)
 {
-    //qDebug() << QString("Volume changed %1").arg(vlm);
     volume = vlm;
     Mix_VolumeMusic(volume);
 }
@@ -105,7 +115,6 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 		MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
 				+std::string(musFile)+"\n"
 				+std::string(Mix_GetError())).c_str(), "Error", 0);
-        //qDebug() << QString("Mix_LoadMUS(\"%1\"): %2").arg(musFile).arg(Mix_GetError());
     }
 }
 
