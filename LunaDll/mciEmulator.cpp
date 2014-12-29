@@ -15,7 +15,7 @@ MciEmulator::~MciEmulator(void)
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
 	std::string cmd = lpstrCommand;
-	std::vector<std::string> spCmd = split(cmd,' ');
+	std::vector<std::string> spCmd = splitCmdArgs(cmd);
 	
 	if(spCmd.size() == 2){
 		if(spCmd[0] == "pause" && spCmd[1] == "all"){
