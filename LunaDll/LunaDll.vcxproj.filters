@@ -103,6 +103,9 @@
     <Filter Include="Header Files\Emulator">
       <UniqueIdentifier>{6fa4bca1-d668-4d26-9f2c-5a24cddda3fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\World">
+      <UniqueIdentifier>{f590b9d7-9715-4bf5-a07f-cd87d8de2a25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -242,6 +245,9 @@
     </ClInclude>
     <ClInclude Include="mciEmulator.h">
       <Filter>Header Files\Emulator</Filter>
+    </ClInclude>
+    <ClInclude Include="Overworld.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="mciEmulator.cpp">
       <Filter>Header Files\Emulator</Filter>
+    </ClCompile>
+    <ClCompile Include="Overworld.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

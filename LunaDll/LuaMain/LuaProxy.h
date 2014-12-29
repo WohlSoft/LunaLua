@@ -515,4 +515,18 @@ namespace LuaProxy {
     //more functions:
     VBStr getInput();
 
+	//For world exclusive:
+	class World
+	{
+	public:
+		World();
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+		double playerX();
+		void setPlayerX(double playerX);
+		double playerY();
+		void setPlayerY(double playerY);
+		short currentWalkingDirection();
+		void setCurrentWalkingDirection(short currentWalkingDirection);
+	};
 }

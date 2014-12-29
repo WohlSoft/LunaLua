@@ -125,6 +125,7 @@
     <ClInclude Include="Minigames.h" />
     <ClInclude Include="MiscFuncs.h" />
     <ClInclude Include="NPCs.h" />
+    <ClInclude Include="Overworld.h" />
     <ClInclude Include="PlayerMOB.h" />
     <ClInclude Include="RenderBitmapOp.h" />
     <ClInclude Include="RenderEffectOp.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="mciEmulator.cpp" />
     <ClCompile Include="MiscFuncs.cpp" />
     <ClCompile Include="NPCs.cpp" />
+    <ClCompile Include="Overworld.cpp" />
     <ClCompile Include="PlayerMOB.cpp" />
     <ClCompile Include="RenderBitmapOp.cpp" />
     <ClCompile Include="RenderEffectOp.cpp" />

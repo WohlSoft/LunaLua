@@ -13,6 +13,7 @@
 #include "../Blocks.h"
 #include "../Layer.h"
 #include "../Animation.h"
+#include "../Overworld.h"
 
 #include "../libs/ini-reader/INIReader.h"
 #include "../SdlMusic/SdlMusPlayer.h"
@@ -2680,4 +2681,72 @@ std::string LuaProxy::getSMBXPath()
 void LuaProxy::hud(bool activate)
 {
 	gSkipSMBXHUD = !activate;
+}
+
+LuaProxy::World::World()
+{}
+
+double LuaProxy::World::playerX()
+{
+	return SMBXOverworld::get()->XPos;
+}
+
+void LuaProxy::World::setPlayerX(double playerX)
+{
+	SMBXOverworld::get()->XPos = playerX;
+}
+
+double LuaProxy::World::playerY()
+{
+	return SMBXOverworld::get()->YPos;
+}
+
+void LuaProxy::World::setPlayerY(double playerY)
+{
+	SMBXOverworld::get()->YPos = playerY;
+}
+
+void LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, luabind::object value)
+{
+	int iftype = (int)ftype;
+	if(iftype >= 1 && iftype <= 5){
+		Overworld* pOverworld = ::SMBXOverworld::get();
+		void* ptr = ((&(*(byte*)pOverworld)) + offset);
+		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+	}
+}
+
+luabind::object LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, lua_State* L)
+{
+	int iftype = (int)ftype;
+	double val = 0;
+	if(iftype >= 1 && iftype <= 5){
+		Overworld* pOverworld = ::SMBXOverworld::get();
+		void* ptr = ((&(*(byte*)pOverworld)) + offset);
+		val = GetMem((int)ptr, (FIELDTYPE)ftype);
+	}
+	switch (ftype) {
+	case LFT_BYTE:
+		return luabind::object(L, (byte)val);
+	case LFT_WORD:
+		return luabind::object(L, (short)val);
+	case LFT_DWORD:
+		return luabind::object(L, (int)val);
+	case LFT_FLOAT:
+		return luabind::object(L, (float)val);
+	case LFT_DFLOAT:
+		return luabind::object(L, (double)val);
+	default:
+		return luabind::object();
+	}
+}
+
+short LuaProxy::World::currentWalkingDirection()
+{
+	return SMBXOverworld::get()->currentWalkingDirection;
+}
+
+void LuaProxy::World::setCurrentWalkingDirection(short currentWalkingDirection)
+{
+	SMBXOverworld::get()->currentWalkingDirection = currentWalkingDirection;
 }

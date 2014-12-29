@@ -667,6 +667,38 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 		osTable["setlocal"] = object();
 		osTable["tmpname"] = object();
 
+		_G["PLAYER_SMALL"] = 1;
+		_G["PLAYER_BIG"] = 2;
+		_G["PLAYER_FIREFLOWER"] = 3;
+		_G["PLAYER_LEAF"] = 4;
+		_G["PLAYER_TANOOKIE"] = 5;
+		_G["PLAYER_HAMMER"] = 6;
+		_G["PLAYER_ICE"] = 7;
+
+		_G["FIND_ANY"] = -1;
+
+		_G["DIR_RIGHT"] = 1;
+		_G["DIR_RANDOM"] = 0;
+		_G["DIR_LEFT"] = -1;
+
+		_G["FIELD_BYTE"] = 1;
+		_G["FIELD_WORD"] = 2;
+		_G["FIELD_DWORD"] = 3;
+		_G["FIELD_FLOAT"] = 4;
+		_G["FIELD_DFLOAT"] = 5;
+		_G["FIELD_STRING"] = 6;
+
+		_G["KEY_UP"] = 0;
+		_G["KEY_DOWN"] = 1;
+		_G["KEY_LEFT"] = 2;
+		_G["KEY_RIGHT"] = 3;
+		_G["KEY_JUMP"] = 4;
+		_G["KEY_SPINJUMP"] = 5;
+		_G["KEY_X"] = 6;
+		_G["KEY_RUN"] = 7;
+		_G["KEY_SEL"] = 8;
+		_G["KEY_STR"] = 9;
+
 		_G["isOverworld"] = true;
 	}
 
@@ -691,12 +723,22 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 					def("save", &LuaProxy::SaveBankProxy::save)
 			],
 
+			class_<LuaProxy::World>("World")
+			.property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
+			.property("playerY", &LuaProxy::World::playerY, &LuaProxy::World::setPlayerY)
+			.property("currentWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
+			.def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::World::mem))
+			.def("mem", static_cast<luabind::object (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::World::mem)),
+
 			class_<LuaProxy::VBStr>("VBStr")
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)
 		];
-
+	{
+		object _G = globals(L);
+		_G["world"] = new LuaProxy::World();
+	}
 	//LAPI LOAD START ==========================
 	bool errLapi = false;
 	int lapierrcode = luaL_loadbuffer(L, lapicode.c_str(), lapicode.length(), "mainV2.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
