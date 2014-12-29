@@ -7,6 +7,8 @@ Mix_Music *PGE_MusPlayer::play_mus = NULL;
 
 bool PGE_SDL_Manager::isInit=false;
 
+std::string PGE_MusPlayer::currentTrack="";
+
 void PGE_SDL_Manager::initSDL()
 {
 	if(!isInit)
@@ -32,7 +34,7 @@ void PGE_MusPlayer::MUS_playMusic()
 	if(!PGE_SDL_Manager::isInit) return;
 	if(play_mus)
 	{
-		if(Mix_PausedMusic()==0)
+		if(Mix_PlayingMusic()==0)
 		{
 			if(Mix_PlayMusic(play_mus, -1)==-1)
 			{
@@ -40,7 +42,10 @@ void PGE_MusPlayer::MUS_playMusic()
 			}
 		}
 		else
+		if(Mix_PausedMusic()==1)
+		{
 			Mix_ResumeMusic();
+		}
 	}
 	else
 	{
@@ -88,6 +93,7 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
     sRate=sampleRate;
     Mix_CloseAudio();
     Mix_OpenAudio(sRate, AUDIO_S16, 2, 4096);
+	Mix_AllocateChannels(24);
 }
 
 int PGE_MusPlayer::sampleRate()
@@ -104,6 +110,8 @@ int PGE_MusPlayer::currentVolume()
 void PGE_MusPlayer::MUS_openFile(const char *musFile)
 {
 	PGE_SDL_Manager::initSDL();
+	if(currentTrack==std::string(musFile)) return;
+
     if(play_mus!=NULL)
     {
         Mix_FreeMusic(play_mus);
@@ -116,6 +124,10 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 				+std::string(musFile)+"\n"
 				+std::string(Mix_GetError())).c_str(), "Error", 0);
     }
+	else
+	{
+		currentTrack = std::string(musFile);
+	}
 }
 
 

@@ -106,69 +106,80 @@ std::map<std::string, Mix_Chunk *> MusicManager::chunksBuffer;
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
 	PGE_SDL_Manager::initSDL();
+	
+	//clear junk
+	replaceSubStr(fileName, "\"", "");
+	replaceSubStr(fileName, "\\\\",  "\\");
+	replaceSubStr(fileName, "/",  "\\");
 
-	std::map<std::string, musicFile>::iterator it = registredFiles.find(alias);
-		if(it == registredFiles.end())
+	bool isChunk=false;
+	std::string s(fileName);
+
+	//Check is this an SMBX Sound file
+	for(int i=0;i<91;i++)
+	{
+		std::string t(chunksList[i]);
+		if(s.compare(s.length()-t.length(), t.length(), t)==0)
 		{
-			bool isChunk=false;
-			std::string s(fileName);
+			isChunk=true;
+			break;
+		}
+	}
 
-			//Check is this an SMBX Sound file
-			for(int i=0;i<91;i++)
-			{
-				std::string t(chunksList[i]);
-				if(s.compare(s.length()-t.length(), s.length(), t)==0)
-				{
-					isChunk=true;
-					break;
-				}
-			}
+	musicFile file;
+	if(isChunk)
+	{
+		file.first=Chunk;
+		//replace extension of file with ogg
+		s[s.length()-3]='o';
+		s[s.length()-2]='g';
+		s[s.length()-1]='g';
+		file.second=s;
+	}
+	else
+	{
+		file.first=Stream;
+		file.second=fileName;
+	}
+			
+	registredFiles[alias]=file;
 
-			musicFile file;
-			if(isChunk)
+	if(isChunk)
+	{//Register SDL Chunk
+		Mix_Chunk* sound = Mix_LoadWAV( file.second.c_str() );
+		if(!sound)
+		{
+			MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
+				+std::string(file.second)+"\n"
+				+std::string(Mix_GetError())).c_str(), "Error", 0);
+			// handle error
+		}
+		else
+		{
+			std::map<std::string, Mix_Chunk *>::iterator it = chunksBuffer.find(alias);
+			if(it != chunksBuffer.end())
 			{
-				file.first=Chunk;
-				//replace extension of file with ogg
-				s[s.length()-3]='o';
-				s[s.length()-2]='g';
-				s[s.length()-1]='g';
-				file.second=s;
+				chunksBuffer[alias] = sound;
 			}
 			else
 			{
-				file.first=Stream;
-				file.second=fileName;
-			}
-			
-			registredFiles[alias]=file;
-
-			if(isChunk)
-			{//Register SDL Chunk
-				Mix_Chunk* sound = Mix_LoadWAV( file.second.c_str() );
-				if(!sound)
-				{
-					MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
-						+std::string(file.second)+"\n"
-						+std::string(Mix_GetError())).c_str(), "Error", 0);
-					// handle error
-				}
-				else
-					chunksBuffer[alias] = sound;
+				Mix_FreeChunk(chunksBuffer[alias]);
+				chunksBuffer[alias] = sound;
 			}
 		}
+	}
+
 }
 
 void MusicManager::close()
 {
 	PGE_MusPlayer::MUS_stopMusic();
-	for (std::map<std::string, Mix_Chunk *>::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
-	{
-		Mix_FreeChunk(it->second);
-	}
-	chunksBuffer.clear();
-	registredFiles.clear();
-	Mix_CloseAudio();
-	SDL_Quit();
+	//for (std::map<std::string, Mix_Chunk *>::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
+	//{
+	//	Mix_FreeChunk(it->second);
+	//}
+	//chunksBuffer.clear();
+	//registredFiles.clear();
 }
 
 void MusicManager::play(std::string alias) //Chunk will be played once, stream will be played with loop
@@ -179,7 +190,6 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 			musicFile file = registredFiles[alias];
 			if(file.first==Stream)
 			{
-				PGE_MusPlayer::MUS_stopMusic();
 				PGE_MusPlayer::MUS_openFile(file.second.c_str());
 				PGE_MusPlayer::MUS_playMusic();
 			}
@@ -214,15 +224,6 @@ void MusicManager::stop(std::string alias)
 			{
 				PGE_MusPlayer::MUS_stopMusic();
 			}
-			else
-			if(file.first==Chunk)
-			{
-				std::map<std::string, Mix_Chunk *>::iterator it = chunksBuffer.find(alias);
-				if(it != chunksBuffer.end())
-				{
-					Mix_HaltChannel(-1);
-				}
-			}
 		}
 
 }
@@ -232,4 +233,17 @@ void MusicManager::setVolume(int _volume)
 	double piece = ((double)_volume/1000.0);
 	int converted = int(piece*128.0);
 	PGE_MusPlayer::MUS_changeVolume(converted);
+}
+
+
+std::string MusicManager::lenght()
+{
+	return "9999999999";
+}
+
+std::string MusicManager::position()
+{
+	std::string t="12";
+	t[0]=((char)SDL_GetTicks());
+	return t;
 }

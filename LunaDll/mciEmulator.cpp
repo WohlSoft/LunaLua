@@ -42,9 +42,9 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				if(spCmd[2] == "Position"){
-					strcpy(lpstrReturnString, "6187");
+					strcpy(lpstrReturnString, MusicManager::position().c_str());
 				}else if(spCmd[2] == "Length"){
-					strcpy(lpstrReturnString, "5845896");
+					strcpy(lpstrReturnString, MusicManager::lenght().c_str());
 				}
 			}
 		}
