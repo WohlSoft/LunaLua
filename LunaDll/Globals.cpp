@@ -107,6 +107,7 @@ void InitGlobals()
 	gStartupSettings.game = false;
 	gStartupSettings.lvlEditor = false;
 	gStartupSettings.debugger = false;
+	gStartupSettings.logger = false;
 
 	srand((int)time(NULL));
 

@@ -22,14 +22,17 @@ DEFINES += LunadllNewLauncher
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    asyncdebugger.cpp
+    asyncdebugger.cpp \
+    logger.cpp
 
 HEADERS  += mainwindow.h \
     setting.h \
-    asyncdebugger.h
+    asyncdebugger.h \
+    logger.h
 
 FORMS    += mainwindow.ui \
-    asyncdebugger.ui
+    asyncdebugger.ui \
+    logger.ui
 
 RESOURCES += \
     res.qrc

@@ -679,6 +679,14 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object)) &LuaProxy::mem),
 			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
+			namespace_("UserData")[
+					def("setValue", &LuaProxy::SaveBankProxy::setValue),
+					def("getValue", &LuaProxy::SaveBankProxy::getValue),
+					def("isValueSet", &LuaProxy::SaveBankProxy::isValueSet),
+					def("values", &LuaProxy::SaveBankProxy::values),
+					def("save", &LuaProxy::SaveBankProxy::save)
+			],
+
 			class_<LuaProxy::VBStr>("VBStr")
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)

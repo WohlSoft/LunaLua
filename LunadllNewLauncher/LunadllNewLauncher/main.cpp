@@ -9,11 +9,17 @@
 #include <thread>
 
 #include "asyncdebugger.h"
+#include "logger.h"
+
 
 resultStruct* Settings = 0;
 AsyncDebugger* asyncDebuggerWnd = 0;
 QApplication* asyncApp = 0;
 std::thread* thr = 0;
+
+QApplication* asyncLoggerApp = 0;
+Logger* asyncLoggerWnd = 0;
+std::thread* asyncLoggerThread = 0;
 
 extern "C" Q_DECL_EXPORT bool run()
 {
@@ -59,8 +65,6 @@ void initAndRunAsyncDebugger(){
 
     QApplication::addLibraryPath( QFileInfo( pathBuf ).dir().path() );
 
-    Settings = new resultStruct;
-
     char* myBuffer = pathBuf;
 
     int n = 1;
@@ -102,4 +106,39 @@ extern "C" Q_DECL_EXPORT __stdcall WINBOOL asyncBitBlt(HDC hdcDest, int nXDest, 
          }
     }
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+void asyncLogger(){
+    char pathBuf[500];
+    HMODULE hModule = GetModuleHandleA(NULL);
+    if(!hModule)
+        return;
+
+    if(!GetModuleFileNameA(hModule, pathBuf, sizeof(pathBuf)))
+        return;
+
+    QApplication::addLibraryPath( QFileInfo( pathBuf ).dir().path() );
+
+    char* myBuffer = pathBuf;
+
+    int n = 1;
+    QApplication a(n, &myBuffer);
+    asyncLoggerWnd = new Logger();
+    asyncLoggerWnd->show();
+    a.exec();
+    a.quit();
+    delete asyncLoggerWnd;
+    asyncLoggerWnd = 0;
+    return;
+}
+
+extern "C" Q_DECL_EXPORT void runAsyncLogger(){
+    asyncLoggerThread = new std::thread(&asyncLogger);
+    asyncLoggerThread->detach();
+}
+
+extern "C" Q_DECL_EXPORT void asyncLog(const char* text){
+    if(asyncLoggerWnd){
+        asyncLoggerWnd->log(text);
+    }
 }

@@ -160,6 +160,9 @@ void ParseArgs(const std::vector<std::string>& args)
 
 	if(vecStrFind(args, std::string("--debugger")))
 		gStartupSettings.debugger = true;
+
+	if(vecStrFind(args, std::string("--logger")))
+		gStartupSettings.logger = true;
 }
 
 
@@ -174,7 +177,7 @@ void TrySkipPatch()
 		PATCH_FUNC(0x8BED00, &InitHook);
 
 		//PATCH_FUNC(0x933443, &prTest);
-		
+		*(void**)0xB2F244 = (void*)&mciSendStringHookA;
 		//8C11D5
 	}
 	PATCH_FUNC(0x8D6BB6, &forceTermination);
@@ -200,7 +203,7 @@ extern void InitHook()
 		}
 		RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
 		if(!hRunProc){
-			std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 			errMsg += std::to_string((long long)GetLastError());
 			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
 			FreeLibrary(newLauncherLib);
@@ -209,7 +212,7 @@ extern void InitHook()
 		}
 		GetPromptResultProc hPrompt = (GetPromptResultProc)GetProcAddress(newLauncherLib, "GetPromptResult");
 		if(!hRunProc){
-			std::string errMsg = "Failed to load 'GetPromptResult' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			std::string errMsg = "Failed to load 'GetPromptResult' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 			errMsg += std::to_string((long long)GetLastError());
 			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
 			FreeLibrary(newLauncherLib);
@@ -218,7 +221,7 @@ extern void InitHook()
 		}
 		FreeVarsProc hFreeVarsProc = (FreeVarsProc)GetProcAddress(newLauncherLib, "FreeVars");
 		if(!hRunProc){
-			std::string errMsg = "Failed to load 'FreeVars' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			std::string errMsg = "Failed to load 'FreeVars' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 			errMsg += std::to_string((long long)GetLastError());
 			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
 			FreeLibrary(newLauncherLib);
@@ -239,7 +242,6 @@ extern void InitHook()
 			}
 			GM_NOSOUND = COMBOOL(settings.NoSound);
 			GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);
-			return;
 		}
 
 		GM_ISLEVELEDITORMODE = 0; //set run to false
@@ -263,7 +265,7 @@ extern void InitHook()
 		runAsyncDebuggerProc = (void(*)(void))GetProcAddress(newDebugger, "runAsyncDebugger");
 		asyncBitBltProc = (int (*)(HDC, int, int, int, int, HDC, int, int, unsigned int))GetProcAddress(newDebugger, "asyncBitBlt@36");
 		if(!runAsyncDebuggerProc){
-			std::string errMsg = "Failed to load 'runAsyncDebugger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			std::string errMsg = "Failed to load 'runAsyncDebugger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 			errMsg += std::to_string((long long)GetLastError());
 			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
 			FreeLibrary(newDebugger);
@@ -271,7 +273,7 @@ extern void InitHook()
 			return;
 		}
 		if(!asyncBitBltProc){
-			std::string errMsg = "Failed to load 'asyncBitBlt' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll diffrent versions?\nError code:";
+			std::string errMsg = "Failed to load 'asyncBitBlt' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 			errMsg += std::to_string((long long)GetLastError());
 			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
 			FreeLibrary(newDebugger);
@@ -283,7 +285,30 @@ extern void InitHook()
 		*(void**)0xB2F1D8 = (void*)asyncBitBltProc;
 		runAsyncDebuggerProc();
 	}
-	
+	if(gStartupSettings.logger){
+		if(!newDebugger)
+			newDebugger = LoadLibraryA("LunadllNewLauncher.dll");
+
+		runAsyncLoggerProc = (void(*)(void))GetProcAddress(newDebugger, "runAsyncLogger");
+		asyncLogProc = (void(*)(const char*))GetProcAddress(newDebugger, "asyncLog");
+		if(!runAsyncLoggerProc){
+			std::string errMsg = "Failed to load 'runAsyncLogger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newDebugger);
+			newDebugger = NULL;
+			return;
+		}
+		if(!asyncLogProc){
+			std::string errMsg = "Failed to load 'asyncLog' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
+			errMsg += std::to_string((long long)GetLastError());
+			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+			FreeLibrary(newDebugger);
+			newDebugger = NULL;
+			return;
+		}
+		runAsyncLoggerProc();
+	}
 	
 	/*void (*exitCall)(void);
 	exitCall = (void(*)(void))0x8D6BB0;
@@ -360,7 +385,9 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 {
 	Render::Print(std::wstring(L"LUNALUA V0.5 BETA"), 3, 5, 5);
 	if(newDebugger){
-		return asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+		if(asyncBitBltProc){
+			return asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+		}
 	}
 	return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
@@ -374,6 +401,54 @@ extern void* renderTest()
 	gLunaRender.RenderAll();
 
 	return (void*)0xB25010;
+}
+
+extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
+{
+	bool doLogInput = true;
+	bool doLogOutput = true;
+
+	if(lpstrCommand == 0){
+		doLogInput = false;
+	}else{
+		if(lpstrCommand[0] == 0){
+			doLogInput = false;
+		}
+	}
+
+	std::string inputStr = "";
+	std::string outputStr = "";
+
+	if(doLogInput){
+		inputStr += "Input: ";
+		inputStr += lpstrCommand;
+
+		if(newDebugger){
+			if(asyncLogProc){
+				asyncLogProc(inputStr.c_str());
+			}
+		}
+	}
+	MCIERROR ret = mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+	
+	if(lpstrReturnString == 0){
+		doLogOutput = false;
+	}else{
+		if(lpstrReturnString[0] == 0){
+			doLogOutput = false;
+		}
+	}
+	if(doLogOutput){
+		outputStr += "Output: ";
+		outputStr += lpstrReturnString;
+
+		if(newDebugger){
+			if(asyncLogProc){
+				asyncLogProc(outputStr.c_str());
+			}
+		}
+	}
+	return ret;
 }
 
 

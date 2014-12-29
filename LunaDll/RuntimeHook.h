@@ -35,6 +35,7 @@ extern void* renderTest();
 extern void prTest(wchar_t** tarString, int* type, float* x, float* y);
 extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
+extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);
 
 
 //DBG
@@ -49,6 +50,8 @@ extern HMODULE newDebugger = 0;
 //DBG Procs
 void (*runAsyncDebuggerProc)(void);
 int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
+void (*runAsyncLoggerProc)(void);
+void (*asyncLogProc)(const char*);
 
 struct resultStruct{
 	int result;

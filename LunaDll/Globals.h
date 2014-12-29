@@ -23,6 +23,7 @@ struct startUpSettings{
 	bool frameskip;
 	bool noSound;
 	bool debugger;
+	bool logger;
 };
 
 /// Global settings
