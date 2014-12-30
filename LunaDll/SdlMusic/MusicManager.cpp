@@ -98,12 +98,107 @@ std::string MusicManager::chunksList[91]=
 	"sound\\bubble.mp3"
 };
 
+int MusicManager::chunksChannelsList[91] =
+{
+	27,//"sound\\player-jump.mp3",
+	-1,//"sound\\stomped.mp3",
+	-1,//"sound\\block-hit.mp3",
+	-1,//"sound\\block-smash.mp3",
+	-1,//"sound\\player-shrink.mp3",
+	-1,//"sound\\player-grow.mp3",
+	-1,//"sound\\mushroom.mp3",
+	-1,//"sound\\player-died.mp3",
+	26,//"sound\\shell-hit.mp3",
+	25,//"sound\\player-slide.mp3",
+	-1,//"sound\\item-dropped.mp3",
+	-1,//"sound\\has-item.mp3",
+	-1,//"sound\\camera-change.mp3",
+	-1,//"sound\\coin.mp3",
+	-1,//"sound\\1up.mp3",
+	-1,//"sound\\lava.mp3",
+	-1,//"sound\\warp.mp3",
+	-1,//"sound\\fireball.mp3",
+	-1,//"sound\\level-win.mp3",
+	-1,//"sound\\boss-beat.mp3",
+	-1,//"sound\\dungeon-win.mp3",
+	-1,//"sound\\bullet-bill.mp3",
+	-1,//"sound\\grab.mp3",
+	-1,//"sound\\spring.mp3",
+	-1,//"sound\\hammer.mp3",
+	30,//"sound\\slide.mp3",
+	-1,//"sound\\newpath.mp3",
+	-1,//"sound\\level-select.mp3",
+	-1,//"sound\\do.mp3",
+	-1,//"sound\\pause.mp3",
+	-1,//"sound\\key.mp3",
+	23,//"sound\\pswitch.mp3",
+	-1,//"sound\\tail.mp3",
+	-1,//"sound\\racoon.mp3",
+	-1,//"sound\\boot.mp3",
+	22,//"sound\\smash.mp3",
+	-1,//"sound\\thwomp.mp3",
+	-1,//"sound\\birdo-spit.mp3",
+	-1,//"sound\\birdo-hit.mp3",
+	-1,//"sound\\smb2-exit.mp3",
+	-1,//"sound\\birdo-beat.mp3",
+	-1,//"sound\\npc-fireball.mp3",
+	-1,//"sound\\fireworks.mp3",
+	-1,//"sound\\bowser-killed.mp3",
+	-1,//"sound\\game-beat.mp3",
+	-1,//"sound\\door.mp3",
+	-1,//"sound\\message.mp3",
+	-1,//"sound\\yoshi.mp3",
+	-1,//"sound\\yoshi-hurt.mp3",
+	31,//"sound\\yoshi-tongue.mp3",
+	-1,//"sound\\yoshi-egg.mp3",
+	-1,//"sound\\got-star.mp3",
+	-1,//"sound\\zelda-kill.mp3",
+	-1,//"sound\\player-died2.mp3",
+	-1,//"sound\\yoshi-swallow.mp3",
+	-1,//"sound\\ring.mp3",
+	-1,//"sound\\dry-bones.mp3",
+	-1,//"sound\\smw-checkpoint.mp3",
+	-1,//"sound\\dragon-coin.mp3",
+	-1,//"sound\\smw-exit.mp3",
+	-1,//"sound\\smw-blaarg.mp3",
+	-1,//"sound\\wart-bubble.mp3",
+	-1,//"sound\\wart-die.mp3",
+	-1,//"sound\\sm-block-hit.mp3",
+	-1,//"sound\\sm-killed.mp3",
+	-1,//"sound\\sm-hurt.mp3",
+	-1,//"sound\\sm-glass.mp3",
+	-1,//"sound\\sm-boss-hit.mp3",
+	-1,//"sound\\sm-cry.mp3",
+	-1,//"sound\\sm-explosion.mp3",
+	29,//"sound\\climbing.mp3",
+	28,//"sound\\swim.mp3",
+	-1,//"sound\\grab2.mp3",
+	-1,//"sound\\smw-saw.mp3",
+	-1,//"sound\\smb2-throw.mp3",
+	-1,//"sound\\smb2-hit.mp3",
+	-1,//"sound\\zelda-stab.mp3",
+	-1,//"sound\\zelda-hurt.mp3",
+	-1,//"sound\\zelda-heart.mp3",
+	-1,//"sound\\zelda-died.mp3",
+	-1,//"sound\\zelda-rupee.mp3",
+	-1,//"sound\\zelda-fire.mp3",
+	-1,//"sound\\zelda-item.mp3",
+	-1,//"sound\\zelda-key.mp3",
+	-1,//"sound\\zelda-shield.mp3",
+	-1,//"sound\\zelda-dash.mp3",
+	-1,//"sound\\zelda-fairy.mp3",
+	-1,//"sound\\zelda-grass.mp3",
+	-1,//"sound\\zelda-hit.mp3",
+	-1,//"sound\\zelda-sword-beam.mp3",
+	-1,//"sound\\bubble.mp3"
+};
+
 /*
 typedef std::pair<int, std::string> musicFile;
 */
 
-std::map<std::string, musicFile> MusicManager::registredFiles;
-std::map<std::string, Mix_Chunk *> MusicManager::chunksBuffer;
+std::map<std::string, musicFile > MusicManager::registredFiles;
+std::map<std::string, chunkFile > MusicManager::chunksBuffer;
 
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
@@ -117,6 +212,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 	bool isChunk=false;
 	std::string s(fileName);
 
+	int chanID=0;
 	//Check is this an SMBX Sound file
 	for(int i=0;i<91;i++)
 	{
@@ -125,6 +221,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 		if(s.compare(s.length()-t.length(), t.length(), t)==0)
 		{
 			isChunk=true;
+			chanID=i;
 			break;
 		}
 	}
@@ -159,15 +256,19 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 		}
 		else
 		{
-			std::map<std::string, Mix_Chunk *>::iterator it = chunksBuffer.find(alias);
+			std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 			if(it != chunksBuffer.end())
 			{
-				chunksBuffer[alias] = sound;
+				chunkFile file;
+				file.first  = chunksChannelsList[chanID];//ID of reserved channel for this sample
+				file.second = sound;//Pointer to sample
+				chunksBuffer[alias] = file;
 			}
 			else
 			{
-				Mix_FreeChunk(chunksBuffer[alias]);
-				chunksBuffer[alias] = sound;
+				Mix_FreeChunk(chunksBuffer[alias].second);
+				chunksBuffer[alias].first  = chunksChannelsList[chanID];
+				chunksBuffer[alias].second = sound;
 			}
 		}
 	}
@@ -199,10 +300,10 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 			else
 			if(file.first==Chunk)
 			{
-				std::map<std::string, Mix_Chunk *>::iterator it = chunksBuffer.find(alias);
+				std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 				if(it != chunksBuffer.end())
 				{
-					if(Mix_PlayChannel( -1, chunksBuffer[alias], 0 )==-1)
+					if(Mix_PlayChannel( chunksBuffer[alias].first, chunksBuffer[alias].second, 0 )==-1)
 					{
 						MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
 					}
