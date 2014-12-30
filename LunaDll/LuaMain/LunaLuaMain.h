@@ -6,6 +6,7 @@
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
+#include <luabind/operator.hpp>
 
 namespace LunaLua{
     struct lapiData{

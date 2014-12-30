@@ -423,6 +423,7 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)
+			.def(tostring(self))
 		];
 	{
 		object _G = globals(L);
@@ -699,6 +700,11 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 		_G["KEY_SEL"] = 8;
 		_G["KEY_STR"] = 9;
 
+		_G["ODIR_UP"] = 1;
+		_G["ODIR_LEFT"] = 2;
+		_G["ODIR_DOWN"] = 3;
+		_G["ODIR_RIGHT"] = 4;
+
 		_G["isOverworld"] = true;
 	}
 
@@ -726,7 +732,13 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			class_<LuaProxy::World>("World")
 			.property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
 			.property("playerY", &LuaProxy::World::playerY, &LuaProxy::World::setPlayerY)
-			.property("currentWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
+			.property("playerWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
+			.property("playerWalkingTimer", &LuaProxy::World::currentWalkingTimer, &LuaProxy::World::setCurrentWalkingTimer)
+			.property("playerWalkingFrame", &LuaProxy::World::currentWalkingFrame, &LuaProxy::World::setCurrentWalkingFrame)	
+			.property("playerWalkingFrameTimer", &LuaProxy::World::currentWalkingFrameTimer, &LuaProxy::World::setCurrentWalkingFrameTimer)
+			.property("playerIsCurrentWalking", &LuaProxy::World::playerIsCurrentWalking)
+			.property("levelTitle", &LuaProxy::World::levelTitle)
+			.property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
 			.def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::World::mem))
 			.def("mem", static_cast<luabind::object (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::World::mem)),
 
@@ -734,6 +746,7 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)
+			.def(tostring(self))
 		];
 	{
 		object _G = globals(L);

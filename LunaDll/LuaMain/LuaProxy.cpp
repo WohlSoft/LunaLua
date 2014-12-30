@@ -2349,7 +2349,7 @@ LuaProxy::VBStr::VBStr(wchar_t *ptr)
     m_wcharptr = ptr;
 }
 
-std::string LuaProxy::VBStr::str()
+std::string LuaProxy::VBStr::str() const
 {
     return utf8_encode(std::wstring(m_wcharptr));
 }
@@ -2381,7 +2381,6 @@ void LuaProxy::VBStr::clear()
     *(((short*)m_wcharptr) - 2) = (int)0;
     *(short*)m_wcharptr = (short)0;
 }
-
 
 LuaProxy::Layer::Layer(int layerIndex)
 {
@@ -2759,4 +2758,62 @@ short LuaProxy::World::currentWalkingDirection()
 void LuaProxy::World::setCurrentWalkingDirection(short currentWalkingDirection)
 {
 	SMBXOverworld::get()->currentWalkingDirection = currentWalkingDirection;
+}
+
+short LuaProxy::World::currentWalkingFrame()
+{
+	return SMBXOverworld::get()->currentWalkingFrame;
+}
+
+void LuaProxy::World::setCurrentWalkingFrame(short currentWalkingFrame)
+{
+	SMBXOverworld::get()->currentWalkingFrame = currentWalkingFrame;
+}
+
+short LuaProxy::World::currentWalkingFrameTimer()
+{
+	return SMBXOverworld::get()->currentWalkingFrameTimer;
+}
+
+void LuaProxy::World::setCurrentWalkingFrameTimer(short currentWalkingFrameTimer)
+{
+	SMBXOverworld::get()->currentWalkingFrameTimer = currentWalkingFrameTimer;
+}
+
+short LuaProxy::World::currentWalkingTimer()
+{
+	return SMBXOverworld::get()->currentWalkingTimer;
+}
+
+void LuaProxy::World::setCurrentWalkingTimer(short currentWalkingTimer)
+{
+	SMBXOverworld::get()->currentWalkingTimer = currentWalkingTimer;
+}
+
+bool LuaProxy::World::playerIsCurrentWalking()
+{
+	return (SMBXOverworld::get()->currentWalkingDirection || SMBXOverworld::get()->isCurrentlyWalking ? true : false);
+}
+
+luabind::object LuaProxy::World::levelTitle(lua_State* L)
+{
+	if(SMBXOverworld::get()->currentLevelTitle[0] && SMBXOverworld::get()->currentLevelTitle != (wchar_t*)0x423D00){
+		return luabind::object(L, new VBStr(SMBXOverworld::get()->currentLevelTitle));
+	}
+	return luabind::object();
+}
+
+short LuaProxy::World::getCurrentDirection()
+{
+	short val = SMBXOverworld::get()->currentWalkingFrame;
+	if(val == 0 || val == 1)
+		return 3;
+	if(val == 2 || val == 3)
+		return 4;
+	if(val == 4 || val == 5)
+		return 2;
+	if(val == 6 || val == 7)
+		return 1;
+
+	return 0;
 }

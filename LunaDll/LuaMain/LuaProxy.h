@@ -116,14 +116,22 @@ namespace LuaProxy {
     class VBStr{
     public:
         VBStr (wchar_t* ptr);
-        std::string str();
+        std::string str() const;
         void setStr(std::string str);
         int length();
         void setLength(int len);
         void clear();
+
+		friend std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
+
     private:
         wchar_t* m_wcharptr;
     };
+
+	std::ostream& operator<<(std::ostream& os, const VBStr& wStr){
+		os << wStr.str();
+		return os;
+	}
 
     class Animation{
     public:
@@ -528,5 +536,14 @@ namespace LuaProxy {
 		void setPlayerY(double playerY);
 		short currentWalkingDirection();
 		void setCurrentWalkingDirection(short currentWalkingDirection);
+		short currentWalkingFrame();
+		void setCurrentWalkingFrame(short currentWalkingFrame);
+		short currentWalkingFrameTimer();
+		void setCurrentWalkingFrameTimer(short currentWalkingFrameTimer);
+		short currentWalkingTimer();
+		void setCurrentWalkingTimer(short currentWalkingTimer);
+		bool playerIsCurrentWalking();
+		luabind::object levelTitle(lua_State* L);
+		short getCurrentDirection();
 	};
 }
