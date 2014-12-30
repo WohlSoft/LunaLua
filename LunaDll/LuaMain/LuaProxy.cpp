@@ -688,37 +688,47 @@ void LuaProxy::playSFX(const char *filename)
 
 void LuaProxy::playSFXSDL(const char* filename)
 {
-    wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-    wstring full_path = world_dir.append(Level::GetName());
-    full_path = removeExtension(full_path);
-    full_path = full_path.append(L"\\"); // < path into level folder
-    string full_paths = wstr2str(full_path) + filename;
+#ifndef NO_SDL
+	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+	wstring full_path = world_dir.append(Level::GetName());
+	full_path = removeExtension(full_path);
+	full_path = full_path.append(L"\\"); // < path into level folder
+	string full_paths = wstr2str(full_path) + filename;
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
+#endif
 }
 
 void LuaProxy::MusicOpen(const char *filename)
 {
-    wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-    wstring full_path = world_dir.append(Level::GetName());
-    full_path = removeExtension(full_path);
-    full_path = full_path.append(L"\\"); // < path into level folder
-    string full_paths = wstr2str(full_path) + filename;
+#ifndef NO_SDL
+	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+	wstring full_path = world_dir.append(Level::GetName());
+	full_path = removeExtension(full_path);
+	full_path = full_path.append(L"\\"); // < path into level folder
+	string full_paths = wstr2str(full_path) + filename;
 	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
+#endif
 }
 
 void LuaProxy::MusicPlay()
 {
+#ifndef NO_SDL
 	PGE_MusPlayer::MUS_playMusic();
+#endif
 }
 
 void LuaProxy::MusicPlayFadeIn(int ms)
 {
+#ifndef NO_SDL
 	PGE_MusPlayer::MUS_playMusicFadeIn(ms);
+#endif
 }
 
 void LuaProxy::MusicStop()
 {
+#ifndef NO_SDL
 	PGE_MusPlayer::MUS_playMusic();
+#endif
 }
 
 void LuaProxy::SaveBankProxy::setValue(const char *key, double value)

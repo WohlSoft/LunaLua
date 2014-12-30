@@ -1,3 +1,4 @@
+#ifndef NO_SDL
 
 #ifndef MusicManager_HHHH
 #define MusicManager_HHHH
@@ -31,4 +32,7 @@ class MusicManager
 		static std::map<std::string, Mix_Chunk *> chunksBuffer;
 		static std::string chunksList[91];
 };
+#endif
+
+
 #endif

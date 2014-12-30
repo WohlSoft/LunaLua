@@ -1,3 +1,6 @@
+#ifndef NO_SDL
+
+
 #include <windows.h>
 #include <string>
 #include "SdlMusPlayer.h"
@@ -161,3 +164,4 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 
 }
 
+#endif

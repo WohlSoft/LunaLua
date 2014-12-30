@@ -1,3 +1,6 @@
+#ifndef NO_SDL
+
+
 #ifndef SDL_MUS_PLAYER
 #define SDL_MUS_PLAYER
 
@@ -46,5 +49,7 @@ private:
     static Mix_Chunk *sound;
     static char *current;
 };
+
+#endif
 
 #endif

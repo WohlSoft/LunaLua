@@ -1,3 +1,5 @@
+#ifndef NO_SDL
+
 #include "MusicManager.h"
 #include "../Globals.h"
 
@@ -247,3 +249,5 @@ std::string MusicManager::position()
 	t[0]=((char)SDL_GetTicks());
 	return t;
 }
+
+#endif

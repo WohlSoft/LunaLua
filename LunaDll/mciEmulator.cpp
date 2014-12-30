@@ -14,6 +14,8 @@ MciEmulator::~MciEmulator(void)
 
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
+#ifndef NO_SDL
+
 	std::string cmd = lpstrCommand;
 	std::vector<std::string> spCmd = splitCmdArgs(cmd);
 	
@@ -84,4 +86,7 @@ errorFinalize:;
 	lpstrReturnString[0] = '0';
 	lpstrReturnString[1] = '\0';
 	return 0;
+#else
+	return mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
+#endif
 }
