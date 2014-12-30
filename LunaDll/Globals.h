@@ -25,6 +25,7 @@ struct startUpSettings{
 	bool noSound;
 	bool debugger;
 	bool logger;
+	bool newLauncher;
 };
 
 /// Global settings

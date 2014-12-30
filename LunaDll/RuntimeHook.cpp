@@ -163,6 +163,9 @@ void ParseArgs(const std::vector<std::string>& args)
 
 	if(vecStrFind(args, std::string("--logger")))
 		gStartupSettings.logger = true;
+
+	if(vecStrFind(args, std::string("--newlauncher")))
+		gStartupSettings.newLauncher = true;
 }
 
 
@@ -175,11 +178,8 @@ void TrySkipPatch()
 		*(WORD*)(0xB25046) = -1; //set run to true
 		
 		PATCH_FUNC(0x8BED00, &InitHook);
-
-		//PATCH_FUNC(0x933443, &prTest);
-		*(void**)0xB2F244 = (void*)&mciSendStringHookA;
-		//8C11D5
 	}
+	*(void**)0xB2F244 = (void*)&mciSendStringHookA;
 	PATCH_FUNC(0x8D6BB6, &forceTermination);
 	PATCH_FUNC(0x8C11D5, &LoadWorld);
 	PATCH_FUNC(0x8C16F7, &WorldLoop);
@@ -190,7 +190,7 @@ void TrySkipPatch()
 extern void InitHook()
 {
 	
-	if(!gStartupSettings.game&&!gStartupSettings.lvlEditor){
+	if(gStartupSettings.newLauncher){
 		typedef bool (*RunProc)(void);
 		typedef void (*GetPromptResultProc)(void*);
 		typedef void (*FreeVarsProc)(void);

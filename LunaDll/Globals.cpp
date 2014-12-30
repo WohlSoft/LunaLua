@@ -112,6 +112,7 @@ void InitGlobals()
 	gStartupSettings.lvlEditor = false;
 	gStartupSettings.debugger = false;
 	gStartupSettings.logger = false;
+	gStartupSettings.newLauncher = false;
 
 	srand((int)time(NULL));
 
