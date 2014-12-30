@@ -10,6 +10,7 @@
 #include "SdlMusPlayer.h"
 
 typedef std::pair<int, std::string> musicFile;
+typedef std::pair<int, Mix_Chunk* > chunkFile;
 
 class MusicManager
 {
@@ -28,9 +29,10 @@ class MusicManager
 		static std::string position();
 	
 	private:
-		static std::map<std::string, musicFile> registredFiles;
-		static std::map<std::string, Mix_Chunk *> chunksBuffer;
+		static std::map<std::string, musicFile > registredFiles;
+		static std::map<std::string, chunkFile > chunksBuffer;
 		static std::string chunksList[91];
+		static int chunksChannelsList[91];
 };
 #endif
 
