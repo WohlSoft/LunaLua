@@ -54,7 +54,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			else
 			{
 				if(spCmd[2] == "Position"){
-					strcpy(lpstrReturnString, "00:00:12:45");
+					strcpy(lpstrReturnString, "00:04:12:45");
 				}else if(spCmd[2] == "Length"){
 					strcpy(lpstrReturnString, "52:12:11:12");
 				}

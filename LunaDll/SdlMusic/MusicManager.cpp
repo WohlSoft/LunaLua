@@ -2,6 +2,7 @@
 
 #include "MusicManager.h"
 #include "../Globals.h"
+#include <math.h>
 
 std::string MusicManager::chunksList[91]=
 {
@@ -345,7 +346,7 @@ void MusicManager::stop(std::string alias)
 void MusicManager::setVolume(int _volume)
 {
 	double piece = ((double)_volume/1000.0);
-	int converted = int(piece*128.0);
+	int converted = (int)floor((piece*128.0)+0.5);
 	PGE_MusPlayer::MUS_changeVolume(converted);
 }
 
@@ -357,7 +358,7 @@ std::string MusicManager::lenght()
 
 std::string MusicManager::position()
 {
-	std::string t="00:00:12:45";
+	std::string t="00:04:12:45";
 	return t;
 }
 
