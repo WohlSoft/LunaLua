@@ -6,7 +6,6 @@
 Mix_Music *PGE_MusPlayer::play_mus = NULL;
 
 bool PGE_SDL_Manager::isInit=false;
-
 std::string PGE_MusPlayer::currentTrack="";
 
 void PGE_SDL_Manager::initSDL()
@@ -22,6 +21,8 @@ void PGE_SDL_Manager::initSDL()
 
 int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
+bool PGE_MusPlayer::showMsg=true;
+std::string PGE_MusPlayer::showMsg_for="";
 
 void PGE_MusPlayer::MUS_stopMusic()
 {
@@ -119,14 +120,23 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
     }
 
     play_mus = Mix_LoadMUS( musFile );
-    if(!play_mus) {
-		MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
-				+std::string(musFile)+"\n"
-				+std::string(Mix_GetError())).c_str(), "Error", 0);
+    if(!play_mus)
+	{
+		if(showMsg_for!=musFile)
+			showMsg=true;
+		if(showMsg)
+		{
+			MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
+			+std::string(musFile)+"\n"
+			+std::string(Mix_GetError())).c_str(), "Error", 0);
+			showMsg_for = std::string(musFile);
+			showMsg=false;
+		}
     }
 	else
 	{
 		currentTrack = std::string(musFile);
+		showMsg=true;
 	}
 }
 
@@ -147,8 +157,8 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 		sound = Mix_LoadWAV( sndFile );
         if(!sound) {
 			MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
-				+std::string(sndFile)+"\n"
-				+std::string(Mix_GetError())).c_str(), "Error", 0);
+			+std::string(sndFile)+"\n"
+			+std::string(Mix_GetError())).c_str(), "Error", 0);
             // handle error
         }
     }
