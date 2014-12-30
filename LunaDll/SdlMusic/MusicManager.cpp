@@ -100,7 +100,7 @@ std::string MusicManager::chunksList[91]=
 
 int MusicManager::chunksChannelsList[91] =
 {
-	27,//"sound\\player-jump.mp3",
+	31,//"sound\\player-jump.mp3",
 	-1,//"sound\\stomped.mp3",
 	-1,//"sound\\block-hit.mp3",
 	-1,//"sound\\block-smash.mp3",
@@ -108,8 +108,8 @@ int MusicManager::chunksChannelsList[91] =
 	-1,//"sound\\player-grow.mp3",
 	-1,//"sound\\mushroom.mp3",
 	-1,//"sound\\player-died.mp3",
-	26,//"sound\\shell-hit.mp3",
-	25,//"sound\\player-slide.mp3",
+	30,//"sound\\shell-hit.mp3",
+	29,//"sound\\player-slide.mp3",
 	-1,//"sound\\item-dropped.mp3",
 	-1,//"sound\\has-item.mp3",
 	-1,//"sound\\camera-change.mp3",
@@ -125,17 +125,17 @@ int MusicManager::chunksChannelsList[91] =
 	-1,//"sound\\grab.mp3",
 	-1,//"sound\\spring.mp3",
 	-1,//"sound\\hammer.mp3",
-	30,//"sound\\slide.mp3",
+	28,//"sound\\slide.mp3",
 	-1,//"sound\\newpath.mp3",
 	-1,//"sound\\level-select.mp3",
 	-1,//"sound\\do.mp3",
 	-1,//"sound\\pause.mp3",
 	-1,//"sound\\key.mp3",
-	23,//"sound\\pswitch.mp3",
+	27,//"sound\\pswitch.mp3",
 	-1,//"sound\\tail.mp3",
 	-1,//"sound\\racoon.mp3",
 	-1,//"sound\\boot.mp3",
-	22,//"sound\\smash.mp3",
+	26,//"sound\\smash.mp3",
 	-1,//"sound\\thwomp.mp3",
 	-1,//"sound\\birdo-spit.mp3",
 	-1,//"sound\\birdo-hit.mp3",
@@ -149,7 +149,7 @@ int MusicManager::chunksChannelsList[91] =
 	-1,//"sound\\message.mp3",
 	-1,//"sound\\yoshi.mp3",
 	-1,//"sound\\yoshi-hurt.mp3",
-	31,//"sound\\yoshi-tongue.mp3",
+	25,//"sound\\yoshi-tongue.mp3",
 	-1,//"sound\\yoshi-egg.mp3",
 	-1,//"sound\\got-star.mp3",
 	-1,//"sound\\zelda-kill.mp3",
@@ -170,8 +170,8 @@ int MusicManager::chunksChannelsList[91] =
 	-1,//"sound\\sm-boss-hit.mp3",
 	-1,//"sound\\sm-cry.mp3",
 	-1,//"sound\\sm-explosion.mp3",
-	29,//"sound\\climbing.mp3",
-	28,//"sound\\swim.mp3",
+	24,//"sound\\climbing.mp3",
+	23,//"sound\\swim.mp3",
 	-1,//"sound\\grab2.mp3",
 	-1,//"sound\\smw-saw.mp3",
 	-1,//"sound\\smb2-throw.mp3",
@@ -327,6 +327,16 @@ void MusicManager::stop(std::string alias)
 			if(file.first==Stream)
 			{
 				PGE_MusPlayer::MUS_stopMusic();
+			}
+			else
+			if(file.first==Chunk)
+			{
+				std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
+				if(it != chunksBuffer.end())
+				{
+					if(chunksBuffer[alias].first>=0)
+						Mix_HaltChannel(chunksBuffer[alias].first);
+				}
 			}
 		}
 
