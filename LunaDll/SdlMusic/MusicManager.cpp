@@ -119,6 +119,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 	for(int i=0;i<91;i++)
 	{
 		std::string t(chunksList[i]);
+		if(s.length()<t.length()) continue;
 		if(s.compare(s.length()-t.length(), t.length(), t)==0)
 		{
 			isChunk=true;
