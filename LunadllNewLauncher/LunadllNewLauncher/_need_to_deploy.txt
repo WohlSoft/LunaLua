@@ -17,6 +17,7 @@ Qt5Qml.dll
 Qt5Quick.dll
 Qt5Sensors.dll
 Qt5Sql.dll
+Qt5WebChannel.dll (Qt 5.4)
 Qt5WebKit.dll
 Qt5WebKitWidgets.dll
 Qt5Widgets.dll
