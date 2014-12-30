@@ -1,6 +1,9 @@
 #include "logger.h"
 #include "ui_logger.h"
 
+#include <QFile>
+#include <QTextStream>
+
 Logger::Logger(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Logger)
@@ -21,6 +24,12 @@ void Logger::log(const QString &logText)
     locker.lock();
     loggerBuf << logText;
     locker.unlock();
+
+    QFile outFile("smbx_log.txt");
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream ts(&outFile);
+    ts << logText << "\n";
+    outFile.close();
 }
 
 void Logger::doLogging()
