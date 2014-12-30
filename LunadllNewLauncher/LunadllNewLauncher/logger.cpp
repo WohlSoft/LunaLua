@@ -37,6 +37,12 @@ void Logger::doLogging()
     locker.lock();
     foreach(QString strs, loggerBuf){
         ui->editLogger->appendPlainText(strs);
+        QString buffer = ui->editLogger->toPlainText();
+        if(buffer.length()>10000)
+        {
+            buffer.remove(0, buffer.length()-8000);
+            ui->editLogger->setPlainText(buffer);
+        }
     }
     loggerBuf.clear();
     locker.unlock();

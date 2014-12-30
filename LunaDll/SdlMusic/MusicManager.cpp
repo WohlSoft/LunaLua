@@ -342,13 +342,12 @@ void MusicManager::setVolume(int _volume)
 
 std::string MusicManager::lenght()
 {
-	return "9999999999";
+	return "52:12:11:12";
 }
 
 std::string MusicManager::position()
 {
-	std::string t="12";
-	t[0]=((char)SDL_GetTicks());
+	std::string t="00:00:12:45";
 	return t;
 }
 

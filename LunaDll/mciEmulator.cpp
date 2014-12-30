@@ -41,12 +41,22 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 		}
 	}else if(spCmd.size() == 3){
 		if(spCmd[0] == "Status"){
+			uReturnLength = 11;
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
-			if(it != registeredFiles.end()){
+			if(it != registeredFiles.end())
+			{
 				if(spCmd[2] == "Position"){
 					strcpy(lpstrReturnString, MusicManager::position().c_str());
 				}else if(spCmd[2] == "Length"){
 					strcpy(lpstrReturnString, MusicManager::lenght().c_str());
+				}
+			}
+			else
+			{
+				if(spCmd[2] == "Position"){
+					strcpy(lpstrReturnString, "00:00:12:45");
+				}else if(spCmd[2] == "Length"){
+					strcpy(lpstrReturnString, "52:12:11:12");
 				}
 			}
 		}
@@ -80,11 +90,15 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 	
 
 errorFinalize:;
-	if(uReturnLength < 2){
+	if(uReturnLength < 2)
+	{
 		return MCIERR_UNSUPPORTED_FUNCTION;
 	}
-	lpstrReturnString[0] = '0';
-	lpstrReturnString[1] = '\0';
+	if(uReturnLength==2)
+	{
+		lpstrReturnString[0] = '0';
+		lpstrReturnString[1] = '\0';
+	}
 	return 0;
 #else
 	return mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
