@@ -38,7 +38,7 @@ void PGE_MusPlayer::MUS_playMusic()
 		{
 			if(Mix_PlayMusic(play_mus, -1)==-1)
 			{
-				MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+				//MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
 			}
 		}
 		else
@@ -49,7 +49,7 @@ void PGE_MusPlayer::MUS_playMusic()
 	}
 	else
 	{
-		MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+		//MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
 	}
 }
 
