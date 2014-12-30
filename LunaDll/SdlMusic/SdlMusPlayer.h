@@ -37,6 +37,8 @@ private:
     static Mix_Music *play_mus;
     static int volume;
     static int sRate;
+	static bool showMsg;
+	static std::string showMsg_for;
 };
 
 
