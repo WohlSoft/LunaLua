@@ -698,6 +698,13 @@ void LuaProxy::playSFXSDL(const char* filename)
 #endif
 }
 
+void LuaProxy::clearSFXBuffer()
+{
+#ifndef NO_SDL
+	PGE_Sounds::clearSoundBuffer();
+#endif
+}
+
 void LuaProxy::MusicOpen(const char *filename)
 {
 #ifndef NO_SDL
@@ -730,6 +737,21 @@ void LuaProxy::MusicStop()
 	PGE_MusPlayer::MUS_playMusic();
 #endif
 }
+
+void LuaProxy::MusicStopFadeOut(int ms)
+{
+#ifndef NO_SDL
+	PGE_MusPlayer::MUS_stopMusicFadeOut(ms);
+#endif
+}
+
+void LuaProxy::MusicVolume(int vlm)
+{
+#ifndef NO_SDL
+	PGE_MusPlayer::MUS_changeVolume(vlm);
+#endif
+}
+
 
 void LuaProxy::SaveBankProxy::setValue(const char *key, double value)
 {

@@ -18,7 +18,7 @@ void PGE_SDL_Manager::initSDL()
 		SDL_Init(SDL_INIT_AUDIO);
 		isInit=true;
 		PGE_MusPlayer::setSampleRate(44100);
-		PGE_MusPlayer::MUS_changeVolume(75);
+		PGE_MusPlayer::MUS_changeVolume(80);
 	}
 }
 
@@ -26,12 +26,6 @@ int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
-
-void PGE_MusPlayer::MUS_stopMusic()
-{
-	if(!PGE_SDL_Manager::isInit) return;
-    Mix_HaltMusic();
-}
 
 void PGE_MusPlayer::MUS_playMusic()
 {
@@ -64,10 +58,11 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
     {
 		if(Mix_PausedMusic()==0)
 		{
-	        if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
-			{
-				MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-			}
+			if(Mix_FadingMusic()!=MIX_FADING_IN)
+				if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
+				{
+					MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+				}
 		}
 		else
 			Mix_ResumeMusic();
@@ -83,6 +78,19 @@ void PGE_MusPlayer::MUS_pauseMusic()
 {
 	if(!PGE_SDL_Manager::isInit) return;
     Mix_PauseMusic();
+}
+
+void PGE_MusPlayer::MUS_stopMusic()
+{
+	if(!PGE_SDL_Manager::isInit) return;
+    Mix_HaltMusic();
+}
+
+void PGE_MusPlayer::MUS_stopMusicFadeOut(int ms)
+{
+	if(!PGE_SDL_Manager::isInit) return;
+	if(Mix_FadingMusic()!=MIX_FADING_OUT)
+		Mix_FadeOutMusic(ms);
 }
 
 
@@ -150,28 +158,44 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 Mix_Chunk *PGE_Sounds::sound = NULL;
 char *PGE_Sounds::current = "";
 
+std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
+
 void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 {
 	PGE_SDL_Manager::initSDL();
-    if(current!=sndFile)
-    {
-        if(sound) { Mix_FreeChunk(sound); sound=NULL; }
-
+ 	std::string filePath = sndFile;	
+	std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
+	if(it == chunksBuffer.end())
+	{
 		sound = Mix_LoadWAV( sndFile );
-        if(!sound) {
+		if(!sound) {
 			MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
 			+std::string(sndFile)+"\n"
 			+std::string(Mix_GetError())).c_str(), "Error", 0);
-            // handle error
-        }
-    }
+		}
 
-    //qDebug() << QString("Play Sound (SDL2_mixer)");
-    if(Mix_PlayChannel( -1, sound, 0 )==-1)
-    {
-		MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
-    }
+		chunksBuffer[filePath] = sound;
+		if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+		{
+			MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+		}
+	}
+	else
+	{
+		if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+		{
+			MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+		}
+	}
+}
 
+void PGE_Sounds::clearSoundBuffer()
+{
+	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
+	{
+		Mix_FreeChunk(it->second);
+	}
+	chunksBuffer.clear();
 }
 
 #endif

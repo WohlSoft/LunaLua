@@ -38,10 +38,13 @@ namespace LuaProxy {
     void playSFX(int index);
     void playSFX(const char* filename);
 	void playSFXSDL(const char* filename);
+	void clearSFXBuffer();
 	void MusicOpen(const char *filename);
 	void MusicPlay();
 	void MusicPlayFadeIn(int ms);
 	void MusicStop();
+	void MusicStopFadeOut(int ms);
+	void MusicVolume(int vlm);
     void playMusic(int section);
     void loadImage(const char* filename, int resNumber, int transColor);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
