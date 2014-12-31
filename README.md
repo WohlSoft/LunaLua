@@ -5,7 +5,9 @@ LunaDLL - is a free extension for SMBX game engine
 
 This is a fork of original LunaDLL by Talkhaus community
 
-Main feature of this fork - is a LUA scripting system which allow to use a LUA scripts together with internal LunaAssembly language.
+Main feature of this fork - is a LUA scripting system which allow to use a LUA scripts together with internal assambly-like Autocode language.
+Also it fully replacing SMBX's audio engine with better and more flexible SDL2_mixer library.
+
 
 =======
 Build in the Microsoft Visual Studio 2010
