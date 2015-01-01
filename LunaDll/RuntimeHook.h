@@ -37,6 +37,8 @@ extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHe
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);
 
+extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
+
 
 //DBG
 extern long long dbglongTest;
@@ -52,6 +54,8 @@ void (*runAsyncDebuggerProc)(void);
 int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
 void (*runAsyncLoggerProc)(void);
 void (*asyncLogProc)(const char*);
+//Old procs
+float (*__vbaR4Var)(VARIANTARG*);
 
 struct resultStruct{
 	int result;
