@@ -27,6 +27,9 @@ class MusicManager
 		static void setVolume(int _volume);
 		static std::string lenght();
 		static std::string position();
+		
+		static void loadSounds(std::string path);
+		static void loadMusics(std::string path);
 	
 	private:
 		static std::map<std::string, musicFile > registredFiles;
@@ -34,6 +37,8 @@ class MusicManager
 		static std::string chunksAliasesList[91];
 		static std::string chunksList[91];
 		static int chunksChannelsList[91];
+		static std::string defaultSndINI;
+		static std::string defaultMusINI;
 };
 #endif
 

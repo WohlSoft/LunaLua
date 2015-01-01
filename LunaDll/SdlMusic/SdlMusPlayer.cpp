@@ -1,15 +1,11 @@
 #ifndef NO_SDL
 
-
-#include <windows.h>
-#include <string>
+#include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
 
-
-Mix_Music *PGE_MusPlayer::play_mus = NULL;
-
+/***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
-std::string PGE_MusPlayer::currentTrack="";
+std::string PGE_SDL_Manager::appPath="";
 
 void PGE_SDL_Manager::initSDL()
 {
@@ -19,9 +15,29 @@ void PGE_SDL_Manager::initSDL()
 		isInit=true;
 		PGE_MusPlayer::setSampleRate(44100);
 		PGE_MusPlayer::MUS_changeVolume(80);
+
+		HMODULE hModule = GetModuleHandleW(NULL);
+		WCHAR path[MAX_PATH];
+		int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+		for(int i = count; i > 3; i--)
+		{
+			if(path[i] == L'\\')
+			{
+				path[i] = 0;
+				break;
+			}
+		}
+		std::wstring smbxPath = path;
+		smbxPath = smbxPath.append(L"\\");
+		appPath = wstr2str(smbxPath);
 	}
 }
 
+
+
+/***********************************PGE_MusPlayer********************************************/
+Mix_Music *PGE_MusPlayer::play_mus = NULL;
+std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
@@ -157,7 +173,7 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 
 
 
-
+/***********************************PGE_Sounds********************************************/
 
 Mix_Chunk *PGE_Sounds::sound = NULL;
 char *PGE_Sounds::current = "";

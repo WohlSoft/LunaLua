@@ -8,13 +8,14 @@
 #include <SDL2/SDL_mixer.h>
 #undef main
 #include <map>
+#include <string>
 
 class PGE_SDL_Manager
 {
 public:
 	static bool isInit;
 	static void initSDL();
-
+	static std::string appPath;
 };
 
 

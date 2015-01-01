@@ -2,19 +2,9 @@
 
 #include "MusicManager.h"
 #include "../Globals.h"
+#include "../GlobalFuncs.h"
 #include <math.h>
 #include "../libs/ini-reader/INIReader.h"
-
-/*
-HMODULE hModule = GetModuleHandleW(NULL);
-WCHAR path[MAX_PATH];
-int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-for(int i = count; i > 3; i--) {
-if(path[i] == L'\\') {
-path[i] = 0;
-break;
-}
-}*/
 
 std::string MusicManager::chunksAliasesList[91]=
 {
@@ -113,192 +103,192 @@ std::string MusicManager::chunksAliasesList[91]=
 
 std::string MusicManager::chunksList[91]=
 {
-	"sound\\player-jump.mp3", 
-	"sound\\stomped.mp3", 
-	"sound\\block-hit.mp3", 
-	"sound\\block-smash.mp3", 
-	"sound\\player-shrink.mp3", 
-	"sound\\player-grow.mp3", 
-	"sound\\mushroom.mp3", 
-	"sound\\player-died.mp3", 
-	"sound\\shell-hit.mp3", 
-	"sound\\player-slide.mp3", 
-	"sound\\item-dropped.mp3", 
-	"sound\\has-item.mp3", 
-	"sound\\camera-change.mp3", 
-	"sound\\coin.mp3", 
-	"sound\\1up.mp3", 
-	"sound\\lava.mp3", 
-	"sound\\warp.mp3", 
-	"sound\\fireball.mp3", 
-	"sound\\level-win.mp3", 
-	"sound\\boss-beat.mp3", 
-	"sound\\dungeon-win.mp3", 
-	"sound\\bullet-bill.mp3", 
-	"sound\\grab.mp3", 
-	"sound\\spring.mp3", 
-	"sound\\hammer.mp3", 
-	"sound\\slide.mp3", 
-	"sound\\newpath.mp3", 
-	"sound\\level-select.mp3", 
-	"sound\\do.mp3", 
-	"sound\\pause.mp3", 
-	"sound\\key.mp3", 
-	"sound\\pswitch.mp3", 
-	"sound\\tail.mp3", 
-	"sound\\racoon.mp3", 
-	"sound\\boot.mp3", 
-	"sound\\smash.mp3", 
-	"sound\\thwomp.mp3", 
-	"sound\\birdo-spit.mp3", 
-	"sound\\birdo-hit.mp3", 
-	"sound\\smb2-exit.mp3", 
-	"sound\\birdo-beat.mp3", 
-	"sound\\npc-fireball.mp3", 
-	"sound\\fireworks.mp3", 
-	"sound\\bowser-killed.mp3", 
-	"sound\\game-beat.mp3", 
-	"sound\\door.mp3", 
-	"sound\\message.mp3", 
-	"sound\\yoshi.mp3", 
-	"sound\\yoshi-hurt.mp3", 
-	"sound\\yoshi-tongue.mp3", 
-	"sound\\yoshi-egg.mp3", 
-	"sound\\got-star.mp3", 
-	"sound\\zelda-kill.mp3", 
-	"sound\\player-died2.mp3", 
-	"sound\\yoshi-swallow.mp3", 
-	"sound\\ring.mp3", 
-	"sound\\dry-bones.mp3", 
-	"sound\\smw-checkpoint.mp3", 
-	"sound\\dragon-coin.mp3", 
-	"sound\\smw-exit.mp3", 
-	"sound\\smw-blaarg.mp3", 
-	"sound\\wart-bubble.mp3", 
-	"sound\\wart-die.mp3", 
-	"sound\\sm-block-hit.mp3", 
-	"sound\\sm-killed.mp3", 
-	"sound\\sm-hurt.mp3", 
-	"sound\\sm-glass.mp3", 
-	"sound\\sm-boss-hit.mp3", 
-	"sound\\sm-cry.mp3", 
-	"sound\\sm-explosion.mp3", 
-	"sound\\climbing.mp3", 
-	"sound\\swim.mp3", 
-	"sound\\grab2.mp3", 
-	"sound\\smw-saw.mp3", 
-	"sound\\smb2-throw.mp3", 
-	"sound\\smb2-hit.mp3", 
-	"sound\\zelda-stab.mp3", 
-	"sound\\zelda-hurt.mp3", 
-	"sound\\zelda-heart.mp3", 
-	"sound\\zelda-died.mp3", 
-	"sound\\zelda-rupee.mp3", 
-	"sound\\zelda-fire.mp3", 
-	"sound\\zelda-item.mp3", 
-	"sound\\zelda-key.mp3", 
-	"sound\\zelda-shield.mp3", 
-	"sound\\zelda-dash.mp3", 
-	"sound\\zelda-fairy.mp3", 
-	"sound\\zelda-grass.mp3", 
-	"sound\\zelda-hit.mp3", 
-	"sound\\zelda-sword-beam.mp3", 
-	"sound\\bubble.mp3"
+	"sound\\player-jump.ogg", 
+	"sound\\stomped.ogg", 
+	"sound\\block-hit.ogg", 
+	"sound\\block-smash.ogg", 
+	"sound\\player-shrink.ogg", 
+	"sound\\player-grow.ogg", 
+	"sound\\mushroom.ogg", 
+	"sound\\player-died.ogg", 
+	"sound\\shell-hit.ogg", 
+	"sound\\player-slide.ogg", 
+	"sound\\item-dropped.ogg", 
+	"sound\\has-item.ogg", 
+	"sound\\camera-change.ogg", 
+	"sound\\coin.ogg", 
+	"sound\\1up.ogg", 
+	"sound\\lava.ogg", 
+	"sound\\warp.ogg", 
+	"sound\\fireball.ogg", 
+	"sound\\level-win.ogg", 
+	"sound\\boss-beat.ogg", 
+	"sound\\dungeon-win.ogg", 
+	"sound\\bullet-bill.ogg", 
+	"sound\\grab.ogg", 
+	"sound\\spring.ogg", 
+	"sound\\hammer.ogg", 
+	"sound\\slide.ogg", 
+	"sound\\newpath.ogg", 
+	"sound\\level-select.ogg", 
+	"sound\\do.ogg", 
+	"sound\\pause.ogg", 
+	"sound\\key.ogg", 
+	"sound\\pswitch.ogg", 
+	"sound\\tail.ogg", 
+	"sound\\racoon.ogg", 
+	"sound\\boot.ogg", 
+	"sound\\smash.ogg", 
+	"sound\\thwomp.ogg", 
+	"sound\\birdo-spit.ogg", 
+	"sound\\birdo-hit.ogg", 
+	"sound\\smb2-exit.ogg", 
+	"sound\\birdo-beat.ogg", 
+	"sound\\npc-fireball.ogg", 
+	"sound\\fireworks.ogg", 
+	"sound\\bowser-killed.ogg", 
+	"sound\\game-beat.ogg", 
+	"sound\\door.ogg", 
+	"sound\\message.ogg", 
+	"sound\\yoshi.ogg", 
+	"sound\\yoshi-hurt.ogg", 
+	"sound\\yoshi-tongue.ogg", 
+	"sound\\yoshi-egg.ogg", 
+	"sound\\got-star.ogg", 
+	"sound\\zelda-kill.ogg", 
+	"sound\\player-died2.ogg", 
+	"sound\\yoshi-swallow.ogg", 
+	"sound\\ring.ogg", 
+	"sound\\dry-bones.ogg", 
+	"sound\\smw-checkpoint.ogg", 
+	"sound\\dragon-coin.ogg", 
+	"sound\\smw-exit.ogg", 
+	"sound\\smw-blaarg.ogg", 
+	"sound\\wart-bubble.ogg", 
+	"sound\\wart-die.ogg", 
+	"sound\\sm-block-hit.ogg", 
+	"sound\\sm-killed.ogg", 
+	"sound\\sm-hurt.ogg", 
+	"sound\\sm-glass.ogg", 
+	"sound\\sm-boss-hit.ogg", 
+	"sound\\sm-cry.ogg", 
+	"sound\\sm-explosion.ogg", 
+	"sound\\climbing.ogg", 
+	"sound\\swim.ogg", 
+	"sound\\grab2.ogg", 
+	"sound\\smw-saw.ogg", 
+	"sound\\smb2-throw.ogg", 
+	"sound\\smb2-hit.ogg", 
+	"sound\\zelda-stab.ogg", 
+	"sound\\zelda-hurt.ogg", 
+	"sound\\zelda-heart.ogg", 
+	"sound\\zelda-died.ogg", 
+	"sound\\zelda-rupee.ogg", 
+	"sound\\zelda-fire.ogg", 
+	"sound\\zelda-item.ogg", 
+	"sound\\zelda-key.ogg", 
+	"sound\\zelda-shield.ogg", 
+	"sound\\zelda-dash.ogg", 
+	"sound\\zelda-fairy.ogg", 
+	"sound\\zelda-grass.ogg", 
+	"sound\\zelda-hit.ogg", 
+	"sound\\zelda-sword-beam.ogg", 
+	"sound\\bubble.ogg"
 };
 
 int MusicManager::chunksChannelsList[91] =
 {
-	31,//"sound\\player-jump.mp3",
-	-1,//"sound\\stomped.mp3",
-	-1,//"sound\\block-hit.mp3",
-	-1,//"sound\\block-smash.mp3",
-	-1,//"sound\\player-shrink.mp3",
-	-1,//"sound\\player-grow.mp3",
-	-1,//"sound\\mushroom.mp3",
-	-1,//"sound\\player-died.mp3",
-	30,//"sound\\shell-hit.mp3",
-	29,//"sound\\player-slide.mp3",
-	-1,//"sound\\item-dropped.mp3",
-	-1,//"sound\\has-item.mp3",
-	-1,//"sound\\camera-change.mp3",
-	-1,//"sound\\coin.mp3",
-	-1,//"sound\\1up.mp3",
-	-1,//"sound\\lava.mp3",
-	-1,//"sound\\warp.mp3",
-	-1,//"sound\\fireball.mp3",
-	-1,//"sound\\level-win.mp3",
-	-1,//"sound\\boss-beat.mp3",
-	-1,//"sound\\dungeon-win.mp3",
-	-1,//"sound\\bullet-bill.mp3",
-	-1,//"sound\\grab.mp3",
-	-1,//"sound\\spring.mp3",
-	-1,//"sound\\hammer.mp3",
-	-1,//"sound\\slide.mp3",
-	-1,//"sound\\newpath.mp3",
-	-1,//"sound\\level-select.mp3",
-	-1,//"sound\\do.mp3",
-	-1,//"sound\\pause.mp3",
-	-1,//"sound\\key.mp3",
-	28,//"sound\\pswitch.mp3",
-	-1,//"sound\\tail.mp3",
-	-1,//"sound\\racoon.mp3",
-	-1,//"sound\\boot.mp3",
-	27,//"sound\\smash.mp3",
-	-1,//"sound\\thwomp.mp3",
-	-1,//"sound\\birdo-spit.mp3",
-	-1,//"sound\\birdo-hit.mp3",
-	-1,//"sound\\smb2-exit.mp3",
-	-1,//"sound\\birdo-beat.mp3",
-	-1,//"sound\\npc-fireball.mp3",
-	-1,//"sound\\fireworks.mp3",
-	-1,//"sound\\bowser-killed.mp3",
-	-1,//"sound\\game-beat.mp3",
-	-1,//"sound\\door.mp3",
-	-1,//"sound\\message.mp3",
-	-1,//"sound\\yoshi.mp3",
-	-1,//"sound\\yoshi-hurt.mp3",
-	26,//"sound\\yoshi-tongue.mp3",
-	-1,//"sound\\yoshi-egg.mp3",
-	-1,//"sound\\got-star.mp3",
-	-1,//"sound\\zelda-kill.mp3",
-	-1,//"sound\\player-died2.mp3",
-	-1,//"sound\\yoshi-swallow.mp3",
-	-1,//"sound\\ring.mp3",
-	-1,//"sound\\dry-bones.mp3",
-	-1,//"sound\\smw-checkpoint.mp3",
-	-1,//"sound\\dragon-coin.mp3",
-	-1,//"sound\\smw-exit.mp3",
-	-1,//"sound\\smw-blaarg.mp3",
-	-1,//"sound\\wart-bubble.mp3",
-	-1,//"sound\\wart-die.mp3",
-	-1,//"sound\\sm-block-hit.mp3",
-	-1,//"sound\\sm-killed.mp3",
-	-1,//"sound\\sm-hurt.mp3",
-	-1,//"sound\\sm-glass.mp3",
-	-1,//"sound\\sm-boss-hit.mp3",
-	-1,//"sound\\sm-cry.mp3",
-	-1,//"sound\\sm-explosion.mp3",
-	25,//"sound\\climbing.mp3",
-	24,//"sound\\swim.mp3",
-	-1,//"sound\\grab2.mp3",
-	-1,//"sound\\smw-saw.mp3",
-	-1,//"sound\\smb2-throw.mp3",
-	-1,//"sound\\smb2-hit.mp3",
-	-1,//"sound\\zelda-stab.mp3",
-	-1,//"sound\\zelda-hurt.mp3",
-	-1,//"sound\\zelda-heart.mp3",
-	-1,//"sound\\zelda-died.mp3",
-	-1,//"sound\\zelda-rupee.mp3",
-	-1,//"sound\\zelda-fire.mp3",
-	-1,//"sound\\zelda-item.mp3",
-	-1,//"sound\\zelda-key.mp3",
-	-1,//"sound\\zelda-shield.mp3",
-	-1,//"sound\\zelda-dash.mp3",
-	-1,//"sound\\zelda-fairy.mp3",
-	-1,//"sound\\zelda-grass.mp3",
-	-1,//"sound\\zelda-hit.mp3",
-	-1,//"sound\\zelda-sword-beam.mp3",
-	-1,//"sound\\bubble.mp3"
+	31,//"sound\\player-jump.ogg",
+	-1,//"sound\\stomped.ogg",
+	-1,//"sound\\block-hit.ogg",
+	-1,//"sound\\block-smash.ogg",
+	-1,//"sound\\player-shrink.ogg",
+	-1,//"sound\\player-grow.ogg",
+	-1,//"sound\\mushroom.ogg",
+	-1,//"sound\\player-died.ogg",
+	30,//"sound\\shell-hit.ogg",
+	29,//"sound\\player-slide.ogg",
+	-1,//"sound\\item-dropped.ogg",
+	-1,//"sound\\has-item.ogg",
+	-1,//"sound\\camera-change.ogg",
+	-1,//"sound\\coin.ogg",
+	-1,//"sound\\1up.ogg",
+	-1,//"sound\\lava.ogg",
+	-1,//"sound\\warp.ogg",
+	-1,//"sound\\fireball.ogg",
+	-1,//"sound\\level-win.ogg",
+	-1,//"sound\\boss-beat.ogg",
+	-1,//"sound\\dungeon-win.ogg",
+	-1,//"sound\\bullet-bill.ogg",
+	-1,//"sound\\grab.ogg",
+	-1,//"sound\\spring.ogg",
+	-1,//"sound\\hammer.ogg",
+	-1,//"sound\\slide.ogg",
+	-1,//"sound\\newpath.ogg",
+	-1,//"sound\\level-select.ogg",
+	-1,//"sound\\do.ogg",
+	-1,//"sound\\pause.ogg",
+	-1,//"sound\\key.ogg",
+	28,//"sound\\pswitch.ogg",
+	-1,//"sound\\tail.ogg",
+	-1,//"sound\\racoon.ogg",
+	-1,//"sound\\boot.ogg",
+	27,//"sound\\smash.ogg",
+	-1,//"sound\\thwomp.ogg",
+	-1,//"sound\\birdo-spit.ogg",
+	-1,//"sound\\birdo-hit.ogg",
+	-1,//"sound\\smb2-exit.ogg",
+	-1,//"sound\\birdo-beat.ogg",
+	-1,//"sound\\npc-fireball.ogg",
+	-1,//"sound\\fireworks.ogg",
+	-1,//"sound\\bowser-killed.ogg",
+	-1,//"sound\\game-beat.ogg",
+	-1,//"sound\\door.ogg",
+	-1,//"sound\\message.ogg",
+	-1,//"sound\\yoshi.ogg",
+	-1,//"sound\\yoshi-hurt.ogg",
+	26,//"sound\\yoshi-tongue.ogg",
+	-1,//"sound\\yoshi-egg.ogg",
+	-1,//"sound\\got-star.ogg",
+	-1,//"sound\\zelda-kill.ogg",
+	-1,//"sound\\player-died2.ogg",
+	-1,//"sound\\yoshi-swallow.ogg",
+	-1,//"sound\\ring.ogg",
+	-1,//"sound\\dry-bones.ogg",
+	-1,//"sound\\smw-checkpoint.ogg",
+	-1,//"sound\\dragon-coin.ogg",
+	-1,//"sound\\smw-exit.ogg",
+	-1,//"sound\\smw-blaarg.ogg",
+	-1,//"sound\\wart-bubble.ogg",
+	-1,//"sound\\wart-die.ogg",
+	-1,//"sound\\sm-block-hit.ogg",
+	-1,//"sound\\sm-killed.ogg",
+	-1,//"sound\\sm-hurt.ogg",
+	-1,//"sound\\sm-glass.ogg",
+	-1,//"sound\\sm-boss-hit.ogg",
+	-1,//"sound\\sm-cry.ogg",
+	-1,//"sound\\sm-explosion.ogg",
+	25,//"sound\\climbing.ogg",
+	24,//"sound\\swim.ogg",
+	-1,//"sound\\grab2.ogg",
+	-1,//"sound\\smw-saw.ogg",
+	-1,//"sound\\smb2-throw.ogg",
+	-1,//"sound\\smb2-hit.ogg",
+	-1,//"sound\\zelda-stab.ogg",
+	-1,//"sound\\zelda-hurt.ogg",
+	-1,//"sound\\zelda-heart.ogg",
+	-1,//"sound\\zelda-died.ogg",
+	-1,//"sound\\zelda-rupee.ogg",
+	-1,//"sound\\zelda-fire.ogg",
+	-1,//"sound\\zelda-item.ogg",
+	-1,//"sound\\zelda-key.ogg",
+	-1,//"sound\\zelda-shield.ogg",
+	-1,//"sound\\zelda-dash.ogg",
+	-1,//"sound\\zelda-fairy.ogg",
+	-1,//"sound\\zelda-grass.ogg",
+	-1,//"sound\\zelda-hit.ogg",
+	-1,//"sound\\zelda-sword-beam.ogg",
+	-1,//"sound\\bubble.ogg"
 };
 
 /*
@@ -308,9 +298,21 @@ typedef std::pair<int, std::string> musicFile;
 std::map<std::string, musicFile > MusicManager::registredFiles;
 std::map<std::string, chunkFile > MusicManager::chunksBuffer;
 
+std::string MusicManager::defaultSndINI="";
+std::string MusicManager::defaultMusINI="";
+
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
+	bool firstRun = PGE_SDL_Manager::isInit;
 	PGE_SDL_Manager::initSDL();
+
+	if(firstRun)
+	{
+		defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
+		defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
+		loadSounds(defaultSndINI);
+		loadMusics(defaultMusINI);
+	}
 	
 	//clear junk
 	replaceSubStr(fileName, "\"", "");
@@ -336,11 +338,8 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 	if(isChunk)
 	{
 		file.first=Chunk;
-		//replace extension of file with ogg
-		s[s.length()-3]='o';
-		s[s.length()-2]='g';
-		s[s.length()-1]='g';
-		file.second=s;
+		//Wroting another path to file
+		file.second=PGE_SDL_Manager::appPath+chunksList[chanID];
 	}
 	else
 	{
@@ -465,6 +464,16 @@ std::string MusicManager::position()
 {
 	std::string t="00:04:12:45";
 	return t;
+}
+
+void MusicManager::loadSounds(std::string path)
+{
+
+}
+
+void MusicManager::loadMusics(std::string path)
+{
+
 }
 
 #endif
