@@ -258,7 +258,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 		else
 		{
 			std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
-			if(it != chunksBuffer.end())
+			if(it == chunksBuffer.end())
 			{
 				chunkFile file;
 				file.first  = chunksChannelsList[chanID];//ID of reserved channel for this sample

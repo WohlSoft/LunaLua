@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #undef main
-
+#include <map>
 
 class PGE_SDL_Manager
 {
@@ -21,11 +21,12 @@ public:
 class PGE_MusPlayer
 {
 public:
-    static void MUS_stopMusic();
 	static std::string currentTrack;
     static void MUS_playMusic();
 	static void MUS_playMusicFadeIn(int ms);
 	static void MUS_pauseMusic();
+	static void MUS_stopMusic();
+	static void MUS_stopMusicFadeOut(int ms);
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);
@@ -46,8 +47,9 @@ class PGE_Sounds
 {
 public:
     static void SND_PlaySnd(const char *sndFile);
-
+	static void clearSoundBuffer();
 private:
+	static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;
     static char *current;
 };
