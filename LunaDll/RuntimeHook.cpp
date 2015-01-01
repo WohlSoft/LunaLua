@@ -505,11 +505,114 @@ extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_eco
 
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 {
-	if(variant->vt == VT_BSTR){
+	if(variant->vt == VT_BSTR)
+	{
 		wchar_t* str = variant->bstrVal;
 		return (float)wcstod(str, NULL);
-		
 	}
-	return __vbaR4Var(variant);
+	else
+	if(variant->vt == VT_BSTR|VT_BYREF)
+	{
+		if(variant->pbstrVal==NULL) return 0.0;
+		wchar_t* str = *(variant->pbstrVal);
+		return (float)wcstod(str, NULL);
+	}
+	else
+	if(variant->vt == VT_I2)
+	{
+		short str = variant->iVal;
+		return (float)str;
+	}
+	else
+	if(variant->vt == (VT_I2|VT_BYREF))
+	{
+		if(variant->piVal==NULL) return 0.0;
+		return (float)((int)(*(variant->piVal)));
+	}
+	else
+	if(variant->vt == VT_I4)
+	{
+		long str = variant->lVal;
+		return (float)str;
+	}
+	else
+	if(variant->vt == VT_I4|VT_BYREF)
+	{
+		if(variant->plVal==NULL) return 0.0;
+		return (float)(*variant->plVal);
+	}
+	else
+	if(variant->vt == VT_BOOL)
+	{
+		bool str = variant->boolVal;
+		return (float)(int)str;
+	}
+	else
+	if(variant->vt == VT_BOOL|VT_BYREF)
+	{
+		if(variant->pboolVal==NULL) return 0.0;
+		bool str = *(variant->pboolVal);
+		return (float)(int)str;
+	}
+	else
+	if(variant->vt == VT_R4)
+	{
+		return variant->fltVal;
+	}
+	else
+	if(variant->vt == VT_R4|VT_BYREF)
+	{
+		if(variant->pfltVal==NULL) return 0.0;
+		return (*variant->pfltVal);
+	}
+	else
+	if(variant->vt == VT_R8)
+	{
+		return (float)variant->dblVal;
+	}
+	else
+	if(variant->vt == VT_R8|VT_BYREF)
+	{
+		if(variant->pdblVal==NULL) return 0.0;
+		return (float)(*variant->pdblVal);
+	}
+	else
+	if(variant->vt == VT_CY)
+	{
+		CY x = variant->cyVal;
+		float y=x.Hi;
+		float z=x.Lo;
+		while(z>1.0)
+		{
+			z/=10;
+		}
+		y+=z;
+		return y;
+	}
+	else
+	if(variant->vt == VT_CY|VT_BYREF)
+	{
+		if(variant->pcyVal==0) return 0.0;
+		CY x = *(variant->pcyVal);
+		float y=x.Hi;
+		float z=x.Lo;
+		while(z>1.0)
+		{
+			z/=10;
+		}
+		y+=z;
+		return y;
+	}
+	else
+	if(variant->vt == VT_UI1)
+	{
+		return (float)((int)((char)variant->bVal));
+	}
+	else
+	if(variant->vt == VT_UI1|VT_BYREF)
+	{
+		return (float)((int)((char)(*(variant->pbVal))));
+	}
+	return 0.0;//__vbaR4Var(variant);
 }
 
