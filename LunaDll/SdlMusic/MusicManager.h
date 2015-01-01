@@ -31,6 +31,7 @@ class MusicManager
 	private:
 		static std::map<std::string, musicFile > registredFiles;
 		static std::map<std::string, chunkFile > chunksBuffer;
+		static std::string chunksAliasesList[91];
 		static std::string chunksList[91];
 		static int chunksChannelsList[91];
 };
