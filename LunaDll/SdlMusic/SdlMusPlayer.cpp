@@ -34,10 +34,7 @@ void PGE_MusPlayer::MUS_playMusic()
 	{
 		if(Mix_PlayingMusic()==0)
 		{
-			if(Mix_PlayMusic(play_mus, -1)==-1)
-			{
-				//MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-			}
+			Mix_PlayMusic(play_mus, -1);
 		}
 		else
 		if(Mix_PausedMusic()==1)
@@ -54,6 +51,7 @@ void PGE_MusPlayer::MUS_playMusic()
 void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 {
 	if(!PGE_SDL_Manager::isInit) return;
+
 	if(play_mus)
     {
 		if(Mix_PausedMusic()==0)
@@ -122,15 +120,21 @@ int PGE_MusPlayer::currentVolume()
 void PGE_MusPlayer::MUS_openFile(const char *musFile)
 {
 	PGE_SDL_Manager::initSDL();
-	if(currentTrack==std::string(musFile)) return;
+	if(currentTrack==std::string(musFile))
+	{
+		if(Mix_PlayingMusic()==1)
+			return;
+	}
 
     if(play_mus!=NULL)
     {
-        Mix_FreeMusic(play_mus);
-        play_mus=NULL;
+        Mix_HaltMusic();
+		Mix_FreeMusic(play_mus);
+		play_mus=NULL;
     }
 
-    play_mus = Mix_LoadMUS( musFile );
+	play_mus = Mix_LoadMUS( musFile );
+
     if(!play_mus)
 	{
 		if(showMsg_for!=musFile)
