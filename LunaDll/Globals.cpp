@@ -6,6 +6,7 @@
 #include <time.h>
 #include "Logging.h"
 #include "UserSaving.h"
+#include "GlobalFuncs.h"
 #include <cctype>
 
 
@@ -288,76 +289,3 @@ bool is_number(const std::string& s)
 	return !s.empty() && it == s.end();
 }
 
-void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
-{
-	char* pTempStr = strdup( str.c_str() );
-	char* pWord = std::strtok(pTempStr, separator);
-	while(pWord != NULL)
-	{
-		dest.push_back(pWord);
-		pWord = std::strtok(NULL, separator);
-	}
-	free(pTempStr);
-}
-
-void replaceSubStr(std::string& str, const std::string& from, const std::string& to)
-{
-	if(from.empty())
-	return;
-	size_t start_pos = 0;
-	while((start_pos = str.find(from, start_pos)) != std::string::npos)
-	{
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-	}
-}
-
-void RemoveSubStr(std::string& sInput, const std::string& sub)
-{
-	std::string::size_type foundpos = sInput.find(sub);
-	if ( foundpos != std::string::npos )
-	sInput.erase(sInput.begin() + foundpos, sInput.begin() + foundpos + sub.length());
-}
-
-std::vector<std::string> splitCmdArgs( std::string str)
-{
-	std::vector<std::string> args;
-	std::string arg;
-	arg.clear();
-	bool quote_opened=false;
-	for(int i=0; i<str.size();i++)
-	{
-		if(quote_opened)
-			goto qstr;
-		if(str[i] == ' ')
-		{
-			if(!arg.empty())
-				args.push_back(arg);
-			arg.clear();
-			continue;
-		}
-		if(str[i] == '\"')
-		{
-			quote_opened=true;
-			continue;
-		}
-		arg.push_back(str[i]);
-	continue;
-
-		qstr:
-			if(str[i] == '\"')
-			{
-				if(!arg.empty())
-					args.push_back(arg);
-				arg.clear();
-				quote_opened=false;
-				continue;
-			}
-			arg.push_back(str[i]);
-	}
-
-	if(!arg.empty())
-				args.push_back(arg);
-
-	return args;
-}
