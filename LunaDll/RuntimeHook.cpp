@@ -523,7 +523,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return (float)wcstod(str, NULL);
 	}
 	else
-	if(variant->vt == VT_BSTR|VT_BYREF)
+	if(variant->vt == (VT_BSTR|VT_BYREF))
 	{
 		if(variant->pbstrVal==NULL) return 0.0;
 		wchar_t* str = *(variant->pbstrVal);
@@ -548,7 +548,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return (float)str;
 	}
 	else
-	if(variant->vt == VT_I4|VT_BYREF)
+	if(variant->vt == (VT_I4|VT_BYREF))
 	{
 		if(variant->plVal==NULL) return 0.0;
 		return (float)(*variant->plVal);
@@ -560,7 +560,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return (float)(int)str;
 	}
 	else
-	if(variant->vt == VT_BOOL|VT_BYREF)
+	if(variant->vt == (VT_BOOL|VT_BYREF))
 	{
 		if(variant->pboolVal==NULL) return 0.0;
 		bool str = *(variant->pboolVal);
@@ -572,7 +572,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return variant->fltVal;
 	}
 	else
-	if(variant->vt == VT_R4|VT_BYREF)
+	if(variant->vt == (VT_R4|VT_BYREF))
 	{
 		if(variant->pfltVal==NULL) return 0.0;
 		return (*variant->pfltVal);
@@ -583,7 +583,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return static_cast<float>(variant->dblVal);
 	}
 	else
-	if(variant->vt == VT_R8|VT_BYREF)
+	if(variant->vt == (VT_R8|VT_BYREF))
 	{
 		if(variant->pdblVal==NULL) return 0.0;
 		return (float)(*variant->pdblVal);
@@ -602,7 +602,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return y;
 	}
 	else
-	if(variant->vt == VT_CY|VT_BYREF)
+	if(variant->vt == (VT_CY|VT_BYREF))
 	{
 		if(variant->pcyVal==0) return 0.0;
 		CY x = *(variant->pcyVal);
@@ -621,7 +621,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		return (float)((int)((char)variant->bVal));
 	}
 	else
-	if(variant->vt == VT_UI1|VT_BYREF)
+	if(variant->vt == (VT_UI1|VT_BYREF))
 	{
 		return (float)((int)((char)(*(variant->pbVal))));
 	}
