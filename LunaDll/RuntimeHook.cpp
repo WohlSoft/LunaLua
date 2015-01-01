@@ -505,6 +505,18 @@ extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_eco
 
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 {
+	if(asyncLogProc)
+	{
+		stringstream q;
+		q << variant->vt << " ";
+		if(variant->vt == VT_R8)
+		{
+			q<<"src:"<<variant->dblVal<< " dst:"<<static_cast<float>(variant->dblVal);
+		}
+		string rr("vbaR4VarHook type:"+q.str()+";");
+		asyncLogProc( rr.c_str() );
+	}
+
 	if(variant->vt == VT_BSTR)
 	{
 		wchar_t* str = variant->bstrVal;
@@ -568,7 +580,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 	else
 	if(variant->vt == VT_R8)
 	{
-		return (float)variant->dblVal;
+		return static_cast<float>(variant->dblVal);
 	}
 	else
 	if(variant->vt == VT_R8|VT_BYREF)
