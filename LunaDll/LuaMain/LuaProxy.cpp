@@ -641,12 +641,16 @@ void LuaProxy::playSFX(int index)
 
 void LuaProxy::playSFX(const char *filename)
 {
+#ifndef NO_SDL
+	playSFXSDL(filename);
+#else
     wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
     wstring full_path = world_dir.append(Level::GetName());
     full_path = removeExtension(full_path);
     full_path = full_path.append(L"\\"); // < path into level folder
     full_path = full_path + utf8_decode(filename);
     PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
+#endif
 }
 
 void LuaProxy::playSFXSDL(const char* filename)
@@ -658,6 +662,8 @@ void LuaProxy::playSFXSDL(const char* filename)
 	full_path = full_path.append(L"\\"); // < path into level folder
 	string full_paths = wstr2str(full_path) + filename;
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
+#else
+	playSFX(filename);
 #endif
 }
 
