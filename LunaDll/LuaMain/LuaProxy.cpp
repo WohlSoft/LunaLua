@@ -14,6 +14,7 @@
 #include "../Layer.h"
 #include "../Animation.h"
 #include "../Overworld.h"
+#include "../WorldLevel.h"
 
 #include "../libs/ini-reader/INIReader.h"
 #include "../SdlMusic/SdlMusPlayer.h"
@@ -2714,6 +2715,57 @@ void LuaProxy::hud(bool activate)
 	gSkipSMBXHUD = !activate;
 }
 
+luabind::object LuaProxy::levels(lua_State *L)
+{
+	luabind::object vlevels = luabind::newtable(L);
+	for(int i = 0; i < GM_LEVEL_COUNT; i++) {
+		vlevels[i] = new LuaProxy::LevelObject(i);
+	}
+	return vlevels;
+}
+
+luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
+{
+	luabind::object obj = luabind::newtable(L);
+	bool found = false;
+	for(int i = 0, j = 0; i < GM_LEVEL_COUNT; ++i){
+		WorldLevel* ctrl = ::SMBXLevel::get(i);
+		if(ctrl){
+			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
+			if(!ctrl->levelTitle)
+				continue;
+			std::wstring sourceLayerName(ctrl->levelTitle);
+			if(sourceLayerName.find(tarLevelName) != std::wstring::npos){
+				if(!found)
+					found = true;
+
+				obj[j++] = new LevelObject(i);
+			}
+		}
+	}
+	if(!found){
+		return luabind::object();
+	}
+	return obj;
+}
+
+luabind::object LuaProxy::findlevel(std::string toFindName, lua_State* L)
+{
+	for(int i = 0; i < GM_LEVEL_COUNT; ++i){
+		WorldLevel* ctrl = ::SMBXLevel::get(i);
+		if(ctrl){
+			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
+			if(!ctrl->levelTitle)
+				continue;
+			std::wstring sourceLevelName(ctrl->levelTitle);
+			if(tarLevelName == sourceLevelName){
+				return luabind::object(L, new LevelObject(i));
+			}
+		}
+	}
+	return luabind::object();
+}
+
 LuaProxy::World::World()
 {}
 
@@ -2838,4 +2890,86 @@ short LuaProxy::World::getCurrentDirection()
 		return 1;
 
 	return 0;
+}
+
+LuaProxy::LevelObject::LevelObject(int index) : m_index(index)
+{}
+
+void LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, luabind::object value)
+{
+	int iftype = (int)ftype;
+	if(iftype >= 1 && iftype <= 5){
+		WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
+		void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+	}
+}
+
+luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_State* L)
+{
+	int iftype = (int)ftype;
+	double val = 0;
+	if(iftype >= 1 && iftype <= 5){
+		WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
+		void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+		val = GetMem((int)ptr, (FIELDTYPE)ftype);
+	}
+	switch (ftype) {
+	case LFT_BYTE:
+		return luabind::object(L, (byte)val);
+	case LFT_WORD:
+		return luabind::object(L, (short)val);
+	case LFT_DWORD:
+		return luabind::object(L, (int)val);
+	case LFT_FLOAT:
+		return luabind::object(L, (float)val);
+	case LFT_DFLOAT:
+		return luabind::object(L, (double)val);
+	default:
+		return luabind::object();
+	}
+}
+
+bool LuaProxy::LevelObject::isValid()
+{
+	if(m_index < 0 || m_index > GM_LEVEL_COUNT)
+		return false;
+	return true;
+}
+
+
+double LuaProxy::LevelObject::x()
+{
+	if(!isValid())
+		return 0;
+	return SMBXLevel::get(m_index)->XPos;
+}
+
+
+void LuaProxy::LevelObject::setX(double x)
+{
+	if(!isValid())
+		return;
+	SMBXLevel::get(m_index)->XPos = x;
+}
+
+double LuaProxy::LevelObject::y()
+{
+	if(!isValid())
+		return 0;
+	return SMBXLevel::get(m_index)->YPos;
+}
+
+void LuaProxy::LevelObject::setY(double y)
+{
+	if(!isValid())
+		return;
+	SMBXLevel::get(m_index)->YPos = y;
+}
+
+LuaProxy::VBStr LuaProxy::LevelObject::levelTitle()
+{
+	if(!isValid())
+		return VBStr(0);
+	return VBStr(SMBXLevel::get(m_index)->levelTitle);
 }

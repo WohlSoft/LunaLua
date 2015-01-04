@@ -724,6 +724,21 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object)) &LuaProxy::mem),
 			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
+			def("levels", &LuaProxy::levels),
+			def("findlevels", &LuaProxy::findlevels),
+			def("findlevel", &LuaProxy::findlevel),
+
+			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
+			def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
+			def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
+			def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
+			def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
+			def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
+			def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
+			def("MusicStop", (void(*)())&LuaProxy::MusicStop),
+			def("MusicStopFadeOut", (void(*)(int))&LuaProxy::MusicStopFadeOut),
+			def("MusicVolume", (void(*)(int))&LuaProxy::MusicVolume),
+
 			namespace_("UserData")[
 					def("setValue", &LuaProxy::SaveBankProxy::setValue),
 					def("getValue", &LuaProxy::SaveBankProxy::getValue),
@@ -744,6 +759,13 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			.property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
 			.def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::World::mem))
 			.def("mem", static_cast<luabind::object (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::World::mem)),
+
+			class_<LuaProxy::LevelObject>("Level")
+			.property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
+			.property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
+			.property("levelTitle", &LuaProxy::LevelObject::levelTitle)
+			.def("mem", static_cast<void (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::LevelObject::mem))
+			.def("mem", static_cast<luabind::object (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::LevelObject::mem)),
 
 			class_<LuaProxy::VBStr>("VBStr")
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)

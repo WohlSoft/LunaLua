@@ -246,11 +246,14 @@
     <ClInclude Include="mciEmulator.h">
       <Filter>Header Files\Emulator</Filter>
     </ClInclude>
-    <ClInclude Include="Overworld.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-	<ClInclude Include="SdlMusic\MusicManager.h">
+    <ClInclude Include="SdlMusic\MusicManager.h">
       <Filter>Header Files\MusicPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="Overworld.h">
+      <Filter>Header Files\World</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldLevel.h">
+      <Filter>Header Files\World</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -422,11 +425,14 @@
     <ClCompile Include="mciEmulator.cpp">
       <Filter>Header Files\Emulator</Filter>
     </ClCompile>
-    <ClCompile Include="Overworld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-	<ClCompile Include="SdlMusic\MusicManager.cpp">
+    <ClCompile Include="SdlMusic\MusicManager.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Overworld.cpp">
+      <Filter>Header Files\World</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldLevel.cpp">
+      <Filter>Header Files\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

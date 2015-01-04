@@ -77,6 +77,14 @@ enum PRIORITY {
 #define GM_CAMERA_X			*(DWORD*)0x00B2B984
 #define GM_CAMERA_Y			*(DWORD*)0x00B2B9A0
 
+// Overworld base struct
+#define GM_OVERWORLD_PTR	*(DWORD*)0x00B2C5C8
+
+// Overworld Level Array
+#define GM_LEVEL_COUNT		*(DWORD*)0x00B25960
+#define GM_LEVEL_BASE		*(DWORD*)0x00B25994
+
+
 // Level related memory
 #define GM_LVL_BOUNDARIES	*(DWORD*)0x00B257D4		// 6 doubles each section, L/U/R/D/?/?
 #define GM_LVLNAME_PTR		*(DWORD*)0x00B2C5A4	

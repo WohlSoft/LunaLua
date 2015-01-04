@@ -66,6 +66,11 @@ namespace LuaProxy {
 	//Load hitbox values for playable character
 	void loadHitboxes(int _character, int _powerup, const char *ini_file);
 
+	//World
+	luabind::object levels(lua_State *L);
+	luabind::object findlevels(std::string toFindName, lua_State* L);
+	luabind::object findlevel(std::string toFindName, lua_State* L);
+
     //for runAnimation
     struct coorStruct{
         double x;
@@ -548,5 +553,21 @@ namespace LuaProxy {
 		bool playerIsCurrentWalking();
 		luabind::object levelTitle(lua_State* L);
 		short getCurrentDirection();
+	};
+
+	class LevelObject
+	{
+	public:
+		LevelObject(int index);
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+		double x();
+		void setX(double x);
+		double y();
+		void setY(double y);
+		VBStr levelTitle();
+	private:
+		bool isValid();
+		int m_index;
 	};
 }
