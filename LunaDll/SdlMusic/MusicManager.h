@@ -28,8 +28,10 @@ class MusicManager
 		static std::string lenght();
 		static std::string position();
 		
-		static void loadSounds(std::string path);
-		static void loadMusics(std::string path);
+		static void loadCustomSounds(std::string episodePath);
+		static void resetSoundsToDefault();
+		static void loadSounds(std::string path, std::string root);
+		static void loadMusics(std::string path, std::string root);
 	
 	private:
 		static std::map<std::string, musicFile > registredFiles;

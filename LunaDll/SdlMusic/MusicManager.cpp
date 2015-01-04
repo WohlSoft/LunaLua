@@ -309,8 +309,8 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 	{
 		defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
 		defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
-		loadSounds(defaultSndINI);
-		loadMusics(defaultMusINI);
+		loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+		loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
 	}
 	
 	//clear junk
@@ -465,7 +465,7 @@ std::string MusicManager::position()
 	return t;
 }
 
-void MusicManager::loadSounds(std::string path)
+void MusicManager::loadSounds(std::string path, std::string root)
 {
 	if( !file_existsX(path) ) return;
 
@@ -488,16 +488,34 @@ void MusicManager::loadSounds(std::string path)
 		replaceSubStr(fileName, "\\\\",  "\\");
 		replaceSubStr(fileName, "/",  "\\");
 
-		if( file_existsX(PGE_SDL_Manager::appPath+fileName) )
+		if( file_existsX(root+fileName) )
 		{
 			chunksList[i] = fileName.c_str();
 		}
 	}
 }
 
-void MusicManager::loadMusics(std::string path)
+void MusicManager::loadMusics(std::string path, std::string root)
 {
 
 }
+
+void MusicManager::loadCustomSounds(std::string episodePath)
+{
+	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+	loadSounds(episodePath+"\\sounds.ini", episodePath);
+
+	for(int i=0; i<91; i++)
+		addSound(chunksAliasesList[i], "dummy");
+}
+
+
+void MusicManager::resetSoundsToDefault()
+{
+	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+	for(int i=0; i<91; i++)
+		addSound(chunksAliasesList[i], "dummy");
+}
+
 
 #endif
