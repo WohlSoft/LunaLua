@@ -303,9 +303,8 @@ std::string MusicManager::defaultMusINI="";
 
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
-	bool firstRun = PGE_SDL_Manager::isInit;
+	bool firstRun = !PGE_SDL_Manager::isInit;
 	PGE_SDL_Manager::initSDL();
-
 	if(firstRun)
 	{
 		defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
@@ -468,7 +467,32 @@ std::string MusicManager::position()
 
 void MusicManager::loadSounds(std::string path)
 {
+	if( !file_existsX(path) ) return;
 
+	INIReader hitBoxFile( path.c_str() );
+	if (hitBoxFile.ParseError() < 0)
+	{
+		MessageBoxA(0, std::string(path+"\n\nError of read INI file").c_str(), "Error", 0);
+		return;
+	}
+
+	for(int i=0; i<91; i++)
+	{
+		bool valid=false;
+		std::string head = "sound-"+i2str(i+1);
+		std::string fileName;
+
+		fileName = hitBoxFile.Get(head, "file", "");
+		if(fileName.size()==0) continue;
+		replaceSubStr(fileName, "\"", "");
+		replaceSubStr(fileName, "\\\\",  "\\");
+		replaceSubStr(fileName, "/",  "\\");
+
+		if( file_existsX(PGE_SDL_Manager::appPath+fileName) )
+		{
+			chunksList[i] = fileName.c_str();
+		}
+	}
 }
 
 void MusicManager::loadMusics(std::string path)
