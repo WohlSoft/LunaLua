@@ -17,4 +17,7 @@ std::string utf8_encode(const std::wstring &wstr);
 std::wstring utf8_decode(const std::string &str);
 std::string wstr2str(const std::wstring &wstr);
 
+std::string i2str(int source);
+bool file_existsX(const std::string& name);
+
 #endif

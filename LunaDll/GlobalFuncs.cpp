@@ -1,3 +1,4 @@
+#include <sstream>
 #include "GlobalFuncs.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
@@ -110,4 +111,22 @@ std::string wstr2str(const std::wstring &wstr)
       s = std::string(&to[0], to_next);
     }
 	return s;
+}
+
+std::string i2str(int source)
+{
+	std::stringstream s;
+	s<<source;
+	return s.str();
+}
+
+
+bool file_existsX(const std::string& name)
+{
+    if (FILE *file = fopen(name.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false;
+    }   
 }
