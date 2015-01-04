@@ -2,6 +2,7 @@
 #include "SdlMusic/MusicManager.h"
 #include <vector>
 #include "Globals.h"
+#include "GlobalFuncs.h"
 
 MciEmulator::MciEmulator(void)
 {
@@ -86,8 +87,6 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			}
 		}
 	}
-
-	
 
 errorFinalize:;
 	if(uReturnLength < 2)

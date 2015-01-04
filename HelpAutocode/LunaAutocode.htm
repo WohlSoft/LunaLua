@@ -1,0 +1,365 @@
+<html>
+<head>
+<title>LunaDLL</title>
+<body>
+
+<br><h2>Basic filters</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+</tr>
+<tr>
+<td>FilterToSmall</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>FilterToBig</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>FilterToFire</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>FilterMount</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>FilterReservePowerup</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>FilterPlayer</td><td>x</td><td>Player ID</td><td>Filter to ID</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+</table>
+ 
+
+<br><h2>General effect commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<td>HeartSystem</td><td>Display X</td><td>Display Y</td><td>Max hearts</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>InfiniteFlying</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>ForceFacing</td><td>NPC ID</td><td>Section</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+</table>
+ 
+<br><h2>Text commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<td>ShowText</td><td>x</td><td>X position</td><td>Y position</td><td>Font type</td><td>Length</td><td>String</td>
+<tr>
+<td>ShowNPCLifeLeft</td><td>NPC ID</td><td>X position</td><td>Y position</td><td>Section</td><td>Length</td><td>Base Health</td>
+</tr>
+</table>
+ 
+<br><h2>Control/Event commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<tr>
+<td>Trigger</td><td>New section</td><td>Event</td><td>x</td><td>x</td><td>x</td><td>x</td>
+</tr>
+<tr>
+<td>Timer</td><td>Target</td><td>Action</td><td>Display?</td><td>Reset?</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>TriggerRandom</td><td>Possible event 1</td><td>Possible event 2</td><td>Possible event 3</td><td>Possible event 4</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>TriggerZone</td><td>Event to trigger</td><td>Top edge</td><td>Bottom edge edge</td><td>Left edge</td><td>Right edge</td><td>Options</td>
+</tr>
+<tr>
+<td>IfNPC</td><td>NPC ID</td><td>Condition</td><td>Trigger section</td><td>Event to trigger</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>OnInput</td><td>x</td><td>Button</td><td>First frame?</td><td>Event to trigger</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>OnCustomCheat</td><td>x</td><td>x</td><td>Only once?</td><td>Event to trigger</td><td>Length</td><td>Type (b, w, dw, f, df)</td>
+</tr>
+<tr>
+<td>OnPlayerMem</td><td>Offset</td><td>Value</td><td>Comparison type</td><td>Event to trigger</td><td>Length</td><td>Type (b, w, dw, f, df)</td>
+</tr>
+<tr>
+<td>OnGlobalMem</td><td>Address</td><td>Value</td><td>Comparison type</td><td>Event to trigger</td><td>Length</td><td>Type (b, w, dw, f, df)</td>
+</tr>
+<tr>
+<td>BlockTrigger</td><td>Who can trigger</td><td>Block type</td><td>Collision type</td><td>Event to trigger</td><td>Length</td><td>Options</td>
+</tr>
+</table>
+ 
+<br><h2>Layer commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<tr>
+<td>LayerXSpeed</td><td>Layer #</td><td>Stop after?</td><td>x</td><td>x</td><td>Length</td><td>New speed</td>
+</tr>
+<tr>
+<td>LayerYSpeed</td><td>Layer #</td><td>Stop after?</td><td>x</td><td>x</td><td>Length</td><td>New speed</td>
+</tr>
+<tr>
+<td>AccelerateLayerX</td><td>Layer #</td><td>Max speed</td><td>x</td><td>x</td><td>Length</td><td>Accel amt</td>
+</tr>
+<tr>
+<td>AccelerateLayerY</td><td>Layer #</td><td>Max speed</td><td>x</td><td>x</td><td>Length</td><td>Accel amt</td>
+</tr>
+<tr>
+<td>DccelerateLayerX</td><td>Layer #</td><td>Deccelerate to</td><td>x</td><td>x</td><td>Length</td><td>Accel amt</td>
+</tr>
+<tr>
+<td>DccelerateLayerY</td><td>Layer #</td><td>Deccelerate to</td><td>x</td><td>x</td><td>Length</td><td>Accel amt</td>
+</tr>
+</table>
+ 
+<br><h2>Set commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<tr>
+<td>SetHearts</td><td>x</td><td>Hearts</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>SetHits</td><td>NPC ID</td><td>Section</td><td>Damage</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+</table>
+
+<br><h2>Audio commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<tr>
+<td>SFX</td><td>x</td><td>Sound ID</td><td>x</td><td>x</td><td>Delay</td><td>x</td>
+</tr>
+<tr>
+<td>PlayMusic</td><td>x</td><td>Section</td><td>x</td><td>x</td><td>Delay</td><td>x</td>
+</tr>
+</table>
+ 
+<br><h2>Advanced commands</h2>
+<table border="1">
+<tr>
+<th>Command</th><th>Target</th><th>Param</th><th>Param</th><th>Param</th><th>Active time</th><th>String</th>
+<tr>
+<tr>
+<td>DebugPrint</td><td>x</td><td>x</td><td>x</td><td>x</td><td>Length</td><td>x</td>
+</tr>
+<tr>
+<td>NPCMemSet</td><td>NPC ID</td><td>Offset</td><td>Value</td><td>x</td><td>Length</td><td>Data type</td>
+</tr>
+</table>
+<br>
+<br>
+Sections/IDs - Specifies when events will run
+<ul>
+ <li>-1 = "Load level" events</li>
+ <li>0 = Always active events</li>
+ <li>1-21 = Section-specific events</li>
+ <li>1000+ = Custom event blocks</li>
+</ul>
+<br>
+Example<br>
+#-1<br>
+<br>
+ FilterToSmall,0,0,0,0,0,0 = In the "Load level" section, make the player small
+<br>
+<br>
+<br>
+Targets - Target of event
+<ul>
+ <li>0 = Player</li>
+ <li>1+ = Type of sprite / block to target</li>
+</ul>
+Actions - Action the event performs on the target
+<ul>
+ <li>0 = Invalid</li>
+ <li>1 = Death</li>
+ <li>1000+ = Activate custom event</li>
+</ul>
+
+<br>
+<br>
+<br>
+Font type - Built-in font types for text functions
+<ul>
+ <li>0 = ?</li>
+ <li>1 = Numbers only (the score font)</li>
+ <li>2 = Black, upper and lower case (the level name font)</li>
+ <li>3 = Blocky white, upper case only (font for everything else)</li>
+</ul>
+Example<br> ShowText,0,50,50,3,0,Hi = Print "Hi" at 50,50 on the screen using font 3
+<br>
+<br>
+<br>
+Player IDs
+<ul>
+ <li>0 = Invalid</li>
+ <li>1 = Demo</li>
+ <li>2 = Iris</li>
+ <li>3 = Peach</li>
+ <li>4 = Raocow</li>
+ <li>5 = Sheath</li>
+</ul>
+Example<br>FilterToPlayer,0,5,1,0,0,0 = Player with ID 5 (sheath) becomes player ID 1 (demo)
+<br>
+<br>
+<br>
+Conditional
+<ul>
+ <li>0 = Invalid</li>
+ <li>1 = Exists</li>
+ <li>2 = Does not exist</li>
+ <li>3 = On screen</li>
+ <li>4 = Off screen</li>
+(Note: There must be at least 1 NPC somewhere in the level or conditionals will not be checked)
+</ul>
+Example<br> IfNPC,31,2,0,1000,0,0 = If an NPC with ID 31 (31 = a key) does not exist, trigger event 1000. (must be at least 1 NPC somewhere though)
+<br>
+<br>
+<br>
+Data types - For advanced modification of data
+<ul>
+ <li>"byte" = 1 byte unsigned data</li>
+ <li>"short" = 2 bytes unsigned data</li>
+ <li>"int" = 4 bytes unsigned data</li>
+ <li>"float" = 4 bytes float/decimal formatted data data</li>
+ <li>"double" = 8 bytes double precision float/decimal formatted data data</li>
+</ul>
+Example<br>NPCMemSet,10,0x98,-3,0,0,double = All npcs of type 10 have their memory at 0x98 set to -3, formatted as an 8 byte double. (0x98 in an NPC object is the X Speed variable which is stored as a double)
+<br>
+<br>
+<br>
+- Format -<br>
+#n, where n is a Section/ID, mean all following commands will have that specifier<br>
+<br>
+<code>
+#-1<br>
+-- Statements for load level section --<br>
+<br>
+#0<br>
+-- Statements for always section --<br>
+<br>
+#5<br>
+-- Statements for section 5--<br>
+<br>
+#1005<br>
+-- Statements for custom event 1005 --<br>
+<br>
+#END<br>
+</code>
+<br>
+<br>
+- FilterToSmall -<br> x, x, x, x, Length, x<br>
+Player loses all powerups.<br>
+<br>
+- FilterToBig -<br> x, x, x, x, Length, x<br>
+Player loses all powerups higher than bigness.<br>
+<br>
+- FilterToFire -<br> x, x, x, x, Length, x<br>
+Player loses all powerups higher than fireballs.<br>
+<br>
+- FilterMount -<br> x, x, x, x, Length, x<br>
+Whatever the player is riding disappears.<br>
+<br>
+- FilterReservePowerup -<br> x, x, x, x, Length, x<br>
+The player's reserve powerup disappears.<br>
+<br>
+- FilterPlayer -<br> x, Filter ID, To ID, x, Length, x<br>
+If the player's character type is "Filter ID", they change to the character set in "To ID".<br>
+<br>
+- SetHearts -<br> x, Hearts, To ID, x, Length, x<br>
+Sets the player's hearts.
+<br>
+<br>
+- HeartSystem -<br> X display, Y display, Max hearts, x, Length, x<br>
+Activates a heart tracking system for players that use hearts. Allows for more than 3 hearts and displays the current heart count at X / Y on screen.<br>
+<br>
+- InfiniteFlying -<br> x, x, x, x, Length, x<br>
+Player's flight timer never decreases below 50 so long as this event is active.<br>
+<br>
+- ShowText -<br> x, X pos, Y pos, Font type, Length, String<br>
+Shows String on the screen, at coordinates Xpos and Y pos, with specified font type.<br>
+<br>
+- ShowNPCLifeLeft -<br> NPC ID, X pos, Y pos, Section, Length, Base health<br>
+Displays how much life the first match for "NPC ID" in "Section" has. Displays on the screen at coordinates X pos and Y pos. Supply the correct base health for the NPC so it can calculate the correct remaining life.<br>
+<br>
+- Trigger -<br> New section, Event, x, x, x, x<br>
+Activates an event by moving "Event" to "New section". The trigger itself expires afterwards.
+<br>
+<br>
+- Timer -<br> Target, Effect, Display?, Reset?, Length, x<br>
+Starts a timer that performs Effect on Target. Set "Display?" to 1 to display the timer in the top right. Set "Reset" to 1 and the timer will start over once it completes.
+<br>
+<br>
+If "Effect" is 1000 or higher, the timer will behave like the Trigger command. It will trigger the corresponding custom event by placing it in the section specified by Target.<br>
+<br>
+<br>
+- IfNPC -<br> NPC ID, Condition, To section, Event, Length, x<br>
+If "Condition" is true for NPC specified by "NPC ID", then custom event "Event" is triggered in "To section". IfNPC command expires itself after triggering.
+<br>
+<br>
+- SetHits -<br> NPC ID, Section, Damage, x, Length, x<br>
+The first NPC matching "NPC ID" in "Section" has its "hits taken" set to "Damage". Set to negative values to increase hits beyond normal.<br>
+<br>
+- ForceFacing -<br> NPC ID, Section, x, x, Length, x<br>
+All NPCs of NPC ID in Section always face the player.<br>
+<br>
+- SFX -<br> x, Sound ID, x, x, x, x<br>
+Plays specified sound. Expires itself afterwards.<br>
+<br>
+- DebugPrint -<br> x, x, x, x, Length, x<br>
+Prints event information for the level designer for diagnostic purposes.<br>
+<br>
+- NPCMemSet -<br> NPC ID, Offset, Value, x, Length, Data type<br>
+This is an advanced and dangerous command. It allows one to modify the data of any NPC that is alive in the level.<br>
+<br>
+Any NPC of type NPC ID will have memory inside it at Offset set to Value. Value will be formatted according to "Data type".
+<br>
+<br>
+<br>
+<h2>Advanced Examples</h2>
+<br>
+<h3>Heart system power-up</h3>
+<code>
+#0<br>
+IfNPC,178,2,0,1000,0,once<br>
+#1000<br>
+HeartSystem,610,35,7,0,0,0<br>
+SFX,0,83,0,0,0,0<br>
+#END<br>
+<br></code>
+Activates the special Heart system once the player picks up the Axe (NPC 178), and plays the ZeldaItemGet sound effect.
+<br>
+<br>
+<h3>Infinite looping gimmick</h3>
+<code>
+#0<br>
+DebugPrint,0,0,0,0,0,0<br>
+Trigger,0,1000,0,0,0,0<br>
+<br>
+// All enemies friendly<br>
+#1000<br>
+Timer,0,1001,1,0,200,0<br>
+NPCMemSet,-1,0x46,0xFFFF,0,200,short<br>
+ShowText,0,400,550,3,200,YAY!<br>
+<br>
+// All enemies unfriendly<br>
+#1001<br>
+Timer,0,1000,1,0,200,0<br>
+NPCMemSet,-1,0x46,0x0000,0,200,short<br>
+ShowText,0,400,550,3,200,GRR!<br>
+<br>
+#END<br>
+<br></code>
+Starts the friendly enemy event, which calls the unfriendly enemy event when it ends, which calls the friendly enemy event again when that ends. Loops forever. Use DebugPrint when designing your code to be sure you didn't create some horrific infinite memory leak.
+<br>
+<br>
+</body>
+</html>

@@ -1,15 +1,11 @@
 #ifndef NO_SDL
 
-
-#include <windows.h>
-#include <string>
+#include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
 
-
-Mix_Music *PGE_MusPlayer::play_mus = NULL;
-
+/***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
-std::string PGE_MusPlayer::currentTrack="";
+std::string PGE_SDL_Manager::appPath="";
 
 void PGE_SDL_Manager::initSDL()
 {
@@ -19,9 +15,29 @@ void PGE_SDL_Manager::initSDL()
 		isInit=true;
 		PGE_MusPlayer::setSampleRate(44100);
 		PGE_MusPlayer::MUS_changeVolume(80);
+
+		HMODULE hModule = GetModuleHandleW(NULL);
+		WCHAR path[MAX_PATH];
+		int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+		for(int i = count; i > 3; i--)
+		{
+			if(path[i] == L'\\')
+			{
+				path[i] = 0;
+				break;
+			}
+		}
+		std::wstring smbxPath = path;
+		smbxPath = smbxPath.append(L"\\");
+		appPath = wstr2str(smbxPath);
 	}
 }
 
+
+
+/***********************************PGE_MusPlayer********************************************/
+Mix_Music *PGE_MusPlayer::play_mus = NULL;
+std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
@@ -34,10 +50,7 @@ void PGE_MusPlayer::MUS_playMusic()
 	{
 		if(Mix_PlayingMusic()==0)
 		{
-			if(Mix_PlayMusic(play_mus, -1)==-1)
-			{
-				//MessageBoxA(0, std::string(std::string("Mix_PlayMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-			}
+			Mix_PlayMusic(play_mus, -1);
 		}
 		else
 		if(Mix_PausedMusic()==1)
@@ -54,6 +67,7 @@ void PGE_MusPlayer::MUS_playMusic()
 void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 {
 	if(!PGE_SDL_Manager::isInit) return;
+
 	if(play_mus)
     {
 		if(Mix_PausedMusic()==0)
@@ -122,15 +136,21 @@ int PGE_MusPlayer::currentVolume()
 void PGE_MusPlayer::MUS_openFile(const char *musFile)
 {
 	PGE_SDL_Manager::initSDL();
-	if(currentTrack==std::string(musFile)) return;
+	if(currentTrack==std::string(musFile))
+	{
+		if(Mix_PlayingMusic()==1)
+			return;
+	}
 
     if(play_mus!=NULL)
     {
-        Mix_FreeMusic(play_mus);
-        play_mus=NULL;
+        Mix_HaltMusic();
+		Mix_FreeMusic(play_mus);
+		play_mus=NULL;
     }
 
-    play_mus = Mix_LoadMUS( musFile );
+	play_mus = Mix_LoadMUS( musFile );
+
     if(!play_mus)
 	{
 		if(showMsg_for!=musFile)
@@ -153,7 +173,7 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 
 
 
-
+/***********************************PGE_Sounds********************************************/
 
 Mix_Chunk *PGE_Sounds::sound = NULL;
 char *PGE_Sounds::current = "";

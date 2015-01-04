@@ -255,6 +255,12 @@
     <ClInclude Include="WorldLevel.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
+	<ClInclude Include="SdlMusic\MusicManager.h">
+      <Filter>Header Files\MusicPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -433,6 +439,12 @@
     </ClCompile>
     <ClCompile Include="WorldLevel.cpp">
       <Filter>Header Files\World</Filter>
+	</ClCompile>
+    <ClCompile Include="SdlMusic\MusicManager.cpp">
+      <Filter>Header Files\MusicPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalFuncs.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

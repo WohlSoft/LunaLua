@@ -8,8 +8,6 @@
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 
-std::string wstr2str(const std::wstring &wstr);
-
 namespace LuaProxy {
     enum L_FIELDTYPE{
         LFT_INVALID = 0,

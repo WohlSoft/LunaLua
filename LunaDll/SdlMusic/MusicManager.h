@@ -27,12 +27,20 @@ class MusicManager
 		static void setVolume(int _volume);
 		static std::string lenght();
 		static std::string position();
+		
+		static void loadCustomSounds(std::string episodePath);
+		static void resetSoundsToDefault();
+		static void loadSounds(std::string path, std::string root);
+		static void loadMusics(std::string path, std::string root);
 	
 	private:
 		static std::map<std::string, musicFile > registredFiles;
 		static std::map<std::string, chunkFile > chunksBuffer;
+		static std::string chunksAliasesList[91];
 		static std::string chunksList[91];
 		static int chunksChannelsList[91];
+		static std::string defaultSndINI;
+		static std::string defaultMusINI;
 };
 #endif
 

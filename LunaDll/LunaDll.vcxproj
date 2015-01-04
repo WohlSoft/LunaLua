@@ -154,6 +154,7 @@
     <ClInclude Include="DeathRecord.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="BMPBox.h" />
+    <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hitbox.h" />
     <ClInclude Include="Input.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="EuroShellRandD.lvl.cpp" />
     <ClCompile Include="BMPBox.cpp" />
     <ClCompile Include="GenComp.cpp" />
+    <ClCompile Include="GlobalFuncs.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="Input.cpp" />
