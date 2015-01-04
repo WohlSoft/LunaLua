@@ -1,0 +1,1455 @@
+-- LunaDLL COMPLETE command reference --
+
+
+
+*-------------------------------------------------------------------------------
+FILTER TO SMALL
+
+FilterToSmall,-,-,-,-,Active time,-
+
+Description -
+Sets player 1 to small until active time runs out.
+
+Notes -
+
+Example -
+
+// Forced to be small for an entire level
+FilterToSmall,0,0,0,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+FILTER TO BIG
+
+FilterToBig,-,-,-,-,Active time,-
+
+Description -
+Lowers player 1's powerup state down to "bigness" if they have anything better (fire flower, leaf...)
+so long as active time hasn't run out
+
+Notes -
+If you are already small or big, you will stay small or big.
+
+Example -
+
+// Forced to be at best Big for an entire level
+FilterToBig,0,0,0,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+FILTER TO FIRE
+
+FilterToFire,-,-,-,-,Active time,-
+
+Description -
+Lowers player 1's powerup state down to fire flower if they have anything better (leaf, hammer suit...)
+so long as active time hasn't run out
+
+Notes -
+If you are already small, big, or fire-flowered, you will stay that way
+
+Example -
+
+// Forced to be at best fire for an entire level
+FilterToFire,0,0,0,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+FILTER MOUNT
+
+FilterMount,-,-,-,-,Active time,-
+
+Description -
+Removes your mount (yoshi, clown car, boot...) so long as active time hasn't run out
+
+Notes -
+
+Example -
+
+// Remove your mount as the level begins
+FilterMount,0,0,0,0,2,0
+
+
+
+
+*-------------------------------------------------------------------------------
+FILTER RESERVE POWERUP
+
+FilterReservePowerup,-,-,-,-,Active time,-
+
+Description -
+Removes whatever is in the reserve powerup box so long as active time hasn't run out
+
+Notes -
+
+Example -
+
+// Forced to have no reserve powerup for 1 second 
+FilterReservePowerup,0,0,0,0,60,0
+
+
+
+
+*-------------------------------------------------------------------------------
+FILTER PLAYER
+
+FilterPlayer,-,P1,P2,-,Active time,-
+
+Description -
+If the player is P1, change them to P2 instead, so long as active time hasn't run out.
+Use to keep certain characters out of levels you don't want them in.
+
+Notes -
+P1 and P2 are Player IDs. They're numbers 1 2 3 4 or 5.
+
+1 = Mario / Demo
+2 = Luigi / Iris
+3 = Princess
+4 = Toad / raocow
+5 = Link / Sheath
+
+
+Example -
+
+// Change Link into Mario
+FilterPlayer,0,5,1,0,0,0
+
+Example -
+
+// Force Princess (filter all other characters to be princess instead)
+FilterPlayer,0,1,3,0,0,0
+FilterPlayer,0,2,3,0,0,0
+FilterPlayer,0,4,3,0,0,0
+FilterPlayer,0,5,3,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+INFINITE FLYING
+
+InfiniteFlying,-,-,-,-,Active time,-
+
+Description -
+Keeps the player's flight timer from counting down so long as active time hasn't run out.
+
+Notes -
+
+Example -
+
+// Infinite flying for the first 30 seconds of the level
+InfiniteFlying,0,0,0,0,1800,0
+
+
+
+
+*-------------------------------------------------------------------------------
+HEART SYSTEM
+
+HeartSystem,X,Y,MAX HEARTS,-,Active time,-
+
+Description -
+Activates a special heart system so long as active time hasn't run out. The hearts will
+be displayed on the screen at the X / Y coordinate.
+MAX HEARTS allows you to collect more than 3 hearts.
+
+Notes -
+This command lets any heart based character stock more hearts. If you don't want the counter
+displayed, move the X / Y far off screen, like 5000 / 5000.
+
+Example -
+
+// Activate the heart system with 9 max hearts
+HeartSystem,50,500,9,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+SCREEN EDGE BUFFER
+
+ScreenEdgeBuffer,NPC ID,UDLR Border,BUFFER SPACE,-,Active time,-
+
+Description -
+Keeps NPCs from leaving the screen.
+NPC ID is which type of NPC will be effected.
+UDLR (Up Down Left Right) is which border of the screen the npc won't be able to pass.
+
+0 = Top
+1 = Bottom
+2 = Left
+3 = Right
+
+BUFFER SPACE is how close the NPCs can get to the edge before being stopped.
+
+
+Notes -
+If you increase the BUFFER SPACE to a large amount, you can force NPCs to stay in certain
+parts of the screen. For instance a Lakitu that can't leave a small box area in the middle,
+or an NPC that can only be on the right side of the screen.
+
+Example -
+
+// Make it so Lakitu can't go off the left side of the screen (SMB1 style)
+// (stops him at 1 pixel from the left edge)
+ScreenEdgeBuffer,0x011C,2,1,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+SHOW TEXT
+
+ShowText,-,X,Y,FONT #,Active time,Text
+
+Description -
+Shows Text on the screen using the game's text printing function.
+Prints at coordinates X,Y using FONT 1 through 3.
+
+Notes -
+
+FONT 1 only displays black letters (overworld level name font)
+FONT 2 only displays numbers (score font)
+FONT 3 only displays uppercase (normal game font)
+
+Example -
+
+// Display a message in the middle of the screen for 10 seconds using FONT 3
+ShowText,0,250,350,3,600,HELLO WORLD
+
+
+
+
+*-------------------------------------------------------------------------------
+SHOW NPC LIFE LEFT
+
+ShowNPCLifeLeft,NPC ID,X,Y,SECTION #,Active time,BASE HEALTH
+
+Description -
+Prints a number on the screen showing how much life the npc in SECTION # with NPC ID has left.
+Prints at X,Y coordinate, and uses BASE HEALTH to calculate the difference.
+
+Notes -
+
+Example -
+
+// Show remaining health of Mother Brain from section 4 health
+ShowNPCLifeLeft,209,50,500,4,0,10
+
+
+
+
+*-------------------------------------------------------------------------------
+TRIGGER
+
+Trigger,TARGET SECTION,CUSTOM EVENT #,-,-,Active time,-
+
+Description -
+"Triggers" the commands in CUSTOM EVENT # by copying them to TARGET SECTION.
+
+Notes -
+
+Example -
+
+// Copy custom event #1050 into the #0 (always) section
+Trigger,0,1050,0,0,1,0
+
+
+
+
+*-------------------------------------------------------------------------------
+TIMER
+
+Timer,-,CUSTOM EVENT #,DISPLAY?,REPEAT?,Active time,-
+
+Description -
+Starts a timer that counts its Active time down to 0. Once it reaches 0, it activates CUSTOM EVENT.
+
+Notes -
+
+DISPLAY? = 0 = Don't show the timer in the top right corner
+DISPLAY? = 1 = Display the timer
+
+REPEAT? = 0 = Don't restart the timer when it finishes.
+REPEAT? = 1 = Restart the timer back to its starting point when it finishes.
+
+Example -
+
+// Timer that activates custom event #1000 after 100 seconds and displays itself
+Timer,0,1000,1,0,6000,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+IF NPC
+
+IfNPC,NPC ID,CONDITION,0,CUSTOM EVENT,Active time,OPTION
+
+Description -
+Scans the level continuously so long as active time hasn't run out.
+If the scan finds that an NPC of NPC ID meets the condition, it activates CUSTOM EVENT.
+
+Notes -
+
+There are two CONDITIONS this command can check
+CONDITION = 1 = The given NPC exists
+CONDITION = 2 = The given NPC does not exist
+
+So this command can only check and activate events based on if an NPC exists somewhere in your level or not.
+
+This command supports the "once" OPTION, meaning if you enter "once" as the final parameter
+it will only activate once and then delete itself.
+
+
+Example -
+
+// Activate custom event 1000 when the player picks up the axe (axe no longer exists). Only activates once
+IfNPC,178,2,0,1000,0,once
+
+Example - 
+
+// Activate custom event 1001 so long as the axe is still there
+IfNPC,178,1,0,1001,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+BLOCK TRIGGER
+
+BlockTrigger,0,BLOCK ID,URDL,EVENT,Active time,OPTION
+
+Description -
+When player touches any block of type BLOCK ID, activates EVENT.
+URDL determines what type of interaction the player must have with the block.
+
+Notes -
+
+URDL = 1 = Player on top of block
+URDL = 2 = Player touching right side
+URDL = 3 = Player touching bottom
+URDL = 4 = Player touching left side
+0 and 5 have an unknown interaction
+
+This command supports the "once" OPTION, meaning if you enter "once" as the final parameter
+it will only activate once and then delete itself.
+
+Example -
+
+// Activate event #1000 when player lands on basic wood block (block ID 1) only once
+BlockTrigger,0,1,1,1000,0,once
+
+
+
+
+*-------------------------------------------------------------------------------
+TRIGGER RANDOM
+
+TriggerRandom,CHOICE 1,CHOICE 2,CHOICE 3,CHOICE 4,Active time,-
+
+Description -
+Triggers one of the 4 events at random.
+
+Notes -
+
+Example -
+
+// Trigger a random event. 3000 has a higher chance of being triggered (50%)
+// because it's listed twice
+TriggerRandom,1000,2000,3000,3000,1,0
+
+
+
+
+*-------------------------------------------------------------------------------
+TRIGGER RANDOM RANGE
+
+TriggerRandomRange,START,END,-,-,Active time,-
+
+Description -
+Triggers one of the events starting at START and ending at END.
+
+Notes -
+
+Example -
+
+// Trigger one of the 100 events between #1000 and #1100
+TriggerRandomRange,1000,1100,0,0,1,0
+
+
+
+
+*-------------------------------------------------------------------------------
+LUNA CONTROL
+
+LunaControl,TYPE,ACTION,-,-,Active time,-
+
+Description -
+Allows controlling how LunaDLL functions.
+Performs ACTION on TYPE.
+
+Notes -
+ACTION allows you to disable or enable parts of LunaDLL.
+ACTION = 0 = Disable
+ACTION = 1 = Enable
+
+TYPE is the type of thing that will be affected.
+TYPE = 1 = The death counter in the top left
+
+Example -
+
+// Activate the death counter (TYPE = Death counter  ACTION = Enable)
+LunaControl,1,1,0,0,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+TRIGGER ZONE
+
+TriggerZone,EVENT #,TOP,BOTTOM,LEFT,RIGHT,OPTION
+
+Description -
+Triggers EVENT when the player enters the rectangle created by the 4 bounds.
+
+Notes -
+To figure out where the TOP BOTTOM LEFT RIGHT coordinates in your level should be,
+open up the SMBX debugger in the level editor and note how the X and Y change based
+on your mouse. Move your mouse to figure out the coordinates for your trigger zone.
+
+This command supports the "once" OPTION, meaning if you enter "once" as the final parameter
+it will only activate once and then delete itself.
+
+Example -
+
+// Activate event 1000 once when the player enters a certain area in the level
+TriggerZone,1000,-200576,-200384,-201344,-201244,once
+
+
+
+
+*-------------------------------------------------------------------------------
+ON INPUT
+
+OnInput,-,BUTTON,TAPPED?,EVENT,Active time,-
+
+Description -
+Activates EVENT when BUTTON is pressed. If TAPPED is set, it only activates the first frame
+that the player pressed the button and won't again until they let go and press again.
+
+Notes -
+BUTTON can be one through 6
+
+1 = UP
+2 = DOWN
+3 = LEFT
+4 = RIGHT
+5 = RUN
+6 = JUMP
+
+TAPPED = 0 = Activate when holding the button
+TAPPED = 1 = Activate ONLY when first pressing the button
+
+Example -
+
+// Activate event #1000 when you tap jump
+OnINput,0,6,1,1000,0,0
+
+
+
+
+*-------------------------------------------------------------------------------
+ON CUSTOM CHEAT
+
+OnCustomCheat,0,0,ONCE?,EVENT,Active time,CHEAT STRING
+
+Description -
+When the player types CHEAT STRING, activate EVENT.
+
+Notes -
+ONCE? = 0 = The cheat can be entered multiple times
+ONCE? = 1 = This command disables itself after first use.
+
+Example -
+
+// Activate event #1000 when typing "activate". Can only be done once
+OnCustomCheat,0,0,1,1000,0,activate
+
+
+
+
+
+*-------------------------------------------------------------------------------
+ON PLAYER MEM
+
+OnPlayerMem,OFFSET,VALUE,COMPARISON,EVENT,Active time,DATA SIZE
+
+Description -
+Scans player memory and checks OFFSET. Does COMPARISON to the VALUE at that OFFSET,
+and if the comparison is true, it activates EVENT. DATA SIZE is what type of data it
+should look for at that offset.
+
+Notes -
+The OFFSETS are bits of memory that determine the state of the player.
+Not all of them are fully understood. Check the reference at the bottom to find some.
+
+COMPARISON types compare the value at OFFSET to the VALUE in the command.
+
+COMPARISON = 0 = EQUALS. If the VALUE is exactly equal, activate the event.
+COMPARISON = 1 = GREATER THAN. If the VALUE is bigger, activate the event.
+COMPARISON = 2 = LESS THAN. If the VALUE is smaller, activate the event.
+
+There are 5 DATA SIZES used to change memory. The data size has to match the type the
+OFFSET uses. Check the in depth tutorial to actually understand this.
+
+b = byte (1 byte of memory)
+w = word (2 bytes of memory)
+dw = double word (4 bytes of memory)
+f = float / decimal (4 bytes of memory)
+df = double float / double precision decimal (8 bytes of memory)
+
+
+Example -
+
+// When player current powerup ("w" size memory at 0x112) equals 3 (fire flower), activate event 1000
+OnPlayerMem,0x112,3,0,1000,0,w
+
+
+Example -
+
+// When player current powerup ("w" size memory at 0x112) is less than 4 (big or small or firey), activate event 1001
+OnPlayerMem,0x112,4,2,1001,0,w
+
+
+Example -
+
+// When player underwater stroke timer ("w" memory at +0x38) is greater than 5, activate event 1002
+// (if you make event 1002 set the stroke timer to 4, it'll be like you can swim relly fast)
+OnPlayerMem,0x38,5,1,1002,w
+
+
+
+
+
+*-------------------------------------------------------------------------------
+ON GLOBAL MEM
+
+OnGlobalMem,ADDRESS,VALUE,COMPARISON TYPE,EVENT,Active Time,DATA SIZE
+
+
+Description -
+
+Scans SMBX global memory at ADDRESS. Does COMPARISON to the VALUE at that ADDRESS,
+and if the compaison is true, it activates EVENT. DATA SIZE is what type of data it
+should look for at that offset.
+
+
+Notes -
+The ADDRESS Is the memory location of some value stored by SMBX.
+Very few of them are fully understood. These are the ones I've found:
+
+- ADDRESSES -
+0x00B2C8B4 - w = P switch freeze effect on or off
+0x00B2C5A8 - w = Current coin count
+0x00B2C5AC - f = Player lives
+0x00B2C8C4 - w = "You have cheated" variable. 0xFFFF = you've cheated, 0x0 = you haven't cheated
+
+COMPARISON types compare the value at OFFSET to the VALUE in the command.
+
+COMPARISON = 0 = EQUALS. If the VALUE is exactly equal, activate the event.
+COMPARISON = 1 = GREATER THAN. If the VALUE is bigger, activate the event.
+COMPARISON = 2 = LESS THAN. If the VALUE is smaller, activate the event.
+
+There are 5 DATA SIZES used to change memory. The data size has to match the type the
+OFFSET uses. Check the in depth tutorial to actually understand this.
+
+b = byte (1 byte of memory)
+w = word (2 bytes of memory)
+dw = double word (4 bytes of memory)
+f = float / decimal (4 bytes of memory)
+df = double float / double precision decimal (8 bytes of memory)
+
+
+Example -
+
+// If player has exactly 0 lives, activate event 1000 once
+OnGlobalMem,0x00B2C5AC,0,0,1000,1,f
+
+
+Example -
+
+// If player has more than 50 coins, continuously activate event 1001
+OnGlobalMem,0x00B2C5A8,50,1,1001,1,w
+
+
+Example -
+
+// If player has cheated, activate event 1002 once
+OnGlobalMem,0x00B2C8C4,0xFFFF,0,1002,1,w
+
+
+
+
+*-------------------------------------------------------------------------------
+MOD PARAM
+
+ModParam,PARAM TO MOD,VALUE,OPERATION,SECTION,Active time,IDENTIFIER
+
+
+Description -
+ModParam changes another command somewhere in your code.
+PARAM TO MOD is which parameter (which number) of that command you want to change. 1 is the first, 2 is the second, etc.
+OPERATION is how you want to change the number.
+VALUE is the number you want to change it by.
+SECTION is which section it will search for the command.
+IDENTIFIER is a word it will look for to match that command.
+
+If you want to use it on a command like this:
+FilterToSmall,0,0,0,0,0,0
+
+You should change the last 0 to something to identify it by.
+
+FilterPlayer,0,5,3,0,0,mine
+
+Now ModParam can find the command by searching for the IDENTIFIER "mine".
+
+Notes -
+ModParam is a weird and dangerous command and you probably shouldn't use it.
+
+There are 6 types of OPERATION to be performed on VALUE:
+OPERATION = 0 = Assign. VALUE will be set.
+OPERATION = 1 = Add. VALUE will be added to the current value.
+OPERATION = 2 = Subtract. VALUE will be subtracted from the current value.
+OPERATION = 3 = Multiply. The current value will be multiplied by VALUE.
+OPERATION = 4 = Divide. The current value will be divided by VALUE.
+OPERATION = 5 = XOR. The current value will have a bitwise exclusive-or operation performed on it against VALUE.
+
+PARAM TO MOD
+
+Example -
+
+// Change the second value of the command with the identifier "mine", by subtracting 1 from it
+ModParam,2,1,2,0,1,mine
+
+
+// The command that will be changed (it will change from a toad -> peach filter into a link -> peach filter)
+FilterPlayer,0,5,3,0,0,mine
+
+
+
+
+
+*-------------------------------------------------------------------------------
+SET VAR
+
+SetVar,-,OPERATION,VALUE,-,Active time,VARIABLE NAME
+
+Description -
+Manipulates permanent user variables (permanent until SMBX is closed).
+It performs OPERATION on a user variable using VALUE.
+VARIABLE NAME can be chosen by you to be whatever you wish.
+If no variable with the given name exists, it will be created.
+
+
+Notes -
+There are 6 types of OPERATION to be performed on VALUE:
+OPERATION = 0 = Assign. VALUE will be set.
+OPERATION = 1 = Add. VALUE will be added to the current value.
+OPERATION = 2 = Subtract. VALUE will be subtracted from the current value.
+OPERATION = 3 = Multiply. The current value will be multiplied by VALUE.
+OPERATION = 4 = Divide. The current value will be divided by VALUE.
+OPERATION = 5 = XOR. The current value will have a bitwise exclusive-or operation performed on it against VALUE.
+
+Example -
+
+// Create variable "BossesBeaten" and set its value to 1
+SetVar,0,0,1,0,1,BossesBeaten
+
+
+Example - 
+
+// Add 1 to previously created variable
+SetVar,0,1,1,0,1,BossesBeaten
+
+
+
+
+
+*-------------------------------------------------------------------------------
+IF VAR
+
+IfVar,-,COMPARISON,VALUE,EVENT,Active time,VARIABLE NAME
+
+Description -
+Check permanent user variables, and activates EVENTS if the COMPARISON against VALUE is true.
+
+
+Notes -
+COMPARISON types compare the value os the user variable to the VALUE in the command.
+
+COMPARISON = 0 = EQUALS. If the VALUE is exactly equal, activate the event.
+COMPARISON = 1 = GREATER THAN. If the VALUE is bigger, activate the event.
+COMPARISON = 2 = LESS THAN. If the VALUE is smaller, activate the event.
+
+Example -
+
+// If the "BossesBeaten" variable is greater than 7, activate event 1000
+IfVar,0,1,7,0,1,BossesBeaten
+
+
+
+
+
+*-------------------------------------------------------------------------------
+DELETE EVENTS FROM
+
+DeleteEventsFrom,SECTION,-,-,-,Active time,-
+
+Description -
+Delete all commands that are marked with the given SECTION.
+
+Notes -
+
+Example -
+
+// Delete all commands currently in section 1
+DeleteEventsFromt,1,0,0,0,1,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+CLEAR INPUT STRING
+
+ClearInputString,-,-,-,-,Active time,-
+
+Description -
+Reset the player input text.
+
+Notes -
+This will interrupt whatever words or cheats the player is typing in SMBX memory.
+
+
+Example -
+
+// Disable cheats so long as this runs
+ClearInputString,0,0,0,0,0,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+LAYER X SPEED
+
+LayerXSpeed,LAYER NUMBER,STOP?,-,-,Active time,SPEED
+
+Description -
+Sets the X (left and right) speed of LAYER NUMBER to SPEED. 
+If STOP? is 1, the layer stops when this command ends.
+
+Notes -
+
+Example -
+
+// Move layer 0 ("default" layer) to the right at speed 2.5. Stop after 10 seconds
+LayerXSpeed,0,1,0,0,600,2.5
+
+// Move layer 0 ("default" layer) to the left at speed 2.5. Stop after 10 seconds
+LayerXSpeed,0,1,0,0,600,-2.5
+
+
+
+
+*-------------------------------------------------------------------------------
+LAYER Y SPEED
+
+LayerYSpeed,LAYER NUMBER,STOP?,-,-,Active time,SPEED
+
+Description -
+Sets the Y (up and down) speed of LAYER NUMBER to SPEED. 
+If STOP? is 1, the layer stops when this command ends.
+
+Notes -
+
+Example -
+
+// Move layer 0 ("default" layer) down at speed 2.5. Stop after 10 seconds
+LayerYSpeed,0,1,0,0,600,2.5
+
+// Move layer 0 ("default" layer) up at speed 2.5. Stop after 10 seconds
+LayerYSpeed,0,1,0,0,600,-2.5
+
+
+
+
+*-------------------------------------------------------------------------------
+ACCELERATE LAYER X
+
+AccelerateLayerX,LAYER NUMBER,MAX SPEED,-,-,Active time,SPEED
+
+Description -
+Increases the X speed of a layer, up to MAX SPEED. Adds by SPEED every frame.
+
+Notes -
+Accelerate by a small amount or you won't notice any acceleration.
+
+Example -
+
+// Slowly accelerate default layer to the right, until it hits max speed of 4
+AccelerateLayerX,0,4,0,0,0,0.01
+
+
+
+
+*-------------------------------------------------------------------------------
+ACCELERATE LAYER Y
+
+AccelerateLayerY,LAYER NUMBER,MAX SPEED,-,-,Active time,SPEED
+
+Description -
+Increases the Y speed of a layer, up to MAX SPEED. Adds by SPEED every frame.
+
+Notes -
+Accelerate by a small amount or you won't notice any acceleration.
+
+Example -
+
+// Slowly accelerate default layer upwards, until it hits max speed of 4
+AccelerateLayerY,0,4,0,0,0,0.01
+
+
+
+
+*-------------------------------------------------------------------------------
+DECCELERATE LAYER X
+DECCELERATE LAYER Y
+
+DeccelerateLayerX,LAYER NUMBER,DECCEL TO,-,-,Active time,SPEED
+DeccelerateLayerY,LAYER NUMBER,DECCEL TO,-,-,Active time,SPEED
+
+Description -
+Puts a friction or air resistance-like decceleration on a layer.
+The layer's speed will decrease by SPEED every frame, to a minimum of DECCEL TO.
+
+Notes -
+Deccelerate by a small amount or you won't notice any Decceleration.
+
+
+Example -
+
+// Default layer will eventually deccelerate down to 0 speed
+AccelerateLayerX,0,0,0,0,0,0.01
+
+
+Example -
+
+// Default layer will eventually deccelerate down to 0 speed
+AccelerateLayerY,0,0,0,0,0,0.01
+
+
+
+
+*-------------------------------------------------------------------------------
+PUSH SCREEN BOUNDARY
+
+PushScreenBoundary,Section,UDLR,-,-,Active time,Speed
+
+Description -
+Moves the borders of sections around.
+SECTION is which section's border. UDLR = Up, Down, Left, or Right border.
+SPEED is what amount the border should move.
+
+UDLR borders
+0 = Top border
+1 = Bottom border
+2 = Left border
+3 = Right border
+
+Notes -
+You can use this to make autoscrolling in potentially weird ways.
+
+
+Example -
+
+//Autoscroll to the right in section 3, by moving the screen's left and right borders to the right
+PushScreenBoundary,3,2,0,0,0,1
+PushScreenBoundary,3,3,0,0,0,1
+
+
+
+
+*-------------------------------------------------------------------------------
+CYCLE PLAYER RIGHT
+CYCLE PLAYER LEFT
+
+CyclePlayerRight,-,-,-,-,Active time,-
+CyclePlayerLeft,-,-,-,-,Active time,-
+
+Description -
+Changes who the player currently is.
+
+To the right: Mario -> Luigi -> Princess -> Link -> Toad -> Mario
+To the Left: Mario <- Luigi <- Princess <- Link <- Toad <- Mario
+
+Notes -
+
+Example -
+
+// Cycle to the right really fast (you probably shouldn't do this)
+CyclePlayerRight,0,0,0,0,0,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+SET HEARTS
+
+SetHearts,-,HEARTS,-,-,Active time,-
+
+Description -
+Sets the amount of hearts the player currently has to HEARTS.
+
+Notes -
+
+Example -
+
+// Force player to have only 1 heart
+SetHearts,0,1,0,0,1,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+SET HITS
+
+SetHits,NPCID,Section,Hits,-,Active time,-
+
+Description -
+Set all NPCs that have the given NPCID to have taken HITS amount of hits.
+
+Notes -
+You can use this to set boss life, but remember it only tracks how many hits a boss has taken.
+So 0 hits = FULL LIFE / 10 HITS LEFT
+10 hits for mother brain = DEAD
+-10 hits for mother brain = 20 HITS LEFT FOR KILL
+
+Example -
+
+// Set mother brain (NPC ID 209) in section 4 to have 3 life left (7 hits taken)
+SetHits,209,4,7,0,2,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+SFX
+
+SFX,-,SOUND EFFECT,-,-,DELAY,FILENAME
+
+Description -
+Plays SOUND EFFECT after DELAY. Set DELAY of 1 for instant playback.
+Can play a custom sound effect from the level folder if you specify FILENAME.
+
+Notes -
+The SOUND EFFECT number is the same order as in the SMBX event sound effect
+
+
+Example -
+
+// Play SMBX sound effect 1 right now
+SFX,0,1,0,0,1,0
+
+
+Example -
+
+// Play custom sound effect in the level folder "whoop.wav" right now
+SFX,0,0,0,0,1,whoop.wav
+
+
+
+
+
+*-------------------------------------------------------------------------------
+PLAY MUSIC
+
+PlayMusic,-,SECTION,-,-,DELAY,-
+
+Description -
+Plays the music from SECTION after DELAY. Set DELAY to 1 to play it right now.
+
+Notes -
+You can use this to have more than 1 custom music in a section.
+Just set the music as the music for sections you're not using.
+
+
+Example -
+
+// Play the music from section 21 right now
+PlayMusic,0,21,0,0,1,0
+
+
+Example -
+
+// Play the music from section 20 right now
+PlayMusic,0,20,0,0,1,0
+
+
+
+
+
+*-------------------------------------------------------------------------------
+TRIGGER SMBX EVENT
+
+TriggerSMBXEvent,-,-,-,-,Active time,EVENT NAME
+
+Description -
+Triggers the SMBX event with EVENT NAME.
+
+Notes -
+
+Example -
+
+// Trigger the "Level - Start" event
+TriggerSMBXEvent,0,0,0,0,1,Level - Start
+
+
+
+
+*-------------------------------------------------------------------------------
+KILL
+
+Kill,TARGET,-,-,-,Active time,OPTION
+
+Description -
+Kills the target. Currently the only target is 0, which is the player.
+This command supports the OPTION command "once", meaning it will only be run once
+and then it will delete itself.
+
+Notes -
+
+Example -
+
+// Kill the player (once, or else it gets buggy and the level never ends)
+Kill,0,0,0,0,0,once
+
+
+
+
+*-------------------------------------------------------------------------------
+NPC MEM SET
+
+NPCMemSet,NPCID,OFFSET,VALUE,OPERATION,Active time,DATA SIZE
+
+Description -
+Sets the memory of all NPCs in the level of the given type.
+NPC ID is the type of NPC. Check the graphics folder to find the NPC number of the NPC type you want to target.
+OFFSET is the memory of those NPCs you want to change. Check the reference at the bottom of the document for some known memory offsets.
+OPERATION is the way you want to manipulate the memory (adding to it, multiplying from it, subtracting from it...)
+VALUE is what the value that OPERATION will perform on.
+DATA SIZE is the type of data in the NPC's memory. Check the reference at the bottom of the document to find the data size.
+
+Notes -
+
+There are 6 types of OPERATION to be performed on VALUE:
+OPERATION = 0 = Assign. VALUE will be set.
+OPERATION = 1 = Add. VALUE will be added to the current value.
+OPERATION = 2 = Subtract. VALUE will be subtracted from the current value.
+OPERATION = 3 = Multiply. The current value will be multiplied by VALUE.
+OPERATION = 4 = Divide. The current value will be divided by VALUE.
+OPERATION = 5 = XOR. The current value will have a bitwise exclusive-or operation performed on it against VALUE.
+
+There are 5 types of DATA SIZE that can be set
+b = byte (1 byte of memory)
+w = word (2 bytes of memory)
+dw = double word (4 bytes of memory)
+f = float / decimal (4 bytes of memory)
+df = double float / double precision decimal (8 bytes of memory)
+
+Example -
+
+// All enemies think they're underwater (use 0 to set memory for ALL NPCs)
+NPCMemSet,0,0x1C,3,0,0,w
+
+
+
+
+*-------------------------------------------------------------------------------
+PLAYER MEM SET
+
+PlayerMemSet,-,OFFSET,VALUE,OPERATION,Active time,DATA SIZE
+
+Description -
+Sets the memory of player 1.
+OFFSET is the memory of the player you want to change. Check the reference at the bottom of the document for some known memory offsets.
+OPERATION is the way you want to manipulate the memory (adding to it, multiplying from it, subtracting from it...)
+VALUE is what the value that OPERATION will perform on.
+DATA SIZE is the type of data in the player's memory. Check the reference at the bottom of the document to find the data size.
+
+Notes -
+
+There are 6 types of OPERATION to be performed on VALUE:
+OPERATION = 0 = Assign. VALUE will be set.
+OPERATION = 1 = Add. VALUE will be added to the current value.
+OPERATION = 2 = Subtract. VALUE will be subtracted from the current value.
+OPERATION = 3 = Multiply. The current value will be multiplied by VALUE.
+OPERATION = 4 = Divide. The current value will be divided by VALUE.
+OPERATION = 5 = XOR. The current value will have a bitwise exclusive-or operation performed on it against VALUE.
+
+There are 5 types of DATA SIZE that can be set
+b = byte (1 byte of memory)
+w = word (2 bytes of memory)
+dw = double word (4 bytes of memory)
+f = float / decimal (4 bytes of memory)
+df = double float / double precision decimal (8 bytes of memory)
+
+Example -
+
+// Player sparkles permanently
+PlayerMemSet,0,0x02,1,0,0,w
+
+
+
+
+*-------------------------------------------------------------------------------
+MEM ASSIGN
+
+MemAssign,ADDRESS,VALUE,OPERATION,-,Active time,DATA SIZE
+
+Description -
+Sets the internal memory of SMBX.
+ADDRESS is the memory address of the thing you want to change. Only a few addresses are known right now.
+OPERATION is the way you want to manipulate the memory (adding to it, multiplying from it, subtracting from it...)
+VALUE is what the value that OPERATION will perform on.
+DATA SIZE is the type of data in the NPC's memory. Check the reference at the bottom of the document to find the data size.
+
+Notes -
+
+Known addresses:
+0x00B2C8B4 - w = P switch freeze effect on or off
+0x00B2C5A8 - w = Current coin count
+0x00B2C5AC - f = Player lives
+0x00B2C8C4 - w = "You have cheated" variable. 0xFFFF = you've cheated, 0x0 = you haven't cheated
+
+There are 6 types of OPERATION to be performed on VALUE:
+OPERATION = 0 = Assign. VALUE will be set.
+OPERATION = 1 = Add. VALUE will be added to the current value.
+OPERATION = 2 = Subtract. VALUE will be subtracted from the current value.
+OPERATION = 3 = Multiply. The current value will be multiplied by VALUE.
+OPERATION = 4 = Divide. The current value will be divided by VALUE.
+OPERATION = 5 = XOR. The current value will have a bitwise exclusive-or operation performed on it against VALUE.
+
+There are 5 types of DATA SIZE that can be set
+b = byte (1 byte of memory)
+w = word (2 bytes of memory)
+dw = double word (4 bytes of memory)
+f = float / decimal (4 bytes of memory)
+df = double float / double precision decimal (8 bytes of memory)
+
+Example -
+
+// Add 50 lives to the player life count
+MemAssign,0x00B2C5AC,50,1,0,1,f
+
+
+
+
+*-------------------------------------------------------------------------------
+DEBUG PRINT
+
+DebugPrint,-,-,-,-,Active time,-
+
+Description -
+Write some info about how lunadll is running onto the screen.
+
+Notes -
+Use this to check if anything weird is going on in your code. If you see thousands of commands
+being spawned then you have a problem.
+
+Example -
+
+// Show debug info
+DebugPrint,0,0,0,0,0,0
+
+
+
+
+
+
+
+
+
+***** PLAYER MEMORY OFFSET REFERENCE *****
+
+// - Player MOB Struct. size = 0x184 (388 bytes)
+//
+//+0x00		w	= Toad doublejump ready (FFFF = true)
+//+0x02		w	= Star sparkling effect on player
+//+0x04		w	= Horizontal and ducking disabled (?)
+//+0x06		w	= Ducking enabled?
+//+0x08		w	= Water or quicksand timer
+//+0x0A		w	= Is on slippery ground
+
+// - LINK
+//+0x0C		w	= Is a fairy
+//+0x0E		w	= Fairy already used this jump (1 = true)
+//+0x10		w	= Frames until fairy runs out
+//+0x12		w	= Link has a key
+//+0x14		w	= Link slash cooldown timer
+//+0x16		w	= # of hearts (all characters)
+
+// - PRINCESS
+//+0x18		w	= Princess hover is available
+//+0x1A		w	= Holding jump button
+//+0x1C		w	= Princess hover timer
+//+0x1E		w	= Unused (not cleared on level load)
+//+0x20		f	= Princess hover Y tremble speed
+//+0x24		w	= Princess hover Y tremble direction
+
+//+0x26		w	= Ground item pull-up timer
+//+0x28		f	= Ground item pull-up momentum save
+//+0x2A		w	= Unused (not cleared on level load)
+
+//+0x2C		w	= Climbing related
+//+0x30		w	= Climbing related
+//+0x32		w	= Climbing related
+
+//- WATER
+//+0x34		w	= 2 when in water
+//+0x36		w	= 0xFFFF when in water
+//+0x38		w	= Water stroke timer (can't stroke again until 0)
+
+//- MISC
+//+0x3A		w	= Unknown hover timer
+//+0x3C		w	= Is sliding
+//+0x3E		w	= Is generating sliding smoke puffs
+//+0x40		w	= Climbing state (3 = climbing, 2 = pushed up against edge of climbable area)
+//+0x42		w	= Unknown timer42
+//+0x44		w	= Unknown flag44
+//+0x46		w	= Unknown46 (powerup pickup related)
+//+0x48		w	= Slope modifier
+
+//- TANOOKI SUIT
+//+0x4A		w	= Tanooki suit statue flag
+//+0x4C		w	= Statue transform cooldown frame timer
+//+0x4E		w	= Frames spent as statue
+
+//- SPINJUMP
+//+0x50		w	= Spinjump flag (-1 = true)
+//+0x52		w	= Spinjump state counter
+//+0x54		w	= Spinjump land direction (will face this direction when landing)
+
+// - STATES
+//+0x56		w	= Current enemy kill combo count
+//+0x58		w	= Ground sliding smoke puffs state
+//+0x5A		w	= Warp is nearby (1 = pipe, 2 = instant, 3 = door)
+
+//+0x60		w	= Has jumped
+
+//+0x62		w	= Unknown62
+//+0x64		w	= Unknown64
+//+0x66		w	= Unknown66
+//+0x68		w	= Unknown68
+//+0x7A		w	= Unknown70
+//+0x7C		w	= Unknown72
+
+// - MOUNT 
+//+0x7E		w	= Mount upper X offset
+//+0x80		w	= Mount upper Y offset
+//+0x82		w	= Mount upper GFX index
+//+0x84		w	= Mount item in mouth swallow timer
+//+0x86		w	= Mount lower X offset
+//+0x88		w	= Mount upper Y offset
+//+0x8A		w	= Mount lower GFX index
+//+0x8C		w	= Unknown82
+//+0x8E		w	= Unknown82
+//+0x90		qw	= Tongue X position
+//+0x98		qw	= Tongue Y position
+//+0xA0		qw	= Tongue height or hitbox related
+//+0xA8		qw	= Tongue height or hitbox related
+
+// - POSITION
+//+0xC0		qw	= Player X position (absolute coordinates within level)
+//+0xC8		qw	= Player Y position (absolute coordinates within level)
+//+0xD0		qw	= Player height or hitbox related
+//+0xD8		qw	= Player width or hitbox related
+//+0xE0		qw	= Player X speed
+//+0xE8		qw	= Player Y speed
+
+//+0xF0		w	= Player identity index (0 = nothing! don't use, 1 = demo, 2 = iris, 3 = princess, 5 = sheath)
+
+/// - KEYS - 
+//+0xF2		w	= U key pressing
+//+0xF4		w	= D key pressing
+//+0xF6		w	= L key pressing
+//+0xF8		w	= R key pressing
+//+0xFA		w	= J key pressing
+//+0xFC		w	= SJ key pressing
+//+0xFE		w	= X key pressing
+//+0x100	w	= RN key pressing
+//+0x102	w	= SEL key pressing
+//+0x104	w	= STR key pressing
+
+//+0x106	w	= Direction faced (-1 = left)
+
+/// - MOUNT
+//+0x108	w	= Mount identity (0 = no mount,1 = boot, 2 = clowncar, 3 = yoshi)
+//+0x10A	w	= Mount color
+//+0x10C	w	= Mount state
+//+0x10E	w	= Mount height offset or something
+//+0x110	w	= Mount gfx index
+
+/// - STATES
+//+0x112	w	= Current powerup
+//+0x114	w	= Current player sprite index being displayed
+//+0x116	w	= Unused
+//+0x118	f	= X momentum assumption (used when determining how to draw the sprite)
+//+0x11C	w	= Current upward jumping force (2 byte integer representation)
+//+0x11E	w	= Holding jump button
+//+0x120	w	= Holding spinjump button
+//+0x122	w	= Forced animation state	(1 = powerup, 2 = powerdown, 3 = entering pipe, 4 = getting fire flower,
+//											 7 = entering door, 500 = tanooki statue poof state)
+//+0x124	f	= Unknown124
+//+0x128	f	= Unknown128
+//+0x12C	w	= Down button mirror (redundant?)
+//+0x12E	w	= In ducking state
+//+0x130	w	= Select button mirror (redundant?)
+//+0x132	w	= Unknown powerup change related
+//+0x134	w	= Down button pressed this frame (reset next frame)
+//+0x136	w	= Unknown136
+//+0x138	f	= X momentum push (eg. pushed by a bully)
+//
+//+0x13C	w	= Player death state
+//+0x13E	w	= Player death animation timer
+//
+//+0x140	w	= Powerup blinking timer
+//+0x142	w	= Powerup blinking state
+//+0x144	w	= Unknown144
+//
+// - LAYER INTERACTION
+//+0x146	w	= Bottom state (0 = not on the ground or standing on sprite, 2 = foot contact with a solid layer)
+//+0x148	w	= Left state (0 = no left contact, 1 = half or pushed back by a solid layer, 2 = pushing against layer)
+//+0x14A	w	= Top state (0 = no top contact, 1 = half or pushed back by a solid layer, 2 = pushing against layer)
+//+0x14C	w	= Right state (0 = no right contact, 1 = half or pushed back by a solid layer, 2 = pushing against layer)
+//+0x14E	w	= Pushed by a moving layer (0 = not pushed by any, 2 = being pushed to the left or right)
+//+0x150	w	= Unused150
+//+0x152	w	= Unused152
+
+//+0x154	w	= Index of sprite being held (index to a specific sprite object that was generated only, -1 = can't carry anything)
+//+0x156	w	= Unknown156, usually reset to 0
+//+0x158	w	= Powerup box contents (0 = no item)
+//
+// - SECTIONS
+//+0x15A	w	= Current section
+//+0x15C	w	= Warp timer (can't warp / pipe until 0)
+//+0x15E	w	= Unknwon15E
+//
+// - PROJECTILES / ATTACKS
+//+0x160	w	= Projectile timer (fireballs, hammers, link slash..)
+//+0x162	w	= Projectile timer 2 (link projectiles)
+//+0x164	w	= Tail swipe timer
+//+0x166	w	= Unknown166
+//
+// - FLIGHT
+//+0x168	f	= Run speed aggregate until flight achieveable
+//+0x16C	w	= Can fly
+//+0x16E	w	= Is flying
+//+0x170	w	= Flight time remaining
+//+0x172	w	= Holding flight run button
+//+0x174	w	= Holding flight button
+
+//+0x176	w	= Index of sprite being stood on
+//+0x178	w	= Unknown X momentum with sprites
+
+//+0x17A	w	= Usually forced to -1	
+//+0x17C	w	= Unused17C
+//+0x17E	w	= Unused17E
+//+0x180	w	= Unused180
+//+0x182	w	= Unused182
+//+0x184	w	= Unused184
+
+
+***** NPC MEMORY OFFSET REFERENCE *****
+
+// -- NPC structure -- ( 0x158 bytes )
+// 0x+00	pt	= wchar_t* Attached layer name?
+// 0x+04	w	= Unknown
+// 0x+06	w	= Unknown decrementing timer
+
+// 0x+1C	w	= underwater state ( 2 = underwater, 0 = no)
+
+// +0x2C	pt  = wchar_t* Activate event layer name
+// +0x30	pt	= wchar_t* Death event layer name
+// +0x34	pt	= ptr to unknown string
+// +0x38	pt	= wchar_t* No More Objs event layer name
+
+// +0x3C	pt	= wchar_t* Attached layer name?
+
+// 0x+44	w	= Activated / interacted with player flag
+// 0x+46	w	= Friendly (on = 0xFFFF)
+// 0x+48	w	= Don't Move (on = 0xFFFF)
+
+// 0x+64	w	= Is a generator
+// 0x+68	f	= Generator delay setting
+// 0x+6C	f	= Generator delay countdown
+// 0x+70	w	= Direction to generate NPC?
+// 0x+72	w	= Which layer to spawn NPC on
+// 0x+74	w	= Invalidity or offscreen flag?
+
+// 0x+78	qw	= X position
+// 0x+80	qw	= Y position
+// 0x+88	qw	= w/h?
+// 0x+90	qw	= h/w?
+// 0x+98	qw	= X speed
+// 0x+A0	qw	= Y speed
+
+// 0x+E2	w	= Sprite GFX index   // x011C = lakitu
+// 0x+E4	w	= Animation frame
+
+// 0x+E8	f	= Animation timer
+
+// 0x+F4	?	= Related to lakitu throw identity?
+
+// 0x+FC	w	= Grabbable gun projectile timer
+
+// 0x+110	f	= Lakitu throw timer
+
+// 0x+118	f	= Direction faced
+//
+// 0x+124	w	= Unknown
+// 0x+12C	w	= Unknown grabbing-related
+// 0x+12E	w	= 
+
+// 0x+136	w	= FFFF on spawn
+//
+// 0x+146	w	= Current section this NPC is on
+// 0x+148	f	= Hit count
+
+
+
+
+*-------------------------------------------------------------------------------
+
+
+,-,-,-,-,Active time,-
+
+Description -
+
+Notes -
+
+Example -
+
+//
+

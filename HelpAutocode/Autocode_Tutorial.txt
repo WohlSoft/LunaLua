@@ -1,0 +1,966 @@
+
+ - Using lunadll.txt scripts - 
+
+The most important things to think about are the action you want to do
+and the point at which the action should happen. The scripting engine
+only deals with those two things: A time, and an action.
+
+Example times:
+While loading a level
+Always
+In section 1
+In section 2
+When a timer runs down
+When touching a block of a certain type
+When typing a custom cheat code
+When a condition is met such as NPC with ID 138 no longer exists
+
+Example actions:
+Change the player character
+Change the powerup
+Change the reserve powerup
+Play a sound
+Change the music
+Show text
+Trigger an event
+Manipulate game memory somehow
+
+
+ - The basics -
+
+The first step is creating a file named lunadll.txt in your level folder. That's it.
+
+
+ - Structure -
+
+There's only 4 things you'll be writing in your lunadll.txt.
+
+
+1) Time designator - #
+# designates a time of an action. They mostly correspond to sections of the level
+
+#-1 means during level load
+#0 means "always"
+#1 means section 1
+#2 means section 2
+...
+#21 means section 21
+
+#1000 and up is an advanced feature for designating custom events / custom blocks of commands
+
+Once you write say #-1, then all commands you write from then on will be run
+during the level load time of your level, until you write #1 or some other designator.
+
+
+2) Comments - // comment
+
+Any line that contains a // will be understood as a comment. Comments are only 
+for humans to read, and the scripting engine ignores them. They're actually important
+for remembering just what the hell your code is supposed to do, and for others to
+understand what your code does.
+
+
+3) Commands - Kill,0,0,0,0,0,0
+
+Commands are the most important part of lunadll scripts, and the most complicated.
+There's no way to remember them all or what all of the parts of one do usually,
+so you have to check the reference.
+
+They mostly have the same parts, separated by commas
+
+"Kill" - This first part is the command name. It's the easiest part to remember and
+explains what the command does, usually. This one kills something. "Infinite flying"
+activates infinite flying for the player, and so on.
+
+After each command name, there are 6 parameters separated by commas. What each one
+does is specific to each command, and they're quite hard to remember, which is why
+you'll have to refer to the reference. But there is some underlying pattern.
+
+1 - The target parameter
+The first number is usually the "target" of the command. If you want the command to
+target the player, 0 is usually the player. If you want to target the "key" NPC
+(the thing you pick up that opens lockd doors), well you need to target the key's 
+NPC ID (the key is NPC ID 38)
+
+2, 3, 4 - Options
+Parameter 2, 3, 4 are extra parameters that can mean just about anything, but for a
+lot of commands that aren't complicated, they usually aren't used and are just 0. 
+Check the command reference. 
+
+5 - Active time
+Parameter 5 is virtually always the "active time" specifier. Basically it's how long
+the command will "run" before finally deleting itself. 0 means it never runs out. 
+1 means it lasts 1 frame. 60 means it lasts 60 frames (1 second), and so on.
+
+Keep in mind that commands don't run at all unless they're in the section you're in.
+A command in #21 with 1 frame active time will sit there forever until the player
+actually gets to section 21, and then it will run once and then die.
+
+6 - Text
+Unlike the others, the 6th parameter can also be entered as text, but is oftentimes
+just left as 0 anyway. It's usually where you type messages, decimal numbers, and
+options.
+
+That's all you need to know about commands.
+
+
+4) Script footer - #END
+
+#END is a special string you should put at the end of your .txt file. It's pretty
+simple - just put #END after everything else.
+
+
+ - Examples - 
+
+Here's a bunch of examples in ascending level of complexity with lots of comments
+
+
+///--Basic filter script--///
+
+#-1
+FilterToBig,0,0,0,0,0,0
+#END
+
+That's the whole thing. First we have the level load designator, which is where you
+normally want a filter. FilterToBig lowers Demo's powerup down to mushroom level
+if she has anything higher than a mushroom, and does nothing if she's small.
+
+FilterToBig's 6 parameters do nothing except the 5th, the active time. It's set to
+0 which means "always", but since it's in the level load section, it only works
+for that 1 frame when the level is loading. If this were in section #0, Demo would
+never be able to get a powerup higher than a mushroom because she would constantly
+be filtered to bigness.
+
+
+///--Basic filter script 2--///
+
+#-1
+FilterMount,0,0,0,0,0,0
+#END
+
+Same thing as filter 1, except it deletes your mount/yoshi/shoe if you have one.
+
+
+///--Basic filter script 3--///
+
+// Section 2
+#2
+FilterReservePowerup,0,0,0,0,180,0
+#END
+
+Let's change things up. The designator is now section 2, and the active time is 180.
+That means when you enter section 2, the player will constantly have his reserve 
+powerup removed over the span of 3 seconds. Why you would actually do this is
+another story.
+
+
+///--Bad Example--///
+#-1
+InfiniteFlying,0,0,0,0,0,0
+#END
+
+This is a bad example because the command exists in the level load section. This
+command in particular doesn't work unless it's continuously active, and in the level
+load section it won't actually do anything. It should be under #0
+
+
+///--Multi character filter--///
+#-1
+
+// Filter Raocow to Demo
+FilterPlayer,0,4,1,0,0,0
+
+// Filter Princess to Demo
+FilterPlayer,0,3,1,0,0,0
+
+#END
+
+This example removes the possibility of Raocow or Princess being in your level. 
+FilterPlayer only has 3 relevent parameters. #2 is the character you want to filter
+out, and #3 is the character you want it to filter to. 1 is Demo, 2 is Iris, etc.
+#5 is the active time as usual, but since it's the load level section, any amount is 
+fine.
+
+
+///--Fairness---/// (lunadll version 7+)
+#0
+ClearInputString,0,0,0,0,0,0
+#END
+
+What might that do? #0 is the always section, and ClearInputString... clears the
+keyboard input buffer. With an active time of 0, it never stops. The keyboard 
+input buffer is filled with keyboard strokes and used to identify when a cheat code 
+is entered. Clearing it constantly means no one will be able to enter a cheat code.
+
+
+///--Full level--///
+#-1
+
+// Filter Demo to Sheath
+FilterPlayer,0,1,5,0,0,0
+
+#0
+// Print the word "HI" at x:300 y:300 on the screen, with font 3
+ShowText,0,300,300,3,0,Hi
+
+#1
+
+ShowText,0,200,400,3,0,ISN'T IT HARD TO SEE WITH ALL THIS TEXT IN THE WAY?
+
+#2
+// Filter a bunch of stuff and play sound effect ID 10 for no reason
+SFX,10,0,0,0,0,0
+FilterToSmall,0,0,0,0,1,0
+FilterReservePowerup,0,0,0,0,1,0
+FilterMount,0,0,0,0,1,0
+
+#END
+
+This is mainly here to illustrate the syntax of having a bunch of different things
+in one script (basically there aren't many rules in the way of syntax)
+
+
+///--Modify boss life--///
+#1
+// Set the hit counter of NPCs of type 209 (mother brains) in section 1 to 9 hits
+AT_SetHits,209,1,9,0,1,0
+#END
+
+NPCs in this game don't have health. They have a hit counter. So a mother brain
+with 9 hits has 1 hit left. A birdo with 1 hit has 2 hits left. A mother brain
+with -10 hits has 20 hits left. Only NPCs that can normally get hit more than
+once can have their hit counts manipulated. To find the NPC ID of an NPC, check
+the graphics folder or a list of NPC IDs. Currently there's no way to specify
+one single NPC among many that may be in your level. The command runs for every 
+NPC of the type you specify. This goes for all NPC and block commands actually.
+
+
+///--Trigger an event--/// (lunadll version 7+)
+#1
+TriggerSMBXEvent,0,0,0,0,1,MyEvent
+#END
+
+This will start the event named "MyEvent" (assuming you put such an event in
+your level). Pretty simple.
+
+
+///--Is this working?--///
+#0
+// Show script info on the screen
+DebugPrint,0,0,0,0,0,0
+#END
+
+DebugPrint is a command that prints some basic info about how the scripts are
+running. It's useful for figuring out whether lunadll is even working at all.
+If you see it reporting that thousands of events are being spawned for no
+good reason, you should probably recheck your script.
+
+
+///--Double the player's lives--///
+#1
+
+// Multiply the decimal amount at memory location 0x00B2C5AC by 2
+MemAssign,0x00B2C5AC,2,3,0,1,f
+
+#END
+
+This is a memory manipulation command, and it's the most complicated thing you're
+going to find in here. You can skip this part and just not use direct memory
+manipulation commands and do just fine.
+
+MemAssign performs an operation on a selected memory location in a global variable 
+section. The game remembers all sorts of things in this space. Lives, coins, 
+the state of switches, timers for everything, score, pointers to level names, 
+directory names, state info like whether or not you're in the editor, in battle
+mode, how many players there are, how many npcs there are...
+
+Unfortunately, there's no way to be sure which memory location contains what
+information, unless you poke around in a debugger or scan memory. 0x00B2C5AC 
+just happens to be where the lives counter is always located.
+
+If you know the address of something and the format, you can do basic operations
+on it with MemAssign. The 3rd parameter in 0x00B2C5AC,2,3 is the 3, which is the
+operation to perform, here being multiply. The 2nd is 2, meaning multiply by 2.
+
+0 = Assign
+1 = Add
+2 = Subtract
+3 = Multiply <<
+4 = Divide
+5 = XOR
+
+MemAssign,0x00B2C5AC,2,3 means multiply the value at 0x00B2C5AC by 2.
+
+MemAssign,0x00B2C5AC,2,2 would be subtract lives by 2.
+
+MemAssign,0x00B2C5AC,2,1 would be add 2 extra lives.
+
+MemAssign,0x00B2C5AC,2,0 would be set player's lives to 2.
+
+MemAssign,0x00B2C5AC,2,3,0 - The 4th param is 0 since it's unused
+
+MemAssign,0x00B2C5AC,2,3,0,1 - An active time of 1. More would keep multiplying
+the value by 2 and it would quickly max at 99.
+
+MemAssign,0x00B2C5AC,2,3,0,1,f - Unfortunately memory is not packed evenly. You 
+need to know the size of the data you're trying to manipulate. For lives, it just
+so happens that they're a decimal / floating point value (which is odd considering
+lives are one thing you'd always expect to be a whole number). So the last param
+specifies what kind of data is operated upon. f means floating point / decimal 
+operation.
+
+b - 1 byte
+w - 2 byte (word)
+dw- 4 byte (double word)
+f - 4 byte decimal / floating point
+df- 8 byte decimal / double precision floating point
+
+1 byte memory is rarely used in this game. 2 byte words are used for many things. 
+4 byte double words aren't used that often and when they are it's usually something
+you don't WANT to manipulate this way. The decimal types are very often used for 
+spatial positions of things on the game map.
+
+
+ - Custom Events - 
+
+There are many actions you can do with all these commands, but the "time" part
+the equation will be lacking unless there are more ways to trigger them besides
+entering sections.
+
+Any commands designated under a section header higher than 999 will be marked
+as a custom event block.
+
+// Custom event block 1000. It plays sfx 10 when activated.
+#1000
+SFX,10,0,0,0,0,0
+
+// Custom event block 1001. It plays sfx 11 and kills you when activated.
+// It also calls the delete command on this whole block, so it can't be
+// activated any more. (lunadll version 7+)
+#1001
+SFX,11,0,0,0,0,0
+Kill,0,0,0,0,1,0
+DeleteEventsFrom,1001,0,0,0,1,0
+
+These are two examples of custom event blocks. They need something to trigger
+them though. There are many commands that trigger custom events on a condition.
+
+Trigger - All it does is trigger a custom event.
+Timer - It can trigger a custom event when it counts down to 0.
+BlockTrigger - It can trigger an event when the target touches a certain block.
+OnInput - Trigger an event when you press a certain something (lunadll 7+)
+OnCustomCheat - Trigger an event when you type something (lunadll 7+)
+
+
+///--Cheat a layer--///
+#0
+// Wait for you to type "go", then activates custom event 1000
+OnCustomCheat,0,0,0,1000,0,go
+
+#1000
+// Set layer3 X speed to 2.5 (assuming you added blocks to layer number 3)
+LayerXSpeed,3,0,0,0,0,2.5
+
+#END
+
+Really it's self explanatory. Just type "go" and the layer command is run.
+By the way, layer 0 is "default" layer, so 3 is the first custom layer you can
+make. 
+
+There's actually a terrible problem here. The layer command is set to have
+infinite time. If you type "go" about 15,000 times, your game will start
+to lag because there are 15,000 commands being run per frame. When you
+trigger a custom event, it actually means the event is copied into the 
+"always section", so events are like blueprints. The solution is to lower the 
+active time. 1 is fine since the layer doesn't stop.
+
+
+///--Player switch--/// (lunadll 7+)
+#0
+
+// When tapping up, copy event 1000
+OnInput,0,1,1,1000,0,0
+
+#1000
+// If tapping up again in the next 10 frames, copy event 1001
+OnInput,0,1,1,1001,10,0
+
+#1001
+// Event 1001, switch to next player and play sound
+CyclePlayerRight,0,0,0,0,1,0
+SFX,0,13,0,0,0,0
+
+#END
+
+Now it's getting complicated.
+
+OnInput triggers when you press a certain button. Param2 is 1, which is "up". 
+Param3 is also 1, which means it only detects the key press, not holding them
+down. With this behavior you can simulate the detection of double taps (or more).
+
+In this code, When you push up the first time, another OnInput (event 1000) is 
+activated for 10 frames. This also waits for an up key press. If you successfully 
+double tap, finally, event 1001 is triggered, which switches the character.
+
+
+///--Suicide dance--/// (lunadll 7+)
+#0
+
+// When tapping up, copy event 1000
+OnInput,0,1,1,1000,0,0
+
+#1000
+// If tapping down in the next 20 frames, copy event 1001
+OnInput,0,2,1,1001,20,0
+
+#1001
+// If tapping left in the next 20 frames, copy event 1002
+OnInput,0,3,1,1002,20,0
+
+#1002
+// If tapping right in the next 20 frames, copy event 1003
+OnInput,0,4,1,1003,20,0
+
+#1003
+// Tap jump...
+OnInput,0,6,1,1004,20,0
+
+#1004
+// And then the dance is complete
+Kill,0,0,0,0,1,0
+DeleteEventsFrom,1003,0,0,0,1,0
+
+#END
+
+A big button sequence. Just a more contrived version of the last one. 
+
+
+///--Timer--///
+#0
+
+// Activate #1000 after 600 frames
+Timer,0,1000,1,0,600,0
+
+// Time's up
+#1000
+Kill,0,0,0,0,1,0
+
+#END
+
+This is mainly about Timer. Timer is a useful command for automatic
+repetition or... timing. It activates the custom event specified in its 2nd 
+param whenever it reaches 0. Param 3 specifies whether or not to display 
+the timer at the top right of the screen. Param 4 specifies whether or not
+the timer should reset itself whenever it reaches 0. 5 is both the frame
+countdown time and the time it should reset itself to if it's set to reset.
+
+
+///--Pushable layer--///
+#0
+
+//Apply permanent friction/air resistance to layer 3
+DeccelerateLayerX,3,0,0,0,0,0.02
+
+//Trigger event 1000 when wooden square pushed from right
+BlockTrigger,0,1,2,1000,0,0
+
+//Trigger event 1001 when wooden square pushed from left
+BlockTrigger,0,1,4,1001,0,0
+
+
+//Move layer left, stop when length runs out
+#1000
+AccelerateLayerX,3,-2,0,0,2,-0.1
+
+//Move layer right, stop when length runs out
+#1001
+AccelerateLayerX,3,2,0,0,2,0.1
+
+#END
+
+If you put some wood blocks (Block ID 1) on layer 3, this script will
+create the illusion that you're pushing them around by running into them
+from the sides.
+
+DeccelerateLayerX when active slows a layer (towards 0) by the amount in 
+param 6. This simulates something like friction/air resistance.
+
+BlockTrigger triggers custom events when the target interacts with a certain
+block type from a certain direction. 
+
+BlockTrigger,0,1,2,1000,0,0
+0 = player triggers the event, 1+ would be NPC IDS
+1 = the Block ID
+2 = The direction the block should be touched from to trigger. 1=U 2=R 3=D 4=L
+1000 = The event to trigger
+0 = active time (forever)
+0 = unused
+
+Accelerate layer is just the opposite of deccelerate. The second param is the
+max speed it'll be allowed to accelerate to.
+
+
+///--Play custom sound effect when you collect the axe--/// (luna version 7+)
+#0
+
+// Activate #1000 after getting the axe (NPC ID 178)
+IfNPC,178,2,0,1000,0,once
+
+// Plays custom sound effect in the level folder "kefka.wav"
+#1000
+SFX,0,0,0,0,1,kefka.wav
+
+#END
+
+IfNPC triggers an event based on an NPC condition. 178 means the condition is
+for axe NPCs. 2 means "no longer exists", so it triggers once the axe is gone.
+
+
+///--Infinite looping gimmick--///
+#0
+
+// Just starts the looping events with #1000
+Trigger,0,1000,0,0,0,0
+
+// All enemies friendly, and trigger 1001
+#1000
+Timer,0,1001,1,0,200,0
+NPCMemSet,-1,0x46,0xFFFF,0,200,short
+ShowText,0,400,550,3,200,YAY!
+
+// All enemies unfriendly, and trigger 1000
+#1001
+Timer,0,1000,1,0,200,0
+NPCMemSet,-1,0x46,0x0000,0,200,short
+ShowText,0,400,550,3,200,GRR!
+
+#END
+
+Starts the friendly enemy event, which calls the unfriendly enemy event when it 
+ends, which calls the friendly enemy event again when that ends. Loops forever.
+Check the reference to be sure about NPCMemSet and IfNPC.
+
+
+///--Judgement--/// (luna version 7+)
+#0
+
+// Constantly check if 0x00B2C8C4 equals 0xFFFF, and if so copy #1000
+OnGlobalMem,0x00B2C8C4,0xFFFF,0,1000,0,w
+
+// Constantly check if 0x00B2C8C4 equals 0, and if so copy #1001
+OnGlobalMem,0x00B2C8C4,0,0,1001,0,w
+
+#1000
+ShowText,0,100,250,3,1,THOU HATH CHEATED
+
+#1001
+ShowText,0,100,250,3,1,THOU HATH NOT CHEATED
+
+#END
+
+OnGlobalMem is a powerful trigger command that activates events based on whatever 
+memory location you like. It just so happens that 0x00B2C8C4 is an address which
+contains a two byte value that represents whether or not you've entered a 
+cheat code before. This is the memory that's checked to see if you can save,
+and it's cleared by the cheat which lets you save again.
+
+OnGlobalMem,0x00B2C8C4,0xFFFF,0,1000,0,w
+0x00B2C8C4 = address
+0xFFFF = value to check
+0 = "equals" operation. 1 checks "greater than", 2 checks "less than"
+1000 = activate #1000 if the check is true
+0 = last forever
+w = check it like a 2 byte value
+
+Remember that either trigger is constantly being activated every frame because 
+the test is either true or untrue, so one ShowText will be copied per frame.
+The ShowText commands must not have an active time of 0, because then the old
+ones would never expire while new ones are constantly being added ever frame. 
+You'd end up with thousands of identical showtext commands being spawned and you 
+would lag out really quickly.
+
+
+///--Hide layer when player is Raocow or Sheath--/// (luna version 7+)
+#0
+
+// Constantly check if player memory at 0xF0 is greater than 3, and if so copy #1000
+OnPlayerMem,0xF0,3,1,1000,0,w
+
+// Trigger an smbx event, assuming you added one to your level with this name
+#1000
+TriggerSMBXEvent,0,0,0,0,1,layerhide
+
+#END
+
+It's almost the same as OnGlobalMem, but the player doesn't have a fixed memory
+address, so you use a short offset this time. It just so happens that 0xF0 is the
+offset to the memory which contains what character you currently are. To find more
+offsets, check the reference at the end of the document.
+
+First, keep in mind that these are the character IDs
+0 = invalid
+1 = demo
+2 = iris
+3 = princess
+4 = raocow
+5 = sheath
+
+OnPlayerMem,0xF0,3,1,1000,0,w
+0xF0 = target is player memory offset 0xF0, which contains the character ID
+3 = value to test against is 3
+1 = operation to perform is "greater than"
+1000 = 1000 is the event to trigger if the character ID is greater than 3
+0 = active forever
+w = check the memory like it's a 2 byte word
+
+
+///--The same exact thing--/// (luna version 7+)
+#0
+
+InfIniteFlying,0,0,0,0,0,0
+
+PlayerMemSet,0,+0x170,50,0,0,w
+
+These both do the exact same thing. InfiniteFlying is just an easier to understand 
+wrapper around the same operation.
+
+
+///--Random refill--/// (luna version 7+)
+#-1
+// Set coins to 0 on level load
+MemAssign,0x00B2C5A8,0,0,0,1,w
+
+#0
+// Whenever you have more than 0 coins, activate #1000
+OnGlobalMem,0x00B2C5A8,0,1,1000,0,w
+
+// Continuously reset coins to 0
+MemAssign,0x00B2C5A8,0,0,0,0,w
+
+#1000
+// Random trigger called when you get a coin. 
+// One of four choices is chosen with an even* 25% chance.
+// #1003 has a 50% chance since it's listed twice.
+TriggerRandom,1001,1002,1003,1003,1,0
+
+#1001
+// Become small
+FilterToSmall,0,0,0,0,1,0
+ShowText,0,200,200,3,60,TRIGGERING 1001
+
+#1002
+// Become big
+PlayerMemSet,0,0x112,2,0,1,w
+ShowText,0,200,300,3,60,TRIGGERING 1002
+
+#1003
+// Become firey
+PlayerMemSet,0,0x112,3,0,1,w
+ShowText,0,200,400,3,60,TRIGGERING 1003
+
+#END
+
+The comments explain it all.
+
+
+///--Scroll text up--/// (luna version 7+)
+#0
+
+// The command we'll modify
+ShowText,0,300,700,3,0,FAREWELL...
+
+// This command won't be modified (and won't appear because it's off screen)
+ShowText,0,300,700,3,0,FAREWELL?
+
+// Modify 3rd param, by 1, subtraction, section #0, forever, "FAREWELL..."  what?
+ModParam,3,1,2,0,0,FAREWELL...
+
+#END
+
+ModParam is a powerful command that can also totally foul everything up beyond
+imagining. It changes the params of other commands. The challenge is identifying
+the commands. Param 4 and 6 are used to specify which command you're looking for.
+Param 4 is which # section the command is in, and Param 6 must match the text
+exactly of the command you want to modify. Since most commands don't use text
+you can just write anything in them and then match it later with ModParam.
+
+ModParam,3,1,2,0,0,FAREWELL...
+3 = modify the third param (ShowText's Y coordinate)
+1 = amount to modify by
+2 = modify by subtracting
+0 = look in #0 for the command to modify
+0 = modify forever
+FAREWELL... = the command to modify will have this in the text field
+
+
+
+
+ - Reference -
+
+Most of the structure of the player's data is known actually. You can trigger off 
+of any of it with OnPlayerMem, or change any of it with PlayerMemSet, but a lot
+of them are useless or not well understood at the moment. 
+
+(qw is the same as df / double precision float)
+
+
+// - Player MOB Struct. size = 0x184 (388 bytes)
+//
+//+0x00		w	= Toad doublejump ready (FFFF = true)
+//+0x02		w	= Star sparkling effect on player
+//+0x04		w	= Horizontal and ducking disabled (?)
+//+0x06		w	= Ducking enabled?
+//+0x08		w	= Water or quicksand timer
+//+0x0A		w	= Is on slippery ground
+
+// - SHEATH
+//+0x0C		w	= Is a fairy
+//+0x0E		w	= Fairy already used this jump (1 = true)
+//+0x10		w	= Frames until fairy runs out
+//+0x12		w	= Sheath has a key
+//+0x14		w	= Sheath slash cooldown timer
+//+0x16		w	= # of hearts
+
+// - PRINCESS
+//+0x18		w	= Princess hover is available
+//+0x1A		w	= Holding jump button
+//+0x1C		w	= Princess hover timer
+//+0x1E		w	= Unused (not cleared on level load)
+//+0x20		f	= Princess hover Y tremble speed
+//+0x24		w	= Princess hover Y tremble direction
+
+//+0x26		w	= Ground item pull-up timer
+//+0x28		f	= Ground item pull-up momentum save
+//+0x2A		w	= Unused (not cleared on level load)
+
+//+0x2C		w	= Climbing related
+//+0x30		w	= Climbing related
+//+0x32		w	= Climbing related
+
+//- WATER
+//+0x34		w	= 2 when in water
+//+0x36		w	= 0xFFFF when in water
+//+0x38		w	= Water stroke timer (can't stroke again until 0)
+
+//- MISC
+//+0x3A		w	= Unknown hover timer
+//+0x3C		w	= Is sliding
+//+0x3E		w	= Is generating sliding smoke puffs
+//+0x40		w	= Climbing state (3 = climbing, 2 = pushed up against edge of climbable area)
+//+0x42		w	= Unknown timer42
+//+0x44		w	= Unknown flag44
+//+0x46		w	= Unknown46 (powerup pickup related)
+//+0x48		w	= Slope modifier
+
+//- TANOOKI SUIT
+//+0x4A		w	= Tanooki suit statue flag
+//+0x4C		w	= Statue transform cooldown frame timer
+//+0x4E		w	= Frames spent as statue
+
+//- SPINJUMP
+//+0x50		w	= Spinjump flag (-1 = true)
+//+0x52		w	= Spinjump state counter
+//+0x54		w	= Spinjump land direction (will face this direction when landing)
+
+// - STATES
+//+0x56		w	= Current enemy kill combo count
+//+0x58		w	= Ground sliding smoke puffs state
+//+0x5A		w	= Warp is nearby this player (1 = pipe, 2 = instant, 3 = door)
+
+//+0x60		w	= Has jumped
+
+//+0x62		w	= Unknown62
+//+0x64		w	= Unknown64
+//+0x66		w	= Unknown66
+//+0x68		w	= Unknown68
+//+0x7A		w	= Unknown70
+//+0x7C		w	= Unknown72
+
+// - MOUNT 
+//+0x7E		w	= Mount upper X offset
+//+0x80		w	= Mount upper Y offset
+//+0x82		w	= Mount upper GFX index
+//+0x84		w	= Mount item in mouth swallow timer
+//+0x86		w	= Mount lower X offset
+//+0x88		w	= Mount upper Y offset
+//+0x8A		w	= Mount lower GFX index
+//+0x8C		w	= Unknown82
+//+0x8E		w	= Unknown82
+//+0x90		qw	= Tongue X position
+//+0x98		qw	= Tongue Y position
+//+0xA0		qw	= Tongue height or hitbox related
+//+0xA8		qw	= Tongue height or hitbox related
+
+// - POSITION
+//+0xC0		qw	= Player X position (absolute coordinates within level)
+//+0xC8		qw	= Player Y position (absolute coordinates within level)
+//+0xD0		qw	= Player height or hitbox related
+//+0xD8		qw	= Player width or hitbox related
+//+0xE0		qw	= Player X speed
+//+0xE8		qw	= Player Y speed
+
+//+0xF0		w	= Player identity index (0 = nothing! don't use, 1 = demo, 2 = iris, 3 = princess, 5 = 
+
+sheath)
+
+/// - KEYS - 
+//+0xF2		w	= U key pressing
+//+0xF4		w	= D key pressing
+//+0xF6		w	= L key pressing
+//+0xF8		w	= R key pressing
+//+0xFA		w	= J key pressing
+//+0xFC		w	= SJ key pressing
+//+0xFE		w	= X key pressing
+//+0x100	w	= RN key pressing
+//+0x102	w	= SEL key pressing
+//+0x104	w	= STR key pressing
+
+//+0x106	w	= Direction faced (-1 = left)
+
+/// - MOUNT
+//+0x108	w	= Mount identity (0 = no mount,1 = boot, 2 = clowcar, 3 = yoshi)
+//+0x10A	w	= Mount color
+//+0x10C	w	= Mount state
+//+0x10E	w	= Mount height offset or something
+//+0x110	w	= Mount gfx index
+
+/// - STATES
+//+0x112	w	= Current powerup
+//+0x114	w	= Current player sprite index being displayed
+//+0x116	w	= Unused
+//+0x118	f	= X momentum assumption (used when determining how to draw the sprite)
+//+0x11C	w	= Current upward jumping force (2 byte integer representation)
+//+0x11E	w	= Holding jump button
+//+0x120	w	= Holding spinjump button
+//+0x122	w	= Forced animation state	(1 = powerup, 2 = powerdown, 3 = entering pipe, 4 = 
+
+getting fire flower,
+//											 7 = entering door, 500 
+
+= tanooki statue poof state)
+//+0x124	f	= Unknown124
+//+0x128	f	= Unknown128
+//+0x12C	w	= Down button mirror (redundant?)
+//+0x12E	w	= In ducking state
+//+0x130	w	= Select button mirror (redundant?)
+//+0x132	w	= Unknown powerup change related
+//+0x134	w	= Down button pressed this frame (reset next frame)
+//+0x136	w	= Unknown136
+//+0x138	f	= X momentum push (eg. pushed by a bully)
+//
+//+0x13C	w	= Player death state
+//+0x13E	w	= Player death animation timer
+//
+//+0x140	w	= Powerup blinking timer
+//+0x142	w	= Powerup blinking state
+//+0x144	w	= Unknown144
+//
+// - LAYER INTERACTION
+//+0x146	w	= Bottom state (0 = not on the ground or standing on sprite, 2 = foot contact with a 
+
+solid layer)
+//+0x148	w	= Left state (0 = no left contact, 1 = half or pushed back by a solid layer, 2 = pushing 
+
+against layer)
+//+0x14A	w	= Top state (0 = no top contact, 1 = half or pushed back by a solid layer, 2 = pushing 
+
+against layer)
+//+0x14C	w	= Right state (0 = no right contact, 1 = half or pushed back by a solid layer, 2 = 
+
+pushing against layer)
+//+0x14E	w	= Pushed by a moving layer (0 = not pushed by any, 2 = being pushed to the left or 
+
+right)
+//+0x150	w	= Unused150
+//+0x152	w	= Unused152
+
+//+0x154	w	= Index of sprite being held (index to a specific sprite object that was generated only, 
+
+-1 = can't carry anything)
+//+0x156	w	= Unknown156, usually reset to 0
+//+0x158	w	= Powerup box contents (0 = no item)
+//
+// - SECTIONS
+//+0x15A	w	= Current section player is in
+//+0x15C	w	= Warp timer (can't warp / pipe until 0)
+//+0x15E	w	= Unknwon15E
+//
+// - PROJECTILES / ATTACKS
+//+0x160	w	= Projectile timer (fireballs, hammers, link slash...)
+//+0x162	w	= Projectile timer 2 (link projectiles)
+//+0x164	w	= Tail swipe timer
+//+0x166	w	= Unknown166
+//
+// - FLIGHT
+//+0x168	f	= Run speed aggregate until flight achieveable
+//+0x16C	w	= Can fly
+//+0x16E	w	= Is flying
+//+0x170	w	= Flight time remaining
+//+0x172	w	= Holding flight run button
+//+0x174	w	= Holding flight button
+
+//+0x176	w	= Index of sprite being stood on
+//+0x178	w	= Unknown X momentum with sprites
+
+//+0x17A	w	= Usually forced to -1	
+//+0x17C	w	= Unused17C
+//+0x17E	w	= Unused17E
+//+0x180	w	= Unused180
+//+0x182	w	= Unused182
+//+0x184	w	= Unused184
+
+
+
+There's less information on the structure of NPC data. You can manipulate NPCs with NPCMemSet.
+
+(pt is the same as dw)
+
+// -- NPC structure -- ( 0x158 bytes )
+// 0x+00	pt	= wchar_t* Attached layer name?
+// 0x+04	w	= Unknown
+// 0x+06	w	= Unknown decrementing timer
+
+// +0x2C	pt  	= wchar_t* Activate event layer name
+// +0x30	pt	= wchar_t* Death event layer name
+// +0x34	pt	= ptr to unknown string
+// +0x38	pt	= wchar_t* No More Objs event layer name
+
+// +0x3C	pt	= wchar_t* Attached layer name?
+
+// 0x+44	w	= Activated / interacted with player flag
+// 0x+46	w	= Friendly (on = 0xFFFF)
+// 0x+48	w	= Don't Move (on = 0xFFFF)
+
+// 0x+64	w	= Is a generator
+// 0x+68	f	= Generator delay setting
+// 0x+6C	f	= Generator delay countdown
+// 0x+70	w	= Direction to generate NPC?
+// 0x+72	w	= Which layer to spawn NPC on
+// 0x+74	w	= Invalidity or offscreen flag?
+
+// 0x+78	qw	= X position
+// 0x+80	qw	= Y position
+// 0x+88	qw	= w/h?
+// 0x+90	qw	= h/w?
+// 0x+98	qw	= X speed
+// 0x+A0	qw	= Y speed
+
+// 0x+E2	w	= Sprite GFX index
+// 0x+E4	w	= Animation frame
+
+// 0x+E8	f	= Animation timer
+
+// 0x+FC	w	= Grabbable gun projectile timer
+
+// 0x+110	f	= Lakitu throw timer
+
+// 0x+118	f	= Direction faced
+//
+// 0x+124	w	= Unknown
+// 0x+12C	w	= Unknown grabbing-related
+// 0x+12E	w	= 
+
+// 0x+136	w	= FFFF on spawn
+//
+// 0x+146	w	= Current section this NPC is on
+// 0x+148	f	= Hit count
