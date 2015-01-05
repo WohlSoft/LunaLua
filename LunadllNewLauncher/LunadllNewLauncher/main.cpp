@@ -10,6 +10,7 @@
 
 #include "asyncdebugger.h"
 #include "logger.h"
+#include "launcherwindowhtml.h"
 
 
 resultStruct* Settings = 0;
@@ -39,8 +40,10 @@ extern "C" Q_DECL_EXPORT bool run()
 
     int n = 1;
     QApplication a(n, &myBuffer);
-    MainWindow w;
-    w.show();
+    //MainWindow w;
+    //w.show();
+    LauncherWindowHtml lwh;
+    lwh.show();
     a.exec();
     a.quit();
     return true;

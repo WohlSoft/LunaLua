@@ -282,21 +282,20 @@ extern void InitHook()
 		hRunProc();
 		resultStruct settings;
 		hPrompt((void*)&settings);
-		hFreeVarsProc();
-		FreeLibrary(newLauncherLib);
-		newLauncherLib = NULL;
-		
-		if(settings.result){
-			GM_ISGAME = -1;
-			if(settings.result == 2){
-				GM_ISLEVELEDITORMODE = -1;
-			}
-			GM_NOSOUND = COMBOOL(settings.NoSound);
-			GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);
-		}
+		//hFreeVarsProc();
+		//FreeLibrary(newLauncherLib);
+		//newLauncherLib = NULL;
 
-		GM_ISLEVELEDITORMODE = 0; //set run to false
-		_exit(0);
+		if(!settings.result){
+			GM_ISLEVELEDITORMODE = 0; //set run to false
+			_exit(0);
+		}
+		GM_ISGAME = -1;
+		if(settings.result == 2){
+			GM_ISLEVELEDITORMODE = -1;
+		}
+		GM_NOSOUND = COMBOOL(settings.NoSound);
+		GM_FRAMESKIP = COMBOOL(settings.disableFrameskip);
 	}else{
 		GM_ISLEVELEDITORMODE = COMBOOL(gStartupSettings.lvlEditor);
 		GM_ISGAME = COMBOOL(gStartupSettings.game);
@@ -361,11 +360,11 @@ extern void InitHook()
 		runAsyncLoggerProc();
 	}
 	
+
+
 	/*void (*exitCall)(void);
 	exitCall = (void(*)(void))0x8D6BB0;
 	exitCall();*/
-	
-
 }
 
 long long dbglongTest = 0;
