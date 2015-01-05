@@ -1,0 +1,35 @@
+<html>
+<head>
+	<style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        body {
+            background-color: #9BA3FF;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+<div style="text-align:center">
+	<h1>This is a sample Launcher</h1>
+    <p>Following buttons are provided:</p>
+    <p>
+        <button onclick="Launcher.quitApp()">Exit</button>
+        <button onclick="Launcher.startGame()">Start Game</button>
+        <button onclick="Launcher.startLevelEditor()">Level Editor</button>
+    </p>
+    <p>
+    	Settings:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input id="boxNoFrameskip" type="checkbox" onchange="Launcher.noframeskip = document.getElementById('boxNoFrameskip').checked"/> No Frameskip&nbsp;&nbsp;&nbsp;
+        <input id="boxNoSound" type="checkbox"  onchange="Launcher.nosound = document.getElementById('boxNoSound').checked"/> No Sound
+    </p>
+</div>
+
+
+</body>
+</html>
