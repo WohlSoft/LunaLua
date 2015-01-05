@@ -302,6 +302,7 @@ void MusicManager::loadCustomSounds(std::string episodePath)
 	initArrays();
 	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
 	loadSounds(episodePath+"\\sounds.ini", episodePath);
+	loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
 	loadMusics(episodePath+"\\music.ini", episodePath);
 
 	for(int i=0; i<91; i++)
