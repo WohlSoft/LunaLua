@@ -36,11 +36,14 @@ class MusicManager
 	private:
 		static std::map<std::string, musicFile > registredFiles;
 		static std::map<std::string, chunkFile > chunksBuffer;
-		static std::string chunksAliasesList[91];
-		static std::string chunksList[91];
-		static int chunksChannelsList[91];
-		static std::string defaultSndINI;
-		static std::string defaultMusINI;
+
+		static std::string chunksList[91];//List of currently loaded files
+		static std::string defaultChunksList[91];//List of system default files
+		static std::string chunksAliasesList[91];//List of reserved aliases for sound effects
+		static void initChunks();//Fill chinks list with system default files
+		static int chunksChannelsList[91];//List of channel reservation by some files (-1 is allowing mixed playback)
+		static std::string defaultSndINI;//Full path to global sounds.ini file
+		static std::string defaultMusINI;//Full path to global music.ini file
 };
 #endif
 
