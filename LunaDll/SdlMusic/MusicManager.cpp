@@ -101,7 +101,7 @@ std::string MusicManager::chunksAliasesList[91]=
 	"sound91"
 };
 
-std::string MusicManager::chunksList[91]=
+std::string MusicManager::defaultChunksList[91]=
 {
 	"sound\\player-jump.ogg", 
 	"sound\\stomped.ogg", 
@@ -295,6 +295,8 @@ int MusicManager::chunksChannelsList[91] =
 typedef std::pair<int, std::string> musicFile;
 */
 
+std::string MusicManager::chunksList[91];
+
 std::map<std::string, musicFile > MusicManager::registredFiles;
 std::map<std::string, chunkFile > MusicManager::chunksBuffer;
 
@@ -307,6 +309,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 	PGE_SDL_Manager::initSDL();
 	if(firstRun)
 	{
+		initChunks();
 		defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
 		defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
 		loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
@@ -502,6 +505,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
 void MusicManager::loadCustomSounds(std::string episodePath)
 {
+	initChunks();
 	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
 	loadSounds(episodePath+"\\sounds.ini", episodePath);
 
@@ -512,10 +516,17 @@ void MusicManager::loadCustomSounds(std::string episodePath)
 
 void MusicManager::resetSoundsToDefault()
 {
+	initChunks();
 	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
 	for(int i=0; i<91; i++)
 		addSound(chunksAliasesList[i], "dummy");
 }
 
+
+void MusicManager::initChunks()
+{
+	for(int i=0; i<91; i++)
+		chunksList[i]=defaultChunksList[i];
+}
 
 #endif
