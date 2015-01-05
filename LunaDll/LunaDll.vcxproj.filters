@@ -100,11 +100,11 @@
     <Filter Include="Header Files\MusicPlayer">
       <UniqueIdentifier>{93991f96-d10e-48c6-9e09-9c8bc9d6c451}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Emulator">
-      <UniqueIdentifier>{6fa4bca1-d668-4d26-9f2c-5a24cddda3fb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\World">
       <UniqueIdentifier>{f590b9d7-9715-4bf5-a07f-cd87d8de2a25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mci2sdl music proxy">
+      <UniqueIdentifier>{6fa4bca1-d668-4d26-9f2c-5a24cddda3fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -244,7 +244,7 @@
       <Filter>Header Files\MusicPlayer</Filter>
     </ClInclude>
     <ClInclude Include="mciEmulator.h">
-      <Filter>Header Files\Emulator</Filter>
+      <Filter>Header Files\mci2sdl music proxy</Filter>
     </ClInclude>
     <ClInclude Include="SdlMusic\MusicManager.h">
       <Filter>Header Files\MusicPlayer</Filter>
@@ -255,7 +255,7 @@
     <ClInclude Include="WorldLevel.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
-	<ClInclude Include="SdlMusic\MusicManager.h">
+    <ClInclude Include="SdlMusic\MusicManager.h">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClInclude>
     <ClInclude Include="GlobalFuncs.h">
@@ -429,7 +429,7 @@
       <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
     <ClCompile Include="mciEmulator.cpp">
-      <Filter>Header Files\Emulator</Filter>
+      <Filter>Header Files\mci2sdl music proxy</Filter>
     </ClCompile>
     <ClCompile Include="SdlMusic\MusicManager.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
@@ -439,12 +439,15 @@
     </ClCompile>
     <ClCompile Include="WorldLevel.cpp">
       <Filter>Header Files\World</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="SdlMusic\MusicManager.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
     <ClCompile Include="GlobalFuncs.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SdlMusic\MusicDefList.cpp">
+      <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
