@@ -28,7 +28,7 @@ namespace LuaEvents {
 		int unkVal;
 		int callType;
 	};
-	std::vector<SMBXEventQueueItem> SMBXEventQueue;
+	extern std::vector<SMBXEventQueueItem> SMBXEventQueue;
 
 
     static LuaEventData evPlayer1;

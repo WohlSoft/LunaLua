@@ -1,4 +1,5 @@
 #include "LunaLuaMain.h"
+#include "../GlobalFuncs.h"
 #include "../Level.h"
 #include "../MiscFuncs.h"
 #include "../PlayerMOB.h"
@@ -9,20 +10,15 @@
 #include "LuaEvents.h"
 #include <string>
 
+std::map<lua_State*, LunaLua::lapiData> LunaLua::extraLapiData;
 
-std::string utf8_encode(const std::wstring &wstr)
+void dbg(std::wstring txt)
 {
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-	std::string strTo( size_needed, 0 );
-	WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-	return strTo;
-}
-
-void dbg(std::wstring txt){
     MessageBoxW(0, txt.c_str(), L"Debug", 0);
 }
 
-void windowError(const char* errorText){
+void windowError(const char* errorText)
+{
     MessageBoxA(0, errorText, "Error", 0);
 }
 

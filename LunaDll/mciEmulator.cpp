@@ -88,7 +88,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 		}
 	}
 
-errorFinalize:;
+//errorFinalize:;
 	if(uReturnLength < 2)
 	{
 		return MCIERR_UNSUPPORTED_FUNCTION;

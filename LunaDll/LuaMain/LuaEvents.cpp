@@ -12,6 +12,7 @@
 #include "../CSpriteManager.h"
 #include "../Blocks.h"
 
+std::vector<LuaEvents::SMBXEventQueueItem> LuaEvents::SMBXEventQueue;
 
 char LuaEvents::pressTest(short oldp, short newp)
 {
