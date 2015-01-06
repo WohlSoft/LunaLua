@@ -167,22 +167,8 @@ extern void InitHook()
 		}
 		runAsyncDebuggerProc = (void(*)(void))GetProcAddress(newDebugger, "runAsyncDebugger");
 		asyncBitBltProc = (int (*)(HDC, int, int, int, int, HDC, int, int, unsigned int))GetProcAddress(newDebugger, "asyncBitBlt@36");
-		if(!runAsyncDebuggerProc){
-			std::string errMsg = "Failed to load 'runAsyncDebugger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
-			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-			FreeLibrary(newDebugger);
-			newDebugger = NULL;
-			return;
-		}
-		if(!asyncBitBltProc){
-			std::string errMsg = "Failed to load 'asyncBitBlt' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
-			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-			FreeLibrary(newDebugger);
-			newDebugger = NULL;
-			return;
-		}
+		GL_PROC_CHECK(runAsyncDebuggerProc, runAsyncDebugger, newDebugger, LunadllNewLauncher.dll)
+		GL_PROC_CHECK(asyncBitBltProc, asyncBitBlt, newDebugger, LunadllNewLauncher.dll)
 		//PATCH_JMP(0x4242D0, &bitBltHook);
 		
 		*(void**)0xB2F1D8 = (void*)asyncBitBltProc;
@@ -194,22 +180,8 @@ extern void InitHook()
 
 		runAsyncLoggerProc = (void(*)(void))GetProcAddress(newDebugger, "runAsyncLogger");
 		asyncLogProc = (void(*)(const char*))GetProcAddress(newDebugger, "asyncLog");
-		if(!runAsyncLoggerProc){
-			std::string errMsg = "Failed to load 'runAsyncLogger' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
-			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-			FreeLibrary(newDebugger);
-			newDebugger = NULL;
-			return;
-		}
-		if(!asyncLogProc){
-			std::string errMsg = "Failed to load 'asyncLog' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
-			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-			FreeLibrary(newDebugger);
-			newDebugger = NULL;
-			return;
-		}
+		GL_PROC_CHECK(runAsyncLoggerProc, runAsyncLogger, newDebugger, LunadllNewLauncher.dll)
+		GL_PROC_CHECK(asyncLogProc, asyncLog, newDebugger, LunadllNewLauncher.dll)
 		runAsyncLoggerProc();
 	}
 	
