@@ -50,18 +50,18 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
 extern long long dbglongTest;
 
 //Libs
-extern HMODULE newLauncherLib = 0;
+extern HMODULE newLauncherLib;
 
 
-extern HMODULE newDebugger = 0;
+extern HMODULE newDebugger;
 
 //DBG Procs
-void (*runAsyncDebuggerProc)(void);
-int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
-void (*runAsyncLoggerProc)(void);
-void (*asyncLogProc)(const char*);
+extern void (*runAsyncDebuggerProc)(void);
+extern int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
+extern void (*runAsyncLoggerProc)(void);
+extern void (*asyncLogProc)(const char*);
 //Old procs
-float (*__vbaR4Var)(VARIANTARG*);
+extern float (*__vbaR4Var)(VARIANTARG*);
 
 struct resultStruct{
 	int result;

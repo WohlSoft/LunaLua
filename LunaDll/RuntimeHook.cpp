@@ -18,8 +18,14 @@
 bool episodeStarted=false;
 #endif
 
+void (*runAsyncDebuggerProc)(void) = 0;
+void (*runAsyncLoggerProc)(void) = 0;
+int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int) = 0;
+void (*asyncLogProc)(const char*) = 0;
+float (*__vbaR4Var)(VARIANTARG*) = 0;
 
-
+HMODULE newLauncherLib = 0;
+HMODULE newDebugger = 0;
 
 void ParseArgs(const std::vector<std::string>& args)
 {
@@ -425,8 +431,8 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 	if(variant->vt == VT_CY)
 	{
 		CY x = variant->cyVal;
-		float y=x.Hi;
-		float z=x.Lo;
+		float y=(float)x.Hi;
+		float z=(float)x.Lo;
 		while(z>1.0)
 		{
 			z/=10;
@@ -439,8 +445,8 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 	{
 		if(variant->pcyVal==0) return 0.0;
 		CY x = *(variant->pcyVal);
-		float y=x.Hi;
-		float z=x.Lo;
+		float y=(float)x.Hi;
+		float z=(float)x.Lo;
 		while(z>1.0)
 		{
 			z/=10;
