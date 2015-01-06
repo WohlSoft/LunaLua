@@ -289,3 +289,12 @@ bool is_number(const std::string& s)
 	return !s.empty() && it == s.end();
 }
 
+HMODULE getModule(std::string moduleName)
+{
+	HMODULE ret = 0;
+	if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
+		ret = LoadLibraryA(moduleName.c_str());
+	}
+	return ret;
+}
+

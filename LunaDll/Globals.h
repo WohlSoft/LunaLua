@@ -91,5 +91,25 @@ std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
 void resetDefines();
 bool is_number(const std::string& s);
+HMODULE getModule(std::string moduleName);
 
-
+/// HELPER MACROS ///
+/*
+if(!hRunProc){
+std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
+errMsg += std::to_string((long long)GetLastError());
+MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+FreeLibrary(newLauncherLib);
+newLauncherLib = NULL;
+return;
+}
+*/
+#define GL_PROC_CHECK(procHandle, procName, moduleHandle, moduleName) \
+	if(!procHandle){\
+		std::string errMsg = "Failed to load 'procName' in moduleName D:!\nIs Lunadll.dll or moduleName different versions?\nError code:";\
+		errMsg += std::to_string((long long)GetLastError());\
+		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);\
+		FreeLibrary(moduleHandle);\
+		moduleHandle = NULL;\
+		return;\
+	}

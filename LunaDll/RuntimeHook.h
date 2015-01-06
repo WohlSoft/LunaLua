@@ -14,7 +14,7 @@
 
 #define COMBOOL(b) (b ? -1 : 0)
 
-typedef int SMBXTrigger(BSTR*, int*);
+
 
 #ifndef NO_SDL
 extern bool episodeStarted;
@@ -26,22 +26,23 @@ void ParseArgs(const std::vector<std::string>& args);
 void TrySkipPatch();
 
 //Hooks
+
+//The Init Hook will be run when "--patch" is executed.
 extern void InitHook();
+//Force Termination when SMBX runs the end code.
+//Without this code, there is a chance of "zombie"-processes.
 extern void forceTermination();
-
-
 //The World Load Code
 extern int LoadWorld();
 //The World Loop Code
 extern DWORD WorldLoop();
 //The World Render Code
-extern void* renderTest();
-
-extern void prTest(wchar_t** tarString, int* type, float* x, float* y);
-extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
+extern void* WorldRender();
+//The Main Menu Render Code
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
+//The MCI Emulator Code
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);
-
+//The Converter Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
 
 

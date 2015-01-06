@@ -454,5 +454,8 @@
     <None Include="scratch.txt">
       <Filter>Header Files\Misc</Filter>
     </None>
+    <None Include="scrappedcode.txt">
+      <Filter>Header Files\Misc</Filter>
+    </None>
   </ItemGroup>
 </Project>

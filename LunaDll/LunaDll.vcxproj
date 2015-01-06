@@ -257,6 +257,7 @@
     <ClCompile Include="WorldLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="scrappedcode.txt" />
     <None Include="scratch.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
