@@ -16,7 +16,10 @@
 
 typedef int SMBXTrigger(BSTR*, int*);
 
+#ifndef NO_SDL
 extern bool episodeStarted;
+#endif
+
 
 void ParseArgs(const std::vector<std::string>& args);
 

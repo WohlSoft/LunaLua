@@ -14,7 +14,10 @@
 //	return strTo;
 //}
 
+#ifndef NO_SDL
 bool episodeStarted=false;
+#endif
+
 
 void RuntimePatch()
 {
@@ -377,14 +380,14 @@ extern void forceTermination()
 extern int LoadWorld()
 {
 	resetDefines();
-
+#ifndef NO_SDL
 	if(!episodeStarted)
 	{
 		std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
 		MusicManager::loadCustomSounds(wldPath+"\\");
 		episodeStarted=true;
 	}
-
+#endif
 
 	gSkipSMBXHUD = false;
 	gIsOverworld = true;
@@ -438,12 +441,13 @@ extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHe
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
 {
+#ifndef NO_SDL
 	if(episodeStarted)
 	{   //Reset sounds to default when main menu is loaded
 		MusicManager::resetSoundsToDefault();
 		episodeStarted=false;
 	}
-
+#endif
 	Render::Print(std::wstring(L"LUNALUA V0.5.2 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{

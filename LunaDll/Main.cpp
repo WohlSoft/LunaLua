@@ -52,6 +52,7 @@ int OnLvlLoad() {
 	*(DWORD*)0x00B25958 = 0;
     resetDefines();
 
+#ifndef NO_SDL
 	if(!episodeStarted)
 	{//Load custom sounds
 		std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
@@ -59,7 +60,7 @@ int OnLvlLoad() {
 		replaceSubStr(wldPath, "\"", "");
 		replaceSubStr(wldPath, "\\\\",  "\\");
 		replaceSubStr(wldPath, "/",  "\\");
-		
+
 		replaceSubStr(SndRoot, "\"", "");
 		replaceSubStr(SndRoot, "\\\\",  "\\");
 		replaceSubStr(SndRoot, "/",  "\\");
@@ -70,7 +71,7 @@ int OnLvlLoad() {
 			//MessageBoxA(0, std::string(wldPath+"\n"+SndRoot+"\nLevel started").c_str(), "Debug", 0);
 		}
 	}
-
+#endif
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gIsOverworld = false;
