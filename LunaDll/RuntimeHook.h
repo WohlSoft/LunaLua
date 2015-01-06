@@ -16,6 +16,8 @@
 
 typedef int SMBXTrigger(BSTR*, int*);
 
+extern bool episodeStarted;
+
 void ParseArgs(const std::vector<std::string>& args);
 
 void TrySkipPatch();

@@ -244,6 +244,7 @@
     <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp" />
     <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp" />
     <ClCompile Include="SAJewers-Snowboardin.cpp" />
+    <ClCompile Include="SdlMusic\MusicDefList.cpp" />
     <ClCompile Include="SdlMusic\MusicManager.cpp" />
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
     <ClCompile Include="SMBXEvent.cpp" />

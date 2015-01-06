@@ -75,6 +75,7 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 			if(Mix_FadingMusic()!=MIX_FADING_IN)
 				if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
 				{
+					if(std::string(Mix_GetError())!="No free channels available")//Don't show overflow messagebox
 					MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
 				}
 		}

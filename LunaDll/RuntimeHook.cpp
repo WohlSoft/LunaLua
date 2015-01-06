@@ -3,15 +3,18 @@
 #include "LuaMain/LuaEvents.h"
 #include <comutil.h>
 #include "Input.h"
+#include "GlobalFuncs.h"
+#include "SdlMusic/MusicManager.h"
 
-std::string utf8_encode(const std::wstring &wstr)
-{
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-	std::string strTo( size_needed, 0 );
-	WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-	return strTo;
-}
+//std::string utf8_encode(const std::wstring &wstr)
+//{
+//	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+//	std::string strTo( size_needed, 0 );
+//	WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+//	return strTo;
+//}
 
+bool episodeStarted=false;
 
 void RuntimePatch()
 {
@@ -171,7 +174,7 @@ void ParseArgs(const std::vector<std::string>& args)
 
 void TrySkipPatch()
 {
-	ParseArgs(split(std::string(GetCommandLineA()), ' '));
+	ParseArgs(splitCmdArgs(std::string(GetCommandLineA())));
 
 	if(gStartupSettings.patch){
 		memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
@@ -196,7 +199,7 @@ extern void InitHook()
 	// I still provide this code as a attempt to patch the conversion of string to float.
 	// Unfortunatly I made me too much work and now I just patched the import table with my new code.
 	// If someone wants to use it to get better understanding to ASM here you are:
-	/*
+	
 	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
 	if(vmVB6Lib){
 		//Get the function conversion code;
@@ -235,9 +238,8 @@ extern void InitHook()
 		output += std::to_string((long long)targetAddrBYTE[4]) + " ";
 		output += std::to_string((long long)targetAddrBYTE[5]) + " ";
 
-		MessageBoxA(NULL, output.c_str(), "Dbg", NULL);
+		MessageBoxA(NULL, output.c_str(), "Dbg", NULL);*/
 	}
-	*/
 	
 	if(gStartupSettings.newLauncher){
 		typedef bool (*RunProc)(void);
@@ -358,6 +360,8 @@ extern void InitHook()
 		runAsyncLoggerProc();
 	}
 	
+
+
 	/*void (*exitCall)(void);
 	exitCall = (void(*)(void))0x8D6BB0;
 	exitCall();*/
@@ -373,6 +377,14 @@ extern void forceTermination()
 extern int LoadWorld()
 {
 	resetDefines();
+
+	if(!episodeStarted)
+	{
+		std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
+		MusicManager::loadCustomSounds(wldPath+"\\");
+		episodeStarted=true;
+	}
+
 
 	gSkipSMBXHUD = false;
 	gIsOverworld = true;
@@ -403,7 +415,6 @@ extern int LoadWorld()
 
 extern DWORD WorldLoop()
 {
-
 	gSavedVarBank.CheckSaveDeletion();
 
 	// Update inputs
@@ -427,8 +438,15 @@ extern DWORD bitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHe
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
 {
+	if(episodeStarted)
+	{   //Reset sounds to default when main menu is loaded
+		MusicManager::resetSoundsToDefault();
+		episodeStarted=false;
+	}
+
 	Render::Print(std::wstring(L"LUNALUA V0.5.2 BETA"), 3, 5, 5);
-	if(newDebugger){
+	if(newDebugger)
+	{
 		if(asyncBitBltProc){
 			return asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 		}

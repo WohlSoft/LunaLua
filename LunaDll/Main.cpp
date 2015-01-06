@@ -2,6 +2,7 @@
 //#include <windows.h>
 #include <string>
 #include "Globals.h"
+#include "GlobalFuncs.h"
 #include "Defines.h"
 #include "Layer.h"
 #include "LevelCodes.h"
@@ -18,6 +19,7 @@
 #include "SMBXEvents.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "RuntimeHook.h"
+#include "SdlMusic/MusicManager.h"
 
 #define PATCHIT 1
 
@@ -50,6 +52,25 @@ int OnLvlLoad() {
 	*(DWORD*)0x00B25958 = 0;
     resetDefines();
 
+	if(!episodeStarted)
+	{//Load custom sounds
+		std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
+		std::string SndRoot = MusicManager::SndRoot();
+		replaceSubStr(wldPath, "\"", "");
+		replaceSubStr(wldPath, "\\\\",  "\\");
+		replaceSubStr(wldPath, "/",  "\\");
+		
+		replaceSubStr(SndRoot, "\"", "");
+		replaceSubStr(SndRoot, "\\\\",  "\\");
+		replaceSubStr(SndRoot, "/",  "\\");
+
+		if(wldPath!=SndRoot)
+		{
+			MusicManager::loadCustomSounds(wldPath+"\\");
+			//MessageBoxA(0, std::string(wldPath+"\n"+SndRoot+"\nLevel started").c_str(), "Debug", 0);
+		}
+	}
+
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gIsOverworld = false;
@@ -61,8 +82,6 @@ int OnLvlLoad() {
 
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
-
-
 
 	if(gLunaEnabled) {
 		// Load autocode
@@ -98,7 +117,8 @@ int OnLvlLoad() {
 }
 
 // *EXPORT* Test Func -- Run once per gameplay frame
-int TestFunc() {
+int TestFunc()
+{
 	
 	// Clean up
 	gLunaRender.ClearExpired();
@@ -314,6 +334,7 @@ void InitLevel() {
 	}
 
 }
+
 
 
 
