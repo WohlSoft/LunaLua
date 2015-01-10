@@ -1,5 +1,6 @@
 // LunaLuaMain.h -- Main Lua Function Manager
-#pragma once
+#ifndef LunaLuaMain_____hhhhhh
+#define LunaLuaMain_____hhhhhh
 
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -12,7 +13,8 @@ namespace LunaLua{
     struct lapiData{
         std::string lapiEventTable;
     };
-    std::map<lua_State*, lapiData> extraLapiData;
+
+    extern std::map<lua_State*, lapiData> extraLapiData;
 	static lua_State* mainStateV2 = 0;
 	void initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring lapi_path);
 	void initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::wstring lapi_path);
@@ -25,3 +27,5 @@ namespace LunaLua{
     void TryCloseState(lua_State *&L);
     void TryClose();
 }
+
+#endif

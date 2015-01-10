@@ -2687,7 +2687,7 @@ void LuaProxy::hud(bool activate)
 luabind::object LuaProxy::levels(lua_State *L)
 {
 	luabind::object vlevels = luabind::newtable(L);
-	for(int i = 0; i < GM_LEVEL_COUNT; i++) {
+	for(int i = 0; i < (signed)GM_LEVEL_COUNT; i++) {
 		vlevels[i] = new LuaProxy::LevelObject(i);
 	}
 	return vlevels;
@@ -2697,7 +2697,7 @@ luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
 {
 	luabind::object obj = luabind::newtable(L);
 	bool found = false;
-	for(int i = 0, j = 0; i < GM_LEVEL_COUNT; ++i){
+	for(int i = 0, j = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
 			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
@@ -2720,7 +2720,7 @@ luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
 
 luabind::object LuaProxy::findlevel(std::string toFindName, lua_State* L)
 {
-	for(int i = 0; i < GM_LEVEL_COUNT; ++i){
+	for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
 			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
@@ -2901,7 +2901,7 @@ luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_St
 
 bool LuaProxy::LevelObject::isValid()
 {
-	if(m_index < 0 || m_index > GM_LEVEL_COUNT)
+	if((m_index < 0) || (m_index > (signed)GM_LEVEL_COUNT))
 		return false;
 	return true;
 }
@@ -2934,6 +2934,32 @@ void LuaProxy::LevelObject::setY(double y)
 	if(!isValid())
 		return;
 	SMBXLevel::get(m_index)->YPos = y;
+}
+
+RECT LuaProxy::newRECT()
+{
+    RECT r;
+    r.bottom = 0;
+    r.left = 0;
+    r.right = 0;
+    r.top = 0;
+    return r;
+}
+
+LuaProxy::RECTd LuaProxy::newRECTd()
+{
+    RECTd r;
+    r.bottom = 0.0;
+    r.left = 0.0;
+    r.right = 0.0;
+    r.top = 0.0;
+    return r;
+}
+
+std::ostream& LuaProxy::operator<<(std::ostream& os, const VBStr& wStr)
+{
+	os << wStr.str();
+	return os;
 }
 
 LuaProxy::VBStr LuaProxy::LevelObject::levelTitle()

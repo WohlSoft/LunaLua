@@ -101,23 +101,8 @@ namespace LuaProxy {
         double bottom;
     };
 
-    RECT newRECT(){
-        RECT r;
-        r.bottom = 0;
-        r.left = 0;
-        r.right = 0;
-        r.top = 0;
-        return r;
-    }
-
-    RECTd newRECTd(){
-        RECTd r;
-        r.bottom = 0.0;
-        r.left = 0.0;
-        r.right = 0.0;
-        r.top = 0.0;
-        return r;
-    }
+    RECT newRECT();
+    RECTd newRECTd();
 
     class VBStr{
     public:
@@ -134,10 +119,7 @@ namespace LuaProxy {
         wchar_t* m_wcharptr;
     };
 
-	std::ostream& operator<<(std::ostream& os, const VBStr& wStr){
-		os << wStr.str();
-		return os;
-	}
+	std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
 
     class Animation{
     public:

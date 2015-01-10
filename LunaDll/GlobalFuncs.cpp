@@ -3,14 +3,17 @@
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
-	char* pTempStr = strdup( str.c_str() );
-	char* pWord = std::strtok(pTempStr, separator);
-	while(pWord != NULL)
+	dest.clear();
+	std::string st=str;
+	while ( true )
 	{
-		dest.push_back(pWord);
-		pWord = std::strtok(NULL, separator);
+		size_t pos = str.find_first_of( separator );
+		std::string cur = st.substr( 0, pos );
+		dest.push_back( cur );
+		if ( pos == std::string::npos )
+			break;
+		st = st.substr( pos + 1 );
 	}
-	free(pTempStr);
 }
 
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to)
@@ -38,7 +41,7 @@ std::vector<std::string> splitCmdArgs( std::string str)
 	std::string arg;
 	arg.clear();
 	bool quote_opened=false;
-	for(int i=0; i<str.size();i++)
+	for(unsigned int i=0; i<str.size();i++)
 	{
 		if(quote_opened)
 			goto qstr;
