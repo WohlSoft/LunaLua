@@ -104,7 +104,8 @@ SOURCES += \
     LunaDll/libs/luabind-src/stack_content_by_name.cpp \
     LunaDll/libs/luabind-src/weak_ref.cpp \
     LunaDll/libs/luabind-src/wrapper_base.cpp \
-    LunaDll/PngRender.cpp
+    LunaDll/PngRender.cpp \
+    LunaDll/HardcodedGraphicsManager.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -240,7 +241,8 @@ HEADERS += \
     LunaDll/SdlMusic/MusicManager.h \
     LunaDll/SdlMusic/SdlMusPlayer.h \
     LunaDll/libs/ini-reader/ini.h \
-    LunaDll/libs/ini-reader/INIReader.h
+    LunaDll/libs/ini-reader/INIReader.h \
+    LunaDll/HardcodedGraphicsManager.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
