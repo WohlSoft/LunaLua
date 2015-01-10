@@ -68,6 +68,8 @@ MciEmulator gMciEmulator;
 
 startUpSettings gStartupSettings;
 
+HardcodedGraphicsManager gGraphManager;
+
 /// INIT GLOBALS
 void InitGlobals()
 {

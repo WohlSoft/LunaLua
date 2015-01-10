@@ -157,6 +157,7 @@
     <ClInclude Include="BMPBox.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="HardcodedGraphicsManager.h" />
     <ClInclude Include="Hitbox.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Keyboard.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="HardcodedGraphicsManager.cpp" />
     <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="JosephStaleknight-CurtainTortoise.lvl.cpp" />
