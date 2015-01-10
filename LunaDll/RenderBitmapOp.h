@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RenderBitmapOp_H
+#define RenderBitmapOp_H
 
 #include "RenderOp.h"
 
@@ -16,3 +17,5 @@ public:
 	
 	int img_resource_code;
 };
+
+#endif

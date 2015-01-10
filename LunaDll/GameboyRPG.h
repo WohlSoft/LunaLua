@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef GameboyRGP_Hhh
+#define GameboyRGP_Hhh
 #include "Minigames.h"
 
 class GameboyRPG : Minigame {
@@ -7,4 +7,6 @@ class GameboyRPG : Minigame {
 	void Process();
 	void Draw(Renderer g);
 	void End();
-}
+};
+
+#endif

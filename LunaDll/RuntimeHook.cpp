@@ -4,6 +4,7 @@
 #include <comutil.h>
 #include "Input.h"
 #include "GlobalFuncs.h"
+#include "MiscFuncs.h"
 #include "SdlMusic/MusicManager.h"
 
 //std::string utf8_encode(const std::wstring &wstr)
@@ -132,7 +133,7 @@ extern void InitHook()
 		if(!newLauncherLib){
 			std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
 			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
 			return;
 		}
 		RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
@@ -167,7 +168,7 @@ extern void InitHook()
 		if(!newDebugger){
 			std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
 			errMsg += std::to_string((long long)GetLastError());
-			MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
 			newDebugger = NULL;
 			return;
 		}
@@ -238,10 +239,19 @@ extern int LoadWorld()
 	gDeathCounter.Recount();
 
 	short plValue = GM_PLAYERS_COUNT;
+    #ifndef __MINGW32__
 	__asm {
 		MOV EAX, 1
 		MOV CX, plValue
 	}
+    #else
+    asm(".intel_syntax noprefix\n"
+    "mov eax, 1\n"
+    "mov cx, %0\n"
+    ".att_syntax\n": "=r" (plValue));
+    //".intel_syntax prefix" :: [plValue] "g" (plValue) : "edx");
+
+    #endif
 }
 
 extern DWORD WorldLoop()

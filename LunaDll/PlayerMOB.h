@@ -1,7 +1,9 @@
 //*** PlayerMOB.h - Definition of known Player structure and Player-related framework functions ***
-#pragma once
+#ifndef PlayerMob_hhhhh
+#define PlayerMob_hhhhh
 #include "Defines.h"
 
+#ifndef __MINGW32__
 #pragma region Lookup
 // - Player MOB Struct. size = 0x184 (388 bytes)
 //
@@ -190,6 +192,7 @@
 //+0x182	w	= Unused182
 //+0x184	w	= Unused184
 #pragma endregion
+#endif
 
 // SMBX player structure (INCOMPLETE)
 struct PlayerMOB {
@@ -400,3 +403,5 @@ namespace Player {
 
 	RECT GetScreenPosition(PlayerMOB* player);
 };
+
+#endif

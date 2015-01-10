@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CGUIContainer_hhh
+#define CGUIContainer_hhh
 
 #include "CGUI.h"
 
@@ -6,3 +7,4 @@
 class CGUIContainer : CGUIElement, IGUIContainer {
 	list<CGUIElement*> m_ChildElements;
 };
+#endif

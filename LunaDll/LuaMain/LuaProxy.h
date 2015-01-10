@@ -1,5 +1,6 @@
 // LuaHelper.h Helper Functions
-#pragma once
+#ifndef LuaProxy_Hhh
+#define LuaProxy_Hhh
 
 #include <Windows.h>
 #include <lua.hpp>
@@ -551,3 +552,5 @@ namespace LuaProxy {
 		int m_index;
 	};
 }
+
+#endif

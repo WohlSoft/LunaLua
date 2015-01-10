@@ -68,8 +68,9 @@ namespace ScienceBattle
 		
 		if (grace_timer >= 0)
 		{
-			for each (NPCMOB* doughnut in doughnuts)
+            for(std::vector<NPCMOB*>::const_iterator it = doughnuts.begin();it!=doughnuts.end();it++)
 			{
+                NPCMOB* doughnut=*it;
 				double x_diff, y_diff, m;
 
 				x_diff = doughnut->Xpos - demo->CurXPos;
@@ -91,8 +92,9 @@ namespace ScienceBattle
 		{
 			if (throw_timer <= 0)
 			{
-				for each (NPCMOB* doughnut in doughnuts)
-				{
+                for(std::vector<NPCMOB*>::const_iterator it = doughnuts.begin();it!=doughnuts.end();it++)
+                {
+                    NPCMOB* doughnut=*it;
 					//Ignore generators
 					if ((*((int*)doughnut + 16)) != 0)
 						continue;

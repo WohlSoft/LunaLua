@@ -1,5 +1,6 @@
 #include "UserSaving.h"
 #include "MiscFuncs.h"
+#include "GlobalFuncs.h"
 #include <iostream>
 #include <string>
 #include <stdlib.h>
@@ -19,14 +20,14 @@ bool SavedVariableBank::TryLoadWorldVars() {
 	ClearBank();
 
 	// Try to open the file
-	wfstream var_file(full_path, ios::in|ios::out);
+    wfstream var_file(wstr2str(full_path).c_str(), ios::in|ios::out);
 
 	// If open failed, try to create empty file
 	if(var_file.is_open() == false) {
-		var_file.open(full_path, ios::out);
+        var_file.open(wstr2str(full_path).c_str(), ios::out);
 		var_file.flush();	
 		var_file.close();
-		var_file.open(full_path, ios::in|ios::out);;
+        var_file.open(wstr2str(full_path).c_str(), ios::in|ios::out);;
 	}
 
 	// If create failed, get out
@@ -119,7 +120,7 @@ void SavedVariableBank::WriteBank() {
 		return;
 	wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 
-	wfstream var_file(full_path, ios::out|ios::trunc);
+    wfstream var_file(wstr2str(full_path).c_str(), ios::out|ios::trunc);
 
 	for(map<wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
 		var_file << it->first << endl << it->second << endl;
@@ -145,7 +146,7 @@ void SavedVariableBank::CheckSaveDeletion() {
 
 		wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 		ClearBank();
-		wfstream var_file(full_path, ios::out);
+        wfstream var_file(wstr2str(full_path).c_str(), ios::out);
 		InitSaveFile(&var_file);
 		var_file.flush();
 		var_file.close();

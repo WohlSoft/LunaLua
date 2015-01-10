@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CGUI_Hhh
+#define CGUI_Hhh
 
 #include <list>
 
@@ -20,9 +21,11 @@ protected:
 // Interface for element that can contain child elements
 class IGUIContainer {
 protected:
-	void AddElement(CGUIElement* ele) =0;
-	list<CGUIElement*> m_ChildElements;
+    inline void AddElement(CGUIElement* ele=0) {}
+    list<CGUIElement*> m_ChildElements;
 };
 
  // Forward declarations for anything #including this file
 class CGUIContainer;
+
+#endif

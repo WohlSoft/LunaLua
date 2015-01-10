@@ -1,4 +1,7 @@
-#pragma once
+#ifndef Autocode_hhh
+#define Autocode_hhh
+
+
 #include "Defines.h"
 #include <string>
 #include "CSprite.h"
@@ -228,3 +231,5 @@ private:
 	bool ReferenceOK();	// check if this object has a valid reference (not empty)
 
 };
+
+#endif

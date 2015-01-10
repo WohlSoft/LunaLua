@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DeathRecord_hhhh
+#define DeathRecord_hhhh
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -16,4 +18,6 @@ struct DeathRecord {
 
 namespace DeathRecords {
 	bool by_fewer_deaths(DeathRecord* lhs, DeathRecord* rhs);	// for automatic sorting
-};
+}
+
+#endif

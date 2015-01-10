@@ -1,9 +1,12 @@
 //*** Globals.h - It has some globals in it ***
+#ifndef globals_hhhhhh
+#define globals_hhhhhh
 
-#pragma once
+#ifndef __MINGW32__
 #pragma warning(disable: 4731)
 #pragma warning(disable: 4800)
 #pragma warning(disable: 4996) //localtime
+#endif
 #include "LevelCodes.h"
 #include "Rendering.h"
 #include "DeathCounter.h"
@@ -15,7 +18,9 @@
 #include "UserSaving.h"
 #include "mciEmulator.h"
 
+#ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
+#endif
 
 struct startUpSettings{
 	bool patch;
@@ -90,7 +95,6 @@ std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
 void resetDefines();
-bool is_number(const std::string& s);
 HMODULE getModule(std::string moduleName);
 
 /// HELPER MACROS ///
@@ -108,8 +112,11 @@ return;
 	if(!procHandle){\
 		std::string errMsg = "Failed to load 'procName' in moduleName D:!\nIs Lunadll.dll or moduleName different versions?\nError code:";\
 		errMsg += std::to_string((long long)GetLastError());\
-		MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);\
+        MessageBoxA(NULL, errMsg.c_str(), "Error", 0);\
 		FreeLibrary(moduleHandle);\
 		moduleHandle = NULL;\
 		return;\
 	}
+
+
+#endif

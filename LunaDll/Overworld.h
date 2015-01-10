@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Overworld_hhhhhh
+#define Overworld_hhhhhh
 
 struct Overworld{
 	char padding1[64];					
@@ -20,3 +21,5 @@ struct Overworld{
 namespace SMBXOverworld{
 	Overworld* get();
 }
+
+#endif

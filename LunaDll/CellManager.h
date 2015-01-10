@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef CellManager_hhh
+#define CellManager_hhh
 #include <list>
 #include <cmath>
 
@@ -24,7 +24,7 @@ struct CellObj { // Objects that can be contained in a Cell, such as block/NPC r
 
 
 struct Cell { // Cells that hold references to objects and are singly linked
-	Cell(int _x, int _y) { x = _x; y = _y; pNext = NULL; };
+    Cell(int _x, int _y);
 	int x, y;
 	Cell* pNext;
 	std::list<CellObj> ContainedObjs;
@@ -42,7 +42,7 @@ struct Bucket { // Map buckets that hold (sometimes multiple) cells
 // Spatial partitioning & collision detection manager
 class CellManager {
 public:
-	CellManager() { Reset(); };
+    CellManager();
 
 	/// Functions ///
 	void Reset();									// Re-initialize cell manager
@@ -67,4 +67,6 @@ public:
 	Bucket m_BucketArray[BUCKET_COUNT];
 };
 
-inline double SnapToGrid(double coord, double span) { return floor(coord / span) * span; };
+inline double SnapToGrid(double coord, double span);
+
+#endif

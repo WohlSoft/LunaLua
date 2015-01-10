@@ -78,7 +78,7 @@ void Input::CheckSpecialCheats() {
 
 // UPDATE INPUT TASKS -- Update key presses, etc
 void Input::UpdateInputTasks() {
-	wchar_t* dbg = L"Input tasks debug";
+    //wchar_t* dbg = L"Input tasks debug";
 	ResetTaps();
 	UpdateKeyRecords(Player::Get(1));
 }
@@ -114,7 +114,7 @@ void Input::UpdateKeyRecords(PlayerMOB* pPlayer) {
 	if(pPlayer == 0)
 		return;
 
-	wchar_t* dbg = L"Update keys debug";
+    //wchar_t* dbg = L"Update keys debug";
 
 	// Up
 	if(Player::PressingUp(pPlayer)) {
@@ -212,7 +212,7 @@ wstring Input::GetInputStringCopy() {
 
 // CLEAR INPUT STRING BUFFER -- 
 void Input::ClearInputStringBuffer() {
-	int len = GetInputStringCopy().length();
+    //int len = GetInputStringCopy().length();
 	if(GM_INPUTSTR_BUF_PTR != 0) {
 		*(((short*)GM_INPUTSTR_BUF_PTR) - 2) = (int)0; // zero out VBA string len
 		*(short*)GM_INPUTSTR_BUF_PTR = (short)0; // null out first character

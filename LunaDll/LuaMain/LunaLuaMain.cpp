@@ -43,7 +43,7 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 	lua_pushcfunction(L, luaopen_package);
 	lua_call(L,0,0);
 
-	wifstream lapi_file(lapi_path, ios::binary|ios::in);
+    wifstream lapi_file(wstr2str(lapi_path).c_str(), ios::binary|ios::in);
 	if(!lapi_file.is_open()){
 		lapi_file.close();
 		windowError("Since v0.3 the LuaScriptsLib-Folder with\
@@ -635,7 +635,7 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 	lua_pushcfunction(L, luaopen_package);
 	lua_call(L,0,0);
 
-	wifstream lapi_file(lapi_path, ios::binary|ios::in);
+    wifstream lapi_file(wstr2str(lapi_path).c_str(), ios::binary|ios::in);
 	if(!lapi_file.is_open()){
 		lapi_file.close();
 		windowError("Since v0.3 the LuaScriptsLib-Folder with\

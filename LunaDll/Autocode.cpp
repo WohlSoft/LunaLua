@@ -146,7 +146,7 @@ void Autocode::Do(bool init) {
 
 		// SCREEN EDGE BUFFER
 		case AT_ScreenEdgeBuffer: {
-			char* dbg = "SCREEN EDGE DBG";
+            //char* dbg = "SCREEN EDGE DBG";
 
 			// Get all target NPCs in section into a list
 			list<NPCMOB*> npcs;
@@ -226,7 +226,7 @@ void Autocode::Do(bool init) {
 				else {
 					// Sound from level folder
 					if(MyString.length() > 0) {
-						char* dbg = "CUSTOM SOUND PLAY DBG";
+                        //char* dbg = "CUSTOM SOUND PLAY DBG";
 						wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
 						wstring full_path = world_dir.append(Level::GetName());	
 						full_path = removeExtension(full_path);
@@ -672,7 +672,7 @@ void Autocode::Do(bool init) {
 							   }		
 
 		case AT_ClearInputString: {
-			wchar_t* dbg = L"ClearInputString debug";
+            //wchar_t* dbg = L"ClearInputString debug";
 			Input::ClearInputStringBuffer();
 			break;
 								  }
@@ -978,7 +978,7 @@ void Autocode::Do(bool init) {
 								 }
 
 		case AT_Attach: {
-			char* dbg = "!!! ATTACH DEBUG !!!";
+            //char* dbg = "!!! ATTACH DEBUG !!!";
 			if(ReferenceOK() && MyString.length() > 0) {
 				if(gSpriteMan.m_SpriteBlueprints.find(MyRef) != gSpriteMan.m_SpriteBlueprints.end()) { // BLueprint exists
 					CSprite* pSpr = gSpriteMan.m_SpriteBlueprints[MyRef];					// Get blueprint
@@ -1070,7 +1070,7 @@ void Autocode::DoPredicate(int target, int predicate) {
 
 // NPC CONDITIONAL
 bool Autocode::NPCConditional(int target, int cond) {
-	char* dbg = "NPC COND DBG";
+    //const char* dbg = "NPC COND DBG";
 	bool ret = false;
 
 	switch((AC_Conditional)cond) {

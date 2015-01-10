@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SpriteComponent_hhhhhh
+#define SpriteComponent_hhhhhh
 
 #include "Defines.h"
 #include <string>
@@ -26,14 +27,17 @@ struct SpriteComponent {
 
 	void Tick();			// Tick down the timer of this component. Expires self when run_time reaches 1
 
-	pfnSprFunc func;
+    double data1;
+    double data2;
+    double data3;
+    double data4;
+    pfnSprFunc func;
 	int lookup_code;		// Which "bucket" of custom components this component is a part of
 	int run_time;			// Run time frame countdown. 0 = infinite lifetime, always run
 	int org_time;			// Frame count to begin countdown at
-	double data1;
-	double data2;
-	double data3;
-	double data4;
+
 	wstring data5;
 	bool expired;			// If this component should be deleted at the next clean up cycle
 };
+
+#endif

@@ -1,7 +1,7 @@
 #include "mciEmulator.h"
 #include "SdlMusic/MusicManager.h"
 #include <vector>
-#include "Globals.h"
+//#include "Globals.h"
 #include "GlobalFuncs.h"
 
 MciEmulator::MciEmulator(void)

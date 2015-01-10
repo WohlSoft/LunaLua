@@ -1,5 +1,12 @@
 #include <sstream>
 #include "GlobalFuncs.h"
+#include <iostream>
+#include <clocale>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <locale>
+#include <vector>
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -121,6 +128,13 @@ std::string i2str(int source)
 	std::stringstream s;
 	s<<source;
 	return s.str();
+}
+
+bool is_number(const std::string& s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && (isdigit(*it))) ++it;
+    return !s.empty() && it == s.end();
 }
 
 

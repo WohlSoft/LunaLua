@@ -1,11 +1,11 @@
 //*** Defines.h - It has defines in it, also basically the known RAM map. ***
-#pragma once
+#ifndef Defines_hhhh
+#define Defines_hhhh
 
 #include <windows.h>
 
 #define LUNA_VERSION		8
 
-;
 enum FIELDTYPE {
 	FT_INVALID = 0,
 	FT_BYTE = 1,
@@ -200,3 +200,4 @@ enum PRIORITY {
 
 #define GF_RUN_ANIM			0x009E7380			// Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
 
+#endif

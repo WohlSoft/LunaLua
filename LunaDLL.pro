@@ -1,27 +1,24 @@
-TEMPLATE = vclib
-
-CONFIG += dll
+TEMPLATE = lib
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += dll
+CONFIG += static
 
 TARGET = LunaDLL
-#OBJECTS_DIR = release/obj
 
-DEFINES += LunaDLL_LIBRARY LunaDLL_EXPORTS _USRDLL
-DEFINES += DX_EXPORT=Q_DECL_EXPORT NDEBUG _WINDOWS _USRDLL LUNADLL_EXPORTS
+QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter -Wno-write-strings -mwindows
 
-INCLUDEPATH += LunaDLL LunaDll/libs/luabind-include
-INCLUDEPATH += %ProgramFiles%\\Lua\\5.1\\include
+DEFINES += LunaDLL_LIBRARY LunaDLL_EXPORTS
+DEFINES += DX_EXPORT=Q_DECL_EXPORT _USRDLL LUNADLL_EXPORTS
 
-CONFIG += create_prl
-CONFIG += link_prl
-
-LIBS += kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib winmm.lib Gdiplus.lib
-LIBS += -L$$PWD/LunaDll/libs/luabind-lib/ -llibluabind
-LIBS += -L%ProgramFiles%\\Lua\\5.1\\lib
-
+INCLUDEPATH += $$PWD/LunaDLL
+INCLUDEPATH += $$PWD/LunaDLL/libs/lua_mingw/include
 INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include
-DEPENDPATH += $$PWD/LunaDll/libs/luabind-include
+INCLUDEPATH += $$PWD/LunaDll/libs/sdl_mingw/include
+LIBS += -L$$PWD/LunaDLL/libs/lua_mingw/lib
+LIBS += -L$$PWD/LunaDLL/libs/sdl_mingw/lib
+LIBS += -static -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lmsimg32 -ldsound -lwinspool -ladvapi32 -lole32 -loleaut32 -static -llua5.1
+LIBS += -lwinmm -static -lSDL2main -lSDL2.dll -static -lSDL2_mixer.dll libversion -lDbghelp -lvorbisfile -lvorbis -lmad -lmikmod.dll -lflac -logg
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
@@ -74,12 +71,39 @@ SOURCES += \
     LunaDll/KilArmoryCode.cpp \
     LunaDll/Minigames.cpp \
     LunaDll/PerformanceTimer.cpp \
-    LunaDll/PngRender.cpp \
     LunaDll/RenderEffectOp.cpp \
     LunaDll/SMBXEvents.cpp \
     LunaDll/UserSaving.cpp \
     LunaDll/LuaMain/LuaEvents.cpp \
-    LunaDll/Animation.cpp
+    LunaDll/Animation.cpp \
+    LunaDll/GlobalFuncs.cpp \
+    LunaDll/RuntimeHook.cpp \
+    LunaDll/mciEmulator.cpp \
+    LunaDll/Overworld.cpp \
+    LunaDll/WorldLevel.cpp \
+    LunaDll/SdlMusic/MusicDefList.cpp \
+    LunaDll/SdlMusic/MusicManager.cpp \
+    LunaDll/SdlMusic/SdlMusPlayer.cpp \
+    LunaDll/libs/ini-reader/INIReader.cpp \
+    LunaDll/libs/ini-reader/ini.c \
+    LunaDll/libs/luabind-src/class.cpp \
+    LunaDll/libs/luabind-src/class_info.cpp \
+    LunaDll/libs/luabind-src/class_registry.cpp \
+    LunaDll/libs/luabind-src/class_rep.cpp \
+    LunaDll/libs/luabind-src/create_class.cpp \
+    LunaDll/libs/luabind-src/error.cpp \
+    LunaDll/libs/luabind-src/exception_handler.cpp \
+    LunaDll/libs/luabind-src/function.cpp \
+    LunaDll/libs/luabind-src/inheritance.cpp \
+    LunaDll/libs/luabind-src/link_compatibility.cpp \
+    LunaDll/libs/luabind-src/object_rep.cpp \
+    LunaDll/libs/luabind-src/open.cpp \
+    LunaDll/libs/luabind-src/pcall.cpp \
+    LunaDll/libs/luabind-src/scope.cpp \
+    LunaDll/libs/luabind-src/stack_content_by_name.cpp \
+    LunaDll/libs/luabind-src/weak_ref.cpp \
+    LunaDll/libs/luabind-src/wrapper_base.cpp \
+    LunaDll/PngRender.cpp
 
 HEADERS += \
     LunaDll/Autocode.h \
@@ -206,8 +230,20 @@ HEADERS += \
     LunaDll/RenderEffectOp.h \
     LunaDll/UserSaving.h \
     LunaDll/LuaMain/LuaEvents.h \
-    LunaDll/Animation.h
+    LunaDll/Animation.h \
+    LunaDll/RuntimeHook.h \
+    LunaDll/WorldLevel.h \
+    LunaDll/GlobalFuncs.h \
+    LunaDll/Overworld.h \
+    LunaDll/mciEmulator.h \
+    LunaDll/SdlMusic/MusicManager.h \
+    LunaDll/SdlMusic/SdlMusPlayer.h \
+    LunaDll/libs/ini-reader/ini.h \
+    LunaDll/libs/ini-reader/INIReader.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
+
+DISTFILES += \
+    LunaDll/scrappedcode.txt
 

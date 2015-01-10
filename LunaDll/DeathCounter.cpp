@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "MiscFuncs.h"
 #include "Level.h"
+#include "GlobalFuncs.h"
 using namespace std;
 
 // CTOR
@@ -243,16 +244,22 @@ void DeathCounter::PrintDebug() {
 
 // DUMP ALL TO FILE
 void DeathCounter::DumpAllToFile(std::wstring file_name) {
-	int tempint = 0;
+    //int tempint = 0;
+
+    #ifndef __MINGW32__
 	wofstream out_file(file_name, ios::out|ios::trunc);
+    #else
+    wofstream out_file(wstr2str(file_name).c_str(), ios::out|ios::trunc);
+    #endif
+
 
 	// Create file if not existing
 	if(out_file.is_open() == false) {
-		out_file.open(file_name, ios::out);
+        out_file.open(wstr2str(file_name).c_str(), ios::out);
 		out_file << L" *** DEATH RECORDS FILE ***" << endl;
 		out_file.flush();	
 		out_file.close();
-		out_file.open(file_name, ios::in|ios::out);;
+        out_file.open(wstr2str(file_name).c_str(), ios::in|ios::out);;
 	}
 
 	// If create failed, get out
@@ -261,14 +268,23 @@ void DeathCounter::DumpAllToFile(std::wstring file_name) {
 
 	// Get all the records into a list
 	list<DeathRecord*> records;
-	for each(DeathRecord* pRec in mDeathRecords)
+    for(std::list<DeathRecord*>::const_iterator it = mDeathRecords.begin();
+        it != mDeathRecords.end(); it++
+        )
+    {
+        DeathRecord* pRec = *it;
 		records.push_back(pRec);
+    }
 
 	// Sort em	
 	records.sort(DeathRecords::by_fewer_deaths);
 
 	// Write em
-	for each(DeathRecord* pRec in records) {
+    for(std::list<DeathRecord*>::const_iterator it = records.begin();
+        it != records.end(); it++
+        )
+    {
+        DeathRecord* pRec = *it;
 		pRec->WriteText(&out_file);
 		out_file << endl;
 	}

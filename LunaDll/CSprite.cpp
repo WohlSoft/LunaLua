@@ -55,7 +55,9 @@ void CSprite::ClearExpiredComponents() {
 	}
 }
 
+#ifndef __MINGW32__
 #pragma region Add functions
+#endif
 
 // ADD BIRTH -- Add a birth function to sprite
 void CSprite::AddBirthComponent(SpriteComponent comp) {
@@ -84,7 +86,9 @@ void CSprite::AddDeathComponent(SpriteComponent comp) {
 		m_DeathComponents.push_back(comp);
 }
 
+#ifndef __MINGW32__
 #pragma endregion
+#endif
 
 // SET IMAGE RESOURCE
 void CSprite::SetImageResource(int _resource_code) {

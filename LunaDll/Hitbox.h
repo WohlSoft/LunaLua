@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HitBox_hhh
+#define HitBox_hhh
 
 #include <stddef.h>
 
@@ -25,12 +26,13 @@ struct Hitbox {
 	bool Test(int left, int up, int width, int height);	// Test hitbox against given rect
 	bool Test(int cx, int cy, int radius);				// Test hitbox against given circle
 
-	//COLLISION_TYPE GetCollisionDir(int left, int up, int right, int down); // Get the direction this hitbox is colliding with given rect
-	
-	CSprite* pParent;	// Pointer to parent sprite (for calculating actual coordinates + collision area)
 	short Left_off;			// Offset from 0,0 on sprite
 	short Top_off;			// Offset from 0,0 on sprite
 	short W;				// Width
 	short H;				// Height
-	char CollisionType;		// 0 = square aabb  1 = circle/dist
+    //COLLISION_TYPE GetCollisionDir(int left, int up, int right, int down); // Get the direction this hitbox is colliding with given rect
+    char CollisionType;		// 0 = square aabb  1 = circle/dist
+    CSprite* pParent;	// Pointer to parent sprite (for calculating actual coordinates + collision area)
+
 };
+#endif

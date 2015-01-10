@@ -5,6 +5,23 @@
 #include <windows.h>
 #include <math.h>
 
+#ifdef __MINGW32__
+wstring std::to_wstring(long long src)
+{
+    wstringstream tg;
+    tg<<src;
+    return tg.str();
+}
+
+
+string std::to_string(long long src)
+{
+    stringstream tg;
+    tg<<src;
+    return tg.str();
+}
+#endif
+
 void NumpadLayerControl1(LayerControl* sought_layer) {		
 	gNumpad4 = GetKeyState(VK_NUMPAD4);
 	gNumpad8 = GetKeyState(VK_NUMPAD8);
@@ -46,7 +63,7 @@ BOOL FileExists(LPCTSTR szPath) {
 
   return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
          !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-};
+}
 
 BOOL DirectoryExists(LPCTSTR szPath)
 {
@@ -301,6 +318,8 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((short*)address) < (short)value;
 			break;
 						  }
+        default:
+            break;
 		}
 		break;
 				  }
@@ -321,6 +340,8 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((int*)address) < (int)value;
 			break;
 						  }
+        default:
+            break;
 		}
 		break;
 				  }
@@ -341,6 +362,8 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((float*)address) < (float)value;
 			break;
 						  }
+        default:
+            break;
 		}
 		break;
 				  }
@@ -361,9 +384,13 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
 			return *((double*)address) < value;
 			break;
 						  }
+        default:
+            break;
 		}
 		break;
 				  }					
+    default:
+        break;
 	}
 
 	return false;
@@ -381,6 +408,8 @@ double GetMem(int addr, FIELDTYPE ftype) {
 		return (double)*((float*)addr);
 	case FT_DFLOAT:
 		return *((double*)addr);
+    default:
+        break;
 	}
 	return 0;
 }
@@ -709,3 +738,8 @@ void readAndWriteNPCSettings()
     }
 }
 
+
+const wchar_t *BoolToString(bool b)
+{
+    return (b ? L"TRUE" : L"FALSE");
+}

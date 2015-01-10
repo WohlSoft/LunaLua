@@ -3,8 +3,11 @@
 #include "MiscFuncs.h"
 
 // CELL :: COUNT
+Cell::Cell(int _x, int _y)
+{ x = _x; y = _y; pNext=0; }
+
 int Cell::CountDownward(int* oObjCounter) {
-	int count = 1;
+    int count = 1;
 	int objcount = 0;
 	Cell* downward = pNext;
 	if(oObjCounter != NULL)
@@ -21,9 +24,12 @@ int Cell::CountDownward(int* oObjCounter) {
 }
 
 // CELL :: ADD UNIQUE
-bool Cell::AddUnique(CellObj new_obj) {
-	for each(CellObj obj in ContainedObjs) {
-		if(obj.pObj == new_obj.pObj)
+bool Cell::AddUnique(CellObj new_obj)
+{
+    for (std::list<CellObj >::const_iterator it = ContainedObjs.begin() ; it != ContainedObjs.end() ; it++)
+    {
+        CellObj obj = *it;
+        if(obj.pObj == new_obj.pObj)
 			return false;
 	}
 	ContainedObjs.push_back(new_obj);
@@ -31,8 +37,10 @@ bool Cell::AddUnique(CellObj new_obj) {
 }
 
 // CELL MANAGER :: RESET
+CellManager::CellManager() { Reset(); }
+
 void CellManager::Reset() {
-	ClearAllBuckets();
+    ClearAllBuckets();
 }
 
 // CELL MANAGER :: CLEAR BUCKETS
@@ -95,7 +103,7 @@ int CellManager::ComputeHashBucketIndex(int x, int y) {
 
 // CELL MANAGER :: SCAN LEVEL
 void CellManager::ScanLevel(bool update_blocks) {
-	char* dbg = "!!! SCAN LEVEL DEBUG !!!";
+    //char* dbg = "!!! SCAN LEVEL DEBUG !!!";
 	PlayerMOB* demo = Player::Get(1);
 	ClearAllBuckets();
 
@@ -233,7 +241,11 @@ void CellManager::GetUniqueObjs(list<CellObj>* objlist, double x, double y) {
 
 	if(sought_cell != NULL) {		
 		bool add = true;
-		for each(CellObj cellobj in sought_cell->ContainedObjs) { // Loop over all objs in this cell
+        for( std::list<CellObj >::const_iterator it = sought_cell->ContainedObjs.begin();
+             it != sought_cell->ContainedObjs.end(); it++)
+        {
+            CellObj cellobj = *it;
+            // Loop over all objs in this cell
 			for(list<CellObj>::iterator iter = objlist->begin(), end = objlist->end(); iter != end; ++iter) { // Compare to each passed obj
 				if((*iter).pObj == cellobj.pObj) { // Set to not add if pointing to same obj
 					add = false;
@@ -301,3 +313,6 @@ void CellManager::SortByNearest(list<CellObj>* objlist, double cx, double cy) {
 		objlist->push_front(objvec[i]);
 	}
 }
+
+
+double SnapToGrid(double coord, double span) { return floor(coord / span) * span; }

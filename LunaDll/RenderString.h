@@ -1,4 +1,6 @@
-#pragma once
+#ifndef RenderString_hhh
+#define RenderString_hhh
+
 #include <string>
 
 // String object to be rendered later
@@ -26,3 +28,5 @@ struct RenderString {
 	float m_Y;
 	int m_FramesLeft;
 };
+
+#endif

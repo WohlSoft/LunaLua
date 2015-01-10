@@ -1,7 +1,9 @@
 #include "AutocodeManager.h"
 #include "MiscFuncs.h"
+#include "GlobalFuncs.h"
 #include "Level.h"
 #include "Logging.h"
+#include <fstream>
 
 using namespace std;
 
@@ -51,7 +53,7 @@ void AutocodeManager::ReadFile(wstring dir_path) {
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(AUTOCODE_FNAME);	
 
-	wifstream code_file(full_path, ios::binary|ios::in);	
+    wifstream code_file(wstr2str(full_path).c_str(), ios::binary|ios::in);
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
@@ -70,7 +72,7 @@ void AutocodeManager::ReadWorld(wstring dir_path) {
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(WORLDCODE_FNAME);	
 
-	wifstream code_file(full_path, ios::binary|ios::in);	
+	wifstream code_file(wstr2str(full_path).c_str(), ios::binary|ios::in);	
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
@@ -86,7 +88,7 @@ void AutocodeManager::ReadGlobals(wstring dir_path) {
 	full_path = full_path.append(GLOBALCODE_FNAME);
 
 	// 
-	wifstream code_file(full_path, ios::binary|ios::in);	
+    wifstream code_file(wstr2str(full_path).c_str(), ios::binary|ios::in);
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
@@ -122,9 +124,9 @@ void AutocodeManager::Parse(wifstream* code_file, bool add_to_globals) {
 	ZeroMemory(wstrbuf, 1000 * sizeof(wchar_t));
 	ZeroMemory(wrefbuf, 128 * sizeof(wchar_t));
 
-	code_file->seekg(0, 0);
+    code_file->seekg(0, ios::beg);
 
-	char* dbg = "ParseDbgEOF";
+    //char* dbg = "ParseDbgEOF";
 	while(code_file->eof() == false) {
 
 		// Get a line and reset buffers
@@ -248,7 +250,7 @@ void AutocodeManager::Parse(wifstream* code_file, bool add_to_globals) {
 
 // DO EVENTS
 void AutocodeManager::DoEvents(bool init) {
-	char* dbg = "DO EVENTS DBG";
+    //char* dbg = "DO EVENTS DBG";
 	if(m_Enabled) {
 		// Add any outstanding custom events
 		while(m_CustomCodes.empty() == false) {
@@ -295,12 +297,12 @@ void AutocodeManager::DeleteEvent(std::wstring ref_name) {
 
 // CLEAN EXPIRED - Don't call this while iterating over codes
 void AutocodeManager::ClearExpired() {
-	char* dbg = "CLEAN EXPIRED DBG";
+    //char* dbg = "CLEAN EXPIRED DBG";
 	std::list<Autocode*>::iterator iter = m_Autocodes.begin();
 	std::list<Autocode*>::iterator end  = m_Autocodes.end();
 
 	while(iter != m_Autocodes.end()) {
-		Autocode* ac = *iter;
+        //Autocode* ac = *iter;
 		if((*iter)->Expired || (*iter)->m_Type == AT_Invalid) {
 			delete (*iter);
 			iter = m_Autocodes.erase(iter);
@@ -313,7 +315,7 @@ void AutocodeManager::ClearExpired() {
 	end  = m_GlobalCodes.end();
 
 	while(iter != m_GlobalCodes.end()) {
-		Autocode* ac = *iter;
+        //Autocode* ac = *iter;
 		if((*iter)->Expired || (*iter)->m_Type == AT_Invalid) {
 			delete (*iter);
 			iter = m_GlobalCodes.erase(iter);
@@ -325,7 +327,7 @@ void AutocodeManager::ClearExpired() {
 
 // ACTIVATE CUSTOM EVENTS
 void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode) {
-	char* dbg = "ACTIVATE CUSTOM DBG";
+    //char* dbg = "ACTIVATE CUSTOM DBG";
 	if(m_Enabled) {
 		for (std::list<Autocode*>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter) {	
 
@@ -357,7 +359,7 @@ void AutocodeManager::ActivateCustomEvents(int new_section, int eventcode) {
 
 // FORCE EXPIRE -- Expire all codes in section
 void AutocodeManager::ForceExpire(int section) {
-	char* dbg = "FORCE EXPIRE DBG";
+    //char* dbg = "FORCE EXPIRE DBG";
 	if(m_Enabled) {
 		for (std::list<Autocode*>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter) {				
 			if((*iter)->ActiveSection == section) {
@@ -375,7 +377,7 @@ void AutocodeManager::ForceExpire(int section) {
 
 // FIND MATCHING -- Return a reference to the first autocode that matches, or 0
 Autocode* AutocodeManager::FindMatching(int section, wstring soughtstr) {
-	char* dbg = "FIND MATCHING DBG";	
+    //char* dbg = "FIND MATCHING DBG";
 	for (std::list<Autocode*>::iterator iter = m_Autocodes.begin(), end = m_Autocodes.end(); iter != end; ++iter) {	
 		if((*iter)->ActiveSection == section && (*iter)->MyString == soughtstr) {
 			return (*iter);

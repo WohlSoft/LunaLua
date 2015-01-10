@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AutocodeManager_Hhh
+#define AutocodeManager_Hhh
 #include <list>
 #include <iostream>
 #include <fstream>
@@ -51,3 +52,5 @@ struct AutocodeManager {
 	// Hearts manager stuff
 	int m_Hearts;
 };
+
+#endif

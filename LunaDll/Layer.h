@@ -1,5 +1,7 @@
 //*** Layer.h - Definition of known Layer structures and Layer-related framework functions ***
-#pragma once
+#ifndef layer__cpp
+#define layer__cpp
+
 #include "Defines.h"
 #include "Globals.h"
 
@@ -24,3 +26,5 @@ namespace Layer{
 	void SetXSpeed(LayerControl* layercontrol, float xSpeed);
 	void SetYSpeed(LayerControl* layercontrol, float ySpeed);
 }
+
+#endif

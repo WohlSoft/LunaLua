@@ -1,5 +1,6 @@
 //*** Main.h - General function declarations ***
-#pragma once
+#ifndef Main_Hhh
+#define Main_Hhh
 
 
 // DLL exports
@@ -17,3 +18,5 @@ void LevelFrameCode();
 void OnHUDDraw();
 
 void InitLevel();
+
+#endif

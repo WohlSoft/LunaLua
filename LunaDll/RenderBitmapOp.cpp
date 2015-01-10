@@ -1,6 +1,7 @@
 #include "RenderBitmapOp.h"
 #include "BMPBox.h"
 #include "Globals.h"
+#include "MiscFuncs.h"
 
 // CTOR
 RenderBitmapOp::RenderBitmapOp() {
@@ -31,4 +32,3 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
 		}
 	}
 }
-;

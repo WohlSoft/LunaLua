@@ -1,6 +1,7 @@
 // Input.h -- Easily accesible functions for the input of the main player
+#ifndef Input_hhhhh
+#define Input_hhhhh
 
-#pragma once
 #include "Globals.h"
 #include "PlayerMOB.h"
 
@@ -31,3 +32,5 @@ namespace Input {
 	bool RunThisFrame(); 
 	bool JumpThisFrame(); 
 }
+
+#endif

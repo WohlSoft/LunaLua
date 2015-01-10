@@ -3,13 +3,15 @@
 #include "RenderBitmapOp.h"
 #include "RenderRectOp.h"
 #include "PlayerMOB.h"
+#ifndef __MINGW32__
 #pragma warning(disable: 4018)	// signed comparison
+#endif
 
 // STATIC DRAW - Simply draw the sprite at its absolute screen coordinates
 //				 by registering a new bitmap render operation
 void SpriteFunc::StaticDraw(CSprite* me) {	
 	if(me != NULL && me->m_Visible) {
-		if(me->m_AnimationFrame < me->m_GfxRects.size()) { // Frame should be less than size of GfxRect container			
+        if(me->m_AnimationFrame < (signed)me->m_GfxRects.size()) { // Frame should be less than size of GfxRect container
 			RenderBitmapOp* op = new RenderBitmapOp();
 			op->m_FramesLeft = 1;
 			op->x = me->m_Xpos + me->m_GfxXOffset;
@@ -29,7 +31,7 @@ void SpriteFunc::StaticDraw(CSprite* me) {
 //				   to camera position by registering new bitmap render operation
 void SpriteFunc::RelativeDraw(CSprite* me) {
 	if(me != NULL && me->m_Visible) {
-		if(me->m_AnimationFrame < me->m_GfxRects.size()) {
+        if(me->m_AnimationFrame < (signed)me->m_GfxRects.size()) {
 			double cx = 0;				// camera x (top left of screen)
 			double cy = 0;				// camera y (top left of screen)
 			double sx = me->m_Xpos;		// sprite x position (top left of sprite)

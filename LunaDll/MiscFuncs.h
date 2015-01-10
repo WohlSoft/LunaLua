@@ -1,8 +1,11 @@
-#pragma once
+#ifndef MiscFuncs_hhh
+#define MiscFuncs_hhh
+
 #include "Layer.h"
 #include <math.h>
 #include <string>
 #include <vector>
+#include <sstream>
 
 void NumpadLayerControl1(LayerControl* sought_layer);
 
@@ -32,23 +35,31 @@ void PrintSyntaxError(wstring errored_line);
 
 void InitIfMissing(std::map<std::wstring, double>* map, std::wstring sought_key, double init_val);	// Init a map value if key doesn't exist
 
+#ifndef __MINGW32__
 static inline double round(double val)
 {    
     return floor(val + 0.5);
 }
+#endif
 
-
-
-static inline const wchar_t* const BoolToString(bool b)
+namespace std
 {
-  return b ? L"TRUE" : L"FALSE";
+    #ifdef __MINGW32__
+    wstring to_wstring(long long src);
+    string to_string(long long src);
+    #endif
 }
 
+const wchar_t* BoolToString(bool b);
+
+#ifndef __MINGW32__
 static inline float roundf(float val)
 {    
     return (float)floor(val + 0.5);
 }
+#endif
 
 //PGE Debug stuff: 
 void readAndWriteNPCSettings();
 
+#endif

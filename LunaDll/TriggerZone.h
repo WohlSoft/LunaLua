@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TriggerZone_hhh
+#define TriggerZone_hhh
 
 struct TriggerZone {
 	// The trigger zone boundaries
@@ -28,3 +29,4 @@ private:
 	}
 
 };
+#endif

@@ -102,7 +102,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req, bool center_coords) 
 
 				comp.Init(0); // Phase Move
 				comp.func = SpriteFunc::PhaseMove;
-				comp.lookup_code;
+                //comp.lookup_code;
 				spr->AddBehaviorComponent(comp);
 
 				// #100 -- Chase player / active mode
@@ -141,7 +141,8 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req, bool center_coords) 
 				gSpriteMan.m_ComponentList.push_back(comp);
 				m_SpriteBlueprints[L"__DefaultPhanto"] = spr;
 			}
-			CSprite* from_bp = CopyFromBlueprint(L"__DefaultPhanto");
+            wchar_t* defPhant = L"__DefaultPhanto";
+            CSprite* from_bp = CopyFromBlueprint(defPhant);
 			from_bp->m_Xpos = req->x;
 			from_bp->m_Ypos = req->y;
 			from_bp->SetImageResource(req->img_resource_code);
@@ -234,7 +235,7 @@ void CSpriteManager::ClearInvalidSprites() {
 	std::list<CSprite*>::iterator end = m_SpriteList.end();
 
 	while(iter != m_SpriteList.end()) {
-		CSprite* spr = *iter;
+        //CSprite* spr = *iter;
 		if((*iter)->m_Invalidated) {
 			delete (*iter);
 			iter = m_SpriteList.erase(iter);

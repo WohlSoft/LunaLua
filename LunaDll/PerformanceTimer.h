@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PerformanceTimer_hhhhhh
+#define PerformanceTimer_hhhhhh
+
 #include <Windows.h>
 
 struct PerformanceTimer {
@@ -23,3 +25,5 @@ struct PerformanceTimer {
 	LARGE_INTEGER	LunaCurTime;
 	LARGE_INTEGER	LunaDisplayTime;
 };
+
+#endif

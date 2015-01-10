@@ -1,7 +1,12 @@
-#pragma once
+#ifndef RuntimeHook_hhh
+#define RuntimeHook_hhh
+
+
 #include "Defines.h"
 #include "Globals.h"
+#ifndef __MINGW32__
 #pragma comment(lib, "comsuppw.lib")
+#endif
 
 #define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
 	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
@@ -86,3 +91,6 @@ int getSMBXTriggerActivateEventLayer(BSTR* trigger, int* unkVal);
 int getSMBXTriggerDeathEvent(BSTR* trigger, int* unkVal);
 int getSMBXTriggerNoMoreObjEvent(BSTR* trigger, int* unkVal);
 int getSMBXTriggerEventTrigger(BSTR* trigger, int* unkVal);
+
+#endif
+

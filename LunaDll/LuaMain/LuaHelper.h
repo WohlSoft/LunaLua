@@ -1,5 +1,6 @@
 // LuaHelper.h Helper Functions
-#pragma once
+#ifndef LuaHelper_HHH
+#define LuaHelper_HHH
 
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -11,3 +12,5 @@ namespace LuaHelper {
     luabind::object getEventCallbase(lua_State* base);
     bool is_function(struct lua_State * luaState, const char * fname);
 }
+
+#endif

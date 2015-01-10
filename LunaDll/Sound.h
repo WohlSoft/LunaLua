@@ -1,4 +1,5 @@
-#pragma once
+#ifndef sounds_hhhh
+#define sounds_hhhh
 #include <string>
 
 namespace SMBXSound {
@@ -8,3 +9,4 @@ namespace SMBXSound {
 	void SetMusicPath(int section, std::wstring path);
 	void PlayMusic(int section);
 }
+#endif
