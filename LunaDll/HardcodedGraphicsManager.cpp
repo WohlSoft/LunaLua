@@ -1,5 +1,6 @@
 #include "HardcodedGraphicsManager.h"
 #include "Defines.h"
+#include "GlobalFuncs.h"
 
 #include <fstream>
 #include <iostream>
@@ -14,7 +15,7 @@ HardcodedGraphicsManager::~HardcodedGraphicsManager(void)
 int HardcodedGraphicsManager::patchGraphics(void* offset, char* filepath, int sizeOfMemory)
 {
 	std::ifstream graphFile;
-	graphFile.open(filepath, std::ios::in, std::ios::binary);
+    graphFile.open(filepath, std::ios::in|std::ios::binary);
 	if(!graphFile.is_open())
 		return -2;
 	
