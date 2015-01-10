@@ -106,6 +106,9 @@
     <Filter Include="Header Files\mci2sdl music proxy">
       <UniqueIdentifier>{6fa4bca1-d668-4d26-9f2c-5a24cddda3fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\HardcodedGraphics">
+      <UniqueIdentifier>{1027b6d8-6102-4902-88fe-3e2a69c3d6ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -260,6 +263,9 @@
     </ClInclude>
     <ClInclude Include="GlobalFuncs.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HardcodedGraphicsManager.h">
+      <Filter>Header Files\HardcodedGraphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +454,9 @@
     </ClCompile>
     <ClCompile Include="SdlMusic\MusicDefList.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="HardcodedGraphicsManager.cpp">
+      <Filter>Header Files\HardcodedGraphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

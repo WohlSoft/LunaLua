@@ -48,6 +48,10 @@ enum PRIORITY {
 #define GM_BASE				0x00B25000
 #define GM_END				0x00B2E000
 
+#define GM_FILE_START		0x00400000
+#define FN_OFFSET2ADDR(offs) (void*)(GM_FILE_START + (DWORD)offs)
+
+
 // General
 #define GM_SCRN_HDC			*(DWORD*)0x00B25028
 #define GM_MODE_INTRO		*(WORD*)0x00B2C89C

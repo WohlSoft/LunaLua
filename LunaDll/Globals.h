@@ -17,6 +17,7 @@
 #include "CellManager.h"
 #include "UserSaving.h"
 #include "mciEmulator.h"
+#include "HardcodedGraphicsManager.h"
 
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
@@ -84,6 +85,7 @@ extern Logger				gLogger;
 extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
+extern HardcodedGraphicsManager gGraphManager;
 
 /// Functions ///
 void InitGlobals();
