@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CSPrite_hhhhhhh
+#define CSPrite_hhhhhhh
 
 #include "Defines.h"
 #include <list>
@@ -100,3 +101,5 @@ struct CSpriteRequest {
 	double y_speed;
 	bool spawned;			// "spawned" means the sprite will be deleted after being offscreen for some time
 };
+
+#endif

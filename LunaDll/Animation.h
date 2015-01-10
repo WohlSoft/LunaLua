@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Animations_hhhh
+#define Animations_hhhh
 
 #pragma pack(push, 4)
 struct SMBXAnimation{
@@ -26,3 +27,5 @@ namespace Animations {
     SMBXAnimation* Get(int AnimationIndex);
 
 }
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CSpriteManager_hhhhhh
+#define CSpriteManager_hhhhhh
 
 #include "SpriteComponent.h"
 #include <list>
@@ -57,3 +58,5 @@ struct CSpriteManager {
 	std::map<std::wstring, CSprite*> m_SpriteBlueprints;
 	std::list<SpriteComponent> m_ComponentList;		// User components that can be copied (activated) into a sprite's behavior list
 };
+
+#endif

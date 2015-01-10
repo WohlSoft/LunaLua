@@ -1,6 +1,27 @@
-#pragma once
+#ifndef MciEmulator_hhhh
+#define MciEmulator_hhhh
 #include <map>
-#include <Windows.h>
+#include <string>
+#include <windows.h>
+#ifdef __MINGW32__
+#include <mmsystem.h>
+#define __in
+#define __out
+#define __in_opt
+#define __inout
+#define __in_bcount(x)
+#define __in_ecount(x)
+#define __out_ecount(x)
+#define __out_bcount(x)
+#define __out_ecount_part_opt(x,y)
+#define __out_bcount_opt(x)
+#define __in_bcount_opt(x)
+#define __in_ecount_opt(x)
+#define __out_ecount_opt(x)
+#define __out_opt
+#define __inout_opt
+#endif
+
 class MciEmulator
 {
 public:
@@ -17,3 +38,4 @@ private:
 	std::map<std::string, regSoundFile> registeredFiles;
 };
 
+#endif

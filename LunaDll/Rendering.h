@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Rendering_hhhh
+#define Rendering_hhhh
 #include <Windows.h>
 #include <string>
 #include <list>
@@ -56,3 +57,5 @@ namespace Render{
 	void Print(std::wstring, int font_type, float x, float y); // only works during post-draw phase!
 
 }
+
+#endif

@@ -1,4 +1,3 @@
-#pragma once
 #include <windows.h>
 #include "Layer.h"
 #include "Defines.h"
@@ -30,3 +29,4 @@ void Layer::SetXSpeed(LayerControl* layer, float setX) {
 	layer->xSpeed = setX;
 	layer->IsStopped = (short)0xFFFF;
 }
+

@@ -18,6 +18,7 @@ std::wstring utf8_decode(const std::string &str);
 std::string wstr2str(const std::wstring &wstr);
 
 std::string i2str(int source);
+bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 
 #endif

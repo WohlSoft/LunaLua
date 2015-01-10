@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DeathCounter_hhhh
+#define DeathCounter_hhhh
+
 #include <string>
 #include <list>
 #include <iostream>
@@ -6,7 +8,11 @@
 #include "Defines.h"
 #include "DeathRecord.h"
 
+#ifndef __MINGW32__
 #define DEATHCT_FNAME L"demos.dmo"
+#else
+#define DEATHCT_FNAME "demos.dmo"
+#endif
 
 struct DeathCounter {
 
@@ -40,3 +46,4 @@ public:
 
 	std::list<DeathRecord*> mDeathRecords;
 };
+#endif

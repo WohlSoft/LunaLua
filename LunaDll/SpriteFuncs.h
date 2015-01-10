@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SpriteFuncs_hhhh
+#define SpriteFuncs_hhhh
 
 #include "CSprite.h"
 
@@ -81,3 +82,4 @@ namespace SpriteFunc {
 	void StaticDraw(CSprite* me);		// Draw sprite to absolute position on the screen
 	void RelativeDraw(CSprite* me);		// Draw sprite inside level, relative to camera position
 }
+#endif

@@ -317,7 +317,9 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 
 	// Get all blocks being collided with into collide_list
 	list<CellObj> collide_list;	
-	for each(CellObj cellobj in nearby_list) {
+    for(std::list<CellObj >::const_iterator it = nearby_list.begin();it!=nearby_list.end();it++)
+    {
+        CellObj cellobj=*it;
 		bool collide = false;
 		if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 			Block* block = (Block*)cellobj.pObj;
@@ -335,7 +337,9 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 	
 	// Force sprite out of block if colliding with block, and reverse speed according to energy_loss_mod
 	if(collide_list.size() > 0) {
-		for each(CellObj cellobj in collide_list) {		
+        for(std::list<CellObj >::const_iterator it = collide_list.begin(); it!=collide_list.end();it++)
+        {
+            CellObj cellobj = *it;
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
 				if(!block->IsHidden && !block->IsInvisible 
@@ -413,7 +417,9 @@ void SpriteFunc::CrashMove(CSprite* me, SpriteComponent* obj) {
 												(int)me->m_Hitbox.W,
 												(int)me->m_Hitbox.H);
 	if(collide_list.size() > 0) {		
-		for each(CellObj cellobj in collide_list) {		
+        for(std::list<CellObj >::const_iterator it = collide_list.begin();it!=collide_list.end();it++)
+        {
+            CellObj cellobj=*it;
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
 				if(!block->IsHidden && !block->IsInvisible 

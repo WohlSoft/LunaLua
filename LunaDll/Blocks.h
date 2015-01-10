@@ -1,4 +1,6 @@
-#pragma once
+#ifndef Blocks_Hhhhh
+#define Blocks_Hhhhh
+
 #include "Defines.h"
 #include "Globals.h"
 #include "PlayerMOB.h"
@@ -64,3 +66,5 @@ namespace Blocks {
 inline Block* Blocks::GetBase() { return (Block*)GM_BLOCKS_PTR; }
 
 inline short Blocks::Count() { return GM_BLOCK_COUNT; }
+
+#endif

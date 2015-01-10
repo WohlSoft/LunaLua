@@ -2,6 +2,7 @@
 #include "Autocode.h"
 #include "Globals.h"
 #include "PlayerMOB.h"
+#include <sstream>
 
 void Autocode::HeartSystem() {
 
@@ -27,7 +28,7 @@ void Autocode::HeartSystem() {
 
 		// If damaged, take hearts from extra hearts
 		if(sheath->Hearts == 1 && gAutoMan.m_Hearts > 2) {
-			char* dbg = "HEART SET";
+            //char* dbg = "HEART SET";
 			sheath->Hearts = 2;
 			sheath->CurrentPowerup = (sheath->CurrentPowerup > 2 ? sheath->CurrentPowerup : 2);
 			gAutoMan.m_Hearts--;
@@ -40,8 +41,13 @@ void Autocode::HeartSystem() {
 			gAutoMan.m_Hearts = 0;
 		}
 
+        std::wstringstream gAutoMan_m_Hearts;
+        gAutoMan_m_Hearts<<(long long)gAutoMan.m_Hearts;
 		// Display life stuff on screen
-		gLunaRender.SafePrint(std::wstring(L"HP: " + std::to_wstring((long long)gAutoMan.m_Hearts)),3, (float)Target, (float)Param1);
+        gLunaRender.SafePrint(std::wstring(
+                                  std::wstring(L"HP: ")+std::wstring(gAutoMan_m_Hearts.str())
+                                  )
+                              ,3, (float)Target, (float)Param1);
 
 	}//if heartuser
 

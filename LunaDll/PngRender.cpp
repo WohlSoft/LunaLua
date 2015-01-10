@@ -1,5 +1,6 @@
 #include "Defines.h"
 
+#ifndef __MINGW32__
 //display a 32 bit deep png image
 void Png32_Show(HDC hdc,int xDest,int yDest,int nWidth,int nHeight,
        PNGINFO *pPngInfo,int xSour,int ySour)
@@ -127,3 +128,4 @@ beginx:
  DeleteDC(hmemdc);
  }
 }
+#endif

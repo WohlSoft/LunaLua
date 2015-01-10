@@ -1,8 +1,14 @@
-#pragma once
+#ifndef logging_hhhhh
+#define logging_hhhhh
+
 #include "Defines.h"
 #include <fstream>
 
+#ifndef __MINGW32__
 #define LOG_FNAME L"log.txt"
+#else
+#define LOG_FNAME "log.txt"
+#endif
 
 typedef int LOGOPTS;
 #define LOG_NewlineAfter 	0x00000001
@@ -26,3 +32,5 @@ public:
 	bool m_Enabled;
 	wofstream m_File;
 };
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BMPBox_hhhhhh
+#define BMPBox_hhhhhh
 
 #include "Defines.h"
 #include <string>
@@ -24,3 +25,5 @@ public:
 	HBITMAP m_hbmp;			// Handle to bitmap data
 	HDC m_hdc;				// handle to compatible DC for this bitmap
 };
+
+#endif

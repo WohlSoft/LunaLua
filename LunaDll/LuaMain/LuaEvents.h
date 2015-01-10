@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LuaEvents_hhh
+#define LuaEvents_hhh
 
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -45,3 +46,5 @@ namespace LuaEvents {
 	void processSMBXEvents(lua_State *L);
     void finishEventHandling();
 }
+
+#endif

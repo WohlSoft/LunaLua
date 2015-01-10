@@ -3,13 +3,15 @@
 #include <mmintrin.h>
 
 // DRAW
+RenderEffectOp::RenderEffectOp() : effect_type(RNDEFF_ScreenGlow), blend_type(BLEND_Additive),  color(0x00000000), intensity(0) {}
+
 void RenderEffectOp::Draw(Renderer* g) {
-	switch(effect_type) {
-	case RNDEFF_ScreenGlow:
-		ScreenGlow(g);
-		break;
-	default:
-		break;
+    switch(effect_type) {
+    case RNDEFF_ScreenGlow:
+        ScreenGlow(g);
+        break;
+    default:
+        break;
 	}
 }
 
@@ -22,6 +24,7 @@ void RenderEffectOp::ScreenGlow(Renderer* g) {
 	if(ghGeneralDIB && ghMemDC && gpScreenBits) {
 		BitBlt(ghMemDC, 0, 0, 800, 600, hScreen, 0, 0, SRCCOPY);
 
+        #ifndef __MINGW32__
 		// MMX code and loop
 		_mm_empty();		
 			int nLoops = (800 * 600) / 2;
@@ -46,9 +49,11 @@ void RenderEffectOp::ScreenGlow(Renderer* g) {
 		}
 
 		_mm_empty();
+        #endif
 
-		BitBlt(hScreen, 0, 0, 800, 600, ghMemDC, 0, 0, SRCCOPY);		
+        BitBlt(hScreen, 0, 0, 800, 600, ghMemDC, 0, 0, SRCCOPY);
 
 		SelectObject(ghMemDC, hOld);
 	}
+
 }

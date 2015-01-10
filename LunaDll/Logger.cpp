@@ -1,15 +1,18 @@
 #include "Logging.h"
 #include <ctime>
 
+#ifndef __MINGW32__
 #pragma warning(disable: 4996) //localtime
+#endif
 
 using namespace std;
 
 // 'TORS
 Logger::Logger() {
 	if(true) {
-		m_File = wofstream(LOG_FNAME, ios::out | ios::app);	
-		if(m_File.is_open() == false) {
+        m_File.open(LOG_FNAME, ios::out|ios::app);
+        if(m_File.is_open() == false)
+        {
 			m_File.close();
 			return;
 		}
@@ -57,7 +60,7 @@ void Logger::Log(wstring msg, LOGOPTS options) {
 	if(m_Enabled) {
 		if(m_File != NULL && m_File.is_open()) {
 
-			if((options && LOG_DateTime) || options && LOG_STD) {
+            if((options && LOG_DateTime) || (options && LOG_STD)) {
 				m_File << L"[";
 				WriteDateTime(&m_File);
 				m_File << L"]: ";
@@ -66,14 +69,14 @@ void Logger::Log(wstring msg, LOGOPTS options) {
 			// Write the message
 			m_File.write(msg.c_str(), msg.length());
 
-			if((options && LOG_NewlineAfter) || options && LOG_STD)
+            if((options && LOG_NewlineAfter) || (options && LOG_STD))
 				m_File << endl;
 
-			if((options && LOG_Flush) || options && LOG_STD)
+            if((options && LOG_Flush) || (options && LOG_STD))
 				m_File.flush();
 
 			if(options && LOG_Space)
 				m_File << " ";
 		}
 	}
-};
+}

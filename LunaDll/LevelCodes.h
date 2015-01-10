@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LevelCodes_Hhh
+#define LevelCodes_Hhh
 
 namespace ScienceBattle
 {
@@ -43,3 +44,5 @@ void ScienceBattle::ScienceCode();
 void ScienceBattle::ScienceInitCode();
 void SAJSnowbordin::SnowbordinCode();
 void SAJSnowbordin::SnowbordinInitCode();
+
+#endif

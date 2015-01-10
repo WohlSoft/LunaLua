@@ -51,31 +51,31 @@ void Player::MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype)
 
 // BUTTON FUNCS
 bool Player::PressingDown(PlayerMOB* pPlayer) {
-	return pPlayer->DKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->DKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingJump(PlayerMOB* pPlayer) {
-	return pPlayer->JKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->JKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingUp(PlayerMOB* pPlayer) {
-	return pPlayer->UKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->UKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingRight(PlayerMOB* pPlayer) {
-	return pPlayer->RKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->RKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingLeft(PlayerMOB* pPlayer) {
-	return pPlayer->LKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->LKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingRun(PlayerMOB* pPlayer) {
-	return pPlayer->RNKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->RNKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingSEL(PlayerMOB* pPlayer) {
-	return pPlayer->SELKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->SELKeyState == 0xFFFFFFFF ? true : false;
 }
 
 void Player::ConsumeAllKeys(PlayerMOB* pPlayer) {
@@ -112,7 +112,7 @@ bool Player::UsesHearts(PlayerMOB* pPlayer) {
 }
 
 bool Player::IsSpinjumping(PlayerMOB* pPlayer) {
-	return pPlayer->IsSpinjumping == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->IsSpinjumping == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::IsInForcedAnimation(PlayerMOB* player) {

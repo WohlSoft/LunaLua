@@ -1,4 +1,5 @@
-#pragma once
+#ifndef Minigames_H
+#define Minigames_H
 
 #include <queue>
 #include "Defines.h"
@@ -23,3 +24,5 @@ class Minigame {
 //class MinigameController {
 //	queue<Minigame*> m_Games;
 //};
+
+#endif

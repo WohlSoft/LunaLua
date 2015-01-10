@@ -71,7 +71,7 @@ startUpSettings gStartupSettings;
 /// INIT GLOBALS
 void InitGlobals()
 {
-	char* dbg = "GLOBAL INIT DBG";
+    //char* dbg = "GLOBAL INIT DBG";
 	gLunaEnabled = true;
 	gShowDemoCounter = false;
 	gSkipSMBXHUD = false;
@@ -237,7 +237,7 @@ void resetDefines(){
 
 	wstring resetDefinies = path;
 	resetDefinies = resetDefinies.append(L"\\resetdefines.txt");
-	wifstream rdef(resetDefinies, ios::binary|ios::in);
+    wifstream rdef(wstr2str(resetDefinies).c_str(), ios::binary|ios::in);
 	if(!rdef.is_open()){
 		return;
 	}
@@ -280,13 +280,6 @@ void resetDefines(){
 		}
 	}
 
-}
-
-bool is_number(const std::string& s)
-{
-	std::string::const_iterator it = s.begin();
-	while (it != s.end() && std::isdigit(*it)) ++it;
-	return !s.empty() && it == s.end();
 }
 
 HMODULE getModule(std::string moduleName)

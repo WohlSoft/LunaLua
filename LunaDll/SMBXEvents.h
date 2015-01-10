@@ -1,5 +1,7 @@
 //*** SMBXEvents.h - Definition of known event structure ***
-#pragma once
+#ifndef SMBXEvents_hhhhhh
+#define SMBXEvents_hhhhhh
+
 #include "Defines.h"
 #include "Globals.h"
 
@@ -262,6 +264,8 @@ namespace SMBXEvents {
 	void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
 	void TriggerEvent(std::wstring EventName, int UnknownArg);
 
-};
+}
 
 inline short SMBXEvents::Count() { return GM_EVENT_COUNT; }
+
+#endif

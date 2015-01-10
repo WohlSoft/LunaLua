@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RenderRectOp_Hhhh
+#define RenderRectOp_Hhhh
 
 #include "RenderOp.h"
 
@@ -14,3 +15,5 @@ public:
 	double y2;
 	DWORD color;
 };
+
+#endif

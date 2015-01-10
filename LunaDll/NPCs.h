@@ -1,5 +1,7 @@
 //*** NPCs.h - Definition of known NPC structure and NPC-related framework functions ***
-#pragma once
+#ifndef NPCs_hhhh
+#define NPCs_hhhh
+
 #include "Defines.h"
 #include <list>
 #include <vector>
@@ -103,4 +105,7 @@ namespace NPC {
 	// ITERATORS
 	void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
 	void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
-};
+}
+
+#endif
+

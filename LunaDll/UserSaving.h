@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UserSaving_Hhh
+#define UserSaving_Hhh
 
 #include "Defines.h"
 #include <string>
@@ -43,3 +44,5 @@ private:
 namespace Saves {
 	inline int GetCurSaveSlot() { return GM_CUR_SAVE_SLOT; }
 }
+
+#endif

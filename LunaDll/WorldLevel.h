@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WorldLevel_hhh
+#define WorldLevel_hhh
 
 #pragma pack(push, 4)
 struct WorldLevel{
@@ -17,3 +18,5 @@ struct WorldLevel{
 namespace SMBXLevel{
 	WorldLevel* get(int index);
 }
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RenderEffect_hhhh
+#define RenderEffect_hhhh
 
 #include "RenderOp.h"
 
@@ -13,7 +14,7 @@ enum BLEND_TYPE {
 
 class RenderEffectOp : public RenderOp {
 public:
-	RenderEffectOp() : effect_type(RNDEFF_ScreenGlow), blend_type(BLEND_Additive),  color(0x00000000), intensity(0) {   };
+    RenderEffectOp();
 	RenderEffectOp(RENDER_EFFECT effect, BLEND_TYPE blend, COLORREF col, int intensity) {
 		effect_type = effect;
 		blend_type = blend;
@@ -29,6 +30,8 @@ public:
 	// Members //
 	RENDER_EFFECT effect_type;
 	BLEND_TYPE blend_type;
+    COLORREF color;
 	int intensity;
-	COLORREF color;
 };
+
+#endif

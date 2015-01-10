@@ -133,8 +133,9 @@ void Renderer::AddOp(RenderOp* op) {
 }
 
 // PRINT -- Calls SMBX's own print function. Only works during the HUD hook
-void Render::Print(std::wstring str, int font_type, float x, float y) {
-	typedef int printfunc(wchar_t**, int*, float*, float*);
+void Render::Print(std::wstring str, int font_type, float x, float y)
+{
+    typedef int printfunc(wchar_t**, int*, float*, float*);
 	int font_ptr = font_type;
 	float x_ptr = x;
 	float y_ptr = y;
@@ -149,8 +150,8 @@ void Render::Print(std::wstring str, int font_type, float x, float y) {
 	// Copy the string's bytes 4 bytes ahead of the len
 	memcpy((void*)&wbuf[2], str.data(), strlen);
 
-	printfunc* f = (printfunc*)GF_PRINT;
-	int ret = f((&wbufptr), &font_ptr, &x_ptr, &y_ptr);
+    printfunc* f = (printfunc*)GF_PRINT;
+    int ret = f((&wbufptr), &font_ptr, &x_ptr, &y_ptr);
 }
 
 // SAFE PRINT
@@ -186,7 +187,9 @@ void Renderer::RenderAll() {
 	// Format debug messages and enter them into renderstring list
 	int dbg_x = 325;
 	int dbg_y = 160;
-	for each(std::wstring dbg in DebugMessages) {
+    for( std::list<std::wstring >::const_iterator it = DebugMessages.begin(); it!=DebugMessages.end(); it++)
+    {
+        std::wstring dbg = *it;
 		Render::Print(dbg, 4, (float)dbg_x, (float)dbg_y);
 		dbg_y += 20;
 		if(dbg_y > 560) {
@@ -196,7 +199,7 @@ void Renderer::RenderAll() {
 	}
 	this->DebugMessages.clear();
 
-	for (std::list<RenderString>::iterator iter = RenderStrings.begin(), end = RenderStrings.end();	iter != end; ++iter) {				
+    for(std::list<RenderString>::iterator iter = RenderStrings.begin(), end = RenderStrings.end();	iter != end; ++iter) {
 		Render::Print((*iter).m_String, (*iter).m_FontType, (*iter).m_X, (*iter).m_Y);
 		(*iter).m_FramesLeft--;
 	}
@@ -213,7 +216,7 @@ void Renderer::ClearExpired() {
 	while(iter != RenderOperations.end()) {
 		RenderOp* pOp = *iter;
 		if((*iter)->m_FramesLeft <= 0) {
-			delete (*iter);
+            delete pOp;
 			iter = RenderOperations.erase(iter);
 		} else {
 			++iter;
@@ -242,7 +245,7 @@ void Renderer::ClearAll() {
 	//	DeleteObject(CustomBitmaps.back());
 	//	CustomBitmaps.pop_back();
 	//}
-};
+}
 
 // DEBUG PRINT
 void Renderer::DebugPrint(std::wstring message) {
