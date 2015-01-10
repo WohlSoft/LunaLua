@@ -17,8 +17,9 @@ INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include
 INCLUDEPATH += $$PWD/LunaDll/libs/sdl_mingw/include
 LIBS += -L$$PWD/LunaDLL/libs/lua_mingw/lib
 LIBS += -L$$PWD/LunaDLL/libs/sdl_mingw/lib
-LIBS += -static -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lmsimg32 -ldsound -lwinspool -ladvapi32 -lole32 -loleaut32 -static -llua5.1
-LIBS += -lwinmm -static -lSDL2main -lSDL2.dll -static -lSDL2_mixer.dll libversion -lDbghelp -lvorbisfile -lvorbis -lmad -lmikmod.dll -lflac -logg
+LIBS += -static -lkernel32 -static -luser32 -static -lgdi32 -static -lcomdlg32 -static -lmsimg32 #-static -lcomsuppw
+LIBS += -static -lmsimg32 -static -ldsound -static -lwinspool -static -ladvapi32 -static -lole32 -static -loleaut32 -static -llua5.1
+LIBS += -static -lwinmm -static -lSDL2main -lSDL2.dll -static -lSDL2_mixer.dll libversion -lDbghelp -lvorbisfile -lvorbis -lmad -lmikmod.dll -lflac -logg
 
 SOURCES += \
     LunaDll/AC_HeartSystem.cpp \
