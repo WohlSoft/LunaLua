@@ -17,18 +17,23 @@ std::string MusicManager::defaultMusINI="";
 
 std::string MusicManager::curRoot="";
 
+void MusicManager::initAudioEngine()
+{
+    bool firstRun = !PGE_SDL_Manager::isInit;
+    PGE_SDL_Manager::initSDL();
+    if(firstRun)
+    {
+        initArrays();
+        defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
+        defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
+        loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+        loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
+    }
+}
+
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
-	bool firstRun = !PGE_SDL_Manager::isInit;
-	PGE_SDL_Manager::initSDL();
-	if(firstRun)
-	{
-		initArrays();
-		defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
-		defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
-		loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
-		loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
-	}
+    initAudioEngine();
 	
 	//clear junk
 	replaceSubStr(fileName, "\"", "");
@@ -335,7 +340,7 @@ void MusicManager::initArrays()
 
 std::string MusicManager::SndRoot()
 {
-	return curRoot;
+    return curRoot;
 }
 
 #endif

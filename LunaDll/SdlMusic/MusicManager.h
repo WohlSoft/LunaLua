@@ -19,6 +19,7 @@ class MusicManager
 		Stream=0,
 		Chunk
 		};
+        static void initAudioEngine();
 		static void addSound(std::string alias, std::string fileName);
 		static void close();
 		static void play(std::string alias); //Chunk will be played once, stream will be played with loop

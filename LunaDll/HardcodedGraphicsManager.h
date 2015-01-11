@@ -1,4 +1,8 @@
-#pragma once
+#ifndef HardcodedGraphicsManager_hhh
+#define HardcodedGraphicsManager_hhh
+
+#include <string>
+
 class HardcodedGraphicsManager
 {
 public:
@@ -18,5 +22,7 @@ public:
 	//************************************
 	int patchGraphics(void* offset, char* filepath, int sizeOfMemory);
 
+    void loadGraphics(std::string imgRootPath);
 };
 
+#endif
