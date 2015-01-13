@@ -1,12 +1,12 @@
 #ifndef CSPrite_hhhhhhh
 #define CSPrite_hhhhhhh
 
-#include "Defines.h"
+#include "../Defines.h"
 #include <list>
 #include <vector>
 #include <map>
-#include "SpriteComponent.h"
-#include "Hitbox.h"
+#include "../CustomSprites/SpriteComponent.h"
+#include "../CustomSprites/Hitbox/Hitbox.h"
 
 /// CSprite builtin custom variables
 #define CVAR_GEN_ANGLE L"_GenAngle"

@@ -1,9 +1,9 @@
 #include "CSprite.h"
-#include "Rendering.h"
-#include "Globals.h"
-#include "RenderOp.h"
-#include "RenderRectOp.h"
-#include "SpriteFuncs.h"
+#include "../Rendering.h"
+#include "../Globals.h"
+#include "../RenderOp.h"
+#include "../RenderRectOp.h"
+#include "../CustomSprites/SpritesFuncs/SpriteFuncs.h"
 
 // CTOR
 CSprite::CSprite() {

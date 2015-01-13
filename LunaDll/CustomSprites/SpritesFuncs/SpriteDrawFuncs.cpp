@@ -1,8 +1,8 @@
 #include "SpriteFuncs.h"
-#include "Globals.h"
-#include "RenderBitmapOp.h"
-#include "RenderRectOp.h"
-#include "PlayerMOB.h"
+#include "../../Globals.h"
+#include "../../RenderBitmapOp.h"
+#include "../../RenderRectOp.h"
+#include "../../PlayerMOB.h"
 #ifndef __MINGW32__
 #pragma warning(disable: 4018)	// signed comparison
 #endif

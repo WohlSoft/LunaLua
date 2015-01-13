@@ -1,7 +1,7 @@
 #include "Hitbox.h"
-#include "CSprite.h"
-#include "Globals.h"
-#include "MiscFuncs.h"
+#include "../CSprite.h"
+#include "../../Globals.h"
+#include "../../MiscFuncs.h"
 
 // TEST -- fast rectangle
 bool Hitbox::Test(int Left2, int Up2, int _W, int _H) {

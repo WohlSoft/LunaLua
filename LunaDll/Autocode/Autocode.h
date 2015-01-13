@@ -4,7 +4,7 @@
 
 #include "../Defines.h"
 #include <string>
-#include "../CSprite.h"
+#include "../CustomSprites/CSprite.h"
 
 enum LunaControlAct {
 	LCA_Invalid = 0,

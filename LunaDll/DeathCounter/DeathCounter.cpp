@@ -1,9 +1,9 @@
 #include "DeathCounter.h"
-#include "PlayerMOB.h"
+#include "../PlayerMOB.h"
 #include <Windows.h>
-#include "MiscFuncs.h"
-#include "Level.h"
-#include "GlobalFuncs.h"
+#include "../MiscFuncs.h"
+#include "../Level.h"
+#include "../GlobalFuncs.h"
 using namespace std;
 
 // CTOR

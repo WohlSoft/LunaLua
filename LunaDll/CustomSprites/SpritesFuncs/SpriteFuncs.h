@@ -1,7 +1,7 @@
 #ifndef SpriteFuncs_hhhh
 #define SpriteFuncs_hhhh
 
-#include "CSprite.h"
+#include "../CSprite.h"
 
 void Activate(int code, CSprite* spr);	// Formally add the components specified by "code" to sprite behaviors
 

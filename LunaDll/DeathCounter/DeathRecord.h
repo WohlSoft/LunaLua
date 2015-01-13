@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "Defines.h"
+#include "../Defines.h"
 
 struct DeathRecord {
 

@@ -4,7 +4,7 @@
 #include "../Globals.h"
 #include "../NPCs.h"
 #include "../Sound.h"
-#include "../Blocks.h"
+#include "../Blocks/Blocks.h"
 #include <cmath>
 #include "../Input.h"
 #include "../SMBXEvents.h"

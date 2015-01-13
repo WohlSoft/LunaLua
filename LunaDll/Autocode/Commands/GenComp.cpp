@@ -1,6 +1,6 @@
 #include "../Autocode.h"
-#include "../../SpriteComponent.h"
-#include "../../SpriteFuncs.h"
+#include "../../CustomSprites/SpriteComponent.h"
+#include "../../CustomSprites/SpritesFuncs/SpriteFuncs.h"
 
 SpriteComponent Autocode::GenerateComponent(Autocode* obj_to_convert) {
 	SpriteComponent comp;

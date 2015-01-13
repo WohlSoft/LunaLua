@@ -144,26 +144,17 @@
     <ClInclude Include="Rendering.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="DeathCounter.h">
-      <Filter>Header Files\Death Counter</Filter>
-    </ClInclude>
     <ClInclude Include="RenderString.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DeathRecord.h">
-      <Filter>Header Files\Death Counter</Filter>
-    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
     <ClInclude Include="Sound.h">
       <Filter>Header Files\Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="Blocks.h">
-      <Filter>Header Files\Blocks</Filter>
     </ClInclude>
     <ClInclude Include="SMBXEvents.h">
       <Filter>Header Files\SMBX Events</Filter>
@@ -177,12 +168,6 @@
     <ClInclude Include="BMPBox.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="CSprite.h">
-      <Filter>Header Files\CustomSprites</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteFuncs.h">
-      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
-    </ClInclude>
     <ClInclude Include="RenderOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
     </ClInclude>
@@ -191,18 +176,6 @@
     </ClInclude>
     <ClInclude Include="RenderRectOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteComponent.h">
-      <Filter>Header Files\CustomSprites</Filter>
-    </ClInclude>
-    <ClInclude Include="Hitbox.h">
-      <Filter>Header Files\CustomSprites\Hitbox</Filter>
-    </ClInclude>
-    <ClInclude Include="CSpriteManager.h">
-      <Filter>Header Files\CustomSprites</Filter>
-    </ClInclude>
-    <ClInclude Include="CellManager.h">
-      <Filter>Header Files\CellManager</Filter>
     </ClInclude>
     <ClInclude Include="RenderEffectOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
@@ -270,6 +243,33 @@
     <ClInclude Include="Autocode\AutocodeManager.h">
       <Filter>Header Files\AutoCode</Filter>
     </ClInclude>
+    <ClInclude Include="Blocks\Blocks.h">
+      <Filter>Header Files\Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="CellManager\CellManager.h">
+      <Filter>Header Files\CellManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSprites\CSprite.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSprites\CSpriteManager.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSprites\SpriteComponent.h">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSprites\Hitbox\Hitbox.h">
+      <Filter>Header Files\CustomSprites\Hitbox</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathCounter\DeathCounter.h">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClInclude>
+    <ClInclude Include="DeathCounter\DeathRecord.h">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -308,12 +308,6 @@
     <ClCompile Include="Rendering.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="DeathCounter.cpp">
-      <Filter>Header Files\Death Counter</Filter>
-    </ClCompile>
-    <ClCompile Include="DeathRecord.cpp">
-      <Filter>Header Files\Death Counter</Filter>
-    </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>Header Files\Level</Filter>
     </ClCompile>
@@ -328,9 +322,6 @@
     </ClCompile>
     <ClCompile Include="Sound.cpp">
       <Filter>Header Files\Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="Blocks.cpp">
-      <Filter>Header Files\Blocks</Filter>
     </ClCompile>
     <ClCompile Include="SMBXEvent.cpp">
       <Filter>Header Files\SMBX Events</Filter>
@@ -350,35 +341,14 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Header Files\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="CSprite.cpp">
-      <Filter>Header Files\CustomSprites</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteDrawFuncs.cpp">
-      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
-    </ClCompile>
     <ClCompile Include="RenderBitmapOp.cpp">
       <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClCompile>
-    <ClCompile Include="CSpriteManager.cpp">
-      <Filter>Header Files\CustomSprites</Filter>
     </ClCompile>
     <ClCompile Include="BMPBox.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="RenderRectOp.cpp">
       <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteBehaviorFuncs.cpp">
-      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
-    </ClCompile>
-    <ClCompile Include="Hitbox.cpp">
-      <Filter>Header Files\CustomSprites\Hitbox</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteComponent.cpp">
-      <Filter>Header Files\CustomSprites</Filter>
-    </ClCompile>
-    <ClCompile Include="CellManager.cpp">
-      <Filter>Header Files\CellManager</Filter>
     </ClCompile>
     <ClCompile Include="KilArmoryCode.cpp">
       <Filter>Header Files\LevelCodes</Filter>
@@ -460,6 +430,36 @@
     </ClCompile>
     <ClCompile Include="Autocode\Commands\GenComp.cpp">
       <Filter>Header Files\AutoCode\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Blocks\Blocks.cpp">
+      <Filter>Header Files\Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="CellManager\CellManager.cpp">
+      <Filter>Header Files\CellManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\CSprite.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\CSpriteManager.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\SpriteComponent.cpp">
+      <Filter>Header Files\CustomSprites</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\Hitbox\Hitbox.cpp">
+      <Filter>Header Files\CustomSprites\Hitbox</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\SpritesFuncs\SpriteBehaviorFuncs.cpp">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSprites\SpritesFuncs\SpriteDrawFuncs.cpp">
+      <Filter>Header Files\CustomSprites\SpriteFuncs</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathCounter\DeathCounter.cpp">
+      <Filter>Header Files\Death Counter</Filter>
+    </ClCompile>
+    <ClCompile Include="DeathCounter\DeathRecord.cpp">
+      <Filter>Header Files\Death Counter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@
 #include "Rendering.h"
 #include "Level.h"
 #include "NPCs.h"
-#include "Blocks.h"
+#include "Blocks/Blocks.h"
 #include "MiscFuncs.h"
 #include "Sound.h"
 #define _USE_MATH_DEFINES

@@ -8,9 +8,9 @@
 #include "../SMBXEvents.h"
 #include "../Sound.h"
 #include "../Level.h"
-#include "../CSprite.h"
-#include "../CSpriteManager.h"
-#include "../Blocks.h"
+#include "../CustomSprites/CSprite.h"
+#include "../CustomSprites/CSpriteManager.h"
+#include "../Blocks/Blocks.h"
 
 std::vector<LuaEvents::SMBXEventQueueItem> LuaEvents::SMBXEventQueue;
 

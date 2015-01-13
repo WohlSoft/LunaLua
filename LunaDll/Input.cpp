@@ -1,6 +1,6 @@
 #include "Input.h"
 #include "Sound.h"
-#include "DeathCounter.h"
+#include "DeathCounter/DeathCounter.h"
 #include "Autocode/Autocode.h"
 
 using namespace std;
