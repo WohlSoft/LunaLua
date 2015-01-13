@@ -143,9 +143,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="Autocode.h" />
-    <ClInclude Include="AutocodeManager.h" />
+    <ClInclude Include="Animation\Animation.h" />
+    <ClInclude Include="Autocode\Autocode.h" />
+    <ClInclude Include="Autocode\AutocodeManager.h" />
     <ClInclude Include="Blocks.h" />
     <ClInclude Include="CellManager.h" />
     <ClInclude Include="CGUI.h" />
@@ -196,11 +196,11 @@
     <ClInclude Include="WorldLevel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AC_HeartSystem.cpp" />
-    <ClCompile Include="AC_LunaControl.cpp" />
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="Autocode.cpp" />
-    <ClCompile Include="AutocodeManager.cpp" />
+    <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
+    <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
+    <ClCompile Include="Animation\Animation.cpp" />
+    <ClCompile Include="Autocode\Autocode.cpp" />
+    <ClCompile Include="Autocode\AutocodeManager.cpp" />
     <ClCompile Include="Blocks.cpp" />
     <ClCompile Include="CellManager.cpp" />
     <ClCompile Include="CGUIContainer.cpp" />
@@ -211,10 +211,10 @@
     <ClCompile Include="dlltestlvlCode.cpp" />
     <ClCompile Include="Docopoper-AbstractAssault.lvl.cpp" />
     <ClCompile Include="Docopoper-Calleoca.cpp" />
-    <ClCompile Include="EnumCmd.cpp" />
+    <ClCompile Include="Autocode\Commands\EnumCmd.cpp" />
     <ClCompile Include="EuroShellRandD.lvl.cpp" />
     <ClCompile Include="BMPBox.cpp" />
-    <ClCompile Include="GenComp.cpp" />
+    <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="HardcodedGraphicsManager.cpp" />

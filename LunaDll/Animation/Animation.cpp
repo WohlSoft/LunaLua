@@ -1,5 +1,5 @@
 #include "Animation.h"
-#include "Defines.h"
+#include "../Defines.h"
 
 SMBXAnimation *Animations::Get(int AnimationIndex)
 {

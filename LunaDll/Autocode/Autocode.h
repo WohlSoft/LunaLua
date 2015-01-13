@@ -2,9 +2,9 @@
 #define Autocode_hhh
 
 
-#include "Defines.h"
+#include "../Defines.h"
 #include <string>
-#include "CSprite.h"
+#include "../CSprite.h"
 
 enum LunaControlAct {
 	LCA_Invalid = 0,

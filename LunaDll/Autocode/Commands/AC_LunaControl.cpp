@@ -1,6 +1,6 @@
 // Child for autocode.cpp
-#include "Autocode.h"
-#include "Globals.h"
+#include "../Autocode.h"
+#include "../../Globals.h"
 
 void Autocode::LunaControl(LunaControlAct act, int val) {
 	switch(act) {

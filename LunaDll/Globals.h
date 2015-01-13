@@ -10,7 +10,7 @@
 #include "LevelCodes.h"
 #include "Rendering.h"
 #include "DeathCounter.h"
-#include "AutocodeManager.h"
+#include "Autocode/AutocodeManager.h"
 #include "Logging.h"
 #include "CSprite.h"
 #include "CSpriteManager.h"

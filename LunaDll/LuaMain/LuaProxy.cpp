@@ -12,7 +12,7 @@
 #include "../CSpriteManager.h"
 #include "../Blocks.h"
 #include "../Layer.h"
-#include "../Animation.h"
+#include "../Animation/Animation.h"
 #include "../Overworld.h"
 #include "../WorldLevel.h"
 
