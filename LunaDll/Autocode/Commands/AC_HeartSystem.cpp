@@ -1,7 +1,7 @@
 // Child for autocode.cpp
-#include "Autocode.h"
-#include "Globals.h"
-#include "PlayerMOB.h"
+#include "../Autocode.h"
+#include "../../Globals.h"
+#include "../../PlayerMOB.h"
 #include <sstream>
 
 void Autocode::HeartSystem() {

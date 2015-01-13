@@ -1,10 +1,10 @@
 #include "CSprite.h"
 #include "CSpriteManager.h"
-#include "SpriteFuncs.h"
-#include "Globals.h"
-#include "BMPBox.h"
-#include "PlayerMOB.h"
-#include "MiscFuncs.h"
+#include "SpritesFuncs/SpriteFuncs.h"
+#include "../Globals.h"
+#include "../BMPBox.h"
+#include "../PlayerMOB.h"
+#include "../MiscFuncs.h"
 
 // RESET SPRITE MANAGER
 void CSpriteManager::ResetSpriteManager() {

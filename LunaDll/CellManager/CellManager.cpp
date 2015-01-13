@@ -1,6 +1,6 @@
 #include "CellManager.h"
-#include "Blocks.h"
-#include "MiscFuncs.h"
+#include "../Blocks/Blocks.h"
+#include "../MiscFuncs.h"
 
 // CELL :: COUNT
 Cell::Cell(int _x, int _y)

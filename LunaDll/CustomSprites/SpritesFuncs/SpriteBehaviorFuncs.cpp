@@ -1,11 +1,11 @@
 #include "SpriteFuncs.h"
-#include "Globals.h"
-#include "RenderBitmapOp.h"
-#include "RenderRectOp.h"
-#include "PlayerMOB.h"
-#include "MiscFuncs.h"
-#include "CellManager.h"
-#include "Blocks.h"
+#include "../../Globals.h"
+#include "../../RenderBitmapOp.h"
+#include "../../RenderRectOp.h"
+#include "../../PlayerMOB.h"
+#include "../../MiscFuncs.h"
+#include "../../CellManager/CellManager.h"
+#include "../../Blocks/Blocks.h"
 #include <math.h>
 
 using namespace std;

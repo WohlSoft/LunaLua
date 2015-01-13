@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "LevelCodes.h"
-#include "DeathCounter.h"
+#include "DeathCounter/DeathCounter.h"
 #include <windows.h>
 #include "Shlwapi.h"
 #include <time.h>

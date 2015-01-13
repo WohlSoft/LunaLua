@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "Defines.h"
+#include "../Defines.h"
 #include "Autocode.h"
 
 #define AUTOCODE_FNAME L"lunadll.txt"

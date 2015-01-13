@@ -1,7 +1,7 @@
 #ifndef SpriteComponent_hhhhhh
 #define SpriteComponent_hhhhhh
 
-#include "Defines.h"
+#include "../Defines.h"
 #include <string>
 
 using namespace std;

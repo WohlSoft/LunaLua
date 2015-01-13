@@ -5,7 +5,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
-#include "Defines.h"
+#include "../Defines.h"
 #include "DeathRecord.h"
 
 #ifndef __MINGW32__

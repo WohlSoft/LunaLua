@@ -1,9 +1,9 @@
 #ifndef Blocks_Hhhhh
 #define Blocks_Hhhhh
 
-#include "Defines.h"
-#include "Globals.h"
-#include "PlayerMOB.h"
+#include "../Defines.h"
+#include "../Globals.h"
+#include "../PlayerMOB.h"
 
 struct Block {
 
