@@ -72,5 +72,4 @@ void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
         MessageBoxA(0, std::string(ttscrpath+"\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
-
 }
