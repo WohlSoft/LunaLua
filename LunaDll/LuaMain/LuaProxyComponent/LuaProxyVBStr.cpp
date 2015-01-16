@@ -40,3 +40,10 @@ void LuaProxy::VBStr::clear()
 	*(short*)m_wcharptr = (short)0;
 }
 
+
+
+std::ostream& LuaProxy::operator<<(std::ostream& os, const VBStr& wStr)
+{
+	os << wStr.str();
+	return os;
+}

@@ -203,6 +203,7 @@
     <ClCompile Include="Autocode\AutocodeManager.cpp" />
     <ClCompile Include="Blocks\Blocks.cpp" />
     <ClCompile Include="CellManager\CellManager.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBlock.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLayer.cpp" />
@@ -211,6 +212,8 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySection.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyVBStr.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorld.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorldLevel.cpp" />
     <ClCompile Include="Minigames\CGUI\CGUIContainer.cpp" />
     <ClCompile Include="CustomSprites\CSprite.cpp" />
     <ClCompile Include="CustomSprites\CSpriteManager.cpp" />
