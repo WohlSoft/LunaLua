@@ -7,17 +7,17 @@
 #pragma warning(disable: 4800)
 #pragma warning(disable: 4996) //localtime
 #endif
-#include "LevelCodes.h"
-#include "Rendering.h"
+#include "LevelCodes/LevelCodes.h"
+#include "Rendering/Rendering.h"
 #include "DeathCounter/DeathCounter.h"
 #include "Autocode/AutocodeManager.h"
-#include "Logging.h"
+#include "Logging/Logging.h"
 #include "CustomSprites/CSprite.h"
 #include "CustomSprites/CSpriteManager.h"
 #include "CellManager/CellManager.h"
-#include "UserSaving.h"
-#include "mciEmulator.h"
-#include "HardcodedGraphicsManager.h"
+#include "UserSaves/UserSaving.h"
+#include "MciEmulator/mciEmulator.h"
+#include "HardcodedGraphics/HardcodedGraphicsManager.h"
 
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")

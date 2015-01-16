@@ -1,8 +1,8 @@
 #include "CSprite.h"
-#include "../Rendering.h"
+#include "../Rendering/Rendering.h"
 #include "../Globals.h"
-#include "../RenderOp.h"
-#include "../RenderRectOp.h"
+#include "../Rendering/RenderOps/RenderOp.h"
+#include "../Rendering/RenderOps/RenderRectOp.h"
 #include "../CustomSprites/SpritesFuncs/SpriteFuncs.h"
 
 // CTOR

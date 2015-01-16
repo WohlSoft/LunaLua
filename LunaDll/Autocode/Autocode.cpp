@@ -1,14 +1,14 @@
 #include "AutocodeManager.h"
-#include "../PlayerMOB.h"
-#include "../MiscFuncs.h"
+#include "../MOBs/PlayerMOB.h"
+#include "../Misc/MiscFuncs.h"
 #include "../Globals.h"
-#include "../NPCs.h"
-#include "../Sound.h"
+#include "../MOBs/NPCs.h"
+#include "../Sound/Sound.h"
 #include "../Blocks/Blocks.h"
 #include <cmath>
-#include "../Input.h"
-#include "../SMBXEvents.h"
-#include "../Level.h"
+#include "../Input/Input.h"
+#include "../SMBX_Events/SMBXEvents.h"
+#include "../Level/Level.h"
 #include <windows.h>
 #include <time.h>
 

@@ -1,8 +1,8 @@
 #include "AutocodeManager.h"
-#include "../MiscFuncs.h"
+#include "../Misc/MiscFuncs.h"
 #include "../GlobalFuncs.h"
-#include "../Level.h"
-#include "../Logging.h"
+#include "../Level/Level.h"
+#include "../Logging/Logging.h"
 #include <fstream>
 
 using namespace std;

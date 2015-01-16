@@ -1,8 +1,8 @@
 #include "DeathCounter.h"
-#include "../PlayerMOB.h"
+#include "../MOBs/PlayerMOB.h"
 #include <Windows.h>
-#include "../MiscFuncs.h"
-#include "../Level.h"
+#include "../Misc/MiscFuncs.h"
+#include "../Level/Level.h"
 #include "../GlobalFuncs.h"
 using namespace std;
 

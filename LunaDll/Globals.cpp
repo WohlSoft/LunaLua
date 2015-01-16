@@ -1,11 +1,11 @@
 #include "Globals.h"
-#include "LevelCodes.h"
+#include "LevelCodes/LevelCodes.h"
 #include "DeathCounter/DeathCounter.h"
 #include <windows.h>
 #include "Shlwapi.h"
 #include <time.h>
-#include "Logging.h"
-#include "UserSaving.h"
+#include "Logging/Logging.h"
+#include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
 #include <cctype>
 

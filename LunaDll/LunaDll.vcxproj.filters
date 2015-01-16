@@ -120,71 +120,8 @@
     <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerMOB.h">
-      <Filter>Header Files\MOBs</Filter>
-    </ClInclude>
-    <ClInclude Include="NPCs.h">
-      <Filter>Header Files\MOBs</Filter>
-    </ClInclude>
-    <ClInclude Include="Layer.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Header Files\Keyboard</Filter>
-    </ClInclude>
-    <ClInclude Include="MiscFuncs.h">
-      <Filter>Header Files\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelCodes.h">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClInclude>
-    <ClInclude Include="TriggerZone.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderString.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Defines.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Header Files\Level</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>Header Files\Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="SMBXEvents.h">
-      <Filter>Header Files\SMBX Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Logging.h">
-      <Filter>Header Files\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="BMPBox.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderOp.h">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderBitmapOp.h">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderRectOp.h">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderEffectOp.h">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClInclude>
-    <ClInclude Include="Minigames.h">
-      <Filter>Header Files\Minigames</Filter>
-    </ClInclude>
-    <ClInclude Include="CGUI.h">
-      <Filter>Header Files\Minigames\CGUI</Filter>
     </ClInclude>
     <ClInclude Include="LuaMain\LuaHelper.h">
       <Filter>Header Files\Lua</Filter>
@@ -195,14 +132,8 @@
     <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>Header Files\Lua</Filter>
     </ClInclude>
-    <ClInclude Include="UserSaving.h">
-      <Filter>Header Files\UserSaves</Filter>
-    </ClInclude>
     <ClInclude Include="LuaMain\LuaEvents.h">
       <Filter>Header Files\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="RuntimeHook.h">
-      <Filter>Header Files\Misc</Filter>
     </ClInclude>
     <ClInclude Include="libs\ini-reader\ini.h">
       <Filter>Header Files\INIReader</Filter>
@@ -213,26 +144,14 @@
     <ClInclude Include="SdlMusic\SdlMusPlayer.h">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClInclude>
-    <ClInclude Include="mciEmulator.h">
-      <Filter>Header Files\mci2sdl music proxy</Filter>
-    </ClInclude>
     <ClInclude Include="SdlMusic\MusicManager.h">
       <Filter>Header Files\MusicPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="Overworld.h">
-      <Filter>Header Files\World</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldLevel.h">
-      <Filter>Header Files\World</Filter>
     </ClInclude>
     <ClInclude Include="SdlMusic\MusicManager.h">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClInclude>
     <ClInclude Include="GlobalFuncs.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HardcodedGraphicsManager.h">
-      <Filter>Header Files\HardcodedGraphics</Filter>
     </ClInclude>
     <ClInclude Include="Animation\Animation.h">
       <Filter>Header Files\Animation</Filter>
@@ -270,94 +189,94 @@
     <ClInclude Include="DeathCounter\DeathRecord.h">
       <Filter>Header Files\Death Counter</Filter>
     </ClInclude>
+    <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h">
+      <Filter>Header Files\HardcodedGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard\Keyboard.h">
+      <Filter>Header Files\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer\Layer.h">
+      <Filter>Header Files\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer\TriggerZone.h">
+      <Filter>Header Files\Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Header Files\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\Logging.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="MciEmulator\mciEmulator.h">
+      <Filter>Header Files\mci2sdl music proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="Minigames\CGUI\CGUI.h">
+      <Filter>Header Files\Minigames\CGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minigames\Minigames.h">
+      <Filter>Header Files\Minigames</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\MiscFuncs.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHook.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="MOBs\NPCs.h">
+      <Filter>Header Files\MOBs</Filter>
+    </ClInclude>
+    <ClInclude Include="MOBs\PlayerMOB.h">
+      <Filter>Header Files\MOBs</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\BMPBox.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Rendering.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderString.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderRectOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderEffectOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderBitmapOp.h">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBX_Events\SMBXEvents.h">
+      <Filter>Header Files\SMBX Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound\Sound.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="UserSaves\UserSaving.h">
+      <Filter>Header Files\UserSaves</Filter>
+    </ClInclude>
+    <ClInclude Include="World\WorldLevel.h">
+      <Filter>Header Files\World</Filter>
+    </ClInclude>
+    <ClInclude Include="World\Overworld.h">
+      <Filter>Header Files\World</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelCodes\LevelCodes.h">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Layer.cpp">
-      <Filter>Header Files\Layers</Filter>
-    </ClCompile>
-    <ClCompile Include="MiscFuncs.cpp">
-      <Filter>Header Files\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="Globals.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerMOB.cpp">
-      <Filter>Header Files\MOBs</Filter>
-    </ClCompile>
-    <ClCompile Include="dlltestlvlCode.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="SAJewers-QraestoliaCaverns.lvl.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Docopoper-TheFloorisLava.lvl..cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="JosephStaleknight-CurtainTortoise.lvl.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Docopoper-AbstractAssault.lvl.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Kil-DemosBrain.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering.cpp">
-      <Filter>Header Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>Header Files\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>Header Files\Keyboard</Filter>
-    </ClCompile>
-    <ClCompile Include="EuroShellRandD.lvl.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="NPCs.cpp">
-      <Filter>Header Files\MOBs</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Header Files\Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="SMBXEvent.cpp">
-      <Filter>Header Files\SMBX Events</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Header Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Docopoper-Calleoca.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="SAJewers-Snowboardin.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Talkhaus-Science_Final_Battle.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger.cpp">
-      <Filter>Header Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderBitmapOp.cpp">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClCompile>
-    <ClCompile Include="BMPBox.cpp">
-      <Filter>Header Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderRectOp.cpp">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClCompile>
-    <ClCompile Include="KilArmoryCode.cpp">
-      <Filter>Header Files\LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderEffectOp.cpp">
-      <Filter>Header Files\Rendering\RenderOps</Filter>
-    </ClCompile>
-    <ClCompile Include="CGUIContainer.cpp">
-      <Filter>Header Files\Minigames\CGUI</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
       <Filter>Header Files\Lua</Filter>
@@ -368,14 +287,8 @@
     <ClCompile Include="LuaMain\LunaLuaMain.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
-    <ClCompile Include="UserSaving.cpp">
-      <Filter>Header Files\UserSaves</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaEvents.cpp">
       <Filter>Header Files\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="RuntimeHook.cpp">
-      <Filter>Header Files\Misc</Filter>
     </ClCompile>
     <ClCompile Include="libs\ini-reader\ini.c">
       <Filter>Header Files\INIReader</Filter>
@@ -386,17 +299,8 @@
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
-    <ClCompile Include="mciEmulator.cpp">
-      <Filter>Header Files\mci2sdl music proxy</Filter>
-    </ClCompile>
     <ClCompile Include="SdlMusic\MusicManager.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
-    </ClCompile>
-    <ClCompile Include="Overworld.cpp">
-      <Filter>Header Files\World</Filter>
-    </ClCompile>
-    <ClCompile Include="WorldLevel.cpp">
-      <Filter>Header Files\World</Filter>
     </ClCompile>
     <ClCompile Include="SdlMusic\MusicManager.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
@@ -406,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="SdlMusic\MusicDefList.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
-    </ClCompile>
-    <ClCompile Include="HardcodedGraphicsManager.cpp">
-      <Filter>Header Files\HardcodedGraphics</Filter>
     </ClCompile>
     <ClCompile Include="Animation\Animation.cpp">
       <Filter>Header Files\Animation</Filter>
@@ -461,12 +362,111 @@
     <ClCompile Include="DeathCounter\DeathRecord.cpp">
       <Filter>Header Files\Death Counter</Filter>
     </ClCompile>
+    <ClCompile Include="HardcodedGraphics\HardcodedGraphicsManager.cpp">
+      <Filter>Header Files\HardcodedGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Input.cpp">
+      <Filter>Header Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard\Keyboard.cpp">
+      <Filter>Header Files\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer\Layer.cpp">
+      <Filter>Header Files\Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Header Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\dlltestlvlCode.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\Docopoper-AbstractAssault.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\Docopoper-Calleoca.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\Docopoper-TheFloorisLava.lvl..cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\EuroShellRandD.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\KilArmoryCode.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\Kil-DemosBrain.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\JosephStaleknight-CurtainTortoise.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\SAJewers-QraestoliaCaverns.lvl.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\SAJewers-Snowboardin.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelCodes\Talkhaus-Science_Final_Battle.cpp">
+      <Filter>Header Files\LevelCodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\Logger.cpp">
+      <Filter>Header Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="MciEmulator\mciEmulator.cpp">
+      <Filter>Header Files\mci2sdl music proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="Minigames\CGUI\CGUIContainer.cpp">
+      <Filter>Header Files\Minigames\CGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\MiscFuncs.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHook.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="MOBs\NPCs.cpp">
+      <Filter>Header Files\MOBs</Filter>
+    </ClCompile>
+    <ClCompile Include="MOBs\PlayerMOB.cpp">
+      <Filter>Header Files\MOBs</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\BMPBox.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Rendering.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOps\RenderRectOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOps\RenderEffectOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOps\RenderBitmapOp.cpp">
+      <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBX_Events\SMBXEvent.cpp">
+      <Filter>Header Files\SMBX Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound\Sound.cpp">
+      <Filter>Header Files\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="UserSaves\UserSaving.cpp">
+      <Filter>Header Files\UserSaves</Filter>
+    </ClCompile>
+    <ClCompile Include="World\WorldLevel.cpp">
+      <Filter>Header Files\World</Filter>
+    </ClCompile>
+    <ClCompile Include="World\Overworld.cpp">
+      <Filter>Header Files\World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scratch.txt">
+    <None Include="Misc\scratch.txt">
       <Filter>Header Files\Misc</Filter>
     </None>
-    <None Include="scrappedcode.txt">
+    <None Include="Misc\scrappedcode.txt">
       <Filter>Header Files\Misc</Filter>
     </None>
   </ItemGroup>

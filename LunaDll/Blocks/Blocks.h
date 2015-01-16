@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 #include "../Globals.h"
-#include "../PlayerMOB.h"
+#include "../MOBs/PlayerMOB.h"
 
 struct Block {
 
