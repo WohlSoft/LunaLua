@@ -178,11 +178,11 @@ FakesAssemblies/
 *.slo
 *.lo
 *.o
-*.a
-*.la
-*.lai
-*.so
-*.dll
+#*.a
+#*.la
+#*.lai
+#*.so
+#*.dll
 *.dylib
 
 # Qt-es
@@ -209,4 +209,6 @@ bin
 
 HardcodedGraphicsData
 
-!/LunaDll/libs/sdl
+!/LunaDll/libs/sdl/*
+!/LunaDll/libs/sdl/*
+!/LunaDll/libs/sdl_mingw/*
