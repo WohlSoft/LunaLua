@@ -461,6 +461,30 @@
     <ClCompile Include="World\Overworld.cpp">
       <Filter>Header Files\World</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNPC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyVBStr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
