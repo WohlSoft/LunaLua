@@ -41,71 +41,83 @@ SOURCES += \
     LunaDll/libs/luabind-src/stack_content_by_name.cpp \
     LunaDll/libs/luabind-src/weak_ref.cpp \
     LunaDll/libs/luabind-src/wrapper_base.cpp \
-    LunaDll/BMPBox.cpp \
-    LunaDll/CGUIContainer.cpp \
-    LunaDll/dlltestlvlCode.cpp \
-    LunaDll/Docopoper-AbstractAssault.lvl.cpp \
-    LunaDll/Docopoper-Calleoca.cpp \
-    LunaDll/Docopoper-TheFloorisLava.lvl..cpp \
-    LunaDll/EuroShellRandD.lvl.cpp \
     LunaDll/GameboyRPG.cpp \
     LunaDll/GlobalFuncs.cpp \
     LunaDll/Globals.cpp \
     LunaDll/HardcodedGraphicsManager.cpp \
-    LunaDll/Input.cpp \
-    LunaDll/JosephStaleknight-CurtainTortoise.lvl.cpp \
-    LunaDll/Keyboard.cpp \
-    LunaDll/KilArmoryCode.cpp \
-    LunaDll/Kil-DemosBrain.cpp \
-    LunaDll/Layer.cpp \
-    LunaDll/Level.cpp \
-    LunaDll/Logger.cpp \
     LunaDll/Main.cpp \
-    LunaDll/mciEmulator.cpp \
     LunaDll/Minigames.cpp \
-    LunaDll/MiscFuncs.cpp \
-    LunaDll/NPCs.cpp \
-    LunaDll/Overworld.cpp \
     LunaDll/PerformanceTimer.cpp \
-    LunaDll/PlayerMOB.cpp \
     LunaDll/PngRender.cpp \
-    LunaDll/RenderBitmapOp.cpp \
-    LunaDll/RenderEffectOp.cpp \
-    LunaDll/Rendering.cpp \
-    LunaDll/RenderRectOp.cpp \
-    LunaDll/RuntimeHook.cpp \
-    LunaDll/SAJewers-QraestoliaCaverns.lvl.cpp \
-    LunaDll/SAJewers-Snowboardin.cpp \
-    LunaDll/SMBXEvent.cpp \
     LunaDll/SMBXEvents.cpp \
-    LunaDll/Sound.cpp \
-    LunaDll/Talkhaus-Science_Final_Battle.cpp \
-    LunaDll/UserSaving.cpp \
-    LunaDll/WorldLevel.cpp \
     LunaDll/Animation/Animation.cpp \
-    LunaDll/Autocode/Autocode.cpp \
-    LunaDll/Autocode/AutocodeManager.cpp \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
     LunaDll/Autocode/Commands/AC_LunaControl.cpp \
     LunaDll/Autocode/Commands/EnumCmd.cpp \
     LunaDll/Autocode/Commands/GenComp.cpp \
+    LunaDll/Autocode/Autocode.cpp \
+    LunaDll/Autocode/AutocodeManager.cpp \
     LunaDll/Blocks/Blocks.cpp \
     LunaDll/CellManager/CellManager.cpp \
+    LunaDll/CustomSprites/Hitbox/Hitbox.cpp \
+    LunaDll/CustomSprites/SpritesFuncs/SpriteBehaviorFuncs.cpp \
+    LunaDll/CustomSprites/SpritesFuncs/SpriteDrawFuncs.cpp \
     LunaDll/CustomSprites/CSprite.cpp \
     LunaDll/CustomSprites/CSpriteManager.cpp \
     LunaDll/CustomSprites/SpriteComponent.cpp \
-    LunaDll/CustomSprites/SpritesFuncs/SpriteBehaviorFuncs.cpp \
-    LunaDll/CustomSprites/SpritesFuncs/SpriteDrawFuncs.cpp \
-    LunaDll/CustomSprites/Hitbox/Hitbox.cpp \
     LunaDll/DeathCounter/DeathCounter.cpp \
     LunaDll/DeathCounter/DeathRecord.cpp \
+    LunaDll/Input/Input.cpp \
+    LunaDll/Keyboard/Keyboard.cpp \
+    LunaDll/Layer/Layer.cpp \
+    LunaDll/Level/Level.cpp \
+    LunaDll/LevelCodes/dlltestlvlCode.cpp \
+    LunaDll/LevelCodes/Docopoper-AbstractAssault.lvl.cpp \
+    LunaDll/LevelCodes/Docopoper-Calleoca.cpp \
+    LunaDll/LevelCodes/Docopoper-TheFloorisLava.lvl..cpp \
+    LunaDll/LevelCodes/EuroShellRandD.lvl.cpp \
+    LunaDll/LevelCodes/JosephStaleknight-CurtainTortoise.lvl.cpp \
+    LunaDll/LevelCodes/Kil-DemosBrain.cpp \
+    LunaDll/LevelCodes/KilArmoryCode.cpp \
+    LunaDll/LevelCodes/SAJewers-QraestoliaCaverns.lvl.cpp \
+    LunaDll/LevelCodes/SAJewers-Snowboardin.cpp \
+    LunaDll/LevelCodes/Talkhaus-Science_Final_Battle.cpp \
+    LunaDll/Logging/Logger.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyAnimation.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyBlock.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyGlobalFunctions.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyLayer.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyNPC.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyPlayer.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxySaveBank.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxySection.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyVBStr.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyWorld.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyWorldLevel.cpp \
     LunaDll/LuaMain/LuaEvents.cpp \
     LunaDll/LuaMain/LuaHelper.cpp \
     LunaDll/LuaMain/LuaProxy.cpp \
     LunaDll/LuaMain/LunaLuaMain.cpp \
+    LunaDll/MciEmulator/mciEmulator.cpp \
+    LunaDll/Minigames/CGUI/CGUIContainer.cpp \
+    LunaDll/Misc/MiscFuncs.cpp \
+    LunaDll/Misc/RuntimeHook.cpp \
+    LunaDll/MOBs/NPCs.cpp \
+    LunaDll/MOBs/PlayerMOB.cpp \
+    LunaDll/Rendering/RenderOps/RenderBitmapOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderEffectOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderRectOp.cpp \
+    LunaDll/Rendering/BMPBox.cpp \
+    LunaDll/Rendering/Rendering.cpp \
     LunaDll/SdlMusic/MusicDefList.cpp \
     LunaDll/SdlMusic/MusicManager.cpp \
-    LunaDll/SdlMusic/SdlMusPlayer.cpp
+    LunaDll/SdlMusic/SdlMusPlayer.cpp \
+    LunaDll/SMBX_Events/SMBXEvent.cpp \
+    LunaDll/Sound/Sound.cpp \
+    LunaDll/UserSaves/UserSaving.cpp \
+    LunaDll/World/Overworld.cpp \
+    LunaDll/World/WorldLevel.cpp
+
 
 HEADERS += \
     LunaDll/libs/luabind-include/luabind/detail/calc_arity.hpp \
@@ -188,59 +200,59 @@ HEADERS += \
     LunaDll/libs/luabind-include/luabind/weak_ref.hpp \
     LunaDll/libs/luabind-include/luabind/wrapper_base.hpp \
     LunaDll/libs/luabind-include/luabind/yield_policy.hpp \
-    LunaDll/BMPBox.h \
-    LunaDll/CGUI.h \
     LunaDll/CGUIContainer.h \
     LunaDll/Defines.h \
     LunaDll/GameboyRPG.h \
     LunaDll/GlobalFuncs.h \
     LunaDll/Globals.h \
-    LunaDll/HardcodedGraphicsManager.h \
-    LunaDll/Input.h \
-    LunaDll/Keyboard.h \
-    LunaDll/Layer.h \
-    LunaDll/Level.h \
-    LunaDll/LevelCodes.h \
-    LunaDll/Logging.h \
     LunaDll/Main.h \
-    LunaDll/mciEmulator.h \
-    LunaDll/Minigames.h \
-    LunaDll/MiscFuncs.h \
-    LunaDll/NPCs.h \
-    LunaDll/Overworld.h \
     LunaDll/PerformanceTimer.h \
-    LunaDll/PlayerMOB.h \
     LunaDll/PngRender.h \
-    LunaDll/RenderBitmapOp.h \
-    LunaDll/RenderEffectOp.h \
-    LunaDll/Rendering.h \
-    LunaDll/RenderOp.h \
-    LunaDll/RenderRectOp.h \
-    LunaDll/RenderString.h \
-    LunaDll/RuntimeHook.h \
-    LunaDll/SMBXEvents.h \
-    LunaDll/Sound.h \
-    LunaDll/TriggerZone.h \
-    LunaDll/UserSaving.h \
-    LunaDll/WorldLevel.h \
     LunaDll/Animation/Animation.h \
     LunaDll/Autocode/Autocode.h \
     LunaDll/Autocode/AutocodeManager.h \
     LunaDll/Blocks/Blocks.h \
     LunaDll/CellManager/CellManager.h \
+    LunaDll/CustomSprites/Hitbox/Hitbox.h \
+    LunaDll/CustomSprites/SpritesFuncs/SpriteFuncs.h \
     LunaDll/CustomSprites/CSprite.h \
     LunaDll/CustomSprites/CSpriteManager.h \
     LunaDll/CustomSprites/SpriteComponent.h \
-    LunaDll/CustomSprites/SpritesFuncs/SpriteFuncs.h \
-    LunaDll/CustomSprites/Hitbox/Hitbox.h \
     LunaDll/DeathCounter/DeathCounter.h \
     LunaDll/DeathCounter/DeathRecord.h \
+    LunaDll/Input/Input.h \
+    LunaDll/Keyboard/Keyboard.h \
+    LunaDll/Layer/Layer.h \
+    LunaDll/Layer/TriggerZone.h \
+    LunaDll/Level/Level.h \
+    LunaDll/LevelCodes/LevelCodes.h \
+    LunaDll/Logging/Logging.h \
     LunaDll/LuaMain/LuaEvents.h \
     LunaDll/LuaMain/LuaHelper.h \
     LunaDll/LuaMain/LuaProxy.h \
     LunaDll/LuaMain/LunaLuaMain.h \
+    LunaDll/MciEmulator/mciEmulator.h \
+    LunaDll/Minigames/CGUI/CGUI.h \
+    LunaDll/Minigames/Minigames.h \
+    LunaDll/Misc/MiscFuncs.h \
+    LunaDll/Misc/RuntimeHook.h \
+    LunaDll/MOBs/NPCs.h \
+    LunaDll/MOBs/PlayerMOB.h \
+    LunaDll/Rendering/RenderOps/RenderBitmapOp.h \
+    LunaDll/Rendering/RenderOps/RenderEffectOp.h \
+    LunaDll/Rendering/RenderOps/RenderOp.h \
+    LunaDll/Rendering/RenderOps/RenderRectOp.h \
+    LunaDll/Rendering/BMPBox.h \
+    LunaDll/Rendering/Rendering.h \
+    LunaDll/Rendering/RenderString.h \
     LunaDll/SdlMusic/MusicManager.h \
-    LunaDll/SdlMusic/SdlMusPlayer.h
+    LunaDll/SdlMusic/SdlMusPlayer.h \
+    LunaDll/SMBX_Events/SMBXEvents.h \
+    LunaDll/Sound/Sound.h \
+    LunaDll/UserSaves/UserSaving.h \
+    LunaDll/World/Overworld.h \
+    LunaDll/World/WorldLevel.h \
+    LunaDll/HardcodedGraphics/hardcodedgraphicsmanager.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
