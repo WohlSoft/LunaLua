@@ -44,7 +44,6 @@ SOURCES += \
     LunaDll/GameboyRPG.cpp \
     LunaDll/GlobalFuncs.cpp \
     LunaDll/Globals.cpp \
-    LunaDll/HardcodedGraphicsManager.cpp \
     LunaDll/Main.cpp \
     LunaDll/Minigames.cpp \
     LunaDll/PerformanceTimer.cpp \
@@ -116,7 +115,8 @@ SOURCES += \
     LunaDll/Sound/Sound.cpp \
     LunaDll/UserSaves/UserSaving.cpp \
     LunaDll/World/Overworld.cpp \
-    LunaDll/World/WorldLevel.cpp
+    LunaDll/World/WorldLevel.cpp \
+    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp
 
 
 HEADERS += \
@@ -252,7 +252,8 @@ HEADERS += \
     LunaDll/UserSaves/UserSaving.h \
     LunaDll/World/Overworld.h \
     LunaDll/World/WorldLevel.h \
-    LunaDll/HardcodedGraphics/hardcodedgraphicsmanager.h
+    LunaDll/HardcodedGraphics/hardcodedgraphicsmanager.h \
+    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
