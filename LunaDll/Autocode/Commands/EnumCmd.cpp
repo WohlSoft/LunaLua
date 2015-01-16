@@ -1,5 +1,5 @@
 #include "../Autocode.h"
-#include "../../MiscFuncs.h"
+#include "../../Misc/MiscFuncs.h"
 //#include "Globals.h"
 
 // Commander reader function

@@ -270,6 +270,9 @@
     <ClInclude Include="LevelCodes\LevelCodes.h">
       <Filter>Header Files\LevelCodes</Filter>
     </ClInclude>
+    <ClInclude Include="Minigames\GameboyRPG.h">
+      <Filter>Header Files\Minigames</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -493,6 +496,12 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Minigames\GameboyRPG.cpp">
+      <Filter>Header Files\Minigames</Filter>
+    </ClCompile>
+    <ClCompile Include="Minigames\Minigames.cpp">
+      <Filter>Header Files\Minigames</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

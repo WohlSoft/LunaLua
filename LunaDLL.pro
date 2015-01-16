@@ -41,11 +41,9 @@ SOURCES += \
     LunaDll/libs/luabind-src/stack_content_by_name.cpp \
     LunaDll/libs/luabind-src/weak_ref.cpp \
     LunaDll/libs/luabind-src/wrapper_base.cpp \
-    LunaDll/GameboyRPG.cpp \
     LunaDll/GlobalFuncs.cpp \
     LunaDll/Globals.cpp \
     LunaDll/Main.cpp \
-    LunaDll/Minigames.cpp \
     LunaDll/PerformanceTimer.cpp \
     LunaDll/PngRender.cpp \
     LunaDll/SMBXEvents.cpp \
@@ -116,7 +114,9 @@ SOURCES += \
     LunaDll/UserSaves/UserSaving.cpp \
     LunaDll/World/Overworld.cpp \
     LunaDll/World/WorldLevel.cpp \
-    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp
+    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp \
+    LunaDll/Minigames/GameboyRPG.cpp \
+    LunaDll/Minigames/Minigames.cpp
 
 
 HEADERS += \
@@ -202,7 +202,6 @@ HEADERS += \
     LunaDll/libs/luabind-include/luabind/yield_policy.hpp \
     LunaDll/CGUIContainer.h \
     LunaDll/Defines.h \
-    LunaDll/GameboyRPG.h \
     LunaDll/GlobalFuncs.h \
     LunaDll/Globals.h \
     LunaDll/Main.h \
@@ -253,7 +252,8 @@ HEADERS += \
     LunaDll/World/Overworld.h \
     LunaDll/World/WorldLevel.h \
     LunaDll/HardcodedGraphics/hardcodedgraphicsmanager.h \
-    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h
+    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h \
+    LunaDll/Minigames/GameboyRPG.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt

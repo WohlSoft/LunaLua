@@ -12,7 +12,7 @@
 #include "../../Level/Level.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
-
+#include "../../SdlMusic/SdlMusPlayer.h"
 
 
 void LuaProxy::windowDebug(const char *debugText){

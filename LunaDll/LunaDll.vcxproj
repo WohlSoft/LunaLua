@@ -154,6 +154,7 @@
     <ClInclude Include="DeathCounter\DeathCounter.h" />
     <ClInclude Include="DeathCounter\DeathRecord.h" />
     <ClInclude Include="Defines.h" />
+    <ClInclude Include="Minigames\GameboyRPG.h" />
     <ClInclude Include="Rendering\BMPBox.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
@@ -224,6 +225,8 @@
     <ClCompile Include="LevelCodes\Docopoper-Calleoca.cpp" />
     <ClCompile Include="Autocode\Commands\EnumCmd.cpp" />
     <ClCompile Include="LevelCodes\EuroShellRandD.lvl.cpp" />
+    <ClCompile Include="Minigames\GameboyRPG.cpp" />
+    <ClCompile Include="Minigames\Minigames.cpp" />
     <ClCompile Include="Rendering\BMPBox.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />
