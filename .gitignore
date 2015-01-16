@@ -207,6 +207,6 @@ bin
 *.db
 *_plugin_import.cpp
 
-HardcodedGraphics
+HardcodedGraphicsData
 
 !/LunaDll/libs/sdl
