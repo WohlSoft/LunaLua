@@ -56,6 +56,33 @@ bool INIReader::GetBoolean(string section, string name, bool default_value)
         return default_value;
 }
 
+std::vector<std::string> INIReader::getAllSectionKeys(std::string section)
+{
+    std::vector<std::string> v;
+    for(std::map<std::string, std::string>::iterator it = _values.begin(); it != _values.end(); ++it)
+    {
+        std::string mkey = it->first;
+        std::string key;
+        int resizeTo=-1;
+        for(unsigned int i=0; i<mkey.size();i++)
+        {
+            if(resizeTo>=0)
+                key.push_back(mkey[i]);
+            if(mkey[i]=='.')
+            {
+                resizeTo=i;
+            }
+        }
+        if(resizeTo>=0)
+            key.resize(resizeTo);
+        else continue;
+
+        if(mkey==section)
+            v.push_back(key);
+    }
+    return v;
+}
+
 string INIReader::MakeKey(string section, string name)
 {
     string key = section + "." + name;

@@ -64,7 +64,7 @@ void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
     #endif
 
     if( !file_existsX(imgRootPath) ) return;
-    std::string ttscrpath=root+"graphics\\title_screen.ini";
+    std::string ttscrpath=root+"graphics\\graphics.ini";
 
     INIReader TitleScreenIni( ttscrpath );
     if (TitleScreenIni.ParseError() < 0)
