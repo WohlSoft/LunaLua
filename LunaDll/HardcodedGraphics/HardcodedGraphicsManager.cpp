@@ -19,18 +19,15 @@ HardcodedGraphicsManager::~HardcodedGraphicsManager()
 
 int HardcodedGraphicsManager::patchGraphics(unsigned int offset_i, const char* filepath)
 {
-	int sizeOfMemory;
-	void *offset = (void*)offset_i;
-
 	//Check existing of address
 	std::map<unsigned int, int>::iterator it = hardcoded_data_map.find(offset_i);
 	if(it == hardcoded_data_map.end())
 	{
-		return -1;
+		return -3;
 	}
 
 	//get internal memory size
-	sizeOfMemory = hardcoded_data_map[offset_i];
+	int sizeOfMemory = hardcoded_data_map[offset_i]-8;
 
 	std::ifstream graphFile;
     graphFile.open(filepath, std::ios::in|std::ios::binary);
@@ -40,15 +37,21 @@ int HardcodedGraphicsManager::patchGraphics(unsigned int offset_i, const char* f
 	graphFile.seekg(0, graphFile.end);
 	std::streamoff length = graphFile.tellg();
 	graphFile.seekg(0, graphFile.beg);
-	if(length > sizeOfMemory){
+
+	if(length > sizeOfMemory)
+	{
 		graphFile.close();
-		return (int)length;
+		return sizeOfMemory;
 	}
 
 	char* buffer = new char[sizeOfMemory];
+	for(int i=0;i<sizeOfMemory;i++)
+	{
+		buffer[i] = 0;
+	}
 	graphFile.read(buffer, length);
 	// The actual patching
-	void* addr = FN_OFFSET2ADDR(offset);
+	void* addr = FN_OFFSET2ADDR(offset_i);
 	memset(addr, 0, sizeOfMemory);
 	memcpy(addr, buffer, sizeOfMemory);
 
