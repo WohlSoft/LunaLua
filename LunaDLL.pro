@@ -116,7 +116,8 @@ SOURCES += \
     LunaDll/World/WorldLevel.cpp \
     LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp \
     LunaDll/Minigames/GameboyRPG.cpp \
-    LunaDll/Minigames/Minigames.cpp
+    LunaDll/Minigames/Minigames.cpp \
+    LunaDll/HardcodedGraphics/HardocdeGFXMap.cpp
 
 
 HEADERS += \

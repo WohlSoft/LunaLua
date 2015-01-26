@@ -2,12 +2,13 @@
 #define HardcodedGraphicsManager_hhh
 
 #include <string>
+#include <map>
 
 class HardcodedGraphicsManager
 {
 public:
-	HardcodedGraphicsManager(void);
-	~HardcodedGraphicsManager(void);
+	HardcodedGraphicsManager();
+	~HardcodedGraphicsManager();
 
 	
 	//************************************
@@ -20,9 +21,13 @@ public:
 	// Parameter: char * filepath The image file to patch
 	// Parameter: int sizeOfFile The size of the original image memory segment
 	//************************************
-	static int patchGraphics(void* offset, const char* filepath, int sizeOfMemory);
+	static int patchGraphics(unsigned int offset_i, const char* filepath);
 
     static void loadGraphics();
+	static void buildMap();
+
+private:
+	static std::map<unsigned int, int> hardcoded_data_map;
 };
 
 #endif

@@ -503,6 +503,9 @@
     <ClCompile Include="Minigames\Minigames.cpp">
       <Filter>Header Files\Minigames</Filter>
     </ClCompile>
+    <ClCompile Include="HardcodedGraphics\HardocdeGFXMap.cpp">
+      <Filter>Header Files\HardcodedGraphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
