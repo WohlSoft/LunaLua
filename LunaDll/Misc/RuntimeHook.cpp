@@ -6,6 +6,7 @@
 #include "../GlobalFuncs.h"
 #include "../Misc/MiscFuncs.h"
 #include "../SdlMusic/MusicManager.h"
+#include "../HardcodedGraphics/HardcodedGraphicsManager.h"
 
 //std::string utf8_encode(const std::wstring &wstr)
 //{
@@ -66,6 +67,8 @@ void TrySkipPatch()
 		
 		PATCH_FUNC(0x8BED00, &InitHook);
 	}
+
+	HardcodedGraphicsManager::loadGraphics();
 
 	__vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
 	*(void**)0x00401124 = (void*)&vbaR4VarHook;

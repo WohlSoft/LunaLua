@@ -20,9 +20,9 @@ public:
 	// Parameter: char * filepath The image file to patch
 	// Parameter: int sizeOfFile The size of the original image memory segment
 	//************************************
-	int patchGraphics(void* offset, char* filepath, int sizeOfMemory);
+	static int patchGraphics(void* offset, const char* filepath, int sizeOfMemory);
 
-    void loadGraphics(std::string imgRootPath);
+    static void loadGraphics();
 };
 
 #endif

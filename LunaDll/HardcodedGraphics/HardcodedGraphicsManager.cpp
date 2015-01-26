@@ -14,7 +14,7 @@ HardcodedGraphicsManager::HardcodedGraphicsManager(void)
 HardcodedGraphicsManager::~HardcodedGraphicsManager(void)
 {}
 
-int HardcodedGraphicsManager::patchGraphics(void* offset, char* filepath, int sizeOfMemory)
+int HardcodedGraphicsManager::patchGraphics(void* offset, const char* filepath, int sizeOfMemory)
 {
 	std::ifstream graphFile;
     graphFile.open(filepath, std::ios::in|std::ios::binary);
@@ -22,7 +22,7 @@ int HardcodedGraphicsManager::patchGraphics(void* offset, char* filepath, int si
 		return -2;
 	
 	graphFile.seekg(0, graphFile.end);
-	int length = graphFile.tellg();
+	std::streamoff length = graphFile.tellg();
 	graphFile.seekg(0, graphFile.beg);
 	if(length > sizeOfMemory){
 		graphFile.close();
@@ -42,12 +42,8 @@ int HardcodedGraphicsManager::patchGraphics(void* offset, char* filepath, int si
     return -1;
 }
 
-void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
+void toLog(std::string str)
 {
-    #ifndef NO_SDL
-    MusicManager::initAudioEngine();//Init audio engine if it not initalized
-    std::string root=PGE_SDL_Manager::appPath;
-    #else
     HMODULE hModule = GetModuleHandleW(NULL);
     WCHAR path[MAX_PATH];
     int count = GetModuleFileNameW(hModule, path, MAX_PATH);
@@ -62,10 +58,31 @@ void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
     std::wstring smbxPath = path;
     smbxPath = smbxPath.append(L"\\");
     std::string root = wstr2str(smbxPath);
-    #endif
 
-    if( !file_existsX(imgRootPath) ) return;
+	FILE *x = fopen(std::string(root+"\\lunalog.txt").c_str(), "a") ;
+	fprintf(x, "%s\n", str.c_str());
+	fclose(x);
+}
+
+void HardcodedGraphicsManager::loadGraphics()
+{
+    HMODULE hModule = GetModuleHandleW(NULL);
+    WCHAR path[MAX_PATH];
+    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+    for(int i = count; i > 3; i--)
+    {
+        if(path[i] == L'\\')
+        {
+            path[i] = 0;
+            break;
+        }
+    }
+    std::wstring smbxPath = path;
+    smbxPath = smbxPath.append(L"\\");
+    std::string root = wstr2str(smbxPath);
+
     std::string ttscrpath=root+"graphics.ini";
+	if( !file_existsX(ttscrpath) ) return;
 
     INIReader GraphicsINI( ttscrpath );
     if (GraphicsINI.ParseError() < 0)
@@ -74,9 +91,18 @@ void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
         return;
     }
 
-	std::vector<std::string > list= GraphicsINI.getAllSectionKeys("keys");
+	toLog("get hex key");
+
+	std::vector<std::string > list= GraphicsINI.getAllSectionKeys("hex");
+	if(list.empty())
+		toLog("...no keys :(");
+	else
+		toLog("...keys found :)");
+
 	for(int i=0; i<list.size(); i++)
 	{
+		toLog("key"+list[i]);
+
 		bool wrong=false;
 		RemoveSubStr(list[i], "0x");
 		for(int j=0;j<list[i].size();j++)
@@ -94,18 +120,28 @@ void HardcodedGraphicsManager::loadGraphics(std::string imgRootPath)
 				}
 			}
 		}
+		toLog("is wrong?");
 		if(wrong) continue;
 
+		toLog("get hex key");
 		unsigned int hexKey;   
 		std::stringstream ss;
 		ss << std::hex << list[i];
 		ss >> hexKey;
-		std::string imageFile = GraphicsINI.Get("HEX", list[i], "");
+		std::string imageFile = GraphicsINI.Get("hex", list[i], "");
 	    if(imageFile.empty()) continue;
 		
+		toLog("check file");
+		imageFile = root+"graphics\\common\\"+imageFile;
+		const char *str = imageFile.c_str();
+
+		toLog(imageFile+" "+list[i]);
+
+		toLog("patch");
 		//Here we should load file  hexKey - address, imageFile:
 		//is a name of image file in the <SMBX>\graphics\common
-
+		patchGraphics((void*)hexKey, str, 34816);
+		toLog("done");
 	}
 
 }
