@@ -30,6 +30,7 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		InitGlobals();
+		gHInstance = (HINSTANCE)hinstDLL;
 #if PATCHIT
 		TrySkipPatch();
 #endif // PATCHIT

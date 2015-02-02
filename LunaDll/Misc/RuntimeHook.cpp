@@ -25,9 +25,32 @@ void (*runAsyncLoggerProc)(void) = 0;
 int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int) = 0;
 void (*asyncLogProc)(const char*) = 0;
 float (*__vbaR4Var)(VARIANTARG*) = 0;
+int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD) = 0;
 
 HMODULE newLauncherLib = 0;
 HMODULE newDebugger = 0;
+HHOOK HookWnd;
+
+LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	if(nCode < 0){
+		return CallNextHookEx(HookWnd, nCode, wParam, lParam);
+	}
+
+	//CWPRETSTRUCT* wData = (CWPRETSTRUCT*)lParam;
+	LPCWPSTRUCT wData = (LPCWPSTRUCT)lParam;
+	if(wData->message == WM_COPYDATA){
+		PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
+		if(pcds->cbData == 1){
+			if(pcds->dwData == 0xDEADC0DE){
+				gHook_SkipTestMsgBox = true;
+				((void(*)())0x00A02220)();
+			}
+		}
+	}
+
+	return CallNextHookEx(HookWnd, nCode, wParam, lParam);
+}
 
 void ParseArgs(const std::vector<std::string>& args)
 {
@@ -72,6 +95,19 @@ void TrySkipPatch()
 
 	__vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
 	*(void**)0x00401124 = (void*)&vbaR4VarHook;
+
+	rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
+	*(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
+
+	HookWnd = SetWindowsHookExA(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
+	if(!HookWnd){
+		DWORD errCode = GetLastError();
+		std::string errCmd = "Failed to Hook";
+		errCmd +="\nErr-Code: ";
+		errCmd += std::to_string((long long)errCode);
+		MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
+	}
+		
 
 	*(void**)0xB2F244 = (void*)&mciSendStringHookA;
 	PATCH_FUNC(0x8D6BB6, &forceTermination);
@@ -283,7 +319,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.5.2 BETA"), 3, 5, 5);
+	Render::Print(std::wstring(L"LUNALUA V0.5.3 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){
@@ -483,5 +519,32 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 		break;
 	}
 	return 0.0;//__vbaR4Var(variant);
+}
+
+extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD arg1, DWORD arg2, DWORD arg3, DWORD arg4)
+{
+	std::wstring msg((wchar_t*)msgText->bstrVal);
+	if(gHook_SkipTestMsgBox){
+		gHook_SkipTestMsgBox = false;
+		if(msg == std::wstring((wchar_t*)0x42BE28))
+			return 7;
+	}
+
+	return rtcMsgBox(msgText, arg1, arg2, arg3, arg4);
+}
+
+
+
+extern void __stdcall doEventsLevelEditorHook()
+{
+	/*void* lvlEditForm = *(void**)(0x00B2D7E8);
+	if(lvlEditForm){
+		char* lvlEditFormVtbl = *(char**)lvlEditForm;
+		((HRESULT (__stdcall*)(void *, void *))*((char**)lvlEditFormVtbl + 58))(lvlEditForm, )
+
+	}*/
+
+	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+	GetProcAddress(vmVB6Lib, "rtcDoEvents")();
 }
 

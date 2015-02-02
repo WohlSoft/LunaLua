@@ -34,12 +34,15 @@ struct startUpSettings{
 	bool newLauncher;
 };
 
+extern HINSTANCE	gHInstance;
+
 /// Global settings
 extern bool		gLunaEnabled;
 extern bool		gShowDemoCounter;
 extern bool		gSkipSMBXHUD;
 extern bool		gPrintErrorsToScreen;
 extern bool		gIsOverworld;
+extern bool		gHook_SkipTestMsgBox;
 extern startUpSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

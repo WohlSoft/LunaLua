@@ -9,6 +9,7 @@
 #include "GlobalFuncs.h"
 #include <cctype>
 
+HINSTANCE gHInstance;
 
 // Global settings
 bool gLunaEnabled;
@@ -16,6 +17,7 @@ bool gShowDemoCounter;
 bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
 bool gPrintErrorsToScreen;
 bool gIsOverworld;
+bool gHook_SkipTestMsgBox;
 
 // Global variables
 int	gFrames;
@@ -116,6 +118,8 @@ void InitGlobals()
 	gStartupSettings.debugger = false;
 	gStartupSettings.logger = false;
 	gStartupSettings.newLauncher = false;
+
+	gHook_SkipTestMsgBox = false;
 
 	srand((int)time(NULL));
 

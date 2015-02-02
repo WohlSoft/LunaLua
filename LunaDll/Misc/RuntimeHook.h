@@ -49,6 +49,10 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);
 //The Converter Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
+//The Messagebox Hook Code
+extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWORD);
+//Reset Level Editor
+extern void __stdcall doEventsLevelEditorHook();
 
 
 //DBG
@@ -67,6 +71,7 @@ extern void (*runAsyncLoggerProc)(void);
 extern void (*asyncLogProc)(const char*);
 //Old procs
 extern float (*__vbaR4Var)(VARIANTARG*);
+extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 
 struct resultStruct{
 	int result;
@@ -74,6 +79,7 @@ struct resultStruct{
 	bool NoSound;
 };
 
+//Windows Hooks
 
 
 
