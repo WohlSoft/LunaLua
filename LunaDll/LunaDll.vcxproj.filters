@@ -273,6 +273,9 @@
     <ClInclude Include="Minigames\GameboyRPG.h">
       <Filter>Header Files\Minigames</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\SHMemServer.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -505,6 +508,9 @@
     </ClCompile>
     <ClCompile Include="HardcodedGraphics\HardocdeGFXMap.cpp">
       <Filter>Header Files\HardcodedGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\SHMemServer.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

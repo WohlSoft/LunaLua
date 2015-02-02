@@ -117,7 +117,8 @@ SOURCES += \
     LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp \
     LunaDll/Minigames/GameboyRPG.cpp \
     LunaDll/Minigames/Minigames.cpp \
-    LunaDll/HardcodedGraphics/HardocdeGFXMap.cpp
+    LunaDll/HardcodedGraphics/HardocdeGFXMap.cpp \
+    LunaDll/Misc/SHMemServer.cpp
 
 
 HEADERS += \
@@ -254,7 +255,11 @@ HEADERS += \
     LunaDll/World/WorldLevel.h \
     LunaDll/HardcodedGraphics/hardcodedgraphicsmanager.h \
     LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h \
-    LunaDll/Minigames/GameboyRPG.h
+    LunaDll/Minigames/GameboyRPG.h \
+    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h \
+    LunaDll/libs/ini-reader/ini.h \
+    LunaDll/libs/ini-reader/INIReader.h \
+    LunaDll/Misc/SHMemServer.h
 
 OTHER_FILES += \
     LunaDll/scratch.txt
