@@ -91,8 +91,81 @@ void HardcodedGraphicsManager::loadGraphics()
         return;
     }
 	
-	std::vector<std::string > list= GraphicsINI.getAllSectionKeys("hex");
+	/*
+	;Note: Mask should be detected automatically (file with m suffix like other stuff)
+	[splash]
+	game=editor_splash.gif
+	editor=big_splash.gif
+	loading=big_splash_loading.gif
+	coin_ani=editor_splash_coin.gif
+	coin_ani=coin.gif
 
+	[title]
+	curtain=curtain.gif
+	www=www.gif
+	title=title.gif
+	selector_red=selector_red.gif
+	selector_green=selector_green.gif
+	scroll_up=scroll_up.gif
+	scroll_down=scroll_down.gif
+	worldmap_back=world_back.gif
+
+	[HUD]
+	itemslot=itemslot.gif
+	itemslot_p1=itemslot_p1.gif
+	itemslot_p2=itemslot_p2.gif
+	heard_on=heart.gif
+	heard_off=heart_n.gif
+	star=stars.gif
+	key=key.gif
+	coin=coins.gif
+	bomb=bombs.gif
+	rupee=emerald.gif
+	1up=1up.gif
+	2up=2up.gif
+
+	[yoshi]
+	tongue=yoshi_tongue.gif
+	tongue_line=yoshi_tongue_line.gif
+	wings=wings.gif
+
+	[shoes]
+	green=boot_green.gif
+	red=boot_red.gif
+	blue=boot_blue.gif
+
+	[clowncar]
+	clowncar=clowncar.gif
+
+	[cursors]
+	white=cursor_white.gif
+	blue=cursor_blue.gif
+	cyan=cursor_cyan.gif
+	gray=cursor_gray.gif
+	green=cursor_green.gif
+	magenta=cursor_magenta.gif
+	violet=cursor_violet.gif
+	red=cursor_red.gif
+	yellow=cursor_yellow.gif
+	rubber=cursor_rubber.gif
+
+	[battle]
+	versus=btl_vs.gif
+	mario=btl_mario.gif
+	luigi=btl_luigi.gif
+	peach=btl_peach.gif
+	toad=btl_toad.gif
+	link=btl_link.gif
+	wins=btl_wins.gif
+
+	[misc]
+	warp_point=warp.gif
+	messagebox=message_box.gif
+	npc_talkable=nps_message.gif
+	*/
+
+	/******************Hex section************************************/
+	std::vector<std::string > list= GraphicsINI.getAllSectionKeys("hex");
 	for(unsigned int i=0; i<list.size(); i++)
 	{
 		bool wrong=false;
@@ -128,5 +201,6 @@ void HardcodedGraphicsManager::loadGraphics()
 		//is a name of image file in the <SMBX>\graphics\common
 		patchGraphics(hexKey, str);
 	}
+	/******************Hex section**end*******************************/
 
 }
