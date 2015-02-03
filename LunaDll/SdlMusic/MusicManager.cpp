@@ -96,6 +96,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 		}
 		else
 		{
+			Mix_VolumeChunk(sound, MIX_MAX_VOLUME);
 			std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 			if(it == chunksBuffer.end())
 			{
