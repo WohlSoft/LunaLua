@@ -18,6 +18,7 @@
 #include "UserSaves/UserSaving.h"
 #include "MciEmulator/mciEmulator.h"
 #include "HardcodedGraphics/HardcodedGraphicsManager.h"
+#include "Misc/SHMemServer.h"
 
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
@@ -89,6 +90,7 @@ extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
+extern SHMemServer			gShMemServer;
 
 /// Functions ///
 void InitGlobals();

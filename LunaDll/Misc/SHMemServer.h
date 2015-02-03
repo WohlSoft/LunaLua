@@ -20,6 +20,4 @@ private:
 	bool isInit;
 };
 
-extern SHMemServer shmem;
-
 #endif // SHMEMSERVER_H

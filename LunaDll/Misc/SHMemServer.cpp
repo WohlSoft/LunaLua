@@ -1,7 +1,5 @@
 #include "SHMemServer.h"
 
-//Workinf shared memory server is here!
-SHMemServer shmem;
 //to read data use the shmem.read(); it will return std::wstring value
 
 SHMemServer::SHMemServer()

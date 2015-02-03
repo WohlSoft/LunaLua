@@ -72,6 +72,8 @@ startUpSettings gStartupSettings;
 
 HardcodedGraphicsManager gGraphManager;
 
+SHMemServer gShMemServer;
+
 /// INIT GLOBALS
 void InitGlobals()
 {

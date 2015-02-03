@@ -8,6 +8,8 @@
 #include "../SdlMusic/MusicManager.h"
 #include "../HardcodedGraphics/HardcodedGraphicsManager.h"
 
+#include "SHMemServer.h"
+
 //std::string utf8_encode(const std::wstring &wstr)
 //{
 //	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
@@ -43,6 +45,10 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 		PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
 		if(pcds->cbData == 1){
 			if(pcds->dwData == 0xDEADC0DE){
+				std::wstring lvlName = gShMemServer.read();
+				if(!lvlName.empty()){
+					GM_FULLPATH = (DWORD)SysAllocString(lvlName.c_str());
+				}
 				gHook_SkipTestMsgBox = true;
 				((void(*)())0x00A02220)();
 			}
@@ -525,11 +531,10 @@ extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD arg1, DWORD arg2, 
 {
 	std::wstring msg((wchar_t*)msgText->bstrVal);
 	if(gHook_SkipTestMsgBox){
-		gHook_SkipTestMsgBox = false;
 		if(msg == std::wstring((wchar_t*)0x42BE28))
 			return 7;
 	}
-
+	gHook_SkipTestMsgBox = false;
 	return rtcMsgBox(msgText, arg1, arg2, arg3, arg4);
 }
 
