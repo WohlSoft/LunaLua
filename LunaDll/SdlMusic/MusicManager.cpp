@@ -144,6 +144,8 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 				std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 				if(it != chunksBuffer.end())
 				{
+					if(chunksBuffer[alias].first != -1)
+						Mix_HaltChannel(chunksBuffer[alias].first);
 					if(Mix_PlayChannel( chunksBuffer[alias].first, chunksBuffer[alias].second, 0 )==-1)
 					{
 						MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
