@@ -205,7 +205,7 @@
     <ClCompile Include="Autocode\AutocodeManager.cpp" />
     <ClCompile Include="Blocks\Blocks.cpp" />
     <ClCompile Include="CellManager\CellManager.cpp" />
-    <ClCompile Include="HardcodedGraphics\HardocdeGFXMap.cpp" />
+    <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBlock.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp" />

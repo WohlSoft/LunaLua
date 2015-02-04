@@ -506,11 +506,11 @@
     <ClCompile Include="Minigames\Minigames.cpp">
       <Filter>Header Files\Minigames</Filter>
     </ClCompile>
-    <ClCompile Include="HardcodedGraphics\HardocdeGFXMap.cpp">
-      <Filter>Header Files\HardcodedGraphics</Filter>
-    </ClCompile>
     <ClCompile Include="Misc\SHMemServer.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp">
+      <Filter>Header Files\HardcodedGraphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
