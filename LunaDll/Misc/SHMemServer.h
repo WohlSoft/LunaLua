@@ -5,7 +5,7 @@
 #include <string>
 
 #define BUF_SIZE 15360
-#define SHMEM_NAME L"Global\\LunaDLL_LevelFileName_834727238"
+#define SHMEM_NAME L"LunaDLL_LevelFileName_834727238"
 
 class SHMemServer
 {
