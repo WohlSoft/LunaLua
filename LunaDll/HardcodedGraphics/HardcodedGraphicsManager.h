@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+class INIReader;
 
 class HardcodedGraphicsManager
 {
@@ -27,7 +28,10 @@ public:
 	static void buildMap();
 
 private:
-	static std::map<unsigned int, int> hardcoded_data_map;
+        static std::map<unsigned int, int> hardcoded_data_map;
+
+        static std::string root;
+        static void loadIniImage(unsigned int hex, unsigned int hex_m, INIReader &ini, std::string sct, std::string value);
 };
 
 #endif

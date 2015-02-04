@@ -10,6 +10,8 @@
 #include "../libs/ini-reader/INIReader.h" //Ini files reader
 
 
+std::string HardcodedGraphicsManager::root="";
+
 HardcodedGraphicsManager::HardcodedGraphicsManager()
 {}
 
@@ -61,6 +63,34 @@ int HardcodedGraphicsManager::patchGraphics(unsigned int offset_i, const char* f
     return -1;
 }
 
+void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m, INIReader &ini, std::string sct, std::string value)
+{
+    std::string imageFile = ini.Get(sct, value, "");
+    if(imageFile.empty()) return;
+    imageFile = root+"graphics\\common\\"+imageFile;
+
+    const char *str = imageFile.c_str();
+
+    //Here we should load file  hexKey - address, imageFile:
+    //is a name of image file in the <SMBX>\graphics\common
+    patchGraphics(hex, str);
+
+    //if mask no used - abort
+    if(hex_m==0) return;
+
+    //get filename of mask
+    for(int i=imageFile.size()-1; i>0; i--)
+        if(imageFile[i]=='.')
+        {
+            imageFile.insert(imageFile.begin()+i, 'm');
+            break;
+        }
+
+    imageFile = root+"graphics\\common\\"+imageFile;
+    const char *str2 = imageFile.c_str();
+    patchGraphics(hex_m, str2);
+}
+
 void HardcodedGraphicsManager::loadGraphics()
 {
 	if(hardcoded_data_map.empty())
@@ -79,7 +109,7 @@ void HardcodedGraphicsManager::loadGraphics()
     }
     std::wstring smbxPath = path;
     smbxPath = smbxPath.append(L"\\");
-    std::string root = wstr2str(smbxPath);
+    root = wstr2str(smbxPath);
 
     std::string ttscrpath=root+"graphics.ini";
 	if( !file_existsX(ttscrpath) ) return;
@@ -91,11 +121,17 @@ void HardcodedGraphicsManager::loadGraphics()
         return;
     }
 	
+    //Splash
+    loadIniImage(0x000ca018, 0 ,GraphicsINI, "splash", "game");
+    loadIniImage(0x00032a21, 0 ,GraphicsINI, "splash", "editor");
+
+    //Title
+    loadIniImage(0x002f460c, 0x002f3a8d, GraphicsINI, "title", "title");
+
+
 	/*
 	;Note: Mask should be detected automatically (file with m suffix like other stuff)
 	[splash]
-	game=editor_splash.gif
-	editor=big_splash.gif
 	loading=big_splash_loading.gif
 	coin_ani=editor_splash_coin.gif
 	coin_ani=coin.gif
