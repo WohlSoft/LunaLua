@@ -67,6 +67,7 @@ void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m
 {
     std::string imageFile = ini.Get(sct, value, "");
     if(imageFile.empty()) return;
+	std::string imageFile_src = imageFile;
     imageFile = root+"graphics\\common\\"+imageFile;
 
     const char *str = imageFile.c_str();
@@ -79,10 +80,11 @@ void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m
     if(hex_m==0) return;
 
     //get filename of mask
+	imageFile = imageFile_src;
     for(int i=imageFile.size()-1; i>0; i--)
         if(imageFile[i]=='.')
         {
-            imageFile.insert(imageFile.begin()+i, 'm');
+            imageFile.insert(i, "m");
             break;
         }
 
