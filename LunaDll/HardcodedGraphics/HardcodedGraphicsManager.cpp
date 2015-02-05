@@ -134,33 +134,32 @@ void HardcodedGraphicsManager::loadGraphics()
 	/*
 	;Note: Mask should be detected automatically (file with m suffix like other stuff)
 	[splash]
-	loading=big_splash_loading.gif
-	coin_ani=editor_splash_coin.gif
-	coin_ani=coin.gif
+	loading=big_splash_loading.gif //000d944b
+	coin_ani=editor_splash_coin.gif//000d9010
+	coin_ani=coin.gif//002dfe6d, 002df9d4
 
 	[title]
-	curtain=curtain.gif
-	www=www.gif
-	title=title.gif
+	curtain=curtain.gif //002f6733, 002e9beb
+	www=www.gif//002f336b,002f2d5a
 	selector_red=selector_red.gif
-	selector_green=selector_green.gif
-	scroll_up=scroll_up.gif
-	scroll_down=scroll_down.gif
+	selector_green=selector_green.gif//002f9742
+	scroll_up=scroll_up.gif//002fb1c1, 002fb568
+	scroll_down=scroll_down.gif//002faa77, 002fae1e
 	worldmap_back=world_back.gif
 
 	[HUD]
 	itemslot=itemslot.gif
 	itemslot_p1=itemslot_p1.gif
 	itemslot_p2=itemslot_p2.gif
-	heard_on=heart.gif
-	heard_off=heart_n.gif
+	heard_on=heart.gif//002fa65e
+	heard_off=heart_n.gif//002fa247
 	star=stars.gif
 	key=key.gif
 	coin=coins.gif
 	bomb=bombs.gif
-	rupee=emerald.gif
+	rupee=emerald.gif//002f8c65, 002f88d4
 	1up=1up.gif
-	2up=2up.gif
+	2up=2up.gif//002f84ed, 002f810a
 
 	[yoshi]
 	tongue=yoshi_tongue.gif
