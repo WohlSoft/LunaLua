@@ -312,7 +312,7 @@ void LuaProxy::MusicVolume(int vlm)
 bool LuaProxy::MusicIsPlaying()
 {
 #ifndef NO_SDL
-    PGE_MusPlayer::MUS_IsPlaying();
+    return PGE_MusPlayer::MUS_IsPlaying();
 #else
     return false;
 #endif
@@ -321,7 +321,7 @@ bool LuaProxy::MusicIsPlaying()
 bool LuaProxy::MusicIsPaused()
 {
 #ifndef NO_SDL
-    PGE_MusPlayer::MUS_IsPaused();
+    return PGE_MusPlayer::MUS_IsPaused();
 #else
     return false;
 #endif
@@ -330,7 +330,7 @@ bool LuaProxy::MusicIsPaused()
 bool LuaProxy::MusicIsFading()
 {
 #ifndef NO_SDL
-    PGE_MusPlayer::MUS_IsFading();
+    return PGE_MusPlayer::MUS_IsFading();
 #else
     return false;
 #endif

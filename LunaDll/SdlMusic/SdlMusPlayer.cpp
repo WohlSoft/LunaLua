@@ -117,15 +117,15 @@ void PGE_MusPlayer::MUS_changeVolume(int vlm)
 
 bool PGE_MusPlayer::MUS_IsPlaying()
 {
-    return (bool)Mix_PlayingMusic();
+    return (Mix_PlayingMusic()==1);
 }
 bool PGE_MusPlayer::MUS_IsPaused()
 {
-    return (bool)Mix_PausedMusic();
+    return (Mix_PausedMusic()==1);
 }
 bool PGE_MusPlayer::MUS_IsFading()
 {
-    return (bool)Mix_FadingMusic();
+    return (Mix_FadingMusic()==1);
 }
 
 
