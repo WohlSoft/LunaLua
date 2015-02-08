@@ -309,6 +309,34 @@ void LuaProxy::MusicVolume(int vlm)
 #endif
 }
 
+bool LuaProxy::MusicIsPlaying()
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::MUS_IsPlaying();
+#else
+    return false;
+#endif
+}
+
+bool LuaProxy::MusicIsPaused()
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::MUS_IsPaused();
+#else
+    return false;
+#endif
+}
+
+bool LuaProxy::MusicIsFading()
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::MUS_IsFading();
+#else
+    return false;
+#endif
+}
+
+
 void LuaProxy::playMusic(int section)
 {
 	SMBXSound::PlayMusic(section);

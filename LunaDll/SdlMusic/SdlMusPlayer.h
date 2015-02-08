@@ -35,6 +35,9 @@ public:
     static int sampleRate();
     static int currentVolume();
 
+    static bool MUS_IsPlaying();
+    static bool MUS_IsPaused();
+    static bool MUS_IsFading();
 private:
     static Mix_Music *play_mus;
     static int volume;

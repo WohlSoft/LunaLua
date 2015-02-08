@@ -44,6 +44,9 @@ namespace LuaProxy {
 	void MusicStop();
 	void MusicStopFadeOut(int ms);
 	void MusicVolume(int vlm);
+    bool MusicIsPlaying();
+    bool MusicIsPaused();
+    bool MusicIsFading();
     void playMusic(int section);
     void loadImage(const char* filename, int resNumber, int transColor);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);

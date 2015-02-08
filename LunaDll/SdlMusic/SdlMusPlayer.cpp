@@ -115,6 +115,21 @@ void PGE_MusPlayer::MUS_changeVolume(int vlm)
     Mix_VolumeMusic(volume);
 }
 
+bool PGE_MusPlayer::MUS_IsPlaying()
+{
+    return (bool)Mix_PlayingMusic();
+}
+bool PGE_MusPlayer::MUS_IsPaused()
+{
+    return (bool)Mix_PausedMusic();
+}
+bool PGE_MusPlayer::MUS_IsFading()
+{
+    return (bool)Mix_FadingMusic();
+}
+
+
+
 void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
 {
     sRate=sampleRate;
