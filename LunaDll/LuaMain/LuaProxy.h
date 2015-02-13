@@ -65,6 +65,8 @@ namespace LuaProxy {
     unsigned short winState();
     void winState(unsigned short value);
     luabind::object animations(lua_State* L);
+	std::string getLevelFilename();
+	std::string getLevelName();
 	//Load hitbox values for playable character
 	void loadHitboxes(int _character, int _powerup, const char *ini_file);
 

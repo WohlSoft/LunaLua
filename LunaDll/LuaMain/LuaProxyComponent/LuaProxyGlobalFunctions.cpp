@@ -581,7 +581,7 @@ luabind::object LuaProxy::levels(lua_State *L)
 {
 	luabind::object vlevels = luabind::newtable(L);
 	for(int i = 0; i < (signed)GM_LEVEL_COUNT; i++) {
-		vlevels[i] = new LuaProxy::LevelObject(i);
+		vlevels[i+1] = new LuaProxy::LevelObject(i);
 	}
 	return vlevels;
 }
@@ -646,4 +646,15 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 	r.right = 0.0;
 	r.top = 0.0;
 	return r;
+}
+
+
+std::string LuaProxy::getLevelFilename()
+{
+	return utf8_encode(std::wstring((wchar_t*)GM_LVLFILENAME_PTR));
+}
+
+std::string LuaProxy::getLevelName()
+{
+	return utf8_encode(std::wstring((wchar_t*)GM_LVLNAME_PTR));
 }

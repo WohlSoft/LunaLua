@@ -69,6 +69,6 @@ void Level::GetBoundary(RECT* rect, int section) {
 }
 
 std::wstring Level::GetName() {
-	if(GM_LVLNAME_PTR == 0) return 0;
-	return std::wstring((wchar_t*)GM_LVLNAME_PTR);
+	if(GM_LVLFILENAME_PTR == 0) return 0;
+	return std::wstring((wchar_t*)GM_LVLFILENAME_PTR);
 }

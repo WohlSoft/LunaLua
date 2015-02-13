@@ -91,7 +91,8 @@ enum PRIORITY {
 
 // Level related memory
 #define GM_LVL_BOUNDARIES	*(DWORD*)0x00B257D4		// 6 doubles each section, L/U/R/D/?/?
-#define GM_LVLNAME_PTR		*(DWORD*)0x00B2C5A4	
+#define GM_LVLFILENAME_PTR	*(DWORD*)0x00B2C5A4		// Lvl filename
+#define GM_LVLNAME_PTR		*(DWORD*)0x00B2D764
 #define GM_FULLPATH			*(DWORD*)0x00B2C618		// Full path to current .lvl file
 #define GM_FULLDIR			*(DWORD*)0x00B2C61C		// Full path to current world dir
 #define GM_CUR_LVL			*(WORD*)0x00B2C6D8
