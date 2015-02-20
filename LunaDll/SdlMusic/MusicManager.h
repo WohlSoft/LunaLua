@@ -5,6 +5,7 @@
 
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include "SdlMusPlayer.h"
@@ -35,8 +36,8 @@ class MusicManager
 		static void loadMusics(std::string path, std::string root);
 		static std::string SndRoot();
 	private:
-		static std::map<std::string, musicFile > registredFiles;
-		static std::map<std::string, chunkFile > chunksBuffer;
+		static std::unordered_map<std::string, musicFile > registredFiles;
+		static std::unordered_map<std::string, chunkFile > chunksBuffer;
 
 		static std::string curRoot;//Current rood directory (episode or application dir)
 
