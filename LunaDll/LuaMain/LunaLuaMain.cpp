@@ -126,16 +126,16 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 		_G["FIELD_DFLOAT"] = 5;
 		_G["FIELD_STRING"] = 6;
 
-		_G["KEY_UP"] = 0;
-		_G["KEY_DOWN"] = 1;
-		_G["KEY_LEFT"] = 2;
-		_G["KEY_RIGHT"] = 3;
-		_G["KEY_JUMP"] = 4;
-		_G["KEY_SPINJUMP"] = 5;
-		_G["KEY_X"] = 6;
-		_G["KEY_RUN"] = 7;
-		_G["KEY_SEL"] = 8;
-		_G["KEY_STR"] = 9;
+		_G["KEY_UP"] = GM_PLAYER_KEY_UP;
+		_G["KEY_DOWN"] = GM_PLAYER_KEY_DOWN;
+		_G["KEY_LEFT"] = GM_PLAYER_KEY_LEFT;
+		_G["KEY_RIGHT"] = GM_PLAYER_KEY_RIGHT;
+		_G["KEY_JUMP"] = GM_PLAYER_KEY_JUMP;
+		_G["KEY_SPINJUMP"] = GM_PLAYER_KEY_SJUMP;
+		_G["KEY_X"] = GM_PLAYER_KEY_X;
+		_G["KEY_RUN"] = GM_PLAYER_KEY_RUN;
+		_G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
+		_G["KEY_STR"] = GM_PLAYER_KEY_STR;
 	}
 
 
@@ -245,10 +245,10 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 
 			class_<LuaProxy::NPC>("NPC")
 			.def(constructor<int>())
-			.def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::NPC::mem))
+			.def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::NPC::mem))
 			.def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::NPC::mem))
-			.def("kill", static_cast<void (LuaProxy::NPC::*)()>(&LuaProxy::NPC::kill))
-			.def("kill", static_cast<void (LuaProxy::NPC::*)(int)>(&LuaProxy::NPC::kill))
+			.def("kill", static_cast<void (LuaProxy::NPC::*)(lua_State*)>(&LuaProxy::NPC::kill))
+			.def("kill", static_cast<void (LuaProxy::NPC::*)(int, lua_State*)>(&LuaProxy::NPC::kill))
 			.property("id", &LuaProxy::NPC::id)
 			.property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
 			.property("x", &LuaProxy::NPC::x, &LuaProxy::NPC::setX)
@@ -263,12 +263,13 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 			.property("msg", &LuaProxy::NPC::msg)
 			.property("layerName", &LuaProxy::NPC::layerName)
 			.property("attachedLayerObj", &LuaProxy::NPC::attachedLayerObj)
-			.property("layerObj", &LuaProxy::NPC::layerObj),
+			.property("layerObj", &LuaProxy::NPC::layerObj)
+			.property("isValid", &LuaProxy::NPC::isValid),
 
 			class_<LuaProxy::Player>("Player")
 			.def(constructor<>())
 			.def(constructor<int>())
-			.def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Player::mem))
+			.def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::Player::mem))
 			.def("mem", static_cast<luabind::object (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Player::mem))
 			.def("kill", &LuaProxy::Player::kill)
 			.def("harm", &LuaProxy::Player::harm)
@@ -693,16 +694,16 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 		_G["FIELD_DFLOAT"] = 5;
 		_G["FIELD_STRING"] = 6;
 
-		_G["KEY_UP"] = 0;
-		_G["KEY_DOWN"] = 1;
-		_G["KEY_LEFT"] = 2;
-		_G["KEY_RIGHT"] = 3;
-		_G["KEY_JUMP"] = 4;
-		_G["KEY_SPINJUMP"] = 5;
-		_G["KEY_X"] = 6;
-		_G["KEY_RUN"] = 7;
-		_G["KEY_SEL"] = 8;
-		_G["KEY_STR"] = 9;
+		_G["KEY_UP"] = GM_PLAYER_KEY_UP;
+		_G["KEY_DOWN"] = GM_PLAYER_KEY_DOWN;
+		_G["KEY_LEFT"] = GM_PLAYER_KEY_LEFT;
+		_G["KEY_RIGHT"] = GM_PLAYER_KEY_RIGHT;
+		_G["KEY_JUMP"] = GM_PLAYER_KEY_JUMP;
+		_G["KEY_SPINJUMP"] = GM_PLAYER_KEY_SJUMP;
+		_G["KEY_X"] = GM_PLAYER_KEY_X;
+		_G["KEY_RUN"] = GM_PLAYER_KEY_RUN;
+		_G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
+		_G["KEY_STR"] = GM_PLAYER_KEY_STR;
 
 		_G["ODIR_UP"] = 1;
 		_G["ODIR_LEFT"] = 2;
@@ -842,5 +843,32 @@ void LunaLua::DoCodeWorldFile(lua_State* L)
 	if(err)
 		TryClose();
 }
+
+/*bool LunaLua::runKeyboardEvent(int keycode, bool isPressed)
+{
+	bool err;
+	if(!mainStateV2)
+		return true;
+
+	try
+	{
+		luabind::object evTable = LuaHelper::getEventCallbase(mainStateV2);
+		luabind::object cl = evTable["onNativeKeyboardUpdate"];
+		luabind::object ret = luabind::call_function<luabind::object>(cl, keycode, isPressed);
+		if(ret.is_valid()){
+			if(luabind::type(ret) == LUA_TBOOLEAN){
+				return luabind::object_cast<bool>(ret);
+			}
+		}
+	}
+	catch (luabind::error& e)
+	{
+		err = true;
+	}
+	if(err)
+		TryClose();
+
+	return true;
+}*/
 
 

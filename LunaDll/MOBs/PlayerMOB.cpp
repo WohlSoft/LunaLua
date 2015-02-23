@@ -5,7 +5,7 @@
 
 // ACCESSORS
 PlayerMOB* Player::Get(int index) {
-	if(index > 255 || index < 0)
+	if(index > GM_PLAYERS_COUNT || index < 0)
 		return 0;
 	return (PlayerMOB*)(GM_PLAYERS_PTR + (0x00000184 * index));
 }

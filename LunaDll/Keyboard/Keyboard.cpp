@@ -28,3 +28,9 @@ void Input::PressUp() {
 
 void Input::PressSJ() {
 }
+
+SMBXNativeKeyboard* Input::getNativeInput()
+{
+	return (SMBXNativeKeyboard*)GM_VKEY_TABLE_PTR;
+}
+

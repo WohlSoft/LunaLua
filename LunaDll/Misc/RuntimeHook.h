@@ -53,6 +53,8 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
 extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWORD);
 //Reset Level Editor
 extern void __stdcall doEventsLevelEditorHook();
+//Keyboard Hook
+//extern short __stdcall GetKeyState(int vKey);
 
 
 //DBG

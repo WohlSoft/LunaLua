@@ -26,6 +26,10 @@ namespace LunaLua{
 	void DoCodeWorldFile(lua_State* L);
     void TryCloseState(lua_State *&L);
     void TryClose();
+	
+	//bool runKeyboardEvent(int keycode, bool isPressed);
+
+
 }
 
 #endif

@@ -33,6 +33,8 @@ HMODULE newLauncherLib = 0;
 HMODULE newDebugger = 0;
 HHOOK HookWnd;
 
+#include <CommCtrl.h>
+
 LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if(nCode < 0){
@@ -41,6 +43,8 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	//CWPRETSTRUCT* wData = (CWPRETSTRUCT*)lParam;
 	LPCWPSTRUCT wData = (LPCWPSTRUCT)lParam;
+	
+
 	if(wData->message == WM_COPYDATA){
 		PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
 		if(pcds->cbData == 1){
@@ -54,6 +58,26 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
+
+	/*if(wData->message == WM_CREATE){
+		wchar_t clName[501];
+		GetClassNameW(wData->hwnd, clName, 500);
+		if(!wcscmp(clName, L"ThunderRT6MDIForm")){
+			TBBUTTON * bnt = new TBBUTTON;
+			bnt->iBitmap = I_IMAGENONE;
+			bnt->idCommand = 1000;
+			bnt->fsState = TBSTATE_ENABLED;
+			bnt->fsStyle = TBSTYLE_AUTOSIZE;
+			bnt->dwData = NULL;
+			char* myText = "Hallo";
+			const int numButtons = 1;
+			TBBUTTON tbButtonsAdd[numButtons] = 
+			{
+				*bnt
+			}; 
+			SendMessage(wData->hwnd, TB_ADDBUTTONS, numButtons, (LPARAM)tbButtonsAdd);
+		}
+	}*/
 
 	return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
@@ -325,7 +349,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.5.3 BETA"), 3, 5, 5);
+	Render::Print(std::wstring(L"LUNALUA V0.5.3.2 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){

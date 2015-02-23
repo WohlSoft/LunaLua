@@ -51,6 +51,17 @@ enum PRIORITY {
 #define GM_FILE_START		0x00400000
 #define FN_OFFSET2ADDR(offs) (void*)(GM_FILE_START + (DWORD)offs)
 
+#define GM_PLAYER_KEY_UP	0
+#define GM_PLAYER_KEY_DOWN	1
+#define GM_PLAYER_KEY_LEFT	2
+#define GM_PLAYER_KEY_RIGHT	3
+#define GM_PLAYER_KEY_JUMP	4
+#define GM_PLAYER_KEY_SJUMP	5
+#define GM_PLAYER_KEY_X		6
+#define GM_PLAYER_KEY_RUN	7
+#define GM_PLAYER_KEY_SEL	8
+#define GM_PLAYER_KEY_STR	9
+
 
 // General
 #define GM_SCRN_HDC			*(DWORD*)0x00B25028
@@ -64,7 +75,7 @@ enum PRIORITY {
 #define GM_NPCS_PTR			*(DWORD*)0x00B259E8	// +0xAD58 + 0x20  to NPCs
 #define GM_NPCS_COUNT		*(WORD*)0x00B2595A 
 #define GM_PLAYERS_PTR		*(DWORD*)0x00B25A20
-#define GM_PLAYERS_COUNT    *(WORD*)0x00B2595E;
+#define GM_PLAYERS_COUNT    *(WORD*)0x00B2595E
 #define GM_EDIT_PLAYERS_PTR *(DWORD*)0x00CF74D8 // Editor Template player
 
 // HUD stuff
