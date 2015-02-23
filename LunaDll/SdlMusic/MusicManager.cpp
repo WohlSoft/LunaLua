@@ -9,8 +9,8 @@
 std::string MusicManager::chunksList[91];
 std::string MusicManager::musList[74];
 
-std::map<std::string, musicFile > MusicManager::registredFiles;
-std::map<std::string, chunkFile > MusicManager::chunksBuffer;
+std::unordered_map<std::string, musicFile > MusicManager::registredFiles;
+std::unordered_map<std::string, chunkFile > MusicManager::chunksBuffer;
 
 std::string MusicManager::defaultSndINI="";
 std::string MusicManager::defaultMusINI="";
@@ -97,7 +97,7 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 		else
 		{
 			Mix_VolumeChunk(sound, MIX_MAX_VOLUME);
-			std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
+			std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 			if(it == chunksBuffer.end())
 			{
 				chunkFile file;
@@ -129,7 +129,7 @@ void MusicManager::close()
 
 void MusicManager::play(std::string alias) //Chunk will be played once, stream will be played with loop
 {
-	std::map<std::string, musicFile>::iterator it = registredFiles.find(alias);
+	std::unordered_map<std::string, musicFile>::iterator it = registredFiles.find(alias);
 		if(it != registredFiles.end())
 		{
 			musicFile file = registredFiles[alias];
@@ -141,13 +141,14 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 			else
 			if(file.first==Chunk)
 			{
-				std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
+				std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 				if(it != chunksBuffer.end())
 				{
 					if(chunksBuffer[alias].first != -1)
 						Mix_HaltChannel(chunksBuffer[alias].first);
-					if(Mix_PlayChannel( chunksBuffer[alias].first, chunksBuffer[alias].second, 0 )==-1)
+					if(Mix_PlayChannelTimed( chunksBuffer[alias].first, chunksBuffer[alias].second, 0, -1 )==-1)
 					{
+						if(std::string(Mix_GetError())!="No free channels available")//Don't show overflow messagebox
 						MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
 					}
 				}
@@ -163,7 +164,7 @@ void MusicManager::pause()
 
 void MusicManager::stop(std::string alias)
 {
-	std::map<std::string, musicFile>::iterator it = registredFiles.find(alias);
+	std::unordered_map<std::string, musicFile>::iterator it = registredFiles.find(alias);
 	if(it != registredFiles.end())
 	{
 		musicFile file = registredFiles[alias];
@@ -174,7 +175,7 @@ void MusicManager::stop(std::string alias)
 		else
 		if(file.first==Chunk)
 		{
-			std::map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
+			std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
 			if(it != chunksBuffer.end())
 			{
 				if(chunksBuffer[alias].first>=0)
