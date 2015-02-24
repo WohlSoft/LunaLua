@@ -152,7 +152,7 @@ luabind::object LuaProxy::npcs(lua_State *L)
 {
 	luabind::object vnpcs = luabind::newtable(L);
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		vnpcs[i] = new LuaProxy::NPC(i);
+		vnpcs[i] = LuaProxy::NPC(i);
 	}
 	return vnpcs;
 }
@@ -450,7 +450,7 @@ luabind::object LuaProxy::blocks(lua_State *L)
 {
 	luabind::object vblocks = luabind::newtable(L);
 	for(int i = 0; i < GM_BLOCK_COUNT; i++) {
-		vblocks[i] = new LuaProxy::Block(i);
+		vblocks[i] = LuaProxy::Block(i);
 	}
 	return vblocks;
 }
@@ -484,7 +484,7 @@ luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
 				continue;
 			std::wstring sourceLayerName(ctrl->ptLayerName);
 			if(tarLayerName == sourceLayerName){
-				return luabind::object(L, new Layer(i));
+				return luabind::object(L, Layer(i));
 			}
 		}
 	}
@@ -510,7 +510,7 @@ luabind::object LuaProxy::animations(lua_State *L)
 {
 	luabind::object vanimations = luabind::newtable(L);
 	for(int i = 0; i < GM_ANIM_COUNT; i++) {
-		vanimations[i] = new LuaProxy::Animation(i);
+		vanimations[i] = LuaProxy::Animation(i);
 	}
 	return vanimations;
 }
@@ -581,7 +581,7 @@ luabind::object LuaProxy::levels(lua_State *L)
 {
 	luabind::object vlevels = luabind::newtable(L);
 	for(int i = 0; i < (signed)GM_LEVEL_COUNT; i++) {
-		vlevels[i+1] = new LuaProxy::LevelObject(i);
+		vlevels[i+1] = LuaProxy::LevelObject(i);
 	}
 	return vlevels;
 }
@@ -601,7 +601,7 @@ luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
 				if(!found)
 					found = true;
 
-				obj[j++] = new LevelObject(i);
+				obj[j++] = LevelObject(i);
 			}
 		}
 	}
@@ -621,7 +621,7 @@ luabind::object LuaProxy::findlevel(std::string toFindName, lua_State* L)
 				continue;
 			std::wstring sourceLevelName(ctrl->levelTitle);
 			if(tarLevelName == sourceLevelName){
-				return luabind::object(L, new LevelObject(i));
+				return luabind::object(L, LevelObject(i));
 			}
 		}
 	}

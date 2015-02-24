@@ -108,7 +108,7 @@ bool LuaProxy::World::playerIsCurrentWalking()
 luabind::object LuaProxy::World::levelTitle(lua_State* L)
 {
 	if(SMBXOverworld::get()->currentLevelTitle[0] && SMBXOverworld::get()->currentLevelTitle != (wchar_t*)0x423D00){
-		return luabind::object(L, new VBStr(SMBXOverworld::get()->currentLevelTitle));
+		return luabind::object(L, VBStr(SMBXOverworld::get()->currentLevelTitle));
 	}
 	return luabind::object();
 }

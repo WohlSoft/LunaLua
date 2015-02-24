@@ -134,7 +134,7 @@ luabind::object LuaProxy::Player::holdingNPC(lua_State *L)
 	if(!isValid_throw(L))
 		return luabind::object();
 	if(::Player::Get(m_index)->HeldNPCIndex != 0) {
-		return luabind::object(L, new NPC(::Player::Get(m_index)->HeldNPCIndex-1));
+		return luabind::object(L, NPC(::Player::Get(m_index)->HeldNPCIndex-1));
 	}
 
 	return luabind::object();
