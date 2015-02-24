@@ -22,7 +22,7 @@ luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lu
 	double val = 0;
 	::Block* pBlock = &::Blocks::GetBase()[m_index];
 	void* ptr = ((&(*(byte*)pBlock)) + offset);
-	if(iftype >= 1 && iftype <= 5){
+	if(iftype >= 1 && iftype <= 6){
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -37,7 +37,7 @@ luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lu
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)ptr));
+		return luabind::object(L, VBStr((wchar_t*)(int)val));
 	default:
 		return luabind::object();
 	}

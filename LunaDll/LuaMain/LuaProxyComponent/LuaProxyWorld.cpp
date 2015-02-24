@@ -41,7 +41,7 @@ luabind::object LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, lua_State* L
 	double val = 0;
 	Overworld* pOverworld = ::SMBXOverworld::get();
 	void* ptr = ((&(*(byte*)pOverworld)) + offset);
-	if(iftype >= 1 && iftype <= 5){
+	if(iftype >= 1 && iftype <= 6){
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -56,7 +56,7 @@ luabind::object LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, lua_State* L
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)ptr));
+		return luabind::object(L, VBStr((wchar_t*)(int)val));
 	default:
 		return luabind::object();
 	}

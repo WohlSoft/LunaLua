@@ -402,6 +402,7 @@ double GetMem(int addr, FIELDTYPE ftype) {
 		return (double)*((byte*)addr);
 	case FT_WORD:
 		return (double)*((short*)addr);
+	case 6: //FIELD_STRING
 	case FT_DWORD:
 		return (double)*((int*)addr);
 	case FT_FLOAT:

@@ -193,7 +193,7 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
 {
 	int iftype = (int)ftype;
 	double val = 0;
-	if(iftype >= 1 && iftype <= 5){
+	if(iftype >= 1 && iftype <= 6){
 		void* ptr = ((&(*(byte*)mem)));
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
@@ -209,7 +209,7 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)mem));
+		return luabind::object(L, VBStr((wchar_t*)(int)val));
 	default:
 		return luabind::object();
 	}

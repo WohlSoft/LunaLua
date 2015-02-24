@@ -23,7 +23,7 @@ luabind::object LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype
 	double val = 0;
 	SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
 	void* ptr = ((&(*(byte*)manimation)) + offset);
-	if(iftype >= 1 && iftype <= 5){
+	if(iftype >= 1 && iftype <= 6){
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -38,7 +38,7 @@ luabind::object LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)ptr));
+		return luabind::object(L, VBStr((wchar_t*)(int)val));
 	default:
 		return luabind::object();
 	}

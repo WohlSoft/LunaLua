@@ -130,7 +130,7 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 	double val = 0;
 	NPCMOB* mnpc = ::NPC::Get(m_index);
 	void* ptr = ((&(*(byte*)mnpc)) + offset);
-	if(iftype >= 1 && iftype <= 5){
+	if(iftype >= 1 && iftype <= 6){
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -145,7 +145,7 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)ptr));
+		return luabind::object(L, VBStr((wchar_t*)(int)val));
 	default:
 		return luabind::object();
 	}
