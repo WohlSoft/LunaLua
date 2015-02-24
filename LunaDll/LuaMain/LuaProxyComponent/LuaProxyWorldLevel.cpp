@@ -20,9 +20,9 @@ luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_St
 {
 	int iftype = (int)ftype;
 	double val = 0;
-	if(iftype >= 1 && iftype <= 5){
-		WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
-		void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
+	void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+		if(iftype >= 1 && iftype <= 5){
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -36,6 +36,8 @@ luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_St
 		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
+	case LFT_STRING:
+		return luabind::object(L, VBStr((wchar_t*)ptr));
 	default:
 		return luabind::object();
 	}
@@ -81,6 +83,6 @@ void LuaProxy::LevelObject::setY(double y)
 LuaProxy::VBStr LuaProxy::LevelObject::levelTitle()
 {
 	if(!isValid())
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 	return VBStr(SMBXLevel::get(m_index)->levelTitle);
 }

@@ -128,9 +128,9 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 
 	int iftype = (int)ftype;
 	double val = 0;
+	NPCMOB* mnpc = ::NPC::Get(m_index);
+	void* ptr = ((&(*(byte*)mnpc)) + offset);
 	if(iftype >= 1 && iftype <= 5){
-		NPCMOB* mnpc = ::NPC::Get(m_index);
-		void* ptr = ((&(*(byte*)mnpc)) + offset);
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -144,6 +144,8 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
+	case LFT_STRING:
+		return luabind::object(L, VBStr((wchar_t*)ptr));
 	default:
 		return luabind::object();
 	}
@@ -152,7 +154,7 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 LuaProxy::VBStr LuaProxy::NPC::attachedLayerName(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)));
@@ -172,7 +174,7 @@ luabind::object LuaProxy::NPC::attachedLayerObj(lua_State *L)
 LuaProxy::VBStr LuaProxy::NPC::activateEventName(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x2C);
@@ -182,7 +184,7 @@ LuaProxy::VBStr LuaProxy::NPC::activateEventName(lua_State* L)
 LuaProxy::VBStr LuaProxy::NPC::deathEventName(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x30);
@@ -192,7 +194,7 @@ LuaProxy::VBStr LuaProxy::NPC::deathEventName(lua_State* L)
 LuaProxy::VBStr LuaProxy::NPC::talkEventName(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x34);
@@ -202,7 +204,7 @@ LuaProxy::VBStr LuaProxy::NPC::talkEventName(lua_State* L)
 LuaProxy::VBStr LuaProxy::NPC::noMoreObjInLayer(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x38);
@@ -212,7 +214,7 @@ LuaProxy::VBStr LuaProxy::NPC::noMoreObjInLayer(lua_State* L)
 LuaProxy::VBStr LuaProxy::NPC::msg(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x4C);
@@ -222,7 +224,7 @@ LuaProxy::VBStr LuaProxy::NPC::msg(lua_State* L)
 LuaProxy::VBStr LuaProxy::NPC::layerName(lua_State* L)
 {
 	if(!isValid_throw(L))
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisnpc)) + 0x3C);

@@ -113,6 +113,7 @@ namespace LuaProxy {
     class VBStr{
     public:
         VBStr (wchar_t* ptr);
+		VBStr (long ptr);
         std::string str() const;
         void setStr(std::string str);
         int length();

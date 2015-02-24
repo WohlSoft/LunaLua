@@ -425,6 +425,7 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 			.property("layerObj", &LuaProxy::Block::layerObj),
 
 			class_<LuaProxy::VBStr>("VBStr")
+			.def(constructor<long>())
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)
@@ -770,6 +771,7 @@ void LunaLua::initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::ws
 			.def("mem", static_cast<luabind::object (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::LevelObject::mem)),
 
 			class_<LuaProxy::VBStr>("VBStr")
+			.def(constructor<long>())
 			.property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)

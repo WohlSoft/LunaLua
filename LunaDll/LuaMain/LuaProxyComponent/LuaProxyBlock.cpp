@@ -20,9 +20,9 @@ luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lu
 {
 	int iftype = (int)ftype;
 	double val = 0;
+	::Block* pBlock = &::Blocks::GetBase()[m_index];
+	void* ptr = ((&(*(byte*)pBlock)) + offset);
 	if(iftype >= 1 && iftype <= 5){
-		::Block* pBlock = &::Blocks::GetBase()[m_index];
-		void* ptr = ((&(*(byte*)pBlock)) + offset);
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -36,6 +36,8 @@ luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lu
 		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
+	case LFT_STRING:
+		return luabind::object(L, VBStr((wchar_t*)ptr));
 	default:
 		return luabind::object();
 	}
@@ -174,7 +176,7 @@ int LuaProxy::Block::collidesWith(LuaProxy::Player *player)
 LuaProxy::VBStr LuaProxy::Block::layerName()
 {
 	if(!isValid())
-		return VBStr(0);
+		return VBStr((wchar_t*)0);
 
 	::Block* thisblock = ::Blocks::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);

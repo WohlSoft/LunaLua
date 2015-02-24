@@ -159,9 +159,9 @@ luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, l
 
 	int iftype = (int)ftype;
 	double val = 0;
+	PlayerMOB* pPlayer = ::Player::Get(m_index);
+	void* ptr = ((&(*(byte*)pPlayer)) + offset);
 	if(iftype >= 1 && iftype <= 5){
-		PlayerMOB* pPlayer = ::Player::Get(m_index);
-		void* ptr = ((&(*(byte*)pPlayer)) + offset);
 		val = GetMem((int)ptr, (FIELDTYPE)ftype);
 	}
 	switch (ftype) {
@@ -175,6 +175,8 @@ luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, l
 		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
 		return luabind::object(L, (double)val);
+	case LFT_STRING:
+		return luabind::object(L, VBStr((wchar_t*)ptr));
 	default:
 		return luabind::object();
 	}

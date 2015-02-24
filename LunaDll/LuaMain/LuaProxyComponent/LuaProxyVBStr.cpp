@@ -7,6 +7,13 @@ LuaProxy::VBStr::VBStr(wchar_t *ptr)
 	m_wcharptr = ptr;
 }
 
+
+LuaProxy::VBStr::VBStr(long ptr)
+{
+	m_wcharptr = (wchar_t*)ptr;
+}
+
+
 std::string LuaProxy::VBStr::str() const
 {
 	if(!isValid())
