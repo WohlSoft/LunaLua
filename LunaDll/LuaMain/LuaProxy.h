@@ -22,18 +22,27 @@ namespace LuaProxy {
 
 	//undocumented
 	std::string getSMBXPath();
-
+	//Debug/Text functions
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
+	//General functions
+	void exitLevel();
+	void npcToCoins();
+	void hud(bool activate);
+	//NPC functions
     int totalNPCs();
     luabind::object npcs(lua_State *L);
     luabind::object findNPCs(int ID, int section, lua_State *L);
+	//Block functions
     luabind::object blocks(lua_State *L);
     luabind::object findblocks(int ID, lua_State *L);
+	//Memory functions
     void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+	//SMBX trigger function
     void triggerEvent(const char* evName);
+	//Music related
     void playSFX(int index);
     void playSFX(const char* filename);
 	void playSFXSDL(const char* filename);
@@ -48,11 +57,13 @@ namespace LuaProxy {
     bool MusicIsPaused();
     bool MusicIsFading();
     void playMusic(int section);
+	//CSprite functions
     void loadImage(const char* filename, int resNumber, int transColor);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
     void placeSprite(int type, int imgResource, int xPos, int yPos);
-    unsigned short gravity();
+    //General global memory
+	unsigned short gravity();
     void gravity(unsigned short value);
     unsigned short earthquake();
     void earthquake(unsigned short value);
@@ -60,13 +71,17 @@ namespace LuaProxy {
     void jumpheight(unsigned short value);
     unsigned short jumpheightBounce();
     void jumpheightBounce(unsigned short value);
-    luabind::object findlayer(const char* layername, lua_State *L);
-    void exitLevel();
-    unsigned short winState();
-    void winState(unsigned short value);
-    luabind::object animations(lua_State* L);
+	unsigned short winState();
+	void winState(unsigned short value);
 	std::string getLevelFilename();
 	std::string getLevelName();
+	//Layer functions
+    luabind::object findlayer(const char* layername, lua_State *L);
+	//Animation functions
+    luabind::object animations(lua_State* L);
+	void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
+	void runAnimation(int id, double x, double y, double height, double width, int extraData);
+	void runAnimation(int id, double x, double y, int extraData);
 	//Load hitbox values for playable character
 	void loadHitboxes(int _character, int _powerup, const char *ini_file);
 
@@ -84,12 +99,9 @@ namespace LuaProxy {
         double XSpeed;
         double YSpeed;
     };
-    void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
-    void runAnimation(int id, double x, double y, double height, double width, int extraData);
-    void runAnimation(int id, double x, double y, int extraData);
+    
 
-    void npcToCoins();
-	void hud(bool activate);
+    
 
 
     namespace SaveBankProxy {
@@ -107,8 +119,7 @@ namespace LuaProxy {
         double bottom;
     };
 
-    RECT newRECT();
-    RECTd newRECTd();
+    
 
     class VBStr{
     public:
@@ -205,6 +216,8 @@ namespace LuaProxy {
         luabind::object layerObj(lua_State *L);
         bool isValid();
 		bool isValid_throw(lua_State *L);
+		//not bound functions
+		void* getNativeAddr();
 	private:
         int m_index;
     };
@@ -560,6 +573,10 @@ namespace LuaProxy {
 		bool isValid();
 		int m_index;
 	};
+	//Non-Member-Constructors:
+	RECT newRECT();
+	RECTd newRECTd();
+	NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
 }
 
 #endif

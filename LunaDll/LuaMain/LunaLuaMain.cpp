@@ -195,6 +195,7 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 			def("hud", &LuaProxy::hud),
 			def("getLevelFilename", &LuaProxy::getLevelFilename),
 			def("getLevelName", &LuaProxy::getLevelName),
+			def("spawnNPC", &LuaProxy::spawnNPC),
 
 			namespace_("UserData")[
 				def("setValue", &LuaProxy::SaveBankProxy::setValue),

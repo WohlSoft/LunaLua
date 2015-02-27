@@ -13,6 +13,7 @@
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
+#include "../../Misc/RuntimeHook.h"
 
 
 void LuaProxy::windowDebug(const char *debugText){
@@ -659,4 +660,66 @@ std::string LuaProxy::getLevelFilename()
 std::string LuaProxy::getLevelName()
 {
 	return utf8_encode(std::wstring((wchar_t*)GM_LVLNAME_PTR));
+}
+
+
+
+LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, lua_State* L)
+{
+
+	if(npcid < 1 || npcid > 292){
+		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", npcid);
+		return LuaProxy::NPC(-1);
+	}
+		
+	if(section < 0 || section > 20){
+		luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", section);
+		return LuaProxy::NPC(-1);
+	}
+		
+	if(GM_NPCS_COUNT >= 5000){
+		luaL_error(L, "Over 5000 NPCs, cannot spawn more!");
+		return LuaProxy::NPC(-1);
+	}
+
+	LuaProxy::NPC theNewNPC(GM_NPCS_COUNT);
+	void* nativeAddr = theNewNPC.getNativeAddr();
+
+
+	memset(nativeAddr, 0, 0x156);
+	WORD* widthArray = (WORD*)GM_CONF_WIDTH;
+	WORD* heightArray = (WORD*)GM_CONF_HEIGHT;
+	WORD* gfxWidthArray = (WORD*)GM_CONF_GFXWIDTH;
+	WORD* gfxHeightArray = (WORD*)GM_CONF_GFXHEIGHT;
+
+	short width = widthArray[npcid];
+	short height = heightArray[npcid];
+	short gfxWidth = gfxWidthArray[npcid];
+	short gfxHeight = gfxHeightArray[npcid];
+
+	gfxWidth = (gfxWidth ? gfxWidth : width);
+	gfxHeight = (gfxHeight ? gfxHeight : height);
+
+	PATCH_OFFSET(nativeAddr, 0x78, double, x);
+	PATCH_OFFSET(nativeAddr, 0x80, double, y);
+	PATCH_OFFSET(nativeAddr, 0x88, double, height);
+	PATCH_OFFSET(nativeAddr, 0x90, double, width);
+	PATCH_OFFSET(nativeAddr, 0x98, double, 0.0);
+	PATCH_OFFSET(nativeAddr, 0xA0, double, 0.0);
+
+	PATCH_OFFSET(nativeAddr, 0xA8, double, x);
+	PATCH_OFFSET(nativeAddr, 0xB0, double, y);
+	PATCH_OFFSET(nativeAddr, 0xB8, double, gfxHeight);
+	PATCH_OFFSET(nativeAddr, 0xC0, double, gfxWidth);
+
+	PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
+	PATCH_OFFSET(nativeAddr, 0xE2, WORD, npcid);
+
+	PATCH_OFFSET(nativeAddr, 0x12A, WORD, 180);
+	PATCH_OFFSET(nativeAddr, 0x124, WORD, -1);
+	PATCH_OFFSET(nativeAddr, 0x146, WORD, section);
+
+	++(GM_NPCS_COUNT);
+
+	return theNewNPC;
 }

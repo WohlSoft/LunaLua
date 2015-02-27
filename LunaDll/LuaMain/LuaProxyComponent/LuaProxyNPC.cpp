@@ -105,7 +105,7 @@ void LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object
 
 void LuaProxy::NPC::kill(lua_State* L)
 {
-	if(isValid_throw(L))
+	if(!isValid_throw(L))
 		return;
 	NPCMOB* mnpc = ::NPC::Get(m_index);
 	void* ptr = ((&(*(byte*)mnpc)) + 290);
@@ -114,7 +114,7 @@ void LuaProxy::NPC::kill(lua_State* L)
 
 void LuaProxy::NPC::kill(int killEffectID, lua_State* L)
 {
-	if(isValid_throw(L))
+	if(!isValid_throw(L))
 		return;
 	NPCMOB* mnpc = ::NPC::Get(m_index);
 	void* ptr = ((&(*(byte*)mnpc)) + 290);
@@ -254,4 +254,9 @@ bool LuaProxy::NPC::isValid_throw(lua_State *L)
 		return false;
 	}
 	return true;
+}
+
+void* LuaProxy::NPC::getNativeAddr()
+{
+	return (void*)::NPC::Get(m_index);
 }

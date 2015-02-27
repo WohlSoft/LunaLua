@@ -17,6 +17,8 @@
 #define PATCH_JMPOLD(ptr, func) *(BYTE*)source = 0xE9;\
 	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
 
+#define PATCH_OFFSET(ptr, offset, type, value) *(type*)((DWORD)ptr + (DWORD)offset) = value
+
 #define COMBOOL(b) (b ? -1 : 0)
 
 
