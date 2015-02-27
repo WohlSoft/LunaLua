@@ -243,7 +243,7 @@ luabind::object LuaProxy::NPC::layerObj(lua_State *L)
 
 bool LuaProxy::NPC::isValid()
 {
-	return !(m_index < 0 || m_index > GM_NPCS_COUNT);
+	return !(m_index < 1 || m_index > GM_NPCS_COUNT);
 }
 
 
