@@ -686,7 +686,7 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 	void* nativeAddr = theNewNPC.getNativeAddr();
 
 
-	memset(nativeAddr, 0, 0x156);
+	memset(nativeAddr, 0, 0x158);
 	WORD* widthArray = (WORD*)GM_CONF_WIDTH;
 	WORD* heightArray = (WORD*)GM_CONF_HEIGHT;
 	WORD* gfxWidthArray = (WORD*)GM_CONF_GFXWIDTH;
