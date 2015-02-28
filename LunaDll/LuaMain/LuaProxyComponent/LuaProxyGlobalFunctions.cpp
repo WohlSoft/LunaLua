@@ -562,17 +562,7 @@ LuaProxy::VBStr LuaProxy::getInput()
 
 std::string LuaProxy::getSMBXPath()
 {
-	HMODULE hModule = GetModuleHandleW(NULL);
-	WCHAR path[MAX_PATH];
-	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-	for(int i = count; i > 3; i--) {
-		if(path[i] == L'\\') {
-			path[i] = 0;
-			break;
-		}
-	}
-
-	return utf8_encode(wstring(path));
+	return utf8_encode(wstring(getModulePath()));
 }
 
 void LuaProxy::hud(bool activate)

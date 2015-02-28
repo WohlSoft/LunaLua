@@ -92,17 +92,7 @@ extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
 
-/// Functions ///
-void InitGlobals();
-void ResetFreeGlob();
-void CleanUp();
 
-/// HELPER FUNCTIONS ///
-std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
-std::vector<std::string> split( std::string str, char delimiter);
-bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
-void resetDefines();
-HMODULE getModule(std::string moduleName);
 
 /// HELPER MACROS ///
 /*

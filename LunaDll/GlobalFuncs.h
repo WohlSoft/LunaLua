@@ -21,4 +21,17 @@ std::string i2str(int source);
 bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 
+/// Functions ///
+void InitGlobals();
+void ResetFreeGlob();
+void CleanUp();
+
+/// HELPER FUNCTIONS ///
+std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
+std::vector<std::string> split( std::string str, char delimiter);
+bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
+void resetDefines();
+HMODULE getModule(std::string moduleName);
+std::wstring getModulePath();
+
 #endif

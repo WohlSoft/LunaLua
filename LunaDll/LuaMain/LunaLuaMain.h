@@ -32,4 +32,14 @@ namespace LunaLua{
 
 }
 
+class CLunaLua
+{
+public:
+	CLunaLua();
+	~CLunaLua();
+protected:
+private:
+	std::string m_main;
+};
+
 #endif

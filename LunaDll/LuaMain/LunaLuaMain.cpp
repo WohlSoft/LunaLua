@@ -491,17 +491,7 @@ void LunaLua::initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring 
 
 void LunaLua::init(wstring main_path)
 {
-    HMODULE hModule = GetModuleHandleW(NULL);
-    WCHAR path[MAX_PATH];
-    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-    for(int i = count; i > 3; i--) {
-        if(path[i] == L'\\') {
-            path[i] = 0;
-            break;
-        }
-    }
-
-	wstring lapi = path;
+	wstring lapi = getModulePath();
     lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
 
 	initCodeFiles(mainStateV2, main_path, lapi);
@@ -606,17 +596,8 @@ void LunaLua::TryClose()
 
 void LunaLua::initWorld(std::wstring main_path)
 {
-	HMODULE hModule = GetModuleHandleW(NULL);
-	WCHAR path[MAX_PATH];
-	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-	for(int i = count; i > 3; i--) {
-		if(path[i] == L'\\') {
-			path[i] = 0;
-			break;
-		}
-	}
 
-	wstring lapi = path;
+	wstring lapi = getModulePath();
 	lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
 
 	initCodeFileWorld(mainStateV2, main_path, lapi);

@@ -98,18 +98,7 @@ void HardcodedGraphicsManager::loadGraphics()
 	if(hardcoded_data_map.empty())
 		buildMap();
 
-    HMODULE hModule = GetModuleHandleW(NULL);
-    WCHAR path[MAX_PATH];
-    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-    for(int i = count; i > 3; i--)
-    {
-        if(path[i] == L'\\')
-        {
-            path[i] = 0;
-            break;
-        }
-    }
-    std::wstring smbxPath = path;
+    std::wstring smbxPath = getModulePath();
     smbxPath = smbxPath.append(L"\\");
     root = wstr2str(smbxPath);
 

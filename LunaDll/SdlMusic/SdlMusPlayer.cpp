@@ -16,18 +16,7 @@ void PGE_SDL_Manager::initSDL()
 		PGE_MusPlayer::setSampleRate(44100);
 		PGE_MusPlayer::MUS_changeVolume(80);
 
-		HMODULE hModule = GetModuleHandleW(NULL);
-		WCHAR path[MAX_PATH];
-		int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-		for(int i = count; i > 3; i--)
-		{
-			if(path[i] == L'\\')
-			{
-				path[i] = 0;
-				break;
-			}
-		}
-		std::wstring smbxPath = path;
+		std::wstring smbxPath = getModulePath();
 		smbxPath = smbxPath.append(L"\\");
 		appPath = wstr2str(smbxPath);
 	}
