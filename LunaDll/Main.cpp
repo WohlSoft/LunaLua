@@ -98,7 +98,8 @@ int OnLvlLoad() {
 		gSavedVarBank.CheckSaveDeletion();
 		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-        LunaLua::init(std::wstring((wchar_t*)GM_FULLDIR));
+		gLunaLua = CLunaLua();
+		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, std::wstring((wchar_t*)GM_FULLDIR), Level::GetName());
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init
@@ -134,7 +135,7 @@ int TestFunc()
 
 
 	if(gLunaEnabled) {	
-        LunaLua::Do();
+		gLunaLua.doEvents();
 
 		// Run autocode
 		gAutoMan.DoEvents(false);

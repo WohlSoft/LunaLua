@@ -371,3 +371,17 @@ std::wstring getModulePath()
 	}
 	return std::wstring(path);
 }
+
+bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
+{
+	wifstream theFile(path, ios::binary|ios::in);
+	if(!theFile.is_open()){
+		theFile.close();
+		if(!errMsg.empty())
+			MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
+		return false;
+	}
+
+	content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
+	return true;
+}

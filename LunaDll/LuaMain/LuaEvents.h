@@ -35,15 +35,17 @@ namespace LuaEvents {
     static LuaEventData evPlayer1;
     static LuaEventData evPlayer2;
 
+	void resetToDefaults();
+
     LuaEventData* getEvData(int playerIndex);
 
     char pressTest(short oldp, short newp);
-    void processKeyboardEvent(short oldp, short newp, int index, int playerIndex, lua_State *L);
-    void processKeyboardEvents(lua_State *L);
-    void processJumpEvent(lua_State *L);
-    void processSectionEvents(lua_State *L);
-    void proccesEvents(lua_State *L);
-	void processSMBXEvents(lua_State *L);
+    void processKeyboardEvent(short oldp, short newp, int index, int playerIndex, lua_State *L, std::string eventTable);
+    void processKeyboardEvents(lua_State *L, std::string eventTable);
+    void processJumpEvent(lua_State *L, std::string eventTable);
+    void processSectionEvents(lua_State *L, std::string eventTable);
+    void proccesEvents(lua_State *L, std::string eventTable);
+	void processSMBXEvents(lua_State *L, std::string eventTable);
     void finishEventHandling();
 }
 

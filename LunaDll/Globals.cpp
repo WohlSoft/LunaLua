@@ -73,3 +73,5 @@ startUpSettings gStartupSettings;
 HardcodedGraphicsManager gGraphManager;
 
 SHMemServer gShMemServer;
+
+CLunaLua gLunaLua;

@@ -9,37 +9,43 @@
 #include <luabind/detail/call_function.hpp>
 #include <luabind/operator.hpp>
 
-namespace LunaLua{
-    struct lapiData{
-        std::string lapiEventTable;
-    };
-
-    extern std::map<lua_State*, lapiData> extraLapiData;
-	static lua_State* mainStateV2 = 0;
-	void initCodeFiles(lua_State* &L, std::wstring levelPath, std::wstring lapi_path);
-	void initCodeFileWorld(lua_State* &L, std::wstring episodePath, std::wstring lapi_path);
-    void init(std::wstring main_path);
-	void initWorld(std::wstring main_path);
-    void DoCodeFile(lua_State* L);
-    void Do();
-	void DoWorld();
-	void DoCodeWorldFile(lua_State* L);
-    void TryCloseState(lua_State *&L);
-    void TryClose();
-	
-	//bool runKeyboardEvent(int keycode, bool isPressed);
-
-
-}
-
 class CLunaLua
 {
 public:
+	static const std::wstring LuaLibsPath;
+	static std::wstring getLuaLibsPath();
+	//Construct a new LunaLua Object
 	CLunaLua();
+	//Destructs a LunaLua Object and shutdown the engine if needed.
 	~CLunaLua();
-protected:
+
+	//The Codefile type
+	enum LuaLunaType {
+		LUNALUA_LEVEL,
+		LUNALUA_WORLD
+	};
+
+	
+
+	//Init a lua code file
+	void init(LuaLunaType type, std::wstring codePath, std::wstring levelPath = std::wstring());
+	//Does the event queue
+	void doEvents();
+	//Shutdown lua module
+	bool shutdown();
+	//If the lua module is valid
+	bool isValid(){return L != 0;}
+
 private:
-	std::string m_main;
+	LuaLunaType m_type;
+	std::string m_luaEventTableName;
+
+
+	//private init functions
+	void bindAll();
+	void setupDefaults();
+
+	lua_State *L;
 };
 
 #endif

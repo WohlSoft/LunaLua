@@ -302,7 +302,8 @@ extern int LoadWorld()
 	gSavedVarBank.CheckSaveDeletion();
 	gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-	LunaLua::initWorld(std::wstring((wchar_t*)GM_FULLDIR));
+	gLunaLua = CLunaLua();
+	gLunaLua.init(CLunaLua::LUNALUA_WORLD, std::wstring((wchar_t*)GM_FULLDIR));
 
 	// Recount deaths
 	gDeathCounter.Recount();
@@ -331,7 +332,7 @@ extern DWORD WorldLoop()
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
 
-	LunaLua::DoWorld();
+	gLunaLua.doEvents();
 
 	gSavedVarBank.SaveIfNeeded();
 
@@ -349,7 +350,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.5.4 BETA"), 3, 5, 5);
+	Render::Print(std::wstring(L"LUNALUA V0.5.5 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){

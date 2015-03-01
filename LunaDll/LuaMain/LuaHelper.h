@@ -9,7 +9,7 @@
 #include <luabind/detail/call_function.hpp>
 
 namespace LuaHelper {
-    luabind::object getEventCallbase(lua_State* base);
+    luabind::object getEventCallbase(lua_State* base, std::string eventTable);
     bool is_function(struct lua_State * luaState, const char * fname);
 }
 

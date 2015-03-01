@@ -1,12 +1,10 @@
 #include "LuaHelper.h"
-
 #include "LunaLuaMain.h"
 
-luabind::object LuaHelper::getEventCallbase(lua_State *base)
+luabind::object LuaHelper::getEventCallbase(lua_State *base, std::string eventTable)
 {
-    luabind::object _G = luabind::globals(base);
-    std::string strEventTable = LunaLua::extraLapiData[base].lapiEventTable;
-    return _G[strEventTable.c_str()];
+	luabind::object _G = luabind::globals(base);
+    return _G[eventTable.c_str()];
 }
 
 

@@ -19,6 +19,7 @@
 #include "MciEmulator/mciEmulator.h"
 #include "HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "Misc/SHMemServer.h"
+#include "LuaMain/LunaLuaMain.h"
 
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
@@ -91,6 +92,8 @@ extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
+
+extern CLunaLua				gLunaLua;
 
 
 
