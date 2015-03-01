@@ -57,7 +57,8 @@ extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWO
 extern void __stdcall doEventsLevelEditorHook();
 //Keyboard Hook
 //extern short __stdcall GetKeyState(int vKey);
-
+//TriggerSMBXEvent cmp function
+extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 
 //DBG
 extern long long dbglongTest;

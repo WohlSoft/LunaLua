@@ -22,21 +22,19 @@ Logger::Logger() {
 }
 
 Logger::~Logger() {
-	if(m_File != NULL) {
-		if(m_File.is_open() && m_Enabled) {
-			m_File << L"**** Logger ended at ";
-			WriteDateTime(&m_File);
-			m_File << endl << endl;
-		}
-		m_File.flush();
-		m_File.close();
+	if (m_File.is_open() && m_Enabled) {
+		m_File << L"**** Logger ended at ";
+		WriteDateTime(&m_File);
+		m_File << endl << endl;
 	}
+	m_File.flush();
+	m_File.close();
 }
 
 // NEW SESSION
 void Logger::NewSession() {
 	if(m_Enabled) {
-		if(m_File != NULL && m_File.is_open()) {
+		if(m_File.is_open()) {
 			m_File << L"**** New session started at ";
 			WriteDateTime(&m_File);
 			m_File << endl;
@@ -58,7 +56,7 @@ void Logger::WriteDateTime(wofstream* file) {
 // LOG
 void Logger::Log(wstring msg, LOGOPTS options) {
 	if(m_Enabled) {
-		if(m_File != NULL && m_File.is_open()) {
+		if(m_File.is_open()) {
 
             if((options && LOG_DateTime) || (options && LOG_STD)) {
 				m_File << L"[";

@@ -578,3 +578,15 @@ extern void __stdcall doEventsLevelEditorHook()
 	GetProcAddress(vmVB6Lib, "rtcDoEvents")();
 }
 
+
+extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
+{
+	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+	if(vmVB6Lib){
+		int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))GetProcAddress(vmVB6Lib, "__vbaStrCmp");
+
+		return origCmp(nullStr, eventName);
+	}
+	return 0;
+}
+
