@@ -2,12 +2,9 @@
 #ifndef LunaLuaMain_____hhhhhh
 #define LunaLuaMain_____hhhhhh
 
-#include <lua.hpp>
-#include <luabind/luabind.hpp>
-#include <luabind/function.hpp>
-#include <luabind/class.hpp>
-#include <luabind/detail/call_function.hpp>
-#include <luabind/operator.hpp>
+#include "LuabindIncludes.h"
+#include "LuaSharedProxy.h"
+#include "LuaHelper.h"
 
 class CLunaLua
 {
@@ -36,10 +33,34 @@ public:
 	//If the lua module is valid
 	bool isValid(){return L != 0;}
 
+	template<typename... Args>
+	void callEvent(Event* e, Args... args){
+		if (!isValid())
+			return;
+
+		if (!Player::Get(1)){
+			shutdown();
+			return;
+		}
+
+		bool err = false;
+		try
+		{
+			luabind::object evTable = LuaHelper::getEventCallbase(L, m_luaEventTableName);
+			luabind::object cl = evTable[e->eventName()];
+			luabind::call_function<void>(cl, e, args...);
+		}
+		catch (luabind::error& /*e*/)
+		{
+			err = true;
+		}
+		if (err)
+			shutdown();
+	}
+
 private:
 	LuaLunaType m_type;
 	std::string m_luaEventTableName;
-
 
 	//private init functions
 	void bindAll();
@@ -47,5 +68,6 @@ private:
 
 	lua_State *L;
 };
+
 
 #endif

@@ -276,6 +276,12 @@
     <ClInclude Include="Misc\SHMemServer.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LuabindIncludes.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaMain\LuaSharedProxy.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -514,6 +520,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeKeyboard.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaSharedProxy.cpp">
+      <Filter>Header Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

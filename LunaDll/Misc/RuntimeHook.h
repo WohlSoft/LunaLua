@@ -8,18 +8,19 @@
 #pragma comment(lib, "comsuppw.lib")
 #endif
 
+
+/************************************************************************/
+/* Macros                                                               */
+/************************************************************************/
 #define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
 	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-
 #define PATCH_JMP(ptr, func) *(BYTE*)ptr = 0xE9;\
 	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-
 #define PATCH_JMPOLD(ptr, func) *(BYTE*)source = 0xE9;\
 	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
-
 #define PATCH_OFFSET(ptr, offset, type, value) *(type*)((DWORD)ptr + (DWORD)offset) = value
-
 #define COMBOOL(b) (b ? -1 : 0)
+#define INSTR_NOP 0x90
 
 
 
@@ -27,13 +28,15 @@
 extern bool episodeStarted;
 #endif
 
-
+/************************************************************************/
+/* Runtime Patch Main Functions                                         */
+/************************************************************************/
 void ParseArgs(const std::vector<std::string>& args);
-
 void TrySkipPatch();
 
-//Hooks
-
+/************************************************************************/
+/* Hooks                                                                */
+/************************************************************************/
 //The Init Hook will be run when "--patch" is executed.
 extern void InitHook();
 //Force Termination when SMBX runs the end code.
@@ -60,23 +63,19 @@ extern void __stdcall doEventsLevelEditorHook();
 //TriggerSMBXEvent cmp function
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 
-//DBG
-extern long long dbglongTest;
-
-//Libs
+/************************************************************************/
+/* Libs                                                                 */
+/************************************************************************/
 extern HMODULE newLauncherLib;
-
-
 extern HMODULE newDebugger;
 
-//DBG Procs
+/************************************************************************/
+/* Debugg Procs                                                         */
+/************************************************************************/
 extern void (*runAsyncDebuggerProc)(void);
 extern int (*asyncBitBltProc)(HDC, int, int, int, int, HDC, int, int, unsigned int);
 extern void (*runAsyncLoggerProc)(void);
 extern void (*asyncLogProc)(const char*);
-//Old procs
-extern float (*__vbaR4Var)(VARIANTARG*);
-extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 
 struct resultStruct{
 	int result;
@@ -84,7 +83,16 @@ struct resultStruct{
 	bool NoSound;
 };
 
-//Windows Hooks
+/************************************************************************/
+/* Old (VB6) Procs                                                      */
+/************************************************************************/
+extern float (*__vbaR4Var)(VARIANTARG*);
+extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
+
+
+
+//Fixup errors
+void fixup_TypeMismatch13();
 
 
 

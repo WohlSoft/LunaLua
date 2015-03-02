@@ -235,6 +235,11 @@ void CLunaLua::bindAll()
 			.def_readwrite("right", &LuaProxy::RECTd::right)
 			.def_readwrite("bottom", &LuaProxy::RECTd::bottom),
 
+			class_<Event>("Event")
+			.property("eventName", &Event::eventName)
+			.property("cancleable", &Event::isCancleable)
+			.property("cancled", &Event::cancled, &Event::setCancled),
+
 			def("newRECT", &LuaProxy::newRECT),
 			def("newRECTd", &LuaProxy::newRECTd),
 
@@ -558,4 +563,5 @@ void CLunaLua::doEvents()
 	if(m_type == LUNALUA_LEVEL)
 		LuaEvents::finishEventHandling();
 }
+
 

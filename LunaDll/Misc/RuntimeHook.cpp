@@ -112,23 +112,28 @@ void ParseArgs(const std::vector<std::string>& args)
 
 void TrySkipPatch()
 {
+	//Check for arguments and write them in gStartupSettings
 	ParseArgs(splitCmdArgs(std::string(GetCommandLineA())));
 
 	if(gStartupSettings.patch){
-		memset((void*)0x8BECF2, 0x90, 0x1B5); //nop out the loader code
+		memset((void*)0x8BECF2, INSTR_NOP, 0x1B5); //nop out the loader code
 		*(WORD*)(0xB25046) = -1; //set run to true
 		
 		PATCH_FUNC(0x8BED00, &InitHook);
 	}
-
+	//Load graphics from the HardcodedGraphicsManager
 	HardcodedGraphicsManager::loadGraphics();
 
-	__vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
-	*(void**)0x00401124 = (void*)&vbaR4VarHook;
+	/************************************************************************/
+	/* Simple ASM Source Patches                                            */
+	/************************************************************************/
+	fixup_TypeMismatch13();
 
-	rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
-	*(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
 
+
+	/************************************************************************/
+	/* Set Hook                                                             */
+	/************************************************************************/
 	HookWnd = SetWindowsHookExA(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
 	if(!HookWnd){
 		DWORD errCode = GetLastError();
@@ -138,62 +143,29 @@ void TrySkipPatch()
 		MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
 	}
 		
-
+	/************************************************************************/
+	/* Source Code Function Patch                                           */
+	/************************************************************************/
 	*(void**)0xB2F244 = (void*)&mciSendStringHookA;
 	PATCH_FUNC(0x8D6BB6, &forceTermination);
 	PATCH_FUNC(0x8C11D5, &LoadWorld);
 	PATCH_FUNC(0x8C16F7, &WorldLoop);
 	PATCH_FUNC(0x932353, &printLunaLuaVersion);
 	PATCH_FUNC(0x9090F5, &WorldRender);
+	PATCH_FUNC(0xAA4352, &__vbaStrCmp_TriggerSMBXEventHook);
+	*(BYTE*)(0xAA4357) = INSTR_NOP;
+
+	/************************************************************************/
+	/* Import Table Patch                                                   */
+	/************************************************************************/
+	__vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
+	*(void**)0x00401124 = (void*)&vbaR4VarHook;
+	rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
+	*(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
 }
 
 extern void InitHook()
 {
-	// I still provide this code as a attempt to patch the conversion of string to float.
-	// Unfortunatly I made me too much work and now I just patched the import table with my new code.
-	// If someone wants to use it to get better understanding to ASM here you are:
-	
-	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
-	if(vmVB6Lib){
-		//Get the function conversion code;
-		BYTE* baseAddr = (BYTE*)GetProcAddress(vmVB6Lib, "__vbaR8Str");
-		//Go to the function call asm to find out the address of the function that returns local language id 
-		BYTE* funcAddrASM = baseAddr + 11;
-		//Now get the relative address of this function
-		DWORD relAddr = *((DWORD*)(funcAddrASM + 1));
-		//Convert the relative address to an absolute address
-		DWORD targetAddr = relAddr + (DWORD)funcAddrASM + 5;
-		//Now get the pointer of the code
-		BYTE* targetAddrBYTE = (BYTE*)targetAddr;
-
-		// Normally this function would call another function called GetUserDefaultLCID.
-		// In this case we overwrite the function and directly copy the return address to 0
-		// After this code vb6 will think that this system has no language installed and
-		// uses 1033 (US Code Page) as default. Now vb6 will always use "." as comma!
-		DWORD oldprotect; 
-		// Now remove the protection to write to the code
-		if(VirtualProtect((void*)targetAddrBYTE, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
-			targetAddrBYTE[0] = 0xB8; //MOV EAX, 0
-			targetAddrBYTE[1] = 0x00;
-			targetAddrBYTE[2] = 0x00;
-			targetAddrBYTE[3] = 0x00;
-			targetAddrBYTE[4] = 0x00;
-			targetAddrBYTE[5] = 0x90; //NOP
-			// Now get the protection back
-			VirtualProtect((void*)targetAddrBYTE, 10, oldprotect, &oldprotect);
-		}
-
-		/*std::string output = "";
-		output += std::to_string((long long)targetAddrBYTE[0]) + " ";
-		output += std::to_string((long long)targetAddrBYTE[1]) + " ";
-		output += std::to_string((long long)targetAddrBYTE[2]) + " ";
-		output += std::to_string((long long)targetAddrBYTE[3]) + " ";
-		output += std::to_string((long long)targetAddrBYTE[4]) + " ";
-		output += std::to_string((long long)targetAddrBYTE[5]) + " ";
-
-		MessageBoxA(NULL, output.c_str(), "Dbg", NULL);*/
-	}
-	
 	if(gStartupSettings.newLauncher){
 		typedef bool (*RunProc)(void);
 		typedef void (*GetPromptResultProc)(void*);
@@ -267,8 +239,6 @@ extern void InitHook()
 	exitCall = (void(*)(void))0x8D6BB0;
 	exitCall();*/
 }
-
-long long dbglongTest = 0;
 
 extern void forceTermination()
 {
@@ -584,9 +554,62 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
 	if(vmVB6Lib){
 		int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))GetProcAddress(vmVB6Lib, "__vbaStrCmp");
-
+		Event TriggerEventData("onTriggerEvent", true);
+		gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
+		if (TriggerEventData.native_cancled())
+			return 0;
 		return origCmp(nullStr, eventName);
+		
 	}
 	return 0;
 }
+
+void fixup_TypeMismatch13()
+{
+	// I still provide this code as a attempt to patch the conversion of string to float.
+	// Unfortunatly I made me too much work and now I just patched the import table with my new code.
+	// If someone wants to use it to get better understanding to ASM here you are:
+
+	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+	if (vmVB6Lib){
+		//Get the function conversion code;
+		BYTE* baseAddr = (BYTE*)GetProcAddress(vmVB6Lib, "__vbaR8Str");
+		//Go to the function call asm to find out the address of the function that returns local language id 
+		BYTE* funcAddrASM = baseAddr + 11;
+		//Now get the relative address of this function
+		DWORD relAddr = *((DWORD*)(funcAddrASM + 1));
+		//Convert the relative address to an absolute address
+		DWORD targetAddr = relAddr + (DWORD)funcAddrASM + 5;
+		//Now get the pointer of the code
+		BYTE* targetAddrBYTE = (BYTE*)targetAddr;
+
+		// Normally this function would call another function called GetUserDefaultLCID.
+		// In this case we overwrite the function and directly copy the return address to 0
+		// After this code vb6 will think that this system has no language installed and
+		// uses 1033 (US Code Page) as default. Now vb6 will always use "." as comma!
+		DWORD oldprotect;
+		// Now remove the protection to write to the code
+		if (VirtualProtect((void*)targetAddrBYTE, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
+			targetAddrBYTE[0] = 0xB8; //MOV EAX, 0
+			targetAddrBYTE[1] = 0x00;
+			targetAddrBYTE[2] = 0x00;
+			targetAddrBYTE[3] = 0x00;
+			targetAddrBYTE[4] = 0x00;
+			targetAddrBYTE[5] = 0x90; //NOP
+			// Now get the protection back
+			VirtualProtect((void*)targetAddrBYTE, 10, oldprotect, &oldprotect);
+		}
+
+		/*std::string output = "";
+		output += std::to_string((long long)targetAddrBYTE[0]) + " ";
+		output += std::to_string((long long)targetAddrBYTE[1]) + " ";
+		output += std::to_string((long long)targetAddrBYTE[2]) + " ";
+		output += std::to_string((long long)targetAddrBYTE[3]) + " ";
+		output += std::to_string((long long)targetAddrBYTE[4]) + " ";
+		output += std::to_string((long long)targetAddrBYTE[5]) + " ";
+
+		MessageBoxA(NULL, output.c_str(), "Dbg", NULL);*/
+	}
+}
+
 

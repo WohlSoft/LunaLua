@@ -148,6 +148,8 @@
     <ClInclude Include="Autocode\AutocodeManager.h" />
     <ClInclude Include="Blocks\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
+    <ClInclude Include="LuaMain\LuabindIncludes.h" />
+    <ClInclude Include="LuaMain\LuaSharedProxy.h" />
     <ClInclude Include="Minigames\CGUI\CGUI.h" />
     <ClInclude Include="CustomSprites\CSprite.h" />
     <ClInclude Include="CustomSprites\CSpriteManager.h" />
@@ -218,6 +220,7 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyVBStr.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorld.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorldLevel.cpp" />
+    <ClCompile Include="LuaMain\LuaSharedProxy.cpp" />
     <ClCompile Include="Minigames\CGUI\CGUIContainer.cpp" />
     <ClCompile Include="CustomSprites\CSprite.cpp" />
     <ClCompile Include="CustomSprites\CSpriteManager.cpp" />
