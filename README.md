@@ -9,12 +9,10 @@ Also it fully replacing SMBX's audio engine with better and more flexible SDL2_m
 
 
 =======
-Build in the Microsoft Visual Studio 2010
+Build in the Microsoft Visual Studio 2013
 
 Also you need download:
 - Boost http://www.boost.org/
 - Lua for Windows https://code.google.com/p/luaforwindows/
-
-Before build, you need unpack the Boost archive and copy "boost" directory into %ProgramFiles%\Microsoft Visual Studio 10.0\VC\include
 
 Note: recommended version of boost is 1.56. When you will install 1.57, you will have some compilation issues.
