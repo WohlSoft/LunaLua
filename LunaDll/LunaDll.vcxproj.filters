@@ -524,6 +524,9 @@
     <ClCompile Include="LuaMain\LuaSharedProxy.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyData.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

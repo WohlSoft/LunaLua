@@ -240,6 +240,28 @@ void CLunaLua::bindAll()
 			.property("cancleable", &Event::isCancleable)
 			.property("cancled", &Event::cancled, &Event::setCancled),
 
+			class_<LuaProxy::Data>("Data")
+				.enum_("DataTypes")
+				[
+					value("DATA_LEVEL", LuaProxy::Data::DATA_LEVEL),
+					value("DATA_WORLD", LuaProxy::Data::DATA_WORLD),
+					value("DATA_GLOBAL", LuaProxy::Data::DATA_GLOBAL)
+				]
+			.def(constructor<LuaProxy::Data::DataType>())
+			.def(constructor<LuaProxy::Data::DataType, std::string>())
+			.def(constructor<LuaProxy::Data::DataType, bool>())
+			.def(constructor<LuaProxy::Data::DataType, std::string, bool>())
+			.def("set", &LuaProxy::Data::set)
+			.def("get", static_cast<std::string(LuaProxy::Data::*)(std::string)>(&LuaProxy::Data::get))
+			.def("get", static_cast<luabind::object(LuaProxy::Data::*)(lua_State*)>(&LuaProxy::Data::get))
+			.def("save", static_cast<void(LuaProxy::Data::*)()>(&LuaProxy::Data::save))
+			.def("save", static_cast<void(LuaProxy::Data::*)(std::string)>(&LuaProxy::Data::save))
+			.property("dataType", &LuaProxy::Data::dataType, &LuaProxy::Data::setDataType)
+			.property("sectionName", &LuaProxy::Data::sectionName, &LuaProxy::Data::setSectionName)
+			.property("useSaveSlot", &LuaProxy::Data::useSaveSlot, &LuaProxy::Data::setUseSaveSlot),
+
+			
+
 			def("newRECT", &LuaProxy::newRECT),
 			def("newRECTd", &LuaProxy::newRECTd),
 

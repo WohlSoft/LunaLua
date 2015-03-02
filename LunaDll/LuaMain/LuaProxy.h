@@ -112,6 +112,48 @@ namespace LuaProxy {
         void save();
     }
 
+	class Data {
+	public:
+		enum DataType{
+			DATA_LEVEL,
+			DATA_WORLD,
+			DATA_GLOBAL
+		};
+		Data(DataType dataType);
+		Data(DataType dataType, bool useSaveSlot);
+
+		Data(DataType dataType, std::string sectionName);
+		Data(DataType dataType, std::string sectionName, bool useSaveSlot);
+
+		~Data();
+
+		void set(std::string key, std::string value);
+		std::string get(std::string key);
+		luabind::object get(lua_State* L);
+
+		void save();
+		void save(std::string sectionName);
+
+		DataType dataType();
+		void setDataType(DataType dataType);
+
+		std::string sectionName();
+		void setSectionName(std::string sectionName);
+
+		bool useSaveSlot();
+		void setUseSaveSlot(bool useSaveSlot);
+
+	private:
+		DataType m_dataType;
+		std::string m_sectionName;
+		std::map<std::string, std::string> m_data;
+		bool m_useSaveSlot;
+
+		void init();
+		std::string resolvePathFromSection();
+
+	};
+
     struct RECTd{
         double left;
         double top;

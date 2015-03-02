@@ -210,6 +210,7 @@
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBlock.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyData.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLayer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeKeyboard.cpp" />

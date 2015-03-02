@@ -58,6 +58,12 @@ std::wstring removeExtension(const std::wstring filename) {
     return filename.substr(0, lastdot); 
 }
 
+std::string removeExtension(const std::string filename) {
+	size_t lastdot = filename.find_first_of(".");
+	if (lastdot == std::string::npos) return filename;
+	return filename.substr(0, lastdot);
+}
+
 BOOL FileExists(LPCTSTR szPath) {
   DWORD dwAttrib = GetFileAttributes(szPath);
 

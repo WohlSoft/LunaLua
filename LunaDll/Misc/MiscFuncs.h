@@ -12,7 +12,7 @@ void NumpadLayerControl1(LayerControl* sought_layer);
 void InfiniteFlying(int player);
 
 std::wstring removeExtension(const std::wstring filename);
-
+std::string removeExtension(const std::string filename);
 BOOL FileExists(LPCTSTR szPath);
 BOOL DirectoryExists(LPCTSTR szPath);
 
