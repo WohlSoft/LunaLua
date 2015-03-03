@@ -13,16 +13,16 @@ public:
 	Event(std::string eventName, bool cancleable);
 	~Event();
 
-	bool isCancleable();
-	bool cancled(lua_State* L);
-	bool native_cancled();
-	void setCancled(bool cancled, lua_State* L);
+	bool isCancellable();
+	bool cancelled(lua_State* L);
+	bool native_cancelled();
+	void setCancelled(bool cancled, lua_State* L);
 	std::string eventName();
 private:
 
 	std::string m_eventName;
-	bool m_cancleable;
-	bool m_isCancled;
+	bool m_cancellable;
+	bool m_isCancelled;
 
 };
 

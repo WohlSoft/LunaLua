@@ -2,37 +2,37 @@
 
 
 
-Event::Event(std::string eventName, bool cancleable)
+Event::Event(std::string eventName, bool cancellable)
 {
 	m_eventName = eventName;
-	m_cancleable = cancleable;
+	m_cancellable = cancellable;
 }
 
 Event::~Event()
 {}
 
-bool Event::isCancleable()
+bool Event::isCancellable()
 {
-	return m_cancleable;
+	return m_cancellable;
 }
 
-bool Event::cancled(lua_State* L)
+bool Event::cancelled(lua_State* L)
 {
-	if (!isCancleable())
+	if (!isCancellable())
 		luaL_error(L, "Cannot cancle a non-cancleable event");
-	return m_isCancled;
+	return m_isCancelled;
 }
 
-bool Event::native_cancled()
+bool Event::native_cancelled()
 {
-	return m_isCancled;
+	return m_isCancelled;
 }
 
-void Event::setCancled(bool cancled, lua_State* L)
+void Event::setCancelled(bool cancled, lua_State* L)
 {
-	if (!isCancleable())
+	if (!isCancellable())
 		luaL_error(L, "Cannot cancle a non-cancleable event");
-	m_isCancled = cancled;
+	m_isCancelled = cancled;
 }
 
 std::string Event::eventName()
