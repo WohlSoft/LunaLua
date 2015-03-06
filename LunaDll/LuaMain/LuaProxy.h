@@ -58,7 +58,7 @@ namespace LuaProxy {
     bool MusicIsFading();
     void playMusic(int section);
 	//CSprite functions
-    void loadImage(const char* filename, int resNumber, int transColor);
+    bool loadImage(const char* filename, int resNumber, int transColor);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
     void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
     void placeSprite(int type, int imgResource, int xPos, int yPos);

@@ -20,6 +20,8 @@ std::string wstr2str(const std::wstring &wstr);
 std::string i2str(int source);
 bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
+bool isAbsolutePath(const std::wstring& path);
+bool isAbsolutePath(const std::string& path);
 
 /// Functions ///
 void InitGlobals();

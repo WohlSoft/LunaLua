@@ -6,6 +6,7 @@
 #include "RenderOps/RenderOp.h"
 #include "RenderOps/RenderRectOp.h"
 #include "../MOBs/PlayerMOB.h"
+#include "../GlobalFuncs.h"
 
 using namespace std;
 
@@ -30,19 +31,33 @@ bool Renderer::ReloadScreenHDC() {
 	return true;
 }
 
+#define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
+
 // LOAD BITMAP RESOURCE - Load an image resource with given resource code. If resource code exists, replaces old image
 bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color) {
 	// If slot in use, delete old image
 	DeleteImage(resource_code);
 
 	// Concoct full filepath
-	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));	
-	if(!gIsOverworld){
-		full_path = removeExtension(full_path);
-		full_path = full_path.append(L"\\"); // < path into level folder
+	wstring full_path = L"";
+	
+	
+	if (!isAbsolutePath(filename)){
+		wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+		wstring full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
+		if (!gIsOverworld){
+			full_path = removeExtension(full_path);
+			full_path = full_path.append(L"\\"); // < path into level folder
+		}
+		full_path = full_path + filename;
+		dbgbox((std::wstring(L"Relative: ") + full_path).c_str());
 	}
-	full_path = full_path + filename;
+	else
+	{
+		full_path = filename;
+		dbgbox((std::wstring(L"Absolute: ") + full_path).c_str());
+	}
+	
 	//MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
 	
 	// Create and store the image resource

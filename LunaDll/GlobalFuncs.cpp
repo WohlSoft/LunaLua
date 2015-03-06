@@ -8,6 +8,8 @@
 #include <locale>
 #include <vector>
 #include "Globals.h"
+#include <ctype.h>
+#include <cwctype>
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -384,4 +386,14 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 
 	content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
 	return true;
+}
+
+bool isAbsolutePath(const std::wstring& path)
+{
+	return std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+}
+
+bool isAbsolutePath(const std::string& path)
+{
+	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && path[2] == L'\\';
 }

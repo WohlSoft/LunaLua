@@ -235,11 +235,17 @@ void LuaProxy::playSFX(const char *filename)
 #ifndef NO_SDL
 	playSFXSDL(filename);
 #else
-	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = world_dir.append(Level::GetName());
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
-	full_path = full_path + utf8_decode(filename);
+	wstring full_path;
+	if(!isAbsolutePath(std::string(filename))){
+		wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+		full_path = world_dir.append(Level::GetName());
+		full_path = removeExtension(full_path);
+		full_path = full_path.append(L"\\"); // < path into level folder
+		full_path = full_path + utf8_decode(filename);
+	}else{
+		full_path = utf8_decode(std::string(filename));
+	}
+	
 	PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 #endif
 }
@@ -247,11 +253,19 @@ void LuaProxy::playSFX(const char *filename)
 void LuaProxy::playSFXSDL(const char* filename)
 {
 #ifndef NO_SDL
-	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = world_dir.append(Level::GetName());
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
-	string full_paths = wstr2str(full_path) + filename;
+	string full_paths;
+	if (!isAbsolutePath(std::string(filename))){
+		wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+		wstring full_path = world_dir.append(Level::GetName());
+		full_path = removeExtension(full_path);
+		full_path = full_path.append(L"\\"); // < path into level folder
+		full_paths = wstr2str(full_path) + filename;
+	}
+	else
+	{
+		full_paths = filename;
+	}
+	
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 #else
 	playSFX(filename);
@@ -346,9 +360,9 @@ void LuaProxy::playMusic(int section)
 }
 
 
-void LuaProxy::loadImage(const char *filename, int resNumber, int transColor)
+bool LuaProxy::loadImage(const char* filename, int resNumber, int transColor)
 {
-	gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
+	return gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
 }
 
 
