@@ -320,7 +320,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.6.0.1 BETA"), 3, 5, 5);
+	Render::Print(std::wstring(L"LUNALUA V0.6.0.2 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){
@@ -551,17 +551,14 @@ extern void __stdcall doEventsLevelEditorHook()
 
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
-	HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
-	if(vmVB6Lib){
-		int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))GetProcAddress(vmVB6Lib, "__vbaStrCmp");
-		Event TriggerEventData("onEvent", true);
-		gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
-		if (TriggerEventData.native_cancelled())
-			return 0;
-		return origCmp(nullStr, eventName);
-		
-	}
-	return 0;
+
+	int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
+	Event TriggerEventData("onEvent", true);
+	gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
+	if (TriggerEventData.native_cancelled())
+		return 0;
+	return origCmp(nullStr, eventName);
+	
 }
 
 void fixup_TypeMismatch13()

@@ -187,6 +187,13 @@ enum PRIORITY {
 #define VASM_END_COINSOUND  *(BYTE*)0x00A3C87F      // = 14
 #define VASM_END_COINVAL    *(BYTE*)0x00A3C891      // = 1
 
+
+/////////////////////
+///  -Imports-    ///
+/////////////////////
+
+#define IMP_vbaStrCmp		*(DWORD*)0x004010F8
+
 /////////////////////
 ///  -Functions-  ///
 /////////////////////
@@ -223,3 +230,7 @@ enum PRIORITY {
 #define GF_RUN_ANIM			0x009E7380			// Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
 
 #endif
+
+
+//DEBUG:
+#define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
