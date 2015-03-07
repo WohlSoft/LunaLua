@@ -18,7 +18,7 @@ NPCMOB* NPC::GetFirstMatch(int ID, int section) {
 
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = Get(i);
-		if(thisnpc->Identity == ID || anyID) {
+		if(thisnpc->id == ID || anyID) {
 			if(GetSection(thisnpc) == section || anySec) {
 				return thisnpc; //matched
 			}
@@ -35,7 +35,7 @@ void NPC::FindAll(int ID, int section, std::list<NPCMOB*>* return_list) {
 
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = Get(i);
-		if(thisnpc->Identity == ID || anyID) {
+		if(thisnpc->id == ID || anyID) {
 			if(GetSection(thisnpc) == section || anySec) {
 				return_list->push_back(thisnpc);
 			}
@@ -56,7 +56,7 @@ short NPC::GetSection(NPCMOB* npc) {
 
 // FACE DIRECTION
 void NPC::FaceDirection(NPCMOB* npc, float direction) {
-	npc->FacingDirection = direction;
+	npc->directionFaced = direction;
 }
 
 // MEM SET
@@ -69,7 +69,7 @@ void NPC::MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE f
 
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = Get(i);
-		if(anyID || thisnpc->Identity == ID) {
+		if(anyID || thisnpc->id == ID) {
 			void* ptr = ((&(*(byte*)thisnpc)) + offset);
 			MemAssign((int)ptr, value, operation, ftype);
 		}
@@ -84,7 +84,7 @@ void NPC::AllSetHits(int identity, int section, float hits) {
 
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = Get(i);
-		if(anyID || thisnpc->Identity == identity) {
+        if (anyID || thisnpc->id == identity) {
 			if(anySec || GetSection(thisnpc) == section) {
 				SetHits(thisnpc, hits);
 			}
@@ -99,9 +99,9 @@ void NPC::AllFace(int identity, int section, double x) {
 	NPCMOB* thisnpc;
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = Get(i);
-		if(anyID || thisnpc->Identity == identity) {
+        if (anyID || thisnpc->id == identity) {
 			if(anySec || GetSection(thisnpc) == section) {
-				if(x < thisnpc->Xpos) {
+				if(x < thisnpc->x) {
 					FaceDirection(thisnpc, -1);
 				} else {
 					FaceDirection(thisnpc, 1);

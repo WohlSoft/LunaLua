@@ -162,32 +162,32 @@ void Autocode::Do(bool init) {
 					case 0: { // UP
 						double* pCamera = (double*)GM_CAMERA_Y;
 						double top = -pCamera[1];
-						if(npc->Ypos < top + Param2)
-							npc->Ypos = (top + Param2) + 1;
+						if(npc->y < top + Param2)
+							npc->y = (top + Param2) + 1;
 						break;
 							}
 
 					case 1: { // DOWN
 						double* pCamera = (double*)GM_CAMERA_Y;
 						double bot = -pCamera[1] + 600;
-						if(npc->Ypos > bot - Param2)
-							npc->Ypos = (bot - Param2) - 1;
+						if(npc->y > bot - Param2)
+							npc->y = (bot - Param2) - 1;
 						break;
 							}
 
 					case 2: { // LEFT
 						double* pCamera = (double*)GM_CAMERA_X;
 						double left = -pCamera[1];
-						if(npc->Xpos < left + Param2)
-							npc->Xpos = (left + Param2) + 1;
+						if(npc->x < left + Param2)
+							npc->x = (left + Param2) + 1;
 						break;
 							}
 
 					case 3: { // RIGHT
 						double* pCamera = (double*)GM_CAMERA_X;
 						double rt = -pCamera[1] + 800;
-						if(npc->Xpos > rt - Param2)
-							npc->Xpos = (rt - Param2) - 1;
+						if(npc->x > rt - Param2)
+							npc->x = (rt - Param2) - 1;
 						break;
 							}
 					}

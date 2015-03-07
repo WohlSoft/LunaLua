@@ -50,13 +50,13 @@ namespace ScienceBattle
 
 
 		if (hurt_timer <= 0)
-			hurt_npc ->Ypos = demo->CurYPos - 128;
+			hurt_npc ->y = demo->CurYPos - 128;
 		else
 		{
 			hurt_timer--;
-			hurt_npc ->Ypos = demo->CurYPos;
+			hurt_npc ->y = demo->CurYPos;
 		}
-		hurt_npc ->Xpos = demo->CurXPos;
+		hurt_npc ->x = demo->CurXPos;
 
 		doughnuts = FindAllNPC(NPC_DOUGHNUT);
 
@@ -73,8 +73,8 @@ namespace ScienceBattle
                 NPCMOB* doughnut=*it;
 				double x_diff, y_diff, m;
 
-				x_diff = doughnut->Xpos - demo->CurXPos;
-				y_diff = doughnut->Ypos - demo->CurYPos;
+				x_diff = doughnut->x - demo->CurXPos;
+				y_diff = doughnut->y - demo->CurYPos;
 				m = sqrt(x_diff * x_diff + y_diff * y_diff);
 
 				if (m == 0)
@@ -83,8 +83,8 @@ namespace ScienceBattle
 				x_diff /= m;
 				y_diff /= m;
 
-				doughnut->Xpos += x_diff * 15;
-				doughnut->Ypos += y_diff * 15;
+				doughnut->x += x_diff * 15;
+				doughnut->y += y_diff * 15;
 			}
 			grace_timer--;
 		}
@@ -101,10 +101,10 @@ namespace ScienceBattle
 				
 					double x1, x2, y1, y2;
 			
-					x1 = doughnut->Xpos + 28 * 0.42;
-					y1 = doughnut->Ypos + 32 * 0.42;
-					x2 = doughnut->Xpos + 28 * 0.57;
-					y2 = doughnut->Ypos + 32 * 0.57;
+					x1 = doughnut->x + 28 * 0.42;
+					y1 = doughnut->y + 32 * 0.42;
+					x2 = doughnut->x + 28 * 0.57;
+					y2 = doughnut->y + 32 * 0.57;
 
 					if (TriggerBox(x1, y1, x2, y2))
 						HurtPlayer();
@@ -124,7 +124,7 @@ namespace ScienceBattle
 		for(int i = 0; i < GM_NPCS_COUNT; i++)
 		{
 			currentnpc = NPC::Get(i);
-			if (currentnpc->Identity == identity)
+			if (currentnpc->id == identity)
 				return currentnpc;
 		}
 
@@ -139,7 +139,7 @@ namespace ScienceBattle
 		for(int i = 0; i < GM_NPCS_COUNT; i++)
 		{
 			currentnpc = NPC::Get(i);
-			if (currentnpc->Identity == identity)
+			if (currentnpc->id == identity)
 				npcs_found.push_back(currentnpc);
 		}
 

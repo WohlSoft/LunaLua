@@ -81,7 +81,7 @@ void CalleocaInitCode()
 
 void Phase0()
 {
-	calleoca_npc1->AnimationFrame = 0;
+	calleoca_npc1->animationFrame = 0;
 
 	if (demo->CurXPos > calleoca_x + 128)
 	{
@@ -125,7 +125,7 @@ void Phase1()
 	calleoca_x += thwomp_hspeed;
 	calleoca_y += thwomp_vspeed;
 
-	calleoca_npc1->AnimationFrame = 2;
+	calleoca_npc1->animationFrame = 2;
 	if (TriggerBox(calleoca_x + 10, calleoca_y + 0, calleoca_x + 54, calleoca_y + 64))
 		HurtPlayer();
 
@@ -149,7 +149,7 @@ void Phase2()
 	
 	calleoca_x += thwomp_hspeed;
 	calleoca_y += thwomp_vspeed;
-	calleoca_npc1->AnimationFrame = 1;
+    calleoca_npc1->animationFrame = 1;
 	if (TriggerBox(calleoca_x + 10, calleoca_y + 0, calleoca_x + 54, calleoca_y + 64))
 		HurtPlayer();
 
@@ -170,7 +170,7 @@ void Phase2()
 //Missile
 void Phase3()
 {
-	calleoca_npc1->AnimationFrame = 3 + int(0.5 + missile_direction / 45) % 8;
+    calleoca_npc1->animationFrame = 3 + int(0.5 + missile_direction / 45) % 8;
 
 	int dir = (int) (atan2( (demo->CurYPos + demo->Height / 2) - (calleoca_y + 32),
 						   -(demo->CurXPos + demo->Width  / 2) + (calleoca_x + 32))
@@ -258,8 +258,8 @@ void CalleocaCode()
 			goal_npc = FindNPC(NPC_GOAL);
 			if (goal_npc != NULL)
 			{
-				goal_npc->Xpos = demo->CurXPos;
-				goal_npc->Ypos = demo->CurYPos;
+				goal_npc->x = demo->CurXPos;
+				goal_npc->y = demo->CurYPos;
 			}
 		}
 		
@@ -272,10 +272,10 @@ void CalleocaCode()
 		calleoca_npc2 = FindNPC(NPC_COIN);
 		hurt_npc	  = FindNPC(NPC_FIREBAR);
 
-		calleoca_x = calleoca_npc1->Xpos;
-		calleoca_y = calleoca_npc1->Ypos;
-		storage_x  = calleoca_npc2->Xpos;
-		storage_y  = calleoca_npc2->Ypos;
+		calleoca_x = calleoca_npc1->x;
+		calleoca_y = calleoca_npc1->y;
+		storage_x  = calleoca_npc2->x;
+		storage_y  = calleoca_npc2->y;
 
 		thwomp_height = calleoca_y - 64 * 6 + 16;
 		thwomp_bottom = calleoca_y + 128;
@@ -286,17 +286,17 @@ void CalleocaCode()
 		init_doonce = true;
 	}
 
-	if (calleoca_npc1->Identity != NPC_SIGN)
+	if (calleoca_npc1->id != NPC_SIGN)
 		calleoca_npc1 = FindNPC(NPC_SIGN);
 
-	if (calleoca_npc2->Identity != NPC_COIN)
+    if (calleoca_npc2->id != NPC_COIN)
 		calleoca_npc2 = FindNPC(NPC_COIN);
 
-	if (hurt_npc->Identity != NPC_FIREBAR)
+    if (hurt_npc->id != NPC_FIREBAR)
 		hurt_npc = FindNPC(NPC_FIREBAR);
 
-	hurt_npc->Xpos = demo->CurXPos;
-	hurt_npc->Ypos = demo->CurYPos - 128;
+	hurt_npc->x = demo->CurXPos;
+	hurt_npc->y = demo->CurYPos - 128;
 
 	switch (phase)
 	{
@@ -326,17 +326,17 @@ void CalleocaCode()
 
 	if (phase < 4)
 	{
-		calleoca_npc1->Xpos = calleoca_x;
-		calleoca_npc1->Ypos = calleoca_y;
-		calleoca_npc2->Xpos = storage_x;
-		calleoca_npc2->Ypos = storage_y;
+		calleoca_npc1->x = calleoca_x;
+		calleoca_npc1->y = calleoca_y;
+		calleoca_npc2->x = storage_x;
+		calleoca_npc2->y = storage_y;
 	}
 	else
 	{
-		calleoca_npc2->Xpos = calleoca_x;
-		calleoca_npc2->Ypos = calleoca_y;
-		calleoca_npc1->Xpos = storage_x;
-		calleoca_npc1->Ypos = storage_y;
+		calleoca_npc2->x = calleoca_x;
+		calleoca_npc2->y = calleoca_y;
+		calleoca_npc1->x = storage_x;
+		calleoca_npc1->y = storage_y;
 	}
 
 	//gLunaRender.SafePrint(std::wstring(L"FUEL: " + std::to_wstring(missile_fuel)), 3, 0, 256);
@@ -350,7 +350,7 @@ NPCMOB* FindNPC(short identity)
 	for(int i = 0; i < GM_NPCS_COUNT; i++)
 	{
 		currentnpc = NPC::Get(i);
-		if (currentnpc->Identity == identity)
+		if (currentnpc->id == identity)
 			return currentnpc;
 	}
 
@@ -367,7 +367,7 @@ bool TriggerBox(double x1, double y1, double x2, double y2)
 
 void HurtPlayer()
 {
-	hurt_npc->Ypos = demo->CurYPos;
+	hurt_npc->y = demo->CurYPos;
 }
 
 int AngleDifference(int angle1, int angle2)

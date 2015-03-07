@@ -66,23 +66,128 @@
 // 0x+146	w	= Current section this NPC is on
 // 0x+148	f	= Hit count
 
+#pragma pack(push, 4)
 struct NPCMOB {
-	char padding1[0x78];
-
-	double Xpos;			// x78~
-	double Ypos;			// x80~87
-
-	char padding2[0x5A];
-
-	short Identity;			// E2
-	short AnimationFrame;	// E4
-
-	short UnknownE6;		// E6
-
-	float UnknownE8;		// E8
-
-	float FacingDirection;	// EC
+    wchar_t* attachedLayerName;             //+0x00
+    short unknown_04;                       //+0x04
+    short unknown_06;                       //+0x06
+    short unknown_08;                       //+0x08 Unknown decrementing timer
+    short collidesBelow;                    //+0x0A
+    short collidesLeft;                     //+0x0C
+    short collidesAbove;                    //+0x0E
+    short collidesRight;                    //+0x10
+    short unknown_12;                       //+0x12
+    short unknown_14;                       //+0x14
+    short unknown_16;                       //+0x16
+    short unknown_18;                       //+0x18
+    short unknown_1A;                       //+0x1A
+    short unknown_1C;                       //+0x1C
+    short unknown_1E;                       //+0x1E
+    short unknown_20;                       //+0x20
+    short unknown_22;                       //+0x22
+    short unknown_24;                       //+0x24
+    short invincibilityToSword;             //+0x26
+    short unknown_28;                       //+0x28
+    short unknown_2A;                       //+0x2A
+    wchar_t* activateEventLayerName;        //+0x2C
+    wchar_t* deathEventName;                //+0x30
+    wchar_t* talkEventName;                 //+0x34
+    wchar_t* noMoreObjInLayerEventName;     //+0x38
+    wchar_t* layerName;                     //+0x3C
+    short unknown_40;                       //+0x40
+    short unknown_42;                       //+0x42
+    short activated;                        //+0x44
+    short friendly;                         //+0x46
+    short dontMove;                         //+0x48
+    short unknown_4A;                       //+0x4A
+    wchar_t* talkMsg;                       //+0x4C
+    short unknown_50;                       //+0x50
+    short unknown_52;                       //+0x52
+    short unknown_54;                       //+0x54
+    short unknown_56;                       //+0x56
+    short unknown_58;                       //+0x58
+    short unknown_5A;                       //+0x5A
+    short unknown_5C;                       //+0x5C
+    short unknown_5E;                       //+0x5E
+    short unknown_60;                       //+0x60
+    short unknown_62;                       //+0x62
+    short isGenerator;                      //+0x64
+    short unknown_66;                       //+0x66
+    short generatorDelaySetting;            //+0x68  NOTE: In the wiki we have float noted, but it does not match with the 4-Byte size! Needs more investigating.
+    short generatorFiringRate;              //+0x6A
+    float generatorDelayCountdown;          //+0x6C
+    short directionToGenerate;              //+0x70
+    short layerToSpawn;                     //+0x72  NOTE: Missing information, is it an index or a ptr to text?
+    short offscreenFlag;                    //+0x74
+    short unknown_76;                       //+0x76
+    double x;                               //+0x78
+    double y;                               //+0x80
+    double height;                          //+0x88
+    double width;                           //+0x90
+    double speedX;                          //+0x98
+    double speedY;                          //+0xA0
+    short unknown_A8;                       //+0xA8
+    short unknown_AA;                       //+0xAA
+    double spawnX;                          //+0xAC
+    float spawnY;                           //+0xB4  NOTE: In the wiki we have double noted, but it does not match with the 8-Byte size!
+    double gfxHeight;                       //+0xB8
+    double gfxWidth;                        //+0xC0
+    short unknown_C8;                       //+0xC8
+    short unknown_CA;                       //+0xCA
+    short unknown_CC;                       //+0xCC
+    short unknown_CE;                       //+0xCE
+    short unknown_D0;                       //+0xD0
+    short unknown_D2;                       //+0xD2
+    short unknown_D4;                       //+0xD4
+    short unknown_D6;                       //+0xD6
+    short unknown_D8;                       //+0xD8
+    short unknown_DA;                       //+0xDA
+    short respawnID;                        //+0xDC
+    short unknown_DE;                       //+0xDE
+    short unknown_E0;                       //+0xE0
+    short id;                               //+0xE2
+    short animationFrame;                   //+0xE4
+    short unknown_E6;                       //+0xE6
+    float animationTimer;                   //+0xE8
+    float directionFaced;                   //+0xEC
+    double ai1;                             //+0xF0
+    double ai2;                             //+0xF8
+    double ai3;                             //+0x100
+    double ai4;                             //+0x108
+    double ai5;                             //+0x110
+    float directionFaced2;                  //+0x118
+    short unknown_11C;                      //+0x11C
+    short unknown_11E;                      //+0x11E
+    short bounceOffBlock;                   //+0x120
+    short killFlag;                         //+0x122
+    short unknown_124;                      //+0x124
+    short unknown_126;                      //+0x126
+    short offscreenFlag2;                   //+0x128  NOTE: In the wiki we have double noted, but it does not match with the 8-Byte size!
+    short offscreenCountdownTimer;          //+0x12A
+    short unknown_12C;                      //+0x12C
+    short unknown_12E;                      //+0x12E
+    short unknown_130;                      //+0x130
+    short unknown_132;                      //+0x132
+    short unknown_134;                      //+0x134
+    short collidesWithNPC;                  //+0x136
+    short containedWithin;                  //+0x138
+    short unknown_13A;                      //+0x13A
+    short unknown_13C;                      //+0x13C
+    short unknown_13E;                      //+0x13E
+    short unknown_140;                      //+0x140
+    short unknown_142;                      //+0x142
+    short unknown_144;                      //+0x144
+    short currentSection;                   //+0x146
+    short unknown_148;                      //+0x148
+    short unknown_14A;                      //+0x14A
+    short unknown_14C;                      //+0x14C
+    short unknown_14E;                      //+0x14E
+    short unknown_150;                      //+0x150
+    short unknown_152;                      //+0x152
+    short unknown_154;                      //+0x154
+    short invincibilityFrames;              //+0x156
 };
+#pragma pack(pop)
 
 namespace NPC {
 

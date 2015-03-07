@@ -170,7 +170,7 @@ luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 
 	for(int i = 0; i < GM_NPCS_COUNT; i++) {
 		thisnpc = ::NPC::Get(i);
-		if(thisnpc->Identity == ID || anyID) {
+		if(thisnpc->id == ID || anyID) {
 			if(::NPC::GetSection(thisnpc) == section || anySec) {
 				vnpcs[r] = LuaProxy::NPC(i);
 				++r;

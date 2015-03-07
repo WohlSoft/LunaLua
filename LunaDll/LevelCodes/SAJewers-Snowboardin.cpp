@@ -50,7 +50,7 @@ namespace SAJSnowbordin
 		for(int i = 0; i < GM_NPCS_COUNT; i++)
 		{
 			currentnpc = NPC::Get(i);
-			if (currentnpc->Identity == identity)
+			if (currentnpc->id == identity)
 				return currentnpc;
 		}
 

@@ -12,14 +12,14 @@ int LuaProxy::NPC::id(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return (int)::NPC::Get(m_index)->Identity;
+	return (int)::NPC::Get(m_index)->id;
 }
 
 float LuaProxy::NPC::direction(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->FacingDirection;
+	return ::NPC::Get(m_index)->directionFaced;
 }
 
 void LuaProxy::NPC::setDirection(float direction, lua_State* L)
@@ -29,35 +29,35 @@ void LuaProxy::NPC::setDirection(float direction, lua_State* L)
 
 	NPCMOB* npc =  ::NPC::Get(m_index);
 	setSpeedX(0.0, L);
-	npc->FacingDirection = direction;
+    npc->directionFaced = direction;
 }
 
 double LuaProxy::NPC::x(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->Xpos;
+	return ::NPC::Get(m_index)->x;
 }
 
 void LuaProxy::NPC::setX(double x, lua_State* L)
 {
 	if(!isValid_throw(L))
 		return;
-	::NPC::Get(m_index)->Xpos = x;
+	::NPC::Get(m_index)->x = x;
 }
 
 double LuaProxy::NPC::y(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->Ypos;
+	return ::NPC::Get(m_index)->y;
 }
 
 void LuaProxy::NPC::setY(double y, lua_State* L)
 {
 	if(!isValid_throw(L))
 		return;
-	::NPC::Get(m_index)->Ypos = y;
+	::NPC::Get(m_index)->y = y;
 }
 
 double LuaProxy::NPC::speedX(lua_State* L)

@@ -125,7 +125,7 @@ bool Player::IsInForcedAnimation(PlayerMOB* player) {
 bool Player::IsHoldingSpriteType(PlayerMOB* player, int NPC_ID) {
 	if(player->HeldNPCIndex != 0) {
 		NPCMOB* npc = NPC::Get(player->HeldNPCIndex);
-		if(npc->Identity == NPC_ID)
+		if(npc->id == NPC_ID)
 			return true;
 	}
 	return false;
