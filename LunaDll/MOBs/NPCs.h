@@ -70,8 +70,8 @@
 struct NPCMOB {
     wchar_t* attachedLayerName;             //+0x00
     short unknown_04;                       //+0x04
-    short unknown_06;                       //+0x06
-    short unknown_08;                       //+0x08 Unknown decrementing timer
+    short unknown_06;                       //+0x06 Unknown decrementing Timer
+    short unknown_08;                       //+0x08 
     short collidesBelow;                    //+0x0A
     short collidesLeft;                     //+0x0C
     short collidesAbove;                    //+0x0E
@@ -126,10 +126,8 @@ struct NPCMOB {
     double width;                           //+0x90
     double speedX;                          //+0x98
     double speedY;                          //+0xA0
-    short unknown_A8;                       //+0xA8
-    short unknown_AA;                       //+0xAA
-    double spawnX;                          //+0xAC
-    float spawnY;                           //+0xB4  NOTE: In the wiki we have double noted, but it does not match with the 8-Byte size!
+    double spawnX;                          //+0xA8
+    double spawnY;                          //+0xB0
     double gfxHeight;                       //+0xB8
     double gfxWidth;                        //+0xC0
     short unknown_C8;                       //+0xC8
@@ -178,8 +176,7 @@ struct NPCMOB {
     short unknown_142;                      //+0x142
     short unknown_144;                      //+0x144
     short currentSection;                   //+0x146
-    short unknown_148;                      //+0x148
-    short unknown_14A;                      //+0x14A
+    float hitCount;                         //+0x148
     short unknown_14C;                      //+0x14C
     short unknown_14E;                      //+0x14E
     short unknown_150;                      //+0x150
