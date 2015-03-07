@@ -2,7 +2,8 @@
 
 
 
-Event::Event(std::string eventName, bool cancellable)
+Event::Event(std::string eventName, bool cancellable) : 
+    m_isCancelled(false)
 {
 	m_eventName = eventName;
 	m_cancellable = cancellable;
