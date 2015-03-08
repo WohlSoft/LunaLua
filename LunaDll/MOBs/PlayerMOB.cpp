@@ -197,9 +197,9 @@ RECT Player::GetScreenPosition(PlayerMOB* player) {
 	double cam_r = cam_x + 800;
 
 	RECT ret_rect;
-	ret_rect.left = (LONG)(player->CurXPos - cam_x);
-	ret_rect.top = (LONG)(player->CurYPos - cam_y);
-	ret_rect.right = ret_rect.left + (LONG)player->Width;
-	ret_rect.bottom = ret_rect.top + (LONG)player->Height;
+    ret_rect.left = (LONG)(player->momentum.x - cam_x);
+    ret_rect.top = (LONG)(player->momentum.y - cam_y);
+    ret_rect.right = ret_rect.left + (LONG)player->momentum.width;
+    ret_rect.bottom = ret_rect.top + (LONG)player->momentum.height;
 	return ret_rect;
 }

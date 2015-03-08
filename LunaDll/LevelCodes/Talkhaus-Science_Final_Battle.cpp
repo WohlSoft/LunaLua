@@ -50,13 +50,13 @@ namespace ScienceBattle
 
 
 		if (hurt_timer <= 0)
-			hurt_npc ->y = demo->CurYPos - 128;
+            hurt_npc->momentum.y = demo->momentum.y - 128;
 		else
 		{
 			hurt_timer--;
-			hurt_npc ->y = demo->CurYPos;
+			hurt_npc ->momentum.y = demo->momentum.y;
 		}
-		hurt_npc ->x = demo->CurXPos;
+        hurt_npc->momentum.x = demo->momentum.x;
 
 		doughnuts = FindAllNPC(NPC_DOUGHNUT);
 
@@ -73,8 +73,8 @@ namespace ScienceBattle
                 NPCMOB* doughnut=*it;
 				double x_diff, y_diff, m;
 
-				x_diff = doughnut->x - demo->CurXPos;
-				y_diff = doughnut->y - demo->CurYPos;
+                x_diff = doughnut->momentum.x - demo->momentum.x;
+                y_diff = doughnut->momentum.y - demo->momentum.y;
 				m = sqrt(x_diff * x_diff + y_diff * y_diff);
 
 				if (m == 0)
@@ -83,8 +83,8 @@ namespace ScienceBattle
 				x_diff /= m;
 				y_diff /= m;
 
-				doughnut->x += x_diff * 15;
-				doughnut->y += y_diff * 15;
+				doughnut->momentum.x += x_diff * 15;
+				doughnut->momentum.y += y_diff * 15;
 			}
 			grace_timer--;
 		}
@@ -101,10 +101,10 @@ namespace ScienceBattle
 				
 					double x1, x2, y1, y2;
 			
-					x1 = doughnut->x + 28 * 0.42;
-					y1 = doughnut->y + 32 * 0.42;
-					x2 = doughnut->x + 28 * 0.57;
-					y2 = doughnut->y + 32 * 0.57;
+					x1 = doughnut->momentum.x + 28 * 0.42;
+					y1 = doughnut->momentum.y + 32 * 0.42;
+					x2 = doughnut->momentum.x + 28 * 0.57;
+					y2 = doughnut->momentum.y + 32 * 0.57;
 
 					if (TriggerBox(x1, y1, x2, y2))
 						HurtPlayer();
@@ -154,9 +154,9 @@ namespace ScienceBattle
 
 	bool TriggerBox(double x1, double y1, double x2, double y2)
 	{
-		return (demo->CurXPos + demo->Width		> x1 &&
-				demo->CurXPos					< x2 &&
-				demo->CurYPos + demo->Height	> y1 &&
-				demo->CurYPos					< y2);
+        return (demo->momentum.x + demo->momentum.width		> x1 &&
+            demo->momentum.x					< x2 &&
+            demo->momentum.y + demo->momentum.height	> y1 &&
+            demo->momentum.y					< y2);
 	}
 }

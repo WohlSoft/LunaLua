@@ -101,7 +101,7 @@ void NPC::AllFace(int identity, int section, double x) {
 		thisnpc = Get(i);
         if (anyID || thisnpc->id == identity) {
 			if(anySec || GetSection(thisnpc) == section) {
-				if(x < thisnpc->x) {
+				if(x < thisnpc->momentum.x) {
 					FaceDirection(thisnpc, -1);
 				} else {
 					FaceDirection(thisnpc, 1);

@@ -26,8 +26,8 @@ void Activate(int code, CSprite* spr) {
 void SpriteFunc::PlayerCollectible(CSprite* me, SpriteComponent* comp) {
 	PlayerMOB* demo = Player::Get(1);
 	if(demo) {		
-		if(me->m_Hitbox.Test((int)demo->CurXPos, (int)demo->CurYPos, 
-			(int)demo->Width, (int)demo->Height)) {		
+        if (me->m_Hitbox.Test((int)demo->momentum.x, (int)demo->momentum.y,
+            (int)demo->momentum.width, (int)demo->momentum.height)) {
 			me->Die();
 		}
 	}
@@ -208,13 +208,13 @@ void SpriteFunc::AccelToPlayer(CSprite* me, SpriteComponent* obj) {
 	PlayerMOB* demo = Player::Get(1);
 	if(demo) {				
 		double negmax = obj->data3 * -1;
-		if(demo->CurXPos < me->m_Xpos) {
+        if (demo->momentum.x < me->m_Xpos) {
 			me->m_Xspd -= obj->data1;
 		}
 		else {
 			me->m_Xspd += obj->data1;
 		}
-		if(demo->CurYPos < me->m_Ypos) {
+        if (demo->momentum.y < me->m_Ypos) {
 			me->m_Yspd -= obj->data2;
 		}
 		else {
@@ -254,15 +254,15 @@ void SpriteFunc::OnPlayerCollide(CSprite* me, SpriteComponent* obj) {
 
 	if(demo) {				
 		if(obj->data2 == 0) { // player normal hitbox
-			if(me->m_Hitbox.Test((int)demo->CurXPos, (int)demo->CurYPos, (int)demo->Width, (int)demo->Height)) {		
+            if (me->m_Hitbox.Test((int)demo->momentum.x, (int)demo->momentum.y, (int)demo->momentum.width, (int)demo->momentum.height)) {
 				Activate((int)obj->data4, me);
 			}
 		}
 		else { // special small circle hitbox
 			double extent = obj->data2 / 2;
 
-			double cx = demo->CurXPos + (demo->Width / 2);
-			double cy = demo->CurYPos + (demo->Height / 2);
+            double cx = demo->momentum.x + (demo->momentum.width / 2);
+            double cy = demo->momentum.y + (demo->momentum.height / 2);
 			if(me->m_Hitbox.Test((int)cx, (int)cy, (int)extent)) {		
 				Activate((int)obj->data4, me);
 			}
@@ -274,8 +274,8 @@ void SpriteFunc::OnPlayerCollide(CSprite* me, SpriteComponent* obj) {
 void SpriteFunc::OnPlayerDistance(CSprite* me, SpriteComponent* obj) {
 	PlayerMOB* demo = Player::Get(1);
 	if(demo) {
-		double xdist = abs(demo->CurXPos - me->m_Xpos);
-		double ydist = abs(demo->CurYPos - me->m_Ypos);		
+        double xdist = abs(demo->momentum.x - me->m_Xpos);
+        double ydist = abs(demo->momentum.y - me->m_Ypos);
 
 		// Checking farness or nearness?
 		if(obj->data2 == 0) { 
@@ -469,8 +469,8 @@ void SpriteFunc::SetHitbox(CSprite* me, SpriteComponent* obj) {
 void SpriteFunc::TeleportNearPlayer(CSprite* me, SpriteComponent* obj) {
 	PlayerMOB* demo = Player::Get(1);
 	if(demo) {
-		double cx = demo->CurXPos;
-		double cy = demo->CurYPos;
+        double cx = demo->momentum.x;
+        double cy = demo->momentum.y;
 		double phase = rand() % 360;
 		double xoff = sin(phase) * obj->data1;
 		double yoff = cos(phase) * obj->data1;

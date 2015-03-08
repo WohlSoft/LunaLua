@@ -99,11 +99,11 @@ void Render::CalcCameraPos(double* ret_x, double* ret_y) {
 	// Camera func, calculated from player position and boundaries
 	PlayerMOB* demo = Player::Get(1);
 	if(false) {
-		gLunaRender.SafePrint(to_wstring((long long) demo->CurXPos),3,300,300);
-		gLunaRender.SafePrint(to_wstring((long long) demo->CurYPos),3,300,350);
+        gLunaRender.SafePrint(to_wstring((long long)demo->momentum.x), 3, 300, 300);
+        gLunaRender.SafePrint(to_wstring((long long)demo->momentum.y), 3, 300, 350);
 		
-		double cx = demo->CurXPos - (400 - (demo->Width / 2));
-		double cy = demo->CurYPos - (300 - (demo->Height / 2));
+        double cx = demo->momentum.x - (400 - (demo->momentum.width / 2));
+        double cy = demo->momentum.y - (300 - (demo->momentum.height / 2));
 
 		// Force camera to fit in level bounds
 		RECT rect;

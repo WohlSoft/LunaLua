@@ -120,12 +120,7 @@ struct NPCMOB {
     short layerToSpawn;                     //+0x72  NOTE: Missing information, is it an index or a ptr to text?
     short offscreenFlag;                    //+0x74
     short unknown_76;                       //+0x76
-    double x;                               //+0x78
-    double y;                               //+0x80
-    double height;                          //+0x88
-    double width;                           //+0x90
-    double speedX;                          //+0x98
-    double speedY;                          //+0xA0
+    Momentum momentum;                      //+0x78
     double spawnX;                          //+0xA8
     double spawnY;                          //+0xB0
     double gfxHeight;                       //+0xB8

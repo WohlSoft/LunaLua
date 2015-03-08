@@ -49,54 +49,54 @@ double LuaProxy::Player::x(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurXPos;
+	return ::Player::Get(m_index)->momentum.x;
 }
 
 void LuaProxy::Player::setX(double x, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurXPos = x;
+    ::Player::Get(m_index)->momentum.x = x;
 }
 
 double LuaProxy::Player::y(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurYPos;
+    return ::Player::Get(m_index)->momentum.y;
 }
 
 void LuaProxy::Player::setY(double y, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurYPos = y;
+    ::Player::Get(m_index)->momentum.y = y;
 }
 
 double LuaProxy::Player::speedX(lua_State *L)
 {
-	return ::Player::Get(m_index)->CurXSpeed;
+    return ::Player::Get(m_index)->momentum.speedX;
 }
 
 void LuaProxy::Player::setSpeedX(double speedX, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurXSpeed = speedX;
+    ::Player::Get(m_index)->momentum.speedX = speedX;
 }
 
 double LuaProxy::Player::speedY(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurYSpeed;
+    return ::Player::Get(m_index)->momentum.speedY;
 }
 
 void LuaProxy::Player::setSpeedY(double speedY, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurYSpeed = speedY;
+    ::Player::Get(m_index)->momentum.speedY = speedY;
 }
 
 int LuaProxy::Player::powerup(lua_State *L)
@@ -861,84 +861,84 @@ double LuaProxy::Player::curXPos(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurXPos;
+    return ::Player::Get(m_index)->momentum.x;
 }
 
 void LuaProxy::Player::setCurXPos(double var_curXPos, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurXPos = var_curXPos;
+    ::Player::Get(m_index)->momentum.x = var_curXPos;
 }
 
 double LuaProxy::Player::curYPos(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurYPos;
+    return ::Player::Get(m_index)->momentum.y;
 }
 
 void LuaProxy::Player::setCurYPos(double var_curYPos, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurYPos = var_curYPos;
+    ::Player::Get(m_index)->momentum.y = var_curYPos;
 }
 
 double LuaProxy::Player::height(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->Height;
+    return ::Player::Get(m_index)->momentum.height;
 }
 
 void LuaProxy::Player::setHeight(double var_height, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->Height = var_height;
+    ::Player::Get(m_index)->momentum.height = var_height;
 }
 
 double LuaProxy::Player::width(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->Width;
+	return ::Player::Get(m_index)->momentum.width;
 }
 
 void LuaProxy::Player::setWidth(double var_width, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->Width = var_width;
+	::Player::Get(m_index)->momentum.width = var_width;
 }
 
 double LuaProxy::Player::curXSpeed(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurXSpeed;
+	return ::Player::Get(m_index)->momentum.speedX;
 }
 
 void LuaProxy::Player::setCurXSpeed(double var_curXSpeed, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurXSpeed = var_curXSpeed;
+	::Player::Get(m_index)->momentum.speedX = var_curXSpeed;
 }
 
 double LuaProxy::Player::curYSpeed(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->CurYSpeed;
+	return ::Player::Get(m_index)->momentum.speedY;
 }
 
 void LuaProxy::Player::setCurYSpeed(double var_curYSpeed, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->CurYSpeed = var_curYSpeed;
+	::Player::Get(m_index)->momentum.speedY = var_curYSpeed;
 }
 
 short LuaProxy::Player::identity(lua_State *L)

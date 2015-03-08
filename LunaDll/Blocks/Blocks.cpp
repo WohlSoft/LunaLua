@@ -11,10 +11,10 @@ Block* Blocks::Get(int index) {
 bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {	
 	Block* blocks = Blocks::GetBase();
 	Block* block = 0;
-	double playerX = demo->CurXPos - 0.20;
-	double playerY = demo->CurYPos - 0.20;
-	double playerX2 = demo->CurXPos + demo->Width + 0.20;
-	double playerY2 = demo->CurYPos + demo->Height + 0.20;
+	double playerX = demo->momentum.x - 0.20;
+	double playerY = demo->momentum.y - 0.20;
+	double playerX2 = demo->momentum.x + demo->momentum.width + 0.20;
+	double playerY2 = demo->momentum.y + demo->momentum.height + 0.20;
 
 	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
 		if(blocks[i].BlockType == type) {
@@ -37,7 +37,7 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
 	typedef int colfunc(void*, void*);
 	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
-	return f(&pMobPOS->CurXPos, &pBlockPOS->XPos);
+	return f(&pMobPOS->momentum.x, &pBlockPOS->XPos);
 }
 
 // SET ALL

@@ -65,8 +65,8 @@ void AbstractAssaultCode() {
 		else
 			noControlTimer--;
 		
-		demo -> CurYSpeed = -0.4 + vspeed;
-		demo -> CurXSpeed = hspeed;
+		demo->momentum.speedY = -0.4 + vspeed;
+        demo->momentum.speedX = hspeed;
 		
 		hspeed *=(float) 0.9;
 		vspeed *=(float) 0.9;

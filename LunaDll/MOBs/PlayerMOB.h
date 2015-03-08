@@ -259,12 +259,7 @@ struct PlayerMOB {
 
 	char	padding[0x58];				//pad to next
 
-	double	CurXPos;					// offset +0xC0
-	double	CurYPos;
-	double	Height;
-	double	Width;
-	double	CurXSpeed;
-	double	CurYSpeed;
+    Momentum momentum;
 
 	short	Identity;
 

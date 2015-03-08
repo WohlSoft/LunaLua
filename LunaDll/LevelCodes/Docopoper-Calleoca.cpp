@@ -83,13 +83,13 @@ void Phase0()
 {
 	calleoca_npc1->animationFrame = 0;
 
-	if (demo->CurXPos > calleoca_x + 128)
+    if (demo->momentum.x > calleoca_x + 128)
 	{
 		freeze_timer = 45;
 		phase = 1;
 	}
 
-	if (demo->CurXPos >= MIDPOINT_X)
+    if (demo->momentum.x >= MIDPOINT_X)
 	{
 		phase = 3;
 		calleoca_x = MIDPOINT_X - 256;
@@ -101,7 +101,7 @@ void Phase0()
 //Standing there
 void Phase1()
 {
-	thwomp_hspeed += (demo->CurXPos - calleoca_x) * 0.001;
+    thwomp_hspeed += (demo->momentum.x - calleoca_x) * 0.001;
 	if (abs(thwomp_height - calleoca_y) < 8)
 	{
 		thwomp_hspeed = Clamp<double>(thwomp_hspeed, -9, 9);
@@ -129,7 +129,7 @@ void Phase1()
 	if (TriggerBox(calleoca_x + 10, calleoca_y + 0, calleoca_x + 54, calleoca_y + 64))
 		HurtPlayer();
 
-	if (demo->CurXPos >= MIDPOINT_X)
+    if (demo->momentum.x >= MIDPOINT_X)
 	{
 		freeze_timer = 150;
 		phase = 3;
@@ -141,7 +141,7 @@ void Phase1()
 void Phase2()
 {
 	thwomp_hspeed *= 0.9;
-	if (demo->CurYPos <= calleoca_y)
+    if (demo->momentum.y <= calleoca_y)
 		thwomp_hspeed *= 0.9;
 
 	thwomp_vspeed += (thwomp_bottom - calleoca_y) * 0.05;
@@ -159,7 +159,7 @@ void Phase2()
 		phase = 1;
 	}
 
-	if (demo->CurXPos >= MIDPOINT_X)
+    if (demo->momentum.x >= MIDPOINT_X)
 	{
 		freeze_timer = 150;
 		phase = 3;
@@ -172,8 +172,8 @@ void Phase3()
 {
     calleoca_npc1->animationFrame = 3 + int(0.5 + missile_direction / 45) % 8;
 
-	int dir = (int) (atan2( (demo->CurYPos + demo->Height / 2) - (calleoca_y + 32),
-						   -(demo->CurXPos + demo->Width  / 2) + (calleoca_x + 32))
+    int dir = (int)(atan2((demo->momentum.y + demo->momentum.height / 2) - (calleoca_y + 32),
+        -(demo->momentum.x + demo->momentum.width / 2) + (calleoca_x + 32))
 					 * 180 / PI);
 
 	missile_direction += AngleDifference((int)missile_direction, dir) * 0.015;
@@ -206,13 +206,13 @@ void Phase3()
 	}
 
 	
-	calleoca_x = Clamp<double>(calleoca_x + missile_hspeed, demo->CurXPos - 464, demo->CurXPos + 464);
+    calleoca_x = Clamp<double>(calleoca_x + missile_hspeed, demo->momentum.x - 464, demo->momentum.x + 464);
 	calleoca_y = Clamp<double>(calleoca_y + missile_vspeed, missile_top, missile_bottom);
 
 	if (TriggerBox(calleoca_x + 18, calleoca_y + 18, calleoca_x + 46, calleoca_y + 46))
 		HurtPlayer();
 
-	if (demo->CurXPos >= END_X)
+    if (demo->momentum.x >= END_X)
 	{
 		if (calleoca_x > END_X - 64)
 			calleoca_x = END_X - 64;
@@ -229,8 +229,8 @@ void Phase4()
 	}
 	else
 	{
-		fishingboo_hspeed += (demo->CurXPos - calleoca_x) * 0.001 * fishingboo_ferocity;
-		fishingboo_vspeed += (demo->CurYPos - calleoca_y) * 0.001 * fishingboo_ferocity;
+        fishingboo_hspeed += (demo->momentum.x - calleoca_x) * 0.001 * fishingboo_ferocity;
+        fishingboo_vspeed += (demo->momentum.y - calleoca_y) * 0.001 * fishingboo_ferocity;
 		fishingboo_hspeed = Clamp<double>(fishingboo_hspeed, -7 * fishingboo_ferocity, 7 * fishingboo_ferocity);
 		fishingboo_vspeed = Clamp<double>(fishingboo_vspeed, -0.5 * fishingboo_ferocity, 0.5 * fishingboo_ferocity);
 
@@ -240,7 +240,7 @@ void Phase4()
 		fishingboo_ferocity += 0.0002;
 	}
 
-	calleoca_x = Clamp<double>(calleoca_x, demo->CurXPos - 512, demo->CurXPos + 464);
+    calleoca_x = Clamp<double>(calleoca_x, demo->momentum.x - 512, demo->momentum.y + 464);
 }
 
 void CalleocaCode()
@@ -258,8 +258,8 @@ void CalleocaCode()
 			goal_npc = FindNPC(NPC_GOAL);
 			if (goal_npc != NULL)
 			{
-				goal_npc->x = demo->CurXPos;
-				goal_npc->y = demo->CurYPos;
+                goal_npc->momentum.x = demo->momentum.x;
+                goal_npc->momentum.y = demo->momentum.y;
 			}
 		}
 		
@@ -272,10 +272,10 @@ void CalleocaCode()
 		calleoca_npc2 = FindNPC(NPC_COIN);
 		hurt_npc	  = FindNPC(NPC_FIREBAR);
 
-		calleoca_x = calleoca_npc1->x;
-		calleoca_y = calleoca_npc1->y;
-		storage_x  = calleoca_npc2->x;
-		storage_y  = calleoca_npc2->y;
+		calleoca_x = calleoca_npc1->momentum.x;
+		calleoca_y = calleoca_npc1->momentum.y;
+		storage_x  = calleoca_npc2->momentum.x;
+		storage_y  = calleoca_npc2->momentum.y;
 
 		thwomp_height = calleoca_y - 64 * 6 + 16;
 		thwomp_bottom = calleoca_y + 128;
@@ -295,8 +295,8 @@ void CalleocaCode()
     if (hurt_npc->id != NPC_FIREBAR)
 		hurt_npc = FindNPC(NPC_FIREBAR);
 
-	hurt_npc->x = demo->CurXPos;
-	hurt_npc->y = demo->CurYPos - 128;
+    hurt_npc->momentum.x = demo->momentum.x;
+    hurt_npc->momentum.y = demo->momentum.y - 128;
 
 	switch (phase)
 	{
@@ -326,17 +326,17 @@ void CalleocaCode()
 
 	if (phase < 4)
 	{
-		calleoca_npc1->x = calleoca_x;
-		calleoca_npc1->y = calleoca_y;
-		calleoca_npc2->x = storage_x;
-		calleoca_npc2->y = storage_y;
+		calleoca_npc1->momentum.x = calleoca_x;
+		calleoca_npc1->momentum.y = calleoca_y;
+		calleoca_npc2->momentum.x = storage_x;
+		calleoca_npc2->momentum.y = storage_y;
 	}
 	else
 	{
-		calleoca_npc2->x = calleoca_x;
-		calleoca_npc2->y = calleoca_y;
-		calleoca_npc1->x = storage_x;
-		calleoca_npc1->y = storage_y;
+		calleoca_npc2->momentum.x = calleoca_x;
+		calleoca_npc2->momentum.y = calleoca_y;
+		calleoca_npc1->momentum.x = storage_x;
+		calleoca_npc1->momentum.y = storage_y;
 	}
 
 	//gLunaRender.SafePrint(std::wstring(L"FUEL: " + std::to_wstring(missile_fuel)), 3, 0, 256);
@@ -359,15 +359,15 @@ NPCMOB* FindNPC(short identity)
 
 bool TriggerBox(double x1, double y1, double x2, double y2)
 {
-	return (demo->CurXPos + demo->Width		> x1 &&
-			demo->CurXPos					< x2 &&
-			demo->CurYPos + demo->Height	> y1 &&
-			demo->CurYPos					< y2);
+    return (demo->momentum.x + demo->momentum.width		> x1 &&
+        demo->momentum.x					< x2 &&
+        demo->momentum.y + demo->momentum.height	> y1 &&
+        demo->momentum.y					< y2);
 }
 
 void HurtPlayer()
 {
-	hurt_npc->y = demo->CurYPos;
+    hurt_npc->momentum.y = demo->momentum.y;
 }
 
 int AngleDifference(int angle1, int angle2)

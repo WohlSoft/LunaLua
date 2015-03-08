@@ -162,32 +162,32 @@ void Autocode::Do(bool init) {
 					case 0: { // UP
 						double* pCamera = (double*)GM_CAMERA_Y;
 						double top = -pCamera[1];
-						if(npc->y < top + Param2)
-							npc->y = (top + Param2) + 1;
+						if(npc->momentum.y < top + Param2)
+							npc->momentum.y = (top + Param2) + 1;
 						break;
 							}
 
 					case 1: { // DOWN
 						double* pCamera = (double*)GM_CAMERA_Y;
 						double bot = -pCamera[1] + 600;
-						if(npc->y > bot - Param2)
-							npc->y = (bot - Param2) - 1;
+						if(npc->momentum.y > bot - Param2)
+							npc->momentum.y = (bot - Param2) - 1;
 						break;
 							}
 
 					case 2: { // LEFT
 						double* pCamera = (double*)GM_CAMERA_X;
 						double left = -pCamera[1];
-						if(npc->x < left + Param2)
-							npc->x = (left + Param2) + 1;
+						if(npc->momentum.x < left + Param2)
+                            npc->momentum.x = (left + Param2) + 1;
 						break;
 							}
 
 					case 3: { // RIGHT
 						double* pCamera = (double*)GM_CAMERA_X;
 						double rt = -pCamera[1] + 800;
-						if(npc->x > rt - Param2)
-							npc->x = (rt - Param2) - 1;
+                        if (npc->momentum.x > rt - Param2)
+                            npc->momentum.x = (rt - Param2) - 1;
 						break;
 							}
 					}
@@ -334,7 +334,7 @@ void Autocode::Do(bool init) {
 
 		case AT_TriggerZone: {
 			Length++; // undo length decrement
-			if(demo->CurXPos > Param3 && demo->CurYPos > Param1 && demo->CurYPos < Param2 && demo->CurXPos < Length) {
+			if(demo->momentum.x > Param3 && demo->momentum.y > Param1 && demo->momentum.y < Param2 && demo->momentum.x < Length) {
 				gAutoMan.ActivateCustomEvents(0, (int)Target);
 				RunSelfOption();
 			}
@@ -353,19 +353,19 @@ void Autocode::Do(bool init) {
 			double R_edge = 800 - depth;
 			
 			if(demo->WarpTimer < 1) {
-				if(player_screen_rect.left <= L_edge && demo->CurXSpeed < 0) {
+				if(player_screen_rect.left <= L_edge && demo->momentum.speedX < 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Target);
 					demo->WarpTimer = 2;
 				}
-				else if(player_screen_rect.top <= U_edge  && demo->CurYSpeed < 0) {
+				else if(player_screen_rect.top <= U_edge  && demo->momentum.speedY < 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param1);
 					demo->WarpTimer = 2;
 				}
-				else if(player_screen_rect.right >= R_edge  && demo->CurXSpeed > 0) {
+				else if(player_screen_rect.right >= R_edge  && demo->momentum.speedX > 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param2);
 					demo->WarpTimer = 2;
 				}
-				else if(player_screen_rect.bottom >= D_edge && demo->CurYSpeed > 0) {
+				else if(player_screen_rect.bottom >= D_edge && demo->momentum.speedY > 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param3);
 					demo->WarpTimer = 2;
 				}
@@ -835,7 +835,7 @@ void Autocode::Do(bool init) {
 		case AT_ForceFacing: {
 			PlayerMOB* demo = Player::Get(1);
 			if(demo != 0) {
-				NPC::AllFace((int)Target, (int)Param1 - 1, demo->CurXPos);
+				NPC::AllFace((int)Target, (int)Param1 - 1, demo->momentum.speedX);
 			}
 			break;
 						 }
@@ -943,7 +943,7 @@ void Autocode::Do(bool init) {
 									+ std::to_wstring((long long)objs), 3, 50, 510);
 
 			std::list<CellObj> cellobjs;
-			gCellMan.GetObjectsOfInterest(&cellobjs, demo->CurXPos, demo->CurYPos, (int)demo->Width, (int)demo->Height);
+			gCellMan.GetObjectsOfInterest(&cellobjs, demo->momentum.x, demo->momentum.y, (int)demo->momentum.width, (int)demo->momentum.height);
 			gLunaRender.SafePrint(L"NEAR-" + std::to_wstring((long long)cellobjs.size()), 3, 50, 540);
 
 			break;

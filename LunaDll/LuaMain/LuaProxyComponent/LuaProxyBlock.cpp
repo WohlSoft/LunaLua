@@ -159,10 +159,10 @@ int LuaProxy::Block::collidesWith(LuaProxy::Player *player)
 	::Block* tarBlock = ::Blocks::Get(m_index);
 	PlayerMOB* tarPlayer = ::Player::Get(ind);
 
-	double playerX = tarPlayer->CurXPos - 0.20;
-	double playerY = tarPlayer->CurYPos - 0.20;
-	double playerX2 = tarPlayer->CurXPos + tarPlayer->Width + 0.20;
-	double playerY2 = tarPlayer->CurYPos + tarPlayer->Height + 0.20;
+    double playerX = tarPlayer->momentum.x - 0.20;
+    double playerY = tarPlayer->momentum.y - 0.20;
+    double playerX2 = tarPlayer->momentum.x + tarPlayer->momentum.width + 0.20;
+    double playerY2 = tarPlayer->momentum.y + tarPlayer->momentum.height + 0.20;
 
 	if(playerX > tarBlock->XPos + tarBlock->W ||
 		playerX2 < tarBlock->XPos  ||

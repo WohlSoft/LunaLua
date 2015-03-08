@@ -188,15 +188,29 @@ enum PRIORITY {
 #define VASM_END_COINVAL    *(BYTE*)0x00A3C891      // = 1
 
 
-/////////////////////
-///  -Imports-    ///
-/////////////////////
+////////////////////////
+/// -Shared Strcuts- ///
+////////////////////////
+
+struct Momentum
+{
+    double x;
+    double y;
+    double height;
+    double width;
+    double speedX;
+    double speedY;
+};
+
+////////////////////////
+///    -Imports-     ///
+////////////////////////
 
 #define IMP_vbaStrCmp		*(DWORD*)0x004010F8
 
-/////////////////////
-///  -Functions-  ///
-/////////////////////
+////////////////////////
+///    -Functions-   ///
+////////////////////////
 
 // Print using game's text function
 #define GF_PRINT			0x00951F50			// Arg4 = float* y, Arg3 = float* x, Arg2 = Int* fonttype, Arg1 = WCSTR* string

@@ -36,28 +36,28 @@ double LuaProxy::NPC::x(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->x;
+	return ::NPC::Get(m_index)->momentum.x;
 }
 
 void LuaProxy::NPC::setX(double x, lua_State* L)
 {
 	if(!isValid_throw(L))
 		return;
-	::NPC::Get(m_index)->x = x;
+	::NPC::Get(m_index)->momentum.x = x;
 }
 
 double LuaProxy::NPC::y(lua_State* L)
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->y;
+	return ::NPC::Get(m_index)->momentum.y;
 }
 
 void LuaProxy::NPC::setY(double y, lua_State* L)
 {
 	if(!isValid_throw(L))
 		return;
-	::NPC::Get(m_index)->y = y;
+	::NPC::Get(m_index)->momentum.y = y;
 }
 
 double LuaProxy::NPC::speedX(lua_State* L)
