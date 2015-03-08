@@ -62,84 +62,84 @@ double LuaProxy::Animation::x()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.x;
+    return ::Animations::Get(m_animationIndex)->momentum.x;
 }
 
 void LuaProxy::Animation::setX(double x)
 {
 	if(!isValid())
 		return;
-    ::Animations::Get(m_animationIndex)->monumentum.x = x;
+    ::Animations::Get(m_animationIndex)->momentum.x = x;
 }
 
 double LuaProxy::Animation::y()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.y;
+    return ::Animations::Get(m_animationIndex)->momentum.y;
 }
 
 void LuaProxy::Animation::setY(double y)
 {
 	if(!isValid())
 		return;
-    ::Animations::Get(m_animationIndex)->monumentum.y = y;
+    ::Animations::Get(m_animationIndex)->momentum.y = y;
 }
 
 double LuaProxy::Animation::speedX()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.speedX;
+    return ::Animations::Get(m_animationIndex)->momentum.speedX;
 }
 
 void LuaProxy::Animation::setSpeedX(double speedX)
 {
 	if(!isValid())
 		return;
-    ::Animations::Get(m_animationIndex)->monumentum.speedX = speedX;
+    ::Animations::Get(m_animationIndex)->momentum.speedX = speedX;
 }
 
 double LuaProxy::Animation::speedY()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.speedY;
+    return ::Animations::Get(m_animationIndex)->momentum.speedY;
 }
 
 void LuaProxy::Animation::setSpeedY(double speedY)
 {
 	if(!isValid())
 		return;
-	::Animations::Get(m_animationIndex)->monumentum.speedY = speedY;
+	::Animations::Get(m_animationIndex)->momentum.speedY = speedY;
 }
 
 double LuaProxy::Animation::height()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.height;
+    return ::Animations::Get(m_animationIndex)->momentum.height;
 }
 
 void LuaProxy::Animation::setHeight(double height)
 {
 	if(!isValid())
 		return;
-    ::Animations::Get(m_animationIndex)->monumentum.height = height;
+    ::Animations::Get(m_animationIndex)->momentum.height = height;
 }
 
 double LuaProxy::Animation::width()
 {
 	if(!isValid())
 		return 0;
-    return ::Animations::Get(m_animationIndex)->monumentum.width;
+    return ::Animations::Get(m_animationIndex)->momentum.width;
 }
 
 void LuaProxy::Animation::setWidth(double width)
 {
 	if(!isValid())
 		return;
-    ::Animations::Get(m_animationIndex)->monumentum.width = width;
+    ::Animations::Get(m_animationIndex)->momentum.width = width;
 }
 
 short LuaProxy::Animation::timer()
