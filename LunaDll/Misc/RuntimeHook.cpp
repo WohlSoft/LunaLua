@@ -247,7 +247,6 @@ extern void forceTermination()
 
 extern int LoadWorld()
 {
-	resetDefines();
 #ifndef NO_SDL
 	if(!episodeStarted)
 	{
@@ -320,7 +319,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.6.0.3 BETA"), 3, 5, 5);
+	Render::Print(std::wstring(L"LUNALUA V0.6.1 BETA"), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){

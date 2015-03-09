@@ -157,7 +157,11 @@ function __onInit(lvlPath, lvlName)
 			local doLunaworld = true
 			local doLunadll = true
 			
+			--SEGMENT TO ADD PRELOADED APIS START
 			loadSharedAPI("uservar")
+			Defines = loadSharedAPI("core\\defines")
+			--SEGMENT TO ADD PRELOADED APIS END
+			
 			local localLuaFile = nil
 			local glLuaFile = lvlPath .. "lunaworld.lua"
 			if(lvlName:find("."))then
@@ -189,6 +193,10 @@ function __onInit(lvlPath, lvlName)
 		local status = {pcall(function() --Safe code: This code segment can post errors
 			__episodePath = lvlPath
 			local doOverworld = true
+			
+			--SEGMENT TO ADD PRELOADED APIS START
+			Defines = loadSharedAPI("core\\defines")
+			--SEGMENT TO ADD PRELOADED APIS END
 
 			local overworldLuaFile = lvlPath .. "lunaoverworld.lua"
 

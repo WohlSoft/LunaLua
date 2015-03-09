@@ -51,7 +51,6 @@ int OnLvlLoad() {
 
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
-    resetDefines();
 
 #ifndef NO_SDL
 	if(!episodeStarted)

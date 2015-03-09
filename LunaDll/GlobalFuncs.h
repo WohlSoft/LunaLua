@@ -32,7 +32,6 @@ void CleanUp();
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
-void resetDefines();
 HMODULE getModule(std::string moduleName);
 std::wstring getModulePath();
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
