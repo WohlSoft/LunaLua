@@ -238,7 +238,9 @@ void CLunaLua::bindAll()
 			class_<Event>("Event")
 			.property("eventName", &Event::eventName)
 			.property("cancellable", &Event::isCancellable)
-			.property("cancelled", &Event::cancelled, &Event::setCancelled),
+			.property("cancelled", &Event::cancelled, &Event::setCancelled)
+            .property("loopable", &Event::getLoopable, &Event::setLoopable)
+            .property("directEventName", &Event::getDirectEventName, &Event::setDirectEventName),
 
 			class_<LuaProxy::Data>("Data")
 				.enum_("DataTypes")

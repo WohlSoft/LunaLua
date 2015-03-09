@@ -147,13 +147,23 @@ void TrySkipPatch()
 	/* Source Code Function Patch                                           */
 	/************************************************************************/
 	*(void**)0xB2F244 = (void*)&mciSendStringHookA;
+
 	PATCH_FUNC(0x8D6BB6, &forceTermination);
+
 	PATCH_FUNC(0x8C11D5, &LoadWorld);
+
 	PATCH_FUNC(0x8C16F7, &WorldLoop);
+
 	PATCH_FUNC(0x932353, &printLunaLuaVersion);
+
 	PATCH_FUNC(0x9090F5, &WorldRender);
+
 	PATCH_FUNC(0xAA4352, &__vbaStrCmp_TriggerSMBXEventHook);
 	*(BYTE*)(0xAA4357) = INSTR_NOP;
+
+    PATCH_FUNC(0x8C23CB, &checkLevelShutdown);
+    *(BYTE*)(0x8C23D0) = INSTR_NOP;
+    *(BYTE*)(0x8C23D1) = INSTR_NOP;
 
 	/************************************************************************/
 	/* Import Table Patch                                                   */
@@ -560,6 +570,24 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 	
 }
 
+extern void checkLevelShutdown()
+{
+    if (GM_WORLD_MODE || GM_INTRO_MODE){
+        if (gLunaLua.isValid()){
+            Event shutdownEvent("onExitLevel", false);
+            shutdownEvent.setDirectEventName("onExitLevel");
+            shutdownEvent.setLoopable(false);
+            gLunaLua.callEvent(&shutdownEvent);
+            gLunaLua.shutdown();
+        }
+    }
+
+    __asm{
+        CMP WORD PTR DS : [0x00B2C5B4], 0
+    }
+}
+
+
 void fixup_TypeMismatch13()
 {
 	// I still provide this code as a attempt to patch the conversion of string to float.
@@ -607,5 +635,4 @@ void fixup_TypeMismatch13()
 		MessageBoxA(NULL, output.c_str(), "Dbg", NULL);*/
 	}
 }
-
 

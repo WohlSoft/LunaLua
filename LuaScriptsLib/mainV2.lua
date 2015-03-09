@@ -291,7 +291,18 @@ detourEventQueue = {
 	collectedEvents = {},
 	-- Collect an native event for the onLoop event
 	collectEvent = function(eventName, ...)
-		detourEventQueue.collectedEvents[eventName] = detourEventQueue.transformArgs(eventName, ...)
+		local args = {...}
+		local eventInfo = args[1]
+		local directEventName = ""
+		if(eventInfo.loopable)then
+			detourEventQueue.collectedEvents[eventName] = detourEventQueue.transformArgs(eventName, ...)
+		end
+		if(eventInfo.directEventName == "")then
+			directEventName = eventName.."Direct"
+		else
+			directEventName = eventInfo.directEventName
+		end
+		return directEventName
 	end,
 	transformArgs = function(eventName, ...)
 		local fArgs = {...} -- Original Functions Args
@@ -302,6 +313,8 @@ detourEventQueue = {
 			-- Original Signature: Event eventObj, String name
 			-- New Signature: String name
 			rArgs = {fArgs[2]}
+		else
+			table.remove(rArgs[1]) --Remove the event object, as it cannot be used for loop events
 		end
 		--- ALL HARDCODED EVENTS END ---
 		return rArgs
@@ -330,8 +343,7 @@ eventManager = setmetatable({ --Normal table
 		if(eventManager.nextEvent:len() > __lapiSigNative:len())then
 			if(eventManager.nextEvent:sub(0, __lapiSigNative:len()) == __lapiSigNative)then
 				eventManager.nextEvent = eventManager.nextEvent:sub(__lapiSigNative:len()+1)
-				detourEventQueue.collectEvent(eventManager.nextEvent, ...)
-				eventManager.nextEvent = eventManager.nextEvent.."Direct"
+				eventManager.nextEvent = detourEventQueue.collectEvent(eventManager.nextEvent, ...)
 			end
 		end
 		

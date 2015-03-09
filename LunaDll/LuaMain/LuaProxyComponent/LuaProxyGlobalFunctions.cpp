@@ -510,7 +510,7 @@ luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
 
 void LuaProxy::exitLevel()
 {
-	GM_LEAVE_LEVEL = 0xFFFF;
+	GM_WORLD_MODE = 0xFFFF;
 }
 
 unsigned short LuaProxy::winState()

@@ -162,7 +162,8 @@ enum PRIORITY {
 #define GM_WINS_T           *(WORD*)0x00B2D762      // 0 = default, if higher than 0 then display text "WINS!"
 
 #define GM_WINNING          *(WORD*)0x00B2C59E      // 0 = not winning, if higher than 0 then winning by this win-type
-#define GM_LEAVE_LEVEL      *(WORD*)0x00B2C5B4      // 0xFFFF = leave current level
+#define GM_WORLD_MODE       *(WORD*)0x00B2C5B4      // 0xFFFF = leave current level
+#define GM_INTRO_MODE       *(WORD*)0x00B2C620
 
 #define GM_UNK_OV_DATABLOCK *(DWORD*)0x00B25164     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 

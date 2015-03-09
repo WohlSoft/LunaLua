@@ -3,11 +3,12 @@
 
 
 Event::Event(std::string eventName, bool cancellable) : 
-    m_isCancelled(false)
-{
-	m_eventName = eventName;
-	m_cancellable = cancellable;
-}
+    m_directEventName(""),
+    m_eventName(eventName),
+    m_cancellable(cancellable),
+    m_isCancelled(false),
+    m_isLoopable(true) 
+{}
 
 Event::~Event()
 {}

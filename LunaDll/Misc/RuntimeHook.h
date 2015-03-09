@@ -62,6 +62,8 @@ extern void __stdcall doEventsLevelEditorHook();
 //extern short __stdcall GetKeyState(int vKey);
 //TriggerSMBXEvent cmp function
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
+//Level Shutdown Check Function
+extern void checkLevelShutdown();
 
 /************************************************************************/
 /* Libs                                                                 */

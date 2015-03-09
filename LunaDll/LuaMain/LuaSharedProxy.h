@@ -18,12 +18,21 @@ public:
 	bool native_cancelled();
 	void setCancelled(bool cancled, lua_State* L);
 	std::string eventName();
-private:
+    
+    std::string getDirectEventName() const { return m_directEventName; }
+    void setDirectEventName(std::string val) { m_directEventName = val; }
 
-	std::string m_eventName;
+    bool getLoopable() const { return m_isLoopable; }
+    void setLoopable(bool val) { m_isLoopable = val; }
+
+private:
+    std::string m_directEventName;
+    
+    std::string m_eventName;
 	bool m_cancellable;
 	bool m_isCancelled;
-
+    bool m_isLoopable;
+    
 };
 
 #endif
