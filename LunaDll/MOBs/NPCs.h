@@ -3,6 +3,7 @@
 #define NPCs_hhhh
 
 #include "../Defines.h"
+#include "../Misc/VB6StrPtr.h"
 #include <list>
 #include <vector>
 #include <string>
@@ -68,7 +69,7 @@
 
 #pragma pack(push, 4)
 struct NPCMOB {
-    wchar_t* attachedLayerName;             //+0x00
+	VB6StrPtr attachedLayerName;            //+0x00
     short unknown_04;                       //+0x04
     short unknown_06;                       //+0x06 Unknown decrementing Timer
     short unknown_08;                       //+0x08 
@@ -89,18 +90,18 @@ struct NPCMOB {
     short invincibilityToSword;             //+0x26
     short unknown_28;                       //+0x28
     short unknown_2A;                       //+0x2A
-    wchar_t* activateEventLayerName;        //+0x2C
-    wchar_t* deathEventName;                //+0x30
-    wchar_t* talkEventName;                 //+0x34
-    wchar_t* noMoreObjInLayerEventName;     //+0x38
-    wchar_t* layerName;                     //+0x3C
+	VB6StrPtr activateEventLayerName;       //+0x2C
+	VB6StrPtr deathEventName;               //+0x30
+	VB6StrPtr talkEventName;                //+0x34
+	VB6StrPtr noMoreObjInLayerEventName;    //+0x38
+	VB6StrPtr layerName;                    //+0x3C
     short unknown_40;                       //+0x40
     short unknown_42;                       //+0x42
     short activated;                        //+0x44
     short friendly;                         //+0x46
     short dontMove;                         //+0x48
     short unknown_4A;                       //+0x4A
-    wchar_t* talkMsg;                       //+0x4C
+	VB6StrPtr talkMsg;                      //+0x4C
     short unknown_50;                       //+0x50
     short unknown_52;                       //+0x52
     short unknown_54;                       //+0x54

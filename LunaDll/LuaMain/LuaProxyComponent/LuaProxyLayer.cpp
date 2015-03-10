@@ -11,7 +11,7 @@ LuaProxy::Layer::Layer(int layerIndex)
 LuaProxy::VBStr LuaProxy::Layer::layerName()
 {
 	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	return VBStr(thislayer->ptLayerName);
+	return VBStr(thislayer->ptLayerName.ptr);
 }
 
 float LuaProxy::Layer::speedX()

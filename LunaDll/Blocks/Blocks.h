@@ -4,6 +4,7 @@
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../MOBs/PlayerMOB.h"
+#include "../Misc/VB6StrPtr.h"
 
 struct Block {
 
@@ -17,7 +18,7 @@ struct Block {
 	wchar_t*			pUnknown0C;
 	wchar_t*			pUnknown10;
 	wchar_t*			pUnknown14;
-	wchar_t*			pLayerName;		// 0x18	
+	VB6StrPtr			pLayerName;		// 0x18	
 
 	short				IsInvisible;	// 0x1C	
 	short				BlockType;		// 0x1E	

@@ -1,6 +1,8 @@
 #ifndef WorldLevel_hhh
 #define WorldLevel_hhh
 
+#include "../Misc/VB6StrPtr.h"
+
 #pragma pack(push, 4)
 struct WorldLevel{
 	double XPos;						//+0
@@ -10,7 +12,7 @@ struct WorldLevel{
 	double unkUnused_speedX;			//+32
 	double unkUnused_speedY;			//+40
 	char padding1[20];					//+48
-	wchar_t* levelTitle;				//+68
+	VB6StrPtr levelTitle;				//+68
 	char padding2[28];					//+72
 };
 #pragma pack(pop)

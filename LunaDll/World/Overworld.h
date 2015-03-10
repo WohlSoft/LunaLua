@@ -1,6 +1,8 @@
 #ifndef Overworld_hhhhhh
 #define Overworld_hhhhhh
 
+#include "../Misc/VB6StrPtr.h"
+
 struct Overworld{
 	char padding1[64];					
 	double XPos;						//+64
@@ -15,7 +17,7 @@ struct Overworld{
 	short currentWalkingDirection;		//+118		0 = Not Walking (Idle) | 1 = Walking Up | 2 = Walking Left | 3 = Walking Down | 4 = Walking Right
 	short currentWalkingTimer;			//+120		0-32	will increment by 2 each frame, if reached 32 then the target tile has been reached and movement will be stopped
 	short isCurrentlyWalking;			//+122		TRUE / FALSE	0 / -1
-	wchar_t* currentLevelTitle;			//+124
+	VB6StrPtr currentLevelTitle;		//+124
 };
 
 namespace SMBXOverworld{

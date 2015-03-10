@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -24,14 +24,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -159,6 +159,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Minigames\GameboyRPG.h" />
     <ClInclude Include="Misc\SHMemServer.h" />
+    <ClInclude Include="Misc\VB6StrPtr.h" />
     <ClInclude Include="Rendering\BMPBox.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="Minigames\GameboyRPG.cpp" />
     <ClCompile Include="Minigames\Minigames.cpp" />
     <ClCompile Include="Misc\SHMemServer.cpp" />
+    <ClCompile Include="Misc\VB6StrPtr.cpp" />
     <ClCompile Include="Rendering\BMPBox.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />

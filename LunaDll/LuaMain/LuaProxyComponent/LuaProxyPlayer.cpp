@@ -144,12 +144,10 @@ void LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::obj
 {
 	if(!isValid_throw(L))
 		return;
-	int iftype = (int)ftype;
-	if(iftype >= 1 && iftype <= 5){
-		PlayerMOB* pPlayer = ::Player::Get(m_index);
-		void* ptr = ((&(*(byte*)pPlayer)) + offset);
-		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
-	}
+
+	PlayerMOB* pPlayer = ::Player::Get(m_index);
+	void* ptr = ((&(*(byte*)pPlayer)) + offset);
+	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
@@ -157,29 +155,9 @@ luabind::object LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, l
 	if(!isValid_throw(L))
 		return luabind::object();
 
-	int iftype = (int)ftype;
-	double val = 0;
 	PlayerMOB* pPlayer = ::Player::Get(m_index);
 	void* ptr = ((&(*(byte*)pPlayer)) + offset);
-	if(iftype >= 1 && iftype <= 6){
-		val = GetMem((int)ptr, (FIELDTYPE)ftype);
-	}
-	switch (ftype) {
-	case LFT_BYTE:
-		return luabind::object(L, (byte)val);
-	case LFT_WORD:
-		return luabind::object(L, (short)val);
-	case LFT_DWORD:
-		return luabind::object(L, (int)val);
-	case LFT_FLOAT:
-		return luabind::object(L, (float)val);
-	case LFT_DFLOAT:
-		return luabind::object(L, (double)val);
-	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)(int)val));
-	default:
-		return luabind::object();
-	}
+	return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 bool LuaProxy::Player::isValid()

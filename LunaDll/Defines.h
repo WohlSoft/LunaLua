@@ -208,6 +208,8 @@ struct Momentum
 ////////////////////////
 
 #define IMP_vbaStrCmp		*(DWORD*)0x004010F8
+#define IMP_vbaStrCopy		*(DWORD*)0x004011b0
+#define IMP_vbaFreeStr		*(DWORD*)0x00401248
 
 ////////////////////////
 ///    -Functions-   ///

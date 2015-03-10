@@ -209,7 +209,7 @@ void CLunaLua::bindAll()
 			def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
 			def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),
 			def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::placeSprite),
-			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object)) &LuaProxy::mem),
+			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)) &LuaProxy::mem),
 			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
 			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
@@ -299,14 +299,14 @@ void CLunaLua::bindAll()
 				.property("playerIsCurrentWalking", &LuaProxy::World::playerIsCurrentWalking)
 				.property("levelTitle", &LuaProxy::World::levelTitle)
 				.property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
-				.def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::World::mem))
+				.def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::World::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::World::mem)),
 
 				class_<LuaProxy::LevelObject>("Level")
 				.property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
 				.property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
 				.property("levelTitle", &LuaProxy::LevelObject::levelTitle)
-				.def("mem", static_cast<void (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::LevelObject::mem))
+				.def("mem", static_cast<void (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::LevelObject::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::LevelObject::mem))
 
 			];
@@ -347,7 +347,7 @@ void CLunaLua::bindAll()
 
 				class_<LuaProxy::Animation>("Animation")
 				.def(constructor<int>())
-				.def("mem", static_cast<void (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Animation::mem))
+				.def("mem", static_cast<void (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::Animation::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Animation::mem))
 				.property("id", &LuaProxy::Animation::id, &LuaProxy::Animation::setId)
 				.property("x", &LuaProxy::Animation::x, &LuaProxy::Animation::setX)
@@ -537,7 +537,7 @@ void CLunaLua::bindAll()
 
 				class_<LuaProxy::Block>("Block")
 				.def(constructor<int>())
-				.def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, luabind::object)>(&LuaProxy::Block::mem))
+				.def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)>(&LuaProxy::Block::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*)>(&LuaProxy::Block::mem))
 				.def("collidesWith", &LuaProxy::Block::collidesWith)
 				.property("x", &LuaProxy::Block::x, &LuaProxy::Block::setX)

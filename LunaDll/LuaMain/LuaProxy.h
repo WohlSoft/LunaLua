@@ -38,7 +38,7 @@ namespace LuaProxy {
     luabind::object blocks(lua_State *L);
     luabind::object findblocks(int ID, lua_State *L);
 	//Memory functions
-    void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+	void mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 	//SMBX trigger function
     void triggerEvent(const char* evName);
@@ -184,7 +184,7 @@ namespace LuaProxy {
     class Animation{
     public:
         Animation (int animationIndex);
-        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
         short id();
         void setId(short id);
@@ -549,7 +549,7 @@ namespace LuaProxy {
     {
     public:
         Block(int index);
-        void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
         double x();
         void setX(double x);
@@ -581,7 +581,7 @@ namespace LuaProxy {
 	{
 	public:
 		World();
-		void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L);
 		luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 		double playerX();
 		void setPlayerX(double playerX);
@@ -604,7 +604,7 @@ namespace LuaProxy {
 	{
 	public:
 		LevelObject(int index);
-		void mem(int offset, L_FIELDTYPE ftype, luabind::object value);
+		void mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L);
 		luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 		double x();
 		void setX(double x);

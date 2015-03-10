@@ -25,41 +25,18 @@ void LuaProxy::World::setPlayerY(double playerY)
 	SMBXOverworld::get()->YPos = playerY;
 }
 
-void LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, luabind::object value)
+void LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L)
 {
-	int iftype = (int)ftype;
-	if(iftype >= 1 && iftype <= 5){
-		Overworld* pOverworld = ::SMBXOverworld::get();
-		void* ptr = ((&(*(byte*)pOverworld)) + offset);
-		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
-	}
+	Overworld* pOverworld = ::SMBXOverworld::get();
+	void* ptr = ((&(*(byte*)pOverworld)) + offset);
+	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, lua_State* L)
 {
-	int iftype = (int)ftype;
-	double val = 0;
 	Overworld* pOverworld = ::SMBXOverworld::get();
 	void* ptr = ((&(*(byte*)pOverworld)) + offset);
-	if(iftype >= 1 && iftype <= 6){
-		val = GetMem((int)ptr, (FIELDTYPE)ftype);
-	}
-	switch (ftype) {
-	case LFT_BYTE:
-		return luabind::object(L, (byte)val);
-	case LFT_WORD:
-		return luabind::object(L, (short)val);
-	case LFT_DWORD:
-		return luabind::object(L, (int)val);
-	case LFT_FLOAT:
-		return luabind::object(L, (float)val);
-	case LFT_DFLOAT:
-		return luabind::object(L, (double)val);
-	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)(int)val));
-	default:
-		return luabind::object();
-	}
+	return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 short LuaProxy::World::currentWalkingDirection()
@@ -109,8 +86,8 @@ bool LuaProxy::World::playerIsCurrentWalking()
 
 luabind::object LuaProxy::World::levelTitle(lua_State* L)
 {
-	if(SMBXOverworld::get()->currentLevelTitle[0] && SMBXOverworld::get()->currentLevelTitle != (wchar_t*)0x423D00){
-		return luabind::object(L, VBStr(SMBXOverworld::get()->currentLevelTitle));
+	if(SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != (wchar_t*)0x423D00){
+		return luabind::object(L, VBStr(SMBXOverworld::get()->currentLevelTitle.ptr));
 	}
 	return luabind::object();
 }

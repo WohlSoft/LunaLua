@@ -7,41 +7,18 @@ LuaProxy::Animation::Animation(int animationIndex)
 	m_animationIndex = animationIndex;
 }
 
-void LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+void LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value, lua_State *L)
 {
-	int iftype = (int)ftype;
-	if(iftype >= 1 && iftype <= 5){
-		SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
-		void* ptr = ((&(*(byte*)manimation)) + offset);
-		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
-	}
+	SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
+	void* ptr = ((&(*(byte*)manimation)) + offset);
+	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
 {
-	int iftype = (int)ftype;
-	double val = 0;
 	SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
 	void* ptr = ((&(*(byte*)manimation)) + offset);
-	if(iftype >= 1 && iftype <= 6){
-		val = GetMem((int)ptr, (FIELDTYPE)ftype);
-	}
-	switch (ftype) {
-	case LFT_BYTE:
-		return luabind::object(L, (byte)val);
-	case LFT_WORD:
-		return luabind::object(L, (short)val);
-	case LFT_DWORD:
-		return luabind::object(L, (int)val);
-	case LFT_FLOAT:
-		return luabind::object(L, (float)val);
-	case LFT_DFLOAT:
-		return luabind::object(L, (double)val);
-	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)(int)val));
-	default:
-		return luabind::object();
-	}
+	return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 short LuaProxy::Animation::id()

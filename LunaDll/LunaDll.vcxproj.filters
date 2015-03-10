@@ -282,6 +282,9 @@
     <ClInclude Include="LuaMain\LuaSharedProxy.h">
       <Filter>Header Files\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\VB6StrPtr.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -526,6 +529,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyData.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\VB6StrPtr.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

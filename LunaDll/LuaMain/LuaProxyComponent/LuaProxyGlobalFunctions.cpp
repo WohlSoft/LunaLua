@@ -180,12 +180,16 @@ luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 	return vnpcs;
 }
 
-void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, luabind::object value)
+void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, luabind::object value, lua_State *L)
 {
 	int iftype = (int)ftype;
 	if(iftype >= 1 && iftype <= 5){
 		void* ptr = ((&(*(byte*)mem)));
 		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
+	}
+	else if (ftype == LFT_STRING) {
+		void* ptr = ((&(*(byte*)mem)));
+		LuaHelper::assignVB6StrPtr((VB6StrPtr*)ptr, value, L);
 	}
 }
 

@@ -4,11 +4,12 @@
 
 #include "../Defines.h"
 #include "../Globals.h"
+#include "../Misc/VB6StrPtr.h"
 
 struct LayerControl {
 	short		IsStopped;		// 0xFFFF when moving, event ended?
 	short		Unknown1;
-	wchar_t*	ptLayerName;	// ptr to double zero terminated 2byte wide char string
+	VB6StrPtr	ptLayerName;	// ptr to double zero terminated 2byte wide char string
 	int			Unknown2;
 
 	float		xSpeed;
