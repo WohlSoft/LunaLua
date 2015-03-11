@@ -40,8 +40,6 @@ void VB6StrPtr::operator=(const VB6StrPtr &other) {
 
 // Assignment operator from std::wstring
 void VB6StrPtr::operator=(const std::wstring &other) {
-	static char tmp[512];
-
 	// Allocate temporary memory of the right length so we can prefix the length header
 	std::size_t len = other.length();
 	unsigned char* tmpVBString = (unsigned char*)malloc(sizeof(unsigned int) + sizeof(wchar_t)*(len + 1));
