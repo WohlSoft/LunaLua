@@ -15,9 +15,9 @@ struct VB6StrPtr {
 	void operator=(const VB6StrPtr &other);
 	void operator=(const std::wstring &other);
 	void operator=(const std::string &other);
-	operator std::wstring();
-	operator std::string();
-	operator bool();
+	operator std::wstring() const;
+	operator std::string() const;
+	operator bool() const;
 };
 #pragma pack(pop)
 

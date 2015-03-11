@@ -18,7 +18,7 @@ std::string LuaProxy::VBStr::str() const
 {
 	if(!isValid())
 		return std::string("");
-	return utf8_encode(std::wstring(m_wcharptr));
+	return utf8_encode(std::wstring(m_wcharptr, (*(((short*)m_wcharptr) - 2) / 2)));
 }
 
 void LuaProxy::VBStr::setStr(std::string str)
