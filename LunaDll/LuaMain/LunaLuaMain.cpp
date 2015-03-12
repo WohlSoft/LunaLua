@@ -241,7 +241,6 @@ void CLunaLua::bindAll()
 				def("MusicStopFadeOut", (void(*)(int))&LuaProxy::Audio::MusicStopFadeOut),
 				def("MusicPause", (void(*)())&LuaProxy::Audio::MusicPause),
 				def("MusicResume", (void(*)())&LuaProxy::Audio::MusicResume),
-				def("MusicStop", (void(*)())&LuaProxy::Audio::MusicStop),
 				def("MusicIsPlaying", (bool(*)())&LuaProxy::Audio::MusicIsPlaying),
 				def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
 				def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
