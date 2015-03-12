@@ -1,9 +1,12 @@
-#ifdef LuaProxyAudio_H //Temporary disabled, WIP
-//#ifndef LuaProxyAudio_H
+//#ifdef LuaProxyAudio_H //Temporary disabled, WIP
+#ifndef LuaProxyAudio_H
 #define LuaProxyAudio_H
 
 #include <SDL2/SDL_mixer.h>
 #undef main
+#include <string>
+
+class MciEmulator;
 
 namespace LuaProxy
 {
@@ -27,18 +30,24 @@ namespace LuaProxy
 		//SFX
 		void clearSFXBuffer();
 		void playSFX(const char* filename);
-		Mix_Chunk* openSFX(const char* filename);
-		int playSFXChannel(int channel, Mix_Chunk* chunk, int loops);
-		int playSFXChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
-		int FadeInSFXChannel(int channel, Mix_Chunk *chunk, int loops, int ms);
-		int FadeInSFXChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
-		void pauseSFX(int channel);
-		void resumeSFX(int channel);
-		int stopSFXChannel(int channel);
-		int expireSFXChannel(int channel, int ticks);
-		int fadeOutSFXChannel(int channel, int ms);
-		int sfxIsPlaying(int channel);
-		int sfxIsPaused(int channel);
+        Mix_Chunk* SfxOpen(const char* filename);
+        int SfxPlayCh(int channel, Mix_Chunk* chunk, int loops);
+        int SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
+        int SfxFadeInCh(int channel, Mix_Chunk *chunk, int loops, int ms);
+        int SfxFadeInChTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
+        void SfxPause(int channel);
+        void SfxResume(int channel);
+        int SfxStop(int channel);
+        int SfxExpire(int channel, int ticks);
+        int SfxFadeOut(int channel, int ms);
+        int SfxIsPlaying(int channel);
+        int SfxIsPaused(int channel);
+
+        std::string getSfxPath(std::string path);
+        void setMciEngine(MciEmulator *_engine);
+        void setMciSection(int section);
+        void resetMciSections();
+        extern MciEmulator *mciEngine;
 	}
 }
 #endif

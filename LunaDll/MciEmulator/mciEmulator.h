@@ -33,9 +33,15 @@ public:
 		std::string fileName;
 		int volume;
 	};
+    void resetSeizes();
+    void setSeized(int section, bool state);
+    void setCurrentSection(int section);
 
 private:
 	std::map<std::string, regSoundFile> registeredFiles;
+    bool seizedSections[21];
+    bool pausedNatively;
+    int curSection;
 };
 
 #endif

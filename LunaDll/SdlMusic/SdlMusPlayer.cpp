@@ -185,42 +185,70 @@ char *PGE_Sounds::current = "";
 
 std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
 
+Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
+{
+    PGE_SDL_Manager::initSDL();
+    std::string filePath = sndFile;
+    std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
+    Mix_Chunk* tmpChunk;
+    if(it == chunksBuffer.end())
+    {
+        tmpChunk = Mix_LoadWAV( sndFile );
+        if(!tmpChunk) {
+            MessageBoxA(0, std::string(std::string("OpenSFX: Mix_LoadWAV: ")
+            +std::string(sndFile)+"\n"
+            +std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
+        chunksBuffer[filePath] = tmpChunk;
+    }
+    else
+    {
+        tmpChunk = chunksBuffer[filePath];
+    }
+
+    Mix_ReserveChannels(chunksBuffer.size()>4 ? 4: chunksBuffer.size());
+
+    return tmpChunk;
+}
+
 void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 {
-	PGE_SDL_Manager::initSDL();
- 	std::string filePath = sndFile;	
-	std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
-	if(it == chunksBuffer.end())
-	{
-		sound = Mix_LoadWAV( sndFile );
-		if(!sound) {
-			MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
-			+std::string(sndFile)+"\n"
-			+std::string(Mix_GetError())).c_str(), "Error", 0);
-		}
+    PGE_SDL_Manager::initSDL();
+    std::string filePath = sndFile;
+    std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
+    if(it == chunksBuffer.end())
+    {
+        sound = Mix_LoadWAV( sndFile );
+        if(!sound) {
+            MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
+            +std::string(sndFile)+"\n"
+            +std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
 
-		chunksBuffer[filePath] = sound;
-		if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
-		{
-			MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
-		}
-	}
-	else
-	{
-		if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
-		{
-			MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
-		}
-	}
+        chunksBuffer[filePath] = sound;
+        if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+        {
+            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
+    }
+    else
+    {
+        if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+        {
+            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
+    }
 }
 
 void PGE_Sounds::clearSoundBuffer()
 {
+    Mix_HaltChannel(-1);
 	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
 	{
 		Mix_FreeChunk(it->second);
 	}
 	chunksBuffer.clear();
+    Mix_ReserveChannels(0);
 }
 
 #endif

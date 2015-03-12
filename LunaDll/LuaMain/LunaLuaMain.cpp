@@ -8,6 +8,7 @@
 #include "LuaHelper.h"
 #include "LuaProxy.h"
 #include "LuaEvents.h"
+#include "LuaProxyComponent/LuaProxyAudio.h"
 #include <string>
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -40,6 +41,7 @@ bool CLunaLua::shutdown()
 	if(!isValid())
 		return false;
 		
+    LuaProxy::Audio::resetMciSections();
 	lua_close(L);
 	L = NULL;
 	return true;

@@ -150,6 +150,7 @@
     <ClInclude Include="Blocks\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
     <ClInclude Include="LuaMain\LuabindIncludes.h" />
+    <ClInclude Include="LuaMain\LuaProxyComponent\LuaProxyAudio.h" />
     <ClInclude Include="LuaMain\LuaSharedProxy.h" />
     <ClInclude Include="Minigames\CGUI\CGUI.h" />
     <ClInclude Include="CustomSprites\CSprite.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="CellManager\CellManager.cpp" />
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAudio.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBlock.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyData.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp" />
