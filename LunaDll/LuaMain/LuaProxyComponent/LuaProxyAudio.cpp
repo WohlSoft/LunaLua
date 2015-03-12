@@ -104,20 +104,21 @@ bool LuaProxy::Audio::MusicIsFading()
 
 void LuaProxy::Audio::seizeStream(int section)
 {
-    if(mciEngine)
-        mciEngine->setSeized(section, true);
+	MusicManager::setSeized(section, true);
 
 }
 
 void LuaProxy::Audio::releaseStream(int section)
 {
-    if(mciEngine)
-        mciEngine->setSeized(section, false);
+	MusicManager::setSeized(section, false);
 }
 
 
 
-
+Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
+{
+	return NULL;
+}
 
 
 
@@ -229,22 +230,20 @@ string LuaProxy::Audio::getSfxPath(string filename)
     return full_paths;
 }
 
-MciEmulator *LuaProxy::Audio::mciEngine=NULL;
-void LuaProxy::Audio::setMciEngine(MciEmulator *_engine)
-{
-    mciEngine=_engine;
-}
-
 
 void LuaProxy::Audio::setMciSection(int section)
 {
-    if(mciEngine)
-        mciEngine->setCurrentSection(section);
+    MusicManager::setCurrentSection(section);
 }
 
 
 void LuaProxy::Audio::resetMciSections()
 {
-    if(mciEngine)
-        mciEngine->resetSeizes();
+	MusicManager::resetSeizes();
+}
+
+
+void LuaProxy::Audio::SfxVolume(int channel, int vlm)
+{
+    Mix_Volume(channel, vlm);
 }

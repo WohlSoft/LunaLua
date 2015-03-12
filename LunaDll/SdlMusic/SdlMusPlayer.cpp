@@ -64,7 +64,6 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 			if(Mix_FadingMusic()!=MIX_FADING_IN)
 				if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
 				{
-					if(std::string(Mix_GetError())!="No free channels available")//Don't show overflow messagebox
 					MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
 				}
 		}
@@ -190,7 +189,7 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
     PGE_SDL_Manager::initSDL();
     std::string filePath = sndFile;
     std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
-    Mix_Chunk* tmpChunk;
+    Mix_Chunk* tmpChunk = NULL;
     if(it == chunksBuffer.end())
     {
         tmpChunk = Mix_LoadWAV( sndFile );
@@ -228,6 +227,7 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
         chunksBuffer[filePath] = sound;
         if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
         {
+			if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
             MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }
@@ -235,6 +235,7 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
     {
         if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
         {
+			if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
             MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }

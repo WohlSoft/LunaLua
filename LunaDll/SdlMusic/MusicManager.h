@@ -35,6 +35,10 @@ class MusicManager
 		static void loadSounds(std::string path, std::string root);
 		static void loadMusics(std::string path, std::string root);
 		static std::string SndRoot();
+
+		static void resetSeizes();
+		static void setSeized(int section, bool state);
+		static void setCurrentSection(int section);
 	private:
 		static std::unordered_map<std::string, musicFile > registredFiles;
 		static std::unordered_map<std::string, chunkFile > chunksBuffer;
@@ -57,6 +61,11 @@ class MusicManager
 		//INI Paths
 		static std::string defaultSndINI;//Full path to global sounds.ini file
 		static std::string defaultMusINI;//Full path to global music.ini file
+
+		//Music stream seizing
+		static bool seizedSections[21];
+		static bool pausedNatively;
+		static int curSection;
 };
 #endif
 

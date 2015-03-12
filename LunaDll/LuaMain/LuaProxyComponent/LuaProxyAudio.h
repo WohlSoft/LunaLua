@@ -28,6 +28,7 @@ namespace LuaProxy
 		void releaseStream(int section);
 
 		//SFX
+		Mix_Chunk* newMix_Chunk();
 		void clearSFXBuffer();
 		void playSFX(const char* filename);
         Mix_Chunk* SfxOpen(const char* filename);
@@ -42,12 +43,11 @@ namespace LuaProxy
         int SfxFadeOut(int channel, int ms);
         int SfxIsPlaying(int channel);
         int SfxIsPaused(int channel);
+        void SfxVolume(int channel, int vlm);
 
         std::string getSfxPath(std::string path);
-        void setMciEngine(MciEmulator *_engine);
         void setMciSection(int section);
         void resetMciSections();
-        extern MciEmulator *mciEngine;
 	}
 }
 #endif

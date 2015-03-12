@@ -225,6 +225,54 @@ void CLunaLua::bindAll()
 			def("MusicStopFadeOut", (void(*)(int))&LuaProxy::MusicStopFadeOut),
 			def("MusicVolume", (void(*)(int))&LuaProxy::MusicVolume),
 
+			//SDL_Mixer's Mix_Chunk structure
+			class_<Mix_Chunk>("Mix_Chunk")
+			.property("allocated", &Mix_Chunk::allocated)
+			.property("abuf", &Mix_Chunk::abuf)
+			.property("alen", &Mix_Chunk::alen)
+			.property("volume", &Mix_Chunk::volume),
+
+			namespace_("Audio")[
+				//Music
+				def("MusicOpen", (void(*)(const char *))&LuaProxy::Audio::MusicOpen),
+				def("MusicPlay", (void(*)())&LuaProxy::Audio::MusicPlay),
+				def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::Audio::MusicPlayFadeIn),
+				def("MusicStop", (void(*)())&LuaProxy::Audio::MusicStop),
+				def("MusicStopFadeOut", (void(*)(int))&LuaProxy::Audio::MusicStopFadeOut),
+				def("MusicPause", (void(*)())&LuaProxy::Audio::MusicPause),
+				def("MusicResume", (void(*)())&LuaProxy::Audio::MusicResume),
+				def("MusicStop", (void(*)())&LuaProxy::Audio::MusicStop),
+				def("MusicIsPlaying", (bool(*)())&LuaProxy::Audio::MusicIsPlaying),
+				def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
+				def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
+				def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),				
+				//Seize music stream for LUA usage for section 0..20
+				def("SeizeStream", (void(*)(int))&LuaProxy::Audio::seizeStream),
+				//Return music stream access to SMBX engine back for section 0..20
+				def("ReleaseStream", (void(*)(int))&LuaProxy::Audio::releaseStream),
+				//Release music stream for ALL sections
+				def("resetMciSections", (void(*)())&LuaProxy::Audio::resetMciSections),
+
+				//SFX
+				def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
+				def("clearSFXBuffer", (void(*)())&LuaProxy::Audio::clearSFXBuffer),
+				def("playSFX", (void(*)(const char *))&LuaProxy::Audio::playSFX),
+				def("SfxOpen", (Mix_Chunk*(*)(const char *))&LuaProxy::Audio::SfxOpen),
+				def("SfxPlayCh", (int(*)(int, Mix_Chunk*,int))&LuaProxy::Audio::SfxPlayCh),
+				def("SfxPlayChTimed", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxPlayChTimed),
+				def("SfxFadeInCh", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxFadeInCh),
+				def("SfxFadeInChTimed", (int(*)(int, Mix_Chunk*, int, int, int))&LuaProxy::Audio::SfxFadeInChTimed),
+				def("SfxPause", (void(*)(int))&LuaProxy::Audio::SfxPause),
+				def("SfxResume", (void(*)(int))&LuaProxy::Audio::SfxResume),
+				def("SfxStop", (int(*)(int))&LuaProxy::Audio::SfxStop),
+				def("SfxExpire", (int(*)(int, int))&LuaProxy::Audio::SfxExpire),
+				def("SfxFadeOut", (int(*)(int, int))&LuaProxy::Audio::SfxFadeOut),
+				def("SfxIsPlaying", (int(*)(int))&LuaProxy::Audio::SfxIsPlaying),
+				def("SfxIsPaused", (int(*)(int))&LuaProxy::Audio::SfxIsPaused),
+				def("SfxVolume", (void(*)(int, int))&LuaProxy::Audio::SfxVolume)
+			],
+
+
 			class_<RECT>("RECT")
 			.def_readwrite("left", &RECT::left)
 			.def_readwrite("top", &RECT::top)
