@@ -243,7 +243,14 @@ void LuaProxy::Audio::resetMciSections()
 }
 
 
-void LuaProxy::Audio::SfxVolume(int channel, int vlm)
+int LuaProxy::Audio::SfxVolume(int channel, int vlm)
 {
-    Mix_Volume(channel, vlm);
+    return Mix_Volume(channel, vlm);
+}
+
+
+int LuaProxy::Audio::SfxIsFading(int channel)
+{
+    if(channel<0) channel=1;//Anti-crash protection
+    return Mix_FadingChannel(channel);
 }

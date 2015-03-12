@@ -268,7 +268,8 @@ void CLunaLua::bindAll()
 				def("SfxFadeOut", (int(*)(int, int))&LuaProxy::Audio::SfxFadeOut),
 				def("SfxIsPlaying", (int(*)(int))&LuaProxy::Audio::SfxIsPlaying),
 				def("SfxIsPaused", (int(*)(int))&LuaProxy::Audio::SfxIsPaused),
-				def("SfxVolume", (void(*)(int, int))&LuaProxy::Audio::SfxVolume)
+				def("SfxIsFading", (int(*)(int))&LuaProxy::Audio::SfxIsFading),
+				def("SfxVolume", (int(*)(int, int))&LuaProxy::Audio::SfxVolume)
 			],
 
 

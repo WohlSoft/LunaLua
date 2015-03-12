@@ -43,7 +43,8 @@ namespace LuaProxy
         int SfxFadeOut(int channel, int ms);
         int SfxIsPlaying(int channel);
         int SfxIsPaused(int channel);
-        void SfxVolume(int channel, int vlm);
+		int SfxIsFading(int channel);
+        int SfxVolume(int channel, int vlm);
 
         std::string getSfxPath(std::string path);
         void setMciSection(int section);
