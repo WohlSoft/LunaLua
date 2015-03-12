@@ -145,8 +145,15 @@ void MusicManager::resetSeizes()
 void MusicManager::setSeized(int section, bool state)
 {
 	if (section>21) return;
-	if (section<0) return;
-	seizedSections[section] = state;
+	if (section<-1) return;
+
+	if (section == -1)
+	{
+		for (int i = 0; i < 21;i++)
+			seizedSections[section] = state;
+	}
+	else
+		seizedSections[section] = state;
 }
 
 void MusicManager::setCurrentSection(int section)
