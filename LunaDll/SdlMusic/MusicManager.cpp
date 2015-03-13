@@ -150,7 +150,7 @@ void MusicManager::setSeized(int section, bool state)
 	if (section == -1)
 	{
 		for (int i = 0; i < 21;i++)
-			seizedSections[section] = state;
+			seizedSections[i] = state;
 	}
 	else
 		seizedSections[section] = state;
