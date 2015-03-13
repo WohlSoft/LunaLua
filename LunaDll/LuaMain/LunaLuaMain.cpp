@@ -231,8 +231,8 @@ void CLunaLua::bindAll()
 			class_<Mix_Chunk>("Mix_Chunk")
 			.property("allocated", &Mix_Chunk::allocated)
 			.property("abuf", &Mix_Chunk::abuf)
-			.property("alen", &Mix_Chunk::alen)
-			.property("volume", &Mix_Chunk::volume),
+			.def_readwrite("alen", &Mix_Chunk::alen)
+			.def_readwrite("volume", &Mix_Chunk::volume),
 
 			namespace_("Audio")[
 				//Music
