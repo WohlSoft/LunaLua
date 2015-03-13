@@ -214,6 +214,8 @@ void CLunaLua::bindAll()
 			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)) &LuaProxy::mem),
 			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
+			/*************************Audio*****************************/
+			//Old Audio stuff
 			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
 			def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
 			def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
@@ -269,9 +271,14 @@ void CLunaLua::bindAll()
 				def("SfxIsPlaying", (int(*)(int))&LuaProxy::Audio::SfxIsPlaying),
 				def("SfxIsPaused", (int(*)(int))&LuaProxy::Audio::SfxIsPaused),
 				def("SfxIsFading", (int(*)(int))&LuaProxy::Audio::SfxIsFading),
-				def("SfxVolume", (int(*)(int, int))&LuaProxy::Audio::SfxVolume)
-			],
+				def("SfxVolume", (int(*)(int, int))&LuaProxy::Audio::SfxVolume),
 
+				def("SfxSetPanning", (int(*)(int, int, int))&LuaProxy::Audio::SfxSetPanning),
+				def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
+				def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
+				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo)
+			],
+			/*************************Audio*end*************************/
 
 			class_<RECT>("RECT")
 			.def_readwrite("left", &RECT::left)
