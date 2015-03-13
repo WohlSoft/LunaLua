@@ -206,8 +206,11 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 
 void MusicManager::pause()
 {
-	PGE_MusPlayer::MUS_pauseMusic();
-	pausedNatively = true;
+	if(!PGE_MusPlayer::MUS_IsPaused())
+	{//Pause if it was NOT paused
+		PGE_MusPlayer::MUS_pauseMusic();
+		pausedNatively = true;
+	}
 }
 
 void MusicManager::stop(std::string alias)
