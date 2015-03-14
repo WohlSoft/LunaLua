@@ -62,12 +62,12 @@ local defines = {
                                                                                     "the npcs into coins."},
     
     --[[ Coin Value Defines ]]--
-    coinValue                       = {defValue = 1  , minVal = 1, maxVal = 99 , address = 0x00A262BD, size = FIELD_BYTE,
+    coinValue                       = {defValue = 1  , minVal = 0, maxVal = 99 , address = 0x00A262BD, size = FIELD_BYTE,
                                         n = 1, group = "Coin Value", desc = "How much a coin npc is worth as coins. It will affect every coin-npc which has a 1-coin value "..
                                                                                     "as default (except the npc-to-coins function)."},
-    coin5Value                      = {defValue = 5  , minVal = 1, maxVal = 99 , address = 0x00A262C9, size = FIELD_BYTE,
+    coin5Value                      = {defValue = 5  , minVal = 0, maxVal = 99 , address = 0x00A262C9, size = FIELD_BYTE,
                                         n = 2, group = "Coin Value", desc = "How much a 5-coin npc is worth as coins."},
-    coin20Value                     = {defValue = 20 , minVal = 1, maxVal = 99 , address = 0x00A262B7, size = FIELD_BYTE,
+    coin20Value                     = {defValue = 20 , minVal = 0, maxVal = 99 , address = 0x00A262B7, size = FIELD_BYTE,
                                         n = 3, group = "Coin Value", desc = "How much a 20-coin npc is worth as coins."}
     
     
