@@ -16,7 +16,7 @@ SMBXEvent* SMBXEvents::GetByName(std::wstring Name) {
 	SMBXEvent* pEventBase = (SMBXEvent*)GM_EVENTS_PTR;
 
 	for(int i = 0; i < 100; i++) {
-		if(std::wcscmp(pEventBase[i].pName, Name.c_str()) == 0)
+		if(pEventBase[i].pName == Name)
 			return &(pEventBase[i]);
 	}
 	return 0;

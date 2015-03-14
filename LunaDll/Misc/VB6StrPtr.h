@@ -18,6 +18,12 @@ struct VB6StrPtr {
 	operator std::wstring() const;
 	operator std::string() const;
 	operator bool() const;
+
+	unsigned int length() const;
+
+	bool operator==(const VB6StrPtr &other) const;
+	bool operator==(const std::wstring &other) const;
+	bool operator==(const std::string &other) const;
 };
 #pragma pack(pop)
 
