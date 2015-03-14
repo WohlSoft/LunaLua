@@ -8,6 +8,7 @@
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
+#include "LuaHelper.h"
 
 namespace LuaProxy {
     enum L_FIELDTYPE{
@@ -175,6 +176,8 @@ namespace LuaProxy {
 		bool isValid() const;
 		friend std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
 
+		// Allow assignVB6StrPtr access to m_wcharptr
+		friend void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, luabind::object value, lua_State* L);
     private:
         wchar_t* m_wcharptr;
     };

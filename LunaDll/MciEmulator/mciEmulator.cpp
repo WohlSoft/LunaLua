@@ -3,15 +3,14 @@
 #include <vector>
 //#include "Globals.h"
 #include "../GlobalFuncs.h"
+#include "../LuaMain/LuaProxyComponent/LuaProxyAudio.h"
 
 MciEmulator::MciEmulator(void)
-{
-}
-
+{}
 
 MciEmulator::~MciEmulator(void)
-{
-}
+{}
+
 
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
@@ -24,7 +23,6 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 		if(spCmd[0] == "pause" && spCmd[1] == "all"){
 			//Add pause code
 			MusicManager::pause();
-
 		}else if(spCmd[0] == "close"){
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
@@ -37,7 +35,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				//do stop code
-				MusicManager::stop(spCmd[1]);
+                MusicManager::stop(spCmd[1]);
 			}
 		}
 	}else if(spCmd.size() == 3){
@@ -61,7 +59,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 				}
 			}
 		}
-	}else if(spCmd.size() == 4){
+    }else if(spCmd.size() == 4){
 		if(spCmd[0] == "open" && spCmd[2] == "alias"){
 			//register music/sound file
 			regSoundFile snFile;
@@ -73,7 +71,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 			if(it != registeredFiles.end()){
 				//play code
-				MusicManager::play(spCmd[1]);
+                MusicManager::play(spCmd[1]);                
 			}
 		}
 	}else if(spCmd.size() == 5){
@@ -81,8 +79,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			if(registeredFiles.find(spCmd[1])!=registeredFiles.end()){
 				if(is_number(spCmd[4])){
 					//set audio volume
-					/******/MusicManager::setVolume(atoi(spCmd[4].c_str()));/******/
-					registeredFiles[spCmd[1]].volume = atoi(spCmd[4].c_str());
+                    /******/MusicManager::setVolume(atoi(spCmd[4].c_str()));/******/
+                    registeredFiles[spCmd[1]].volume = atoi(spCmd[4].c_str());
 				}
 			}
 		}

@@ -4,29 +4,24 @@
 #include "..\Defines.h"
 #include "..\GlobalFuncs.h"
 
-#define _vbaStrCopy ((void(__stdcall *)(const wchar_t*, VB6StrPtr*))IMP_vbaStrCopy)
-#define _vbaFreeStr ((void(__stdcall *)(VB6StrPtr*))IMP_vbaFreeStr)
+#define _vbaStrCopy ((void(__fastcall *)(VB6StrPtr*, const wchar_t*))IMP_vbaStrCopy)
+#define _vbaFreeStr ((void(__fastcall *)(VB6StrPtr*))IMP_vbaFreeStr)
 
 // Empty constructor
-VB6StrPtr::VB6StrPtr() : ptr(NULL)
-{
-}
+VB6StrPtr::VB6StrPtr() : ptr(NULL) {}
 
 // Constructor from another VB6StrPtr
-VB6StrPtr::VB6StrPtr(const VB6StrPtr &other) : ptr(NULL)
-{
+VB6StrPtr::VB6StrPtr(const VB6StrPtr &other) : ptr(NULL) {
 	*this = other;
 }
 
 // Constructor from a std::wstring
-VB6StrPtr::VB6StrPtr(const std::wstring &other) : ptr(NULL)
-{
+VB6StrPtr::VB6StrPtr(const std::wstring &other) : ptr(NULL) {
 	*this = other;
 }
 
 // Constructor from a std::string
-VB6StrPtr::VB6StrPtr(const std::string &other) : ptr(NULL)
-{
+VB6StrPtr::VB6StrPtr(const std::string &other) : ptr(NULL) {
 	*this = other;
 }
 
@@ -39,16 +34,13 @@ VB6StrPtr::~VB6StrPtr() {
 }
 
 // Assignment operator from another VB6StrPtr
-void VB6StrPtr::operator=(const VB6StrPtr &other)
-{
-	_vbaStrCopy(other.ptr, this);
+void VB6StrPtr::operator=(const VB6StrPtr &other) {
+	_vbaStrCopy(this, other.ptr);
 }
 
 // Assignment operator from std::wstring
-void VB6StrPtr::operator=(const std::wstring &other)
-{
-	// Allocate temporary memory of the right length so we can prefix the length header on
-	// as to fake a VB6 string to pass to _vbaStrCopy
+void VB6StrPtr::operator=(const std::wstring &other) {
+	// Allocate temporary memory of the right length so we can prefix the length header
 	std::size_t len = other.length();
 	unsigned char* tmpVBString = (unsigned char*)malloc(sizeof(unsigned int) + sizeof(wchar_t)*(len + 1));
 
@@ -56,29 +48,39 @@ void VB6StrPtr::operator=(const std::wstring &other)
 	*((unsigned int*)&tmpVBString[0]) = len * 2;
 	memcpy(&tmpVBString[4], other.c_str(), sizeof(wchar_t)*(len + 1));
 
-	// Copy the wstring
-	_vbaStrCopy((wchar_t*)&tmpVBString[4], this);
+	// Copy the temporary string using _vbaStrCopy
+	_vbaStrCopy(this, (wchar_t*)&tmpVBString[4]);
 
+	// Free the temporary string
 	free(tmpVBString);
 }
 
 // Assignment operator from std::string
-void VB6StrPtr::operator=(const std::string &other)
-{
+void VB6StrPtr::operator=(const std::string &other) {
 	*this = utf8_decode(other);
 }
 
 // Cast operator to std::wstring
-VB6StrPtr::operator std::wstring() {
-	return std::wstring(ptr);
+VB6StrPtr::operator std::wstring() const {
+	if (ptr == NULL)
+		return std::wstring(L"");
+
+	// Get a pointer to the length prefix
+	unsigned int* len = (unsigned int*)&((unsigned char*)ptr)[-4];
+
+	// Make a wstring from the string data, making sure to truncate based on the length prefix just in case
+	return std::wstring(ptr, *len/2);
 }
 
 // Cast operator to std::string
-VB6StrPtr::operator std::string() {
+VB6StrPtr::operator std::string() const {
+	if (ptr == NULL)
+		return std::string("");
+
 	return std::string(utf8_encode(*this));
 }
 
 // Cast operator to bool, true if non-null
-VB6StrPtr::operator bool() {
+VB6StrPtr::operator bool() const {
 	return ptr != NULL;
 }

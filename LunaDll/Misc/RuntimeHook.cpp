@@ -579,6 +579,10 @@ extern void checkLevelShutdown()
             shutdownEvent.setLoopable(false);
             gLunaLua.callEvent(&shutdownEvent);
             gLunaLua.shutdown();
+
+            //Clean & stop all user started sounds and musics
+            PGE_MusPlayer::MUS_stopMusic();
+            PGE_Sounds::clearSoundBuffer();
         }
     }
 

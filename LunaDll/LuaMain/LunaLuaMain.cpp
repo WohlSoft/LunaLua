@@ -8,6 +8,7 @@
 #include "LuaHelper.h"
 #include "LuaProxy.h"
 #include "LuaEvents.h"
+#include "LuaProxyComponent/LuaProxyAudio.h"
 #include <string>
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -40,6 +41,7 @@ bool CLunaLua::shutdown()
 	if(!isValid())
 		return false;
 		
+    LuaProxy::Audio::resetMciSections();
 	lua_close(L);
 	L = NULL;
 	return true;
@@ -212,6 +214,8 @@ void CLunaLua::bindAll()
 			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, luabind::object, lua_State*)) &LuaProxy::mem),
 			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
+			/*************************Audio*****************************/
+			//Old Audio stuff
 			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
 			def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
 			def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
@@ -222,6 +226,59 @@ void CLunaLua::bindAll()
 			def("MusicStop", (void(*)())&LuaProxy::MusicStop),
 			def("MusicStopFadeOut", (void(*)(int))&LuaProxy::MusicStopFadeOut),
 			def("MusicVolume", (void(*)(int))&LuaProxy::MusicVolume),
+
+			//SDL_Mixer's Mix_Chunk structure
+			class_<Mix_Chunk>("Mix_Chunk")
+			.property("allocated", &Mix_Chunk::allocated)
+			.property("abuf", &Mix_Chunk::abuf)
+			.def_readwrite("alen", &Mix_Chunk::alen)
+			.def_readwrite("volume", &Mix_Chunk::volume),
+
+			namespace_("Audio")[
+				//Music
+				def("MusicOpen", (void(*)(const char *))&LuaProxy::Audio::MusicOpen),
+				def("MusicPlay", (void(*)())&LuaProxy::Audio::MusicPlay),
+				def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::Audio::MusicPlayFadeIn),
+				def("MusicStop", (void(*)())&LuaProxy::Audio::MusicStop),
+				def("MusicStopFadeOut", (void(*)(int))&LuaProxy::Audio::MusicStopFadeOut),
+				def("MusicPause", (void(*)())&LuaProxy::Audio::MusicPause),
+				def("MusicResume", (void(*)())&LuaProxy::Audio::MusicResume),
+				def("MusicIsPlaying", (bool(*)())&LuaProxy::Audio::MusicIsPlaying),
+				def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
+				def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
+				def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),				
+				//Seize music stream for LUA usage for section 0..20
+				def("SeizeStream", (void(*)(int))&LuaProxy::Audio::seizeStream),
+				//Return music stream access to SMBX engine back for section 0..20
+				def("ReleaseStream", (void(*)(int))&LuaProxy::Audio::releaseStream),
+				//Release music stream for ALL sections
+				def("resetMciSections", (void(*)())&LuaProxy::Audio::resetMciSections),
+
+				//SFX
+				def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
+				def("clearSFXBuffer", (void(*)())&LuaProxy::Audio::clearSFXBuffer),
+				def("playSFX", (void(*)(const char *))&LuaProxy::Audio::playSFX),
+				def("SfxOpen", (Mix_Chunk*(*)(const char *))&LuaProxy::Audio::SfxOpen),
+				def("SfxPlayCh", (int(*)(int, Mix_Chunk*,int))&LuaProxy::Audio::SfxPlayCh),
+				def("SfxPlayChTimed", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxPlayChTimed),
+				def("SfxFadeInCh", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxFadeInCh),
+				def("SfxFadeInChTimed", (int(*)(int, Mix_Chunk*, int, int, int))&LuaProxy::Audio::SfxFadeInChTimed),
+				def("SfxPause", (void(*)(int))&LuaProxy::Audio::SfxPause),
+				def("SfxResume", (void(*)(int))&LuaProxy::Audio::SfxResume),
+				def("SfxStop", (int(*)(int))&LuaProxy::Audio::SfxStop),
+				def("SfxExpire", (int(*)(int, int))&LuaProxy::Audio::SfxExpire),
+				def("SfxFadeOut", (int(*)(int, int))&LuaProxy::Audio::SfxFadeOut),
+				def("SfxIsPlaying", (int(*)(int))&LuaProxy::Audio::SfxIsPlaying),
+				def("SfxIsPaused", (int(*)(int))&LuaProxy::Audio::SfxIsPaused),
+				def("SfxIsFading", (int(*)(int))&LuaProxy::Audio::SfxIsFading),
+				def("SfxVolume", (int(*)(int, int))&LuaProxy::Audio::SfxVolume),
+
+				def("SfxSetPanning", (int(*)(int, int, int))&LuaProxy::Audio::SfxSetPanning),
+				def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
+				def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
+				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo)
+			],
+			/*************************Audio*end*************************/
 
 			class_<RECT>("RECT")
 			.def_readwrite("left", &RECT::left)

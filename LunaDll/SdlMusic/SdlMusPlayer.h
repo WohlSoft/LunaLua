@@ -51,7 +51,8 @@ class PGE_Sounds
 {
 public:
     static void SND_PlaySnd(const char *sndFile);
-	static void clearSoundBuffer();
+    static void clearSoundBuffer();
+    static Mix_Chunk *SND_OpenSnd(const char *sndFile);
 private:
 	static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;

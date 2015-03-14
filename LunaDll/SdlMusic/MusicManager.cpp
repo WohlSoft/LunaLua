@@ -127,6 +127,44 @@ void MusicManager::close()
 	//registredFiles.clear();
 }
 
+
+bool MusicManager::seizedSections[21] =
+				{ false, false, false, false, false, false, false,
+				  false, false, false, false, false, false, false,
+				  false, false, false, false, false, false, false};
+bool MusicManager::pausedNatively=false;
+int MusicManager::curSection=0;
+
+//Music stream seizing
+void MusicManager::resetSeizes()
+{
+	for (int i = 0; i<21; i++)
+		seizedSections[i] = false;
+}
+
+void MusicManager::setSeized(int section, bool state)
+{
+	if (section>21) return;
+	if (section<-1) return;
+
+	if (section == -1)
+	{
+		for (int i = 0; i < 21;i++)
+			seizedSections[i] = state;
+	}
+	else
+		seizedSections[section] = state;
+}
+
+void MusicManager::setCurrentSection(int section)
+{
+	if (section>21) return;
+	if (section<0) return;
+
+	curSection = section;
+}
+
+
 void MusicManager::play(std::string alias) //Chunk will be played once, stream will be played with loop
 {
 	std::unordered_map<std::string, musicFile>::iterator it = registredFiles.find(alias);
@@ -135,8 +173,17 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 			musicFile file = registredFiles[alias];
 			if(file.first==Stream)
 			{
-				PGE_MusPlayer::MUS_openFile(file.second.c_str());
-				PGE_MusPlayer::MUS_playMusic();
+				if (!seizedSections[curSection])
+				{
+					PGE_MusPlayer::MUS_openFile(file.second.c_str());
+					PGE_MusPlayer::MUS_playMusic();
+					pausedNatively = false;
+				}
+				else if(pausedNatively)
+				{
+					PGE_MusPlayer::MUS_playMusic();
+					pausedNatively = false;
+				}
 			}
 			else
 			if(file.first==Chunk)
@@ -159,7 +206,11 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
 
 void MusicManager::pause()
 {
-	PGE_MusPlayer::MUS_pauseMusic();
+	if(!PGE_MusPlayer::MUS_IsPaused())
+	{//Pause if it was NOT paused
+		PGE_MusPlayer::MUS_pauseMusic();
+		pausedNatively = true;
+	}
 }
 
 void MusicManager::stop(std::string alias)
@@ -170,7 +221,11 @@ void MusicManager::stop(std::string alias)
 		musicFile file = registredFiles[alias];
 		if(file.first==Stream)
 		{
-			PGE_MusPlayer::MUS_stopMusic();
+			if(!seizedSections[curSection])
+			{
+				PGE_MusPlayer::MUS_stopMusic();
+				pausedNatively = false;
+			}
 		}
 		else
 		if(file.first==Chunk)
@@ -187,9 +242,12 @@ void MusicManager::stop(std::string alias)
 
 void MusicManager::setVolume(int _volume)
 {
-	double piece = ((double)_volume/1000.0);
-	int converted = (int)floor((piece*128.0)+0.5);
-	PGE_MusPlayer::MUS_changeVolume(converted);
+	if (!seizedSections[curSection])
+	{
+		double piece = ((double)_volume / 1000.0);
+		int converted = (int)floor((piece*128.0) + 0.5);
+		PGE_MusPlayer::MUS_changeVolume(converted);
+	}
 }
 
 
@@ -238,7 +296,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
 
 void MusicManager::loadMusics(std::string path, std::string root)
 {
-		if( !file_existsX(path) ) return;
+	if( !file_existsX(path) ) return;
 
 	INIReader MusicIni( path.c_str() );
 	if (MusicIni.ParseError() < 0)

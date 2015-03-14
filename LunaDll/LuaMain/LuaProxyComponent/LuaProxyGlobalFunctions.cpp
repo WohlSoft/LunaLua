@@ -14,6 +14,7 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
 #include "../../Misc/RuntimeHook.h"
+#include "LuaProxyAudio.h"
 
 
 void LuaProxy::windowDebug(const char *debugText){
@@ -257,19 +258,7 @@ void LuaProxy::playSFX(const char *filename)
 void LuaProxy::playSFXSDL(const char* filename)
 {
 #ifndef NO_SDL
-	string full_paths;
-	if (!isAbsolutePath(std::string(filename))){
-		wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-		wstring full_path = world_dir.append(Level::GetName());
-		full_path = removeExtension(full_path);
-		full_path = full_path.append(L"\\"); // < path into level folder
-		full_paths = wstr2str(full_path) + filename;
-	}
-	else
-	{
-		full_paths = filename;
-	}
-	
+    string full_paths = Audio::getSfxPath(string(filename));
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 #else
 	playSFX(filename);
@@ -286,11 +275,7 @@ void LuaProxy::clearSFXBuffer()
 void LuaProxy::MusicOpen(const char *filename)
 {
 #ifndef NO_SDL
-	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = world_dir.append(Level::GetName());
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
-	string full_paths = wstr2str(full_path) + filename;
+    string full_paths = Audio::getSfxPath(string(filename));
 	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
 #endif
 }
@@ -312,7 +297,7 @@ void LuaProxy::MusicPlayFadeIn(int ms)
 void LuaProxy::MusicStop()
 {
 #ifndef NO_SDL
-	PGE_MusPlayer::MUS_playMusic();
+    PGE_MusPlayer::MUS_stopMusic();
 #endif
 }
 
