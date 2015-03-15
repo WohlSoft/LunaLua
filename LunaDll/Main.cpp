@@ -20,6 +20,8 @@
 #include "LuaMain/LunaLuaMain.h"
 #include "Misc/RuntimeHook.h"
 #include "SdlMusic/MusicManager.h"
+#include "Misc/Playground.h"
+
 
 #define PATCHIT 1
 
@@ -134,6 +136,9 @@ int TestFunc()
 
 
 	if(gLunaEnabled) {	
+#if COMPILE_PLAYGROUND
+        Playground::doPlaygroundStuff();
+#endif
 		gLunaLua.doEvents();
 
 		// Run autocode

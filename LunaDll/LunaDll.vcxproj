@@ -161,6 +161,7 @@
     <ClInclude Include="Minigames\GameboyRPG.h" />
     <ClInclude Include="Misc\SHMemServer.h" />
     <ClInclude Include="Misc\VB6StrPtr.h" />
+    <ClInclude Include="Misc\Playground.h" />
     <ClInclude Include="Rendering\BMPBox.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="Minigames\Minigames.cpp" />
     <ClCompile Include="Misc\SHMemServer.cpp" />
     <ClCompile Include="Misc\VB6StrPtr.cpp" />
+    <ClCompile Include="Misc\Playground.cpp" />
     <ClCompile Include="Rendering\BMPBox.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />
