@@ -45,18 +45,17 @@ void NPC::FindAll(int ID, int section, std::list<NPCMOB*>* return_list) {
 
 // SET HITS
 void NPC::SetHits(NPCMOB* npc, float hits) {
-	float* ptr=(float*)((&(*(byte*)npc)) + 0x148);
-	*ptr = hits;
+	npc->hitCount = hits;
 }
 
 // GET SECTION
 short NPC::GetSection(NPCMOB* npc) {
-	return *((short*)((&(*(byte*)npc)) + 0x146));
+	return npc->currentSection;
 }
 
 // FACE DIRECTION
 void NPC::FaceDirection(NPCMOB* npc, float direction) {
-	npc->directionFaced = direction;
+	npc->directionFaced2 = direction; // The version at 0x118
 }
 
 // MEM SET
