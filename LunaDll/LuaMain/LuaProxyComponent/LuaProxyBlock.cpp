@@ -6,14 +6,14 @@
 LuaProxy::Block::Block(int index) : m_index(index)
 {}
 
-void LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, luabind::object value, lua_State *L)
+void LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
 	::Block* pBlock = &::Blocks::GetBase()[m_index];
 	void* ptr = ((&(*(byte*)pBlock)) + offset);
 	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
-luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
+luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const
 {
 	::Block* pBlock = &::Blocks::GetBase()[m_index];
 	void* ptr = ((&(*(byte*)pBlock)) + offset);
@@ -21,7 +21,7 @@ luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lu
 }
 
 
-double LuaProxy::Block::x()
+double LuaProxy::Block::x() const
 {
 	if(!isValid())
 		return 0;
@@ -35,7 +35,7 @@ void LuaProxy::Block::setX(double x)
 	::Blocks::Get(m_index)->XPos = x;
 }
 
-double LuaProxy::Block::y()
+double LuaProxy::Block::y() const
 {
 	if(!isValid())
 		return 0;
@@ -49,7 +49,7 @@ void LuaProxy::Block::setY(double y)
 	::Blocks::Get(m_index)->YPos = y;
 }
 
-double LuaProxy::Block::speedX()
+double LuaProxy::Block::speedX() const
 {
 	if(!isValid())
 		return 0;
@@ -63,7 +63,7 @@ void LuaProxy::Block::setSpeedX(double speedX)
 	::Blocks::Get(m_index)->XSpeed = speedX;
 }
 
-double LuaProxy::Block::speedY()
+double LuaProxy::Block::speedY() const
 {
 	if(!isValid())
 		return 0;
@@ -77,7 +77,7 @@ void LuaProxy::Block::setSpeedY(double speedY)
 	::Blocks::Get(m_index)->YSpeed = speedY;
 }
 
-short LuaProxy::Block::id()
+short LuaProxy::Block::id() const
 {
 	if(!isValid())
 		return 0;
@@ -92,7 +92,7 @@ void LuaProxy::Block::setId(short id)
 	::Blocks::Get(m_index)->BlockType = id;
 }
 
-bool LuaProxy::Block::slippery()
+bool LuaProxy::Block::slippery() const
 {
 	if(!isValid())
 		return false;
@@ -108,7 +108,7 @@ void LuaProxy::Block::setSlippery(bool slippery)
 	::Blocks::Get(m_index)->Slippery = (slippery ? 0xFFFF : 0);
 }
 
-bool LuaProxy::Block::invisible()
+bool LuaProxy::Block::invisible() const
 {
 	if(!isValid())
 		return 0;
@@ -124,7 +124,7 @@ void LuaProxy::Block::setInvisible(bool invisible)
 	::Blocks::Get(m_index)->IsInvisible = (invisible ? 0xFFFF : 0);
 }
 
-int LuaProxy::Block::collidesWith(LuaProxy::Player *player)
+int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
 {
 	if(!isValid())
 		return 0;
@@ -150,7 +150,7 @@ int LuaProxy::Block::collidesWith(LuaProxy::Player *player)
 	return ::Blocks::TestCollision(tarPlayer, tarBlock);
 }
 
-LuaProxy::VBStr LuaProxy::Block::layerName()
+LuaProxy::VBStr LuaProxy::Block::layerName() const
 {
 	if(!isValid())
 		return VBStr((wchar_t*)0);
@@ -160,7 +160,7 @@ LuaProxy::VBStr LuaProxy::Block::layerName()
 	return VBStr(ptr);
 }
 
-luabind::object LuaProxy::Block::layerObj(lua_State *L)
+luabind::object LuaProxy::Block::layerObj(lua_State *L) const
 {
 	if(!isValid())
 		return luabind::object();
@@ -170,7 +170,7 @@ luabind::object LuaProxy::Block::layerObj(lua_State *L)
 	return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
 }
 
-bool LuaProxy::Block::isValid()
+bool LuaProxy::Block::isValid() const
 {
 	return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
 }

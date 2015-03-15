@@ -21,7 +21,7 @@ LuaProxy::Data::Data(DataType dataType, bool useSaveSlot) :
 	init();
 }
 
-LuaProxy::Data::Data(DataType dataType, std::string sectionName) :
+LuaProxy::Data::Data(DataType dataType, const std::string &sectionName) :
 	m_dataType(dataType),
 	m_sectionName(sectionName),
 	m_useSaveSlot(dataType != DATA_GLOBAL)
@@ -30,7 +30,7 @@ LuaProxy::Data::Data(DataType dataType, std::string sectionName) :
 }
 
 
-LuaProxy::Data::Data(DataType dataType, std::string sectionName, bool useSaveSlot) :
+LuaProxy::Data::Data(DataType dataType, const std::string &sectionName, bool useSaveSlot) :
 	m_dataType(dataType),
 	m_sectionName(sectionName),
 	m_useSaveSlot(useSaveSlot)
@@ -108,21 +108,24 @@ std::string LuaProxy::Data::resolvePathFromSection()
 
 
 
-void LuaProxy::Data::set(std::string key, std::string value)
+void LuaProxy::Data::set(const std::string &key, const std::string &value)
 {
 	m_data[key] = value;
 }
 
 
-std::string LuaProxy::Data::get(std::string key)
+std::string LuaProxy::Data::get(const std::string &key) const
 {
-	return m_data[key];
+	// Using [] isn't allowed in a const function, so one is supposed to use 'find'
+	std::map<std::string, std::string>::const_iterator it;
+	it = m_data.find(key);
+	return it == m_data.end() ? "" : it->second;
 }
 
-luabind::object LuaProxy::Data::get(lua_State* L)
+luabind::object LuaProxy::Data::get(lua_State* L) const
 {
 	luabind::object allData = luabind::newtable(L);
-	for (std::map<std::string, std::string>::iterator it = m_data.begin(); it != m_data.end(); ++it) {
+	for (std::map<std::string, std::string>::const_iterator it = m_data.begin(); it != m_data.end(); ++it) {
 		allData[it->first] = it->second;
 	}
 	return allData;
@@ -134,7 +137,7 @@ void LuaProxy::Data::save()
 	save(m_sectionName);
 }
 
-void LuaProxy::Data::save(std::string sectionName)
+void LuaProxy::Data::save(const std::string &sectionName)
 {
 	m_sectionName = sectionName;
 	std::string path = resolvePathFromSection();
@@ -153,7 +156,7 @@ void LuaProxy::Data::save(std::string sectionName)
 }
 
 
-LuaProxy::Data::DataType LuaProxy::Data::dataType()
+LuaProxy::Data::DataType LuaProxy::Data::dataType() const
 {
 	return m_dataType;
 }
@@ -165,19 +168,19 @@ void LuaProxy::Data::setDataType(DataType dataType)
 }
 
 
-std::string LuaProxy::Data::sectionName()
+std::string LuaProxy::Data::sectionName() const
 {
 	return m_sectionName;
 }
 
 
-void LuaProxy::Data::setSectionName(std::string sectionName)
+void LuaProxy::Data::setSectionName(const std::string &sectionName)
 {
 	m_sectionName = sectionName;
 }
 
 
-bool LuaProxy::Data::useSaveSlot()
+bool LuaProxy::Data::useSaveSlot() const
 {
 	return m_useSaveSlot;
 }

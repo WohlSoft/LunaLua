@@ -21,7 +21,7 @@ std::string LuaProxy::VBStr::str() const
 	return utf8_encode(std::wstring(m_wcharptr, (*(((short*)m_wcharptr) - 2) / 2)));
 }
 
-void LuaProxy::VBStr::setStr(std::string str)
+void LuaProxy::VBStr::setStr(const std::string &str)
 {
 	if(!isValid())
 		return;
@@ -31,7 +31,7 @@ void LuaProxy::VBStr::setStr(std::string str)
 	wcscpy(m_wcharptr, newWStr);
 }
 
-int LuaProxy::VBStr::length()
+int LuaProxy::VBStr::length() const
 {
 	if(!isValid())
 		return 0;

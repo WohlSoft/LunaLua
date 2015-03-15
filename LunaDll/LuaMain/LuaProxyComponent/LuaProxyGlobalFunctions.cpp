@@ -181,7 +181,7 @@ luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 	return vnpcs;
 }
 
-void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, luabind::object value, lua_State *L)
+void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
 	int iftype = (int)ftype;
 	if(iftype >= 1 && iftype <= 5){
@@ -582,7 +582,7 @@ luabind::object LuaProxy::levels(lua_State *L)
 	return vlevels;
 }
 
-luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
+luabind::object LuaProxy::findlevels(const std::string &toFindName, lua_State* L)
 {
 	luabind::object obj = luabind::newtable(L);
 	bool found = false;
@@ -607,7 +607,7 @@ luabind::object LuaProxy::findlevels(std::string toFindName, lua_State* L)
 	return obj;
 }
 
-luabind::object LuaProxy::findlevel(std::string toFindName, lua_State* L)
+luabind::object LuaProxy::findlevel(const std::string &toFindName, lua_State* L)
 {
 	for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);

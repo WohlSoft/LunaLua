@@ -6,21 +6,21 @@
 LuaProxy::LevelObject::LevelObject(int index) : m_index(index)
 {}
 
-void LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, luabind::object value, lua_State* L)
+void LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)
 {
 	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
 	void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
 	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
-luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_State* L)
+luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_State* L) const
 {
 	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
 	void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
 	return LuaProxy::mem((int)ptr, ftype, L);
 }
 
-bool LuaProxy::LevelObject::isValid()
+bool LuaProxy::LevelObject::isValid() const
 {
 	if((m_index < 0) || (m_index > (signed)GM_LEVEL_COUNT))
 		return false;
@@ -28,7 +28,7 @@ bool LuaProxy::LevelObject::isValid()
 }
 
 
-double LuaProxy::LevelObject::x()
+double LuaProxy::LevelObject::x() const
 {
 	if(!isValid())
 		return 0;
@@ -43,7 +43,7 @@ void LuaProxy::LevelObject::setX(double x)
 	SMBXLevel::get(m_index)->XPos = x;
 }
 
-double LuaProxy::LevelObject::y()
+double LuaProxy::LevelObject::y() const
 {
 	if(!isValid())
 		return 0;
@@ -57,7 +57,7 @@ void LuaProxy::LevelObject::setY(double y)
 	SMBXLevel::get(m_index)->YPos = y;
 }
 
-LuaProxy::VBStr LuaProxy::LevelObject::levelTitle()
+LuaProxy::VBStr LuaProxy::LevelObject::levelTitle() const
 {
 	if(!isValid())
 		return VBStr((wchar_t*)0);

@@ -22,10 +22,10 @@ bool LuaHelper::is_function(lua_State *luaState, const char *fname)
     return false;
 }
 
-void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, luabind::object value, lua_State* L)
+void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L)
 {
 	// Copy from native Lua string
-	boost::optional<std::string> opt_str = luabind::object_cast_nothrow<std::string>(value);
+	boost::optional<std::string const> opt_str = luabind::object_cast_nothrow<std::string const>(value);
 	if (opt_str != boost::none)
 	{
 		*ptr = *opt_str;
@@ -33,7 +33,7 @@ void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, luabind::object value, lua_State
 	}
 
 	// Copy from VBStr object
-	boost::optional<LuaProxy::VBStr> opt_obj = luabind::object_cast_nothrow<LuaProxy::VBStr>(value);
+	boost::optional<LuaProxy::VBStr const> opt_obj = luabind::object_cast_nothrow<LuaProxy::VBStr const>(value);
 	if (opt_obj != boost::none)
 	{
 		*ptr = *((VB6StrPtr*)&(*opt_obj).m_wcharptr);

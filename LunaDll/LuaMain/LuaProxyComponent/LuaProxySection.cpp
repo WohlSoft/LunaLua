@@ -7,7 +7,7 @@ LuaProxy::Section::Section(int sectionNum)
 	m_secNum = sectionNum;
 }
 
-LuaProxy::RECTd LuaProxy::Section::boundary()
+LuaProxy::RECTd LuaProxy::Section::boundary() const
 {
 	double* boundtable = (double*)GM_LVL_BOUNDARIES;
 	boundtable = boundtable + (m_secNum * 6);
@@ -21,7 +21,7 @@ LuaProxy::RECTd LuaProxy::Section::boundary()
 	return rectd;
 }
 
-void LuaProxy::Section::setBoundary(LuaProxy::RECTd boundary)
+void LuaProxy::Section::setBoundary(const LuaProxy::RECTd &boundary)
 {
 	double* boundtable = (double*)GM_LVL_BOUNDARIES;
 	boundtable = boundtable + (m_secNum * 6);
