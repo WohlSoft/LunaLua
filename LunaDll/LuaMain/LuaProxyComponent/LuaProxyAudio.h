@@ -53,6 +53,9 @@ namespace LuaProxy
         std::string getSfxPath(std::string path);
         void setMciSection(int section);
         void resetMciSections();
+
+		double AudioClock();
+		double MusicClock();
 	}
 }
 #endif

@@ -276,7 +276,11 @@ void CLunaLua::bindAll()
 				def("SfxSetPanning", (int(*)(int, int, int))&LuaProxy::Audio::SfxSetPanning),
 				def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
 				def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
-				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo)
+				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
+
+				//Time
+				def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
+				def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock)
 			],
 			/*************************Audio*end*************************/
 

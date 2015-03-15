@@ -276,4 +276,20 @@ int LuaProxy::Audio::SfxReverseStereo(int channel, int flip)
 	return Mix_SetReverseStereo(channel, flip);
 }
 
+double LuaProxy::Audio::AudioClock()
+{
+#ifndef NO_SDL
+	return ((double)PGE_MusPlayer::sampleCount()) / PGE_MusPlayer::sampleRate();
+#else
+	return 0;
+#endif
+}
 
+double LuaProxy::Audio::MusicClock()
+{
+#ifndef NO_SDL
+	return ((double)PGE_MusPlayer::MUS_sampleCount()) / PGE_MusPlayer::sampleRate();
+#else
+	return 0;
+#endif
+}
