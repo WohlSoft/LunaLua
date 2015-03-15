@@ -633,6 +633,8 @@ namespace LuaProxy {
 	RECT newRECT();
 	RECTd newRECTd();
 	NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
+	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
+	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
 }
 
 #endif

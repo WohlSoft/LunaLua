@@ -656,8 +656,17 @@ std::string LuaProxy::getLevelName()
 }
 
 
-
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, lua_State* L)
+{
+	return LuaProxy::spawnNPC(npcid, x, y, section, false, false, L);
+}
+
+LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L)
+{
+	return LuaProxy::spawnNPC(npcid, x, y, section, respawn, false, L);
+}
+
+LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
 	if(npcid < 1 || npcid > 292){
@@ -693,6 +702,11 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 	gfxWidth = (gfxWidth ? gfxWidth : width);
 	gfxHeight = (gfxHeight ? gfxHeight : height);
 
+	if (centered) {
+		x -= 0.5 * (double)width;
+		y -= 0.5 * (double)height;
+	}
+
 	PATCH_OFFSET(nativeAddr, 0x78, double, x);
 	PATCH_OFFSET(nativeAddr, 0x80, double, y);
 	PATCH_OFFSET(nativeAddr, 0x88, double, height);
@@ -705,7 +719,9 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 	PATCH_OFFSET(nativeAddr, 0xB8, double, gfxHeight);
 	PATCH_OFFSET(nativeAddr, 0xC0, double, gfxWidth);
 
-	PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
+	if (respawn) {
+		PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
+	}
 	PATCH_OFFSET(nativeAddr, 0xE2, WORD, npcid);
 
 	PATCH_OFFSET(nativeAddr, 0x12A, WORD, 180);

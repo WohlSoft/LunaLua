@@ -404,7 +404,9 @@ void CLunaLua::bindAll()
 				def("hud", &LuaProxy::hud),
 				def("getLevelFilename", &LuaProxy::getLevelFilename),
 				def("getLevelName", &LuaProxy::getLevelName),
-				def("spawnNPC", &LuaProxy::spawnNPC),		
+				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
+				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
 
 				class_<LuaProxy::Animation>("Animation")
 				.def(constructor<int>())
