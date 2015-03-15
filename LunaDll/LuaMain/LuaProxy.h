@@ -219,6 +219,8 @@ namespace LuaProxy {
         float speedY();
         void setSpeedY(float speedY);
         void stop();
+
+		int layerIndex();
     private:
         int m_layerIndex;
     };
@@ -251,14 +253,23 @@ namespace LuaProxy {
         void kill(int killEffectID, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
         VBStr attachedLayerName(lua_State* L);
+		void setAttachedLayerName(luabind::object value, lua_State* L);
         luabind::object attachedLayerObj(lua_State *L);
+		void setAttachedLayerObj(LuaProxy::Layer &value, lua_State *L);
         VBStr activateEventName(lua_State* L);
+		void setActivateEventName(luabind::object value, lua_State* L);
         VBStr deathEventName(lua_State* L);
+		void setDeathEventName(luabind::object value, lua_State* L);
         VBStr talkEventName(lua_State* L);
+		void setTalkEventName(luabind::object value, lua_State* L);
         VBStr noMoreObjInLayer(lua_State* L);
+		void setNoMoreObjInLayer(luabind::object value, lua_State* L);
         VBStr msg(lua_State* L);
+		void setMsg(luabind::object value, lua_State* L);
         VBStr layerName(lua_State* L);
+		void setLayerName(luabind::object value, lua_State* L);
         luabind::object layerObj(lua_State *L);
+		void setLayerObj(LuaProxy::Layer &value, lua_State *L);
         bool isValid();
 		bool isValid_throw(lua_State *L);
 		//not bound functions

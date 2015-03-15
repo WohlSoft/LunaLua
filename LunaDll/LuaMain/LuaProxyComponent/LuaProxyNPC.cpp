@@ -1,4 +1,5 @@
 #include "../LuaProxy.h"
+#include "../LuaHelper.h"
 #include "../../MOBs/NPCs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
@@ -132,6 +133,14 @@ LuaProxy::VBStr LuaProxy::NPC::attachedLayerName(lua_State* L)
 	return VBStr(thisnpc->attachedLayerName.ptr);
 }
 
+void LuaProxy::NPC::setAttachedLayerName(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->attachedLayerName, value, L);
+}
+
 luabind::object LuaProxy::NPC::attachedLayerObj(lua_State *L)
 {
 	if(!isValid_throw(L))
@@ -139,6 +148,14 @@ luabind::object LuaProxy::NPC::attachedLayerObj(lua_State *L)
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	return findlayer(((std::string)thisnpc->attachedLayerName).c_str(), L);
+}
+
+void LuaProxy::NPC::setAttachedLayerObj(LuaProxy::Layer &value, lua_State *L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	thisnpc->attachedLayerName = ::Layer::Get(value.layerIndex())->ptLayerName;
 }
 
 LuaProxy::VBStr LuaProxy::NPC::activateEventName(lua_State* L)
@@ -150,6 +167,14 @@ LuaProxy::VBStr LuaProxy::NPC::activateEventName(lua_State* L)
 	return VBStr(thisnpc->activateEventLayerName.ptr);
 }
 
+void LuaProxy::NPC::setActivateEventName(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->activateEventLayerName, value, L);
+}
+
 LuaProxy::VBStr LuaProxy::NPC::deathEventName(lua_State* L)
 {
 	if(!isValid_throw(L))
@@ -157,6 +182,14 @@ LuaProxy::VBStr LuaProxy::NPC::deathEventName(lua_State* L)
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	return VBStr(thisnpc->deathEventName.ptr);
+}
+
+void LuaProxy::NPC::setDeathEventName(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->deathEventName, value, L);
 }
 
 LuaProxy::VBStr LuaProxy::NPC::talkEventName(lua_State* L)
@@ -168,6 +201,14 @@ LuaProxy::VBStr LuaProxy::NPC::talkEventName(lua_State* L)
 	return VBStr(thisnpc->talkEventName.ptr);
 }
 
+void LuaProxy::NPC::setTalkEventName(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->talkEventName, value, L);
+}
+
 LuaProxy::VBStr LuaProxy::NPC::noMoreObjInLayer(lua_State* L)
 {
 	if(!isValid_throw(L))
@@ -175,6 +216,14 @@ LuaProxy::VBStr LuaProxy::NPC::noMoreObjInLayer(lua_State* L)
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	return VBStr(thisnpc->noMoreObjInLayerEventName.ptr);
+}
+
+void LuaProxy::NPC::setNoMoreObjInLayer(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->noMoreObjInLayerEventName, value, L);
 }
 
 LuaProxy::VBStr LuaProxy::NPC::msg(lua_State* L)
@@ -186,6 +235,14 @@ LuaProxy::VBStr LuaProxy::NPC::msg(lua_State* L)
 	return VBStr(thisnpc->talkMsg.ptr);
 }
 
+void LuaProxy::NPC::setMsg(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->talkMsg, value, L);
+}
+
 LuaProxy::VBStr LuaProxy::NPC::layerName(lua_State* L)
 {
 	if(!isValid_throw(L))
@@ -195,6 +252,14 @@ LuaProxy::VBStr LuaProxy::NPC::layerName(lua_State* L)
 	return VBStr(thisnpc->layerName.ptr);
 }
 
+void LuaProxy::NPC::setLayerName(luabind::object value, lua_State* L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	LuaHelper::assignVB6StrPtr(&thisnpc->layerName, value, L);
+}
+
 luabind::object LuaProxy::NPC::layerObj(lua_State *L)
 {
 	if(!isValid_throw(L))
@@ -202,6 +267,14 @@ luabind::object LuaProxy::NPC::layerObj(lua_State *L)
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
 	return findlayer(((std::string)thisnpc->layerName).c_str(), L);
+}
+
+void LuaProxy::NPC::setLayerObj(LuaProxy::Layer &value, lua_State *L)
+{
+	if (!isValid_throw(L)) return;
+
+	NPCMOB* thisnpc = ::NPC::Get(m_index);
+	thisnpc->layerName = ::Layer::Get(value.layerIndex())->ptLayerName;
 }
 
 bool LuaProxy::NPC::isValid()

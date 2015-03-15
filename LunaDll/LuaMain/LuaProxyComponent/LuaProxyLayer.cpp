@@ -43,3 +43,8 @@ void LuaProxy::Layer::stop()
 	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
 	::Layer::Stop(thislayer);
 }
+
+int LuaProxy::Layer::layerIndex()
+{
+	return m_layerIndex;
+}
