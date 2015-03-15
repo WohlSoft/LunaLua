@@ -174,6 +174,10 @@ namespace LuaProxy {
         void setLength(int len);
         void clear();
 		bool isValid() const;
+		static std::string LuaProxy::VBStr::luaConcatToString(const luabind::object &value, lua_State *L);
+		static std::string luaConcat(const luabind::object &arg1, const luabind::object &arg2, lua_State *L);
+
+		// Allow << operator to act as friend
 		friend std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
 
 		// Allow assignVB6StrPtr access to m_wcharptr

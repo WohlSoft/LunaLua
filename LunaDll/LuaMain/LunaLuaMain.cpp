@@ -342,6 +342,7 @@ void CLunaLua::bindAll()
 			.property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
 			.def("clear", &LuaProxy::VBStr::clear)
 			.def(tostring(self))
+			.def("__concat", &LuaProxy::VBStr::luaConcat)
 		];
 	if(m_type == LUNALUA_WORLD){
 		module(L)
