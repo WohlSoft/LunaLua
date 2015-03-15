@@ -5,6 +5,8 @@
 #include <windows.h>
 
 #define LUNA_VERSION		8
+#define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
+
 
 enum FIELDTYPE {
 	FT_INVALID = 0,
@@ -245,6 +247,8 @@ struct Momentum
 #define GF_NPC_TO_COINS		0x00A3C580			// No Args, Does convert every NPC to coins (Like player would win)
 
 #define GF_RUN_ANIM			0x009E7380			// Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
+
+#define GF_SCORE_RELEATED   0x008F80C0
 
 #endif
 

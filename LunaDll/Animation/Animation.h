@@ -160,13 +160,13 @@ struct SMBXAnimation{
     EffectID AnimationID;
     short unknown02;
     Momentum momentum;
-    short unknown34; //Subtimer?
+    short animationFrame;       //The current animation frame
     short unknown36;
     short unknown38;
     short unknown3A;
     short Timer;
-    short unknown3E;
-    short unknown40;
+    short npcID;                //User by yoshi egg and ludwig (somehow)
+    short onlyDrawMask;         //Only draw mask: Is used by the cheat "shadowstar" / "ghostytime"
     short unknown42;
 };
 #pragma pack(pop)
