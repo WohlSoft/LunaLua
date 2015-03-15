@@ -276,7 +276,11 @@ void CLunaLua::bindAll()
 				def("SfxSetPanning", (int(*)(int, int, int))&LuaProxy::Audio::SfxSetPanning),
 				def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
 				def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
-				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo)
+				def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
+
+				//Time
+				def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
+				def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock)
 			],
 			/*************************Audio*end*************************/
 
@@ -438,15 +442,15 @@ void CLunaLua::bindAll()
 				.property("y", &LuaProxy::NPC::y, &LuaProxy::NPC::setY)
 				.property("speedX", &LuaProxy::NPC::speedX, &LuaProxy::NPC::setSpeedX)
 				.property("speedY", &LuaProxy::NPC::speedY, &LuaProxy::NPC::setSpeedY)
-				.property("attachedLayerName", &LuaProxy::NPC::attachedLayerName)
-				.property("activateEventName", &LuaProxy::NPC::activateEventName)
-				.property("deathEventName", &LuaProxy::NPC::deathEventName)
-				.property("noMoreObjInLayer", &LuaProxy::NPC::noMoreObjInLayer)
-				.property("talkEventName", &LuaProxy::NPC::talkEventName)
-				.property("msg", &LuaProxy::NPC::msg)
-				.property("layerName", &LuaProxy::NPC::layerName)
-				.property("attachedLayerObj", &LuaProxy::NPC::attachedLayerObj)
-				.property("layerObj", &LuaProxy::NPC::layerObj)
+				.property("attachedLayerName", &LuaProxy::NPC::attachedLayerName, &LuaProxy::NPC::setAttachedLayerName)
+				.property("activateEventName", &LuaProxy::NPC::activateEventName, &LuaProxy::NPC::setActivateEventName)
+				.property("deathEventName", &LuaProxy::NPC::deathEventName, &LuaProxy::NPC::setDeathEventName)
+				.property("noMoreObjInLayer", &LuaProxy::NPC::noMoreObjInLayer, &LuaProxy::NPC::setNoMoreObjInLayer)
+				.property("talkEventName", &LuaProxy::NPC::talkEventName, &LuaProxy::NPC::setTalkEventName)
+				.property("msg", &LuaProxy::NPC::msg, &LuaProxy::NPC::setMsg)
+				.property("layerName", &LuaProxy::NPC::layerName, &LuaProxy::NPC::setLayerName)
+				.property("attachedLayerObj", &LuaProxy::NPC::attachedLayerObj, &LuaProxy::NPC::setAttachedLayerObj)
+				.property("layerObj", &LuaProxy::NPC::layerObj, &LuaProxy::NPC::setLayerObj)
 				.property("isValid", &LuaProxy::NPC::isValid),
 
 				class_<LuaProxy::Player>("Player")

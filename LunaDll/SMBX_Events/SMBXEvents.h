@@ -112,74 +112,74 @@ struct SMBXEvent {
 
 	short		NoSmoke; //(0xFFFF == no smoke, 0 == smoke)
 	short		SoundID;
-	wchar_t*	pName;
-	wchar_t*	pTextMsg;
+	VB6StrPtr	pName;
+	VB6StrPtr	pTextMsg;
 
-	wchar_t*	pHideLayerTarg1;
-	wchar_t*	pHideLayerTarg2;
-	wchar_t*	pHideLayerTarg3;
-	wchar_t*	pHideLayerTarg4;
-	wchar_t*	pHideLayerTarg5;
-	wchar_t*	pHideLayerTarg6;
-	wchar_t*	pHideLayerTarg7;
-	wchar_t*	pHideLayerTarg8;
-	wchar_t*	pHideLayerTarg9;
-	wchar_t*	pHideLayerTarg10;
-	wchar_t*	pHideLayerTarg11;
-	wchar_t*	pHideLayerTarg12;
-	wchar_t*	pHideLayerTarg13;
-	wchar_t*	pHideLayerTarg14;
-	wchar_t*	pHideLayerTarg15;
-	wchar_t*	pHideLayerTarg16;
-	wchar_t*	pHideLayerTarg17;
-	wchar_t*	pHideLayerTarg18;
-	wchar_t*	pHideLayerTarg19;
-	wchar_t*	pHideLayerTarg20;
-	wchar_t*	pHideLayerTarg21;
+	VB6StrPtr	pHideLayerTarg1;
+	VB6StrPtr	pHideLayerTarg2;
+	VB6StrPtr	pHideLayerTarg3;
+	VB6StrPtr	pHideLayerTarg4;
+	VB6StrPtr	pHideLayerTarg5;
+	VB6StrPtr	pHideLayerTarg6;
+	VB6StrPtr	pHideLayerTarg7;
+	VB6StrPtr	pHideLayerTarg8;
+	VB6StrPtr	pHideLayerTarg9;
+	VB6StrPtr	pHideLayerTarg10;
+	VB6StrPtr	pHideLayerTarg11;
+	VB6StrPtr	pHideLayerTarg12;
+	VB6StrPtr	pHideLayerTarg13;
+	VB6StrPtr	pHideLayerTarg14;
+	VB6StrPtr	pHideLayerTarg15;
+	VB6StrPtr	pHideLayerTarg16;
+	VB6StrPtr	pHideLayerTarg17;
+	VB6StrPtr	pHideLayerTarg18;
+	VB6StrPtr	pHideLayerTarg19;
+	VB6StrPtr	pHideLayerTarg20;
+	VB6StrPtr	pHideLayerTarg21;
 
-	wchar_t*	pShowLayerTarg1;
-	wchar_t*	pShowLayerTarg2;
-	wchar_t*	pShowLayerTarg3;
-	wchar_t*	pShowLayerTarg4;
-	wchar_t*	pShowLayerTarg5;
-	wchar_t*	pShowLayerTarg6;
-	wchar_t*	pShowLayerTarg7;
-	wchar_t*	pShowLayerTarg8;
-	wchar_t*	pShowLayerTarg9;
-	wchar_t*	pShowLayerTarg10;
-	wchar_t*	pShowLayerTarg11;
-	wchar_t*	pShowLayerTarg12;
-	wchar_t*	pShowLayerTarg13;
-	wchar_t*	pShowLayerTarg14;
-	wchar_t*	pShowLayerTarg15;
-	wchar_t*	pShowLayerTarg16;
-	wchar_t*	pShowLayerTarg17;
-	wchar_t*	pShowLayerTarg18;
-	wchar_t*	pShowLayerTarg19;
-	wchar_t*	pShowLayerTarg20;
-	wchar_t*	pShowLayerTarg21;
+	VB6StrPtr	pShowLayerTarg1;
+	VB6StrPtr	pShowLayerTarg2;
+	VB6StrPtr	pShowLayerTarg3;
+	VB6StrPtr	pShowLayerTarg4;
+	VB6StrPtr	pShowLayerTarg5;
+	VB6StrPtr	pShowLayerTarg6;
+	VB6StrPtr	pShowLayerTarg7;
+	VB6StrPtr	pShowLayerTarg8;
+	VB6StrPtr	pShowLayerTarg9;
+	VB6StrPtr	pShowLayerTarg10;
+	VB6StrPtr	pShowLayerTarg11;
+	VB6StrPtr	pShowLayerTarg12;
+	VB6StrPtr	pShowLayerTarg13;
+	VB6StrPtr	pShowLayerTarg14;
+	VB6StrPtr	pShowLayerTarg15;
+	VB6StrPtr	pShowLayerTarg16;
+	VB6StrPtr	pShowLayerTarg17;
+	VB6StrPtr	pShowLayerTarg18;
+	VB6StrPtr	pShowLayerTarg19;
+	VB6StrPtr	pShowLayerTarg20;
+	VB6StrPtr	pShowLayerTarg21;
 
-	wchar_t*	pToggleLayerTarg1;
-	wchar_t*	pToggleLayerTarg2;
-	wchar_t*	pToggleLayerTarg3;
-	wchar_t*	pToggleLayerTarg4;
-	wchar_t*	pToggleLayerTarg5;
-	wchar_t*	pToggleLayerTarg6;
-	wchar_t*	pToggleLayerTarg7;
-	wchar_t*	pToggleLayerTarg8;
-	wchar_t*	pToggleLayerTarg9;
-	wchar_t*	pToggleLayerTarg10;
-	wchar_t*	pToggleLayerTarg11;
-	wchar_t*	pToggleLayerTarg12;
-	wchar_t*	pToggleLayerTarg13;
-	wchar_t*	pToggleLayerTarg14;
-	wchar_t*	pToggleLayerTarg15;
-	wchar_t*	pToggleLayerTarg16;
-	wchar_t*	pToggleLayerTarg17;
-	wchar_t*	pToggleLayerTarg18;
-	wchar_t*	pToggleLayerTarg19;
-	wchar_t*	pToggleLayerTarg20;
-	wchar_t*	pToggleLayerTarg21;
+	VB6StrPtr	pToggleLayerTarg1;
+	VB6StrPtr	pToggleLayerTarg2;
+	VB6StrPtr	pToggleLayerTarg3;
+	VB6StrPtr	pToggleLayerTarg4;
+	VB6StrPtr	pToggleLayerTarg5;
+	VB6StrPtr	pToggleLayerTarg6;
+	VB6StrPtr	pToggleLayerTarg7;
+	VB6StrPtr	pToggleLayerTarg8;
+	VB6StrPtr	pToggleLayerTarg9;
+	VB6StrPtr	pToggleLayerTarg10;
+	VB6StrPtr	pToggleLayerTarg11;
+	VB6StrPtr	pToggleLayerTarg12;
+	VB6StrPtr	pToggleLayerTarg13;
+	VB6StrPtr	pToggleLayerTarg14;
+	VB6StrPtr	pToggleLayerTarg15;
+	VB6StrPtr	pToggleLayerTarg16;
+	VB6StrPtr	pToggleLayerTarg17;
+	VB6StrPtr	pToggleLayerTarg18;
+	VB6StrPtr	pToggleLayerTarg19;
+	VB6StrPtr	pToggleLayerTarg20;
+	VB6StrPtr	pToggleLayerTarg21;
 
 	short		Section1MusicID; //(FFFF == don't change)
 	short		Section2MusicID; //(FFFF == don't change)
@@ -230,7 +230,7 @@ struct SMBXEvent {
 	float		PositionSettings[251];
 
 	int			EndGame; //(1 == bowser defeat, 0 = none)
-	wchar_t*	EventToTrigger;
+	VB6StrPtr	EventToTrigger;
 	float		Delay;
 
 	short		ForceUp; //(0xFFFF = checked)
@@ -244,7 +244,7 @@ struct SMBXEvent {
 	short		ForceDrop; //(0xFFFF = checked)
 	short		ForceStart; //(0xFFFF = checked)
 
-	wchar_t*	LayerToMoveName;
+	VB6StrPtr	LayerToMoveName;
 	float		LayerHSpeed;
 	float		LayerVSpeed;
 

@@ -35,15 +35,23 @@ public:
     static int sampleRate();
     static int currentVolume();
 
-    static bool MUS_IsPlaying();
+	static bool MUS_IsPlaying();
     static bool MUS_IsPaused();
     static bool MUS_IsFading();
+
+	static unsigned __int64 sampleCount();
+	static unsigned __int64 MUS_sampleCount();
 private:
     static Mix_Music *play_mus;
     static int volume;
     static int sRate;
 	static bool showMsg;
 	static std::string showMsg_for;
+	
+	static SDL_mutex* sampleCountMutex;
+	static unsigned __int64 sCount;
+	static unsigned __int64 musSCount;
+	static void postMixCallback(void *udata, Uint8 *stream, int len);
 };
 
 

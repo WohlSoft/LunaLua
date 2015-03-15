@@ -55,7 +55,7 @@ void VB6StrPtr::operator=(const std::wstring &other) {
 	free(tmpVBString);
 }
 
-// Assignment operator from std::string
+// Assignment operator from std::string, assuming it's utf-8 encoding
 void VB6StrPtr::operator=(const std::string &other) {
 	*this = utf8_decode(other);
 }
@@ -65,14 +65,11 @@ VB6StrPtr::operator std::wstring() const {
 	if (ptr == NULL)
 		return std::wstring(L"");
 
-	// Get a pointer to the length prefix
-	unsigned int* len = (unsigned int*)&((unsigned char*)ptr)[-4];
-
 	// Make a wstring from the string data, making sure to truncate based on the length prefix just in case
-	return std::wstring(ptr, *len/2);
+	return std::wstring(ptr, length());
 }
 
-// Cast operator to std::string
+// Cast operator to std::string, assuming utf-8 encoding
 VB6StrPtr::operator std::string() const {
 	if (ptr == NULL)
 		return std::string("");
@@ -83,4 +80,45 @@ VB6StrPtr::operator std::string() const {
 // Cast operator to bool, true if non-null
 VB6StrPtr::operator bool() const {
 	return ptr != NULL;
+}
+
+// Reads the BSTR length header
+unsigned int VB6StrPtr::length() const
+{
+	if (ptr == NULL)
+		return 0;
+
+	return *((unsigned int*)&((unsigned char*)ptr)[-4]) / 2;
+}
+
+// Equality operator for VBStrPtr
+bool VB6StrPtr::operator==(const VB6StrPtr &other) const
+{
+	// To my understanding the VB6 strings are generally null-terminated, but
+	// there is a length field I trust more, so let's be extra safe and ensure
+	// we don't read beyond the length specified.
+	unsigned int len1 = length();
+	unsigned int len2 = other.length();
+	if (len1 != len2) return false;
+	if (len1 == 0) return true; // If both zero length, it matches and the pointer might be invalid so have an early check for that
+	return std::wcsncmp(ptr, other.ptr, len1) == 0;
+}
+
+// Equality operator for str::wstring
+bool VB6StrPtr::operator==(const std::wstring &other) const
+{
+	// To my understanding the VB6 strings are generally null-terminated, but
+	// there is a length field I trust more, so let's be extra safe and ensure
+	// we don't read beyond the length specified.
+	unsigned int len1 = length();
+	unsigned int len2 = other.length();
+	if (len1 != len2) return false;
+	if (len1 == 0) return true; // If both zero length, it matches and the pointer might be invalid so have an early check for that
+	return std::wcsncmp(ptr, other.c_str(), len1) == 0;
+}
+
+// Equality operator for str::string, assumes it's utf-8 encoded
+bool VB6StrPtr::operator==(const std::string &other) const
+{
+	return (*this == utf8_decode(other));
 }
