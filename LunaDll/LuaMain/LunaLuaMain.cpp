@@ -420,7 +420,11 @@ void CLunaLua::bindAll()
 				.property("speedY", &LuaProxy::Animation::speedY, &LuaProxy::Animation::setSpeedY)
 				.property("width", &LuaProxy::Animation::width, &LuaProxy::Animation::setWidth)
 				.property("height", &LuaProxy::Animation::height, &LuaProxy::Animation::setHeight)
-				.property("timer", &LuaProxy::Animation::timer, &LuaProxy::Animation::setTimer),
+				.property("timer", &LuaProxy::Animation::timer, &LuaProxy::Animation::setTimer)
+                .property("animationFrame", &LuaProxy::Animation::animationFrame, &LuaProxy::Animation::setAnimationFrame)
+                .property("npcID", &LuaProxy::Animation::npcID, &LuaProxy::Animation::setNpcID)
+                .property("drawOnlyMask", &LuaProxy::Animation::drawOnlyMask, &LuaProxy::Animation::setDrawOnlyMask)
+                .property("isValid", &LuaProxy::Animation::isValid),
 
 				class_<LuaProxy::Layer>("Layer")
 				.def(constructor<int>())

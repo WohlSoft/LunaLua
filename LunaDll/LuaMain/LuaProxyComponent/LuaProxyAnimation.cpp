@@ -132,7 +132,50 @@ void LuaProxy::Animation::setTimer(short timer)
 
 }
 
+short LuaProxy::Animation::npcID() const
+{
+    if (!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->npcID;
+}
+
+void LuaProxy::Animation::setNpcID(short npcID)
+{
+    if (!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->npcID = npcID;
+}
+
+bool LuaProxy::Animation::drawOnlyMask() const
+{
+    if (!isValid())
+        return false;
+    return (bool)::Animations::Get(m_animationIndex)->onlyDrawMask;
+}
+
+void LuaProxy::Animation::setDrawOnlyMask(bool drawOnlyMask)
+{
+    if (!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->onlyDrawMask = (drawOnlyMask ? 0 : -1);
+}
+
+short LuaProxy::Animation::animationFrame() const
+{
+    if (!isValid())
+        return 0;
+    return ::Animations::Get(m_animationIndex)->animationFrame;
+}
+
+void LuaProxy::Animation::setAnimationFrame(short animationFrame)
+{
+    if (!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->animationFrame = animationFrame;
+}
+
+
 bool LuaProxy::Animation::isValid() const
 {
-	return !(m_animationIndex < 0 || m_animationIndex > GM_NPCS_COUNT);
+    return !(m_animationIndex < 0 || m_animationIndex > GM_NPCS_COUNT);
 }

@@ -209,8 +209,14 @@ namespace LuaProxy {
         void setWidth(double width);
 		short timer() const;
         void setTimer(short timer);
-    private:
+        short npcID() const;
+        void setNpcID(short npcID);
+        bool drawOnlyMask() const;
+        void setDrawOnlyMask(bool drawOnlyMask);
+        short animationFrame() const;
+        void setAnimationFrame(short animationFrame);
         bool isValid() const;
+    private:
         int m_animationIndex;
     };
 
