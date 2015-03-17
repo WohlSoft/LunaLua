@@ -177,5 +177,5 @@ void LuaProxy::Animation::setAnimationFrame(short animationFrame)
 
 bool LuaProxy::Animation::isValid() const
 {
-    return !(m_animationIndex < 0 || m_animationIndex > GM_NPCS_COUNT);
+	return !(m_animationIndex < 0 || m_animationIndex > GM_ANIM_COUNT);
 }
