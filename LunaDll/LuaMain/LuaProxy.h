@@ -80,6 +80,7 @@ namespace LuaProxy {
     luabind::object findlayer(const char* layername, lua_State *L);
 	//Animation functions
     luabind::object animations(lua_State* L);
+    //DEPRECATED
 	void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
 	void runAnimation(int id, double x, double y, double height, double width, int extraData);
 	void runAnimation(int id, double x, double y, int extraData);
@@ -645,6 +646,8 @@ namespace LuaProxy {
 	NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
 	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
 	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
+    Animation spawnEffect(short effectID, double x, double y, lua_State* L);
+    Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 }
 
 #endif

@@ -157,7 +157,7 @@ void LuaProxy::Animation::setDrawOnlyMask(bool drawOnlyMask)
 {
     if (!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->onlyDrawMask = (drawOnlyMask ? 0 : -1);
+    ::Animations::Get(m_animationIndex)->onlyDrawMask = COMBOOL(drawOnlyMask);
 }
 
 short LuaProxy::Animation::animationFrame() const
@@ -179,3 +179,5 @@ bool LuaProxy::Animation::isValid() const
 {
 	return !(m_animationIndex < 0 || m_animationIndex > GM_ANIM_COUNT);
 }
+
+

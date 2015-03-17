@@ -6,7 +6,7 @@
 
 #define LUNA_VERSION		8
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
-
+#define COMBOOL(b) (b ? -1 : 0)
 
 enum FIELDTYPE {
 	FT_INVALID = 0,

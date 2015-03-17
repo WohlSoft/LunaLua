@@ -732,3 +732,36 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 
 	return theNewNPC;
 }
+
+
+
+LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, lua_State* L)
+{
+    return spawnEffect(effectID, x, y, 1.0f, L);
+} 
+
+
+LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L)
+{
+    typedef void animationFunc(short*, Momentum*, float*, short*, short*);
+    animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
+
+    if (effectID < 1 || effectID > 148){
+        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-292\nGot Effect-ID: %d", effectID);
+        return LuaProxy::Animation(-1);
+    }
+
+    if (GM_ANIM_COUNT >= 996){
+        luaL_error(L, "Over 996 Effects, cannot spawn more!");
+        return LuaProxy::Animation(-1);
+    }
+
+    Momentum coor;                          //Arg 2
+    coor.x = x;
+    coor.y = y;            //Arg 3
+    short npcID = 0;                        //Arg 4
+    short onlyDrawMask = COMBOOL(false);    //Arg 5
+
+    spawnEffectFunc(&effectID, &coor, &animationFrame, &npcID, &onlyDrawMask);
+    return LuaProxy::Animation(GM_ANIM_COUNT - 1);
+}
