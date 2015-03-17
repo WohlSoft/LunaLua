@@ -6,6 +6,7 @@
 #include "../MOBs/PlayerMOB.h"
 #include "../Misc/VB6StrPtr.h"
 
+#pragma pack(push, 4)
 struct Block {
 
 	short				Slippery; //0xFFFF = yes
@@ -30,21 +31,22 @@ struct Block {
 	double				XSpeed;			// 0x40	
 	double				YSpeed;			// 0x48	
 
-	short				ContentsID;
-	short				BeingHitStatus1;	//50
-	short				BeingHitTimer;		//52
-	short				BeingHitStatus2;	//54
+	short				ContentsID;     // 0x50 (todo: verify!)
+	short				BeingHitStatus1;// 0x52 (todo: verify!)
+	short				BeingHitTimer;	// 0x54 (todo: verify!)
+	short				BeingHitStatus2;// 0x56 (todo: verify!)
 
-	short				Unknown56;			
-	short				Unknown58;	
-	unsigned short		IsHidden;			//5A
-	short				Unknown5C;
+	short				Unknown58;
+	short				Unknown5A;
+	unsigned short		IsHidden;		// 0x5C (todo: verify!)
 	short				Unknown5E;
+	short				Unknown60;
 
-	//int				Unknown60;
-	//int				Unknown64;
-
+	short				Unknown62;
+	short				Unknown64;
+	short				Unknown66;
 };
+#pragma pack(pop)
 
 namespace Blocks {
 
