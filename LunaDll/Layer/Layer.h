@@ -10,7 +10,7 @@ struct LayerControl {
 	short		IsStopped;		// 0xFFFF when moving, event ended?
 	short		Unknown1;
 	VB6StrPtr	ptLayerName;	// ptr to double zero terminated 2byte wide char string
-	int			Unknown2;
+	int			Unknown2;       // Have a hunch +0x08 is a 16-bit value representing layer visibility, need to verify.
 
 	float		xSpeed;
 	float		ySpeed;
