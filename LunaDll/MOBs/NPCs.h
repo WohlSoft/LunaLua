@@ -80,8 +80,7 @@ struct NPCMOB {
     short unknown_12;                       //+0x12
     short unknown_14;                       //+0x14
     short unknown_16;                       //+0x16
-    short unknown_18;                       //+0x18
-    short unknown_1A;                       //+0x1A
+    float unknown_18;                       //+0x18 NPC x-axis movement related, maybe temporary?
     short unknown_1C;                       //+0x1C
     short unknown_1E;                       //+0x1E
     short unknown_20;                       //+0x20
