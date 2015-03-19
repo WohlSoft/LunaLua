@@ -64,6 +64,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 //Level Shutdown Check Function
 extern void checkLevelShutdown();
 
+
 /************************************************************************/
 /* Libs                                                                 */
 /************************************************************************/

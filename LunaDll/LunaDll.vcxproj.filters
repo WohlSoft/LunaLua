@@ -112,6 +112,9 @@
     <Filter Include="Header Files\Lua\LuaProxyComponent">
       <UniqueIdentifier>{3c5c273e-0210-44ee-92fd-0d9857bfe836}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Misc\RuntimeHookComponents">
+      <UniqueIdentifier>{7fe805c0-8b82-466c-9330-213a4a32c632}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -550,6 +553,15 @@
     </ClCompile>
     <ClCompile Include="Misc\ErrorReporter.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookHooks.cpp">
+      <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookFixups.cpp">
+      <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookGeneral.cpp">
+      <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
