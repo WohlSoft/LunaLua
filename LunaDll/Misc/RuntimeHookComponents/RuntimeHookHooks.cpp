@@ -431,3 +431,9 @@ extern void checkLevelShutdown()
     }
 }
 
+
+extern void handleError(int errCode)
+{
+
+    //HERE NEED ESI CMP CODE (ORIGINAL CODE)
+}

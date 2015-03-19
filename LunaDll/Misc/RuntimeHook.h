@@ -63,6 +63,8 @@ extern void __stdcall doEventsLevelEditorHook();
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 //Level Shutdown Check Function
 extern void checkLevelShutdown();
+//Error Handler
+extern void handleError(int errCode);
 
 
 /************************************************************************/
@@ -95,6 +97,7 @@ extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 
 //Fixup errors
 void fixup_TypeMismatch13();
+void fixup_ErrorReporting();
 
 
 

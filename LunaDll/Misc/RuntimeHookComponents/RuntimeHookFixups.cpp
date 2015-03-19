@@ -1,6 +1,14 @@
 #include "../RuntimeHook.h"
 #include <windows.h>
 
+BYTE* tracedownAddress(BYTE* addr){
+    //Now get the relative address of this function
+    DWORD relAddr = *((DWORD*)(addr + 1));
+    //Convert the relative address to an absolute address
+    DWORD targetAddr = relAddr + (DWORD)addr + 5;
+    //Now get the pointer of the code
+    return (BYTE*)targetAddr;
+}
 
 void fixup_TypeMismatch13()
 {
@@ -13,13 +21,7 @@ void fixup_TypeMismatch13()
         //Get the function conversion code;
         BYTE* baseAddr = (BYTE*)GetProcAddress(vmVB6Lib, "__vbaR8Str");
         //Go to the function call asm to find out the address of the function that returns local language id 
-        BYTE* funcAddrASM = baseAddr + 11;
-        //Now get the relative address of this function
-        DWORD relAddr = *((DWORD*)(funcAddrASM + 1));
-        //Convert the relative address to an absolute address
-        DWORD targetAddr = relAddr + (DWORD)funcAddrASM + 5;
-        //Now get the pointer of the code
-        BYTE* targetAddrBYTE = (BYTE*)targetAddr;
+        BYTE* targetAddrBYTE = tracedownAddress(baseAddr + 11);
 
         // Normally this function would call another function called GetUserDefaultLCID.
         // In this case we overwrite the function and directly copy the return address to 0
@@ -50,3 +52,22 @@ void fixup_TypeMismatch13()
     }
 }
 
+
+void fixup_ErrorReporting()
+{
+    HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+    if (vmVB6Lib){
+        BYTE* overflowFuncAddr = (BYTE*)GetProcAddress(vmVB6Lib, "__vbaErrorOverflow");
+        BYTE* internalRaiseErrorFunc = tracedownAddress(overflowFuncAddr + 2);
+
+        BYTE* toPatch = internalRaiseErrorFunc + 20;
+        DWORD oldprotect;
+        if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
+            toPatch[0] = 0x56; //PUSH ESI
+            PATCH_FUNC((DWORD)&toPatch[1], &handleError);
+                //NOP
+            // Now get the protection back
+            VirtualProtect((void*)toPatch, 10, oldprotect, &oldprotect);
+        }
+    }
+}
