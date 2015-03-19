@@ -35,5 +35,10 @@ bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
 HMODULE getModule(std::string moduleName);
 std::wstring getModulePath();
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
+bool writeFile(const std::string &content, const std::string &path);
+
+std::string generateTimestamp(std::string format);
+std::string generateTimestampForFilename();
+std::string generateTimestamp();
 
 #endif

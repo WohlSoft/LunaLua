@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,7 +107,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
@@ -137,7 +137,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
@@ -149,6 +149,7 @@
     <ClInclude Include="Autocode\AutocodeManager.h" />
     <ClInclude Include="Blocks\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
+    <ClInclude Include="Misc\ErrorReporter.h" />
     <ClInclude Include="LuaMain\LuabindIncludes.h" />
     <ClInclude Include="LuaMain\LuaProxyComponent\LuaProxyAudio.h" />
     <ClInclude Include="LuaMain\LuaSharedProxy.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="Autocode\AutocodeManager.cpp" />
     <ClCompile Include="Blocks\Blocks.cpp" />
     <ClCompile Include="CellManager\CellManager.cpp" />
+    <ClCompile Include="Misc\ErrorReporter.cpp" />
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAudio.cpp" />

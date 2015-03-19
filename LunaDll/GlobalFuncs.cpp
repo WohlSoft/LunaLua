@@ -339,3 +339,33 @@ bool isAbsolutePath(const std::string& path)
 {
 	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && path[2] == L'\\';
 }
+
+std::string generateTimestamp(std::string format)
+{
+    std::time_t t = std::time(NULL);
+    char mbstr[100];
+    std::strftime(mbstr, sizeof(mbstr), format.c_str(), std::localtime(&t));
+    return std::string(mbstr);
+}
+
+std::string generateTimestamp()
+{
+    return generateTimestamp("%F %H %M %S");
+}
+
+std::string generateTimestampForFilename()
+{
+    return generateTimestamp("%F_%H_%M_%S");
+}
+
+bool writeFile(const std::string &content, const std::string &path)
+{
+    ofstream theFile(path, ios::binary | ios::out);
+    if (!theFile.is_open()){
+        theFile.close();
+        return false;
+    }
+    theFile << content;
+    theFile.close();
+    return true;
+}

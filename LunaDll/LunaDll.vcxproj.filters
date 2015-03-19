@@ -291,6 +291,9 @@
     <ClInclude Include="Misc\Playground.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\ErrorReporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -544,6 +547,9 @@
     </ClCompile>
     <ClCompile Include="Misc\Playground.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\ErrorReporter.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

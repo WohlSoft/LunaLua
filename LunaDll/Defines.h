@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #define LUNA_VERSION		8
+#define LUALUA_VERSION      "LUNALUA V0.6.1 BETA"
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
 #define COMBOOL(b) (b ? -1 : 0)
 

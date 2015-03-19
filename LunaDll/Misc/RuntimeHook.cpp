@@ -329,7 +329,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 		episodeStarted=false;
 	}
 #endif
-	Render::Print(std::wstring(L"LUNALUA V0.6.1 BETA"), 3, 5, 5);
+    Render::Print(utf8_decode(LUALUA_VERSION), 3, 5, 5);
 	if(newDebugger)
 	{
 		if(asyncBitBltProc){
