@@ -21,7 +21,7 @@ float LuaProxy::NPC::direction(lua_State* L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::NPC::Get(m_index)->directionFaced2; // The version at 0x118 is the original version
+	return ::NPC::Get(m_index)->directionFaced;
 }
 
 void LuaProxy::NPC::setDirection(float direction, lua_State* L)
@@ -31,7 +31,7 @@ void LuaProxy::NPC::setDirection(float direction, lua_State* L)
 
 	NPCMOB* npc =  ::NPC::Get(m_index);
 	setSpeedX(0.0, L);
-    npc->directionFaced2 = direction; // The version at 0x118 is the original version
+    npc->directionFaced = direction;
 }
 
 double LuaProxy::NPC::x(lua_State* L) const
