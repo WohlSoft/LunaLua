@@ -568,6 +568,12 @@ std::string LuaProxy::getSMBXPath()
 	return utf8_encode(wstring(getModulePath()));
 }
 
+void LuaProxy::simulateError(short errcode)
+{
+    emulateVB6Error((int)errcode);
+}
+
+
 void LuaProxy::hud(bool activate)
 {
 	gSkipSMBXHUD = !activate;

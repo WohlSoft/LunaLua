@@ -118,6 +118,7 @@ void TrySkipPatch()
     /* Simple ASM Source Patches                                            */
     /************************************************************************/
     fixup_TypeMismatch13();
+    fixup_ErrorReporting();
 
 
 
@@ -165,3 +166,14 @@ void TrySkipPatch()
 }
 
 
+
+
+
+void emulateVB6Error(int errorCode)
+{
+    HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+    if (vmVB6Lib){
+        void(__stdcall *vbaErrorFunc)(int) = (void(__stdcall *)(int))GetProcAddress(vmVB6Lib, "__vbaError");
+        vbaErrorFunc(errorCode);
+    }
+}

@@ -343,19 +343,19 @@ bool isAbsolutePath(const std::string& path)
 std::string generateTimestamp(std::string format)
 {
     std::time_t t = std::time(NULL);
-    char mbstr[100];
+    char mbstr[300];
     std::strftime(mbstr, sizeof(mbstr), format.c_str(), std::localtime(&t));
     return std::string(mbstr);
 }
 
 std::string generateTimestamp()
 {
-    return generateTimestamp("%F %H %M %S");
+    return generateTimestamp("%Y-%m-%d %H %M %S");
 }
 
 std::string generateTimestampForFilename()
 {
-    return generateTimestamp("%F_%H_%M_%S");
+    return generateTimestamp("%Y-%m-%d_%H_%M_%S");
 }
 
 bool writeFile(const std::string &content, const std::string &path)

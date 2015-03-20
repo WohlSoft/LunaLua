@@ -3,6 +3,7 @@
 #include <dbghelp.h>
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
+#include <array>
 
 std::string ErrorReport::generateStackTrace()
 {
@@ -13,7 +14,7 @@ std::string ErrorReport::generateStackTrace()
     HANDLE process;
     process = GetCurrentProcess();
     SymInitialize(process, NULL, TRUE);
-    frames = CaptureStackBackTrace(0, 100, stack, NULL);
+    frames = CaptureStackBackTrace(0, 63, stack, NULL);
     symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
     symbol->MaxNameLen = 255;
     symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
@@ -33,7 +34,7 @@ void ErrorReport::writeErrorLog(const std::string &text)
     std::string smbxPath = utf8_encode(getModulePath());
     smbxPath += "\\";
     smbxPath += "ERROR_";
-    smbxPath += generateTimestamp();
+    smbxPath += generateTimestampForFilename();
     smbxPath += ".txt";
 
     writeFile(text, smbxPath);
@@ -72,6 +73,7 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
         errDesc += "VB6 Error Name: Type mismatch\n";
         break;
     default:
+        errDesc += "VB6 Error Name: Unknown\n";
         break;
     }
     return errDesc;
@@ -80,13 +82,17 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
 
 void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
 {
+    std::vector<int> ignoreErrorCodes = { 424 };
+    if (std::find(ignoreErrorCodes.begin(), ignoreErrorCodes.end(), static_cast<int>(errCode)) != ignoreErrorCodes.end())
+        return;
+
     std::string fullErrorDescription = "";
     fullErrorDescription += "**************************************************\n";
     fullErrorDescription += "*                  Summary                       *\n";
     fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += "SMBX has crashed due an error. See the description for more information!";
-    fullErrorDescription += "LunaLua Version: " + std::string(LUALUA_VERSION);
-    fullErrorDescription += std::string("Time/Date: ") + generateTimestamp();
+    fullErrorDescription += "SMBX has crashed due an error. See the description for more information!\n";
+    fullErrorDescription += "LunaLua Version: " + std::string(LUALUA_VERSION) + "\n";
+    fullErrorDescription += std::string("Time/Date: ") + generateTimestamp() + "\n";
     fullErrorDescription += "**************************************************\n";
     fullErrorDescription += "*              Description                       *\n";
     fullErrorDescription += "**************************************************\n";
@@ -94,7 +100,7 @@ void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
     fullErrorDescription += "\n";
     fullErrorDescription += "If you like to help us finding the error then please post this log at:\n";
     fullErrorDescription += "* http://engine.wohlnet.ru/forum/ or\n";
-    fullErrorDescription += "* http://www.supermariobrosx.org/forums/viewforum.php?f=35\n or";
+    fullErrorDescription += "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";
     fullErrorDescription += "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription += "\n";
     fullErrorDescription += "**************************************************\n";

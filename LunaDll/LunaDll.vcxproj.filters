@@ -295,7 +295,7 @@
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Misc\ErrorReporter.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -551,9 +551,6 @@
     <ClCompile Include="Misc\Playground.cpp">
       <Filter>Header Files\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\ErrorReporter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookHooks.cpp">
       <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
     </ClCompile>
@@ -562,6 +559,9 @@
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookGeneral.cpp">
       <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\ErrorReporter.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

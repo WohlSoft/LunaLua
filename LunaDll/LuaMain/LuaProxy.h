@@ -23,6 +23,7 @@ namespace LuaProxy {
 
 	//undocumented
 	std::string getSMBXPath();
+    void simulateError(short errcode);
 	//Debug/Text functions
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);

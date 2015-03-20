@@ -32,6 +32,7 @@ extern bool episodeStarted;
 /************************************************************************/
 void ParseArgs(const std::vector<std::string>& args);
 void TrySkipPatch();
+void emulateVB6Error(int errorCode);
 
 /************************************************************************/
 /* Hooks                                                                */

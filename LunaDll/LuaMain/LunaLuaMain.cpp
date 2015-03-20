@@ -204,6 +204,7 @@ void CLunaLua::bindAll()
 	module(L)
 		[
 			def("getSMBXPath", &LuaProxy::getSMBXPath),
+            def("simulateError", &LuaProxy::simulateError),
 			def("windowDebug", &LuaProxy::windowDebug),
 			def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
 			def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
