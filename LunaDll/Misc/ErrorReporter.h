@@ -2,8 +2,22 @@
 #define ErrorReporter_hhh
 
 #include <string>
+#include "../libs/stackwalker/StackWalker.h"
 
 namespace ErrorReport{
+
+    class CustomStackTracer : public StackWalker 
+    {
+    public:
+        CustomStackTracer() : theOutput(""), StackWalker() {}
+        std::string theOutput;
+    protected:
+        virtual void OnOutput(LPCSTR szText)
+        {
+            theOutput += std::string(szText);
+        }
+    };
+
 
     enum VB6ErrorCode{
         VB6ERR_OVERFLOW = 6,

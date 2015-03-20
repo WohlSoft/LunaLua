@@ -149,6 +149,7 @@
     <ClInclude Include="Autocode\AutocodeManager.h" />
     <ClInclude Include="Blocks\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
+    <ClInclude Include="libs\stackwalker\StackWalker.h" />
     <ClInclude Include="Misc\ErrorReporter.h" />
     <ClInclude Include="LuaMain\LuabindIncludes.h" />
     <ClInclude Include="LuaMain\LuaProxyComponent\LuaProxyAudio.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="Autocode\AutocodeManager.cpp" />
     <ClCompile Include="Blocks\Blocks.cpp" />
     <ClCompile Include="CellManager\CellManager.cpp" />
+    <ClCompile Include="libs\stackwalker\StackWalker.cpp" />
     <ClCompile Include="Misc\ErrorReporter.cpp" />
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAnimation.cpp" />

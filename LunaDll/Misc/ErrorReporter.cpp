@@ -7,26 +7,9 @@
 
 std::string ErrorReport::generateStackTrace()
 {
-    unsigned int i;
-    void * stack[100];
-    unsigned short frames;
-    SYMBOL_INFO * symbol;
-    HANDLE process;
-    process = GetCurrentProcess();
-    SymInitialize(process, NULL, TRUE);
-    frames = CaptureStackBackTrace(0, 63, stack, NULL);
-    symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
-    symbol->MaxNameLen = 255;
-    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-    std::string bkTrace = "";
-    for (i = 0; i < frames; i++)
-    {
-        char buf[500];
-        SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
-        sprintf(buf, "%i: %s - 0x%0llx\n", frames - i - 1, symbol->Name, symbol->Address);
-        bkTrace += buf;
-    }
-    return bkTrace;
+    CustomStackTracer cst;
+    cst.ShowCallstack();
+    return cst.theOutput;
 }
 
 void ErrorReport::writeErrorLog(const std::string &text)

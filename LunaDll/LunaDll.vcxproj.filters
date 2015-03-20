@@ -297,6 +297,9 @@
     <ClInclude Include="Misc\ErrorReporter.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="libs\stackwalker\StackWalker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -562,6 +565,9 @@
     </ClCompile>
     <ClCompile Include="Misc\ErrorReporter.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\stackwalker\StackWalker.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
