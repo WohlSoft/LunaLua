@@ -147,6 +147,7 @@
     <ClInclude Include="SMBXInternal\Animation.h" />
     <ClInclude Include="Autocode\Autocode.h" />
     <ClInclude Include="Autocode\AutocodeManager.h" />
+    <ClInclude Include="SMBXInternal\BGOs.h" />
     <ClInclude Include="SMBXInternal\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
     <ClInclude Include="libs\stackwalker\StackWalker.h" />
@@ -201,6 +202,8 @@
     <ClInclude Include="SMBXInternal\Sound.h" />
     <ClInclude Include="CustomSprites\SpriteComponent.h" />
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h" />
+    <ClInclude Include="SMBXInternal\Warp.h" />
+    <ClInclude Include="SMBXInternal\Water.h" />
     <ClInclude Include="UserSaves\UserSaving.h" />
     <ClInclude Include="SMBXInternal\WorldLevel.h" />
   </ItemGroup>

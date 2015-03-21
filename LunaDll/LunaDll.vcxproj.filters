@@ -273,6 +273,15 @@
     <ClInclude Include="libs\stackwalker\StackWalker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\Warp.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\BGOs.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Water.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

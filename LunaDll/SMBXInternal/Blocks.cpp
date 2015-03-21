@@ -20,10 +20,10 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 		if(blocks[i].BlockType == type) {
 			block = &blocks[i];
 
-			if(playerX > block->XPos + block->W ||
-				playerX2 < block->XPos  ||
-				playerY > block->YPos + block->H ||
-				playerY2 < block->YPos)
+			if(playerX > block->mometum.x + block->mometum.width ||
+				playerX2 < block->mometum.x  ||
+				playerY > block->mometum.y + block->mometum.height ||
+				playerY2 < block->mometum.y)
 				continue;
 
 			if(TestCollision(demo, block) == sought)
@@ -37,7 +37,7 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
 	typedef int colfunc(void*, void*);
 	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
-	return f(&pMobPOS->momentum.x, &pBlockPOS->XPos);
+	return f(&pMobPOS->momentum.x, &pBlockPOS->mometum.x);
 }
 
 // SET ALL

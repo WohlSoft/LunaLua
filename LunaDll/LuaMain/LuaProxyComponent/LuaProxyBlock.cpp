@@ -25,56 +25,56 @@ double LuaProxy::Block::x() const
 {
 	if(!isValid())
 		return 0;
-	return ::Blocks::Get(m_index)->XPos;
+    return ::Blocks::Get(m_index)->mometum.x;
 }
 
 void LuaProxy::Block::setX(double x)
 {
 	if(!isValid())
 		return;
-	::Blocks::Get(m_index)->XPos = x;
+    ::Blocks::Get(m_index)->mometum.x = x;
 }
 
 double LuaProxy::Block::y() const
 {
 	if(!isValid())
 		return 0;
-	return ::Blocks::Get(m_index)->YPos;
+    return ::Blocks::Get(m_index)->mometum.y;
 }
 
 void LuaProxy::Block::setY(double y)
 {
 	if(!isValid())
 		return;
-	::Blocks::Get(m_index)->YPos = y;
+    ::Blocks::Get(m_index)->mometum.y = y;
 }
 
 double LuaProxy::Block::speedX() const
 {
 	if(!isValid())
 		return 0;
-	return ::Blocks::Get(m_index)->XSpeed;
+    return ::Blocks::Get(m_index)->mometum.speedX;
 }
 
 void LuaProxy::Block::setSpeedX(double speedX)
 {
 	if(!isValid())
 		return;
-	::Blocks::Get(m_index)->XSpeed = speedX;
+    ::Blocks::Get(m_index)->mometum.speedX = speedX;
 }
 
 double LuaProxy::Block::speedY() const
 {
 	if(!isValid())
 		return 0;
-	return ::Blocks::Get(m_index)->YSpeed;
+    return ::Blocks::Get(m_index)->mometum.speedY;
 }
 
 void LuaProxy::Block::setSpeedY(double speedY)
 {
 	if(!isValid())
 		return;
-	::Blocks::Get(m_index)->YSpeed = speedY;
+    ::Blocks::Get(m_index)->mometum.speedY = speedY;
 }
 
 short LuaProxy::Block::id() const
@@ -141,10 +141,10 @@ int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
     double playerX2 = tarPlayer->momentum.x + tarPlayer->momentum.width + 0.20;
     double playerY2 = tarPlayer->momentum.y + tarPlayer->momentum.height + 0.20;
 
-	if(playerX > tarBlock->XPos + tarBlock->W ||
-		playerX2 < tarBlock->XPos  ||
-		playerY > tarBlock->YPos + tarBlock->H ||
-		playerY2 < tarBlock->YPos)
+    if (playerX > tarBlock->mometum.x + tarBlock->mometum.width ||
+        playerX2 < tarBlock->mometum.x ||
+        playerY > tarBlock->mometum.y + tarBlock->mometum.height ||
+        playerY2 < tarBlock->mometum.y)
 		return 0;
 
 	return ::Blocks::TestCollision(tarPlayer, tarBlock);

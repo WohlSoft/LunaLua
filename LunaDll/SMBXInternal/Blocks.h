@@ -25,12 +25,7 @@ struct Block {
     short               IsInvisible;                        // 0x1C
     short               BlockType;                          // 0x1E
 
-    double              XPos;                               // 0x20
-    double              YPos;                               // 0x28
-    double              H;                                  // 0x30
-    double              W;                                  // 0x38
-    double              XSpeed;                             // 0x40
-    double              YSpeed;                             // 0x48
+    Momentum            mometum;                               // 0x20
 
     short               ContentsID;                         // 0x50
     short               BeingHitStatus1;                    // 0x52 (todo: verify!)
