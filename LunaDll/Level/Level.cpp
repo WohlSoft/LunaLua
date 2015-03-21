@@ -1,70 +1,66 @@
 #include "Level.h"
 
 void Level::PushSectionBoundary(int section, int which_boundary_UDLR, double push_val) {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (section * 6);
+    Bounds* boundarray = (Bounds*)GM_LVL_BOUNDARIES;
 
 	switch(which_boundary_UDLR) {
 	case 0:		// U
-		boundtable[1] += push_val;
+        boundarray[section].top += push_val;
 		break;
 
 	case 1:		// D
-		boundtable[2] += push_val;
+        boundarray[section].bottom += push_val;
 		break;
 
 	case 2:		// L
-		boundtable[0] += push_val;
+        boundarray[section].left += push_val;
 		break;
 
 	case 3:		// R
-		boundtable[3] += push_val;
+        boundarray[section].right += push_val;
 		break;
 	}
 }
 
 void Level::SetSectionBounds(int section, double left_bound, double top_bound, double right_bound, double bot_bound) {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (section * 6);
-	boundtable[0] = left_bound;
-	boundtable[1] = top_bound;
-	boundtable[2] = bot_bound;
-	boundtable[3] = right_bound;
+    Bounds* boundarray = (Bounds*)GM_LVL_BOUNDARIES;
+    boundarray[section].left = left_bound;
+    boundarray[section].top = top_bound;
+    boundarray[section].bottom = bot_bound;
+    boundarray[section].right = right_bound;
 }
 
 double Level::GetBoundary(int section, int which_boundary_UDLR) {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (section * 6);
+    Bounds* boundarray = (Bounds*)GM_LVL_BOUNDARIES;
 
 	switch(which_boundary_UDLR) {
 	case 0:		// U
-		return boundtable[1];
+        return boundarray[section].top;
 		break;
 
 	case 1:		// D
-		return boundtable[2];
+        return boundarray[section].bottom;
 		break;
 
 	case 2:		// L
-		return boundtable[0];
+        return boundarray[section].left;
 		break;
 
 	case 3:		// R
-		return boundtable[3];
+        return boundarray[section].right;
 		break;
 	}
 	return 0;
 }
 
 void Level::GetBoundary(RECT* rect, int section) {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (section * 6);
+    Bounds* boundarray = (Bounds*)GM_LVL_BOUNDARIES;
 
 	if(rect != NULL) {
-		rect->top = (LONG)boundtable[1];
-		rect->bottom = (LONG)boundtable[2];
-		rect->left = (LONG)boundtable[0];
-		rect->right = (LONG)boundtable[3];		
+        rect->top = (LONG)boundarray->top;
+        rect->bottom = (LONG)boundarray->bottom;
+        rect->left = (LONG)boundarray->left;
+        rect->right = (LONG)boundarray->right;
 	}
 }
 

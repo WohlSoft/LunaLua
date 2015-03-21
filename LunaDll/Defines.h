@@ -206,6 +206,16 @@ struct Momentum
     double speedY;
 };
 
+struct Bounds
+{
+    double left;
+    double top;
+    double bottom;
+    double right;
+    double unk1;
+    double unk2;
+};
+
 ////////////////////////
 ///    -Imports-     ///
 ////////////////////////
