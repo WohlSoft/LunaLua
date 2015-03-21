@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../World/WorldLevel.h"
+#include "../../SMBXInternal/WorldLevel.h"
 #include "../../Misc/MiscFuncs.h"
 
 

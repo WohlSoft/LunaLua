@@ -1,8 +1,8 @@
 #include "DeathCounter.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include <Windows.h>
 #include "../Misc/MiscFuncs.h"
-#include "../Level/Level.h"
+#include "../SMBXInternal/Level.h"
 #include "../GlobalFuncs.h"
 using namespace std;
 

@@ -7,7 +7,7 @@
 #include "../../GlobalFuncs.h"
 #include "../../MciEmulator/mciEmulator.h"
 
-#include "../../Level/Level.h"
+#include "../../SMBXInternal/Level.h"
 
 void LuaProxy::Audio::MusicOpen(const char *filename)
 {

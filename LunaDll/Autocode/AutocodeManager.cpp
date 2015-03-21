@@ -1,7 +1,7 @@
 #include "AutocodeManager.h"
 #include "../Misc/MiscFuncs.h"
 #include "../GlobalFuncs.h"
-#include "../Level/Level.h"
+#include "../SMBXInternal/Level.h"
 #include "../Logging/Logging.h"
 #include <fstream>
 

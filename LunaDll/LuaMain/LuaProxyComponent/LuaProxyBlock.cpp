@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../Blocks/Blocks.h"
+#include "../../SMBXInternal/Blocks.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 

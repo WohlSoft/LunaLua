@@ -1,5 +1,5 @@
 #include "LevelCodes.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
 
 void QraestoliaCavernsCode() {

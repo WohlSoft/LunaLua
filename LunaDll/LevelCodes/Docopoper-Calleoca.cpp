@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include "LevelCodes.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
-#include "../MOBs/NPCs.h"
+#include "../SMBXInternal/NPCs.h"
 
 #define PI 3.1415926535897932384626433832795
 

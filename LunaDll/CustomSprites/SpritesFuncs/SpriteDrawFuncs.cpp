@@ -2,7 +2,7 @@
 #include "../../Globals.h"
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Rendering/RenderOps/RenderRectOp.h"
-#include "../../MOBs/PlayerMOB.h"
+#include "../../SMBXInternal/PlayerMOB.h"
 #ifndef __MINGW32__
 #pragma warning(disable: 4018)	// signed comparison
 #endif

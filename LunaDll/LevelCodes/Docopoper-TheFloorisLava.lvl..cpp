@@ -1,7 +1,7 @@
 #include "LevelCodes.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
-#include "../Layer/Layer.h"
+#include "../SMBXInternal/Layer.h"
 
 void TheFloorisLavaCode() {
 	PlayerMOB* demo = Player::Get(1);

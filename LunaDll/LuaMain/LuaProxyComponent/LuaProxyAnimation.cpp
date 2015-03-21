@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../Animation/Animation.h"
+#include "../../SMBXInternal/Animation.h"
 #include "../../Misc/MiscFuncs.h"
 
 LuaProxy::Animation::Animation(int animationIndex)

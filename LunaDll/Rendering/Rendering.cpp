@@ -1,11 +1,11 @@
 #include "Rendering.h"
 #include "../Defines.h"
-#include "../Level/Level.h"
+#include "../SMBXInternal/Level.h"
 #include "../Misc/MiscFuncs.h"
 #include "BMPBox.h"
 #include "RenderOps/RenderOp.h"
 #include "RenderOps/RenderRectOp.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 
 using namespace std;

@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../Layer/Layer.h"
+#include "../../SMBXInternal/Layer.h"
 
 
 

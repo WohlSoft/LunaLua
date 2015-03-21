@@ -1,6 +1,6 @@
 #include "Playground.h"
 #include "../Defines.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 
 //Here you can add random crap if you want to test something
 #if COMPILE_PLAYGROUND

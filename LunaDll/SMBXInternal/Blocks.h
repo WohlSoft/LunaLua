@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 #include "../Globals.h"
-#include "../MOBs/PlayerMOB.h"
+#include "PlayerMOB.h"
 #include "../Misc/VB6StrPtr.h"
 
 #pragma pack(push, 4)

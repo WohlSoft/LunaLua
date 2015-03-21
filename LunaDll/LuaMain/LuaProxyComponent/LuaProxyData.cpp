@@ -1,6 +1,6 @@
 #include "../LuaProxy.h"
 #include "../../GlobalFuncs.h"
-#include "../../Level/Level.h"
+#include "../../SMBXInternal/Level.h"
 #include "../../Misc/MiscFuncs.h"
 
 #include <iostream>

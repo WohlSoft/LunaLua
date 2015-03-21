@@ -3,7 +3,7 @@
 #define Input_hhhhh
 
 #include "../Globals.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 
 namespace Input {
 

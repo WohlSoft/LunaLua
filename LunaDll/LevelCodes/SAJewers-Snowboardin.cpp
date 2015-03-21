@@ -3,9 +3,9 @@
 #include <time.h>
 #include <math.h>
 #include "LevelCodes.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
-#include "../MOBs/NPCs.h"
+#include "../SMBXInternal/NPCs.h"
 
 #define NPC_SHELL 195
 

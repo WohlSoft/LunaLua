@@ -1,9 +1,9 @@
 #include "LevelCodes.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
 #include "../Defines.h"
 #include <Windows.h>
-#include "../Layer/Layer.h"
+#include "../SMBXInternal/Layer.h"
 #include "../Misc/MiscFuncs.h"
 
 void dlltestlvlCode() {

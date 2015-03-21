@@ -1,9 +1,9 @@
 #include "LunaLuaMain.h"
 #include "../GlobalFuncs.h"
-#include "../Level/Level.h"
+#include "../SMBXInternal/Level.h"
 #include "../Misc/MiscFuncs.h"
-#include "../MOBs/PlayerMOB.h"
-#include "../MOBs/NPCs.h"
+#include "../SMBXInternal/PlayerMOB.h"
+#include "../SMBXInternal/NPCs.h"
 
 #include "LuaHelper.h"
 #include "LuaProxy.h"

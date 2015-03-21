@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../World/Overworld.h"
+#include "../../SMBXInternal/Overworld.h"
 #include "../../Misc/MiscFuncs.h"
 
 LuaProxy::World::World()

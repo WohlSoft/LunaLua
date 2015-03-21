@@ -144,10 +144,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Animation\Animation.h" />
+    <ClInclude Include="SMBXInternal\Animation.h" />
     <ClInclude Include="Autocode\Autocode.h" />
     <ClInclude Include="Autocode\AutocodeManager.h" />
-    <ClInclude Include="Blocks\Blocks.h" />
+    <ClInclude Include="SMBXInternal\Blocks.h" />
     <ClInclude Include="CellManager\CellManager.h" />
     <ClInclude Include="libs\stackwalker\StackWalker.h" />
     <ClInclude Include="Misc\ErrorReporter.h" />
@@ -170,9 +170,9 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
-    <ClInclude Include="Keyboard\Keyboard.h" />
-    <ClInclude Include="Layer\Layer.h" />
-    <ClInclude Include="Level\Level.h" />
+    <ClInclude Include="SMBXInternal\Keyboard.h" />
+    <ClInclude Include="SMBXInternal\Layer.h" />
+    <ClInclude Include="SMBXInternal\Level.h" />
     <ClInclude Include="LevelCodes\LevelCodes.h" />
     <ClInclude Include="libs\ini-reader\ini.h" />
     <ClInclude Include="libs\ini-reader\INIReader.h" />
@@ -185,9 +185,9 @@
     <ClInclude Include="MciEmulator\mciEmulator.h" />
     <ClInclude Include="Minigames\Minigames.h" />
     <ClInclude Include="Misc\MiscFuncs.h" />
-    <ClInclude Include="MOBs\NPCs.h" />
-    <ClInclude Include="World\Overworld.h" />
-    <ClInclude Include="MOBs\PlayerMOB.h" />
+    <ClInclude Include="SMBXInternal\NPCs.h" />
+    <ClInclude Include="SMBXInternal\Overworld.h" />
+    <ClInclude Include="SMBXInternal\PlayerMOB.h" />
     <ClInclude Include="Rendering\RenderOps\RenderBitmapOp.h" />
     <ClInclude Include="Rendering\RenderOps\RenderEffectOp.h" />
     <ClInclude Include="Rendering\Rendering.h" />
@@ -197,21 +197,20 @@
     <ClInclude Include="Misc\RuntimeHook.h" />
     <ClInclude Include="SdlMusic\MusicManager.h" />
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
-    <ClInclude Include="SMBX_Events\SMBXEvents.h" />
-    <ClInclude Include="Sound\Sound.h" />
+    <ClInclude Include="SMBXInternal\SMBXEvents.h" />
+    <ClInclude Include="SMBXInternal\Sound.h" />
     <ClInclude Include="CustomSprites\SpriteComponent.h" />
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h" />
-    <ClInclude Include="Layer\TriggerZone.h" />
     <ClInclude Include="UserSaves\UserSaving.h" />
-    <ClInclude Include="World\WorldLevel.h" />
+    <ClInclude Include="SMBXInternal\WorldLevel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
-    <ClCompile Include="Animation\Animation.cpp" />
+    <ClCompile Include="SMBXInternal\Animation.cpp" />
     <ClCompile Include="Autocode\Autocode.cpp" />
     <ClCompile Include="Autocode\AutocodeManager.cpp" />
-    <ClCompile Include="Blocks\Blocks.cpp" />
+    <ClCompile Include="SMBXInternal\Blocks.cpp" />
     <ClCompile Include="CellManager\CellManager.cpp" />
     <ClCompile Include="libs\stackwalker\StackWalker.cpp" />
     <ClCompile Include="Misc\ErrorReporter.cpp" />
@@ -256,11 +255,11 @@
     <ClCompile Include="CustomSprites\Hitbox\Hitbox.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="LevelCodes\JosephStaleknight-CurtainTortoise.lvl.cpp" />
-    <ClCompile Include="Keyboard\Keyboard.cpp" />
+    <ClCompile Include="SMBXInternal\Keyboard.cpp" />
     <ClCompile Include="LevelCodes\Kil-DemosBrain.cpp" />
     <ClCompile Include="LevelCodes\KilArmoryCode.cpp" />
-    <ClCompile Include="Layer\Layer.cpp" />
-    <ClCompile Include="Level\Level.cpp" />
+    <ClCompile Include="SMBXInternal\Layer.cpp" />
+    <ClCompile Include="SMBXInternal\Level.cpp" />
     <ClCompile Include="libs\ini-reader\ini.c" />
     <ClCompile Include="libs\ini-reader\INIReader.cpp" />
     <ClCompile Include="Logging\Logger.cpp" />
@@ -271,10 +270,10 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MciEmulator\mciEmulator.cpp" />
     <ClCompile Include="Misc\MiscFuncs.cpp" />
-    <ClCompile Include="MOBs\NPCs.cpp" />
+    <ClCompile Include="SMBXInternal\NPCs.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookHooks.cpp" />
-    <ClCompile Include="World\Overworld.cpp" />
-    <ClCompile Include="MOBs\PlayerMOB.cpp" />
+    <ClCompile Include="SMBXInternal\Overworld.cpp" />
+    <ClCompile Include="SMBXInternal\PlayerMOB.cpp" />
     <ClCompile Include="Rendering\RenderOps\RenderBitmapOp.cpp" />
     <ClCompile Include="Rendering\RenderOps\RenderEffectOp.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
@@ -286,14 +285,14 @@
     <ClCompile Include="SdlMusic\MusicDefList.cpp" />
     <ClCompile Include="SdlMusic\MusicManager.cpp" />
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
-    <ClCompile Include="SMBX_Events\SMBXEvent.cpp" />
-    <ClCompile Include="Sound\Sound.cpp" />
+    <ClCompile Include="SMBXInternal\SMBXEvents.cpp" />
+    <ClCompile Include="SMBXInternal\Sound.cpp" />
     <ClCompile Include="CustomSprites\SpritesFuncs\SpriteBehaviorFuncs.cpp" />
     <ClCompile Include="CustomSprites\SpriteComponent.cpp" />
     <ClCompile Include="CustomSprites\SpritesFuncs\SpriteDrawFuncs.cpp" />
     <ClCompile Include="LevelCodes\Talkhaus-Science_Final_Battle.cpp" />
     <ClCompile Include="UserSaves\UserSaving.cpp" />
-    <ClCompile Include="World\WorldLevel.cpp" />
+    <ClCompile Include="SMBXInternal\WorldLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scrappedcode.txt" />

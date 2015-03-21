@@ -2,10 +2,10 @@
 #include "../../Globals.h"
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Rendering/RenderOps/RenderRectOp.h"
-#include "../../MOBs/PlayerMOB.h"
+#include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../CellManager/CellManager.h"
-#include "../../Blocks/Blocks.h"
+#include "../../SMBXInternal/Blocks.h"
 #include <math.h>
 
 using namespace std;

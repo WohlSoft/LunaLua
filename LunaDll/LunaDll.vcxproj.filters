@@ -16,15 +16,6 @@
     <Filter Include="Header Files\GameRAM">
       <UniqueIdentifier>{53b6d2da-2ccf-483c-a0b7-c7301a732898}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MOBs">
-      <UniqueIdentifier>{4e1a9b08-0646-4194-9542-2e8736ef9f77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Layers">
-      <UniqueIdentifier>{8e5067c6-18b1-4ec1-b541-292815675ff2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Keyboard">
-      <UniqueIdentifier>{8597f246-c284-4e04-850c-840eba701fcf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Misc">
       <UniqueIdentifier>{31594c82-2c70-47d7-8f94-aeab75eb2906}</UniqueIdentifier>
     </Filter>
@@ -37,23 +28,11 @@
     <Filter Include="Header Files\Death Counter">
       <UniqueIdentifier>{9c3f331d-cd02-4afd-94a7-771d65d59a82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Level">
-      <UniqueIdentifier>{c31949cd-0cd9-44c1-87c4-fff0d3ddbbc0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\AutoCode">
       <UniqueIdentifier>{c9bf9cf4-9398-45ed-b4fb-b1b7de72c151}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Sound">
-      <UniqueIdentifier>{d6fe9def-e865-4338-ab71-7753b0a6df67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\AutoCode\Commands">
       <UniqueIdentifier>{35e56b17-c07a-44c7-90bc-9504bff9570f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Blocks">
-      <UniqueIdentifier>{9a41ec4b-a9a3-495c-9bbb-f2b5ebb12f3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\SMBX Events">
-      <UniqueIdentifier>{d5827348-ca72-43fd-979d-608a4a883bd4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Input">
       <UniqueIdentifier>{7355c692-c445-440b-81d2-6abe60fd7051}</UniqueIdentifier>
@@ -91,7 +70,7 @@
     <Filter Include="Header Files\UserSaves">
       <UniqueIdentifier>{5ffce8e1-f367-4b21-ad3e-e2b529b20551}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Animation">
+    <Filter Include="Header Files\SMBXInternal">
       <UniqueIdentifier>{70bdd782-5d49-4a55-a8d9-a470fd505f4e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\INIReader">
@@ -99,9 +78,6 @@
     </Filter>
     <Filter Include="Header Files\MusicPlayer">
       <UniqueIdentifier>{93991f96-d10e-48c6-9e09-9c8bc9d6c451}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\World">
-      <UniqueIdentifier>{f590b9d7-9715-4bf5-a07f-cd87d8de2a25}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\mci2sdl music proxy">
       <UniqueIdentifier>{6fa4bca1-d668-4d26-9f2c-5a24cddda3fb}</UniqueIdentifier>
@@ -156,8 +132,8 @@
     <ClInclude Include="GlobalFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Animation.h">
-      <Filter>Header Files\Animation</Filter>
+    <ClInclude Include="SMBXInternal\Animation.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="Autocode\Autocode.h">
       <Filter>Header Files\AutoCode</Filter>
@@ -165,8 +141,8 @@
     <ClInclude Include="Autocode\AutocodeManager.h">
       <Filter>Header Files\AutoCode</Filter>
     </ClInclude>
-    <ClInclude Include="Blocks\Blocks.h">
-      <Filter>Header Files\Blocks</Filter>
+    <ClInclude Include="SMBXInternal\Blocks.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="CellManager\CellManager.h">
       <Filter>Header Files\CellManager</Filter>
@@ -198,17 +174,14 @@
     <ClInclude Include="Input\Input.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Keyboard\Keyboard.h">
-      <Filter>Header Files\Keyboard</Filter>
+    <ClInclude Include="SMBXInternal\Keyboard.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Layer\Layer.h">
-      <Filter>Header Files\Layers</Filter>
+    <ClInclude Include="SMBXInternal\Layer.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Layer\TriggerZone.h">
-      <Filter>Header Files\Layers</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\Level.h">
-      <Filter>Header Files\Level</Filter>
+    <ClInclude Include="SMBXInternal\Level.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="Logging\Logging.h">
       <Filter>Header Files\Logging</Filter>
@@ -228,11 +201,11 @@
     <ClInclude Include="Misc\RuntimeHook.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="MOBs\NPCs.h">
-      <Filter>Header Files\MOBs</Filter>
+    <ClInclude Include="SMBXInternal\NPCs.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="MOBs\PlayerMOB.h">
-      <Filter>Header Files\MOBs</Filter>
+    <ClInclude Include="SMBXInternal\PlayerMOB.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\BMPBox.h">
       <Filter>Header Files\Rendering</Filter>
@@ -255,20 +228,20 @@
     <ClInclude Include="Rendering\RenderOps\RenderBitmapOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
     </ClInclude>
-    <ClInclude Include="SMBX_Events\SMBXEvents.h">
-      <Filter>Header Files\SMBX Events</Filter>
+    <ClInclude Include="SMBXInternal\SMBXEvents.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Sound\Sound.h">
-      <Filter>Header Files\Sound</Filter>
+    <ClInclude Include="SMBXInternal\Sound.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="UserSaves\UserSaving.h">
       <Filter>Header Files\UserSaves</Filter>
     </ClInclude>
-    <ClInclude Include="World\WorldLevel.h">
-      <Filter>Header Files\World</Filter>
+    <ClInclude Include="SMBXInternal\WorldLevel.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="World\Overworld.h">
-      <Filter>Header Files\World</Filter>
+    <ClInclude Include="SMBXInternal\Overworld.h">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
     <ClInclude Include="LevelCodes\LevelCodes.h">
       <Filter>Header Files\LevelCodes</Filter>
@@ -341,8 +314,8 @@
     <ClCompile Include="SdlMusic\MusicDefList.cpp">
       <Filter>Header Files\MusicPlayer</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\Animation.cpp">
-      <Filter>Header Files\Animation</Filter>
+    <ClCompile Include="SMBXInternal\Animation.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="Autocode\Autocode.cpp">
       <Filter>Header Files\AutoCode</Filter>
@@ -362,8 +335,8 @@
     <ClCompile Include="Autocode\Commands\GenComp.cpp">
       <Filter>Header Files\AutoCode\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Blocks\Blocks.cpp">
-      <Filter>Header Files\Blocks</Filter>
+    <ClCompile Include="SMBXInternal\Blocks.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="CellManager\CellManager.cpp">
       <Filter>Header Files\CellManager</Filter>
@@ -398,14 +371,14 @@
     <ClCompile Include="Input\Input.cpp">
       <Filter>Header Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Keyboard\Keyboard.cpp">
-      <Filter>Header Files\Keyboard</Filter>
+    <ClCompile Include="SMBXInternal\Keyboard.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="Layer\Layer.cpp">
-      <Filter>Header Files\Layers</Filter>
+    <ClCompile Include="SMBXInternal\Layer.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="Level\Level.cpp">
-      <Filter>Header Files\Level</Filter>
+    <ClCompile Include="SMBXInternal\Level.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="LevelCodes\dlltestlvlCode.cpp">
       <Filter>Header Files\LevelCodes</Filter>
@@ -455,11 +428,11 @@
     <ClCompile Include="Misc\RuntimeHook.cpp">
       <Filter>Header Files\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="MOBs\NPCs.cpp">
-      <Filter>Header Files\MOBs</Filter>
+    <ClCompile Include="SMBXInternal\NPCs.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="MOBs\PlayerMOB.cpp">
-      <Filter>Header Files\MOBs</Filter>
+    <ClCompile Include="SMBXInternal\PlayerMOB.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\BMPBox.cpp">
       <Filter>Header Files\Rendering</Filter>
@@ -476,20 +449,20 @@
     <ClCompile Include="Rendering\RenderOps\RenderBitmapOp.cpp">
       <Filter>Header Files\Rendering\RenderOps</Filter>
     </ClCompile>
-    <ClCompile Include="SMBX_Events\SMBXEvent.cpp">
-      <Filter>Header Files\SMBX Events</Filter>
+    <ClCompile Include="SMBXInternal\SMBXEvents.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="Sound\Sound.cpp">
-      <Filter>Header Files\Sound</Filter>
+    <ClCompile Include="SMBXInternal\Sound.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="UserSaves\UserSaving.cpp">
       <Filter>Header Files\UserSaves</Filter>
     </ClCompile>
-    <ClCompile Include="World\WorldLevel.cpp">
-      <Filter>Header Files\World</Filter>
+    <ClCompile Include="SMBXInternal\WorldLevel.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="World\Overworld.cpp">
-      <Filter>Header Files\World</Filter>
+    <ClCompile Include="SMBXInternal\Overworld.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorldLevel.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>

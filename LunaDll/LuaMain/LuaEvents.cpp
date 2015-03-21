@@ -2,15 +2,15 @@
 #include "LuaHelper.h"
 #include "../Rendering/Rendering.h"
 #include "../Globals.h"
-#include "../MOBs/PlayerMOB.h"
-#include "../MOBs/NPCs.h"
+#include "../SMBXInternal/PlayerMOB.h"
+#include "../SMBXInternal/NPCs.h"
 #include "../Misc/MiscFuncs.h"
-#include "../SMBX_Events/SMBXEvents.h"
-#include "../Sound/Sound.h"
-#include "../Level/Level.h"
+#include "../SMBXInternal/SMBXEvents.h"
+#include "../SMBXInternal/Sound.h"
+#include "../SMBXInternal/Level.h"
 #include "../CustomSprites/CSprite.h"
 #include "../CustomSprites/CSpriteManager.h"
-#include "../Blocks/Blocks.h"
+#include "../SMBXInternal/Blocks.h"
 
 std::vector<LuaEvents::SMBXEventQueueItem> LuaEvents::SMBXEventQueue;
 

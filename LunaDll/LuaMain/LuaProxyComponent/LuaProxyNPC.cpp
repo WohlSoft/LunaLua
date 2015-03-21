@@ -1,6 +1,6 @@
 #include "../LuaProxy.h"
 #include "../LuaHelper.h"
-#include "../../MOBs/NPCs.h"
+#include "../../SMBXInternal/NPCs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/VB6StrPtr.h"

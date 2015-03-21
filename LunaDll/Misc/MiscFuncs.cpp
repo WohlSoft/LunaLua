@@ -1,7 +1,7 @@
 #include "MiscFuncs.h"
 #include "../Globals.h"
-#include "../MOBs/PlayerMOB.h"
-#include "../Layer/Layer.h"
+#include "../SMBXInternal/PlayerMOB.h"
+#include "../SMBXInternal/Layer.h"
 #include <windows.h>
 #include <math.h>
 

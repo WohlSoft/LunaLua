@@ -3,7 +3,7 @@
 #include "SpritesFuncs/SpriteFuncs.h"
 #include "../Globals.h"
 #include "../Rendering/BMPBox.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
 
 // RESET SPRITE MANAGER

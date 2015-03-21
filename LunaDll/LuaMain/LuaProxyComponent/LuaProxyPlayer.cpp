@@ -1,5 +1,5 @@
 #include "../LuaProxy.h"
-#include "../../MOBs/PlayerMOB.h"
+#include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Misc/MiscFuncs.h"
 
 LuaProxy::Player::Player() : m_index(1)

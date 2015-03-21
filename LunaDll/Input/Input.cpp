@@ -1,5 +1,5 @@
 #include "Input.h"
-#include "../Sound/Sound.h"
+#include "../SMBXInternal/Sound.h"
 #include "../DeathCounter/DeathCounter.h"
 #include "../Autocode/Autocode.h"
 

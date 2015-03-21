@@ -1,7 +1,7 @@
 #ifndef MiscFuncs_hhh
 #define MiscFuncs_hhh
 
-#include "../Layer/Layer.h"
+#include "../SMBXInternal/Layer.h"
 #include <math.h>
 #include <string>
 #include <vector>

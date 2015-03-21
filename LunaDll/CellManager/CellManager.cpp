@@ -1,5 +1,5 @@
 #include "CellManager.h"
-#include "../Blocks/Blocks.h"
+#include "../SMBXInternal/Blocks.h"
 #include "../Misc/MiscFuncs.h"
 
 // CELL :: COUNT

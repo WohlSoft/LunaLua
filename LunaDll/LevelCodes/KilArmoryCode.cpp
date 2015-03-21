@@ -1,7 +1,7 @@
 #include "LevelCodes.h"
 #include "../Globals.h"
 #include "../Defines.h"
-#include "../MOBs/PlayerMOB.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderOp.h"
 #include "../Rendering/RenderOps/RenderEffectOp.h"
