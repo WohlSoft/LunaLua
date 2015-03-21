@@ -13,7 +13,6 @@ struct SMBX_Warp {				// Length should be 0x90
 	short 		unknown_04;		// +0x04
 	short 		unknown_06;		// +0x06
 	VB6StrPtr	ptLayerName;	// +0x08
-	short 		unknown_0A;		// +0x0A
 	short 		isHidden;		// +0x0C
 	short		unknown_end[130]; // +0x0E to end
 };
