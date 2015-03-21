@@ -95,7 +95,7 @@ struct NPCMOB {
 	VB6StrPtr noMoreObjInLayerEventName;    //+0x38
 	VB6StrPtr layerName;                    //+0x3C
     short unknown_40;                       //+0x40
-    short unknown_42;                       //+0x42
+    short legacyBoss;                       //+0x42
     short activated;                        //+0x44
     short friendly;                         //+0x46
     short dontMove;                         //+0x48
