@@ -9,42 +9,43 @@
 #pragma pack(push, 4)
 struct Block {
 
-	short				Slippery; //0xFFFF = yes
-	short				Unknown02;
+    short               Slippery;                           // 0x00 0xFFFF = yes
+    short               Unknown02;                          // 0x02
 
-	short				Unknown04;
-	short				Unknown06;
-	int					Unknown08;
+    short               Unknown04;                          // 0x04
+    short               BlockType2;                         // 0x06
+    short               ContentIDRelated;                   // 0x08
+    short               Unknwon10;                          // 0x0A
 
-	wchar_t*			pUnknown0C;
-	wchar_t*			pUnknown10;
-	wchar_t*			pUnknown14;
-	VB6StrPtr			pLayerName;		// 0x18	
+    VB6StrPtr           pHitEventName;                      // 0x0C
+    VB6StrPtr           pDestroyEventName;                  // 0x10
+    VB6StrPtr           pNoMoreObjInLayerEventName;         // 0x14
+    VB6StrPtr           pLayerName;                         // 0x18
 
-	short				IsInvisible;	// 0x1C	
-	short				BlockType;		// 0x1E	
+    short               IsInvisible;                        // 0x1C
+    short               BlockType;                          // 0x1E
 
-	double				XPos;			// 0x20	
-	double				YPos;			// 0x28	
-	double				H;				// 0x30	
-	double				W;				// 0x38	
-	double				XSpeed;			// 0x40	
-	double				YSpeed;			// 0x48	
+    double              XPos;                               // 0x20
+    double              YPos;                               // 0x28
+    double              H;                                  // 0x30
+    double              W;                                  // 0x38
+    double              XSpeed;                             // 0x40
+    double              YSpeed;                             // 0x48
 
-	short				ContentsID;     // 0x50 (todo: verify!)
-	short				BeingHitStatus1;// 0x52 (todo: verify!)
-	short				BeingHitTimer;	// 0x54 (todo: verify!)
-	short				BeingHitStatus2;// 0x56 (todo: verify!)
+    short               ContentsID;                         // 0x50
+    short               BeingHitStatus1;                    // 0x52 (todo: verify!)
+    short               BeingHitTimer;                      // 0x54 (todo: verify!)
+    short               BeingHitStatus2;                    // 0x56 (todo: verify!)
 
-	short				Unknown58;
-	short				Unknown5A;
-	unsigned short		IsHidden;		// 0x5C (todo: verify!)
-	short				Unknown5E;
-	short				Unknown60;
+    short               Unknown58;                          // 0x58
+    short               IsInvisible2;                       // 0x5A
+    unsigned short      IsHidden;                           // 0x5C (todo: verify!)
+    short               Unknown5E;                          // 0x5E
+    short               Unknown60;                          // 0x60
 
-	short				Unknown62;
-	short				Unknown64;
-	short				Unknown66;
+    short               Unknown62;                          // 0x62
+    short               Unknown64;                          // 0x64
+    short               Unknown66;                          // 0x66
 };
 #pragma pack(pop)
 
