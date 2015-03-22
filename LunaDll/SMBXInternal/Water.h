@@ -7,10 +7,14 @@
 #include "../Misc/VB6StrPtr.h"
 
 #pragma pack(push, 4)
-struct SMBX_Water {				// Length should be 0x40
-	VB6StrPtr	ptLayerName;	// +0x00
-	short 		isHidden;		// +0x04
-	short		unknown_end[58]; // +0x06 to end
+struct SMBX_Water {				    // Length should be 0x40
+    VB6StrPtr ptLayerName;          // +0x00
+    short isHidden;                 // +0x04
+    short unknown_06;               // +0x06
+    float unknown_08;               // +0x08
+    short isQuicksand;              // +0x0C
+    short unknown_0E;               // +0x0E
+    Momentum momentum;              // +0x10
 };
 #pragma pack(pop)
 
