@@ -99,7 +99,7 @@ extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 //Fixup errors
 void fixup_TypeMismatch13();
 void fixup_ErrorReporting();
-
+void fixup_WarpLimit();
 
 
 //scraped for now..... D:

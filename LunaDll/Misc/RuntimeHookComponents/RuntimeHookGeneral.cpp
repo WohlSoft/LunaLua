@@ -99,6 +99,17 @@ void ParseArgs(const std::vector<std::string>& args)
         gStartupSettings.newLauncher = true;
 }
 
+static unsigned int LatePatch(void)
+{
+    /************************************************************************/
+    /* Engine Limit patches                                                 */
+    /************************************************************************/
+    fixup_WarpLimit();
+
+    /* Do what the place we patched this in is supposed to do: */
+    /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
+    return *((unsigned int*)(0xB2D788));
+}
 
 void TrySkipPatch()
 {
@@ -111,6 +122,11 @@ void TrySkipPatch()
 
         PATCH_FUNC(0x8BED00, &InitHook);
     }
+
+    // Insert callback for patching which must occur after the runtime has started
+    // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
+    PATCH_FUNC(0x8BEC61, &LatePatch);
+
     //Load graphics from the HardcodedGraphicsManager
     HardcodedGraphicsManager::loadGraphics();
 
@@ -119,8 +135,6 @@ void TrySkipPatch()
     /************************************************************************/
     fixup_TypeMismatch13();
     fixup_ErrorReporting();
-
-
 
     /************************************************************************/
     /* Set Hook                                                             */
