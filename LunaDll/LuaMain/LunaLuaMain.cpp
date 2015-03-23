@@ -208,6 +208,7 @@ void CLunaLua::bindAll()
 			def("windowDebug", &LuaProxy::windowDebug),
 			def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
 			def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
+            def("showMessageBox", &LuaProxy::showMessageBox),       //actually I am not quite sure if this will work for the world
 			def("loadImage", &LuaProxy::loadImage),
 			def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
 			def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),

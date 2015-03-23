@@ -32,7 +32,13 @@ extern bool episodeStarted;
 /************************************************************************/
 void ParseArgs(const std::vector<std::string>& args);
 void TrySkipPatch();
+
+
+/************************************************************************/
+/* Runtime Patch Public Functions                                       */
+/************************************************************************/
 void emulateVB6Error(int errorCode);
+void showSMBXMessageBox(std::string message);
 
 /************************************************************************/
 /* Hooks                                                                */
@@ -42,30 +48,20 @@ extern void InitHook();
 //Force Termination when SMBX runs the end code.
 //Without this code, there is a chance of "zombie"-processes.
 extern void forceTermination();
-//The World Load Code
-extern int LoadWorld();
-//The World Loop Code
-extern DWORD WorldLoop();
-//The World Render Code
-extern void* WorldRender();
-//The Main Menu Render Code
-extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);
-//The MCI Emulator Code
-extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);
-//The Converter Code
-extern float __stdcall vbaR4VarHook(VARIANTARG* variant);
-//The Messagebox Hook Code
-extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWORD);
-//Reset Level Editor
-extern void __stdcall doEventsLevelEditorHook();
+extern int LoadWorld();     //The World Load Code
+extern DWORD WorldLoop();       //The World Loop Code
+extern void* WorldRender();     //The World Render Code
+extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);       //The Main Menu Render Code
+extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);       //The MCI Emulator Code
+extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter Code
+extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWORD);        //The Messagebox Hook Code
+extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 //Keyboard Hook
 //extern short __stdcall GetKeyState(int vKey);
 //TriggerSMBXEvent cmp function
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
-//Level Shutdown Check Function
-extern void checkLevelShutdown();
-//Error Handler
-extern void handleError(int errCode);
+extern void checkLevelShutdown();       //Level Shutdown Check Function
+extern void handleError(int errCode);       //Error Handler
 
 
 /************************************************************************/

@@ -37,6 +37,13 @@ void LuaProxy::print(const char *text, int type, int x, int y)
 	gLunaRender.SafePrint(txt, type, (float)x, (float)y);
 }
 
+
+void LuaProxy::showMessageBox(const std::string &text)
+{
+    showSMBXMessageBox(text);
+}
+
+
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
 void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)

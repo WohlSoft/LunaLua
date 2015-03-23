@@ -28,6 +28,7 @@ namespace LuaProxy {
     void windowDebug(const char* debugText);
     void print(const char *text, int x, int y);
     void print(const char *text, int type, int x, int y);
+    void showMessageBox(const std::string &text);
 	//General functions
 	void exitLevel();
 	void npcToCoins();

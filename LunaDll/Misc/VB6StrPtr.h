@@ -3,6 +3,9 @@
 
 #include <string>
 
+#define _vbaStrCopy ((void(__fastcall *)(VB6StrPtr*, const wchar_t*))IMP_vbaStrCopy)
+#define _vbaFreeStr ((void(__fastcall *)(VB6StrPtr*))IMP_vbaFreeStr)
+
 #pragma pack(push, 4)
 struct VB6StrPtr {
 	wchar_t* ptr;
