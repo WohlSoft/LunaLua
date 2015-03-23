@@ -73,6 +73,7 @@ enum PRIORITY {
 // Pre-Defined Strings      
 #define GM_STR_NULL         *(DWORD*)0x00423D00
 #define GM_STR_MSGBOX       *(DWORD*)0x00B250E4
+#define GM_STR_CHECKPOINT   *(DWORD*)0x00B250B0     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
 
 // NPC Settings
 #define GM_CONF_WIDTH		*(DWORD*)0x00B25BA8
