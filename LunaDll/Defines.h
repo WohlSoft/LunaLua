@@ -221,6 +221,19 @@ struct Bounds
     double unk2;
 };
 
+struct KeyMap{
+    short	UKeyState;
+    short	DKeyState;
+    short	LKeyState;
+    short	RKeyState;
+    short	JKeyState;
+    short	SJKeyState;
+    short	XKeyState;
+    short	RNKeyState;
+    short	SELKeyState;
+    short	STRKeyState;
+};
+
 ////////////////////////
 ///    -Imports-     ///
 ////////////////////////

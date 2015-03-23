@@ -42,16 +42,16 @@ void LuaEvents::processKeyboardEvents(lua_State* L, std::string eventTable)
         PlayerMOB* player = ::Player::Get(i);
         LuaEventData* evData = getEvData(i);
         if(player && evData){
-            processKeyboardEvent(evData->playerUPressing, player->UKeyState, 0, i, L, eventTable);
-            processKeyboardEvent(evData->playerDPressing, player->DKeyState, 1, i, L, eventTable);
-            processKeyboardEvent(evData->playerLPressing, player->LKeyState, 2, i, L, eventTable);
-            processKeyboardEvent(evData->playerRPressing, player->RKeyState, 3, i, L, eventTable);
-            processKeyboardEvent(evData->playerJPressing, player->JKeyState, 4, i, L, eventTable);
-            processKeyboardEvent(evData->playerSJPressing, player->SJKeyState, 5, i, L, eventTable);
-            processKeyboardEvent(evData->playerXPressing, player->XKeyState, 6, i, L, eventTable);
-            processKeyboardEvent(evData->playerRNPressing, player->RNKeyState, 7, i, L, eventTable);
-            processKeyboardEvent(evData->playerSELPressing, player->SELKeyState, 8, i, L, eventTable);
-            processKeyboardEvent(evData->playerSTRPressing, player->STRKeyState, 9, i, L, eventTable);
+            processKeyboardEvent(evData->playerUPressing, player->keymap.UKeyState, 0, i, L, eventTable);
+            processKeyboardEvent(evData->playerDPressing, player->keymap.DKeyState, 1, i, L, eventTable);
+            processKeyboardEvent(evData->playerLPressing, player->keymap.LKeyState, 2, i, L, eventTable);
+            processKeyboardEvent(evData->playerRPressing, player->keymap.RKeyState, 3, i, L, eventTable);
+            processKeyboardEvent(evData->playerJPressing, player->keymap.JKeyState, 4, i, L, eventTable);
+            processKeyboardEvent(evData->playerSJPressing, player->keymap.SJKeyState, 5, i, L, eventTable);
+            processKeyboardEvent(evData->playerXPressing, player->keymap.XKeyState, 6, i, L, eventTable);
+            processKeyboardEvent(evData->playerRNPressing, player->keymap.RNKeyState, 7, i, L, eventTable);
+            processKeyboardEvent(evData->playerSELPressing, player->keymap.SELKeyState, 8, i, L, eventTable);
+            processKeyboardEvent(evData->playerSTRPressing, player->keymap.STRKeyState, 9, i, L, eventTable);
         }
     }
 }
@@ -137,16 +137,16 @@ void LuaEvents::finishEventHandling()
 		PlayerMOB* player = ::Player::Get(i);
 		LuaEventData* evData = getEvData(i);
 		if(player && evData){
-			evData->playerUPressing = player->UKeyState;
-			evData->playerDPressing = player->DKeyState;
-			evData->playerLPressing = player->LKeyState;
-			evData->playerRPressing = player->RKeyState;
-			evData->playerJPressing = player->JKeyState;
-			evData->playerSJPressing = player->SJKeyState;
-			evData->playerXPressing = player->XKeyState;
-			evData->playerRNPressing = player->RNKeyState;
-			evData->playerSELPressing = player->SELKeyState;
-			evData->playerSTRPressing = player->STRKeyState;
+            evData->playerUPressing = player->keymap.UKeyState;
+            evData->playerDPressing = player->keymap.DKeyState;
+            evData->playerLPressing = player->keymap.LKeyState;
+            evData->playerRPressing = player->keymap.RKeyState;
+            evData->playerJPressing = player->keymap.JKeyState;
+            evData->playerSJPressing = player->keymap.SJKeyState;
+            evData->playerXPressing = player->keymap.XKeyState;
+            evData->playerRNPressing = player->keymap.RNKeyState;
+            evData->playerSELPressing = player->keymap.SELKeyState;
+            evData->playerSTRPressing = player->keymap.STRKeyState;
 			evData->playerJumping = player->HasJumped;
 			evData->section = player->CurrentSection;
 		}

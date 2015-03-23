@@ -15,10 +15,10 @@ void AbstractAssaultCode() {
 	static char gameStarted = 0;
 	static unsigned short noControlTimer = 0;
 	
-	char press_up = (demo -> UKeyState != 0);
-	char press_left = (demo -> LKeyState != 0);
-	char press_down = (demo -> DKeyState != 0);
-	char press_right = (demo -> RKeyState != 0);
+    char press_up = (demo->keymap.UKeyState != 0);
+    char press_left = (demo->keymap.LKeyState != 0);
+    char press_down = (demo->keymap.DKeyState != 0);
+    char press_right = (demo->keymap.RKeyState != 0);
 	
 	short *powerup = (short*)((char*)(demo) + 0x112);
 	
