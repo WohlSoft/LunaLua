@@ -195,6 +195,7 @@
 #endif
 
 // SMBX player structure (INCOMPLETE)
+#pragma pack(push, 4)
 struct PlayerMOB {
 	short	ToadDoubleJReady;
 	short	SparklingEffect;
@@ -257,7 +258,7 @@ struct PlayerMOB {
 	
 	short	HasJumped;					// +0x60
 
-	char	padding[0x58];				//pad to next
+	char	padding[0x5e];				//pad to next
 
     Momentum momentum;
 
@@ -344,9 +345,15 @@ struct PlayerMOB {
 	short	Unused17E;
 	short	Unused180;
 	short	Unused182;
-	short	Unused184;
-
 };
+#pragma pack(pop)
+
+/* Verify struct is correctly sized, and also verify that a sampling of fields
+ * that were affected by packing before */
+static_assert(&((PlayerMOB*)0x0)->HasJumped == (void*)0x60, "HasJumped must be at at 0x60");
+static_assert(&((PlayerMOB*)0x0)->momentum.x == (void*)0xC0, "momentum.x must be at at 0xC0");
+static_assert(&((PlayerMOB*)0x0)->Unknown166 == (void*)0x166, "Unknown166 must be at at 0x166");
+static_assert(sizeof(PlayerMOB) == 0x184, "sizeof(PlayerMOB) must be 0x184");
 
 namespace Player {
 

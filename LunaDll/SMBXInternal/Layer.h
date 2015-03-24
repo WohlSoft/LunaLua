@@ -6,6 +6,7 @@
 #include "../Globals.h"
 #include "../Misc/VB6StrPtr.h"
 
+#pragma pack(push, 4)
 struct LayerControl {
 	short		IsStopped;		// 0xFFFF when moving, event ended?
 	short		Unknown1;
@@ -15,7 +16,10 @@ struct LayerControl {
 	float		xSpeed;
 	float		ySpeed;
 };
+#pragma pack(pop)
 
+/* Verify struct is correctly sized */
+static_assert(sizeof(LayerControl) == 0x14, "sizeof(LayerControl) must be 0x14");
 
 namespace Layer{
 

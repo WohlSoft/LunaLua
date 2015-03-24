@@ -18,4 +18,7 @@ struct SMBX_Water {				    // Length should be 0x40
 };
 #pragma pack(pop)
 
+/* Verify struct is correctly sized */
+static_assert(sizeof(SMBX_Water) == 0x40, "sizeof(SMBX_Water) must be 0x40");
+
 #endif

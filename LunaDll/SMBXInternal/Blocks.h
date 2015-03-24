@@ -25,12 +25,12 @@ struct Block {
     short               IsInvisible;                        // 0x1C
     short               BlockType;                          // 0x1E
 
-    Momentum            mometum;                               // 0x20
+    Momentum            mometum;                            // 0x20
 
     short               ContentsID;                         // 0x50
-    short               BeingHitStatus1;                    // 0x52 (todo: verify!)
-    short               BeingHitTimer;                      // 0x54 (todo: verify!)
-    short               BeingHitStatus2;                    // 0x56 (todo: verify!)
+    short               BeingHitStatus1;                    // 0x52
+    short               BeingHitTimer;                      // 0x54
+    short               BeingHitStatus2;                    // 0x56
 
     short               Unknown58;                          // 0x58
     short               IsInvisible2;                       // 0x5A
@@ -43,6 +43,9 @@ struct Block {
     short               Unknown66;                          // 0x66
 };
 #pragma pack(pop)
+
+/* Verify struct is correctly sized */
+static_assert(sizeof(Block) == 0x68, "sizeof(Block) must be 0x68");
 
 namespace Blocks {
 

@@ -15,4 +15,7 @@ struct SMBX_BGO {				// Length should be 0x38
 };
 #pragma pack(pop)
 
+/* Verify struct is correctly sized */
+static_assert(sizeof(SMBX_BGO) == 0x38, "sizeof(SMBX_BGO) must be 0x38");
+
 #endif

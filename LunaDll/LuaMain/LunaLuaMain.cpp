@@ -603,8 +603,7 @@ void CLunaLua::bindAll()
 				.property("Unused17C", &LuaProxy::Player::unused17C, &LuaProxy::Player::setUnused17C)
 				.property("Unused17E", &LuaProxy::Player::unused17E, &LuaProxy::Player::setUnused17E)
 				.property("Unused180", &LuaProxy::Player::unused180, &LuaProxy::Player::setUnused180)
-				.property("Unused182", &LuaProxy::Player::unused182, &LuaProxy::Player::setUnused182)
-				.property("Unused184", &LuaProxy::Player::unused184, &LuaProxy::Player::setUnused184),
+				.property("Unused182", &LuaProxy::Player::unused182, &LuaProxy::Player::setUnused182),
 
 				class_<LuaProxy::Block>("Block")
 				.def(constructor<int>())

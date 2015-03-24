@@ -171,6 +171,8 @@ struct SMBXAnimation{
 };
 #pragma pack(pop)
 
+/* Verify struct is correctly sized */
+static_assert(sizeof(SMBXAnimation) == 0x44, "sizeof(SMBXAnimation) must be 0x44");
 
 namespace Animations {
 

@@ -82,5 +82,7 @@ struct SMBX_Warp
 };
 #pragma pack(pop)
 
+/* Verify struct is correctly sized */
+static_assert(sizeof(SMBX_Warp) == 0x90, "sizeof(SMBX_Warp) must be 0x90");
 
 #endif

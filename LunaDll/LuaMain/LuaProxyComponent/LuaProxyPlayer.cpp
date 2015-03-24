@@ -1885,20 +1885,6 @@ void LuaProxy::Player::setUnused182(short var_unused182, lua_State *L)
 	::Player::Get(m_index)->Unused182 = var_unused182;
 }
 
-short LuaProxy::Player::unused184(lua_State *L) const
-{
-	if(!isValid_throw(L))
-		return 0;
-	return ::Player::Get(m_index)->Unused184;
-}
-
-void LuaProxy::Player::setUnused184(short var_unused184, lua_State *L)
-{
-	if(!isValid_throw(L))
-		return;
-	::Player::Get(m_index)->Unused184 = var_unused184;
-}
-
 int LuaProxy::Player::getIndex() const
 {
 	return m_index;

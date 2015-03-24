@@ -561,8 +561,6 @@ namespace LuaProxy {
         void setUnused180(short var_unused180, lua_State *L);
 		short unused182(lua_State *L) const;
         void setUnused182(short var_unused182, lua_State *L);
-		short unused184(lua_State *L) const;
-        void setUnused184(short var_unused184, lua_State *L);
         //internal use
 		int getIndex() const;
 		
