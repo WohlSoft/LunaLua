@@ -91,6 +91,9 @@
     <Filter Include="Header Files\Misc\RuntimeHookComponents">
       <UniqueIdentifier>{7fe805c0-8b82-466c-9330-213a4a32c632}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions">
+      <UniqueIdentifier>{d9197f0d-581d-4438-95b6-4e01fc6bba07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -553,6 +556,21 @@
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
       <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncHud.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncLevel.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncMisc.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncNative.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

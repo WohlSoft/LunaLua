@@ -64,6 +64,8 @@ private:
 
 	//private init functions
 	void bindAll();
+    void bindAllDeprecated();
+
 	void setupDefaults();
 
 	lua_State *L;

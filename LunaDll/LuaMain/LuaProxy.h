@@ -21,29 +21,25 @@ namespace LuaProxy {
         LFT_STRING = 6
     };
 
-	//undocumented
-	std::string getSMBXPath();
-    void simulateError(short errcode);
-	//Debug/Text functions
-    void windowDebug(const char* debugText);
-    void print(const char *text, int x, int y);
-    void print(const char *text, int type, int x, int y);
-    void showMessageBox(const std::string &text);
-	//General functions
-	void exitLevel();
-	void npcToCoins();
-	void hud(bool activate);
-	//NPC functions
+#ifdef _MSC_VER //DEPRECATED STUFF
+#pragma region
+#endif
+
+    void loadHitboxes(int _character, int _powerup, const char *ini_file);
+	
+	//NPC functions [Moved as static function]
     int totalNPCs();
     luabind::object npcs(lua_State *L);
     luabind::object findNPCs(int ID, int section, lua_State *L);
-	//Block functions
+	//Block functions [Moved as static function]
     luabind::object blocks(lua_State *L);
     luabind::object findblocks(int ID, lua_State *L);
+
 	//Memory functions
 	void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
-	//SMBX trigger function
+
+	//SMBX trigger function [Moved as static function]
     void triggerEvent(const char* evName);
 	//Music related
     void playSFX(int index);
@@ -60,12 +56,8 @@ namespace LuaProxy {
     bool MusicIsPaused();
     bool MusicIsFading();
     void playMusic(int section);
-	//CSprite functions
-    bool loadImage(const char* filename, int resNumber, int transColor);
-    void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
-    void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
-    void placeSprite(int type, int imgResource, int xPos, int yPos);
-    //General global memory
+    
+    //General global memory [Moved as Defines.*]
 	unsigned short gravity();
     void gravity(unsigned short value);
     unsigned short earthquake();
@@ -74,25 +66,26 @@ namespace LuaProxy {
     void jumpheight(unsigned short value);
     unsigned short jumpheightBounce();
     void jumpheightBounce(unsigned short value);
-	unsigned short winState();
-	void winState(unsigned short value);
-	std::string getLevelFilename();
-	std::string getLevelName();
-	//Layer functions
+	
+	//Layer functions [Moved as static function]
     luabind::object findlayer(const char* layername, lua_State *L);
-	//Animation functions
+	//Animation functions [Moved as static function]
     luabind::object animations(lua_State* L);
     //DEPRECATED
 	void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
 	void runAnimation(int id, double x, double y, double height, double width, int extraData);
 	void runAnimation(int id, double x, double y, int extraData);
 	//Load hitbox values for playable character
-	void loadHitboxes(int _character, int _powerup, const char *ini_file);
+	
 
 	//World
 	luabind::object levels(lua_State *L);
 	luabind::object findlevels(const std::string &toFindName, lua_State* L);
 	luabind::object findlevel(const std::string &toFindName, lua_State* L);
+
+#ifdef _MSC_VER
+#pragma endregion
+#endif
 
     //for runAnimation
     struct coorStruct{
@@ -107,7 +100,7 @@ namespace LuaProxy {
 
     
 
-
+    //Deprecated
     namespace SaveBankProxy {
         void setValue(const char* key, double value);
         luabind::object getValue(const char* key, lua_State *L);
@@ -249,6 +242,10 @@ namespace LuaProxy {
 
     class NPC{
     public:
+        static int count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L);
+
         NPC (int index);
 		int id(lua_State* L) const;
 		float direction(lua_State* L) const;
@@ -599,7 +596,7 @@ namespace LuaProxy {
     };
 
     //more functions:
-    VBStr getInput();
+    
 
 	//For world exclusive:
 	class World
@@ -640,14 +637,61 @@ namespace LuaProxy {
 		bool isValid() const;
 		int m_index;
 	};
+
+
+
+    //undocumented
+    namespace Native{
+        std::string getSMBXPath();
+        void simulateError(short errcode);
+    }
+    //Debug/Text functions
+    namespace Text{
+        void windowDebug(const char* debugText);
+        void print(const char *text, int x, int y);
+        void print(const char *text, int type, int x, int y);
+        void showMessageBox(const std::string &text);
+    }
+    //General functions
+    namespace Level{
+        void exit();
+        std::string filename();
+        std::string name();
+        unsigned short winState();
+        void winState(unsigned short value);
+    }
+
+    namespace Misc{
+        void npcToCoins();
+        VBStr getInput();
+    }
+
+    namespace Hud{
+        void activate(bool activate);
+        //CSprite functions
+        bool loadImage(const char* filename, int resNumber, int transColor);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
+        void placeSprite(int type, int imgResource, int xPos, int yPos);
+    }
+
 	//Non-Member-Constructors:
 	RECT newRECT();
 	RECTd newRECTd();
-	NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
-	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
-	NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
+
+
+#ifdef _MSC_VER //DEPRECATED STUFF
+#pragma region
+#endif
+    //Moved as static functions
+    NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
+    NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
+    NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
+#ifdef _MSC_VER
+#pragma endregion
+#endif
 }
 
 #endif

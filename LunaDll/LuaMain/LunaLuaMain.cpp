@@ -98,6 +98,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
 	//Bind all functions, propeties ect...
 	bindAll();
+    bindAllDeprecated();
 
 	//Setup default contants
 	setupDefaults();
@@ -110,7 +111,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 	int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "mainV2.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
 	if(!(lapierrcode == 0)){
 		object error_msg(from_stack(L, -1));
-		LuaProxy::windowDebug(object_cast<const char*>(error_msg));
+		LuaProxy::Text::windowDebug(object_cast<const char*>(error_msg));
 		errLapi = true;
 	}
 
@@ -203,30 +204,30 @@ void CLunaLua::bindAll()
 	//Bind stuff for world and level
 	module(L)
 		[
-			def("getSMBXPath", &LuaProxy::getSMBXPath),
-            def("simulateError", &LuaProxy::simulateError),
-			def("windowDebug", &LuaProxy::windowDebug),
-			def("printText", (void(*)(const char*, int, int)) &LuaProxy::print),
-			def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::print),
-			def("loadImage", &LuaProxy::loadImage),
-			def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::placeSprite),
-			def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::placeSprite),
-			def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::placeSprite),
-			def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)) &LuaProxy::mem),
-			def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
+            def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)) &LuaProxy::mem),
+            def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
 
-			/*************************Audio*****************************/
-			//Old Audio stuff
-			def("playSFX", (void(*)(int))&LuaProxy::playSFX),
-			def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
-			def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
-			def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
-			def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
-			def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
-			def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
-			def("MusicStop", (void(*)())&LuaProxy::MusicStop),
-			def("MusicStopFadeOut", (void(*)(int))&LuaProxy::MusicStopFadeOut),
-			def("MusicVolume", (void(*)(int))&LuaProxy::MusicVolume),
+            namespace_("Native")[
+                def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
+                def("simulateError", &LuaProxy::Native::simulateError)
+            ],
+
+            namespace_("Text")[
+                def("windowDebug", &LuaProxy::Text::windowDebug),
+                def("printText", (void(*)(const char*, int, int)) &LuaProxy::Text::print),
+                def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print)
+            ],
+
+            namespace_("Hud")[
+                def("loadImage", &LuaProxy::Hud::loadImage),
+                def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Hud::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Hud::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Hud::placeSprite)
+            ],
+
+            namespace_("Misc")[
+                def("getInput", &LuaProxy::Misc::getInput)
+            ],
 
 			//SDL_Mixer's Mix_Chunk structure
 			class_<Mix_Chunk>("Mix_Chunk")
@@ -348,9 +349,6 @@ void CLunaLua::bindAll()
 	if(m_type == LUNALUA_WORLD){
 		module(L)
 			[
-				def("levels", &LuaProxy::levels),
-				def("findlevels", &LuaProxy::findlevels),
-				def("findlevel", &LuaProxy::findlevel),
 
 				class_<LuaProxy::World>("World")
 				.property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
@@ -378,40 +376,25 @@ void CLunaLua::bindAll()
 	if(m_type == LUNALUA_LEVEL){
 		module(L)
 			[
-                def("showMessageBox", &LuaProxy::showMessageBox),
-				def("totalNPC", &LuaProxy::totalNPCs),
-				def("npcs", &LuaProxy::npcs),
-				def("findnpcs", &LuaProxy::findNPCs),
-				def("triggerEvent", &LuaProxy::triggerEvent),
-				def("playMusic", &LuaProxy::playMusic),
-				def("gravity", (unsigned short(*)())&LuaProxy::gravity),
-				def("gravity", (void(*)(unsigned short))&LuaProxy::gravity),
-				def("earthquake", (unsigned short(*)())&LuaProxy::earthquake),
-				def("earthquake", (void(*)(unsigned short))&LuaProxy::earthquake),
-				def("jumpheight", (unsigned short(*)())&LuaProxy::jumpheight),
-				def("jumpheight", (void(*)(unsigned short))&LuaProxy::jumpheight),
-				def("jumpheightBounce", (unsigned short(*)())&LuaProxy::jumpheightBounce),
-				def("jumpheightBounce", (void(*)(unsigned short))&LuaProxy::jumpheightBounce),
-				def("runAnimation", (void(*)(int, double, double, double, double, double, double,int))&LuaProxy::runAnimation),
-				def("runAnimation", (void(*)(int, double, double, double, double, int))&LuaProxy::runAnimation),
-				def("runAnimation", (void(*)(int, double, double, int))&LuaProxy::runAnimation),
-				def("npcToCoins", &LuaProxy::npcToCoins),
-				def("blocks", &LuaProxy::blocks),
-				def("findblocks", &LuaProxy::findblocks),
-				def("findlayer", &LuaProxy::findlayer),
-				def("exitLevel", &LuaProxy::exitLevel),
-				def("winState", (unsigned short(*)())&LuaProxy::winState),
-				def("winState", (void(*)(unsigned short))&LuaProxy::winState),
-				def("animations", &LuaProxy::animations),
-				def("getInput", &LuaProxy::getInput),
-				def("hud", &LuaProxy::hud),
-				def("getLevelFilename", &LuaProxy::getLevelFilename),
-				def("getLevelName", &LuaProxy::getLevelName),
-				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
-				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-				def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::spawnEffect),
-                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::spawnEffect),
+                namespace_("Text")[
+                    def("showMessageBox", &LuaProxy::Text::showMessageBox)
+                ],
+                
+                namespace_("Misc")[
+                    def("npcToCoins", &LuaProxy::Misc::npcToCoins)
+                ],
+
+                namespace_("Level")[
+                    def("exitLevel", &LuaProxy::Level::exit),
+                    def("winState", (unsigned short(*)())&LuaProxy::Level::winState),
+                    def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
+                    def("filename", &LuaProxy::Level::filename),
+                    def("name", &LuaProxy::Level::name)
+                ],
+
+                namespace_("Hud")[
+                    def("hud", &LuaProxy::Hud::activate)
+                ],
 
 				class_<LuaProxy::Animation>("Animation")
 				.def(constructor<int>())
@@ -442,6 +425,13 @@ void CLunaLua::bindAll()
 				.property("boundary", &LuaProxy::Section::boundary, &LuaProxy::Section::setBoundary),
 
 				class_<LuaProxy::NPC>("NPC")
+                .scope[ //static functions
+                    def("count", &LuaProxy::NPC::count),
+                    def("get", (luabind::object(*)(lua_State* L))&LuaProxy::NPC::get),
+                    def("get", (luabind::object(*)(luabind::object, luabind::object, lua_State* L))&LuaProxy::NPC::get)
+                ]
+                
+
 				.def(constructor<int>())
 				.def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::NPC::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::NPC::mem))
@@ -483,6 +473,9 @@ void CLunaLua::bindAll()
 				.property("holdingNPC", &LuaProxy::Player::holdingNPC)
 				.property("isValid", &LuaProxy::Player::isValid)
 				/*Generated by code*/
+#ifdef _MSC_VER //Generated by code
+#pragma region
+#endif
 				.property("ToadDoubleJReady", &LuaProxy::Player::toadDoubleJReady, &LuaProxy::Player::setToadDoubleJReady)
 				.property("SparklingEffect", &LuaProxy::Player::sparklingEffect, &LuaProxy::Player::setSparklingEffect)
 				.property("UnknownCTRLLock1", &LuaProxy::Player::unknownCTRLLock1, &LuaProxy::Player::setUnknownCTRLLock1)
@@ -605,7 +598,9 @@ void CLunaLua::bindAll()
 				.property("Unused17E", &LuaProxy::Player::unused17E, &LuaProxy::Player::setUnused17E)
 				.property("Unused180", &LuaProxy::Player::unused180, &LuaProxy::Player::setUnused180)
 				.property("Unused182", &LuaProxy::Player::unused182, &LuaProxy::Player::setUnused182),
-
+#ifdef _MSC_VER //Generated by code
+#pragma endregion
+#endif
 				class_<LuaProxy::Block>("Block")
 				.def(constructor<int>())
 				.def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object&, lua_State*)>(&LuaProxy::Block::mem))
@@ -623,6 +618,85 @@ void CLunaLua::bindAll()
 			];
 	}
 }
+
+
+void CLunaLua::bindAllDeprecated()
+{
+    module(L)
+        [
+            def("getSMBXPath", &LuaProxy::Native::getSMBXPath), //DONE
+            def("simulateError", &LuaProxy::Native::simulateError), //DONE
+            def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
+            def("printText", (void(*)(const char*, int, int)) &LuaProxy::Text::print), //DONE
+            def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print), //DONE
+            def("loadImage", &LuaProxy::Hud::loadImage), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Hud::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Hud::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Hud::placeSprite), //DONE
+
+            /*************************Audio*****************************/
+            //Old Audio stuff
+            def("playSFX", (void(*)(int))&LuaProxy::playSFX),
+            def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
+            def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
+            def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
+            def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
+            def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
+            def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
+            def("MusicStop", (void(*)())&LuaProxy::MusicStop),
+            def("MusicStopFadeOut", (void(*)(int))&LuaProxy::MusicStopFadeOut),
+            def("MusicVolume", (void(*)(int))&LuaProxy::MusicVolume)
+        ];
+    if (m_type == LUNALUA_WORLD){
+        module(L)
+            [
+                def("levels", &LuaProxy::levels),
+                def("findlevels", &LuaProxy::findlevels),
+                def("findlevel", &LuaProxy::findlevel)
+            ];
+    }
+    if (m_type == LUNALUA_LEVEL){
+        module(L)
+            [
+                def("showMessageBox", &LuaProxy::Text::showMessageBox), //DONE
+                def("totalNPC", &LuaProxy::totalNPCs),
+                def("npcs", &LuaProxy::npcs), //DONE
+                def("findnpcs", &LuaProxy::findNPCs), //NOT WORKING YET
+                def("triggerEvent", &LuaProxy::triggerEvent),
+                def("playMusic", &LuaProxy::playMusic),
+                def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
+                def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
+                def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]
+                def("earthquake", (void(*)(unsigned short))&LuaProxy::earthquake), //DONE [DEPRECATED]
+                def("jumpheight", (unsigned short(*)())&LuaProxy::jumpheight), //DONE [DEPRECATED]
+                def("jumpheight", (void(*)(unsigned short))&LuaProxy::jumpheight), //DONE [DEPRECATED]
+                def("jumpheightBounce", (unsigned short(*)())&LuaProxy::jumpheightBounce), //DONE [DEPRECATED]
+                def("jumpheightBounce", (void(*)(unsigned short))&LuaProxy::jumpheightBounce), //DONE [DEPRECATED]
+                def("runAnimation", (void(*)(int, double, double, double, double, double, double, int))&LuaProxy::runAnimation), //DONE [DEPRECATED]
+                def("runAnimation", (void(*)(int, double, double, double, double, int))&LuaProxy::runAnimation), //DONE [DEPRECATED]
+                def("runAnimation", (void(*)(int, double, double, int))&LuaProxy::runAnimation), //DONE
+                def("npcToCoins", &LuaProxy::Misc::npcToCoins), //DONE
+                def("blocks", &LuaProxy::blocks),
+                def("findblocks", &LuaProxy::findblocks),
+                def("findlayer", &LuaProxy::findlayer),
+                def("exitLevel", &LuaProxy::Level::exit), //DONE
+                def("winState", (unsigned short(*)())&LuaProxy::Level::winState), //DONE
+                def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
+                def("animations", &LuaProxy::animations),
+                def("getInput", &LuaProxy::Misc::getInput),
+                def("hud", &LuaProxy::Hud::activate), //DONE
+                def("getLevelFilename", &LuaProxy::Level::filename), //DONE
+                def("getLevelName", &LuaProxy::Level::name), //DONE
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::spawnEffect),
+                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::spawnEffect)
+            ];
+
+    }
+}
+
 
 void CLunaLua::doEvents()
 {

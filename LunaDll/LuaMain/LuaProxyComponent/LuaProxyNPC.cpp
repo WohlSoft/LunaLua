@@ -4,6 +4,63 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/VB6StrPtr.h"
+#include <vector>
+
+
+int LuaProxy::NPC::count()
+{
+    return (int)GM_NPCS_COUNT;
+}
+
+luabind::object LuaProxy::NPC::get(lua_State* L)
+{
+    return get(luabind::object(L, -1), luabind::object(L, -1), L);
+}
+
+luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L)
+{
+    int searchTargetID = -1;
+    int searchTargetSection = -1;
+    
+    if (luabind::type(idFilter) == LUA_TNUMBER){
+        searchTargetID = luabind::object_cast<int>(idFilter);
+    }
+    if (luabind::type(sectionFilter) == LUA_TNUMBER){
+        searchTargetSection = luabind::object_cast<int>(sectionFilter);
+    }
+
+    luabind::object retNPCs = luabind::newtable(L);
+    int npcIndex = 1;
+
+    if (luabind::type(idFilter) == LUA_TTABLE && luabind::type(sectionFilter) == LUA_TTABLE) {
+        for (int i = 0; i < GM_NPCS_COUNT; i++) {
+            ::NPCMOB* thisnpc = ::NPC::Get(i);
+            if (luabind::type(idFilter[thisnpc->id]) != LUA_TNIL || luabind::type(idFilter[-1]) != LUA_TNIL) {
+                if (luabind::type(sectionFilter[::NPC::GetSection(thisnpc)]) != LUA_TNIL || luabind::type(sectionFilter[-1]) != LUA_TNIL) {
+                    retNPCs[npcIndex++] = LuaProxy::NPC(i);
+                }
+            }
+        }
+        return retNPCs;
+    }
+    else if (luabind::type(idFilter) == LUA_TNUMBER && luabind::type(sectionFilter) == LUA_TNUMBER){
+        for (int i = 0; i < GM_NPCS_COUNT; i++) {
+            ::NPCMOB* thisnpc = ::NPC::Get(i);
+            if (thisnpc->id == searchTargetID || searchTargetID == -1) {
+                if (::NPC::GetSection(thisnpc) == searchTargetSection || searchTargetSection == -1) {
+                    retNPCs[npcIndex++] = LuaProxy::NPC(i);
+                }
+            }
+        }
+        return retNPCs;
+    }
+
+    const char* invalidArgType1 = lua_typename(L, luabind::type(idFilter));
+    const char* invalidArgType2 = lua_typename(L, luabind::type(sectionFilter));
+    luaL_error(L, "Invalid args! [Either get(table id, table section) or get(numer id, number section)]\nGot id = %s and section = %s!", invalidArgType1, invalidArgType2);
+    return luabind::object();
+}
+
 
 LuaProxy::NPC::NPC(int index)
 {

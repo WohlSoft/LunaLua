@@ -17,32 +17,6 @@
 #include "LuaProxyAudio.h"
 
 
-void LuaProxy::windowDebug(const char *debugText){
-	MessageBoxA(0, debugText, "Debug", 0);
-}
-
-void LuaProxy::print(const char *text, int x, int y)
-{
-	LuaProxy::print(text, 3, x, y);
-}
-
-
-void LuaProxy::print(const char *text, int type, int x, int y)
-{
-	std::wstring txt = utf8_decode(std::string(text));
-	if(type==3)
-		for (wstring::iterator it = txt.begin(); it != txt.end(); ++it)
-			*it = towupper(*it);
-
-	gLunaRender.SafePrint(txt, type, (float)x, (float)y);
-}
-
-
-void LuaProxy::showMessageBox(const std::string &text)
-{
-    showSMBXMessageBox(text);
-}
-
 
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
@@ -55,7 +29,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 	int character = _character-1;
 
 	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-	wstring full_path = world_dir.append(Level::GetName());
+	wstring full_path = world_dir.append(::Level::GetName());
 	full_path = removeExtension(full_path);
 	full_path = full_path.append(L"\\"); // < path into level folder
 	full_path = full_path + utf8_decode(ini_file);
@@ -355,37 +329,6 @@ void LuaProxy::playMusic(int section)
 	SMBXSound::PlayMusic(section);
 }
 
-
-bool LuaProxy::loadImage(const char* filename, int resNumber, int transColor)
-{
-	return gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
-}
-
-
-void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra, int time)
-{
-	CSpriteRequest req;
-	req.type = type;
-	req.img_resource_code = imgResource;
-	req.x = xPos;
-	req.y = yPos;
-	req.time = time;
-	req.str = utf8_decode(std::string(extra));
-	gSpriteMan.InstantiateSprite(&req, false);
-}
-
-void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra)
-{
-	placeSprite(type, imgResource, xPos, yPos, extra, 0);
-}
-
-
-void LuaProxy::placeSprite(int type, int imgResource, int xPos, int yPos)
-{
-	placeSprite(type, imgResource, xPos, yPos, "");
-}
-
-
 unsigned short LuaProxy::gravity()
 {
 	return GM_GRAVITY;
@@ -451,14 +394,6 @@ void LuaProxy::runAnimation(int id, double x, double y, double height, double wi
 }
 
 
-void LuaProxy::npcToCoins()
-{
-	typedef void npcToCoinsFunc();
-	npcToCoinsFunc* f = (npcToCoinsFunc*)GF_NPC_TO_COINS;
-	f();
-}
-
-
 luabind::object LuaProxy::blocks(lua_State *L)
 {
 	luabind::object vblocks = luabind::newtable(L);
@@ -502,21 +437,6 @@ luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
 		}
 	}
 	return luabind::object();
-}
-
-void LuaProxy::exitLevel()
-{
-	GM_WORLD_MODE = 0xFFFF;
-}
-
-unsigned short LuaProxy::winState()
-{
-	return GM_WINNING;
-}
-
-void LuaProxy::winState(unsigned short value)
-{
-	GM_WINNING = value;
 }
 
 luabind::object LuaProxy::animations(lua_State *L)
@@ -564,27 +484,6 @@ void LuaProxy::runAnimation(int id, double x, double y, int extraData)
 	f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
 }
 
-
-LuaProxy::VBStr LuaProxy::getInput()
-{
-	return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
-}
-
-std::string LuaProxy::getSMBXPath()
-{
-	return utf8_encode(wstring(getModulePath()));
-}
-
-void LuaProxy::simulateError(short errcode)
-{
-    emulateVB6Error((int)errcode);
-}
-
-
-void LuaProxy::hud(bool activate)
-{
-	gSkipSMBXHUD = !activate;
-}
 
 luabind::object LuaProxy::levels(lua_State *L)
 {
@@ -658,15 +557,7 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 }
 
 
-std::string LuaProxy::getLevelFilename()
-{
-	return utf8_encode(std::wstring((wchar_t*)GM_LVLFILENAME_PTR));
-}
 
-std::string LuaProxy::getLevelName()
-{
-	return utf8_encode(std::wstring((wchar_t*)GM_LVLNAME_PTR));
-}
 
 
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, lua_State* L)
