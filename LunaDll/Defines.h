@@ -698,6 +698,7 @@ _O_Pub_Obj_Inf31_Event0x6               00B23F40 P
 
 //DEBUG:
 #define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
+#define dbgboxA(msg) MessageBoxA(NULL, msg, "Dbg", NULL);
 
 #endif
 
