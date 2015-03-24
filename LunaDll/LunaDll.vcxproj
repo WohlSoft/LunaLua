@@ -210,6 +210,7 @@
   <ItemGroup>
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
     <ClCompile Include="SMBXInternal\Animation.cpp" />
     <ClCompile Include="Autocode\Autocode.cpp" />
     <ClCompile Include="Autocode\AutocodeManager.cpp" />

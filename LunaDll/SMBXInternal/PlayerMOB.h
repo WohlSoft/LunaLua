@@ -197,159 +197,151 @@
 // SMBX player structure (INCOMPLETE)
 #pragma pack(push, 4)
 struct PlayerMOB {
-	short	ToadDoubleJReady;
-	short	SparklingEffect;
-	short	UnknownCTRLLock1;
-	short	UnknownCTRLLock2;
-	short	QuicksandEffectTimer;
-	short	OnSlipperyGround;
+    short ToadDoubleJReady;             // +0x00
+    short SparklingEffect;              // +0x02
+    short UnknownCTRLLock1;             // +0x04
+    short UnknownCTRLLock2;             // +0x06
+    short QuicksandEffectTimer;         // +0x08
+    short OnSlipperyGround;             // +0x0A
 
-	short	IsAFairy;
-	short	FairyAlreadyInvoked;
-	short	FairyFramesLeft;			// +0x10
-	short	SheathHasKey;
-	short	SheathAttackCooldown;
-	short	Hearts;
+    short IsAFairy;                     // +0x0C
+    short FairyAlreadyInvoked;          // +0x0E
+    short FairyFramesLeft;              // +0x10
+    short SheathHasKey;                 // +0x12
+    short SheathAttackCooldown;         // +0x14
+    short Hearts;                       // +0x16
 
-	short	PeachHoverAvailable;
-	short	PressingHoverButton;
-	short	PeachHoverTimer;
-	short	Unused1;
-	short	PeachHoverTrembleSpeed;		// +0x20
-	short	PeachHoverTrembleDir;
+    short PeachHoverAvailable;          // +0x18
+    short PressingHoverButton;          // +0x1A
+    short PeachHoverTimer;              // +0x1C
+    short Unused1;                      // +0x1E
+    float PeachHoverTrembleSpeed;       // +0x20
+    short PeachHoverTrembleDir;         // +0x24
 
-	short	ItemPullupTimer;
-	float	ItemPullupMomentumSave;
+    short ItemPullupTimer;              // +0x26
+    float ItemPullupMomentumSave;       // +0x28
 
-	short	Unused2;
+    short Unused2;                      // +0x2C
 
-	short	UnkClimbing1;
-	short	UnkClimbing2;				// +0x30
-	short	UnkClimbing3;
+    short UnkClimbing1;                 // +0x2E
+    short UnkClimbing2;                 // +0x30
+    short UnkClimbing3;
 
-	short	WaterState;
-	short	IsInWater;
-	short	WaterStrokeTimer;
+    short WaterState;
+    short IsInWater;
+    short WaterStrokeTimer;
 
-	short	UnknownHoverTimer;
-	short	SlidingState;
-	short	SlidingGroundPuffs;
+    short UnknownHoverTimer;
+    short SlidingState;
+    short SlidingGroundPuffs;
 
-	short	ClimbingState;				// +0x40
+    short ClimbingState;                // +0x40
 
-	short	UnknownTimer;
-	short	UnknownFlag;
-	short	UnknownPowerupState;
-	short	SlopeRelated;
+    short UnknownTimer;
+    short UnknownFlag;
+    short UnknownPowerupState;
+    short SlopeRelated;
 
-	short	TanookiStatueActive;
-	short	TanookiMorphCooldown;
-	short	TanookiActiveFrameCount;
-	
-	short	IsSpinjumping;				// +0x50
-	short	SpinjumpStateCounter;
-	short	SpinjumpLandDirection;		// (will face this direction when landing)
+    short TanookiStatueActive;
+    short TanookiMorphCooldown;
+    short TanookiActiveFrameCount;
+    
+    short IsSpinjumping;                // +0x50
+    short SpinjumpStateCounter;
+    short SpinjumpLandDirection;        // (will face this direction when landing)
 
-	short	CurrentKillCombo;
-	short	GroundSlidingPuffsState;
-	short	WarpNearby;					// (1 = pipe, 2 = instant, 3 = door)
-	short	Unknown5C;
-	short	Unknown5E;
-	
-	short	HasJumped;					// +0x60
+    short CurrentKillCombo;
+    short GroundSlidingPuffsState;
+    short WarpNearby;                    // (1 = pipe, 2 = instant, 3 = door)
+    short Unknown5C;
+    short Unknown5E;
+    
+    short HasJumped;                    // +0x60
 
-	char	padding[0x5e];				//pad to next
+    char padding[0x5e];                //pad to next
 
     Momentum momentum;
 
-	short	Identity;
+    short Identity;
 
-	short	UKeyState;
-	short	DKeyState;
-	short	LKeyState;
-	short	RKeyState;
-	short	JKeyState;
-	short	SJKeyState;
-	short	XKeyState;
-	short	RNKeyState;
-	short	SELKeyState;
-	short	STRKeyState;
+    KeyMap keymap;
 
-	short	FacingDirection;			// offset x106
+    short FacingDirection;            // offset x106
 
-	short	MountType;
-	short	MountColor;
-	short	MountState;
-	short	MountHeightOffset;
-	short	MountGfxIndex;
+    short MountType;
+    short MountColor;
+    short MountState;
+    short MountHeightOffset;
+    short MountGfxIndex;
 
-	short	CurrentPowerup;
-	short	CurrentPlayerSprite;
-	short	Unused116;
-	float	GfxMirrorX;
-	short	UpwardJumpingForce;
-	short	JumpButtonHeld;
-	short	SpinjumpButtonHeld;
-	short	ForcedAnimationState;
-	float	Unknown124;
-	float	Unknown128;
+    short CurrentPowerup;
+    short CurrentPlayerSprite;
+    short Unused116;
+    float GfxMirrorX;
+    short UpwardJumpingForce;
+    short JumpButtonHeld;
+    short SpinjumpButtonHeld;
+    short ForcedAnimationState;
+    float Unknown124;
+    float Unknown128;
 
-	short	DownButtonMirror;
-	short	InDuckingPosition;
-	short	SelectButtonMirror;
-	short	Unknown132;
-	short	DownButtonTapped;
-	short	Unknown136;
-	float	XMomentumPush;
+    short DownButtonMirror;
+    short InDuckingPosition;
+    short SelectButtonMirror;
+    short Unknown132;
+    short DownButtonTapped;
+    short Unknown136;
+    float XMomentumPush;
 
-	short	DeathState;
-	short	DeathTimer;
+    short DeathState;
+    short DeathTimer;
 
-	short	BlinkTimer;
-	short	BlinkState;
-	short	Unknown144;
+    short BlinkTimer;
+    short BlinkState;
+    short Unknown144;
 
-	short	LayerStateStanding;
-	short	LayerStateLeftContact;
-	short	LayerStateTopContact;
-	short	LayerStateRightContact;
-	short	PushedByMovingLayer;
-	short	Unused150;
-	short	Unused152;
+    short LayerStateStanding;
+    short LayerStateLeftContact;
+    short LayerStateTopContact;
+    short LayerStateRightContact;
+    short PushedByMovingLayer;
+    short Unused150;
+    short Unused152;
 
-	short	HeldNPCIndex;
-	short	Unknown156;
-	short	PowerupBoxContents;
+    short HeldNPCIndex;
+    short Unknown156;
+    short PowerupBoxContents;
 
-	short	CurrentSection;
-	short	WarpTimer;
-	short	Unknown15E;
+    short CurrentSection;
+    short WarpTimer;
+    short Unknown15E;
 
-	short	ProjectileTimer1;
-	short	ProjectileTimer2;
-	short	TailswipeTimer;
-	short	Unknown166;
+    short ProjectileTimer1;
+    short ProjectileTimer2;
+    short TailswipeTimer;
+    short Unknown166;
 
-	float	TakeoffSpeed;
-	short	CanFly;
-	short	IsFlying;
-	short	FlightTimeRemaining;
-	short	HoldingFlightRunButton;
-	short	HoldingFlightButton;
+    float TakeoffSpeed;
+    short CanFly;
+    short IsFlying;
+    short FlightTimeRemaining;
+    short HoldingFlightRunButton;
+    short HoldingFlightButton;
 
-	short	NPCBeingStoodOnIndex;
-	short	Unknown178;
+    short NPCBeingStoodOnIndex;
+    short Unknown178;
 
-	short	Unknown17A;
-	short	Unused17C;
-	short	Unused17E;
-	short	Unused180;
-	short	Unused182;
+    short Unknown17A;
+    short Unused17C;
+    short Unused17E;
+    short Unused180;
+    short Unused182;
 };
 #pragma pack(pop)
 
 /* Verify struct is correctly sized, and also verify that a sampling of fields
- * that were affected by packing before */
+ * that errors in would indicate a problem */
+static_assert(&((PlayerMOB*)0x0)->ItemPullupTimer == (void*)0x26, "ItemPullupTimer must be at at 0x26");
 static_assert(&((PlayerMOB*)0x0)->HasJumped == (void*)0x60, "HasJumped must be at at 0x60");
 static_assert(&((PlayerMOB*)0x0)->momentum.x == (void*)0xC0, "momentum.x must be at at 0xC0");
 static_assert(&((PlayerMOB*)0x0)->Unknown166 == (void*)0x166, "Unknown166 must be at at 0x166");

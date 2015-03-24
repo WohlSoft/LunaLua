@@ -4,9 +4,6 @@
 #include "..\Defines.h"
 #include "..\GlobalFuncs.h"
 
-#define _vbaStrCopy ((void(__fastcall *)(VB6StrPtr*, const wchar_t*))IMP_vbaStrCopy)
-#define _vbaFreeStr ((void(__fastcall *)(VB6StrPtr*))IMP_vbaFreeStr)
-
 // Empty constructor
 VB6StrPtr::VB6StrPtr() : ptr(NULL) {}
 

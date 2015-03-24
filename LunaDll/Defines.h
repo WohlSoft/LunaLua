@@ -70,6 +70,11 @@ enum PRIORITY {
 #define GM_SCRN_HDC			*(DWORD*)0x00B25028
 #define GM_MODE_INTRO		*(WORD*)0x00B2C89C
 
+// Pre-Defined Strings      
+#define GM_STR_NULL         *(DWORD*)0x00423D00
+#define GM_STR_MSGBOX       *(DWORD*)0x00B250E4
+#define GM_STR_CHECKPOINT   *(DWORD*)0x00B250B0     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
+
 // NPC Settings
 #define GM_CONF_WIDTH		*(DWORD*)0x00B25BA8
 #define GM_CONF_HEIGHT		*(DWORD*)0x00B25BC4
@@ -216,6 +221,19 @@ struct Bounds
     double unk2;
 };
 
+struct KeyMap{
+    short	UKeyState;
+    short	DKeyState;
+    short	LKeyState;
+    short	RKeyState;
+    short	JKeyState;
+    short	SJKeyState;
+    short	XKeyState;
+    short	RNKeyState;
+    short	SELKeyState;
+    short	STRKeyState;
+};
+
 ////////////////////////
 ///    -Imports-     ///
 ////////////////////////
@@ -260,6 +278,8 @@ struct Bounds
 #define GF_RUN_ANIM			0x009E7380			// Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
 
 #define GF_SCORE_RELEATED   0x008F80C0
+
+#define GF_MSGBOX           0x008E54C0
 
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P

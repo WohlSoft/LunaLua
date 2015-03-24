@@ -378,6 +378,7 @@ void CLunaLua::bindAll()
 	if(m_type == LUNALUA_LEVEL){
 		module(L)
 			[
+                def("showMessageBox", &LuaProxy::showMessageBox),
 				def("totalNPC", &LuaProxy::totalNPCs),
 				def("npcs", &LuaProxy::npcs),
 				def("findnpcs", &LuaProxy::findNPCs),

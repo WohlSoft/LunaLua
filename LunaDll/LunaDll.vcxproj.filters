@@ -551,6 +551,9 @@
     <ClCompile Include="libs\stackwalker\StackWalker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
+      <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
