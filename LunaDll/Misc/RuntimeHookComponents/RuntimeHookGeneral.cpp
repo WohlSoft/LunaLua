@@ -1,3 +1,4 @@
+#include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
 #include "../../GlobalFuncs.h"
@@ -151,6 +152,16 @@ void TrySkipPatch()
     /************************************************************************/
     /* Source Code Function Patch                                           */
     /************************************************************************/
+    PATCH_FUNC(0x8D9446, &OnLvlLoad);
+    *(BYTE*)(0x8D944B) = INSTR_NOP;
+    *(BYTE*)(0x8D944C) = INSTR_NOP;
+
+    PATCH_FUNC(0x8CA23B, &TestFunc);
+    *(BYTE*)(0x8CA240) = INSTR_NOP;
+
+    PATCH_FUNC(0x96C030, &HUDHook);
+    *(BYTE*)(0x96C035) = INSTR_NOP;
+
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
     PATCH_FUNC(0x8D6BB6, &forceTermination);
