@@ -661,7 +661,7 @@ void CLunaLua::bindAllDeprecated()
                 def("showMessageBox", &LuaProxy::Text::showMessageBox), //DONE
                 def("totalNPC", &LuaProxy::totalNPCs),
                 def("npcs", &LuaProxy::npcs), //DONE
-                def("findnpcs", &LuaProxy::findNPCs), //NOT WORKING YET
+                def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent),
                 def("playMusic", &LuaProxy::playMusic),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
