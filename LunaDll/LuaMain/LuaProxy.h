@@ -347,8 +347,8 @@ namespace LuaProxy {
         void setPeachHoverTimer(short var_peachHoverTimer, lua_State *L);
 		short unused1(lua_State *L) const;
         void setUnused1(short var_unused1, lua_State *L);
-		short peachHoverTrembleSpeed(lua_State *L) const;
-        void setPeachHoverTrembleSpeed(short var_peachHoverTrembleSpeed, lua_State *L);
+	    float peachHoverTrembleSpeed(lua_State *L) const;
+        void setPeachHoverTrembleSpeed(float var_peachHoverTrembleSpeed, lua_State *L);
 		short peachHoverTrembleDir(lua_State *L) const;
         void setPeachHoverTrembleDir(short var_peachHoverTrembleDir, lua_State *L);
 		short itemPullupTimer(lua_State *L) const;

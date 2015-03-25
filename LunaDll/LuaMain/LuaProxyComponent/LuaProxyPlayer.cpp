@@ -401,14 +401,14 @@ void LuaProxy::Player::setUnused1(short var_unused1, lua_State *L)
 	::Player::Get(m_index)->Unused1 = var_unused1;
 }
 
-short LuaProxy::Player::peachHoverTrembleSpeed(lua_State *L) const
+float LuaProxy::Player::peachHoverTrembleSpeed(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
 	return ::Player::Get(m_index)->PeachHoverTrembleSpeed;
 }
 
-void LuaProxy::Player::setPeachHoverTrembleSpeed(short var_peachHoverTrembleSpeed, lua_State *L)
+void LuaProxy::Player::setPeachHoverTrembleSpeed(float var_peachHoverTrembleSpeed, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
