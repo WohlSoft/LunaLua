@@ -79,10 +79,22 @@ struct SMBX_Warp
     short unknown_8A;                       //0x8A
     short unknown_8C;                       //0x8C
     short unknown_8E;                       //0x8E
+
+    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
+    static inline SMBX_Warp* Get(unsigned short index) {
+        if (index >= GM_WARP_COUNT) return NULL;
+        return &((SMBX_Warp*)GM_WARPS_PTR)[index];
+    }
+
+    static inline unsigned short Count() {
+        return GM_WARP_COUNT;
+    }
 };
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(SMBX_Warp) == 0x90, "sizeof(SMBX_Warp) must be 0x90");
+#endif
 
 #endif

@@ -15,10 +15,23 @@ struct SMBX_Water {				    // Length should be 0x40
     short isQuicksand;              // +0x0C
     short unknown_0E;               // +0x0E
     Momentum momentum;              // +0x10
+
+    // Note, 1-base indexed in SMBX code, but we translate to 0-base indexed
+    // for consistency of C++ code
+    static inline SMBX_Water* Get(unsigned short index) {
+        if (index >= GM_WATER_AREA_COUNT) return NULL;
+        return &((SMBX_Water*)GM_WATER_AREAS_PTR)[index+1];
+    }
+
+    static inline unsigned short Count() {
+        return GM_WATER_AREA_COUNT;
+    }
 };
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(SMBX_Water) == 0x40, "sizeof(SMBX_Water) must be 0x40");
+#endif
 
 #endif
