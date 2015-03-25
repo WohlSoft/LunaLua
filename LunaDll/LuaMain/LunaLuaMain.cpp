@@ -671,7 +671,7 @@ void CLunaLua::bindAllDeprecated()
         module(L)
             [
                 def("showMessageBox", &LuaProxy::Text::showMessageBox), //DONE
-                def("totalNPC", &LuaProxy::totalNPCs),
+                def("totalNPC", &LuaProxy::totalNPCs), //DONE
                 def("npcs", &LuaProxy::npcs), //DONE
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent),
@@ -699,9 +699,9 @@ void CLunaLua::bindAllDeprecated()
                 def("hud", &LuaProxy::Hud::activate), //DONE
                 def("getLevelFilename", &LuaProxy::Level::filename), //DONE
                 def("getLevelName", &LuaProxy::Level::name), //DONE
-                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
-                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
+                def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
                 def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::spawnEffect),
                 def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::spawnEffect)
             ];
