@@ -28,7 +28,7 @@ luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
     {
-        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
         return luabind::object();
     }
 
