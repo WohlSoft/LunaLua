@@ -43,3 +43,38 @@ void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lu
 	luaL_error(L, "Cannot cast to string");
 }
 
+bool* LuaHelper::generateFilterTable(lua_State* L, luabind::object theFilter, int maxVal, int minVal /*= 1*/)
+{
+    int mallocVal = maxVal + 1;
+
+    bool* filterTable = (bool*)calloc(mallocVal, sizeof(bool));
+
+    if (luabind::type(theFilter) == LUA_TNUMBER){
+        int theBgoID = luabind::object_cast<int>(theFilter);
+
+        if (theBgoID == -1){
+            memset(&filterTable, true, mallocVal*sizeof(bool));
+        }
+        else{
+            if (theBgoID < minVal || theBgoID > maxVal){
+                throw new LuaHelper::invalidIDException(theBgoID);
+            }
+            filterTable[theBgoID] = true;
+        }
+    }
+    else if (luabind::type(theFilter) == LUA_TTABLE){
+        for (luabind::iterator i(theFilter), end; i != end; ++i)
+        {
+            int theBgoID = luabind::object_cast<int>((luabind::object)*i);
+            if (theBgoID < minVal || theBgoID > maxVal){
+                throw new LuaHelper::invalidIDException(theBgoID);
+            }
+            filterTable[theBgoID] = true;
+        }
+    }
+    else{
+        throw new LuaHelper::invalidTypeException();
+    }
+    return filterTable;
+}
+

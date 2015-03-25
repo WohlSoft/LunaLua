@@ -15,38 +15,21 @@ luabind::object LuaProxy::BGO::get(lua_State* L)
 //       entity id filtering code isn't duplicated.
 luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
 {
-    bool lookupTableBgoID[191];
+    std::unique_ptr<bool> lookupTableBgoID;
 
-    memset(&lookupTableBgoID, false, sizeof(lookupTableBgoID));
-
-    if (luabind::type(idFilter) == LUA_TNUMBER){
-        int theBgoID = luabind::object_cast<int>(idFilter);
-
-        if (theBgoID == -1){
-            memset(&lookupTableBgoID, true, sizeof(lookupTableBgoID));
-        }
-        else{
-            if (theBgoID < 1 || theBgoID > 190){
-                luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-190\nGot BGO-ID: %d", theBgoID);
-                return luabind::object();
-            }
-            lookupTableBgoID[theBgoID] = true;
-        }
+    try
+    {
+        lookupTableBgoID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, 292));
     }
-    else if (luabind::type(idFilter) == LUA_TTABLE){
-        for (luabind::iterator i(idFilter), end; i != end; ++i)
-        {
-            int theBgoID = luabind::object_cast<int>((luabind::object)*i);
-            if (theBgoID < 1 || theBgoID > 190){
-                luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-190\nGot BGO-ID: %d", theBgoID);
-                return luabind::object();
-            }
-            lookupTableBgoID[theBgoID] = true;
-        }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-190\nGot BGO-ID: %d", e->usedID());
+        return luabind::object();
     }
-    else{
-        const char* invalidBgoIDType = lua_typename(L, luabind::type(idFilter));
-        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", invalidBgoIDType);
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
     }
 
     luabind::object retBGOs = luabind::newtable(L);
@@ -54,7 +37,7 @@ luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
 
     for (int i = 0; i < ::SMBX_BGO::Count(); i++) {
         SMBX_BGO* thisnpc = ::SMBX_BGO::Get(i);
-        if (thisnpc != NULL && lookupTableBgoID[thisnpc->id]) {
+        if (thisnpc != NULL && lookupTableBgoID.get()[thisnpc->id]) {
             retBGOs[bgoIndex++] = LuaProxy::BGO(i);
         }
     }

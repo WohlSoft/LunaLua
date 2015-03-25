@@ -6,7 +6,6 @@
 #include "../../Misc/VB6StrPtr.h"
 #include <vector>
 
-
 int LuaProxy::NPC::count()
 {
     return (int)GM_NPCS_COUNT;
@@ -19,69 +18,37 @@ luabind::object LuaProxy::NPC::get(lua_State* L)
 
 luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L)
 {
-    bool lookupTableNpcID[300];
-    bool lookupTableSectionID[21];
+    std::unique_ptr<bool> lookupTableNpcID;
+    std::unique_ptr<bool> lookupTableSectionID;
 
-    memset(&lookupTableNpcID, false, sizeof(lookupTableNpcID));
-    memset(&lookupTableSectionID, false, sizeof(lookupTableSectionID));
-    
-    if (luabind::type(idFilter) == LUA_TNUMBER){
-        int theNpcID = luabind::object_cast<int>(idFilter);
-        
-        if (theNpcID == -1){
-            memset(&lookupTableNpcID, true, sizeof(lookupTableNpcID));
-        }else{
-            if (theNpcID < 1 || theNpcID > 292){
-                luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", theNpcID);
-                return luabind::object();
-            }
-            lookupTableNpcID[theNpcID] = true;
-        }
+    try
+    {
+        lookupTableNpcID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, 292));
     }
-    else if (luabind::type(idFilter) == LUA_TTABLE){
-        for (luabind::iterator i(idFilter), end; i != end; ++i)
-        {
-            int theNpcID = luabind::object_cast<int>((luabind::object)*i);
-            if (theNpcID < 1 || theNpcID > 292){
-                luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", theNpcID);
-                return luabind::object();
-            }
-            lookupTableNpcID[theNpcID] = true;
-        }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", e->usedID());
+        return luabind::object();
     }
-    else{
-        const char* invalidNpcIDType = lua_typename(L, luabind::type(idFilter));
-        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", invalidNpcIDType);
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
     }
 
-    if (luabind::type(sectionFilter) == LUA_TNUMBER){
-        int theSectionID = luabind::object_cast<int>(sectionFilter);
-        
-        if (theSectionID == -1){
-            memset(&lookupTableSectionID, true, sizeof(lookupTableSectionID));
-        }
-        else{
-            if (theSectionID < 0 || theSectionID > 20){
-                luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", theSectionID);
-                return luabind::object();
-            }
-            lookupTableSectionID[theSectionID] = true;
-        }
+    try
+    {
+        lookupTableSectionID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, sectionFilter, 20, 0));
     }
-    else if (luabind::type(sectionFilter) == LUA_TTABLE){
-        for (luabind::iterator i(sectionFilter), end; i != end; ++i)
-        {
-            int theSectionID = luabind::object_cast<int>((luabind::object)*i);
-            if (theSectionID < 0 || theSectionID > 20){
-                luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", theSectionID);
-                return luabind::object();
-            }
-            lookupTableSectionID[theSectionID] = true;
-        }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", e->usedID());
+        return luabind::object();
     }
-    else{
-        const char* invalidSectionIDType = lua_typename(L, luabind::type(sectionFilter));
-        luaL_error(L, "Invalid args for section number (arg #1, expected table or number, got %s)", invalidSectionIDType);
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for section number (arg #2, expected table or number, got %s)", lua_typename(L, luabind::type(sectionFilter)));
+        return luabind::object();
     }
 
     luabind::object retNPCs = luabind::newtable(L);
@@ -89,8 +56,8 @@ luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sec
     
     for (int i = 0; i < GM_NPCS_COUNT; i++) {
         NPCMOB* thisnpc = ::NPC::Get(i);
-        if (lookupTableNpcID[thisnpc->id]) {
-            if (lookupTableSectionID[::NPC::GetSection(thisnpc)]) {
+        if (lookupTableNpcID.get()[thisnpc->id]) {
+            if (lookupTableSectionID.get()[::NPC::GetSection(thisnpc)]) {
                 retNPCs[npcIndex++] = LuaProxy::NPC(i);
             }
         }
