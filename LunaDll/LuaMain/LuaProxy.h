@@ -638,7 +638,19 @@ namespace LuaProxy {
 		int m_index;
 	};
 
+    class BGO
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
 
+        BGO(unsigned short index);
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+    private:
+        unsigned short m_index;
+    };
 
     //undocumented
     namespace Native{

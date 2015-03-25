@@ -614,7 +614,16 @@ void CLunaLua::bindAll()
 				.property("invisible", &LuaProxy::Block::invisible, &LuaProxy::Block::setInvisible)
 				.property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery)
 				.property("layerName", &LuaProxy::Block::layerName)
-				.property("layerObj", &LuaProxy::Block::layerObj)
+				.property("layerObj", &LuaProxy::Block::layerObj),
+
+                class_<LuaProxy::BGO>("BGO")
+                .scope[ //static functions
+                    def("count", &LuaProxy::BGO::count),
+                        def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
+                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get))
+                ]
+                .def(constructor<int>())
+                .property("isValid", &LuaProxy::BGO::isValid)
 			];
 	}
 }

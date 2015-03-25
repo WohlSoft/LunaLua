@@ -572,6 +572,9 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBGO.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
