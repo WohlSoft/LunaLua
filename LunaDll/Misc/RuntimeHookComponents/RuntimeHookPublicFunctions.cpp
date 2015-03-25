@@ -16,9 +16,7 @@ void showSMBXMessageBox(std::string message)
     typedef void nativeMsgFunc(unsigned int*);
     nativeMsgFunc* theNativeMsgFunc = (nativeMsgFunc*)GF_MSGBOX;
 
-
-    VB6StrPtr nativeMsg = VB6StrPtr(message);
-    *(VB6StrPtr*)&(GM_STR_MSGBOX) = nativeMsg;
+    *(VB6StrPtr*)&(GM_STR_MSGBOX) = message;
 
     unsigned int arg1 = 1;
     theNativeMsgFunc(&arg1);
