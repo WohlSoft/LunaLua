@@ -50,26 +50,26 @@ bool* LuaHelper::generateFilterTable(lua_State* L, luabind::object theFilter, in
     bool* filterTable = (bool*)calloc(mallocVal, sizeof(bool));
 
     if (luabind::type(theFilter) == LUA_TNUMBER){
-        int theBgoID = luabind::object_cast<int>(theFilter);
+        int theID = luabind::object_cast<int>(theFilter);
 
-        if (theBgoID == -1){
+        if (theID == -1){
             memset(&filterTable, true, mallocVal*sizeof(bool));
         }
         else{
-            if (theBgoID < minVal || theBgoID > maxVal){
-                throw new LuaHelper::invalidIDException(theBgoID);
+            if (theID < minVal || theID > maxVal){
+                throw new LuaHelper::invalidIDException(theID);
             }
-            filterTable[theBgoID] = true;
+            filterTable[theID] = true;
         }
     }
     else if (luabind::type(theFilter) == LUA_TTABLE){
         for (luabind::iterator i(theFilter), end; i != end; ++i)
         {
-            int theBgoID = luabind::object_cast<int>((luabind::object)*i);
-            if (theBgoID < minVal || theBgoID > maxVal){
-                throw new LuaHelper::invalidIDException(theBgoID);
+            int theID = luabind::object_cast<int>((luabind::object)*i);
+            if (theID < minVal || theID > maxVal){
+                throw new LuaHelper::invalidIDException(theID);
             }
-            filterTable[theBgoID] = true;
+            filterTable[theID] = true;
         }
     }
     else{
