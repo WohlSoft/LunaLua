@@ -1,10 +1,9 @@
-#include "../../Defines.h"
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/BGOs.h"
 
 unsigned short LuaProxy::BGO::count()
 {
-    return GM_BGO_COUNT;
+    return ::SMBX_BGO::Count();
 }
 
 luabind::object LuaProxy::BGO::get(lua_State* L)
@@ -53,7 +52,7 @@ luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
     luabind::object retBGOs = luabind::newtable(L);
     int bgoIndex = 1;
 
-    for (int i = 0; i < GM_BGO_COUNT; i++) {
+    for (int i = 0; i < ::SMBX_BGO::Count(); i++) {
         SMBX_BGO* thisnpc = ::SMBX_BGO::Get(i);
         if (thisnpc != NULL && lookupTableBgoID[thisnpc->id]) {
             retBGOs[bgoIndex++] = LuaProxy::BGO(i);
@@ -70,7 +69,7 @@ LuaProxy::BGO::BGO(unsigned short index)
 
 bool LuaProxy::BGO::isValid() const
 {
-    return (m_index < GM_BGO_COUNT);
+    return (m_index < ::SMBX_BGO::Count());
 }
 
 
