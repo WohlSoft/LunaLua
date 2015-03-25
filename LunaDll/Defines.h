@@ -122,9 +122,20 @@ enum PRIORITY {
 #define GM_FULLDIR          *(DWORD*)0x00B2C61C     // Full path to current world dir
 #define GM_CUR_LVL          *(WORD*)0x00B2C6D8
 
+// Background objects
+#define GM_BGO_COUNT        *(WORD*)0x00B25958
+#define GM_BGOS_PTR         *(DWORD*)0x00B259B0
+
+// Warps
+#define GM_WARP_COUNT       *(WORD*)0x00B258E2
+#define GM_WARPS_PTR        *(DWORD*)0x00B258F4
+
+// Water/Quicksand areas
+#define GM_WATER_AREA_COUNT *(WORD*)0x00B25700
+#define GM_WATER_AREAS_PTR  *(DWORD*)0x00B256F4
+
 // Layers
 #define GM_LAYER_UNK_PTR    *(DWORD*)0x00B259E8
-#define GM_LAYER_EX_PTR     *(DWORD*)0x00B259B0
 #define GM_LAYER_ARRAY_PTR  *(DWORD*)0x00B2C6B0
 
 // Events
