@@ -245,9 +245,12 @@ namespace LuaProxy {
         static int count();
         static luabind::object get(lua_State* L);
         static luabind::object get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L);
+        static LuaProxy::NPC spawn(short npcid, double x, double y, short section, lua_State* L);
+        static LuaProxy::NPC spawn(short npcid, double x, double y, short section, bool respawn, lua_State* L);
+        static LuaProxy::NPC spawn(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
 
         NPC (int index);
-		int id(lua_State* L) const;
+        int id(lua_State* L) const;
 		float direction(lua_State* L) const;
         void setDirection(float direction, lua_State* L);
 		double x(lua_State* L) const;
@@ -284,7 +287,8 @@ namespace LuaProxy {
 		bool isValid_throw(lua_State *L) const;
 		//not bound functions
 		void* getNativeAddr() const;
-	private:
+
+    private:
         int m_index;
     };
 

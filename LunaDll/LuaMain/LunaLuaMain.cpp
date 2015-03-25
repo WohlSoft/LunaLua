@@ -428,7 +428,10 @@ void CLunaLua::bindAll()
                 .scope[ //static functions
                     def("count", &LuaProxy::NPC::count),
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::NPC::get),
-                    def("get", (luabind::object(*)(luabind::object, luabind::object, lua_State* L))&LuaProxy::NPC::get)
+                    def("get", (luabind::object(*)(luabind::object, luabind::object, lua_State* L))&LuaProxy::NPC::get),
+                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
+                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
                 ]
                 
 
