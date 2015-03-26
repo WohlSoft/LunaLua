@@ -168,6 +168,18 @@ struct SMBXAnimation{
     short npcID;                //User by yoshi egg and ludwig (somehow)
     short onlyDrawMask;         //Only draw mask: Is used by the cheat "shadowstar" / "ghostytime"
     short unknown42;
+
+    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
+    static inline SMBXAnimation* Get(unsigned short index) {
+        if (index >= GM_ANIM_COUNT) return NULL;
+        return &((SMBXAnimation*)GM_ANIM_PTR)[index];
+    }
+
+    static inline unsigned short Count() {
+        return GM_ANIM_COUNT;
+    }
+
+    static const short MAX_ID = 148;
 };
 #pragma pack(pop)
 

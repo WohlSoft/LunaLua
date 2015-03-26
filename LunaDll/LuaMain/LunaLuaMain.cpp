@@ -405,7 +405,15 @@ void CLunaLua::bindAll()
                 ],
 
 				class_<LuaProxy::Animation>("Animation")
-				.def(constructor<int>())
+                .scope[ //static functions
+                        def("count", &LuaProxy::Animation::count),
+                        def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Animation::get)),
+                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Animation::get)),
+                        def("spawn", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::Animation::spawnEffect), //DONE
+                        def("spawn", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::Animation::spawnEffect) //DONE
+                ]
+                
+                .def(constructor<int>())
 				.def("mem", static_cast<void (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Animation::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Animation::mem))
 				.property("id", &LuaProxy::Animation::id, &LuaProxy::Animation::setId)
@@ -629,7 +637,7 @@ void CLunaLua::bindAll()
 
                 class_<LuaProxy::BGO>("BGO")
                 .scope[ //static functions
-                    def("count", &LuaProxy::BGO::count),
+                        def("count", &LuaProxy::BGO::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get))
                 ]
@@ -702,16 +710,16 @@ void CLunaLua::bindAllDeprecated()
                 def("exitLevel", &LuaProxy::Level::exit), //DONE
                 def("winState", (unsigned short(*)())&LuaProxy::Level::winState), //DONE
                 def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
-                def("animations", &LuaProxy::animations),
-                def("getInput", &LuaProxy::Misc::getInput),
+                def("animations", &LuaProxy::animations), //DONE
+                def("getInput", &LuaProxy::Misc::getInput), //DONE
                 def("hud", &LuaProxy::Hud::activate), //DONE
                 def("getLevelFilename", &LuaProxy::Level::filename), //DONE
                 def("getLevelName", &LuaProxy::Level::name), //DONE
                 def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
                 def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
                 def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
-                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::spawnEffect),
-                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::spawnEffect)
+                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::spawnEffect), //DONE
+                def("spawnEffect", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::spawnEffect) //DONE
             ];
 
     }

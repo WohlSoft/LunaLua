@@ -2,6 +2,78 @@
 #include "../../SMBXInternal/Animation.h"
 #include "../../Misc/MiscFuncs.h"
 
+int LuaProxy::Animation::count()
+{
+    return SMBXAnimation::Count();
+}
+
+luabind::object LuaProxy::Animation::get(lua_State* L)
+{
+    return LuaHelper::getObjList(::SMBXAnimation::Count(), [](unsigned short i){ return LuaProxy::Animation(i); }, L);
+}
+
+luabind::object LuaProxy::Animation::get(luabind::object idFilter, lua_State* L)
+{
+    std::unique_ptr<bool> lookupTableEffectID;
+
+    try
+    {
+        lookupTableEffectID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::SMBXAnimation::MAX_ID));
+    }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid Effect-ID!\nNeed BGO-ID between 1-%d\nGot Effect-ID: %d", ::SMBXAnimation::MAX_ID, e->usedID());
+        return luabind::object();
+    }
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for EffectID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
+    }
+
+    return LuaHelper::getObjList(
+        ::SMBXAnimation::Count(),
+        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [&lookupTableEffectID](unsigned short i){
+        ::SMBXAnimation *bgo = ::SMBXAnimation::Get(i);
+        return (bgo != NULL) &&
+            (bgo->AnimationID <= ::SMBXAnimation::MAX_ID) && lookupTableEffectID.get()[bgo->AnimationID];
+    }, L);
+}
+
+LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, double y, lua_State* L)
+{
+    return spawnEffect(effectID, x, y, 1.0f, L);
+}
+
+LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L)
+{
+    typedef void animationFunc(short*, Momentum*, float*, short*, short*);
+    animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
+
+    if (effectID < 1 || effectID > SMBXAnimation::MAX_ID){
+        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-148\nGot Effect-ID: %d", effectID);
+        return LuaProxy::Animation(-1);
+    }
+
+    if (GM_ANIM_COUNT >= 996){
+        luaL_error(L, "Over 996 Effects, cannot spawn more!");
+        return LuaProxy::Animation(-1);
+    }
+
+    Momentum coor;                          //Arg 2
+    coor.x = x;
+    coor.y = y;            //Arg 3
+    short npcID = 0;                        //Arg 4
+    short onlyDrawMask = COMBOOL(false);    //Arg 5
+
+    spawnEffectFunc(&effectID, &coor, &animationFrame, &npcID, &onlyDrawMask);
+    return LuaProxy::Animation(GM_ANIM_COUNT - 1);
+}
+
+
+
+
 LuaProxy::Animation::Animation(int animationIndex)
 {
 	m_animationIndex = animationIndex;
