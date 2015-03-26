@@ -3,6 +3,7 @@
 #define Defines_hhhh
 
 #include <windows.h>
+#include "Misc/VB6StrPtr.h"
 
 #define LUNA_VERSION        8
 #define LUALUA_VERSION      "LUNALUA V0.7 BETA"
@@ -303,7 +304,7 @@ struct KeyMap{
 
 //      Arg1 = int* Killed NPC index
 //      Arg2 = NPCMOB* Killer NPC
-#define GF_NPC_KILL         0x00A315A0
+#define GF_NPC_CLEANUP      0x00A315A0
 
 //      No Args, Does convert every NPC to coins (Like player would win)
 #define GF_NPC_TO_COINS     0x00A3C580
@@ -333,6 +334,26 @@ struct KeyMap{
 //      Arg1 = VB6StrPtr* layerName
 //      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_HIDE_LAYER       0x00AA3730
+
+static void(*const native_print)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/) = (void(*)(VB6StrPtr*, short*, float*, float* ))GF_PRINT;
+
+static void(*const native_killPlayer)(short* /*playerIndex*/) = (void(*)(short*))GF_KILL_PLAYER;
+static void(*const native_harmPlayer)(short* /*playerIndex*/) = (void(*)(short*))GF_HARM_PLAYER;
+
+static void(*const native_playMusic)(short* /*section*/) = (void(*)(short*))GF_PLAY_MUSIC;
+static void(*const native_playSFX)(short* /*soundIndex*/) = (void(*)(short*))GF_PLAY_SFX;
+
+static void(*const native_npcToCoins)() = (void(*)())GF_NPC_TO_COINS;
+
+static void(*const native_runEffect)(short* /*EffectID*/, Momentum* /*coor*/, float* /*EffectFrame*/, short* /*npcID*/, short* /*showOnlyMask*/) = (void(*)(short*, Momentum*, float*, short*, short*))GF_RUN_ANIM;
+static void(*const native_addScoreEffect)(short* /*baseValue*/, Momentum* /*coor*/, short* /*factor*/) = (void(*)(short*, Momentum*, short*))GF_SCORE_RELEATED;
+
+static void(*const native_msgbox)(short* /*unkVal*/) = (void(*)(short*))GF_MSGBOX;
+
+static void(*const native_triggerEvent)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/) = (void(*)(VB6StrPtr*, short*))GF_TRIGGER_EVENT;
+
+static void(*const native_showLayer)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/) = (void(*)(VB6StrPtr*, short*))GF_SHOW_LAYER;
+static void(*const native_hideLayer)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/) = (void(*)(VB6StrPtr*, short*))GF_HIDE_LAYER;
 
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P

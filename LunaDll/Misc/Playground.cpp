@@ -28,12 +28,10 @@ void Playground::doPlaygroundStuff()
 
     }
 
-    typedef void hideLayer(VB6StrPtr* layerName, short*);
-    hideLayer* hideLayerFunc = (hideLayer*)GF_HIDE_LAYER;
     if (localCounter % 100 == 0){
         VB6StrPtr defLayer = "Default";
         short smoke = 0;
-        hideLayerFunc(&defLayer, &smoke);
+        native_hideLayer(&defLayer, &smoke);
     }
 }
 #endif
