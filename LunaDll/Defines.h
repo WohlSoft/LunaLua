@@ -258,42 +258,80 @@ struct KeyMap{
 ////////////////////////
 
 // Print using game's text function
-#define GF_PRINT            0x00951F50          // Arg4 = float* y, Arg3 = float* x, Arg2 = Int* fonttype, Arg1 = WCSTR* string
+
+//      Arg1 = WCSTR* string
+//      Arg2 = Int* fonttype
+//      Arg3 = float* x
+//      Arg4 = float* y
+#define GF_PRINT            0x00951F50
 
 // Start kill event for a player
-#define GF_KILL_PLAYER      0x009B66D0          // Arg1 = int* to Index of player
+//      Arg1 = int* to Index of player
+#define GF_KILL_PLAYER      0x009B66D0
 
-#define GF_HARM_PLAYER      0x009B51E0          // Arg1 = int* Index of player
+//      Arg1 = int* Index of player
+#define GF_HARM_PLAYER      0x009B51E0
 
-#define GF_INIT_NPC         0x00A03630          // Arg1 = int* Sprite ID, Arg2 = int* Unk flags, Arg3 = int* Unk
+//      Arg1 = int* Sprite ID
+//      Arg2 = int* Unk flags
+//      Arg3 = int* Unk
+#define GF_INIT_NPC         0x00A03630
 
-#define GF_UPDATE_NPC       0x00A3B680          // Arg1 = int* Index of NPC in NPC list
+//      Arg1 = int* Index of NPC in NPC list
+#define GF_UPDATE_NPC       0x00A3B680
 
-#define GF_PLAY_MUSIC       0x00A61B40          // Arg1 = int* Index of section containing music settings to play now
+//      Arg1 = int* Index of section containing music settings to play now
+#define GF_PLAY_MUSIC       0x00A61B40
 
-#define GF_PLAY_SFX         0x00A73FD0          // Arg1 = int* SoundIndex
+//      Arg1 = int* SoundIndex
+#define GF_PLAY_SFX         0x00A73FD0
 
-#define GF_MOB_BLOCK_COL    0x00994250          // Arg1 = POS* structure of player, POS* structure of block
-                                                // 1=Collision from top, 2=From right, 3=From bottom, 4=From left, 5=?
+//      Arg1 = POS* structure of player, POS* structure of block
+//      1=Collision from top, 2=From right, 3=From bottom, 4=From left, 5=?
+#define GF_MOB_BLOCK_COL    0x00994250
 
-#define GF_IS_ON_CAMERA     0x00993DE0          // Arg1 = int* (1)  Arg2 = POS* structure
+//      Arg1 = int* (1)
+//      Arg2 = Momentum* structure
+#define GF_IS_ON_CAMERA     0x00993DE0
 
-#define GF_TRIGGER_EVENT    0x00AA42D0          // Arg1 = wchar_t** name of event to start, Arg2 = short* [VB6 Bool] Force smoke (ignore Event setting) 
+//      Arg1 = wchar_t** name of event to start
+//      Arg2 = short* [VB6 Bool] Force smoke (ignore Event setting)
+#define GF_TRIGGER_EVENT    0x00AA42D0
 
-#define GF_BITBLT_CALL      0x004242D0          // Arg1
+//      Arg1
+#define GF_BITBLT_CALL      0x004242D0
 
-#define GF_NPC_KILL         0x00A315A0          // Arg1 = int* Killed NPC index  Arg2 = NPCMOB* Killer NPC
+//      Arg1 = int* Killed NPC index
+//      Arg2 = NPCMOB* Killer NPC
+#define GF_NPC_KILL         0x00A315A0
 
-#define GF_NPC_TO_COINS     0x00A3C580          // No Args, Does convert every NPC to coins (Like player would win)
+//      No Args, Does convert every NPC to coins (Like player would win)
+#define GF_NPC_TO_COINS     0x00A3C580
 
-#define GF_RUN_ANIM         0x009E7380          // Arg1 = int* Animation ID, Arg2 = coorStruct* Struct pointer to x,y, Arg3 = int* some sort of adress, Arg4 = int* Unknown (mostly 0), Arg5 = int* Unknown (mostly 0)
+//      Arg1 = short* Animation ID
+//      Arg2 = Momentum* (for x and y coor)
+//      Arg3 = float* Animation frame (NOTE: Not the direct frame of the gif-file)
+//      Arg4 = short* npcID (for yoshi egg)
+//      Arg5 = short* [VB 6 Bool] True, if only drawing the mask => Shadow effect
+#define GF_RUN_ANIM         0x009E7380
 
+//      Arg1 = short* Base score
+//      Arg2 = Momentum* (for x and y coor)
+//      Arg3 = short* Score factor
+//      Actually Arg1 and Arg3 will be multiplied
 #define GF_SCORE_RELEATED   0x008F80C0
 
+//      This function displays the native SMBX messagebox AND menu.
+//      To display you text you need to set GM_STR_MSGBOX before the call and reset it after the call.
+//      Arg1 = short* Some sort of type (mostly the value 1)
 #define GF_MSGBOX           0x008E54C0
 
+//      Arg1 = VB6StrPtr* layerName
+//      Arg2 = short* [VB 6 Bool] True, to display the smoke effect
 #define GF_SHOW_LAYER       0x00AA2760
 
+//      Arg1 = VB6StrPtr* layerName
+//      Arg2 = short* [VB 6 Bool] True, to display the smoke effect
 #define GF_HIDE_LAYER       0x00AA3730
 
 /*
