@@ -22,7 +22,7 @@ luabind::object LuaProxy::Animation::get(luabind::object idFilter, lua_State* L)
     }
     catch (LuaHelper::invalidIDException* e)
     {
-        luaL_error(L, "Invalid Effect-ID!\nNeed BGO-ID between 1-%d\nGot Effect-ID: %d", ::SMBXAnimation::MAX_ID, e->usedID());
+        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-%d\nGot Effect-ID: %d", ::SMBXAnimation::MAX_ID, e->usedID());
         return luabind::object();
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
@@ -33,11 +33,11 @@ luabind::object LuaProxy::Animation::get(luabind::object idFilter, lua_State* L)
 
     return LuaHelper::getObjList(
         ::SMBXAnimation::Count(),
-        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [](unsigned short i){ return LuaProxy::Animation(i); },
         [&lookupTableEffectID](unsigned short i){
-        ::SMBXAnimation *bgo = ::SMBXAnimation::Get(i);
-        return (bgo != NULL) &&
-            (bgo->AnimationID <= ::SMBXAnimation::MAX_ID) && lookupTableEffectID.get()[bgo->AnimationID];
+        ::SMBXAnimation *effect = ::SMBXAnimation::Get(i);
+        return (effect != NULL) &&
+            (effect->AnimationID <= ::SMBXAnimation::MAX_ID) && lookupTableEffectID.get()[effect->AnimationID];
     }, L);
 }
 
