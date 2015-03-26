@@ -224,6 +224,10 @@ namespace LuaProxy {
 
     class Layer{
     public:
+        static luabind::object get(lua_State *L);
+        static luabind::object get(const std::string& layerName, lua_State* L);
+        static luabind::object find(const std::string& layerName, lua_State* L);
+
         Layer (int layerIndex);
         VBStr layerName() const;
         float speedX() const;

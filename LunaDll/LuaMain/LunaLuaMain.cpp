@@ -430,7 +430,12 @@ void CLunaLua::bindAll()
                 .property("isValid", &LuaProxy::Animation::isValid),
 
 				class_<LuaProxy::Layer>("Layer")
-				.def(constructor<int>())
+                .scope[ //static functions
+                        def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Layer::get),
+                        def("get", (luabind::object(*)(const std::string& , lua_State* L))&LuaProxy::Layer::get),
+                        def("find", &LuaProxy::Layer::find)
+                ]
+                .def(constructor<int>())
 				.def("stop", &LuaProxy::Layer::stop)
 				.property("speedX", &LuaProxy::Layer::speedX, &LuaProxy::Layer::setSpeedX)
 				.property("speedY", &LuaProxy::Layer::speedY, &LuaProxy::Layer::setSpeedY)

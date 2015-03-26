@@ -9,12 +9,18 @@
 #pragma pack(push, 4)
 struct LayerControl {
 	short		IsStopped;		// 0xFFFF when moving, event ended?
-	short		Unknown1;
+	short		isHidden;
 	VB6StrPtr	ptLayerName;	// ptr to double zero terminated 2byte wide char string
 	int			Unknown2;       // Have a hunch +0x08 is a 16-bit value representing layer visibility, need to verify.
 
 	float		xSpeed;
 	float		ySpeed;
+
+    static inline LayerControl* Get(unsigned short index) {
+        if (index >= 100) return NULL;
+        return &((LayerControl*)GM_LAYER_ARRAY_PTR)[index];
+    }
+
 };
 #pragma pack(pop)
 
