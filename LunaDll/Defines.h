@@ -292,6 +292,10 @@ struct KeyMap{
 
 #define GF_MSGBOX           0x008E54C0
 
+#define GF_SHOW_LAYER       0x00AA2760
+
+#define GF_HIDE_LAYER       0x00AA3730
+
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P
 _O_Pub_Obj_Inf1_Event0x4                008BD900 P
