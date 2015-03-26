@@ -278,7 +278,7 @@ struct KeyMap{
 
 #define GF_IS_ON_CAMERA     0x00993DE0          // Arg1 = int* (1)  Arg2 = POS* structure
 
-#define GF_TRIGGER_EVENT    0x00AA42D0          // Arg1 = wchar_t** name of event to start, Arg2 = Int* Unknown (0 or -1)
+#define GF_TRIGGER_EVENT    0x00AA42D0          // Arg1 = wchar_t** name of event to start, Arg2 = short* [VB6 Bool] Force smoke (ignore Event setting) 
 
 #define GF_BITBLT_CALL      0x004242D0          // Arg1
 
