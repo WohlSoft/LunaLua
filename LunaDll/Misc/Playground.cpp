@@ -1,6 +1,7 @@
 #include "Playground.h"
 #include "../Defines.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "../Misc/VB6StrPtr.h"
 
 //Here you can add random crap if you want to test something
 #if COMPILE_PLAYGROUND
@@ -27,20 +28,12 @@ void Playground::doPlaygroundStuff()
 
     }
 
-    typedef void spawnEffect(short* id, Momentum* theMomentum, float* animationFrame, short* unknown1, short* unknown2);
-    spawnEffect* theSpawnEffectFunc = (spawnEffect*)GF_RUN_ANIM;
+    typedef void hideLayer(VB6StrPtr* layerName, short*);
+    hideLayer* hideLayerFunc = (hideLayer*)GF_HIDE_LAYER;
     if (localCounter % 100 == 0){
-        Momentum customMomentum;
-        ::PlayerMOB* pl = ::Player::Get(1);
-        memcpy((void*)&customMomentum, (void*)&pl->momentum, sizeof(Momentum));
-        customMomentum.y -= 100;
-        customMomentum.x += 100;
-
-        short the_id = 0x38;
-        float the_animationFrame = 5.0f;
-        short the_unknown1 = 20;
-        short the_unknown2 = -1;
-        theSpawnEffectFunc(&the_id, &customMomentum, &the_animationFrame, &the_unknown1, &the_unknown2);
+        VB6StrPtr defLayer = "Default";
+        short smoke = 0;
+        hideLayerFunc(&defLayer, &smoke);
     }
 }
 #endif

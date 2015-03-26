@@ -295,7 +295,7 @@ struct KeyMap{
 #define GF_IS_ON_CAMERA     0x00993DE0
 
 //      Arg1 = wchar_t** name of event to start
-//      Arg2 = short* [VB6 Bool] Force smoke (ignore Event setting)
+//      Arg2 = short* [VB6 Bool] Force no smoke (ignore Event setting)
 #define GF_TRIGGER_EVENT    0x00AA42D0
 
 //      Arg1
@@ -327,11 +327,11 @@ struct KeyMap{
 #define GF_MSGBOX           0x008E54C0
 
 //      Arg1 = VB6StrPtr* layerName
-//      Arg2 = short* [VB 6 Bool] True, to display the smoke effect
+//      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_SHOW_LAYER       0x00AA2760
 
 //      Arg1 = VB6StrPtr* layerName
-//      Arg2 = short* [VB 6 Bool] True, to display the smoke effect
+//      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_HIDE_LAYER       0x00AA3730
 
 /*
