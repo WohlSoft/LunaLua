@@ -227,7 +227,10 @@ void CLunaLua::bindAll()
 
             namespace_("Effects")[
                 def("screenGlow", &LuaProxy::Effects::screenGlow),
-                def("screenGlowNegative", &LuaProxy::Effects::screenGlowNegative)
+                def("screenGlowNegative", &LuaProxy::Effects::screenGlowNegative),
+                def("flipX", &LuaProxy::Effects::flipX),
+                def("flipY", &LuaProxy::Effects::flipY),
+                def("flipXY", &LuaProxy::Effects::flipXY)
             ],
 
             namespace_("Misc")[

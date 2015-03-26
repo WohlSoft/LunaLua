@@ -694,6 +694,9 @@ namespace LuaProxy {
     namespace Effects{
         void screenGlow(unsigned int color);
         void screenGlowNegative(unsigned int color);
+        void flipX();
+        void flipY();
+        void flipXY();
     }
 
     //Non-Member-Constructors:

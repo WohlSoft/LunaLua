@@ -3,12 +3,20 @@
 #include <mmintrin.h>
 
 // DRAW
-RenderEffectOp::RenderEffectOp() : effect_type(RNDEFF_ScreenGlow), blend_type(BLEND_Additive),  color(0x00000000), intensity(0) {}
+RenderEffectOp::RenderEffectOp() :
+    effect_type(RNDEFF_ScreenGlow),
+    blend_type(BLEND_Additive),
+    color(0x00000000),
+    intensity(0),
+    flip_type(FLIP_TYPE_NONE) {}
 
 void RenderEffectOp::Draw(Renderer* g) {
     switch(effect_type) {
     case RNDEFF_ScreenGlow:
         ScreenGlow(g);
+        break;
+    case RNDEFF_Flip:
+        Flip(g);
         break;
     default:
         break;
@@ -57,3 +65,24 @@ void RenderEffectOp::ScreenGlow(Renderer* g) {
 	}
 
 }
+
+
+// Flip
+void RenderEffectOp::Flip(Renderer* g) {
+    HDC hScreen = g->m_hScreenDC;
+
+    HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
+    if (!(ghGeneralDIB && ghMemDC && gpScreenBits)) return;
+
+    BitBlt(ghMemDC, 0, 0, 800, 600, hScreen, 0, 0, SRCCOPY);
+
+    StretchBlt(hScreen,
+        (flip_type & FLIP_TYPE_X) ? 800 : 0,
+        (flip_type & FLIP_TYPE_Y) ? 600 : 0,
+        (flip_type & FLIP_TYPE_X) ? -800 : 800,
+        (flip_type & FLIP_TYPE_Y) ? -600 : 600,
+        ghMemDC, 0, 0, 800, 600, SRCCOPY);
+
+    SelectObject(ghMemDC, hOld);
+}
+
