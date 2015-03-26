@@ -8,7 +8,7 @@ unsigned short LuaProxy::BGO::count()
 
 luabind::object LuaProxy::BGO::get(lua_State* L)
 {
-    return get(luabind::object(L, -1), L);
+    return LuaHelper::getObjList(::SMBX_BGO::Count(), [](unsigned short i){ return LuaProxy::BGO(i); }, L);
 }
 
 // TODO: Consider if there's a good way to use C++ templates to make it so
@@ -19,11 +19,11 @@ luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
 
     try
     {
-        lookupTableBgoID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, 292));
+        lookupTableBgoID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::SMBX_BGO::MAX_ID));
     }
     catch (LuaHelper::invalidIDException* e)
     {
-        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-190\nGot BGO-ID: %d", e->usedID());
+        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-%d\nGot BGO-ID: %d", ::SMBX_BGO::MAX_ID, e->usedID());
         return luabind::object();
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
@@ -31,18 +31,15 @@ luabind::object LuaProxy::BGO::get(luabind::object idFilter, lua_State* L)
         luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
         return luabind::object();
     }
-
-    luabind::object retBGOs = luabind::newtable(L);
-    int bgoIndex = 1;
-
-    for (int i = 0; i < ::SMBX_BGO::Count(); i++) {
-        SMBX_BGO* thisnpc = ::SMBX_BGO::Get(i);
-        if (thisnpc != NULL && lookupTableBgoID.get()[thisnpc->id]) {
-            retBGOs[bgoIndex++] = LuaProxy::BGO(i);
-        }
-    }
-
-    return retBGOs;
+    
+    return LuaHelper::getObjList(
+        ::SMBX_BGO::Count(),
+        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [&lookupTableBgoID](unsigned short i){
+            ::SMBX_BGO *bgo = ::SMBX_BGO::Get(i);
+            return (bgo != NULL) &&
+                   (bgo->id <= ::SMBX_BGO::MAX_ID) && lookupTableBgoID.get()[bgo->id];
+        }, L);
 }
 
 LuaProxy::BGO::BGO(unsigned short index)

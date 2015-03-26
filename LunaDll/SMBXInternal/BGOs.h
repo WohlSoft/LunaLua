@@ -22,6 +22,8 @@ struct SMBX_BGO {				// Length should be 0x38
     static inline unsigned short Count() {
         return GM_BGO_COUNT;
     }
+
+    static const short MAX_ID = 190;
 };
 #pragma pack(pop)
 

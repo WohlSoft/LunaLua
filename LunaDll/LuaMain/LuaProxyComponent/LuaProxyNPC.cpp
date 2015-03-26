@@ -14,7 +14,7 @@ int LuaProxy::NPC::count()
 
 luabind::object LuaProxy::NPC::get(lua_State* L)
 {
-    return get(luabind::object(L, -1), luabind::object(L, -1), L);
+    return LuaHelper::getObjList(GM_NPCS_COUNT, [](unsigned short i){ return LuaProxy::NPC(i); }, L);
 }
 
 luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L)
@@ -24,11 +24,11 @@ luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sec
 
     try
     {
-        lookupTableNpcID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, 292));
+        lookupTableNpcID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::NPC::MAX_ID));
     }
     catch (LuaHelper::invalidIDException* e)
     {
-        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", e->usedID());
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, e->usedID());
         return luabind::object();
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
@@ -52,19 +52,18 @@ luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sec
         return luabind::object();
     }
 
-    luabind::object retNPCs = luabind::newtable(L);
-    int npcIndex = 1;
-    
-    for (int i = 0; i < GM_NPCS_COUNT; i++) {
-        NPCMOB* thisnpc = ::NPC::Get(i);
-        if (lookupTableNpcID.get()[thisnpc->id]) {
-            if (lookupTableSectionID.get()[::NPC::GetSection(thisnpc)]) {
-                retNPCs[npcIndex++] = LuaProxy::NPC(i);
-            }
-        }
-    }
-    
-    return retNPCs;
+    return LuaHelper::getObjList(
+        GM_NPCS_COUNT,
+        [](unsigned short i){ return LuaProxy::NPC(i); },
+        [&lookupTableNpcID, &lookupTableSectionID](unsigned short i){
+            NPCMOB* thisnpc = ::NPC::Get(i);
+            if (thisnpc == NULL) return false;
+        
+            short id = thisnpc->id;
+            short section = ::NPC::GetSection(thisnpc);
+            return (id <= ::NPC::MAX_ID) && lookupTableNpcID.get()[id] &&
+                   (section <= 20) && lookupTableNpcID.get()[section];
+        }, L);
 }
 
 LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short section, lua_State* L)
