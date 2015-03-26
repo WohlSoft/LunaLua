@@ -225,6 +225,11 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Hud::placeSprite)
             ],
 
+            namespace_("Effects")[
+                def("screenGlow", &LuaProxy::Effects::screenGlow),
+                def("screenGlowNegative", &LuaProxy::Effects::screenGlowNegative)
+            ],
+
             namespace_("Misc")[
                 def("getInput", &LuaProxy::Misc::getInput)
             ],

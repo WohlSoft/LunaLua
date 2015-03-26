@@ -691,6 +691,11 @@ namespace LuaProxy {
         void placeSprite(int type, int imgResource, int xPos, int yPos);
     }
 
+    namespace Effects{
+        void screenGlow(unsigned int color);
+        void screenGlowNegative(unsigned int color);
+    }
+
     //Non-Member-Constructors:
     RECT newRECT();
     RECTd newRECTd();
