@@ -3,6 +3,49 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 
+
+
+
+int LuaProxy::Block::count()
+{
+    return ::Block::Count();
+}
+
+luabind::object LuaProxy::Block::get(lua_State* L)
+{
+    return LuaHelper::getObjList(::Block::Count(), [](unsigned short i){ return LuaProxy::Block(i); }, L);
+}
+
+luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
+{
+    std::unique_ptr<bool> lookupTableBlockID;
+
+    try
+    {
+        lookupTableBlockID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::Block::MAX_ID));
+    }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-%d\nGot BGO-ID: %d", ::Block::MAX_ID, e->usedID());
+        return luabind::object();
+    }
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
+    }
+
+    return LuaHelper::getObjList(
+        ::Block::Count(),
+        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [&lookupTableBlockID](unsigned short i){
+        ::Block *block = ::Block::Get(i);
+        return (block != NULL) &&
+            (block->BlockType <= ::Block::MAX_ID) && lookupTableBlockID.get()[block->BlockType];
+    }, L);
+}
+
+
 LuaProxy::Block::Block(int index) : m_index(index)
 {}
 

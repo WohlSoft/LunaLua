@@ -626,6 +626,11 @@ void CLunaLua::bindAll()
 #pragma endregion
 #endif
 				class_<LuaProxy::Block>("Block")
+                .scope[ //static functions
+                        def("count", &LuaProxy::Block::count),
+                        def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
+                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get)
+                ]
 				.def(constructor<int>())
 				.def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object&, lua_State*)>(&LuaProxy::Block::mem))
 				.def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Block::mem))

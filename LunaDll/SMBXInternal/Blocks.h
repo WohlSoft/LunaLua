@@ -41,6 +41,18 @@ struct Block {
     short               Unknown62;                          // 0x62
     short               Unknown64;                          // 0x64
     short               Unknown66;                          // 0x66
+
+    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
+    static inline ::Block* Get(unsigned short index) {
+        if (index >= GM_BLOCK_COUNT) return NULL;
+        return &((Block*)GM_BLOCKS_PTR)[index];
+    }
+
+    static inline unsigned short Count() {
+        return GM_BLOCK_COUNT;
+    }
+
+    static const short MAX_ID = 638;
 };
 #pragma pack(pop)
 
