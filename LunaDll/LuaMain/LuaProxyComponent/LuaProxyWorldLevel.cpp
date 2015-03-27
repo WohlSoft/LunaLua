@@ -44,6 +44,58 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
 }
 
 
+luabind::object LuaProxy::LevelObject::getByName(const std::string& levelName, lua_State* L)
+{
+    for (int i = 0; i < 400; ++i){
+        WorldLevel* theLevel = WorldLevel::Get(i);
+        if (!theLevel)
+            return luabind::object();
+        if (theLevel->levelTitle == levelName)
+            return luabind::object(L, LevelObject(i));
+    }
+    return luabind::object();
+}
+
+luabind::object LuaProxy::LevelObject::getByFilename(const std::string& levelFilename, lua_State* L)
+{
+    for (int i = 0; i < 400; ++i){
+        WorldLevel* theLevel = WorldLevel::Get(i);
+        if (!theLevel)
+            return luabind::object();
+        if (theLevel->levelFileName == levelFilename)
+            return luabind::object(L, LevelObject(i));
+    }
+    return luabind::object();
+}
+
+luabind::object LuaProxy::LevelObject::findByName(const std::string& levelName, lua_State* L)
+{
+    luabind::object levels = luabind::newtable(L);
+    for (int i = 0, j = 0; i < 400; ++i){
+        WorldLevel* theLevel = WorldLevel::Get(i);
+        if (!theLevel)
+            break;
+        if (((std::string)theLevel->levelTitle).find(levelName) != std::string::npos)
+            levels[++j] = LevelObject(i);
+    }
+    return levels;
+}
+
+luabind::object LuaProxy::LevelObject::findByFilename(const std::string& levelFilename, lua_State* L)
+{
+    luabind::object levels = luabind::newtable(L);
+    for (int i = 0, j = 0; i < 400; ++i){
+        WorldLevel* theLevel = WorldLevel::Get(i);
+        if (!theLevel)
+            break;
+        if (((std::string)theLevel->levelFileName).find(levelFilename) != std::string::npos)
+            levels[++j] = LevelObject(i);
+    }
+    return levels;
+}
+
+
+
 LuaProxy::LevelObject::LevelObject(int index) : m_index(index)
 {}
 

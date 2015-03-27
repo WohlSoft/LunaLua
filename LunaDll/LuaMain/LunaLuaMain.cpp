@@ -375,7 +375,11 @@ void CLunaLua::bindAll()
                 .scope[ //static functions
                         def("count", &LuaProxy::LevelObject::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::LevelObject::get),
-                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::LevelObject::get)
+                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::LevelObject::get),
+                        def("getByName", &LuaProxy::LevelObject::getByName),
+                        def("getByFilename", &LuaProxy::LevelObject::getByFilename),
+                        def("findByName", &LuaProxy::LevelObject::findByName),
+                        def("findByFilename", &LuaProxy::LevelObject::findByFilename)
                 ]
 				.property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
 				.property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
