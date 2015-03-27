@@ -24,18 +24,18 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
     }
     catch (LuaHelper::invalidIDException* e)
     {
-        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-%d\nGot BGO-ID: %d", ::WorldLevel::MAX_ID, e->usedID());
+        luaL_error(L, "Invalid LevelObject-ID!\nNeed LevelObject-ID between 1-%d\nGot LevelObject-ID: %d", ::WorldLevel::MAX_ID, e->usedID());
         return luabind::object();
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
     {
-        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        luaL_error(L, "Invalid args for LevelObject-ID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
         return luabind::object();
     }
 
     return LuaHelper::getObjList(
         ::WorldLevel::Count(),
-        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [](unsigned short i){ return LuaProxy::WorldLevel(i); },
         [&lookupTableLevelObjectID](unsigned short i){
         ::WorldLevel *levelObject = ::WorldLevel::Get(i);
         return (levelObject != NULL) &&
