@@ -175,3 +175,33 @@ void fixup_WarpLimit()
 
 
 
+void fixup_Credits()
+{
+    const unsigned char nullStrMove[] = { 0xBA, 0x00, 0x3D, 0x42, 0x00 };
+    const unsigned char line1_createdBy[] = { 0xBA, 0x70, 0xA6, 0x42, 0x00 };
+    const unsigned char line2_andrewSpinks[] = { 0xBA, 0x8C, 0xA6, 0x42, 0x00 };
+    const unsigned char line3_redigit[] = { 0xBA, 0xAC, 0xA6, 0x42, 0x00 };
+
+    memcpy((void*)0x008F72D0, nullStrMove, sizeof(nullStrMove));  //Sorry Redigit, but I need that space
+    memcpy((void*)0x008F7300, nullStrMove, sizeof(nullStrMove));
+    memcpy((void*)0x008F7318, nullStrMove, sizeof(nullStrMove));
+
+
+    memcpy((void*)0x008F7288, line1_createdBy, sizeof(line1_createdBy)); //Still give you the "king" position
+    memcpy((void*)0x008F72A0, line2_andrewSpinks, sizeof(line2_andrewSpinks));
+    memcpy((void*)0x008F72B8, line3_redigit, sizeof(line3_redigit));
+
+
+    VB6StrPtr* text_HackedBy = new VB6StrPtr(std::string("Hacked By [LunaDll]: "));
+    VB6StrPtr* text_Kevsoft = new VB6StrPtr(std::string("Kevsoft"));
+    VB6StrPtr* text_Rednaxela = new VB6StrPtr(std::string("Rednaxela"));
+    VB6StrPtr* text_Kil = new VB6StrPtr(std::string("Kil"));
+    VB6StrPtr* text_Wohlstand = new VB6StrPtr(std::string("Wohlstand"));
+
+    memcpy((void*)0x008F7301, text_HackedBy, 4);
+    memcpy((void*)0x008F7319, text_Kevsoft, 4);
+    memcpy((void*)0x008F7331, text_Rednaxela, 4);
+    memcpy((void*)0x008F7349, text_Kil, 4);
+    memcpy((void*)0x008F7361, text_Wohlstand, 4);
+}
+
