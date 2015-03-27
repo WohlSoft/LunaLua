@@ -11,7 +11,7 @@ luabind::object LuaProxy::Layer::get(lua_State *L)
             break;
         if (l->ptLayerName == std::wstring(L""))
             break;
-        layers[i + 1] = new LuaProxy::Layer(i);
+        layers[i + 1] = LuaProxy::Layer(i);
     }
     return layers;
 }
@@ -25,7 +25,7 @@ luabind::object LuaProxy::Layer::get(const std::string& layerName, lua_State* L)
         if (l->ptLayerName == std::wstring(L""))
             break;
         if (l->ptLayerName == layerName)
-            return luabind::object(L, new LuaProxy::Layer(i));
+            return luabind::object(L, LuaProxy::Layer(i));
     }
     return luabind::object();
 }
@@ -40,7 +40,7 @@ luabind::object LuaProxy::Layer::find(const std::string& layerName, lua_State* L
         if (l->ptLayerName == std::wstring(L""))
             break;
         if (((std::string)l->ptLayerName).find(layerName) != std::string::npos){
-            foundLayers[++j] = new LuaProxy::Layer(i);
+            foundLayers[++j] = LuaProxy::Layer(i);
         }
     }
     return foundLayers;
