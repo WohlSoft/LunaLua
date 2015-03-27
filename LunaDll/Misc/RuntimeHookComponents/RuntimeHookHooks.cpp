@@ -434,7 +434,7 @@ extern void __stdcall checkLevelShutdown()
 
 extern void __stdcall handleError(int errCode)
 {
-    //ErrorReport::ReportVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
+    ErrorReport::ReportVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{
         CMP     ESI, 0x9C68
