@@ -35,7 +35,7 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
 
     return LuaHelper::getObjList(
         ::WorldLevel::Count(),
-        [](unsigned short i){ return LuaProxy::WorldLevel(i); },
+        [](unsigned short i){ return LuaProxy::LevelObject(i); },
         [&lookupTableLevelObjectID](unsigned short i){
         ::WorldLevel *levelObject = ::WorldLevel::Get(i);
         return (levelObject != NULL) &&
