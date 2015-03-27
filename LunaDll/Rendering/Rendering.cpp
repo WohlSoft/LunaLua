@@ -143,25 +143,10 @@ void Renderer::AddOp(RenderOp* op) {
 }
 
 // PRINT -- Calls SMBX's own print function. Only works during the HUD hook
-void Render::Print(std::wstring str, int font_type, float x, float y)
+void Render::Print(std::wstring str, short font_type, float x, float y)
 {
-    typedef int __stdcall printfunc(wchar_t**, int*, float*, float*);
-	int font_ptr = font_type;
-	float x_ptr = x;
-	float y_ptr = y;
-	wchar_t wbuf[1000];
-	ZeroMemory(wbuf, 2000);
-	wchar_t* wbufptr = wbuf+2;
-
-	// Place the length of the string in bytes first
-	int strlen = str.length() * 2;
-	wbuf[0] = strlen;
-
-	// Copy the string's bytes 4 bytes ahead of the len
-	memcpy((void*)&wbuf[2], str.data(), strlen);
-
-    printfunc* f = (printfunc*)GF_PRINT;
-    int ret = f((&wbufptr), &font_ptr, &x_ptr, &y_ptr);
+    VB6StrPtr text(str);
+    native_print(&text, &font_type, &x, &y);
 }
 
 // SAFE PRINT

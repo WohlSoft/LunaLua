@@ -262,7 +262,7 @@ namespace SMBXEvents {
 	short Count();
 
 	void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
-	void TriggerEvent(std::wstring EventName, int UnknownArg);
+    void TriggerEvent(std::wstring eventName, short forceNoSmoke);
 
 }
 

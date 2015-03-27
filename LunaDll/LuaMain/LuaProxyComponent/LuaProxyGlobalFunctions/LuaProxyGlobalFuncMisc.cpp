@@ -3,9 +3,7 @@
 
 void LuaProxy::Misc::npcToCoins()
 {
-    typedef void __stdcall npcToCoinsFunc();
-    npcToCoinsFunc* f = (npcToCoinsFunc*)GF_NPC_TO_COINS;
-    f();
+    native_npcToCoins();
 }
 
 LuaProxy::VBStr LuaProxy::Misc::getInput()

@@ -21,72 +21,6 @@ namespace LuaProxy {
         LFT_STRING = 6
     };
 
-#ifdef _MSC_VER //DEPRECATED STUFF
-#pragma region
-#endif
-
-    void loadHitboxes(int _character, int _powerup, const char *ini_file);
-    
-    //NPC functions [Moved as static function]
-    int totalNPCs();
-    luabind::object npcs(lua_State *L);
-    luabind::object findNPCs(int ID, int section, lua_State *L);
-    //Block functions [Moved as static function]
-    luabind::object blocks(lua_State *L);
-    luabind::object findblocks(int ID, lua_State *L);
-
-    //Memory functions
-    void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
-    luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
-
-    //SMBX trigger function [Moved as static function]
-    void triggerEvent(const char* evName);
-    //Music related
-    void playSFX(int index);
-    void playSFX(const char* filename);
-    void playSFXSDL(const char* filename);
-    void clearSFXBuffer();
-    void MusicOpen(const char *filename);
-    void MusicPlay();
-    void MusicPlayFadeIn(int ms);
-    void MusicStop();
-    void MusicStopFadeOut(int ms);
-    void MusicVolume(int vlm);
-    bool MusicIsPlaying();
-    bool MusicIsPaused();
-    bool MusicIsFading();
-    void playMusic(int section);
-    
-    //General global memory [Moved as Defines.*]
-    unsigned short gravity();
-    void gravity(unsigned short value);
-    unsigned short earthquake();
-    void earthquake(unsigned short value);
-    unsigned short jumpheight();
-    void jumpheight(unsigned short value);
-    unsigned short jumpheightBounce();
-    void jumpheightBounce(unsigned short value);
-    
-    //Layer functions [Moved as static function]
-    luabind::object findlayer(const char* layername, lua_State *L);
-    //Animation functions [Moved as static function]
-    luabind::object animations(lua_State* L);
-    //DEPRECATED
-    void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
-    void runAnimation(int id, double x, double y, double height, double width, int extraData);
-    void runAnimation(int id, double x, double y, int extraData);
-    //Load hitbox values for playable character
-    
-
-    //World
-    luabind::object levels(lua_State *L);
-    luabind::object findlevels(const std::string &toFindName, lua_State* L);
-    luabind::object findlevel(const std::string &toFindName, lua_State* L);
-
-#ifdef _MSC_VER
-#pragma endregion
-#endif
-
     //for runAnimation
     struct coorStruct{
         double x;
@@ -234,7 +168,12 @@ namespace LuaProxy {
         void setSpeedX(float speedX);
         float speedY() const;
         void setSpeedY(float speedY);
+        bool isHidden();
+        
         void stop();
+        void show(bool noSmoke);
+        void hide(bool noSmoke);
+        void toggle(bool noSmoke);
 
         int layerIndex() const;
     private:
@@ -728,9 +667,69 @@ namespace LuaProxy {
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
+
+    void loadHitboxes(int _character, int _powerup, const char *ini_file);
+
+    //NPC functions [Moved as static function]
+    int totalNPCs();
+    luabind::object npcs(lua_State *L);
+    luabind::object findNPCs(int ID, int section, lua_State *L);
+    //Block functions [Moved as static function]
+    luabind::object blocks(lua_State *L);
+    luabind::object findblocks(int ID, lua_State *L);
+
+    //Memory functions
+    void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
+    luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
+
+    //SMBX trigger function [Moved as static function]
+    void triggerEvent(const char* evName);
+    //Music related
+    void playSFX(int index);
+    void playSFX(const char* filename);
+    void playSFXSDL(const char* filename);
+    void clearSFXBuffer();
+    void MusicOpen(const char *filename);
+    void MusicPlay();
+    void MusicPlayFadeIn(int ms);
+    void MusicStop();
+    void MusicStopFadeOut(int ms);
+    void MusicVolume(int vlm);
+    bool MusicIsPlaying();
+    bool MusicIsPaused();
+    bool MusicIsFading();
+    void playMusic(int section);
+
+    //General global memory [Moved as Defines.*]
+    unsigned short gravity();
+    void gravity(unsigned short value);
+    unsigned short earthquake();
+    void earthquake(unsigned short value);
+    unsigned short jumpheight();
+    void jumpheight(unsigned short value);
+    unsigned short jumpheightBounce();
+    void jumpheightBounce(unsigned short value);
+
+    //Layer functions [Moved as static function]
+    luabind::object findlayer(const char* layername, lua_State *L);
+    //Animation functions [Moved as static function]
+    luabind::object animations(lua_State* L);
+    //DEPRECATED
+    void runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData);
+    void runAnimation(int id, double x, double y, double height, double width, int extraData);
+    void runAnimation(int id, double x, double y, int extraData);
+    //Load hitbox values for playable character
+
+
+    //World
+    luabind::object levels(lua_State *L);
+    luabind::object findlevels(const std::string &toFindName, lua_State* L);
+    luabind::object findlevel(const std::string &toFindName, lua_State* L);
+
 #ifdef _MSC_VER
 #pragma endregion
 #endif
+
 }
 
 #endif

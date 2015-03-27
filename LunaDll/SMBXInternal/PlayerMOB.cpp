@@ -174,16 +174,12 @@ void Player::SetHearts(PlayerMOB* player, int new_hearts) {
 
 
 // ACTIONS
-int Player::Kill(int* pIndex) {
-	typedef int __stdcall killfunc(int*);	
-	killfunc* f = (killfunc*)GF_KILL_PLAYER;
-	return f(pIndex);
+void Player::Kill(short* pIndex) {
+    native_killPlayer(pIndex);
 }
 
-int Player::Harm(int* pIndex) {
-	typedef int __stdcall harmfunc(int*);
-	harmfunc* f = (harmfunc*)GF_HARM_PLAYER;
-	return f(pIndex);
+void Player::Harm(short* pIndex) {
+    native_harmPlayer(pIndex);
 }
 
 

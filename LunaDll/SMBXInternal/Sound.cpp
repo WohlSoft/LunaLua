@@ -2,10 +2,8 @@
 #include "Sound.h"
 
 // PLAY SFX
-void SMBXSound::PlaySFX(int soundindex) {
-	typedef void __stdcall soundfunc(int*);
-	soundfunc* f = (soundfunc*)GF_PLAY_SFX;	
-	f(&soundindex);
+void SMBXSound::PlaySFX(short soundindex) {
+    native_playSFX(&soundindex);
 }
 
 // SET MUSIC
@@ -32,8 +30,6 @@ void SMBXSound::SetMusicPath(int section, std::wstring newpath) {
 }
 
 // PLAY MUSIC
-void SMBXSound::PlayMusic(int section) {
-	typedef void __stdcall musicfunc(int*);
-	musicfunc* f = (musicfunc*)GF_PLAY_MUSIC;	
-	f(&section);
+void SMBXSound::PlayMusic(short section) {
+    native_playMusic(&section);
 }

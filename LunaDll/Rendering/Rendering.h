@@ -54,7 +54,7 @@ namespace Render{
 	bool IsOnScreen(double x, double y, double w, double h);// Returns whether or not the digven rectangle is on screen this frame
 	void CalcCameraPos(double* p_X, double* p_Y);			// Tries to read smbx memory to return the camera coords in the 2 passed args
 
-	void Print(std::wstring, int font_type, float x, float y); // only works during post-draw phase!
+	void Print(std::wstring, short font_type, float x, float y); // only works during post-draw phase!
 
 }
 

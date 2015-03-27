@@ -437,6 +437,10 @@ void CLunaLua::bindAll()
                 ]
                 .def(constructor<int>())
 				.def("stop", &LuaProxy::Layer::stop)
+                .def("show", &LuaProxy::Layer::show)
+                .def("hide", &LuaProxy::Layer::hide)
+                .def("toggle", &LuaProxy::Layer::toggle)
+                .property("isHidden", &LuaProxy::Layer::isHidden)
 				.property("speedX", &LuaProxy::Layer::speedX, &LuaProxy::Layer::setSpeedX)
 				.property("speedY", &LuaProxy::Layer::speedY, &LuaProxy::Layer::setSpeedY)
 				.property("layerName", &LuaProxy::Layer::layerName),

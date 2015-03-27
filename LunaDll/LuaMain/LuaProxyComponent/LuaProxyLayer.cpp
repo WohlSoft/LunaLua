@@ -83,13 +83,43 @@ void LuaProxy::Layer::setSpeedY(float speedY)
 	::Layer::SetYSpeed(thislayer, speedY);
 }
 
+bool LuaProxy::Layer::isHidden()
+{
+    return (bool)::Layer::Get(m_layerIndex)->isHidden;
+}
+
+
 void LuaProxy::Layer::stop()
 {
 	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
 	::Layer::Stop(thislayer);
 }
 
+void LuaProxy::Layer::show(bool noSmoke)
+{
+    short noSmokeNative = COMBOOL(noSmoke);
+    native_showLayer(&::Layer::Get(m_layerIndex)->ptLayerName, &noSmokeNative);
+}
+
+void LuaProxy::Layer::hide(bool noSmoke)
+{
+    short noSmokeNative = COMBOOL(noSmoke);
+    native_hideLayer(&::Layer::Get(m_layerIndex)->ptLayerName, &noSmokeNative);
+}
+
+void LuaProxy::Layer::toggle(bool noSmoke)
+{
+    if (::Layer::Get(m_layerIndex)->isHidden == -1){
+        show(noSmoke);
+    }
+    else{
+        hide(noSmoke);
+    }
+}
+
+
 int LuaProxy::Layer::layerIndex() const
 {
-	return m_layerIndex;
+    return m_layerIndex;
 }
+

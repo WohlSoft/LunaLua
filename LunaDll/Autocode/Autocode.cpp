@@ -848,7 +848,7 @@ void Autocode::Do(bool init) {
 
 		// PREDICATES
 		case AT_Hurt: {
-			int tempint = 1;
+			short tempint = 1;
 			if(Target == 0)
 				Player::Harm(&tempint);
 				RunSelfOption();
@@ -856,7 +856,7 @@ void Autocode::Do(bool init) {
 					}
 
 		case AT_Kill: {
-			int tempint = 1;
+            short tempint = 1;
 			if(Target == 0)
 				Player::Kill(&tempint);
 				RunSelfOption();
@@ -1051,7 +1051,7 @@ void Autocode::DoPredicate(int target, int predicate) {
 
 	// Else, do predicate
 	AutocodePredicate pred = (AutocodePredicate)predicate;
-	int tempint = 1;
+    short tempint = 1;
 
 	switch (pred) {
 

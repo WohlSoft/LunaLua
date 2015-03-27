@@ -25,20 +25,7 @@ SMBXEvent* SMBXEvents::GetByName(std::wstring Name) {
 void SMBXEvents::TriggerEvent(int Index, int UnknownArg) {
 }
 
-void SMBXEvents::TriggerEvent(std::wstring str, int UnknownArg) {
-	char* dbg = "TRIGGER EVENT DBG";
-	typedef int __stdcall triggerfunc(wchar_t**, int*);			
-	wchar_t wbuf[250];
-	ZeroMemory(wbuf, 500);
-	wchar_t* wbufptr = wbuf+2;
-
-	// Place the length of the string in bytes first
-	int strlen = str.length() * 2;
-	wbuf[0] = strlen;
-
-	// Copy the string's bytes 4 bytes ahead of the len
-	memcpy((void*)&wbuf[2], str.data(), strlen);
-
-	triggerfunc* f = (triggerfunc*)GF_TRIGGER_EVENT;
-	int ret = f((&wbufptr), &UnknownArg);
+void SMBXEvents::TriggerEvent(std::wstring str, short forceNoSmoke) {
+    VB6StrPtr eventName(str);
+    native_triggerEvent(&eventName, &forceNoSmoke);
 }

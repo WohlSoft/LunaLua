@@ -493,7 +493,7 @@ void SpriteFunc::TriggerLunaEvent(CSprite* me, SpriteComponent* obj) {
 
 // HARM PLAYER
 void SpriteFunc::HarmPlayer(CSprite* me, SpriteComponent* obj) {	
-	int player = 1;
+	short player = 1;
 	Player::Harm(&player);
 }
 

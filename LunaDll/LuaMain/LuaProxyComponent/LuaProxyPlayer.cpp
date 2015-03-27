@@ -26,7 +26,7 @@ void LuaProxy::Player::kill(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	int tempint = m_index;
+	short tempint = m_index;
 	::Player::Kill(&tempint);
 }
 
@@ -34,7 +34,7 @@ void LuaProxy::Player::harm(lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	int tempint = m_index;
+	short tempint = m_index;
 	::Player::Harm(&tempint);
 }
 
