@@ -111,7 +111,7 @@ enum PRIORITY {
 #define GM_OVERWORLD_PTR    *(DWORD*)0x00B2C5C8
 
 // Overworld Level Array
-#define GM_LEVEL_COUNT      *(DWORD*)0x00B25960
+#define GM_LEVEL_COUNT      *(WORD*)0x00B25960
 #define GM_LEVEL_BASE       *(DWORD*)0x00B25994
 
 

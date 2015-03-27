@@ -583,6 +583,11 @@ namespace LuaProxy {
     class LevelObject
     {
     public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+
+
         LevelObject(int index);
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;

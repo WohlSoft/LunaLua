@@ -2,18 +2,42 @@
 #define WorldLevel_hhh
 
 #include "../Misc/VB6StrPtr.h"
+#include "../Defines.h"
 
-#pragma pack(push, 4)
-struct WorldLevel{
-	double XPos;						//+0
-	double YPos;						//+8
-	double unkUnused_height;			//+16
-	double unkUnused_width;				//+24
-	double unkUnused_speedX;			//+32
-	double unkUnused_speedY;			//+40
-	char padding1[20];					//+48
-	VB6StrPtr levelTitle;				//+68
-	char padding2[28];					//+72
+#pragma pack(push, 1)
+struct WorldLevel
+{
+    Momentum momentum;
+    short id;
+    short field_32;
+    VB6StrPtr levelFileName;
+    short topExitType;
+    short leftExitType;
+    short bottomExitType;
+    short rightExitType;
+    short field_40;
+    short field_42;
+    VB6StrPtr levelTitle;
+    short levelWarpNumber;
+    short field_4A;
+    double goToX;
+    double goToY;
+    short isPathBackground;
+    short isBigBackground;
+    short isGameStartPoint;
+    short isAlwaysVisible;
+
+    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
+    static inline WorldLevel* Get(unsigned short index) {
+        if (index >= GM_LEVEL_COUNT) return NULL;
+        return &((WorldLevel*)GM_LEVEL_BASE)[index];
+    }
+
+    static inline unsigned short Count() {
+        return GM_LEVEL_COUNT;
+    }
+
+    static const short MAX_ID = 32;
 };
 #pragma pack(pop)
 

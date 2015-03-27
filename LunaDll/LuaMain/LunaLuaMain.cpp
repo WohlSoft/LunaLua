@@ -372,6 +372,11 @@ void CLunaLua::bindAll()
 				.def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
 				class_<LuaProxy::LevelObject>("Level")
+                .scope[ //static functions
+                        def("count", &LuaProxy::LevelObject::count),
+                        def("get", (luabind::object(*)(lua_State* L))&LuaProxy::LevelObject::get),
+                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::LevelObject::get)
+                ]
 				.property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
 				.property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
 				.property("levelTitle", &LuaProxy::LevelObject::levelTitle)
@@ -705,7 +710,7 @@ void CLunaLua::bindAllDeprecated()
                 def("npcs", &LuaProxy::npcs), //DONE
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent),
-                def("playMusic", &LuaProxy::playMusic),
+                def("playMusic", &LuaProxy::playMusic), //DONE
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]
@@ -718,9 +723,9 @@ void CLunaLua::bindAllDeprecated()
                 def("runAnimation", (void(*)(int, double, double, double, double, int))&LuaProxy::runAnimation), //DONE [DEPRECATED]
                 def("runAnimation", (void(*)(int, double, double, int))&LuaProxy::runAnimation), //DONE
                 def("npcToCoins", &LuaProxy::Misc::npcToCoins), //DONE
-                def("blocks", &LuaProxy::blocks),
-                def("findblocks", &LuaProxy::findblocks),
-                def("findlayer", &LuaProxy::findlayer),
+                def("blocks", &LuaProxy::blocks),   //DONE
+                def("findblocks", &LuaProxy::findblocks),   //DONE
+                def("findlayer", &LuaProxy::findlayer),     //DONE
                 def("exitLevel", &LuaProxy::Level::exit), //DONE
                 def("winState", (unsigned short(*)())&LuaProxy::Level::winState), //DONE
                 def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
