@@ -378,7 +378,7 @@ void LuaProxy::jumpheightBounce(unsigned short value)
 
 void LuaProxy::runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData)
 {
-	typedef int animationFunc(int, int, int, int, int);
+	typedef int __stdcall animationFunc(int, int, int, int, int);
 	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
 
 	coorStruct tmp;
@@ -451,7 +451,7 @@ luabind::object LuaProxy::animations(lua_State *L)
 
 void LuaProxy::runAnimation(int id, double x, double y, double height, double width, int extraData)
 {
-	typedef int animationFunc(int, int, int, int, int);
+	typedef int __stdcall animationFunc(int, int, int, int, int);
 	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
 
 	coorStruct tmp;
@@ -469,7 +469,7 @@ void LuaProxy::runAnimation(int id, double x, double y, double height, double wi
 
 void LuaProxy::runAnimation(int id, double x, double y, int extraData)
 {
-	typedef int animationFunc(int, int, int, int, int);
+	typedef int __stdcall animationFunc(int, int, int, int, int);
 	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
 
 	coorStruct tmp;
@@ -647,7 +647,7 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, lu
 
 LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L)
 {
-    typedef void animationFunc(short*, Momentum*, float*, short*, short*);
+    typedef void __stdcall animationFunc(short*, Momentum*, float*, short*, short*);
     animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
 
     if (effectID < 1 || effectID > 148){

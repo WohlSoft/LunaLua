@@ -44,13 +44,13 @@ void showSMBXMessageBox(std::string message);
 /* Hooks                                                                */
 /************************************************************************/
 //The Init Hook will be run when "--patch" is executed.
-extern void InitHook();
+extern void __stdcall InitHook();
 //Force Termination when SMBX runs the end code.
 //Without this code, there is a chance of "zombie"-processes.
-extern void forceTermination();
-extern int LoadWorld();     //The World Load Code
-extern DWORD WorldLoop();       //The World Loop Code
-extern void* WorldRender();     //The World Render Code
+extern void __stdcall forceTermination();
+extern int __stdcall LoadWorld();     //The World Load Code
+extern DWORD __stdcall WorldLoop();       //The World Loop Code
+extern void* __stdcall WorldRender();     //The World Render Code
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);       //The Main Menu Render Code
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);       //The MCI Emulator Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter Code
@@ -60,8 +60,8 @@ extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 //extern short __stdcall GetKeyState(int vKey);
 //TriggerSMBXEvent cmp function
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
-extern void checkLevelShutdown();       //Level Shutdown Check Function
-extern void handleError(int errCode);       //Error Handler
+extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Function
+extern void __stdcall handleError(int errCode);       //Error Handler
 
 
 /************************************************************************/

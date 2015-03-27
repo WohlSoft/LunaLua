@@ -14,7 +14,7 @@ void Playground::doPlaygroundStuff()
     //2. Arg Momentum struct
     //3. Unknown
 
-    typedef void scoreFunc(short*, Momentum*, short*);
+    typedef void __stdcall scoreFunc(short*, Momentum*, short*);
     scoreFunc* theScoreFunc = (scoreFunc*)GF_SCORE_RELEATED;
     if (localCounter % 100 == 0){
         Momentum customMomentum;

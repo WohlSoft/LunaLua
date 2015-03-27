@@ -35,7 +35,7 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 
 // TEST COLLISION (SMBX BUILTIN)
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
-	typedef int colfunc(void*, void*);
+	typedef int __stdcall colfunc(void*, void*);
 	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
 	return f(&pMobPOS->momentum.x, &pBlockPOS->mometum.x);
 }

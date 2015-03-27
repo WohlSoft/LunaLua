@@ -13,7 +13,7 @@ void emulateVB6Error(int errorCode)
 
 void showSMBXMessageBox(std::string message)
 {
-    typedef void nativeMsgFunc(unsigned int*);
+    typedef void __stdcall nativeMsgFunc(unsigned int*);
     nativeMsgFunc* theNativeMsgFunc = (nativeMsgFunc*)GF_MSGBOX;
 
     *(VB6StrPtr*)&(GM_STR_MSGBOX) = message;

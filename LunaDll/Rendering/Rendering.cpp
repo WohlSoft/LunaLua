@@ -145,7 +145,7 @@ void Renderer::AddOp(RenderOp* op) {
 // PRINT -- Calls SMBX's own print function. Only works during the HUD hook
 void Render::Print(std::wstring str, int font_type, float x, float y)
 {
-    typedef int printfunc(wchar_t**, int*, float*, float*);
+    typedef int __stdcall printfunc(wchar_t**, int*, float*, float*);
 	int font_ptr = font_type;
 	float x_ptr = x;
 	float y_ptr = y;

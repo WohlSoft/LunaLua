@@ -100,7 +100,7 @@ void ParseArgs(const std::vector<std::string>& args)
         gStartupSettings.newLauncher = true;
 }
 
-static unsigned int LatePatch(void)
+static unsigned int __stdcall LatePatch(void)
 {
     /************************************************************************/
     /* Engine Limit patches                                                 */

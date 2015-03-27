@@ -48,7 +48,7 @@ LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, d
 
 LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L)
 {
-    typedef void animationFunc(short*, Momentum*, float*, short*, short*);
+    typedef void __stdcall animationFunc(short*, Momentum*, float*, short*, short*);
     animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
 
     if (effectID < 1 || effectID > SMBXAnimation::MAX_ID){

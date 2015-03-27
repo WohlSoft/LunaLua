@@ -3,7 +3,7 @@
 
 void LuaProxy::Misc::npcToCoins()
 {
-    typedef void npcToCoinsFunc();
+    typedef void __stdcall npcToCoinsFunc();
     npcToCoinsFunc* f = (npcToCoinsFunc*)GF_NPC_TO_COINS;
     f();
 }

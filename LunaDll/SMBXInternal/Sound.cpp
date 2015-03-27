@@ -3,7 +3,7 @@
 
 // PLAY SFX
 void SMBXSound::PlaySFX(int soundindex) {
-	typedef void soundfunc(int*);
+	typedef void __stdcall soundfunc(int*);
 	soundfunc* f = (soundfunc*)GF_PLAY_SFX;	
 	f(&soundindex);
 }
@@ -33,7 +33,7 @@ void SMBXSound::SetMusicPath(int section, std::wstring newpath) {
 
 // PLAY MUSIC
 void SMBXSound::PlayMusic(int section) {
-	typedef void musicfunc(int*);
+	typedef void __stdcall musicfunc(int*);
 	musicfunc* f = (musicfunc*)GF_PLAY_MUSIC;	
 	f(&section);
 }

@@ -27,7 +27,7 @@ void SMBXEvents::TriggerEvent(int Index, int UnknownArg) {
 
 void SMBXEvents::TriggerEvent(std::wstring str, int UnknownArg) {
 	char* dbg = "TRIGGER EVENT DBG";
-	typedef int triggerfunc(wchar_t**, int*);			
+	typedef int __stdcall triggerfunc(wchar_t**, int*);			
 	wchar_t wbuf[250];
 	ZeroMemory(wbuf, 500);
 	wchar_t* wbufptr = wbuf+2;

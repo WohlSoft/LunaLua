@@ -11,7 +11,7 @@
 
 #include "../SHMemServer.h"
 
-extern void InitHook()
+extern void __stdcall InitHook()
 {
     if (gStartupSettings.newLauncher){
         typedef bool(*RunProc)(void);
@@ -88,12 +88,12 @@ extern void InitHook()
     exitCall();*/
 }
 
-extern void forceTermination()
+extern void __stdcall forceTermination()
 {
     _exit(0);
 }
 
-extern int LoadWorld()
+extern int __stdcall LoadWorld()
 {
 #ifndef NO_SDL
     if (!episodeStarted)
@@ -141,7 +141,7 @@ extern int LoadWorld()
 #endif
 }
 
-extern DWORD WorldLoop()
+extern DWORD __stdcall WorldLoop()
 {
     gSavedVarBank.CheckSaveDeletion();
 
@@ -177,7 +177,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
-extern void* WorldRender()
+extern void* __stdcall WorldRender()
 {
     if (gShowDemoCounter)
         gDeathCounter.Draw();
@@ -410,7 +410,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 
 }
 
-extern void checkLevelShutdown()
+extern void __stdcall checkLevelShutdown()
 {
     if (GM_WORLD_MODE || GM_INTRO_MODE){
         if (gLunaLua.isValid()){
@@ -432,9 +432,9 @@ extern void checkLevelShutdown()
 }
 
 
-extern void handleError(int errCode)
+extern void __stdcall handleError(int errCode)
 {
-    ErrorReport::ReportVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
+    //ErrorReport::ReportVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{
         CMP     ESI, 0x9C68
