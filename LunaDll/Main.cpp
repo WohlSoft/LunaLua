@@ -164,17 +164,17 @@ int HUDHook()
 		OnHUDDraw();
 	}
 
-	// Overwrite return address? (skip hud drawing)
+	// Overwrite next instruction if we're skipping hud drawing,
+    // otherwise make sure the original is restored
 	if(gSkipSMBXHUD) {
-        #ifndef __MINGW32__
-		__asm {
-			MOV DWORD PTR DS: [ESP+8], 0x00987C10
-        }
-        #else
-        asm(".intel_syntax noprefix\n"
-        "MOV DWORD PTR DS: [ESP+8], 0x00987C10\n"
-        ".att_syntax\n");
-        #endif
+        // 0096C036 | E9 D5 BB 01 00 | jmp 987C10
+        // 0096C03B | 90 | nop
+        *((unsigned int*)0x96C036) = 0x01BBD5E9;
+        *((unsigned short*)0x96C03a) = 0x9000;
+    } else {
+        // 0096C036 | 0F 84 D1 8B 00 00 | je 974C0D
+        *((unsigned int*)0x96C036) = 0x8BD1840F;
+        *((unsigned short*)0x96C03a) = 0x0000;
     }
 
 	// Restore some code the hook overwrote
