@@ -214,8 +214,9 @@ void CLunaLua::bindAll()
 
             namespace_("Text")[
                 def("windowDebug", &LuaProxy::Text::windowDebug),
-                def("printText", (void(*)(const char*, int, int)) &LuaProxy::Text::print),
-                def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print)
+                def("print", (void(*)(const char*, int, int)) &LuaProxy::Text::print),
+                def("print", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print),
+                def("showMessageBox", &LuaProxy::Text::showMessageBox)
             ],
 
             namespace_("Hud")[
