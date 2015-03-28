@@ -643,6 +643,7 @@ namespace LuaProxy {
 
     namespace Misc{
         void npcToCoins();
+        void doPOW();
         VBStr getInput();
     }
 

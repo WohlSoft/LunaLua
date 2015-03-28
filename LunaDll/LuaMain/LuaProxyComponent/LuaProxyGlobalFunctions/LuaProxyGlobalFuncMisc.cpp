@@ -10,3 +10,9 @@ LuaProxy::VBStr LuaProxy::Misc::getInput()
 {
     return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
 }
+
+
+void LuaProxy::Misc::doPOW()
+{
+    native_doPow();
+}

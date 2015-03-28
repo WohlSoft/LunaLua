@@ -398,7 +398,8 @@ void CLunaLua::bindAll()
                 ],
                 
                 namespace_("Misc")[
-                    def("npcToCoins", &LuaProxy::Misc::npcToCoins)
+                    def("npcToCoins", &LuaProxy::Misc::npcToCoins),
+                    def("doPOW", &LuaProxy::Misc::doPOW)
                 ],
 
                 namespace_("Level")[

@@ -335,6 +335,8 @@ struct KeyMap{
 //      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_HIDE_LAYER       0x00AA3730
 
+#define GF_POW              0x009E4600
+
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
@@ -344,6 +346,7 @@ static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/)
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
 
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
+static const auto native_doPow          = (void(__stdcall *)())GF_POW;
 
 static const auto native_runEffect      = (void(__stdcall *)(short* /*EffectID*/, Momentum* /*coor*/, float* /*EffectFrame*/, short* /*npcID*/, short* /*showOnlyMask*/))GF_RUN_ANIM;
 static const auto native_addScoreEffect = (void(__stdcall *)(short* /*baseValue*/, Momentum* /*coor*/, short* /*factor*/))GF_SCORE_RELEATED;
