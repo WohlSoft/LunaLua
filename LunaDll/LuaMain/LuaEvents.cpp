@@ -11,6 +11,7 @@
 #include "../CustomSprites/CSprite.h"
 #include "../CustomSprites/CSpriteManager.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SdlMusic/MusicManager.h"
 
 std::vector<LuaEvents::SMBXEventQueueItem> LuaEvents::SMBXEventQueue;
 
@@ -108,6 +109,7 @@ void LuaEvents::processSectionEvents(lua_State *L, std::string eventTable)
         if(player && evData){
             if(evData->section != player->CurrentSection){
                 std::string curSecLoop = "onLoadSection";
+				MusicManager::setCurrentSection((int)player->CurrentSection);
 				luabind::call_function<void>(evTable[curSecLoop.c_str()], i); //onLoadSection
                 curSecLoop = curSecLoop.append(std::to_string((long long)player->CurrentSection));
 				luabind::call_function<void>(evTable[curSecLoop.c_str()], i); //onLoadSection#
