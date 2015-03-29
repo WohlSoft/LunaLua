@@ -647,8 +647,8 @@ namespace LuaProxy {
         VBStr getInput();
     }
 
-    namespace Hud{
-        void activate(bool activate);
+    namespace Graphics{
+        void activateHud(bool activateHud);
         //CSprite functions
         bool loadImage(const char* filename, int resNumber, int transColor);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);

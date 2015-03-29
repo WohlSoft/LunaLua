@@ -557,9 +557,6 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
       <Filter>Header Files\Misc\RuntimeHookComponents</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncHud.cpp">
-      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncLevel.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
@@ -576,6 +573,9 @@
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEffects.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncGraphics.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
   </ItemGroup>

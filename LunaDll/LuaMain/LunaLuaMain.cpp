@@ -219,11 +219,11 @@ void CLunaLua::bindAll()
                 def("showMessageBox", &LuaProxy::Text::showMessageBox)
             ],
 
-            namespace_("Hud")[
-                def("loadImage", &LuaProxy::Hud::loadImage),
-                def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Hud::placeSprite),
-                def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Hud::placeSprite),
-                def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Hud::placeSprite)
+            namespace_("Graphics")[
+                def("loadImage", &LuaProxy::Graphics::loadImage),
+                def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite)
             ],
 
             namespace_("Effects")[
@@ -411,8 +411,8 @@ void CLunaLua::bindAll()
                     def("name", &LuaProxy::Level::name)
                 ],
 
-                namespace_("Hud")[
-                    def("hud", &LuaProxy::Hud::activate)
+                namespace_("Graphics")[
+                    def("activateHud", &LuaProxy::Graphics::activateHud)
                 ],
 
 				class_<LuaProxy::Animation>("Animation")
@@ -682,10 +682,10 @@ void CLunaLua::bindAllDeprecated()
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
             def("printText", (void(*)(const char*, int, int)) &LuaProxy::Text::print), //DONE
             def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print), //DONE
-            def("loadImage", &LuaProxy::Hud::loadImage), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Hud::placeSprite), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Hud::placeSprite), //DONE
-            def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Hud::placeSprite), //DONE
+            def("loadImage", &LuaProxy::Graphics::loadImage), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite), //DONE
 
             /*************************Audio*****************************/
             //Old Audio stuff
@@ -737,7 +737,7 @@ void CLunaLua::bindAllDeprecated()
                 def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
                 def("animations", &LuaProxy::animations), //DONE
                 def("getInput", &LuaProxy::Misc::getInput), //DONE
-                def("hud", &LuaProxy::Hud::activate), //DONE
+                def("hud", &LuaProxy::Graphics::activateHud), //DONE
                 def("getLevelFilename", &LuaProxy::Level::filename), //DONE
                 def("getLevelName", &LuaProxy::Level::name), //DONE
                 def("spawnNPC", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)), //DONE
