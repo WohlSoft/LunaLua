@@ -235,7 +235,8 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Misc")[
-                def("getInput", &LuaProxy::Misc::getInput)
+                def("cheatBuffer", (std::string(*)())&LuaProxy::Misc::cheatBuffer),
+                    def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer)
             ],
 
 			//SDL_Mixer's Mix_Chunk structure
@@ -736,7 +737,7 @@ void CLunaLua::bindAllDeprecated()
                 def("winState", (unsigned short(*)())&LuaProxy::Level::winState), //DONE
                 def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
                 def("animations", &LuaProxy::animations), //DONE
-                def("getInput", &LuaProxy::Misc::getInput), //DONE
+                def("getInput", &LuaProxy::getInput), //DONE
                 def("hud", &LuaProxy::Graphics::activateHud), //DONE
                 def("getLevelFilename", &LuaProxy::Level::filename), //DONE
                 def("getLevelName", &LuaProxy::Level::name), //DONE

@@ -6,13 +6,18 @@ void LuaProxy::Misc::npcToCoins()
     native_npcToCoins();
 }
 
-LuaProxy::VBStr LuaProxy::Misc::getInput()
-{
-    return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
-}
-
-
 void LuaProxy::Misc::doPOW()
 {
     native_doPow();
+}
+
+
+std::string LuaProxy::Misc::cheatBuffer()
+{
+    return *(VB6StrPtr*)&(GM_INPUTSTR_BUF_PTR);
+}
+
+void LuaProxy::Misc::cheatBuffer(const luabind::object &value, lua_State* L)
+{
+    LuaHelper::assignVB6StrPtr((VB6StrPtr*)&(GM_INPUTSTR_BUF_PTR), value, L);
 }

@@ -644,7 +644,8 @@ namespace LuaProxy {
     namespace Misc{
         void npcToCoins();
         void doPOW();
-        VBStr getInput();
+        std::string cheatBuffer();
+        void cheatBuffer(const luabind::object &value, lua_State* L);
     }
 
     namespace Graphics{
@@ -680,6 +681,8 @@ namespace LuaProxy {
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 
     void loadHitboxes(int _character, int _powerup, const char *ini_file);
+
+    VBStr getInput();
 
     //NPC functions [Moved as static function]
     int totalNPCs();

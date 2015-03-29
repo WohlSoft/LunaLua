@@ -669,3 +669,8 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
     spawnEffectFunc(&effectID, &coor, &animationFrame, &npcID, &onlyDrawMask);
     return LuaProxy::Animation(GM_ANIM_COUNT - 1);
 }
+
+LuaProxy::VBStr LuaProxy::getInput()
+{
+    return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
+}
