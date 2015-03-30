@@ -74,7 +74,7 @@ bool renderNpcOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHei
 static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid)
 {
     HRESULT hr;
-    CComPtr<IWICImagingFactory> pFactory;
+    IWICImagingFactory *pFactory = NULL;
     CComPtr<IWICBitmapDecoder> pDecoder;
     CComPtr<IWICBitmapFrameDecode> pFrame = NULL;
     CComPtr<IWICFormatConverter> pConvertedFrame = NULL;
