@@ -11,6 +11,8 @@
 
 #include "../SHMemServer.h"
 
+#include "../../Rendering/RenderOverrides.h"
+
 extern void __stdcall InitHook()
 {
     if (gStartupSettings.newLauncher){
@@ -441,8 +443,8 @@ extern void __stdcall handleError(int errCode)
     }
 }
 
-static std::unordered_map<void*, unsigned short> npcHdcMap;
-static std::unordered_map<void*, unsigned short> npcMaskHdcMap;
+static std::unordered_map<HDC, unsigned short> npcHdcMap;
+static std::unordered_map<HDC, unsigned short> npcMaskHdcMap;
 
 extern void __stdcall loadLocalGfxHook()
 {
@@ -452,15 +454,18 @@ extern void __stdcall loadLocalGfxHook()
     npcHdcMap.clear();
     npcMaskHdcMap.clear();
     for (unsigned short i = 0; i < 300; i++) {
-        void* npcHdcPtr = (void*)((DWORD*)GM_GFX_NPC_PTR)[i];
+        HDC npcHdcPtr = ((HDC*)GM_GFX_NPC_PTR)[i];
         if (npcHdcPtr != NULL) {
             npcHdcMap[npcHdcPtr] = i + 1;
         }
-        void* npcHdcMaskPtr = (void*)((DWORD*)GM_GFX_NPC_MASK_PTR)[i];
+        HDC npcHdcMaskPtr = ((HDC*)GM_GFX_NPC_MASK_PTR)[i];
         if (npcHdcMaskPtr != NULL) {
             npcHdcMap[npcHdcMaskPtr] = i + 1;
         }
     }
+
+    // Load render override graphics
+    loadRenderOverrideGfx();
 }
 
 extern BOOL __stdcall npcMaskBitbltHook(
@@ -468,9 +473,13 @@ extern BOOL __stdcall npcMaskBitbltHook(
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     )
 {
-    std::unordered_map<void*, unsigned short>::const_iterator it = npcHdcMap.find(hdcSrc);
+    auto it = npcHdcMap.find(hdcSrc);
     if (it != npcHdcMap.end()) {
         unsigned short npcid = it->second;
+
+        if (renderNpcMaskOverride(hdcDest, nXDest, nYDest, nWidth, nHeight, npcid, nXSrc, nYSrc)) {
+            return -1;
+        }
     }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
@@ -481,9 +490,13 @@ extern BOOL __stdcall npcBitbltHook(
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     )
 {
-    std::unordered_map<void*, unsigned short>::const_iterator it = npcHdcMap.find(hdcSrc);
+    auto it = npcHdcMap.find(hdcSrc);
     if (it != npcHdcMap.end()) {
         unsigned short npcid = it->second;
+
+        if (renderNpcOverride(hdcDest, nXDest, nYDest, nWidth, nHeight, npcid, nXSrc, nYSrc)) {
+            return -1;
+        }
     }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
