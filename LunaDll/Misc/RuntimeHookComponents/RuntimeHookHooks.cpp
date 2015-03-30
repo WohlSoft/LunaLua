@@ -441,21 +441,50 @@ extern void __stdcall handleError(int errCode)
     }
 }
 
+static std::unordered_map<void*, unsigned short> npcHdcMap;
+static std::unordered_map<void*, unsigned short> npcMaskHdcMap;
+
+extern void __stdcall loadLocalGfxHook()
+{
+    native_loadLocalGfx();
+
+    // After loading local graphics, map graphics pointers back to NPC id
+    npcHdcMap.clear();
+    npcMaskHdcMap.clear();
+    for (unsigned short i = 0; i < 300; i++) {
+        void* npcHdcPtr = (void*)((DWORD*)GM_GFX_NPC_PTR)[i];
+        if (npcHdcPtr != NULL) {
+            npcHdcMap[npcHdcPtr] = i + 1;
+        }
+        void* npcHdcMaskPtr = (void*)((DWORD*)GM_GFX_NPC_MASK_PTR)[i];
+        if (npcHdcMaskPtr != NULL) {
+            npcHdcMap[npcHdcMaskPtr] = i + 1;
+        }
+    }
+}
 
 extern BOOL __stdcall npcMaskBitbltHook(
-    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     )
 {
-    // npcMaskHdcs = B2CAB4 len300
+    std::unordered_map<void*, unsigned short>::const_iterator it = npcHdcMap.find(hdcSrc);
+    if (it != npcHdcMap.end()) {
+        unsigned short npcid = it->second;
+    }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
 extern BOOL __stdcall npcBitbltHook(
-    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     )
 {
-    // npcImgHdcs  = B2CA98 len300
+    std::unordered_map<void*, unsigned short>::const_iterator it = npcHdcMap.find(hdcSrc);
+    if (it != npcHdcMap.end()) {
+        unsigned short npcid = it->second;
+    }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }

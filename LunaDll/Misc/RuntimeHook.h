@@ -62,6 +62,7 @@ extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Function
 extern void __stdcall handleError(int errCode);       //Error Handler
+extern void __stdcall loadLocalGfxHook();
 extern BOOL __stdcall npcMaskBitbltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall npcBitbltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 

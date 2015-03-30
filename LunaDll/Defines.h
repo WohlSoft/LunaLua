@@ -342,6 +342,8 @@ struct KeyMap{
 
 #define GF_POW              0x009E4600
 
+#define GF_LOAD_LOCAL_GFX   0x00ACD220
+
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
@@ -362,6 +364,8 @@ static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventN
 
 static const auto native_showLayer      = (void(__stdcall *)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/))GF_SHOW_LAYER;
 static const auto native_hideLayer      = (void(__stdcall *)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/))GF_HIDE_LAYER;
+
+static const auto native_loadLocalGfx   = (void(__stdcall *)())GF_LOAD_LOCAL_GFX;
 
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P
