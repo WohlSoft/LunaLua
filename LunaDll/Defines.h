@@ -198,6 +198,11 @@ enum PRIORITY {
 #define GM_NOSOUND              *(WORD*)0x00B2D734
 #define GM_FRAMESKIP            *(WORD*)0x00B2C684
 
+//Graphics Memory
+#define GM_GFX_NPC_PTR      *(DWORD*)0xB2CA98   // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
+#define GM_GFX_NPC_MASK_PTR *(DWORD*)0xB2CAB4   // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
+
+
 /////////////////////
 ///  -Assembly-   ///
 /////////////////////

@@ -440,3 +440,23 @@ extern void __stdcall handleError(int errCode)
         CMP     ESI, 0x9C68
     }
 }
+
+
+extern BOOL __stdcall npcMaskBitbltHook(
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    // npcMaskHdcs = B2CAB4 len300
+
+    return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+extern BOOL __stdcall npcBitbltHook(
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    // npcImgHdcs  = B2CA98 len300
+
+    return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
