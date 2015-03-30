@@ -6,6 +6,8 @@
 #include <wincodec.h>
 #include <wincodecsdk.h>
 
+#include <atlbase.h>
+
 static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid);
 static IWICImagingFactory* getWICFactory();
 static std::unordered_map<unsigned short, HBITMAP> npcGfxMap;
@@ -72,10 +74,10 @@ bool renderNpcOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHei
 static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid)
 {
     HRESULT hr;
-    IWICImagingFactory *pFactory = NULL;
-    IWICBitmapDecoder *pDecoder = NULL;
-    IWICBitmapFrameDecode *pFrame = NULL;
-    IWICFormatConverter *pConvertedFrame = NULL;
+    CComPtr<IWICImagingFactory> pFactory;
+    CComPtr<IWICBitmapDecoder> pDecoder;
+    CComPtr<IWICBitmapFrameDecode> pFrame = NULL;
+    CComPtr<IWICFormatConverter> pConvertedFrame = NULL;
     HBITMAP hDIBBitmap = NULL;
     unsigned int width = 0, height = 0;
 
@@ -145,15 +147,6 @@ static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid)
 cleanup:
     if (hdcScreen != NULL) {
         ReleaseDC(NULL, hdcScreen);
-    }
-    if (pConvertedFrame) {
-        pConvertedFrame->Release();
-    }
-    if (pFrame) {
-        pFrame->Release();
-    }
-    if (pDecoder) {
-        pDecoder->Release();
     }
     
     return hDIBBitmap;
