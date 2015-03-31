@@ -94,6 +94,9 @@
     <Filter Include="Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions">
       <UniqueIdentifier>{d9197f0d-581d-4438-95b6-4e01fc6bba07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Misc\Gui">
+      <UniqueIdentifier>{ec3acb73-5a65-4d13-95ec-4fd46441f1b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -287,6 +290,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\RenderOverrides.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Gui\GuiCrashNotify.h">
+      <Filter>Header Files\Misc\Gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -584,6 +593,9 @@
     <ClCompile Include="Rendering\RenderOverrides.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp">
+      <Filter>Header Files\Misc\Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
@@ -592,5 +604,10 @@
     <None Include="Misc\scrappedcode.txt">
       <Filter>Header Files\Misc</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LunaDll.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

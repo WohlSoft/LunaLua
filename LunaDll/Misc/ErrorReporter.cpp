@@ -5,6 +5,8 @@
 #include "../Defines.h"
 #include <array>
 
+#include "Gui/GuiCrashNotify.h"
+
 std::string ErrorReport::generateStackTrace()
 {
     CustomStackTracer cst;
@@ -22,12 +24,6 @@ void ErrorReport::writeErrorLog(const std::string &text)
 
     writeFile(text, smbxPath);
 }
-
-void ErrorReport::sendErrorReport(const std::string &url)
-{
-
-}
-
 
 
 std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
@@ -62,6 +58,13 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
     return errDesc;
 }
 
+void ErrorReport::manageErrorReport(const std::string &url, const std::string &errText)
+{
+    GuiCrashNotify notifier(errText);
+    notifier.show();
+}
+
+
 
 void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
 {
@@ -92,6 +95,7 @@ void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
     fullErrorDescription += generateStackTrace();
     
     writeErrorLog(fullErrorDescription);
+    manageErrorReport("", fullErrorDescription);
 }
 
 
