@@ -1,16 +1,17 @@
 #include "RenderOverrides.h"
 #include <unordered_map>
+#include <unordered_set>
 #include "../Defines.h"
 #include "../SMBXInternal/Level.h"
 
 #include <wincodec.h>
 #include <wincodecsdk.h>
 
-#include <atlbase.h>
-
-static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid);
+static HBITMAP loadLevelNpcGfx(const std::wstring& path, unsigned short npcid);
+static HBITMAP loadGfxAsBitmap(const std::wstring& filename);
 static IWICImagingFactory* getWICFactory();
-static std::unordered_map<unsigned short, HBITMAP> npcGfxMap;
+static std::unordered_map<HDC, HBITMAP> gfxOverrideMap;
+static std::unordered_set<HDC> gfxOverrideMaskSet;
 
 void loadRenderOverrideGfx()
 {
@@ -24,36 +25,42 @@ void loadRenderOverrideGfx()
     std::wstring levelFolder = worldPath + levelFile.substr(0, idx) + L'\\';
 
     // Clear existing npc graphics resources
-    for (auto kv : npcGfxMap) {
+    for (auto kv : gfxOverrideMap) {
         DeleteObject(kv.second);
     }
-    npcGfxMap.clear();
+    gfxOverrideMap.clear();
+    gfxOverrideMaskSet.clear();
 
     // Load new npc graphics resources
     for (unsigned short i = 1; i < 300; i++) {
+        HDC npcHdcPtr = ((HDC*)GM_GFX_NPC_PTR)[i - 1];
+        HDC npcHdcMaskPtr = ((HDC*)GM_GFX_NPC_MASK_PTR)[i - 1];
+        if (npcHdcPtr == NULL) continue;
+
         HBITMAP npbBmp = loadLevelNpcGfx(levelFolder, i);
         if (npbBmp != NULL) {
-            npcGfxMap[i] = npbBmp;
+            gfxOverrideMap[npcHdcPtr] = npbBmp;
+
+            if (npcHdcMaskPtr != NULL) {
+                gfxOverrideMaskSet.insert(npcHdcMaskPtr);
+            }
         }
     }
 }
 
-bool renderNpcMaskOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, unsigned short npcid, int nXSrc, int nYSrc)
+bool renderOverrideBitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    auto it = npcGfxMap.find(npcid);
-    if (it != npcGfxMap.end()) {
+    auto maskIt = gfxOverrideMaskSet.find(hdcSrc);
+    if (maskIt != gfxOverrideMaskSet.end())
+    {
+        // Don't render mask if we're overriding
         return true;
     }
 
-    return false;
-}
-
-bool renderNpcOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, unsigned short npcid, int nXSrc, int nYSrc)
-{
-    auto it = npcGfxMap.find(npcid);
-    if (it != npcGfxMap.end()) {
+    auto gfxIt = gfxOverrideMap.find(hdcSrc);
+    if (gfxIt != gfxOverrideMap.end()) {
         HDC hdc = CreateCompatibleDC(hdcDest);
-        SelectObject(hdc, it->second);
+        SelectObject(hdc, gfxIt->second);
 
         BLENDFUNCTION bf;
         bf.BlendOp = AC_SRC_OVER;
@@ -65,23 +72,29 @@ bool renderNpcOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHei
 
         DeleteDC(hdc);
 
+        // Don't run BitBlt if we've run AlphaBlend
         return true;
     }
 
+    // Otherwise, run BitBlt as normal
     return false;
 }
 
-static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid)
+static HBITMAP loadLevelNpcGfx(const std::wstring& path, unsigned short npcid)
+{
+    std::wstring filename = path + L"npc-" + std::to_wstring(npcid) + L".png";
+    return loadGfxAsBitmap(filename);
+}
+
+static HBITMAP loadGfxAsBitmap(const std::wstring& filename)
 {
     HRESULT hr;
     IWICImagingFactory *pFactory = NULL;
-    CComPtr<IWICBitmapDecoder> pDecoder;
-    CComPtr<IWICBitmapFrameDecode> pFrame = NULL;
-    CComPtr<IWICFormatConverter> pConvertedFrame = NULL;
+    IWICBitmapDecoder *pDecoder = NULL;
+    IWICBitmapFrameDecode *pFrame = NULL;
+    IWICFormatConverter *pConvertedFrame = NULL;
     HBITMAP hDIBBitmap = NULL;
     unsigned int width = 0, height = 0;
-
-    std::wstring filename = path + L"npc-" + std::to_wstring(npcid) + L".png";
     
     // Skip if it doesn't exist
     if (GetFileAttributesW(filename.c_str()) == INVALID_FILE_ATTRIBUTES) return NULL;
@@ -147,6 +160,16 @@ static HBITMAP loadLevelNpcGfx(std::wstring& path, unsigned short npcid)
 cleanup:
     if (hdcScreen != NULL) {
         ReleaseDC(NULL, hdcScreen);
+    }
+    // NOTE: Not using CComPtr here because this should be possible to build with VS Express
+    if (pConvertedFrame) {
+        pConvertedFrame->Release();
+    }
+    if (pFrame) {
+        pFrame->Release();
+    }
+    if (pDecoder) {
+        pDecoder->Release();
     }
     
     return hDIBBitmap;

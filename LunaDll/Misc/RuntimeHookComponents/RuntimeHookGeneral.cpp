@@ -186,12 +186,12 @@ void TrySkipPatch()
     *(BYTE*)(0x8C23D1) = INSTR_NOP;
 
     // Graphics Bitblt hooks
-    PATCH_FUNC(0x8C137E, &loadLocalGfxHook);
-    PATCH_FUNC(0x8D8BF1, &loadLocalGfxHook);
-    PATCH_FUNC(0x8D9611, &loadLocalGfxHook);
-    PATCH_FUNC(0x8DF52B, &loadLocalGfxHook);
-    PATCH_FUNC(0x8DFF7C, &loadLocalGfxHook);
-    NpcBitbltPatch();
+    PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);
+    PATCH_FUNC(0x8D8BF1, &LoadLocalGfxHook);
+    PATCH_FUNC(0x8D9611, &LoadLocalGfxHook);
+    PATCH_FUNC(0x8DF52B, &LoadLocalGfxHook);
+    PATCH_FUNC(0x8DFF7C, &LoadLocalGfxHook);
+    PATCH_JMP(0x4242D0, &BitBltHook);
 
     /************************************************************************/
     /* Import Table Patch                                                   */
@@ -200,140 +200,4 @@ void TrySkipPatch()
     *(void**)0x00401124 = (void*)&vbaR4VarHook;
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
-}
-
-static void NpcBitbltPatch(void)
-{
-    // Start of unkRender_909290 (909290 to 94DF08)
-
-    // NPC loop from 91274F to 915316
-    // Unknown purpose
-    PATCH_FUNC(0x912D2F, &npcMaskBitbltHook);
-    PATCH_FUNC(0x912FA5, &npcBitbltHook);
-    PATCH_FUNC(0x9132AF, &npcMaskBitbltHook);
-    PATCH_FUNC(0x9135A6, &npcBitbltHook);
-    PATCH_FUNC(0x913843, &npcMaskBitbltHook);
-    PATCH_FUNC(0x913AB9, &npcBitbltHook);
-    PATCH_FUNC(0x913D95, &npcMaskBitbltHook);
-    PATCH_FUNC(0x914084, &npcBitbltHook);
-    PATCH_FUNC(0x91434C, &npcMaskBitbltHook);
-    PATCH_FUNC(0x9145BE, &npcBitbltHook);
-    PATCH_FUNC(0x9149A3, &npcMaskBitbltHook);
-    PATCH_FUNC(0x914DA1, &npcBitbltHook);
-
-    // Unknown purpose
-    PATCH_FUNC(0x915DD7, &npcMaskBitbltHook);
-    PATCH_FUNC(0x915F96, &npcBitbltHook);
-    PATCH_FUNC(0x91615C, &npcMaskBitbltHook);
-    PATCH_FUNC(0x91631A, &npcBitbltHook);
-    PATCH_FUNC(0x91CEA6, &npcMaskBitbltHook);
-    PATCH_FUNC(0x91D064, &npcBitbltHook);
-    PATCH_FUNC(0x91D228, &npcMaskBitbltHook);
-    PATCH_FUNC(0x91D3E9, &npcBitbltHook);
-
-    // NPC loop from 91E1F9 to 91F802
-    // Coins and similar
-    PATCH_FUNC(0x91E81F, &npcMaskBitbltHook);
-    PATCH_FUNC(0x91EA78, &npcBitbltHook);
-    PATCH_FUNC(0x91EE7A, &npcMaskBitbltHook);
-    PATCH_FUNC(0x91F28D, &npcBitbltHook);
-
-    // NPC loop from 91F809 to 920040
-    // Unknown purpose, also calls unkPaintNPCOnScreen(009920D0)
-
-    // NPC loop from 920047 to 922D00
-    // Most normal non-foreground NPCs
-    PATCH_FUNC(0x9207EB, &npcMaskBitbltHook);
-    PATCH_FUNC(0x920A41, &npcBitbltHook);
-    PATCH_FUNC(0x920F74, &npcMaskBitbltHook);
-    PATCH_FUNC(0x921134, &npcBitbltHook);
-    PATCH_FUNC(0x921531, &npcMaskBitbltHook);
-    PATCH_FUNC(0x921944, &npcBitbltHook);
-    // Not NPC gfx: 0x9220D6
-    // Not NPC gfx: 0x922256
-    // Not NPC gfx: 0x9223B7
-    // Not NPC gfx: 0x922533
-
-    // NPC loop from 922D07 to 923786
-    // Not NPC gfx: 0x9232BA
-    // Not NPC gfx: 0x923737
-
-    // NPC loop from 927F28 to 928EA5
-    // Unknown purpose, also calls unkPaintNPCOnScreen(009920D0)
-    PATCH_FUNC(0x928411, &npcMaskBitbltHook);
-    PATCH_FUNC(0x928667, &npcBitbltHook);
-    PATCH_FUNC(0x928A66, &npcMaskBitbltHook);
-    PATCH_FUNC(0x928E7D, &npcBitbltHook);
-
-    // NPC loop from 929F88 to 92B428
-    // Foreground NPCs
-    PATCH_FUNC(0x92A3F3, &npcMaskBitbltHook);
-    PATCH_FUNC(0x92A64C, &npcBitbltHook);
-    PATCH_FUNC(0x92AA4E, &npcMaskBitbltHook);
-    PATCH_FUNC(0x92AE61, &npcBitbltHook);
-
-    // NPC loop from 92EC30 to 92FC3F
-    // Falling reserve powerups (npc.containedWithin == 2)
-    PATCH_FUNC(0x92EFD7, &npcMaskBitbltHook);
-    PATCH_FUNC(0x92F214, &npcBitbltHook);
-    PATCH_FUNC(0x92F5F9, &npcMaskBitbltHook);
-    PATCH_FUNC(0x92F9DB, &npcBitbltHook);
-
-    // Unknown purpose
-    PATCH_FUNC(0x93A2E4, &npcMaskBitbltHook);
-    PATCH_FUNC(0x93B05D, &npcMaskBitbltHook);
-    PATCH_FUNC(0x93BC5D, &npcMaskBitbltHook);
-
-    // NPC loop from 93BE67 to 93DB45
-    // Something to do with herbs and eggs
-    PATCH_FUNC(0x93C795, &npcMaskBitbltHook);
-    PATCH_FUNC(0x93CA6D, &npcBitbltHook);
-    PATCH_FUNC(0x93D4AE, &npcMaskBitbltHook);
-    PATCH_FUNC(0x93DB2E, &npcBitbltHook);
-
-    // Unknown purpose
-    PATCH_FUNC(0x93A5B0, &npcBitbltHook);
-    PATCH_FUNC(0x93B6BC, &npcBitbltHook);
-    PATCH_FUNC(0x93BE49, &npcBitbltHook);
-
-    // Unknown purpose
-    PATCH_FUNC(0x946B1F, &npcMaskBitbltHook);
-    PATCH_FUNC(0x946D5F, &npcBitbltHook);
-    PATCH_FUNC(0x94728E, &npcMaskBitbltHook);
-    PATCH_FUNC(0x947450, &npcBitbltHook);
-    PATCH_FUNC(0x947830, &npcMaskBitbltHook);
-    PATCH_FUNC(0x947C12, &npcBitbltHook);
-
-    // End of unkRender_909290
-
-    // unknown functions
-    PATCH_FUNC(0x96C7E6, &npcMaskBitbltHook);
-    PATCH_FUNC(0x96C995, &npcBitbltHook);
-    PATCH_FUNC(0x96E920, &npcMaskBitbltHook);
-    PATCH_FUNC(0x9754EE, &npcMaskBitbltHook);
-    PATCH_FUNC(0x9756AB, &npcBitbltHook);
-    PATCH_FUNC(0x97E178, &npcMaskBitbltHook);
-    PATCH_FUNC(0x97E327, &npcBitbltHook);
-    PATCH_FUNC(0x989EF0, &npcMaskBitbltHook);
-    PATCH_FUNC(0x98A059, &npcBitbltHook);
-    PATCH_FUNC(0x98A1AE, &npcMaskBitbltHook);
-    PATCH_FUNC(0x98A317, &npcBitbltHook);
-    PATCH_FUNC(0x99001F, &npcMaskBitbltHook);
-    PATCH_FUNC(0x990231, &npcBitbltHook);
-    PATCH_FUNC(0x9905B0, &npcMaskBitbltHook);
-    PATCH_FUNC(0x990943, &npcBitbltHook);
-
-    // Start of unkPaintNPCOnScreen (9920D0 until 992F40)
-    // Unknown purpose
-    PATCH_FUNC(0x992376, &npcMaskBitbltHook);
-    PATCH_FUNC(0x9924B8, &npcBitbltHook);
-    PATCH_FUNC(0x99260E, &npcMaskBitbltHook);
-    PATCH_FUNC(0x99276F, &npcBitbltHook);
-    PATCH_FUNC(0x9928BA, &npcMaskBitbltHook);
-    PATCH_FUNC(0x992A10, &npcBitbltHook);
-    PATCH_FUNC(0x992B5B, &npcMaskBitbltHook);
-    PATCH_FUNC(0x992CB1, &npcBitbltHook);
-    PATCH_FUNC(0x992DEE, &npcMaskBitbltHook);
-    PATCH_FUNC(0x992F2E, &npcBitbltHook);
-    // End of unkPaintNPCOnScreen
 }

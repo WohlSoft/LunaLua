@@ -4,7 +4,6 @@
 #include <windows.h>
 
 void loadRenderOverrideGfx();
-bool renderNpcMaskOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, unsigned short npcid, int nXSrc, int nYSrc);
-bool renderNpcOverride(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, unsigned short npcid, int nXSrc, int nYSrc);
+bool renderOverrideBitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 
 #endif
