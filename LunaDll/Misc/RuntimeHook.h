@@ -4,9 +4,6 @@
 
 #include "../Defines.h"
 #include "../Globals.h"
-#ifndef __MINGW32__
-#pragma comment(lib, "comsuppw.lib")
-#endif
 
 
 /************************************************************************/

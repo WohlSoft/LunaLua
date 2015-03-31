@@ -41,4 +41,6 @@ std::string generateTimestamp(std::string format);
 std::string generateTimestampForFilename();
 std::string generateTimestamp();
 
+void sendPOSTRequest(const std::string& server, const std::string& data);
+
 #endif

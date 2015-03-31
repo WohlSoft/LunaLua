@@ -297,6 +297,9 @@
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h">
       <Filter>Header Files\Misc\Gui</Filter>
     </ClInclude>
+    <ClInclude Include="httprequest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -4,7 +4,6 @@
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
 #include <array>
-
 #include "Gui/GuiCrashNotify.h"
 
 std::string ErrorReport::generateStackTrace()
@@ -62,6 +61,9 @@ void ErrorReport::manageErrorReport(const std::string &url, const std::string &e
 {
     GuiCrashNotify notifier(errText);
     notifier.show();
+    if (notifier.doSend){
+        sendPOSTRequest(url, errText);
+    }
 }
 
 
@@ -95,7 +97,8 @@ void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
     fullErrorDescription += generateStackTrace();
     
     writeErrorLog(fullErrorDescription);
-    manageErrorReport("", fullErrorDescription);
+    //Might make it dynamic in the future by an ini file....
+    manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", fullErrorDescription);
 }
 
 
