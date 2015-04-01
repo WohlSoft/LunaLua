@@ -1,0 +1,31 @@
+  sss. d s   sb d ss.  Ss   sS                                                                              
+d      S  S S S S    b   S S                                                                                
+Y      S   S  S S    P    S                                                                                 
+  ss.  S      S S sSS'    S                                                                                 
+     b S      S S    b    S                                                                                 
+     P S      S S    P   S S                                                                                
+` ss'  P      P P `SS  s"   "s                                                                              
+                                                                                                            
+d ss.  d sss     sSSs.   sSSSs   d s  b   sss. sss sssss d ss.  d       b   sSSs. sss sssss d sss   d ss    
+S    b S        S       S     S  S  S S d          S     S    b S       S  S          S     S       S   ~o  
+S    P S       S       S       S S   SS Y          S     S    P S       S S           S     S       S     b 
+S sS'  S sSSs  S       S       S S    S   ss.      S     S sS'  S       S S           S     S sSSs  S     S 
+S   S  S       S       S       S S    S      b     S     S   S  S       S S           S     S       S     P 
+S    S S        S       S     S  S    S      P     S     S    S  S     S   S          S     S       S    S  
+P    P P sSSss   "sss'   "sss"   P    P ` ss'      P     P    P   "sss"     "sss'     P     P sSSss P ss" 
+
+==== SMBX Recontstructed ====
+
+This folder contains reconstructed Methods from SMBX. They should be mostly 1:1, but readable C/C++ code.
+
+The following two headers can be used by other files:
+
+- ReconstructedDefines.h        Includes all reconstructed function with their settings
+
+Because this (sub)-project goes deep into SMBX, this file should not go outside SMBXInternal!
+
+The following headers are used outside of SMBXInternal:
+ Defines.h
+
+ Every Cpp File has information about the original overwritten method.
+

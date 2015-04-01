@@ -97,6 +97,12 @@
     <Filter Include="Header Files\Misc\Gui">
       <UniqueIdentifier>{ec3acb73-5a65-4d13-95ec-4fd46441f1b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SMBXInternal\Reconstructed">
+      <UniqueIdentifier>{5fd3c3a0-12a5-40e8-b460-4421e764474b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SMBXInternal\Reconstructed\Util">
+      <UniqueIdentifier>{69360985-d306-4c26-ae4e-631b886fba00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -299,6 +305,12 @@
     </ClInclude>
     <ClInclude Include="httprequest.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Reconstructed\ReconstructedDefines.h">
+      <Filter>Header Files\SMBXInternal\Reconstructed</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h">
+      <Filter>Header Files\SMBXInternal\Reconstructed\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -599,6 +611,9 @@
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp">
       <Filter>Header Files\Misc\Gui</Filter>
     </ClCompile>
+    <ClCompile Include="SMBXInternal\Reconstructed\Util\NpcToCoins.cpp">
+      <Filter>Header Files\SMBXInternal\Reconstructed\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
@@ -612,5 +627,10 @@
     <ResourceCompile Include="LunaDll.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SMBXInternal\Reconstructed\about.txt">
+      <Filter>Header Files\SMBXInternal\Reconstructed</Filter>
+    </Text>
   </ItemGroup>
 </Project>
