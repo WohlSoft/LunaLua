@@ -144,7 +144,7 @@ void MusicManager::resetSeizes()
 
 void MusicManager::setSeized(int section, bool state)
 {
-	if (section>21) return;
+	if (section>=21) return;
 	if (section<-1) return;
 
 	if (section == -1)

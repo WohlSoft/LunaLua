@@ -155,6 +155,7 @@ extern DWORD __stdcall WorldLoop()
 
     gSavedVarBank.SaveIfNeeded();
 
+#pragma warning(suppress: 28159)
     return GetTickCount();
 }
 
@@ -395,8 +396,8 @@ extern void __stdcall doEventsLevelEditorHook()
 
     }*/
 
-    HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
-    GetProcAddress(vmVB6Lib, "rtcDoEvents")();
+    /*HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
+    GetProcAddress(vmVB6Lib, "rtcDoEvents")();*/
 }
 
 
