@@ -118,6 +118,31 @@ namespace LuaProxy {
 
     std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
 
+    class Warp{
+    public:
+        static int count();
+        static luabind::object get(lua_State* L);
+
+        Warp(int warpIndex);
+        void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
+        luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
+
+        double entranceX() const;
+        void setEntranceX(double entranceX);
+        double entranceY() const;
+        void setEntranceY(double entranceY);
+
+        double exitX() const;
+        void setExitX(double exitX);
+        double exitY() const;
+        void setExitY(double exitY);
+
+        std::string levelFilename();
+        void setLevelFilename(const luabind::object &value, lua_State* L);
+    private:
+        int m_index;
+    };
+
     class Animation{
     public:
         static int count();

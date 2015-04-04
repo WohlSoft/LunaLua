@@ -620,6 +620,9 @@
     <ClCompile Include="Rendering\GLEngine.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

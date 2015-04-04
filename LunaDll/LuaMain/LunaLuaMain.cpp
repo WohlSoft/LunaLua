@@ -416,6 +416,22 @@ void CLunaLua::bindAll()
                     def("activateHud", &LuaProxy::Graphics::activateHud)
                 ],
 
+                class_<LuaProxy::Warp>("Warp")
+                .scope[
+                        def("count", &LuaProxy::Warp::count),
+                        def("get", &LuaProxy::Warp::get)
+                ]
+                .def(constructor<int>())
+                .def("mem", static_cast<void (LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Warp::mem))
+                .def("mem", static_cast<luabind::object(LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Warp::mem))
+                .property("exitX", &LuaProxy::Warp::exitX, &LuaProxy::Warp::setExitX)
+                .property("exitY", &LuaProxy::Warp::exitY, &LuaProxy::Warp::setExitY)
+                .property("entranceX", &LuaProxy::Warp::entranceX, &LuaProxy::Warp::setEntranceX)
+                .property("entranceY", &LuaProxy::Warp::entranceY, &LuaProxy::Warp::setEntranceY)
+                .property("levelFilename", &LuaProxy::Warp::levelFilename, &LuaProxy::Warp::setLevelFilename),
+
+
+
 				class_<LuaProxy::Animation>("Animation")
                 .scope[ //static functions
                         def("count", &LuaProxy::Animation::count),
