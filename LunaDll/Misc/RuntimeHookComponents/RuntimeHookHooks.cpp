@@ -12,6 +12,7 @@
 #include "../SHMemServer.h"
 
 #include "../../Rendering/RenderOverrides.h"
+#include "../../Rendering/GLEngine.h"
 
 extern void __stdcall InitHook()
 {
@@ -115,6 +116,7 @@ extern int __stdcall LoadWorld()
     Input::ResetAll();
 
     gLunaRender.ReloadScreenHDC();
+    g_GLEngine.ClearTextures();
 
     // Init var bank
     gSavedVarBank.TryLoadWorldVars();
@@ -176,7 +178,8 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
             return asyncBitBltProc(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
         }
     }
-    return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
 extern void* __stdcall WorldRender()
@@ -459,10 +462,37 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
+        if (g_GLEngine.IsEnabled()) {
+            g_GLEngine.EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+            return -1;
+        }
+
         if (renderOverrideBitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop)) {
             return -1;
         }
     }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+extern BOOL __stdcall StretchBltHook(
+    HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+    HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
+    DWORD dwRop
+    )
+{
+    // If we're copying from our rendering screen, we're done with the frame
+    if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
+    {
+        HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
+
+        // Run our OpenGL frame
+        g_GLEngine.WriteFrame(gpScreenBits);
+        BOOL ret = StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, ghMemDC, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+
+        SelectObject(ghMemDC, hOld);
+        return ret;
+    }
+
+    return StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 }

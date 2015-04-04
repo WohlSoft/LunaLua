@@ -300,6 +300,9 @@
     <ClInclude Include="httprequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\GLEngine.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -598,6 +601,9 @@
     </ClCompile>
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp">
       <Filter>Header Files\Misc\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GLEngine.cpp">
+      <Filter>Header Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

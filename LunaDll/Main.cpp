@@ -21,7 +21,7 @@
 #include "Misc/RuntimeHook.h"
 #include "SdlMusic/MusicManager.h"
 #include "Misc/Playground.h"
-
+#include "Rendering/GLEngine.h"
 
 #define PATCHIT 1
 
@@ -85,6 +85,7 @@ int OnLvlLoad() {
 
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
+    g_GLEngine.ClearTextures();
 
 	if(gLunaEnabled) {
 		// Load autocode

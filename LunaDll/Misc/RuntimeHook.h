@@ -61,6 +61,7 @@ extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Functio
 extern void __stdcall handleError(int errCode);       //Error Handler
 extern void __stdcall LoadLocalGfxHook();
 extern BOOL __stdcall BitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+extern BOOL __stdcall StretchBltHook(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, DWORD dwRop);
 
 /************************************************************************/
 /* Libs                                                                 */

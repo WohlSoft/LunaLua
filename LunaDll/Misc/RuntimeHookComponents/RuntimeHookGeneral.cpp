@@ -192,6 +192,7 @@ void TrySkipPatch()
     PATCH_FUNC(0x8DF52B, &LoadLocalGfxHook);
     PATCH_FUNC(0x8DFF7C, &LoadLocalGfxHook);
     PATCH_JMP(0x4242D0, &BitBltHook);
+    PATCH_JMP(0x424314, &StretchBltHook);
 
     /************************************************************************/
     /* Import Table Patch                                                   */
