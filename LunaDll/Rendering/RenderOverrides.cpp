@@ -158,10 +158,12 @@ static HBITMAP loadGfxAsBitmap(const std::wstring& filename)
     }
 
 cleanup:
+#pragma warning(suppress: 6001)
     if (hdcScreen != NULL) {
         ReleaseDC(NULL, hdcScreen);
     }
     // NOTE: Not using CComPtr here because this should be possible to build with VS Express
+#pragma warning(suppress: 6102)
     if (pConvertedFrame) {
         pConvertedFrame->Release();
     }

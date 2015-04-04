@@ -1,4 +1,5 @@
 #include "../RuntimeHook.h"
+#include "../../SMBXInternal/Reconstructed/ReconstructedDefines.h"
 #include <windows.h>
 
 BYTE* tracedownAddress(BYTE* addr){
@@ -205,3 +206,12 @@ void fixup_Credits()
     memcpy((void*)0x008F7361, text_Wohlstand, 4);
 }
 
+
+
+
+
+void fixup_NativeFuncs()
+{
+    patchWholeNativeFunction((void*)0xA3C580, 0x40B, (void*)&Reconstructed::Util::npcToCoins);
+    Reconstructed::Util::npcToCoins_setup();
+}

@@ -12,6 +12,7 @@ MciEmulator::~MciEmulator(void)
 {}
 
 
+#pragma warning(suppress: 6054)
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
 #ifndef NO_SDL
@@ -55,6 +56,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 				if(spCmd[2] == "Position"){
 					strcpy(lpstrReturnString, "00:04:12:45");
 				}else if(spCmd[2] == "Length"){
+#pragma warning(suppress: 6387)
+#pragma warning(suppress: 6386)
 					strcpy(lpstrReturnString, "52:12:11:12");
 				}
 			}
@@ -93,6 +96,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 	}
 	if(uReturnLength==2)
 	{
+#pragma warning(suppress: 6011)
 		lpstrReturnString[0] = '0';
 		lpstrReturnString[1] = '\0';
 	}

@@ -202,6 +202,78 @@ enum PRIORITY {
 #define GM_GFX_NPC_PTR      *(DWORD*)0xB2CA98   // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
 #define GM_GFX_NPC_MASK_PTR *(DWORD*)0xB2CAB4   // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
 
+static  short** npc_gfxoffsetx = (short**)0x00B25B70;
+static  short** npc_gfxoffsety = (short**)0x00B25B8C;
+static  short** npc_width = (short**)0x00B25BA8;
+static  short** npc_height = (short**)0x00B25BC4;
+static  short** npc_gfxwidth = (short**)0x00B25BE0;
+static  short** npc_gfxheight = (short**)0x00B25BFC;
+static  short** npc_speed = (short**)0x00B25C18;
+static  short** npc_isShell = (short**)0x00B25C34;
+static  short** npc_npcblock = (short**)0x00B25C50;
+static  short** npc_npcblocktop = (short**)0x00B25C6C;
+static  short** isInteractableNPC_ptr = (short**)0x00B25C88;
+static  short** isCoin_ptr = (short**)0x00B25CA4;
+static  short** isVineNPC_ptr = (short**)0x00B25CC0;
+static  short** isCollectableGoalNPC_ptr = (short**)0x00B25CDC;
+static  short** npc_isflying = (short**)0x00B25CF8;
+static  short** npc_isWaterNPC = (short**)0x00B25D14;
+static  short** npc_jumphurt = (short**)0x00B25D30;
+static  short** npc_noblockcollision = (short**)0x00B25D4C;
+static  short** npc_score = (short**)0x00B25D68;
+static  short** npc_playerblocktop = (short**)0x00B25D84;
+static  short** npc_grabtop = (short**)0x00B25DA0;
+static  short** npc_cliffturn = (short**)0x00B25DBC;
+static  short** npc_nohurt = (short**)0x00B25DD8;
+static  short** npc_playerblock = (short**)0x00B25DF4;
+static  short** npc_grabside = (short**)0x00B25E2C;
+static  short** isShoeNPC_ptr = (short**)0x00B25E48;
+static  short** isYoshiNPC_ptr = (short**)0x00B25E64;
+static  short** npc_noyoshi = (short**)0x00B25E9C;
+static  short** npc_foreground = (short**)0x00B25EB8;
+static  short** npc_isBot = (short**)0x00B25ED4;
+static  short** isVegetableNPC_ptr = (short**)0x00B25F0C;
+static  short** npc_nofireball = (short**)0x00B25F28;
+static  short** npc_noiceball = (short**)0x00B25F44;
+static  short** npc_nogravity = (short**)0x00B25F60;
+static  short** npc_frames = (short**)0x00B25F7C;
+static  short** npc_framespeed = (short**)0x00B25F98;
+static  short** npc_framestyle = (short**)0x00B25FB4;
+
+static  short** npcdef_gfxoffsetx = (short**)0x00B25FC0;
+static  short** npcdef_gfxoffsety = (short**)0x00B2621A;
+static  short** npcdef_width = (short**)0x00B26474;
+static  short** npcdef_height = (short**)0x00B266CE;
+static  short** npcdef_gfxwidth = (short**)0x00B26928;
+static  short** npcdef_gfxheight = (short**)0x00B26B82;
+static  short** npcdef_isShell = (short**)0x00B26DDC;
+static  short** npcdef_npcblock = (short**)0x00B27036;
+static  short** npcdef_npcblocktop = (short**)0x00B27290;
+static  short** npcdef_isInteractableNPC = (short**)0x00B274EA;
+static  short** npcdef_isCoin = (short**)0x00B27744;
+static  short** npcdef_isVine = (short**)0x00B2799E;
+static  short** npcdef_isCollectableGoal = (short**)0x00B27BF8;
+static  short** npcdef_isFlyingNPC = (short**)0x00B27E52;
+static  short** npcdef_isWaterNPC = (short**)0x00B280AC;
+static  short** npcdef_jumphurt = (short**)0x00B28306;
+static  short** npcdef_noblockcollision = (short**)0x00B28560;
+static  short** npcdef_score = (short**)0x00B287BA;
+static  short** npcdef_playerblocktop = (short**)0x00B28A14;
+static  short** npcdef_grabtop = (short**)0x00B28C6E;
+static  short** npcdef_cliffturn = (short**)0x00B28EC8;
+static  short** npcdef_nohurt = (short**)0x00B29122;
+static  short** npcdef_playerblock = (short**)0x00B2937C;
+static  short** npcdef_grabside = (short**)0x00B29830;
+static  short** npcdef_isShoeNPC = (short**)0x00B29A8A;
+static  short** npcdef_isYoshiNPC = (short**)0x00B29CE4;
+static  short** npcdef_noYoshi = (short**)0x00B2A198;
+static  short** npcdef_foreground = (short**)0x00B2A3F2;
+static  short** npcdef_isBot = (short**)0x00B2A64C;
+static  short** npcdef_isVegetableNPC = (short**)0x00B2AB00;
+static  short** npcdef_speed = (short**)0x00B2AD5C;
+static  short** npcdef_nofireball = (short**)0x00B2B210;
+static  short** npcdef_noiceball = (short**)0x00B2B46A;
+static  short** npcdef_nogravity = (short**)0x00B2B6C4;
 
 /////////////////////
 ///  -Assembly-   ///

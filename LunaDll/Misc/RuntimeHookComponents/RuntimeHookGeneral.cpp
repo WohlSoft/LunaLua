@@ -140,6 +140,7 @@ void TrySkipPatch()
     fixup_TypeMismatch13();
     fixup_ErrorReporting();
     fixup_Credits();
+    fixup_NativeFuncs();
 
     /************************************************************************/
     /* Set Hook                                                             */

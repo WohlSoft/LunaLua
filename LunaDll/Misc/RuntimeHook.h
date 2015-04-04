@@ -36,6 +36,7 @@ void TrySkipPatch();
 /************************************************************************/
 void emulateVB6Error(int errorCode);
 void showSMBXMessageBox(std::string message);
+extern inline void patchWholeNativeFunction(void* native_func, int sizeOfNativeFunc, void* newFunc);
 
 /************************************************************************/
 /* Hooks                                                                */
@@ -96,6 +97,7 @@ void fixup_TypeMismatch13();
 void fixup_ErrorReporting();
 void fixup_WarpLimit();
 void fixup_Credits();
+void fixup_NativeFuncs();
 
 
 //scraped for now..... D:

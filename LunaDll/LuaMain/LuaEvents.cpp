@@ -20,7 +20,7 @@ char LuaEvents::pressTest(short oldp, short newp)
     if(oldp == 0 && newp == -1)
         return 1;
 
-    if(oldp == -1 && oldp == 0)
+    if (oldp == -1 && newp == 0)
         return -1;
 
     return 0;

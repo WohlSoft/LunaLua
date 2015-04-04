@@ -19,3 +19,10 @@ void showSMBXMessageBox(std::string message)
     native_msgbox(&arg1);
     *(VB6StrPtr*)&(GM_STR_MSGBOX) = *(VB6StrPtr*)&(GM_STR_NULL);
 }
+
+
+extern void patchWholeNativeFunction(void* native_func, int sizeOfNativeFunc, void* newFunc)
+{
+    memset(native_func, INSTR_NOP, sizeOfNativeFunc);
+    PATCH_JMP((DWORD)native_func, newFunc);
+}

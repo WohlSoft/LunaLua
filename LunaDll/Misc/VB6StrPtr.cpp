@@ -42,7 +42,9 @@ void VB6StrPtr::operator=(const std::wstring &other) {
 	unsigned char* tmpVBString = (unsigned char*)malloc(sizeof(unsigned int) + sizeof(wchar_t)*(len + 1));
 
 	// Copy the string data, prefixing it with the length
+#pragma warning(suppress: 6011) //if we run out of memory, then it's lost anyway
 	*((unsigned int*)&tmpVBString[0]) = len * 2;
+#pragma warning(suppress: 6011)
 	memcpy(&tmpVBString[4], other.c_str(), sizeof(wchar_t)*(len + 1));
 
 	// Copy the temporary string using _vbaStrCopy

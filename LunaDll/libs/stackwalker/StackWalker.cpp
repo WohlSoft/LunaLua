@@ -726,6 +726,7 @@ private:
           LPVOID vData = malloc(dwSize);
           if (vData != NULL)
           {
+#pragma warning(suppress: 6388)
             if (GetFileVersionInfoA(szImg, dwHandle, dwSize, vData) != 0)
             {
               UINT len;
@@ -1262,6 +1263,7 @@ BOOL __stdcall StackWalker::myReadProcMem(
   {
     SIZE_T st;
     BOOL bRet = ReadProcessMemory(hProcess, (LPVOID) qwBaseAddress, lpBuffer, nSize, &st);
+#pragma warning(suppress: 6102) //API
     *lpNumberOfBytesRead = (DWORD) st;
     //printf("ReadMemory: hProcess: %p, baseAddr: %p, buffer: %p, size: %d, read: %d, result: %d\n", hProcess, (LPVOID) qwBaseAddress, lpBuffer, nSize, (DWORD) st, (DWORD) bRet);
     return bRet;
@@ -1342,6 +1344,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
   OSVERSIONINFOEXA ver;
   ZeroMemory(&ver, sizeof(OSVERSIONINFOEXA));
   ver.dwOSVersionInfoSize = sizeof(ver);
+#pragma warning(suppress: 28159) //API 
   if (GetVersionExA( (OSVERSIONINFOA*) &ver) != FALSE)
   {
     _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n", 
