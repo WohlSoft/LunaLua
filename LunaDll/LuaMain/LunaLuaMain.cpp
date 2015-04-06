@@ -684,6 +684,16 @@ void CLunaLua::bindAll()
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get))
                 ]
                 .def(constructor<int>())
+                .property("id", &LuaProxy::BGO::id, &LuaProxy::BGO::setId)
+                .property("isHidden", &LuaProxy::BGO::isHidden)
+                .property("x", &LuaProxy::BGO::x, &LuaProxy::BGO::setX)
+                .property("y", &LuaProxy::BGO::y, &LuaProxy::BGO::setY)
+                .property("width", &LuaProxy::BGO::width, &LuaProxy::BGO::setWidth)
+                .property("height", &LuaProxy::BGO::height, &LuaProxy::BGO::setHeight)
+                .property("speedX", &LuaProxy::BGO::speedX, &LuaProxy::BGO::setSpeedX)
+                .property("speedY", &LuaProxy::BGO::speedY, &LuaProxy::BGO::setSpeedY)
+                .property("layerName", &LuaProxy::BGO::layerName, &LuaProxy::BGO::setLayerName)
+                .property("layer", &LuaProxy::BGO::layer, &LuaProxy::BGO::setLayer)
                 .property("isValid", &LuaProxy::BGO::isValid)
 			];
 	}
