@@ -639,6 +639,31 @@ namespace LuaProxy {
         static luabind::object get(luabind::object idFilter, lua_State* L);
 
         BGO(unsigned short index);
+
+        bool isHidden(lua_State* L) const;
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        double speedX(lua_State* L) const;
+        void setSpeedX(double speedX, lua_State* L);
+        double speedY(lua_State* L) const;
+        void setSpeedY(double speedY, lua_State* L);
+
+        std::string layerName(lua_State* L) const;
+        void setLayerName(const luabind::object& obj, lua_State* L);
+        luabind::object layer(lua_State* L) const;
+        void setLayer(const Layer& layer, lua_State* L);
+
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;
     private:

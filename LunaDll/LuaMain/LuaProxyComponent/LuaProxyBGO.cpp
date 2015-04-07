@@ -47,6 +47,147 @@ LuaProxy::BGO::BGO(unsigned short index)
     m_index = index;
 }
 
+
+bool LuaProxy::BGO::isHidden(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)SMBX_BGO::Get(m_index)->isHidden;
+}
+
+short LuaProxy::BGO::id(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->id;
+}
+
+void LuaProxy::BGO::setId(short id, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->id = id;
+}
+
+double LuaProxy::BGO::x(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.x;
+}
+
+void LuaProxy::BGO::setX(double x, lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.x = x;
+}
+
+double LuaProxy::BGO::y(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.y;
+}
+
+void LuaProxy::BGO::setY(double y, lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.y = y;
+}
+
+double LuaProxy::BGO::width(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.width;
+}
+
+void LuaProxy::BGO::setWidth(double width, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.width = width;
+}
+
+double LuaProxy::BGO::height(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.height;
+}
+
+void LuaProxy::BGO::setHeight(double height, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.height = height;
+}
+
+double LuaProxy::BGO::speedX(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.speedX;
+}
+
+void LuaProxy::BGO::setSpeedX(double speedX, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.speedX = speedX;
+}
+
+double LuaProxy::BGO::speedY(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return SMBX_BGO::Get(m_index)->momentum.speedY;
+}
+
+void LuaProxy::BGO::setSpeedY(double speedY, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBX_BGO::Get(m_index)->momentum.speedY = speedY;
+}
+
+
+std::string LuaProxy::BGO::layerName(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return "";
+
+    return SMBX_BGO::Get(m_index)->ptLayerName;
+}
+
+void LuaProxy::BGO::setLayerName(const luabind::object& value, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+
+    SMBX_BGO* thisbgo = ::SMBX_BGO::Get(m_index);
+    LuaHelper::assignVB6StrPtr(&thisbgo->ptLayerName, value, L);
+}
+
+luabind::object LuaProxy::BGO::layer(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return luabind::object(L, Layer(0));
+
+    return Layer::get(SMBX_BGO::Get(m_index)->ptLayerName, L);
+}
+
+void LuaProxy::BGO::setLayer(const Layer& layer, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+
+    return SMBX_BGO::Get(m_index)->ptLayerName = layer.layerName().str();
+}
+
+
 bool LuaProxy::BGO::isValid() const
 {
     return (m_index < ::SMBX_BGO::Count());
