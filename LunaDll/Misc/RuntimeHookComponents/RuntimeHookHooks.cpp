@@ -13,6 +13,15 @@
 
 #include "../../Rendering/RenderOverrides.h"
 #include "../../Rendering/GLEngine.h"
+#include "../../Main.h"
+
+// Simple init hook to run the main LunaDLL initialization
+void __stdcall LunaDLLInitHook(void* arg1)
+{
+    LunaDLLInit();
+
+    native_rtcRandomize(arg1);
+}
 
 extern void __stdcall InitHook()
 {

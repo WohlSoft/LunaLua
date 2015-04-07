@@ -330,6 +330,9 @@ struct KeyMap{
 #define IMP_vbaStrCmp       *(DWORD*)0x004010F8 // Ptr to __stdcall
 #define IMP_vbaStrCopy      *(DWORD*)0x004011b0 // Ptr to __fastcall
 #define IMP_vbaFreeStr      *(DWORD*)0x00401248 // Ptr to __fastcall
+#define IMP_rtcRandomize    *(DWORD*)0x00401090 // Ptr to __stdcall
+
+static const auto native_rtcRandomize = (void(__stdcall *)(void *))IMP_rtcRandomize;
 
 ////////////////////////
 ///    -Functions-   ///

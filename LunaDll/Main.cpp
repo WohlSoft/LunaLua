@@ -31,11 +31,8 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-		InitGlobals();
 		gHInstance = (HINSTANCE)hinstDLL;
-#if PATCHIT
-		TrySkipPatch();
-#endif // PATCHIT
+        SetupLunaDLLInitHook();
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -46,6 +43,18 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 		break;
 	}
 	return TRUE;
+}
+
+// We don't call this directly from DLL_PROCESS_ATTACH because if we do things
+// can break when we're loaded via LoadLibrary
+// Instead this is called by LunaDLLInitHook, which is set up by
+// SetupLunaDLLInitHook that runs from DLL_PROCESS_ATTACH
+void LunaDLLInit()
+{
+    InitGlobals();
+#if PATCHIT
+    TrySkipPatch();
+#endif // PATCHIT
 }
 
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)

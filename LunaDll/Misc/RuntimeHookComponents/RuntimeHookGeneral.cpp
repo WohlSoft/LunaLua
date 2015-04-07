@@ -29,6 +29,17 @@ HHOOK HookWnd;
 static void NpcBitbltPatch(void);
 static unsigned int __stdcall LatePatch(void);
 
+void SetupLunaDLLInitHook()
+{
+    // Remove protection on smbx.text section
+    DWORD oldprotect;
+    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
+
+    // Set up hook that will launch LunaDLLInit
+    PATCH_FUNC(0x8BEC53, &LunaDLLInitHook);
+    *(uint8_t*)0x8BEC58 = INSTR_NOP;
+}
+
 LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode < 0){
