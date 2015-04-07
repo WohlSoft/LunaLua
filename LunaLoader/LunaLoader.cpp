@@ -6,7 +6,7 @@
 #include "windows.h"
 #include <string>
 
-#define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
+#define ErrorBox(title, msg) MessageBox(NULL, _T(title), _T(msg), MB_ICONERROR)
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
     HINSTANCE hPrevInstance,
@@ -31,7 +31,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         &pi)              // Pointer to PROCESS_INFORMATION structure
         )
     {
-        dbgbox(L"Couldn't run SMBX");
+        ErrorBox("Error: Couldn't run SMBX", "Couldn't run SMBX");
         return 1;
     }
 
@@ -64,7 +64,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     if (WriteProcessMemory(pi.hProcess, (void*)0x8BEA79, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
         WriteProcessMemory(pi.hProcess, (void*)0xB24C00, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
     {
-        dbgbox(L"Failed to patch SMBX");
+        ErrorBox("Error: Failed to patch SMBX", "Failed to patch SMBX");
     }
 
     // Resume the main program thread
