@@ -149,6 +149,7 @@
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
     <ClInclude Include="Rendering\GLEngine.h" />
     <ClInclude Include="Rendering\RenderOverrides.h" />
+    <ClInclude Include="Rendering\RenderUtils.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SMBXInternal\Animation.h" />
     <ClInclude Include="Autocode\Autocode.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
     <ClCompile Include="Rendering\GLEngine.cpp" />
     <ClCompile Include="Rendering\RenderOverrides.cpp" />
+    <ClCompile Include="Rendering\RenderUtils.cpp" />
     <ClCompile Include="SMBXInternal\Animation.cpp" />
     <ClCompile Include="Autocode\Autocode.cpp" />
     <ClCompile Include="Autocode\AutocodeManager.cpp" />

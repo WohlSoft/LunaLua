@@ -315,6 +315,9 @@
     <ClInclude Include="Rendering\GLEngine.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\RenderUtils.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -622,6 +625,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderUtils.cpp">
+      <Filter>Header Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

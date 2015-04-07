@@ -4,6 +4,7 @@
 #include "GLEngine.h"
 #include "../Defines.h"
 #include "../Globals.h"
+#include "RenderUtils.h"
 
 GLEngine g_GLEngine;
 
@@ -116,21 +117,12 @@ const GLEngine::Texture* GLEngine::TextureFromBitmapHDC(HDC hdc) {
     }
 
     // Convert to 24bpp BGR in memory that's accessible
-    BITMAPINFO convBMI;
-    memset(&convBMI, 0, sizeof(BITMAPINFO));
-    convBMI.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    convBMI.bmiHeader.biWidth = tex.w;
-    convBMI.bmiHeader.biHeight = -(int)tex.h;
-    convBMI.bmiHeader.biPlanes = 1;
-    convBMI.bmiHeader.biBitCount = 24;
-    convBMI.bmiHeader.biCompression = BI_RGB;
+    void* pData = NULL;
+    HBITMAP convHBMP = CreateEmptyBitmap(tex.w, tex.h, 24, &pData);
     HDC screenHDC = GetDC(NULL);
-    if (screenHDC == NULL)
-    {
+    if (screenHDC == NULL) {
         return 0;
     }
-    void* pData = NULL;
-    HBITMAP convHBMP = CreateDIBSection(screenHDC, &convBMI, DIB_RGB_COLORS, &pData, NULL, 0);
     HDC convHDC = CreateCompatibleDC(screenHDC);
     SelectObject(convHDC, convHBMP);
     BitBlt(convHDC, 0, 0, tex.w, tex.h, hdc, 0, 0, SRCCOPY);
