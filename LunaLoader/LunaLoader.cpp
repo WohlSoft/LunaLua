@@ -37,8 +37,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
     unsigned char LoaderPatch1[] =
     {
-        0xE9, 0x82, 0x61, 0x26, 0x00,  // 0x8BEA79 JMP 00B24C00
-        0x90
+        0xE9, 0x23, 0x8E, 0x71, 0x00  // 0x40BDD8 JMP 00B24C00
     };
 
     unsigned char LoaderPatch2[] =
@@ -49,11 +48,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         0x54,                         // 0xB24C0F PUSH ESP
         0xE8, 0x00, 0x00, 0x00, 0x00, // 0xB24C10 CALL LoadLibraryA
         0x83, 0xC4, 0x0C,             // 0xB24C15 ADD ESP, 0C
-        0x31, 0xDB,                   // 0xB24C18 XOR EBX, EBX (just in case)
-        0xA1, 0x04, 0xF3, 0xB2, 0x00, // 0xB24C1A MOV EAX, DWORD PTR DS : [B2F304]
-        0x89, 0x9D, 0x88, 0xFD, 0xFF, 0xFF, // 00B24C1F mov dword ptr ss:[ebp-278],ebx
-        0x39, 0xD8,                   // 00B24C25 CMP EAX, EBX
-        0xE9, 0x53, 0x9E, 0xD9, 0xFF, // 00B24C27 JMP 008BEA7F
+        0x68, 0x6C, 0xC1, 0x40, 0x00, // 0xB24C18 PUSH 40C16C
+        0xE9, 0xBB, 0x71, 0x8E, 0xFF, // 0xB24C1D JMP 40BDDD
         0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
     };
 
@@ -61,7 +57,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     *(DWORD*)&LoaderPatch2[0x11] = (DWORD)&LoadLibraryA - (DWORD)(0xB24C10 + 5);
 
     // Patch the entry point...
-    if (WriteProcessMemory(pi.hProcess, (void*)0x8BEA79, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
+    if (WriteProcessMemory(pi.hProcess, (void*)0x40BDD8, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
         WriteProcessMemory(pi.hProcess, (void*)0xB24C00, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
     {
         ErrorBox("Error: Failed to patch SMBX", "Failed to patch SMBX");

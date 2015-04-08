@@ -332,8 +332,6 @@ struct KeyMap{
 #define IMP_vbaFreeStr      *(DWORD*)0x00401248 // Ptr to __fastcall
 #define IMP_rtcRandomize    *(DWORD*)0x00401090 // Ptr to __stdcall
 
-static const auto native_rtcRandomize = (void(__stdcall *)(void *))IMP_rtcRandomize;
-
 ////////////////////////
 ///    -Functions-   ///
 ////////////////////////
@@ -419,6 +417,10 @@ static const auto native_rtcRandomize = (void(__stdcall *)(void *))IMP_rtcRandom
 
 #define GF_LOAD_LOCAL_GFX   0x00ACD220
 
+//      Arg1 = Pointer to structure
+#define GF_THUN_RT_MAIN     0x0040BDD2
+
+
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
@@ -441,6 +443,8 @@ static const auto native_showLayer      = (void(__stdcall *)(VB6StrPtr* /*layerN
 static const auto native_hideLayer      = (void(__stdcall *)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/))GF_HIDE_LAYER;
 
 static const auto native_loadLocalGfx   = (void(__stdcall *)())GF_LOAD_LOCAL_GFX;
+
+static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_MAIN;
 
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P

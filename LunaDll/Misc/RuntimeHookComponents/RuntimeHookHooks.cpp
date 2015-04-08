@@ -16,11 +16,11 @@
 #include "../../Main.h"
 
 // Simple init hook to run the main LunaDLL initialization
-void __stdcall LunaDLLInitHook(void* arg1)
+void __stdcall ThunRTMainHook(void* arg1)
 {
     LunaDLLInit();
 
-    native_rtcRandomize(arg1);
+    native_ThunRTMain(arg1);
 }
 
 extern void __stdcall InitHook()

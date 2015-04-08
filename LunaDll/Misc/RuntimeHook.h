@@ -27,7 +27,7 @@ extern bool episodeStarted;
 /************************************************************************/
 /* Runtime Patch Main Functions                                         */
 /************************************************************************/
-void SetupLunaDLLInitHook();
+void SetupThunRTMainHook();
 void ParseArgs(const std::vector<std::string>& args);
 void TrySkipPatch();
 
@@ -43,7 +43,7 @@ extern inline void patchWholeNativeFunction(void* native_func, int sizeOfNativeF
 /* Hooks                                                                */
 /************************************************************************/
 // Early initialization hook
-void __stdcall LunaDLLInitHook(void* arg1);
+void __stdcall ThunRTMainHook(void* arg1);
 //The Init Hook will be run when "--patch" is executed.
 extern void __stdcall InitHook();
 //Force Termination when SMBX runs the end code.
