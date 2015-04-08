@@ -92,6 +92,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 	std::wstring wLuaCode;
 	if(!readFile(wLuaCode, getLuaLibsPath(), L"Since v0.3 the LuaScriptsLib-Folder with\nall its content is required.\nBe sure you installed everything correctly!")){
 		shutdown();
+        return;
 	}
 	//Convert to ASCII, as lua doesn't support unicode
 	std::string LuaCode = utf8_encode(wLuaCode);
