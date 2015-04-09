@@ -33,7 +33,7 @@ struct SMBX_Warp
     short allowCarryNPC;                    //0x02
     short noYoshi;                          //0x04
     short unknown_06;                       //0x06
-    wchar_t *ptLayerName;                   //0x08
+    VB6StrPtr ptLayerName;                  //0x08
     short isHidden;                         //0x0C
     short unknown_0E;                       //0x0E
     short unknown_10;                       //0x10
