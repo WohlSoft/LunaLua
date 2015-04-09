@@ -69,6 +69,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
             if (cmdArgs.size() > 1){ //strip the smbx-path from the arguments
                 for (unsigned int i = 1; i < cmdArgs.size(); ++i){
                     newCmdLine += cmdArgs[i] + std::string(" ");
+                    if (i == cmdArgs.size() - 1){ //if the last argument of the args list then remove the last space.
+                        std::string::iterator it = newCmdLine.end();
+                        newCmdLine.erase(--it);
+                    }
                 }
             }
         }
