@@ -4,12 +4,15 @@
 #include <string>
 #include "../libs/stackwalker/StackWalker.h"
 
+
+
 namespace ErrorReport{
 
     class CustomStackTracer : public StackWalker 
     {
     public:
         CustomStackTracer() : theOutput(""), StackWalker() {}
+        
         std::string theOutput;
     protected:
         virtual void OnOutput(LPCSTR szText)
@@ -33,7 +36,10 @@ namespace ErrorReport{
     std::string getCustomVB6ErrorDescription(VB6ErrorCode errCode);
 
     //USE THIS METHOD TO REPORT ERRORS
-    void ReportVB6Error(VB6ErrorCode errCode);
+    void SnapshotVB6Error(VB6ErrorCode errCode);
+    void report();
 
 }
+
+extern std::string lastErrDesc;
 #endif

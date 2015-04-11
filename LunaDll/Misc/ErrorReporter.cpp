@@ -6,6 +6,8 @@
 #include <array>
 #include "Gui/GuiCrashNotify.h"
 
+std::string lastErrDesc;
+
 std::string ErrorReport::generateStackTrace()
 {
     CustomStackTracer cst;
@@ -68,12 +70,8 @@ void ErrorReport::manageErrorReport(const std::string &url, const std::string &e
 
 
 
-void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
+void ErrorReport::SnapshotVB6Error(VB6ErrorCode errCode)
 {
-    std::vector<int> ignoreErrorCodes = { 424 };
-    if (std::find(ignoreErrorCodes.begin(), ignoreErrorCodes.end(), static_cast<int>(errCode)) != ignoreErrorCodes.end())
-        return;
-
     std::string fullErrorDescription = "";
     fullErrorDescription += "**************************************************\n";
     fullErrorDescription += "*                  Summary                       *\n";
@@ -96,9 +94,17 @@ void ErrorReport::ReportVB6Error(VB6ErrorCode errCode)
     fullErrorDescription += "**************************************************\n";
     fullErrorDescription += generateStackTrace();
     
-    writeErrorLog(fullErrorDescription);
+    lastErrDesc = fullErrorDescription;
+
+    //writeErrorLog(fullErrorDescription);
     //Might make it dynamic in the future by an ini file....
-    manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", fullErrorDescription);
+    //manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", fullErrorDescription);
+}
+
+void ErrorReport::report()
+{
+    writeErrorLog(lastErrDesc);
+    manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", lastErrDesc);
 }
 
 

@@ -58,6 +58,8 @@ void fixup_ErrorReporting()
 {
     HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
     if (vmVB6Lib){
+        // This is the old version
+
         BYTE* overflowFuncAddr = (BYTE*)GetProcAddress(vmVB6Lib, "__vbaErrorOverflow");
         BYTE* internalRaiseErrorFunc = tracedownAddress(overflowFuncAddr + 2);
 
@@ -65,11 +67,22 @@ void fixup_ErrorReporting()
         DWORD oldprotect;
         if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
             toPatch[0] = 0x56; //PUSH ESI
-            PATCH_FUNC((DWORD)&toPatch[1], &handleError);
+            PATCH_FUNC((DWORD)&toPatch[1], &snapshotError);
                 //NOP
             // Now get the protection back
             VirtualProtect((void*)toPatch, 10, oldprotect, &oldprotect);
         }
+        
+        
+    }
+
+
+    DWORD oldprotect;
+    if (VirtualProtect((void*)0x72A0C6CA, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
+        PATCH_FUNC(0x72A0C6CA, &handleErrorV2);
+        //NOP
+        // Now get the protection back
+        VirtualProtect((void*)0x72A0C6CA, 10, oldprotect, &oldprotect);
     }
 }
 

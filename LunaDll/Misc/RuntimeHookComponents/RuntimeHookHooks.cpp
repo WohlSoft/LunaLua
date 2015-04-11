@@ -447,14 +447,24 @@ extern void __stdcall checkLevelShutdown()
 }
 
 
-extern void __stdcall handleError(int errCode)
+extern void __stdcall snapshotError(int errCode)
 {
-    ErrorReport::ReportVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
+    ErrorReport::SnapshotVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{
         CMP     ESI, 0x9C68
     }
 }
+
+
+extern void __stdcall handleErrorV2(void* errInfoStruct)
+{
+    //short theErrorCode = *(short*)(((char*)errInfoStruct + 28));
+    //ErrorReport::SnapshotVB6Error(static_cast<ErrorReport::VB6ErrorCode>(theErrorCode));
+    ErrorReport::report();
+    forceTermination();
+}
+
 
 extern void __stdcall LoadLocalGfxHook()
 {
