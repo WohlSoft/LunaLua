@@ -312,7 +312,8 @@ detourEventQueue = {
 		local eventInfo = args[1]
 		local directEventName = ""
 		if(eventInfo.loopable)then
-			detourEventQueue.collectedEvents[eventName] = detourEventQueue.transformArgs(eventName, ...)
+            local collectedEvent = {eventName, detourEventQueue.transformArgs(eventName, ...)}
+            table.insert(detourEventQueue.collectedEvents, collectedEvent)
 		end
 		if(eventInfo.directEventName == "")then
 			directEventName = eventName.."Direct"
@@ -338,8 +339,8 @@ detourEventQueue = {
 	end,
 	-- Dispatch the new event
 	dispatchEvents = function()
-		for eventName, eventArgs in pairs(detourEventQueue.collectedEvents) do
-			eventManager[eventName](unpack(eventArgs))
+		for idx, collectedEvent in ipairs(detourEventQueue.collectedEvents) do
+			eventManager[collectedEvent[1]](unpack(collectedEvent[2]))
 		end
 		detourEventQueue.collectedEvents = {}
 	end
