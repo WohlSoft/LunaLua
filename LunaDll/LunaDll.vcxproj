@@ -147,7 +147,12 @@
   <ItemGroup>
     <ClInclude Include="httprequest.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
+    <ClInclude Include="Misc\ThreadedCmdQueue.h" />
+    <ClInclude Include="Rendering\GLContextManager.h" />
+    <ClInclude Include="Rendering\GLDraw.h" />
     <ClInclude Include="Rendering\GLEngine.h" />
+    <ClInclude Include="Rendering\GLEngineProxy.h" />
+    <ClInclude Include="Rendering\GLTextureStore.h" />
     <ClInclude Include="Rendering\RenderOverrides.h" />
     <ClInclude Include="Rendering\RenderUtils.h" />
     <ClInclude Include="resource.h" />
@@ -229,7 +234,11 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncNative.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
+    <ClCompile Include="Rendering\GLContextManager.cpp" />
+    <ClCompile Include="Rendering\GLDraw.cpp" />
     <ClCompile Include="Rendering\GLEngine.cpp" />
+    <ClCompile Include="Rendering\GLEngineProxy.cpp" />
+    <ClCompile Include="Rendering\GLTextureStore.cpp" />
     <ClCompile Include="Rendering\RenderOverrides.cpp" />
     <ClCompile Include="Rendering\RenderUtils.cpp" />
     <ClCompile Include="SMBXInternal\Animation.cpp" />

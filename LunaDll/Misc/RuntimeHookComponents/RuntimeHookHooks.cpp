@@ -439,6 +439,7 @@ extern void __stdcall checkLevelShutdown()
             PGE_MusPlayer::MUS_stopMusic();
             PGE_Sounds::clearSoundBuffer();
         }
+        g_GLEngine.ClearTextures();
     }
 
     __asm{
@@ -504,14 +505,7 @@ extern BOOL __stdcall StretchBltHook(
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
     {
-        HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
-
-        // Run our OpenGL frame
-        g_GLEngine.WriteFrame(gpScreenBits);
-        BOOL ret = StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, ghMemDC, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
-
-        SelectObject(ghMemDC, hOld);
-        return ret;
+        return g_GLEngine.EmulatedStretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
     }
 
     return StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
