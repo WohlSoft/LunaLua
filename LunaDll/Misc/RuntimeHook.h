@@ -101,6 +101,7 @@ void fixup_TypeMismatch13();
 void fixup_ErrorReporting();
 void fixup_WarpLimit();
 void fixup_Credits();
+void fixup_Mushbug();
 void fixup_NativeFuncs();
 
 
