@@ -333,6 +333,51 @@
     <ClInclude Include="Rendering\GLEngineProxy.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="libs\luasocket\auxiliar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\except.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\inet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\io.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\mime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\pierror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\select.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\tcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\timeout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\udp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\wsocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\luasocket\luasocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -655,6 +700,45 @@
     </ClCompile>
     <ClCompile Include="Rendering\GLEngineProxy.cpp">
       <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\auxiliar.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\buffer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\except.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\inet.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\options.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\select.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\tcp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\timeout.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\udp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\wsocket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\luasocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luasocket\mime.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

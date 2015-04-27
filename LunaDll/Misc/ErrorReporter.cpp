@@ -64,7 +64,7 @@ void ErrorReport::manageErrorReport(const std::string &url, const std::string &e
     GuiCrashNotify notifier(errText);
     notifier.show();
     if (notifier.doSend){
-        sendPOSTRequest(url, errText);
+        sendPUTRequest(url, errText);
     }
 }
 

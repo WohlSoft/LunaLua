@@ -13,6 +13,8 @@
 #include "httprequest.h"
 #include <comutil.h>
 
+#include "Misc/MiscFuncs.h"
+
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
 	dest.clear();
@@ -373,7 +375,7 @@ bool writeFile(const std::string &content, const std::string &path)
 }
 
 
-void sendPOSTRequest(const std::string& server, const std::string& data)
+void sendPUTRequest(const std::string& server, const std::string& data)
 {
     HRESULT hr;
     CLSID clsid;
@@ -405,4 +407,42 @@ void sendPOSTRequest(const std::string& server, const std::string& data)
     }
 
     pIWinHttpRequest->Release();
+}
+
+std::vector<std::string> listFilesOfDir(const std::string& path)
+{
+    std::vector<std::string> out;
+    HANDLE dir;
+    WIN32_FIND_DATAA file_data;
+
+    if ((dir = FindFirstFileA((path + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+        return out; /* No files found */
+
+    do {
+        const string file_name = file_data.cFileName;
+        const bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+        if (file_name[0] == '.')
+            continue;
+
+        if (is_directory)
+            continue;
+
+        out.push_back(file_name);
+    } while (FindNextFileA(dir, &file_data));
+
+    FindClose(dir);
+
+    return out;
+}
+
+std::wstring getCustomFolderPath()
+{
+    wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+    wstring full_path = (gIsOverworld ? world_dir : world_dir.append((wchar_t*)GM_LVLFILENAME_PTR));
+    if (!gIsOverworld){
+        full_path = removeExtension(full_path);
+        full_path = full_path.append(L"\\"); // < path into level folder
+    }
+    return full_path;
 }

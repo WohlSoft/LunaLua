@@ -9,6 +9,8 @@
 #include "LuaProxy.h"
 #include "LuaEvents.h"
 #include "LuaProxyComponent/LuaProxyAudio.h"
+#include "../libs/luasocket/luasocket.h"
+#include "../libs/luasocket/mime.h"
 #include <string>
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -75,13 +77,28 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 	lua_pushcfunction(L, luaopen_package);
 	lua_call(L,0,0);
 
+    //SOCKET TESTING STUFF
+    lua_pushcfunction(L, luaopen_io);
+    lua_call(L,0,0);
+
+    lua_getfield(L, LUA_GLOBALSINDEX, "package");
+    lua_getfield(L, -1, "preload");
+    lua_pushcfunction(L, luaopen_socket_core);
+    lua_setfield(L, -2, "socket.core");
+
+    lua_pushcfunction(L, luaopen_mime_core);
+    lua_setfield(L, -2, "mime.core");
+    
+    //SOCKET TESTING STUFF
+
+
 	//Remove unsafe apis
 	{
 		object _G = globals(L);
 		object osTable = _G["os"];
 		osTable["execute"] = object();
 		osTable["exit"] = object();
-		osTable["getenv"] = object();
+		//osTable["getenv"] = object();
 		osTable["remove"] = object();
 		osTable["rename"] = object();
 		osTable["setlocal"] = object();
@@ -237,7 +254,9 @@ void CLunaLua::bindAll()
 
             namespace_("Misc")[
                 def("cheatBuffer", (std::string(*)())&LuaProxy::Misc::cheatBuffer),
-                    def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer)
+                    def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer),
+                    def("listFiles", &LuaProxy::Misc::listFiles),
+                    def("listLocalFiles", &LuaProxy::Misc::listLocalFiles)
             ],
 
 			//SDL_Mixer's Mix_Chunk structure

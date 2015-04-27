@@ -1,0 +1,6 @@
+
+* Finish up socket debugger (maybe add env sandbox)
+* Fix isAPILoaded (include the overworld code)
+
+DONE:
+* Add a list-function, which list up a folder

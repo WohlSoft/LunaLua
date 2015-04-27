@@ -696,6 +696,8 @@ namespace LuaProxy {
         void doPOW();
         std::string cheatBuffer();
         void cheatBuffer(const luabind::object &value, lua_State* L);
+        luabind::object listFiles(const std::string& path, lua_State* L);
+        luabind::object listLocalFiles(std::string path, lua_State* L);
     }
 
     namespace Graphics{

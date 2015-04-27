@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,7 +108,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;windowscodecs.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2_mixer.lib;SDL2main.lib;windowscodecs.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
@@ -138,7 +138,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
@@ -146,6 +146,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="httprequest.h" />
+    <ClInclude Include="libs\luasocket\auxiliar.h" />
+    <ClInclude Include="libs\luasocket\buffer.h" />
+    <ClInclude Include="libs\luasocket\except.h" />
+    <ClInclude Include="libs\luasocket\inet.h" />
+    <ClInclude Include="libs\luasocket\io.h" />
+    <ClInclude Include="libs\luasocket\luasocket.h" />
+    <ClInclude Include="libs\luasocket\mime.h" />
+    <ClInclude Include="libs\luasocket\options.h" />
+    <ClInclude Include="libs\luasocket\pierror.h" />
+    <ClInclude Include="libs\luasocket\select.h" />
+    <ClInclude Include="libs\luasocket\socket.h" />
+    <ClInclude Include="libs\luasocket\tcp.h" />
+    <ClInclude Include="libs\luasocket\timeout.h" />
+    <ClInclude Include="libs\luasocket\udp.h" />
+    <ClInclude Include="libs\luasocket\wsocket.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
     <ClInclude Include="Misc\ThreadedCmdQueue.h" />
     <ClInclude Include="Rendering\GLContextManager.h" />
@@ -224,6 +239,19 @@
   <ItemGroup>
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
+    <ClCompile Include="libs\luasocket\auxiliar.c" />
+    <ClCompile Include="libs\luasocket\buffer.c" />
+    <ClCompile Include="libs\luasocket\except.c" />
+    <ClCompile Include="libs\luasocket\inet.c" />
+    <ClCompile Include="libs\luasocket\io.c" />
+    <ClCompile Include="libs\luasocket\luasocket.cpp" />
+    <ClCompile Include="libs\luasocket\mime.cpp" />
+    <ClCompile Include="libs\luasocket\options.c" />
+    <ClCompile Include="libs\luasocket\select.c" />
+    <ClCompile Include="libs\luasocket\tcp.c" />
+    <ClCompile Include="libs\luasocket\timeout.c" />
+    <ClCompile Include="libs\luasocket\udp.c" />
+    <ClCompile Include="libs\luasocket\wsocket.c" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp" />
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBGO.cpp" />

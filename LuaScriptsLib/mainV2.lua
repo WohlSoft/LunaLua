@@ -23,6 +23,9 @@ It is a attempt to merge lunaworld.lua and lunadll.lua in one state.
 
 ]]
 
+--LunaLua Version
+
+__LUNALUA = "0.7"
 
 --Constants used by Lunadll. Do not modify them, or Lunadll with crash. 
 -- ==DANGER ZONE START==
@@ -52,6 +55,11 @@ end
 
 __episodePath = ""
 __customFolderPath = ""
+
+-- Modified Native functions: 
+os.exit = function() error("Shutdown") end
+
+
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)
@@ -177,7 +185,8 @@ function __onInit(lvlPath, lvlName)
 			--SEGMENT TO ADD PRELOADED APIS START
 			loadSharedAPI("uservar")
 			Defines = loadSharedAPI("core\\defines")
-			--SEGMENT TO ADD PRELOADED APIS END
+			DBG = loadSharedAPI("core\\dbg")
+            --SEGMENT TO ADD PRELOADED APIS END
 			
 			local localLuaFile = nil
 			local glLuaFile = lvlPath .. "lunaworld.lua"
@@ -213,6 +222,7 @@ function __onInit(lvlPath, lvlName)
 			
 			--SEGMENT TO ADD PRELOADED APIS START
 			Defines = loadSharedAPI("core\\defines")
+            DBG = loadSharedAPI("core\\dbg")
 			--SEGMENT TO ADD PRELOADED APIS END
 
 			local overworldLuaFile = lvlPath .. "lunaoverworld.lua"
@@ -301,7 +311,25 @@ function registerEvent(apiTable, event, eventHandler, beforeMainCall)
 			table.insert(eventManager.eventHosterAfter[event], tHandler)
 		end
 	end	
-	
+end
+
+function unregisterEvent(apiTable, event, eventHandler)
+    eventHandler = eventHandler or event
+    if(isAPILoaded(apiTable))then
+        for index, eventHandlerStruct in pairs(eventManager.eventHosterBefore[event]) do
+            if(eventHandlerStruct.apiTable == apiTable and eventHandlerStruct.eventHandler == eventHandler)then
+                table.remove(eventManager.eventHosterBefore[event], index)
+                return true
+            end
+        end
+        for index, eventHandlerStruct in pairs(eventManager.eventHosterAfter[event]) do
+            if(eventHandlerStruct.apiTable == apiTable and eventHandlerStruct.eventHandler == eventHandler)then
+                table.remove(eventManager.eventHosterAfter[event], index)
+                return true
+            end
+        end
+    end
+    return false
 end
 
 detourEventQueue = {
@@ -312,8 +340,7 @@ detourEventQueue = {
 		local eventInfo = args[1]
 		local directEventName = ""
 		if(eventInfo.loopable)then
-            local collectedEvent = {eventName, detourEventQueue.transformArgs(eventName, ...)}
-            table.insert(detourEventQueue.collectedEvents, collectedEvent)
+			detourEventQueue.collectedEvents[eventName] = detourEventQueue.transformArgs(eventName, ...)
 		end
 		if(eventInfo.directEventName == "")then
 			directEventName = eventName.."Direct"
@@ -339,8 +366,8 @@ detourEventQueue = {
 	end,
 	-- Dispatch the new event
 	dispatchEvents = function()
-		for idx, collectedEvent in ipairs(detourEventQueue.collectedEvents) do
-			eventManager[collectedEvent[1]](unpack(collectedEvent[2]))
+		for eventName, eventArgs in pairs(detourEventQueue.collectedEvents) do
+			eventManager[eventName](unpack(eventArgs))
 		end
 		detourEventQueue.collectedEvents = {}
 	end

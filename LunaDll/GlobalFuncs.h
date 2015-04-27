@@ -32,15 +32,22 @@ void CleanUp();
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
+// Module Helper Funcs
 HMODULE getModule(std::string moduleName);
-std::wstring getModulePath();
+
+// File/Path Helper Funcs
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
 bool writeFile(const std::string &content, const std::string &path);
+std::vector<std::string> listFilesOfDir(const std::string& path);
+std::wstring getModulePath();
+std::wstring getCustomFolderPath();
 
+// Time Helper Funcs
 std::string generateTimestamp(std::string format);
 std::string generateTimestampForFilename();
 std::string generateTimestamp();
 
-void sendPOSTRequest(const std::string& server, const std::string& data);
+// Network Helper Funcs
+void sendPUTRequest(const std::string& server, const std::string& data);
 
 #endif

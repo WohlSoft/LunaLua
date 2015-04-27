@@ -212,3 +212,5 @@ HardcodedGraphicsData
 !/LunaDll/libs/sdl/*
 !/LunaDll/libs/sdl/*
 !/LunaDll/libs/sdl_mingw/*
+
+*.bak
