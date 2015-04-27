@@ -94,6 +94,14 @@ function isAPILoaded(api)
 				end
 			end
 		end
+        
+        if(__lunaoverworld.__init)then
+            for k,v in pairs(__lunaoverworld.__loadedAPIs) do
+                if(v == api)then
+                    return true
+                end
+            end
+        end
 	elseif(type(api)=="string")then
 		if(__loadedAPIs[api])then
 			return true
@@ -110,6 +118,12 @@ function isAPILoaded(api)
 				return true
 			end
 		end
+        
+        if(__lunaoverworld.__init)then
+            if(__lunaoverworld.__loadedAPIs[api])then
+				return true
+			end
+        end
 	end
 	
 	return false
