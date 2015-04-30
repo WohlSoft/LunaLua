@@ -1,0 +1,82 @@
+-------------------------------------------------------------------------------
+-- @module Player
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX Player struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myNPC:mem(0x16, FIELD_WORD, 3)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local heartsOfPlayer = myNPC:mem(0x16, FIELD_WORD)
+--      
+-- @function [parent=#Player] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+
+-------------------------------------------------------------------------------
+-- Kills the player.
+-- @function [parent=#Player] kill
+-- @param self
+
+-------------------------------------------------------------------------------
+-- Harms the player. 
+-- If this is the player's last hp (either small or only one heart) then the player will be killed.
+-- @function [parent=#Player] harm
+-- @param self
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the Player.
+-- @field [parent=#Player] #number x
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the Player.
+-- @field [parent=#Player] #number y
+
+-------------------------------------------------------------------------------
+-- The x-speed of the Player.
+-- @field [parent=#Player] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the Player.
+-- @field [parent=#Player] #number speedY
+
+-------------------------------------------------------------------------------
+-- Returns the distances from the player's coordinates to the screen boundaries of player camera.
+-- Note that this means width is 'right' + 'left', and not 'right' - 'left', etc.
+-- @field [parent=#Player] RECT#RECT screen
+
+-------------------------------------------------------------------------------
+-- The current section number of the player.
+-- @field [parent=#Player] #number section
+
+-------------------------------------------------------------------------------
+-- The current section object of the player.
+-- @field [parent=#Player] Section#Section sectionObj
+
+-------------------------------------------------------------------------------
+-- The current powerup state the player is in.
+-- @field [parent=#Player] #number powerup
+
+
+-------------------------------------------------------------------------------
+-- The npc-id in the powerup box of the player.
+-- @field [parent=#Player] #number reservePowerup 
+
+-------------------------------------------------------------------------------
+-- The npc which the player is holding. 
+-- If the player holds nothing then nil is returned.
+-- @field [parent=#Player] NPC#NPC holdingNPC
+
+-------------------------------------------------------------------------------
+-- Checks if the player is acutally valid.
+-- With this method you can check if a second player is in the level.
+-- @field [parent=#Player] #boolean isValid
+
+return nil

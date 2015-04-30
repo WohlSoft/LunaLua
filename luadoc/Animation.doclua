@@ -1,0 +1,88 @@
+-------------------------------------------------------------------------------
+-- @module Animation
+
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX effect struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myAnimation:mem(0x3C, FIELD_WORD, 4)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local animationTimer = myAnimation:mem(0x3C, FIELD_WORD)
+--      
+-- @function [parent=#Animation] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+-------------------------------------------------------------------------------
+-- Returns the amount of running Effects in the level.
+-- @function [parent=#Animation] count
+-- @return #number The number of running Effects in the level.
+
+-------------------------------------------------------------------------------
+-- Returns running Effects of the level.
+-- @function [parent=#Animation] get
+-- @param ids [Optional] The ids to be filtered. Can be a single number or a table with numbers of ids to be filtered out.
+-- @return #list<#Animation> Returns a table with all Effects in the level.
+
+-------------------------------------------------------------------------------
+-- Spawns/Runs a new Effect.
+-- @function [parent=#Animation] spawn 
+-- @param #number effectID The id of the new Effect, which should be spawned.
+-- @param #number x The x position of the new Effect.
+-- @param #number y The y position of the new Effect.
+-- @param #number animationFrame The selected animation frame of new effect.<br>This Animation frame (as parameter) is not the same as Animation.animationFrame!
+-- @return #Animation The spawned Effect-Object. This can be used to modify additional behaviour.
+
+-------------------------------------------------------------------------------
+-- The id of the Effect.
+-- @field [parent=#Animation] #number id
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the Animation.
+-- @field [parent=#Animation] #number x
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the Animation.
+-- @field [parent=#Animation] #number y
+
+-------------------------------------------------------------------------------
+-- The x-speed of the Animation.
+-- @field [parent=#Animation] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the Animation.
+-- @field [parent=#Animation] #number speedY
+
+-------------------------------------------------------------------------------
+-- The width of the Animation.
+-- @field [parent=#Animation] #number width
+
+-------------------------------------------------------------------------------
+-- The height of the Animation.
+-- @field [parent=#Animation] #number height
+
+-------------------------------------------------------------------------------
+-- The timer of the Animation. This value might be ignored, depending on the type of effect.
+-- @field [parent=#Animation] #number timer
+
+-------------------------------------------------------------------------------
+-- The current animation frame. This might be used also as a timer.
+-- @field [parent=#Animation] #number animationFrame
+
+-------------------------------------------------------------------------------
+-- The included npc id of the effect. This value is used for effects like yoshis egg.
+-- @field [parent=#Animation] #number npcID
+
+-------------------------------------------------------------------------------
+-- A boolean flag if only the mask should be drawn. This value is used for the cheat 'shadowmario'.
+-- @field [parent=#Animation] #boolean drawOnlyMask
+
+
+return nil

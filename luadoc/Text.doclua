@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+-- This namespace provides functions for displaying Text and messages.
+-- @module Text
+
+-------------------------------------------------------------------------------
+-- Writes <i>debugText</i> in a message box and shows it to the user.
+-- @function [parent=#Text] windowDebug
+-- @param #string debugText The text which should be displayed on the MessageBox.
+
+-------------------------------------------------------------------------------
+-- Prints text at x, y with font-type <i>type</i>
+-- @function [parent=#Text] print
+-- @param #string text The text which should be drawn.
+-- @param #number type The text-style which should be draw.
+-- @param #number x The x coordinate
+-- @param #number y The y cooridnate
+
+-------------------------------------------------------------------------------
+-- Displays a SMBX Message Box.
+-- @function [parent=#Text] showMessageBox
+-- @param #string text The text which should be displayed in the message box.
+
+
+
+
+
+
+
+return nil

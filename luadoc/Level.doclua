@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+-- @module Level
+
+-------------------------------------------------------------------------------
+-- Exit the level.
+-- @function [parent=#Level] exitLevel
+
+-------------------------------------------------------------------------------
+-- Returns the filename of the level.
+-- @function [parent=#Level] filename
+-- @return #string The filename of the current level.
+
+-------------------------------------------------------------------------------
+-- Returns the Title/Name of the level.
+-- @function [parent=#Level] name
+-- @return #string The name/title of the current level.
+
+-------------------------------------------------------------------------------
+-- The current state of hitting the goal. If currently not winning then this value is 0.
+-- If no argument is passed, then the value will be retured.
+-- If the value is set the the winState will be modified.
+-- @function [parent=#Level] winState
+-- @param #number value If this value is set, then the winState will be modified.
+-- @return #number The current win state.
+
+
+
+
+return nil

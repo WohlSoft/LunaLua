@@ -1,0 +1,52 @@
+-------------------------------------------------------------------------------
+-- @module Warp
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX Warp struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myWarp:mem(0x7C, FIELD_WORD, 3)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local warpNumber = myWarp:mem(0x7C, FIELD_WORD)
+--      
+-- @function [parent=#Player] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+-------------------------------------------------------------------------------
+-- Returns the amount of Warps in the level.
+-- @function [parent=#Warp] count
+-- @return #number The number of running Effects in the level.
+
+-------------------------------------------------------------------------------
+-- Returns all Warps of the level.
+-- @function [parent=#Warp] get
+-- @return #list<#Warp> Returns a table with all Effects in the level.
+
+-------------------------------------------------------------------------------
+-- The x cooridate of the entrance.
+-- @field [parent=#Warp] #number entranceX
+
+-------------------------------------------------------------------------------
+-- The y cooridate of the entrance.
+-- @field [parent=#Warp] #number entranceY
+
+-------------------------------------------------------------------------------
+-- The x cooridate of the exit.
+-- @field [parent=#Warp] #number exitX
+
+-------------------------------------------------------------------------------
+-- The y cooridate of the exit.
+-- @field [parent=#Warp] #number exitY
+
+-------------------------------------------------------------------------------
+-- The level filename of the warp.
+-- @field [parent=#Warp] #string levelFilename
+
+return nil

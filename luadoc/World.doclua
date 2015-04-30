@@ -1,0 +1,84 @@
+-------------------------------------------------------------------------------
+-- @module World
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX world struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      world:mem(0x64, FIELD_DOUBLE, 10)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local playerPosX = world:mem(0x64, FIELD_DOUBLE)
+--      
+-- @function [parent=#global] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory address will be set.
+-- @return The value of the struct offset
+
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the player on the world map.
+-- @field [parent=#World] #number playerX
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the player on the world map.
+-- @field [parent=#World] #number playerY
+
+-------------------------------------------------------------------------------
+-- Gets/Sets the current walking direction.
+-- Following walking direction values:<br>
+-- 0 - Idle<br>
+-- 1 - Walking Up<br>
+-- 2 - Walking Left<br>
+-- 3 - Walking Down<br>
+-- 4 - Walking Right
+-- @field [parent=#World] #number playerWalkingDirection
+
+-------------------------------------------------------------------------------
+-- Gets/Sets the current walking timer. 
+-- This value will increment from 0 to 32 by 2 each frame.
+-- It is an indicator if the player reached the tile.
+-- If the value is 32 then the player reached the tile.
+-- @field [parent=#World] #number playerWalkingTimer
+
+-------------------------------------------------------------------------------
+-- Gets/Sets the current walking frame.
+-- Following frame values:<br>
+-- 0 or 1 - Walking Frames Down<br>
+-- 2 or 3 - Walking Frames Right<br>
+-- 4 or 5 - Walking Frames Left<br>
+-- 6 or 7 - Walking Frames Up
+-- @field [parent=#World] #number playerWalkingFrame
+
+-------------------------------------------------------------------------------
+-- Gets/Sets the current walking frame timer. 
+-- This value will increment from 0 to 8 by 1 each frame. 
+-- If the value is 8 then the playerWalkingFrame is swapped. <br>
+-- For example: If walking down and the value is 0 then the value will be chaged to 1.
+-- @field [parent=#World] #number playerWalkingFrameTimer
+
+-------------------------------------------------------------------------------
+-- If the player is currently walking/moving the this field is set to true. Otherwise the field is set to false
+-- @field [parent=#World] #boolean playerIsCurrentWalking
+
+-------------------------------------------------------------------------------
+-- If the player stands under a level the level title will be returned. Otherwise nil is returned.
+-- @field [parent=#World] VBStr#VBStr levelTitle
+
+-------------------------------------------------------------------------------
+-- Similar to world.playerWalkingDirection but does return the direction values even if the player is not walking.
+-- Following walking direction values:<br>
+-- 1 - Looking Up<br>
+-- 2 - Looking Left<br>
+-- 3 - Looking Down<br>
+-- 4 - Looking Right<br>
+-- @field [parent=#World] #number playerCurrentDirection
+
+
+
+
+return nil

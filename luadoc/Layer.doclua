@@ -1,0 +1,69 @@
+-------------------------------------------------------------------------------
+-- @module Layer
+
+-------------------------------------------------------------------------------
+-- Returns all Layers or one Layer of the level.
+-- For example:
+-- 
+--      local myLayer = Layer.get("myLayer")
+-- 
+-- or if you want all layers:
+-- 
+--      local tableOfLayers = Layer.get()
+--      
+-- However, if you only want the amout of layers then you can use:
+-- 
+--      local amountOfLayers = #Layer.get()
+--      
+-- 
+-- @function [parent=#Layer] get
+-- @param #string layerName [Optional] The name of the layer.
+-- @return #Layer Returns the first match of layerName.
+-- @return #list<#Layer> Returns all layers. Only if layerName is <b>not</b> passed. 
+
+-------------------------------------------------------------------------------
+-- Returns all layers containg the text layerName.
+-- @function [parent=#Layer] find
+-- @param #string layerName The string which the layers should contain
+-- @return #list<#Layer> Returns all layers where layerName is contained in the layer.
+
+-------------------------------------------------------------------------------
+-- Stops the layer's movement
+-- @function [parent=#Layer] stop
+-- @param self
+
+-------------------------------------------------------------------------------
+-- Shows the layer.
+-- @function [parent=#Layer] show
+-- @param self
+-- @param #boolean noSmoke If true, then no smoke will be displayed.
+
+-------------------------------------------------------------------------------
+-- Hides the layer.
+-- @function [parent=#Layer] hide
+-- @param self
+-- @param #boolean noSmoke If true, then no smoke will be displayed.
+
+-------------------------------------------------------------------------------
+-- Toggles (Showing/Hiding) the layer.
+-- @function [parent=#Layer] toggle
+-- @param self
+-- @param #boolean noSmoke If true, then no smoke will be displayed.
+
+-------------------------------------------------------------------------------
+-- [READONLY] A boolean flag if the layer is hidden or not. This can be controlled by the show, hide, toggle function.
+-- @field [parent=#Layer] #boolean isHidden
+
+-------------------------------------------------------------------------------
+-- [READONLY] The layer name.
+-- @field [parent=#Layer] VBStr#VBStr layerName
+
+-------------------------------------------------------------------------------
+-- The x-speed of the layer.
+-- @field [parent=#Layer] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the layer.
+-- @field [parent=#Layer] #number speedY
+
+return nil

@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------
+-- This namespace contains misc. functions for SMBX.
+-- @module Misc
+
+-------------------------------------------------------------------------------
+-- Converts every npc on screen to coins. 
+-- (Like you would hit the exit.)
+-- @function [parent=#Misc] npcToCoins
+
+
+-------------------------------------------------------------------------------
+-- Starts the "POW"-Effect 
+-- (like if the POW-Block hits the floor)
+-- @function [parent=#Misc] doPOW
+
+-------------------------------------------------------------------------------
+-- Gets or sets the cheat buffer text. 
+-- If you don't pass an parameter to cheatBuffer, then the cheat buffer will be returned.
+-- @function [parent=#Misc] cheatBuffer
+-- @param #string cheatBufferText Sets the current cheat buffer text.
+-- @return #string A copy of the cheat string buffer.
+
+-------------------------------------------------------------------------------
+-- Returns a list of files in the given path. 
+-- The paths starts from the SMBX-Directory. 
+-- If path is an empty string, then the files in the SMBX-Directory are returned.
+-- @function [parent=#Misc] listFiles
+-- @param #string path The relative or absolute path to the files to be listed. If this argument is an empty string then the SMBX root directory is listed and returned.
+-- @return #table The files in the directory. (Does not contain the full path)
+
+-------------------------------------------------------------------------------
+-- Returns a list of files in the given path.
+-- The paths starts from the custom folder of the level (when in a level) or the current episode folder (when in the overworld). 
+-- If path is an empty string, then the files in the custom folder (or episode folder when in overworld) are returned. 
+-- If you want to access the episode folder from the level code you can use Misc.listLocalFiles("..").
+-- @function [parent=#Misc] listLocalFiles
+-- @param #string path The relative or absolute path to the files to be listed.
+-- @return #table The files in the directory. (Does not contain the full path)
+
+
+return nil

@@ -1,0 +1,77 @@
+-------------------------------------------------------------------------------
+-- @module Block
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX Block struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myBlock:mem(0x1C, FIELD_WORD, -1)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local bgoIsHidden = myBlock:mem(0x1C, FIELD_WORD)
+--      
+-- @function [parent=#Block] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+-------------------------------------------------------------------------------
+-- Returns the amount of blocks in the level.
+-- @function [parent=#Block] count
+-- @return #number The number of blocks in the level.
+
+-------------------------------------------------------------------------------
+-- Returns blocks of the level.
+-- @function [parent=#Block] get
+-- @param ids [Optional] The ids to be filtered. Can be a single number or a table with numbers of ids to be filtered out.
+-- @return #list<#Block> Returns a table with all blocks in the level.
+
+-------------------------------------------------------------------------------
+-- Makes a collision check and returns the side of the collision.
+-- @function [parent=#Block] collidesWith
+-- @param self
+-- @param #Player player The player where the collison check should be done.
+-- @return #number The side of the collision.<br>0 = no collision<br>1 = Player on top of block<br>2 = Player touching right side<br>3 = Player touching bottom<br>4 = Player touching left side
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the block.
+-- @field [parent=#Block] #number x
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the block.
+-- @field [parent=#Block] #number y
+
+-------------------------------------------------------------------------------
+-- The x-speed of the block.
+-- @field [parent=#Block] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the block.
+-- @field [parent=#Block] #number speedY
+
+-------------------------------------------------------------------------------
+-- The id of the block.
+-- @field [parent=#Block] #number id
+
+-------------------------------------------------------------------------------
+-- Boolean flag if the block is invisible.
+-- @field [parent=#Block] #number invisible
+
+-------------------------------------------------------------------------------
+-- Boolean flag if the block is slippery.
+-- @field [parent=#Block] #number slippery
+
+-------------------------------------------------------------------------------
+-- [READONLY] The layer name of the npc.
+-- @field [parent=#Block] #VBStr layerName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The layer object of the npc.
+-- @field [parent=#Block] #Layer layerObj
+
+
+return nil

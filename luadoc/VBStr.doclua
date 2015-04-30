@@ -1,0 +1,19 @@
+-------------------------------------------------------------------------------
+-- This class contains a reference to a SMBX String.
+-- The name "VB" comes from the orignal Development Enviroment "Visual Basic 6".
+-- @module VBStr
+
+-------------------------------------------------------------------------------
+-- @field [parent=#VBStr] #string str The stored string.
+
+-------------------------------------------------------------------------------
+-- @field [parent=#VBStr] #number length The length of the string
+
+-------------------------------------------------------------------------------
+-- @function [parent=#VBStr] clear
+-- @param self
+
+
+
+
+return nil

@@ -1,0 +1,74 @@
+-------------------------------------------------------------------------------
+-- @module BGO
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX BGO struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myBGO:mem(0x04, FIELD_WORD, -1)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local bgoIsHidden = myBGO:mem(0x04, FIELD_WORD)
+--      
+-- @function [parent=#BGO] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+-------------------------------------------------------------------------------
+-- Returns the amount of BGO in the level.
+-- @function [parent=#BGO] count
+-- @return #number The number of BGOs in the level.
+
+-------------------------------------------------------------------------------
+-- Returns BGO of the level.
+-- @function [parent=#BGO] get
+-- @param ids [Optional] The ids to be filtered. Can be a single number or a table with numbers of ids to be filtered out.
+-- @return #list<#BGO> Returns a table with all BGOs in the level.
+
+-------------------------------------------------------------------------------
+-- The id of the BGO.
+-- @field [parent=#BGO] #number id
+
+-------------------------------------------------------------------------------
+-- Boolean flag if the BGO is invisible.
+-- @field [parent=#BGO] #number isHidden
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the BGO.
+-- @field [parent=#BGO] #number x
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the BGO.
+-- @field [parent=#BGO] #number y
+
+-------------------------------------------------------------------------------
+-- The x-speed of the BGO.
+-- @field [parent=#BGO] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the BGO.
+-- @field [parent=#BGO] #number speedY
+
+-------------------------------------------------------------------------------
+-- The width of the BGO.
+-- @field [parent=#BGO] #number width
+
+-------------------------------------------------------------------------------
+-- The height of the BGO.
+-- @field [parent=#BGO] #number height
+
+-------------------------------------------------------------------------------
+-- The layer object of the BGO.
+-- @field [parent=#BGO] #Layer layer
+
+-------------------------------------------------------------------------------
+-- The layer name of the BGO.
+-- @field [parent=#BGO] #string layerName
+
+
+return nil

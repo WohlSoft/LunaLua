@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+-- @module Graphics
+
+-------------------------------------------------------------------------------
+-- Toggels the hud on/off
+-- @function [parent=#Graphics] activate
+-- @param #boolean showHud If true, then the hud will be shown. 
+
+-------------------------------------------------------------------------------
+-- Loads a image in the resource memory at <i>resourceNumber</i>. You can also set the transparent Color.
+-- @function [parent=#Graphics] loadImage
+-- @param #string filename The filename of the image file relative to the custom folder. Can be also a absolute path.
+-- @param #number resourceNumber The ID for the resource number. Can be selected freely.
+-- @param #number transparentColor The color-code, which should be transparent.
+
+-------------------------------------------------------------------------------
+-- Places a sprite from the resource memory and places it at xPos, yPos
+-- @function [parent=#Graphics] placeSprite
+-- @param #number type If true, then the hud will be shown. <br>1 = Static / HUD sprite<br>2 = "In level" sprite<br>3 = Collectible item<br>4 = Progress bar<br>5 = Phanto
+-- @param #number imgResource The resource number where the image is loaded.
+-- @param #number xPos The x position the image should be placed on. (relative/absolute position depends on type)
+-- @param #number yPos The y position the image should be placed on. (relative/absolute position depends on type)
+-- @param #string extra [Optional] Extra value, depends on the given type.<br>On type 4 this value is used for the event when it is collected by the player.
+-- @param #number time [Optional] The lifetime of the placed sprite. If not set then the sprite is placed forever.
+
+
+
+
+return nil

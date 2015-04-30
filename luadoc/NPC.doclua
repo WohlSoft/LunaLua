@@ -1,0 +1,112 @@
+-------------------------------------------------------------------------------
+-- @module NPC
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory by the offset of the SMBX NPC struct.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      myNPC:mem(0xE2, FIELD_WORD, 77)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local npcID = myNPC:mem(0xE2, FIELD_WORD)
+--      
+-- @function [parent=#NPC] mem
+-- @param self
+-- @param #number address The Memory offset of the struct to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory offset will be set.
+-- @return The value of the struct offset
+
+-------------------------------------------------------------------------------
+-- Returns the amount of NPCs in the level.
+-- @function [parent=#NPC] count
+-- @return #number The number of NPCs in the level.
+
+-------------------------------------------------------------------------------
+-- Returns NPCs of the level.
+-- @function [parent=#NPC] get
+-- @param ids [Optional, use -1 to skip this filter] The ids to be filtered. Can be a single number or a table with numbers of ids to be filtered out.
+-- @param sections [Optional, use -1 to skip this filter] The sections to be filtered. Can be a single number or a table with numbers of ids to be filtered out. 
+-- @return #list<#NPC> Returns a table with all NPCs in the level.
+
+-------------------------------------------------------------------------------
+-- Spawns a new NPC.
+-- @function [parent=#NPC] spawn 
+-- @param #number npcID The id of the NPC, which should be spawned.
+-- @param #number x The x position of the spawned NPC.
+-- @param #number y The y position of the spawned NPC.
+-- @param #number sectionNumber The section number (0-20) where the NPC belongs to. (Check coordinates).<br>Note that sectionNumber is from 0-20 (-> Section 1 would be Section 0)
+-- @param #boolean respawn [OPTIONAL] If the npc should keep respawning.
+-- @param #boolean centered [OPTIONAL] If the x, y coordinates represenets the center position of the NPC.
+-- @return #NPC The spawned NPC-Object. This can be used to modify additional behaviour.
+
+-------------------------------------------------------------------------------
+-- @function [parent=#NPC] kill
+-- @param self
+-- @param #number killAnimation [OPTIONAL] If the kill animation should be specific. (For example spin-jump kill)<br>Default value is 1.
+
+-------------------------------------------------------------------------------
+-- The id of the NPC.
+-- @field [parent=#NPC] #number id
+
+-------------------------------------------------------------------------------
+-- The x coordinate of the NPC.
+-- @field [parent=#NPC] #number x
+
+-------------------------------------------------------------------------------
+-- The y coordinate of the NPC.
+-- @field [parent=#NPC] #number y
+
+-------------------------------------------------------------------------------
+-- The x-speed of the NPC.
+-- @field [parent=#NPC] #number speedX
+
+-------------------------------------------------------------------------------
+-- The y-speed of the NPC.
+-- @field [parent=#NPC] #number speedY
+
+-------------------------------------------------------------------------------
+-- The direction of the NPC. 
+-- Setting the direction of a npc, resets the momentum of the npc.
+-- You can modify the speedX value if you want to set your own momentum.
+-- @field [parent=#NPC] #number direction
+
+-------------------------------------------------------------------------------
+-- The message of the npc.
+-- @field [parent=#NPC] VBStr#VBStr msg
+
+-------------------------------------------------------------------------------
+-- [READONLY] The attached layer.
+-- @field [parent=#NPC] VBStr#VBStr attachedLayerName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The event name of the activate-event.
+-- @field [parent=#NPC] VBStr#VBStr activateEventName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The event name of the death-event.
+-- @field [parent=#NPC] VBStr#VBStr deathEventName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The event name of the "No more objects in layer"-event.
+-- @field [parent=#NPC] VBStr#VBStr noMoreObjInLayer
+
+-------------------------------------------------------------------------------
+-- [READONLY] The event name of the talk-event.
+-- @field [parent=#NPC] VBStr#VBStr talkEventName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The layer name of the npc.
+-- @field [parent=#NPC] VBStr#VBStr layerName
+
+-------------------------------------------------------------------------------
+-- [READONLY] The layer object of the npc.
+-- @field [parent=#NPC] Layer#Layer layerObj
+
+-------------------------------------------------------------------------------
+-- [READONLY] The attached layer object.
+-- @field [parent=#NPC] Layer#Layer attachedLayerObj
+
+return nil

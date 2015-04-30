@@ -1,0 +1,168 @@
+-------------------------------------------------------------------------------
+-- @module global
+
+
+-- Values:
+
+
+
+-- TODO Hardcoded funcs/fields
+-- -- Fields
+
+-------------------------------------------------------------------------------
+-- 
+
+-- -- Functions
+
+-------------------------------------------------------------------------------
+-- Creates a new RECT-struct. This class can hold integer values for left, right, bottom and top.
+-- @function [parent=#global] newRECT
+-- @return RECT#RECT A new RECT-Struct
+
+-------------------------------------------------------------------------------
+--Creates a new RECT-struct. This class can hold double values for left, right, bottom and top.
+-- @function [parent=#global] newRECTd
+-- @return RECT#RECT A new RECTd-Struct
+
+
+
+-- Hardcoded namespaces
+
+-------------------------------------------------------------------------------
+-- This namespace contains text functions for SMBX.
+-- @field[parent = #global] Text#Text Text
+
+-------------------------------------------------------------------------------
+-- This namespace contains level functions for SMBX. [Level only]
+-- @field[parent = #global] Level#Level Level
+
+-------------------------------------------------------------------------------
+-- This namespace contains misc. functions for SMBX.
+-- @field[parent = #global] Misc#Misc Misc
+
+-------------------------------------------------------------------------------
+-- This namespace contains graphics functions for SMBX.
+-- @field[parent = #global] Graphics#Graphics Graphics
+
+-- Hardcoded classes
+-- -- SMBX Classes
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX Block.
+-- @field[parent = #global] Block#Block Block
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX BGO.
+-- @field[parent = #global] BGO#BGO BGO
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX NPC.
+-- @field[parent = #global] NPC#NPC NPC
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX Effects.
+-- @field[parent = #global] Animation#Animation Animation
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX Layer.
+-- @field[parent = #global] Layer#Layer Layer
+
+-------------------------------------------------------------------------------
+-- This is the class for interacting with the SMBX Warp.
+-- @field[parent = #global] Warp#Warp Warp
+
+-------------------------------------------------------------------------------
+-- This is a pre-defined field for the player.
+-- @field [parent=#global] Player#Player player
+
+-------------------------------------------------------------------------------
+-- This is a pre-defined field for the overworld.
+-- @field [parent=#global] World#World world
+
+
+
+-------------------------------------------------------------------------------
+-- This is a pre-defined field for the second player.
+-- <b>Please note </b> that this field is not set in single player.
+
+
+-- -- Misc Classes
+
+-------------------------------------------------------------------------------
+-- With this class you can share Data between levels, worlds and even episodes.
+-- @field [parent=#global] Data#Data Data
+
+
+
+
+
+-- Hardcoded funcs
+
+-------------------------------------------------------------------------------
+-- Gets or sets a value of the SMBX Memory.
+-- If you write the third parameter, then you will set the value.<br>
+-- Example of setting a field with mem:
+-- 
+--      mem(0x00B2C5AC, FIELD_WORD, 10)
+--      
+-- Example of getting the value of a field with mem:
+-- 
+--      local lifes = mem(0x00B2C5AC, FIELD_WORD)
+--      
+-- @function [parent=#global] mem
+-- @param #number address The Address of the value to fetch or set.
+-- @param #number fieldtype The field type of the value. 
+-- @param value If this value is passed, then the value of this memory address will be set.
+-- @return The value of the address
+
+
+
+
+
+
+-- Softcoded funcs/fields
+
+-------------------------------------------------------------------------------
+-- Register an event. <b>ONLY FOR API MODULES</b>
+-- @function [parent=#global] registerEvent
+-- @param #table apiTable The api table itself, where the event will be executed.
+-- @param #string event The event to be hooked to.
+-- @param #string eventHandler The function name which should be called. Default value is the event name.
+-- @param #boolean beforeMainCall True, if the event should be called before the main calls. Default value is true.
+
+-------------------------------------------------------------------------------
+-- Unregister an event. <b>ONLY FOR API MODULES</b>
+-- @function [parent=#global] unregisterEvent
+-- @param #table apiTable The api table itself, where the event is executed.
+-- @param #string event The eventname of the hooked function.
+-- @param #string eventHandler The function name which is called. Default value is the event name.
+
+-------------------------------------------------------------------------------
+-- Loads the given API.
+-- 
+-- Following paths will be checked for an API:
+-- <ul>
+-- <li>{SMBXPath}/LuaScriptsLib/<b>TheAPIName</b>.lua</li>
+-- <li>{EpisodePath}/<b>TheAPIName</b>.lua</li>
+-- <li>{EpisodePath}/{CustomFolderOfLevel}/<b>TheAPIName</b>.lua</li>
+-- </ul>
+-- @function [parent=#global] loadAPI
+-- @param #string apiName The API Name
+-- @return #table The loaded API-table
+
+-------------------------------------------------------------------------------
+-- Loads the given API shared.
+-- If the API is already loaded, then the already loaded copy of the API will be returned.
+-- 
+-- Following paths will be checked for an API:
+-- <ul>
+-- <li>{SMBXPath}/LuaScriptsLib/<b>TheAPIName</b>.lua</li>
+-- <li>{EpisodePath}/<b>TheAPIName</b>.lua</li>
+-- <li>{EpisodePath}/{CustomFolderOfLevel}/<b>TheAPIName</b>.lua</li>
+-- </ul>
+-- @function [parent=#global] loadSharedAPI
+-- @param #string apiName The API Name
+-- @return #table The loaded API-table
+
+
+return nil

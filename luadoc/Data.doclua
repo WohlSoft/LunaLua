@@ -1,0 +1,70 @@
+-------------------------------------------------------------------------------
+-- @module Data
+
+
+-------------------------------------------------------------------------------
+-- This data will be saved in the level custom folder and can be only accessed by the current level.
+-- @field [parent=#Data] #number DATA_LEVEL
+
+-------------------------------------------------------------------------------
+-- This data will be saved in the episode folder and can be only accessed by the current world or level.
+-- @field [parent=#Data] #number DATA_WORLD
+
+-------------------------------------------------------------------------------
+-- This data will be saved in the {SMBX-Path}/worlds folder and can be accessed from every world or level.
+-- @field [parent=#Data] #number DATA_GLOBAL
+
+-------------------------------------------------------------------------------
+-- Constructs a new Data class.
+-- @callof #Data
+-- @param self
+-- @param #number dataLocation This value can be Data.DATA_LEVEL, Data.DATA_WORLD or Data.DATA_GLOBAL
+-- @param #string sectionName The sectionName of the data file.
+-- @param #boolean useSaveSlot This boolean flags decides if the data file depends on the save slot.
+-- @return #Data The new Data class.
+
+
+-------------------------------------------------------------------------------
+-- Will set a value in the dataset.
+-- @function [parent=#Data] set
+-- @param self
+-- @param #string key The key for the value
+-- @param #string value The value which should be set
+
+-------------------------------------------------------------------------------
+-- Will return one or all values.
+-- If no argument is passed then a table with [key] = value is returned:
+-- 
+--      local allData = myData:get()
+--      local aValue = allData["aKey"]
+-- 
+-- or if you pass an argument:
+-- 
+--      local aValue = myData:get("aKey")
+-- 
+-- @function [parent=#Data] get
+-- @param self
+-- @param #string key The key for the value
+-- @return #string The value of the key.
+-- @return #map<#string, #string> A table with [key] = value
+
+-------------------------------------------------------------------------------
+-- Saves the data.
+-- @function [parent=#Data] save
+-- @param self
+-- @param #string sectionName [OPTIONAL] A new section name.
+
+-------------------------------------------------------------------------------
+-- The save location of the data.
+-- @field [parent=#Data] #number dataType Can be Data.DATA_LEVEL, Data.DATA_WORLD or Data.DATA_GLOBAL
+
+-------------------------------------------------------------------------------
+-- The section name of the data.
+-- @field [parent=#Data] #string sectionName
+
+-------------------------------------------------------------------------------
+-- If the save slot number should be used when saving.
+-- @field [parent=#Data] #boolean useSaveSlot
+
+
+return nil
