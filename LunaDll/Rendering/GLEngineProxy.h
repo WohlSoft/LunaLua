@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
 #include <thread>
+#include <atomic>
 #include "GLDraw.h"
 #include "../Misc/ThreadedCmdQueue.h"
 #include "GLEngine.h"
@@ -48,6 +49,8 @@ class GLEngineProxy {
 private:
     std::thread* mpThread;
     ThreadedCmdQueue<GLEngineCmd> mQueue;
+    std::atomic<uint32_t> mFrameCount;
+    std::atomic<uint32_t> mPendingClear;
 
     GLEngine mGLEngine;
 protected:

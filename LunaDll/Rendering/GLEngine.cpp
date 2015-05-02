@@ -145,21 +145,10 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
-    //glClearColor(0.0, 0.0, 0.0, 1.0);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return TRUE;
-#if 0
-    HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
-
-    // Run our OpenGL frame
-    g_GLEngine.WriteFrame(gpScreenBits);
-    BOOL ret = StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, ghMemDC, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
-
-    SelectObject(ghMemDC, hOld);
-
-    return ret;
-#endif
 }
 
 

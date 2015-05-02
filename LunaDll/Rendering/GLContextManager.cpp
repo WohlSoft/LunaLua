@@ -64,6 +64,14 @@ bool GLContextManager::InitFromHDC(HDC hDC) {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
+    // Prefer v-sync off (but will work fine if forced on too)
+    typedef BOOL(APIENTRY * PFNWGLSWAPINTERVALEXTPROC)(int);
+    static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = 0;
+    wglSwapIntervalEXT = reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(wglGetProcAddress("wglSwapIntervalEXT"));
+    if (wglSwapIntervalEXT != 0) {
+        wglSwapIntervalEXT(0);
+    }
+
     this->hDC = hDC;
     this->hCTX = tempContext;
     return true;

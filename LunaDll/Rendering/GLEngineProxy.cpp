@@ -7,16 +7,18 @@
 GLEngineProxy g_GLEngine;
 
 GLEngineProxy::GLEngineProxy() {
+    mFrameCount = 0;
+    mPendingClear = false;
     mpThread = NULL;
 }
 
 GLEngineProxy::~GLEngineProxy() {
-    /*if (mpThread != NULL) {
+    if (mpThread != NULL) {
         GLEngineCmd cmd;
         cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EXIT;
         mQueue.push(cmd);
         mpThread->join();
-    }*/
+    }
 }
 
 void GLEngineProxy::Init() {
@@ -25,19 +27,14 @@ void GLEngineProxy::Init() {
     }
 }
 
-void GLEngineProxy::ThreadMain2() {
-    dbgboxA("Foo");
-}
-
 void GLEngineProxy::ThreadMain() {
     while (1) {
         GLEngineCmd cmd = mQueue.pop();
 
         RunCmd(cmd);
 
+        // Upon exit command, exit the eng
         if (cmd.mCmd == GLEngineCmd::GL_ENGINE_CMD_EXIT) return;
-
-        //return;
     }
 }
 
@@ -45,24 +42,30 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
     switch (cmd.mCmd) {
     case GLEngineCmd::GL_ENGINE_CMD_CLEAR:
         mGLEngine.ClearTextures();
+        mPendingClear--;
         break;
     case GLEngineCmd::GL_ENGINE_CMD_BITBLT:
-        mGLEngine.EmulatedBitBlt(
-            cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
-            cmd.mData.mBitBlt.nWidth, cmd.mData.mBitBlt.nHeight,
-            cmd.mData.mBitBlt.hdcSrc,
-            cmd.mData.mBitBlt.nXSrc, cmd.mData.mBitBlt.nYSrc,
-            cmd.mData.mBitBlt.dwRop);
+        if (mPendingClear == 0 && mFrameCount <= 1) {
+            mGLEngine.EmulatedBitBlt(
+                cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
+                cmd.mData.mBitBlt.nWidth, cmd.mData.mBitBlt.nHeight,
+                cmd.mData.mBitBlt.hdcSrc,
+                cmd.mData.mBitBlt.nXSrc, cmd.mData.mBitBlt.nYSrc,
+                cmd.mData.mBitBlt.dwRop);
+        }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_STRETCHBLT:
-        mGLEngine.EmulatedStretchBlt(
-            cmd.mData.mStretchBlt.hdcDest,
-            cmd.mData.mStretchBlt.nXOriginDest, cmd.mData.mStretchBlt.nYOriginDest,
-            cmd.mData.mStretchBlt.nWidthDest, cmd.mData.mStretchBlt.nHeightDest,
-            cmd.mData.mStretchBlt.hdcSrc,
-            cmd.mData.mStretchBlt.nXOriginSrc, cmd.mData.mStretchBlt.nYOriginSrc,
-            cmd.mData.mStretchBlt.nWidthSrc, cmd.mData.mStretchBlt.nHeightSrc,
-            cmd.mData.mStretchBlt.dwRop);
+        if (mPendingClear == 0 && mFrameCount <= 1) {
+            mGLEngine.EmulatedStretchBlt(
+                cmd.mData.mStretchBlt.hdcDest,
+                cmd.mData.mStretchBlt.nXOriginDest, cmd.mData.mStretchBlt.nYOriginDest,
+                cmd.mData.mStretchBlt.nWidthDest, cmd.mData.mStretchBlt.nHeightDest,
+                cmd.mData.mStretchBlt.hdcSrc,
+                cmd.mData.mStretchBlt.nXOriginSrc, cmd.mData.mStretchBlt.nYOriginSrc,
+                cmd.mData.mStretchBlt.nWidthSrc, cmd.mData.mStretchBlt.nHeightSrc,
+                cmd.mData.mStretchBlt.dwRop);
+        }
+        mFrameCount--;
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EXIT:
         return;
@@ -76,9 +79,10 @@ void GLEngineProxy::ClearTextures() {
     GLEngineCmd cmd;
 
     cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR;
-    mQueue.push(cmd); //ThreadMain();
+
+    mPendingClear++;
+    mQueue.push(cmd);
     mQueue.waitTillEmpty();
-    //RunCmd(cmd);
 }
 
 void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
@@ -96,8 +100,7 @@ void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeig
     cmd.mData.mBitBlt.nYSrc = nYSrc;
     cmd.mData.mBitBlt.dwRop = dwRop;
 
-    mQueue.push(cmd); //ThreadMain();
-    //RunCmd(cmd);
+    mQueue.push(cmd);
 }
 
 BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
@@ -120,8 +123,10 @@ BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOrig
     cmd.mData.mStretchBlt.nHeightSrc = nHeightSrc;
     cmd.mData.mStretchBlt.dwRop = dwRop;
 
-    mQueue.push(cmd); //ThreadMain();
-    //RunCmd(cmd);
+    // Increment count of stored frames
+    mFrameCount++;
+
+    mQueue.push(cmd);
     return TRUE;
 }
 
