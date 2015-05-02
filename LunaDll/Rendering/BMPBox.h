@@ -10,20 +10,20 @@
 class BMPBox {
 public:
 
-	/// Functions ///
-	BMPBox();
-	~BMPBox();
-	BMPBox(std::wstring filename, HDC screen_dc);
-	void Init();
+    /// Functions ///
+    BMPBox();
+    ~BMPBox();
+    BMPBox(std::wstring filename, HDC screen_dc);
+    void Init();
 
-	bool ImageLoaded();
+    bool ImageLoaded();
 
-	/// Members ///
-	int m_H;				// Height of bitmap
-	int m_W;				// Width of bitmap
-	int	m_TransColor;		// Value that represents transparency (will write nothing)
-	HBITMAP m_hbmp;			// Handle to bitmap data
-	HDC m_hdc;				// handle to compatible DC for this bitmap
+    /// Members ///
+    int m_H;				// Height of bitmap
+    int m_W;				// Width of bitmap
+    int	m_TransColor;		// Value that represents transparency (will write nothing)
+    HBITMAP m_hbmp;			// Handle to bitmap data
+    HDC m_hdc;				// handle to compatible DC for this bitmap
 };
 
 #endif
