@@ -29,12 +29,16 @@ void GLDraw::Draw(int nXDest, int nYDest, int nWidth, int nHeight, const Texture
         nHeight += nYSrc;
         nYSrc = 0;
     }
-    if (nWidth >((int)tex->w - nXSrc)) {
+    if (nWidth > ((int)tex->w - nXSrc)) {
         nWidth = (int)tex->w - nXSrc;
     }
     if (nHeight > ((int)tex->h - nYSrc)) {
         nHeight = (int)tex->h - nYSrc;
     }
+
+    // Don't render if calculated width or height is <= 0
+    if (nHeight <= 0) return;
+    if (nWidth <= 0) return;
 
     // Generate our floating point coordinates
     float texw = (float)tex->w;
