@@ -390,8 +390,10 @@ extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD arg1, DWORD arg2, 
 {
     std::wstring msg((wchar_t*)msgText->bstrVal);
     if (gHook_SkipTestMsgBox){
-        if (msg == std::wstring((wchar_t*)0x42BE28))
+        if (msg == std::wstring((wchar_t*)0x42BE28)){
+            gHook_SkipTestMsgBox = false;
             return 7;
+        }
     }
     gHook_SkipTestMsgBox = false;
     return rtcMsgBox(msgText, arg1, arg2, arg3, arg4);
