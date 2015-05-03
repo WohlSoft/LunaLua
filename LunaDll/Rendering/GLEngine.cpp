@@ -10,7 +10,8 @@
 #include "GLContextManager.h"
 
 GLEngine::GLEngine() :
-    mInitialized(false), mHadError(false), mEnabled(false),
+    mInitialized(false), mHadError(false),
+    mEnabled(false), mBitwiseCompat(true),
     mFB(0), mColorRB(0), mDepthRB(0) {
     mBufTex.w = 800;
     mBufTex.h = 600;
@@ -96,10 +97,10 @@ void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, H
     GLDraw::RenderMode mode;
     switch (dwRop) {
     case SRCAND:
-        mode = GLDraw::RENDER_MODE_MULTIPLY;
+        mode = mBitwiseCompat ? GLDraw::RENDER_MODE_AND : GLDraw::RENDER_MODE_MULTIPLY;
         break;
     case SRCPAINT:
-        mode = GLDraw::RENDER_MODE_MAX;
+        mode = mBitwiseCompat ? GLDraw::RENDER_MODE_OR : GLDraw::RENDER_MODE_MAX;
         break;
     default:
         mode = GLDraw::RENDER_MODE_ALPHA;

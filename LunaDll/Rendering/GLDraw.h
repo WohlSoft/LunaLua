@@ -15,7 +15,9 @@ public:
     enum RenderMode {
         RENDER_MODE_ALPHA,
         RENDER_MODE_MULTIPLY,
-        RENDER_MODE_MAX
+        RENDER_MODE_MAX,
+        RENDER_MODE_AND,
+        RENDER_MODE_OR
     };
 
 public:

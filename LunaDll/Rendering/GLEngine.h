@@ -11,6 +11,7 @@ private:
     bool mInitialized;
     bool mHadError;
     bool mEnabled;
+    bool mBitwiseCompat;
     SDL_Window *mScreen;
     SDL_Renderer *mRenderer;
     SDL_GLContext mGLContext;

@@ -61,6 +61,16 @@ void GLDraw::Draw(int nXDest, int nYDest, int nWidth, int nHeight, const Texture
     case RENDER_MODE_MAX:
         glBlendEquation(GL_MAX);
         break;
+    case RENDER_MODE_AND:
+        glEnable(GL_COLOR_LOGIC_OP);
+        glBlendEquationEXT(GL_LOGIC_OP);
+        glLogicOp(GL_AND);
+        break;
+    case RENDER_MODE_OR:
+        glEnable(GL_COLOR_LOGIC_OP);
+        glBlendEquationEXT(GL_LOGIC_OP);
+        glLogicOp(GL_OR);
+        break;
     case RENDER_MODE_ALPHA:
     default:
         glBlendEquation(GL_FUNC_ADD);
@@ -94,6 +104,12 @@ void GLDraw::Draw(int nXDest, int nYDest, int nWidth, int nHeight, const Texture
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+
+    // Disable color logic op if we enabled it
+    if (mode == RENDER_MODE_AND || mode == RENDER_MODE_OR)
+    {
+        glDisable(GL_COLOR_LOGIC_OP);
+    }
 }
 
 void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
