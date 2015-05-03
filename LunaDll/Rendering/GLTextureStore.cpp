@@ -57,7 +57,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromBitmapHDC(HDC hdc) {
     HDC convHDC = CreateCompatibleDC(screenHDC);
     SelectObject(convHDC, convHBMP);
     BitBlt(convHDC, 0, 0, tex.w, tex.h, hdc, 0, 0, SRCCOPY);
-    ReleaseDC(NULL, convHDC);
+    DeleteDC(convHDC);
     convHDC = NULL;
     ReleaseDC(NULL, screenHDC);
     screenHDC = NULL;
