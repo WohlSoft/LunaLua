@@ -134,10 +134,16 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     // Unbind the texture from the framebuffer
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-    // Set viewport for window size (Note: broken for split screen. Need to fix that later)
-    glViewport(0, 0, nWidthDest, nHeightDest);
+    // Get window size
+    RECT clientRect;
+    GetClientRect(WindowFromDC(hdcDest), &clientRect);
+    int32_t windowWidth = clientRect.right - clientRect.left;
+    int32_t windowHeight = clientRect.bottom - clientRect.top;
+
+    // Set viewport for window size
+    glViewport(0, 0, windowWidth, windowHeight);
     glLoadIdentity();
-    glOrtho(0.0f, (float)nWidthDest, (float)nHeightDest, 0.0f, -1.0f, 1.0f);
+    glOrtho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f, -1.0f, 1.0f);
 
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
