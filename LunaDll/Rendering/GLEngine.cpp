@@ -140,10 +140,23 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     int32_t windowWidth = clientRect.right - clientRect.left;
     int32_t windowHeight = clientRect.bottom - clientRect.top;
 
+    // Implement letterboxing correction
+    float scaledWidth = windowWidth / 800.0f;
+    float scaledHeight = windowHeight / 600.0f;
+    float xScale = 1.0f;
+    float yScale = 1.0f;
+    if (scaledWidth > scaledHeight) {
+        xScale = scaledHeight / scaledWidth;
+    } else if (scaledWidth < scaledHeight) {
+        yScale = scaledWidth / scaledHeight;
+    }
+    float xOffset = (windowWidth / xScale - windowWidth) * 0.5f;
+    float yOffset = (windowHeight / yScale - windowHeight) * 0.5f;
+
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
     glLoadIdentity();
-    glOrtho(0.0f, (float)windowWidth, (float)windowHeight, 0.0f, -1.0f, 1.0f);
+    glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
 
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
