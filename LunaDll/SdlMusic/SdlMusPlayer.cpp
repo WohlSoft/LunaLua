@@ -137,7 +137,7 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
 {
     sRate=sampleRate;
     Mix_CloseAudio();
-    Mix_OpenAudio(sRate, AUDIO_S16, 2, 4096);
+    Mix_OpenAudio(sRate, AUDIO_S16, 2, 2048);
 	Mix_AllocateChannels(32);
 
 	// Reset the audio sample count and set the post mix callback
