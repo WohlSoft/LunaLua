@@ -39,7 +39,7 @@ void GLEngine::Init() {
     glBindTexture(GL_TEXTURE_2D, mBufTex.name);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     glGenRenderbuffersEXT(1, &mDepthRB);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mDepthRB);
@@ -112,7 +112,7 @@ void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, H
         return;
     }
 
-    g_GLDraw.Draw(nXDest, nYDest, nWidth, nHeight, tex, nXSrc, nYSrc, mode);
+    g_GLDraw.DrawSprite(nXDest, nYDest, nWidth, nHeight, tex, nXSrc, nYSrc, mode);
 }
 
 BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
@@ -131,69 +131,26 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     g_GLDraw.Unbind();
 
-    glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    // Unbind the texture from the framebuffer
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-    DrawBuffer(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
-    //g_GLDraw.Draw(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc/*, nWidthSrc, nHeightSrc*/, GLDraw::RENDER_MODE_ALPHA);
-    //g_GLDraw.Draw(0, 0, 800, 600, &mBufTex, 0, 0/*, nWidthSrc, nHeightSrc*/, GLDraw::RENDER_MODE_ALPHA);
+    // Set viewport for window size (Note: broken for split screen. Need to fix that later)
+    glViewport(0.0f, 0.0f, nWidthDest, nHeightDest);
+    glLoadIdentity();
+    glOrtho(0.0f, nWidthDest, 0.0f, nHeightDest, -1.0f, 1.0f);
 
+    // Draw the buffer, flipped/stretched as appropriate
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest + nHeightDest, nWidthDest, -nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
     glFlush();
-
     SwapBuffers(hdcDest);
 
+    // Get ready to draw some more
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
-    glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
+    glViewport(0.0f, 0.0f, 800.0f, 600.0f);
+    glLoadIdentity();
+    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return TRUE;
 }
-
-
-void GLEngine::DrawBuffer(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
-{
-    glDisable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, mBufTex.name);
-    
-    // Generate our floating point coordinates
-    float texw = (float)800;
-    float texh = (float)600;
-    float x1 = 0.0f;
-    float y1 = 600.0f;
-    float x2 = 800.0f;
-    float y2 = 0.0f;
-    float tx1 = 0.0f / texw;
-    float ty1 = 0.0f / texh;
-    float tx2 = tx1 + 800.0f / texw;
-    float ty2 = ty1 + 600.0f / texh;
-
-    GLfloat Vertices[] = {
-        x1, y1, 0,
-        x2, y1, 0,
-        x2, y2, 0,
-        x1, y2, 0
-    };
-    GLfloat TexCoord[] = {
-        tx1, ty1,
-        tx2, ty1,
-        tx2, ty2,
-        tx1, ty2
-    };
-    GLubyte indices[] = {
-        0, 1, 2, // (bottom left - top left - top right)
-        0, 2, 3  // (bottom left - top right - bottom right)
-    };
-
-    glVertexPointer(3, GL_FLOAT, 0, Vertices);
-    glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
-}
-
-

@@ -16,7 +16,7 @@ void GLDraw::Unbind()
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void GLDraw::Draw(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode)
+void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode)
 {
     // Trim the coordinates to fit the texture
     if (nXSrc < 0) {
@@ -141,3 +141,51 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
 }
+
+
+void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight)
+{
+    // Generate our floating point coordinates
+    float texw = (float)tex->w;
+    float texh = (float)tex->h;
+    float x1 = (float)nXDest;
+    float y1 = (float)nYDest;
+    float x2 = x1 + nWidth;
+    float y2 = y1 + nHeight;
+    float tx1 = nXSrc / texw;
+    float ty1 = nYSrc / texh;
+    float tx2 = tx1 + nSrcWidth / texw;
+    float ty2 = ty1 + nSrcHeight / texh;
+
+    // Set rendering mode for this draw operation
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (mLastTexName != tex->name)
+    {
+        mLastTexName = tex->name;
+        glBindTexture(GL_TEXTURE_2D, tex->name);
+    }
+
+    GLfloat Vertices[] = {
+        x1, y1, 0,
+        x2, y1, 0,
+        x2, y2, 0,
+        x1, y2, 0
+    };
+    GLfloat TexCoord[] = {
+        tx1, ty1,
+        tx2, ty1,
+        tx2, ty2,
+        tx1, ty2
+    };
+    GLubyte indices[] = {
+        0, 1, 2, // (bottom left - top left - top right)
+        0, 2, 3  // (bottom left - top right - bottom right)
+    };
+
+    glVertexPointer(3, GL_FLOAT, 0, Vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+}
+
