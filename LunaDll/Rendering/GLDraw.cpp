@@ -2,6 +2,7 @@
 #include <gl/glew.h>
 #include "../Defines.h"
 #include "GLDraw.h"
+#include "GLCompat.h"
 
 // Instance
 GLDraw g_GLDraw;
@@ -55,25 +56,25 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     // Set rendering mode for this draw operation
     switch (mode) {
     case RENDER_MODE_MULTIPLY:
-        glBlendEquation(GL_FUNC_ADD);
-        glBlendFuncSeparate(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
+        glBlendEquationANY(GL_FUNC_ADD);
+        glBlendFuncSeparateANY(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
         break;
     case RENDER_MODE_MAX:
-        glBlendEquation(GL_MAX);
+        glBlendEquationANY(GL_MAX);
         break;
     case RENDER_MODE_AND:
+        glBlendEquationANY(GL_LOGIC_OP);
         glEnable(GL_COLOR_LOGIC_OP);
-        glBlendEquationEXT(GL_LOGIC_OP);
         glLogicOp(GL_AND);
         break;
     case RENDER_MODE_OR:
+        glBlendEquationANY(GL_LOGIC_OP);
         glEnable(GL_COLOR_LOGIC_OP);
-        glBlendEquationEXT(GL_LOGIC_OP);
         glLogicOp(GL_OR);
         break;
     case RENDER_MODE_ALPHA:
     default:
-        glBlendEquation(GL_FUNC_ADD);
+        glBlendEquationANY(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         break;
     }
@@ -158,7 +159,7 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     float ty2 = ty1 + nSrcHeight / texh;
 
     // Set rendering mode for this draw operation
-    glBlendEquation(GL_FUNC_ADD);
+    glBlendEquationANY(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (mLastTexName != tex->name)

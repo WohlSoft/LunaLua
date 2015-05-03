@@ -5,6 +5,7 @@
 #include "../Defines.h"
 #include "../Globals.h"
 #include "RenderUtils.h"
+#include "GLCompat.h"
 #include "GLDraw.h"
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
@@ -29,8 +30,8 @@ void GLEngine::Init() {
 
 #if 1
     // Set up framebuffer object
-    glGenFramebuffersEXT(1, &mFB);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
+    glGenFramebuffersANY(1, &mFB);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
 
     mBufTex.w = 800;
     mBufTex.h = 600;
@@ -41,22 +42,22 @@ void GLEngine::Init() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    glGenRenderbuffersEXT(1, &mDepthRB);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mDepthRB);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 800, 600);
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
-
-    glFramebufferTextureEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, mBufTex.name, 0);
+    glGenRenderbuffersANY(1, &mDepthRB);
+    glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
+    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 800, 600);
+    glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
+    
+    glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
     glDrawBuffers(1, DrawBuffers);
 
-    GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    GLenum status = glCheckFramebufferStatusANY(GL_FRAMEBUFFER_EXT);
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         dbgboxA("error setting up");
     }
 
     // Bind framebuffer
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -132,7 +133,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     g_GLDraw.Unbind();
 
     // Unbind the texture from the framebuffer
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
 
     // Get window size
     RECT clientRect;
@@ -164,7 +165,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     SwapBuffers(hdcDest);
 
     // Get ready to draw some more
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
     glViewport(0, 0, 800, 600);
     glLoadIdentity();
     glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);

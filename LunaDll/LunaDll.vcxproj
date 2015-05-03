@@ -163,6 +163,7 @@
     <ClInclude Include="libs\luasocket\wsocket.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
     <ClInclude Include="Misc\ThreadedCmdQueue.h" />
+    <ClInclude Include="Rendering\GLCompat.h" />
     <ClInclude Include="Rendering\GLContextManager.h" />
     <ClInclude Include="Rendering\GLDraw.h" />
     <ClInclude Include="Rendering\GLEngine.h" />
