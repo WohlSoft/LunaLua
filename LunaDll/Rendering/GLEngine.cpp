@@ -135,18 +135,18 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
     // Set viewport for window size (Note: broken for split screen. Need to fix that later)
-    glViewport(0.0f, 0.0f, nWidthDest, nHeightDest);
+    glViewport(0, 0, nWidthDest, nHeightDest);
     glLoadIdentity();
-    glOrtho(0.0f, nWidthDest, 0.0f, nHeightDest, -1.0f, 1.0f);
+    glOrtho(0.0f, (float)nWidthDest, (float)nHeightDest, 0.0f, -1.0f, 1.0f);
 
     // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest + nHeightDest, nWidthDest, -nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
     glFlush();
     SwapBuffers(hdcDest);
 
     // Get ready to draw some more
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
-    glViewport(0.0f, 0.0f, 800.0f, 600.0f);
+    glViewport(0, 0, 800, 600);
     glLoadIdentity();
     glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
     glClearColor(0.0, 0.0, 0.0, 1.0);
