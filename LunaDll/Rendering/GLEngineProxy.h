@@ -12,8 +12,9 @@
 struct GLEngineCmd {
     enum GLEngineCmdType {
         GL_ENGINE_CMD_CLEAR,
-        GL_ENGINE_CMD_BITBLT,
-        GL_ENGINE_CMD_STRETCHBLT,
+        GL_ENGINE_CMD_EMULATE_BITBLT,
+        GL_ENGINE_CMD_EMULATE_STRETCHBLT,
+        GL_ENGINE_CMD_END_FRAME,
         GL_ENGINE_CMD_EXIT
     };
 
@@ -42,6 +43,9 @@ struct GLEngineCmd {
             int nHeightSrc;
             DWORD dwRop;
         } mStretchBlt;
+        struct {
+            HDC hdcDest;
+        } mEndFrame;
     } mData;
 };
 
@@ -57,7 +61,6 @@ protected:
     // Internal routines
     void Init();
     void ThreadMain();
-    void ThreadMain2();
     void RunCmd(const GLEngineCmd& cmd);
 
 public:
@@ -70,6 +73,7 @@ public:
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
+    void EndFrame(HDC hdcDest);
 
     inline bool IsEnabled() { return mGLEngine.IsEnabled(); };
 };

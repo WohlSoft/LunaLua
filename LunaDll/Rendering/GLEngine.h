@@ -39,6 +39,7 @@ public:
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
+    void EndFrame(HDC hdcDest);
 };
 
 #include "GLEngineProxy.h"

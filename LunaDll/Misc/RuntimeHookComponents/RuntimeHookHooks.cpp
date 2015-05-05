@@ -504,10 +504,25 @@ extern BOOL __stdcall StretchBltHook(
     DWORD dwRop
     )
 {
+    static uint8_t callCount = 0;
+
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
     {
-        return g_GLEngine.EmulatedStretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+        BOOL ret = g_GLEngine.EmulatedStretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+
+        // Heuristic for the last StretchBlt of the frame
+        if ((nWidthSrc == 800 && nHeightSrc == 600) || (callCount == 1))
+        {
+            g_GLEngine.EndFrame(hdcDest);
+            callCount = 0;
+        }
+        else
+        {
+            callCount++;
+        }
+
+        return ret;
     }
 
     return StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);

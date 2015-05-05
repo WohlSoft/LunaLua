@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <SDL2/SDL.h>
 #include <gl/glew.h>
 #include "GLEngine.h"
 #include "../Defines.h"
@@ -162,7 +161,6 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
     glFlush();
-    SwapBuffers(hdcDest);
 
     // Get ready to draw some more
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
@@ -173,4 +171,13 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return TRUE;
+}
+
+void GLEngine::EndFrame(HDC hdcDest)
+{
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    SwapBuffers(hdcDest);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
 }

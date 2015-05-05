@@ -44,7 +44,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         mGLEngine.ClearTextures();
         mPendingClear--;
         break;
-    case GLEngineCmd::GL_ENGINE_CMD_BITBLT:
+    case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
         if (mPendingClear == 0 && mFrameCount <= 1) {
             mGLEngine.EmulatedBitBlt(
                 cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
@@ -54,7 +54,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mBitBlt.dwRop);
         }
         break;
-    case GLEngineCmd::GL_ENGINE_CMD_STRETCHBLT:
+    case GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT:
         if (mPendingClear == 0 && mFrameCount <= 1) {
             mGLEngine.EmulatedStretchBlt(
                 cmd.mData.mStretchBlt.hdcDest,
@@ -64,6 +64,11 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mStretchBlt.nXOriginSrc, cmd.mData.mStretchBlt.nYOriginSrc,
                 cmd.mData.mStretchBlt.nWidthSrc, cmd.mData.mStretchBlt.nHeightSrc,
                 cmd.mData.mStretchBlt.dwRop);
+        }
+        break;
+    case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
+        if (mPendingClear == 0 && mFrameCount <= 1) {
+            mGLEngine.EndFrame(cmd.mData.mEndFrame.hdcDest);
         }
         mFrameCount--;
         break;
@@ -82,6 +87,8 @@ void GLEngineProxy::ClearTextures() {
 
     mPendingClear++;
     mQueue.push(cmd);
+
+    // Block until the clear has been processed.
     mQueue.waitTillEmpty();
 }
 
@@ -90,7 +97,7 @@ void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeig
     Init();
     GLEngineCmd cmd;
 
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_BITBLT;
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT;
     cmd.mData.mBitBlt.nXDest = nXDest;
     cmd.mData.mBitBlt.nYDest = nYDest;
     cmd.mData.mBitBlt.nWidth = nWidth;
@@ -110,7 +117,7 @@ BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOrig
     Init();
     GLEngineCmd cmd;
 
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_STRETCHBLT;
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT;
     cmd.mData.mStretchBlt.hdcDest = hdcDest;
     cmd.mData.mStretchBlt.nXOriginDest = nXOriginDest;
     cmd.mData.mStretchBlt.nYOriginDest = nYOriginDest;
@@ -123,10 +130,21 @@ BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOrig
     cmd.mData.mStretchBlt.nHeightSrc = nHeightSrc;
     cmd.mData.mStretchBlt.dwRop = dwRop;
 
+    mQueue.push(cmd);
+
+    return TRUE;
+}
+
+void GLEngineProxy::EndFrame(HDC hdcDest)
+{
+    Init();
+    GLEngineCmd cmd;
+
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_END_FRAME;
+    cmd.mData.mEndFrame.hdcDest = hdcDest;
+
     // Increment count of stored frames
     mFrameCount++;
 
     mQueue.push(cmd);
-    return TRUE;
 }
-
