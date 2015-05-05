@@ -1,5 +1,6 @@
 #include "BMPBox.h"
 #include "../Globals.h"
+#include "RenderUtils.h"
 
 // CTOR
 BMPBox::BMPBox() {
@@ -25,7 +26,8 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
     if (filename.length() < 1)
         return;
 
-    m_hbmp = (HBITMAP)LoadImage(NULL, filename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    // Load any image, converted to pre-multiplied BGRA
+    m_hbmp = LoadGfxAsBitmap(filename);
 
     //gLogger.Log(L"Requested handle for: " + filename, LOG_STD);
     //int lasterr = GetLastError();
@@ -48,7 +50,35 @@ void BMPBox::Init() {
     m_W = 0;
     m_hbmp = NULL;
     m_hdc = NULL;
-    m_TransColor = DEFAULT_TRANS_COLOR;
+}
+
+// Makes a specified color transparent
+void BMPBox::MakeColorTransparent(int transparency_color) {
+    // Convert RGB to BGRA
+    uint32_t match_color = (
+        ((uint32_t)(transparency_color & 0xFF0000) >> 8) |
+        ((uint32_t)(transparency_color & 0x00FF00) << 8) |
+        ((uint32_t)(transparency_color & 0x0000FF) << 24) |
+        0xFF
+    );
+
+    if (m_hbmp) {
+        BITMAP bm;
+        memset(&bm, 0, sizeof(BITMAP));
+        GetObject(m_hbmp, sizeof(BITMAP), &bm);
+        uint32_t *pData = (uint32_t *)bm.bmBits;
+        uint32_t dataLen = bm.bmHeight * bm.bmWidth;
+
+        // Presuming we can get the bitmap data, replace all of the color with
+        // transparency.
+        if (pData) {
+            for (uint32_t idx = 0; idx < dataLen; idx++) {
+                if (pData[idx] == match_color) {
+                    pData[idx] = 0;
+                }
+            }
+        }
+    }
 }
 
 // IMAGE LOADED - Returns true if this object loaded correctly / the bitmap handle isn't null

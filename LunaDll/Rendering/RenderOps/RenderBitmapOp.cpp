@@ -19,8 +19,16 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     BMPBox* bmp = renderer->LoadedImages[img_resource_code];
     if (bmp != NULL && bmp->m_hdc != NULL) {
         //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
-        TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
-            bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
+        //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
+        //    bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
+
+        BLENDFUNCTION bf;
+        bf.BlendOp = AC_SRC_OVER;
+        bf.BlendFlags = 0;
+        bf.SourceConstantAlpha = 255;
+        bf.AlphaFormat = AC_SRC_ALPHA;
+        AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
+            bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bf);
 
         if (false) { //debug
             Render::Print(to_wstring((long long)x), 3, 300, 420);

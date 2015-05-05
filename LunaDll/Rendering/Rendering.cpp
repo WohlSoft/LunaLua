@@ -64,7 +64,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int 
         return false;
     }
 
-    pNewbox->m_TransColor = transparency_color;
+    pNewbox->MakeColorTransparent(transparency_color);
     StoreImage(pNewbox, resource_code);
 
     return true;
