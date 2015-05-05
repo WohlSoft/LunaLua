@@ -429,7 +429,8 @@ void CLunaLua::bindAll()
                     def("winState", (unsigned short(*)())&LuaProxy::Level::winState),
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
-                    def("name", &LuaProxy::Level::name)
+                    def("name", &LuaProxy::Level::name),
+					def("loadPlayerHitBoxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes)
                 ],
 
                 namespace_("Graphics")[
@@ -764,6 +765,7 @@ void CLunaLua::bindAllDeprecated()
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent),
                 def("playMusic", &LuaProxy::playMusic), //DONE
+				def("loadHitboxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]
