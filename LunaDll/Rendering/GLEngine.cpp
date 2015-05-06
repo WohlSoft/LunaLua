@@ -77,8 +77,8 @@ void GLEngine::Init() {
     mHadError = false;
 }
 
-void GLEngine::ClearTextures() {
-    g_GLTextureStore.ClearTextures();
+void GLEngine::ClearSMBXTextures() {
+    g_GLTextureStore.ClearSMBXTextures();
 }
 
 void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
@@ -107,7 +107,7 @@ void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, H
         break;
     }
 
-    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromBitmapHDC(hdcSrc);
+    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromSMBXBitmap(hdcSrc);
     if (tex == NULL) {
         return;
     }

@@ -11,7 +11,7 @@
 
 struct GLEngineCmd {
     enum GLEngineCmdType {
-        GL_ENGINE_CMD_CLEAR,
+        GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES,
         GL_ENGINE_CMD_EMULATE_BITBLT,
         GL_ENGINE_CMD_EMULATE_STRETCHBLT,
         GL_ENGINE_CMD_END_FRAME,
@@ -66,7 +66,7 @@ protected:
 public:
     GLEngineProxy();
     ~GLEngineProxy();
-    void ClearTextures();
+    void ClearSMBXTextures();
 
     // External commands
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);

@@ -28,7 +28,7 @@ protected:
 public:
     GLEngine();
     ~GLEngine();
-    void ClearTextures();
+    void ClearSMBXTextures();
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };

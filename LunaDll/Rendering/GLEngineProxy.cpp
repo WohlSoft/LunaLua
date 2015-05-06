@@ -40,8 +40,8 @@ void GLEngineProxy::ThreadMain() {
 
 void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
     switch (cmd.mCmd) {
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR:
-        mGLEngine.ClearTextures();
+    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
+        mGLEngine.ClearSMBXTextures();
         mPendingClear--;
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
@@ -79,11 +79,11 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
     }
 }
 
-void GLEngineProxy::ClearTextures() {
+void GLEngineProxy::ClearSMBXTextures() {
     Init();
     GLEngineCmd cmd;
 
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR;
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES;
 
     mPendingClear++;
     mQueue.push(cmd);

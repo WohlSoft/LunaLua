@@ -10,13 +10,12 @@
 
 class GLTextureStore {
 public:
-    std::vector<const GLDraw::Texture> mTexList;
-    std::unordered_map<HDC, unsigned int> mHDCMap;
+    std::unordered_map<HDC, const GLDraw::Texture*> mSmbxHdcMap;
     GLuint mLastTexName;
 
     GLTextureStore();
-    void ClearTextures();
-    const GLDraw::Texture* TextureFromBitmapHDC(HDC hdc);
+    void ClearSMBXTextures();
+    const GLDraw::Texture* TextureFromSMBXBitmap(HDC hdc);
 private:
     bool GetFromHDC(HDC hDC);
 };

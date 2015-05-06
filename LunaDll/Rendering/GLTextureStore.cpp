@@ -10,27 +10,26 @@ GLTextureStore g_GLTextureStore;
 // Constructor
 GLTextureStore::GLTextureStore() :
     mLastTexName(0) {
-    mTexList.clear();
-    mHDCMap.clear();
+    mSmbxHdcMap.clear();
 }
 
-void GLTextureStore::ClearTextures()
+void GLTextureStore::ClearSMBXTextures()
 {
     mLastTexName = 0;
-    for (unsigned int i = 0; i < mTexList.size(); i++) {
-        glDeleteTextures(1, &mTexList[i].name);
+    for (const auto i : mSmbxHdcMap) {
+        glDeleteTextures(1, &i.second->name);
+        delete i.second;
     }
-    mTexList.clear();
-    mHDCMap.clear();
+    mSmbxHdcMap.clear();
 }
 
-const GLDraw::Texture* GLTextureStore::TextureFromBitmapHDC(HDC hdc) {
+const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
     GLDraw::Texture tex = { 0, 0, 0 };
 
     // Get associated texture from cache if possible
-    auto it = mHDCMap.find(hdc);
-    if (it != mHDCMap.end()) {
-        return &mTexList[it->second];
+    auto it = mSmbxHdcMap.find(hdc);
+    if (it != mSmbxHdcMap.end()) {
+        return it->second;
     }
 
     {
@@ -84,9 +83,8 @@ const GLDraw::Texture* GLTextureStore::TextureFromBitmapHDC(HDC hdc) {
     convHBMP = NULL;
 
     // Cache new texture
-    unsigned int texIdx = mTexList.size();
-    mTexList.push_back(tex);
-    mHDCMap[hdc] = texIdx;
+    GLDraw::Texture* pTex = new GLDraw::Texture(tex);
+    mSmbxHdcMap[hdc] = pTex;
 
-    return &mTexList[texIdx];
+    return pTex;
 }
