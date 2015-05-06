@@ -5,6 +5,7 @@
 #include <gl/glew.h>
 #include <unordered_map>
 #include "GLDraw.h"
+#include "BMPBox.h"
 
 class GLEngine {
 private:
@@ -29,6 +30,7 @@ public:
     GLEngine();
     ~GLEngine();
     void ClearSMBXTextures();
+    void ClearLunaTexture(const BMPBox& bmp);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };
@@ -39,6 +41,8 @@ public:
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
+    void DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc);
     void EndFrame(HDC hdcDest);
 };
 

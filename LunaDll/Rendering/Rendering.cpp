@@ -7,6 +7,7 @@
 #include "RenderOps/RenderRectOp.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
+#include "GLEngine.h"
 
 using namespace std;
 
@@ -77,9 +78,17 @@ void Renderer::StoreImage(BMPBox* bmp, int resource_code) {
 
 // DELETE IMAGE - Deletes the image resource and returns true if it exists, otherwise does nothing and returns false
 bool Renderer::DeleteImage(int resource_code) {
-    if (LoadedImages.find(resource_code) != LoadedImages.end()) {
-        delete LoadedImages[resource_code];
-        LoadedImages.erase(resource_code);
+    auto it = LoadedImages.find(resource_code);
+    if (it != LoadedImages.end()) {
+        if (g_GLEngine.IsEnabled())
+        {
+            if (it->second != NULL) {
+                g_GLEngine.ClearLunaTexture(*it->second);
+            }
+        }
+
+        delete it->second;
+        LoadedImages.erase(it);
         return true;
     }
     return false;

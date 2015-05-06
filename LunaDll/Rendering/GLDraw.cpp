@@ -75,7 +75,7 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     case RENDER_MODE_ALPHA:
     default:
         glBlendEquationANY(GL_FUNC_ADD);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         break;
     }
 
@@ -107,7 +107,7 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 
     // Disable color logic op if we enabled it
-    if (mode == RENDER_MODE_AND || mode == RENDER_MODE_OR)
+    if ((mode == RENDER_MODE_AND) || (mode == RENDER_MODE_OR))
     {
         glDisable(GL_COLOR_LOGIC_OP);
     }
@@ -160,7 +160,7 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 
     // Set rendering mode for this draw operation
     glBlendEquationANY(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     if (mLastTexName != tex->name)
     {

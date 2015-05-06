@@ -78,7 +78,13 @@ void GLEngine::Init() {
 }
 
 void GLEngine::ClearSMBXTextures() {
+    g_GLDraw.Unbind();
     g_GLTextureStore.ClearSMBXTextures();
+}
+
+void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
+    g_GLDraw.Unbind();
+    g_GLTextureStore.ClearLunaTexture(bmp);
 }
 
 void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
@@ -171,6 +177,20 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     return TRUE;
+}
+
+void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
+{
+    if (!mInitialized) Init();
+    if (!mInitialized) return;
+
+    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(bmp);
+    if (tex == NULL) {
+        return;
+    }
+
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, tex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
 }
 
 void GLEngine::EndFrame(HDC hdcDest)

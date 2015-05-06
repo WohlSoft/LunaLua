@@ -8,27 +8,25 @@
 GLTextureStore g_GLTextureStore;
 
 // Constructor
-GLTextureStore::GLTextureStore() :
-    mLastTexName(0) {
-    mSmbxHdcMap.clear();
+GLTextureStore::GLTextureStore() {
+    mSmbxTexMap.clear();
 }
 
 void GLTextureStore::ClearSMBXTextures()
 {
-    mLastTexName = 0;
-    for (const auto i : mSmbxHdcMap) {
+    for (const auto i : mSmbxTexMap) {
         glDeleteTextures(1, &i.second->name);
         delete i.second;
     }
-    mSmbxHdcMap.clear();
+    mSmbxTexMap.clear();
 }
 
 const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
     GLDraw::Texture tex = { 0, 0, 0 };
 
     // Get associated texture from cache if possible
-    auto it = mSmbxHdcMap.find(hdc);
-    if (it != mSmbxHdcMap.end()) {
+    auto it = mSmbxTexMap.find(hdc);
+    if (it != mSmbxTexMap.end()) {
         return it->second;
     }
 
@@ -67,7 +65,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
     {
         DeleteObject(convHBMP);
         convHBMP = NULL;
-        return 0;
+        return NULL;
     }
     glBindTexture(GL_TEXTURE_2D, tex.name);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -75,7 +73,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, GL_BGR, GL_UNSIGNED_BYTE, pData);
 
     // Delete conversion DIB section
@@ -84,7 +82,61 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
 
     // Cache new texture
     GLDraw::Texture* pTex = new GLDraw::Texture(tex);
-    mSmbxHdcMap[hdc] = pTex;
+    mSmbxTexMap[hdc] = pTex;
+
+    return pTex;
+}
+
+void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
+{
+    auto it = mLunaTexMap.find(&bmp);
+    if (it != mLunaTexMap.end()) {
+        glDeleteTextures(1, &it->second->name);
+        delete it->second;
+        mLunaTexMap.erase(it);
+    }
+}
+
+const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
+{
+    GLDraw::Texture tex = { 0, 0, 0 };
+    if (bmp.m_hbmp == NULL) return NULL;
+
+    // Get associated texture from cache if possible
+    auto it = mLunaTexMap.find(&bmp);
+    if (it != mLunaTexMap.end()) {
+        return it->second;
+    }
+
+    // The bitmap of BMPBox is known to be a DIB one, with pre-multiplied BGRA.
+    // This makes things easy.
+    BITMAP bm;
+    memset(&bm, 0, sizeof(BITMAP));
+    GetObject(bmp.m_hbmp, sizeof(BITMAP), &bm);
+    if (bm.bmBits == NULL) return NULL; // Wrong type of bitmap?
+
+    // Set width/height
+    tex.h = bm.bmHeight;
+    tex.w = bm.bmWidth;
+
+    // Try to allocate texture
+    glGenTextures(1, &tex.name);
+    if (tex.name == 0) return NULL;
+
+    glBindTexture(GL_TEXTURE_2D, tex.name);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
+
+    // Cache new texture
+    GLDraw::Texture* pTex = new GLDraw::Texture(tex);
+    mLunaTexMap[&bmp] = pTex;
 
     return pTex;
 }

@@ -44,6 +44,9 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         mGLEngine.ClearSMBXTextures();
         mPendingClear--;
         break;
+    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE:
+        mGLEngine.ClearLunaTexture(*cmd.mData.mClearLunaTexture.bmp);
+        break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
         if (mPendingClear == 0 && mFrameCount <= 1) {
             mGLEngine.EmulatedBitBlt(
@@ -66,6 +69,16 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mStretchBlt.dwRop);
         }
         break;
+    case GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE:
+        if (mPendingClear == 0 && mFrameCount <= 1) {
+            mGLEngine.DrawLunaSprite(
+                cmd.mData.mLunaSprite.nXOriginDest, cmd.mData.mLunaSprite.nYOriginDest,
+                cmd.mData.mLunaSprite.nWidthDest, cmd.mData.mLunaSprite.nHeightDest,
+                *cmd.mData.mLunaSprite.bmp,
+                cmd.mData.mLunaSprite.nXOriginSrc, cmd.mData.mLunaSprite.nYOriginSrc,
+                cmd.mData.mLunaSprite.nWidthSrc, cmd.mData.mLunaSprite.nHeightSrc);
+        }
+        break;
     case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
         if (mPendingClear == 0 && mFrameCount <= 1) {
             mGLEngine.EndFrame(cmd.mData.mEndFrame.hdcDest);
@@ -86,6 +99,18 @@ void GLEngineProxy::ClearSMBXTextures() {
     cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES;
 
     mPendingClear++;
+    mQueue.push(cmd);
+
+    // Block until the clear has been processed.
+    mQueue.waitTillEmpty();
+}
+
+void GLEngineProxy::ClearLunaTexture(const BMPBox& bmp) {
+    Init();
+    GLEngineCmd cmd;
+
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE;
+    cmd.mData.mClearLunaTexture.bmp = &bmp;
     mQueue.push(cmd);
 
     // Block until the clear has been processed.
@@ -133,6 +158,26 @@ BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOrig
     mQueue.push(cmd);
 
     return TRUE;
+}
+
+void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
+{
+    Init();
+    GLEngineCmd cmd;
+
+    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE;
+    cmd.mData.mLunaSprite.nXOriginDest = nXOriginDest;
+    cmd.mData.mLunaSprite.nYOriginDest = nYOriginDest;
+    cmd.mData.mLunaSprite.nWidthDest = nWidthDest;
+    cmd.mData.mLunaSprite.nHeightDest = nHeightDest;
+    cmd.mData.mLunaSprite.bmp = &bmp;
+    cmd.mData.mLunaSprite.nXOriginSrc = nXOriginSrc;
+    cmd.mData.mLunaSprite.nYOriginSrc = nYOriginSrc;
+    cmd.mData.mLunaSprite.nWidthSrc = nWidthSrc;
+    cmd.mData.mLunaSprite.nHeightSrc = nHeightSrc;
+
+    mQueue.push(cmd);
 }
 
 void GLEngineProxy::EndFrame(HDC hdcDest)

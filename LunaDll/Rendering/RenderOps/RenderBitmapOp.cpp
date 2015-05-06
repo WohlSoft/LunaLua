@@ -2,6 +2,7 @@
 #include "../BMPBox.h"
 #include "../../Globals.h"
 #include "../../Misc/MiscFuncs.h"
+#include "../GLEngine.h"
 
 // CTOR
 RenderBitmapOp::RenderBitmapOp() {
@@ -22,13 +23,22 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
         //    bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
 
-        BLENDFUNCTION bf;
-        bf.BlendOp = AC_SRC_OVER;
-        bf.BlendFlags = 0;
-        bf.SourceConstantAlpha = 255;
-        bf.AlphaFormat = AC_SRC_ALPHA;
-        AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
-            bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bf);
+        if (g_GLEngine.IsEnabled())
+        {
+            g_GLEngine.DrawLunaSprite(
+                (int)x, (int)y, (int)sx2, (int)sy2,
+                *bmp, (int)sx1, (int)sy1, (int)sx2, (int)sy2);
+        }
+        else
+        {
+            BLENDFUNCTION bf;
+            bf.BlendOp = AC_SRC_OVER;
+            bf.BlendFlags = 0;
+            bf.SourceConstantAlpha = 255;
+            bf.AlphaFormat = AC_SRC_ALPHA;
+            AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
+                bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bf);
+        }
 
         if (false) { //debug
             Render::Print(to_wstring((long long)x), 3, 300, 420);
