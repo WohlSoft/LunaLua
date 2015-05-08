@@ -22,6 +22,9 @@ GLEngineProxy::~GLEngineProxy() {
 }
 
 void GLEngineProxy::Init() {
+    // Don't use built-in SMBX frameskip for OpenGL renderer.
+    GM_FRAMESKIP = COMBOOL(false);
+
     if (mpThread == NULL) {
         mpThread = new std::thread( [this] {this->ThreadMain(); });
     }
