@@ -63,11 +63,11 @@ os.exit = function() error("Shutdown") end
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)
-  return xpcall(function () return f(unpack(arg)) end,
+  return xpcall(f,
     function (msg)
       -- build the error message
       return "==> "..msg..'\n'.."============="..'\n'..debug.traceback()
-    end)
+    end, ...)
 end
 -- ERR HANDLING END
 
