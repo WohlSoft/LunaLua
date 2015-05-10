@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScannerWindow</class>
+ <widget class="QMainWindow" name="ScannerWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>540</width>
+    <height>540</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ScannerWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="buttonOpenSMBX">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Open SMBX Process</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Select Memory Group:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QTreeWidget" name="treeData">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Address</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Type</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+      <item>
+       <property name="text">
+        <string>Test</string>
+       </property>
+       <property name="text">
+        <string>OLD</string>
+       </property>
+       <property name="text">
+        <string>WORD</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable|ItemIsEnabled</set>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="labelStatus">
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Status:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QComboBox" name="comboMemRange"/>
+    </item>
+    <item row="5" column="0">
+     <layout class="QGridLayout" name="contentControllerLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="buttonAddNewEntry">
+        <property name="text">
+         <string>Add New Entry</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

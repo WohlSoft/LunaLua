@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddNewEntryWidget</class>
+ <widget class="QWidget" name="AddNewEntryWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelName">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelAddress">
+     <property name="text">
+      <string>Address:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="4">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>5</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="QLineEdit" name="editAddress">
+     <property name="inputMask">
+      <string>hhhhhhhh</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelFieldType">
+     <property name="text">
+      <string>Field Type:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QComboBox" name="comboFieldType">
+     <item>
+      <property name="text">
+       <string>byte</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>word</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>dword</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>float</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>double</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>string</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="QLineEdit" name="editName"/>
+   </item>
+   <item row="5" column="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
