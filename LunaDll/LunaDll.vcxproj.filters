@@ -103,6 +103,9 @@
     <Filter Include="Header Files\SMBXInternal\Reconstructed\Util">
       <UniqueIdentifier>{69360985-d306-4c26-ae4e-631b886fba00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Misc\MemoryScanner">
+      <UniqueIdentifier>{48dca8f9-ecf9-46bd-9ef7-a969b2124ff9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -380,6 +383,12 @@
     </ClInclude>
     <ClInclude Include="Rendering\GLCompat.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h">
+      <Filter>Header Files\Misc\MemoryScanner</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h">
+      <Filter>Header Files\Misc\MemoryScanner</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -742,6 +751,9 @@
     </ClCompile>
     <ClCompile Include="libs\luasocket\mime.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\MemoryScanner\MemoryScanner.cpp">
+      <Filter>Header Files\Misc\MemoryScanner</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

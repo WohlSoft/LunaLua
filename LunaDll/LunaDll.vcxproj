@@ -161,6 +161,8 @@
     <ClInclude Include="libs\luasocket\timeout.h" />
     <ClInclude Include="libs\luasocket\udp.h" />
     <ClInclude Include="libs\luasocket\wsocket.h" />
+    <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h" />
+    <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
     <ClInclude Include="Misc\ThreadedCmdQueue.h" />
     <ClInclude Include="Rendering\GLCompat.h" />
@@ -254,6 +256,7 @@
     <ClCompile Include="libs\luasocket\udp.c" />
     <ClCompile Include="libs\luasocket\wsocket.c" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp" />
+    <ClCompile Include="Misc\MemoryScanner\MemoryScanner.cpp" />
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBGO.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEffects.cpp" />
