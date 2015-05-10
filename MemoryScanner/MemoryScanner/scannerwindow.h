@@ -45,6 +45,16 @@ private slots:
     void on_buttonAddNewEntry_clicked();
     void on_comboMemRange_currentIndexChanged(int index);
     void on_treeData_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_buttonEditSelected_clicked();
+    void on_buttonDelete_clicked();
+
+    void on_buttonUp_clicked();
+
+    void on_buttonDown_clicked();
+
+    void on_buttonCatAdd_clicked();
+
+    void on_buttonCatRemove_clicked();
 
 private:
     Ui::ScannerWindow *ui;

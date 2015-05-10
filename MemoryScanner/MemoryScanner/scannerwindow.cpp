@@ -4,6 +4,7 @@
 #include <QMessageBox>
 
 #include <QCloseEvent>
+#include <QInputDialog>
 #include <addnewentrywidget.h>
 
 ScannerWindow::ScannerWindow(QWidget *parent) :
@@ -155,6 +156,8 @@ void ScannerWindow::loadCategories()
 
 void ScannerWindow::saveCurrentTo(QString name)
 {
+    if(ui->comboMemRange->findText(name) == -1) return;
+
     QMap<QString, QVariant> allRanges = config.toMap();
     QList<QVariant> mainEntries;
     for(int i = 0; i < ui->treeData->topLevelItemCount(); ++i){
@@ -206,6 +209,11 @@ void ScannerWindow::updateGuiUponState()
     ui->buttonAddNewEntry->setEnabled(m_state == SCANNER_OPEN);
     ui->comboMemRange->setEnabled(m_state == SCANNER_OPEN);
     ui->treeData->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonDelete->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonDown->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonUp->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonEditSelected->setEnabled(m_state == SCANNER_OPEN);
+
 
     switch (m_state) {
     case SCANNER_IDLE:
@@ -350,11 +358,72 @@ void ScannerWindow::on_treeData_itemDoubleClicked(QTreeWidgetItem *item, int col
         ui->treeData->editItem(item, 0);
 }
 
+void ScannerWindow::on_buttonEditSelected_clicked()
+{
+    QTreeWidgetItem* current = ui->treeData->currentItem();
+    if(!current)
+        return;
+
+    QString type = current->data(0, Qt::UserRole+1).toString();
+    if(type == "entry"){
+        AddNewEntryWidget* entryDialog = new AddNewEntryWidget(current);
+        entryDialog->exec();
+        delete entryDialog;
+    }
+}
+
+void ScannerWindow::on_buttonDelete_clicked()
+{
+    if(ui->treeData->currentItem())
+        delete ui->treeData->currentItem();
+}
 
 
+void ScannerWindow::on_buttonUp_clicked()
+{
+    if(!ui->treeData->currentItem())
+        return;
+    if(ui->treeData->currentItem()->parent())
+        return;
+
+    int row = ui->treeData->currentIndex().row();
+    if(row == 0) return;
+
+    QTreeWidgetItem* theItem = ui->treeData->takeTopLevelItem(row);
+    ui->treeData->insertTopLevelItem(row-1, theItem);
+    ui->treeData->setCurrentItem(theItem);
+}
+
+void ScannerWindow::on_buttonDown_clicked()
+{
+    if(!ui->treeData->currentItem())
+        return;
+    if(ui->treeData->currentItem()->parent())
+        return;
+
+    int row = ui->treeData->currentIndex().row();
+    if(row == ui->treeData->topLevelItemCount()-1) return;
+
+    QTreeWidgetItem* theItem = ui->treeData->takeTopLevelItem(row);
+    ui->treeData->insertTopLevelItem(row+1, theItem);
+    ui->treeData->setCurrentItem(theItem);
+}
 
 
+void ScannerWindow::on_buttonCatAdd_clicked()
+{
+    QString newName = QInputDialog::getText(this, "Input the new category name", "Please input the category name: ");
+    if(newName.isEmpty()) return;
 
+    ui->comboMemRange->addItem(newName);
+    ui->comboMemRange->setCurrentText(newName);
+}
+
+
+void ScannerWindow::on_buttonCatRemove_clicked()
+{
+    ui->comboMemRange->removeItem(ui->comboMemRange->currentIndex());
+}
 
 
 /*
@@ -401,6 +470,9 @@ void ScannerWindow::resetConnection()
     SMBXSocket = nullptr;
 }
 */
+
+
+
 
 
 

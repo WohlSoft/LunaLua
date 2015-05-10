@@ -14,7 +14,7 @@ class AddNewEntryWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddNewEntryWidget(QDialog *parent = 0);
+    explicit AddNewEntryWidget(QTreeWidgetItem* editToItem = 0, QDialog *parent = 0);
     ~AddNewEntryWidget();
 
     QTreeWidgetItem *generateNewEntry();
@@ -24,6 +24,7 @@ private slots:
 
 private:
     Ui::AddNewEntryWidget *ui;
+    QTreeWidgetItem* m_editItem;
 };
 
 #endif // ADDNEWENTRYWIDGET_H
