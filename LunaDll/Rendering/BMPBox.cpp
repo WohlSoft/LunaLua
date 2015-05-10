@@ -53,14 +53,22 @@ void BMPBox::Init() {
 }
 
 // Makes a specified color transparent
-void BMPBox::MakeColorTransparent(int transparency_color) {
+void BMPBox::MakeColorTransparent(int rgb_color) {
+    union {
+        struct {
+            uint8_t b;
+            uint8_t g;
+            uint8_t r;
+            uint8_t a;
+        } asStruct;
+        uint32_t asInt;
+    } bgra_color;
+
     // Convert RGB to BGRA
-    uint32_t match_color = (
-        ((uint32_t)(transparency_color & 0xFF0000) >> 8) |
-        ((uint32_t)(transparency_color & 0x00FF00) << 8) |
-        ((uint32_t)(transparency_color & 0x0000FF) << 24) |
-        0xFF
-    );
+    bgra_color.asStruct.b = (rgb_color & 0x0000FF);
+    bgra_color.asStruct.g = (rgb_color & 0x00FF00) >> 8;
+    bgra_color.asStruct.r = (rgb_color & 0xFF0000) >> 16;
+    bgra_color.asStruct.a = 255;
 
     if (m_hbmp) {
         BITMAP bm;
@@ -73,7 +81,7 @@ void BMPBox::MakeColorTransparent(int transparency_color) {
         // transparency.
         if (pData) {
             for (uint32_t idx = 0; idx < dataLen; idx++) {
-                if (pData[idx] == match_color) {
+                if (pData[idx] == bgra_color.asInt) {
                     pData[idx] = 0;
                 }
             }

@@ -76,6 +76,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 	lua_call(L,0,0);
 	lua_pushcfunction(L, luaopen_package);
 	lua_call(L,0,0);
+    lua_pushcfunction(L, luaopen_bit);
+    lua_call(L, 0, 0);
 
     //SOCKET TESTING STUFF
     lua_pushcfunction(L, luaopen_io);
