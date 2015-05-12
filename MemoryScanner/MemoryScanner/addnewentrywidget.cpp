@@ -9,8 +9,8 @@ AddNewEntryWidget::AddNewEntryWidget(QTreeWidgetItem *editToItem, QDialog *paren
     ui->setupUi(this);
     if(editToItem){
         ui->editName->setText(editToItem->text(0));
-        ui->comboFieldType->setCurrentText(editToItem->text(1));
-        ui->editAddress->setText(editToItem->text(2));
+        ui->editAddress->setText(editToItem->text(1));
+        ui->comboFieldType->setCurrentText(editToItem->text(2));
     }
 }
 
@@ -19,7 +19,7 @@ AddNewEntryWidget::~AddNewEntryWidget()
     delete ui;
 }
 
-QTreeWidgetItem* AddNewEntryWidget::generateNewEntry()
+QTreeWidgetItem *AddNewEntryWidget::generateNewEntry()
 {
     QTreeWidgetItem* newEntry = new QTreeWidgetItem();
     newEntry->setText(0, ui->editName->text());
@@ -30,6 +30,8 @@ QTreeWidgetItem* AddNewEntryWidget::generateNewEntry()
     newEntry->setCheckState(0, Qt::Unchecked);
     return newEntry;
 }
+
+
 
 void AddNewEntryWidget::on_buttonBox_accepted()
 
@@ -46,3 +48,4 @@ void AddNewEntryWidget::on_buttonBox_rejected()
 {
     reject();
 }
+

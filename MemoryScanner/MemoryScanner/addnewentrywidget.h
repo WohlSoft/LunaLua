@@ -18,11 +18,16 @@ public:
     ~AddNewEntryWidget();
 
     QTreeWidgetItem *generateNewEntry();
+
+
+
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
 private:
+
+
     Ui::AddNewEntryWidget *ui;
     QTreeWidgetItem* m_editItem;
 };

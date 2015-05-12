@@ -15,11 +15,14 @@ CONFIG += C++11
 
 SOURCES += main.cpp\
         scannerwindow.cpp \
-    addnewentrywidget.cpp
+    addnewentrywidget.cpp \
+    addnewsimplestructwidget.cpp
 
 HEADERS  += scannerwindow.h \
     win32Helper.h \
-    addnewentrywidget.h
+    addnewentrywidget.h \
+    addnewsimplestructwidget.h
 
 FORMS    += scannerwindow.ui \
-    addnewentrywidget.ui
+    addnewentrywidget.ui \
+    addnewsimplestructwidget.ui

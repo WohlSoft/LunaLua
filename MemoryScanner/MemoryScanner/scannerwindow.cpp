@@ -1,14 +1,15 @@
 #include "scannerwindow.h"
 #include "ui_scannerwindow.h"
 
-#include <QMessageBox>
-
 #include <QCloseEvent>
-#include <QInputDialog>
-#include <addnewentrywidget.h>
 
-#include <QFileDialog>
+#include <QMessageBox>
 #include <QInputDialog>
+#include <QFileDialog>
+
+#include <addnewentrywidget.h>
+#include <addnewsimplestructwidget.h>
+
 
 ScannerWindow::ScannerWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -86,6 +87,8 @@ void ScannerWindow::updateMemoryList()
             }else{
                 item->setText(3, "?");
             }
+        }else if(item->data(0, Qt::UserRole+1).toString() == "struct"){
+            updateStructEntryList(item);
         }
     }
 }
@@ -178,6 +181,25 @@ void ScannerWindow::saveCurrentTo(QString name)
             entrySetting["entry-type"] = nextItem->text(2);
             entrySetting["entry-checked"] = (nextItem->checkState(0) == Qt::Checked);
             mainEntries << QVariant(entrySetting);
+        }else if(nextItem->data(0, Qt::UserRole+1).toString() == "struct"){
+            QMap<QString, QVariant> structSettings = nextItem->data(0, Qt::UserRole+2).toMap();
+            structSettings["type"] = "struct";
+            structSettings["struct-name"] = nextItem->text(0);
+            structSettings["struct-baseaddress"] = nextItem->text(1);
+
+            QList<QVariant> subEntries;
+            for(int j = 0; j < nextItem->childCount(); ++j){
+                QTreeWidgetItem* childEntry = nextItem->child(j);
+                QMap<QString, QVariant> subentrySetting;
+                subentrySetting["entry-name"] = childEntry->text(0);
+                subentrySetting["entry-address"] =  childEntry->text(1);
+                subentrySetting["entry-type"] = childEntry->text(2);
+                subentrySetting["entry-checked"] = (childEntry->checkState(0) == Qt::Checked);
+                subEntries << QVariant(subentrySetting);
+            }
+
+            structSettings["struct-entries"] = QVariant(subEntries);
+            mainEntries << structSettings;
         }
     }
     allRanges[name] = QVariant(mainEntries);
@@ -212,7 +234,34 @@ void ScannerWindow::loadCurrentFromSelection()
             newEntry->setCheckState(0, (isChecked ? Qt::Checked : Qt::Unchecked));
             ui->treeData->addTopLevelItem(newEntry);
         }else if(type == "struct"){
+            QString name = entrySetting["struct-name"].toString();
+            QString address = entrySetting["struct-baseaddress"].toString();
 
+            entrySetting.remove("type");
+            entrySetting.remove("struct-name");
+            entrySetting.remove("struct-baseaddress");
+
+            QTreeWidgetItem* newEntry = new QTreeWidgetItem({name, address, "", "---"});
+            newEntry->setData(0, Qt::UserRole+1, type);
+            newEntry->setData(0, Qt::UserRole+2, entrySetting);
+            newEntry->setFlags(newEntry->flags() | Qt::ItemIsEditable);
+
+            QList<QVariant> subEntries = entrySetting["struct-entries"].toList();
+            foreach(QVariant nextSubEntry, subEntries){
+                QMap<QString, QVariant> subEntry = nextSubEntry.toMap();
+                QString name = subEntry["entry-name"].toString();
+                QString dataType = subEntry["entry-type"].toString();
+                QString address = subEntry["entry-address"].toString();
+                bool isChecked = subEntry["entry-checked"].toBool();
+
+                QTreeWidgetItem* newSubEntry = new QTreeWidgetItem({name, address, dataType, "?"});
+                newSubEntry->setData(0, Qt::UserRole+1, type);
+                newSubEntry->setFlags(newSubEntry->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+                newSubEntry->setCheckState(0, (isChecked ? Qt::Checked : Qt::Unchecked));
+                newEntry->addChild(newSubEntry);
+            }
+
+            ui->treeData->addTopLevelItem(newEntry);
         }
     }
 
@@ -223,6 +272,7 @@ void ScannerWindow::updateGuiUponState()
 {
     ui->buttonOpenSMBX->setText(m_state == SCANNER_IDLE ? "Open SMBX Process" : "Close SMBX Process");
     ui->buttonAddNewEntry->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonAddNewSimpleStruct->setEnabled(m_state == SCANNER_OPEN);
     ui->comboMemRange->setEnabled(m_state == SCANNER_OPEN);
     ui->treeData->setEnabled(m_state == SCANNER_OPEN);
     ui->buttonDelete->setEnabled(m_state == SCANNER_OPEN);
@@ -231,6 +281,8 @@ void ScannerWindow::updateGuiUponState()
     ui->buttonEditSelected->setEnabled(m_state == SCANNER_OPEN);
     ui->buttonJsonExport->setEnabled(m_state == SCANNER_OPEN);
     ui->buttonJsonImport->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonCatAdd->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonCatRemove->setEnabled(m_state == SCANNER_OPEN);
 
 
     switch (m_state) {
@@ -252,9 +304,23 @@ void ScannerWindow::on_buttonAddNewEntry_clicked()
 {
     AddNewEntryWidget* entryDialog = new AddNewEntryWidget();
     if(entryDialog->exec() == QDialog::Accepted){
-        ui->treeData->addTopLevelItem(entryDialog->generateNewEntry());
+        QTreeWidgetItem* entryItem = entryDialog->generateNewEntry();
+        if(ui->treeData->currentItem()->data(0, Qt::UserRole+1).toString() == "struct"){
+            ui->treeData->currentItem()->addChild(entryItem);
+        }else{
+            ui->treeData->addTopLevelItem(entryItem);
+        }
     }
     delete entryDialog;
+}
+
+void ScannerWindow::on_buttonAddNewSimpleStruct_clicked()
+{
+    AddNewSimpleStructWidget* simpleStructDialog = new AddNewSimpleStructWidget();
+    if(simpleStructDialog->exec() == QDialog::Accepted){
+        ui->treeData->addTopLevelItem(simpleStructDialog->generateNewEntry());
+    }
+    delete simpleStructDialog;
 }
 
 QList<QVariant> ScannerWindow::config_getListOfCategory(QString catName)
@@ -291,6 +357,121 @@ void ScannerWindow::updateMainEntryList(QTreeWidgetItem *item)
     }
 
     delete buffer;
+}
+
+void ScannerWindow::updateStructEntryList(QTreeWidgetItem *item)
+{
+    QMap<QString, QVariant> settings = item->data(0, Qt::UserRole+2).toMap();
+    QString addr = item->text(1);
+
+    bool success;
+    DWORD address = (DWORD)addr.toInt(&success, 16);
+    if(!success){
+        item->setText(3, "!Address Format Error!");
+        return;
+    }
+
+    DWORD addressOfSturctArray;
+    if(!ReadProcessMemory(smbxHandle, (void*)address, &addressOfSturctArray, sizeof(addressOfSturctArray), NULL)){
+        item->setText(3, "!Invalid Address!");
+        return;
+    }
+
+
+    int structSize = settings["struct-size"].toString().toInt(&success);
+    if(!success){
+        item->setText(3, "!Struct size invalid (check settings)!");
+        return;
+    }
+
+    int totalCount = settings["struct-totalcount"].toString().toInt(&success);
+    if(!success){
+        item->setText(3, "!Total count invalid (check settings)!");
+        return;
+    }
+
+    int arrayOffset = settings["struct-offset"].toString().toInt(&success, 16);
+    if(!success){
+        item->setText(3, "!Array offset invalid (check settings)!");
+        return;
+    }
+
+    QScopedPointer<BYTE, QScopedPointerArrayDeleter<BYTE> > buffer(new BYTE[structSize*totalCount]);
+    if(!ReadProcessMemory(smbxHandle, (void*)(addressOfSturctArray+arrayOffset), buffer.data(), structSize*totalCount, NULL)){
+        item->setText(3, "!Failed to copy array!");
+        return;
+    }
+
+    int useLookupType = settings["struct-lookupValType"].toString().toInt(&success);
+    if(!success || useLookupType < 0 || useLookupType > 1){
+        item->setText(3, "!Invalid lookup type (check settings)!");
+        return;
+    }
+
+
+    if(useLookupType == 0){
+        //Use id
+
+        int useID = settings["struct-id"].toString().toInt(&success);
+        if(!success){
+            item->setText(3, "!Invalid id for lookup (check settings)!");
+            return;
+        }
+
+        int useIdOffset = settings["struct-id-offset"].toString().toInt(&success, 16);
+        if(!success){
+            item->setText(3, "!Invalid id offset for lookup (check settings)!");
+            return;
+        }
+
+        for(int i = 0; i < totalCount; ++i){
+            int theID;
+            int currentIndex = i * structSize;
+            theID = *(WORD*)(&(buffer.data()[currentIndex + useIdOffset]));
+            if(theID = useID){
+                BYTE* curStruct = &(buffer.data()[currentIndex]);
+                for(int j = 0; j < item->childCount(); ++j){
+                    QTreeWidgetItem* nextItem = item->child(j);
+
+                    if(nextItem->checkState(0) == Qt::Checked){
+                        // I know that it is copy & paste >->
+                        QString addr = nextItem->text(1);
+
+                        bool success;
+                        DWORD offset = (DWORD)addr.toInt(&success, 16);
+                        if(!success){
+                            nextItem->setText(3, "!Address Format Error!");
+                            return;
+                        }
+
+                        QString type = nextItem->text(2);
+                        int bufLen = strTypeToLength(type);
+                        if(bufLen == -1){
+                            nextItem->setText(3, "!Invalid Type!");
+                            return;
+                        }
+
+                        QDataStream data(QByteArray((const char*)(curStruct+offset), bufLen));
+                        nextItem->setText(3, dataToString(type, data));
+                    }else{
+                        nextItem->setText(3, "?");
+                    }
+                }
+                return;
+            }
+        }
+
+    }else if(useLookupType == 1){
+        //Use index
+
+    }
+
+
+
+
+
+
+    item->setText(3, "---");
 }
 
 int ScannerWindow::strTypeToLength(const QString &memType)
@@ -463,3 +644,5 @@ void ScannerWindow::on_buttonJsonImport_clicked()
     resetAll();
     initJSONAndGui(filePath);
 }
+
+

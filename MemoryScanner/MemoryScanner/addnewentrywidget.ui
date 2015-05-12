@@ -14,6 +14,33 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelAddress">
+     <property name="text">
+      <string>Address or Offset:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="2">
+    <widget class="QLineEdit" name="editName"/>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLineEdit" name="editAddress">
+     <property name="inputMask">
+      <string>hhhhhhhh</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="labelName">
      <property name="text">
@@ -21,27 +48,14 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="labelAddress">
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelFieldType">
      <property name="text">
-      <string>Address:</string>
+      <string>Field Type:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="4">
+   <item row="3" column="0" colspan="3">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -54,21 +68,7 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="2" colspan="2">
-    <widget class="QLineEdit" name="editAddress">
-     <property name="inputMask">
-      <string>hhhhhhhh</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="labelFieldType">
-     <property name="text">
-      <string>Field Type:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" colspan="2">
+   <item row="2" column="1" colspan="2">
     <widget class="QComboBox" name="comboFieldType">
      <item>
       <property name="text">
@@ -102,18 +102,18 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2">
-    <widget class="QLineEdit" name="editName"/>
-   </item>
-   <item row="5" column="3">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   <item row="5" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="centerButtons">
-      <bool>false</bool>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
      </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -65,11 +65,15 @@ private slots:
     void on_buttonJsonExport_clicked();
     void on_buttonJsonImport_clicked();
 
+    void on_buttonAddNewSimpleStruct_clicked();
+
 private:
     Ui::ScannerWindow *ui;
 
     //Memory Stuff
     void updateMainEntryList(QTreeWidgetItem* item);
+    void updateStructEntryList(QTreeWidgetItem* item);
+
     int strTypeToLength(const QString &memType);
     QString dataToString(const QString &memType, QDataStream& streamWithData);
 
