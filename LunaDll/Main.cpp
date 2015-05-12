@@ -109,7 +109,11 @@ int OnLvlLoad() {
 		gSavedVarBank.CheckSaveDeletion();
 		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-		gLunaLua = CLunaLua();
+        //  Don't try to call the CLunaLua constructor... It's already
+        //  constructed automatically once, and trying to do this will call
+        //  the constructor extra times *without* ever calling the destructor,
+        //  which can result in a memory leak of the whole Lua state!
+		//    gLunaLua = CLunaLua();
 		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, std::wstring((wchar_t*)GM_FULLDIR), Level::GetName());
 
 		// Do some stuff
