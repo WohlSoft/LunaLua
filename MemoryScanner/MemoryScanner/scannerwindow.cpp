@@ -7,6 +7,9 @@
 #include <QInputDialog>
 #include <addnewentrywidget.h>
 
+#include <QFileDialog>
+#include <QInputDialog>
+
 ScannerWindow::ScannerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ScannerWindow),
@@ -38,7 +41,7 @@ void ScannerWindow::closeEvent(QCloseEvent *e)
 
 void ScannerWindow::showEvent(QShowEvent *e)
 {
-    initJSON();
+    initJSONAndGui();
     e->accept();
 }
 
@@ -46,33 +49,28 @@ void ScannerWindow::showEvent(QShowEvent *e)
 
 void ScannerWindow::on_buttonOpenSMBX_clicked()
 {
-    EnableDebugPriv();
-
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(PROCESSENTRY32);
-
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
-    bool found = false;
-    if (Process32First(snapshot, &entry) == TRUE)
-    {
-        while (Process32Next(snapshot, &entry) == TRUE)
-        {
-            QString entryName = QString::fromWCharArray(entry.szExeFile);
-            if(entryName == "a2mbxt.exe" || entryName == "smbx.exe"){
-                smbxHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
-                m_state = SCANNER_OPEN;
-                updateGuiUponState();
-                found = true;
-                loadCurrentFromSelection();
+    if(m_state == SCANNER_IDLE){
+        smbxHandle = getSMBXProcessHandle("a2mbxt.exe");
+        if(!smbxHandle) smbxHandle = getSMBXProcessHandle("smbx.exe");
+        if(!smbxHandle){
+            QString possibleProcessName = QInputDialog::getText(this, "Please enter the smbx process name!", "Did not found the SMBX Process.\nPlease enter the smbx process name!\nExample: \"smbx.exe\"");
+            smbxHandle = getSMBXProcessHandle(possibleProcessName);
+            if(!smbxHandle) smbxHandle = getSMBXProcessHandle(possibleProcessName + ".exe");
+            if(!smbxHandle){
+                QMessageBox::information(this , "Didn't find process!", "Didn't find process!");
             }
         }
-    }
-    if(!found){
-        QMessageBox::warning(this, "Warning", "Did not found SMBX process!");
+        m_state = SCANNER_OPEN;
+        updateGuiUponState();
+        loadCurrentFromSelection();
+    }else if(m_state == SCANNER_OPEN){
+        CloseHandle(smbxHandle);
+        smbxHandle = NULL;
+        m_state = SCANNER_IDLE;
+        updateGuiUponState();
     }
 
-    CloseHandle(snapshot);
+
 }
 
 void ScannerWindow::updateMemoryList()
@@ -92,9 +90,8 @@ void ScannerWindow::updateMemoryList()
     }
 }
 
-void ScannerWindow::initJSON()
-{
-    QFile jsonFile("data.json");
+void ScannerWindow::initJSONAndGui(QString fileName){
+    QFile jsonFile(fileName);
     if(!jsonFile.open(QIODevice::ReadWrite)){
         qDebug() << "Failed to open json file";
         return;
@@ -130,9 +127,15 @@ void ScannerWindow::initJSON()
     loadCurrentFromSelection();
 }
 
-void ScannerWindow::saveJSON()
+
+void ScannerWindow::initJSONAndGui()
 {
-    QFile jsonFile("data.json");
+    initJSONAndGui("data.json");
+}
+
+
+void ScannerWindow::saveJSON(QString fileName){
+    QFile jsonFile(fileName);
     if(!jsonFile.open(QIODevice::WriteOnly)){
         qDebug() << "Failed to open json file";
         return;
@@ -140,6 +143,11 @@ void ScannerWindow::saveJSON()
 
     jsonFile.write(QJsonDocument::fromVariant(config).toJson());
     jsonFile.close();
+}
+
+void ScannerWindow::saveJSON()
+{
+    saveJSON("data.json");
 }
 
 void ScannerWindow::loadCategories()
@@ -176,6 +184,14 @@ void ScannerWindow::saveCurrentTo(QString name)
     config = QVariant(allRanges);
 }
 
+void ScannerWindow::resetAll()
+{
+    ui->treeData->clear();
+    ui->treeData->setProperty("latestItem", "");
+    config = QVariant();
+    ui->comboMemRange->clear();
+}
+
 void ScannerWindow::loadCurrentFromSelection()
 {
     ui->treeData->clear();
@@ -205,7 +221,7 @@ void ScannerWindow::loadCurrentFromSelection()
 
 void ScannerWindow::updateGuiUponState()
 {
-    ui->buttonOpenSMBX->setEnabled(m_state == SCANNER_IDLE);
+    ui->buttonOpenSMBX->setText(m_state == SCANNER_IDLE ? "Open SMBX Process" : "Close SMBX Process");
     ui->buttonAddNewEntry->setEnabled(m_state == SCANNER_OPEN);
     ui->comboMemRange->setEnabled(m_state == SCANNER_OPEN);
     ui->treeData->setEnabled(m_state == SCANNER_OPEN);
@@ -213,6 +229,8 @@ void ScannerWindow::updateGuiUponState()
     ui->buttonDown->setEnabled(m_state == SCANNER_OPEN);
     ui->buttonUp->setEnabled(m_state == SCANNER_OPEN);
     ui->buttonEditSelected->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonJsonExport->setEnabled(m_state == SCANNER_OPEN);
+    ui->buttonJsonImport->setEnabled(m_state == SCANNER_OPEN);
 
 
     switch (m_state) {
@@ -426,55 +444,22 @@ void ScannerWindow::on_buttonCatRemove_clicked()
 }
 
 
-/*
-void ScannerWindow::on_buttonConnect_clicked()
+
+void ScannerWindow::on_buttonJsonExport_clicked()
 {
-    ui->buttonConnect->setDisabled(true);
+    QString filePath = QFileDialog::getSaveFileName(this, "Please select the save location to save the json data.", QString(), QString("JSON data (*.json)"));
+    if(filePath.isEmpty())
+        return;
 
-    SMBXSocket = new QTcpSocket();
-    updateStatusText("Connecting", QColor(218,165,32));
-
-
-    connect(SMBXSocket, SIGNAL(connected()), this, SLOT(smbxsocket_connected()));
-    connect(SMBXSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(smbxsocket_error(QAbstractSocket::SocketError)));
-
-    SMBXSocket->connectToHost("127.0.0.1", 42198);
-
+    saveJSON(filePath);
 }
 
-void ScannerWindow::smbxsocket_connected()
+void ScannerWindow::on_buttonJsonImport_clicked()
 {
+    QString filePath = QFileDialog::getOpenFileName(this, "Please select the location to open the json data.", QString(), QString("JSON data (*.json)"));
+    if(filePath.isEmpty())
+        return;
 
+    resetAll();
+    initJSONAndGui(filePath);
 }
-
-void ScannerWindow::smbxsocket_error(QAbstractSocket::SocketError error)
-{
-    QMessageBox::warning(this, "ERROR", SMBXSocket->errorString());
-
-
-}
-
-
-
-void ScannerWindow::updateStatusText(const QString& text, const QColor& color)
-{
-
-    ui->labelStatus->setText("<html><head/><body><p>Status: <span style=\" color:" + color.name(QColor::HexRgb) + ";\">" + text + "</span></p></body></html>");
-}
-
-void ScannerWindow::resetConnection()
-{
-    updateStatusText("Not Connected", QColor(255, 0, 0));
-    SMBXSocket->abort();
-    delete SMBXSocket;
-    SMBXSocket = nullptr;
-}
-*/
-
-
-
-
-
-
-
-

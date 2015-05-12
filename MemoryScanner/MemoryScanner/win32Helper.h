@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
+#include <QString>
+
 static void EnableDebugPriv()
 {
     HANDLE hToken;
@@ -21,6 +23,31 @@ static void EnableDebugPriv()
     AdjustTokenPrivileges(hToken, false, &tkp, sizeof(tkp), NULL, NULL);
 
     CloseHandle(hToken);
+}
+
+static HANDLE getSMBXProcessHandle(const QString& fileName){
+    EnableDebugPriv();
+
+    PROCESSENTRY32 entry;
+    entry.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (Process32First(snapshot, &entry) == TRUE)
+    {
+        while (Process32Next(snapshot, &entry) == TRUE)
+        {
+            QString entryName = QString::fromWCharArray(entry.szExeFile);
+            if(entryName == fileName){
+                HANDLE retHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
+                CloseHandle(snapshot);
+                return retHandle;
+            }
+        }
+    }
+
+    CloseHandle(snapshot);
+    return (HANDLE)0;
 }
 
 #endif // WIN32HELPER_H
