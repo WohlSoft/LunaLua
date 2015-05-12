@@ -17,7 +17,10 @@ RenderBitmapOp::RenderBitmapOp() {
 
 // DRAW
 void RenderBitmapOp::Draw(Renderer* renderer) {
-    BMPBox* bmp = renderer->LoadedImages[img_resource_code];
+    BMPBox* bmp = NULL;
+    auto it = renderer->LoadedImages.find(img_resource_code);
+    if (it != renderer->LoadedImages.end()) bmp = it->second;
+
     if (bmp != NULL && bmp->m_hdc != NULL) {
         //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
         //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,

@@ -266,10 +266,11 @@ void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) 
 
 // INITIALIZE DIMENSIONS -- Resets sprite hitbox according to image. Needs img code set and image loaded
 void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
+    BMPBox* box = NULL;
+    auto it = gLunaRender.LoadedImages.find(spr->m_ImgResCode);
+    if (it != gLunaRender.LoadedImages.end()) box = it->second;
 
-	BMPBox* box = gLunaRender.LoadedImages[spr->m_ImgResCode];
-
-	if(box != NULL) {		
+	if(box != NULL) {
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;

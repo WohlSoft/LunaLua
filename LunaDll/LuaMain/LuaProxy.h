@@ -701,12 +701,23 @@ namespace LuaProxy {
     }
 
     namespace Graphics{
+        class LuaImageResource {
+        public:
+            int imgResource;
+            LuaImageResource(int imgResource);
+            ~LuaImageResource();
+        };
+
         void activateHud(bool activateHud);
         //CSprite functions
         bool loadImage(const char* filename, int resNumber, int transColor);
+        LuaImageResource* loadImage(const char* filename);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
+        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos, const char* extra, int time);
+        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos, const char* extra);
+        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos);
     }
 
     namespace Effects{

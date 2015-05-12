@@ -1,3 +1,4 @@
+#include <climits>
 #include "Rendering.h"
 #include "../Defines.h"
 #include "../SMBXInternal/Level.h"
@@ -36,6 +37,19 @@ bool Renderer::ReloadScreenHDC() {
 
 // LOAD BITMAP RESOURCE - Load an image resource with given resource code. If resource code exists, replaces old image
 bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color) {
+    if (Renderer::LoadBitmapResource(filename, resource_code)) {
+
+        auto it = LoadedImages.find(resource_code);
+        if (it != LoadedImages.end()) {
+            it->second->MakeColorTransparent(transparency_color);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
     // If slot in use, delete old image
     DeleteImage(resource_code);
 
@@ -65,7 +79,6 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int 
         return false;
     }
 
-    pNewbox->MakeColorTransparent(transparency_color);
     StoreImage(pNewbox, resource_code);
 
     return true;
@@ -80,18 +93,31 @@ void Renderer::StoreImage(BMPBox* bmp, int resource_code) {
 bool Renderer::DeleteImage(int resource_code) {
     auto it = LoadedImages.find(resource_code);
     if (it != LoadedImages.end()) {
-        if (g_GLEngine.IsEnabled())
-        {
-            if (it->second != NULL) {
-                g_GLEngine.ClearLunaTexture(*it->second);
+        if (it->second) {
+            if (g_GLEngine.IsEnabled())
+            {
+                if (it->second != NULL) {
+                    g_GLEngine.ClearLunaTexture(*it->second);
+                }
             }
-        }
 
-        delete it->second;
+            delete it->second;
+        }
         LoadedImages.erase(it);
         return true;
     }
     return false;
+}
+
+// Get an automatic resource code (always negative numbers, returns 0 if unable to allocate)
+int Renderer::GetAutoImageResourceCode() const {
+    for (int resource_code = INT_MIN; resource_code < 0; resource_code++) {
+        // If the resource code is unused
+        if (LoadedImages.count(resource_code) == 0) {
+            return resource_code;
+        }
+    }
+    return 0;
 }
 
 // IS ON SCREEN

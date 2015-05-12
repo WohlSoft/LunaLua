@@ -20,7 +20,9 @@ struct Renderer {
     bool ReloadScreenHDC();
 
     bool LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color); // don't give full path
+    bool LoadBitmapResource(std::wstring filename, int resource_code);
     bool DeleteImage(int resource_code);
+    int  GetAutoImageResourceCode() const;
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
     void SafePrint(std::wstring, int font_type, float x, float y);
