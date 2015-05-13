@@ -6,6 +6,7 @@
 #include "BMPBox.h"
 #include "RenderOps/RenderOp.h"
 #include "RenderOps/RenderRectOp.h"
+#include "RenderOps/RenderGLOp.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
@@ -175,6 +176,12 @@ void Render::CalcCameraPos(double* ret_x, double* ret_y) {
 // ADD OP
 void Renderer::AddOp(RenderOp* op) {
     this->RenderOperations.push_back(op);
+}
+
+// GL Engine OP
+void Renderer::GLCmd(const GLEngineCmd &cmd) {
+    RenderGLOp* op = new RenderGLOp(cmd);
+    AddOp(op);
 }
 
 // PRINT -- Calls SMBX's own print function. Only works during the HUD hook
