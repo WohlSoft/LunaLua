@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>610</width>
-    <height>439</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -132,7 +132,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Offset of ID: </string>
+          <string>Offset of ID (in hex:): </string>
          </property>
         </widget>
        </item>
@@ -157,7 +157,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Base Address:</string>
+      <string>Base Address (in hex:):</string>
      </property>
     </widget>
    </item>
@@ -208,7 +208,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Offset To Array:</string>
+      <string>Offset To Array (in hex:):</string>
      </property>
     </widget>
    </item>

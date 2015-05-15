@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="labelAddress">
      <property name="text">
-      <string>Address or Offset:</string>
+      <string>Address or Offset (in hex:):</string>
      </property>
     </widget>
    </item>
