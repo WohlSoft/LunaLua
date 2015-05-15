@@ -1,7 +1,7 @@
 #include "addnewentrywidget.h"
 #include "ui_addnewentrywidget.h"
 
-AddNewEntryWidget::AddNewEntryWidget(QTreeWidgetItem *editToItem, QDialog *parent) :
+AddNewEntryWidget::AddNewEntryWidget(QTreeWidgetItemSMBXAddress *editToItem, QDialog *parent) :
     QDialog(parent),
     ui(new Ui::AddNewEntryWidget),
     m_editItem(editToItem)
@@ -19,9 +19,9 @@ AddNewEntryWidget::~AddNewEntryWidget()
     delete ui;
 }
 
-QTreeWidgetItem *AddNewEntryWidget::generateNewEntry()
+QTreeWidgetItemSMBXAddress *AddNewEntryWidget::generateNewEntry()
 {
-    QTreeWidgetItem* newEntry = new QTreeWidgetItem();
+    QTreeWidgetItemSMBXAddress* newEntry = new QTreeWidgetItemSMBXAddress();
     newEntry->setText(0, ui->editName->text());
     newEntry->setText(1, ui->editAddress->text());
     newEntry->setText(2, ui->comboFieldType->currentText());

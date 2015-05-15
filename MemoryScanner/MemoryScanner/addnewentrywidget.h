@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QVariant>
-#include <QTreeWidgetItem>
+#include <qtreewidgetitemsmbxaddress.h>
 
 namespace Ui {
 class AddNewEntryWidget;
@@ -14,10 +14,10 @@ class AddNewEntryWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddNewEntryWidget(QTreeWidgetItem* editToItem = 0, QDialog *parent = 0);
+    explicit AddNewEntryWidget(QTreeWidgetItemSMBXAddress* editToItem = 0, QDialog *parent = 0);
     ~AddNewEntryWidget();
 
-    QTreeWidgetItem *generateNewEntry();
+    QTreeWidgetItemSMBXAddress *generateNewEntry();
 
 
 
@@ -29,7 +29,7 @@ private:
 
 
     Ui::AddNewEntryWidget *ui;
-    QTreeWidgetItem* m_editItem;
+    QTreeWidgetItemSMBXAddress* m_editItem;
 };
 
 #endif // ADDNEWENTRYWIDGET_H

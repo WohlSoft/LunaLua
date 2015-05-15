@@ -3,11 +3,10 @@
 
 #include <QMainWindow>
 
-
 #include <QtCore>
 #include <win32Helper.h>
 #include <QJsonDocument>
-#include <QTreeWidgetItem>
+#include <qtreewidgetitemsmbxaddress.h>
 
 namespace Ui {
 class ScannerWindow;
@@ -45,7 +44,7 @@ private slots:
     void on_buttonOpenSMBX_clicked();
 
     //Tree List
-    void on_treeData_itemDoubleClicked(QTreeWidgetItem *item, int column);
+    void on_treeData_itemDoubleClicked(QTreeWidgetItemSMBXAddress *item, int column);
 
     //New
     void on_buttonAddNewEntry_clicked();
@@ -71,8 +70,9 @@ private:
     Ui::ScannerWindow *ui;
 
     //Memory Stuff
-    void updateMainEntryList(QTreeWidgetItem* item);
-    void updateStructEntryList(QTreeWidgetItem* item);
+    void updateMainEntryList(QTreeWidgetItemSMBXAddress* item);
+    void updateStructEntryList(QTreeWidgetItemSMBXAddress* item);
+    void updatestruct_updateChildren(BYTE* curStructData, QTreeWidgetItemSMBXAddress* nextItem);
 
     int strTypeToLength(const QString &memType);
     QString dataToString(const QString &memType, QDataStream& streamWithData);

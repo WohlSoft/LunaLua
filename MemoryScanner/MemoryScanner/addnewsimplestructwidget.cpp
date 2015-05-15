@@ -4,8 +4,11 @@
 #include <QIntValidator>
 #include <QMessageBox>
 
+#include <QFileDialog>
+#include <parsetools.h>
 
-AddNewSimpleStructWidget::AddNewSimpleStructWidget(QTreeWidgetItem* editToItem, QWidget *parent) :
+
+AddNewSimpleStructWidget::AddNewSimpleStructWidget(QTreeWidgetItemSMBXAddress* editToItem, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddNewSimpleStructWidget),
     m_editItem(editToItem)
@@ -22,15 +25,19 @@ AddNewSimpleStructWidget::AddNewSimpleStructWidget(QTreeWidgetItem* editToItem, 
 
     connect(ui->radioUseId, SIGNAL(toggled(bool)), this, SLOT(updateGuiState(bool)));
     connect(ui->radioUseIndex, SIGNAL(toggled(bool)), this, SLOT(updateGuiState(bool)));
+    connect(ui->checkParseHeader, SIGNAL(toggled(bool)), this, SLOT(updateGuiState(bool)));
     updateGuiState(false);
+
+    // TODO add edits
+    // TODO add m_subItems on edit
 
     ui->editName->setFocus();
     ui->editName->selectAll();
 }
 
-QTreeWidgetItem* AddNewSimpleStructWidget::generateNewEntry()
+QPair<QTreeWidgetItemSMBXAddress *, QList<QTreeWidgetItem *> > AddNewSimpleStructWidget::generateNewEntry()
 {
-    QTreeWidgetItem* newEntry = new QTreeWidgetItem();
+    QTreeWidgetItemSMBXAddress* newEntry = new QTreeWidgetItemSMBXAddress();
     newEntry->setText(0, ui->editName->text());
     newEntry->setText(1, ui->editBaseAddress->text());
     newEntry->setText(2, "");
@@ -56,7 +63,26 @@ QTreeWidgetItem* AddNewSimpleStructWidget::generateNewEntry()
 
     newEntry->setData(0, Qt::UserRole+2, structMetadata);
 
-    return newEntry;
+    if(ui->checkParseHeader->isChecked()){
+        QFile f(ui->editHeaderFilePath->text());
+        if(!f.open(QIODevice::ReadOnly)){
+            QMessageBox::warning(this, "File Error", "Failed to open header file");
+            return qMakePair(newEntry, QList<QTreeWidgetItem*>());
+        }
+
+        QString data = QString(f.readAll());
+        bool success;
+
+        QList<QTreeWidgetItem* > subItems = ParseTools::parseStruct(data, ui->checkHeaderIgnoreUnknown->isChecked(), success);
+        if(!success){
+            QMessageBox::warning(this, "Parse Error", "Failed to parse header file!");
+            qDeleteAll(subItems);
+            return qMakePair(newEntry, QList<QTreeWidgetItem*>());
+        }
+        return qMakePair(newEntry, subItems);
+    }
+
+    return qMakePair(newEntry, QList<QTreeWidgetItem*>());
 }
 
 AddNewSimpleStructWidget::~AddNewSimpleStructWidget()
@@ -64,7 +90,27 @@ AddNewSimpleStructWidget::~AddNewSimpleStructWidget()
     delete ui;
 }
 
-void AddNewSimpleStructWidget::on_buttonBox_accepted()
+
+void AddNewSimpleStructWidget::updateGuiState(bool /*_1*/)
+{
+    ui->editID->setEnabled(ui->radioUseId->isChecked());
+    ui->editOffsetID->setEnabled(ui->radioUseId->isChecked());
+    ui->editIndex->setEnabled(ui->radioUseIndex->isChecked());
+    ui->editHeaderFilePath->setEnabled(ui->checkParseHeader->isChecked());
+    ui->buttonHeaderPathLookup->setEnabled(ui->checkParseHeader->isChecked());
+    ui->checkHeaderIgnoreUnknown->setEnabled(ui->checkParseHeader->isChecked());
+}
+
+void AddNewSimpleStructWidget::on_buttonHeaderPathLookup_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, "Please select the header file to parse", ui->editHeaderFilePath->text());
+    if(filePath.isEmpty())
+        return;
+
+    ui->editHeaderFilePath->setText(filePath);
+}
+
+void AddNewSimpleStructWidget::accept()
 {
     if(ui->radioUseId->isChecked()){
         int sizeOfStruct = ui->editSizeOfStruct->text().toInt();
@@ -75,17 +121,11 @@ void AddNewSimpleStructWidget::on_buttonBox_accepted()
         }
     }
 
-    accept();
-}
+    if(ui->checkParseHeader->isChecked())
+        if(!QFile(ui->editHeaderFilePath->text()).exists()){
+            QMessageBox::warning(this, "Header File Path Error", "Did not find file \"" + ui->editHeaderFilePath->text() + "\"");
+            return;
+        }
 
-void AddNewSimpleStructWidget::on_buttonBox_rejected()
-{
-    reject();
-}
-
-void AddNewSimpleStructWidget::updateGuiState(bool /*_1*/)
-{
-    ui->editID->setEnabled(ui->radioUseId->isChecked());
-    ui->editOffsetID->setEnabled(ui->radioUseId->isChecked());
-    ui->editIndex->setEnabled(ui->radioUseIndex->isChecked());
+    QDialog::accept();
 }

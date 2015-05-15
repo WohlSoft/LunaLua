@@ -16,12 +16,15 @@ CONFIG += C++11
 SOURCES += main.cpp\
         scannerwindow.cpp \
     addnewentrywidget.cpp \
-    addnewsimplestructwidget.cpp
+    addnewsimplestructwidget.cpp \
+    parsetools.cpp
 
 HEADERS  += scannerwindow.h \
     win32Helper.h \
     addnewentrywidget.h \
-    addnewsimplestructwidget.h
+    addnewsimplestructwidget.h \
+    parsetools.h \
+    qtreewidgetitemsmbxaddress.h
 
 FORMS    += scannerwindow.ui \
     addnewentrywidget.ui \

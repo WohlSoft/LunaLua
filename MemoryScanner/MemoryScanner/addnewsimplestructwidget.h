@@ -2,7 +2,7 @@
 #define ADDNEWSIMPLESTRUCTWIDGET_H
 
 #include <QDialog>
-#include <QTreeWidgetItem>
+#include <qtreewidgetitemsmbxaddress.h>
 
 namespace Ui {
 class AddNewSimpleStructWidget;
@@ -13,17 +13,20 @@ class AddNewSimpleStructWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddNewSimpleStructWidget(QTreeWidgetItem* editToItem = 0, QWidget *parent = 0);
+    explicit AddNewSimpleStructWidget(QTreeWidgetItemSMBXAddress* editToItem = 0, QWidget *parent = 0);
     ~AddNewSimpleStructWidget();
 
-    QTreeWidgetItem *generateNewEntry();
+    QPair<QTreeWidgetItemSMBXAddress *, QList<QTreeWidgetItem *> > generateNewEntry();
 private slots:
-    void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
     void updateGuiState(bool _1);
+    void on_buttonHeaderPathLookup_clicked();
+protected:
+
+    void accept();
 private:
     Ui::AddNewSimpleStructWidget *ui;
-    QTreeWidgetItem* m_editItem;
+    QTreeWidgetItemSMBXAddress* m_editItem;
+    QList<QTreeWidgetItemSMBXAddress* > m_subItems;
 };
 
 #endif // ADDNEWSIMPLESTRUCTWIDGET_H
