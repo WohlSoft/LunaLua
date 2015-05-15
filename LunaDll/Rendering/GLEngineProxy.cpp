@@ -2,13 +2,15 @@
 #include "../Misc/ThreadedCmdQueue.h"
 #include "GLEngineProxy.h"
 #include "../Defines.h"
+#include "GLEngineCmds.h"
 
 // Instance
 GLEngineProxy g_GLEngine;
 
 GLEngineProxy::GLEngineProxy() {
     mFrameCount = 0;
-    mPendingClear = false;
+    mPendingClear = 0;
+    mSkipFrame = false;
     mpThread = NULL;
 }
 
@@ -51,7 +53,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         mGLEngine.ClearLunaTexture(*cmd.mData.mClearLunaTexture.bmp);
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EmulatedBitBlt(
                 cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
                 cmd.mData.mBitBlt.nWidth, cmd.mData.mBitBlt.nHeight,
@@ -61,7 +63,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EmulatedStretchBlt(
                 cmd.mData.mStretchBlt.hdcDest,
                 cmd.mData.mStretchBlt.nXOriginDest, cmd.mData.mStretchBlt.nYOriginDest,
@@ -73,7 +75,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.DrawLunaSprite(
                 cmd.mData.mLunaSprite.nXOriginDest, cmd.mData.mLunaSprite.nYOriginDest,
                 cmd.mData.mLunaSprite.nWidthDest, cmd.mData.mLunaSprite.nHeightDest,
@@ -83,10 +85,14 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EndFrame(cmd.mData.mEndFrame.hdcDest);
         }
-        mFrameCount--;
+        if (mFrameCount-- > 1) {
+            mSkipFrame = true;
+        } else {
+            mSkipFrame = false;
+        }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EXIT:
         return;
@@ -95,104 +101,63 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
     }
 }
 
+void GLEngineProxy::QueueCmd(const GLEngineCmd cmd) {
+    // Ensure we're initialized
+    Init();
+
+    switch (cmd.mCmd) {
+    case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
+        // Increment count of stored frames
+        mFrameCount++;
+        break;
+    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
+        mPendingClear++;
+        break;
+    default:
+        break;
+    }
+
+    // Push the command
+    mQueue.push(cmd);
+
+    switch (cmd.mCmd) {
+    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
+    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE:
+        // Texture clear commands will be synchronous
+        mQueue.waitTillEmpty();
+        break;
+    default:
+        break;
+    }
+}
+
+
 void GLEngineProxy::ClearSMBXTextures() {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES;
-
-    mPendingClear++;
-    mQueue.push(cmd);
-
-    // Block until the clear has been processed.
-    mQueue.waitTillEmpty();
+    QueueCmd(GLEngineCmd::ClearSMBXTextures());
 }
-
 void GLEngineProxy::ClearLunaTexture(const BMPBox& bmp) {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE;
-    cmd.mData.mClearLunaTexture.bmp = &bmp;
-    mQueue.push(cmd);
-
-    // Block until the clear has been processed.
-    mQueue.waitTillEmpty();
+    QueueCmd(GLEngineCmd::ClearLunaTexture(bmp));
 }
-
 void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT;
-    cmd.mData.mBitBlt.nXDest = nXDest;
-    cmd.mData.mBitBlt.nYDest = nYDest;
-    cmd.mData.mBitBlt.nWidth = nWidth;
-    cmd.mData.mBitBlt.nHeight = nHeight;
-    cmd.mData.mBitBlt.hdcSrc = hdcSrc;
-    cmd.mData.mBitBlt.nXSrc = nXSrc;
-    cmd.mData.mBitBlt.nYSrc = nYSrc;
-    cmd.mData.mBitBlt.dwRop = dwRop;
-
-    mQueue.push(cmd);
+    QueueCmd(GLEngineCmd::EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop));
 }
-
-BOOL GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+void GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT;
-    cmd.mData.mStretchBlt.hdcDest = hdcDest;
-    cmd.mData.mStretchBlt.nXOriginDest = nXOriginDest;
-    cmd.mData.mStretchBlt.nYOriginDest = nYOriginDest;
-    cmd.mData.mStretchBlt.nWidthDest = nWidthDest;
-    cmd.mData.mStretchBlt.nHeightDest = nHeightDest;
-    cmd.mData.mStretchBlt.hdcSrc = hdcSrc;
-    cmd.mData.mStretchBlt.nXOriginSrc = nXOriginSrc;
-    cmd.mData.mStretchBlt.nYOriginSrc = nYOriginSrc;
-    cmd.mData.mStretchBlt.nWidthSrc = nWidthSrc;
-    cmd.mData.mStretchBlt.nHeightSrc = nHeightSrc;
-    cmd.mData.mStretchBlt.dwRop = dwRop;
-
-    mQueue.push(cmd);
-
-    return TRUE;
+    QueueCmd(GLEngineCmd::EmulatedStretchBlt(
+        hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
+        hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop));
 }
-
 void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
 {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE;
-    cmd.mData.mLunaSprite.nXOriginDest = nXOriginDest;
-    cmd.mData.mLunaSprite.nYOriginDest = nYOriginDest;
-    cmd.mData.mLunaSprite.nWidthDest = nWidthDest;
-    cmd.mData.mLunaSprite.nHeightDest = nHeightDest;
-    cmd.mData.mLunaSprite.bmp = &bmp;
-    cmd.mData.mLunaSprite.nXOriginSrc = nXOriginSrc;
-    cmd.mData.mLunaSprite.nYOriginSrc = nYOriginSrc;
-    cmd.mData.mLunaSprite.nWidthSrc = nWidthSrc;
-    cmd.mData.mLunaSprite.nHeightSrc = nHeightSrc;
-
-    mQueue.push(cmd);
+    QueueCmd(GLEngineCmd::DrawLunaSprite(
+        nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
+        bmp, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc));
 }
-
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {
-    Init();
-    GLEngineCmd cmd;
-
-    cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_END_FRAME;
-    cmd.mData.mEndFrame.hdcDest = hdcDest;
-
-    // Increment count of stored frames
-    mFrameCount++;
-
-    mQueue.push(cmd);
+    QueueCmd(GLEngineCmd::EndFrame(hdcDest));
 }

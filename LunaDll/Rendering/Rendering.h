@@ -7,6 +7,7 @@
 //#include "BMPBox.h"
 #include <map>
 //#include "RenderOp.h"
+#include "GLEngineCmds.h"
 
 class RenderOp;
 class BMPBox;
@@ -25,6 +26,7 @@ struct Renderer {
     int  GetAutoImageResourceCode() const;
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
+    void GLCmd(const GLEngineCmd &cmd);
     void SafePrint(std::wstring, int font_type, float x, float y);
     void SafePrint(RenderString str);
 
