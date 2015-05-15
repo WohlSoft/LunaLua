@@ -15,6 +15,7 @@ private:
     ThreadedCmdQueue<GLEngineCmd> mQueue;
     std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
+    bool mSkipFrame;
 
     GLEngine mGLEngine;
 protected:

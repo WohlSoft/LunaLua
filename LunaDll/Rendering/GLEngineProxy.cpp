@@ -10,6 +10,7 @@ GLEngineProxy g_GLEngine;
 GLEngineProxy::GLEngineProxy() {
     mFrameCount = 0;
     mPendingClear = 0;
+    mSkipFrame = false;
     mpThread = NULL;
 }
 
@@ -52,7 +53,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         mGLEngine.ClearLunaTexture(*cmd.mData.mClearLunaTexture.bmp);
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EmulatedBitBlt(
                 cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
                 cmd.mData.mBitBlt.nWidth, cmd.mData.mBitBlt.nHeight,
@@ -62,7 +63,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EmulatedStretchBlt(
                 cmd.mData.mStretchBlt.hdcDest,
                 cmd.mData.mStretchBlt.nXOriginDest, cmd.mData.mStretchBlt.nYOriginDest,
@@ -74,7 +75,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.DrawLunaSprite(
                 cmd.mData.mLunaSprite.nXOriginDest, cmd.mData.mLunaSprite.nYOriginDest,
                 cmd.mData.mLunaSprite.nWidthDest, cmd.mData.mLunaSprite.nHeightDest,
@@ -84,10 +85,14 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
-        if (mPendingClear == 0 && mFrameCount <= 1) {
+        if (mPendingClear == 0 && !mSkipFrame) {
             mGLEngine.EndFrame(cmd.mData.mEndFrame.hdcDest);
         }
-        mFrameCount--;
+        if (mFrameCount-- > 1) {
+            mSkipFrame = true;
+        } else {
+            mSkipFrame = false;
+        }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EXIT:
         return;
