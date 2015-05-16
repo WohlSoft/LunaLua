@@ -29,7 +29,22 @@ AddNewSimpleStructWidget::AddNewSimpleStructWidget(QTreeWidgetItemSMBXAddress* e
     updateGuiState(false);
 
     // TODO add edits
-    // TODO add m_subItems on edit
+    if(editToItem){
+        ui->editName->setText(editToItem->text(0));
+        ui->editBaseAddress->setText(editToItem->text(1));
+
+        QMap<QString, QVariant> structMetadata = editToItem->data(0, Qt::UserRole+2).toMap();
+        ui->editOffset->setText(structMetadata["struct-offset"].toString());
+        ui->editSizeOfStruct->setText(structMetadata["struct-size"].toString());
+        ui->editTotalCount->setText(structMetadata["struct-totalcount"].toString());
+
+        ui->radioUseId->setChecked(structMetadata["struct-lookupValType"].toInt() == 0);
+        ui->radioUseIndex->setChecked(structMetadata["struct-lookupValType"].toInt() == 1);
+        ui->editID->setText(structMetadata["struct-id"].toString());
+        ui->editOffsetID->setText(structMetadata["struct-id-offset"].toString());
+        ui->editIndex->setText(structMetadata["struct-index"].toString());
+
+    }
 
     ui->editName->setFocus();
     ui->editName->selectAll();
@@ -44,12 +59,6 @@ QPair<QTreeWidgetItemSMBXAddress *, QList<QTreeWidgetItem *> > AddNewSimpleStruc
     newEntry->setText(3, "---");
     newEntry->setData(0, Qt::UserRole+1, "struct");
     newEntry->setFlags(newEntry->flags() | Qt::ItemIsEditable);
-
-    /*
-     *      QString name = entrySetting["entry-name"].toString();
-            QString dataType = entrySetting["entry-type"].toString();
-            QString address = entrySetting["entry-address"].toString();
-     */
 
     QMap<QString, QVariant> structMetadata;
     structMetadata["struct-offset"] = ui->editOffset->text();
@@ -126,6 +135,65 @@ void AddNewSimpleStructWidget::accept()
             QMessageBox::warning(this, "Header File Path Error", "Did not find file \"" + ui->editHeaderFilePath->text() + "\"");
             return;
         }
+
+    if(m_editItem){
+        m_editItem->setText(0, ui->editName->text());
+        m_editItem->setText(1, ui->editBaseAddress->text());
+
+        QMap<QString, QVariant> structMetadata;
+        structMetadata["struct-offset"] = ui->editOffset->text();
+        structMetadata["struct-size"] = ui->editSizeOfStruct->text();
+        structMetadata["struct-totalcount"] = ui->editTotalCount->text();
+
+        structMetadata["struct-lookupValType"] = (ui->radioUseId->isChecked() ? 0 : 1);
+        structMetadata["struct-id"] = ui->editID->text();
+        structMetadata["struct-id-offset"] = ui->editOffsetID->text();
+        structMetadata["struct-index"] = ui->editIndex->text();
+
+        m_editItem->setData(0, Qt::UserRole+2, structMetadata);
+
+        if(ui->checkParseHeader->isChecked()){
+            QFile f(ui->editHeaderFilePath->text());
+            if(!f.open(QIODevice::ReadOnly)){
+                QMessageBox::warning(this, "File Error", "Failed to open header file");
+                QDialog::accept();
+                return;
+            }
+
+            QString data = QString(f.readAll());
+            bool success;
+
+            QList<QTreeWidgetItem* > subItems = ParseTools::parseStruct(data, ui->checkHeaderIgnoreUnknown->isChecked(), success);
+            if(!success){
+                QMessageBox::warning(this, "Parse Error", "Failed to parse header file!");
+                qDeleteAll(subItems);
+                QDialog::accept();
+                return;
+            }
+
+
+            QList<QTreeWidgetItem* > filteredSubItems;
+            QList<QTreeWidgetItem* > duplicatedSubItems;
+            foreach (QTreeWidgetItem* nextSubItem, subItems) {
+                bool dupFound = false;
+
+                for(int i = 0; i < m_editItem->childCount(); ++i){
+                    QTreeWidgetItem* nextChildItem = m_editItem->child(0);
+                    if(nextSubItem->text(0) == nextChildItem->text(0)){
+                        duplicatedSubItems << nextSubItem;
+                        dupFound = true;
+                        break;
+                    }
+                }
+                if(!dupFound)
+                    filteredSubItems << nextSubItem;
+            }
+
+            qDeleteAll(duplicatedSubItems);
+            m_editItem->addChildren(filteredSubItems);
+            m_editItem->sortChildren(1, Qt::AscendingOrder);
+        }
+    }
 
     QDialog::accept();
 }

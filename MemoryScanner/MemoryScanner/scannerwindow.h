@@ -28,7 +28,6 @@ public:
 
 protected:
     virtual void closeEvent(QCloseEvent * e);
-    virtual void showEvent(QShowEvent *e);
 
 private slots:
     /*void on_buttonConnect_clicked();
@@ -44,7 +43,7 @@ private slots:
     void on_buttonOpenSMBX_clicked();
 
     //Tree List
-    void on_treeData_itemDoubleClicked(QTreeWidgetItemSMBXAddress *item, int column);
+    void on_treeData_itemDoubleClicked(QTreeWidgetItem *item, int column);
 
     //New
     void on_buttonAddNewEntry_clicked();

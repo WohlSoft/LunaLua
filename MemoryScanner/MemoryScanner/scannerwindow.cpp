@@ -22,6 +22,10 @@ ScannerWindow::ScannerWindow(QWidget *parent) :
     connect(scannerTimer, SIGNAL(timeout()), this, SLOT(updateMemoryList()));
     scannerTimer->start(10);
     updateGuiUponState();
+
+    ui->treeData->setColumnWidth(0, 200);
+
+    initJSONAndGui();
 }
 
 ScannerWindow::~ScannerWindow()
@@ -39,13 +43,6 @@ void ScannerWindow::closeEvent(QCloseEvent *e)
     saveJSON();
     e->accept();
 }
-
-void ScannerWindow::showEvent(QShowEvent *e)
-{
-    initJSONAndGui();
-    e->accept();
-}
-
 
 
 void ScannerWindow::on_buttonOpenSMBX_clicked()
@@ -256,7 +253,6 @@ void ScannerWindow::loadCurrentFromSelection()
                 bool isChecked = subEntry["entry-checked"].toBool();
 
                 QTreeWidgetItemSMBXAddress* newSubEntry = new QTreeWidgetItemSMBXAddress({name, address, dataType, "?"});
-                newSubEntry->setData(0, Qt::UserRole+1, type);
                 newSubEntry->setFlags(newSubEntry->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
                 newSubEntry->setCheckState(0, (isChecked ? Qt::Checked : Qt::Unchecked));
                 newEntry->addChild(newSubEntry);
@@ -460,11 +456,6 @@ void ScannerWindow::updateStructEntryList(QTreeWidgetItemSMBXAddress *item)
         return;
     }
 
-
-
-
-
-
     item->setText(3, "---");
 }
 
@@ -578,7 +569,7 @@ void ScannerWindow::on_comboMemRange_currentIndexChanged(int index)
 
 
 //Edit trigger
-void ScannerWindow::on_treeData_itemDoubleClicked(QTreeWidgetItemSMBXAddress *item, int column)
+void ScannerWindow::on_treeData_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     if(column == 0)
         ui->treeData->editItem(item, 0);
@@ -595,7 +586,18 @@ void ScannerWindow::on_buttonEditSelected_clicked()
         AddNewEntryWidget* entryDialog = new AddNewEntryWidget(current);
         entryDialog->exec();
         delete entryDialog;
+    }else if(type == "struct"){
+        AddNewSimpleStructWidget* structDialog = new AddNewSimpleStructWidget(current);
+        structDialog->exec();
+        delete structDialog;
+    }else if(current->parent()){
+        if(current->parent()->data(0, Qt::UserRole+1).toString() == "struct"){
+            AddNewEntryWidget* entryDialog = new AddNewEntryWidget(current);
+            entryDialog->exec();
+            delete entryDialog;
+        }
     }
+
 }
 
 void ScannerWindow::on_buttonDelete_clicked()
@@ -659,6 +661,7 @@ void ScannerWindow::on_buttonJsonExport_clicked()
     if(filePath.isEmpty())
         return;
 
+    saveCurrentTo(ui->treeData->property("latestItem").toString());
     saveJSON(filePath);
 }
 
