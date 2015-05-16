@@ -191,8 +191,26 @@ void LuaProxy::Animation::setWidth(double width)
     ::Animations::Get(m_animationIndex)->momentum.width = width;
 }
 
+float LuaProxy::Animation::subTimer() const
+{
+    if (!isValid())
+        return 0;
+
+    return ::Animations::Get(m_animationIndex)->subTimer;
+}
+
+void LuaProxy::Animation::setSubTimer(float subTimer)
+{
+    if (!isValid())
+        return;
+    ::Animations::Get(m_animationIndex)->subTimer = subTimer;
+}
+
+
 short LuaProxy::Animation::timer() const
 {
+    if (!isValid())
+        return 0;
 	return ::Animations::Get(m_animationIndex)->Timer;
 }
 

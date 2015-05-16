@@ -168,6 +168,8 @@ namespace LuaProxy {
         void setHeight(double height);
         double width() const;
         void setWidth(double width);
+        float subTimer() const;
+        void setSubTimer(float subTimer);
         short timer() const;
         void setTimer(short timer);
         short npcID() const;

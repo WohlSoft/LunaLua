@@ -162,8 +162,7 @@ struct SMBXAnimation{
     Momentum momentum;
     short animationFrame;       //The current animation frame
     short unknown36;
-    short unknown38;
-    short unknown3A;
+    float subTimer;
     short Timer;
     short npcID;                //User by yoshi egg and ludwig (somehow)
     short onlyDrawMask;         //Only draw mask: Is used by the cheat "shadowstar" / "ghostytime"
