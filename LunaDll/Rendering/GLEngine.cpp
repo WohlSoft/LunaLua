@@ -11,7 +11,7 @@
 
 GLEngine::GLEngine() :
     mInitialized(false), mHadError(false),
-    mEnabled(false), mBitwiseCompat(true),
+    mEnabled(true), mBitwiseCompat(true),
     mFB(0), mColorRB(0), mDepthRB(0) {
     mBufTex.w = 800;
     mBufTex.h = 600;
@@ -200,4 +200,36 @@ void GLEngine::EndFrame(HDC hdcDest)
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+}
+
+void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
+    const GLDraw::Texture* tex = NULL;
+    if (bmp) {
+        tex = g_GLTextureStore.TextureFromLunaBitmap(*bmp);
+    }
+
+    glBlendEquationANY(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (tex) {
+        if (g_GLDraw.mLastTexName != tex->name)
+        {
+            g_GLDraw.mLastTexName = tex->name;
+            glBindTexture(GL_TEXTURE_2D, tex->name);
+        }
+    }
+    else {
+        g_GLDraw.Unbind();
+    }
+
+    float r = ((0xFF0000 & color) >> 16) / 255.0f;
+    float g = ((0x00FF00 & color) >> 8) / 255.0f;
+    float b = ((0x0000FF & color) >> 0) / 255.0f;
+    glColor3f(r, g, b);
+}
+
+void GLEngine::DrawTriangles(const float* vert, const float* tex, uint32_t count) {
+    glVertexPointer(2, GL_FLOAT, 0, vert);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex);
+    glDrawArrays(GL_TRIANGLES, 0, count);
 }

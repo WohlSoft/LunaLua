@@ -76,3 +76,22 @@ void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImag
 {
     placeSprite(type, img->imgResource, xPos, yPos, "");
 }
+
+void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t color)
+{
+    const BMPBox* bmp = NULL;
+    if (img) {
+        auto it = gLunaRender.LoadedImages.find(img->imgResource);
+        if (it != gLunaRender.LoadedImages.end()) {
+            bmp = it->second;
+        }
+    }
+
+    gLunaRender.GLCmd(GLEngineCmd::SetTex(bmp, color));
+}
+
+extern "C" {
+    __declspec(dllexport) void __cdecl LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
+        gLunaRender.GLCmd(GLEngineCmd::DrawTriangles(vert, tex, count));
+    }
+}

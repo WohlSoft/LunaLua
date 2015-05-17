@@ -79,6 +79,10 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     lua_call(L,0,0);
     lua_pushcfunction(L, luaopen_bit);
     lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_ffi);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_jit);
+    lua_call(L, 0, 0);
 
     //SOCKET TESTING STUFF
     lua_pushcfunction(L, luaopen_io);
@@ -249,7 +253,10 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int))&LuaProxy::Graphics::placeSprite)
+
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int))&LuaProxy::Graphics::placeSprite),
+                def("glSetTexture", &LuaProxy::Graphics::glSetTexture)
+                // glDrawTriangles will be defined at runtime using FFI
             ],
 
             namespace_("__Effects_EXPERIMENTAL")[

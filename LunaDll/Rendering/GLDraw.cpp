@@ -13,6 +13,7 @@ GLDraw::GLDraw() : mLastTexName(0)
 
 void GLDraw::Unbind()
 {
+    if (mLastTexName == 0) return;
     mLastTexName = 0;
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -189,4 +190,5 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 }
+
 

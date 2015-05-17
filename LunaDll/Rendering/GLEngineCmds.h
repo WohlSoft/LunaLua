@@ -2,6 +2,7 @@
 #define GLEngineCmds__hhhh
 
 #include <windows.h>
+#include <cstdint>
 #include "BMPBox.h"
 
 struct GLEngineCmd {
@@ -12,7 +13,10 @@ struct GLEngineCmd {
         GL_ENGINE_CMD_EMULATE_STRETCHBLT,
         GL_ENGINE_CMD_DRAW_LUNA_SPRITE,
         GL_ENGINE_CMD_END_FRAME,
-        GL_ENGINE_CMD_EXIT
+        GL_ENGINE_CMD_EXIT,
+
+        GL_ENGINE_CMD_SET_TEX,
+        GL_ENGINE_CMD_DRAW_TRIANGLES
     };
 
     GLEngineCmdType mCmd;
@@ -57,6 +61,15 @@ struct GLEngineCmd {
         struct {
             HDC hdcDest;
         } mEndFrame;
+        struct {
+            const BMPBox* bmp;
+            uint32_t color;
+        } mSetTex;
+        struct {
+            const float* vert;
+            const float* tex;
+            uint32_t count;
+        } mDrawTriangles;
     } mData;
 
     static inline GLEngineCmd ClearSMBXTextures() {
@@ -140,6 +153,33 @@ struct GLEngineCmd {
 
         cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_END_FRAME;
         cmd.mData.mEndFrame.hdcDest = hdcDest;
+
+        return cmd;
+    }
+
+    static inline GLEngineCmd SetTex(const BMPBox* bmp, uint32_t color)
+    {
+        GLEngineCmd cmd;
+
+        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_SET_TEX,
+        cmd.mData.mSetTex.bmp = bmp;
+        cmd.mData.mSetTex.color = color;
+
+        return cmd;
+    }
+    static inline GLEngineCmd DrawTriangles(const float* vert, const float* tex, uint32_t count)
+    {
+        GLEngineCmd cmd;
+
+        float* rawVert = new float[count * 2];
+        float* rawTex = new float[count * 2];
+        memcpy(rawVert, vert, count * 2 * sizeof(float));
+        memcpy(rawTex, tex, count * 2 * sizeof(float));
+
+        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_TRIANGLES;
+        cmd.mData.mDrawTriangles.vert = rawVert;
+        cmd.mData.mDrawTriangles.tex = rawTex;
+        cmd.mData.mDrawTriangles.count = count;
 
         return cmd;
     }

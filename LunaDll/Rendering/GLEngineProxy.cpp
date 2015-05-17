@@ -96,6 +96,25 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
         break;
     case GLEngineCmd::GL_ENGINE_CMD_EXIT:
         return;
+
+
+    case GLEngineCmd::GL_ENGINE_CMD_SET_TEX:
+        if (mPendingClear == 0 && !mSkipFrame) {
+            mGLEngine.SetTex(
+                cmd.mData.mSetTex.bmp,
+                cmd.mData.mSetTex.color);
+        }
+        break;
+    case GLEngineCmd::GL_ENGINE_CMD_DRAW_TRIANGLES:
+        if (mPendingClear == 0 && !mSkipFrame) {
+            mGLEngine.DrawTriangles(
+                cmd.mData.mDrawTriangles.vert,
+                cmd.mData.mDrawTriangles.tex,
+                cmd.mData.mDrawTriangles.count);
+        }
+        delete cmd.mData.mDrawTriangles.vert;
+        delete cmd.mData.mDrawTriangles.tex;
+        break;
     default:
         break;
     }

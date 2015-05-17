@@ -59,7 +59,24 @@ __customFolderPath = ""
 -- Modified Native functions: 
 os.exit = function() error("Shutdown") end
 
-
+-- FFI-based APIs (remove direct acccess to FFI though)
+local function initFFIBasedAPIs()
+    local ffi = require("ffi")
+    ffi.cdef[[
+        void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
+    ]]
+    local LunaDLL = ffi.load("LunaDll.dll")
+    
+    Graphics.glDrawTriangles = function(arg1, arg2, arg3)
+        LunaDLL.LunaLuaGlDrawTriangles(arg1, arg2, arg3)
+    end
+    
+    -- Limit access to FFI (not real security, but well, the mem calls already give global access anyway, so...)
+    ffi.C = nil
+    ffi.cdef = nil
+    ffi.load = nil
+end
+initFFIBasedAPIs()
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)
@@ -88,7 +105,7 @@ function isAPILoaded(api)
 		end
 		
 		if(__lunalocal.__init)then
-			for k,v in pairs(__lunalocal.__loadedAPIs) do
+			for k,v in pairs(__lunalocal.__loadedAPIs) do 
 				if(v == api)then
 					return true
 				end
@@ -184,7 +201,7 @@ end
 --Preloading function.
 --This code segment won't post any errors!
 function __onInit(lvlPath, lvlName)
-	
+    
 	--Load default libs
 	if(not isOverworld)then
 		local isLunaworld = true
