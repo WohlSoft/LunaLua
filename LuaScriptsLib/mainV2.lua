@@ -95,12 +95,17 @@ local function initFFIBasedAPIs()
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
+    Graphics.glNewCoordArray = function(size)
+        return ffi.new("float[?]", size)
+    end
     Graphics.glDrawTriangles = function(arg1, arg2, arg3)
         local arrLen = 2*arg3
         local arg1_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
         local arg2_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
         for i = 0,arrLen-1 do
             arg1_raw[i] = arg1[i] or 0
+        end
+        for i = 0,arrLen-1 do
             arg2_raw[i] = arg2[i] or 0
         end
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
