@@ -6,7 +6,24 @@ local running = false
 --Private Funcs
 local function internalStart()
     package.path = package.path .. ";./LuaScriptsLib/ext/debugger/?.lua"
-    require("debugger")("127.0.0.1", "10001", "LunaLua")
+
+    --First make it temporarly global
+    _G["require"] = require
+    _G["package"] = package
+
+    local tDbg = require("debugger")
+
+
+    local tEnv = {require = _G["require"], package =  _G["package"]}
+	setmetatable( tEnv, { __index = _G } )
+    setfenv(tDbg, tEnv)
+
+    tDbg("127.0.0.1", "10001", "LunaLua")
+
+    --Now make is safe again
+    _G["require"] = nil
+    _G["package"] = nil
+
     running = true
     doStart = false
 end
@@ -16,7 +33,6 @@ function DBG.checkForDbgFlag()
         unregisterEvent(DBG, "onLoop", "checkForDbgFlag") --Unregister that command to safe some preformance
     end
 end
-
 
 --Public Funcs
 function DBG.stop()
@@ -32,8 +48,6 @@ function DBG.start()
     doStart = true
     registerEvent(DBG, "onLoop", "checkForDbgFlag") --We need to do that to be sure that it gets started when the game starts
 end
-
-
 
 
 return DBG
