@@ -62,21 +62,59 @@ os.exit = function() error("Shutdown") end
 -- FFI-based APIs (remove direct acccess to FFI though)
 local function initFFIBasedAPIs()
     local ffi = require("ffi")
+    
+    -- Add high resolution clock under the Misc namespace
     ffi.cdef[[
+        typedef long			BOOL;
+        BOOL QueryPerformanceFrequency(int64_t *lpFrequency);
+        BOOL QueryPerformanceCounter(int64_t *lpPerformanceCount);
+    ]]
+    local kernel32 = ffi.load("kernel32.dll")
+    local function GetPerformanceFrequency()
+        local anum = ffi.new("int64_t[1]");
+        if kernel32.QueryPerformanceFrequency(anum) == 0 then
+            return nil
+        end
+        return tonumber(anum[0])
+    end
+    local function GetPerformanceCounter()
+        local anum = ffi.new("int64_t[1]")
+        if kernel32.QueryPerformanceCounter(anum) == 0 then
+            return nil
+        end
+        return tonumber(anum[0])
+    end   
+    local performanceCounterFreq = GetPerformanceFrequency()
+    Misc.clock = function()
+        return GetPerformanceCounter() / performanceCounterFreq
+    end
+    
+    -- Add GL engine FFI APIs
+    ffi.cdef[[
+        float* LunaLuaGlAllocCoords(size_t size);
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
-    
     Graphics.glDrawTriangles = function(arg1, arg2, arg3)
-        LunaDLL.LunaLuaGlDrawTriangles(arg1, arg2, arg3)
+        local arrLen = 2*arg3
+        local arg1_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
+        local arg2_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
+        for i = 0,arrLen-1 do
+            arg1_raw[i] = arg1[i] or 0
+            arg2_raw[i] = arg2[i] or 0
+        end
+        LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
     
-    -- Limit access to FFI (not real security, but well, the mem calls already give global access anyway, so...)
-    ffi.C = nil
-    ffi.cdef = nil
-    ffi.load = nil
+    -- Limit access to FFI
+    package.preload['ffi'] = nil
+    package.loaded['ffi'] = nil
 end
 initFFIBasedAPIs()
+
+-- We want the JIT running, so it's initially preloaded, but disable access to it
+package.preload['jit'] = nil
+package.loaded['jit'] = nil
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)

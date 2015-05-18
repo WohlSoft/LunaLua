@@ -170,15 +170,9 @@ struct GLEngineCmd {
     static inline GLEngineCmd DrawTriangles(const float* vert, const float* tex, uint32_t count)
     {
         GLEngineCmd cmd;
-
-        float* rawVert = new float[count * 2];
-        float* rawTex = new float[count * 2];
-        memcpy(rawVert, vert, count * 2 * sizeof(float));
-        memcpy(rawTex, tex, count * 2 * sizeof(float));
-
         cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_TRIANGLES;
-        cmd.mData.mDrawTriangles.vert = rawVert;
-        cmd.mData.mDrawTriangles.tex = rawTex;
+        cmd.mData.mDrawTriangles.vert = vert;
+        cmd.mData.mDrawTriangles.tex = tex;
         cmd.mData.mDrawTriangles.count = count;
 
         return cmd;

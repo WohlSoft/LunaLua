@@ -112,8 +112,8 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mDrawTriangles.tex,
                 cmd.mData.mDrawTriangles.count);
         }
-        delete cmd.mData.mDrawTriangles.vert;
-        delete cmd.mData.mDrawTriangles.tex;
+        free((void*)cmd.mData.mDrawTriangles.vert);
+        free((void*)cmd.mData.mDrawTriangles.tex);
         break;
     default:
         break;

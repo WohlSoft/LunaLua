@@ -91,6 +91,10 @@ void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t colo
 }
 
 extern "C" {
+    __declspec(dllexport) float* __cdecl LunaLuaGlAllocCoords(size_t size) {
+        return (float*)malloc(size * sizeof(float));
+    }
+
     __declspec(dllexport) void __cdecl LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
         gLunaRender.GLCmd(GLEngineCmd::DrawTriangles(vert, tex, count));
     }
