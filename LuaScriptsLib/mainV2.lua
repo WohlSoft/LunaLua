@@ -59,13 +59,9 @@ __customFolderPath = ""
 -- Modified Native functions: 
 os.exit = function() error("Shutdown") end
 
--- Make safe
-local unsafe_require = _G["require"] _G["require"] = nil
-local unsafe_package = _G["package"] _G["package"] = nil
-
--- FFI-based APIs (remove direct acccess to FFI though) [DONE]
+-- FFI-based APIs (remove direct acccess to FFI though)
 local function initFFIBasedAPIs()
-    local ffi = unsafe_require("ffi")
+    local ffi = require("ffi")
     
     -- Add high resolution clock under the Misc namespace
     ffi.cdef[[
@@ -115,8 +111,15 @@ local function initFFIBasedAPIs()
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
     
+    -- Limit access to FFI
+    package.preload['ffi'] = nil
+    package.loaded['ffi'] = nil
 end
 initFFIBasedAPIs()
+
+-- We want the JIT running, so it's initially preloaded, but disable access to it
+package.preload['jit'] = nil
+package.loaded['jit'] = nil
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)
@@ -186,10 +189,7 @@ function isAPILoaded(api)
     return false
 end
 
-local function doAPI(apiName, preDefinedEnv)
-    local tEnv = preDefinedEnv or {}
-    setmetatable( tEnv, { __index = _G } )
-
+local function doAPI(apiName)
     local searchInPath = {
         __episodePath,
         __customFolderPath,
@@ -202,7 +202,6 @@ local function doAPI(apiName, preDefinedEnv)
         for _,ending in pairs(endings) do
             func, err = loadfile(apiPath..apiName..ending)
             if(func)then
-                setfenv(func, tEnv)
                 return func()
             end
             if(not err:find("such file"))then
@@ -260,7 +259,7 @@ function __onInit(lvlPath, lvlName)
             --SEGMENT TO ADD PRELOADED APIS START
             loadSharedAPI("uservar")
             Defines = loadSharedAPI("core\\defines")
-            DBG = loadSharedAPI("core\\dbg", {require = unsafe_require, package = unsafe_package}) -- Here we have to pass the "unsafe" function for the debugger sockets.
+            DBG = loadSharedAPI("core\\dbg")
             --SEGMENT TO ADD PRELOADED APIS END
             
             local localLuaFile = nil
@@ -297,7 +296,7 @@ function __onInit(lvlPath, lvlName)
             
             --SEGMENT TO ADD PRELOADED APIS START
             Defines = loadSharedAPI("core\\defines")
-            DBG = loadSharedAPI("core\\dbg", {require = unsafe_require, package = unsafe_package}) -- Here we have to pass the "unsafe" function for the debugger sockets.
+            DBG = loadSharedAPI("core\\dbg")
             --SEGMENT TO ADD PRELOADED APIS END
 
             local overworldLuaFile = lvlPath .. "lunaoverworld.lua"
@@ -320,12 +319,12 @@ function __onInit(lvlPath, lvlName)
 end
 
 -- Loads shared apis
-function loadSharedAPI(api, preDefEnv)
+function loadSharedAPI(api)
     if(__loadedAPIs[api])then
         return __loadedAPIs[api], false
     end
     
-    local loadedAPI = doAPI(api, preDefEnv)
+    local loadedAPI = doAPI(api)
     __loadedAPIs[api] = loadedAPI
     if(type(loadedAPI["onInitAPI"])=="function")then
         loadedAPI.onInitAPI()
