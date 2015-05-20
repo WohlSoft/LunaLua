@@ -82,7 +82,6 @@
     <ClCompile Include="LunaLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LunaDll\GameConfig\GameConfiguration.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
