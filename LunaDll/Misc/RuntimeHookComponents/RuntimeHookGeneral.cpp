@@ -6,6 +6,8 @@
 #include "../../SdlMusic/MusicManager.h"
 #include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
+#include "../../GameConfig/GameConfiguration.h"
+
 
 #include "../SHMemServer.h"
 
@@ -143,6 +145,9 @@ void TrySkipPatch()
 
     //Load graphics from the HardcodedGraphicsManager
     HardcodedGraphicsManager::loadGraphics();
+
+    //game.ini reader
+    GameConfiguration::runPatchByIni(INIReader(utf8_encode(getModulePath())+ "\\game.ini"));
 
     /************************************************************************/
     /* Simple ASM Source Patches                                            */

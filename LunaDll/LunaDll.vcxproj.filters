@@ -106,6 +106,9 @@
     <Filter Include="Header Files\Misc\MemoryScanner">
       <UniqueIdentifier>{48dca8f9-ecf9-46bd-9ef7-a969b2124ff9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameConfig">
+      <UniqueIdentifier>{757faf1a-e7b6-4b48-ae27-01df41d001f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -395,6 +398,9 @@
     </ClInclude>
     <ClInclude Include="Rendering\RenderOps\RenderGLOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig\GameConfiguration.h">
+      <Filter>GameConfig</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -763,6 +769,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\RenderOps\RenderGLOp.cpp">
       <Filter>Header Files\Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="GameConfig\GameConfiguration.cpp">
+      <Filter>GameConfig</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

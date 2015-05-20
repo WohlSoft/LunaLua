@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GameConfig\GameConfiguration.h" />
     <ClInclude Include="httprequest.h" />
     <ClInclude Include="libs\luasocket\auxiliar.h" />
     <ClInclude Include="libs\luasocket\buffer.h" />
@@ -244,6 +245,7 @@
   <ItemGroup>
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
+    <ClCompile Include="GameConfig\GameConfiguration.cpp" />
     <ClCompile Include="libs\luasocket\auxiliar.c" />
     <ClCompile Include="libs\luasocket\buffer.c" />
     <ClCompile Include="libs\luasocket\except.c" />
