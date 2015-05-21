@@ -120,7 +120,14 @@ static unsigned int __stdcall LatePatch(void)
     /************************************************************************/
     /* Engine Limit patches                                                 */
     /************************************************************************/
+
+    // Runs this in LatePatch because we can only overwrite the pointer to the
+    // warp array after it's been assigned to in the first place.
     fixup_WarpLimit();
+
+    // Run this in LatePatch because overwriting the SEH handler only works
+    // after we have the VB runtime running.
+    fixup_ErrorReporting();
 
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
@@ -153,7 +160,6 @@ void TrySkipPatch()
     /* Simple ASM Source Patches                                            */
     /************************************************************************/
     fixup_TypeMismatch13();
-    fixup_ErrorReporting();
     fixup_Credits();
     fixup_Mushbug();
     fixup_NativeFuncs();

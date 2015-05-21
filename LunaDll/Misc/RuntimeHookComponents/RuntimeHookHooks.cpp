@@ -449,25 +449,40 @@ extern void __stdcall checkLevelShutdown()
     }
 }
 
-
-extern void __stdcall snapshotError(int errCode)
+EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
+    EXCEPTION_RECORD *ExceptionRecord,
+    void * EstablisherFrame,
+    CONTEXT *ContextRecord,
+    void * DispatcherContext)
 {
-    ErrorReport::SnapshotVB6Error(static_cast<ErrorReport::VB6ErrorCode>(errCode));
+
+    ErrorReport::SnapshotError(ExceptionRecord, ContextRecord);
+    ErrorReport::report();
+
+    _exit(0);
+    return ExceptionContinueSearch; // Never reached
+}
+
+extern void __stdcall recordVBErrCode(int errCode)
+{
+    // Running the whole stack trace now is *far* too slow and can make the
+    // editor grind to a halt in some situations due to exceptions which are
+    // caught in the VB code.
+
+    // Instead... just capture a nice lightweight context. We can pass this
+    // to StackWalker later.
+    RtlCaptureContext(&lastVB6ErrContext);
+
+    // Also record the VB6 error code, because this is simpler than fetching
+    // VB6's "error" object that stores this internally (would involve calling
+    // rtcErrObj)
+    lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{
         CMP     ESI, 0x9C68
     }
 }
-
-
-extern void __stdcall handleErrorV2(void* errInfoStruct)
-{
-    //short theErrorCode = *(short*)(((char*)errInfoStruct + 28));
-    //ErrorReport::SnapshotVB6Error(static_cast<ErrorReport::VB6ErrorCode>(theErrorCode));
-    ErrorReport::report();
-    forceTermination();
-}
-
 
 extern void __stdcall LoadLocalGfxHook()
 {

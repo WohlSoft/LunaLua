@@ -7,12 +7,14 @@
 #include "Gui/GuiCrashNotify.h"
 
 std::string lastErrDesc;
+ErrorReport::VB6ErrorCode lastVB6ErrCode;
+CONTEXT lastVB6ErrContext;
 
-std::string ErrorReport::generateStackTrace()
+std::string ErrorReport::generateStackTrace(CONTEXT* context)
 {
     CustomStackTracer cst;
-    cst.ShowCallstack();
-    return cst.theOutput;
+    cst.ShowCallstack(GetCurrentThread(), context);
+    return cst.theOutput.str();
 }
 
 void ErrorReport::writeErrorLog(const std::string &text)
@@ -68,37 +70,37 @@ void ErrorReport::manageErrorReport(const std::string &url, const std::string &e
     }
 }
 
-
-
-void ErrorReport::SnapshotVB6Error(VB6ErrorCode errCode)
+void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 {
-    std::string fullErrorDescription = "";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += "*                  Summary                       *\n";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += "SMBX has crashed due an error. See the description for more information!\n";
-    fullErrorDescription += "LunaLua Version: " + std::string(LUALUA_VERSION) + "\n";
-    fullErrorDescription += std::string("Time/Date: ") + generateTimestamp() + "\n";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += "*              Description                       *\n";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += getCustomVB6ErrorDescription(errCode);
-    fullErrorDescription += "\n";
-    fullErrorDescription += "If you like to help us finding the error then please post this log at:\n";
-    fullErrorDescription += "* http://engine.wohlnet.ru/forum/ or\n";
-    fullErrorDescription += "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";
-    fullErrorDescription += "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
-    fullErrorDescription += "\n";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += "*              Stacktrace                        *\n";
-    fullErrorDescription += "**************************************************\n";
-    fullErrorDescription += generateStackTrace();
-    
-    lastErrDesc = fullErrorDescription;
+    bool isVB6Exception = (exception->ExceptionCode == 0xc000008f);
+    std::string stackTrace = generateStackTrace(isVB6Exception ? &lastVB6ErrContext : context);
+    std::stringstream fullErrorDescription;
 
-    //writeErrorLog(fullErrorDescription);
-    //Might make it dynamic in the future by an ini file....
-    //manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", fullErrorDescription);
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << "*                  Summary                       *\n";
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << "SMBX has crashed due an error. See the description for more information!\n";
+    fullErrorDescription << "LunaLua Version: " + std::string(LUALUA_VERSION) + "\n";
+    fullErrorDescription << std::string("Time/Date: ") + generateTimestamp() + "\n";
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << "*              Description                       *\n";
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << "Exception code: 0x" << std::hex << exception->ExceptionCode << "\n";
+    if (isVB6Exception) {
+        fullErrorDescription << getCustomVB6ErrorDescription(lastVB6ErrCode);
+    }
+    fullErrorDescription << "\n";
+    fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
+    fullErrorDescription << "* http://engine.wohlnet.ru/forum/ or\n";
+    fullErrorDescription << "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";
+    fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
+    fullErrorDescription << "\n";
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << "*              Stacktrace                        *\n";
+    fullErrorDescription << "**************************************************\n";
+    fullErrorDescription << stackTrace;
+
+    lastErrDesc = fullErrorDescription.str();
 }
 
 void ErrorReport::report()
@@ -106,5 +108,3 @@ void ErrorReport::report()
     writeErrorLog(lastErrDesc);
     manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", lastErrDesc);
 }
-
-

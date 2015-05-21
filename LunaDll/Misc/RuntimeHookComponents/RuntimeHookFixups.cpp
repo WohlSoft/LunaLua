@@ -53,6 +53,17 @@ void fixup_TypeMismatch13()
     }
 }
 
+typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
+    _In_ EXCEPTION_RECORD *_ExceptionRecord,
+    _In_ void * _EstablisherFrame,
+    _Inout_ CONTEXT *_ContextRecord,
+    _Inout_ void * _DispatcherContext
+    );
+
+typedef struct _SEH_CHAIN_RECORD {
+    struct _SEH_CHAIN_RECORD* next;
+    SEH_HANDLER* handler;
+} SEH_CHAIN_RECORD;
 
 void fixup_ErrorReporting()
 {
@@ -67,23 +78,21 @@ void fixup_ErrorReporting()
         DWORD oldprotect;
         if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
             toPatch[0] = 0x56; //PUSH ESI
-            PATCH_FUNC((DWORD)&toPatch[1], &snapshotError);
+            PATCH_FUNC((DWORD)&toPatch[1], &recordVBErrCode);
                 //NOP
             // Now get the protection back
             VirtualProtect((void*)toPatch, 10, oldprotect, &oldprotect);
         }
-        
-        
     }
 
-
-    DWORD oldprotect;
-    if (VirtualProtect((void*)0x72A0C6CA, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
-        PATCH_FUNC(0x72A0C6CA, &handleErrorV2);
-        //NOP
-        // Now get the protection back
-        VirtualProtect((void*)0x72A0C6CA, 10, oldprotect, &oldprotect);
+    // Find the first link of the SEH chain which is *not* smbx.__vbaExceptHandler
+    SEH_CHAIN_RECORD* seh = (SEH_CHAIN_RECORD *)__readfsdword(0x00);
+    while ((seh->next != (void*)0xFFFFFFFF) && (seh->handler == (void*)0x0040BA66)) {
+        seh = seh->next;
     }
+
+    // Substitute that exception handler with our own.
+    seh->handler = LunaDLLCustomExceptionHandler;
 }
 
 

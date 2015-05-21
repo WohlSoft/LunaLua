@@ -62,8 +62,12 @@ extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 //TriggerSMBXEvent cmp function
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Function
-extern void __stdcall snapshotError(int errCode);       //Error Handler
-extern void __stdcall handleErrorV2(void* errInfoStruct); //New Error Handler
+extern void __stdcall recordVBErrCode(int errCode);       //Error Handler
+extern EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
+    EXCEPTION_RECORD *ExceptionRecord,
+    void * EstablisherFrame,
+    CONTEXT *ContextRecord,
+    void * DispatcherContext);
 extern void __stdcall LoadLocalGfxHook();
 extern BOOL __stdcall BitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall StretchBltHook(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, DWORD dwRop);

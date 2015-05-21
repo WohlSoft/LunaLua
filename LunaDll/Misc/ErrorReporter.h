@@ -2,6 +2,7 @@
 #define ErrorReporter_hhh
 
 #include <string>
+#include <sstream>
 #include "../libs/stackwalker/StackWalker.h"
 
 
@@ -13,11 +14,11 @@ namespace ErrorReport{
     public:
         CustomStackTracer() : theOutput(""), StackWalker() {}
         
-        std::string theOutput;
+        std::stringstream theOutput;
     protected:
         virtual void OnOutput(LPCSTR szText)
         {
-            theOutput += std::string(szText);
+            theOutput << szText;
         }
     };
 
@@ -32,14 +33,16 @@ namespace ErrorReport{
     void manageErrorReport(const std::string &url, const std::string &errText);
     void writeErrorLog(const std::string &text);
 
-    std::string generateStackTrace();
+    std::string generateStackTrace(CONTEXT* context = NULL);
     std::string getCustomVB6ErrorDescription(VB6ErrorCode errCode);
 
     //USE THIS METHOD TO REPORT ERRORS
-    void SnapshotVB6Error(VB6ErrorCode errCode);
+    void SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context);
     void report();
 
 }
 
 extern std::string lastErrDesc;
+extern ErrorReport::VB6ErrorCode lastVB6ErrCode;
+extern CONTEXT lastVB6ErrContext;
 #endif
