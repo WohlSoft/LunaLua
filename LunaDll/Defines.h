@@ -417,6 +417,9 @@ struct KeyMap{
 
 #define GF_LOAD_LOCAL_GFX   0x00ACD220
 
+//      Arg1 = VB6StrPtr* Added text to the cheat buffer and execute
+#define GF_UPDATESCAN_CHEAT 0x008E7490
+
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
@@ -443,6 +446,8 @@ static const auto native_showLayer      = (void(__stdcall *)(VB6StrPtr* /*layerN
 static const auto native_hideLayer      = (void(__stdcall *)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/))GF_HIDE_LAYER;
 
 static const auto native_loadLocalGfx   = (void(__stdcall *)())GF_LOAD_LOCAL_GFX;
+
+static const auto native_updateCheatbuf = (void(__stdcall *)(VB6StrPtr* /*addedText*/))GF_UPDATESCAN_CHEAT;
 
 static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_MAIN;
 

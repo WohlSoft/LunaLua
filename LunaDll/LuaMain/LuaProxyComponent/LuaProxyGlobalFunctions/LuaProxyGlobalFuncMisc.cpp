@@ -22,6 +22,8 @@ std::string LuaProxy::Misc::cheatBuffer()
 void LuaProxy::Misc::cheatBuffer(const luabind::object &value, lua_State* L)
 {
     LuaHelper::assignVB6StrPtr((VB6StrPtr*)&(GM_INPUTSTR_BUF_PTR), value, L);
+    VB6StrPtr triggerStr = " ";
+    native_updateCheatbuf(&triggerStr);
 }
 
 
