@@ -36,7 +36,7 @@ luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
         modulePath += path;
     }
     std::vector<std::string> listedFiles = listFilesOfDir(modulePath);
-    for (int i = 0; i < listedFiles.size(); ++i){
+    for (unsigned int i = 0; i < listedFiles.size(); ++i){
         theList[i + 1] = listedFiles[i];
     }
     return theList;
