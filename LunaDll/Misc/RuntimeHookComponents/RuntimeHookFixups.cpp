@@ -53,13 +53,6 @@ void fixup_TypeMismatch13()
     }
 }
 
-typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
-    _In_ EXCEPTION_RECORD *_ExceptionRecord,
-    _In_ void * _EstablisherFrame,
-    _Inout_ CONTEXT *_ContextRecord,
-    _Inout_ void * _DispatcherContext
-    );
-
 typedef struct _SEH_CHAIN_RECORD {
     struct _SEH_CHAIN_RECORD* next;
     SEH_HANDLER* handler;
@@ -92,6 +85,7 @@ void fixup_ErrorReporting()
     }
 
     // Substitute that exception handler with our own.
+    LunaDLLOriginalExceptionHandler = seh->handler;
     seh->handler = LunaDLLCustomExceptionHandler;
 }
 

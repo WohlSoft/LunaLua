@@ -449,12 +449,20 @@ extern void __stdcall checkLevelShutdown()
     }
 }
 
+// Storage of original exception handler
+SEH_HANDLER* LunaDLLOriginalExceptionHandler = NULL;
+
 EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     EXCEPTION_RECORD *ExceptionRecord,
     void * EstablisherFrame,
     CONTEXT *ContextRecord,
     void * DispatcherContext)
 {
+    // For VB error code 40040, defer to the original handler
+    bool isVB6Exception = (ExceptionRecord->ExceptionCode == 0xc000008f);
+    if (isVB6Exception && lastVB6ErrCode == 40040) {
+        return LunaDLLOriginalExceptionHandler(ExceptionRecord, EstablisherFrame, ContextRecord, DispatcherContext);
+    }
 
     ErrorReport::SnapshotError(ExceptionRecord, ContextRecord);
     ErrorReport::report();

@@ -2,7 +2,7 @@
 #define ADDNEWSIMPLESTRUCTWIDGET_H
 
 #include <QDialog>
-#include <qtreewidgetitemsmbxaddress.h>
+#include "qtreewidgetitemsmbxaddress.h"
 
 namespace Ui {
 class AddNewSimpleStructWidget;

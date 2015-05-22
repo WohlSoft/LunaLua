@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QVariant>
-#include <qtreewidgetitemsmbxaddress.h>
+#include "qtreewidgetitemsmbxaddress.h"
 
 namespace Ui {
 class AddNewEntryWidget;

@@ -5,6 +5,15 @@
 #include "../Defines.h"
 #include "../Globals.h"
 
+/************************************************************************/
+/* Typedefs                                                             */
+/************************************************************************/
+typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
+    _In_ EXCEPTION_RECORD *_ExceptionRecord,
+    _In_ void * _EstablisherFrame,
+    _Inout_ CONTEXT *_ContextRecord,
+    _Inout_ void * _DispatcherContext
+    );
 
 /************************************************************************/
 /* Macros                                                               */
@@ -63,6 +72,7 @@ extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Function
 extern void __stdcall recordVBErrCode(int errCode);       //Error Handler
+extern SEH_HANDLER* LunaDLLOriginalExceptionHandler;
 extern EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     EXCEPTION_RECORD *ExceptionRecord,
     void * EstablisherFrame,

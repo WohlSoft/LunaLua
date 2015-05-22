@@ -7,8 +7,8 @@
 #include <QInputDialog>
 #include <QFileDialog>
 
-#include <addnewentrywidget.h>
-#include <addnewsimplestructwidget.h>
+#include "addnewentrywidget.h"
+#include "addnewsimplestructwidget.h"
 
 
 ScannerWindow::ScannerWindow(QWidget *parent) :
