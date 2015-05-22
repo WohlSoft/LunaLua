@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 #include <QFileDialog>
-#include <parsetools.h>
+#include "parsetools.h"
 
 
 AddNewSimpleStructWidget::AddNewSimpleStructWidget(QTreeWidgetItemSMBXAddress* editToItem, QWidget *parent) :

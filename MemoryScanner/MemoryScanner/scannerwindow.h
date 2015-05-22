@@ -4,9 +4,9 @@
 #include <QMainWindow>
 
 #include <QtCore>
-#include <win32Helper.h>
+#include "win32Helper.h"
 #include <QJsonDocument>
-#include <qtreewidgetitemsmbxaddress.h>
+#include "qtreewidgetitemsmbxaddress.h"
 
 namespace Ui {
 class ScannerWindow;

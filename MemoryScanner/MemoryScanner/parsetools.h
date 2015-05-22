@@ -1,7 +1,7 @@
 #ifndef PARSETOOLS_H
 #define PARSETOOLS_H
 
-#include <qtreewidgetitemsmbxaddress.h>
+#include "qtreewidgetitemsmbxaddress.h"
 #include <QList>
 
 class ParseTools
