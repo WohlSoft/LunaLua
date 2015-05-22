@@ -318,7 +318,7 @@ void InitLevel() {
 	// The Floor is Lava init block
 	else if(curlvl == L"Docopoper-TheFloorisLava.lvl") {
 		gLevelEnum = TheFloorIsLava;
-		demo -> Identity = 1;
+		demo -> Identity = CHARACTER_MARIO;
 	}
 
 	// Curtain Tortoise init block
@@ -366,7 +366,7 @@ void InitLevel() {
 		Player::FilterToBig(Player::Get(1));
 		Player::FilterMount(Player::Get(1));
 		Player::FilterReservePowerup(Player::Get(1));
-		Player::Get(1)->Identity = 1;
+		Player::Get(1)->Identity = CHARACTER_MARIO;
 	}
 
 }

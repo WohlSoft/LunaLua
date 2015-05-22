@@ -20,6 +20,7 @@
 #include "HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
+#include "GameConfig/GameAutostart.h"
 
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
@@ -45,6 +46,8 @@ extern bool		gSkipSMBXHUD;
 extern bool		gPrintErrorsToScreen;
 extern bool		gIsOverworld;
 extern bool		gHook_SkipTestMsgBox;
+extern bool     gAutostartRan;
+
 extern startUpSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

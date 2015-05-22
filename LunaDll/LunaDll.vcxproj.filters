@@ -402,6 +402,12 @@
     <ClInclude Include="GameConfig\GameConfiguration.h">
       <Filter>GameConfig</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig\GameAutostart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -772,6 +778,9 @@
     </ClCompile>
     <ClCompile Include="GameConfig\GameConfiguration.cpp">
       <Filter>GameConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="GameConfig\GameAutostart.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

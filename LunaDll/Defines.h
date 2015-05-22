@@ -98,10 +98,30 @@ enum PRIORITY {
 #define GM_COINS            *(WORD*)0x00B2C5A8
 #define GM_PLAYER_LIVES     *(FLOAT*)0x00B2C5AC
 
+// Menu Stuff
+#define GM_CUR_MENUCHOICE   *(WORD*)0x00B2C880      // Current menu choice
+#define GM_CUR_MENUTYPE     *(WORD*)0x00B2C882
+
+// Menu already choosen stuff
+#define GM_CUR_MENUPLAYER1  *(WORD*)0x00B2D6B8
+#define GM_CUR_MENUPLAYER2  *(WORD*)0x00B2D6BA
+
+#define GM_CUR_MENULEVEL    *(WORD*)0x00B2C628
+
+// Menu Episode List
+#define GM_EP_LIST_COUNT    *(WORD*)0x00B250E8
+#define GM_EP_LIST_PTR      *(DWORD*)0x00B250FC
+
+// Interaction
+#define GM_MOUSEMOVING      *(WORD*)0x00B2D6D2
+#define GM_MOUSERELEASED    *(WORD*)0x00B2D6D0
+#define GM_MOUSEPRESSING    *(WORD*)0x00B2D6CC
+#define GM_KEYRELEASED      *(WORD*)0x00B2C884
+
+
 // States
 #define GM_FREEZWITCH_ACTIV *(WORD*)0x00B2C8B4
 #define GM_PAUSE_OPEN       *(WORD*)0x00B250E2
-#define GM_CUR_MENUCHOICE   *(WORD*)0x00B2C880      // Current menu choice
 
 // Camera
 #define GM_CAMERA_X         *(DWORD*)0x00B2B984
@@ -323,6 +343,14 @@ struct KeyMap{
     short    STRKeyState;
 };
 
+enum Characters : short {
+    CHARACTER_MARIO = 1,    //DEMO
+    CHARACTER_LUIGI = 2,    //IRIS
+    CHARACTER_PEACH = 3,    //KOOD
+    CHARACTER_TOAD  = 4,    //RAOCOW
+    CHARACTER_LINK  = 5     //SHEATH
+};
+
 ////////////////////////
 ///    -Imports-     ///
 ////////////////////////
@@ -420,6 +448,10 @@ struct KeyMap{
 //      Arg1 = VB6StrPtr* Added text to the cheat buffer and execute
 #define GF_UPDATESCAN_CHEAT 0x008E7490
 
+#define GF_LOAD_WORLD_LIST  0x008E35E0
+
+#define GF_LOAD_SAVE_STATES 0x008E41D0
+
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
@@ -448,6 +480,9 @@ static const auto native_hideLayer      = (void(__stdcall *)(VB6StrPtr* /*layerN
 static const auto native_loadLocalGfx   = (void(__stdcall *)())GF_LOAD_LOCAL_GFX;
 
 static const auto native_updateCheatbuf = (void(__stdcall *)(VB6StrPtr* /*addedText*/))GF_UPDATESCAN_CHEAT;
+
+static const auto native_loadWorldList  = (void(__stdcall *)())GF_LOAD_WORLD_LIST;
+static const auto native_loadSaveStates = (void(__stdcall *)())GF_LOAD_SAVE_STATES;
 
 static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_MAIN;
 

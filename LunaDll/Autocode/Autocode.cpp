@@ -122,7 +122,7 @@ void Autocode::Do(bool init) {
 			if(demo != 0) {
 				if(demo->Identity == Param1)
 					if(Param2 > 0 && Param2 < 6)
-						demo->Identity = (short)Param2;
+						demo->Identity = static_cast<Characters>((int)Param2);
 			}
 			break;		
 								   }

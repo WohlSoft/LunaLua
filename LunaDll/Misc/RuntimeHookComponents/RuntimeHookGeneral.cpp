@@ -197,6 +197,8 @@ void TrySkipPatch()
 
     PATCH_FUNC(0x8C16F7, &WorldLoop);
 
+    PATCH_FUNC(0x8C0E6D, &LoadIntro);
+
     PATCH_FUNC(0x932353, &printLunaLuaVersion);
 
     PATCH_FUNC(0x9090F5, &WorldRender);

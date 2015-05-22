@@ -25,7 +25,7 @@ void AbstractAssaultCode() {
 	if (layerStartingPlatform -> ySpeed == 0)
 	{
 
-		demo -> Identity = 1; //Demo
+		demo -> Identity = CHARACTER_MARIO; //Demo
 		//player_id_set = 1;
 		gameStarted = 0;
 		*powerup = 1;
@@ -39,7 +39,7 @@ void AbstractAssaultCode() {
 		hspeed = -4;
 		gameStarted = 1;
 		noControlTimer = 30;
-		demo -> Identity = 5; //Sheath
+		demo -> Identity = CHARACTER_LINK; //Sheath
 	}
 	
 	if (gameStarted)

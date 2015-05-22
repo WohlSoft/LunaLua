@@ -18,6 +18,7 @@ bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
 bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
+bool gAutostartRan = false;
 
 // Global variables
 int	gFrames;

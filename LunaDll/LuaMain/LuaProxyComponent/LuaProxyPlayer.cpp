@@ -923,14 +923,14 @@ short LuaProxy::Player::identity(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->Identity;
+	return static_cast<int>(::Player::Get(m_index)->Identity);
 }
 
 void LuaProxy::Player::setIdentity(short var_identity, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->Identity = var_identity;
+	::Player::Get(m_index)->Identity = static_cast<Characters>(var_identity);
 }
 
 short LuaProxy::Player::uKeyState(lua_State *L) const

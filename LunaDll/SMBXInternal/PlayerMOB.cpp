@@ -92,17 +92,24 @@ void Player::CycleRight(PlayerMOB* pPlayer) {
 	//		return false; // fail to cycle because next character can't be mounted
 	//}
 
-	pPlayer->Identity++;
-	if(pPlayer->Identity > 5)
-		pPlayer->Identity = 1;
+    int playerID = static_cast<int>(pPlayer->Identity);
+    
+    playerID++;
+	if(playerID > 5)
+		playerID = 1;
 
+    pPlayer->Identity = static_cast<Characters>(playerID);
 
 }
 
 void Player::CycleLeft(PlayerMOB* pPlayer) {
-	pPlayer->Identity--;
-	if(pPlayer->Identity <= 0)
-		pPlayer->Identity = 5;
+    int playerID = static_cast<int>(pPlayer->Identity);
+
+    playerID--;
+    if (playerID <= 0)
+        playerID = 5;
+
+    pPlayer->Identity = static_cast<Characters>(playerID);
 }
 
 

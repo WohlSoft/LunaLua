@@ -247,7 +247,7 @@ void CalleocaCode()
 {
 	demo = Player::Get(1);
 	
-	demo->Identity = 1;
+	demo->Identity = CHARACTER_MARIO;
 
 	if (calleoca_npc2 == NULL && init_doonce)
 	{

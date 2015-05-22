@@ -262,7 +262,7 @@ struct PlayerMOB {
 
     Momentum momentum;
 
-    short Identity;
+    Characters Identity;
 
     KeyMap keymap;
 

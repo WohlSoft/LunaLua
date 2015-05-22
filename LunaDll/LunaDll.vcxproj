@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GameConfig\GameAutostart.h" />
     <ClInclude Include="GameConfig\GameConfiguration.h" />
     <ClInclude Include="httprequest.h" />
     <ClInclude Include="libs\luasocket\auxiliar.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="libs\luasocket\timeout.h" />
     <ClInclude Include="libs\luasocket\udp.h" />
     <ClInclude Include="libs\luasocket\wsocket.h" />
+    <ClInclude Include="SMBXInternal\Menu.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
@@ -246,6 +248,7 @@
   <ItemGroup>
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
+    <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
     <ClCompile Include="libs\luasocket\auxiliar.c" />
     <ClCompile Include="libs\luasocket\buffer.c" />

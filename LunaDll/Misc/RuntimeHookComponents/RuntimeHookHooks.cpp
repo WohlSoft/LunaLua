@@ -14,6 +14,7 @@
 #include "../../Rendering/RenderOverrides.h"
 #include "../../Rendering/GLEngine.h"
 #include "../../Main.h"
+#include "../../libs/ini-reader/INIReader.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -153,6 +154,46 @@ extern int __stdcall LoadWorld()
 
 #endif
 }
+
+
+extern int __stdcall LoadIntro()
+{
+    /* TEST */
+    /*if (!gIntroRun){
+        //Load world list
+        native_loadWorldList();
+        //Slot selection
+        GM_CUR_MENUTYPE = 10;
+        //DEMO
+        GM_CUR_MENUPLAYER1 = 1;
+        //Second level
+        GM_CUR_MENULEVEL = 2;
+        //Load save states
+        native_loadSaveStates();
+
+        *(WORD*)0xB2D6D4 = -1;
+    }*/
+    /* TEST END */
+    std::string autostartFile = utf8_encode(getModulePath()) + "\\autostart.ini";
+
+    if (!file_existsX(autostartFile))
+        return GetTickCount();
+
+    INIReader autostartConfig(autostartFile);
+    if (autostartConfig.GetBoolean("autostart", "do-autostart", false)){
+        if (!gAutostartRan){
+            GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+            autostarter.applyAutostart();
+            gAutostartRan = true;
+        }
+        
+    }
+
+
+#pragma warning(suppress: 28159)
+    return GetTickCount();
+}
+
 
 extern DWORD __stdcall WorldLoop()
 {
