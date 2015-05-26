@@ -591,3 +591,10 @@ extern BOOL __stdcall StretchBltHook(
 
     return StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 }
+
+// This is more optimized than __vbaStrCmp for the most typical case, but does the same thing
+int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2) {
+    if (arg1 == NULL) arg1 = L"";
+    if (arg2 == NULL) arg2 = L"";
+    return wcscmp(arg1, arg2);
+}
