@@ -140,6 +140,148 @@ luabind::object LuaProxy::Player::holdingNPC(lua_State *L) const
 	return luabind::object();
 }
 
+bool LuaProxy::Player::upKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.upKeyState;
+}
+
+void LuaProxy::Player::setUpKeyPressing(bool upKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.upKeyState = COMBOOL(upKeyPressing);
+}
+
+bool LuaProxy::Player::downKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.downKeyState;
+}
+
+void LuaProxy::Player::setDownKeyPressing(bool downKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.downKeyState = COMBOOL(downKeyPressing);
+}
+
+bool LuaProxy::Player::leftKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.leftKeyState;
+}
+
+void LuaProxy::Player::setLeftKeyPressing(bool leftKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.leftKeyState = COMBOOL(leftKeyPressing);
+}
+
+bool LuaProxy::Player::rightKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.rightKeyState;
+}
+
+void LuaProxy::Player::setRightKeyPressing(bool rightKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.rightKeyState = COMBOOL(rightKeyPressing);
+}
+
+bool LuaProxy::Player::jumpKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.jumpKeyState;
+}
+
+void LuaProxy::Player::setJumpKeyPressing(bool jumpKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.jumpKeyState = COMBOOL(jumpKeyPressing);
+}
+
+bool LuaProxy::Player::altJumpKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.altJumpKeyState;
+}
+
+void LuaProxy::Player::setAltJumpKeyPressing(bool altJumpKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.altJumpKeyState = COMBOOL(altJumpKeyPressing);
+}
+
+bool LuaProxy::Player::runKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.runKeyState;
+}
+
+void LuaProxy::Player::setRunKeyPressing(bool runKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.runKeyState = COMBOOL(runKeyPressing);
+}
+
+bool LuaProxy::Player::altRunKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.altRunKeyState;
+}
+
+void LuaProxy::Player::setAltRunKeyPressing(bool altRunKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.altRunKeyState = COMBOOL(altRunKeyPressing);
+}
+
+bool LuaProxy::Player::dropItemKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.dropItemKeyState;
+}
+
+void LuaProxy::Player::setDropItemKeyPressing(bool dropItemKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.dropItemKeyState = COMBOOL(dropItemKeyPressing);
+}
+
+bool LuaProxy::Player::pauseKeyPressing(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return (bool)::Player::Get(m_index)->keymap.pauseKeyState;
+}
+
+void LuaProxy::Player::setPauseKeyPressing(bool pauseKeyPressing, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->keymap.pauseKeyState = COMBOOL(pauseKeyPressing);
+}
+
+
+
 void LuaProxy::Player::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
 	if(!isValid_throw(L))
