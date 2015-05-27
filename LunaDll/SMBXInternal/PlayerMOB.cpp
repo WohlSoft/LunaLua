@@ -51,31 +51,31 @@ void Player::MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype)
 
 // BUTTON FUNCS
 bool Player::PressingDown(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.DKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.downKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingJump(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.JKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.jumpKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingUp(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.UKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.upKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingRight(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.RKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.rightKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingLeft(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.LKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.leftKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingRun(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.RNKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.altRunKeyState == 0xFFFFFFFF ? true : false;
 }
 
 bool Player::PressingSEL(PlayerMOB* pPlayer) {
-    return (unsigned)pPlayer->keymap.SELKeyState == 0xFFFFFFFF ? true : false;
+    return (unsigned)pPlayer->keymap.dropItemKeyState == 0xFFFFFFFF ? true : false;
 }
 
 void Player::ConsumeAllKeys(PlayerMOB* pPlayer) {

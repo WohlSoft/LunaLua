@@ -937,140 +937,140 @@ short LuaProxy::Player::uKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->keymap.UKeyState;
+	return ::Player::Get(m_index)->keymap.upKeyState;
 }
 
 void LuaProxy::Player::setUKeyState(short var_uKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.UKeyState = var_uKeyState;
+    ::Player::Get(m_index)->keymap.upKeyState = var_uKeyState;
 }
 
 short LuaProxy::Player::dKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.DKeyState;
+    return ::Player::Get(m_index)->keymap.downKeyState;
 }
 
 void LuaProxy::Player::setDKeyState(short var_dKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.DKeyState = var_dKeyState;
+    ::Player::Get(m_index)->keymap.downKeyState = var_dKeyState;
 }
 
 short LuaProxy::Player::lKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.LKeyState;
+    return ::Player::Get(m_index)->keymap.leftKeyState;
 }
 
 void LuaProxy::Player::setLKeyState(short var_lKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.LKeyState = var_lKeyState;
+    ::Player::Get(m_index)->keymap.leftKeyState = var_lKeyState;
 }
 
 short LuaProxy::Player::rKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.RKeyState;
+    return ::Player::Get(m_index)->keymap.rightKeyState;
 }
 
 void LuaProxy::Player::setRKeyState(short var_rKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.RKeyState = var_rKeyState;
+    ::Player::Get(m_index)->keymap.rightKeyState = var_rKeyState;
 }
 
 short LuaProxy::Player::jKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.JKeyState;
+    return ::Player::Get(m_index)->keymap.jumpKeyState;
 }
 
 void LuaProxy::Player::setJKeyState(short var_jKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.JKeyState = var_jKeyState;
+    ::Player::Get(m_index)->keymap.jumpKeyState = var_jKeyState;
 }
 
 short LuaProxy::Player::sJKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.SJKeyState;
+    return ::Player::Get(m_index)->keymap.altJumpKeyState;
 }
 
 void LuaProxy::Player::setSJKeyState(short var_sJKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.SJKeyState = var_sJKeyState;
+    ::Player::Get(m_index)->keymap.altJumpKeyState = var_sJKeyState;
 }
 
 short LuaProxy::Player::xKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.XKeyState;
+    return ::Player::Get(m_index)->keymap.runKeyState;
 }
 
 void LuaProxy::Player::setXKeyState(short var_xKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.XKeyState = var_xKeyState;
+    ::Player::Get(m_index)->keymap.runKeyState = var_xKeyState;
 }
 
 short LuaProxy::Player::rNKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.RNKeyState;
+    return ::Player::Get(m_index)->keymap.altRunKeyState;
 }
 
 void LuaProxy::Player::setRNKeyState(short var_rNKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.RNKeyState = var_rNKeyState;
+    ::Player::Get(m_index)->keymap.altRunKeyState = var_rNKeyState;
 }
 
 short LuaProxy::Player::sELKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.SELKeyState;
+    return ::Player::Get(m_index)->keymap.dropItemKeyState;
 }
 
 void LuaProxy::Player::setSELKeyState(short var_sELKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.SELKeyState = var_sELKeyState;
+    ::Player::Get(m_index)->keymap.dropItemKeyState = var_sELKeyState;
 }
 
 short LuaProxy::Player::sTRKeyState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-    return ::Player::Get(m_index)->keymap.STRKeyState;
+    return ::Player::Get(m_index)->keymap.pauseKeyState;
 }
 
 void LuaProxy::Player::setSTRKeyState(short var_sTRKeyState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-    ::Player::Get(m_index)->keymap.STRKeyState = var_sTRKeyState;
+    ::Player::Get(m_index)->keymap.pauseKeyState = var_sTRKeyState;
 }
 
 short LuaProxy::Player::facingDirection(lua_State *L) const
