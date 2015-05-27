@@ -221,6 +221,9 @@ void CLunaLua::setupDefaults()
         LuaProxy::Player pl(2);
         if(pl.isValid())
             _G["player2"] = pl;
+
+        _G["inputConfig1"] = LuaProxy::InputConfig(1);
+        _G["inputConfig2"] = LuaProxy::InputConfig(2);
     }
 }
 
@@ -330,6 +333,18 @@ void CLunaLua::bindAll()
                 def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock)
             ],
             /*************************Audio*end*************************/
+
+            class_<LuaProxy::InputConfig>("NativeInputConfig")
+            .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
+            .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
+            .property("left", &LuaProxy::InputConfig::left, &LuaProxy::InputConfig::setLeft)
+            .property("right", &LuaProxy::InputConfig::right, &LuaProxy::InputConfig::setRight)
+            .property("run", &LuaProxy::InputConfig::run, &LuaProxy::InputConfig::setRun)
+            .property("altrun", &LuaProxy::InputConfig::altrun, &LuaProxy::InputConfig::setAltRun)
+            .property("jump", &LuaProxy::InputConfig::jump, &LuaProxy::InputConfig::setJump)
+            .property("altjump", &LuaProxy::InputConfig::altjump, &LuaProxy::InputConfig::setAltJump)
+            .property("dropitem", &LuaProxy::InputConfig::dropitem, &LuaProxy::InputConfig::setDropItem)
+            .property("pause", &LuaProxy::InputConfig::pause, &LuaProxy::InputConfig::setPause),
 
             class_<RECT>("RECT")
             .def_readwrite("left", &RECT::left)

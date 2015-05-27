@@ -672,6 +672,42 @@ namespace LuaProxy {
         unsigned short m_index;
     };
 
+    class InputConfig{
+    public:
+        InputConfig(unsigned short index);
+       
+        short inputType(lua_State* L);
+        void setInputType(short inputType, lua_State* L);
+
+        short up(lua_State* L);
+        short down(lua_State* L);
+        short left(lua_State* L);
+        short right(lua_State* L);
+        short run(lua_State* L);
+        short altrun(lua_State* L);
+        short jump(lua_State* L);
+        short altjump(lua_State* L);
+        short dropitem(lua_State* L);
+        short pause(lua_State* L);
+
+        void setUp(unsigned short keycode, lua_State* L);
+        void setDown(unsigned short keycode, lua_State* L);
+        void setLeft(unsigned short keycode, lua_State* L);
+        void setRight(unsigned short keycode, lua_State* L);
+        void setRun(unsigned short keycode, lua_State* L);
+        void setAltRun(unsigned short keycode, lua_State* L);
+        void setJump(unsigned short keycode, lua_State* L);
+        void setAltJump(unsigned short keycode, lua_State* L);
+        void setDropItem(unsigned short keycode, lua_State* L);
+        void setPause(unsigned short keycode, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+    private:
+        unsigned short m_index;
+    };
+
     //undocumented
     namespace Native{
         std::string getSMBXPath();

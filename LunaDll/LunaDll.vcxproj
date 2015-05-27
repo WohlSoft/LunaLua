@@ -207,7 +207,7 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
-    <ClInclude Include="SMBXInternal\Keyboard.h" />
+    <ClInclude Include="SMBXInternal\NativeInput.h" />
     <ClInclude Include="SMBXInternal\Layer.h" />
     <ClInclude Include="SMBXInternal\Level.h" />
     <ClInclude Include="LevelCodes\LevelCodes.h" />
@@ -296,7 +296,7 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyData.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLayer.cpp" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeKeyboard.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNPC.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp" />
@@ -330,7 +330,6 @@
     <ClCompile Include="CustomSprites\Hitbox\Hitbox.cpp" />
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="LevelCodes\JosephStaleknight-CurtainTortoise.lvl.cpp" />
-    <ClCompile Include="SMBXInternal\Keyboard.cpp" />
     <ClCompile Include="LevelCodes\Kil-DemosBrain.cpp" />
     <ClCompile Include="LevelCodes\KilArmoryCode.cpp" />
     <ClCompile Include="SMBXInternal\Layer.cpp" />

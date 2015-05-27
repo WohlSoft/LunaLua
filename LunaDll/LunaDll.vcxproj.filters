@@ -192,9 +192,6 @@
     <ClInclude Include="Input\Input.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="SMBXInternal\Keyboard.h">
-      <Filter>Header Files\SMBXInternal</Filter>
-    </ClInclude>
     <ClInclude Include="SMBXInternal\Layer.h">
       <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
@@ -408,6 +405,9 @@
     <ClInclude Include="GameConfig\GameAutostart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\NativeInput.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -505,9 +505,6 @@
     </ClCompile>
     <ClCompile Include="Input\Input.cpp">
       <Filter>Header Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="SMBXInternal\Keyboard.cpp">
-      <Filter>Header Files\SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="SMBXInternal\Layer.cpp">
       <Filter>Header Files\SMBXInternal</Filter>
@@ -644,9 +641,6 @@
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp">
       <Filter>Header Files\HardcodedGraphics</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeKeyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaSharedProxy.cpp">
       <Filter>Header Files\Lua</Filter>
     </ClCompile>
@@ -780,6 +774,9 @@
       <Filter>GameConfig</Filter>
     </ClCompile>
     <ClCompile Include="GameConfig\GameAutostart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
