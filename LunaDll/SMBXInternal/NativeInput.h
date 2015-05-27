@@ -39,39 +39,43 @@ namespace SMBXInput {
     }
 }
 
-struct SMBXNativeKeyboard{
-	short up;
-	short down;
-	short left;
-	short right;
-	short run;
-	short altrun;
-	short jump;
-	short altjump;
-	short dropitem;
-	short pause;
+#pragma pack(push, 1)
+struct __declspec(align(1)) SMBXNativeKeyboard
+{
+    short up;
+    short down;
+    short left;
+    short right;
+    short jump;
+    short run;
+    short dropitem;
+    short pause;
+    short altjump;
+    short altrun;
 
     static inline SMBXNativeKeyboard* Get(unsigned short inputIndex) {
         if (inputIndex < 1 || inputIndex > 2) return nullptr;
         return &((SMBXNativeKeyboard*)GM_VKEY_TABLE_PTR)[inputIndex - 1];
     }
 };
+#pragma pack(pop)
 
-struct SMBXNativeJoystick
+#pragma pack(push, 1)
+struct __declspec(align(1)) SMBXNativeJoystick
 {
-    short run;
-    short altrun;
     short jump;
-    short altjump;
+    short run;
     short dropitem;
     short pause;
+    short altjump;
+    short altrun;
 
     static inline SMBXNativeJoystick* Get(unsigned short inputIndex) {
         if (inputIndex < 1 || inputIndex > 2) return nullptr;
         return &((SMBXNativeJoystick*)GM_VJOY_TABLE_PTR)[inputIndex - 1];
     }
 };
-
+#pragma pack(pop)
 
 
 

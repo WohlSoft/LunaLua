@@ -61,7 +61,7 @@ extern void __stdcall forceTermination();
 extern int __stdcall LoadWorld();     //The World Load Code
 extern DWORD __stdcall WorldLoop();       //The World Loop Code
 extern void* __stdcall WorldRender();     //The World Render Code
-extern int __stdcall LoadIntro();
+extern int __stdcall LoadIntro();       // Load Intro Code (Autostart)
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);       //The Main Menu Render Code
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);       //The MCI Emulator Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter Code
@@ -83,6 +83,8 @@ extern void __stdcall LoadLocalGfxHook();
 extern BOOL __stdcall BitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall StretchBltHook(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, DWORD dwRop);
 extern int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2);
+extern void __stdcall UpdateInputHook();
+extern void UpdateInputHook_Wrapper();
 
 /************************************************************************/
 /* Libs                                                                 */

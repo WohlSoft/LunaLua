@@ -598,3 +598,24 @@ int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2) {
     if (arg2 == NULL) arg2 = L"";
     return wcscmp(arg1, arg2);
 }
+
+
+
+__declspec(naked) void UpdateInputHook_Wrapper()
+{
+    __asm {
+        MOV EBX, 1
+        JMP UpdateInputHook
+    }
+}
+
+
+extern void __stdcall UpdateInputHook()
+{
+    if (gLunaLua.isValid()){
+        Event inputEvent("onInputUpdate", false);
+        inputEvent.setDirectEventName("onInputUpdate");
+        inputEvent.setLoopable(false);
+        gLunaLua.callEvent(&inputEvent);
+    }
+}

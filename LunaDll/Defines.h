@@ -333,16 +333,16 @@ struct Bounds
 };
 
 struct KeyMap{
-    short    UKeyState;
-    short    DKeyState;
-    short    LKeyState;
-    short    RKeyState;
-    short    JKeyState;
-    short    SJKeyState;
-    short    XKeyState;
-    short    RNKeyState;
-    short    SELKeyState;
-    short    STRKeyState;
+    short    UKeyState; //Up
+    short    DKeyState; //Down
+    short    LKeyState; //Left
+    short    RKeyState; //Right
+    short    JKeyState; //Jump
+    short    SJKeyState; //Spin Jump
+    short    XKeyState;  //Run
+    short    RNKeyState; //Alt Run
+    short    SELKeyState; //Select/Drop Item
+    short    STRKeyState; //Pause
 };
 
 enum Characters : short {

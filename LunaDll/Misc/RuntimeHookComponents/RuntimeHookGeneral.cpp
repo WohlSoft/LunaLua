@@ -215,6 +215,8 @@ void TrySkipPatch()
     *(BYTE*)(0x8C23D0) = INSTR_NOP;
     *(BYTE*)(0x8C23D1) = INSTR_NOP;
 
+    PATCH_FUNC(0xA755D2, &UpdateInputHook_Wrapper);
+
     // Graphics Bitblt hooks
     PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);
     PATCH_FUNC(0x8D8BF1, &LoadLocalGfxHook);
