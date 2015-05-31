@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>emptyPage.html</file>
+        <file>smbxIcon.png</file>
+    </qresource>
+</RCC>

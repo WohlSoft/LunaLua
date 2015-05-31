@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script language="JavaScript" type="text/javascript">
+
+        /*
+
+         ****************
+               MAIN
+         ****************
+
+         Functions:
+
+         Launcher.runSMBX()
+         Launcher.runSMBXEditor()
+         Launcher.loadEpisodeWebpage(String name)
+
+         ****************
+            Autostart
+         ****************
+
+         Properties:
+         Launcher.Autostart.useAutostart = bool
+         Launcher.Autostart.episodeName = String
+         Launcher.Autostart.singleplayer = bool
+         Launcher.Autostart.character1 = int
+         Launcher.Autostart.character2 = int
+         Launcher.Autostart.saveSlot = int
+
+         */
+
+        function exampleRunSMBX(){
+            Launcher.Autostart.useAutostart = true
+            Launcher.Autostart.episodeName = "1: analog funk"
+            Launcher.Autostart.singleplayer = true
+            Launcher.Autostart.character1 = 1 //DEMO
+            Launcher.Autostart.character2 = 2 //IRIS
+            Launcher.Autostart.saveSlot = 1
+
+            Launcher.runSMBX();
+        }
+
+        function exampleRunSMBXEditor(){
+            Launcher.runSMBXEditor();
+        }
+
+        function exampleLoadEpisodeWebpage(){
+            Launcher.loadEpisodeWebpage("MyEpisodeLauncher2.html");
+        }
+
+    </script>
+</head>
+<body>
+
+<p>
+    <button onclick="exampleRunSMBX()">Run SMBX</button><br>
+    <button onclick="exampleRunSMBXEditor()">Run SMBX Editor</button><br>
+    <button onclick="exampleLoadEpisodeWebpage()">Switch to another episode html file</button><br>
+</p>
+
+</body>
+</html>
