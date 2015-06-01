@@ -1,4 +1,5 @@
 This are sample files for the new SMBX Launcher.
+Note: The "launcher" folder goes to an episode of your choice!
 With this application you can design your own Launcher.
 
 You can find the reference for Javascript/HTML code in MyEpisodeLauncher.html

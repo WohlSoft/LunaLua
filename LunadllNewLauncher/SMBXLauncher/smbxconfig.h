@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <autostartconfig.h>
+#include <QVariant>
 
 class SMBXConfig : public QObject
 {
@@ -18,6 +19,7 @@ public:
     }
 
 public slots:
+    QVariantList getEpisodeInfo(const QString& subDirPerEpisode, const QString &jsonFileName);
 
 
 signals:

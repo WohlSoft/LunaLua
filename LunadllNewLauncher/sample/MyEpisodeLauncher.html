@@ -15,6 +15,7 @@
          Launcher.runSMBX()
          Launcher.runSMBXEditor()
          Launcher.loadEpisodeWebpage(String name)
+         Launcher.getEpisodeInfo(String episodeSubDir, String jsonFile)
 
          ****************
             Autostart
@@ -48,6 +49,14 @@
         function exampleLoadEpisodeWebpage(){
             Launcher.loadEpisodeWebpage("MyEpisodeLauncher2.html");
         }
+        
+        
+        window.onload = function(){
+            //Note: File Path with this paramter is: {SMBX Main Dir}/worlds/{episode}/launcher/info.json
+            var someData = Launcher.getEpisodeInfo("launcher", "info.json");
+            document.getElementById('episodeInfo').innerHTML = JSON.stringify(someData);
+        }
+        
 
     </script>
 </head>
@@ -57,6 +66,8 @@
     <button onclick="exampleRunSMBX()">Run SMBX</button><br>
     <button onclick="exampleRunSMBXEditor()">Run SMBX Editor</button><br>
     <button onclick="exampleLoadEpisodeWebpage()">Switch to another episode html file</button><br>
+    <p>Episode Info: </p>
+    <p id="episodeInfo"></p>
 </p>
 
 </body>
