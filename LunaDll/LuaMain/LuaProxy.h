@@ -573,7 +573,7 @@ namespace LuaProxy {
         static int count();
         static luabind::object get(lua_State* L);
         static luabind::object get(luabind::object idFilter, lua_State* L);
-
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
 
         Block(int index);
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);

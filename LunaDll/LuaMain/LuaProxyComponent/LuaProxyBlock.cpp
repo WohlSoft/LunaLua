@@ -26,23 +26,39 @@ luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
     }
     catch (LuaHelper::invalidIDException* e)
     {
-        luaL_error(L, "Invalid BGO-ID!\nNeed BGO-ID between 1-%d\nGot BGO-ID: %d", ::Block::MAX_ID, e->usedID());
+        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-%d\nGot Block-ID: %d", ::Block::MAX_ID, e->usedID());
         return luabind::object();
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
     {
-        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        luaL_error(L, "Invalid args for BlockID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
         return luabind::object();
     }
 
     return LuaHelper::getObjList(
         ::Block::Count(),
-        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [](unsigned short i){ return LuaProxy::Block(i); },
         [&lookupTableBlockID](unsigned short i){
         ::Block *block = ::Block::Get(i);
         return (block != NULL) &&
             (block->BlockType <= ::Block::MAX_ID) && lookupTableBlockID.get()[block->BlockType];
     }, L);
+}
+
+luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::Block::Count(),
+        [](unsigned short i){ return LuaProxy::Block(i); },
+        [x1, y1, x2, y2](unsigned short i){
+            ::Block *block = ::Block::Get(i);
+            if (block == NULL) return false;
+            if (x2 <= block->mometum.x) return false;
+            if (y2 <= block->mometum.y) return false;
+            if (block->mometum.x + block->mometum.width <= x1) return false;
+            if (block->mometum.y + block->mometum.height <= y1) return false;
+            return true;
+        }, L);
 }
 
 

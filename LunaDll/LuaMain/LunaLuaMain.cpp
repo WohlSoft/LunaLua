@@ -723,7 +723,8 @@ void CLunaLua::bindAll()
                 .scope[ //static functions
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
-                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get)
+                        def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get),
+                        def("getIntersecting", &LuaProxy::Block::getIntersecting)
                 ]
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object&, lua_State*)>(&LuaProxy::Block::mem))
