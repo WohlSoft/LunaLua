@@ -183,7 +183,9 @@ struct SMBXAnimation{
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(SMBXAnimation) == 0x44, "sizeof(SMBXAnimation) must be 0x44");
+#endif
 
 namespace Animations {
 

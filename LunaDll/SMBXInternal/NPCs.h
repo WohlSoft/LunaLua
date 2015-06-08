@@ -468,7 +468,9 @@ struct NPCMOB {
 #pragma pack(pop)
 
 /* Verify NPC struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
+#endif
 
 namespace NPC {
 

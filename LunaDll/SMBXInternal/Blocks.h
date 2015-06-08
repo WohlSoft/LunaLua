@@ -57,7 +57,9 @@ struct Block {
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(Block) == 0x68, "sizeof(Block) must be 0x68");
+#endif
 
 namespace Blocks {
 

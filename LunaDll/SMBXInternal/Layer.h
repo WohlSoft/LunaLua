@@ -26,7 +26,9 @@ struct LayerControl {
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(LayerControl) == 0x14, "sizeof(LayerControl) must be 0x14");
+#endif
 
 namespace Layer{
 
