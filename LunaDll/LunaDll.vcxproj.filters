@@ -707,9 +707,6 @@
     <ClCompile Include="Rendering\GLEngine.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\RenderUtils.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
@@ -778,6 +775,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,22 @@ luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sec
         }, L);
 }
 
+luabind::object LuaProxy::NPC::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        GM_NPCS_COUNT,
+        [](unsigned short i){ return LuaProxy::NPC(i); },
+        [x1, y1, x2, y2](unsigned short i){
+        ::NPCMOB *obj = ::NPC::Get(i);
+        if (obj == NULL) return false;
+        if (x2 <= obj->momentum.x) return false;
+        if (y2 <= obj->momentum.y) return false;
+        if (obj->momentum.x + obj->momentum.width <= x1) return false;
+        if (obj->momentum.y + obj->momentum.height <= y1) return false;
+        return true;
+    }, L);
+}
+
 LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short section, lua_State* L)
 {
     return LuaProxy::NPC::spawn(npcid, x, y, section, false, false, L);

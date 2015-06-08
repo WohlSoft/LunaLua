@@ -41,6 +41,22 @@ luabind::object LuaProxy::Animation::get(luabind::object idFilter, lua_State* L)
     }, L);
 }
 
+luabind::object LuaProxy::Animation::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::SMBXAnimation::Count(),
+        [](unsigned short i){ return LuaProxy::Animation(i); },
+        [x1, y1, x2, y2](unsigned short i){
+        ::SMBXAnimation *obj = ::SMBXAnimation::Get(i);
+        if (obj == NULL) return false;
+        if (x2 <= obj->momentum.x) return false;
+        if (y2 <= obj->momentum.y) return false;
+        if (obj->momentum.x + obj->momentum.width <= x1) return false;
+        if (obj->momentum.y + obj->momentum.height <= y1) return false;
+        return true;
+    }, L);
+}
+
 LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, double y, lua_State* L)
 {
     return spawnEffect(effectID, x, y, 1.0f, L);

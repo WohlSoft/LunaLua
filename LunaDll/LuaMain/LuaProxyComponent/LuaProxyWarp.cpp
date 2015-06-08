@@ -11,6 +11,52 @@ luabind::object LuaProxy::Warp::get(lua_State* L)
     return LuaHelper::getObjList(::SMBX_Warp::Count(), [](unsigned short i){ return LuaProxy::Warp(i); }, L);
 }
 
+luabind::object LuaProxy::Warp::getIntersectingEntrance(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::SMBX_Warp::Count(),
+        [](unsigned short i){ return LuaProxy::Warp(i); },
+        [x1, y1, x2, y2](unsigned short i){
+        ::SMBX_Warp *obj = ::SMBX_Warp::Get(i);
+        if (obj == NULL) return false;
+
+        double wx1 = obj->entranceX;
+        if (x2 <= wx1) return false;
+        double wy1 = obj->entranceY;
+        if (y2 <= wy1) return false;
+        double wx2 = wx1 + 32.0;
+        if (wx2 <= x1) return false;
+        double wy2 = wy1 + 32.0;
+        if (wy2 <= y1) return false;
+
+        return true;
+    }, L);
+}
+
+luabind::object LuaProxy::Warp::getIntersectingExit(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::SMBX_Warp::Count(),
+        [](unsigned short i){ return LuaProxy::Warp(i); },
+        [x1, y1, x2, y2](unsigned short i){
+        ::SMBX_Warp *obj = ::SMBX_Warp::Get(i);
+        if (obj == NULL) return false;
+
+        // Ignore if exit isn't pointing to within this level actually
+        if (obj->warpToLevelFileName.length() > 0) return false;
+
+        double wx1 = obj->exitX;
+        if (x2 <= wx1) return false;
+        double wy1 = obj->exitY;
+        if (y2 <= wy1) return false;
+        double wx2 = wx1 + 32.0;
+        if (wx2 <= x1) return false;
+        double wy2 = wy1 + 32.0;
+        if (wy2 <= y1) return false;
+
+        return true;
+    }, L);
+}
 
 LuaProxy::Warp::Warp(int warpIndex)
 {

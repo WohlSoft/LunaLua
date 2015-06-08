@@ -47,6 +47,21 @@ LuaProxy::BGO::BGO(unsigned short index)
     m_index = index;
 }
 
+luabind::object LuaProxy::BGO::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::SMBX_BGO::Count(),
+        [](unsigned short i){ return LuaProxy::BGO(i); },
+        [x1, y1, x2, y2](unsigned short i){
+        ::SMBX_BGO *obj = ::SMBX_BGO::Get(i);
+        if (obj == NULL) return false;
+        if (x2 <= obj->momentum.x) return false;
+        if (y2 <= obj->momentum.y) return false;
+        if (obj->momentum.x + obj->momentum.width <= x1) return false;
+        if (obj->momentum.y + obj->momentum.height <= y1) return false;
+        return true;
+    }, L);
+}
 
 bool LuaProxy::BGO::isHidden(lua_State* L) const
 {

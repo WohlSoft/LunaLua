@@ -470,7 +470,9 @@ void CLunaLua::bindAll()
                 class_<LuaProxy::Warp>("Warp")
                 .scope[
                         def("count", &LuaProxy::Warp::count),
-                        def("get", &LuaProxy::Warp::get)
+                        def("get", &LuaProxy::Warp::get),
+                        def("getIntersectingEntrance", &LuaProxy::Warp::getIntersectingEntrance),
+                        def("getIntersectingExit", &LuaProxy::Warp::getIntersectingExit)
                 ]
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Warp::mem))
@@ -488,6 +490,7 @@ void CLunaLua::bindAll()
                         def("count", &LuaProxy::Animation::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Animation::get)),
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Animation::get)),
+                        def("getIntersecting", &LuaProxy::Animation::getIntersecting),
                         def("spawn", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::Animation::spawnEffect), //DONE
                         def("spawn", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::Animation::spawnEffect) //DONE
                 ]
@@ -534,6 +537,7 @@ void CLunaLua::bindAll()
                     def("count", &LuaProxy::NPC::count),
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::NPC::get),
                     def("get", (luabind::object(*)(luabind::object, luabind::object, lua_State* L))&LuaProxy::NPC::get),
+                    def("getIntersecting", &LuaProxy::NPC::getIntersecting),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
@@ -750,7 +754,8 @@ void CLunaLua::bindAll()
                 .scope[ //static functions
                         def("count", &LuaProxy::BGO::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
-                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get))
+                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
+                        def("getIntersecting", &LuaProxy::BGO::getIntersecting)
                 ]
                 .def(constructor<int>())
                 .property("id", &LuaProxy::BGO::id, &LuaProxy::BGO::setId)
