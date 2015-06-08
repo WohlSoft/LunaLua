@@ -773,11 +773,12 @@ namespace LuaProxy {
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
-        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos, const char* extra, int time);
-        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos, const char* extra);
-        void placeSprite(int type, const LuaImageResource* img, int xPos, int yPos);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra, int time);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
 
         void glSetTexture(const LuaImageResource* img, uint32_t color);
+        void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
     }
 
     namespace Effects{

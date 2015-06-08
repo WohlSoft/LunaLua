@@ -254,11 +254,11 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
-
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource* img, int, int))&LuaProxy::Graphics::placeSprite),
-                def("glSetTexture", &LuaProxy::Graphics::glSetTexture)
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
+                def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
+                def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
                 // glDrawTriangles will be defined at runtime using FFI
             ],
 

@@ -6,6 +6,8 @@
 #include <cstdint>
 
 class GLDraw {
+private:
+    GLuint mLastTexName;
 public:
     struct Texture {
         GLuint name;
@@ -21,10 +23,21 @@ public:
     };
 
 public:
-    GLuint mLastTexName;
-    
     GLDraw();
-    void Unbind();
+    inline void BindTexture(const Texture* tex) {
+        GLuint textName = tex ? tex->name : 0;
+        if (mLastTexName != textName)
+        {
+            mLastTexName = textName;
+            glBindTexture(GL_TEXTURE_2D, textName);
+        }
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    inline void UnbindTexture() {
+        if (mLastTexName == 0) return;
+        mLastTexName = 0;
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
     void DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode);
     void DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight);
     void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight);

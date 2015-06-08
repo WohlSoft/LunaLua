@@ -34,9 +34,8 @@ void GLEngine::Init() {
 
     mBufTex.w = 800;
     mBufTex.h = 600;
-    g_GLDraw.Unbind();
     glGenTextures(1, &mBufTex.name);
-    glBindTexture(GL_TEXTURE_2D, mBufTex.name);
+    g_GLDraw.BindTexture(&mBufTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -78,12 +77,12 @@ void GLEngine::Init() {
 }
 
 void GLEngine::ClearSMBXTextures() {
-    g_GLDraw.Unbind();
+    g_GLDraw.UnbindTexture();
     g_GLTextureStore.ClearSMBXTextures();
 }
 
 void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
-    g_GLDraw.Unbind();
+    g_GLDraw.UnbindTexture();
     g_GLTextureStore.ClearLunaTexture(bmp);
 }
 
@@ -135,7 +134,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     if (!mInitialized) Init();
     if (!mInitialized) return FALSE;
 
-    g_GLDraw.Unbind();
+    g_GLDraw.UnbindTexture();
 
     // Unbind the texture from the framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
@@ -211,21 +210,13 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     glBlendEquationANY(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (tex) {
-        if (g_GLDraw.mLastTexName != tex->name)
-        {
-            g_GLDraw.mLastTexName = tex->name;
-            glBindTexture(GL_TEXTURE_2D, tex->name);
-        }
-    }
-    else {
-        g_GLDraw.Unbind();
-    }
+    g_GLDraw.BindTexture(tex);
 
-    float r = ((0xFF0000 & color) >> 16) / 255.0f;
-    float g = ((0x00FF00 & color) >> 8) / 255.0f;
-    float b = ((0x0000FF & color) >> 0) / 255.0f;
-    glColor3f(r, g, b);
+    float r = ((0xFF000000 & color) >> 24) / 255.0f;
+    float g = ((0x00FF0000 & color) >> 16) / 255.0f;
+    float b = ((0x0000FF00 & color) >> 8) / 255.0f;
+    float a = ((0x000000FF & color) >> 0) / 255.0f;
+    glColor4f(r*a, g*a, b*a, a);
 }
 
 void GLEngine::DrawTriangles(const float* vert, const float* tex, uint32_t count) {

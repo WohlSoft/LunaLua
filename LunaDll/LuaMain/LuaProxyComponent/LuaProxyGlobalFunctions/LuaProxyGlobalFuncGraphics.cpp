@@ -61,23 +61,28 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     placeSprite(type, imgResource, xPos, yPos, "");
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource* img, int xPos, int yPos, const char *extra, int time)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra, int time)
 {
-    placeSprite(type, img->imgResource, xPos, yPos, extra, time);
+    placeSprite(type, img.imgResource, xPos, yPos, extra, time);
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource* img, int xPos, int yPos, const char *extra)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra)
 {
-    placeSprite(type, img->imgResource, xPos, yPos, extra, 0);
+    placeSprite(type, img.imgResource, xPos, yPos, extra, 0);
 }
 
-
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource* img, int xPos, int yPos)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos)
 {
-    placeSprite(type, img->imgResource, xPos, yPos, "");
+    placeSprite(type, img.imgResource, xPos, yPos, "");
 }
 
 void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t color)
+{   
+    // Convert RGB to RGBA
+    LuaProxy::Graphics::glSetTextureRGBA(img, (color << 8) | 0xFF);
+}
+
+void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t color)
 {
     const BMPBox* bmp = NULL;
     if (img) {

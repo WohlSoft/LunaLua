@@ -11,13 +11,6 @@ GLDraw::GLDraw() : mLastTexName(0)
 {
 }
 
-void GLDraw::Unbind()
-{
-    if (mLastTexName == 0) return;
-    mLastTexName = 0;
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
 void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode)
 {
     // Trim the coordinates to fit the texture
@@ -80,11 +73,7 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
         break;
     }
 
-    if (mLastTexName != tex->name)
-    {
-        mLastTexName = tex->name;
-        glBindTexture(GL_TEXTURE_2D, tex->name);
-    }
+    BindTexture(tex);
 
     GLfloat Vertices[] = {
         x1, y1, 0,
@@ -116,7 +105,7 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
 
 void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 {
-    Unbind();
+    UnbindTexture();
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
 
@@ -163,11 +152,7 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     glBlendEquationANY(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (mLastTexName != tex->name)
-    {
-        mLastTexName = tex->name;
-        glBindTexture(GL_TEXTURE_2D, tex->name);
-    }
+    BindTexture(tex);
 
     GLfloat Vertices[] = {
         x1, y1, 0,

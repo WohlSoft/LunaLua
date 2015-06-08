@@ -67,7 +67,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
         convHBMP = NULL;
         return NULL;
     }
-    glBindTexture(GL_TEXTURE_2D, tex.name);
+    g_GLDraw.BindTexture(&tex);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -123,7 +123,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     glGenTextures(1, &tex.name);
     if (tex.name == 0) return NULL;
 
-    glBindTexture(GL_TEXTURE_2D, tex.name);
+    g_GLDraw.BindTexture(&tex);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
