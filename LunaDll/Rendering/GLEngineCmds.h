@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <cstdint>
 #include "BMPBox.h"
+#include <gl/glew.h>
 
 struct GLEngineCmd {
     enum GLEngineCmdType {
@@ -16,7 +17,7 @@ struct GLEngineCmd {
         GL_ENGINE_CMD_EXIT,
 
         GL_ENGINE_CMD_SET_TEX,
-        GL_ENGINE_CMD_DRAW_TRIANGLES
+        GL_ENGINE_CMD_DRAW_2D_ARRAY
     };
 
     GLEngineCmdType mCmd;
@@ -66,10 +67,11 @@ struct GLEngineCmd {
             uint32_t color;
         } mSetTex;
         struct {
+            GLuint type;
             const float* vert;
             const float* tex;
             uint32_t count;
-        } mDrawTriangles;
+        } mDraw2DArray;
     } mData;
 
     static inline GLEngineCmd ClearSMBXTextures() {
@@ -167,15 +169,20 @@ struct GLEngineCmd {
 
         return cmd;
     }
-    static inline GLEngineCmd DrawTriangles(const float* vert, const float* tex, uint32_t count)
+    static inline GLEngineCmd Draw2DArray(GLuint type, const float* vert, const float* tex, uint32_t count)
     {
         GLEngineCmd cmd;
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_TRIANGLES;
-        cmd.mData.mDrawTriangles.vert = vert;
-        cmd.mData.mDrawTriangles.tex = tex;
-        cmd.mData.mDrawTriangles.count = count;
+        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_2D_ARRAY;
+        cmd.mData.mDraw2DArray.type = type;
+        cmd.mData.mDraw2DArray.vert = vert;
+        cmd.mData.mDraw2DArray.tex = tex;
+        cmd.mData.mDraw2DArray.count = count;
 
         return cmd;
+    }
+    static inline GLEngineCmd DrawTriangles(const float* vert, const float* tex, uint32_t count)
+    {
+        return Draw2DArray(GL_TRIANGLES, vert, tex, count);
     }
 };
 

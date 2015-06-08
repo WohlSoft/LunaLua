@@ -219,8 +219,8 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     glColor4f(r*a, g*a, b*a, a);
 }
 
-void GLEngine::DrawTriangles(const float* vert, const float* tex, uint32_t count) {
+void GLEngine::Draw2DArray(GLuint type, const float* vert, const float* tex, uint32_t count) {
     glVertexPointer(2, GL_FLOAT, 0, vert);
     glTexCoordPointer(2, GL_FLOAT, 0, tex);
-    glDrawArrays(GL_TRIANGLES, 0, count);
+    glDrawArrays(type, 0, count);
 }

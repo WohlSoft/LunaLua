@@ -46,7 +46,7 @@ public:
     void EndFrame(HDC hdcDest);
 
     void SetTex(const BMPBox* bmp, uint32_t color);
-    void DrawTriangles(const float* vert, const float* tex, uint32_t count);
+    void Draw2DArray(GLuint type, const float* vert, const float* tex, uint32_t count);
 };
 
 #include "GLEngineProxy.h"

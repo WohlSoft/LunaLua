@@ -105,15 +105,16 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mSetTex.color);
         }
         break;
-    case GLEngineCmd::GL_ENGINE_CMD_DRAW_TRIANGLES:
+    case GLEngineCmd::GL_ENGINE_CMD_DRAW_2D_ARRAY:
         if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.DrawTriangles(
-                cmd.mData.mDrawTriangles.vert,
-                cmd.mData.mDrawTriangles.tex,
-                cmd.mData.mDrawTriangles.count);
+            mGLEngine.Draw2DArray(
+                cmd.mData.mDraw2DArray.type,
+                cmd.mData.mDraw2DArray.vert,
+                cmd.mData.mDraw2DArray.tex,
+                cmd.mData.mDraw2DArray.count);
         }
-        free((void*)cmd.mData.mDrawTriangles.vert);
-        free((void*)cmd.mData.mDrawTriangles.tex);
+        free((void*)cmd.mData.mDraw2DArray.vert);
+        free((void*)cmd.mData.mDraw2DArray.tex);
         break;
     default:
         break;
