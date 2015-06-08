@@ -619,3 +619,12 @@ extern void __stdcall UpdateInputHook()
         gLunaLua.callEvent(&inputEvent);
     }
 }
+
+extern void __stdcall WindowInactiveHook()
+{
+    // Replacement for what we hooked
+    native_rtcDoEvents();
+
+    // Don't hog the CPU when window is inactive!
+    Sleep(100);
+}

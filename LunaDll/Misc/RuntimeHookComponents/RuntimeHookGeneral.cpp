@@ -226,6 +226,9 @@ void TrySkipPatch()
     PATCH_JMP(0x4242D0, &BitBltHook);
     PATCH_JMP(0x424314, &StretchBltHook);
 
+    *(BYTE*)(0x8E6FE1) = INSTR_NOP;
+    PATCH_FUNC(0x8E6FE2, &WindowInactiveHook);
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

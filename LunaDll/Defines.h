@@ -457,6 +457,7 @@ enum Characters : short {
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
+#define GF_RTC_DO_EVENTS    *(DWORD*)0x004010B8
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
@@ -487,6 +488,8 @@ static const auto native_loadWorldList  = (void(__stdcall *)())GF_LOAD_WORLD_LIS
 static const auto native_loadSaveStates = (void(__stdcall *)())GF_LOAD_SAVE_STATES;
 
 static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_MAIN;
+
+static const auto native_rtcDoEvents    = (void(__stdcall *)())GF_RTC_DO_EVENTS;
 
 /*
 _O_Pub_Obj_Inf1_Event0x3                008BD770 P
