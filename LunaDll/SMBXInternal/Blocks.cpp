@@ -67,7 +67,7 @@ void Blocks::ShowAll(int type) {
 	Block* blocks = Blocks::GetBase();	
 	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
 		if(blocks[i].BlockType == type) {
-			blocks[i].IsHidden = 0;
+			blocks[i].IsInvisible3 = 0;
 		}		
 	}
 }
@@ -76,7 +76,7 @@ void Blocks::HideAll(int type) {
 	Block* blocks = Blocks::GetBase();	
 	for(int i = 1; i <= GM_BLOCK_COUNT; i++) {
 		if(blocks[i].BlockType == type) {
-			blocks[i].IsHidden = 0xFFFF;
+			blocks[i].IsInvisible3 = 0xFFFF;
 		}		
 	}
 }

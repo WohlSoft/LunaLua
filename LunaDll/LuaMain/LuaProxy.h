@@ -129,6 +129,9 @@ namespace LuaProxy {
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
 
+        bool isHidden() const;
+        void setIsHidden(bool isHidden);
+
         double entranceX() const;
         void setEntranceX(double entranceX);
         double entranceY() const;
@@ -159,6 +162,8 @@ namespace LuaProxy {
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         short id() const;
         void setId(short id);
+        bool isHidden() const;
+        void setIsHidden(bool isHidden);
         double x() const;
         void setX(double x);
         double y() const;
@@ -231,6 +236,8 @@ namespace LuaProxy {
 
         NPC (int index);
         int id(lua_State* L) const;
+        bool isHidden(lua_State* L) const;
+        void setIsHidden(bool isHidden, lua_State* L);
         float direction(lua_State* L) const;
         void setDirection(float direction, lua_State* L);
         double x(lua_State* L) const;
@@ -602,8 +609,8 @@ namespace LuaProxy {
         void setId(short id);
         bool slippery() const;
         void setSlippery(bool slippery);
-        bool invisible() const;
-        void setInvisible(bool invisible);
+        bool isHidden() const;
+        void setIsHidden(bool isHidden);
         int collidesWith(const Player* player) const;
         VBStr layerName() const;
         luabind::object layerObj(lua_State* L) const;
@@ -676,6 +683,7 @@ namespace LuaProxy {
         BGO(unsigned short index);
 
         bool isHidden(lua_State* L) const;
+        void setIsHidden(bool isHidden, lua_State* L);
         short id(lua_State* L) const;
         void setId(short id, lua_State* L);
 

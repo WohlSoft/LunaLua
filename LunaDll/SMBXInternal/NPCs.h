@@ -380,7 +380,7 @@ struct NPCMOB {
 	VB6StrPtr talkEventName;                //+0x34
 	VB6StrPtr noMoreObjInLayerEventName;    //+0x38
 	VB6StrPtr layerName;                    //+0x3C
-    short unknown_40;                       //+0x40
+    short isHidden;                         //+0x40
     short legacyBoss;                       //+0x42
     short activated;                        //+0x44
     short friendly;                         //+0x46

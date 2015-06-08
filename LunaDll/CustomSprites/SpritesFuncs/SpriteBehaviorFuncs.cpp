@@ -323,7 +323,7 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 		bool collide = false;
 		if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 			Block* block = (Block*)cellobj.pObj;
-			if(!block->IsHidden && !block->IsInvisible) {				
+			if(!block->IsInvisible3 && !block->IsHidden) {
                 collide = me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height);
 				if(collide) {
 					collide_list.push_back(cellobj);
@@ -342,7 +342,7 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
             CellObj cellobj = *it;
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
-				if(!block->IsHidden && !block->IsInvisible 
+				if(!block->IsInvisible3 && !block->IsHidden
                     && me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height)) {
 					double sprite_bot = me->m_Hitbox.CalcBottom();
 					double sprite_right = me->m_Hitbox.CalcRight();
@@ -422,7 +422,7 @@ void SpriteFunc::CrashMove(CSprite* me, SpriteComponent* obj) {
             CellObj cellobj=*it;
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
-				if(!block->IsHidden && !block->IsInvisible 
+				if(!block->IsInvisible3 && !block->IsHidden
                     && me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height)) {
 						me->Die();
 				}

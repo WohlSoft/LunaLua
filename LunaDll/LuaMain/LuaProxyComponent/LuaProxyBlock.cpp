@@ -195,20 +195,20 @@ void LuaProxy::Block::setSlippery(bool slippery)
 	::Blocks::Get(m_index)->Slippery = (slippery ? 0xFFFF : 0);
 }
 
-bool LuaProxy::Block::invisible() const
+bool LuaProxy::Block::isHidden() const
 {
 	if(!isValid())
 		return 0;
 
-	return (bool)::Blocks::Get(m_index)->IsInvisible;
+	return (bool)::Blocks::Get(m_index)->IsHidden;
 }
 
-void LuaProxy::Block::setInvisible(bool invisible)
+void LuaProxy::Block::setIsHidden(bool isHidden)
 {
 	if(!isValid())
 		return;
 
-	::Blocks::Get(m_index)->IsInvisible = (invisible ? 0xFFFF : 0);
+	::Blocks::Get(m_index)->IsHidden = (isHidden ? 0xFFFF : 0);
 }
 
 int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const

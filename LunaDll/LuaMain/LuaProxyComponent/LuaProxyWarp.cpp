@@ -78,6 +78,16 @@ luabind::object LuaProxy::Warp::mem(int offset, L_FIELDTYPE ftype, lua_State* L)
     return LuaProxy::mem((int)ptr, ftype, L);
 }
 
+bool LuaProxy::Warp::isHidden() const
+{
+    return SMBX_Warp::Get(m_index)->isHidden != 0;
+}
+
+void LuaProxy::Warp::setIsHidden(bool isHidden)
+{
+    SMBX_Warp::Get(m_index)->isHidden = isHidden ? -1 : 0;
+}
+
 double LuaProxy::Warp::entranceX() const
 {
     return SMBX_Warp::Get(m_index)->entranceX;

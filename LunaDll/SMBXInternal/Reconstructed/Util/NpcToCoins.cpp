@@ -159,7 +159,7 @@ void __stdcall Reconstructed::Util::npcToCoins()
         if (nextNPC->unknown_124 && !nextNPC->isGenerator){
             //Get the id of the npc, we want to check if it is on the list of "non-transformable" npcs
             int id = nextNPC->id;
-            if (!nextNPC->unknown_40 // (probably isHidden-Field)
+            if (!nextNPC->isHidden // (probably isHidden-Field)
                 && !nextNPC->killFlag // is currently not killed
                 && !nextNPC->friendly // is not friendly
                 && !(*isCollectableGoalNPC_ptr)[id]){ //check the built-in isCollectableGoal, if it is a collectable coin then skip
@@ -207,7 +207,7 @@ void __stdcall Reconstructed::Util::npcToCoins()
             //If it is a generator, then kill the generator
             if (nextNPC->isGenerator == -1){
                 nextNPC->killFlag = 9; // 9 = vanish
-                nextNPC->unknown_40 = -1;
+                nextNPC->isHidden = -1;
             }
         }
     }

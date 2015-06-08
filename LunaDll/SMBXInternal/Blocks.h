@@ -22,7 +22,7 @@ struct Block {
     VB6StrPtr           pNoMoreObjInLayerEventName;         // 0x14
     VB6StrPtr           pLayerName;                         // 0x18
 
-    short               IsInvisible;                        // 0x1C
+    short               IsHidden;                           // 0x1C
     short               BlockType;                          // 0x1E
 
     Momentum            mometum;                            // 0x20
@@ -34,7 +34,7 @@ struct Block {
 
     short               Unknown58;                          // 0x58
     short               IsInvisible2;                       // 0x5A
-    unsigned short      IsHidden;                           // 0x5C (todo: verify!)
+    unsigned short      IsInvisible3;                       // 0x5C (todo: verify!)
     short               Unknown5E;                          // 0x5E
     short               Unknown60;                          // 0x60
 

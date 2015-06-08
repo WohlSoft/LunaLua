@@ -283,6 +283,21 @@ void LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::
 	LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
+
+bool LuaProxy::NPC::isHidden(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return ::NPC::Get(m_index)->isHidden != 0;
+}
+
+void LuaProxy::NPC::setIsHidden(bool isHidden, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::NPC::Get(m_index)->isHidden = isHidden ? -1 : 0;
+}
+
 void LuaProxy::NPC::kill(lua_State* L)
 {
 	if(!isValid_throw(L))
