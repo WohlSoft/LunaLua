@@ -101,6 +101,34 @@ double LuaProxy::Block::y() const
     return ::Blocks::Get(m_index)->mometum.y;
 }
 
+double LuaProxy::Block::width() const
+{
+    if (!isValid())
+        return 0;
+    return ::Blocks::Get(m_index)->mometum.width;
+}
+
+void LuaProxy::Block::setWidth(double width)
+{
+    if (!isValid())
+        return;
+    ::Blocks::Get(m_index)->mometum.width = width;
+}
+
+double LuaProxy::Block::height() const
+{
+    if (!isValid())
+        return 0;
+    return ::Blocks::Get(m_index)->mometum.height;
+}
+
+void LuaProxy::Block::setHeight(double height)
+{
+    if (!isValid())
+        return;
+    ::Blocks::Get(m_index)->mometum.height = height;
+}
+
 void LuaProxy::Block::setY(double y)
 {
 	if(!isValid())

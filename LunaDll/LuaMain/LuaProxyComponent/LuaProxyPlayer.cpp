@@ -73,6 +73,34 @@ void LuaProxy::Player::setY(double y, lua_State *L)
     ::Player::Get(m_index)->momentum.y = y;
 }
 
+double LuaProxy::Player::width(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return ::Player::Get(m_index)->momentum.width;
+}
+
+void LuaProxy::Player::setWidth(double width, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->momentum.width = width;
+}
+
+double LuaProxy::Player::height(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return ::Player::Get(m_index)->momentum.height;
+}
+
+void LuaProxy::Player::setHeight(double height, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->momentum.height = height;
+}
+
 double LuaProxy::Player::speedX(lua_State *L) const
 {
     return ::Player::Get(m_index)->momentum.speedX;
@@ -1003,34 +1031,6 @@ void LuaProxy::Player::setCurYPos(double var_curYPos, lua_State *L)
 	if(!isValid_throw(L))
 		return;
     ::Player::Get(m_index)->momentum.y = var_curYPos;
-}
-
-double LuaProxy::Player::height(lua_State *L) const
-{
-	if(!isValid_throw(L))
-		return 0;
-    return ::Player::Get(m_index)->momentum.height;
-}
-
-void LuaProxy::Player::setHeight(double var_height, lua_State *L)
-{
-	if(!isValid_throw(L))
-		return;
-    ::Player::Get(m_index)->momentum.height = var_height;
-}
-
-double LuaProxy::Player::width(lua_State *L) const
-{
-	if(!isValid_throw(L))
-		return 0;
-	return ::Player::Get(m_index)->momentum.width;
-}
-
-void LuaProxy::Player::setWidth(double var_width, lua_State *L)
-{
-	if(!isValid_throw(L))
-		return;
-	::Player::Get(m_index)->momentum.width = var_width;
 }
 
 double LuaProxy::Player::curXSpeed(lua_State *L) const

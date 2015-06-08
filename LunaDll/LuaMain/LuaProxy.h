@@ -233,6 +233,10 @@ namespace LuaProxy {
         void setX(double x, lua_State* L);
         double y(lua_State* L) const;
         void setY(double y, lua_State* L);
+        double width(lua_State *L) const;
+        void setWidth(double width, lua_State *L);
+        double height(lua_State *L) const;
+        void setHeight(double height, lua_State *L);
         double speedX(lua_State* L) const;
         void setSpeedX(double speedX, lua_State* L);
         double speedY(lua_State* L) const;
@@ -281,6 +285,10 @@ namespace LuaProxy {
         void setX(double x, lua_State *L);
         double y(lua_State *L) const;
         void setY(double y, lua_State *L);
+        double width(lua_State *L) const;
+        void setWidth(double width, lua_State *L);
+        double height(lua_State *L) const;
+        void setHeight(double height, lua_State *L);
         double speedX(lua_State *L) const;
         void setSpeedX(double speedX, lua_State *L);
         double speedY(lua_State *L) const;
@@ -413,10 +421,6 @@ namespace LuaProxy {
         void setCurXPos(double var_curXPos, lua_State *L);
         double curYPos(lua_State *L) const;
         void setCurYPos(double var_curYPos, lua_State *L);
-        double height(lua_State *L) const;
-        void setHeight(double var_height, lua_State *L);
-        double width(lua_State *L) const;
-        void setWidth(double var_width, lua_State *L);
         double curXSpeed(lua_State *L) const;
         void setCurXSpeed(double var_curXSpeed, lua_State *L);
         double curYSpeed(lua_State *L) const;
@@ -582,6 +586,10 @@ namespace LuaProxy {
         void setX(double x);
         double y() const;
         void setY(double y);
+        double width() const;
+        void setWidth(double width);
+        double height() const;
+        void setHeight(double height);
         double speedX() const;
         void setSpeedX(double speedX);
         double speedY() const;

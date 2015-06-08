@@ -201,6 +201,34 @@ void LuaProxy::NPC::setY(double y, lua_State* L)
 	::NPC::Get(m_index)->momentum.y = y;
 }
 
+double LuaProxy::NPC::width(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return ::NPC::Get(m_index)->momentum.width;
+}
+
+void LuaProxy::NPC::setWidth(double width, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::NPC::Get(m_index)->momentum.width = width;
+}
+
+double LuaProxy::NPC::height(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return ::NPC::Get(m_index)->momentum.height;
+}
+
+void LuaProxy::NPC::setHeight(double height, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::NPC::Get(m_index)->momentum.height = height;
+}
+
 double LuaProxy::NPC::speedX(lua_State* L) const
 {
 	if(!isValid_throw(L))
