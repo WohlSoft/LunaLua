@@ -23,7 +23,7 @@ void GameAutostart::applyAutostart()
     native_loadWorldList();
     VB6StrPtr toSearchItem = selectedEpisode;
     std::vector<EpisodeListItem*> allEpisodes = EpisodeListItem::GetAll();
-    for (int i = 0; i < allEpisodes.size(); ++i){
+    for (unsigned int i = 0; i < allEpisodes.size(); ++i){
         EpisodeListItem* item = allEpisodes[i];
         if (item->episodeName == toSearchItem) {
             //Slot selection/Singleplayer
