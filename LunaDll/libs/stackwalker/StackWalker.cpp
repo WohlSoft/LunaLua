@@ -232,7 +232,8 @@ DWORD64
 #define strcpy_s(dst, len, src) strcpy(dst, src)
 #define strncpy_s(dst, len, src, maxLen) strncpy(dst, src, maxLen)
 #define strcat_s(dst, len, src) strcat(dst, src)
-#define sprintf_s snprintf
+#define snprintf _snprintf
+#define sprintf_sss snprintf
 //#define _tcscat_s _tcscat
 
 
@@ -1286,14 +1287,14 @@ void StackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD s
 {
   CHAR buffer[STACKWALK_MAX_NAMELEN];
   if(fileVersion == 0)
-    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s'\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName);
+    sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s'\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName);
   else
   {
     DWORD v4 = (DWORD) (fileVersion & 0xFFFF);
     DWORD v3 = (DWORD) ((fileVersion>>16) & 0xFFFF);
     DWORD v2 = (DWORD) ((fileVersion>>32) & 0xFFFF);
     DWORD v1 = (DWORD) ((fileVersion>>48) & 0xFFFF);
-    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s', fileVersion: %ld.%ld.%ld.%ld\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
+    sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s', fileVersion: %ld.%ld.%ld.%ld\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
   }
   OnOutput(buffer);
 }
@@ -1314,10 +1315,10 @@ void StackWalker::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &ent
       MyStrCpy(entry.lineFileName, STACKWALK_MAX_NAMELEN, "(filename not available)");
       if (entry.moduleName[0] == 0)
         MyStrCpy(entry.moduleName, STACKWALK_MAX_NAMELEN, "(module-name not available)");
-      sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s: %s\n", (LPVOID) entry.offset, entry.moduleName, entry.lineFileName, entry.name);
+      sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s: %s\n", (LPVOID) entry.offset, entry.moduleName, entry.lineFileName, entry.name);
     }
     else
-      sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s (%ld): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
+      sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s (%ld): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
     buffer[STACKWALK_MAX_NAMELEN-1] = 0;
     OnOutput(buffer);
   }
@@ -1327,7 +1328,7 @@ void StackWalker::OnDbgHelpErr(LPCSTR /*szFuncName*/, DWORD /*gle*/, DWORD64 /*a
 {
   /*
   CHAR buffer[STACKWALK_MAX_NAMELEN];
-  sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "ERROR: %s, GetLastError: %d (Address: %p)\n", szFuncName, gle, (LPVOID) addr);
+  sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "ERROR: %s, GetLastError: %d (Address: %p)\n", szFuncName, gle, (LPVOID) addr);
   OnOutput(buffer);
   */
 }
@@ -1335,7 +1336,7 @@ void StackWalker::OnDbgHelpErr(LPCSTR /*szFuncName*/, DWORD /*gle*/, DWORD64 /*a
 void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName)
 {
   CHAR buffer[STACKWALK_MAX_NAMELEN];
-  sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %ld, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
+  sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %ld, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
   OnOutput(buffer);
   // Also display the OS-version
 #if _MSC_VER <= 1200
@@ -1344,7 +1345,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
   ver.dwOSVersionInfoSize = sizeof(ver);
   if (GetVersionExA(&ver) != FALSE)
   {
-    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %ld.%ld.%ld (%s)\n",
+    sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %ld.%ld.%ld (%s)\n",
       ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
       ver.szCSDVersion);
     OnOutput(buffer);
@@ -1356,7 +1357,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
 #pragma warning(suppress: 28159) //API 
   if (GetVersionExA( (OSVERSIONINFOA*) &ver) != FALSE)
   {
-    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n",
+    sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n",
       ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
       ver.szCSDVersion, ver.wSuiteMask, ver.wProductType);
     OnOutput(buffer);
