@@ -80,11 +80,11 @@
  *
  **********************************************************************/
 #include <windows.h>
-#include <tchar.h>
+#include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
-#pragma comment(lib, "version.lib")  // for "VerQueryValue"
-#pragma warning(disable:4826)
+//#pragma comment(lib, "version.lib")  // for "VerQueryValue"
+//#pragma warning(disable:4826)
 
 #include "StackWalker.h"
 #include <string>
@@ -229,13 +229,13 @@ DWORD64
 
 
 // secure-CRT_functions are only available starting with VC8
-#if _MSC_VER < 1400
 #define strcpy_s(dst, len, src) strcpy(dst, src)
-#define strncpy_s(dst, len, src, maxLen) strncpy(dst, len, src)
+#define strncpy_s(dst, len, src, maxLen) strncpy(dst, src, maxLen)
 #define strcat_s(dst, len, src) strcat(dst, src)
-#define _snprintf_s _snprintf
-#define _tcscat_s _tcscat
-#endif
+#define sprintf_s snprintf
+//#define _tcscat_s _tcscat
+
+
 
 static void MyStrCpy(char* szDest, size_t nMaxDestSize, const char* szSrc)
 {
@@ -289,71 +289,78 @@ public:
       return FALSE;
     // Dynamically load the Entry-Points for dbghelp.dll:
     // First try to load the newsest one from
-    TCHAR szTemp[4096];
+
+    std::wstring szTemp;
     // But before wqe do this, we first check if the ".local" file exists
-    if (GetModuleFileName(NULL, szTemp, 4096) > 0)
+    wchar_t* szTempS = (wchar_t*)szTemp.c_str();
+    if (GetModuleFileName(NULL, szTempS, 4096) > 0)
     {
-      _tcscat_s(szTemp, _T(".local"));
-      if (GetFileAttributes(szTemp) == INVALID_FILE_ATTRIBUTES)
+      szTemp += L".local";
+      if (GetFileAttributes(szTemp.c_str()) == INVALID_FILE_ATTRIBUTES)
       {
         // ".local" file does not exist, so we can try to load the dbghelp.dll from the "Debugging Tools for Windows"
         // Ok, first try the new path according to the archtitecture:
 #ifdef _M_IX86
-        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, 4096) > 0) )
+        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(L"ProgramFiles", szTempS, 4096) > 0) )
         {
-          _tcscat_s(szTemp, _T("\\Debugging Tools for Windows (x86)\\dbghelp.dll"));
+          szTemp = szTemp + L"\\Debugging Tools for Windows (x86)\\dbghelp.dll";
+          szTempS = (wchar_t*)szTemp.c_str();
           // now check if the file exists:
-          if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
+          if (GetFileAttributes(szTemp.c_str()) != INVALID_FILE_ATTRIBUTES)
           {
-            m_hDbhHelp = LoadLibrary(szTemp);
+            m_hDbhHelp = LoadLibrary(szTemp.c_str());
           }
         }
 #elif _M_X64
         if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, 4096) > 0) )
         {
-          _tcscat_s(szTemp, _T("\\Debugging Tools for Windows (x64)\\dbghelp.dll"));
+          szTemp += L"\\Debugging Tools for Windows (x64)\\dbghelp.dll";
+          szTempS = (wchar_t*)szTemp.c_str();
           // now check if the file exists:
-          if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
+          if (GetFileAttributes(szTemp.c_str()) != INVALID_FILE_ATTRIBUTES)
           {
-            m_hDbhHelp = LoadLibrary(szTemp);
+            m_hDbhHelp = LoadLibrary(szTemp.c_str());
           }
         }
 #elif _M_IA64
         if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, 4096) > 0) )
         {
-          _tcscat_s(szTemp, _T("\\Debugging Tools for Windows (ia64)\\dbghelp.dll"));
+          szTemp += L"\\Debugging Tools for Windows (ia64)\\dbghelp.dll";
+          szTempS = (wchar_t*)szTemp.c_str();
           // now check if the file exists:
-          if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
+          if (GetFileAttributes(szTempS) != INVALID_FILE_ATTRIBUTES)
           {
-            m_hDbhHelp = LoadLibrary(szTemp);
+            m_hDbhHelp = LoadLibrary(szTempS);
           }
         }
 #endif
         // If still not found, try the old directories...
-        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, 4096) > 0) )
+        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(L"ProgramFiles", szTempS, 4096) > 0) )
         {
-          _tcscat_s(szTemp, _T("\\Debugging Tools for Windows\\dbghelp.dll"));
+          szTemp += L"\\Debugging Tools for Windows\\dbghelp.dll";
+          szTempS = (wchar_t*)szTemp.c_str();
           // now check if the file exists:
-          if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
+          if (GetFileAttributes(szTempS) != INVALID_FILE_ATTRIBUTES)
           {
-            m_hDbhHelp = LoadLibrary(szTemp);
+            m_hDbhHelp = LoadLibrary(szTempS);
           }
         }
 #if defined _M_X64 || defined _M_IA64
         // Still not found? Then try to load the (old) 64-Bit version:
-        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTemp, 4096) > 0) )
+        if ( (m_hDbhHelp == NULL) && (GetEnvironmentVariable(_T("ProgramFiles"), szTempS, 4096) > 0) )
         {
-          _tcscat_s(szTemp, _T("\\Debugging Tools for Windows 64-Bit\\dbghelp.dll"));
-          if (GetFileAttributes(szTemp) != INVALID_FILE_ATTRIBUTES)
+          szTemp += L"\\Debugging Tools for Windows 64-Bit\\dbghelp.dll";
+          szTempS = (wchar_t*)szTemp.c_str();
+          if (GetFileAttributes(szTempS) != INVALID_FILE_ATTRIBUTES)
           {
-            m_hDbhHelp = LoadLibrary(szTemp);
+            m_hDbhHelp = LoadLibrary(szTempS);
           }
         }
 #endif
       }
     }
     if (m_hDbhHelp == NULL)  // if not already loaded, try to load a default-one
-      m_hDbhHelp = LoadLibrary( _T("dbghelp.dll") );
+      m_hDbhHelp = LoadLibrary( L"dbghelp.dll" );
     if (m_hDbhHelp == NULL)
       return FALSE;
     pSI = (tSI) GetProcAddress(m_hDbhHelp, "SymInitialize" );
@@ -416,7 +423,7 @@ public:
   LPSTR m_szSymPath;
 
 #pragma pack(push,8)
-typedef struct IMAGEHLP_MODULE64_V3 {
+struct IMAGEHLP_MODULE64_V3 {
     DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE64)
     DWORD64  BaseOfImage;            // base load address of module
     DWORD    ImageSize;              // virtual size of the loaded module
@@ -444,7 +451,7 @@ typedef struct IMAGEHLP_MODULE64_V3 {
     BOOL     Publics;                // contains public symbols
 };
 
-typedef struct IMAGEHLP_MODULE64_V2 {
+struct IMAGEHLP_MODULE64_V2 {
     DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE64)
     DWORD64  BaseOfImage;            // base load address of module
     DWORD    ImageSize;              // virtual size of the loaded module
@@ -556,7 +563,7 @@ private:
     typedef BOOL (__stdcall *tM32N)(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
 
     // try both dlls...
-    const TCHAR *dllname[] = { _T("kernel32.dll"), _T("tlhelp32.dll") };
+    const wchar_t *dllname[] = { L"kernel32.dll", L"tlhelp32.dll" };
     HINSTANCE hToolhelp = NULL;
     tCT32S pCT32S = NULL;
     tM32F pM32F = NULL;
@@ -641,7 +648,7 @@ private:
     const SIZE_T TTBUFLEN = 8096;
     int cnt = 0;
 
-    hPsapi = LoadLibrary( _T("psapi.dll") );
+    hPsapi = LoadLibrary( L"psapi.dll" );
     if (hPsapi == NULL)
       return FALSE;
 
@@ -651,7 +658,7 @@ private:
     pGMI = (tGMI) GetProcAddress( hPsapi, "GetModuleInformation" );
     if ( (pEPM == NULL) || (pGMFNE == NULL) || (pGMBN == NULL) || (pGMI == NULL) )
     {
-      // we couldn´t find all functions
+      // we couldn? find all functions
       FreeLibrary(hPsapi);
       return FALSE;
     }
@@ -726,11 +733,11 @@ private:
           LPVOID vData = malloc(dwSize);
           if (vData != NULL)
           {
-#pragma warning(suppress: 6388)
+//#pragma warning(suppress: 6388)
             if (GetFileVersionInfoA(szImg, dwHandle, dwSize, vData) != 0)
             {
               UINT len;
-              TCHAR szSubBlock[] = _T("\\");
+              wchar_t szSubBlock[] = L"\\";
               if (VerQueryValue(vData, szSubBlock, (LPVOID*) &fInfo, &len) == 0)
                 fInfo = NULL;
               else
@@ -776,6 +783,8 @@ private:
             break;
           case 8: //SymVirtual:
             szSymType = "Virtual";
+            break;
+          default:
             break;
         }
       }
@@ -1001,7 +1010,6 @@ BOOL StackWalker::LoadModules()
   return bRet;
 }
 
-
 // The following is used to pass the "userData"-Pointer to the user-provided readMemoryFunction
 // This has to be done due to a problem with the "hProcess"-parameter in x64...
 // Because this class is in no case multi-threading-enabled (because of the limitations 
@@ -1037,13 +1045,11 @@ BOOL StackWalker::ShowCallstack(HANDLE hThread, const CONTEXT *context, PReadPro
     // If no context is provided, capture the context
     // See: https://stackwalker.codeplex.com/discussions/446958
 //#if _WIN32_WINNT <= 0x0501
-// EDIT: We want to support WinXP and the above check doesn't work for us
-#if 1
       // If we need to support XP, we need to use the "old way", because "GetThreadId" is not available!
     if (hThread == GetCurrentThread())
-#else
-    if (GetThreadId(hThread) == GetCurrentThreadId())
-#endif
+//#else
+//    if (GetThreadId_My(hThread) == GetCurrentThreadId())
+//#endif
     {
       GET_CURRENT_CONTEXT_STACKWALKER_CODEPLEX(c, USED_CONTEXT_FLAGS);
     }
@@ -1265,7 +1271,7 @@ BOOL __stdcall StackWalker::myReadProcMem(
   {
     SIZE_T st;
     BOOL bRet = ReadProcessMemory(hProcess, (LPVOID) qwBaseAddress, lpBuffer, nSize, &st);
-#pragma warning(suppress: 6102) //API
+//#pragma warning(suppress: 6102) //API
     *lpNumberOfBytesRead = (DWORD) st;
     //printf("ReadMemory: hProcess: %p, baseAddr: %p, buffer: %p, size: %d, read: %d, result: %d\n", hProcess, (LPVOID) qwBaseAddress, lpBuffer, nSize, (DWORD) st, (DWORD) bRet);
     return bRet;
@@ -1279,15 +1285,15 @@ BOOL __stdcall StackWalker::myReadProcMem(
 void StackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD size, DWORD result, LPCSTR symType, LPCSTR pdbName, ULONGLONG fileVersion)
 {
   CHAR buffer[STACKWALK_MAX_NAMELEN];
-  if (fileVersion == 0)
-    _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %d (result: %d), SymType: '%s', PDB: '%s'\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName);
+  if(fileVersion == 0)
+    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s'\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName);
   else
   {
     DWORD v4 = (DWORD) (fileVersion & 0xFFFF);
     DWORD v3 = (DWORD) ((fileVersion>>16) & 0xFFFF);
     DWORD v2 = (DWORD) ((fileVersion>>32) & 0xFFFF);
     DWORD v1 = (DWORD) ((fileVersion>>48) & 0xFFFF);
-    _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %d (result: %d), SymType: '%s', PDB: '%s', fileVersion: %d.%d.%d.%d\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
+    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s', fileVersion: %ld.%ld.%ld.%ld\n", img, mod, (LPVOID) baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
   }
   OnOutput(buffer);
 }
@@ -1308,19 +1314,20 @@ void StackWalker::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &ent
       MyStrCpy(entry.lineFileName, STACKWALK_MAX_NAMELEN, "(filename not available)");
       if (entry.moduleName[0] == 0)
         MyStrCpy(entry.moduleName, STACKWALK_MAX_NAMELEN, "(module-name not available)");
-      _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s: %s\n", (LPVOID) entry.offset, entry.moduleName, entry.lineFileName, entry.name);
+      sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s: %s\n", (LPVOID) entry.offset, entry.moduleName, entry.lineFileName, entry.name);
     }
     else
-      _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s (%d): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
+      sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "%s (%ld): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
     buffer[STACKWALK_MAX_NAMELEN-1] = 0;
     OnOutput(buffer);
   }
 }
 
-void StackWalker::OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr)
-{/*
+void StackWalker::OnDbgHelpErr(LPCSTR /*szFuncName*/, DWORD /*gle*/, DWORD64 /*addr*/)
+{
+  /*
   CHAR buffer[STACKWALK_MAX_NAMELEN];
-  _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "ERROR: %s, GetLastError: %d (Address: %p)\n", szFuncName, gle, (LPVOID) addr);
+  sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "ERROR: %s, GetLastError: %d (Address: %p)\n", szFuncName, gle, (LPVOID) addr);
   OnOutput(buffer);
   */
 }
@@ -1328,7 +1335,7 @@ void StackWalker::OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr)
 void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName)
 {
   CHAR buffer[STACKWALK_MAX_NAMELEN];
-  _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %d, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
+  sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %ld, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
   OnOutput(buffer);
   // Also display the OS-version
 #if _MSC_VER <= 1200
@@ -1337,7 +1344,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
   ver.dwOSVersionInfoSize = sizeof(ver);
   if (GetVersionExA(&ver) != FALSE)
   {
-    _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s)\n", 
+    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %ld.%ld.%ld (%s)\n",
       ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
       ver.szCSDVersion);
     OnOutput(buffer);
@@ -1349,7 +1356,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
 #pragma warning(suppress: 28159) //API 
   if (GetVersionExA( (OSVERSIONINFOA*) &ver) != FALSE)
   {
-    _snprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n", 
+    sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n",
       ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
       ver.szCSDVersion, ver.wSuiteMask, ver.wProductType);
     OnOutput(buffer);
