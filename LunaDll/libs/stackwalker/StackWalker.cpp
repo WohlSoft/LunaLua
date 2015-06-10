@@ -83,7 +83,7 @@
 #include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#pragma comment(lib, "version.lib")  // for "VerQueryValue"
+#pragma comment(lib, "version.lib")  // for "VerQueryValue"
 //#pragma warning(disable:4826)
 
 #include "StackWalker.h"
