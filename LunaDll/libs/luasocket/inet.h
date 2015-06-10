@@ -46,5 +46,6 @@ int inet_aton(const char *cp, struct in_addr *inp);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
 int inet_pton(int af, const char *src, void *dst);
 #endif
+int inet_pton_x(int af, const char *src, void *dst);
 
 #endif /* INET_H */
