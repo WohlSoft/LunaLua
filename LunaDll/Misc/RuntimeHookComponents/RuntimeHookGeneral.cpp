@@ -226,8 +226,27 @@ void TrySkipPatch()
     PATCH_JMP(0x4242D0, &BitBltHook);
     PATCH_JMP(0x424314, &StretchBltHook);
 
+    // Hook to fix 100% CPU when window is inactive
     *(BYTE*)(0x8E6FE1) = INSTR_NOP;
     PATCH_FUNC(0x8E6FE2, &WindowInactiveHook);
+
+    // Hooks to fix 100% CPU during operation
+    // These ones are normally not sensitive to the "max FPS" setting
+    memset((void*)0x8BFD4A, INSTR_NOP, 0x40);
+    PATCH_FUNC(   0x8BFD4A, &FrameTimingHook);
+    memset((void*)0x8C0488, INSTR_NOP, 0x40);
+    PATCH_FUNC(   0x8C0488, &FrameTimingHook);
+    memset((void*)0x8C0EE6, INSTR_NOP, 0x40);
+    PATCH_FUNC(   0x8C0EE6, &FrameTimingHook);
+    // These ones are normally sensitive to the "max FPS" setting
+    memset((void*)0x8C15A7, INSTR_NOP, 0x4A);
+    PATCH_FUNC(   0x8C15A7, &FrameTimingMaxFPSHook);
+    memset((void*)0x8C20FC, INSTR_NOP, 0x4A);
+    PATCH_FUNC(   0x8C20FC, &FrameTimingMaxFPSHook);
+    memset((void*)0x8E2AED, INSTR_NOP, 0x4A);
+    PATCH_FUNC(   0x8E2AED, &FrameTimingMaxFPSHook);
+    memset((void*)0x8E56ED, INSTR_NOP, 0x4A);
+    PATCH_FUNC(   0x8E56ED, &FrameTimingMaxFPSHook);
 
     /************************************************************************/
     /* Import Table Patch                                                   */

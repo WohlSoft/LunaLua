@@ -33,12 +33,14 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	case DLL_PROCESS_ATTACH:
 		gHInstance = (HINSTANCE)hinstDLL;
         SetupThunRTMainHook();
+        timeBeginPeriod(1);
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
 	case DLL_THREAD_DETACH:
 		break;
 	case DLL_PROCESS_DETACH:
+        timeEndPeriod(1);
 		CleanUp();
 		break;
 	}

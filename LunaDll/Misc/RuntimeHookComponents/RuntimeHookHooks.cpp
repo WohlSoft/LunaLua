@@ -628,3 +628,23 @@ extern void __stdcall WindowInactiveHook()
     // Don't hog the CPU when window is inactive!
     Sleep(100);
 }
+
+extern void __stdcall FrameTimingHook()
+{
+    double nextFrameTime = GM_LAST_FRAME_TIME + 15.0;
+
+    // Wait until GetTickCount equals the scheduled value
+    while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
+        Sleep((unsigned int)(nextFrameTime - GM_CURRENT_TIME));
+        GM_CURRENT_TIME = GetTickCount();
+    }
+}
+
+extern void __stdcall FrameTimingMaxFPSHook()
+{
+    // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
+    if (GM_MAX_FPS_MODE) return;
+
+    // If we're not in "max FPS" mode, run the frame timing as normal
+    FrameTimingHook();
+}

@@ -297,6 +297,11 @@ static  short** npcdef_nofireball = (short**)0x00B2B210;
 static  short** npcdef_noiceball = (short**)0x00B2B46A;
 static  short** npcdef_nogravity = (short**)0x00B2B6C4;
 
+// Frame timing related references
+static double& GM_LAST_FRAME_TIME = *(double*)0x00B2D72C;
+static double& GM_CURRENT_TIME    = *(double*)0x00B2D738;
+static short&  GM_MAX_FPS_MODE    =  *(short*)0x00B2C8BE;
+
 /////////////////////
 ///  -Assembly-   ///
 /////////////////////
