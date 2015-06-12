@@ -164,6 +164,7 @@
     <ClInclude Include="libs\luasocket\timeout.h" />
     <ClInclude Include="libs\luasocket\udp.h" />
     <ClInclude Include="libs\luasocket\wsocket.h" />
+    <ClInclude Include="Misc\RunningStat.h" />
     <ClInclude Include="SMBXInternal\Menu.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h" />

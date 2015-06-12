@@ -16,6 +16,8 @@
 #include "../../Main.h"
 #include "../../libs/ini-reader/INIReader.h"
 
+#include "../RunningStat.h"
+
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
@@ -629,15 +631,67 @@ extern void __stdcall WindowInactiveHook()
     Sleep(100);
 }
 
+/**
+ * 15ms and 16ms frame timing have much lower frame jitter (better than vanilla
+ *     SMBX), but are slightly faster (4%) and slower (2.5%)
+ * 15.6ms frame timing has higher frame jitter (same as vanilla SMBX), but
+ *     equal to vanilla SMBX game speed
+ **/
+//#define ENABLE_FRAME_TIMING_BENCHMARK
+//#define FRAME_TIMING_15MS
+//#define FRAME_TIMING_16MS
+#define FRAME_TIMING_15_6MS
+
 extern void __stdcall FrameTimingHook()
 {
-    double nextFrameTime = GM_LAST_FRAME_TIME + 15.0;
+    double nextFrameTime = GM_LAST_FRAME_TIME;
 
-    // Wait until GetTickCount equals the scheduled value
-    while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
-        Sleep((unsigned int)(nextFrameTime - GM_CURRENT_TIME));
-        GM_CURRENT_TIME = GetTickCount();
+#if defined(FRAME_TIMING_15MS)
+    nextFrameTime += 15.0;
+#elif defined(FRAME_TIMING_16MS)
+    nextFrameTime += 15.0;
+#elif defined(FRAME_TIMING_15_6MS)
+    static uint8_t u8Phase = 0;
+    u8Phase = (u8Phase + 1) % 10;
+    nextFrameTime += 15.0 + ((u8Phase == 0) ? 1 : (u8Phase % 2));
+#else
+    #error "Must define a frame timing variant"
+#endif
+
+    // Wait until time >= (nextFrameTime-1)
+    // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
+    GM_CURRENT_TIME = timeGetTime();
+    while ((nextFrameTime-1) > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
+        Sleep((unsigned int)((nextFrameTime-1) - GM_CURRENT_TIME));
+        GM_CURRENT_TIME = timeGetTime();
     }
+
+    // Busy loop to finish off the timing
+    while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
+        GM_CURRENT_TIME = timeGetTime();
+    }
+
+#if defined(ENABLE_FRAME_TIMING_BENCHMARK)
+    static RunningStat sFrameTime;
+    static double dDivisor = 0.0;
+    if (dDivisor == 0.0) {
+        LARGE_INTEGER sFreqStruct;
+        QueryPerformanceFrequency(&sFreqStruct);
+        dDivisor = 1000.0 / sFreqStruct.QuadPart;
+    }
+    static LARGE_INTEGER sLastCount = {0};
+    {
+        LARGE_INTEGER sCount;
+        QueryPerformanceCounter(&sCount);
+        if (sLastCount.QuadPart != 0) {
+            double milliCount = (sCount.QuadPart - sLastCount.QuadPart) * dDivisor;
+            sFrameTime.Push(milliCount);
+            if (milliCount > 100) sFrameTime.Clear();
+        }
+        sLastCount.QuadPart = sCount.QuadPart;
+    }
+    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+#endif
 }
 
 extern void __stdcall FrameTimingMaxFPSHook()
