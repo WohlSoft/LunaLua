@@ -46,7 +46,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
 
     // Convert to 24bpp BGR in memory that's accessible
     void* pData = NULL;
-    HBITMAP convHBMP = CreateEmptyBitmap(tex.w, tex.h, 24, &pData);
+    HBITMAP convHBMP = CreateEmptyBitmap(tex.w, tex.h, 32, &pData);
     HDC screenHDC = GetDC(NULL);
     if (screenHDC == NULL) {
         return 0;
@@ -59,7 +59,15 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
     ReleaseDC(NULL, screenHDC);
     screenHDC = NULL;
 
+    // Set alpha channel to 0xFF, because it's always supposed to be and won't
+    // be copied as such by BitBlt
+    uint32_t pixelCount = tex.w * tex.h;
+    for (uint32_t idx = 0; idx < pixelCount; idx++) {
+        ((uint8_t*)pData)[idx * 4 + 3] = 0xFF;
+    }
+
     // Move into texture
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glGenTextures(1, &tex.name);
     if (tex.name == 0)
     {
@@ -68,13 +76,12 @@ const GLDraw::Texture* GLTextureStore::TextureFromSMBXBitmap(HDC hdc) {
         return NULL;
     }
     g_GLDraw.BindTexture(&tex);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, GL_BGR, GL_UNSIGNED_BYTE, pData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, pData);
 
     // Delete conversion DIB section
     DeleteObject(convHBMP);
