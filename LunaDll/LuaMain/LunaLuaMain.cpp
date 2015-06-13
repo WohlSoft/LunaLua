@@ -455,7 +455,8 @@ void CLunaLua::bindAll()
                 ],
 
                 namespace_("Level")[
-                    def("exitLevel", &LuaProxy::Level::exit),
+                    def("exit", &LuaProxy::Level::exit),
+                    def("exitLevel", &LuaProxy::Level::exit), // Supposed to be 'exit' but one release had Level.exitLevel, so let that work too.
                     def("winState", (unsigned short(*)())&LuaProxy::Level::winState),
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
