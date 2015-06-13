@@ -632,45 +632,113 @@ extern void __stdcall WindowInactiveHook()
 }
 
 /**
- * 15ms and 16ms frame timing have much lower frame jitter (better than vanilla
- *     SMBX), but are slightly faster (4%) and slower (2.5%)
- * 15.6ms frame timing has higher frame jitter (same as vanilla SMBX), but
- *     equal to vanilla SMBX game speed
+ * 15.6ms is the normal vanilla SMBX frame time.
+ * When using timeGetTime to time it, this introduces some frame jitter and we
+ * could get lower frame jitter by going with 16ms...
+ * however let's keep the gameplay speed faithful instead, and use
+ * QueryPerformanceCounter for improved frame jitter when we're on an OS new
+ * enough that we trust QueryPerformanceCounter.
  **/
 //#define ENABLE_FRAME_TIMING_BENCHMARK
-//#define FRAME_TIMING_15MS
-//#define FRAME_TIMING_16MS
-#define FRAME_TIMING_15_6MS
+#define FRAME_TIMING_MS (15.6)
+
+extern void __stdcall FrameTimingHookQPC()
+{
+    static int64_t lastFrameTime = 0;
+    static double frameError = 0.0;
+    double frameDuration;
+    LARGE_INTEGER currentTime;
+    double frameTime;
+
+    if (lastFrameTime == 0) {
+        QueryPerformanceFrequency(&currentTime);
+        lastFrameTime = currentTime.QuadPart;
+        return;
+    }
+
+    static double qpcFactor = 0.0;
+    if (qpcFactor == 0.0) {
+        LARGE_INTEGER sFreqStruct;
+        QueryPerformanceFrequency(&sFreqStruct);
+        qpcFactor = 1000.0 / sFreqStruct.QuadPart;
+    }
+
+    // Get the desired duration for this frame
+    frameDuration = FRAME_TIMING_MS - frameError * 0.5;
+
+    // Wait until time >= (nextFrameTime-1)
+    // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
+    QueryPerformanceCounter(&currentTime);
+    frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
+    while (frameDuration - frameTime >= 1.0) {
+        //Sleep((unsigned int)(frameDuration - frameTime - 1.0));
+        Sleep(1);
+        QueryPerformanceCounter(&currentTime);
+        frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
+    }
+
+    // Busy loop to finish off the timing
+    while (frameDuration - frameTime > 0.0) {
+        QueryPerformanceCounter(&currentTime);
+        frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
+    }
+
+    // Compensate for errors in frame timing
+    frameError = frameError * 0.5 + frameTime - frameDuration;
+
+#if defined(ENABLE_FRAME_TIMING_BENCHMARK)
+    static RunningStat sFrameTime;
+    if (sFrameTime.Count() > 65 * 10) sFrameTime.Clear();
+    if (frameTime < 200.0)
+    {
+        sFrameTime.Push(frameTime);
+    }
+    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+#endif
+
+    if (frameError > 5.0) frameError = 5.0;
+    if (frameError < -5.0) frameError = -5.0;
+    lastFrameTime = currentTime.QuadPart;
+}
+
+
+extern void __stdcall FrameTimingMaxFPSHookQPC()
+{
+    // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
+    if (GM_MAX_FPS_MODE) return;
+
+    // If we're not in "max FPS" mode, run the frame timing as normal
+    FrameTimingHookQPC();
+}
 
 extern void __stdcall FrameTimingHook()
 {
-    double nextFrameTime = GM_LAST_FRAME_TIME;
+    static double lastFrameTime = 0.0;
+    double nextFrameTime = lastFrameTime;
+    static double frameError = 0.0;
 
-#if defined(FRAME_TIMING_15MS)
-    nextFrameTime += 15.0;
-#elif defined(FRAME_TIMING_16MS)
-    nextFrameTime += 15.0;
-#elif defined(FRAME_TIMING_15_6MS)
-    static uint8_t u8Phase = 0;
-    u8Phase = (u8Phase + 1) % 10;
-    nextFrameTime += 15.0 + ((u8Phase == 0) ? 1 : (u8Phase % 2));
-#else
-    #error "Must define a frame timing variant"
-#endif
+    // Compensate for error in the last frame's timing
+    nextFrameTime += FRAME_TIMING_MS - frameError;
 
     // Wait until time >= (nextFrameTime-1)
     // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
     GM_CURRENT_TIME = timeGetTime();
-    while ((nextFrameTime-1) > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
-        Sleep((unsigned int)((nextFrameTime-1) - GM_CURRENT_TIME));
+    while ((nextFrameTime - 1) > GM_CURRENT_TIME && GM_CURRENT_TIME >= lastFrameTime) {
+        Sleep(1);
         GM_CURRENT_TIME = timeGetTime();
     }
 
     // Busy loop to finish off the timing
-    while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= GM_LAST_FRAME_TIME) {
+    while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= lastFrameTime) {
         GM_CURRENT_TIME = timeGetTime();
     }
+    lastFrameTime = GM_CURRENT_TIME;
 
+    // Compensate for errors in frame timing
+    frameError = GM_CURRENT_TIME - nextFrameTime;
+    if (frameError > 5.0) frameError = 5.0;
+    if (frameError < -5.0) frameError = -5.0;
+    
 #if defined(ENABLE_FRAME_TIMING_BENCHMARK)
     static RunningStat sFrameTime;
     static double dDivisor = 0.0;
@@ -685,6 +753,7 @@ extern void __stdcall FrameTimingHook()
         QueryPerformanceCounter(&sCount);
         if (sLastCount.QuadPart != 0) {
             double milliCount = (sCount.QuadPart - sLastCount.QuadPart) * dDivisor;
+            if (sFrameTime.Count() > 65*10) sFrameTime.Clear();
             sFrameTime.Push(milliCount);
             if (milliCount > 100) sFrameTime.Clear();
         }
