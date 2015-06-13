@@ -88,6 +88,8 @@ extern void UpdateInputHook_Wrapper();
 extern void __stdcall WindowInactiveHook();
 extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
+extern void __stdcall FrameTimingHookQPC();
+extern void __stdcall FrameTimingMaxFPSHookQPC();
 
 /************************************************************************/
 /* Libs                                                                 */

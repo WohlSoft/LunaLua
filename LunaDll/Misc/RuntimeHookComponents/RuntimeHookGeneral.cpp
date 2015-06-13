@@ -134,6 +134,28 @@ static unsigned int __stdcall LatePatch(void)
     return *((unsigned int*)(0xB2D788));
 }
 
+static bool IsWindowsVistaOrNewer() {
+    OSVERSIONINFOEX osVersionInfo;
+    DWORDLONG conditionMask = 0;
+
+    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
+    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osVersionInfo.dwMajorVersion = 6;
+    osVersionInfo.dwMinorVersion = 0;
+    osVersionInfo.wServicePackMajor = 0;
+    osVersionInfo.wServicePackMinor = 0;
+    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
+
+    return VerifyVersionInfo(
+        &osVersionInfo,
+        VER_MAJORVERSION | VER_MINORVERSION |
+        VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+        conditionMask);
+}
+
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
@@ -230,23 +252,35 @@ void TrySkipPatch()
     *(BYTE*)(0x8E6FE1) = INSTR_NOP;
     PATCH_FUNC(0x8E6FE2, &WindowInactiveHook);
 
+    // Don't trust QPC as much on WinXP
+    void* frameTimingHookPtr;
+    void* frameTimingMaxFPSHookPtr;
+    if (IsWindowsVistaOrNewer()) {
+        frameTimingHookPtr = (void*)&FrameTimingHookQPC;
+        frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
+    }
+    else {
+        frameTimingHookPtr = (void*)&FrameTimingHook;
+        frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHook;
+    }
+
     // Hooks to fix 100% CPU during operation
     // These ones are normally not sensitive to the "max FPS" setting
     memset((void*)0x8BFD4A, INSTR_NOP, 0x40);
-    PATCH_FUNC(   0x8BFD4A, &FrameTimingHook);
     memset((void*)0x8C0488, INSTR_NOP, 0x40);
-    PATCH_FUNC(   0x8C0488, &FrameTimingHook);
     memset((void*)0x8C0EE6, INSTR_NOP, 0x40);
-    PATCH_FUNC(   0x8C0EE6, &FrameTimingHook);
+    PATCH_FUNC(0x8BFD4A, frameTimingHookPtr);
+    PATCH_FUNC(0x8C0488, frameTimingHookPtr);
+    PATCH_FUNC(0x8C0EE6, frameTimingHookPtr);
     // These ones are normally sensitive to the "max FPS" setting
     memset((void*)0x8C15A7, INSTR_NOP, 0x4A);
-    PATCH_FUNC(   0x8C15A7, &FrameTimingMaxFPSHook);
     memset((void*)0x8C20FC, INSTR_NOP, 0x4A);
-    PATCH_FUNC(   0x8C20FC, &FrameTimingMaxFPSHook);
     memset((void*)0x8E2AED, INSTR_NOP, 0x4A);
-    PATCH_FUNC(   0x8E2AED, &FrameTimingMaxFPSHook);
     memset((void*)0x8E56ED, INSTR_NOP, 0x4A);
-    PATCH_FUNC(   0x8E56ED, &FrameTimingMaxFPSHook);
+    PATCH_FUNC(0x8C15A7, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC(0x8C20FC, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC(0x8E2AED, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC(0x8E56ED, frameTimingMaxFPSHookPtr);
 
     /************************************************************************/
     /* Import Table Patch                                                   */

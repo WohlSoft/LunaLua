@@ -47,6 +47,16 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 	return TRUE;
 }
 
+static DWORD __stdcall GetCurrentProcessorNumberXP(void)
+{
+    __asm {
+        MOV EAX, 1
+        CPUID
+        SHR EBX, 24
+        MOV EAX, EBX
+    }
+}
+
 // We don't call this directly from DLL_PROCESS_ATTACH because if we do things
 // can break when we're loaded via LoadLibrary
 // Instead this is called by LunaDLLInitHook, which is set up by
@@ -57,6 +67,11 @@ void LunaDLLInit()
 #if PATCHIT
     TrySkipPatch();
 #endif // PATCHIT
+
+    // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
+    DWORD curProcessor = GetCurrentProcessorNumberXP();
+    SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 }
 
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)
