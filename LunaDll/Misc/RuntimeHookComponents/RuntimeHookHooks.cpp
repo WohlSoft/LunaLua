@@ -639,8 +639,8 @@ extern void __stdcall WindowInactiveHook()
  * QueryPerformanceCounter for improved frame jitter when we're on an OS new
  * enough that we trust QueryPerformanceCounter.
  **/
-//#define ENABLE_FRAME_TIMING_BENCHMARK
-#define FRAME_TIMING_MS (15.6)
+#define ENABLE_FRAME_TIMING_BENCHMARK
+#define FRAME_TIMING_MS (15.600)
 
 extern void __stdcall FrameTimingHookQPC()
 {
@@ -649,12 +649,6 @@ extern void __stdcall FrameTimingHookQPC()
     double frameDuration;
     LARGE_INTEGER currentTime;
     double frameTime;
-
-    if (lastFrameTime == 0) {
-        QueryPerformanceFrequency(&currentTime);
-        lastFrameTime = currentTime.QuadPart;
-        return;
-    }
 
     static double qpcFactor = 0.0;
     if (qpcFactor == 0.0) {
@@ -666,13 +660,28 @@ extern void __stdcall FrameTimingHookQPC()
     // Get the desired duration for this frame
     frameDuration = FRAME_TIMING_MS - frameError * 0.5;
 
-    // Wait until time >= (nextFrameTime-1)
-    // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
     QueryPerformanceCounter(&currentTime);
     frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
-    while (frameDuration - frameTime >= 1.0) {
-        //Sleep((unsigned int)(frameDuration - frameTime - 1.0));
-        Sleep(1);
+    if (lastFrameTime == 0 || frameTime > 100.0) {
+        // If we've lost track of time, synchronize with scheduler because it turns out if we
+        // call Sleep at the wrong time Windows likes to eat too much CPU during the Sleep call.
+        // Yeah. This is weird.
+        DWORD firstTick = GetTickCount();
+        DWORD tick;
+        do {
+            tick = GetTickCount();
+        } while (tick == firstTick);
+        QueryPerformanceCounter(&currentTime);
+        lastFrameTime = currentTime.QuadPart;
+        frameError = -2.0;
+
+        return;
+    }
+
+    // Wait until time >= (nextFrameTime-1)
+    // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
+    while (frameDuration - frameTime >= 2.0) {
+        Sleep((DWORD)(frameDuration - frameTime - 1.0));
         QueryPerformanceCounter(&currentTime);
         frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
     }
@@ -682,6 +691,7 @@ extern void __stdcall FrameTimingHookQPC()
         QueryPerformanceCounter(&currentTime);
         frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
     }
+    GM_CURRENT_TIME = GetTickCount();
 
     // Compensate for errors in frame timing
     frameError = frameError * 0.5 + frameTime - frameDuration;
@@ -722,15 +732,15 @@ extern void __stdcall FrameTimingHook()
 
     // Wait until time >= (nextFrameTime-1)
     // (We'll use a busy loop to finish off the rest of the timing, for sake of reduced jitter)
-    GM_CURRENT_TIME = timeGetTime();
+    GM_CURRENT_TIME = GetTickCount();
     while ((nextFrameTime - 1) > GM_CURRENT_TIME && GM_CURRENT_TIME >= lastFrameTime) {
         Sleep(1);
-        GM_CURRENT_TIME = timeGetTime();
+        GM_CURRENT_TIME = GetTickCount();
     }
 
     // Busy loop to finish off the timing
     while (nextFrameTime > GM_CURRENT_TIME && GM_CURRENT_TIME >= lastFrameTime) {
-        GM_CURRENT_TIME = timeGetTime();
+        GM_CURRENT_TIME = GetTickCount();
     }
     lastFrameTime = GM_CURRENT_TIME;
 

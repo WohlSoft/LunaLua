@@ -71,7 +71,7 @@ void LunaDLLInit()
     // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
     DWORD curProcessor = GetCurrentProcessorNumberXP();
     SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
 }
 
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)

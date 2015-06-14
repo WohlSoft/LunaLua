@@ -269,18 +269,18 @@ void TrySkipPatch()
     memset((void*)0x8BFD4A, INSTR_NOP, 0x40);
     memset((void*)0x8C0488, INSTR_NOP, 0x40);
     memset((void*)0x8C0EE6, INSTR_NOP, 0x40);
-    PATCH_FUNC(0x8BFD4A, frameTimingHookPtr);
-    PATCH_FUNC(0x8C0488, frameTimingHookPtr);
-    PATCH_FUNC(0x8C0EE6, frameTimingHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8BFD4A, frameTimingHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8C0488, frameTimingHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8C0EE6, frameTimingHookPtr);
     // These ones are normally sensitive to the "max FPS" setting
     memset((void*)0x8C15A7, INSTR_NOP, 0x4A);
     memset((void*)0x8C20FC, INSTR_NOP, 0x4A);
     memset((void*)0x8E2AED, INSTR_NOP, 0x4A);
     memset((void*)0x8E56ED, INSTR_NOP, 0x4A);
-    PATCH_FUNC(0x8C15A7, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC(0x8C20FC, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC(0x8E2AED, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC(0x8E56ED, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8C15A7, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8C20FC, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8E2AED, frameTimingMaxFPSHookPtr);
+    PATCH_FUNC_CALL_SAFE(0x8E56ED, frameTimingMaxFPSHookPtr);
 
     /************************************************************************/
     /* Import Table Patch                                                   */

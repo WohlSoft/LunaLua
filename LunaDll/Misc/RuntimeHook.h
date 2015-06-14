@@ -26,7 +26,19 @@ typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
 	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
 #define PATCH_OFFSET(ptr, offset, type, value) *(type*)((DWORD)ptr + (DWORD)offset) = value
 #define INSTR_NOP 0x90
+static inline void PATCH_FUNC_CALL_SAFE(DWORD ptr, void* func) { // Takes 13 bytes, but tries to be very safe...
+    BYTE* bPtr = (BYTE*)ptr;
 
+    bPtr[0] = 0x9C; // pushf
+    bPtr[1] = 0x50; // push eax
+    bPtr[2] = 0x51; // push ecx
+    bPtr[3] = 0x52; // push edx
+    PATCH_FUNC((DWORD)&bPtr[4], func);
+    bPtr[9] = 0x5A; // pop edx
+    bPtr[10] = 0x59; // pop ecx
+    bPtr[11] = 0x58; // pop eax
+    bPtr[12] = 0x9D; // popf
+}
 
 
 #ifndef NO_SDL
