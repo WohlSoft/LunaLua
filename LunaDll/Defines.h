@@ -137,6 +137,7 @@ enum PRIORITY {
 
 // Level related memory
 #define GM_LVL_BOUNDARIES   *(DWORD*)0x00B257D4     // 6 doubles each section, L/U/R/D/?/?
+#define GM_ORIG_LVL_BOUNDS  *(DWORD*)0x00B2587C     // Same as above, but always the initial values. Used by events that reset level boundaries.
 #define GM_LVLFILENAME_PTR  *(DWORD*)0x00B2C5A4     // Lvl filename
 #define GM_LVLNAME_PTR      *(DWORD*)0x00B2D764
 #define GM_FULLPATH         *(DWORD*)0x00B2C618     // Full path to current .lvl file
