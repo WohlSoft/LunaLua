@@ -162,7 +162,7 @@ void __stdcall Reconstructed::Util::npcToCoins()
             if (!nextNPC->isHidden // (probably isHidden-Field)
                 && !nextNPC->killFlag // is currently not killed
                 && !nextNPC->friendly // is not friendly
-                && !(*isCollectableGoalNPC_ptr)[id]){ //check the built-in isCollectableGoal, if it is a collectable coin then skip
+                && !isCollectableGoalNPC_ptr[id]){ //check the built-in isCollectableGoal, if it is a collectable coin then skip
                 if (isNotCoinTransformable[id]){ // check our array, if the npc is NOT Transformable
                     if (id == NPCID_GOALTAPE //If it is NOT transformable then check for these special npcs
                         || id == NPCID_FIREBAR

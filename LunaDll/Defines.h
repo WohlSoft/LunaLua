@@ -49,6 +49,8 @@ enum PRIORITY {
     PRI_HIGH
 };
 
+#define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 
@@ -68,240 +70,240 @@ enum PRIORITY {
 
 
 // General
-#define GM_SCRN_HDC         *(DWORD*)0x00B25028
-#define GM_MODE_INTRO       *(WORD*)0x00B2C89C
+DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
+DEFMEM(GM_MODE_INTRO,       WORD,  0x00B2C89C);
 
 // Pre-Defined Strings      
-#define GM_STR_NULL         *(DWORD*)0x00423D00
-#define GM_STR_MSGBOX       *(DWORD*)0x00B250E4
-#define GM_STR_CHECKPOINT   *(DWORD*)0x00B250B0     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
+DEFMEM(GM_STR_NULL,         DWORD, 0x00423D00);
+DEFMEM(GM_STR_MSGBOX,       DWORD, 0x00B250E4);
+DEFMEM(GM_STR_CHECKPOINT,   DWORD, 0x00B250B0);     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
 
 // NPC Settings
-#define GM_CONF_WIDTH       *(DWORD*)0x00B25BA8
-#define GM_CONF_HEIGHT      *(DWORD*)0x00B25BC4
-#define GM_CONF_GFXWIDTH    *(DWORD*)0x00B25BE0
-#define GM_CONF_GFXHEIGHT   *(DWORD*)0x00B25BFC
+DEFMEM(GM_CONF_WIDTH,       DWORD, 0x00B25BA8);
+DEFMEM(GM_CONF_HEIGHT,      DWORD, 0x00B25BC4);
+DEFMEM(GM_CONF_GFXWIDTH,    DWORD, 0x00B25BE0);
+DEFMEM(GM_CONF_GFXHEIGHT,   DWORD, 0x00B25BFC);
 
 // Frame counters
-#define GM_TRANS_FRAMECT    *(DWORD*)0x00B2C670
-//#define GM_ACTIVE_FRAMECT *(DWORD*)0x00B2C67C  Float?
+DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
+//DEFMEM(GM_ACTIVE_FRAMECT, DWORD, 0x00B2C67C);  Float?
 
 // MOB Related memory
-#define GM_NPCS_PTR         *(DWORD*)0x00B259E8     // +0xAD58 + 0x20  to NPCs
-#define GM_NPCS_COUNT       *(WORD*)0x00B2595A 
-#define GM_PLAYERS_PTR      *(DWORD*)0x00B25A20
-#define GM_PLAYERS_COUNT    *(WORD*)0x00B2595E
-#define GM_EDIT_PLAYERS_PTR *(DWORD*)0x00CF74D8     // Editor Template player
+DEFMEM(GM_NPCS_PTR,         DWORD, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
+DEFMEM(GM_NPCS_COUNT,       WORD,  0x00B2595A); 
+DEFMEM(GM_PLAYERS_PTR,      DWORD, 0x00B25A20);
+DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
+DEFMEM(GM_EDIT_PLAYERS_PTR, DWORD, 0x00CF74D8);     // Editor Template player
 
 // HUD stuff
-#define GM_STAR_COUNT       *(DWORD*)0x00B251E0
-#define GM_COINS            *(WORD*)0x00B2C5A8
-#define GM_PLAYER_LIVES     *(FLOAT*)0x00B2C5AC
+DEFMEM(GM_STAR_COUNT,       DWORD, 0x00B251E0);
+DEFMEM(GM_COINS,            WORD,  0x00B2C5A8);
+DEFMEM(GM_PLAYER_LIVES,     FLOAT, 0x00B2C5AC);
 
 // Menu Stuff
-#define GM_CUR_MENUCHOICE   *(WORD*)0x00B2C880      // Current menu choice
-#define GM_CUR_MENUTYPE     *(WORD*)0x00B2C882
+DEFMEM(GM_CUR_MENUCHOICE,   WORD,  0x00B2C880);      // Current menu choice
+DEFMEM(GM_CUR_MENUTYPE,     WORD,  0x00B2C882);
 
 // Menu already choosen stuff
-#define GM_CUR_MENUPLAYER1  *(WORD*)0x00B2D6B8
-#define GM_CUR_MENUPLAYER2  *(WORD*)0x00B2D6BA
+DEFMEM(GM_CUR_MENUPLAYER1,  WORD,  0x00B2D6B8);
+DEFMEM(GM_CUR_MENUPLAYER2,  WORD,  0x00B2D6BA);
 
-#define GM_CUR_MENULEVEL    *(WORD*)0x00B2C628
+DEFMEM(GM_CUR_MENULEVEL,    WORD,  0x00B2C628);
 
 // Menu Episode List
-#define GM_EP_LIST_COUNT    *(WORD*)0x00B250E8
-#define GM_EP_LIST_PTR      *(DWORD*)0x00B250FC
+DEFMEM(GM_EP_LIST_COUNT,    WORD,  0x00B250E8);
+DEFMEM(GM_EP_LIST_PTR,      DWORD, 0x00B250FC);
 
 // Interaction
-#define GM_MOUSEMOVING      *(WORD*)0x00B2D6D2
-#define GM_MOUSERELEASED    *(WORD*)0x00B2D6D0
-#define GM_MOUSEPRESSING    *(WORD*)0x00B2D6CC
-#define GM_KEYRELEASED      *(WORD*)0x00B2C884
+DEFMEM(GM_MOUSEMOVING,      WORD,  0x00B2D6D2);
+DEFMEM(GM_MOUSERELEASED,    WORD,  0x00B2D6D0);
+DEFMEM(GM_MOUSEPRESSING,    WORD,  0x00B2D6CC);
+DEFMEM(GM_KEYRELEASED,      WORD,  0x00B2C884);
 
 
 // States
-#define GM_FREEZWITCH_ACTIV *(WORD*)0x00B2C8B4
-#define GM_PAUSE_OPEN       *(WORD*)0x00B250E2
+DEFMEM(GM_FREEZWITCH_ACTIV, WORD,  0x00B2C8B4);
+DEFMEM(GM_PAUSE_OPEN,       WORD,  0x00B250E2);
 
 // Camera
-#define GM_CAMERA_X         *(DWORD*)0x00B2B984
-#define GM_CAMERA_Y         *(DWORD*)0x00B2B9A0
+DEFMEM(GM_CAMERA_X,         DWORD, 0x00B2B984);
+DEFMEM(GM_CAMERA_Y,         DWORD, 0x00B2B9A0);
 
 // Overworld base struct
-#define GM_OVERWORLD_PTR    *(DWORD*)0x00B2C5C8
+DEFMEM(GM_OVERWORLD_PTR,    DWORD, 0x00B2C5C8);
 
 // Overworld Level Array
-#define GM_LEVEL_COUNT      *(WORD*)0x00B25960
-#define GM_LEVEL_BASE       *(DWORD*)0x00B25994
+DEFMEM(GM_LEVEL_COUNT,      WORD,  0x00B25960);
+DEFMEM(GM_LEVEL_BASE,       DWORD, 0x00B25994);
 
 
 // Level related memory
-#define GM_LVL_BOUNDARIES   *(DWORD*)0x00B257D4     // 6 doubles each section, L/U/R/D/?/?
-#define GM_ORIG_LVL_BOUNDS  *(DWORD*)0x00B2587C     // Same as above, but always the initial values. Used by events that reset level boundaries.
-#define GM_LVLFILENAME_PTR  *(DWORD*)0x00B2C5A4     // Lvl filename
-#define GM_LVLNAME_PTR      *(DWORD*)0x00B2D764
-#define GM_FULLPATH         *(DWORD*)0x00B2C618     // Full path to current .lvl file
-#define GM_FULLDIR          *(DWORD*)0x00B2C61C     // Full path to current world dir
-#define GM_CUR_LVL          *(WORD*)0x00B2C6D8
+DEFMEM(GM_LVL_BOUNDARIES,   DWORD, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
+DEFMEM(GM_ORIG_LVL_BOUNDS,  DWORD, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.
+DEFMEM(GM_LVLFILENAME_PTR,  DWORD, 0x00B2C5A4);     // Lvl filename
+DEFMEM(GM_LVLNAME_PTR,      DWORD, 0x00B2D764);
+DEFMEM(GM_FULLPATH,         DWORD, 0x00B2C618);     // Full path to current .lvl file
+DEFMEM(GM_FULLDIR,          DWORD, 0x00B2C61C);     // Full path to current world dir
+DEFMEM(GM_CUR_LVL,          WORD,  0x00B2C6D8);
 
 // Background objects
-#define GM_BGO_COUNT        *(WORD*)0x00B25958
-#define GM_BGOS_PTR         *(DWORD*)0x00B259B0
+DEFMEM(GM_BGO_COUNT,        WORD,  0x00B25958);
+DEFMEM(GM_BGOS_PTR,         DWORD, 0x00B259B0);
 
 // Warps
-#define GM_WARP_COUNT       *(WORD*)0x00B258E2
-#define GM_WARPS_PTR        *(DWORD*)0x00B258F4
+DEFMEM(GM_WARP_COUNT,       WORD,  0x00B258E2);
+DEFMEM(GM_WARPS_PTR,        DWORD, 0x00B258F4);
 
 // Water/Quicksand areas
-#define GM_WATER_AREA_COUNT *(WORD*)0x00B25700
-#define GM_WATER_AREAS_PTR  *(DWORD*)0x00B256F4
+DEFMEM(GM_WATER_AREA_COUNT, WORD,  0x00B25700);
+DEFMEM(GM_WATER_AREAS_PTR,  DWORD, 0x00B256F4);
 
 // Layers
-#define GM_LAYER_UNK_PTR    *(DWORD*)0x00B259E8
-#define GM_LAYER_ARRAY_PTR  *(DWORD*)0x00B2C6B0
+DEFMEM(GM_LAYER_UNK_PTR,    DWORD, 0x00B259E8);
+DEFMEM(GM_LAYER_ARRAY_PTR,  DWORD, 0x00B2C6B0);
 
 // Events
-#define GM_EVENTS_PTR       *(DWORD*)0x00B2C6CC
-#define GM_EVENT_TIMES_PTR  *(DWORD*)0x00B2D104     // array of 100 shorts
-#define GM_EVENT_COUNT      *(WORD*)0x00B2D710
+DEFMEM(GM_EVENTS_PTR,       DWORD, 0x00B2C6CC);
+DEFMEM(GM_EVENT_TIMES_PTR,  DWORD, 0x00B2D104);     // array of 100 shorts
+DEFMEM(GM_EVENT_COUNT,      WORD,  0x00B2D710);
 
 // Blocks
-#define GM_BLOCK_COUNT      *(WORD*)0x00B25956
-#define GM_BLOCKS_PTR       *(DWORD*)0x00B25A04
+DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
+DEFMEM(GM_BLOCKS_PTR,       DWORD, 0x00B25A04);
 
 // Backgrounds
-#define GM_SEC_BG_ARRAY     *(DOUBLE*)0x00B258B8
-#define GM_BG_XPOS_PTR      *(DOUBLE*)0x00B2B984
+DEFMEM(GM_SEC_BG_ARRAY,     DOUBLE, 0x00B258B8);
+DEFMEM(GM_BG_XPOS_PTR,      DOUBLE, 0x00B2B984);
 
 // Animations
-#define GM_ANIM_COUNT       *(WORD*)0x00B2595C
-#define GM_ANIM_PTR         *(DWORD*)0x00B259CC
+DEFMEM(GM_ANIM_COUNT,       WORD,  0x00B2595C);
+DEFMEM(GM_ANIM_PTR,         DWORD, 0x00B259CC);
 
 // Sound
-#define GM_MUSIC_PATHS_PTR  *(DWORD*)0x00B257B8 
-#define GM_SEC_MUSIC_TBL_P  *(DWORD*)0x00B25828     // 21 shorts containing music # for each section
+DEFMEM(GM_MUSIC_PATHS_PTR,  DWORD, 0x00B257B8); 
+DEFMEM(GM_SEC_MUSIC_TBL_P,  DWORD, 0x00B25828);     // 21 shorts containing music # for each section
 
 // Input
-#define GM_VKEY_TABLE_PTR   *(DWORD*)0x00B25068 
-#define GM_VJOY_TABLE_PTR   *(DWORD*)0x00B25084
-#define GM_INPUTTYPE        *(DWORD*)0x00B250A0
-#define GM_INPUTSTR_BUF_PTR *(DWORD*)0x00B2C898
+DEFMEM(GM_VKEY_TABLE_PTR,   DWORD, 0x00B25068); 
+DEFMEM(GM_VJOY_TABLE_PTR,   DWORD, 0x00B25084);
+DEFMEM(GM_INPUTTYPE,        DWORD, 0x00B250A0);
+DEFMEM(GM_INPUTSTR_BUF_PTR, DWORD, 0x00B2C898);
 
 // Saves
-#define GM_CUR_SAVE_SLOT    *(WORD*)0x00B2C62A      // 1 2 or 3
+DEFMEM(GM_CUR_SAVE_SLOT,    WORD,  0x00B2C62A);      // 1 2 or 3
 
 // Cheats
-#define GM_PLAYER_INVULN    *(WORD*)0x00B2C8C0      // 0xFFFF = invuln
-#define GM_PLAYER_INFJUMP   *(WORD*)0x00B2C8AC      // 0xFFFF = infinite jumps
-#define GM_CHEATED          *(WORD*)0x00B2C8C4      // 0xFFFF = cheated
+DEFMEM(GM_PLAYER_INVULN,    WORD,  0x00B2C8C0);      // 0xFFFF = invuln
+DEFMEM(GM_PLAYER_INFJUMP,   WORD,  0x00B2C8AC);      // 0xFFFF = infinite jumps
+DEFMEM(GM_CHEATED,          WORD,  0x00B2C8C4);      // 0xFFFF = cheated
 
 // Miscs
-#define GM_GRAVITY          *(WORD*)0x00B2C6F4      // 12 = default, 0 = non-falling
-#define GM_JUMPHIGHT        *(WORD*)0x00B2C6DC      // 20 = default, higher number = higher jumps
-#define GM_JUMPHIGHT_BOUNCE *(WORD*)0x00B2C6E2      // Same as normal jumphight, but from NPC
-#define GM_EARTHQUAKE       *(WORD*)0x00B250AC      // 0 = default, higher number = bigger shaking, slowly resets to 0
+DEFMEM(GM_GRAVITY,          WORD,  0x00B2C6F4);      // 12 = default, 0 = non-falling
+DEFMEM(GM_JUMPHIGHT,        WORD,  0x00B2C6DC);      // 20 = default, higher number = higher jumps
+DEFMEM(GM_JUMPHIGHT_BOUNCE, WORD,  0x00B2C6E2);      // Same as normal jumphight, but from NPC
+DEFMEM(GM_EARTHQUAKE,       WORD,  0x00B250AC);      // 0 = default, higher number = bigger shaking, slowly resets to 0
 
-#define GM_MARIO_VS_LUIGI_T *(WORD*)0x00B2D760      // 0 = default, if higher than 0 then display text "Mario VS Luigi"
-#define GM_WINS_T           *(WORD*)0x00B2D762      // 0 = default, if higher than 0 then display text "WINS!"
+DEFMEM(GM_MARIO_VS_LUIGI_T, WORD,  0x00B2D760);      // 0 = default, if higher than 0 then display text "Mario VS Luigi"
+DEFMEM(GM_WINS_T,           WORD,  0x00B2D762);      // 0 = default, if higher than 0 then display text "WINS!"
 
-#define GM_WINNING          *(WORD*)0x00B2C59E      // 0 = not winning, if higher than 0 then winning by this win-type
-#define GM_WORLD_MODE       *(WORD*)0x00B2C5B4      // 0xFFFF = leave current level
-#define GM_INTRO_MODE       *(WORD*)0x00B2C620
+DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if higher than 0 then winning by this win-type
+DEFMEM(GM_WORLD_MODE,       WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
+DEFMEM(GM_INTRO_MODE,       WORD,  0x00B2C620);
 
-#define GM_UNK_OV_DATABLOCK *(DWORD*)0x00B25164     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
+DEFMEM(GM_UNK_OV_DATABLOCK, DWORD, 0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
 //Hitbox
-#define GM_HITBOX_H_PTR     *(WORD*)0x00B2C6FC      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
-#define GM_HITBOX_H_D_PTR   *(WORD*)0x00B2C742      // hitbox heights while ducking
-#define GM_HITBOX_W_PTR     *(WORD*)0x00B2C788      // hitbox widths
+DEFMEM(GM_HITBOX_H_PTR,     WORD,  0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
+DEFMEM(GM_HITBOX_H_D_PTR,   WORD,  0x00B2C742);      // hitbox heights while ducking
+DEFMEM(GM_HITBOX_W_PTR,     WORD,  0x00B2C788);      // hitbox widths
 
 //Startup Config:
-#define GM_ISLEVELEDITORMODE    *(WORD*)0x00B25134
-#define GM_ISGAME               *(WORD*)0x00B25046
-#define GM_NOSOUND              *(WORD*)0x00B2D734
-#define GM_FRAMESKIP            *(WORD*)0x00B2C684
+DEFMEM(GM_ISLEVELEDITORMODE, WORD, 0x00B25134);
+DEFMEM(GM_ISGAME,           WORD,  0x00B25046);
+DEFMEM(GM_NOSOUND,          WORD,  0x00B2D734);
+DEFMEM(GM_FRAMESKIP,        WORD,  0x00B2C684);
 
 //Graphics Memory
-#define GM_GFX_NPC_PTR      *(DWORD*)0xB2CA98   // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
-#define GM_GFX_NPC_MASK_PTR *(DWORD*)0xB2CAB4   // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_NPC_PTR,      DWORD, 0x00B2CA98);     // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_NPC_MASK_PTR, DWORD, 0x00B2CAB4);     // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
 
-static  short** npc_gfxoffsetx = (short**)0x00B25B70;
-static  short** npc_gfxoffsety = (short**)0x00B25B8C;
-static  short** npc_width = (short**)0x00B25BA8;
-static  short** npc_height = (short**)0x00B25BC4;
-static  short** npc_gfxwidth = (short**)0x00B25BE0;
-static  short** npc_gfxheight = (short**)0x00B25BFC;
-static  short** npc_speed = (short**)0x00B25C18;
-static  short** npc_isShell = (short**)0x00B25C34;
-static  short** npc_npcblock = (short**)0x00B25C50;
-static  short** npc_npcblocktop = (short**)0x00B25C6C;
-static  short** isInteractableNPC_ptr = (short**)0x00B25C88;
-static  short** isCoin_ptr = (short**)0x00B25CA4;
-static  short** isVineNPC_ptr = (short**)0x00B25CC0;
-static  short** isCollectableGoalNPC_ptr = (short**)0x00B25CDC;
-static  short** npc_isflying = (short**)0x00B25CF8;
-static  short** npc_isWaterNPC = (short**)0x00B25D14;
-static  short** npc_jumphurt = (short**)0x00B25D30;
-static  short** npc_noblockcollision = (short**)0x00B25D4C;
-static  short** npc_score = (short**)0x00B25D68;
-static  short** npc_playerblocktop = (short**)0x00B25D84;
-static  short** npc_grabtop = (short**)0x00B25DA0;
-static  short** npc_cliffturn = (short**)0x00B25DBC;
-static  short** npc_nohurt = (short**)0x00B25DD8;
-static  short** npc_playerblock = (short**)0x00B25DF4;
-static  short** npc_grabside = (short**)0x00B25E2C;
-static  short** isShoeNPC_ptr = (short**)0x00B25E48;
-static  short** isYoshiNPC_ptr = (short**)0x00B25E64;
-static  short** npc_noyoshi = (short**)0x00B25E9C;
-static  short** npc_foreground = (short**)0x00B25EB8;
-static  short** npc_isBot = (short**)0x00B25ED4;
-static  short** isVegetableNPC_ptr = (short**)0x00B25F0C;
-static  short** npc_nofireball = (short**)0x00B25F28;
-static  short** npc_noiceball = (short**)0x00B25F44;
-static  short** npc_nogravity = (short**)0x00B25F60;
-static  short** npc_frames = (short**)0x00B25F7C;
-static  short** npc_framespeed = (short**)0x00B25F98;
-static  short** npc_framestyle = (short**)0x00B25FB4;
+DEFMEM(npc_gfxoffsetx,          short*, 0x00B25B70);
+DEFMEM(npc_gfxoffsety,          short*, 0x00B25B8C);
+DEFMEM(npc_width,               short*, 0x00B25BA8);
+DEFMEM(npc_height,              short*, 0x00B25BC4);
+DEFMEM(npc_gfxwidth,            short*, 0x00B25BE0);
+DEFMEM(npc_gfxheight,           short*, 0x00B25BFC);
+DEFMEM(npc_speed,               float*, 0x00B25C18);
+DEFMEM(npc_isShell,             short*, 0x00B25C34);
+DEFMEM(npc_npcblock,            short*, 0x00B25C50);
+DEFMEM(npc_npcblocktop,         short*, 0x00B25C6C);
+DEFMEM(isInteractableNPC_ptr,   short*, 0x00B25C88);
+DEFMEM(isCoin_ptr,              short*, 0x00B25CA4);
+DEFMEM(isVineNPC_ptr,           short*, 0x00B25CC0);
+DEFMEM(isCollectableGoalNPC_ptr,short*, 0x00B25CDC);
+DEFMEM(npc_isflying,            short*, 0x00B25CF8);
+DEFMEM(npc_isWaterNPC,          short*, 0x00B25D14);
+DEFMEM(npc_jumphurt,            short*, 0x00B25D30);
+DEFMEM(npc_noblockcollision,    short*, 0x00B25D4C);
+DEFMEM(npc_score,               short*, 0x00B25D68);
+DEFMEM(npc_playerblocktop,      short*, 0x00B25D84);
+DEFMEM(npc_grabtop,             short*, 0x00B25DA0);
+DEFMEM(npc_cliffturn,           short*, 0x00B25DBC);
+DEFMEM(npc_nohurt,              short*, 0x00B25DD8);
+DEFMEM(npc_playerblock,         short*, 0x00B25DF4);
+DEFMEM(npc_grabside,            short*, 0x00B25E2C);
+DEFMEM(isShoeNPC_ptr,           short*, 0x00B25E48);
+DEFMEM(isYoshiNPC_ptr,          short*, 0x00B25E64);
+DEFMEM(npc_noyoshi,             short*, 0x00B25E9C);
+DEFMEM(npc_foreground,          short*, 0x00B25EB8);
+DEFMEM(npc_isBot,               short*, 0x00B25ED4);
+DEFMEM(isVegetableNPC_ptr,      short*, 0x00B25F0C);
+DEFMEM(npc_nofireball,          short*, 0x00B25F28);
+DEFMEM(npc_noiceball,           short*, 0x00B25F44);
+DEFMEM(npc_nogravity,           short*, 0x00B25F60);
+DEFMEM(npc_frames,              short*, 0x00B25F7C);
+DEFMEM(npc_framespeed,          short*, 0x00B25F98);
+DEFMEM(npc_framestyle,          short*, 0x00B25FB4);
 
-static  short** npcdef_gfxoffsetx = (short**)0x00B25FC0;
-static  short** npcdef_gfxoffsety = (short**)0x00B2621A;
-static  short** npcdef_width = (short**)0x00B26474;
-static  short** npcdef_height = (short**)0x00B266CE;
-static  short** npcdef_gfxwidth = (short**)0x00B26928;
-static  short** npcdef_gfxheight = (short**)0x00B26B82;
-static  short** npcdef_isShell = (short**)0x00B26DDC;
-static  short** npcdef_npcblock = (short**)0x00B27036;
-static  short** npcdef_npcblocktop = (short**)0x00B27290;
-static  short** npcdef_isInteractableNPC = (short**)0x00B274EA;
-static  short** npcdef_isCoin = (short**)0x00B27744;
-static  short** npcdef_isVine = (short**)0x00B2799E;
-static  short** npcdef_isCollectableGoal = (short**)0x00B27BF8;
-static  short** npcdef_isFlyingNPC = (short**)0x00B27E52;
-static  short** npcdef_isWaterNPC = (short**)0x00B280AC;
-static  short** npcdef_jumphurt = (short**)0x00B28306;
-static  short** npcdef_noblockcollision = (short**)0x00B28560;
-static  short** npcdef_score = (short**)0x00B287BA;
-static  short** npcdef_playerblocktop = (short**)0x00B28A14;
-static  short** npcdef_grabtop = (short**)0x00B28C6E;
-static  short** npcdef_cliffturn = (short**)0x00B28EC8;
-static  short** npcdef_nohurt = (short**)0x00B29122;
-static  short** npcdef_playerblock = (short**)0x00B2937C;
-static  short** npcdef_grabside = (short**)0x00B29830;
-static  short** npcdef_isShoeNPC = (short**)0x00B29A8A;
-static  short** npcdef_isYoshiNPC = (short**)0x00B29CE4;
-static  short** npcdef_noYoshi = (short**)0x00B2A198;
-static  short** npcdef_foreground = (short**)0x00B2A3F2;
-static  short** npcdef_isBot = (short**)0x00B2A64C;
-static  short** npcdef_isVegetableNPC = (short**)0x00B2AB00;
-static  short** npcdef_speed = (short**)0x00B2AD5C;
-static  short** npcdef_nofireball = (short**)0x00B2B210;
-static  short** npcdef_noiceball = (short**)0x00B2B46A;
-static  short** npcdef_nogravity = (short**)0x00B2B6C4;
+DEFMEM(npcdef_gfxoffsetx,       short*, 0x00B25FC0);
+DEFMEM(npcdef_gfxoffsety,       short*, 0x00B2621A);
+DEFMEM(npcdef_width,            short*, 0x00B26474);
+DEFMEM(npcdef_height,           short*, 0x00B266CE);
+DEFMEM(npcdef_gfxwidth,         short*, 0x00B26928);
+DEFMEM(npcdef_gfxheight,        short*, 0x00B26B82);
+DEFMEM(npcdef_isShell,          short*, 0x00B26DDC);
+DEFMEM(npcdef_npcblock,         short*, 0x00B27036);
+DEFMEM(npcdef_npcblocktop,      short*, 0x00B27290);
+DEFMEM(npcdef_isInteractableNPC,short*, 0x00B274EA);
+DEFMEM(npcdef_isCoin,           short*, 0x00B27744);
+DEFMEM(npcdef_isVine,           short*, 0x00B2799E);
+DEFMEM(npcdef_isCollectableGoal,short*, 0x00B27BF8);
+DEFMEM(npcdef_isFlyingNPC,      short*, 0x00B27E52);
+DEFMEM(npcdef_isWaterNPC,       short*, 0x00B280AC);
+DEFMEM(npcdef_jumphurt,         short*, 0x00B28306);
+DEFMEM(npcdef_noblockcollision, short*, 0x00B28560);
+DEFMEM(npcdef_score,            short*, 0x00B287BA);
+DEFMEM(npcdef_playerblocktop,   short*, 0x00B28A14);
+DEFMEM(npcdef_grabtop,          short*, 0x00B28C6E);
+DEFMEM(npcdef_cliffturn,        short*, 0x00B28EC8);
+DEFMEM(npcdef_nohurt,           short*, 0x00B29122);
+DEFMEM(npcdef_playerblock,      short*, 0x00B2937C);
+DEFMEM(npcdef_grabside,         short*, 0x00B29830);
+DEFMEM(npcdef_isShoeNPC,        short*, 0x00B29A8A);
+DEFMEM(npcdef_isYoshiNPC,       short*, 0x00B29CE4);
+DEFMEM(npcdef_noYoshi,          short*, 0x00B2A198);
+DEFMEM(npcdef_foreground,       short*, 0x00B2A3F2);
+DEFMEM(npcdef_isBot,            short*, 0x00B2A64C);
+DEFMEM(npcdef_isVegetableNPC,   short*, 0x00B2AB00);
+DEFMEM(npcdef_speed,            float*, 0x00B2AD5C);
+DEFMEM(npcdef_nofireball,       short*, 0x00B2B210);
+DEFMEM(npcdef_noiceball,        short*, 0x00B2B46A);
+DEFMEM(npcdef_nogravity,        short*, 0x00B2B6C4);
 
 // Frame timing related references
-static double& GM_LAST_FRAME_TIME = *(double*)0x00B2D72C;
-static double& GM_CURRENT_TIME    = *(double*)0x00B2D738;
-static short&  GM_MAX_FPS_MODE    =  *(short*)0x00B2C8BE;
+DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
+DEFMEM(GM_CURRENT_TIME,    double, 0x00B2D738);
+DEFMEM(GM_MAX_FPS_MODE,    short,  0x00B2C8BE);
 
 /////////////////////
 ///  -Assembly-   ///
@@ -309,9 +311,9 @@ static short&  GM_MAX_FPS_MODE    =  *(short*)0x00B2C8BE;
 
 //VASM = value is assembly code
 //npcToCoins ending Animation Settings
-#define VASM_END_ANIM       *(BYTE*)0x00A3C86E      // = 11
-#define VASM_END_COINSOUND  *(BYTE*)0x00A3C87F      // = 14
-#define VASM_END_COINVAL    *(BYTE*)0x00A3C891      // = 1
+DEFMEM(VASM_END_ANIM,      BYTE, 0x00A3C86E);      // = 11
+DEFMEM(VASM_END_COINSOUND, BYTE, 0x00A3C87F);      // = 14
+DEFMEM(VASM_END_COINVAL,   BYTE, 0x00A3C891);      // = 1
 
 
 ////////////////////////
@@ -363,10 +365,10 @@ enum Characters : short {
 ///    -Imports-     ///
 ////////////////////////
 
-#define IMP_vbaStrCmp       *(DWORD*)0x004010F8 // Ptr to __stdcall
-#define IMP_vbaStrCopy      *(DWORD*)0x004011b0 // Ptr to __fastcall
-#define IMP_vbaFreeStr      *(DWORD*)0x00401248 // Ptr to __fastcall
-#define IMP_rtcRandomize    *(DWORD*)0x00401090 // Ptr to __stdcall
+DEFMEM(IMP_vbaStrCmp, DWORD, 0x004010F8); // Ptr to __stdcall
+DEFMEM(IMP_vbaStrCopy, DWORD, 0x004011b0); // Ptr to __fastcall
+DEFMEM(IMP_vbaFreeStr, DWORD, 0x00401248); // Ptr to __fastcall
+DEFMEM(IMP_rtcRandomize, DWORD, 0x00401090); // Ptr to __stdcall
 
 ////////////////////////
 ///    -Functions-   ///
@@ -463,7 +465,7 @@ enum Characters : short {
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
-#define GF_RTC_DO_EVENTS    *(DWORD*)0x004010B8
+DEFMEM(GF_RTC_DO_EVENTS, DWORD, 0x004010B8);
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
