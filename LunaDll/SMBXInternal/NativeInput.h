@@ -27,15 +27,13 @@ namespace SMBXInput {
     static inline short getPlayerInputType(unsigned short index)
     {
         if (index < 1 || index > 2) return -1;
-        short* type = (short*)GM_INPUTTYPE;
-        return type[index - 1];
+        return GM_INPUTTYPE[index - 1];
     }
 
     static inline void setPlayerInputType(unsigned short index, short inputType)
     {
         if (index < 1 || index > 2) return;
-        short* type = (short*)GM_INPUTTYPE;
-        type[index - 1] = inputType;
+        GM_INPUTTYPE[index - 1] = inputType;
     }
 }
 

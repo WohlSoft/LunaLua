@@ -113,7 +113,7 @@ extern int __stdcall LoadWorld()
 #ifndef NO_SDL
     if (!episodeStarted)
     {
-        std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
+        std::string wldPath = wstr2str(GM_FULLDIR);
         MusicManager::loadCustomSounds(wldPath + "\\");
         episodeStarted = true;
     }
@@ -136,7 +136,7 @@ extern int __stdcall LoadWorld()
     gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
     gLunaLua = CLunaLua();
-    gLunaLua.init(CLunaLua::LUNALUA_WORLD, std::wstring((wchar_t*)GM_FULLDIR));
+    gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
 
     // Recount deaths
     gDeathCounter.Recount();

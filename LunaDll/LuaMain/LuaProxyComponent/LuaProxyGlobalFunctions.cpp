@@ -28,7 +28,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 	int powerup = _powerup-1;
 	int character = _character-1;
 
-	wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+	wstring world_dir = (wstring)GM_FULLDIR;
 	wstring full_path = world_dir.append(::Level::GetName());
 	full_path = removeExtension(full_path);
 	full_path = full_path.append(L"\\"); // < path into level folder
@@ -223,7 +223,7 @@ void LuaProxy::playSFX(const char *filename)
 #else
 	wstring full_path;
 	if(!isAbsolutePath(std::string(filename))){
-		wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+		wstring world_dir = (wstring)GM_FULLDIR;
 		full_path = world_dir.append(Level::GetName());
 		full_path = removeExtension(full_path);
 		full_path = full_path.append(L"\\"); // < path into level folder
@@ -593,10 +593,10 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 
 
 	memset(nativeAddr, 0, 0x158);
-	WORD* widthArray = (WORD*)GM_CONF_WIDTH;
-	WORD* heightArray = (WORD*)GM_CONF_HEIGHT;
-	WORD* gfxWidthArray = (WORD*)GM_CONF_GFXWIDTH;
-	WORD* gfxHeightArray = (WORD*)GM_CONF_GFXHEIGHT;
+	WORD* widthArray = GM_CONF_WIDTH;
+	WORD* heightArray = GM_CONF_HEIGHT;
+	WORD* gfxWidthArray = GM_CONF_GFXWIDTH;
+	WORD* gfxHeightArray = GM_CONF_GFXHEIGHT;
 
 	short width = widthArray[npcid];
 	short height = heightArray[npcid];
@@ -672,5 +672,5 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
 
 LuaProxy::VBStr LuaProxy::getInput()
 {
-    return VBStr((wchar_t*)GM_INPUTSTR_BUF_PTR);
+    return VBStr(*(wchar_t**)&GM_INPUTSTR_BUF_PTR);
 }

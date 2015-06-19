@@ -205,16 +205,10 @@ bool Input::JumpThisFrame() { return gJumpTapped != 0 ? true : false; }
 
 // GET INPUT STRING COPY -- Get a copy of the current state of the input string buffer (for cheats)
 wstring Input::GetInputStringCopy() {
-	if(GM_INPUTSTR_BUF_PTR == 0)
-		return wstring(L"");
-	return wstring((wchar_t*)GM_INPUTSTR_BUF_PTR);
+	return (wstring)GM_INPUTSTR_BUF_PTR;
 }
 
 // CLEAR INPUT STRING BUFFER -- 
 void Input::ClearInputStringBuffer() {
-    //int len = GetInputStringCopy().length();
-	if(GM_INPUTSTR_BUF_PTR != 0) {
-		*(((short*)GM_INPUTSTR_BUF_PTR) - 2) = (int)0; // zero out VBA string len
-		*(short*)GM_INPUTSTR_BUF_PTR = (short)0; // null out first character
-	}
+    GM_INPUTSTR_BUF_PTR = L"";
 }

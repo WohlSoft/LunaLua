@@ -438,8 +438,8 @@ std::vector<std::string> listFilesOfDir(const std::string& path)
 
 std::wstring getCustomFolderPath()
 {
-    wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
-    wstring full_path = (gIsOverworld ? world_dir : world_dir.append((wchar_t*)GM_LVLFILENAME_PTR));
+    wstring world_dir = (wstring)GM_FULLDIR;
+    wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
     if (!gIsOverworld){
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder

@@ -59,7 +59,7 @@ wstring SavedVariableBank::GetSaveFileName() {
 
 // GET SAVE FILE FULL PATH
 wstring SavedVariableBank::GetSaveFileFullPath(wstring save_file_name) {
-	wstring full_path = wstring((wchar_t*)GM_FULLDIR);	
+    wstring full_path = (wstring)GM_FULLDIR;
 
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(save_file_name);

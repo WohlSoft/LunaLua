@@ -15,7 +15,7 @@ static std::unordered_set<HDC> gfxOverrideMaskSet;
 void loadRenderOverrideGfx()
 {
     // Get world and level filenames
-    std::wstring worldPath = std::wstring((wchar_t*)GM_FULLDIR);
+    std::wstring worldPath = (std::wstring)GM_FULLDIR;
     std::wstring levelFile = Level::GetName();
 
     // Generate the custom resource dir

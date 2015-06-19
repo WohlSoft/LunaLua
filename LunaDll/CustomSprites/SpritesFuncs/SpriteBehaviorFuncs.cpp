@@ -350,9 +350,9 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 					double sprite_left = me->m_Hitbox.CalcLeft();
 
 					if(false) { // debugging
-						double* pCameraY = (double*)GM_CAMERA_Y;
+						double* pCameraY = GM_CAMERA_Y;
 						double camtop = -pCameraY[1];
-						double* pCameraX = (double*)GM_CAMERA_X;
+						double* pCameraX = GM_CAMERA_X;
 						double camleft = -pCameraX[1];
 						//debug_rect.color = COLOR;
 						COLOR += 0x55000055;

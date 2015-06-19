@@ -57,7 +57,7 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             if (pcds->dwData == 0xDEADC0DE){
                 std::wstring lvlName = gShMemServer.read();
                 if (!lvlName.empty()){
-                    GM_FULLPATH = (DWORD)SysAllocString(lvlName.c_str());
+                    GM_FULLPATH = lvlName;
                 }
                 gHook_SkipTestMsgBox = true;
                 ((void(*)())0x00A02220)();
@@ -189,7 +189,7 @@ void TrySkipPatch()
     /************************************************************************/
     /* Replaced Imports                                                     */
     /************************************************************************/
-    IMP_vbaStrCmp = (DWORD)&replacement_VbaStrCmp;
+    IMP_vbaStrCmp = &replacement_VbaStrCmp;
     
     /************************************************************************/
     /* Set Hook                                                             */

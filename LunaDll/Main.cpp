@@ -83,7 +83,7 @@ int OnLvlLoad() {
 #ifndef NO_SDL
 	if(!episodeStarted)
 	{//Load custom sounds
-		std::string wldPath = wstr2str(std::wstring((wchar_t*)GM_FULLDIR));
+		std::string wldPath = wstr2str(GM_FULLDIR);
 		std::string SndRoot = MusicManager::SndRoot();
 		replaceSubStr(wldPath, "\"", "");
 		replaceSubStr(wldPath, "\\\\",  "\\");
@@ -116,10 +116,10 @@ int OnLvlLoad() {
 	if(gLunaEnabled) {
 		// Load autocode
 		gAutoMan.Clear(false);		
-		gAutoMan.ReadFile(std::wstring((wchar_t*)GM_FULLDIR));
+		gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
 
 		// Try to load world codes		
-		gAutoMan.ReadWorld(std::wstring((wchar_t*)GM_FULLDIR));
+		gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
 
 		// Init var bank
 		gSavedVarBank.TryLoadWorldVars();
@@ -131,7 +131,7 @@ int OnLvlLoad() {
         //  the constructor extra times *without* ever calling the destructor,
         //  which can result in a memory leak of the whole Lua state!
 		//    gLunaLua = CLunaLua();
-		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, std::wstring((wchar_t*)GM_FULLDIR), Level::GetName());
+		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init

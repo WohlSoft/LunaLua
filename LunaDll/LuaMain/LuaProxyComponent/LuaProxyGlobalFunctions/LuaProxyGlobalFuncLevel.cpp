@@ -19,10 +19,10 @@ void LuaProxy::Level::winState(unsigned short value)
 
 std::string LuaProxy::Level::filename()
 {
-    return utf8_encode(std::wstring((wchar_t*)GM_LVLFILENAME_PTR));
+    return (std::string)GM_LVLFILENAME_PTR;
 }
 
 std::string LuaProxy::Level::name()
 {
-    return utf8_encode(std::wstring((wchar_t*)GM_LVLNAME_PTR));
+    return (std::string)GM_LVLNAME_PTR;
 }

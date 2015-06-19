@@ -17,7 +17,7 @@ void showSMBXMessageBox(std::string message)
 
     short arg1 = 1;
     native_msgbox(&arg1);
-    *(VB6StrPtr*)&(GM_STR_MSGBOX) = *(VB6StrPtr*)&(GM_STR_NULL);
+    GM_STR_MSGBOX = GM_STR_NULL;
 }
 
 

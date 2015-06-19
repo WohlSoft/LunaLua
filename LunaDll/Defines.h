@@ -49,7 +49,50 @@ enum PRIORITY {
     PRI_HIGH
 };
 
-#define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
+////////////////////////
+/// -Shared Strcuts- ///
+////////////////////////
+
+struct Momentum
+{
+    double x;
+    double y;
+    double height;
+    double width;
+    double speedX;
+    double speedY;
+};
+
+struct Bounds
+{
+    double left;
+    double top;
+    double bottom;
+    double right;
+    double unk1;
+    double unk2;
+};
+
+struct KeyMap{
+    short    upKeyState; //Up
+    short    downKeyState; //Down
+    short    leftKeyState; //Left
+    short    rightKeyState; //Right
+    short    jumpKeyState; //Jump
+    short    altJumpKeyState; //Spin Jump
+    short    runKeyState;  //Run
+    short    altRunKeyState; //Alt Run
+    short    dropItemKeyState; //Select/Drop Item
+    short    pauseKeyState; //Pause
+};
+
+enum Characters : short {
+    CHARACTER_MARIO = 1,    //DEMO
+    CHARACTER_LUIGI = 2,    //IRIS
+    CHARACTER_PEACH = 3,    //KOOD
+    CHARACTER_TOAD = 4,    //RAOCOW
+    CHARACTER_LINK = 5     //SHEATH
+};
 
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
@@ -68,32 +111,33 @@ enum PRIORITY {
 #define GM_PLAYER_KEY_SEL   8
 #define GM_PLAYER_KEY_STR   9
 
+#define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
 
 // General
 DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
 DEFMEM(GM_MODE_INTRO,       WORD,  0x00B2C89C);
 
 // Pre-Defined Strings      
-DEFMEM(GM_STR_NULL,         DWORD, 0x00423D00);
-DEFMEM(GM_STR_MSGBOX,       DWORD, 0x00B250E4);
-DEFMEM(GM_STR_CHECKPOINT,   DWORD, 0x00B250B0);     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
+DEFMEM(GM_STR_NULL,         VB6StrPtr, 0x00423D00);
+DEFMEM(GM_STR_MSGBOX,       VB6StrPtr, 0x00B250E4);
+DEFMEM(GM_STR_CHECKPOINT,   VB6StrPtr, 0x00B250B0);     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
 
 // NPC Settings
-DEFMEM(GM_CONF_WIDTH,       DWORD, 0x00B25BA8);
-DEFMEM(GM_CONF_HEIGHT,      DWORD, 0x00B25BC4);
-DEFMEM(GM_CONF_GFXWIDTH,    DWORD, 0x00B25BE0);
-DEFMEM(GM_CONF_GFXHEIGHT,   DWORD, 0x00B25BFC);
+DEFMEM(GM_CONF_WIDTH,       WORD*, 0x00B25BA8);
+DEFMEM(GM_CONF_HEIGHT,      WORD*, 0x00B25BC4);
+DEFMEM(GM_CONF_GFXWIDTH,    WORD*, 0x00B25BE0);
+DEFMEM(GM_CONF_GFXHEIGHT,   WORD*, 0x00B25BFC);
 
 // Frame counters
 DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
 //DEFMEM(GM_ACTIVE_FRAMECT, DWORD, 0x00B2C67C);  Float?
 
 // MOB Related memory
-DEFMEM(GM_NPCS_PTR,         DWORD, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
+DEFMEM(GM_NPCS_PTR,         void*, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
 DEFMEM(GM_NPCS_COUNT,       WORD,  0x00B2595A); 
-DEFMEM(GM_PLAYERS_PTR,      DWORD, 0x00B25A20);
+DEFMEM(GM_PLAYERS_PTR,      void*, 0x00B25A20);
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
-DEFMEM(GM_EDIT_PLAYERS_PTR, DWORD, 0x00CF74D8);     // Editor Template player
+DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
 
 // HUD stuff
 DEFMEM(GM_STAR_COUNT,       DWORD, 0x00B251E0);
@@ -112,7 +156,7 @@ DEFMEM(GM_CUR_MENULEVEL,    WORD,  0x00B2C628);
 
 // Menu Episode List
 DEFMEM(GM_EP_LIST_COUNT,    WORD,  0x00B250E8);
-DEFMEM(GM_EP_LIST_PTR,      DWORD, 0x00B250FC);
+DEFMEM(GM_EP_LIST_PTR,      void*, 0x00B250FC);
 
 // Interaction
 DEFMEM(GM_MOUSEMOVING,      WORD,  0x00B2D6D2);
@@ -126,68 +170,68 @@ DEFMEM(GM_FREEZWITCH_ACTIV, WORD,  0x00B2C8B4);
 DEFMEM(GM_PAUSE_OPEN,       WORD,  0x00B250E2);
 
 // Camera
-DEFMEM(GM_CAMERA_X,         DWORD, 0x00B2B984);
-DEFMEM(GM_CAMERA_Y,         DWORD, 0x00B2B9A0);
+DEFMEM(GM_CAMERA_X,         double*, 0x00B2B984);
+DEFMEM(GM_CAMERA_Y,         double*, 0x00B2B9A0);
 
 // Overworld base struct
-DEFMEM(GM_OVERWORLD_PTR,    DWORD, 0x00B2C5C8);
+DEFMEM(GM_OVERWORLD_PTR,    void*, 0x00B2C5C8);
 
 // Overworld Level Array
 DEFMEM(GM_LEVEL_COUNT,      WORD,  0x00B25960);
-DEFMEM(GM_LEVEL_BASE,       DWORD, 0x00B25994);
+DEFMEM(GM_LEVEL_BASE,       void*, 0x00B25994);
 
 
 // Level related memory
-DEFMEM(GM_LVL_BOUNDARIES,   DWORD, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
-DEFMEM(GM_ORIG_LVL_BOUNDS,  DWORD, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.
-DEFMEM(GM_LVLFILENAME_PTR,  DWORD, 0x00B2C5A4);     // Lvl filename
-DEFMEM(GM_LVLNAME_PTR,      DWORD, 0x00B2D764);
-DEFMEM(GM_FULLPATH,         DWORD, 0x00B2C618);     // Full path to current .lvl file
-DEFMEM(GM_FULLDIR,          DWORD, 0x00B2C61C);     // Full path to current world dir
+DEFMEM(GM_LVL_BOUNDARIES,   Bounds*, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
+DEFMEM(GM_ORIG_LVL_BOUNDS,  Bounds*, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.
+DEFMEM(GM_LVLFILENAME_PTR,  VB6StrPtr, 0x00B2C5A4);   // Lvl filename
+DEFMEM(GM_LVLNAME_PTR,      VB6StrPtr, 0x00B2D764);
+DEFMEM(GM_FULLPATH,         VB6StrPtr, 0x00B2C618);   // Full path to current .lvl file
+DEFMEM(GM_FULLDIR,          VB6StrPtr, 0x00B2C61C);   // Full path to current world dir
 DEFMEM(GM_CUR_LVL,          WORD,  0x00B2C6D8);
 
 // Background objects
 DEFMEM(GM_BGO_COUNT,        WORD,  0x00B25958);
-DEFMEM(GM_BGOS_PTR,         DWORD, 0x00B259B0);
+DEFMEM(GM_BGOS_PTR,         void*, 0x00B259B0);
 
 // Warps
 DEFMEM(GM_WARP_COUNT,       WORD,  0x00B258E2);
-DEFMEM(GM_WARPS_PTR,        DWORD, 0x00B258F4);
+DEFMEM(GM_WARPS_PTR,        void*, 0x00B258F4);
 
 // Water/Quicksand areas
 DEFMEM(GM_WATER_AREA_COUNT, WORD,  0x00B25700);
-DEFMEM(GM_WATER_AREAS_PTR,  DWORD, 0x00B256F4);
+DEFMEM(GM_WATER_AREAS_PTR,  void*, 0x00B256F4);
 
 // Layers
-DEFMEM(GM_LAYER_UNK_PTR,    DWORD, 0x00B259E8);
-DEFMEM(GM_LAYER_ARRAY_PTR,  DWORD, 0x00B2C6B0);
+DEFMEM(GM_LAYER_UNK_PTR,    void*, 0x00B259E8);
+DEFMEM(GM_LAYER_ARRAY_PTR,  void*, 0x00B2C6B0);
 
 // Events
-DEFMEM(GM_EVENTS_PTR,       DWORD, 0x00B2C6CC);
-DEFMEM(GM_EVENT_TIMES_PTR,  DWORD, 0x00B2D104);     // array of 100 shorts
+DEFMEM(GM_EVENTS_PTR,       void*, 0x00B2C6CC);
+DEFMEM(GM_EVENT_TIMES_PTR,  void*, 0x00B2D104);     // array of 100 shorts
 DEFMEM(GM_EVENT_COUNT,      WORD,  0x00B2D710);
 
 // Blocks
 DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
-DEFMEM(GM_BLOCKS_PTR,       DWORD, 0x00B25A04);
+DEFMEM(GM_BLOCKS_PTR,       void*, 0x00B25A04);
 
 // Backgrounds
-DEFMEM(GM_SEC_BG_ARRAY,     DOUBLE, 0x00B258B8);
-DEFMEM(GM_BG_XPOS_PTR,      DOUBLE, 0x00B2B984);
+DEFMEM(GM_SEC_BG_ARRAY,     short*,  0x00B258B8);
+DEFMEM(GM_BG_XPOS_PTR,      double*, 0x00B2B984);
 
 // Animations
 DEFMEM(GM_ANIM_COUNT,       WORD,  0x00B2595C);
-DEFMEM(GM_ANIM_PTR,         DWORD, 0x00B259CC);
+DEFMEM(GM_ANIM_PTR,         void*, 0x00B259CC);
 
 // Sound
-DEFMEM(GM_MUSIC_PATHS_PTR,  DWORD, 0x00B257B8); 
-DEFMEM(GM_SEC_MUSIC_TBL_P,  DWORD, 0x00B25828);     // 21 shorts containing music # for each section
+DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8); 
+DEFMEM(GM_SEC_MUSIC_TBL,    short*, 0x00B25828);     // 21 shorts containing music # for each section
 
 // Input
-DEFMEM(GM_VKEY_TABLE_PTR,   DWORD, 0x00B25068); 
-DEFMEM(GM_VJOY_TABLE_PTR,   DWORD, 0x00B25084);
-DEFMEM(GM_INPUTTYPE,        DWORD, 0x00B250A0);
-DEFMEM(GM_INPUTSTR_BUF_PTR, DWORD, 0x00B2C898);
+DEFMEM(GM_VKEY_TABLE_PTR,   void*,  0x00B25068); 
+DEFMEM(GM_VJOY_TABLE_PTR,   void*,  0x00B25084);
+DEFMEM(GM_INPUTTYPE,        short*, 0x00B250A0);
+DEFMEM(GM_INPUTSTR_BUF_PTR, VB6StrPtr, 0x00B2C898);
 
 // Saves
 DEFMEM(GM_CUR_SAVE_SLOT,    WORD,  0x00B2C62A);      // 1 2 or 3
@@ -210,12 +254,12 @@ DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if high
 DEFMEM(GM_WORLD_MODE,       WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
 DEFMEM(GM_INTRO_MODE,       WORD,  0x00B2C620);
 
-DEFMEM(GM_UNK_OV_DATABLOCK, DWORD, 0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
+DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
 //Hitbox
-DEFMEM(GM_HITBOX_H_PTR,     WORD,  0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
-DEFMEM(GM_HITBOX_H_D_PTR,   WORD,  0x00B2C742);      // hitbox heights while ducking
-DEFMEM(GM_HITBOX_W_PTR,     WORD,  0x00B2C788);      // hitbox widths
+DEFMEM(GM_HITBOX_H_PTR,     short*,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
+DEFMEM(GM_HITBOX_H_D_PTR,   short*,0x00B2C742);      // hitbox heights while ducking
+DEFMEM(GM_HITBOX_W_PTR,     short*,0x00B2C788);      // hitbox widths
 
 //Startup Config:
 DEFMEM(GM_ISLEVELEDITORMODE, WORD, 0x00B25134);
@@ -224,8 +268,8 @@ DEFMEM(GM_NOSOUND,          WORD,  0x00B2D734);
 DEFMEM(GM_FRAMESKIP,        WORD,  0x00B2C684);
 
 //Graphics Memory
-DEFMEM(GM_GFX_NPC_PTR,      DWORD, 0x00B2CA98);     // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
-DEFMEM(GM_GFX_NPC_MASK_PTR, DWORD, 0x00B2CAB4);     // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_NPC_PTR,      void*, 0x00B2CA98);     // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_NPC_MASK_PTR, void*, 0x00B2CAB4);     // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
 
 DEFMEM(npc_gfxoffsetx,          short*, 0x00B25B70);
 DEFMEM(npc_gfxoffsety,          short*, 0x00B25B8C);
@@ -315,60 +359,14 @@ DEFMEM(VASM_END_ANIM,      BYTE, 0x00A3C86E);      // = 11
 DEFMEM(VASM_END_COINSOUND, BYTE, 0x00A3C87F);      // = 14
 DEFMEM(VASM_END_COINVAL,   BYTE, 0x00A3C891);      // = 1
 
-
-////////////////////////
-/// -Shared Strcuts- ///
-////////////////////////
-
-struct Momentum
-{
-    double x;
-    double y;
-    double height;
-    double width;
-    double speedX;
-    double speedY;
-};
-
-struct Bounds
-{
-    double left;
-    double top;
-    double bottom;
-    double right;
-    double unk1;
-    double unk2;
-};
-
-struct KeyMap{
-    short    upKeyState; //Up
-    short    downKeyState; //Down
-    short    leftKeyState; //Left
-    short    rightKeyState; //Right
-    short    jumpKeyState; //Jump
-    short    altJumpKeyState; //Spin Jump
-    short    runKeyState;  //Run
-    short    altRunKeyState; //Alt Run
-    short    dropItemKeyState; //Select/Drop Item
-    short    pauseKeyState; //Pause
-};
-
-enum Characters : short {
-    CHARACTER_MARIO = 1,    //DEMO
-    CHARACTER_LUIGI = 2,    //IRIS
-    CHARACTER_PEACH = 3,    //KOOD
-    CHARACTER_TOAD  = 4,    //RAOCOW
-    CHARACTER_LINK  = 5     //SHEATH
-};
-
 ////////////////////////
 ///    -Imports-     ///
 ////////////////////////
 
-DEFMEM(IMP_vbaStrCmp, DWORD, 0x004010F8); // Ptr to __stdcall
-DEFMEM(IMP_vbaStrCopy, DWORD, 0x004011b0); // Ptr to __fastcall
-DEFMEM(IMP_vbaFreeStr, DWORD, 0x00401248); // Ptr to __fastcall
-DEFMEM(IMP_rtcRandomize, DWORD, 0x00401090); // Ptr to __stdcall
+DEFMEM(IMP_vbaStrCmp,       void*, 0x004010F8); // Ptr to __stdcall
+DEFMEM(IMP_vbaStrCopy,      void*, 0x004011b0); // Ptr to __fastcall
+DEFMEM(IMP_vbaFreeStr,      void*, 0x00401248); // Ptr to __fastcall
+DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 ////////////////////////
 ///    -Functions-   ///
@@ -465,7 +463,7 @@ DEFMEM(IMP_rtcRandomize, DWORD, 0x00401090); // Ptr to __stdcall
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
-DEFMEM(GF_RTC_DO_EVENTS, DWORD, 0x004010B8);
+DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 

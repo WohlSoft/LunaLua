@@ -58,7 +58,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
     wstring full_path = L"";
 
     if (!isAbsolutePath(filename)){
-        wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+        wstring world_dir = (wstring)GM_FULLDIR;
         full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
         if (!gIsOverworld){
             full_path = removeExtension(full_path);
@@ -159,8 +159,8 @@ void Render::CalcCameraPos(double* ret_x, double* ret_y) {
 
     // Old camera func, using "camera" memory
     if (GM_CAMERA_Y != 0 && GM_CAMERA_X != 0) {
-        double* pCameraX = (double*)(GM_CAMERA_X);
-        double* pCameraY = (double*)(GM_CAMERA_Y);
+        double* pCameraX = (GM_CAMERA_X);
+        double* pCameraY = (GM_CAMERA_Y);
         double val;
         if (ret_x != NULL) {
             val = pCameraX[1];

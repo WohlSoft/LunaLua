@@ -160,7 +160,7 @@ void Autocode::Do(bool init) {
 					switch((int)Param1) {
 					default:
 					case 0: { // UP
-						double* pCamera = (double*)GM_CAMERA_Y;
+						double* pCamera = GM_CAMERA_Y;
 						double top = -pCamera[1];
 						if(npc->momentum.y < top + Param2)
 							npc->momentum.y = (top + Param2) + 1;
@@ -168,7 +168,7 @@ void Autocode::Do(bool init) {
 							}
 
 					case 1: { // DOWN
-						double* pCamera = (double*)GM_CAMERA_Y;
+						double* pCamera = GM_CAMERA_Y;
 						double bot = -pCamera[1] + 600;
 						if(npc->momentum.y > bot - Param2)
 							npc->momentum.y = (bot - Param2) - 1;
@@ -176,7 +176,7 @@ void Autocode::Do(bool init) {
 							}
 
 					case 2: { // LEFT
-						double* pCamera = (double*)GM_CAMERA_X;
+						double* pCamera = GM_CAMERA_X;
 						double left = -pCamera[1];
 						if(npc->momentum.x < left + Param2)
                             npc->momentum.x = (left + Param2) + 1;
@@ -184,7 +184,7 @@ void Autocode::Do(bool init) {
 							}
 
 					case 3: { // RIGHT
-						double* pCamera = (double*)GM_CAMERA_X;
+						double* pCamera = GM_CAMERA_X;
 						double rt = -pCamera[1] + 800;
                         if (npc->momentum.x > rt - Param2)
                             npc->momentum.x = (rt - Param2) - 1;
@@ -227,7 +227,7 @@ void Autocode::Do(bool init) {
 					// Sound from level folder
 					if(MyString.length() > 0) {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
-						wstring world_dir = wstring((wchar_t*)GM_FULLDIR);
+						wstring world_dir = (wstring)GM_FULLDIR;
 						wstring full_path = world_dir.append(Level::GetName());	
 						full_path = removeExtension(full_path);
 						full_path = full_path.append(L"\\"); // < path into level folder

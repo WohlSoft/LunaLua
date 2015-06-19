@@ -42,7 +42,9 @@ struct WorldLevel
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
+#ifndef __INTELLISENSE__
 static_assert(sizeof(WorldLevel) == 0x64, "sizeof(WorldLevel) must be 0x64");
+#endif
 
 namespace SMBXLevel{
 	WorldLevel* get(int index);

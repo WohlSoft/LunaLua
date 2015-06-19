@@ -115,10 +115,10 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 
 
     memset(nativeAddr, 0, 0x158);
-    WORD* widthArray = (WORD*)GM_CONF_WIDTH;
-    WORD* heightArray = (WORD*)GM_CONF_HEIGHT;
-    WORD* gfxWidthArray = (WORD*)GM_CONF_GFXWIDTH;
-    WORD* gfxHeightArray = (WORD*)GM_CONF_GFXHEIGHT;
+    WORD* widthArray = GM_CONF_WIDTH;
+    WORD* heightArray = GM_CONF_HEIGHT;
+    WORD* gfxWidthArray = GM_CONF_GFXWIDTH;
+    WORD* gfxHeightArray = GM_CONF_GFXHEIGHT;
 
     short width = widthArray[npcid];
     short height = heightArray[npcid];
