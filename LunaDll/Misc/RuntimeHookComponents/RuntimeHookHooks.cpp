@@ -628,7 +628,7 @@ extern void __stdcall WindowInactiveHook()
     native_rtcDoEvents();
 
     // Don't hog the CPU when window is inactive!
-    Sleep(100);
+    Sleep(1);
 }
 
 /**
