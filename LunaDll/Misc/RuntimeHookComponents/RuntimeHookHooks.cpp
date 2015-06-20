@@ -639,7 +639,7 @@ extern void __stdcall WindowInactiveHook()
  * QueryPerformanceCounter for improved frame jitter when we're on an OS new
  * enough that we trust QueryPerformanceCounter.
  **/
-#define ENABLE_FRAME_TIMING_BENCHMARK
+//#define ENABLE_FRAME_TIMING_BENCHMARK
 #define FRAME_TIMING_MS (15.600)
 
 extern void __stdcall FrameTimingHookQPC()
