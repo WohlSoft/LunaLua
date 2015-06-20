@@ -1,0 +1,23 @@
+This library allows communication between LunaLua and SMBX events. Specifically, it allows SMBX events to trigger Lua code. This does, however, need some setting up.
+
+0. Place the file "triggers.lua" in the Main Game/lua folder. If that folder does not exist, create it.
+
+1. Create a new layer in SMBX and place an NPC on this layer (it is recommended to use the axe, with gravity disabled, and to place it outside the section boundaries). It is important that this NPC should not move.
+
+2. Write down the X and Y position of the NPC. You can find this in SMBX's Debugger, or in the Item Properties in WohlEditor.
+
+3. Hide this layer.
+
+4. Create an event in SMBX, and set it to show this layer.
+
+5. Create a second event that hides the layer (I'll call it "HideTriggerLayer", but any name will work, so long as you use it in Lua as well).
+
+---The following can be seen in the example.lua file---
+
+6. Jump into lunadll.lua, and import the triggers library using a require statement. You may need to set the package path to ensure it finds the right file (see the example code).
+
+7. Create an array, and assign your trigger to it using the library Trigger function. The arguments should be (x,y,actions,event), where x and y and the position of the NPC you recorded in step 2, event is the name of the event in step 5 ("HideTriggerLayer"), and actions is a function containing the Lua code you want to run.
+
+8. Inside the onLoop function, call the library function testTriggers, with the first argument as the ID of your NPC, and the second argument the array you created in step 7.
+
+9. You should now be able to trigger Lua code from SMBX functions!

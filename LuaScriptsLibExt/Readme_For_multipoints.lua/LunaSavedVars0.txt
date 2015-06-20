@@ -1,0 +1,10 @@
+__LunaVarBankSpecialCounter
+0
+__Lunadll_Version
+8
+example.lvl - MPCheck_Get0
+1
+example.lvl - MPCheck_Get1
+1
+example.lvl - MPCheck_ID
+0

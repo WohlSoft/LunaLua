@@ -1,0 +1,51 @@
+EXTERNAL USE:
+These functions are all you need to use the trigger system.
+
+
+Trigger(x,y,actions,event)
+--------------------------------
+Creates a new Trigger structure.
+--------------------------------
+x		: number	: The x coordinate of the trigger (can be found using Wohlstand's editor, or Lua debug)
+y 		: number	: The y coordinate of the trigger (can be found using Wohlstand's editor, or Lua debug)
+actions		: function	: The actions to perform when the trigger is activated
+event		: string	: OPTIONAL : The SMBX event to trigger after the Lua code has run. Typically, this hides the trigger layer so it can be re-activated
+
+
+testTriggers(triggerID, trigs)
+--------------------------------
+Tests the available triggers, determines whether they are active or not, and runs the specified Lua code.
+--------------------------------
+triggerID	: number	: The NPC ID of the trigger NPC
+trigs		: Trigger table : A table of trigger objects, which should contain all triggers in the level
+
+
+
+INTERNAL USE:
+These functions are used internally to run the trigger system, and are not necessary outside the library itself.
+
+withinSquare(x,y,sqx,sqy)
+--------------------------------
+Determines if the point (x,y) is within one SMBX tile of the point (sqx,sqy).
+--------------------------------
+x		: number	: The x coordinate of the first point
+y		: number	: The y coordinate of the first point
+sqx		: number	: The x coordinate of the second point
+sqy		: number	: The y coordinate of the second point
+
+
+getTrigger(npc,tx,ty)
+--------------------------------
+Determines whether the given npc is active and at the given position.
+--------------------------------
+npc		: NPC		: The NPC to check
+tx		: number	: The x coordinate of the trigger position
+ty		: number	: The y coordinate of the trigger position
+
+
+resetTrigger(npc, eventName)
+--------------------------------
+Resets the trigger for later use.
+--------------------------------
+npc		: NPC		: The NPC to reset
+eventName	: string	: OPTIONAL : The event to run after resetting the NPC. Typically, this hides the trigger layer so it can be re-activated
