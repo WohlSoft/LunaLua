@@ -138,7 +138,7 @@ void fixup_WarpLimit();
 void fixup_Credits();
 void fixup_Mushbug();
 void fixup_NativeFuncs();
-
+void fixup_BGODepletion();
 
 //scraped for now..... D:
 void RuntimePatch();

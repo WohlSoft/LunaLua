@@ -242,4 +242,21 @@ void fixup_NativeFuncs()
     Reconstructed::Util::npcToCoins_setup();
 }
 
+__declspec(naked) static void fixup_BGODepletionASM()
+{
+    // Replaces the following code:
+    // 008D9010 | 66 89 1D E4 B9 B2 00 | mov word ptr ds:[B2B9E4],bx
+    __asm {
+        MOV WORD PTR DS : [0xB250D6], BX
+        MOV WORD PTR DS : [0xB2B9E4], BX
+        PUSH 0x8D9017
+        RET
+    }
+}
 
+void fixup_BGODepletion()
+{
+    *(BYTE*)(0x8D9010) = INSTR_NOP;
+    *(BYTE*)(0x8D9011) = INSTR_NOP;
+    PATCH_JMP(0x8D9012, fixup_BGODepletionASM);
+}

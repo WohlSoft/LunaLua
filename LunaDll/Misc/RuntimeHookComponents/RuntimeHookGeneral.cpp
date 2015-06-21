@@ -185,6 +185,7 @@ void TrySkipPatch()
     fixup_Credits();
     fixup_Mushbug();
     fixup_NativeFuncs();
+    fixup_BGODepletion();
     
     /************************************************************************/
     /* Replaced Imports                                                     */
