@@ -62,7 +62,7 @@ luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sec
             short id = thisnpc->id;
             short section = ::NPC::GetSection(thisnpc);
             return (id <= ::NPC::MAX_ID) && lookupTableNpcID.get()[id] &&
-                   (section <= 20) && lookupTableNpcID.get()[section];
+                (section <= 20) && lookupTableSectionID.get()[section];
         }, L);
 }
 

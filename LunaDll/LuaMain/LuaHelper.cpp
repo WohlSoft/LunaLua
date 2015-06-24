@@ -46,14 +46,11 @@ void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lu
 bool* LuaHelper::generateFilterTable(lua_State* L, luabind::object theFilter, int maxVal, int minVal /*= 1*/)
 {
     int mallocVal = maxVal + 1;
-
     bool* filterTable = (bool*)calloc(mallocVal, sizeof(bool));
-
     if (luabind::type(theFilter) == LUA_TNUMBER){
         int theID = luabind::object_cast<int>(theFilter);
-
         if (theID == -1){
-            memset(&filterTable, true, mallocVal*sizeof(bool));
+            memset((void*)filterTable, 0xFF, mallocVal*sizeof(bool));
         }
         else{
             if (theID < minVal || theID > maxVal){
