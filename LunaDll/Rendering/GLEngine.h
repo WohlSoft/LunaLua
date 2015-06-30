@@ -34,8 +34,8 @@ public:
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };
-    inline bool Enable() { mEnabled = true; }
-    inline bool Disable() { mEnabled = false; }
+    inline void Enable() { mEnabled = true; }
+    inline void Disable() { mEnabled = false; }
 
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,

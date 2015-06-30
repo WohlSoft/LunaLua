@@ -43,6 +43,8 @@ public:
     void EndFrame(HDC hdcDest);
 
     inline bool IsEnabled() { return mGLEngine.IsEnabled(); };
+    inline void Enable() { mGLEngine.Enable(); };
+    inline void Disable() { mGLEngine.Disable(); };
 };
 
 // Instance

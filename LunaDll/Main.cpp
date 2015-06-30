@@ -22,6 +22,7 @@
 #include "SdlMusic/MusicManager.h"
 #include "Misc/Playground.h"
 #include "Rendering/GLEngine.h"
+#include "Rendering/GLInitTest.h"
 
 #define PATCHIT 1
 
@@ -67,6 +68,13 @@ void LunaDLLInit()
 #if PATCHIT
     TrySkipPatch();
 #endif // PATCHIT
+
+    // Test OpenGL support
+    if (LunaDLLTestGLFeatures()) {
+        g_GLEngine.Enable();
+    } else {
+        g_GLEngine.Disable();
+    }
 
     // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
     DWORD curProcessor = GetCurrentProcessorNumberXP();
