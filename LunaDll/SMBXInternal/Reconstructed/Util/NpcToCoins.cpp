@@ -194,8 +194,8 @@ void __stdcall Reconstructed::Util::npcToCoins()
                             //And play the sound for it
                             native_playSFX(&soundID_GotLife);
                             (GM_PLAYER_LIVES)++;
+                            (GM_COINS) -= 100; //and really, really remove those 100 coins.
                         }
-                        (GM_COINS) -= 100; //and really, really remove those 100 coins.
                     }
                     //Now put up the kill flags for the transformed npcs
                     nextNPC->killFlag = 9; // 9 = vanish
