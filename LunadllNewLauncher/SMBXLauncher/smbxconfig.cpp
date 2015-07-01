@@ -11,12 +11,15 @@ SMBXConfig::SMBXConfig(QObject *parent) :
     QObject(parent)
 {
     m_Autostart = new AutostartConfig();
+    m_Controls = new ControlConfig();
 }
 
 SMBXConfig::~SMBXConfig()
 {
     delete m_Autostart;
 }
+
+
 
 QVariantList SMBXConfig::getEpisodeInfo(const QString& subDirPerEpisode, const QString& jsonFileName)
 {
@@ -27,7 +30,6 @@ QVariantList SMBXConfig::getEpisodeInfo(const QString& subDirPerEpisode, const Q
         //dbg("Did not find worlds folder");
         return QVariantList();
     }
-
 
     foreach (QFileInfo fileInfo, worldsDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         if(!fileInfo.isDir()){
