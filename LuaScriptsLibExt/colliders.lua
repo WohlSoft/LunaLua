@@ -1,5 +1,5 @@
 --colliders.lua 
---v2.0.0
+--v2.0.0.1
 --Created by Hoeloe, 2015
 local colliders = {}
 
@@ -881,7 +881,7 @@ end
 function colliders.bounce(a,b)
 	local ta = getType(a);
 	
-	if(ta.TYPE ~= nil) then
+	if(a.TYPE ~= nil) then
 		error("Cannot check if an unmoving collider type (Box or Circle) is bouncing!",2);
 	end
 	
