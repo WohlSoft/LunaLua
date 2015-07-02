@@ -234,9 +234,15 @@ int HUDHook()
 }
 
 void OnHUDDraw() {
-
 	if(gShowDemoCounter)
 		gDeathCounter.Draw();
+
+    if (gLunaLua.isValid()) {
+        Event inputEvent("onHUDDraw", false);
+        inputEvent.setDirectEventName("onHUDDraw");
+        inputEvent.setLoopable(false);
+        gLunaLua.callEvent(&inputEvent);
+    }
 
 	gSpriteMan.RunSprites();
 	gLunaRender.RenderAll();
