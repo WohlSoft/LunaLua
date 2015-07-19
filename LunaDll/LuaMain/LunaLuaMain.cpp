@@ -243,8 +243,7 @@ void CLunaLua::bindAll()
             namespace_("Text")[
                 def("windowDebug", &LuaProxy::Text::windowDebug),
                 def("print", (void(*)(const char*, int, int)) &LuaProxy::Text::print),
-                def("print", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print),
-                def("showMessageBox", &LuaProxy::Text::showMessageBox)
+                def("print", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print)
             ],
 
             namespace_("Graphics")[
