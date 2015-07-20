@@ -166,6 +166,7 @@
     <ClInclude Include="libs\luasocket\wsocket.h" />
     <ClInclude Include="Misc\RunningStat.h" />
     <ClInclude Include="Rendering\GLInitTest.h" />
+    <ClInclude Include="Rendering\GLSprite.h" />
     <ClInclude Include="SMBXInternal\Menu.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="Rendering\GLEngine.cpp" />
     <ClCompile Include="Rendering\GLEngineProxy.cpp" />
     <ClCompile Include="Rendering\GLInitTest.cpp" />
+    <ClCompile Include="Rendering\GLSprite.cpp" />
     <ClCompile Include="Rendering\GLTextureStore.cpp" />
     <ClCompile Include="Rendering\RenderOps\RenderGLOp.cpp" />
     <ClCompile Include="Rendering\RenderOverrides.cpp" />

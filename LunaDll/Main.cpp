@@ -119,7 +119,7 @@ int OnLvlLoad() {
 
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
-    g_GLEngine.ClearSMBXTextures();
+    g_GLEngine.ClearSMBXSprites();
 
 	if(gLunaEnabled) {
 		// Load autocode

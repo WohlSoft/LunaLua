@@ -414,6 +414,9 @@
     <ClInclude Include="Rendering\GLInitTest.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\GLSprite.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -786,6 +789,9 @@
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\GLInitTest.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GLSprite.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>

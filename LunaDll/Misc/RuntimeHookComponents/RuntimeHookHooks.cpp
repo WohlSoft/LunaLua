@@ -128,7 +128,7 @@ extern int __stdcall LoadWorld()
     Input::ResetAll();
 
     gLunaRender.ReloadScreenHDC();
-    g_GLEngine.ClearSMBXTextures();
+    g_GLEngine.ClearSMBXSprites();
 
     // Init var bank
     gSavedVarBank.TryLoadWorldVars();
@@ -491,7 +491,7 @@ extern void __stdcall checkLevelShutdown()
             PGE_MusPlayer::MUS_stopMusic();
             PGE_Sounds::clearSoundBuffer();
         }
-        g_GLEngine.ClearSMBXTextures();
+        g_GLEngine.ClearSMBXSprites();
     }
 
     __asm{

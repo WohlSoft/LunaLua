@@ -74,7 +74,7 @@ struct GLEngineCmd {
         } mDraw2DArray;
     } mData;
 
-    static inline GLEngineCmd ClearSMBXTextures() {
+    static inline GLEngineCmd ClearSMBXSprites() {
         GLEngineCmd cmd;
 
         cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES;
