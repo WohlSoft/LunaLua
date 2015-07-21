@@ -76,6 +76,18 @@ void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImag
     placeSprite(type, img.imgResource, xPos, yPos, "");
 }
 
+
+void LuaProxy::Graphics::unplaceSprites(const LuaImageResource& img, int xPos, int yPos)
+{
+    gSpriteMan.ClearSprites(img.imgResource, xPos, yPos);
+}
+
+void LuaProxy::Graphics::unplaceSprites(const LuaImageResource& img)
+{
+    gSpriteMan.ClearSprites(img.imgResource);
+}
+
+
 void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t color)
 {   
     // Convert RGB to RGBA

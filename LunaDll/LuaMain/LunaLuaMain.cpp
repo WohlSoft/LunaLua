@@ -256,6 +256,8 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
+                def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img))&LuaProxy::Graphics::unplaceSprites),
+                def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
                 // glDrawTriangles will be defined at runtime using FFI

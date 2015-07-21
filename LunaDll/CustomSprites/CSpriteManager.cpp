@@ -253,6 +253,44 @@ void CSpriteManager::ClearAllSprites() {
 	}
 }
 
+
+void CSpriteManager::ClearSprites(int imgResourceCode, int xPos, int yPos)
+{
+    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
+    std::list<CSprite*>::iterator end = m_SpriteList.end();
+
+    while (iter != m_SpriteList.end()) {
+        //CSprite* spr = *iter;
+        CSprite* next = *iter;
+        if (next->m_ImgResCode == imgResourceCode && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos){
+            delete (*iter);
+            iter = m_SpriteList.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+
+void CSpriteManager::ClearSprites(int imgResourceCode)
+{
+    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
+    std::list<CSprite*>::iterator end = m_SpriteList.end();
+
+    while (iter != m_SpriteList.end()) {
+        //CSprite* spr = *iter;
+        CSprite* next = *iter;
+        if (next->m_ImgResCode == imgResourceCode){
+            delete (*iter);
+            iter = m_SpriteList.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+}
+
+
 // BASIC INIT
 void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) {
 	spr->m_Xpos = pReq->x;
@@ -306,3 +344,4 @@ void CSpriteManager::GetComponents(int code, std::list<SpriteComponent*>* compon
 		}
 	}
 }
+

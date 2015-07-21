@@ -49,6 +49,8 @@ struct CSpriteManager {
 	
 	void ClearInvalidSprites(); // Don't call while iterating
 	void ClearAllSprites();
+    void ClearSprites(int imgResourceCode, int xPos, int yPos);
+    void ClearSprites(int imgResourceCode);
 
 	void AddSprite(CSprite* spr);
 
