@@ -68,7 +68,7 @@ const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
 
     // Try to allocate the GLSprite
     GLSprite* sprite;
-    sprite = new GLSprite(pData, GL_BGRA, 0, 0, w, h);
+    sprite = GLSprite::Create(pData, GL_BGRA, w, h);
 
     // Deallocate temporary conversion memory
     DeleteObject(convHBMP);

@@ -417,6 +417,9 @@
     <ClInclude Include="Rendering\GLSprite.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\GLSplitSprite.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -792,6 +795,9 @@
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\GLSprite.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GLSplitSprite.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
