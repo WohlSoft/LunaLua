@@ -76,9 +76,9 @@ void GLEngine::Init() {
     mHadError = false;
 }
 
-void GLEngine::ClearSMBXTextures() {
+void GLEngine::ClearSMBXSprites() {
     g_GLDraw.UnbindTexture();
-    g_GLTextureStore.ClearSMBXTextures();
+    g_GLTextureStore.ClearSMBXSprites();
 }
 
 void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
@@ -112,12 +112,12 @@ void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, H
         break;
     }
 
-    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromSMBXBitmap(hdcSrc);
-    if (tex == NULL) {
+    const GLSprite* sprite = g_GLTextureStore.SpriteFromSMBXBitmap(hdcSrc);
+    if (sprite == NULL) {
         return;
     }
 
-    g_GLDraw.DrawSprite(nXDest, nYDest, nWidth, nHeight, tex, nXSrc, nYSrc, mode);
+    sprite->Draw(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, mode);
 }
 
 BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,

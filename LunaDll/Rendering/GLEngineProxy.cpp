@@ -46,7 +46,7 @@ void GLEngineProxy::ThreadMain() {
 void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
     switch (cmd.mCmd) {
     case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
-        mGLEngine.ClearSMBXTextures();
+        mGLEngine.ClearSMBXSprites();
         mPendingClear--;
         break;
     case GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE:
@@ -152,8 +152,8 @@ void GLEngineProxy::QueueCmd(const GLEngineCmd cmd) {
 }
 
 
-void GLEngineProxy::ClearSMBXTextures() {
-    QueueCmd(GLEngineCmd::ClearSMBXTextures());
+void GLEngineProxy::ClearSMBXSprites() {
+    QueueCmd(GLEngineCmd::ClearSMBXSprites());
 }
 void GLEngineProxy::ClearLunaTexture(const BMPBox& bmp) {
     QueueCmd(GLEngineCmd::ClearLunaTexture(bmp));

@@ -11,8 +11,8 @@ private:
 public:
     struct Texture {
         GLuint name;
-        uint32_t w;
-        uint32_t h;
+        int32_t w;
+        int32_t h;
     };
     enum RenderMode {
         RENDER_MODE_ALPHA,

@@ -29,7 +29,7 @@ protected:
 public:
     GLEngine();
     ~GLEngine();
-    void ClearSMBXTextures();
+    void ClearSMBXSprites();
     void ClearLunaTexture(const BMPBox& bmp);
 
     // External commands

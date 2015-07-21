@@ -32,7 +32,7 @@ public:
     void GLEngineProxy::QueueCmd(const GLEngineCmd cmd);
 
     // Convenience command functions
-    void ClearSMBXTextures();
+    void ClearSMBXSprites();
     void ClearLunaTexture(const BMPBox& bmp);
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     void EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,

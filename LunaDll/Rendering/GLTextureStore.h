@@ -8,15 +8,16 @@
 #include <cstdint>
 #include "GLDraw.h"
 #include "BMPBox.h"
+#include "GLSprite.h"
 
 class GLTextureStore {
 public:
-    std::unordered_map<HDC, const GLDraw::Texture*> mSmbxTexMap;
+    std::unordered_map<HDC, const GLSprite*> mSmbxTexMap;
     std::unordered_map<const BMPBox*, const GLDraw::Texture*> mLunaTexMap;
     
     GLTextureStore();
-    void ClearSMBXTextures();
-    const GLDraw::Texture* TextureFromSMBXBitmap(HDC hdc);
+    void ClearSMBXSprites();
+    const GLSprite* SpriteFromSMBXBitmap(HDC hdc);
 
     void ClearLunaTexture(const BMPBox& bmp);
     const GLDraw::Texture* TextureFromLunaBitmap(const BMPBox& bmp);
