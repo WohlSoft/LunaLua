@@ -249,6 +249,9 @@ void TrySkipPatch()
     PATCH_JMP(0x4242D0, &BitBltHook);
     PATCH_JMP(0x424314, &StretchBltHook);
 
+    PATCH_FUNC(0x8E54EC, &MessageBoxOpenHook);
+    *(BYTE*)(0x8E54F1) = INSTR_NOP;
+
     // Hook to fix 100% CPU when window is inactive
     *(BYTE*)(0x8E6FE1) = INSTR_NOP;
     PATCH_FUNC(0x8E6FE2, &WindowInactiveHook);

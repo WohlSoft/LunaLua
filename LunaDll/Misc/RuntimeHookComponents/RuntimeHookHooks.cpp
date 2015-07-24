@@ -788,3 +788,21 @@ extern void __stdcall FrameTimingMaxFPSHook()
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHook();
 }
+
+extern short __stdcall MessageBoxOpenHook()
+{
+    // A note here: If the message is set, then the message box will called
+    // However, if a message is not set, then this function is called when the menu opens.
+    if (GM_STR_MSGBOX){
+        if (GM_STR_MSGBOX.length() > 0){
+            if (gLunaLua.isValid()){
+                Event messageBoxEvent("onMessageBox", false);
+                messageBoxEvent.setDirectEventName("onMessageBox");
+                messageBoxEvent.setLoopable(false);
+                gLunaLua.callEvent(&messageBoxEvent, (std::string)GM_STR_MSGBOX);
+            }
+        }
+    }
+    
+    return (short)GM_PLAYERS_COUNT;
+}

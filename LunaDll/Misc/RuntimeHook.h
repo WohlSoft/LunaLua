@@ -102,7 +102,7 @@ extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
-
+extern short __stdcall MessageBoxOpenHook();
 /************************************************************************/
 /* Libs                                                                 */
 /************************************************************************/
