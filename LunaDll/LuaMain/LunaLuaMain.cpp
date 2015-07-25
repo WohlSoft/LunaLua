@@ -886,6 +886,8 @@ void CLunaLua::doEvents()
     {
         err = true;
     }
+    err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+    
     if(err)
         shutdown();
 

@@ -26,6 +26,7 @@ It is a attempt to merge lunaworld.lua and lunadll.lua in one state.
 --LunaLua Version
 
 __LUNALUA = "0.7"
+__isLuaError = false
 
 --Constants used by Lunadll. Do not modify them, or Lunadll with crash. 
 -- ==DANGER ZONE START==
@@ -478,7 +479,8 @@ eventManager = setmetatable({ --Normal table
                     local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
                     if(not returns[1])then
                         windowDebug(returns[2])
-                        error()
+                        __isLuaError = true
+                        return
                     end
                     if(eventReturn ~= nil)then
                         table.remove(returns, 1)
@@ -494,7 +496,8 @@ eventManager = setmetatable({ --Normal table
                 local returns = {__xpcall(__lunaworld[eventManager.nextEvent],...)}
                 if(not returns[1])then
                     windowDebug(returns[2])
-                    error()
+                    __isLuaError = true
+                    return
                 end
                 table.remove(returns, 1)
                 eventReturn = returns
@@ -506,7 +509,8 @@ eventManager = setmetatable({ --Normal table
                 local returns = {__xpcall(__lunalocal[eventManager.nextEvent],...)}
                 if(not returns[1])then
                     windowDebug(returns[2])
-                    error()
+                    __isLuaError = true
+                    return
                 end
                 table.remove(returns, 1)
                 eventReturn = returns
@@ -518,7 +522,8 @@ eventManager = setmetatable({ --Normal table
                 local returns = {__xpcall(__lunaoverworld[eventManager.nextEvent],...)}
                 if(not returns[1])then
                     windowDebug(returns[2])
-                    error()
+                    __isLuaError = true
+                    return
                 end
                 table.remove(returns, 1)
                 eventReturn = returns
@@ -532,7 +537,8 @@ eventManager = setmetatable({ --Normal table
                     local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
                     if(not returns[1])then
                         windowDebug(returns[2])
-                        error()
+                        __isLuaError = true
+                        return
                     end
                     if(eventReturn ~= nil)then
                         table.remove(returns, 1)
