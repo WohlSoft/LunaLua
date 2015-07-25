@@ -8,15 +8,18 @@ void LuaProxy::Text::windowDebug(const char *debugText){
     MessageBoxA(0, debugText, "Debug", 0);
 }
 
-void LuaProxy::Text::print(const char *text, int x, int y)
+void LuaProxy::Text::print(const luabind::object& toPrint, int x, int y)
 {
-    LuaProxy::Text::print(text, 3, x, y);
+    LuaProxy::Text::print(toPrint, 3, x, y);
 }
 
 
-void LuaProxy::Text::print(const char *text, int type, int x, int y)
+void LuaProxy::Text::print(const luabind::object& toPrint, int type, int x, int y)
 {
-    std::wstring txt = utf8_decode(std::string(text));
+    lua_State* L = toPrint.interpreter();
+    // FIXME: Use better method than calling the tostring function directly! (defensive programming?)
+    std::wstring txt = utf8_decode(luabind::call_function<std::string>(L, "tostring", toPrint));
+    
     if (type == 3)
         for (wstring::iterator it = txt.begin(); it != txt.end(); ++it)
             *it = towupper(*it);

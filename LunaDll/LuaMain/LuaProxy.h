@@ -757,8 +757,8 @@ namespace LuaProxy {
     //Debug/Text functions
     namespace Text{
         void windowDebug(const char* debugText);
-        void print(const char *text, int x, int y);
-        void print(const char *text, int type, int x, int y);
+        void print(const luabind::object& toPrint, int x, int y);
+        void print(const luabind::object& toPrint, int type, int x, int y);
         void showMessageBox(const std::string &text);
     }
     //General functions

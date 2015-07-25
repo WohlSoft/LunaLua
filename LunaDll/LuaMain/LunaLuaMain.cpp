@@ -242,8 +242,8 @@ void CLunaLua::bindAll()
 
             namespace_("Text")[
                 def("windowDebug", &LuaProxy::Text::windowDebug),
-                def("print", (void(*)(const char*, int, int)) &LuaProxy::Text::print),
-                def("print", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print)
+                def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
+                def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print)
             ],
 
             namespace_("Graphics")[
@@ -786,8 +786,8 @@ void CLunaLua::bindAllDeprecated()
             def("getSMBXPath", &LuaProxy::Native::getSMBXPath), //DONE
             def("simulateError", &LuaProxy::Native::simulateError), //DONE
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
-            def("printText", (void(*)(const char*, int, int)) &LuaProxy::Text::print), //DONE
-            def("printText", (void(*)(const char*, int, int, int)) &LuaProxy::Text::print), //DONE
+            def("printText", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print), //DONE
+            def("printText", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print), //DONE
             def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage), //DONE
             def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite), //DONE
             def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite), //DONE
