@@ -60,7 +60,13 @@ local defines = {
                                         n = 2, group = "Game Exit", desc = "How many coins get subtracted from the coin-value when the coin value hits 100 coins. "..
                                                                                     "The npc-to-coins function is executed when the player hits an exit, which transforms "..
                                                                                     "the npcs into coins."},
-    
+    smb3RouletteScoreValueStar      = {defValue = 10,  minVal = 1, maxVal = 12,  address = 0x00A266AC, size = FIELD_DWORD,
+                                        n = 3, group = "Game Exit", desc = "The score value of smb3 roulette star"},
+    smb3RouletteScoreValueMushroom  = {defValue = 6,   minVal = 1, maxVal = 12,  address = 0x00A26719, size = FIELD_DWORD,
+                                        n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},
+    smb3RouletteScoreValueFlower    = {defValue = 8,   minVal = 1, maxVal = 12,  address = 0x00A2677E, size = FIELD_DWORD,
+                                        n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},    
+                                        
     --[[ Coin Value Defines ]]--
     coinValue                       = {defValue = 1  , minVal = 0, maxVal = 99 , address = 0x00A262BD, size = FIELD_BYTE,
                                         n = 1, group = "Coin Value", desc = "How much a coin npc is worth as coins. It will affect every coin-npc which has a 1-coin value "..
