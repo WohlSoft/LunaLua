@@ -1,0 +1,15 @@
+--This can go in your lunaworld.lua (if you wanted to set a constant time for each level) or in your
+--lunadll.lua file if you wanted it on a per level basis.
+--Usage is SIMILAR to the death counter, a little more is needed though
+
+
+--We declare an instance of the timerApi, like the death counter
+timerApi = loadAPI("leveltimer");
+
+function onLoad()  
+	--But now in the onLoad override, we set a few values
+	timerApi.setSecondsLeft(300);
+ --For one, we need to set the timer value. No greater than 999
+	timerApi.setTimerState(true);
+ --Then, we need to make sure we enable it. It's not enabled by default
+end

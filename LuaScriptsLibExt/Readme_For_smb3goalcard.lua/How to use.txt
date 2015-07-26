@@ -1,0 +1,13 @@
+HOW TO USE
+
+--SETUP--
+1 . Copy/Paste the smb3goalcard.lua file and smb3goalcard folder into your LuaScriptsLib folder which should be in the root of your SMBX folder. (../SMBX/LuaScriptsLib/)
+
+--IMPLEMENTING INTO YOUR SMBX EPISODE/LEVEL--
+1 . Make a new file in your worlds folder called LunaWorld.lua.
+2 . Add " smb3card = loadAPI("smb3goalcard"); " to the file.
+3 . In your onLoad function, you can toggle the card function on/off
+with " smb3card.usesCard(TRUE/FALSE); "
+4 . If you want to have a certain level not use the card function, or if
+it doesn't have a card, add the above line, set it to false, and put it
+into a LunaDll.lua file in that levels graphic folder.

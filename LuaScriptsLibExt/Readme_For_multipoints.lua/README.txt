@@ -1,23 +1,35 @@
-Multipoints is a library that enhances SMBX midpoints. It allows for multiple midpoints to be placed in a level, and for the player to spawn at a different location to the midpoint itself. It can also expand midpoints in other ways, though these are more advanced. It requires a little bit of setup, but the steps involved are listed here.
+Multipoints is a library that enhances SMBX midpoints. It allows for multiple checkpoints to be placed in a level, and for the player to spawn at a different location to the checkpoint itself. It can also expand checkpoints in other ways, though these are more advanced.
 
---------------------------------------------------------------------------------------------------------------------------
-THIS LIBRARY REQUIRES THE LUA TRIGGER LIBRARY (NOT INCLUDED, DOWNLOAD HERE: http://engine.wohlnet.ru/pgewiki/Triggers.lua)
---------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
 
-0. Install the Trigger library, and place the "multipoints.lua" file in your Lua directory.
+INSTALLATION
 
-1. Place a single SMBX midpoint on the ground in a location separate from the rest of the level. This can be in its own section, or in any point unreachable from playing the level. It is recommended to re-sprite the midpoint so that it is invisible.
+Drop the file "multipoints.lua" and the folder named "multipoints" into the LuaScriptsLib folder in your SMBX installation. Multipoints should now be installed!
 
-2. Create a Lua Trigger using the Trigger library (see the Trigger library "how to use" document). Make sure you know the ID of the NPC used to create the Trigger (an Axe is recommended). You do not need to do steps 6-9 in the "how to use" document, as these are done by the Multipoint library.
+-------------------------------------------------------------------------------------------------------------------------
 
-3. Re-sprite the Axe NPC as a midpoint. Alternatively, make the Axe NPC invisible, and use a background object re-sprited as a midpoint. Either way, make sure this object disappears when the player makes contact with the midpoint.
+USING MULTIPOINTS:
 
-4. Make the midpoint Axe call the Trigger (step 2) on Death.
+1. Find where you want to place your checkpoint, and keep track of the coordinates.
 
-5. Make a layer that hides the Multipoint midpoint and its hitbox. This will be used when we spawn having already collected the midpoint. Here, it will be referred to as "HideMidpointLayer", but any name will work.
+2. Import the Multipoints API using the code: multipoints = loadAPI("multipoints")
 
-6. Jump into lunadll.lua, and import Multipoints as an API. If you used an NPC other than the Axe as your Trigger, you will need to tell Multipoints using the triggerID value.
+3. Use the function "addLuaCheckpoint" to create your checkpoint. Pass the coordinates you found in step 1 to place the checkpoints, and fill in the section to spawn in. Optionally, you can specify spawn coordinates that differ from the checkpoint's position, and add a list of Lua function to call when spawning to the checkpoint (this is particularly useful if your Lua program changes state as you progress through the level).
 
-7. Use the function addMidpoint to create a new functioning midpoint. You must specify the coordinates of the Trigger NPC, the section containing the Multipoint midpoint, the spawn location, and the name of the "HideMidpointLayer" event. You can optionally also specify a list of Lua functions to call when spawning to that midpoint.
+4. You should now have a working checkpoint! You can repeat steps 1-3 as many times as you like to create multiple checkpoints!
 
-8. You should now have a working midpoint! You can repeat steps 2-7 as many times as you like to create multiple midpoints!
+ALTERNATIVE METHOD:
+
+The original setup of multipoints required the use of NPCs and events to create checkpoints. This has been kept for compatibility reasons but the newer method introduced in v2.1 is easier to implement and does not require NPCs or events. This alternative method also has some restricted functionality where multiple players are involved.
+
+1. Re-sprite the Axe NPC as a checkpoint. Alternatively, make the Axe NPC invisible, and use a background object re-sprited as a checkpoint. Either way, make sure this object disappears when the player makes contact with the checkpoint.
+
+2. Make the checkpoint Axe call a SMBX event on Death. This event does not need to do anything in SMBX, but make a note of the name. Here, it will be referred to as "GetCheckpoint", but any name will work.
+
+3. Make a layer that hides the Multipoint checkpoint and its hitbox. This will be used when we spawn having already collected the checkpoint. Here, it will be referred to as "HideCheckpointLayer", but any name will work.
+
+4. Jump into lunadll.lua, and import Multipoints as an API (see step 2 in the regular method).
+
+5. Use the function "addCheckpoint" to create a new functioning checkpoint. You must specify the name of the "GetCheckpoint" event, the section containing the Multipoint checkpoint, the spawn location, and the name of the "HideCheckpointLayer" event. You can optionally also specify a list of Lua functions to call when spawning to that checkpoint (this is particularly useful if your Lua program changes state as you progress through the level).
+
+6. You should now have a working checkpoint! You can repeat steps 1-5 as many times as you like to create multiple checkpoints!

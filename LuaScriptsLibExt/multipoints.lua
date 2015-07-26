@@ -1,6 +1,7 @@
 --multipoints.lua 
---v2.2.2
+--v3.0.0
 --Created by Hoeloe, 2015
+--With help from Rednaxela
 local multipoints = {}
 
 local playerMP = { sec = 0, x = 0, y = 0, act = nil }
@@ -9,9 +10,7 @@ multipoints.midpointCount = 0;
 local mpData;
 local mpTrigs;
 local mpLuaTrigs;
-multipoints.IMG_ID = 156932;
-multipoints.IMG_ALPHA = 0xFF00FF;
-multipoints.IMG_PATH = getSMBXPath().."\\LuaScriptsLib\\multipoints\\mp.bmp";
+multipoints.IMG_PATH = getSMBXPath().."\\LuaScriptsLib\\multipoints\\mp.png";
 multipoints.IMG_SIZE = { width = 32, height = 32 }
 
 local dataFile;
@@ -34,16 +33,18 @@ function multipoints.onInitAPI()
 	registerEvent(multipoints, "onEvent", "onEvent", true) --Register the SMBX triggers event
 end
 
-function multipoints.setImage(path, id, alpha)
+function multipoints.setImage(path)
 	if(path ~= nil) then multipoints.IMG_PATH = path end;
-	if(id ~= nil) then multipoints.IMG_ID = id end;
-	if(alpha ~= nil) then multipoints.IMG_ALPHA = alpha end;
-	loadImage(multipoints.IMG_PATH, multipoints.IMG_ID, multipoints.IMG_ALPHA);
+	
+	multipoints.IMG = Graphics.loadImage(multipoints.IMG_PATH);
+end
+
+function multipoints:onCollected(id)
 end
 
 local function getMP(i)
-		return function()
-				local mp = findnpcs(192, -1)[0]
+		return function(plyr)
+		
 				if((mpLuaTrigs[i] ~= nil and not mpLuaTrigs[i].obj.silent) or (mpTrigs[i] ~= nil and not mpTrigs[i].obj.silent)) then
 					playSFX(58);
 				end
@@ -56,18 +57,25 @@ local function getMP(i)
 				end
 				
 				if(p >= PLAYER_SMALL) then
-					if(player:mem(0x112,FIELD_WORD) < p and player:mem(0x122,FIELD_WORD) ~= 1 and player:mem(0x122,FIELD_WORD) ~= 2) then
-						player:mem(0x112,FIELD_WORD, p)
+					if(plyr == nil) then
+						if(player:mem(0x112,FIELD_WORD) < p and player:mem(0x122,FIELD_WORD) ~= 1 and player:mem(0x122,FIELD_WORD) ~= 2) then
+							player:mem(0x112,FIELD_WORD, p);
+						end
+						if(player2:mem(0x112,FIELD_WORD) < p and player2:mem(0x122,FIELD_WORD) ~= 1 and player2:mem(0x122,FIELD_WORD) ~= 2) then
+							player2:mem(0x112,FIELD_WORD, p);
+						end
+					elseif(plyr:mem(0x112,FIELD_WORD) < p and plyr:mem(0x122,FIELD_WORD) ~= 1 and plyr:mem(0x122,FIELD_WORD) ~= 2) then
+						plyr:mem(0x112,FIELD_WORD, p)
 					end
 				end
 				
-				if(mp ~= nil) then
-					mp.x = player.x;
-					mp.y = player.y;
-				end
 				dataFile:set("MPCheck_Get"..i,tostring(1));
 				dataFile:set("MPCheck_ID",tostring(i));
 				dataFile:save()
+				
+				mem(0x00B250B0, FIELD_STRING, mem(0x00B2C618, FIELD_STRING))
+				
+				multipoints.onCollected(multipoints.getCheckpoint(i), i)
 		end
 end
 
@@ -83,9 +91,9 @@ mpmt.__index =
 				elseif(k=="y") then
 					return mpLuaTrigs[t.id].y;
 				elseif(k == "collect") then
-					return function() 
+					return function(plyr) 
 						if(not t.collected) then
-							mpLuaTrigs[t.id].func();
+							mpLuaTrigs[t.id].func(plyr);
 						end
 					end
 				elseif(k == "collected") then
@@ -119,9 +127,9 @@ mpmt.__index =
 				elseif(k=="visible") then
 					return true;
 				elseif(k == "collect") then
-					return function() 
+					return function(plyr) 
 						if(not t.collected) then
-							mpTrigs[t.id].func();
+							mpTrigs[t.id].func(plyr);
 						end
 					end
 				elseif(k == "collected") then
@@ -202,6 +210,12 @@ function multipoints.getCheckpointStatus(id)
 	return tonumber(dataFile:get("MPCheck_Get"..id)) == 1;
 end
 
+function multipoints.getCheckpoint(id)
+	if(mpLuaTrigs[i] ~= nil) then return mpLuaTrigs[i].obj;
+	elseif(mpTrigs[i] ~= nil) then return mpTrigs[i].obj;
+	else return nil end;
+end
+
 function multipoints.resetMidpoints()
 			dataFile:set("MPCheck_ID",tostring(-1));
 			local i = 0;
@@ -210,6 +224,7 @@ function multipoints.resetMidpoints()
 				i = i + 1;
 			end
 			dataFile:save()
+			mem(0x00B250B0, FIELD_STRING, "")
 end
 
 function multipoints.onLoad()
@@ -227,12 +242,13 @@ function multipoints.update()
 			end
 		end
 		
-		local mp = findnpcs(192, -1)[0]
-		if mp == nil then
+		if (multipoints.getCheckpointID() == nil) or (multipoints.getCheckpointID() < 0) then
+			multipoints.resetMidpoints()
+			firstRun = false;
 			return
 		end
 		
-		if (mp:mem (0x44, FIELD_WORD) ~= 0)  or  (mp:mem(0x122, FIELD_WORD) ~= 0)   then
+		if (tostring(mem(0x00B250B0, FIELD_STRING)) == tostring(mem(0x00B2C618, FIELD_STRING))) then
 			local i = 0;
 			while(i < multipoints.midpointCount) do
 				if(multipoints.getCheckpointStatus(i) and mpData[i].hide ~= nil) then
@@ -243,9 +259,16 @@ function multipoints.update()
 				end
 				i = i + 1
 			end
+			playMusic(playerMP.sec)
 			player:mem(0x15A,FIELD_WORD,playerMP.sec);
 			player.x = playerMP.x;
 			player.y = playerMP.y - player:mem(0xD0,FIELD_DFLOAT) + 32;
+			if(player2 ~= nil) then
+				player.x = player.x + 16;
+				player2:mem(0x15A,FIELD_WORD,playerMP.sec);
+				player2.x = playerMP.x - 16;
+				player2.y = playerMP.y - player2:mem(0xD0,FIELD_DFLOAT) + 32;
+			end
 			if(playerMP.act ~= nil) then
 				playerMP.act();
 			end
@@ -258,9 +281,13 @@ function multipoints.update()
 	
 	for k,v in pairs(mpLuaTrigs) do
 		if(not v.spawnAt and not multipoints.getCheckpointStatus(k) and v.obj.visible) then
-			placeSprite(2,multipoints.IMG_ID,v.x,v.y,"",2);
-			if(player.x < v.x+multipoints.IMG_SIZE.width and player.x+player:mem(0xD8, FIELD_DFLOAT) > v.x and player.y < v.y+multipoints.IMG_SIZE.height and player.y + player:mem(0xD0, FIELD_DFLOAT) > v.y) then
-				v.func();
+			
+			Graphics.placeSprite(2,multipoints.IMG,v.x,v.y,"",2);
+			if(player.x < v.x+multipoints.IMG_SIZE.width and player.x+player:mem(0xD8, FIELD_DFLOAT) > v.x and player.y < v.y+multipoints.IMG_SIZE.height and player.y + player:mem(0xD0, FIELD_DFLOAT) > v.y)then
+				v.func(player);
+			end
+			if(player2 ~= nil and player2.x < v.x+multipoints.IMG_SIZE.width and player2.x+player2:mem(0xD8, FIELD_DFLOAT) > v.x and player2.y < v.y+multipoints.IMG_SIZE.height and player2.y + player2:mem(0xD0, FIELD_DFLOAT) > v.y) then
+				v.func(player2);
 			end
 		end
 	end
