@@ -2,11 +2,25 @@
 #ifndef Defines_hhhh
 #define Defines_hhhh
 
+#include "resource.h"
 #include <windows.h>
 #include "Misc/VB6StrPtr.h"
 
+// The version number is now defined in resource.h, as it now compiled as meta-data too.
+// If you want to define your "custom" version number anyway, then set NORMAL_VER_NUM to 0 and modify the LUNALUA_VERSION string.
+#define NORMAL_VER_NUM 1
+
+#if NORMAL_VER_NUM
+#define LUNALUA_VER_PREFIX   "LUNALUA V"
+#define LUNALUA_VER_SUFFIX   " BETA"
+#define LUNALUA_VERSION      LUNALUA_VER_PREFIX LUNALUA_VER_STR LUNALUA_VER_SUFFIX
+#else
+#define LUNALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
+#endif
+
+
+
 #define LUNA_VERSION        8
-#define LUALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
 #define COMBOOL(b) (b ? -1 : 0)
 

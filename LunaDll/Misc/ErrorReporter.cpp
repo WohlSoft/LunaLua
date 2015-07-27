@@ -80,7 +80,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     fullErrorDescription << "*                  Summary                       *\n";
     fullErrorDescription << "**************************************************\n";
     fullErrorDescription << "SMBX has crashed due an error. See the description for more information!\n";
-    fullErrorDescription << "LunaLua Version: " + std::string(LUALUA_VERSION) + "\n";
+    fullErrorDescription << "LunaLua Version: " + std::string(LUNALUA_VERSION) + "\n";
     fullErrorDescription << std::string("Time/Date: ") + generateTimestamp() + "\n";
     fullErrorDescription << "**************************************************\n";
     fullErrorDescription << "*              Description                       *\n";
