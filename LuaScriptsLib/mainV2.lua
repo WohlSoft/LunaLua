@@ -203,7 +203,11 @@ local function doAPI(apiName)
         for _,ending in pairs(endings) do
             func, err = loadfile(apiPath..apiName..ending)
             if(func)then
-                return func()
+                local returnVal = func()
+                if(type(returnVal) ~= "table")then
+                    error("API \""..apiName.."\" did not return the api-table (got "..type(returnVal)..")", 2)
+                end
+                return returnVal
             end
             if(not err:find("such file"))then
                 error(err,2)
