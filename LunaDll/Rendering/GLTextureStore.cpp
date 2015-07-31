@@ -99,7 +99,6 @@ void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
 
 const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
 {
-    GLDraw::Texture tex = { 0, 0, 0 };
     if (bmp.m_hbmp == NULL) return NULL;
 
     // Get associated texture from cache if possible
@@ -115,9 +114,8 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     GetObject(bmp.m_hbmp, sizeof(BITMAP), &bm);
     if (bm.bmBits == NULL) return NULL; // Wrong type of bitmap?
 
-    // Set width/height
-    tex.h = bm.bmHeight;
-    tex.w = bm.bmWidth;
+    // Create texture object with width/height
+    GLDraw::Texture tex(NULL, bm.bmWidth, bm.bmWidth);
 
     // Try to allocate texture
     glGenTextures(1, &tex.name);
@@ -129,10 +127,11 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 
     // Cache new texture
     GLDraw::Texture* pTex = new GLDraw::Texture(tex);

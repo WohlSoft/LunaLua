@@ -7,7 +7,10 @@
 // Instance
 GLDraw g_GLDraw;
 
-GLDraw::GLDraw() : mLastTexName(0)
+GLDraw::GLDraw() :
+    mLastTexName(0),
+    mLastPwScale(1.0f),
+    mLastPhScale(1.0f)
 {
 }
 
@@ -36,14 +39,14 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     if (nWidth <= 0) return;
 
     // Generate our floating point coordinates
-    float texw = (float)tex->w;
-    float texh = (float)tex->h;
+    float texw = (float)tex->pw;
+    float texh = (float)tex->ph;
     float x1 = (float)nXDest;
     float y1 = (float)nYDest;
     float x2 = x1 + nWidth;
     float y2 = y1 + nHeight;
-    float tx1 = nXSrc / texw;
-    float ty1 = nYSrc / texh;
+    float tx1 = (nXSrc + 0.0f) / texw;
+    float ty1 = (nYSrc + 0.0f) / texh;
     float tx2 = tx1 + nWidth / texw;
     float ty2 = ty1 + nHeight / texh;
 
@@ -137,14 +140,14 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight)
 {
     // Generate our floating point coordinates
-    float texw = (float)tex->w;
-    float texh = (float)tex->h;
+    float texw = (float)tex->pw;
+    float texh = (float)tex->ph;
     float x1 = (float)nXDest;
     float y1 = (float)nYDest;
     float x2 = x1 + nWidth;
     float y2 = y1 + nHeight;
-    float tx1 = nXSrc / texw;
-    float ty1 = nYSrc / texh;
+    float tx1 = (nXSrc + 0.0f) / texw;
+    float ty1 = (nYSrc + 0.0f) / texh;
     float tx2 = tx1 + nSrcWidth / texw;
     float ty2 = ty1 + nSrcHeight / texh;
 
