@@ -12,10 +12,8 @@
 GLEngine::GLEngine() :
     mInitialized(false), mHadError(false),
     mEnabled(true), mBitwiseCompat(true),
-    mFB(0), mColorRB(0), mDepthRB(0) {
-    mBufTex.w = 800;
-    mBufTex.h = 600;
-    mBufTex.name = NULL;
+    mFB(0), mColorRB(0), mDepthRB(0),
+    mBufTex(NULL, 800, 600) {
 }
 
 GLEngine::~GLEngine() {
@@ -32,11 +30,9 @@ void GLEngine::Init() {
     glGenFramebuffersANY(1, &mFB);
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
 
-    mBufTex.w = 800;
-    mBufTex.h = 600;
     glGenTextures(1, &mBufTex.name);
     g_GLDraw.BindTexture(&mBufTex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -219,7 +215,19 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     glColor4f(r*a, g*a, b*a, a);
 }
 
-void GLEngine::Draw2DArray(GLuint type, const float* vert, const float* tex, uint32_t count) {
+void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count) {
+    // Convert texel coordinates to what we need for our power-of-two padded textures
+    if (g_GLDraw.mLastPwScale != 1.0f) {
+        for (unsigned int idx = 0; idx < count * 2; idx += 2) {
+            tex[idx] *= g_GLDraw.mLastPwScale;
+        }
+    }
+    if (g_GLDraw.mLastPhScale != 1.0f) {
+        for (unsigned int idx = 1; idx < count * 2; idx += 2) {
+            tex[idx] *= g_GLDraw.mLastPhScale;
+        }
+    }
+
     glVertexPointer(2, GL_FLOAT, 0, vert);
     glTexCoordPointer(2, GL_FLOAT, 0, tex);
     glDrawArrays(type, 0, count);

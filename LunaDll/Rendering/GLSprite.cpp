@@ -24,17 +24,17 @@ GLSprite::GLSprite() {
 GLSprite::~GLSprite() {
 }
 
-GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint32_t dataHeight, uint32_t xOff, uint32_t yOff, uint32_t width, uint32_t height) {
+GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint32_t dataHeight, uint32_t xOff, uint32_t yOff, uint32_t width, uint32_t height) :
+    tex(0, width, height)
+{
     valid = false;
-    tex.h = height;
-    tex.w = width;
-    tex.name = 0;
 
     // Limit width/height
     if (xOff >= dataWidth) return;
     if (yOff >= dataHeight) return;
     if (dataWidth - xOff < width) width = dataWidth - xOff;
     if (dataHeight - yOff < height) height = dataHeight - yOff;
+    tex = GLDraw::Texture(0, width, height);
 
     // Try to allocate texture
     glGenTextures(1, &tex.name);
@@ -46,13 +46,14 @@ GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint3
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, dataWidth);
     char* subData = (char*)data + (xOff + yOff*dataWidth) * 4;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.w, tex.h, 0, format, GL_UNSIGNED_BYTE, subData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, format, GL_UNSIGNED_BYTE, subData);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
     valid = true;

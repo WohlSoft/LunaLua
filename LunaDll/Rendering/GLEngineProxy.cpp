@@ -110,7 +110,7 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
             mGLEngine.Draw2DArray(
                 cmd.mData.mDraw2DArray.type,
                 cmd.mData.mDraw2DArray.vert,
-                cmd.mData.mDraw2DArray.tex,
+                (float*)cmd.mData.mDraw2DArray.tex,
                 cmd.mData.mDraw2DArray.count);
         }
         free((void*)cmd.mData.mDraw2DArray.vert);
