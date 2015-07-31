@@ -121,6 +121,7 @@ extern int __stdcall LoadWorld()
 
     gSkipSMBXHUD = false;
     gIsOverworld = true;
+    gOverworldHudControlFlag = WHUD_ALL;
     gLunaRender.ClearAll();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
@@ -811,7 +812,32 @@ extern short __stdcall MessageBoxOpenHook()
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
-    if (gHudControlFlag == WHUD_ALL){
+    if (gOverworldHudControlFlag == WHUD_ALL){
         native_print(Text, fonttype, x, y);
     }
+}
+
+extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
+{
+    if (gOverworldHudControlFlag == WHUD_NONE)
+        return -1;
+
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+
+extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
+{
+    if (gOverworldHudControlFlag == WHUD_NONE || gOverworldHudControlFlag == WHUD_ONLY_OVERLAY)
+        return -1;
+
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+
+extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* momentumObj)
+{
+    if (gOverworldHudControlFlag == WHUD_NONE)
+        return native_isOnCamera(camIndex, momentumObj);
+    return native_isOnWCamera(camIndex, momentumObj);
 }

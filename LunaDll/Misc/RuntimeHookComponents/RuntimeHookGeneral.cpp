@@ -240,6 +240,73 @@ void TrySkipPatch()
 
     PATCH_FUNC(0xA755D2, &UpdateInputHook_Wrapper);
 
+    
+    PATCH_FUNC(0x902D3D, &WorldOverlayHUDBitBltHook);
+    PATCH_FUNC(0x902DFC, &WorldOverlayHUDBitBltHook);
+    PATCH_FUNC(0x902EBB, &WorldOverlayHUDBitBltHook);
+    PATCH_FUNC(0x902F80, &WorldOverlayHUDBitBltHook);
+
+    PATCH_FUNC(0x908995, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9087A8, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9085BB, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9083CE, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x908115, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x907F28, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x907D3B, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x907B4E, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9077FD, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x907537, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9072B2, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90702D, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x906DB2, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9055CE, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x905304, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9051A7, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x905055, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x904F24, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x908995, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x904D4F, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9062E0, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x906183, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x906031, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x905F00, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x905D29, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x905990, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9065DE, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x906973, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90499A, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9046D0, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x904573, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x904421, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9042F0, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90411B, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x906B31, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x903D66, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9063FF, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x903A9C, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90393F, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9037ED, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9036BC, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9034E7, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9032E9, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90323D, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x90319F, &WorldIconsHUDBitBltHook);
+    PATCH_FUNC(0x9030F2, &WorldIconsHUDBitBltHook);
+
+
+    PATCH_FUNC(0x9000B2, &WorldHUDIsOnCameraHook);
+    PATCH_FUNC(0x900235, &WorldHUDIsOnCameraHook);
+    PATCH_FUNC(0x9004B7, &WorldHUDIsOnCameraHook);
+    PATCH_FUNC(0x90068F, &WorldHUDIsOnCameraHook);
+
+    PATCH_FUNC(0x901439, &WorldHUDPrintTextController);
+    PATCH_FUNC(0x90266A, &WorldHUDPrintTextController);
+    PATCH_FUNC(0x907611, &WorldHUDPrintTextController);
+    PATCH_FUNC(0x9081E7, &WorldHUDPrintTextController);
+    PATCH_FUNC(0x908B03, &WorldHUDPrintTextController);
+    PATCH_FUNC(0x908A67, &WorldHUDPrintTextController);
+
+    
     // Graphics Bitblt hooks
     PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);
     PATCH_FUNC(0x8D8BF1, &LoadLocalGfxHook);
@@ -294,3 +361,4 @@ void TrySkipPatch()
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
 }
+

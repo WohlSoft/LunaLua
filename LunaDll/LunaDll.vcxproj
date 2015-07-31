@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="SMBXInternal\CameraInfo.h" />
     <ClInclude Include="GameConfig\GameAutostart.h" />
     <ClInclude Include="GameConfig\GameConfiguration.h" />
     <ClInclude Include="httprequest.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="libs\luasocket\timeout.c" />
     <ClCompile Include="libs\luasocket\udp.c" />
     <ClCompile Include="libs\luasocket\wsocket.c" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp" />
     <ClCompile Include="Misc\MemoryScanner\MemoryScanner.cpp" />
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp" />

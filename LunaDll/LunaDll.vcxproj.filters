@@ -420,6 +420,9 @@
     <ClInclude Include="Rendering\GLSplitSprite.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\CameraInfo.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -799,6 +802,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\GLSplitSprite.cpp">
       <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

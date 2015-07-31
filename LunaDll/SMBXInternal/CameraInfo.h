@@ -1,9 +1,9 @@
-#ifndef CameraInfo_Hhhh
-#define CameraInfo_Hhhh
+#ifndef SMBX_CameraInfo_Hhhh
+#define SMBX_CameraInfo_Hhhh
 
 #include "../Defines.h"
 
-class CameraInfo
+class SMBX_CameraInfo
 {
 public:
     short unknown00;
@@ -29,9 +29,21 @@ public:
     short unknown34;
     short unknown36;
 
-    static inline CameraInfo* Get(unsigned short index) {
-        if (index >= 3) return NULL;
-        return &((CameraInfo*)GM_CAMINFO)[index];
+    static const int MAX_CAMERAINFO = 3;
+
+    static inline SMBX_CameraInfo* Get(unsigned short index) {
+        if (index >= MAX_CAMERAINFO) return NULL;
+        return &((SMBX_CameraInfo*)GM_CAMINFO)[index];
+    }
+
+    static inline double getCameraX(unsigned short index) {
+        if (index >= 201) return 0;
+        return -((double*)GM_CAMERA_X)[index];
+    }
+
+    static inline double getCameraY(unsigned short index) {
+        if (index >= 201) return 0;
+        return -((double*)GM_CAMERA_Y)[index];
     }
 };
 

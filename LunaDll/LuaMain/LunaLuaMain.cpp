@@ -208,6 +208,10 @@ void CLunaLua::setupDefaults()
     _G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
     _G["KEY_STR"] = GM_PLAYER_KEY_STR;
 
+    _G["WHUD_ALL"] = WHUD_ALL;
+    _G["WHUD_ONLY_OVERLAY"] = WHUD_ONLY_OVERLAY;
+    _G["WHUD_NONE"] = WHUD_NONE;
+
     _G["ODIR_UP"] = 1;
     _G["ODIR_LEFT"] = 2;
     _G["ODIR_DOWN"] = 3;
@@ -547,6 +551,17 @@ void CLunaLua::bindAll()
 #pragma endregion
 #endif
 
+            class_<LuaProxy::Camera>("Camera")
+            .scope[ //static functions
+                def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Camera::get)),
+                def("getX", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getX)),
+                def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
+            ]
+            .property("x", &LuaProxy::Camera::x)
+            .property("y", &LuaProxy::Camera::y)
+            .property("width", &LuaProxy::Animation::width)
+            .property("height", &LuaProxy::Animation::height),
+
 
             def("newRECT", &LuaProxy::newRECT),
             def("newRECTd", &LuaProxy::newRECTd),
@@ -570,6 +585,9 @@ void CLunaLua::bindAll()
     if(m_type == LUNALUA_WORLD){
         module(L)
             [
+                namespace_("Graphics")[
+                    def("activateOverworldHud", &LuaProxy::Graphics::activateOverworldHud)
+                ],
 
                 class_<LuaProxy::World>("World")
                 .property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
@@ -581,6 +599,7 @@ void CLunaLua::bindAll()
                 .property("playerIsCurrentWalking", &LuaProxy::World::playerIsCurrentWalking)
                 .property("levelTitle", &LuaProxy::World::levelTitle)
                 .property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
+                .property("playerPowerup", &LuaProxy::World::playerPowerup, &LuaProxy::World::setPlayerPowerup)
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 

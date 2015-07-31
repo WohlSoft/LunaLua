@@ -9,6 +9,7 @@
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 #include "LuaHelper.h"
+#include "../Defines.h"
 
 namespace LuaProxy {
     enum L_FIELDTYPE{
@@ -644,6 +645,8 @@ namespace LuaProxy {
         bool playerIsCurrentWalking() const;
         luabind::object levelTitle(lua_State* L);
         short getCurrentDirection() const;
+        short playerPowerup() const;
+        void setPlayerPowerup(short playerPowerup);
     };
 
     class LevelObject
@@ -749,6 +752,25 @@ namespace LuaProxy {
         unsigned short m_index;
     };
 
+    class Camera {
+    public:
+        static luabind::object get(lua_State *L);
+        
+        static double getX(unsigned short index);
+        static double getY(unsigned short index);
+
+        Camera(unsigned short index);
+
+        double x();
+        double y();
+        double width();
+        double height();
+        
+
+    private:
+        unsigned short m_index;
+    };
+
     //undocumented
     namespace Native{
         std::string getSMBXPath();
@@ -788,6 +810,7 @@ namespace LuaProxy {
         };
 
         void activateHud(bool activateHud);
+        void activateOverworldHud(WORLD_HUD_CONTROL activateFlag);
         //CSprite functions
         bool loadImage(const char* filename, int resNumber, int transColor);
         LuaImageResource* loadImage(const char* filename);

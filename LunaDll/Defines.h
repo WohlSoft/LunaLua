@@ -432,6 +432,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg2 = Momentum* structure
 #define GF_IS_ON_CAMERA     0x00993DE0
 
+//      Arg1 = int* (1)
+//      Arg2 = Momentum* structure
+#define GF_IS_ON_WCAMERA    0x00993F90
+
+
 //      Arg1 = wchar_t** name of event to start
 //      Arg2 = short* [VB6 Bool] Force no smoke (ignore Event setting)
 #define GF_TRIGGER_EVENT    0x00AA42D0
@@ -489,6 +494,10 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
+
+static const auto native_isOnCamera     = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_CAMERA;
+static const auto native_isOnWCamera    = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_WCAMERA;
+
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
 static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;

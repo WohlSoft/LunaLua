@@ -52,7 +52,6 @@ void SetupThunRTMainHook();
 void ParseArgs(const std::vector<std::string>& args);
 void TrySkipPatch();
 
-
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
 /************************************************************************/
@@ -105,7 +104,10 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern short __stdcall MessageBoxOpenHook();
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);
-extern void __stdcall WorldHUDIsOnCameraHook();
+extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* momentumObj);
+
 
 /************************************************************************/
 /* Libs                                                                 */

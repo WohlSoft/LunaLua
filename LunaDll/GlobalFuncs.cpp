@@ -204,6 +204,8 @@ void InitGlobals()
 
 	gHook_SkipTestMsgBox = false;
 
+    gOverworldHudControlFlag = WHUD_ALL;
+
 	srand((int)time(NULL));
 
 	// Get compatible handle for screen

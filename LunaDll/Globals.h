@@ -101,7 +101,7 @@ extern SHMemServer			gShMemServer;
 extern CLunaLua				gLunaLua;
 
 
-extern WORLD_HUD_CONTROL    gHudControlFlag;
+extern WORLD_HUD_CONTROL    gOverworldHudControlFlag;
 
 /// HELPER MACROS ///
 /*

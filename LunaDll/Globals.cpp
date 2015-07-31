@@ -78,5 +78,5 @@ SHMemServer gShMemServer;
 CLunaLua gLunaLua;
 
 
+WORLD_HUD_CONTROL    gOverworldHudControlFlag = WHUD_ALL;
 
-WORLD_HUD_CONTROL    gHudControlFlag = WHUD_ALL;

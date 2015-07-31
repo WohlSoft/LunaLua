@@ -106,3 +106,14 @@ short LuaProxy::World::getCurrentDirection() const
 
 	return 0;
 }
+
+short LuaProxy::World::playerPowerup() const
+{
+    return SMBXOverworld::get()->currentPowerup;
+}
+
+void LuaProxy::World::setPlayerPowerup(short playerPowerup)
+{
+    SMBXOverworld::get()->currentPowerup = playerPowerup;
+}
+

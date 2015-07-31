@@ -111,6 +111,7 @@ int OnLvlLoad() {
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gIsOverworld = false;
+    gOverworldHudControlFlag = WHUD_ALL;
 	gLunaRender.ClearAll();
 	gSpriteMan.ResetSpriteManager();
 	gCellMan.Reset();

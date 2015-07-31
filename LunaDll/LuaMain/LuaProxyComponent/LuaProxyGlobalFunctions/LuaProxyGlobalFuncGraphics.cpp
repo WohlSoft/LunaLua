@@ -2,6 +2,8 @@
 #include "../../../Globals.h"
 #include "../../../GlobalFuncs.h"
 #include "../../../Rendering/Rendering.h"
+#include "../../../Misc/RuntimeHook.h"
+
 
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(int imgResource) {
@@ -16,6 +18,11 @@ LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
 void LuaProxy::Graphics::activateHud(bool activate)
 {
     gSkipSMBXHUD = !activate;
+}
+
+void LuaProxy::Graphics::activateOverworldHud(WORLD_HUD_CONTROL activateFlag)
+{
+    gOverworldHudControlFlag = activateFlag;
 }
 
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* filename)
