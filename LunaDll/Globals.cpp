@@ -76,3 +76,7 @@ HardcodedGraphicsManager gGraphManager;
 SHMemServer gShMemServer;
 
 CLunaLua gLunaLua;
+
+
+
+WORLD_HUD_CONTROL    gHudControlFlag = WHUD_ALL;

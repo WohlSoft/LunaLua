@@ -63,6 +63,14 @@ enum PRIORITY {
     PRI_HIGH
 };
 
+
+
+enum WORLD_HUD_CONTROL {
+    WHUD_ALL,
+    WHUD_ONLY_OVERLAY,
+    WHUD_NONE
+};
+
 ////////////////////////
 /// -Shared Strcuts- ///
 ////////////////////////
@@ -186,6 +194,7 @@ DEFMEM(GM_PAUSE_OPEN,       WORD,  0x00B250E2);
 // Camera
 DEFMEM(GM_CAMERA_X,         double*, 0x00B2B984);
 DEFMEM(GM_CAMERA_Y,         double*, 0x00B2B9A0);
+DEFMEM(GM_CAMINFO,          void*,   0x00B25124);
 
 // Overworld base struct
 DEFMEM(GM_OVERWORLD_PTR,    void*, 0x00B2C5C8);

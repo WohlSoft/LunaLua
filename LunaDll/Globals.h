@@ -22,6 +22,8 @@
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
 
+#include "Defines.h"
+
 #ifndef __MINGW32__
 #pragma comment (lib, "Msimg32.lib")
 #endif
@@ -99,6 +101,7 @@ extern SHMemServer			gShMemServer;
 extern CLunaLua				gLunaLua;
 
 
+extern WORLD_HUD_CONTROL    gHudControlFlag;
 
 /// HELPER MACROS ///
 /*

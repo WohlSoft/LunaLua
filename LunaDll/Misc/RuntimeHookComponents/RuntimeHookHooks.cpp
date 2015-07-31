@@ -550,6 +550,7 @@ extern void __stdcall LoadLocalGfxHook()
     loadRenderOverrideGfx();
 }
 
+
 extern BOOL __stdcall BitBltHook(
     HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
@@ -805,4 +806,12 @@ extern short __stdcall MessageBoxOpenHook()
     }
     
     return (short)GM_PLAYERS_COUNT;
+}
+
+
+extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
+{
+    if (gHudControlFlag == WHUD_ALL){
+        native_print(Text, fonttype, x, y);
+    }
 }

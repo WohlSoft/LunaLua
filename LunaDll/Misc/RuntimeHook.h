@@ -103,6 +103,10 @@ extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern short __stdcall MessageBoxOpenHook();
+
+extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);
+extern void __stdcall WorldHUDIsOnCameraHook();
+
 /************************************************************************/
 /* Libs                                                                 */
 /************************************************************************/
