@@ -115,7 +115,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     if (bm.bmBits == NULL) return NULL; // Wrong type of bitmap?
 
     // Create texture object with width/height
-    GLDraw::Texture tex(NULL, bm.bmWidth, bm.bmWidth);
+    GLDraw::Texture tex(NULL, bm.bmWidth, bm.bmHeight);
 
     // Try to allocate texture
     glGenTextures(1, &tex.name);
