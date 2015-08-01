@@ -97,6 +97,7 @@ extern int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2);
 extern void __stdcall UpdateInputHook();
 extern void UpdateInputHook_Wrapper();
 extern void __stdcall WindowInactiveHook();
+extern void SetSMBXFrameTiming(double ms);
 extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();

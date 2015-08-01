@@ -649,7 +649,11 @@ extern void __stdcall WindowInactiveHook()
  * enough that we trust QueryPerformanceCounter.
  **/
 //#define ENABLE_FRAME_TIMING_BENCHMARK
-#define FRAME_TIMING_MS (15.600)
+static double FRAME_TIMING_MS = 15.600;
+extern void SetSMBXFrameTiming(double ms)
+{
+    FRAME_TIMING_MS = ms;
+}
 
 extern void __stdcall FrameTimingHookQPC()
 {
