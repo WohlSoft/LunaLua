@@ -822,6 +822,11 @@ namespace LuaProxy {
         void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img);
+
+        void drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
+        void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
+        void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
+        void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
         
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
