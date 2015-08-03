@@ -13,8 +13,10 @@ GLEngine::GLEngine() :
     mInitialized(false), mHadError(false),
     mEnabled(true), mBitwiseCompat(true),
     mFB(0), mColorRB(0), mDepthRB(0),
-    mBufTex(NULL, 800, 600) {
-}
+    mBufTex(NULL, 800, 600),
+    mHwnd(NULL),
+    mScreenshot(false)
+{ }
 
 GLEngine::~GLEngine() {
 }
@@ -167,7 +169,8 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     // Get window size
     RECT clientRect;
-    GetClientRect(WindowFromDC(hdcDest), &clientRect);
+    mHwnd = WindowFromDC(hdcDest);
+    GetClientRect(mHwnd, &clientRect);
     int32_t windowWidth = clientRect.right - clientRect.left;
     int32_t windowHeight = clientRect.bottom - clientRect.top;
 
@@ -235,6 +238,15 @@ void GLEngine::EndFrame(HDC hdcDest)
 {
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
     GLERRORCHECK();
+
+    // Generate screenshot...
+    if (mScreenshot) {
+        RECT clientRect;
+        mScreenshot = false;
+        GetClientRect(mHwnd, &clientRect);
+        GenerateScreenshot(0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+    }
+
     SwapBuffers(hdcDest);
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -289,4 +301,51 @@ void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t 
         glMatrixMode(GL_MODELVIEW);
         GLERRORCHECK();
     }
+}
+
+
+bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+    uint32_t byteSize = 3 * w * h;
+
+    // Generate handle 
+    HANDLE handle = (HANDLE)GlobalAlloc(GHND, sizeof(BITMAPINFOHEADER) + byteSize);
+    if (handle == NULL) return false;
+
+    // Lock
+    uint8_t *pData = (uint8_t *)GlobalLock(handle);
+    BITMAPINFOHEADER &header = *((BITMAPINFOHEADER*)pData);
+    uint8_t *pPixelData = &pData[sizeof(BITMAPINFOHEADER)];
+
+    // Set up headers
+    memset(&header, 0, sizeof(BITMAPINFOHEADER));
+    header.biWidth = w;
+    header.biHeight = h;
+    header.biSizeImage = byteSize;
+    header.biSize = 40;
+    header.biPlanes = 1;
+    header.biBitCount = 3 * 8;
+    header.biCompression = 0;
+    header.biXPelsPerMeter = 0;
+    header.biYPelsPerMeter = 0;
+    header.biClrUsed = 0;
+    header.biClrImportant = 0;
+
+    // Read pixels
+    glReadPixels(x, y, w, h, GL_BGR, GL_UNSIGNED_BYTE, pPixelData);
+    if (glGetError() != GL_NO_ERROR) {
+        GlobalUnlock(handle);
+        GlobalFree(handle);
+        return false;
+    }
+
+    // Unlock
+    GlobalUnlock(handle);
+
+    // Write to clipboard
+    OpenClipboard(mHwnd);
+    EmptyClipboard();
+    SetClipboardData(CF_DIB, handle);
+    CloseClipboard();
+
+    return true;
 }

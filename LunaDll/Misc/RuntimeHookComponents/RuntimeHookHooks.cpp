@@ -845,3 +845,20 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
         return native_isOnCamera(camIndex, momentumObj);
     return native_isOnWCamera(camIndex, momentumObj);
 }
+
+extern HHOOK KeyHookWnd;
+LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode < 0){
+        return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
+    }
+
+    // Hook print screen key
+    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
+    {
+        g_GLEngine.TriggerScreenshot();
+        return 1;
+    }
+
+    return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
+}

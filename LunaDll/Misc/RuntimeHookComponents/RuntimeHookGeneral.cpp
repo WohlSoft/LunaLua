@@ -25,6 +25,7 @@ int(__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD) = 0;
 HMODULE newLauncherLib = 0;
 HMODULE newDebugger = 0;
 HHOOK HookWnd;
+HHOOK KeyHookWnd;
 
 #include <CommCtrl.h>
 
@@ -197,6 +198,15 @@ void TrySkipPatch()
     /************************************************************************/
     HookWnd = SetWindowsHookExA(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
     if (!HookWnd){
+        DWORD errCode = GetLastError();
+        std::string errCmd = "Failed to Hook";
+        errCmd += "\nErr-Code: ";
+        errCmd += std::to_string((long long)errCode);
+        MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
+    }
+
+    KeyHookWnd = SetWindowsHookExA(WH_KEYBOARD, KeyHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
+    if (!KeyHookWnd){
         DWORD errCode = GetLastError();
         std::string errCmd = "Failed to Hook";
         errCmd += "\nErr-Code: ";
