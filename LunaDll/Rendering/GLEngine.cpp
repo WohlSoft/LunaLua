@@ -74,6 +74,7 @@ void GLEngine::Init() {
     GLERRORCHECK();
 
     // Set projection (test)
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
     glOrtho(0.0f, (float)mBufTex.pw, 0.0f, (float)mBufTex.ph, -1.0f, 1.0f);
@@ -186,6 +187,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
     GLERRORCHECK();
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
     glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
@@ -202,6 +204,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     GLERRORCHECK();
     glViewport(0, 0, mBufTex.pw, mBufTex.ph);
     GLERRORCHECK();
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
     glOrtho(0.0f, ((float)mBufTex.pw), 0.0f, ((float)mBufTex.ph), -1.0f, 1.0f);
@@ -265,15 +268,13 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
 
 void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count) {
     // Convert texel coordinates to what we need for our power-of-two padded textures
-    if (g_GLDraw.mLastPwScale != 1.0f) {
-        for (unsigned int idx = 0; idx < count * 2; idx += 2) {
-            tex[idx] *= g_GLDraw.mLastPwScale;
-        }
-    }
-    if (g_GLDraw.mLastPhScale != 1.0f) {
-        for (unsigned int idx = 1; idx < count * 2; idx += 2) {
-            tex[idx] *= g_GLDraw.mLastPhScale;
-        }
+    bool texIsPadded = (g_GLDraw.mLastPwScale != 1.0f) || (g_GLDraw.mLastPhScale != 1.0f);
+    if (texIsPadded) {
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glLoadIdentity();
+        glScalef(g_GLDraw.mLastPwScale, g_GLDraw.mLastPhScale, 1.0f);
+        GLERRORCHECK();
     }
 
     glVertexPointer(2, GL_FLOAT, 0, vert);
@@ -282,4 +283,10 @@ void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t 
     GLERRORCHECK();
     glDrawArrays(type, 0, count);
     GLERRORCHECK();
+
+    if (texIsPadded) {
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        GLERRORCHECK();
+    }
 }
