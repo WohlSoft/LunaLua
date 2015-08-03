@@ -38,29 +38,49 @@ GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint3
 
     // Try to allocate texture
     glGenTextures(1, &tex.name);
+    GLERRORCHECK();
     if (tex.name == 0) return;
 
     g_GLDraw.BindTexture(&tex);
+    GLERRORCHECK();
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    GLERRORCHECK();
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    GLERRORCHECK();
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, dataWidth);
+    GLERRORCHECK();
     char* subData = (char*)data + (xOff + yOff*dataWidth) * 4;
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, NULL);
+    GLERRORCHECK();
+
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, format, GL_UNSIGNED_BYTE, subData);
+    GLERRORCHECK();
+
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, subData);
+    //GLERRORCHECK();
+
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    GLERRORCHECK();
 
     valid = true;
 }
 
 GLBasicSprite::~GLBasicSprite() {
     if (valid) glDeleteTextures(1, &tex.name);
+    GLERRORCHECK();
 }
 
 void GLBasicSprite::Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const {

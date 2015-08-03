@@ -45,6 +45,7 @@ public:
     inline bool IsEnabled() { return mGLEngine.IsEnabled(); };
     inline void Enable() { mGLEngine.Enable(); };
     inline void Disable() { mGLEngine.Disable(); };
+    inline void TriggerScreenshot() { mGLEngine.TriggerScreenshot(); }
 };
 
 // Instance

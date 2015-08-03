@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <gl/glew.h>
 #include <cstdint>
+#include "GLCompat.h"
 
 class GLDraw {
 private:
@@ -66,8 +67,10 @@ public:
                 mLastPhScale = tex->phScale;
             }
             glBindTexture(GL_TEXTURE_2D, textName);
+            GLERRORCHECK();
         }
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GLERRORCHECK();
     }
     inline void UnbindTexture() {
         if (mLastTexName == 0) return;
@@ -75,6 +78,7 @@ public:
         mLastPwScale = 1.0f;
         mLastPhScale = 1.0f;
         glBindTexture(GL_TEXTURE_2D, 0);
+        GLERRORCHECK();
     }
     void DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode);
     void DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight);

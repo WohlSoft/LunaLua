@@ -13,8 +13,10 @@ GLEngine::GLEngine() :
     mInitialized(false), mHadError(false),
     mEnabled(true), mBitwiseCompat(true),
     mFB(0), mColorRB(0), mDepthRB(0),
-    mBufTex(NULL, 800, 600) {
-}
+    mBufTex(NULL, 800, 600),
+    mHwnd(NULL),
+    mScreenshot(false)
+{ }
 
 GLEngine::~GLEngine() {
 }
@@ -28,44 +30,73 @@ void GLEngine::Init() {
 #if 1
     // Set up framebuffer object
     glGenFramebuffersANY(1, &mFB);
+    GLERRORCHECK();
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
 
     glGenTextures(1, &mBufTex.name);
+    GLERRORCHECK();
     g_GLDraw.BindTexture(&mBufTex);
+    GLERRORCHECK();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GLERRORCHECK();
 
     glGenRenderbuffersANY(1, &mDepthRB);
+    GLERRORCHECK();
     glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
-    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 800, 600);
+    GLERRORCHECK();
+    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mBufTex.pw, mBufTex.ph);
+    GLERRORCHECK();
     glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
+    GLERRORCHECK();
     
     glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
+    GLERRORCHECK();
+
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
     glDrawBuffers(1, DrawBuffers);
+    GLERRORCHECK();
 
     GLenum status = glCheckFramebufferStatusANY(GL_FRAMEBUFFER_EXT);
+    GLERRORCHECK();
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         dbgboxA("error setting up");
     }
 
     // Bind framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
 
     // Set projection (test)
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    GLERRORCHECK();
+    glOrtho(0.0f, (float)mBufTex.pw, 0.0f, (float)mBufTex.ph, -1.0f, 1.0f);
+    GLERRORCHECK();
     glColor3f(1, 1, 1);
+    GLERRORCHECK();
     glDisable(GL_LIGHTING);
+    GLERRORCHECK();
     glDisable(GL_DEPTH_TEST);
+    GLERRORCHECK();
     glDisable(GL_CULL_FACE);
+    GLERRORCHECK();
     glEnable(GL_BLEND);
+    GLERRORCHECK();
     glEnable(GL_TEXTURE_2D);
+    GLERRORCHECK();
     glEnableClientState(GL_VERTEX_ARRAY);
+    GLERRORCHECK();
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    GLERRORCHECK();
 #endif
     
     mInitialized = true;
@@ -134,10 +165,12 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     // Unbind the texture from the framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    GLERRORCHECK();
 
     // Get window size
     RECT clientRect;
-    GetClientRect(WindowFromDC(hdcDest), &clientRect);
+    mHwnd = WindowFromDC(hdcDest);
+    GetClientRect(mHwnd, &clientRect);
     int32_t windowWidth = clientRect.right - clientRect.left;
     int32_t windowHeight = clientRect.bottom - clientRect.top;
 
@@ -156,20 +189,33 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
+    GLERRORCHECK();
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    GLERRORCHECK();
     glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
+    GLERRORCHECK();
 
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
+    GLERRORCHECK();
     glFlush();
+    GLERRORCHECK();
 
     // Get ready to draw some more
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    glViewport(0, 0, 800, 600);
+    GLERRORCHECK();
+    glViewport(0, 0, mBufTex.pw, mBufTex.ph);
+    GLERRORCHECK();
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    GLERRORCHECK();
+    glOrtho(0.0f, ((float)mBufTex.pw), 0.0f, ((float)mBufTex.ph), -1.0f, 1.0f);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
 
     return TRUE;
 }
@@ -191,10 +237,24 @@ void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest
 void GLEngine::EndFrame(HDC hdcDest)
 {
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    GLERRORCHECK();
+
+    // Generate screenshot...
+    if (mScreenshot) {
+        RECT clientRect;
+        mScreenshot = false;
+        GetClientRect(mHwnd, &clientRect);
+        GenerateScreenshot(0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+    }
+
     SwapBuffers(hdcDest);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
 }
 
 void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
@@ -204,7 +264,9 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     }
 
     glBlendEquationANY(GL_FUNC_ADD);
+    GLERRORCHECK();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GLERRORCHECK();
 
     g_GLDraw.BindTexture(tex);
 
@@ -213,22 +275,77 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     float b = ((0x0000FF00 & color) >> 8) / 255.0f;
     float a = ((0x000000FF & color) >> 0) / 255.0f;
     glColor4f(r*a, g*a, b*a, a);
+    GLERRORCHECK();
 }
 
 void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count) {
     // Convert texel coordinates to what we need for our power-of-two padded textures
-    if (g_GLDraw.mLastPwScale != 1.0f) {
-        for (unsigned int idx = 0; idx < count * 2; idx += 2) {
-            tex[idx] *= g_GLDraw.mLastPwScale;
-        }
-    }
-    if (g_GLDraw.mLastPhScale != 1.0f) {
-        for (unsigned int idx = 1; idx < count * 2; idx += 2) {
-            tex[idx] *= g_GLDraw.mLastPhScale;
-        }
+    bool texIsPadded = (g_GLDraw.mLastPwScale != 1.0f) || (g_GLDraw.mLastPhScale != 1.0f);
+    if (texIsPadded) {
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glLoadIdentity();
+        glScalef(g_GLDraw.mLastPwScale, g_GLDraw.mLastPhScale, 1.0f);
+        GLERRORCHECK();
     }
 
     glVertexPointer(2, GL_FLOAT, 0, vert);
+    GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, tex);
+    GLERRORCHECK();
     glDrawArrays(type, 0, count);
+    GLERRORCHECK();
+
+    if (texIsPadded) {
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        GLERRORCHECK();
+    }
+}
+
+
+bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+    uint32_t byteSize = 3 * w * h;
+
+    // Generate handle 
+    HANDLE handle = (HANDLE)GlobalAlloc(GHND, sizeof(BITMAPINFOHEADER) + byteSize);
+    if (handle == NULL) return false;
+
+    // Lock
+    uint8_t *pData = (uint8_t *)GlobalLock(handle);
+    BITMAPINFOHEADER &header = *((BITMAPINFOHEADER*)pData);
+    uint8_t *pPixelData = &pData[sizeof(BITMAPINFOHEADER)];
+
+    // Set up headers
+    memset(&header, 0, sizeof(BITMAPINFOHEADER));
+    header.biWidth = w;
+    header.biHeight = h;
+    header.biSizeImage = byteSize;
+    header.biSize = 40;
+    header.biPlanes = 1;
+    header.biBitCount = 3 * 8;
+    header.biCompression = 0;
+    header.biXPelsPerMeter = 0;
+    header.biYPelsPerMeter = 0;
+    header.biClrUsed = 0;
+    header.biClrImportant = 0;
+
+    // Read pixels
+    glReadPixels(x, y, w, h, GL_BGR, GL_UNSIGNED_BYTE, pPixelData);
+    if (glGetError() != GL_NO_ERROR) {
+        GlobalUnlock(handle);
+        GlobalFree(handle);
+        return false;
+    }
+
+    // Unlock
+    GlobalUnlock(handle);
+
+    // Write to clipboard
+    OpenClipboard(mHwnd);
+    EmptyClipboard();
+    SetClipboardData(CF_DIB, handle);
+    CloseClipboard();
+
+    return true;
 }

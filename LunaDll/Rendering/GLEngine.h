@@ -22,6 +22,9 @@ private:
     GLuint mDepthRB;
 
     GLDraw::Texture mBufTex;
+
+    HWND mHwnd;
+    bool mScreenshot;
 protected:
     // Internal routines
     void Init();
@@ -36,6 +39,7 @@ public:
     inline bool IsEnabled() { return mEnabled; };
     inline void Enable() { mEnabled = true; }
     inline void Disable() { mEnabled = false; }
+    inline void TriggerScreenshot() { mScreenshot = true; }
 
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
@@ -47,6 +51,8 @@ public:
 
     void SetTex(const BMPBox* bmp, uint32_t color);
     void Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count);
+
+    bool GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 };
 
 #include "GLEngineProxy.h"

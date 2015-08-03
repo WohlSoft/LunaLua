@@ -54,25 +54,38 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     switch (mode) {
     case RENDER_MODE_MULTIPLY:
         glBlendEquationANY(GL_FUNC_ADD);
+        GLERRORCHECK();
         glBlendFuncSeparateANY(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
+        GLERRORCHECK();
         break;
     case RENDER_MODE_MAX:
         glBlendEquationANY(GL_MAX);
+        GLERRORCHECK();
         break;
     case RENDER_MODE_AND:
         glBlendEquationANY(GL_LOGIC_OP);
+        while (glGetError() != GL_NO_ERROR);
+        GLERRORCHECK();
         glEnable(GL_COLOR_LOGIC_OP);
+        GLERRORCHECK();
         glLogicOp(GL_AND);
+        GLERRORCHECK();
         break;
     case RENDER_MODE_OR:
         glBlendEquationANY(GL_LOGIC_OP);
+        while (glGetError() != GL_NO_ERROR);
+        GLERRORCHECK();
         glEnable(GL_COLOR_LOGIC_OP);
+        GLERRORCHECK();
         glLogicOp(GL_OR);
+        GLERRORCHECK();
         break;
     case RENDER_MODE_ALPHA:
     default:
         glBlendEquationANY(GL_FUNC_ADD);
+        GLERRORCHECK();
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        GLERRORCHECK();
         break;
     }
 
@@ -96,13 +109,17 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     };
 
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
+    GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
+    GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+    GLERRORCHECK();
 
     // Disable color logic op if we enabled it
     if ((mode == RENDER_MODE_AND) || (mode == RENDER_MODE_OR))
     {
         glDisable(GL_COLOR_LOGIC_OP);
+        GLERRORCHECK();
     }
 }
 
@@ -110,7 +127,9 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 {
     UnbindTexture();
     glDisable(GL_BLEND);
+    GLERRORCHECK();
     glDisable(GL_TEXTURE_2D);
+    GLERRORCHECK();
 
     // Generate our floating point coordinates
     float x1 = (float)nXDest;
@@ -130,10 +149,14 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
     };
 
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
+    GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+    GLERRORCHECK();
 
     glEnable(GL_BLEND);
+    GLERRORCHECK();
     glEnable(GL_TEXTURE_2D);
+    GLERRORCHECK();
 }
 
 
@@ -153,7 +176,9 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 
     // Set rendering mode for this draw operation
     glBlendEquationANY(GL_FUNC_ADD);
+    GLERRORCHECK();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GLERRORCHECK();
 
     BindTexture(tex);
 
@@ -175,8 +200,11 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     };
 
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
+    GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
+    GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+    GLERRORCHECK();
 }
 
 
