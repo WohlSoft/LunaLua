@@ -28,44 +28,72 @@ void GLEngine::Init() {
 #if 1
     // Set up framebuffer object
     glGenFramebuffersANY(1, &mFB);
+    GLERRORCHECK();
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
 
     glGenTextures(1, &mBufTex.name);
+    GLERRORCHECK();
     g_GLDraw.BindTexture(&mBufTex);
+    GLERRORCHECK();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GLERRORCHECK();
 
     glGenRenderbuffersANY(1, &mDepthRB);
+    GLERRORCHECK();
     glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
-    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, 800, 600);
+    GLERRORCHECK();
+    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mBufTex.pw, mBufTex.ph);
+    GLERRORCHECK();
     glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
+    GLERRORCHECK();
     
     glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
+    GLERRORCHECK();
+
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
     glDrawBuffers(1, DrawBuffers);
+    GLERRORCHECK();
 
     GLenum status = glCheckFramebufferStatusANY(GL_FRAMEBUFFER_EXT);
+    GLERRORCHECK();
     if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
         dbgboxA("error setting up");
     }
 
     // Bind framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
 
     // Set projection (test)
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    GLERRORCHECK();
+    glOrtho(0.0f, (float)mBufTex.pw, 0.0f, (float)mBufTex.ph, -1.0f, 1.0f);
+    GLERRORCHECK();
     glColor3f(1, 1, 1);
+    GLERRORCHECK();
     glDisable(GL_LIGHTING);
+    GLERRORCHECK();
     glDisable(GL_DEPTH_TEST);
+    GLERRORCHECK();
     glDisable(GL_CULL_FACE);
+    GLERRORCHECK();
     glEnable(GL_BLEND);
+    GLERRORCHECK();
     glEnable(GL_TEXTURE_2D);
+    GLERRORCHECK();
     glEnableClientState(GL_VERTEX_ARRAY);
+    GLERRORCHECK();
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    GLERRORCHECK();
 #endif
     
     mInitialized = true;
@@ -134,6 +162,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     // Unbind the texture from the framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    GLERRORCHECK();
 
     // Get window size
     RECT clientRect;
@@ -156,20 +185,31 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
+    GLERRORCHECK();
     glLoadIdentity();
+    GLERRORCHECK();
     glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
+    GLERRORCHECK();
 
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
+    GLERRORCHECK();
     glFlush();
+    GLERRORCHECK();
 
     // Get ready to draw some more
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    glViewport(0, 0, 800, 600);
+    GLERRORCHECK();
+    glViewport(0, 0, mBufTex.pw, mBufTex.ph);
+    GLERRORCHECK();
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    GLERRORCHECK();
+    glOrtho(0.0f, ((float)mBufTex.pw), 0.0f, ((float)mBufTex.ph), -1.0f, 1.0f);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
 
     return TRUE;
 }
@@ -191,10 +231,15 @@ void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest
 void GLEngine::EndFrame(HDC hdcDest)
 {
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    GLERRORCHECK();
     SwapBuffers(hdcDest);
+    GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERRORCHECK();
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
+    GLERRORCHECK();
 }
 
 void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
@@ -204,7 +249,9 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     }
 
     glBlendEquationANY(GL_FUNC_ADD);
+    GLERRORCHECK();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GLERRORCHECK();
 
     g_GLDraw.BindTexture(tex);
 
@@ -213,6 +260,7 @@ void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
     float b = ((0x0000FF00 & color) >> 8) / 255.0f;
     float a = ((0x000000FF & color) >> 0) / 255.0f;
     glColor4f(r*a, g*a, b*a, a);
+    GLERRORCHECK();
 }
 
 void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count) {
@@ -229,6 +277,9 @@ void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t 
     }
 
     glVertexPointer(2, GL_FLOAT, 0, vert);
+    GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, tex);
+    GLERRORCHECK();
     glDrawArrays(type, 0, count);
+    GLERRORCHECK();
 }

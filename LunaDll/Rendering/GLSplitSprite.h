@@ -18,6 +18,7 @@ public:
         }
         maxTextureSize = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+        GLERRORCHECK();
         if (maxTextureSize <= 0) maxTextureSize = 1024;
         return maxTextureSize;
     }

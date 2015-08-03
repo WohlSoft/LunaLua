@@ -92,6 +92,7 @@ void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
     auto it = mLunaTexMap.find(&bmp);
     if (it != mLunaTexMap.end()) {
         glDeleteTextures(1, &it->second->name);
+        GLERRORCHECK();
         delete it->second;
         mLunaTexMap.erase(it);
     }
@@ -119,19 +120,34 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
 
     // Try to allocate texture
     glGenTextures(1, &tex.name);
+    GLERRORCHECK();
     if (tex.name == 0) return NULL;
 
     g_GLDraw.BindTexture(&tex);
+    GLERRORCHECK();
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    GLERRORCHECK();
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLERRORCHECK();
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    GLERRORCHECK();
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+    GLERRORCHECK();
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
+    GLERRORCHECK();
+
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
+    //GLERRORCHECK();
 
     // Cache new texture
     GLDraw::Texture* pTex = new GLDraw::Texture(tex);
