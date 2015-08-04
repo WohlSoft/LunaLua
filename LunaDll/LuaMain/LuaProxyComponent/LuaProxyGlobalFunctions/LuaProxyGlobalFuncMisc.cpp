@@ -50,3 +50,40 @@ luabind::object LuaProxy::Misc::listLocalFiles(std::string path, lua_State* L)
 {
     return listFiles(utf8_encode(getCustomFolderPath()) + path, L);
 }
+
+template<const DWORD FILTER>
+luabind::object luabindResolveFile(const std::string& file, lua_State* L){
+    std::vector<std::string> paths = {
+        utf8_encode(getCustomFolderPath()),
+        (std::string)GM_FULLDIR,
+        utf8_encode(getModulePath()) + "\\LuaScriptsLib\\",
+        utf8_encode(getModulePath()) + "\\"
+    };
+
+
+    for (const std::string& nextSearchPath : paths) {
+        if (nextSearchPath == "" || nextSearchPath == "\\")
+            continue;
+
+        std::vector<std::string> listOfFiles = listOfDir(nextSearchPath, FILTER);
+        for (const std::string& nextFoundFile : listOfFiles) {
+            if (nextFoundFile == file) {
+                return luabind::object(L, nextSearchPath + nextFoundFile);
+            }
+        }
+    }
+
+    return luabind::object();
+}
+
+luabind::object LuaProxy::Misc::resolveFile(const std::string& file, lua_State* L)
+{
+    return luabindResolveFile<~FILE_ATTRIBUTE_DIRECTORY>(file, L);
+}
+
+luabind::object LuaProxy::Misc::resolveDirectory(const std::string& directory, lua_State* L)
+{
+    return luabindResolveFile<FILE_ATTRIBUTE_DIRECTORY>(directory, L);
+}
+
+

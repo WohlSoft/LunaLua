@@ -39,6 +39,7 @@ HMODULE getModule(std::string moduleName);
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
 bool writeFile(const std::string &content, const std::string &path);
 std::vector<std::string> listFilesOfDir(const std::string& path);
+std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes);
 std::wstring getModulePath();
 std::wstring getCustomFolderPath();
 

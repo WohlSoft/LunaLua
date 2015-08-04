@@ -413,21 +413,26 @@ void sendPUTRequest(const std::string& server, const std::string& data)
 
 std::vector<std::string> listFilesOfDir(const std::string& path)
 {
+    return listOfDir(path, ~FILE_ATTRIBUTE_DIRECTORY);
+}
+
+std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes)
+{
     std::vector<std::string> out;
     HANDLE dir;
     WIN32_FIND_DATAA file_data;
-
+    
     if ((dir = FindFirstFileA((path + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
         return out; /* No files found */
 
     do {
         const string file_name = file_data.cFileName;
-        const bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-
+        const bool skipFile = (file_data.dwFileAttributes & fileAttributes) == 0;
+        
         if (file_name[0] == '.')
             continue;
 
-        if (is_directory)
+        if (skipFile)
             continue;
 
         out.push_back(file_name);
@@ -437,6 +442,7 @@ std::vector<std::string> listFilesOfDir(const std::string& path)
 
     return out;
 }
+
 
 std::wstring getCustomFolderPath()
 {

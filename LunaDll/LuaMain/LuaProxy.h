@@ -799,6 +799,8 @@ namespace LuaProxy {
         void cheatBuffer(const luabind::object &value, lua_State* L);
         luabind::object listFiles(const std::string& path, lua_State* L);
         luabind::object listLocalFiles(std::string path, lua_State* L);
+        luabind::object resolveFile(const std::string& relativePath, lua_State* L);
+        luabind::object resolveDirectory(const std::string& relativePath, lua_State* L);
     }
 
     namespace Graphics{

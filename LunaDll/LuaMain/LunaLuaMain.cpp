@@ -283,7 +283,9 @@ void CLunaLua::bindAll()
                 def("cheatBuffer", (std::string(*)())&LuaProxy::Misc::cheatBuffer),
                     def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer),
                     def("listFiles", &LuaProxy::Misc::listFiles),
-                    def("listLocalFiles", &LuaProxy::Misc::listLocalFiles)
+                    def("listLocalFiles", &LuaProxy::Misc::listLocalFiles),
+                    def("resolveFile", &LuaProxy::Misc::resolveFile),
+                    def("resolveDirectory", &LuaProxy::Misc::resolveDirectory)
             ],
 
             namespace_("Audio")[
