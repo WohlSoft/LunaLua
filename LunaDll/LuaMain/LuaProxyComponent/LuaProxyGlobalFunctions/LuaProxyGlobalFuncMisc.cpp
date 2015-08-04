@@ -52,7 +52,7 @@ luabind::object LuaProxy::Misc::listLocalFiles(std::string path, lua_State* L)
 }
 
 template<const DWORD FILTER>
-luabind::object luabindResolveFile(const std::string& file, lua_State* L){
+luabind::object luabindResolveFile(std::string file, lua_State* L){
     std::vector<std::string> paths = {
         utf8_encode(getCustomFolderPath()),
         (std::string)GM_FULLDIR,
@@ -61,9 +61,39 @@ luabind::object luabindResolveFile(const std::string& file, lua_State* L){
     };
 
 
-    for (const std::string& nextSearchPath : paths) {
+    for (std::string nextSearchPath : paths) {
         if (nextSearchPath == "" || nextSearchPath == "\\")
             continue;
+        
+        // If the file is a whole path, then check path!
+        size_t nextPos;
+        if ((nextPos = file.find_first_of("\\/")) != std::string::npos) {
+            bool foundValid = true;
+            nextSearchPath = nextSearchPath.substr(0, nextSearchPath.size() - 1); //remove the last slash of the root search paths
+            do {
+                std::vector<std::string> subPaths = listOfDir(nextSearchPath, FILE_ATTRIBUTE_DIRECTORY); //Get all dirs in the next directory
+                
+                std::string nextPathStrip = file.substr(0, nextPos); // Get the directory to be searched on
+                nextSearchPath += "\\" + nextPathStrip; // Add the strip to the current one (for the next search)
+
+                // Try to find a match
+                foundValid = false;
+                for (const std::string& nextSubPath : subPaths) {
+                    foundValid = nextSubPath == nextPathStrip;
+                    if (foundValid)
+                        break;
+                }
+                if (!foundValid) break; //otherwise break the search
+
+                file = file.substr(nextPos + 1);
+                nextPos = file.find_first_of("\\/"); // try to find the next folder
+            } while (nextPos != std::string::npos);
+
+            if (!foundValid) //Go to the next result
+                continue;
+
+            nextSearchPath += "\\";
+        }
 
         std::vector<std::string> listOfFiles = listOfDir(nextSearchPath, FILTER);
         for (const std::string& nextFoundFile : listOfFiles) {
