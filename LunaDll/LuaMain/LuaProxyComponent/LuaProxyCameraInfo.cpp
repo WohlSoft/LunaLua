@@ -3,7 +3,7 @@
 
 luabind::object LuaProxy::Camera::get(lua_State *L)
 {
-    return LuaHelper::getObjList(3, [](unsigned short i){ return LuaProxy::Camera(i); }, L);
+    return LuaHelper::getObjList(3, [](unsigned short i){ return LuaProxy::Camera(i); }, [](unsigned int i) { return i != 0; }, L);
 }
 
 
