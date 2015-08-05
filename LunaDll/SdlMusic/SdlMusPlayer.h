@@ -5,7 +5,7 @@
 #define SDL_MUS_PLAYER
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_mixer_ext.h>
 #undef main
 #include <map>
 #include <string>
@@ -28,6 +28,8 @@ public:
 	static void MUS_pauseMusic();
 	static void MUS_stopMusic();
 	static void MUS_stopMusicFadeOut(int ms);
+	static const char* MUS_MusicTitle();
+	static const char* MUS_MusicTitleTag();
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);
