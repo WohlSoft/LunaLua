@@ -308,6 +308,8 @@ void CLunaLua::bindAll()
                 def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
                 def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
                 def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),
+				def("MusicTitle", (const char(*)())&LuaProxy::Audio::MusicTitle),
+				def("MusicTitleTag", (const char(*)())&LuaProxy::Audio::MusicTitleTag),
                 //Seize music stream for LUA usage for section 0..20
                 def("SeizeStream", (void(*)(int))&LuaProxy::Audio::seizeStream),
                 //Return music stream access to SMBX engine back for section 0..20
