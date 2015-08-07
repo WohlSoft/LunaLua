@@ -161,18 +161,20 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     if (!mInitialized) Init();
     if (!mInitialized) return FALSE;
 
+    // Get window size
+    RECT clientRect;
+    mHwnd = WindowFromDC(hdcDest);
+    if (!GetClientRect(mHwnd, &clientRect)) return FALSE;
+    if (clientRect.right < 0) clientRect.right = 1;
+    if (clientRect.bottom < 0) clientRect.bottom = 1;
+    int32_t windowWidth = clientRect.right;
+    int32_t windowHeight = clientRect.bottom;
+
     g_GLDraw.UnbindTexture();
 
     // Unbind the texture from the framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
     GLERRORCHECK();
-
-    // Get window size
-    RECT clientRect;
-    mHwnd = WindowFromDC(hdcDest);
-    GetClientRect(mHwnd, &clientRect);
-    int32_t windowWidth = clientRect.right - clientRect.left;
-    int32_t windowHeight = clientRect.bottom - clientRect.top;
 
     // Implement letterboxing correction
     float scaledWidth = windowWidth / 800.0f;
@@ -243,8 +245,11 @@ void GLEngine::EndFrame(HDC hdcDest)
     if (mScreenshot) {
         RECT clientRect;
         mScreenshot = false;
-        GetClientRect(mHwnd, &clientRect);
-        GenerateScreenshot(0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
+        if (GetClientRect(mHwnd, &clientRect)) {
+            if (clientRect.right < 0) clientRect.right = 1;
+            if (clientRect.bottom < 0) clientRect.bottom = 1;
+            GenerateScreenshot(0, 0, clientRect.right, clientRect.bottom);
+        }
     }
 
     SwapBuffers(hdcDest);
