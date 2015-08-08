@@ -113,6 +113,24 @@ void PGE_MusPlayer::MUS_stopMusicFadeOut(int ms)
 		Mix_FadeOutMusic(ms);
 }
 
+const char* PGE_MusPlayer::MUS_MusicTitle()
+{
+	if (!PGE_SDL_Manager::isInit) return "";
+	if (play_mus)
+		return Mix_GetMusicTitle(play_mus);
+	else
+		return "";
+}
+
+const char* PGE_MusPlayer::MUS_MusicTitleTag()
+{
+	if (!PGE_SDL_Manager::isInit) return "";
+	if (play_mus)
+		return Mix_GetMusicTitleTag(play_mus);
+	else
+		return "";
+}
+
 
 void PGE_MusPlayer::MUS_changeVolume(int vlm)
 {

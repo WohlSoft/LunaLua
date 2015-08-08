@@ -2,7 +2,7 @@
 #ifndef LuaProxyAudio_H
 #define LuaProxyAudio_H
 
-#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_mixer_ext.h>
 #undef main
 #include <string>
 
@@ -24,9 +24,11 @@ namespace LuaProxy
 		bool MusicIsPlaying();
 		bool MusicIsPaused();
 		bool MusicIsFading();
+ const char *MusicTitle();
+ const char *MusicTitleTag();
 		void seizeStream(int section);
 		void releaseStream(int section);
-
+		
 		//SFX
 		Mix_Chunk* newMix_Chunk();
 		void clearSFXBuffer();
