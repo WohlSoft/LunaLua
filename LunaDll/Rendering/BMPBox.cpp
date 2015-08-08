@@ -95,3 +95,25 @@ bool BMPBox::ImageLoaded() {
         return false;
     return true;
 }
+
+void BMPBox::forEachPixelValue(std::function<void(BYTE)> forEachFunc)
+{
+    if (!forEachFunc)
+        return;
+
+    if (!m_hbmp)
+        return;
+
+    BITMAP bm;
+    memset(&bm, 0, sizeof(BITMAP));
+    GetObject(m_hbmp, sizeof(BITMAP), &bm);
+    BYTE *pData = (BYTE *)bm.bmBits;
+    uint32_t dataLen = bm.bmHeight * bm.bmWidth * 4;
+
+    if (pData) {
+        for (uint32_t i = 0; i < dataLen; i++) {
+            forEachFunc(pData[i]);
+        }
+    }
+    
+}

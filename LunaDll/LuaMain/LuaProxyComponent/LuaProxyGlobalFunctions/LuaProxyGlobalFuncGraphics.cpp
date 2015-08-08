@@ -95,6 +95,24 @@ void LuaProxy::Graphics::unplaceSprites(const LuaImageResource& img)
     gSpriteMan.ClearSprites(img.imgResource);
 }
 
+luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, int& width, int& height, lua_State *L)
+{
+    luabind::object returnTable = luabind::newtable(L);
+    const auto bmpIt = gLunaRender.LoadedImages.find(img.imgResource);
+    if (bmpIt == gLunaRender.LoadedImages.cend()){
+        luaL_error(L, "Internal error: Failed to find image resource!");
+        return luabind::object();
+    }
+
+    BMPBox* imgBox = bmpIt->second;
+    int i = 1;
+    imgBox->forEachPixelValue([&returnTable, &i](BYTE nextPixelValue){returnTable[i++] = nextPixelValue; });
+    width = imgBox->m_W;
+    height = imgBox->m_H;
+
+    return returnTable;
+}
+
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
 {
@@ -115,11 +133,12 @@ void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yP
     renderOp->img_resource_code = img.imgResource;
     renderOp->x = xPos;
     renderOp->y = yPos;
-    renderOp->sx1 = (sourceX <= 0 ? 0 : sourceX);
-    renderOp->sy1 = (sourceY <= 0 ? 0 : sourceY);
-    renderOp->sx2 = (sourceWidth <= 0 ? imgBox->m_W : sourceX + sourceWidth);
-    renderOp->sy2 = (sourceHeight <= 0 ? imgBox->m_H : sourceY + sourceHeight);
+    renderOp->sx = (sourceX <= 0 ? 0 : sourceX);
+    renderOp->sy = (sourceY <= 0 ? 0 : sourceY);
+    renderOp->sw = (sourceWidth <= 0 ? imgBox->m_W : sourceWidth);
+    renderOp->sh = (sourceHeight <= 0 ? imgBox->m_H : sourceHeight);
 
+    
     gLunaRender.AddOp(renderOp);
 }
 

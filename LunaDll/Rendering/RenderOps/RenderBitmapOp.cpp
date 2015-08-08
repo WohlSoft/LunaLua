@@ -3,15 +3,16 @@
 #include "../../Globals.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../GLEngine.h"
+#include "../../Defines.h"
 
 // CTOR
 RenderBitmapOp::RenderBitmapOp() {
     x = 0;
     y = 0;
-    sx1 = 0;
-    sy1 = 0;
-    sx2 = 0;
-    sy2 = 0;
+    sx = 0;
+    sy = 0;
+    sw = 0;
+    sh = 0;
     m_PerCycleOnly = false;
 }
 
@@ -29,8 +30,8 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         if (g_GLEngine.IsEnabled())
         {
             g_GLEngine.DrawLunaSprite(
-                (int)x, (int)y, (int)sx2, (int)sy2,
-                *bmp, (int)sx1, (int)sy1, (int)sx2, (int)sy2);
+                (int)x, (int)y, (int)sw, (int)sh,
+                *bmp, (int)sx, (int)sy, (int)sw, (int)sh);
         }
         else
         {
@@ -39,17 +40,17 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
             bf.BlendFlags = 0;
             bf.SourceConstantAlpha = 255;
             bf.AlphaFormat = AC_SRC_ALPHA;
-            AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
-                bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bf);
+            AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
+                bmp->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
         }
 
         if (false) { //debug
             Render::Print(to_wstring((long long)x), 3, 300, 420);
             Render::Print(to_wstring((long long)y), 3, 300, 440);
-            Render::Print(to_wstring((long long)sx1), 3, 300, 460);
-            Render::Print(to_wstring((long long)sy1), 3, 300, 480);
-            Render::Print(to_wstring((long long)sx2), 3, 300, 500);
-            Render::Print(to_wstring((long long)sy2), 3, 300, 520);
+            Render::Print(to_wstring((long long)sx), 3, 300, 460);
+            Render::Print(to_wstring((long long)sy), 3, 300, 480);
+            Render::Print(to_wstring((long long)sw), 3, 300, 500);
+            Render::Print(to_wstring((long long)sh), 3, 300, 520);
         }
     }
 }

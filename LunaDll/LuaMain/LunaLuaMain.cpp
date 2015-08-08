@@ -13,6 +13,7 @@
 #include "../libs/luasocket/mime.h"
 #include <string>
 #include <luabind/adopt_policy.hpp>
+#include <luabind/out_value_policy.hpp>
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
@@ -136,22 +137,26 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "mainV2.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
     if(!(lapierrcode == 0)){
         object error_msg(from_stack(L, -1));
-        LuaProxy::Text::windowDebug(object_cast<const char*>(error_msg));
+        MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
         errLapi = true;
     }
-
+    {
+        errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+    }
+    
+    
     //Shutdown if an error happend.
     if(errLapi){
         shutdown();
         return;
     }
 
+
     //Call the lua api init funtion.
     {
         object _G = globals(L);
         const char* initFunc = object_cast<const char*>(_G["__lapiInit"]);
         m_luaEventTableName = std::string(object_cast<const char*>(_G["__lapiEventMgr"]));
-
 
         try
         {
@@ -164,7 +169,9 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
             errLapi = true;
         }
     }
-
+    {
+        errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+    }
     //Shutdown if an error happend.
     if(errLapi){
         shutdown();
@@ -246,6 +253,7 @@ void CLunaLua::bindAll()
 
             namespace_("Text")[
                 def("windowDebug", &LuaProxy::Text::windowDebug),
+                def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
                 def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
                 def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print)
             ],
@@ -262,6 +270,7 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img))&LuaProxy::Graphics::unplaceSprites),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
+                def("getPixelData", &LuaProxy::Graphics::getPixelData, pure_out_value(_2) + pure_out_value(_3)),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, lua_State*))&LuaProxy::Graphics::drawImageToScene),

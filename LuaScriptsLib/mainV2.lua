@@ -230,7 +230,7 @@ local function loadCodeFile(tableAddr, path, preDefinedEnv)
         codeFile()
     else
         if(not err:find("such file"))then
-            windowDebug("Error: "..err)
+            Text.windowDebugSimple("Error: "..err)
         end
         return false
     end
@@ -285,13 +285,15 @@ function __onInit(lvlPath, lvlName)
         end)}
         
         if(not status[1])then
-            windowDebug(status[2])
-            error()
+            Text.windowDebugSimple(status[2])
+            __isLuaError = true
+            return
         end
         table.remove(status, 1)
         isLunaworld, isLunadll = unpack(status)
         if((not isLunaworld) and (not isLunadll))then
-            error() --Shutdown Lua module as it is not used.
+            __isLuaError = true --Shutdown Lua module as it is not used.
+            return
         end
     else
         local isOverworld = true
@@ -312,13 +314,15 @@ function __onInit(lvlPath, lvlName)
             return doOverworld
         end)}
         if(not status[1])then
-            windowDebug(status[2])
-            error()
+            Text.windowDebugSimple(status[2])
+            __isLuaError = true
+            return
         end
         table.remove(status, 1)
         isOverworld = unpack(status)
         if(not isOverworld)then
-            error() --Shutdown Lua module as it is not used.
+            __isLuaError = true --Shutdown Lua module as it is not used.
+            return
         end
     end
 end
@@ -482,7 +486,7 @@ eventManager = setmetatable({ --Normal table
                 if(type(v.apiTable[v.eventHandler])=="function")then
                     local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
                     if(not returns[1])then
-                        windowDebug(returns[2])
+                        Text.windowDebugSimple(returns[2])
                         __isLuaError = true
                         return
                     end
@@ -499,7 +503,7 @@ eventManager = setmetatable({ --Normal table
             if(type(__lunaworld[eventManager.nextEvent])=="function")then
                 local returns = {__xpcall(__lunaworld[eventManager.nextEvent],...)}
                 if(not returns[1])then
-                    windowDebug(returns[2])
+                    Text.windowDebugSimple(returns[2])
                     __isLuaError = true
                     return
                 end
@@ -512,7 +516,7 @@ eventManager = setmetatable({ --Normal table
             if(type(__lunalocal[eventManager.nextEvent])=="function")then
                 local returns = {__xpcall(__lunalocal[eventManager.nextEvent],...)}
                 if(not returns[1])then
-                    windowDebug(returns[2])
+                    Text.windowDebugSimple(returns[2])
                     __isLuaError = true
                     return
                 end
@@ -525,7 +529,7 @@ eventManager = setmetatable({ --Normal table
             if(type(__lunaoverworld[eventManager.nextEvent])=="function")then
                 local returns = {__xpcall(__lunaoverworld[eventManager.nextEvent],...)}
                 if(not returns[1])then
-                    windowDebug(returns[2])
+                    Text.windowDebugSimple(returns[2])
                     __isLuaError = true
                     return
                 end
@@ -540,7 +544,7 @@ eventManager = setmetatable({ --Normal table
                 if(type(v.apiTable[v.eventHandler])=="function")then
                     local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
                     if(not returns[1])then
-                        windowDebug(returns[2])
+                        Text.windowDebugSimple(returns[2])
                         __isLuaError = true
                         return
                     end
@@ -564,7 +568,7 @@ eventManager = setmetatable({ --Normal table
 },    
 { --Metatable
     __newindex = function (tarTable, key, value)
-        --windowDebug("newindex: "..tostring(key))
+        --Text.windowDebugSimple("newindex: "..tostring(key))
     end,
 
     __index = function (tarTable, tarKey)

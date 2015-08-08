@@ -3,6 +3,7 @@
 
 #include "../Defines.h"
 #include <string>
+#include <functional>
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
 
@@ -16,8 +17,10 @@ public:
     BMPBox(std::wstring filename, HDC screen_dc);
     void Init();
     void MakeColorTransparent(int transparency_color);
-
     bool ImageLoaded();
+
+    void forEachPixelValue(std::function<void(BYTE)> forEachFunc);
+
 
     /// Members ///
     int m_H;				// Height of bitmap

@@ -778,7 +778,8 @@ namespace LuaProxy {
     }
     //Debug/Text functions
     namespace Text{
-        void windowDebug(const char* debugText);
+        void windowDebug(const char* debugText, lua_State* L);
+        void windowDebugSimple(const char* debugText);
         void print(const luabind::object& toPrint, int x, int y);
         void print(const luabind::object& toPrint, int type, int x, int y);
         void showMessageBox(const std::string &text);
@@ -824,6 +825,7 @@ namespace LuaProxy {
         void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img);
+        luabind::object getPixelData(const LuaImageResource& img, int& width, int& height, lua_State *L);
 
         void drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
         void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);

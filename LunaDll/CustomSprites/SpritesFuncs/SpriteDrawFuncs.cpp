@@ -16,10 +16,10 @@ void SpriteFunc::StaticDraw(CSprite* me) {
 			op->m_FramesLeft = 1;
 			op->x = me->m_Xpos + me->m_GfxXOffset;
 			op->y = me->m_Ypos + me->m_GfxYOffset;
-			op->sx1 = me->m_GfxRects[me->m_AnimationFrame].left;
-			op->sy1 = me->m_GfxRects[me->m_AnimationFrame].top;
-			op->sx2 = me->m_GfxRects[me->m_AnimationFrame].right;
-			op->sy2 = me->m_GfxRects[me->m_AnimationFrame].bottom;
+			op->sx = me->m_GfxRects[me->m_AnimationFrame].left;
+			op->sy = me->m_GfxRects[me->m_AnimationFrame].top;
+			op->sw = me->m_GfxRects[me->m_AnimationFrame].right;
+			op->sh = me->m_GfxRects[me->m_AnimationFrame].bottom;
 			op->img_resource_code = me->m_ImgResCode;
 
 			gLunaRender.AddOp(op);
@@ -49,10 +49,10 @@ void SpriteFunc::RelativeDraw(CSprite* me) {
 			op->m_FramesLeft = 1;
 			op->x = sx;
 			op->y = sy;
-			op->sx1 = me->m_GfxRects[me->m_AnimationFrame].left;
-			op->sy1 = me->m_GfxRects[me->m_AnimationFrame].top;
-			op->sx2 = me->m_GfxRects[me->m_AnimationFrame].right;
-			op->sy2 = me->m_GfxRects[me->m_AnimationFrame].bottom;
+			op->sx = me->m_GfxRects[me->m_AnimationFrame].left;
+			op->sy = me->m_GfxRects[me->m_AnimationFrame].top;
+			op->sw = me->m_GfxRects[me->m_AnimationFrame].right;
+			op->sh = me->m_GfxRects[me->m_AnimationFrame].bottom;
 			op->img_resource_code = me->m_ImgResCode;			
 
 			gLunaRender.AddOp(op);	
