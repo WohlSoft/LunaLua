@@ -24,8 +24,8 @@ namespace LuaProxy
 		bool MusicIsPlaying();
 		bool MusicIsPaused();
 		bool MusicIsFading();
- std::string MusicTitle();
- std::string MusicTitleTag();
+        std::string MusicTitle();
+        std::string MusicTitleTag();
 		void seizeStream(int section);
 		void releaseStream(int section);
 		
