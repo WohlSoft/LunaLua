@@ -113,22 +113,22 @@ void PGE_MusPlayer::MUS_stopMusicFadeOut(int ms)
 		Mix_FadeOutMusic(ms);
 }
 
-const char* PGE_MusPlayer::MUS_MusicTitle()
+std::string PGE_MusPlayer::MUS_MusicTitle()
 {
 	if (!PGE_SDL_Manager::isInit) return "";
 	if (play_mus)
-		return Mix_GetMusicTitle(play_mus);
+		return std::string(Mix_GetMusicTitle(play_mus));
 	else
-		return "";
+		return std::string("");
 }
 
-const char* PGE_MusPlayer::MUS_MusicTitleTag()
+std::string PGE_MusPlayer::MUS_MusicTitleTag()
 {
 	if (!PGE_SDL_Manager::isInit) return "";
 	if (play_mus)
-		return Mix_GetMusicTitleTag(play_mus);
+		return std::string(Mix_GetMusicTitleTag(play_mus));
 	else
-		return "";
+		return std::string("");
 }
 
 

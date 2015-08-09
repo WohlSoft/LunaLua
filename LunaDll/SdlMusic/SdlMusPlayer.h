@@ -28,8 +28,8 @@ public:
 	static void MUS_pauseMusic();
 	static void MUS_stopMusic();
 	static void MUS_stopMusicFadeOut(int ms);
-	static const char* MUS_MusicTitle();
-	static const char* MUS_MusicTitleTag();
+	static std::string MUS_MusicTitle();
+	static std::string MUS_MusicTitleTag();
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);

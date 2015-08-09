@@ -99,14 +99,14 @@ bool LuaProxy::Audio::MusicIsFading()
 #endif
 }
 
-const char *LuaProxy::Audio::MusicTitle()
+std::string LuaProxy::Audio::MusicTitle()
 {
 #ifndef NO_SDL
 	return PGE_MusPlayer::MUS_MusicTitle();
 #endif
 }
 
-const char *LuaProxy::Audio::MusicTitleTag()
+std::string LuaProxy::Audio::MusicTitleTag()
 {
 #ifndef NO_SDL
 	return PGE_MusPlayer::MUS_MusicTitleTag();
