@@ -177,7 +177,7 @@ void LuaProxy::NPC::setId(int id, lua_State* L)
 {
     if (!isValid_throw(L))
         return;
-    ::NPC::Get(m_index)->id;
+    ::NPC::Get(m_index)->id = id;
 }
 
 
