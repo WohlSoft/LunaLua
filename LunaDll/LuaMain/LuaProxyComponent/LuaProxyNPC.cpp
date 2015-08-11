@@ -172,6 +172,15 @@ int LuaProxy::NPC::id(lua_State* L) const
 	return (int)::NPC::Get(m_index)->id;
 }
 
+
+void LuaProxy::NPC::setId(int id, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::NPC::Get(m_index)->id;
+}
+
+
 float LuaProxy::NPC::direction(lua_State* L) const
 {
 	if(!isValid_throw(L))

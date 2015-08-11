@@ -237,6 +237,7 @@ namespace LuaProxy {
 
         NPC (int index);
         int id(lua_State* L) const;
+        void setId(int id, lua_State* L);
         bool isHidden(lua_State* L) const;
         void setIsHidden(bool isHidden, lua_State* L);
         float direction(lua_State* L) const;
