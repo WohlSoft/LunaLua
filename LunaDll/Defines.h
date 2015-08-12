@@ -158,6 +158,7 @@ DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
 DEFMEM(GM_NPCS_PTR,         void*, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
 DEFMEM(GM_NPCS_COUNT,       WORD,  0x00B2595A); 
 DEFMEM(GM_PLAYERS_PTR,      void*, 0x00B25A20);
+DEFMEM(GM_PLAYERS_TEMPLATE, void*, 0x00B2C91C);     // Editor Template
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
 DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
 
@@ -453,8 +454,13 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 
 //      Arg1 = unsigned int*  block index
-//      Arg2 = short* playSoundAndEffects
+//      Arg2 = short*         playSoundAndEffects
 #define GF_BLOCK_REMOVE     0x009E0D50
+
+//      Arg1 = unsigned int*  block index
+//      Arg2 = short*         unknown flag 1
+//      Arg3 = short*         unknown flag 2
+#define GF_BLOCK_HIT        0x009DA620
 
 //      Arg1 = short* Animation ID
 //      Arg2 = Momentum* (for x and y coor)
@@ -513,6 +519,7 @@ static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
 static const auto native_doPow          = (void(__stdcall *)())GF_POW;
 
+static const auto native_hitBlock       = (void(__stdcall *)(unsigned int* /*blockIndex*/, short* /*unknownFlag1*/, unsigned short* /*unknownFlag2*/))GF_BLOCK_HIT;
 static const auto native_removeBlock    = (void(__stdcall *)(unsigned int* /*blockIndex*/, short* /*playEffects*/))GF_BLOCK_REMOVE;
 
 static const auto native_runEffect      = (void(__stdcall *)(short* /*EffectID*/, Momentum* /*coor*/, float* /*EffectFrame*/, short* /*npcID*/, short* /*showOnlyMask*/))GF_RUN_ANIM;

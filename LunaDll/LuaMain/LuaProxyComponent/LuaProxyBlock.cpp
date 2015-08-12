@@ -269,6 +269,26 @@ void LuaProxy::Block::remove(bool playSoundEffect)
     native_removeBlock(&blockIndex, &doPlaySoundAndEffects);
 }
 
+void LuaProxy::Block::hit()
+{
+    hit(false);
+}
+
+void LuaProxy::Block::hit(bool fromUpSide)
+{
+    hit(fromUpSide, Player(1));
+}
+
+void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player)
+{
+    unsigned int blockIndex = m_index;
+    short unkFlag1VB = COMBOOL(fromUpSide);
+    unsigned short unkFlag2VB = player.getIndex();
+    native_hitBlock(&blockIndex, &unkFlag1VB, &unkFlag2VB);
+    player.getIndex();
+}
+
+
 
 bool LuaProxy::Block::isValid() const
 {

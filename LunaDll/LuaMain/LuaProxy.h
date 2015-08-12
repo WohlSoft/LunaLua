@@ -618,6 +618,9 @@ namespace LuaProxy {
         luabind::object layerObj(lua_State* L) const;
         void remove();
         void remove(bool playSoundEffect);
+        void hit();
+        void hit(bool fromUpSide);
+        void hit(bool fromUpSide, LuaProxy::Player player);
     private:
         bool isValid() const;
         int m_index;
