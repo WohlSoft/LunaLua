@@ -451,6 +451,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      No Args, Does convert every NPC to coins (Like player would win)
 #define GF_NPC_TO_COINS     0x00A3C580
 
+
+//      Arg1 = unsigned int*  block index
+//      Arg2 = short* playSoundAndEffects
+#define GF_BLOCK_REMOVE     0x009E0D50
+
 //      Arg1 = short* Animation ID
 //      Arg2 = Momentum* (for x and y coor)
 //      Arg3 = float* Animation frame (NOTE: Not the direct frame of the gif-file)
@@ -507,6 +512,8 @@ static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex
 
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
 static const auto native_doPow          = (void(__stdcall *)())GF_POW;
+
+static const auto native_removeBlock    = (void(__stdcall *)(unsigned int* /*blockIndex*/, short* /*playEffects*/))GF_BLOCK_REMOVE;
 
 static const auto native_runEffect      = (void(__stdcall *)(short* /*EffectID*/, Momentum* /*coor*/, float* /*EffectFrame*/, short* /*npcID*/, short* /*showOnlyMask*/))GF_RUN_ANIM;
 static const auto native_addScoreEffect = (void(__stdcall *)(short* /*baseValue*/, Momentum* /*coor*/, short* /*factor*/))GF_SCORE_RELEATED;

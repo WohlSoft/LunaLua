@@ -616,6 +616,8 @@ namespace LuaProxy {
         int collidesWith(const Player* player) const;
         VBStr layerName() const;
         luabind::object layerObj(lua_State* L) const;
+        void remove();
+        void remove(bool playSoundEffect);
     private:
         bool isValid() const;
         int m_index;

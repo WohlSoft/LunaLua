@@ -257,6 +257,19 @@ luabind::object LuaProxy::Block::layerObj(lua_State *L) const
 	return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
 }
 
+void LuaProxy::Block::remove()
+{
+    remove(false);
+}
+
+void LuaProxy::Block::remove(bool playSoundEffect)
+{
+    unsigned int blockIndex = m_index;
+    short doPlaySoundAndEffects = COMBOOL(playSoundEffect);
+    native_removeBlock(&blockIndex, &doPlaySoundAndEffects);
+}
+
+
 bool LuaProxy::Block::isValid() const
 {
 	return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
