@@ -165,8 +165,8 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     RECT clientRect;
     mHwnd = WindowFromDC(hdcDest);
     if (!GetClientRect(mHwnd, &clientRect)) return FALSE;
-    if (clientRect.right < 0) clientRect.right = 1;
-    if (clientRect.bottom < 0) clientRect.bottom = 1;
+    if (clientRect.right <= 0) clientRect.right = 1;
+    if (clientRect.bottom <= 0) clientRect.bottom = 1;
     int32_t windowWidth = clientRect.right;
     int32_t windowHeight = clientRect.bottom;
 
