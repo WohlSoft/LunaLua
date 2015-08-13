@@ -13,6 +13,7 @@ RenderBitmapOp::RenderBitmapOp() {
     sy = 0;
     sw = 0;
     sh = 0;
+    opacity = 1.0f;
     m_PerCycleOnly = false;
 }
 
@@ -21,6 +22,10 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     BMPBox* bmp = NULL;
     auto it = renderer->LoadedImages.find(img_resource_code);
     if (it != renderer->LoadedImages.end()) bmp = it->second;
+
+    float thisOpacity = opacity;
+    if (thisOpacity > 1.0f) thisOpacity = 1.0f;
+    if (thisOpacity < 0.0f) thisOpacity = 0.0f;
 
     if (bmp != NULL && bmp->m_hdc != NULL) {
         //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
@@ -31,14 +36,14 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         {
             g_GLEngine.DrawLunaSprite(
                 (int)x, (int)y, (int)sw, (int)sh,
-                *bmp, (int)sx, (int)sy, (int)sw, (int)sh);
+                *bmp, (int)sx, (int)sy, (int)sw, (int)sh, opacity);
         }
         else
         {
             BLENDFUNCTION bf;
             bf.BlendOp = AC_SRC_OVER;
             bf.BlendFlags = 0;
-            bf.SourceConstantAlpha = 255;
+            bf.SourceConstantAlpha = (int)roundf(255 * opacity);
             bf.AlphaFormat = AC_SRC_ALPHA;
             AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
                 bmp->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);

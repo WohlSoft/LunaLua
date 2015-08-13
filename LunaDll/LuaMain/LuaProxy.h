@@ -834,9 +834,13 @@ namespace LuaProxy {
         luabind::object getPixelData(const LuaImageResource& img, int& width, int& height, lua_State *L);
 
         void drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
+        void drawImage(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L);
         void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
+        void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
+        void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
+        void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L);
         
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);

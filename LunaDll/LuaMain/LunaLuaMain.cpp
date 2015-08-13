@@ -272,9 +272,13 @@ void CLunaLua::bindAll()
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
                 def("getPixelData", &LuaProxy::Graphics::getPixelData, pure_out_value(_2) + pure_out_value(_3)),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
                 // glDrawTriangles will be defined at runtime using FFI

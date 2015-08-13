@@ -81,7 +81,8 @@ void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
                 cmd.mData.mLunaSprite.nWidthDest, cmd.mData.mLunaSprite.nHeightDest,
                 *cmd.mData.mLunaSprite.bmp,
                 cmd.mData.mLunaSprite.nXOriginSrc, cmd.mData.mLunaSprite.nYOriginSrc,
-                cmd.mData.mLunaSprite.nWidthSrc, cmd.mData.mLunaSprite.nHeightSrc);
+                cmd.mData.mLunaSprite.nWidthSrc, cmd.mData.mLunaSprite.nHeightSrc,
+                cmd.mData.mLunaSprite.opacity);
         }
         break;
     case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
@@ -171,11 +172,11 @@ void GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOrig
         hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop));
 }
 void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
+    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
 {
     QueueCmd(GLEngineCmd::DrawLunaSprite(
         nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
-        bmp, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc));
+        bmp, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, opacity));
 }
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {

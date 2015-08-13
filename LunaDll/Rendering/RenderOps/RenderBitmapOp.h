@@ -15,6 +15,8 @@ public:
     double sw;				// Source x1 (right edge)
     double sh;				// Source x1 (bottom edge)
 
+    float  opacity;         // Opacity value
+
     int img_resource_code;
 };
 

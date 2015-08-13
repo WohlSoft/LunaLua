@@ -199,7 +199,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     GLERRORCHECK();
 
     // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f);
     GLERRORCHECK();
     glFlush();
     GLERRORCHECK();
@@ -223,7 +223,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 }
 
 void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
+    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
 {
     if (!mInitialized) Init();
     if (!mInitialized) return;
@@ -233,7 +233,7 @@ void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest
         return;
     }
 
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, tex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc);
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, tex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, opacity);
 }
 
 void GLEngine::EndFrame(HDC hdcDest)

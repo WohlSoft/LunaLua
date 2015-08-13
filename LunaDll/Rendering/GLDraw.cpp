@@ -160,7 +160,7 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 }
 
 
-void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight)
+void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity)
 {
     // Generate our floating point coordinates
     float texw = (float)tex->pw;
@@ -199,6 +199,12 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
         0, 2, 3  // (bottom left - top right - bottom right)
     };
 
+    if (opacity < 1.0f)
+    {
+        // Apply opacity for pre-multiplied alpha
+        glColor4f(opacity, opacity, opacity, opacity);
+        GLERRORCHECK();
+    }
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);

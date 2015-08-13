@@ -58,6 +58,7 @@ struct GLEngineCmd {
             int nYOriginSrc;
             int nWidthSrc;
             int nHeightSrc;
+            float opacity;
         } mLunaSprite;
         struct {
             HDC hdcDest;
@@ -131,7 +132,7 @@ struct GLEngineCmd {
     }
 
     static inline GLEngineCmd DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc)
+        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
     {
         GLEngineCmd cmd;
 
@@ -145,6 +146,9 @@ struct GLEngineCmd {
         cmd.mData.mLunaSprite.nYOriginSrc = nYOriginSrc;
         cmd.mData.mLunaSprite.nWidthSrc = nWidthSrc;
         cmd.mData.mLunaSprite.nHeightSrc = nHeightSrc;
+        if (opacity > 1.0f) opacity = 1.0f;
+        if (opacity < 0.0f) opacity = 0.0f;
+        cmd.mData.mLunaSprite.opacity = opacity;
 
         return cmd;
     }
