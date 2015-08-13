@@ -413,6 +413,11 @@ void CLunaLua::bindAll()
 
             
             class_<LuaProxy::Player>("Player")
+            .scope[ //static functions
+                def("count", &LuaProxy::Player::count),
+                def("get", &LuaProxy::Player::get),
+                def("getTemplates", &LuaProxy::Player::getTemplates)
+            ]
             .def(constructor<>())
             .def(constructor<int>())
             .def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Player::mem))

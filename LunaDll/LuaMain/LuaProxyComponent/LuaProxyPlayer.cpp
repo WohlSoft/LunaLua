@@ -2,6 +2,24 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Misc/MiscFuncs.h"
 
+
+
+int LuaProxy::Player::count()
+{
+    return GM_PLAYERS_COUNT;
+}
+
+luabind::object LuaProxy::Player::get(lua_State* L)
+{
+    return LuaHelper::getObjList(GM_PLAYERS_COUNT, [](unsigned short i){ return LuaProxy::Player(i + 1); }, L);
+}
+
+luabind::object LuaProxy::Player::getTemplates(lua_State* L)
+{
+    return LuaHelper::getObjList(5, [](unsigned short i){ return LuaProxy::Player(i + 1001); }, L);
+}
+
+
 LuaProxy::Player::Player() : m_index(1)
 {}
 
