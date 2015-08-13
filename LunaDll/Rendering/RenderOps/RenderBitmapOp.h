@@ -16,6 +16,7 @@ public:
     double sh;				// Source x1 (bottom edge)
 
     float  opacity;         // Opacity value
+    bool   sceneCoords;     // If true, x and y are scene coordinates
 
     int img_resource_code;
 };

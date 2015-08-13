@@ -116,20 +116,45 @@ luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, in
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
 {
-    drawImage(img, xPos, yPos, 0, 0, 0, 0, 1.0f, L);
+    drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, false, L);
 }
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L)
 {
-    drawImage(img, xPos, yPos, 0, 0, 0, 0, opacity, L);
+    drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, false, L);
 }
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L)
 {
-    drawImage(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, L);
+    drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, false, L);
 }
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L)
+{
+    drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, false, L);
+}
+
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
+{
+    drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, true, L);
+}
+
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L)
+{
+    drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, true, L);
+}
+
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L)
+{
+    drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, true, L);
+}
+
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L)
+{
+    drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, true, L);
+}
+
+void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, lua_State* L)
 {
     const auto bmpIt = gLunaRender.LoadedImages.find(img.imgResource);
     if (bmpIt == gLunaRender.LoadedImages.cend()){
@@ -138,7 +163,7 @@ void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yP
     }
 
     BMPBox* imgBox = bmpIt->second;
-    
+
     RenderBitmapOp* renderOp = new RenderBitmapOp();
     renderOp->img_resource_code = img.imgResource;
     renderOp->x = xPos;
@@ -148,35 +173,10 @@ void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yP
     renderOp->sw = (sourceWidth <= 0 ? imgBox->m_W : sourceWidth);
     renderOp->sh = (sourceHeight <= 0 ? imgBox->m_H : sourceHeight);
     renderOp->opacity = opacity;
+    renderOp->sceneCoords = sceneCoords;
 
-    
     gLunaRender.AddOp(renderOp);
 }
-
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
-{
-    drawImageToScene(img, xPos, yPos, 0, 0, 0, 0, 1.0f, L);
-}
-
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L)
-{
-    drawImageToScene(img, xPos, yPos, 0, 0, 0, 0, opacity, L);
-}
-
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L)
-{
-    drawImageToScene(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, L);
-}
-
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L)
-{
-    double camX = SMBX_CameraInfo::getCameraX(1);
-    double camY = SMBX_CameraInfo::getCameraY(1);
-    
-    drawImage(img, xPos - camX, yPos - camY, sourceX, sourceY, sourceWidth, sourceHeight, opacity, L);
-}
-
-
 
 void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t color)
 {   
