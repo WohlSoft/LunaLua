@@ -287,6 +287,10 @@ namespace LuaProxy {
 
     class Player{
     public:
+        static int count();
+        static luabind::object get(lua_State* L);
+        static luabind::object getTemplates(lua_State* L);
+        
         Player ();
         Player (int index);
         int section(lua_State *L) const;
