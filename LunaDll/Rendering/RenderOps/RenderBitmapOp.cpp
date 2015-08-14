@@ -4,6 +4,7 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../GLEngine.h"
 #include "../../Defines.h"
+#include "../../SMBXInternal/CameraInfo.h"
 
 // CTOR
 RenderBitmapOp::RenderBitmapOp() {
@@ -14,6 +15,7 @@ RenderBitmapOp::RenderBitmapOp() {
     sw = 0;
     sh = 0;
     opacity = 1.0f;
+    sceneCoords = false;
     m_PerCycleOnly = false;
 }
 
@@ -23,9 +25,16 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     auto it = renderer->LoadedImages.find(img_resource_code);
     if (it != renderer->LoadedImages.end()) bmp = it->second;
 
-    float thisOpacity = opacity;
-    if (thisOpacity > 1.0f) thisOpacity = 1.0f;
-    if (thisOpacity < 0.0f) thisOpacity = 0.0f;
+    float opacity = this->opacity;
+    if (opacity > 1.0f) opacity = 1.0f;
+    if (opacity < 0.0f) opacity = 0.0f;
+
+    double x = this->x;
+    double y = this->y;
+    if (sceneCoords) {
+        x -= (int)SMBX_CameraInfo::getCameraX(1);
+        y -= (int)SMBX_CameraInfo::getCameraY(1);
+    }
 
     if (bmp != NULL && bmp->m_hdc != NULL) {
         //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
