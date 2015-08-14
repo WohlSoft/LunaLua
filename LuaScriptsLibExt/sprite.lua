@@ -211,26 +211,30 @@ local SpriteClass_mt = {}
 SpriteClass_mt.__index = SpriteClass_mt
 
 function SpriteClass_mt:onLoop()
-    self.x = self.x + self.speedX
-    self.y = self.y + self.speedY
+    if(self.updateMovement)then
+        self.x = self.x + self.speedX
+        self.y = self.y + self.speedY
+    end
     
     local currentAnimationSet = self:getCurrentAnimationSet()
     if(#currentAnimationSet == 0)then
         return
     end
     
-    if(self.frameTimerCurrent == self.frameTimerSpeed)then
-        if(self.currentAnimationSetFrame >= #currentAnimationSet)then
-            self.currentAnimationSetFrame = 1
-        else
-            self.currentAnimationSetFrame = self.currentAnimationSetFrame + 1
+    if(self.updateFrames)then
+        if(self.frameTimerCurrent == self.frameTimerSpeed)then
+            if(self.currentAnimationSetFrame >= #currentAnimationSet)then
+                self.currentAnimationSetFrame = 1
+            else
+                self.currentAnimationSetFrame = self.currentAnimationSetFrame + 1
+            end
         end
-    end
-    
-    if(self.frameTimerCurrent == self.frameTimerSpeed)then
-        self.frameTimerCurrent = 1
-    else
-        self.frameTimerCurrent = self.frameTimerCurrent + 1
+        
+        if(self.frameTimerCurrent == self.frameTimerSpeed)then
+            self.frameTimerCurrent = 1
+        else
+            self.frameTimerCurrent = self.frameTimerCurrent + 1
+        end
     end
 end
 
@@ -326,6 +330,22 @@ function SpriteClass_mt:setFrameSpeed(frameSpeed)
     self.frameTimerSpeed = frameSpeed
 end
 
+function SpriteClass_mt:pauseMovement()
+    self.updateMovement = false
+end
+
+function SpriteClass_mt:continueMovement()
+    self.updateMovement = true
+end
+
+function SpriteClass_mt:pauseAnimation()
+    self.updateFrames = false
+end
+
+function SpriteClass_mt:continueAnimation()
+    self.updateFrames = true
+end
+
 
 
 
@@ -376,6 +396,9 @@ function SpriteFactory.sprite(...)
     
     newSprite.isShown = false
     newSprite.updateSpeed = true
+    
+    newSprite.updateFrames = true
+    newSprite.updateMovement = true
     
     
     local args = {...}
