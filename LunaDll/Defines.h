@@ -137,7 +137,19 @@ enum Characters : short {
 
 // General
 DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
-DEFMEM(GM_MODE_INTRO,       WORD,  0x00B2C89C);
+
+// Modes
+DEFMEM(GM_CREDITS_MODE,     WORD,  0x00B2C89C);
+DEFMEM(GM_EPISODE_MODE,     WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
+DEFMEM(GM_LEVEL_MODE,       WORD,  0x00B2C620);
+/*
+The modes work as followed:
+GM_CREDITS_MODE == -1                        --> Credits
+GM_LEVEL_MODE   == -1                        --> Intro (Main Menu)
+GM_EPISODE_MODE == -1                        --> Overworld
+GM_EPISODE_MODE == -1 && GM_LEVEL_MODE == -1 --> Level
+*/
+
 
 // Pre-Defined Strings      
 DEFMEM(GM_STR_NULL,         VB6StrPtr, 0x00423D00);
@@ -275,8 +287,6 @@ DEFMEM(GM_MARIO_VS_LUIGI_T, WORD,  0x00B2D760);      // 0 = default, if higher t
 DEFMEM(GM_WINS_T,           WORD,  0x00B2D762);      // 0 = default, if higher than 0 then display text "WINS!"
 
 DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if higher than 0 then winning by this win-type
-DEFMEM(GM_WORLD_MODE,       WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
-DEFMEM(GM_INTRO_MODE,       WORD,  0x00B2C620);
 
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
@@ -404,6 +414,8 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg4 = float* y
 #define GF_PRINT            0x00951F50
 
+#define GF_SAVE_GAME        0x008E47D0
+
 // Start kill event for a player
 //      Arg1 = int* to Index of player
 #define GF_KILL_PLAYER      0x009B66D0
@@ -505,6 +517,8 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
+
+static const auto native_saveGame       = (void(__stdcall *)())GF_SAVE_GAME;
 
 static const auto native_isOnCamera     = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_CAMERA;
 static const auto native_isOnWCamera    = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_WCAMERA;

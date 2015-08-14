@@ -294,11 +294,15 @@ void CLunaLua::bindAll()
 
             namespace_("Misc")[
                 def("cheatBuffer", (std::string(*)())&LuaProxy::Misc::cheatBuffer),
-                    def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer),
-                    def("listFiles", &LuaProxy::Misc::listFiles),
-                    def("listLocalFiles", &LuaProxy::Misc::listLocalFiles),
-                    def("resolveFile", &LuaProxy::Misc::resolveFile),
-                    def("resolveDirectory", &LuaProxy::Misc::resolveDirectory)
+                def("cheatBuffer", (void(*)(const luabind::object&, lua_State*))&LuaProxy::Misc::cheatBuffer),
+                def("listFiles", &LuaProxy::Misc::listFiles),
+                def("listLocalFiles", &LuaProxy::Misc::listLocalFiles),
+                def("resolveFile", &LuaProxy::Misc::resolveFile),
+                def("resolveDirectory", &LuaProxy::Misc::resolveDirectory),
+                def("openPauseMenu", &LuaProxy::Misc::openPauseMenu),
+                def("saveGame", &LuaProxy::Misc::saveGame),
+                def("exitGame", &LuaProxy::Misc::exitGame),
+                def("loadEpisode", &LuaProxy::Misc::loadEpisode)
             ],
 
             namespace_("Audio")[

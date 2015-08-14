@@ -192,6 +192,11 @@ extern int __stdcall LoadIntro()
         
     }
 
+    if (GameAutostartConfig::nextAutostartConfig) {
+        GameAutostartConfig::nextAutostartConfig->doAutostart();
+        GameAutostartConfig::nextAutostartConfig.reset();
+    }
+
 
 #pragma warning(suppress: 28159)
     return GetTickCount();
@@ -480,7 +485,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 
 extern void __stdcall checkLevelShutdown()
 {
-    if (GM_WORLD_MODE || GM_INTRO_MODE){
+    if (GM_EPISODE_MODE || GM_LEVEL_MODE){
         if (gLunaLua.isValid()){
             Event shutdownEvent("onExitLevel", false);
             shutdownEvent.setDirectEventName("onExitLevel");

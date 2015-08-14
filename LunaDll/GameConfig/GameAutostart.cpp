@@ -1,5 +1,6 @@
 #include "GameAutostart.h"
 
+std::unique_ptr<GameAutostart> GameAutostartConfig::nextAutostartConfig;
 
 GameAutostart::GameAutostart() :
     selectedEpisode(""),
@@ -14,10 +15,10 @@ GameAutostart::~GameAutostart() {}
 
 
 
-void GameAutostart::applyAutostart()
+bool GameAutostart::applyAutostart()
 {
     if (selectedEpisode == "")
-        return;
+        return false;
 
     //load all episodes
     native_loadWorldList();
@@ -41,15 +42,23 @@ void GameAutostart::applyAutostart()
             //First save slot
             GM_CUR_MENUCHOICE = saveSlot - 1;
 
-            //Now simulate an VK_RETURN and enter the episode
-            *(WORD*)0xB2D6D4 = -1;
+            //When the intro loads, then do the VK_RETURN patch
+            //Set doAutostart() function
+            GameAutostartConfig::nextAutostartConfig.reset(new GameAutostart(*this));
             
             //We're done here
-            return;
+            return true;
         }
     }
+    return false;
 }
 
+
+void GameAutostart::doAutostart()
+{
+    //Now simulate an VK_RETURN and enter the episode
+    *(WORD*)0xB2D6D4 = -1;
+}
 
 GameAutostart GameAutostart::createGameAutostartByIniConfig(INIReader& reader)
 {

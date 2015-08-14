@@ -1,7 +1,7 @@
 #include "../../LuaProxy.h"
 #include "../../../Defines.h"
 #include "../../../GlobalFuncs.h"
-
+#include "../../../GameConfig/GameAutostart.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -116,4 +116,30 @@ luabind::object LuaProxy::Misc::resolveDirectory(const std::string& directory, l
     return luabindResolveFile<FILE_ATTRIBUTE_DIRECTORY>(directory, L);
 }
 
+void LuaProxy::Misc::openPauseMenu()
+{
+    short player = 1;
+    native_msgbox(&player);
+}
 
+void LuaProxy::Misc::saveGame()
+{
+    native_saveGame();
+}
+
+void LuaProxy::Misc::exitGame()
+{
+    GM_EPISODE_MODE = 0;
+    GM_LEVEL_MODE = 0xFFFF;
+}
+
+bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
+{
+    GameAutostart autoStartEpisode;
+    autoStartEpisode.setSelectedEpisode(episodeName);
+    autoStartEpisode.setSaveSlot(GM_CUR_SAVE_SLOT);
+    bool success = autoStartEpisode.applyAutostart();
+    if (success)
+        exitGame();
+    return success;
+}

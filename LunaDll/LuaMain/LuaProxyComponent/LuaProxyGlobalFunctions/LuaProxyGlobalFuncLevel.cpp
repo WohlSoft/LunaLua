@@ -4,7 +4,8 @@
 
 void LuaProxy::Level::exit()
 {
-    GM_WORLD_MODE = 0xFFFF;
+    GM_EPISODE_MODE = 0xFFFF;
+    GM_LEVEL_MODE = 0;
 }
 
 unsigned short LuaProxy::Level::winState()

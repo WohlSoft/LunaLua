@@ -3,6 +3,7 @@
 
 #include "../SMBXInternal/Menu.h"
 #include "../libs/ini-reader/INIReader.h"
+#include <memory>
 
 class GameAutostart
 {
@@ -18,7 +19,7 @@ public:
     GameAutostart();
     ~GameAutostart();
     static GameAutostart createGameAutostartByIniConfig(INIReader& reader);
-
+    
 
     std::string getSelectedEpisode() const { return selectedEpisode; }
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
@@ -31,10 +32,13 @@ public:
     int getSaveSlot() const { return saveSlot; }
     void setSaveSlot(int val) { saveSlot = val; }
 
-
-    void applyAutostart();
-
+    
+    bool applyAutostart();
+    void doAutostart();
 };
 
+namespace GameAutostartConfig {
+    extern std::unique_ptr<GameAutostart> nextAutostartConfig;
+}
 
 #endif

@@ -812,6 +812,10 @@ namespace LuaProxy {
         luabind::object listLocalFiles(std::string path, lua_State* L);
         luabind::object resolveFile(const std::string& relativePath, lua_State* L);
         luabind::object resolveDirectory(const std::string& relativePath, lua_State* L);
+        void openPauseMenu();
+        void saveGame();
+        void exitGame();
+        bool loadEpisode(const std::string& episodeName);
     }
 
     namespace Graphics{
