@@ -49,7 +49,7 @@ void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITM
     pFactory = getWICFactory();
     if (pFactory == NULL) goto cleanup;
 
-    hr = pFactory->CreateDecoderFromFilename(filename.c_str(), NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+    hr = pFactory->CreateDecoderFromFilename(filename.c_str(), NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder);
     if (FAILED(hr)) goto cleanup;
 
     UINT frames = 0;

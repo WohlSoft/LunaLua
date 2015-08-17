@@ -129,7 +129,6 @@ luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, in
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
 {
-    //dbgboxA(std::to_string((int)gLunaRender.LoadedImages.size()).c_str());
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, false, L);
 }
 
