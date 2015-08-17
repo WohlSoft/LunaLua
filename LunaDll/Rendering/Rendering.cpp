@@ -1,5 +1,6 @@
 #include <climits>
 #include "Rendering.h"
+#include "RenderUtils.h"
 #include "../Defines.h"
 #include "../SMBXInternal/Level.h"
 #include "../Misc/MiscFuncs.h"
@@ -10,6 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
+
 
 using namespace std;
 
@@ -84,6 +86,44 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 
     return true;
 }
+
+
+std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename)
+{
+    // Concoct full filepath
+    wstring full_path = L"";
+
+    if (!isAbsolutePath(filename)){
+        wstring world_dir = (wstring)GM_FULLDIR;
+        full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
+        if (!gIsOverworld){
+            full_path = removeExtension(full_path);
+            full_path = full_path.append(L"\\"); // < path into level folder
+        }
+        full_path = full_path + filename;
+    }
+    else
+    {
+        full_path = filename;
+    }
+
+    std::vector<HBITMAP> bitmaps = LoadAnimatedGfx(filename);
+    std::vector<int> bitmapResCode;
+
+    for (HBITMAP nextBitmap : bitmaps) {
+        int nextResCode = GetAutoImageResourceCode();
+        BMPBox* pNewbox = new BMPBox(nextBitmap, m_hScreenDC);
+        if (pNewbox->ImageLoaded() == false) {
+            delete pNewbox;
+            gLogger.Log(L"BMPBox image load failed", LOG_STD);
+            continue;
+        }
+        StoreImage(pNewbox, nextResCode);
+        bitmapResCode.push_back(nextResCode);
+    }
+    return bitmapResCode;  
+}
+
 
 //STORE IMAGE
 void Renderer::StoreImage(BMPBox* bmp, int resource_code) {

@@ -15,6 +15,9 @@ public:
     BMPBox();
     ~BMPBox();
     BMPBox(std::wstring filename, HDC screen_dc);
+    BMPBox(HBITMAP bitmapData, HDC screen_dc);
+    BMPBox(BMPBox&) = default;
+    
     void Init();
     void MakeColorTransparent(int transparency_color);
     bool ImageLoaded();

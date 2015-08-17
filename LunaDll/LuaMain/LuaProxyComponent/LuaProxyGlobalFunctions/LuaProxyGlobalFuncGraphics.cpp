@@ -5,6 +5,7 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
+#include <luabind/adopt_policy.hpp>
 
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(int imgResource) {
@@ -39,6 +40,18 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* 
     // Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
     return new LuaProxy::Graphics::LuaImageResource(resNumber);
 }
+
+luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, lua_State* L)
+{
+    luabind::object tLuaImageResources = luabind::newtable(L);
+    std::vector<int> resCodes = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename));
+    for (int i = 0; i < resCodes.size(); i++){
+        tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(resCodes[i]), luabind::adopt(luabind::result));
+    }
+    return tLuaImageResources;
+}
+
+
 
 bool LuaProxy::Graphics::loadImage(const char* filename, int resNumber, int transColor)
 {
@@ -116,6 +129,7 @@ luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, in
 
 void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
 {
+    //dbgboxA(std::to_string((int)gLunaRender.LoadedImages.size()).c_str());
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, false, L);
 }
 

@@ -8,6 +8,7 @@
 #include <map>
 //#include "RenderOp.h"
 #include "GLEngineCmds.h"
+#include <vector>
 
 class RenderOp;
 class BMPBox;
@@ -22,6 +23,8 @@ struct Renderer {
 
     bool LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(std::wstring filename, int resource_code);
+    std::vector<int> LoadAnimatedBitmapResource(std::wstring filename);
+
     bool DeleteImage(int resource_code);
     int  GetAutoImageResourceCode() const;
 

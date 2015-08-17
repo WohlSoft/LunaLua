@@ -262,6 +262,7 @@ void CLunaLua::bindAll()
                 class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource"),
                 def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const char*))&LuaProxy::Graphics::loadImage, adopt(result)),
+                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage),
                 def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
