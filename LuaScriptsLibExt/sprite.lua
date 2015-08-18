@@ -165,6 +165,20 @@ function AnimationSetFactory.fromSubImages(imgs)
     return animationSet
 end
 
+function AnimationSetFactory.fromGif(path)
+    local typeOfPath = type(path)
+    if(typeOfPath ~= "string")then
+        error("Arg #1 path expected string (got " .. typeOfPath .. ")", 2)
+    end
+
+    local gifFrames, frameSpeed = Graphics.loadAnimatedImage(path)
+    if(#gifFrames == 0)then
+        return nil
+    end
+    
+    return AnimationSetFactory.fromImages(gifFrames), frameSpeed
+end
+
 
 
 -- SPRITE CLASS BEGIN
@@ -377,6 +391,10 @@ end
 
 function SpriteFactory.animationFromImages(...)
     return AnimationSetFactory.fromImages(...)
+end
+
+function SpriteFactory.animationFromGif(...)
+    return AnimationSetFactory.fromGif(...)
 end
 
 function SpriteFactory.animationFromSubImages(...)
