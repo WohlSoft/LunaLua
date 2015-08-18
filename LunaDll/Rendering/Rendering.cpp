@@ -11,7 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
-
+#include <tuple>
 
 using namespace std;
 
@@ -88,7 +88,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 }
 
 
-std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename)
+std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
 {
     // Concoct full filepath
     wstring full_path = L"";
@@ -107,9 +107,14 @@ std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename)
         full_path = filename;
     }
 
-    std::vector<HBITMAP> bitmaps = LoadAnimatedGfx(filename);
+    std::tuple<std::vector<HBITMAP>, int> ret = LoadAnimatedGfx(filename);
+    std::vector<HBITMAP>& bitmaps = std::get<0>(ret);
+    if (frameTime) {
+        double avgFrameTime = (double)std::get<1>(ret);
+        *frameTime = (int)((avgFrameTime / 100) * 65);
+    }
+    
     std::vector<int> bitmapResCode;
-
     for (HBITMAP nextBitmap : bitmaps) {
         int nextResCode = GetAutoImageResourceCode();
         BMPBox* pNewbox = new BMPBox(nextBitmap, m_hScreenDC);

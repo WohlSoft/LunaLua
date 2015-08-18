@@ -830,7 +830,7 @@ namespace LuaProxy {
         void activateOverworldHud(WORLD_HUD_CONTROL activateFlag);
         //CSprite functions
         bool loadImage(const char* filename, int resNumber, int transColor);
-        luabind::object loadAnimatedImage(const std::string& filename, lua_State* L);
+        luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
         LuaImageResource* loadImage(const char* filename);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);

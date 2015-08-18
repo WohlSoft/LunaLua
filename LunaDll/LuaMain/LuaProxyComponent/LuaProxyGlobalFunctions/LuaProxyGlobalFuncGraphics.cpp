@@ -41,11 +41,11 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* 
     return new LuaProxy::Graphics::LuaImageResource(resNumber);
 }
 
-luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, lua_State* L)
+luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
-    std::vector<int> resCodes = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename));
-    for (int i = 0; i < resCodes.size(); i++){
+    std::vector<int> resCodes = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename), &smbxFrameTime);
+    for (unsigned int i = 0; i < resCodes.size(); i++){
         tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(resCodes[i]), luabind::adopt(luabind::result));
     }
     return tLuaImageResources;
