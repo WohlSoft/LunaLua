@@ -1,7 +1,20 @@
---colliders.lua 
---v2.0.1
---Created by Hoeloe, 2015
+--*********************************************--
+--**   _____      _ _ _     _                **--
+--**  / ____|    | | (_)   | |               **--
+--** | |     ___ | | |_  __| | ___ _ __ ___  **--
+--** | |    / _ \| | | |/ _` |/ _ \ '__/ __| **--
+--** | |___| (_) | | | | (_| |  __/ |  \__ \ **--
+--**  \_____\___/|_|_|_|\__,_|\___|_|  |___/ **--
+--**                                         **--
+--*********************************************--                                       
+-------------Created by Hoeloe - 2015------------
+-----Open-Source Collision Detection Library-----
+--------------For Super Mario Bros X-------------
+---------------------v2.1.2----------------------
+---------------REQUIRES VECTR.lua----------------
+
 local colliders = {}
+local vect = loadSharedAPI("vectr");
 
 local TYPE_PLAYER = 1;
 local TYPE_NPC = 2;
@@ -56,65 +69,6 @@ local function worldToScreen(x,y)
 end
 
 local colliderList = {};
-
-local Vector = {}
-
-function Vector.dot(v1, v2)
-	return (v1.x*v2.x) + (v1.y*v2.y);
-end
-
-function Vector:normalise()
-	return colliders.Vector(self.x/self.magnitude, self.y/self.magnitude);
-end
-
-function Vector:normalize()
-	return self:normalise();
-end
-
-function Vector.add(a,b)
-	if(type(a) == 'number') then return Vector.add(colliders.Vector(a,a),b);
-	elseif(type(b) == 'number') then return Vector.add(a,colliders.Vector(b,b));
-	else return colliders.Vector(a.x+b.x,a.y+b.y);
-	end
-end
-
-function Vector.subtract(a,b)
-	if(type(a) == 'number') then return Vector.subtract(colliders.Vector(a,a),b);
-	elseif(type(b) == 'number') then return Vector.subtract(a,colliders.Vector(b,b));
-	else return colliders.Vector(a.x-b.x,a.y-b.y);
-	end
-end
-
-function Vector.mul(v,c)
-	if(type(v) == 'number') then return Vector.mul(c,v); 
-	else return colliders.Vector(v.x*c,v.y*c);
-	end
-end
-
-function Vector.div(v,c)
-	return colliders.Vector(v.x/c, v.y/c);
-end
-
-local Vectormt = {}
-
-function colliders.Vector(x,y)
-	local v = {}
-	setmetatable(v,Vectormt);
-	v.x = x;
-	v.y = y;
-	v.sqrMagnitude = x*x + y*y;
-	v.magnitude = math.sqrt(v.sqrMagnitude);
-	return v;
-end
-
-Vectormt.__index = Vector;
-Vectormt.__eq = function(a,b) return a.x == b.x and a.y == b.y; end
-Vectormt.__add = Vector.add;
-Vectormt.__sub = Vector.subtract;
-Vectormt.__mul = Vector.mul;
-Vectormt.__div = Vector.div;
-Vectormt.__unm = function(a) return colliders.Vector(-a.x, -a.y) end
-Vectormt.__tostring = function(a) return "("..tostring(a.x)..", "..tostring(a.y)..")"; end
 
 local debugList = {}
 
@@ -365,11 +319,11 @@ local function convertPoints(p)
 	if(p.x == nil) then
 		a = p;
 		b = colliders.Point(p[1],p[2]);
-		c = colliders.Vector(p[1],p[2]);
-	elseif(p.magnitude == nil) then
+		c = vect.v2(p[1],p[2]);
+	elseif(p._type == nil) then
 		a = {p.x, p.y};
 		b = p;
-		c = colliders.Vector(p.x,p.y);
+		c = vect.v2(p.x,p.y);
 	else
 		a = {p.x, p.y};
 		b = colliders.Point(p.x,p.y);
@@ -394,14 +348,14 @@ local function testBoxCircle(ta,tb)
 			
 			if(tb.x > ta.x and tb.x < ta.x+ta.width and tb.y > ta.y and tb.y < ta.y+ta.height) then return true; end;
 			
-			local vs = { colliders.Vector(ta.x - tb.x,ta.y - tb.y), 
-						 colliders.Vector(ta.x+ta.width - tb.x,ta.y - tb.y),
-						 colliders.Vector(ta.x - tb.x,ta.y+ta.height - tb.y),
-						 colliders.Vector(ta.x+ta.width - tb.x,ta.y+ta.height - tb.y) };
+			local vs = { vect.v2(ta.x - tb.x,ta.y - tb.y), 
+						 vect.v2(ta.x+ta.width - tb.x,ta.y - tb.y),
+						 vect.v2(ta.x - tb.x,ta.y+ta.height - tb.y),
+						 vect.v2(ta.x+ta.width - tb.x,ta.y+ta.height - tb.y) };
 						 
 						 
 			for _,v in pairs(vs) do
-				if(v.magnitude < tb.radius) then
+				if(v.length < tb.radius) then
 					return true;
 				end
 			end
@@ -418,7 +372,7 @@ end
 
 local function testCirclePoint(a,b)
 			local _,p = convertPoints(b);
-			return (colliders.Vector(a.x-p.x,a.y-p.y).magnitude < a.radius);
+			return (vect.v2(a.x-p.x,a.y-p.y).length < a.radius);
 end
 
 local function isLeft(a, p0, p1)
@@ -452,7 +406,7 @@ local function testTriBox(a,b)
 		return true;
 	end
 		
-	if(colliders.raycast(a:Get(1),a:Get(2), b) or colliders.raycast(a:Get(2), a:Get(3), b) or colliders.raycast(a:Get(3), a:Get(1), b)) then
+	if(colliders.linecast(a:Get(1),a:Get(2), b) or colliders.linecast(a:Get(2), a:Get(3), b) or colliders.linecast(a:Get(3), a:Get(1), b)) then
 		return true;
 	else
 		return false;
@@ -471,7 +425,7 @@ local function testTriTri(a,b)
 		return true;
 	end
 		
-	if(colliders.raycast(a:Get(1),a:Get(2), b) or colliders.raycast(a:Get(2), a:Get(3), b) or colliders.raycast(a:Get(3), a:Get(1), b)) then
+	if(colliders.linecast(a:Get(1),a:Get(2), b) or colliders.linecast(a:Get(2), a:Get(3), b) or colliders.linecast(a:Get(3), a:Get(1), b)) then
 		return true;
 	else
 		return false;
@@ -673,6 +627,38 @@ local function intersect(a1, a2, b1, b2)
 	
 end
 
+--Determines whether two line segments are intersecting, and returns the intersection point as a second argument.
+local function intersectpoint(a1, a2, b1, b2)
+
+	if(not intersect(a1,a2,b1,b2)) then
+		return false, nil;
+	end
+
+	local div = 1/((a1[1]-a2[1])*(b1[2]-b2[2]) - (a1[2]-a2[2])*(b1[1]-b2[1]))
+	local ma = a1[1]*a2[2] - a1[2]*a2[1];
+	local mb = b1[1]*b2[2] - b1[2]*b2[1]
+	
+	local px = (ma*(b1[1]-b2[1]) - mb*(a1[1]-a2[1]))*div;
+	local py = (ma*(b1[2]-b2[2]) - mb*(a1[2]-a2[2]))*div;
+	
+	--[[local maxxa = math.max(a1[1],a2[1]);
+	local maxya = math.max(a1[2],a2[2]);
+	local minxa = math.min(a1[1],a2[1]);
+	local minya = math.min(a1[2],a2[2]);
+	local maxxb = math.max(b1[1],b2[1]);
+	local maxyb = math.max(b1[2],b2[2]);
+	local minxb = math.min(b1[1],b2[1]);
+	local minyb = math.min(b1[2],b2[2]);
+	
+	if(px > maxxa or px < minxxa or py > maxya or py < minya or
+	   px > maxxb or px < minxxb or py > maxyb or py < minyb) then
+		return false, vectr.zero2;
+	end]]
+	
+	return true, vect.v2(px,py);
+
+end
+
 local function testPolyPoly(a,b)
 	local bba = colliders.Box(a.minX+a.x, a.minY+a.y, a.maxX-a.minX, a.maxY-a.minY);
 	local bbb = colliders.Box(b.minX+b.x, b.minY+b.y, b.maxX-b.minX, b.maxY-b.minY);
@@ -709,44 +695,134 @@ local function testPolyCircle(a,b)
 	return false;
 end
 
-function colliders.raycast(startPoint,endPoint,collider)
-	local c = colliders.getHitbox(collider);
+function colliders.linecast(startPoint,endPoint,collider)
 	
 	local a,sp,v1 = convertPoints(startPoint);
 	local b,ep,v2 = convertPoints(endPoint);
 	
-	if(sp.x == ep.x and sp.y == ep.y) then
-		return colliders.collide(sp,c);
+	local c1n = collider[1] ~= nil;
+	local c0n = collider[0] ~= nil;
+	
+	
+	if(collider[1] ~= nil) then	
+		local hit;
+		local norm;
+		local col;
+		for _,v in  pairs(collider) do
+			local bl,pt,nm = colliders.linecast(startPoint,endPoint,v);
+			if(bl and (hit == nil or (pt-v1).sqrlength < (hit-v1).sqrlength)) then
+				hit = pt;
+				norm = nm;
+				col = v;
+			end
+		end
+		if(hit ~= nil) then
+			return true, hit, norm, col;
+		else
+			return false, nil, nil, nil;
+		end
 	end
 	
-	if(colliders.collide(sp,c) or colliders.collide(ep,c)) then
-		return true;
+	local c = colliders.getHitbox(collider);
+	
+	local aabb = colliders.Box(math.min(v1.x,v2.x),math.min(v1.y,v2.y),math.abs(v2.x-v1.x),math.abs(v2.y-v1.y));
+	local cbb = colliders.getAABB(collider);
+	
+	if(not colliders.collide(aabb,cbb)) then
+		return false, nil, nil, nil;
+	end
+	
+	if(sp.x == ep.x and sp.y == ep.y) then
+		local b = colliders.collide(sp,c);
+		if(b) then
+			return true, vect.v2(sp), vect.zero2, collider;
+		else
+			return false, nil, nil, nil;
+		end
+	end
+	
+	if(colliders.collide(sp,c) and --[[or]] colliders.collide(ep,c)) then
+		return true,v1,vect.zero2, collider;
 	end
 	
 	local t = getType(c);
 	--NOTE: t CANNOT be a non-primitive collider here, because getHitbox always returns a primitive collider.
 	
 	if(t == TYPE_BOX) then
-		return (intersect(a,b,{c.x,c.y},{c.x+c.width,c.y})
+		--[[return (intersect(a,b,{c.x,c.y},{c.x+c.width,c.y})
 			or intersect(a,b,{c.x+c.width,c.y},{c.x+c.width,c.y+c.height})
 			or intersect(a,b,{c.x+c.width,c.y+c.height},{c.x,c.y+c.height})
-			or intersect(a,b,{c.x,c.y+c.height},{c.x,c.y}));
+			or intersect(a,b,{c.x,c.y+c.height},{c.x,c.y}));--]]
+		local hit,nm;
+		local col,p = intersectpoint(a,b,{c.x,c.y},{c.x+c.width,c.y});
+		if(col) then
+			hit = p;
+			nm = -vect.up2;
+		end
+		col,p = intersectpoint(a,b,{c.x+c.width,c.y},{c.x+c.width,c.y+c.height})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = vect.right2;
+		end
+		col,p = intersectpoint(a,b,{c.x+c.width,c.y+c.height},{c.x,c.y+c.height})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = vect.up2;
+		end
+		col,p = intersectpoint(a,b,{c.x,c.y+c.height},{c.x,c.y})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = -vect.right2;
+		end
+		if(hit ~= nil) then
+			return true, hit, nm, collider;
+		else
+			return false, nil, nil, nil;
+		end
 	elseif(t == TYPE_CIRCLE) then
-		local l2 = (ep.x-sp.x)*(ep.x-sp.x) + (ep.y-sp.y)*(ep.y-sp.y);
-		local p = colliders.Vector(c.x,c.y);
-		local t = ((p:subtract(v1)):dot(v2:subtract(v1))):mul(1/l2);
+		local centre = vect.v2(c.x,c.y);
+		local t1 = v1-centre;
+		local t2 = v2-centre;
+		local dx = t2.x-t1.x;
+		local dy = t2.y-t1.y;
+		local dr = math.sqrt(dx*dx + dy*dy);
+		local D = t1.x*t2.y - t2.x*t1.y;
+		local delta = c.radius*c.radius*dr*dr - D*D;
+		if(delta < 0) then
+			return false, nil, nil, nil;
+		else
+			local sdy;
+			if(dy < 0) then sdy=-1; else sdy = 1; end
+			local qx = sdy*dx*math.sqrt(delta);
+			local qy = math.abs(dy)*math.sqrt(delta);
+			local px1 = (D*dy + qx)/(dr*dr);
+			local px2 = (D*dy - qx)/(dr*dr);
+			local py1 = (-D*dx + qy)/(dr*dr);
+			local py2 = (-D*dx - qy)/(dr*dr);
+			local p1 = vect.v2(px1,py1);
+			local p2 = vect.v2(px2,py2);
+			if((p2-t1).sqrlength < (p1-t1).sqrlength) then
+				return true, p2+centre, (p2):normalise(), collider;
+			else
+				return true, p1+centre, (p1):normalise(), collider;
+			end
+		end
+		--[[local l2 = (ep.x-sp.x)*(ep.x-sp.x) + (ep.y-sp.y)*(ep.y-sp.y);
+		local p = vect.v2(c.x,c.y);
+		local t = ((p-v1)..(v2-v1))/l2;
 		if(t < 0) then return colliders.collide(c,sp);
 		elseif(t > 1) then return colliders.collide(c,ep);
 		else
-			local pr = v1:add((v2:subtract(v1)):mul(t));
-			return (p:subtract(pr)).magnitude <= c.radius;
-		end
+			local pr = v1+((v2-v1)*t);
+			return (p-pr).length <= c.radius;
+		end]]
+		
 	elseif(t == TYPE_POINT) then
-		local p = colliders.Vector(c.x,c.y);
-		return math.abs(v2:subtract(p).magnitude + v1:subtract(p).magnitude  - v2:subtract(v1).magnitude) < 0.001;
+		local p = vect.v2(c.x,c.y);
+		return math.abs((v2-p).length + (v1-p).length - (v2-v1).length) < 0.001, p, (v2-v1):normalise(), collider;
 	elseif(t == TYPE_POLY) then
-			local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
-			if(not colliders.raycast(startPoint, endPoint, bb)) then return false; end
+		--[[	local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
+			if(not colliders.linecast(startPoint, endPoint, bb)) then return false,nil,nil; end
 			
 			for k,v in ipairs(c.v) do
 			local n = c.v[k+1];
@@ -756,16 +832,66 @@ function colliders.raycast(startPoint,endPoint,collider)
 			n = {n[1]+c.x,n[2]+c.y};
 			local m = {v[1]+c.x,v[2]+c.y};
 			
-			if(intersect(m,n,a,b)) then return true; end
+			local inter,point = intersectpoint(m,n,a,b)			
+			if(inter) then 
+				local ray = v2-v1;
+				local ln = vect.v2(n[1]-m[1],n[2]-m[2]);
+				local norm = (ray:tov3()^ln:tov3()):tov2();
+				return true,point,norm; 
+			end
 		end
-		return false;
+		return false;]]
+		local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
+		if(not colliders.linecast(startPoint, endPoint, bb)) then return false,nil,nil,nil; end
+		
+		local hit;
+		local norm;
+		
+		for k,v in ipairs(c.tris) do
+			local ht,pt,nm = colliders.linecast(startPoint,endPoint,v);
+			if(ht and (hit == nil or (pt-v1).sqrlength < (hit-v1).sqrlength)) then
+				hit = pt;
+				norm = nm;
+			end
+		end
+		
+		if(hit ~= nil) then
+			return true,hit,norm, collider;
+		else
+			return false, nil, nil, nil;
+		end
+		
 	elseif(t == TYPE_TRI) then
 			local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
-			if(not colliders.raycast(startPoint, endPoint, bb)) then return false; end
+			if(not colliders.linecast(startPoint, endPoint, bb)) then return false,nil,nil,nil; end
 			
-			if(intersect(a,b,c:Get(1),c:Get(2)) or intersect(a,b,c:Get(2), c:Get(3)) or intersect(a,b,c:Get(3),c:Get(1))) then return true;
-			else return false end;
+			local hit;
+			local dir;
+			
+			for i=1,3,1 do
+				local j = i+1;
+				if(j > 3) then j = 1; end
+				local col,pt = intersectpoint(a,b,c:Get(i),c:Get(j));
+				if(col and (hit == nil or (pt-v1).sqrlength < (hit-v1).sqrlength)) then
+					hit = pt;
+					dir = vect.v2(c:Get(j)[1]-c:Get(i)[1],c:Get(j)[2]-c:Get(i)[2]);
+				end
+			end
+			
+			if(hit ~= nil) then
+				return true,hit,(dir:tov3()^vect.v3(0,0,1)):tov2():normalise(), collider;
+			else
+				return false, nil, nil, nil;
+			end
+	else 
+		return false,nil,nil, nil;
 	end
+end
+
+function colliders.raycast(startPoint,direction,collider)
+	local _,_,sp = convertPoints(startPoint);
+	local _,_,dir = convertPoints(direction);
+	return colliders.linecast(sp,sp-dir,collider);
 end
 
 local function getBlockHitbox(id, x, y, wid, hei)
@@ -821,6 +947,7 @@ end
 
 function colliders.getAABB(a)
 	local ta = getType(a);
+	
 	
 	if(a.TYPE == TYPE_BOX) then
 		return a;
@@ -1034,7 +1161,7 @@ function colliders.collide(a,b)
 		if(tb == TYPE_BOX) then --Check each side of both boxes
 			return testBoxCircle(b,a);
 		elseif(tb == TYPE_CIRCLE) then --Check each corner of the box with the circle
-			return (colliders.Vector(a.x-b.x,a.y-b.y).magnitude < (a.radius + b.radius));
+			return (vect.v2(a.x-b.x,a.y-b.y).length < (a.radius + b.radius));
 		elseif(tb == TYPE_POINT) then --Check if the point is inside the circle
 			return testCirclePoint(a,b);
 		elseif(tb == TYPE_POLY) then --Check poly with sampled circle
@@ -1112,101 +1239,144 @@ function colliders.speedCollide(a,b)
 	return colliders.collide(ca,cb);
 end
 
-function colliders.collideNPCBlock(a,b)
-	local idA = type(a) == 'number';
-	local idB = type(b) == 'number';
+local function contains(a,b)
+	if(type(a) == 'number') then return a == b; end
+	for _,v in ipairs(a) do
+		if(v == b) then
+			return true;
+		end
+	end
+	return false;
+end
+
+function colliders.collideNPCBlock(a,b,sec)
+	local idA = type(a) == 'number' or (a[1] ~= nil and type(a[1]) == 'number');
+	local idB = type(b) == 'number' or (b[1] ~= nil and type(b[1]) == 'number');
 	local c = 0;
+	local cpairs = {};
+	sec = sec or -1;
 	
 	if(idA and idB) then
-		for _,v in pairs(NPC.get(a,-1)) do
+		for _,v in pairs(NPC.get(a,sec)) do
 			local hb = colliders.getAABB(v);
-			for _,v2 in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-				if(v2.id == b and colliders.collide(v,v2)) then
-					c = c + 1;
+			if(hb ~= nil) then
+				for _,v2 in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+					if(contains(b,v2.id) and colliders.collide(v,v2)) then
+						c = c + 1;
+						table.insert(cpairs,{v,v2});
+					end
 				end
 			end
 		end
 	elseif(idA and not idB) then
-		local _,count = colliders.collideNPC(b,a);
+		local _,count,ps = colliders.collideNPC(b,a);
 		c = count;
+		cpairs = ps;
 	elseif(not idA and idB) then
-		local _,count = colliders.collideBlock(a,b);
+		local _,count,ps = colliders.collideBlock(a,b);
 		c = count;
+		cpairs = ps;
 	else
 		if(colliders.collide(a,b)) then c = 1; else c = 0; end;
 	end
 	
-	return c>0,c;
+	return c>0,c,cpairs;
 end
 
-function colliders.collideBlock(a,b)
-	local npcA = type(a) == 'number';
-	local npcB = type(b) == 'number';
+function colliders.collideBlock(a,b,sec)
+	local npcA = type(a) == 'number' or (a[1] ~= nil and type(a[1]) == 'number');
+	local npcB = type(b) == 'number' or (b[1] ~= nil and type(b[1]) == 'number');
 	local c = 0;
+	local cpairs = {};
+	sec = sec or -1;
 	
 	if(npcA and npcB) then
-		for _,v in pairs(Block.get(a,-1)) do
+		for _,v in pairs(Block.get(a,sec)) do
 			local hb = colliders.getAABB(v);
-			for _,v2 in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-				if(v2.id == b and colliders.collide(v,v2)) then
-					c = c + 1;
+			if(hb ~= nil) then
+				for _,v2 in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+					if(contains(b,v2.id) and colliders.collide(v,v2)) then
+						c = c + 1;
+						table.insert(cpairs,{v,v2});
+					end
 				end
 			end
 		end
 	elseif(npcA and not npcB) then
 		local hb = colliders.getAABB(b);
-		for _,v in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-			if(v.id == a and colliders.collide(v,b)) then
-				c = c + 1;
+		if(hb ~= nil) then
+			for _,v in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+				if(contains(a,v.id) and colliders.collide(v,b)) then
+					c = c + 1;
+					table.insert(cpairs,v);
+				end
 			end
 		end
 	elseif(not npcA and npcB) then
 		local hb = colliders.getAABB(a);
-		for _,v in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-			if(v.id == b and colliders.collide(v,a)) then
-				c = c + 1;
+		if(hb ~= nil) then
+			for _,v in pairs(Block.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+				if(contains(b,v.id) and colliders.collide(v,a)) then
+					c = c + 1;
+					table.insert(cpairs,v);
+				end
 			end
 		end
 	else
 		if(colliders.collide(a,b)) then c = 1; else c = 0; end;
 	end
 	
-	return c>0,c;
+	return c>0,c,cpairs;
 end
 
-function colliders.collideNPC(a,b)
-	local npcA = type(a) == 'number';
-	local npcB = type(b) == 'number';
+function colliders.collideNPC(a,b,sec)
+	local npcA = type(a) == 'number' or (a[1] ~= nil and type(a[1]) == 'number');
+	local npcB = type(b) == 'number' or (b[1] ~= nil and type(b[1]) == 'number');
 	local c = 0;
+	local cpairs = {};
+	sec = sec or -1;
 	
 	if(npcA and npcB) then
-		for _,v in pairs(NPC.get(a,-1)) do
+		for _,v in pairs(NPC.get(a,sec)) do
 			local hb = colliders.getAABB(v);
-			for _,v2 in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-				if(v2.id == b and colliders.collide(v,v2)) then
-					c = c + 1;
+			if(hb ~= nil) then
+				for _,v2 in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+					if(contains(b,v2.id) and colliders.collide(v,v2)) then
+						c = c + 1;
+						table.insert(cpairs,{v,v2});
+					end
 				end
 			end
 		end
 	elseif(npcA and not npcB) then
 		local hb = colliders.getAABB(b);
-		for _,v in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-			if(v.id == a and colliders.collide(v,b)) then
-				c = c + 1;
+		if(hb ~= nil) then
+			for _,v in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+				if(contains(a,v.id) and colliders.collide(v,b)) then
+					c = c + 1;
+					table.insert(cpairs,v);
+				end
 			end
 		end
 	elseif(not npcA and npcB) then
 		local hb = colliders.getAABB(a);
-		for _,v in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
-			if(v.id == b and colliders.collide(v,a)) then
-				c = c + 1;
+		if(hb ~= nil) then
+			for _,v in pairs(NPC.getIntersecting(hb.x,hb.y,hb.x+hb.width,hb.y+hb.height)) do
+				if(contains(b,v.id) and colliders.collide(v,a)) then
+					c = c + 1;
+					table.insert(cpairs,v);
+				end
 			end
 		end
 	else
-		if(colliders.collide(a,b)) then c = 1; else c = 0; end;
+		if(colliders.collide(a,b)) then 
+			c = 1;
+		else 
+			c = 0; 
+		end;
 	end
 	
-	return c>0,c;
+	return c>0,c,cpairs;
 end
 
 function colliders.update()

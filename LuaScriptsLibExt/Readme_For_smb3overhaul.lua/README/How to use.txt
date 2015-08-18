@@ -1,0 +1,17 @@
+HOW TO USE
+
+--SETUP--
+1 . Copy/Paste the smb3overhaul.lua file and smb3overhaul folder into your LuaScriptsLib folder which should be in the root of your SMBX folder. (../SMBX/LuaScriptsLib/)
+
+--IMPLEMENTING INTO YOUR SMBX EPISODE/LEVEL--
+1 . Make a new file in your worlds folder called LunaWorld.lua.
+2 . Add "_smb3overhaul = loadAPI("smb3overhaul");" to the file.
+3 . In your onLoad function, you can toggle certain settings on/off.
+
+	_smb3overhaul.setSecondsLeft(TIME);
+	_smb3overhaul.setTimerState(true/false);
+	_smb3overhaul.usesPBar(true/false);
+	_smb3overhaul.useEasyMode(true/false);
+	_smb3overhaul.usesCard(true/false);
+	_smb3overhaul.disableSpinJump(true/false);
+
