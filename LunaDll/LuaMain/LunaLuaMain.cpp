@@ -259,7 +259,8 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource"),
+                class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource")
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>),
                 def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const char*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
@@ -366,6 +367,7 @@ void CLunaLua::bindAll()
             /*************************Audio*end*************************/
 
             class_<LuaProxy::InputConfig>("NativeInputConfig")
+            .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
             .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
             .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
             .property("left", &LuaProxy::InputConfig::left, &LuaProxy::InputConfig::setLeft)
@@ -420,9 +422,11 @@ void CLunaLua::bindAll()
             class_<LuaProxy::Player>("Player")
             .scope[ //static functions
                 def("count", &LuaProxy::Player::count),
-                def("get", &LuaProxy::Player::get),
-                def("getTemplates", &LuaProxy::Player::getTemplates)
+                    def("get", &LuaProxy::Player::get),
+                    def("getTemplates", &LuaProxy::Player::getTemplates)
             ]
+            .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Player, m_index))
+
             .def(constructor<>())
             .def(constructor<int>())
             .def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Player::mem))
@@ -588,6 +592,7 @@ void CLunaLua::bindAll()
                 def("getX", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getX)),
                 def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
             ]
+            .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
             .property("x", &LuaProxy::Camera::x)
             .property("y", &LuaProxy::Camera::y)
             .property("width", &LuaProxy::Animation::width)
@@ -644,6 +649,7 @@ void CLunaLua::bindAll()
                         def("findByName", &LuaProxy::LevelObject::findByName),
                         def("findByFilename", &LuaProxy::LevelObject::findByFilename)
                 ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::LevelObject, m_index))
                 .property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
                 .property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
                 .property("levelTitle", &LuaProxy::LevelObject::levelTitle)
@@ -686,6 +692,7 @@ void CLunaLua::bindAll()
                         def("getIntersectingEntrance", &LuaProxy::Warp::getIntersectingEntrance),
                         def("getIntersectingExit", &LuaProxy::Warp::getIntersectingExit)
                 ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Warp, m_index))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Warp::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Warp::mem))
@@ -707,7 +714,7 @@ void CLunaLua::bindAll()
                         def("spawn", (LuaProxy::Animation(*)(short, double, double, lua_State*))&LuaProxy::Animation::spawnEffect), //DONE
                         def("spawn", (LuaProxy::Animation(*)(short, double, double, float, lua_State*))&LuaProxy::Animation::spawnEffect) //DONE
                 ]
-                
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Animation, m_animationIndex))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Animation::mem))
                 .def("mem", static_cast<luabind::object (LuaProxy::Animation::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Animation::mem))
@@ -731,6 +738,7 @@ void CLunaLua::bindAll()
                         def("get", (luabind::object(*)(const std::string& , lua_State* L))&LuaProxy::Layer::get),
                         def("find", &LuaProxy::Layer::find)
                 ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Layer, m_layerIndex))
                 .def(constructor<int>())
                 .def("stop", &LuaProxy::Layer::stop)
                 .def("show", &LuaProxy::Layer::show)
@@ -756,7 +764,7 @@ void CLunaLua::bindAll()
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
                 ]
                 
-
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::NPC, m_index))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::NPC::mem))
                 .def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::NPC::mem))
@@ -790,6 +798,7 @@ void CLunaLua::bindAll()
                         def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get),
                         def("getIntersecting", &LuaProxy::Block::getIntersecting)
                 ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Block, m_index))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object&, lua_State*)>(&LuaProxy::Block::mem))
                 .def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Block::mem))
@@ -819,6 +828,7 @@ void CLunaLua::bindAll()
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
                         def("getIntersecting", &LuaProxy::BGO::getIntersecting)
                 ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::BGO, m_index))
                 .def(constructor<int>())
                 .property("id", &LuaProxy::BGO::id, &LuaProxy::BGO::setId)
                 .property("isHidden", &LuaProxy::BGO::isHidden, &LuaProxy::BGO::setIsHidden)

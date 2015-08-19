@@ -10,8 +10,72 @@
 #include <luabind/detail/call_function.hpp>
 #include "LuaHelper.h"
 #include "../Defines.h"
+#include <type_traits>
 
 namespace LuaProxy {
+
+    template<typename T>
+    bool luaUserdataCompare(const luabind::object& arg1, const luabind::object& arg2, lua_State* L) {
+        boost::optional<T*> arg1Casted = luabind::object_cast_nothrow<T*>(arg1);
+        boost::optional<T*> arg2Casted = luabind::object_cast_nothrow<T*>(arg2);
+
+        T* rawArg1 = nullptr;
+        T* rawArg2 = nullptr;
+        if (arg1Casted != boost::none) 
+        {
+            rawArg1 = arg1Casted.get();
+        }
+        else 
+        {
+            luaL_error(L, "Failed to compare %s == %s:\nLeft compare argument is not %s", typeid(T).name(), typeid(T).name(), typeid(T).name());
+            return false;
+        }
+        if (arg2Casted != boost::none)
+        {
+            rawArg2 = arg2Casted.get();
+        }
+        else
+        {
+            luaL_error(L, "Failed to compare %s == %s:\nRight compare argument is not %s", typeid(T).name(), typeid(T).name(), typeid(T).name());
+            return false;
+        }
+
+        return rawArg1 == rawArg2;
+    };
+
+    template<typename C, typename IndexType, IndexType C::* Index>
+    bool luaUserdataIndexCompare(const luabind::object& arg1, const luabind::object& arg2, lua_State* L){
+        static_assert(std::is_integral<IndexType>::value, "Data member type must be integral!");
+
+        boost::optional<C*> arg1Casted = luabind::object_cast_nothrow<C*>(arg1);
+        boost::optional<C*> arg2Casted = luabind::object_cast_nothrow<C*>(arg2);
+
+        C* rawArg1 = nullptr;
+        C* rawArg2 = nullptr;
+        if (arg1Casted != boost::none)
+        {
+            rawArg1 = arg1Casted.get();
+        }
+        else
+        {
+            luaL_error(L, "Failed to compare %s == %s:\nLeft compare argument is not %s", typeid(C).name(), typeid(C).name(), typeid(C).name());
+            return false;
+        }
+        if (arg2Casted != boost::none)
+        {
+            rawArg2 = arg2Casted.get();
+        }
+        else
+        {
+            luaL_error(L, "Failed to compare %s == %s:\nRight compare argument is not %s", typeid(C).name(), typeid(C).name(), typeid(C).name());
+            return false;
+        }
+
+        return rawArg1->*Index == rawArg2->*Index;
+    };
+//&LuaProxy::luaUserdataIndexCompare<LuaProxy::Player, decltype(LuaProxy::Player::m_index), &LuaProxy::Player::m_index>
+#define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
+
     enum L_FIELDTYPE{
         LFT_INVALID = 0,
         LFT_BYTE = 1,
@@ -145,7 +209,7 @@ namespace LuaProxy {
 
         std::string levelFilename();
         void setLevelFilename(const luabind::object &value, lua_State* L);
-    private:
+
         int m_index;
     };
 
@@ -188,7 +252,7 @@ namespace LuaProxy {
         short animationFrame() const;
         void setAnimationFrame(short animationFrame);
         bool isValid() const;
-    private:
+
         int m_animationIndex;
     };
 
@@ -212,7 +276,7 @@ namespace LuaProxy {
         void toggle(bool noSmoke);
 
         int layerIndex() const;
-    private:
+
         int m_layerIndex;
     };
 
@@ -281,7 +345,7 @@ namespace LuaProxy {
         //not bound functions
         void* getNativeAddr() const;
 
-    private:
+
         int m_index;
     };
 
@@ -583,7 +647,6 @@ namespace LuaProxy {
         //internal use
         int getIndex() const;
         
-    private:
         int m_index;
     };
 
@@ -625,7 +688,7 @@ namespace LuaProxy {
         void hit();
         void hit(bool fromUpSide);
         void hit(bool fromUpSide, LuaProxy::Player player);
-    private:
+
         bool isValid() const;
         int m_index;
     };
@@ -680,7 +743,7 @@ namespace LuaProxy {
         double y() const;
         void setY(double y);
         VBStr levelTitle() const;
-    private:
+
         bool isValid() const;
         int m_index;
     };
@@ -722,7 +785,7 @@ namespace LuaProxy {
 
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;
-    private:
+
         unsigned short m_index;
     };
 
@@ -758,7 +821,6 @@ namespace LuaProxy {
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;
 
-    private:
         unsigned short m_index;
     };
 
@@ -777,7 +839,6 @@ namespace LuaProxy {
         double height();
         
 
-    private:
         unsigned short m_index;
     };
 
