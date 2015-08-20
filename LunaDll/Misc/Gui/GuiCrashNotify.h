@@ -10,6 +10,8 @@ public:
 
     bool doSend;
     std::string crashText;
+    std::string username;
+    std::string usercomment;
 
 };
 

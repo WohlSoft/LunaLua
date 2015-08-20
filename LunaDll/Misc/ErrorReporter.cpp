@@ -61,10 +61,17 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
     return errDesc;
 }
 
-void ErrorReport::manageErrorReport(const std::string &url, const std::string &errText)
+void ErrorReport::manageErrorReport(const std::string &url, std::string &errText)
 {
     GuiCrashNotify notifier(errText);
     notifier.show();
+
+    errText += "\n\n\nUSERNAME: \n";
+    errText += (notifier.username.length() == 0 ? "(NONE)" : notifier.username);
+    errText += "\n\n\nUSERCOMMENT: \n";
+    errText += (notifier.usercomment.length() == 0 ? "(NONE)" : notifier.usercomment);
+    errText += "\n";
+
     if (notifier.doSend){
         sendPUTRequest(url, errText);
     }
@@ -105,6 +112,6 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 
 void ErrorReport::report()
 {
-    writeErrorLog(lastErrDesc);
     manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", lastErrDesc);
+    writeErrorLog(lastErrDesc);
 }

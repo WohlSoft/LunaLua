@@ -30,7 +30,7 @@ namespace ErrorReport{
         VB6ERR_DIVBYZERO = 11,
         VB6ERR_TYPEMISMATCH = 13
     };
-    void manageErrorReport(const std::string &url, const std::string &errText);
+    void manageErrorReport(const std::string &url, std::string &errText);
     void writeErrorLog(const std::string &text);
 
     std::string generateStackTrace(CONTEXT* context = NULL);

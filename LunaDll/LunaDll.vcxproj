@@ -386,6 +386,7 @@
     <ResourceCompile Include="LunaDll.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Changelog.txt" />
     <Text Include="SMBXInternal\Reconstructed\about.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -824,5 +824,6 @@
     <Text Include="SMBXInternal\Reconstructed\about.txt">
       <Filter>Header Files\SMBXInternal\Reconstructed</Filter>
     </Text>
+    <Text Include="Changelog.txt" />
   </ItemGroup>
 </Project>
