@@ -183,13 +183,19 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 void CLunaLua::setupDefaults()
 {
     object _G = globals(L);
-    _G["PLAYER_SMALL"] = 1;
-    _G["PLAYER_BIG"] = 2;
-    _G["PLAYER_FIREFLOWER"] = 3;
-    _G["PLAYER_LEAF"] = 4;
-    _G["PLAYER_TANOOKIE"] = 5;
-    _G["PLAYER_HAMMER"] = 6;
-    _G["PLAYER_ICE"] = 7;
+    _G["PLAYER_SMALL"] = PLAYER_SMALL;
+    _G["PLAYER_BIG"] = PLAYER_BIG;
+    _G["PLAYER_FIREFLOWER"] = PLAYER_FIREFLOWER;
+    _G["PLAYER_LEAF"] = PLAYER_LEAF;
+    _G["PLAYER_TANOOKIE"] = PLAYER_TANOOKIE;
+    _G["PLAYER_HAMMER"] = PLAYER_HAMMER;
+    _G["PLAYER_ICE"] = PLAYER_ICE;
+
+    _G["CHARACTER_MARIO"] = CHARACTER_MARIO;
+    _G["CHARACTER_LUIGI"] = CHARACTER_LUIGI;
+    _G["CHARACTER_PEACH"] = CHARACTER_PEACH;
+    _G["CHARACTER_TOAD"] = CHARACTER_TOAD;
+    _G["CHARACTER_LINK"] = CHARACTER_LINK;
 
     _G["FIND_ANY"] = -1;
 
@@ -418,7 +424,20 @@ void CLunaLua::bindAll()
             .property("sectionName", &LuaProxy::Data::sectionName, &LuaProxy::Data::setSectionName)
             .property("useSaveSlot", &LuaProxy::Data::useSaveSlot, &LuaProxy::Data::setUseSaveSlot),
 
-            
+            class_<LuaProxy::PlayerSettings>("PlayerSettings")
+            .scope[
+                def("get", &LuaProxy::PlayerSettings::get)
+            ]
+            .property("hitboxWidth", &LuaProxy::PlayerSettings::getHitboxWidth, &LuaProxy::PlayerSettings::setHitboxWidth)
+            .property("hitboxHeight", &LuaProxy::PlayerSettings::getHitboxHeight, &LuaProxy::PlayerSettings::setHitboxHeight)
+            .property("hitboxDuckHeight", &LuaProxy::PlayerSettings::getHitboxDuckHeight, &LuaProxy::PlayerSettings::setHitboxDuckHeight)
+            .def("getSpriteOffset", &LuaProxy::PlayerSettings::getSpriteOffset)
+            .def("setSpriteOffset", &LuaProxy::PlayerSettings::setSpriteOffset)
+
+            .property("character", &LuaProxy::PlayerSettings::getCharacter, &LuaProxy::PlayerSettings::setCharacter)
+            .property("powerup", &LuaProxy::PlayerSettings::getPowerupID, &LuaProxy::PlayerSettings::setPowerupID),
+
+
             class_<LuaProxy::Player>("Player")
             .scope[ //static functions
                 def("count", &LuaProxy::Player::count),

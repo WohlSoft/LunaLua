@@ -27,7 +27,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 
 	int powerup = _powerup-1;
 	int character = _character-1;
-
+    
 	wstring world_dir = (wstring)GM_FULLDIR;
 	wstring full_path = world_dir.append(::Level::GetName());
 	full_path = removeExtension(full_path);
@@ -60,11 +60,11 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 	}
 
 
-	short *hitbox_width = (short *)(0xB2C788);
-	short *hitbox_height = (short *)(0xB2C6FC);
-	short *hitbox_height_duck = (short *)(0xB2C742);
-	short *hitbox_grab_offset_X = (short *)(0xB2C7CE);
-	short *hitbox_grab_offset_Y = (short *)(0xB2C814);
+    short* hitbox_width = &GM_HITBOX_W_PTR;
+    short* hitbox_height = &GM_HITBOX_H_PTR;
+    short* hitbox_height_duck = &GM_HITBOX_H_D_PTR;
+    short* hitbox_grab_offset_X = &GM_HITBOX_GRABOFF_X;
+    short* hitbox_grab_offset_Y = &GM_HITBOX_GRABOFF_Y;
 
 
 	//Parser of hitbox properties from PGE Calibrator INI File

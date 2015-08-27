@@ -116,6 +116,16 @@ enum Characters : short {
     CHARACTER_LINK = 5     //SHEATH
 };
 
+enum PowerupID : short {
+    PLAYER_SMALL = 1,
+    PLAYER_BIG = 2,
+    PLAYER_FIREFLOWER = 3,
+    PLAYER_LEAF = 4,
+    PLAYER_TANOOKIE = 5,
+    PLAYER_HAMMER = 6,
+    PLAYER_ICE = 7
+};
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 
@@ -291,9 +301,36 @@ DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if high
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
 //Hitbox
-DEFMEM(GM_HITBOX_H_PTR,     short*,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
-DEFMEM(GM_HITBOX_H_D_PTR,   short*,0x00B2C742);      // hitbox heights while ducking
-DEFMEM(GM_HITBOX_W_PTR,     short*,0x00B2C788);      // hitbox widths
+DEFMEM(GM_HITBOX_H_PTR,     short,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
+DEFMEM(GM_HITBOX_H_D_PTR,   short,0x00B2C742);      // player hitbox heights while ducking
+DEFMEM(GM_HITBOX_W_PTR,     short,0x00B2C788);      // player hitbox widths
+DEFMEM(GM_HITBOX_GRABOFF_X, short,0x00B2C7CE);      // player graboffset x
+DEFMEM(GM_HITBOX_GRABOFF_Y, short,0x00B2C814);      // player graboffset y
+
+DEFMEM(GM_GFXOFFSET_MARIO_X, short*, 0x00B25A3C);    // mario gfx offset x
+DEFMEM(GM_GFXOFFSET_MARIO_Y, short*, 0x00B25A58);    // mario gfx offset y
+DEFMEM(GM_GFXOFFSET_LUIGI_X, short*, 0x00B25A74);    // luigi gfx offset x
+DEFMEM(GM_GFXOFFSET_LUIGI_Y, short*, 0x00B25A90);    // luigi gfx offset y
+DEFMEM(GM_GFXOFFSET_PEACH_X, short*, 0x00B25AAC);    // peach gfx offset x
+DEFMEM(GM_GFXOFFSET_PEACH_Y, short*, 0x00B25AC8);    // peach gfx offset y
+DEFMEM(GM_GFXOFFSET_TOAD_X,  short*, 0x00B25AE4);    // toad gfx offset x
+DEFMEM(GM_GFXOFFSET_TOAD_Y,  short*, 0x00B25B00);    // toad gfx offset y
+DEFMEM(GM_GFXOFFSET_LINK_X,  short*, 0x00B25B1C);    // link gfx offset x
+DEFMEM(GM_GFXOFFSET_LINK_Y,  short*, 0x00B25B38);    // link gfx offset y
+
+
+/*
+Mario_OffsetsX 00B25A3C
+Mario_OffsetsY 00B25A58
+Luigi_OffsetsX 00B25A74
+Luigi_OffsetsY 00B25A90
+Peach_OffsetsX 00B25AAC
+Peach_OffsetsY 00B25AC8
+Toad_OffsetsX  00B25AE4
+Toad_OffsetsY  00B25B00
+Link_OffsetsX  00B25B1C
+Link_OffsetsY  00B25B38
+*/
 
 //Startup Config:
 DEFMEM(GM_ISLEVELEDITORMODE, WORD, 0x00B25134);
@@ -441,6 +478,12 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      1=Collision from top, 2=From right, 3=From bottom, 4=From left, 5=?
 #define GF_MOB_BLOCK_COL    0x00994250
 
+//      Arg1 = int* spriteIndex
+#define GF_SPRITESHEET_X    0x00987CE0
+
+//      Arg1 = int* spriteIndex
+#define GF_SPRITESHEET_Y    0x00987D90
+
 //      Arg1 = int* (1)
 //      Arg2 = Momentum* structure
 #define GF_IS_ON_CAMERA     0x00993DE0
@@ -519,6 +562,9 @@ DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_saveGame       = (void(__stdcall *)())GF_SAVE_GAME;
+
+static const auto native_spritesheetX   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_X;
+static const auto native_spritesheetY   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_Y;
 
 static const auto native_isOnCamera     = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_CAMERA;
 static const auto native_isOnWCamera    = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_WCAMERA;

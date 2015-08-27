@@ -423,6 +423,9 @@
     <ClInclude Include="SMBXInternal\CameraInfo.h">
       <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\CustomGraphics.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -804,6 +807,12 @@
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\CustomGraphics.cpp">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

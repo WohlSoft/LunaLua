@@ -349,6 +349,37 @@ namespace LuaProxy {
         int m_index;
     };
 
+    class PlayerSettings {
+    public:
+        static PlayerSettings get(Characters character, PowerupID powerupID, lua_State* L);
+        PlayerSettings(Characters character, PowerupID powerupID) : m_powerupID(powerupID), m_character(character) {}
+
+        int getHitboxWidth(lua_State* L);
+        void setHitboxWidth(int width, lua_State* L);
+        int getHitboxHeight(lua_State* L);
+        void setHitboxHeight(int height, lua_State* L);
+        int getHitboxDuckHeight(lua_State* L);
+        void setHitboxDuckHeight(int duckHeight, lua_State* L);
+        int getGrabOffsetX(lua_State* L);
+        void setGrabOffsetX(int grabOffsetX, lua_State* L);
+        int getGrabOffsetY(lua_State* L);
+        void setGrabOffsetY(int grabOffsetY, lua_State* L);
+
+        int getSpriteOffset(int indexX, int indexY, lua_State* L);
+        void setSpriteOffset(int indexX, int indexY, int value, lua_State* L);
+
+        PowerupID getPowerupID(lua_State* L) const;
+        void setPowerupID(PowerupID val, lua_State* L);
+        Characters getCharacter(lua_State* L) const;
+        void setCharacter(Characters val, lua_State* L);
+    
+        bool isValid_throw(lua_State* L) const;
+    private:
+        PowerupID m_powerupID;
+        Characters m_character;
+        
+    };
+
     class Player{
     public:
         static int count();
@@ -924,7 +955,7 @@ namespace LuaProxy {
         void flipY();
         void flipXY();
     }
-
+    
     //Non-Member-Constructors:
     RECT newRECT();
     RECTd newRECTd();
