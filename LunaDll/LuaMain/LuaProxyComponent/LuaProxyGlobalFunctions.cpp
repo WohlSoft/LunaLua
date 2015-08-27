@@ -71,6 +71,13 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 
 	//Frames X and Y on playable character sprite from 0 to 9
 
+	// SMBX FrameID <-> X-Y Conversion formulas:
+	// TO:
+	//FrameID = (Y+10*X)-49
+	// FROM:
+	//X = ((FrameID+49)-(FrameID+49)%10)/10
+	//Y = (FrameID+49)%10
+
 	//hitBoxFile.Get("frame-y-x", "used", "false");
 	//if(used==false) --> skip this frame
 	//{
