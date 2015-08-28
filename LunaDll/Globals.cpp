@@ -8,6 +8,7 @@
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
 #include <cctype>
+#include "Rendering/RenderOverrideManager.h"
 
 HINSTANCE gHInstance;
 
@@ -75,7 +76,7 @@ HardcodedGraphicsManager gGraphManager;
 
 SHMemServer gShMemServer;
 
-RenderOverrideManager gRenderOverride
+RenderOverrideManager gRenderOverride;
 
 CLunaLua gLunaLua;
 

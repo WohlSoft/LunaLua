@@ -21,7 +21,8 @@
 #include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
-#include "Rendering/RenderOverrideManager.h"
+
+class RenderOverrideManager;
 
 #include "Defines.h"
 
