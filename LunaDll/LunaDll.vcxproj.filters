@@ -426,6 +426,9 @@
     <ClInclude Include="SMBXInternal\CustomGraphics.h">
       <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\RenderOverrideManager.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -814,6 +817,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOverrideManager.cpp">
+      <Filter>Header Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

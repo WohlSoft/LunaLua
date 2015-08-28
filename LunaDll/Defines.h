@@ -318,29 +318,50 @@ DEFMEM(GM_GFXOFFSET_TOAD_Y,  short*, 0x00B25B00);    // toad gfx offset y
 DEFMEM(GM_GFXOFFSET_LINK_X,  short*, 0x00B25B1C);    // link gfx offset x
 DEFMEM(GM_GFXOFFSET_LINK_Y,  short*, 0x00B25B38);    // link gfx offset y
 
-
-/*
-Mario_OffsetsX 00B25A3C
-Mario_OffsetsY 00B25A58
-Luigi_OffsetsX 00B25A74
-Luigi_OffsetsY 00B25A90
-Peach_OffsetsX 00B25AAC
-Peach_OffsetsY 00B25AC8
-Toad_OffsetsX  00B25AE4
-Toad_OffsetsY  00B25B00
-Link_OffsetsX  00B25B1C
-Link_OffsetsY  00B25B38
-*/
-
 //Startup Config:
 DEFMEM(GM_ISLEVELEDITORMODE, WORD, 0x00B25134);
 DEFMEM(GM_ISGAME,           WORD,  0x00B25046);
 DEFMEM(GM_NOSOUND,          WORD,  0x00B2D734);
 DEFMEM(GM_FRAMESKIP,        WORD,  0x00B2C684);
 
-//Graphics Memory
-DEFMEM(GM_GFX_NPC_PTR,      void*, 0x00B2CA98);     // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
-DEFMEM(GM_GFX_NPC_MASK_PTR, void*, 0x00B2CAB4);     // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
+
+//Graphics Memory [Level]
+DEFMEM(GM_GFX_BLOCKS_PTR,           void*, 0x00B2C95C);
+DEFMEM(GM_GFX_BLOCKS_MASK_PTR,      void*, 0x00B2C978);
+DEFMEM(GM_GFX_BACKGROUND2_PTR,      void*, 0x00B2CA00);
+DEFMEM(GM_GFX_NPC_PTR,              void*, 0x00B2CA98);     // Array of NPC graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_NPC_MASK_PTR,         void*, 0x00B2CAB4);     // Array of NPC mask graphics HDCs, len 300, indexed by (npc.id - 1)
+DEFMEM(GM_GFX_EFFECTS_PTR,          void*, 0x00B2CB74);
+DEFMEM(GM_GFX_EFFECTS_MASK_PTR,     void*, 0x00B2CB90);
+DEFMEM(GM_GFX_BACKGROUND_PTR,       void*, 0x00B2CC50);
+DEFMEM(GM_GFX_BACKGROUND_MASK_PTR,  void*, 0x00B2CC6C);
+DEFMEM(GM_GFX_MARIO_PTR,            void*, 0x00B2CD2C);
+DEFMEM(GM_GFX_MARIO_MASK_PTR,       void*, 0x00B2CD48);
+DEFMEM(GM_GFX_LUIGI_PTR,            void*, 0x00B2CE08);
+DEFMEM(GM_GFX_LUIGI_MASK_PTR,       void*, 0x00B2CE24);
+DEFMEM(GM_GFX_PEACH_PTR,            void*, 0x00B2CEE4);
+DEFMEM(GM_GFX_PEACH_MASK_PTR,       void*, 0x00B2CF00);
+DEFMEM(GM_GFX_TOAD_PTR,             void*, 0x00B2CFC0);
+DEFMEM(GM_GFX_TOAD_MASK_PTR,        void*, 0x00B2CFDC);
+DEFMEM(GM_GFX_LINK_PTR,             void*, 0x00B2D09C);
+DEFMEM(GM_GFX_LINK_MASK_PTR,        void*, 0x00B2D0B8);
+DEFMEM(GM_GFX_YOSHIB_PTR,           void*, 0x00B2D178);
+DEFMEM(GM_GFX_YOSHIB_MASK_PTR,      void*, 0x00B2D194);
+DEFMEM(GM_GFX_YOSHIT_PTR,           void*, 0x00B2D21C);
+DEFMEM(GM_GFX_YOSHIT_MASK_PTR,      void*, 0x00B2D238);
+
+//Graphics Memory [Overworld]
+DEFMEM(GM_GFX_TILES_PTR,            void*, 0x00B2D2C0);
+DEFMEM(GM_GFX_LEVEL_PTR,            void*, 0x00B2D358);
+DEFMEM(GM_GFX_LEVEL_MASK_PTR,       void*, 0x00B2D374);
+DEFMEM(GM_GFX_SCENE_PTR,            void*, 0x00B2D450);
+DEFMEM(GM_GFX_SCENE_MASK_PTR,       void*, 0x00B2D46C);
+DEFMEM(GM_GFX_PATH_PTR,             void*, 0x00B2D52C);
+DEFMEM(GM_GFX_PATH_MASK_PTR,        void*, 0x00B2D548);
+DEFMEM(GM_GFX_PLAYER_PTR,           void*, 0x00B2D608);
+DEFMEM(GM_GFX_PLAYER_MASK_PTR,      void*, 0x00B2D624);
+
+
 
 DEFMEM(npc_gfxoffsetx,          short*, 0x00B25B70);
 DEFMEM(npc_gfxoffsety,          short*, 0x00B25B8C);

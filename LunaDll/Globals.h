@@ -21,6 +21,7 @@
 #include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
+#include "Rendering/RenderOverrideManager.h"
 
 #include "Defines.h"
 
@@ -97,6 +98,7 @@ extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
+extern RenderOverrideManager gRenderOverride;
 
 extern CLunaLua				gLunaLua;
 

@@ -75,6 +75,8 @@ HardcodedGraphicsManager gGraphManager;
 
 SHMemServer gShMemServer;
 
+RenderOverrideManager gRenderOverride
+
 CLunaLua gLunaLua;
 
 
