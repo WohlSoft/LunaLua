@@ -32,8 +32,8 @@ void loadRenderOverrideGfx()
 
     // Load new npc graphics resources
     for (unsigned short i = 1; i < 300; i++) {
-        HDC npcHdcPtr = ((HDC*)GM_GFX_NPC_PTR)[i - 1];
-        HDC npcHdcMaskPtr = ((HDC*)GM_GFX_NPC_MASK_PTR)[i - 1];
+        HDC npcHdcPtr = GM_GFX_NPC_PTR[i - 1];
+        HDC npcHdcMaskPtr = GM_GFX_NPC_MASK_PTR[i - 1];
         if (npcHdcPtr == NULL) continue;
 
         HBITMAP npbBmp = loadLevelNpcGfx(levelFolder, i);
