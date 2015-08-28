@@ -78,17 +78,60 @@ void LuaProxy::PlayerSettings::setGrabOffsetY(int grabOffsetY, lua_State* L)
     SMBX_CustomGraphics::setPlayerGrabOffsetY(m_powerupID, m_character, grabOffsetY);
 }
 
-int LuaProxy::PlayerSettings::getSpriteOffset(int indexX, int indexY, lua_State* L)
+int LuaProxy::PlayerSettings::getSpriteOffsetX(int indexX, int indexY, lua_State* L)
 {
     if (!isValid_throw(L))
         return 0;
-    return 0;
+    int errCode = 0;
+    int result = SMBX_CustomGraphics::getOffsetX(m_character, SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY), m_powerupID, &errCode);
+    
+    if (errCode == -1 || indexX < 0 || indexY < 0 || indexX > 9 || indexY > 9) {
+        luaL_error(L, "indexX (%d) with indexY (%d) are invalid coordinate indexes", indexX, indexY);
+        return 0;
+    }
+
+    return result;
 }
 
-void LuaProxy::PlayerSettings::setSpriteOffset(int indexX, int indexY, int value, lua_State* L)
+void LuaProxy::PlayerSettings::setSpriteOffsetX(int indexX, int indexY, int value, lua_State* L)
 {
     if (!isValid_throw(L))
         return;
+    int errCode = 0;
+    SMBX_CustomGraphics::setOffsetX(m_character, SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY), m_powerupID, value, &errCode);
+
+    if (errCode == -1 || indexX < 0 || indexY < 0 || indexX > 9 || indexY > 9) {
+        luaL_error(L, "indexX (%d) with indexY (%d) are invalid coordinate indexes", indexX, indexY);
+        return;
+    }
+}
+
+int LuaProxy::PlayerSettings::getSpriteOffsetY(int indexX, int indexY, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return 0;
+    int errCode = 0;
+    int result = SMBX_CustomGraphics::getOffsetY(m_character, SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY), m_powerupID, &errCode);
+
+    if (errCode == -1 || indexX < 0 || indexY < 0 || indexX > 9 || indexY > 9) {
+        luaL_error(L, "indexX (%d) with indexY (%d) are invalid coordinate indexes", indexX, indexY);
+        return 0;
+    }
+
+    return result;
+}
+
+void LuaProxy::PlayerSettings::setSpriteOffsetY(int indexX, int indexY, int value, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    int errCode = 0;
+    SMBX_CustomGraphics::setOffsetY(m_character, SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY), m_powerupID, value, &errCode);
+
+    if (errCode == -1 || indexX < 0 || indexY < 0 || indexX > 9 || indexY > 9) {
+        luaL_error(L, "indexX (%d) with indexY (%d) are invalid coordinate indexes", indexX, indexY);
+        return;
+    }
 }
 
 PowerupID LuaProxy::PlayerSettings::getPowerupID(lua_State* L) const

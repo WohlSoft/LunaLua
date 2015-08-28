@@ -58,8 +58,12 @@ public:
         return native_spritesheetY(&spIndexY);
     }
 
+    static inline int convIndexCoorToSpriteIndex(int x, int y){
+        return (y + 10 * x) - 49;
+    }
+
     static int getOffsetX(Characters characterID, int spriteIndex, PowerupID powerupID, int* retSuccess = 0) {
-        if (spriteIndex < -49 || spriteIndex > 49) {
+        if (spriteIndex < -49 || spriteIndex > 50) {
             if (retSuccess) {
                 *retSuccess = -1;
             }
@@ -94,7 +98,7 @@ public:
     }
 
     static int getOffsetY(Characters characterID, int spriteIndex, PowerupID powerupID, int* retSuccess = 0) {
-        if (spriteIndex < -49 || spriteIndex > 49) {
+        if (spriteIndex < -49 || spriteIndex > 50) {
             if (retSuccess) {
                 *retSuccess = -1;
             }
@@ -129,7 +133,7 @@ public:
     }
 
     static void setOffsetX(Characters characterID, int spriteIndex, PowerupID powerupID, int value, int* retSuccess = 0) {
-        if (spriteIndex < -49 || spriteIndex > 49) {
+        if (spriteIndex < -49 || spriteIndex > 50) {
             if (retSuccess) {
                 *retSuccess = -1;
             }
@@ -162,7 +166,7 @@ public:
     }
 
     static void setOffsetY(Characters characterID, int spriteIndex, PowerupID powerupID, int value, int* retSuccess = 0) {
-        if (spriteIndex < -49 || spriteIndex > 49) {
+        if (spriteIndex < -49 || spriteIndex > 50) {
             if (retSuccess) {
                 *retSuccess = -1;
             }

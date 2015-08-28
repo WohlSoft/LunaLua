@@ -431,8 +431,13 @@ void CLunaLua::bindAll()
             .property("hitboxWidth", &LuaProxy::PlayerSettings::getHitboxWidth, &LuaProxy::PlayerSettings::setHitboxWidth)
             .property("hitboxHeight", &LuaProxy::PlayerSettings::getHitboxHeight, &LuaProxy::PlayerSettings::setHitboxHeight)
             .property("hitboxDuckHeight", &LuaProxy::PlayerSettings::getHitboxDuckHeight, &LuaProxy::PlayerSettings::setHitboxDuckHeight)
-            .def("getSpriteOffset", &LuaProxy::PlayerSettings::getSpriteOffset)
-            .def("setSpriteOffset", &LuaProxy::PlayerSettings::setSpriteOffset)
+            .property("graboffsetX", &LuaProxy::PlayerSettings::getGrabOffsetX, &LuaProxy::PlayerSettings::setGrabOffsetX)
+            .property("graboffsetY", &LuaProxy::PlayerSettings::getGrabOffsetY, &LuaProxy::PlayerSettings::setGrabOffsetY)
+            .def("getSpriteOffsetX", &LuaProxy::PlayerSettings::getSpriteOffsetX)
+            .def("setSpriteOffsetX", &LuaProxy::PlayerSettings::setSpriteOffsetX)
+            .def("getSpriteOffsetY", &LuaProxy::PlayerSettings::getSpriteOffsetY)
+            .def("setSpriteOffsetY", &LuaProxy::PlayerSettings::setSpriteOffsetY)
+
 
             .property("character", &LuaProxy::PlayerSettings::getCharacter, &LuaProxy::PlayerSettings::setCharacter)
             .property("powerup", &LuaProxy::PlayerSettings::getPowerupID, &LuaProxy::PlayerSettings::setPowerupID),

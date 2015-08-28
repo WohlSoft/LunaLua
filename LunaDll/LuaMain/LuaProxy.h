@@ -365,8 +365,11 @@ namespace LuaProxy {
         int getGrabOffsetY(lua_State* L);
         void setGrabOffsetY(int grabOffsetY, lua_State* L);
 
-        int getSpriteOffset(int indexX, int indexY, lua_State* L);
-        void setSpriteOffset(int indexX, int indexY, int value, lua_State* L);
+        int getSpriteOffsetX(int indexX, int indexY, lua_State* L);
+        void setSpriteOffsetX(int indexX, int indexY, int value, lua_State* L);
+        int getSpriteOffsetY(int indexX, int indexY, lua_State* L);
+        void setSpriteOffsetY(int indexX, int indexY, int value, lua_State* L);
+
 
         PowerupID getPowerupID(lua_State* L) const;
         void setPowerupID(PowerupID val, lua_State* L);
