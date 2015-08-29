@@ -7,7 +7,18 @@
 #include "../../SMBXInternal/CameraInfo.h"
 
 // CTOR
-RenderBitmapOp::RenderBitmapOp() {
+RenderBitmapOp::RenderBitmapOp() : RenderOp(),
+    x(0.0),
+    y(0.0),
+    sx(0.0),
+    sy(0.0),
+    sw(0.0),
+    sh(0.0),
+    opacity(1.0f),
+    sceneCoords(false),
+    img_resource_code(-1),
+    direct_img(nullptr)
+{
     x = 0;
     y = 0;
     sx = 0;
@@ -16,15 +27,16 @@ RenderBitmapOp::RenderBitmapOp() {
     sh = 0;
     opacity = 1.0f;
     sceneCoords = false;
-    m_PerCycleOnly = false;
 }
 
 // DRAW
 void RenderBitmapOp::Draw(Renderer* renderer) {
-    BMPBox* bmp = NULL;
-    auto it = renderer->LoadedImages.find(img_resource_code);
-    if (it != renderer->LoadedImages.end()) bmp = it->second;
-
+    BMPBox* bmp = direct_img;
+    if (!bmp) {
+        auto it = renderer->LoadedImages.find(img_resource_code);
+        if (it != renderer->LoadedImages.end()) bmp = it->second;
+    }
+    
     float opacity = this->opacity;
     if (opacity > 1.0f) opacity = 1.0f;
     if (opacity < 0.0f) opacity = 0.0f;

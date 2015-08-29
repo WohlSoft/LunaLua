@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
+#include <memory.h>
 
 class RenderOverrideManager
 {
@@ -16,10 +17,11 @@ public:
 
     void ResetOverrides();
     void loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
-
+    void loadLevelGFX();
+    bool renderOverrideBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc);
     
 private:
-    std::unordered_map<HDC, BMPBox*> gfxOverrideMap;
+    std::unordered_map<HDC, std::shared_ptr<BMPBox>> gfxOverrideMap;
     std::unordered_set<HDC> gfxOverrideMaskSet;
 };
 

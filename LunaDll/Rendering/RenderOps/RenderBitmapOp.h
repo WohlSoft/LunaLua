@@ -19,6 +19,7 @@ public:
     bool   sceneCoords;     // If true, x and y are scene coordinates
 
     int img_resource_code;
+    BMPBox* direct_img;
 };
 
 #endif

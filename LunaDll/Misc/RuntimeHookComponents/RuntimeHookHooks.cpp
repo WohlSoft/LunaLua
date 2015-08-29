@@ -17,6 +17,7 @@
 #include "../../libs/ini-reader/INIReader.h"
 
 #include "../RunningStat.h"
+#include "../../Rendering/RenderOverrideManager.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -553,7 +554,7 @@ extern void __stdcall LoadLocalGfxHook()
     native_loadLocalGfx();
 
     // Load render override graphics
-    loadRenderOverrideGfx();
+    gRenderOverride.loadLevelGFX();
 }
 
 
@@ -565,14 +566,14 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
-        if (g_GLEngine.IsEnabled()) {
-            g_GLEngine.EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
-            return -1;
-        }
+        bool skipRendering = gRenderOverride.renderOverrideBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc);
 
-        if (renderOverrideBitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop)) {
-            return -1;
+        if (!skipRendering){
+            if (g_GLEngine.IsEnabled()) {
+                g_GLEngine.EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+            }
         }
+        return -1;
     }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
