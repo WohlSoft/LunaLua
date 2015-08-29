@@ -18,16 +18,7 @@ RenderBitmapOp::RenderBitmapOp() : RenderOp(),
     sceneCoords(false),
     img_resource_code(-1),
     direct_img(nullptr)
-{
-    x = 0;
-    y = 0;
-    sx = 0;
-    sy = 0;
-    sw = 0;
-    sh = 0;
-    opacity = 1.0f;
-    sceneCoords = false;
-}
+{}
 
 // DRAW
 void RenderBitmapOp::Draw(Renderer* renderer) {

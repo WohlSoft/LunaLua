@@ -564,17 +564,21 @@ extern BOOL __stdcall BitBltHook(
     )
 {
     // Only override if the BitBlt is for the screen
+    bool skipRendering = false;
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
-        bool skipRendering = gRenderOverride.renderOverrideBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc);
+        skipRendering = gRenderOverride.renderOverrideBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc);
 
         if (!skipRendering){
             if (g_GLEngine.IsEnabled()) {
                 g_GLEngine.EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+                return -1;
             }
         }
-        return -1;
     }
+
+    if (skipRendering)
+        return -1;
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
