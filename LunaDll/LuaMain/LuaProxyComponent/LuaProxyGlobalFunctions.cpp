@@ -88,7 +88,6 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 	std::string isUsed;
 	std::string offsetX;
 	std::string offsetY;
-	std::stringstream xx;
 
 	switch(character)
 	{
@@ -114,7 +113,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 				isUsed.clear();
 				offsetX.clear();
 				offsetY.clear();
-				xx.clear();
+				std::stringstream xx;
 				xx << "frame-" << x << "-" << y;
 				std::string tFrame = xx.str();
 				isUsed = hitBoxFile.Get(tFrame, "used", "false");
@@ -127,10 +126,10 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 					{
 						SMBX_CustomGraphics::setOffsetX((Characters)_character,
 							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-							(PowerupID)_powerup, (int)atoi(offsetX.c_str()));
-						SMBX_CustomGraphics::setOffsetX((Characters)_character,
+							(PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
+						SMBX_CustomGraphics::setOffsetY((Characters)_character,
 							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-							(PowerupID)_powerup, (int)atoi(offsetY.c_str()));
+							(PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
 					}
 				}
 			}
