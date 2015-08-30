@@ -10,12 +10,13 @@
 #include "../../SMBXInternal/Overworld.h"
 #include "../../SMBXInternal/WorldLevel.h"
 #include "../../SMBXInternal/Level.h"
+#include "../../SMBXInternal/CustomGraphics.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
 #include "../../Misc/RuntimeHook.h"
 #include "LuaProxyAudio.h"
-
+#include <sstream>
 
 
 //type - Player's state/powerup
@@ -78,24 +79,16 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 	//X = ((FrameID+49)-(FrameID+49)%10)/10
 	//Y = (FrameID+49)%10
 
-	//hitBoxFile.Get("frame-y-x", "used", "false");
-	//if(used==false) --> skip this frame
-	//{
-	//Size of hitbox
-	//hitBoxFile.Get("frame-x-x", "width", "default value");
-	//hitBoxFile.Get("frame-x-x", "height", "default value");
-	//Offset relative to
-	//hitBoxFile.Get("frame-x-x", "offsetX", "default value");
-	//hitBoxFile.Get("frame-x-x", "offsetY", "default value");
-	//Later will be available grab offset x and grab offset y
-	//hitBoxFile.Get("frame-x-x", "grabOffsetX", "default value");
-	//hitBoxFile.Get("frame-x-x", "grabOffsetY", "default value");
-	//}
+
 	std::string width = "";
 	std::string height = "";
 	std::string height_duck = "";
 	std::string grab_offset_x = "";
 	std::string grab_offset_y = "";
+	std::string isUsed;
+	std::string offsetX;
+	std::string offsetY;
+	std::stringstream xx;
 
 	switch(character)
 	{
@@ -113,6 +106,35 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 		//grab offsets
 		grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
 		grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
+
+		for (int x = 0; x<10; x++)
+		{
+			for (int y = 0; y<10; y++)
+			{
+				isUsed.clear();
+				offsetX.clear();
+				offsetY.clear();
+				xx.clear();
+				xx << "frame-" << x << "-" << y;
+				std::string tFrame = xx.str();
+				isUsed = hitBoxFile.Get(tFrame, "used", "false");
+				if (isUsed == "true") //--> skip this frame
+				{
+					//Offset relative to
+					offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
+					offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
+					if (!offsetX.empty() && !offsetY.empty())
+					{
+						SMBX_CustomGraphics::setOffsetX((Characters)_character,
+							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+							(PowerupID)_powerup, (int)atoi(offsetX.c_str()));
+						SMBX_CustomGraphics::setOffsetX((Characters)_character,
+							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+							(PowerupID)_powerup, (int)atoi(offsetY.c_str()));
+					}
+				}
+			}
+		}
 		break;
 	default:
 		MessageBoxA(0, "Wrong character ID", "Error", 0);
