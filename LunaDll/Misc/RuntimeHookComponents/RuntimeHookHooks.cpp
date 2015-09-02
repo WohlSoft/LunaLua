@@ -895,6 +895,8 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
         if (wParam == VK_F12 && g_GLEngine.IsEnabled())
         {
+            short screenshotSoundID = 12;
+            native_playSFX(&screenshotSoundID);
             g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
                 std::wstring screenshotPath = getModulePath() + std::wstring(L"\\screenshots");
                 if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
