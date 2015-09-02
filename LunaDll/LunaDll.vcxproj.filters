@@ -297,9 +297,6 @@
     <ClInclude Include="SMBXInternal\Water.h">
       <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\RenderOverrides.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -715,9 +712,6 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncGraphics.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\RenderOverrides.cpp">
-      <Filter>Header Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp">
       <Filter>Header Files\Misc\Gui</Filter>
