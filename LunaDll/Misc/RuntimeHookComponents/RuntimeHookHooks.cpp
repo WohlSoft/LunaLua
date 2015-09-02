@@ -11,7 +11,6 @@
 
 #include "../SHMemServer.h"
 
-#include "../../Rendering/RenderOverrides.h"
 #include "../../Rendering/GLEngine.h"
 #include "../../Main.h"
 #include "../../libs/ini-reader/INIReader.h"
