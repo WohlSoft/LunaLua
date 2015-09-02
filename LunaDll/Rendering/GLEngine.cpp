@@ -340,17 +340,24 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
     if (glGetError() != GL_NO_ERROR) {
         GlobalUnlock(handle);
         GlobalFree(handle);
+        mScreenshotCallback = nullptr;
         return false;
     }
 
-    // Unlock
-    GlobalUnlock(handle);
+    
+    bool releaseMem = true;
+    if (mScreenshotCallback) {
+        bool releaseMem = mScreenshotCallback(handle, &header, (void*)pPixelData, mHwnd);
+    }
 
-    // Write to clipboard
-    OpenClipboard(mHwnd);
-    EmptyClipboard();
-    SetClipboardData(CF_DIB, handle);
-    CloseClipboard();
+    if ((GlobalFlags(handle) & GMEM_LOCKCOUNT) >= 1){
+        GlobalUnlock(handle);
+    }
 
+    if (releaseMem){
+        GlobalFree(handle);
+    }
+    
+    mScreenshotCallback = nullptr;
     return true;
 }

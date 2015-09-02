@@ -186,3 +186,75 @@ static IWICImagingFactory* getWICFactory() {
 
     return pInstance;
 }
+
+void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& header, void* pData)
+{
+    IWICImagingFactory* pFactory = getWICFactory();
+    IWICStream* pFileStream = NULL;
+    IWICBitmap* pBitmap = NULL;
+    IWICBitmapEncoder* pEncoder = NULL;
+    IWICBitmapFrameEncode* pFrameEncoder = NULL;
+    IWICBitmapFlipRotator* pRotator = NULL;
+
+    HRESULT hr = pFactory->CreateBitmapFromMemory(
+        header.biWidth,
+        header.biHeight,
+        GUID_WICPixelFormat24bppBGR,
+        ((((header.biWidth * header.biBitCount) + 31) & ~31) >> 3),
+        header.biWidth * header.biHeight * 3,
+        (BYTE*)pData,
+        &pBitmap);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFactory->CreateStream(&pFileStream);
+    if (FAILED(hr)) goto cleanup;
+
+    pFileStream->InitializeFromFilename(fName.c_str(), GENERIC_WRITE);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFactory->CreateEncoder(GUID_ContainerFormatPng, NULL, &pEncoder);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pEncoder->Initialize(pFileStream, WICBitmapEncoderNoCache);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pEncoder->CreateNewFrame(&pFrameEncoder, NULL);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFrameEncoder->Initialize(NULL);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFactory->CreateBitmapFlipRotator(&pRotator);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pRotator->Initialize(pBitmap, WICBitmapTransformFlipVertical);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFrameEncoder->WriteSource(pRotator, NULL);
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pFrameEncoder->Commit();
+    if (FAILED(hr)) goto cleanup;
+
+    hr = pEncoder->Commit();
+    if (FAILED(hr)) goto cleanup;
+
+
+cleanup:;
+    if (pBitmap){
+        pBitmap->Release();
+    }
+    if (pEncoder){
+        pEncoder->Release();
+    }
+    if (pFrameEncoder){
+        pFrameEncoder->Release();
+    }
+    if (pFileStream){
+        pFileStream->Release();
+    }
+    if (pRotator){
+        pRotator->Release();
+    }
+
+}

@@ -3,3 +3,5 @@
 v0.7.1.1 BETA:
   * Added comparing operator for some LunaLua classes.
   * Added PlayerSettings-Class
+  * Added PNG support for custom level items (i.e. npc-1.png)
+  * Fixed screenshot-function (With changes: PNG-Format and filename is now date + time)

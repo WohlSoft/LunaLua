@@ -114,6 +114,9 @@ void ParseArgs(const std::vector<std::string>& args)
 
     if (vecStrFind(args, std::string("--newlauncher")))
         gStartupSettings.newLauncher = true;
+
+    if (vecStrFind(args, std::string("--console")))
+        gStartupSettings.console = true;
 }
 
 static unsigned int __stdcall LatePatch(void)
@@ -168,6 +171,9 @@ void TrySkipPatch()
 
         PATCH_FUNC(0x8BED00, &InitHook);
     }
+
+    if (gStartupSettings.console)
+        RedirectIOToConsole();
 
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
@@ -316,6 +322,8 @@ void TrySkipPatch()
     PATCH_FUNC(0x908B03, &WorldHUDPrintTextController);
     PATCH_FUNC(0x908A67, &WorldHUDPrintTextController);
 
+    PATCH_FUNC(0x909217, &GenerateScreenshotHook);
+    PATCH_FUNC(0x94D5E7, &GenerateScreenshotHook);
     
     // Graphics Bitblt hooks
     PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);

@@ -18,6 +18,7 @@
 
 #include "../RunningStat.h"
 #include "../../Rendering/RenderOverrideManager.h"
+#include "../../Rendering/RenderUtils.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -856,6 +857,21 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
     return native_isOnWCamera(camIndex, momentumObj);
 }
 
+
+extern void __stdcall GenerateScreenshotHook()
+{
+    //dbgboxA("Screeny!");
+    GM_DO_SCREENSHOT = COMBOOL(false);
+    // Fails --> Renderer freezes!
+    /*
+    g_GLEngine.TriggerScreenshot([](const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
+        //::GenerateScreenshot(L"Test.png", *header, pData);
+        return true;
+    });
+    */
+}
+
+
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -863,12 +879,40 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-    // Hook print screen key
-    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
-    {
-        g_GLEngine.TriggerScreenshot();
-        return 1;
+    if ((lParam & 0x80000000) == 0) { //be sure to only call it when the button is pressed, not released!
+        // Hook print screen key
+        if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
+        {
+            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
+                GlobalUnlock(&globalMem);
+                // Write to clipboard
+                OpenClipboard(curHwnd);
+                EmptyClipboard();
+                SetClipboardData(CF_DIB, globalMem);
+                CloseClipboard();
+                return false;
+            });
+            return 1;
+        }
+        if (wParam == VK_F12 && g_GLEngine.IsEnabled())
+        {
+            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
+                std::wstring screenshotPath = getModulePath() + std::wstring(L"\\screenshots");
+                if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+                    CreateDirectoryW(screenshotPath.c_str(), NULL);
+                }
+                screenshotPath += L"\\";
+                screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".png");
+
+                ::GenerateScreenshot(screenshotPath, *header, pData);
+                return true;
+            });
+            return 1;
+        }
     }
+    
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
+
+

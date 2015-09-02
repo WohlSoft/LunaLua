@@ -147,6 +147,7 @@ enum PowerupID : short {
 
 // General
 DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
+DEFMEM(GM_DO_SCREENSHOT,    short, 0x00B2504C);
 
 // Modes
 DEFMEM(GM_CREDITS_MODE,     WORD,  0x00B2C89C);

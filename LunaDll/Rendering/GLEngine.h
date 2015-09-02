@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include "GLDraw.h"
 #include "BMPBox.h"
+#include <functional>
+
+typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
 
 class GLEngine {
 private:
@@ -25,6 +28,7 @@ private:
 
     HWND mHwnd;
     bool mScreenshot;
+    SCREENSHOT_CALLBACK mScreenshotCallback;
 protected:
     // Internal routines
     void Init();
@@ -39,7 +43,8 @@ public:
     inline bool IsEnabled() { return mEnabled; };
     inline void Enable() { mEnabled = true; }
     inline void Disable() { mEnabled = false; }
-    inline void TriggerScreenshot() { mScreenshot = true; }
+    inline void TriggerScreenshot() { mScreenshot = true; mScreenshotCallback = nullptr;  }
+    inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& screenshotCallback) { mScreenshot = true; mScreenshotCallback = screenshotCallback; }
 
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,

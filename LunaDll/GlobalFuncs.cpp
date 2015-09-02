@@ -12,6 +12,10 @@
 #include <cwctype>
 #include "httprequest.h"
 #include <comutil.h>
+#include <fcntl.h>
+#include <io.h>
+#include <iostream>
+#include <fstream>
 
 #include "Misc/MiscFuncs.h"
 
@@ -193,14 +197,7 @@ void InitGlobals()
 	gLevelEnum = Invalid;
 
 	//startup settings default
-	gStartupSettings.patch = false;
-	gStartupSettings.noSound = false;
-	gStartupSettings.frameskip = true;
-	gStartupSettings.game = false;
-	gStartupSettings.lvlEditor = false;
-	gStartupSettings.debugger = false;
-	gStartupSettings.logger = false;
-	gStartupSettings.newLauncher = false;
+    memset(&gStartupSettings, 0, sizeof(gStartupSettings));
 
 	gHook_SkipTestMsgBox = false;
 
@@ -453,4 +450,53 @@ std::wstring getCustomFolderPath()
         full_path = full_path.append(L"\\"); // < path into level folder
     }
     return full_path;
+}
+
+void RedirectIOToConsole()
+{
+    int hConHandle;
+    long lStdHandle;
+    CONSOLE_SCREEN_BUFFER_INFO coninfo;
+    FILE *fp;
+
+    // allocate a console for this app
+    AllocConsole();
+
+    // set the screen buffer to be big enough to let us scroll text
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
+    coninfo.dwSize.Y = 500;
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
+
+    // redirect unbuffered STDOUT to the console
+    lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+
+    fp = _fdopen(hConHandle, "w");
+
+    *stdout = *fp;
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+
+    // redirect unbuffered STDIN to the console
+
+    lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+
+    fp = _fdopen(hConHandle, "r");
+    *stdin = *fp;
+    setvbuf(stdin, NULL, _IONBF, 0);
+
+    // redirect unbuffered STDERR to the console
+    lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+    hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+
+    fp = _fdopen(hConHandle, "w");
+
+    *stderr = *fp;
+
+    setvbuf(stderr, NULL, _IONBF, 0);
+
+    // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
+    // point to console as well
+    ios::sync_with_stdio();
 }

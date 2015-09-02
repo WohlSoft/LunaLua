@@ -39,6 +39,7 @@ struct startUpSettings{
 	bool debugger;
 	bool logger;
 	bool newLauncher;
+    bool console;
 };
 
 extern HINSTANCE	gHInstance;

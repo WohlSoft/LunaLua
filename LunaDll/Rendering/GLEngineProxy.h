@@ -46,6 +46,7 @@ public:
     inline void Enable() { mGLEngine.Enable(); };
     inline void Disable() { mGLEngine.Disable(); };
     inline void TriggerScreenshot() { mGLEngine.TriggerScreenshot(); }
+    inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& func) { mGLEngine.TriggerScreenshot(func); }
 };
 
 // Instance

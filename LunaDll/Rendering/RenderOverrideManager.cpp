@@ -2,6 +2,7 @@
 #include "../GlobalFuncs.h"
 #include "RenderOps/RenderBitmapOp.h"
 
+
 void RenderOverrideManager::ResetOverrides()
 {
     gfxOverrideMap.clear();
@@ -56,8 +57,23 @@ bool RenderOverrideManager::renderOverrideBitBlt(int nXDest, int nYDest, int nWi
 
 void RenderOverrideManager::loadLevelGFX()
 {
+    //dbgboxA("Loading overrides!");
     ResetOverrides();
+    
+    /*
+    LARGE_INTEGER li;
+    QueryPerformanceFrequency(&li);
+    double pcFreq = double(li.QuadPart);
+    QueryPerformanceCounter(&li);
+    __int64 startNow = li.QuadPart;
+    */
+
     loadOverrides(L"block", GM_GFX_BLOCKS_PTR, 638, GM_GFX_BLOCKS_MASK_PTR);
+    /*
+    QueryPerformanceCounter(&li);
+    double diffTime = double(li.QuadPart-startNow) / pcFreq;
+    dbgboxA((std::string("Duration: ") + std::to_string(diffTime) + std::string(" sec")).c_str());
+    */
     loadOverrides(L"background2", GM_GFX_BACKGROUND2_PTR, 58);
     loadOverrides(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR);
     loadOverrides(L"effect", GM_GFX_EFFECTS_PTR, 148, GM_GFX_EFFECTS_MASK_PTR);

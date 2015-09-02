@@ -51,4 +51,7 @@ std::string generateTimestamp();
 // Network Helper Funcs
 void sendPUTRequest(const std::string& server, const std::string& data);
 
+// Debug stuff
+void RedirectIOToConsole();
+
 #endif
