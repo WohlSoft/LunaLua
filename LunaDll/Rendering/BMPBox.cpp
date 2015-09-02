@@ -1,6 +1,7 @@
 #include "BMPBox.h"
 #include "../Globals.h"
 #include "RenderUtils.h"
+#include "GLEngine.h"
 
 // CTOR
 BMPBox::BMPBox() {
@@ -9,6 +10,12 @@ BMPBox::BMPBox() {
 
 // DTOR
 BMPBox::~BMPBox() {
+    // If the GL Engine is running, deallocate the associated texture and erase the BMPBox->Texture mapping.
+    if (g_GLEngine.IsEnabled())
+    {
+        g_GLEngine.ClearLunaTexture(*this);
+    }
+
     if (m_hbmp != NULL) {
         DeleteObject(m_hbmp);
         m_hbmp = NULL;

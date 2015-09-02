@@ -140,13 +140,6 @@ bool Renderer::DeleteImage(int resource_code) {
     auto it = LoadedImages.find(resource_code);
     if (it != LoadedImages.end()) {
         if (it->second) {
-            if (g_GLEngine.IsEnabled())
-            {
-                if (it->second != NULL) {
-                    g_GLEngine.ClearLunaTexture(*it->second);
-                }
-            }
-
             delete it->second;
         }
         LoadedImages.erase(it);
