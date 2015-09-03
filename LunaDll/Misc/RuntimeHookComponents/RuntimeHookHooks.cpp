@@ -878,38 +878,36 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-    if ((lParam & 0x80000000) == 0) { //be sure to only call it when the button is pressed, not released!
-        // Hook print screen key
-        if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
-        {
-            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-                GlobalUnlock(&globalMem);
-                // Write to clipboard
-                OpenClipboard(curHwnd);
-                EmptyClipboard();
-                SetClipboardData(CF_DIB, globalMem);
-                CloseClipboard();
-                return false;
-            });
-            return 1;
-        }
-        if (wParam == VK_F12 && g_GLEngine.IsEnabled())
-        {
-            short screenshotSoundID = 12;
-            native_playSFX(&screenshotSoundID);
-            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-                std::wstring screenshotPath = getModulePath() + std::wstring(L"\\screenshots");
-                if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-                    CreateDirectoryW(screenshotPath.c_str(), NULL);
-                }
-                screenshotPath += L"\\";
-                screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".png");
+    // Hook print screen key
+    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
+    {
+        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
+            GlobalUnlock(&globalMem);
+            // Write to clipboard
+            OpenClipboard(curHwnd);
+            EmptyClipboard();
+            SetClipboardData(CF_DIB, globalMem);
+            CloseClipboard();
+            return false;
+        });
+        return 1;
+    }
+    if (wParam == VK_F12 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
+    {
+        short screenshotSoundID = 12;
+        native_playSFX(&screenshotSoundID);
+        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
+            std::wstring screenshotPath = getModulePath() + std::wstring(L"\\screenshots");
+            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+                CreateDirectoryW(screenshotPath.c_str(), NULL);
+            }
+            screenshotPath += L"\\";
+            screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".png");
 
-                ::GenerateScreenshot(screenshotPath, *header, pData);
-                return true;
-            });
-            return 1;
-        }
+            ::GenerateScreenshot(screenshotPath, *header, pData);
+            return true;
+        });
+        return 1;
     }
     
 
