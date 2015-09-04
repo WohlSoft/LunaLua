@@ -909,6 +909,11 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         });
         return 1;
     }
+    if (wParam == VK_F11 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
+    {
+        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+        native_playSFX(&gifRecSoundID);
+    }
     
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);

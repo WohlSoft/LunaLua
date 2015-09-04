@@ -7,8 +7,6 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 
-static IWICImagingFactory* getWICFactory();
-
 HBITMAP CreateEmptyBitmap(int width, int height, int bpp, void** data)
 {
     BITMAPINFO convBMI;
@@ -176,7 +174,7 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
 }
 
 
-static IWICImagingFactory* getWICFactory() {
+IWICImagingFactory* getWICFactory() {
     static IWICImagingFactory *pInstance = NULL;
 
     if (pInstance == NULL) {

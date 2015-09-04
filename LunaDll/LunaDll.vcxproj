@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Rendering\AsyncGifRecorder.h" />
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
@@ -252,6 +253,7 @@
     <ClInclude Include="SMBXInternal\WorldLevel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Rendering\AsyncGifRecorder.cpp" />
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp" />

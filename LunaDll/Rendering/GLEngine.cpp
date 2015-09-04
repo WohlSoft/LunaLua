@@ -101,6 +101,8 @@ void GLEngine::Init() {
     
     mInitialized = true;
     mHadError = false;
+
+    mGifRecorder.init();
 }
 
 void GLEngine::ClearSMBXSprites() {
@@ -252,6 +254,16 @@ void GLEngine::EndFrame(HDC hdcDest)
         }
     }
 
+    if (mGifRecorder.isRunning())
+    {
+        RECT clientRect;
+        if (GetClientRect(mHwnd, &clientRect)) {
+            if (clientRect.right < 0) clientRect.right = 1;
+            if (clientRect.bottom < 0) clientRect.bottom = 1;
+            GifRecorderNextFrame(0, 0, clientRect.right, clientRect.bottom);
+        }
+    }
+
     SwapBuffers(hdcDest);
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -360,4 +372,31 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
     
     mScreenshotCallback = nullptr;
     return true;
+}
+
+bool GLEngine::GifRecorderToggle()
+{
+    if (!mGifRecorder.isRunning()){
+        mGifRecorder.start();
+        return true;
+    }
+    else
+    {
+        mGifRecorder.stop();
+        return false;
+    }
+
+}
+
+void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+{
+    BYTE* pixData = new BYTE[w * h * 3];
+    
+    // Read pixels
+    glReadPixels(x, y, w, h, GL_BGR, GL_UNSIGNED_BYTE, pixData);
+    if (glGetError() != GL_NO_ERROR) {
+        return;
+    }
+
+    mGifRecorder.addNextFrameToProcess(w, h, pixData);
 }
