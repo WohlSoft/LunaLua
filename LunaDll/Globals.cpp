@@ -78,6 +78,8 @@ SHMemServer gShMemServer;
 
 RenderOverrideManager gRenderOverride;
 
+FreeImageInit        gFreeImgInit;
+
 CLunaLua gLunaLua;
 
 

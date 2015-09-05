@@ -7,7 +7,7 @@
 #include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 #include "../../GameConfig/GameConfiguration.h"
-
+#include "../../Globals.h"
 
 #include "../SHMemServer.h"
 
@@ -174,6 +174,9 @@ void TrySkipPatch()
 
     if (gStartupSettings.console)
         RedirectIOToConsole();
+
+    // Init freeimage:
+    gFreeImgInit.init();
 
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)

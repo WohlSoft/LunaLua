@@ -429,6 +429,12 @@
     <ClInclude Include="Rendering\AsyncGifRecorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\FreeImageUtils\FreeImageGifWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -819,6 +825,12 @@
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\FreeImageUtils\FreeImageGifWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

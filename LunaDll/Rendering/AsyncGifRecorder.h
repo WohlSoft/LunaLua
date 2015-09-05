@@ -9,6 +9,7 @@
 #include "RenderUtils.h"
 #include <wincodec.h>
 #include <atomic>
+#include "../Misc/FreeImageUtils/FreeImageGifWriter.h"
 
 class AsyncGifRecorder
 {
@@ -34,10 +35,12 @@ private:
     std::atomic_bool m_isRunning;
     
     //On worker Thread:
+    std::unique_ptr<FreeImageGifWriter> m_gifWriter;
+    /*
     IWICStream* m_curStream;
     IWICBitmapEncoder* m_curEncoder;
     std::vector<IWICBitmapFrameEncode*> m_curAllFrames;
-
+    */
 public:
     AsyncGifRecorder();
     ~AsyncGifRecorder();

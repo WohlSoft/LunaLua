@@ -21,6 +21,7 @@
 #include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
+#include "Misc/FreeImageUtils/FreeImageInit.h"
 
 class RenderOverrideManager;
 
@@ -101,6 +102,7 @@ extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
 extern RenderOverrideManager gRenderOverride;
+extern FreeImageInit        gFreeImgInit;
 
 extern CLunaLua				gLunaLua;
 
