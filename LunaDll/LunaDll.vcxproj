@@ -253,6 +253,7 @@
     <ClInclude Include="SMBXInternal\Water.h" />
     <ClInclude Include="UserSaves\UserSaving.h" />
     <ClInclude Include="SMBXInternal\WorldLevel.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />

@@ -2,7 +2,7 @@
 #ifndef Defines_hhhh
 #define Defines_hhhh
 
-#include "resource.h"
+#include "version.h"
 #include <windows.h>
 #include "Misc/VB6StrPtr.h"
 
