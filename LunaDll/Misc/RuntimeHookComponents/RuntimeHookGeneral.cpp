@@ -334,6 +334,10 @@ void TrySkipPatch()
     PATCH_FUNC(0x8D9611, &LoadLocalGfxHook);
     PATCH_FUNC(0x8DF52B, &LoadLocalGfxHook);
     PATCH_FUNC(0x8DFF7C, &LoadLocalGfxHook);
+
+    PATCH_FUNC(0x8DEF73, &LoadLocalOverworldGfxHook);
+    PATCH_FUNC(0x8DF808, &LoadLocalOverworldGfxHook);
+
     PATCH_JMP(0x4242D0, &BitBltHook);
     PATCH_JMP(0x424314, &StretchBltHook);
 

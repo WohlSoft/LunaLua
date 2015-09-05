@@ -17,7 +17,9 @@ public:
 
     void ResetOverrides();
     void loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
+    void loadOverrides(const std::wstring& path, const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
     void loadLevelGFX();
+    void loadWorldGFX();
     bool renderOverrideBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc);
     
 private:

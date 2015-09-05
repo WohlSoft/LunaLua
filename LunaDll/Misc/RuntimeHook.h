@@ -91,6 +91,7 @@ extern EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     CONTEXT *ContextRecord,
     void * DispatcherContext);
 extern void __stdcall LoadLocalGfxHook();
+extern void __stdcall LoadLocalOverworldGfxHook();
 extern BOOL __stdcall BitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall StretchBltHook(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, DWORD dwRop);
 extern int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2);

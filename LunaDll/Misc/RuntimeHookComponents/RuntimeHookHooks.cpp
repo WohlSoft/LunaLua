@@ -553,9 +553,22 @@ extern void __stdcall LoadLocalGfxHook()
 {
     native_loadLocalGfx();
 
+    
     // Load render override graphics
+    gRenderOverride.ResetOverrides();
     gRenderOverride.loadLevelGFX();
+    gRenderOverride.loadWorldGFX();
 }
+
+
+extern void __stdcall LoadLocalOverworldGfxHook()
+{
+    native_loadWorldGfx();
+
+    gRenderOverride.ResetOverrides();
+    gRenderOverride.loadWorldGFX();
+}
+
 
 
 extern BOOL __stdcall BitBltHook(

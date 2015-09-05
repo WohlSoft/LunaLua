@@ -12,19 +12,36 @@ void RenderOverrideManager::ResetOverrides()
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
     std::wstring customLevelPath = getCustomFolderPath();
-    for (int i = 1; i < numElements + 1; i++){
+    if (customLevelPath != L"") {
+        loadOverrides(customLevelPath, prefix, graphicsArray, numElements, graphicsArray_Mask);
+    }
+    
+    std::wstring episodePath = GM_FULLDIR;
+    if (customLevelPath != episodePath){
+        loadOverrides(episodePath, prefix, graphicsArray, numElements, graphicsArray_Mask);
+    }
+}
+
+void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
+{
+    for (int i = 1; i < numElements + 1; i++){        
         HDC nextHdcPtr = graphicsArray[i - 1];
+        
+        if (gfxOverrideMap.find(nextHdcPtr) != gfxOverrideMap.end())
+            continue;
+
         HDC nextHdcMaskPtr = 0;
         if (graphicsArray_Mask)
             nextHdcMaskPtr = graphicsArray_Mask[i - 1];
-        
-        std::wstring nextFilename = customLevelPath + prefix + L"-" + std::to_wstring(i) + L".png";
-        
+
+        std::wstring nextFilename = path + prefix + L"-" + std::to_wstring(i) + L".png";
+
         DWORD fAttrib = GetFileAttributesW(nextFilename.c_str());
         if (fAttrib == INVALID_FILE_ATTRIBUTES)
             continue;
         if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
             continue;
+        
 
         gfxOverrideMap[nextHdcPtr] = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
         if (nextHdcMaskPtr) {
@@ -58,7 +75,6 @@ bool RenderOverrideManager::renderOverrideBitBlt(int nXDest, int nYDest, int nWi
 void RenderOverrideManager::loadLevelGFX()
 {
     //dbgboxA("Loading overrides!");
-    ResetOverrides();
     
     /*
     LARGE_INTEGER li;
@@ -85,4 +101,13 @@ void RenderOverrideManager::loadLevelGFX()
     loadOverrides(L"link", GM_GFX_LINK_PTR, 7, GM_GFX_LINK_MASK_PTR);
     loadOverrides(L"yoshib", GM_GFX_YOSHIB_PTR, 8, GM_GFX_YOSHIB_MASK_PTR);
     loadOverrides(L"yoshit", GM_GFX_YOSHIT_PTR, 8, GM_GFX_YOSHIT_MASK_PTR);
+}
+
+void RenderOverrideManager::loadWorldGFX()
+{
+    loadOverrides(L"tiles", GM_GFX_TILES_PTR, 328);
+    loadOverrides(L"level", GM_GFX_LEVEL_PTR, 32, GM_GFX_LEVEL_MASK_PTR);
+    loadOverrides(L"scene", GM_GFX_SCENE_PTR, 65, GM_GFX_SCENE_MASK_PTR);
+    loadOverrides(L"path", GM_GFX_PATH_PTR, 32, GM_GFX_PATH_MASK_PTR);
+    loadOverrides(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR);
 }

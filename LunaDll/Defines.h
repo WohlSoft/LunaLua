@@ -569,6 +569,8 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 #define GF_LOAD_LOCAL_GFX   0x00ACD220
 
+#define GF_LOAD_WORLD_GFX   0x00ADFF90
+
 //      Arg1 = VB6StrPtr* Added text to the cheat buffer and execute
 #define GF_UPDATESCAN_CHEAT 0x008E7490
 
@@ -615,6 +617,7 @@ static const auto native_showLayer      = (void(__stdcall *)(VB6StrPtr* /*layerN
 static const auto native_hideLayer      = (void(__stdcall *)(VB6StrPtr* /*layerName*/, short* /*noSmoke*/))GF_HIDE_LAYER;
 
 static const auto native_loadLocalGfx   = (void(__stdcall *)())GF_LOAD_LOCAL_GFX;
+static const auto native_loadWorldGfx   = (void(__stdcall *)())GF_LOAD_WORLD_GFX;
 
 static const auto native_updateCheatbuf = (void(__stdcall *)(VB6StrPtr* /*addedText*/))GF_UPDATESCAN_CHEAT;
 
