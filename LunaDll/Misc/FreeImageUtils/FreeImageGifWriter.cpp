@@ -1,6 +1,9 @@
 #include "FreeImageGifWriter.h"
+typedef void* HMODULE;
+#include "../../GlobalFuncs.h"
+#include <cstdio>
 #include <iostream>
-
+#include <vector>
 
 FreeImageGifWriter::FreeImageGifWriter(const std::string& filename) :
     m_filename(filename),
@@ -19,6 +22,13 @@ void FreeImageGifWriter::closeAndCleanup()
 {
     if (m_gifHandle){
         FreeImage_CloseMultiBitmap(m_gifHandle);
+        std::string dirOfFile = m_filename.substr(0, m_filename.find_last_of("\\/"));
+        std::vector<std::string> fNames = listFilesOfDir(dirOfFile);
+        for (const std::string& nextFileName : fNames) {
+            if (nextFileName.find(".fispool") != std::string::npos || nextFileName.find(".ficache") != std::string::npos) {
+                std::remove((dirOfFile + "\\" +nextFileName).c_str());
+            }
+        }
         m_gifHandle = nullptr;
     }
 }
