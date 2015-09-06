@@ -5,6 +5,7 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
+#include "../../../Rendering/GLEngineProxy.h"
 #include <luabind/adopt_policy.hpp>
 
 // Stores reference to a loaded image
@@ -189,6 +190,12 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
     renderOp->sceneCoords = sceneCoords;
 
     gLunaRender.AddOp(renderOp);
+}
+
+
+bool LuaProxy::Graphics::isOpenGLEnabled()
+{
+    return g_GLEngine.IsEnabled();
 }
 
 void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t color)
