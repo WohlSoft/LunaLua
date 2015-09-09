@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Misc\FreeImageUtils\FreeImageData.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageGifWriter.h" />
     <ClInclude Include="Rendering\AsyncGifRecorder.h" />
@@ -256,6 +257,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageGifWriter.cpp" />
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp" />

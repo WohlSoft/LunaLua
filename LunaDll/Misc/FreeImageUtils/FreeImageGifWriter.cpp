@@ -40,7 +40,8 @@ void FreeImageGifWriter::add24bitBGRDataPage(int width, int height, BYTE* pData)
     memcpy(bitmapData, pData, width * height * 3);
     
     //Set metadata
-    FIBITMAP* convBitmap = FreeImage_ColorQuantize(newBitmap, FIQ_LFPQUANT);
+    FIBITMAP* convBitmap = FreeImage_ColorQuantizeEx(newBitmap, FIQ_WUQUANT, 256);
+
     FITAG* delayTag = FreeImage_CreateTag();
     
     FreeImage_SetMetadata(FIMD_ANIMATION, convBitmap, NULL, NULL);

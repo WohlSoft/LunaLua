@@ -438,6 +438,9 @@
     <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\FreeImageUtils\FreeImageData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -834,6 +837,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

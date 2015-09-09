@@ -54,8 +54,6 @@ void AsyncGifRecorder::workerFunc()
         if (nextData.data)
             wrappedData.reset(nextData.data);
 
-        //std::cout << "Incoming command id: " << (int)nextData.cmd << std::endl;
-        //std::cout << "Running? " << std::boolalpha << m_isRunning.load(std::memory_order_relaxed) << std::noboolalpha << std::endl;
         if (nextData.cmd == GIFREC_EXIT)
             return;
         
@@ -66,15 +64,12 @@ void AsyncGifRecorder::workerFunc()
         {
             if (m_isRunning.load(std::memory_order_relaxed))
                 continue;
-
             std::wstring screenshotPath = getModulePath() + std::wstring(L"\\gif-recordings");
             if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }
             screenshotPath += L"\\";
             screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".gif");
-            
-            //std::cout << "Gif recoding started!" << std::endl;
             m_gifWriter.reset(new FreeImageGifWriter(utf8_encode(screenshotPath)));
 
             m_isRunning.store(true, std::memory_order_relaxed);
@@ -84,7 +79,6 @@ void AsyncGifRecorder::workerFunc()
         {
             if (!m_isRunning.load(std::memory_order_relaxed))
                 continue;
-
             m_gifWriter->add24bitBGRDataPage(nextData.width, nextData.height, nextData.data);
             break;
         }
@@ -92,8 +86,6 @@ void AsyncGifRecorder::workerFunc()
         {
             if (!m_isRunning.load(std::memory_order_relaxed))
                 continue;
-
-            
             m_gifWriter->closeAndCleanup();
 
             m_isRunning.store(false, std::memory_order_relaxed);
@@ -109,7 +101,6 @@ void AsyncGifRecorder::workerFunc()
 
 void AsyncGifRecorder::start()
 {
-    //std::cout << "Send start CMD!" << std::endl;
     GifRecorderCMDItem startCmd;
     memset(&startCmd, 0, sizeof(startCmd));
     startCmd.cmd = GIFREC_START;
@@ -118,7 +109,6 @@ void AsyncGifRecorder::start()
 
 void AsyncGifRecorder::stop()
 {
-    //std::cout << "Send stop CMD!" << std::endl;
     GifRecorderCMDItem stopCmd;
     memset(&stopCmd, 0, sizeof(stopCmd));
     stopCmd.cmd = GIFREC_STOP;
