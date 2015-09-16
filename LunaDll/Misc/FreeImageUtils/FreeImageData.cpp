@@ -23,7 +23,7 @@ bool FreeImageData::loadFile(const std::string& filename)
     m_bitmap = FreeImage_Load(fif, filename.c_str());
     return m_bitmap != NULL;
 }
-#include <iostream>
+
 bool FreeImageData::saveFile(const std::string& filename) const
 {
     if (!m_bitmap)
