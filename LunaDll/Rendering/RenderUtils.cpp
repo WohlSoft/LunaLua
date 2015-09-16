@@ -63,7 +63,15 @@ void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITM
         if (FAILED(hr)) goto cleanup;
         
         hr = pFrame->GetMetadataQueryReader(&pMetadataReader);
-        if (FAILED(hr)) goto cleanup;
+        if (FAILED(hr)) {
+            // Getting the metadata query reader is optional, and may fail for
+            // some files on some systems. If it fails, don't bail out,
+            // instead just double-check that it's not allocated.
+            if (pMetadataReader) {
+                pMetadataReader->Release();
+                pMetadataReader = NULL;
+            }
+        }
 
         hr = pFactory->CreateFormatConverter(&pConvertedFrame);
         if (FAILED(hr)) goto cleanup;
@@ -151,11 +159,14 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
     LoadGfxAndEnumFrames(filename, [&allBitmapFrames, &frameDelayQueries, &sumFrameDelay](HBITMAP nextBitmap, IWICMetadataQueryReader* pMetadata){
         allBitmapFrames.push_back(nextBitmap);
         
-        _variant_t delayVal;
-        HRESULT hr = pMetadata->GetMetadataByName(L"/grctlext/Delay", (PROPVARIANT*)&delayVal);
-        if (SUCCEEDED(hr)) {
-            frameDelayQueries++;
-            sumFrameDelay += (short)delayVal;
+        // pMetadata may be NULL, if so we can't read a delay value
+        if (pMetadata) {
+            _variant_t delayVal;
+            HRESULT hr = pMetadata->GetMetadataByName(L"/grctlext/Delay", (PROPVARIANT*)&delayVal);
+            if (SUCCEEDED(hr)) {
+                frameDelayQueries++;
+                sumFrameDelay += (short)delayVal;
+            }
         }
         
         return true; //continue enum
