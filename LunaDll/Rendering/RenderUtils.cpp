@@ -8,29 +8,6 @@
 #include "../GlobalFuncs.h"
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 
-HBITMAP CreateEmptyBitmap(int width, int height, int bpp, void** data)
-{
-    BITMAPINFO convBMI;
-    memset(&convBMI, 0, sizeof(BITMAPINFO));
-    convBMI.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    convBMI.bmiHeader.biWidth = width;
-    convBMI.bmiHeader.biHeight = -(int)height;
-    convBMI.bmiHeader.biPlanes = 1;
-    convBMI.bmiHeader.biBitCount = bpp;
-    convBMI.bmiHeader.biCompression = BI_RGB;
-    HDC screenHDC = GetDC(NULL);
-    if (screenHDC == NULL)
-    {
-        return NULL;
-    }
-    *data = NULL;
-    HBITMAP convHBMP = CreateDIBSection(screenHDC, &convBMI, DIB_RGB_COLORS, data, NULL, 0);
-
-    ReleaseDC(NULL, screenHDC);
-    screenHDC = NULL;
-
-    return convHBMP;
-}
 
 void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITMAP, IWICMetadataQueryReader*)> bitmapEnumFunc){
     HRESULT hr;
@@ -90,7 +67,7 @@ void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITM
         if (FAILED(hr)) goto cleanup;
 
         void* pData = NULL;
-        hDIBBitmap = CreateEmptyBitmap(width, height, 32, &pData);
+        hDIBBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, &pData);
         if (!hDIBBitmap) goto cleanup;
 
         // Calculate the number of bytes in 1 scanline

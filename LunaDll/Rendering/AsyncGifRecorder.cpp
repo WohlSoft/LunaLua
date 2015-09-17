@@ -70,7 +70,7 @@ void AsyncGifRecorder::workerFunc()
             }
             screenshotPath += L"\\";
             screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".gif");
-            m_gifWriter.reset(new FreeImageGifWriter(utf8_encode(screenshotPath)));
+            m_gifWriter.reset(new FreeImageGifData(utf8_encode(screenshotPath)));
 
             m_isRunning.store(true, std::memory_order_relaxed);
             break;

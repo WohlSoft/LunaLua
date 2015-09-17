@@ -46,7 +46,7 @@ const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
 
     // Convert to 24bpp BGR in memory that's accessible
     void* pData = NULL;
-    HBITMAP convHBMP = CreateEmptyBitmap(w, h, 32, &pData);
+    HBITMAP convHBMP = FreeImageHelper::CreateEmptyBitmap(w, h, 32, &pData);
     HDC screenHDC = GetDC(NULL);
     if (screenHDC == NULL) {
         return 0;
