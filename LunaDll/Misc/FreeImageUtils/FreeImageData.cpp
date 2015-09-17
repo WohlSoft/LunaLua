@@ -1,6 +1,6 @@
 #include <Windows.h>
-
 #include "FreeImageData.h"
+#include "FreeImageHelper.h"
 
 FreeImageData::FreeImageData() : m_bitmap(NULL)
 {}
@@ -32,7 +32,8 @@ bool FreeImageData::saveFile(const std::string& filename) const
     FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(filename.c_str());
     if (fif == FIF_UNKNOWN)
         return false;
-    bool returnVal = FreeImage_Save(fif, m_bitmap, filename.c_str());
+    if(!FreeImage_Save(fif, m_bitmap, filename.c_str()))
+        return false;
     
     return GetFileAttributesA(filename.c_str()) != INVALID_FILE_ATTRIBUTES;
 }
@@ -75,7 +76,7 @@ void FreeImageData::init(int width, int height, BYTE* pData, ColorMode color /*=
     case FreeImageData::ColorMode::COLORMODE_RGB:
         redMask = 0xFF0000;
         greenMask = 0x00FF00;
-        blueMask = 0xFF0000;
+        blueMask = 0x0000FF;
         break;
     default:
         break;
@@ -93,6 +94,13 @@ void FreeImageData::reset()
 {
     if (m_bitmap)
         FreeImage_Unload(m_bitmap);
+}
+
+HBITMAP FreeImageData::toHBITMAP()
+{
+    if (m_bitmap)
+        return FreeImageHelper::FromFreeImage(m_bitmap);
+    return nullptr;
 }
 
 

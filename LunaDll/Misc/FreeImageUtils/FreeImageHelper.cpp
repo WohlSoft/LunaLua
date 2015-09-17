@@ -24,3 +24,32 @@ HBITMAP FreeImageHelper::CreateEmptyBitmap(int width, int height, int bpp, void*
 
     return convHBMP;
 }
+
+HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
+{
+    int width = FreeImage_GetWidth(bitmap);
+    int height = FreeImage_GetHeight(bitmap);
+
+    FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(bitmap);
+
+    BYTE* out; //BGRA
+    HBITMAP outBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, (void**)&out);
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            RGBQUAD outPixel;
+            FreeImage_GetPixelColor(bitmap, x, y, &outPixel);
+            out[(y * width + x) * 4 + 0] = outPixel.rgbBlue;
+            out[(y * width + x) * 4 + 1] = outPixel.rgbGreen;
+            out[(y * width + x) * 4 + 2] = outPixel.rgbRed;
+            if (FreeImage_IsTransparent(bitmap))
+                out[(y * width + x) * 4 + 3] = outPixel.rgbReserved;
+            else
+                out[(y * width + x) * 4 + 3] = 255u;
+        }
+    }
+
+
+    FreeImage_Unload(frame32bit);
+    return outBitmap;
+}

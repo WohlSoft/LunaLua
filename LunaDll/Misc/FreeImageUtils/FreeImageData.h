@@ -23,6 +23,7 @@ public:
 
     void init(int width, int height, BYTE* pData, ColorMode color = ColorMode::COLORMODE_BGR, int bpp = -1);
     void reset();
+    HBITMAP toHBITMAP();
 };
 
 #endif

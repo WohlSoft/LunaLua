@@ -68,33 +68,7 @@ HBITMAP FreeImageGifData::getFrame(int index)
 {
     if (m_gifHandle) {
         FIBITMAP* frame = FreeImage_LockPage(m_gifHandle, index);
-        int width = FreeImage_GetWidth(frame);
-        int height = FreeImage_GetHeight(frame);
-        FREE_IMAGE_TYPE frameType = FreeImage_GetImageType(frame);
-        unsigned int usedColors = FreeImage_GetColorsUsed(frame);
-        unsigned int bpp = FreeImage_GetBPP(frame);
-        
-        FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(frame);
-
-        BYTE* out; //BGRA
-        HBITMAP outBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, (void**)&out);
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                RGBQUAD outPixel;
-                FreeImage_GetPixelColor(frame, x, y, &outPixel);
-                out[(y * width + x) * 4 + 0] = outPixel.rgbBlue;
-                out[(y * width + x) * 4 + 1] = outPixel.rgbGreen;
-                out[(y * width + x) * 4 + 2] = outPixel.rgbRed;
-                if (FreeImage_IsTransparent(frame))
-                    out[(y * width + x) * 4 + 3] = outPixel.rgbReserved;
-                else
-                    out[(y * width + x) * 4 + 3] = 255u;
-            }
-        }
-        
-        
-        FreeImage_Unload(frame32bit);
+        HBITMAP outBitmap = FreeImageHelper::FromFreeImage(frame);
         FreeImage_UnlockPage(m_gifHandle, frame, false);
         return outBitmap;
     }
