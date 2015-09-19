@@ -26,7 +26,7 @@ public:
         return 0;
     };
     HBITMAP getFrame(int index);
-    
+    int getDelayValue(int index);
 
 };
 

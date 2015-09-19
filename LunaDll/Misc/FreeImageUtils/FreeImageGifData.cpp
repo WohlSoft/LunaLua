@@ -74,3 +74,20 @@ HBITMAP FreeImageGifData::getFrame(int index)
     }
     return nullptr;
 }
+
+int FreeImageGifData::getDelayValue(int index)
+{
+    if (m_gifHandle) {
+        FIBITMAP* frame = FreeImage_LockPage(m_gifHandle, index);
+        FITAG* delayTag = NULL;
+        if (!FreeImage_GetMetadata(FIMD_ANIMATION, frame, "FrameTime", &delayTag))
+        {
+            FreeImage_UnlockPage(m_gifHandle, frame, false);
+            return -1;
+        }
+        LONG delayVal = *(LONG*)FreeImage_GetTagValue(delayTag);
+        FreeImage_UnlockPage(m_gifHandle, frame, false);
+        return delayVal / 10;
+    }
+    return -1;
+}

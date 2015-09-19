@@ -8,7 +8,6 @@
 #include <wincodec.h>
 #include "../Misc/FreeImageUtils/FreeImageHelper.h"
 
-IWICImagingFactory* getWICFactory();
 HBITMAP LoadGfxAsBitmap(const std::wstring& filename);
 std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filename);
 void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& header, void* pData);
