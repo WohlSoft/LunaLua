@@ -29,27 +29,23 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
 {
     int width = FreeImage_GetWidth(bitmap);
     int height = FreeImage_GetHeight(bitmap);
-
+    
+    // Convert to 32bit so we can be sure that it is compatible.
     FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(bitmap);
+    // Flip the image to top-down.
+    FreeImage_FlipVertical(frame32bit);
+    // Make it premultiplied so we can use it for opengl
+    FreeImage_PreMultiplyWithAlpha(frame32bit);
 
+    // Make HBITMAP handle
     BYTE* out; //BGRA
     HBITMAP outBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, (void**)&out);
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            RGBQUAD outPixel;
-            FreeImage_GetPixelColor(bitmap, x, y, &outPixel);
-            out[(y * width + x) * 4 + 0] = outPixel.rgbBlue;
-            out[(y * width + x) * 4 + 1] = outPixel.rgbGreen;
-            out[(y * width + x) * 4 + 2] = outPixel.rgbRed;
-            if (FreeImage_IsTransparent(bitmap))
-                out[(y * width + x) * 4 + 3] = outPixel.rgbReserved;
-            else
-                out[(y * width + x) * 4 + 3] = 255u;
-        }
-    }
-
-
+    // Copy the bits from out FI bitmap to HBITMAP
+    BYTE* flippedBits = FreeImage_GetBits(frame32bit);
+    memcpy(out, flippedBits, width * height * 4);
+  
+    // Free and return
     FreeImage_Unload(frame32bit);
     return outBitmap;
 }

@@ -8,7 +8,6 @@
 #include "../GlobalFuncs.h"
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 
-
 void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITMAP, IWICMetadataQueryReader*)> bitmapEnumFunc){
     HRESULT hr;
     IWICImagingFactory *pFactory = NULL;
@@ -76,6 +75,7 @@ void LoadGfxAndEnumFrames(const std::wstring& filename, std::function<bool(HBITM
         unsigned int nImage = nStride * height;
         // Copy the pixels to the DIB section
         hr = pConvertedFrame->CopyPixels(nullptr, nStride, nImage, (unsigned char*)pData);
+
         if (FAILED(hr))
         {
             DeleteObject(hDIBBitmap);
@@ -116,16 +116,11 @@ cleanup:
     }
 }
 
-
 HBITMAP LoadGfxAsBitmap(const std::wstring& filename)
 {
-    HBITMAP retSingleBitmap = NULL;
-    LoadGfxAndEnumFrames(filename, [&retSingleBitmap](HBITMAP nextBitmap, IWICMetadataQueryReader*){
-        retSingleBitmap = nextBitmap;
-        return false;
-    });
-
-    return retSingleBitmap;
+    FreeImageData bitmapData;
+    bitmapData.loadFile(utf8_encode(filename));
+    return bitmapData.toHBITMAP();
 }
 
 std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filename)
