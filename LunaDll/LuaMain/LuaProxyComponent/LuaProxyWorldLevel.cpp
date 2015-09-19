@@ -150,9 +150,17 @@ void LuaProxy::LevelObject::setY(double y)
     SMBXLevel::get(m_index)->momentum.y = y;
 }
 
-LuaProxy::VBStr LuaProxy::LevelObject::levelTitle() const
+std::string LuaProxy::LevelObject::title() const
 {
 	if(!isValid())
-		return VBStr((wchar_t*)0);
-	return VBStr(SMBXLevel::get(m_index)->levelTitle.ptr);
+		return "";
+	return SMBXLevel::get(m_index)->levelTitle;
+}
+
+
+std::string LuaProxy::LevelObject::filename() const
+{
+    if (!isValid())
+        return "";
+    return SMBXLevel::get(m_index)->levelFileName;
 }

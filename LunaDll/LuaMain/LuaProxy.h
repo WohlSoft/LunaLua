@@ -776,7 +776,8 @@ namespace LuaProxy {
         void setX(double x);
         double y() const;
         void setY(double y);
-        VBStr levelTitle() const;
+        std::string title() const;
+        std::string filename() const;
 
         bool isValid() const;
         int m_index;

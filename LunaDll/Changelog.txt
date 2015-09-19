@@ -7,4 +7,5 @@ v0.7.1.1 BETA:
   * Fixed screenshot-function (With changes: PNG-Format and filename is now date + time)
   * Added experimental gif recorder using FreeImage library. Can be toggled with F11. Don't record for too long or it may crash due to memory overflow (too much frames to encode)
   * Added Graphics.isOpenGLEnabled() for checking if the new renderer is active.
-  * Replacing WIC-functions with FreeImage (WIP)
+  * Replacing WIC-functions with FreeImage
+  * Added Level class for overworld
