@@ -1,5 +1,8 @@
 
 
+v0.7.2 BETA:
+  * Extended Level class and World class (Overworld)
+
 v0.7.1.1 BETA:
   * Added comparing operator for some LunaLua classes.
   * Added PlayerSettings-Class

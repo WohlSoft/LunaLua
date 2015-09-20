@@ -751,6 +751,7 @@ namespace LuaProxy {
         void setCurrentWalkingTimer(short currentWalkingTimer);
         bool playerIsCurrentWalking() const;
         luabind::object levelTitle(lua_State* L);
+        luabind::object levelObj(lua_State* L);
         short getCurrentDirection() const;
         short playerPowerup() const;
         void setPlayerPowerup(short playerPowerup);

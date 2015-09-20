@@ -86,10 +86,18 @@ bool LuaProxy::World::playerIsCurrentWalking() const
 
 luabind::object LuaProxy::World::levelTitle(lua_State* L)
 {
-	if(SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != (wchar_t*)0x423D00){
+	if(SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != GM_STR_NULL.ptr){
 		return luabind::object(L, VBStr(SMBXOverworld::get()->currentLevelTitle.ptr));
 	}
 	return luabind::object();
+}
+
+luabind::object LuaProxy::World::levelObj(lua_State* L)
+{
+    if (SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != GM_STR_NULL.ptr){
+        return LuaProxy::LevelObject::getByName(SMBXOverworld::get()->currentLevelTitle, L);
+    }
+    return luabind::object();
 }
 
 short LuaProxy::World::getCurrentDirection() const
