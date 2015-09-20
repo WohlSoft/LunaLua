@@ -11,10 +11,10 @@ struct WorldLevel
     short id;
     short field_32;
     VB6StrPtr levelFileName;
-    short topExitType;
-    short leftExitType;
-    short bottomExitType;
-    short rightExitType;
+    ExitType topExitType;
+    ExitType leftExitType;
+    ExitType bottomExitType;
+    ExitType rightExitType;
     short field_40;
     short field_42;
     VB6StrPtr levelTitle;

@@ -776,6 +776,28 @@ namespace LuaProxy {
         void setX(double x);
         double y() const;
         void setY(double y);
+        double goToX();
+        void setGoToX(double goToX);
+        double goToY();
+        void setGoToY(double goToY);
+        ExitType topExitType() const;
+        void setTopExitType(ExitType topExitType);
+        ExitType leftExitType() const;
+        void setLeftExitType(ExitType leftExitType);
+        ExitType bottomExitType() const;
+        void setBottomExitType(ExitType bottomExitType);
+        ExitType rightExitType() const;
+        void setRightExitType(ExitType rightExitType);
+        short levelWarpNumber() const;
+        void setLevelWarpNumber(short levelWarpNumber);
+        bool isPathBackground() const;
+        void setIsPathBackground(bool isPathBackground);
+        bool isBigBackground() const;
+        void setIsBigBackground(bool isBigBackground);
+        bool isGameStartPoint() const;
+        void setIsGameStartPoint(bool isGameStartPoint);
+        bool isAlwaysVisible() const;
+        void setIsAlwaysVisible(bool isAlwaysVisible);
         std::string title() const;
         std::string filename() const;
 

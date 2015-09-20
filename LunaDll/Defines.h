@@ -126,6 +126,19 @@ enum PowerupID : short {
     PLAYER_ICE = 7
 };
 
+enum ExitType : short {
+    EXITTYPE_ANY = -1,
+    EXITTYPE_NONE = 0,
+    EXITTYPE_CARD_ROULETTE = 1,
+    EXITTYPE_BOSS = 2,
+    EXITTYPE_OFFSCREEN = 3,
+    EXITTYPE_SECRET = 4,
+    EXITTYPE_CRYSTAL = 5,
+    EXITTYPE_WARP = 6,
+    EXITTYPE_STAR = 7,
+    EXITTYPE_TAPE = 8
+};
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 

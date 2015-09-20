@@ -32,8 +32,6 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     
     // Convert to 32bit so we can be sure that it is compatible.
     FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(bitmap);
-    // Flip the image to top-down.
-    FreeImage_FlipVertical(frame32bit);
     // Make it premultiplied so we can use it for opengl
     FreeImage_PreMultiplyWithAlpha(frame32bit);
 
@@ -42,9 +40,8 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     HBITMAP outBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, (void**)&out);
 
     // Copy the bits from out FI bitmap to HBITMAP
-    BYTE* flippedBits = FreeImage_GetBits(frame32bit);
-    memcpy(out, flippedBits, width * height * 4);
-  
+    FreeImage_ConvertToRawBits(out, frame32bit, FreeImage_GetPitch(frame32bit), 32, 0x0000FF, 0x00FF00, 0xFF0000, true);
+
     // Free and return
     FreeImage_Unload(frame32bit);
     return outBitmap;

@@ -150,6 +150,161 @@ void LuaProxy::LevelObject::setY(double y)
     SMBXLevel::get(m_index)->momentum.y = y;
 }
 
+
+double LuaProxy::LevelObject::goToX()
+{
+    if (!isValid())
+        return 0.0;
+    return SMBXLevel::get(m_index)->goToX;
+}
+
+void LuaProxy::LevelObject::setGoToX(double goToX)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->goToX = goToX;
+}
+
+double LuaProxy::LevelObject::goToY()
+{
+    if (!isValid())
+        return 0.0;
+    return SMBXLevel::get(m_index)->goToY;
+}
+
+void LuaProxy::LevelObject::setGoToY(double goToY)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->goToY = goToY;
+}
+
+ExitType LuaProxy::LevelObject::topExitType() const
+{
+    if (!isValid())
+        return EXITTYPE_NONE;
+    return SMBXLevel::get(m_index)->topExitType;
+}
+
+void LuaProxy::LevelObject::setTopExitType(ExitType topExitType)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->topExitType = topExitType;
+}
+
+ExitType LuaProxy::LevelObject::leftExitType() const
+{
+    if (!isValid())
+        return EXITTYPE_NONE;
+    return SMBXLevel::get(m_index)->leftExitType;
+}
+
+void LuaProxy::LevelObject::setLeftExitType(ExitType leftExitType)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->leftExitType = leftExitType;
+}
+
+ExitType LuaProxy::LevelObject::bottomExitType() const
+{
+    if (!isValid())
+        return EXITTYPE_NONE;
+    return SMBXLevel::get(m_index)->bottomExitType;
+}
+
+void LuaProxy::LevelObject::setBottomExitType(ExitType bottomExitType)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->bottomExitType = bottomExitType;
+}
+
+ExitType LuaProxy::LevelObject::rightExitType() const
+{
+    if (!isValid())
+        return EXITTYPE_NONE;
+    return SMBXLevel::get(m_index)->rightExitType;
+}
+
+void LuaProxy::LevelObject::setRightExitType(ExitType rightExitType)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->rightExitType = rightExitType;
+}
+
+short LuaProxy::LevelObject::levelWarpNumber() const
+{
+    if (!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->levelWarpNumber;
+}
+
+void LuaProxy::LevelObject::setLevelWarpNumber(short levelWarpNumber)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->levelWarpNumber = levelWarpNumber;
+}
+
+bool LuaProxy::LevelObject::isPathBackground() const
+{
+    if (!isValid())
+        return false;
+    return (bool)SMBXLevel::get(m_index)->isPathBackground;
+}
+
+void LuaProxy::LevelObject::setIsPathBackground(bool isPathBackground)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->isPathBackground = COMBOOL(isPathBackground);
+}
+
+bool LuaProxy::LevelObject::isBigBackground() const
+{
+    if (!isValid())
+        return false;
+    return (bool)SMBXLevel::get(m_index)->isBigBackground;
+}
+
+void LuaProxy::LevelObject::setIsBigBackground(bool isBigBackground)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->isBigBackground = COMBOOL(isBigBackground);
+}
+
+bool LuaProxy::LevelObject::isGameStartPoint() const
+{
+    if (!isValid())
+        return false;
+    return (bool)SMBXLevel::get(m_index)->isGameStartPoint;
+}
+
+void LuaProxy::LevelObject::setIsGameStartPoint(bool isGameStartPoint)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->isGameStartPoint = COMBOOL(isGameStartPoint);
+}
+
+bool LuaProxy::LevelObject::isAlwaysVisible() const
+{
+    if (!isValid())
+        return false;
+    return (bool)SMBXLevel::get(m_index)->isAlwaysVisible;
+}
+
+void LuaProxy::LevelObject::setIsAlwaysVisible(bool isAlwaysVisible)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->isAlwaysVisible = COMBOOL(isAlwaysVisible);
+}
+
 std::string LuaProxy::LevelObject::title() const
 {
 	if(!isValid())
@@ -164,3 +319,4 @@ std::string LuaProxy::LevelObject::filename() const
         return "";
     return SMBXLevel::get(m_index)->levelFileName;
 }
+
