@@ -806,7 +806,8 @@ void CLunaLua::bindAll()
 
                 class_<LuaProxy::Section>("Section")
                 .scope[
-                    def("get", &LuaProxy::Section::get)
+                    def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Section::get),
+                    def("get", (LuaProxy::Section(*)(short, lua_State* L))&LuaProxy::Section::get)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Section, m_secNum))
                 .def(constructor<int>())

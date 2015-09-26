@@ -282,6 +282,7 @@ namespace LuaProxy {
 
     class Section{
     public:
+        static luabind::object get(lua_State* L);
         static LuaProxy::Section get(short secNumber, lua_State* L);
         
         Section (int sectionNum);

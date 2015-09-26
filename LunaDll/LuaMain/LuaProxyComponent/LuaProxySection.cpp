@@ -2,13 +2,18 @@
 #include "../../Defines.h"
 
 
+luabind::object LuaProxy::Section::get(lua_State * L)
+{
+    return LuaHelper::getObjList(21, [](unsigned short i) { return LuaProxy::Section(i); }, L);
+}
+
 LuaProxy::Section LuaProxy::Section::get(short secNumber, lua_State * L)
 {
     if (secNumber < 1 || secNumber > 21) {
         luaL_error(L, "Section number must be between 1 and 21. (Got id %d)", secNumber);
         return LuaProxy::Section(1);
     }
-    return LuaProxy::Section(secNumber);
+    return LuaProxy::Section(secNumber - 1);
 }
 
 LuaProxy::Section::Section(int sectionNum)
