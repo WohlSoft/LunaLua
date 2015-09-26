@@ -805,8 +805,18 @@ void CLunaLua::bindAll()
                 .property("layerName", &LuaProxy::Layer::layerName),
 
                 class_<LuaProxy::Section>("Section")
+                .scope[
+                    def("get", &LuaProxy::Section::get)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Section, m_secNum))
                 .def(constructor<int>())
-                .property("boundary", &LuaProxy::Section::boundary, &LuaProxy::Section::setBoundary),
+                .property("boundary", &LuaProxy::Section::boundary, &LuaProxy::Section::setBoundary)
+                .property("musicID", &LuaProxy::Section::musicID, &LuaProxy::Section::setMusicID)
+                .property("isLevelWarp", &LuaProxy::Section::isLevelWarp, &LuaProxy::Section::setIsLevelWarp)
+                .property("hasOffscreenExit", &LuaProxy::Section::hasOffscreenExit, &LuaProxy::Section::setHasOffscreenExit)
+                .property("backgroundID", &LuaProxy::Section::backgroundID, &LuaProxy::Section::setBackgroundID)
+                .property("noTurnBack", &LuaProxy::Section::noTurnBack, &LuaProxy::Section::setNoTurnBack)
+                .property("isUnderwater", &LuaProxy::Section::isUnderwater, &LuaProxy::Section::setIsUnderwater),
 
                 class_<LuaProxy::NPC>("NPC")
                 .scope[ //static functions

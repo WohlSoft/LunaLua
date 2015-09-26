@@ -243,13 +243,19 @@ DEFMEM(GM_LEVEL_BASE,       void*, 0x00B25994);
 
 
 // Level related memory
-DEFMEM(GM_LVL_BOUNDARIES,   Bounds*, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
-DEFMEM(GM_ORIG_LVL_BOUNDS,  Bounds*, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.
 DEFMEM(GM_LVLFILENAME_PTR,  VB6StrPtr, 0x00B2C5A4);   // Lvl filename
 DEFMEM(GM_LVLNAME_PTR,      VB6StrPtr, 0x00B2D764);
 DEFMEM(GM_FULLPATH,         VB6StrPtr, 0x00B2C618);   // Full path to current .lvl file
 DEFMEM(GM_FULLDIR,          VB6StrPtr, 0x00B2C61C);   // Full path to current world dir
 DEFMEM(GM_CUR_LVL,          WORD,  0x00B2C6D8);
+
+// Section related arrays
+DEFMEM(GM_LVL_BOUNDARIES,   Bounds*, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
+DEFMEM(GM_ORIG_LVL_BOUNDS,  Bounds*, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.
+DEFMEM(GM_SEC_ISWARP,       short*, 0x00B257F0);
+DEFMEM(GM_SEC_OFFSCREEN,    short*, 0x00B2580C);
+DEFMEM(GM_SEC_NOTURNBACK,   short*, 0x00B2C5EC);
+DEFMEM(GM_SEC_ISUNDERWATER, short*, 0x00B2C608);
 
 // Background objects
 DEFMEM(GM_BGO_COUNT,        WORD,  0x00B25958);
@@ -277,7 +283,7 @@ DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
 DEFMEM(GM_BLOCKS_PTR,       void*, 0x00B25A04);
 
 // Backgrounds
-DEFMEM(GM_SEC_BG_ARRAY,     short*,  0x00B258B8);
+DEFMEM(GM_SEC_BG_ARRAY,     short*,  0x00B258B8); //Define for sections
 DEFMEM(GM_BG_XPOS_PTR,      double*, 0x00B2B984);
 
 // Animations

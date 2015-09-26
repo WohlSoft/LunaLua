@@ -282,10 +282,24 @@ namespace LuaProxy {
 
     class Section{
     public:
+        static LuaProxy::Section get(short secNumber, lua_State* L);
+        
         Section (int sectionNum);
         RECTd boundary() const;
         void setBoundary(const RECTd &boundary);
-    private:
+        short musicID() const;
+        void setMusicID(short musicID);
+        bool isLevelWarp() const;
+        void setIsLevelWarp(bool isLevelWarp);
+        bool hasOffscreenExit() const;
+        void setHasOffscreenExit(bool hasOffscreenExit);
+        short backgroundID() const;
+        void setBackgroundID(short backgroundID);
+        bool noTurnBack() const;
+        void setNoTurnBack(bool noTurnBack);
+        bool isUnderwater() const;
+        void setIsUnderwater(bool isUnderwater);
+
         int m_secNum;
     };
 
