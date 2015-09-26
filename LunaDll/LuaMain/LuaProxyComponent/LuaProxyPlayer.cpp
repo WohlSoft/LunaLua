@@ -1,7 +1,7 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/PlayerMOB.h"
+#include "../../SMBXInternal/CustomGraphics.h"
 #include "../../Misc/MiscFuncs.h"
-
 
 
 int LuaProxy::Player::count()
@@ -145,19 +145,33 @@ void LuaProxy::Player::setSpeedY(double speedY, lua_State *L)
     ::Player::Get(m_index)->momentum.speedY = speedY;
 }
 
-int LuaProxy::Player::powerup(lua_State *L) const
+PowerupID LuaProxy::Player::powerup(lua_State *L) const
 {
-	if(!isValid_throw(L))
-		return 0;
-	return (int)::Player::Get(m_index)->CurrentPowerup;
+    if (!isValid_throw(L))
+        return PLAYER_SMALL;
+    return (PowerupID)::Player::Get(m_index)->CurrentPowerup;
 }
 
-void LuaProxy::Player::setPowerup(int powerup, lua_State *L)
+void LuaProxy::Player::setPowerup(PowerupID powerup, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
 	if(powerup > 0 && powerup < 9)
-		::Player::Get(m_index)->CurrentPowerup = powerup;
+		::Player::Get(m_index)->CurrentPowerup = (short)powerup;
+}
+
+Characters LuaProxy::Player::character(lua_State *L) const
+{
+    if (!isValid_throw(L))
+        return CHARACTER_UNKNOWN;
+    return ::Player::Get(m_index)->Identity;
+}
+
+void LuaProxy::Player::setCharacter(Characters character, lua_State *L)
+{
+    if (!isValid_throw(L))
+        return;
+    ::Player::Get(m_index)->Identity = character;
 }
 
 int LuaProxy::Player::reservePowerup(lua_State *L) const
@@ -325,6 +339,39 @@ void LuaProxy::Player::setPauseKeyPressing(bool pauseKeyPressing, lua_State *L)
         return;
     ::Player::Get(m_index)->keymap.pauseKeyState = COMBOOL(pauseKeyPressing);
 }
+
+luabind::object LuaProxy::Player::getCurrentPlayerSetting(lua_State* L)
+{
+    if (!isValid_throw(L))
+        return luabind::object();
+    PlayerMOB* curPlayer = ::Player::Get(m_index);
+    return luabind::object(L, PlayerSettings::get(curPlayer->Identity, (PowerupID)curPlayer->CurrentPowerup, L));
+}
+
+void LuaProxy::Player::getCurrentSpriteIndex(short& indexX, short& indexY, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    PlayerMOB* curPlayer = ::Player::Get(m_index);
+    short sprIndex = curPlayer->CurrentPlayerSprite * curPlayer->FacingDirection;
+    SMBX_CustomGraphics::convSpriteIndexToCoor(sprIndex, indexX, indexY);
+}
+
+void LuaProxy::Player::setCurrentSpriteIndex(short indexX, short indexY, bool forceDirection, lua_State* L)
+{
+	indexX = 0;
+	indexY = 0;
+	if (!isValid_throw(L))
+		return;
+	PlayerMOB* curPlayer = ::Player::Get(m_index);
+	int sprIndex = SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY);
+	bool isLeft = sprIndex < 0;
+	if (isLeft && forceDirection) {
+		curPlayer->FacingDirection = COMBOOL(isLeft);
+	}
+	curPlayer->CurrentPlayerSprite = (short)abs(sprIndex);
+}
+
 
 
 

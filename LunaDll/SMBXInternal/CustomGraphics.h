@@ -58,8 +58,13 @@ public:
         return native_spritesheetY(&spIndexY);
     }
 
-    static inline int convIndexCoorToSpriteIndex(int x, int y){
+    static inline int convIndexCoorToSpriteIndex(short x, short y){
         return (y + 10 * x) - 49;
+    }
+
+    static inline void convSpriteIndexToCoor(short index, short& x, short& y) {
+        y = (index + 49) % 10;
+        x = ((index + 49) - (index + 49) % 10) / 10;
     }
 
     static int getOffsetX(Characters characterID, int spriteIndex, PowerupID powerupID, int* retSuccess = 0) {

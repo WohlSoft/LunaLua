@@ -4,7 +4,8 @@
 #include <thread>
 #include <map>
 #include "MemoryScannerDefines.h"
-
+#include <WinSock2.h>
+#include <WS2tcpip.h>
 
 class MemoryScanner
 {

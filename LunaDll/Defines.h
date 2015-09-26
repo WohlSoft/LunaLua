@@ -109,6 +109,7 @@ struct KeyMap{
 };
 
 enum Characters : short {
+    CHARACTER_UNKNOWN = 0,
     CHARACTER_MARIO = 1,    //DEMO
     CHARACTER_LUIGI = 2,    //IRIS
     CHARACTER_PEACH = 3,    //KOOD

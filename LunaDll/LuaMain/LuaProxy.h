@@ -408,8 +408,10 @@ namespace LuaProxy {
         void setSpeedX(double speedX, lua_State *L);
         double speedY(lua_State *L) const;
         void setSpeedY(double speedY, lua_State *L);
-        int powerup(lua_State *L) const;
-        void setPowerup(int powerup, lua_State *L);
+        PowerupID powerup(lua_State *L) const;
+        void setPowerup(PowerupID powerup, lua_State *L);
+        Characters character(lua_State *L) const;
+        void setCharacter(Characters character, lua_State *L);
         int reservePowerup(lua_State *L) const;
         void setReservePowerup(int reservePowerup, lua_State *L);
         luabind::object holdingNPC(lua_State *L) const;
@@ -433,6 +435,10 @@ namespace LuaProxy {
         void setDropItemKeyPressing(bool dropItemKeyPressing, lua_State *L);
         bool pauseKeyPressing(lua_State *L) const;
         void setPauseKeyPressing(bool pauseKeyPressing, lua_State *L);
+        luabind::object getCurrentPlayerSetting(lua_State* L);
+        void getCurrentSpriteIndex(short& indexX, short& indexY, lua_State* L);
+        void setCurrentSpriteIndex(short indexX, short indexY, bool forceDirection, lua_State* L);
+
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State *L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         bool isValid() const;

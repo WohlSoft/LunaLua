@@ -1,3 +1,5 @@
+#ifndef MemoryScannerDefines_hhhhh
+#define MemoryScannerDefines_hhhhh
 
 namespace MemoryScannerDefines{
 
@@ -37,3 +39,5 @@ namespace MemoryScannerDefines{
     */
 
 }
+
+#endif
