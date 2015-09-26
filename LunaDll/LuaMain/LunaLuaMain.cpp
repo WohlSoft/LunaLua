@@ -662,7 +662,8 @@ void CLunaLua::bindAll()
         module(L)
             [
                 namespace_("Graphics")[
-                    def("activateOverworldHud", &LuaProxy::Graphics::activateOverworldHud)
+                    def("activateOverworldHud", &LuaProxy::Graphics::activateOverworldHud),
+                    def("getOverworldHudState", &LuaProxy::Graphics::getOverworldHudState)
                 ],
 
                 class_<LuaProxy::World>("World")
@@ -735,7 +736,8 @@ void CLunaLua::bindAll()
                 ],
 
                 namespace_("Graphics")[
-                    def("activateHud", &LuaProxy::Graphics::activateHud)
+                    def("activateHud", &LuaProxy::Graphics::activateHud),
+                    def("isHudActivated", &LuaProxy::Graphics::isHudActivated)
                 ],
 
                 class_<LuaProxy::Warp>("Warp")

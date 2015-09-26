@@ -23,9 +23,19 @@ void LuaProxy::Graphics::activateHud(bool activate)
     gSkipSMBXHUD = !activate;
 }
 
+bool LuaProxy::Graphics::isHudActivated()
+{
+    return !gSkipSMBXHUD;
+}
+
 void LuaProxy::Graphics::activateOverworldHud(WORLD_HUD_CONTROL activateFlag)
 {
     gOverworldHudControlFlag = activateFlag;
+}
+
+WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
+{
+    return gOverworldHudControlFlag;
 }
 
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* filename)

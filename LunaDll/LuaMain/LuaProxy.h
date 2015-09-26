@@ -952,7 +952,9 @@ namespace LuaProxy {
         };
 
         void activateHud(bool activateHud);
+        bool isHudActivated();
         void activateOverworldHud(WORLD_HUD_CONTROL activateFlag);
+        WORLD_HUD_CONTROL getOverworldHudState();
         //CSprite functions
         bool loadImage(const char* filename, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
