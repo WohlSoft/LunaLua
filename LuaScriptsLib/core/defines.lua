@@ -5,6 +5,7 @@ if __wikiGEN then
     FIELD_DWORD = 2
     FIELD_FLOAT = 3
     FIELD_DFLOAT = 4
+    FIELD_BOOLEAN = 5
 end
 
 --This is a helper function used for the wikiGEN.
@@ -23,7 +24,8 @@ local sortedCategories = {
     "Sound Modification",
     "Game Exit",
     "Coin Value",
-    "Misc"
+    "Misc",
+    "Player Settings: Link"
 }
 
 -- The define Table
@@ -65,7 +67,7 @@ local defines = {
     smb3RouletteScoreValueMushroom  = {defValue = 6,   minVal = 1, maxVal = 12,  address = 0x00A26719, size = FIELD_DWORD,
                                         n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},
     smb3RouletteScoreValueFlower    = {defValue = 8,   minVal = 1, maxVal = 12,  address = 0x00A2677E, size = FIELD_DWORD,
-                                        n = 5, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},    
+                                        n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},    
                                         
     --[[ Coin Value Defines ]]--
     coinValue                       = {defValue = 1  , minVal = 0, maxVal = 99 , address = 0x00A262BD, size = FIELD_BYTE,
@@ -74,19 +76,57 @@ local defines = {
     coin5Value                      = {defValue = 5  , minVal = 0, maxVal = 99 , address = 0x00A262C9, size = FIELD_BYTE,
                                         n = 2, group = "Coin Value", desc = "How much a 5-coin npc is worth as coins."},
     coin20Value                     = {defValue = 20 , minVal = 0, maxVal = 99 , address = 0x00A262B7, size = FIELD_BYTE,
-                                        n = 3, group = "Coin Value", desc = "How much a 20-coin npc is worth as coins."}
+                                        n = 3, group = "Coin Value", desc = "How much a 20-coin npc is worth as coins."},
     
-    
+    --[[ Player Defines ]]--
+    player_link_shieldEnabled       = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 1, group = "Player Settings: Link", desc = "If the shield of link is enabled.", 
+                                        customFuncGet = function()
+                                            return mem(0x00A53042, FIELD_BYTE) == 0x90
+                                        end,
+                                        customFuncSet = function(value)
+                                            if(value)then
+                                                mem(0x00A53042, FIELD_BYTE, 0x52)
+                                                mem(0x00A53043, FIELD_BYTE, 0x50)
+                                                mem(0x00A53044, FIELD_BYTE, 0xE8)
+                                                mem(0x00A53045, FIELD_BYTE, 0x07)
+                                                mem(0x00A53046, FIELD_BYTE, 0xFF)
+                                                mem(0x00A53047, FIELD_BYTE, 0xF3)
+                                                mem(0x00A53048, FIELD_BYTE, 0xFF)
+                                            else
+                                                mem(0x00A53042, FIELD_BYTE, 0x90)
+                                                mem(0x00A53043, FIELD_BYTE, 0x90)
+                                                mem(0x00A53044, FIELD_BYTE, 0x90)
+                                                mem(0x00A53045, FIELD_BYTE, 0x90)
+                                                mem(0x00A53046, FIELD_BYTE, 0x90)
+                                                mem(0x00A53047, FIELD_BYTE, 0x90)
+                                                mem(0x00A53048, FIELD_BYTE, 0x90)
+                                            end
+                                        end}
 }
 
 --(Re)sets a define
 local function setDefine(defTable, value)
-    local theValue = value or defTable.defValue
-    mem(defTable.address, defTable.size, theValue)
+    local theValue = nil
+    if(value ~= nil)then
+        theValue = value
+    else
+        theValue = defTable.defValue
+    end
+    if(defTable.customFuncSet)then
+        defTable.customFuncSet(theValue)
+    else
+        mem(defTable.address, defTable.size, theValue)
+    end
+    
 end
 
 local function getDefine(defTable)
-    return mem(defTable.address, defTable.size)
+    if(defTable.customFuncGet)then
+        defTable.customFuncGet()
+    else
+        return mem(defTable.address, defTable.size)    
+    end
 end
 
 --The actual host code
@@ -107,8 +147,8 @@ local definesLib  = setmetatable({
         if not theDefine then
             error("Field \""..tostring(key).."\" does not exist!", 2)
         end
-        if type(value) ~= "number" and type(value) ~= "nil" then
-            error("Value is not a number: Need number, got "..type(value).."!", 2)
+        if type(value) ~= "number" and type(value) ~= "boolean" and type(value) ~= "nil" then
+            error("Value is not a number: Need number or boolean, got "..type(value).."!", 2)
         end
         if theDefine.minVal then
             if theDefine.minVal > value then
@@ -225,6 +265,8 @@ local function generateWiki()
                     wfile:write("FLOAT|")
                 elseif defineTable.size == FIELD_DFLOAT then
                     wfile:write("DFLOAT (double)|")
+                elseif defineTable.size == FIELD_BOOLEAN then
+                    wfile:write("BOOLEAN|")
                 end
                 wfile:write(tostring(defineTable.defValue).."|")
                 if defineTable.minVal and defineTable.maxVal then
