@@ -6,6 +6,7 @@ v0.7.2 BETA:
   * Extended Section Class
   * Extended Graphics Namespace
   * Added Section Namespace (Static functions for Section class)
+  * Added some new Defines (Defines.* namespace)
 
 v0.7.1.1 BETA:
   * Added comparing operator for some LunaLua classes.
