@@ -1,11 +1,13 @@
 LunaLUA
 =======
 
-LunaLUA - LunaDLL With LUA, is a free extension for SMBX game engine
+LunaLUA - LunaDLL with LUA is a free extension for SMBX game engine
+This version is based on LunaDLL ver. 8 with Lua Support.
 
-LunaDLL Stars from version 8 have a LUA scripting system which allows usage of the LUA scripts together with internal assambly-like Autocode language.
+Quick Overview
+-------
 
-LunaLUA also provides:
+Features:
 * Increasing of total performance
 * Fixes of some bugs
  * npc-*.txt with decimal numbers will no more crash SMBX with "runtime error 13"
@@ -15,7 +17,10 @@ LunaLUA also provides:
 * Added PGE's [sounds.ini](http://engine.wohlnet.ru/pgewiki/Game_Configuration_Pack_References#sounds.ini) and [music.ini](http://engine.wohlnet.ru/pgewiki/Game_Configuration_Pack_References#music.ini) support which gives ability to have custom musics (include world map musics!) and custom sound effects per episode.
 
 [Download LunaLUA](http://engine.wohlnet.ru/LunaLua/)
+[LunaLua Documenation](http://engine.wohlnet.ru/pgewiki/Category:LunaLua_API)
 
-=======
-Build in the Microsoft Visual Studio 2013
+Requirements to build LunaDLL yourself
+------
+Visual Studio 2015 (msvc140)
+
 
