@@ -179,6 +179,22 @@ void LuaProxy::Block::setId(short id)
 	::Blocks::Get(m_index)->BlockType = id;
 }
 
+short LuaProxy::Block::contentID() const
+{
+    if (!isValid())
+        return 0;
+
+    return ::Block::Get(m_index)->ContentsID;
+}
+
+void LuaProxy::Block::setContentID(short contentsID)
+{
+    if (!isValid())
+        return;
+
+    ::Block::Get(m_index)->ContentsID = contentsID;
+}
+
 bool LuaProxy::Block::slippery() const
 {
 	if(!isValid())

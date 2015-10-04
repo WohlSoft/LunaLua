@@ -731,6 +731,8 @@ namespace LuaProxy {
         void setSpeedY(double speedY);
         short id() const;
         void setId(short id);
+        short contentID() const;
+        void setContentID(short contentID);
         bool slippery() const;
         void setSlippery(bool slippery);
         bool isHidden() const;
