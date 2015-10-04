@@ -743,6 +743,7 @@ namespace LuaProxy {
         void hit();
         void hit(bool fromUpSide);
         void hit(bool fromUpSide, LuaProxy::Player player);
+        void hit(bool fromUpSide, LuaProxy::Player player, int hittingCount);
 
         bool isValid() const;
         int m_index;

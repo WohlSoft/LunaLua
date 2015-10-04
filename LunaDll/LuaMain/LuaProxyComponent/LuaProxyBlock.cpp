@@ -281,11 +281,18 @@ void LuaProxy::Block::hit(bool fromUpSide)
 
 void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player)
 {
+    hit(fromUpSide, player, -1);
+}
+
+void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player, int hittingCount)
+{
     unsigned int blockIndex = m_index;
     short unkFlag1VB = COMBOOL(fromUpSide);
     unsigned short unkFlag2VB = player.getIndex();
     native_hitBlock(&blockIndex, &unkFlag1VB, &unkFlag2VB);
-    player.getIndex();
+    if (hittingCount != -1) {
+        Blocks::Get(blockIndex)->RepeatingHits = hittingCount;
+    }
 }
 
 

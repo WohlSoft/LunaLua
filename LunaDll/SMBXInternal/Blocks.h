@@ -12,7 +12,7 @@ struct Block {
     short               Slippery;                           // 0x00 0xFFFF = yes
     short               Unknown02;                          // 0x02
 
-    short               Unknown04;                          // 0x04
+    short               RepeatingHits;                      // 0x04
     short               BlockType2;                         // 0x06
     short               ContentIDRelated;                   // 0x08
     short               Unknwon10;                          // 0x0A
