@@ -19,7 +19,7 @@ Features:
 [Download LunaLUA](http://engine.wohlnet.ru/LunaLua/)
 [LunaLua Documenation](http://engine.wohlnet.ru/pgewiki/Category:LunaLua_API)
 
-Requirements to build yourself
+Requirements to build LunaDLL yourself
 ------
 Visual Studio 2015 (msvc140)
 
