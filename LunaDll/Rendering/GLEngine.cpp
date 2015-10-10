@@ -183,11 +183,16 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     float scaledHeight = windowHeight / 600.0f;
     float xScale = 1.0f;
     float yScale = 1.0f;
-    if (scaledWidth > scaledHeight) {
-        xScale = scaledHeight / scaledWidth;
-    } else if (scaledWidth < scaledHeight) {
-        yScale = scaledWidth / scaledHeight;
+
+    if (gGeneralConfig.getRendererUseLetterbox()) {
+        if (scaledWidth > scaledHeight) {
+            xScale = scaledHeight / scaledWidth;
+        }
+        else if (scaledWidth < scaledHeight) {
+            yScale = scaledWidth / scaledHeight;
+        }
     }
+
     float xOffset = (windowWidth / xScale - windowWidth) * 0.5f;
     float yOffset = (windowHeight / yScale - windowHeight) * 0.5f;
 

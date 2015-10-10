@@ -235,6 +235,14 @@ void InitGlobals()
 	gAutoMan.Clear(true);
 	gAutoMan.ReadGlobals(getModulePath());
 	gAutoMan.m_GlobalEnabled = true;
+
+    // Be sure that the config folder exist
+    if (GetFileAttributesW(L"config") & INVALID_FILE_ATTRIBUTES) {
+        CreateDirectoryW(L"config", NULL);
+    }
+
+    gGeneralConfig.setFilename(L"config/luna.ini");
+    gGeneralConfig.loadOrDefault();
 }
 
 /// RESET FREE GLOB

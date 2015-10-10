@@ -927,6 +927,11 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
         native_playSFX(&gifRecSoundID);
     }
+    if (wParam == VK_F4 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
+    {
+        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+        gGeneralConfig.save();
+    }
     
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);

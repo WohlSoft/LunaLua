@@ -8,6 +8,7 @@ v0.7.2 BETA:
   * Extended Block class
   * Added Section Namespace (Static functions for Section class)
   * Added some new Defines (Defines.* namespace)
+  * Added switch between letterbox-mode (forced 4:3) or scretched-mode via F4
 
 v0.7.1.1 BETA:
   * Added comparing operator for some LunaLua classes.

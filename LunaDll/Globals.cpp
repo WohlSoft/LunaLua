@@ -80,6 +80,8 @@ RenderOverrideManager gRenderOverride;
 
 FreeImageInit        gFreeImgInit;
 
+GeneralLunaConfig    gGeneralConfig;
+
 CLunaLua gLunaLua;
 
 

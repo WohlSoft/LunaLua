@@ -22,6 +22,8 @@
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
 #include "Misc/FreeImageUtils/FreeImageInit.h"
+#include "Misc/GeneralLunaConfig.h"
+
 
 class RenderOverrideManager;
 
@@ -103,6 +105,7 @@ extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
 extern RenderOverrideManager gRenderOverride;
 extern FreeImageInit        gFreeImgInit;
+extern GeneralLunaConfig    gGeneralConfig;
 
 extern CLunaLua				gLunaLua;
 

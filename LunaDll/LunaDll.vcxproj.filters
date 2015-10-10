@@ -444,6 +444,12 @@
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\GeneralLunaConfig.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\simpleini\SimpleIni.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -847,6 +853,9 @@
     </ClCompile>
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\GeneralLunaConfig.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

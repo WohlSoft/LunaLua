@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="libs\simpleini\SimpleIni.h" />
+    <ClInclude Include="Misc\GeneralLunaConfig.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageData.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h" />
@@ -259,6 +261,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
