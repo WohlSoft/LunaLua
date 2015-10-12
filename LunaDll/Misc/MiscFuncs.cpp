@@ -22,28 +22,6 @@ string std::to_string(long long src)
 }
 #endif
 
-void NumpadLayerControl1(LayerControl* sought_layer) {		
-	gNumpad4 = GetKeyState(VK_NUMPAD4);
-	gNumpad8 = GetKeyState(VK_NUMPAD8);
-	gNumpad2 = GetKeyState(VK_NUMPAD2);
-	gNumpad6 = GetKeyState(VK_NUMPAD6);	
-
-	Layer::Stop(sought_layer);
-
-	if(gNumpad4 & 0x80) {
-		Layer::SetXSpeed(sought_layer, -2);
-	}
-	if(gNumpad8 & 0x80) {
-		Layer::SetYSpeed(sought_layer, -2);
-	}
-	if(gNumpad6 & 0x80) {
-		Layer::SetXSpeed(sought_layer, 2);
-	}
-	if(gNumpad2 & 0x80) {
-		Layer::SetYSpeed(sought_layer, 2);
-	} 		
-}
-
 void InfiniteFlying(int player) {
 	PlayerMOB* demo = Player::Get(1);
 

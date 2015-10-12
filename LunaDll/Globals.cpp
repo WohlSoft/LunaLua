@@ -24,8 +24,6 @@ bool gAutostartRan = false;
 // Global variables
 int	gFrames;
 
-int* gpFreeGlob;
-
 int gLastDownPress;
 int gDownTapped;
 int gLastUpPress;
@@ -45,11 +43,6 @@ int	gCurrentMainPlayer;
 HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
-
-short gNumpad4;
-short gNumpad8;
-short gNumpad2;
-short gNumpad6;
 
 LvlEnum gLevelEnum;
 
