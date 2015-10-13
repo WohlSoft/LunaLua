@@ -189,11 +189,6 @@ void InitGlobals()
 
 	gCurrentMainPlayer = 1;
 
-	gNumpad4 = 0;
-	gNumpad8 = 0;
-	gNumpad2 = 0;
-	gNumpad6 = 0;
-
 	gLevelEnum = Invalid;
 
 	//startup settings default
@@ -220,11 +215,6 @@ void InitGlobals()
 
 	ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
 
-	// Allocate 40k bytes of free mem
-	gpFreeGlob = NULL;
-	gpFreeGlob = new int[10000];
-	ResetFreeGlob();
-
 	// Try to activate death counter, and disable it if there's some problem
 	gDeathCounter.TryLoadStats();
 	if(gDeathCounter.mStatFileOK == false)
@@ -245,17 +235,9 @@ void InitGlobals()
     gGeneralConfig.loadOrDefault();
 }
 
-/// RESET FREE GLOB
-void ResetFreeGlob() {
-	if(gpFreeGlob)
-		ZeroMemory(gpFreeGlob, 10000 * sizeof(int));
-}
-
 /// CLEAN UP
 void CleanUp() {
-	if(gpFreeGlob)
-		delete[] gpFreeGlob;
-	if(ghMemDC)
+    if(ghMemDC)
 		DeleteObject(ghMemDC);
 	DeleteObject(ghGeneralDIB);
 }

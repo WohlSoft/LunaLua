@@ -61,8 +61,6 @@ extern startUpSettings gStartupSettings;
 /// General use globals - These are all defined in Globals.cpp ///
 extern int		gFrames;
 
-extern int*		gpFreeGlob;
-
 extern int		gLastDownPress;
 extern int		gDownTapped;
 extern int		gLastUpPress;
