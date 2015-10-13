@@ -10,99 +10,13 @@
 #include "GLContextManager.h"
 
 GLEngine::GLEngine() :
-    mInitialized(false), mHadError(false),
     mEnabled(true), mBitwiseCompat(true),
-    mFB(0), mColorRB(0), mDepthRB(0),
-    mBufTex(NULL, 800, 600),
     mHwnd(NULL),
     mScreenshot(false)
-{ }
-
-GLEngine::~GLEngine() {
+{
 }
 
-void GLEngine::Init() {
-    if (!g_GLContextManager.IsInitialized()) return;
-
-    if (mInitialized || mHadError) return;
-    mHadError = true;
-
-#if 1
-    // Set up framebuffer object
-    glGenFramebuffersANY(1, &mFB);
-    GLERRORCHECK();
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    GLERRORCHECK();
-
-    glGenTextures(1, &mBufTex.name);
-    GLERRORCHECK();
-    g_GLDraw.BindTexture(&mBufTex);
-    GLERRORCHECK();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    GLERRORCHECK();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    GLERRORCHECK();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    GLERRORCHECK();
-
-    glGenRenderbuffersANY(1, &mDepthRB);
-    GLERRORCHECK();
-    glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
-    GLERRORCHECK();
-    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mBufTex.pw, mBufTex.ph);
-    GLERRORCHECK();
-    glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
-    GLERRORCHECK();
-    
-    glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
-    GLERRORCHECK();
-
-    GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
-    glDrawBuffers(1, DrawBuffers);
-    GLERRORCHECK();
-
-    GLenum status = glCheckFramebufferStatusANY(GL_FRAMEBUFFER_EXT);
-    GLERRORCHECK();
-    if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-        dbgboxA("error setting up");
-    }
-
-    // Bind framebuffer
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    GLERRORCHECK();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    GLERRORCHECK();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    GLERRORCHECK();
-
-    // Set projection (test)
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    GLERRORCHECK();
-    glOrtho(0.0f, (float)mBufTex.pw, 0.0f, (float)mBufTex.ph, -1.0f, 1.0f);
-    GLERRORCHECK();
-    glColor3f(1, 1, 1);
-    GLERRORCHECK();
-    glDisable(GL_LIGHTING);
-    GLERRORCHECK();
-    glDisable(GL_DEPTH_TEST);
-    GLERRORCHECK();
-    glDisable(GL_CULL_FACE);
-    GLERRORCHECK();
-    glEnable(GL_BLEND);
-    GLERRORCHECK();
-    glEnable(GL_TEXTURE_2D);
-    GLERRORCHECK();
-    glEnableClientState(GL_VERTEX_ARRAY);
-    GLERRORCHECK();
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    GLERRORCHECK();
-#endif
-    
-    mInitialized = true;
-    mHadError = false;
-
-    mGifRecorder.init();
+GLEngine::~GLEngine() {
 }
 
 void GLEngine::ClearSMBXSprites() {
@@ -117,8 +31,7 @@ void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
 
 void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    if (!mInitialized) Init();
-    if (!mInitialized) return;
+	if (!g_GLContextManager.IsInitialized()) return;
 
     if (dwRop == BLACKNESS || dwRop == 0x10)
     {
@@ -153,15 +66,18 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
+	// TODO: This block of code will need to be changed once
+	//       GLContextManager is modified to handle re-init
+	//       with a new hDC
     if (!g_GLContextManager.IsInitialized()) {
         if (!g_GLContextManager.Init(hdcDest)) {
             dbgboxA("Failed to init...");
         } else {
-            //dbgboxA("Initialized");
+			mGifRecorder.init();
         }
     }
-    if (!mInitialized) Init();
-    if (!mInitialized) return FALSE;
+
+	if (!g_GLContextManager.IsInitialized()) return FALSE;
 
     // Get window size
     RECT clientRect;
@@ -174,9 +90,8 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 
     g_GLDraw.UnbindTexture();
 
-    // Unbind the texture from the framebuffer
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
-    GLERRORCHECK();
+    // Unbind the texture from the framebuffer (Bind screen)
+	g_GLContextManager.BindScreen();
 
     // Implement letterboxing correction
     float scaledWidth = windowWidth / 800.0f;
@@ -206,25 +121,13 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     GLERRORCHECK();
 
     // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &mBufTex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f);
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f);
     GLERRORCHECK();
     glFlush();
     GLERRORCHECK();
 
     // Get ready to draw some more
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    GLERRORCHECK();
-    glViewport(0, 0, mBufTex.pw, mBufTex.ph);
-    GLERRORCHECK();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    GLERRORCHECK();
-    glOrtho(0.0f, ((float)mBufTex.pw), 0.0f, ((float)mBufTex.ph), -1.0f, 1.0f);
-    GLERRORCHECK();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    GLERRORCHECK();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    GLERRORCHECK();
+	g_GLContextManager.BindFramebuffer();
 
     return TRUE;
 }
@@ -232,8 +135,7 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
 void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
 {
-    if (!mInitialized) Init();
-    if (!mInitialized) return;
+	if (!g_GLContextManager.IsInitialized()) return;
 
     const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(bmp);
     if (tex == NULL) {
@@ -245,8 +147,8 @@ void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest
 
 void GLEngine::EndFrame(HDC hdcDest)
 {
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
-    GLERRORCHECK();
+	// Bind screen
+	g_GLContextManager.BindScreen();
 
     // Generate screenshot...
     if (mScreenshot) {
@@ -269,14 +171,18 @@ void GLEngine::EndFrame(HDC hdcDest)
         }
     }
 
+	// Display Frame
     SwapBuffers(hdcDest);
+
+	// Clear screen backbuffer
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();
-    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-    GLERRORCHECK();
+
+	// Bind framebuffer
+	g_GLContextManager.BindFramebuffer();
 }
 
 void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
