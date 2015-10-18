@@ -109,6 +109,9 @@
     <Filter Include="GameConfig">
       <UniqueIdentifier>{757faf1a-e7b6-4b48-ae27-01df41d001f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Misc\RuntimeHookUtils">
+      <UniqueIdentifier>{4d72dffc-f1e1-4224-b611-0ffbf60b3c7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -449,6 +452,15 @@
     </ClInclude>
     <ClInclude Include="libs\simpleini\SimpleIni.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookUtils\APIHook.h">
+      <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookUtils\CmnHdr.h">
+      <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookUtils\Toolhelp.h">
+      <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -856,6 +868,9 @@
     </ClCompile>
     <ClCompile Include="Misc\GeneralLunaConfig.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookUtils\APIHook.cpp">
+      <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
