@@ -13,29 +13,14 @@ typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*head
 
 class GLEngine {
 private:
-    bool mInitialized;
-    bool mHadError;
     bool mEnabled;
     bool mBitwiseCompat;
-    SDL_Window *mScreen;
-    SDL_Renderer *mRenderer;
-    SDL_GLContext mGLContext;
-
-    GLuint mFB;
-    GLuint mColorRB;
-    GLuint mDepthRB;
-
-    GLDraw::Texture mBufTex;
 
     HWND mHwnd;
     bool mScreenshot;
     SCREENSHOT_CALLBACK mScreenshotCallback;
 
     AsyncGifRecorder mGifRecorder;
-
-protected:
-    // Internal routines
-    void Init();
 
 public:
     GLEngine();

@@ -299,6 +299,8 @@ enum NPCID : short
 // 0x+04	w	= Unknown
 // 0x+06	w	= Unknown decrementing timer
 
+// +0x28    w   = Should render mask only
+
 // +0x2C	pt  = wchar_t* Activate event layer name
 // +0x30	pt	= wchar_t* Death event layer name
 // +0x34	pt	= wchar_t* Talk event name?
@@ -373,7 +375,7 @@ struct NPCMOB {
     short unknown_22;                       //+0x22
     short unknown_24;                       //+0x24
     short invincibilityToSword;             //+0x26
-    short unknown_28;                       //+0x28
+    short isMaskOnly;                       //+0x28
     short unknown_2A;                       //+0x2A
 	VB6StrPtr activateEventLayerName;       //+0x2C
 	VB6StrPtr deathEventName;               //+0x30

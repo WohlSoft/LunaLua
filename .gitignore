@@ -7,15 +7,35 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]elease without SDL/
-x64/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
+/[Dd]ebug/
+/[Dd]ebugPublic/
+/[Rr]elease/
+/[Rr]elease without SDL/
+/x64/
+/build/
+/bld/
+/[Bb]in/
+/[Oo]bj/
+
+/LunaDll/[Dd]ebug/
+/LunaDll/[Dd]ebugPublic/
+/LunaDll/[Rr]elease/
+/LunaDll/[Rr]elease without SDL/
+/LunaDll/x64/
+/LunaDll/build/
+/LunaDll/bld/
+/LunaDll/[Bb]in/
+/LunaDll/[Oo]bj/
+
+/LunaLoader/[Dd]ebug/
+/LunaLoader/[Dd]ebugPublic/
+/LunaLoader/[Rr]elease/
+/LunaLoader/[Rr]elease without SDL/
+/LunaLoader/x64/
+/LunaLoader/build/
+/LunaLoader/bld/
+/LunaLoader/[Bb]in/
+/LunaLoader/[Oo]bj/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
