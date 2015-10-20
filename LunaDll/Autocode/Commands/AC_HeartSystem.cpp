@@ -2,6 +2,7 @@
 #include "../Autocode.h"
 #include "../../Globals.h"
 #include "../../SMBXInternal/PlayerMOB.h"
+#include "../../Rendering/RenderOps/RenderStringOp.h"
 #include <sstream>
 
 void Autocode::HeartSystem() {
@@ -44,10 +45,10 @@ void Autocode::HeartSystem() {
         std::wstringstream gAutoMan_m_Hearts;
         gAutoMan_m_Hearts<<(long long)gAutoMan.m_Hearts;
 		// Display life stuff on screen
-        gLunaRender.SafePrint(std::wstring(
+        gLunaRender.AddOp(new RenderStringOp(wstring(
                                   std::wstring(L"HP: ")+std::wstring(gAutoMan_m_Hearts.str())
                                   )
-                              ,3, (float)Target, (float)Param1);
+                              ,3, (float)Target, (float)Param1));
 
 	}//if heartuser
 

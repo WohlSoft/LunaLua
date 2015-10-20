@@ -8,10 +8,12 @@
 #include "RenderOps/RenderOp.h"
 #include "RenderOps/RenderRectOp.h"
 #include "RenderOps/RenderGLOp.h"
+#include "RenderOps/RenderStringOp.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
 #include <tuple>
+#include <algorithm>
 
 using namespace std;
 
@@ -173,8 +175,8 @@ void Render::CalcCameraPos(double* ret_x, double* ret_y) {
     // Camera func, calculated from player position and boundaries
     PlayerMOB* demo = Player::Get(1);
     if (false) {
-        gLunaRender.SafePrint(to_wstring((long long)demo->momentum.x), 3, 300, 300);
-        gLunaRender.SafePrint(to_wstring((long long)demo->momentum.y), 3, 300, 350);
+        gLunaRender.AddOp(new RenderStringOp(to_wstring((long long)demo->momentum.x), 3, 300, 300));
+        gLunaRender.AddOp(new RenderStringOp(to_wstring((long long)demo->momentum.y), 3, 300, 350));
 
         double cx = demo->momentum.x - (400 - (demo->momentum.width / 2));
         double cy = demo->momentum.y - (300 - (demo->momentum.height / 2));
@@ -222,22 +224,6 @@ void Renderer::GLCmd(const GLEngineCmd &cmd) {
     AddOp(op);
 }
 
-// PRINT -- Calls SMBX's own print function. Only works during the HUD hook
-void Render::Print(std::wstring str, short font_type, float x, float y)
-{
-    VB6StrPtr text(str);
-    native_print(&text, &font_type, &x, &y);
-}
-
-// SAFE PRINT
-void Renderer::SafePrint(std::wstring str, int font_type, float x, float y) {
-    RenderStrings.push_back(RenderString(str, font_type, x, y));
-}
-
-void Renderer::SafePrint(RenderString str) {
-    RenderStrings.push_back(str);
-}
-
 // DRAW OP -- Process a render operation, draw, and decrement active timer remaining
 void Renderer::DrawOp(RenderOp* op) {
     if (op->m_FramesLeft < 1)
@@ -252,6 +238,10 @@ void Renderer::RenderAll() {
 
     ClearExpired();
 
+    std::stable_sort(RenderOperations.begin(), RenderOperations.end(), 
+        [](RenderOp* lhs, RenderOp* rhs) {return lhs->m_renderPriority < rhs->m_renderPriority; } );
+    
+
     // Do render ops
     for (std::list<RenderOp*>::iterator iter = RenderOperations.begin(), end = RenderOperations.end(); iter != end; ++iter) {
         if ((*iter)->m_LastRenderedOn == gFrames && (*iter)->m_PerCycleOnly)
@@ -265,7 +255,7 @@ void Renderer::RenderAll() {
     for (std::list<std::wstring >::const_iterator it = DebugMessages.begin(); it != DebugMessages.end(); it++)
     {
         std::wstring dbg = *it;
-        Render::Print(dbg, 4, (float)dbg_x, (float)dbg_y);
+        RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
         dbg_y += 20;
         if (dbg_y > 560) {
             dbg_y = 160;
@@ -273,11 +263,6 @@ void Renderer::RenderAll() {
         }
     }
     this->DebugMessages.clear();
-
-    for (std::list<RenderString>::iterator iter = RenderStrings.begin(), end = RenderStrings.end(); iter != end; ++iter) {
-        Render::Print((*iter).m_String, (*iter).m_FontType, (*iter).m_X, (*iter).m_Y);
-        (*iter).m_FramesLeft--;
-    }
 }
 
 // CLEAR EXPIRED -- Delete render ops & strings with no display frames left
@@ -299,29 +284,11 @@ void Renderer::ClearExpired() {
         }
     }
 
-    // Clear expired print strings
-    std::list<RenderString>::iterator str_iter = RenderStrings.begin();
-    std::list<RenderString>::iterator str_end = RenderStrings.end();
-
-    while (str_iter != str_end) {
-        if (str_iter->m_FramesLeft <= 0) {
-            str_iter = RenderStrings.erase(str_iter);
-        }
-        else {
-            ++str_iter;
-        }
-    }
 }
 
 // CLEAR ALL
 void Renderer::ClearAll() {
     this->DebugMessages.clear();
-    this->RenderStrings.clear();
-
-    //while(CustomBitmaps.empty() == false) {
-    //	DeleteObject(CustomBitmaps.back());
-    //	CustomBitmaps.pop_back();
-    //}
 }
 
 // DEBUG PRINT

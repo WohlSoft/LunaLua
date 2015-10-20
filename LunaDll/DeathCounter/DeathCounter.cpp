@@ -4,6 +4,7 @@
 #include "../Misc/MiscFuncs.h"
 #include "../SMBXInternal/Level.h"
 #include "../GlobalFuncs.h"
+#include "../Rendering/RenderOps/RenderStringOp.h"
 using namespace std;
 
 // CTOR
@@ -225,8 +226,8 @@ void DeathCounter::Draw() {
 	float minusoffset = (float)(123 - (printstr.size() * 8));
 
 	// Print to screen in upper left
-	Render::Print(std::wstring(L"DEMOS"), 3, 80, 27);
-	Render::Print(std::wstring(printstr), 3, minusoffset, 48);
+    gLunaRender.AddOp(new RenderStringOp(std::wstring(L"DEMOS"), 3, 80, 27));
+    gLunaRender.AddOp(new RenderStringOp(std::wstring(printstr), 3, minusoffset, 48));
 }
 
 // PRINT DEBUG - Prints all death records to the screen
@@ -234,8 +235,8 @@ void DeathCounter::PrintDebug() {
 	if(mDeathRecords.size() >= 1) {		
 		float y = 300;
 		for (std::list<DeathRecord*>::iterator iter = mDeathRecords.begin(), end = mDeathRecords.end();	iter != end; ++iter) {
-			gLunaRender.SafePrint(std::to_wstring((long long)(*iter)->Deaths), 2, 50, y);
-			gLunaRender.SafePrint((*iter)->LevelName, 2, 80, y);
+			gLunaRender.AddOp(new RenderStringOp(std::to_wstring((long long)(*iter)->Deaths), 2, 50, y));
+			gLunaRender.AddOp(new RenderStringOp((*iter)->LevelName, 2, 80, y));
 			y+=30;
 		}		
 	}

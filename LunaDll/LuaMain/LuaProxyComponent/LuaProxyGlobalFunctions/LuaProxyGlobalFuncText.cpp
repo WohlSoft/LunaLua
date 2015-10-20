@@ -3,6 +3,7 @@
 #include "../../../Globals.h"
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
+#include "../../../Rendering/RenderOps/RenderStringOp.h"
 
 void LuaProxy::Text::windowDebug(const char* debugText, lua_State* L)
 {
@@ -33,7 +34,7 @@ void LuaProxy::Text::print(const luabind::object& toPrint, int type, int x, int 
         for (wstring::iterator it = txt.begin(); it != txt.end(); ++it)
             *it = towupper(*it);
 
-    gLunaRender.SafePrint(txt, type, (float)x, (float)y);
+    gLunaRender.AddOp(new RenderStringOp(txt, type, (float)x, (float)y));
 }
 
 

@@ -4,6 +4,7 @@
 #include "../SMBXInternal/Layer.h"
 #include <windows.h>
 #include <math.h>
+#include "../Rendering/RenderOps/RenderStringOp.h"
 
 #ifdef __MINGW32__
 wstring std::to_wstring(long long src)
@@ -542,14 +543,14 @@ bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, i
 void PrintSyntaxError(wstring errored_line) {
 		static int errors = 0;
 		errors += 25;
-		RenderString render_str;
-		render_str.m_FontType = 2;
-		render_str.m_FramesLeft = 440;
-		render_str.m_String = errored_line;
-		render_str.m_String += L"- SYNTAX ERROR";
-		render_str.m_X = 125;
-		render_str.m_Y = (float)(errors % 600);
-		gLunaRender.SafePrint(render_str);
+		RenderStringOp* render_str = new RenderStringOp();
+		render_str->m_FontType = 2;
+		render_str->m_FramesLeft = 440;
+		render_str->m_String = errored_line;
+		render_str->m_String += L"- SYNTAX ERROR";
+		render_str->m_X = 125;
+		render_str->m_Y = (float)(errors % 600);
+        gLunaRender.AddOp(render_str);
 }
 
 bool SegmentIntersectRectangle(double a_rectangleMinX,

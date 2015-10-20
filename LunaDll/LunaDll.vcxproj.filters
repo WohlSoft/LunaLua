@@ -231,9 +231,6 @@
     <ClInclude Include="Rendering\Rendering.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\RenderString.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\RenderOps\RenderRectOp.h">
       <Filter>Header Files\Rendering\RenderOps</Filter>
     </ClInclude>
@@ -461,6 +458,9 @@
     </ClInclude>
     <ClInclude Include="Misc\RuntimeHookUtils\Toolhelp.h">
       <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderStringOp.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

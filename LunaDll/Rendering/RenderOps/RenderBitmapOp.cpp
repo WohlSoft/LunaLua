@@ -7,7 +7,7 @@
 #include "../../SMBXInternal/CameraInfo.h"
 
 // CTOR
-RenderBitmapOp::RenderBitmapOp() : RenderOp(),
+RenderBitmapOp::RenderBitmapOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
     x(0.0),
     y(0.0),
     sx(0.0),
@@ -59,15 +59,6 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
             bf.AlphaFormat = AC_SRC_ALPHA;
             AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
                 bmp->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
-        }
-
-        if (false) { //debug
-            Render::Print(to_wstring((long long)x), 3, 300, 420);
-            Render::Print(to_wstring((long long)y), 3, 300, 440);
-            Render::Print(to_wstring((long long)sx), 3, 300, 460);
-            Render::Print(to_wstring((long long)sy), 3, 300, 480);
-            Render::Print(to_wstring((long long)sw), 3, 300, 500);
-            Render::Print(to_wstring((long long)sh), 3, 300, 520);
         }
     }
 }

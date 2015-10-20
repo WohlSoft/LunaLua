@@ -11,6 +11,7 @@
 #include "../SMBXInternal/Level.h"
 #include <windows.h>
 #include <time.h>
+#include "../Rendering/RenderOps/RenderStringOp.h"
 
 using namespace std;
 
@@ -200,7 +201,7 @@ void Autocode::Do(bool init) {
 
 		// SHOW TEXT
 		case AT_ShowText:
-			gLunaRender.SafePrint(MyString, (int)Param3, (float)Param1, (float)Param2);
+			gLunaRender.AddOp(new RenderStringOp(MyString, (int)Param3, (float)Param1, (float)Param2));
 			break;
 
 		// SHOW NPC LIFE LEFT
@@ -209,9 +210,9 @@ void Autocode::Do(bool init) {
 			NPCMOB* npc = NPC::GetFirstMatch((int)Target, (int)Param3 - 1);
 			if(npc != NULL) {
 				float hits = *(((float*)((&(*(byte*)npc)) + 0x148)));				
-				gLunaRender.SafePrint(std::to_wstring((long long)(base_health - hits)), 3, (float)Param1, (float)Param2);
+				gLunaRender.AddOp(new RenderStringOp(std::to_wstring((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
 			} else {
-				gLunaRender.SafePrint(L"?", 3, (float)Param1, (float)Param2);
+				gLunaRender.AddOp(new RenderStringOp(L"?", 3, (float)Param1, (float)Param2));
 			}
 			break;
 							}
@@ -267,8 +268,8 @@ void Autocode::Do(bool init) {
 
 		case AT_Timer:
 			if(Param2) { // Display timer?
-				gLunaRender.SafePrint(L"TIMER", 3, 600, 27);
-				gLunaRender.SafePrint(std::to_wstring((long long)Length / 60), 3, 618, 48);
+				gLunaRender.AddOp(new RenderStringOp(L"TIMER", 3, 600, 27));
+				gLunaRender.AddOp(new RenderStringOp(std::to_wstring((long long)Length / 60), 3, 618, 48));
 			}
 			if(Length == 1 || Length == 0) {
 				if(Length == 1)
@@ -587,7 +588,7 @@ void Autocode::Do(bool init) {
 				std::wstring str = std::to_wstring((long double)gAutoMan.GetVar(MyRef));
 				if(MyString.length() > 0)
 					str = MyString + str;
-				gLunaRender.SafePrint(str, (int)Param3, (float)Param1, (float)Param2);
+				gLunaRender.AddOp(new RenderStringOp(str, (int)Param3, (float)Param1, (float)Param2));
 			}
 			break;
 						 }
@@ -919,32 +920,32 @@ void Autocode::Do(bool init) {
 
 		// DEBUG
 		case AT_DebugPrint: {
-            gLunaRender.SafePrint(L"LUNADLL (WITH LUA) VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250);
+            gLunaRender.AddOp(new RenderStringOp(L"LUNADLL (WITH LUA) VERSION-" + std::to_wstring((long long)LUNA_VERSION), 3, 50, 250));
 			//gLunaRender.SafePrint(, 3, 340, 250);
 
-			gLunaRender.SafePrint(L"GLOBL-" + std::to_wstring((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300);
+			gLunaRender.AddOp(new RenderStringOp(L"GLOBL-" + std::to_wstring((long long)gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
 
-			gLunaRender.SafePrint(L"INIT -" + std::to_wstring((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330);
+			gLunaRender.AddOp(new RenderStringOp(L"INIT -" + std::to_wstring((long long)gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
 
-			gLunaRender.SafePrint(L"CODES-" + std::to_wstring((long long)gAutoMan.m_Autocodes.size()), 3, 50, 360);
+			gLunaRender.AddOp(new RenderStringOp(L"CODES-" + std::to_wstring((long long)gAutoMan.m_Autocodes.size()), 3, 50, 360));
 
-			gLunaRender.SafePrint(L"QUEUE-" + std::to_wstring((long long)gAutoMan.m_CustomCodes.size()), 3, 50, 390);
+			gLunaRender.AddOp(new RenderStringOp(L"QUEUE-" + std::to_wstring((long long)gAutoMan.m_CustomCodes.size()), 3, 50, 390));
 
-			gLunaRender.SafePrint(L"SPRITE-" + std::to_wstring((long long)gSpriteMan.CountSprites()), 3, 50, 420);
+			gLunaRender.AddOp(new RenderStringOp(L"SPRITE-" + std::to_wstring((long long)gSpriteMan.CountSprites()), 3, 50, 420));
 
-			gLunaRender.SafePrint(L"BLPRNT-" + std::to_wstring((long long)gSpriteMan.CountBlueprints()), 3, 50, 450);
+			gLunaRender.AddOp(new RenderStringOp(L"BLPRNT-" + std::to_wstring((long long)gSpriteMan.CountBlueprints()), 3, 50, 450));
 
-			gLunaRender.SafePrint(L"COMP-" + std::to_wstring((long long)gSpriteMan.m_ComponentList.size()), 3, 50, 480);
+			gLunaRender.AddOp(new RenderStringOp(L"COMP-" + std::to_wstring((long long)gSpriteMan.m_ComponentList.size()), 3, 50, 480));
 
 			int buckets = 0, cells = 0, objs = 0;
 			gCellMan.CountAll(&buckets, &cells, &objs);
-			gLunaRender.SafePrint(L"BCO-" + std::to_wstring((long long)buckets) + L" "
+			gLunaRender.AddOp(new RenderStringOp(L"BCO-" + std::to_wstring((long long)buckets) + L" "
 									+ std::to_wstring((long long)cells) + L" "
-									+ std::to_wstring((long long)objs), 3, 50, 510);
+									+ std::to_wstring((long long)objs), 3, 50, 510));
 
 			std::list<CellObj> cellobjs;
 			gCellMan.GetObjectsOfInterest(&cellobjs, demo->momentum.x, demo->momentum.y, (int)demo->momentum.width, (int)demo->momentum.height);
-			gLunaRender.SafePrint(L"NEAR-" + std::to_wstring((long long)cellobjs.size()), 3, 50, 540);
+			gLunaRender.AddOp(new RenderStringOp(L"NEAR-" + std::to_wstring((long long)cellobjs.size()), 3, 50, 540));
 
 			break;
 							 }

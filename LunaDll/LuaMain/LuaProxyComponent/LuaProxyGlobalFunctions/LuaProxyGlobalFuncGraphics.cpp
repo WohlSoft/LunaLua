@@ -198,6 +198,7 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
     renderOp->sh = (sourceHeight <= 0 ? imgBox->m_H : sourceHeight);
     renderOp->opacity = opacity;
     renderOp->sceneCoords = sceneCoords;
+    renderOp->m_renderPriority = RENDEROP_DEFAULT_PRIORITY_RENDEROP; // Default
 
     gLunaRender.AddOp(renderOp);
 }

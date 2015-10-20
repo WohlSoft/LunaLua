@@ -18,6 +18,7 @@
 #include "../RunningStat.h"
 #include "../../Rendering/RenderOverrideManager.h"
 #include "../../Rendering/RenderUtils.h"
+#include "../../Rendering/RenderOps/RenderStringOp.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -231,7 +232,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    Render::Print(utf8_decode(LUNALUA_VERSION), 3, 5, 5);
+    RenderStringOp(utf8_decode(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
     if (newDebugger)
     {
         if (asyncBitBltProc){

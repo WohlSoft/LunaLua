@@ -248,7 +248,7 @@
     <ClInclude Include="Rendering\Rendering.h" />
     <ClInclude Include="Rendering\RenderOps\RenderOp.h" />
     <ClInclude Include="Rendering\RenderOps\RenderRectOp.h" />
-    <ClInclude Include="Rendering\RenderString.h" />
+    <ClInclude Include="Rendering\RenderOps\RenderStringOp.h" />
     <ClInclude Include="Misc\RuntimeHook.h" />
     <ClInclude Include="SdlMusic\MusicManager.h" />
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
