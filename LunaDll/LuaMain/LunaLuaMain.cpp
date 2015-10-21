@@ -272,7 +272,9 @@ void CLunaLua::bindAll()
                 def("windowDebug", &LuaProxy::Text::windowDebug),
                 def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
                 def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
-                def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print)
+                def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
+                def("printWithPriority", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWithPriority),
+                def("printWithPriority", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWithPriority)
             ],
 
             namespace_("Graphics")[

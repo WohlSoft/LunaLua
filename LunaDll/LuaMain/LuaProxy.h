@@ -935,6 +935,8 @@ namespace LuaProxy {
         void windowDebugSimple(const char* debugText);
         void print(const luabind::object& toPrint, int x, int y);
         void print(const luabind::object& toPrint, int type, int x, int y);
+        void printWithPriority(const luabind::object& toPrint, int x, int y, double priority);
+        void printWithPriority(const luabind::object& toPrint, int type, int x, int y, double priority);
         void showMessageBox(const std::string &text);
     }
     //General functions
