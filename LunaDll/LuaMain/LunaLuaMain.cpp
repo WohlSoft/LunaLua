@@ -273,8 +273,8 @@ void CLunaLua::bindAll()
                 def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
                 def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
                 def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
-                def("printWithPriority", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWithPriority),
-                def("printWithPriority", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWithPriority)
+                def("printWP", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWP),
+                def("printWP", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWP)
             ],
 
             namespace_("Graphics")[
@@ -296,10 +296,18 @@ void CLunaLua::bindAll()
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, lua_State*))&LuaProxy::Graphics::drawImageToScene),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, lua_State*))&LuaProxy::Graphics::drawImageToScene),
                 def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
