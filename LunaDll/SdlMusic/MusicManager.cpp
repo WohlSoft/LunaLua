@@ -364,11 +364,13 @@ void MusicManager::loadMusics(std::string path, std::string root)
 	}
 }
 
-void MusicManager::loadCustomSounds(std::string episodePath)
+void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCustomPath)
 {
 	initArrays();
 	loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
 	loadSounds(episodePath+"\\sounds.ini", episodePath);
+    if(!levelCustomPath.empty())
+        loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath);
 	loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
 	loadMusics(episodePath+"\\music.ini", episodePath);
 

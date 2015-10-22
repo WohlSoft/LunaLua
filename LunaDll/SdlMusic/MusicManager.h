@@ -30,7 +30,7 @@ class MusicManager
 		static std::string lenght();
 		static std::string position();
 		
-		static void loadCustomSounds(std::string episodePath);
+        static void loadCustomSounds(std::string episodePath, std::string levelCustomPath="");
 		static void resetSoundsToDefault();
 		static void loadSounds(std::string path, std::string root);
 		static void loadMusics(std::string path, std::string root);

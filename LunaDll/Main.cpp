@@ -93,7 +93,8 @@ int OnLvlLoad() {
 	{//Load custom sounds
 		std::string wldPath = wstr2str(GM_FULLDIR);
 		std::string SndRoot = MusicManager::SndRoot();
-		replaceSubStr(wldPath, "\"", "");
+        std::string custPath = wstr2str(getCustomFolderPath());
+        replaceSubStr(wldPath, "\"", "");
 		replaceSubStr(wldPath, "\\\\",  "\\");
 		replaceSubStr(wldPath, "/",  "\\");
 
@@ -103,7 +104,7 @@ int OnLvlLoad() {
 
 		if(wldPath!=SndRoot)
 		{
-			MusicManager::loadCustomSounds(wldPath+"\\");
+            MusicManager::loadCustomSounds(wldPath+"\\", custPath);
 			//MessageBoxA(0, std::string(wldPath+"\n"+SndRoot+"\nLevel started").c_str(), "Debug", 0);
 		}
 	}
