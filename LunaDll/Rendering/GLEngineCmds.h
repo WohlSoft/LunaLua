@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <cstdint>
 #include "BMPBox.h"
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 struct GLEngineCmd {
     enum GLEngineCmdType {

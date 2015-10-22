@@ -2,7 +2,7 @@
 #ifndef LuaProxy_Hhh
 #define LuaProxy_Hhh
 
-#include <Windows.h>
+#include <windows.h>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/function.hpp>

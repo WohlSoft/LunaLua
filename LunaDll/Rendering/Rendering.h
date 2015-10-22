@@ -1,6 +1,6 @@
 #ifndef Rendering_hhhh
 #define Rendering_hhhh
-#include <Windows.h>
+#include <windows.h>
 #include <string>
 #include <list>
 //#include "BMPBox.h"
