@@ -935,8 +935,8 @@ namespace LuaProxy {
         void windowDebugSimple(const char* debugText);
         void print(const luabind::object& toPrint, int x, int y);
         void print(const luabind::object& toPrint, int type, int x, int y);
-        void printWithPriority(const luabind::object& toPrint, int x, int y, double priority);
-        void printWithPriority(const luabind::object& toPrint, int type, int x, int y, double priority);
+        void printWP(const luabind::object& toPrint, int x, int y, double priority);
+        void printWP(const luabind::object& toPrint, int type, int x, int y, double priority);
         void showMessageBox(const std::string &text);
     }
     //General functions
@@ -993,11 +993,19 @@ namespace LuaProxy {
         void drawImage(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L);
         void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
         void drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L);
+        void drawImageWP(const LuaImageResource& img, int xPos, int yPos, double priority, lua_State* L);
+        void drawImageWP(const LuaImageResource& img, int xPos, int yPos, float opacity, double priority, lua_State* L);
+        void drawImageWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L);
+        void drawImageWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L);
-        void drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, lua_State* L);
+        void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, double priority, lua_State* L);
+        void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, float opacity, double priority, lua_State* L);
+        void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L);
+        void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L);
+        void drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
         
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);

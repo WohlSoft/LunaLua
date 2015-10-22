@@ -26,15 +26,15 @@ void LuaProxy::Text::print(const luabind::object& toPrint, int x, int y)
 
 void LuaProxy::Text::print(const luabind::object& toPrint, int type, int x, int y)
 {
-    printWithPriority(toPrint, type, x, y, RENDEROP_DEFAULT_PRIORITY_TEXT);
+    printWP(toPrint, type, x, y, RENDEROP_DEFAULT_PRIORITY_TEXT);
 }
 
-void LuaProxy::Text::printWithPriority(const luabind::object & toPrint, int x, int y, double priority)
+void LuaProxy::Text::printWP(const luabind::object & toPrint, int x, int y, double priority)
 {
-    printWithPriority(toPrint, 3, x, y, priority);
+    printWP(toPrint, 3, x, y, priority);
 }
 
-void LuaProxy::Text::printWithPriority(const luabind::object & toPrint, int type, int x, int y, double priority)
+void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, int y, double priority)
 {
     lua_State* L = toPrint.interpreter();
     
