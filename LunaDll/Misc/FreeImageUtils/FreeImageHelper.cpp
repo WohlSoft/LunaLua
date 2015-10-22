@@ -32,6 +32,7 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     int width = FreeImage_GetWidth(bitmap);
     int height = FreeImage_GetHeight(bitmap);
     
+    /*
     std::cout << "Original Image: " << std::hex << std::endl;
     std::cout << "R: " << FreeImage_GetRedMask(bitmap) << std::endl;
     std::cout << "G: " << FreeImage_GetGreenMask(bitmap) << std::endl;
@@ -40,13 +41,14 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     std::cout << "BPP: " << FreeImage_GetBPP(bitmap) << std::endl;
     std::cout << "Color type: " << (int)FreeImage_GetColorType(bitmap) << std::endl;
     std::cout << "--------------------------------" << std::endl;
+    */
 
     // Convert to 32bit so we can be sure that it is compatible.
     FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(bitmap);
     // Make it premultiplied so we can use it for opengl
     FreeImage_PreMultiplyWithAlpha(frame32bit);
 
-
+    /*
     std::cout << "Converted Image: " << std::hex << std::endl;
     std::cout << "R: " << FreeImage_GetRedMask(frame32bit) << std::endl;
     std::cout << "G: " << FreeImage_GetGreenMask(frame32bit) << std::endl;
@@ -55,7 +57,7 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     std::cout << "BPP: " << FreeImage_GetBPP(frame32bit) << std::endl;
     std::cout << "Color type: " << (int)FreeImage_GetColorType(frame32bit) << std::endl;
     std::cout << "================================" << std::endl;
-
+    */
 
     // Make HBITMAP handle
     BYTE* out; //BGRA
