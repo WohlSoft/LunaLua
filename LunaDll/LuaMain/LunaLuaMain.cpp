@@ -869,6 +869,11 @@ void CLunaLua::bindAll()
                 .property("ai3", &LuaProxy::NPC::ai3, &LuaProxy::NPC::setAi3)
                 .property("ai4", &LuaProxy::NPC::ai4, &LuaProxy::NPC::setAi4)
                 .property("ai5", &LuaProxy::NPC::ai5, &LuaProxy::NPC::setAi5)
+                .property("drawOnlyMask", &LuaProxy::NPC::drawOnlyMask, &LuaProxy::NPC::setDrawOnlyMask)
+                .property("invincibleToSword", &LuaProxy::NPC::isInvincibleToSword, &LuaProxy::NPC::setIsInvincibleToSword)
+                .property("legacyBoss", &LuaProxy::NPC::legacyBoss, &LuaProxy::NPC::setLegacyBoss)
+                .property("friendly", &LuaProxy::NPC::friendly, &LuaProxy::NPC::setFriendly)
+                .property("dontMove", &LuaProxy::NPC::dontMove, &LuaProxy::NPC::setDontMove)
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 

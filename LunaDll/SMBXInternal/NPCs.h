@@ -387,7 +387,7 @@ struct NPCMOB {
     short activated;                        //+0x44
     short friendly;                         //+0x46
     short dontMove;                         //+0x48
-    short unknown_4A;                       //+0x4A
+    short dontMove2;                        //+0x4A
 	VB6StrPtr talkMsg;                      //+0x4C
     short unknown_50;                       //+0x50
     short unknown_52;                       //+0x52
