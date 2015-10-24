@@ -839,11 +839,11 @@ void CLunaLua::bindAll()
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
                 ]
-                
+
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::NPC, m_index))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::NPC::mem))
-                .def("mem", static_cast<luabind::object (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::NPC::mem))
+                .def("mem", static_cast<luabind::object(LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::NPC::mem))
                 .def("kill", static_cast<void (LuaProxy::NPC::*)(lua_State*)>(&LuaProxy::NPC::kill))
                 .def("kill", static_cast<void (LuaProxy::NPC::*)(int, lua_State*)>(&LuaProxy::NPC::kill))
                 .property("id", &LuaProxy::NPC::id, &LuaProxy::NPC::setId)
@@ -864,6 +864,11 @@ void CLunaLua::bindAll()
                 .property("layerName", &LuaProxy::NPC::layerName, &LuaProxy::NPC::setLayerName)
                 .property("attachedLayerObj", &LuaProxy::NPC::attachedLayerObj, &LuaProxy::NPC::setAttachedLayerObj)
                 .property("layerObj", &LuaProxy::NPC::layerObj, &LuaProxy::NPC::setLayerObj)
+                .property("ai1", &LuaProxy::NPC::ai1, &LuaProxy::NPC::setAi1)
+                .property("ai2", &LuaProxy::NPC::ai2, &LuaProxy::NPC::setAi2)
+                .property("ai3", &LuaProxy::NPC::ai3, &LuaProxy::NPC::setAi3)
+                .property("ai4", &LuaProxy::NPC::ai4, &LuaProxy::NPC::setAi4)
+                .property("ai5", &LuaProxy::NPC::ai5, &LuaProxy::NPC::setAi5)
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
