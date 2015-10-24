@@ -355,6 +355,18 @@ namespace LuaProxy {
         void setLayerName(const luabind::object &value, lua_State* L);
         luabind::object layerObj(lua_State *L) const;
         void setLayerObj(const LuaProxy::Layer &value, lua_State *L);
+        double ai1(lua_State* L) const;
+        void setAi1(double ai1, lua_State* L);
+        double ai2(lua_State* L) const;
+        void setAi2(double ai2, lua_State* L);
+        double ai3(lua_State* L) const;
+        void setAi3(double ai3, lua_State* L);
+        double ai4(lua_State* L) const;
+        void setAi4(double ai4, lua_State* L);
+        double ai5(lua_State* L) const;
+        void setAi5(double ai5, lua_State* L);
+
+
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;
         //not bound functions

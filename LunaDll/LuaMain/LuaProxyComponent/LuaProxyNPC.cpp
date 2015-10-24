@@ -484,6 +484,66 @@ void LuaProxy::NPC::setLayerObj(const LuaProxy::Layer &value, lua_State *L)
 	thisnpc->layerName = ::Layer::Get(value.layerIndex())->ptLayerName;
 }
 
+double LuaProxy::NPC::ai1(lua_State * L) const
+{
+    if (!isValid_throw(L)) return 0.0;
+    return ::NPC::Get(m_index)->ai1;
+}
+
+void LuaProxy::NPC::setAi1(double ai1, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    ::NPC::Get(m_index)->ai1 = ai1;
+}
+
+double LuaProxy::NPC::ai2(lua_State * L) const
+{
+    if (!isValid_throw(L)) return 0.0;
+    return ::NPC::Get(m_index)->ai2;
+}
+
+void LuaProxy::NPC::setAi2(double ai2, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    ::NPC::Get(m_index)->ai2 = ai2;
+}
+
+double LuaProxy::NPC::ai3(lua_State * L) const
+{
+    if (!isValid_throw(L)) return 0.0;
+    return ::NPC::Get(m_index)->ai3;
+}
+
+void LuaProxy::NPC::setAi3(double ai3, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    ::NPC::Get(m_index)->ai3 = ai3;
+}
+
+double LuaProxy::NPC::ai4(lua_State * L) const
+{
+    if (!isValid_throw(L)) return 0.0;
+    return ::NPC::Get(m_index)->ai4;
+}
+
+void LuaProxy::NPC::setAi4(double ai4, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    ::NPC::Get(m_index)->ai4 = ai4;
+}
+
+double LuaProxy::NPC::ai5(lua_State * L) const
+{
+    if (!isValid_throw(L)) return 0.0;
+    return ::NPC::Get(m_index)->ai5;
+}
+
+void LuaProxy::NPC::setAi5(double ai5, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    ::NPC::Get(m_index)->ai5 = ai5;
+}
+
 bool LuaProxy::NPC::isValid() const
 {
 	return !(m_index < 0 || m_index > GM_NPCS_COUNT-1);
