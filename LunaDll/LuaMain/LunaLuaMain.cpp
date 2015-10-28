@@ -183,6 +183,9 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 void CLunaLua::setupDefaults()
 {
     object _G = globals(L);
+    _G["GAME_ENGINE"] = GAME_ENGINE;
+    _G["LUNALUA_VER"] = LUNALUA_VERSION;
+
     _G["PLAYER_SMALL"] = PLAYER_SMALL;
     _G["PLAYER_BIG"] = PLAYER_BIG;
     _G["PLAYER_FIREFLOWER"] = PLAYER_FIREFLOWER;
