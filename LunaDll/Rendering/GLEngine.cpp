@@ -66,15 +66,16 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
-	// TODO: This block of code will need to be changed once
-	//       GLContextManager is modified to handle re-init
-	//       with a new hDC
-    if (!g_GLContextManager.IsInitialized()) {
-        if (!g_GLContextManager.Init(hdcDest)) {
-            dbgboxA("Failed to init...");
-        } else {
+	static bool runOnce = true;
+    if (!g_GLContextManager.Init(hdcDest)) {
+        dbgboxA("Failed to init...");
+    } else {
+		// TODO: Move mGifRecorder initialization somewhere else. It can't be
+		//       in the constructor due to when the constructor 
+		if (runOnce) {
 			mGifRecorder.init();
-        }
+			runOnce = false;
+		}
     }
 
 	if (!g_GLContextManager.IsInitialized()) return FALSE;

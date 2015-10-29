@@ -15,10 +15,13 @@ public:
     std::unordered_map<HDC, const GLSprite*> mSmbxTexMap;
     std::unordered_map<const BMPBox*, const GLDraw::Texture*> mLunaTexMap;
     
+	void Reset();
+
     GLTextureStore();
     void ClearSMBXSprites();
     const GLSprite* SpriteFromSMBXBitmap(HDC hdc);
 
+	void ClearLunaTextures();
     void ClearLunaTexture(const BMPBox& bmp);
     const GLDraw::Texture* TextureFromLunaBitmap(const BMPBox& bmp);
 };
