@@ -484,6 +484,77 @@ void LuaProxy::NPC::setLayerObj(const LuaProxy::Layer &value, lua_State *L)
 	thisnpc->layerName = ::Layer::Get(value.layerIndex())->ptLayerName;
 }
 
+bool LuaProxy::NPC::drawOnlyMask(lua_State * L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return (bool)::NPC::Get(m_index)->isMaskOnly;
+}
+
+void LuaProxy::NPC::setDrawOnlyMask(bool drawOnlyMask, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->isMaskOnly = COMBOOL(drawOnlyMask);
+}
+
+bool LuaProxy::NPC::isInvincibleToSword(lua_State * L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return (bool)::NPC::Get(m_index)->invincibilityToSword;
+}
+
+void LuaProxy::NPC::setIsInvincibleToSword(bool isInvincibleToSword, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->invincibilityToSword = COMBOOL(isInvincibleToSword);
+}
+
+bool LuaProxy::NPC::legacyBoss(lua_State * L)
+{
+    if (!isValid_throw(L)) return false;
+
+    return (bool)::NPC::Get(m_index)->legacyBoss;
+}
+
+void LuaProxy::NPC::setLegacyBoss(bool legacyBoss, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->legacyBoss = COMBOOL(legacyBoss);
+}
+
+bool LuaProxy::NPC::friendly(lua_State * L)
+{
+    if (!isValid_throw(L)) return false;
+    
+    return (bool)::NPC::Get(m_index)->friendly;
+}
+
+void LuaProxy::NPC::setFriendly(bool friendly, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->friendly = COMBOOL(friendly);
+}
+
+bool LuaProxy::NPC::dontMove(lua_State * L)
+{
+    if (!isValid_throw(L)) return false;
+
+    return (bool)::NPC::Get(m_index)->dontMove;
+}
+
+void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->dontMove2 = COMBOOL(dontMove);
+    ::NPC::Get(m_index)->dontMove = COMBOOL(dontMove);
+}
+
 double LuaProxy::NPC::ai1(lua_State * L) const
 {
     if (!isValid_throw(L)) return 0.0;
