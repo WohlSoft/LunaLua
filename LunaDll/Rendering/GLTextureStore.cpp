@@ -12,12 +12,37 @@ GLTextureStore::GLTextureStore() {
     mSmbxTexMap.clear();
 }
 
+void GLTextureStore::Reset() {
+	ClearSMBXSprites();
+	ClearLunaTextures();
+}
+
+void GLTextureStore::ClearLunaTextures() {
+	for (const auto i : mLunaTexMap) {
+		glDeleteTextures(1, &i.second->name);
+		GLERRORCHECK();
+		delete i.second;
+	}
+	mLunaTexMap.clear();
+}
+
 void GLTextureStore::ClearSMBXSprites()
 {
     for (const auto i : mSmbxTexMap) {
         delete i.second;
     }
     mSmbxTexMap.clear();
+}
+
+void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
+{
+	auto it = mLunaTexMap.find(&bmp);
+	if (it != mLunaTexMap.end()) {
+		glDeleteTextures(1, &it->second->name);
+		GLERRORCHECK();
+		delete it->second;
+		mLunaTexMap.erase(it);
+	}
 }
 
 const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
@@ -85,17 +110,6 @@ const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
     mSmbxTexMap[hdc] = sprite;
 
     return sprite;
-}
-
-void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
-{
-    auto it = mLunaTexMap.find(&bmp);
-    if (it != mLunaTexMap.end()) {
-        glDeleteTextures(1, &it->second->name);
-        GLERRORCHECK();
-        delete it->second;
-        mLunaTexMap.erase(it);
-    }
 }
 
 const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)

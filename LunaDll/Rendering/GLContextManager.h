@@ -18,20 +18,26 @@ public:
 private:
     bool  mInitialized;
     bool  mHadError;
+
+	// Context variables
+	int   mOldPixelFormat;
     HDC   hDC;
     HGLRC hCTX;
 
+	// Framebuffer variables
+	// TODO: Move framebuffer into a class.
     GLuint mFB;
-    GLuint mColorRB;
     GLuint mDepthRB;
     GLDraw::Texture mBufTex;
 
+	// Init functions
     bool InitContextFromHDC(HDC hDC);
     bool InitFramebuffer();
 	bool InitProjectionAndState();
 
-	// TODO: Implement the following to support switching hDCs
-	// void ReleaseContext()
+	// Release functions
+	void ReleaseContext();
+	void ReleaseFramebuffer();
 };
 
 // Instance
