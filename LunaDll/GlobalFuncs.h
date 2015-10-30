@@ -37,6 +37,7 @@ HMODULE getModule(std::string moduleName);
 
 // File/Path Helper Funcs
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
+bool readFile(std::string &content, std::string path, std::string errMsg = std::string());
 bool writeFile(const std::string &content, const std::string &path);
 std::vector<std::string> listFilesOfDir(const std::string& path);
 std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes);
