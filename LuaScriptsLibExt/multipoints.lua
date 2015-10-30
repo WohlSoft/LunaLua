@@ -1,7 +1,19 @@
---multipoints.lua 
---v3.0.0
---Created by Hoeloe, 2015
---With help from Rednaxela
+-----------------------------------------------
+-----------------------------------------------
+--*******************************************--
+--*           _ _   _         _     _       *--
+--* _____ _ _| | |_|_|___ ___|_|___| |_ ___ *--
+--*|     | | | |  _| | . | . | |   |  _|_ -|*--
+--*|_|_|_|___|_|_| |_|  _|___|_|_|_|_| |___|*--
+--*                  |_|                    *--
+--*******************************************--
+-----------------------------------------------
+-----------------------------------------------
+-----------Created by Hoeloe - 2015------------
+-----------With help from Rednaxella-----------
+--------Open-Source Checkpoint Library---------
+------------For Super Mario Bros X-------------
+-------------------v3.0.4----------------------
 local multipoints = {}
 
 local playerMP = { sec = 0, x = 0, y = 0, act = nil }
@@ -16,6 +28,7 @@ multipoints.IMG_SIZE = { width = 32, height = 32 }
 local dataFile;
 
 local firstRun = true;
+local preRun = true;
 
 function multipoints.onInitAPI()
 	--register event handler
@@ -27,6 +40,7 @@ function multipoints.onInitAPI()
 	if(dataFile:get("MPCheck_ID") ==  nil) then
 		multipoints.resetMidpoints();
 	end
+	preRun = true;
 	firstRun = true;
 	
 	registerEvent(multipoints, "onLoop", "update", true) --Register the loop event
@@ -72,6 +86,7 @@ local function getMP(i)
 				dataFile:set("MPCheck_Get"..i,tostring(1));
 				dataFile:set("MPCheck_ID",tostring(i));
 				dataFile:save()
+				
 				
 				mem(0x00B250B0, FIELD_STRING, mem(0x00B2C618, FIELD_STRING))
 				
@@ -227,24 +242,38 @@ function multipoints.resetMidpoints()
 			mem(0x00B250B0, FIELD_STRING, "")
 end
 
-function multipoints.onLoad()
+function multipoints.onLevelStart()
 end
 
 function multipoints.update()
+	if(preRun) then
+		preRun = false;
+		return;
+	end
 	if(firstRun) then
-		local i = 0;
-		while(i > -1 and mpData[i] ~= nil) do
-			if(multipoints.getCheckpointID() == i) then
-				playerMP = {sec = mpData[i].sec, x = mpData[i].x, y = mpData[i].y, act = mpData[i].actions }
-				i = -1;
-			else
-				i = i + 1;
+		if(mpData ~= nil) then
+			local i = 0;
+			while(i > -1 and mpData[i] ~= nil) do
+				if(multipoints.getCheckpointID() == i) then
+					playerMP = {sec = mpData[i].sec, x = mpData[i].x, y = mpData[i].y, act = mpData[i].actions }
+					i = -1;
+				else
+					i = i + 1;
+				end
+			end
+		else
+			if(mpTrigs == nil) then
+				mpTrigs = {} 
+			end
+			if(mpLuaTrigs == nil) then
+				mpLuaTrigs = {} 
 			end
 		end
 		
 		if (multipoints.getCheckpointID() == nil) or (multipoints.getCheckpointID() < 0) then
 			multipoints.resetMidpoints()
 			firstRun = false;
+			multipoints.onLevelStart();
 			return
 		end
 		
@@ -272,11 +301,13 @@ function multipoints.update()
 			if(playerMP.act ~= nil) then
 				playerMP.act();
 			end
+			wasMidpointed = true;
 		else
 			multipoints.resetMidpoints()
 		end
 		
 		firstRun = false;
+		multipoints.onLevelStart();
 	end
 	
 	for k,v in pairs(mpLuaTrigs) do
