@@ -11,13 +11,20 @@ GLContextManager g_GLContextManager;
 GLContextManager::GLContextManager() :
 	hDC(NULL), hCTX(NULL),
 	mInitialized(false), mHadError(false),
-	mFB(0), mColorRB(0), mDepthRB(0),
+	mFB(0), mDepthRB(0),
 	mBufTex(NULL, 800, 600) {
 }
 
 bool GLContextManager::Init(HDC hDC) {
-	// Note: In future versions, check if the hDC is different, and if so
-	//       re-init.
+	// If we're switching HDCs, deal with it...
+	if (mInitialized && !mHadError && hDC != this->hDC) {
+		// If we're switching HDCs, deal with it...
+		g_GLDraw.UnbindTexture(); // Unbind current texture
+		g_GLTextureStore.Reset(); // Delete all textures
+		ReleaseFramebuffer(); // Release framebuffer
+		ReleaseContext(); // Release context
+		mInitialized = false;
+	}
 
 	// Don't re-run if already run
     if (mInitialized || mHadError) return true;
@@ -71,6 +78,8 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     pfd.cColorBits = 32;
     pfd.cDepthBits = 32;
     pfd.iLayerType = PFD_MAIN_PLANE;
+
+	mOldPixelFormat = GetPixelFormat(hDC);
 
     int nPixelFormat = ChoosePixelFormat(hDC, &pfd);
     if (0 == nPixelFormat)
@@ -197,3 +206,51 @@ bool GLContextManager::InitProjectionAndState() {
 }
 
 
+void GLContextManager::ReleaseFramebuffer() {
+	// Unbind framebuffer
+	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+	GLERRORCHECK();
+
+	// Unbind texture just in case
+	g_GLDraw.UnbindTexture();
+
+	// Delete framebuffer
+	if (mFB) {
+		glDeleteFramebuffersANY(1, &mFB);
+		GLERRORCHECK();
+		mFB = 0;
+	}
+
+	// Delete depth renderbuffer
+	if (mDepthRB) {
+		glDeleteRenderbuffersANY(1, &mDepthRB);
+		GLERRORCHECK();
+		mDepthRB = 0;
+	}
+
+	// Delete texture
+	if (mBufTex.name) {
+		glDeleteTextures(1, &mBufTex.name);
+		GLERRORCHECK();
+		mBufTex.name = 0;
+	}
+}
+
+void GLContextManager::ReleaseContext() {
+	// Delete Context
+	if (hCTX) {
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(hCTX);
+		hCTX = NULL;
+	}
+
+	// Restore pixel format if necessary
+	if (mOldPixelFormat != GetPixelFormat(hDC)) {
+		PIXELFORMATDESCRIPTOR pfd;
+		DescribePixelFormat(hDC, mOldPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+		SetPixelFormat(hDC, mOldPixelFormat, &pfd);
+	}
+
+	// Clear hDC
+	hDC = NULL;
+}

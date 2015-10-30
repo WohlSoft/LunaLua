@@ -18,7 +18,11 @@
 #define LUNALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
 #endif
 
-
+// Common PGE Engine and LunaLUA constant to identify which engine is uses to run lunadll.lua script
+// This need to have able use same lunadll.lua script with both PGE Engine and LunaLUA.
+// PGE Engine going to have similar to LunaLUA API, but some super-special functions like mem() will NOT be made
+// at PGE Engine because useless with PGE's opened API.
+#define GAME_ENGINE        "LunaLUA"
 
 #define LUNA_VERSION        8
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
