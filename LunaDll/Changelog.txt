@@ -11,6 +11,7 @@ v0.7.2 BETA:
   * Added some new Defines (Defines.* namespace)
   * Added switch between letterbox-mode (forced 4:3) or scretched-mode via F4
   * Bugfix [LunaLua and SMBX Engine]: Decimal numbers now work perfectly in layer speed and npc codes (Thanks to DarkMecha for testing!)
+  * Bugfix [LunaLua and SMBX Engine]: Fullscreen in the level editor works again!
   * Added printTextWP, drawImageWP, drawImageToSceneWP which enables rendering with priority settings (also known as Z-Index)
   * Added sounds.ini on level-basis
 
