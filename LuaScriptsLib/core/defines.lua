@@ -82,7 +82,7 @@ local defines = {
     player_link_shieldEnabled       = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
                                         n = 1, group = "Player Settings: Link", desc = "If the shield of link is enabled.", 
                                         customFuncGet = function()
-                                            return mem(0x00A53042, FIELD_BYTE) == 0x90
+                                            return mem(0x00A53042, FIELD_BYTE) ~= 0x90
                                         end,
                                         customFuncSet = function(value)
                                             if(value)then
@@ -101,6 +101,18 @@ local defines = {
                                                 mem(0x00A53046, FIELD_BYTE, 0x90)
                                                 mem(0x00A53047, FIELD_BYTE, 0x90)
                                                 mem(0x00A53048, FIELD_BYTE, 0x90)
+                                            end
+                                        end},
+    player_link_fairyVineEnabled    = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 2, group = "Player Settings: Link", desc = "If the vine fairy is enabled",
+                                        customFuncGet = function()
+                                            return mem(0x009AAF93, FIELD_BYTE) == 0x5
+                                        end,
+                                        customFuncSet = function(value)
+                                            if(value)then
+                                                mem(0x009AAF93, FIELD_BYTE, 0x5)
+                                            else
+                                                mem(0x009AAF93, FIELD_BYTE, 0xFF)
                                             end
                                         end}
 }
@@ -123,7 +135,7 @@ end
 
 local function getDefine(defTable)
     if(defTable.customFuncGet)then
-        defTable.customFuncGet()
+        return defTable.customFuncGet()
     else
         return mem(defTable.address, defTable.size)    
     end
