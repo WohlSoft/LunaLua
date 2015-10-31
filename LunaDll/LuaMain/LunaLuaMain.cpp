@@ -981,7 +981,7 @@ void CLunaLua::bindAllDeprecated()
                 def("totalNPC", &LuaProxy::totalNPCs), //DONE
                 def("npcs", &LuaProxy::npcs), //DONE
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
-                def("triggerEvent", &LuaProxy::triggerEvent),
+                def("triggerEvent", &LuaProxy::triggerEvent), //In next version event namespace
                 def("playMusic", &LuaProxy::playMusic), //DONE
                 def("loadHitboxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
