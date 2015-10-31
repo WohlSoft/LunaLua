@@ -144,6 +144,11 @@ enum ExitType : short {
     EXITTYPE_TAPE = 8
 };
 
+enum CollidersType : short {
+    COLLIDERS_NPC = 3,
+    COLLIDERS_PLAYER = 10
+};
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 
@@ -550,6 +555,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg2 = NPCMOB* Killer NPC
 #define GF_NPC_CLEANUP      0x00A315A0
 
+//      Arg1 = short* The NPC Index which gets hit by an object
+//      Arg2 = CollidersType* object type
+//      Arg3 = short* The Object Index
+#define GF_NPC_COLLIDES     0x00A281B0
+
 //      No Args, Does convert every NPC to coins (Like player would win)
 #define GF_NPC_TO_COINS     0x00A3C580
 
@@ -623,6 +633,8 @@ static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerInde
 
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
+
+static const auto native_collideNPC     = (void(__stdcall *)(short* /*npcIndexToCollide*/, CollidersType* /*typeOfObject*/, short* /*objectIndex*/))GF_NPC_COLLIDES;
 
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
 static const auto native_doPow          = (void(__stdcall *)())GF_POW;

@@ -369,12 +369,15 @@ namespace LuaProxy {
         void setDrawOnlyMask(bool drawOnlyMask, lua_State* L);
         bool isInvincibleToSword(lua_State* L) const;
         void setIsInvincibleToSword(bool isInvincibleToSword, lua_State* L);
-        bool legacyBoss(lua_State* L);
+        bool legacyBoss(lua_State* L) const;
         void setLegacyBoss(bool legacyBoss, lua_State *L);
-        bool friendly(lua_State* L);
+        bool friendly(lua_State* L) const;
         void setFriendly(bool friendly, lua_State* L);
-        bool dontMove(lua_State* L);
+        bool dontMove(lua_State* L) const;
         void setDontMove(bool dontMove, lua_State* L);
+        void toIce(lua_State* L);
+        void toCoin(lua_State* L);
+
 
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;

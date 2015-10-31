@@ -6,6 +6,8 @@
 #include "../../Misc/VB6StrPtr.h"
 #include <vector>
 #include "../../Misc/RuntimeHook.h"
+#include "../../SMBXInternal/Reconstructed/Util/NpcToCoins.h"
+
 
 int LuaProxy::NPC::count()
 {
@@ -512,7 +514,7 @@ void LuaProxy::NPC::setIsInvincibleToSword(bool isInvincibleToSword, lua_State *
     ::NPC::Get(m_index)->invincibilityToSword = COMBOOL(isInvincibleToSword);
 }
 
-bool LuaProxy::NPC::legacyBoss(lua_State * L)
+bool LuaProxy::NPC::legacyBoss(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
@@ -526,7 +528,7 @@ void LuaProxy::NPC::setLegacyBoss(bool legacyBoss, lua_State * L)
     ::NPC::Get(m_index)->legacyBoss = COMBOOL(legacyBoss);
 }
 
-bool LuaProxy::NPC::friendly(lua_State * L)
+bool LuaProxy::NPC::friendly(lua_State * L) const 
 {
     if (!isValid_throw(L)) return false;
     
@@ -540,7 +542,7 @@ void LuaProxy::NPC::setFriendly(bool friendly, lua_State * L)
     ::NPC::Get(m_index)->friendly = COMBOOL(friendly);
 }
 
-bool LuaProxy::NPC::dontMove(lua_State * L)
+bool LuaProxy::NPC::dontMove(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
@@ -554,6 +556,27 @@ void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)
     ::NPC::Get(m_index)->dontMove2 = COMBOOL(dontMove);
     ::NPC::Get(m_index)->dontMove = COMBOOL(dontMove);
 }
+
+void LuaProxy::NPC::toIce(lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+    
+    NPCMOB* dummy = ::NPC::GetDummyNPC();
+    dummy->id = 265;
+    short indexCollideWith = 0;
+    short targetIndex = m_index + 1;
+    CollidersType targetType = COLLIDERS_NPC;
+    native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
+}
+
+void LuaProxy::NPC::toCoin(lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    Reconstructed::Util::npcToCoin(::NPC::Get(m_index));
+}
+
+
 
 double LuaProxy::NPC::ai1(lua_State * L) const
 {
