@@ -81,7 +81,7 @@ local defines = {
     smb3RouletteScoreValueMushroom  = {defValue = 6,   minVal = 1, maxVal = 12,  address = 0x00A26719, size = FIELD_DWORD,
                                         n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},
     smb3RouletteScoreValueFlower    = {defValue = 8,   minVal = 1, maxVal = 12,  address = 0x00A2677E, size = FIELD_DWORD,
-                                        n = 4, group = "Game Exit", desc = "The score value of smb3 roulette mushroom"},    
+                                        n = 5, group = "Game Exit", desc = "The score value of smb3 roulette flower"},    
                                         
     --[[ Coin Value Defines ]]--
     coinValue                       = {defValue = 1  , minVal = 0, maxVal = 99 , address = 0x00A262BD, size = FIELD_BYTE,
