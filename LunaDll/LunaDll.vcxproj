@@ -157,6 +157,9 @@
     <ClInclude Include="Misc\RuntimeHookUtils\APIHook.h" />
     <ClInclude Include="Misc\RuntimeHookUtils\CmnHdr.h" />
     <ClInclude Include="Misc\RuntimeHookUtils\Toolhelp.h" />
+    <ClInclude Include="Misc\TypeLib.h" />
+    <ClInclude Include="Misc\VariantHelper.h" />
+    <ClInclude Include="Misc\win32_Unicode.h" />
     <ClInclude Include="Rendering\AsyncGifRecorder.h" />
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
@@ -266,12 +269,16 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp" />
     <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageGifData.cpp" />
     <ClCompile Include="Misc\RuntimeHookUtils\APIHook.cpp" />
+    <ClCompile Include="Misc\TypeLib.cpp" />
+    <ClCompile Include="Misc\VariantHelper.cpp" />
+    <ClCompile Include="Misc\win32_Unicode.cpp" />
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp" />
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />

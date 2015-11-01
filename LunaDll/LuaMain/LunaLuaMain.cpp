@@ -256,6 +256,7 @@ void CLunaLua::setupDefaults()
     _G["inputConfig1"] = LuaProxy::InputConfig(1);
     _G["inputConfig2"] = LuaProxy::InputConfig(2);
     
+    _G["console"] = LuaProxy::Console();
 }
 
 void CLunaLua::bindAll()
@@ -669,7 +670,11 @@ void CLunaLua::bindAll()
             .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
             .def("clear", &LuaProxy::VBStr::clear)
             .def(tostring(self))
-            .def("__concat", &LuaProxy::VBStr::luaConcat)
+            .def("__concat", &LuaProxy::VBStr::luaConcat),
+
+            class_<LuaProxy::Console>("Console")
+            .def("print", &LuaProxy::Console::print)
+            .def("println", &LuaProxy::Console::println)
         ];
     if(m_type == LUNALUA_WORLD){
         module(L)

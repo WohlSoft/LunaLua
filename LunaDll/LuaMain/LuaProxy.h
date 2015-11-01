@@ -183,6 +183,18 @@ namespace LuaProxy {
 
     std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
 
+    class Console {
+    public:
+        Console();
+
+        void print(const std::string& outText);
+        void println(const std::string& outText);
+    private:
+        bool m_isDefaultConsole;
+    };
+
+
+
     class Warp{
     public:
         static int count();
