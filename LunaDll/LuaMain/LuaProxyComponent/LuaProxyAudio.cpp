@@ -113,7 +113,26 @@ std::string LuaProxy::Audio::MusicTitleTag()
 #endif
 }
 
+std::string LuaProxy::Audio::MusicArtistTag()
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_MusicArtistTag();
+#endif
+}
 
+std::string LuaProxy::Audio::MusicAlbumTag()
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_MusicAlbumTag();
+#endif
+}
+
+std::string LuaProxy::Audio::MusicCopyrightTag()
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_MusicCopyrightTag();
+#endif
+}
 
 
 void LuaProxy::Audio::seizeStream(int section)

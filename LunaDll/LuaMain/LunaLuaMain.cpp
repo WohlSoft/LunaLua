@@ -361,6 +361,9 @@ void CLunaLua::bindAll()
                 def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),
                 def("MusicTitle", (std::string(*)())&LuaProxy::Audio::MusicTitle),
                 def("MusicTitleTag", (std::string(*)())&LuaProxy::Audio::MusicTitleTag),
+                def("MusicArtistTag", (std::string(*)())&LuaProxy::Audio::MusicArtistTag),
+                def("MusicAlbumTag", (std::string(*)())&LuaProxy::Audio::MusicAlbumTag),
+                def("MusicCopyrightTag", (std::string(*)())&LuaProxy::Audio::MusicCopyrightTag),
                 //Seize music stream for LUA usage for section 0..20
                 def("SeizeStream", (void(*)(int))&LuaProxy::Audio::seizeStream),
                 //Return music stream access to SMBX engine back for section 0..20

@@ -1,6 +1,7 @@
 v0.7.2.1 BETA:
   * Extended NPC class
   * Added cheat values. Some cheat can now be toggled by value. (Defines.* namespace)
+  * Added Audio.MusicArtistTag(), Audio.MusicAlbumTag() and Audio.MusicCopyrightTag() functions
 
 v0.7.2 BETA:
   * Extended Level class and World class (Overworld)

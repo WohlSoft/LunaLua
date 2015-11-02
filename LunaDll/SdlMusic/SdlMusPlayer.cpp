@@ -131,6 +131,33 @@ std::string PGE_MusPlayer::MUS_MusicTitleTag()
 		return std::string("");
 }
 
+std::string PGE_MusPlayer::MUS_MusicArtistTag()
+{
+    if (!PGE_SDL_Manager::isInit) return "";
+    if (play_mus)
+        return std::string(Mix_GetMusicArtistTag(play_mus));
+    else
+        return std::string("");
+}
+
+std::string PGE_MusPlayer::MUS_MusicAlbumTag()
+{
+    if (!PGE_SDL_Manager::isInit) return "";
+    if (play_mus)
+        return std::string(Mix_GetMusicAlbumTag(play_mus));
+    else
+        return std::string("");
+}
+
+std::string PGE_MusPlayer::MUS_MusicCopyrightTag()
+{
+    if (!PGE_SDL_Manager::isInit) return "";
+    if (play_mus)
+        return std::string(Mix_GetMusicCopyrightTag(play_mus));
+    else
+        return std::string("");
+}
+
 
 void PGE_MusPlayer::MUS_changeVolume(int vlm)
 {

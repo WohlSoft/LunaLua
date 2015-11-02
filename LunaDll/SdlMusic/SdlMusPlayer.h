@@ -30,6 +30,8 @@ public:
 	static void MUS_stopMusicFadeOut(int ms);
 	static std::string MUS_MusicTitle();
 	static std::string MUS_MusicTitleTag();
+    static std::string MUS_MusicArtistTag();
+    static std::string MUS_MusicCopyrightTag();
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);
@@ -42,7 +44,7 @@ public:
     static bool MUS_IsFading();
 
 	static unsigned __int64 sampleCount();
-	static unsigned __int64 MUS_sampleCount();
+    static unsigned __int64 MUS_sampleCount();
 private:
     static Mix_Music *play_mus;
     static int volume;
