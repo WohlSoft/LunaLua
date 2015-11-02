@@ -88,6 +88,9 @@ int OnLvlLoad() {
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
 
+    // WIP
+    // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
+
 #ifndef NO_SDL
 	if(!episodeStarted)
 	{//Load custom sounds

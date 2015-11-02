@@ -504,3 +504,64 @@ void RedirectIOToConsole()
     // point to console as well
     ios::sync_with_stdio();
 }
+
+// WIP 
+#include <atlbase.h>
+#include "Misc/TypeLib.h"
+
+#define COMUTILS_RETURN_IF_FAILED_START HRESULT ___errCodeUse_
+#define COMUTILS_RETURN_IF_FAILED(code, outputter, text) \
+    ___errCodeUse_ = code; \
+    if(FAILED(___errCodeUse_)){ \
+        outputter << L"ERROR: " << text << L" HRESULT = " << std::hex << (int)___errCodeUse_ << std::dec << std::endl; \
+        return; \
+    } 
+
+void dumpTYPEATTR(TYPEATTR* attr, std::wostream& toOutput) {
+    //toOutput << L"GUID: " << std::hex << attr->guid.Data1 << L"-" << attr->guid.Data2 << "-" << attr->guid.Data3 << "-"
+//        << *(long long*)(&attr->guid.Data4) << std::dec << std::endl;
+    toOutput << L"Num of functions: " << attr->cFuncs << std::endl;
+    toOutput << L"Num of vars: " << attr->cVars << std::endl;
+    toOutput << L"Num of implemented interfaces: " << attr->cImplTypes << std::endl;
+    toOutput << L"Version number: " << attr->wMajorVerNum << L"." << attr->wMinorVerNum << std::endl;
+    
+}
+
+void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
+{
+    toOutput << L"Start dumping!" << std::endl;
+    COMUTILS_RETURN_IF_FAILED_START;
+
+    UINT typeLibCount = 0;
+    COMUTILS_RETURN_IF_FAILED(dispatchToDump->GetTypeInfoCount(&typeLibCount), toOutput, L"Failed to get type count");
+
+    toOutput << "Type Library count: " << typeLibCount << std::endl;
+    if (typeLibCount == 0) return;
+
+    ATL::CComPtr<ITypeInfo> typeInfoOfObj = NULL;
+    COMUTILS_RETURN_IF_FAILED(dispatchToDump->GetTypeInfo(NULL, LOCALE_SYSTEM_DEFAULT, &typeInfoOfObj), toOutput, L"Failed to get type info");
+    toOutput << L"DEBUG: Got type info!" << std::endl;
+    toOutput << L"DEBUG: Ptr to ITypeLib: " << std::hex << (int)typeInfoOfObj.p << std::dec << std::endl;
+
+    ATL::CComPtr<ITypeLib> typeLibOfObj = NULL;
+    UINT index = 0;
+    COMUTILS_RETURN_IF_FAILED(typeInfoOfObj->GetContainingTypeLib(&typeLibOfObj, &index), toOutput, L"Failed to get type lib");
+    toOutput << "DEBUG: Got type lib with index " << index << std::endl;
+    
+    /*
+
+    TYPEATTR* descriptor = NULL;
+    COMUTILS_RETURN_IF_FAILED(typeInfoOfObj->GetTypeAttr(&descriptor), toOutput, L"Failed to get descriptor!");
+    toOutput << L"DEBUG: Got descriptor!" << std::endl;
+    toOutput << std::hex << (UINT)descriptor << std::dec << std::endl;
+
+    dumpTYPEATTR(descriptor, toOutput);
+    
+    
+    typeInfoOfObj->ReleaseTypeAttr(descriptor);
+
+    toOutput << L"DEBUG: Released descriptor!" << std::endl;
+
+    */
+
+}

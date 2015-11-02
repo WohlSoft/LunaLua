@@ -31,7 +31,7 @@ void DeathRecord::Load(fstream* openfile) {
 	openfile->read((char*)&length, sizeof(int));	
 
 	// Read string data 
-	for(int i = 0; i < length; i++) {
+	for(int i = 0; i < length && i < sizeof(buf); i++) {
 		buf[i] = openfile->get();
 	}
 	LevelName = wstring((wchar_t*)buf);

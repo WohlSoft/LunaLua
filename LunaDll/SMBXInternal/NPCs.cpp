@@ -10,6 +10,11 @@ NPCMOB* NPC::Get(int index) {
     return &((NPCMOB*)GM_NPCS_PTR)[index + 129]; // +129 makes an offset of 0xAD58
 }
 
+NPCMOB * NPC::GetDummyNPC()
+{
+    return &((NPCMOB*)GM_NPCS_PTR)[128];
+}
+
 // GET FIRST MATCH
 NPCMOB* NPC::GetFirstMatch(int ID, int section) {
 	bool anyID = (ID == -1 ? true : false);

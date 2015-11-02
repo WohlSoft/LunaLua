@@ -465,6 +465,15 @@
     <ClInclude Include="Rendering\Shaders\GLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\VariantHelper.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\win32_Unicode.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\TypeLib.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -827,9 +836,6 @@
     <ClCompile Include="GameConfig\GameAutostart.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
@@ -842,14 +848,8 @@
     <ClCompile Include="Rendering\GLSplitSprite.cpp">
       <Filter>Header Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp">
       <Filter>Header Files\SMBXInternal</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\RenderOverrideManager.cpp">
       <Filter>Header Files\Rendering</Filter>
@@ -877,6 +877,27 @@
     </ClCompile>
     <ClCompile Include="Rendering\Shaders\GLShader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\VariantHelper.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\win32_Unicode.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\TypeLib.cpp">
+      <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -54,5 +54,6 @@ void sendPUTRequest(const std::string& server, const std::string& data);
 
 // Debug stuff
 void RedirectIOToConsole();
+void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 #endif

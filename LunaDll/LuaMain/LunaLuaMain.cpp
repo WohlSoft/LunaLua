@@ -256,6 +256,7 @@ void CLunaLua::setupDefaults()
     _G["inputConfig1"] = LuaProxy::InputConfig(1);
     _G["inputConfig2"] = LuaProxy::InputConfig(2);
     
+    _G["console"] = LuaProxy::Console();
 }
 
 void CLunaLua::bindAll()
@@ -669,7 +670,11 @@ void CLunaLua::bindAll()
             .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
             .def("clear", &LuaProxy::VBStr::clear)
             .def(tostring(self))
-            .def("__concat", &LuaProxy::VBStr::luaConcat)
+            .def("__concat", &LuaProxy::VBStr::luaConcat),
+
+            class_<LuaProxy::Console>("Console")
+            .def("print", &LuaProxy::Console::print)
+            .def("println", &LuaProxy::Console::println)
         ];
     if(m_type == LUNALUA_WORLD){
         module(L)
@@ -849,6 +854,8 @@ void CLunaLua::bindAll()
                 .def("mem", static_cast<luabind::object(LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::NPC::mem))
                 .def("kill", static_cast<void (LuaProxy::NPC::*)(lua_State*)>(&LuaProxy::NPC::kill))
                 .def("kill", static_cast<void (LuaProxy::NPC::*)(int, lua_State*)>(&LuaProxy::NPC::kill))
+                .def("toIce", &LuaProxy::NPC::toIce)
+                .def("toCoin", &LuaProxy::NPC::toCoin)
                 .property("id", &LuaProxy::NPC::id, &LuaProxy::NPC::setId)
                 .property("isHidden", &LuaProxy::NPC::isHidden, &LuaProxy::NPC::setIsHidden)
                 .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
@@ -979,7 +986,7 @@ void CLunaLua::bindAllDeprecated()
                 def("totalNPC", &LuaProxy::totalNPCs), //DONE
                 def("npcs", &LuaProxy::npcs), //DONE
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
-                def("triggerEvent", &LuaProxy::triggerEvent),
+                def("triggerEvent", &LuaProxy::triggerEvent), //In next version event namespace
                 def("playMusic", &LuaProxy::playMusic), //DONE
                 def("loadHitboxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
