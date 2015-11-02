@@ -323,6 +323,20 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 	return true;
 }
 
+bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
+{
+    ifstream theFile(path, ios::binary | ios::in);
+    if (!theFile.is_open()) {
+        theFile.close();
+        if (!errMsg.empty())
+            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+        return false;
+    }
+
+    content = std::string((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+    return true;
+}
+
 bool isAbsolutePath(const std::wstring& path)
 {
 	return std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';

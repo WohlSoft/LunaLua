@@ -66,6 +66,8 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
+	// Load Post-Processing Shader somewhere here
+
 	static bool runOnce = true;
     if (!g_GLContextManager.Init(hdcDest)) {
         dbgboxA("Failed to init...");

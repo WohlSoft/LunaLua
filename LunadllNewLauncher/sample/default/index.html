@@ -1,0 +1,47 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Super Mario Bros. X</title>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+		<link rel="stylesheet" href="default.css" />
+		<script type="text/javascript">
+			function runEpisode() {
+				/* Generated */
+				Launcher.Autostart.useAutostart = true
+				Launcher.Autostart.episodeName = "1: analog funk"
+				Launcher.Autostart.singleplayer = true
+				Launcher.Autostart.character1 = 1 //DEMO
+				Launcher.Autostart.character2 = 2 //IRIS
+				Launcher.Autostart.saveSlot = 1
+
+				Launcher.runSMBX();
+			}
+			window.onload = function () {
+				document.getElementById("playButton").onClick = runEpisode();
+				document.getElementById("playButton").onClick = Launcher.runSMBXEditor();
+				document.getElementById("newEditorButton").onClick = Launcher.runPGE(); /* This will assume a PGE editor in PGE/pge_editor.exe */
+			}
+		</script>
+	</head>
+	<body>
+		<div id="header"><img src="header.png" alt="SMBX Header" /></div>
+		<div class="bodycontent">
+			<h1>World Name Field</h1>
+			<h3>Number of Stars: <span>Number of Stars Field</span></h3>
+			<p><strong>Credits:</strong></p>
+			<ul>
+				<li>Credit Field 1</li>
+				<li>Credit Field 2</li>
+				<li>Credit Field 3</li>
+				<li>Credit Field 4</li>
+				<li>Credit Field 5</li>
+			</ul>
+			<p><strong>Useable Characters:</strong> <span>Useable Characters Listed Here</span></p>
+			<div id="buttonContainer">
+				<input class="buttons" type="button" value="Play Episode" id="playButton" />
+				<input class="buttons" type="button" value="Launch Classic Editor" id="classicEditorButton" />
+				<input class="buttons" type="button" value="Launch PGE Editor" id="newEditorButton" />
+			</div>
+		</div>
+	</body>
+</html>

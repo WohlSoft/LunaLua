@@ -162,6 +162,8 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 
 void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity)
 {
+    // Bind Post-Processing Shader here
+
     // Generate our floating point coordinates
     float texw = (float)tex->pw;
     float texh = (float)tex->ph;
@@ -181,6 +183,9 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     GLERRORCHECK();
 
     BindTexture(tex);
+    GLERRORCHECK();
+    
+    // Set Post-Processing uniforms/attributes here
 
     GLfloat Vertices[] = {
         x1, y1, 0,
@@ -211,6 +216,7 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
     GLERRORCHECK();
+    // Unbind Post-Processing Shader here
 }
 
 
