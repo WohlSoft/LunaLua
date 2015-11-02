@@ -21,6 +21,9 @@ Mix_GetMusicDecoder
 Mix_GetMusicHookData
 Mix_GetMusicTitle
 Mix_GetMusicTitleTag
+Mix_GetMusicArtistTag
+Mix_GetMusicAlbumTag
+Mix_GetMusicCopyrightTag
 Mix_GetMusicType
 Mix_GetNumChunkDecoders
 Mix_GetNumMusicDecoders
