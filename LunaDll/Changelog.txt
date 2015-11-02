@@ -2,6 +2,8 @@ v0.7.2.1 BETA:
   * Extended NPC class
   * Added cheat values. Some cheat can now be toggled by value. (Defines.* namespace)
   * Added Audio.MusicArtistTag(), Audio.MusicAlbumTag() and Audio.MusicCopyrightTag() functions
+  * Added console class. You can now use the windows console for debugging. (See LunaLua command arguments at the wiki)
+  * Hotfix Bugfix [LunaLua]: Fixed ROP exploit at the Autocode module.
 
 v0.7.2 BETA:
   * Extended Level class and World class (Overworld)
