@@ -31,6 +31,7 @@ public:
 	static std::string MUS_MusicTitle();
 	static std::string MUS_MusicTitleTag();
     static std::string MUS_MusicArtistTag();
+	static std::string MUS_MusicAlbumTag();
     static std::string MUS_MusicCopyrightTag();
 
     static void MUS_changeVolume(int vlm);
