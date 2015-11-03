@@ -188,7 +188,7 @@ bool TypeLib::NextFunction() {
 }
 
 bool TypeLib::HasFunctionTypeFlag(TYPEFLAG tf) {
-  return curImplTypeFlags_ & static_cast<int>(tf);
+  return ((curImplTypeFlags_&static_cast<int>(tf))!=0);
 }
 
 std::string TypeLib::ConstValue() {
@@ -338,7 +338,7 @@ bool TypeLib::ParameterHasCustumData() {
 }
 bool TypeLib::ParameterIsHasX(int flag) {
   ELEMDESC e = curFuncDesc_->lprgelemdescParam[curFuncParam_];
-  return e.paramdesc.wParamFlags & flag;
+  return ((e.paramdesc.wParamFlags & flag)!=0);
 }
 
 void TypeLib::ReleaseFuncNames() {
