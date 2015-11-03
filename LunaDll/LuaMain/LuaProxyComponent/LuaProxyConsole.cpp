@@ -1,6 +1,7 @@
 #include "../LuaProxy.h"
 
 #include <iostream>
+#include <stdio.h>
 LuaProxy::Console::Console() :
     m_isDefaultConsole(true)
 {}
