@@ -22,6 +22,8 @@ Quick Overview
 
 Requirements to build LunaDLL yourself
 ------
-Visual Studio 2015 (msvc140)
+Visual Studio 2013 (msvc120)
+or
+Visual Studio 2015 but with msvc120
 
 
