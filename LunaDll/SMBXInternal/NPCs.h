@@ -369,7 +369,7 @@ struct NPCMOB {
     short unknown_14;                       //+0x14
     short unknown_16;                       //+0x16
     float unknown_18;                       //+0x18 NPC x-axis movement related, maybe temporary?
-    short unknown_1C;                       //+0x1C
+    short isUnderwater;                     //+0x1C
     short unknown_1E;                       //+0x1E
     short unknown_20;                       //+0x20
     short unknown_22;                       //+0x22

@@ -390,6 +390,17 @@ namespace LuaProxy {
         void toIce(lua_State* L);
         void toCoin(lua_State* L);
 
+        bool collidesBlockBottom(lua_State* L) const;
+        void setCollidesBlockBottom(bool collidesBlockBottom, lua_State* L);
+        bool collidesBlockLeft(lua_State* L) const;
+        void setCollidesBlockLeft(bool collidesBlockLeft, lua_State* L);
+        bool collidesBlockUp(lua_State* L) const;
+        void setCollidesBlockUp(bool collidesBlockUp, lua_State* L);
+        bool collidesBlockRight(lua_State* L) const;
+        void setCollidesBlockRight(bool collidesBlockRight, lua_State* L);
+        bool isUnderwater(lua_State* L) const;
+        void setIsUnderwater(bool isUnderwater, lua_State* L);
+
 
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;

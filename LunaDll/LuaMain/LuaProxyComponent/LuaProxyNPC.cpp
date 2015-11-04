@@ -576,6 +576,77 @@ void LuaProxy::NPC::toCoin(lua_State * L)
     Reconstructed::Util::npcToCoin(::NPC::Get(m_index));
 }
 
+bool LuaProxy::NPC::collidesBlockBottom(lua_State * L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return ::NPC::Get(m_index)->collidesBelow == 2;
+}
+
+
+void LuaProxy::NPC::setCollidesBlockBottom(bool collidesBlockBottom, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->collidesBelow = (collidesBlockBottom ? 2 : 0);
+}
+
+bool LuaProxy::NPC::collidesBlockLeft(lua_State* L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return ::NPC::Get(m_index)->collidesLeft == 2;
+}
+
+void LuaProxy::NPC::setCollidesBlockLeft(bool collidesBlockLeft, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->collidesLeft = (collidesBlockLeft ? 2 : 0);
+}
+
+bool LuaProxy::NPC::collidesBlockUp(lua_State* L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return ::NPC::Get(m_index)->collidesAbove == 2;
+}
+
+void LuaProxy::NPC::setCollidesBlockUp(bool collidesBlockUp, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->collidesAbove = (collidesBlockUp ? 2 : 0);
+}
+
+bool LuaProxy::NPC::collidesBlockRight(lua_State* L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return ::NPC::Get(m_index)->collidesRight == 2;
+}
+
+void LuaProxy::NPC::setCollidesBlockRight(bool collidesBlockRight, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->collidesRight = (collidesBlockRight ? 2 : 0);
+}
+
+bool LuaProxy::NPC::isUnderwater(lua_State* L) const
+{
+    if (!isValid_throw(L)) return false;
+
+    return ::NPC::Get(m_index)->isUnderwater == 2;
+}
+
+void LuaProxy::NPC::setIsUnderwater(bool isUnderwater, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->isUnderwater = (isUnderwater ? 2 : 0);
+}
+
 
 
 double LuaProxy::NPC::ai1(lua_State * L) const

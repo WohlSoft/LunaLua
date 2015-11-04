@@ -887,6 +887,11 @@ void CLunaLua::bindAll()
                 .property("legacyBoss", &LuaProxy::NPC::legacyBoss, &LuaProxy::NPC::setLegacyBoss)
                 .property("friendly", &LuaProxy::NPC::friendly, &LuaProxy::NPC::setFriendly)
                 .property("dontMove", &LuaProxy::NPC::dontMove, &LuaProxy::NPC::setDontMove)
+                .property("collidesBlockBottom", &LuaProxy::NPC::collidesBlockBottom, &LuaProxy::NPC::setCollidesBlockBottom)
+                .property("collidesBlockLeft", &LuaProxy::NPC::collidesBlockLeft, &LuaProxy::NPC::setCollidesBlockLeft)
+                .property("collidesBlockUp", &LuaProxy::NPC::collidesBlockUp, &LuaProxy::NPC::setCollidesBlockUp)
+                .property("collidesBlockRight", &LuaProxy::NPC::collidesBlockRight, &LuaProxy::NPC::setCollidesBlockRight)
+                .property("underwater", &LuaProxy::NPC::isUnderwater, &LuaProxy::NPC::setIsUnderwater)
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
