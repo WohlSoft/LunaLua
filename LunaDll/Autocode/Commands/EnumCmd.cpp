@@ -3,7 +3,6 @@
 //#include "Globals.h"
 
 // Commander reader function
-#include <iostream>
 
 AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 	if(wbuf) {
