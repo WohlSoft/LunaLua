@@ -176,10 +176,11 @@ void AutocodeManager::Parse(wifstream* code_file, bool add_to_globals) {
 			ac_type = Autocode::EnumerizeCommand(wbuf);
 
 			// Decimal pass
-			int hits = swscanf_s(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
-            
+			int hits = swscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
+
 			// Integer pass
-			int bhits = swscanf_s(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
+			int bhits = swscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
+
 
 			/*if(PARSEDEBUG) {
 			gLogger.Log(L"Parsed on decimal pass " + wstring(wbuf) + L" \\ ", LOG_STD);

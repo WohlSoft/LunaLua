@@ -3,12 +3,13 @@
 //#include "Globals.h"
 
 // Commander reader function
+#include <iostream>
 
 AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 	if(wbuf) {
 		wchar_t command[100];
 		ZeroMemory(command, 100 * sizeof(wchar_t));
-		int success = swscanf(wbuf, L" %99s[^,] ,", &command);
+		int success = swscanf(wbuf, L" %99[^,] ,", &command);
 		if(!success) {
 			// Bad or mistyped command?
 			wstring line = wstring(wbuf);

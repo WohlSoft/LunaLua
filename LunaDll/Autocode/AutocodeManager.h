@@ -10,8 +10,8 @@
 #define AUTOCODE_FNAME L"lunadll.txt"
 #define WORLDCODE_FNAME L"lunaworld.txt"
 #define GLOBALCODE_FNAME L"lunaglobal.txt"
-#define PARSE_FMT_STR L" %149s[^,], %lf , %lf , %lf , %lf , %lf , %999[^\n]"
-#define PARSE_FMT_STR_2 L" %149s[^,], %i , %i , %i , %i , %i , %999[^\n]"
+#define PARSE_FMT_STR L" %149[^,], %lf , %lf , %lf , %lf , %lf , %999[^\n]"
+#define PARSE_FMT_STR_2 L" %149[^,], %i , %i , %i , %i , %i , %999[^\n]"
 //						 Cmd	Trg   P1    P2    P3    Len   String
 
 struct AutocodeManager {
