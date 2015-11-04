@@ -649,6 +649,35 @@ void LuaProxy::NPC::setIsUnderwater(bool isUnderwater, lua_State* L)
 
 
 
+short LuaProxy::NPC::animationFrame(lua_State* L) const
+{
+    if (!isValid_throw(L)) return 0;
+
+    return ::NPC::Get(m_index)->animationFrame;
+}
+
+void LuaProxy::NPC::setAnimationFrame(short animationFrame, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->animationFrame = animationFrame;
+}
+
+float LuaProxy::NPC::animationTimer(lua_State* L) const
+{
+    if (!isValid_throw(L)) return 0.0f;
+
+    return ::NPC::Get(m_index)->animationTimer;
+}
+
+void LuaProxy::NPC::setAnimationTimer(float animationTimer, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->animationTimer = animationTimer;
+}
+
+
 double LuaProxy::NPC::ai1(lua_State * L) const
 {
     if (!isValid_throw(L)) return 0.0;
