@@ -13,7 +13,7 @@ int LuaProxy::Block::count()
 
 luabind::object LuaProxy::Block::get(lua_State* L)
 {
-    return LuaHelper::getObjList(::Block::Count(), [](unsigned short i){ return LuaProxy::Block(i); }, L);
+    return LuaHelper::getObjList(::Block::Count(), [](unsigned short i){ return LuaProxy::Block(i + 1); }, L);
 }
 
 luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
@@ -37,9 +37,9 @@ luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
 
     return LuaHelper::getObjList(
         ::Block::Count(),
-        [](unsigned short i){ return LuaProxy::Block(i); },
+        [](unsigned short i){ return LuaProxy::Block(i + 1); },
         [&lookupTableBlockID](unsigned short i){
-        ::Block *block = ::Block::Get(i);
+        ::Block *block = ::Block::Get(i + 1);
         return (block != NULL) &&
             (block->BlockType <= ::Block::MAX_ID) && lookupTableBlockID.get()[block->BlockType];
     }, L);
@@ -49,9 +49,9 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
 {
     return LuaHelper::getObjList(
         ::Block::Count(),
-        [](unsigned short i){ return LuaProxy::Block(i); },
+        [](unsigned short i){ return LuaProxy::Block(i + 1); },
         [x1, y1, x2, y2](unsigned short i){
-            ::Block *block = ::Block::Get(i);
+            ::Block *block = ::Block::Get(i + 1);
             if (block == NULL) return false;
             if (x2 <= block->mometum.x) return false;
             if (y2 <= block->mometum.y) return false;
@@ -73,7 +73,7 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
         return LuaProxy::Block(-1);
     }
 
-    LuaProxy::Block theNewBlock(GM_BLOCK_COUNT++);
+    LuaProxy::Block theNewBlock(++GM_BLOCK_COUNT);
     ::Block* nativeAddr = theNewBlock.getBlockPtr();
     memset((void*)nativeAddr, 0, sizeof(::Block));
 

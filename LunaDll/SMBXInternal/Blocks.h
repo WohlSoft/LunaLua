@@ -44,7 +44,7 @@ struct Block {
 
     // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
     static inline ::Block* Get(unsigned short index) {
-        if (index >= GM_BLOCK_COUNT) return NULL;
+        if (index > GM_BLOCK_COUNT) return NULL;
         return &((Block*)GM_BLOCKS_PTR)[index];
     }
 
