@@ -61,6 +61,36 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
         }, L);
 }
 
+LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
+{
+    if (blockid < 1 || blockid > 638) {
+        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-638\nGot Block-ID: %d", blockid);
+        return LuaProxy::Block(-1);
+    }
+
+    if (GM_BLOCK_COUNT >= 16384) {
+        luaL_error(L, "Over 16384 Blocks, cannot spawn more!");
+        return LuaProxy::Block(-1);
+    }
+
+    LuaProxy::Block theNewBlock(GM_BLOCK_COUNT++);
+    ::Block* nativeAddr = theNewBlock.getBlockPtr();
+    memset((void*)nativeAddr, 0, sizeof(::Block));
+
+    nativeAddr->BlockType = blockid;
+    nativeAddr->BlockType2 = blockid;
+    nativeAddr->mometum.x = x;
+    nativeAddr->mometum.y = y;
+    nativeAddr->mometum.width = 32;
+    nativeAddr->mometum.height = 32;
+    nativeAddr->IsInvisible2 = COMBOOL(false);
+    nativeAddr->IsInvisible3 = COMBOOL(false);
+    nativeAddr->pLayerName = "Default";
+
+    return theNewBlock;
+}
+
+
 
 LuaProxy::Block::Block(int index) : m_index(index)
 {}
@@ -312,8 +342,14 @@ void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player, int hittingC
 }
 
 
+::Block* LuaProxy::Block::getBlockPtr()
+{
+    return ::Block::GetRaw(m_index);
+}
+
 
 bool LuaProxy::Block::isValid() const
 {
 	return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
 }
+

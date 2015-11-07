@@ -48,6 +48,10 @@ struct Block {
         return &((Block*)GM_BLOCKS_PTR)[index];
     }
 
+    static inline ::Block* GetRaw(unsigned short index) {
+        return &((Block*)GM_BLOCKS_PTR)[index];
+    }
+
     static inline unsigned short Count() {
         return GM_BLOCK_COUNT;
     }

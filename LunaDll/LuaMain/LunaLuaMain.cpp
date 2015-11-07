@@ -652,8 +652,8 @@ void CLunaLua::bindAll()
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
             .property("x", &LuaProxy::Camera::x)
             .property("y", &LuaProxy::Camera::y)
-            .property("width", &LuaProxy::Animation::width)
-            .property("height", &LuaProxy::Animation::height),
+            .property("width", &LuaProxy::Camera::width)
+            .property("height", &LuaProxy::Camera::height),
 
 
             def("newRECT", &LuaProxy::newRECT),
@@ -902,7 +902,9 @@ void CLunaLua::bindAll()
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
                         def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get),
-                        def("getIntersecting", &LuaProxy::Block::getIntersecting)
+                        def("getIntersecting", &LuaProxy::Block::getIntersecting),
+                        def("spawn", &LuaProxy::Block::spawn)
+
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Block, m_index))
                 .def(constructor<int>())
