@@ -61,6 +61,7 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
         }, L);
 }
 
+
 LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
 {
     if (blockid < 1 || blockid > 638) {
@@ -73,9 +74,13 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
         return LuaProxy::Block(-1);
     }
 
+    Blocks::SetNextFrameSorting(); // Be sure that the blocks are sorted
+
     LuaProxy::Block theNewBlock(++GM_BLOCK_COUNT);
     ::Block* nativeAddr = theNewBlock.getBlockPtr();
+    
     memset((void*)nativeAddr, 0, sizeof(::Block));
+
 
     nativeAddr->BlockType = blockid;
     nativeAddr->BlockType2 = blockid;
@@ -86,10 +91,14 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
     nativeAddr->IsInvisible2 = COMBOOL(false);
     nativeAddr->IsInvisible3 = COMBOOL(false);
     nativeAddr->pLayerName = "Default";
+    nativeAddr->pHitEventName = "";
+    nativeAddr->pDestroyEventName = "";
+    nativeAddr->pNoMoreObjInLayerEventName = "";
 
     return theNewBlock;
 }
 
+#pragma optimize( "", on ) 
 
 
 LuaProxy::Block::Block(int index) : m_index(index)

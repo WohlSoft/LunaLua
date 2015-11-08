@@ -78,6 +78,10 @@ namespace Blocks {
 	void HideAll(int type);				// Hide all blocks of type
 
 	bool IsPlayerTouchingType(int BlockType, int sought_collision, PlayerMOB* pMobPOS); // See if player touching block of BlockType
+
+    //Sorting releated
+    void DoSortingIfRequired(); // Will the block array sort if needed.
+    void SetNextFrameSorting(); // This will activate the flag for making sorting available through "DoSortingIfRequired"
 }
 
 
