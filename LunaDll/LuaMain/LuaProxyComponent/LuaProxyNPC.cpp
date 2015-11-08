@@ -677,6 +677,22 @@ void LuaProxy::NPC::setAnimationTimer(float animationTimer, lua_State* L)
     ::NPC::Get(m_index)->animationTimer = animationTimer;
 }
 
+short LuaProxy::NPC::killFlag(lua_State* L) const
+{
+    if (!isValid_throw(L)) return 0;
+
+    return ::NPC::Get(m_index)->killFlag;
+}
+
+void LuaProxy::NPC::setKillFlag(short killFlag, lua_State* L)
+{
+    if (!isValid_throw(L)) return;
+
+    ::NPC::Get(m_index)->killFlag = killFlag;
+}
+
+
+
 
 double LuaProxy::NPC::ai1(lua_State * L) const
 {

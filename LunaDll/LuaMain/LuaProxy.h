@@ -401,11 +401,12 @@ namespace LuaProxy {
         void setCollidesBlockRight(bool collidesBlockRight, lua_State* L);
         bool isUnderwater(lua_State* L) const;
         void setIsUnderwater(bool isUnderwater, lua_State* L);
-
         short animationFrame(lua_State* L) const;
         void setAnimationFrame(short animationFrame, lua_State* L);
         float animationTimer(lua_State* L) const;
         void setAnimationTimer(float animationTimer, lua_State* L);
+        short killFlag(lua_State* L) const;
+        void setKillFlag(short killFlag, lua_State* L);
 
 
         bool isValid() const;

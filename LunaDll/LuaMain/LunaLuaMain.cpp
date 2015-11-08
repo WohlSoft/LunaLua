@@ -894,6 +894,7 @@ void CLunaLua::bindAll()
                 .property("underwater", &LuaProxy::NPC::isUnderwater, &LuaProxy::NPC::setIsUnderwater)
                 .property("animationFrame", &LuaProxy::NPC::animationFrame, &LuaProxy::NPC::setAnimationFrame)
                 .property("animationTimer", &LuaProxy::NPC::animationTimer, &LuaProxy::NPC::setAnimationTimer)
+                .property("killFlag", &LuaProxy::NPC::killFlag, &LuaProxy::NPC::setKillFlag)
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 

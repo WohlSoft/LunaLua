@@ -250,6 +250,11 @@ void TrySkipPatch()
 
     PATCH_FUNC(0x9090F5, &WorldRender);
 
+    PATCH_FUNC(0x9204E5, &NPCKillHook);
+    PATCH_FUNC(0x9B4E35, &NPCKillHook);
+    PATCH_FUNC(0xA0664E, &NPCKillHook);
+    PATCH_FUNC(0xA23278, &NPCKillHook);
+
     PATCH_FUNC(0xAA4352, &__vbaStrCmp_TriggerSMBXEventHook);
     *(BYTE*)(0xAA4357) = INSTR_NOP;
 

@@ -591,6 +591,20 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg1 = short* Some sort of type (mostly the value 1)
 #define GF_MSGBOX           0x008E54C0
 
+//      Arg1 = short* startIndex
+//      Arg2 = short* endIndex
+#define GF_BLOCKSORT_Y      0x00A985A0
+
+//      Arg1 = short* startIndex
+//      Arg2 = short* endIndex
+#define GF_BLOCKSORT_X      0x00A988E0
+
+//      No Args
+#define GF_BLOCKSORT_FIN1   0x00A98FE0
+
+//      No Args
+#define GF_BLOCKSORT_FIN2   0x00A99870
+
 //      Arg1 = VB6StrPtr* layerName
 //      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_SHOW_LAYER       0x00AA2760
@@ -634,6 +648,8 @@ static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerInde
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
 
+static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short* /**/))GF_NPC_CLEANUP;
+
 static const auto native_collideNPC     = (void(__stdcall *)(short* /*npcIndexToCollide*/, CollidersType* /*typeOfObject*/, short* /*objectIndex*/))GF_NPC_COLLIDES;
 
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
@@ -646,6 +662,11 @@ static const auto native_runEffect      = (void(__stdcall *)(short* /*EffectID*/
 static const auto native_addScoreEffect = (void(__stdcall *)(short* /*baseValue*/, Momentum* /*coor*/, short* /*factor*/))GF_SCORE_RELEATED;
 
 static const auto native_msgbox         = (void(__stdcall *)(short* /*unkVal*/))GF_MSGBOX;
+
+static const auto native_sortY          = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BLOCKSORT_Y;
+static const auto native_sortX          = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BLOCKSORT_X;
+static const auto native_sort_finalize1 = (void(__stdcall *)())GF_BLOCKSORT_FIN1;
+static const auto native_sort_finalize2 = (void(__stdcall *)())GF_BLOCKSORT_FIN2;
 
 static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/))GF_TRIGGER_EVENT;
 
