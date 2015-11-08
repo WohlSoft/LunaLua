@@ -466,6 +466,12 @@ DEFMEM(npcdef_nofireball,       short*, 0x00B2B210);
 DEFMEM(npcdef_noiceball,        short*, 0x00B2B46A);
 DEFMEM(npcdef_nogravity,        short*, 0x00B2B6C4);
 
+
+DEFMEM(blockdef_isResizeableBlock, short*, 0x00B2B930);
+DEFMEM(blockdef_width, short*, 0x00B2B9F8);
+DEFMEM(blockdef_height, short*, 0x00B2BA14);
+
+
 // Frame timing related references
 DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
 DEFMEM(GM_CURRENT_TIME,    double, 0x00B2D738);

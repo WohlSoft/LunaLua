@@ -61,7 +61,6 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
         }, L);
 }
 
-
 LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
 {
     if (blockid < 1 || blockid > 638) {
@@ -86,8 +85,8 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
     nativeAddr->BlockType2 = blockid;
     nativeAddr->mometum.x = x;
     nativeAddr->mometum.y = y;
-    nativeAddr->mometum.width = 32;
-    nativeAddr->mometum.height = 32;
+    nativeAddr->mometum.width = blockdef_width[blockid];
+    nativeAddr->mometum.height = blockdef_height[blockid];
     nativeAddr->IsInvisible2 = COMBOOL(false);
     nativeAddr->IsInvisible3 = COMBOOL(false);
     nativeAddr->pLayerName = "Default";
@@ -98,7 +97,6 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
     return theNewBlock;
 }
 
-#pragma optimize( "", on ) 
 
 
 LuaProxy::Block::Block(int index) : m_index(index)
