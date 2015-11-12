@@ -459,7 +459,6 @@ detourEventQueue = {
 }
 
 
-
 --Event Manager
 eventManager = setmetatable({ --Normal table
     
@@ -580,3 +579,43 @@ eventManager = setmetatable({ --Normal table
         end
     end
 });
+
+
+
+--[[ Main Event Manager ]]
+EventManager = {}
+EventManager.userListeners = {}
+EventManager.apiListeners = {}
+
+EventManager.queuedEvents = {}
+
+-- ===================== Event Calling =============================
+-- This will call a new event
+function EventManager.manageEventObj(eventObj, ...)
+	
+end
+
+function EventManager.doQueue()
+	
+end
+
+-- ================== Event Distribution ===========================
+-- This will add a new listener object.
+-- table listenerObject (A code file)
+function EventManager.addUserListener(listenerObject)
+	table.insert(EventManager.userListeners, listenerObject)
+end
+
+-- This will add proxy objects for Events
+function EventManager.getProxyEnvironment()
+	return {
+		"NPC" = setmetatable({},{__index = _G["NPC"]})
+	}
+end
+
+-- usage for luabind, always do with event-object
+function __CallEvent(...)
+	EventManager.manageEventObj(...)
+end
+
+
