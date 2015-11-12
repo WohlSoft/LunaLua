@@ -899,6 +899,9 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp">
+      <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

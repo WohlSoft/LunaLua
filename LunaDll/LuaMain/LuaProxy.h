@@ -11,6 +11,7 @@
 #include "LuaHelper.h"
 #include "../Defines.h"
 #include <type_traits>
+#include <stdio.h>
 
 #include "../SMBXInternal/Blocks.h"
 
@@ -979,6 +980,17 @@ namespace LuaProxy {
 
         unsigned short m_index;
     };
+
+    class Logger {
+    public:
+        Logger(std::string filename);
+        Logger(const Logger &lg) = default;
+        ~Logger();
+        void write(const char*line);
+        std::string filePath;
+        FILE* file;
+    };
+
 
     //undocumented
     namespace Native{

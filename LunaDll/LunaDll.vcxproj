@@ -270,6 +270,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp" />
     <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
