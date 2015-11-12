@@ -433,6 +433,11 @@ void CLunaLua::bindAll()
             .property("loopable", &Event::getLoopable, &Event::setLoopable)
             .property("directEventName", &Event::getDirectEventName, &Event::setDirectEventName),
 
+			class_<Logger>("Logger")
+			.def(constructor<>())
+			.def(constructor<std::string>())
+			.def("write", &LuaProxy::Logger::write),
+
             class_<LuaProxy::Data>("Data")
                 .enum_("DataTypes")
                 [
