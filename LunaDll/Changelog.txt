@@ -1,3 +1,10 @@
+v0.7.2.2 BETA:
+  * Extended NPC class
+  * Bugfix [LunaLua]: Fixed Camera.width and Camera.height
+  * Bugfix [LunaLua]: Fixed the bug, where the functions Blocks.get and Blocks.getInterseting don't includes the last block.
+  * Added onNPCKill event
+  * Block can now be spawned with Block.spawn(...)
+
 v0.7.2.1 BETA:
   * Extended NPC class
   * Added cheat values. Some cheat can now be toggled by value. (Defines.* namespace)

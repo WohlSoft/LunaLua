@@ -657,8 +657,8 @@ void CLunaLua::bindAll()
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
             .property("x", &LuaProxy::Camera::x)
             .property("y", &LuaProxy::Camera::y)
-            .property("width", &LuaProxy::Animation::width)
-            .property("height", &LuaProxy::Animation::height),
+            .property("width", &LuaProxy::Camera::width)
+            .property("height", &LuaProxy::Camera::height),
 
 
             def("newRECT", &LuaProxy::newRECT),
@@ -892,6 +892,14 @@ void CLunaLua::bindAll()
                 .property("legacyBoss", &LuaProxy::NPC::legacyBoss, &LuaProxy::NPC::setLegacyBoss)
                 .property("friendly", &LuaProxy::NPC::friendly, &LuaProxy::NPC::setFriendly)
                 .property("dontMove", &LuaProxy::NPC::dontMove, &LuaProxy::NPC::setDontMove)
+                .property("collidesBlockBottom", &LuaProxy::NPC::collidesBlockBottom, &LuaProxy::NPC::setCollidesBlockBottom)
+                .property("collidesBlockLeft", &LuaProxy::NPC::collidesBlockLeft, &LuaProxy::NPC::setCollidesBlockLeft)
+                .property("collidesBlockUp", &LuaProxy::NPC::collidesBlockUp, &LuaProxy::NPC::setCollidesBlockUp)
+                .property("collidesBlockRight", &LuaProxy::NPC::collidesBlockRight, &LuaProxy::NPC::setCollidesBlockRight)
+                .property("underwater", &LuaProxy::NPC::isUnderwater, &LuaProxy::NPC::setIsUnderwater)
+                .property("animationFrame", &LuaProxy::NPC::animationFrame, &LuaProxy::NPC::setAnimationFrame)
+                .property("animationTimer", &LuaProxy::NPC::animationTimer, &LuaProxy::NPC::setAnimationTimer)
+                .property("killFlag", &LuaProxy::NPC::killFlag, &LuaProxy::NPC::setKillFlag)
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
@@ -900,7 +908,9 @@ void CLunaLua::bindAll()
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
                         def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get),
-                        def("getIntersecting", &LuaProxy::Block::getIntersecting)
+                        def("getIntersecting", &LuaProxy::Block::getIntersecting),
+                        def("spawn", &LuaProxy::Block::spawn)
+
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Block, m_index))
                 .def(constructor<int>())

@@ -13,7 +13,7 @@ int LuaProxy::Block::count()
 
 luabind::object LuaProxy::Block::get(lua_State* L)
 {
-    return LuaHelper::getObjList(::Block::Count(), [](unsigned short i){ return LuaProxy::Block(i); }, L);
+    return LuaHelper::getObjList(::Block::Count(), [](unsigned short i){ return LuaProxy::Block(i + 1); }, L);
 }
 
 luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
@@ -37,9 +37,9 @@ luabind::object LuaProxy::Block::get(luabind::object idFilter, lua_State* L)
 
     return LuaHelper::getObjList(
         ::Block::Count(),
-        [](unsigned short i){ return LuaProxy::Block(i); },
+        [](unsigned short i){ return LuaProxy::Block(i + 1); },
         [&lookupTableBlockID](unsigned short i){
-        ::Block *block = ::Block::Get(i);
+        ::Block *block = ::Block::Get(i + 1);
         return (block != NULL) &&
             (block->BlockType <= ::Block::MAX_ID) && lookupTableBlockID.get()[block->BlockType];
     }, L);
@@ -49,9 +49,9 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
 {
     return LuaHelper::getObjList(
         ::Block::Count(),
-        [](unsigned short i){ return LuaProxy::Block(i); },
+        [](unsigned short i){ return LuaProxy::Block(i + 1); },
         [x1, y1, x2, y2](unsigned short i){
-            ::Block *block = ::Block::Get(i);
+            ::Block *block = ::Block::Get(i + 1);
             if (block == NULL) return false;
             if (x2 <= block->mometum.x) return false;
             if (y2 <= block->mometum.y) return false;
@@ -60,6 +60,43 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
             return true;
         }, L);
 }
+
+LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
+{
+    if (blockid < 1 || blockid > 638) {
+        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-638\nGot Block-ID: %d", blockid);
+        return LuaProxy::Block(-1);
+    }
+
+    if (GM_BLOCK_COUNT >= 16384) {
+        luaL_error(L, "Over 16384 Blocks, cannot spawn more!");
+        return LuaProxy::Block(-1);
+    }
+
+    Blocks::SetNextFrameSorting(); // Be sure that the blocks are sorted
+
+    LuaProxy::Block theNewBlock(++GM_BLOCK_COUNT);
+    ::Block* nativeAddr = theNewBlock.getBlockPtr();
+    
+    memset((void*)nativeAddr, 0, sizeof(::Block));
+
+
+    nativeAddr->BlockType = blockid;
+    nativeAddr->BlockType2 = blockid;
+    nativeAddr->mometum.x = x;
+    nativeAddr->mometum.y = y;
+    nativeAddr->mometum.width = blockdef_width[blockid];
+    nativeAddr->mometum.height = blockdef_height[blockid];
+    nativeAddr->IsInvisible2 = COMBOOL(false);
+    nativeAddr->IsInvisible3 = COMBOOL(false);
+    nativeAddr->pLayerName = "Default";
+    nativeAddr->pHitEventName = "";
+    nativeAddr->pDestroyEventName = "";
+    nativeAddr->pNoMoreObjInLayerEventName = "";
+
+    return theNewBlock;
+}
+
 
 
 LuaProxy::Block::Block(int index) : m_index(index)
@@ -312,8 +349,14 @@ void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player, int hittingC
 }
 
 
+::Block* LuaProxy::Block::getBlockPtr()
+{
+    return ::Block::GetRaw(m_index);
+}
+
 
 bool LuaProxy::Block::isValid() const
 {
 	return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
 }
+

@@ -197,6 +197,8 @@ int TestFunc()
 		TestFrameCode();
 		LevelFrameCode();
 	}
+
+    Blocks::DoSortingIfRequired();
 	return 0;
 }
 

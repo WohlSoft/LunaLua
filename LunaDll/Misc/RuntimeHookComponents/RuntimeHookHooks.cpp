@@ -1,6 +1,7 @@
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
 #include "../../LuaMain/LuaEvents.h"
+#include "../../LuaMain/LuaProxy.h"
 #include <comutil.h>
 #include "../../Input/Input.h"
 #include "../../GlobalFuncs.h"
@@ -470,6 +471,19 @@ extern void __stdcall doEventsLevelEditorHook()
 
     /*HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
     GetProcAddress(vmVB6Lib, "rtcDoEvents")();*/
+}
+
+
+extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
+{
+    if (gLunaLua.isValid()) {
+        Event npcKillEvent("onNPCKill", false);
+        npcKillEvent.setDirectEventName("onNPCKill");
+        npcKillEvent.setLoopable(false);
+        gLunaLua.callEvent(&npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
+    }
+
+    native_cleanupKillNPC(npcIndex_ptr, killReason);
 }
 
 

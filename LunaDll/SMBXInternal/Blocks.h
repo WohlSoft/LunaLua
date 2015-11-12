@@ -44,7 +44,11 @@ struct Block {
 
     // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
     static inline ::Block* Get(unsigned short index) {
-        if (index >= GM_BLOCK_COUNT) return NULL;
+        if (index > GM_BLOCK_COUNT) return NULL;
+        return &((Block*)GM_BLOCKS_PTR)[index];
+    }
+
+    static inline ::Block* GetRaw(unsigned short index) {
         return &((Block*)GM_BLOCKS_PTR)[index];
     }
 
@@ -74,6 +78,10 @@ namespace Blocks {
 	void HideAll(int type);				// Hide all blocks of type
 
 	bool IsPlayerTouchingType(int BlockType, int sought_collision, PlayerMOB* pMobPOS); // See if player touching block of BlockType
+
+    //Sorting releated
+    void DoSortingIfRequired(); // Will the block array sort if needed.
+    void SetNextFrameSorting(); // This will activate the flag for making sorting available through "DoSortingIfRequired"
 }
 
 

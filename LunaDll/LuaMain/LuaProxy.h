@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <stdio.h>
 
+#include "../SMBXInternal/Blocks.h"
+
 namespace LuaProxy {
 
     template<typename T>
@@ -390,6 +392,22 @@ namespace LuaProxy {
         void setDontMove(bool dontMove, lua_State* L);
         void toIce(lua_State* L);
         void toCoin(lua_State* L);
+        bool collidesBlockBottom(lua_State* L) const;
+        void setCollidesBlockBottom(bool collidesBlockBottom, lua_State* L);
+        bool collidesBlockLeft(lua_State* L) const;
+        void setCollidesBlockLeft(bool collidesBlockLeft, lua_State* L);
+        bool collidesBlockUp(lua_State* L) const;
+        void setCollidesBlockUp(bool collidesBlockUp, lua_State* L);
+        bool collidesBlockRight(lua_State* L) const;
+        void setCollidesBlockRight(bool collidesBlockRight, lua_State* L);
+        bool isUnderwater(lua_State* L) const;
+        void setIsUnderwater(bool isUnderwater, lua_State* L);
+        short animationFrame(lua_State* L) const;
+        void setAnimationFrame(short animationFrame, lua_State* L);
+        float animationTimer(lua_State* L) const;
+        void setAnimationTimer(float animationTimer, lua_State* L);
+        short killFlag(lua_State* L) const;
+        void setKillFlag(short killFlag, lua_State* L);
 
 
         bool isValid() const;
@@ -750,6 +768,7 @@ namespace LuaProxy {
         static luabind::object get(lua_State* L);
         static luabind::object get(luabind::object idFilter, lua_State* L);
         static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+        static LuaProxy::Block spawn(int npcid, double x, double y, lua_State* L);
 
         Block(int index);
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
@@ -784,6 +803,7 @@ namespace LuaProxy {
         void hit(bool fromUpSide, LuaProxy::Player player);
         void hit(bool fromUpSide, LuaProxy::Player player, int hittingCount);
 
+        ::Block* getBlockPtr();
         bool isValid() const;
         int m_index;
     };

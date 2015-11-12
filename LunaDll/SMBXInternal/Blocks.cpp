@@ -1,5 +1,7 @@
 #include "Blocks.h"
 
+bool isBlocksSortingRequired = false;
+
 Block* Blocks::Get(int index) {
 	if(GM_BLOCKS_PTR == 0 || index < 0 || index > GM_BLOCK_COUNT) {
 		return NULL;
@@ -31,6 +33,31 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 		}
 	}
 	return false; // no collision
+}
+
+void Blocks::DoSortingIfRequired()
+{
+    if (!isBlocksSortingRequired)
+        return;
+
+    WORD beginIndex = 1;
+    WORD blockCount = GM_BLOCK_COUNT;
+    native_sortX((short*)&beginIndex, (short*)&blockCount);
+
+    for (WORD i = 2; i <= blockCount; i++) {
+        if (Blocks::Get(i)->mometum.x > Blocks::Get(i - 1)->mometum.x) {
+            WORD prev = i - 1;
+            native_sortY((short*)&i, (short*)&prev);
+        }
+    }
+
+    native_sort_finalize1();
+    native_sort_finalize2();
+}
+
+void Blocks::SetNextFrameSorting()
+{
+    isBlocksSortingRequired = true;
 }
 
 // TEST COLLISION (SMBX BUILTIN)
