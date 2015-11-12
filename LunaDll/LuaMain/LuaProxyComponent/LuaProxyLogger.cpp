@@ -5,29 +5,23 @@
 
 LuaProxy::Logger::Logger(std::string filename)
 {
-	std::string custPath = wstr2str(getCustomFolderPath());
-	filePath = custPath + "\\" + filename;
-	file = fopen(filePath.c_str(), "a");
-}
-
-LuaProxy::Logger::Logger(const Logger& lg)
-{
-	filePath = lg.filePath;
-	file = fopen(filePath.c_str(), "a");
+    std::string custPath = wstr2str(getCustomFolderPath());
+    filePath = custPath + "\\" + filename;
+    file = fopen(filePath.c_str(), "a");
 }
 
 LuaProxy::Logger::~Logger()
 {
-	if (file) fclose(file);
+    if (file) fclose(file);
 }
 
 void LuaProxy::Logger::write(const char*line)
 {
-	if (file)
-	{
-		fprintf(file, "%s\n", line);
-		fflush(file);
-	}
+    if (file)
+    {
+        fprintf(file, "%s\n", line);
+        fflush(file);
+    }
 }
 
 

@@ -981,15 +981,15 @@ namespace LuaProxy {
         unsigned short m_index;
     };
 
-	class Logger {
-	public:
-		Logger(std::string filename);
-		Logger(const Logger &lg);
-		~Logger();
-		void write(const char*line);
-		std::string filePath;
-		FILE* file;
-	};
+    class Logger {
+    public:
+        Logger(std::string filename);
+        Logger(const Logger &lg) = default;
+        ~Logger();
+        void write(const char*line);
+        std::string filePath;
+        FILE* file;
+    };
 
 
     //undocumented
