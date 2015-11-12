@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     PGE_File_Formats/smbx64.cpp \
     PGE_File_Formats/smbx64_cnf_filedata.cpp \
     PGE_File_Formats/wld_filedata.cpp \
-    controlconfig.cpp
+    controlconfig.cpp \
+    launcherconfiguration.cpp
 
 HEADERS  += mainlauncherwindow.h \
     smbxconfig.h \
@@ -59,7 +60,8 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/smbx64_cnf_filedata.h \
     PGE_File_Formats/smbx64_macro.h \
     PGE_File_Formats/wld_filedata.h \
-    controlconfig.h
+    controlconfig.h \
+    launcherconfiguration.h
 
 FORMS    += mainlauncherwindow.ui
 
