@@ -3,6 +3,8 @@
 
 #include <QJsonDocument>
 #include <QPair>
+#include <functional>
+#include "qjsonutil.h"
 
 class LauncherConfiguration
 {
@@ -22,7 +24,11 @@ public:
         UERR_INVALID_JSON
     };
 
+    LauncherConfiguration();
     LauncherConfiguration(const QJsonDocument &settingsToParse);
+
+    bool setConfigurationAndValidate(const QJsonDocument &settingsToParse, const std::function<void(VALIDATE_ERROR, const QString&)>& errFunc);
+
     bool checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
     bool hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
 

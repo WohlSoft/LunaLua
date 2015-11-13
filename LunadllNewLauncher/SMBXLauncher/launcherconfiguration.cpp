@@ -6,6 +6,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QApplication>
+#include "qjsonutil.h"
+
 
 QJsonDocument LauncherConfiguration::generateDefault()
 {
@@ -26,6 +28,9 @@ QJsonDocument LauncherConfiguration::generateDefault()
 
 }
 
+LauncherConfiguration::LauncherConfiguration() : LauncherConfiguration(generateDefault())
+{}
+
 LauncherConfiguration::LauncherConfiguration(const QJsonDocument &settingsToParse)
 {
     QJsonObject mainObject = settingsToParse.object();
@@ -35,6 +40,31 @@ LauncherConfiguration::LauncherConfiguration(const QJsonDocument &settingsToPars
     version2 = gameValue.value("version-2").toInt(0);
     version3 = gameValue.value("version-3").toInt(0);
     version4 = gameValue.value("version-4").toInt(0);
+}
+
+bool LauncherConfiguration::setConfigurationAndValidate(const QJsonDocument &settingsToParse, const std::function<void (VALIDATE_ERROR, const QString &)> &errFunc)
+{
+    if(!settingsToParse.isObject()){
+        if(errFunc)
+            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+        return false;
+    }
+
+    QJsonObject mainObject = settingsToParse.object();
+    if(!qJsonValidate<QJsonObject>(mainObject, "game", errFunc)) return false;
+
+    QJsonObject gameObject = mainObject.value("game").toObject();
+    if(!qJsonValidate<QString>(gameObject, "update-check-website", errFunc)) return false;
+    if(!qJsonValidate<int>(gameObject, "version-1", errFunc)) return false;
+    if(!qJsonValidate<int>(gameObject, "version-2", errFunc)) return false;
+    if(!qJsonValidate<int>(gameObject, "version-3", errFunc)) return false;
+    if(!qJsonValidate<int>(gameObject, "version-4", errFunc)) return false;
+    updateCheckWebsite = gameObject.value("update-check-website").toString(".");
+    version1 = gameObject.value("version-1").toInt(0);
+    version2 = gameObject.value("version-2").toInt(0);
+    version3 = gameObject.value("version-3").toInt(0);
+    version4 = gameObject.value("version-4").toInt(0);
+    return true;
 }
 
 #include <iostream>
@@ -70,8 +100,6 @@ bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerE
 
     while(!replyFinished)
         qApp->processEvents();
-
-
 
     QByteArray data = rpl->readAll();
     if(data.isEmpty()){

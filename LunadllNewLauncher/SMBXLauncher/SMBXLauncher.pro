@@ -61,7 +61,8 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/smbx64_macro.h \
     PGE_File_Formats/wld_filedata.h \
     controlconfig.h \
-    launcherconfiguration.h
+    launcherconfiguration.h \
+    qjsonutil.h
 
 FORMS    += mainlauncherwindow.ui
 

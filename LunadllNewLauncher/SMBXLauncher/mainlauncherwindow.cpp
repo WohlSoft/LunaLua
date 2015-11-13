@@ -5,6 +5,7 @@
 #include <QWebFrame>
 #include <QMessageBox>
 
+
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainLauncherWindow)
@@ -36,7 +37,9 @@ void MainLauncherWindow::loadDefaultWebpage()
 
 void MainLauncherWindow::loadConfig(const QString &configName)
 {
-
+    auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+        jsonErrHandler(errType, errChild);
+    };
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
 
@@ -58,7 +61,17 @@ void MainLauncherWindow::loadConfig(const QString &configName)
 
     // The errors are surpressed.
     if(configurationJSON.open(QIODevice::ReadOnly)){
-        m_launcherSettings.reset(new LauncherConfiguration(QJsonDocument::fromJson(configurationJSON.readAll())));
+        QByteArray rawData = configurationJSON.readAll();
+
+        QJsonParseError jsonErrCode;
+        QJsonDocument jsonSettingsFile = QJsonDocument::fromJson(rawData, &jsonErrCode);
+        if(jsonErrCode.error != QJsonParseError::NoError){
+            QMessageBox::warning(this, "Error", QString("Failed to parse settings.json:\n") + jsonErrCode.errorString());
+            m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
+        }else{
+            m_launcherSettings.reset(new LauncherConfiguration());
+            m_launcherSettings->setConfigurationAndValidate(jsonSettingsFile, errFunc);
+        }
     }else{
         QMessageBox::warning(this, "Error", "Failed to load config, using default!");
         m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
@@ -122,55 +135,33 @@ void MainLauncherWindow::checkForUpdates()
     LauncherConfiguration::UpdateCheckerErrCodes err;
     QString errDesc;
     if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
-        try{
-            if(!output.isObject())
-                throw "Invalid Update Server JSON: Root is not object!";
+        auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+            jsonErrHandler(errType, errChild);
+        };
 
-            QJsonObject outputObj = output.object();
-            if(!outputObj.contains("current-version"))
-                throw "Invalid Update Server JSON: No \"current-version\" JSON object!";
-
-            QJsonValue currentVersionVal = outputObj.value("current-version");
-            if(!currentVersionVal.isObject())
-                throw "Invalid Update Server JSON: Invalid \"current-version\" Node. Must be object!";
-
-            QJsonObject currentVersionObj = currentVersionVal.toObject();
-            if(!currentVersionObj.contains("version-1"))
-                throw "Invalid Update Server JSON: No version-1 value!";
-            if(!currentVersionObj.contains("version-2"))
-                throw "Invalid Update Server JSON: No version-2 value!";
-            if(!currentVersionObj.contains("version-3"))
-                throw "Invalid Update Server JSON: No version-3 value!";
-            if(!currentVersionObj.contains("version-4"))
-                throw "Invalid Update Server JSON: No version-4 value!";
-
-            QJsonValue version1Val = currentVersionObj.value("version-1");
-            QJsonValue version2Val = currentVersionObj.value("version-2");
-            QJsonValue version3Val = currentVersionObj.value("version-3");
-            QJsonValue version4Val = currentVersionObj.value("version-4");
-            if(!version1Val.isDouble())
-                throw "Invalid Update Server JSON: Invalid \"version-1\" Node. Must be double/number!";
-            if(!version2Val.isDouble())
-                throw "Invalid Update Server JSON: Invalid \"version-2\" Node. Must be double/number!";
-            if(!version3Val.isDouble())
-                throw "Invalid Update Server JSON: Invalid \"version-3\" Node. Must be double/number!";
-            if(!version4Val.isDouble())
-                throw "Invalid Update Server JSON: Invalid \"version-4\" Node. Must be double/number!";
-
-            if(!outputObj.contains("update-message"))
-                throw "Invalid Update Server JSON: No \"update-message\" JSON value!";
-
-            QJsonValue updateMessageVal = outputObj.value("update-message");
-            if(!updateMessageVal.isString())
-                throw "Invalid Update Server JSON: Invalid \"update-message\" Value. Must be string!";
-
-
-            if(m_launcherSettings->hasHigherVersion(version1Val.toInt(), version2Val.toInt(), version3Val.toInt(), version4Val.toInt())){
-                QMessageBox::information(this, "New Update!", updateMessageVal.toString());
-            }
-        }catch(const char* err){
-            QMessageBox::warning(this, "Error", err);
+        if(!output.isObject()){
+            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+            return;
         }
+
+        QJsonObject outputObj = output.object();
+        if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
+        if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
+
+        QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
+        if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
+
+
+        if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
+                                                currentVersionObj.value("version-2").toInt(),
+                                                currentVersionObj.value("version-3").toInt(),
+                                                currentVersionObj.value("version-4").toInt())){
+            QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
+        }
+
 
 
     }else{
@@ -188,6 +179,14 @@ void MainLauncherWindow::checkForUpdates()
             break;
         }
     }
+}
+
+void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &errChild)
+{
+    if(errType == VALIDATE_ERROR::VALIDATE_NO_CHILD)
+        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
+    if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
+        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
 }
 
 void MainLauncherWindow::writeLunaConfig()

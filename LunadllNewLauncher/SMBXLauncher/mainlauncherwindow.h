@@ -32,6 +32,9 @@ public slots:
     //General stuff
     void checkForUpdates();
 
+    //Error handlers
+    void jsonErrHandler(VALIDATE_ERROR errType, const QString& errChild);
+
 private:
     void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);
