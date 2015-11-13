@@ -3,6 +3,9 @@
 
 #include <QtWebKit/QtWebKit>
 #include <QWebFrame>
+#include <QMessageBox>
+
+
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainLauncherWindow)
@@ -34,8 +37,51 @@ void MainLauncherWindow::loadDefaultWebpage()
 
 void MainLauncherWindow::loadConfig(const QString &configName)
 {
+    auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+        jsonErrHandler(errType, errChild);
+    };
+    // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
+    // In addition I would like to put all launcher data in the "launcher" folder.
+
+    // Check for the launcher config dir
+    QDir launcherDir = QDir::current();
+    if(!launcherDir.exists("launcher"))
+        launcherDir.mkdir("launcher");
+
+    // Check for the main configuration file
+    QFile configurationJSON("launcher/settings.json");
+
+    // If not exist then write the configuration file
+    if(!configurationJSON.exists()){
+        if(configurationJSON.open(QIODevice::WriteOnly)){
+            configurationJSON.write(LauncherConfiguration::generateDefault().toJson());
+            configurationJSON.close();
+        }
+    }
+
+    // The errors are surpressed.
+    if(configurationJSON.open(QIODevice::ReadOnly)){
+        QByteArray rawData = configurationJSON.readAll();
+
+        QJsonParseError jsonErrCode;
+        QJsonDocument jsonSettingsFile = QJsonDocument::fromJson(rawData, &jsonErrCode);
+        if(jsonErrCode.error != QJsonParseError::NoError){
+            QMessageBox::warning(this, "Error", QString("Failed to parse settings.json:\n") + jsonErrCode.errorString());
+            m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
+        }else{
+            m_launcherSettings.reset(new LauncherConfiguration());
+            m_launcherSettings->setConfigurationAndValidate(jsonSettingsFile, errFunc);
+        }
+    }else{
+        QMessageBox::warning(this, "Error", "Failed to load config, using default!");
+        m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
+    }
+
+    checkForUpdates();
+
     QSettings settingFile(configName, QSettings::IniFormat);
     settingFile.setIniCodec("UTF-8");
+
 
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
@@ -81,6 +127,66 @@ void MainLauncherWindow::runSMBXEditor()
 void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 {
     ui->webLauncherPage->setUrl(QUrl::fromUserInput(file, QDir::currentPath(), QUrl::AssumeLocalFile));
+}
+
+void MainLauncherWindow::checkForUpdates()
+{
+    QJsonDocument output;
+    LauncherConfiguration::UpdateCheckerErrCodes err;
+    QString errDesc;
+    if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
+        auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+            jsonErrHandler(errType, errChild);
+        };
+
+        if(!output.isObject()){
+            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+            return;
+        }
+
+        QJsonObject outputObj = output.object();
+        if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
+        if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
+
+        QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
+        if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
+
+
+        if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
+                                                currentVersionObj.value("version-2").toInt(),
+                                                currentVersionObj.value("version-3").toInt(),
+                                                currentVersionObj.value("version-4").toInt())){
+            QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
+        }
+
+
+
+    }else{
+        switch (err) {
+        case LauncherConfiguration::UERR_CONNECTION_FAILED:
+            QMessageBox::warning(this, "Error", QString("Failed while connecting to update server:\n") + errDesc);
+            break;
+        case LauncherConfiguration::UERR_INVALID_JSON:
+            QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
+            break;
+        case LauncherConfiguration::UERR_INVALID_URL:
+            QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &errChild)
+{
+    if(errType == VALIDATE_ERROR::VALIDATE_NO_CHILD)
+        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
+    if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
+        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
 }
 
 void MainLauncherWindow::writeLunaConfig()
