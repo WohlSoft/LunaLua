@@ -246,84 +246,36 @@ local function loadCodeFile(tableAddr, path, preDefinedEnv)
     return true
 end
 
+
 --Preloading function.
 --This code segment won't post any errors!
-function __onInit(lvlPath, lvlName)
-    
-    --Load default libs
-    if(not isOverworld)then
-        local isLunaworld = true
-        local isLunadll = true
+function __onInit(episodePath, lvlName)
+    local status = {__xpcall(function()
+        --SEGMENT TO ADD PRELOADED APIS START
+        Defines = loadSharedAPI("core\\defines")
+        loadSharedAPI("uservar")
+        DBG = loadSharedAPI("core\\dbg")
+        --SEGMENT TO ADD PRELOADED APIS END
         
-        local status = {pcall(function() --Safe code: This code segment can post errors
-            __episodePath = lvlPath
-            __customFolderPath = lvlPath..string.sub(lvlName, 0, -5).."\\"
-            local doLunaworld = true
-            local doLunadll = true
-            
-            --SEGMENT TO ADD PRELOADED APIS START
-            loadSharedAPI("uservar")
-            Defines = loadSharedAPI("core\\defines")
-            DBG = loadSharedAPI("core\\dbg")
-            --SEGMENT TO ADD PRELOADED APIS END
-            
-            local localLuaFile = nil
-            local glLuaFile = lvlPath .. "lunaworld.lua"
-            if(lvlName:find("."))then
-                localLuaFile = lvlPath..string.sub(lvlName, 0, -5).."\\lunadll.lua"
-            end    
-
-            if(not loadCodeFile(__lunaworld, glLuaFile, {loadAPI = __lunaworld.loadAPI}))then
-                doLunaworld = false
-            end
-
-            if(not loadCodeFile(__lunalocal, localLuaFile, {loadAPI = __lunalocal.loadAPI}))then
-                doLunadll = false
-            end
-            
-            return doLunaworld, doLunadll
-        end)}
-        
-        if(not status[1])then
-            Text.windowDebugSimple(status[2])
-            __isLuaError = true
-            return
-        end
-        table.remove(status, 1)
-        isLunaworld, isLunadll = unpack(status)
-        if((not isLunaworld) and (not isLunadll))then
-            __isLuaError = true --Shutdown Lua module as it is not used.
-            return
-        end
-    else
-        local isOverworld = true
-        local status = {pcall(function() --Safe code: This code segment can post errors
-            __episodePath = lvlPath
-            local doOverworld = true
-            
-            --SEGMENT TO ADD PRELOADED APIS START
-            Defines = loadSharedAPI("core\\defines")
-            DBG = loadSharedAPI("core\\dbg")
-            --SEGMENT TO ADD PRELOADED APIS END
-
-            local overworldLuaFile = lvlPath .. "lunaoverworld.lua"
-
-            if(not loadCodeFile(__lunaoverworld, overworldLuaFile, {loadAPI = __lunaoverworld.loadAPI}))then
-                doOverworld = false
-            end
-            return doOverworld
-        end)}
-        if(not status[1])then
-            Text.windowDebugSimple(status[2])
-            __isLuaError = true
-            return
-        end
-        table.remove(status, 1)
-        isOverworld = unpack(status)
+        local noFileLoaded = true
         if(not isOverworld)then
-            __isLuaError = true --Shutdown Lua module as it is not used.
+            local customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
+            if(loadCodeFile(    __lunalocal,        customFolderPath.."lunadll.lua",       {loadAPI = __lunalocal.loadAPI})) then noFileLoaded = false end
+            if(loadCodeFile(    __lunaworld,        episodePath .. "lunaworld.lua",        {loadAPI = __lunaworld.loadAPI})) then noFileLoaded = false end
+        else
+            if(loadCodeFile(__lunaoverworld,    episodePath .. "lunaoverworld.lua",        {loadAPI = __lunaoverworld.loadAPI})) then noFileLoaded = false end
+        end
+        if(noFileLoaded)then
+            __isLuaError = true
             return
         end
+    end)}
+    if(not status[1])then
+        console:println("DEBUG: Error thrown!")
+        Text.windowDebugSimple(status[2])
+        __isLuaError = true
+        console:println("DEBUG: Set error flag!")
+        return
     end
 end
 
@@ -467,7 +419,6 @@ eventManager = setmetatable({ --Normal table
     eventHosterAfter = {},
     
     manageEvent = function(...)
-        
         if(eventManager.nextEvent:len() > __lapiSigNative:len())then
             if(eventManager.nextEvent:sub(0, __lapiSigNative:len()) == __lapiSigNative)then
                 eventManager.nextEvent = eventManager.nextEvent:sub(__lapiSigNative:len()+1)
@@ -582,7 +533,17 @@ eventManager = setmetatable({ --Normal table
 
 
 
---[[ Main Event Manager ]]
+--=====================================================================
+--[[ Main User Code Manager ]]--
+UserCodeManager = {}
+UserCodeManager.codefiles = {}
+
+function UserCodeManager.loadCodeFile(codeFileName)
+    
+end
+
+--=====================================================================
+--[[ Main Event Manager ]]--
 EventManager = {}
 EventManager.userListeners = {}
 EventManager.apiListeners = {}
@@ -592,30 +553,30 @@ EventManager.queuedEvents = {}
 -- ===================== Event Calling =============================
 -- This will call a new event
 function EventManager.manageEventObj(eventObj, ...)
-	
+
 end
 
 function EventManager.doQueue()
-	
+
 end
 
 -- ================== Event Distribution ===========================
 -- This will add a new listener object.
 -- table listenerObject (A code file)
 function EventManager.addUserListener(listenerObject)
-	table.insert(EventManager.userListeners, listenerObject)
+    table.insert(EventManager.userListeners, listenerObject)
 end
 
 -- This will add proxy objects for Events
 function EventManager.getProxyEnvironment()
-	return {
-		"NPC" = setmetatable({},{__index = _G["NPC"]})
-	}
+    return {
+        NPC = setmetatable({},{__index = _G["NPC"]})
+    }
 end
 
 -- usage for luabind, always do with event-object
 function __CallEvent(...)
-	EventManager.manageEventObj(...)
+    EventManager.manageEventObj(...)
 end
 
 
