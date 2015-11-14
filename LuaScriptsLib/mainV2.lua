@@ -132,62 +132,51 @@ function __xpcall (f, ...)
 end
 -- ERR HANDLING END
 
-function isAPILoaded(api)
+function isAPILoadedByAPITable(apiTable, api)
     if(type(api)=="table")then
-        for k,v in pairs(__loadedAPIs) do
+        for _,v in pairs(apiTable) do
             if(v == api)then
                 return true
             end
         end
-        
-        if(__lunaworld.__init)then
-            for k,v in pairs(__lunaworld.__loadedAPIs) do
-                if(v == api)then
-                    return true
-                end
-            end
-        end
-        
-        if(__lunalocal.__init)then
-            for k,v in pairs(__lunalocal.__loadedAPIs) do 
-                if(v == api)then
-                    return true
-                end
-            end
-        end
-        
-        if(__lunaoverworld.__init)then
-            for k,v in pairs(__lunaoverworld.__loadedAPIs) do
-                if(v == api)then
-                    return true
-                end
-            end
-        end
-    elseif(type(api)=="string")then
-        if(__loadedAPIs[api])then
+    end
+    if(type(api)=="string")then
+        if(apiTable[api])then
             return true
         end
-        
-        if(__lunaworld.__init)then
-            if(__lunaworld.__loadedAPIs[api])then
-                return true
-            end
-        end
-        
-        if(__lunalocal.__init)then
-            if(__lunalocal.__loadedAPIs[api])then
-                return true
-            end
-        end
-        
-        if(__lunaoverworld.__init)then
-            if(__lunaoverworld.__loadedAPIs[api])then
-                return true
-            end
-        end
     end
-    
     return false
+end
+
+function isAPILoaded(api)
+    if(isAPILoadedByAPITable(__loadedAPIs, api)) then return true end
+    if(__lunaworld.__init)then
+        if(isAPILoadedByAPITable(__lunaworld.__loadedAPIs, api)) then return true end
+    end
+    if(__lunalocal.__init)then
+        if(isAPILoadedByAPITable(__lunalocal.__loadedAPIs, api)) then return true end
+    end
+    if(__lunaoverworld.__init)then
+        if(isAPILoadedByAPITable(__lunaoverworld.__loadedAPIs, api)) then return true end
+    end
+    return false
+end
+
+local function findLast(haystack, needle)
+    local i=haystack:match(".*"..needle.."()")
+    if i==nil then return -1 else return i-1 end
+end
+
+local function filenameOfPath(path)
+    local lastIndexOfSlash = findLast(path, "/")
+    local lastIndexOfBackslash = findLast(path, "\\")
+    if(lastIndexOfSlash == -1 and lastIndexOfBackslash == -1)then return path end
+    
+    local lastIndex = lastIndexOfSlash
+    if(lastIndex < lastIndexOfBackslash)then
+        lastIndex = lastIndexOfBackslash
+    end
+    return path:sub(lastIndex + 1)
 end
 
 local function doAPI(apiName)
@@ -281,12 +270,13 @@ end
 
 -- Loads shared apis
 function loadSharedAPI(api)
-    if(__loadedAPIs[api])then
-        return __loadedAPIs[api], false
+    local apiName = filenameOfPath(api)
+    if(__loadedAPIs[apiName])then
+        return __loadedAPIs[apiName], false
     end
     
     local loadedAPI = doAPI(api)
-    __loadedAPIs[api] = loadedAPI
+    __loadedAPIs[apiName] = loadedAPI
     if(type(loadedAPI["onInitAPI"])=="function")then
         loadedAPI.onInitAPI()
     end
@@ -294,6 +284,7 @@ function loadSharedAPI(api)
 end
 
 function loadLocalAPI(apiHoster, api)
+    local apiName = filenameOfPath(api)
     local tHoster = nil
     if(apiHoster == "lunadll")then
         tHoster = __lunalocal
@@ -305,13 +296,13 @@ function loadLocalAPI(apiHoster, api)
         return nil, false
     end
     
-    if(tHoster.__loadedAPIs[api])then
-        return tHoster.__loadedAPIs[api], false
+    if(tHoster.__loadedAPIs[apiName])then
+        return tHoster.__loadedAPIs[apiName], false
     end
     
     local loadedAPI = doAPI(api)
 
-    tHoster.__loadedAPIs[api] = loadedAPI
+    tHoster.__loadedAPIs[apiName] = loadedAPI
     if(type(loadedAPI["onInitAPI"])=="function")then
         loadedAPI.onInitAPI()
     end
