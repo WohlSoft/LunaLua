@@ -246,10 +246,11 @@ function __onInit(episodePath, lvlName)
         DBG = loadSharedAPI("core\\dbg")
         --SEGMENT TO ADD PRELOADED APIS END
         
+        __episodePath = episodePath
+        __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
         local noFileLoaded = true
         if(not isOverworld)then
-            local customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
-            if(loadCodeFile(    __lunalocal,        customFolderPath.."lunadll.lua",       {loadAPI = __lunalocal.loadAPI})) then noFileLoaded = false end
+            if(loadCodeFile(    __lunalocal,        __customFolderPath.."lunadll.lua",     {loadAPI = __lunalocal.loadAPI})) then noFileLoaded = false end
             if(loadCodeFile(    __lunaworld,        episodePath .. "lunaworld.lua",        {loadAPI = __lunaworld.loadAPI})) then noFileLoaded = false end
         else
             if(loadCodeFile(__lunaoverworld,    episodePath .. "lunaoverworld.lua",        {loadAPI = __lunaoverworld.loadAPI})) then noFileLoaded = false end
