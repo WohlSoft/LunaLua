@@ -522,6 +522,49 @@ eventManager = setmetatable({ --Normal table
     end
 });
 
+--=====================================================================
+--[[ API Functions ]]--
+local APIHelper = {}
+function APIHelper.doAPI(apiTableHolder, apiPath)
+    local apiName = filenameOfPath(apiPath)
+    if(apiTableHolder[apiName])then
+        return apiTableHolder[apiName], false
+    end
+    
+    local loadedAPI = nil
+    local searchInPath = {
+    __episodePath,
+    __customFolderPath,
+    getSMBXPath().."\\LuaScriptsLib\\"}
+    local endings = {
+        ".lua",
+        ".dll"}
+    local func, err
+    for _,apiPath in pairs(searchInPath) do
+        for _,ending in pairs(endings) do
+            func, err = loadfile(apiPath..apiPath..ending)
+            if(func)then
+                loadedAPI = func()
+                if(type(loadedAPI) ~= "table")then
+                    error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
+                end
+            end
+            if(not err:find("such file"))then
+                error(err,2)
+            end
+            if(loadedAPI) then break end
+        end
+        if(loadedAPI) then break end
+    end
+    if(not loadedAPI) then error("No API found \""..apiPath.."\"",2) end
+    
+    apiTableHolder[apiName] = loadedAPI
+    if(type(loadedAPI["onInitAPI"])=="function")then
+        loadedAPI.onInitAPI()
+    end
+    return loadedAPI, true
+end
+
 
 
 --=====================================================================
@@ -529,8 +572,47 @@ eventManager = setmetatable({ --Normal table
 UserCodeManager = {}
 UserCodeManager.codefiles = {}
 
-function UserCodeManager.loadCodeFile(codeFileName)
+function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
+    -- 1. Setup the usercode instance
+    local usercodeInstance = {}
+    usercodeInstance.__loadedAPIs = {}
     
+    -- 2. Setup environment
+    local usercodeEnvironment = {
+        -- 2.1 Add loadAPI function
+        loadAPI = function(api)
+            APIHelper.doAPI(usercodeInstance.__loadedAPIs, api)
+        end
+    }
+    -- 3. Add access to global environment
+    setmetatable( usercodeEnvironment, { __index = _G } )
+    
+    -- 4. Load the code file and add environment
+    local codeFile, err = loadfile(path)
+    if codeFile then
+        -- 4.1 Set environment to the usercode
+        setfenv( codeFile, usercodeEnvironment )
+        -- 4.2 Execute file for initial run.
+        codeFile()
+    else
+        -- 4.3 If file not found then ignore error, otherwise throw error!
+        if(not err:find("such file"))then
+            Text.windowDebugSimple("Error: "..err)
+        end
+        return false
+    end
+    
+    -- 5. Directly add "global" fields to the table.
+    for k,v in pairs( usercodeEnvironment ) do
+        tableAddr[k] =  v
+    end
+    
+    -- 6. Notify usercode file that loading has finished via "onLoad".
+    if(type(tableAddr["onLoad"]) == "function")then
+        tableAddr.onLoad()
+    end
+    
+    return true
 end
 
 --=====================================================================
