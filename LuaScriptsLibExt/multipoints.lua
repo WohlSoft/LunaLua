@@ -13,7 +13,7 @@
 -----------With help from Rednaxella-----------
 --------Open-Source Checkpoint Library---------
 ------------For Super Mario Bros X-------------
--------------------v3.0.4----------------------
+-------------------v3.0.6----------------------
 local multipoints = {}
 
 local playerMP = { sec = 0, x = 0, y = 0, act = nil }
@@ -75,7 +75,7 @@ local function getMP(i)
 						if(player:mem(0x112,FIELD_WORD) < p and player:mem(0x122,FIELD_WORD) ~= 1 and player:mem(0x122,FIELD_WORD) ~= 2) then
 							player:mem(0x112,FIELD_WORD, p);
 						end
-						if(player2:mem(0x112,FIELD_WORD) < p and player2:mem(0x122,FIELD_WORD) ~= 1 and player2:mem(0x122,FIELD_WORD) ~= 2) then
+						if(player2 ~= nil and player2:mem(0x112,FIELD_WORD) < p and player2:mem(0x122,FIELD_WORD) ~= 1 and player2:mem(0x122,FIELD_WORD) ~= 2) then
 							player2:mem(0x112,FIELD_WORD, p);
 						end
 					elseif(plyr:mem(0x112,FIELD_WORD) < p and plyr:mem(0x122,FIELD_WORD) ~= 1 and plyr:mem(0x122,FIELD_WORD) ~= 2) then
@@ -312,8 +312,7 @@ function multipoints.update()
 	
 	for k,v in pairs(mpLuaTrigs) do
 		if(not v.spawnAt and not multipoints.getCheckpointStatus(k) and v.obj.visible) then
-			
-			Graphics.placeSprite(2,multipoints.IMG,v.x,v.y,"",2);
+			Graphics.drawImageToScene(multipoints.IMG,v.x,v.y);
 			if(player.x < v.x+multipoints.IMG_SIZE.width and player.x+player:mem(0xD8, FIELD_DFLOAT) > v.x and player.y < v.y+multipoints.IMG_SIZE.height and player.y + player:mem(0xD0, FIELD_DFLOAT) > v.y)then
 				v.func(player);
 			end

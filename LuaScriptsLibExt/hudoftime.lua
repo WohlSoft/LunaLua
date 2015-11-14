@@ -10,7 +10,7 @@
 --------------------------------Created by Hoeloe - 2015--------------------------------
 ----------------------------Open-Source Zelda HUD Framework-----------------------------
 ---------------------------------For Super Mario Bros X---------------------------------
-----------------------------------------v1.0.1------------------------------------------
+----------------------------------------v1.0.2------------------------------------------
 
 local zelda = {}
 
@@ -31,7 +31,7 @@ zelda.TRIFORCE = Graphics.loadImage(getSMBXPath().."\\LuaScriptsLib\\hudoftime\\
 zelda.FAIRY = Graphics.loadImage(getSMBXPath().."\\LuaScriptsLib\\hudoftime\\lives.png");
 
 zelda.hearts = 0;
-zelda.maxhearts = 3;
+zelda.maxhearts = 6;
 
 zelda.magic = 1;
 
@@ -67,9 +67,6 @@ zelda.auto_navi = true;
 
 --Automatically enables and disables the HUD based on whether the player is Link.
 zelda.auto_enable = true;
-
---Keep powerups when hurt and have more than one heart.
-zelda.keep_powerups = true;
 
 --HUD show flags.
 zelda.show_hearts = true;
@@ -171,11 +168,7 @@ local function UpdateHearts()
 		end
 		
 		if (player.powerup == PLAYER_SMALL) and (zelda.hearts >= 2) then
-			if(zelda.keep_powerups) then
-				player.powerup = powercache;
-			else
-				player.powerup = PLAYER_BIG;
-			end
+			 player.powerup = powercache;
 		end
 	end
 end
@@ -314,7 +307,15 @@ local function DrawMagic(y)
 		pts[8] = 16+158*zelda.magic; pts[9] = y;
 		pts[10] = 16+158*zelda.magic; pts[11] = y+16;
 		
-		Graphics.glDrawTriangles(pts, {0,0,0,1,1,0,1,0,0,1,1,1}, 6);
+		local tx = {};
+		tx[0] = 0; tx[1] = 0;
+		tx[2] = 1; tx[3] = 0;
+		tx[4] = 0; tx[5] = 1;
+		tx[6] = 0; tx[7] = 1;
+		tx[8] = 1; tx[9] = 0;
+		tx[10] = 1; tx[11] = 1;
+		
+		Graphics.glDrawTriangles(pts, tx, 6);
 		Graphics.glSetTextureRGBA(nil, 0xFFFFFFFF);
 end
 
