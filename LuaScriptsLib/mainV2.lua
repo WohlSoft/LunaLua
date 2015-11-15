@@ -523,6 +523,20 @@ eventManager = setmetatable({ --Normal table
     end
 });
 
+
+-- ====================================================================
+-- =================== NEW REWORKED MAIN FUNTION ======================
+-- ====================================================================
+
+--=====================================================================
+--[[ Utils ]]--
+function string:split(sep)
+    local sep, fields = sep or ":", {}
+    local pattern = string.format("([^%s]+)", sep)
+    self:gsub(pattern, function(c) fields[#fields+1] = c end)
+    return fields
+end
+
 --=====================================================================
 --[[ API Functions ]]--
 local APIHelper = {}
@@ -573,18 +587,46 @@ end
 UserCodeManager = {}
 UserCodeManager.codefiles = {}
 
+-- Codefile manager START
+function UserCodeManager.addCodeFile(codeFileName, loadedCodeFile, apiTable)
+    local newCodeFileEntry = {
+        name = codeFileName,
+        loadedAPIs = {},
+        instance = loadedCodeFile
+    }
+    table.insert(UserCodeManager.codefiles, newCodeFileEntry)
+end
+
+function UserCodeManager.getCodeFile(codeFileName)
+    for _, v in pairs(UserCodeManager.codefiles) do
+        if(v.name == codeFileName)then
+            return v
+        end
+    end
+    return nil
+end
+
+-- Codefile manager END
+
 function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     -- 1. Setup the usercode instance
     local usercodeInstance = {}
-    usercodeInstance.__loadedAPIs = {}
+    local loadedAPIsTable = {}
     
     -- 2. Setup environment
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
         loadAPI = function(api)
-            APIHelper.doAPI(usercodeInstance.__loadedAPIs, api)
+            APIHelper.doAPI(loadedAPIsTable, api)
         end
     }
+    
+    -- 2.2 Add proxy environment
+    local eventEnvironment = EventManager.getProxyEnvironment()
+    for k,v in pairs(eventEnvironment) do
+        usercodeEnvironment[k] = v
+    end
+    
     -- 3. Add access to global environment
     setmetatable( usercodeEnvironment, { __index = _G } )
     
@@ -605,13 +647,16 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     
     -- 5. Directly add "global" fields to the table.
     for k,v in pairs( usercodeEnvironment ) do
-        tableAddr[k] =  v
+        usercodeInstance[k] =  v
     end
     
     -- 6. Notify usercode file that loading has finished via "onLoad".
-    if(type(tableAddr["onLoad"]) == "function")then
-        tableAddr.onLoad()
+    if(type(usercodeInstance["onLoad"]) == "function")then
+        usercodeInstance.onLoad()
     end
+
+    -- 7. Now add the code file to the usercode table
+    UserCodeManager.addCodeFile(codeFileName, usercodeEnvironment, loadedAPIsTable)
     
     return true
 end
@@ -621,18 +666,44 @@ end
 EventManager = {}
 EventManager.userListeners = {}
 EventManager.apiListeners = {}
-
 EventManager.queuedEvents = {}
 
--- ===================== Event Calling =============================
--- This will call a new event
+-- ====================== Event Management ==============================
+function EventManager.callEvent(name, ...)
+    local mainName, childName = unpack(name:split("."))
+    if(mainName == nil or childName == nil)then
+        mainName, childName = unpack(name:split(":"))
+    end
+    
+    for _, nextUserListener in pairs(EventManager.userListeners)do
+        local hostObject = nextUserListener
+        if(childName)then
+            hostObject = nextUserListener[mainName]
+            mainName = childName
+        end
+        hostObject[mainName](...)
+    end
+end
+function EventManager.queueEvent(name, ...)
+    local newQueueEntry = 
+    {
+        eventName = name,
+        parameters = {...}
+    }
+    table.insert(EventManager.queuedEvents, newQueueEntry)
+end
 function EventManager.manageEventObj(eventObj, ...)
-
+    local directEventName = eventObj.directEventName
+    if(directEventName == "")then
+        directEventName = eventObj.eventName
+    end
+    EventManager.callEvent(directEventName, eventObj, ...)
+    if(eventObj.loopable)then
+        EventManager.queueEvent(eventObj.eventName, ...) 
+    end
 end
 
-function EventManager.doQueue()
 
-end
 
 -- ================== Event Distribution ===========================
 -- This will add a new listener object.
@@ -641,12 +712,34 @@ function EventManager.addUserListener(listenerObject)
     table.insert(EventManager.userListeners, listenerObject)
 end
 
+function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainCall)
+    eventHandler = eventHandler or event
+    beforeMainCall = beforeMainCall or true
+    local newApiHandler =
+    {
+        api = thisTable,
+        eventName = event,
+        eventHandlerName = eventHandler,
+        callBefore = beforeMainCall
+    }
+    table.insert(EventManager.apiListeners, newApiHandler)
+end
+
 -- This will add proxy objects for Events
 function EventManager.getProxyEnvironment()
     return {
         NPC = setmetatable({},{__index = _G["NPC"]})
     }
 end
+
+
+function EventManager.doQueue()
+    while(#EventManager.queuedEvents > 0)do
+        local nextQueuedEvent = table.remove(EventManager.queuedEvents)
+        EventManager.callEvent(nextQueuedEvent.eventName, unpack(nextQueuedEvent.parameters))
+    end
+end
+
 
 -- usage for luabind, always do with event-object
 function __CallEvent(...)
