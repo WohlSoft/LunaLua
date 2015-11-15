@@ -28,32 +28,6 @@ It is a attempt to merge lunaworld.lua and lunadll.lua in one state.
 __LUNALUA = "0.7"
 __isLuaError = false
 
---Constants used by Lunadll. Do not modify them, or Lunadll with crash. 
--- ==DANGER ZONE START==
-__lapiInit = "__onInit"
-__lapiEventMgr = "eventManager"
-__lapiSigNative = "detourEv_"
--- ==DANGER ZONE END==
--- Global vars
-__loadedAPIs = {}
-
-__lunaworld = {} --lunaworld.lua
-__lunaworld.__init = false
-__lunaworld.loadAPI = function(api)
-    return loadLocalAPI("lunaworld", api)
-end
-__lunalocal = {} --lunadll.lua
-__lunalocal.__init = false
-__lunalocal.loadAPI = function(api)
-    return loadLocalAPI("lunadll", api)
-end
-
-__lunaoverworld = {} --lunaoverworld.lua
-__lunaoverworld.__init = false
-__lunaoverworld.loadAPI = function(api)
-    return loadLocalAPI("lunaoverworld", api)
-end
-
 __episodePath = ""
 __customFolderPath = ""
 
@@ -162,112 +136,6 @@ function isAPILoaded(api)
     return false
 end
 
-local function findLast(haystack, needle)
-    local i=haystack:match(".*"..needle.."()")
-    if i==nil then return -1 else return i-1 end
-end
-
-local function filenameOfPath(path)
-    local lastIndexOfSlash = findLast(path, "/")
-    local lastIndexOfBackslash = findLast(path, "\\")
-    if(lastIndexOfSlash == -1 and lastIndexOfBackslash == -1)then return path end
-    
-    local lastIndex = lastIndexOfSlash
-    if(lastIndex < lastIndexOfBackslash)then
-        lastIndex = lastIndexOfBackslash
-    end
-    return path:sub(lastIndex + 1)
-end
-
-local function doAPI(apiName)
-    local searchInPath = {
-        __episodePath,
-        __customFolderPath,
-        getSMBXPath().."\\LuaScriptsLib\\"}
-    local endings = {
-        ".lua",
-        ".dll"}
-    local func, err
-    for _,apiPath in pairs(searchInPath) do
-        for _,ending in pairs(endings) do
-            func, err = loadfile(apiPath..apiName..ending)
-            if(func)then
-                local returnVal = func()
-                if(type(returnVal) ~= "table")then
-                    error("API \""..apiName.."\" did not return the api-table (got "..type(returnVal)..")", 2)
-                end
-                return returnVal
-            end
-            if(not err:find("such file"))then
-                error(err,2)
-            end
-        end
-    end
-    error("No API found \""..apiName.."\"",2)
-end
-
-local function loadCodeFile(tableAddr, path, preDefinedEnv)
-    tableAddr.__loadedAPIs = {}
-    
-    local tEnv = preDefinedEnv or {}
-    setmetatable( tEnv, { __index = _G } )
-    
-    local codeFile, err = loadfile(path)
-    if codeFile then
-        tableAddr.__init = true
-        setfenv( codeFile, tEnv )
-        codeFile()
-    else
-        if(not err:find("such file"))then
-            Text.windowDebugSimple("Error: "..err)
-        end
-        return false
-    end
-    
-    for k,v in pairs( tEnv ) do
-        tableAddr[k] =  v
-    end
-    
-    if(type(tableAddr["onLoad"]) == "function")then
-        tableAddr.onLoad()
-    end
-    
-    return true
-end
-
-
---Preloading function.
---This code segment won't post any errors!
-function __onInit(episodePath, lvlName)
-    local status = {__xpcall(function()
-        --SEGMENT TO ADD PRELOADED APIS START
-        Defines = loadSharedAPI("core\\defines")
-        loadSharedAPI("uservar")
-        DBG = loadSharedAPI("core\\dbg")
-        --SEGMENT TO ADD PRELOADED APIS END
-        
-        __episodePath = episodePath
-        __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
-        local noFileLoaded = true
-        if(not isOverworld)then
-            if(loadCodeFile(    __lunalocal,        __customFolderPath.."lunadll.lua",     {loadAPI = __lunalocal.loadAPI})) then noFileLoaded = false end
-            if(loadCodeFile(    __lunaworld,        episodePath .. "lunaworld.lua",        {loadAPI = __lunaworld.loadAPI})) then noFileLoaded = false end
-        else
-            if(loadCodeFile(__lunaoverworld,    episodePath .. "lunaoverworld.lua",        {loadAPI = __lunaoverworld.loadAPI})) then noFileLoaded = false end
-        end
-        if(noFileLoaded)then
-            __isLuaError = true
-            return
-        end
-    end)}
-    if(not status[1])then
-        console:println("DEBUG: Error thrown!")
-        Text.windowDebugSimple(status[2])
-        __isLuaError = true
-        console:println("DEBUG: Set error flag!")
-        return
-    end
-end
 
 -- Loads shared apis
 function loadSharedAPI(api)
@@ -278,32 +146,6 @@ function loadSharedAPI(api)
     
     local loadedAPI = doAPI(api)
     __loadedAPIs[apiName] = loadedAPI
-    if(type(loadedAPI["onInitAPI"])=="function")then
-        loadedAPI.onInitAPI()
-    end
-    return loadedAPI, true
-end
-
-function loadLocalAPI(apiHoster, api)
-    local apiName = filenameOfPath(api)
-    local tHoster = nil
-    if(apiHoster == "lunadll")then
-        tHoster = __lunalocal
-    elseif(apiHoster == "lunaworld")then
-        tHoster = __lunaworld
-    elseif(apiHoster == "lunaoverworld")then
-        tHoster = __lunaoverworld
-    else
-        return nil, false
-    end
-    
-    if(tHoster.__loadedAPIs[apiName])then
-        return tHoster.__loadedAPIs[apiName], false
-    end
-    
-    local loadedAPI = doAPI(api)
-
-    tHoster.__loadedAPIs[apiName] = loadedAPI
     if(type(loadedAPI["onInitAPI"])=="function")then
         loadedAPI.onInitAPI()
     end
@@ -359,169 +201,8 @@ function unregisterEvent(apiTable, event, eventHandler)
     return false
 end
 
-detourEventQueue = {
-    collectedEvents = {},
-    -- Collect an native event for the onLoop event
-    collectEvent = function(eventName, ...)
-        local args = {...}
-        local eventInfo = args[1]
-        local directEventName = ""
-        if(eventInfo.loopable)then
-            local collectedEvent = {eventName, detourEventQueue.transformArgs(eventName, ...)}
-            table.insert(detourEventQueue.collectedEvents, collectedEvent)
-        end
-        if(eventInfo.directEventName == "")then
-            directEventName = eventName.."Direct"
-        else
-            directEventName = eventInfo.directEventName
-        end
-        return directEventName
-    end,
-    transformArgs = function(eventName, ...)
-        local fArgs = {...} -- Original Functions Args
-        local rArgs = {...} -- New Functions Args
-        --- ALL HARDCODED EVENTS ---
-        if(eventName == "onEvent")then
-            -- NOTE: Index starts with 1!
-            -- Original Signature: Event eventObj, String name
-            -- New Signature: String name
-            rArgs = {fArgs[2]}
-        else
-            table.remove(rArgs[1]) --Remove the event object, as it cannot be used for loop events
-        end
-        --- ALL HARDCODED EVENTS END ---
-        return rArgs
-    end,
-    -- Dispatch the new event
-    dispatchEvents = function()
-         for idx, collectedEvent in ipairs(detourEventQueue.collectedEvents) do
-             eventManager[collectedEvent[1]](unpack(collectedEvent[2]))
-        end
-        detourEventQueue.collectedEvents = {}
-    end
-    
-}
 
 
---Event Manager
-eventManager = setmetatable({ --Normal table
-    
-    nextEvent = "",
-    eventHosterBefore = {},
-    eventHosterAfter = {},
-    
-    manageEvent = function(...)
-        if(eventManager.nextEvent:len() > __lapiSigNative:len())then
-            if(eventManager.nextEvent:sub(0, __lapiSigNative:len()) == __lapiSigNative)then
-                eventManager.nextEvent = eventManager.nextEvent:sub(__lapiSigNative:len()+1)
-                eventManager.nextEvent = detourEventQueue.collectEvent(eventManager.nextEvent, ...)
-            end
-        end
-        
-        
-        
-        local eventReturn = nil
-    
-        --Event host before    
-        if(eventManager.eventHosterBefore[eventManager.nextEvent])then
-            for k,v in pairs(eventManager.eventHosterBefore[eventManager.nextEvent]) do
-                if(type(v.apiTable[v.eventHandler])=="function")then
-                    local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
-                    if(not returns[1])then
-                        Text.windowDebugSimple(returns[2])
-                        __isLuaError = true
-                        return
-                    end
-                    if(eventReturn ~= nil)then
-                        table.remove(returns, 1)
-                        eventReturn = returns
-                    end
-                end
-            end
-        end
-        --Call global script event
-        
-        if(__lunaworld.__init)then
-            if(type(__lunaworld[eventManager.nextEvent])=="function")then
-                local returns = {__xpcall(__lunaworld[eventManager.nextEvent],...)}
-                if(not returns[1])then
-                    Text.windowDebugSimple(returns[2])
-                    __isLuaError = true
-                    return
-                end
-                table.remove(returns, 1)
-                eventReturn = returns
-            end
-        end
-        
-        if(__lunalocal.__init)then
-            if(type(__lunalocal[eventManager.nextEvent])=="function")then
-                local returns = {__xpcall(__lunalocal[eventManager.nextEvent],...)}
-                if(not returns[1])then
-                    Text.windowDebugSimple(returns[2])
-                    __isLuaError = true
-                    return
-                end
-                table.remove(returns, 1)
-                eventReturn = returns
-            end
-        end
-        
-        if(__lunaoverworld.__init)then
-            if(type(__lunaoverworld[eventManager.nextEvent])=="function")then
-                local returns = {__xpcall(__lunaoverworld[eventManager.nextEvent],...)}
-                if(not returns[1])then
-                    Text.windowDebugSimple(returns[2])
-                    __isLuaError = true
-                    return
-                end
-                table.remove(returns, 1)
-                eventReturn = returns
-            end
-        end
-        
-        --Event host after
-        if(eventManager.eventHosterAfter[eventManager.nextEvent])then
-            for k,v in pairs(eventManager.eventHosterAfter[eventManager.nextEvent]) do
-                if(type(v.apiTable[v.eventHandler])=="function")then
-                    local returns = {__xpcall(v.apiTable[v.eventHandler],...)} --Call event
-                    if(not returns[1])then
-                        Text.windowDebugSimple(returns[2])
-                        __isLuaError = true
-                        return
-                    end
-                    if(eventReturn ~= nil)then
-                        table.remove(returns, 1)
-                        eventReturn = returns
-                    end
-                end
-            end
-        end
-        
-        if(eventManager.nextEvent == "onLoop")then
-            detourEventQueue.dispatchEvents()
-        end
-        
-        if(type(eventReturn) == "table")then
-            return unpack(eventReturn)
-        end
-        return eventReturn
-    end
-},    
-{ --Metatable
-    __newindex = function (tarTable, key, value)
-        --Text.windowDebugSimple("newindex: "..tostring(key))
-    end,
-
-    __index = function (tarTable, tarKey)
-        if(type(rawget(eventManager,tarKey))=="nil")then --Handle a event
-            rawset(eventManager, "nextEvent", tarKey)
-            return rawget(eventManager, "manageEvent")
-        else
-            return rawget(eventManager, tarKey) --Get a already set field
-        end
-    end
-});
 
 
 -- ====================================================================
@@ -535,6 +216,32 @@ function string:split(sep)
     local pattern = string.format("([^%s]+)", sep)
     self:gsub(pattern, function(c) fields[#fields+1] = c end)
     return fields
+end
+
+function __xpcallCheck(returnData)
+    if(not returnData[1])then
+        Text.windowDebugSimple(returnData[2])
+        __isLuaError = true
+        return false
+    end
+    return true
+end
+
+local function findLast(haystack, needle)
+    local i=haystack:match(".*"..needle.."()")
+    if i==nil then return -1 else return i-1 end
+end
+
+local function filenameOfPath(path)
+    local lastIndexOfSlash = findLast(path, "/")
+    local lastIndexOfBackslash = findLast(path, "\\")
+    if(lastIndexOfSlash == -1 and lastIndexOfBackslash == -1)then return path end
+    
+    local lastIndex = lastIndexOfSlash
+    if(lastIndex < lastIndexOfBackslash)then
+        lastIndex = lastIndexOfBackslash
+    end
+    return path:sub(lastIndex + 1)
 end
 
 --=====================================================================
@@ -555,17 +262,18 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
         ".lua",
         ".dll"}
     local func, err
-    for _,apiPath in pairs(searchInPath) do
+    for _,apiSearchPath in pairs(searchInPath) do
         for _,ending in pairs(endings) do
-            func, err = loadfile(apiPath..apiPath..ending)
+            func, err = loadfile(apiSearchPath..apiPath..ending)
             if(func)then
                 loadedAPI = func()
                 if(type(loadedAPI) ~= "table")then
                     error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
                 end
-            end
-            if(not err:find("such file"))then
-                error(err,2)
+            else
+                if(not err:find("such file"))then
+                    error(err,2)
+                end
             end
             if(loadedAPI) then break end
         end
@@ -609,10 +317,12 @@ end
 -- Codefile manager END
 
 function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
+    console:println("DEBUG: Setting up instance!")
     -- 1. Setup the usercode instance
     local usercodeInstance = {}
     local loadedAPIsTable = {}
     
+    console:println("DEBUG: Setting up environment!")
     -- 2. Setup environment
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
@@ -621,21 +331,27 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
         end
     }
     
+    console:println("DEBUG: Adding proxy environment!")
     -- 2.2 Add proxy environment
     local eventEnvironment = EventManager.getProxyEnvironment()
     for k,v in pairs(eventEnvironment) do
         usercodeEnvironment[k] = v
     end
     
+    console:println("DEBUG: Setup metatable!")
     -- 3. Add access to global environment
     setmetatable( usercodeEnvironment, { __index = _G } )
     
+    console:println("DEBUG: Load and check code file!")
+    console:println("DEBUG: Loading codefile: "..codeFilePath)
     -- 4. Load the code file and add environment
-    local codeFile, err = loadfile(path)
+    local codeFile, err = loadfile(codeFilePath)
     if codeFile then
+        console:println("DEBUG: setfenv")
         -- 4.1 Set environment to the usercode
         setfenv( codeFile, usercodeEnvironment )
         -- 4.2 Execute file for initial run.
+        console:println("DEBUG: EXECUTE!")
         codeFile()
     else
         -- 4.3 If file not found then ignore error, otherwise throw error!
@@ -645,18 +361,24 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
         return false
     end
     
+    console:println("DEBUG: Copy environment result!")
     -- 5. Directly add "global" fields to the table.
     for k,v in pairs( usercodeEnvironment ) do
         usercodeInstance[k] =  v
     end
     
+    console:println("DEBUG: Call load function!")
     -- 6. Notify usercode file that loading has finished via "onLoad".
     if(type(usercodeInstance["onLoad"]) == "function")then
         usercodeInstance.onLoad()
     end
 
+    console:println("DEBUG: Add to code files!")
     -- 7. Now add the code file to the usercode table
     UserCodeManager.addCodeFile(codeFileName, usercodeEnvironment, loadedAPIsTable)
+    
+    -- 8. Subscript to all events
+    EventManager.addUserListener(usercodeEnvironment)
     
     return true
 end
@@ -681,7 +403,9 @@ function EventManager.callEvent(name, ...)
             hostObject = nextUserListener[mainName]
             mainName = childName
         end
-        hostObject[mainName](...)
+        if(hostObject[mainName])then
+            hostObject[mainName](...)
+        end
     end
 end
 function EventManager.queueEvent(name, ...)
@@ -693,6 +417,7 @@ function EventManager.queueEvent(name, ...)
     table.insert(EventManager.queuedEvents, newQueueEntry)
 end
 function EventManager.manageEventObj(eventObj, ...)
+    console:println("DEBUG: Manage LunaLua event: " .. eventObj.eventName)
     local directEventName = eventObj.directEventName
     if(directEventName == "")then
         directEventName = eventObj.eventName
@@ -741,9 +466,52 @@ function EventManager.doQueue()
 end
 
 
+
+
+
+-- ===== FUNCTION USED BY LUNALUA ===== --
 -- usage for luabind, always do with event-object
-function __CallEvent(...)
-    EventManager.manageEventObj(...)
+function __callEvent(...)
+    console:println("DEBUG: Calling Event!")
+    local pcallReturns = {__xpcall(EventManager.manageEventObj, ...)}
+    __xpcallCheck(pcallReturns)
 end
 
+function __doEventQueue()
+    console:println("DEBUG: Running queue")
+    local pcallReturns = {__xpcall(EventManager.doQueue)}
+    __xpcallCheck(pcallReturns)
+end
 
+--Preloading function
+--This code segment won't post any errors!
+function __onInit(episodePath, lvlName)
+    console:println("DEBUG: Start init")
+    local pcallReturns = {__xpcall(function()
+        console:println("DEBUG: Loading APIs")
+        --SEGMENT TO ADD PRELOADED APIS START
+        Defines = APIHelper.doAPI(_G, "core\\defines")
+        APIHelper.doAPI(_G, "uservar")
+        DBG = APIHelper.doAPI(_G, "core\\dbg")
+        --SEGMENT TO ADD PRELOADED APIS END
+        
+        console:println("DEBUG: Loading user files!")
+        __episodePath = episodePath
+        __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
+        local noFileLoaded = true
+        if(not isOverworld)then
+            if(UserCodeManager.loadCodeFile("lunadll", __customFolderPath.."lunadll.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("lunaworld", episodePath .. "lunaworld.lua")) then noFileLoaded = false end
+        else
+            if(UserCodeManager.loadCodeFile("lunaoverworld", episodePath .. "lunaoverworld.lua")) then noFileLoaded = false end
+        end
+        
+        console:println("DEBUG: Loaded user files!")
+        if(noFileLoaded)then
+            console:println("DEBUG: No user files found... shutting down!")
+            __isLuaError = true
+            return
+        end
+    end)}
+    __xpcallCheck(pcallReturns)
+end

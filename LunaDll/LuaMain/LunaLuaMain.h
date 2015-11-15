@@ -46,9 +46,7 @@ public:
 		bool err = false;
 		try
 		{
-			luabind::object evTable = LuaHelper::getEventCallbase(L, m_luaEventTableName);
-			luabind::object cl = evTable[luabind::object_cast<std::string>(luabind::globals(L)["__lapiSigNative"]) + e->eventName()];
-			luabind::call_function<void>(cl, e, args...);
+            luabind::call_function<void>(L, "__callEvent", e, args...);
 		}
 		catch (luabind::error& /*e*/)
 		{

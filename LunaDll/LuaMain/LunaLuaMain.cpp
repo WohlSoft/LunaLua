@@ -155,13 +155,12 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     //Call the lua api init funtion.
     {
         object _G = globals(L);
-        const char* initFunc = object_cast<const char*>(_G["__lapiInit"]);
-        m_luaEventTableName = std::string(object_cast<const char*>(_G["__lapiEventMgr"]));
+        const char* initName = "__onInit";
 
         try
         {
-            if(LuaHelper::is_function(L, initFunc)){
-                luabind::call_function<void>(L, initFunc, utf8_encode(codePath), utf8_encode(levelPath));
+            if(LuaHelper::is_function(L, initName)){
+                luabind::call_function<void>(L, initName, utf8_encode(codePath), utf8_encode(levelPath));
             }
         }
         catch (error& /*e*/)
@@ -1055,14 +1054,16 @@ void CLunaLua::doEvents()
         }
     }
 
+    Event* onLoopEvent = new Event("onLoop", false);
+    onLoopEvent->setLoopable(false);
+    onLoopEvent->setDirectEventName("onLoop");
+    callEvent(onLoopEvent);
+    delete onLoopEvent;
+
     bool err = false;
     try
     {
-        luabind::object evTable = LuaHelper::getEventCallbase(L, m_luaEventTableName);
-        luabind::object cl = evTable["onLoop"];
-        luabind::call_function<void>(cl);
-        if(m_type == LUNALUA_LEVEL)
-            LuaEvents::proccesEvents(L, m_luaEventTableName);
+        luabind::call_function<void>(L, "__doEventQueue");
     }
     catch (luabind::error& /*e*/)
     {
