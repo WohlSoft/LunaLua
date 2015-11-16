@@ -253,6 +253,21 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
         return apiTableHolder[apiName], false
     end
     
+	
+	local apiEnvironment = {
+        queueEvent = function()
+			
+		end,
+		callEvent = function()
+			
+		end
+    }
+	local eventEnvironment = EventManager.getProxyEnvironment()
+    for k,v in pairs(eventEnvironment) do
+        apiEnvironment[k] = v
+    end
+	setmetatable( apiEnvironment, { __index = _G } )
+	
     local loadedAPI = nil
     local searchInPath = {
     __episodePath,
@@ -266,6 +281,7 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
         for _,ending in pairs(endings) do
             func, err = loadfile(apiSearchPath..apiPath..ending)
             if(func)then
+				setfenv(func, apiEnvironment)
                 loadedAPI = func()
                 if(type(loadedAPI) ~= "table")then
                     error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
@@ -396,6 +412,20 @@ function EventManager.callEvent(name, ...)
     if(mainName == nil or childName == nil)then
         mainName, childName = unpack(name:split(":"))
     end
+	
+	local callApiListeners = function(isBefore, ...)
+		for _, nextAPIToHandle in pairs(EventManager.apiListeners) do
+			if(nextAPIToHandle.callBefore == isBefore)then
+				if(nextAPIToHandle.eventName == name)then
+					local hostObject = nextAPIToHandle.api
+					hostObject[nextAPIToHandle.eventHandlerName](...)
+				end
+			end
+		end
+	end
+	
+	callApiListeners(true, ...)
+	
     
     for _, nextUserListener in pairs(EventManager.userListeners)do
         local hostObject = nextUserListener
@@ -407,6 +437,8 @@ function EventManager.callEvent(name, ...)
             hostObject[mainName](...)
         end
     end
+	
+	callApiListeners(false, ...)
 end
 function EventManager.queueEvent(name, ...)
     local newQueueEntry = 
@@ -438,7 +470,7 @@ function EventManager.addUserListener(listenerObject)
 end
 
 function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainCall)
-    eventHandler = eventHandler or event
+    eventHandler = eventHandler or event --FIXME: Handle ==> NPC:onKill
     beforeMainCall = beforeMainCall or true
     local newApiHandler =
     {
@@ -472,7 +504,6 @@ end
 -- ===== FUNCTION USED BY LUNALUA ===== --
 -- usage for luabind, always do with event-object
 function __callEvent(...)
-    console:println("DEBUG: Calling Event!")
     local pcallReturns = {__xpcall(EventManager.manageEventObj, ...)}
     __xpcallCheck(pcallReturns)
 end
