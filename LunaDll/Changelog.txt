@@ -1,3 +1,7 @@
+v0.7.2.3 BETA
+  * Bugfix [LunaLua]: LunaLua is now only running, when SMBX is fully initialized.
+  * Added onStart - This event is the better "onLoop". This event will be executed, when SMBX is running the first frame.
+
 v0.7.2.2 BETA:
   * Extended NPC class
   * Bugfix [LunaLua]: Fixed Camera.width and Camera.height

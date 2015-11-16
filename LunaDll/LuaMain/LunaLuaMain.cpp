@@ -30,7 +30,9 @@ std::wstring CLunaLua::getLuaLibsPath()
 CLunaLua::CLunaLua() :
         m_type(CLunaLua::LUNALUA_LEVEL),
         m_luaEventTableName(""),
-        L(0)
+        L(0),
+        m_ready(false),
+        m_eventLoopOnceExecuted(false)
 {}
 
 CLunaLua::~CLunaLua()
@@ -45,6 +47,8 @@ bool CLunaLua::shutdown()
     if(!isValid())
         return false;
         
+    m_ready = false;
+    m_eventLoopOnceExecuted = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -1046,6 +1050,10 @@ void CLunaLua::doEvents()
     if(!isValid())
         return;
 
+    // If is not ready (SMBX not init), then skip event loop
+    if (!m_ready)
+        return;
+
     
     //If player is not valid then shutdown the lua module
     if(m_type == LUNALUA_LEVEL){
@@ -1055,6 +1063,15 @@ void CLunaLua::doEvents()
         }
     }
 
+    if (!m_eventLoopOnceExecuted) {
+        Event* onStartEvent = new Event("onStart", false);
+        onStartEvent->setLoopable(false);
+        onStartEvent->setDirectEventName("onStart");
+        callEvent(onStartEvent);
+        delete onStartEvent;
+        m_eventLoopOnceExecuted = true;
+    }
+    
     bool err = false;
     try
     {
