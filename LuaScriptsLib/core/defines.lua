@@ -26,7 +26,9 @@ local sortedCategories = {
     "Coin Value",
     "Level",
     "Cheats",
-    "Player Settings: Link"
+    "Player Settings: Link",
+    "Block Modification",
+    "Kill Modification"
 }
 
 local function getBoolean(self)
@@ -185,7 +187,22 @@ local defines = {
                                             else
                                                 mem(0x009AAF93, FIELD_BYTE, 0xFF)
                                             end
-                                        end}
+                                        end},
+    
+    
+    block_hit_link_rupeeID1         = {defValue = 251, minVal = 0, maxVal = 300, address = 0x009DBD9A, size = FIELD_WORD,
+                                        n = 1, group = "Block Modification", desc = "The npc id for Link's main coin when hitting the block. (Default would be the green rupee.)"},
+    block_hit_link_rupeeID2         = {defValue = 252, minVal = 0, maxVal = 300, address = 0x009DBDFF, size = FIELD_WORD,
+                                        n = 2, group = "Block Modification", desc = "The npc id for Link's secondary coin when hitting the block (chance 20:3). (Default would be the blue rupee.)"},
+    block_hit_link_rupeeID3         = {defValue = 253, minVal = 0, maxVal = 300, address = 0x009DBE64, size = FIELD_WORD,
+                                        n = 3, group = "Block Modification", desc = "The npc id for Link's tertiary coin when hitting the block (chance 60:3). (Default would be the red rupee.)"},
+
+    kill_drop_link_rupeeID1         = {defValue = 251, minVal = 0, maxVal = 300, address = 0x00A32943, size = FIELD_WORD,
+                                        n = 1, group = "Kill Modification", desc = "The npc id for Link's main coin when killing an enemy. (Default would be the green rupee.)"},
+    kill_drop_link_rupeeID2         = {defValue = 252, minVal = 0, maxVal = 300, address = 0x00A329D5, size = FIELD_WORD,
+                                        n = 2, group = "Kill Modification", desc = "The npc id for Link's secondary coin when killing an enemy. (chance 15:3). (Default would be the blue rupee.)"},
+    kill_drop_link_rupeeID3         = {defValue = 253, minVal = 0, maxVal = 300, address = 0x00A32A6F, size = FIELD_WORD,
+                                        n = 3, group = "Kill Modification", desc = "The npc id for Link's tertiary coin when killing an enemy. (chance 40:3). (Default would be the red rupee.)"},
 }
 
 --(Re)sets a define
