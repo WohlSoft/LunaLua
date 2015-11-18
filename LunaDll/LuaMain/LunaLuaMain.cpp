@@ -15,6 +15,7 @@
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 
+
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
 
@@ -57,6 +58,7 @@ bool CLunaLua::shutdown()
 
 void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelPath /*= std::wstring()*/)
 {
+    SafeFPUControl noFPUExecptions;
 
     //Just to be safe
     shutdown();
@@ -1046,6 +1048,8 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
+    SafeFPUControl noFPUExecptions;
+
     //If the lua module is not valid anyway, then just return
     if(!isValid())
         return;

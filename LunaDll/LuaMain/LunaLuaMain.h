@@ -5,6 +5,7 @@
 #include "LuabindIncludes.h"
 #include "LuaSharedProxy.h"
 #include "LuaHelper.h"
+#include "../Misc/SafeFPUControl.h"
 
 class CLunaLua
 {
@@ -39,7 +40,9 @@ public:
 
 	template<typename... Args>
 	void callEvent(Event* e, Args... args){
-		if (!isValid())
+        SafeFPUControl noFPUExecptions;
+        
+        if (!isValid())
 			return;
 
         if (!m_ready)

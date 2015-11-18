@@ -474,6 +474,9 @@
     <ClInclude Include="Misc\TypeLib.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\SafeFPUControl.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -901,6 +904,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp">
       <Filter>Header Files\Lua\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\SafeFPUControl.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
