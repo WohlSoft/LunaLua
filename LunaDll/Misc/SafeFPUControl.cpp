@@ -2,8 +2,11 @@
 
 #include <float.h>
 #include <iostream>
+#include <cfenv>
 
 #pragma fenv_access (on)
+#pragma STDC FENV_ACCESS ON
+
 
 /*
  FIXME: Right now disabling all FPU exceptions will crash SMBX with the SSE2 error 0xc00002b4 by _lj_set_tab function by luajit.
@@ -22,6 +25,7 @@ SafeFPUControl::SafeFPUControl()
 
 SafeFPUControl::~SafeFPUControl()
 {
+    std::feclearexcept(FE_ALL_EXCEPT);
     /*
     unsigned int temp;
     int err = _controlfp_s(&temp, fpu_control, _MCW_EM);
