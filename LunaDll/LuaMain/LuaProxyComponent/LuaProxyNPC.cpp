@@ -314,6 +314,7 @@ void LuaProxy::NPC::kill(lua_State* L)
 	if(!isValid_throw(L))
 		return;
 	::NPC::Get(m_index)->killFlag = 1;
+    ::NPC::Get(m_index)->isHidden = COMBOOL(false);
 }
 
 void LuaProxy::NPC::kill(int killEffectID, lua_State* L)
@@ -321,6 +322,7 @@ void LuaProxy::NPC::kill(int killEffectID, lua_State* L)
 	if(!isValid_throw(L))
 		return;
 	::NPC::Get(m_index)->killFlag = killEffectID;
+    ::NPC::Get(m_index)->isHidden = COMBOOL(false);
 }
 
 luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State* L) const
