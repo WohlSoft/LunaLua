@@ -831,11 +831,9 @@ extern void __stdcall FrameTimingMaxFPSHook()
     FrameTimingHook();
 }
 
-#include <iostream>
-
+// Also know as "Player init" hook. This method is called when the player resets.
 extern void __stdcall InitLevelEnvironmentHook()
 {
-    std::cout << "LUNALUA DEBUG: Init Level Environment" << std::endl;
     native_initLevelEnv();
 }
 

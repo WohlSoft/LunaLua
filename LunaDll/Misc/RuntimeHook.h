@@ -104,6 +104,7 @@ extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
+extern void __stdcall InitLevelEnvironmentHook();
 extern short __stdcall MessageBoxOpenHook();
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);

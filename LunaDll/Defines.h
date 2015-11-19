@@ -510,6 +510,9 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 #define GF_SAVE_GAME        0x008E47D0
 
+//      No args
+#define GF_INIT_LEVEL_ENVIR 0x009944F0
+
 // Start kill event for a player
 //      Arg1 = int* to Index of player
 #define GF_KILL_PLAYER      0x009B66D0
@@ -647,6 +650,7 @@ static const auto native_spritesheetY   = (short(__stdcall *)(int* /*spriteIndex
 static const auto native_isOnCamera     = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_CAMERA;
 static const auto native_isOnWCamera    = (short(__stdcall *)(unsigned int* /*camIndex*/, Momentum* /*momentumObj*/))GF_IS_ON_WCAMERA;
 
+static const auto native_initLevelEnv   = (void(__stdcall *)())GF_INIT_LEVEL_ENVIR;
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
 static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;

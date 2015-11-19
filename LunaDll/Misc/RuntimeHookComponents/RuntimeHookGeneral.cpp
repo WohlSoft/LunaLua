@@ -333,6 +333,18 @@ void TrySkipPatch()
     PATCH_FUNC(0x909217, &GenerateScreenshotHook);
     PATCH_FUNC(0x94D5E7, &GenerateScreenshotHook);
     
+    PATCH_FUNC(0x8C03DC, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8C0A1A, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8C1383, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8C1953, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8CE292, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8E61BD, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x8FE8D4, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x987E94, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0x9B7B2C, &InitLevelEnvironmentHook);
+    PATCH_FUNC(0xA02AD3, &InitLevelEnvironmentHook);
+
+
     // Graphics Bitblt hooks
     PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);
     PATCH_FUNC(0x8D8BF1, &LoadLocalGfxHook);
