@@ -183,19 +183,17 @@ extern int __stdcall LoadIntro()
     /* TEST END */
     std::string autostartFile = utf8_encode(getModulePath()) + "\\autostart.ini";
 
-    if (!file_existsX(autostartFile))
-        return GetTickCount();
-
-    INIReader autostartConfig(autostartFile);
-    if (autostartConfig.GetBoolean("autostart", "do-autostart", false)){
-        if (!gAutostartRan){
-            GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-            autostarter.applyAutostart();
-            gAutostartRan = true;
+    if (file_existsX(autostartFile)) {
+        INIReader autostartConfig(autostartFile);
+        if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
+            if (!gAutostartRan) {
+                GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                autostarter.applyAutostart();
+                gAutostartRan = true;
+            }
         }
-        
     }
-
+    
     if (GameAutostartConfig::nextAutostartConfig) {
         GameAutostartConfig::nextAutostartConfig->doAutostart();
         GameAutostartConfig::nextAutostartConfig.reset();
@@ -832,6 +830,15 @@ extern void __stdcall FrameTimingMaxFPSHook()
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHook();
 }
+
+#include <iostream>
+
+extern void __stdcall InitLevelEnvironmentHook()
+{
+    std::cout << "LUNALUA DEBUG: Init Level Environment" << std::endl;
+    native_initLevelEnv();
+}
+
 
 extern short __stdcall MessageBoxOpenHook()
 {
