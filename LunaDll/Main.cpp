@@ -145,6 +145,7 @@ int OnLvlLoad() {
         //  which can result in a memory leak of the whole Lua state!
 		//    gLunaLua = CLunaLua();
 		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
+        gLunaLua.setReady(true);
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init

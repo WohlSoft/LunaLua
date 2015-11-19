@@ -490,11 +490,6 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
-    // We can be sure that the level is now really loaded. With this knowledge we can activate LunaLua.
-    if (std::wstring(L"Level - Start") == std::wstring(eventName)) {
-        gLunaLua.setReady(true);
-    }
-
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
     Event TriggerEventData("onEvent", true);
     gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
