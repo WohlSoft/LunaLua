@@ -131,6 +131,10 @@ extern int __stdcall LoadWorld()
     gSavedVarBank.ClearBank();
     Input::ResetAll();
 
+    // Static default hitboxes and other values
+    native_initStaticVals();
+    native_initDefVals();
+
     gLunaRender.ReloadScreenHDC();
     g_GLEngine.ClearSMBXSprites();
 

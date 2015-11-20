@@ -122,6 +122,10 @@ int OnLvlLoad() {
 	gSavedVarBank.ClearBank();	
 	Input::ResetAll();
 
+    // Static default hitboxes and other values
+    native_initStaticVals();
+    native_initDefVals();
+
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
     g_GLEngine.ClearSMBXSprites();

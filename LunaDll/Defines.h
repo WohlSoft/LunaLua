@@ -508,6 +508,10 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg4 = float* y
 #define GF_PRINT            0x00951F50
 
+#define GF_INIT_STATIC_VALS 0x008BE410
+
+#define GF_INIT_DEF_VALS    0x008C2720
+
 #define GF_SAVE_GAME        0x008E47D0
 
 //      No args
@@ -639,6 +643,9 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
+
+static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
+static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
