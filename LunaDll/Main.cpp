@@ -26,6 +26,8 @@
 
 #define PATCHIT 1
 
+static bool LevelCustomSounds = false;
+
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
 {
@@ -91,27 +93,36 @@ int OnLvlLoad() {
     // WIP
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
-#ifndef NO_SDL
-	if(!episodeStarted)
-	{//Load custom sounds
-		std::string wldPath = wstr2str(GM_FULLDIR);
-		std::string SndRoot = MusicManager::SndRoot();
-        std::string custPath = wstr2str(getCustomFolderPath());
-        replaceSubStr(wldPath, "\"", "");
-		replaceSubStr(wldPath, "\\\\",  "\\");
-		replaceSubStr(wldPath, "/",  "\\");
+    std::string custPath = wstr2str(getCustomFolderPath());
+    std::string wldPath = wstr2str(GM_FULLDIR);
+    std::string SndRoot = MusicManager::SndRoot();
+    replaceSubStr(wldPath, "\"", "");
+    replaceSubStr(wldPath, "\\\\",  "\\");
+    replaceSubStr(wldPath, "/",  "\\");
 
-		replaceSubStr(SndRoot, "\"", "");
-		replaceSubStr(SndRoot, "\\\\",  "\\");
-		replaceSubStr(SndRoot, "/",  "\\");
+    replaceSubStr(SndRoot, "\"", "");
+    replaceSubStr(SndRoot, "\\\\",  "\\");
+    replaceSubStr(SndRoot, "/",  "\\");
 
-		if(wldPath!=SndRoot)
-		{
-            MusicManager::loadCustomSounds(wldPath+"\\", custPath);
-			//MessageBoxA(0, std::string(wldPath+"\n"+SndRoot+"\nLevel started").c_str(), "Debug", 0);
-		}
+    bool doSoundLoading=false;
+
+    if((!custPath.empty()) && (file_existsX(custPath+"\\sounds.ini"))) {
+        //If custom-level specific sounds.ini detected
+        doSoundLoading = true;
+        LevelCustomSounds = true;
+    } else if(LevelCustomSounds) {
+        //If custom-level specific sounds.ini was NOT detected, but was loaded recently - reload episode specific sounds
+        doSoundLoading = true;
+        LevelCustomSounds = false;
+    }
+
+    if(!episodeStarted) {
+        //Load custom sounds if episode is not finally started
+        if(wldPath!=SndRoot) doSoundLoading=true;
 	}
-#endif
+
+    if(doSoundLoading) MusicManager::loadCustomSounds(wldPath+"\\", custPath);
+
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gIsOverworld = false;
