@@ -93,36 +93,6 @@ int OnLvlLoad() {
     // WIP
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
-    std::string custPath = wstr2str(getCustomFolderPath());
-    std::string wldPath = wstr2str(GM_FULLDIR);
-    std::string SndRoot = MusicManager::SndRoot();
-    replaceSubStr(wldPath, "\"", "");
-    replaceSubStr(wldPath, "\\\\",  "\\");
-    replaceSubStr(wldPath, "/",  "\\");
-
-    replaceSubStr(SndRoot, "\"", "");
-    replaceSubStr(SndRoot, "\\\\",  "\\");
-    replaceSubStr(SndRoot, "/",  "\\");
-
-    bool doSoundLoading=false;
-
-    if((!custPath.empty()) && (file_existsX(custPath+"\\sounds.ini"))) {
-        //If custom-level specific sounds.ini detected
-        doSoundLoading = true;
-        LevelCustomSounds = true;
-    } else if(LevelCustomSounds) {
-        //If custom-level specific sounds.ini was NOT detected, but was loaded recently - reload episode specific sounds
-        doSoundLoading = true;
-        LevelCustomSounds = false;
-    }
-
-    if(!episodeStarted) {
-        //Load custom sounds if episode is not finally started
-        if(wldPath!=SndRoot) doSoundLoading=true;
-	}
-
-    if(doSoundLoading) MusicManager::loadCustomSounds(wldPath+"\\", custPath);
-
 	// Clean up leftovers
 	gSkipSMBXHUD = false;
 	gIsOverworld = false;
@@ -136,6 +106,37 @@ int OnLvlLoad() {
     // Static default hitboxes and other values
     native_initStaticVals();
     native_initDefVals();
+
+    std::string custPath = wstr2str(getCustomFolderPath());
+    std::string wldPath = wstr2str(GM_FULLDIR);
+    std::string SndRoot = MusicManager::SndRoot();
+    replaceSubStr(wldPath, "\"", "");
+    replaceSubStr(wldPath, "\\\\", "\\");
+    replaceSubStr(wldPath, "/", "\\");
+
+    replaceSubStr(SndRoot, "\"", "");
+    replaceSubStr(SndRoot, "\\\\", "\\");
+    replaceSubStr(SndRoot, "/", "\\");
+
+    bool doSoundLoading = false;
+
+    if ((!custPath.empty()) && (file_existsX(custPath + "\\sounds.ini"))) {
+        //If custom-level specific sounds.ini detected
+        doSoundLoading = true;
+        LevelCustomSounds = true;
+    }
+    else if (LevelCustomSounds) {
+        //If custom-level specific sounds.ini was NOT detected, but was loaded recently - reload episode specific sounds
+        doSoundLoading = true;
+        LevelCustomSounds = false;
+    }
+
+    if (!episodeStarted) {
+        //Load custom sounds if episode is not finally started
+        if (wldPath != SndRoot) doSoundLoading = true;
+    }
+
+    if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
 	// Update renderer stuff
 	gLunaRender.ReloadScreenHDC();
