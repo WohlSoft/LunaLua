@@ -77,7 +77,7 @@ LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, d
         return LuaProxy::Animation(-1);
     }
 
-    Momentum coor;                          //Arg 2
+	Momentum coor = {0};                    //Arg 2
     coor.x = x;
     coor.y = y;            //Arg 3
     short npcID = 0;                        //Arg 4
