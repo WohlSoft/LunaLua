@@ -208,8 +208,11 @@ DEFMEM(GM_PLAYERS_TEMPLATE, void*, 0x00B2C91C);     // Editor Template
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
 DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
 
-// HUD stuff
+// Star counting
 DEFMEM(GM_STAR_COUNT,       DWORD, 0x00B251E0);
+DEFMEM(GM_STARS_PTR,        void*, 0x00B25714);
+
+// HUD stuff
 DEFMEM(GM_COINS,            WORD,  0x00B2C5A8);
 DEFMEM(GM_PLAYER_LIVES,     FLOAT, 0x00B2C5AC);
 
