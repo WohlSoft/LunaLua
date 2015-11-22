@@ -18,6 +18,7 @@
 #include <fstream>
 
 #include "Misc/MiscFuncs.h"
+#include "Input/Input.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -159,44 +160,64 @@ bool file_existsX(const std::string& name)
     }   
 }
 
+void ResetLunaModule() 
+{
+    gLunaEnabled = true;
+    gShowDemoCounter = false;
+    gSkipSMBXHUD = false;
+    gPrintErrorsToScreen = true;
+    gLogger.m_Enabled = false;
+    gIsOverworld = false;
+    gCellMan.Reset();
+
+
+    gFrames = 0;
+
+    gLastDownPress = 0;
+    gDownTapped = 0;
+    gLastUpPress = 0;
+    gUpTapped = 0;
+    gLastLeftPress = 0;
+    gLeftTapped = 0;
+    gLastRightPress = 0;
+    gRightTapped = 0;
+
+    gLastJumpPress = 0;
+    gJumpTapped = 0;
+    gLastRunPress = 0;
+    gRunTapped = 0;
+
+    gLevelEnum = Invalid;
+
+
+    gSkipSMBXHUD = false;
+    gOverworldHudControlFlag = WHUD_ALL;
+    gLunaRender.ClearAll();
+    gSpriteMan.ResetSpriteManager();
+    gCellMan.Reset();
+    gSavedVarBank.ClearBank();
+    Input::ResetAll();
+
+
+    gOverworldHudControlFlag = WHUD_ALL;
+    gHook_SkipTestMsgBox = false;
+
+    // Static default hitboxes and other values
+    native_initStaticVals();
+    native_initDefVals();
+
+    gLunaRender.ReloadScreenHDC();
+
+
+}
+
 /// INIT GLOBALS
 void InitGlobals()
 {
-	//char* dbg = "GLOBAL INIT DBG";
-	gLunaEnabled = true;
-	gShowDemoCounter = false;
-	gSkipSMBXHUD = false;
-	gPrintErrorsToScreen = true;
-	gLogger.m_Enabled = false;
-	gIsOverworld = false;
-	gCellMan.Reset();
-
-	gFrames = 0;
-
-	gLastDownPress = 0;
-	gDownTapped = 0;
-	gLastUpPress = 0;
-	gUpTapped = 0;
-	gLastLeftPress = 0;
-	gLeftTapped = 0;
-	gLastRightPress = 0;
-	gRightTapped = 0;
-
-	gLastJumpPress = 0;
-	gJumpTapped = 0;
-	gLastRunPress = 0;
-	gRunTapped = 0;
-
-	gCurrentMainPlayer = 1;
-
-	gLevelEnum = Invalid;
-
+    //char* dbg = "GLOBAL INIT DBG";
+	
 	//startup settings default
     memset(&gStartupSettings, 0, sizeof(gStartupSettings));
-
-	gHook_SkipTestMsgBox = false;
-
-    gOverworldHudControlFlag = WHUD_ALL;
 
 	srand((int)time(NULL));
 

@@ -113,6 +113,9 @@ extern void __stdcall forceTermination()
 
 extern int __stdcall LoadWorld()
 {
+    ResetLunaModule();
+    gIsOverworld = true;
+
 #ifndef NO_SDL
     if (!episodeStarted)
     {
@@ -122,20 +125,6 @@ extern int __stdcall LoadWorld()
     }
 #endif
 
-    gSkipSMBXHUD = false;
-    gIsOverworld = true;
-    gOverworldHudControlFlag = WHUD_ALL;
-    gLunaRender.ClearAll();
-    gSpriteMan.ResetSpriteManager();
-    gCellMan.Reset();
-    gSavedVarBank.ClearBank();
-    Input::ResetAll();
-
-    // Static default hitboxes and other values
-    native_initStaticVals();
-    native_initDefVals();
-
-    gLunaRender.ReloadScreenHDC();
     g_GLEngine.ClearSMBXSprites();
 
     // Init var bank

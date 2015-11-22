@@ -89,24 +89,13 @@ int OnLvlLoad() {
 
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
+    
+    ResetLunaModule();
 
     // WIP
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
-	// Clean up leftovers
-	gSkipSMBXHUD = false;
-	gIsOverworld = false;
-    gOverworldHudControlFlag = WHUD_ALL;
-	gLunaRender.ClearAll();
-	gSpriteMan.ResetSpriteManager();
-	gCellMan.Reset();
-	gSavedVarBank.ClearBank();	
-	Input::ResetAll();
-
-    // Static default hitboxes and other values
-    native_initStaticVals();
-    native_initDefVals();
-
+    
     std::string custPath = wstr2str(getCustomFolderPath());
     std::string wldPath = wstr2str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
@@ -139,8 +128,7 @@ int OnLvlLoad() {
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
 	// Update renderer stuff
-	gLunaRender.ReloadScreenHDC();
-    g_GLEngine.ClearSMBXSprites();
+	g_GLEngine.ClearSMBXSprites();
 
 	if(gLunaEnabled) {
 		// Load autocode
@@ -362,7 +350,6 @@ void InitLevel() {
 	// Example init block
 	if(curlvl == L"dlltest.lvl") {
 		gLevelEnum = DllTestLvl;
-		gCurrentMainPlayer = 1; // If you need to init stuff pre-level like this, you can put it in your level's init block		
 	}
 
 	// Qraestolia Caverns init block

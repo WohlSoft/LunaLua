@@ -24,6 +24,7 @@ bool isAbsolutePath(const std::wstring& path);
 bool isAbsolutePath(const std::string& path);
 
 /// Functions ///
+void ResetLunaModule();
 void InitGlobals();
 void ResetFreeGlob();
 void CleanUp();

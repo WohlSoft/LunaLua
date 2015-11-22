@@ -38,8 +38,6 @@ int gJumpTapped;
 int gLastRunPress;
 int gRunTapped;
 
-int	gCurrentMainPlayer;
-
 HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
