@@ -526,6 +526,7 @@ void RedirectIOToConsole()
     ios::sync_with_stdio();
 }
 
+#ifdef BUILD_WITH_ATL_STUFF
 // WIP 
 #include <atlbase.h>
 #include "Misc/TypeLib.h"
@@ -586,3 +587,4 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
     */
 
 }
+#endif
