@@ -164,6 +164,7 @@
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
     <ClInclude Include="Misc\SafeFPUControl.h" />
+    <ClInclude Include="SMBXInternal\CollectedStarRecord.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
     <ClInclude Include="GameConfig\GameAutostart.h" />

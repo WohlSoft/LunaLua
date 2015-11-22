@@ -477,6 +477,9 @@
     <ClInclude Include="Misc\SafeFPUControl.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\CollectedStarRecord.h">
+      <Filter>Header Files\SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
