@@ -409,18 +409,7 @@ struct NPCMOB {
     short offscreenFlag;                    //+0x74
     short unknown_76;                       //+0x76
     Momentum momentum;                      //+0x78
-    double spawnX;                          //+0xA8
-    double spawnY;                          //+0xB0
-    double gfxHeight;                       //+0xB8
-    double gfxWidth;                        //+0xC0
-    short unknown_C8;                       //+0xC8
-    short unknown_CA;                       //+0xCA
-    short unknown_CC;                       //+0xCC
-    short unknown_CE;                       //+0xCE
-    short unknown_D0;                       //+0xD0
-    short unknown_D2;                       //+0xD2
-    short unknown_D4;                       //+0xD4
-    short unknown_D6;                       //+0xD6
+    Momentum spawnMomentum;                 //+0xA8
     short unknown_D8;                       //+0xD8
     short unknown_DA;                       //+0xDA
     short respawnID;                        //+0xDC
