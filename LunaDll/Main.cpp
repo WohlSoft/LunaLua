@@ -220,12 +220,28 @@ int HUDHook()
 	if(gSMBXHUDSettings.skip) {
         // 0096C036 | E9 D5 BB 01 00 | jmp 987C10
         // 0096C03B | 90 | nop
-        *((unsigned int*)0x96C036) = 0x01BBD5E9;
-        *((unsigned short*)0x96C03a) = 0x9000;
+        const static unsigned char skipHudASM[] = {
+            0xE9, 0xD5, 0xBB, 0x01, 0x00, 0x90};
+        memcpy((void*)0x96C036, skipHudASM, 6);
     } else {
         // 0096C036 | 0F 84 D1 8B 00 00 | je 974C0D
-        *((unsigned int*)0x96C036) = 0x8BD1840F;
-        *((unsigned short*)0x96C03a) = 0x0000;
+        const static unsigned char noSkipHudASM[] = {
+            0x0F, 0x84, 0xD1, 0x8B, 0x00, 0x00 };
+        memcpy((void*)0x96C036, noSkipHudASM, 6);
+    }
+
+    if (gSMBXHUDSettings.skipStarCount) {
+        PATCH_CONDJMP_TO_NOPJMP(0x973E85);
+        PATCH_CONDJMP_TO_NOPJMP(0x97ADBF);
+        PATCH_CONDJMP_TO_NOPJMP(0x9837A1);
+    }
+    else {
+        // 00973E85 | 0F 8E 54 1A 01 00 | jng 9858DF
+        // 0097ADBF | 0F 8E 1A AB 00 00 | jng 9858DF
+        // 009837A1 | 0F 8E 38 21 00 00 | jng 9858DF
+        PATCH_NOPJMP_TO_JNG(0x973E85);
+        PATCH_NOPJMP_TO_JNG(0x97ADBF);
+        PATCH_NOPJMP_TO_JNG(0x9837A1);
     }
 
 	// Restore some code the hook overwrote

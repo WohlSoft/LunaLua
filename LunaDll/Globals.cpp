@@ -20,8 +20,9 @@ bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
 bool gAutostartRan = false;
 SMBXHUDSettings gSMBXHUDSettings = {
-    false,   // skip
-    WHUD_ALL // overworldHudControlFlag
+    false,    // skip
+    WHUD_ALL, // overworldHudControlFlag
+    false     // skipStarCount
 };
 
 // Global variables

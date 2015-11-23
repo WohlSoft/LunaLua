@@ -48,6 +48,7 @@ struct startUpSettings{
 struct SMBXHUDSettings {
     bool              skip; // Skip the whole HUD drawing
     WORLD_HUD_CONTROL overworldHudState;
+    bool              skipStarCount;
 };
 
 extern HINSTANCE	gHInstance;

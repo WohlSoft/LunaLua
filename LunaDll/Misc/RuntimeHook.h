@@ -39,7 +39,19 @@ static inline void PATCH_FUNC_CALL_SAFE(DWORD ptr, void* func) { // Takes 13 byt
     bPtr[11] = 0x58; // pop eax
     bPtr[12] = 0x9D; // popf
 }
+// Transform a conditional jump, into a sequence of nop followed by jmp
+static inline void PATCH_CONDJMP_TO_NOPJMP(unsigned int addr) {
+    unsigned char* inst = (unsigned char*)addr;
+    inst[0] = 0x90;
+    inst[1] = 0xE9;
+}
 
+// Transform a sequence of nop followed by jmp, to a jng
+static inline void PATCH_NOPJMP_TO_JNG(unsigned int addr) {
+    unsigned char* inst = (unsigned char*)addr;
+    inst[0] = 0x0F;
+    inst[1] = 0x84;
+}
 
 #ifndef NO_SDL
 extern bool episodeStarted;

@@ -170,6 +170,7 @@ void ResetLunaModule()
 
     gSMBXHUDSettings.skip = false;
     gSMBXHUDSettings.overworldHudState = WHUD_ALL;
+    gSMBXHUDSettings.skipStarCount = false;
 
     gFrames = 0;
 
