@@ -576,6 +576,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg3 = short* The Object Index
 #define GF_NPC_COLLIDES     0x00A281B0
 
+//      Arg1 = Mometum* The location for the bomb explosion
+//      Arg2 = short* Bomb explosion type
+//      Arg3 = short* Player index
+#define GF_DO_BOMB          0x00A3BA90
+
 //      No Args, Does convert every NPC to coins (Like player would win)
 #define GF_NPC_TO_COINS     0x00A3C580
 
@@ -672,6 +677,7 @@ static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short*
 
 static const auto native_collideNPC     = (void(__stdcall *)(short* /*npcIndexToCollide*/, CollidersType* /*typeOfObject*/, short* /*objectIndex*/))GF_NPC_COLLIDES;
 
+static const auto native_doBomb         = (void(__stdcall *)(Momentum* /*position*/, short* /*bombType*/, short* /*player index*/))GF_DO_BOMB;
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;
 static const auto native_doPow          = (void(__stdcall *)())GF_POW;
 

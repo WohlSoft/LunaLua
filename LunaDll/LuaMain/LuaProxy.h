@@ -1019,6 +1019,8 @@ namespace LuaProxy {
     namespace Misc{
         void npcToCoins();
         void doPOW();
+        void doBombExplosion(double x, double y, short bombType);
+        void doBombExplosion(double x, double y, short bombType, const LuaProxy::Player& playerObj);
         std::string cheatBuffer();
         void cheatBuffer(const luabind::object &value, lua_State* L);
         luabind::object listFiles(const std::string& path, lua_State* L);

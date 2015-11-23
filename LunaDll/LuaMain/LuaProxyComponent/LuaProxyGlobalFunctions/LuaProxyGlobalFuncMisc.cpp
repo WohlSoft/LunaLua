@@ -13,6 +13,18 @@ void LuaProxy::Misc::doPOW()
     native_doPow();
 }
 
+void LuaProxy::Misc::doBombExplosion(double x, double y, short bombType)
+{
+    doBombExplosion(x, y, bombType, LuaProxy::Player(0));
+}
+
+void LuaProxy::Misc::doBombExplosion(double x, double y, short bombType, const LuaProxy::Player& playerObj) {
+    Momentum position = { 0 };
+    position.x = x;
+    position.y = y;
+    short playerIndex = playerObj.m_index;
+    native_doBomb(&position, &bombType, &playerIndex);
+}
 
 std::string LuaProxy::Misc::cheatBuffer()
 {
@@ -111,3 +123,4 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
         exitGame();
     return success;
 }
+

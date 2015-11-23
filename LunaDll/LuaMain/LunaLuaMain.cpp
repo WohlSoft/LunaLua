@@ -755,7 +755,9 @@ void CLunaLua::bindAll()
                 
                 namespace_("Misc")[
                     def("npcToCoins", &LuaProxy::Misc::npcToCoins),
-                    def("doPOW", &LuaProxy::Misc::doPOW)
+                    def("doPOW", &LuaProxy::Misc::doPOW),
+                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
+                    def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
 
                 namespace_("Level")[
