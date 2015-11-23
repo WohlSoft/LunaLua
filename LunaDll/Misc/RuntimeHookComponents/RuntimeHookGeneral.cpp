@@ -133,12 +133,12 @@ static unsigned int __stdcall LatePatch(void)
     // after we have the VB runtime running.
     fixup_ErrorReporting();
 
+    // Be sure that all values are init.
+    ResetLunaModule();
+
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
     return *((unsigned int*)(0xB2D788));
-
-    // Be sure that all values are init.
-    ResetLunaModule();
 }
 
 static bool IsWindowsVistaOrNewer() {
