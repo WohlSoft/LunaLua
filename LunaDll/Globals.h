@@ -45,16 +45,21 @@ struct startUpSettings{
     bool console;
 };
 
+struct SMBXHUDSettings {
+    bool              skip; // Skip the whole HUD drawing
+    WORLD_HUD_CONTROL overworldHudState;
+};
+
 extern HINSTANCE	gHInstance;
 
 /// Global settings
-extern bool		gLunaEnabled;
-extern bool		gShowDemoCounter;
-extern bool		gSkipSMBXHUD;
-extern bool		gPrintErrorsToScreen;
-extern bool		gIsOverworld;
-extern bool		gHook_SkipTestMsgBox;
-extern bool     gAutostartRan;
+extern bool            gLunaEnabled;
+extern bool            gShowDemoCounter;
+extern bool            gPrintErrorsToScreen;
+extern bool            gIsOverworld;
+extern bool            gHook_SkipTestMsgBox;
+extern bool            gAutostartRan;
+extern SMBXHUDSettings gSMBXHUDSettings;
 
 extern startUpSettings gStartupSettings;
 
@@ -104,9 +109,6 @@ extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
 
 extern CLunaLua				gLunaLua;
-
-
-extern WORLD_HUD_CONTROL    gOverworldHudControlFlag;
 
 /// HELPER MACROS ///
 /*

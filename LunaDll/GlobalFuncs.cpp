@@ -164,12 +164,12 @@ void ResetLunaModule()
 {
     gLunaEnabled = true;
     gShowDemoCounter = false;
-    gSkipSMBXHUD = false;
     gPrintErrorsToScreen = true;
     gLogger.m_Enabled = false;
     gIsOverworld = false;
-    gCellMan.Reset();
 
+    gSMBXHUDSettings.skip = false;
+    gSMBXHUDSettings.overworldHudState = WHUD_ALL;
 
     gFrames = 0;
 
@@ -189,17 +189,12 @@ void ResetLunaModule()
 
     gLevelEnum = Invalid;
 
-
-    gSkipSMBXHUD = false;
-    gOverworldHudControlFlag = WHUD_ALL;
     gLunaRender.ClearAll();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
     gSavedVarBank.ClearBank();
     Input::ResetAll();
 
-
-    gOverworldHudControlFlag = WHUD_ALL;
     gHook_SkipTestMsgBox = false;
 
     // Static default hitboxes and other values
@@ -207,8 +202,6 @@ void ResetLunaModule()
     native_initDefVals();
 
     gLunaRender.ReloadScreenHDC();
-
-
 }
 
 /// INIT GLOBALS

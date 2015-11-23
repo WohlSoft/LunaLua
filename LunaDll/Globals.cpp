@@ -15,11 +15,14 @@ HINSTANCE gHInstance;
 // Global settings
 bool gLunaEnabled;
 bool gShowDemoCounter;
-bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
 bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
 bool gAutostartRan = false;
+SMBXHUDSettings gSMBXHUDSettings = {
+    false,   // skip
+    WHUD_ALL // overworldHudControlFlag
+};
 
 // Global variables
 int	gFrames;
@@ -75,6 +78,4 @@ GeneralLunaConfig    gGeneralConfig;
 
 CLunaLua gLunaLua;
 
-
-WORLD_HUD_CONTROL    gOverworldHudControlFlag = WHUD_ALL;
 

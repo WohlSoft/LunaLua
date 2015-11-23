@@ -36,22 +36,22 @@ int LuaProxy::Graphics::LuaImageResource::GetHeight() {
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {
-    gSkipSMBXHUD = !activate;
+    gSMBXHUDSettings.skip = !activate;
 }
 
 bool LuaProxy::Graphics::isHudActivated()
 {
-    return !gSkipSMBXHUD;
+    return !gSMBXHUDSettings.skip;
 }
 
 void LuaProxy::Graphics::activateOverworldHud(WORLD_HUD_CONTROL activateFlag)
 {
-    gOverworldHudControlFlag = activateFlag;
+    gSMBXHUDSettings.overworldHudState = activateFlag;
 }
 
 WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
 {
-    return gOverworldHudControlFlag;
+    return gSMBXHUDSettings.overworldHudState;
 }
 
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* filename)

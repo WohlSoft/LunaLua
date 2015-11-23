@@ -217,7 +217,7 @@ int HUDHook()
 
 	// Overwrite next instruction if we're skipping hud drawing,
     // otherwise make sure the original is restored
-	if(gSkipSMBXHUD) {
+	if(gSMBXHUDSettings.skip) {
         // 0096C036 | E9 D5 BB 01 00 | jmp 987C10
         // 0096C03B | 90 | nop
         *((unsigned int*)0x96C036) = 0x01BBD5E9;
