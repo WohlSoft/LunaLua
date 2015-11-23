@@ -1037,6 +1037,8 @@ namespace LuaProxy {
             int imgResource;
             LuaImageResource(int imgResource);
             ~LuaImageResource();
+            int GetWidth();
+            int GetHeight();
         };
 
         void activateHud(bool activateHud);

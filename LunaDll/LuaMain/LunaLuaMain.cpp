@@ -289,7 +289,9 @@ void CLunaLua::bindAll()
 
             namespace_("Graphics")[
                 class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource")
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>),
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+                    .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
+                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
                 def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const char*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),

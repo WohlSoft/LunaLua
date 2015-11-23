@@ -18,6 +18,22 @@ LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
     gLunaRender.DeleteImage(imgResource);
 }
 
+int LuaProxy::Graphics::LuaImageResource::GetWidth() {
+    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
+    if (bmpIt == gLunaRender.LoadedImages.cend()) {
+        return 0;
+    }
+    return bmpIt->second->m_W;
+}
+
+int LuaProxy::Graphics::LuaImageResource::GetHeight() {
+    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
+    if (bmpIt == gLunaRender.LoadedImages.cend()) {
+        return 0;
+    }
+    return bmpIt->second->m_H;
+}
+
 void LuaProxy::Graphics::activateHud(bool activate)
 {
     gSkipSMBXHUD = !activate;
