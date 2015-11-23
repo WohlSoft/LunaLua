@@ -8,6 +8,7 @@ v0.7.2.3 BETA
   * Fixed music.ini bug which wasn't supported track number suffix for NSF/HES/etc. multi-track musics
   * NPCs can now be killed, even if they are hidden.
   * Add width/height properties to LuaImageResource.
+  * Allow onNPCKill to be cancelled.
   
 v0.7.2.2 BETA:
   * Extended NPC class

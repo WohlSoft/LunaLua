@@ -21,6 +21,8 @@
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
 
+#include "../../SMBXInternal/NPCs.h"
+
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
@@ -469,10 +471,15 @@ extern void __stdcall doEventsLevelEditorHook()
 extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 {
     if (gLunaLua.isValid()) {
-        Event npcKillEvent("onNPCKill", false);
+        Event npcKillEvent("onNPCKill", true);
         npcKillEvent.setDirectEventName("onNPCKill");
         npcKillEvent.setLoopable(false);
         gLunaLua.callEvent(&npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
+        if (npcKillEvent.native_cancelled())
+        {
+            ::NPC::Get(*npcIndex_ptr - 1)->killFlag = 0;
+            return;
+        }
     }
 
     native_cleanupKillNPC(npcIndex_ptr, killReason);
