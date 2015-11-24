@@ -1,5 +1,6 @@
 LunaLUA
 =======
+[![Build status](https://ci.appveyor.com/api/projects/status/72ttgr33ggar3x21?svg=true)](https://ci.appveyor.com/project/Wohlstand/lunadll)
 
 LunaLUA - LunaDLL with LUA is a free extension for SMBX game engine
 This version is based on LunaDLL ver. 8 with Lua Support.
