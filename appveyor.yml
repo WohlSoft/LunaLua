@@ -1,0 +1,19 @@
+version: 0.7.2.3.{build}
+branches:
+  only:
+  - master
+skip_tags: true
+
+os: Visual Studio 2013
+
+configuration: Release
+
+platform: x86
+clone_depth: 1
+
+clone_folder: C:\_Repos\LunaDLL
+
+build:
+  project: LunaDll.sln
+  verbosity: minimal
+  
