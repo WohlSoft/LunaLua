@@ -5,10 +5,8 @@ branches:
 skip_tags: true
 
 os: Visual Studio 2013
-
 configuration: Release
 
-platform: x86
 clone_depth: 1
 
 clone_folder: C:\_Repos\LunaDLL
