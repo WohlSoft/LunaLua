@@ -15,3 +15,5 @@ build:
   project: LunaDll.sln
   verbosity: minimal
   
+artifacts:
+- path: Release\LunaDLL.dll
