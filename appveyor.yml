@@ -21,3 +21,4 @@ after_build:
 artifacts:
 - path: LunaLUA-bin.zip
 - path: LunaLoader-bin.zip
+- path: Release\LunaDLL.dll
