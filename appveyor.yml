@@ -15,5 +15,9 @@ build:
   project: LunaDll.sln
   verbosity: minimal
   
+after_build:
+- cmd: deploy.bat nopause 
+
 artifacts:
-- path: Release\LunaDLL.dll
+- path: LunaLUA-bin.zip
+- path: LunaLoader-bin.zip
