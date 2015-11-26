@@ -5,7 +5,7 @@ v0.7.2.3 BETA
   * Bugfix [LunaLua]: Level sounds.ini now works correctly when using from the main game
   * Bugfix [LunaLua]: Hitboxes and offsets are now reset before loading a new level or world
   * Bugfix [LunaLua]: Misc.loadEpisode now works also without Autostart ini file.
-  * Added onStart - This event is the better "onLoop". This event will be executed, when SMBX is running the first frame.
+  * Added onStart - This event is the better "onLoad". This event will be executed, when SMBX is running the first frame.
   * Fixed music.ini bug which wasn't supported track number suffix for NSF/HES/etc. multi-track musics
   * NPCs can now be killed, even if they are hidden.
   * Add width/height properties to LuaImageResource.
