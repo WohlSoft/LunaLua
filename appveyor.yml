@@ -22,3 +22,7 @@ artifacts:
 - path: LunaLUA-bin.zip
 - path: LunaLoader-bin.zip
 - path: Release\LunaDLL.dll
+
+deploy:
+- provider: Environment
+  name: WohlnetFTP
