@@ -2,15 +2,11 @@
 #define Overworld_hhhhhh
 
 #include "../Misc/VB6StrPtr.h"
+#include "../Defines.h"
 
 struct Overworld{
 	char padding1[64];					
-	double XPos;						//+64
-	double YPos;						//+72
-	double unkUnused_height;			//+80
-	double unkUnused_width;				//+88
-	double unkUnused_speedX;			//+96
-	double unkUnused_speedY;			//+104
+    Momentum momentum;                  //+64
 	short currentPowerup;   			//+112
 	short currentWalkingFrame;			//+114		0 / 1 = Walking frame down | 2 / 3 Walking frame right | 4 / 5 Walking frame left | 6 / 7 Walking frame up
 	short currentWalkingFrameTimer;		//+116		0-7 is won't change the frame, if higher or equal to 8 then currentRunningFrame will be swaped
