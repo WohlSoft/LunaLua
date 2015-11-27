@@ -26,6 +26,35 @@ void LuaProxy::Misc::doBombExplosion(double x, double y, short bombType, const L
     native_doBomb(&position, &bombType, &playerIndex);
 }
 
+void LuaProxy::Misc::doPSwitchRaw(bool activate) {
+    short doPSwitchActivate = COMBOOL(activate);
+    native_doPSwitch(&doPSwitchActivate);
+}
+
+void LuaProxy::Misc::doPSwitch() {
+    doPSwitch(GM_PSWITCH_COUNTER == 0);
+}
+
+void LuaProxy::Misc::doPSwitch(bool activate) {
+    if (activate)
+        GM_PSWITCH_COUNTER = GM_PSWITCH_LENGTH - 1;
+    else
+        GM_PSWITCH_COUNTER = 0;
+
+    short pswitchActive = COMBOOL(activate);
+    
+    if (activate) {
+        native_stopMusic();
+        native_playMusic(&pswitchActive);
+        native_doPSwitch(&pswitchActive);
+    } else {
+        native_doPSwitch(&pswitchActive);
+        native_stopMusic();
+        native_playMusic(&::Player::Get(GM_MUSIC_RESTORE_PL)->CurrentSection);
+    }
+    
+}
+
 std::string LuaProxy::Misc::cheatBuffer()
 {
     return (std::string)GM_INPUTSTR_BUF_PTR;
