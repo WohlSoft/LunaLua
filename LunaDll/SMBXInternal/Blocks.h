@@ -15,7 +15,7 @@ struct Block {
     short               RepeatingHits;                      // 0x04
     short               BlockType2;                         // 0x06
     short               ContentIDRelated;                   // 0x08
-    short               Unknwon10;                          // 0x0A
+    short               Unknown10;                          // 0x0A
 
     VB6StrPtr           pHitEventName;                      // 0x0C
     VB6StrPtr           pDestroyEventName;                  // 0x10
@@ -30,7 +30,7 @@ struct Block {
     short               ContentsID;                         // 0x50
     short               BeingHitStatus1;                    // 0x52
     short               BeingHitTimer;                      // 0x54
-    short               BeingHitStatus2;                    // 0x56
+    short               HitOffset;                          // 0x56 Render Offset when got hit
 
     short               Unknown58;                          // 0x58
     short               IsInvisible2;                       // 0x5A
