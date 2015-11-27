@@ -1081,8 +1081,14 @@ void CLunaLua::doEvents()
         callEvent(onStartEvent);
         delete onStartEvent;
         m_eventLoopOnceExecuted = true;
+    
+        // If an error happened in onStart then return.
+        if (!isValid())
+            return;
     }
     
+    
+
     bool err = false;
     try
     {
