@@ -20,6 +20,7 @@
 #define FILE_STRLIST_H
 
 #ifdef PGE_FILES_QT
+#include <QObject>
 #include <QString>
 #include <QStringList>
 #define PGESTRING QString
