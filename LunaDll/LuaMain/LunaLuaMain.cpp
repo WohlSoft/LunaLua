@@ -714,6 +714,24 @@ void CLunaLua::bindAll()
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
+                class_<LuaProxy::Tile>("Tile")
+                .scope[ //static functions
+                    def("count", &LuaProxy::Tile::count),
+                        def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Tile::get)),
+                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Tile::get)),
+                        def("getIntersecting", &LuaProxy::Tile::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Tile, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Tile::id, &LuaProxy::Tile::setId)
+                .property("x", &LuaProxy::Tile::x, &LuaProxy::Tile::setX)
+                .property("y", &LuaProxy::Tile::y, &LuaProxy::Tile::setY)
+                .property("width", &LuaProxy::Tile::width, &LuaProxy::Tile::setWidth)
+                .property("height", &LuaProxy::Tile::height, &LuaProxy::Tile::setHeight)
+                .property("speedX", &LuaProxy::Tile::speedX, &LuaProxy::Tile::setSpeedX)
+                .property("speedY", &LuaProxy::Tile::speedY, &LuaProxy::Tile::setSpeedY)
+                .property("isValid", &LuaProxy::Tile::isValid),
+
                 class_<LuaProxy::LevelObject>("Level")
                 .scope[ //static functions
                         def("count", &LuaProxy::LevelObject::count),

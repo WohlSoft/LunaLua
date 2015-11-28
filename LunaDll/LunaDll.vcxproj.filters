@@ -480,6 +480,18 @@
     <ClInclude Include="SMBXInternal\CollectedStarRecord.h">
       <Filter>Header Files\SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\Path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Scenery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Musicbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -910,6 +922,9 @@
     </ClCompile>
     <ClCompile Include="Misc\SafeFPUControl.cpp">
       <Filter>Header Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyTile.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -231,6 +231,7 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="SMBXInternal\Musicbox.h" />
     <ClInclude Include="SMBXInternal\NativeInput.h" />
     <ClInclude Include="SMBXInternal\Layer.h" />
     <ClInclude Include="SMBXInternal\Level.h" />
@@ -248,6 +249,7 @@
     <ClInclude Include="Misc\MiscFuncs.h" />
     <ClInclude Include="SMBXInternal\NPCs.h" />
     <ClInclude Include="SMBXInternal\Overworld.h" />
+    <ClInclude Include="SMBXInternal\Path.h" />
     <ClInclude Include="SMBXInternal\PlayerMOB.h" />
     <ClInclude Include="Rendering\RenderOps\RenderBitmapOp.h" />
     <ClInclude Include="Rendering\RenderOps\RenderEffectOp.h" />
@@ -260,10 +262,12 @@
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\ReconstructedDefines.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h" />
+    <ClInclude Include="SMBXInternal\Scenery.h" />
     <ClInclude Include="SMBXInternal\SMBXEvents.h" />
     <ClInclude Include="SMBXInternal\Sound.h" />
     <ClInclude Include="CustomSprites\SpriteComponent.h" />
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h" />
+    <ClInclude Include="SMBXInternal\Tile.h" />
     <ClInclude Include="SMBXInternal\Warp.h" />
     <ClInclude Include="SMBXInternal\Water.h" />
     <ClInclude Include="UserSaves\UserSaving.h" />
@@ -273,6 +277,7 @@
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyTile.cpp" />
     <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
