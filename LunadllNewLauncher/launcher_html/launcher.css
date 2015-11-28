@@ -1,0 +1,52 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+body {
+	background-color: #f1f1f1;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+table {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	border-width: 0;
+}
+td {
+	padding: 0;
+}
+.controlSection {
+	padding: 5px;
+}
+#iframer {
+	margin: 0;
+	padding: 0;
+	width: calc(100% - 4px);
+	height: calc(100% - 4px);
+}
+.centeredSection {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+#player2Label {
+	padding-left: 2em;
+}
+.buttons {
+	color: #fff;
+	background-color: #6496c8;
+	border: 1px solid black;
+	border-radius: 15px;
+	box-shadow: 0 3px #27496d;
+	padding: 20px;
+	margin: 0px 10px 0px 10px;
+	font-size: 1.25em;
+}
+.buttons:hover {
+	background-color: #417cb8;
+	box-shadow: 0 0px #27496d;
+	transform: translateY(5px);
+}
