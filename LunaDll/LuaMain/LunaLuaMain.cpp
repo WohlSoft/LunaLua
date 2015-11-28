@@ -756,6 +756,9 @@ void CLunaLua::bindAll()
                 namespace_("Misc")[
                     def("npcToCoins", &LuaProxy::Misc::npcToCoins),
                     def("doPOW", &LuaProxy::Misc::doPOW),
+                    def("doPSwitchRaw", &LuaProxy::Misc::doPSwitchRaw),
+                    def("doPSwitch", (void(*)())&LuaProxy::Misc::doPSwitch),
+                    def("doPSwitch", (void(*)(bool))&LuaProxy::Misc::doPSwitch),
                     def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
                     def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
@@ -1078,8 +1081,14 @@ void CLunaLua::doEvents()
         callEvent(onStartEvent);
         delete onStartEvent;
         m_eventLoopOnceExecuted = true;
+    
+        // If an error happened in onStart then return.
+        if (!isValid())
+            return;
     }
     
+    
+
     bool err = false;
     try
     {

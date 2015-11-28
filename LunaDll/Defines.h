@@ -305,6 +305,8 @@ DEFMEM(GM_ANIM_PTR,         void*, 0x00B259CC);
 // Sound
 DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8); 
 DEFMEM(GM_SEC_MUSIC_TBL,    short*, 0x00B25828);     // 21 shorts containing music # for each section
+DEFMEM(GM_MUSIC_RESTORE_PL, WORD, 0x00B2C630); // If pswitch is active, then the music of the section of the player index is restored.
+
 
 // Input
 DEFMEM(GM_VKEY_TABLE_PTR,   void*,  0x00B25068); 
@@ -330,6 +332,9 @@ DEFMEM(GM_MARIO_VS_LUIGI_T, WORD,  0x00B2D760);      // 0 = default, if higher t
 DEFMEM(GM_WINS_T,           WORD,  0x00B2D762);      // 0 = default, if higher than 0 then display text "WINS!"
 
 DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if higher than 0 then winning by this win-type
+
+DEFMEM(GM_PSWITCH_COUNTER,  WORD,  0x00B2C62C);
+DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
@@ -538,6 +543,10 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg1 = int* Index of section containing music settings to play now
 #define GF_PLAY_MUSIC       0x00A61B40
 
+//      no args
+#define GF_STOP_MUSIC       0x00A621A0
+
+
 //      Arg1 = int* SoundIndex
 #define GF_PLAY_SFX         0x00A73FD0
 
@@ -593,6 +602,9 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg2 = short*         unknown flag 1
 //      Arg3 = short*         unknown flag 2
 #define GF_BLOCK_HIT        0x009DA620
+
+//      Arg1 = short*         if to activate or deactivate the pswitch.
+#define GF_DO_PSWITCH       0x009E33B0
 
 //      Arg1 = short* Animation ID
 //      Arg2 = Momentum* (for x and y coor)
@@ -671,6 +683,7 @@ static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerInde
 static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;
 
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
+static const auto native_stopMusic      = (void(__stdcall *)())GF_STOP_MUSIC;
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
 
 static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short* /**/))GF_NPC_CLEANUP;
@@ -683,6 +696,7 @@ static const auto native_doPow          = (void(__stdcall *)())GF_POW;
 
 static const auto native_hitBlock       = (void(__stdcall *)(unsigned int* /*blockIndex*/, short* /*unknownFlag1*/, unsigned short* /*unknownFlag2*/))GF_BLOCK_HIT;
 static const auto native_removeBlock    = (void(__stdcall *)(unsigned int* /*blockIndex*/, short* /*playEffects*/))GF_BLOCK_REMOVE;
+static const auto native_doPSwitch      = (void(__stdcall *)(short* /*doPSwith*/))GF_DO_PSWITCH;
 
 static const auto native_runEffect      = (void(__stdcall *)(short* /*EffectID*/, Momentum* /*coor*/, float* /*EffectFrame*/, short* /*npcID*/, short* /*showOnlyMask*/))GF_RUN_ANIM;
 static const auto native_addScoreEffect = (void(__stdcall *)(short* /*baseValue*/, Momentum* /*coor*/, short* /*factor*/))GF_SCORE_RELEATED;

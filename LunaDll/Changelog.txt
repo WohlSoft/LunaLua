@@ -1,4 +1,6 @@
 v0.7.2.3 BETA
+  * Added Misc.doPSwitchRaw - You can now trigger the raw P-Switch effect.
+  * Added Misc.doPSwitch - You can now trigger the full P-Switch effect.
   * Added Misc.doBombExplosion - You can now spawn bomb explosions.
   * Bugfix [LunaLua]: Misc.resolveFile and Misc.resolveDirectory don't crash anymore and works faster now.
   * Bugfix [LunaLua]: Some unreliability of Animation.spawn has been fixed.
