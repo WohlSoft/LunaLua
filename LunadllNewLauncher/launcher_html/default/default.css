@@ -1,18 +1,33 @@
+html {
+	height: 100%;
+}
+
 body {
-	background: -webkit-linear-gradient(top, #3BE7E8 0%,#59ffff 100%);
+	background: -webkit-radial-gradient(#f3eddf, #ffd879);
+	/*background: url('bg.jpg')*/
 }
 #header img {
 	display: block;
 	text-align: center;
 	margin-right: auto;
 	margin-left: auto;
+	width: 40%;
 }
 body {
 	text-align: center;
+	height: 100%;
+}
+.upperBody {
+	height: 100%;
+	width: 100%;
+}
+#butterscotch {
+	margin-bottom: -3px;
+	margin-top: 1em;
 }
 .bodycontent {
 	display: inline-block;
-	margin: 2em 1em 2em 1em;
+	margin: 0em 1em 2em 1em;
 	background-color: #F2F1E5;
 	padding: 1em;
 	border-radius: 30px;
@@ -24,9 +39,29 @@ body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	font-size: 1.05em;
 	font-weight: 400;
-	height: 50%;
 	text-align: center;
+	width: calc(100% - 4em);
+	min-height: 50%;
+	position: relative;
+	z-index: 0;
 }
+
+.bodycontent::after {
+	content: "";
+	background-image: url('McKnackus.png');
+	background-position-y: 100%;
+	background-position-x: 50%;
+	background-repeat: no-repeat;
+	background-size: 30%;
+	opacity: 0.4;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	z-index: -1;
+}
+
 .bodycontent * {
 	margin: 0;
 	padding: 0;

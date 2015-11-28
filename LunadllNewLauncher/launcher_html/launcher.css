@@ -7,6 +7,8 @@ body {
 	background-color: #f1f1f1;
 	overflow-x: hidden;
 	overflow-y: hidden;
+	-webkit-font-smoothing: antialiased;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 table {
 	margin: 0;
@@ -39,7 +41,7 @@ td {
 	color: #fff;
 	background-color: #6496c8;
 	border: 1px solid black;
-	border-radius: 15px;
+	border-radius: 16px;
 	box-shadow: 0 3px #27496d;
 	padding: 20px;
 	margin: 0px 10px 0px 10px;
@@ -49,4 +51,16 @@ td {
 	background-color: #417cb8;
 	box-shadow: 0 0px #27496d;
 	transform: translateY(5px);
+}
+#iframer {
+	-webkit-flex: 1;
+}
+.otherStuff {
+	overflow-y: none;
+}
+.masterContainer {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-box-orient: vertical;
+	height: 100%;
 }
