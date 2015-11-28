@@ -20,7 +20,7 @@ struct SMBXTile
         return GM_TILE_COUNT;
     }
 
-    static const short MAX_ID = 32;
+    static const short MAX_ID = 328;
 
 };
 #pragma pack(pop)
