@@ -7,8 +7,7 @@ body {
 	background-color: #f1f1f1;
 	overflow-x: hidden;
 	overflow-y: hidden;
-	-webkit-font-smoothing: antialiased;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	color: #2e3641;
 }
 table {
 	margin: 0;
@@ -28,39 +27,111 @@ td {
 	padding: 0;
 	width: calc(100% - 4px);
 	height: calc(100% - 4px);
+	-webkit-flex: 1;
 }
 .centeredSection {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
+	display: -webkit-flex;
 }
-#player2Label {
-	padding-left: 2em;
+@media only screen and (max-width: 615px) {
+	.centeredSection {
+		-webkit-flex-direction: column;
+	}
 }
 .buttons {
-	color: #fff;
-	background-color: #6496c8;
-	border: 1px solid black;
-	border-radius: 16px;
-	box-shadow: 0 3px #27496d;
-	padding: 20px;
-	margin: 0px 10px 0px 10px;
-	font-size: 1.25em;
+	display: inline-block;
+    vertical-align: top;
+    width: 220px;
+    color: #fff;
+    font-size: 17px;
+    line-height: 21px;
+    font-weight: bold;
+    background: #1abc9c;
+    border-radius: 3px;
+    padding: 12px 0;
+    font-weight: 500;
+    border-bottom: 2px solid #16a085;
+    margin: 0 5px;
 }
 .buttons:hover {
-	background-color: #417cb8;
+	background-color: #19a98c;
 	box-shadow: 0 0px #27496d;
 	transform: translateY(5px);
 }
-#iframer {
-	-webkit-flex: 1;
-}
 .otherStuff {
 	overflow-y: none;
+	color: black;
+	font-weight: bold;
+	font-size: 20px;
+	position: relative;
+}
+.otherStuff::after {
+	content: "";
+	opacity: 0.4;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	z-index: -1;
+	background-image: url('hills.svg');
+	background-size: cover;
+	background-repeat: no-repeat;
 }
 .masterContainer {
 	display: -webkit-flex;
 	-webkit-flex-direction: column;
 	-webkit-box-orient: vertical;
 	height: 100%;
+}
+
+select {
+	background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='50px' height='50px'><polyline points='46.139,15.518 25.166,36.49 4.193,15.519'/></svg>");
+	background-color:#128AC9;
+	background-repeat:no-repeat;
+	background-position: right 10px top 15px;
+	background-size: 16px 16px;
+	color:white;
+	padding:12px;
+	width:auto;
+	font-family:arial,tahoma;
+	font-size:16px;
+	font-weight:bold;
+	color:#fff;
+	text-align:center;
+	text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);
+	border-radius:3px;
+	-webkit-border-radius:3px;
+	-webkit-appearance: none;
+	border:0;
+	outline:0;
+	-webkit-transition:0.3s ease all;
+	width: 300px;
+}
+select option {
+	margin: 100px;
+}
+select:focus, select:active {
+	border:0;
+	outline:0;
+}
+.centeredSection label {
+	-webkit-flex: 1;
+}
+.centeredSection label span:first-of-type {
+	width: 100px;
+	display: inline-block;
+	color: #0C183E;
+}
+.centeredSection label span:first-of-type, .buttons {
+	font-family: Century Gothic, sans-serif;
+}
+.flexBoxes {
+	-webkit-flex: 1;
+}
+#buttonBox {
+	margin-top: 10px;
+	padding-bottom: 5px;
 }

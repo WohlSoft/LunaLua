@@ -101,15 +101,20 @@
 			containerObj.appendChild(selectObj);
 			return selectObj;
 		});
+		var butts = document.createElement("span");
+		var butts2 = document.createElement("span");
 		if (episode.allowTwoPlayer !== false) {
-			player1Label.appendChild(document.createTextNode("Player 1: "));
+			butts.appendChild(document.createTextNode("Player 1:"));
+			player1Label.appendChild(butts);
 		} else {
-			player1Label.appendChild(document.createTextNode("Character: "));
+			butts.appendChild(document.createTextNode("Character:"));
+			player1Label.appendChild(butts);
 		}
 		player1Selector = populatePlayerSelector(player1Label, false);
 		player1Label.style.display = "inline-block";
 		if (episode.allowTwoPlayer !== false) {
-			player2Label.appendChild(document.createTextNode("Player 2: "));
+			butts2.appendChild(document.createTextNode("Player 2: "));
+			player2Label.appendChild(butts2);
 			player2Selector = populatePlayerSelector(player2Label, true);
 			player2Label.style.display = "inline-block";
 		} else {
