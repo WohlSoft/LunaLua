@@ -717,9 +717,9 @@ void CLunaLua::bindAll()
                 class_<LuaProxy::Tile>("Tile")
                 .scope[ //static functions
                     def("count", &LuaProxy::Tile::count),
-                        def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Tile::get)),
-                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Tile::get)),
-                        def("getIntersecting", &LuaProxy::Tile::getIntersecting)
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Tile::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Tile::get)),
+                    def("getIntersecting", &LuaProxy::Tile::getIntersecting)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Tile, m_index))
                 .def(constructor<int>())
@@ -728,9 +728,55 @@ void CLunaLua::bindAll()
                 .property("y", &LuaProxy::Tile::y, &LuaProxy::Tile::setY)
                 .property("width", &LuaProxy::Tile::width, &LuaProxy::Tile::setWidth)
                 .property("height", &LuaProxy::Tile::height, &LuaProxy::Tile::setHeight)
-                .property("speedX", &LuaProxy::Tile::speedX, &LuaProxy::Tile::setSpeedX)
-                .property("speedY", &LuaProxy::Tile::speedY, &LuaProxy::Tile::setSpeedY)
                 .property("isValid", &LuaProxy::Tile::isValid),
+
+                class_<LuaProxy::Scenery>("Scenery")
+                .scope[ //static functions
+                    def("count", &LuaProxy::Scenery::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Scenery::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Scenery::get)),
+                    def("getIntersecting", &LuaProxy::Scenery::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Scenery, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Scenery::id, &LuaProxy::Scenery::setId)
+                .property("x", &LuaProxy::Scenery::x, &LuaProxy::Scenery::setX)
+                .property("y", &LuaProxy::Scenery::y, &LuaProxy::Scenery::setY)
+                .property("width", &LuaProxy::Scenery::width, &LuaProxy::Scenery::setWidth)
+                .property("height", &LuaProxy::Scenery::height, &LuaProxy::Scenery::setHeight)
+                .property("isValid", &LuaProxy::Scenery::isValid),
+
+                class_<LuaProxy::Path>("Path")
+                .scope[ //static functions
+                    def("count", &LuaProxy::Path::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Path::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Path::get)),
+                    def("getIntersecting", &LuaProxy::Path::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Path, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Path::id, &LuaProxy::Path::setId)
+                .property("x", &LuaProxy::Path::x, &LuaProxy::Path::setX)
+                .property("y", &LuaProxy::Path::y, &LuaProxy::Path::setY)
+                .property("width", &LuaProxy::Path::width, &LuaProxy::Path::setWidth)
+                .property("height", &LuaProxy::Path::height, &LuaProxy::Path::setHeight)
+                .property("isValid", &LuaProxy::Path::isValid),
+
+                class_<LuaProxy::Musicbox>("Musicbox")
+                .scope[ //static functions
+                    def("count", &LuaProxy::Musicbox::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Musicbox::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Musicbox::get)),
+                    def("getIntersecting", &LuaProxy::Musicbox::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Musicbox, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Musicbox::id, &LuaProxy::Musicbox::setId)
+                .property("x", &LuaProxy::Musicbox::x, &LuaProxy::Musicbox::setX)
+                .property("y", &LuaProxy::Musicbox::y, &LuaProxy::Musicbox::setY)
+                .property("width", &LuaProxy::Musicbox::width, &LuaProxy::Musicbox::setWidth)
+                .property("height", &LuaProxy::Musicbox::height, &LuaProxy::Musicbox::setHeight)
+                .property("isValid", &LuaProxy::Musicbox::isValid),
 
                 class_<LuaProxy::LevelObject>("Level")
                 .scope[ //static functions

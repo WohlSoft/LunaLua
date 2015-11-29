@@ -28,7 +28,7 @@ luabind::object LuaProxy::Tile::get(luabind::object idFilter, lua_State* L)
     }
     catch (LuaHelper::invalidTypeException* /*e*/)
     {
-        luaL_error(L, "Invalid args for bgoID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        luaL_error(L, "Invalid args for tileID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
         return luabind::object();
     }
 
@@ -131,34 +131,6 @@ void LuaProxy::Tile::setHeight(double height, lua_State* L)
     if (!isValid_throw(L))
         return;
     SMBXTile::Get(m_index)->momentum.height = height;
-}
-
-double LuaProxy::Tile::speedX(lua_State* L) const
-{
-    if (!isValid_throw(L))
-        return 0;
-    return SMBXTile::Get(m_index)->momentum.speedX;
-}
-
-void LuaProxy::Tile::setSpeedX(double speedX, lua_State* L)
-{
-    if (!isValid_throw(L))
-        return;
-    SMBXTile::Get(m_index)->momentum.speedX = speedX;
-}
-
-double LuaProxy::Tile::speedY(lua_State* L) const
-{
-    if (!isValid_throw(L))
-        return 0;
-    return SMBXTile::Get(m_index)->momentum.speedY;
-}
-
-void LuaProxy::Tile::setSpeedY(double speedY, lua_State* L)
-{
-    if (!isValid_throw(L))
-        return;
-    SMBXTile::Get(m_index)->momentum.speedY = speedY;
 }
 
 bool LuaProxy::Tile::isValid() const
