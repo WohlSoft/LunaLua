@@ -20,7 +20,7 @@ struct SMBXMusicbox
         return GM_MUSICBOX_COUNT;
     }
 
-    static const short MAX_ID = 65;
+    static const short MAX_ID = 16;
 
 };
 #pragma pack(pop)
