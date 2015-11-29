@@ -302,6 +302,25 @@ DEFMEM(GM_BG_XPOS_PTR,      double*, 0x00B2B984);
 DEFMEM(GM_ANIM_COUNT,       WORD,  0x00B2595C);
 DEFMEM(GM_ANIM_PTR,         void*, 0x00B259CC);
 
+// Tile
+DEFMEM(GM_TILE_COUNT,       WORD,   0x00B257A4);
+DEFMEM(GM_TILE_PTR,         void*,  0x00B25910);
+
+// Scenery
+DEFMEM(GM_SCENERY_COUNT,    WORD,   0x00B257A6);
+DEFMEM(GM_SCENERY_PTR,      void*,  0x00B2592C);
+
+// Path
+DEFMEM(GM_PATH_COUNT,       WORD,   0x00B258E0);
+DEFMEM(GM_PATH_PTR,         void*,  0x00B258D4);
+
+// Musicbox
+DEFMEM(GM_MUSICBOX_COUNT,   WORD,   0x00B25980);
+DEFMEM(GM_MUSICBOX_PTR,     void*,  0x00B25974);
+
+
+
+
 // Sound
 DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8); 
 DEFMEM(GM_SEC_MUSIC_TBL,    short*, 0x00B25828);     // 21 shorts containing music # for each section

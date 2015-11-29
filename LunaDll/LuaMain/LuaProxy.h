@@ -838,6 +838,40 @@ namespace LuaProxy {
         void setPlayerPowerup(short playerPowerup);
     };
 
+    class Tile
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+
+        Tile(unsigned short index);
+
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        double speedX(lua_State* L) const;
+        void setSpeedX(double speedX, lua_State* L);
+        double speedY(lua_State* L) const;
+        void setSpeedY(double speedY, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+        unsigned short m_index;
+    };
+
     class LevelObject
     {
     public:
