@@ -4,6 +4,7 @@
 
 #include "../Defines.h"
 #include "../Globals.h"
+#include "AsmPatch.h"
 
 /************************************************************************/
 /* Typedefs                                                             */
@@ -15,43 +16,7 @@ typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
     _Inout_ void * _DispatcherContext
     );
 
-/************************************************************************/
-/* Macros                                                               */
-/************************************************************************/
-#define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
-	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-#define PATCH_JMP(ptr, func) *(BYTE*)ptr = 0xE9;\
-	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-#define PATCH_JMPOLD(ptr, func) *(BYTE*)source = 0xE9;\
-	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
-#define PATCH_OFFSET(ptr, offset, type, value) *(type*)((DWORD)ptr + (DWORD)offset) = value
-#define INSTR_NOP 0x90
-static inline void PATCH_FUNC_CALL_SAFE(DWORD ptr, void* func) { // Takes 13 bytes, but tries to be very safe...
-    BYTE* bPtr = (BYTE*)ptr;
 
-    bPtr[0] = 0x9C; // pushf
-    bPtr[1] = 0x50; // push eax
-    bPtr[2] = 0x51; // push ecx
-    bPtr[3] = 0x52; // push edx
-    PATCH_FUNC((DWORD)&bPtr[4], func);
-    bPtr[9] = 0x5A; // pop edx
-    bPtr[10] = 0x59; // pop ecx
-    bPtr[11] = 0x58; // pop eax
-    bPtr[12] = 0x9D; // popf
-}
-// Transform a conditional jump, into a sequence of nop followed by jmp
-static inline void PATCH_CONDJMP_TO_NOPJMP(unsigned int addr) {
-    unsigned char* inst = (unsigned char*)addr;
-    inst[0] = 0x90;
-    inst[1] = 0xE9;
-}
-
-// Transform a sequence of nop followed by jmp, to a jng
-static inline void PATCH_NOPJMP_TO_JNG(unsigned int addr) {
-    unsigned char* inst = (unsigned char*)addr;
-    inst[0] = 0x0F;
-    inst[1] = 0x84;
-}
 
 #ifndef NO_SDL
 extern bool episodeStarted;
@@ -69,7 +34,6 @@ void TrySkipPatch();
 /************************************************************************/
 void emulateVB6Error(int errorCode);
 void showSMBXMessageBox(std::string message);
-extern inline void patchWholeNativeFunction(void* native_func, int sizeOfNativeFunc, void* newFunc);
 
 /************************************************************************/
 /* Hooks                                                                */

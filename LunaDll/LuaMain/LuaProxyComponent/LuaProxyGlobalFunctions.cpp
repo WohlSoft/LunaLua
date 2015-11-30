@@ -639,26 +639,29 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 		y -= 0.5 * (double)height;
 	}
 
-	PATCH_OFFSET(nativeAddr, 0x78, double, x);
-	PATCH_OFFSET(nativeAddr, 0x80, double, y);
-	PATCH_OFFSET(nativeAddr, 0x88, double, height);
-	PATCH_OFFSET(nativeAddr, 0x90, double, width);
-	PATCH_OFFSET(nativeAddr, 0x98, double, 0.0);
-	PATCH_OFFSET(nativeAddr, 0xA0, double, 0.0);
+    NPCMOB* npc = (NPCMOB*)nativeAddr;
+    npc->momentum.x = x;
+    npc->momentum.y = y;
+    npc->momentum.height = height;
+    npc->momentum.width = width;
+    npc->momentum.speedX = 0.0;
+    npc->momentum.speedY = 0.0;
 
-	PATCH_OFFSET(nativeAddr, 0xA8, double, x);
-	PATCH_OFFSET(nativeAddr, 0xB0, double, y);
-	PATCH_OFFSET(nativeAddr, 0xB8, double, gfxHeight);
-	PATCH_OFFSET(nativeAddr, 0xC0, double, gfxWidth);
+    npc->spawnMomentum.x = x;
+    npc->spawnMomentum.y = y;
+    npc->spawnMomentum.height = gfxHeight;
+    npc->spawnMomentum.width = gfxWidth;
+    npc->spawnMomentum.speedX = 0.0;
+    npc->spawnMomentum.speedY = 0.0;
 
-	if (respawn) {
-		PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
-	}
-	PATCH_OFFSET(nativeAddr, 0xE2, WORD, npcid);
+    if (respawn) {
+        npc->respawnID = npcid;
+    }
+    npc->id = npcid;
 
-	PATCH_OFFSET(nativeAddr, 0x12A, WORD, 180);
-	PATCH_OFFSET(nativeAddr, 0x124, WORD, -1);
-	PATCH_OFFSET(nativeAddr, 0x146, WORD, section);
+    npc->offscreenCountdownTimer = 180;
+    npc->unknown_124 = -1;
+    npc->currentSection = section;
 
 	++(GM_NPCS_COUNT);
 
