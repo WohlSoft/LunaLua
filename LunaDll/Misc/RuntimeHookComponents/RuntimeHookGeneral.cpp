@@ -376,6 +376,13 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
+    // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
+    PATCH(0x90C856)
+        .CALL(&CameraUpdateHook)
+        .NOP()
+        .NOP()
+        .Apply();
+
     // Hook to fix 100% CPU when window is inactive
     PATCH(0x8E6FE1)
         .NOP()

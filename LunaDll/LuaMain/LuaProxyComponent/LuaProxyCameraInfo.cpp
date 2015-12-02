@@ -32,6 +32,14 @@ double LuaProxy::Camera::y()
     return SMBX_CameraInfo::getCameraY(m_index);
 }
 
+void LuaProxy::Camera::setX(double x) {
+    SMBX_CameraInfo::setCameraX(m_index, x);
+}
+
+void LuaProxy::Camera::setY(double y) {
+    SMBX_CameraInfo::setCameraY(m_index, y);
+}
+
 double LuaProxy::Camera::width()
 {
     return SMBX_CameraInfo::Get(m_index)->width;

@@ -45,6 +45,15 @@ public:
         if (index >= 201) return 0;
         return -((double*)GM_CAMERA_Y)[index];
     }
+
+    static inline void setCameraX(unsigned short index, double value) {
+        if (index >= 201) return;
+        ((double*)GM_CAMERA_X)[index] = -value;
+    }
+    static inline void setCameraY(unsigned short index, double value) {
+        if (index >= 201) return;
+        ((double*)GM_CAMERA_Y)[index] = -value;
+    }
 };
 
 

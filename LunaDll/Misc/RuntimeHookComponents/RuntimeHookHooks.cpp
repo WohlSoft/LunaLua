@@ -856,6 +856,16 @@ extern short __stdcall MessageBoxOpenHook()
     return (short)GM_PLAYERS_COUNT;
 }
 
+extern void __stdcall CameraUpdateHook()
+{
+    if (gLunaLua.isValid()) {
+        Event messageBoxEvent("onCameraUpdate", false);
+        messageBoxEvent.setDirectEventName("onCameraUpdate");
+        messageBoxEvent.setLoopable(false);
+        gLunaLua.callEvent(&messageBoxEvent);
+    }
+}
+
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
