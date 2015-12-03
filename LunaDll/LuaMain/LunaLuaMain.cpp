@@ -662,8 +662,8 @@ void CLunaLua::bindAll()
                 def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
             ]
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
-            .property("x", &LuaProxy::Camera::x)
-            .property("y", &LuaProxy::Camera::y)
+            .property("x", &LuaProxy::Camera::x, &LuaProxy::Camera::setX)
+            .property("y", &LuaProxy::Camera::y, &LuaProxy::Camera::setY)
             .property("width", &LuaProxy::Camera::width)
             .property("height", &LuaProxy::Camera::height),
 

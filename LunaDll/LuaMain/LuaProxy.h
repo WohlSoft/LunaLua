@@ -1091,6 +1091,8 @@ namespace LuaProxy {
 
         double x();
         double y();
+        void setX(double x);
+        void setY(double y);
         double width();
         double height();
         

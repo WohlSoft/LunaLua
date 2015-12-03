@@ -1,4 +1,7 @@
 v0.7.2.3 BETA
+  * Added registerCustomEvent, so you can create custom events from your APIs.
+  * Added event onCameraUpdate and Camera.x, Camera.y is now writeable.
+  * Added a lot of new world map classes.
   * Added Misc.doPSwitchRaw - You can now trigger the raw P-Switch effect.
   * Added Misc.doPSwitch - You can now trigger the full P-Switch effect.
   * Added Misc.doBombExplosion - You can now spawn bomb explosions.

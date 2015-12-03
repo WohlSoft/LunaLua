@@ -415,6 +415,38 @@ function unregisterEvent(apiTable, event, eventHandler)
     return false
 end
 
+function registerCustomEvent(obj, eventName)
+    local queue = {};
+    local mt = getmetatable(obj);
+    if(mt == nil) then
+        mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
+    end
+    local index_f = mt.__index;
+    local newindex_f = mt.__newindex;
+    
+    mt.__index = function(tbl, key)
+        if(key == eventName) then
+            return function(...)
+                for _,v in ipairs(queue) do
+                    v(...);
+                end
+            end
+        else
+            return index_f(tbl, key);
+        end
+    end
+    
+    mt.__newindex = function (tbl,key,val)
+        if(key == eventName) then
+            table.insert(queue, val);
+        else
+            newindex_f(tbl,key,val);
+        end
+    end
+    
+    setmetatable(obj,mt);
+end
+
 detourEventQueue = {
     collectedEvents = {},
     -- Collect an native event for the onLoop event
