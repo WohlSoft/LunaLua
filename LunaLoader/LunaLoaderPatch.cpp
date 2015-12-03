@@ -4,8 +4,10 @@
 #include "LunaLoaderPatch.h"
 
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir) {
-    STARTUPINFO si = {0};
-    PROCESS_INFORMATION pi = {0};
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+    memset(&si, 0, sizeof(si));
+    memset(&pi, 0, sizeof(pi));
     
     // Prepare command line
     size_t pos = 0;
@@ -58,7 +60,8 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     };
 
     // Set LoadLibraryA address (will be the same in all processes)
-    *(DWORD*)&LoaderPatch2[0x11] = (DWORD)&LoadLibraryA - (DWORD)(0xB24C10 + 5);
+    DWORD* patchAddrLoadLibraryA = (DWORD*)&LoaderPatch2[0x11];
+    *patchAddrLoadLibraryA = (DWORD)&LoadLibraryA - (DWORD)(0xB24C10 + 5);
 
     // Patch the entry point...
     if (WriteProcessMemory(pi.hProcess, (void*)0x40BDD8, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||

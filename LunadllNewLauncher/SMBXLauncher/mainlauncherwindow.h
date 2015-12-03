@@ -42,6 +42,7 @@ private:
     QScopedPointer<SMBXConfig> m_smbxConfig;
     QScopedPointer<LauncherConfiguration> m_launcherSettings;
     QString m_smbxExe;
+    bool m_ApplyLunaLoaderPatch;
     Ui::MainLauncherWindow *ui;
 };
 

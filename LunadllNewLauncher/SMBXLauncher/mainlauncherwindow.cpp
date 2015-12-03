@@ -1,5 +1,6 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
+#include "../../LunaLoader/LunaLoaderPatch.h"
 
 #include <QtWebKit/QtWebKit>
 #include <QWebFrame>
@@ -8,6 +9,7 @@
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_ApplyLunaLoaderPatch(false),
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
@@ -99,9 +101,11 @@ void MainLauncherWindow::loadConfig(const QString &configName)
                 ui->mainWindowWidget->setWindowIcon(QIcon(iconFilePath));
             }
         }
+        m_ApplyLunaLoaderPatch = (settingFile.value("apply-lunaloader-patch", "false").toString() == "true");
     }else{
         m_smbxExe = "smbx.exe";
         ui->mainWindowWidget->setWindowTitle("SMBX Launcher");
+        m_ApplyLunaLoaderPatch = false;
         loadDefaultWebpage();
     }
 }
@@ -217,5 +221,18 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
     QList<QString> runArgs(args);
     runArgs << "--patch";
 
-    QProcess::startDetached(smbxExeFile, runArgs);
+    if (m_ApplyLunaLoaderPatch) {
+        // We're not handling quoting here... but all the arguments currently don't use spaces or quotes so...
+        QString argString;
+        for (int i=0; i<runArgs.length(); i++) {
+            if (i > 0) {
+                argString += " ";
+            }
+            argString += runArgs[i];
+        }
+        LunaLoaderRun(smbxExeFile.toStdWString().c_str(), argString.toStdWString().c_str());
+    }
+    else {
+        QProcess::startDetached(smbxExeFile, runArgs);
+    }
 }
