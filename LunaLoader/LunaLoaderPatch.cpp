@@ -3,6 +3,11 @@
 #include <cstring>
 #include "LunaLoaderPatch.h"
 
+static void setJmpAddr(uint8_t* patch, DWORD patchAddr, DWORD patchOffset, DWORD target) {
+    DWORD* dwordAddr = (DWORD*)&patch[patchOffset+1];
+    *dwordAddr = (DWORD)target - (DWORD)(patchAddr + patchOffset + 5);
+}
+
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir) {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -20,8 +25,9 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         std::wstring(L"\"") + quotedPathToSMBX + std::wstring(L"\" ") +
         std::wstring(cmdLineArgs)
         );
-    wchar_t* cmdLine = (wchar_t*)malloc(sizeof(wchar_t) * strCmdLine.length());
-    std::memcpy(cmdLine, strCmdLine.c_str(), sizeof(wchar_t) * strCmdLine.length());
+    uint32_t cmdLineMemoryLen = sizeof(wchar_t) * (strCmdLine.length() + 1); // Include null terminator
+    wchar_t* cmdLine = (wchar_t*)malloc(cmdLineMemoryLen);
+    std::memcpy(cmdLine, strCmdLine.c_str(), cmdLineMemoryLen);
 
     // Create process
     if (!CreateProcessW(pathToSMBX, // Launch smbx.exe
@@ -41,32 +47,62 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     }
     free(cmdLine); cmdLine = NULL;
 
+    // Patch 1 (jump to Patch 2)
+    uintptr_t LoaderPatchAddr1 = 0x40BDD8;
     unsigned char LoaderPatch1[] =
     {
-        0xE9, 0x23, 0x8E, 0x71, 0x00  // 0x40BDD8 JMP 00B24C00
+        0xE9, 0x00, 0x00, 0x00, 0x00  // 0x40BDD8 JMP <Patch2>
     };
 
+    // Patch 2 (loads LunaDll.dll)
     unsigned char LoaderPatch2[] =
     {
-        0x68, 0x64, 0x6C, 0x6C, 0x00, // 0xB24C00 PUSH "dll\0"
-        0x68, 0x44, 0x6C, 0x6C, 0x2E, // 0xB24C05 PUSH "Dll."
-        0x68, 0x4C, 0x75, 0x6E, 0x61, // 0xB24C0A PUSH "Luna"
-        0x54,                         // 0xB24C0F PUSH ESP
-        0xE8, 0x00, 0x00, 0x00, 0x00, // 0xB24C10 CALL LoadLibraryA
-        0x83, 0xC4, 0x0C,             // 0xB24C15 ADD ESP, 0C
-        0x68, 0x6C, 0xC1, 0x40, 0x00, // 0xB24C18 PUSH 40C16C
-        0xE9, 0xBB, 0x71, 0x8E, 0xFF, // 0xB24C1D JMP 40BDDD
+        0x68, 0x64, 0x6C, 0x6C, 0x00, // 00 PUSH "dll\0"
+        0x68, 0x44, 0x6C, 0x6C, 0x2E, // 05 PUSH "Dll."
+        0x68, 0x4C, 0x75, 0x6E, 0x61, // 0A PUSH "Luna"
+        0x54,                         // 0F PUSH ESP
+        0xE8, 0x00, 0x00, 0x00, 0x00, // 10 CALL LoadLibraryA
+        0x83, 0xC4, 0x0C,             // 15 ADD ESP, 0C
+        0x68, 0x6C, 0xC1, 0x40, 0x00, // 18 PUSH 40C16C (this inst used to be at 0x40BDD8)
+        0xE9, 0x00, 0x00, 0x00, 0x00, // 1D JMP 40BDDD
         0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
     };
 
-    // Set LoadLibraryA address (will be the same in all processes)
-    DWORD* patchAddrLoadLibraryA = (DWORD*)&LoaderPatch2[0x11];
-    *patchAddrLoadLibraryA = (DWORD)&LoadLibraryA - (DWORD)(0xB24C10 + 5);
+    // Allocate space for Patch 2
+    DWORD LoaderPatchAddr2 = (DWORD)VirtualAllocEx(
+        pi.hProcess,           // Target process
+        NULL,                  // Don't request any particular address
+        sizeof(LoaderPatch2),  // Length of Patch 2
+        MEM_COMMIT,            // Type of memory allocation
+        PAGE_READWRITE         // Memory protection type
+        );
+    if (LoaderPatchAddr2 == (DWORD)NULL) {
+        return LUNALOADER_PATCH_FAIL;
+    }
+
+    // Set Patch1 Addresses
+    setJmpAddr(LoaderPatch1, LoaderPatchAddr1, 0x00, LoaderPatchAddr2);
+
+    // Set Patch2 Addresses
+    setJmpAddr(LoaderPatch2, LoaderPatchAddr2, 0x10, (DWORD)&LoadLibraryA);
+    setJmpAddr(LoaderPatch2, LoaderPatchAddr2, 0x1D, LoaderPatchAddr1 + 5);
 
     // Patch the entry point...
-    if (WriteProcessMemory(pi.hProcess, (void*)0x40BDD8, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
-        WriteProcessMemory(pi.hProcess, (void*)0xB24C00, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
+    if (WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr1, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
+        WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr2, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
     {
+        return LUNALOADER_PATCH_FAIL;
+    }
+
+    // Change Patch2 memory protection type
+    DWORD TmpDword = 0;
+    if (VirtualProtectEx(
+        pi.hProcess,
+        (void*)LoaderPatchAddr2,
+        sizeof(LoaderPatch2),
+        PAGE_EXECUTE,
+        &TmpDword
+    ) == 0) {
         return LUNALOADER_PATCH_FAIL;
     }
 
