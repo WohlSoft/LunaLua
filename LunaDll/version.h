@@ -6,8 +6,8 @@
 
 #define LUNA_VERNUM1                    0
 #define LUNA_VERNUM2                    7
-#define LUNA_VERNUM3                    2
-#define LUNA_VERNUM4                    3
+#define LUNA_VERNUM3                    3
+#define LUNA_VERNUM4                    0
 
 #define LUNALUA_VER TO_VER(LUNA_VERNUM1, LUNA_VERNUM2, LUNA_VERNUM3, LUNA_VERNUM4)
 #define LUNALUA_VER_STR TO_VER_STR(LUNA_VERNUM1, LUNA_VERNUM2, LUNA_VERNUM3, LUNA_VERNUM4)
