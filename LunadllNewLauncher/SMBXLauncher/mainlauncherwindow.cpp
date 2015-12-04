@@ -211,6 +211,7 @@ void MainLauncherWindow::writeLunaConfig()
         autostartINI.setValue("character-player1", config.character1());
         autostartINI.setValue("character-player2", config.character2());
         autostartINI.setValue("save-slot", config.saveSlot());
+        autostartINI.setValue("transient", true);
         autostartINI.endGroup();
 
     }

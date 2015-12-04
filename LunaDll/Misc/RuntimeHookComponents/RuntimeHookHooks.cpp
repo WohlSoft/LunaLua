@@ -185,6 +185,9 @@ extern int __stdcall LoadIntro()
                 GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
                 autostarter.applyAutostart();
                 gAutostartRan = true;
+                if (autostartConfig.GetBoolean("autostart", "transient", false)) {
+                    remove(autostartFile.c_str());
+                }
             }
         }
     }
