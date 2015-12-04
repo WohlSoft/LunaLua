@@ -662,6 +662,8 @@ void CLunaLua::bindAll()
                 def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
             ]
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
+            .def("mem", static_cast<void (LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Camera::mem))
+            .def("mem", static_cast<luabind::object(LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Camera::mem))
             .property("x", &LuaProxy::Camera::x, &LuaProxy::Camera::setX)
             .property("y", &LuaProxy::Camera::y, &LuaProxy::Camera::setY)
             .property("width", &LuaProxy::Camera::width)

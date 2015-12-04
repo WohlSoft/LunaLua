@@ -1089,6 +1089,8 @@ namespace LuaProxy {
 
         Camera(unsigned short index);
 
+        void mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L);
+        luabind::object mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const;
         double x();
         double y();
         void setX(double x);
