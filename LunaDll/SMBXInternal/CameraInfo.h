@@ -3,6 +3,7 @@
 
 #include "../Defines.h"
 
+#pragma pack(push, 1)
 class SMBX_CameraInfo
 {
 public:
@@ -45,6 +46,10 @@ public:
         ((double*)GM_CAMERA_Y)[index] = -value;
     }
 };
+#pragma pack(pop)
 
+#ifndef __INTELLISENSE__
+static_assert(sizeof(SMBX_CameraInfo) == 0x38, "sizeof(SMBX_CameraInfo) must be 0x38");
+#endif
 
 #endif
