@@ -1095,10 +1095,15 @@ namespace LuaProxy {
         double y();
         void setX(double x);
         void setY(double y);
+        double renderX();
+        double renderY();
+        void setRenderX(double renderX);
+        void setRenderY(double renderY);
         double width();
         double height();
+        void setWidth(double width);
+        void setHeight(double height);
         
-
         unsigned short m_index;
     };
 

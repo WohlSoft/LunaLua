@@ -666,8 +666,10 @@ void CLunaLua::bindAll()
             .def("mem", static_cast<luabind::object(LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Camera::mem))
             .property("x", &LuaProxy::Camera::x, &LuaProxy::Camera::setX)
             .property("y", &LuaProxy::Camera::y, &LuaProxy::Camera::setY)
-            .property("width", &LuaProxy::Camera::width)
-            .property("height", &LuaProxy::Camera::height),
+            .property("renderX", &LuaProxy::Camera::renderX, &LuaProxy::Camera::setRenderX)
+            .property("renderY", &LuaProxy::Camera::renderY, &LuaProxy::Camera::setRenderY)
+            .property("width", &LuaProxy::Camera::width, &LuaProxy::Camera::setWidth)
+            .property("height", &LuaProxy::Camera::height, &LuaProxy::Camera::setHeight),
 
 
             def("newRECT", &LuaProxy::newRECT),
