@@ -105,7 +105,7 @@ void RenderOverrideManager::loadLevelGFX()
 
 void RenderOverrideManager::loadWorldGFX()
 {
-    loadOverrides(L"tiles", GM_GFX_TILES_PTR, 328);
+    loadOverrides(L"tile", GM_GFX_TILES_PTR, 328);
     loadOverrides(L"level", GM_GFX_LEVEL_PTR, 32, GM_GFX_LEVEL_MASK_PTR);
     loadOverrides(L"scene", GM_GFX_SCENE_PTR, 65, GM_GFX_SCENE_MASK_PTR);
     loadOverrides(L"path", GM_GFX_PATH_PTR, 32, GM_GFX_PATH_MASK_PTR);
