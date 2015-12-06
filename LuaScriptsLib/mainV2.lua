@@ -116,6 +116,13 @@ local function initFFIBasedAPIs()
     package.preload['ffi'] = nil
     package.loaded['ffi'] = nil
 end
+
+local function initJSON()
+    package.path = package.path .. ";./LuaScriptsLib/ext/?.lua"
+    _G["json"] = require("lunajson")
+end
+
+initJSON()
 initFFIBasedAPIs()
 
 -- We want the JIT running, so it's initially preloaded, but disable access to it
