@@ -66,7 +66,7 @@
 // - STATES
 //+0x56		w	= Current enemy kill combo count
 //+0x58		w	= Ground sliding smoke puffs state
-//+0x5A		w	= Warp is nearby (1 = pipe, 2 = instant, 3 = door)
+//+0x5A		w	= Nearby warp entrance index (index in warp array)
 
 //+0x60		w	= Has jumped
 
@@ -252,7 +252,7 @@ struct PlayerMOB {
 
     short CurrentKillCombo;
     short GroundSlidingPuffsState;
-    short WarpNearby;                    // (1 = pipe, 2 = instant, 3 = door)
+    short WarpNearby;                    // (index of nearby/intersecting warp entrance)
     short Unknown5C;
     short Unknown5E;
     
