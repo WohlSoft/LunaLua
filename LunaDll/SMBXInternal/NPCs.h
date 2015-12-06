@@ -307,7 +307,7 @@ enum NPCID : short
 // +0x38	pt	= wchar_t* No More Objs event layer name
 // +0x3C	pt	= wchar_t* Layer name
 
-// 0x+40	w	= Unknown (some sort of hide value if -1)
+// 0x+40	w	= If the NPC is hidden. (Layer based)
 // 0x+44	w	= Activated / interacted with player flag
 // 0x+46	w	= Friendly (on = 0xFFFF)
 // 0x+48	w	= Don't Move (on = 0xFFFF)
@@ -319,7 +319,7 @@ enum NPCID : short
 // 0x+6A	w	- Generator firing rate
 // 0x+6C	f	= Generator delay countdown
 // 0x+70	w	= Direction to generate NPC?
-// 0x+72	w	= Which layer to spawn NPC on
+// 0x+72	w	= The generator type (1 = Warp; 2 = Projectile)
 // 0x+74	w	= Invalidity or offscreen flag?
 
 // 0x+78	qw	= X position
