@@ -1,4 +1,6 @@
 v0.7.3 BETA
+  * Bugfix [LunaLua]: Tiles can now correctly be replaced with PNGs.
+  * Bugfix [LunaLua]: PlayerSetting.height was pointing to players width
   * Extended Camera class
   * Bugfix [LunaLua]: Cheat defines now don't reset.
   * Added registerCustomEvent, so you can create custom events from your APIs.
