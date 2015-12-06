@@ -489,7 +489,6 @@ std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
         }
 
         if (CompareFileTime(&newest, &nextFileTime) < 0) {
-            std:cout << "CONFIG DEBUG: Second file is newer!" << std::endl;
             memcpy(&newest, &nextFileTime, sizeof(FILETIME));
             newestFileName = nextPath;
         }

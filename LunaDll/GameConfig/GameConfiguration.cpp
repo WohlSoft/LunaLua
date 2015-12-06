@@ -26,6 +26,12 @@ namespace optionsMenu{
     VB6StrPtr& viewCredits = *(VB6StrPtr*)0x936F72;
 }
 
+namespace general {
+    VB6StrPtr& gameTitle_1 = *(VB6StrPtr*)0x8BD869;
+    VB6StrPtr& gameTitle_2 = *(VB6StrPtr*)0x8BE25A;
+    VB6StrPtr& gameTitle_3 = *(VB6StrPtr*)0x96AF26;
+}
+
 void GameConfiguration::runPatchByIni(INIReader& reader)
 {
     if (reader.ParseError() != 0)
@@ -50,4 +56,8 @@ void GameConfiguration::runPatchByIni(INIReader& reader)
     optionsMenu::windowedMode = reader.Get("option-menu", "windowed-mode", optionsMenu::windowedMode);
     optionsMenu::viewCredits = reader.Get("option-menu", "view-credits", optionsMenu::viewCredits);
 
+    // References the same string memory, so do not destruct those. 
+    general::gameTitle_1.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_1));
+    general::gameTitle_2.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_2));
+    general::gameTitle_3.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_3));
 }
