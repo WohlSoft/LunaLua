@@ -246,8 +246,6 @@ void InitGlobals()
         CreateDirectoryW(L"config", NULL);
     }
 
-    gGeneralConfig.setFilename(L"config/luna.ini");
-    gGeneralConfig.loadOrDefault();
 }
 
 /// CLEAN UP
@@ -469,6 +467,44 @@ std::wstring getCustomFolderPath()
         full_path = full_path.append(L"\\"); // < path into level folder
     }
     return full_path;
+}
+
+std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
+{
+    FILETIME newest = { 0 };
+    std::wstring newestFileName = L"";
+
+    for (const std::wstring& nextPath : paths) {
+        if(GetFileAttributesW(nextPath.c_str()) == INVALID_FILE_ATTRIBUTES)
+            continue; // File does not exist, continue with next.
+
+        HANDLE hNextFile = CreateFileW(nextPath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+        if(!hNextFile) // Failed to open file, continue with next.
+            continue;
+
+        FILETIME nextFileTime = { 0 };
+        if (!GetFileTime(hNextFile, NULL, NULL, &nextFileTime)) {
+            CloseHandle(hNextFile);
+            continue;
+        }
+
+        if (CompareFileTime(&newest, &nextFileTime) < 0) {
+            std:cout << "CONFIG DEBUG: Second file is newer!" << std::endl;
+            memcpy(&newest, &nextFileTime, sizeof(FILETIME));
+            newestFileName = nextPath;
+        }
+        CloseHandle(hNextFile);
+    }
+
+    return newestFileName;
+}
+
+std::wstring getLatestConfigFile(const std::wstring& configname)
+{
+    return getLatestFile({
+        getModulePath() + L"//" + configname,
+        getModulePath() + L"//config//" + configname
+    });
 }
 
 void RedirectIOToConsole()
