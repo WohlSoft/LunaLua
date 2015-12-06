@@ -160,7 +160,7 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    std::string autostartFile = utf8_encode(getLatestConfigFile(L"\\autostart.ini"));
+    std::string autostartFile = utf8_encode(getLatestConfigFile(L"autostart.ini"));
 
     if (file_existsX(autostartFile)) {
         INIReader autostartConfig(autostartFile);
