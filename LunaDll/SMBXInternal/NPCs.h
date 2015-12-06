@@ -324,36 +324,49 @@ enum NPCID : short
 
 // 0x+78	qw	= X position
 // 0x+80	qw	= Y position
-// 0x+88	qw	= w/h?
-// 0x+90	qw	= h/w?
+// 0x+88	qw	= Height
+// 0x+90	qw	= Width
 // 0x+98	qw	= X speed
 // 0x+A0	qw	= Y speed
 // 0x+AC	dw	= Spawn X
 // 0x+B4	dw	= Spawn Y
+// 0x+B8    dw  = GFX Height
+// 0x+C0    dw  = GFX Width
+
+// 0x+D8    f   = Spawn Direction
+// 0x+DC    w   = Spawn ID
 
 // 0x+E2	w	= Sprite GFX index/Identity   // x011C = lakitu
 // 0x+E4	w	= Animation frame
 
 // 0x+E8	f	= Animation timer
+// 0x+EC    f   = Direciton faced
 
-// 0x+F4	?	= Related to lakitu throw identity?
-
-// 0x+FC	w	= Grabbable gun projectile timer
-
-// 0x+110	f	= Lakitu throw timer
+// 0x+F0    dq  = AI variable 1
+// 0x+F8    dq  = AI variable 2
+// 0x+100   dq  = AI variable 3
+// 0x+108   dq  = AI variable 4
+// 0x+110   dq  = AI variable 5
 
 // 0x+118	f	= Direction faced
 // 0x+122	w	= Kill/Kill effect (0 = No kill/ 1-? Kill effect with kill)
 // 0x+124	w	= Unknown (same effect as 0x+128; -1 = offscreen)
 // 0x+128	dw	= Ofscreen flag (0xFFFFFFFF = offscreen)
 // 0x+12A	w	= Ofscreen countdown timer?
-// 0x+12C	w	= Unknown grabbing-related
-// 0x+12E	w	= 
+// 0x+12C	w	= Grabbing Player Index
+// 0x+12E	w	= Grab timer
 
-// 0x+136	w	= FFFF on spawn
+// 0x+136	w	= Collides with NPCs
+// 0x+138   w   = Contained within
 //
 // 0x+146	w	= Current section this NPC is on
-// 0x+148	f	= Hit count
+// 0x+148   f   = Hit Count
+//
+// 0x+14E   w   = ID of the block they were created from due to p-switch
+//
+// 0x+152	w	= NPC Collision (Seems to be set to -1 for a bullet when it destroys another NPC. May apply to all 0x136-related collisions but untested.)
+//
+// 0x+156	w	= Invincibility frames
 
 #pragma pack(push, 4)
 struct NPCMOB {
@@ -405,14 +418,13 @@ struct NPCMOB {
     short generatorFiringRate;              //+0x6A
     float generatorDelayCountdown;          //+0x6C
     short directionToGenerate;              //+0x70
-    short layerToSpawn;                     //+0x72  NOTE: Missing information, is it an index or a ptr to text?
+    short generatorType;                    //+0x72
     short offscreenFlag;                    //+0x74
     short unknown_76;                       //+0x76
     Momentum momentum;                      //+0x78
     Momentum spawnMomentum;                 //+0xA8
-    short unknown_D8;                       //+0xD8
-    short unknown_DA;                       //+0xDA
-    short respawnID;                        //+0xDC
+    float spawnDirection;                   //+0xD8
+    short spawnID;                          //+0xDC
     short unknown_DE;                       //+0xDE
     short unknown_E0;                       //+0xE0
     short id;                               //+0xE2
@@ -430,12 +442,12 @@ struct NPCMOB {
     short unknown_11E;                      //+0x11E
     short bounceOffBlock;                   //+0x120
     short killFlag;                         //+0x122
-    short unknown_124;                      //+0x124
+    short unknown_124;                      //+0x124  Note: Must be set to -1 when spawning a new NPC
     short unknown_126;                      //+0x126
-    short offscreenFlag2;                   //+0x128  NOTE: In the wiki we have double noted, but it does not match with the 8-Byte size!
+    short offscreenFlag2;                   //+0x128
     short offscreenCountdownTimer;          //+0x12A
-    short unknown_12C;                      //+0x12C
-    short unknown_12E;                      //+0x12E
+    short grabbingPlayerIndex;              //+0x12C
+    short grabTimer;                        //+0x12E
     short unknown_130;                      //+0x130
     short unknown_132;                      //+0x132
     short unknown_134;                      //+0x134
@@ -452,7 +464,7 @@ struct NPCMOB {
     short unknown_14C;                      //+0x14C
     short pSwitchTransformedBlockID;        //+0x14E
     short unknown_150;                      //+0x150
-    short unknown_152;                      //+0x152
+    short npcCollisionFlag;                 //+0x152
     short unknown_154;                      //+0x154
     short invincibilityFrames;              //+0x156
 };

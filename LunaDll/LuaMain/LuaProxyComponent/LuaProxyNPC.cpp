@@ -151,7 +151,7 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
     npc->spawnMomentum.speedY = 0.0;
 
     if (respawn) {
-        npc->respawnID = npcid;
+        npc->spawnID = npcid;
     }
     npc->id = npcid;
 
