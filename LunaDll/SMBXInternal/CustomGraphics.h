@@ -13,7 +13,7 @@ public:
         (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerHitboxHeight(PowerupID powerupID, Characters characterID, int value) {
-        (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        (&GM_HITBOX_H_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerHitboxDuckHeight(PowerupID powerupID, Characters characterID, int value) {
         (&GM_HITBOX_H_D_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
@@ -29,7 +29,7 @@ public:
         return (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerHitboxHeight(PowerupID powerupID, Characters characterID) {
-        return (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
+        return (&GM_HITBOX_H_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerHitboxDuckHeight(PowerupID powerupID, Characters characterID) {
         return (&GM_HITBOX_H_D_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
