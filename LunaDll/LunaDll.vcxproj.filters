@@ -444,9 +444,6 @@
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\GeneralLunaConfig.h">
-      <Filter>Header Files\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="libs\simpleini\SimpleIni.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -491,6 +488,9 @@
     </ClInclude>
     <ClInclude Include="SMBXInternal\Musicbox.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig\GeneralLunaConfig.h">
+      <Filter>Header Files\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -887,9 +887,6 @@
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\GeneralLunaConfig.cpp">
-      <Filter>Header Files\Misc</Filter>
-    </ClCompile>
     <ClCompile Include="Misc\RuntimeHookUtils\APIHook.cpp">
       <Filter>Header Files\Misc\RuntimeHookUtils</Filter>
     </ClCompile>
@@ -934,6 +931,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyScenery.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameConfig\GeneralLunaConfig.cpp">
+      <Filter>Header Files\Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

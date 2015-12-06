@@ -149,7 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="libs\simpleini\SimpleIni.h" />
-    <ClInclude Include="Misc\GeneralLunaConfig.h" />
+    <ClInclude Include="GameConfig\GeneralLunaConfig.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageData.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h" />
@@ -281,7 +281,7 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPath.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyScenery.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyTile.cpp" />
-    <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
+    <ClCompile Include="GameConfig\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
