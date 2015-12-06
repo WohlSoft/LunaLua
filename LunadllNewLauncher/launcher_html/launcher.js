@@ -176,7 +176,15 @@
 			Launcher.runSMBXEditor();
 		}
 		document.getElementById("newEditorButton").onclick = function () {
-			alert("Not Yet Integrated");
+			Launcher.runPGEEditor();
+		}
+		document.getElementById("deleteSaveSlot").onclick = function() {
+			var episode = episodeData[parseInt(selectObj.value)];
+			var slot = parseInt(document.getElementById("saveSlot").value);
+			if (confirm("Are you sure you want to delete save slot " + slot.toString() + "?")) {
+				Launcher.deleteSaveSlot(episode.directoryName, slot)
+				selectEpisodeById(parseInt(selectObj.value));
+			}
 		}
 	}
 })();

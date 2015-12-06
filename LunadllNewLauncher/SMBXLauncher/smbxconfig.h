@@ -33,10 +33,12 @@ private:
 public slots:
     QVariantList getEpisodeInfo(const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
     QVariantList getSaveInfo(const QString& directoryName);
+    void deleteSaveSlot(const QString& directoryName, int slot);
 
 signals:
     void runSMBX();
     void runSMBXEditor();
+    void runPGEEditor();
     void loadEpisodeWebpage(const QString& file);
 
 private:

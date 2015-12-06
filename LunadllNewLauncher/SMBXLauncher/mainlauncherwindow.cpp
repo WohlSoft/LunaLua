@@ -29,6 +29,7 @@ void MainLauncherWindow::addJavascriptObject()
 
     connect(m_smbxConfig.data(), SIGNAL(runSMBX()), this, SLOT(runSMBX()));
     connect(m_smbxConfig.data(), SIGNAL(runSMBXEditor()), this, SLOT(runSMBXEditor()));
+    connect(m_smbxConfig.data(), SIGNAL(runPGEEditor()), this, SLOT(runPGEEditor()));
     connect(m_smbxConfig.data(), SIGNAL(loadEpisodeWebpage(QString)), this, SLOT(loadEpisodeWebpage(QString)));
 }
 
@@ -87,6 +88,7 @@ void MainLauncherWindow::loadConfig(const QString &configName)
 
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
+        m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
         setWindowTitle(settingFile.value("title", "SMBX Launcher").toString());
         QString webpage = settingFile.value("episode-webpage", "").toString();
         if(webpage == ""){
@@ -103,7 +105,7 @@ void MainLauncherWindow::loadConfig(const QString &configName)
         }
         m_ApplyLunaLoaderPatch = (settingFile.value("apply-lunaloader-patch", "false").toString() == "true");
     }else{
-        m_smbxExe = "smbx.exe";
+        m_pgeExe = "PGE/pge_editor.exe";
         ui->mainWindowWidget->setWindowTitle("SMBX Launcher");
         m_ApplyLunaLoaderPatch = false;
         loadDefaultWebpage();
@@ -121,11 +123,19 @@ void MainLauncherWindow::runSMBX()
 
 void MainLauncherWindow::runSMBXEditor()
 {
-    writeLunaConfig();
+    // Don't need to write luna config for editor
     QList<QString> args;
     args << "--leveleditor";
     internalRunSMBX(m_smbxExe, args);
     close();
+}
+
+void MainLauncherWindow::runPGEEditor()
+{
+    if (m_pgeExe.length() > 0) {
+        QProcess::startDetached(m_pgeExe);
+        close();
+    }
 }
 
 void MainLauncherWindow::loadEpisodeWebpage(const QString &file)

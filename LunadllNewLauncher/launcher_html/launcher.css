@@ -40,22 +40,30 @@ td {
 		-webkit-flex-direction: column;
 	}
 }
-.buttons {
+.buttons, .miniButtons {
 	display: inline-block;
     vertical-align: top;
-    width: 220px;
     color: #fff;
-    font-size: 17px;
     line-height: 21px;
     font-weight: bold;
     background: #1abc9c;
     border-radius: 3px;
-    padding: 12px 0;
     font-weight: 500;
     border-bottom: 2px solid #16a085;
-    margin: 0 5px;
 }
-.buttons:hover {
+.buttons {
+	margin: 0 5px;
+	width: 220px;
+	padding: 12px 5px;
+	font-size: 17px;
+}
+.miniButtons {
+	margin: 3px;
+	padding: 2px 5px;
+	font-size: 12px;
+	height: 41px;
+}
+.buttons:hover, .miniButtons:hover {
 	background-color: #19a98c;
 	box-shadow: 0 0px #27496d;
 	transform: translateY(5px);
@@ -125,7 +133,7 @@ select:focus, select:active {
 	display: inline-block;
 	color: #0C183E;
 }
-.centeredSection label span:first-of-type, .buttons {
+.centeredSection label span:first-of-type, .buttons, .miniButtons {
 	font-family: Century Gothic, sans-serif;
 }
 .flexBoxes {

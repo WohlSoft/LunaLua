@@ -178,3 +178,24 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
     }
     return ret;
 }
+
+void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
+{
+    if (slot < 1 || slot > 3) return;
+
+    QDir episodeDir = QDir::current();
+
+    if(!episodeDir.cd("worlds")){
+        return;
+    }
+
+    if(!episodeDir.cd(directoryName)){
+        return;
+    }
+
+    QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".sav";
+    QFile saveFile(saveFilePath);
+    if (saveFile.exists()){
+        saveFile.remove();
+    }
+}

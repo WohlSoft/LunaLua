@@ -27,6 +27,7 @@ public slots:
 
     void runSMBX();
     void runSMBXEditor();
+    void runPGEEditor();
     void loadEpisodeWebpage(const QString& file);
 
     //General stuff
@@ -42,6 +43,7 @@ private:
     QScopedPointer<SMBXConfig> m_smbxConfig;
     QScopedPointer<LauncherConfiguration> m_launcherSettings;
     QString m_smbxExe;
+    QString m_pgeExe;
     bool m_ApplyLunaLoaderPatch;
     Ui::MainLauncherWindow *ui;
 };
