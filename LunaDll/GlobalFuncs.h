@@ -16,6 +16,9 @@ std::vector<std::string> splitCmdArgs( std::string str);
 std::string utf8_encode(const std::wstring &wstr);
 std::wstring utf8_decode(const std::string &str);
 std::string wstr2str(const std::wstring &wstr);
+std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
+std::string ConvertBSTRToMBS(BSTR bstr);
+BSTR ConvertMBSToBSTR(const std::string & str);
 
 std::string i2str(int source);
 bool is_number(const std::string& s);
@@ -33,6 +36,7 @@ void CleanUp();
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
+std::string url_encode(const std::string &value);
 // Module Helper Funcs
 HMODULE getModule(std::string moduleName);
 

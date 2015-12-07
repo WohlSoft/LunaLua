@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <stdio.h>
 
+#include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
 
 namespace LuaProxy {
@@ -151,6 +152,26 @@ namespace LuaProxy {
         void init();
         std::string resolvePathFromSection();
 
+    };
+
+    class AsyncHTTPRequest {
+        std::shared_ptr<AsyncHTTPClient> m_client;
+    public:
+        AsyncHTTPRequest();
+        void addArgument(const std::string& argName, const std::string& data, lua_State* L);
+        void setUrl(const std::string& url, lua_State* L);
+        std::string getUrl(lua_State* L) const;
+        void setMethod(AsyncHTTPClient::AsyncHTTPMethod method, lua_State* L);
+        AsyncHTTPClient::AsyncHTTPMethod getMethod(lua_State* L) const;
+        void send(lua_State* L);
+        void wait(lua_State* L);
+
+        bool isReady() const;
+        bool isProcessing() const;
+        bool isFinished() const;
+        std::string responseText(lua_State* L) const;
+        int statusCode(lua_State* L) const;
+        
     };
 
     struct RECTd{
