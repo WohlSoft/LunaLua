@@ -410,12 +410,12 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
 
 bool isAbsolutePath(const std::wstring& path)
 {
-	return std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+	return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
 }
 
 bool isAbsolutePath(const std::string& path)
 {
-	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && path[2] == L'\\';
+	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
 
 std::string generateTimestamp(std::string format)
