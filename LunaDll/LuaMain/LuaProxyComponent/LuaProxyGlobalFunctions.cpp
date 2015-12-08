@@ -23,17 +23,25 @@
 //ini_file - path to INI-file which contains the hitbox redefinations
 void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
 {
-	if( (_powerup < 1) || (_powerup>7)) return;
-	if(( _character < 1) || (_character > 5)) return;
+    if ((_powerup < 1) || (_powerup>7)) return;
+    if ((_character < 1) || (_character > 5)) return;
 
-	int powerup = _powerup-1;
-	int character = _character-1;
-    
-	wstring world_dir = (wstring)GM_FULLDIR;
-	wstring full_path = world_dir.append(::Level::GetName());
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
-	full_path = full_path + utf8_decode(ini_file);
+    int powerup = _powerup - 1;
+    int character = _character - 1;
+
+    std::wstring full_path;
+    if (((ini_file[0] >= 'A' && ini_file[0] <= 'Z') || (ini_file[0] >= 'a' && ini_file[0] <= 'z'))
+        && (ini_file[1] == ':')
+        && ((ini_file[2] == '\\')||(ini_file[2] == '/')))
+    {
+        full_path = utf8_decode(ini_file);
+    } else {
+        std::wstring world_dir = (wstring)GM_FULLDIR;
+        full_path = world_dir.append(::Level::GetName());
+        full_path = removeExtension(full_path);
+        full_path = full_path.append(L"\\"); // < path into level folder
+        full_path = full_path + utf8_decode(ini_file);
+    }
 
 	std::wstring ws = full_path;
 	std::string s;
