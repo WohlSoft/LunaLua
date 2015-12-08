@@ -122,6 +122,33 @@ local function initJSON()
     _G["json"] = require("lunajson")
 end
 
+local nativeIO = io.open
+local nativeIsSamePath = Misc.isSamePath
+local function initSafeIO()
+    io.open = function(filename, mode)
+        local badFiles = {
+            "./config/luna.ini",
+            "./config/game.ini",
+            "./config/autostart.ini",
+            "./luna.ini",
+            "./game.ini",
+            "./autostart.ini",
+            "./LuaScriptsLib/mainV2.lua"
+        }
+        local hasSame = false
+        for _, nextPath in pairs(badFiles) do
+            if(nativeIsSamePath(nextPath, filename))then
+                hasSame = true
+            end
+        end
+        if hasSame then
+            error("You cannot access this path: " .. filename);
+        end
+        return nativeIO(filename, mode)
+    end
+end
+
+initSafeIO()
 initJSON()
 initFFIBasedAPIs()
 

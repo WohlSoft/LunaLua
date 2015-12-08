@@ -1,4 +1,5 @@
 #include "../LuaProxy.h"
+#include "../../Globals.h"
 
 LuaProxy::AsyncHTTPRequest::AsyncHTTPRequest()
 {
@@ -16,6 +17,10 @@ void LuaProxy::AsyncHTTPRequest::addArgument(const std::string& argName, const s
 
 void LuaProxy::AsyncHTTPRequest::send(lua_State* L)
 {
+    if (!gGeneralConfig.getLuaEnableHTTP()) {
+        luaL_error(L, "Cannot send request: HTTP API is not enabled!");
+        return;
+    }
     if (!isReady()) {
         luaL_error(L, "Cannot send request: HTTP Request is already processing or is finished!");
         return;

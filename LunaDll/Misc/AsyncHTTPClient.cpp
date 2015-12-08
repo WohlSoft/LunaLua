@@ -25,14 +25,10 @@ void AsyncHTTPClient::addArgument(const std::string & argName, const std::string
     m_args.emplace_back(argName, content);
 }
 
-#include <iostream>
-#define dbgHR std::cout << "HRESULT = " << std::hex << (DWORD)hr << std::dec << std::endl;
 void AsyncHTTPClient::asyncSendWorker()
 {
     // To prevent the destructor from beeing executed.
     std::shared_ptr<AsyncHTTPClient> lock = shared_from_this();
-
-    m_currentStatus.store(HTTP_PROCESSING, std::memory_order_relaxed);
 
     // FIXME: Only apply arg list in URL for GET, otherwise pass as data.
     std::string fullArgList = "";
@@ -43,8 +39,7 @@ void AsyncHTTPClient::asyncSendWorker()
         fullArgList = fullArgList.substr(0, fullArgList.length() - 1); // To remove the extra "&"
     }
 
-    std::cout << "HTTP Client: Args --> " << fullArgList << std::endl;
-
+   
     std::string method = "";
     switch (m_method) {
     case HTTP_POST:
@@ -57,21 +52,18 @@ void AsyncHTTPClient::asyncSendWorker()
 
     }
 
-    std::cout << "HTTP Client: Method --> " << method << std::endl;
-
-
     HRESULT hr;
     CLSID clsid;
     IWinHttpRequest *pIWinHttpRequest = NULL;
 
     _variant_t varFalse(false);
     _variant_t varData(fullArgList.c_str());
-    _variant_t varEmpty("");
+    _variant_t varContent("");
+    if (m_method == HTTP_POST)
+        varContent = fullArgList.c_str();
     
-    std::cout << "HTTP Client: Create Object " << method << std::endl;
-
+    
     hr = CLSIDFromProgID(L"WinHttp.WinHttpRequest.5.1", &clsid);
-    dbgHR
     if (SUCCEEDED(hr)) {
         hr = CoCreateInstance(clsid, NULL,
             CLSCTX_INPROC_SERVER,
@@ -79,40 +71,41 @@ void AsyncHTTPClient::asyncSendWorker()
             (void **)&pIWinHttpRequest);
     }
 
-    dbgHR
-    std::cout << "HTTP Client: Set timeout" << std::endl;
-
     if (SUCCEEDED(hr)) {
         hr = pIWinHttpRequest->SetTimeouts(1000, 1000, 2000, 1000);
     }
 
-    dbgHR
-    std::cout << "HTTP Client: Open connect" << std::endl;
     if (SUCCEEDED(hr)) {
         _bstr_t method(method.c_str());
-        _bstr_t url((m_url + (fullArgList.empty() ? "" : "?") + fullArgList).c_str());
+        _bstr_t url;
+        if (m_method == HTTP_GET) {
+            url = ((m_url + (fullArgList.empty() ? "" : "?") + fullArgList).c_str());
+        }
+        else 
+        {
+            url = m_url.c_str();
+        }
         hr = pIWinHttpRequest->Open(method, url, varFalse);
     }
 
-    dbgHR
-    std::cout << "HTTP Client: Send data" << std::endl;
+    if (m_method == HTTP_POST) {
+        if (SUCCEEDED(hr)) {
+            hr = pIWinHttpRequest->SetRequestHeader(bstr_t("Content-Type"), bstr_t("application/x-www-form-urlencoded"));
+        }
+    }
+
     if (SUCCEEDED(hr)) {
-        hr = pIWinHttpRequest->Send(varEmpty);
-        std::cout << "Err part: " << std::hex << (hr & 0xFFFF) << std::dec << std::endl;
+        hr = pIWinHttpRequest->Send(varContent);
         if ((hr & 0xFFFF) == ERROR_WINHTTP_TIMEOUT)
             m_responseCode = 408; // If timeout then set the HTTP response code.
     }
 
-    dbgHR
-    std::cout << "HTTP Client: Get status code" << std::endl;
     if (SUCCEEDED(hr)) {
         LONG statusCode = 0;
         hr = pIWinHttpRequest->get_Status(&statusCode);
         m_responseCode = statusCode;
     }
 
-    dbgHR
-    std::cout << "HTTP Client: Get response text (Status code: " << m_responseCode << ")" << std::endl;
     BSTR responseText = 0;
     if (SUCCEEDED(hr)) {
         if (m_responseCode == 200) {
@@ -122,9 +115,6 @@ void AsyncHTTPClient::asyncSendWorker()
             hr = E_FAIL;
         }
     }
-
-    dbgHR
-    std::cout << "HTTP Client: FINISHED!" << std::endl;
 
     if (SUCCEEDED(hr)) {
         m_response = ConvertBSTRToMBS(responseText);
@@ -138,11 +128,12 @@ void AsyncHTTPClient::asyncSendWorker()
 }
 
 
-
 void AsyncHTTPClient::asynSend()
 {
     if (getStatus() != HTTP_READY)
         return;
+
+    m_currentStatus.store(HTTP_PROCESSING, std::memory_order_relaxed);
     m_asyncSendWorkerThread = std::thread([this]() { asyncSendWorker(); });
 }
 
