@@ -160,23 +160,7 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    /* TEST */
-    /*if (!gIntroRun){
-        //Load world list
-        native_loadWorldList();
-        //Slot selection
-        GM_CUR_MENUTYPE = 10;
-        //DEMO
-        GM_CUR_MENUPLAYER1 = 1;
-        //Second level
-        GM_CUR_MENULEVEL = 2;
-        //Load save states
-        native_loadSaveStates();
-
-        *(WORD*)0xB2D6D4 = -1;
-    }*/
-    /* TEST END */
-    std::string autostartFile = utf8_encode(getModulePath()) + "\\autostart.ini";
+    std::string autostartFile = utf8_encode(getLatestConfigFile(L"autostart.ini"));
 
     if (file_existsX(autostartFile)) {
         INIReader autostartConfig(autostartFile);

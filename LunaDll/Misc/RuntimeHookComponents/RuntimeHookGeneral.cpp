@@ -188,8 +188,11 @@ void TrySkipPatch()
     //Load graphics from the HardcodedGraphicsManager
     HardcodedGraphicsManager::loadGraphics();
 
+    // Either in root or in config folder. The config folder is recommended however.
+    gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
+    gGeneralConfig.loadOrDefault();
     //game.ini reader
-    GameConfiguration::runPatchByIni(INIReader(utf8_encode(getModulePath())+ "\\game.ini"));
+    GameConfiguration::runPatchByIni(INIReader(utf8_encode(getLatestConfigFile(L"game.ini"))));
 
     /************************************************************************/
     /* Simple ASM Source Patches                                            */

@@ -465,6 +465,23 @@ void CLunaLua::bindAll()
             .property("sectionName", &LuaProxy::Data::sectionName, &LuaProxy::Data::setSectionName)
             .property("useSaveSlot", &LuaProxy::Data::useSaveSlot, &LuaProxy::Data::setUseSaveSlot),
 
+            class_<LuaProxy::AsyncHTTPRequest>("AsyncHTTPRequest")
+            .enum_("HTTP_METHOD")[
+                value("HTTP_POST", AsyncHTTPClient::HTTP_POST),
+                value("HTTP_GET", AsyncHTTPClient::HTTP_GET)
+            ]
+            .def(constructor<>())
+            .def("addArgument", &LuaProxy::AsyncHTTPRequest::addArgument)
+            .def("send", &LuaProxy::AsyncHTTPRequest::send)
+            .def("wait", &LuaProxy::AsyncHTTPRequest::wait)
+            .property("url", &LuaProxy::AsyncHTTPRequest::getUrl, &LuaProxy::AsyncHTTPRequest::setUrl)
+            .property("method", &LuaProxy::AsyncHTTPRequest::getMethod, &LuaProxy::AsyncHTTPRequest::setMethod)
+            .property("ready", &LuaProxy::AsyncHTTPRequest::isReady)
+            .property("processing", &LuaProxy::AsyncHTTPRequest::isProcessing)
+            .property("finished", &LuaProxy::AsyncHTTPRequest::isFinished)
+            .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
+            .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
+
             class_<LuaProxy::PlayerSettings>("PlayerSettings")
             .scope[
                 def("get", &LuaProxy::PlayerSettings::get)

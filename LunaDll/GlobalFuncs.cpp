@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "Misc/MiscFuncs.h"
@@ -135,6 +136,38 @@ std::string wstr2str(const std::wstring &wstr)
 	return s;
 }
 
+std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen)
+{
+    int len = ::WideCharToMultiByte(CP_ACP, 0, pstr, wslen, NULL, 0, NULL, NULL);
+
+    std::string dblstr(len, '\0');
+    len = ::WideCharToMultiByte(CP_ACP, 0 /* no flags */,
+        pstr, wslen /* not necessary NULL-terminated */,
+        &dblstr[0], len,
+        NULL, NULL /* no default char */);
+
+    return dblstr;
+}
+
+std::string ConvertBSTRToMBS(BSTR bstr)
+{
+    int wslen = ::SysStringLen(bstr);
+    return ConvertWCSToMBS((wchar_t*)bstr, wslen);
+}
+
+BSTR ConvertMBSToBSTR(const std::string & str)
+{
+    int wslen = ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
+        str.data(), str.length(),
+        NULL, 0);
+
+    BSTR wsdata = ::SysAllocStringLen(NULL, wslen);
+    ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
+        str.data(), str.length(),
+        wsdata, wslen);
+    return wsdata;
+}
+
 std::string i2str(int source)
 {
 	std::stringstream s;
@@ -246,8 +279,6 @@ void InitGlobals()
         CreateDirectoryW(L"config", NULL);
     }
 
-    gGeneralConfig.setFilename(L"config/luna.ini");
-    gGeneralConfig.loadOrDefault();
 }
 
 /// CLEAN UP
@@ -289,6 +320,31 @@ std::vector<std::string> split(std::string str, char delimiter)
 		str = str.substr( pos + 1 );
 	}
 	return ret;
+}
+
+
+std::string url_encode(const std::string &value)
+{
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        std::string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
+        }
+
+        // Any other characters are percent-encoded
+        escaped << std::uppercase;
+        escaped << '%' << setw(2) << int((unsigned char)c);
+        escaped << std::nouppercase;
+    }
+
+    return escaped.str();
 }
 
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
@@ -471,6 +527,43 @@ std::wstring getCustomFolderPath()
     return full_path;
 }
 
+std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
+{
+    FILETIME newest = { 0 };
+    std::wstring newestFileName = L"";
+
+    for (const std::wstring& nextPath : paths) {
+        if(GetFileAttributesW(nextPath.c_str()) == INVALID_FILE_ATTRIBUTES)
+            continue; // File does not exist, continue with next.
+
+        HANDLE hNextFile = CreateFileW(nextPath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+        if(!hNextFile) // Failed to open file, continue with next.
+            continue;
+
+        FILETIME nextFileTime = { 0 };
+        if (!GetFileTime(hNextFile, NULL, NULL, &nextFileTime)) {
+            CloseHandle(hNextFile);
+            continue;
+        }
+
+        if (CompareFileTime(&newest, &nextFileTime) < 0) {
+            memcpy(&newest, &nextFileTime, sizeof(FILETIME));
+            newestFileName = nextPath;
+        }
+        CloseHandle(hNextFile);
+    }
+
+    return newestFileName;
+}
+
+std::wstring getLatestConfigFile(const std::wstring& configname)
+{
+    return getLatestFile({
+        getModulePath() + L"//" + configname,
+        getModulePath() + L"//config//" + configname
+    });
+}
+
 void RedirectIOToConsole()
 {
     int hConHandle;
@@ -581,4 +674,6 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
     */
 
 }
+
+
 #endif

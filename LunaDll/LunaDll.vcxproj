@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Misc\AsyncHTTPClient.h" />
     <ClInclude Include="libs\simpleini\SimpleIni.h" />
     <ClInclude Include="GameConfig\GeneralLunaConfig.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h" />
@@ -275,6 +276,8 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp" />
+    <ClCompile Include="Misc\AsyncHTTPClient.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyMusicbox.cpp" />
