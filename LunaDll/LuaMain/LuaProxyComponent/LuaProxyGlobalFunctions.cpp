@@ -32,7 +32,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
     std::wstring full_path;
     if (((ini_file[0] >= 'A' && ini_file[0] <= 'Z') || (ini_file[0] >= 'a' && ini_file[0] <= 'z'))
         && (ini_file[1] == ':')
-        && (ini_file[2] == '\\'))
+        && ((ini_file[2] == '\\')||(ini_file[2] == '/')))
     {
         full_path = utf8_decode(ini_file);
     } else {
