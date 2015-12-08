@@ -30,7 +30,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
     int character = _character - 1;
 
     std::wstring full_path;
-    if (isAbsolutePath(full_path))
+    if (isAbsolutePath(ini_file))
     {
         full_path = utf8_decode(ini_file);
     } else {
