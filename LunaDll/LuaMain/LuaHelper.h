@@ -10,6 +10,9 @@
 #include <type_traits>
 #include "../Misc/VB6StrPtr.h"
 
+
+#define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
+
 namespace LuaHelper {
     luabind::object getEventCallbase(lua_State* base, std::string eventTable);
     bool is_function(struct lua_State * luaState, const char * fname);
