@@ -5,6 +5,7 @@
 #include <QtWebKit/QtWebKit>
 #include <QWebFrame>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
@@ -15,6 +16,8 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->webLauncherPage->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
+    connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
+    ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 }
 
 MainLauncherWindow::~MainLauncherWindow()
@@ -201,6 +204,11 @@ void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &e
         QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
     if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
         QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
+}
+
+void MainLauncherWindow::openURL(QUrl url)
+{
+    QDesktopServices::openUrl(url);
 }
 
 void MainLauncherWindow::writeLunaConfig()

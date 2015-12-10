@@ -69,15 +69,20 @@ bool LauncherConfiguration::setConfigurationAndValidate(const QJsonDocument &set
 
 #include <iostream>
 
-bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes& errCode, QString& errDescription)
+bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription)
+{
+    return loadUpdateJson(updateCheckWebsite, result, errCode, errDescription);
+}
+
+bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDocument *result, UpdateCheckerErrCodes& errCode, QString& errDescription)
 {
     errDescription = "";
-    if(updateCheckWebsite.isEmpty() || updateCheckWebsite == "."){
+    if(checkWebsite.isEmpty() || checkWebsite == "."){
         errCode = UERR_NO_URL;
         return false;
     }
 
-    QUrl urlToUpdateChecker(updateCheckWebsite);
+    QUrl urlToUpdateChecker(checkWebsite);
     if(!urlToUpdateChecker.isValid()){
         errCode = UERR_INVALID_URL;
         errDescription = urlToUpdateChecker.errorString();

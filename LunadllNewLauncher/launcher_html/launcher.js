@@ -51,6 +51,19 @@
 			creditsField.appendChild(tableObj);
 		}
 	}
+	function isSecondVersionNewer(a, b) {
+		if (a === undefined || b === undefined) return false;
+		
+		var i = 0;
+		while (true) {
+			if (a[i] === undefined && b[i] === undefined) return false; // Ran out of digits, *not* newer
+			if (b[i] === undefined) return false; // Equal so far and second is shorter, *not* newer
+			if (a[i] === undefined) return true;  // Equal so far and second is longer, newer
+			if (b[i] > a[i]) return true; 		  // Equal so far and second digit is higher, newer
+			i = i + 1;
+		}
+		return false;
+	}
 	function selectEpisodeById(i) {
 		var episode = episodeData[i];
 		var iframe = document.getElementById("iframer");
@@ -137,6 +150,21 @@
 			}
 			saveSlot.textContent = (idx+1).toString() + " " + extraText;
 		}
+		
+		
+		// Check for updates
+		var updateData = Launcher.checkEpisodeUpdate(episode.directoryName, "launcher", "info.json");
+		
+		if (updateData) {
+			if (isSecondVersionNewer(episode['current-version'], updateData['current-version'])) {
+				var updateMsg = updateData['update-message'];
+				if (updateMsg === undefined)
+				{
+					updateMsg = "An update to \"" + episode.title + "\" is avaliable.";
+				}
+				alert(updateMsg);
+			}
+		}
 	}
 	function launchSMBXIGuess() {
 		var episode = episodeData[parseInt(document.getElementById("episodeSelect").value)];
@@ -159,10 +187,12 @@
 		selectObj = document.createElement("select");
 		selectObj.id = "episodeSelect";
 		for (var i = 0; i < episodeData.length; i++) {
-			optionObj = document.createElement("option");
-			optionObj.value = i.toString();
-			optionObj.textContent = episodeData[i].title;
-			selectObj.appendChild(optionObj);
+			if (episodeData[i]['hidden'] !== true) {
+				optionObj = document.createElement("option");
+				optionObj.value = i.toString();
+				optionObj.textContent = episodeData[i].title;
+				selectObj.appendChild(optionObj);
+			}
 		}
 		selectObj.onchange = function () {
 			selectEpisodeById(parseInt(this.value));

@@ -27,11 +27,11 @@
 #include <QMessageBox>
 #endif
 
-MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
+MetaData FileFormats::ReadNonSMBX64MetaData(PGESTRING RawData)
 {
-    errorString.clear();
+    PGESTRING errorString;
     int str_count=0;        //Line Counter
-    QString line;           //Current Line data
+    PGESTRING line;           //Current Line data
 
 
     MetaData FileData;
@@ -46,35 +46,24 @@ MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
         goto badfile;
     }
 
-    for(int section=0; section<pgeX_Data.dataTree.size(); section++) //look sections
+    for(int section=0; section<(signed)pgeX_Data.dataTree.size(); section++) //look sections
     {
         PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];
-        if(f_section.name=="JOKES")
-        {
-            #ifdef PGE_FILES_USE_MESSAGEBOXES
-            if((!silentMode)&&(!f_section.data.isEmpty()))
-                if(!f_section.data[0].values.isEmpty())
-                    QMessageBox::information(nullptr, "Jokes",
-                            f_section.data[0].values[0].value,
-                            QMessageBox::Ok);
-            #endif
-        }
-        else
         if(f_section.name=="META_BOOKMARKS")
         {
             if(f_section.type!=PGEFile::PGEX_Struct)
             {
-                errorString=QString("Wrong section data syntax:\nSection [%1]").arg(f_section.name);
+                errorString=PGESTRING("Wrong section data syntax:\nSection [")+f_section.name+"%1]";
                 goto badfile;
             }
 
-            for(int sdata=0;sdata<f_section.data.size();sdata++)
+            for(int sdata=0;sdata<(signed)f_section.data.size();sdata++)
             {
                 if(f_section.data[sdata].type!=PGEFile::PGEX_Struct)
                 {
-                    errorString=QString("Wrong data item syntax:\nSection [%1]\nData line %2")
-                            .arg(f_section.name)
-                            .arg(sdata);
+                    errorString=PGESTRING("Wrong data item syntax:\nSection [")+
+                            f_section.name+"]\nData line "+
+                            fromNum(sdata)+")";
                     goto badfile;
                 }
 
@@ -85,14 +74,14 @@ MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
 
-                for(int sval=0;sval<x.values.size();sval++) //Look markers and values
+                for(int sval=0;sval<(signed)x.values.size();sval++) //Look markers and values
                 {
                     PGEFile::PGEX_Val v = x.values[sval];
-                    errorString=QString("Wrong value syntax\nSection [%1]\nData line %2\nMarker %3\nValue %4")
-                            .arg(f_section.name)
-                            .arg(sdata)
-                            .arg(v.marker)
-                            .arg(v.value);
+                    errorString=PGESTRING("Wrong value syntax\nSection [")+
+                            f_section.name+"]\nData line "+
+                            fromNum(sdata)+"\nMarker "+
+                            v.marker+"\nValue "+
+                            v.value;
 
                       if(v.marker=="BM") //Bookmark name
                       {
@@ -105,7 +94,7 @@ MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
                       if(v.marker=="X") // Position X
                       {
                           if(PGEFile::IsIntS(v.value))
-                              meta_bookmark.x = v.value.toInt();
+                              meta_bookmark.x = toInt(v.value);
                           else
                               goto badfile;
                       }
@@ -113,7 +102,7 @@ MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
                       if(v.marker=="Y") //Position Y
                       {
                           if(PGEFile::IsIntS(v.value))
-                              meta_bookmark.y = v.value.toInt();
+                              meta_bookmark.y = toInt(v.value);
                           else
                               goto badfile;
                       }
@@ -303,26 +292,32 @@ MetaData FileFormats::ReadNonSMBX64MetaData(QString RawData, QString filePath)
     ///////////////////////////////////////EndFile///////////////////////////////////////
 
     errorString.clear(); //If no errors, clear string;
+    FileData.ReadFileValid=true;
     return FileData;
 
     badfile:    //If file format is not correct
-    BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
+    //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
+    FileData.ERROR_info=errorString;
+    FileData.ERROR_linenum=str_count;
+    FileData.ERROR_linedata=line;
+    FileData.ReadFileValid=false;
+
     FileData.bookmarks.clear();
 
     return FileData;
 }
 
 
-QString FileFormats::WriteNonSMBX64MetaData(MetaData metaData)
+PGESTRING FileFormats::WriteNonSMBX64MetaData(MetaData metaData)
 {
-    QString TextData;
+    PGESTRING TextData;
     long i;
 
     //Bookmarks
-    if(!metaData.bookmarks.isEmpty())
+    if(!metaData.bookmarks.PGESTRINGisEmpty())
     {
         TextData += "META_BOOKMARKS\n";
-        for(i=0;i<metaData.bookmarks.size(); i++)
+        for(i=0;i<(signed)metaData.bookmarks.size(); i++)
         {
             //Bookmark name
             TextData += PGEFile::value("BM", PGEFile::qStrS(metaData.bookmarks[i].bookmarkName));

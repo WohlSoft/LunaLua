@@ -28,39 +28,6 @@
 #endif
 
 PGESTRING FileFormats::errorString="";
-bool FileFormats::silentMode=false;
-
-void FileFormats::BadFileMsg(PGESTRING fileName_DATA, int str_count, PGESTRING line)
-{
-    #ifdef PGE_FILES_USE_MESSAGEBOXES
-    if(!silentMode)
-    {
-        QMessageBox * box;
-        box= new QMessageBox();
-        box->setWindowTitle( QTranslator::tr("Bad File") );
-        box->setWindowIcon( Themes::icon(Themes::debugger) );
-        box->setText(
-                    PGESTRING( QTranslator::tr("Bad file format\nFile: %1\n").arg(fileName_DATA)  //Print Bad data string
-                              +QTranslator::tr("Line Number: %1\n").arg(str_count)         //Print Line With error
-                               +QTranslator::tr("Line Data: %1").arg(line))
-                    );
-        box->setStandardButtons(QMessageBox::Ok);
-        box->setIcon(QMessageBox::Warning);
-        box->exec();
-    }
-    #endif
-    #ifdef PGE_FILES_QT
-    errorString = PGESTRING( QTranslator::tr("Bad file format\nFile: %1\n").arg(fileName_DATA)  //Print Bad data string
-                           +QTranslator::tr("Line Number: %1\n").arg(str_count)         //Print Line With error
-                            +QTranslator::tr("Line Data: %1").arg(line));
-    #else
-    std::ostringstream errMsg;
-    errMsg<<"Bad file format\nFile:"<<fileName_DATA<<"\n"<<
-            "Line Number: "<<str_count<<"\n"<<"Line Data: "<< line;
-    errorString = errMsg.str();
-    #endif
-}
-
 
 PGESTRING FileFormats::removeQuotes(PGESTRING str)
 {
@@ -83,7 +50,23 @@ PGESTRING FileFormats::removeQuotes(PGESTRING str)
     return target;
 }
 
+PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
+{
+    switch(errCode)
+    {
+        case Success: return "";
+        case ERROR_NotExist: return "File not exist";
+        case ERROR_AccessDenied: return "Access denied";
+        case ERROR_InvalidSyntax: return "Invalid file format";
+        case ERROR_PGEX_SectionNotClosed: return "PGE-X Section is not closed";
+        case ERROR_PGEX_InvalidSyntax: return "PGE-X Invalid data entry syntax";
+        case ERROR_PGEX_InvalidDataType: return "PGE-X Invalid data type";
+        default: return "Unknown error";
+    }
+}
+
 /***************************************************************************/
+#ifdef PGE_EDITOR
 CrashData::CrashData() : used(false),untitled(false), modifyed(false) {}
 
 CrashData::CrashData(const CrashData &_cd)
@@ -115,4 +98,4 @@ void CrashData::reset()
     filename.clear();
     path.clear();
 }
-
+#endif
