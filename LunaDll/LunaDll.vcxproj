@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Misc\AsmPatch.h" />
     <ClInclude Include="Misc\AsyncHTTPClient.h" />
     <ClInclude Include="libs\simpleini\SimpleIni.h" />
     <ClInclude Include="GameConfig\GeneralLunaConfig.h" />
