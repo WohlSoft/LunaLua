@@ -187,10 +187,12 @@
 		selectObj = document.createElement("select");
 		selectObj.id = "episodeSelect";
 		for (var i = 0; i < episodeData.length; i++) {
-			optionObj = document.createElement("option");
-			optionObj.value = i.toString();
-			optionObj.textContent = episodeData[i].title;
-			selectObj.appendChild(optionObj);
+			if (episodeData[i]['hidden'] !== true) {
+				optionObj = document.createElement("option");
+				optionObj.value = i.toString();
+				optionObj.textContent = episodeData[i].title;
+				selectObj.appendChild(optionObj);
+			}
 		}
 		selectObj.onchange = function () {
 			selectEpisodeById(parseInt(this.value));
