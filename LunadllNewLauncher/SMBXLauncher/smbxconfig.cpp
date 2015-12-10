@@ -1,5 +1,6 @@
 #include "smbxconfig.h"
 #include "PGE_File_Formats/file_formats.h"
+#include "launcherconfiguration.h"
 
 #include <QDir>
 #include <QJsonDocument>
@@ -141,6 +142,40 @@ QVariantList SMBXConfig::getEpisodeInfo(const QString& jsonSubDirPerEpisode, con
         }
     }
     return episodesInfo;
+}
+
+QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
+{
+    QDir cursorDir = QDir::current();
+
+    if(!cursorDir.cd("worlds")){
+        return QVariant();
+    }
+
+    if(!cursorDir.cd(directoryName)){
+        return QVariant();
+    }
+
+    QVariant episodeData = getDataForEpisode(cursorDir.canonicalPath(), jsonSubDirPerEpisode, jsonFileName);
+    if(episodeData.type() != QVariant::Map){
+        return QVariant();
+    }
+    QMap<QString, QVariant> episode = episodeData.toMap();
+
+    auto it = episode.constFind("update-check-website");
+    if ((it == episode.constEnd()) || (it.value().type() != QVariant::String)){
+        return QVariant();
+    }
+    QString updateWebsite = it.value().toString();
+
+    QJsonDocument updateOut;
+    LauncherConfiguration::UpdateCheckerErrCodes updateErr;
+    QString updateErrDesc;
+    if (!LauncherConfiguration::loadUpdateJson(updateWebsite, &updateOut, updateErr, updateErrDesc)) {
+        return QVariant();
+    }
+
+    return updateOut.toVariant().toMap();
 }
 
 QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)

@@ -32,6 +32,7 @@ private:
 
 public slots:
     QVariantList getEpisodeInfo(const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
+    QVariant checkEpisodeUpdate(const QString& directoryName, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
     QVariantList getSaveInfo(const QString& directoryName);
     void deleteSaveSlot(const QString& directoryName, int slot);
 
