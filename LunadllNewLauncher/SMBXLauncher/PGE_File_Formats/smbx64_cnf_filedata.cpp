@@ -38,7 +38,6 @@ SMBX64_ConfigPlayer::SMBX64_ConfigPlayer()
     j_pause=0;
     j_altjump=0;//>=19
     j_altrun=0;//>=19
-
 }
 
 

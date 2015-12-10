@@ -25,135 +25,33 @@
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
-LevelData FileFormats::ReadLevelFile(PGEFILE &inf)
+struct LevelEvent_layers
 {
-    errorString.clear();
-
-    #ifdef PGE_FILES_QT
-    QByteArray data;
-    data = inf.read(7);
-    if( (data.size()==0) || (data.size()<7))
-    {
-    #else
-    char data[8];
-    inf.read(data, 7);
-    #endif
-        LevelData FileData = dummyLvlDataArray();
-        #ifdef PGE_FILES_QT
-        if(data.size()==0)
-        BadFileMsg(inf.fileName()+
-            PGESTRING("\nFile is empty! (size of file is 0 bytes)"),
-                   0, "<FILE IS EMPTY>");
-        else
-        BadFileMsg(inf.fileName()+
-            PGESTRING("\nFile is too small! (size of file is %1 bytes)").arg(data.size()),
-                   0, "<FILE IS TOO SMALL>");
-        #else
-        if(inf.eof())
-        {
-            std::ostringstream badFileMsgText;
-            badFileMsgText <<"\nFile is too small! (size of file is " << inf.tellg() <<  "bytes)";
-            BadFileMsg("filename.lvl"+ badFileMsgText.str(), 0, "<FILE IS TOO SMALL>");
-        }
-        #endif
-        FileData.ReadFileValid=false;
-        return FileData;
-    #ifdef PGE_FILES_QT
-    }
-    #endif
-
-    #ifdef PGE_FILES_QT
-    //Check magic number: should be number from 0 to 64 and \n character after
-    if(
-            ((int)data.at(0)>0x39)||
-            ((int)data.at(0)<0x30)||
-            ( ((int)data.at(1)!=0x0D && (int)data.at(1)!=0x0A)&&
-             ((int)data.at(2)!=0x0D && (int)data.at(2)!=0x0A) )
-      )
-        {
-            LevelData FileData = dummyLvlDataArray();
-            BadFileMsg(inf.fileName()+
-                "\nThis is not SMBX64 level file, Bad magic number!", 0, "<NULL>");
-            FileData.ReadFileValid=false;
-            return FileData;
-        }
-    inf.reset();
-    QTextStream in(&inf);   //Read File
-
-    in.setAutoDetectUnicode(true);
-    in.setLocale(QLocale::system());
-    in.setCodec(QTextCodec::codecForLocale());
-
-    return ReadSMBX64LvlFile( in.readAll(), inf.fileName() );
-    #else
-    if(
-            ((int)data[0]>0x39)||
-            ((int)data[0]<0x30)||
-            ( ((int)data[1]!=0x0D && (int)data[1]!=0x0A)&&
-             ((int)data[2]!=0x0D && (int)data[2]!=0x0A) )
-      )
-    {
-        LevelData FileData = dummyLvlDataArray();
-        BadFileMsg(PGESTRING("unknown.lvl")+
-            "\nThis is not SMBX64 level file, Bad magic number!", 0, "<NULL>");
-        FileData.ReadFileValid=false;
-        return FileData;
-    }
-    inf.seekg(std::ios::beg);
-
-    PGESTRING buffer;
-    while(!inf.eof())
-    {
-        buffer.push_back(inf.get());
-    }
-    return ReadSMBX64LvlFile( buffer, "unknown.lvl" );
-    #endif
-}
+    PGESTRING hide;
+    PGESTRING show;
+    PGESTRING toggle;
+};
 
 LevelData FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath)
 {
     errorString.clear();
     LevelData FileData;
-    FileData = dummyLvlDataArray();
+    FileData = CreateLevelData();
 
-    #ifdef PGE_FILES_QT
-    QFile inf(filePath);
-    if(!inf.open(QIODevice::ReadOnly|QIODevice::Text))
+    PGE_FileFormats_misc::TextFileInput inf;
+    if(!inf.open(filePath, false))
     {
         FileData.ReadFileValid=false;
         return FileData;
     }
-    QFileInfo in_1(filePath);
-    FileData.filename = in_1.baseName();
-    FileData.path = in_1.absoluteDir().absolutePath();
-    QTextStream in(&inf);
-    in.setAutoDetectUnicode(true);
-    in.setLocale(QLocale::system());
-    in.setCodec(QTextCodec::codecForLocale());
-    in.seek(0);
-    #else
-    std::ifstream inf;
-    inf.open(filePath.c_str(), std::ios::in);
-    if(!inf.is_open())
-    {
-        FileData.ReadFileValid=false;
-        return FileData;
-    }
-    FileData.filename = "in_1.baseName()";
-    FileData.path = "in_1.absoluteDir().absolutePath()";
-    inf.seekg(std::ios::beg);
-    #endif
+    PGE_FileFormats_misc::FileInfo in_1(filePath);
+    FileData.filename = in_1.basename();
+    FileData.path = in_1.dirpath();
 
+    inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
     SMBX64_FileBegin();
 
-
-    /*****************Macroses*****************************/
-    #ifdef PGE_FILES_QT
-    #define nextLineH() str_count++;line = in.readLine();
-    #else
-    #define nextLineH() str_count++; {line.clear(); char x; while( ((x=inf.get())!='\n') && (!inf.eof()) ) { line.push_back(x); } }
-    #endif
-    /*****************Macroses*end*************************/
+    #define nextLineH() str_count++;line = inf.readLine();
 
     nextLineH();   //Read first line
     if( SMBX64::uInt(line) ) //File format number
@@ -185,14 +83,16 @@ LevelData FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath)
     return FileData;
 badfile:
     FileData.ReadFileValid=false;
+    FileData.ERROR_info="Invalid file format, detected file SMBX-"+fromNum(file_format)+"format";
+    FileData.ERROR_linenum=str_count;
+    FileData.ERROR_linedata=line;
     return FileData;
 }
 
-LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, bool sielent)
+LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath)
 {
     errorString.clear();
     SMBX64_File( RawData );
-    (void)sielent;
 
     int i;                  //counters
     LevelData FileData;
@@ -229,14 +129,9 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     //Add path data
     if(!filePath.PGESTRINGisEmpty())
     {
-        #ifdef PGE_FILES_QT
-        QFileInfo in_1(filePath);
-        FileData.filename = in_1.baseName();
-        FileData.path = in_1.absoluteDir().absolutePath();
-        #else
-        FileData.filename = "in_1.baseName()";
-        FileData.path = "in_1.absoluteDir().absolutePath()";
-        #endif
+        PGE_FileFormats_misc::FileInfo in_1(filePath);
+        FileData.filename = in_1.basename();
+        FileData.path = in_1.dirpath();
     }
 
     #ifdef PGE_EDITOR
@@ -261,7 +156,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     ////////////SECTION Data//////////
     for(i=0;i<sct;i++)
     {
-        section = dummyLvlSection();
+        section = CreateLvlSection();
 
         nextLine(); SIntVar(section.size_left, line); section.PositionX=toInt(line)-10; //left
         nextLine(); SIntVar(section.size_top,  line); section.PositionY=toInt(line)-10; //top
@@ -270,7 +165,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
 
         nextLine(); UIntVar(section.music_id, line);    //Music ID
         nextLine(); UIntVar(section.bgcolor, line);     //BG Color
-        nextLine(); wBoolVar(section.IsWarp, line);     //Connect sides of section
+        nextLine(); wBoolVar(section.wrap_h, line);     //Connect sides of section
         nextLine(); wBoolVar(section.OffScreenEn, line);//Offscreen exit
         nextLine(); UIntVar(section.background, line);  //BackGround id
         if(ge(1)) {nextLine(); wBoolVar(section.lock_left_scroll, line);} //Don't walk to left (no turn back)
@@ -282,14 +177,14 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     }
 
     if(lt(8))
-        for(;i<21;i++) { section = dummyLvlSection(); section.id=i;
+        for(;i<21;i++) { section = CreateLvlSection(); section.id=i;
                             FileData.sections.push_back(section); }
 
 
     //Player's point config
     for(i=0;i<2;i++)
     {
-        players=dummyLvlPlayerPoint();
+        players=CreateLvlPlayerPoint();
 
         nextLine(); SIntVar(players.x, line);//Player x
         nextLine(); SIntVar(players.y, line);//Player y
@@ -306,7 +201,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     nextLine();
     while(line!="\"next\"")
     {
-        blocks = dummyLvlBlock();
+        blocks = CreateLvlBlock();
 
                     SIntVar(blocks.x, line);
         nextLine(); SIntVar(blocks.y, line);
@@ -360,7 +255,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     nextLine();
     while(line!="\"next\"")
     {
-        bgodata = dummyLvlBgo();
+        bgodata = CreateLvlBgo();
 
                     SIntVar(bgodata.x, line);
         nextLine(); SIntVar(bgodata.y, line);
@@ -389,7 +284,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
      nextLine();
      while(line!="\"next\"")
      {
-         npcdata = dummyLvlNpc();
+         npcdata = CreateLvlNpc();
 
 
                      parseLine( SMBX64::sFloat(line), npcdata.x, round(toDouble(line)));
@@ -501,7 +396,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     nextLine();
     while( ((line!="\"next\"")&&(file_format>=10)) || ((file_format<10)&&(line!="")&&(!line.PGESTRINGisEmpty())))
     {
-        doors = dummyLvlDoor();
+        doors = CreateLvlWarp();
         doors.isSetIn=true;
         doors.isSetOut=true;
 
@@ -547,7 +442,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
         nextLine();
         while(line!="\"next\"")
         {
-            waters = dummyLvlPhysEnv();
+            waters = CreateLvlPhysEnv();
 
                         SIntVar(waters.x, line);
             nextLine(); SIntVar(waters.y, line);
@@ -570,7 +465,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     if(ge(10)) {
         ////////////Layers Data//////////
         nextLine();
-        while((line!="\"next\"")&&(!line.PGESTRINGisEmpty()))
+        while((line!="\"next\"")&&(!in.isEOF())&&(!line.PGESTRINGisEmpty()))
         {
 
                           strVar(layers.name, line);     //Layer name
@@ -587,9 +482,9 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
 
         ////////////Events Data//////////
         nextLine();
-        while((line!="")&&(!line.PGESTRINGisEmpty()))
+        while((line!="")&&(!in.isEOF())&&(!line.PGESTRINGisEmpty()))
         {
-            events = dummyLvlEvent();
+            events = CreateLvlEvent();
 
             strVar(events.name, line);//Event name
 
@@ -602,7 +497,8 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
             if(ge(14)){ nextLine(); UIntVar(events.sound_id, line);}
             if(ge(18)){ nextLine(); UIntVar(events.end_game, line);}
 
-            events.layers.clear();
+            PGELIST<LevelEvent_layers > events_layersArr;
+            events_layersArr.clear();
 
             events.layers_hide.clear();
             events.layers_show.clear();
@@ -618,7 +514,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
                 if(events_layers.hide!="") events.layers_hide.push_back(events_layers.hide);
                 if(events_layers.show!="") events.layers_show.push_back(events_layers.show);
                 if(events_layers.toggle!="") events.layers_toggle.push_back(events_layers.toggle);
-                events.layers.push_back(events_layers);
+                events_layersArr.push_back(events_layers);
             }
 
             if(ge(13))
@@ -682,8 +578,9 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
         //Add system layers if not exist
         bool def=false,desb=false,spawned=false;
 
-        foreach(LevelLayer lr, FileData.layers)
+        for(int lrID=0; lrID<(signed)FileData.layers.size();lrID++)
         {
+            LevelLayer &lr=FileData.layers[lrID];
             if(lr.name=="Default") def=true;
             else
             if(lr.name=="Destroyed Blocks") desb=true;
@@ -715,8 +612,9 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
         //P Switch - Start
         //P Switch - End
         bool lstart=false, pstart=false, pend=false;
-        foreach(LevelSMBX64Event ev, FileData.events)
+        for(int evID=0; evID<(signed)FileData.events.size(); evID++)
         {
+            LevelSMBX64Event &ev=FileData.events[evID];
             if(ev.name=="Level - Start") lstart=true;
             else
             if(ev.name=="P Switch - Start") pstart=true;
@@ -724,7 +622,7 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
             if(ev.name=="P Switch - End") pend=true;
         }
 
-        events = dummyLvlEvent();
+        events = CreateLvlEvent();
 
         if(!lstart)
         {
@@ -758,9 +656,13 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
     return FileData;
 
     badfile:    //If file format is not correct
-    if(!sielent)
-        BadFileMsg(filePath+"\nFile format "+PGESTRING::number(file_format), str_count, line);
-    FileData.ReadFileValid=false;
+        if(file_format>0)
+            FileData.ERROR_info="Detected file format: SMBX-"+fromNum(file_format)+" is invalid";
+        else
+            FileData.ERROR_info="It is not an SMBX level file";
+        FileData.ERROR_linenum=str_count;
+        FileData.ERROR_linedata=line;
+        FileData.ReadFileValid=false;
     return FileData;
 }
 
@@ -775,7 +677,6 @@ LevelData FileFormats::ReadSMBX64LvlFile(PGESTRING RawData, PGESTRING filePath, 
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-
 PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
 {
     PGESTRING TextData;
@@ -783,11 +684,16 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
 
     //Count placed stars on this level
     FileData.stars=0;
-    for(i=0;i<FileData.npc.size();i++)
+    for(i=0;i<(signed)FileData.npc.size();i++)
     {
         if(FileData.npc[i].is_star)
             FileData.stars++;
     }
+
+    //Sort blocks array by X->Y
+    smbx64LevelSortBlocks(FileData);
+    //Sort BGO's array by SortPriority->X->Y
+    smbx64LevelSortBGOs(FileData);
 
     //Prevent out of range: 0....64
     if(file_format<0) file_format = 0;
@@ -809,7 +715,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
     //qDebug() << "sections "<<s_limit << "format "<<file_format ;
 
     //Sections settings
-    for(i=0; (i<s_limit)&&(i<FileData.sections.size()) ; i++)
+    for(i=0; (i<s_limit)&&(i<(signed)FileData.sections.size()) ; i++)
     {
         TextData += SMBX64::IntS(FileData.sections[i].size_left);
         TextData += SMBX64::IntS(FileData.sections[i].size_top);
@@ -817,7 +723,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
         TextData += SMBX64::IntS(FileData.sections[i].size_right);
         TextData += SMBX64::IntS(FileData.sections[i].music_id);
         TextData += SMBX64::IntS(FileData.sections[i].bgcolor);
-        TextData += SMBX64::BoolS(FileData.sections[i].IsWarp);
+        TextData += SMBX64::BoolS(FileData.sections[i].wrap_h);
         TextData += SMBX64::BoolS(FileData.sections[i].OffScreenEn);
         TextData += SMBX64::IntS(FileData.sections[i].background);
         if(file_format>=1)
@@ -847,7 +753,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
     for(j=1;j<=2 && playerpoints<2;j++)
     {
         bool found=false;
-        for(i=0; i<FileData.players.size(); i++ )
+        for(i=0; i<(signed)FileData.players.size(); i++ )
         {
             if(FileData.players[i].id!=(unsigned int)j) continue;
             TextData += SMBX64::IntS(FileData.players[i].x);
@@ -868,98 +774,76 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
 
 
     //Blocks
-    QMap<long, QMap<long, QMap<long, LevelBlock > > > sortedBlocks;
-    foreach(LevelBlock block, FileData.blocks)
+    for(int blkID=0;blkID<(signed)FileData.blocks.size();blkID++)
     {
-        sortedBlocks[block.x][block.y][block.array_id] = block;
-    }
-
-    //for(i=0; i<FileData.blocks.size(); i++)
-    //{
-    for (QMap<long, QMap<long, QMap<long, LevelBlock > > >::iterator bArr = sortedBlocks.begin(); bArr != sortedBlocks.end(); bArr++)
-    {
-      for (QMap<long, QMap<long, LevelBlock > >::iterator bBrr = (* bArr).begin(); bBrr != (* bArr).end(); bBrr++)
-        for (QMap<long, LevelBlock >::iterator block = (* bBrr).begin(); block != (*bBrr).end(); block++)
+        LevelBlock &block=FileData.blocks[blkID];
+        TextData += SMBX64::IntS(block.x);
+        TextData += SMBX64::IntS(block.y);
+        TextData += SMBX64::IntS(block.h);
+        TextData += SMBX64::IntS(block.w);
+        TextData += SMBX64::IntS(block.id);
+        int npcID = block.npc_id;
+        if(npcID < 0)
         {
-            TextData += SMBX64::IntS((*block).x);
-            TextData += SMBX64::IntS((*block).y);
-            TextData += SMBX64::IntS((*block).h);
-            TextData += SMBX64::IntS((*block).w);
-            TextData += SMBX64::IntS((*block).id);
-            int npcID = (*block).npc_id;
-            if(npcID < 0)
+            npcID *= -1; if(npcID>99) npcID = 99;
+        }
+        else
+        if(npcID!=0)
+        {
+            npcID+=1000;
+            if(file_format<=64)
             {
-                npcID *= -1; if(npcID>99) npcID = 99;
-            }
-            else
-            if(npcID!=0)
-            {
-                npcID+=1000;
-                if(file_format<=64)
+                long xnpcID = npcID;
+                //Convert NPC-ID value from SMBX64 to SMBX1/2
+                switch(xnpcID)
                 {
-                    long xnpcID = npcID;
-                    //Convert NPC-ID value from SMBX64 to SMBX1/2
-                    switch(xnpcID)
-                    {
-                        case 1009://Mushroom
-                            xnpcID = 100; break;
-                        case 1001://Goomba
-                            xnpcID = 101; break;
-                        case 1014://Fire flower
-                            xnpcID = 102; break;
-                        case 1034://Super leaf
-                            xnpcID = 103; break;
-                        case 1035://Shoe
-                            xnpcID = 104; break;
-                        default:
-                            break;
-                    }
-                    npcID = xnpcID;
+                    case 1009://Mushroom
+                        xnpcID = 100; break;
+                    case 1001://Goomba
+                        xnpcID = 101; break;
+                    case 1014://Fire flower
+                        xnpcID = 102; break;
+                    case 1034://Super leaf
+                        xnpcID = 103; break;
+                    case 1035://Shoe
+                        xnpcID = 104; break;
+                    default:
+                        break;
                 }
+                npcID = xnpcID;
             }
+        }
 
-            TextData += SMBX64::IntS(npcID);
-            TextData += SMBX64::BoolS((*block).invisible);
-            if(file_format>=61)
-            TextData += SMBX64::BoolS((*block).slippery);
-            if(file_format>=10)
-            TextData += SMBX64::qStrS((*block).layer);
-            if(file_format>=14)
-                {
-                TextData += SMBX64::qStrS((*block).event_destroy);
-                TextData += SMBX64::qStrS((*block).event_hit);
-                TextData += SMBX64::qStrS((*block).event_emptylayer);
-                }
+        TextData += SMBX64::IntS(npcID);
+        TextData += SMBX64::BoolS(block.invisible);
+        if(file_format>=61)
+        TextData += SMBX64::BoolS(block.slippery);
+        if(file_format>=10)
+        TextData += SMBX64::qStrS(block.layer);
+        if(file_format>=14)
+        {
+            TextData += SMBX64::qStrS(block.event_destroy);
+            TextData += SMBX64::qStrS(block.event_hit);
+            TextData += SMBX64::qStrS(block.event_emptylayer);
         }
     }
     TextData += "\"next\"\n";//Separator
 
 
     //BGOs
-    QMap<long, QMap<long, QMap<long, QMap<long, LevelBGO > > > > sortedBGO;
-    foreach(LevelBGO bgo1, FileData.bgo)
+    for(int bgoID=0;bgoID<(signed)FileData.bgo.size();bgoID++)
     {
-        sortedBGO[bgo1.smbx64_sp_apply][bgo1.x][bgo1.y][bgo1.array_id] = bgo1;
-    }
-
-    //for(i=0; i<FileData.bgo.size(); i++)
-    for (QMap<long, QMap<long, QMap<long, QMap<long, LevelBGO > > > >::iterator sArr = sortedBGO.begin(); sArr != sortedBGO.end(); sArr++)
-    {
-        for (QMap<long, QMap<long, QMap<long, LevelBGO > > >::iterator bArr = (* sArr).begin(); bArr != (* sArr).end(); bArr++)
-          for (QMap<long, QMap<long, LevelBGO > >::iterator bBrr = (* bArr).begin(); bBrr != (* bArr).end(); bBrr++)
-            for (QMap<long, LevelBGO >::iterator bgo = (* bBrr).begin(); bgo != (*bBrr).end(); bgo++)
-            {
-            TextData += SMBX64::IntS( (*bgo).x);
-            TextData += SMBX64::IntS( (*bgo).y);
-            TextData += SMBX64::IntS( (*bgo).id);
-            if(file_format>=10)
-            TextData += SMBX64::qStrS( (*bgo).layer);
-            }
+        LevelBGO &bgo1=FileData.bgo[bgoID];
+        TextData += SMBX64::IntS( bgo1.x);
+        TextData += SMBX64::IntS( bgo1.y);
+        TextData += SMBX64::IntS( bgo1.id);
+        if(file_format>=10)
+        TextData += SMBX64::qStrS( bgo1.layer);
     }
     TextData += "\"next\"\n";//Separator
 
     //NPCs
-    for(i=0; i<FileData.npc.size(); i++)
+    for(i=0; i<(signed)FileData.npc.size(); i++)
     {
         //Section size
         TextData += SMBX64::IntS(FileData.npc[i].x);
@@ -1041,7 +925,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
     TextData += "\"next\"\n";//Separator
 
     //Doors
-    for(i=0; i<FileData.doors.size(); i++)
+    for(i=0; i<(signed)FileData.doors.size(); i++)
     {
         if( ((!FileData.doors[i].lvl_o) && (!FileData.doors[i].lvl_i)) || ((FileData.doors[i].lvl_o) && (!FileData.doors[i].lvl_i)) )
             if(!FileData.doors[i].isSetIn) continue; // Skip broken door
@@ -1086,7 +970,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
     if(file_format>=29)
     {
         TextData += "\"next\"\n";//Separator
-        for(i=0; i<FileData.physez.size(); i++)
+        for(i=0; i<(signed)FileData.physez.size(); i++)
         {
             TextData += SMBX64::IntS(FileData.physez[i].x);
             TextData += SMBX64::IntS(FileData.physez[i].y);
@@ -1105,7 +989,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
         TextData += "\"next\"\n";//Separator
 
         //Layers
-        for(i=0; i<FileData.layers.size(); i++)
+        for(i=0; i<(signed)FileData.layers.size(); i++)
         {
             TextData += SMBX64::qStrS(FileData.layers[i].name);
             TextData += SMBX64::BoolS(FileData.layers[i].hidden);
@@ -1113,7 +997,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
         TextData += "\"next\"\n";//Separator
 
         LevelEvent_layers layerSet;
-        for(i=0; i<FileData.events.size(); i++)
+        for(i=0; i<(signed)FileData.events.size(); i++)
         {
             TextData += SMBX64::qStrS(FileData.events[i].name);
             if(file_format>=11)
@@ -1123,28 +1007,29 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
             if(file_format>=18)
             TextData += SMBX64::IntS(FileData.events[i].end_game);
 
-            FileData.events[i].layers.clear();
+            PGELIST<LevelEvent_layers > events_layersArr;
+            //FileData.events[i].layers.clear();
             for(j=0; j<20; j++)
             {
                 layerSet.hide =
-                        ((j<FileData.events[i].layers_hide.size())?
+                        ((j<(signed)FileData.events[i].layers_hide.size())?
                           FileData.events[i].layers_hide[j] : "");
                 layerSet.show =
-                        ((j<FileData.events[i].layers_show.size())?
+                        ((j<(signed)FileData.events[i].layers_show.size())?
                           FileData.events[i].layers_show[j] : "");;
                 layerSet.toggle =
-                        ((j<FileData.events[i].layers_toggle.size())?
+                        ((j<(signed)FileData.events[i].layers_toggle.size())?
                           FileData.events[i].layers_toggle[j] : "");
 
-                FileData.events[i].layers.push_back(layerSet);
+                events_layersArr.push_back(layerSet);
             }
 
-            for(j=0; j< FileData.events[i].layers.size()  && j<s_limit-1; j++)
+            for(j=0; j< (signed)events_layersArr.size()  && j<s_limit-1; j++)
             {
-                TextData += SMBX64::qStrS(FileData.events[i].layers[j].hide);
-                TextData += SMBX64::qStrS(FileData.events[i].layers[j].show);
+                TextData += SMBX64::qStrS(events_layersArr[j].hide);
+                TextData += SMBX64::qStrS(events_layersArr[j].show);
                 if(file_format>=14)
-                TextData += SMBX64::qStrS(FileData.events[i].layers[j].toggle);
+                TextData += SMBX64::qStrS(events_layersArr[j].toggle);
             }
             for( ; j<s_limit; j++)
             {
@@ -1156,7 +1041,7 @@ PGESTRING FileFormats::WriteSMBX64LvlFile(LevelData FileData, int file_format)
 
             if(file_format>=13)
             {
-                for(j=0; j< FileData.events[i].sets.size()  && j<s_limit; j++)
+                for(j=0; j< (signed)FileData.events[i].sets.size()  && j<s_limit; j++)
                 {
                     TextData += SMBX64::IntS(FileData.events[i].sets[j].music_id);
                     TextData += SMBX64::IntS(FileData.events[i].sets[j].background_id);
