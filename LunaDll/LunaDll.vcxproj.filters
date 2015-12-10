@@ -112,6 +112,9 @@
     <Filter Include="Header Files\Misc\RuntimeHookUtils">
       <UniqueIdentifier>{4d72dffc-f1e1-4224-b611-0ffbf60b3c7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Misc\RuntimeHookManagers">
+      <UniqueIdentifier>{d4e2ea0a-7d76-40e6-a6c6-c3d4e7681e60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -497,6 +500,9 @@
     </ClInclude>
     <ClInclude Include="Misc\AsmPatch.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h">
+      <Filter>Header Files\Misc\RuntimeHookManagers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -946,6 +952,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp">
+      <Filter>Header Files\Misc\RuntimeHookManagers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

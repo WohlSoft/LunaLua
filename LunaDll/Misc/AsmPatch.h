@@ -5,6 +5,13 @@
 #include <exception>
 #include <type_traits>
 
+class Patchable {
+public:
+    virtual void Apply() = 0;
+    virtual void Unapply() = 0;
+    virtual bool IsPatched() const = 0;
+};
+
 namespace AsmConsts {
     enum R32  {
         R32_EAX = 0x0,
@@ -23,7 +30,7 @@ struct AsmPatchNoCondtionalJump : std::exception {
 };
 
 template <std::uintptr_t Size>
-struct AsmPatch {
+struct AsmPatch : public Patchable {
     /********************
      * Member variables *
      ********************/
@@ -31,13 +38,15 @@ public:
     const std::uintptr_t mAddr;
     std::uint8_t mPatchBytes[Size ? Size : 1];
     std::uint8_t mOrigBytes[Size ? Size : 1];
+    bool mIsPatched;
 
     /***********************************
      * Constructor and utility methods *
      ***********************************/
 public:
     AsmPatch(std::uintptr_t addr) :
-        mAddr(addr)
+        mAddr(addr),
+        mIsPatched(false)
     {}
 
     std::uintptr_t size() const {
@@ -48,18 +57,24 @@ public:
         return mAddr + Size;
     }
 
-    void Apply() const {
+    void Apply() {
         if (Size == 0) return;
         for (std::uintptr_t i = 0; i < Size; i++) {
             ((uint8_t*)mAddr)[i] = mPatchBytes[i];
         }
+        mIsPatched = true;
     }
 
-    void Unapply() const {
+    void Unapply() {
         if (Size == 0) return;
         for (std::uintptr_t i = 0; i < Size; i++) {
             ((uint8_t*)mAddr)[i] = mOrigBytes[i];
         }
+        mIsPatched = false;
+    }
+
+    bool IsPatched() const {
+        return mIsPatched;
     }
 
     /*******************************

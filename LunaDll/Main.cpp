@@ -208,12 +208,12 @@ int TestFunc()
 }
 
 // HUD Drawing Patches
-static const AsmPatch<6> skipHudPatch = (
+static AsmPatch<6> skipHudPatch = (
     PATCH(0x96C036)
     .JMP(0x987C10)
     .NOP()
     );
-static const AsmPatch<2> skipStarCountPatches[3] = {
+static AsmPatch<2> skipStarCountPatches[3] = {
     PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
     PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
     PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
