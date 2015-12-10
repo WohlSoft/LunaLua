@@ -5,6 +5,7 @@
 #include <smbxconfig.h>
 #include <QScopedPointer>
 #include <QProcess>
+#include <QUrl>
 #include "launcherconfiguration.h"
 
 namespace Ui {
@@ -35,7 +36,8 @@ public slots:
 
     //Error handlers
     void jsonErrHandler(VALIDATE_ERROR errType, const QString& errChild);
-
+private slots:
+    void openURL(QUrl url);
 private:
     void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);
