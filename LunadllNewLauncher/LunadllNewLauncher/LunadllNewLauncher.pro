@@ -14,7 +14,7 @@ CONFIG += c++11
 CONFIG += sharedlib
 
 QMAKE_CXXFLAGS = -std=c++11 
-LIBS += -pthread
+LIBS += -lgdi32 -pthread
 
 
 DEFINES += LunadllNewLauncher
