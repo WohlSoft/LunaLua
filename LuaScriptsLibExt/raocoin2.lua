@@ -34,14 +34,14 @@
 --------------------Created by Hoeloe - 2015-------------------
 -------------Open-Source Currency and Shop Library-------------
 ---------------------For Super Mario Bros X--------------------
-----------------------------v2.0.5-----------------------------
+----------------------------v2.0.8-----------------------------
 ----------------------REQUIRES ENCRYPT.dll---------------------
 ---------------------REQUIRES COLLIDERS.lua--------------------
 -----------------------REQUIRES PNPC.lua-----------------------
 
 local raocoin = {}
 local encrypt = loadSharedAPI("encrypt");
-local colliders;
+local colliders = loadSharedAPI("colliders");
 local pnpc;
 
 local currencies = {}
@@ -110,7 +110,7 @@ function raocoin.registerCurrency(npcID, showUI, UIx, UIy, imgPath, ignoreHud)
 	imgPath = imgPath or getSMBXPath().."\\LuaScriptsLib\\raocoin\\dragoncoin.png";
 	ignoreHud = ignoreHud or (ignoreHud == nil and false);
 	
-	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency) end };
+	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency, item) end };
 	setmetatable(c,currencyMT.createMT(npcID,-1));
 	
 	c:refreshUI();
@@ -135,7 +135,7 @@ function raocoin.registerMemCurrency(memaddress, memType, restore, showUI, UIx, 
 	imgPath = imgPath or getSMBXPath().."\\LuaScriptsLib\\raocoin\\dragoncoin.png";
 	ignoreHud = ignoreHud or (ignoreHud == nil and false);
 	
-	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency) end };
+	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency, item) end };
 	setmetatable(c,currencyMT.createMT(memaddress,memType));
 	
 	c:refreshUI();
@@ -327,12 +327,12 @@ function raocoin.update()
 	
 	actionQueue = {};
 
-	for k,v in pairs(currencies) do
-		--[[if(v.visible) then
+	--[[for k,v in pairs(currencies) do
+		--if(v.visible) then
 			Graphics.placeSprite(1, v.img, v.x, v.y, "", 2);
 			local val = tostring(v:get());
 			Text.print(val, 1, v.x + 98-18*(string.len(val)), v.y);
-		end]]
+		end
 		
 		currencyCache[k].count = 0;
 		for _,_ in pairs(findnpcs(k,-1)) do
@@ -344,7 +344,7 @@ function raocoin.update()
 			v:onCollect(currencyCache[k].lastCount - currencyCache[k].count);
 		end
 		currencyCache[k].lastCount = currencyCache[k].count;
-	end
+	end]]
 	
 	for k,v in pairs(memcurrencies) do
 		--[[if(v.visible) then
@@ -476,6 +476,14 @@ function raocoin.update()
 	tryBuy = false;
 end
 
+function raocoin:onnpcdie(npc, reason)
+	if(currencies[npc.id] ~= nil and reason == 9 and (colliders.collide(player,npc) or colliders.speedCollide(player,npc))) then
+			currencyCache[npc.id].value = currencyCache[npc.id].value + 1;
+			raocoin.onCollect(currencies[npc.id], 1, npc);
+			currencies[npc.id]:onCollect(1, npc);
+	end
+end
+
 function raocoin.drawhud()
 		for _,v in ipairs(drawQueue) do
 			v();
@@ -500,53 +508,54 @@ function raocoin.drawhud()
 		end
 end
 
+
+--NOTE: If and when this function gets added to mainV2, remove from here.
+local function registerCustomEvent(obj, eventName)
+	local queue = {};
+	local mt = getmetatable(obj);
+	if(mt == nil) then
+		mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
+	end
+	local index_f = mt.__index;
+	local newindex_f = mt.__newindex;
+		
+	mt.__index = function(tbl, key)
+		if(key == eventName) then
+			return function(...)
+				for _,v in ipairs(queue) do
+					v(...);
+				end
+			end
+		else
+			return index_f(tbl, key);
+		end
+	end
+		
+	mt.__newindex = function (tbl,key,val)
+		if(key == eventName) then
+			table.insert(queue, val);
+		else
+			newindex_f(tbl,key,val);
+		end
+	end
+		
+	setmetatable(obj,mt);
+end
+
 function raocoin.onInitAPI()
 	registerEvent(raocoin, "onLoop", "update", true) --Register the loop event
 	registerEvent(raocoin, "onInputUpdate", "inputupdate", true) --Register the input event
 	registerEvent(raocoin, "onHUDDraw", "drawhud", true) --Register the draw event
+	registerEvent(raocoin, "onNPCKill", "onnpcdie", true) --Register the NPC kill event
+	
+	registerCustomEvent(raocoin, "onBuyFail"); 	--(item, code) -- code: 0=can't afford, 1=already bought
+	registerCustomEvent(raocoin, "onBuy");		--(item)
+	registerCustomEvent(raocoin, "onCollect");	--(currency, increment, collectedItem) -- collectedItem is nil for mem currencies
 end
-
-
-function raocoin.onCollect(currency, increment)
-end
-
-function raocoin.onBuy(item)
-end
-
---code: 0=can't afford, 1=already bought
-function raocoin.onBuyFail(item,code)
-end
-
 
 function raocoin.getScreenBounds()
 	local c = Camera.get()[1];
 	local b = {left = c.x, right = c.x + 800, top = c.y, bottom = c.y+600};
-
-	--[[local h = (player:mem(0xD0, FIELD_DFLOAT));
-	local b = { left = player.x-400+player.speedX, right = player.x+400+player.speedX, top = player.y-260+player.speedY, bottom = player.y+340+player.speedY };
-	
-    local sect = Section(player.section);
-    local bounds = sect.boundary;
-
-	if(b.left < bounds.left - 10) then
-		b.left = bounds.left - 10;
-		b.right = b.left + 800;
-	end
-	
-	if(b.right > bounds.right - 10) then
-		b.right = bounds.right - 10;
-		b.left = b.right - 800;
-	end
-	
-	if(b.top < bounds.top+40-h) then
-		b.top = bounds.top+40-h;
-		b.bottom = b.top + 600;
-	end
-	
-	if(b.bottom > bounds.bottom+40-h) then
-		b.bottom = bounds.bottom+40-h;
-		b.top = b.bottom - 600;
-	end]]
 	
 	return b;
 	
