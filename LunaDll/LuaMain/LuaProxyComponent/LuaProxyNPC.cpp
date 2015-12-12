@@ -170,6 +170,11 @@ LuaProxy::NPC::NPC(int index)
 	m_index = index;
 }
 
+int LuaProxy::NPC::idx() const
+{
+    return m_index;
+}
+
 int LuaProxy::NPC::id(lua_State* L) const
 {
 	if(!isValid_throw(L))
