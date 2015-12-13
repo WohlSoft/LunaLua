@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <exception>
 #include <type_traits>
+#include <tuple>
 
 class Patchable {
 public:
@@ -216,6 +217,53 @@ static inline AsmPatch<0> PATCH(std::uintptr_t addr) {
 }
 static inline AsmPatch<0> PATCH(void* addr) {
     return PATCH((std::uintptr_t)addr);
+}
+
+/********************/
+/* Patch colleciton */
+/********************/
+
+template <typename... Ts>
+class PatchCollectionImpl : Patchable {
+private:
+    std::tuple<Ts...> items;
+
+private:
+    template<std::size_t I>
+    inline typename std::enable_if < I == sizeof...(Ts), void>::type ApplyImpl() {}
+    template<std::size_t I>
+    inline typename std::enable_if < I != sizeof...(Ts), void>::type ApplyImpl() {
+        std::get<I>(items).Apply();
+        ApplyImpl<I + 1>();
+    }
+
+    template<std::size_t I>
+    inline typename std::enable_if < I == sizeof...(Ts), void>::type UnapplyImpl() {}
+    template<std::size_t I>
+    inline typename std::enable_if < I != sizeof...(Ts), void>::type UnapplyImpl() {
+        std::get<I>(items).Unapply();
+        UnapplyImpl<I + 1>();
+    }
+
+public:
+    PatchCollectionImpl(const Ts&... args) :
+        items(args...)
+    {}
+
+    void Apply() {
+        ApplyImpl<0>();
+    }
+    void Unapply() {
+        UnapplyImpl<0>();
+    }
+    bool IsPatched() const {
+        return std::get<0>(items).IsPatched();
+    }
+};
+
+template <typename... Ts>
+static inline PatchCollectionImpl<Ts...> PatchCollection(const Ts&... args) {
+    return PatchCollectionImpl<Ts...>(args...);
 }
 
 #endif
