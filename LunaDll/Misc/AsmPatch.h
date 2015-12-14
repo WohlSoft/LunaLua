@@ -18,11 +18,6 @@ _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
 
 template<void* TARGETADDR>
 static inline void* GET_RETADDR_TRACE_HOOK(void) {
-    /*auto f =  static_cast<void (__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
-    char foo[128];
-    sprintf(foo, "Addr=%X %X", (uint32_t)(void*)f, (uint32_t)(void*)TARGETADDR);
-    MessageBoxA(NULL, foo, "Dbg", NULL);
-    return f;*/
     return static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
 }
 
