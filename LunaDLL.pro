@@ -236,7 +236,21 @@ HEADERS += \
     LunaDll/PerformanceTimer.h \
     LunaDll/PngRender.h \
     LunaDll/resource.h \
-    LunaDll/version.h
+    LunaDll/version.h \
+    LunaDll/GameConfig/GeneralLunaConfig.h \
+    LunaDll/Misc/RuntimeHookManagers/LevelHUDController.h \
+    LunaDll/Misc/AsmPatch.h \
+    LunaDll/Misc/AsyncHTTPClient.h \
+    LunaDll/Misc/SafeFPUControl.h \
+    LunaDll/Misc/TypeLib.h \
+    LunaDll/Misc/VariantHelper.h \
+    LunaDll/Misc/win32_Unicode.h \
+    LunaDll/Rendering/Shaders/GLShader.h \
+    LunaDll/SMBXInternal/CollectedStarRecord.h \
+    LunaDll/SMBXInternal/Musicbox.h \
+    LunaDll/SMBXInternal/Path.h \
+    LunaDll/SMBXInternal/Scenery.h \
+    LunaDll/SMBXInternal/Tile.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -396,5 +410,20 @@ SOURCES += \
     LunaDll/libs/luasocket/udp.c \
     LunaDll/libs/luasocket/unix.c \
     LunaDll/libs/luasocket/usocket.c \
-    LunaDll/libs/luasocket/wsocket.c
+    LunaDll/libs/luasocket/wsocket.c \
+    LunaDll/GameConfig/GeneralLunaConfig.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyAsyncHTTPRequest.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyConsole.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyLogger.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyMusicbox.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyPath.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyScenery.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyTile.cpp \
+    LunaDll/Misc/RuntimeHookManagers/LevelHUDController.cpp \
+    LunaDll/Misc/AsyncHTTPClient.cpp \
+    LunaDll/Misc/SafeFPUControl.cpp \
+    LunaDll/Misc/TypeLib.cpp \
+    LunaDll/Misc/VariantHelper.cpp \
+    LunaDll/Misc/win32_Unicode.cpp \
+    LunaDll/Rendering/Shaders/GLShader.cpp
 
