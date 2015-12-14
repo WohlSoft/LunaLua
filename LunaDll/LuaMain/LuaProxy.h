@@ -351,6 +351,7 @@ namespace LuaProxy {
         static LuaProxy::NPC spawn(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
 
         NPC (int index);
+        int idx() const;
         int id(lua_State* L) const;
         void setId(int id, lua_State* L);
         bool isHidden(lua_State* L) const;

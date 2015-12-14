@@ -4,6 +4,7 @@
 #include "../../Defines.h"
 #include <utility>
 #include <map>
+#include "../../Misc/AsmPatch.h"
 
 class LevelHUDController
 {

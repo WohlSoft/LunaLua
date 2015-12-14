@@ -10,7 +10,7 @@
 #include "GLContextManager.h"
 
 GLEngine::GLEngine() :
-    mEnabled(true), mBitwiseCompat(true),
+    mEnabled(true), mBitwiseCompat(false),
     mHwnd(NULL),
     mScreenshot(false)
 {

@@ -23,6 +23,7 @@
 #include "Misc/Playground.h"
 #include "Rendering/GLEngine.h"
 #include "Rendering/GLInitTest.h"
+#include "Misc/AsmPatch.h"
 
 #define PATCHIT 1
 
@@ -213,17 +214,15 @@ static AsmPatch<6> skipHudPatch = (
     .JMP(0x987C10)
     .NOP()
     );
-static AsmPatch<2> skipStarCountPatches[3] = {
+static auto skipStarCountPatch = PatchCollection(
     PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
     PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
     PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
-};
+);
 
 // *EXPORT* HUD Hook -- Runs each time the HUD is drawn.
 int HUDHook()
 {
-
-
 	if(gLunaEnabled) {
 		OnHUDDraw();
 	}
@@ -237,14 +236,10 @@ int HUDHook()
     }
 
     if (gSMBXHUDSettings.skipStarCount) {
-        for (int i = 0; i < 3; i++) {
-            skipStarCountPatches[i].Apply();
-        }
+        skipStarCountPatch.Apply();
     }
     else {
-        for (int i = 0; i < 3; i++) {
-            skipStarCountPatches[i].Unapply();
-        }
+        skipStarCountPatch.Unapply();
     }
 
 	// Restore some code the hook overwrote

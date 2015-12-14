@@ -4,6 +4,22 @@
 #include <cstdint>
 #include <exception>
 #include <type_traits>
+#include <tuple>
+
+template<void* TARGETADDR>
+_declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
+{
+    static const void* thisPtr = TARGETADDR;
+    __asm {
+        PUSH DWORD PTR DS : [esp]
+        JMP thisPtr
+    }
+}
+
+template<void* TARGETADDR>
+static inline void* GET_RETADDR_TRACE_HOOK(void) {
+    return static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
+}
 
 class Patchable {
 public:
@@ -120,6 +136,9 @@ public:
     inline AsmPatch<Size + 1> NOP() const {
         return byte(0x90);
     }
+    inline AsmPatch<Size + 1> RET() const {
+        return byte(0xC3);
+    }
     inline AsmPatch<Size + 1> PUSH_R32(AsmConsts::R32 arg) const {
         return byte(0x50 | arg);
     }
@@ -154,6 +173,10 @@ public:
     inline AsmPatch<Size + 5> CALL(void* func) const { return CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 5> CALL(std::uintptr_t func) const {
         return byte(0xE8).dword(func - cursor() - 5);
+    }
+    template <void* func>
+    inline AsmPatch<Size + 5> TRACE_CALL(void) const {
+        return CALL(static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<func>));
     }
 
     inline AsmPatch<Size + 5> JMP(void* addr) const { return JMP((std::uintptr_t)addr); }
@@ -216,6 +239,53 @@ static inline AsmPatch<0> PATCH(std::uintptr_t addr) {
 }
 static inline AsmPatch<0> PATCH(void* addr) {
     return PATCH((std::uintptr_t)addr);
+}
+
+/********************/
+/* Patch colleciton */
+/********************/
+
+template <typename... Ts>
+class PatchCollectionImpl : Patchable {
+private:
+    std::tuple<Ts...> items;
+
+private:
+    template<std::size_t I>
+    inline typename std::enable_if < I == sizeof...(Ts), void>::type ApplyImpl() {}
+    template<std::size_t I>
+    inline typename std::enable_if < I != sizeof...(Ts), void>::type ApplyImpl() {
+        std::get<I>(items).Apply();
+        ApplyImpl<I + 1>();
+    }
+
+    template<std::size_t I>
+    inline typename std::enable_if < I == sizeof...(Ts), void>::type UnapplyImpl() {}
+    template<std::size_t I>
+    inline typename std::enable_if < I != sizeof...(Ts), void>::type UnapplyImpl() {
+        std::get<I>(items).Unapply();
+        UnapplyImpl<I + 1>();
+    }
+
+public:
+    PatchCollectionImpl(const Ts&... args) :
+        items(args...)
+    {}
+
+    void Apply() {
+        ApplyImpl<0>();
+    }
+    void Unapply() {
+        UnapplyImpl<0>();
+    }
+    bool IsPatched() const {
+        return std::get<0>(items).IsPatched();
+    }
+};
+
+template <typename... Ts>
+static inline PatchCollectionImpl<Ts...> PatchCollection(const Ts&... args) {
+    return PatchCollectionImpl<Ts...>(args...);
 }
 
 #endif
