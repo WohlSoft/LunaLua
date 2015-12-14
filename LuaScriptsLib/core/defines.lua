@@ -30,6 +30,7 @@ local sortedCategories = {
     "Coin Value",
     "Level",
     "Cheats",
+    "Player Settings General",
     "Player Settings: Link",
     "Block Modification",
     "Kill Modification"
@@ -154,8 +155,45 @@ local defines = {
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
     
+    --[[ Player General Defines ]]--
+    player_grabSideEnabled          = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 1, group = "Player Settings General", desc = "If grabbing from the side is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009AD622, FIELD_WORD) == 0x850F
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009AD622, FIELD_WORD, 0x850F)
+                                            else
+                                                mem(0x009AD622, FIELD_WORD, 0xE990)
+                                            end
+                                        end},
+    player_grabTopEnabled           = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 2, group = "Player Settings General", desc = "If grabbing from top is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009CC392, FIELD_WORD) == 0x850F
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009CC392, FIELD_WORD, 0x850F)
+                                            else
+                                                mem(0x009CC392, FIELD_WORD, 0xE990)
+                                            end
+                                        end},    
+    player_grabShellEnabled         = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 3, group = "Player Settings General", desc = "If grabbing shells is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009ADA63, FIELD_WORD) == 0x1474
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009ADA63, FIELD_WORD, 0x1474)
+                                            else
+                                                mem(0x009ADA63, FIELD_WORD, 0x9090)
+                                            end
+                                        end},      
     
-    --[[ Player Defines ]]--
+    --[[ Player Link Defines ]]--
     player_link_shieldEnabled       = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
                                         n = 1, group = "Player Settings: Link", desc = "If the shield of link is enabled.", 
                                         customFuncGet = function(self)
@@ -192,7 +230,8 @@ local defines = {
                                                 mem(0x009AAF93, FIELD_BYTE, 0xFF)
                                             end
                                         end},
-    
+                                        
+
     
     block_hit_link_rupeeID1         = {defValue = 251, minVal = 0, maxVal = 300, address = 0x009DBD9A, size = FIELD_WORD,
                                         n = 1, group = "Block Modification", desc = "The npc id for Link's main coin when hitting the block. (Default would be the green rupee.)"},
