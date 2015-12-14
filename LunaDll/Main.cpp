@@ -427,8 +427,10 @@ void InitLevel() {
 
 }
 
-
-
-
-
-
+__declspec(naked) int UltimateProxy()
+{
+    __asm {
+        POP EAX
+        JMP EAX
+    }
+}
