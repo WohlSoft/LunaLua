@@ -569,7 +569,22 @@ extern void __stdcall LoadLocalOverworldGfxHook()
     gRenderOverride.loadWorldGFX();
 }
 
-
+extern BOOL __stdcall BitBltTraceHook(
+    DWORD retAddr,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    /*
+     Insert debug code based on return address, such as:
+     if (retAddr >= 0x96C036 && retAddr <= 0x987C10) {
+        return 0;
+     }
+     */
+    return BitBltHook(
+        hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop
+        );
+}
 
 extern BOOL __stdcall BitBltHook(
     HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,

@@ -6,6 +6,26 @@
 #include <type_traits>
 #include <tuple>
 
+template<void* TARGETADDR>
+_declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
+{
+    static const void* thisPtr = TARGETADDR;
+    __asm {
+        PUSH DWORD PTR DS : [esp]
+        JMP thisPtr
+    }
+}
+
+template<void* TARGETADDR>
+static inline void* GET_RETADDR_TRACE_HOOK(void) {
+    /*auto f =  static_cast<void (__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
+    char foo[128];
+    sprintf(foo, "Addr=%X %X", (uint32_t)(void*)f, (uint32_t)(void*)TARGETADDR);
+    MessageBoxA(NULL, foo, "Dbg", NULL);
+    return f;*/
+    return static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
+}
+
 class Patchable {
 public:
     virtual void Apply() = 0;
@@ -121,6 +141,9 @@ public:
     inline AsmPatch<Size + 1> NOP() const {
         return byte(0x90);
     }
+    inline AsmPatch<Size + 1> RET() const {
+        return byte(0xC3);
+    }
     inline AsmPatch<Size + 1> PUSH_R32(AsmConsts::R32 arg) const {
         return byte(0x50 | arg);
     }
@@ -155,6 +178,10 @@ public:
     inline AsmPatch<Size + 5> CALL(void* func) const { return CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 5> CALL(std::uintptr_t func) const {
         return byte(0xE8).dword(func - cursor() - 5);
+    }
+    template <void* func>
+    inline AsmPatch<Size + 5> TRACE_CALL(void) const {
+        return CALL(static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<func>));
     }
 
     inline AsmPatch<Size + 5> JMP(void* addr) const { return JMP((std::uintptr_t)addr); }

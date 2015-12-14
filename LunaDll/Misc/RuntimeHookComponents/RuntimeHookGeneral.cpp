@@ -8,6 +8,7 @@
 #include "../ErrorReporter.h"
 #include "../../GameConfig/GameConfiguration.h"
 #include "../../Globals.h"
+#include "../AsmPatch.h"
 
 #include "../SHMemServer.h"
 
@@ -370,7 +371,8 @@ void TrySkipPatch()
 
     PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
     PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
-
+    
+    //PATCH(0x4242D0).JMP(GET_RETADDR_TRACE_HOOK<&BitBltTraceHook>()).Apply();
     PATCH(0x4242D0).JMP(&BitBltHook).Apply();
     PATCH(0x424314).JMP(&StretchBltHook).Apply();
 

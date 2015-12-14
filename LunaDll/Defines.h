@@ -5,7 +5,6 @@
 #include "version.h"
 #include <windows.h>
 #include "Misc/VB6StrPtr.h"
-#include "Misc/AsmPatch.h"
 
 // The version number is now defined in resource.h, as it now compiled as meta-data too.
 // If you want to define your "custom" version number anyway, then set NORMAL_VER_NUM to 0 and modify the LUNALUA_VERSION string.
@@ -520,7 +519,6 @@ DEFMEM(VASM_END_COINSOUND, BYTE, 0x00A3C87F);      // = 14
 DEFMEM(VASM_END_COINVAL,   BYTE, 0x00A3C891);      // = 1
 
 // see LEVEL_HUD_CONTROL
-static const auto PATCH_LHUD_UNKNOWN1 = PATCH(0x96E472);
 
 ////////////////////////
 ///    -Imports-     ///

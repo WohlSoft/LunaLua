@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include "../RuntimeHookUtils/APIHook.h"
+#include "../AsmPatch.h"
 
 BYTE* tracedownAddress(BYTE* addr){
     //Now get the relative address of this function

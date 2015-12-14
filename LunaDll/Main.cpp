@@ -23,6 +23,7 @@
 #include "Misc/Playground.h"
 #include "Rendering/GLEngine.h"
 #include "Rendering/GLInitTest.h"
+#include "Misc/AsmPatch.h"
 
 #define PATCHIT 1
 
