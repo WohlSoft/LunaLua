@@ -187,9 +187,11 @@ local defines = {
                                         end,
                                         customFuncSet = function(self, value)
                                             if(value)then
-                                                mem(0x009ADA63, FIELD_WORD, 0x1474)
+                                                mem(0x009ADA63, FIELD_WORD, 0x1474) -- From Side
+                                                mem(0x009AC6C4, FIELD_WORD, 0x850F) -- From Top
                                             else
-                                                mem(0x009ADA63, FIELD_WORD, 0x9090)
+                                                mem(0x009ADA63, FIELD_WORD, 0x9090) -- From Side
+                                                mem(0x009AC6C4, FIELD_WORD, 0xE990) -- From Top
                                             end
                                         end},      
     
