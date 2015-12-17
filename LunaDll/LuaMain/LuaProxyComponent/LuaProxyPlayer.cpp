@@ -359,17 +359,14 @@ void LuaProxy::Player::getCurrentSpriteIndex(short& indexX, short& indexY, lua_S
 
 void LuaProxy::Player::setCurrentSpriteIndex(short indexX, short indexY, bool forceDirection, lua_State* L)
 {
-	indexX = 0;
-	indexY = 0;
 	if (!isValid_throw(L))
 		return;
 	PlayerMOB* curPlayer = ::Player::Get(m_index);
 	int sprIndex = SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY);
-	bool isLeft = sprIndex < 0;
-	if (isLeft && forceDirection) {
-		curPlayer->FacingDirection = COMBOOL(isLeft);
+	if (forceDirection) {
+		curPlayer->FacingDirection = (sprIndex < 0 ? -1 : 1); // is left?
 	}
-	curPlayer->CurrentPlayerSprite = (short)abs(sprIndex);
+	curPlayer->CurrentPlayerSprite = (short)sprIndex;
 }
 
 
