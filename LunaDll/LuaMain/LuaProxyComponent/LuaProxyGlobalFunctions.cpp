@@ -607,8 +607,8 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
-	if(npcid < 1 || npcid > 292){
-		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", npcid);
+	if(npcid < 1 || npcid > ::NPC::MAX_ID){
+		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
 		return LuaProxy::NPC(-1);
 	}
 		
@@ -687,8 +687,8 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
     typedef void __stdcall animationFunc(short*, Momentum*, float*, short*, short*);
     animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
 
-    if (effectID < 1 || effectID > 148){
-        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-292\nGot Effect-ID: %d", effectID);
+    if (effectID < 1 || effectID > ::SMBXAnimation::MAX_ID){
+        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-%d\nGot Effect-ID: %d", ::SMBXAnimation::MAX_ID, effectID);
         return LuaProxy::Animation(-1);
     }
 

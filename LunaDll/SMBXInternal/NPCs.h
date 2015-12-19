@@ -498,7 +498,7 @@ namespace NPC {
 	void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
 	void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
 
-    static const short MAX_ID = 292;
+    static const short MAX_ID = 300;
 }
 
 #endif

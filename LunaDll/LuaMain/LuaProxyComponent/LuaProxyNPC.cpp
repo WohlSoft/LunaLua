@@ -1,6 +1,7 @@
 #include "../LuaProxy.h"
 #include "../LuaHelper.h"
 #include "../../SMBXInternal/NPCs.h"
+#include "../../SMBXInternal/Animation.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/VB6StrPtr.h"
@@ -97,8 +98,8 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
-    if (npcid < 1 || npcid > 292){
-        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", npcid);
+    if (npcid < 1 || npcid > ::NPC::MAX_ID){
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
         return LuaProxy::NPC(-1);
     }
 
