@@ -3,6 +3,7 @@
 #include "../../libs/ini-reader/INIReader.h"
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/NPCs.h"
+#include "../../SMBXInternal/Animation.h"
 #include "../../SMBXInternal/Blocks.h"
 #include "../../SMBXInternal/Layer.h"
 #include "../../SMBXInternal/Sound.h"
