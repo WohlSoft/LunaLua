@@ -54,12 +54,12 @@ WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
     return gSMBXHUDSettings.overworldHudState;
 }
 
-LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* filename)
+LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::string& filename, lua_State* L)
 {
     int resNumber = gLunaRender.GetAutoImageResourceCode();
     if (resNumber == 0) return NULL;
 
-    if (!gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber)) {
+    if (!gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber)) {
         // If image loading failed, return null
         return NULL;
     }
@@ -80,13 +80,13 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 
 
-bool LuaProxy::Graphics::loadImage(const char* filename, int resNumber, int transColor)
+bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
+    return gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber, transColor);
 }
 
 
-void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra, int time)
+void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time)
 {
     CSpriteRequest req;
     req.type = type;
@@ -94,11 +94,11 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = utf8_decode(std::string(extra));
+    req.str = utf8_decode(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
-void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra)
+void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra)
 {
     placeSprite(type, imgResource, xPos, yPos, extra, 0);
 }
@@ -109,12 +109,12 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     placeSprite(type, imgResource, xPos, yPos, "");
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra, int time)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time)
 {
     placeSprite(type, img.imgResource, xPos, yPos, extra, time);
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra)
 {
     placeSprite(type, img.imgResource, xPos, yPos, extra, 0);
 }

@@ -22,10 +22,16 @@
 
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
-void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
+void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
 {
-    if ((_powerup < 1) || (_powerup>7)) return;
-    if ((_character < 1) || (_character > 5)) return;
+    if ((_powerup < 1) || (_powerup>7)) {
+        luaL_error(L, "Powerup ID must be from 1 to 7.");
+        return;
+    }
+    if ((_character < 1) || (_character > 5)) {
+        luaL_error(L, "Character ID must be from 1 to 5.");
+        return;
+    }
 
     int powerup = _powerup - 1;
     int character = _character - 1;
@@ -238,10 +244,9 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
 }
 
 
-void LuaProxy::triggerEvent(const char *evName)
+void LuaProxy::triggerEvent(const std::string& evName)
 {
-	SMBXEvents::TriggerEvent(utf8_decode(std::string(evName)), 0);
-
+	SMBXEvents::TriggerEvent(utf8_decode(evName), 0);
 }
 
 
@@ -251,30 +256,30 @@ void LuaProxy::playSFX(int index)
 }
 
 
-void LuaProxy::playSFX(const char *filename)
+void LuaProxy::playSFX(const std::string& filename)
 {
 #ifndef NO_SDL
 	playSFXSDL(filename);
 #else
 	wstring full_path;
-	if(!isAbsolutePath(std::string(filename))){
+	if(!isAbsolutePath(filename)){
 		wstring world_dir = (wstring)GM_FULLDIR;
 		full_path = world_dir.append(Level::GetName());
 		full_path = removeExtension(full_path);
 		full_path = full_path.append(L"\\"); // < path into level folder
 		full_path = full_path + utf8_decode(filename);
 	}else{
-		full_path = utf8_decode(std::string(filename));
+		full_path = utf8_decode(filename);
 	}
 	
 	PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 #endif
 }
 
-void LuaProxy::playSFXSDL(const char* filename)
+void LuaProxy::playSFXSDL(const std::string& filename)
 {
 #ifndef NO_SDL
-    string full_paths = Audio::getSfxPath(string(filename));
+    std::string full_paths = Audio::getSfxPath(filename);
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 #else
 	playSFX(filename);
@@ -288,10 +293,10 @@ void LuaProxy::clearSFXBuffer()
 #endif
 }
 
-void LuaProxy::MusicOpen(const char *filename)
+void LuaProxy::MusicOpen(const std::string& filename)
 {
 #ifndef NO_SDL
-    string full_paths = Audio::getSfxPath(string(filename));
+    std::string full_paths = Audio::getSfxPath(filename);
 	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
 #endif
 }
@@ -457,12 +462,12 @@ luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 	return vblocks;
 }
 
-luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
+luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
+    std::wstring tarLayerName = utf8_decode(layername);
 	for(int i = 0; i < 100; ++i){
 		LayerControl* ctrl = ::Layer::Get(i);
 		if(ctrl){
-			std::wstring tarLayerName = utf8_decode(std::string(layername));
 			if(!ctrl->ptLayerName)
 				continue;
 			std::wstring sourceLayerName(ctrl->ptLayerName);

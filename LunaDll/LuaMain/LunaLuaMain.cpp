@@ -293,14 +293,14 @@ void CLunaLua::bindAll()
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
-                def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage),
-                def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const char*))&LuaProxy::Graphics::loadImage, adopt(result)),
+                def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
+                def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
-                def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img))&LuaProxy::Graphics::unplaceSprites),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
@@ -859,7 +859,7 @@ void CLunaLua::bindAll()
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
-                    def("loadPlayerHitBoxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes)
+                    def("loadPlayerHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
                 ],
 
                 namespace_("Graphics")[
@@ -1076,18 +1076,18 @@ void CLunaLua::bindAllDeprecated()
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
             def("printText", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print), //DONE
             def("printText", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print), //DONE
-            def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite), //DONE
+            def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite), //DONE
             def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite), //DONE
 
             /*************************Audio*****************************/
             //Old Audio stuff
             def("playSFX", (void(*)(int))&LuaProxy::playSFX),
-            def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
-            def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
+            def("playSFX", (void(*)(const std::string&))&LuaProxy::playSFX),
+            def("playSFXSDL", (void(*)(const std::string&))&LuaProxy::playSFXSDL),
             def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
-            def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
+            def("MusicOpen", (void(*)(const std::string&))&LuaProxy::MusicOpen),
             def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
             def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
             def("MusicStop", (void(*)())&LuaProxy::MusicStop),
@@ -1111,7 +1111,7 @@ void CLunaLua::bindAllDeprecated()
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent), //In next version event namespace
                 def("playMusic", &LuaProxy::playMusic), //DONE
-                def("loadHitboxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes),
+                def("loadHitboxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]

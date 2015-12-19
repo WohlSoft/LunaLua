@@ -105,9 +105,9 @@ namespace LuaProxy {
 
     //Deprecated
     namespace SaveBankProxy {
-        void setValue(const char* key, double value);
-        luabind::object getValue(const char* key, lua_State *L);
-        bool isValueSet(const char* key);
+        void setValue(const std::string& key, double value);
+        luabind::object getValue(const std::string& key, lua_State *L);
+        bool isValueSet(const std::string& key);
         luabind::object values(lua_State* L);
         void save();
     }
@@ -1135,7 +1135,7 @@ namespace LuaProxy {
         Logger(std::string filename);
         Logger(const Logger &lg) = default;
         ~Logger();
-        void write(const char*line);
+        void write(const std::string& line);
         std::string filePath;
         FILE* file;
     };
@@ -1148,8 +1148,8 @@ namespace LuaProxy {
     }
     //Debug/Text functions
     namespace Text{
-        void windowDebug(const char* debugText, lua_State* L);
-        void windowDebugSimple(const char* debugText);
+        void windowDebug(const std::string& debugText, lua_State* L);
+        void windowDebugSimple(const std::string& debugText);
         void print(const luabind::object& toPrint, int x, int y);
         void print(const luabind::object& toPrint, int type, int x, int y);
         void printWP(const luabind::object& toPrint, int x, int y, double priority);
@@ -1201,14 +1201,14 @@ namespace LuaProxy {
         void activateOverworldHud(WORLD_HUD_CONTROL activateFlag);
         WORLD_HUD_CONTROL getOverworldHudState();
         //CSprite functions
-        bool loadImage(const char* filename, int resNumber, int transColor);
+        bool loadImage(const std::string&, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
-        LuaImageResource* loadImage(const char* filename);
-        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
-        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
+        LuaImageResource* loadImage(const std::string&, lua_State* L);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra, int time);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img);
@@ -1260,7 +1260,7 @@ namespace LuaProxy {
     Animation spawnEffect(short effectID, double x, double y, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 
-    void loadHitboxes(int _character, int _powerup, const char *ini_file);
+    void loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L);
 
     VBStr getInput();
 
@@ -1277,13 +1277,13 @@ namespace LuaProxy {
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 
     //SMBX trigger function [Moved as static function]
-    void triggerEvent(const char* evName);
+    void triggerEvent(const std::string& evName);
     //Music related
     void playSFX(int index);
-    void playSFX(const char* filename);
-    void playSFXSDL(const char* filename);
+    void playSFX(const std::string& filename);
+    void playSFXSDL(const std::string& filename);
     void clearSFXBuffer();
-    void MusicOpen(const char *filename);
+    void MusicOpen(const std::string& filename);
     void MusicPlay();
     void MusicPlayFadeIn(int ms);
     void MusicStop();
@@ -1305,7 +1305,7 @@ namespace LuaProxy {
     void jumpheightBounce(unsigned short value);
 
     //Layer functions [Moved as static function]
-    luabind::object findlayer(const char* layername, lua_State *L);
+    luabind::object findlayer(const std::string& layername, lua_State *L);
     //Animation functions [Moved as static function]
     luabind::object animations(lua_State* L);
     //DEPRECATED

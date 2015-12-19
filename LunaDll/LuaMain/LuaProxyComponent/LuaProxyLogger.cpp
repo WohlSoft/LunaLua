@@ -15,11 +15,11 @@ LuaProxy::Logger::~Logger()
     if (file) fclose(file);
 }
 
-void LuaProxy::Logger::write(const char*line)
+void LuaProxy::Logger::write(const std::string& line)
 {
     if (file)
     {
-        fprintf(file, "%s\n", line);
+        fprintf(file, "%s\n", line.c_str());
         fflush(file);
     }
 }

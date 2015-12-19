@@ -5,16 +5,16 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 
-void LuaProxy::Text::windowDebug(const char* debugText, lua_State* L)
+void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 {
-    int resultCode = MessageBoxA(0, debugText, "Debug", MB_OKCANCEL);
+    int resultCode = MessageBoxA(0, debugText.c_str(), "Debug", MB_OKCANCEL);
     if (resultCode == IDCANCEL)
         luaL_error(L, "Pressed cancel on windowDebug!");
 }
 
-void LuaProxy::Text::windowDebugSimple(const char* debugText)
+void LuaProxy::Text::windowDebugSimple(const std::string& debugText)
 {
-    MessageBoxA(0, debugText, "Debug", MB_OK);
+    MessageBoxA(0, debugText.c_str(), "Debug", MB_OK);
 }
 
 
