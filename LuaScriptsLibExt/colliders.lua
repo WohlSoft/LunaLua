@@ -10,7 +10,7 @@
 -------------Created by Hoeloe - 2015------------
 -----Open-Source Collision Detection Library-----
 --------------For Super Mario Bros X-------------
----------------------v2.1.2----------------------
+---------------------v2.1.4----------------------
 ---------------REQUIRES VECTR.lua----------------
 
 local colliders = {}
@@ -26,7 +26,77 @@ local TYPE_POINT = 7;
 local TYPE_POLY = 8;
 local TYPE_TRI = 9;
 
+colliders.BLOCK_SOLID = {};
+colliders.BLOCK_SEMISOLID = {8,25,26,27,28,38,69,121,122,123,130,161,168,240,241,242,243,244,245,259,260,261,287,288,289,290,372,373,374,375,379,380,381,382,389,391,392,437,438,439,440,441,442,443,444,445,446,447,448,506,507,508,568,572,579};
+colliders.BLOCK_NONSOLID = {172,175,179,181};
+colliders.BLOCK_LAVA = {30,371,404,405,406,420,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487};
+colliders.BLOCK_HURT = {109,110,267,268,269,407,408,428,429,430,431,511,598};
+colliders.BLOCK_PLAYER = {626,627,628,629,632};
+
+local blockscache = {};
+
+local blockmt = {}
+
+local function makeblockmt(id)
+	local r = {};
+	for k,v in pairs(blockmt) do
+		r[k] = v;
+	end
+	r.__index = function(tbl,key)
+		if(key == "id") then
+			return id;
+		end
+	end
+	return r;
+end
+
+blockmt.__concat = function(a,b)
+	if(blockscache[a.id*b.id] ~= nil) then
+		return blockscache[a.id*b.id];
+	end
+	
+	local r = {};
+	for k,v in ipairs(a) do
+		r[k] = v;
+	end
+	for k,v in ipairs(b) do
+		r[#a+k] = v;
+	end
+	setmetatable(r, makeblockmt(a.id*b.id));
+	blockscache[a.id*b.id] = r;
+	return r;
+end
+blockmt.__newindex = function(tbl,key,val)
+	error("Attempted to assign a value in a read-only table.",2)
+end
+
+--IDs are set to prime numbers so that concats can be cached with the id of the product of two or more ids.
+setmetatable(colliders.BLOCK_SOLID, makeblockmt(2));
+setmetatable(colliders.BLOCK_SEMISOLID, makeblockmt(3));
+setmetatable(colliders.BLOCK_NONSOLID, makeblockmt(5));
+setmetatable(colliders.BLOCK_LAVA, makeblockmt(7));
+setmetatable(colliders.BLOCK_HURT, makeblockmt(11));
+setmetatable(colliders.BLOCK_PLAYER, makeblockmt(13));
+
+local function contains(a,b)
+	if(type(a) == 'number') then return a == b; end
+	for _,v in ipairs(a) do
+		if(v == b) then
+			return true;
+		end
+	end
+	return false;
+end
+
 function colliders.onInitAPI()
+	
+	--Blocks that are not semi-solid, non-solid, lava, or player switch blocks are solid.
+	for i=1,638,1 do
+		if(not contains(colliders.BLOCK_SEMISOLID,i) and not contains(colliders.BLOCK_NONSOLID,i) and not contains(colliders.BLOCK_LAVA,i) and not contains(colliders.BLOCK_PLAYER,i)) then
+			table.insert(colliders.BLOCK_SOLID,i);
+		end
+	end
+
 	registerEvent(colliders, "onLoop", "update", false) --Register the loop event
 end
 
@@ -405,6 +475,10 @@ local function testTriBox(a,b)
 	if(testBoxPoint(b,a:Get(1)) or testBoxPoint(b,a:Get(2)) or testBoxPoint(b,a:Get(3))) then
 		return true;
 	end
+	
+	if(testTriPoint(a,{b.x,b.y}) or testTriPoint(a,{b.x+b.width,b.y})  or testTriPoint(a,{b.x+b.width,b.y+b.height}) or testTriPoint(a,{b.x,b.y+b.height})) then
+		return true;
+	end
 		
 	if(colliders.linecast(a:Get(1),a:Get(2), b) or colliders.linecast(a:Get(2), a:Get(3), b) or colliders.linecast(a:Get(3), a:Get(1), b)) then
 		return true;
@@ -422,6 +496,10 @@ local function testTriTri(a,b)
 	end
 		
 	if(testTriPoint(b,a:Get(1)) or testTriPoint(b,a:Get(2)) or testTriPoint(b,a:Get(3))) then
+		return true;
+	end
+	
+	if(testTriPoint(a,b:Get(1)) or testTriPoint(a,b:Get(2)) or testTriPoint(a,b:Get(3))) then
 		return true;
 	end
 		
@@ -1237,16 +1315,6 @@ function colliders.speedCollide(a,b)
 	if(ca == nil or cb == nil) then return false; end;
 	
 	return colliders.collide(ca,cb);
-end
-
-local function contains(a,b)
-	if(type(a) == 'number') then return a == b; end
-	for _,v in ipairs(a) do
-		if(v == b) then
-			return true;
-		end
-	end
-	return false;
 end
 
 function colliders.collideNPCBlock(a,b,sec)
