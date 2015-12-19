@@ -570,13 +570,21 @@ void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)
 void LuaProxy::NPC::toIce(lua_State * L)
 {
     if (!isValid_throw(L)) return;
-    
+
+    // Get dummy NPC, make note of it's old ID so we can restore it afterward
     NPCMOB* dummy = ::NPC::GetDummyNPC();
+    short oldDummyId = dummy->id;
+
+    // Call native_collideNPC with a dummy NPC with an id of iceball
     dummy->id = 265;
     short indexCollideWith = 0;
     short targetIndex = m_index + 1;
     CollidersType targetType = COLLIDERS_NPC;
     native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
+
+    // Restore dummy NPC ID, this prevents bomb explosions from becoming
+    // freeze bombs, and is generally courteous.
+    dummy->id = oldDummyId;
 }
 
 void LuaProxy::NPC::toCoin(lua_State * L)
