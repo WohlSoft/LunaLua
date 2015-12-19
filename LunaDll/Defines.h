@@ -149,15 +149,21 @@ enum ExitType : short {
 };
 
 enum CollidersType : short {
-    COLLIDERS_DEFAULT = 1,   // other is 'player index'. Triggered for jumping on NPC
-    COLLIDERS_FROMBELOW = 2, // other is 'block index'. Triggered for hit from below or pow
-    COLLIDERS_NPC = 3,       // other is 'npc index'. Triggered for NPCs hitting eachother or bomb explosion
-    COLLIDERS_PROJ = 4,      // other is 'npc index'. Triggered for projectile being destroyed
-    COLLIDERS_LAVA = 6,      // other is 'block index'. Triggered for being hit by lava
-    COLLIDERS_TAIL = 7,      // other is 'player index'. Triggered for being hit by tail
-    COLLIDERS_SPINJUMP = 8,  // other is 'player index'. Triggered for spinjump or statue
-    COLLIDERS_OFFSCREEN = 9, // other is 0. Triggered when timing out offscreen
-    COLLIDERS_SWORD = 10     // other is 'player index'. Triggered for sword or sword-beam
+    HARM_TYPE_JUMP = 1,      // other is 'player index'. Triggered for jumping on NPC
+    HARM_TYPE_FROMBELOW = 2, // other is 'block index'. Triggered for hit from below or pow
+    HARM_TYPE_NPC = 3,       // other is 'npc index'. Triggered for NPCs hitting eachother or bomb explosion
+    HARM_TYPE_PROJ_USED = 4, // other is 'npc index'.  Triggered on a projectile once it hits something, in case the projectile should be destroyed
+    HARM_TYPE_LAVA = 6,      // other is 'block index'. Triggered for being hit by lava
+    HARM_TYPE_UNK5 = 5,      // other is 'npc index'. Unknown cause.
+    HARM_TYPE_TAIL = 7,      // other is 'player index'. Triggered for being hit by tail
+    HARM_TYPE_SPINJUMP = 8,  // other is 'player index'. Triggered for spinjump or statue
+    HARM_TYPE_OFFSCREEN = 9, // other is 0. Triggered when timing out offscreen
+    HARM_TYPE_SWORD = 10,    // other is 'player index'. Triggered for sword or sword-beam
+
+    // Extended types for Lua use
+    HARM_TYPE_EXT_FIRE = -1,
+    HARM_TYPE_EXT_ICE = -2,
+    HARM_TYPE_EXT_HAMMER = -3,
 };
 
 #define GM_BASE             0x00B25000

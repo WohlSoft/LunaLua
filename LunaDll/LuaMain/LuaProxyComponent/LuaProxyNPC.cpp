@@ -576,10 +576,10 @@ void LuaProxy::NPC::toIce(lua_State * L)
     short oldDummyId = dummy->id;
 
     // Call native_collideNPC with a dummy NPC with an id of iceball
-    dummy->id = 265;
+    dummy->id = NPCID_PLAYERICEBALL;
     short indexCollideWith = 0;
     short targetIndex = m_index + 1;
-    CollidersType targetType = COLLIDERS_NPC;
+    CollidersType targetType = HARM_TYPE_NPC;
     native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
 
     // Restore dummy NPC ID, this prevents bomb explosions from becoming
@@ -592,6 +592,67 @@ void LuaProxy::NPC::toCoin(lua_State * L)
     if (!isValid_throw(L)) return;
 
     Reconstructed::Util::npcToCoin(::NPC::Get(m_index));
+}
+
+void LuaProxy::NPC::harm(lua_State * L)
+{
+    harm(HARM_TYPE_NPC, L);
+}
+
+void LuaProxy::NPC::harm(short harmType, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    // Get dummy NPC, make note of it's old ID so we can restore it afterward
+    NPCMOB* dummy = ::NPC::GetDummyNPC();
+    short oldDummyId = dummy->id;
+
+    short indexCollideWith = 0;
+    short targetIndex = m_index + 1;
+
+    switch (harmType) {
+    case HARM_TYPE_JUMP:      // other is 'player index'. Triggered for jumping on NPC
+    case HARM_TYPE_TAIL:      // other is 'player index'. Triggered for being hit by tail
+    case HARM_TYPE_SPINJUMP:  // other is 'player index'. Triggered for spinjump or statue
+    case HARM_TYPE_SWORD:    // other is 'player index'. Triggered for sword or sword-beam
+        indexCollideWith = 0; // Dummy player?
+        break;
+    case HARM_TYPE_NPC:       // other is 'npc index'. Triggered for NPCs hitting eachother or bomb explosion
+    case HARM_TYPE_PROJ_USED: // other is 'npc index'. Triggered on a projectile once it hits something, in case the projectile should be destroyed
+    case HARM_TYPE_UNK5:      // other is 'npc index'. Unknown cause.
+        indexCollideWith = 0; // Dummy NPC?
+        break;
+    case HARM_TYPE_FROMBELOW: // other is 'block index'. Triggered for hit from below or pow
+    case HARM_TYPE_LAVA:      // other is 'block index'. Triggered for being hit by lava
+        indexCollideWith = 0; // Dummy block?
+        break;
+    case HARM_TYPE_OFFSCREEN: // other is 0. Triggered when timing out offscreen
+        indexCollideWith = 0; // Nothing
+        break;
+    case HARM_TYPE_EXT_FIRE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERFIREBALL;
+        break;
+    case HARM_TYPE_EXT_ICE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERICEBALL;
+        break;
+    case HARM_TYPE_EXT_HAMMER:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERHAMMER;
+        break;
+    default:
+        return;
+    }
+
+    // Call native_collideNPC for the type of harm we wish to do
+    native_collideNPC(&targetIndex, (CollidersType*)&harmType, &indexCollideWith);
+
+    // Restore dummy NPC ID, in case we changed it
+    dummy->id = oldDummyId;
 }
 
 bool LuaProxy::NPC::collidesBlockBottom(lua_State * L) const

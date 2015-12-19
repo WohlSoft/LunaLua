@@ -414,6 +414,8 @@ namespace LuaProxy {
         void setDontMove(bool dontMove, lua_State* L);
         void toIce(lua_State* L);
         void toCoin(lua_State* L);
+        void harm(lua_State* L);
+        void harm(short harmType, lua_State* L);
         bool collidesBlockBottom(lua_State* L) const;
         void setCollidesBlockBottom(bool collidesBlockBottom, lua_State* L);
         bool collidesBlockLeft(lua_State* L) const;
