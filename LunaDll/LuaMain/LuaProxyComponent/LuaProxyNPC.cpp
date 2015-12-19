@@ -7,7 +7,7 @@
 #include <vector>
 #include "../../Misc/RuntimeHook.h"
 #include "../../SMBXInternal/Reconstructed/Util/NpcToCoins.h"
-
+#include "../../Misc/AsmPatch.h"
 
 int LuaProxy::NPC::count()
 {
@@ -653,6 +653,51 @@ void LuaProxy::NPC::harm(short harmType, lua_State * L)
 
     // Restore dummy NPC ID, in case we changed it
     dummy->id = oldDummyId;
+}
+
+void LuaProxy::NPC::harm(short harmType, float damage, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    // Patch all instructions which add a damage amount to the NPC
+    auto patchSet = PatchCollection(
+        PATCH(0xA2A2D1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A418 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A45C + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5C5 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5CD + 2).dword((DWORD)&damage),
+        PATCH(0xA2A62F + 2).dword((DWORD)&damage),
+        PATCH(0xA2A745 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A766 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A7AB + 2).dword((DWORD)&damage),
+        PATCH(0xA2A94E + 2).dword((DWORD)&damage),
+        PATCH(0xA2A9FC + 2).dword((DWORD)&damage),
+        PATCH(0xA2AA3C + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB08 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB63 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AD8E + 2).dword((DWORD)&damage),
+        PATCH(0xA2C124 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C164 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C5B9 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C672 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C6CC + 2).dword((DWORD)&damage),
+        PATCH(0xA2C7B7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C826 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E1B1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E20E + 2).dword((DWORD)&damage),
+        PATCH(0xA2E280 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FE7F + 2).dword((DWORD)&damage),
+        PATCH(0xA2FEC7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FF01 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FFA7 + 2).dword((DWORD)&damage),
+        PATCH(0xA300B2 + 2).dword((DWORD)&damage),
+        PATCH(0xA300FA + 2).dword((DWORD)&damage),
+        PATCH(0xA30134 + 2).dword((DWORD)&damage)
+        );
+
+    patchSet.Apply();
+    harm(harmType, L);
+    patchSet.Unapply();
 }
 
 bool LuaProxy::NPC::collidesBlockBottom(lua_State * L) const
