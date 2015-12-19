@@ -19,6 +19,7 @@ xcopy /Y /E /I %CurDir%\LuaScriptsLib\*.* "%DeployDir%\LuaScriptsLib" > NUL
 
 echo Copying LunaLUA binaries...
 copy "%CurDir%\Release\LunaDll.dll" "%DeployDir%" > NUL
+copy "%CurDir%\Release\LunaDll.pdb" "%DeployDir%" > NUL
 copy "%CurDir%\Release\LunaLoader.exe" "%DeployDirL%"  > NUL
 
 echo Installing SDL2 and SDL2_mixer_ext...
