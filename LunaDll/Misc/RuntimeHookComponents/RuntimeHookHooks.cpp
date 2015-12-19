@@ -970,3 +970,33 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 
+
+// NPC Collision Logging Hook
+_declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    __asm {
+        push ebp
+        mov ebp,esp
+        sub esp,8
+        push 0xA281B6
+        ret
+    }
+}
+
+extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
+
+    static std::ofstream f;
+    if (!f.is_open()) {
+        f.open("npc_collide_log.txt", ios::out);
+    }
+    f << std::hex << (DWORD)retAddr << ": ";
+    f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
+    f << "type=" << std::dec << (WORD)*typeOfObject << " ";
+    f << "other=" << std::dec << (WORD)*objectIndex << " ";
+    f << endl;
+    f.flush();
+
+    collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
+}

@@ -91,6 +91,7 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
 
 extern void __stdcall GenerateScreenshotHook();
 extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
+extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex);
 
 /************************************************************************/
 /* Libs                                                                 */

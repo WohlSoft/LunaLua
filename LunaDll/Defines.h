@@ -149,8 +149,15 @@ enum ExitType : short {
 };
 
 enum CollidersType : short {
-    COLLIDERS_NPC = 3,
-    COLLIDERS_PLAYER = 10
+    COLLIDERS_DEFAULT = 1,   // other is 'player index'. Triggered for jumping on NPC
+    COLLIDERS_FROMBELOW = 2, // other is 'block index'. Triggered for hit from below or pow
+    COLLIDERS_NPC = 3,       // other is 'npc index'. Triggered for NPCs hitting eachother or bomb explosion
+    COLLIDERS_PROJ = 4,      // other is 'npc index'. Triggered for projectile being destroyed
+    COLLIDERS_LAVA = 6,      // other is 'block index'. Triggered for being hit by lava
+    COLLIDERS_TAIL = 7,      // other is 'player index'. Triggered for being hit by tail
+    COLLIDERS_SPINJUMP = 8,  // other is 'player index'. Triggered for spinjump or statue
+    COLLIDERS_OFFSCREEN = 9, // other is 0. Triggered when timing out offscreen
+    COLLIDERS_SWORD = 10     // other is 'player index'. Triggered for sword or sword-beam
 };
 
 #define GM_BASE             0x00B25000

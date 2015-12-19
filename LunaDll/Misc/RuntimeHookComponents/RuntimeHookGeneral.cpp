@@ -418,6 +418,9 @@ void TrySkipPatch()
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
 
+    // Logging for NPC collisions
+    //PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&collideNPCLoggingHook>()).NOP().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
