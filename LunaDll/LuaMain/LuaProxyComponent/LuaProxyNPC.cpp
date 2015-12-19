@@ -577,6 +577,7 @@ void LuaProxy::NPC::toIce(lua_State * L)
     short targetIndex = m_index + 1;
     CollidersType targetType = COLLIDERS_NPC;
     native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
+    memset(dummy, 0, sizeof(NPCMOB));
 }
 
 void LuaProxy::NPC::toCoin(lua_State * L)
