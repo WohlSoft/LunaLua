@@ -12,6 +12,7 @@
 #include "../ErrorReporter.h"
 
 #include "../SHMemServer.h"
+#include "../AsmPatch.h"
 
 #include "../../Rendering/GLEngine.h"
 #include "../../Main.h"
@@ -23,6 +24,7 @@
 #include "../../Rendering/RenderOps/RenderStringOp.h"
 
 #include "../../SMBXInternal/NPCs.h"
+
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -840,21 +842,27 @@ extern void __stdcall InitLevelEnvironmentHook()
     native_initLevelEnv();
 }
 
-
+static auto MessageBoxContinueCode = PATCH(0x8E54F2).RET_STDCALL_FULL();
 extern short __stdcall MessageBoxOpenHook()
 {
+    bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
     // A note here: If the message is set, then the message box will called
     // However, if a message is not set, then this function is called when the menu opens.
     if (GM_STR_MSGBOX){
         if (GM_STR_MSGBOX.length() > 0){
             if (gLunaLua.isValid()){
-                Event messageBoxEvent("onMessageBox", false);
+                Event messageBoxEvent("onMessageBox", true);
                 messageBoxEvent.setDirectEventName("onMessageBox");
                 messageBoxEvent.setLoopable(false);
                 gLunaLua.callEvent(&messageBoxEvent, (std::string)GM_STR_MSGBOX);
+                isCancelled = messageBoxEvent.native_cancelled();
             }
         }
     }
+    if (isCancelled)
+        MessageBoxContinueCode.Apply();
+    else
+        MessageBoxContinueCode.Unapply();
     
     return (short)GM_PLAYERS_COUNT;
 }
