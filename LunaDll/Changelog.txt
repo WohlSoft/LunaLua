@@ -1,4 +1,5 @@
 v0.7.3 BETA
+  * Improvement [LunaLua]: onMessageBox can now be cancelled
   * Added FIELD_BOOL which can be used for the mem-functions.
   * Added NPC.get overload with only the npc-id as argument.
   * Bugfix [LunaLua]: SMBX doesn't crash anymore, if you pass nil to some LunaLua functions.
