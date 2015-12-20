@@ -20,6 +20,38 @@ luabind::object LuaProxy::NPC::get(lua_State* L)
     return LuaHelper::getObjList(GM_NPCS_COUNT, [](unsigned short i){ return LuaProxy::NPC(i); }, L);
 }
 
+luabind::object LuaProxy::NPC::get(luabind::object idFilter, lua_State* L)
+{
+    std::unique_ptr<bool> lookupTableNpcID;
+
+    try
+    {
+        lookupTableNpcID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::NPC::MAX_ID));
+    }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, e->usedID());
+        return luabind::object();
+    }
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
+    }
+
+    return LuaHelper::getObjList(
+        GM_NPCS_COUNT,
+        [](unsigned short i) { return LuaProxy::NPC(i); },
+        [&lookupTableNpcID](unsigned short i) {
+        NPCMOB* thisnpc = ::NPC::Get(i);
+        if (thisnpc == NULL) return false;
+
+        short id = thisnpc->id;
+        short section = ::NPC::GetSection(thisnpc);
+        return (id <= ::NPC::MAX_ID) && lookupTableNpcID.get()[id];
+    }, L);
+}
+
 luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L)
 {
     std::unique_ptr<bool> lookupTableNpcID;
