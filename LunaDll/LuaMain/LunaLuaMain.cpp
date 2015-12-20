@@ -213,12 +213,13 @@ void CLunaLua::setupDefaults()
     _G["DIR_RANDOM"] = 0;
     _G["DIR_LEFT"] = -1;
 
-    _G["FIELD_BYTE"] = 1;
-    _G["FIELD_WORD"] = 2;
-    _G["FIELD_DWORD"] = 3;
-    _G["FIELD_FLOAT"] = 4;
-    _G["FIELD_DFLOAT"] = 5;
-    _G["FIELD_STRING"] = 6;
+    _G["FIELD_BYTE"] = LuaProxy::LFT_BYTE;
+    _G["FIELD_WORD"] = LuaProxy::LFT_WORD;
+    _G["FIELD_DWORD"] = LuaProxy::LFT_DWORD;
+    _G["FIELD_FLOAT"] = LuaProxy::LFT_FLOAT;
+    _G["FIELD_DFLOAT"] = LuaProxy::LFT_DFLOAT;
+    _G["FIELD_STRING"] = LuaProxy::LFT_STRING;
+    _G["FIELD_BOOL"] = LuaProxy::LFT_BOOL;
 
     _G["KEY_UP"] = GM_PLAYER_KEY_UP;
     _G["KEY_DOWN"] = GM_PLAYER_KEY_DOWN;

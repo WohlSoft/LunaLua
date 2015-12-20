@@ -80,13 +80,14 @@ namespace LuaProxy {
 #define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
 
     enum L_FIELDTYPE{
-        LFT_INVALID = 0,
-        LFT_BYTE = 1,
-        LFT_WORD = 2,
-        LFT_DWORD = 3,
-        LFT_FLOAT = 4,
-        LFT_DFLOAT = 5,
-        LFT_STRING = 6
+        LFT_INVALID = FT_INVALID,
+        LFT_BYTE = FT_BYTE,
+        LFT_WORD = FT_WORD,
+        LFT_DWORD = FT_DWORD,
+        LFT_FLOAT = FT_FLOAT,
+        LFT_DFLOAT = FT_DFLOAT,
+        LFT_STRING = FT_MAX + 1,
+        LFT_BOOL = FT_MAX + 2
     };
 
     //for runAnimation

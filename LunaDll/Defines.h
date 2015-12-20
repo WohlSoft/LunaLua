@@ -36,7 +36,9 @@ enum FIELDTYPE {
     FT_WORD = 2,
     FT_DWORD = 3,
     FT_FLOAT = 4,
-    FT_DFLOAT = 5
+    FT_DFLOAT = 5,
+
+    FT_MAX = 5
 };
 
 enum OPTYPE {

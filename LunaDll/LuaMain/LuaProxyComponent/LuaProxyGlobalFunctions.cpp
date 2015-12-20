@@ -205,39 +205,68 @@ luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 
 void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
-	int iftype = (int)ftype;
-	if(iftype >= 1 && iftype <= 5){
-		void* ptr = ((&(*(byte*)mem)));
-		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
-	}
-	else if (ftype == LFT_STRING) {
-		void* ptr = ((&(*(byte*)mem)));
-		LuaHelper::assignVB6StrPtr((VB6StrPtr*)ptr, value, L);
-	}
+    void* ptr = ((&(*(byte*)mem)));
+
+    switch (ftype) {
+    case LFT_BYTE:
+    case LFT_WORD:
+    case LFT_DWORD:
+    case LFT_FLOAT:
+    case LFT_DFLOAT:
+    {
+        boost::optional<double> opt_obj = luabind::object_cast_nothrow<double>(value);
+        if (opt_obj == boost::none) {
+            luaL_error(L, "Cannot interpret field as number");
+            break;
+        }
+        MemAssign((int)ptr, *opt_obj, OP_Assign, (FIELDTYPE)ftype);
+        break;
+    }
+    case LFT_STRING:
+    {
+        LuaHelper::assignVB6StrPtr((VB6StrPtr*)ptr, value, L);
+        break;
+    }
+    case LFT_BOOL:
+    {
+        boost::optional<bool> opt_obj = luabind::object_cast_nothrow<bool>(value);
+        if (opt_obj == boost::none) {
+            luaL_error(L, "Cannot interpret field as boolean");
+            break;
+        }
+        void* ptr = ((&(*(byte*)mem)));
+        *((short*)ptr) = COMBOOL(*opt_obj);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 
 luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
 {
 	int iftype = (int)ftype;
-	double val = 0;
-	if(iftype >= 1 && iftype <= 6){
-		void* ptr = ((&(*(byte*)mem)));
-		val = GetMem((int)ptr, (FIELDTYPE)ftype);
-	}
+    void* ptr = ((&(*(byte*)mem)));
+
 	switch (ftype) {
 	case LFT_BYTE:
-		return luabind::object(L, (byte)val);
 	case LFT_WORD:
-		return luabind::object(L, (short)val);
 	case LFT_DWORD:
-		return luabind::object(L, (int)val);
 	case LFT_FLOAT:
-		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
-		return luabind::object(L, (double)val);
+    {
+        double val = GetMem((int)ptr, (FIELDTYPE)ftype);
+        return luabind::object(L, val);
+    }
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)(int)val));
+    {
+        return luabind::object(L, VBStr((wchar_t*)*((int32_t*)ptr)));
+    }
+    case LFT_BOOL:
+    {
+        return luabind::object(L, 0 != *((int16_t*)ptr));
+    }
 	default:
 		return luabind::object();
 	}
