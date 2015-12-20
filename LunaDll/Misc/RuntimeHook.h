@@ -129,20 +129,6 @@ void fixup_Mushbug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 
-//scraped for now..... D:
-void RuntimePatch();
-
-//Event Hooks
-void record_SMBXTrigger(wchar_t* trigger, int unkVal, int type);
-
-int getSMBXTriggerMain(BSTR* trigger, int* unkVal);
-int getSMBXTriggerTalk(BSTR* trigger, int* unkVal);
-int getSMBXTriggerUnknown(BSTR* trigger, int* unkVal);
-int getSMBXTriggerPSwitch(BSTR* trigger, int* unkVal);
-int getSMBXTriggerActivateEventLayer(BSTR* trigger, int* unkVal);
-int getSMBXTriggerDeathEvent(BSTR* trigger, int* unkVal);
-int getSMBXTriggerNoMoreObjEvent(BSTR* trigger, int* unkVal);
-int getSMBXTriggerEventTrigger(BSTR* trigger, int* unkVal);
 
 #endif
 
