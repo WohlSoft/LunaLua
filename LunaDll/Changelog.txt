@@ -1,4 +1,9 @@
 v0.7.3 BETA
+  * Added FIELD_BOOL which can be used for the mem-functions.
+  * Added NPC.get overload with only the npc-id as argument.
+  * Bugfix [LunaLua]: SMBX doesn't crash anymore, if you pass nil to some LunaLua functions.
+  * Improvement [LunaLua]: The max npc id is now 300
+  * Added NPC:harm
   * Bugfix [LunaLua]: Tiles can now correctly be replaced with PNGs.
   * Bugfix [LunaLua]: PlayerSetting.height was pointing to players width
   * Extended Camera class
