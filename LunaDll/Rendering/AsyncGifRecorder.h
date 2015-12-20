@@ -2,9 +2,9 @@
 #ifndef AsyncGifRecorder_hhhhh
 #define AsyncGifRecorder_hhhhh
 
+#include <Windows.h>
 #include "../Misc/ThreadedCmdQueue.h"
 #include <memory>
-#include <Windows.h>
 #include <thread>
 #include "RenderUtils.h"
 #include <wincodec.h>

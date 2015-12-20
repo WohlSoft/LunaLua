@@ -501,7 +501,7 @@ bool LuaProxy::NPC::drawOnlyMask(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->isMaskOnly;
+    return 0 != ::NPC::Get(m_index)->isMaskOnly;
 }
 
 void LuaProxy::NPC::setDrawOnlyMask(bool drawOnlyMask, lua_State * L)
@@ -515,7 +515,7 @@ bool LuaProxy::NPC::isInvincibleToSword(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->invincibilityToSword;
+    return 0 != ::NPC::Get(m_index)->invincibilityToSword;
 }
 
 void LuaProxy::NPC::setIsInvincibleToSword(bool isInvincibleToSword, lua_State * L)
@@ -529,7 +529,7 @@ bool LuaProxy::NPC::legacyBoss(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->legacyBoss;
+    return 0 != ::NPC::Get(m_index)->legacyBoss;
 }
 
 void LuaProxy::NPC::setLegacyBoss(bool legacyBoss, lua_State * L)
@@ -543,7 +543,7 @@ bool LuaProxy::NPC::friendly(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
     
-    return (bool)::NPC::Get(m_index)->friendly;
+    return 0 != ::NPC::Get(m_index)->friendly;
 }
 
 void LuaProxy::NPC::setFriendly(bool friendly, lua_State * L)
@@ -557,7 +557,7 @@ bool LuaProxy::NPC::dontMove(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->dontMove;
+    return 0 != ::NPC::Get(m_index)->dontMove;
 }
 
 void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)

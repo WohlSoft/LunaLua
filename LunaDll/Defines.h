@@ -2,8 +2,10 @@
 #ifndef Defines_hhhh
 #define Defines_hhhh
 
-#include "version.h"
+// Includes
 #include <windows.h>
+#include <stddef.h>
+#include "version.h"
 #include "Misc/VB6StrPtr.h"
 
 // The version number is now defined in resource.h, as it now compiled as meta-data too.

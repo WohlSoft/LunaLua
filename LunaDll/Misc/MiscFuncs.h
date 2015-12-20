@@ -1,11 +1,12 @@
 #ifndef MiscFuncs_hhh
 #define MiscFuncs_hhh
 
-#include "../SMBXInternal/Layer.h"
 #include <math.h>
 #include <string>
 #include <vector>
 #include <sstream>
+#include <map>
+#include "../SMBXInternal/Layer.h"
 
 void InfiniteFlying(int player);
 
@@ -29,7 +30,7 @@ bool FastTestCollision(int Left1, int Up1, int Right1, int Down1, int Left2, int
 bool SegmentIntersectRectangle(double a_rectangleMinX, double a_rectangleMinY, double a_rectangleMaxX, double a_rectangleMaxY,
                                  double a_p1x, double a_p1y, double a_p2x, double a_p2y);
 
-void PrintSyntaxError(wstring errored_line);
+void PrintSyntaxError(std::wstring errored_line);
 
 void InitIfMissing(std::map<std::wstring, double>* map, std::wstring sought_key, double init_val);	// Init a map value if key doesn't exist
 

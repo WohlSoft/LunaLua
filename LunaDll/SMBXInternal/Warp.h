@@ -3,7 +3,6 @@
 #define Warp_hhhh
 
 #include "../Defines.h"
-#include "../Globals.h"
 #include "../Misc/VB6StrPtr.h"
 
 enum SMBX_EntranceDir : short {

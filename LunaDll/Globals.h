@@ -12,7 +12,6 @@
 #include "DeathCounter/DeathCounter.h"
 #include "Autocode/AutocodeManager.h"
 #include "Logging/Logging.h"
-#include "CustomSprites/CSprite.h"
 #include "CustomSprites/CSpriteManager.h"
 #include "CellManager/CellManager.h"
 #include "UserSaves/UserSaving.h"

@@ -1,6 +1,7 @@
+#include <windows.h>
+
 #include "../RuntimeHook.h"
 #include "../../SMBXInternal/Reconstructed/ReconstructedDefines.h"
-#include <windows.h>
 
 #include "../RuntimeHookUtils/APIHook.h"
 #include "../AsmPatch.h"

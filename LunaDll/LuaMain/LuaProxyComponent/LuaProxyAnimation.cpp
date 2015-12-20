@@ -256,7 +256,7 @@ bool LuaProxy::Animation::drawOnlyMask() const
 {
     if (!isValid())
         return false;
-    return (bool)::Animations::Get(m_animationIndex)->onlyDrawMask;
+    return 0 != ::Animations::Get(m_animationIndex)->onlyDrawMask;
 }
 
 void LuaProxy::Animation::setDrawOnlyMask(bool drawOnlyMask)

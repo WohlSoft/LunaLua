@@ -294,7 +294,7 @@ void CleanUp() {
 
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
 {
-	vector<std::wstring> ret;
+    std::vector<std::wstring> ret;
 	while ( true )
 	{
 		size_t pos = str.find_first_of( delimiter );
@@ -309,7 +309,7 @@ std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
 
 std::vector<std::string> split(std::string str, char delimiter)
 {
-	vector<std::string> ret;
+    std::vector<std::string> ret;
 	while ( true )
 	{
 		size_t pos = str.find_first_of( delimiter );
@@ -327,7 +327,7 @@ std::string url_encode(const std::string &value)
 {
     std::ostringstream escaped;
     escaped.fill('0');
-    escaped << hex;
+    escaped << std::hex;
 
     for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
         std::string::value_type c = (*i);
@@ -340,7 +340,7 @@ std::string url_encode(const std::string &value)
 
         // Any other characters are percent-encoded
         escaped << std::uppercase;
-        escaped << '%' << setw(2) << int((unsigned char)c);
+        escaped << '%' << std::setw(2) << int((unsigned char)c);
         escaped << std::nouppercase;
     }
 
@@ -382,7 +382,7 @@ std::wstring getModulePath()
 
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
-	wifstream theFile(path, ios::binary|ios::in);
+    std::wifstream theFile(path, std::ios::binary| std::ios::in);
 	if(!theFile.is_open()){
 		theFile.close();
 		if(!errMsg.empty())
@@ -396,7 +396,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
 {
-    ifstream theFile(path, ios::binary | ios::in);
+    std::ifstream theFile(path, std::ios::binary | std::ios::in);
     if (!theFile.is_open()) {
         theFile.close();
         if (!errMsg.empty())
@@ -438,7 +438,7 @@ std::string generateTimestampForFilename()
 
 bool writeFile(const std::string &content, const std::string &path)
 {
-    ofstream theFile(path, ios::binary | ios::out);
+    std::ofstream theFile(path, std::ios::binary | std::ios::out);
     if (!theFile.is_open()){
         theFile.close();
         return false;
@@ -498,7 +498,7 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
         return out; /* No files found */
 
     do {
-        const string file_name = file_data.cFileName;
+        const std::string file_name = file_data.cFileName;
         const bool skipFile = (file_data.dwFileAttributes & fileAttributes) == 0;
         
         if (file_name[0] == '.')
@@ -518,8 +518,8 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
 
 std::wstring getCustomFolderPath()
 {
-    wstring world_dir = (wstring)GM_FULLDIR;
-    wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
+    std::wstring world_dir = (std::wstring)GM_FULLDIR;
+    std::wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
     if (!gIsOverworld){
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder
@@ -610,7 +610,7 @@ void RedirectIOToConsole()
 
     // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
     // point to console as well
-    ios::sync_with_stdio();
+    std::ios::sync_with_stdio();
 }
 
 #ifdef BUILD_WITH_ATL_STUFF

@@ -1,8 +1,9 @@
+#include <comutil.h>
+#include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
 #include "../../LuaMain/LuaEvents.h"
 #include "../../LuaMain/LuaProxy.h"
-#include <comutil.h>
 #include "../../Input/Input.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
@@ -300,13 +301,13 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 {
     if (asyncLogProc)
     {
-        stringstream q;
+        std::stringstream q;
         q << variant->vt << " ";
         if (variant->vt == VT_R8)
         {
             q << "src:" << variant->dblVal << " dst:" << static_cast<float>(variant->dblVal);
         }
-        string rr("vbaR4VarHook type:" + q.str() + ";");
+        std::string rr("vbaR4VarHook type:" + q.str() + ";");
         asyncLogProc(rr.c_str());
     }
 
@@ -989,13 +990,13 @@ extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToColl
 
     static std::ofstream f;
     if (!f.is_open()) {
-        f.open("npc_collide_log.txt", ios::out);
+        f.open("npc_collide_log.txt", std::ios::out);
     }
     f << std::hex << (DWORD)retAddr << ": ";
     f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
     f << "type=" << std::dec << (WORD)*typeOfObject << " ";
     f << "other=" << std::dec << (WORD)*objectIndex << " ";
-    f << endl;
+    f << std::endl;
     f.flush();
 
     collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);

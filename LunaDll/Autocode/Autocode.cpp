@@ -1,3 +1,6 @@
+#include <windows.h>
+#include <time.h>
+#include <cmath>
 #include "AutocodeManager.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
@@ -5,12 +8,9 @@
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/Sound.h"
 #include "../SMBXInternal/Blocks.h"
-#include <cmath>
 #include "../Input/Input.h"
 #include "../SMBXInternal/SMBXEvents.h"
 #include "../SMBXInternal/Level.h"
-#include <windows.h>
-#include <time.h>
 #include "../Rendering/RenderOps/RenderStringOp.h"
 
 using namespace std;

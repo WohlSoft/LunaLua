@@ -245,7 +245,7 @@ int LuaProxy::Audio::SfxIsPaused(int channel)
 
 
 
-string LuaProxy::Audio::getSfxPath(string filename)
+std::string LuaProxy::Audio::getSfxPath(const std::string& filename)
 {
     std::string full_paths;
     if(!isAbsolutePath(filename))

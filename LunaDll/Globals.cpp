@@ -1,13 +1,13 @@
+#include <windows.h>
+#include <time.h>
+#include <cctype>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "DeathCounter/DeathCounter.h"
-#include <windows.h>
 #include "Shlwapi.h"
-#include <time.h>
 #include "Logging/Logging.h"
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
-#include <cctype>
 #include "Rendering/RenderOverrideManager.h"
 
 HINSTANCE gHInstance;

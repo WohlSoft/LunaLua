@@ -1,4 +1,7 @@
 #include <climits>
+#include <tuple>
+#include <algorithm>
+#include "../Globals.h"
 #include "Rendering.h"
 #include "RenderUtils.h"
 #include "../Defines.h"
@@ -12,8 +15,6 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
-#include <tuple>
-#include <algorithm>
 
 using namespace std;
 

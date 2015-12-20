@@ -2,12 +2,10 @@
 #define Minigames_H
 
 #include <queue>
+#include <list>
 #include "../Defines.h"
-#include "../Globals.h"
 #include "CGUI/CGUI.h"
 #include "../Rendering/Rendering.h"
-
-using namespace std;
 
 class Minigame {
 	virtual bool Initialize() =0;
@@ -18,7 +16,7 @@ class Minigame {
 	virtual void OnPause();				// Should be called if user tries to pause SMBX, to disable pausing
 
 	Minigame* m_ChildGame;
-	list<CGUIElement*> m_GUIElements;	
+	std::list<CGUIElement*> m_GUIElements;	
 };
 
 //class MinigameController {

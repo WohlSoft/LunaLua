@@ -41,7 +41,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     {
         full_path = utf8_decode(ini_file);
     } else {
-        std::wstring world_dir = (wstring)GM_FULLDIR;
+        std::wstring world_dir = (std::wstring)GM_FULLDIR;
         full_path = world_dir.append(::Level::GetName());
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder

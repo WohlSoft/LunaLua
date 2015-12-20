@@ -1,9 +1,9 @@
 #ifndef GlobalFuncs_hhhhhhh
 #define GlobalFuncs_hhhhhhh
 
+#include <windows.h>
 #include <string>
 #include <vector>
-#include <windows.h>
 #include <wchar.h>
 #include <string.h>
 

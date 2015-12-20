@@ -2,11 +2,11 @@
 #ifndef NPCs_hhhh
 #define NPCs_hhhh
 
-#include "../Defines.h"
-#include "../Misc/VB6StrPtr.h"
 #include <list>
 #include <vector>
 #include <string>
+#include "../Defines.h"
+#include "../Misc/VB6StrPtr.h"
 
 //Not fully complete!!!
 enum NPCID : short

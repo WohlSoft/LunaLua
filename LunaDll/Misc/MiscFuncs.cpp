@@ -1,9 +1,11 @@
+#include <windows.h>
+#include <math.h>
+#include <string>
+#include <fstream>
 #include "MiscFuncs.h"
 #include "../Globals.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/Layer.h"
-#include <windows.h>
-#include <math.h>
 #include "../Rendering/RenderOps/RenderStringOp.h"
 
 #ifdef __MINGW32__
@@ -540,7 +542,7 @@ bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, i
 	return true;
 }
 
-void PrintSyntaxError(wstring errored_line) {
+void PrintSyntaxError(std::wstring errored_line) {
 		static int errors = 0;
 		errors += 25;
 		RenderStringOp* render_str = new RenderStringOp();
@@ -637,7 +639,7 @@ bool SegmentIntersectRectangle(double a_rectangleMinX,
 
 void readAndWriteNPCSettings()
 {
-    ofstream settingsOutput("npcsettings.csv");
+    std::ofstream settingsOutput("npcsettings.csv");
     if(!settingsOutput)
         return;
 

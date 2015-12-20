@@ -1,3 +1,7 @@
+#include <string>
+#include <luabind/adopt_policy.hpp>
+#include <luabind/out_value_policy.hpp>
+
 #include "LunaLuaMain.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
@@ -11,18 +15,14 @@
 #include "LuaProxyComponent/LuaProxyAudio.h"
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
-#include <string>
-#include <luabind/adopt_policy.hpp>
-#include <luabind/out_value_policy.hpp>
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
 
-
 std::wstring CLunaLua::getLuaLibsPath()
 {
-    wstring lapi = getModulePath();
+    std::wstring lapi = getModulePath();
     lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
     return lapi;
 }

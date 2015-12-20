@@ -2,6 +2,7 @@
 #include "../../../Defines.h"
 #include "../../../GlobalFuncs.h"
 #include "../../../GameConfig/GameAutostart.h"
+#include "../../../SMBXInternal/PlayerMOB.h"
 
 void LuaProxy::Misc::npcToCoins()
 {

@@ -1,10 +1,10 @@
 #ifndef TYPE_LIB_H__
 #define TYPE_LIB_H__
 
+#include <windows.h>
+
 #include <string>
 #include <iostream>
-
-#include <windows.h>
 
 #include "win32_Unicode.h"
 

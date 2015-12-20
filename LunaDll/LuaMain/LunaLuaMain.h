@@ -6,6 +6,7 @@
 #include "LuaSharedProxy.h"
 #include "LuaHelper.h"
 #include "../Misc/SafeFPUControl.h"
+#include "../SMBXInternal/PlayerMOB.h"
 
 class CLunaLua
 {

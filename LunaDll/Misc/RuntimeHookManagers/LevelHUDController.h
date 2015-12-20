@@ -1,9 +1,9 @@
 #ifndef LevelHUDController_hhhhh
 #define LevelHUDController_hhhhh
 
-#include "../../Defines.h"
 #include <utility>
 #include <map>
+#include "../../Defines.h"
 #include "../../Misc/AsmPatch.h"
 
 class LevelHUDController

@@ -1,9 +1,11 @@
+#include <fstream>
 #include "AutocodeManager.h"
+#include "../Globals.h"
 #include "../Misc/MiscFuncs.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
 #include "../Logging/Logging.h"
-#include <fstream>
+
 
 using namespace std;
 

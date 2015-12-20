@@ -2,9 +2,8 @@
 #define Blocks_Hhhhh
 
 #include "../Defines.h"
-#include "../Globals.h"
-#include "PlayerMOB.h"
 #include "../Misc/VB6StrPtr.h"
+struct PlayerMOB;
 
 #pragma pack(push, 4)
 struct Block {

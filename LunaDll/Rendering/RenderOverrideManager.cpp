@@ -1,7 +1,7 @@
 #include "RenderOverrideManager.h"
 #include "../GlobalFuncs.h"
 #include "RenderOps/RenderBitmapOp.h"
-
+#include "../Globals.h"
 
 void RenderOverrideManager::ResetOverrides()
 {

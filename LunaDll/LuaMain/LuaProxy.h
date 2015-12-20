@@ -4,15 +4,14 @@
 
 #include <windows.h>
 #include <lua.hpp>
+#include <type_traits>
+#include <stdio.h>
 #include <luabind/luabind.hpp>
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 #include "LuaHelper.h"
 #include "../Defines.h"
-#include <type_traits>
-#include <stdio.h>
-
 #include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
 

@@ -5,8 +5,6 @@
 #include <string>
 #include <map>
 
-using namespace std;
-
 // -- Custom user variables saving/loading manager --
 // How it works: (On level load) Reads LunaSavedVars#.txt from world folder and reads all vars into object's local variable bank
 // There are 3 LunaSavedVars files based on the current SMBX save slot
@@ -18,13 +16,13 @@ public:
 
 	bool TryLoadWorldVars();		// Try to read in the saved variables for this world & current save slot
 
-	wstring GetSaveFileName();						// Get name of current var save file
-	wstring GetSaveFileFullPath(wstring file_name);	// Form the full path to current var save file
+    std::wstring GetSaveFileName();						// Get name of current var save file
+    std::wstring GetSaveFileFullPath(std::wstring file_name);	// Form the full path to current var save file
 
-	void SetVar(wstring key, double val);			// Sets or adds a key/value pair to the bank
-	bool VarExists(wstring key);					// Returns whether or not this var exists in the bank
-	double GetVar(wstring key);						// Get value of a key, or 0 if key not found
-	void CopyBank(map<wstring, double>* target);	// Copy all k,v pairs of variable bank to another map
+	void SetVar(std::wstring key, double val);			// Sets or adds a key/value pair to the bank
+	bool VarExists(std::wstring key);					// Returns whether or not this var exists in the bank
+	double GetVar(std::wstring key);						// Get value of a key, or 0 if key not found
+	void CopyBank(std::map<std::wstring, double>* target);	// Copy all k,v pairs of variable bank to another map
 	void ClearBank();
 
 	void WriteBank();								// Save vars by writing the current bank back to world folder
@@ -33,12 +31,12 @@ public:
 	void CheckSaveDeletion();						// Tries to heuristically detect if the current user save should be deleted and deletes it
 
 	/// Members ///
-	map<std::wstring, double> m_VarBank;
+    std::map<std::wstring, double> m_VarBank;
 
 private:
 	void Init();					// Init the object
-	void InitSaveFile(wfstream*);	// Init a new save file
-	void ReadFile(wfstream*);		// Read all vars from open file into bank
+	void InitSaveFile(std::wfstream*);	// Init a new save file
+	void ReadFile(std::wfstream*);		// Read all vars from open file into bank
 };
 
 namespace Saves {

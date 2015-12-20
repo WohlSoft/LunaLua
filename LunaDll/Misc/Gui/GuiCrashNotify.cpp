@@ -1,11 +1,10 @@
+#include <windows.h>
+
 #include "GuiCrashNotify.h"
 
 #include "../../resource.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
-
-#include <windows.h>
-
 
 #pragma comment(linker, \
   "\"/manifestdependency:type='Win32' "\

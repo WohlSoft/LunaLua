@@ -1,8 +1,8 @@
+#include <Windows.h>
 #include "LevelCodes.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../Globals.h"
 #include "../Defines.h"
-#include <Windows.h>
 #include "../SMBXInternal/Layer.h"
 #include "../Misc/MiscFuncs.h"
 

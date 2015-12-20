@@ -67,7 +67,7 @@ bool LuaProxy::BGO::isHidden(lua_State* L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)SMBX_BGO::Get(m_index)->isHidden;
+    return 0 != SMBX_BGO::Get(m_index)->isHidden;
 }
 
 void LuaProxy::BGO::setIsHidden(bool isHidden, lua_State* L)

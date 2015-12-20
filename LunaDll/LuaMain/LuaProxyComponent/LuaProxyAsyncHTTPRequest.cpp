@@ -3,7 +3,7 @@
 
 LuaProxy::AsyncHTTPRequest::AsyncHTTPRequest()
 {
-    m_client = make_shared<AsyncHTTPClient>();
+    m_client = std::make_shared<AsyncHTTPClient>();
 }
 
 void LuaProxy::AsyncHTTPRequest::addArgument(const std::string& argName, const std::string& data, lua_State* L)

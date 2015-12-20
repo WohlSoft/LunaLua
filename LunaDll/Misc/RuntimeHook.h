@@ -1,9 +1,8 @@
 #ifndef RuntimeHook_hhh
 #define RuntimeHook_hhh
 
-
+#include <vector>
 #include "../Defines.h"
-#include "../Globals.h"
 
 /************************************************************************/
 /* Typedefs                                                             */

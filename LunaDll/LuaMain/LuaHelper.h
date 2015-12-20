@@ -2,12 +2,12 @@
 #ifndef LuaHelper_HHH
 #define LuaHelper_HHH
 
+#include <type_traits>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
-#include <type_traits>
 #include "../Misc/VB6StrPtr.h"
 
 

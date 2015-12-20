@@ -1,6 +1,8 @@
-#include "Main.h"
-//#include <windows.h>
 #include <string>
+#define _USE_MATH_DEFINES
+#include <math.h>
+//#include <windows.h>
+#include "Main.h"
 #include "Globals.h"
 #include "GlobalFuncs.h"
 #include "Defines.h"
@@ -13,8 +15,6 @@
 #include "SMBXInternal/Blocks.h"
 #include "Misc/MiscFuncs.h"
 #include "SMBXInternal/Sound.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "Input/Input.h"
 #include "SMBXInternal/SMBXEvents.h"
 #include "LuaMain/LunaLuaMain.h"

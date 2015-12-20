@@ -13,7 +13,7 @@ void LuaProxy::SaveBankProxy::setValue(const std::string& key, double value)
 
 luabind::object LuaProxy::SaveBankProxy::getValue(const std::string& key, lua_State* L)
 {
-	wstring wkey = utf8_decode(key);
+    std::wstring wkey = utf8_decode(key);
 	if(!gSavedVarBank.VarExists(wkey))
 		return luabind::object();
 
@@ -31,9 +31,9 @@ luabind::object LuaProxy::SaveBankProxy::values(lua_State *L)
 {
 	luabind::object valTable = luabind::newtable(L);
 
-	map<wstring, double> cpMap;
+    std::map<std::wstring, double> cpMap;
 	gSavedVarBank.CopyBank(&cpMap);
-	for(map<wstring, double>::iterator it = cpMap.begin(); it != cpMap.end(); ++it) {
+	for(std::map<std::wstring, double>::iterator it = cpMap.begin(); it != cpMap.end(); ++it) {
 		valTable[utf8_encode(it->first.c_str())] = it->second;
 	}
 	return valTable;

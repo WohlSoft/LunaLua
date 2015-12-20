@@ -1,5 +1,6 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/Blocks.h"
+#include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 
@@ -237,7 +238,7 @@ bool LuaProxy::Block::slippery() const
 	if(!isValid())
 		return false;
 
-	return (bool)::Blocks::Get(m_index)->Slippery;
+	return 0 != ::Blocks::Get(m_index)->Slippery;
 }
 
 void LuaProxy::Block::setSlippery(bool slippery)
@@ -253,7 +254,7 @@ bool LuaProxy::Block::isHidden() const
 	if(!isValid())
 		return 0;
 
-	return (bool)::Blocks::Get(m_index)->IsHidden;
+	return 0 != ::Blocks::Get(m_index)->IsHidden;
 }
 
 void LuaProxy::Block::setIsHidden(bool isHidden)

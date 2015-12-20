@@ -158,7 +158,7 @@ void CSprite::Die() {
 }
 
 // SET CUSTOM VAR
-void CSprite::SetCustomVar(wstring var_name, OPTYPE operation_to_do, double value) {
+void CSprite::SetCustomVar(std::wstring var_name, OPTYPE operation_to_do, double value) {
 	if(var_name.length() > 0) {
 		// Create var if doesn't exist
 		if(m_CustomVars.find(var_name) == m_CustomVars.end()) {
@@ -197,12 +197,12 @@ void CSprite::SetCustomVar(wstring var_name, OPTYPE operation_to_do, double valu
 }
 
 // CUSTOM VAR EXISTS
-bool CSprite::CustomVarExists(wstring var_name) {
+bool CSprite::CustomVarExists(std::wstring var_name) {
 	return m_CustomVars.find(var_name) == m_CustomVars.end() ? false : true;
 }
 
 // GET CUSTOM VAR
-double CSprite::GetCustomVar(wstring var_name) {
+double CSprite::GetCustomVar(std::wstring var_name) {
 	if(m_CustomVars.find(var_name) == m_CustomVars.end()) {
 		return 0;
 	}
