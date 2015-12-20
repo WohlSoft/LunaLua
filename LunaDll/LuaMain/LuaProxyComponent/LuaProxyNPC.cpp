@@ -650,9 +650,9 @@ void LuaProxy::NPC::harm(short harmType, lua_State * L)
     case HARM_TYPE_SWORD:    // other is 'player index'. Triggered for sword or sword-beam
         indexCollideWith = 0; // Dummy player?
         break;
-    case HARM_TYPE_NPC:       // other is 'npc index'. Triggered for NPCs hitting eachother or bomb explosion
-    case HARM_TYPE_PROJ_USED: // other is 'npc index'. Triggered on a projectile once it hits something, in case the projectile should be destroyed
-    case HARM_TYPE_UNK5:      // other is 'npc index'. Unknown cause.
+    case HARM_TYPE_NPC:       // other is 'npc index'. Triggered for thrown NPCS, bomb explosions, shells, etc
+    case HARM_TYPE_PROJECTILE_USED: // other is 'npc index'. Triggered on a projectile once it hits something, in case the projectile should be destroyed
+    case HARM_TYPE_HELD:      // other is 'npc index'. Triggered by colliding with held NPCs or kicked gloombas
         indexCollideWith = 0; // Dummy NPC?
         break;
     case HARM_TYPE_FROMBELOW: // other is 'block index'. Triggered for hit from below or pow
