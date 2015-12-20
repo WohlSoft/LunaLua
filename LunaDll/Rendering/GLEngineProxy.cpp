@@ -1,4 +1,5 @@
 #include <thread>
+#include <memory>
 #include "../Misc/ThreadedCmdQueue.h"
 #include "GLEngineProxy.h"
 #include "../Defines.h"
@@ -16,9 +17,7 @@ GLEngineProxy::GLEngineProxy() {
 
 GLEngineProxy::~GLEngineProxy() {
     if (mpThread != NULL) {
-        GLEngineCmd cmd;
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EXIT;
-        mQueue.push(cmd);
+        QueueCmd(std::make_shared<GLEngineCmd_Exit>());
         mpThread->join();
     }
 }
@@ -34,151 +33,115 @@ void GLEngineProxy::Init() {
 
 void GLEngineProxy::ThreadMain() {
     while (1) {
-        GLEngineCmd cmd = mQueue.pop();
+        std::shared_ptr<GLEngineCmd> cmd = mQueue.pop();
 
-        RunCmd(cmd);
+        if (cmd->shouldBeSynchronous() || (mPendingClear == 0 && !mSkipFrame)) {
+            cmd->run(mInternalGLEngine);
+        }
 
-        // Upon exit command, exit the eng
-        if (cmd.mCmd == GLEngineCmd::GL_ENGINE_CMD_EXIT) return;
+        if (cmd->isSmbxClearCmd()) {
+            mPendingClear--;
+        }
+        if (cmd->isFrameEnd()) {
+            if (mFrameCount-- > 1) {
+                mSkipFrame = true;
+            }
+            else {
+                mSkipFrame = false;
+            }
+        }
+
+        // Upon exit command, exit the thread
+        if (cmd->isExitCmd()) return;
     }
 }
 
-void GLEngineProxy::RunCmd(const GLEngineCmd& cmd) {
-    switch (cmd.mCmd) {
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
-        mGLEngine.ClearSMBXSprites();
-        mPendingClear--;
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE:
-        mGLEngine.ClearLunaTexture(*cmd.mData.mClearLunaTexture.bmp);
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.EmulatedBitBlt(
-                cmd.mData.mBitBlt.nXDest, cmd.mData.mBitBlt.nYDest,
-                cmd.mData.mBitBlt.nWidth, cmd.mData.mBitBlt.nHeight,
-                cmd.mData.mBitBlt.hdcSrc,
-                cmd.mData.mBitBlt.nXSrc, cmd.mData.mBitBlt.nYSrc,
-                cmd.mData.mBitBlt.dwRop);
-        }
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.EmulatedStretchBlt(
-                cmd.mData.mStretchBlt.hdcDest,
-                cmd.mData.mStretchBlt.nXOriginDest, cmd.mData.mStretchBlt.nYOriginDest,
-                cmd.mData.mStretchBlt.nWidthDest, cmd.mData.mStretchBlt.nHeightDest,
-                cmd.mData.mStretchBlt.hdcSrc,
-                cmd.mData.mStretchBlt.nXOriginSrc, cmd.mData.mStretchBlt.nYOriginSrc,
-                cmd.mData.mStretchBlt.nWidthSrc, cmd.mData.mStretchBlt.nHeightSrc,
-                cmd.mData.mStretchBlt.dwRop);
-        }
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.DrawLunaSprite(
-                cmd.mData.mLunaSprite.nXOriginDest, cmd.mData.mLunaSprite.nYOriginDest,
-                cmd.mData.mLunaSprite.nWidthDest, cmd.mData.mLunaSprite.nHeightDest,
-                *cmd.mData.mLunaSprite.bmp,
-                cmd.mData.mLunaSprite.nXOriginSrc, cmd.mData.mLunaSprite.nYOriginSrc,
-                cmd.mData.mLunaSprite.nWidthSrc, cmd.mData.mLunaSprite.nHeightSrc,
-                cmd.mData.mLunaSprite.opacity);
-        }
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.EndFrame(cmd.mData.mEndFrame.hdcDest);
-        }
-        if (mFrameCount-- > 1) {
-            mSkipFrame = true;
-        } else {
-            mSkipFrame = false;
-        }
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_EXIT:
-        return;
-
-
-    case GLEngineCmd::GL_ENGINE_CMD_SET_TEX:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.SetTex(
-                cmd.mData.mSetTex.bmp,
-                cmd.mData.mSetTex.color);
-        }
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_DRAW_2D_ARRAY:
-        if (mPendingClear == 0 && !mSkipFrame) {
-            mGLEngine.Draw2DArray(
-                cmd.mData.mDraw2DArray.type,
-                cmd.mData.mDraw2DArray.vert,
-                (float*)cmd.mData.mDraw2DArray.tex,
-                cmd.mData.mDraw2DArray.count);
-        }
-        free((void*)cmd.mData.mDraw2DArray.vert);
-        free((void*)cmd.mData.mDraw2DArray.tex);
-        break;
-    default:
-        break;
-    }
-}
-
-void GLEngineProxy::QueueCmd(const GLEngineCmd cmd) {
+void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
     // Ensure we're initialized
     Init();
 
-    switch (cmd.mCmd) {
-    case GLEngineCmd::GL_ENGINE_CMD_END_FRAME:
+    if (cmd->isFrameEnd()) { 
         // Increment count of stored frames
         mFrameCount++;
-        break;
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
+    }
+    if (cmd->isSmbxClearCmd())
+    {
         mPendingClear++;
-        break;
-    default:
-        break;
     }
 
     // Push the command
     mQueue.push(cmd);
 
-    switch (cmd.mCmd) {
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES:
-    case GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE:
-        // Texture clear commands will be synchronous
+    if (cmd->shouldBeSynchronous())
+    {
         mQueue.waitTillEmpty();
-        break;
-    default:
-        break;
     }
 }
 
 
 void GLEngineProxy::ClearSMBXSprites() {
-    QueueCmd(GLEngineCmd::ClearSMBXSprites());
+    QueueCmd(std::make_shared<GLEngineCmd_ClearSMBXSprites>());
 }
 void GLEngineProxy::ClearLunaTexture(const BMPBox& bmp) {
-    QueueCmd(GLEngineCmd::ClearLunaTexture(bmp));
+    auto obj = std::make_shared<GLEngineCmd_ClearLunaTexture>();
+    obj->mBmp = &bmp;
+    QueueCmd(obj);
 }
 void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    QueueCmd(GLEngineCmd::EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop));
+    auto obj = std::make_shared<GLEngineCmd_EmulateBitBlt>();
+    obj->mXDest = nXDest;
+    obj->mYDest = nYDest;
+    obj->mWidthDest = nWidth;
+    obj->mHeightDest = nHeight;
+    obj->mXSrc = nXSrc;
+    obj->mYSrc = nYSrc;
+    obj->mWidthSrc = nWidth;
+    obj->mHeightSrc = nHeight;
+
+    obj->mHdcSrc = hdcSrc;
+    obj->mRop = dwRop;
+    QueueCmd(obj);
 }
-void GLEngineProxy::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
-    QueueCmd(GLEngineCmd::EmulatedStretchBlt(
-        hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
-        hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop));
+    auto obj = std::make_shared<GLEngineCmd_RenderCameraToScreen>();
+    obj->mXDest = nXOriginDest;
+    obj->mYDest = nYOriginDest;
+    obj->mWidthDest = nWidthDest;
+    obj->mHeightDest = nHeightDest;
+    obj->mXSrc = nXOriginSrc;
+    obj->mYSrc = nYOriginSrc;
+    obj->mWidthSrc = nWidthSrc;
+    obj->mHeightSrc = nHeightSrc;
+
+    obj->mHdcDest = hdcDest;
+    obj->mHdcSrc = hdcSrc;
+    obj->mRop = dwRop;
+    QueueCmd(obj);
 }
 void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
 {
-    QueueCmd(GLEngineCmd::DrawLunaSprite(
-        nXOriginDest, nYOriginDest, nWidthDest, nHeightDest,
-        bmp, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, opacity));
+    auto obj = std::make_shared<GLEngineCmd_LunaDrawSprite>();
+    obj->mXDest = nXOriginDest;
+    obj->mYDest = nYOriginDest;
+    obj->mWidthDest = nWidthDest;
+    obj->mHeightDest = nHeightDest;
+    obj->mXSrc = nXOriginSrc;
+    obj->mYSrc = nYOriginSrc;
+    obj->mWidthSrc = nWidthSrc;
+    obj->mHeightSrc = nHeightSrc;
+
+    obj->mBmp = &bmp;
+    obj->mOpacity = opacity;
+    QueueCmd(obj);
 }
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {
-    QueueCmd(GLEngineCmd::EndFrame(hdcDest));
+    auto obj = std::make_shared<GLEngineCmd_EndFrame>();
+    obj->mHdcDest = hdcDest;
+    QueueCmd(obj);
 }

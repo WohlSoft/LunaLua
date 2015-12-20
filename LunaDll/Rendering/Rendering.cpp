@@ -220,7 +220,7 @@ void Renderer::AddOp(RenderOp* op) {
 }
 
 // GL Engine OP
-void Renderer::GLCmd(const GLEngineCmd &cmd) {
+void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd) {
     RenderGLOp* op = new RenderGLOp(cmd);
     AddOp(op);
 }

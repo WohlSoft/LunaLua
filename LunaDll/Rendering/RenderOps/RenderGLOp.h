@@ -1,14 +1,15 @@
 #ifndef RenderGLOp_H
 #define RenderGLOp_H
 
+#include <memory>
 #include "RenderOp.h"
 #include "../GLEngineCmds.h"
 
 class RenderGLOp : public RenderOp {
 public:
-    RenderGLOp(const GLEngineCmd &cmd);
+    RenderGLOp(const std::shared_ptr<GLEngineCmd> &cmd);
     void Draw(Renderer* renderer);
-    GLEngineCmd m_Cmd;
+    std::shared_ptr<GLEngineCmd> m_Cmd;
 };
 
 #endif

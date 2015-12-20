@@ -956,6 +956,9 @@
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp">
       <Filter>Header Files\Misc\RuntimeHookManagers</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\GLEngineCmds.cpp">
+      <Filter>Header Files\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

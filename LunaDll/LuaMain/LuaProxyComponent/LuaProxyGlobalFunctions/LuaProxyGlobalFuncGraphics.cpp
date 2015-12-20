@@ -289,7 +289,10 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
         }
     }
 
-    gLunaRender.GLCmd(GLEngineCmd::SetTex(bmp, color));
+    auto obj = std::make_shared<GLEngineCmd_SetTexture>();
+    obj->mBmp = bmp;
+    obj->mColor = color;
+    gLunaRender.GLCmd(obj);
 }
 
 extern "C" {
@@ -298,6 +301,11 @@ extern "C" {
     }
 
     __declspec(dllexport) void __cdecl LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
-        gLunaRender.GLCmd(GLEngineCmd::DrawTriangles(vert, tex, count));
+        auto obj = std::make_shared<GLEngineCmd_Draw2DArray>();
+        obj->mType = GL_TRIANGLES;
+        obj->mVert = vert;
+        obj->mTex = tex;
+        obj->mCount = count;
+        gLunaRender.GLCmd(obj);
     }
 }

@@ -3,190 +3,108 @@
 
 #include <windows.h>
 #include <cstdint>
-#include "BMPBox.h"
 #include <GL/glew.h>
+#include "BMPBox.h"
+class GLEngine;
 
-struct GLEngineCmd {
-    enum GLEngineCmdType {
-        GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES,
-        GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE,
-        GL_ENGINE_CMD_EMULATE_BITBLT,
-        GL_ENGINE_CMD_EMULATE_STRETCHBLT,
-        GL_ENGINE_CMD_DRAW_LUNA_SPRITE,
-        GL_ENGINE_CMD_END_FRAME,
-        GL_ENGINE_CMD_EXIT,
+/****************************************************/
+/* Common argumets for bitmap rendering coordinates */
+/****************************************************/
+struct GLBitmapRenderCoords {
+    int mXDest;
+    int mYDest;
+    int mWidthDest;
+    int mHeightDest;
+    int mXSrc;
+    int mYSrc;
+    int mWidthSrc;
+    int mHeightSrc;
+};
 
-        GL_ENGINE_CMD_SET_TEX,
-        GL_ENGINE_CMD_DRAW_2D_ARRAY
-    };
+/************************************/
+/* Base class for GLEngine Commands */
+/************************************/
+class GLEngineCmd;
+class GLEngineCmd {
+public:
+    GLEngineCmd() {}
+    virtual ~GLEngineCmd() {}
+public:
+    virtual void run(GLEngine& glEngine) const = 0;
+    virtual bool shouldBeSynchronous(void) const { return false; }
+    virtual bool isFrameEnd(void) const { return false; }
+    virtual bool isSmbxClearCmd(void) const { return false; }
+    virtual bool isExitCmd(void) const { return false; }
+};
 
-    GLEngineCmdType mCmd;
-    union {
-        struct {
-            const BMPBox* bmp;
-        } mClearLunaTexture;
-        struct {
-            int nXDest;
-            int nYDest;
-            int nWidth;
-            int nHeight;
-            HDC hdcSrc;
-            int nXSrc;
-            int nYSrc;
-            DWORD dwRop;
-        } mBitBlt;
-        struct {
-            HDC hdcDest;
-            int nXOriginDest;
-            int nYOriginDest;
-            int nWidthDest;
-            int nHeightDest;
-            HDC hdcSrc;
-            int nXOriginSrc;
-            int nYOriginSrc;
-            int nWidthSrc;
-            int nHeightSrc;
-            DWORD dwRop;
-        } mStretchBlt;
-        struct {
-            int nXOriginDest;
-            int nYOriginDest;
-            int nWidthDest;
-            int nHeightDest;
-            const BMPBox* bmp;
-            int nXOriginSrc;
-            int nYOriginSrc;
-            int nWidthSrc;
-            int nHeightSrc;
-            float opacity;
-        } mLunaSprite;
-        struct {
-            HDC hdcDest;
-        } mEndFrame;
-        struct {
-            const BMPBox* bmp;
-            uint32_t color;
-        } mSetTex;
-        struct {
-            GLuint type;
-            const float* vert;
-            const float* tex;
-            uint32_t count;
-        } mDraw2DArray;
-    } mData;
+/******************************/
+/* Specific GLEngine Commands */
+/******************************/
 
-    static inline GLEngineCmd ClearSMBXSprites() {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_SMBX_TEXTURES;
-
-        return cmd;
-    }
-
-    static inline GLEngineCmd ClearLunaTexture(const BMPBox& bmp) {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_CLEAR_LUNA_TEXTURE;
-        cmd.mData.mClearLunaTexture.bmp = &bmp;
-        
-        return cmd;
-    }
-
-    static inline GLEngineCmd EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
-    {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_BITBLT;
-        cmd.mData.mBitBlt.nXDest = nXDest;
-        cmd.mData.mBitBlt.nYDest = nYDest;
-        cmd.mData.mBitBlt.nWidth = nWidth;
-        cmd.mData.mBitBlt.nHeight = nHeight;
-        cmd.mData.mBitBlt.hdcSrc = hdcSrc;
-        cmd.mData.mBitBlt.nXSrc = nXSrc;
-        cmd.mData.mBitBlt.nYSrc = nYSrc;
-        cmd.mData.mBitBlt.dwRop = dwRop;
-
-        return cmd;
-    }
-
-    static inline GLEngineCmd EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-        DWORD dwRop)
-    {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_EMULATE_STRETCHBLT;
-        cmd.mData.mStretchBlt.hdcDest = hdcDest;
-        cmd.mData.mStretchBlt.nXOriginDest = nXOriginDest;
-        cmd.mData.mStretchBlt.nYOriginDest = nYOriginDest;
-        cmd.mData.mStretchBlt.nWidthDest = nWidthDest;
-        cmd.mData.mStretchBlt.nHeightDest = nHeightDest;
-        cmd.mData.mStretchBlt.hdcSrc = hdcSrc;
-        cmd.mData.mStretchBlt.nXOriginSrc = nXOriginSrc;
-        cmd.mData.mStretchBlt.nYOriginSrc = nYOriginSrc;
-        cmd.mData.mStretchBlt.nWidthSrc = nWidthSrc;
-        cmd.mData.mStretchBlt.nHeightSrc = nHeightSrc;
-        cmd.mData.mStretchBlt.dwRop = dwRop;
-
-        return cmd;
-    }
-
-    static inline GLEngineCmd DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
-    {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_LUNA_SPRITE;
-        cmd.mData.mLunaSprite.nXOriginDest = nXOriginDest;
-        cmd.mData.mLunaSprite.nYOriginDest = nYOriginDest;
-        cmd.mData.mLunaSprite.nWidthDest = nWidthDest;
-        cmd.mData.mLunaSprite.nHeightDest = nHeightDest;
-        cmd.mData.mLunaSprite.bmp = &bmp;
-        cmd.mData.mLunaSprite.nXOriginSrc = nXOriginSrc;
-        cmd.mData.mLunaSprite.nYOriginSrc = nYOriginSrc;
-        cmd.mData.mLunaSprite.nWidthSrc = nWidthSrc;
-        cmd.mData.mLunaSprite.nHeightSrc = nHeightSrc;
-        if (opacity > 1.0f) opacity = 1.0f;
-        if (opacity < 0.0f) opacity = 0.0f;
-        cmd.mData.mLunaSprite.opacity = opacity;
-
-        return cmd;
-    }
-
-    static inline GLEngineCmd EndFrame(HDC hdcDest)
-    {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_END_FRAME;
-        cmd.mData.mEndFrame.hdcDest = hdcDest;
-
-        return cmd;
-    }
-
-    static inline GLEngineCmd SetTex(const BMPBox* bmp, uint32_t color)
-    {
-        GLEngineCmd cmd;
-
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_SET_TEX,
-        cmd.mData.mSetTex.bmp = bmp;
-        cmd.mData.mSetTex.color = color;
-
-        return cmd;
-    }
-    static inline GLEngineCmd Draw2DArray(GLuint type, const float* vert, const float* tex, uint32_t count)
-    {
-        GLEngineCmd cmd;
-        cmd.mCmd = GLEngineCmd::GL_ENGINE_CMD_DRAW_2D_ARRAY;
-        cmd.mData.mDraw2DArray.type = type;
-        cmd.mData.mDraw2DArray.vert = vert;
-        cmd.mData.mDraw2DArray.tex = tex;
-        cmd.mData.mDraw2DArray.count = count;
-
-        return cmd;
-    }
-    static inline GLEngineCmd DrawTriangles(const float* vert, const float* tex, uint32_t count)
-    {
-        return Draw2DArray(GL_TRIANGLES, vert, tex, count);
+class GLEngineCmd_ClearSMBXSprites : public GLEngineCmd {
+public:
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+    virtual bool isSmbxClearCmd(void) const { return true; }
+};
+class GLEngineCmd_ClearLunaTexture : public GLEngineCmd {
+public:
+    const BMPBox* mBmp;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+};
+class GLEngineCmd_EmulateBitBlt : public GLEngineCmd, public GLBitmapRenderCoords {
+public:
+    HDC mHdcSrc;
+    DWORD mRop;
+    virtual void run(GLEngine& glEngine) const;
+};
+class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd, public GLBitmapRenderCoords {
+public:
+    HDC mHdcDest;
+    HDC mHdcSrc;
+    DWORD mRop;
+    virtual void run(GLEngine& glEngine) const;
+};
+class GLEngineCmd_EndFrame : public GLEngineCmd {
+public:
+    HDC mHdcDest;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isFrameEnd(void) const { return true; }
+};
+class GLEngineCmd_LunaDrawSprite : public GLEngineCmd, public GLBitmapRenderCoords {
+public:
+    const BMPBox* mBmp;
+    float mOpacity;
+    virtual void run(GLEngine& glEngine) const;
+};
+class GLEngineCmd_Exit : public GLEngineCmd {
+public:
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isExitCmd(void) const { return true; }
+};
+class GLEngineCmd_SetTexture : public GLEngineCmd {
+public:
+    const BMPBox* mBmp;
+    uint32_t mColor;
+    virtual void run(GLEngine& glEngine) const;
+};
+class GLEngineCmd_Draw2DArray : public GLEngineCmd {
+public:
+    GLuint mType;
+    const float* mVert;
+    const float* mTex;
+    uint32_t mCount;
+    virtual void run(GLEngine& glEngine) const;
+    virtual ~GLEngineCmd_Draw2DArray() {
+        if (mVert) {
+            free((void*)mVert);
+            mVert = NULL;
+        }
+        if (mTex) {
+            free((void*)mTex);
+            mTex = NULL;
+        }
     }
 };
 

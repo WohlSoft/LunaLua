@@ -29,40 +29,7 @@ void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
     g_GLTextureStore.ClearLunaTexture(bmp);
 }
 
-void GLEngine::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
-{
-	if (!g_GLContextManager.IsInitialized()) return;
-
-    if (dwRop == BLACKNESS || dwRop == 0x10)
-    {
-        glColor3f(0.0f, 0.0f, 0.0f);
-        g_GLDraw.DrawRectangle(nXDest, nYDest, nWidth, nHeight);
-        glColor3f(1, 1, 1);
-        return;
-    }
-
-    GLDraw::RenderMode mode;
-    switch (dwRop) {
-    case SRCAND:
-        mode = mBitwiseCompat ? GLDraw::RENDER_MODE_AND : GLDraw::RENDER_MODE_MULTIPLY;
-        break;
-    case SRCPAINT:
-        mode = mBitwiseCompat ? GLDraw::RENDER_MODE_OR : GLDraw::RENDER_MODE_MAX;
-        break;
-    default:
-        mode = GLDraw::RENDER_MODE_ALPHA;
-        break;
-    }
-
-    const GLSprite* sprite = g_GLTextureStore.SpriteFromSMBXBitmap(hdcSrc);
-    if (sprite == NULL) {
-        return;
-    }
-
-    sprite->Draw(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, mode);
-}
-
-BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
@@ -135,19 +102,6 @@ BOOL GLEngine::EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDes
     return TRUE;
 }
 
-void GLEngine::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
-{
-	if (!g_GLContextManager.IsInitialized()) return;
-
-    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(bmp);
-    if (tex == NULL) {
-        return;
-    }
-
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, tex, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, opacity);
-}
-
 void GLEngine::EndFrame(HDC hdcDest)
 {
 	// Bind screen
@@ -187,53 +141,6 @@ void GLEngine::EndFrame(HDC hdcDest)
 	// Bind framebuffer
 	g_GLContextManager.BindFramebuffer();
 }
-
-void GLEngine::SetTex(const BMPBox* bmp, uint32_t color) {
-    const GLDraw::Texture* tex = NULL;
-    if (bmp) {
-        tex = g_GLTextureStore.TextureFromLunaBitmap(*bmp);
-    }
-
-    glBlendEquationANY(GL_FUNC_ADD);
-    GLERRORCHECK();
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    GLERRORCHECK();
-
-    g_GLDraw.BindTexture(tex);
-
-    float r = ((0xFF000000 & color) >> 24) / 255.0f;
-    float g = ((0x00FF0000 & color) >> 16) / 255.0f;
-    float b = ((0x0000FF00 & color) >> 8) / 255.0f;
-    float a = ((0x000000FF & color) >> 0) / 255.0f;
-    glColor4f(r*a, g*a, b*a, a);
-    GLERRORCHECK();
-}
-
-void GLEngine::Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count) {
-    // Convert texel coordinates to what we need for our power-of-two padded textures
-    bool texIsPadded = (g_GLDraw.mLastPwScale != 1.0f) || (g_GLDraw.mLastPhScale != 1.0f);
-    if (texIsPadded) {
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        glLoadIdentity();
-        glScalef(g_GLDraw.mLastPwScale, g_GLDraw.mLastPhScale, 1.0f);
-        GLERRORCHECK();
-    }
-
-    glVertexPointer(2, GL_FLOAT, 0, vert);
-    GLERRORCHECK();
-    glTexCoordPointer(2, GL_FLOAT, 0, tex);
-    GLERRORCHECK();
-    glDrawArrays(type, 0, count);
-    GLERRORCHECK();
-
-    if (texIsPadded) {
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        GLERRORCHECK();
-    }
-}
-
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
     uint32_t byteSize = 3 * w * h;
