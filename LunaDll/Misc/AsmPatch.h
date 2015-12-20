@@ -140,7 +140,7 @@ public:
         return byte(0xC3);
     }
     inline AsmPatch<Size + 3> RET_NEAR() const {
-        return byte(0xC2).byte(0x04).byte(0x00);
+        return bytes(0xC2, 0x04, 0x00);
     }
     inline AsmPatch<Size + 1> PUSH_R32(AsmConsts::R32 arg) const {
         return byte(0x50 | arg);
@@ -174,7 +174,7 @@ public:
     inline AsmPatch<Size + 1> POP_EDI() const { return POP_R32(AsmConsts::R32_EDI); }
 
     inline AsmPatch<Size + 2> MOV_RESTORE_STACKPTR() {
-        return byte(0x8B).byte(0xE5);
+        return bytes(0x8B, 0xE5);
     }
 
     inline AsmPatch<Size + 9> RET_STDCALL_FULL() {
