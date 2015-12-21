@@ -206,6 +206,31 @@ extern DWORD __stdcall WorldLoop()
     return GetTickCount();
 }
 
+// HUD Drawing Patches
+static auto skipStarCountPatch = PatchCollection(
+    PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
+    PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
+    PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
+    );
+
+// HUD Hook -- Runs each time the HUD is drawn.
+extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
+{
+    if (gLunaEnabled) {
+        OnLevelHUDDraw(*cameraIdx);
+    }
+
+    if (gSMBXHUDSettings.skipStarCount) {
+        skipStarCountPatch.Apply();
+    }
+    else {
+        skipStarCountPatch.Unapply();
+    }
+
+    if (!gSMBXHUDSettings.skip) {
+        native_renderLevelHud(cameraIdx, unknown0x4002);
+    }
+}
 
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
@@ -867,16 +892,25 @@ extern short __stdcall MessageBoxOpenHook()
     return (short)GM_PLAYERS_COUNT;
 }
 
-extern void __stdcall CameraUpdateHook()
+static void __stdcall CameraUpdateHook(int cameraIdx)
 {
     if (gLunaLua.isValid()) {
         Event messageBoxEvent("onCameraUpdate", false);
         messageBoxEvent.setDirectEventName("onCameraUpdate");
         messageBoxEvent.setLoopable(false);
-        gLunaLua.callEvent(&messageBoxEvent);
+        gLunaLua.callEvent(&messageBoxEvent, cameraIdx);
     }
 }
 
+void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
+{
+    __asm {
+        POP EAX                        // POP the return address
+        PUSH DWORD PTR DS:[EBP - 0x38] // Sneak a camera index argument in there
+        PUSH EAX                       // PUSH the return address
+        JMP CameraUpdateHook           // JMP to CameraUpdateHook
+    };
+}
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
@@ -990,11 +1024,11 @@ extern short __stdcall IsNPCCollidesWithVeggiHook()
 _declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
 {
     __asm {
-        push ebp
-        mov ebp,esp
-        sub esp,8
-        push 0xA281B6
-        ret
+        PUSH EBP
+        MOV EBP,ESP
+        SUB ESP,8
+        PUSH 0xA281B6
+        RET
     }
 }
 
@@ -1021,4 +1055,37 @@ extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, in
     HWND destHwnd = WindowFromDC(hdcDest);
     std::cout << "HWND of DEST: " << (DWORD)destHwnd << std::endl;
     return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+static void __declspec(naked) __stdcall RenderLevelReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x18
+        PUSH 0x909296
+        RET
+    };
+}
+
+extern void __stdcall RenderLevelHook()
+{
+    RenderLevelReal();
+}
+
+static void __declspec(naked) __stdcall RenderWorldReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8FEB16
+        RET
+    };
+}
+
+extern void __stdcall RenderWorldHook()
+{
+    RenderWorldReal();
 }

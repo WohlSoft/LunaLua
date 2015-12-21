@@ -156,9 +156,9 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     GLERRORCHECK();
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-    GLERRORCHECK();
+    GLERRORCHECK("glTexImage2D", bmp.m_Filename, tex.pw, tex.ph);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
-    GLERRORCHECK();
+    GLERRORCHECK("glTexSubImage2D", bmp.m_Filename, tex.pw, tex.ph);
 
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
     //GLERRORCHECK();

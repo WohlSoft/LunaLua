@@ -121,6 +121,7 @@ std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int
     for (HBITMAP nextBitmap : bitmaps) {
         int nextResCode = GetAutoImageResourceCode();
         BMPBox* pNewbox = new BMPBox(nextBitmap, m_hScreenDC);
+        pNewbox->m_Filename = filename;
         if (pNewbox->ImageLoaded() == false) {
             delete pNewbox;
             gLogger.Log(L"BMPBox image load failed", LOG_STD);

@@ -244,9 +244,8 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
-    PATCH(0x96C030)
-        .CALL(&HUDHook)
-        .NOP()
+    PATCH(0x92EC24)
+        .CALL(&LevelHUDHook)
         .Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
@@ -383,7 +382,7 @@ void TrySkipPatch()
 
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)
-        .CALL(&CameraUpdateHook)
+        .CALL(&CameraUpdateHook_Wrapper)
         .NOP()
         .NOP()
         .Apply();
@@ -422,6 +421,10 @@ void TrySkipPatch()
 
     // Logging for NPC collisions
     //PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&collideNPCLoggingHook>()).NOP().Apply();
+
+    // Level and world render hooks
+    PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
+    PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
