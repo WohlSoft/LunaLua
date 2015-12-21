@@ -1018,11 +1018,11 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 _declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
 {
     __asm {
-        push ebp
-        mov ebp,esp
-        sub esp,8
-        push 0xA281B6
-        ret
+        PUSH EBP
+        MOV EBP,ESP
+        SUB ESP,8
+        PUSH 0xA281B6
+        RET
     }
 }
 
@@ -1042,4 +1042,38 @@ extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToColl
     f.flush();
 
     collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
+}
+
+static void __declspec(naked) __stdcall RenderLevelReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x18
+        PUSH 0x909296
+        RET
+    };
+}
+
+extern void __stdcall RenderLevelHook()
+{
+    RenderLevelReal();
+}
+
+static void __declspec(naked) __stdcall RenderWorldReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8FEB16
+        RET
+    };
+}
+
+extern void __stdcall RenderWorldHook()
+{
+    RenderWorldReal();
 }

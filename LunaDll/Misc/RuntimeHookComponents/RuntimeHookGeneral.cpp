@@ -420,6 +420,10 @@ void TrySkipPatch()
     // Logging for NPC collisions
     //PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&collideNPCLoggingHook>()).NOP().Apply();
 
+    // Level and world render hooks
+    PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
+    PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
