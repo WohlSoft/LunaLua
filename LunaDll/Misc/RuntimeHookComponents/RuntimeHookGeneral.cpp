@@ -382,7 +382,7 @@ void TrySkipPatch()
 
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)
-        .CALL(&CameraUpdateHook)
+        .CALL(&CameraUpdateHook_Wrapper)
         .NOP()
         .NOP()
         .Apply();

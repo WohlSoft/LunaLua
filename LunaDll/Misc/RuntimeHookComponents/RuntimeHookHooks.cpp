@@ -892,16 +892,25 @@ extern short __stdcall MessageBoxOpenHook()
     return (short)GM_PLAYERS_COUNT;
 }
 
-extern void __stdcall CameraUpdateHook()
+static void __stdcall CameraUpdateHook(int cameraIdx)
 {
     if (gLunaLua.isValid()) {
         Event messageBoxEvent("onCameraUpdate", false);
         messageBoxEvent.setDirectEventName("onCameraUpdate");
         messageBoxEvent.setLoopable(false);
-        gLunaLua.callEvent(&messageBoxEvent);
+        gLunaLua.callEvent(&messageBoxEvent, cameraIdx);
     }
 }
 
+void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
+{
+    __asm {
+        POP EAX                        // POP the return address
+        PUSH DWORD PTR DS:[EBP - 0x38] // Sneak a camera index argument in there
+        PUSH EAX                       // PUSH the return address
+        JMP CameraUpdateHook           // JMP to CameraUpdateHook
+    };
+}
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
