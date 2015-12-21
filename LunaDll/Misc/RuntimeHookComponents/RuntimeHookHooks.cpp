@@ -979,6 +979,12 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 
+extern short __stdcall IsNPCCollidesWithVeggiHook()
+{
+    
+}
+
+
 
 // NPC Collision Logging Hook
 _declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
@@ -1008,4 +1014,11 @@ extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToColl
     f.flush();
 
     collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
+}
+
+extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
+{
+    HWND destHwnd = WindowFromDC(hdcDest);
+    std::cout << "HWND of DEST: " << (DWORD)destHwnd << std::endl;
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }

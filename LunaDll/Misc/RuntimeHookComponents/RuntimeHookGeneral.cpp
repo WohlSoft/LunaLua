@@ -394,6 +394,8 @@ void TrySkipPatch()
         .CALL(&WindowInactiveHook)
         .Apply();
 
+    // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
+
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;

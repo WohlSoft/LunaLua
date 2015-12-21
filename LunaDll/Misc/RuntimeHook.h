@@ -90,7 +90,17 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
 
 extern void __stdcall GenerateScreenshotHook();
 extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
+
+// Hooks which are helping fixups
+extern short __stdcall IsNPCCollidesWithVeggiHook();
+
+
+
+/************************************************************************/
+/* Hooks for analyze purpose                                            */
+/************************************************************************/
 extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex);
+extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 
 /************************************************************************/
 /* Libs                                                                 */
