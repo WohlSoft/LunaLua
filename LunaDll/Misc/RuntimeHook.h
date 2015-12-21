@@ -47,6 +47,7 @@ extern int __stdcall LoadWorld();     //The World Load Code
 extern DWORD __stdcall WorldLoop();       //The World Loop Code
 extern void* __stdcall WorldRender();     //The World Render Code
 extern int __stdcall LoadIntro();       // Load Intro Code (Autostart)
+extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002);
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);       //The Main Menu Render Code
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);       //The MCI Emulator Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter Code

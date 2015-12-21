@@ -206,6 +206,31 @@ extern DWORD __stdcall WorldLoop()
     return GetTickCount();
 }
 
+// HUD Drawing Patches
+static auto skipStarCountPatch = PatchCollection(
+    PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
+    PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
+    PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
+    );
+
+// HUD Hook -- Runs each time the HUD is drawn.
+extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
+{
+    if (gLunaEnabled) {
+        OnLevelHUDDraw(*cameraIdx);
+    }
+
+    if (gSMBXHUDSettings.skipStarCount) {
+        skipStarCountPatch.Apply();
+    }
+    else {
+        skipStarCountPatch.Unapply();
+    }
+
+    if (!gSMBXHUDSettings.skip) {
+        native_renderLevelHud(cameraIdx, unknown0x4002);
+    }
+}
 
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)

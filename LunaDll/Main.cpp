@@ -208,58 +208,7 @@ int TestFunc()
 	return 0;
 }
 
-// HUD Drawing Patches
-static AsmPatch<6> skipHudPatch = (
-    PATCH(0x96C036)
-    .JMP(0x987C10)
-    .NOP()
-    );
-static auto skipStarCountPatch = PatchCollection(
-    PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
-    PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
-    PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
-);
-
-// *EXPORT* HUD Hook -- Runs each time the HUD is drawn.
-int HUDHook()
-{
-	if(gLunaEnabled) {
-		OnHUDDraw();
-	}
-
-	// Overwrite next instruction if we're skipping hud drawing,
-    // otherwise make sure the original is restored
-	if(gSMBXHUDSettings.skip) {
-        skipHudPatch.Apply();
-    } else {
-        skipHudPatch.Unapply();
-    }
-
-    if (gSMBXHUDSettings.skipStarCount) {
-        skipStarCountPatch.Apply();
-    }
-    else {
-        skipStarCountPatch.Unapply();
-    }
-
-	// Restore some code the hook overwrote
-    #ifndef __MINGW32__
-	__asm {
-		MOV AX, WORD PTR DS: 0x00B25130
-		CMP AX, 5
-		MOV BX, 0
-	}
-    #else
-    asm(".intel_syntax noprefix\n"
-    "MOV AX, WORD PTR DS: 0x00B25130\n"
-    "CMP AX, 5\n"
-    "MOV BX, 0\n"
-    ".att_syntax\n");
-    #endif
-	return *(WORD*)0x00B25130;
-}
-
-void OnHUDDraw() {
+void OnLevelHUDDraw(int cameraIdx) {
 	if(gShowDemoCounter)
 		gDeathCounter.Draw();
 
@@ -267,7 +216,7 @@ void OnHUDDraw() {
         Event inputEvent("onHUDDraw", false);
         inputEvent.setDirectEventName("onHUDDraw");
         inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent);
+        gLunaLua.callEvent(&inputEvent, cameraIdx);
     }
 
 	gSpriteMan.RunSprites();

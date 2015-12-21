@@ -244,9 +244,8 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
-    PATCH(0x96C030)
-        .CALL(&HUDHook)
-        .NOP()
+    PATCH(0x92EC24)
+        .CALL(&LevelHUDHook)
         .Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;

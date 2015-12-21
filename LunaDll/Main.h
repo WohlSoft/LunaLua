@@ -8,8 +8,6 @@ extern "C" __declspec(dllexport) int TestFunc();
 
 extern "C" __declspec(dllexport) int OnLvlLoad();
 
-extern "C" __declspec(dllexport) int HUDHook();
-
 extern "C" {
     __declspec(dllexport) int UltimateProxy();
 }
@@ -21,7 +19,7 @@ void TestFrameCode();
 
 void LevelFrameCode();
 
-void OnHUDDraw();
+void OnLevelHUDDraw(int cameraIdx);
 
 void InitLevel();
 

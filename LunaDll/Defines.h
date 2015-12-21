@@ -704,6 +704,10 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
 
+//      Arg1 = Camera Index
+//      Arg2 = Always 0x4002 in, but maybe used as an output?
+#define GF_RENDER_LEVEL_HUD 0x0096BF20
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -766,6 +770,8 @@ static const auto native_loadSaveStates = (void(__stdcall *)())GF_LOAD_SAVE_STAT
 static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_MAIN;
 
 static const auto native_rtcDoEvents    = (void(__stdcall *)())GF_RTC_DO_EVENTS;
+
+static const auto native_renderLevelHud = (void(__stdcall *)(int* /*camIndex*/, int* /* unknown0x4002 */))GF_RENDER_LEVEL_HUD;
 
 /*
 Function name                                
