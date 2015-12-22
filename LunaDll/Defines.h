@@ -188,7 +188,7 @@ enum CollidersType : short {
 #define GM_PLAYER_KEY_STR   9
 
 #define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
-#define DEFMEM_PTR(name, type, addr) static auto name = (type*)(addr)
+#define DEFMEM_PTR(name, type, addr) static auto name = (const type*)(addr)
 
 
 // General
