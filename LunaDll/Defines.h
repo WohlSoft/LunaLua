@@ -708,6 +708,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg2 = Always 0x4002 in, but maybe used as an output?
 #define GF_RENDER_LEVEL_HUD 0x0096BF20
 
+#define GF_UPDATE_INPUT     0x00A74910
+#define GF_RENDER_WORLD     0x008FEB10
+#define GF_RENDER_LEVEL     0x00909290
+#define GF_UPDATE_BLOCK_ANIM 0x009E14B0
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -772,6 +777,10 @@ static const auto native_ThunRTMain     = (void(__stdcall *)(void *))GF_THUN_RT_
 static const auto native_rtcDoEvents    = (void(__stdcall *)())GF_RTC_DO_EVENTS;
 
 static const auto native_renderLevelHud = (void(__stdcall *)(int* /*camIndex*/, int* /* unknown0x4002 */))GF_RENDER_LEVEL_HUD;
+static const auto native_updateInput    = (void(__stdcall *)(void))GF_UPDATE_INPUT;
+static const auto native_renderWorld    = (void(__stdcall *)(void))GF_RENDER_WORLD;
+static const auto native_renderLevel    = (void(__stdcall *)(void))GF_RENDER_LEVEL;
+static const auto native_updateBlockAnim = (void(__stdcall *)(void))GF_UPDATE_BLOCK_ANIM;
 
 /*
 Function name                                

@@ -239,11 +239,35 @@ void ResetLunaModule()
     gLunaRender.ReloadScreenHDC();
 }
 
+static bool IsWindowsVistaOrNewer() {
+    OSVERSIONINFOEX osVersionInfo;
+    DWORDLONG conditionMask = 0;
+
+    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
+    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osVersionInfo.dwMajorVersion = 6;
+    osVersionInfo.dwMinorVersion = 0;
+    osVersionInfo.wServicePackMajor = 0;
+    osVersionInfo.wServicePackMinor = 0;
+    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
+
+    return VerifyVersionInfo(
+        &osVersionInfo,
+        VER_MAJORVERSION | VER_MINORVERSION |
+        VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+        conditionMask);
+}
+
 /// INIT GLOBALS
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
 	
+    gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
+
 	//startup settings default
     memset(&gStartupSettings, 0, sizeof(gStartupSettings));
 

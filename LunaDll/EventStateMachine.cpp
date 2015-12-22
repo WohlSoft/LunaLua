@@ -1,6 +1,7 @@
 #include <string>
 #include "Globals.h"
 #include "EventStateMachine.h"
+#include "Misc\RuntimeHook.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -21,13 +22,22 @@ void EventStateMachine::reset(void) {
     m_onTickReady = false;
     m_onTickEndReady = false;
     m_onDrawEndReady = false;
+    m_RequestPause = false;
+    m_RequestUnpause = false;
+    m_IsPaused = false;
 }
 
 void EventStateMachine::hookLevelLoop(void) {
+    // Check if we should pause
+    checkPause();
+
     sendOnLoop();
 }
 
 void EventStateMachine::hookWorldLoop(void) {
+    // Check if we should pause
+    checkPause();
+
     sendOnLoop();
 }
 
@@ -103,4 +113,56 @@ void EventStateMachine::sendOnDrawEnd(void) {
     m_onDrawEndReady = false;
 
     sendSimpleLuaEvent("onDrawEnd");
+}
+
+// Public methods (pause requests)
+void EventStateMachine::requestPause(void) {
+    if (!m_IsPaused) {
+        m_RequestPause = true;
+    }
+    m_RequestUnpause = false;
+}
+
+void EventStateMachine::requestUnpause(void) {
+    if (m_IsPaused) {
+        m_RequestUnpause = true;
+    }
+    m_RequestPause = false;
+}
+
+bool EventStateMachine::isPaused(void) {
+    return m_IsPaused;
+}
+
+// Paused game logic
+void EventStateMachine::checkPause(void) {
+    if (!m_IsPaused && m_RequestPause) {
+        m_RequestPause = false;
+        runPause();
+    }
+}
+
+void EventStateMachine::runPause(void) {
+    m_IsPaused = true;
+    while (!m_RequestUnpause) {
+        native_updateInput();
+
+        // Render the world
+        if (gIsOverworld) {
+            // TODO: Is there any animation we want to update in the overworld?
+            native_renderWorld();
+        } else {
+            native_updateBlockAnim();
+            native_renderLevel();
+        }
+
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingMaxFPSHookQPC();
+        } else {
+            FrameTimingMaxFPSHook();
+        }
+
+    }
+    m_RequestUnpause = false;
+    m_IsPaused = false;
 }

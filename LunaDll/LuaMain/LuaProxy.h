@@ -1185,6 +1185,9 @@ namespace LuaProxy {
         void saveGame();
         void exitGame();
         bool loadEpisode(const std::string& episodeName);
+        void pause();
+        void unpause();
+        bool isPausedByLua();
     }
 
     namespace Graphics{

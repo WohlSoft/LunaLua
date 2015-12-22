@@ -3,6 +3,7 @@
 #include "../../../GlobalFuncs.h"
 #include "../../../GameConfig/GameAutostart.h"
 #include "../../../SMBXInternal/PlayerMOB.h"
+#include "../../../EventStateMachine.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -184,3 +185,17 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
     return success;
 }
 
+void LuaProxy::Misc::pause()
+{
+    g_EventHandler.requestPause();
+}
+
+void LuaProxy::Misc::unpause()
+{
+    g_EventHandler.requestUnpause();
+}
+
+bool LuaProxy::Misc::isPausedByLua()
+{
+    return g_EventHandler.isPaused();
+}

@@ -8,6 +8,10 @@ private:
     bool m_onTickEndReady;
     bool m_onDrawEndReady;
 
+    bool m_RequestPause;
+    bool m_RequestUnpause;
+    bool m_IsPaused;
+
 // Constructor and Destructor
 public:
     EventStateMachine() { reset(); }
@@ -30,8 +34,20 @@ private:
     void sendOnInputUpdate(void);
     void sendOnTick(void);
     void sendOnTickEnd(void);
-    void sendOnDraw();
-    void sendOnDrawEnd();
+    void sendOnDraw(void);
+    void sendOnDrawEnd(void);
+
+// Public methods (pause requests)
+public:
+    void requestPause(void);
+    void requestUnpause(void);
+    bool isPaused(void);
+
+// Paused game logic
+private:
+    void checkPause(void);
+    void runPause(void);
+public:
 };
 
 // Global instance

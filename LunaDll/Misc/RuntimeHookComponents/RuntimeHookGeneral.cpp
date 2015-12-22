@@ -142,28 +142,6 @@ static unsigned int __stdcall LatePatch(void)
     return *((unsigned int*)(0xB2D788));
 }
 
-static bool IsWindowsVistaOrNewer() {
-    OSVERSIONINFOEX osVersionInfo;
-    DWORDLONG conditionMask = 0;
-
-    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
-    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    osVersionInfo.dwMajorVersion = 6;
-    osVersionInfo.dwMinorVersion = 0;
-    osVersionInfo.wServicePackMajor = 0;
-    osVersionInfo.wServicePackMinor = 0;
-    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
-
-    return VerifyVersionInfo(
-        &osVersionInfo,
-        VER_MAJORVERSION | VER_MINORVERSION |
-        VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
-        conditionMask);
-}
-
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
@@ -398,7 +376,7 @@ void TrySkipPatch()
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;
-    if (IsWindowsVistaOrNewer()) {
+    if (gIsWindowsVistaOrNewer) {
         frameTimingHookPtr = (void*)&FrameTimingHookQPC;
         frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
     }

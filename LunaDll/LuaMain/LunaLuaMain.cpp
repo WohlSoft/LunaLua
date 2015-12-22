@@ -361,7 +361,10 @@ void CLunaLua::bindAll()
                 def("openPauseMenu", &LuaProxy::Misc::openPauseMenu),
                 def("saveGame", &LuaProxy::Misc::saveGame),
                 def("exitGame", &LuaProxy::Misc::exitGame),
-                def("loadEpisode", &LuaProxy::Misc::loadEpisode)
+                def("loadEpisode", &LuaProxy::Misc::loadEpisode),
+                def("pause", &LuaProxy::Misc::pause),
+                def("unpause", &LuaProxy::Misc::unpause),
+                def("isPausedByLua", &LuaProxy::Misc::isPausedByLua)
             ],
 
             namespace_("Audio")[
