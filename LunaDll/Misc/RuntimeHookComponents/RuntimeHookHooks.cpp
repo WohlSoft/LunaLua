@@ -1015,7 +1015,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 extern short __stdcall IsNPCCollidesWithVeggiHook()
 {
-    
+    return 0;
 }
 
 
