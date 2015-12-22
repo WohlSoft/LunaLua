@@ -17,6 +17,14 @@ static inline void sendSimpleLuaEvent(const std::string& eventName, Ts&&... args
     }
 }
 
+static inline void ProcessWindowsMessageQueue(void) {
+    MSG msg;
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+}
+
 // Public methods (Notifications of State)
 void EventStateMachine::reset(void) {
     m_onTickReady = false;
@@ -156,12 +164,15 @@ void EventStateMachine::runPause(void) {
             native_renderLevel();
         }
 
+        ProcessWindowsMessageQueue();
+
         if (gIsWindowsVistaOrNewer) {
             FrameTimingMaxFPSHookQPC();
         } else {
             FrameTimingMaxFPSHook();
         }
 
+        ProcessWindowsMessageQueue();
     }
     m_RequestUnpause = false;
     m_IsPaused = false;
