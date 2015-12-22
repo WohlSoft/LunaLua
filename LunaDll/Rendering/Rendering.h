@@ -30,7 +30,7 @@ struct Renderer {
     int  GetAutoImageResourceCode() const;
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
-    void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd);
+    void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
     
     void DebugPrint(std::wstring message);				// Print a debug message on the screen
     void DebugPrint(std::wstring message, double val);	// Print a debug message on the screen and display a related value

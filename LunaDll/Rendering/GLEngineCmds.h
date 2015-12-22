@@ -108,4 +108,31 @@ public:
     }
 };
 
+class GLEngineCmd_LuaDraw : public GLEngineCmd {
+public:
+    const BMPBox* mBmp;
+    float mColor[4];
+
+    GLuint mType;
+    const float* mVert;
+    const float* mTex;
+    const float* mVertColor;
+    uint32_t mCount;
+    virtual void run(GLEngine& glEngine) const;
+    virtual ~GLEngineCmd_LuaDraw() {
+        if (mVert) {
+            free((void*)mVert);
+            mVert = NULL;
+        }
+        if (mTex) {
+            free((void*)mTex);
+            mTex = NULL;
+        }
+        if (mVertColor) {
+            free((void*)mVertColor);
+            mVertColor = NULL;
+        }
+    }
+};
+
 #endif

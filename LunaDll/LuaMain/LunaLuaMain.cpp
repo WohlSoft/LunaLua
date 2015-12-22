@@ -338,8 +338,9 @@ void CLunaLua::bindAll()
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
-                def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
+                def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA),
                 // glDrawTriangles will be defined at runtime using FFI
+                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw)
             ],
 
             namespace_("__Effects_EXPERIMENTAL")[

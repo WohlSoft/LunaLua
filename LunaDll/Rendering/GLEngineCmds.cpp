@@ -119,3 +119,66 @@ void GLEngineCmd_Draw2DArray::run(GLEngine& glEngine) const {
     }
 }
 
+
+void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
+    const GLDraw::Texture* tex = NULL;
+    if (mBmp) {
+        tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
+    }
+
+    glBlendEquationANY(GL_FUNC_ADD);
+    GLERRORCHECK();
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GLERRORCHECK();
+
+    g_GLDraw.BindTexture(tex);
+
+    glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
+    GLERRORCHECK();
+
+    // Convert texel coordinates to what we need for our power-of-two padded textures
+    bool texIsPadded = (g_GLDraw.mLastPwScale != 1.0f) || (g_GLDraw.mLastPhScale != 1.0f);
+    if ((mTex != NULL) && texIsPadded) {
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glLoadIdentity();
+        glScalef(g_GLDraw.mLastPwScale, g_GLDraw.mLastPhScale, 1.0f);
+        GLERRORCHECK();
+    }
+
+    glVertexPointer(2, GL_FLOAT, 0, mVert);
+    GLERRORCHECK();
+
+    if (mTex != NULL) {
+        glTexCoordPointer(2, GL_FLOAT, 0, mTex);
+        GLERRORCHECK();
+    } else {
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        GLERRORCHECK();
+    }
+
+    if (mVertColor != NULL) {
+        glEnableClientState(GL_COLOR_ARRAY);
+        GLERRORCHECK();
+        glColorPointer(4, GL_FLOAT, 0, mVertColor);
+        GLERRORCHECK();
+    }
+
+    glDrawArrays(mType, 0, mCount);
+    GLERRORCHECK();
+
+    if (mTex == NULL) {
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        GLERRORCHECK();
+    }
+    if (mVertColor != NULL) {
+        glDisableClientState(GL_COLOR_ARRAY);
+        GLERRORCHECK();
+    }
+
+    if ((mTex != NULL) && texIsPadded) {
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        GLERRORCHECK();
+    }
+}

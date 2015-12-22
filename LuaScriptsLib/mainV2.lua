@@ -112,6 +112,60 @@ local function initFFIBasedAPIs()
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
     
+	local function convertGlArray(arr, arr_len)
+		if (arr == nil) then return 0 end
+		local arr_offset = 0
+		if (arr[0] == nil) then arr_offset = 1 end
+        local arr_raw = LunaDLL.LunaLuaGlAllocCoords(arr_len)
+        for i = 0,arr_len-1 do
+            arr_raw[i] = arr[i+arr_offset] or 0
+        end
+		return tonumber(ffi.cast("unsigned int", arr_raw))
+	end
+	
+	local function getGlElementCount(arr, divisor)
+		local len_offset = 0
+		if (arr[0] ~= nil) then len_offset = 1 end
+		return math.floor((#arr + len_offset) / divisor)
+	end
+	
+	Graphics.glDraw = function(args)
+		local priority = args['priority'] or 1.0
+		local texture = args['texture']
+		local color = args['color'] or {1.0, 1.0, 1.0, 1.0}
+		if (type(color) == "number") then
+			error("Numeric colors support not yet existing")
+		elseif (#color == 3) then
+			color = {color[1], color[2], color[3], 1.0}
+		end
+		local vertCoords = args['vertexCoords']
+		local texCoords = args['textureCoords']
+		local vertColor = args['vertexColors']
+		local arr_len = nil
+		if (vertCoords == nil) then
+			error("vertexCoords is required")
+		end
+		local arr_len = getGlElementCount(vertCoords, 2)
+		if (texCoords ~= nil) then
+			if (arr_len ~= getGlElementCount(texCoords, 2)) then
+				error("Incorrect textureCoords len")
+			end
+		end
+		if (vertColor ~= nil) then
+			if (arr_len ~= getGlElementCount(vertColor, 4)) then
+				error("Incorrect vertexColors len")
+			end
+		end
+		vertCoords = convertGlArray(vertCoords, arr_len*2)
+		texCoords = convertGlArray(texCoords, arr_len*2)
+		vertColor = convertGlArray(vertColor, arr_len*4)
+	
+		Graphics.__glInternalDraw(
+			priority, texture,
+			color[1], color[2], color[3], color[4],
+			vertCoords, texCoords, vertColor, arr_len)
+	end
+	
     -- Limit access to FFI
     package.preload['ffi'] = nil
     package.loaded['ffi'] = nil

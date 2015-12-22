@@ -221,8 +221,9 @@ void Renderer::AddOp(RenderOp* op) {
 }
 
 // GL Engine OP
-void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd) {
+void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority) {
     RenderGLOp* op = new RenderGLOp(cmd);
+    op->m_renderPriority = renderPriority;
     AddOp(op);
 }
 

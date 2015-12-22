@@ -309,3 +309,27 @@ extern "C" {
         gLunaRender.GLCmd(obj);
     }
 }
+
+void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count)
+{
+    const BMPBox* bmp = NULL;
+    if (img) {
+        auto it = gLunaRender.LoadedImages.find(img->imgResource);
+        if (it != gLunaRender.LoadedImages.end()) {
+            bmp = it->second;
+        }
+    }
+
+    auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
+    obj->mBmp = bmp;
+    obj->mColor[0] = r;
+    obj->mColor[1] = g;
+    obj->mColor[2] = b;
+    obj->mColor[3] = a;
+    obj->mType = GL_TRIANGLES;
+    obj->mVert = (const float*)vert;
+    obj->mTex = (const float*)tex;
+    obj->mVertColor = (const float*)color;
+    obj->mCount = count;
+    gLunaRender.GLCmd(obj, renderPriority);
+}

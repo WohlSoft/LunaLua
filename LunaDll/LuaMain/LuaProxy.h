@@ -1239,6 +1239,7 @@ namespace LuaProxy {
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
+        void __glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count);
     }
 
     namespace Effects{
