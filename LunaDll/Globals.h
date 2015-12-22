@@ -22,7 +22,7 @@
 #include "GameConfig/GameAutostart.h"
 #include "Misc/FreeImageUtils/FreeImageInit.h"
 #include "GameConfig/GeneralLunaConfig.h"
-
+#include "EventStateMachine.h"
 
 class RenderOverrideManager;
 

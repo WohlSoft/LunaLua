@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h" />
     <ClInclude Include="Misc\AsmPatch.h" />
     <ClInclude Include="Misc\AsyncHTTPClient.h" />
@@ -278,6 +279,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp" />
     <ClCompile Include="Misc\AsyncHTTPClient.cpp" />

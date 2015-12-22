@@ -189,7 +189,7 @@ int TestFunc()
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
 #endif
-		gLunaLua.doEvents();
+        g_EventHandler.hookLevelLoop();
 
 		// Run autocode
 		gAutoMan.DoEvents(false);

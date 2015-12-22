@@ -198,7 +198,7 @@ extern DWORD __stdcall WorldLoop()
     Input::CheckSpecialCheats();
     Input::UpdateInputTasks();
 
-    gLunaLua.doEvents();
+    g_EventHandler.hookWorldLoop();
 
     gSavedVarBank.SaveIfNeeded();
 
@@ -689,12 +689,7 @@ __declspec(naked) void UpdateInputHook_Wrapper()
 
 extern void __stdcall UpdateInputHook()
 {
-    if (gLunaLua.isValid()){
-        Event inputEvent("onInputUpdate", false);
-        inputEvent.setDirectEventName("onInputUpdate");
-        inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent);
-    }
+    g_EventHandler.hookInputUpdate();
 }
 
 extern void __stdcall WindowInactiveHook()
@@ -1070,7 +1065,9 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
+    g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
+    g_EventHandler.hookLevelRenderEnd();
 }
 
 static void __declspec(naked) __stdcall RenderWorldReal()
@@ -1087,5 +1084,7 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
+    g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
+    g_EventHandler.hookWorldRenderEnd();
 }

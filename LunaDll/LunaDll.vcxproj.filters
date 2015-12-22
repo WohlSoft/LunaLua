@@ -491,6 +491,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="EventStateMachine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -940,6 +941,7 @@
     <ClCompile Include="GlobalFuncs.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="EventStateMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

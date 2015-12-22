@@ -223,6 +223,7 @@ void ResetLunaModule()
 
     gLevelEnum = Invalid;
 
+    g_EventHandler.reset();
     gLunaRender.ClearAll();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
