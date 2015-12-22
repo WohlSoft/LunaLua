@@ -179,6 +179,7 @@ void TrySkipPatch()
     fixup_TypeMismatch13();
     fixup_Credits();
     fixup_Mushbug();
+    fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
     

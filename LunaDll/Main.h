@@ -8,6 +8,8 @@ extern "C" __declspec(dllexport) int TestFunc();
 
 extern "C" __declspec(dllexport) int OnLvlLoad();
 
+extern "C" __declspec(dllexport) int HUDHook();
+
 extern "C" {
     __declspec(dllexport) int UltimateProxy();
 }

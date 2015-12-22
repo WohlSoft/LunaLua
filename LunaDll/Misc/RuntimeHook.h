@@ -93,7 +93,7 @@ extern void __stdcall GenerateScreenshotHook();
 extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // Hooks which are helping fixups
-extern short __stdcall IsNPCCollidesWithVeggiHook();
+extern void IsNPCCollidesWithVeggiHook_Wrapper();
 
 
 
@@ -139,6 +139,7 @@ void fixup_ErrorReporting();
 void fixup_WarpLimit();
 void fixup_Credits();
 void fixup_Mushbug();
+void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 

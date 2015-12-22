@@ -1007,10 +1007,33 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
 
+extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
+    NPCMOB* npcObj = ::NPC::Get(*npcIndex - 1);
+    if (npcdef_isVegetableNPC[npcObj->id]) {
+        if (*objType == 6) {
+            npcObj->killFlag = 6;
+            return 0; // Don't handle extra code
+        }
+        return 0xFFFF; // Handle extra veggi code
+    }
+    return 0; // Don't handle extra code
+}
 
-extern short __stdcall IsNPCCollidesWithVeggiHook()
+_declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
 {
-    return 0;
+    __asm {
+        PUSHF
+        PUSH EAX
+        PUSH EDX
+        PUSH DWORD PTR DS : [EBP + 0xC] // objType
+        PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
+        CALL IsNPCCollidesWithVeggiHook
+        MOV CX, AX
+        POP EDX
+        POP EAX
+        POPF
+        RET
+    }
 }
 
 

@@ -217,6 +217,12 @@ void fixup_Mushbug()
     memcpy((void*)0x00a2d08b, mushbugPatch, sizeof(mushbugPatch));
 }
 
+void fixup_Veggibug()
+{
+    PATCH(0xA2B17D)
+        .CALL(&IsNPCCollidesWithVeggiHook_Wrapper).NOP().Apply();
+}
+
 
 
 void fixup_NativeFuncs()

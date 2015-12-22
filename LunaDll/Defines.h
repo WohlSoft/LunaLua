@@ -188,6 +188,8 @@ enum CollidersType : short {
 #define GM_PLAYER_KEY_STR   9
 
 #define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
+#define DEFMEM_PTR(name, type, addr) static auto name = (type*)(addr)
+
 
 // General
 DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
@@ -479,40 +481,40 @@ DEFMEM(npc_frames,              short*, 0x00B25F7C);
 DEFMEM(npc_framespeed,          short*, 0x00B25F98);
 DEFMEM(npc_framestyle,          short*, 0x00B25FB4);
 
-DEFMEM(npcdef_gfxoffsetx,       short*, 0x00B25FC0);
-DEFMEM(npcdef_gfxoffsety,       short*, 0x00B2621A);
-DEFMEM(npcdef_width,            short*, 0x00B26474);
-DEFMEM(npcdef_height,           short*, 0x00B266CE);
-DEFMEM(npcdef_gfxwidth,         short*, 0x00B26928);
-DEFMEM(npcdef_gfxheight,        short*, 0x00B26B82);
-DEFMEM(npcdef_isShell,          short*, 0x00B26DDC);
-DEFMEM(npcdef_npcblock,         short*, 0x00B27036);
-DEFMEM(npcdef_npcblocktop,      short*, 0x00B27290);
-DEFMEM(npcdef_isInteractableNPC,short*, 0x00B274EA);
-DEFMEM(npcdef_isCoin,           short*, 0x00B27744);
-DEFMEM(npcdef_isVine,           short*, 0x00B2799E);
-DEFMEM(npcdef_isCollectableGoal,short*, 0x00B27BF8);
-DEFMEM(npcdef_isFlyingNPC,      short*, 0x00B27E52);
-DEFMEM(npcdef_isWaterNPC,       short*, 0x00B280AC);
-DEFMEM(npcdef_jumphurt,         short*, 0x00B28306);
-DEFMEM(npcdef_noblockcollision, short*, 0x00B28560);
-DEFMEM(npcdef_score,            short*, 0x00B287BA);
-DEFMEM(npcdef_playerblocktop,   short*, 0x00B28A14);
-DEFMEM(npcdef_grabtop,          short*, 0x00B28C6E);
-DEFMEM(npcdef_cliffturn,        short*, 0x00B28EC8);
-DEFMEM(npcdef_nohurt,           short*, 0x00B29122);
-DEFMEM(npcdef_playerblock,      short*, 0x00B2937C);
-DEFMEM(npcdef_grabside,         short*, 0x00B29830);
-DEFMEM(npcdef_isShoeNPC,        short*, 0x00B29A8A);
-DEFMEM(npcdef_isYoshiNPC,       short*, 0x00B29CE4);
-DEFMEM(npcdef_noYoshi,          short*, 0x00B2A198);
-DEFMEM(npcdef_foreground,       short*, 0x00B2A3F2);
-DEFMEM(npcdef_isBot,            short*, 0x00B2A64C);
-DEFMEM(npcdef_isVegetableNPC,   short*, 0x00B2AB00);
-DEFMEM(npcdef_speed,            float*, 0x00B2AD5C);
-DEFMEM(npcdef_nofireball,       short*, 0x00B2B210);
-DEFMEM(npcdef_noiceball,        short*, 0x00B2B46A);
-DEFMEM(npcdef_nogravity,        short*, 0x00B2B6C4);
+DEFMEM_PTR(npcdef_gfxoffsetx,       short, 0x00B25FC0);
+DEFMEM_PTR(npcdef_gfxoffsety,       short, 0x00B2621A);
+DEFMEM_PTR(npcdef_width,            short, 0x00B26474);
+DEFMEM_PTR(npcdef_height,           short, 0x00B266CE);
+DEFMEM_PTR(npcdef_gfxwidth,         short, 0x00B26928);
+DEFMEM_PTR(npcdef_gfxheight,        short, 0x00B26B82);
+DEFMEM_PTR(npcdef_isShell,          short, 0x00B26DDC);
+DEFMEM_PTR(npcdef_npcblock,         short, 0x00B27036);
+DEFMEM_PTR(npcdef_npcblocktop,      short, 0x00B27290);
+DEFMEM_PTR(npcdef_isInteractableNPC,short, 0x00B274EA);
+DEFMEM_PTR(npcdef_isCoin,           short, 0x00B27744);
+DEFMEM_PTR(npcdef_isVine,           short, 0x00B2799E);
+DEFMEM_PTR(npcdef_isCollectableGoal,short, 0x00B27BF8);
+DEFMEM_PTR(npcdef_isFlyingNPC,      short, 0x00B27E52);
+DEFMEM_PTR(npcdef_isWaterNPC,       short, 0x00B280AC);
+DEFMEM_PTR(npcdef_jumphurt,         short, 0x00B28306);
+DEFMEM_PTR(npcdef_noblockcollision, short, 0x00B28560);
+DEFMEM_PTR(npcdef_score,            short, 0x00B287BA);
+DEFMEM_PTR(npcdef_playerblocktop,   short, 0x00B28A14);
+DEFMEM_PTR(npcdef_grabtop,          short, 0x00B28C6E);
+DEFMEM_PTR(npcdef_cliffturn,        short, 0x00B28EC8);
+DEFMEM_PTR(npcdef_nohurt,           short, 0x00B29122);
+DEFMEM_PTR(npcdef_playerblock,      short, 0x00B2937C);
+DEFMEM_PTR(npcdef_grabside,         short, 0x00B29830);
+DEFMEM_PTR(npcdef_isShoeNPC,        short, 0x00B29A8A);
+DEFMEM_PTR(npcdef_isYoshiNPC,       short, 0x00B29CE4);
+DEFMEM_PTR(npcdef_noYoshi,          short, 0x00B2A198);
+DEFMEM_PTR(npcdef_foreground,       short, 0x00B2A3F2);
+DEFMEM_PTR(npcdef_isBot,            short, 0x00B2A64C);
+DEFMEM_PTR(npcdef_isVegetableNPC,   short, 0x00B2AB00);
+DEFMEM_PTR(npcdef_speed,            float, 0x00B2AD5C);
+DEFMEM_PTR(npcdef_nofireball,       short, 0x00B2B210);
+DEFMEM_PTR(npcdef_noiceball,        short, 0x00B2B46A);
+DEFMEM_PTR(npcdef_nogravity,        short, 0x00B2B6C4);
 
 
 DEFMEM(blockdef_isResizeableBlock, short*, 0x00B2B930);

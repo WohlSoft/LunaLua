@@ -383,3 +383,21 @@ __declspec(naked) int UltimateProxy()
         JMP EAX
     }
 }
+
+int HUDHook()
+{
+#ifndef __MINGW32__
+    __asm {
+        MOV AX, WORD PTR DS : 0x00B25130
+            CMP AX, 5
+            MOV BX, 0
+    }
+#else
+    asm(".intel_syntax noprefix\n"
+        "MOV AX, WORD PTR DS: 0x00B25130\n"
+        "CMP AX, 5\n"
+        "MOV BX, 0\n"
+        ".att_syntax\n");
+#endif
+    return *(unsigned short*)0x00B25130;
+}
