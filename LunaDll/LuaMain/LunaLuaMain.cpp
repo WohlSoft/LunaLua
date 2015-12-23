@@ -306,7 +306,7 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                LUAHELPER_DEF_CLASS(HelperClass_LuaImageResource)
+                LUAHELPER_DEF_CLASS(LuaImageResource)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),

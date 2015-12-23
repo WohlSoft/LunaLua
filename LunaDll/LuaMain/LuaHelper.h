@@ -79,11 +79,15 @@ namespace LuaHelper {
 };
 
 #define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
+
+#define LUAHELPER_HELPCLASS_NAME(name) HelperClass_ ## name
+#define LUAHELPER_HELPCLASS_STR_NAME(name) _cls_ ## name
 #define LUAHELPER_DEF_CLASS_HELPER(classType, name) \
-    extern const char _cls_ ## name [] = #name ; \
-    typedef LuaHelper::LuaBaseClassUtils< classType , _cls_ ## name > HelperClass_ ## name ;
-#define LUAHELPER_DEF_CLASS(helpercls) \
-    luabind::class_<helpercls::cls>(helpercls::getRawName()) \
-        .property("__type", &helpercls::getName)
+    extern const char LUAHELPER_HELPCLASS_STR_NAME(name) [] = #name ; \
+    typedef LuaHelper::LuaBaseClassUtils< classType , LUAHELPER_HELPCLASS_STR_NAME(name) > LUAHELPER_HELPCLASS_NAME(name) ;
+
+#define LUAHELPER_DEF_CLASS(name) \
+    luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
+        .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
 
 #endif
