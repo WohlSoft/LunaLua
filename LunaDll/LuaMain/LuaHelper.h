@@ -11,7 +11,6 @@
 #include "../Misc/VB6StrPtr.h"
 
 
-#define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
 
 namespace LuaHelper {
     luabind::object getEventCallbase(lua_State* base, std::string eventTable);
@@ -57,6 +56,34 @@ namespace LuaHelper {
     {
         return getObjList(count, wrapFunc, [](unsigned int i) { return true; }, L);
     }
-}
+
+
+    template<class T, char const* clsName>
+    struct LuaBaseClassUtils 
+    {
+        using cls = T;
+
+        static luabind::class_<T> defClass() {
+            return luabind::class_<T>(clsName);
+        }
+
+        static std::string getName(T& cls) {
+            return std::string(clsName);
+        }
+
+        static const char *getRawName() {
+            return clsName;
+        }
+    };
+
+};
+
+#define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
+#define LUAHELPER_DEF_CLASS_HELPER(classType, name) \
+    extern const char _cls_ ## name [] = #name ; \
+    typedef LuaHelper::LuaBaseClassUtils< classType , _cls_ ## name > HelperClass_ ## name ;
+#define LUAHELPER_DEF_CLASS(helpercls) \
+    luabind::class_<helpercls::cls>(helpercls::getRawName()) \
+        .property("__type", &helpercls::getName)
 
 #endif

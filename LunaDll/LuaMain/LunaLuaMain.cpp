@@ -281,6 +281,8 @@ void CLunaLua::setupDefaults()
     _G["console"] = LuaProxy::Console();
 }
 
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+
 void CLunaLua::bindAll()
 {
     //Bind stuff for world and level
@@ -304,7 +306,7 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource")
+                LUAHELPER_DEF_CLASS(HelperClass_LuaImageResource)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
