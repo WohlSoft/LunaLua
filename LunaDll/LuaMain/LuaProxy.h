@@ -1199,6 +1199,10 @@ namespace LuaProxy {
             int GetWidth();
             int GetHeight();
         };
+        enum RENDER_TYPE {
+            RTYPE_IMAGE,
+            RTYPE_TEXT
+        };
 
         void activateHud(bool activateHud);
         bool isHudActivated();
@@ -1235,7 +1239,8 @@ namespace LuaProxy {
         void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L);
         void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L);
         void drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
-        
+        void draw(const luabind::object& namedArgs, lua_State* L);
+
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);

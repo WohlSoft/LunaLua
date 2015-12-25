@@ -82,6 +82,7 @@ namespace LuaHelper {
 
 #define LUAHELPER_HELPCLASS_NAME(name) HelperClass_ ## name
 #define LUAHELPER_HELPCLASS_STR_NAME(name) _cls_ ## name
+
 #define LUAHELPER_DEF_CLASS_HELPER(classType, name) \
     extern const char LUAHELPER_HELPCLASS_STR_NAME(name) [] = #name ; \
     typedef LuaHelper::LuaBaseClassUtils< classType , LUAHELPER_HELPCLASS_STR_NAME(name) > LUAHELPER_HELPCLASS_NAME(name) ;
@@ -89,5 +90,28 @@ namespace LuaHelper {
 #define LUAHELPER_DEF_CLASS(name) \
     luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
         .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
+
+
+#define LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(tableObj, elemKey) \
+    try { \
+        elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
+    } catch (luabind::cast_failed& e) { \
+        luaL_error(L, "Value '" #elemKey "' is not set or has the wrong type!"); \
+        return; \
+    }
+
+
+#define LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(tableObj, elemKey, defValue) \
+    try { \
+        elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
+    } catch (luabind::cast_failed& /*e*/) { \
+        if(!tableObj [ #elemKey ]) { \
+            elemKey = defValue; \
+        } else { \
+            luaL_error(L, "Value '" #elemKey "' has the wrong type!"); \
+            return; \
+        } \
+    }
+
 
 #endif

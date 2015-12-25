@@ -4,6 +4,7 @@
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
+#include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
 #include "../../../Rendering/GLEngineProxy.h"
 #include <luabind/adopt_policy.hpp>
@@ -266,6 +267,90 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
 
     gLunaRender.AddOp(renderOp);
 }
+
+
+void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
+{
+    if (luabind::type(namedArgs) != LUA_TTABLE) {
+        luaL_error(L, "Argument #1 must be a table with named arguments!");
+        return;
+    }
+    
+
+    int x, y;
+    RENDER_TYPE type;
+    double priority;
+    RenderOp* renderOperation;
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, x);
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, y);
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, type);
+    if (type == RTYPE_TEXT) 
+    {
+        priority = RENDEROP_DEFAULT_PRIORITY_TEXT;
+        RenderStringOp* strRenderOp = new RenderStringOp();
+
+        std::string text;
+        int fontType;
+        LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, text);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
+
+        strRenderOp->m_String = utf8_decode(text);
+        if (fontType == 3)
+            for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
+                *it = towupper(*it);
+        strRenderOp->m_X = (int)x;
+        strRenderOp->m_Y = (int)y;
+        strRenderOp->m_FontType = fontType;
+        renderOperation = strRenderOp;
+    }
+    else if (type == RTYPE_IMAGE) 
+    {
+        priority = RENDEROP_DEFAULT_PRIORITY_RENDEROP;
+        RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
+        
+        LuaImageResource* image;
+        unsigned int sourceX;
+        unsigned int sourceY;
+        unsigned int sourceWidth;
+        unsigned int sourceHeight;
+        float opacity;
+        bool isSceneCoordinates;
+
+        LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
+        const auto bmpIt = gLunaRender.LoadedImages.find(image->imgResource);
+        if (bmpIt == gLunaRender.LoadedImages.cend()) {
+            luaL_error(L, "Internal error: Failed to find image resource!");
+            return;
+        }
+        BMPBox* imgBox = bmpIt->second;
+
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, imgBox->m_W);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, imgBox->m_H);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
+
+        
+        bitmapRenderOp->direct_img = bmpIt->second;
+        bitmapRenderOp->sx = sourceX;
+        bitmapRenderOp->sy = sourceY;
+        bitmapRenderOp->sw = sourceWidth;
+        bitmapRenderOp->sh = sourceHeight;
+        bitmapRenderOp->x = x;
+        bitmapRenderOp->y = y;
+        renderOperation = bitmapRenderOp;
+    }
+    else
+    {
+        luaL_error(L, "No valid 'type'. Must be RTYPE_TEXT or RTYPE_IMAGE");
+    }
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, priority);
+ 
+    renderOperation->m_renderPriority = priority;
+    gLunaRender.AddOp(renderOperation);
+}
+
 
 
 bool LuaProxy::Graphics::isOpenGLEnabled()

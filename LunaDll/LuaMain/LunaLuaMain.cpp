@@ -261,6 +261,12 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_ICE);
     LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_HAMMER);
 
+    {
+        using namespace LuaProxy::Graphics;
+        LUAHELPER_DEF_CONST(_G, RTYPE_IMAGE);
+        LUAHELPER_DEF_CONST(_G, RTYPE_TEXT);
+    }
+
     _G["ODIR_UP"] = 1;
     _G["ODIR_LEFT"] = 2;
     _G["ODIR_DOWN"] = 3;
@@ -367,6 +373,7 @@ void CLunaLua::bindAll()
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("draw", &LuaProxy::Graphics::draw),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA),
