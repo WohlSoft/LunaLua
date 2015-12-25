@@ -13,8 +13,6 @@
 #include "../SMBXInternal/Blocks.h"
 #include "../SdlMusic/MusicManager.h"
 
-std::vector<LuaEvents::SMBXEventQueueItem> LuaEvents::SMBXEventQueue;
-
 char LuaEvents::pressTest(short oldp, short newp)
 {
     if(oldp == 0 && newp == -1)
@@ -96,7 +94,6 @@ void LuaEvents::proccesEvents(lua_State *L, std::string eventTable)
     processKeyboardEvents(L, eventTable);
     processJumpEvent(L, eventTable);
     processSectionEvents(L, eventTable);
-	processSMBXEvents(L, eventTable);
 }
 
 
@@ -122,16 +119,6 @@ void LuaEvents::processSectionEvents(lua_State *L, std::string eventTable)
     }
 }
 
-
-void LuaEvents::processSMBXEvents(lua_State *L, std::string eventTable)
-{
-	luabind::object evTable = LuaHelper::getEventCallbase(L, eventTable);
-	for(int i = 0; i < (int)SMBXEventQueue.size(); ++i){
-		SMBXEventQueueItem& item = SMBXEventQueue[i];
-		luabind::call_function<void>(evTable["onSMBXEvent"], item.event, item.callType, item.unkVal);
-	}
-}
-
 //CLEANUP
 void LuaEvents::finishEventHandling()
 {
@@ -153,7 +140,6 @@ void LuaEvents::finishEventHandling()
 			evData->section = player->CurrentSection;
 		}
 	}
-	SMBXEventQueue.clear();
 }
 
 void LuaEvents::resetToDefaults()
