@@ -5,11 +5,9 @@
 
 class SafeFPUControl
 {
-private:
-    unsigned int fpu_control;
-    unsigned int sse2_control;
 public:
-    SafeFPUControl();
+    SafeFPUControl() = default;
+    SafeFPUControl(SafeFPUControl& other) = delete;
     ~SafeFPUControl();
 };
 
