@@ -3,8 +3,6 @@
 #include <list>
 #include <cmath>
 
-using namespace std;
-
 #define DEF_CELL_H 96
 #define DEF_CELL_W 96
 #define HASH_PRIME_1 0x8da6b343
@@ -58,10 +56,10 @@ public:
 	void AddCell(int bucket_index, Cell* pcell);			// Add cell at the end of cell list in bucket
 	Cell* FindCell(int bucket_index, int x, int y);			// Finds cell in given bucket, or returns null
 
-	void GetObjectsOfInterest(list<CellObj>* objlist, double x, double y, int w, int h);	// Get objs that might be intersecting a rectangle
-	void GetUniqueObjs(list<CellObj>* objlist, double cellx, double celly);		// Get objs from cell (don't add any that are already in the list)
+	void GetObjectsOfInterest(std::list<CellObj>* objlist, double x, double y, int w, int h);	// Get objs that might be intersecting a rectangle
+	void GetUniqueObjs(std::list<CellObj>* objlist, double cellx, double celly);		// Get objs from cell (don't add any that are already in the list)
 
-	static void SortByNearest(list<CellObj>* objlist, double cx, double cy); // Sort a list of cell objects by which is closest to cx/cy
+	static void SortByNearest(std::list<CellObj>* objlist, double cx, double cy); // Sort a list of cell objects by which is closest to cx/cy
 
 	/// Members ///
 	Bucket m_BucketArray[BUCKET_COUNT];

@@ -294,6 +294,19 @@ void MusicManager::loadSounds(std::string path, std::string root)
 	}
 }
 
+static std::string clearTrackNumber(std::string in)
+{
+	unsigned int i = 0;
+	for (; i < in.size(); i++)
+	{
+		if (in[i] == '|')
+			break;
+	}
+	if (i == in.size()) return in;//Not found
+	in.resize(i, ' ');
+	return in;
+}
+
 void MusicManager::loadMusics(std::string path, std::string root)
 {
 	if( !file_existsX(path) ) return;
@@ -320,7 +333,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 		replaceSubStr(fileName, "\"", "");
 		replaceSubStr(fileName, "\\\\",  "\\");
 		replaceSubStr(fileName, "/",  "\\");
-		if( file_existsX(root+fileName) )
+		if (file_existsX(root + clearTrackNumber(fileName) ))
 		{
 			musList[i] = root+fileName.c_str();
 		}
@@ -338,7 +351,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 		replaceSubStr(fileName, "\"", "");
 		replaceSubStr(fileName, "\\\\",  "\\");
 		replaceSubStr(fileName, "/",  "\\");
-		if( file_existsX(root+fileName) )
+		if (file_existsX(root + clearTrackNumber(fileName)))
 		{
 			musList[i] = root+fileName.c_str();
 		}
@@ -357,7 +370,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 		replaceSubStr(fileName, "\"", "");
 		replaceSubStr(fileName, "\\\\",  "\\");
 		replaceSubStr(fileName, "/",  "\\");
-		if( file_existsX(root+fileName) )
+		if (file_existsX(root + clearTrackNumber(fileName)))
 		{
 			musList[i] = root+fileName.c_str();
 		}

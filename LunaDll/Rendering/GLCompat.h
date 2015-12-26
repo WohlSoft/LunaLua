@@ -113,7 +113,7 @@ static inline void glBlendEquationANY(GLenum mode)
 ////////////////////////
 
 // Macro inserting the arguments
-#define GLERRORCHECK() _GLErrorCheck(__FILE__, __LINE__, __FUNCTION__)
+#define GLERRORCHECK(...) _GLErrorCheck(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
 
 // Don't depend on gluErrorString, because 1) It's deprecated, 2) It's unreliable, 3) adds a dependency on glu32.lib, 4) There aren't many options anyway
 static const char* _GLGetErrorString(GLenum err) {
@@ -136,11 +136,20 @@ static const char* _GLGetErrorString(GLenum err) {
 #undef CASESTR
 }
 
+static inline void _GLErrorMsgArgs(std::wostringstream& errMsg) {
+}
+template <typename X, typename... Ts>
+static inline void _GLErrorMsgArgs(std::wostringstream& errMsg, X&& arg, Ts&&... otherArgs) {
+    errMsg << arg << "\r\n";
+    _GLErrorMsgArgs(errMsg, std::forward<Ts>(otherArgs)...);
+}
+
 // Error checking function
-static inline void _GLErrorCheck(const char* fn, int line, const char* func) {
+template <typename... Ts>
+static inline void _GLErrorCheck(const char* fn, int line, const char* func, Ts... otherArgs) {
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        std::ostringstream errMsg;
+        std::wostringstream errMsg;
 
         errMsg << "OpenGL Error in " << func << " (at " << fn << ":" << line << ")\r\n";
         errMsg << "\r\n";
@@ -150,7 +159,9 @@ static inline void _GLErrorCheck(const char* fn, int line, const char* func) {
 
         errMsg << _GLGetErrorString(err) << " (0x" << std::hex << (unsigned int)err << ")";
 
-        dbgboxA(errMsg.str().c_str());
+        _GLErrorMsgArgs(errMsg, std::forward<Ts>(otherArgs)...);
+
+        dbgbox(errMsg.str().c_str());
         _exit(1);
     }
 }

@@ -1,0 +1,30 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Super Mario Bros. X</title>
+		<link rel="stylesheet" type="text/css" href="launcher.css"></link>
+		<script type="text/javascript" src="launcher.js"></script>
+	</head>
+	<body>
+		<div class="masterContainer">
+			<iframe id="iframer"></iframe>
+			<div class="otherStuff">
+				<div class="controlSection">
+				<div class="centeredSection">
+					<label><span>Episode:</span><span id="episodeInfo"></span></label>
+					<label><span>Save Slot:</span><select id="saveSlot"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+					<input id="deleteSaveSlot" class="miniButtons" type="button" value="Delete" /></label>
+				</div>
+				<div id="saveData" class="centeredSection"></div>
+				<div class="centeredSection">
+					<label id="player1Label" class="flexBoxes"></label><label id="player2Label" class="flexBoxes"></label>
+				</div>
+				<div class="centeredSection" id="buttonBox">
+					<span class="flexBoxes"><input class="buttons" type="button" value="Play Episode" id="playButton" /></span>
+					<span class="flexBoxes"><input class="buttons" type="button" value="Launch Classic Editor" id="classicEditorButton" /></span>
+					<span class="flexBoxes"><input class="buttons" type="button" value="Launch PGE Editor" id="newEditorButton" /></span>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

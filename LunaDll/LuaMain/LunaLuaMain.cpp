@@ -1,3 +1,7 @@
+#include <string>
+#include <luabind/adopt_policy.hpp>
+#include <luabind/out_value_policy.hpp>
+
 #include "LunaLuaMain.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
@@ -11,17 +15,14 @@
 #include "LuaProxyComponent/LuaProxyAudio.h"
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
-#include <string>
-#include <luabind/adopt_policy.hpp>
-#include <luabind/out_value_policy.hpp>
+
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
 
-
 std::wstring CLunaLua::getLuaLibsPath()
 {
-    wstring lapi = getModulePath();
+    std::wstring lapi = getModulePath();
     lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
     return lapi;
 }
@@ -30,7 +31,9 @@ std::wstring CLunaLua::getLuaLibsPath()
 CLunaLua::CLunaLua() :
         m_type(CLunaLua::LUNALUA_LEVEL),
         m_luaEventTableName(""),
-        L(0)
+        L(0),
+        m_ready(false),
+        m_eventLoopOnceExecuted(false)
 {}
 
 CLunaLua::~CLunaLua()
@@ -45,6 +48,8 @@ bool CLunaLua::shutdown()
     if(!isValid())
         return false;
         
+    m_ready = false;
+    m_eventLoopOnceExecuted = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -53,6 +58,7 @@ bool CLunaLua::shutdown()
 
 void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelPath /*= std::wstring()*/)
 {
+    SafeFPUControl noFPUExecptions;
 
     //Just to be safe
     shutdown();
@@ -182,22 +188,23 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 void CLunaLua::setupDefaults()
 {
     object _G = globals(L);
-    _G["GAME_ENGINE"] = GAME_ENGINE;
-    _G["LUNALUA_VER"] = LUNALUA_VERSION;
+    LUAHELPER_DEF_CONST(_G, GAME_ENGINE);
+    LUAHELPER_DEF_CONST(_G, LUNALUA_VERSION);
+    _G["LUNALUA_VER"] = LUNALUA_VERSION; // ALIAS
 
-    _G["PLAYER_SMALL"] = PLAYER_SMALL;
-    _G["PLAYER_BIG"] = PLAYER_BIG;
-    _G["PLAYER_FIREFLOWER"] = PLAYER_FIREFLOWER;
-    _G["PLAYER_LEAF"] = PLAYER_LEAF;
-    _G["PLAYER_TANOOKIE"] = PLAYER_TANOOKIE;
-    _G["PLAYER_HAMMER"] = PLAYER_HAMMER;
-    _G["PLAYER_ICE"] = PLAYER_ICE;
+    LUAHELPER_DEF_CONST(_G, PLAYER_SMALL);
+    LUAHELPER_DEF_CONST(_G, PLAYER_BIG);
+    LUAHELPER_DEF_CONST(_G, PLAYER_FIREFLOWER);
+    LUAHELPER_DEF_CONST(_G, PLAYER_LEAF);
+    LUAHELPER_DEF_CONST(_G, PLAYER_TANOOKIE);
+    LUAHELPER_DEF_CONST(_G, PLAYER_HAMMER);
+    LUAHELPER_DEF_CONST(_G, PLAYER_ICE);
 
-    _G["CHARACTER_MARIO"] = CHARACTER_MARIO;
-    _G["CHARACTER_LUIGI"] = CHARACTER_LUIGI;
-    _G["CHARACTER_PEACH"] = CHARACTER_PEACH;
-    _G["CHARACTER_TOAD"] = CHARACTER_TOAD;
-    _G["CHARACTER_LINK"] = CHARACTER_LINK;
+    LUAHELPER_DEF_CONST(_G, CHARACTER_MARIO);
+    LUAHELPER_DEF_CONST(_G, CHARACTER_LUIGI);
+    LUAHELPER_DEF_CONST(_G, CHARACTER_PEACH);
+    LUAHELPER_DEF_CONST(_G, CHARACTER_TOAD);
+    LUAHELPER_DEF_CONST(_G, CHARACTER_LINK);
 
     _G["FIND_ANY"] = -1;
 
@@ -205,12 +212,13 @@ void CLunaLua::setupDefaults()
     _G["DIR_RANDOM"] = 0;
     _G["DIR_LEFT"] = -1;
 
-    _G["FIELD_BYTE"] = 1;
-    _G["FIELD_WORD"] = 2;
-    _G["FIELD_DWORD"] = 3;
-    _G["FIELD_FLOAT"] = 4;
-    _G["FIELD_DFLOAT"] = 5;
-    _G["FIELD_STRING"] = 6;
+    _G["FIELD_BYTE"] = LuaProxy::LFT_BYTE;
+    _G["FIELD_WORD"] = LuaProxy::LFT_WORD;
+    _G["FIELD_DWORD"] = LuaProxy::LFT_DWORD;
+    _G["FIELD_FLOAT"] = LuaProxy::LFT_FLOAT;
+    _G["FIELD_DFLOAT"] = LuaProxy::LFT_DFLOAT;
+    _G["FIELD_STRING"] = LuaProxy::LFT_STRING;
+    _G["FIELD_BOOL"] = LuaProxy::LFT_BOOL;
 
     _G["KEY_UP"] = GM_PLAYER_KEY_UP;
     _G["KEY_DOWN"] = GM_PLAYER_KEY_DOWN;
@@ -223,20 +231,40 @@ void CLunaLua::setupDefaults()
     _G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
     _G["KEY_STR"] = GM_PLAYER_KEY_STR;
 
-    _G["WHUD_ALL"] = WHUD_ALL;
-    _G["WHUD_ONLY_OVERLAY"] = WHUD_ONLY_OVERLAY;
-    _G["WHUD_NONE"] = WHUD_NONE;
+    LUAHELPER_DEF_CONST(_G, WHUD_ALL);
+    LUAHELPER_DEF_CONST(_G, WHUD_ONLY_OVERLAY);
+    LUAHELPER_DEF_CONST(_G, WHUD_NONE);
 
-    _G["EXITTYPE_ANY"] = EXITTYPE_ANY;
-    _G["EXITTYPE_BOSS"] = EXITTYPE_BOSS;
-    _G["EXITTYPE_CARD_ROULETTE"] = EXITTYPE_CARD_ROULETTE;
-    _G["EXITTYPE_CRYSTAL"] = EXITTYPE_CRYSTAL;
-    _G["EXITTYPE_NONE"] = EXITTYPE_NONE;
-    _G["EXITTYPE_OFFSCREEN"] = EXITTYPE_OFFSCREEN;
-    _G["EXITTYPE_SECRET"] = EXITTYPE_SECRET;
-    _G["EXITTYPE_STAR"] = EXITTYPE_STAR;
-    _G["EXITTYPE_TAPE"] = EXITTYPE_TAPE;
-    _G["EXITTYPE_WARP"] = EXITTYPE_WARP;
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_ANY);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_BOSS);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_CARD_ROULETTE);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_CRYSTAL);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_NONE);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_OFFSCREEN);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_SECRET);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_STAR);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_TAPE);
+    LUAHELPER_DEF_CONST(_G, EXITTYPE_WARP);
+
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_JUMP);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_FROMBELOW);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_NPC);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_PROJECTILE_USED);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_LAVA);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_HELD);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_TAIL);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_SPINJUMP);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_OFFSCREEN);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_SWORD);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_FIRE);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_ICE);
+    LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_HAMMER);
+
+    {
+        using namespace LuaProxy::Graphics;
+        LUAHELPER_DEF_CONST(_G, RTYPE_IMAGE);
+        LUAHELPER_DEF_CONST(_G, RTYPE_TEXT);
+    }
 
     _G["ODIR_UP"] = 1;
     _G["ODIR_LEFT"] = 2;
@@ -257,6 +285,37 @@ void CLunaLua::setupDefaults()
     
     _G["console"] = LuaProxy::Console();
 }
+
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
+LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::RECTd, RECTd);
+LUAHELPER_DEF_CLASS_HELPER(Event, Event);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Logger, Logger);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Data, Data);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Player, Player);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Camera, Camera);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::VBStr, VBStr);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::World, World);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Path, Path);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Musicbox, Musicbox);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::LevelObject, Level);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Warp, Warp);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Animation, Animation);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Layer, Layer);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Section, Section);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Block, Block);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::BGO, BGO);
+
+
+// LUAHELPER_DEF_CLASS(LuaImageResource)
+
 
 void CLunaLua::bindAll()
 {
@@ -281,16 +340,18 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                class_<LuaProxy::Graphics::LuaImageResource>("LuaImageResource")
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>),
-                def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage),
-                def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const char*))&LuaProxy::Graphics::loadImage, adopt(result)),
+                LUAHELPER_DEF_CLASS(LuaImageResource)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+                    .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
+                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
+                def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
+                def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
-                def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const char*))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img))&LuaProxy::Graphics::unplaceSprites),
                 def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
@@ -311,10 +372,12 @@ void CLunaLua::bindAll()
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, int, int, int, int, int, int, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("draw", &LuaProxy::Graphics::draw),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
-                def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA)
+                def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA),
                 // glDrawTriangles will be defined at runtime using FFI
+                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw)
             ],
 
             namespace_("__Effects_EXPERIMENTAL")[
@@ -332,15 +395,19 @@ void CLunaLua::bindAll()
                 def("listLocalFiles", &LuaProxy::Misc::listLocalFiles),
                 def("resolveFile", &LuaProxy::Misc::resolveFile),
                 def("resolveDirectory", &LuaProxy::Misc::resolveDirectory),
+                def("isSamePath", &LuaProxy::Misc::isSamePath),
                 def("openPauseMenu", &LuaProxy::Misc::openPauseMenu),
                 def("saveGame", &LuaProxy::Misc::saveGame),
                 def("exitGame", &LuaProxy::Misc::exitGame),
-                def("loadEpisode", &LuaProxy::Misc::loadEpisode)
+                def("loadEpisode", &LuaProxy::Misc::loadEpisode),
+                def("pause", &LuaProxy::Misc::pause),
+                def("unpause", &LuaProxy::Misc::unpause),
+                def("isPausedByLua", &LuaProxy::Misc::isPausedByLua)
             ],
 
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure
-                class_<Mix_Chunk>("Mix_Chunk")
+                LUAHELPER_DEF_CLASS(Mix_Chunk)
                     .property("allocated", &Mix_Chunk::allocated)
                     .property("abuf", &Mix_Chunk::abuf)
                     .def_readwrite("alen", &Mix_Chunk::alen)
@@ -400,7 +467,7 @@ void CLunaLua::bindAll()
             ],
             /*************************Audio*end*************************/
 
-            class_<LuaProxy::InputConfig>("NativeInputConfig")
+            LUAHELPER_DEF_CLASS(NativeInputConfig)
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
             .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
             .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
@@ -413,30 +480,30 @@ void CLunaLua::bindAll()
             .property("dropitem", &LuaProxy::InputConfig::dropitem, &LuaProxy::InputConfig::setDropItem)
             .property("pause", &LuaProxy::InputConfig::pause, &LuaProxy::InputConfig::setPause),
 
-            class_<RECT>("RECT")
+            LUAHELPER_DEF_CLASS(RECT)
             .def_readwrite("left", &RECT::left)
             .def_readwrite("top", &RECT::top)
             .def_readwrite("right", &RECT::right)
             .def_readwrite("bottom", &RECT::bottom),
 
-            class_<LuaProxy::RECTd>("RECTd")
+            LUAHELPER_DEF_CLASS(RECTd)
             .def_readwrite("left", &LuaProxy::RECTd::left)
             .def_readwrite("top", &LuaProxy::RECTd::top)
             .def_readwrite("right", &LuaProxy::RECTd::right)
             .def_readwrite("bottom", &LuaProxy::RECTd::bottom),
 
-            class_<Event>("Event")
+            LUAHELPER_DEF_CLASS(Event)
             .property("eventName", &Event::eventName)
             .property("cancellable", &Event::isCancellable)
             .property("cancelled", &Event::cancelled, &Event::setCancelled)
             .property("loopable", &Event::getLoopable, &Event::setLoopable)
             .property("directEventName", &Event::getDirectEventName, &Event::setDirectEventName),
 
-            class_<LuaProxy::Logger>("Logger")
+            LUAHELPER_DEF_CLASS(Logger)
             .def(constructor<std::string>())
             .def("write", &LuaProxy::Logger::write),
 
-            class_<LuaProxy::Data>("Data")
+            LUAHELPER_DEF_CLASS(Data)
                 .enum_("DataTypes")
                 [
                     value("DATA_LEVEL", LuaProxy::Data::DATA_LEVEL),
@@ -456,7 +523,24 @@ void CLunaLua::bindAll()
             .property("sectionName", &LuaProxy::Data::sectionName, &LuaProxy::Data::setSectionName)
             .property("useSaveSlot", &LuaProxy::Data::useSaveSlot, &LuaProxy::Data::setUseSaveSlot),
 
-            class_<LuaProxy::PlayerSettings>("PlayerSettings")
+            LUAHELPER_DEF_CLASS(AsyncHTTPRequest)
+            .enum_("HTTP_METHOD")[
+                value("HTTP_POST", AsyncHTTPClient::HTTP_POST),
+                value("HTTP_GET", AsyncHTTPClient::HTTP_GET)
+            ]
+            .def(constructor<>())
+            .def("addArgument", &LuaProxy::AsyncHTTPRequest::addArgument)
+            .def("send", &LuaProxy::AsyncHTTPRequest::send)
+            .def("wait", &LuaProxy::AsyncHTTPRequest::wait)
+            .property("url", &LuaProxy::AsyncHTTPRequest::getUrl, &LuaProxy::AsyncHTTPRequest::setUrl)
+            .property("method", &LuaProxy::AsyncHTTPRequest::getMethod, &LuaProxy::AsyncHTTPRequest::setMethod)
+            .property("ready", &LuaProxy::AsyncHTTPRequest::isReady)
+            .property("processing", &LuaProxy::AsyncHTTPRequest::isProcessing)
+            .property("finished", &LuaProxy::AsyncHTTPRequest::isFinished)
+            .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
+            .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
+
+            LUAHELPER_DEF_CLASS(PlayerSettings)
             .scope[
                 def("get", &LuaProxy::PlayerSettings::get)
             ]
@@ -475,7 +559,7 @@ void CLunaLua::bindAll()
             .property("powerup", &LuaProxy::PlayerSettings::getPowerupID, &LuaProxy::PlayerSettings::setPowerupID),
 
 
-            class_<LuaProxy::Player>("Player")
+            LUAHELPER_DEF_CLASS(Player)
             .scope[ //static functions
                 def("count", &LuaProxy::Player::count),
                     def("get", &LuaProxy::Player::get),
@@ -544,7 +628,8 @@ void CLunaLua::bindAll()
             .property("UnkClimbing1", &LuaProxy::Player::unkClimbing1, &LuaProxy::Player::setUnkClimbing1)
             .property("UnkClimbing2", &LuaProxy::Player::unkClimbing2, &LuaProxy::Player::setUnkClimbing2)
             .property("UnkClimbing3", &LuaProxy::Player::unkClimbing3, &LuaProxy::Player::setUnkClimbing3)
-            .property("WaterState", &LuaProxy::Player::waterState, &LuaProxy::Player::setWaterState)
+            .property("WaterState", &LuaProxy::Player::waterOrQuicksandState, &LuaProxy::Player::setWaterOrQuicksandState) // Compat (this was undocumented auto-generated anyway)
+            .property("WaterOrQuicksandState", &LuaProxy::Player::waterOrQuicksandState, &LuaProxy::Player::setWaterOrQuicksandState)
             .property("IsInWater", &LuaProxy::Player::isInWater, &LuaProxy::Player::setIsInWater)
             .property("WaterStrokeTimer", &LuaProxy::Player::waterStrokeTimer, &LuaProxy::Player::setWaterStrokeTimer)
             .property("UnknownHoverTimer", &LuaProxy::Player::unknownHoverTimer, &LuaProxy::Player::setUnknownHoverTimer)
@@ -563,7 +648,8 @@ void CLunaLua::bindAll()
             .property("SpinjumpLandDirection", &LuaProxy::Player::spinjumpLandDirection, &LuaProxy::Player::setSpinjumpLandDirection)
             .property("CurrentKillCombo", &LuaProxy::Player::currentKillCombo, &LuaProxy::Player::setCurrentKillCombo)
             .property("GroundSlidingPuffsState", &LuaProxy::Player::groundSlidingPuffsState, &LuaProxy::Player::setGroundSlidingPuffsState)
-            .property("WarpNearby", &LuaProxy::Player::warpNearby, &LuaProxy::Player::setWarpNearby)
+            .property("WarpNearby", &LuaProxy::Player::nearbyWarpIndex, &LuaProxy::Player::setNearbyWarpIndex) // Compat (this was undocumented auto-generated anyway)
+            .property("NearbyWarpIndex", &LuaProxy::Player::nearbyWarpIndex, &LuaProxy::Player::setNearbyWarpIndex)
             .property("Unknown5C", &LuaProxy::Player::unknown5C, &LuaProxy::Player::setUnknown5C)
             .property("Unknown5E", &LuaProxy::Player::unknown5E, &LuaProxy::Player::setUnknown5E)
             .property("HasJumped", &LuaProxy::Player::hasJumped, &LuaProxy::Player::setHasJumped)
@@ -598,8 +684,7 @@ void CLunaLua::bindAll()
             .property("JumpButtonHeld", &LuaProxy::Player::jumpButtonHeld, &LuaProxy::Player::setJumpButtonHeld)
             .property("SpinjumpButtonHeld", &LuaProxy::Player::spinjumpButtonHeld, &LuaProxy::Player::setSpinjumpButtonHeld)
             .property("ForcedAnimationState", &LuaProxy::Player::forcedAnimationState, &LuaProxy::Player::setForcedAnimationState)
-            .property("Unknown124", &LuaProxy::Player::unknown124, &LuaProxy::Player::setUnknown124)
-            .property("Unknown128", &LuaProxy::Player::unknown128, &LuaProxy::Player::setUnknown128)
+            .property("ForcedAnimationTimer", &LuaProxy::Player::forcedAnimationTimer, &LuaProxy::Player::setForcedAnimationTimer)
             .property("DownButtonMirror", &LuaProxy::Player::downButtonMirror, &LuaProxy::Player::setDownButtonMirror)
             .property("InDuckingPosition", &LuaProxy::Player::inDuckingPosition, &LuaProxy::Player::setInDuckingPosition)
             .property("SelectButtonMirror", &LuaProxy::Player::selectButtonMirror, &LuaProxy::Player::setSelectButtonMirror)
@@ -623,8 +708,9 @@ void CLunaLua::bindAll()
             .property("Unknown156", &LuaProxy::Player::unknown156, &LuaProxy::Player::setUnknown156)
             .property("PowerupBoxContents", &LuaProxy::Player::powerupBoxContents, &LuaProxy::Player::setPowerupBoxContents)
             .property("CurrentSection", &LuaProxy::Player::currentSection, &LuaProxy::Player::setCurrentSection)
-            .property("WarpTimer", &LuaProxy::Player::warpTimer, &LuaProxy::Player::setWarpTimer)
-            .property("Unknown15E", &LuaProxy::Player::unknown15E, &LuaProxy::Player::setUnknown15E)
+            .property("WarpTimer", &LuaProxy::Player::warpCooldownTimer, &LuaProxy::Player::setWarpCooldownTimer) // Compat (this was undocumented auto-generated anyway)
+            .property("WarpCooldownTimer", &LuaProxy::Player::warpCooldownTimer, &LuaProxy::Player::setWarpCooldownTimer)
+            .property("TargetWarpIndex", &LuaProxy::Player::targetWarpIndex, &LuaProxy::Player::setTargetWarpIndex)
             .property("ProjectileTimer1", &LuaProxy::Player::projectileTimer1, &LuaProxy::Player::setProjectileTimer1)
             .property("ProjectileTimer2", &LuaProxy::Player::projectileTimer2, &LuaProxy::Player::setProjectileTimer2)
             .property("TailswipeTimer", &LuaProxy::Player::tailswipeTimer, &LuaProxy::Player::setTailswipeTimer)
@@ -646,17 +732,21 @@ void CLunaLua::bindAll()
 #pragma endregion
 #endif
 
-            class_<LuaProxy::Camera>("Camera")
+            LUAHELPER_DEF_CLASS(Camera)
             .scope[ //static functions
                 def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Camera::get)),
                 def("getX", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getX)),
                 def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
             ]
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
-            .property("x", &LuaProxy::Camera::x)
-            .property("y", &LuaProxy::Camera::y)
-            .property("width", &LuaProxy::Camera::width)
-            .property("height", &LuaProxy::Camera::height),
+            .def("mem", static_cast<void (LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Camera::mem))
+            .def("mem", static_cast<luabind::object(LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Camera::mem))
+            .property("x", &LuaProxy::Camera::x, &LuaProxy::Camera::setX)
+            .property("y", &LuaProxy::Camera::y, &LuaProxy::Camera::setY)
+            .property("renderX", &LuaProxy::Camera::renderX, &LuaProxy::Camera::setRenderX)
+            .property("renderY", &LuaProxy::Camera::renderY, &LuaProxy::Camera::setRenderY)
+            .property("width", &LuaProxy::Camera::width, &LuaProxy::Camera::setWidth)
+            .property("height", &LuaProxy::Camera::height, &LuaProxy::Camera::setHeight),
 
 
             def("newRECT", &LuaProxy::newRECT),
@@ -670,7 +760,7 @@ void CLunaLua::bindAll()
                     def("save", &LuaProxy::SaveBankProxy::save)
             ],
 
-            class_<LuaProxy::VBStr>("VBStr")
+            LUAHELPER_DEF_CLASS(VBStr)
             .def(constructor<long>())
             .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
             .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
@@ -690,7 +780,7 @@ void CLunaLua::bindAll()
                     def("getOverworldHudState", &LuaProxy::Graphics::getOverworldHudState)
                 ],
 
-                class_<LuaProxy::World>("World")
+                LUAHELPER_DEF_CLASS(World)
                 .property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
                 .property("playerY", &LuaProxy::World::playerY, &LuaProxy::World::setPlayerY)
                 .property("playerWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
@@ -705,7 +795,71 @@ void CLunaLua::bindAll()
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
-                class_<LuaProxy::LevelObject>("Level")
+                LUAHELPER_DEF_CLASS(Tile)
+                .scope[ //static functions
+                    def("count", &LuaProxy::Tile::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Tile::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Tile::get)),
+                    def("getIntersecting", &LuaProxy::Tile::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Tile, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Tile::id, &LuaProxy::Tile::setId)
+                .property("x", &LuaProxy::Tile::x, &LuaProxy::Tile::setX)
+                .property("y", &LuaProxy::Tile::y, &LuaProxy::Tile::setY)
+                .property("width", &LuaProxy::Tile::width, &LuaProxy::Tile::setWidth)
+                .property("height", &LuaProxy::Tile::height, &LuaProxy::Tile::setHeight)
+                .property("isValid", &LuaProxy::Tile::isValid),
+
+                LUAHELPER_DEF_CLASS(Scenery)
+                .scope[ //static functions
+                    def("count", &LuaProxy::Scenery::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Scenery::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Scenery::get)),
+                    def("getIntersecting", &LuaProxy::Scenery::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Scenery, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Scenery::id, &LuaProxy::Scenery::setId)
+                .property("x", &LuaProxy::Scenery::x, &LuaProxy::Scenery::setX)
+                .property("y", &LuaProxy::Scenery::y, &LuaProxy::Scenery::setY)
+                .property("width", &LuaProxy::Scenery::width, &LuaProxy::Scenery::setWidth)
+                .property("height", &LuaProxy::Scenery::height, &LuaProxy::Scenery::setHeight)
+                .property("isValid", &LuaProxy::Scenery::isValid),
+
+                LUAHELPER_DEF_CLASS(Path)
+                .scope[ //static functions
+                    def("count", &LuaProxy::Path::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Path::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Path::get)),
+                    def("getIntersecting", &LuaProxy::Path::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Path, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Path::id, &LuaProxy::Path::setId)
+                .property("x", &LuaProxy::Path::x, &LuaProxy::Path::setX)
+                .property("y", &LuaProxy::Path::y, &LuaProxy::Path::setY)
+                .property("width", &LuaProxy::Path::width, &LuaProxy::Path::setWidth)
+                .property("height", &LuaProxy::Path::height, &LuaProxy::Path::setHeight)
+                .property("isValid", &LuaProxy::Path::isValid),
+
+                LUAHELPER_DEF_CLASS(Musicbox)
+                .scope[ //static functions
+                    def("count", &LuaProxy::Musicbox::count),
+                    def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Musicbox::get)),
+                    def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::Musicbox::get)),
+                    def("getIntersecting", &LuaProxy::Musicbox::getIntersecting)
+                ]
+                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Musicbox, m_index))
+                .def(constructor<int>())
+                .property("id", &LuaProxy::Musicbox::id, &LuaProxy::Musicbox::setId)
+                .property("x", &LuaProxy::Musicbox::x, &LuaProxy::Musicbox::setX)
+                .property("y", &LuaProxy::Musicbox::y, &LuaProxy::Musicbox::setY)
+                .property("width", &LuaProxy::Musicbox::width, &LuaProxy::Musicbox::setWidth)
+                .property("height", &LuaProxy::Musicbox::height, &LuaProxy::Musicbox::setHeight)
+                .property("isValid", &LuaProxy::Musicbox::isValid),
+
+                LUAHELPER_DEF_CLASS(Level)
                 .scope[ //static functions
                         def("count", &LuaProxy::LevelObject::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::LevelObject::get),
@@ -746,7 +900,12 @@ void CLunaLua::bindAll()
                 
                 namespace_("Misc")[
                     def("npcToCoins", &LuaProxy::Misc::npcToCoins),
-                    def("doPOW", &LuaProxy::Misc::doPOW)
+                    def("doPOW", &LuaProxy::Misc::doPOW),
+                    def("doPSwitchRaw", &LuaProxy::Misc::doPSwitchRaw),
+                    def("doPSwitch", (void(*)())&LuaProxy::Misc::doPSwitch),
+                    def("doPSwitch", (void(*)(bool))&LuaProxy::Misc::doPSwitch),
+                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
+                    def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
 
                 namespace_("Level")[
@@ -756,7 +915,7 @@ void CLunaLua::bindAll()
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
-                    def("loadPlayerHitBoxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes)
+                    def("loadPlayerHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
                 ],
 
                 namespace_("Graphics")[
@@ -764,7 +923,7 @@ void CLunaLua::bindAll()
                     def("isHudActivated", &LuaProxy::Graphics::isHudActivated)
                 ],
 
-                class_<LuaProxy::Warp>("Warp")
+                LUAHELPER_DEF_CLASS(Warp)
                 .scope[
                         def("count", &LuaProxy::Warp::count),
                         def("get", &LuaProxy::Warp::get),
@@ -784,7 +943,7 @@ void CLunaLua::bindAll()
 
 
 
-                class_<LuaProxy::Animation>("Animation")
+                LUAHELPER_DEF_CLASS(Animation)
                 .scope[ //static functions
                         def("count", &LuaProxy::Animation::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Animation::get)),
@@ -811,7 +970,7 @@ void CLunaLua::bindAll()
                 .property("drawOnlyMask", &LuaProxy::Animation::drawOnlyMask, &LuaProxy::Animation::setDrawOnlyMask)
                 .property("isValid", &LuaProxy::Animation::isValid),
 
-                class_<LuaProxy::Layer>("Layer")
+                LUAHELPER_DEF_CLASS(Layer)
                 .scope[ //static functions
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Layer::get),
                         def("get", (luabind::object(*)(const std::string& , lua_State* L))&LuaProxy::Layer::get),
@@ -828,7 +987,7 @@ void CLunaLua::bindAll()
                 .property("speedY", &LuaProxy::Layer::speedY, &LuaProxy::Layer::setSpeedY)
                 .property("layerName", &LuaProxy::Layer::layerName),
 
-                class_<LuaProxy::Section>("Section")
+                LUAHELPER_DEF_CLASS(Section)
                 .scope[
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Section::get),
                     def("get", (LuaProxy::Section(*)(short, lua_State* L))&LuaProxy::Section::get)
@@ -843,17 +1002,17 @@ void CLunaLua::bindAll()
                 .property("noTurnBack", &LuaProxy::Section::noTurnBack, &LuaProxy::Section::setNoTurnBack)
                 .property("isUnderwater", &LuaProxy::Section::isUnderwater, &LuaProxy::Section::setIsUnderwater),
 
-                class_<LuaProxy::NPC>("NPC")
+                LUAHELPER_DEF_CLASS(NPC)
                 .scope[ //static functions
                     def("count", &LuaProxy::NPC::count),
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::NPC::get),
+                    def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::NPC::get),
                     def("get", (luabind::object(*)(luabind::object, luabind::object, lua_State* L))&LuaProxy::NPC::get),
                     def("getIntersecting", &LuaProxy::NPC::getIntersecting),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
                 ]
-
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::NPC, m_index))
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::NPC::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::NPC::mem))
@@ -862,6 +1021,10 @@ void CLunaLua::bindAll()
                 .def("kill", static_cast<void (LuaProxy::NPC::*)(int, lua_State*)>(&LuaProxy::NPC::kill))
                 .def("toIce", &LuaProxy::NPC::toIce)
                 .def("toCoin", &LuaProxy::NPC::toCoin)
+                .def("harm", static_cast<void (LuaProxy::NPC::*)(lua_State*)>(&LuaProxy::NPC::harm))
+                .def("harm", static_cast<void (LuaProxy::NPC::*)(short, lua_State*)>(&LuaProxy::NPC::harm))
+                .def("harm", static_cast<void (LuaProxy::NPC::*)(short, float, lua_State*)>(&LuaProxy::NPC::harm))
+                .property("idx", &LuaProxy::NPC::idx)
                 .property("id", &LuaProxy::NPC::id, &LuaProxy::NPC::setId)
                 .property("isHidden", &LuaProxy::NPC::isHidden, &LuaProxy::NPC::setIsHidden)
                 .property("direction", &LuaProxy::NPC::direction, &LuaProxy::NPC::setDirection)
@@ -901,7 +1064,7 @@ void CLunaLua::bindAll()
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
-                class_<LuaProxy::Block>("Block")
+                LUAHELPER_DEF_CLASS(Block)
                 .scope[ //static functions
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
@@ -935,7 +1098,7 @@ void CLunaLua::bindAll()
                 .property("layerName", &LuaProxy::Block::layerName)
                 .property("layerObj", &LuaProxy::Block::layerObj),
 
-                class_<LuaProxy::BGO>("BGO")
+                LUAHELPER_DEF_CLASS(BGO)
                 .scope[ //static functions
                         def("count", &LuaProxy::BGO::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
@@ -969,18 +1132,18 @@ void CLunaLua::bindAllDeprecated()
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
             def("printText", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print), //DONE
             def("printText", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print), //DONE
-            def("loadImage", (bool(*)(const char*, int, int))&LuaProxy::Graphics::loadImage), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*, int))&LuaProxy::Graphics::placeSprite), //DONE
-            def("placeSprite", (void(*)(int, int, int, int, const char*))&LuaProxy::Graphics::placeSprite), //DONE
+            def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite), //DONE
+            def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite), //DONE
             def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite), //DONE
 
             /*************************Audio*****************************/
             //Old Audio stuff
             def("playSFX", (void(*)(int))&LuaProxy::playSFX),
-            def("playSFX", (void(*)(const char*))&LuaProxy::playSFX),
-            def("playSFXSDL", (void(*)(const char*))&LuaProxy::playSFXSDL),
+            def("playSFX", (void(*)(const std::string&))&LuaProxy::playSFX),
+            def("playSFXSDL", (void(*)(const std::string&))&LuaProxy::playSFXSDL),
             def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
-            def("MusicOpen", (void(*)(const char*))&LuaProxy::MusicOpen),
+            def("MusicOpen", (void(*)(const std::string&))&LuaProxy::MusicOpen),
             def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),
             def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::MusicPlay),
             def("MusicStop", (void(*)())&LuaProxy::MusicStop),
@@ -1004,7 +1167,7 @@ void CLunaLua::bindAllDeprecated()
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent), //In next version event namespace
                 def("playMusic", &LuaProxy::playMusic), //DONE
-                def("loadHitboxes", (void(*)(int, int, const char*))&LuaProxy::loadHitboxes),
+                def("loadHitboxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]
@@ -1041,8 +1204,14 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
+    SafeFPUControl noFPUExecptions;
+
     //If the lua module is not valid anyway, then just return
     if(!isValid())
+        return;
+
+    // If is not ready (SMBX not init), then skip event loop
+    if (!m_ready)
         return;
 
     
@@ -1054,11 +1223,26 @@ void CLunaLua::doEvents()
         }
     }
 
+
     Event* onLoopEvent = new Event("onLoop", false);
     onLoopEvent->setLoopable(false);
     onLoopEvent->setDirectEventName("onLoop");
     callEvent(onLoopEvent);
     delete onLoopEvent;
+
+    if (!m_eventLoopOnceExecuted) {
+        Event* onStartEvent = new Event("onStart", false);
+        onStartEvent->setLoopable(false);
+        onStartEvent->setDirectEventName("onStart");
+        callEvent(onStartEvent);
+        delete onStartEvent;
+        m_eventLoopOnceExecuted = true;
+    
+        // If an error happened in onStart then return.
+        if (!isValid())
+            return;
+    }
+    
 
     bool err = false;
     try

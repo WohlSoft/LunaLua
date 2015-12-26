@@ -10,6 +10,10 @@ extern "C" __declspec(dllexport) int OnLvlLoad();
 
 extern "C" __declspec(dllexport) int HUDHook();
 
+extern "C" {
+    __declspec(dllexport) int UltimateProxy();
+}
+
 // Other funcs
 void LunaDLLInit();
 
@@ -17,7 +21,7 @@ void TestFrameCode();
 
 void LevelFrameCode();
 
-void OnHUDDraw();
+void OnLevelHUDDraw(int cameraIdx);
 
 void InitLevel();
 

@@ -5,6 +5,7 @@
 #include <smbxconfig.h>
 #include <QScopedPointer>
 #include <QProcess>
+#include <QUrl>
 #include "launcherconfiguration.h"
 
 namespace Ui {
@@ -27,6 +28,7 @@ public slots:
 
     void runSMBX();
     void runSMBXEditor();
+    void runPGEEditor();
     void loadEpisodeWebpage(const QString& file);
 
     //General stuff
@@ -34,7 +36,8 @@ public slots:
 
     //Error handlers
     void jsonErrHandler(VALIDATE_ERROR errType, const QString& errChild);
-
+private slots:
+    void openURL(QUrl url);
 private:
     void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);
@@ -42,6 +45,8 @@ private:
     QScopedPointer<SMBXConfig> m_smbxConfig;
     QScopedPointer<LauncherConfiguration> m_launcherSettings;
     QString m_smbxExe;
+    QString m_pgeExe;
+    bool m_ApplyLunaLoaderPatch;
     Ui::MainLauncherWindow *ui;
 };
 

@@ -14,9 +14,9 @@ void Autocode::LunaControl(LunaControlAct act, int val) {
 
 	case LCA_SMBXHUD:
 		if(val == 1)
-			gSkipSMBXHUD = true;
+			gSMBXHUDSettings.skip = true;
 		else
-			gSkipSMBXHUD = false;
+			gSMBXHUDSettings.skip = false;
 		break;
 	
 	case LCA_Invalid:

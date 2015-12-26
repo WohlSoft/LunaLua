@@ -1,5 +1,6 @@
 #include "CellManager.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
 
 // CELL :: COUNT
@@ -235,7 +236,7 @@ void CellManager::GetObjectsOfInterest(std::list<CellObj>* objs, double x, doubl
 }
 
 // CELL MANAGER :: GET UNIQUE OBJS
-void CellManager::GetUniqueObjs(list<CellObj>* objlist, double x, double y) {
+void CellManager::GetUniqueObjs(std::list<CellObj>* objlist, double x, double y) {
 	int hash_i = ComputeHashBucketIndex((int)x, (int)y);
 	Cell* sought_cell = FindCell(hash_i, (int)x, (int)y);
 
@@ -246,7 +247,7 @@ void CellManager::GetUniqueObjs(list<CellObj>* objlist, double x, double y) {
         {
             CellObj cellobj = *it;
             // Loop over all objs in this cell
-			for(list<CellObj>::iterator iter = objlist->begin(), end = objlist->end(); iter != end; ++iter) { // Compare to each passed obj
+			for(std::list<CellObj>::iterator iter = objlist->begin(), end = objlist->end(); iter != end; ++iter) { // Compare to each passed obj
 				if((*iter).pObj == cellobj.pObj) { // Set to not add if pointing to same obj
 					add = false;
 					break;
@@ -260,10 +261,10 @@ void CellManager::GetUniqueObjs(list<CellObj>* objlist, double x, double y) {
 }
 
 // CELL MANAGER :: SORT BY NEAREST
-void CellManager::SortByNearest(list<CellObj>* objlist, double cx, double cy) {
-	vector<CellObj> objvec(objlist->begin(), objlist->end());
-	vector<double> distlist(objvec.size(), 99999);
-	list<CellObj> sortedlist;	
+void CellManager::SortByNearest(std::list<CellObj>* objlist, double cx, double cy) {
+    std::vector<CellObj> objvec(objlist->begin(), objlist->end());
+    std::vector<double> distlist(objvec.size(), 99999);
+    std::list<CellObj> sortedlist;
 
 	for (unsigned int i = 0; i < objvec.size(); i++) {		
 		CellObj obj = objvec[i];

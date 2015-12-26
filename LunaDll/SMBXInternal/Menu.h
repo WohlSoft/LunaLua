@@ -1,8 +1,8 @@
 #ifndef Menu_hhhhh
 #define Menu_hhhhh
 
-#include "../Defines.h"
 #include <vector>
+#include "../Defines.h"
 
 struct EpisodeListItem
 {

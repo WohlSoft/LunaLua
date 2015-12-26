@@ -29,7 +29,7 @@ bool ControlConfig::read()
     in.setAutoDetectUnicode(true);
     in.setLocale(QLocale::system());
     in.setCodec(QTextCodec::codecForLocale());
-    m_data =  FileFormats::ReadSMBX64ConfigFile( in.readAll(), m_configFilename);
+    m_data =  FileFormats::ReadSMBX64ConfigFile(in.readAll());
     if(m_data.ReadFileValid)
         return true;
     else
@@ -51,7 +51,7 @@ bool ControlConfig::write()
     {
         if(raw[i]=='\n')
         {
-            //Force writing CRLF to prevent fakse damage of file on SMBX in Windows
+            //Force writing CRLF to prevent false damage of file on SMBX in Windows
             const char bytes[2] = {0x0D, 0x0A};
             file.write((const char*)(&bytes), 2);
         }

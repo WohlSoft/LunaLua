@@ -1,5 +1,5 @@
-#include "ErrorReporter.h"
 #include <windows.h>
+#include "ErrorReporter.h"
 #include <dbghelp.h>
 #include "../GlobalFuncs.h"
 #include "../Defines.h"

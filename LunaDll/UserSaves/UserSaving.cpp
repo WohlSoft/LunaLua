@@ -1,9 +1,11 @@
-#include "UserSaving.h"
-#include "../Misc/MiscFuncs.h"
-#include "../GlobalFuncs.h"
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include "UserSaving.h"
+#include "../Globals.h"
+#include "../Misc/MiscFuncs.h"
+#include "../GlobalFuncs.h"
 
 #define SPECIAL_SAVE_STR L"__LunaVarBankSpecialCounter"
 
@@ -15,19 +17,19 @@ void SavedVariableBank::Init() {
 bool SavedVariableBank::TryLoadWorldVars() {
 	if(Saves::GetCurSaveSlot() > 3)
 		return false;
-	wstring full_path = GetSaveFileFullPath(GetSaveFileName());
+    std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 
 	ClearBank();
 
 	// Try to open the file
-    wfstream var_file(wstr2str(full_path).c_str(), ios::in|ios::out);
+    std::wfstream var_file(wstr2str(full_path).c_str(), std::ios::in | std::ios::out);
 
 	// If open failed, try to create empty file
 	if(var_file.is_open() == false) {
-        var_file.open(wstr2str(full_path).c_str(), ios::out);
+        var_file.open(wstr2str(full_path).c_str(), std::ios::out);
 		var_file.flush();	
 		var_file.close();
-        var_file.open(wstr2str(full_path).c_str(), ios::in|ios::out);;
+        var_file.open(wstr2str(full_path).c_str(), std::ios::in | std::ios::out);;
 	}
 
 	// If create failed, get out
@@ -35,14 +37,14 @@ bool SavedVariableBank::TryLoadWorldVars() {
 		return false;
 
 	// If size < 2 bytes, init new save file
-	var_file.seekg(0, fstream::end);
+	var_file.seekg(0, std::fstream::end);
 	int cursize = (int)var_file.tellg();
-	var_file.seekg(0, fstream::beg);
+	var_file.seekg(0, std::fstream::beg);
 
 	if(cursize < 2) {
 		InitSaveFile(&var_file);
 		var_file.flush();		
-		var_file.seekg(0, fstream::beg);
+		var_file.seekg(0, std::fstream::beg);
 	}
 
 	ReadFile(&var_file);
@@ -53,13 +55,13 @@ bool SavedVariableBank::TryLoadWorldVars() {
 }
 
 // GET SAVE FILE NAME
-wstring SavedVariableBank::GetSaveFileName() {
-	return L"LunaSavedVars" + to_wstring((long long)Saves::GetCurSaveSlot()) + L".txt";
+std::wstring SavedVariableBank::GetSaveFileName() {
+	return L"LunaSavedVars" + std::to_wstring((long long)Saves::GetCurSaveSlot()) + L".txt";
 }
 
 // GET SAVE FILE FULL PATH
-wstring SavedVariableBank::GetSaveFileFullPath(wstring save_file_name) {
-    wstring full_path = (wstring)GM_FULLDIR;
+std::wstring SavedVariableBank::GetSaveFileFullPath(std::wstring save_file_name) {
+    std::wstring full_path = (std::wstring)GM_FULLDIR;
 
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(save_file_name);
@@ -67,22 +69,22 @@ wstring SavedVariableBank::GetSaveFileFullPath(wstring save_file_name) {
 }
 
 // INIT SAVE FILE
-void SavedVariableBank::InitSaveFile(wfstream* pFilestream) {
+void SavedVariableBank::InitSaveFile(std::wfstream* pFilestream) {
 	if(pFilestream != NULL && pFilestream->is_open()) {
-		*pFilestream << L"__Lunadll_Version" << endl;
-		*pFilestream << LUNA_VERSION << endl;
+		*pFilestream << L"__Lunadll_Version" << std::endl;
+		*pFilestream << LUNA_VERSION << std::endl;
 	}
 }
 
 // READ FILE
 // The format of the save file is simply keys and values separated by newlines
-void SavedVariableBank::ReadFile(wfstream* pFilestream) {
+void SavedVariableBank::ReadFile(std::wfstream* pFilestream) {
 	if(pFilestream != NULL && pFilestream->is_open()) {
-		wstring line;		
+        std::wstring line;
 		double val = 0;
 		while(getline(*pFilestream, line)) {
-			wstring key = line;
-			wstring val_str;
+            std::wstring key = line;
+            std::wstring val_str;
 			getline(*pFilestream, val_str);
 			val = _wtof(val_str.c_str());
 			SetVar(key, val);
@@ -91,19 +93,19 @@ void SavedVariableBank::ReadFile(wfstream* pFilestream) {
 }
 
 // SET VAR
-void SavedVariableBank::SetVar(wstring k, double v) {
+void SavedVariableBank::SetVar(std::wstring k, double v) {
 	m_VarBank[k] = v;
 }
 
 // GET VAR
-double SavedVariableBank::GetVar(wstring key) {
+double SavedVariableBank::GetVar(std::wstring key) {
 	if(!VarExists(key))
 		return 0;
 	return m_VarBank[key];
 }
 
 // VAR EXISTS
-bool SavedVariableBank::VarExists(wstring k) {
+bool SavedVariableBank::VarExists(std::wstring k) {
 	if(m_VarBank.find(k) == m_VarBank.end())
 		return false;
 	return true;
@@ -118,12 +120,12 @@ void SavedVariableBank::ClearBank() {
 void SavedVariableBank::WriteBank() {
 	if(Saves::GetCurSaveSlot() > 3)
 		return;
-	wstring full_path = GetSaveFileFullPath(GetSaveFileName());
+    std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 
-    wfstream var_file(wstr2str(full_path).c_str(), ios::out|ios::trunc);
+    std::wfstream var_file(wstr2str(full_path).c_str(), std::ios::out | std::ios::trunc);
 
-	for(map<wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
-		var_file << it->first << endl << it->second << endl;
+	for(std::map<std::wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
+		var_file << it->first << std::endl << it->second << std::endl;
 	}
 
 	var_file.flush();
@@ -134,7 +136,7 @@ void SavedVariableBank::WriteBank() {
 void SavedVariableBank::CheckSaveDeletion() {
 	if(Saves::GetCurSaveSlot() > 3)
 		return;
-	wstring star_counter = SPECIAL_SAVE_STR;
+    std::wstring star_counter = SPECIAL_SAVE_STR;
 	if(!VarExists(star_counter))
 		SetVar(star_counter, GM_STAR_COUNT);		
 
@@ -142,11 +144,11 @@ void SavedVariableBank::CheckSaveDeletion() {
 	if(GM_STAR_COUNT < GetVar(SPECIAL_SAVE_STR)) {
 
 		if(true) //DEBUG
-			gLogger.Log(L"Deleting user save file - Star count: " + to_wstring((long long)GM_STAR_COUNT) + L" slot: " + to_wstring((long long)Saves::GetCurSaveSlot()), LOG_STD);
+			gLogger.Log(L"Deleting user save file - Star count: " + std::to_wstring((long long)GM_STAR_COUNT) + L" slot: " + std::to_wstring((long long)Saves::GetCurSaveSlot()), LOG_STD);
 
-		wstring full_path = GetSaveFileFullPath(GetSaveFileName());
+        std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 		ClearBank();
-        wfstream var_file(wstr2str(full_path).c_str(), ios::out);
+        std::wfstream var_file(wstr2str(full_path).c_str(), std::ios::out);
 		InitSaveFile(&var_file);
 		var_file.flush();
 		var_file.close();
@@ -163,9 +165,9 @@ void SavedVariableBank::SaveIfNeeded() {
 }
 
 //COPY BANK
-void SavedVariableBank::CopyBank(map<wstring, double>* target_map) {
+void SavedVariableBank::CopyBank(std::map<std::wstring, double>* target_map) {
 	if(target_map != NULL) {
-		for(map<wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
+		for(std::map<std::wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
 			(*target_map)[it->first] = it->second;
 		}
 	}

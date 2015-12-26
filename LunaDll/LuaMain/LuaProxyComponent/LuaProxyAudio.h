@@ -55,7 +55,7 @@ namespace LuaProxy
 		int SfxSet3DPosition(int channel, int angle, int distance);
 		int SfxReverseStereo(int channel, int flip);
 
-        std::string getSfxPath(std::string path);
+        std::string getSfxPath(const std::string& path);
         void setMciSection(int section);
         void resetMciSections();
 

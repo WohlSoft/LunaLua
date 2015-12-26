@@ -4,6 +4,7 @@
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
+#include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
 #include "../../../Rendering/GLEngineProxy.h"
 #include <luabind/adopt_policy.hpp>
@@ -18,32 +19,48 @@ LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
     gLunaRender.DeleteImage(imgResource);
 }
 
+int LuaProxy::Graphics::LuaImageResource::GetWidth() {
+    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
+    if (bmpIt == gLunaRender.LoadedImages.cend()) {
+        return 0;
+    }
+    return bmpIt->second->m_W;
+}
+
+int LuaProxy::Graphics::LuaImageResource::GetHeight() {
+    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
+    if (bmpIt == gLunaRender.LoadedImages.cend()) {
+        return 0;
+    }
+    return bmpIt->second->m_H;
+}
+
 void LuaProxy::Graphics::activateHud(bool activate)
 {
-    gSkipSMBXHUD = !activate;
+    gSMBXHUDSettings.skip = !activate;
 }
 
 bool LuaProxy::Graphics::isHudActivated()
 {
-    return !gSkipSMBXHUD;
+    return !gSMBXHUDSettings.skip;
 }
 
 void LuaProxy::Graphics::activateOverworldHud(WORLD_HUD_CONTROL activateFlag)
 {
-    gOverworldHudControlFlag = activateFlag;
+    gSMBXHUDSettings.overworldHudState = activateFlag;
 }
 
 WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
 {
-    return gOverworldHudControlFlag;
+    return gSMBXHUDSettings.overworldHudState;
 }
 
-LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const char* filename)
+LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::string& filename, lua_State* L)
 {
     int resNumber = gLunaRender.GetAutoImageResourceCode();
     if (resNumber == 0) return NULL;
 
-    if (!gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber)) {
+    if (!gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber)) {
         // If image loading failed, return null
         return NULL;
     }
@@ -64,13 +81,13 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 
 
-bool LuaProxy::Graphics::loadImage(const char* filename, int resNumber, int transColor)
+bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(utf8_decode(std::string(filename)), resNumber, transColor);
+    return gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber, transColor);
 }
 
 
-void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra, int time)
+void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time)
 {
     CSpriteRequest req;
     req.type = type;
@@ -78,11 +95,11 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = utf8_decode(std::string(extra));
+    req.str = utf8_decode(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
-void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const char *extra)
+void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra)
 {
     placeSprite(type, imgResource, xPos, yPos, extra, 0);
 }
@@ -93,12 +110,12 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     placeSprite(type, imgResource, xPos, yPos, "");
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra, int time)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time)
 {
     placeSprite(type, img.imgResource, xPos, yPos, extra, time);
 }
 
-void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const char *extra)
+void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra)
 {
     placeSprite(type, img.imgResource, xPos, yPos, extra, 0);
 }
@@ -252,6 +269,90 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
 }
 
 
+void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
+{
+    if (luabind::type(namedArgs) != LUA_TTABLE) {
+        luaL_error(L, "Argument #1 must be a table with named arguments!");
+        return;
+    }
+    
+
+    int x, y;
+    RENDER_TYPE type;
+    double priority;
+    RenderOp* renderOperation;
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, x);
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, y);
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, type);
+    if (type == RTYPE_TEXT) 
+    {
+        priority = RENDEROP_DEFAULT_PRIORITY_TEXT;
+        RenderStringOp* strRenderOp = new RenderStringOp();
+
+        std::string text;
+        int fontType;
+        LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, text);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
+
+        strRenderOp->m_String = utf8_decode(text);
+        if (fontType == 3)
+            for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
+                *it = towupper(*it);
+        strRenderOp->m_X = (int)x;
+        strRenderOp->m_Y = (int)y;
+        strRenderOp->m_FontType = fontType;
+        renderOperation = strRenderOp;
+    }
+    else if (type == RTYPE_IMAGE) 
+    {
+        priority = RENDEROP_DEFAULT_PRIORITY_RENDEROP;
+        RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
+        
+        LuaImageResource* image;
+        unsigned int sourceX;
+        unsigned int sourceY;
+        unsigned int sourceWidth;
+        unsigned int sourceHeight;
+        float opacity;
+        bool isSceneCoordinates;
+
+        LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
+        const auto bmpIt = gLunaRender.LoadedImages.find(image->imgResource);
+        if (bmpIt == gLunaRender.LoadedImages.cend()) {
+            luaL_error(L, "Internal error: Failed to find image resource!");
+            return;
+        }
+        BMPBox* imgBox = bmpIt->second;
+
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, imgBox->m_W);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, imgBox->m_H);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
+
+        
+        bitmapRenderOp->direct_img = bmpIt->second;
+        bitmapRenderOp->sx = sourceX;
+        bitmapRenderOp->sy = sourceY;
+        bitmapRenderOp->sw = sourceWidth;
+        bitmapRenderOp->sh = sourceHeight;
+        bitmapRenderOp->x = x;
+        bitmapRenderOp->y = y;
+        renderOperation = bitmapRenderOp;
+    }
+    else
+    {
+        luaL_error(L, "No valid 'type'. Must be RTYPE_TEXT or RTYPE_IMAGE");
+    }
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, priority);
+ 
+    renderOperation->m_renderPriority = priority;
+    gLunaRender.AddOp(renderOperation);
+}
+
+
+
 bool LuaProxy::Graphics::isOpenGLEnabled()
 {
     return g_GLEngine.IsEnabled();
@@ -273,7 +374,10 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
         }
     }
 
-    gLunaRender.GLCmd(GLEngineCmd::SetTex(bmp, color));
+    auto obj = std::make_shared<GLEngineCmd_SetTexture>();
+    obj->mBmp = bmp;
+    obj->mColor = color;
+    gLunaRender.GLCmd(obj);
 }
 
 extern "C" {
@@ -282,6 +386,35 @@ extern "C" {
     }
 
     __declspec(dllexport) void __cdecl LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
-        gLunaRender.GLCmd(GLEngineCmd::DrawTriangles(vert, tex, count));
+        auto obj = std::make_shared<GLEngineCmd_Draw2DArray>();
+        obj->mType = GL_TRIANGLES;
+        obj->mVert = vert;
+        obj->mTex = tex;
+        obj->mCount = count;
+        gLunaRender.GLCmd(obj);
     }
+}
+
+void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count)
+{
+    const BMPBox* bmp = NULL;
+    if (img) {
+        auto it = gLunaRender.LoadedImages.find(img->imgResource);
+        if (it != gLunaRender.LoadedImages.end()) {
+            bmp = it->second;
+        }
+    }
+
+    auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
+    obj->mBmp = bmp;
+    obj->mColor[0] = r;
+    obj->mColor[1] = g;
+    obj->mColor[2] = b;
+    obj->mColor[3] = a;
+    obj->mType = GL_TRIANGLES;
+    obj->mVert = (const float*)vert;
+    obj->mTex = (const float*)tex;
+    obj->mVertColor = (const float*)color;
+    obj->mCount = count;
+    gLunaRender.GLCmd(obj, renderPriority);
 }

@@ -49,6 +49,7 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
     GetObject(m_hbmp, sizeof(BITMAP), &bm);
     m_H = bm.bmHeight;
     m_W = bm.bmWidth;
+    m_Filename = filename;
 }
 
 BMPBox::BMPBox(HBITMAP bitmapData, HDC screen_dc)

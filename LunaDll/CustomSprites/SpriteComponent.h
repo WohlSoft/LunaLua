@@ -4,8 +4,6 @@
 #include "../Defines.h"
 #include <string>
 
-using namespace std;
-
 struct SpriteComponent;
 class CSprite;
 
@@ -36,7 +34,7 @@ struct SpriteComponent {
 	int run_time;			// Run time frame countdown. 0 = infinite lifetime, always run
 	int org_time;			// Frame count to begin countdown at
 
-	wstring data5;
+	std::wstring data5;
 	bool expired;			// If this component should be deleted at the next clean up cycle
 };
 

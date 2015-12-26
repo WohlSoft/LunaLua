@@ -1,6 +1,7 @@
-#include "DeathCounter.h"
-#include "../SMBXInternal/PlayerMOB.h"
 #include <Windows.h>
+#include "DeathCounter.h"
+#include "../Globals.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
 #include "../SMBXInternal/Level.h"
 #include "../GlobalFuncs.h"

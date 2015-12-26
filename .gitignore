@@ -233,4 +233,10 @@ HardcodedGraphicsData
 !/LunaDll/libs/sdl/*
 !/LunaDll/libs/sdl_mingw/*
 
+/LunaLUA-bin/
+/LunaLUA-Loader-bin/
+
+/LunaLUA-bin.zip
+/LunaLoader-bin.zip
+
 *.bak

@@ -39,7 +39,7 @@
 //+0x32		w	= Climbing related
 
 //- WATER
-//+0x34		w	= 2 when in water
+//+0x34		w	= 2 when in water or quicksand
 //+0x36		w	= 0xFFFF when in water
 //+0x38		w	= Water stroke timer (can't stroke again until 0)
 
@@ -66,27 +66,27 @@
 // - STATES
 //+0x56		w	= Current enemy kill combo count
 //+0x58		w	= Ground sliding smoke puffs state
-//+0x5A		w	= Warp is nearby (1 = pipe, 2 = instant, 3 = door)
+//+0x5A		w	= Index/id of nearby warp entrance
 
 //+0x60		w	= Has jumped
-
 //+0x62		w	= Unknown62
-//+0x64		w	= Unknown64
-//+0x66		w	= Unknown66
-//+0x68		w	= Unknown68
-//+0x7A		w	= Unknown70
-//+0x7C		w	= Unknown72
 
 // - MOUNT 
+//+0x64		w	= Yoshi has earthquake (yellow shell)
+//+0x66		w	= Yoshi has flight (blue shell)
+//+0x68		w	= Yoshi has fire breath (red shell)
+
+//+0x7A		w	= Yoshi's animation frame (0-6 is left, 7-13 is right)
+//+0x7C		w	= Yoshi animation frame timer (rapidly increments from 0 to 31, freezes in the air, resets to 0 when pressing down; probably used to to move body and head with the animation)
 //+0x7E		w	= Mount upper X offset
 //+0x80		w	= Mount upper Y offset
 //+0x82		w	= Mount upper GFX index
 //+0x84		w	= Mount item in mouth swallow timer
 //+0x86		w	= Mount lower X offset
-//+0x88		w	= Mount upper Y offset
+//+0x88		w	= Mount upper Y offset (related to yoshi tongue)
 //+0x8A		w	= Mount lower GFX index
-//+0x8C		w	= Unknown82
-//+0x8E		w	= Unknown82
+//+0x8C		w	= Unknown8C
+//+0x8E		w	= Unknown8E
 //+0x90		qw	= Tongue X position
 //+0x98		qw	= Tongue Y position
 //+0xA0		qw	= Tongue height or hitbox related
@@ -120,7 +120,7 @@
 //+0x108	w	= Mount identity (0 = no mount,1 = boot, 2 = clowcar, 3 = yoshi)
 //+0x10A	w	= Mount color
 //+0x10C	w	= Mount state
-//+0x10E	w	= Mount height offset or something
+//+0x10E	w	= Mount sprite Y offset
 //+0x110	w	= Mount gfx index
 
 /// - STATES
@@ -132,9 +132,9 @@
 //+0x11E	w	= Holding jump button
 //+0x120	w	= Holding spinjump button
 //+0x122	w	= Forced animation state	(1 = powerup, 2 = powerdown, 3 = entering pipe, 4 = getting fire flower,
-//											 7 = entering door, 500 = tanooki statue poof state)
-//+0x124	f	= Unknown124
-//+0x128	f	= Unknown128
+//											 7 = entering door, 8 = invisible/immobile/intangible state (during fairy or character change poof),
+//                                           500 = tanooki statue poof state)
+//+0x124	qw	= Forced Animation Timer
 //+0x12C	w	= Down button mirror (redundant?)
 //+0x12E	w	= In ducking state
 //+0x130	w	= Select button mirror (redundant?)
@@ -165,8 +165,8 @@
 //
 // - SECTIONS
 //+0x15A	w	= Current section
-//+0x15C	w	= Warp timer (can't warp / pipe until 0)
-//+0x15E	w	= Unknwon15E
+//+0x15C	w	= Warp cooldown timer (can't warp / pipe until 0)
+//+0x15E	w	= Target warp exit index/id (not reset after finished warping)
 //
 // - PROJECTILES / ATTACKS
 //+0x160	w	= Projectile timer (fireballs, hammers, link slash..)
@@ -227,7 +227,7 @@ struct PlayerMOB {
     short UnkClimbing2;                 // +0x30
     short UnkClimbing3;
 
-    short WaterState;
+    short WaterOrQuicksandState;
     short IsInWater;
     short WaterStrokeTimer;
 
@@ -252,13 +252,36 @@ struct PlayerMOB {
 
     short CurrentKillCombo;
     short GroundSlidingPuffsState;
-    short WarpNearby;                    // (1 = pipe, 2 = instant, 3 = door)
+    short NearbyWarpIndex;              // Index of intersecting warp entrance
     short Unknown5C;
     short Unknown5E;
     
     short HasJumped;                    // +0x60
 
-    char padding[0x5e];                //pad to next
+    short Unknown62;
+    short YoshiHasEarthquake;
+    short YoshiHasFlight;
+    short YoshiHasFireBreath;
+    short Unknown6A;
+    short Unknown6C;
+    short Unknown6E;
+    short Unknown70;                    // +0x70
+    short Unknown72;
+    short Unknown74;
+    short Unknown76;
+    short Unknown78;
+    short MountAnimationFrame;
+    short MountFrameTimer;
+    short MountUpperXOffset;
+    short MountUpperYOffset;            // +0x80
+    short MountUpperGfxIndex;
+    short MountItemInMouthSwallowTimer;
+    short MountLowerXOffset;
+    short MountLowerYOffset;
+    short MountLowerGfxIndex;
+    short Unknown8C;
+    short Unknown8E;
+    Momentum MountTongueMomentum;       // +0x90
 
     Momentum momentum;
 
@@ -282,8 +305,7 @@ struct PlayerMOB {
     short JumpButtonHeld;
     short SpinjumpButtonHeld;
     short ForcedAnimationState;
-    float Unknown124;
-    float Unknown128;
+    double ForcedAnimationTimer;
 
     short DownButtonMirror;
     short InDuckingPosition;
@@ -313,8 +335,8 @@ struct PlayerMOB {
     short PowerupBoxContents;
 
     short CurrentSection;
-    short WarpTimer;
-    short Unknown15E;
+    short WarpCooldownTimer;
+    short TargetWarpIndex;
 
     short ProjectileTimer1;
     short ProjectileTimer2;

@@ -3,11 +3,13 @@
 #include <windows.h>
 #include <string>
 #include <list>
-//#include "BMPBox.h"
 #include <map>
+#include <vector>
+#include <memory>
+
+//#include "BMPBox.h"
 //#include "RenderOp.h"
 #include "GLEngineCmds.h"
-#include <vector>
 
 class RenderOp;
 class BMPBox;
@@ -28,7 +30,7 @@ struct Renderer {
     int  GetAutoImageResourceCode() const;
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
-    void GLCmd(const GLEngineCmd &cmd);
+    void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
     
     void DebugPrint(std::wstring message);				// Print a debug message on the screen
     void DebugPrint(std::wstring message, double val);	// Print a debug message on the screen and display a related value

@@ -1,8 +1,9 @@
+#include <comutil.h>
+#include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
 #include "../../LuaMain/LuaEvents.h"
 #include "../../LuaMain/LuaProxy.h"
-#include <comutil.h>
 #include "../../Input/Input.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
@@ -11,6 +12,7 @@
 #include "../ErrorReporter.h"
 
 #include "../SHMemServer.h"
+#include "../AsmPatch.h"
 
 #include "../../Rendering/GLEngine.h"
 #include "../../Main.h"
@@ -20,6 +22,9 @@
 #include "../../Rendering/RenderOverrideManager.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
+
+#include "../../SMBXInternal/NPCs.h"
+
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -113,6 +118,9 @@ extern void __stdcall forceTermination()
 
 extern int __stdcall LoadWorld()
 {
+    ResetLunaModule();
+    gIsOverworld = true;
+
 #ifndef NO_SDL
     if (!episodeStarted)
     {
@@ -122,16 +130,6 @@ extern int __stdcall LoadWorld()
     }
 #endif
 
-    gSkipSMBXHUD = false;
-    gIsOverworld = true;
-    gOverworldHudControlFlag = WHUD_ALL;
-    gLunaRender.ClearAll();
-    gSpriteMan.ResetSpriteManager();
-    gCellMan.Reset();
-    gSavedVarBank.ClearBank();
-    Input::ResetAll();
-
-    gLunaRender.ReloadScreenHDC();
     g_GLEngine.ClearSMBXSprites();
 
     // Init var bank
@@ -141,6 +139,7 @@ extern int __stdcall LoadWorld()
 
     gLunaLua = CLunaLua();
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
+    gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
     // Recount deaths
     gDeathCounter.Recount();
@@ -164,37 +163,22 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    /* TEST */
-    /*if (!gIntroRun){
-        //Load world list
-        native_loadWorldList();
-        //Slot selection
-        GM_CUR_MENUTYPE = 10;
-        //DEMO
-        GM_CUR_MENUPLAYER1 = 1;
-        //Second level
-        GM_CUR_MENULEVEL = 2;
-        //Load save states
-        native_loadSaveStates();
+    std::string autostartFile = utf8_encode(getLatestConfigFile(L"autostart.ini"));
 
-        *(WORD*)0xB2D6D4 = -1;
-    }*/
-    /* TEST END */
-    std::string autostartFile = utf8_encode(getModulePath()) + "\\autostart.ini";
-
-    if (!file_existsX(autostartFile))
-        return GetTickCount();
-
-    INIReader autostartConfig(autostartFile);
-    if (autostartConfig.GetBoolean("autostart", "do-autostart", false)){
-        if (!gAutostartRan){
-            GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-            autostarter.applyAutostart();
-            gAutostartRan = true;
+    if (file_existsX(autostartFile)) {
+        INIReader autostartConfig(autostartFile);
+        if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
+            if (!gAutostartRan) {
+                GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                autostarter.applyAutostart();
+                gAutostartRan = true;
+                if (autostartConfig.GetBoolean("autostart", "transient", false)) {
+                    remove(autostartFile.c_str());
+                }
+            }
         }
-        
     }
-
+    
     if (GameAutostartConfig::nextAutostartConfig) {
         GameAutostartConfig::nextAutostartConfig->doAutostart();
         GameAutostartConfig::nextAutostartConfig.reset();
@@ -214,7 +198,7 @@ extern DWORD __stdcall WorldLoop()
     Input::CheckSpecialCheats();
     Input::UpdateInputTasks();
 
-    gLunaLua.doEvents();
+    g_EventHandler.hookWorldLoop();
 
     gSavedVarBank.SaveIfNeeded();
 
@@ -222,6 +206,31 @@ extern DWORD __stdcall WorldLoop()
     return GetTickCount();
 }
 
+// HUD Drawing Patches
+static auto skipStarCountPatch = PatchCollection(
+    PATCH(0x973E85).CONDJMP_TO_NOPJMP(),
+    PATCH(0x97ADBF).CONDJMP_TO_NOPJMP(),
+    PATCH(0x9837A1).CONDJMP_TO_NOPJMP()
+    );
+
+// HUD Hook -- Runs each time the HUD is drawn.
+extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
+{
+    if (gLunaEnabled) {
+        OnLevelHUDDraw(*cameraIdx);
+    }
+
+    if (gSMBXHUDSettings.skipStarCount) {
+        skipStarCountPatch.Apply();
+    }
+    else {
+        skipStarCountPatch.Unapply();
+    }
+
+    if (!gSMBXHUDSettings.skip) {
+        native_renderLevelHud(cameraIdx, unknown0x4002);
+    }
+}
 
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
@@ -319,13 +328,13 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant)
 {
     if (asyncLogProc)
     {
-        stringstream q;
+        std::stringstream q;
         q << variant->vt << " ";
         if (variant->vt == VT_R8)
         {
             q << "src:" << variant->dblVal << " dst:" << static_cast<float>(variant->dblVal);
         }
-        string rr("vbaR4VarHook type:" + q.str() + ";");
+        std::string rr("vbaR4VarHook type:" + q.str() + ";");
         asyncLogProc(rr.c_str());
     }
 
@@ -477,10 +486,15 @@ extern void __stdcall doEventsLevelEditorHook()
 extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 {
     if (gLunaLua.isValid()) {
-        Event npcKillEvent("onNPCKill", false);
+        Event npcKillEvent("onNPCKill", true);
         npcKillEvent.setDirectEventName("onNPCKill");
         npcKillEvent.setLoopable(false);
         gLunaLua.callEvent(&npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
+        if (npcKillEvent.native_cancelled())
+        {
+            ::NPC::Get(*npcIndex_ptr - 1)->killFlag = 0;
+            return;
+        }
     }
 
     native_cleanupKillNPC(npcIndex_ptr, killReason);
@@ -489,7 +503,6 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
-
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
     Event TriggerEventData("onEvent", true);
     TriggerEventData.setDirectEventName("onEventDirect");
@@ -584,7 +597,22 @@ extern void __stdcall LoadLocalOverworldGfxHook()
     gRenderOverride.loadWorldGFX();
 }
 
-
+extern BOOL __stdcall BitBltTraceHook(
+    DWORD retAddr,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    /*
+     Insert debug code based on return address, such as:
+     if (retAddr >= 0x96C036 && retAddr <= 0x987C10) {
+        return 0;
+     }
+     */
+    return BitBltHook(
+        hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop
+        );
+}
 
 extern BOOL __stdcall BitBltHook(
     HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
@@ -622,7 +650,7 @@ extern BOOL __stdcall StretchBltHook(
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
     {
-        g_GLEngine.EmulatedStretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+        g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 
         // Heuristic for the last StretchBlt of the frame
         if ((nWidthSrc == 800 && nHeightSrc == 600) || (callCount == 1))
@@ -661,12 +689,7 @@ __declspec(naked) void UpdateInputHook_Wrapper()
 
 extern void __stdcall UpdateInputHook()
 {
-    if (gLunaLua.isValid()){
-        Event inputEvent("onInputUpdate", false);
-        inputEvent.setDirectEventName("onInputUpdate");
-        inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent);
-    }
+    g_EventHandler.hookInputUpdate();
 }
 
 extern void __stdcall WindowInactiveHook()
@@ -833,35 +856,67 @@ extern void __stdcall FrameTimingMaxFPSHook()
     FrameTimingHook();
 }
 
+// Also know as "Player init" hook. This method is called when the player resets.
+extern void __stdcall InitLevelEnvironmentHook()
+{
+    native_initLevelEnv();
+}
+
+static auto MessageBoxContinueCode = PATCH(0x8E54F2).RET_STDCALL_FULL();
 extern short __stdcall MessageBoxOpenHook()
 {
+    bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
     // A note here: If the message is set, then the message box will called
     // However, if a message is not set, then this function is called when the menu opens.
     if (GM_STR_MSGBOX){
         if (GM_STR_MSGBOX.length() > 0){
             if (gLunaLua.isValid()){
-                Event messageBoxEvent("onMessageBox", false);
+                Event messageBoxEvent("onMessageBox", true);
                 messageBoxEvent.setDirectEventName("onMessageBox");
                 messageBoxEvent.setLoopable(false);
                 gLunaLua.callEvent(&messageBoxEvent, (std::string)GM_STR_MSGBOX);
+                isCancelled = messageBoxEvent.native_cancelled();
             }
         }
     }
+    if (isCancelled)
+        MessageBoxContinueCode.Apply();
+    else
+        MessageBoxContinueCode.Unapply();
     
     return (short)GM_PLAYERS_COUNT;
 }
 
+static void __stdcall CameraUpdateHook(int cameraIdx)
+{
+    if (gLunaLua.isValid()) {
+        Event messageBoxEvent("onCameraUpdate", false);
+        messageBoxEvent.setDirectEventName("onCameraUpdate");
+        messageBoxEvent.setLoopable(false);
+        gLunaLua.callEvent(&messageBoxEvent, cameraIdx);
+    }
+}
+
+void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
+{
+    __asm {
+        POP EAX                        // POP the return address
+        PUSH DWORD PTR DS:[EBP - 0x38] // Sneak a camera index argument in there
+        PUSH EAX                       // PUSH the return address
+        JMP CameraUpdateHook           // JMP to CameraUpdateHook
+    };
+}
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
-    if (gOverworldHudControlFlag == WHUD_ALL){
+    if (gSMBXHUDSettings.overworldHudState == WHUD_ALL){
         native_print(Text, fonttype, x, y);
     }
 }
 
 extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    if (gOverworldHudControlFlag == WHUD_NONE)
+    if (gSMBXHUDSettings.overworldHudState == WHUD_NONE)
         return -1;
 
     return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
@@ -870,7 +925,7 @@ extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYD
 
 extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
-    if (gOverworldHudControlFlag == WHUD_NONE || gOverworldHudControlFlag == WHUD_ONLY_OVERLAY)
+    if (gSMBXHUDSettings.overworldHudState == WHUD_NONE || gSMBXHUDSettings.overworldHudState == WHUD_ONLY_OVERLAY)
         return -1;
 
     return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
@@ -879,7 +934,7 @@ extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDes
 
 extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* momentumObj)
 {
-    if (gOverworldHudControlFlag == WHUD_NONE)
+    if (gSMBXHUDSettings.overworldHudState == WHUD_NONE)
         return native_isOnCamera(camIndex, momentumObj);
     return native_isOnWCamera(camIndex, momentumObj);
 }
@@ -952,4 +1007,107 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
 
+extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
+    NPCMOB* npcObj = ::NPC::Get(*npcIndex - 1);
+    if (npcdef_isVegetableNPC[npcObj->id]) {
+        if (*objType == 6) {
+            npcObj->killFlag = 6;
+            return 0; // Don't handle extra code
+        }
+        return 0xFFFF; // Handle extra veggi code
+    }
+    return 0; // Don't handle extra code
+}
 
+_declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
+{
+    __asm {
+        PUSHF
+        PUSH EAX
+        PUSH EDX
+        PUSH DWORD PTR DS : [EBP + 0xC] // objType
+        PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
+        CALL IsNPCCollidesWithVeggiHook
+        MOV CX, AX
+        POP EDX
+        POP EAX
+        POPF
+        RET
+    }
+}
+
+
+
+// NPC Collision Logging Hook
+_declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP,ESP
+        SUB ESP,8
+        PUSH 0xA281B6
+        RET
+    }
+}
+
+extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
+
+    static std::ofstream f;
+    if (!f.is_open()) {
+        f.open("npc_collide_log.txt", std::ios::out);
+    }
+    f << std::hex << (DWORD)retAddr << ": ";
+    f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
+    f << "type=" << std::dec << (WORD)*typeOfObject << " ";
+    f << "other=" << std::dec << (WORD)*objectIndex << " ";
+    f << std::endl;
+    f.flush();
+
+    collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
+}
+
+extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
+{
+    HWND destHwnd = WindowFromDC(hdcDest);
+    std::cout << "HWND of DEST: " << (DWORD)destHwnd << std::endl;
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+static void __declspec(naked) __stdcall RenderLevelReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x18
+        PUSH 0x909296
+        RET
+    };
+}
+
+extern void __stdcall RenderLevelHook()
+{
+    g_EventHandler.hookLevelRenderStart();
+    RenderLevelReal();
+    g_EventHandler.hookLevelRenderEnd();
+}
+
+static void __declspec(naked) __stdcall RenderWorldReal()
+{
+    __asm {
+        // Copy of the code we're overwriting with the hook, plus jump back where we belong
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8FEB16
+        RET
+    };
+}
+
+extern void __stdcall RenderWorldHook()
+{
+    g_EventHandler.hookWorldRenderStart();
+    RenderWorldReal();
+    g_EventHandler.hookWorldRenderEnd();
+}

@@ -1,5 +1,6 @@
 #ifndef Animations_hhhh
 #define Animations_hhhh
+
 #include "../Defines.h"
 
 enum EffectID : short

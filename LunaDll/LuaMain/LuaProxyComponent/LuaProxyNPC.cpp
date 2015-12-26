@@ -1,13 +1,14 @@
 #include "../LuaProxy.h"
 #include "../LuaHelper.h"
 #include "../../SMBXInternal/NPCs.h"
+#include "../../SMBXInternal/Animation.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/VB6StrPtr.h"
 #include <vector>
 #include "../../Misc/RuntimeHook.h"
 #include "../../SMBXInternal/Reconstructed/Util/NpcToCoins.h"
-
+#include "../../Misc/AsmPatch.h"
 
 int LuaProxy::NPC::count()
 {
@@ -17,6 +18,38 @@ int LuaProxy::NPC::count()
 luabind::object LuaProxy::NPC::get(lua_State* L)
 {
     return LuaHelper::getObjList(GM_NPCS_COUNT, [](unsigned short i){ return LuaProxy::NPC(i); }, L);
+}
+
+luabind::object LuaProxy::NPC::get(luabind::object idFilter, lua_State* L)
+{
+    std::unique_ptr<bool> lookupTableNpcID;
+
+    try
+    {
+        lookupTableNpcID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::NPC::MAX_ID));
+    }
+    catch (LuaHelper::invalidIDException* e)
+    {
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, e->usedID());
+        return luabind::object();
+    }
+    catch (LuaHelper::invalidTypeException* /*e*/)
+    {
+        luaL_error(L, "Invalid args for npcID (arg #1, expected table or number, got %s)", lua_typename(L, luabind::type(idFilter)));
+        return luabind::object();
+    }
+
+    return LuaHelper::getObjList(
+        GM_NPCS_COUNT,
+        [](unsigned short i) { return LuaProxy::NPC(i); },
+        [&lookupTableNpcID](unsigned short i) {
+        NPCMOB* thisnpc = ::NPC::Get(i);
+        if (thisnpc == NULL) return false;
+
+        short id = thisnpc->id;
+        short section = ::NPC::GetSection(thisnpc);
+        return (id <= ::NPC::MAX_ID) && lookupTableNpcID.get()[id];
+    }, L);
 }
 
 luabind::object LuaProxy::NPC::get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L)
@@ -97,8 +130,8 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
-    if (npcid < 1 || npcid > 292){
-        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", npcid);
+    if (npcid < 1 || npcid > ::NPC::MAX_ID){
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
         return LuaProxy::NPC(-1);
     }
 
@@ -135,26 +168,29 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
         y -= 0.5 * (double)height;
     }
 
-    PATCH_OFFSET(nativeAddr, 0x78, double, x);
-    PATCH_OFFSET(nativeAddr, 0x80, double, y);
-    PATCH_OFFSET(nativeAddr, 0x88, double, height);
-    PATCH_OFFSET(nativeAddr, 0x90, double, width);
-    PATCH_OFFSET(nativeAddr, 0x98, double, 0.0);
-    PATCH_OFFSET(nativeAddr, 0xA0, double, 0.0);
+    NPCMOB* npc = (NPCMOB*)nativeAddr;
+    npc->momentum.x = x;
+    npc->momentum.y = y;
+    npc->momentum.height = height;
+    npc->momentum.width = width;
+    npc->momentum.speedX = 0.0;
+    npc->momentum.speedY = 0.0;
 
-    PATCH_OFFSET(nativeAddr, 0xA8, double, x);
-    PATCH_OFFSET(nativeAddr, 0xB0, double, y);
-    PATCH_OFFSET(nativeAddr, 0xB8, double, gfxHeight);
-    PATCH_OFFSET(nativeAddr, 0xC0, double, gfxWidth);
+    npc->spawnMomentum.x = x;
+    npc->spawnMomentum.y = y;
+    npc->spawnMomentum.height = gfxHeight;
+    npc->spawnMomentum.width = gfxWidth;
+    npc->spawnMomentum.speedX = 0.0;
+    npc->spawnMomentum.speedY = 0.0;
 
     if (respawn) {
-        PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
+        npc->spawnID = npcid;
     }
-    PATCH_OFFSET(nativeAddr, 0xE2, WORD, npcid);
+    npc->id = npcid;
 
-    PATCH_OFFSET(nativeAddr, 0x12A, WORD, 180);
-    PATCH_OFFSET(nativeAddr, 0x124, WORD, -1);
-    PATCH_OFFSET(nativeAddr, 0x146, WORD, section);
+    npc->offscreenCountdownTimer = 180;
+    npc->unknown_124 = -1;
+    npc->currentSection = section;
 
     ++(GM_NPCS_COUNT);
 
@@ -165,6 +201,11 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 LuaProxy::NPC::NPC(int index)
 {
 	m_index = index;
+}
+
+int LuaProxy::NPC::idx() const
+{
+    return m_index;
 }
 
 int LuaProxy::NPC::id(lua_State* L) const
@@ -314,6 +355,7 @@ void LuaProxy::NPC::kill(lua_State* L)
 	if(!isValid_throw(L))
 		return;
 	::NPC::Get(m_index)->killFlag = 1;
+    ::NPC::Get(m_index)->isHidden = COMBOOL(false);
 }
 
 void LuaProxy::NPC::kill(int killEffectID, lua_State* L)
@@ -321,6 +363,7 @@ void LuaProxy::NPC::kill(int killEffectID, lua_State* L)
 	if(!isValid_throw(L))
 		return;
 	::NPC::Get(m_index)->killFlag = killEffectID;
+    ::NPC::Get(m_index)->isHidden = COMBOOL(false);
 }
 
 luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State* L) const
@@ -490,7 +533,7 @@ bool LuaProxy::NPC::drawOnlyMask(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->isMaskOnly;
+    return 0 != ::NPC::Get(m_index)->isMaskOnly;
 }
 
 void LuaProxy::NPC::setDrawOnlyMask(bool drawOnlyMask, lua_State * L)
@@ -504,7 +547,7 @@ bool LuaProxy::NPC::isInvincibleToSword(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->invincibilityToSword;
+    return 0 != ::NPC::Get(m_index)->invincibilityToSword;
 }
 
 void LuaProxy::NPC::setIsInvincibleToSword(bool isInvincibleToSword, lua_State * L)
@@ -518,7 +561,7 @@ bool LuaProxy::NPC::legacyBoss(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->legacyBoss;
+    return 0 != ::NPC::Get(m_index)->legacyBoss;
 }
 
 void LuaProxy::NPC::setLegacyBoss(bool legacyBoss, lua_State * L)
@@ -532,7 +575,7 @@ bool LuaProxy::NPC::friendly(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
     
-    return (bool)::NPC::Get(m_index)->friendly;
+    return 0 != ::NPC::Get(m_index)->friendly;
 }
 
 void LuaProxy::NPC::setFriendly(bool friendly, lua_State * L)
@@ -546,7 +589,7 @@ bool LuaProxy::NPC::dontMove(lua_State * L) const
 {
     if (!isValid_throw(L)) return false;
 
-    return (bool)::NPC::Get(m_index)->dontMove;
+    return 0 != ::NPC::Get(m_index)->dontMove;
 }
 
 void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)
@@ -560,13 +603,21 @@ void LuaProxy::NPC::setDontMove(bool dontMove, lua_State* L)
 void LuaProxy::NPC::toIce(lua_State * L)
 {
     if (!isValid_throw(L)) return;
-    
+
+    // Get dummy NPC, make note of it's old ID so we can restore it afterward
     NPCMOB* dummy = ::NPC::GetDummyNPC();
-    dummy->id = 265;
+    short oldDummyId = dummy->id;
+
+    // Call native_collideNPC with a dummy NPC with an id of iceball
+    dummy->id = NPCID_PLAYERICEBALL;
     short indexCollideWith = 0;
     short targetIndex = m_index + 1;
-    CollidersType targetType = COLLIDERS_NPC;
+    CollidersType targetType = HARM_TYPE_NPC;
     native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
+
+    // Restore dummy NPC ID, this prevents bomb explosions from becoming
+    // freeze bombs, and is generally courteous.
+    dummy->id = oldDummyId;
 }
 
 void LuaProxy::NPC::toCoin(lua_State * L)
@@ -574,6 +625,112 @@ void LuaProxy::NPC::toCoin(lua_State * L)
     if (!isValid_throw(L)) return;
 
     Reconstructed::Util::npcToCoin(::NPC::Get(m_index));
+}
+
+void LuaProxy::NPC::harm(lua_State * L)
+{
+    harm(HARM_TYPE_NPC, L);
+}
+
+void LuaProxy::NPC::harm(short harmType, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    // Get dummy NPC, make note of it's old ID so we can restore it afterward
+    NPCMOB* dummy = ::NPC::GetDummyNPC();
+    short oldDummyId = dummy->id;
+
+    short indexCollideWith = 0;
+    short targetIndex = m_index + 1;
+
+    switch (harmType) {
+    case HARM_TYPE_JUMP:      // other is 'player index'. Triggered for jumping on NPC
+    case HARM_TYPE_TAIL:      // other is 'player index'. Triggered for being hit by tail
+    case HARM_TYPE_SPINJUMP:  // other is 'player index'. Triggered for spinjump or statue
+    case HARM_TYPE_SWORD:    // other is 'player index'. Triggered for sword or sword-beam
+        indexCollideWith = 0; // Dummy player?
+        break;
+    case HARM_TYPE_NPC:       // other is 'npc index'. Triggered for thrown NPCS, bomb explosions, shells, etc
+    case HARM_TYPE_PROJECTILE_USED: // other is 'npc index'. Triggered on a projectile once it hits something, in case the projectile should be destroyed
+    case HARM_TYPE_HELD:      // other is 'npc index'. Triggered by colliding with held NPCs or kicked gloombas
+        indexCollideWith = 0; // Dummy NPC?
+        break;
+    case HARM_TYPE_FROMBELOW: // other is 'block index'. Triggered for hit from below or pow
+    case HARM_TYPE_LAVA:      // other is 'block index'. Triggered for being hit by lava
+        indexCollideWith = 0; // Dummy block?
+        break;
+    case HARM_TYPE_OFFSCREEN: // other is 0. Triggered when timing out offscreen
+        indexCollideWith = 0; // Nothing
+        break;
+    case HARM_TYPE_EXT_FIRE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERFIREBALL;
+        break;
+    case HARM_TYPE_EXT_ICE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERICEBALL;
+        break;
+    case HARM_TYPE_EXT_HAMMER:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERHAMMER;
+        break;
+    default:
+        return;
+    }
+
+    // Call native_collideNPC for the type of harm we wish to do
+    native_collideNPC(&targetIndex, (CollidersType*)&harmType, &indexCollideWith);
+
+    // Restore dummy NPC ID, in case we changed it
+    dummy->id = oldDummyId;
+}
+
+void LuaProxy::NPC::harm(short harmType, float damage, lua_State * L)
+{
+    if (!isValid_throw(L)) return;
+
+    // Patch all instructions which add a damage amount to the NPC
+    auto patchSet = PatchCollection(
+        PATCH(0xA2A2D1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A418 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A45C + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5C5 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5CD + 2).dword((DWORD)&damage),
+        PATCH(0xA2A62F + 2).dword((DWORD)&damage),
+        PATCH(0xA2A745 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A766 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A7AB + 2).dword((DWORD)&damage),
+        PATCH(0xA2A94E + 2).dword((DWORD)&damage),
+        PATCH(0xA2A9FC + 2).dword((DWORD)&damage),
+        PATCH(0xA2AA3C + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB08 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB63 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AD8E + 2).dword((DWORD)&damage),
+        PATCH(0xA2C124 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C164 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C5B9 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C672 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C6CC + 2).dword((DWORD)&damage),
+        PATCH(0xA2C7B7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C826 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E1B1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E20E + 2).dword((DWORD)&damage),
+        PATCH(0xA2E280 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FE7F + 2).dword((DWORD)&damage),
+        PATCH(0xA2FEC7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FF01 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FFA7 + 2).dword((DWORD)&damage),
+        PATCH(0xA300B2 + 2).dword((DWORD)&damage),
+        PATCH(0xA300FA + 2).dword((DWORD)&damage),
+        PATCH(0xA30134 + 2).dword((DWORD)&damage)
+        );
+
+    patchSet.Apply();
+    harm(harmType, L);
+    patchSet.Unapply();
 }
 
 bool LuaProxy::NPC::collidesBlockBottom(lua_State * L) const

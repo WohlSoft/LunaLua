@@ -57,7 +57,7 @@ void LuaProxy::Section::setMusicID(short musicID)
 
 bool LuaProxy::Section::isLevelWarp() const
 {
-    return (bool)(GM_SEC_ISWARP[m_secNum] != 0);
+    return (GM_SEC_ISWARP[m_secNum] != 0);
 }
 
 void LuaProxy::Section::setIsLevelWarp(bool isLevelWarp)
@@ -87,7 +87,7 @@ void LuaProxy::Section::setBackgroundID(short backgroundID)
 
 bool LuaProxy::Section::noTurnBack() const
 {
-    return (bool)(GM_SEC_NOTURNBACK[m_secNum] != 0);
+    return (GM_SEC_NOTURNBACK[m_secNum] != 0);
 }
 
 void LuaProxy::Section::setNoTurnBack(bool noTurnBack)
@@ -97,7 +97,7 @@ void LuaProxy::Section::setNoTurnBack(bool noTurnBack)
 
 bool LuaProxy::Section::isUnderwater() const
 {
-    return (bool)(GM_SEC_ISUNDERWATER[m_secNum] != 0);
+    return (GM_SEC_ISUNDERWATER[m_secNum] != 0);
 }
 
 void LuaProxy::Section::setIsUnderwater(bool isUnderwater)

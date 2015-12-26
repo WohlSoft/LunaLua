@@ -1,9 +1,8 @@
 #ifndef RuntimeHook_hhh
 #define RuntimeHook_hhh
 
-
+#include <vector>
 #include "../Defines.h"
-#include "../Globals.h"
 
 /************************************************************************/
 /* Typedefs                                                             */
@@ -15,30 +14,6 @@ typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
     _Inout_ void * _DispatcherContext
     );
 
-/************************************************************************/
-/* Macros                                                               */
-/************************************************************************/
-#define PATCH_FUNC(ptr, func) *(BYTE*)ptr = 0xE8;\
-	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-#define PATCH_JMP(ptr, func) *(BYTE*)ptr = 0xE9;\
-	*((DWORD*)(ptr+1)) = ((DWORD)(((DWORD)func) - ptr - 5))
-#define PATCH_JMPOLD(ptr, func) *(BYTE*)source = 0xE9;\
-	*((DWORD*)(source+1)) = ((DWORD)(((DWORD)dest) - source - 5))
-#define PATCH_OFFSET(ptr, offset, type, value) *(type*)((DWORD)ptr + (DWORD)offset) = value
-#define INSTR_NOP 0x90
-static inline void PATCH_FUNC_CALL_SAFE(DWORD ptr, void* func) { // Takes 13 bytes, but tries to be very safe...
-    BYTE* bPtr = (BYTE*)ptr;
-
-    bPtr[0] = 0x9C; // pushf
-    bPtr[1] = 0x50; // push eax
-    bPtr[2] = 0x51; // push ecx
-    bPtr[3] = 0x52; // push edx
-    PATCH_FUNC((DWORD)&bPtr[4], func);
-    bPtr[9] = 0x5A; // pop edx
-    bPtr[10] = 0x59; // pop ecx
-    bPtr[11] = 0x58; // pop eax
-    bPtr[12] = 0x9D; // popf
-}
 
 
 #ifndef NO_SDL
@@ -57,7 +32,6 @@ void TrySkipPatch();
 /************************************************************************/
 void emulateVB6Error(int errorCode);
 void showSMBXMessageBox(std::string message);
-extern inline void patchWholeNativeFunction(void* native_func, int sizeOfNativeFunc, void* newFunc);
 
 /************************************************************************/
 /* Hooks                                                                */
@@ -73,6 +47,7 @@ extern int __stdcall LoadWorld();     //The World Load Code
 extern DWORD __stdcall WorldLoop();       //The World Loop Code
 extern void* __stdcall WorldRender();     //The World Render Code
 extern int __stdcall LoadIntro();       // Load Intro Code (Autostart)
+extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002);
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop);       //The Main Menu Render Code
 extern MCIERROR __stdcall mciSendStringHookA(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback);       //The MCI Emulator Code
 extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter Code
@@ -93,6 +68,7 @@ extern EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     void * DispatcherContext);
 extern void __stdcall LoadLocalGfxHook();
 extern void __stdcall LoadLocalOverworldGfxHook();
+extern BOOL __stdcall BitBltTraceHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall BitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern BOOL __stdcall StretchBltHook(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest, HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, DWORD dwRop);
 extern int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2);
@@ -104,7 +80,9 @@ extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
+extern void __stdcall InitLevelEnvironmentHook();
 extern short __stdcall MessageBoxOpenHook();
+extern void __stdcall CameraUpdateHook_Wrapper();
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);
 extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
@@ -113,6 +91,19 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
 
 extern void __stdcall GenerateScreenshotHook();
 extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
+
+// Hooks which are helping fixups
+extern void IsNPCCollidesWithVeggiHook_Wrapper();
+
+
+
+/************************************************************************/
+/* Hooks for analyze purpose                                            */
+/************************************************************************/
+extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex);
+extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+extern void __stdcall RenderLevelHook();
+extern void __stdcall RenderWorldHook();
 
 /************************************************************************/
 /* Libs                                                                 */
@@ -148,23 +139,10 @@ void fixup_ErrorReporting();
 void fixup_WarpLimit();
 void fixup_Credits();
 void fixup_Mushbug();
+void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 
-//scraped for now..... D:
-void RuntimePatch();
-
-//Event Hooks
-void record_SMBXTrigger(wchar_t* trigger, int unkVal, int type);
-
-int getSMBXTriggerMain(BSTR* trigger, int* unkVal);
-int getSMBXTriggerTalk(BSTR* trigger, int* unkVal);
-int getSMBXTriggerUnknown(BSTR* trigger, int* unkVal);
-int getSMBXTriggerPSwitch(BSTR* trigger, int* unkVal);
-int getSMBXTriggerActivateEventLayer(BSTR* trigger, int* unkVal);
-int getSMBXTriggerDeathEvent(BSTR* trigger, int* unkVal);
-int getSMBXTriggerNoMoreObjEvent(BSTR* trigger, int* unkVal);
-int getSMBXTriggerEventTrigger(BSTR* trigger, int* unkVal);
 
 #endif
 

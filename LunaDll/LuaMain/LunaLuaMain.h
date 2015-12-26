@@ -5,6 +5,8 @@
 #include "LuabindIncludes.h"
 #include "LuaSharedProxy.h"
 #include "LuaHelper.h"
+#include "../Misc/SafeFPUControl.h"
+#include "../SMBXInternal/PlayerMOB.h"
 
 class CLunaLua
 {
@@ -33,10 +35,19 @@ public:
 	//If the lua module is valid
 	bool isValid(){return L != 0;}
 
+    //Setting "ready" field
+    bool isReady() const { return m_ready;  }
+    void setReady(bool ready) { m_ready = ready; }
+
 	template<typename... Args>
 	void callEvent(Event* e, Args... args){
-		if (!isValid())
+        SafeFPUControl noFPUExecptions;
+        
+        if (!isValid())
 			return;
+
+        if (!m_ready)
+            return;
 
 		if (!Player::Get(1)){
 			shutdown();
@@ -69,6 +80,8 @@ private:
 	void setupDefaults();
 
 	lua_State *L;
+    bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
+    bool m_eventLoopOnceExecuted; //This should be an alternative to "onLoad". With this flag the event "onStart" is beeing called, if it is false.
 };
 
 

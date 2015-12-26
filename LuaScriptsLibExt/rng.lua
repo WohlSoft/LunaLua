@@ -12,7 +12,7 @@
 --------Created by Hoeloe - 2015-------
 --Open-Source Random Number Generator--
 --------For Super Mario Bros X---------
----------------v1.0.1------------------
+---------------v1.0.2------------------
 
 local rng = {};
 
@@ -24,19 +24,25 @@ rng.seed = nil;
 local function genMT()
 	--Calculate max number (not constant across build platforms.)
 	local x = 1.0
-    while x * 4 > x * 2 do
-        x = x * 2
-    end
-    if x * 4 < x * 2 then
-        x = x * 2
-    end
+	pcall(function()
+				while x * 4 > x * 2 do
+					x = x * 2
+				end
+				if x * 4 < x * 2 then
+					x = x * 2
+				end
+			end)
+			
     local d = x / 2
-    while x + d ~= x do
-        if x + d > x and x + d + d ~= x + d then
-            x = x + d
-        end
-        d = d / 2
-    end
+	
+	pcall(function()
+			while x + d ~= x do
+				if x + d > x and x + d + d ~= x + d then
+					x = x + d
+				end
+				d = d / 2
+			end
+		end)
 	x = math.floor(x);
 	
 	local mt = {};

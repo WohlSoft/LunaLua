@@ -26,6 +26,7 @@ public:
 
 
     /// Members ///
+    std::wstring m_Filename;  // Original filename
     int m_H;				// Height of bitmap
     int m_W;				// Width of bitmap
     HBITMAP m_hbmp;			// Handle to bitmap data

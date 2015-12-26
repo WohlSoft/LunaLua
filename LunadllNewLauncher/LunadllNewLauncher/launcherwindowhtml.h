@@ -2,6 +2,7 @@
 #define LAUNCHERWINDOWHTML_H
 
 #include <QWidget>
+#include <QUrl>
 #include "settingsobject.h"
 
 namespace Ui {
@@ -23,6 +24,8 @@ public slots:
     void quitApp();
     void startGame();
     void startLevelEditor();
+private slots:
+    void linkClicked(QUrl url);
 protected:
     void closeEvent(QCloseEvent *ev);
 private:

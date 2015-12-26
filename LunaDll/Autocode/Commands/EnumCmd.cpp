@@ -11,7 +11,7 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 		int success = swscanf(wbuf, L" %99[^,] ,", &command);
 		if(!success) {
 			// Bad or mistyped command?
-			wstring line = wstring(wbuf);
+            std::wstring line = std::wstring(wbuf);
 			if(line.size() > 10) {
 				PrintSyntaxError(line);
 			}
@@ -359,7 +359,7 @@ AutocodeType Autocode::EnumerizeCommand(wchar_t* wbuf) {
 
 	if(wbuf) {
 		// Nothing matched. Bad or mistyped command?
-		wstring line = wstring(wbuf);
+        std::wstring line = std::wstring(wbuf);
 		if(line.size() > 10) {
 			PrintSyntaxError(line);
 		}

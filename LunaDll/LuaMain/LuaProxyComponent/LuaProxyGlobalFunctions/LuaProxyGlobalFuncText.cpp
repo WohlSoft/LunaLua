@@ -5,16 +5,16 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 
-void LuaProxy::Text::windowDebug(const char* debugText, lua_State* L)
+void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 {
-    int resultCode = MessageBoxA(0, debugText, "Debug", MB_OKCANCEL);
+    int resultCode = MessageBoxA(0, debugText.c_str(), "Debug", MB_OKCANCEL);
     if (resultCode == IDCANCEL)
         luaL_error(L, "Pressed cancel on windowDebug!");
 }
 
-void LuaProxy::Text::windowDebugSimple(const char* debugText)
+void LuaProxy::Text::windowDebugSimple(const std::string& debugText)
 {
-    MessageBoxA(0, debugText, "Debug", MB_OK);
+    MessageBoxA(0, debugText.c_str(), "Debug", MB_OK);
 }
 
 
@@ -46,7 +46,7 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
     std::wstring txt = utf8_decode(luabind::call_function<std::string>(L, "tostring", toPrint));
 
     if (type == 3)
-        for (wstring::iterator it = txt.begin(); it != txt.end(); ++it)
+        for (std::wstring::iterator it = txt.begin(); it != txt.end(); ++it)
             *it = towupper(*it);
 
     RenderStringOp* printTextOp = new RenderStringOp(txt, type, (float)x, (float)y);

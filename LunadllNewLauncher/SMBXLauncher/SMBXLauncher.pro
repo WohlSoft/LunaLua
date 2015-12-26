@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     PGE_File_Formats/smbx64_cnf_filedata.cpp \
     PGE_File_Formats/wld_filedata.cpp \
     controlconfig.cpp \
-    launcherconfiguration.cpp
+    launcherconfiguration.cpp \
+    ../../LunaLoader/LunaLoaderPatch.cpp
 
 HEADERS  += mainlauncherwindow.h \
     smbxconfig.h \

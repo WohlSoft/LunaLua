@@ -3,7 +3,6 @@
 #define Water_hhhh
 
 #include "../Defines.h"
-#include "../Globals.h"
 #include "../Misc/VB6StrPtr.h"
 
 #pragma pack(push, 4)

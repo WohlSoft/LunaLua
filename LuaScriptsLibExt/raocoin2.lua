@@ -34,14 +34,14 @@
 --------------------Created by Hoeloe - 2015-------------------
 -------------Open-Source Currency and Shop Library-------------
 ---------------------For Super Mario Bros X--------------------
-----------------------------v2.0.0-----------------------------
+----------------------------v2.0.8-----------------------------
 ----------------------REQUIRES ENCRYPT.dll---------------------
 ---------------------REQUIRES COLLIDERS.lua--------------------
 -----------------------REQUIRES PNPC.lua-----------------------
 
 local raocoin = {}
 local encrypt = loadSharedAPI("encrypt");
-local colliders;
+local colliders = loadSharedAPI("colliders");
 local pnpc;
 
 local currencies = {}
@@ -103,13 +103,14 @@ function currencyMT:set(value)
 	--self:save();
 end
 
-function raocoin.registerCurrency(npcID, showUI, UIx, UIy, imgPath)
+function raocoin.registerCurrency(npcID, showUI, UIx, UIy, imgPath, ignoreHud)
 	showUI = showUI or (showUI == nil and false);
 	UIx = UIx or 0;
 	UIy = UIy or 0;
 	imgPath = imgPath or getSMBXPath().."\\LuaScriptsLib\\raocoin\\dragoncoin.png";
+	ignoreHud = ignoreHud or (ignoreHud == nil and false);
 	
-	local c = { visible = showUI, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath };
+	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency, item) end };
 	setmetatable(c,currencyMT.createMT(npcID,-1));
 	
 	c:refreshUI();
@@ -126,14 +127,15 @@ function raocoin.registerCurrency(npcID, showUI, UIx, UIy, imgPath)
 end
 
 
-function raocoin.registerMemCurrency(memaddress, memType, restore, showUI, UIx, UIy, imgPath)
+function raocoin.registerMemCurrency(memaddress, memType, restore, showUI, UIx, UIy, imgPath, ignoreHud)
 	restore = restore or (restore == nil and true);
 	showUI = showUI or (showUI == nil and false);
 	UIx = UIx or 0;
 	UIy = UIy or 0;
 	imgPath = imgPath or getSMBXPath().."\\LuaScriptsLib\\raocoin\\dragoncoin.png";
+	ignoreHud = ignoreHud or (ignoreHud == nil and false);
 	
-	local c = { visible = showUI, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath };
+	local c = { visible = showUI, ignoreHud = ignoreHud, img = Graphics.loadImage(imgPath), x = UIx, y = UIy, path = imgPath, onCollect = function(currency, item) end };
 	setmetatable(c,currencyMT.createMT(memaddress,memType));
 	
 	c:refreshUI();
@@ -179,6 +181,8 @@ raocoin.CODE_ALREADYBOUGHT = 1;
 
 local itemMT = {}
 
+local drawQueue = {};
+
 function itemMT.createMT(id)
 	local mt = {}
 	mt.__index = 
@@ -202,16 +206,18 @@ function itemMT:canAfford()
 end
 
 function itemMT:showPrice(x,y,screenSpace)
-		screenSpace = screenSpace or (screenSpace == nil);
-		
-		if(not screenSpace) then
-			x,y = raocoin.worldToScreen(x,y);
-		end
-		
-		local v = self.currency;
-		Graphics.placeSprite(1, v.img, x, y, "", 2);
-		local val = tostring(self.price);
-		Text.print(val, 1, x + 98-18*(string.len(val)), y);
+		table.insert(drawQueue, function()
+			screenSpace = screenSpace or (screenSpace == nil);
+			
+			if(not screenSpace) then
+				x,y = raocoin.worldToScreen(x,y);
+			end
+			
+			local v = self.currency;
+			Graphics.placeSprite(1, v.img, x, y, "", 2);
+			local val = tostring(self.price);
+			Text.print(val, 1, x + 98-18*(string.len(val)), y);
+		end)
 end
 
 function itemMT:buy()
@@ -321,8 +327,8 @@ function raocoin.update()
 	
 	actionQueue = {};
 
-	for k,v in pairs(currencies) do
-		if(v.visible) then
+	--[[for k,v in pairs(currencies) do
+		--if(v.visible) then
 			Graphics.placeSprite(1, v.img, v.x, v.y, "", 2);
 			local val = tostring(v:get());
 			Text.print(val, 1, v.x + 98-18*(string.len(val)), v.y);
@@ -334,20 +340,22 @@ function raocoin.update()
 		end
 		if(currencyCache[k].count < currencyCache[k].lastCount) then
 			currencyCache[k].value = currencyCache[k].value + currencyCache[k].lastCount - currencyCache[k].count;
-			raocoin.onCollect(v);
+			raocoin.onCollect(v, currencyCache[k].lastCount - currencyCache[k].count);
+			v:onCollect(currencyCache[k].lastCount - currencyCache[k].count);
 		end
 		currencyCache[k].lastCount = currencyCache[k].count;
-	end
+	end]]
 	
 	for k,v in pairs(memcurrencies) do
-		if(v.visible) then
+		--[[if(v.visible) then
 			Graphics.placeSprite(1, v.img, v.x, v.y, "", 2);
 			local val = tostring(v:get());
 			Text.print(val, 1, v.x + 98-18*(string.len(val)), v.y);
-		end
+		end]]
 		
 		if(memcurrencyCache[v.id] < mem(v.id,v.type)) then
-			raocoin.onCollect(v);
+			raocoin.onCollect(v, currencyCache[k].lastCount - currencyCache[k].count);
+			v:onCollect(currencyCache[k].lastCount - currencyCache[k].count);
 		end
 		memcurrencyCache[v.id] = mem(v.id,v.type);
 	end
@@ -416,13 +424,15 @@ function raocoin.update()
 			
 			--bmp icon
 			if(v.image ~= nil and v.enableTimer <= 0) then
-				Graphics.placeSprite(2,v.image,v.x,v.y-70-64,"",2);
+				Graphics.drawImageWP(v.image,v.x,v.y-70-64,1);
 			end
 			
 			--text
 			if(v.text ~= nil and v.enableTimer <= 0) then
-				local x1,y1 = raocoin.worldToScreen(v.x,v.y-64);
-				Text.print(v.text,x1+8-string.len(v.text)*9,y1-26);
+				table.insert(drawQueue, function()
+					local x1,y1 = raocoin.worldToScreen(v.x+12,v.y-72);
+					Text.printWP(v.text,x1+8-string.len(v.text)*9,y1-26,1);
+				end);
 			end
 		
 			local img = raocoin.IMG_TOKEN_T;
@@ -432,7 +442,7 @@ function raocoin.update()
 			
 			if(v.enableTimer <= 0) then
 				Graphics.placeSprite(2,img,v.x,v.y-64,"",2);
-				k:showPrice(v.x-48,v.y-8-64,false);
+				k:showPrice(v.x-32,v.y-82,false);
 				
 				if(colliders.collide(player,v.hitbox)) then
 					Graphics.drawImageToScene(raocoin.IMG_ARROW,v.x,v.y-32,math.abs(arrowalpha))
@@ -466,49 +476,86 @@ function raocoin.update()
 	tryBuy = false;
 end
 
+function raocoin:onnpcdie(npc, reason)
+	if(currencies[npc.id] ~= nil and reason == 9 and (colliders.collide(player,npc) or colliders.speedCollide(player,npc))) then
+			currencyCache[npc.id].value = currencyCache[npc.id].value + 1;
+			raocoin.onCollect(currencies[npc.id], 1, npc);
+			currencies[npc.id]:onCollect(1, npc);
+	end
+end
+
+function raocoin.drawhud()
+		for _,v in ipairs(drawQueue) do
+			v();
+		end
+		
+		drawQueue = {};
+
+		for k,v in pairs(currencies) do
+			if(v.visible and (v.ignoreHud or Graphics.isHudActivated())) then
+				Graphics.drawImage(v.img, v.x, v.y);
+				local val = tostring(v:get());
+				Text.print(val, 1, v.x + 90-18*(string.len(val)), v.y);
+			end
+		end
+		
+		for k,v in pairs(memcurrencies) do
+			if(v.visible and (v.ignoreHud or Graphics.isHudActivated())) then
+				Graphics.drawImage(v.img, v.x, v.y);
+				local val = tostring(v:get());
+				Text.print(val, 1, v.x + 90-18*(string.len(val)), v.y);
+			end
+		end
+end
+
+
+--NOTE: If and when this function gets added to mainV2, remove from here.
+local function registerCustomEvent(obj, eventName)
+	local queue = {};
+	local mt = getmetatable(obj);
+	if(mt == nil) then
+		mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
+	end
+	local index_f = mt.__index;
+	local newindex_f = mt.__newindex;
+		
+	mt.__index = function(tbl, key)
+		if(key == eventName) then
+			return function(...)
+				for _,v in ipairs(queue) do
+					v(...);
+				end
+			end
+		else
+			return index_f(tbl, key);
+		end
+	end
+		
+	mt.__newindex = function (tbl,key,val)
+		if(key == eventName) then
+			table.insert(queue, val);
+		else
+			newindex_f(tbl,key,val);
+		end
+	end
+		
+	setmetatable(obj,mt);
+end
+
 function raocoin.onInitAPI()
 	registerEvent(raocoin, "onLoop", "update", true) --Register the loop event
 	registerEvent(raocoin, "onInputUpdate", "inputupdate", true) --Register the input event
+	registerEvent(raocoin, "onHUDDraw", "drawhud", true) --Register the draw event
+	registerEvent(raocoin, "onNPCKill", "onnpcdie", true) --Register the NPC kill event
+	
+	registerCustomEvent(raocoin, "onBuyFail"); 	--(item, code) -- code: 0=can't afford, 1=already bought
+	registerCustomEvent(raocoin, "onBuy");		--(item)
+	registerCustomEvent(raocoin, "onCollect");	--(currency, increment, collectedItem) -- collectedItem is nil for mem currencies
 end
-
-
-function raocoin.onCollect(currency)
-end
-
-function raocoin.onBuy(item)
-end
-
---code: 0=can't afford, 1=already bought
-function raocoin.onBuyFail(item,code)
-end
-
 
 function raocoin.getScreenBounds()
-	local h = (player:mem(0xD0, FIELD_DFLOAT));
-	local b = { left = player.x-400+player.speedX, right = player.x+400+player.speedX, top = player.y-260+player.speedY, bottom = player.y+340+player.speedY };
-	
-    local sect = Section(player.section);
-    local bounds = sect.boundary;
-
-	if(b.left < bounds.left - 10) then
-		b.left = bounds.left - 10;
-		b.right = b.left + 800;
-	end
-	
-	if(b.right > bounds.right - 10) then
-		b.right = bounds.right - 10;
-		b.left = b.right - 800;
-	end
-	
-	if(b.top < bounds.top+40-h) then
-		b.top = bounds.top+40-h;
-		b.bottom = b.top + 600;
-	end
-	
-	if(b.bottom > bounds.bottom+40-h) then
-		b.bottom = bounds.bottom+40-h;
-		b.top = b.bottom - 600;
-	end
+	local c = Camera.get()[1];
+	local b = {left = c.x, right = c.x + 800, top = c.y, bottom = c.y+600};
 	
 	return b;
 	
@@ -517,7 +564,7 @@ end
 function raocoin.worldToScreen(x,y)
 			local b = raocoin.getScreenBounds();
 			local x1 = x-b.left;
-			local y1 = y-b.top-(player:mem(0xD0, FIELD_DFLOAT))+30;
+			local y1 = y-b.top;
 			return x1,y1;
 end
 

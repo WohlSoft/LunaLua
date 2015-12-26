@@ -1,8 +1,8 @@
 #ifndef MciEmulator_hhhh
 #define MciEmulator_hhhh
+#include <windows.h>
 #include <map>
 #include <string>
-#include <windows.h>
 #ifdef __MINGW32__
 #include <mmsystem.h>
 #define __in

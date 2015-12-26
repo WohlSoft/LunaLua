@@ -3,6 +3,7 @@
 #include "../../libs/ini-reader/INIReader.h"
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/NPCs.h"
+#include "../../SMBXInternal/Animation.h"
 #include "../../SMBXInternal/Blocks.h"
 #include "../../SMBXInternal/Layer.h"
 #include "../../SMBXInternal/Sound.h"
@@ -21,19 +22,31 @@
 
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
-void LuaProxy::loadHitboxes(int _character, int _powerup, const char *ini_file)
+void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
 {
-	if( (_powerup < 1) || (_powerup>7)) return;
-	if(( _character < 1) || (_character > 5)) return;
+    if ((_powerup < 1) || (_powerup>7)) {
+        luaL_error(L, "Powerup ID must be from 1 to 7.");
+        return;
+    }
+    if ((_character < 1) || (_character > 5)) {
+        luaL_error(L, "Character ID must be from 1 to 5.");
+        return;
+    }
 
-	int powerup = _powerup-1;
-	int character = _character-1;
-    
-	wstring world_dir = (wstring)GM_FULLDIR;
-	wstring full_path = world_dir.append(::Level::GetName());
-	full_path = removeExtension(full_path);
-	full_path = full_path.append(L"\\"); // < path into level folder
-	full_path = full_path + utf8_decode(ini_file);
+    int powerup = _powerup - 1;
+    int character = _character - 1;
+
+    std::wstring full_path;
+    if (isAbsolutePath(ini_file))
+    {
+        full_path = utf8_decode(ini_file);
+    } else {
+        std::wstring world_dir = (std::wstring)GM_FULLDIR;
+        full_path = world_dir.append(::Level::GetName());
+        full_path = removeExtension(full_path);
+        full_path = full_path.append(L"\\"); // < path into level folder
+        full_path = full_path + utf8_decode(ini_file);
+    }
 
 	std::wstring ws = full_path;
 	std::string s;
@@ -192,49 +205,77 @@ luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 
 void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
-	int iftype = (int)ftype;
-	if(iftype >= 1 && iftype <= 5){
-		void* ptr = ((&(*(byte*)mem)));
-		MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
-	}
-	else if (ftype == LFT_STRING) {
-		void* ptr = ((&(*(byte*)mem)));
-		LuaHelper::assignVB6StrPtr((VB6StrPtr*)ptr, value, L);
-	}
+    void* ptr = ((&(*(byte*)mem)));
+
+    switch (ftype) {
+    case LFT_BYTE:
+    case LFT_WORD:
+    case LFT_DWORD:
+    case LFT_FLOAT:
+    case LFT_DFLOAT:
+    {
+        boost::optional<double> opt_obj = luabind::object_cast_nothrow<double>(value);
+        if (opt_obj == boost::none) {
+            luaL_error(L, "Cannot interpret field as number");
+            break;
+        }
+        MemAssign((int)ptr, *opt_obj, OP_Assign, (FIELDTYPE)ftype);
+        break;
+    }
+    case LFT_STRING:
+    {
+        LuaHelper::assignVB6StrPtr((VB6StrPtr*)ptr, value, L);
+        break;
+    }
+    case LFT_BOOL:
+    {
+        boost::optional<bool> opt_obj = luabind::object_cast_nothrow<bool>(value);
+        if (opt_obj == boost::none) {
+            luaL_error(L, "Cannot interpret field as boolean");
+            break;
+        }
+        void* ptr = ((&(*(byte*)mem)));
+        *((short*)ptr) = COMBOOL(*opt_obj);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 
 luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
 {
 	int iftype = (int)ftype;
-	double val = 0;
-	if(iftype >= 1 && iftype <= 6){
-		void* ptr = ((&(*(byte*)mem)));
-		val = GetMem((int)ptr, (FIELDTYPE)ftype);
-	}
+    void* ptr = ((&(*(byte*)mem)));
+
 	switch (ftype) {
 	case LFT_BYTE:
-		return luabind::object(L, (byte)val);
 	case LFT_WORD:
-		return luabind::object(L, (short)val);
 	case LFT_DWORD:
-		return luabind::object(L, (int)val);
 	case LFT_FLOAT:
-		return luabind::object(L, (float)val);
 	case LFT_DFLOAT:
-		return luabind::object(L, (double)val);
+    {
+        double val = GetMem((int)ptr, (FIELDTYPE)ftype);
+        return luabind::object(L, val);
+    }
 	case LFT_STRING:
-		return luabind::object(L, VBStr((wchar_t*)(int)val));
+    {
+        return luabind::object(L, VBStr((wchar_t*)*((int32_t*)ptr)));
+    }
+    case LFT_BOOL:
+    {
+        return luabind::object(L, 0 != *((int16_t*)ptr));
+    }
 	default:
 		return luabind::object();
 	}
 }
 
 
-void LuaProxy::triggerEvent(const char *evName)
+void LuaProxy::triggerEvent(const std::string& evName)
 {
-	SMBXEvents::TriggerEvent(utf8_decode(std::string(evName)), 0);
-
+	SMBXEvents::TriggerEvent(utf8_decode(evName), 0);
 }
 
 
@@ -244,30 +285,30 @@ void LuaProxy::playSFX(int index)
 }
 
 
-void LuaProxy::playSFX(const char *filename)
+void LuaProxy::playSFX(const std::string& filename)
 {
 #ifndef NO_SDL
 	playSFXSDL(filename);
 #else
 	wstring full_path;
-	if(!isAbsolutePath(std::string(filename))){
+	if(!isAbsolutePath(filename)){
 		wstring world_dir = (wstring)GM_FULLDIR;
 		full_path = world_dir.append(Level::GetName());
 		full_path = removeExtension(full_path);
 		full_path = full_path.append(L"\\"); // < path into level folder
 		full_path = full_path + utf8_decode(filename);
 	}else{
-		full_path = utf8_decode(std::string(filename));
+		full_path = utf8_decode(filename);
 	}
 	
 	PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 #endif
 }
 
-void LuaProxy::playSFXSDL(const char* filename)
+void LuaProxy::playSFXSDL(const std::string& filename)
 {
 #ifndef NO_SDL
-    string full_paths = Audio::getSfxPath(string(filename));
+    std::string full_paths = Audio::getSfxPath(filename);
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 #else
 	playSFX(filename);
@@ -281,10 +322,10 @@ void LuaProxy::clearSFXBuffer()
 #endif
 }
 
-void LuaProxy::MusicOpen(const char *filename)
+void LuaProxy::MusicOpen(const std::string& filename)
 {
 #ifndef NO_SDL
-    string full_paths = Audio::getSfxPath(string(filename));
+    std::string full_paths = Audio::getSfxPath(filename);
 	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
 #endif
 }
@@ -450,12 +491,12 @@ luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 	return vblocks;
 }
 
-luabind::object LuaProxy::findlayer(const char *layername, lua_State *L)
+luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
+    std::wstring tarLayerName = utf8_decode(layername);
 	for(int i = 0; i < 100; ++i){
 		LayerControl* ctrl = ::Layer::Get(i);
 		if(ctrl){
-			std::wstring tarLayerName = utf8_decode(std::string(layername));
 			if(!ctrl->ptLayerName)
 				continue;
 			std::wstring sourceLayerName(ctrl->ptLayerName);
@@ -601,8 +642,8 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
-	if(npcid < 1 || npcid > 292){
-		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-292\nGot NPC-ID: %d", npcid);
+	if(npcid < 1 || npcid > ::NPC::MAX_ID){
+		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
 		return LuaProxy::NPC(-1);
 	}
 		
@@ -639,26 +680,29 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 		y -= 0.5 * (double)height;
 	}
 
-	PATCH_OFFSET(nativeAddr, 0x78, double, x);
-	PATCH_OFFSET(nativeAddr, 0x80, double, y);
-	PATCH_OFFSET(nativeAddr, 0x88, double, height);
-	PATCH_OFFSET(nativeAddr, 0x90, double, width);
-	PATCH_OFFSET(nativeAddr, 0x98, double, 0.0);
-	PATCH_OFFSET(nativeAddr, 0xA0, double, 0.0);
+    NPCMOB* npc = (NPCMOB*)nativeAddr;
+    npc->momentum.x = x;
+    npc->momentum.y = y;
+    npc->momentum.height = height;
+    npc->momentum.width = width;
+    npc->momentum.speedX = 0.0;
+    npc->momentum.speedY = 0.0;
 
-	PATCH_OFFSET(nativeAddr, 0xA8, double, x);
-	PATCH_OFFSET(nativeAddr, 0xB0, double, y);
-	PATCH_OFFSET(nativeAddr, 0xB8, double, gfxHeight);
-	PATCH_OFFSET(nativeAddr, 0xC0, double, gfxWidth);
+    npc->spawnMomentum.x = x;
+    npc->spawnMomentum.y = y;
+    npc->spawnMomentum.height = gfxHeight;
+    npc->spawnMomentum.width = gfxWidth;
+    npc->spawnMomentum.speedX = 0.0;
+    npc->spawnMomentum.speedY = 0.0;
 
-	if (respawn) {
-		PATCH_OFFSET(nativeAddr, 0xDC, WORD, npcid);
-	}
-	PATCH_OFFSET(nativeAddr, 0xE2, WORD, npcid);
+    if (respawn) {
+        npc->spawnID = npcid;
+    }
+    npc->id = npcid;
 
-	PATCH_OFFSET(nativeAddr, 0x12A, WORD, 180);
-	PATCH_OFFSET(nativeAddr, 0x124, WORD, -1);
-	PATCH_OFFSET(nativeAddr, 0x146, WORD, section);
+    npc->offscreenCountdownTimer = 180;
+    npc->unknown_124 = -1;
+    npc->currentSection = section;
 
 	++(GM_NPCS_COUNT);
 
@@ -678,8 +722,8 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
     typedef void __stdcall animationFunc(short*, Momentum*, float*, short*, short*);
     animationFunc* spawnEffectFunc = (animationFunc*)GF_RUN_ANIM;
 
-    if (effectID < 1 || effectID > 148){
-        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-292\nGot Effect-ID: %d", effectID);
+    if (effectID < 1 || effectID > ::SMBXAnimation::MAX_ID){
+        luaL_error(L, "Invalid Effect-ID!\nNeed Effect-ID between 1-%d\nGot Effect-ID: %d", ::SMBXAnimation::MAX_ID, effectID);
         return LuaProxy::Animation(-1);
     }
 

@@ -28,6 +28,13 @@ public:
     void ClearSMBXSprites();
     void ClearLunaTexture(const BMPBox& bmp);
 
+    inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
+
+    BOOL RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
+        HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
+        DWORD dwRop);
+    void EndFrame(HDC hdcDest);
+
     // External commands
     inline bool IsEnabled() { return mEnabled; };
     inline void Enable() { mEnabled = true; }
@@ -35,17 +42,6 @@ public:
     inline void TriggerScreenshot() { mScreenshot = true; mScreenshotCallback = nullptr;  }
     inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& screenshotCallback) { mScreenshot = true; mScreenshotCallback = screenshotCallback; }
     bool GifRecorderToggle();
-
-    void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
-    BOOL EmulatedStretchBlt(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-        DWORD dwRop);
-    void DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity);
-    void EndFrame(HDC hdcDest);
-
-    void SetTex(const BMPBox* bmp, uint32_t color);
-    void Draw2DArray(GLuint type, const float* vert, float* tex, uint32_t count);
 
     bool GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     void GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h);

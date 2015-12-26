@@ -1,12 +1,13 @@
 #ifndef RenderOverrideManager_hhhhh
 #define RenderOverrideManager_hhhhh
 
-#include "../Globals.h"
 #include <Windows.h>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
 #include <memory.h>
+class BMPBox;
 
 class RenderOverrideManager
 {

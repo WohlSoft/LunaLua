@@ -1,8 +1,10 @@
-#include "../RuntimeHook.h"
-#include "../../SMBXInternal/Reconstructed/ReconstructedDefines.h"
 #include <windows.h>
 
+#include "../RuntimeHook.h"
+#include "../../SMBXInternal/Reconstructed/ReconstructedDefines.h"
+
 #include "../RuntimeHookUtils/APIHook.h"
+#include "../AsmPatch.h"
 
 BYTE* tracedownAddress(BYTE* addr){
     //Now get the relative address of this function
@@ -49,9 +51,11 @@ void fixup_ErrorReporting()
         BYTE* toPatch = internalRaiseErrorFunc + 20;
         DWORD oldprotect;
         if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
-            toPatch[0] = 0x56; //PUSH ESI
-            PATCH_FUNC((DWORD)&toPatch[1], &recordVBErrCode);
+
+            // Apply patch to call recordVBErrCode with ESI as an argument
+            PATCH(toPatch).PUSH_ESI().CALL(&recordVBErrCode).Apply();
                 //NOP
+
             // Now get the protection back
             VirtualProtect((void*)toPatch, 10, oldprotect, &oldprotect);
         }
@@ -213,11 +217,18 @@ void fixup_Mushbug()
     memcpy((void*)0x00a2d08b, mushbugPatch, sizeof(mushbugPatch));
 }
 
+void fixup_Veggibug()
+{
+    PATCH(0xA2B17D)
+        .CALL(&IsNPCCollidesWithVeggiHook_Wrapper).NOP().Apply();
+}
+
 
 
 void fixup_NativeFuncs()
 {
-    patchWholeNativeFunction((void*)0xA3C580, 0x40B, (void*)&Reconstructed::Util::npcToCoins);
+    // Patch the whole native function
+    PATCH(0xA3C580).JMP(&Reconstructed::Util::npcToCoins).NOP_PAD_TO_SIZE<0x40B>().Apply();
     Reconstructed::Util::npcToCoins_setup();
 }
 
@@ -235,7 +246,9 @@ __declspec(naked) static void fixup_BGODepletionASM()
 
 void fixup_BGODepletion()
 {
-    *(BYTE*)(0x8D9010) = INSTR_NOP;
-    *(BYTE*)(0x8D9011) = INSTR_NOP;
-    PATCH_JMP(0x8D9012, fixup_BGODepletionASM);
+    PATCH(0x8D9010)
+        .NOP()
+        .NOP()
+        .JMP(fixup_BGODepletionASM)
+        .Apply();
 }

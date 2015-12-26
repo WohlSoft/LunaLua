@@ -1,5 +1,6 @@
 #ifndef sounds_hhhh
 #define sounds_hhhh
+
 #include <string>
 
 namespace SMBXSound {

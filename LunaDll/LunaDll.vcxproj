@@ -148,8 +148,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h" />
+    <ClInclude Include="Misc\AsmPatch.h" />
+    <ClInclude Include="Misc\AsyncHTTPClient.h" />
     <ClInclude Include="libs\simpleini\SimpleIni.h" />
-    <ClInclude Include="Misc\GeneralLunaConfig.h" />
+    <ClInclude Include="GameConfig\GeneralLunaConfig.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageHelper.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageData.h" />
     <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h" />
@@ -163,6 +167,8 @@
     <ClInclude Include="Rendering\AsyncGifRecorder.h" />
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
+    <ClInclude Include="Misc\SafeFPUControl.h" />
+    <ClInclude Include="SMBXInternal\CollectedStarRecord.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
     <ClInclude Include="GameConfig\GameAutostart.h" />
@@ -229,6 +235,7 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="SMBXInternal\Musicbox.h" />
     <ClInclude Include="SMBXInternal\NativeInput.h" />
     <ClInclude Include="SMBXInternal\Layer.h" />
     <ClInclude Include="SMBXInternal\Level.h" />
@@ -246,6 +253,7 @@
     <ClInclude Include="Misc\MiscFuncs.h" />
     <ClInclude Include="SMBXInternal\NPCs.h" />
     <ClInclude Include="SMBXInternal\Overworld.h" />
+    <ClInclude Include="SMBXInternal\Path.h" />
     <ClInclude Include="SMBXInternal\PlayerMOB.h" />
     <ClInclude Include="Rendering\RenderOps\RenderBitmapOp.h" />
     <ClInclude Include="Rendering\RenderOps\RenderEffectOp.h" />
@@ -258,10 +266,12 @@
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\ReconstructedDefines.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h" />
+    <ClInclude Include="SMBXInternal\Scenery.h" />
     <ClInclude Include="SMBXInternal\SMBXEvents.h" />
     <ClInclude Include="SMBXInternal\Sound.h" />
     <ClInclude Include="CustomSprites\SpriteComponent.h" />
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h" />
+    <ClInclude Include="SMBXInternal\Tile.h" />
     <ClInclude Include="SMBXInternal\Warp.h" />
     <ClInclude Include="SMBXInternal\Water.h" />
     <ClInclude Include="UserSaves\UserSaving.h" />
@@ -269,9 +279,17 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp" />
+    <ClCompile Include="Misc\AsyncHTTPClient.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLogger.cpp" />
-    <ClCompile Include="Misc\GeneralLunaConfig.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyMusicbox.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPath.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyScenery.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyTile.cpp" />
+    <ClCompile Include="GameConfig\GeneralLunaConfig.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageHelper.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageData.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
@@ -284,8 +302,10 @@
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp" />
+    <ClCompile Include="Rendering\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
+    <ClCompile Include="Misc\SafeFPUControl.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />

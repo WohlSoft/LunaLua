@@ -3,7 +3,6 @@
 #define SMBXEvents_hhhhhh
 
 #include "../Defines.h"
-#include "../Globals.h"
 
 // - SMBX Event Struct. size = 0x588 (1416 bytes)
 //

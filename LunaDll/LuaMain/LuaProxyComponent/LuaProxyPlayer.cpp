@@ -204,7 +204,7 @@ bool LuaProxy::Player::upKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.upKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.upKeyState;
 }
 
 void LuaProxy::Player::setUpKeyPressing(bool upKeyPressing, lua_State *L)
@@ -218,7 +218,7 @@ bool LuaProxy::Player::downKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.downKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.downKeyState;
 }
 
 void LuaProxy::Player::setDownKeyPressing(bool downKeyPressing, lua_State *L)
@@ -232,7 +232,7 @@ bool LuaProxy::Player::leftKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.leftKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.leftKeyState;
 }
 
 void LuaProxy::Player::setLeftKeyPressing(bool leftKeyPressing, lua_State *L)
@@ -246,7 +246,7 @@ bool LuaProxy::Player::rightKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.rightKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.rightKeyState;
 }
 
 void LuaProxy::Player::setRightKeyPressing(bool rightKeyPressing, lua_State *L)
@@ -260,7 +260,7 @@ bool LuaProxy::Player::jumpKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.jumpKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.jumpKeyState;
 }
 
 void LuaProxy::Player::setJumpKeyPressing(bool jumpKeyPressing, lua_State *L)
@@ -274,7 +274,7 @@ bool LuaProxy::Player::altJumpKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.altJumpKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.altJumpKeyState;
 }
 
 void LuaProxy::Player::setAltJumpKeyPressing(bool altJumpKeyPressing, lua_State *L)
@@ -288,7 +288,7 @@ bool LuaProxy::Player::runKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.runKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.runKeyState;
 }
 
 void LuaProxy::Player::setRunKeyPressing(bool runKeyPressing, lua_State *L)
@@ -302,7 +302,7 @@ bool LuaProxy::Player::altRunKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.altRunKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.altRunKeyState;
 }
 
 void LuaProxy::Player::setAltRunKeyPressing(bool altRunKeyPressing, lua_State *L)
@@ -316,7 +316,7 @@ bool LuaProxy::Player::dropItemKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.dropItemKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.dropItemKeyState;
 }
 
 void LuaProxy::Player::setDropItemKeyPressing(bool dropItemKeyPressing, lua_State *L)
@@ -330,7 +330,7 @@ bool LuaProxy::Player::pauseKeyPressing(lua_State *L) const
 {
     if (!isValid_throw(L))
         return false;
-    return (bool)::Player::Get(m_index)->keymap.pauseKeyState;
+    return 0 != ::Player::Get(m_index)->keymap.pauseKeyState;
 }
 
 void LuaProxy::Player::setPauseKeyPressing(bool pauseKeyPressing, lua_State *L)
@@ -359,17 +359,14 @@ void LuaProxy::Player::getCurrentSpriteIndex(short& indexX, short& indexY, lua_S
 
 void LuaProxy::Player::setCurrentSpriteIndex(short indexX, short indexY, bool forceDirection, lua_State* L)
 {
-	indexX = 0;
-	indexY = 0;
 	if (!isValid_throw(L))
 		return;
 	PlayerMOB* curPlayer = ::Player::Get(m_index);
 	int sprIndex = SMBX_CustomGraphics::convIndexCoorToSpriteIndex(indexX, indexY);
-	bool isLeft = sprIndex < 0;
-	if (isLeft && forceDirection) {
-		curPlayer->FacingDirection = COMBOOL(isLeft);
+	if (forceDirection) {
+		curPlayer->FacingDirection = (sprIndex < 0 ? -1 : 1); // is left?
 	}
-	curPlayer->CurrentPlayerSprite = (short)abs(sprIndex);
+	curPlayer->CurrentPlayerSprite = (short)sprIndex;
 }
 
 
@@ -748,18 +745,18 @@ void LuaProxy::Player::setUnkClimbing3(short var_unkClimbing3, lua_State *L)
 	::Player::Get(m_index)->UnkClimbing3 = var_unkClimbing3;
 }
 
-short LuaProxy::Player::waterState(lua_State *L) const
+short LuaProxy::Player::waterOrQuicksandState(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->WaterState;
+	return ::Player::Get(m_index)->WaterOrQuicksandState;
 }
 
-void LuaProxy::Player::setWaterState(short var_waterState, lua_State *L)
+void LuaProxy::Player::setWaterOrQuicksandState(short var_waterState, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->WaterState = var_waterState;
+	::Player::Get(m_index)->WaterOrQuicksandState = var_waterState;
 }
 
 short LuaProxy::Player::isInWater(lua_State *L) const
@@ -1014,18 +1011,18 @@ void LuaProxy::Player::setGroundSlidingPuffsState(short var_groundSlidingPuffsSt
 	::Player::Get(m_index)->GroundSlidingPuffsState = var_groundSlidingPuffsState;
 }
 
-short LuaProxy::Player::warpNearby(lua_State *L) const
+short LuaProxy::Player::nearbyWarpIndex(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->WarpNearby;
+	return ::Player::Get(m_index)->NearbyWarpIndex;
 }
 
-void LuaProxy::Player::setWarpNearby(short var_warpNearby, lua_State *L)
+void LuaProxy::Player::setNearbyWarpIndex(short var_warpNearby, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->WarpNearby = var_warpNearby;
+	::Player::Get(m_index)->NearbyWarpIndex = var_warpNearby;
 }
 
 short LuaProxy::Player::unknown5C(lua_State *L) const
@@ -1476,32 +1473,18 @@ void LuaProxy::Player::setForcedAnimationState(short var_forcedAnimationState, l
 	::Player::Get(m_index)->ForcedAnimationState = var_forcedAnimationState;
 }
 
-float LuaProxy::Player::unknown124(lua_State *L) const
+double LuaProxy::Player::forcedAnimationTimer(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->Unknown124;
+	return ::Player::Get(m_index)->ForcedAnimationTimer;
 }
 
-void LuaProxy::Player::setUnknown124(float var_unknown124, lua_State *L)
+void LuaProxy::Player::setForcedAnimationTimer(double var_forcedAnimationTimer, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->Unknown124 = var_unknown124;
-}
-
-float LuaProxy::Player::unknown128(lua_State *L) const
-{
-	if(!isValid_throw(L))
-		return 0;
-	return ::Player::Get(m_index)->Unknown128;
-}
-
-void LuaProxy::Player::setUnknown128(float var_unknown128, lua_State *L)
-{
-	if(!isValid_throw(L))
-		return;
-	::Player::Get(m_index)->Unknown128 = var_unknown128;
+	::Player::Get(m_index)->ForcedAnimationTimer = var_forcedAnimationTimer;
 }
 
 short LuaProxy::Player::downButtonMirror(lua_State *L) const
@@ -1826,32 +1809,32 @@ void LuaProxy::Player::setCurrentSection(short var_currentSection, lua_State *L)
 	::Player::Get(m_index)->CurrentSection = var_currentSection;
 }
 
-short LuaProxy::Player::warpTimer(lua_State *L) const
+short LuaProxy::Player::warpCooldownTimer(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->WarpTimer;
+	return ::Player::Get(m_index)->WarpCooldownTimer;
 }
 
-void LuaProxy::Player::setWarpTimer(short var_warpTimer, lua_State *L)
+void LuaProxy::Player::setWarpCooldownTimer(short var_warpCooldownTimer, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->WarpTimer = var_warpTimer;
+	::Player::Get(m_index)->WarpCooldownTimer = var_warpCooldownTimer;
 }
 
-short LuaProxy::Player::unknown15E(lua_State *L) const
+short LuaProxy::Player::targetWarpIndex(lua_State *L) const
 {
 	if(!isValid_throw(L))
 		return 0;
-	return ::Player::Get(m_index)->Unknown15E;
+	return ::Player::Get(m_index)->TargetWarpIndex;
 }
 
-void LuaProxy::Player::setUnknown15E(short var_unknown15E, lua_State *L)
+void LuaProxy::Player::setTargetWarpIndex(short var_targetWarpIndex, lua_State *L)
 {
 	if(!isValid_throw(L))
 		return;
-	::Player::Get(m_index)->Unknown15E = var_unknown15E;
+	::Player::Get(m_index)->TargetWarpIndex = var_targetWarpIndex;
 }
 
 short LuaProxy::Player::projectileTimer1(lua_State *L) const

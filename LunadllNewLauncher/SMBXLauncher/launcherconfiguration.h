@@ -29,9 +29,9 @@ public:
 
     bool setConfigurationAndValidate(const QJsonDocument &settingsToParse, const std::function<void(VALIDATE_ERROR, const QString&)>& errFunc);
 
-    bool checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
     bool hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
-
+    bool checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
+    static bool loadUpdateJson(const QString& checkWebsite, QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
 };
 
 #endif // LAUNCHERSETTINGS_H

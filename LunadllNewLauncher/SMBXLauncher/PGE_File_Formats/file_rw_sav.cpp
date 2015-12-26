@@ -16,8 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef PGE_FILES_QT
 #include <QFileInfo>
 #include <QDir>
+#else
+#include <stdlib.h>
+#include <limits.h> /* PATH_MAX */
+#endif
 
 #include "file_formats.h"
 #include "file_strlist.h"
@@ -28,7 +33,7 @@
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
-GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
+GamesaveData FileFormats::ReadSMBX64SavFile(PGESTRING RawData, PGESTRING filePath)
 {
     errorString.clear();
     SMBX64_File( RawData );
@@ -36,16 +41,16 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
     int i;                  //counters
     int arrayIdCounter=0;
     GamesaveData FileData;
-    FileData = dummySaveDataArray();
+    FileData = CreateGameSaveData();
 
     FileData.untitled = false;
 
     //Add path data
-    if(!filePath.isEmpty())
+    if(!filePath.PGESTRINGisEmpty())
     {
-        QFileInfo in_1(filePath);
-        FileData.filename = in_1.baseName();
-        FileData.path = in_1.absoluteDir().absolutePath();
+        PGE_FileFormats_misc::FileInfo in_1(filePath);
+        FileData.filename = in_1.basename();
+        FileData.path = in_1.dirpath();
     }
 
     //Enable strict mode for SMBX LVL file format
@@ -61,8 +66,8 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
 
     for(i=0; i< (ge(56)? 5 : 2) ;i++)
     {
-        saveCharacterState charState;
-        charState = dummySavCharacterState();
+        saveCharState charState;
+        charState = CreateSavCharacterState();
         nextLine(); UIntVar(charState.state, line);//Character's power up state
         nextLine(); UIntVar(charState.itemID, line) //ID of item in the slot
         if(ge(10)) { nextLine();UIntVar(charState.mountType, line); } //Type of mount
@@ -81,7 +86,7 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
     arrayIdCounter=1;
 
     nextLine();
-    while((line!="\"next\"")&&(!line.isNull()))
+    while((line!="\"next\"")&&(!IsNULL(line)))
     {
         visibleItem level;
         level.first=arrayIdCounter;
@@ -95,7 +100,7 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
 
     arrayIdCounter=1;
     nextLine();
-    while((line!="\"next\"")&&(!line.isNull()))
+    while((line!="\"next\"")&&(!IsNULL(line)))
     {
         visibleItem level;
         level.first=arrayIdCounter;
@@ -109,7 +114,7 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
 
     arrayIdCounter=1;
     nextLine();
-    while((line!="\"next\"")&&(!line.isNull()))
+    while((line!="\"next\"")&&(!IsNULL(line)))
     {
         visibleItem level;
         level.first=arrayIdCounter;
@@ -124,7 +129,7 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
     if(ge(7))
     {
         nextLine();
-        while((line!="\"next\"")&&(!line.isNull()))
+        while((line!="\"next\"")&&(!IsNULL(line)))
         {
             starOnLevel gottenStar;
             gottenStar.first="";
@@ -152,7 +157,12 @@ GamesaveData FileFormats::ReadSMBX64SavFile(QString RawData, QString filePath)
     return FileData;
 
     badfile:    //If file format is not correct
-    BadFileMsg(filePath+"\nFile format "+fromNum(file_format), str_count, line);
+    if(file_format>0)
+        FileData.ERROR_info="Detected file format: SMBX-"+fromNum(file_format)+" is invalid";
+    else
+        FileData.ERROR_info="It is not an SMBX game save file";
+    FileData.ERROR_linenum=str_count;
+    FileData.ERROR_linedata=line;
     FileData.ReadFileValid=false;
     return FileData;
 }

@@ -1,6 +1,8 @@
-#include "Main.h"
-//#include <windows.h>
 #include <string>
+#define _USE_MATH_DEFINES
+#include <math.h>
+//#include <windows.h>
+#include "Main.h"
 #include "Globals.h"
 #include "GlobalFuncs.h"
 #include "Defines.h"
@@ -13,8 +15,6 @@
 #include "SMBXInternal/Blocks.h"
 #include "Misc/MiscFuncs.h"
 #include "SMBXInternal/Sound.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "Input/Input.h"
 #include "SMBXInternal/SMBXEvents.h"
 #include "LuaMain/LunaLuaMain.h"
@@ -23,8 +23,11 @@
 #include "Misc/Playground.h"
 #include "Rendering/GLEngine.h"
 #include "Rendering/GLInitTest.h"
+#include "Misc/AsmPatch.h"
 
 #define PATCHIT 1
+
+static bool LevelCustomSounds = false;
 
 // Standard DLL loader main
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
@@ -87,44 +90,46 @@ int OnLvlLoad() {
 
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
+    
+    ResetLunaModule();
 
     // WIP
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
-#ifndef NO_SDL
-	if(!episodeStarted)
-	{//Load custom sounds
-		std::string wldPath = wstr2str(GM_FULLDIR);
-		std::string SndRoot = MusicManager::SndRoot();
-        std::string custPath = wstr2str(getCustomFolderPath());
-        replaceSubStr(wldPath, "\"", "");
-		replaceSubStr(wldPath, "\\\\",  "\\");
-		replaceSubStr(wldPath, "/",  "\\");
+    
+    std::string custPath = wstr2str(getCustomFolderPath());
+    std::string wldPath = wstr2str(GM_FULLDIR);
+    std::string SndRoot = MusicManager::SndRoot();
+    replaceSubStr(wldPath, "\"", "");
+    replaceSubStr(wldPath, "\\\\", "\\");
+    replaceSubStr(wldPath, "/", "\\");
 
-		replaceSubStr(SndRoot, "\"", "");
-		replaceSubStr(SndRoot, "\\\\",  "\\");
-		replaceSubStr(SndRoot, "/",  "\\");
+    replaceSubStr(SndRoot, "\"", "");
+    replaceSubStr(SndRoot, "\\\\", "\\");
+    replaceSubStr(SndRoot, "/", "\\");
 
-		if(wldPath!=SndRoot)
-		{
-            MusicManager::loadCustomSounds(wldPath+"\\", custPath);
-			//MessageBoxA(0, std::string(wldPath+"\n"+SndRoot+"\nLevel started").c_str(), "Debug", 0);
-		}
-	}
-#endif
-	// Clean up leftovers
-	gSkipSMBXHUD = false;
-	gIsOverworld = false;
-    gOverworldHudControlFlag = WHUD_ALL;
-	gLunaRender.ClearAll();
-	gSpriteMan.ResetSpriteManager();
-	gCellMan.Reset();
-	gSavedVarBank.ClearBank();	
-	Input::ResetAll();
+    bool doSoundLoading = false;
+
+    if ((!custPath.empty()) && (file_existsX(custPath + "\\sounds.ini"))) {
+        //If custom-level specific sounds.ini detected
+        doSoundLoading = true;
+        LevelCustomSounds = true;
+    }
+    else if (LevelCustomSounds) {
+        //If custom-level specific sounds.ini was NOT detected, but was loaded recently - reload episode specific sounds
+        doSoundLoading = true;
+        LevelCustomSounds = false;
+    }
+
+    if (!episodeStarted) {
+        //Load custom sounds if episode is not finally started
+        if (wldPath != SndRoot) doSoundLoading = true;
+    }
+
+    if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
 	// Update renderer stuff
-	gLunaRender.ReloadScreenHDC();
-    g_GLEngine.ClearSMBXSprites();
+	g_GLEngine.ClearSMBXSprites();
 
 	if(gLunaEnabled) {
 		// Load autocode
@@ -145,6 +150,7 @@ int OnLvlLoad() {
         //  which can result in a memory leak of the whole Lua state!
 		//    gLunaLua = CLunaLua();
 		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
+        gLunaLua.setReady(true);
 
 		// Do some stuff
 		gAutoMan.DoEvents(true); // do with init
@@ -183,7 +189,7 @@ int TestFunc()
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
 #endif
-		gLunaLua.doEvents();
+        g_EventHandler.hookLevelLoop();
 
 		// Run autocode
 		gAutoMan.DoEvents(false);
@@ -202,45 +208,7 @@ int TestFunc()
 	return 0;
 }
 
-// *EXPORT* HUD Hook -- Runs each time the HUD is drawn.
-int HUDHook()
-{
-
-	if(gLunaEnabled) {
-		OnHUDDraw();
-	}
-
-	// Overwrite next instruction if we're skipping hud drawing,
-    // otherwise make sure the original is restored
-	if(gSkipSMBXHUD) {
-        // 0096C036 | E9 D5 BB 01 00 | jmp 987C10
-        // 0096C03B | 90 | nop
-        *((unsigned int*)0x96C036) = 0x01BBD5E9;
-        *((unsigned short*)0x96C03a) = 0x9000;
-    } else {
-        // 0096C036 | 0F 84 D1 8B 00 00 | je 974C0D
-        *((unsigned int*)0x96C036) = 0x8BD1840F;
-        *((unsigned short*)0x96C03a) = 0x0000;
-    }
-
-	// Restore some code the hook overwrote
-    #ifndef __MINGW32__
-	__asm {
-		MOV AX, WORD PTR DS: 0x00B25130
-		CMP AX, 5
-		MOV BX, 0
-	}
-    #else
-    asm(".intel_syntax noprefix\n"
-    "MOV AX, WORD PTR DS: 0x00B25130\n"
-    "CMP AX, 5\n"
-    "MOV BX, 0\n"
-    ".att_syntax\n");
-    #endif
-	return *(WORD*)0x00B25130;
-}
-
-void OnHUDDraw() {
+void OnLevelHUDDraw(int cameraIdx) {
 	if(gShowDemoCounter)
 		gDeathCounter.Draw();
 
@@ -248,7 +216,7 @@ void OnHUDDraw() {
         Event inputEvent("onHUDDraw", false);
         inputEvent.setDirectEventName("onHUDDraw");
         inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent);
+        gLunaLua.callEvent(&inputEvent, cameraIdx);
     }
 
 	gSpriteMan.RunSprites();
@@ -345,7 +313,6 @@ void InitLevel() {
 	// Example init block
 	if(curlvl == L"dlltest.lvl") {
 		gLevelEnum = DllTestLvl;
-		gCurrentMainPlayer = 1; // If you need to init stuff pre-level like this, you can put it in your level's init block		
 	}
 
 	// Qraestolia Caverns init block
@@ -409,8 +376,28 @@ void InitLevel() {
 
 }
 
+__declspec(naked) int UltimateProxy()
+{
+    __asm {
+        POP EAX
+        JMP EAX
+    }
+}
 
-
-
-
-
+int HUDHook()
+{
+#ifndef __MINGW32__
+    __asm {
+        MOV AX, WORD PTR DS : 0x00B25130
+            CMP AX, 5
+            MOV BX, 0
+    }
+#else
+    asm(".intel_syntax noprefix\n"
+        "MOV AX, WORD PTR DS: 0x00B25130\n"
+        "CMP AX, 5\n"
+        "MOV BX, 0\n"
+        ".att_syntax\n");
+#endif
+    return *(unsigned short*)0x00B25130;
+}

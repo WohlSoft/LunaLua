@@ -1,13 +1,13 @@
+#include <windows.h>
+#include <time.h>
+#include <cctype>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "DeathCounter/DeathCounter.h"
-#include <windows.h>
 #include "Shlwapi.h"
-#include <time.h>
 #include "Logging/Logging.h"
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
-#include <cctype>
 #include "Rendering/RenderOverrideManager.h"
 
 HINSTANCE gHInstance;
@@ -15,11 +15,16 @@ HINSTANCE gHInstance;
 // Global settings
 bool gLunaEnabled;
 bool gShowDemoCounter;
-bool gSkipSMBXHUD;			// Whether or not the SMBX HUD will be drawn
 bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
 bool gAutostartRan = false;
+bool gIsWindowsVistaOrNewer = false;
+SMBXHUDSettings gSMBXHUDSettings = {
+    false,    // skip
+    WHUD_ALL, // overworldHudControlFlag
+    false     // skipStarCount
+};
 
 // Global variables
 int	gFrames;
@@ -37,8 +42,6 @@ int gLastJumpPress;
 int gJumpTapped;
 int gLastRunPress;
 int gRunTapped;
-
-int	gCurrentMainPlayer;
 
 HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
@@ -77,6 +80,4 @@ GeneralLunaConfig    gGeneralConfig;
 
 CLunaLua gLunaLua;
 
-
-WORLD_HUD_CONTROL    gOverworldHudControlFlag = WHUD_ALL;
 

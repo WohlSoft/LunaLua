@@ -40,9 +40,9 @@ public:
 	void Draw();
 	void Die();
 
-	void SetCustomVar(wstring var_name, OPTYPE operation, double val);
-	bool CustomVarExists(wstring var_name);
-	double GetCustomVar(wstring var_name);
+	void SetCustomVar(std::wstring var_name, OPTYPE operation, double val);
+	bool CustomVarExists(std::wstring var_name);
+	double GetCustomVar(std::wstring var_name);
 
 	/// Members///
 	int m_ImgResCode;				// Image bank code of image resource the sprite uses

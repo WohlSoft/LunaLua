@@ -4,15 +4,15 @@
 
 #include <windows.h>
 #include <lua.hpp>
+#include <type_traits>
+#include <stdio.h>
 #include <luabind/luabind.hpp>
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
 #include <luabind/detail/call_function.hpp>
 #include "LuaHelper.h"
 #include "../Defines.h"
-#include <type_traits>
-#include <stdio.h>
-
+#include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
 
 namespace LuaProxy {
@@ -80,13 +80,14 @@ namespace LuaProxy {
 #define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
 
     enum L_FIELDTYPE{
-        LFT_INVALID = 0,
-        LFT_BYTE = 1,
-        LFT_WORD = 2,
-        LFT_DWORD = 3,
-        LFT_FLOAT = 4,
-        LFT_DFLOAT = 5,
-        LFT_STRING = 6
+        LFT_INVALID = FT_INVALID,
+        LFT_BYTE = FT_BYTE,
+        LFT_WORD = FT_WORD,
+        LFT_DWORD = FT_DWORD,
+        LFT_FLOAT = FT_FLOAT,
+        LFT_DFLOAT = FT_DFLOAT,
+        LFT_STRING = FT_MAX + 1,
+        LFT_BOOL = FT_MAX + 2
     };
 
     //for runAnimation
@@ -104,9 +105,9 @@ namespace LuaProxy {
 
     //Deprecated
     namespace SaveBankProxy {
-        void setValue(const char* key, double value);
-        luabind::object getValue(const char* key, lua_State *L);
-        bool isValueSet(const char* key);
+        void setValue(const std::string& key, double value);
+        luabind::object getValue(const std::string& key, lua_State *L);
+        bool isValueSet(const std::string& key);
         luabind::object values(lua_State* L);
         void save();
     }
@@ -151,6 +152,26 @@ namespace LuaProxy {
         void init();
         std::string resolvePathFromSection();
 
+    };
+
+    class AsyncHTTPRequest {
+        std::shared_ptr<AsyncHTTPClient> m_client;
+    public:
+        AsyncHTTPRequest();
+        void addArgument(const std::string& argName, const std::string& data, lua_State* L);
+        void setUrl(const std::string& url, lua_State* L);
+        std::string getUrl(lua_State* L) const;
+        void setMethod(AsyncHTTPClient::AsyncHTTPMethod method, lua_State* L);
+        AsyncHTTPClient::AsyncHTTPMethod getMethod(lua_State* L) const;
+        void send(lua_State* L);
+        void wait(lua_State* L);
+
+        bool isReady() const;
+        bool isProcessing() const;
+        bool isFinished() const;
+        std::string responseText(lua_State* L) const;
+        int statusCode(lua_State* L) const;
+        
     };
 
     struct RECTd{
@@ -323,6 +344,7 @@ namespace LuaProxy {
     public:
         static int count();
         static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
         static luabind::object get(luabind::object idFilter, luabind::object sectionFilter, lua_State* L);
         static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
         static LuaProxy::NPC spawn(short npcid, double x, double y, short section, lua_State* L);
@@ -330,6 +352,7 @@ namespace LuaProxy {
         static LuaProxy::NPC spawn(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
 
         NPC (int index);
+        int idx() const;
         int id(lua_State* L) const;
         void setId(int id, lua_State* L);
         bool isHidden(lua_State* L) const;
@@ -392,6 +415,9 @@ namespace LuaProxy {
         void setDontMove(bool dontMove, lua_State* L);
         void toIce(lua_State* L);
         void toCoin(lua_State* L);
+        void harm(lua_State* L);
+        void harm(short harmType, lua_State* L);
+        void harm(short harmType, float damage, lua_State* L);
         bool collidesBlockBottom(lua_State* L) const;
         void setCollidesBlockBottom(bool collidesBlockBottom, lua_State* L);
         bool collidesBlockLeft(lua_State* L) const;
@@ -562,8 +588,8 @@ namespace LuaProxy {
         void setUnkClimbing2(short var_unkClimbing2, lua_State *L);
         short unkClimbing3(lua_State *L) const;
         void setUnkClimbing3(short var_unkClimbing3, lua_State *L);
-        short waterState(lua_State *L) const;
-        void setWaterState(short var_waterState, lua_State *L);
+        short waterOrQuicksandState(lua_State *L) const;
+        void setWaterOrQuicksandState(short var_waterState, lua_State *L);
         short isInWater(lua_State *L) const;
         void setIsInWater(short var_isInWater, lua_State *L);
         short waterStrokeTimer(lua_State *L) const;
@@ -600,8 +626,8 @@ namespace LuaProxy {
         void setCurrentKillCombo(short var_currentKillCombo, lua_State *L);
         short groundSlidingPuffsState(lua_State *L) const;
         void setGroundSlidingPuffsState(short var_groundSlidingPuffsState, lua_State *L);
-        short warpNearby(lua_State *L) const;
-        void setWarpNearby(short var_warpNearby, lua_State *L);
+        short nearbyWarpIndex(lua_State *L) const;
+        void setNearbyWarpIndex(short var_warpNearby, lua_State *L);
         short unknown5C(lua_State *L) const;
         void setUnknown5C(short var_unknown5C, lua_State *L);
         short unknown5E(lua_State *L) const;
@@ -666,10 +692,8 @@ namespace LuaProxy {
         void setSpinjumpButtonHeld(short var_spinjumpButtonHeld, lua_State *L);
         short forcedAnimationState(lua_State *L) const;
         void setForcedAnimationState(short var_forcedAnimationState, lua_State *L);
-        float unknown124(lua_State *L) const;
-        void setUnknown124(float var_unknown124, lua_State *L);
-        float unknown128(lua_State *L) const;
-        void setUnknown128(float var_unknown128, lua_State *L);
+        double forcedAnimationTimer(lua_State *L) const;
+        void setForcedAnimationTimer(double var_forcedAnimationTimer, lua_State *L);
         short downButtonMirror(lua_State *L) const;
         void setDownButtonMirror(short var_downButtonMirror, lua_State *L);
         short inDuckingPosition(lua_State *L) const;
@@ -716,10 +740,10 @@ namespace LuaProxy {
         void setPowerupBoxContents(short var_powerupBoxContents, lua_State *L);
         short currentSection(lua_State *L) const;
         void setCurrentSection(short var_currentSection, lua_State *L);
-        short warpTimer(lua_State *L) const;
-        void setWarpTimer(short var_warpTimer, lua_State *L);
-        short unknown15E(lua_State *L) const;
-        void setUnknown15E(short var_unknown15E, lua_State *L);
+        short warpCooldownTimer(lua_State *L) const;
+        void setWarpCooldownTimer(short var_warpCooldownTimer, lua_State *L);
+        short targetWarpIndex(lua_State *L) const;
+        void setTargetWarpIndex(short var_targetWarpIndex, lua_State *L);
         short projectileTimer1(lua_State *L) const;
         void setProjectileTimer1(short var_projectileTimer1, lua_State *L);
         short projectileTimer2(lua_State *L) const;
@@ -837,6 +861,123 @@ namespace LuaProxy {
         short playerPowerup() const;
         void setPlayerPowerup(short playerPowerup);
     };
+
+    class Tile
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+
+        Tile(unsigned short index);
+
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+        unsigned short m_index;
+    };
+
+    class Scenery
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+
+        Scenery(unsigned short index);
+
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+        unsigned short m_index;
+    };
+
+    class Musicbox
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+
+        Musicbox(unsigned short index);
+
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+        unsigned short m_index;
+    };
+
+    class Path
+    {
+    public:
+        static unsigned short count();
+        static luabind::object get(lua_State* L);
+        static luabind::object get(luabind::object idFilter, lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
+
+        Path(unsigned short index);
+
+        short id(lua_State* L) const;
+        void setId(short id, lua_State* L);
+
+        double x(lua_State* L) const;
+        void setX(double x, lua_State* L) const;
+        double y(lua_State*) const;
+        void setY(double y, lua_State* L) const;
+
+        double width(lua_State* L) const;
+        void setWidth(double width, lua_State* L);
+        double height(lua_State* L) const;
+        void setHeight(double height, lua_State* L);
+
+        bool isValid() const;
+        bool isValid_throw(lua_State *L) const;
+
+        unsigned short m_index;
+    };
+
 
     class LevelObject
     {
@@ -972,12 +1113,21 @@ namespace LuaProxy {
 
         Camera(unsigned short index);
 
+        void mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L);
+        luabind::object mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const;
         double x();
         double y();
+        void setX(double x);
+        void setY(double y);
+        double renderX();
+        double renderY();
+        void setRenderX(double renderX);
+        void setRenderY(double renderY);
         double width();
         double height();
+        void setWidth(double width);
+        void setHeight(double height);
         
-
         unsigned short m_index;
     };
 
@@ -986,7 +1136,7 @@ namespace LuaProxy {
         Logger(std::string filename);
         Logger(const Logger &lg) = default;
         ~Logger();
-        void write(const char*line);
+        void write(const std::string& line);
         std::string filePath;
         FILE* file;
     };
@@ -999,8 +1149,8 @@ namespace LuaProxy {
     }
     //Debug/Text functions
     namespace Text{
-        void windowDebug(const char* debugText, lua_State* L);
-        void windowDebugSimple(const char* debugText);
+        void windowDebug(const std::string& debugText, lua_State* L);
+        void windowDebugSimple(const std::string& debugText);
         void print(const luabind::object& toPrint, int x, int y);
         void print(const luabind::object& toPrint, int type, int x, int y);
         void printWP(const luabind::object& toPrint, int x, int y, double priority);
@@ -1019,16 +1169,25 @@ namespace LuaProxy {
     namespace Misc{
         void npcToCoins();
         void doPOW();
+        void doBombExplosion(double x, double y, short bombType);
+        void doBombExplosion(double x, double y, short bombType, const LuaProxy::Player& playerObj);
+        void doPSwitchRaw(bool activate);
+        void doPSwitch();
+        void doPSwitch(bool activate);
         std::string cheatBuffer();
         void cheatBuffer(const luabind::object &value, lua_State* L);
         luabind::object listFiles(const std::string& path, lua_State* L);
         luabind::object listLocalFiles(std::string path, lua_State* L);
         luabind::object resolveFile(const std::string& relativePath, lua_State* L);
         luabind::object resolveDirectory(const std::string& relativePath, lua_State* L);
+        bool isSamePath(const std::string first, const std::string second);
         void openPauseMenu();
         void saveGame();
         void exitGame();
         bool loadEpisode(const std::string& episodeName);
+        void pause();
+        void unpause();
+        bool isPausedByLua();
     }
 
     namespace Graphics{
@@ -1037,6 +1196,12 @@ namespace LuaProxy {
             int imgResource;
             LuaImageResource(int imgResource);
             ~LuaImageResource();
+            int GetWidth();
+            int GetHeight();
+        };
+        enum RENDER_TYPE {
+            RTYPE_IMAGE,
+            RTYPE_TEXT
         };
 
         void activateHud(bool activateHud);
@@ -1044,14 +1209,14 @@ namespace LuaProxy {
         void activateOverworldHud(WORLD_HUD_CONTROL activateFlag);
         WORLD_HUD_CONTROL getOverworldHudState();
         //CSprite functions
-        bool loadImage(const char* filename, int resNumber, int transColor);
+        bool loadImage(const std::string&, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
-        LuaImageResource* loadImage(const char* filename);
-        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra, int time);
-        void placeSprite(int type, int imgResource, int xPos, int yPos, const char* extra);
+        LuaImageResource* loadImage(const std::string&, lua_State* L);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time);
+        void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra, int time);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const char* extra);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time);
+        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img, int xPos, int yPos);
         void unplaceSprites(const LuaImageResource& img);
@@ -1074,10 +1239,12 @@ namespace LuaProxy {
         void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L);
         void drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L);
         void drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
-        
+        void draw(const luabind::object& namedArgs, lua_State* L);
+
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
+        void __glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count);
     }
 
     namespace Effects{
@@ -1103,7 +1270,7 @@ namespace LuaProxy {
     Animation spawnEffect(short effectID, double x, double y, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 
-    void loadHitboxes(int _character, int _powerup, const char *ini_file);
+    void loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L);
 
     VBStr getInput();
 
@@ -1120,13 +1287,13 @@ namespace LuaProxy {
     luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L);
 
     //SMBX trigger function [Moved as static function]
-    void triggerEvent(const char* evName);
+    void triggerEvent(const std::string& evName);
     //Music related
     void playSFX(int index);
-    void playSFX(const char* filename);
-    void playSFXSDL(const char* filename);
+    void playSFX(const std::string& filename);
+    void playSFXSDL(const std::string& filename);
     void clearSFXBuffer();
-    void MusicOpen(const char *filename);
+    void MusicOpen(const std::string& filename);
     void MusicPlay();
     void MusicPlayFadeIn(int ms);
     void MusicStop();
@@ -1148,7 +1315,7 @@ namespace LuaProxy {
     void jumpheightBounce(unsigned short value);
 
     //Layer functions [Moved as static function]
-    luabind::object findlayer(const char* layername, lua_State *L);
+    luabind::object findlayer(const std::string& layername, lua_State *L);
     //Animation functions [Moved as static function]
     luabind::object animations(lua_State* L);
     //DEPRECATED

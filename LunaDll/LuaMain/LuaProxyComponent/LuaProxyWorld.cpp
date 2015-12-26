@@ -7,22 +7,22 @@ LuaProxy::World::World()
 
 double LuaProxy::World::playerX() const
 {
-	return SMBXOverworld::get()->XPos;
+	return SMBXOverworld::get()->momentum.x;
 }
 
 void LuaProxy::World::setPlayerX(double playerX)
 {
-	SMBXOverworld::get()->XPos = playerX;
+	SMBXOverworld::get()->momentum.x = playerX;
 }
 
 double LuaProxy::World::playerY() const
 {
-	return SMBXOverworld::get()->YPos;
+	return SMBXOverworld::get()->momentum.y;
 }
 
 void LuaProxy::World::setPlayerY(double playerY)
 {
-	SMBXOverworld::get()->YPos = playerY;
+	SMBXOverworld::get()->momentum.y = playerY;
 }
 
 void LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)

@@ -1,5 +1,6 @@
 LunaLUA
 =======
+[![Build status](https://ci.appveyor.com/api/projects/status/72ttgr33ggar3x21?svg=true)](https://ci.appveyor.com/project/Wohlstand/lunadll)
 
 LunaLUA - LunaDLL with LUA is a free extension for SMBX game engine
 This version is based on LunaDLL ver. 8 with Lua Support.
@@ -27,3 +28,16 @@ or
 Visual Studio 2015 but with msvc120
 
 
+Note for Qt Creator IDE
+------
+If you wish you edit code via Qt Creator, you still must have Visual Studio because MSVC compiler is required.
+**How to setup building from Qt creator**
+* Open project and configure it
+* Go to the "Projects" tab
+* Disable shadow build for both Debug and Release
+* remove ALL items from "Building" and "Cenaring" sections
+* Add into "Building" a special item with:
+ ** Command "build.bat"
+ ** Argument "Debug" for debug build and "Release" argument for release build
+* Add into "Clearing" a special item with "clear.bat" command
+* Try to build project. If you have "MSBuild" in another path, please modify build.bat to take working build!

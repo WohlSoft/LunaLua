@@ -3,8 +3,6 @@
 
 #include <list>
 
-using namespace std;
-
 // Top class for all GUI elements
 class CGUIElement {
 protected:
@@ -22,7 +20,7 @@ protected:
 class IGUIContainer {
 protected:
     inline void AddElement(CGUIElement* ele=0) {}
-    list<CGUIElement*> m_ChildElements;
+    std::list<CGUIElement*> m_ChildElements;
 };
 
  // Forward declarations for anything #including this file

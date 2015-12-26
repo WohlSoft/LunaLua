@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*! \file smbx64_cnf_filedata.h
+ *  \brief Contains definition of SMBX Engine settings data structure
+ */
+
 #ifndef SMBX64_CNF_FILEDATA_H
 #define SMBX64_CNF_FILEDATA_H
 
@@ -42,7 +46,6 @@ struct SMBX64_ConfigPlayer
       unsigned int j_pause;
       unsigned int j_altjump;//>=19
       unsigned int j_altrun;//>=19
-
 };
 
 struct SMBX64_ConfigFile
@@ -52,6 +55,9 @@ struct SMBX64_ConfigFile
     PGEVECTOR<SMBX64_ConfigPlayer> players;
 
     bool ReadFileValid;
+    PGESTRING ERROR_info;
+    PGESTRING ERROR_linedata;
+    int       ERROR_linenum;
 };
 
 #endif // SMBX64_CNF_FILEDATA_H

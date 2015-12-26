@@ -15,9 +15,11 @@
 #include <fcntl.h>
 #include <io.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "Misc/MiscFuncs.h"
+#include "Input/Input.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -134,6 +136,38 @@ std::string wstr2str(const std::wstring &wstr)
 	return s;
 }
 
+std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen)
+{
+    int len = ::WideCharToMultiByte(CP_ACP, 0, pstr, wslen, NULL, 0, NULL, NULL);
+
+    std::string dblstr(len, '\0');
+    len = ::WideCharToMultiByte(CP_ACP, 0 /* no flags */,
+        pstr, wslen /* not necessary NULL-terminated */,
+        &dblstr[0], len,
+        NULL, NULL /* no default char */);
+
+    return dblstr;
+}
+
+std::string ConvertBSTRToMBS(BSTR bstr)
+{
+    int wslen = ::SysStringLen(bstr);
+    return ConvertWCSToMBS((wchar_t*)bstr, wslen);
+}
+
+BSTR ConvertMBSToBSTR(const std::string & str)
+{
+    int wslen = ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
+        str.data(), str.length(),
+        NULL, 0);
+
+    BSTR wsdata = ::SysAllocStringLen(NULL, wslen);
+    ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
+        str.data(), str.length(),
+        wsdata, wslen);
+    return wsdata;
+}
+
 std::string i2str(int source)
 {
 	std::stringstream s;
@@ -159,44 +193,83 @@ bool file_existsX(const std::string& name)
     }   
 }
 
+void ResetLunaModule() 
+{
+    gLunaEnabled = true;
+    gShowDemoCounter = false;
+    gPrintErrorsToScreen = true;
+    gLogger.m_Enabled = false;
+    gIsOverworld = false;
+
+    gSMBXHUDSettings.skip = false;
+    gSMBXHUDSettings.overworldHudState = WHUD_ALL;
+    gSMBXHUDSettings.skipStarCount = false;
+
+    gFrames = 0;
+
+    gLastDownPress = 0;
+    gDownTapped = 0;
+    gLastUpPress = 0;
+    gUpTapped = 0;
+    gLastLeftPress = 0;
+    gLeftTapped = 0;
+    gLastRightPress = 0;
+    gRightTapped = 0;
+
+    gLastJumpPress = 0;
+    gJumpTapped = 0;
+    gLastRunPress = 0;
+    gRunTapped = 0;
+
+    gLevelEnum = Invalid;
+
+    g_EventHandler.reset();
+    gLunaRender.ClearAll();
+    gSpriteMan.ResetSpriteManager();
+    gCellMan.Reset();
+    gSavedVarBank.ClearBank();
+    Input::ResetAll();
+
+    gHook_SkipTestMsgBox = false;
+
+    // Static default hitboxes and other values
+    native_initStaticVals();
+    native_initDefVals();
+
+    gLunaRender.ReloadScreenHDC();
+}
+
+static bool IsWindowsVistaOrNewer() {
+    OSVERSIONINFOEX osVersionInfo;
+    DWORDLONG conditionMask = 0;
+
+    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
+    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    osVersionInfo.dwMajorVersion = 6;
+    osVersionInfo.dwMinorVersion = 0;
+    osVersionInfo.wServicePackMajor = 0;
+    osVersionInfo.wServicePackMinor = 0;
+    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
+
+    return VerifyVersionInfo(
+        &osVersionInfo,
+        VER_MAJORVERSION | VER_MINORVERSION |
+        VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
+        conditionMask);
+}
+
 /// INIT GLOBALS
 void InitGlobals()
 {
-	//char* dbg = "GLOBAL INIT DBG";
-	gLunaEnabled = true;
-	gShowDemoCounter = false;
-	gSkipSMBXHUD = false;
-	gPrintErrorsToScreen = true;
-	gLogger.m_Enabled = false;
-	gIsOverworld = false;
-	gCellMan.Reset();
-
-	gFrames = 0;
-
-	gLastDownPress = 0;
-	gDownTapped = 0;
-	gLastUpPress = 0;
-	gUpTapped = 0;
-	gLastLeftPress = 0;
-	gLeftTapped = 0;
-	gLastRightPress = 0;
-	gRightTapped = 0;
-
-	gLastJumpPress = 0;
-	gJumpTapped = 0;
-	gLastRunPress = 0;
-	gRunTapped = 0;
-
-	gCurrentMainPlayer = 1;
-
-	gLevelEnum = Invalid;
+    //char* dbg = "GLOBAL INIT DBG";
+	
+    gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
 	//startup settings default
     memset(&gStartupSettings, 0, sizeof(gStartupSettings));
-
-	gHook_SkipTestMsgBox = false;
-
-    gOverworldHudControlFlag = WHUD_ALL;
 
 	srand((int)time(NULL));
 
@@ -231,8 +304,6 @@ void InitGlobals()
         CreateDirectoryW(L"config", NULL);
     }
 
-    gGeneralConfig.setFilename(L"config/luna.ini");
-    gGeneralConfig.loadOrDefault();
 }
 
 /// CLEAN UP
@@ -248,7 +319,7 @@ void CleanUp() {
 
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
 {
-	vector<std::wstring> ret;
+    std::vector<std::wstring> ret;
 	while ( true )
 	{
 		size_t pos = str.find_first_of( delimiter );
@@ -263,7 +334,7 @@ std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
 
 std::vector<std::string> split(std::string str, char delimiter)
 {
-	vector<std::string> ret;
+    std::vector<std::string> ret;
 	while ( true )
 	{
 		size_t pos = str.find_first_of( delimiter );
@@ -274,6 +345,31 @@ std::vector<std::string> split(std::string str, char delimiter)
 		str = str.substr( pos + 1 );
 	}
 	return ret;
+}
+
+
+std::string url_encode(const std::string &value)
+{
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        std::string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
+        }
+
+        // Any other characters are percent-encoded
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << int((unsigned char)c);
+        escaped << std::nouppercase;
+    }
+
+    return escaped.str();
 }
 
 bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
@@ -311,7 +407,7 @@ std::wstring getModulePath()
 
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
-	wifstream theFile(path, ios::binary|ios::in);
+    std::wifstream theFile(path, std::ios::binary| std::ios::in);
 	if(!theFile.is_open()){
 		theFile.close();
 		if(!errMsg.empty())
@@ -325,7 +421,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
 {
-    ifstream theFile(path, ios::binary | ios::in);
+    std::ifstream theFile(path, std::ios::binary | std::ios::in);
     if (!theFile.is_open()) {
         theFile.close();
         if (!errMsg.empty())
@@ -339,12 +435,12 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
 
 bool isAbsolutePath(const std::wstring& path)
 {
-	return std::iswalpha(path[0]) && path[1] == L':' && path[2] == L'\\';
+	return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
 }
 
 bool isAbsolutePath(const std::string& path)
 {
-	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && path[2] == L'\\';
+	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
 
 std::string generateTimestamp(std::string format)
@@ -367,7 +463,7 @@ std::string generateTimestampForFilename()
 
 bool writeFile(const std::string &content, const std::string &path)
 {
-    ofstream theFile(path, ios::binary | ios::out);
+    std::ofstream theFile(path, std::ios::binary | std::ios::out);
     if (!theFile.is_open()){
         theFile.close();
         return false;
@@ -427,7 +523,7 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
         return out; /* No files found */
 
     do {
-        const string file_name = file_data.cFileName;
+        const std::string file_name = file_data.cFileName;
         const bool skipFile = (file_data.dwFileAttributes & fileAttributes) == 0;
         
         if (file_name[0] == '.')
@@ -447,13 +543,50 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
 
 std::wstring getCustomFolderPath()
 {
-    wstring world_dir = (wstring)GM_FULLDIR;
-    wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
+    std::wstring world_dir = (std::wstring)GM_FULLDIR;
+    std::wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
     if (!gIsOverworld){
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder
     }
     return full_path;
+}
+
+std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
+{
+    FILETIME newest = { 0 };
+    std::wstring newestFileName = L"";
+
+    for (const std::wstring& nextPath : paths) {
+        if(GetFileAttributesW(nextPath.c_str()) == INVALID_FILE_ATTRIBUTES)
+            continue; // File does not exist, continue with next.
+
+        HANDLE hNextFile = CreateFileW(nextPath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+        if(!hNextFile) // Failed to open file, continue with next.
+            continue;
+
+        FILETIME nextFileTime = { 0 };
+        if (!GetFileTime(hNextFile, NULL, NULL, &nextFileTime)) {
+            CloseHandle(hNextFile);
+            continue;
+        }
+
+        if (CompareFileTime(&newest, &nextFileTime) < 0) {
+            memcpy(&newest, &nextFileTime, sizeof(FILETIME));
+            newestFileName = nextPath;
+        }
+        CloseHandle(hNextFile);
+    }
+
+    return newestFileName;
+}
+
+std::wstring getLatestConfigFile(const std::wstring& configname)
+{
+    return getLatestFile({
+        getModulePath() + L"//" + configname,
+        getModulePath() + L"//config//" + configname
+    });
 }
 
 void RedirectIOToConsole()
@@ -502,9 +635,10 @@ void RedirectIOToConsole()
 
     // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
     // point to console as well
-    ios::sync_with_stdio();
+    std::ios::sync_with_stdio();
 }
 
+#ifdef BUILD_WITH_ATL_STUFF
 // WIP 
 #include <atlbase.h>
 #include "Misc/TypeLib.h"
@@ -565,3 +699,6 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
     */
 
 }
+
+
+#endif

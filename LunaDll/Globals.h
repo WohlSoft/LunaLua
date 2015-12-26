@@ -12,7 +12,6 @@
 #include "DeathCounter/DeathCounter.h"
 #include "Autocode/AutocodeManager.h"
 #include "Logging/Logging.h"
-#include "CustomSprites/CSprite.h"
 #include "CustomSprites/CSpriteManager.h"
 #include "CellManager/CellManager.h"
 #include "UserSaves/UserSaving.h"
@@ -22,8 +21,8 @@
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
 #include "Misc/FreeImageUtils/FreeImageInit.h"
-#include "Misc/GeneralLunaConfig.h"
-
+#include "GameConfig/GeneralLunaConfig.h"
+#include "EventStateMachine.h"
 
 class RenderOverrideManager;
 
@@ -45,16 +44,23 @@ struct startUpSettings{
     bool console;
 };
 
+struct SMBXHUDSettings {
+    bool              skip; // Skip the whole HUD drawing
+    WORLD_HUD_CONTROL overworldHudState;
+    bool              skipStarCount;
+};
+
 extern HINSTANCE	gHInstance;
 
 /// Global settings
-extern bool		gLunaEnabled;
-extern bool		gShowDemoCounter;
-extern bool		gSkipSMBXHUD;
-extern bool		gPrintErrorsToScreen;
-extern bool		gIsOverworld;
-extern bool		gHook_SkipTestMsgBox;
-extern bool     gAutostartRan;
+extern bool            gLunaEnabled;
+extern bool            gShowDemoCounter;
+extern bool            gPrintErrorsToScreen;
+extern bool            gIsOverworld;
+extern bool            gHook_SkipTestMsgBox;
+extern bool            gAutostartRan;
+extern bool            gIsWindowsVistaOrNewer;
+extern SMBXHUDSettings gSMBXHUDSettings;
 
 extern startUpSettings gStartupSettings;
 
@@ -74,8 +80,6 @@ extern int		gLastJumpPress;
 extern int		gJumpTapped;
 extern int		gLastRunPress;
 extern int		gRunTapped;
-
-extern int		gCurrentMainPlayer;
 
 extern HDC		ghMemDC;		// General-use screen-compatible DC
 extern HBITMAP	ghGeneralDIB;	// General-use screen-sized DIB
@@ -106,9 +110,6 @@ extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
 
 extern CLunaLua				gLunaLua;
-
-
-extern WORLD_HUD_CONTROL    gOverworldHudControlFlag;
 
 /// HELPER MACROS ///
 /*

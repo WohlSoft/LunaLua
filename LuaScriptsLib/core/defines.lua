@@ -1,3 +1,7 @@
+-- To generate the wiki stuff just uncomment this line: 
+-- __wikiGEN = true
+
+
 --These are redefines for the wiki
 if __wikiGEN then
     FIELD_BYTE = 0
@@ -26,7 +30,10 @@ local sortedCategories = {
     "Coin Value",
     "Level",
     "Cheats",
-    "Player Settings: Link"
+    "Player Settings General",
+    "Player Settings: Link",
+    "Block Modification",
+    "Kill Modification"
 }
 
 local function getBoolean(self)
@@ -99,57 +106,96 @@ local defines = {
     
     
     --[[ Cheat Defines ]]--
-    cheat_shadowmario               = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8AA, size = FIELD_BOOLEAN,
+    cheat_shadowmario               = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8AA, size = FIELD_BOOLEAN,
                                         n = 1, group = "Cheats", desc = "If the cheat shadowmario/ghostytime is active. If this cheat is active, then the player can go through blocks.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_ahippinandahoppin         = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8AC, size = FIELD_BOOLEAN,
+    cheat_ahippinandahoppin         = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8AC, size = FIELD_BOOLEAN,
                                         n = 2, group = "Cheats", desc = "If the cheat ahippinandahoppin/jumplikesomething is active. This cheat grants infinite double jumps.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_sonictooslow              = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8AE, size = FIELD_BOOLEAN,
+    cheat_sonictooslow              = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8AE, size = FIELD_BOOLEAN,
                                         n = 3, group = "Cheats", desc = "If the cheat sonictooslow/chipmunktimes is active. This cheat makes the player run very fast.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_illparkwhereiwant         = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8B0, size = FIELD_BOOLEAN,
+    cheat_illparkwhereiwant         = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8B0, size = FIELD_BOOLEAN,
                                         n = 4, group = "Cheats", desc = "If the cheat illparkwhereiwant is active. If this cheat is active, then you can move freely on the world map.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_wingman                   = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8B2, size = FIELD_BOOLEAN,
+    cheat_wingman                   = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8B2, size = FIELD_BOOLEAN,
                                         n = 5, group = "Cheats", desc = "If the cheat wingman/peawing is active. This cheat makes the player/yoshi fly infinitly.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_captainn                  = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8B6, size = FIELD_BOOLEAN,
+    cheat_captainn                  = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8B6, size = FIELD_BOOLEAN,
                                         n = 6, group = "Cheats", desc = "If the cheat captainn/juststop is active. If this cheat is active, then you can freeze time with the PAUSE-Button.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_flamerthrower             = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8B8, size = FIELD_BOOLEAN,
+    cheat_flamerthrower             = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8B8, size = FIELD_BOOLEAN,
                                         n = 7, group = "Cheats", desc = "If the cheat flamerthrower/mchammerdude is active. If this cheat is active, then you can spam projectiles very fast (i.e Fireball, Iceball, Hammer).", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_moneytree                 = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8BA, size = FIELD_BOOLEAN,
+    cheat_moneytree                 = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8BA, size = FIELD_BOOLEAN,
                                         n = 8, group = "Cheats", desc = "If the cheat moneytree/havemoney is active. If this cheat is active, then you can spam projectiles very fast (i.e Fireball, Iceball, Hammer).", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_speeddemon                = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8BE, size = FIELD_BOOLEAN,
+    cheat_speeddemon                = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8BE, size = FIELD_BOOLEAN,
                                         n = 9, group = "Cheats", desc = "If the cheat speeddemon/maytoofast is active. This values is the same as the \"Max FPS\" setting. If this is active, then there is no frame limit.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_donthurtme                = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8C0, size = FIELD_BOOLEAN,
+    cheat_donthurtme                = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8C0, size = FIELD_BOOLEAN,
                                         n = 10, group = "Cheats", desc = "If the cheat donthurtme/strategyyo is active. This values is the same as the \"God Mode\" setting. If this is active, then the player has god mode active and cannot be killed.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    cheat_stickyfingers             = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8C2, size = FIELD_BOOLEAN,
+    cheat_stickyfingers             = {--[[defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8C2, size = FIELD_BOOLEAN,
                                         n = 11, group = "Cheats", desc = "If the cheat stickyfingers/tenacioustoes is active. This values is the same as the \"Grab All\" setting. If this is active, then player can grab every npc.", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
-    player_hasCheated               = {defValue = false, minVal = nil, maxVal = nil, address = 0x00B2C8C4, size = FIELD_BOOLEAN,
+    player_hasCheated               = {--[[{defValue = false,]] minVal = nil, maxVal = nil, address = 0x00B2C8C4, size = FIELD_BOOLEAN,
                                         n = 12, group = "Cheats", desc = "This is the indicator if the player has cheated (used on of the cheat codes). If this is the case then saving is deactivated. However with the cheat redigitiscool/raocowisswell you can activate cheating again. How lucky that you can deactivate it again :)", 
                                         customFuncGet = getBoolean, customFuncSet = setBoolean},
     
     
+    --[[ Player General Defines ]]--
+    player_grabSideEnabled          = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 1, group = "Player Settings General", desc = "If grabbing from the side is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009AD622, FIELD_WORD) == 0x850F
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009AD622, FIELD_WORD, 0x850F)
+                                            else
+                                                mem(0x009AD622, FIELD_WORD, 0xE990)
+                                            end
+                                        end},
+    player_grabTopEnabled           = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 2, group = "Player Settings General", desc = "If grabbing from top is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009CC392, FIELD_WORD) == 0x850F
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009CC392, FIELD_WORD, 0x850F)
+                                            else
+                                                mem(0x009CC392, FIELD_WORD, 0xE990)
+                                            end
+                                        end},    
+    player_grabShellEnabled         = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 3, group = "Player Settings General", desc = "If grabbing shells is enabled!",
+                                        customFuncGet = function(self)
+                                            return mem(0x009ADA63, FIELD_WORD) == 0x1474
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x009ADA63, FIELD_WORD, 0x1474) -- From Side
+                                                mem(0x009AC6C4, FIELD_WORD, 0x850F) -- From Top
+                                            else
+                                                mem(0x009ADA63, FIELD_WORD, 0x9090) -- From Side
+                                                mem(0x009AC6C4, FIELD_WORD, 0xE990) -- From Top
+                                            end
+                                        end},      
     
-    --[[ Player Defines ]]--
+    --[[ Player Link Defines ]]--
     player_link_shieldEnabled       = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
                                         n = 1, group = "Player Settings: Link", desc = "If the shield of link is enabled.", 
                                         customFuncGet = function(self)
@@ -185,7 +231,23 @@ local defines = {
                                             else
                                                 mem(0x009AAF93, FIELD_BYTE, 0xFF)
                                             end
-                                        end}
+                                        end},
+                                        
+
+    
+    block_hit_link_rupeeID1         = {defValue = 251, minVal = 0, maxVal = 300, address = 0x009DBD9A, size = FIELD_WORD,
+                                        n = 1, group = "Block Modification", desc = "The npc id for Link's main coin when hitting the block. (Default would be the green rupee.)"},
+    block_hit_link_rupeeID2         = {defValue = 252, minVal = 0, maxVal = 300, address = 0x009DBDFF, size = FIELD_WORD,
+                                        n = 2, group = "Block Modification", desc = "The npc id for Link's secondary coin when hitting the block (chance 20:3). (Default would be the blue rupee.)"},
+    block_hit_link_rupeeID3         = {defValue = 253, minVal = 0, maxVal = 300, address = 0x009DBE64, size = FIELD_WORD,
+                                        n = 3, group = "Block Modification", desc = "The npc id for Link's tertiary coin when hitting the block (chance 60:3). (Default would be the red rupee.)"},
+
+    kill_drop_link_rupeeID1         = {defValue = 251, minVal = 0, maxVal = 300, address = 0x00A32943, size = FIELD_WORD,
+                                        n = 1, group = "Kill Modification", desc = "The npc id for Link's main coin when killing an enemy. (Default would be the green rupee.)"},
+    kill_drop_link_rupeeID2         = {defValue = 252, minVal = 0, maxVal = 300, address = 0x00A329D5, size = FIELD_WORD,
+                                        n = 2, group = "Kill Modification", desc = "The npc id for Link's secondary coin when killing an enemy. (chance 15:3). (Default would be the blue rupee.)"},
+    kill_drop_link_rupeeID3         = {defValue = 253, minVal = 0, maxVal = 300, address = 0x00A32A6F, size = FIELD_WORD,
+                                        n = 3, group = "Kill Modification", desc = "The npc id for Link's tertiary coin when killing an enemy. (chance 40:3). (Default would be the red rupee.)"},
 }
 
 --(Re)sets a define
@@ -195,6 +257,9 @@ local function setDefine(defTable, value)
         theValue = value
     else
         theValue = defTable.defValue
+        if(theValue == nil)then
+            return
+        end
     end
     if(defTable.customFuncSet)then
         defTable:customFuncSet(theValue)
@@ -351,7 +416,11 @@ local function generateWiki()
                 elseif defineTable.size == FIELD_BOOLEAN then
                     wfile:write("BOOLEAN|")
                 end
-                wfile:write(tostring(defineTable.defValue).."|")
+                if(defineTable.defValue == nil)then
+                    wfile:write("None|")
+                else
+                    wfile:write(tostring(defineTable.defValue).."|")
+                end
                 if defineTable.minVal and defineTable.maxVal then
                     wfile:write("Min. Value: "..defineTable.minVal.."<br>")
                     wfile:write("Max. Value: "..defineTable.maxVal.."|")

@@ -253,7 +253,7 @@ bool LuaProxy::LevelObject::isPathBackground() const
 {
     if (!isValid())
         return false;
-    return (bool)SMBXLevel::get(m_index)->isPathBackground;
+    return 0 != SMBXLevel::get(m_index)->isPathBackground;
 }
 
 void LuaProxy::LevelObject::setIsPathBackground(bool isPathBackground)
@@ -267,7 +267,7 @@ bool LuaProxy::LevelObject::isBigBackground() const
 {
     if (!isValid())
         return false;
-    return (bool)SMBXLevel::get(m_index)->isBigBackground;
+    return 0 != SMBXLevel::get(m_index)->isBigBackground;
 }
 
 void LuaProxy::LevelObject::setIsBigBackground(bool isBigBackground)
@@ -281,7 +281,7 @@ bool LuaProxy::LevelObject::isGameStartPoint() const
 {
     if (!isValid())
         return false;
-    return (bool)SMBXLevel::get(m_index)->isGameStartPoint;
+    return 0 != SMBXLevel::get(m_index)->isGameStartPoint;
 }
 
 void LuaProxy::LevelObject::setIsGameStartPoint(bool isGameStartPoint)
@@ -295,7 +295,7 @@ bool LuaProxy::LevelObject::isAlwaysVisible() const
 {
     if (!isValid())
         return false;
-    return (bool)SMBXLevel::get(m_index)->isAlwaysVisible;
+    return 0 != SMBXLevel::get(m_index)->isAlwaysVisible;
 }
 
 void LuaProxy::LevelObject::setIsAlwaysVisible(bool isAlwaysVisible)

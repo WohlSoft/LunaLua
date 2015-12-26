@@ -86,10 +86,98 @@ local function initFFIBasedAPIs()
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
     
+	local function convertGlArray(arr, arr_len)
+		if (arr == nil) then return 0 end
+		local arr_offset = 0
+		if (arr[0] == nil) then arr_offset = 1 end
+        local arr_raw = LunaDLL.LunaLuaGlAllocCoords(arr_len)
+        for i = 0,arr_len-1 do
+            arr_raw[i] = arr[i+arr_offset] or 0
+        end
+		return tonumber(ffi.cast("unsigned int", arr_raw))
+	end
+	
+	local function getGlElementCount(arr, divisor)
+		local len_offset = 0
+		if (arr[0] ~= nil) then len_offset = 1 end
+		return math.floor((#arr + len_offset) / divisor)
+	end
+	
+	Graphics.glDraw = function(args)
+		local priority = args['priority'] or 1.0
+		local texture = args['texture']
+		local color = args['color'] or {1.0, 1.0, 1.0, 1.0}
+		if (type(color) == "number") then
+			error("Numeric colors support not yet existing")
+		elseif (#color == 3) then
+			color = {color[1], color[2], color[3], 1.0}
+		end
+		local vertCoords = args['vertexCoords']
+		local texCoords = args['textureCoords']
+		local vertColor = args['vertexColors']
+		local arr_len = nil
+		if (vertCoords == nil) then
+			error("vertexCoords is required")
+		end
+		local arr_len = getGlElementCount(vertCoords, 2)
+		if (texCoords ~= nil) then
+			if (arr_len ~= getGlElementCount(texCoords, 2)) then
+				error("Incorrect textureCoords len")
+			end
+		end
+		if (vertColor ~= nil) then
+			if (arr_len ~= getGlElementCount(vertColor, 4)) then
+				error("Incorrect vertexColors len")
+			end
+		end
+		vertCoords = convertGlArray(vertCoords, arr_len*2)
+		texCoords = convertGlArray(texCoords, arr_len*2)
+		vertColor = convertGlArray(vertColor, arr_len*4)
+	
+		Graphics.__glInternalDraw(
+			priority, texture,
+			color[1], color[2], color[3], color[4],
+			vertCoords, texCoords, vertColor, arr_len)
+	end
+	
     -- Limit access to FFI
     package.preload['ffi'] = nil
     package.loaded['ffi'] = nil
 end
+
+local function initJSON()
+    package.path = package.path .. ";./LuaScriptsLib/ext/?.lua"
+    _G["json"] = require("lunajson")
+end
+
+local nativeIO = io.open
+local nativeIsSamePath = Misc.isSamePath
+local function initSafeIO()
+    io.open = function(filename, mode)
+        local badFiles = {
+            "./config/luna.ini",
+            "./config/game.ini",
+            "./config/autostart.ini",
+            "./luna.ini",
+            "./game.ini",
+            "./autostart.ini",
+            "./LuaScriptsLib/mainV2.lua"
+        }
+        local hasSame = false
+        for _, nextPath in pairs(badFiles) do
+            if(nativeIsSamePath(nextPath, filename))then
+                hasSame = true
+            end
+        end
+        if hasSame then
+            error("You cannot access this path: " .. filename);
+        end
+        return nativeIO(filename, mode)
+    end
+end
+
+initSafeIO()
+initJSON()
 initFFIBasedAPIs()
 
 -- We want the JIT running, so it's initially preloaded, but disable access to it
@@ -226,6 +314,80 @@ function __xpcallCheck(returnData)
     end
     return true
 end
+
+function registerCustomEvent(obj, eventName)
+    local queue = {};
+    local mt = getmetatable(obj);
+    if(mt == nil) then
+        mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
+    end
+    local index_f = mt.__index;
+    local newindex_f = mt.__newindex;
+    
+    mt.__index = function(tbl, key)
+        if(key == eventName) then
+            return function(...)
+                for _,v in ipairs(queue) do
+                    v(...);
+                end
+            end
+        else
+            return index_f(tbl, key);
+        end
+    end
+    
+    mt.__newindex = function (tbl,key,val)
+        if(key == eventName) then
+            table.insert(queue, val);
+        else
+            newindex_f(tbl,key,val);
+        end
+    end
+    
+    setmetatable(obj,mt);
+end
+
+detourEventQueue = {
+    collectedEvents = {},
+    -- Collect an native event for the onLoop event
+    collectEvent = function(eventName, ...)
+        local args = {...}
+        local eventInfo = args[1]
+        local directEventName = ""
+        if(eventInfo.loopable)then
+            local collectedEvent = {eventName, detourEventQueue.transformArgs(eventName, ...)}
+            table.insert(detourEventQueue.collectedEvents, collectedEvent)
+        end
+        if(eventInfo.directEventName == "")then
+            directEventName = eventName.."Direct"
+        else
+            directEventName = eventInfo.directEventName
+        end
+        return directEventName
+    end,
+    transformArgs = function(eventName, ...)
+        local fArgs = {...} -- Original Functions Args
+        local rArgs = {...} -- New Functions Args
+        --- ALL HARDCODED EVENTS ---
+        if(eventName == "onEvent")then
+            -- NOTE: Index starts with 1!
+            -- Original Signature: Event eventObj, String name
+            -- New Signature: String name
+            rArgs = {fArgs[2]}
+        else
+            table.remove(rArgs[1]) --Remove the event object, as it cannot be used for loop events
+        end
+        --- ALL HARDCODED EVENTS END ---
+        return rArgs
+    end,
+    -- Dispatch the new event
+    dispatchEvents = function()
+        for idx, collectedEvent in ipairs(detourEventQueue.collectedEvents) do
+             eventManager[collectedEvent[1]](unpack(collectedEvent[2]))
+        end
+        detourEventQueue.collectedEvents = {}
+    end
+}
 
 local function findLast(haystack, needle)
     local i=haystack:match(".*"..needle.."()")
@@ -399,6 +561,7 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     return true
 end
 
+
 --=====================================================================
 --[[ Main Event Manager ]]--
 EventManager = {}
@@ -546,3 +709,4 @@ function __onInit(episodePath, lvlName)
     end)}
     __xpcallCheck(pcallReturns)
 end
+

@@ -23,6 +23,9 @@ struct VB6StrPtr {
 	operator bool() const;
 
 	unsigned int length() const;
+    void assignNoDestruct(const VB6StrPtr& other);
+    void assignNoDestruct(const std::string& other);
+    void assignNoDestruct(const std::wstring& other);
 
 	bool operator==(const VB6StrPtr &other) const;
 	bool operator==(const std::wstring &other) const;

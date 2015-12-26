@@ -1,0 +1,64 @@
+﻿/**
+This file planned to provide a charset conversion.
+**/
+
+
+#include <string>
+#include <windows.h>
+
+/*
+ @name strconvert
+ Работа с конвертацией строк
+ @{
+*/
+namespace strconvert
+{
+	/*!
+	конвертирует std::string -> [ResultCodePage] -> std::wstring
+	@param [__out] dest результирующая строка
+	@param [__in] source исходная строка
+	@param [__in] ResultCodePage результирующая кодовая страница
+	@param [__in] dwFlags флаги
+	@return количество байт
+	*/
+	int StrToWStr( __out std::wstring &dest, __in const std::string &source, __in UINT ResultCodePage = CP_ACP, __in DWORD dwFlags = 0)
+	{
+		dest.resize(source.length() + 1);
+		return MultiByteToWideChar(ResultCodePage, dwFlags, source.c_str(), source.length(), (WCHAR*)dest.c_str(), source.length() + 1);
+	}
+
+	//! конвертирует std::wstring -> [ResultCodePage] -> std::string
+
+	/*!
+	конвертирует std::wstring -> [ResultCodePage] -> std::string
+	@param [__out] dest результирующая строка
+	@param [__in] source исходная строка
+	@param [__in] ResultCodePage результирующая кодова страница
+	@param [__in] dwFlags флаги
+	@return количество байт
+	*/
+	int WStrToStr( __out std::string &dest, __in const std::wstring &source, __in UINT ResultCodePage = CP_ACP, __in DWORD dwFlags = 0)
+	{
+		int dest_len = WideCharToMultiByte(ResultCodePage, dwFlags, source.c_str(), source.length(), (LPSTR)dest.c_str(), 0, NULL, NULL);
+		dest.resize(dest_len);
+		WideCharToMultiByte(ResultCodePage, dwFlags, source.c_str(), source.length(), (LPSTR)dest.c_str(), dest_len, NULL, NULL);
+
+		return dest_len;
+	}
+
+
+	/*!
+	конвертирует std::string -> [ResultCodePage] -> std::string
+	@param [__out] dest результирующая строка
+	@param [__in] source исходная строка
+	@param [__in] ResultCodePage результирующая кодавая страница
+	@param [__in] dwFlags флаги
+	@return количество байт
+	*/
+	int StrToStr( __out std::string& dest, __in const std::string& source, __in UINT ResultCodePage = CP_ACP, __in DWORD dwFlags = 0)
+	{
+		std::wstring wstr; StrToWStr(wstr, source);
+		return WStrToStr(dest, wstr, ResultCodePage, dwFlags);
+	}
+}
+/** @} */

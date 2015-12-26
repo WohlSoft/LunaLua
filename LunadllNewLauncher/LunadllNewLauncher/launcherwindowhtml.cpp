@@ -4,6 +4,7 @@
 #include "setting.h"
 #include <QWebFrame>
 #include <QCloseEvent>
+#include <QDesktopServices>
 
 LauncherWindowHtml::LauncherWindowHtml(QWidget *parent) :
     QWidget(parent),
@@ -14,8 +15,10 @@ LauncherWindowHtml::LauncherWindowHtml(QWidget *parent) :
     connect(&contentSetting, SIGNAL(startGame()), this, SLOT(startGame()));
     connect(&contentSetting, SIGNAL(startLevelEditor()), this, SLOT(startLevelEditor()));
     connect(ui->webContentView->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(initObjects()));
+    connect(ui->webContentView->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
 
     ui->webContentView->page()->mainFrame()->setUrl(QUrl("http://engine.wohlnet.ru/docs/Reverse-Engineer/samplelauncher.html"));
+    ui->webContentView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 }
 
 LauncherWindowHtml::~LauncherWindowHtml()
@@ -44,6 +47,11 @@ void LauncherWindowHtml::startLevelEditor()
 {
     selType = 2;
     close();
+}
+
+void LauncherWindowHtml::linkClicked(QUrl url)
+{
+    QDesktopServices::openUrl(url);
 }
 
 void LauncherWindowHtml::closeEvent(QCloseEvent *ev)

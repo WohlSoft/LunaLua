@@ -85,7 +85,7 @@ void LuaProxy::Layer::setSpeedY(float speedY)
 
 bool LuaProxy::Layer::isHidden()
 {
-    return (bool)::Layer::Get(m_layerIndex)->isHidden;
+    return 0 != ::Layer::Get(m_layerIndex)->isHidden;
 }
 
 

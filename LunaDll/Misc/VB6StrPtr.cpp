@@ -90,6 +90,39 @@ unsigned int VB6StrPtr::length() const
 	return *((unsigned int*)&((unsigned char*)ptr)[-4]) / 2;
 }
 
+void VB6StrPtr::assignNoDestruct(const VB6StrPtr & other)
+{
+    BSTR tmp = 0;
+    _vbaStrCopy((VB6StrPtr*)&tmp, other.ptr);
+    this->ptr = tmp;
+}
+
+void VB6StrPtr::assignNoDestruct(const std::wstring & other)
+{
+    // Allocate temporary memory of the right length so we can prefix the length header
+    std::size_t len = other.length();
+    unsigned char* tmpVBString = (unsigned char*)malloc(sizeof(unsigned int) + sizeof(wchar_t)*(len + 1));
+
+    // Copy the string data, prefixing it with the length
+#pragma warning(suppress: 6011) //if we run out of memory, then it's lost anyway
+    *((unsigned int*)&tmpVBString[0]) = len * 2;
+#pragma warning(suppress: 6011)
+    memcpy(&tmpVBString[4], other.c_str(), sizeof(wchar_t)*(len + 1));
+
+    // Copy the temporary string using _vbaStrCopy
+    BSTR tmp = 0;
+    _vbaStrCopy((VB6StrPtr*)&tmp, (wchar_t*)&tmpVBString[4]);
+    this->ptr = tmp;
+
+    // Free the temporary string
+    free(tmpVBString);
+}
+
+void VB6StrPtr::assignNoDestruct(const std::string & other)
+{
+    this->assignNoDestruct(utf8_decode(other));
+}
+
 // Equality operator for VBStrPtr
 bool VB6StrPtr::operator==(const VB6StrPtr &other) const
 {

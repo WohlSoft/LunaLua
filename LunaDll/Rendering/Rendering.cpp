@@ -1,4 +1,7 @@
 #include <climits>
+#include <tuple>
+#include <algorithm>
+#include "../Globals.h"
 #include "Rendering.h"
 #include "RenderUtils.h"
 #include "../Defines.h"
@@ -12,8 +15,6 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GLEngine.h"
-#include <tuple>
-#include <algorithm>
 
 using namespace std;
 
@@ -120,6 +121,7 @@ std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int
     for (HBITMAP nextBitmap : bitmaps) {
         int nextResCode = GetAutoImageResourceCode();
         BMPBox* pNewbox = new BMPBox(nextBitmap, m_hScreenDC);
+        pNewbox->m_Filename = filename;
         if (pNewbox->ImageLoaded() == false) {
             delete pNewbox;
             gLogger.Log(L"BMPBox image load failed", LOG_STD);
@@ -219,8 +221,9 @@ void Renderer::AddOp(RenderOp* op) {
 }
 
 // GL Engine OP
-void Renderer::GLCmd(const GLEngineCmd &cmd) {
+void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority) {
     RenderGLOp* op = new RenderGLOp(cmd);
+    op->m_renderPriority = renderPriority;
     AddOp(op);
 }
 

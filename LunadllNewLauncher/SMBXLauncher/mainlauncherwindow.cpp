@@ -1,18 +1,23 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
+#include "../../LunaLoader/LunaLoaderPatch.h"
 
 #include <QtWebKit/QtWebKit>
 #include <QWebFrame>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_ApplyLunaLoaderPatch(false),
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
 
     connect(ui->webLauncherPage->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
+    connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
+    ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 }
 
 MainLauncherWindow::~MainLauncherWindow()
@@ -27,6 +32,7 @@ void MainLauncherWindow::addJavascriptObject()
 
     connect(m_smbxConfig.data(), SIGNAL(runSMBX()), this, SLOT(runSMBX()));
     connect(m_smbxConfig.data(), SIGNAL(runSMBXEditor()), this, SLOT(runSMBXEditor()));
+    connect(m_smbxConfig.data(), SIGNAL(runPGEEditor()), this, SLOT(runPGEEditor()));
     connect(m_smbxConfig.data(), SIGNAL(loadEpisodeWebpage(QString)), this, SLOT(loadEpisodeWebpage(QString)));
 }
 
@@ -85,6 +91,7 @@ void MainLauncherWindow::loadConfig(const QString &configName)
 
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
+        m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
         setWindowTitle(settingFile.value("title", "SMBX Launcher").toString());
         QString webpage = settingFile.value("episode-webpage", "").toString();
         if(webpage == ""){
@@ -99,9 +106,11 @@ void MainLauncherWindow::loadConfig(const QString &configName)
                 ui->mainWindowWidget->setWindowIcon(QIcon(iconFilePath));
             }
         }
+        m_ApplyLunaLoaderPatch = (settingFile.value("apply-lunaloader-patch", "false").toString() == "true");
     }else{
-        m_smbxExe = "smbx.exe";
+        m_pgeExe = "PGE/pge_editor.exe";
         ui->mainWindowWidget->setWindowTitle("SMBX Launcher");
+        m_ApplyLunaLoaderPatch = false;
         loadDefaultWebpage();
     }
 }
@@ -117,11 +126,19 @@ void MainLauncherWindow::runSMBX()
 
 void MainLauncherWindow::runSMBXEditor()
 {
-    writeLunaConfig();
+    // Don't need to write luna config for editor
     QList<QString> args;
     args << "--leveleditor";
     internalRunSMBX(m_smbxExe, args);
     close();
+}
+
+void MainLauncherWindow::runPGEEditor()
+{
+    if (m_pgeExe.length() > 0) {
+        QProcess::startDetached(m_pgeExe);
+        close();
+    }
 }
 
 void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
@@ -189,6 +206,11 @@ void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &e
         QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
 }
 
+void MainLauncherWindow::openURL(QUrl url)
+{
+    QDesktopServices::openUrl(url);
+}
+
 void MainLauncherWindow::writeLunaConfig()
 {
     AutostartConfig& config = *m_smbxConfig->Autostart();
@@ -207,6 +229,7 @@ void MainLauncherWindow::writeLunaConfig()
         autostartINI.setValue("character-player1", config.character1());
         autostartINI.setValue("character-player2", config.character2());
         autostartINI.setValue("save-slot", config.saveSlot());
+        autostartINI.setValue("transient", true);
         autostartINI.endGroup();
 
     }
@@ -217,5 +240,18 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
     QList<QString> runArgs(args);
     runArgs << "--patch";
 
-    QProcess::startDetached(smbxExeFile, runArgs);
+    if (m_ApplyLunaLoaderPatch) {
+        // We're not handling quoting here... but all the arguments currently don't use spaces or quotes so...
+        QString argString;
+        for (int i=0; i<runArgs.length(); i++) {
+            if (i > 0) {
+                argString += " ";
+            }
+            argString += runArgs[i];
+        }
+        LunaLoaderRun(smbxExeFile.toStdWString().c_str(), argString.toStdWString().c_str());
+    }
+    else {
+        QProcess::startDetached(smbxExeFile, runArgs);
+    }
 }

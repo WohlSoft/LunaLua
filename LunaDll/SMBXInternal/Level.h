@@ -1,6 +1,6 @@
 #ifndef Level_Hhhh
 #define Level_Hhhh
-#include "../Globals.h"
+
 #include "../Defines.h"
 
 namespace Level {

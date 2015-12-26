@@ -1,3 +1,6 @@
+#include <windows.h>
+#include <time.h>
+#include <cmath>
 #include "AutocodeManager.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
@@ -5,12 +8,9 @@
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/Sound.h"
 #include "../SMBXInternal/Blocks.h"
-#include <cmath>
 #include "../Input/Input.h"
 #include "../SMBXInternal/SMBXEvents.h"
 #include "../SMBXInternal/Level.h"
-#include <windows.h>
-#include <time.h>
 #include "../Rendering/RenderOps/RenderStringOp.h"
 
 using namespace std;
@@ -353,22 +353,22 @@ void Autocode::Do(bool init) {
 			double D_edge = 600 - depth;
 			double R_edge = 800 - depth;
 			
-			if(demo->WarpTimer < 1) {
+			if(demo->WarpCooldownTimer < 1) {
 				if(player_screen_rect.left <= L_edge && demo->momentum.speedX < 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Target);
-					demo->WarpTimer = 2;
+					demo->WarpCooldownTimer = 2;
 				}
 				else if(player_screen_rect.top <= U_edge  && demo->momentum.speedY < 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param1);
-					demo->WarpTimer = 2;
+					demo->WarpCooldownTimer = 2;
 				}
 				else if(player_screen_rect.right >= R_edge  && demo->momentum.speedX > 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param2);
-					demo->WarpTimer = 2;
+					demo->WarpCooldownTimer = 2;
 				}
 				else if(player_screen_rect.bottom >= D_edge && demo->momentum.speedY > 0) {
 					gAutoMan.ActivateCustomEvents(0, (int)Param3);
-					demo->WarpTimer = 2;
+					demo->WarpCooldownTimer = 2;
 				}
 			}
 			break;

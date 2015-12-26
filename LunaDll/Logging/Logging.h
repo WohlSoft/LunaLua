@@ -17,20 +17,18 @@ typedef int LOGOPTS;
 #define LOG_STD 			0x00000008 // Combines newline, flush, and datetime styles
 #define LOG_Space 			0x00000010
 
-using namespace std;
-
 class Logger {
 public:
 	Logger();
 	~Logger();
 
 	void NewSession(); // print header in log
-	void WriteDateTime(wofstream* file);
+	void WriteDateTime(std::wofstream* file);
 	void Log(std::wstring message, LOGOPTS options);
 
 	// Members
 	bool m_Enabled;
-	wofstream m_File;
+    std::wofstream m_File;
 };
 
 #endif

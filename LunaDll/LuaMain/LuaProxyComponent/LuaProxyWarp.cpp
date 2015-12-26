@@ -20,9 +20,9 @@ luabind::object LuaProxy::Warp::getIntersectingEntrance(double x1, double y1, do
         ::SMBX_Warp *obj = ::SMBX_Warp::Get(i);
         if (obj == NULL) return false;
 
-        double wx1 = obj->entranceX;
+        double wx1 = obj->entrance.x;
         if (x2 <= wx1) return false;
-        double wy1 = obj->entranceY;
+        double wy1 = obj->entrance.y;
         if (y2 <= wy1) return false;
         double wx2 = wx1 + 32.0;
         if (wx2 <= x1) return false;
@@ -45,9 +45,9 @@ luabind::object LuaProxy::Warp::getIntersectingExit(double x1, double y1, double
         // Ignore if exit isn't pointing to within this level actually
         if (obj->warpToLevelFileName.length() > 0) return false;
 
-        double wx1 = obj->exitX;
+        double wx1 = obj->exit.x;
         if (x2 <= wx1) return false;
-        double wy1 = obj->exitY;
+        double wy1 = obj->exit.y;
         if (y2 <= wy1) return false;
         double wx2 = wx1 + 32.0;
         if (wx2 <= x1) return false;
@@ -90,42 +90,42 @@ void LuaProxy::Warp::setIsHidden(bool isHidden)
 
 double LuaProxy::Warp::entranceX() const
 {
-    return SMBX_Warp::Get(m_index)->entranceX;
+    return SMBX_Warp::Get(m_index)->entrance.x;
 }
 
 void LuaProxy::Warp::setEntranceX(double entranceX)
 {
-    SMBX_Warp::Get(m_index)->entranceX = entranceX;
+    SMBX_Warp::Get(m_index)->entrance.x = entranceX;
 }
 
 double LuaProxy::Warp::entranceY() const
 {
-    return SMBX_Warp::Get(m_index)->entranceY;
+    return SMBX_Warp::Get(m_index)->entrance.y;
 }
 
 void LuaProxy::Warp::setEntranceY(double entranceY)
 {
-    SMBX_Warp::Get(m_index)->entranceY = entranceY;
+    SMBX_Warp::Get(m_index)->entrance.y = entranceY;
 }
 
 double LuaProxy::Warp::exitX() const
 {
-    return SMBX_Warp::Get(m_index)->exitX;
+    return SMBX_Warp::Get(m_index)->exit.x;
 }
 
 void LuaProxy::Warp::setExitX(double exitX)
 {
-    SMBX_Warp::Get(m_index)->exitX = exitX;
+    SMBX_Warp::Get(m_index)->exit.x = exitX;
 }
 
 double LuaProxy::Warp::exitY() const
 {
-    return SMBX_Warp::Get(m_index)->exitY;
+    return SMBX_Warp::Get(m_index)->exit.y;
 }
 
 void LuaProxy::Warp::setExitY(double exitY)
 {
-    SMBX_Warp::Get(m_index)->exitY = exitY;
+    SMBX_Warp::Get(m_index)->exit.y = exitY;
 }
 
 std::string LuaProxy::Warp::levelFilename()

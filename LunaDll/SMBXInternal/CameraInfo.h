@@ -3,31 +3,22 @@
 
 #include "../Defines.h"
 
+#pragma pack(push, 1)
 class SMBX_CameraInfo
 {
 public:
-    short unknown00;
-    short unknown02;
-    short unknown04;
-    short unknown06;
-    short unknown08;
-    short unknown0A;
-    short unknown0C;
-    short unknown0E;
-    double width;
-    double height;
-    short unknown20;
-    short unknown22;
-    short unknown24;
-    short unknown26;
-    short unknown28;
-    short unknown2A;
-    short unknown2C;
-    short unknown2E;
-    short unknown30;
-    short unknown32;
-    short unknown34;
-    short unknown36;
+    double x;                       //+0x00
+    double y;                       //+0x08
+    double width;                   //+0x10
+    double height;                  //+0x18
+    short unkIsSplitScreen;         //+0x20
+    short unknown22;                //+0x22
+    short unknown24;                //+0x24
+    short unknown26;                //+0x26
+    short unknown28;                //+0x28
+    short unknown2A;                //+0x2A
+    double diffYToOtherPlayer;      //+0x2C
+    unsigned int unknownCounter;    //+0x34
 
     static const int MAX_CAMERAINFO = 3;
 
@@ -45,7 +36,20 @@ public:
         if (index >= 201) return 0;
         return -((double*)GM_CAMERA_Y)[index];
     }
-};
 
+    static inline void setCameraX(unsigned short index, double value) {
+        if (index >= 201) return;
+        ((double*)GM_CAMERA_X)[index] = -value;
+    }
+    static inline void setCameraY(unsigned short index, double value) {
+        if (index >= 201) return;
+        ((double*)GM_CAMERA_Y)[index] = -value;
+    }
+};
+#pragma pack(pop)
+
+#ifndef __INTELLISENSE__
+static_assert(sizeof(SMBX_CameraInfo) == 0x38, "sizeof(SMBX_CameraInfo) must be 0x38");
+#endif
 
 #endif

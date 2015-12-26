@@ -1,3 +1,31 @@
+v0.7.3 BETA
+  * Improvement [LunaLua]: onMessageBox can now be cancelled
+  * Added FIELD_BOOL which can be used for the mem-functions.
+  * Added NPC.get overload with only the npc-id as argument.
+  * Bugfix [LunaLua]: SMBX doesn't crash anymore, if you pass nil to some LunaLua functions.
+  * Improvement [LunaLua]: The max npc id is now 300
+  * Added NPC:harm
+  * Bugfix [LunaLua]: Tiles can now correctly be replaced with PNGs.
+  * Bugfix [LunaLua]: PlayerSetting.height was pointing to players width
+  * Extended Camera class
+  * Bugfix [LunaLua]: Cheat defines now don't reset.
+  * Added registerCustomEvent, so you can create custom events from your APIs.
+  * Added event onCameraUpdate and Camera.x, Camera.y is now writeable.
+  * Added a lot of new world map classes.
+  * Added Misc.doPSwitchRaw - You can now trigger the raw P-Switch effect.
+  * Added Misc.doPSwitch - You can now trigger the full P-Switch effect.
+  * Added Misc.doBombExplosion - You can now spawn bomb explosions.
+  * Bugfix [LunaLua]: Misc.resolveFile and Misc.resolveDirectory don't crash anymore and works faster now.
+  * Bugfix [LunaLua]: Some unreliability of Animation.spawn has been fixed.
+  * Bugfix [LunaLua]: Level sounds.ini now works correctly when using from the main game
+  * Bugfix [LunaLua]: Hitboxes and offsets are now reset before loading a new level or world
+  * Bugfix [LunaLua]: Misc.loadEpisode now works also without Autostart ini file.
+  * Added onStart - This event is the better "onLoad". This event will be executed, when SMBX is running the first frame.
+  * Fixed music.ini bug which wasn't supported track number suffix for NSF/HES/etc. multi-track musics
+  * NPCs can now be killed, even if they are hidden.
+  * Add width/height properties to LuaImageResource.
+  * Allow onNPCKill to be cancelled.
+  
 v0.7.2.2 BETA:
   * Extended NPC class
   * Bugfix [LunaLua]: Fixed Camera.width and Camera.height

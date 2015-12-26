@@ -8,6 +8,7 @@
 #include "../ErrorReporter.h"
 #include "../../GameConfig/GameConfiguration.h"
 #include "../../Globals.h"
+#include "../AsmPatch.h"
 
 #include "../SHMemServer.h"
 
@@ -39,7 +40,7 @@ void SetupThunRTMainHook()
     VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
 
     // Set up hook that will launch LunaDLLInit
-    PATCH_FUNC(0x40BDDD, &ThunRTMainHook);
+    PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
 }
 
 LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -133,31 +134,12 @@ static unsigned int __stdcall LatePatch(void)
     // after we have the VB runtime running.
     fixup_ErrorReporting();
 
+    // Be sure that all values are init.
+    ResetLunaModule();
+
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
     return *((unsigned int*)(0xB2D788));
-}
-
-static bool IsWindowsVistaOrNewer() {
-    OSVERSIONINFOEX osVersionInfo;
-    DWORDLONG conditionMask = 0;
-
-    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
-    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    osVersionInfo.dwMajorVersion = 6;
-    osVersionInfo.dwMinorVersion = 0;
-    osVersionInfo.wServicePackMajor = 0;
-    osVersionInfo.wServicePackMinor = 0;
-    VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
-
-    return VerifyVersionInfo(
-        &osVersionInfo,
-        VER_MAJORVERSION | VER_MINORVERSION |
-        VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
-        conditionMask);
 }
 
 void TrySkipPatch()
@@ -166,10 +148,10 @@ void TrySkipPatch()
     ParseArgs(splitCmdArgs(std::string(GetCommandLineA())));
 
     if (gStartupSettings.patch){
-        memset((void*)0x8BECF2, INSTR_NOP, 0x1B5); //nop out the loader code
+        PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
         *(WORD*)(0xB25046) = -1; //set run to true
 
-        PATCH_FUNC(0x8BED00, &InitHook);
+        PATCH(0x8BED00).CALL(&InitHook).Apply();
     }
 
     if (gStartupSettings.console)
@@ -180,13 +162,16 @@ void TrySkipPatch()
 
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
-    PATCH_FUNC(0x8BEC61, &LatePatch);
+    PATCH(0x8BEC61).CALL(&LatePatch).Apply();
 
     //Load graphics from the HardcodedGraphicsManager
     HardcodedGraphicsManager::loadGraphics();
 
+    // Either in root or in config folder. The config folder is recommended however.
+    gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
+    gGeneralConfig.loadOrDefault();
     //game.ini reader
-    GameConfiguration::runPatchByIni(INIReader(utf8_encode(getModulePath())+ "\\game.ini"));
+    GameConfiguration::runPatchByIni(INIReader(utf8_encode(getLatestConfigFile(L"game.ini"))));
 
     /************************************************************************/
     /* Simple ASM Source Patches                                            */
@@ -194,6 +179,7 @@ void TrySkipPatch()
     fixup_TypeMismatch13();
     fixup_Credits();
     fixup_Mushbug();
+    fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
     
@@ -226,137 +212,172 @@ void TrySkipPatch()
     /************************************************************************/
     /* Source Code Function Patch                                           */
     /************************************************************************/
-    PATCH_FUNC(0x8D9446, &OnLvlLoad);
-    *(BYTE*)(0x8D944B) = INSTR_NOP;
-    *(BYTE*)(0x8D944C) = INSTR_NOP;
+    PATCH(0x8D9446)
+        .CALL(&OnLvlLoad)
+        .NOP()
+        .NOP()
+        .Apply();
 
-    PATCH_FUNC(0x8CA23B, &TestFunc);
-    *(BYTE*)(0x8CA240) = INSTR_NOP;
+    PATCH(0x8CA23B)
+        .CALL(&TestFunc)
+        .NOP()
+        .Apply();
 
-    PATCH_FUNC(0x96C030, &HUDHook);
-    *(BYTE*)(0x96C035) = INSTR_NOP;
+    PATCH(0x92EC24)
+        .CALL(&LevelHUDHook)
+        .Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
-    PATCH_FUNC(0x8D6BB6, &forceTermination);
+    PATCH(0x8D6BB6).CALL(&forceTermination).Apply();
 
-    PATCH_FUNC(0x8C11D5, &LoadWorld);
+    PATCH(0x8C11D5).CALL(&LoadWorld).Apply();
 
-    PATCH_FUNC(0x8C16F7, &WorldLoop);
+    PATCH(0x8C16F7).CALL(&WorldLoop).Apply();
 
-    PATCH_FUNC(0x8C0E6D, &LoadIntro);
+    PATCH(0x8C0E6D).CALL(&LoadIntro).Apply();
 
-    PATCH_FUNC(0x932353, &printLunaLuaVersion);
+    PATCH(0x932353).CALL(&printLunaLuaVersion).Apply();
 
-    PATCH_FUNC(0x9090F5, &WorldRender);
+    PATCH(0x9090F5).CALL(&WorldRender).Apply();
 
-    PATCH_FUNC(0x9204E5, &NPCKillHook);
-    PATCH_FUNC(0x9B4E35, &NPCKillHook);
-    PATCH_FUNC(0xA0664E, &NPCKillHook);
-    PATCH_FUNC(0xA23278, &NPCKillHook);
+    PATCH(0x9204E5).CALL(&NPCKillHook).Apply();
+    PATCH(0x9B4E35).CALL(&NPCKillHook).Apply();
+    PATCH(0xA0664E).CALL(&NPCKillHook).Apply();
+    PATCH(0xA23278).CALL(&NPCKillHook).Apply();
 
-    PATCH_FUNC(0xAA4352, &__vbaStrCmp_TriggerSMBXEventHook);
-    *(BYTE*)(0xAA4357) = INSTR_NOP;
+    PATCH(0xAA4352)
+        .CALL(&__vbaStrCmp_TriggerSMBXEventHook)
+        .NOP()
+        .Apply();
 
-    PATCH_FUNC(0x8C23CB, &checkLevelShutdown);
-    *(BYTE*)(0x8C23D0) = INSTR_NOP;
-    *(BYTE*)(0x8C23D1) = INSTR_NOP;
+    PATCH(0x8C23CB)
+        .CALL(&checkLevelShutdown)
+        .NOP()
+        .NOP()
+        .Apply();
 
-    PATCH_FUNC(0xA755D2, &UpdateInputHook_Wrapper);
+    PATCH(0xA755D2).CALL(&UpdateInputHook_Wrapper).Apply();
 
     
-    PATCH_FUNC(0x902D3D, &WorldOverlayHUDBitBltHook);
-    PATCH_FUNC(0x902DFC, &WorldOverlayHUDBitBltHook);
-    PATCH_FUNC(0x902EBB, &WorldOverlayHUDBitBltHook);
-    PATCH_FUNC(0x902F80, &WorldOverlayHUDBitBltHook);
+    PATCH(0x902D3D).CALL(&WorldOverlayHUDBitBltHook).Apply();
+    PATCH(0x902DFC).CALL(&WorldOverlayHUDBitBltHook).Apply();
+    PATCH(0x902EBB).CALL(&WorldOverlayHUDBitBltHook).Apply();
+    PATCH(0x902F80).CALL(&WorldOverlayHUDBitBltHook).Apply();
 
-    PATCH_FUNC(0x908995, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9087A8, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9085BB, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9083CE, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x908115, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x907F28, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x907D3B, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x907B4E, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9077FD, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x907537, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9072B2, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90702D, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x906DB2, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9055CE, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x905304, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9051A7, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x905055, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x904F24, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x908995, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x904D4F, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9062E0, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x906183, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x906031, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x905F00, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x905D29, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x905990, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9065DE, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x906973, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90499A, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9046D0, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x904573, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x904421, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9042F0, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90411B, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x906B31, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x903D66, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9063FF, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x903A9C, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90393F, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9037ED, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9036BC, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9034E7, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9032E9, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90323D, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x90319F, &WorldIconsHUDBitBltHook);
-    PATCH_FUNC(0x9030F2, &WorldIconsHUDBitBltHook);
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9030F2).CALL(&WorldIconsHUDBitBltHook).Apply();
 
 
-    PATCH_FUNC(0x9000B2, &WorldHUDIsOnCameraHook);
-    PATCH_FUNC(0x900235, &WorldHUDIsOnCameraHook);
-    PATCH_FUNC(0x9004B7, &WorldHUDIsOnCameraHook);
-    PATCH_FUNC(0x90068F, &WorldHUDIsOnCameraHook);
+    PATCH(0x9000B2).CALL(&WorldHUDIsOnCameraHook).Apply();
+    PATCH(0x900235).CALL(&WorldHUDIsOnCameraHook).Apply();
+    PATCH(0x9004B7).CALL(&WorldHUDIsOnCameraHook).Apply();
+    PATCH(0x90068F).CALL(&WorldHUDIsOnCameraHook).Apply();
 
-    PATCH_FUNC(0x901439, &WorldHUDPrintTextController);
-    PATCH_FUNC(0x90266A, &WorldHUDPrintTextController);
-    PATCH_FUNC(0x907611, &WorldHUDPrintTextController);
-    PATCH_FUNC(0x9081E7, &WorldHUDPrintTextController);
-    PATCH_FUNC(0x908B03, &WorldHUDPrintTextController);
-    PATCH_FUNC(0x908A67, &WorldHUDPrintTextController);
+    PATCH(0x901439).CALL(&WorldHUDPrintTextController).Apply();
+    PATCH(0x90266A).CALL(&WorldHUDPrintTextController).Apply();
+    PATCH(0x907611).CALL(&WorldHUDPrintTextController).Apply();
+    PATCH(0x9081E7).CALL(&WorldHUDPrintTextController).Apply();
+    PATCH(0x908B03).CALL(&WorldHUDPrintTextController).Apply();
+    PATCH(0x908A67).CALL(&WorldHUDPrintTextController).Apply();
 
-    PATCH_FUNC(0x909217, &GenerateScreenshotHook);
-    PATCH_FUNC(0x94D5E7, &GenerateScreenshotHook);
+    PATCH(0x909217).CALL(&GenerateScreenshotHook).Apply();
+    PATCH(0x94D5E7).CALL(&GenerateScreenshotHook).Apply();
     
+    PATCH(0x8C03DC).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8C0A1A).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8C1383).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8C1953).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8CE292).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8E61BD).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x8FE8D4).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x987E94).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0x9B7B2C).CALL(&InitLevelEnvironmentHook).Apply();
+    PATCH(0xA02AD3).CALL(&InitLevelEnvironmentHook).Apply();
+
+
     // Graphics Bitblt hooks
-    PATCH_FUNC(0x8C137E, &LoadLocalGfxHook);
-    PATCH_FUNC(0x8D8BF1, &LoadLocalGfxHook);
-    PATCH_FUNC(0x8D9611, &LoadLocalGfxHook);
-    PATCH_FUNC(0x8DF52B, &LoadLocalGfxHook);
-    PATCH_FUNC(0x8DFF7C, &LoadLocalGfxHook);
+    PATCH(0x8C137E).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8D8BF1).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8D9611).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8DF52B).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8DFF7C).CALL(&LoadLocalGfxHook).Apply();
 
-    PATCH_FUNC(0x8DEF73, &LoadLocalOverworldGfxHook);
-    PATCH_FUNC(0x8DF808, &LoadLocalOverworldGfxHook);
+    PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
+    PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
+    
+    //PATCH(0x4242D0).JMP(GET_RETADDR_TRACE_HOOK<&BitBltTraceHook>()).Apply();
+    PATCH(0x4242D0).JMP(&BitBltHook).Apply();
+    PATCH(0x424314).JMP(&StretchBltHook).Apply();
 
-    PATCH_JMP(0x4242D0, &BitBltHook);
-    PATCH_JMP(0x424314, &StretchBltHook);
+    PATCH(0x8E54EC)
+        .CALL(&MessageBoxOpenHook)
+        .NOP()
+        .Apply();
 
-    PATCH_FUNC(0x8E54EC, &MessageBoxOpenHook);
-    *(BYTE*)(0x8E54F1) = INSTR_NOP;
+    // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
+    PATCH(0x90C856)
+        .CALL(&CameraUpdateHook_Wrapper)
+        .NOP()
+        .NOP()
+        .Apply();
 
     // Hook to fix 100% CPU when window is inactive
-    *(BYTE*)(0x8E6FE1) = INSTR_NOP;
-    PATCH_FUNC(0x8E6FE2, &WindowInactiveHook);
+    PATCH(0x8E6FE1)
+        .NOP()
+        .CALL(&WindowInactiveHook)
+        .Apply();
+
+    // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
 
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;
-    if (IsWindowsVistaOrNewer()) {
+    if (gIsWindowsVistaOrNewer) {
         frameTimingHookPtr = (void*)&FrameTimingHookQPC;
         frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
     }
@@ -367,21 +388,22 @@ void TrySkipPatch()
 
     // Hooks to fix 100% CPU during operation
     // These ones are normally not sensitive to the "max FPS" setting
-    memset((void*)0x8BFD4A, INSTR_NOP, 0x40);
-    memset((void*)0x8C0488, INSTR_NOP, 0x40);
-    memset((void*)0x8C0EE6, INSTR_NOP, 0x40);
-    PATCH_FUNC_CALL_SAFE(0x8BFD4A, frameTimingHookPtr);
-    PATCH_FUNC_CALL_SAFE(0x8C0488, frameTimingHookPtr);
-    PATCH_FUNC_CALL_SAFE(0x8C0EE6, frameTimingHookPtr);
+    PATCH(0x8BFD4A).SAFE_CALL(frameTimingHookPtr).NOP_PAD_TO_SIZE<0x40>().Apply();
+    PATCH(0x8C0488).SAFE_CALL(frameTimingHookPtr).NOP_PAD_TO_SIZE<0x40>().Apply();
+    PATCH(0x8C0EE6).SAFE_CALL(frameTimingHookPtr).NOP_PAD_TO_SIZE<0x40>().Apply();
+
     // These ones are normally sensitive to the "max FPS" setting
-    memset((void*)0x8C15A7, INSTR_NOP, 0x4A);
-    memset((void*)0x8C20FC, INSTR_NOP, 0x4A);
-    memset((void*)0x8E2AED, INSTR_NOP, 0x4A);
-    memset((void*)0x8E56ED, INSTR_NOP, 0x4A);
-    PATCH_FUNC_CALL_SAFE(0x8C15A7, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC_CALL_SAFE(0x8C20FC, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC_CALL_SAFE(0x8E2AED, frameTimingMaxFPSHookPtr);
-    PATCH_FUNC_CALL_SAFE(0x8E56ED, frameTimingMaxFPSHookPtr);
+    PATCH(0x8C15A7).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+
+    // Logging for NPC collisions
+    //PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&collideNPCLoggingHook>()).NOP().Apply();
+
+    // Level and world render hooks
+    PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
+    PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

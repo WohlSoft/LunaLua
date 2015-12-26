@@ -1,9 +1,10 @@
+#include <fstream>
+#include <iostream>
+#include <ios>
 #include "../LuaProxy.h"
 #include "../../GlobalFuncs.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../Misc/MiscFuncs.h"
-
-#include <iostream>
 
 LuaProxy::Data::Data(DataType dataType) :
 	m_dataType(dataType),
@@ -42,9 +43,9 @@ LuaProxy::Data::Data(DataType dataType, const std::string &sectionName, bool use
 void LuaProxy::Data::init()
 {
 	std::string path = resolvePathFromSection();
-	std::ifstream luaData(path, ios::binary | ios::in);
+	std::ifstream luaData(path, std::ios::binary | std::ios::in);
 	if (!luaData.is_open()){
-		std::ofstream luaDataCreate(path, ios::binary | ios::out);
+		std::ofstream luaDataCreate(path, std::ios::binary | std::ios::out);
 		if (luaDataCreate.is_open())
 			luaDataCreate.close();
 	}
@@ -141,7 +142,7 @@ void LuaProxy::Data::save(const std::string &sectionName)
 {
 	m_sectionName = sectionName;
 	std::string path = resolvePathFromSection();
-	std::ofstream luaData(path, ios::binary | ios::out);
+	std::ofstream luaData(path, std::ios::binary | std::ios::out);
 	if (luaData.is_open()){
 		for (std::map<std::string, std::string>::iterator it = m_data.begin(); it != m_data.end(); ++it) {
 			std::string key = it->first;
