@@ -211,15 +211,11 @@ function isAPILoadedByAPITable(apiTable, api)
 end
 
 function isAPILoaded(api)
-    if(isAPILoadedByAPITable(__loadedAPIs, api)) then return true end
-    if(__lunaworld.__init)then
-        if(isAPILoadedByAPITable(__lunaworld.__loadedAPIs, api)) then return true end
-    end
-    if(__lunalocal.__init)then
-        if(isAPILoadedByAPITable(__lunalocal.__loadedAPIs, api)) then return true end
-    end
-    if(__lunaoverworld.__init)then
-        if(isAPILoadedByAPITable(__lunaoverworld.__loadedAPIs, api)) then return true end
+    if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then return true end
+    for _, nextCodeFile in pairs(UserCodeManager.codefiles) do
+        if(isAPILoadedByAPITable(nextCodeFile.loadedAPIs, api))then
+            return true
+        end
     end
     return false
 end
@@ -227,66 +223,17 @@ end
 
 -- Loads shared apis
 function loadSharedAPI(api)
-    local apiName = filenameOfPath(api)
-    if(__loadedAPIs[apiName])then
-        return __loadedAPIs[apiName], false
-    end
-    
-    local loadedAPI = doAPI(api)
-    __loadedAPIs[apiName] = loadedAPI
-    if(type(loadedAPI["onInitAPI"])=="function")then
-        loadedAPI.onInitAPI()
-    end
-    return loadedAPI, true
+    return APIHelper.doAPI(UserCodeManager.sharedAPIs, api)
 end
-
 --[[
 value = api
 ]]
 function registerEvent(apiTable, event, eventHandler, beforeMainCall)
-    if(type(apiTable)=="string")then
-        error("\nOutdated version of API is trying to use registerEvent with string\nPlease contact the api developer to fix this issue!",2)
-    end
-    eventHandler = eventHandler or event
-    beforeMainCall = beforeMainCall or true
-    if(isAPILoaded(apiTable))then
-        if(beforeMainCall)then
-            if(not eventManager.eventHosterBefore[event])then
-                eventManager.eventHosterBefore[event] = {}
-            end
-            local tHandler = {}
-            tHandler.eventHandler = eventHandler
-            tHandler.apiTable = apiTable
-            table.insert(eventManager.eventHosterBefore[event], tHandler)
-        else
-            if(not eventManager.eventHosterAfter[event])then
-                eventManager.eventHosterAfter[event] = {}
-            end
-            local tHandler = {}
-            tHandler.eventHandler = eventHandler
-            tHandler.apiTable = apiTable
-            table.insert(eventManager.eventHosterAfter[event], tHandler)
-        end
-    end    
+    EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
 end
 
 function unregisterEvent(apiTable, event, eventHandler)
-    eventHandler = eventHandler or event
-    if(isAPILoaded(apiTable))then
-        for index, eventHandlerStruct in pairs(eventManager.eventHosterBefore[event]) do
-            if(eventHandlerStruct.apiTable == apiTable and eventHandlerStruct.eventHandler == eventHandler)then
-                table.remove(eventManager.eventHosterBefore[event], index)
-                return true
-            end
-        end
-        for index, eventHandlerStruct in pairs(eventManager.eventHosterAfter[event]) do
-            if(eventHandlerStruct.apiTable == apiTable and eventHandlerStruct.eventHandler == eventHandler)then
-                table.remove(eventManager.eventHosterAfter[event], index)
-                return true
-            end
-        end
-    end
-    return false
+    return EventManager.removeAPIListener(apiTable, event, eventHandler)
 end
 
 
@@ -347,47 +294,6 @@ function registerCustomEvent(obj, eventName)
     setmetatable(obj,mt);
 end
 
-detourEventQueue = {
-    collectedEvents = {},
-    -- Collect an native event for the onLoop event
-    collectEvent = function(eventName, ...)
-        local args = {...}
-        local eventInfo = args[1]
-        local directEventName = ""
-        if(eventInfo.loopable)then
-            local collectedEvent = {eventName, detourEventQueue.transformArgs(eventName, ...)}
-            table.insert(detourEventQueue.collectedEvents, collectedEvent)
-        end
-        if(eventInfo.directEventName == "")then
-            directEventName = eventName.."Direct"
-        else
-            directEventName = eventInfo.directEventName
-        end
-        return directEventName
-    end,
-    transformArgs = function(eventName, ...)
-        local fArgs = {...} -- Original Functions Args
-        local rArgs = {...} -- New Functions Args
-        --- ALL HARDCODED EVENTS ---
-        if(eventName == "onEvent")then
-            -- NOTE: Index starts with 1!
-            -- Original Signature: Event eventObj, String name
-            -- New Signature: String name
-            rArgs = {fArgs[2]}
-        else
-            table.remove(rArgs[1]) --Remove the event object, as it cannot be used for loop events
-        end
-        --- ALL HARDCODED EVENTS END ---
-        return rArgs
-    end,
-    -- Dispatch the new event
-    dispatchEvents = function()
-        for idx, collectedEvent in ipairs(detourEventQueue.collectedEvents) do
-             eventManager[collectedEvent[1]](unpack(collectedEvent[2]))
-        end
-        detourEventQueue.collectedEvents = {}
-    end
-}
 
 local function findLast(haystack, needle)
     local i=haystack:match(".*"..needle.."()")
@@ -406,6 +312,11 @@ local function filenameOfPath(path)
     return path:sub(lastIndex + 1)
 end
 
+
+
+
+
+
 --=====================================================================
 --[[ API Functions ]]--
 local APIHelper = {}
@@ -414,21 +325,6 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
     if(apiTableHolder[apiName])then
         return apiTableHolder[apiName], false
     end
-    
-	
-	local apiEnvironment = {
-        queueEvent = function()
-			
-		end,
-		callEvent = function()
-			
-		end
-    }
-	local eventEnvironment = EventManager.getProxyEnvironment()
-    for k,v in pairs(eventEnvironment) do
-        apiEnvironment[k] = v
-    end
-	setmetatable( apiEnvironment, { __index = _G } )
 	
     local loadedAPI = nil
     local searchInPath = {
@@ -443,7 +339,6 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
         for _,ending in pairs(endings) do
             func, err = loadfile(apiSearchPath..apiPath..ending)
             if(func)then
-				setfenv(func, apiEnvironment)
                 loadedAPI = func()
                 if(type(loadedAPI) ~= "table")then
                     error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
@@ -468,16 +363,20 @@ end
 
 
 
+
+
+
 --=====================================================================
 --[[ Main User Code Manager ]]--
 UserCodeManager = {}
 UserCodeManager.codefiles = {}
+UserCodeManager.sharedAPIs = {}
 
 -- Codefile manager START
 function UserCodeManager.addCodeFile(codeFileName, loadedCodeFile, apiTable)
     local newCodeFileEntry = {
         name = codeFileName,
-        loadedAPIs = {},
+        loadedAPIs = apiTable,
         instance = loadedCodeFile
     }
     table.insert(UserCodeManager.codefiles, newCodeFileEntry)
@@ -505,16 +404,12 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
         loadAPI = function(api)
-            APIHelper.doAPI(loadedAPIsTable, api)
+            return APIHelper.doAPI(loadedAPIsTable, api)
         end
     }
     
-    console:println("DEBUG: Adding proxy environment!")
-    -- 2.2 Add proxy environment
-    local eventEnvironment = EventManager.getProxyEnvironment()
-    for k,v in pairs(eventEnvironment) do
-        usercodeEnvironment[k] = v
-    end
+    -- 2.2 Add custom environment (FIXME: Add proxy environment later!)
+    local eventEnvironment = {}
     
     console:println("DEBUG: Setup metatable!")
     -- 3. Add access to global environment
@@ -560,6 +455,13 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     
     return true
 end
+
+
+
+
+
+
+
 
 
 --=====================================================================
@@ -615,15 +517,13 @@ function EventManager.manageEventObj(eventObj, ...)
     console:println("DEBUG: Manage LunaLua event: " .. eventObj.eventName)
     local directEventName = eventObj.directEventName
     if(directEventName == "")then
-        directEventName = eventObj.eventName
+        directEventName = eventObj.eventName .. "Direct"
     end
     EventManager.callEvent(directEventName, eventObj, ...)
     if(eventObj.loopable)then
         EventManager.queueEvent(eventObj.eventName, ...) 
     end
 end
-
-
 
 -- ================== Event Distribution ===========================
 -- This will add a new listener object.
@@ -633,6 +533,9 @@ function EventManager.addUserListener(listenerObject)
 end
 
 function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainCall)
+    if(type(thisTable) == "string")then
+        error("\nOutdated version of API is trying to use registerEvent with string\nPlease contact the api developer to fix this issue!",2)
+    end
     eventHandler = eventHandler or event --FIXME: Handle ==> NPC:onKill
     beforeMainCall = beforeMainCall or true
     local newApiHandler =
@@ -645,13 +548,19 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
     table.insert(EventManager.apiListeners, newApiHandler)
 end
 
--- This will add proxy objects for Events
-function EventManager.getProxyEnvironment()
-    return {
-        NPC = setmetatable({},{__index = _G["NPC"]})
-    }
+-- FIXME: Check also if "beforeMainCall"
+function EventManager.removeAPIListener(apiTable, event, eventHandler)
+    for i=1,#EventManager.apiListeners do
+        local apiObj = EventManager.apiListeners[i]
+        if(apiObj.api == apiTable and 
+            apiObj.eventName == event and
+            apiObj.eventHandlerName == eventHandler)then
+            table.remove(apiTable, i)
+            return true
+        end
+    end
+    return false
 end
-
 
 function EventManager.doQueue()
     while(#EventManager.queuedEvents > 0)do
@@ -664,8 +573,26 @@ end
 
 
 
+
+
+
+
 -- ===== FUNCTION USED BY LUNALUA ===== --
 -- usage for luabind, always do with event-object
+
+--[[
+    The new core uses three functions:
+        * __callEvent(...)  
+            - This function is called when LunaLua grabs a new event. This event is then futher processed and queued if possible.
+              The first argument is always an event object by LunaLua core.
+              The function which process it is called 'EventManager.manageEventObj'.
+        * __doEventQueue()
+            - This function is called when LunaLua should process the queued events.
+              The function which process it is called 'EventManager.doQueue'.
+        * __onInit(episodePath, lvlName)
+            - This function is doing the initializing.
+ 
+]] 
 function __callEvent(...)
     local pcallReturns = {__xpcall(EventManager.manageEventObj, ...)}
     __xpcallCheck(pcallReturns)
@@ -675,6 +602,7 @@ function __doEventQueue()
     console:println("DEBUG: Running queue")
     local pcallReturns = {__xpcall(EventManager.doQueue)}
     __xpcallCheck(pcallReturns)
+    console:println("DEBUG: Finished queue")
 end
 
 --Preloading function
