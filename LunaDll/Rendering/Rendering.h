@@ -24,10 +24,9 @@ struct Renderer {
 
     bool LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(std::wstring filename, int resource_code);
-    std::vector<int> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
+    std::vector<std::shared_ptr<BMPBox>> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
 
     bool DeleteImage(int resource_code);
-    int  GetAutoImageResourceCode() const;
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
     void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
@@ -43,14 +42,14 @@ struct Renderer {
 
 protected:
     void DrawOp(RenderOp* render_operation);
-    void StoreImage(BMPBox* bmp, int resource_code);
+    void StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code);
 
     // Members //
 public:
     HDC m_hScreenDC;								// handle to the main screen DC
 
     std::list<RenderOp*> RenderOperations;			// render operations to be performed
-    std::map<int, BMPBox*> LoadedImages;			// loaded image resources
+    std::map<int, std::shared_ptr<BMPBox>> LoadedImages;			// loaded image resources
 
     std::list<std::wstring> DebugMessages;				// Debug message to be printed
 };

@@ -146,6 +146,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req, bool center_coords) 
 			from_bp->m_Xpos = req->x;
 			from_bp->m_Ypos = req->y;
 			from_bp->SetImageResource(req->img_resource_code);
+            from_bp->SetImage(req->direct_img);
 			InitializeDimensions(from_bp, center_coords);	
 			if(req->time != 0)
 				from_bp->MakeLimitedLifetime(req->time);
@@ -169,6 +170,7 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest* req, bool center_coords) 
 			from_bp->m_Xspd = req->x_speed;
 			from_bp->m_Yspd = req->y_speed;
 			from_bp->SetImageResource(req->img_resource_code);
+            from_bp->SetImage(req->direct_img);
 			InitializeDimensions(from_bp, center_coords);	
 			if(req->time != 0)
 				from_bp->MakeLimitedLifetime(req->time);
@@ -265,7 +267,8 @@ void CSpriteManager::ClearSprites(int imgResourceCode, int xPos, int yPos)
         if (next->m_ImgResCode == imgResourceCode && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos){
             delete (*iter);
             iter = m_SpriteList.erase(iter);
-        } else {
+        }
+        else {
             ++iter;
         }
     }
@@ -280,7 +283,44 @@ void CSpriteManager::ClearSprites(int imgResourceCode)
     while (iter != m_SpriteList.end()) {
         //CSprite* spr = *iter;
         CSprite* next = *iter;
-        if (next->m_ImgResCode == imgResourceCode){
+        if (!next->m_directImg && next->m_ImgResCode == imgResourceCode){
+            delete (*iter);
+            iter = m_SpriteList.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+}
+
+void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img, int xPos, int yPos)
+{
+    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
+    std::list<CSprite*>::iterator end = m_SpriteList.end();
+
+    while (iter != m_SpriteList.end()) {
+        //CSprite* spr = *iter;
+        CSprite* next = *iter;
+        if (!next->m_directImg && next->m_directImg == img && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos){
+            delete (*iter);
+            iter = m_SpriteList.erase(iter);
+        }
+        else {
+            ++iter;
+        }
+    }
+}
+
+
+void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img)
+{
+    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
+    std::list<CSprite*>::iterator end = m_SpriteList.end();
+
+    while (iter != m_SpriteList.end()) {
+        //CSprite* spr = *iter;
+        CSprite* next = *iter;
+        if (next->m_directImg == img){
             delete (*iter);
             iter = m_SpriteList.erase(iter);
         }
@@ -297,6 +337,7 @@ void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) 
 	spr->m_Ypos = pReq->y;			
 	//spr->m_StaticScreenPos = false;
 	spr->SetImageResource(pReq->img_resource_code);
+    spr->SetImage(pReq->direct_img);
 	InitializeDimensions(spr, center);	
 	if(pReq->time != 0)
 		spr->MakeLimitedLifetime(pReq->time);
@@ -304,11 +345,13 @@ void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) 
 
 // INITIALIZE DIMENSIONS -- Resets sprite hitbox according to image. Needs img code set and image loaded
 void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
-    BMPBox* box = NULL;
-    auto it = gLunaRender.LoadedImages.find(spr->m_ImgResCode);
-    if (it != gLunaRender.LoadedImages.end()) box = it->second;
+    std::shared_ptr<BMPBox> box = spr->m_directImg;
+    if (!box) {
+        auto it = gLunaRender.LoadedImages.find(spr->m_ImgResCode);
+        if (it != gLunaRender.LoadedImages.end()) box = it->second;
+    }
 
-	if(box != NULL) {
+	if(box) {
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;

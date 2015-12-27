@@ -58,7 +58,7 @@ bool RenderOverrideManager::renderOverrideBitBlt(int nXDest, int nYDest, int nWi
     auto it = gfxOverrideMap.find(hdcSrc);
     if (it != gfxOverrideMap.end()) {
         RenderBitmapOp overrideFunc;
-        overrideFunc.direct_img = it->second.get();
+        overrideFunc.direct_img = it->second;
         overrideFunc.x = nXDest;
         overrideFunc.y = nYDest;
         overrideFunc.sx = nXSrc;

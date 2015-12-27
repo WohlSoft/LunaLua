@@ -5,12 +5,14 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <memory>
 #include "../CustomSprites/SpriteComponent.h"
 #include "../CustomSprites/Hitbox/Hitbox.h"
 
 /// CSprite builtin custom variables
 #define CVAR_GEN_ANGLE L"_GenAngle"
 
+class BMPBox;
 class CSprite;
 struct CSpriteRequest;
 
@@ -33,6 +35,7 @@ public:
 	void AddDeathComponent(SpriteComponent component);
 
 	void SetImageResource(int _resource_code);
+    void SetImage(const std::shared_ptr<BMPBox>& _img);
 	void MakeLimitedLifetime(int new_lifetime);
 
 	void Birth();
@@ -46,6 +49,7 @@ public:
 
 	/// Members///
 	int m_ImgResCode;				// Image bank code of image resource the sprite uses
+    std::shared_ptr<BMPBox> m_directImg;
 	int m_CollisionCode;			// Collision code for collision blueprint bank (-1 == all blocks collide as solid)
 
 	int m_FramesLeft;				// How many frames are left if dying automatically	
@@ -94,6 +98,7 @@ struct CSpriteRequest {
 	int y;
 	int time;
 	int img_resource_code;
+    std::shared_ptr<BMPBox> direct_img;
 	std::wstring str;
 
 	// Optional parameters

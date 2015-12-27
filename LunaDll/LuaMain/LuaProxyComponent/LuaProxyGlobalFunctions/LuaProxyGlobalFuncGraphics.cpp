@@ -10,29 +10,22 @@
 #include <luabind/adopt_policy.hpp>
 
 // Stores reference to a loaded image
-LuaProxy::Graphics::LuaImageResource::LuaImageResource(int imgResource) {
-    this->imgResource = imgResource;
+LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMPBox>& img) {
+    this->img = img;
 }
 
 // Deconstructor for when a loaded image resource is no longer referenced by Lua
 LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
-    gLunaRender.DeleteImage(imgResource);
 }
 
-int LuaProxy::Graphics::LuaImageResource::GetWidth() {
-    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
-    if (bmpIt == gLunaRender.LoadedImages.cend()) {
-        return 0;
-    }
-    return bmpIt->second->m_W;
+int LuaProxy::Graphics::LuaImageResource::GetWidth() const {
+    if (!img) return 0;
+    return img->m_W;
 }
 
-int LuaProxy::Graphics::LuaImageResource::GetHeight() {
-    const auto bmpIt = gLunaRender.LoadedImages.find(imgResource);
-    if (bmpIt == gLunaRender.LoadedImages.cend()) {
-        return 0;
-    }
-    return bmpIt->second->m_H;
+int LuaProxy::Graphics::LuaImageResource::GetHeight() const {
+    if (!img) return 0;
+    return img->m_H;
 }
 
 void LuaProxy::Graphics::activateHud(bool activate)
@@ -57,24 +50,33 @@ WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
 
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::string& filename, lua_State* L)
 {
-    int resNumber = gLunaRender.GetAutoImageResourceCode();
-    if (resNumber == 0) return NULL;
+    std::wstring full_path;
 
-    if (!gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber)) {
+    if (!isAbsolutePath(filename)) {
+        full_path = getCustomFolderPath() + utf8_decode(filename);
+    }
+    else
+    {
+        full_path = utf8_decode(filename);
+    }
+
+    std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.m_hScreenDC);
+
+    if (img->ImageLoaded() == false) {
         // If image loading failed, return null
         return NULL;
     }
 
     // Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
-    return new LuaProxy::Graphics::LuaImageResource(resNumber);
+    return new LuaProxy::Graphics::LuaImageResource(img);
 }
 
 luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
-    std::vector<int> resCodes = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename), &smbxFrameTime);
-    for (unsigned int i = 0; i < resCodes.size(); i++){
-        tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(resCodes[i]), luabind::adopt(luabind::result));
+    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename), &smbxFrameTime);
+    for (unsigned int i = 0; i < frames.size(); i++){
+        tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(frames[i]), luabind::adopt(luabind::result));
     }
     return tLuaImageResources;
 }
@@ -92,6 +94,7 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     CSpriteRequest req;
     req.type = type;
     req.img_resource_code = imgResource;
+    req.direct_img = nullptr;
     req.x = xPos;
     req.y = yPos;
     req.time = time;
@@ -112,44 +115,50 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
 
 void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time)
 {
-    placeSprite(type, img.imgResource, xPos, yPos, extra, time);
+    CSpriteRequest req;
+    req.type = type;
+    req.img_resource_code = -1;
+    req.direct_img = img.img;
+    req.x = xPos;
+    req.y = yPos;
+    req.time = time;
+    req.str = utf8_decode(extra);
+    gSpriteMan.InstantiateSprite(&req, false);
 }
 
 void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos, const std::string& extra)
 {
-    placeSprite(type, img.imgResource, xPos, yPos, extra, 0);
+    placeSprite(type, img.img, xPos, yPos, extra, 0);
 }
 
 void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImageResource& img, int xPos, int yPos)
 {
-    placeSprite(type, img.imgResource, xPos, yPos, "");
+    placeSprite(type, img.img, xPos, yPos, "");
 }
 
 
 void LuaProxy::Graphics::unplaceSprites(const LuaImageResource& img, int xPos, int yPos)
 {
-    gSpriteMan.ClearSprites(img.imgResource, xPos, yPos);
+    gSpriteMan.ClearSprites(img.img, xPos, yPos);
 }
 
 void LuaProxy::Graphics::unplaceSprites(const LuaImageResource& img)
 {
-    gSpriteMan.ClearSprites(img.imgResource);
+    gSpriteMan.ClearSprites(img.img);
 }
 
 luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, int& width, int& height, lua_State *L)
 {
-    luabind::object returnTable = luabind::newtable(L);
-    const auto bmpIt = gLunaRender.LoadedImages.find(img.imgResource);
-    if (bmpIt == gLunaRender.LoadedImages.cend()){
+    if (!img.img || !img.img->ImageLoaded()){
         luaL_error(L, "Internal error: Failed to find image resource!");
         return luabind::object();
     }
 
-    BMPBox* imgBox = bmpIt->second;
+    luabind::object returnTable = luabind::newtable(L);
     int i = 1;
-    imgBox->forEachPixelValue([&returnTable, &i](BYTE nextPixelValue){returnTable[i++] = nextPixelValue; });
-    width = imgBox->m_W;
-    height = imgBox->m_H;
+    img.img->forEachPixelValue([&returnTable, &i](BYTE nextPixelValue){returnTable[i++] = nextPixelValue; });
+    width = img.img->m_W;
+    height = img.img->m_H;
 
     return returnTable;
 }
@@ -244,23 +253,14 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
         return;
     }
 
-    const auto bmpIt = gLunaRender.LoadedImages.find(img.imgResource);
-    if (bmpIt == gLunaRender.LoadedImages.cend()){
-        luaL_error(L, "Internal error: Failed to find image resource!");
-        return;
-    }
-
-
-    BMPBox* imgBox = bmpIt->second;
-
     RenderBitmapOp* renderOp = new RenderBitmapOp();
-    renderOp->img_resource_code = img.imgResource;
+    renderOp->direct_img = img.img;
     renderOp->x = xPos;
     renderOp->y = yPos;
     renderOp->sx = (sourceX <= 0 ? 0 : sourceX);
     renderOp->sy = (sourceY <= 0 ? 0 : sourceY);
-    renderOp->sw = (sourceWidth <= 0 ? imgBox->m_W : sourceWidth);
-    renderOp->sh = (sourceHeight <= 0 ? imgBox->m_H : sourceHeight);
+    renderOp->sw = (sourceWidth <= 0 ? img.img->m_W : sourceWidth);
+    renderOp->sh = (sourceHeight <= 0 ? img.img->m_H : sourceHeight);
     renderOp->opacity = opacity;
     renderOp->sceneCoords = sceneCoords;
     renderOp->m_renderPriority = priority; 
@@ -287,26 +287,25 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     if (type == RTYPE_TEXT) 
     {
         priority = RENDEROP_DEFAULT_PRIORITY_TEXT;
-        RenderStringOp* strRenderOp = new RenderStringOp();
 
         std::string text;
         int fontType;
         LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, text);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
 
+        RenderStringOp* strRenderOp = new RenderStringOp();
         strRenderOp->m_String = utf8_decode(text);
         if (fontType == 3)
             for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
                 *it = towupper(*it);
-        strRenderOp->m_X = (int)x;
-        strRenderOp->m_Y = (int)y;
+        strRenderOp->m_X = x;
+        strRenderOp->m_Y = y;
         strRenderOp->m_FontType = fontType;
         renderOperation = strRenderOp;
     }
     else if (type == RTYPE_IMAGE) 
     {
         priority = RENDEROP_DEFAULT_PRIORITY_RENDEROP;
-        RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
         
         LuaImageResource* image;
         unsigned int sourceX;
@@ -317,22 +316,21 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         bool isSceneCoordinates;
 
         LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
-        const auto bmpIt = gLunaRender.LoadedImages.find(image->imgResource);
-        if (bmpIt == gLunaRender.LoadedImages.cend()) {
-            luaL_error(L, "Internal error: Failed to find image resource!");
+
+        if (!image || !image->img || !image->img->ImageLoaded()) {
+            luaL_error(L, "Image may not be nil.");
             return;
         }
-        BMPBox* imgBox = bmpIt->second;
 
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, imgBox->m_W);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, imgBox->m_H);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, image->img->m_W);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, image->img->m_H);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
 
-        
-        bitmapRenderOp->direct_img = bmpIt->second;
+        RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
+        bitmapRenderOp->direct_img = image->img;
         bitmapRenderOp->sx = sourceX;
         bitmapRenderOp->sy = sourceY;
         bitmapRenderOp->sw = sourceWidth;
@@ -367,11 +365,8 @@ void LuaProxy::Graphics::glSetTexture(const LuaImageResource* img, uint32_t colo
 void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t color)
 {
     const BMPBox* bmp = NULL;
-    if (img) {
-        auto it = gLunaRender.LoadedImages.find(img->imgResource);
-        if (it != gLunaRender.LoadedImages.end()) {
-            bmp = it->second;
-        }
+    if (img && img->img && img->img->ImageLoaded()) {
+        bmp = img->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
     }
 
     auto obj = std::make_shared<GLEngineCmd_SetTexture>();
@@ -398,11 +393,8 @@ extern "C" {
 void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count)
 {
     const BMPBox* bmp = NULL;
-    if (img) {
-        auto it = gLunaRender.LoadedImages.find(img->imgResource);
-        if (it != gLunaRender.LoadedImages.end()) {
-            bmp = it->second;
-        }
+    if (img && img->img && img->img->ImageLoaded()) {
+        bmp = img->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
     }
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();

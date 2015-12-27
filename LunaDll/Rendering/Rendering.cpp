@@ -78,9 +78,8 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 
     //MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
     // Create and store the image resource
-    BMPBox* pNewbox = new BMPBox(full_path, m_hScreenDC);
+    std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(full_path, m_hScreenDC);
     if (pNewbox->ImageLoaded() == false) {
-        delete pNewbox;
         gLogger.Log(L"BMPBox image load failed", LOG_STD);
         return false;
     }
@@ -91,7 +90,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 }
 
 
-std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
+std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
 {
     // Concoct full filepath
     wstring full_path = L"";
@@ -117,25 +116,22 @@ std::vector<int> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int
         *frameTime = (int)((avgFrameTime / 100) * 65);
     }
     
-    std::vector<int> bitmapResCode;
+    std::vector<std::shared_ptr<BMPBox>> bitmapList;
     for (HBITMAP nextBitmap : bitmaps) {
-        int nextResCode = GetAutoImageResourceCode();
-        BMPBox* pNewbox = new BMPBox(nextBitmap, m_hScreenDC);
+        std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(nextBitmap, m_hScreenDC);
         pNewbox->m_Filename = filename;
         if (pNewbox->ImageLoaded() == false) {
-            delete pNewbox;
             gLogger.Log(L"BMPBox image load failed", LOG_STD);
             continue;
         }
-        StoreImage(pNewbox, nextResCode);
-        bitmapResCode.push_back(nextResCode);
+        bitmapList.push_back(pNewbox);
     }
-    return bitmapResCode;  
+    return bitmapList;  
 }
 
 
 //STORE IMAGE
-void Renderer::StoreImage(BMPBox* bmp, int resource_code) {
+void Renderer::StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code) {
     LoadedImages[resource_code] = bmp;
 }
 
@@ -143,24 +139,10 @@ void Renderer::StoreImage(BMPBox* bmp, int resource_code) {
 bool Renderer::DeleteImage(int resource_code) {
     auto it = LoadedImages.find(resource_code);
     if (it != LoadedImages.end()) {
-        if (it->second) {
-            delete it->second;
-        }
         LoadedImages.erase(it);
         return true;
     }
     return false;
-}
-
-// Get an automatic resource code (always negative numbers, returns 0 if unable to allocate)
-int Renderer::GetAutoImageResourceCode() const {
-    for (int resource_code = INT_MIN; resource_code < 0; resource_code++) {
-        // If the resource code is unused
-        if (LoadedImages.count(resource_code) == 0) {
-            return resource_code;
-        }
-    }
-    return 0;
 }
 
 // IS ON SCREEN

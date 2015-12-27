@@ -16,16 +16,13 @@ RenderBitmapOp::RenderBitmapOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
     sh(0.0),
     opacity(1.0f),
     sceneCoords(false),
-    img_resource_code(-1),
     direct_img(nullptr)
 {}
 
 // DRAW
 void RenderBitmapOp::Draw(Renderer* renderer) {
-    BMPBox* bmp = direct_img;
-    if (!bmp) {
-        auto it = renderer->LoadedImages.find(img_resource_code);
-        if (it != renderer->LoadedImages.end()) bmp = it->second;
+    if (!direct_img || !direct_img->ImageLoaded() || !direct_img->m_hdc) {
+        return;
     }
     
     float opacity = this->opacity;
@@ -39,26 +36,24 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         y -= (int)SMBX_CameraInfo::getCameraY(1);
     }
 
-    if (bmp != NULL && bmp->m_hdc != NULL) {
-        //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
-        //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
-        //    bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
+    //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
+    //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
+    //    bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
 
-        if (g_GLEngine.IsEnabled())
-        {
-            g_GLEngine.DrawLunaSprite(
-                (int)x, (int)y, (int)sw, (int)sh,
-                *bmp, (int)sx, (int)sy, (int)sw, (int)sh, opacity);
-        }
-        else
-        {
-            BLENDFUNCTION bf;
-            bf.BlendOp = AC_SRC_OVER;
-            bf.BlendFlags = 0;
-            bf.SourceConstantAlpha = (int)roundf(255 * opacity);
-            bf.AlphaFormat = AC_SRC_ALPHA;
-            AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
-                bmp->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
-        }
+    if (g_GLEngine.IsEnabled())
+    {
+        g_GLEngine.DrawLunaSprite(
+            (int)x, (int)y, (int)sw, (int)sh,
+            *(direct_img.get()), (int)sx, (int)sy, (int)sw, (int)sh, opacity);
+    }
+    else
+    {
+        BLENDFUNCTION bf;
+        bf.BlendOp = AC_SRC_OVER;
+        bf.BlendFlags = 0;
+        bf.SourceConstantAlpha = (int)roundf(255 * opacity);
+        bf.AlphaFormat = AC_SRC_ALPHA;
+        AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
+            direct_img->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
     }
 }

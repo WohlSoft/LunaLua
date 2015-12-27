@@ -42,10 +42,10 @@ public:
     void requestPause(void);
     void requestUnpause(void);
     bool isPaused(void);
+    void checkPause(void);
 
 // Paused game logic
 private:
-    void checkPause(void);
     void runPause(void);
 public:
 };

@@ -94,6 +94,9 @@ void CSprite::AddDeathComponent(SpriteComponent comp) {
 void CSprite::SetImageResource(int _resource_code) {
 	m_ImgResCode = _resource_code;
 }
+void CSprite::SetImage(const std::shared_ptr<BMPBox>& _img) {
+    m_directImg = _img;
+}
 
 // MAKE LIMITED LIFETIME
 void CSprite::MakeLimitedLifetime(int new_lifetime) {

@@ -3,9 +3,10 @@
 #define LuaProxy_Hhh
 
 #include <windows.h>
-#include <lua.hpp>
 #include <type_traits>
+#include <memory>
 #include <stdio.h>
+#include <lua.hpp>
 #include <luabind/luabind.hpp>
 #include <luabind/function.hpp>
 #include <luabind/class.hpp>
@@ -14,6 +15,8 @@
 #include "../Defines.h"
 #include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
+
+class BMPBox;
 
 namespace LuaProxy {
 
@@ -1193,11 +1196,11 @@ namespace LuaProxy {
     namespace Graphics{
         class LuaImageResource {
         public:
-            int imgResource;
-            LuaImageResource(int imgResource);
+            std::shared_ptr<BMPBox> img;
+            LuaImageResource(const std::shared_ptr<BMPBox>& img);
             ~LuaImageResource();
-            int GetWidth();
-            int GetHeight();
+            int GetWidth() const;
+            int GetHeight() const;
         };
         enum RENDER_TYPE {
             RTYPE_IMAGE,

@@ -4,6 +4,9 @@
 #include "SpriteComponent.h"
 #include <list>
 #include <map>
+#include <memory>
+
+class BMPBox;
 
 ////////////////////////////
 /// BUILTIN SPRITE TYPES /// ****************************************************************************************************
@@ -51,6 +54,8 @@ struct CSpriteManager {
 	void ClearAllSprites();
     void ClearSprites(int imgResourceCode, int xPos, int yPos);
     void ClearSprites(int imgResourceCode);
+    void ClearSprites(const std::shared_ptr<BMPBox>& img, int xPos, int yPos);
+    void ClearSprites(const std::shared_ptr<BMPBox>& img);
 
 	void AddSprite(CSprite* spr);
 
