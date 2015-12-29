@@ -1,4 +1,9 @@
 v0.7.3 BETA
+  * Added new OpenGL drawing system (Graphics.glDraw [Named args])
+  * Added new lua based pause function: Misc.pause, Misc.unpause, Misc.isPausedByLua
+  * Improvement [LunaLua]: Refactored mainV2.lua for better performance and smaller code
+  * Added new function for better controlling the loop: onTick, onTickEnd, onDraw, onDrawEnd
+  * Improvement [LunaLua]: onHUDDraw and onCameraUpdate now has the camera index as argument.
   * Improvement [LunaLua]: onMessageBox can now be cancelled
   * Added FIELD_BOOL which can be used for the mem-functions.
   * Added NPC.get overload with only the npc-id as argument.
