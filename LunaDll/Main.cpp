@@ -213,10 +213,10 @@ void OnLevelHUDDraw(int cameraIdx) {
 		gDeathCounter.Draw();
 
     if (gLunaLua.isValid()) {
-        Event inputEvent("onHUDDraw", false);
-        inputEvent.setDirectEventName("onHUDDraw");
-        inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent, cameraIdx);
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+        inputEvent->setDirectEventName("onHUDDraw");
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent, cameraIdx);
     }
 
 	gSpriteMan.RunSprites();

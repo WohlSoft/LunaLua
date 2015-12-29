@@ -7,6 +7,7 @@
 #include "LuaHelper.h"
 #include "../Misc/SafeFPUControl.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include <luabind/adopt_policy.hpp>
 
 class CLunaLua
 {
@@ -40,7 +41,7 @@ public:
     void setReady(bool ready) { m_ready = ready; }
 
 	template<typename... Args>
-	void callEvent(Event* e, Args... args){
+	void callEvent(const std::shared_ptr<Event>& e, Args... args){
         SafeFPUControl noFPUExecptions;
         
         if (!isValid())

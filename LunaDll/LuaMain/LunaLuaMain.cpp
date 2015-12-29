@@ -1,6 +1,8 @@
 #include <string>
+#include <memory>
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
+
 
 #include "LunaLuaMain.h"
 #include "../GlobalFuncs.h"
@@ -492,7 +494,7 @@ void CLunaLua::bindAll()
             .def_readwrite("right", &LuaProxy::RECTd::right)
             .def_readwrite("bottom", &LuaProxy::RECTd::bottom),
 
-            LUAHELPER_DEF_CLASS(Event)
+            LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(Event, std::shared_ptr)
             .property("eventName", &Event::eventName)
             .property("cancellable", &Event::isCancellable)
             .property("cancelled", &Event::cancelled, &Event::setCancelled)
@@ -1224,18 +1226,16 @@ void CLunaLua::doEvents()
     }
 
 
-    Event* onLoopEvent = new Event("onLoop", false);
+    std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
     onLoopEvent->setLoopable(false);
     onLoopEvent->setDirectEventName("onLoop");
     callEvent(onLoopEvent);
-    delete onLoopEvent;
-
+    
     if (!m_eventLoopOnceExecuted) {
-        Event* onStartEvent = new Event("onStart", false);
+        std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
         callEvent(onStartEvent);
-        delete onStartEvent;
         m_eventLoopOnceExecuted = true;
     
         // If an error happened in onStart then return.

@@ -10,10 +10,10 @@ EventStateMachine g_EventHandler;
 template <typename... Ts>
 static inline void sendSimpleLuaEvent(const std::string& eventName, Ts&&... args) {
     if (gLunaLua.isValid()) {
-        Event inputEvent(eventName, false);
-        inputEvent.setDirectEventName(eventName);
-        inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent, std::forward<Ts>(args)...);
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>(eventName, false);
+        inputEvent->setDirectEventName(eventName);
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent, std::forward<Ts>(args)...);
     }
 }
 

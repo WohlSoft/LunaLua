@@ -78,6 +78,38 @@ namespace LuaHelper {
 
 };
 
+
+// Original Posting: http://stackoverflow.com/questions/15037955/luabind-cant-return-shared-ptr
+// We need to add this, in order to use std::shared_ptr
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105300
+#include <boost/get_pointer.hpp>
+namespace luabind {
+    namespace detail {
+        namespace has_get_pointer_ {
+            template<class T>
+            T * get_pointer(std::shared_ptr<T> const& p) { return p.get(); }
+        }
+    }
+}
+#else // if BOOST_VERSION < 105300
+#include <memory>
+// Not standard conforming: add function to ::std(::tr1)
+namespace std {
+#if defined(_MSC_VER) && _MSC_VER < 1700
+    namespace tr1 {
+#endif
+        template<class T>
+        T * get_pointer(shared_ptr<T> const& p) { return p.get(); }
+#if defined(_MSC_VER) && _MSC_VER < 1700
+    } // namespace tr1
+#endif
+} // namespace std
+#endif // if BOOST_VERSION < 105300
+
+
+
+
 #define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
 
 #define LUAHELPER_HELPCLASS_NAME(name) HelperClass_ ## name
@@ -91,6 +123,9 @@ namespace LuaHelper {
     luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
         .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
 
+#define LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(name, smartPtrClass) \
+    luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls, smartPtrClass ## < LUAHELPER_HELPCLASS_NAME(name) ::cls > >( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
+        .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
 
 #define LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(tableObj, elemKey) \
     try { \
@@ -112,6 +147,8 @@ namespace LuaHelper {
             return; \
         } \
     }
+
+
 
 
 #endif

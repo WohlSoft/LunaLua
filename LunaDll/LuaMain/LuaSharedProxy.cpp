@@ -10,9 +10,6 @@ Event::Event(std::string eventName, bool cancellable) :
     m_isLoopable(true) 
 {}
 
-Event::~Event()
-{}
-
 bool Event::isCancellable()
 {
 	return m_cancellable;

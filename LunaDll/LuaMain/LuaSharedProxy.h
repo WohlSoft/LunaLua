@@ -11,7 +11,7 @@ class Event
 {
 public:
 	Event(std::string eventName, bool cancleable);
-	~Event();
+	~Event() = default;
 
 	bool isCancellable();
 	bool cancelled(lua_State* L);

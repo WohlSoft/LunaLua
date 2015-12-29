@@ -259,10 +259,10 @@ extern void* __stdcall WorldRender()
         gDeathCounter.Draw();
 
     if (gLunaLua.isValid()) {
-        Event inputEvent("onHUDDraw", false);
-        inputEvent.setDirectEventName("onHUDDraw");
-        inputEvent.setLoopable(false);
-        gLunaLua.callEvent(&inputEvent);
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+        inputEvent->setDirectEventName("onHUDDraw");
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent);
     }
 
     gSpriteMan.RunSprites();
@@ -486,11 +486,11 @@ extern void __stdcall doEventsLevelEditorHook()
 extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 {
     if (gLunaLua.isValid()) {
-        Event npcKillEvent("onNPCKill", true);
-        npcKillEvent.setDirectEventName("onNPCKill");
-        npcKillEvent.setLoopable(false);
-        gLunaLua.callEvent(&npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
-        if (npcKillEvent.native_cancelled())
+        std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCKill", true);
+        npcKillEvent->setDirectEventName("onNPCKill");
+        npcKillEvent->setLoopable(false);
+        gLunaLua.callEvent(npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
+        if (npcKillEvent->native_cancelled())
         {
             ::NPC::Get(*npcIndex_ptr - 1)->killFlag = 0;
             return;
@@ -504,10 +504,10 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
-    Event TriggerEventData("onEvent", true);
-    TriggerEventData.setDirectEventName("onEventDirect");
-    gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
-    if (TriggerEventData.native_cancelled())
+    std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
+    triggerEventData->setDirectEventName("onEventDirect");
+    gLunaLua.callEvent(triggerEventData, utf8_encode(eventName));
+    if (triggerEventData->native_cancelled())
         return 0;
     return origCmp(nullStr, eventName);
 }
@@ -516,10 +516,10 @@ extern void __stdcall checkLevelShutdown()
 {
     if (GM_EPISODE_MODE || GM_LEVEL_MODE){
         if (gLunaLua.isValid()){
-            Event shutdownEvent("onExitLevel", false);
-            shutdownEvent.setDirectEventName("onExitLevel");
-            shutdownEvent.setLoopable(false);
-            gLunaLua.callEvent(&shutdownEvent);
+            std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExitLevel", false);
+            shutdownEvent->setDirectEventName("onExitLevel");
+            shutdownEvent->setLoopable(false);
+            gLunaLua.callEvent(shutdownEvent);
             gLunaLua.shutdown();
 
             //Clean & stop all user started sounds and musics
@@ -871,11 +871,11 @@ extern short __stdcall MessageBoxOpenHook()
     if (GM_STR_MSGBOX){
         if (GM_STR_MSGBOX.length() > 0){
             if (gLunaLua.isValid()){
-                Event messageBoxEvent("onMessageBox", true);
-                messageBoxEvent.setDirectEventName("onMessageBox");
-                messageBoxEvent.setLoopable(false);
-                gLunaLua.callEvent(&messageBoxEvent, (std::string)GM_STR_MSGBOX);
-                isCancelled = messageBoxEvent.native_cancelled();
+                std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
+                messageBoxEvent->setDirectEventName("onMessageBox");
+                messageBoxEvent->setLoopable(false);
+                gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
+                isCancelled = messageBoxEvent->native_cancelled();
             }
         }
     }
@@ -890,10 +890,10 @@ extern short __stdcall MessageBoxOpenHook()
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
     if (gLunaLua.isValid()) {
-        Event messageBoxEvent("onCameraUpdate", false);
-        messageBoxEvent.setDirectEventName("onCameraUpdate");
-        messageBoxEvent.setLoopable(false);
-        gLunaLua.callEvent(&messageBoxEvent, cameraIdx);
+        std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onCameraUpdate", false);
+        messageBoxEvent->setDirectEventName("onCameraUpdate");
+        messageBoxEvent->setLoopable(false);
+        gLunaLua.callEvent(messageBoxEvent, cameraIdx);
     }
 }
 
