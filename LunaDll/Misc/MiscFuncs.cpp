@@ -26,10 +26,10 @@ string std::to_string(long long src)
 #endif
 
 void InfiniteFlying(int player) {
-	PlayerMOB* demo = Player::Get(1);
+    PlayerMOB* demo = Player::Get(1);
 
-	if(demo != 0)
-		demo->FlightTimeRemaining = (short)50;
+    if(demo != 0)
+        demo->FlightTimeRemaining = (short)50;
 }
 
 
@@ -40,9 +40,9 @@ std::wstring removeExtension(const std::wstring filename) {
 }
 
 std::string removeExtension(const std::string filename) {
-	size_t lastdot = filename.find_first_of(".");
-	if (lastdot == std::string::npos) return filename;
-	return filename.substr(0, lastdot);
+    size_t lastdot = filename.find_first_of(".");
+    if (lastdot == std::string::npos) return filename;
+    return filename.substr(0, lastdot);
 }
 
 BOOL FileExists(LPCTSTR szPath) {
@@ -61,497 +61,497 @@ BOOL DirectoryExists(LPCTSTR szPath)
 }
 
 FIELDTYPE StrToFieldtype(std::wstring string) {
-	string.erase(string.find_last_not_of(L" \n\r\t")+1);
-	if(string == L"b") {
-		return FT_BYTE;
-	}
-	else if(string == L"s") {
-		return FT_WORD;
-	}
-	else if(string == L"w") {
-		return FT_WORD;
-	}
-	else if(string == L"dw") {
-		return FT_DWORD;
-	}
-	else if(string == L"f") {
-		return FT_FLOAT;
-	}
-	else if(string == L"df") {
-		return FT_DFLOAT;
-	}
-	return FT_BYTE;
+    string.erase(string.find_last_not_of(L" \n\r\t")+1);
+    if(string == L"b") {
+        return FT_BYTE;
+    }
+    else if(string == L"s") {
+        return FT_WORD;
+    }
+    else if(string == L"w") {
+        return FT_WORD;
+    }
+    else if(string == L"dw") {
+        return FT_DWORD;
+    }
+    else if(string == L"f") {
+        return FT_FLOAT;
+    }
+    else if(string == L"df") {
+        return FT_DFLOAT;
+    }
+    return FT_BYTE;
 }
 
 void MemAssign(int Address, double value, OPTYPE operation, FIELDTYPE ftype) {
-	char* dbg =  "MemAssignDbg";
-	if(ftype == FT_INVALID)
-		return;
+    char* dbg =  "MemAssignDbg";
+    if(ftype == FT_INVALID)
+        return;
 
-	if(operation == OP_Div && value == 0)
-		return;
+    if(operation == OP_Div && value == 0)
+        return;
 
-	switch(operation) {
-	case OP_Assign: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) = (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) = (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) = (int)value;
-			break;
-						}
-		case FT_FLOAT: {
-			*((float*)Address) = (float)value;
-			break;
-						}
-		case FT_DFLOAT: {
-			*((double*)Address) = value;
-			break;
-						}
-		default:
-			break;
-		}
-					}//OP Assign
-					break;
+    switch(operation) {
+    case OP_Assign: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) = (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) = (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) = (int)value;
+            break;
+                        }
+        case FT_FLOAT: {
+            *((float*)Address) = (float)value;
+            break;
+                        }
+        case FT_DFLOAT: {
+            *((double*)Address) = value;
+            break;
+                        }
+        default:
+            break;
+        }
+                    }//OP Assign
+                    break;
 
-	case OP_Add: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) += (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) += (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) += (int)value;
-			break;
-						}
-		case FT_FLOAT: {
-			*((float*)Address) += (float)value;
-			break;
-						}
-		case FT_DFLOAT: {
-			*((double*)Address) += value;
-			break;
-						}
-		default:
-			break;
-		}
-				 }//OP Add
-				 break;
+    case OP_Add: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) += (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) += (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) += (int)value;
+            break;
+                        }
+        case FT_FLOAT: {
+            *((float*)Address) += (float)value;
+            break;
+                        }
+        case FT_DFLOAT: {
+            *((double*)Address) += value;
+            break;
+                        }
+        default:
+            break;
+        }
+                 }//OP Add
+                 break;
 
-	case OP_Sub: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) -= (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) -= (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) -= (int)value;
-			break;
-						}
-		case FT_FLOAT: {
-			*((float*)Address) -= (float)value;
-			break;
-						}
-		case FT_DFLOAT: {
-			*((double*)Address) -= value;
-			break;
-						}
-		default:
-			break;
-		}
-					}//OP Sub
-				 break;
+    case OP_Sub: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) -= (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) -= (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) -= (int)value;
+            break;
+                        }
+        case FT_FLOAT: {
+            *((float*)Address) -= (float)value;
+            break;
+                        }
+        case FT_DFLOAT: {
+            *((double*)Address) -= value;
+            break;
+                        }
+        default:
+            break;
+        }
+                    }//OP Sub
+                 break;
 
-	case OP_Mult: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) *= (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) *= (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) *= (int)value;
-			break;
-						}
-		case FT_FLOAT: {
-			*((float*)Address) *= (float)value;
-			break;
-						}
-		case FT_DFLOAT: {
-			*((double*)Address) *= value;
-			break;
-						}
-		default:
-			break;
-		}
-					}//OP Mult
-				  break;
+    case OP_Mult: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) *= (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) *= (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) *= (int)value;
+            break;
+                        }
+        case FT_FLOAT: {
+            *((float*)Address) *= (float)value;
+            break;
+                        }
+        case FT_DFLOAT: {
+            *((double*)Address) *= value;
+            break;
+                        }
+        default:
+            break;
+        }
+                    }//OP Mult
+                  break;
 
-	case OP_Div: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) /= (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) /= (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) /= (int)value;
-			break;
-						}
-		case FT_FLOAT: {
-			*((float*)Address) = roundf(*((float*)Address) / (float)value);
-			break;
-						}
-		case FT_DFLOAT: {
-			*((double*)Address) = round(*((float*)Address) / value);
-			break;
-						}
-		default:
-			break;
-		}
-					}//OP Div
-				 break;
+    case OP_Div: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) /= (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) /= (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) /= (int)value;
+            break;
+                        }
+        case FT_FLOAT: {
+            *((float*)Address) = roundf(*((float*)Address) / (float)value);
+            break;
+                        }
+        case FT_DFLOAT: {
+            *((double*)Address) = round(*((float*)Address) / value);
+            break;
+                        }
+        default:
+            break;
+        }
+                    }//OP Div
+                 break;
 
-	case OP_XOR: {
-		switch(ftype) {
-		case FT_BYTE: {
-			*((byte*)Address) ^= (byte)value;
-			break;
-						}
-		case FT_WORD: {
-			*((short*)Address) ^= (short)value;
-			break;
-						}
-		case FT_DWORD: {
-			*((int*)Address) ^= (int)value;
-			break;
-						}
-		default:
-			break;
-		}
-					}//OP XOR
-				 break;
+    case OP_XOR: {
+        switch(ftype) {
+        case FT_BYTE: {
+            *((byte*)Address) ^= (byte)value;
+            break;
+                        }
+        case FT_WORD: {
+            *((short*)Address) ^= (short)value;
+            break;
+                        }
+        case FT_DWORD: {
+            *((int*)Address) ^= (int)value;
+            break;
+                        }
+        default:
+            break;
+        }
+                    }//OP XOR
+                 break;
 
-	default:
-		break;
-				 }// switch on op
+    default:
+        break;
+                 }// switch on op
 }
 
 bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
-	char* dbg =  "CHECKMEM DBG";
-	if(ftype == FT_INVALID)
-		return false;
+    char* dbg =  "CHECKMEM DBG";
+    if(ftype == FT_INVALID)
+        return false;
 
-	switch(ftype) {
-	case FT_BYTE: {
-		switch(ctype) {
-		case CMPT_EQUALS: {
-			return *((byte*)address) == (byte)value;
-			break;
-						  }
-						  
-		case CMPT_GREATER: {
-			return *((byte*)address) > (byte)value;
-			break;
-						  }
+    switch(ftype) {
+    case FT_BYTE: {
+        switch(ctype) {
+        case CMPT_EQUALS: {
+            return *((byte*)address) == (byte)value;
+            break;
+                          }
+                          
+        case CMPT_GREATER: {
+            return *((byte*)address) > (byte)value;
+            break;
+                          }
 
-		case CMPT_LESS: {
-			return *((byte*)address) < (byte)value;
-			break;
-						  }
+        case CMPT_LESS: {
+            return *((byte*)address) < (byte)value;
+            break;
+                          }
 
-		case CMPT_NOTEQ: {
-			return *((byte*)address) != (byte)value;
-			break;
-						  }
-		}
-		break;
-				  }
-				  
+        case CMPT_NOTEQ: {
+            return *((byte*)address) != (byte)value;
+            break;
+                          }
+        }
+        break;
+                  }
+                  
 
-	case FT_WORD: {
-		switch(ctype) {
-		case CMPT_EQUALS: {
-			return *((short*)address) == (short)value;
-			break;
-						  }
-						  
-		case CMPT_GREATER: {
-			return *((short*)address) > (short)value;
-			break;
-						  }
+    case FT_WORD: {
+        switch(ctype) {
+        case CMPT_EQUALS: {
+            return *((short*)address) == (short)value;
+            break;
+                          }
+                          
+        case CMPT_GREATER: {
+            return *((short*)address) > (short)value;
+            break;
+                          }
 
-		case CMPT_LESS: {
-			return *((short*)address) < (short)value;
-			break;
-						  }
+        case CMPT_LESS: {
+            return *((short*)address) < (short)value;
+            break;
+                          }
         default:
             break;
-		}
-		break;
-				  }
+        }
+        break;
+                  }
 
-	case FT_DWORD: {
-		switch(ctype) {
-		case CMPT_EQUALS: {
-			return *((int*)address) == (int)value;
-			break;
-						  }
-						  
-		case CMPT_GREATER: {
-			return *((int*)address) > (int)value;
-			break;
-						  }
+    case FT_DWORD: {
+        switch(ctype) {
+        case CMPT_EQUALS: {
+            return *((int*)address) == (int)value;
+            break;
+                          }
+                          
+        case CMPT_GREATER: {
+            return *((int*)address) > (int)value;
+            break;
+                          }
 
-		case CMPT_LESS: {
-			return *((int*)address) < (int)value;
-			break;
-						  }
+        case CMPT_LESS: {
+            return *((int*)address) < (int)value;
+            break;
+                          }
         default:
             break;
-		}
-		break;
-				  }
+        }
+        break;
+                  }
 
-	case FT_FLOAT: {
-		switch(ctype) {
-		case CMPT_EQUALS: {
-			return *((float*)address) == (float)value;
-			break;
-						  }
-						  
-		case CMPT_GREATER: {
-			return *((float*)address) > (float)value;
-			break;
-						  }
+    case FT_FLOAT: {
+        switch(ctype) {
+        case CMPT_EQUALS: {
+            return *((float*)address) == (float)value;
+            break;
+                          }
+                          
+        case CMPT_GREATER: {
+            return *((float*)address) > (float)value;
+            break;
+                          }
 
-		case CMPT_LESS: {
-			return *((float*)address) < (float)value;
-			break;
-						  }
+        case CMPT_LESS: {
+            return *((float*)address) < (float)value;
+            break;
+                          }
         default:
             break;
-		}
-		break;
-				  }
+        }
+        break;
+                  }
 
-	case FT_DFLOAT: {
-		switch(ctype) {
-		case CMPT_EQUALS: {
-			return *((double*)address) == value;
-			break;
-						  }
-						  
-		case CMPT_GREATER: {
-			return *((double*)address) > value;
-			break;
-						  }
+    case FT_DFLOAT: {
+        switch(ctype) {
+        case CMPT_EQUALS: {
+            return *((double*)address) == value;
+            break;
+                          }
+                          
+        case CMPT_GREATER: {
+            return *((double*)address) > value;
+            break;
+                          }
 
-		case CMPT_LESS: {
-			return *((double*)address) < value;
-			break;
-						  }
+        case CMPT_LESS: {
+            return *((double*)address) < value;
+            break;
+                          }
         default:
             break;
-		}
-		break;
-				  }					
+        }
+        break;
+                  }					
     default:
         break;
-	}
+    }
 
-	return false;
+    return false;
 }
 
 double GetMem(int addr, FIELDTYPE ftype) {
-	switch(ftype) {
-	case FT_BYTE:
-		return (double)*((byte*)addr);
-	case FT_WORD:
-		return (double)*((short*)addr);
-	case 6: //FIELD_STRING
-	case FT_DWORD:
-		return (double)*((int*)addr);
-	case FT_FLOAT:
-		return (double)*((float*)addr);
-	case FT_DFLOAT:
-		return *((double*)addr);
+    switch(ftype) {
+    case FT_BYTE:
+        return (double)*((byte*)addr);
+    case FT_WORD:
+        return (double)*((short*)addr);
+    case 6: //FIELD_STRING
+    case FT_DWORD:
+        return (double)*((int*)addr);
+    case FT_FLOAT:
+        return (double)*((float*)addr);
+    case FT_DFLOAT:
+        return *((double*)addr);
     default:
         break;
-	}
-	return 0;
+    }
+    return 0;
 }
 
 void InitIfMissing(std::map<std::wstring, double>* pMap, std::wstring sought_key, double init_val) {
-	if(pMap->find(sought_key) == pMap->end()) {
-		(*pMap)[sought_key] = init_val;
-	}
+    if(pMap->find(sought_key) == pMap->end()) {
+        (*pMap)[sought_key] = init_val;
+    }
 }
 
 int ComputeLevelSection(int x, int y) {	
-	int x_sec = ToSection(x);
-	int y_sec = ToSection(y);
-	if(x_sec != y_sec)
-		return -1;
-	return x_sec;
+    int x_sec = ToSection(x);
+    int y_sec = ToSection(y);
+    if(x_sec != y_sec)
+        return -1;
+    return x_sec;
 }
 
 int ToSection(int coord) {
-	coord = coord / 10000;
-	switch(coord) {
-	case -21:
-		return 1;
-	case -20:
-		return 1;
-	case -19:
-		return 1;
-	case -18:
-		return 2;
-	case -17:
-		return 2;
-	case -16:
-		return 3;
-	case -15:
-		return 3;
-	case -14:
-		return 4;
-	case -13:
-		return 4;
-	case -12:
-		return 5;
-	case -11:
-		return 5;
-	case -10:
-		return 6;
-	case -9:
-		return 6;
-	case -8:
-		return 7;
-	case -7:
-		return 7;
-	case -6:
-		return 8;
-	case -5:
-		return 8;
-	case -4:
-		return 9;
-	case -3:
-		return 9;
-	case -2:
-		return 10;
-	case -1:
-		return 10;
+    coord = coord / 10000;
+    switch(coord) {
+    case -21:
+        return 1;
+    case -20:
+        return 1;
+    case -19:
+        return 1;
+    case -18:
+        return 2;
+    case -17:
+        return 2;
+    case -16:
+        return 3;
+    case -15:
+        return 3;
+    case -14:
+        return 4;
+    case -13:
+        return 4;
+    case -12:
+        return 5;
+    case -11:
+        return 5;
+    case -10:
+        return 6;
+    case -9:
+        return 6;
+    case -8:
+        return 7;
+    case -7:
+        return 7;
+    case -6:
+        return 8;
+    case -5:
+        return 8;
+    case -4:
+        return 9;
+    case -3:
+        return 9;
+    case -2:
+        return 10;
+    case -1:
+        return 10;
 
-	case 0:
-		return 11;
+    case 0:
+        return 11;
 
-	case 1:
-		return 12;
-	case 2:
-		return 12;
-	case 3:
-		return 13;
-	case 4:
-		return 13;
-	case 5:
-		return 14;
-	case 6:
-		return 14;
-	case 7:
-		return 15;
-	case 8:
-		return 15;
-	case 9:
-		return 16;
-	case 10:
-		return 16;
-	case 11:
-		return 17;
-	case 12:
-		return 17;
-	case 13:
-		return 18;
-	case 14:
-		return 18;
-	case 15:
-		return 19;
-	case 16:
-		return 19;
-	case 17:
-		return 20;
-	case 18:
-		return 20;
-	case 19:
-		return 21;
-	case 20:
-		return 21;
-	case 21:
-		return 21;
+    case 1:
+        return 12;
+    case 2:
+        return 12;
+    case 3:
+        return 13;
+    case 4:
+        return 13;
+    case 5:
+        return 14;
+    case 6:
+        return 14;
+    case 7:
+        return 15;
+    case 8:
+        return 15;
+    case 9:
+        return 16;
+    case 10:
+        return 16;
+    case 11:
+        return 17;
+    case 12:
+        return 17;
+    case 13:
+        return 18;
+    case 14:
+        return 18;
+    case 15:
+        return 19;
+    case 16:
+        return 19;
+    case 17:
+        return 20;
+    case 18:
+        return 20;
+    case 19:
+        return 21;
+    case 20:
+        return 21;
+    case 21:
+        return 21;
 
-	default:
-		return -1;
-	}
+    default:
+        return -1;
+    }
 }
 
 void RandomPointInRadius(double* ox, double* oy, double cx, double cy, int radius) {	
-	double phase1 = rand() % 360;
-	double phase2 = rand() % 360;
-	double xoff = sin(phase1) * radius;
-	double yoff = cos(phase2) * radius;
-	*ox = cx + xoff;
-	*oy = cy + yoff;
+    double phase1 = rand() % 360;
+    double phase2 = rand() % 360;
+    double xoff = sin(phase1) * radius;
+    double yoff = cos(phase2) * radius;
+    *ox = cx + xoff;
+    *oy = cy + yoff;
 }
 
 bool FastTestCollision(int L1, int U1, int R1, int D1, int L2, int U2, int R2, int D2) {
-	bool rightcol = true;
-	bool leftcol = true;
-	bool upcol = true;
-	bool downcol = true;
+    bool rightcol = true;
+    bool leftcol = true;
+    bool upcol = true;
+    bool downcol = true;
 
-	if(R1 < L2)
-		rightcol = false;
-	if(L1 > R2)
-		leftcol = false;
-	if(U1 > D2)
-		downcol = false;
-	if(D1 < U2)
-		upcol = false;
+    if(R1 < L2)
+        rightcol = false;
+    if(L1 > R2)
+        leftcol = false;
+    if(U1 > D2)
+        downcol = false;
+    if(D1 < U2)
+        upcol = false;
 
-	if(rightcol == false || leftcol == false || upcol == false || downcol == false)
-		return false;
-	return true;
+    if(rightcol == false || leftcol == false || upcol == false || downcol == false)
+        return false;
+    return true;
 }
 
 void PrintSyntaxError(std::wstring errored_line) {
-		static int errors = 0;
-		errors += 25;
-		RenderStringOp* render_str = new RenderStringOp();
-		render_str->m_FontType = 2;
-		render_str->m_FramesLeft = 440;
-		render_str->m_String = errored_line;
-		render_str->m_String += L"- SYNTAX ERROR";
-		render_str->m_X = 125;
-		render_str->m_Y = (float)(errors % 600);
+        static int errors = 0;
+        errors += 25;
+        RenderStringOp* render_str = new RenderStringOp();
+        render_str->m_FontType = 2;
+        render_str->m_FramesLeft = 440;
+        render_str->m_String = errored_line;
+        render_str->m_String += L"- SYNTAX ERROR";
+        render_str->m_X = 125;
+        render_str->m_Y = (float)(errors % 600);
         gLunaRender.AddOp(render_str);
 }
 

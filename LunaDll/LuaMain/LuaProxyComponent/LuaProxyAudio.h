@@ -10,32 +10,32 @@ class MciEmulator;
 
 namespace LuaProxy
 {
-	namespace Audio
-	{
-		//Music
-		void MusicOpen(const char *filename);
-		void MusicPlay();
-		void MusicPlayFadeIn(int ms);
-		void MusicStop();
-		void MusicStopFadeOut(int ms);
-		void MusicVolume(int vlm);
-		void MusicPause();
-		void MusicResume();
-		bool MusicIsPlaying();
-		bool MusicIsPaused();
-		bool MusicIsFading();
+    namespace Audio
+    {
+        //Music
+        void MusicOpen(const char *filename);
+        void MusicPlay();
+        void MusicPlayFadeIn(int ms);
+        void MusicStop();
+        void MusicStopFadeOut(int ms);
+        void MusicVolume(int vlm);
+        void MusicPause();
+        void MusicResume();
+        bool MusicIsPlaying();
+        bool MusicIsPaused();
+        bool MusicIsFading();
         std::string MusicTitle();
         std::string MusicTitleTag();
         std::string MusicArtistTag();
         std::string MusicAlbumTag();
         std::string MusicCopyrightTag();
-		void seizeStream(int section);
-		void releaseStream(int section);
-		
-		//SFX
-		Mix_Chunk* newMix_Chunk();
-		void clearSFXBuffer();
-		void playSFX(const char* filename);
+        void seizeStream(int section);
+        void releaseStream(int section);
+        
+        //SFX
+        Mix_Chunk* newMix_Chunk();
+        void clearSFXBuffer();
+        void playSFX(const char* filename);
         Mix_Chunk* SfxOpen(const char* filename);
         int SfxPlayCh(int channel, Mix_Chunk* chunk, int loops);
         int SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
@@ -48,19 +48,19 @@ namespace LuaProxy
         int SfxFadeOut(int channel, int ms);
         int SfxIsPlaying(int channel);
         int SfxIsPaused(int channel);
-		int SfxIsFading(int channel);
+        int SfxIsFading(int channel);
         int SfxVolume(int channel, int vlm);
-		int SfxSetPanning(int channel, int left, int right);
-		int SfxSetDistance(int channel, int distance);
-		int SfxSet3DPosition(int channel, int angle, int distance);
-		int SfxReverseStereo(int channel, int flip);
+        int SfxSetPanning(int channel, int left, int right);
+        int SfxSetDistance(int channel, int distance);
+        int SfxSet3DPosition(int channel, int angle, int distance);
+        int SfxReverseStereo(int channel, int flip);
 
         std::string getSfxPath(const std::string& path);
         void setMciSection(int section);
         void resetMciSections();
 
-		double AudioClock();
-		double MusicClock();
-	}
+        double AudioClock();
+        double MusicClock();
+    }
 }
 #endif

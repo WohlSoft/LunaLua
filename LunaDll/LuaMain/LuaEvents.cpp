@@ -106,7 +106,7 @@ void LuaEvents::processSectionEvents(lua_State *L, std::string eventTable)
         if(player && evData){
             if(evData->section != player->CurrentSection){
                 std::string curSecLoop = "onLoadSection";
-				MusicManager::setCurrentSection((int)player->CurrentSection);
+                MusicManager::setCurrentSection((int)player->CurrentSection);
                 gLunaLua.callLuaFunction(evTable[curSecLoop.c_str()], i); //onLoadSection
                 curSecLoop = curSecLoop.append(std::to_string((long long)player->CurrentSection));
                 gLunaLua.callLuaFunction(evTable[curSecLoop.c_str()], i); //onLoadSection#
@@ -122,10 +122,10 @@ void LuaEvents::processSectionEvents(lua_State *L, std::string eventTable)
 //CLEANUP
 void LuaEvents::finishEventHandling()
 {
-	for(int i = 1; i <= 2; ++i){
-		PlayerMOB* player = ::Player::Get(i);
-		LuaEventData* evData = getEvData(i);
-		if(player && evData){
+    for(int i = 1; i <= 2; ++i){
+        PlayerMOB* player = ::Player::Get(i);
+        LuaEventData* evData = getEvData(i);
+        if(player && evData){
             evData->playerUPressing = player->keymap.upKeyState;
             evData->playerDPressing = player->keymap.downKeyState;
             evData->playerLPressing = player->keymap.leftKeyState;
@@ -136,38 +136,38 @@ void LuaEvents::finishEventHandling()
             evData->playerRNPressing = player->keymap.altRunKeyState;
             evData->playerSELPressing = player->keymap.dropItemKeyState;
             evData->playerSTRPressing = player->keymap.pauseKeyState;
-			evData->playerJumping = player->HasJumped;
-			evData->section = player->CurrentSection;
-		}
-	}
+            evData->playerJumping = player->HasJumped;
+            evData->section = player->CurrentSection;
+        }
+    }
 }
 
 void LuaEvents::resetToDefaults()
 {
-	LuaEvents::evPlayer1.playerUPressing = 0;
-	LuaEvents::evPlayer1.playerDPressing = 0;
-	LuaEvents::evPlayer1.playerLPressing = 0;
-	LuaEvents::evPlayer1.playerRPressing = 0;
-	LuaEvents::evPlayer1.playerJPressing = 0;
-	LuaEvents::evPlayer1.playerSJPressing = 0;
-	LuaEvents::evPlayer1.playerXPressing = 0;
-	LuaEvents::evPlayer1.playerRNPressing = 0;
-	LuaEvents::evPlayer1.playerSELPressing = 0;
-	LuaEvents::evPlayer1.playerSTRPressing = 0;
-	LuaEvents::evPlayer1.playerJumping = 0;
-	LuaEvents::evPlayer1.section = -1;
+    LuaEvents::evPlayer1.playerUPressing = 0;
+    LuaEvents::evPlayer1.playerDPressing = 0;
+    LuaEvents::evPlayer1.playerLPressing = 0;
+    LuaEvents::evPlayer1.playerRPressing = 0;
+    LuaEvents::evPlayer1.playerJPressing = 0;
+    LuaEvents::evPlayer1.playerSJPressing = 0;
+    LuaEvents::evPlayer1.playerXPressing = 0;
+    LuaEvents::evPlayer1.playerRNPressing = 0;
+    LuaEvents::evPlayer1.playerSELPressing = 0;
+    LuaEvents::evPlayer1.playerSTRPressing = 0;
+    LuaEvents::evPlayer1.playerJumping = 0;
+    LuaEvents::evPlayer1.section = -1;
 
-	LuaEvents::evPlayer2.playerUPressing = 0;
-	LuaEvents::evPlayer2.playerDPressing = 0;
-	LuaEvents::evPlayer2.playerLPressing = 0;
-	LuaEvents::evPlayer2.playerRPressing = 0;
-	LuaEvents::evPlayer2.playerJPressing = 0;
-	LuaEvents::evPlayer2.playerSJPressing = 0;
-	LuaEvents::evPlayer2.playerXPressing = 0;
-	LuaEvents::evPlayer2.playerRNPressing = 0;
-	LuaEvents::evPlayer2.playerSELPressing = 0;
-	LuaEvents::evPlayer2.playerSTRPressing = 0;
-	LuaEvents::evPlayer2.playerJumping = 0;
-	LuaEvents::evPlayer2.section = -1;
+    LuaEvents::evPlayer2.playerUPressing = 0;
+    LuaEvents::evPlayer2.playerDPressing = 0;
+    LuaEvents::evPlayer2.playerLPressing = 0;
+    LuaEvents::evPlayer2.playerRPressing = 0;
+    LuaEvents::evPlayer2.playerJPressing = 0;
+    LuaEvents::evPlayer2.playerSJPressing = 0;
+    LuaEvents::evPlayer2.playerXPressing = 0;
+    LuaEvents::evPlayer2.playerRNPressing = 0;
+    LuaEvents::evPlayer2.playerSELPressing = 0;
+    LuaEvents::evPlayer2.playerSTRPressing = 0;
+    LuaEvents::evPlayer2.playerJumping = 0;
+    LuaEvents::evPlayer2.section = -1;
 }
 

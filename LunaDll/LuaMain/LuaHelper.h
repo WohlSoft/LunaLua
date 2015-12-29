@@ -15,7 +15,7 @@
 namespace LuaHelper {
     luabind::object getEventCallbase(lua_State* base, std::string eventTable);
     bool is_function(struct lua_State * luaState, const char * fname);
-	void assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L);
+    void assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L);
     
     class invalidIDException : std::exception {
     public:

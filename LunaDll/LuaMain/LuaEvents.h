@@ -27,7 +27,7 @@ namespace LuaEvents {
     static LuaEventData evPlayer1;
     static LuaEventData evPlayer2;
 
-	void resetToDefaults();
+    void resetToDefaults();
 
     LuaEventData* getEvData(int playerIndex);
 
