@@ -505,11 +505,11 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 {
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
     Event TriggerEventData("onEvent", true);
+    TriggerEventData.setDirectEventName("onEventDirect");
     gLunaLua.callEvent(&TriggerEventData, utf8_encode(eventName));
     if (TriggerEventData.native_cancelled())
         return 0;
     return origCmp(nullStr, eventName);
-
 }
 
 extern void __stdcall checkLevelShutdown()
