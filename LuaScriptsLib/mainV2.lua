@@ -472,26 +472,28 @@ EventManager.apiListeners = {}
 EventManager.queuedEvents = {}
 
 -- ====================== Event Management ==============================
+function EventManager.callApiListeners(isBefore, ...)
+    for _, nextAPIToHandle in pairs(EventManager.apiListeners) do
+        if(nextAPIToHandle.callBefore == isBefore)then
+            if(nextAPIToHandle.eventName == name)then
+                local hostObject = nextAPIToHandle.api
+                hostObject[nextAPIToHandle.eventHandlerName](...)
+            end
+        end
+    end
+end
+    
 function EventManager.callEvent(name, ...)
+    console:println("DEBUG: Called LunaLua event: " .. name)
     local mainName, childName = unpack(name:split("."))
     if(mainName == nil or childName == nil)then
         mainName, childName = unpack(name:split(":"))
     end
 	
-	local callApiListeners = function(isBefore, ...)
-		for _, nextAPIToHandle in pairs(EventManager.apiListeners) do
-			if(nextAPIToHandle.callBefore == isBefore)then
-				if(nextAPIToHandle.eventName == name)then
-					local hostObject = nextAPIToHandle.api
-					hostObject[nextAPIToHandle.eventHandlerName](...)
-				end
-			end
-		end
-	end
+    -- Call API listeners before usercodes.
+	EventManager.callApiListeners(true, ...)
 	
-	callApiListeners(true, ...)
-	
-    
+    -- Call usercode files
     for _, nextUserListener in pairs(EventManager.userListeners)do
         local hostObject = nextUserListener
         if(childName)then
@@ -503,7 +505,8 @@ function EventManager.callEvent(name, ...)
         end
     end
 	
-	callApiListeners(false, ...)
+    -- Call API Listeners after usercodes.
+	EventManager.callApiListeners(false, ...)
 end
 function EventManager.queueEvent(name, ...)
     local newQueueEntry = 
@@ -514,7 +517,7 @@ function EventManager.queueEvent(name, ...)
     table.insert(EventManager.queuedEvents, newQueueEntry)
 end
 function EventManager.manageEventObj(eventObj, ...)
-    console:println("DEBUG: Manage LunaLua event: " .. eventObj.eventName)
+    -- console:println("DEBUG: Manage LunaLua event: " .. eventObj.eventName)
     local directEventName = eventObj.directEventName
     if(directEventName == "")then
         directEventName = eventObj.eventName .. "Direct"
