@@ -7,80 +7,98 @@
 #include "LuaHelper.h"
 #include "../Misc/SafeFPUControl.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "../EventStateMachine.h"
+
 #include <luabind/adopt_policy.hpp>
+
 
 class CLunaLua
 {
 public:
-	static const std::wstring LuaLibsPath;
-	static std::wstring getLuaLibsPath();
-	//Construct a new LunaLua Object
-	CLunaLua();
-	//Destructs a LunaLua Object and shutdown the engine if needed.
-	~CLunaLua();
+    static const std::wstring LuaLibsPath;
+    static std::wstring getLuaLibsPath();
+    //Construct a new LunaLua Object
+    CLunaLua();
+    //Destructs a LunaLua Object and shutdown the engine if needed.
+    ~CLunaLua();
 
-	//The Codefile type
-	enum LuaLunaType {
-		LUNALUA_LEVEL,
-		LUNALUA_WORLD
-	};
+    //The Codefile type
+    enum LuaLunaType {
+        LUNALUA_LEVEL,
+        LUNALUA_WORLD
+    };
 
-	
+    
 
-	//Init a lua code file
-	void init(LuaLunaType type, std::wstring codePath, std::wstring levelPath = std::wstring());
-	//Does the event queue
-	void doEvents();
-	//Shutdown lua module
-	bool shutdown();
-	//If the lua module is valid
-	bool isValid(){return L != 0;}
+    //Init a lua code file
+    void init(LuaLunaType type, std::wstring codePath, std::wstring levelPath = std::wstring());
+    //Does the event queue
+    void doEvents();
+    //Shutdown lua module
+    bool shutdown();
+    //If the lua module is valid
+    bool isValid(){return L != 0;}
 
     //Setting "ready" field
     bool isReady() const { return m_ready;  }
     void setReady(bool ready) { m_ready = ready; }
 
-	template<typename... Args>
-	void callEvent(const std::shared_ptr<Event>& e, Args... args){
-        SafeFPUControl noFPUExecptions;
-        
+    template<typename... Args>
+    bool callLuaFunction(Args... args){
         if (!isValid())
-			return;
+            return true;
 
-        if (!m_ready)
-            return;
+        if (!Player::Get(1)){
+            shutdown();
+            return true;
+        }
 
-		if (!Player::Get(1)){
-			shutdown();
-			return;
-		}
-
-		bool err = false;
-		try
-		{
-            luabind::call_function<void>(L, "__callEvent", e, args...);
-		}
-		catch (luabind::error& /*e*/)
-		{
-			err = true;
-		}
+        bool err = false;
+        try
+        {
+            SafeFPUControl noFPUExecptions;
+            luabind::call_function<void>(args...);
+        }
+        catch (luabind::error& /*e*/)
+        {
+            err = true;
+        }
         err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
 
-		if (err)
-			shutdown();
-	}
+        // If there was an error, shut down Lua
+        if (err)
+        {
+            shutdown();
+        }
+        
+        // If there was no error, allow a Lua-based game pause to take effect if pending
+        if (!err && isValid())
+        {
+            g_EventHandler.checkPause();
+        }
+
+
+        return err;
+    }
+
+    template<typename... Args>
+    void callEvent(const std::shared_ptr<Event>& e, Args... args){
+        if (m_ready) {
+            callLuaFunction(L, "__callEvent", e, args...);
+        }
+    }
 
 private:
-	LuaLunaType m_type;
-	std::string m_luaEventTableName;
+    LuaLunaType m_type;
+    std::string m_luaEventTableName;
 
-	//private init functions
-	void bindAll();
+    //private init functions
+    void bindAll();
     void bindAllDeprecated();
 
-	void setupDefaults();
+    void setupDefaults();
 
-	lua_State *L;
+    lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
     bool m_eventLoopOnceExecuted; //This should be an alternative to "onLoad". With this flag the event "onStart" is beeing called, if it is false.
 };

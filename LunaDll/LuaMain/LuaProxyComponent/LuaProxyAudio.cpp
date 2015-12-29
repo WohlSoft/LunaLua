@@ -95,21 +95,21 @@ bool LuaProxy::Audio::MusicIsPaused()
 bool LuaProxy::Audio::MusicIsFading()
 {
 #ifndef NO_SDL
-	return PGE_MusPlayer::MUS_IsFading();
+    return PGE_MusPlayer::MUS_IsFading();
 #endif
 }
 
 std::string LuaProxy::Audio::MusicTitle()
 {
 #ifndef NO_SDL
-	return PGE_MusPlayer::MUS_MusicTitle();
+    return PGE_MusPlayer::MUS_MusicTitle();
 #endif
 }
 
 std::string LuaProxy::Audio::MusicTitleTag()
 {
 #ifndef NO_SDL
-	return PGE_MusPlayer::MUS_MusicTitleTag();
+    return PGE_MusPlayer::MUS_MusicTitleTag();
 #endif
 }
 
@@ -137,20 +137,20 @@ std::string LuaProxy::Audio::MusicCopyrightTag()
 
 void LuaProxy::Audio::seizeStream(int section)
 {
-	MusicManager::setSeized(section, true);
+    MusicManager::setSeized(section, true);
 
 }
 
 void LuaProxy::Audio::releaseStream(int section)
 {
-	MusicManager::setSeized(section, false);
+    MusicManager::setSeized(section, false);
 }
 
 
 
 Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
 {
-	return NULL;
+    return NULL;
 }
 
 
@@ -272,7 +272,7 @@ void LuaProxy::Audio::setMciSection(int section)
 
 void LuaProxy::Audio::resetMciSections()
 {
-	MusicManager::resetSeizes();
+    MusicManager::resetSeizes();
 }
 
 
@@ -291,38 +291,38 @@ int LuaProxy::Audio::SfxIsFading(int channel)
 
 int LuaProxy::Audio::SfxSetPanning(int channel, int left, int right)
 {
-	return Mix_SetPanning(channel, (Uint8)left, (Uint8)right);
+    return Mix_SetPanning(channel, (Uint8)left, (Uint8)right);
 }
 
 int LuaProxy::Audio::SfxSetDistance(int channel, int distance)
 {
-	return Mix_SetDistance(channel, (Uint8)distance);
+    return Mix_SetDistance(channel, (Uint8)distance);
 }
 
 int LuaProxy::Audio::SfxSet3DPosition(int channel, int angle, int distance)
 {
-	return Mix_SetPosition(channel, (Sint16)angle, (Uint8)distance);
+    return Mix_SetPosition(channel, (Sint16)angle, (Uint8)distance);
 }
 
 int LuaProxy::Audio::SfxReverseStereo(int channel, int flip)
 {
-	return Mix_SetReverseStereo(channel, flip);
+    return Mix_SetReverseStereo(channel, flip);
 }
 
 double LuaProxy::Audio::AudioClock()
 {
 #ifndef NO_SDL
-	return ((double)PGE_MusPlayer::sampleCount()) / PGE_MusPlayer::sampleRate();
+    return ((double)PGE_MusPlayer::sampleCount()) / PGE_MusPlayer::sampleRate();
 #else
-	return 0;
+    return 0;
 #endif
 }
 
 double LuaProxy::Audio::MusicClock()
 {
 #ifndef NO_SDL
-	return ((double)PGE_MusPlayer::MUS_sampleCount()) / PGE_MusPlayer::sampleRate();
+    return ((double)PGE_MusPlayer::MUS_sampleCount()) / PGE_MusPlayer::sampleRate();
 #else
-	return 0;
+    return 0;
 #endif
 }

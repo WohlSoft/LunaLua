@@ -10,14 +10,15 @@
 class Event
 {
 public:
-	Event(std::string eventName, bool cancleable);
-	~Event() = default;
+    Event(std::string eventName, bool cancleable);
+    ~Event() = default;
 
-	bool isCancellable();
-	bool cancelled(lua_State* L);
-	bool native_cancelled();
-	void setCancelled(bool cancled, lua_State* L);
-	std::string eventName();
+
+    bool isCancellable();
+    bool cancelled(lua_State* L);
+    bool native_cancelled();
+    void setCancelled(bool cancled, lua_State* L);
+    std::string eventName();
     
     std::string getDirectEventName() const { return m_directEventName; }
     void setDirectEventName(std::string val) { m_directEventName = val; }
@@ -29,8 +30,8 @@ private:
     std::string m_directEventName;
     
     std::string m_eventName;
-	bool m_cancellable;
-	bool m_isCancelled;
+    bool m_cancellable;
+    bool m_isCancelled;
     bool m_isLoopable;
     
 };
