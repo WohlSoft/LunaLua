@@ -394,12 +394,10 @@ end
 -- Codefile manager END
 
 function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
-    console:println("DEBUG: Setting up instance!")
     -- 1. Setup the usercode instance
     local usercodeInstance = {}
     local loadedAPIsTable = {}
     
-    console:println("DEBUG: Setting up environment!")
     -- 2. Setup environment
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
@@ -411,20 +409,15 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     -- 2.2 Add custom environment (FIXME: Add proxy environment later!)
     local eventEnvironment = {}
     
-    console:println("DEBUG: Setup metatable!")
     -- 3. Add access to global environment
     setmetatable( usercodeEnvironment, { __index = _G } )
     
-    console:println("DEBUG: Load and check code file!")
-    console:println("DEBUG: Loading codefile: "..codeFilePath)
     -- 4. Load the code file and add environment
     local codeFile, err = loadfile(codeFilePath)
     if codeFile then
-        console:println("DEBUG: setfenv")
         -- 4.1 Set environment to the usercode
         setfenv( codeFile, usercodeEnvironment )
         -- 4.2 Execute file for initial run.
-        console:println("DEBUG: EXECUTE!")
         codeFile()
     else
         -- 4.3 If file not found then ignore error, otherwise throw error!
@@ -434,19 +427,16 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
         return false
     end
     
-    console:println("DEBUG: Copy environment result!")
     -- 5. Directly add "global" fields to the table.
     for k,v in pairs( usercodeEnvironment ) do
         usercodeInstance[k] =  v
     end
     
-    console:println("DEBUG: Call load function!")
     -- 6. Notify usercode file that loading has finished via "onLoad".
     if(type(usercodeInstance["onLoad"]) == "function")then
         usercodeInstance.onLoad()
     end
 
-    console:println("DEBUG: Add to code files!")
     -- 7. Now add the code file to the usercode table
     UserCodeManager.addCodeFile(codeFileName, usercodeEnvironment, loadedAPIsTable)
     
@@ -484,7 +474,6 @@ function EventManager.callApiListeners(isBefore, ...)
 end
     
 function EventManager.callEvent(name, ...)
-    console:println("DEBUG: Called LunaLua event: " .. name)
     local mainName, childName = unpack(name:split("."))
     if(mainName == nil or childName == nil)then
         mainName, childName = unpack(name:split(":"))
@@ -517,7 +506,6 @@ function EventManager.queueEvent(name, ...)
     table.insert(EventManager.queuedEvents, newQueueEntry)
 end
 function EventManager.manageEventObj(eventObj, ...)
-    -- console:println("DEBUG: Manage LunaLua event: " .. eventObj.eventName)
     local directEventName = eventObj.directEventName
     if(directEventName == "")then
         directEventName = eventObj.eventName .. "Direct"
@@ -602,25 +590,20 @@ function __callEvent(...)
 end
 
 function __doEventQueue()
-    console:println("DEBUG: Running queue")
     local pcallReturns = {__xpcall(EventManager.doQueue)}
     __xpcallCheck(pcallReturns)
-    console:println("DEBUG: Finished queue")
 end
 
 --Preloading function
 --This code segment won't post any errors!
 function __onInit(episodePath, lvlName)
-    console:println("DEBUG: Start init")
     local pcallReturns = {__xpcall(function()
-        console:println("DEBUG: Loading APIs")
         --SEGMENT TO ADD PRELOADED APIS START
         Defines = APIHelper.doAPI(_G, "core\\defines")
         APIHelper.doAPI(_G, "uservar")
         DBG = APIHelper.doAPI(_G, "core\\dbg")
         --SEGMENT TO ADD PRELOADED APIS END
         
-        console:println("DEBUG: Loading user files!")
         __episodePath = episodePath
         __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
         local noFileLoaded = true
@@ -631,9 +614,7 @@ function __onInit(episodePath, lvlName)
             if(UserCodeManager.loadCodeFile("lunaoverworld", episodePath .. "lunaoverworld.lua")) then noFileLoaded = false end
         end
         
-        console:println("DEBUG: Loaded user files!")
         if(noFileLoaded)then
-            console:println("DEBUG: No user files found... shutting down!")
             __isLuaError = true
             return
         end
