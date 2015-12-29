@@ -29,9 +29,9 @@ void LuaEvents::processKeyboardEvent(short oldp, short newp, int index, int play
     luabind::object evTable = LuaHelper::getEventCallbase(L, eventTable);
     char pTest = pressTest(oldp, newp);
     if(pTest == 1){
-		luabind::call_function<void>(evTable["onKeyDown"], index, playerIndex);
+        gLunaLua.callLuaFunction(evTable["onKeyDown"], index, playerIndex);
     }else if(pTest == -1){
-		luabind::call_function<void>(evTable["onKeyUp"], index, playerIndex);
+        gLunaLua.callLuaFunction(evTable["onKeyUp"], index, playerIndex);
     }
 }
 
@@ -65,9 +65,9 @@ void LuaEvents::processJumpEvent(lua_State *L, std::string eventTable)
         LuaEventData* evData = getEvData(i);
         if(player && evData){
             if(evData->playerJumping == 0 && player->HasJumped == -1){
-				luabind::call_function<void>(evTable["onJump"], i);
+                gLunaLua.callLuaFunction(evTable["onJump"], i);
             }else if(evData->playerJumping == -1 && player->HasJumped == 0){
-				luabind::call_function<void>(evTable["onJumpEnd"], i);
+                gLunaLua.callLuaFunction(evTable["onJumpEnd"], i);
             }
         }
     }
@@ -107,13 +107,13 @@ void LuaEvents::processSectionEvents(lua_State *L, std::string eventTable)
             if(evData->section != player->CurrentSection){
                 std::string curSecLoop = "onLoadSection";
 				MusicManager::setCurrentSection((int)player->CurrentSection);
-				luabind::call_function<void>(evTable[curSecLoop.c_str()], i); //onLoadSection
+                gLunaLua.callLuaFunction(evTable[curSecLoop.c_str()], i); //onLoadSection
                 curSecLoop = curSecLoop.append(std::to_string((long long)player->CurrentSection));
-				luabind::call_function<void>(evTable[curSecLoop.c_str()], i); //onLoadSection#
+                gLunaLua.callLuaFunction(evTable[curSecLoop.c_str()], i); //onLoadSection#
             }
             std::string curSecLoop = "onLoopSection";
             curSecLoop = curSecLoop.append(std::to_string((long long)player->CurrentSection));
-			luabind::call_function<void>(evTable[curSecLoop.c_str()], i);
+            gLunaLua.callLuaFunction(evTable[curSecLoop.c_str()], i);
 
         }
     }

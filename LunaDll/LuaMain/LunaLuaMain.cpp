@@ -157,30 +157,10 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         return;
     }
 
-
     //Call the lua api init funtion.
-    {
-        object _G = globals(L);
-        const char* initName = "__onInit";
-
-        try
-        {
-            if(LuaHelper::is_function(L, initName)){
-                luabind::call_function<void>(L, initName, utf8_encode(codePath), utf8_encode(levelPath));
-            }
-        }
-        catch (error& /*e*/)
-        {
-            errLapi = true;
-        }
-    }
-    {
-        errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
-    }
-    //Shutdown if an error happend.
-    if(errLapi){
-        shutdown();
-        return;
+    const char* initName = "__onInit";
+    if (LuaHelper::is_function(L, initName)) {
+        callLuaFunction(L, initName, utf8_encode(codePath), utf8_encode(levelPath));
     }
 }
 
@@ -1204,8 +1184,6 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
-    SafeFPUControl noFPUExecptions;
-
     //If the lua module is not valid anyway, then just return
     if(!isValid())
         return;
@@ -1243,20 +1221,7 @@ void CLunaLua::doEvents()
             return;
     }
     
-
-    bool err = false;
-    try
-    {
-        luabind::call_function<void>(L, "__doEventQueue");
-    }
-    catch (luabind::error& /*e*/)
-    {
-        err = true;
-    }
-    err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
-    
-    if(err)
-        shutdown();
+    callLuaFunction(L, "__doEventQueue");
 
     if(m_type == LUNALUA_LEVEL)
         LuaEvents::finishEventHandling();

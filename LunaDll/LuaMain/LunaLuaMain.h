@@ -39,35 +39,41 @@ public:
     bool isReady() const { return m_ready;  }
     void setReady(bool ready) { m_ready = ready; }
 
-	template<typename... Args>
-	void callEvent(Event* e, Args... args){
-        SafeFPUControl noFPUExecptions;
-        
+    template<typename... Args>
+    bool callLuaFunction(Args... args){
         if (!isValid())
-			return;
+            return true;
 
         if (!m_ready)
-            return;
+            return true;
 
-		if (!Player::Get(1)){
-			shutdown();
-			return;
-		}
+        if (!Player::Get(1)){
+            shutdown();
+            return true;
+        }
 
-		bool err = false;
-		try
-		{
-            luabind::call_function<void>(L, "__callEvent", e, args...);
-		}
-		catch (luabind::error& /*e*/)
-		{
-			err = true;
-		}
+        bool err = false;
+        try
+        {
+            SafeFPUControl noFPUExecptions;
+            luabind::call_function<void>(args...);
+        }
+        catch (luabind::error& /*e*/)
+        {
+            err = true;
+        }
         err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
 
-		if (err)
-			shutdown();
-	}
+        if (err)
+            shutdown();
+
+        return err;
+    }
+
+    template<typename... Args>
+    void callEvent(Event* e, Args... args){
+        callLuaFunction(L, "__callEvent", e, args...);
+    }
 
 private:
 	LuaLunaType m_type;
