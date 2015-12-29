@@ -7,6 +7,7 @@
 #include "LuaHelper.h"
 #include "../Misc/SafeFPUControl.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "../EventStateMachine.h"
 
 class CLunaLua
 {
@@ -44,9 +45,6 @@ public:
         if (!isValid())
             return true;
 
-        if (!m_ready)
-            return true;
-
         if (!Player::Get(1)){
             shutdown();
             return true;
@@ -64,15 +62,27 @@ public:
         }
         err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
 
+        // If there was an error, shut down Lua
         if (err)
+        {
             shutdown();
+        }
+        
+        // If there was no error, allow a Lua-based game pause to take effect if pending
+        if (!err && isValid())
+        {
+            g_EventHandler.checkPause();
+        }
+
 
         return err;
     }
 
     template<typename... Args>
     void callEvent(Event* e, Args... args){
-        callLuaFunction(L, "__callEvent", e, args...);
+        if (m_ready) {
+            callLuaFunction(L, "__callEvent", e, args...);
+        }
     }
 
 private:
