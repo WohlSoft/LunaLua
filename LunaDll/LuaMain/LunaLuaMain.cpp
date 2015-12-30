@@ -400,7 +400,7 @@ void CLunaLua::bindAll()
                     .def_readwrite("volume", &Mix_Chunk::volume),
 
                 //Music
-                def("MusicOpen", (void(*)(const char *))&LuaProxy::Audio::MusicOpen),
+                def("MusicOpen", (void(*)(const std::string&))&LuaProxy::Audio::MusicOpen),
                 def("MusicPlay", (void(*)())&LuaProxy::Audio::MusicPlay),
                 def("MusicPlayFadeIn", (void(*)(int))&LuaProxy::Audio::MusicPlayFadeIn),
                 def("MusicStop", (void(*)())&LuaProxy::Audio::MusicStop),
@@ -426,8 +426,8 @@ void CLunaLua::bindAll()
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
                 def("clearSFXBuffer", (void(*)())&LuaProxy::Audio::clearSFXBuffer),
-                def("playSFX", (void(*)(const char *))&LuaProxy::Audio::playSFX),
-                def("SfxOpen", (Mix_Chunk*(*)(const char *))&LuaProxy::Audio::SfxOpen),
+                def("playSFX", (void(*)(const std::string&))&LuaProxy::Audio::playSFX),
+                def("SfxOpen", (Mix_Chunk*(*)(const std::string&))&LuaProxy::Audio::SfxOpen),
                 def("SfxPlayCh", (int(*)(int, Mix_Chunk*,int))&LuaProxy::Audio::SfxPlayCh),
                 def("SfxPlayChTimed", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxPlayChTimed),
                 def("SfxFadeInCh", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxFadeInCh),

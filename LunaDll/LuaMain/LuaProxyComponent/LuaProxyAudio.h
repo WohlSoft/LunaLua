@@ -13,7 +13,7 @@ namespace LuaProxy
     namespace Audio
     {
         //Music
-        void MusicOpen(const char *filename);
+        void MusicOpen(const std::string& filename);
         void MusicPlay();
         void MusicPlayFadeIn(int ms);
         void MusicStop();
@@ -35,8 +35,8 @@ namespace LuaProxy
         //SFX
         Mix_Chunk* newMix_Chunk();
         void clearSFXBuffer();
-        void playSFX(const char* filename);
-        Mix_Chunk* SfxOpen(const char* filename);
+        void playSFX(const std::string& filename);
+        Mix_Chunk* SfxOpen(const std::string& filename);
         int SfxPlayCh(int channel, Mix_Chunk* chunk, int loops);
         int SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
         int SfxFadeInCh(int channel, Mix_Chunk *chunk, int loops, int ms);

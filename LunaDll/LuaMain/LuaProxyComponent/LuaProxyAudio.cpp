@@ -9,10 +9,10 @@
 
 #include "../../SMBXInternal/Level.h"
 
-void LuaProxy::Audio::MusicOpen(const char *filename)
+void LuaProxy::Audio::MusicOpen(const std::string& filename)
 {
 #ifndef NO_SDL
-    std::string full_paths = getSfxPath(std::string(filename));
+    std::string full_paths = getSfxPath(filename);
     PGE_MusPlayer::MUS_openFile(full_paths.c_str());
 #endif
 }
@@ -161,10 +161,10 @@ void LuaProxy::Audio::clearSFXBuffer()
 }
 
 
-void LuaProxy::Audio::playSFX(const char *filename)
+void LuaProxy::Audio::playSFX(const std::string& filename)
 {
 #ifndef NO_SDL
-    std::string full_paths = getSfxPath(std::string(filename));
+    std::string full_paths = getSfxPath(filename);
     PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 #else
     ::LuaProxy::playSFX(filename);
@@ -172,9 +172,9 @@ void LuaProxy::Audio::playSFX(const char *filename)
 }
 
 
-Mix_Chunk *LuaProxy::Audio::SfxOpen(const char *filename)
+Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename)
 {
-    std::string full_paths = getSfxPath(std::string(filename));
+    std::string full_paths = getSfxPath(filename);
     return PGE_Sounds::SND_OpenSnd(full_paths.c_str());
 }
 
