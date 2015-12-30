@@ -462,7 +462,7 @@ EventManager.apiListeners = {}
 EventManager.queuedEvents = {}
 
 -- ====================== Event Management ==============================
-function EventManager.callApiListeners(isBefore, ...)
+function EventManager.callApiListeners(name, isBefore, ...)
     for _, nextAPIToHandle in pairs(EventManager.apiListeners) do
         if(nextAPIToHandle.callBefore == isBefore)then
             if(nextAPIToHandle.eventName == name)then
@@ -480,7 +480,7 @@ function EventManager.callEvent(name, ...)
     end
 	
     -- Call API listeners before usercodes.
-	EventManager.callApiListeners(true, ...)
+	EventManager.callApiListeners(name, true, ...)
 	
     -- Call usercode files
     for _, nextUserListener in pairs(EventManager.userListeners)do
@@ -495,7 +495,7 @@ function EventManager.callEvent(name, ...)
     end
 	
     -- Call API Listeners after usercodes.
-	EventManager.callApiListeners(false, ...)
+	EventManager.callApiListeners(name, false, ...)
 end
 function EventManager.queueEvent(name, ...)
     local newQueueEntry = 
