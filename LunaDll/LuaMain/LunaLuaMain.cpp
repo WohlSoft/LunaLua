@@ -13,10 +13,10 @@
 
 #include "LuaHelper.h"
 #include "LuaProxy.h"
-#include "LuaEvents.h"
 #include "LuaProxyComponent/LuaProxyAudio.h"
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
+#include "../SdlMusic/MusicManager.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -139,9 +139,6 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Setup default contants
     setupDefaults();
-
-    //Reset event data
-    LuaEvents::resetToDefaults();
 
     //Load the Lua API
     bool errLapi = false;
@@ -1207,6 +1204,7 @@ void CLunaLua::doEvents()
         }
     }
 
+    MusicManager::setCurrentSection(Player::Get(1)->CurrentSection);
 
     std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
     onLoopEvent->setLoopable(false);
@@ -1226,9 +1224,6 @@ void CLunaLua::doEvents()
     }
     
     callLuaFunction(L, "__doEventQueue");
-
-    if(m_type == LUNALUA_LEVEL)
-        LuaEvents::finishEventHandling();
 }
 
 void CLunaLua::checkWarnings()

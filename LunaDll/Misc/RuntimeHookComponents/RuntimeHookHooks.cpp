@@ -2,7 +2,6 @@
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
-#include "../../LuaMain/LuaEvents.h"
 #include "../../LuaMain/LuaProxy.h"
 #include "../../Input/Input.h"
 #include "../../GlobalFuncs.h"

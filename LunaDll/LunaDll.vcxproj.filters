@@ -127,9 +127,6 @@
     <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>LuaMain</Filter>
     </ClInclude>
-    <ClInclude Include="LuaMain\LuaEvents.h">
-      <Filter>LuaMain</Filter>
-    </ClInclude>
     <ClInclude Include="libs\ini-reader\ini.h">
       <Filter>libs\ini-reader</Filter>
     </ClInclude>
@@ -501,9 +498,6 @@
       <Filter>LuaMain</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LunaLuaMain.cpp">
-      <Filter>LuaMain</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaMain\LuaEvents.cpp">
       <Filter>LuaMain</Filter>
     </ClCompile>
     <ClCompile Include="libs\ini-reader\ini.c">
