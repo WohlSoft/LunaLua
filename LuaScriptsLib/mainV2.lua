@@ -194,52 +194,6 @@ function __xpcall (f, ...)
 end
 -- ERR HANDLING END
 
-function isAPILoadedByAPITable(apiTable, api)
-    if(type(api)=="table")then
-        for _,v in pairs(apiTable) do
-            if(v == api)then
-                return true
-            end
-        end
-    end
-    if(type(api)=="string")then
-        if(apiTable[api])then
-            return true
-        end
-    end
-    return false
-end
-
-function isAPILoaded(api)
-    if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then return true end
-    for _, nextCodeFile in pairs(UserCodeManager.codefiles) do
-        if(isAPILoadedByAPITable(nextCodeFile.loadedAPIs, api))then
-            return true
-        end
-    end
-    return false
-end
-
-
--- Loads shared apis
-function loadSharedAPI(api)
-    return APIHelper.doAPI(UserCodeManager.sharedAPIs, api)
-end
---[[
-value = api
-]]
-function registerEvent(apiTable, event, eventHandler, beforeMainCall)
-    EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
-end
-
-function unregisterEvent(apiTable, event, eventHandler)
-    return EventManager.removeAPIListener(apiTable, event, eventHandler)
-end
-
-
-
-
-
 -- ====================================================================
 -- =================== NEW REWORKED MAIN FUNTION ======================
 -- ====================================================================
@@ -361,6 +315,82 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
     return loadedAPI, true
 end
 
+local function isAPILoadedByAPITable(apiTable, api)
+    if(type(api)=="table")then
+        for _,v in pairs(apiTable) do
+            if(v == api)then
+                return true
+            end
+        end
+    end
+    if(type(api)=="string")then
+        if(apiTable[api])then
+            return true
+        end
+    end
+    return false
+end
+
+-- API Namespace implementation
+local _loadingAsShared = false
+local function implementAPINamespace(loadedAPIsTable)
+	return {
+		load = (function(api, isShared)
+			local ret
+			local oldLoadingAsShared = _loadingAsShared
+			if (isShared == nil) or (isShared) then
+				_loadingAsShared = true
+				ret = APIHelper.doAPI(UserCodeManager.sharedAPIs, api)
+			elseif (loadedAPIsTable ~= nil) then
+				_loadingAsShared = false
+				ret = APIHelper.doAPI(loadedAPIsTable, api)
+			else
+				error("Cannot load APIs as non-shared outside usercode")
+			end
+			_loadingAsShared = oldLoadingAsShared
+			return ret
+		end),
+		isLoaded = (function(api)
+			if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then
+				return true
+			end
+			if (loadedAPIsTable ~= nil) then
+				return isAPILoadedByAPITable(loadedAPIsTable, api)
+			end
+			return false
+		end),
+		addHandler = (function(apiTable, event, eventHandler, beforeMainCall)
+			EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
+		end),
+		remHandler = (function(apiTable, event, eventHandler)
+			return EventManager.removeAPIListener(apiTable, event, eventHandler)
+		end),
+		isLoadingShared = (function()
+			return _loadingAsShared
+		end)
+	}
+end
+API = implementAPINamespace(nil)
+
+-- Deprecated API APIs
+function isAPILoaded(api)
+    if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then return true end
+    for _, nextCodeFile in pairs(UserCodeManager.codefiles) do
+        if(isAPILoadedByAPITable(nextCodeFile.loadedAPIs, api))then
+            return true
+        end
+    end
+    return false
+end
+function loadSharedAPI(api)
+    return API.load(api)
+end
+function registerEvent(apiTable, event, eventHandler, beforeMainCall)
+	EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
+end
+function unregisterEvent(apiTable, event, eventHandler)
+    return EventManager.removeAPIListener(apiTable, event, eventHandler)
+end
 
 
 
@@ -398,12 +428,17 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     local usercodeInstance = {}
     local loadedAPIsTable = {}
     
+	local thisAPINamesace = implementAPINamespace(loadedAPIsTable)
+	
     -- 2. Setup environment
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
-        loadAPI = function(api)
-            return APIHelper.doAPI(loadedAPIsTable, api)
-        end
+        loadAPI = (function(api)
+            return thisAPINamesace.load(api, false)
+        end),
+		
+		-- API Namespace implementation
+		API = thisAPINamesace
     }
     
     -- 2.2 Add custom environment (FIXME: Add proxy environment later!)
@@ -536,7 +571,8 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
         eventHandlerName = eventHandler,
         callBefore = beforeMainCall
     }
-    table.insert(EventManager.apiListeners, newApiHandler)
+	
+	table.insert(EventManager.apiListeners, newApiHandler)
 end
 
 -- FIXME: Check also if "beforeMainCall"
