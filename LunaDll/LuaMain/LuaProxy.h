@@ -1191,6 +1191,7 @@ namespace LuaProxy {
         void pause();
         void unpause();
         bool isPausedByLua();
+        void warning(const std::string& str);
     }
 
     namespace Graphics{

@@ -35,7 +35,8 @@ CLunaLua::CLunaLua() :
         m_luaEventTableName(""),
         L(0),
         m_ready(false),
-        m_eventLoopOnceExecuted(false)
+        m_eventLoopOnceExecuted(false),
+        m_warningList()
 {}
 
 CLunaLua::~CLunaLua()
@@ -49,7 +50,9 @@ bool CLunaLua::shutdown()
     //Shutdown the lua module if possible
     if(!isValid())
         return false;
-        
+    
+    checkWarnings();
+
     m_ready = false;
     m_eventLoopOnceExecuted = false;
     LuaProxy::Audio::resetMciSections();
@@ -384,7 +387,8 @@ void CLunaLua::bindAll()
                 def("loadEpisode", &LuaProxy::Misc::loadEpisode),
                 def("pause", &LuaProxy::Misc::pause),
                 def("unpause", &LuaProxy::Misc::unpause),
-                def("isPausedByLua", &LuaProxy::Misc::isPausedByLua)
+                def("isPausedByLua", &LuaProxy::Misc::isPausedByLua),
+                def("warning", &LuaProxy::Misc::warning)
             ],
 
             namespace_("Audio")[
@@ -1227,4 +1231,27 @@ void CLunaLua::doEvents()
         LuaEvents::finishEventHandling();
 }
 
+void CLunaLua::checkWarnings()
+{
+    if (m_warningList.size() > 0)
+    {
+        std::wostringstream message;
+        message << L"Warnings occured during run:\r\n";
+        for (auto iter = m_warningList.cbegin(), end = m_warningList.cend(); iter != end; ++iter)
+        {
+            message << L" - " << utf8_decode(*iter) << L"\r\n";
+        }
+        MessageBoxW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
+    }
 
+    m_warningList.clear();
+}
+
+void CLunaLua::setWarning(const std::string& str)
+{
+    // Only queue warnings if in editor
+    if (GM_CUR_SAVE_SLOT == 0)
+    {
+        m_warningList.push_back(str);
+    }
+}

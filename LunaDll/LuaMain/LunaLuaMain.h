@@ -2,6 +2,8 @@
 #ifndef LunaLuaMain_____hhhhhh
 #define LunaLuaMain_____hhhhhh
 
+#include <string>
+#include <vector>
 #include "LuabindIncludes.h"
 #include "LuaSharedProxy.h"
 #include "LuaHelper.h"
@@ -42,6 +44,8 @@ public:
     //Setting "ready" field
     bool isReady() const { return m_ready;  }
     void setReady(bool ready) { m_ready = ready; }
+
+    void setWarning(const std::string& str);
 
     template<typename... Args>
     bool callLuaFunction(Args... args){
@@ -91,6 +95,7 @@ public:
 private:
     LuaLunaType m_type;
     std::string m_luaEventTableName;
+    std::vector<std::string> m_warningList;
 
     //private init functions
     void bindAll();
@@ -98,6 +103,8 @@ private:
 
     void setupDefaults();
 
+    void checkWarnings();
+    
     lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
     bool m_eventLoopOnceExecuted; //This should be an alternative to "onLoad". With this flag the event "onStart" is beeing called, if it is false.

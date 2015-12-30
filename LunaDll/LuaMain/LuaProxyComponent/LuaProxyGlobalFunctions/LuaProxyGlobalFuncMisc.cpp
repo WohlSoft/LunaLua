@@ -1,6 +1,7 @@
 #include "../../LuaProxy.h"
 #include "../../../Defines.h"
 #include "../../../GlobalFuncs.h"
+#include "../../../Globals.h"
 #include "../../../GameConfig/GameAutostart.h"
 #include "../../../SMBXInternal/PlayerMOB.h"
 #include "../../../EventStateMachine.h"
@@ -198,4 +199,9 @@ void LuaProxy::Misc::unpause()
 bool LuaProxy::Misc::isPausedByLua()
 {
     return g_EventHandler.isPaused();
+}
+
+void LuaProxy::Misc::warning(const std::string& str)
+{
+    gLunaLua.setWarning(str);
 }
