@@ -3,13 +3,6 @@
 #include "../Misc/VB6StrPtr.h"
 #include "LuaProxy.h"
 
-luabind::object LuaHelper::getEventCallbase(lua_State *base, std::string eventTable)
-{
-    luabind::object _G = luabind::globals(base);
-    return _G[eventTable.c_str()];
-}
-
-
 bool LuaHelper::is_function(lua_State *luaState, const char *fname)
 {
     luabind::object g = luabind::globals(luaState);
