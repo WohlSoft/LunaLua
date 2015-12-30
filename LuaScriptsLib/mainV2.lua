@@ -502,7 +502,9 @@ function EventManager.callApiListeners(name, isBefore, ...)
         if(nextAPIToHandle.callBefore == isBefore)then
             if(nextAPIToHandle.eventName == name)then
                 local hostObject = nextAPIToHandle.api
-                hostObject[nextAPIToHandle.eventHandlerName](...)
+                if hostObject[nextAPIToHandle.eventHandlerName] then
+                    hostObject[nextAPIToHandle.eventHandlerName](...)
+                end
             end
         end
     end
@@ -531,12 +533,12 @@ function EventManager.callEvent(name, ...)
 	
     -- Call API Listeners after usercodes.
 	EventManager.callApiListeners(name, false, ...)
-
+    
     -- It is hackish, but nothing I can do about it
     if(name == "onLoop" and not isOverworld)then
         __ClassicEvents.doEvents()
     end
-
+    
 end
 function EventManager.queueEvent(name, ...)
     local newQueueEntry = 
