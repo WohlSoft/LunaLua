@@ -1,6 +1,11 @@
 --------------------------------------------------------------------
 --============== Persistent NPC Reference Framework ==============--
+--============== v1.0.2                             ==============--
 --------------------------------------------------------------------
+
+if (not API.isLoadingShared()) then
+	Misc.warning("pnpc API should be loaded shared")
+end
 
 local pNPC = {}
 local ID_FIELD = 0xE6 -- (Presumably) padding before animation timer. Different from the padding location cinematX uses
@@ -135,6 +140,21 @@ function NPCMetaTable:kill(...)
 	validateRef(self)
 	if (self.__id == -1) then error("Invalid access of pNPC reference") end
 	return self.__ref:kill(...)
+end
+function NPCMetaTable:toIce(...)
+	validateRef(self)
+	if (self.__id == -1) then error("Invalid access of pNPC reference") end
+	return self.__ref:toIce(...)
+end
+function NPCMetaTable:toCoin(...)
+	validateRef(self)
+	if (self.__id == -1) then error("Invalid access of pNPC reference") end
+	return self.__ref:toCoin(...)
+end
+function NPCMetaTable:harm(...)
+	validateRef(self)
+	if (self.__id == -1) then error("Invalid access of pNPC reference") end
+	return self.__ref:harm(...)
 end
 
 -- Function to get an existing wrapper for a NPC without trying to create a new one
