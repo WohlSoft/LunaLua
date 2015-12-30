@@ -531,6 +531,12 @@ function EventManager.callEvent(name, ...)
 	
     -- Call API Listeners after usercodes.
 	EventManager.callApiListeners(name, false, ...)
+
+    -- It is hackish, but nothing I can do about it
+    if(name == "onLoop" and not isOverworld)then
+        __ClassicEvents.doEvents()
+    end
+
 end
 function EventManager.queueEvent(name, ...)
     local newQueueEntry = 
@@ -638,6 +644,7 @@ function __onInit(episodePath, lvlName)
         Defines = APIHelper.doAPI(_G, "core\\defines")
         APIHelper.doAPI(_G, "uservar")
         DBG = APIHelper.doAPI(_G, "core\\dbg")
+        __ClassicEvents = APIHelper.doAPI(_G, "core\\classicevents")
         --SEGMENT TO ADD PRELOADED APIS END
         
         __episodePath = episodePath
