@@ -98,25 +98,44 @@ std::vector<std::string> splitCmdArgs( std::string str)
 	return args;
 }
 
+/*!
+ * \brief Returns size of UTF-8 string
+ * \param s Input string
+ * \return length in characters (not in bytes!)
+ */
+size_t utf8len(const char *s)
+{
+    size_t len = 0;
+    while(*s)
+        len += (*(s++)&0xC0)!=0x80;
+    return len;
+}
 
 std::wstring utf8_decode(const std::string &str)
 {
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-    std::wstring wstrTo( size_needed, 0 );
-    MultiByteToWideChar                  (CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-    return wstrTo;
+    std::wstring dest;
+    dest.resize(utf8len(str.c_str()));
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), (wchar_t*)dest.c_str(), str.length());
+    return dest;
 }
 
 std::string utf8_encode(const std::wstring &wstr)
 {
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-    std::string strTo( size_needed, 0 );
-    WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-    return strTo;
+    std::string dest;
+    int dest_len = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), 0, NULL, NULL);
+    dest.resize(dest_len);
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest_len, NULL, NULL);
+    return dest;
 }
 
 std::string wstr2str(const std::wstring &wstr)
 {
+    std::string dest;
+    int dest_len = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), 0, NULL, NULL);
+    dest.resize(dest_len);
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest_len, NULL, NULL);
+    return dest;
+    /*
 	std::wstring ws = wstr;
 	std::string s;
     const std::locale locale("");
@@ -133,7 +152,7 @@ std::string wstr2str(const std::wstring &wstr)
 	{
       s = std::string(&to[0], to_next);
     }
-	return s;
+    return s;*/
 }
 
 std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen)
