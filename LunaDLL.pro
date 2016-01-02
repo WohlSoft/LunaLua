@@ -250,7 +250,9 @@ HEADERS += \
     LunaDll/SMBXInternal/Musicbox.h \
     LunaDll/SMBXInternal/Path.h \
     LunaDll/SMBXInternal/Scenery.h \
-    LunaDll/SMBXInternal/Tile.h
+    LunaDll/SMBXInternal/Tile.h \
+    LunaDll/Misc/PerfTracker.h \
+    LunaDll/EventStateMachine.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -425,5 +427,8 @@ SOURCES += \
     LunaDll/Misc/TypeLib.cpp \
     LunaDll/Misc/VariantHelper.cpp \
     LunaDll/Misc/win32_Unicode.cpp \
-    LunaDll/Rendering/Shaders/GLShader.cpp
+    LunaDll/Rendering/Shaders/GLShader.cpp \
+    LunaDll/Misc/PerfTracker.cpp \
+    LunaDll/Rendering/GLEngineCmds.cpp \
+    LunaDll/EventStateMachine.cpp
 
