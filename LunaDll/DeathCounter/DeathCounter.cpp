@@ -251,17 +251,17 @@ void DeathCounter::DumpAllToFile(std::wstring file_name) {
     #ifndef __MINGW32__
 	wofstream out_file(file_name, ios::out|ios::trunc);
     #else
-    wofstream out_file(wstr2str(file_name).c_str(), ios::out|ios::trunc);
+    wofstream out_file(utf8_encode(file_name).c_str(), ios::out|ios::trunc);
     #endif
 
 
 	// Create file if not existing
 	if(out_file.is_open() == false) {
-        out_file.open(wstr2str(file_name).c_str(), ios::out);
+        out_file.open(utf8_encode(file_name).c_str(), ios::out);
 		out_file << L" *** DEATH RECORDS FILE ***" << endl;
 		out_file.flush();	
 		out_file.close();
-        out_file.open(wstr2str(file_name).c_str(), ios::in|ios::out);;
+        out_file.open(utf8_encode(file_name).c_str(), ios::in|ios::out);;
 	}
 
 	// If create failed, get out

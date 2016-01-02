@@ -254,7 +254,7 @@ std::string LuaProxy::Audio::getSfxPath(const std::string& filename)
         std::wstring full_path = world_dir.append(::Level::GetName());
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder
-        full_paths = wstr2str(full_path) + filename;
+        full_paths = utf8_encode(full_path) + filename;
     }
     else
     {

@@ -5,7 +5,7 @@
 
 LuaProxy::Logger::Logger(std::string filename)
 {
-    std::string custPath = wstr2str(getCustomFolderPath());
+    std::string custPath = utf8_encode(getCustomFolderPath());
     filePath = custPath + "\\" + filename;
     file = fopen(filePath.c_str(), "a");
 }

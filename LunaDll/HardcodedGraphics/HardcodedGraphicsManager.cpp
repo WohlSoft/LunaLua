@@ -100,7 +100,7 @@ void HardcodedGraphicsManager::loadGraphics()
 
     std::wstring smbxPath = getModulePath();
     smbxPath = smbxPath.append(L"\\");
-    root = wstr2str(smbxPath);
+    root = utf8_encode(smbxPath);
 
     std::string ttscrpath=root+"graphics.ini";
 	if( !file_existsX(ttscrpath) ) return;

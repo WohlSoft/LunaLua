@@ -125,7 +125,7 @@ extern int __stdcall LoadWorld()
 #ifndef NO_SDL
     if (!episodeStarted)
     {
-        std::string wldPath = wstr2str(GM_FULLDIR);
+        std::string wldPath = utf8_encode(GM_FULLDIR);
         MusicManager::loadCustomSounds(wldPath + "\\");
         episodeStarted = true;
     }
