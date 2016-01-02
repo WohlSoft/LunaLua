@@ -1,6 +1,16 @@
 local classicEvents = {}
 local playerData = {}
-
+local playerKeymapProperties = {}
+playerKeymapProperties[KEY_UP] = "upKeyPressing"
+playerKeymapProperties[KEY_DOWN] = "downKeyPressing"
+playerKeymapProperties[KEY_LEFT] = "leftKeyPressing"
+playerKeymapProperties[KEY_RIGHT] = "rightKeyPressing"
+playerKeymapProperties[KEY_JUMP] = "jumpKeyPressing"
+playerKeymapProperties[KEY_SPINJUMP] = "altJumpKeyPressing"
+playerKeymapProperties[KEY_X] = "runKeyPressing" -- Maybe use a better name?
+playerKeymapProperties[KEY_RUN] = "altRunKeyPressing" -- Maybe use a better name?
+playerKeymapProperties[KEY_SEL] = "dropItemKeyPressing"
+playerKeymapProperties[KEY_STR] = "pauseKeyPressing"
 
 function classicEvents.onInitAPI()
     if(not isOverworld)then
@@ -13,16 +23,9 @@ function classicEvents.onInitAPI()
     end
     
     for plIndex, plData in pairs(playerData) do
-        plData.upKeyPressing = false
-        plData.downKeyPressing = false
-        plData.leftKeyPressing = false
-        plData.rightKeyPressing = false
-        plData.jumpKeyPressing = false
-        plData.altJumpKeyPressing = false
-        plData.runKeyPressing = false
-        plData.altRunKeyPressing = false
-        plData.dropItemKeyPressing = false
-        plData.pauseKeyPressing = false
+        for _,keymapPropertyName in pairs(playerKeymapProperties) do
+            plData[keymapPropertyName] = false
+        end
         
         plData.playerJumping = false
         
@@ -47,16 +50,9 @@ end
 function classicEvents.doEvents()
     for plIndex, plData in pairs(playerData) do
         local plObject = Player.get()[plIndex]
-        checkKeyboardEvent(plObject, plIndex, plData, "upKeyPressing", KEY_UP)
-        checkKeyboardEvent(plObject, plIndex, plData, "downKeyPressing", KEY_DOWN)
-        checkKeyboardEvent(plObject, plIndex, plData, "leftKeyPressing", KEY_LEFT)
-        checkKeyboardEvent(plObject, plIndex, plData, "rightKeyPressing", KEY_RIGHT)
-        checkKeyboardEvent(plObject, plIndex, plData, "jumpKeyPressing", KEY_JUMP)
-        checkKeyboardEvent(plObject, plIndex, plData, "altJumpKeyPressing", KEY_SPINJUMP)
-        checkKeyboardEvent(plObject, plIndex, plData, "runPressing", KEY_X) -- Maybe use a better name?
-        checkKeyboardEvent(plObject, plIndex, plData, "altRunPressing", KEY_RUN)  -- Maybe use a better name?
-        checkKeyboardEvent(plObject, plIndex, plData, "dropItemKeyPressing", KEY_SEL)
-        checkKeyboardEvent(plObject, plIndex, plData, "pauseKeyPressing", KEY_STR)
+        for keymapEnumValue,keymapPropertyName in pairs(playerKeymapProperties) do
+            checkKeyboardEvent(plObject, plIndex, plData, keymapPropertyName, keymapEnumValue)
+        end
         
         if(plObject:mem(0x60, FIELD_WORD) == -1 and plData.playerJumping == false)then
             EventManager.callEvent("onJump", plIndex)
@@ -72,16 +68,9 @@ function classicEvents.doEvents()
         EventManager.callEvent("onLoopSection" .. plObject.section, plIndex)
         
         -- Copy new data here to plData
-        plData.upKeyPressing = plObject.upKeyPressing
-        plData.downKeyPressing = plObject.downKeyPressing
-        plData.leftKeyPressing = plObject.leftKeyPressing
-        plData.rightKeyPressing = plObject.rightKeyPressing
-        plData.jumpKeyPressing = plObject.jumpKeyPressing
-        plData.altJumpKeyPressing = plObject.upKeyPrealtJumpKeyPressingssing
-        plData.runPressing = plObject.runPressing
-        plData.altRunPressing = plObject.altRunPressing
-        plData.dropItemKeyPressing = plObject.dropItemKeyPressing
-        plData.pauseKeyPressing = plObject.pauseKeyPressing
+        for _,keymapPropertyName in pairs(playerKeymapProperties) do
+            plData[keymapPropertyName] = plObject[keymapPropertyName]
+        end
         
         plData.playerJumping = plObject:mem(0x60, FIELD_WORD) == -1
         
