@@ -79,7 +79,8 @@ namespace luabind
 					rhs.m_called = true;
 				}
 
-				~proxy_function_caller()
+                // MODIFICATION: C++11 complicance patch below, adding noexcept(false) to the destructor.
+				~proxy_function_caller() noexcept(false)
 				{
 					if (m_called) return;
 
@@ -249,7 +250,8 @@ namespace luabind
 					rhs.m_called = true;
 				}
 
-				~proxy_function_void_caller()
+                // MODIFICATION: C++11 complicance patch below, adding noexcept(false) to the destructor.
+				~proxy_function_void_caller() noexcept(false)
 				{
 					if (m_called) return;
 
