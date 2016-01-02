@@ -131,7 +131,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         return;
     }
     //Convert to ASCII, as lua doesn't support unicode
-    std::string LuaCode = utf8_encode(wLuaCode);
+    std::string LuaCode = WStr2Str(wLuaCode);
 
     //Bind all functions, propeties ect...
     bindAll();
@@ -162,7 +162,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     //Call the lua api init funtion.
     const char* initName = "__onInit";
     if (LuaHelper::is_function(L, initName)) {
-        callLuaFunction(L, initName, utf8_encode(codePath), utf8_encode(levelPath));
+        callLuaFunction(L, initName, WStr2Str(codePath), WStr2Str(levelPath));
     }
 }
 
@@ -1234,7 +1234,7 @@ void CLunaLua::checkWarnings()
         message << L"Warnings occured during run:\r\n";
         for (auto iter = m_warningList.cbegin(), end = m_warningList.cend(); iter != end; ++iter)
         {
-            message << L" - " << utf8_decode(*iter) << L"\r\n";
+            message << L" - " << Str2WStr(*iter) << L"\r\n";
         }
         MessageBoxW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
     }

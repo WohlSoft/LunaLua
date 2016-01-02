@@ -56,7 +56,7 @@ void VB6StrPtr::operator=(const std::wstring &other) {
 
 // Assignment operator from std::string, assuming it's utf-8 encoding
 void VB6StrPtr::operator=(const std::string &other) {
-	*this = utf8_decode(other);
+	*this = Str2WStr(other);
 }
 
 // Cast operator to std::wstring
@@ -73,7 +73,7 @@ VB6StrPtr::operator std::string() const {
 	if (ptr == NULL)
 		return std::string("");
 
-	return std::string(utf8_encode(*this));
+	return std::string(WStr2Str(*this));
 }
 
 // Cast operator to bool, true if non-null
@@ -120,7 +120,7 @@ void VB6StrPtr::assignNoDestruct(const std::wstring & other)
 
 void VB6StrPtr::assignNoDestruct(const std::string & other)
 {
-    this->assignNoDestruct(utf8_decode(other));
+    this->assignNoDestruct(Str2WStr(other));
 }
 
 // Equality operator for VBStrPtr
@@ -152,5 +152,5 @@ bool VB6StrPtr::operator==(const std::wstring &other) const
 // Equality operator for str::string, assumes it's utf-8 encoded
 bool VB6StrPtr::operator==(const std::string &other) const
 {
-	return (*this == utf8_decode(other));
+	return (*this == Str2WStr(other));
 }

@@ -39,13 +39,13 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     std::wstring full_path;
     if (isAbsolutePath(ini_file))
     {
-        full_path = utf8_decode(ini_file);
+        full_path = Str2WStr(ini_file);
     } else {
         std::wstring world_dir = (std::wstring)GM_FULLDIR;
         full_path = world_dir.append(::Level::GetName());
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder
-        full_path = full_path + utf8_decode(ini_file);
+        full_path = full_path + Str2WStr(ini_file);
     }
 
 	std::wstring ws = full_path;
@@ -275,7 +275,7 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
 
 void LuaProxy::triggerEvent(const std::string& evName)
 {
-	SMBXEvents::TriggerEvent(utf8_decode(evName), 0);
+	SMBXEvents::TriggerEvent(Str2WStr(evName), 0);
 }
 
 
@@ -493,7 +493,7 @@ luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 
 luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
-    std::wstring tarLayerName = utf8_decode(layername);
+    std::wstring tarLayerName = Str2WStr(layername);
 	for(int i = 0; i < 100; ++i){
 		LayerControl* ctrl = ::Layer::Get(i);
 		if(ctrl){
@@ -570,7 +570,7 @@ luabind::object LuaProxy::findlevels(const std::string &toFindName, lua_State* L
 	for(int i = 0, j = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
-			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
+			std::wstring tarLevelName = Str2WStr(std::string(toFindName));
 			if(!ctrl->levelTitle)
 				continue;
 			std::wstring sourceLayerName(ctrl->levelTitle);
@@ -593,7 +593,7 @@ luabind::object LuaProxy::findlevel(const std::string &toFindName, lua_State* L)
 	for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
-			std::wstring tarLevelName = utf8_decode(std::string(toFindName));
+			std::wstring tarLevelName = Str2WStr(std::string(toFindName));
 			if(!ctrl->levelTitle)
 				continue;
 			std::wstring sourceLevelName(ctrl->levelTitle);

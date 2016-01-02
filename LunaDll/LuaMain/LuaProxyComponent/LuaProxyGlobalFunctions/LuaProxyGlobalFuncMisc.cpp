@@ -77,7 +77,7 @@ luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
     std::string modulePath = path;
     if (!isAbsolutePath(path))
     {
-        modulePath = utf8_encode(getModulePath());
+        modulePath = WStr2Str(getModulePath());
         modulePath += "\\";
         modulePath += path;
     }
@@ -92,16 +92,16 @@ luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
 
 luabind::object LuaProxy::Misc::listLocalFiles(std::string path, lua_State* L)
 {
-    return listFiles(utf8_encode(getCustomFolderPath()) + path, L);
+    return listFiles(WStr2Str(getCustomFolderPath()) + path, L);
 }
 
 template<const DWORD FILTER>
 luabind::object luabindResolveFile(std::string file, lua_State* L){
     std::vector<std::string> paths = {
-        utf8_encode(getCustomFolderPath()),
+        WStr2Str(getCustomFolderPath()),
         (std::string)GM_FULLDIR,
-        utf8_encode(getModulePath()) + "\\LuaScriptsLib\\",
-        utf8_encode(getModulePath()) + "\\"
+        WStr2Str(getModulePath()) + "\\LuaScriptsLib\\",
+        WStr2Str(getModulePath()) + "\\"
     };
 
 

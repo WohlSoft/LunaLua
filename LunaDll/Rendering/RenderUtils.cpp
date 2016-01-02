@@ -10,7 +10,7 @@
 HBITMAP LoadGfxAsBitmap(const std::wstring& filename)
 {
     FreeImageData bitmapData;
-    bitmapData.loadFile(utf8_encode(filename));
+    bitmapData.loadFile(WStr2Str(filename));
     return bitmapData.toHBITMAP();
 }
 
@@ -19,7 +19,7 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
     std::vector<HBITMAP> allBitmapFrames;
     short sumFrameDelay = 0;
 
-    FreeImageGifData gifData(utf8_encode(filename), false);
+    FreeImageGifData gifData(WStr2Str(filename), false);
     if (!gifData.isOpen())
         return make_tuple(allBitmapFrames, 9);
     
@@ -40,5 +40,5 @@ void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& heade
 {
     FreeImageData screenshotFile;
     screenshotFile.init(header.biWidth, header.biHeight, (BYTE*)pData);
-    screenshotFile.saveFile(utf8_encode(fName));
+    screenshotFile.saveFile(WStr2Str(fName));
 }

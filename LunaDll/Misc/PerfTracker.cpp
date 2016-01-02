@@ -43,7 +43,7 @@ void PerfTracker::renderStats() const {
         std::ostringstream s;
         s << PerfTypeNames[i] << ": ";
         s << m_PerfTimesSnapshot[i];
-        RenderStringOp* printTextOp = new RenderStringOp(utf8_decode(s.str()), 3, 10, 100+i*15);
+        RenderStringOp* printTextOp = new RenderStringOp(Str2WStr(s.str()), 3, 10, 100+i*15);
         gLunaRender.AddOp(printTextOp);
     }
 }

@@ -18,7 +18,7 @@ std::string LuaProxy::VBStr::str() const
 {
 	if(!isValid())
 		return std::string("");
-	return utf8_encode(std::wstring(m_wcharptr, (*(((short*)m_wcharptr) - 2) / 2)));
+	return WStr2Str(std::wstring(m_wcharptr, (*(((short*)m_wcharptr) - 2) / 2)));
 }
 
 void LuaProxy::VBStr::setStr(const std::string &str)
@@ -26,7 +26,7 @@ void LuaProxy::VBStr::setStr(const std::string &str)
 	if(!isValid())
 		return;
 	size_t len = wcslen(m_wcharptr);
-	std::wstring trimmedStr = utf8_decode(str.substr(0, len));
+	std::wstring trimmedStr = Str2WStr(str.substr(0, len));
 	const wchar_t* newWStr = trimmedStr.c_str();
 	wcscpy(m_wcharptr, newWStr);
 }

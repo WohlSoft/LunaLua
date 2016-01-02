@@ -308,7 +308,7 @@ luabind::object LuaProxy::Block::layerObj(lua_State *L) const
 
 	::Block* thisblock = ::Blocks::Get(m_index);
 	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
-	return findlayer(utf8_encode(std::wstring(ptr)).c_str(),L);
+	return findlayer(WStr2Str(std::wstring(ptr)).c_str(),L);
 }
 
 void LuaProxy::Block::remove()

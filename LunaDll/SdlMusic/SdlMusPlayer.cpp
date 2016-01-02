@@ -18,7 +18,7 @@ void PGE_SDL_Manager::initSDL()
 
 		std::wstring smbxPath = getModulePath();
 		smbxPath = smbxPath.append(L"\\");
-        appPath = utf8_encode(smbxPath);
+        appPath = WStr2Str(smbxPath);
 	}
 }
 

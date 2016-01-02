@@ -19,7 +19,7 @@ std::string ErrorReport::generateStackTrace(CONTEXT* context)
 
 void ErrorReport::writeErrorLog(const std::string &text)
 {
-    std::string smbxPath = utf8_encode(getModulePath());
+    std::string smbxPath = WStr2Str(getModulePath());
     smbxPath += "\\";
     smbxPath += "ERROR_";
     smbxPath += generateTimestampForFilename();

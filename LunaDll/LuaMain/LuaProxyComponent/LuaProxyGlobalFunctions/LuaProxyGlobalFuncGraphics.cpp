@@ -53,11 +53,11 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
-        full_path = getCustomFolderPath() + utf8_decode(filename);
+        full_path = getCustomFolderPath() + Str2WStr(filename);
     }
     else
     {
-        full_path = utf8_decode(filename);
+        full_path = Str2WStr(filename);
     }
 
     std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.m_hScreenDC);
@@ -74,7 +74,7 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
 luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
-    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(utf8_decode(filename), &smbxFrameTime);
+    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(Str2WStr(filename), &smbxFrameTime);
     for (unsigned int i = 0; i < frames.size(); i++){
         tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(frames[i]), luabind::adopt(luabind::result));
     }
@@ -85,7 +85,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(utf8_decode(filename), resNumber, transColor);
+    return gLunaRender.LoadBitmapResource(Str2WStr(filename), resNumber, transColor);
 }
 
 
@@ -98,7 +98,7 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = utf8_decode(extra);
+    req.str = Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -122,7 +122,7 @@ void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImag
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = utf8_decode(extra);
+    req.str = Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -294,7 +294,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
 
         RenderStringOp* strRenderOp = new RenderStringOp();
-        strRenderOp->m_String = utf8_decode(text);
+        strRenderOp->m_String = Str2WStr(text);
         if (fontType == 3)
             for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
                 *it = towupper(*it);

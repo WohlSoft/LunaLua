@@ -69,9 +69,9 @@ void LuaProxy::Data::init()
 
 std::string LuaProxy::Data::resolvePathFromSection()
 {
-	std::string levelName = utf8_encode(::Level::GetName());
+	std::string levelName = WStr2Str(::Level::GetName());
 	std::string episodePath = (std::string)GM_FULLDIR;
-	std::string smbxPath = utf8_encode(getModulePath());
+	std::string smbxPath = WStr2Str(getModulePath());
 	std::string returnPath = "";
 	switch (m_dataType)
 	{

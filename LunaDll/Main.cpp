@@ -97,8 +97,8 @@ int OnLvlLoad() {
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
     
-    std::string custPath = utf8_encode(getCustomFolderPath());
-    std::string wldPath = utf8_encode(GM_FULLDIR);
+    std::string custPath = WStr2Str(getCustomFolderPath());
+    std::string wldPath = WStr2Str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
     replaceSubStr(wldPath, "\"", "");
     replaceSubStr(wldPath, "\\\\", "\\");

@@ -43,7 +43,7 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
         return;
     }
     // FIXME: Use better method than calling the tostring function directly! (defensive programming?)
-    std::wstring txt = utf8_decode(luabind::call_function<std::string>(L, "tostring", toPrint));
+    std::wstring txt = Str2WStr(luabind::call_function<std::string>(L, "tostring", toPrint));
 
     if (type == 3)
         for (std::wstring::iterator it = txt.begin(); it != txt.end(); ++it)

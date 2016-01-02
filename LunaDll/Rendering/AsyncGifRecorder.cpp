@@ -69,8 +69,8 @@ void AsyncGifRecorder::workerFunc()
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }
             screenshotPath += L"\\";
-            screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".gif");
-            m_gifWriter.reset(new FreeImageGifData(utf8_encode(screenshotPath)));
+            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".gif");
+            m_gifWriter.reset(new FreeImageGifData(WStr2Str(screenshotPath)));
 
             m_isRunning.store(true, std::memory_order_relaxed);
             break;

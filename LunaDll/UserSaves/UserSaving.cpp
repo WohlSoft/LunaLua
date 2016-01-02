@@ -22,14 +22,14 @@ bool SavedVariableBank::TryLoadWorldVars() {
 	ClearBank();
 
 	// Try to open the file
-    std::wfstream var_file(utf8_encode(full_path).c_str(), std::ios::in | std::ios::out);
+    std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);
 
 	// If open failed, try to create empty file
 	if(var_file.is_open() == false) {
-        var_file.open(utf8_encode(full_path).c_str(), std::ios::out);
+        var_file.open(WStr2Str(full_path).c_str(), std::ios::out);
 		var_file.flush();	
 		var_file.close();
-        var_file.open(utf8_encode(full_path).c_str(), std::ios::in | std::ios::out);;
+        var_file.open(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);;
 	}
 
 	// If create failed, get out
@@ -122,7 +122,7 @@ void SavedVariableBank::WriteBank() {
 		return;
     std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 
-    std::wfstream var_file(utf8_encode(full_path).c_str(), std::ios::out | std::ios::trunc);
+    std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out | std::ios::trunc);
 
 	for(std::map<std::wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
 		var_file << it->first << std::endl << it->second << std::endl;
@@ -148,7 +148,7 @@ void SavedVariableBank::CheckSaveDeletion() {
 
         std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 		ClearBank();
-        std::wfstream var_file(utf8_encode(full_path).c_str(), std::ios::out);
+        std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out);
 		InitSaveFile(&var_file);
 		var_file.flush();
 		var_file.close();

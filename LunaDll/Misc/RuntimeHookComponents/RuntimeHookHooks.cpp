@@ -125,7 +125,7 @@ extern int __stdcall LoadWorld()
 #ifndef NO_SDL
     if (!episodeStarted)
     {
-        std::string wldPath = utf8_encode(GM_FULLDIR);
+        std::string wldPath = WStr2Str(GM_FULLDIR);
         MusicManager::loadCustomSounds(wldPath + "\\");
         episodeStarted = true;
     }
@@ -164,7 +164,7 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    std::string autostartFile = utf8_encode(getLatestConfigFile(L"autostart.ini"));
+    std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
     if (file_existsX(autostartFile)) {
         INIReader autostartConfig(autostartFile);
@@ -243,7 +243,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    RenderStringOp(utf8_decode(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
+    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
     if (newDebugger)
     {
         if (asyncBitBltProc){
@@ -507,7 +507,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");
-    gLunaLua.callEvent(triggerEventData, utf8_encode(eventName));
+    gLunaLua.callEvent(triggerEventData, WStr2Str(eventName));
     if (triggerEventData->native_cancelled())
         return 0;
     return origCmp(nullStr, eventName);
@@ -992,7 +992,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }
             screenshotPath += L"\\";
-            screenshotPath += utf8_decode(generateTimestampForFilename()) + std::wstring(L".png");
+            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
 
             ::GenerateScreenshot(screenshotPath, *header, pData);
             return true;
