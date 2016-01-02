@@ -10,6 +10,7 @@
 #include "../Misc/SafeFPUControl.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../EventStateMachine.h"
+#include "../Misc/PerfTracker.h"
 
 #include <luabind/adopt_policy.hpp>
 
@@ -60,6 +61,7 @@ public:
         bool err = false;
         try
         {
+            PerfTrackerState perfState(PerfTracker::PERF_LUA);
             SafeFPUControl noFPUExecptions;
             luabind::call_function<void>(args...);
         }

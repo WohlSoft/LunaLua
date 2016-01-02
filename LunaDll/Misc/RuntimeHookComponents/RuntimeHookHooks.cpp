@@ -24,6 +24,8 @@
 
 #include "../../SMBXInternal/NPCs.h"
 
+#include "../PerfTracker.h"
+
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -717,6 +719,7 @@ extern void SetSMBXFrameTiming(double ms)
 
 extern void __stdcall FrameTimingHookQPC()
 {
+    g_PerfTracker.endFrame();
     static int64_t lastFrameTime = 0;
     static double frameError = 0.0;
     double frameDuration;
@@ -782,6 +785,8 @@ extern void __stdcall FrameTimingHookQPC()
     if (frameError > 5.0) frameError = 5.0;
     if (frameError < -5.0) frameError = -5.0;
     lastFrameTime = currentTime.QuadPart;
+
+    g_PerfTracker.startFrame();
 }
 
 
@@ -796,6 +801,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
 
 extern void __stdcall FrameTimingHook()
 {
+    g_PerfTracker.endFrame();
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
     static double frameError = 0.0;
@@ -844,6 +850,8 @@ extern void __stdcall FrameTimingHook()
     }
     gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
+
+    g_PerfTracker.startFrame();
 }
 
 extern void __stdcall FrameTimingMaxFPSHook()
@@ -1087,6 +1095,7 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
+    PerfTrackerState state(PerfTracker::PERF_DRAWING);
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
     g_EventHandler.hookLevelRenderEnd();
@@ -1106,6 +1115,7 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
+    PerfTrackerState state(PerfTracker::PERF_DRAWING);
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();

@@ -489,6 +489,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\PerfTracker.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -936,6 +939,9 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Misc\PerfTracker.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
