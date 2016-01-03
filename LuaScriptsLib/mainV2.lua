@@ -647,6 +647,7 @@ function __onInit(episodePath, lvlName)
         APIHelper.doAPI(_G, "uservar")
         DBG = APIHelper.doAPI(_G, "core\\dbg")
         __ClassicEvents = APIHelper.doAPI(_G, "core\\classicevents")
+        Profiler = APIHelper.doAPI(_G, "core\\profiler")
         --SEGMENT TO ADD PRELOADED APIS END
         
         __episodePath = episodePath
