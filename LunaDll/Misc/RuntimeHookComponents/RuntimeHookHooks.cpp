@@ -984,6 +984,13 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
+    if ((lParam & 0x80000000) == 0) {
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(wParam));
+        }
+    }
+    
     // Hook print screen key
     if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
     {
