@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
     <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h" />
     <ClInclude Include="Misc\AsmPatch.h" />
@@ -280,6 +281,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Misc\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp" />

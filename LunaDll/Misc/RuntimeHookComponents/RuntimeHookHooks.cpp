@@ -18,6 +18,7 @@
 #include "../../libs/ini-reader/INIReader.h"
 
 #include "../RunningStat.h"
+#include "../BitBltEmulation.h"
 #include "../../Rendering/RenderOverrideManager.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
@@ -610,6 +611,24 @@ extern BOOL __stdcall BitBltTraceHook(
         return 0;
      }
      */
+
+    /*
+    Example code to log bitblts
+    static std::ofstream f;
+    if (hdcDest == (HDC)GM_SCRN_HDC) {
+        if (!f.is_open()) {
+            f.open("bitblt_log.txt", std::ios::out);
+        }
+        f << std::hex << (DWORD)retAddr << ": ";
+        f << "hdc=0x" << std::hex << (DWORD)hdcSrc << " ";
+        f << "pos=" << std::dec << nXDest << "," << nYDest << " ";
+        f << "size=" << std::dec << nWidth << "," << nHeight << " ";
+        f << "rop=0x" << std::hex << dwRop << " ";
+        f << std::endl;
+        f.flush();
+    }
+    */
+
     return BitBltHook(
         hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop
         );
@@ -621,21 +640,11 @@ extern BOOL __stdcall BitBltHook(
     )
 {
     // Only override if the BitBlt is for the screen
-    bool skipRendering = false;
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
-        skipRendering = gRenderOverride.renderOverrideBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc);
-
-        if (!skipRendering){
-            if (g_GLEngine.IsEnabled()) {
-                g_GLEngine.EmulatedBitBlt(nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
-                return -1;
-            }
-        }
-    }
-
-    if (skipRendering)
+        g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
+    }
 
     return BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
@@ -647,6 +656,13 @@ extern BOOL __stdcall StretchBltHook(
     )
 {
     static uint8_t callCount = 0;
+
+
+    if (hdcSrc == (HDC)GM_SCRN_HDC)
+    {
+        // Make sure any mask BitBlt's are flushed before the StretchBlt of the frame
+        g_BitBltEmulation.flushPendingBlt();
+    }
 
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())

@@ -492,6 +492,9 @@
     <ClInclude Include="Misc\PerfTracker.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\BitBltEmulation.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -940,6 +943,9 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\BitBltEmulation.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
