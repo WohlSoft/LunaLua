@@ -1,7 +1,7 @@
 #include "BMPBox.h"
 #include "../Globals.h"
 #include "RenderUtils.h"
-#include "GLEngine.h"
+#include "GL/GLEngine.h"
 
 // CTOR
 BMPBox::BMPBox() {

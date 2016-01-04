@@ -1,8 +1,9 @@
 #include <windows.h>
 #include <gl/glew.h>
-#include "../Defines.h"
+#include "../../Defines.h"
+#include "../RenderUtils.h"
+#include "../BMPBox.h"
 #include "GLTextureStore.h"
-#include "RenderUtils.h"
 
 // Instance
 GLTextureStore g_GLTextureStore;

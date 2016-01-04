@@ -1,7 +1,7 @@
 #ifndef GLShader_hhhhh
 #define GLShader_hhhhh
 
-#include "../GLCompat.h"
+#include "../GL/GLCompat.h"
 #include <string>
 
 class GLShader

@@ -2,7 +2,7 @@
 #define GLCompat_hhhh
 
 #include <gl/glew.h>
-#include "../Defines.h"
+#include "../../Defines.h"
 #include <sstream>
 #include <ios>
 

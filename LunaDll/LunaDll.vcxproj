@@ -149,7 +149,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
-    <ClInclude Include="Misc\BitBltEmulation.h" />
+    <ClInclude Include="Misc\HardcodedGraphicsAccess.h" />
+    <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
     <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h" />
     <ClInclude Include="Misc\AsmPatch.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
     <ClInclude Include="Misc\SafeFPUControl.h" />
     <ClInclude Include="SMBXInternal\BaseItemArray.h" />
+    <ClInclude Include="Rendering\SMBXMaskedImage.h" />
     <ClInclude Include="SMBXInternal\CollectedStarRecord.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
@@ -193,21 +195,21 @@
     <ClInclude Include="libs\luasocket\udp.h" />
     <ClInclude Include="libs\luasocket\wsocket.h" />
     <ClInclude Include="Misc\RunningStat.h" />
-    <ClInclude Include="Rendering\GLInitTest.h" />
-    <ClInclude Include="Rendering\GLSplitSprite.h" />
-    <ClInclude Include="Rendering\GLSprite.h" />
+    <ClInclude Include="Rendering\GL\GLInitTest.h" />
+    <ClInclude Include="Rendering\GL\GLSplitSprite.h" />
+    <ClInclude Include="Rendering\GL\GLSprite.h" />
     <ClInclude Include="SMBXInternal\Menu.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h" />
     <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h" />
     <ClInclude Include="Misc\Gui\GuiCrashNotify.h" />
     <ClInclude Include="Misc\ThreadedCmdQueue.h" />
-    <ClInclude Include="Rendering\GLCompat.h" />
-    <ClInclude Include="Rendering\GLContextManager.h" />
-    <ClInclude Include="Rendering\GLDraw.h" />
-    <ClInclude Include="Rendering\GLEngine.h" />
-    <ClInclude Include="Rendering\GLEngineCmds.h" />
-    <ClInclude Include="Rendering\GLEngineProxy.h" />
-    <ClInclude Include="Rendering\GLTextureStore.h" />
+    <ClInclude Include="Rendering\GL\GLCompat.h" />
+    <ClInclude Include="Rendering\GL\GLContextManager.h" />
+    <ClInclude Include="Rendering\GL\GLDraw.h" />
+    <ClInclude Include="Rendering\GL\GLEngine.h" />
+    <ClInclude Include="Rendering\GL\GLEngineCmds.h" />
+    <ClInclude Include="Rendering\GL\GLEngineProxy.h" />
+    <ClInclude Include="Rendering\GL\GLTextureStore.h" />
     <ClInclude Include="Rendering\RenderOps\RenderGLOp.h" />
     <ClInclude Include="Rendering\RenderUtils.h" />
     <ClInclude Include="resource.h" />
@@ -282,7 +284,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
-    <ClCompile Include="Misc\BitBltEmulation.cpp" />
+    <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp" />
@@ -306,10 +308,11 @@
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp" />
-    <ClCompile Include="Rendering\GLEngineCmds.cpp" />
+    <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
+    <ClCompile Include="Rendering\SMBXMaskedImage.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
@@ -338,14 +341,14 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncNative.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
-    <ClCompile Include="Rendering\GLContextManager.cpp" />
-    <ClCompile Include="Rendering\GLDraw.cpp" />
-    <ClCompile Include="Rendering\GLEngine.cpp" />
-    <ClCompile Include="Rendering\GLEngineProxy.cpp" />
-    <ClCompile Include="Rendering\GLInitTest.cpp" />
-    <ClCompile Include="Rendering\GLSplitSprite.cpp" />
-    <ClCompile Include="Rendering\GLSprite.cpp" />
-    <ClCompile Include="Rendering\GLTextureStore.cpp" />
+    <ClCompile Include="Rendering\GL\GLContextManager.cpp" />
+    <ClCompile Include="Rendering\GL\GLDraw.cpp" />
+    <ClCompile Include="Rendering\GL\GLEngine.cpp" />
+    <ClCompile Include="Rendering\GL\GLEngineProxy.cpp" />
+    <ClCompile Include="Rendering\GL\GLInitTest.cpp" />
+    <ClCompile Include="Rendering\GL\GLSplitSprite.cpp" />
+    <ClCompile Include="Rendering\GL\GLSprite.cpp" />
+    <ClCompile Include="Rendering\GL\GLTextureStore.cpp" />
     <ClCompile Include="Rendering\RenderOps\RenderGLOp.cpp" />
     <ClCompile Include="Rendering\RenderUtils.cpp" />
     <ClCompile Include="SMBXInternal\Animation.cpp" />

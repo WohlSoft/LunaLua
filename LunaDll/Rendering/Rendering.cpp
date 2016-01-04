@@ -14,7 +14,7 @@
 #include "RenderOps/RenderStringOp.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
-#include "GLEngine.h"
+#include "GL/GLEngine.h"
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
-#include "../../../Rendering/GLEngineProxy.h"
+#include "../../../Rendering/GL/GLEngineProxy.h"
 #include <luabind/adopt_policy.hpp>
 
 // Stores reference to a loaded image
