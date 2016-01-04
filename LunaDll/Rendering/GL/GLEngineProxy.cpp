@@ -1,8 +1,8 @@
 #include <thread>
 #include <memory>
-#include "../Misc/ThreadedCmdQueue.h"
+#include "../../Defines.h"
+#include "../../Misc/ThreadedCmdQueue.h"
 #include "GLEngineProxy.h"
-#include "../Defines.h"
 #include "GLEngineCmds.h"
 
 // Instance

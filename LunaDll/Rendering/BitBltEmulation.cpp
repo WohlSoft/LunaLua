@@ -2,7 +2,7 @@
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../Rendering/RenderOverrideManager.h"
-#include "../Rendering/GLEngineProxy.h"
+#include "../Rendering/GL/GLEngineProxy.h"
 
 // Global instance
 BitBltEmulation g_BitBltEmulation;

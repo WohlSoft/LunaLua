@@ -2,7 +2,7 @@
 #include "../BMPBox.h"
 #include "../../Globals.h"
 #include "../../Misc/MiscFuncs.h"
-#include "../GLEngine.h"
+#include "../GL/GLEngine.h"
 #include "../../Defines.h"
 #include "../../SMBXInternal/CameraInfo.h"
 

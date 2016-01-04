@@ -13,12 +13,12 @@
 #include "../SHMemServer.h"
 #include "../AsmPatch.h"
 
-#include "../../Rendering/GLEngine.h"
+#include "../../Rendering/GL/GLEngine.h"
 #include "../../Main.h"
 #include "../../libs/ini-reader/INIReader.h"
 
 #include "../RunningStat.h"
-#include "../BitBltEmulation.h"
+#include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderOverrideManager.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"

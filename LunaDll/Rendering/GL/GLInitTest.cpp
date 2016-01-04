@@ -1,8 +1,8 @@
 #include <windows.h>
 #include <gl/glew.h>
 #include <GL/wglew.h>
-#include "../Defines.h"
 #include <exception>
+#include "../../Defines.h"
 
 class GLException : std::exception {
 public:

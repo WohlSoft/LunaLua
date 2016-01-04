@@ -7,7 +7,6 @@
 #include <vector>
 #include "GLDraw.h"
 #include "GLSprite.h"
-#include "../Defines.h"
 
 class GLSplitSprite : public GLSprite {
 public:

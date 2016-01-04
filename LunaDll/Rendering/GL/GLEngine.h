@@ -4,10 +4,10 @@
 #include <SDL2/SDL.h>
 #include <gl/glew.h>
 #include <unordered_map>
-#include "GLDraw.h"
-#include "BMPBox.h"
 #include <functional>
-#include "AsyncGifRecorder.h"
+#include "GLDraw.h"
+#include "../BMPBox.h"
+#include "../AsyncGifRecorder.h"
 
 typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
 

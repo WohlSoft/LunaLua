@@ -21,8 +21,8 @@
 #include "Misc/RuntimeHook.h"
 #include "SdlMusic/MusicManager.h"
 #include "Misc/Playground.h"
-#include "Rendering/GLEngine.h"
-#include "Rendering/GLInitTest.h"
+#include "Rendering/GL/GLEngine.h"
+#include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
 
 #define PATCHIT 1
