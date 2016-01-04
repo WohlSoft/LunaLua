@@ -128,9 +128,6 @@ int OnLvlLoad() {
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
-	// Update renderer stuff
-	g_GLEngine.ClearSMBXSprites();
-
 	if(gLunaEnabled) {
 		// Load autocode
 		gAutoMan.Clear(false);		

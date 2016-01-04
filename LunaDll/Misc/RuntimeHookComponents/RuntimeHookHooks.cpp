@@ -20,6 +20,7 @@
 #include "../RunningStat.h"
 #include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderOverrideManager.h"
+#include "../../Rendering/SMBXMaskedImage.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
 
@@ -131,8 +132,6 @@ extern int __stdcall LoadWorld()
         episodeStarted = true;
     }
 #endif
-
-    g_GLEngine.ClearSMBXSprites();
 
     // Init var bank
     gSavedVarBank.TryLoadWorldVars();
@@ -528,7 +527,6 @@ extern void __stdcall checkLevelShutdown()
             PGE_MusPlayer::MUS_stopMusic();
             PGE_Sounds::clearSoundBuffer();
         }
-        g_GLEngine.ClearSMBXSprites();
     }
 
     __asm{
@@ -581,11 +579,14 @@ extern void __stdcall recordVBErrCode(int errCode)
 
 extern void __stdcall LoadLocalGfxHook()
 {
+    // Clear data based on loaded SMBX sprites
+    g_GLEngine.ClearSMBXSprites();
+    gRenderOverride.ResetOverrides();
+    SMBXMaskedImage::clearLookupTable();
+
     native_loadLocalGfx();
 
-    
     // Load render override graphics
-    gRenderOverride.ResetOverrides();
     gRenderOverride.loadLevelGFX();
     gRenderOverride.loadWorldGFX();
 }
@@ -593,9 +594,14 @@ extern void __stdcall LoadLocalGfxHook()
 
 extern void __stdcall LoadLocalOverworldGfxHook()
 {
+    // Clear data based on loaded SMBX sprites
+    g_GLEngine.ClearSMBXSprites();
+    gRenderOverride.ResetOverrides();
+    SMBXMaskedImage::clearLookupTable();
+
     native_loadWorldGfx();
 
-    gRenderOverride.ResetOverrides();
+    // Load render override graphics
     gRenderOverride.loadWorldGFX();
 }
 

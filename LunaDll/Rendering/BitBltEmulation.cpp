@@ -1,8 +1,9 @@
-#include "BitBltEmulation.h"
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../Rendering/RenderOverrideManager.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "BitBltEmulation.h"
+#include "SMBXMaskedImage.h"
 
 // Global instance
 BitBltEmulation g_BitBltEmulation;
@@ -60,7 +61,7 @@ void BitBltEmulation::onBitBlt(HDC src, int dx, int dy, int w, int h, int sx, in
     }
     else if (rop == SRCPAINT)
     {
-        // If this is for masked drawing but we don't have a mask... oh well
+        // If this is for masked drawing but we don't have a mask... oh well (this shouldn't happen)
         drawMasked(nullptr, src, dx, dy, w, h, sx, sy);
     }
     else if (rop == SRCCOPY)
@@ -97,27 +98,18 @@ void BitBltEmulation::drawMasked(HDC maskSrc, HDC src, int dx, int dy, int w, in
 {
     if (maskSrc == nullptr && src == nullptr) return;
 
-    // TODO: In the future, based on maskSrc and src, get an "image object"
-    //       that will handle rendering.
-
-    // TODO: Modify RenderOverrideManager to handle the case of mask-only rendering
+    // TODO: Modify RenderOverrideManager to operate based on the SMBXMaskedImage instance instead of HDC
     if ((src != nullptr) && gRenderOverride.renderOverrideBitBlt(dx, dy, w, h, src, sx, sy))
     {
     }
-    else if (g_GLEngine.IsEnabled())
-    {
-        // TODO: Implement GLEngine masked image rendering as a single call of some sort
-        if (maskSrc != nullptr)
-            g_GLEngine.EmulatedBitBlt(dx, dy, w, h, maskSrc, sx, sy, SRCAND);
-        if (src != nullptr)
-            g_GLEngine.EmulatedBitBlt(dx, dy, w, h, src, sx, sy, SRCPAINT);
-    }
     else
     {
-        if (maskSrc != nullptr)
-            BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, maskSrc, sx, sy, SRCAND);
-        if (src != nullptr)
-            BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, src, sx, sy, SRCPAINT);
+        std::shared_ptr<SMBXMaskedImage> img = SMBXMaskedImage::get(maskSrc, src);
+
+        // If src is null, we want to draw only the mask
+        if (img) {
+            img->Draw(dx, dy, w, h, sx, sy, src == nullptr);
+        }
     }
 }
 
@@ -125,20 +117,16 @@ void BitBltEmulation::drawOpaque(HDC src, int dx, int dy, int w, int h, int sx, 
 {
     if (src == nullptr) return;
 
-    // TODO: In the future, based on src, get an "image object" that will
-    //       handle rendering.
-
-    // TODO: Modify RenderOverrideManager to handle the case of mask-only rendering
+    // TODO: Modify RenderOverrideManager to operate based on the SMBXMaskedImage instance instead of HDC
     if ((src != nullptr) && gRenderOverride.renderOverrideBitBlt(dx, dy, w, h, src, sx, sy))
     {
     }
-    else if (g_GLEngine.IsEnabled())
-    {
-        g_GLEngine.EmulatedBitBlt(dx, dy, w, h, src, sx, sy, SRCCOPY);
-    }
     else
     {
-        BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, src, sx, sy, SRCCOPY);
+        std::shared_ptr<SMBXMaskedImage> img = SMBXMaskedImage::get(nullptr, src);
+        if (img) {
+            img->Draw(dx, dy, w, h, sx, sy, false);
+        }
     }
 }
 

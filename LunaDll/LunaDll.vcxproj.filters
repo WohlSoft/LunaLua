@@ -498,6 +498,12 @@
     <ClInclude Include="Rendering\AsyncGifRecorder.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\SMBXMaskedImage.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\HardcodedGraphicsAccess.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -949,6 +955,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\SMBXMaskedImage.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

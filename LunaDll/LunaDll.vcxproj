@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
     <ClInclude Include="Misc\RuntimeHookManagers\LevelHUDController.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
     <ClInclude Include="Misc\SafeFPUControl.h" />
+    <ClInclude Include="Rendering\SMBXMaskedImage.h" />
     <ClInclude Include="SMBXInternal\CollectedStarRecord.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
@@ -309,6 +311,7 @@
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
+    <ClCompile Include="Rendering\SMBXMaskedImage.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
