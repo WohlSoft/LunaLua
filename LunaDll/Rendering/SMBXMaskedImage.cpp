@@ -53,7 +53,25 @@ void SMBXMaskedImage::clearLookupTable(void)
 {
     lookupTable.clear();
 
-    // Special case for hearts, since they share a mask, and work in batches
+    // So... for almost all images, the BitBltEmulation class correctly infers
+    // the pairing between the mask painting and the main image painting. This
+    // however fails in the case of the heart display on the HUD.
+    // This failure is because instead of rendering SRCAND/SRCPAINT in
+    // alternation for each heart, all three hearts have their masks rendered
+    // before rendering the actual image.
+    //
+    // I'm rather sure this quirk is unique to HUD hearts, and doesn't apply
+    // to anything else.
+    
+    // TODO: Consider moving this special casing to BitBltEmulation, instead of
+    //       preloading the SMBXMaskedImage lookup table?
+    //       A caveat about that, is even if we move it there, we still need to
+    //       ensure we correctly handle that both filled and non filled share
+    //       a mask HDC. We'll probably be safe if we switch to using mainHdc
+    //       instead of maskHdc as the highest priority lookup in the
+    //       SMBXMaskedImage::get(maskHdc, mainHdc) implementation.
+
+    // Get the HDCs associated with heart graphics
     HDC heartMask = (HDC)getHDCForHardcodedGraphic(0x384, 0x1);
     HDC filledHeart = (HDC)getHDCForHardcodedGraphic(0x388, 0x1);
     HDC emptyHeart = (HDC)getHDCForHardcodedGraphic(0x388, 0x2);
