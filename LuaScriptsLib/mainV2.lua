@@ -267,7 +267,27 @@ local function filenameOfPath(path)
 end
 
 
-
+-- Version check
+function compareLunaVersion(...)
+    local versionNum = {...}
+    -- We want to check the version number depending on the depth.
+    -- i.e. You use compareVersion(0, 7, 2) then the first 3 version number
+    local versionNumCount = #versionNum
+    local internalVersionNumCount = #__LUNA_VERSION_TABLE
+    if(versionNumCount > internalVersionNumCount)then
+        versionNumCount = internalVersionNumCount
+    end
+    
+    for i = 1, versionNumCount do
+        if(versionNum[i] > __LUNA_VERSION_TABLE[i])then
+            return 1
+        end
+        if(versionNum[i] < __LUNA_VERSION_TABLE[i])then
+            return -1
+        end
+    end
+    return 0
+end
 
 
 

@@ -173,6 +173,13 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, GAME_ENGINE);
     LUAHELPER_DEF_CONST(_G, LUNALUA_VERSION);
     _G["LUNALUA_VER"] = LUNALUA_VERSION; // ALIAS
+    
+    object verTable = newtable(L);
+    verTable[1] = LUNA_VERNUM1;
+    verTable[2] = LUNA_VERNUM2;
+    verTable[3] = LUNA_VERNUM3;
+    verTable[4] = LUNA_VERNUM4;
+    _G["__LUNA_VERSION_TABLE"] = verTable;
 
     LUAHELPER_DEF_CONST(_G, PLAYER_SMALL);
     LUAHELPER_DEF_CONST(_G, PLAYER_BIG);
