@@ -4,9 +4,11 @@
 
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct SMBX_Water {				    // Length should be 0x40
+struct SMBX_Water : SMBX_FullBaseItemArray<SMBX_Water, -1, GM_WATER_AREA_COUNT_CONSTPTR, GM_WATER_AREAS_PTR_CONSTPTR, 1> // Length should be 0x40
+{ 
     VB6StrPtr ptLayerName;          // +0x00
     short isHidden;                 // +0x04
     short unknown_06;               // +0x06
@@ -14,17 +16,6 @@ struct SMBX_Water {				    // Length should be 0x40
     short isQuicksand;              // +0x0C
     short unknown_0E;               // +0x0E
     Momentum momentum;              // +0x10
-
-    // Note, 1-base indexed in SMBX code, but we translate to 0-base indexed
-    // for consistency of C++ code
-    static inline SMBX_Water* Get(unsigned short index) {
-        if (index >= GM_WATER_AREA_COUNT) return NULL;
-        return &((SMBX_Water*)GM_WATER_AREAS_PTR)[index+1];
-    }
-
-    static inline unsigned short Count() {
-        return GM_WATER_AREA_COUNT;
-    }
 };
 #pragma pack(pop)
 
