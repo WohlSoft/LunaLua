@@ -13,26 +13,32 @@ SMBXMaskedImage* SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
         return nullptr;
     }
 
-    auto it = lookupTable.find(maskHdc);
-    if (it != lookupTable.end())
+    if (mainHdc != nullptr)
     {
-        if (mainHdc != nullptr && it->second->mainHdc == nullptr)
+        auto it = lookupTable.find(mainHdc);
+        if (it != lookupTable.end())
         {
-            it->second->mainHdc = mainHdc;
-            lookupTable[mainHdc] = it->second;
+            if (maskHdc != nullptr && it->second->maskHdc == nullptr)
+            {
+                it->second->maskHdc = maskHdc;
+                lookupTable[maskHdc] = it->second;
+            }
+            return it->second.get();
         }
-        return it->second.get();
     }
 
-    it = lookupTable.find(mainHdc);
-    if (it != lookupTable.end())
+    if (maskHdc != nullptr)
     {
-        if (maskHdc != nullptr && it->second->maskHdc == nullptr)
+        auto it = lookupTable.find(maskHdc);
+        if (it != lookupTable.end())
         {
-            it->second->maskHdc = maskHdc;
-            lookupTable[maskHdc] = it->second;
+            if (mainHdc != nullptr && it->second->mainHdc == nullptr)
+            {
+                it->second->mainHdc = mainHdc;
+                lookupTable[mainHdc] = it->second;
+            }
+            return it->second.get();
         }
-        return it->second.get();
     }
 
     std::shared_ptr<SMBXMaskedImage> img = std::make_shared<SMBXMaskedImage>();
