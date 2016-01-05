@@ -8,6 +8,7 @@
 #include <string>
 #include <memory.h>
 class BMPBox;
+class SMBXMaskedImage;
 
 class RenderOverrideManager
 {
@@ -21,11 +22,10 @@ public:
     void loadOverrides(const std::wstring& path, const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
     void loadLevelGFX();
     void loadWorldGFX();
-    bool renderOverrideBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc);
+    bool renderOverrideBitBlt(SMBXMaskedImage* img, int x, int y, int sw, int sh, int sx, int sy, bool maskOnly=false);
     
 private:
-    std::unordered_map<HDC, std::shared_ptr<BMPBox>> gfxOverrideMap;
-    std::unordered_set<HDC> gfxOverrideMaskSet;
+    std::unordered_map<SMBXMaskedImage*, std::shared_ptr<BMPBox>> gfxOverrideMap;
 };
 
 #endif

@@ -2,11 +2,11 @@
 #include "../GlobalFuncs.h"
 #include "RenderOps/RenderBitmapOp.h"
 #include "../Globals.h"
+#include "SMBXMaskedImage.h"
 
 void RenderOverrideManager::ResetOverrides()
 {
     gfxOverrideMap.clear();
-    gfxOverrideMaskSet.clear();
 }
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
@@ -26,13 +26,17 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 {
     for (int i = 1; i < numElements + 1; i++){        
         HDC nextHdcPtr = graphicsArray[i - 1];
-        
-        if (gfxOverrideMap.find(nextHdcPtr) != gfxOverrideMap.end())
-            continue;
 
-        HDC nextHdcMaskPtr = 0;
+        HDC nextHdcMaskPtr = nullptr;
         if (graphicsArray_Mask)
             nextHdcMaskPtr = graphicsArray_Mask[i - 1];
+
+        SMBXMaskedImage* img = SMBXMaskedImage::get(nextHdcMaskPtr, nextHdcPtr);
+        if (img == nullptr)
+            continue;
+
+        if (gfxOverrideMap.find(img) != gfxOverrideMap.end())
+            continue;
 
         std::wstring nextFilename = path + prefix + L"-" + std::to_wstring(i) + L".png";
 
@@ -42,29 +46,26 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
             continue;
         
-
-        gfxOverrideMap[nextHdcPtr] = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
-        if (nextHdcMaskPtr) {
-            gfxOverrideMaskSet.insert(nextHdcMaskPtr);
-        }
-
+        gfxOverrideMap[img] = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
     }
 }
 
-bool RenderOverrideManager::renderOverrideBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc)
+bool RenderOverrideManager::renderOverrideBitBlt(SMBXMaskedImage* img, int x, int y, int sw, int sh, int sx, int sy, bool maskOnly)
 {
-    if (gfxOverrideMaskSet.find(hdcSrc) != gfxOverrideMaskSet.end()) return true; //Skip mask
+    if (img == nullptr) return false;
 
-    auto it = gfxOverrideMap.find(hdcSrc);
+    // TODO: Handle the maskOnly == true case to make things render correctly for shadowstar cheat
+
+    auto it = gfxOverrideMap.find(img);
     if (it != gfxOverrideMap.end()) {
         RenderBitmapOp overrideFunc;
         overrideFunc.direct_img = it->second;
-        overrideFunc.x = nXDest;
-        overrideFunc.y = nYDest;
-        overrideFunc.sx = nXSrc;
-        overrideFunc.sy = nYSrc;
-        overrideFunc.sw = nWidth;
-        overrideFunc.sh = nHeight;
+        overrideFunc.x = x;
+        overrideFunc.y = y;
+        overrideFunc.sx = sx;
+        overrideFunc.sy = sy;
+        overrideFunc.sw = sw;
+        overrideFunc.sh = sh;
         overrideFunc.Draw(&gLunaRender);
         return true;
     }

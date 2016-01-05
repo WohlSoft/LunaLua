@@ -98,16 +98,12 @@ void BitBltEmulation::drawMasked(HDC maskSrc, HDC src, int dx, int dy, int w, in
 {
     if (maskSrc == nullptr && src == nullptr) return;
 
-    // TODO: Modify RenderOverrideManager to operate based on the SMBXMaskedImage instance instead of HDC
-    if ((src != nullptr) && gRenderOverride.renderOverrideBitBlt(dx, dy, w, h, src, sx, sy))
-    {
-    }
-    else
-    {
-        SMBXMaskedImage* img = SMBXMaskedImage::get(maskSrc, src);
+    SMBXMaskedImage* img = SMBXMaskedImage::get(maskSrc, src);
 
+    if (img) {
         // If src is null, we want to draw only the mask
-        if (img) {
+        if (!gRenderOverride.renderOverrideBitBlt(img, dx, dy, w, h, sx, sy, src == nullptr))
+        {
             img->Draw(dx, dy, w, h, sx, sy, maskSrc != nullptr, src != nullptr);
         }
     }
@@ -117,14 +113,11 @@ void BitBltEmulation::drawOpaque(HDC src, int dx, int dy, int w, int h, int sx, 
 {
     if (src == nullptr) return;
 
-    // TODO: Modify RenderOverrideManager to operate based on the SMBXMaskedImage instance instead of HDC
-    if ((src != nullptr) && gRenderOverride.renderOverrideBitBlt(dx, dy, w, h, src, sx, sy))
-    {
-    }
-    else
-    {
-        SMBXMaskedImage* img = SMBXMaskedImage::get(nullptr, src);
-        if (img) {
+    SMBXMaskedImage* img = SMBXMaskedImage::get(nullptr, src);
+
+    if (img) {
+        if (!gRenderOverride.renderOverrideBitBlt(img, dx, dy, w, h, sx, sy, false))
+        {
             img->Draw(dx, dy, w, h, sx, sy, true, true);
         }
     }
