@@ -33,7 +33,7 @@ public:
     SMBXMaskedImage();
     ~SMBXMaskedImage() = default;
 
-    void Draw(int dx, int dy, int w, int h, int sx, int sy, bool maskOnly = false);
+    void Draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
 };
 
 #endif

@@ -52,45 +52,6 @@ SMBXMaskedImage* SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
 void SMBXMaskedImage::clearLookupTable(void)
 {
     lookupTable.clear();
-
-    // So... for almost all images, the BitBltEmulation class correctly infers
-    // the pairing between the mask painting and the main image painting. This
-    // however fails in the case of the heart display on the HUD.
-    // This failure is because instead of rendering SRCAND/SRCPAINT in
-    // alternation for each heart, all three hearts have their masks rendered
-    // before rendering the actual image.
-    //
-    // I'm rather sure this quirk is unique to HUD hearts, and doesn't apply
-    // to anything else.
-    
-    // TODO: Consider moving this special casing to BitBltEmulation, instead of
-    //       preloading the SMBXMaskedImage lookup table?
-    //       A caveat about that, is even if we move it there, we still need to
-    //       ensure we correctly handle that both filled and non filled share
-    //       a mask HDC. We'll probably be safe if we switch to using mainHdc
-    //       instead of maskHdc as the highest priority lookup in the
-    //       SMBXMaskedImage::get(maskHdc, mainHdc) implementation.
-
-    // Get the HDCs associated with heart graphics
-    HDC heartMask = (HDC)getHDCForHardcodedGraphic(35, 1);
-    HDC filledHeart = (HDC)getHDCForHardcodedGraphic(36, 1);
-    HDC emptyHeart = (HDC)getHDCForHardcodedGraphic(36, 2);
-
-    // Dummy to force ignoring the mask render
-    std::shared_ptr<SMBXMaskedImage> heartMaskDummy = std::make_shared<SMBXMaskedImage>();
-    lookupTable[heartMask] = heartMaskDummy;
-
-    // Filled heart image
-    std::shared_ptr<SMBXMaskedImage> filledHeartImg = std::make_shared<SMBXMaskedImage>();
-    filledHeartImg->maskHdc = heartMask;
-    filledHeartImg->mainHdc = filledHeart;
-    lookupTable[filledHeart] = filledHeartImg;
-
-    // Empty heart image
-    std::shared_ptr<SMBXMaskedImage> emptyHeartImg = std::make_shared<SMBXMaskedImage>();
-    emptyHeartImg->maskHdc = heartMask;
-    emptyHeartImg->mainHdc = emptyHeart;
-    lookupTable[emptyHeart] = emptyHeartImg;
 }
 
 SMBXMaskedImage::SMBXMaskedImage() :
@@ -98,13 +59,14 @@ SMBXMaskedImage::SMBXMaskedImage() :
 {
 }
 
-void SMBXMaskedImage::Draw(int dx, int dy, int w, int h, int sx, int sy, bool maskOnly)
+void SMBXMaskedImage::Draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
 {
     if (maskHdc == nullptr && mainHdc == nullptr) return;
+    if (drawMask == false && drawMain == false) return;
     
-    if (maskHdc == nullptr && mainHdc != nullptr) {
-        // If there's no mask, assume opaque rendering
-        if (!maskOnly) {
+    if (drawMask && maskHdc == nullptr) {
+        // If there's no mask hdc but we're supposed to draw a mask, assume a fully black mask
+        if (drawMain && mainHdc != nullptr) {
             // Normal opaque rendering
             if (g_GLEngine.IsEnabled())
             {
@@ -133,16 +95,22 @@ void SMBXMaskedImage::Draw(int dx, int dy, int w, int h, int sx, int sy, bool ma
         if (g_GLEngine.IsEnabled())
         {
             // TODO: Implement GLEngine masked image rendering as a single call of some sort
-            g_GLEngine.EmulatedBitBlt(dx, dy, w, h, maskHdc, sx, sy, SRCAND);
-            if (mainHdc != nullptr && !maskOnly)
+            if (drawMask)
+            {
+                g_GLEngine.EmulatedBitBlt(dx, dy, w, h, maskHdc, sx, sy, SRCAND);
+            }
+            if (mainHdc != nullptr && drawMain)
             {
                 g_GLEngine.EmulatedBitBlt(dx, dy, w, h, mainHdc, sx, sy, SRCPAINT);
             }
         }
         else
         {
-            BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, maskHdc, sx, sy, SRCAND);
-            if (mainHdc != nullptr && !maskOnly)
+            if (drawMask)
+            {
+                BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, maskHdc, sx, sy, SRCAND);
+            }
+            if (mainHdc != nullptr && drawMain)
             {
                 BitBlt((HDC)GM_SCRN_HDC, dx, dy, w, h, mainHdc, sx, sy, SRCPAINT);
             }
