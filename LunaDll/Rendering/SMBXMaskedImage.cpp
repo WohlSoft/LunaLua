@@ -72,9 +72,9 @@ void SMBXMaskedImage::clearLookupTable(void)
     //       SMBXMaskedImage::get(maskHdc, mainHdc) implementation.
 
     // Get the HDCs associated with heart graphics
-    HDC heartMask = (HDC)getHDCForHardcodedGraphic(0x384, 0x1);
-    HDC filledHeart = (HDC)getHDCForHardcodedGraphic(0x388, 0x1);
-    HDC emptyHeart = (HDC)getHDCForHardcodedGraphic(0x388, 0x2);
+    HDC heartMask = (HDC)getHDCForHardcodedGraphic(35, 1);
+    HDC filledHeart = (HDC)getHDCForHardcodedGraphic(36, 1);
+    HDC emptyHeart = (HDC)getHDCForHardcodedGraphic(36, 2);
 
     // Dummy to force ignoring the mask render
     std::shared_ptr<SMBXMaskedImage> heartMaskDummy = std::make_shared<SMBXMaskedImage>();
