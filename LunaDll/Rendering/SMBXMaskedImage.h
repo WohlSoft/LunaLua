@@ -12,11 +12,15 @@ class SMBXMaskedImage
 {
 // Private static
 private:
+    // Use shared_ptr not to return, but because multiple HDCs will refer to
+    // the same SMBXMaskedImage.
     static std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> lookupTable;
 
 // Public static methods
 public:
-    static std::shared_ptr<SMBXMaskedImage> get(HDC maskHdc, HDC mainHdc);
+    static SMBXMaskedImage* get(HDC maskHdc, HDC mainHdc);
+
+    // IMPORTANT: Before this is called, ensure no SMBXMaskedImage remain in use!
     static void clearLookupTable(void);
 
 // Private data storage

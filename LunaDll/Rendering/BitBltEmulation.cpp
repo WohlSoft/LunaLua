@@ -104,7 +104,7 @@ void BitBltEmulation::drawMasked(HDC maskSrc, HDC src, int dx, int dy, int w, in
     }
     else
     {
-        std::shared_ptr<SMBXMaskedImage> img = SMBXMaskedImage::get(maskSrc, src);
+        SMBXMaskedImage* img = SMBXMaskedImage::get(maskSrc, src);
 
         // If src is null, we want to draw only the mask
         if (img) {
@@ -123,7 +123,7 @@ void BitBltEmulation::drawOpaque(HDC src, int dx, int dy, int w, int h, int sx, 
     }
     else
     {
-        std::shared_ptr<SMBXMaskedImage> img = SMBXMaskedImage::get(nullptr, src);
+        SMBXMaskedImage* img = SMBXMaskedImage::get(nullptr, src);
         if (img) {
             img->Draw(dx, dy, w, h, sx, sy, false);
         }

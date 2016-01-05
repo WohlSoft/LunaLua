@@ -7,7 +7,7 @@
 // Lookup table instance
 std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> SMBXMaskedImage::lookupTable;
 
-std::shared_ptr<SMBXMaskedImage> SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
+SMBXMaskedImage* SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
 {
     if (maskHdc == nullptr && mainHdc == nullptr) {
         return nullptr;
@@ -21,7 +21,7 @@ std::shared_ptr<SMBXMaskedImage> SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
             it->second->mainHdc = mainHdc;
             lookupTable[mainHdc] = it->second;
         }
-        return it->second;
+        return it->second.get();
     }
 
     it = lookupTable.find(mainHdc);
@@ -32,7 +32,7 @@ std::shared_ptr<SMBXMaskedImage> SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
             it->second->maskHdc = maskHdc;
             lookupTable[maskHdc] = it->second;
         }
-        return it->second;
+        return it->second.get();
     }
 
     std::shared_ptr<SMBXMaskedImage> img = std::make_shared<SMBXMaskedImage>();
@@ -46,7 +46,7 @@ std::shared_ptr<SMBXMaskedImage> SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
         img->maskHdc = maskHdc;
         lookupTable[maskHdc] = img;
     }
-    return img;
+    return img.get();
 }
 
 void SMBXMaskedImage::clearLookupTable(void)
