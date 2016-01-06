@@ -141,6 +141,10 @@ void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int
         overrideFunc.sh = h;
         overrideFunc.Draw(&gLunaRender);
     }
+    else if (maskedOverrideImage != nullptr)
+    {
+        maskedOverrideImage->Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
+    }
     else
     {
         Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
@@ -150,4 +154,11 @@ void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int
 void SMBXMaskedImage::SetOverride(const std::shared_ptr<BMPBox>& img)
 {
     rgbaOverrideImage = img;
+    maskedOverrideImage = nullptr;
+}
+
+void SMBXMaskedImage::SetOverride(SMBXMaskedImage* img)
+{
+    rgbaOverrideImage = nullptr;
+    maskedOverrideImage = img;
 }
