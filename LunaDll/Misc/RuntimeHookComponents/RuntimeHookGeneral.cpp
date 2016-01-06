@@ -118,6 +118,9 @@ void ParseArgs(const std::vector<std::string>& args)
 
     if (vecStrFind(args, std::string("--console")))
         gStartupSettings.console = true;
+
+    if (vecStrFind(args, std::string("--nogl")))
+        gStartupSettings.noGL = true;
 }
 
 static unsigned int __stdcall LatePatch(void)

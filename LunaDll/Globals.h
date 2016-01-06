@@ -42,6 +42,7 @@ struct startUpSettings{
 	bool logger;
 	bool newLauncher;
     bool console;
+    bool noGL;
 };
 
 struct SMBXHUDSettings {
