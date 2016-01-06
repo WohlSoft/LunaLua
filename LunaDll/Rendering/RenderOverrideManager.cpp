@@ -4,11 +4,6 @@
 #include "../Globals.h"
 #include "SMBXMaskedImage.h"
 
-void RenderOverrideManager::ResetOverrides()
-{
-    gfxOverrideMap.clear();
-}
-
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
     std::wstring customLevelPath = getCustomFolderPath();
@@ -31,13 +26,6 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (graphicsArray_Mask)
             nextHdcMaskPtr = graphicsArray_Mask[i - 1];
 
-        SMBXMaskedImage* img = SMBXMaskedImage::get(nextHdcMaskPtr, nextHdcPtr);
-        if (img == nullptr)
-            continue;
-
-        if (gfxOverrideMap.find(img) != gfxOverrideMap.end())
-            continue;
-
         std::wstring nextFilename = path + prefix + L"-" + std::to_wstring(i) + L".png";
 
         DWORD fAttrib = GetFileAttributesW(nextFilename.c_str());
@@ -46,31 +34,16 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
             continue;
         
-        gfxOverrideMap[img] = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
+        std::shared_ptr<BMPBox> bmp = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
+        if (!bmp->ImageLoaded())
+            continue;
+
+        SMBXMaskedImage* img = SMBXMaskedImage::get(nextHdcMaskPtr, nextHdcPtr);
+        if (img == nullptr)
+            continue;
+
+        img->SetOverride(bmp);
     }
-}
-
-bool RenderOverrideManager::renderOverrideBitBlt(SMBXMaskedImage* img, int x, int y, int sw, int sh, int sx, int sy, bool maskOnly)
-{
-    if (img == nullptr) return false;
-
-    // TODO: Handle the maskOnly == true case to make things render correctly for shadowstar cheat
-
-    auto it = gfxOverrideMap.find(img);
-    if (it != gfxOverrideMap.end()) {
-        RenderBitmapOp overrideFunc;
-        overrideFunc.direct_img = it->second;
-        overrideFunc.x = x;
-        overrideFunc.y = y;
-        overrideFunc.sx = sx;
-        overrideFunc.sy = sy;
-        overrideFunc.sw = sw;
-        overrideFunc.sh = sh;
-        overrideFunc.Draw(&gLunaRender);
-        return true;
-    }
-
-    return false;
 }
 
 void RenderOverrideManager::loadLevelGFX()
