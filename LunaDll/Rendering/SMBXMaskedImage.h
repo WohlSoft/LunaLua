@@ -7,6 +7,7 @@
 #include <memory>
 
 class SMBXMaskedImage;
+class BMPBox;
 
 class SMBXMaskedImage
 {
@@ -27,6 +28,7 @@ public:
 private:
     HDC maskHdc;
     HDC mainHdc;
+    std::shared_ptr<BMPBox> rgbaOverrideImage;
 
 // Public methods
 public:
@@ -34,6 +36,9 @@ public:
     ~SMBXMaskedImage() = default;
 
     void Draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
+    void DrawWithOverride(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
+
+    void SetOverride(const std::shared_ptr<BMPBox>& img);
 };
 
 #endif

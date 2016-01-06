@@ -3,6 +3,7 @@
 #include "../Rendering/GL/GLEngineProxy.h"
 #include "../Misc/HardcodedGraphicsAccess.h"
 #include "SMBXMaskedImage.h"
+#include "RenderOps/RenderBitmapOp.h"
 
 // Lookup table instance
 std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> SMBXMaskedImage::lookupTable;
@@ -61,7 +62,8 @@ void SMBXMaskedImage::clearLookupTable(void)
 }
 
 SMBXMaskedImage::SMBXMaskedImage() :
-    maskHdc(nullptr), mainHdc(nullptr)
+    maskHdc(nullptr), mainHdc(nullptr),
+    rgbaOverrideImage(nullptr)
 {
 }
 
@@ -122,4 +124,30 @@ void SMBXMaskedImage::Draw(int dx, int dy, int w, int h, int sx, int sy, bool dr
             }
         }
     }
+}
+
+void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
+{
+    if (rgbaOverrideImage)
+    {
+        // TODO: Handle drawMask/drawMain parameters (fixes shadowstar for PNGs)
+        RenderBitmapOp overrideFunc;
+        overrideFunc.direct_img = rgbaOverrideImage;
+        overrideFunc.x = dx;
+        overrideFunc.y = dy;
+        overrideFunc.sx = sx;
+        overrideFunc.sy = sy;
+        overrideFunc.sw = w;
+        overrideFunc.sh = h;
+        overrideFunc.Draw(&gLunaRender);
+    }
+    else
+    {
+        Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
+    }
+}
+
+void SMBXMaskedImage::SetOverride(const std::shared_ptr<BMPBox>& img)
+{
+    rgbaOverrideImage = img;
 }

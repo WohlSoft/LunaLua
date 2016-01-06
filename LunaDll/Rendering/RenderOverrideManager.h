@@ -17,15 +17,10 @@ public:
     RenderOverrideManager(RenderOverrideManager&) = delete;
     ~RenderOverrideManager() = default;
 
-    void ResetOverrides();
     void loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
     void loadOverrides(const std::wstring& path, const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
     void loadLevelGFX();
     void loadWorldGFX();
-    bool renderOverrideBitBlt(SMBXMaskedImage* img, int x, int y, int sw, int sh, int sx, int sy, bool maskOnly=false);
-    
-private:
-    std::unordered_map<SMBXMaskedImage*, std::shared_ptr<BMPBox>> gfxOverrideMap;
 };
 
 #endif
