@@ -17,6 +17,7 @@
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
+#include "../Rendering/SMBXMaskedImage.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -410,6 +411,7 @@ void CLunaLua::setupDefaults()
 }
 
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
 LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
 LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
@@ -467,6 +469,8 @@ void CLunaLua::bindAll()
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
+                LUAHELPER_DEF_CLASS(SMBXMaskedImage)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
@@ -500,7 +504,9 @@ void CLunaLua::bindAll()
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA),
                 // glDrawTriangles will be defined at runtime using FFI
-                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw)
+                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw),
+                def("__setSpriteOverride", &LuaProxy::Graphics::__setSpriteOverride),
+                def("__getSpriteOverride", &LuaProxy::Graphics::__getSpriteOverride)
             ],
 
             namespace_("__Effects_EXPERIMENTAL")[
