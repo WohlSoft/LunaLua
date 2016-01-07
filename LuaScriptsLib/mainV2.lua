@@ -139,6 +139,52 @@ local function initFFIBasedAPIs()
 			color[1], color[2], color[3], color[4],
 			vertCoords, texCoords, vertColor, arr_len)
 	end
+
+	local function makeSpriteTable(spriteTypeKey, spriteIdx)
+		local spriteMT = {
+			__index = function(tbl, key)
+				if (key == "img") then
+					return Graphics.__getSpriteOverride(spriteTypeKey, spriteIdx)
+				end
+				error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
+			end,
+			__newindex = function(tbl,key,val)
+				if (key == "img") then
+					Graphics.__setSpriteOverride(spriteTypeKey, spriteIdx, val)
+					return
+				end
+				error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
+			end
+		}
+		local sprite = {}
+		setmetatable(sprite, spriteMT);
+		return sprite;
+	end
+	
+	local function makeSpriteTypeTable(spriteTypeKey)
+		local spriteTypeMT = {
+			__index = function(tbl, spriteIdx)
+				return makeSpriteTable(spriteTypeKey, spriteIdx)
+			end,
+			__newindex = function(tbl,key,val)
+				error("Cannot write to Graphics.sprites." .. spriteTypeKey .. " table")
+			end
+		}
+		local spriteType = {}
+		setmetatable(spriteType, spriteTypeMT);
+		return spriteType;
+	end
+	
+	local spritesMetatable = {
+	__index = function(tbl,spriteTypeKey)
+		return makeSpriteTypeTable(spriteTypeKey)
+	end,
+	__newindex = function(tbl,key,val)
+		error("Cannot write to Graphics.sprites table")
+	end
+	}
+	Graphics.sprites = {}
+	setmetatable(Graphics.sprites, spritesMetatable);
 	
     -- Limit access to FFI
     package.preload['ffi'] = nil
