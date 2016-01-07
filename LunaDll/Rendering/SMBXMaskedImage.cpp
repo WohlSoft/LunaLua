@@ -63,7 +63,9 @@ void SMBXMaskedImage::clearLookupTable(void)
 
 SMBXMaskedImage::SMBXMaskedImage() :
     maskHdc(nullptr), mainHdc(nullptr),
-    rgbaOverrideImage(nullptr)
+    rgbaOverrideImage(nullptr),
+    loadedPngImage(nullptr),
+    maskedOverrideImage(nullptr)
 {
 }
 
@@ -128,11 +130,15 @@ void SMBXMaskedImage::Draw(int dx, int dy, int w, int h, int sx, int sy, bool dr
 
 void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
 {
-    if (rgbaOverrideImage)
+    if (maskedOverrideImage != nullptr)
+    {
+        maskedOverrideImage->Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
+    }
+    else if (rgbaOverrideImage || loadedPngImage)
     {
         // TODO: Handle drawMask/drawMain parameters (fixes shadowstar for PNGs)
         RenderBitmapOp overrideFunc;
-        overrideFunc.direct_img = rgbaOverrideImage;
+        overrideFunc.direct_img = rgbaOverrideImage ? rgbaOverrideImage : loadedPngImage;
         overrideFunc.x = dx;
         overrideFunc.y = dy;
         overrideFunc.sx = sx;
@@ -141,14 +147,15 @@ void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int
         overrideFunc.sh = h;
         overrideFunc.Draw(&gLunaRender);
     }
-    else if (maskedOverrideImage != nullptr)
-    {
-        maskedOverrideImage->Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
-    }
     else
     {
         Draw(dx, dy, w, h, sx, sy, drawMask, drawMain);
     }
+}
+
+void SMBXMaskedImage::SetLoadedPng(const std::shared_ptr<BMPBox>& img)
+{
+    loadedPngImage = img;
 }
 
 void SMBXMaskedImage::SetOverride(const std::shared_ptr<BMPBox>& img)
@@ -160,5 +167,18 @@ void SMBXMaskedImage::SetOverride(const std::shared_ptr<BMPBox>& img)
 void SMBXMaskedImage::SetOverride(SMBXMaskedImage* img)
 {
     rgbaOverrideImage = nullptr;
-    maskedOverrideImage = img;
+    if (img != this)
+    {
+        maskedOverrideImage = img;
+    }
+    else
+    {
+        maskedOverrideImage = nullptr;
+    }
+}
+
+void SMBXMaskedImage::UnsetOverride()
+{
+    rgbaOverrideImage = nullptr;
+    maskedOverrideImage = nullptr;
 }

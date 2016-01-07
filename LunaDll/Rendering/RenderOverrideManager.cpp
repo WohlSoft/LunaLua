@@ -42,7 +42,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (img == nullptr)
             continue;
 
-        img->SetOverride(bmp);
+        img->SetLoadedPng(bmp);
     }
 }
 

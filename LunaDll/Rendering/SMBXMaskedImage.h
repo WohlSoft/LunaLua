@@ -28,6 +28,7 @@ public:
 private:
     HDC maskHdc;
     HDC mainHdc;
+    std::shared_ptr<BMPBox> loadedPngImage;
     std::shared_ptr<BMPBox> rgbaOverrideImage;
     SMBXMaskedImage* maskedOverrideImage;
 
@@ -39,8 +40,11 @@ public:
     void Draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
     void DrawWithOverride(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
 
+    void SetLoadedPng(const std::shared_ptr<BMPBox>& img);
     void SetOverride(const std::shared_ptr<BMPBox>& img);
     void SetOverride(SMBXMaskedImage* img);
+    void UnsetOverride();
+    std::shared_ptr<BMPBox> GetLoadedPng() { return loadedPngImage; };
     std::shared_ptr<BMPBox> GetRGBAOverride() { return rgbaOverrideImage; };
     SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; };
 };
