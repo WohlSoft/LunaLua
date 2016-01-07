@@ -73,7 +73,7 @@ void LunaDLLInit()
 #endif // PATCHIT
 
     // Test OpenGL support
-    if (LunaDLLTestGLFeatures() && !gStartupSettings.noGL) {
+    if (!gStartupSettings.noGL && LunaDLLTestGLFeatures()) {
         g_GLEngine.Enable();
     } else {
         g_GLEngine.Disable();
