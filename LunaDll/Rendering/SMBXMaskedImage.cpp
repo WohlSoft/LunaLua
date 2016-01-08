@@ -160,14 +160,21 @@ void SMBXMaskedImage::SetLoadedPng(const std::shared_ptr<BMPBox>& img)
 
 void SMBXMaskedImage::SetOverride(const std::shared_ptr<BMPBox>& img)
 {
-    rgbaOverrideImage = img;
     maskedOverrideImage = nullptr;
+    if (loadedPngImage.get() != img.get())
+    {
+        rgbaOverrideImage = img;
+    }
+    else
+    {
+        rgbaOverrideImage = nullptr;
+    }
 }
 
 void SMBXMaskedImage::SetOverride(SMBXMaskedImage* img)
 {
     rgbaOverrideImage = nullptr;
-    if (img != this)
+    if (loadedPngImage || (img != this))
     {
         maskedOverrideImage = img;
     }
