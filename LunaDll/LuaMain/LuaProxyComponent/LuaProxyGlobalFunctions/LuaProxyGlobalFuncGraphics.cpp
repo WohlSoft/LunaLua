@@ -300,8 +300,8 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         if (fontType == 3)
             for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
                 *it = towupper(*it);
-        strRenderOp->m_X = x;
-        strRenderOp->m_Y = y;
+        strRenderOp->m_X = static_cast<float>(x);
+        strRenderOp->m_Y = static_cast<float>(y);
         strRenderOp->m_FontType = fontType;
         renderOperation = strRenderOp;
     }

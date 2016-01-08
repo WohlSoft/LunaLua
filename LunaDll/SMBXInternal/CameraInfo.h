@@ -45,6 +45,14 @@ public:
         if (index >= 201) return;
         ((double*)GM_CAMERA_Y)[index] = -value;
     }
+
+    template<typename T>
+    static inline void transformSceneToScreen(unsigned short index, T& x, T& y) {
+        static_assert(std::is_arithmetic<T>::value, "T must be arithmetic!");
+        if (index >= 201) return;
+        x -= (T)getCameraX(index);
+        y -= (T)getCameraY(index);
+    }
 };
 #pragma pack(pop)
 
