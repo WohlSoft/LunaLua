@@ -140,6 +140,7 @@ local function initFFIBasedAPIs()
 			vertCoords, texCoords, vertColor, arr_len)
 	end
 
+    -- This function creates the "virtual" attributes for the sprite table.
 	local function makeSpriteTable(spriteTypeKey, spriteIdx)
 		local spriteMT = {
 			__index = function(tbl, key)
@@ -156,11 +157,11 @@ local function initFFIBasedAPIs()
 				error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
 			end
 		}
-		local sprite = {}
-		setmetatable(sprite, spriteMT);
-		return sprite;
+		return setmetatable({}, spriteMT);
 	end
 	
+    -- This function will create the Graphics.sprite.**** table, where **** is spriteTypeKey
+    -- i.e Graphics.sprite.block
 	local function makeSpriteTypeTable(spriteTypeKey)
 		local spriteTypeMT = {
 			__index = function(tbl, spriteIdx)
@@ -170,14 +171,17 @@ local function initFFIBasedAPIs()
 				error("Cannot write to Graphics.sprites." .. spriteTypeKey .. " table")
 			end
 		}
-		local spriteType = {}
-		setmetatable(spriteType, spriteTypeMT);
-		return spriteType;
+		return setmetatable({}, spriteTypeMT)
 	end
 	
+    -- To improve performance, we can cache those type tables
+    local spriteTypeTableCache = {}
 	local spritesMetatable = {
 	__index = function(tbl,spriteTypeKey)
-		return makeSpriteTypeTable(spriteTypeKey)
+        if(not spriteTypeTableCache[spriteTypeKey])then
+            spriteTypeTableCache[spriteTypeKey] = makeSpriteTypeTable(spriteTypeKey)
+        end
+		return spriteTypeTableCache[spriteTypeKey]
 	end,
 	__newindex = function(tbl,key,val)
 		error("Cannot write to Graphics.sprites table")
