@@ -283,9 +283,11 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     RENDER_TYPE type;
     double priority;
     RenderOp* renderOperation;
+    bool isSceneCoordinates;
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, x);
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, y);
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, type);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
     if (type == RTYPE_TEXT) 
     {
         priority = RENDEROP_DEFAULT_PRIORITY_TEXT;
@@ -298,11 +300,12 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         RenderStringOp* strRenderOp = new RenderStringOp();
         strRenderOp->m_String = Str2WStr(text);
         if (fontType == 3)
-            for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
-                *it = towupper(*it);
+            for (auto& nextChar : strRenderOp->m_String)
+                nextChar = towupper(nextChar);
         strRenderOp->m_X = static_cast<float>(x);
         strRenderOp->m_Y = static_cast<float>(y);
         strRenderOp->m_FontType = fontType;
+        strRenderOp->sceneCoords = isSceneCoordinates;
         renderOperation = strRenderOp;
     }
     else if (type == RTYPE_IMAGE) 
@@ -315,8 +318,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         unsigned int sourceWidth;
         unsigned int sourceHeight;
         float opacity;
-        bool isSceneCoordinates;
-
+        
         LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
 
         if (!image || !image->img || !image->img->ImageLoaded()) {
@@ -329,8 +331,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, image->img->m_W);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, image->img->m_H);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
-
+        
         RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
         bitmapRenderOp->direct_img = image->img;
         bitmapRenderOp->sx = sourceX;
@@ -339,6 +340,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         bitmapRenderOp->sh = sourceHeight;
         bitmapRenderOp->x = x;
         bitmapRenderOp->y = y;
+        bitmapRenderOp->sceneCoords = isSceneCoordinates;
         renderOperation = bitmapRenderOp;
     }
     else

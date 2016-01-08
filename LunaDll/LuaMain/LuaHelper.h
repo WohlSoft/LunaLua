@@ -129,7 +129,7 @@ namespace std {
 #define LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(tableObj, elemKey) \
     try { \
         elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
-    } catch (luabind::cast_failed& e) { \
+    } catch (luabind::cast_failed&) { \
         luaL_error(L, "Value '" #elemKey "' is not set or has the wrong type!"); \
         return; \
     }
@@ -138,7 +138,7 @@ namespace std {
 #define LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(tableObj, elemKey, defValue) \
     try { \
         elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
-    } catch (luabind::cast_failed& /*e*/) { \
+    } catch (luabind::cast_failed&) { \
         if(!tableObj [ #elemKey ]) { \
             elemKey = defValue; \
         } else { \
