@@ -344,6 +344,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     else
     {
         luaL_error(L, "No valid 'type'. Must be RTYPE_TEXT or RTYPE_IMAGE");
+        return;
     }
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, priority);
  
