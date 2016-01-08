@@ -86,110 +86,110 @@ local function initFFIBasedAPIs()
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
     
-	local function convertGlArray(arr, arr_len)
-		if (arr == nil) then return 0 end
-		local arr_offset = 0
-		if (arr[0] == nil) then arr_offset = 1 end
+    local function convertGlArray(arr, arr_len)
+        if (arr == nil) then return 0 end
+        local arr_offset = 0
+        if (arr[0] == nil) then arr_offset = 1 end
         local arr_raw = LunaDLL.LunaLuaGlAllocCoords(arr_len)
         for i = 0,arr_len-1 do
             arr_raw[i] = arr[i+arr_offset] or 0
         end
-		return tonumber(ffi.cast("unsigned int", arr_raw))
-	end
-	
-	local function getGlElementCount(arr, divisor)
-		local len_offset = 0
-		if (arr[0] ~= nil) then len_offset = 1 end
-		return math.floor((#arr + len_offset) / divisor)
-	end
-	
-	Graphics.glDraw = function(args)
-		local priority = args['priority'] or 1.0
-		local texture = args['texture']
-		local color = args['color'] or {1.0, 1.0, 1.0, 1.0}
-		if (type(color) == "number") then
-			error("Numeric colors support not yet existing")
-		elseif (#color == 3) then
-			color = {color[1], color[2], color[3], 1.0}
-		end
-		local vertCoords = args['vertexCoords']
-		local texCoords = args['textureCoords']
-		local vertColor = args['vertexColors']
-		local arr_len = nil
-		if (vertCoords == nil) then
-			error("vertexCoords is required")
-		end
-		local arr_len = getGlElementCount(vertCoords, 2)
-		if (texCoords ~= nil) then
-			if (arr_len ~= getGlElementCount(texCoords, 2)) then
-				error("Incorrect textureCoords len")
-			end
-		end
-		if (vertColor ~= nil) then
-			if (arr_len ~= getGlElementCount(vertColor, 4)) then
-				error("Incorrect vertexColors len")
-			end
-		end
-		vertCoords = convertGlArray(vertCoords, arr_len*2)
-		texCoords = convertGlArray(texCoords, arr_len*2)
-		vertColor = convertGlArray(vertColor, arr_len*4)
-	
-		Graphics.__glInternalDraw(
-			priority, texture,
-			color[1], color[2], color[3], color[4],
-			vertCoords, texCoords, vertColor, arr_len)
-	end
+        return tonumber(ffi.cast("unsigned int", arr_raw))
+    end
+    
+    local function getGlElementCount(arr, divisor)
+        local len_offset = 0
+        if (arr[0] ~= nil) then len_offset = 1 end
+        return math.floor((#arr + len_offset) / divisor)
+    end
+    
+    Graphics.glDraw = function(args)
+        local priority = args['priority'] or 1.0
+        local texture = args['texture']
+        local color = args['color'] or {1.0, 1.0, 1.0, 1.0}
+        if (type(color) == "number") then
+            error("Numeric colors support not yet existing")
+        elseif (#color == 3) then
+            color = {color[1], color[2], color[3], 1.0}
+        end
+        local vertCoords = args['vertexCoords']
+        local texCoords = args['textureCoords']
+        local vertColor = args['vertexColors']
+        local arr_len = nil
+        if (vertCoords == nil) then
+            error("vertexCoords is required")
+        end
+        local arr_len = getGlElementCount(vertCoords, 2)
+        if (texCoords ~= nil) then
+            if (arr_len ~= getGlElementCount(texCoords, 2)) then
+                error("Incorrect textureCoords len")
+            end
+        end
+        if (vertColor ~= nil) then
+            if (arr_len ~= getGlElementCount(vertColor, 4)) then
+                error("Incorrect vertexColors len")
+            end
+        end
+        vertCoords = convertGlArray(vertCoords, arr_len*2)
+        texCoords = convertGlArray(texCoords, arr_len*2)
+        vertColor = convertGlArray(vertColor, arr_len*4)
+    
+        Graphics.__glInternalDraw(
+            priority, texture,
+            color[1], color[2], color[3], color[4],
+            vertCoords, texCoords, vertColor, arr_len)
+    end
 
     -- This function creates the "virtual" attributes for the sprite table.
-	local function makeSpriteTable(spriteTypeKey, spriteIdx)
-		local spriteMT = {
-			__index = function(tbl, key)
-				if (key == "img") then
-					return Graphics.__getSpriteOverride(spriteTypeKey, spriteIdx)
-				end
-				error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
-			end,
-			__newindex = function(tbl,key,val)
-				if (key == "img") then
-					Graphics.__setSpriteOverride(spriteTypeKey, spriteIdx, val)
-					return
-				end
-				error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
-			end
-		}
-		return setmetatable({}, spriteMT);
-	end
-	
+    local function makeSpriteTable(spriteTypeKey, spriteIdx)
+        local spriteMT = {
+            __index = function(tbl, key)
+                if (key == "img") then
+                    return Graphics.__getSpriteOverride(spriteTypeKey, spriteIdx)
+                end
+                error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
+            end,
+            __newindex = function(tbl,key,val)
+                if (key == "img") then
+                    Graphics.__setSpriteOverride(spriteTypeKey, spriteIdx, val)
+                    return
+                end
+                error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
+            end
+        }
+        return setmetatable({}, spriteMT);
+    end
+    
     -- This function will create the Graphics.sprite.**** table, where **** is spriteTypeKey
     -- i.e Graphics.sprite.block
-	local function makeSpriteTypeTable(spriteTypeKey)
-		local spriteTypeMT = {
-			__index = function(tbl, spriteIdx)
-				return makeSpriteTable(spriteTypeKey, spriteIdx)
-			end,
-			__newindex = function(tbl,key,val)
-				error("Cannot write to Graphics.sprites." .. spriteTypeKey .. " table")
-			end
-		}
-		return setmetatable({}, spriteTypeMT)
-	end
-	
+    local function makeSpriteTypeTable(spriteTypeKey)
+        local spriteTypeMT = {
+            __index = function(tbl, spriteIdx)
+                return makeSpriteTable(spriteTypeKey, spriteIdx)
+            end,
+            __newindex = function(tbl,key,val)
+                error("Cannot write to Graphics.sprites." .. spriteTypeKey .. " table")
+            end
+        }
+        return setmetatable({}, spriteTypeMT)
+    end
+    
     -- To improve performance, we can cache those type tables
     local spriteTypeTableCache = {}
-	local spritesMetatable = {
-	__index = function(tbl,spriteTypeKey)
+    local spritesMetatable = {
+    __index = function(tbl,spriteTypeKey)
         if(not spriteTypeTableCache[spriteTypeKey])then
             spriteTypeTableCache[spriteTypeKey] = makeSpriteTypeTable(spriteTypeKey)
         end
-		return spriteTypeTableCache[spriteTypeKey]
-	end,
-	__newindex = function(tbl,key,val)
-		error("Cannot write to Graphics.sprites table")
-	end
-	}
-	Graphics.sprites = {}
-	setmetatable(Graphics.sprites, spritesMetatable);
-	
+        return spriteTypeTableCache[spriteTypeKey]
+    end,
+    __newindex = function(tbl,key,val)
+        error("Cannot write to Graphics.sprites table")
+    end
+    }
+    Graphics.sprites = {}
+    setmetatable(Graphics.sprites, spritesMetatable);
+    
     -- Limit access to FFI
     package.preload['ffi'] = nil
     package.loaded['ffi'] = nil
@@ -349,7 +349,7 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
     if(apiTableHolder[apiName])then
         return apiTableHolder[apiName], false
     end
-	
+    
     local loadedAPI = nil
     local searchInPath = {
     __episodePath,
@@ -404,41 +404,41 @@ end
 -- API Namespace implementation
 local _loadingAsShared = false
 local function implementAPINamespace(loadedAPIsTable)
-	return {
-		load = (function(api, isShared)
-			local ret
-			local oldLoadingAsShared = _loadingAsShared
-			if (isShared == nil) or (isShared) then
-				_loadingAsShared = true
-				ret = APIHelper.doAPI(UserCodeManager.sharedAPIs, api)
-			elseif (loadedAPIsTable ~= nil) then
-				_loadingAsShared = false
-				ret = APIHelper.doAPI(loadedAPIsTable, api)
-			else
-				error("Cannot load APIs as non-shared outside usercode")
-			end
-			_loadingAsShared = oldLoadingAsShared
-			return ret
-		end),
-		isLoaded = (function(api)
-			if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then
-				return true
-			end
-			if (loadedAPIsTable ~= nil) then
-				return isAPILoadedByAPITable(loadedAPIsTable, api)
-			end
-			return false
-		end),
-		addHandler = (function(apiTable, event, eventHandler, beforeMainCall)
-			EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
-		end),
-		remHandler = (function(apiTable, event, eventHandler)
-			return EventManager.removeAPIListener(apiTable, event, eventHandler)
-		end),
-		isLoadingShared = (function()
-			return _loadingAsShared
-		end)
-	}
+    return {
+        load = (function(api, isShared)
+            local ret
+            local oldLoadingAsShared = _loadingAsShared
+            if (isShared == nil) or (isShared) then
+                _loadingAsShared = true
+                ret = APIHelper.doAPI(UserCodeManager.sharedAPIs, api)
+            elseif (loadedAPIsTable ~= nil) then
+                _loadingAsShared = false
+                ret = APIHelper.doAPI(loadedAPIsTable, api)
+            else
+                error("Cannot load APIs as non-shared outside usercode")
+            end
+            _loadingAsShared = oldLoadingAsShared
+            return ret
+        end),
+        isLoaded = (function(api)
+            if(isAPILoadedByAPITable(UserCodeManager.sharedAPIs, api)) then
+                return true
+            end
+            if (loadedAPIsTable ~= nil) then
+                return isAPILoadedByAPITable(loadedAPIsTable, api)
+            end
+            return false
+        end),
+        addHandler = (function(apiTable, event, eventHandler, beforeMainCall)
+            EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
+        end),
+        remHandler = (function(apiTable, event, eventHandler)
+            return EventManager.removeAPIListener(apiTable, event, eventHandler)
+        end),
+        isLoadingShared = (function()
+            return _loadingAsShared
+        end)
+    }
 end
 API = implementAPINamespace(nil)
 
@@ -456,7 +456,7 @@ function loadSharedAPI(api)
     return API.load(api)
 end
 function registerEvent(apiTable, event, eventHandler, beforeMainCall)
-	EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
+    EventManager.addAPIListener(apiTable, event, eventHandler, beforeMainCall)
 end
 function unregisterEvent(apiTable, event, eventHandler)
     return EventManager.removeAPIListener(apiTable, event, eventHandler)
@@ -498,17 +498,17 @@ function UserCodeManager.loadCodeFile(codeFileName, codeFilePath)
     local usercodeInstance = {}
     local loadedAPIsTable = {}
     
-	local thisAPINamesace = implementAPINamespace(loadedAPIsTable)
-	
+    local thisAPINamesace = implementAPINamespace(loadedAPIsTable)
+    
     -- 2. Setup environment
     local usercodeEnvironment = {
         -- 2.1 Add loadAPI function
         loadAPI = (function(api)
             return thisAPINamesace.load(api, false)
         end),
-		
-		-- API Namespace implementation
-		API = thisAPINamesace
+        
+        -- API Namespace implementation
+        API = thisAPINamesace
     }
     
     -- 2.2 Add custom environment (FIXME: Add proxy environment later!)
@@ -585,10 +585,10 @@ function EventManager.callEvent(name, ...)
     if(mainName == nil or childName == nil)then
         mainName, childName = unpack(name:split(":"))
     end
-	
+    
     -- Call API listeners before usercodes.
-	EventManager.callApiListeners(name, true, ...)
-	
+    EventManager.callApiListeners(name, true, ...)
+    
     -- Call usercode files
     for _, nextUserListener in pairs(EventManager.userListeners)do
         local hostObject = nextUserListener
@@ -600,9 +600,9 @@ function EventManager.callEvent(name, ...)
             hostObject[mainName](...)
         end
     end
-	
+    
     -- Call API Listeners after usercodes.
-	EventManager.callApiListeners(name, false, ...)
+    EventManager.callApiListeners(name, false, ...)
     
     -- It is hackish, but nothing I can do about it
     if(name == "onLoop" and not isOverworld)then
@@ -649,8 +649,8 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
         eventHandlerName = eventHandler,
         callBefore = beforeMainCall
     }
-	
-	table.insert(EventManager.apiListeners, newApiHandler)
+    
+    table.insert(EventManager.apiListeners, newApiHandler)
 end
 
 -- FIXME: Check also if "beforeMainCall"
