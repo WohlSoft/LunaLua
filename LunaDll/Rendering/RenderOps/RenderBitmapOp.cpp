@@ -32,8 +32,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     double x = this->x;
     double y = this->y;
     if (sceneCoords) {
-        x -= (int)SMBX_CameraInfo::getCameraX(1);
-        y -= (int)SMBX_CameraInfo::getCameraY(1);
+        SMBX_CameraInfo::transformSceneToScreen(1, x, y);
     }
 
     //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
