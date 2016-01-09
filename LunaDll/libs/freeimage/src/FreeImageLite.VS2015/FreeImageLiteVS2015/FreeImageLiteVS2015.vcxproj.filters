@@ -1,0 +1,428 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Файлы исходного кода">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Заголовочные файлы">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы исходного кода\DeprecationManager">
+      <UniqueIdentifier>{4a6f2d87-5d46-4bbe-ab9b-8c07372a2ce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\FreeImage">
+      <UniqueIdentifier>{8fe94cc5-8873-4624-8e41-4af837ce96df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\DeprecationManager">
+      <UniqueIdentifier>{e2a6c28b-a814-42d3-b0a0-425d5e340af5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\FreeImage">
+      <UniqueIdentifier>{40dcbac1-dc1d-476b-b1dc-f2c53e1b4130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\FreeImageToolkit">
+      <UniqueIdentifier>{6a2ff871-1ec0-4ca6-81fd-78afaa418f2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\FreeImageToolkit">
+      <UniqueIdentifier>{7d00482f-ca0d-494c-aa1d-77e3c5e37274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\LibPNG">
+      <UniqueIdentifier>{7d319d31-02d2-4c4a-9c83-16054b3b469b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\LibPNG">
+      <UniqueIdentifier>{7e712a63-37ea-40ef-80ab-da4d32adb921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\Metadata">
+      <UniqueIdentifier>{fb6e9858-8cbc-48ff-a571-a7507c6f1a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\Metadata">
+      <UniqueIdentifier>{587a71d3-ec08-43a2-9c9f-007e698cb2ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Заголовочные файлы\ZLib">
+      <UniqueIdentifier>{704167fa-d4e4-46c3-8d48-b3ca6884745f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\ZLib">
+      <UniqueIdentifier>{fa7699e8-0b67-43d6-bc8d-0cd615eed4bc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\DeprecationManager\DeprecationMgr.h">
+      <Filter>Заголовочные файлы\DeprecationManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImage\PSDParser.h">
+      <Filter>Заголовочные файлы\FreeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImage\J2KHelper.h">
+      <Filter>Заголовочные файлы\FreeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImageToolkit\Filters.h">
+      <Filter>Заголовочные файлы\FreeImageToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImageToolkit\Resize.h">
+      <Filter>Заголовочные файлы\FreeImageToolkit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pngpriv.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pngstruct.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\png.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pngconf.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pngdebug.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pnginfo.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibPNG\pnglibconf.h">
+      <Filter>Заголовочные файлы\LibPNG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Metadata\FreeImageTag.h">
+      <Filter>Заголовочные файлы\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Metadata\FIRational.h">
+      <Filter>Заголовочные файлы\Metadata</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Quantizers.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ToneMapping.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Utilities.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CacheFile.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImage.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImageIO.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FreeImageLite.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MapIntrospector.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Plugin.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\inflate.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\inftrees.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\trees.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\zconf.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\zlib.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\zutil.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\crc32.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\deflate.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\gzguts.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\inffast.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ZLib\inffixed.h">
+      <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\DeprecationManager\DeprecationMgr.cpp">
+      <Filter>Файлы исходного кода\DeprecationManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\DeprecationManager\Deprecated.cpp">
+      <Filter>Файлы исходного кода\DeprecationManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\FreeImageC.c">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionUINT16.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\FreeImage.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\FreeImageIO.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\GetType.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Halftoning.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\LFPQuantizer.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\MemoryIO.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\MultiPage.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\NNQuantizer.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PixelAccess.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Plugin.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PluginBMP.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PluginGIF.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PluginICO.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PluginPNG.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\tmoColorConvert.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\tmoDrago03.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\tmoFattal02.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\tmoReinhard05.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ToneMapping.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\WuQuantizer.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ZLibInterface.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\BitmapAccess.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\CacheFile.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ColorLookup.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion4.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion8.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion16_555.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion16_565.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion24.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\Conversion32.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionFloat.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionRGB16.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionRGBA16.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionRGBAF.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionRGBF.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\ConversionType.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\MultigridPoissonSolver.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Rescale.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Resize.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Background.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\BSplineRotate.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Channels.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\ClassicRotate.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Colors.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\CopyPaste.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Display.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImageToolkit\Flip.cpp">
+      <Filter>Файлы исходного кода\FreeImageToolkit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngwrite.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngwtran.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngwutil.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\png.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngerror.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngget.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngmem.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngpread.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngread.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngrio.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngrtran.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngrutil.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngset.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngtest.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngtrans.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibPNG\pngwio.c">
+      <Filter>Файлы исходного кода\LibPNG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\TagConversion.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\TagLib.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\FIRational.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\FreeImageTag.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\IPTC.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\gzwrite.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\infback.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\inffast.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\inflate.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\inftrees.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\trees.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\uncompr.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\zutil.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\adler32.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\compress.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\crc32.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\deflate.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\gzclose.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\gzlib.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ZLib\gzread.c">
+      <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\FreeImage.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
