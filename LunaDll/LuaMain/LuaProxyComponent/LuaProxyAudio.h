@@ -2,10 +2,8 @@
 #ifndef LuaProxyAudio_H
 #define LuaProxyAudio_H
 
-#include <SDL2/SDL_mixer_ext.h>
-#undef main
 #include <string>
-
+struct Mix_Chunk;
 class MciEmulator;
 
 namespace LuaProxy
@@ -61,6 +59,11 @@ namespace LuaProxy
 
         double AudioClock();
         double MusicClock();
+
+        void __setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk);
+        Mix_Chunk* __getChunkForAlias(const std::string& alias);
+        void __setMuteForAlias(const std::string& alias, bool muted);
+        bool __getMuteForAlias(const std::string& alias);
     }
 }
 #endif

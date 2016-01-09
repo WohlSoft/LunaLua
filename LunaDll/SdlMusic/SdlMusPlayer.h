@@ -66,10 +66,21 @@ public:
     static void SND_PlaySnd(const char *sndFile);
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
+    static bool playOverrideForAlias(const std::string& alias, int ch);
+    static void setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk);
+    static Mix_Chunk *getChunkForAlias(const std::string& alias);
+    static void setMuteForAlias(const std::string& alias, bool muted);
+    static bool getMuteForAlias(const std::string& alias);
 private:
+    struct ChunkOverrideSettings {
+        Mix_Chunk* chunk;
+        bool muted;
+    };
+
 	static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;
     static char *current;
+    static std::map<std::string, ChunkOverrideSettings > overrideSettings;
 };
 
 #endif

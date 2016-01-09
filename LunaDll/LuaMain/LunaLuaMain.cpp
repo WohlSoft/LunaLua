@@ -593,7 +593,12 @@ void CLunaLua::bindAll()
 
                 //Time
                 def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
-                def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock)
+                def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock),
+
+                def("__setOverrideForAlias", LuaProxy::Audio::__setOverrideForAlias),
+                def("__getChunkForAlias", LuaProxy::Audio::__getChunkForAlias),
+                def("__setMuteForAlias", LuaProxy::Audio::__setMuteForAlias),
+                def("__getMuteForAlias", LuaProxy::Audio::__getMuteForAlias)
             ],
             /*************************Audio*end*************************/
 

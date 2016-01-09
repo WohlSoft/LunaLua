@@ -2,6 +2,7 @@
 
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
+#include "MusicManager.h"
 
 /***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
@@ -259,6 +260,7 @@ Mix_Chunk *PGE_Sounds::sound = NULL;
 char *PGE_Sounds::current = "";
 
 std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
+std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
 
 Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
 {
@@ -320,12 +322,79 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 void PGE_Sounds::clearSoundBuffer()
 {
     Mix_HaltChannel(-1);
+    overrideSettings.clear();
 	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
 	{
 		Mix_FreeChunk(it->second);
 	}
 	chunksBuffer.clear();
     Mix_ReserveChannels(0);
+}
+
+void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)
+{
+    ChunkOverrideSettings settings = { nullptr, false };
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        settings = it->second;
+    }
+
+    settings.chunk = chunk;
+    overrideSettings[alias] = settings;
+}
+
+Mix_Chunk *PGE_Sounds::getChunkForAlias(const std::string& alias)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end() && it->second.chunk != nullptr)
+    {
+        return it->second.chunk;
+    }
+    return MusicManager::getChunkForAlias(alias);
+}
+
+bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        if (it->second.muted) return true;
+        if (it->second.chunk == nullptr) return false;
+
+        if (ch != -1)
+            Mix_HaltChannel(ch);
+        if (Mix_PlayChannelTimed(ch, it->second.chunk, 0, -1) == -1)
+        {
+            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
+        return true;
+    }
+    return false;
+}
+
+void PGE_Sounds::setMuteForAlias(const std::string& alias, bool muted)
+{
+    ChunkOverrideSettings settings = { nullptr, false };
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        settings = it->second;
+    }
+
+    settings.muted = muted;
+    overrideSettings[alias] = settings;
+}
+
+bool PGE_Sounds::getMuteForAlias(const std::string& alias)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        return it->second.muted;
+    }
+    return false;
 }
 
 #endif
