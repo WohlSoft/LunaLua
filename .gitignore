@@ -41,6 +41,8 @@
 /LunaDll/libs/freeimage/src/FreeImageLite.VS2015/[Rr]elease
 /LunaDll/libs/freeimage/src/FreeImageLite.VS2015/FreeImageLiteVS2015/[Dd]ebug
 /LunaDll/libs/freeimage/src/FreeImageLite.VS2015/FreeImageLiteVS2015/[Rr]elease
+/LunaDll/libs/freeimage/src/FreeImageLite.VS2015/TestOfLinking/[Dd]ebug
+/LunaDll/libs/freeimage/src/FreeImageLite.VS2015/TestOfLinking/[Rr]elease
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

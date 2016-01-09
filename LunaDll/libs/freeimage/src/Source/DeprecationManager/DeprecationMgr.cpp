@@ -38,8 +38,8 @@ DeprecationMgr::DeprecationMgr() {
 DeprecationMgr::~DeprecationMgr() {
 #if defined(_WIN32) && !defined(__MINGW32__)
 	if (!m_functions.empty()) {
-		OutputDebugString( "*************************************************************************************\n" );
-		OutputDebugString( "This is a warning, because you use one or more deprecated functions.\nContinuing to use these functions might eventually render your program uncompilable.\nThe following functions are deprecated:\n\n" );
+		OutputDebugStringA( "*************************************************************************************\n" );
+		OutputDebugStringA( "This is a warning, because you use one or more deprecated functions.\nContinuing to use these functions might eventually render your program uncompilable.\nThe following functions are deprecated:\n\n" );
 
 		for (std::map<const char *, DeprecatedFunction>::iterator i = m_functions.begin(); i != m_functions.end(); ++i) {
 			DeprecatedFunction *function = &((*i).second);
@@ -48,10 +48,10 @@ DeprecationMgr::~DeprecationMgr() {
 
 			sprintf(txt, " * %s called from %i different places. Instead use %s.\n", function->old_function_name,  function->called_from.size(), function->new_function_name);
 
-			OutputDebugString(txt);
+			OutputDebugStringA(txt);
 		}
 
-		OutputDebugString( "*************************************************************************************\n" );
+		OutputDebugStringA( "*************************************************************************************\n" );
 
 		m_functions.clear();
 	}
