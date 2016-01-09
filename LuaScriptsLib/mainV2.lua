@@ -190,6 +190,49 @@ local function initFFIBasedAPIs()
     Graphics.sprites = {}
     setmetatable(Graphics.sprites, spritesMetatable);
     
+    
+    -- This function creates the "virtual" attributes for the sound table.
+    local function makeSoundTable(soundIdx)
+        if (type(soundIdx) ~= "number") or (math.floor(soundIdx) ~= soundIdx) or (soundIdx < 1) or (soundIdx > 91) then
+            error("Audio.sounds" .. "[" .. tostring(soundIdx) .. "] does not exist")
+        end
+        local soundAlias = "sound" .. tostring(soundIdx)
+        local spriteMT = {
+            __index = function(tbl, key)
+                if (key == "sfx") then
+                    return Audio.__getChunkForAlias(soundAlias)
+                end
+                if (key == "muted") then
+                    return Audio.__getMuteForAlias(soundAlias, val)
+                end
+                error("Audio.sounds" .. "[" .. tostring(soundIdx) .. "]." .. tostring(key) .. " does not exist")
+            end,
+            __newindex = function(tbl,key,val)
+                if (key == "sfx") then
+                    Audio.__setOverrideForAlias(soundAlias, val)
+                    return
+                end
+                if (key == "muted") then
+                    Audio.__setMuteForAlias(soundAlias, val)
+                    return
+                end
+                error("Audio.sounds" .. "[" .. tostring(soundIdx) .. "]." .. tostring(key) .. " does not exist")
+            end
+        }
+        return setmetatable({}, spriteMT);
+    end
+    
+    local soundsMetatable = {
+        __index = function(tbl,soundIdx)
+            return makeSoundTable(soundIdx)
+        end,
+        __newindex = function(tbl,key,val)
+            error("Cannot write to Audio.sounds table")
+        end
+    }
+    Audio.sounds = {}
+    setmetatable(Audio.sounds, soundsMetatable);
+    
     -- Limit access to FFI
     package.preload['ffi'] = nil
     package.loaded['ffi'] = nil

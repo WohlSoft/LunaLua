@@ -2,6 +2,7 @@
 
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
+#include "MusicManager.h"
 
 /***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
@@ -31,9 +32,8 @@ int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
-unsigned __int64 PGE_MusPlayer::sCount = 0;
-unsigned __int64 PGE_MusPlayer::musSCount = 0;
-SDL_mutex* PGE_MusPlayer::sampleCountMutex = NULL;
+std::atomic<unsigned __int64> PGE_MusPlayer::sCount = 0;
+std::atomic<unsigned __int64> PGE_MusPlayer::musSCount = 0;
 
 void PGE_MusPlayer::MUS_playMusic()
 {
@@ -43,11 +43,7 @@ void PGE_MusPlayer::MUS_playMusic()
 		if (Mix_PlayingMusic() == 0)
 		{
 			// Reset music sample count
-			if (SDL_LockMutex(sampleCountMutex) == 0)
-			{
-				musSCount = 0;
-				SDL_UnlockMutex(sampleCountMutex);
-			}
+			musSCount.store(0);
 
 			Mix_PlayMusic(play_mus, -1);
 		}
@@ -72,11 +68,7 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 		if(Mix_PausedMusic()==0)
 		{
 			// Reset music sample count
-			if (SDL_LockMutex(sampleCountMutex) == 0)
-			{
-				musSCount = 0;
-				SDL_UnlockMutex(sampleCountMutex);
-			}
+			musSCount.store(0);
 
 			if(Mix_FadingMusic()!=MIX_FADING_IN)
 				if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
@@ -185,19 +177,10 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
     Mix_OpenAudio(sRate, AUDIO_S16, 2, 2048);
 	Mix_AllocateChannels(32);
 
-	// Reset the audio sample count and set the post mix callback
-	if (sampleCountMutex == NULL)
-	{
-		sampleCountMutex = SDL_CreateMutex();
-	}
 	// Reset music sample count
-	if (SDL_LockMutex(sampleCountMutex) == 0)
-	{
-		sCount = 0;
-		musSCount = 0;
-		Mix_SetPostMix(postMixCallback, NULL);
-		SDL_UnlockMutex(sampleCountMutex);
-	}
+    sCount.store(0);
+    musSCount.store(0);
+	Mix_SetPostMix(postMixCallback, NULL);
 }
 
 int PGE_MusPlayer::sampleRate()
@@ -251,46 +234,24 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 
 void PGE_MusPlayer::postMixCallback(void *udata, Uint8 *stream, int len)
 {
-	if (SDL_LockMutex(sampleCountMutex) == 0)
-	{
-		// This post mix callback has a simple purpose: count audio samples.
-		sCount += len/4;
+	// This post mix callback has a simple purpose: count audio samples.
+	sCount += len/4;
 
-		// (Approximate) sample count for only when music is playing
-		if ((Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0))
-		{
-			musSCount += len/4;
-		}
-		SDL_UnlockMutex(sampleCountMutex);
+	// (Approximate) sample count for only when music is playing
+	if ((Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0))
+	{
+		musSCount += len/4;
 	}
 }
 
 unsigned __int64 PGE_MusPlayer::sampleCount()
 {
-	unsigned __int64 ret = 0;
-
-	// Make sure we don't have a race condition with the callback
-	if (SDL_LockMutex(sampleCountMutex) == 0)
-	{
-		ret = sCount;
-		SDL_UnlockMutex(sampleCountMutex);
-	}
-
-	return ret;
+	return sCount;
 }
 
 unsigned __int64 PGE_MusPlayer::MUS_sampleCount()
 {
-	unsigned __int64 ret = 0;
-
-	// Make sure we don't have a race condition with the callback
-	if (SDL_LockMutex(sampleCountMutex) == 0)
-	{
-		ret = musSCount;
-		SDL_UnlockMutex(sampleCountMutex);
-	}
-
-	return ret;
+	return musSCount;
 }
 
 /***********************************PGE_Sounds********************************************/
@@ -299,6 +260,7 @@ Mix_Chunk *PGE_Sounds::sound = NULL;
 char *PGE_Sounds::current = "";
 
 std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
+std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
 
 Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
 {
@@ -360,12 +322,79 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 void PGE_Sounds::clearSoundBuffer()
 {
     Mix_HaltChannel(-1);
+    overrideSettings.clear();
 	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
 	{
 		Mix_FreeChunk(it->second);
 	}
 	chunksBuffer.clear();
     Mix_ReserveChannels(0);
+}
+
+void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)
+{
+    ChunkOverrideSettings settings = { nullptr, false };
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        settings = it->second;
+    }
+
+    settings.chunk = chunk;
+    overrideSettings[alias] = settings;
+}
+
+Mix_Chunk *PGE_Sounds::getChunkForAlias(const std::string& alias)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end() && it->second.chunk != nullptr)
+    {
+        return it->second.chunk;
+    }
+    return MusicManager::getChunkForAlias(alias);
+}
+
+bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        if (it->second.muted) return true;
+        if (it->second.chunk == nullptr) return false;
+
+        if (ch != -1)
+            Mix_HaltChannel(ch);
+        if (Mix_PlayChannelTimed(ch, it->second.chunk, 0, -1) == -1)
+        {
+            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
+        }
+        return true;
+    }
+    return false;
+}
+
+void PGE_Sounds::setMuteForAlias(const std::string& alias, bool muted)
+{
+    ChunkOverrideSettings settings = { nullptr, false };
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        settings = it->second;
+    }
+
+    settings.muted = muted;
+    overrideSettings[alias] = settings;
+}
+
+bool PGE_Sounds::getMuteForAlias(const std::string& alias)
+{
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        return it->second.muted;
+    }
+    return false;
 }
 
 #endif

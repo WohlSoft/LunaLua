@@ -326,3 +326,37 @@ double LuaProxy::Audio::MusicClock()
     return 0;
 #endif
 }
+
+void LuaProxy::Audio::__setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)
+{
+#ifndef NO_SDL
+    PGE_Sounds::setOverrideForAlias(alias, chunk);
+#endif
+}
+
+Mix_Chunk* LuaProxy::Audio::__getChunkForAlias(const std::string& alias)
+{
+#ifndef NO_SDL
+    return PGE_Sounds::getChunkForAlias(alias);
+#else
+    return nullptr;
+#endif
+}
+
+void LuaProxy::Audio::__setMuteForAlias(const std::string& alias, bool muted)
+{
+#ifndef NO_SDL
+    PGE_Sounds::setMuteForAlias(alias, muted);
+#endif
+}
+
+bool LuaProxy::Audio::__getMuteForAlias(const std::string& alias)
+{
+#ifndef NO_SDL
+    return PGE_Sounds::getMuteForAlias(alias);
+#else
+    return false;
+#endif
+}
+
+

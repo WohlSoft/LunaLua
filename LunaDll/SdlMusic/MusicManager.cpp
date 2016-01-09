@@ -191,12 +191,17 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
                 std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
                 if(it != chunksBuffer.end())
                 {
-                    if(chunksBuffer[alias].first != -1)
-                        Mix_HaltChannel(chunksBuffer[alias].first);
-                    if(Mix_PlayChannelTimed( chunksBuffer[alias].first, chunksBuffer[alias].second, 0, -1 )==-1)
+                    int ch = it->second.first;
+                    if (!PGE_Sounds::playOverrideForAlias(alias, ch))
                     {
-                        if(std::string(Mix_GetError())!="No free channels available")//Don't show overflow messagebox
-                        MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+                        Mix_Chunk* chunk = it->second.second;
+                        if (ch != -1)
+                            Mix_HaltChannel(ch);
+                        if (Mix_PlayChannelTimed(ch, chunk, 0, -1) == -1)
+                        {
+                            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+                                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
+                        }
                     }
                 }
             }
@@ -418,6 +423,16 @@ void MusicManager::initArrays()
 std::string MusicManager::SndRoot()
 {
     return curRoot;
+}
+
+Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
+{
+    std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
+    if (it != chunksBuffer.end())
+    {
+        return it->second.second;
+    }
+    return nullptr;
 }
 
 #endif

@@ -39,6 +39,8 @@ class MusicManager
         static void resetSeizes();
         static void setSeized(int section, bool state);
         static void setCurrentSection(int section);
+
+        static Mix_Chunk *getChunkForAlias(const std::string& alias);
     private:
         static std::unordered_map<std::string, musicFile > registredFiles;
         static std::unordered_map<std::string, chunkFile > chunksBuffer;
