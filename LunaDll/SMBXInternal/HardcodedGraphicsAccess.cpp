@@ -41,7 +41,7 @@ std::array<HardcodedGraphicsItem, 51> hardcodedGraphicsArrayOffset =
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY,      35, 1, 2),  // 36 (array)
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 2),  // 37 (array)
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 7),  // 38 (array)
-    HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY,      38, 1, 2),  // 39 (array)
+    HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY,      38, 0, 7),  // 39 (array)
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY,      -1, 1, 1),  // 40 (array)
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 1, 3),  // 41 (array)
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_ARRAY,      41, 1, 3),  // 42 (array)
