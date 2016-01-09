@@ -527,6 +527,11 @@ DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
 DEFMEM(GM_CURRENT_TIME,    double, 0x00B2D738);
 DEFMEM(GM_MAX_FPS_MODE,    short,  0x00B2C8BE);
 
+
+// VB6 GUI
+DEFMEM(GM_FORM_GFX,        IDispatch*,      0x00B2D7C4);
+
+
 /////////////////////
 ///  -Assembly-   ///
 /////////////////////

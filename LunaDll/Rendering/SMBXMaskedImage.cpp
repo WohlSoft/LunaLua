@@ -1,7 +1,7 @@
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../Rendering/GL/GLEngineProxy.h"
-#include "../Misc/HardcodedGraphicsAccess.h"
+#include "../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "SMBXMaskedImage.h"
 #include "RenderOps/RenderBitmapOp.h"
 

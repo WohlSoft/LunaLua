@@ -501,10 +501,10 @@
     <ClInclude Include="Rendering\SMBXMaskedImage.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\HardcodedGraphicsAccess.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="SMBXInternal\BaseItemArray.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
   </ItemGroup>
@@ -963,6 +963,7 @@
     <ClCompile Include="Rendering\SMBXMaskedImage.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
