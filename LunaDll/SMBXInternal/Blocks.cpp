@@ -54,6 +54,8 @@ void Blocks::DoSortingIfRequired()
 
     native_sort_finalize1();
     native_sort_finalize2();
+
+    isBlocksSortingRequired = false;
 }
 
 void Blocks::SetNextFrameSorting()

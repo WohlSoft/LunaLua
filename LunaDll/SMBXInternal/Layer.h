@@ -4,9 +4,10 @@
 
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct LayerControl {
+struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 100, GM_LAYER_ARRAY_PTR_CONSTPTR> {
     short       IsStopped;		// 0x00 0xFFFF when moving, event ended?
     short       Unknown1;       // 0x02
     VB6StrPtr	ptLayerName;	// 0x04 ptr to double zero terminated 2byte wide char string
@@ -15,12 +16,6 @@ struct LayerControl {
 
 	float		xSpeed;         // 0x0C
 	float		ySpeed;         // 0x10
-
-    static inline LayerControl* Get(unsigned short index) {
-        if (index >= 100) return NULL;
-        return &((LayerControl*)GM_LAYER_ARRAY_PTR)[index];
-    }
-
 };
 #pragma pack(pop)
 

@@ -1,13 +1,13 @@
 #include <windows.h>
 #include <gl/glew.h>
-#include "GLEngine.h"
-#include "../Defines.h"
-#include "../Globals.h"
-#include "RenderUtils.h"
+#include "../../Defines.h"
+#include "../../Globals.h"
+#include "../RenderUtils.h"
 #include "GLCompat.h"
 #include "GLDraw.h"
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
+#include "GLEngine.h"
 
 GLEngine::GLEngine() :
     mEnabled(true), mBitwiseCompat(false),

@@ -97,14 +97,14 @@ LuaProxy::Animation::Animation(int animationIndex)
 
 void LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
-    SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
+    SMBXAnimation* manimation = SMBXAnimation::Get(m_animationIndex);
     void* ptr = ((&(*(byte*)manimation)) + offset);
     LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const
 {
-    SMBXAnimation* manimation = ::Animations::Get(m_animationIndex);
+    SMBXAnimation* manimation = SMBXAnimation::Get(m_animationIndex);
     void* ptr = ((&(*(byte*)manimation)) + offset);
     return LuaProxy::mem((int)ptr, ftype, L);
 }
@@ -113,98 +113,98 @@ short LuaProxy::Animation::id() const
 {
     if(!isValid())
         return 0;
-    return static_cast<short>(::Animations::Get(m_animationIndex)->AnimationID);
+    return static_cast<short>(SMBXAnimation::Get(m_animationIndex)->AnimationID);
 }
 
 void LuaProxy::Animation::setId(short id)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->AnimationID = static_cast<EffectID>(id);
+    SMBXAnimation::Get(m_animationIndex)->AnimationID = static_cast<EffectID>(id);
 }
 
 double LuaProxy::Animation::x() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.x;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.x;
 }
 
 void LuaProxy::Animation::setX(double x)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.x = x;
+    SMBXAnimation::Get(m_animationIndex)->momentum.x = x;
 }
 
 double LuaProxy::Animation::y() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.y;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.y;
 }
 
 void LuaProxy::Animation::setY(double y)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.y = y;
+    SMBXAnimation::Get(m_animationIndex)->momentum.y = y;
 }
 
 double LuaProxy::Animation::speedX() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.speedX;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.speedX;
 }
 
 void LuaProxy::Animation::setSpeedX(double speedX)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.speedX = speedX;
+    SMBXAnimation::Get(m_animationIndex)->momentum.speedX = speedX;
 }
 
 double LuaProxy::Animation::speedY() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.speedY;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.speedY;
 }
 
 void LuaProxy::Animation::setSpeedY(double speedY)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.speedY = speedY;
+    SMBXAnimation::Get(m_animationIndex)->momentum.speedY = speedY;
 }
 
 double LuaProxy::Animation::height() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.height;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.height;
 }
 
 void LuaProxy::Animation::setHeight(double height)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.height = height;
+    SMBXAnimation::Get(m_animationIndex)->momentum.height = height;
 }
 
 double LuaProxy::Animation::width() const
 {
     if(!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->momentum.width;
+    return SMBXAnimation::Get(m_animationIndex)->momentum.width;
 }
 
 void LuaProxy::Animation::setWidth(double width)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->momentum.width = width;
+    SMBXAnimation::Get(m_animationIndex)->momentum.width = width;
 }
 
 float LuaProxy::Animation::subTimer() const
@@ -212,14 +212,14 @@ float LuaProxy::Animation::subTimer() const
     if (!isValid())
         return 0;
 
-    return ::Animations::Get(m_animationIndex)->subTimer;
+    return SMBXAnimation::Get(m_animationIndex)->subTimer;
 }
 
 void LuaProxy::Animation::setSubTimer(float subTimer)
 {
     if (!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->subTimer = subTimer;
+    SMBXAnimation::Get(m_animationIndex)->subTimer = subTimer;
 }
 
 
@@ -227,14 +227,14 @@ short LuaProxy::Animation::timer() const
 {
     if (!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->Timer;
+    return SMBXAnimation::Get(m_animationIndex)->Timer;
 }
 
 void LuaProxy::Animation::setTimer(short timer)
 {
     if(!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->Timer = timer;
+    SMBXAnimation::Get(m_animationIndex)->Timer = timer;
 
 }
 
@@ -242,42 +242,42 @@ short LuaProxy::Animation::npcID() const
 {
     if (!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->npcID;
+    return SMBXAnimation::Get(m_animationIndex)->npcID;
 }
 
 void LuaProxy::Animation::setNpcID(short npcID)
 {
     if (!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->npcID = npcID;
+    SMBXAnimation::Get(m_animationIndex)->npcID = npcID;
 }
 
 bool LuaProxy::Animation::drawOnlyMask() const
 {
     if (!isValid())
         return false;
-    return 0 != ::Animations::Get(m_animationIndex)->onlyDrawMask;
+    return 0 != SMBXAnimation::Get(m_animationIndex)->onlyDrawMask;
 }
 
 void LuaProxy::Animation::setDrawOnlyMask(bool drawOnlyMask)
 {
     if (!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->onlyDrawMask = COMBOOL(drawOnlyMask);
+    SMBXAnimation::Get(m_animationIndex)->onlyDrawMask = COMBOOL(drawOnlyMask);
 }
 
 short LuaProxy::Animation::animationFrame() const
 {
     if (!isValid())
         return 0;
-    return ::Animations::Get(m_animationIndex)->animationFrame;
+    return SMBXAnimation::Get(m_animationIndex)->animationFrame;
 }
 
 void LuaProxy::Animation::setAnimationFrame(short animationFrame)
 {
     if (!isValid())
         return;
-    ::Animations::Get(m_animationIndex)->animationFrame = animationFrame;
+    SMBXAnimation::Get(m_animationIndex)->animationFrame = animationFrame;
 }
 
 

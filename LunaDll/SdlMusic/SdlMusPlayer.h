@@ -9,6 +9,7 @@
 #undef main
 #include <map>
 #include <string>
+#include <atomic>
 
 class PGE_SDL_Manager
 {
@@ -53,9 +54,8 @@ private:
 	static bool showMsg;
 	static std::string showMsg_for;
 	
-	static SDL_mutex* sampleCountMutex;
-	static unsigned __int64 sCount;
-	static unsigned __int64 musSCount;
+	static std::atomic<unsigned __int64> sCount;
+	static std::atomic<unsigned __int64> musSCount;
 	static void postMixCallback(void *udata, Uint8 *stream, int len);
 };
 
@@ -66,10 +66,21 @@ public:
     static void SND_PlaySnd(const char *sndFile);
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
+    static bool playOverrideForAlias(const std::string& alias, int ch);
+    static void setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk);
+    static Mix_Chunk *getChunkForAlias(const std::string& alias);
+    static void setMuteForAlias(const std::string& alias, bool muted);
+    static bool getMuteForAlias(const std::string& alias);
 private:
+    struct ChunkOverrideSettings {
+        Mix_Chunk* chunk;
+        bool muted;
+    };
+
 	static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;
     static char *current;
+    static std::map<std::string, ChunkOverrideSettings > overrideSettings;
 };
 
 #endif

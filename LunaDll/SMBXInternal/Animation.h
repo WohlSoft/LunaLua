@@ -2,6 +2,7 @@
 #define Animations_hhhh
 
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 enum EffectID : short
 {
@@ -157,7 +158,7 @@ enum EffectID : short
 
 
 #pragma pack(push, 4)
-struct SMBXAnimation{
+struct SMBXAnimation : SMBX_FullBaseItemArray<SMBXAnimation, 148, GM_ANIM_COUNT_CONSTPTR, GM_ANIM_PTR_CONSTPTR> {
     EffectID AnimationID;
     short unknown02;
     Momentum momentum;
@@ -168,18 +169,6 @@ struct SMBXAnimation{
     short npcID;                //User by yoshi egg and ludwig (somehow)
     short onlyDrawMask;         //Only draw mask: Is used by the cheat "shadowstar" / "ghostytime"
     short unknown42;
-
-    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
-    static inline SMBXAnimation* Get(unsigned short index) {
-        if (index >= GM_ANIM_COUNT) return NULL;
-        return &((SMBXAnimation*)GM_ANIM_PTR)[index];
-    }
-
-    static inline unsigned short Count() {
-        return GM_ANIM_COUNT;
-    }
-
-    static const short MAX_ID = 148;
 };
 #pragma pack(pop)
 
@@ -188,10 +177,5 @@ struct SMBXAnimation{
 static_assert(sizeof(SMBXAnimation) == 0x44, "sizeof(SMBXAnimation) must be 0x44");
 #endif
 
-namespace Animations {
-
-    SMBXAnimation* Get(int AnimationIndex);
-
-}
 
 #endif

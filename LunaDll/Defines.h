@@ -187,9 +187,9 @@ enum CollidersType : short {
 #define GM_PLAYER_KEY_SEL   8
 #define GM_PLAYER_KEY_STR   9
 
-#define DEFMEM(name, type, addr) static auto& name = *(type*)(addr)
-#define DEFMEM_PTR(name, type, addr) static auto name = (const type*)(addr)
-
+#define DEFMEM(name, type, addr) static auto& name = *(type*)(addr); \
+    static constexpr auto name ## _CONSTPTR = (type*)(addr)
+#define DEFMEM_PTR(name, type, addr) static constexpr auto name = (const type*)(addr)
 
 // General
 DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
@@ -225,14 +225,14 @@ DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
 
 // MOB Related memory
 DEFMEM(GM_NPCS_PTR,         void*, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
-DEFMEM(GM_NPCS_COUNT,       WORD,  0x00B2595A); 
+DEFMEM(GM_NPCS_COUNT,       WORD,  0x00B2595A);
 DEFMEM(GM_PLAYERS_PTR,      void*, 0x00B25A20);
 DEFMEM(GM_PLAYERS_TEMPLATE, void*, 0x00B2C91C);     // Editor Template
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
 DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
 
 // Star counting
-DEFMEM(GM_STAR_COUNT,       DWORD, 0x00B251E0);
+DEFMEM(GM_STAR_COUNT,       WORD, 0x00B251E0);
 DEFMEM(GM_STARS_PTR,        void*, 0x00B25714);
 
 // HUD stuff
@@ -526,6 +526,11 @@ DEFMEM(blockdef_height, short*, 0x00B2BA14);
 DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
 DEFMEM(GM_CURRENT_TIME,    double, 0x00B2D738);
 DEFMEM(GM_MAX_FPS_MODE,    short,  0x00B2C8BE);
+
+
+// VB6 GUI
+DEFMEM(GM_FORM_GFX,        IDispatch*,      0x00B2D7C4);
+
 
 /////////////////////
 ///  -Assembly-   ///

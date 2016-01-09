@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <gl/glew.h>
-#include "../Defines.h"
+#include "../../Defines.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
 

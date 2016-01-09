@@ -3,9 +3,10 @@
 
 #include "../Misc/VB6StrPtr.h"
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct WorldLevel
+struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 32, GM_LEVEL_COUNT_CONSTPTR, GM_LEVEL_BASE_CONSTPTR>
 {
     Momentum momentum;
     short id;
@@ -26,18 +27,6 @@ struct WorldLevel
     short isBigBackground;
     short isGameStartPoint;
     short isAlwaysVisible;
-
-    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
-    static inline WorldLevel* Get(unsigned short index) {
-        if (index >= GM_LEVEL_COUNT) return NULL;
-        return &((WorldLevel*)GM_LEVEL_BASE)[index];
-    }
-
-    static inline unsigned short Count() {
-        return GM_LEVEL_COUNT;
-    }
-
-    static const short MAX_ID = 32;
 };
 #pragma pack(pop)
 

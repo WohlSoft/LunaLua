@@ -2,12 +2,7 @@
 #include "../GlobalFuncs.h"
 #include "RenderOps/RenderBitmapOp.h"
 #include "../Globals.h"
-
-void RenderOverrideManager::ResetOverrides()
-{
-    gfxOverrideMap.clear();
-    gfxOverrideMaskSet.clear();
-}
+#include "SMBXMaskedImage.h"
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
@@ -26,11 +21,8 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 {
     for (int i = 1; i < numElements + 1; i++){        
         HDC nextHdcPtr = graphicsArray[i - 1];
-        
-        if (gfxOverrideMap.find(nextHdcPtr) != gfxOverrideMap.end())
-            continue;
 
-        HDC nextHdcMaskPtr = 0;
+        HDC nextHdcMaskPtr = nullptr;
         if (graphicsArray_Mask)
             nextHdcMaskPtr = graphicsArray_Mask[i - 1];
 
@@ -42,34 +34,16 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
             continue;
         
+        std::shared_ptr<BMPBox> bmp = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
+        if (!bmp->ImageLoaded())
+            continue;
 
-        gfxOverrideMap[nextHdcPtr] = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
-        if (nextHdcMaskPtr) {
-            gfxOverrideMaskSet.insert(nextHdcMaskPtr);
-        }
+        SMBXMaskedImage* img = SMBXMaskedImage::get(nextHdcMaskPtr, nextHdcPtr);
+        if (img == nullptr)
+            continue;
 
+        img->SetLoadedPng(bmp);
     }
-}
-
-bool RenderOverrideManager::renderOverrideBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc)
-{
-    if (gfxOverrideMaskSet.find(hdcSrc) != gfxOverrideMaskSet.end()) return true; //Skip mask
-
-    auto it = gfxOverrideMap.find(hdcSrc);
-    if (it != gfxOverrideMap.end()) {
-        RenderBitmapOp overrideFunc;
-        overrideFunc.direct_img = it->second;
-        overrideFunc.x = nXDest;
-        overrideFunc.y = nYDest;
-        overrideFunc.sx = nXSrc;
-        overrideFunc.sy = nYSrc;
-        overrideFunc.sw = nWidth;
-        overrideFunc.sh = nHeight;
-        overrideFunc.Draw(&gLunaRender);
-        return true;
-    }
-
-    return false;
 }
 
 void RenderOverrideManager::loadLevelGFX()

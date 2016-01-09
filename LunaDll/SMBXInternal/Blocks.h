@@ -1,12 +1,13 @@
 #ifndef Blocks_Hhhhh
 #define Blocks_Hhhhh
 
+#include "BaseItemArray.h"
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
 struct PlayerMOB;
 
 #pragma pack(push, 4)
-struct Block {
+struct Block : SMBX_FullBaseItemArray<Block, 638, GM_BLOCK_COUNT_CONSTPTR, GM_BLOCKS_PTR_CONSTPTR> {
 
     short               Slippery;                           // 0x00 0xFFFF = yes
     short               Unknown02;                          // 0x02
@@ -41,21 +42,6 @@ struct Block {
     short               Unknown64;                          // 0x64
     short               Unknown66;                          // 0x66
 
-    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
-    static inline ::Block* Get(unsigned short index) {
-        if (index > GM_BLOCK_COUNT) return NULL;
-        return &((Block*)GM_BLOCKS_PTR)[index];
-    }
-
-    static inline ::Block* GetRaw(unsigned short index) {
-        return &((Block*)GM_BLOCKS_PTR)[index];
-    }
-
-    static inline unsigned short Count() {
-        return GM_BLOCK_COUNT;
-    }
-
-    static const short MAX_ID = 638;
 };
 #pragma pack(pop)
 

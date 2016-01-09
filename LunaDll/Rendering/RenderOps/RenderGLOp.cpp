@@ -1,6 +1,6 @@
 #include <memory>
 #include "RenderGLOp.h"
-#include "../GLEngineProxy.h"
+#include "../GL/GLEngineProxy.h"
 
 RenderGLOp::RenderGLOp(const std::shared_ptr<GLEngineCmd> &cmd) {
     m_PerCycleOnly = false;

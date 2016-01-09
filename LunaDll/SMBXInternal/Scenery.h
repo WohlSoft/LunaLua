@@ -2,26 +2,14 @@
 #define Scenery_hhhhh
 
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBXScenery
+struct SMBXScenery : SMBX_FullBaseItemArray<SMBXScenery, 65, GM_SCENERY_COUNT_CONSTPTR, GM_SCENERY_PTR_CONSTPTR>
 {
     Momentum momentum;
     short id;
     short field_32;
-
-    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
-    static inline SMBXScenery* Get(unsigned short index) {
-        if (index >= GM_SCENERY_COUNT) return NULL;
-        return &((SMBXScenery*)GM_SCENERY_PTR)[index];
-    }
-
-    static inline unsigned short Count() {
-        return GM_SCENERY_COUNT;
-    }
-
-    static const short MAX_ID = 65;
-
 };
 #pragma pack(pop)
 

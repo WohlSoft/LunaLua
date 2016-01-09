@@ -1249,6 +1249,8 @@ namespace LuaProxy {
         void glSetTexture(const LuaImageResource* img, uint32_t color);
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
         void __glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count);
+        void __setSpriteOverride(const std::string& type, int index, const luabind::object& img, lua_State* L);
+        luabind::object __getSpriteOverride(const std::string& type, int index, lua_State* L);
     }
 
     namespace Effects{

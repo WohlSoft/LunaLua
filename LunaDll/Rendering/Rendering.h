@@ -9,7 +9,7 @@
 
 //#include "BMPBox.h"
 //#include "RenderOp.h"
-#include "GLEngineCmds.h"
+#include "GL/GLEngineCmds.h"
 
 class RenderOp;
 class BMPBox;

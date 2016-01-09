@@ -17,6 +17,7 @@
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
+#include "../Rendering/SMBXMaskedImage.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -173,6 +174,13 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, GAME_ENGINE);
     LUAHELPER_DEF_CONST(_G, LUNALUA_VERSION);
     _G["LUNALUA_VER"] = LUNALUA_VERSION; // ALIAS
+    
+    object verTable = newtable(L);
+    verTable[1] = LUNA_VERNUM1;
+    verTable[2] = LUNA_VERNUM2;
+    verTable[3] = LUNA_VERNUM3;
+    verTable[4] = LUNA_VERNUM4;
+    _G["__LUNA_VERSION_TABLE"] = verTable;
 
     LUAHELPER_DEF_CONST(_G, PLAYER_SMALL);
     LUAHELPER_DEF_CONST(_G, PLAYER_BIG);
@@ -212,6 +220,140 @@ void CLunaLua::setupDefaults()
     _G["KEY_RUN"] = GM_PLAYER_KEY_RUN;
     _G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
     _G["KEY_STR"] = GM_PLAYER_KEY_STR;
+
+    LUAHELPER_DEF_CONST(_G, VK_LBUTTON);
+    LUAHELPER_DEF_CONST(_G, VK_RBUTTON);
+    LUAHELPER_DEF_CONST(_G, VK_CANCEL);
+    LUAHELPER_DEF_CONST(_G, VK_MBUTTON);
+    LUAHELPER_DEF_CONST(_G, VK_XBUTTON1);
+    LUAHELPER_DEF_CONST(_G, VK_XBUTTON2);
+    LUAHELPER_DEF_CONST(_G, VK_BACK);
+    LUAHELPER_DEF_CONST(_G, VK_TAB);
+    LUAHELPER_DEF_CONST(_G, VK_CLEAR);
+    LUAHELPER_DEF_CONST(_G, VK_RETURN);
+    LUAHELPER_DEF_CONST(_G, VK_SHIFT);
+    LUAHELPER_DEF_CONST(_G, VK_CONTROL);
+    LUAHELPER_DEF_CONST(_G, VK_MENU);
+    LUAHELPER_DEF_CONST(_G, VK_PAUSE);
+    LUAHELPER_DEF_CONST(_G, VK_CAPITAL);
+    LUAHELPER_DEF_CONST(_G, VK_KANA);
+    LUAHELPER_DEF_CONST(_G, VK_HANGEUL);
+    LUAHELPER_DEF_CONST(_G, VK_HANGUL);
+    LUAHELPER_DEF_CONST(_G, VK_JUNJA);
+    LUAHELPER_DEF_CONST(_G, VK_FINAL);
+    LUAHELPER_DEF_CONST(_G, VK_HANJA);
+    LUAHELPER_DEF_CONST(_G, VK_KANJI);
+    LUAHELPER_DEF_CONST(_G, VK_ESCAPE);
+    LUAHELPER_DEF_CONST(_G, VK_CONVERT);
+    LUAHELPER_DEF_CONST(_G, VK_NONCONVERT);
+    LUAHELPER_DEF_CONST(_G, VK_ACCEPT);
+    LUAHELPER_DEF_CONST(_G, VK_MODECHANGE);
+    LUAHELPER_DEF_CONST(_G, VK_SPACE);
+    LUAHELPER_DEF_CONST(_G, VK_PRIOR);
+    LUAHELPER_DEF_CONST(_G, VK_NEXT);
+    LUAHELPER_DEF_CONST(_G, VK_END);
+    LUAHELPER_DEF_CONST(_G, VK_HOME);
+    LUAHELPER_DEF_CONST(_G, VK_LEFT);
+    LUAHELPER_DEF_CONST(_G, VK_UP);
+    LUAHELPER_DEF_CONST(_G, VK_RIGHT);
+    LUAHELPER_DEF_CONST(_G, VK_DOWN);
+    LUAHELPER_DEF_CONST(_G, VK_SELECT);
+    LUAHELPER_DEF_CONST(_G, VK_PRINT);
+    LUAHELPER_DEF_CONST(_G, VK_EXECUTE);
+    LUAHELPER_DEF_CONST(_G, VK_SNAPSHOT);
+    LUAHELPER_DEF_CONST(_G, VK_INSERT);
+    LUAHELPER_DEF_CONST(_G, VK_DELETE);
+    LUAHELPER_DEF_CONST(_G, VK_HELP);
+
+    // VK_# (# from 0 to 9)
+    std::string vkConstantName = "VK_";
+    for (char i = '0'; i <= '9'; i++) {
+        std::string nextName = vkConstantName + i;
+        _G[nextName] = i;
+    }
+
+    // VK_# (# from A to Z)
+    for (char i = 'A'; i <= 'Z'; i++) {
+        std::string nextName = vkConstantName + i;
+        _G[nextName] = i;
+    }
+
+    LUAHELPER_DEF_CONST(_G, VK_LWIN);
+    LUAHELPER_DEF_CONST(_G, VK_RWIN);
+    LUAHELPER_DEF_CONST(_G, VK_APPS);
+    LUAHELPER_DEF_CONST(_G, VK_SLEEP);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD0);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD1);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD2);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD3);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD4);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD5);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD6);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD7);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD8);
+    LUAHELPER_DEF_CONST(_G, VK_NUMPAD9);
+    LUAHELPER_DEF_CONST(_G, VK_MULTIPLY);
+    LUAHELPER_DEF_CONST(_G, VK_ADD);
+    LUAHELPER_DEF_CONST(_G, VK_SEPARATOR);
+    LUAHELPER_DEF_CONST(_G, VK_SUBTRACT);
+    LUAHELPER_DEF_CONST(_G, VK_DECIMAL);
+    LUAHELPER_DEF_CONST(_G, VK_DIVIDE);
+    LUAHELPER_DEF_CONST(_G, VK_F1);
+    LUAHELPER_DEF_CONST(_G, VK_F2);
+    LUAHELPER_DEF_CONST(_G, VK_F3);
+    LUAHELPER_DEF_CONST(_G, VK_F4);
+    LUAHELPER_DEF_CONST(_G, VK_F5);
+    LUAHELPER_DEF_CONST(_G, VK_F6);
+    LUAHELPER_DEF_CONST(_G, VK_F7);
+    LUAHELPER_DEF_CONST(_G, VK_F8);
+    LUAHELPER_DEF_CONST(_G, VK_F9);
+    LUAHELPER_DEF_CONST(_G, VK_F10);
+    LUAHELPER_DEF_CONST(_G, VK_F11);
+    LUAHELPER_DEF_CONST(_G, VK_F12);
+    LUAHELPER_DEF_CONST(_G, VK_F13);
+    LUAHELPER_DEF_CONST(_G, VK_F14);
+    LUAHELPER_DEF_CONST(_G, VK_F15);
+    LUAHELPER_DEF_CONST(_G, VK_F16);
+    LUAHELPER_DEF_CONST(_G, VK_F17);
+    LUAHELPER_DEF_CONST(_G, VK_F18);
+    LUAHELPER_DEF_CONST(_G, VK_F19);
+    LUAHELPER_DEF_CONST(_G, VK_F20);
+    LUAHELPER_DEF_CONST(_G, VK_F21);
+    LUAHELPER_DEF_CONST(_G, VK_F22);
+    LUAHELPER_DEF_CONST(_G, VK_F23);
+    LUAHELPER_DEF_CONST(_G, VK_F24);
+    LUAHELPER_DEF_CONST(_G, VK_NUMLOCK);
+    LUAHELPER_DEF_CONST(_G, VK_SCROLL);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_NEC_EQUAL);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_FJ_JISHO);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_FJ_MASSHOU);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_FJ_TOUROKU);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_FJ_LOYA);
+    LUAHELPER_DEF_CONST(_G, VK_OEM_FJ_ROYA);
+    LUAHELPER_DEF_CONST(_G, VK_LSHIFT);
+    LUAHELPER_DEF_CONST(_G, VK_RSHIFT);
+    LUAHELPER_DEF_CONST(_G, VK_LCONTROL);
+    LUAHELPER_DEF_CONST(_G, VK_RCONTROL);
+    LUAHELPER_DEF_CONST(_G, VK_LMENU);
+    LUAHELPER_DEF_CONST(_G, VK_RMENU);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_BACK);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_FORWARD);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_REFRESH);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_STOP);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_SEARCH);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_FAVORITES);
+    LUAHELPER_DEF_CONST(_G, VK_BROWSER_HOME);
+    LUAHELPER_DEF_CONST(_G, VK_VOLUME_MUTE);
+    LUAHELPER_DEF_CONST(_G, VK_VOLUME_DOWN);
+    LUAHELPER_DEF_CONST(_G, VK_VOLUME_UP);
+    LUAHELPER_DEF_CONST(_G, VK_MEDIA_NEXT_TRACK);
+    LUAHELPER_DEF_CONST(_G, VK_MEDIA_PREV_TRACK);
+    LUAHELPER_DEF_CONST(_G, VK_MEDIA_STOP);
+    LUAHELPER_DEF_CONST(_G, VK_MEDIA_PLAY_PAUSE);
+    LUAHELPER_DEF_CONST(_G, VK_LAUNCH_MAIL);
+    LUAHELPER_DEF_CONST(_G, VK_LAUNCH_MEDIA_SELECT);
+    LUAHELPER_DEF_CONST(_G, VK_LAUNCH_APP1);
+    LUAHELPER_DEF_CONST(_G, VK_LAUNCH_APP2);
 
     LUAHELPER_DEF_CONST(_G, WHUD_ALL);
     LUAHELPER_DEF_CONST(_G, WHUD_ONLY_OVERLAY);
@@ -269,6 +411,7 @@ void CLunaLua::setupDefaults()
 }
 
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
 LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
 LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
@@ -326,6 +469,8 @@ void CLunaLua::bindAll()
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
+                LUAHELPER_DEF_CLASS(SMBXMaskedImage)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
@@ -359,7 +504,9 @@ void CLunaLua::bindAll()
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
                 def("glSetTextureRGBA", &LuaProxy::Graphics::glSetTextureRGBA),
                 // glDrawTriangles will be defined at runtime using FFI
-                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw)
+                def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw),
+                def("__setSpriteOverride", &LuaProxy::Graphics::__setSpriteOverride),
+                def("__getSpriteOverride", &LuaProxy::Graphics::__getSpriteOverride)
             ],
 
             namespace_("__Effects_EXPERIMENTAL")[
@@ -446,7 +593,12 @@ void CLunaLua::bindAll()
 
                 //Time
                 def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
-                def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock)
+                def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock),
+
+                def("__setOverrideForAlias", LuaProxy::Audio::__setOverrideForAlias),
+                def("__getChunkForAlias", LuaProxy::Audio::__getChunkForAlias),
+                def("__setMuteForAlias", LuaProxy::Audio::__setMuteForAlias),
+                def("__getMuteForAlias", LuaProxy::Audio::__getMuteForAlias)
             ],
             /*************************Audio*end*************************/
 

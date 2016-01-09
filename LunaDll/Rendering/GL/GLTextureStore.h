@@ -7,8 +7,8 @@
 #include <unordered_map>
 #include <cstdint>
 #include "GLDraw.h"
-#include "BMPBox.h"
 #include "GLSprite.h"
+class BMPBox;
 
 class GLTextureStore {
 public:

@@ -4,6 +4,7 @@
 
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "BaseItemArray.h"
 
 enum SMBX_EntranceDir : short {
     ENTRANCE_UP = 1,
@@ -26,7 +27,7 @@ enum SMBX_WarpType : short {
 };
 
 #pragma pack(push, 1)
-struct SMBX_Warp
+struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_CONSTPTR, GM_WARPS_PTR_CONSTPTR>
 {
     short isLocked;                         //0x00
     short allowCarryNPC;                    //0x02
@@ -52,16 +53,6 @@ struct SMBX_Warp
     short unknown_8A;                       //0x8A
     short unknown_8C;                       //0x8C
     short unknown_8E;                       //0x8E
-
-    // Note, 0-base indexed in SMBX code, and keep 0-base indexed here
-    static inline SMBX_Warp* Get(unsigned short index) {
-        if (index >= GM_WARP_COUNT) return NULL;
-        return &((SMBX_Warp*)GM_WARPS_PTR)[index];
-    }
-
-    static inline unsigned short Count() {
-        return GM_WARP_COUNT;
-    }
 };
 #pragma pack(pop)
 

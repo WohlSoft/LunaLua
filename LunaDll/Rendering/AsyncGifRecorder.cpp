@@ -1,5 +1,5 @@
-#include "AsyncGifRecorder.h"
 #include <iostream>
+#include "AsyncGifRecorder.h"
 #include "../GlobalFuncs.h"
 #include <FreeImage.h>
 

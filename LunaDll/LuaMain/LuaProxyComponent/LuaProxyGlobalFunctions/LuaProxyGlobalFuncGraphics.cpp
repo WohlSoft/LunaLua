@@ -6,8 +6,10 @@
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
-#include "../../../Rendering/GLEngineProxy.h"
+#include "../../../Rendering/GL/GLEngineProxy.h"
+#include "../../../Rendering/SMBXMaskedImage.h"
 #include <luabind/adopt_policy.hpp>
+#include <luabind/out_value_policy.hpp>
 
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMPBox>& img) {
@@ -281,9 +283,11 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     RENDER_TYPE type;
     double priority;
     RenderOp* renderOperation;
+    bool isSceneCoordinates;
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, x);
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, y);
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, type);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
     if (type == RTYPE_TEXT) 
     {
         priority = RENDEROP_DEFAULT_PRIORITY_TEXT;
@@ -296,11 +300,12 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         RenderStringOp* strRenderOp = new RenderStringOp();
         strRenderOp->m_String = Str2WStr(text);
         if (fontType == 3)
-            for (std::wstring::iterator it = strRenderOp->m_String.begin(); it != strRenderOp->m_String.end(); ++it)
-                *it = towupper(*it);
-        strRenderOp->m_X = x;
-        strRenderOp->m_Y = y;
+            for (auto& nextChar : strRenderOp->m_String)
+                nextChar = towupper(nextChar);
+        strRenderOp->m_X = static_cast<float>(x);
+        strRenderOp->m_Y = static_cast<float>(y);
         strRenderOp->m_FontType = fontType;
+        strRenderOp->sceneCoords = isSceneCoordinates;
         renderOperation = strRenderOp;
     }
     else if (type == RTYPE_IMAGE) 
@@ -313,8 +318,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         unsigned int sourceWidth;
         unsigned int sourceHeight;
         float opacity;
-        bool isSceneCoordinates;
-
+        
         LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
 
         if (!image || !image->img || !image->img->ImageLoaded()) {
@@ -327,8 +331,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, image->img->m_W);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, image->img->m_H);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, isSceneCoordinates, false);
-
+        
         RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
         bitmapRenderOp->direct_img = image->img;
         bitmapRenderOp->sx = sourceX;
@@ -337,11 +340,13 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         bitmapRenderOp->sh = sourceHeight;
         bitmapRenderOp->x = x;
         bitmapRenderOp->y = y;
+        bitmapRenderOp->sceneCoords = isSceneCoordinates;
         renderOperation = bitmapRenderOp;
     }
     else
     {
         luaL_error(L, "No valid 'type'. Must be RTYPE_TEXT or RTYPE_IMAGE");
+        return;
     }
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, priority);
  
@@ -409,4 +414,156 @@ void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageR
     obj->mVertColor = (const float*)color;
     obj->mCount = count;
     gLunaRender.GLCmd(obj, renderPriority);
+}
+
+static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
+{
+    HDC* mainArray = nullptr;
+    HDC* maskArray = nullptr;
+    int maxIndex = 0;
+
+    if (t == "block")
+    {
+        mainArray = GM_GFX_BLOCKS_PTR;
+        maskArray = GM_GFX_BLOCKS_MASK_PTR;
+        maxIndex = 638;
+    }
+    else if (t == "background2")
+    {
+        mainArray = GM_GFX_BACKGROUND2_PTR;
+        maxIndex = 58;
+    }
+    else if (t == "npc")
+    {
+        mainArray = GM_GFX_NPC_PTR;
+        maskArray = GM_GFX_NPC_MASK_PTR;
+        maxIndex = 300;
+    }
+    else if (t == "effect")
+    {
+        mainArray = GM_GFX_EFFECTS_PTR;
+        maskArray = GM_GFX_EFFECTS_MASK_PTR;
+        maxIndex = 148;
+    }
+    else if (t == "background")
+    {
+        mainArray = GM_GFX_BACKGROUND_PTR;
+        maskArray = GM_GFX_BACKGROUND_MASK_PTR;
+        maxIndex = 190;
+    }
+    else if (t == "mario")
+    {
+        mainArray = GM_GFX_MARIO_PTR;
+        maskArray = GM_GFX_MARIO_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "luigi")
+    {
+        mainArray = GM_GFX_LUIGI_PTR;
+        maskArray = GM_GFX_LUIGI_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "peach")
+    {
+        mainArray = GM_GFX_PEACH_PTR;
+        maskArray = GM_GFX_PEACH_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "toad")
+    {
+        mainArray = GM_GFX_TOAD_PTR;
+        maskArray = GM_GFX_TOAD_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "link")
+    {
+        mainArray = GM_GFX_LINK_PTR;
+        maskArray = GM_GFX_LINK_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "yoshib")
+    {
+        mainArray = GM_GFX_YOSHIB_PTR;
+        maskArray = GM_GFX_YOSHIB_MASK_PTR;
+        maxIndex = 8;
+    }
+    else if (t == "yoshit")
+    {
+        mainArray = GM_GFX_YOSHIT_PTR;
+        maskArray = GM_GFX_YOSHIT_MASK_PTR;
+        maxIndex = 8;
+    }
+
+    // Check range on index and get HDCs
+    if (index < 1 || index > maxIndex) return nullptr;
+    HDC mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
+    HDC maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
+
+    // If we have no HDC abort
+    if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
+
+    // Get the image
+    return SMBXMaskedImage::get(maskHdc, mainHdc);
+}
+
+void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, const luabind::object& overrideImg, lua_State* L)
+{
+    SMBXMaskedImage* img = getMaskedImage(t, index);
+    if (img == nullptr)
+    {
+        luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);
+        return;
+    }
+
+    if (!overrideImg.is_valid())
+    {
+        img->UnsetOverride();
+        return;
+    }
+
+    boost::optional<SMBXMaskedImage*> maskImg = luabind::object_cast_nothrow<SMBXMaskedImage*>(overrideImg);
+    if (maskImg != boost::none) {
+        img->SetOverride(*maskImg);
+        return;
+    }
+
+    boost::optional<LuaProxy::Graphics::LuaImageResource*> rgbaImg = luabind::object_cast_nothrow<LuaProxy::Graphics::LuaImageResource*>(overrideImg);
+    if (rgbaImg != boost::none) {
+        if (*rgbaImg != nullptr && (*rgbaImg)->img) {
+            img->SetOverride((*rgbaImg)->img);
+        }
+        return;
+    }
+
+    luaL_error(L, "Cannot set Graphics.sprite.%s[%d], invalid input type", t.c_str(), index);
+}
+
+luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, int index, lua_State* L)
+{
+    SMBXMaskedImage* img = getMaskedImage(t, index);
+    if (img == nullptr)
+    {
+        luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);
+        return luabind::object();
+    }
+
+    SMBXMaskedImage* maskOverride = img->GetMaskedOverride();
+    if (maskOverride != nullptr)
+    {
+        return luabind::object(L, maskOverride);
+    }
+
+    std::shared_ptr<BMPBox> rgbaOverride = img->GetRGBAOverride();
+    if (rgbaOverride)
+    {
+        return luabind::object(L, new LuaImageResource(rgbaOverride), luabind::adopt(luabind::result));
+    }
+
+    std::shared_ptr<BMPBox> loadedPng = img->GetLoadedPng();
+    if (rgbaOverride)
+    {
+        return luabind::object(L, new LuaImageResource(loadedPng), luabind::adopt(luabind::result));
+    }
+
+    return luabind::object(L, img);
 }

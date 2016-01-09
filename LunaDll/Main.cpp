@@ -21,8 +21,8 @@
 #include "Misc/RuntimeHook.h"
 #include "SdlMusic/MusicManager.h"
 #include "Misc/Playground.h"
-#include "Rendering/GLEngine.h"
-#include "Rendering/GLInitTest.h"
+#include "Rendering/GL/GLEngine.h"
+#include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
 
 #define PATCHIT 1
@@ -73,7 +73,7 @@ void LunaDLLInit()
 #endif // PATCHIT
 
     // Test OpenGL support
-    if (LunaDLLTestGLFeatures()) {
+    if (!gStartupSettings.noGL && LunaDLLTestGLFeatures()) {
         g_GLEngine.Enable();
     } else {
         g_GLEngine.Disable();
@@ -127,9 +127,6 @@ int OnLvlLoad() {
     }
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
-
-	// Update renderer stuff
-	g_GLEngine.ClearSMBXSprites();
 
 	if(gLunaEnabled) {
 		// Load autocode

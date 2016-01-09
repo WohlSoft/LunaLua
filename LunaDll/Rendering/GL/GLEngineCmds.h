@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <cstdint>
 #include <GL/glew.h>
-#include "BMPBox.h"
+#include "../BMPBox.h"
 class GLEngine;
 
 /****************************************************/

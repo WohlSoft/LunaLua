@@ -116,6 +116,9 @@
     </Filter>
     <Filter Include="libs\simpleini">
     </Filter>
+    <Filter Include="Rendering\GL">
+      <UniqueIdentifier>{56db33a4-2b5e-4d78-9f38-d622cfc903d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -295,26 +298,11 @@
     <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h">
       <Filter>SMBXInternal\Reconstructed\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\GLEngine.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\RenderUtils.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLContextManager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLTextureStore.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLDraw.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Misc\ThreadedCmdQueue.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLEngineProxy.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="libs\luasocket\auxiliar.h">
       <Filter>libs\luasocket</Filter>
@@ -361,17 +349,11 @@
     <ClInclude Include="libs\luasocket\luasocket.h">
       <Filter>libs\luasocket</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\GLCompat.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Misc\MemoryScanner\MemoryScanner.h">
       <Filter>Misc\MemoryScanner</Filter>
     </ClInclude>
     <ClInclude Include="Misc\MemoryScanner\MemoryScannerDefines.h">
       <Filter>Misc\MemoryScanner</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLEngineCmds.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\RenderOps\RenderGLOp.h">
       <Filter>Rendering\RenderOps</Filter>
@@ -390,15 +372,6 @@
     </ClInclude>
     <ClInclude Include="Misc\RunningStat.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLInitTest.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLSprite.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\GLSplitSprite.h">
-      <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="SMBXInternal\CameraInfo.h">
       <Filter>SMBXInternal</Filter>
@@ -472,9 +445,6 @@
     <ClInclude Include="Misc\AsyncHTTPClient.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\AsyncGifRecorder.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Misc\AsmPatch.h">
       <Filter>Misc</Filter>
     </ClInclude>
@@ -491,6 +461,51 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\PerfTracker.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLCompat.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLContextManager.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLDraw.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLEngine.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLEngineCmds.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLEngineProxy.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLInitTest.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLSplitSprite.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLSprite.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\GL\GLTextureStore.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\BitBltEmulation.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\AsyncGifRecorder.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SMBXMaskedImage.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\BaseItemArray.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h">
+      <Filter>SMBXInternal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -773,22 +788,7 @@
     <ClCompile Include="SMBXInternal\Reconstructed\Util\NpcToCoins.cpp">
       <Filter>SMBXInternal\Reconstructed\Util</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\GLEngine.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\RenderUtils.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLContextManager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLTextureStore.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLDraw.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLEngineProxy.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="libs\luasocket\auxiliar.c">
@@ -845,22 +845,10 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\GLInitTest.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLSprite.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\GLSplitSprite.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp">
       <Filter>SMBXInternal</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\RenderOverrideManager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\AsyncGifRecorder.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp">
@@ -914,9 +902,6 @@
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp">
       <Filter>Misc\RuntimeHookManagers</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\GLEngineCmds.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyAsyncHTTPRequest.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
@@ -942,6 +927,43 @@
     <ClCompile Include="Misc\PerfTracker.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\GL\GLContextManager.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLDraw.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLEngine.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLEngineCmds.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLEngineProxy.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLInitTest.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLSplitSprite.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLSprite.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLTextureStore.cpp">
+      <Filter>Rendering\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\BitBltEmulation.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\AsyncGifRecorder.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\SMBXMaskedImage.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

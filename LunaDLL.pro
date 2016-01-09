@@ -192,16 +192,16 @@ HEADERS += \
     LunaDll/Rendering/RenderOps/RenderStringOp.h \
     LunaDll/Rendering/AsyncGifRecorder.h \
     LunaDll/Rendering/BMPBox.h \
-    LunaDll/Rendering/GLCompat.h \
-    LunaDll/Rendering/GLContextManager.h \
-    LunaDll/Rendering/GLDraw.h \
-    LunaDll/Rendering/GLEngine.h \
-    LunaDll/Rendering/GLEngineCmds.h \
-    LunaDll/Rendering/GLEngineProxy.h \
-    LunaDll/Rendering/GLInitTest.h \
-    LunaDll/Rendering/GLSplitSprite.h \
-    LunaDll/Rendering/GLSprite.h \
-    LunaDll/Rendering/GLTextureStore.h \
+    LunaDll/Rendering/GL/GLCompat.h \
+    LunaDll/Rendering/GL/GLContextManager.h \
+    LunaDll/Rendering/GL/GLDraw.h \
+    LunaDll/Rendering/GL/GLEngine.h \
+    LunaDll/Rendering/GL/GLEngineCmds.h \
+    LunaDll/Rendering/GL/GLEngineProxy.h \
+    LunaDll/Rendering/GL/GLInitTest.h \
+    LunaDll/Rendering/GL/GLSplitSprite.h \
+    LunaDll/Rendering/GL/GLSprite.h \
+    LunaDll/Rendering/GL/GLTextureStore.h \
     LunaDll/Rendering/Rendering.h \
     LunaDll/Rendering/RenderOverrideManager.h \
     LunaDll/Rendering/RenderUtils.h \
@@ -365,14 +365,14 @@ SOURCES += \
     LunaDll/Rendering/RenderOps/RenderRectOp.cpp \
     LunaDll/Rendering/AsyncGifRecorder.cpp \
     LunaDll/Rendering/BMPBox.cpp \
-    LunaDll/Rendering/GLContextManager.cpp \
-    LunaDll/Rendering/GLDraw.cpp \
-    LunaDll/Rendering/GLEngine.cpp \
-    LunaDll/Rendering/GLEngineProxy.cpp \
-    LunaDll/Rendering/GLInitTest.cpp \
-    LunaDll/Rendering/GLSplitSprite.cpp \
-    LunaDll/Rendering/GLSprite.cpp \
-    LunaDll/Rendering/GLTextureStore.cpp \
+    LunaDll/Rendering/GL/GLContextManager.cpp \
+    LunaDll/Rendering/GL/GLDraw.cpp \
+    LunaDll/Rendering/GL/GLEngine.cpp \
+    LunaDll/Rendering/GL/GLEngineProxy.cpp \
+    LunaDll/Rendering/GL/GLInitTest.cpp \
+    LunaDll/Rendering/GL/GLSplitSprite.cpp \
+    LunaDll/Rendering/GL/GLSprite.cpp \
+    LunaDll/Rendering/GL/GLTextureStore.cpp \
     LunaDll/Rendering/Rendering.cpp \
     LunaDll/Rendering/RenderOverrideManager.cpp \
     LunaDll/Rendering/RenderUtils.cpp \
@@ -429,6 +429,6 @@ SOURCES += \
     LunaDll/Misc/win32_Unicode.cpp \
     LunaDll/Rendering/Shaders/GLShader.cpp \
     LunaDll/Misc/PerfTracker.cpp \
-    LunaDll/Rendering/GLEngineCmds.cpp \
+    LunaDll/Rendering/GL/GLEngineCmds.cpp \
     LunaDll/EventStateMachine.cpp
 
