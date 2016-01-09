@@ -9,6 +9,7 @@
 #undef main
 #include <map>
 #include <string>
+#include <atomic>
 
 class PGE_SDL_Manager
 {
@@ -53,9 +54,8 @@ private:
 	static bool showMsg;
 	static std::string showMsg_for;
 	
-	static SDL_mutex* sampleCountMutex;
-	static unsigned __int64 sCount;
-	static unsigned __int64 musSCount;
+	static std::atomic<unsigned __int64> sCount;
+	static std::atomic<unsigned __int64> musSCount;
 	static void postMixCallback(void *udata, Uint8 *stream, int len);
 };
 
