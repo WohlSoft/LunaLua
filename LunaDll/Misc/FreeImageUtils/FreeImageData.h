@@ -2,7 +2,8 @@
 #define FreeImagePngWriter_hhhhh
 
 #include <string>
-#include <FreeImage.h>
+#define FREEIMAGE_LIB
+#include <FreeImageLite.h>
 
 class FreeImageData
 {

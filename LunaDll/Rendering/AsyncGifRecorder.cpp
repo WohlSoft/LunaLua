@@ -1,7 +1,8 @@
 #include <iostream>
 #include "AsyncGifRecorder.h"
 #include "../GlobalFuncs.h"
-#include <FreeImage.h>
+#define FREEIMAGE_LIB
+#include <FreeImageLite.h>
 
 AsyncGifRecorder::AsyncGifRecorder() : 
     m_workerThread(nullptr),

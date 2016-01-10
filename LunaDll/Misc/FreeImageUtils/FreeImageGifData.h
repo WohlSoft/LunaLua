@@ -1,7 +1,8 @@
 #ifndef FreeImageGifWriter_hhhhh
 #define FreeImageGifWriter_hhhhh
 #include <Windows.h>
-#include <FreeImage.h>
+#define FREEIMAGE_LIB
+#include <FreeImageLite.h>
 #include <string>
 
 class FreeImageGifData
