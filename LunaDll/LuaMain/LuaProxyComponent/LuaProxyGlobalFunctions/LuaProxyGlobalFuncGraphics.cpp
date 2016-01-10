@@ -548,7 +548,7 @@ void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, con
     if (name.find("hardcoded-") == 0)
     {
         // If non of the above applies, then try with the hardcoded ones:
-        getHDCForHardcodedGraphicName(name, &mainHdc, &maskHdc);
+        LunaHardcodedGraphicsPatching::getHDCForHardcodedGraphicName(name, &mainHdc, &maskHdc);
     }
     if (mainHdc == nullptr && maskHdc == nullptr) {
         luaL_error(L, "Failed to get hardcoded image!");

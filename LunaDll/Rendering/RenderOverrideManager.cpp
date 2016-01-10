@@ -3,6 +3,7 @@
 #include "RenderOps/RenderBitmapOp.h"
 #include "../Globals.h"
 #include "SMBXMaskedImage.h"
+#include "../SMBXInternal/HardcodedGraphicsAccess.h"
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
@@ -48,22 +49,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 
 void RenderOverrideManager::loadLevelGFX()
 {
-    //dbgboxA("Loading overrides!");
-    
-    /*
-    LARGE_INTEGER li;
-    QueryPerformanceFrequency(&li);
-    double pcFreq = double(li.QuadPart);
-    QueryPerformanceCounter(&li);
-    __int64 startNow = li.QuadPart;
-    */
-
     loadOverrides(L"block", GM_GFX_BLOCKS_PTR, 638, GM_GFX_BLOCKS_MASK_PTR);
-    /*
-    QueryPerformanceCounter(&li);
-    double diffTime = double(li.QuadPart-startNow) / pcFreq;
-    dbgboxA((std::string("Duration: ") + std::to_string(diffTime) + std::string(" sec")).c_str());
-    */
     loadOverrides(L"background2", GM_GFX_BACKGROUND2_PTR, 58);
     loadOverrides(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR);
     loadOverrides(L"effect", GM_GFX_EFFECTS_PTR, 148, GM_GFX_EFFECTS_MASK_PTR);
@@ -84,4 +70,44 @@ void RenderOverrideManager::loadWorldGFX()
     loadOverrides(L"scene", GM_GFX_SCENE_PTR, 65, GM_GFX_SCENE_MASK_PTR);
     loadOverrides(L"path", GM_GFX_PATH_PTR, 32, GM_GFX_PATH_MASK_PTR);
     loadOverrides(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR);
+}
+
+
+
+void RenderOverrideManager::loadHardcodedOverrides()
+{
+    std::wstring baseNameStr = L"hardcoded-";
+    for (int i = 1; i <= LunaHardcodedGraphicsPatching::getHardcodedGraphicsItemSize(); i++) {
+        HardcodedGraphicsItem& nextItem = LunaHardcodedGraphicsPatching::getHardcodedGraphicsItem(i);
+        if(nextItem.state == HardcodedGraphicsItem::HITEMSTATE_INVALID)
+            continue;
+        if(nextItem.isMask())
+            continue;
+
+        HardcodedGraphicsItem* nextItemMask = nullptr;
+        if (nextItem.hasMask())
+            nextItemMask = &LunaHardcodedGraphicsPatching::getHardcodedGraphicsItem(nextItem.maskIndex);
+
+        if (nextItem.isArray()) {
+            for (int j = nextItem.minItem; j <= nextItem.maxItem; j++) 
+            {
+                std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
+                // FIXME: Add loading code for array-based images
+
+                HDC mainHDC = nullptr;
+                HDC maskHDC = nullptr;
+                LunaHardcodedGraphicsPatching::getHDCFromIndex(i, j, &mainHDC, &maskHDC);
+
+            }
+        }
+        else 
+        {
+            // FIXME: Add loading code for images
+
+            HDC mainHDC = nullptr;
+            HDC maskHDC = nullptr;
+            LunaHardcodedGraphicsPatching::getHDCFromIndex(i, -1, &mainHDC, &maskHDC);
+        }
+
+    }
 }

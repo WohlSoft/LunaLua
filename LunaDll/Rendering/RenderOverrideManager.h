@@ -21,6 +21,7 @@ public:
     void loadOverrides(const std::wstring& path, const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
     void loadLevelGFX();
     void loadWorldGFX();
+    void loadHardcodedOverrides();
 };
 
 #endif

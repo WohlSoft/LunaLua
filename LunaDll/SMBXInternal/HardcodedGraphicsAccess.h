@@ -40,11 +40,64 @@ struct HardcodedGraphicsItem {
     inline bool isArray() { return state == HITEMSTATE_ARRAY || state == HITEMSTATE_ARRAY_MASK; }
 };
 
+namespace LunaHardcodedGraphicsPatching 
+{
 // This is the actual array for the hardcoded graphics
 // DON'T USE DIRECTLY, USE getHardcodedGraphicsItem INSTEAD! (Array is 1-indexed)
-extern std::array<HardcodedGraphicsItem, 51> hardcodedGraphicsArrayOffset;
+extern std::array<HardcodedGraphicsItem, 51> HardcodedGraphics;
+static inline HardcodedGraphicsItem& getHardcodedGraphicsItem(int index) { return HardcodedGraphics[index - 1]; }
+static inline int getHardcodedGraphicsItemSize() { return HardcodedGraphics.size(); }
 
-static inline HardcodedGraphicsItem& getHardcodedGraphicsItem(int index) { return hardcodedGraphicsArrayOffset[index - 1]; }
+static inline void getHDCFromIndex(int index, int arrayIndex, HDC* colorHDC, HDC* maskHDC) {
+    HardcodedGraphicsItem& hItemInfo = getHardcodedGraphicsItem(index);
+    HardcodedGraphicsItem* hItemInfoMask = nullptr;
+    if (hItemInfo.hasMask())
+        hItemInfoMask = &getHardcodedGraphicsItem(hItemInfo.maskIndex);
+
+    // 3. Getting the HDC
+    // Without array:   GfxForm -->                          HardcodedImageObj --> HardcodedImageObj.getHDC
+    // With array:      GfxForm --> HardcodedImageObj[X] --> HardcodedImageObj --> HardcodedImageObj.getHDC
+
+
+    // 3.1 First get the main GFX form
+    void* gfxForm = reinterpret_cast<void*>(GM_FORM_GFX);
+
+    // 3.2 Now get the element after the _Form vtbl.
+    // 3.2.1 Do with color image
+    auto get_HardcodedImageObject = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)gfxForm + 0x2f8 + index * 4);
+    void* hardcodedImageObject = get_HardcodedImageObject(gfxForm);
+
+    // 3.2.2 Same do with the mask if it exist: 
+    void* hardcodedImageObjectMask = nullptr;
+    if (hItemInfoMask) {
+        auto get_HardcodedImageObjectMask = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)gfxForm + 0x2f8 + hItemInfo.maskIndex * 4);
+        hardcodedImageObjectMask = get_HardcodedImageObjectMask(gfxForm);
+    }
+
+    // 3.3 Get the actual object:
+    void* pictureBox = nullptr;
+    void* pictureBoxMask = nullptr;
+
+    // It is an array
+    if (hItemInfo.isArray()) {
+        auto getPictureBoxArray = (HRESULT(__stdcall *)(void*, int32_t, void**)) *(void**)(*(int32_t*)hardcodedImageObject + 0x40);
+        getPictureBoxArray(hardcodedImageObject, arrayIndex, &pictureBox);
+        if (hItemInfo.hasMask()) {
+            getPictureBoxArray(hardcodedImageObjectMask, arrayIndex, &pictureBoxMask);
+        }
+    }
+    else { // It is not an array
+        pictureBox = hardcodedImageObject;
+        pictureBoxMask = hardcodedImageObjectMask;
+    }
+
+    // 3.4 Now finally get the HDC
+    auto _IPictureBox_getHDC = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)pictureBox + 0xE0);
+    _IPictureBox_getHDC(pictureBox, colorHDC);
+    if (hItemInfo.hasMask())
+        _IPictureBox_getHDC(pictureBoxMask, maskHDC);
+    return;
+}
 
 // i.e. hardcoded-numId-arrayId.bmp
 static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC, HDC* maskHDC)
@@ -88,7 +141,7 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
 
     // 2. GET HARDCODED OBJECT AND VALIDATE
     // Check if index is in bounds
-    if (index > (int)hardcodedGraphicsArrayOffset.size() || index < 1)
+    if (index > (int)HardcodedGraphics.size() || index < 1)
         return false;
 
     // Get the item info:
@@ -111,78 +164,11 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
     // If it is an array, then do validation further:
     // TODO: Mask Validation
 
-    // 3. Getting the HDC
-    // Without array:   GfxForm -->                          HardcodedImageObj --> HardcodedImageObj.getHDC
-    // With array:      GfxForm --> HardcodedImageObj[X] --> HardcodedImageObj --> HardcodedImageObj.getHDC
-
-
-    // 3.1 First get the main GFX form
-    void* gfxForm = reinterpret_cast<void*>(GM_FORM_GFX);
-
-    // 3.2 Now get the element after the _Form vtbl.
-    // 3.2.1 Do with color image
-    auto get_HardcodedImageObject = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)gfxForm + 0x2f8 + index * 4);
-    void* hardcodedImageObject = get_HardcodedImageObject(gfxForm);
-    
-    // 3.2.2 Same do with the mask if it exist: 
-    void* hardcodedImageObjectMask = nullptr;
-    if (hItemInfoMask) {
-        auto get_HardcodedImageObjectMask = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)gfxForm + 0x2f8 + hItemInfo.maskIndex * 4);
-        hardcodedImageObjectMask = get_HardcodedImageObjectMask(gfxForm);
-    }
-    
-    // 3.3 Get the actual object:
-    void* pictureBox = nullptr;
-    void* pictureBoxMask = nullptr;
-
-    // It is an array
-    if (hItemInfo.isArray()) {
-        auto getPictureBoxArray = (HRESULT(__stdcall *)(void*, int32_t, void**)) *(void**)(*(int32_t*)hardcodedImageObject + 0x40);
-        getPictureBoxArray(hardcodedImageObject, arrayIndex, &pictureBox);
-        if (hItemInfo.hasMask()) {
-            getPictureBoxArray(hardcodedImageObjectMask, arrayIndex, &pictureBoxMask);
-        }        
-    } else { // It is not an array
-        pictureBox = hardcodedImageObject;
-        pictureBoxMask = hardcodedImageObjectMask;
-    }
-
-    // 3.4 Now finally get the HDC
-    auto _IPictureBox_getHDC = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)pictureBox + 0xE0);
-    _IPictureBox_getHDC(pictureBox, colorHDC);
-    if (hItemInfo.hasMask())
-        _IPictureBox_getHDC(pictureBoxMask, maskHDC);
+    getHDCFromIndex(index, arrayIndex, colorHDC, maskHDC);
     return true;
 }
 
-/*
-// Helper function to get a HDC for a hardcoded graphic. Full details not fully understood
-static inline void* getHDCForHardcodedGraphic(int32_t param1, int32_t param2)
-{
-    // Values for param1 and param2: https://gist.github.com/KevinW1998/49417ab8b94712bee39c
-    // param1 - is the main index offset
-    // param2 - is the the array index, if needed
-
-    // First get the main GFX form
-    void* obj1 = reinterpret_cast<void*>(GM_FORM_GFX);
-
-    // Now get the element after the _Form vtbl.
-    auto method1 = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)obj1 + 0x2f8 + param1 * 4);
-    void* obj2 = method1(obj1);
-    
-    // Now get the array object (Only call if array needed?)
-    auto method2 = (void(__stdcall *)(void*, int32_t, void**)) *(void**)(*(int32_t*)obj2 + 0x40);
-    void* obj3 = nullptr;
-    method2(obj2, param2, &obj3);
-    
-    // Now call getHDC
-    auto method3 = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)obj3 + 0xE0);
-    void* ret = nullptr;
-    method3(obj3, &ret);
-
-    return ret;
 }
-*/
 
 
 #endif

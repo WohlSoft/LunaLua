@@ -1,7 +1,7 @@
 #include "HardcodedGraphicsAccess.h"
 
 // Values for index and array-index: https://gist.github.com/KevinW1998/49417ab8b94712bee39c
-std::array<HardcodedGraphicsItem, 51> hardcodedGraphicsArrayOffset =
+std::array<HardcodedGraphicsItem, 51> LunaHardcodedGraphicsPatching::HardcodedGraphics =
 {
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_NORMAL),                // 1
     HardcodedGraphicsItem(HardcodedGraphicsItem::HITEMSTATE_NORMAL_MASK),           // 2
