@@ -37,19 +37,19 @@ struct HardcodedGraphicsItem {
 
     inline bool isMask() { return state == HITEMSTATE_ARRAY_MASK || state == HITEMSTATE_NORMAL_MASK; }
     inline bool hasMask() { return maskIndex != -1; }
+    inline bool isArray() { return state == HITEMSTATE_ARRAY || state == HITEMSTATE_ARRAY_MASK; }
 };
 
 // This is the actual array for the hardcoded graphics
 // DON'T USE DIRECTLY, USE getHardcodedGraphicsItem INSTEAD! (Array is 1-indexed)
 extern std::array<HardcodedGraphicsItem, 51> hardcodedGraphicsArrayOffset;
 
-static inline HardcodedGraphicsItem& getHardcodedGraphicsItem(int index) { return hardcodedGraphicsArrayOffset[index + 1]; }
+static inline HardcodedGraphicsItem& getHardcodedGraphicsItem(int index) { return hardcodedGraphicsArrayOffset[index - 1]; }
 
 // i.e. hardcoded-numId-arrayId.bmp
 static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC, HDC* maskHDC)
 {
     // 1. PARSE TEXT
-    
     // If it has an ending, then remove it:
     if (text.find("."))
         text = removeExtension(text);
@@ -59,7 +59,7 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
         return false;
 
     // Possible outcome:
-
+    
     // hardcoded-1-3.png --> 
     //      hardcoded-1-3 
     // --> [0] = hardcoded 
@@ -101,11 +101,11 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
         return false;
 
     // If it is not an array, but the item info tells it is an array, then it is invalid!
-    if (arrayIndex == -1 && (hItemInfo.state == HardcodedGraphicsItem::HITEMSTATE_ARRAY || hItemInfo.state == HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK))
+    if (arrayIndex == -1 && hItemInfo.isArray())
         return false;
     
     // If it is an array, but the item info tells it is NOT an array, then it is invalid!
-    if (arrayIndex != -1 && (hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_ARRAY && hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK))
+    if (arrayIndex != -1 && !hItemInfo.isArray())
         return false;
 
     // If it is an array, then do validation further:
@@ -131,13 +131,31 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
         hardcodedImageObjectMask = get_HardcodedImageObjectMask(gfxForm);
     }
     
-    // 3.3 
-    
+    // 3.3 Get the actual object:
+    void* pictureBox = nullptr;
+    void* pictureBoxMask = nullptr;
 
+    // It is an array
+    if (hItemInfo.isArray()) {
+        auto getPictureBoxArray = (HRESULT(__stdcall *)(void*, int32_t, void**)) *(void**)(*(int32_t*)hardcodedImageObject + 0x40);
+        getPictureBoxArray(hardcodedImageObject, arrayIndex, &pictureBox);
+        if (hItemInfo.hasMask()) {
+            getPictureBoxArray(hardcodedImageObjectMask, arrayIndex, &pictureBoxMask);
+        }        
+    } else { // It is not an array
+        pictureBox = hardcodedImageObject;
+        pictureBoxMask = hardcodedImageObjectMask;
+    }
 
+    // 3.4 Now finally get the HDC
+    auto _IPictureBox_getHDC = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)pictureBox + 0xE0);
+    _IPictureBox_getHDC(pictureBox, colorHDC);
+    if (hItemInfo.hasMask())
+        _IPictureBox_getHDC(pictureBoxMask, maskHDC);
+    return true;
 }
 
-
+/*
 // Helper function to get a HDC for a hardcoded graphic. Full details not fully understood
 static inline void* getHDCForHardcodedGraphic(int32_t param1, int32_t param2)
 {
@@ -158,11 +176,13 @@ static inline void* getHDCForHardcodedGraphic(int32_t param1, int32_t param2)
     method2(obj2, param2, &obj3);
     
     // Now call getHDC
-    auto method3 = (void(__stdcall *)(void*, void**)) *(void**)(*(int32_t*)obj3 + 0xE0);
+    auto method3 = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)obj3 + 0xE0);
     void* ret = nullptr;
     method3(obj3, &ret);
 
     return ret;
 }
+*/
+
 
 #endif

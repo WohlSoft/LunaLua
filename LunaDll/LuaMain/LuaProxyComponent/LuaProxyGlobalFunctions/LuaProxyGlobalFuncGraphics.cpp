@@ -8,6 +8,7 @@
 #include "../../../SMBXInternal/CameraInfo.h"
 #include "../../../Rendering/GL/GLEngineProxy.h"
 #include "../../../Rendering/SMBXMaskedImage.h"
+#include "../../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 
@@ -420,6 +421,8 @@ static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
 {
     HDC* mainArray = nullptr;
     HDC* maskArray = nullptr;
+    HDC mainHdc;
+    HDC maskHdc;
     int maxIndex = 0;
 
     if (t == "block")
@@ -493,11 +496,12 @@ static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
         maskArray = GM_GFX_YOSHIT_MASK_PTR;
         maxIndex = 8;
     }
+    
 
     // Check range on index and get HDCs
     if (index < 1 || index > maxIndex) return nullptr;
-    HDC mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
-    HDC maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
+    mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
+    maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
 
     // If we have no HDC abort
     if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
@@ -536,6 +540,42 @@ void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, co
     }
 
     luaL_error(L, "Cannot set Graphics.sprite.%s[%d], invalid input type", t.c_str(), index);
+}
+
+void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, const luabind::object & overrideImg, lua_State * L)
+{
+    HDC mainHdc, maskHdc;
+    if (name.find("hardcoded-") == 0)
+    {
+        // If non of the above applies, then try with the hardcoded ones:
+        getHDCForHardcodedGraphicName(name, &mainHdc, &maskHdc);
+    }
+    if (mainHdc == nullptr && maskHdc == nullptr) {
+        luaL_error(L, "Failed to get hardcoded image!");
+        return;
+    }
+    
+    SMBXMaskedImage* img = SMBXMaskedImage::get(mainHdc, maskHdc);
+    if (!overrideImg.is_valid())
+    {
+        img->UnsetOverride();
+        return;
+    }
+
+    boost::optional<SMBXMaskedImage*> maskImg = luabind::object_cast_nothrow<SMBXMaskedImage*>(overrideImg);
+    if (maskImg != boost::none) {
+        img->SetOverride(*maskImg);
+        return;
+    }
+
+    boost::optional<LuaProxy::Graphics::LuaImageResource*> rgbaImg = luabind::object_cast_nothrow<LuaProxy::Graphics::LuaImageResource*>(overrideImg);
+    if (rgbaImg != boost::none) {
+        if (*rgbaImg != nullptr && (*rgbaImg)->img) {
+            img->SetOverride((*rgbaImg)->img);
+        }
+        return;
+    }
+    luaL_error(L, "Invalid input for sprite override!");
 }
 
 luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, int index, lua_State* L)

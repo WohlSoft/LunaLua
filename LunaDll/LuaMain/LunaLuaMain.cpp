@@ -506,6 +506,7 @@ void CLunaLua::bindAll()
                 // glDrawTriangles will be defined at runtime using FFI
                 def("__glInternalDraw", &LuaProxy::Graphics::__glInternalDraw),
                 def("__setSpriteOverride", &LuaProxy::Graphics::__setSpriteOverride),
+                def("__setSimpleSpriteOverride", &LuaProxy::Graphics::__setSimpleSpriteOverride),
                 def("__getSpriteOverride", &LuaProxy::Graphics::__getSpriteOverride)
             ],
 
