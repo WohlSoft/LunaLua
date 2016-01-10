@@ -117,9 +117,7 @@ static inline bool getHDCForHardcodedGraphicName(std::string text, HDC* colorHDC
 
 
     // 3.1 First get the main GFX form
-    void* gfxFormAddr = reinterpret_cast<void*>(GM_FORM_GFX);
-    // Get the V-Table
-    void* gfxForm = *(reinterpret_cast<void**>(gfxFormAddr));
+    void* gfxForm = reinterpret_cast<void*>(GM_FORM_GFX);
 
     // 3.2 Now get the element after the _Form vtbl.
     // 3.2.1 Do with color image
@@ -148,9 +146,7 @@ static inline void* getHDCForHardcodedGraphic(int32_t param1, int32_t param2)
     // param2 - is the the array index, if needed
 
     // First get the main GFX form
-    void* addr = reinterpret_cast<void*>(GM_FORM_GFX);
-    // Get the V-Table
-    void* obj1 = *(reinterpret_cast<void**>(addr));
+    void* obj1 = reinterpret_cast<void*>(GM_FORM_GFX);
 
     // Now get the element after the _Form vtbl.
     auto method1 = (void* (__stdcall *)(void*)) *(void**)(*(int32_t*)obj1 + 0x2f8 + param1 * 4);
