@@ -17,7 +17,8 @@ public:
         m_String(str),
         m_FontType(font_type),
         m_X(X),
-        m_Y(Y)
+        m_Y(Y),
+        sceneCoords(false)
     {}
 
     virtual ~RenderStringOp() { }
