@@ -1358,11 +1358,6 @@ void CLunaLua::doEvents()
 
     MusicManager::setCurrentSection(Player::Get(1)->CurrentSection);
 
-    std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
-    onLoopEvent->setLoopable(false);
-    onLoopEvent->setDirectEventName("onLoop");
-    callEvent(onLoopEvent);
-    
     if (!m_eventLoopOnceExecuted) {
         std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
         onStartEvent->setLoopable(false);
@@ -1374,6 +1369,11 @@ void CLunaLua::doEvents()
         if (!isValid())
             return;
     }
+
+    std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
+    onLoopEvent->setLoopable(false);
+    onLoopEvent->setDirectEventName("onLoop");
+    callEvent(onLoopEvent);
     
     callLuaFunction(L, "__doEventQueue");
 }
