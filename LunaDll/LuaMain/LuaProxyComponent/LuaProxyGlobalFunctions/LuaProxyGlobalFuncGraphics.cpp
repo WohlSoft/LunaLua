@@ -381,21 +381,6 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
     gLunaRender.GLCmd(obj);
 }
 
-extern "C" {
-    __declspec(dllexport) float* __cdecl LunaLuaGlAllocCoords(size_t size) {
-        return (float*)malloc(size * sizeof(float));
-    }
-
-    __declspec(dllexport) void __cdecl LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
-        auto obj = std::make_shared<GLEngineCmd_Draw2DArray>();
-        obj->mType = GL_TRIANGLES;
-        obj->mVert = vert;
-        obj->mTex = tex;
-        obj->mCount = count;
-        gLunaRender.GLCmd(obj);
-    }
-}
-
 void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count)
 {
     const BMPBox* bmp = NULL;

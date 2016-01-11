@@ -964,6 +964,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyFFI.cpp">
+      <Filter>LuaMain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
