@@ -7,10 +7,6 @@
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
 extern "C" {
-    FFI_EXPORT(float*) LunaLuaGlAllocCoords(size_t size) {
-        return (float*)malloc(size  * sizeof(float));
-    }
-
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
         return malloc(size);
     }
