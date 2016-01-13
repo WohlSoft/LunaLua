@@ -66,17 +66,28 @@ local function initFFIBasedAPIs()
     
     -- Add GL engine FFI APIs
     ffi.cdef[[
-        float* LunaLuaGlAllocCoords(size_t size);
+        void* LunaLuaAlloc(size_t size);
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
+    
+    local function safeMallocArray(typeName, count)
+        local byteSize = ffi.sizeof(typeName)
+        if(byteSize == nil)then
+            error("Invalid type for allocating native array!", 2)
+        end
+        local ptrData = LunaDLL.LunaLuaAlloc(count * byteSize)
+        local castedPtrData = ffi.cast(typeName .. "*", ptrData)
+        return castedPtrData
+    end
+    
     Graphics.glNewCoordArray = function(size)
         return ffi.new("float[?]", size)
     end
     Graphics.glDrawTriangles = function(arg1, arg2, arg3)
         local arrLen = 2*arg3
-        local arg1_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
-        local arg2_raw = LunaDLL.LunaLuaGlAllocCoords(arrLen)
+        local arg1_raw = safeMallocArray("float", arrLen)
+        local arg2_raw = safeMallocArray("float", arrLen)
         for i = 0,arrLen-1 do
             arg1_raw[i] = arg1[i] or 0
         end
@@ -90,7 +101,7 @@ local function initFFIBasedAPIs()
         if (arr == nil) then return 0 end
         local arr_offset = 0
         if (arr[0] == nil) then arr_offset = 1 end
-        local arr_raw = LunaDLL.LunaLuaGlAllocCoords(arr_len)
+        local arr_raw = safeMallocArray("float", arr_len)
         for i = 0,arr_len-1 do
             arr_raw[i] = arr[i+arr_offset] or 0
         end
@@ -102,6 +113,7 @@ local function initFFIBasedAPIs()
         if (arr[0] ~= nil) then len_offset = 1 end
         return math.floor((#arr + len_offset) / divisor)
     end
+    
     
     Graphics.glDraw = function(args)
         local priority = args['priority'] or 1.0
