@@ -77,27 +77,24 @@ void RenderOverrideManager::loadWorldGFX()
 void RenderOverrideManager::loadHardcodedOverrides()
 {
     std::wstring baseNameStr = L"hardcoded-";
-    for (int i = 1; i <= LunaHardcodedGraphicsPatching::getHardcodedGraphicsItemSize(); i++) {
-        HardcodedGraphicsItem& nextItem = LunaHardcodedGraphicsPatching::getHardcodedGraphicsItem(i);
+    for (int i = 1; i <= HardcodedGraphicsItem::Size(); i++) {
+        HardcodedGraphicsItem& nextItem = HardcodedGraphicsItem::Get(i);
         if(nextItem.state == HardcodedGraphicsItem::HITEMSTATE_INVALID)
             continue;
         if(nextItem.isMask())
             continue;
 
-        HardcodedGraphicsItem* nextItemMask = nullptr;
-        if (nextItem.hasMask())
-            nextItemMask = &LunaHardcodedGraphicsPatching::getHardcodedGraphicsItem(nextItem.maskIndex);
-
+        HardcodedGraphicsItem* nextItemMask = nextItem.getMaskObj();
         if (nextItem.isArray()) {
             for (int j = nextItem.minItem; j <= nextItem.maxItem; j++) 
             {
                 std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
                 // FIXME: Add loading code for array-based images
+                
 
                 HDC mainHDC = nullptr;
                 HDC maskHDC = nullptr;
-                LunaHardcodedGraphicsPatching::getHDCFromIndex(i, j, &mainHDC, &maskHDC);
-
+                nextItem.getHDC(j, &mainHDC, &maskHDC);
             }
         }
         else 
@@ -106,7 +103,7 @@ void RenderOverrideManager::loadHardcodedOverrides()
 
             HDC mainHDC = nullptr;
             HDC maskHDC = nullptr;
-            LunaHardcodedGraphicsPatching::getHDCFromIndex(i, -1, &mainHDC, &maskHDC);
+            nextItem.getHDC(-1, &mainHDC, &maskHDC);
         }
 
     }
