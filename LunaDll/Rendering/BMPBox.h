@@ -31,6 +31,9 @@ public:
     int m_W;				// Width of bitmap
     HBITMAP m_hbmp;			// Handle to bitmap data
     HDC m_hdc;				// handle to compatible DC for this bitmap
+
+    // Static function
+    static BMPBox* loadIfExist(const std::wstring& filename, HDC screen_dc);
 };
 
 #endif

@@ -588,6 +588,7 @@ extern void __stdcall LoadLocalGfxHook()
     // Load render override graphics
     gRenderOverride.loadLevelGFX();
     gRenderOverride.loadWorldGFX();
+    gRenderOverride.loadHardcodedOverrides();
 }
 
 

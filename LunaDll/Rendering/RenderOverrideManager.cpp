@@ -13,7 +13,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graph
     }
     
     std::wstring episodePath = GM_FULLDIR;
-    if (customLevelPath != episodePath){
+    if (customLevelPath != episodePath){        // So we don't have double loading
         loadOverrides(episodePath, prefix, graphicsArray, numElements, graphicsArray_Mask);
     }
 }
@@ -29,13 +29,9 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 
         std::wstring nextFilename = path + prefix + L"-" + std::to_wstring(i) + L".png";
 
-        DWORD fAttrib = GetFileAttributesW(nextFilename.c_str());
-        if (fAttrib == INVALID_FILE_ATTRIBUTES)
+        std::shared_ptr<BMPBox> bmp = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename, gLunaRender.m_hScreenDC));
+        if(!bmp)
             continue;
-        if (fAttrib & FILE_ATTRIBUTE_DIRECTORY)
-            continue;
-        
-        std::shared_ptr<BMPBox> bmp = std::make_shared<BMPBox>(nextFilename, gLunaRender.m_hScreenDC);
         if (!bmp->ImageLoaded())
             continue;
 
@@ -72,10 +68,13 @@ void RenderOverrideManager::loadWorldGFX()
     loadOverrides(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR);
 }
 
-
-
 void RenderOverrideManager::loadHardcodedOverrides()
 {
+    std::vector<std::wstring> allPathsToSearch;
+    allPathsToSearch.push_back(GM_FULLDIR); // First check in episode dir
+    if (!gIsOverworld)
+        allPathsToSearch.push_back(getCustomFolderPath()); // Then check in the custom folder
+
     std::wstring baseNameStr = L"hardcoded-";
     for (int i = 1; i <= HardcodedGraphicsItem::Size(); i++) {
         HardcodedGraphicsItem& nextItem = HardcodedGraphicsItem::Get(i);
@@ -88,22 +87,40 @@ void RenderOverrideManager::loadHardcodedOverrides()
         if (nextItem.isArray()) {
             for (int j = nextItem.minItem; j <= nextItem.maxItem; j++) 
             {
-                std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
-                // FIXME: Add loading code for array-based images
-                
-
                 HDC mainHDC = nullptr;
                 HDC maskHDC = nullptr;
                 nextItem.getHDC(j, &mainHDC, &maskHDC);
+                SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
+
+                std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
+                
+                for (const auto& nextFilename : allPathsToSearch) {
+                    std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.m_hScreenDC));
+                    if(!bmpObj)
+                        continue;
+                    if(!bmpObj->ImageLoaded())
+                        continue;
+
+                    img->SetLoadedPng(bmpObj);
+                }
             }
         }
         else 
         {
-            // FIXME: Add loading code for images
-
             HDC mainHDC = nullptr;
             HDC maskHDC = nullptr;
             nextItem.getHDC(-1, &mainHDC, &maskHDC);
+            SMBXMaskedImage* img = SMBXMaskedImage::get(mainHDC, maskHDC);
+            std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L".png";
+            for (const auto& nextFilename : allPathsToSearch) {
+                std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.m_hScreenDC));
+                if (!bmpObj)
+                    continue;
+                if (!bmpObj->ImageLoaded())
+                    continue;
+
+                img->SetLoadedPng(bmpObj);
+            }
         }
 
     }
