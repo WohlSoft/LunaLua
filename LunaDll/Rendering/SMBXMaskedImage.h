@@ -44,9 +44,10 @@ public:
     void SetOverride(const std::shared_ptr<BMPBox>& img);
     void SetOverride(SMBXMaskedImage* img);
     void UnsetOverride();
+    bool HasLoadedPng() { return (bool)loadedPngImage; };
     std::shared_ptr<BMPBox> GetLoadedPng() { return loadedPngImage; };
     std::shared_ptr<BMPBox> GetRGBAOverride() { return rgbaOverrideImage; };
-    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; };
+    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; }
 };
 
 #endif

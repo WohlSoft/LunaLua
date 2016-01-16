@@ -39,7 +39,10 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (img == nullptr)
             continue;
 
-        img->SetLoadedPng(bmp);
+        if (!img->HasLoadedPng())
+        {
+            img->SetLoadedPng(bmp);
+        }
     }
 }
 
@@ -71,9 +74,9 @@ void RenderOverrideManager::loadWorldGFX()
 void RenderOverrideManager::loadHardcodedOverrides()
 {
     std::vector<std::wstring> allPathsToSearch;
-    allPathsToSearch.push_back(GM_FULLDIR); // First check in episode dir
     if (!gIsOverworld)
-        allPathsToSearch.push_back(getCustomFolderPath()); // Then check in the custom folder
+        allPathsToSearch.push_back(getCustomFolderPath()); // Check in the custom folder
+    allPathsToSearch.push_back(GM_FULLDIR); // Check the episode dir later if not found in custom folder
 
     std::wstring baseNameStr = L"hardcoded-";
     for (int i = 1; i <= HardcodedGraphicsItem::Size(); i++) {
@@ -87,11 +90,6 @@ void RenderOverrideManager::loadHardcodedOverrides()
         if (nextItem.isArray()) {
             for (int j = nextItem.minItem; j <= nextItem.maxItem; j++) 
             {
-                HDC mainHDC = nullptr;
-                HDC maskHDC = nullptr;
-                nextItem.getHDC(j, &mainHDC, &maskHDC);
-                SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
-
                 std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
                 
                 for (const auto& nextFilename : allPathsToSearch) {
@@ -101,16 +99,24 @@ void RenderOverrideManager::loadHardcodedOverrides()
                     if(!bmpObj->ImageLoaded())
                         continue;
 
-                    img->SetLoadedPng(bmpObj);
+                    HDC mainHDC = nullptr;
+                    HDC maskHDC = nullptr;
+                    nextItem.getHDC(j, &mainHDC, &maskHDC);
+                    
+                    if (mainHDC != nullptr || maskHDC != nullptr)
+                    {
+                        SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
+
+                        if (img != nullptr) {
+                            img->SetLoadedPng(bmpObj);
+                        }
+                    }
+                    break;
                 }
             }
         }
         else 
         {
-            HDC mainHDC = nullptr;
-            HDC maskHDC = nullptr;
-            nextItem.getHDC(-1, &mainHDC, &maskHDC);
-            SMBXMaskedImage* img = SMBXMaskedImage::get(mainHDC, maskHDC);
             std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L".png";
             for (const auto& nextFilename : allPathsToSearch) {
                 std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.m_hScreenDC));
@@ -119,7 +125,19 @@ void RenderOverrideManager::loadHardcodedOverrides()
                 if (!bmpObj->ImageLoaded())
                     continue;
 
-                img->SetLoadedPng(bmpObj);
+                HDC mainHDC = nullptr;
+                HDC maskHDC = nullptr;
+                nextItem.getHDC(-1, &mainHDC, &maskHDC);
+
+                if (mainHDC != nullptr || maskHDC != nullptr)
+                {
+                    SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
+
+                    if (img != nullptr) {
+                        img->SetLoadedPng(bmpObj);
+                    }
+                }
+                break;
             }
         }
 
