@@ -67,6 +67,18 @@ local defines = {
                                         n = 1, group = "Effect Modification", desc = "The effect ID of the npc-to-coins function (default is the coinflip effect). "..
                                                                                      "The npc-to-coins function is executed when the player hits an exit, which transforms "..
                                                                                      "the npcs into coins."},
+    effect_Zoomer_killEffectEnabled = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
+                                        n = 2, group = "Effect Modification", desc = "If the explosion effect is enabled for the zoomer (NPC-ID: 205)",
+                                        customFuncGet = function(self)
+                                            return mem(0x00A33160, FIELD_WORD) == 205
+                                        end,
+                                        customFuncSet = function(self, value)
+                                            if(value)then
+                                                mem(0x00A33160, FIELD_WORD, 205) -- From Side
+                                            else
+                                                mem(0x00A33160, FIELD_WORD, 0xFFFF) -- From Side
+                                            end
+                                        end},   
     
     --[[ Sound Modification Defines ]]--
     sound_NpcToCoin                 = {defValue = 14 , minVal = 0, maxVal = nil, address = 0x00A3C87F, size = FIELD_BYTE,
