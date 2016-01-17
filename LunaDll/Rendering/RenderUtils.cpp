@@ -84,3 +84,46 @@ HBITMAP CopyBitmapFromHdc(HDC hdc)
 
     return convHBMP;
 }
+
+bool SaveMaskedHDCToFile(const std::wstring& fName, HDC hdc, HDC mhdc)
+{
+    HBITMAP hbmp = CopyBitmapFromHdc(hdc);
+    if (hbmp == nullptr) return false;
+    BITMAP bmp;
+    GetObject(hbmp, sizeof(BITMAP), &bmp);
+
+    // Simple masking algorithm... not perfect but eh... for my purpose it's good enough
+    HBITMAP mhbmp = CopyBitmapFromHdc(mhdc);
+    if (mhbmp != nullptr) {
+        BITMAP mbmp;
+        GetObject(mhbmp, sizeof(BITMAP), &mbmp);
+        if (mbmp.bmHeight == bmp.bmHeight && mbmp.bmWidth == bmp.bmWidth) {
+            uint32_t pixelCount = bmp.bmWidth * bmp.bmHeight;
+            for (uint32_t idx = 0; idx < pixelCount; idx++) {
+                if ((((uint32_t*)mbmp.bmBits)[idx] & 0x00FFFFFF) != 0x00000000)
+                {
+                    ((uint32_t*)bmp.bmBits)[idx] = 0x00000000;
+                }
+            }
+        }
+    }
+
+    // Flip vertically
+    uint32_t* tmpRow = new uint32_t[bmp.bmWidth];
+    for (int y = 0; y < bmp.bmHeight / 2; y++)
+    {
+        memcpy(tmpRow, &((uint32_t*)bmp.bmBits)[y*bmp.bmWidth], 4 * bmp.bmWidth);
+        memcpy(&((uint32_t*)bmp.bmBits)[y*bmp.bmWidth] , &((uint32_t*)bmp.bmBits)[(bmp.bmHeight - y - 1)*bmp.bmWidth], 4 * bmp.bmWidth);
+        memcpy(&((uint32_t*)bmp.bmBits)[(bmp.bmHeight-y-1)*bmp.bmWidth], tmpRow, 4 * bmp.bmWidth);
+    }
+    delete tmpRow;
+
+    FreeImageData imgFile;
+    imgFile.init(bmp.bmWidth, bmp.bmHeight, (BYTE*)bmp.bmBits, FreeImageData::ColorMode::COLORMODE_BGR, 32);
+    imgFile.saveFile(WStr2Str(fName));
+
+    if (hbmp != nullptr) DeleteObject(hbmp);
+    if (mhbmp != nullptr) DeleteObject(mhbmp);
+
+    return true;
+}

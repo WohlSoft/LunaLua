@@ -13,5 +13,6 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
 void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& header, void* pData);
 
 HBITMAP CopyBitmapFromHdc(HDC hdc);
+bool SaveMaskedHDCToFile(const std::wstring& fName, HDC hdc, HDC mhdc);
 
 #endif

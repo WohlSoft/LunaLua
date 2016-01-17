@@ -4,6 +4,7 @@
 #include "../Globals.h"
 #include "SMBXMaskedImage.h"
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
+#include "RenderUtils.h"
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
@@ -139,6 +140,43 @@ void RenderOverrideManager::loadHardcodedOverrides()
                 }
                 break;
             }
+        }
+
+    }
+}
+
+
+static void dumpHardcodedImages()
+{
+
+    std::wstring baseNameStr = L"hardcoded-";
+    for (int i = 1; i <= HardcodedGraphicsItem::Size(); i++) {
+        HardcodedGraphicsItem& nextItem = HardcodedGraphicsItem::Get(i);
+        if (nextItem.state == HardcodedGraphicsItem::HITEMSTATE_INVALID)
+            continue;
+        if (nextItem.isMask())
+            continue;
+
+        HardcodedGraphicsItem* nextItemMask = nextItem.getMaskObj();
+        if (nextItem.isArray()) {
+            for (int j = nextItem.minItem; j <= nextItem.maxItem; j++)
+            {
+                std::wstring nextGIFName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
+
+                HDC mainHDC = nullptr;
+                HDC maskHDC = nullptr;
+                nextItem.getHDC(j, &mainHDC, &maskHDC);
+                if (mainHDC) SaveMaskedHDCToFile(nextGIFName, mainHDC, maskHDC);
+            }
+        }
+        else
+        {
+            std::wstring nextGIFName = baseNameStr + std::to_wstring(i) + L".png";
+
+            HDC mainHDC = nullptr;
+            HDC maskHDC = nullptr;
+            nextItem.getHDC(-1, &mainHDC, &maskHDC);
+            if (mainHDC) SaveMaskedHDCToFile(nextGIFName, mainHDC, maskHDC);
         }
 
     }
