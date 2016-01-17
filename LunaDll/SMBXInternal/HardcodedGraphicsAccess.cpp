@@ -52,8 +52,8 @@ std::array<HardcodedGraphicsItem, 51> HardcodedGraphics =
     HardcodedGraphicsItem(47, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 2, 2),  // 47 (array)
     HardcodedGraphicsItem(48, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      49, 0, 2),  // 48 (array)
     HardcodedGraphicsItem(49, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 2),  // 49 (array)
-    HardcodedGraphicsItem(50, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      51, 0, 2),  // 50 (array)
-    HardcodedGraphicsItem(51, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 2)   // 51 (array)
+    HardcodedGraphicsItem(50, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      51, 0, 9),  // 50 (array)
+    HardcodedGraphicsItem(51, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 9)   // 51 (array)
 };
 
 bool HardcodedGraphicsItem::getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC)
