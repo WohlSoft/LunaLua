@@ -963,9 +963,11 @@
     <ClCompile Include="Rendering\SMBXMaskedImage.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp">
       <Filter>LuaMain</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp">
+      <Filter>SMBXInternal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
