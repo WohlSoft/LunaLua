@@ -12,4 +12,6 @@ HBITMAP LoadGfxAsBitmap(const std::wstring& filename);
 std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filename);
 void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& header, void* pData);
 
+HBITMAP CopyBitmapFromHdc(HDC hdc);
+
 #endif

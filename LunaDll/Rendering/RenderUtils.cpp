@@ -42,3 +42,45 @@ void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& heade
     screenshotFile.init(header.biWidth, header.biHeight, (BYTE*)pData);
     screenshotFile.saveFile(WStr2Str(fName));
 }
+
+HBITMAP CopyBitmapFromHdc(HDC hdc)
+{
+    int w, h;
+    {
+        BITMAP bmp;
+        HBITMAP hbmp;
+
+        // Get handle to bitmap
+        hbmp = (HBITMAP)GetCurrentObject(hdc, OBJ_BITMAP);
+        if (hbmp == nullptr) return nullptr;
+
+        // Get bitmap structure to check the height/width
+        GetObject(hbmp, sizeof(BITMAP), &bmp);
+        w = bmp.bmWidth;
+        h = bmp.bmHeight;
+    }
+
+    // Convert to 24bpp BGR in memory that's accessible
+    void* pData = nullptr;
+    HBITMAP convHBMP = FreeImageHelper::CreateEmptyBitmap(w, h, 32, &pData);
+    HDC screenHDC = GetDC(nullptr);
+    if (screenHDC == nullptr) {
+        return nullptr;
+    }
+    HDC convHDC = CreateCompatibleDC(screenHDC);
+    SelectObject(convHDC, convHBMP);
+    BitBlt(convHDC, 0, 0, w, h, hdc, 0, 0, SRCCOPY);
+    DeleteDC(convHDC);
+    convHDC = nullptr;
+    ReleaseDC(nullptr, screenHDC);
+    screenHDC = nullptr;
+
+    // Set alpha channel to 0xFF, because it's always supposed to be and won't
+    // be copied as such by BitBlt
+    uint32_t pixelCount = w * h;
+    for (uint32_t idx = 0; idx < pixelCount; idx++) {
+        ((uint8_t*)pData)[idx * 4 + 3] = 0xFF;
+    }
+
+    return convHBMP;
+}

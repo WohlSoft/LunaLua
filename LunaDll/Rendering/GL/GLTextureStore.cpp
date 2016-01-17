@@ -47,54 +47,20 @@ void GLTextureStore::ClearLunaTexture(const BMPBox& bmp)
 }
 
 const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
-    uint32_t w;
-    uint32_t h;
-
     // Get associated texture from cache if possible
     auto it = mSmbxTexMap.find(hdc);
     if (it != mSmbxTexMap.end()) {
         return it->second;
     }
 
-    {
-        BITMAP bmp;
-        HBITMAP hbmp;
-
-        // Get handle to bitmap
-        hbmp = (HBITMAP)GetCurrentObject(hdc, OBJ_BITMAP);
-        if (hbmp == NULL) return 0;
-
-        // Get bitmap structure to check the height/width
-        GetObject(hbmp, sizeof(BITMAP), &bmp);
-        w = bmp.bmWidth;
-        h = bmp.bmHeight;
-    }
-
-    // Convert to 24bpp BGR in memory that's accessible
-    void* pData = NULL;
-    HBITMAP convHBMP = FreeImageHelper::CreateEmptyBitmap(w, h, 32, &pData);
-    HDC screenHDC = GetDC(NULL);
-    if (screenHDC == NULL) {
-        return 0;
-    }
-    HDC convHDC = CreateCompatibleDC(screenHDC);
-    SelectObject(convHDC, convHBMP);
-    BitBlt(convHDC, 0, 0, w, h, hdc, 0, 0, SRCCOPY);
-    DeleteDC(convHDC);
-    convHDC = NULL;
-    ReleaseDC(NULL, screenHDC);
-    screenHDC = NULL;
-
-    // Set alpha channel to 0xFF, because it's always supposed to be and won't
-    // be copied as such by BitBlt
-    uint32_t pixelCount = w * h;
-    for (uint32_t idx = 0; idx < pixelCount; idx++) {
-        ((uint8_t*)pData)[idx * 4 + 3] = 0xFF;
-    }
+    HBITMAP convHBMP = CopyBitmapFromHdc(hdc);
+    if (convHBMP == nullptr) return nullptr;
+    BITMAP bmp;
+    GetObject(convHBMP, sizeof(BITMAP), &bmp);
 
     // Try to allocate the GLSprite
     GLSprite* sprite;
-    sprite = GLSprite::Create(pData, GL_BGRA, w, h);
+    sprite = GLSprite::Create(bmp.bmBits, GL_BGRA, bmp.bmWidth, bmp.bmHeight);
 
     // Deallocate temporary conversion memory
     DeleteObject(convHBMP);
