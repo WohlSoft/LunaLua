@@ -19,34 +19,21 @@
 using namespace std;
 
 // CTOR
-Renderer::Renderer() {
-    m_hScreenDC = NULL;
+Renderer::Renderer() :
+    m_curCamIdx(1)
+{
 }
 
 // DTOR
 Renderer::~Renderer() {
-    if (m_hScreenDC != NULL)
-        DeleteDC(m_hScreenDC);
 }
-
-// UPDATE HDC -- Try and get the main screen HDC from SMBX. Fails if SMBX in bad state or screen not ready
-bool Renderer::ReloadScreenHDC() {
-    if (GM_SCRN_HDC == 0) { // does SMBX itself have the DC yet?
-        m_hScreenDC = 0;
-        return false;
-    }
-    m_hScreenDC = (HDC)GM_SCRN_HDC;
-    return true;
-}
-
-
 
 // LOAD BITMAP RESOURCE - Load an image resource with given resource code. If resource code exists, replaces old image
 bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color) {
     if (Renderer::LoadBitmapResource(filename, resource_code)) {
 
-        auto it = LoadedImages.find(resource_code);
-        if (it != LoadedImages.end()) {
+        auto it = m_legacyResourceCodeImages.find(resource_code);
+        if (it != m_legacyResourceCodeImages.end()) {
             it->second->MakeColorTransparent(transparency_color);
         }
         return true;
@@ -78,7 +65,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 
     //MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
     // Create and store the image resource
-    std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(full_path, m_hScreenDC);
+    std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(full_path, GetScreenDC());
     if (pNewbox->ImageLoaded() == false) {
         gLogger.Log(L"BMPBox image load failed", LOG_STD);
         return false;
@@ -89,16 +76,40 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
     return true;
 }
 
+//STORE IMAGE
+void Renderer::StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code) {
+    m_legacyResourceCodeImages[resource_code] = bmp;
+}
+
+// DELETE IMAGE - Deletes the image resource and returns true if it exists, otherwise does nothing and returns false
+bool Renderer::DeleteImage(int resource_code) {
+    auto it = m_legacyResourceCodeImages.find(resource_code);
+    if (it != m_legacyResourceCodeImages.end()) {
+        m_legacyResourceCodeImages.erase(it);
+        return true;
+    }
+    return false;
+}
+
+std::shared_ptr<BMPBox> Renderer::GetImageForResourceCode(int resource_code)
+{
+    auto it = m_legacyResourceCodeImages.find(resource_code);
+    if (it != m_legacyResourceCodeImages.end())
+    {
+        return it->second;
+    }
+    return nullptr;
+}
 
 std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
 {
     // Concoct full filepath
     wstring full_path = L"";
 
-    if (!isAbsolutePath(filename)){
+    if (!isAbsolutePath(filename)) {
         wstring world_dir = (wstring)GM_FULLDIR;
         full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
-        if (!gIsOverworld){
+        if (!gIsOverworld) {
             full_path = removeExtension(full_path);
             full_path = full_path.append(L"\\"); // < path into level folder
         }
@@ -115,10 +126,10 @@ std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::w
         double avgFrameTime = (double)std::get<1>(ret);
         *frameTime = (int)((avgFrameTime / 100) * 65);
     }
-    
+
     std::vector<std::shared_ptr<BMPBox>> bitmapList;
     for (HBITMAP nextBitmap : bitmaps) {
-        std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(nextBitmap, m_hScreenDC);
+        std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(nextBitmap, GetScreenDC());
         pNewbox->m_Filename = filename;
         if (pNewbox->ImageLoaded() == false) {
             gLogger.Log(L"BMPBox image load failed", LOG_STD);
@@ -126,24 +137,133 @@ std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::w
         }
         bitmapList.push_back(pNewbox);
     }
-    return bitmapList;  
+    return bitmapList;
 }
 
-
-//STORE IMAGE
-void Renderer::StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code) {
-    LoadedImages[resource_code] = bmp;
-}
-
-// DELETE IMAGE - Deletes the image resource and returns true if it exists, otherwise does nothing and returns false
-bool Renderer::DeleteImage(int resource_code) {
-    auto it = LoadedImages.find(resource_code);
-    if (it != LoadedImages.end()) {
-        LoadedImages.erase(it);
-        return true;
+// ADD OP
+void Renderer::AddOp(RenderOp* op) {
+    if (op->m_selectedCamera == 0)
+    {
+        // If the rendering operation was created in the middle of handling a
+        // camera's rendering, lock the rendering operation to that camera.
+        op->m_selectedCamera = m_curCamIdx;
     }
-    return false;
+    this->m_currentRenderOps.push_back(op);
 }
+
+// GL Engine OP
+void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority) {
+    RenderGLOp* op = new RenderGLOp(cmd);
+    op->m_renderPriority = renderPriority;
+    AddOp(op);
+}
+
+// DRAW OP -- Process a render operation, draw
+void Renderer::DrawOp(RenderOp* op) {
+    if (op->m_FramesLeft < 1)
+        return;
+    op->Draw(this);
+}
+
+// RENDER ALL
+void Renderer::RenderAll() {
+
+    std::stable_sort(m_currentRenderOps.begin(), m_currentRenderOps.end(),
+        [](RenderOp* lhs, RenderOp* rhs) {return lhs->m_renderPriority < rhs->m_renderPriority; } );
+    
+
+    // Do render ops
+    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+        RenderOp* pOp = *iter;
+        if (pOp->m_selectedCamera == 0 || pOp->m_selectedCamera == m_curCamIdx)
+        {
+            DrawOp(pOp);
+        }
+    }
+
+    // Format debug messages and enter them into renderstring list
+    int dbg_x = 325;
+    int dbg_y = 160;
+    for (auto it = m_debugMessages.begin(); it != m_debugMessages.end(); it++)
+    {
+        std::wstring dbg = *it;
+        RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
+        dbg_y += 20;
+        if (dbg_y > 560) {
+            dbg_y = 160;
+            dbg_x += 190;
+        }
+    }
+    this->m_debugMessages.clear();
+}
+
+// CLEAR ALL
+void Renderer::ClearAllDebugMessages() {
+    this->m_debugMessages.clear();
+}
+
+// DEBUG PRINT
+void Renderer::DebugPrint(std::wstring message) {
+    this->m_debugMessages.push_back(message);
+}
+
+void Renderer::DebugPrint(std::wstring message, double val) {
+    this->m_debugMessages.push_back(message + L" " + to_wstring((long long)val));
+}
+
+// DEBUG RELATIVE RECT
+void Renderer::DebugRelativeRect(int x, int y, int w, int h, DWORD color) {
+    RenderRectOp* p_Op = new RenderRectOp;
+    double camtop;
+    double camleft;
+    Render::CalcCameraPos(&camleft, &camtop);
+    p_Op->color = color;
+    p_Op->m_FramesLeft = 1;
+    p_Op->x1 = x - camleft;
+    p_Op->y1 = y - camtop;
+    p_Op->x2 = (x + w) - camleft;
+    p_Op->y2 = (y + h) - camtop;
+    AddOp(p_Op);
+}
+
+void Renderer::StartFrameRender()
+{
+    m_curCamIdx = 0;
+}
+
+void Renderer::StartCameraRender(int idx)
+{
+    m_curCamIdx = idx;
+
+    // TODO: Forward camera coordinates to GL renderer to let it do transforms
+    //
+}
+
+void Renderer::EndFrameRender()
+{
+    if (m_curCamIdx == 0) return;
+
+    m_curCamIdx = 0;
+
+    // Remove cleared operations
+    std::vector<RenderOp*> nonExpiredOps;
+    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+        RenderOp* pOp = *iter;
+        pOp->m_FramesLeft--;
+        if (pOp->m_FramesLeft <= 0)
+        {
+            *iter = nullptr;
+            delete pOp;
+        }
+        else
+        {
+            nonExpiredOps.push_back(pOp);
+        }
+    }
+    m_currentRenderOps.swap(nonExpiredOps);
+}
+
+
 
 // IS ON SCREEN
 bool Render::IsOnScreen(double x, double y, double w, double h) {
@@ -155,148 +275,18 @@ bool Render::IsOnScreen(double x, double y, double w, double h) {
 
 // CALC CAMERA POS
 void Render::CalcCameraPos(double* ret_x, double* ret_y) {
-
-    // Camera func, calculated from player position and boundaries
-    PlayerMOB* demo = Player::Get(1);
-    if (false) {
-        gLunaRender.AddOp(new RenderStringOp(to_wstring((long long)demo->momentum.x), 3, 300, 300));
-        gLunaRender.AddOp(new RenderStringOp(to_wstring((long long)demo->momentum.y), 3, 300, 350));
-
-        double cx = demo->momentum.x - (400 - (demo->momentum.width / 2));
-        double cy = demo->momentum.y - (300 - (demo->momentum.height / 2));
-
-        // Force camera to fit in level bounds
-        RECT rect;
-        Level::GetBoundary(&rect, demo->CurrentSection);
-        if (cx < rect.left)
-            cx = rect.left;
-        if (cx + 800 > rect.right)
-            cx = rect.right - 800;
-        if (cy < rect.top)
-            cy = rect.top;
-        if (cy + 600 > rect.bottom)
-            cy = rect.bottom - 600;
-
-        *ret_x = cx;
-        *ret_y = cy;
-    }
-
     // Old camera func, using "camera" memory
     if (GM_CAMERA_Y != 0 && GM_CAMERA_X != 0) {
         double* pCameraX = (GM_CAMERA_X);
         double* pCameraY = (GM_CAMERA_Y);
         double val;
-        if (ret_x != NULL) {
+        if (ret_x != nullptr) {
             val = pCameraX[1];
             *ret_x = val - val - val; // Fix backwards smbx camera
         }
-        if (ret_y != NULL) {
+        if (ret_y != nullptr) {
             val = pCameraY[1];
             *ret_y = val - val - val; // Fix backwards smbx camera
         }
     }
-}
-
-// ADD OP
-void Renderer::AddOp(RenderOp* op) {
-    this->RenderOperations.push_back(op);
-}
-
-// GL Engine OP
-void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority) {
-    RenderGLOp* op = new RenderGLOp(cmd);
-    op->m_renderPriority = renderPriority;
-    AddOp(op);
-}
-
-// DRAW OP -- Process a render operation, draw, and decrement active timer remaining
-void Renderer::DrawOp(RenderOp* op) {
-    if (op->m_FramesLeft < 1)
-        return;
-    op->m_LastRenderedOn = gFrames;
-    op->Draw(this);
-    op->m_FramesLeft--;
-}
-
-// RENDER ALL
-void Renderer::RenderAll() {
-
-    ClearExpired();
-
-    std::stable_sort(RenderOperations.begin(), RenderOperations.end(), 
-        [](RenderOp* lhs, RenderOp* rhs) {return lhs->m_renderPriority < rhs->m_renderPriority; } );
-    
-
-    // Do render ops
-    for (std::list<RenderOp*>::iterator iter = RenderOperations.begin(), end = RenderOperations.end(); iter != end; ++iter) {
-        if ((*iter)->m_LastRenderedOn == gFrames && (*iter)->m_PerCycleOnly)
-            continue;
-        DrawOp((*iter));
-    }
-
-    // Format debug messages and enter them into renderstring list
-    int dbg_x = 325;
-    int dbg_y = 160;
-    for (std::list<std::wstring >::const_iterator it = DebugMessages.begin(); it != DebugMessages.end(); it++)
-    {
-        std::wstring dbg = *it;
-        RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
-        dbg_y += 20;
-        if (dbg_y > 560) {
-            dbg_y = 160;
-            dbg_x += 190;
-        }
-    }
-    this->DebugMessages.clear();
-}
-
-// CLEAR EXPIRED -- Delete render ops & strings with no display frames left
-//				 -- Don't call this while iterating over renderops
-void Renderer::ClearExpired() {
-
-    // Clear expired render operations
-    std::list<RenderOp*>::iterator iter = RenderOperations.begin();
-    std::list<RenderOp*>::iterator end = RenderOperations.end();
-
-    while (iter != RenderOperations.end()) {
-        RenderOp* pOp = *iter;
-        if ((*iter)->m_FramesLeft <= 0) {
-            delete pOp;
-            iter = RenderOperations.erase(iter);
-        }
-        else {
-            ++iter;
-        }
-    }
-
-}
-
-// CLEAR ALL
-void Renderer::ClearAll() {
-    this->DebugMessages.clear();
-}
-
-// DEBUG PRINT
-void Renderer::DebugPrint(std::wstring message) {
-    this->DebugMessages.push_back(message);
-}
-
-void Renderer::DebugPrint(std::wstring message, double val) {
-    this->DebugMessages.push_back(message + L" " + to_wstring((long long)val));
-}
-
-// DEBUG RELATIVE RECT
-void Renderer::DebugRelativeRect(int x, int y, int w, int h, DWORD color) {
-    RenderRectOp* p_Op = new RenderRectOp;
-    double camtop;
-    double camleft;
-    Render::CalcCameraPos(&camleft, &camtop);
-    p_Op->color = color;
-    p_Op->m_FramesLeft = 1;
-    p_Op->m_PerCycleOnly = false;
-    p_Op->x1 = x - camleft;
-    p_Op->y1 = y - camtop;
-    p_Op->x2 = (x + w) - camleft;
-    p_Op->y2 = (y + h) - camtop;
-    AddOp(p_Op);
 }

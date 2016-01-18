@@ -347,8 +347,7 @@ void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) 
 void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
     std::shared_ptr<BMPBox> box = spr->m_directImg;
     if (!box) {
-        auto it = gLunaRender.LoadedImages.find(spr->m_ImgResCode);
-        if (it != gLunaRender.LoadedImages.end()) box = it->second;
+        box = gLunaRender.GetImageForResourceCode(spr->m_ImgResCode);
     }
 
 	if(box) {

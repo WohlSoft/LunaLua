@@ -32,7 +32,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     double x = this->x;
     double y = this->y;
     if (sceneCoords) {
-        SMBX_CameraInfo::transformSceneToScreen(1, x, y);
+        SMBX_CameraInfo::transformSceneToScreen(renderer->GetCameraIdx(), x, y);
     }
 
     //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
@@ -52,7 +52,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         bf.BlendFlags = 0;
         bf.SourceConstantAlpha = (int)roundf(255 * opacity);
         bf.AlphaFormat = AC_SRC_ALPHA;
-        AlphaBlend(renderer->m_hScreenDC, (int)x, (int)y, (int)sw, (int)sh,
+        AlphaBlend(renderer->GetScreenDC(), (int)x, (int)y, (int)sw, (int)sh,
             direct_img->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
     }
 }

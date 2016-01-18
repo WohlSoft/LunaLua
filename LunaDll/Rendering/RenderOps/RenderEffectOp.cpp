@@ -25,7 +25,7 @@ void RenderEffectOp::Draw(Renderer* g) {
 
 // SCREEN GLOW
 void RenderEffectOp::ScreenGlow(Renderer* g) {
-    HDC hScreen = g->m_hScreenDC;
+    HDC hScreen = g->GetScreenDC();
 
     HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
 
@@ -69,7 +69,7 @@ void RenderEffectOp::ScreenGlow(Renderer* g) {
 
 // Flip
 void RenderEffectOp::Flip(Renderer* g) {
-    HDC hScreen = g->m_hScreenDC;
+    HDC hScreen = g->GetScreenDC();
 
     HBITMAP hOld = (HBITMAP)SelectObject(ghMemDC, ghGeneralDIB);
     if (!(ghGeneralDIB && ghMemDC && gpScreenBits)) return;

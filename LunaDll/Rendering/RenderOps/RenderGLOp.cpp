@@ -3,8 +3,6 @@
 #include "../GL/GLEngineProxy.h"
 
 RenderGLOp::RenderGLOp(const std::shared_ptr<GLEngineCmd> &cmd) {
-    m_PerCycleOnly = false;
-    m_LastRenderedOn = 0;
     m_FramesLeft = 1;
     m_Cmd = cmd;
 }

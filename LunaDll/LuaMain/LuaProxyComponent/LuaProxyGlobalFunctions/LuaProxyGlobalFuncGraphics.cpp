@@ -63,7 +63,7 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
         full_path = Str2WStr(filename);
     }
 
-    std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.m_hScreenDC);
+    std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.GetScreenDC());
 
     if (img->ImageLoaded() == false) {
         // If image loading failed, return null

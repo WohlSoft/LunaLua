@@ -233,7 +233,7 @@ void ResetLunaModule()
     gLevelEnum = Invalid;
 
     g_EventHandler.reset();
-    gLunaRender.ClearAll();
+    gLunaRender.ClearAllDebugMessages();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
     gSavedVarBank.ClearBank();
@@ -244,8 +244,6 @@ void ResetLunaModule()
     // Static default hitboxes and other values
     native_initStaticVals();
     native_initDefVals();
-
-    gLunaRender.ReloadScreenHDC();
 }
 
 static bool IsWindowsVistaOrNewer() {

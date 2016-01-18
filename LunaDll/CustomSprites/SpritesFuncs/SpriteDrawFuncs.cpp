@@ -23,12 +23,7 @@ void SpriteFunc::StaticDraw(CSprite* me) {
             if (me->m_directImg) {
                 op->direct_img = me->m_directImg;
             } else {
-                auto it = gLunaRender.LoadedImages.find(me->m_ImgResCode);
-                if (it != gLunaRender.LoadedImages.end()) {
-                    op->direct_img = it->second;
-                } else {
-                    op->direct_img = nullptr;
-                }
+                op->direct_img = gLunaRender.GetImageForResourceCode(me->m_ImgResCode);
             }
 
 			gLunaRender.AddOp(op);
@@ -66,13 +61,7 @@ void SpriteFunc::RelativeDraw(CSprite* me) {
                 op->direct_img = me->m_directImg;
             }
             else {
-                auto it = gLunaRender.LoadedImages.find(me->m_ImgResCode);
-                if (it != gLunaRender.LoadedImages.end()) {
-                    op->direct_img = it->second;
-                }
-                else {
-                    op->direct_img = nullptr;
-                }
+                op->direct_img = gLunaRender.GetImageForResourceCode(me->m_ImgResCode);
             }
 
 			gLunaRender.AddOp(op);	

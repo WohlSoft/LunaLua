@@ -14,14 +14,13 @@ static const double RENDEROP_DEFAULT_PRIORITY_TEXT = 3.0; // Default priority fo
 // Rendering operations include a draw function and a count of how many frames of activity remain
 class RenderOp {
 public:
-    RenderOp() : m_PerCycleOnly(false), m_LastRenderedOn(0), m_FramesLeft(1), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) { }
-    RenderOp(double priority) : m_PerCycleOnly(false), m_LastRenderedOn(0), m_FramesLeft(1), m_renderPriority(priority) { }
+    RenderOp() : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) { }
+    RenderOp(double priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) { }
     virtual ~RenderOp() {}
     virtual void Draw(Renderer* renderer) {}
 
-    bool m_PerCycleOnly;	// Whether or not this renderop should only run once per full game frame (no running while minimized etc)
-    int m_LastRenderedOn;	// The last frame this was rendered on
     int m_FramesLeft;		// How many frames until this op should be destroyed
+    int m_selectedCamera;
     double m_renderPriority;
 };
 

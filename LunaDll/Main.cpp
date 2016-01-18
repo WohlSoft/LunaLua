@@ -172,7 +172,6 @@ int TestFunc()
 {
 	
 	// Clean up
-	gLunaRender.ClearExpired();
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
 

@@ -917,6 +917,8 @@ extern short __stdcall MessageBoxOpenHook()
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
+    gLunaRender.StartCameraRender(cameraIdx);
+
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onCameraUpdate", false);
         messageBoxEvent->setDirectEventName("onCameraUpdate");
@@ -1124,9 +1126,11 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 extern void __stdcall RenderLevelHook()
 {
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
+    gLunaRender.StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
     g_EventHandler.hookLevelRenderEnd();
+    gLunaRender.EndFrameRender();
 }
 
 static void __declspec(naked) __stdcall RenderWorldReal()
@@ -1144,7 +1148,9 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 extern void __stdcall RenderWorldHook()
 {
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
+    gLunaRender.StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();
+    gLunaRender.EndFrameRender();
 }

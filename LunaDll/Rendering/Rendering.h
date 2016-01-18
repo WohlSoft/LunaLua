@@ -20,13 +20,13 @@ struct Renderer {
     Renderer();
     ~Renderer();
 
-    bool ReloadScreenHDC();
-
     bool LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(std::wstring filename, int resource_code);
-    std::vector<std::shared_ptr<BMPBox>> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
-
+    void StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code);
     bool DeleteImage(int resource_code);
+    std::shared_ptr<BMPBox> GetImageForResourceCode(int resource_code);
+
+    std::vector<std::shared_ptr<BMPBox>> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
     void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
@@ -37,26 +37,35 @@ struct Renderer {
 
     void RenderAll();
 
-    void ClearExpired();
-    void ClearAll();
+    void ClearAllDebugMessages();
 
-protected:
+    // Calls from hooks
+    void StartCameraRender(int idx);
+    void StartFrameRender();
+    void EndFrameRender();
+
     void DrawOp(RenderOp* render_operation);
-    void StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code);
+    
 
     // Members //
+private:
+    int m_curCamIdx; // Camera state
+
+    std::vector<RenderOp*> m_currentRenderOps;  // render operations to be performed
+
+    std::map<int, std::shared_ptr<BMPBox>> m_legacyResourceCodeImages;  // loaded image resources
+
+    std::list<std::wstring> m_debugMessages;                // Debug message to be printed
+
+    // Simple getters //
 public:
-    HDC m_hScreenDC;								// handle to the main screen DC
-
-    std::list<RenderOp*> RenderOperations;			// render operations to be performed
-    std::map<int, std::shared_ptr<BMPBox>> LoadedImages;			// loaded image resources
-
-    std::list<std::wstring> DebugMessages;				// Debug message to be printed
+    int GetCameraIdx() { return m_curCamIdx; }
+    HDC GetScreenDC() { return (HDC)GM_SCRN_HDC; }
 };
 
 namespace Render{
-    bool IsOnScreen(double x, double y, double w, double h);// Returns whether or not the digven rectangle is on screen this frame
-    void CalcCameraPos(double* p_X, double* p_Y);			// Tries to read smbx memory to return the camera coords in the 2 passed args
+    bool IsOnScreen(double x, double y, double w, double h); // Returns whether or not the digven rectangle is on screen this frame
+    void CalcCameraPos(double* p_X, double* p_Y);            // Tries to read smbx memory to return the camera coords in the 2 passed args
 
     
 }

@@ -30,7 +30,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 
         std::wstring nextFilename = path + prefix + L"-" + std::to_wstring(i) + L".png";
 
-        std::shared_ptr<BMPBox> bmp = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename, gLunaRender.m_hScreenDC));
+        std::shared_ptr<BMPBox> bmp = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename, gLunaRender.GetScreenDC()));
         if(!bmp)
             continue;
         if (!bmp->ImageLoaded())
@@ -94,7 +94,7 @@ void RenderOverrideManager::loadHardcodedOverrides()
                 std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L"-" + std::to_wstring(j) + L".png";
                 
                 for (const auto& nextFilename : allPathsToSearch) {
-                    std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.m_hScreenDC));
+                    std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.GetScreenDC()));
                     if(!bmpObj)
                         continue;
                     if(!bmpObj->ImageLoaded())
@@ -120,7 +120,7 @@ void RenderOverrideManager::loadHardcodedOverrides()
         {
             std::wstring nextPNGName = baseNameStr + std::to_wstring(i) + L".png";
             for (const auto& nextFilename : allPathsToSearch) {
-                std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.m_hScreenDC));
+                std::shared_ptr<BMPBox> bmpObj = std::shared_ptr<BMPBox>(BMPBox::loadIfExist(nextFilename + nextPNGName, gLunaRender.GetScreenDC()));
                 if (!bmpObj)
                     continue;
                 if (!bmpObj->ImageLoaded())

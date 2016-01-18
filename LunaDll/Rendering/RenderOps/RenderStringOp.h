@@ -26,7 +26,7 @@ public:
     {
         VB6StrPtr text(m_String);
         if (sceneCoords)
-            SMBX_CameraInfo::transformSceneToScreen(1, m_X, m_Y);
+            SMBX_CameraInfo::transformSceneToScreen(renderer->GetCameraIdx(), m_X, m_Y);
         native_print(&text, &m_FontType, &m_X, &m_Y);
     }
 

@@ -16,7 +16,6 @@ void KilArmoryCode() {
 			intensity <<= 16;
 			RenderEffectOp* op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
 			op->m_FramesLeft = 1;
-			op->m_PerCycleOnly = true;
 			gLunaRender.AddOp(op);
 		}
 
@@ -26,7 +25,6 @@ void KilArmoryCode() {
 			intensity <<= 16;
 			RenderEffectOp* op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
 			op->m_FramesLeft = 1;
-			op->m_PerCycleOnly = true;
 			gLunaRender.AddOp(op);
 		}
 	}
