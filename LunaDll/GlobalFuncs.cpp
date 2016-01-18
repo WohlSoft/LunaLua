@@ -20,6 +20,7 @@
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
+#include "SMBXInternal/Level.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -551,7 +552,7 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
 std::wstring getCustomFolderPath()
 {
     std::wstring world_dir = (std::wstring)GM_FULLDIR;
-    std::wstring full_path = (gIsOverworld ? world_dir : world_dir.append(GM_LVLFILENAME_PTR));
+    std::wstring full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
     if (!gIsOverworld){
         full_path = removeExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder

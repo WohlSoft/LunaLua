@@ -41,11 +41,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     {
         full_path = Str2WStr(ini_file);
     } else {
-        std::wstring world_dir = (std::wstring)GM_FULLDIR;
-        full_path = world_dir.append(::Level::GetName());
-        full_path = removeExtension(full_path);
-        full_path = full_path.append(L"\\"); // < path into level folder
-        full_path = full_path + Str2WStr(ini_file);
+        full_path = getCustomFolderPath() + Str2WStr(ini_file);
     }
 
 	std::wstring ws = full_path;
@@ -292,11 +288,7 @@ void LuaProxy::playSFX(const std::string& filename)
 #else
 	wstring full_path;
 	if(!isAbsolutePath(filename)){
-		wstring world_dir = (wstring)GM_FULLDIR;
-		full_path = world_dir.append(Level::GetName());
-		full_path = removeExtension(full_path);
-		full_path = full_path.append(L"\\"); // < path into level folder
-		full_path = full_path + utf8_decode(filename);
+		full_path = getCustomFolderPath() + utf8_decode(filename);
 	}else{
 		full_path = utf8_decode(filename);
 	}

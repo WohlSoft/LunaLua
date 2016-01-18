@@ -12,6 +12,7 @@
 #include "../SMBXInternal/SMBXEvents.h"
 #include "../SMBXInternal/Level.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
+#include "../GlobalFuncs.h"
 
 using namespace std;
 
@@ -228,11 +229,7 @@ void Autocode::Do(bool init) {
 					// Sound from level folder
 					if(MyString.length() > 0) {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
-						wstring world_dir = (wstring)GM_FULLDIR;
-						wstring full_path = world_dir.append(Level::GetName());	
-						full_path = removeExtension(full_path);
-						full_path = full_path.append(L"\\"); // < path into level folder
-						full_path = full_path + MyString;
+						std::wstring full_path = getCustomFolderPath() + MyString;
 						PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 					}
 

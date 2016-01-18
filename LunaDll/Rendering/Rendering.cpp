@@ -50,13 +50,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
     wstring full_path = L"";
 
     if (!isAbsolutePath(filename)){
-        wstring world_dir = (wstring)GM_FULLDIR;
-        full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
-        if (!gIsOverworld){
-            full_path = removeExtension(full_path);
-            full_path = full_path.append(L"\\"); // < path into level folder
-        }
-        full_path = full_path + filename;
+        full_path = getCustomFolderPath() + filename;
     }
     else
     {
@@ -107,13 +101,7 @@ std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::w
     wstring full_path = L"";
 
     if (!isAbsolutePath(filename)) {
-        wstring world_dir = (wstring)GM_FULLDIR;
-        full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
-        if (!gIsOverworld) {
-            full_path = removeExtension(full_path);
-            full_path = full_path.append(L"\\"); // < path into level folder
-        }
-        full_path = full_path + filename;
+        full_path = getCustomFolderPath() + filename;
     }
     else
     {
