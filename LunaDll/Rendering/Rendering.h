@@ -35,7 +35,7 @@ struct Renderer {
     void DebugPrint(std::wstring message, double val);	// Print a debug message on the screen and display a related value
     void DebugRelativeRect(int x, int y, int w, int h, DWORD color);	// Draw a rectangle on screen somewhere (level coordinates)
 
-    void RenderAll();
+    void RenderUpTo(double maxPriority);
 
     void ClearAllDebugMessages();
 
@@ -44,13 +44,16 @@ struct Renderer {
     void StartFrameRender();
     void EndFrameRender();
 
-    void DrawOp(RenderOp* render_operation);
+private:
+    void DrawOp(RenderOp& render_operation);
     
 
     // Members //
 private:
     int m_curCamIdx; // Camera state
-
+    
+    std::size_t m_renderOpsSortedCount;
+    std::size_t m_renderOpsProcessedCount;
     std::vector<RenderOp*> m_currentRenderOps;  // render operations to be performed
 
     std::map<int, std::shared_ptr<BMPBox>> m_legacyResourceCodeImages;  // loaded image resources

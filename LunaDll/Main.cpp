@@ -216,7 +216,7 @@ void OnLevelHUDDraw(int cameraIdx) {
     }
 
 	gSpriteMan.RunSprites();
-	gLunaRender.RenderAll();
+	gLunaRender.RenderUpTo(DBL_MAX);
 }
 
 

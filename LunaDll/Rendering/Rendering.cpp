@@ -20,7 +20,9 @@ using namespace std;
 
 // CTOR
 Renderer::Renderer() :
-    m_curCamIdx(1)
+    m_curCamIdx(1),
+    m_renderOpsSortedCount(0),
+    m_renderOpsProcessedCount(0)
 {
 }
 
@@ -147,26 +149,52 @@ void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPrior
 }
 
 // DRAW OP -- Process a render operation, draw
-void Renderer::DrawOp(RenderOp* op) {
-    if (op->m_FramesLeft < 1)
-        return;
-    op->Draw(this);
+void Renderer::DrawOp(RenderOp& op) {
+    if ((op.m_selectedCamera == 0 || op.m_selectedCamera == m_curCamIdx) && (op.m_FramesLeft >= 1))
+    {
+        op.Draw(this);
+    }
+}
+
+static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
+{
+    return lhs->m_renderPriority < rhs->m_renderPriority;
 }
 
 // RENDER ALL
-void Renderer::RenderAll() {
+void Renderer::RenderUpTo(double maxPriority) {
+    auto& ops = m_currentRenderOps;
+    if (ops.size() == 0) return;
+    double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
 
-    std::stable_sort(m_currentRenderOps.begin(), m_currentRenderOps.end(),
-        [](RenderOp* lhs, RenderOp* rhs) {return lhs->m_renderPriority < rhs->m_renderPriority; } );
-    
+    // Assume operations already processed were already sorted
+    bool haveNewOps = m_renderOpsSortedCount < ops.size();
+    if (haveNewOps)
+    {
+        // Sort the new operations
+        std::stable_sort(ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
-    // Do render ops
-    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
-        RenderOp* pOp = *iter;
-        if (pOp->m_selectedCamera == 0 || pOp->m_selectedCamera == m_curCamIdx)
+        // Render things with lower priority than what we've already rendered
+        for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
         {
-            DrawOp(pOp);
+            RenderOp& op = **iter;
+            if (op.m_renderPriority >= nextPriorityInOldList) break;
+            if (op.m_renderPriority > maxPriority) break;
+            DrawOp(op);
+            m_renderOpsProcessedCount++;
         }
+
+        // Merge sorted list sections (note, std::inplace_merge is a stable sort)
+        std::inplace_merge(ops.begin(), ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
+        m_renderOpsSortedCount = ops.size();
+    }
+
+    // Render other operations
+    for (auto iter = ops.cbegin() + m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter) {
+        RenderOp& op = **iter;
+        if (op.m_renderPriority > maxPriority) break;
+        DrawOp(op);
+        m_renderOpsProcessedCount++;
     }
 
     // Format debug messages and enter them into renderstring list
@@ -223,8 +251,7 @@ void Renderer::StartCameraRender(int idx)
 {
     m_curCamIdx = idx;
 
-    // TODO: Forward camera coordinates to GL renderer to let it do transforms
-    //
+    m_renderOpsProcessedCount = 0;
 }
 
 void Renderer::EndFrameRender()
@@ -249,6 +276,8 @@ void Renderer::EndFrameRender()
         }
     }
     m_currentRenderOps.swap(nonExpiredOps);
+    m_renderOpsProcessedCount = 0;
+    m_renderOpsSortedCount = m_currentRenderOps.size();
 }
 
 
