@@ -169,24 +169,29 @@ void Renderer::RenderBelowPriority(double maxPriority) {
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;
 
-    // Make note of the next item's priority
-    double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
-
     // Assume operations already processed were already sorted
-    bool haveNewOps = m_renderOpsSortedCount < ops.size();
-    if (haveNewOps)
+    if (m_renderOpsSortedCount == 0)
+    {
+        std::stable_sort(ops.begin(), ops.end(), CompareRenderPriority);
+        m_renderOpsSortedCount = ops.size();
+    }
+    else if (m_renderOpsSortedCount < ops.size())
     {
         // Sort the new operations
         std::stable_sort(ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
         // Render things with lower priority than what we've already rendered
-        for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+        if (m_renderOpsProcessedCount > 0)
         {
-            RenderOp& op = **iter;
-            if (op.m_renderPriority >= nextPriorityInOldList) break;
-            if (op.m_renderPriority >= maxPriority) break;
-            DrawOp(op);
-            m_renderOpsProcessedCount++;
+            double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
+            for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+            {
+                RenderOp& op = **iter;
+                if (op.m_renderPriority >= nextPriorityInOldList) break;
+                if (op.m_renderPriority >= maxPriority) break;
+                DrawOp(op);
+                m_renderOpsProcessedCount++;
+            }
         }
 
         // Merge sorted list sections (note, std::inplace_merge is a stable sort)

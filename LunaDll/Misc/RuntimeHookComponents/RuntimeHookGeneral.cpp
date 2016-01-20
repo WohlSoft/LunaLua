@@ -411,46 +411,46 @@ void TrySkipPatch()
 
     // Level rendering layering hooks
 
-    PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
-    // -95: Level Background
-    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
-    // -90: Furthest back BGOs
-    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply();
-    // -85: Sizable Blocks
-    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-80>()).Apply(); 
-    // -80: Some more BGOs
-    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHook<-75>()).Apply();
-    // -75: Warp - Derived BGOs (locks on doors and stuff)
-    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHook<-70>()).Apply();
-    // -70: Background NPCs (vines, piranah plants, diggable sand, mother brain, things in MB jars)
-    PATCH(0x915316).NOP().NOP().CALL(GetRenderBelowPriorityHook<-65>()).Apply();
-    // -65: Held NPCs
-    PATCH(0x91D422).NOP().NOP().CALL(GetRenderBelowPriorityHook<-60>()).Apply();
-    // -60: Normal Blocks
-    PATCH(0x91DD90).NOP().NOP().CALL(GetRenderBelowPriorityHook<-55>()).Apply();
-    // -55: Furthest Back Effects (doors, pressed p-switches, some other stuff)
-    PATCH(0x91E1F2).NOP().NOP().CALL(GetRenderBelowPriorityHook<-50>()).Apply();
-    // -50: Some NPCs (i.e. coins, clown car, chompy, herb, wood rocket, koopaling fire)
-    PATCH(0x91F802).NOP().NOP().CALL(GetRenderBelowPriorityHook<-45>()).Apply();
-    // -45: Some NPCs (ice blocks)
-    PATCH(0x920040).NOP().NOP().CALL(GetRenderBelowPriorityHook<-40>()).Apply();
-    // -40: Normal NPCs
-    PATCH(0x922D00).NOP().NOP().CALL(GetRenderBelowPriorityHook<-35>()).Apply();
-    // -35: Symbol above NPCs that want to chat (hardcoded-43/44)
-    PATCH(0x923786).NOP().NOP().CALL(GetRenderBelowPriorityHook<-30>()).Apply();
-    // -30: Player Mounts
-    PATCH(0x927F21).NOP().NOP().CALL(GetRenderBelowPriorityHook<-25>()).Apply();
-    // -25: Something else player mount related?
-    PATCH(0x928EA5).NOP().NOP().CALL(GetRenderBelowPriorityHook<-20>()).Apply();
-    // -20: Players
-    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHook<-15>()).Apply();
-    // -15: Foreground BGOs
-    PATCH(0x929F81).NOP().NOP().CALL(GetRenderBelowPriorityHook<-10>()).Apply();
-    // -10: Foreground NPCs
-    PATCH(0x92B428).NOP().NOP().CALL(GetRenderBelowPriorityHook<-5>()).Apply();
-    //  -5: Foreground Blocks
-    PATCH(0x92BAC0).NOP().NOP().CALL(GetRenderBelowPriorityHook<0>()).Apply();
-    //   0: Foreground Effects (all not at 0091DD90)
+    //PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
+    //-100: Level Background
+    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
+    // -95: Furthest back BGOs
+    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
+    // -90: Sizable Blocks
+    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply(); 
+    // -85: Some more BGOs
+    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHook<-80>()).Apply();
+    // -80: Warp - Derived BGOs (locks on doors and stuff)
+    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHook<-75>()).Apply();
+    // -75: Background NPCs (vines, piranah plants, diggable sand, mother brain, things in MB jars)
+    PATCH(0x915316).NOP().NOP().CALL(GetRenderBelowPriorityHook<-70>()).Apply();
+    // -70: Held NPCs
+    PATCH(0x91D422).NOP().NOP().CALL(GetRenderBelowPriorityHook<-65>()).Apply();
+    // -65: Normal Blocks
+    PATCH(0x91DD90).NOP().NOP().CALL(GetRenderBelowPriorityHook<-60>()).Apply();
+    // -60: Furthest Back Effects (doors, pressed p-switches, some other stuff)
+    PATCH(0x91E1F2).NOP().NOP().CALL(GetRenderBelowPriorityHook<-55>()).Apply();
+    // -55: Some NPCs (i.e. coins, clown car, chompy, herb, wood rocket, koopaling fire)
+    PATCH(0x91F802).NOP().NOP().CALL(GetRenderBelowPriorityHook<-50>()).Apply();
+    // -50: Some NPCs (ice blocks)
+    PATCH(0x920040).NOP().NOP().CALL(GetRenderBelowPriorityHook<-45>()).Apply();
+    // -45: Normal NPCs
+    PATCH(0x922D00).NOP().NOP().CALL(GetRenderBelowPriorityHook<-40>()).Apply();
+    // -40: Symbol above NPCs that want to chat (hardcoded-43/44)
+    PATCH(0x923786).NOP().NOP().CALL(GetRenderBelowPriorityHook<-35>()).Apply();
+    // -35: Player Mounts
+    PATCH(0x927F21).NOP().NOP().CALL(GetRenderBelowPriorityHook<-30>()).Apply();
+    // -30: Something else player mount related?
+    PATCH(0x928EA5).NOP().NOP().CALL(GetRenderBelowPriorityHook<-25>()).Apply();
+    // -25: Players
+    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHook<-20>()).Apply();
+    // -20: Foreground BGOs
+    PATCH(0x929F81).NOP().NOP().CALL(GetRenderBelowPriorityHook<-15>()).Apply();
+    // -15: Foreground NPCs
+    PATCH(0x92B428).NOP().NOP().CALL(GetRenderBelowPriorityHook<-10>()).Apply();
+    // -10: Foreground Blocks
+    PATCH(0x92BAC0).NOP().NOP().CALL(GetRenderBelowPriorityHook<-5>()).Apply();
+    //  -5: Foreground Effects (all not at 0091DD90)
     PATCH(0x92BF96).NOP().NOP().CALL(GetRenderBelowPriorityHook<5>()).Apply();
     //   5: HUD
     PATCH(0x939977).NOP().NOP().CALL(GetRenderBelowPriorityHook<100>()).Apply();
