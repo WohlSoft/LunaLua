@@ -163,7 +163,7 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 }
 
 // RENDER ALL
-void Renderer::RenderUpTo(double maxPriority) {
+void Renderer::RenderBelowPriority(double maxPriority) {
     if (!m_InFrameRender) return;
 
     auto& ops = m_currentRenderOps;
@@ -184,7 +184,7 @@ void Renderer::RenderUpTo(double maxPriority) {
         {
             RenderOp& op = **iter;
             if (op.m_renderPriority >= nextPriorityInOldList) break;
-            if (op.m_renderPriority > maxPriority) break;
+            if (op.m_renderPriority >= maxPriority) break;
             DrawOp(op);
             m_renderOpsProcessedCount++;
         }
@@ -197,7 +197,7 @@ void Renderer::RenderUpTo(double maxPriority) {
     // Render other operations
     for (auto iter = ops.cbegin() + m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter) {
         RenderOp& op = **iter;
-        if (op.m_renderPriority > maxPriority) break;
+        if (op.m_renderPriority >= maxPriority) break;
         DrawOp(op);
         m_renderOpsProcessedCount++;
     }

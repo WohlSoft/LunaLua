@@ -147,14 +147,14 @@ void fixup_BGODepletion();
 /* Render Priority Hooks                                                */
 /************************************************************************/
 template <int priority>
-_declspec(naked) static void __stdcall _RenderUpToHookImpl() {
+_declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
     __asm {
         pushf
         push eax
         push ecx
         push edx
     }
-    gLunaRender.RenderUpTo((priority >= 100) ? DBL_MAX : priority);
+    gLunaRender.RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
     __asm {
         pop edx
         pop ecx
@@ -164,8 +164,8 @@ _declspec(naked) static void __stdcall _RenderUpToHookImpl() {
     }
 }
 template<int priority>
-static inline constexpr void* GetRenderUpToHook(void) {
-    return static_cast<void(__stdcall *)(void)>(&_RenderUpToHookImpl<priority>);
+static inline constexpr void* GetRenderBelowPriorityHook(void) {
+    return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookImpl<priority>);
 }
 
 #endif

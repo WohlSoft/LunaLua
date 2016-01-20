@@ -267,7 +267,7 @@ extern void* __stdcall WorldRender()
     }
 
     gSpriteMan.RunSprites();
-    gLunaRender.RenderUpTo(DBL_MAX);
+    gLunaRender.RenderBelowPriority(DBL_MAX);
 
     return (void*)0xB25010;
 }
