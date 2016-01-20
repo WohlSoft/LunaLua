@@ -143,6 +143,30 @@ void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 
+/************************************************************************/
+/* Render Priority Hooks                                                */
+/************************************************************************/
+template <int priority>
+_declspec(naked) static void __stdcall _RenderUpToHookImpl() {
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+    }
+    gLunaRender.RenderUpTo((priority >= 100) ? DBL_MAX : priority);
+    __asm {
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        ret
+    }
+}
+template<int priority>
+static inline constexpr void* GetRenderUpToHook(void) {
+    return static_cast<void(__stdcall *)(void)>(&_RenderUpToHookImpl<priority>);
+}
 
 #endif
 

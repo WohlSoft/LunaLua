@@ -17,7 +17,7 @@ _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
 }
 
 template<void* TARGETADDR>
-static inline void* GET_RETADDR_TRACE_HOOK(void) {
+static inline constexpr void* GET_RETADDR_TRACE_HOOK(void) {
     return static_cast<void(__stdcall *)(void)>(&RETADDR_TRACE_HOOK_IMPL<TARGETADDR>);
 }
 

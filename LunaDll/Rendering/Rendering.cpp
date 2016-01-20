@@ -20,6 +20,7 @@ using namespace std;
 
 // CTOR
 Renderer::Renderer() :
+    m_InFrameRender(false),
     m_curCamIdx(1),
     m_renderOpsSortedCount(0),
     m_renderOpsProcessedCount(0)
@@ -163,8 +164,12 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 
 // RENDER ALL
 void Renderer::RenderUpTo(double maxPriority) {
+    if (!m_InFrameRender) return;
+
     auto& ops = m_currentRenderOps;
-    if (ops.size() == 0) return;
+    if (ops.size() <= m_renderOpsProcessedCount) return;
+
+    // Make note of the next item's priority
     double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
 
     // Assume operations already processed were already sorted
@@ -197,20 +202,23 @@ void Renderer::RenderUpTo(double maxPriority) {
         m_renderOpsProcessedCount++;
     }
 
-    // Format debug messages and enter them into renderstring list
-    int dbg_x = 325;
-    int dbg_y = 160;
-    for (auto it = m_debugMessages.begin(); it != m_debugMessages.end(); it++)
+    if (maxPriority >= DBL_MAX)
     {
-        std::wstring dbg = *it;
-        RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
-        dbg_y += 20;
-        if (dbg_y > 560) {
-            dbg_y = 160;
-            dbg_x += 190;
+        // Format debug messages and enter them into renderstring list
+        int dbg_x = 325;
+        int dbg_y = 160;
+        for (auto it = m_debugMessages.begin(); it != m_debugMessages.end(); it++)
+        {
+            std::wstring dbg = *it;
+            RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
+            dbg_y += 20;
+            if (dbg_y > 560) {
+                dbg_y = 160;
+                dbg_x += 190;
+            }
         }
+        this->m_debugMessages.clear();
     }
-    this->m_debugMessages.clear();
 }
 
 // CLEAR ALL
@@ -245,6 +253,7 @@ void Renderer::DebugRelativeRect(int x, int y, int w, int h, DWORD color) {
 void Renderer::StartFrameRender()
 {
     m_curCamIdx = 0;
+    m_InFrameRender = true;
 }
 
 void Renderer::StartCameraRender(int idx)
@@ -278,6 +287,7 @@ void Renderer::EndFrameRender()
     m_currentRenderOps.swap(nonExpiredOps);
     m_renderOpsProcessedCount = 0;
     m_renderOpsSortedCount = m_currentRenderOps.size();
+    m_InFrameRender = false;
 }
 
 

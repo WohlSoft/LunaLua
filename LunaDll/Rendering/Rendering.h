@@ -50,6 +50,7 @@ private:
 
     // Members //
 private:
+    bool m_InFrameRender;
     int m_curCamIdx; // Camera state
     
     std::size_t m_renderOpsSortedCount;

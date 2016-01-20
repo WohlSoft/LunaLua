@@ -4,7 +4,7 @@
 //#include "Defines.h"
 #include "../Rendering.h"
 
-static const double RENDEROP_PRIORITY_MIN = 0.5;
+static const double RENDEROP_PRIORITY_MIN = -100.5;
 static const double RENDEROP_PRIORITY_MAX = 3.5;
 static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP = 1.0; // Default priority for RenderOp and RenderImage
 static const double RENDEROP_DEFAULT_PRIORITY_CGFX = 2.0; // Default priority for Custom GFX

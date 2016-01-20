@@ -409,6 +409,29 @@ void TrySkipPatch()
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
     PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
+    // Level rendering layering hooks
+    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderUpToHook<-100>()).Apply();
+    PATCH(0x910433).NOP().NOP().CALL(GetRenderUpToHook<-95>()).Apply();
+    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderUpToHook<-90>()).Apply();
+    PATCH(0x911F19).NOP().NOP().CALL(GetRenderUpToHook<-85>()).Apply();
+    PATCH(0x912748).NOP().NOP().CALL(GetRenderUpToHook<-80>()).Apply();
+    PATCH(0x915316).NOP().NOP().CALL(GetRenderUpToHook<-75>()).Apply();
+    PATCH(0x91D422).NOP().NOP().CALL(GetRenderUpToHook<-70>()).Apply();
+    PATCH(0x91DD90).NOP().NOP().CALL(GetRenderUpToHook<-65>()).Apply();
+    PATCH(0x91E1F2).NOP().NOP().CALL(GetRenderUpToHook<-60>()).Apply();
+    PATCH(0x91F802).NOP().NOP().CALL(GetRenderUpToHook<-55>()).Apply();
+    PATCH(0x920040).NOP().NOP().CALL(GetRenderUpToHook<-50>()).Apply();
+    PATCH(0x922D00).NOP().NOP().CALL(GetRenderUpToHook<-45>()).Apply();
+    PATCH(0x923786).NOP().NOP().CALL(GetRenderUpToHook<-40>()).Apply();
+    PATCH(0x927F21).NOP().NOP().CALL(GetRenderUpToHook<-35>()).Apply();
+    PATCH(0x928EA5).NOP().NOP().CALL(GetRenderUpToHook<-30>()).Apply();
+    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderUpToHook<-25>()).Apply();
+    PATCH(0x929F81).NOP().NOP().CALL(GetRenderUpToHook<-20>()).Apply();
+    PATCH(0x92B428).NOP().NOP().CALL(GetRenderUpToHook<-15>()).Apply();
+    PATCH(0x92BAC0).NOP().NOP().CALL(GetRenderUpToHook<-10>()).Apply();
+    PATCH(0x92BF96).NOP().NOP().CALL(GetRenderUpToHook<-5>()).Apply();
+    PATCH(0x939977).NOP().NOP().CALL(GetRenderUpToHook<100>()).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
