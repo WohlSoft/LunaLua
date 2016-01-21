@@ -31,11 +31,12 @@ std::array<HardcodedGraphicsItem, 51> HardcodedGraphics =
     HardcodedGraphicsItem(26, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      27, 2, 2),  // 26 (array)
     HardcodedGraphicsItem(27, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 2, 2),  // 27 (array)
     HardcodedGraphicsItem(28, HardcodedGraphicsItem::HITEMSTATE_INVALID),               // 28 "Menu"
-    HardcodedGraphicsItem(29, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 1, 4),  // 29 (array)
+    HardcodedGraphicsItem(29, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 1, 3),  // 29 (array)
     HardcodedGraphicsItem(30, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      29, 1, 4),  // 30 (array)
     HardcodedGraphicsItem(31, HardcodedGraphicsItem::HITEMSTATE_INVALID),               // 31 "Interface"
-    HardcodedGraphicsItem(32, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 1, 8),  // 32 (array)
-    HardcodedGraphicsItem(33, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      32, 1, 8),  // 33 (array)
+    HardcodedGraphicsItem(32, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 8,   // 32 (array) NOTE: It has not a mask at array-index 4
+        [](HardcodedGraphicsItem* obj, int arrayIndex) { return obj->minItem <= arrayIndex && obj->maxItem >= arrayIndex && arrayIndex != 4; } ),  
+    HardcodedGraphicsItem(33, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      32, 0, 8),  // 33 (array)
     HardcodedGraphicsItem(34, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      37, 0, 2),  // 34 (array)
     HardcodedGraphicsItem(35, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 1, 2),  // 35 (array)
     HardcodedGraphicsItem(36, HardcodedGraphicsItem::HITEMSTATE_ARRAY,      35, 1, 2),  // 36 (array)
@@ -56,10 +57,13 @@ std::array<HardcodedGraphicsItem, 51> HardcodedGraphics =
     HardcodedGraphicsItem(51, HardcodedGraphicsItem::HITEMSTATE_ARRAY_MASK, -1, 0, 9)   // 51 (array)
 };
 
+#include <iostream>
 bool HardcodedGraphicsItem::getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC)
 {
+    *colorHDC = nullptr;
+    *maskHDC = nullptr;
     HardcodedGraphicsItem* hItemInfoMask = nullptr;
-    if (hasMask())
+    if (hasMask(arrayIndex))
         hItemInfoMask = &HardcodedGraphicsItem::Get(maskIndex);
 
     // 3. Getting the HDC
@@ -90,7 +94,7 @@ bool HardcodedGraphicsItem::getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC)
     if (isArray()) {
         auto getPictureBoxArray = (HRESULT(__stdcall *)(void*, int32_t, void**)) *(void**)(*(int32_t*)hardcodedImageObject + 0x40);
         getPictureBoxArray(hardcodedImageObject, arrayIndex, &pictureBox);
-        if (hasMask()) {
+        if (hasMask(arrayIndex)) {
             getPictureBoxArray(hardcodedImageObjectMask, arrayIndex, &pictureBoxMask);
         }
     }
@@ -101,17 +105,19 @@ bool HardcodedGraphicsItem::getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC)
 
     // 3.4 Now finally get the HDC
     auto _IPictureBox_getHDC = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)pictureBox + 0xE0);
-    _IPictureBox_getHDC(pictureBox, colorHDC);
-    if (hasMask())
+    if(pictureBox != nullptr)
+        _IPictureBox_getHDC(pictureBox, colorHDC);
+    if (pictureBoxMask != nullptr && hasMask())
         _IPictureBox_getHDC(pictureBoxMask, maskHDC);
     return true;
 }
 
 HardcodedGraphicsItem* HardcodedGraphicsItem::getMaskObj()
 {
-    if (!isMask())
+    HardcodedGraphicsItem* possibleMaskObj = &Get(maskIndex);
+    if (!possibleMaskObj->isMask())
         return nullptr;
-    return &Get(maskIndex);
+    return possibleMaskObj;
 }
 
 HardcodedGraphicsItem& HardcodedGraphicsItem::Get(int index)

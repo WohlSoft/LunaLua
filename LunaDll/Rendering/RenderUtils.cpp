@@ -93,21 +93,24 @@ bool SaveMaskedHDCToFile(const std::wstring& fName, HDC hdc, HDC mhdc)
     GetObject(hbmp, sizeof(BITMAP), &bmp);
 
     // Simple masking algorithm... not perfect but eh... for my purpose it's good enough
-    HBITMAP mhbmp = CopyBitmapFromHdc(mhdc);
-    if (mhbmp != nullptr) {
-        BITMAP mbmp;
-        GetObject(mhbmp, sizeof(BITMAP), &mbmp);
-        if (mbmp.bmHeight == bmp.bmHeight && mbmp.bmWidth == bmp.bmWidth) {
-            uint32_t pixelCount = bmp.bmWidth * bmp.bmHeight;
-            for (uint32_t idx = 0; idx < pixelCount; idx++) {
-                if ((((uint32_t*)mbmp.bmBits)[idx] & 0x00FFFFFF) != 0x00000000)
-                {
-                    ((uint32_t*)bmp.bmBits)[idx] = 0x00000000;
+    if (mhdc != nullptr) {
+        HBITMAP mhbmp = CopyBitmapFromHdc(mhdc);
+        if (mhbmp != nullptr) {
+            BITMAP mbmp;
+            GetObject(mhbmp, sizeof(BITMAP), &mbmp);
+            if (mbmp.bmHeight == bmp.bmHeight && mbmp.bmWidth == bmp.bmWidth) {
+                uint32_t pixelCount = bmp.bmWidth * bmp.bmHeight;
+                for (uint32_t idx = 0; idx < pixelCount; idx++) {
+                    if ((((uint32_t*)mbmp.bmBits)[idx] & 0x00FFFFFF) != 0x00000000)
+                    {
+                        ((uint32_t*)bmp.bmBits)[idx] = 0x00000000;
+                    }
                 }
             }
         }
+        DeleteObject(mhbmp);
     }
-
+    
     // Flip vertically
     uint32_t* tmpRow = new uint32_t[bmp.bmWidth];
     for (int y = 0; y < bmp.bmHeight / 2; y++)
@@ -123,7 +126,6 @@ bool SaveMaskedHDCToFile(const std::wstring& fName, HDC hdc, HDC mhdc)
     imgFile.saveFile(WStr2Str(fName));
 
     if (hbmp != nullptr) DeleteObject(hbmp);
-    if (mhbmp != nullptr) DeleteObject(mhbmp);
-
+    
     return true;
 }

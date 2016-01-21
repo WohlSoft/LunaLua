@@ -8,7 +8,8 @@
 #include <vector>
 #include <utility>
 #include <array>
-
+#include <iostream>
+#include <functional>
 
 /*
     This struct describes internal information about a hardcoded graphic in GM_FORM_GFX
@@ -24,11 +25,12 @@ public:
         HITEMSTATE_INVALID          // Other form elements which are not a VB6 Picture Box
     };
 
-    int index;                          // The own index value
-    HardcodedGraphicsItemState state;   // The type/state of the graphic/form
-    int maskIndex;                      // The mask of that image. If no mask, then the value is -1
-    int minItem;                        // The min value of the array (lower bound). -1 if none
-    int maxItem;                        // The max value of the array (upper bound). -1 if none
+    int index;                              // The own index value
+    HardcodedGraphicsItemState state;       // The type/state of the graphic/form
+    int maskIndex;                          // The mask of that image. If no mask, then the value is -1
+    int minItem;                            // The min value of the array (lower bound). -1 if none
+    int maxItem;                            // The max value of the array (upper bound). -1 if none
+    std::function<bool(HardcodedGraphicsItem*, int)> isValidArrayItem;  // Alternative function
     
     // Constructor for constructing normal or invalid items
     HardcodedGraphicsItem(int indexParam, HardcodedGraphicsItemState stateParam) : 
@@ -38,15 +40,33 @@ public:
         HardcodedGraphicsItem(indexParam, stateParam, maskIndexParam, -1, -1) {}
     // Constructor for constructing array items with and without mask
     HardcodedGraphicsItem(int indexParam, HardcodedGraphicsItemState stateParam, int maskIndexParam, int minItemParam, int maxItemParam) :
-        index(indexParam), 
-        state(stateParam), 
-        maskIndex(maskIndexParam), 
-        minItem(minItemParam), 
-        maxItem(maxItemParam)  {}
+        HardcodedGraphicsItem(indexParam, stateParam, maskIndexParam, minItemParam, maxItemParam, nullptr) {}
+
+    HardcodedGraphicsItem(int indexParam, HardcodedGraphicsItemState stateParam, int maskIndexParam, int minItemParam, int maxItemParam, std::function<bool(HardcodedGraphicsItem*, int)> isValidArrayItemParam) :
+        index(indexParam),
+        state(stateParam),
+        maskIndex(maskIndexParam),
+        minItem(minItemParam),
+        maxItem(maxItemParam),
+        isValidArrayItem(isValidArrayItemParam) {}
 
     inline bool isMask() { return state == HITEMSTATE_ARRAY_MASK || state == HITEMSTATE_NORMAL_MASK; }
     inline bool hasMask() { return maskIndex != -1; }
+    inline bool hasMask(int arrayIndex) {
+        if (maskIndex == -1)
+            return false;
+        if (isArray())
+            return getMaskObj()->isValidArrayIndex(arrayIndex);
+        else
+            return hasMask();
+    }
     inline bool isArray() { return state == HITEMSTATE_ARRAY || state == HITEMSTATE_ARRAY_MASK; }
+    inline bool isValidArrayIndex(int arrayIndex) 
+    {
+        if (isValidArrayItem)
+            return isValidArrayItem(this, arrayIndex);
+        return minItem <= arrayIndex && maxItem >= arrayIndex;
+    }
     
     bool getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC);
     HardcodedGraphicsItem* getMaskObj();
