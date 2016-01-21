@@ -381,11 +381,29 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
     gLunaRender.GLCmd(obj);
 }
 
-void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageResource* img, float r, float g, float b, float a, unsigned int vert, unsigned int tex, unsigned int color, unsigned int count)
+void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_State* L)
 {
-    const BMPBox* bmp = NULL;
-    if (img && img->img && img->img->ImageLoaded()) {
-        bmp = img->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
+    double priority;
+    const LuaProxy::Graphics::LuaImageResource* texture;
+    float r, g, b, a;
+    unsigned int rawVer, rawTex, rawCol, rawCnt;
+    unsigned int primitive;
+
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, texture, nullptr);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawVer, (unsigned int)nullptr);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawTex, (unsigned int)nullptr);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawCol, (unsigned int)nullptr);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawCnt, 0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, r, 1.0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, g, 1.0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, b, 1.0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, a, 1.0);
+
+    const BMPBox* bmp = nullptr;
+    if (texture && texture->img && texture->img->ImageLoaded()) {
+        bmp = texture->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
     }
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
@@ -394,12 +412,12 @@ void LuaProxy::Graphics::__glInternalDraw(double renderPriority, const LuaImageR
     obj->mColor[1] = g;
     obj->mColor[2] = b;
     obj->mColor[3] = a;
-    obj->mType = GL_TRIANGLES;
-    obj->mVert = (const float*)vert;
-    obj->mTex = (const float*)tex;
-    obj->mVertColor = (const float*)color;
-    obj->mCount = count;
-    gLunaRender.GLCmd(obj, renderPriority);
+    obj->mType = primitive;
+    obj->mVert = (const float*)rawVer;
+    obj->mTex = (const float*)rawTex;
+    obj->mVertColor = (const float*)rawCol;
+    obj->mCount = rawCnt;
+    gLunaRender.GLCmd(obj, priority);
 }
 
 static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)

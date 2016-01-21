@@ -114,7 +114,13 @@ local function initFFIBasedAPIs()
         return math.floor((#arr + len_offset) / divisor)
     end
     
-    
+    Graphics.GL_POINTS         = 0
+    Graphics.GL_LINES          = 1
+    Graphics.GL_LINE_LOOP      = 2
+    Graphics.GL_LINE_STRIP     = 3
+    Graphics.GL_TRIANGLES      = 4
+    Graphics.GL_TRIANGLE_STRIP = 5
+    Graphics.GL_TRIANGLE_FAN   = 6
     Graphics.glDraw = function(args)
         local priority = args['priority'] or 1.0
         local texture = args['texture']
@@ -146,10 +152,10 @@ local function initFFIBasedAPIs()
         texCoords = convertGlArray(texCoords, arr_len*2)
         vertColor = convertGlArray(vertColor, arr_len*4)
     
-        Graphics.__glInternalDraw(
-            priority, texture,
-            color[1], color[2], color[3], color[4],
-            vertCoords, texCoords, vertColor, arr_len)
+        Graphics.__glInternalDraw{
+            priority=priority, primitive=args['primitive'], texture=texture,
+            r=color[1], g=color[2], b=color[3], a=color[4],
+            rawVer=vertCoords, rawTex=texCoords, rawCol=vertColor, rawCnt=arr_len}
     end
 
     -- This function creates the "virtual" attributes for the sprite table.
