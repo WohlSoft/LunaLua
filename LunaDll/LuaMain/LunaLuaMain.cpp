@@ -143,7 +143,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Load the Lua API
     bool errLapi = false;
-    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "mainV2.lua")  || lua_pcall(L, 0, LUA_MULTRET, 0);
+    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=mainV2.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
     if(!(lapierrcode == 0)){
         object error_msg(from_stack(L, -1));
         MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
