@@ -54,10 +54,10 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
         [x1, y1, x2, y2](unsigned short i){
             ::Block *block = ::Block::Get(i + 1);
             if (block == NULL) return false;
-            if (x2 <= block->mometum.x) return false;
-            if (y2 <= block->mometum.y) return false;
-            if (block->mometum.x + block->mometum.width <= x1) return false;
-            if (block->mometum.y + block->mometum.height <= y1) return false;
+            if (x2 <= block->momentum.x) return false;
+            if (y2 <= block->momentum.y) return false;
+            if (block->momentum.x + block->momentum.width <= x1) return false;
+            if (block->momentum.y + block->momentum.height <= y1) return false;
             return true;
         }, L);
 }
@@ -84,10 +84,10 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
 
     nativeAddr->BlockType = blockid;
     nativeAddr->BlockType2 = blockid;
-    nativeAddr->mometum.x = x;
-    nativeAddr->mometum.y = y;
-    nativeAddr->mometum.width = blockdef_width[blockid];
-    nativeAddr->mometum.height = blockdef_height[blockid];
+    nativeAddr->momentum.x = x;
+    nativeAddr->momentum.y = y;
+    nativeAddr->momentum.width = blockdef_width[blockid];
+    nativeAddr->momentum.height = blockdef_height[blockid];
     nativeAddr->IsInvisible2 = COMBOOL(false);
     nativeAddr->IsInvisible3 = COMBOOL(false);
     nativeAddr->pLayerName = "Default";
@@ -122,84 +122,84 @@ double LuaProxy::Block::x() const
 {
 	if(!isValid())
 		return 0;
-    return ::Blocks::Get(m_index)->mometum.x;
+    return ::Blocks::Get(m_index)->momentum.x;
 }
 
 void LuaProxy::Block::setX(double x)
 {
 	if(!isValid())
 		return;
-    ::Blocks::Get(m_index)->mometum.x = x;
+    ::Blocks::Get(m_index)->momentum.x = x;
 }
 
 double LuaProxy::Block::y() const
 {
 	if(!isValid())
 		return 0;
-    return ::Blocks::Get(m_index)->mometum.y;
+    return ::Blocks::Get(m_index)->momentum.y;
 }
 
 double LuaProxy::Block::width() const
 {
     if (!isValid())
         return 0;
-    return ::Blocks::Get(m_index)->mometum.width;
+    return ::Blocks::Get(m_index)->momentum.width;
 }
 
 void LuaProxy::Block::setWidth(double width)
 {
     if (!isValid())
         return;
-    ::Blocks::Get(m_index)->mometum.width = width;
+    ::Blocks::Get(m_index)->momentum.width = width;
 }
 
 double LuaProxy::Block::height() const
 {
     if (!isValid())
         return 0;
-    return ::Blocks::Get(m_index)->mometum.height;
+    return ::Blocks::Get(m_index)->momentum.height;
 }
 
 void LuaProxy::Block::setHeight(double height)
 {
     if (!isValid())
         return;
-    ::Blocks::Get(m_index)->mometum.height = height;
+    ::Blocks::Get(m_index)->momentum.height = height;
 }
 
 void LuaProxy::Block::setY(double y)
 {
 	if(!isValid())
 		return;
-    ::Blocks::Get(m_index)->mometum.y = y;
+    ::Blocks::Get(m_index)->momentum.y = y;
 }
 
 double LuaProxy::Block::speedX() const
 {
 	if(!isValid())
 		return 0;
-    return ::Blocks::Get(m_index)->mometum.speedX;
+    return ::Blocks::Get(m_index)->momentum.speedX;
 }
 
 void LuaProxy::Block::setSpeedX(double speedX)
 {
 	if(!isValid())
 		return;
-    ::Blocks::Get(m_index)->mometum.speedX = speedX;
+    ::Blocks::Get(m_index)->momentum.speedX = speedX;
 }
 
 double LuaProxy::Block::speedY() const
 {
 	if(!isValid())
 		return 0;
-    return ::Blocks::Get(m_index)->mometum.speedY;
+    return ::Blocks::Get(m_index)->momentum.speedY;
 }
 
 void LuaProxy::Block::setSpeedY(double speedY)
 {
 	if(!isValid())
 		return;
-    ::Blocks::Get(m_index)->mometum.speedY = speedY;
+    ::Blocks::Get(m_index)->momentum.speedY = speedY;
 }
 
 short LuaProxy::Block::id() const
@@ -282,10 +282,10 @@ int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
     double playerX2 = tarPlayer->momentum.x + tarPlayer->momentum.width + 0.20;
     double playerY2 = tarPlayer->momentum.y + tarPlayer->momentum.height + 0.20;
 
-    if (playerX > tarBlock->mometum.x + tarBlock->mometum.width ||
-        playerX2 < tarBlock->mometum.x ||
-        playerY > tarBlock->mometum.y + tarBlock->mometum.height ||
-        playerY2 < tarBlock->mometum.y)
+    if (playerX > tarBlock->momentum.x + tarBlock->momentum.width ||
+        playerX2 < tarBlock->momentum.x ||
+        playerY > tarBlock->momentum.y + tarBlock->momentum.height ||
+        playerY2 < tarBlock->momentum.y)
 		return 0;
 
 	return ::Blocks::TestCollision(tarPlayer, tarBlock);

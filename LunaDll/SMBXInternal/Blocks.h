@@ -25,7 +25,7 @@ struct Block : SMBX_FullBaseItemArray<Block, 638, GM_BLOCK_COUNT_CONSTPTR, GM_BL
     short               IsHidden;                           // 0x1C
     short               BlockType;                          // 0x1E
 
-    Momentum            mometum;                            // 0x20
+    Momentum            momentum;                           // 0x20
 
     short               ContentsID;                         // 0x50
     short               BeingHitStatus1;                    // 0x52

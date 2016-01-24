@@ -324,7 +324,7 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 		if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 			Block* block = (Block*)cellobj.pObj;
 			if(!block->IsInvisible3 && !block->IsHidden) {
-                collide = me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height);
+                collide = me->m_Hitbox.Test((int)block->momentum.x, (int)block->momentum.y, (int)block->momentum.width, (int)block->momentum.height);
 				if(collide) {
 					collide_list.push_back(cellobj);
 				}
@@ -343,7 +343,7 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
 				if(!block->IsInvisible3 && !block->IsHidden
-                    && me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height)) {
+                    && me->m_Hitbox.Test((int)block->momentum.x, (int)block->momentum.y, (int)block->momentum.width, (int)block->momentum.height)) {
 					double sprite_bot = me->m_Hitbox.CalcBottom();
 					double sprite_right = me->m_Hitbox.CalcRight();
 					double sprite_top = me->m_Hitbox.CalcTop();
@@ -365,37 +365,37 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 					}
 
 					if(me->m_CollisionCode == -1) { // default solid collision
-                        double block_topcol = abs(block->mometum.y - sprite_bot);
-                        double block_botcol = abs((block->mometum.y + block->mometum.height) - sprite_top);
-                        double block_leftcol = abs(block->mometum.x - sprite_right);
-                        double block_rightcol = abs((block->mometum.x + block->mometum.width) - sprite_left);
+                        double block_topcol = abs(block->momentum.y - sprite_bot);
+                        double block_botcol = abs((block->momentum.y + block->momentum.height) - sprite_top);
+                        double block_leftcol = abs(block->momentum.x - sprite_right);
+                        double block_rightcol = abs((block->momentum.x + block->momentum.width) - sprite_left);
 
 						// Determine best direction to free sprite
 						// Top collision, push sprite up and out
 						if(block_topcol <= block_botcol && block_topcol <= block_leftcol && 
 							block_topcol <= block_rightcol && !collided_top) {
-                            me->m_Ypos = (block->mometum.y - me->m_Hitbox.H) - 1;
+                            me->m_Ypos = (block->momentum.y - me->m_Hitbox.H) - 1;
 							me->m_Yspd = -(me->m_Yspd * energy_loss_mod);
 							collided_top = true;
 						} 
 
 						// Bot collision, push sprite down
 						else if(block_botcol <= block_leftcol && block_botcol <= block_rightcol && !collided_right) {							
-                            me->m_Ypos = ((block->mometum.y + block->mometum.height) - me->m_Hitbox.Top_off) + 1;
+                            me->m_Ypos = ((block->momentum.y + block->momentum.height) - me->m_Hitbox.Top_off) + 1;
 							me->m_Yspd = -(me->m_Yspd * energy_loss_mod);							
 							collided_bot = true;
 						}
 
 						// Left collision, push sprite left
 						else if(block_leftcol <= block_rightcol && !collided_left) {							
-                            me->m_Xpos = (block->mometum.x - me->m_Hitbox.W) - 1;
+                            me->m_Xpos = (block->momentum.x - me->m_Hitbox.W) - 1;
 							me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
 							collided_left = true;
 						}
 
 						// Right collision, push sprite right
 						else if(!collided_right){							
-                            me->m_Xpos = ((block->mometum.x + block->mometum.width) - me->m_Hitbox.Left_off) + 1;
+                            me->m_Xpos = ((block->momentum.x + block->momentum.width) - me->m_Hitbox.Left_off) + 1;
 							me->m_Xspd = -(me->m_Xspd  * energy_loss_mod);
 							collided_right = true;
 						}
@@ -423,7 +423,7 @@ void SpriteFunc::CrashMove(CSprite* me, SpriteComponent* obj) {
 			if(cellobj.Type == CLOBJ_SMBXBLOCK) {
 				Block* block = (Block*)cellobj.pObj;
 				if(!block->IsInvisible3 && !block->IsHidden
-                    && me->m_Hitbox.Test((int)block->mometum.x, (int)block->mometum.y, (int)block->mometum.width, (int)block->mometum.height)) {
+                    && me->m_Hitbox.Test((int)block->momentum.x, (int)block->momentum.y, (int)block->momentum.width, (int)block->momentum.height)) {
 						me->Die();
 				}
 			}

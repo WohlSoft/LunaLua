@@ -23,10 +23,10 @@ bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {
 		if(blocks[i].BlockType == type) {
 			block = &blocks[i];
 
-			if(playerX > block->mometum.x + block->mometum.width ||
-				playerX2 < block->mometum.x  ||
-				playerY > block->mometum.y + block->mometum.height ||
-				playerY2 < block->mometum.y)
+			if(playerX > block->momentum.x + block->momentum.width ||
+				playerX2 < block->momentum.x  ||
+				playerY > block->momentum.y + block->momentum.height ||
+				playerY2 < block->momentum.y)
 				continue;
 
 			if(TestCollision(demo, block) == sought)
@@ -46,7 +46,7 @@ void Blocks::DoSortingIfRequired()
     native_sortX((short*)&beginIndex, (short*)&blockCount);
 
     for (WORD i = 2; i <= blockCount; i++) {
-        if (Blocks::Get(i)->mometum.x > Blocks::Get(i - 1)->mometum.x) {
+        if (Blocks::Get(i)->momentum.x > Blocks::Get(i - 1)->momentum.x) {
             WORD prev = i - 1;
             native_sortY((short*)&i, (short*)&prev);
         }
@@ -67,7 +67,7 @@ void Blocks::SetNextFrameSorting()
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
 	typedef int __stdcall colfunc(void*, void*);
 	colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
-	return f(&pMobPOS->momentum.x, &pBlockPOS->mometum.x);
+	return f(&pMobPOS->momentum.x, &pBlockPOS->momentum.x);
 }
 
 // SET ALL

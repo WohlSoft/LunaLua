@@ -634,7 +634,7 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 //      Arg3 = short* The Object Index
 #define GF_NPC_COLLIDES     0x00A281B0
 
-//      Arg1 = Mometum* The location for the bomb explosion
+//      Arg1 = Momentum* The location for the bomb explosion
 //      Arg2 = short* Bomb explosion type
 //      Arg3 = short* Player index
 #define GF_DO_BOMB          0x00A3BA90

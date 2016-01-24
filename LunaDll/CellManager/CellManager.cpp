@@ -113,7 +113,7 @@ void CellManager::ScanLevel(bool update_blocks) {
 		int ct = Blocks::Count();
 		for(int i = 0; i <  ct; i++) {
 			cur_block = Blocks::Get(i);
-            if (cur_block != NULL && demo && demo->CurrentSection + 1 == ComputeLevelSection((int)cur_block->mometum.x, (int)cur_block->mometum.y))
+            if (cur_block != NULL && demo && demo->CurrentSection + 1 == ComputeLevelSection((int)cur_block->momentum.x, (int)cur_block->momentum.y))
 				AddObj((void*)cur_block, CLOBJ_SMBXBLOCK);
 		}
 	}
@@ -124,13 +124,13 @@ void CellManager::AddObj(void* pObj, CELL_OBJ_TYPE type) {
 	switch(type) {
 	case CLOBJ_SMBXBLOCK:{
 		Block* cur_block = (Block*)pObj;		
-		double block_x = cur_block->mometum.x;
-        double block_y = cur_block->mometum.y;
-        double block_xMax = block_x + cur_block->mometum.width;					// Rightmost block point
-        double block_yMax = block_y + cur_block->mometum.height;					// Bottommost block point
-        double snapped_x = SnapToGrid(cur_block->mometum.x, DEF_CELL_W);
+		double block_x = cur_block->momentum.x;
+        double block_y = cur_block->momentum.y;
+        double block_xMax = block_x + cur_block->momentum.width;					// Rightmost block point
+        double block_yMax = block_y + cur_block->momentum.height;					// Bottommost block point
+        double snapped_x = SnapToGrid(cur_block->momentum.x, DEF_CELL_W);
 		double original_snapped_x = snapped_x;
-        double snapped_y = SnapToGrid(cur_block->mometum.y, DEF_CELL_H);
+        double snapped_y = SnapToGrid(cur_block->momentum.y, DEF_CELL_H);
 
 		// Check if block spans multiple cells
 		int cells_occupied_x = 1;
@@ -271,8 +271,8 @@ void CellManager::SortByNearest(std::list<CellObj>* objlist, double cx, double c
 		switch(obj.Type) {
 		case CLOBJ_SMBXBLOCK: {
 			Block* block = (Block*)obj.pObj;
-            double block_cx = (block->mometum.x + (block->mometum.width / 2));
-            double block_cy = (block->mometum.y + (block->mometum.height / 2));
+            double block_cx = (block->momentum.x + (block->momentum.width / 2));
+            double block_cy = (block->momentum.y + (block->momentum.height / 2));
 			double x_dist = cx - block_cx;
 			double y_dist = cy - block_cy;
 			double sqrd_dist = abs((x_dist * x_dist) + (y_dist * y_dist));
