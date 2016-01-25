@@ -167,89 +167,89 @@ luabind::object LuaProxy::Graphics::getPixelData(const LuaImageResource& img, in
 }
 
 
-void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
+void LuaProxy::Graphics::drawImage(const LuaImageResource& img, double xPos, double yPos, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, false, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L)
+void LuaProxy::Graphics::drawImage(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, false, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L)
+void LuaProxy::Graphics::drawImage(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, false, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImage(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L)
+void LuaProxy::Graphics::drawImage(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, false, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, int xPos, int yPos, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, double yPos, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, false, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, int xPos, int yPos, float opacity, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, false, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, false, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, false, priority, L);
 }
 
 
 
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, lua_State* L)
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, true, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, float opacity, lua_State* L)
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, true, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, lua_State* L)
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, true, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, lua_State* L)
+void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, true, RENDEROP_DEFAULT_PRIORITY_RENDEROP, L);
 }
 
-void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, 1.0f, true, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, float opacity, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, opacity, true, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, 1.0f, true, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L)
 {
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, true, priority, L);
 }
 
-void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos, int yPos, int sourceX, int sourceY, int sourceWidth, int sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L)
+void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L)
 {
     if (priority < RENDEROP_PRIORITY_MIN || priority > RENDEROP_PRIORITY_MAX) {
         luaL_error(L, "Priority value is not valid (must be between %f and %f, got %f).", RENDEROP_PRIORITY_MIN, RENDEROP_PRIORITY_MAX, priority);
@@ -260,10 +260,10 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, int xPos,
     renderOp->direct_img = img.img;
     renderOp->x = xPos;
     renderOp->y = yPos;
-    renderOp->sx = (sourceX <= 0 ? 0 : sourceX);
-    renderOp->sy = (sourceY <= 0 ? 0 : sourceY);
-    renderOp->sw = (sourceWidth <= 0 ? img.img->m_W : sourceWidth);
-    renderOp->sh = (sourceHeight <= 0 ? img.img->m_H : sourceHeight);
+    renderOp->sx = (sourceX <= 0.0 ? 0.0 : sourceX);
+    renderOp->sy = (sourceY <= 0.0 ? 0.0 : sourceY);
+    renderOp->sw = (sourceWidth <= 0.0 ? static_cast<double>(img.img->m_W) : sourceWidth);
+    renderOp->sh = (sourceHeight <= 0.0 ? static_cast<double>(img.img->m_H) : sourceHeight);
     renderOp->opacity = opacity;
     renderOp->sceneCoords = sceneCoords;
     renderOp->m_renderPriority = priority; 
@@ -280,7 +280,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     }
     
 
-    int x, y;
+    double x, y;
     RENDER_TYPE type;
     double priority;
     RenderOp* renderOperation;
@@ -314,10 +314,10 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         priority = RENDEROP_DEFAULT_PRIORITY_RENDEROP;
         
         LuaImageResource* image;
-        unsigned int sourceX;
-        unsigned int sourceY;
-        unsigned int sourceWidth;
-        unsigned int sourceHeight;
+        double sourceX;
+        double sourceY;
+        double sourceWidth;
+        double sourceHeight;
         float opacity;
         
         LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
@@ -327,10 +327,10 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
             return;
         }
 
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, image->img->m_W);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, image->img->m_H);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0.0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0.0);
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, static_cast<double>(image->img->m_W));
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, static_cast<double>(image->img->m_H));
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
         
         RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();

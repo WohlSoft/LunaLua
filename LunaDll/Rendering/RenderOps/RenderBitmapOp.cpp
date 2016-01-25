@@ -42,8 +42,8 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     if (g_GLEngine.IsEnabled())
     {
         g_GLEngine.DrawLunaSprite(
-            (int)x, (int)y, (int)sw, (int)sh,
-            *(direct_img.get()), (int)sx, (int)sy, (int)sw, (int)sh, opacity);
+            (int)round(x), (int)round(y), (int)round(sw), (int)round(sh),
+            *(direct_img.get()), (int)round(sx), (int)round(sy), (int)round(sw), (int)round(sh), opacity);
     }
     else
     {
@@ -52,7 +52,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         bf.BlendFlags = 0;
         bf.SourceConstantAlpha = (int)roundf(255 * opacity);
         bf.AlphaFormat = AC_SRC_ALPHA;
-        AlphaBlend(renderer->GetScreenDC(), (int)x, (int)y, (int)sw, (int)sh,
-            direct_img->m_hdc, (int)sx, (int)sy, (int)sw, (int)sh, bf);
+        AlphaBlend(renderer->GetScreenDC(), (int)round(x), (int)round(y), (int)round(sw), (int)round(sh),
+            direct_img->m_hdc, (int)round(sx), (int)round(sy), (int)round(sw), (int)round(sh), bf);
     }
 }
