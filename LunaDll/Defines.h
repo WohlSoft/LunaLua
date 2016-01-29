@@ -213,6 +213,16 @@ DEFMEM(GM_STR_NULL,         VB6StrPtr, 0x00423D00);
 DEFMEM(GM_STR_MSGBOX,       VB6StrPtr, 0x00B250E4);
 DEFMEM(GM_STR_CHECKPOINT,   VB6StrPtr, 0x00B250B0);     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
 
+DEFMEM(GM_IS_EDITOR_TESTING_NON_FULLSCREEN, WORD, 0x00B250B4);
+DEFMEM(GM_UNK_IS_CONNECTED, WORD,  0x00B253C4);
+DEFMEM(GM_CAMERA_CONTROL,   WORD,  0x00B25130);
+DEFMEM(GM_CLEAR_LEVEL_CHECKPOINT, WORD, 0x00B2C59C);
+DEFMEM(GM_UNK_B2B9E4,       WORD,  0x00B2B9E4);
+DEFMEM(GM_UNK_B2C5A0,       WORD,  0x00B2C5A0);
+DEFMEM(GM_UNK_B2C6DA,       WORD,  0x00B2C6DA);
+DEFMEM(GM_UNK_B2C8E4,       WORD,  0x00B2C8E4);
+DEFMEM(GM_UNK_B2D742,       WORD,  0x00B2D742);
+
 // NPC Settings
 DEFMEM(GM_CONF_WIDTH,       WORD*, 0x00B25BA8);
 DEFMEM(GM_CONF_HEIGHT,      WORD*, 0x00B25BC4);
@@ -720,6 +730,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 #define GF_RENDER_LEVEL     0x00909290
 #define GF_UPDATE_BLOCK_ANIM 0x009E14B0
 
+#define GF_CLEANUP_LEVEL    0x008DC6E0
+#define GF_LOAD_LEVEL       0x008D8F40
+#define GF_INIT_CAMERA      0x009502E0
+#define GF_RENDER_INIT_SCREEN 0x00987DE0
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -788,6 +803,11 @@ static const auto native_updateInput    = (void(__stdcall *)(void))GF_UPDATE_INP
 static const auto native_renderWorld    = (void(__stdcall *)(void))GF_RENDER_WORLD;
 static const auto native_renderLevel    = (void(__stdcall *)(void))GF_RENDER_LEVEL;
 static const auto native_updateBlockAnim = (void(__stdcall *)(void))GF_UPDATE_BLOCK_ANIM;
+
+static const auto native_cleanupLevel   = (void(__stdcall *)(void))GF_CLEANUP_LEVEL;
+static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_LEVEL;
+static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
+static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 
 /*
 Function name                                

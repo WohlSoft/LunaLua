@@ -969,6 +969,9 @@
     <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp">
       <Filter>SMBXInternal</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\TestMode.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

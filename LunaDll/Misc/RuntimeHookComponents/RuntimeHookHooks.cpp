@@ -516,17 +516,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 extern void __stdcall checkLevelShutdown()
 {
     if (GM_EPISODE_MODE || GM_LEVEL_MODE){
-        if (gLunaLua.isValid()){
-            std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExitLevel", false);
-            shutdownEvent->setDirectEventName("onExitLevel");
-            shutdownEvent->setLoopable(false);
-            gLunaLua.callEvent(shutdownEvent);
-            gLunaLua.shutdown();
-
-            //Clean & stop all user started sounds and musics
-            PGE_MusPlayer::MUS_stopMusic();
-            PGE_Sounds::clearSoundBuffer();
-        }
+        gLunaLua.exitLevel();
     }
 
     __asm{

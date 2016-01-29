@@ -46,6 +46,22 @@ CLunaLua::~CLunaLua()
     shutdown();
 }
 
+void CLunaLua::exitLevel()
+{
+    if (isValid())
+    {
+        std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExitLevel", false);
+        shutdownEvent->setDirectEventName("onExitLevel");
+        shutdownEvent->setLoopable(false);
+        callEvent(shutdownEvent);
+        shutdown();
+
+        //Clean & stop all user started sounds and musics
+        PGE_MusPlayer::MUS_stopMusic();
+        PGE_Sounds::clearSoundBuffer();
+    }
+}
+
 bool CLunaLua::shutdown()
 {
     //Shutdown the lua module if possible

@@ -37,6 +37,8 @@ public:
     void init(LuaLunaType type, std::wstring codePath, std::wstring levelPath = std::wstring());
     //Does the event queue
     void doEvents();
+    // Exit level
+    void exitLevel();
     //Shutdown lua module
     bool shutdown();
     //If the lua module is valid
