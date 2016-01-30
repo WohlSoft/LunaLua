@@ -112,6 +112,6 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 
 void ErrorReport::report()
 {
-    manageErrorReport("http://engine.wohlnet.ru/LunaLuaErrorReport/index.php", lastErrDesc);
+    manageErrorReport("http://wohlsoft.ru/LunaLuaErrorReport/index.php", lastErrDesc);
     writeErrorLog(lastErrDesc);
 }
