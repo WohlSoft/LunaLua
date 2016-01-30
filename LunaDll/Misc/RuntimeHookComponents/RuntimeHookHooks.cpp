@@ -27,6 +27,7 @@
 #include "../../SMBXInternal/NPCs.h"
 
 #include "../PerfTracker.h"
+#include "../TestMode.h"
 
 
 // Simple init hook to run the main LunaDLL initialization

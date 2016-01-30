@@ -507,6 +507,7 @@
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\TestMode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
