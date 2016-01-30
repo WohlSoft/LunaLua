@@ -99,6 +99,50 @@ std::vector<std::string> splitCmdArgs( std::string str)
 	return args;
 }
 
+
+std::vector<std::wstring> splitCmdArgsW(std::wstring str)
+{
+    std::vector<std::wstring> args;
+    std::wstring arg;
+    arg.clear();
+    bool quote_opened = false;
+    for (unsigned int i = 0; i<str.size(); i++)
+    {
+        if (quote_opened)
+            goto qstr;
+        if (str[i] == L' ')
+        {
+            if (!arg.empty())
+                args.push_back(arg);
+            arg.clear();
+            continue;
+        }
+        if (str[i] == L'\"')
+        {
+            quote_opened = true;
+            continue;
+        }
+        arg.push_back(str[i]);
+        continue;
+
+    qstr:
+        if (str[i] == L'\"')
+        {
+            if (!arg.empty())
+                args.push_back(arg);
+            arg.clear();
+            quote_opened = false;
+            continue;
+        }
+        arg.push_back(str[i]);
+    }
+
+    if (!arg.empty())
+        args.push_back(arg);
+
+    return args;
+}
+
 /*!
  * \brief Returns size of UTF-8 string
  * \param s Input string
@@ -380,7 +424,7 @@ std::string url_encode(const std::string &value)
     return escaped.str();
 }
 
-bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
+bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find)
 {
 	for(int i = 0; i < (int)vecStr.size(); ++i){
 		if(vecStr[i] == find)
@@ -388,7 +432,6 @@ bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find)
 	}
 	return false;
 }
-
 
 HMODULE getModule(std::string moduleName)
 {

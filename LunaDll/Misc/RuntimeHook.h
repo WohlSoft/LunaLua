@@ -24,7 +24,7 @@ extern bool episodeStarted;
 /* Runtime Patch Main Functions                                         */
 /************************************************************************/
 void SetupThunRTMainHook();
-void ParseArgs(const std::vector<std::string>& args);
+void ParseArgs(const std::vector<std::wstring>& args);
 void TrySkipPatch();
 
 /************************************************************************/

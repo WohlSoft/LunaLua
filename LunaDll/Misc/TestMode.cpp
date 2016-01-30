@@ -1,7 +1,9 @@
 #include <string>
 #include "../Defines.h"
 #include "../Globals.h"
+#include "../GlobalFuncs.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "MiscFuncs.h"
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
 
@@ -69,8 +71,24 @@ static void TestModeInitSettings()
     }
 }
 
-void TestModeLoadLevel(std::wstring fullPath)
+bool TestModeLoadLevel(const std::wstring& path)
 {
+    // Get the full path if necessary
+    std::wstring fullPath;
+    if (isAbsolutePath(path)) {
+        fullPath = path;
+    }
+    else
+    {
+        fullPath = getModulePath() + L"\\worlds\\" + path;
+    }
+
+    // Check that the file exists
+    if (FileExists(fullPath.c_str()) == 0)
+    {
+        return false;
+    }
+
     // Start by stopping any Lua things
     gLunaLua.exitLevel();
 
@@ -95,4 +113,6 @@ void TestModeLoadLevel(std::wstring fullPath)
 	
 	// Run this after? Double check that... Some code doesn't run this right after, but some does...
     native_initLevelEnv();
+
+    return true;
 }

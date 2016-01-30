@@ -12,6 +12,7 @@ void splitStr(std::vector<std::string>& dest, const std::string& str, const char
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
 void RemoveSubStr(std::string& sInput, const std::string& sub);
 std::vector<std::string> splitCmdArgs( std::string str);
+std::vector<std::wstring> splitCmdArgsW(std::wstring str);
 
 //Compatibility macroses left just in case
 #define utf8_encode(wstr) WStr2Str(wstr)
@@ -63,7 +64,7 @@ void CleanUp();
 /// HELPER FUNCTIONS ///
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);
-bool vecStrFind(const std::vector<std::string>& vecStr, const std::string& find);
+bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
 std::string url_encode(const std::string &value);
 // Module Helper Funcs
 HMODULE getModule(std::string moduleName);

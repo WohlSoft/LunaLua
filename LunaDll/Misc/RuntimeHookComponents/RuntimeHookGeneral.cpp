@@ -90,37 +90,49 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
 
-void ParseArgs(const std::vector<std::string>& args)
+void ParseArgs(const std::vector<std::wstring>& args)
 {
-    if (vecStrFind(args, std::string("--patch")))
+
+    if (vecStrFind(args, L"--patch"))
         gStartupSettings.patch = true;
 
-    if (vecStrFind(args, std::string("--game")))
+    if (vecStrFind(args, L"--game"))
         gStartupSettings.game = true;
 
-    if (vecStrFind(args, std::string("--leveleditor")))
+    if (vecStrFind(args, L"--leveleditor"))
         gStartupSettings.lvlEditor = true;
 
-    if (vecStrFind(args, std::string("--noframeskip")))
+    if (vecStrFind(args, L"--noframeskip"))
         gStartupSettings.frameskip = false;
 
-    if (vecStrFind(args, std::string("--nosound")))
+    if (vecStrFind(args, L"--nosound"))
         gStartupSettings.noSound = true;
 
-    if (vecStrFind(args, std::string("--debugger")))
+    if (vecStrFind(args, L"--debugger"))
         gStartupSettings.debugger = true;
 
-    if (vecStrFind(args, std::string("--logger")))
+    if (vecStrFind(args, L"--logger"))
         gStartupSettings.logger = true;
 
-    if (vecStrFind(args, std::string("--newlauncher")))
+    if (vecStrFind(args, L"--newlauncher"))
         gStartupSettings.newLauncher = true;
 
-    if (vecStrFind(args, std::string("--console")))
+    if (vecStrFind(args, L"--console"))
         gStartupSettings.console = true;
 
-    if (vecStrFind(args, std::string("--nogl")))
+    if (vecStrFind(args, L"--nogl"))
         gStartupSettings.noGL = true;
+
+    for (int i = 0; i < args.size(); i++)
+    {
+        const std::wstring& arg = args[i];
+        if (arg.find(L"--testLevel=") == 0)
+        {
+            gStartupSettings.testLevel = arg.substr(12);
+            gStartupSettings.patch = true;
+            break;
+        }
+    }
 }
 
 static unsigned int __stdcall LatePatch(void)
@@ -152,7 +164,7 @@ static unsigned int __stdcall LatePatch(void)
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
-    ParseArgs(splitCmdArgs(std::string(GetCommandLineA())));
+    ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
 
     if (gStartupSettings.patch){
         PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
