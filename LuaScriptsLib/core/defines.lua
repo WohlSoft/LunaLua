@@ -23,9 +23,9 @@ local function getKeyOfValue(theTable, theValue)
 end
 
 local function writeBytes(addr, data)
-	for idx,val in ipairs(data) do
-		mem(addr+idx-1, FIELD_BYTE, val)
-	end
+    for idx,val in ipairs(data) do
+        mem(addr+idx-1, FIELD_BYTE, val)
+    end
 end
 
 local sortedCategories = {
@@ -268,7 +268,7 @@ local defines = {
                                         n = 3, group = "Kill Modification", desc = "The npc id for Link's tertiary coin when killing an enemy. (chance 40:3). (Default would be the red rupee.)"},
 
     --[[ P-Switch Settings ]]--
-	--
+    --
     pswitch_music                   = {defValue = true, minVal = nil, maxVal = nil, address = nil, size = FIELD_BOOLEAN,
                                         n = 1, group = "P-Switch Settings", desc = "If P-Switch music is enabled.", 
                                         customFuncGet = function(self)
@@ -277,32 +277,32 @@ local defines = {
                                         customFuncSet = function(self, value)
                                             if(value)then
                                                 writeBytes(0x9E330B, {0xE8, 0x90, 0xEE, 0x07, 0x00})
-												writeBytes(0x9E3317, {0x50})
-												writeBytes(0x9E331C, {0xE8, 0x1F, 0xE8, 0x07, 0x00})
-												writeBytes(0x9E336B, {0xE8, 0x30, 0xEE, 0x07, 0x00})
-												writeBytes(0x9E3396, {0x50})
-												writeBytes(0x9E3397, {0xE8, 0xA4, 0xE7, 0x07, 0x00})
-												
-												writeBytes(0xA747DD, {0x75, 0x68})
-												writeBytes(0xA61DBE, {0x0F, 0x85, 0x61, 0x03, 0x00, 0x00})
-												writeBytes(0x8E65F0, {0x7E, 0x59})
-												writeBytes(0x8E5628, {0x7E, 0x59})
-												writeBytes(0x8CA4B9, {0x0F, 0x8E, 0x49, 0x01, 0x00, 0x00})
-												writeBytes(0x8CA52B, {0x0F, 0x8E, 0xD7, 0x00, 0x00, 0x00})
+                                                writeBytes(0x9E3317, {0x50})
+                                                writeBytes(0x9E331C, {0xE8, 0x1F, 0xE8, 0x07, 0x00})
+                                                writeBytes(0x9E336B, {0xE8, 0x30, 0xEE, 0x07, 0x00})
+                                                writeBytes(0x9E3396, {0x50})
+                                                writeBytes(0x9E3397, {0xE8, 0xA4, 0xE7, 0x07, 0x00})
+                                                
+                                                writeBytes(0xA747DD, {0x75, 0x68})
+                                                writeBytes(0xA61DBE, {0x0F, 0x85, 0x61, 0x03, 0x00, 0x00})
+                                                writeBytes(0x8E65F0, {0x7E, 0x59})
+                                                writeBytes(0x8E5628, {0x7E, 0x59})
+                                                writeBytes(0x8CA4B9, {0x0F, 0x8E, 0x49, 0x01, 0x00, 0x00})
+                                                writeBytes(0x8CA52B, {0x0F, 0x8E, 0xD7, 0x00, 0x00, 0x00})
                                             else
                                                 writeBytes(0x9E330B, {0x0F, 0x1F, 0x44, 0x00, 0x00})
-												writeBytes(0x9E3317, {0x90})
-												writeBytes(0x9E331C, {0x0F, 0x1F, 0x44, 0x00, 0x00})
-												writeBytes(0x9E336B, {0x0F, 0x1F, 0x44, 0x00, 0x00})
-												writeBytes(0x9E3396, {0x90})
-												writeBytes(0x9E3397, {0x0F, 0x1F, 0x44, 0x00, 0x00})
-												
-												writeBytes(0xA747DD, {0x90, 0x90})
-												writeBytes(0xA61DBE, {0x90, 0x90, 0x90, 0x90, 0x90, 0x90})
-												writeBytes(0x8E65F0, {0xEB, 0x59})
-												writeBytes(0x8E5628, {0xEB, 0x59})
-												writeBytes(0x8CA4B9, {0xE9, 0x4A, 0x01, 0x00, 0x00, 0x90})
-												writeBytes(0x8CA52B, {0xE9, 0xD8, 0x00, 0x00, 0x00, 0x90})
+                                                writeBytes(0x9E3317, {0x90})
+                                                writeBytes(0x9E331C, {0x0F, 0x1F, 0x44, 0x00, 0x00})
+                                                writeBytes(0x9E336B, {0x0F, 0x1F, 0x44, 0x00, 0x00})
+                                                writeBytes(0x9E3396, {0x90})
+                                                writeBytes(0x9E3397, {0x0F, 0x1F, 0x44, 0x00, 0x00})
+                                                
+                                                writeBytes(0xA747DD, {0x90, 0x90})
+                                                writeBytes(0xA61DBE, {0x90, 0x90, 0x90, 0x90, 0x90, 0x90})
+                                                writeBytes(0x8E65F0, {0xEB, 0x59})
+                                                writeBytes(0x8E5628, {0xEB, 0x59})
+                                                writeBytes(0x8CA4B9, {0xE9, 0x4A, 0x01, 0x00, 0x00, 0x90})
+                                                writeBytes(0x8CA52B, {0xE9, 0xD8, 0x00, 0x00, 0x00, 0x90})
                                             end
                                         end},
 }
