@@ -342,6 +342,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         bitmapRenderOp->x = x;
         bitmapRenderOp->y = y;
         bitmapRenderOp->sceneCoords = isSceneCoordinates;
+        bitmapRenderOp->opacity = opacity;
         renderOperation = bitmapRenderOp;
     }
     else
