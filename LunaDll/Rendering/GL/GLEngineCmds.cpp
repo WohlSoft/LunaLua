@@ -74,6 +74,8 @@ void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
+    if (!g_GLContextManager.IsInitialized()) return;
+
     const GLDraw::Texture* tex = NULL;
     if (mBmp) {
         tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
@@ -95,6 +97,8 @@ void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
 }
 
 void GLEngineCmd_Draw2DArray::run(GLEngine& glEngine) const {
+    if (!g_GLContextManager.IsInitialized()) return;
+
     // Convert texel coordinates to what we need for our power-of-two padded textures
     bool texIsPadded = (g_GLDraw.mLastPwScale != 1.0f) || (g_GLDraw.mLastPhScale != 1.0f);
     if (texIsPadded) {
@@ -121,6 +125,8 @@ void GLEngineCmd_Draw2DArray::run(GLEngine& glEngine) const {
 
 
 void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
+    if (!g_GLContextManager.IsInitialized()) return;
+
     const GLDraw::Texture* tex = NULL;
     if (mBmp) {
         tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
