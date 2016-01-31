@@ -15,6 +15,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../GlobalFuncs.h"
 #include "GL/GLEngine.h"
+#include "BitBltEmulation.h"
 
 using namespace std;
 
@@ -169,6 +170,9 @@ void Renderer::RenderBelowPriority(double maxPriority) {
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;
 
+    // Flush pending BltBlt
+    g_BitBltEmulation.flushPendingBlt();
+
     // Assume operations already processed were already sorted
     if (m_renderOpsSortedCount == 0)
     {
@@ -270,7 +274,7 @@ void Renderer::StartCameraRender(int idx)
 
 void Renderer::EndFrameRender()
 {
-    if (m_curCamIdx == 0) return;
+    if (!m_InFrameRender) return;
 
     m_curCamIdx = 0;
 
