@@ -1,15 +1,165 @@
+#include <Windows.h>
 #include <string>
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "../SMBXInternal/Sound.h"
+#include "../Rendering/Rendering.h"
+#include "../Rendering/RenderOps/RenderStringOp.h"
+#include "../Rendering/RenderOps/RenderRectOp.h"
 #include "MiscFuncs.h"
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
+#include "TestMode.h"
 
-static void TestModeInitSettings()
+enum PAUSE_MENU_OPTIONS {
+    PAUSE_MENU_CONTINUE = 0,
+    PAUSE_MENU_RESTART = 1,
+    PAUSE_MENU_QUIT = 2,
+
+    PAUSE_MENU_OPTION_MIN = PAUSE_MENU_CONTINUE,
+    PAUSE_MENU_OPTION_MAX = PAUSE_MENU_QUIT,
+};
+
+static const wchar_t* pauseMenuOptionStrings[] = {
+    L"Continue",
+    L"Restart Level",
+    L"Quit",
+};
+
+static void testModePauseMenu(bool allowContinue)
 {
-    GM_STR_CHECKPOINT = ""; // Optionally?
+    KeyMap lastKeymap = Player::Get(1)->keymap;
+    int topOption = allowContinue ? PAUSE_MENU_CONTINUE : PAUSE_MENU_RESTART;
+    int selectedOption = topOption;
+    float menuX = 200.0f;
+    float menuY = 200.0f;
+    float menuW = 400.0f;
+    float menuH = 200.0f;
+    float lineSpacing = 20.0f;
+    float charWidth = 20.0f;
+
+    // Pause Sound
+    SMBXSound::PlaySFX(30);
+
+    while(true)
+    {
+        // Read input...
+        native_updateInput();
+
+        KeyMap keymap = Player::Get(1)->keymap;
+        if ((keymap.jumpKeyState && !lastKeymap.jumpKeyState) || (GetKeyState(VK_RETURN) & 0x1000))
+        {
+            break;
+        }
+        if (keymap.downKeyState && !lastKeymap.downKeyState)
+        {
+            selectedOption++;
+            if (selectedOption > PAUSE_MENU_OPTION_MAX)
+            {
+                selectedOption = topOption;
+            }
+            SMBXSound::PlaySFX(71);
+        }
+        if (keymap.upKeyState && !lastKeymap.upKeyState)
+        {
+            selectedOption--;
+            if (selectedOption < topOption)
+            {
+                selectedOption = PAUSE_MENU_OPTION_MAX;
+            }
+            SMBXSound::PlaySFX(71);
+        }
+        lastKeymap = keymap;
+
+        RenderRectOp* rect = new RenderRectOp();
+        rect->x1 = menuX - 5;
+        rect->y1 = menuY - 5;
+        rect->x2 = menuX + menuW + 5;
+        rect->y2 = menuY + menuH + 5;
+        rect->fillColor = RenderOpColor(0.0f, 0.0f, 0.0f, 0.7f);
+        rect->borderColor = RenderOpColor(0.5f, 0.0f, 0.0f, 1.0f);
+        gLunaRender.AddOp(rect);
+
+
+        gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
+        for (int displayOption = topOption; displayOption <= PAUSE_MENU_OPTION_MAX; displayOption++)
+        {
+            float yIdx = menuY + lineSpacing*(displayOption - topOption + 1.5f);
+            gLunaRender.AddOp(new RenderStringOp(pauseMenuOptionStrings[displayOption], 4, menuX + charWidth, yIdx));
+            if (selectedOption == displayOption) {
+                gLunaRender.AddOp(new RenderStringOp(L">", 4, menuX, yIdx));
+            }
+        }
+
+        // Render the world
+        native_updateBlockAnim();
+        native_renderLevel();
+    
+        // Audio management...
+        native_audioManagement();
+
+        // Wait for next frame
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingMaxFPSHookQPC();
+        }
+        else {
+            FrameTimingMaxFPSHook();
+        }
+
+        native_updateInput();
+        MSG msg;
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        native_updateInput();
+    }
+
+    if (selectedOption == PAUSE_MENU_QUIT)
+    {
+        _exit(0);
+    }
+    else if (selectedOption == PAUSE_MENU_RESTART)
+    {
+        // Consider a sound shorter than the unpause one?
+        //SMBXSound::PlaySFX(30);
+
+        // Re-load the level
+        testModeLoadLevel(GM_FULLPATH);
+    }
+    else
+    {
+        // Pause Sound
+        SMBXSound::PlaySFX(30);
+
+        // TODO: Somehow prevent jump when unpausing
+    }
+}
+
+// 008CA487 | E8 34 B0 01 00 | call <smbx.GF_MSGBOX>
+// 008CA597 | E8 24 AF 01 00 | call <smbx.GF_MSGBOX>
+// TODO: Figure out if 0x8CA597 is the right only place, or if others should be patched
+static void __stdcall pauseTestModeHook(short* pPlayer);
+static AsmPatch<5U> pauseOverridePatch = PATCH(0x8CA597).CALL(pauseTestModeHook);
+static void __stdcall pauseTestModeHook(short* pPlayer)
+{
+    testModePauseMenu(true);
+}
+
+// 008C23C6 | E8 B5 53 0F 00 | call <smbx.doPlayerDeadCode>
+static void __stdcall playerDeathTestModeHook(void);
+static AsmPatch<5U> playerDeathOverridePatch = PATCH(0x8C23C6).CALL(playerDeathTestModeHook);
+static void __stdcall playerDeathTestModeHook(void)
+{
+    testModePauseMenu(false);
+}
+
+static void testModeInitSettings()
+{
+    // Later on, remove this, once some control of things is set up
+    GM_STR_CHECKPOINT = "";
 
     // No message box or pause menu open
     GM_STR_MSGBOX = "";
@@ -71,7 +221,7 @@ static void TestModeInitSettings()
     }
 }
 
-bool TestModeLoadLevel(const std::wstring& path)
+bool testModeLoadLevel(const std::wstring& path)
 {
     // Get the full path if necessary
     std::wstring fullPath;
@@ -89,6 +239,9 @@ bool TestModeLoadLevel(const std::wstring& path)
         return false;
     }
 
+    pauseOverridePatch.Unapply();
+    playerDeathOverridePatch.Unapply();
+    
     // Start by stopping any Lua things
     gLunaLua.exitLevel();
 
@@ -99,7 +252,7 @@ bool TestModeLoadLevel(const std::wstring& path)
     native_cleanupLevel();
 	
     // Set our test mode settings
-    TestModeInitSettings();
+    testModeInitSettings();
 	
     // TODO: Consider setting episode settings?
 
@@ -113,6 +266,9 @@ bool TestModeLoadLevel(const std::wstring& path)
 	
 	// Run this after? Double check that... Some code doesn't run this right after, but some does...
     native_initLevelEnv();
+
+    playerDeathOverridePatch.Apply();
+    pauseOverridePatch.Apply();
 
     return true;
 }

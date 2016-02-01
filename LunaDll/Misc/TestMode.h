@@ -3,6 +3,6 @@
 
 #include <string>
 
-bool TestModeLoadLevel(const std::wstring& path);
+bool testModeLoadLevel(const std::wstring& path);
 
 #endif

@@ -167,7 +167,7 @@ extern int __stdcall LoadIntro()
     // Special Load
     if (gStartupSettings.testLevel.length() > 0)
     {
-        TestModeLoadLevel(gStartupSettings.testLevel);
+        testModeLoadLevel(gStartupSettings.testLevel);
     }
     else
     {
