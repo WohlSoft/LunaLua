@@ -33,7 +33,6 @@ struct Renderer {
     
     void DebugPrint(std::wstring message);				// Print a debug message on the screen
     void DebugPrint(std::wstring message, double val);	// Print a debug message on the screen and display a related value
-    void DebugRelativeRect(int x, int y, int w, int h, DWORD color);	// Draw a rectangle on screen somewhere (level coordinates)
 
     void RenderBelowPriority(double maxPriority);
 

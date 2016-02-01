@@ -244,21 +244,6 @@ void Renderer::DebugPrint(std::wstring message, double val) {
     this->m_debugMessages.push_back(message + L" " + to_wstring((long long)val));
 }
 
-// DEBUG RELATIVE RECT
-void Renderer::DebugRelativeRect(int x, int y, int w, int h, DWORD color) {
-    RenderRectOp* p_Op = new RenderRectOp;
-    double camtop;
-    double camleft;
-    Render::CalcCameraPos(&camleft, &camtop);
-    p_Op->color = color;
-    p_Op->m_FramesLeft = 1;
-    p_Op->x1 = x - camleft;
-    p_Op->y1 = y - camtop;
-    p_Op->x2 = (x + w) - camleft;
-    p_Op->y2 = (y + h) - camtop;
-    AddOp(p_Op);
-}
-
 void Renderer::StartFrameRender()
 {
     m_curCamIdx = 0;

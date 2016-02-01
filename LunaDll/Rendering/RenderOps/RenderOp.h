@@ -10,6 +10,16 @@ static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP = 1.0; // Default priorit
 static const double RENDEROP_DEFAULT_PRIORITY_CGFX = 2.0; // Default priority for Custom GFX
 static const double RENDEROP_DEFAULT_PRIORITY_TEXT = 3.0; // Default priority for Text
 
+
+struct RenderOpColor {
+    float r;
+    float g;
+    float b;
+    float a;
+
+    inline RenderOpColor(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {};
+};
+
 // Base class respresenting a rendering operation
 // Rendering operations include a draw function and a count of how many frames of activity remain
 class RenderOp {

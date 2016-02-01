@@ -1,7 +1,8 @@
 #include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
-//#include <windows.h>
+#include <Windows.h>
+#include <GdiPlus.h>
 #include "Main.h"
 #include "Globals.h"
 #include "GlobalFuncs.h"
@@ -83,6 +84,11 @@ void LunaDLLInit()
     DWORD curProcessor = GetCurrentProcessorNumberXP();
     SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+
+    // Initialize GDI+ so we can make use of it
+    ULONG_PTR m_gdiplusToken;   // class member
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
 }
 
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)
