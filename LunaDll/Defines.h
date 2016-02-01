@@ -734,6 +734,8 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 #define GF_LOAD_LEVEL       0x008D8F40
 #define GF_INIT_CAMERA      0x009502E0
 #define GF_RENDER_INIT_SCREEN 0x00987DE0
+#define GF_AUDIO_MANAGEMENT 0x00A74460
+//0x008E6F70
 
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
@@ -808,6 +810,7 @@ static const auto native_cleanupLevel   = (void(__stdcall *)(void))GF_CLEANUP_LE
 static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_LEVEL;
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
+static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
 
 /*
 Function name                                

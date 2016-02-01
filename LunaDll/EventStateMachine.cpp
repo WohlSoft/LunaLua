@@ -164,6 +164,9 @@ void EventStateMachine::runPause(void) {
             native_renderLevel();
         }
 
+        // Audio management...
+        native_audioManagement();
+
         ProcessWindowsMessageQueue();
 
         if (gIsWindowsVistaOrNewer) {
