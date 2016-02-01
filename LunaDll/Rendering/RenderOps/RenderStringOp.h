@@ -25,9 +25,10 @@ public:
     virtual void Draw(Renderer* renderer) 
     {
         VB6StrPtr text(m_String);
+        float x = m_X, y = m_Y;
         if (sceneCoords)
-            SMBX_CameraInfo::transformSceneToScreen(renderer->GetCameraIdx(), m_X, m_Y);
-        native_print(&text, &m_FontType, &m_X, &m_Y);
+            SMBX_CameraInfo::transformSceneToScreen(renderer->GetCameraIdx(), x, y);
+        native_print(&text, &m_FontType, &x, &y);
     }
 
     std::wstring m_String;
