@@ -152,6 +152,14 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
 
+    // If we're using line primatives, apply a 0.5 offset to center in pixel
+    bool isLineDrawing = (mType == GL_LINE_LOOP) || (mType == GL_LINE_STRIP) || (mType == GL_LINES);
+    if (isLineDrawing) {
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glTranslatef(0.5f, 0.5f, 0.0f);
+    }
+
     glVertexPointer(2, GL_FLOAT, 0, mVert);
     GLERRORCHECK();
 
@@ -182,7 +190,13 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
 
+    if (isLineDrawing) {
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+    }
+
     if ((mTex != NULL) && texIsPadded) {
+        glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         GLERRORCHECK();
