@@ -1,4 +1,12 @@
 EXPORTS
+MIX_ADLMIDI_getScaleMod
+MIX_ADLMIDI_getTremolo
+MIX_ADLMIDI_getVibrato
+MIX_ADLMIDI_setBankID
+MIX_ADLMIDI_setScaleMod
+MIX_ADLMIDI_setTremolo
+MIX_ADLMIDI_setVibrato
+MIX_SetMidiDevice
 MIX_Timidity_addToPathList
 Mix_AllocateChannels
 Mix_ChannelFinished
