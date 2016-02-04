@@ -148,27 +148,9 @@ static void testModePauseMenu(bool allowContinue)
     }
 }
 
-// 008CA487 | E8 34 B0 01 00 | call <smbx.GF_MSGBOX>
-// 008CA597 | E8 24 AF 01 00 | call <smbx.GF_MSGBOX>
-// TODO: Figure out if 0x8CA597 is the right only place, or if others should be patched
-static void __stdcall pauseTestModeHook(short* pPlayer);
-static AsmPatch<5U> pauseOverridePatch = PATCH(0x8CA597).CALL(pauseTestModeHook);
-static void __stdcall pauseTestModeHook(short* pPlayer)
-{
-    testModePauseMenu(true);
-}
-
-// 008C23C6 | E8 B5 53 0F 00 | call <smbx.doPlayerDeadCode>
-static void __stdcall playerDeathTestModeHook(void);
-static AsmPatch<5U> playerDeathOverridePatch = PATCH(0x8C23C6).CALL(playerDeathTestModeHook);
-static void __stdcall playerDeathTestModeHook(void)
-{
-    testModePauseMenu(false);
-}
-
-//////////////////////////////////////////////
-//================ OLD CODE ================//
-//////////////////////////////////////////////
+/////////////////////////////////////////////
+//============ GAME MODE sETUP ============//
+/////////////////////////////////////////////
 
 static void initTestModePlayerSettings(void)
 {
@@ -270,10 +252,6 @@ static bool testModeLoadLevel(const std::wstring& path)
     GM_EPISODE_MODE = -1;
     GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
 
-    // Make sure test mode patches are enabled
-    playerDeathOverridePatch.Apply();
-    pauseOverridePatch.Apply();
-
     return true;
 }
 
@@ -315,10 +293,34 @@ static __declspec(naked) void __stdcall smbxChangeModeHookRaw(void)
 static AsmPatch<10U> smbxChangeModePatch =
     PATCH(0x8BF4E3)
     .CALL(smbxChangeModeHookRaw)
-    .NOP().NOP().NOP().NOP().NOP();
+    .NOP_PAD_TO_SIZE<10>();
+
+static AsmPatch<10U> shortenReloadPatch =
+    PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>();
+
+// 008CA487 | E8 34 B0 01 00 | call <smbx.GF_MSGBOX>
+// 008CA597 | E8 24 AF 01 00 | call <smbx.GF_MSGBOX>
+// TODO: Figure out if 0x8CA597 is the right only place, or if others should be patched
+static void __stdcall pauseTestModeHook(short* pPlayer);
+static AsmPatch<5U> pauseOverridePatch = PATCH(0x8CA597).CALL(pauseTestModeHook);
+static void __stdcall pauseTestModeHook(short* pPlayer)
+{
+    testModePauseMenu(true);
+}
+
+// 008C23C6 | E8 B5 53 0F 00 | call <smbx.doPlayerDeadCode>
+static void __stdcall playerDeathTestModeHook(void);
+static AsmPatch<5U> playerDeathOverridePatch = PATCH(0x8C23C6).CALL(playerDeathTestModeHook);
+static void __stdcall playerDeathTestModeHook(void)
+{
+    testModePauseMenu(false);
+}
 
 void testModeEnable(const std::wstring& path)
 {
-    smbxChangeModePatch.Apply();
     testLevelPath = path;
+    smbxChangeModePatch.Apply();
+    shortenReloadPatch.Apply();
+    playerDeathOverridePatch.Apply();
+    pauseOverridePatch.Apply();
 }
