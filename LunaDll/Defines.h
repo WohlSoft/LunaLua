@@ -294,6 +294,9 @@ DEFMEM(GM_FULLPATH,         VB6StrPtr, 0x00B2C618);   // Full path to current .l
 DEFMEM(GM_FULLDIR,          VB6StrPtr, 0x00B2C61C);   // Full path to current world dir
 DEFMEM(GM_CUR_LVL,          WORD,  0x00B2C6D8);
 
+DEFMEM(GM_NEXT_LEVEL_FILENAME, VB6StrPtr, 0x00B25720);
+DEFMEM(GM_NEXT_LEVEL_WARPIDX, WORD, 0x00B2C6DA);
+
 // Section related arrays
 DEFMEM(GM_LVL_BOUNDARIES,   Bounds*, 0x00B257D4);     // 6 doubles each section, L/U/R/D/?/?
 DEFMEM(GM_ORIG_LVL_BOUNDS,  Bounds*, 0x00B2587C);     // Same as above, but always the initial values. Used by events that reset level boundaries.

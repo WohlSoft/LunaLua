@@ -12,6 +12,8 @@
 
 #include "../SHMemServer.h"
 
+#include "../TestMode.h"
+
 #ifndef NO_SDL
 bool episodeStarted = false;
 #endif
@@ -128,7 +130,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
         const std::wstring& arg = args[i];
         if (arg.find(L"--testLevel=") == 0)
         {
-            gStartupSettings.testLevel = arg.substr(12);
+            testModeEnable(arg.substr(12));
             gStartupSettings.patch = true;
             break;
         }

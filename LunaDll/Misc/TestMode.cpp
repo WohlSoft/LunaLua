@@ -13,6 +13,18 @@
 #include "RuntimeHook.h"
 #include "TestMode.h"
 
+/////////////////////////////////////////////
+//================ DEFINES ================//
+/////////////////////////////////////////////
+
+static void testModePauseMenu(bool allowContinue);
+static void initTestModePlayerSettings(void);
+static bool testModeLoadLevel(const std::wstring& path);
+
+////////////////////////////////////////////////
+//================ PAUSE MENU ================//
+////////////////////////////////////////////////
+
 enum PAUSE_MENU_OPTIONS {
     PAUSE_MENU_CONTINUE = 0,
     PAUSE_MENU_RESTART = 1,
@@ -108,13 +120,11 @@ static void testModePauseMenu(bool allowContinue)
             FrameTimingMaxFPSHook();
         }
 
-        native_updateInput();
         MSG msg;
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        native_updateInput();
     }
 
     if (selectedOption == PAUSE_MENU_QUIT)
@@ -156,42 +166,12 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-static void testModeInitSettings()
+//////////////////////////////////////////////
+//================ OLD CODE ================//
+//////////////////////////////////////////////
+
+static void initTestModePlayerSettings(void)
 {
-    // Later on, remove this, once some control of things is set up
-    GM_STR_CHECKPOINT = "";
-
-    // No message box or pause menu open
-    GM_STR_MSGBOX = "";
-    GM_PAUSE_OPEN = 0;
-
-    // Reset winning state
-    GM_WINNING = 0;
-    GM_WINS_T = 0;
-
-    // Reset game mode setttings
-    GM_EPISODE_MODE = 0;
-    GM_LEVEL_MODE = 0;
-    GM_ISLEVELEDITORMODE = 0;
-    GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
-    GM_UNK_IS_CONNECTED = 0;
-    GM_CUR_MENUTYPE = 0;
-    GM_CUR_MENULEVEL = 0;
-    GM_CUR_LVL = 0;
-    GM_UNK_B2B9E4 = 0;
-    GM_UNK_B2C5A0 = 0;
-    GM_UNK_B2C6DA = 0;
-    GM_UNK_B2C8E4 = 0;
-    GM_UNK_B2D742 = 0;
-
-    // Don't use any save slot
-    GM_CUR_SAVE_SLOT = 0;
-
-    // Reset scores/counts/lives
-    GM_STAR_COUNT = 0;
-    GM_COINS = 0;
-    GM_PLAYER_LIVES = 99;
-
     // Reset character templates
     for (int i = 1; i <= 5; i++)
     {
@@ -221,7 +201,7 @@ static void testModeInitSettings()
     }
 }
 
-bool testModeLoadLevel(const std::wstring& path)
+static bool testModeLoadLevel(const std::wstring& path)
 {
     // Get the full path if necessary
     std::wstring fullPath;
@@ -238,9 +218,6 @@ bool testModeLoadLevel(const std::wstring& path)
     {
         return false;
     }
-
-    pauseOverridePatch.Unapply();
-    playerDeathOverridePatch.Unapply();
     
     // Start by stopping any Lua things
     gLunaLua.exitLevel();
@@ -251,24 +228,97 @@ bool testModeLoadLevel(const std::wstring& path)
     // Cleanup custom level resources
     native_cleanupLevel();
 	
-    // Set our test mode settings
-    testModeInitSettings();
-	
-    // TODO: Consider setting episode settings?
+    // Set our player test settings
+    initTestModePlayerSettings();
 
-    // Load the specified level
-	GM_FULLPATH = fullPath;
-	native_loadLevel(GM_FULLPATH_CONSTPTR);
-	
-    // Camera initialization
-    GM_CAMERA_CONTROL = 0; // Maybe? May need to be different for 2p
-    native_initCamera();
-	
-	// Run this after? Double check that... Some code doesn't run this right after, but some does...
-    native_initLevelEnv();
+    // Overwrite episode list data
+    size_t pos = fullPath.find_last_of(L"/\\");
+    GM_EP_LIST_COUNT = 1;
+    EpisodeListItem* ep = EpisodeListItem::GetRaw(0);
+    ep->episodeName = "dummy";
+    ep->episodePath = fullPath.substr(0, pos+1);
+    ep->episodeWorldFile = "";
+    ep->unknown_C = 0;
+    ep->unknown_10 = 0;
+    ep->unknown_14 = "";
 
+    // Select dummy episode entry
+    GM_CUR_MENULEVEL = 1;
+
+    // Write warp destination data
+    GM_NEXT_LEVEL_WARPIDX = 0;
+    GM_NEXT_LEVEL_FILENAME = fullPath.substr(pos+1);
+
+    // Don't use any save slot
+    GM_CUR_SAVE_SLOT = 0;
+
+    // Reset scores/counts/lives
+    GM_STAR_COUNT = 0;
+    GM_COINS = 0;
+    GM_PLAYER_LIVES = 99;
+
+    // Clear some state
+    GM_STR_MSGBOX = "";
+    GM_PAUSE_OPEN = 0;
+    GM_WINNING = 0;
+    GM_WINS_T = 0;
+
+    // Set mode settings
+    GM_ISLEVELEDITORMODE = 0;
+    GM_CREDITS_MODE = 0;
+    GM_LEVEL_MODE = 0; // Intro
+    GM_EPISODE_MODE = -1;
+    GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
+
+    // Make sure test mode patches are enabled
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
 
     return true;
+}
+
+
+//////////////////////////////////////////////
+//================ NEW HOOK ================//
+//////////////////////////////////////////////
+
+// Data
+static std::wstring testLevelPath = L"";
+
+static void smbxChangeModeHook(void)
+{
+    if (GM_ISLEVELEDITORMODE || GM_CREDITS_MODE || GM_LEVEL_MODE ||
+        (GM_EPISODE_MODE && (GM_NEXT_LEVEL_FILENAME.length() == 0)))
+    {
+        testModeLoadLevel(testLevelPath);
+    }
+}
+static __declspec(naked) void __stdcall smbxChangeModeHookRaw(void)
+{
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+    }
+    smbxChangeModeHook();
+    __asm {
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        or ebx, 0xFFFFFFFF
+        cmp word ptr ds : [0xB2C620], bx
+        ret
+    }
+}
+static AsmPatch<10U> smbxChangeModePatch =
+    PATCH(0x8BF4E3)
+    .CALL(smbxChangeModeHookRaw)
+    .NOP().NOP().NOP().NOP().NOP();
+
+void testModeEnable(const std::wstring& path)
+{
+    smbxChangeModePatch.Apply();
+    testLevelPath = path;
 }

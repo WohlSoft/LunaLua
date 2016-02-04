@@ -27,7 +27,6 @@
 #include "../../SMBXInternal/NPCs.h"
 
 #include "../PerfTracker.h"
-#include "../TestMode.h"
 
 
 // Simple init hook to run the main LunaDLL initialization
@@ -164,33 +163,25 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    // Special Load
-    if (gStartupSettings.testLevel.length() > 0)
-    {
-        testModeLoadLevel(gStartupSettings.testLevel);
-    }
-    else
-    {
-        std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+    std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
-        if (file_existsX(autostartFile)) {
-            INIReader autostartConfig(autostartFile);
-            if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
-                if (!gAutostartRan) {
-                    GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-                    autostarter.applyAutostart();
-                    gAutostartRan = true;
-                    if (autostartConfig.GetBoolean("autostart", "transient", false)) {
-                        remove(autostartFile.c_str());
-                    }
+    if (file_existsX(autostartFile)) {
+        INIReader autostartConfig(autostartFile);
+        if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
+            if (!gAutostartRan) {
+                GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                autostarter.applyAutostart();
+                gAutostartRan = true;
+                if (autostartConfig.GetBoolean("autostart", "transient", false)) {
+                    remove(autostartFile.c_str());
                 }
             }
         }
+    }
 
-        if (GameAutostartConfig::nextAutostartConfig) {
-            GameAutostartConfig::nextAutostartConfig->doAutostart();
-            GameAutostartConfig::nextAutostartConfig.reset();
-        }
+    if (GameAutostartConfig::nextAutostartConfig) {
+        GameAutostartConfig::nextAutostartConfig->doAutostart();
+        GameAutostartConfig::nextAutostartConfig.reset();
     }
 
 
