@@ -64,26 +64,101 @@ static STestModeSettings testModeSettings;
 //================ PAUSE MENU ================//
 ////////////////////////////////////////////////
 
-enum PAUSE_MENU_OPTIONS {
-    PAUSE_MENU_CONTINUE = 0,
-    PAUSE_MENU_RESTART = 1,
-    PAUSE_MENU_QUIT = 2,
-
-    PAUSE_MENU_OPTION_MIN = PAUSE_MENU_CONTINUE,
-    PAUSE_MENU_OPTION_MAX = PAUSE_MENU_QUIT,
+class MenuItem
+{
+public:
+    MenuItem() {};
+    virtual ~MenuItem() {};
+    virtual void Render(float x, float y, bool selected) = 0;
+    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) = 0;
+};
+class TextMenuItem : public virtual MenuItem
+{
+public:
+    TextMenuItem() {};
+    virtual ~TextMenuItem() {};
+    virtual std::wstring GetText() = 0;
+    virtual void Render(float x, float y, bool selected)
+    {
+        if (selected) {
+            gLunaRender.AddOp(new RenderStringOp(L">", 4, x, y));
+        }
+        gLunaRender.AddOp(new RenderStringOp(GetText(), 4, x + 20, y));
+    }
+};
+class RunnableMenuItem : public virtual MenuItem
+{
+public:
+    RunnableMenuItem() {};
+    virtual ~RunnableMenuItem() {};
+    virtual bool Run() = 0;
+    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap)
+    {
+        if ((keymap.jumpKeyState && !lastKeymap.jumpKeyState) || (GetKeyState(VK_RETURN) & 0x1000))
+        {
+            return Run();
+        }
+        return false;
+    }
 };
 
-static const wchar_t* pauseMenuOptionStrings[] = {
-    L"Continue",
-    L"Restart Level",
-    L"Quit",
+class MenuItemContinue : public TextMenuItem, public RunnableMenuItem
+{
+public:
+    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
+    virtual std::wstring GetText() { return L"Continue"; };
+    virtual bool Run() {
+        // Pause Sound
+        SMBXSound::PlaySFX(30);
+        return true;
+    };
+    static MenuItemContinue inst;
 };
+class MenuItemRestartLevel : public TextMenuItem, public RunnableMenuItem
+{
+public:
+    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
+    virtual std::wstring GetText() { return L"Restart Level"; };
+    virtual bool Run() {
+        // Restart Level
+        testModeRestartLevel();
+        return true;
+    };
+    static MenuItemRestartLevel inst;
+};
+class MenuItemQuit : public TextMenuItem, public RunnableMenuItem
+{
+public:
+    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
+    virtual std::wstring GetText() { return L"Quit"; };
+    virtual bool Run() {
+        // Exit
+        // TODO: If launched by something with IPC (PGE Editor) hide window instead of exit
+        _exit(0);
+        return true;
+    };
+    static MenuItemQuit inst;
+};
+MenuItemContinue MenuItemContinue::inst;
+MenuItemRestartLevel MenuItemRestartLevel::inst;
+MenuItemQuit MenuItemQuit::inst;
 
 static void testModePauseMenu(bool allowContinue)
 {
     KeyMap lastKeymap = Player::Get(1)->keymap;
-    int topOption = allowContinue ? PAUSE_MENU_CONTINUE : PAUSE_MENU_RESTART;
-    int selectedOption = topOption;
+    
+    unsigned int selectedOption = 0;
+    std::vector<MenuItem*> menuItems;
+    if (allowContinue)
+    {
+        menuItems.push_back(&MenuItemContinue::inst);
+    }
+    menuItems.push_back(&MenuItemRestartLevel::inst);
+    menuItems.push_back(&MenuItemQuit::inst);
+
     float menuX = 200.0f;
     float menuY = 200.0f;
     float menuW = 400.0f;
@@ -100,25 +175,28 @@ static void testModePauseMenu(bool allowContinue)
         native_updateInput();
 
         KeyMap keymap = Player::Get(1)->keymap;
-        if ((keymap.jumpKeyState && !lastKeymap.jumpKeyState) || (GetKeyState(VK_RETURN) & 0x1000))
+
+        // Process selected item input
+        if (menuItems[selectedOption]->ProcessInput(keymap, lastKeymap))
         {
             break;
         }
+
         if (keymap.downKeyState && !lastKeymap.downKeyState)
         {
             selectedOption++;
-            if (selectedOption > PAUSE_MENU_OPTION_MAX)
+            if (selectedOption >= menuItems.size())
             {
-                selectedOption = topOption;
+                selectedOption = 0;
             }
             SMBXSound::PlaySFX(71);
         }
         if (keymap.upKeyState && !lastKeymap.upKeyState)
         {
             selectedOption--;
-            if (selectedOption < topOption)
+            if (selectedOption < 0)
             {
-                selectedOption = PAUSE_MENU_OPTION_MAX;
+                selectedOption = menuItems.size() - 1;
             }
             SMBXSound::PlaySFX(71);
         }
@@ -135,13 +213,10 @@ static void testModePauseMenu(bool allowContinue)
 
 
         gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
-        for (int displayOption = topOption; displayOption <= PAUSE_MENU_OPTION_MAX; displayOption++)
+        for (unsigned int i = 0; i < menuItems.size(); i++)
         {
-            float yIdx = menuY + lineSpacing*(displayOption - topOption + 1.5f);
-            gLunaRender.AddOp(new RenderStringOp(pauseMenuOptionStrings[displayOption], 4, menuX + charWidth, yIdx));
-            if (selectedOption == displayOption) {
-                gLunaRender.AddOp(new RenderStringOp(L">", 4, menuX, yIdx));
-            }
+            float yIdx = menuY + lineSpacing*(i + 1.5f);
+            menuItems[i]->Render(menuX, yIdx, selectedOption == i);
         }
 
         // Render the world
@@ -164,26 +239,6 @@ static void testModePauseMenu(bool allowContinue)
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-    }
-
-    if (selectedOption == PAUSE_MENU_QUIT)
-    {
-        _exit(0);
-    }
-    else if (selectedOption == PAUSE_MENU_RESTART)
-    {
-        // Consider a sound shorter than the unpause one?
-        //SMBXSound::PlaySFX(30);
-
-        // Re-load the level
-        testModeRestartLevel();
-    }
-    else
-    {
-        // Pause Sound
-        SMBXSound::PlaySFX(30);
-
-        // TODO: Somehow prevent jump when unpausing
     }
 }
 
@@ -376,4 +431,6 @@ bool testModeEnable(const std::wstring& path)
     shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
+
+    return true;
 }
