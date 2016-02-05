@@ -18,8 +18,47 @@
 /////////////////////////////////////////////
 
 static void testModePauseMenu(bool allowContinue);
-static void initTestModePlayerSettings(void);
-static bool testModeLoadLevel(const std::wstring& path);
+static bool testModeSetupForLoading();
+static void testModeRestartLevel(void);
+
+//////////////////////////////////////////////
+//================ SETTINGS ================//
+//////////////////////////////////////////////
+
+struct STestModePlayerSettings
+{
+    Characters identity;
+    short powerup;
+    short mountType;
+    short mountColor;
+};
+
+struct STestModeSettings
+{
+    std::wstring levelPath;
+    int playerCount;
+    STestModePlayerSettings players[2];
+
+    STestModeSettings()
+    {
+        ResetToDefault();
+    }
+    void ResetToDefault(void)
+    {
+        levelPath = L"";
+        playerCount = 1;
+        players[0].identity = CHARACTER_MARIO;
+        players[0].powerup = 1;
+        players[0].mountType = 0;
+        players[0].mountColor = 0;
+        players[1].identity = CHARACTER_LUIGI;
+        players[1].powerup = 1;
+        players[1].mountType = 0;
+        players[1].mountColor = 0;
+    }
+};
+
+static STestModeSettings testModeSettings;
 
 ////////////////////////////////////////////////
 //================ PAUSE MENU ================//
@@ -137,7 +176,7 @@ static void testModePauseMenu(bool allowContinue)
         //SMBXSound::PlaySFX(30);
 
         // Re-load the level
-        testModeLoadLevel(GM_FULLPATH);
+        testModeRestartLevel();
     }
     else
     {
@@ -152,51 +191,12 @@ static void testModePauseMenu(bool allowContinue)
 //============ GAME MODE sETUP ============//
 /////////////////////////////////////////////
 
-static void initTestModePlayerSettings(void)
+static bool testModeSetupForLoading()
 {
-    // Reset character templates
-    for (int i = 1; i <= 5; i++)
-    {
-        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[i];
-        memset(playerTemplate, 0, sizeof(PlayerMOB));
-        playerTemplate->CurrentPowerup = 1;
-        playerTemplate->Identity = (Characters)i;
-    }
-
-    // Zero the whole players data structure
-    GM_PLAYERS_COUNT = 0;
-    memset(GM_PLAYERS_PTR, 0, sizeof(PlayerMOB) * 201);
-
-    // Initialize Player 1
-    GM_PLAYERS_COUNT = 1;
-    {
-        PlayerMOB* player = Player::Get(1);
-        player->Hearts = 1;
-        player->CurrentPowerup = 1;
-        player->MountType = 0;
-        player->MountColor = 0;
-        player->Identity = CHARACTER_MARIO;
-
-        // Copy this player over the player template
-        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[player->Identity];
-        memcpy(playerTemplate, player, sizeof(PlayerMOB));
-    }
-}
-
-static bool testModeLoadLevel(const std::wstring& path)
-{
-    // Get the full path if necessary
-    std::wstring fullPath;
-    if (isAbsolutePath(path)) {
-        fullPath = path;
-    }
-    else
-    {
-        fullPath = getModulePath() + L"\\worlds\\" + path;
-    }
+    const std::wstring& path = testModeSettings.levelPath;
 
     // Check that the file exists
-    if (FileExists(fullPath.c_str()) == 0)
+    if (FileExists(path.c_str()) == 0)
     {
         return false;
     }
@@ -210,15 +210,41 @@ static bool testModeLoadLevel(const std::wstring& path)
     // Cleanup custom level resources
     native_cleanupLevel();
 	
-    // Set our player test settings
-    initTestModePlayerSettings();
+    // Reset character templates
+    for (int i = 1; i <= 5; i++)
+    {
+        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[i];
+        memset(playerTemplate, 0, sizeof(PlayerMOB));
+        playerTemplate->Hearts = 1;
+        playerTemplate->CurrentPowerup = 1;
+        playerTemplate->Identity = (Characters)i;
+    }
+
+    // Zero the whole players data structure
+    GM_PLAYERS_COUNT = 0;
+    memset(GM_PLAYERS_PTR, 0, sizeof(PlayerMOB) * 201);
+
+    // Initialize Players
+    GM_PLAYERS_COUNT = testModeSettings.playerCount;
+    for (int i = 1; i <= testModeSettings.playerCount; i++) {
+        PlayerMOB* player = Player::Get(i);
+        player->Hearts = 1;
+        player->CurrentPowerup = testModeSettings.players[i - 1].powerup;
+        player->MountType = testModeSettings.players[i - 1].mountType;
+        player->MountColor = testModeSettings.players[i - 1].mountColor;
+        player->Identity = testModeSettings.players[i - 1].identity;
+
+        // Copy this player over the player template
+        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[player->Identity];
+        memcpy(playerTemplate, player, sizeof(PlayerMOB));
+    }
 
     // Overwrite episode list data
-    size_t pos = fullPath.find_last_of(L"/\\");
+    size_t pos = path.find_last_of(L"/\\");
     GM_EP_LIST_COUNT = 1;
     EpisodeListItem* ep = EpisodeListItem::GetRaw(0);
-    ep->episodeName = "dummy";
-    ep->episodePath = fullPath.substr(0, pos+1);
+    ep->episodeName = "Test Mode";
+    ep->episodePath = path.substr(0, pos+1);
     ep->episodeWorldFile = "";
     ep->unknown_C = 0;
     ep->unknown_10 = 0;
@@ -229,7 +255,7 @@ static bool testModeLoadLevel(const std::wstring& path)
 
     // Write warp destination data
     GM_NEXT_LEVEL_WARPIDX = 0;
-    GM_NEXT_LEVEL_FILENAME = fullPath.substr(pos+1);
+    GM_NEXT_LEVEL_FILENAME = path.substr(pos+1);
 
     // Don't use any save slot
     GM_CUR_SAVE_SLOT = 0;
@@ -255,20 +281,29 @@ static bool testModeLoadLevel(const std::wstring& path)
     return true;
 }
 
+static void testModeRestartLevel(void)
+{
+    // Exit level with no destination set
+    GM_ISLEVELEDITORMODE = 0;
+    GM_CREDITS_MODE = 0;
+    GM_LEVEL_MODE = 0; // Intro
+    GM_EPISODE_MODE = -1;
+    GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
+
+    GM_NEXT_LEVEL_WARPIDX = 0;
+    GM_NEXT_LEVEL_FILENAME = "";
+}
 
 //////////////////////////////////////////////
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
-
-// Data
-static std::wstring testLevelPath = L"";
 
 static void smbxChangeModeHook(void)
 {
     if (GM_ISLEVELEDITORMODE || GM_CREDITS_MODE || GM_LEVEL_MODE ||
         (GM_EPISODE_MODE && (GM_NEXT_LEVEL_FILENAME.length() == 0)))
     {
-        testModeLoadLevel(testLevelPath);
+        testModeSetupForLoading();
     }
 }
 static __declspec(naked) void __stdcall smbxChangeModeHookRaw(void)
@@ -316,9 +351,27 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-void testModeEnable(const std::wstring& path)
+bool testModeEnable(const std::wstring& path)
 {
-    testLevelPath = path;
+    // Get the full path if necessary
+    std::wstring fullPath;
+    if (isAbsolutePath(path)) {
+        fullPath = path;
+    }
+    else
+    {
+        fullPath = getModulePath() + L"\\worlds\\" + path;
+    }
+
+    // Check that the file exists
+    if (FileExists(fullPath.c_str()) == 0)
+    {
+        return false;
+    }
+
+    testModeSettings.ResetToDefault();
+    testModeSettings.levelPath = fullPath;
+
     smbxChangeModePatch.Apply();
     shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();

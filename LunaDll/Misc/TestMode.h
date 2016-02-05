@@ -3,6 +3,6 @@
 
 #include <string>
 
-void testModeEnable(const std::wstring& path);
+bool testModeEnable(const std::wstring& path);
 
 #endif

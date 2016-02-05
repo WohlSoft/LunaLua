@@ -125,7 +125,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--nogl"))
         gStartupSettings.noGL = true;
 
-    for (int i = 0; i < args.size(); i++)
+    for (unsigned int i = 0; i < args.size(); i++)
     {
         const std::wstring& arg = args[i];
         if (arg.find(L"--testLevel=") == 0)
