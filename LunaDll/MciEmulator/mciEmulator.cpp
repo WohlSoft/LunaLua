@@ -56,8 +56,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 				if(spCmd[2] == "Position"){
 					strcpy(lpstrReturnString, "00:04:12:45");
 				}else if(spCmd[2] == "Length"){
-#pragma warning(suppress: 6387)
-#pragma warning(suppress: 6386)
+                    #pragma warning(suppress: 6387)
+                    #pragma warning(suppress: 6386)
 					strcpy(lpstrReturnString, "52:12:11:12");
 				}
 			}
@@ -72,7 +72,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			/******/MusicManager::addSound(spCmd[3], snFile.fileName);/******/
 		}else if(spCmd[0] == "play" && spCmd[2] == "from"){
 			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
-			if(it != registeredFiles.end()){
+            if(it != registeredFiles.end()) {
 				//play code
                 MusicManager::play(spCmd[1]);                
 			}
@@ -88,7 +88,6 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 			}
 		}
 	}
-
 //errorFinalize:;
 	if(uReturnLength < 2)
 	{

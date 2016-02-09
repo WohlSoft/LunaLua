@@ -13,6 +13,35 @@
 typedef std::pair<int, std::string> musicFile;
 typedef std::pair<int, Mix_Chunk* > chunkFile;
 
+struct ChunkEntry {
+    ChunkEntry();
+    ~ChunkEntry();
+
+    bool setPath(std::string path);
+    bool doLoad();
+    bool play();
+
+    int         id;
+    Mix_Chunk*  chunk;
+    bool        needReload;
+    std::string fullPath;
+    int         channel;
+};
+
+struct MusicEntry {
+    MusicEntry();
+    ~MusicEntry();
+    bool setPath(std::string path);
+    enum MusType {
+        MUS_WORLD='w',
+        MUS_SPECIAL='s',
+        MUS_LEVEL='l'
+    };
+    int     id;
+    char    type;
+    std::string fullPath;
+};
+
 class MusicManager
 {
     public:

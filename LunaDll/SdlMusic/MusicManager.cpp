@@ -6,6 +6,66 @@
 #include <math.h>
 #include "../libs/ini-reader/INIReader.h"
 
+
+ChunkEntry::ChunkEntry()
+{
+    id=0;
+    chunk=NULL;
+    needReload=true;
+    fullPath = "";
+    channel = -1;
+}
+
+ChunkEntry::~ChunkEntry()
+{
+    if(chunk)
+        Mix_FreeChunk(chunk);
+    chunk=NULL;
+}
+
+bool ChunkEntry::setPath(std::string path)
+{
+    if(fullPath!=path)
+    {
+        needReload=true;
+        fullPath=path;
+    }
+}
+
+bool ChunkEntry::doLoad()
+{
+    if(needReload)
+    {
+        if(chunk)
+            Mix_FreeChunk(chunk);
+        chunk = Mix_LoadWAV( fullPath.c_str() );
+        return (bool)chunk;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool ChunkEntry::play()
+{
+
+}
+
+
+MusicEntry::MusicEntry()
+{
+
+}
+
+MusicEntry::~MusicEntry()
+{
+
+}
+
+
+
+
 std::string MusicManager::chunksList[91];
 std::string MusicManager::musList[74];
 
@@ -46,19 +106,21 @@ void MusicManager::addSound(std::string alias, std::string fileName)
     int chanID=0;
     int musID=0;
     //Check is this an SMBX Sound file
-    for(int i=0;i<91;i++)
+    const char* chunk_alias="sound";
+    for(int i=0;(i<alias.size())&&(i<5);i++)
     {
-        if(chunksAliasesList[i]==alias)
+        if(alias[i]!=chunk_alias[i])
         {
-            isChunk=true;
-            chanID=i;
+            isChunk=false;
             break;
-        }
+        };
     }
 
     musicFile file;
     if(isChunk)
     {
+        std::string chanIDs = alias.substr(5, alias.size()-5);
+        chanID = std::atoi(chanIDs.c_str());
         file.first = Chunk;
         //Wroting another path to file
         file.second = chunksList[chanID];
@@ -436,3 +498,4 @@ Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
 }
 
 #endif
+
