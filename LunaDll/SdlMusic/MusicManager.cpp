@@ -30,6 +30,7 @@ bool ChunkEntry::setPath(std::string path)
         needReload=true;
         fullPath=path;
     }
+    return false;
 }
 
 bool ChunkEntry::doLoad()
@@ -49,7 +50,7 @@ bool ChunkEntry::doLoad()
 
 bool ChunkEntry::play()
 {
-
+    return false;
 }
 
 
