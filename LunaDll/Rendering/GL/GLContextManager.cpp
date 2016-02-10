@@ -9,10 +9,9 @@ GLContextManager g_GLContextManager;
 
 // Constructor
 GLContextManager::GLContextManager() :
-	hDC(NULL), hCTX(NULL),
+	hDC(nullptr), hCTX(nullptr),
 	mInitialized(false), mHadError(false),
-	mFB(0), mDepthRB(0),
-	mBufTex(NULL, 800, 600) {
+    mCurrentFB(nullptr), mFramebuffer(nullptr) {
 }
 
 bool GLContextManager::Init(HDC hDC) {
@@ -47,24 +46,16 @@ bool GLContextManager::IsInitialized() {
 
 void GLContextManager::BindScreen() {
 	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    g_GLContextManager.SetCurrentFB(nullptr);
 	GLERRORCHECK();
 }
 
-void GLContextManager::BindFramebuffer() {
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-	GLERRORCHECK();
+void GLContextManager::BindAndClearFramebuffer() {
+    if (mFramebuffer == nullptr) return;
 
-	glViewport(0, 0, mBufTex.pw, mBufTex.ph);
-	GLERRORCHECK();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	GLERRORCHECK();
-	glOrtho(0.0f, ((float)mBufTex.pw), 0.0f, ((float)mBufTex.ph), -1.0f, 1.0f);
-	GLERRORCHECK();
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	GLERRORCHECK();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GLERRORCHECK();
+    // Bind the main screen framebuffer and clear it
+    mFramebuffer->Bind();
+    mFramebuffer->Clear();
 }
 
 // Set up a new context from a HDC
@@ -102,7 +93,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
-        wglMakeCurrent(NULL, NULL);
+        wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(tempContext);
         return false;
     }
@@ -128,62 +119,27 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 }
 
 bool GLContextManager::InitFramebuffer() {
-	// Set up framebuffer object
-	glGenFramebuffersANY(1, &mFB);
-	GLERRORCHECK();
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-	GLERRORCHECK();
-
-	glGenTextures(1, &mBufTex.name);
-	GLERRORCHECK();
-	g_GLDraw.BindTexture(&mBufTex);
-	GLERRORCHECK();
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	GLERRORCHECK();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	GLERRORCHECK();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	GLERRORCHECK();
-
-	glGenRenderbuffersANY(1, &mDepthRB);
-	GLERRORCHECK();
-	glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
-	GLERRORCHECK();
-	glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mBufTex.pw, mBufTex.ph);
-	GLERRORCHECK();
-	glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
-	GLERRORCHECK();
-
-	glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
-	GLERRORCHECK();
-
-	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
-	glDrawBuffers(1, DrawBuffers);
-	GLERRORCHECK();
-
-	GLenum status = glCheckFramebufferStatusANY(GL_FRAMEBUFFER_EXT);
-	GLERRORCHECK();
-	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		return false;
-	}
-
-	// Bind framebuffer
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
-	GLERRORCHECK();
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	GLERRORCHECK();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GLERRORCHECK();
-
-	return true;
+    try
+    {
+        mFramebuffer = new GLFramebuffer(800, 600);
+    }
+    catch(...)
+    {
+        mFramebuffer = nullptr;
+        return false;
+    }
+    return true;
 }
 
 bool GLContextManager::InitProjectionAndState() {
+    if (mFramebuffer == nullptr) return false;
+    GLDraw::Texture& tex = mFramebuffer->AsTexture();
+
     // Set projection
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
-    glOrtho(0.0f, (float)mBufTex.pw, 0.0f, (float)mBufTex.ph, -1.0f, 1.0f);
+    glOrtho(0.0f, (float)tex.pw, 0.0f, (float)tex.ph, -1.0f, 1.0f);
     GLERRORCHECK();
     glColor3f(1, 1, 1);
     GLERRORCHECK();
@@ -207,41 +163,16 @@ bool GLContextManager::InitProjectionAndState() {
 
 
 void GLContextManager::ReleaseFramebuffer() {
-	// Unbind framebuffer
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
-	GLERRORCHECK();
-
-	// Unbind texture just in case
-	g_GLDraw.UnbindTexture();
-
-	// Delete framebuffer
-	if (mFB) {
-		glDeleteFramebuffersANY(1, &mFB);
-		GLERRORCHECK();
-		mFB = 0;
-	}
-
-	// Delete depth renderbuffer
-	if (mDepthRB) {
-		glDeleteRenderbuffersANY(1, &mDepthRB);
-		GLERRORCHECK();
-		mDepthRB = 0;
-	}
-
-	// Delete texture
-	if (mBufTex.name) {
-		glDeleteTextures(1, &mBufTex.name);
-		GLERRORCHECK();
-		mBufTex.name = 0;
-	}
+    delete mFramebuffer;
+    mFramebuffer = nullptr;
 }
 
 void GLContextManager::ReleaseContext() {
 	// Delete Context
 	if (hCTX) {
-		wglMakeCurrent(NULL, NULL);
+		wglMakeCurrent(nullptr, nullptr);
 		wglDeleteContext(hCTX);
-		hCTX = NULL;
+		hCTX = nullptr;
 	}
 
 	// Restore pixel format if necessary
@@ -252,5 +183,5 @@ void GLContextManager::ReleaseContext() {
 	}
 
 	// Clear hDC
-	hDC = NULL;
+	hDC = nullptr;
 }

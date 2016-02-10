@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\TestMode.h" />
+    <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -312,6 +313,7 @@
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp" />
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
+    <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />

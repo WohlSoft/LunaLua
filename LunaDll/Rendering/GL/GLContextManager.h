@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <gl/glew.h>
 #include "GLTextureStore.h"
+#include "GLFramebuffer.h"
 
 class GLContextManager {
 public:
@@ -12,8 +13,18 @@ public:
     bool IsInitialized();
 
 	void BindScreen();
-	void BindFramebuffer();
-	inline GLDraw::Texture& GetBufTex() { return mBufTex; }
+	void BindAndClearFramebuffer();
+	inline GLDraw::Texture& GetBufTex()
+    {
+        static GLDraw::Texture nullTex(0, 0, 0);
+        if (mFramebuffer == nullptr)
+        {
+            return nullTex;
+        }
+        return mFramebuffer->AsTexture();
+    }
+    inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
+    inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
 
 private:
     bool  mInitialized;
@@ -25,10 +36,8 @@ private:
     HGLRC hCTX;
 
 	// Framebuffer variables
-	// TODO: Move framebuffer into a class.
-    GLuint mFB;
-    GLuint mDepthRB;
-    GLDraw::Texture mBufTex;
+    GLFramebuffer* mCurrentFB;
+    GLFramebuffer* mFramebuffer;
 
 	// Init functions
     bool InitContextFromHDC(HDC hDC);

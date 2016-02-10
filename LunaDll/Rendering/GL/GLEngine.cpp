@@ -97,7 +97,7 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     GLERRORCHECK();
 
     // Get ready to draw some more
-	g_GLContextManager.BindFramebuffer();
+	g_GLContextManager.BindAndClearFramebuffer();
 
     return TRUE;
 }
@@ -139,7 +139,7 @@ void GLEngine::EndFrame(HDC hdcDest)
     GLERRORCHECK();
 
 	// Bind framebuffer
-	g_GLContextManager.BindFramebuffer();
+	g_GLContextManager.BindAndClearFramebuffer();
 }
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {

@@ -510,6 +510,9 @@
     <ClInclude Include="Misc\TestMode.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\GL\GLFramebuffer.h">
+      <Filter>Rendering\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -974,6 +977,9 @@
     </ClCompile>
     <ClCompile Include="Misc\TestMode.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\GL\GLFramebuffer.cpp">
+      <Filter>Rendering\GL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
