@@ -484,7 +484,8 @@ void CLunaLua::bindAll()
                 LUAHELPER_DEF_CLASS(LuaImageResource)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
-                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight),
+                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
+                    .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),

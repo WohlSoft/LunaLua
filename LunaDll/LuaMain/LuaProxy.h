@@ -1202,6 +1202,8 @@ namespace LuaProxy {
             ~LuaImageResource();
             int GetWidth() const;
             int GetHeight() const;
+            uintptr_t __BMPBoxPtr();
+
         };
         enum RENDER_TYPE {
             RTYPE_IMAGE,

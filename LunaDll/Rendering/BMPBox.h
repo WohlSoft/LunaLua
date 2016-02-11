@@ -23,7 +23,7 @@ public:
     bool ImageLoaded();
 
     void forEachPixelValue(std::function<void(BYTE)> forEachFunc);
-
+    void* getBits();
 
     /// Members ///
     std::wstring m_Filename;  // Original filename

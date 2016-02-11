@@ -31,6 +31,13 @@ int LuaProxy::Graphics::LuaImageResource::GetHeight() const {
     return img->m_H;
 }
 
+
+uintptr_t LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr()
+{
+    return (uintptr_t)img.get();
+}
+
+
 void LuaProxy::Graphics::activateHud(bool activate)
 {
     gSMBXHUDSettings.skip = !activate;

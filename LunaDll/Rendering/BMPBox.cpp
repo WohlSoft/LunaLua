@@ -148,6 +148,13 @@ void BMPBox::forEachPixelValue(std::function<void(BYTE)> forEachFunc)
     
 }
 
+void* BMPBox::getBits()
+{
+    BITMAP bm = { 0 };
+    GetObject(m_hbmp, sizeof(bm), &bm);
+    return bm.bmBits;
+}
+
 BMPBox* BMPBox::loadIfExist(const std::wstring& filename, HDC screen_dc)
 {
     DWORD fAttrib = GetFileAttributesW(filename.c_str());
