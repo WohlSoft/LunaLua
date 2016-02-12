@@ -17,7 +17,7 @@ struct ChunkEntry {
     ChunkEntry();
     ~ChunkEntry();
 
-    bool setPath(std::string path);
+    void setPath(std::string path);
     bool doLoad();
     bool play();
 
@@ -32,6 +32,7 @@ struct MusicEntry {
     MusicEntry();
     ~MusicEntry();
     bool setPath(std::string path);
+    bool play();
     enum MusType {
         MUS_WORLD='w',
         MUS_SPECIAL='s',

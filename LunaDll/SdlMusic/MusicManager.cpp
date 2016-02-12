@@ -23,14 +23,13 @@ ChunkEntry::~ChunkEntry()
     chunk=NULL;
 }
 
-bool ChunkEntry::setPath(std::string path)
+void ChunkEntry::setPath(std::string path)
 {
     if(fullPath!=path)
     {
         needReload=true;
         fullPath=path;
     }
-    return false;
 }
 
 bool ChunkEntry::doLoad()
@@ -50,18 +49,34 @@ bool ChunkEntry::doLoad()
 
 bool ChunkEntry::play()
 {
-    return false;
+    if (channel != -1)
+        Mix_HaltChannel(channel);
+    if(!chunk)
+        return false;
+    return (Mix_PlayChannelTimed(channel, chunk, 0, -1) != -1);
 }
 
 
 MusicEntry::MusicEntry()
 {
-
+    id = 0;
+    type = 0;
+    fullPath = "";
 }
 
 MusicEntry::~MusicEntry()
-{
+{}
 
+bool MusicEntry::setPath(std::string path)
+{
+    fullPath = path;
+}
+
+bool MusicEntry::play()
+{
+    PGE_MusPlayer::MUS_stopMusic();
+    PGE_MusPlayer::MUS_openFile(fullPath.c_str());
+    PGE_MusPlayer::MUS_playMusic();
 }
 
 
@@ -392,7 +407,6 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //World music
     for(int j=1; (j<=16) && (i<74); i++, j++)
     {
-        bool valid=false;
         std::string head = "world-music-"+i2str(j);
         std::string fileName;
 
@@ -410,7 +424,6 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //Special music
     for(int j=1; (j<=3) && (i<74); i++, j++)
     {
-        bool valid=false;
         std::string head = "special-music-"+i2str(j);
         std::string fileName;
 
@@ -429,7 +442,6 @@ void MusicManager::loadMusics(std::string path, std::string root)
     for(int j=1; (j<=56) && (i<74); i++, j++)
     {
         if(j==24) j++;
-        bool valid=false;
         std::string head = "level-music-"+i2str(j);
         std::string fileName;
 
