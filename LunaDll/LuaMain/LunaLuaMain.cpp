@@ -691,6 +691,7 @@ void CLunaLua::bindAll()
             .property("processing", &LuaProxy::AsyncHTTPRequest::isProcessing)
             .property("finished", &LuaProxy::AsyncHTTPRequest::isFinished)
             .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
+			.property("responseBody", &LuaProxy::AsyncHTTPRequest::responseBody)
             .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
 
             LUAHELPER_DEF_CLASS(PlayerSettings)

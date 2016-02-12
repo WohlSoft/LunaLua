@@ -173,6 +173,7 @@ namespace LuaProxy {
         bool isProcessing() const;
         bool isFinished() const;
         std::string responseText(lua_State* L) const;
+		std::string responseBody(lua_State* L) const;
         int statusCode(lua_State* L) const;
         
     };
@@ -1040,6 +1041,10 @@ namespace LuaProxy {
         static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
 
         BGO(unsigned short index);
+
+		LuaProxy::BGO spawn(short bgoid, double x, double y, lua_State * L);
+
+		void * getNativeAddr() const;
 
         bool isHidden(lua_State* L) const;
         void setIsHidden(bool isHidden, lua_State* L);
