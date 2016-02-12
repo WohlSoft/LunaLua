@@ -106,24 +106,27 @@ void MusicManager::addSound(std::string alias, std::string fileName)
 
     int chanID=0;
     int musID=0;
+
     //Check is this an SMBX Sound file
-    const char* chunk_alias="sound";
-    for(int i=0;(i<alias.size())&&(i<5);i++)
+    isChunk = alias.substr(0, 5) == "sound";
+    if (isChunk)
     {
-        if(alias[i]!=chunk_alias[i])
+        std::string chanIDs = alias.substr(5);
+        chanID = std::atoi(chanIDs.c_str()) - 1;
+
+        //Detect out-of-bounds chanID
+        if ((chanID < 0) || (chanID >= (sizeof(chunksList) / sizeof(chunksList[0]))))
         {
-            isChunk=false;
-            break;
-        };
+            isChunk = false;
+            chanID = 0;
+        }
     }
 
     musicFile file;
     if(isChunk)
     {
-        std::string chanIDs = alias.substr(5, alias.size()-5);
-        chanID = std::atoi(chanIDs.c_str());
         file.first = Chunk;
-        //Wroting another path to file
+        //Writing another path to file
         file.second = chunksList[chanID];
     }
     else
