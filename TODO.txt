@@ -4,7 +4,6 @@
 * Implement ability to restore default hardcode images to provide ability use episode/level specific hardcoded images
 
 * Support movie textures
-* decolab
 
 DONE:
 * Add a list-function, which list up a folder
