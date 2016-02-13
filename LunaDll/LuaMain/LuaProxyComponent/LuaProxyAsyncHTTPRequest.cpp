@@ -91,14 +91,9 @@ AsyncHTTPClient::AsyncHTTPMethod LuaProxy::AsyncHTTPRequest::getMethod(lua_State
 }
 
 
-
 std::string LuaProxy::AsyncHTTPRequest::responseText(lua_State* L) const
 {
-    if (!isFinished()) {
-        luaL_error(L, "Cannot get response text: HTTP Request is currently processing or didn't start!");
-        return "";
-    }
-    return m_client->getResponseData();
+	return responseBody(L);
 }
 
 std::string LuaProxy::AsyncHTTPRequest::responseBody(lua_State* L) const
@@ -107,7 +102,7 @@ std::string LuaProxy::AsyncHTTPRequest::responseBody(lua_State* L) const
 		luaL_error(L, "Cannot get response text: HTTP Request is currently processing or didn't start!");
 		return "";
 	}
-	return m_client->getResponseDataRaw();
+	return m_client->getResponseData();
 }
 
 int LuaProxy::AsyncHTTPRequest::statusCode(lua_State* L) const

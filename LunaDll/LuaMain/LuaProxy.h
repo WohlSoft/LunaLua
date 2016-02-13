@@ -1042,10 +1042,6 @@ namespace LuaProxy {
 
         BGO(unsigned short index);
 
-		LuaProxy::BGO spawn(short bgoid, double x, double y, lua_State * L);
-
-		void * getNativeAddr() const;
-
         bool isHidden(lua_State* L) const;
         void setIsHidden(bool isHidden, lua_State* L);
         short id(lua_State* L) const;

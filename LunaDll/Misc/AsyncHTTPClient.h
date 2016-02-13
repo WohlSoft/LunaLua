@@ -33,7 +33,6 @@ private:
     std::atomic<AsyncHTTPStatus> m_currentStatus;
 
     // Response
-	std::string m_raw_response;
     std::string m_response;
     int m_responseCode;
     
@@ -77,7 +76,6 @@ public:
     //                           -FINISHED- Functions                       //
     //////////////////////////////////////////////////////////////////////////
     std::string getResponseData()  const;
-	std::string getResponseDataRaw() const;
     int getStatusCode()  const;
 };
 

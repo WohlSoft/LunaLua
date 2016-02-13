@@ -10,7 +10,6 @@
 AsyncHTTPClient::AsyncHTTPClient() :
 	m_url(""),
 	m_currentStatus(AsyncHTTPClient::HTTP_READY),
-	m_raw_response(""),
     m_response(""),
     m_responseCode(0)
 {}
@@ -108,10 +107,8 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
 	_variant_t responseRaw("");
-    //BSTR responseText = 0;
     if (SUCCEEDED(hr)) {
         if (m_responseCode == 200) {
-            //hr = pIWinHttpRequest->get_ResponseText(&responseText);
 			hr = pIWinHttpRequest->get_ResponseBody(&responseRaw);
         }
         else {
@@ -133,8 +130,7 @@ void AsyncHTTPClient::asyncSendWorker()
 				upperBounds++;
 
 				SafeArrayAccessData(responseRaw.parray, (void**)&buff);
-				m_raw_response = std::string(reinterpret_cast<const char *>(buff), upperBounds-lowerBounds);
-				m_response = m_raw_response;
+				m_response = std::string(reinterpret_cast<const char *>(buff), upperBounds-lowerBounds);
 				SafeArrayUnaccessData(responseRaw.parray);
 			}
 		}
@@ -163,14 +159,6 @@ std::string AsyncHTTPClient::getResponseData() const
     if (getStatus() != HTTP_FINISHED)
         return "";
     return m_response;
-}
-
-std::string AsyncHTTPClient::getResponseDataRaw() const
-{
-	if (getStatus() != HTTP_FINISHED)
-		return "";
-	return m_raw_response;
-
 }
 
 AsyncHTTPClient::AsyncHTTPStatus AsyncHTTPClient::getStatus() const

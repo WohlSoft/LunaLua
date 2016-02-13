@@ -1,3 +1,8 @@
+v0.7.3 BETA : 2016/02/13 <AirpLunaLua>
+  + Based on LunaDLL Git revision 47e55099e7d52b85f27ad243c79152cdbf8d61ae.
+  * Add responseBody properties to AsyncHTTPRequest.
+  * Added Video support for LuaImageResource. (Required ffmpeg)
+
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
   * Added new event onKeyboardPress which handles raw keyboard input
