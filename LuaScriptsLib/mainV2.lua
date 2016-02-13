@@ -97,13 +97,13 @@ local function initFFIBasedAPIs()
         end
         LunaDLL.LunaLuaGlDrawTriangles(arg1_raw, arg2_raw, arg3)
     end
-    Graphics.getBits32 = function(resImg)
-        -- type check
-        if(type(resImg) ~= "userdata")then
+Graphics.getBits32 = function(resImg)
+-- type check
+if(type(resImg) ~= "userdata")then
             error("Wrong type for getBits argument #1 (expected LuaResourceImage, got " .. type(resImg) .. ")", 2)
         end
         if(resImg.__type == "LuaResourceImage")then
-            error("Wrong type for getBits arguemnt #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
+           error("Wrong type for getBits arguemnt #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
         end
         local nativeBitArray = LunaDLL.LunaLuaGetImageResourceBits(resImg.__BMPBoxPtr)
         
@@ -282,8 +282,8 @@ local function initFFIBasedAPIs()
     setmetatable(Audio.sounds, soundsMetatable);
     
     -- Limit access to FFI
-    package.preload['ffi'] = nil
-    package.loaded['ffi'] = nil
+    --package.preload['ffi'] = nil
+    --package.loaded['ffi'] = nil
 end
 
 local function initJSON()
@@ -322,8 +322,8 @@ initJSON()
 initFFIBasedAPIs()
 
 -- We want the JIT running, so it's initially preloaded, but disable access to it
-package.preload['jit'] = nil
-package.loaded['jit'] = nil
+--package.preload['jit'] = nil
+--package.loaded['jit'] = nil
 
 -- ERR HANDLING v2.0, Let's get some more good ol' data
 function __xpcall (f, ...)
@@ -429,7 +429,6 @@ function compareLunaVersion(...)
     end
     return 0
 end
-
 
 
 --=====================================================================
@@ -816,6 +815,7 @@ function __onInit(episodePath, lvlName)
         if(not isOverworld)then
             if(UserCodeManager.loadCodeFile("lunadll", __customFolderPath.."lunadll.lua")) then noFileLoaded = false end
             if(UserCodeManager.loadCodeFile("lunaworld", episodePath .. "lunaworld.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("lunaall", episodePath .. "../lunaall.lua")) then noFileLoaded = false end
         else
             if(UserCodeManager.loadCodeFile("lunaoverworld", episodePath .. "lunaoverworld.lua")) then noFileLoaded = false end
         end
@@ -824,7 +824,7 @@ function __onInit(episodePath, lvlName)
             __isLuaError = true
             return
         end
+        
     end)}
     __xpcallCheck(pcallReturns)
 end
-
