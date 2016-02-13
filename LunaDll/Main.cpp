@@ -133,7 +133,7 @@ int OnLvlLoad() {
     }
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
-
+	BMPBox::initMovieCache();
 	if(gLunaEnabled) {
 		// Load autocode
 		gAutoMan.Clear(false);		

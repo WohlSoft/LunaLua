@@ -6,7 +6,14 @@
 #include <vector>
 #include <wchar.h>
 #include <string.h>
-
+extern "C" {
+#include "libavutil/imgutils.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavdevice/avdevice.h"
+#include "libswscale/swscale.h"
+#include "libswresample/swresample.h"
+}
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to);

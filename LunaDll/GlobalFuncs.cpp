@@ -316,6 +316,9 @@ static bool IsWindowsVistaOrNewer() {
 /// INIT GLOBALS
 void InitGlobals()
 {
+	avcodec_register_all();
+	avdevice_register_all();
+	av_register_all();
     //char* dbg = "GLOBAL INIT DBG";
 	
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();

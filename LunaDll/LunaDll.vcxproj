@@ -61,8 +61,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\ffmpeg;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(MSBuildProjectDirectory)\libs\ffmpeg\libavcodec;$(MSBuildProjectDirectory)\libs\ffmpeg\libavformat;$(MSBuildProjectDirectory)\libs\ffmpeg\libavdevice;$(MSBuildProjectDirectory)\libs\ffmpeg\libavutil;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(MSBuildProjectDirectory)\libs\ffmpeg\libswscale;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -110,7 +110,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;avcodec.lib;avformat.lib;avdevice.lib;avutil.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>

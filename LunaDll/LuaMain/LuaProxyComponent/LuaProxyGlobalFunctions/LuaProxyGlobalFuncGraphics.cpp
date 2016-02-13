@@ -611,7 +611,13 @@ luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, in
     }
 
     std::shared_ptr<BMPBox> loadedPng = img->GetLoadedPng();
-    if (rgbaOverride)
+	/*
+	FIXED?
+
+	if(rgbaOverride) -> if(loadedPng)
+
+	*/
+	if (loadedPng)
     {
         return luabind::object(L, new LuaImageResource(loadedPng), luabind::adopt(luabind::result));
     }

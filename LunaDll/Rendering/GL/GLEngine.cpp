@@ -140,6 +140,7 @@ void GLEngine::EndFrame(HDC hdcDest)
 
 	// Bind framebuffer
 	g_GLContextManager.BindAndClearFramebuffer();
+	g_GLTextureStore.checkRendered();
 }
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
