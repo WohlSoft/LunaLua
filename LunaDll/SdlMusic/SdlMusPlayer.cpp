@@ -218,9 +218,12 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 			showMsg=true;
 		if(showMsg)
 		{
+			// Disabling error message for smooth playing experience.
+			/*
 			MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
 			+std::string(musFile)+"\n"
 			+std::string(Mix_GetError())).c_str(), "Error", 0);
+			*/
 			showMsg_for = std::string(musFile);
 			showMsg=false;
 		}
