@@ -80,6 +80,7 @@ void BMPBox::Init() {
     m_W = 0;
     m_hbmp = NULL;
     m_hdc = NULL;
+    m_modified.store(false, std::memory_order_relaxed);
 }
 
 // Makes a specified color transparent
