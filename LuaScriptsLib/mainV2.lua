@@ -105,8 +105,26 @@ local function initFFIBasedAPIs()
         if(resImg.__type == "LuaResourceImage")then
             error("Wrong type for getBits arguemnt #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
         end
+        local nativeBitArray = LunaDLL.LunaLuaGetImageResourceBits(resImg.__BMPBoxPtr)
+        
         -- get bits
-        return  LunaDLL.LunaLuaGetImageResourceBits(resImg.__BMPBoxPtr)
+        local bitMT = setmetatable({
+        -- Normal Fields
+            __data = nativeBitArray,
+            __size = resImg.width * resImg.height - 1
+        }, {
+        -- Metamethods
+            __index = function(tbl, key)
+                if(0 > key or tbl.__size < key)then error("Bit-Array out of bounds. (Valid index: 0-" .. tbl.__size .. ", got " .. key .. ")", 2) end
+                return tbl.__data[key]
+            end,
+            __newindex = function(tbl, key, value)
+                if(0 > key or tbl.__size < key)then error("Bit-Array out of bounds. (Valid index: 0-" .. tbl.__size .. ", got " .. key .. ")", 2) end
+                tbl.__data[key] = value
+            end
+        })
+        
+        return bitMT
     end
     
     local function convertGlArray(arr, arr_len)
