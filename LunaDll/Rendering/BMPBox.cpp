@@ -205,7 +205,7 @@ void BMPBox::stopPlay(bool noFlush) {
 	fCount = 0;
 	av_free_packet(&vPkt);
 	updateVideoFrame(true);
-	updated = true;
+	m_modified.store(true, std::memory_order_relaxed);
 }
 
 std::shared_ptr<Mix_Chunk> BMPBox::decodeAudioOnce() {
@@ -342,7 +342,8 @@ void BMPBox::updateVideoFrame(bool forceReset) {
 				for (int h = 0; h < m_H; h++) {
 					memcpy((uint32_t*)bmpPtr + h*m_W, ((uint8_t*)destFrame->data[0]) + h*destFrame->linesize[0], destFrame->linesize[0]);
 				}
-				updated = true;
+
+				m_modified.store(true, std::memory_order_relaxed);
 			}
 
 			lastDecodedGFrame = gFrames;
@@ -387,6 +388,7 @@ void BMPBox::Init() {
 	SDL_zero(specD);
 	SDL_zero(specH);
 	musicPlayed = false;
+	m_modified.store(false, std::memory_order_relaxed);
 	audioDataPtr = NULL;
 	vStrIdx = -1;
 	aStrIdx = -1;

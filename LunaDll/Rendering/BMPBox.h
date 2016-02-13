@@ -9,6 +9,7 @@
 #include <functional>
 #include <unordered_map>
 #include <memory>
+#include <atomic>
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
 
@@ -45,7 +46,7 @@ public:
 	HBITMAP m_hbmp;			// Handle to bitmap data
 	HDC m_hdc;				// handle to compatible DC for this bitmap
 	double FPS;
-	bool updated;
+	std::atomic<bool> m_modified;       // If the image was modified and needs a reload
 	std::shared_ptr<Mix_Chunk> audioDataPtr;
 	// Static function
 	static BMPBox* loadIfExist(const std::wstring& filename, HDC screen_dc);
