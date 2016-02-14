@@ -726,7 +726,9 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
         error("\nOutdated version of API is trying to use registerEvent with string\nPlease contact the api developer to fix this issue!",2)
     end
     eventHandler = eventHandler or event --FIXME: Handle ==> NPC:onKill
-    beforeMainCall = beforeMainCall or true
+	if (beforeMainCall == nil) then
+		beforeMainCall = true
+	end
     local newApiHandler =
     {
         api = thisTable,
