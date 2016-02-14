@@ -54,7 +54,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     }
     if (direct_img->m_H < height + sy)
     {
-        width = direct_img->m_H - sy;
+        height = direct_img->m_H - sy;
     }
 
     // Don't render if no size
