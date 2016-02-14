@@ -3,6 +3,7 @@ v0.7.3 BETA : 2016/02/13 <AirpLunaLua>
   * Add responseBody properties to AsyncHTTPRequest.
   * Added Video support for LuaImageResource. (Required ffmpeg)
   * Disabled SdlMusPlayer error message.
+  * Add Misc.updateWarp() from APLib.
 
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
