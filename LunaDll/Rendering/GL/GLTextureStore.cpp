@@ -93,7 +93,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 	cacheFound = it != mLunaTexMap.end();
 
 	//image
-	if (!bmp.updated && cacheFound)return it->second;
+	if (!bmp.m_modified.load() && cacheFound)return it->second;
 
 	// The bitmap of BMPBox is known to be a DIB one, with pre-multiplied BGRA.
 	// This makes things easy.
@@ -145,7 +145,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 	//GLERRORCHECK();
-	((BMPBox*)&bmp)->updated = false;
+	((BMPBox*)&bmp)->m_modified.store(false, std::memory_order_relaxed);
 	// Cache new texture
 	if (cacheFound) {
 		return it->second;
