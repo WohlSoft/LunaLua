@@ -550,7 +550,8 @@ void CLunaLua::bindAll()
                 def("pause", &LuaProxy::Misc::pause),
                 def("unpause", &LuaProxy::Misc::unpause),
                 def("isPausedByLua", &LuaProxy::Misc::isPausedByLua),
-                def("warning", &LuaProxy::Misc::warning)
+                def("warning", &LuaProxy::Misc::warning),
+				def("updateWarp", &LuaProxy::Misc::updateWarp)
             ],
 
             namespace_("Audio")[

@@ -1193,6 +1193,7 @@ namespace LuaProxy {
         void unpause();
         bool isPausedByLua();
         void warning(const std::string& str);
+		void updateWarp();
     }
 
     namespace Graphics{
