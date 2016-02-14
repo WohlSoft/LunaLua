@@ -1,7 +1,8 @@
 #ifndef BMPBox_hhhhhh
 #define BMPBox_hhhhhh
 
-#include "../GlobalFuncs.h"
+#include "FFmpeg/FFmpeg.h"
+#include "../../GlobalFuncs.h"
 #include "../Defines.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
 #include <SDL2/SDL.h>

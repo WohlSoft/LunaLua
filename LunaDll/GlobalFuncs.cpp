@@ -21,6 +21,7 @@
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
 #include "SMBXInternal/Level.h"
+#include "Rendering/FFmpeg/FFmpeg.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {

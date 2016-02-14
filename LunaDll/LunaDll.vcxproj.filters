@@ -513,6 +513,12 @@
     <ClInclude Include="Rendering\GL\GLFramebuffer.h">
       <Filter>Rendering\GL</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMedia.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegInit.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpeg.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeQueue.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -981,6 +987,10 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp">
       <Filter>Rendering\GL</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMedia.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
