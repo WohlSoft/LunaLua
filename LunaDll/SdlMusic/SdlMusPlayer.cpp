@@ -351,12 +351,13 @@ void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)
 
 Mix_Chunk *PGE_Sounds::getChunkForAlias(const std::string& alias)
 {
-    if(!overrideArrayIsUsed)
-        return nullptr;//Don't wait if overriding array is empty
-    auto it = overrideSettings.find(alias);
-    if (it != overrideSettings.end() && it->second.chunk != nullptr)
+    if (overrideArrayIsUsed)
     {
-        return it->second.chunk;
+        auto it = overrideSettings.find(alias);
+        if (it != overrideSettings.end() && it->second.chunk != nullptr)
+        {
+            return it->second.chunk;
+        }
     }
     return MusicManager::getChunkForAlias(alias);
 }
@@ -386,16 +387,18 @@ bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
 
 void PGE_Sounds::setMuteForAlias(const std::string& alias, bool muted)
 {
-    if(!overrideArrayIsUsed)
-        return;
     ChunkOverrideSettings settings = { nullptr, false };
-    auto it = overrideSettings.find(alias);
-    if (it != overrideSettings.end())
+    if (overrideArrayIsUsed)
     {
-        settings = it->second;
+        auto it = overrideSettings.find(alias);
+        if (it != overrideSettings.end())
+        {
+            settings = it->second;
+        }
     }
     settings.muted = muted;
     overrideSettings[alias] = settings;
+    overrideArrayIsUsed = true;
 }
 
 bool PGE_Sounds::getMuteForAlias(const std::string& alias)
