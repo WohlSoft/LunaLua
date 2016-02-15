@@ -468,6 +468,7 @@ void CLunaLua::bindAll()
 
             namespace_("Native")[
                 def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
+				def("getWorldPath", &LuaProxy::Native::getWorldPath),
                 def("simulateError", &LuaProxy::Native::simulateError)
             ],
 
@@ -1083,7 +1084,8 @@ void CLunaLua::bindAll()
                         def("count", &LuaProxy::Warp::count),
                         def("get", &LuaProxy::Warp::get),
                         def("getIntersectingEntrance", &LuaProxy::Warp::getIntersectingEntrance),
-                        def("getIntersectingExit", &LuaProxy::Warp::getIntersectingExit)
+                        def("getIntersectingExit", &LuaProxy::Warp::getIntersectingExit),
+						def("spawn", static_cast<LuaProxy::Warp(*)(const luabind::object&, double, double, double, double, lua_State*)>(&LuaProxy::spawnWarp))
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Warp, m_index))
                 .def(constructor<int>())
@@ -1283,6 +1285,7 @@ void CLunaLua::bindAllDeprecated()
     module(L)
         [
             def("getSMBXPath", &LuaProxy::Native::getSMBXPath), //DONE
+			def("getWorldPath", &LuaProxy::Native::getWorldPath),
             def("simulateError", &LuaProxy::Native::simulateError), //DONE
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
             def("printText", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print), //DONE

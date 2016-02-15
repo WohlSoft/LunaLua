@@ -218,6 +218,7 @@ namespace LuaProxy {
         static luabind::object getIntersectingEntrance(double x1, double y1, double x2, double y2, lua_State* L);
         static luabind::object getIntersectingExit(double x1, double y1, double x2, double y2, lua_State* L);
 
+		LuaProxy::Warp spawn(const luabind::object & value, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
         Warp(int warpIndex);
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
@@ -237,6 +238,9 @@ namespace LuaProxy {
 
         std::string levelFilename();
         void setLevelFilename(const luabind::object &value, lua_State* L);
+
+		//not bound functions
+		void * getNativeAddr() const;
 
         int m_index;
     };
@@ -1137,6 +1141,7 @@ namespace LuaProxy {
     //undocumented
     namespace Native{
         std::string getSMBXPath();
+		std::string getWorldPath();
         void simulateError(short errcode);
     }
     //Debug/Text functions
@@ -1262,7 +1267,9 @@ namespace LuaProxy {
 #ifdef _MSC_VER //DEPRECATED STUFF
 #pragma region
 #endif
-    //Moved as static functions
+	// AirpLunaLua
+	LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
+	//Moved as static functions
     NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);

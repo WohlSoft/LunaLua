@@ -1,5 +1,7 @@
 v0.7.3 BETA : 2016/02/15 <AirpLunaLua>
   + Based on LunaDLL Git revision d7e3eec047e8cb2f45486bd4cbfea3132b17cb7b.
+  * Added Warp.spawn - You can spawn warp point.
+  * Deprecated Misc.updateWarp, use Warp.spawn.
 
 v0.7.3 BETA : 2016/02/14 <AirpLunaLua>
   + Based on LunaDLL Git revision 7af75f7c60a20f0b2226905493af2d5cbc0f5e61.

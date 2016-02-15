@@ -209,5 +209,5 @@ void LuaProxy::Misc::warning(const std::string& str)
 
 void LuaProxy::Misc::updateWarp()
 {
-	((void(__stdcall *)(void))(0x008F7D70))();
+	native_updateWarp();
 }

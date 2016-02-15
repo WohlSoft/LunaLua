@@ -742,6 +742,9 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
+// AirpLunaLua
+#define GF_UPDATE_WARP		0x008F7D70
+
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
 static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 
@@ -814,6 +817,8 @@ static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
+
+static const auto native_updateWarp = (void(__stdcall *)(void))GF_UPDATE_WARP;
 
 /*
 Function name                                
