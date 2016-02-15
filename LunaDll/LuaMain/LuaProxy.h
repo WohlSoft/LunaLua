@@ -93,19 +93,7 @@ namespace LuaProxy {
         LFT_BOOL = FT_MAX + 2
     };
 
-    //for runAnimation
-    struct coorStruct{
-        double x;
-        double y;
-        double Height;
-        double Width;
-        double XSpeed;
-        double YSpeed;
-    };
     
-
-    
-
     //Deprecated
     namespace SaveBankProxy {
         void setValue(const std::string& key, double value);
