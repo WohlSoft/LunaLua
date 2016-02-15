@@ -67,23 +67,22 @@ MusicEntry::MusicEntry()
 MusicEntry::~MusicEntry()
 {}
 
-bool MusicEntry::setPath(std::string path)
+void MusicEntry::setPath(std::string path)
 {
     fullPath = path;
 }
 
-bool MusicEntry::play()
+void MusicEntry::play()
 {
-    PGE_MusPlayer::MUS_stopMusic();
     PGE_MusPlayer::MUS_openFile(fullPath.c_str());
     PGE_MusPlayer::MUS_playMusic();
 }
 
 
-
-
-std::string MusicManager::chunksList[91];
-std::string MusicManager::musList[74];
+ChunkEntry MusicManager::sounds[91];
+MusicEntry MusicManager::music_lvl[57];
+MusicEntry MusicManager::music_wld[16];
+MusicEntry MusicManager::music_spc[4];
 
 std::unordered_map<std::string, musicFile > MusicManager::registredFiles;
 std::unordered_map<std::string, chunkFile > MusicManager::chunksBuffer;
@@ -92,6 +91,7 @@ std::string MusicManager::defaultSndINI="";
 std::string MusicManager::defaultMusINI="";
 
 std::string MusicManager::curRoot="";
+
 
 void MusicManager::initAudioEngine()
 {
@@ -104,108 +104,68 @@ void MusicManager::initAudioEngine()
         defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
         loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
         loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
+        rebuildSoundCache();
     }
 }
 
+
+void MusicManager::rebuildSoundCache()
+{
+    //Reinit reserved channels list
+    int numberOfReservedChannels=0;
+
+    std::string failedSounds;
+    for(int i=0; i<91; i++)
+    {
+        if(sounds[i].channel != -1)
+        {
+            sounds[i].channel = numberOfReservedChannels++;
+        }
+        if(sounds[i].needReload)
+        {
+            if(!sounds[i].doLoad())
+            {
+                failedSounds += " "+sounds[i].fullPath;
+            }
+        }
+    }
+    if(numberOfReservedChannels>32)
+        Mix_AllocateChannels(numberOfReservedChannels+32);
+    Mix_ReserveChannels(numberOfReservedChannels);
+
+    if(!failedSounds.empty())
+    {
+        std::string errorMsg="Some sound files are failed to load:\n"+
+                failedSounds;
+        MessageBoxA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK|MB_ICONWARNING);
+    }
+}
+
+
+//!
+//! \brief This function accepts MCI-alias and file path. Function used to poke initialization of sound engine and bind custom musics sent by SMBX Engine.
+//! \param alias MCI-Alias sent by SMBX Engine
+//! \param fileName File path sent by SMBX Engine
+//!
 void MusicManager::addSound(std::string alias, std::string fileName)
 {
     initAudioEngine();
-    
-    //clear junk
-    replaceSubStr(fileName, "\"", "");
-    replaceSubStr(fileName, "\\\\",  "\\");
-    replaceSubStr(fileName, "/",  "\\");
 
-    bool isChunk=false;
-    std::string s(fileName);
-
-    int chanID=0;
-    int musID=0;
-
-    //Check is this an SMBX Sound file
-    isChunk = alias.substr(0, 5) == "sound";
-    if (isChunk)
-    {
-        std::string chanIDs = alias.substr(5);
-        chanID = std::atoi(chanIDs.c_str()) - 1;
-
-        //Detect out-of-bounds chanID
-        if ((chanID < 0) || (chanID >= (sizeof(chunksList) / sizeof(chunksList[0]))))
-        {
-            isChunk = false;
-            chanID = 0;
-        }
+    //Load custom music
+    if(alias=="music24") {
+        //clear junk
+        replaceSubStr(fileName, "\"", "");
+        replaceSubStr(fileName, "\\\\",  "\\");
+        replaceSubStr(fileName, "/",  "\\");
+        music_lvl[23].setPath(fileName);
     }
-
-    musicFile file;
-    if(isChunk)
-    {
-        file.first = Chunk;
-        //Writing another path to file
-        file.second = chunksList[chanID];
-    }
-    else
-    {
-        bool found=false;
-        for(int i=0; i<74; i++)
-        {
-            if(musAliasesList[i]==alias)
-            {
-                found=true;
-                musID=i;
-                break;
-            }
-        }
-        file.first=Stream;
-        if(found)
-            file.second=musList[musID];
-        else
-            file.second=fileName;
-    }
-            
-    registredFiles[alias]=file;
-
-    if(isChunk)
-    {//Register SDL Chunk
-        Mix_Chunk* sound = Mix_LoadWAV( file.second.c_str() );
-        if(!sound)
-        {
-            MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
-                +std::string(file.second)+"\n"
-                +std::string(Mix_GetError())).c_str(), "Error", 0);
-            // handle error
-        }
-        else
-        {
-            Mix_VolumeChunk(sound, MIX_MAX_VOLUME);
-            std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
-            if(it == chunksBuffer.end())
-            {
-                chunkFile file;
-                file.first  = chunksChannelsList[chanID];//ID of reserved channel for this sample
-                file.second = sound;//Pointer to sample
-                chunksBuffer[alias] = file;
-            }
-            else
-            {
-                Mix_FreeChunk(chunksBuffer[alias].second);
-                chunksBuffer[alias].first  = chunksChannelsList[chanID];
-                chunksBuffer[alias].second = sound;
-            }
-        }
-    }
-
 }
+
+
 
 void MusicManager::close()
 {
     PGE_MusPlayer::MUS_stopMusic();
-    //for (std::map<std::string, Mix_Chunk *>::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
-    //{
-    //	Mix_FreeChunk(it->second);
-    //}
-    //chunksBuffer.clear();
-    //registredFiles.clear();
 }
 
 
@@ -248,47 +208,54 @@ void MusicManager::setCurrentSection(int section)
 
 void MusicManager::play(std::string alias) //Chunk will be played once, stream will be played with loop
 {
-    std::unordered_map<std::string, musicFile>::iterator it = registredFiles.find(alias);
-        if(it != registredFiles.end())
+    bool isChunk = alias.substr(0, 5) == "sound";
+    if (isChunk)
+    {
+        std::string chanIDs = alias.substr(5);
+        int chanID = std::atoi(chanIDs.c_str()) - 1;
+        //Detect out-of-bounds chanID
+        if((chanID >= 0)&&(chanID <91))
         {
-            musicFile file = registredFiles[alias];
-            if(file.first==Stream)
+            if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
             {
-                if (!seizedSections[curSection])
-                {
-                    PGE_MusPlayer::MUS_openFile(file.second.c_str());
-                    PGE_MusPlayer::MUS_playMusic();
-                    pausedNatively = false;
-                }
-                else if(pausedNatively)
-                {
-                    PGE_MusPlayer::MUS_playMusic();
-                    pausedNatively = false;
-                }
-            }
-            else
-            if(file.first==Chunk)
-            {
-                std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
-                if(it != chunksBuffer.end())
-                {
-                    int ch = it->second.first;
-                    if (!PGE_Sounds::playOverrideForAlias(alias, ch))
-                    {
-                        Mix_Chunk* chunk = it->second.second;
-                        if (ch != -1)
-                            Mix_HaltChannel(ch);
-                        if (Mix_PlayChannelTimed(ch, chunk, 0, -1) == -1)
-                        {
-                            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-                                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
-                        }
-                    }
-                }
+                //Play it!
+                sounds[chanID].play();
             }
         }
-
+    } else {
+        if (!seizedSections[curSection])
+        {
+            if(alias=="smusic") {
+                music_spc[0].play();
+            } else if(alias=="stmusic") {
+                music_spc[1].play();
+            } else if(alias=="tmusic") {
+                music_spc[2].play();
+            } else if(alias.substr(0, 6) == "wmusic") {
+                std::string musIDs = alias.substr(6);
+                int musID = std::atoi(musIDs.c_str()) - 1;
+                if(musID>=0 && musID<16)
+                {
+                    music_wld[musID].play();
+                }
+            } else if(alias.substr(0, 5) == "music") {
+                std::string musIDs = alias.substr(5);
+                int musID = std::atoi(musIDs.c_str()) - 1;
+                if(musID>=0 && musID<56)
+                {
+                    music_lvl[musID].play();
+                }
+            }
+            pausedNatively = false;
+        }
+        else if(pausedNatively)
+        {
+            PGE_MusPlayer::MUS_playMusic();
+            pausedNatively = false;
+        }
+    }
 }
+
 
 void MusicManager::pause()
 {
@@ -301,27 +268,25 @@ void MusicManager::pause()
 
 void MusicManager::stop(std::string alias)
 {
-    std::unordered_map<std::string, musicFile>::iterator it = registredFiles.find(alias);
-    if(it != registredFiles.end())
+    bool isChunk = alias.substr(0, 5) == "sound";
+    if (isChunk)
     {
-        musicFile file = registredFiles[alias];
-        if(file.first==Stream)
+        std::string chanIDs = alias.substr(5);
+        int chanID = std::atoi(chanIDs.c_str()) - 1;
+        //Detect out-of-bounds chanID
+        if((chanID < 0) || (chanID >= 91))
         {
-            if(!seizedSections[curSection])
-            {
-                PGE_MusPlayer::MUS_stopMusic();
-                pausedNatively = false;
-            }
+            chanID = 0;
+        } else {
+            //Mute it!
+            if(sounds[chanID].channel>0)
+                Mix_HaltChannel(sounds[chanID].channel);
         }
-        else
-        if(file.first==Chunk)
+    } else {
+        if(!seizedSections[curSection])
         {
-            std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
-            if(it != chunksBuffer.end())
-            {
-                if(chunksBuffer[alias].first>=0)
-                    Mix_HaltChannel(chunksBuffer[alias].first);
-            }
+            PGE_MusPlayer::MUS_stopMusic();
+            pausedNatively = false;
         }
     }
 }
@@ -360,25 +325,32 @@ void MusicManager::loadSounds(std::string path, std::string root)
     }
 
     curRoot=root;
-
     for(int i=0; i<91; i++)
     {
-        bool valid=false;
         std::string head = "sound-"+i2str(i+1);
         std::string fileName;
+        std::string reserveChannel;
 
         fileName = hitBoxFile.Get(head, "file", "");
         if(fileName.size()==0) continue;
+
+        reserveChannel = hitBoxFile.Get(head, "single-channel", "0");
+
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
 
         if( file_existsX(root+fileName) )
         {
-            chunksList[i] = root+fileName.c_str();
+            sounds[i].setPath(root+fileName.c_str());
+            if(reserveChannel=="1")
+                sounds[i].channel = 0;
+            else
+                sounds[i].channel = -1;
         }
     }
 }
+
 
 static std::string clearTrackNumber(std::string in)
 {
@@ -420,7 +392,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
         replaceSubStr(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
-            musList[i] = root+fileName.c_str();
+            music_wld[j-1].setPath(root+fileName.c_str());
         }
     }
 
@@ -437,7 +409,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
         replaceSubStr(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            musList[i] = root+fileName.c_str();
+            music_spc[j-1].setPath(root+fileName.c_str());
         }
     }
 
@@ -455,7 +427,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
         replaceSubStr(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            musList[i] = root+fileName.c_str();
+            music_lvl[j-1].setPath(root+fileName.c_str());
         }
     }
 }
@@ -469,11 +441,9 @@ void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCu
         loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath);
     loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
     loadMusics(episodePath+"\\music.ini", episodePath);
-
-    for(int i=0; i<91; i++)
-        addSound(chunksAliasesList[i], "dummy");
-    for(int i=0; i<74; i++)
-        addSound(musAliasesList[i], "dummy");
+    if(!levelCustomPath.empty())
+        loadMusics(levelCustomPath+"\\music.ini", levelCustomPath);
+    rebuildSoundCache();
 }
 
 
@@ -482,10 +452,7 @@ void MusicManager::resetSoundsToDefault()
     initArrays();
     loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
     loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
-    for(int i=0; i<91; i++)
-        addSound(chunksAliasesList[i], "dummy");
-    for(int i=0; i<74; i++)
-        addSound(musAliasesList[i], "dummy");
+    rebuildSoundCache();
 }
 
 
@@ -493,9 +460,40 @@ void MusicManager::initArrays()
 {
     curRoot = PGE_SDL_Manager::appPath;
     for(int i=0; i<91; i++)
-        chunksList[i]=PGE_SDL_Manager::appPath+defaultChunksList[i];
-    for(int i=0; i<74; i++)
-        musList[i] = PGE_SDL_Manager::appPath+defaultMusList[i];
+    {
+        sounds[i].id=i+1;
+        sounds[i].setPath(PGE_SDL_Manager::appPath+defaultChunksList[i]);
+        sounds[i].channel=chunksChannelsList[i];
+    }
+    for(int i=0, j=0, k=MusicEntry::MUS_WORLD; i<74; i++, j++)
+    {
+        switch(k)
+        {
+        case MusicEntry::MUS_WORLD:
+            music_wld[j].type=k;
+            music_wld[j].id=j+1;
+            music_wld[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
+            if(j>=15)
+            {
+                j=0; j++;
+            }
+            break;
+        case MusicEntry::MUS_SPECIAL:
+            music_spc[j].type=k;
+            music_spc[j].id=j+1;
+            music_spc[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
+            if(j>=3)
+            {
+                j=0; j++;
+            }
+            break;
+        case MusicEntry::MUS_LEVEL:
+            music_spc[j].type=k;
+            music_spc[j].id=j+1;
+            music_spc[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
+            break;
+        }
+    }
 }
 
 std::string MusicManager::SndRoot()
@@ -505,10 +503,16 @@ std::string MusicManager::SndRoot()
 
 Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
 {
-    std::unordered_map<std::string, chunkFile >::iterator it = chunksBuffer.find(alias);
-    if (it != chunksBuffer.end())
+    bool isChunk = alias.substr(0, 5) == "sound";
+    if (isChunk)
     {
-        return it->second.second;
+        std::string chanIDs = alias.substr(5);
+        int chanID = std::atoi(chanIDs.c_str()) - 1;
+        //Detect out-of-bounds chanID
+        if((chanID >= 0)&&(chanID <91))
+        {
+            return sounds[chanID].chunk;
+        }
     }
     return nullptr;
 }

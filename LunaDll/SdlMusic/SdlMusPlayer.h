@@ -76,10 +76,10 @@ private:
         Mix_Chunk* chunk;
         bool muted;
     };
-
 	static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;
     static char *current;
+    static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;
 };
 

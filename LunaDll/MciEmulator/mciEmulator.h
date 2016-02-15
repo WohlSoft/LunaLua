@@ -2,6 +2,7 @@
 #define MciEmulator_hhhh
 #include <windows.h>
 #include <map>
+#include <unordered_map>
 #include <string>
 #ifdef __MINGW32__
 #include <mmsystem.h>

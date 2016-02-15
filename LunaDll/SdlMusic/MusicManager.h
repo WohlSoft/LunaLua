@@ -31,8 +31,8 @@ struct ChunkEntry {
 struct MusicEntry {
     MusicEntry();
     ~MusicEntry();
-    bool setPath(std::string path);
-    bool play();
+    void setPath(std::string path);
+    void play();
     enum MusType {
         MUS_WORLD='w',
         MUS_SPECIAL='s',
@@ -51,6 +51,7 @@ class MusicManager
         Chunk
         };
         static void initAudioEngine();
+        static void rebuildSoundCache();
         static void addSound(std::string alias, std::string fileName);
         static void close();
         static void play(std::string alias); //Chunk will be played once, stream will be played with loop
@@ -78,12 +79,14 @@ class MusicManager
         static std::string curRoot;//Current rood directory (episode or application dir)
 
         //Musics
-        static std::string musList[74];//List of currently loaded files
-        static std::string defaultMusList[74];//List of system default files
-        static std::string musAliasesList[74];//List of reserved aliases for sound effects
+        static MusicEntry music_lvl[57];
+        static MusicEntry music_wld[16];
+        static MusicEntry music_spc[4];
+        static std::string defaultMusList[75];//List of system default files
+        static std::string musAliasesList[75];//List of reserved aliases for sound effects
 
         //SFX
-        static std::string chunksList[91];//List of currently loaded files
+        static ChunkEntry sounds[91];
         static std::string defaultChunksList[91];//List of system default files
         static std::string chunksAliasesList[91];//List of reserved aliases for sound effects
         static int chunksChannelsList[91];//List of channel reservation by some files (-1 is allowing mixed playback)
