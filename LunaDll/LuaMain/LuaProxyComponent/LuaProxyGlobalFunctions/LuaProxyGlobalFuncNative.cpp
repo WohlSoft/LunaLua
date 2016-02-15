@@ -10,12 +10,7 @@ std::string LuaProxy::Native::getSMBXPath()
 
 std::string LuaProxy::Native::getWorldPath()
 {
-	VB6StrPtr smbxWorldPath = (VB6StrPtr)GM_FULLDIR;
-	std::string buf;
-
-	buf = smbxWorldPath;
-
-	return buf;
+	return (std::string)(VB6StrPtr)GM_FULLDIR;
 }
 
 void LuaProxy::Native::simulateError(short errcode)
