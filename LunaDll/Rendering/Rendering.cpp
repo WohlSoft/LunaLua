@@ -184,18 +184,22 @@ void Renderer::RenderBelowPriority(double maxPriority) {
         // Sort the new operations
         std::stable_sort(ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
-        // Render things with lower priority than what we've already rendered
-        if (m_renderOpsProcessedCount > 0)
+        // Render things as many of the new items as we should before merging the sorted lists
+        double maxPassPriority = maxPriority;
+        if (m_renderOpsSortedCount > m_renderOpsProcessedCount)
         {
             double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
-            for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+            if (nextPriorityInOldList < maxPassPriority)
             {
-                RenderOp& op = **iter;
-                if (op.m_renderPriority >= nextPriorityInOldList) break;
-                if (op.m_renderPriority >= maxPriority) break;
-                DrawOp(op);
-                m_renderOpsProcessedCount++;
+                maxPassPriority = nextPriorityInOldList;
             }
+        }
+        for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+        {
+            RenderOp& op = **iter;
+            if (op.m_renderPriority >= maxPassPriority) break;
+            DrawOp(op);
+            m_renderOpsProcessedCount++;
         }
 
         // Merge sorted list sections (note, std::inplace_merge is a stable sort)

@@ -4,6 +4,7 @@
 #include "../Defines.h"
 #include <string>
 #include <functional>
+#include <atomic>
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
 
@@ -26,11 +27,12 @@ public:
     void* getBits();
 
     /// Members ///
-    std::wstring m_Filename;  // Original filename
-    int m_H;				// Height of bitmap
-    int m_W;				// Width of bitmap
-    HBITMAP m_hbmp;			// Handle to bitmap data
-    HDC m_hdc;				// handle to compatible DC for this bitmap
+    std::wstring m_Filename;            // Original filename
+    int m_H;                            // Height of bitmap
+    int m_W;                            // Width of bitmap
+    HBITMAP m_hbmp;                     // Handle to bitmap data
+    HDC m_hdc;                          // handle to compatible DC for this bitmap
+    std::atomic<bool> m_modified;       // If the image was modified and needs a reload
 
     // Static function
     static BMPBox* loadIfExist(const std::wstring& filename, HDC screen_dc);

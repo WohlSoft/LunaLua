@@ -437,23 +437,6 @@ void LuaProxy::jumpheightBounce(unsigned short value)
 	GM_JUMPHIGHT_BOUNCE = value;
 }
 
-void LuaProxy::runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData)
-{
-	typedef int __stdcall animationFunc(int, int, int, int, int);
-	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
-
-	coorStruct tmp;
-	tmp.x = x;
-	tmp.y = y;
-	tmp.Height = height;
-	tmp.Width = width;
-	tmp.XSpeed = speedX;
-	tmp.YSpeed = speedY;
-	int a4 = 0;
-	int a5 = 0;
-	f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
-}
-
 
 luabind::object LuaProxy::blocks(lua_State *L)
 {
@@ -509,40 +492,31 @@ luabind::object LuaProxy::animations(lua_State *L)
 	return vanimations;
 }
 
+void LuaProxy::runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData)
+{
+    typedef int __stdcall animationFunc(int, int, int, int, int);
+    animationFunc* f = (animationFunc*)GF_RUN_ANIM;
+
+    Momentum tmp;
+    tmp.x = x;
+    tmp.y = y;
+    tmp.height = height;
+    tmp.width = width;
+    tmp.speedX = speedX;
+    tmp.speedY = speedY;
+    int a4 = 0;
+    int a5 = 0;
+    f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
+}
 
 void LuaProxy::runAnimation(int id, double x, double y, double height, double width, int extraData)
 {
-	typedef int __stdcall animationFunc(int, int, int, int, int);
-	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
-
-	coorStruct tmp;
-	tmp.x = x;
-	tmp.y = y;
-	tmp.Height = height;
-	tmp.Width = width;
-	tmp.XSpeed = 0;
-	tmp.YSpeed = 0;
-	int a4 = 0;
-	int a5 = 0;
-	f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
+    runAnimation(id, x, y, height, width, 0.0, 0.0, extraData);
 }
-
 
 void LuaProxy::runAnimation(int id, double x, double y, int extraData)
 {
-	typedef int __stdcall animationFunc(int, int, int, int, int);
-	animationFunc* f = (animationFunc*)GF_RUN_ANIM;
-
-	coorStruct tmp;
-	tmp.x = x;
-	tmp.y = y;
-	tmp.Height = 0;
-	tmp.Width = 0;
-	tmp.XSpeed = 0;
-	tmp.YSpeed = 0;
-	int a4 = 0;
-	int a5 = 0;
-	f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
+    runAnimation(id, x, y, 0.0, 0.0, extraData);
 }
 
 
