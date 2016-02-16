@@ -53,6 +53,14 @@ std::vector<std::wstring> splitCmdArgs(std::wstring str)
     return args;
 }
 
+std::wstring dirnameOf(const std::wstring& fname)
+{
+	size_t pos = fname.find_last_of(L"\\/");
+	return (std::wstring::npos == pos)
+		? L""
+		: fname.substr(0, pos);
+}
+
 int APIENTRY _tWinMain(HINSTANCE hInstance,
     HINSTANCE hPrevInstance,
     LPTSTR    lpCmdLine,
@@ -60,10 +68,22 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
     std::vector<std::wstring> cmdArgs = splitCmdArgs(lpCmdLine);
     std::wstring newCmdLine = lpCmdLine;
+
+	std::wstring curPath;
+
+	TCHAR szFileName[MAX_PATH];
+	GetModuleFileName(NULL, szFileName, MAX_PATH);
+	WCHAR** lppPart = { NULL };
+	WCHAR fulPath_s[4096] = L"";
+	GetFullPathName(szFileName, 4096, fulPath_s, lppPart);
+	curPath = dirnameOf(fulPath_s);
     
-    std::wstring pathToSMBX = L"smbx.exe"; //use either smbx.exe or the first arg
-    if (cmdArgs.size() > 0){ //if more than one arg then possible of a smbx path
-        if (cmdArgs[0].find(L"--") == std::wstring::npos){ //if the first arg starting with "--" then no smbx path --> just starting with argument
+    std::wstring pathToSMBX = curPath+L"\\smbx.exe"; //use either smbx.exe or the first arg
+	if (pathToSMBX == fulPath_s) // If LunaLoader.exe renamed into "SMBX.exe"
+		pathToSMBX = curPath + L"\\smbx.legacy";
+
+    if (cmdArgs.size() > 0) { //if more than one arg then possible of a smbx path
+        if (cmdArgs[0].find(L"--") == std::wstring::npos) { //if the first arg starting with "--" then no smbx path --> just starting with argument
             pathToSMBX = cmdArgs[0];
 
             newCmdLine = L""; //reset the arg path
@@ -79,7 +99,14 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
         }
     }
 
-    LunaLoaderResult ret = LunaLoaderRun(pathToSMBX.c_str(), newCmdLine.c_str());
+	FILE *test;
+	_wfopen_s(&test, pathToSMBX.c_str(), L"rb");
+	if (!test) {
+		pathToSMBX = curPath+L"\\smbx.legacy";
+	}
+	else fclose(test);
+
+    LunaLoaderResult ret = LunaLoaderRun(pathToSMBX.c_str(), newCmdLine.c_str(), curPath.c_str());
 
     switch(ret) {
     case LUNALOADER_OK:
