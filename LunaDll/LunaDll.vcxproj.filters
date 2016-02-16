@@ -981,6 +981,9 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp">
       <Filter>Rendering\GL</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
