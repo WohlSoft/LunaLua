@@ -293,6 +293,7 @@
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />

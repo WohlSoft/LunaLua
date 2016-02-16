@@ -991,6 +991,9 @@
     <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
