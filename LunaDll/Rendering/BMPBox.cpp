@@ -54,6 +54,7 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
 	if (filename.length() < 1)
 		return;
 	m_hbmp = LoadGfxAsBitmap(filename);
+	m_hdc = CreateCompatibleDC(screen_dc);
 	if (m_hbmp != NULL) {
 		// Load any image, converted to pre-multiplied BGRA
 		//m_hbmp = LoadGfxAsBitmap(filename);
@@ -74,7 +75,6 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
 	else {
 		mp = new FFmpegMediaPlayer(filename, ffdset);
 		realffdset = mp->getAppliedSetting();
-		m_hdc = CreateCompatibleDC(screen_dc);
 		if (mp->isVideoPlayable()) {
 			m_H = realffdset.video.height;
 			m_W = realffdset.video.width;
@@ -85,6 +85,7 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
 		}
 	}
 	m_Filename = filename;
+
 }
 
 
@@ -212,5 +213,5 @@ BMPBox* BMPBox::loadIfExist(const std::wstring& filename, HDC screen_dc)
 }
 
 void BMPBox::setOnScreen(bool onScreen) {
-	mp->setOnScreen(onScreen);
+	if(mp)mp->setOnScreen(onScreen);
 }

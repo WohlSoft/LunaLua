@@ -154,6 +154,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 		mLunaTexMap[&bmp] = pTex;
 		return pTex;
 	}
+
 	
 }
 
