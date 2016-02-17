@@ -416,14 +416,15 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 	return true;
 }
 bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) {
-	//_initADCmp(&FFADC);
 	if (!m->isAudioAvailable())return false;
 	FFADC.swrCtx = swr_alloc();
 	if (FFADC.swrCtx == NULL)return false;
-	av_opt_set_int(FFADC.swrCtx, "in_channel_layout", m->audCodecCtx->channel_layout, 0);
-	av_opt_set_int(FFADC.swrCtx, "in_sample_rate", m->audCodecCtx->sample_rate, 0);
-	av_opt_set_sample_fmt(FFADC.swrCtx, "in_sample_fmt", m->audCodecCtx->sample_fmt, 0);
-
+	int o_chLayout = m->audCodecCtx->channel_layout;
+	int o_sRate = m->audCodecCtx->sample_rate;
+	AVSampleFormat o_sFmt = m->audCodecCtx->sample_fmt;
+	av_opt_set_int(FFADC.swrCtx, "in_channel_layout", o_chLayout? o_chLayout :AV_CH_LAYOUT_STEREO, 0);
+	av_opt_set_int(FFADC.swrCtx, "in_sample_rate", o_sRate? o_sRate:44100, 0);
+	av_opt_set_sample_fmt(FFADC.swrCtx, "in_sample_fmt", o_sFmt == AV_SAMPLE_FMT_NONE?AV_SAMPLE_FMT_S16:o_sFmt, 0);
 	av_opt_set_int(FFADC.swrCtx, "out_channel_layout", as->channelLayout, 0);
 	av_opt_set_int(FFADC.swrCtx, "out_sample_rate", as->sample_rate, 0);
 	av_opt_set_sample_fmt(FFADC.swrCtx, "out_sample_fmt", as->sample_format, 0);
@@ -484,6 +485,7 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 			}
 		}
 	});
+	
 	return setSDLAudioDevice(as);
 }
 void FFmpegMediaPlayer::coreInit() {
@@ -517,6 +519,7 @@ void FFmpegMediaPlayer::coreInit() {
 	_seek->data = &__seekVal;
 
 	__queue = new FFmpegThreadFunc((std::function<void(FFmpegThreadFuncController*)>)[=](FFmpegThreadFuncController* ctrl) {
+		
 		if (waitEnd)return;
 		if (shouldEnd()) {
 			waitEnd = true;
@@ -553,7 +556,10 @@ void FFmpegMediaPlayer::coreInit() {
 			sman.seekProc();
 		}			
 			//av_init_packet(&pkt);
+		
+		
 			while (!ctrl->quit && soundQueue->dataSize() < soundQueue->MAX_SIZE && videoQueue->dataSize() < videoQueue->MAX_SIZE) {
+				
 				end = av_read_frame(media->fmtCtx, &pkt);
 				if (end < 0) {
 					loadCompleted = (end == AVERROR_EOF);
@@ -588,6 +594,7 @@ FFmpegMediaPlayer::FFmpegMediaPlayer(std::wstring filePath, FFmpegDecodeSetting 
 	coreInit();
 	//startTime = std::chrono::system_clock::now();
 	if (isVideoPlayable())FFmpegMediaPlayer::videoOutputThread->addWork(__outputVideoBuffer);
+	
 	FFmpegDecodeQueue::queueThread->addWork(__queue);
 	//play();
 }

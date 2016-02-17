@@ -119,7 +119,7 @@ void BMPBox::Init() {
 	m_hbmp = NULL;
 	m_hdc = NULL;
 	hasVideo = false;
-	ffdset.video.pixFmt = PIX_FMT_BGRA;
+	ffdset.video.pixFmt = AV_PIX_FMT_BGRA;
 	ffdset.video.resampling_mode = SWS_FAST_BILINEAR;
 	ffdset.video.width = 0;		//use almost original size
 	ffdset.video.height = 0;

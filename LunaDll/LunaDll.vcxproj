@@ -118,6 +118,8 @@
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
