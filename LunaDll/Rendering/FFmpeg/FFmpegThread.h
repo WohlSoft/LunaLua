@@ -30,18 +30,22 @@ public:
 
 class FFmpegThread {
 public:
-	std::thread* th;
-	std::atomic<bool> workHasStarted;
+	
 	void createThread();
 	void check_exit();
 	void worker();
 	void addWork(FFmpegThreadFunc* work);
 	bool delWork(FFmpegThreadFunc* work);
-	std::vector<FFmpegThreadFunc*> workList;
 	void kill();
+	FFmpegThread();
+	bool boost;
+private:
+	std::vector<FFmpegThreadFunc*> workList;
+	
+	std::thread* th;
+	std::atomic<bool> workHasStarted;
 	std::atomic<bool> pendingKill;
 	std::mutex mtx1;
-	FFmpegThread();
 };
 
 #endif

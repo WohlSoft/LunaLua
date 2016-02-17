@@ -5,6 +5,7 @@
 
 FFmpegThreadFunc::FFmpegThreadFunc() {
 	memset(&ctrl, 0, sizeof(FFmpegThreadFuncController));
+
 }
 
 FFmpegThreadFunc::FFmpegThreadFunc(std::function<void(FFmpegThreadFuncController*)>& _func):FFmpegThreadFunc() {
@@ -25,7 +26,7 @@ void FFmpegThread::worker() {
 		
 		//NOTE:Sleep(1) limits the interval of this loop to 15ms at least. 
 		//(due to windows' timeslice)
-		Sleep(1);
+		if(!boost)Sleep(1);
 	}
 }
 bool FFmpegThread::delWork(FFmpegThreadFunc* work) {
@@ -43,7 +44,7 @@ bool FFmpegThread::delWork(FFmpegThreadFunc* work) {
 	if(found)workList.erase(workList.begin() + i);
 	return found;
 }
-FFmpegThread::FFmpegThread():pendingKill(false),workHasStarted(false) {
+FFmpegThread::FFmpegThread():pendingKill(false),workHasStarted(false),boost(false),th(NULL) {
 }
 
 void FFmpegThread::addWork(FFmpegThreadFunc* work) {

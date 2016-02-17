@@ -490,7 +490,7 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 }
 void FFmpegMediaPlayer::coreInit() {
 	soundQueue = new FFmpegDecodeQueue(44100 * 2); //0.5sec
-	videoQueue = new FFmpegDecodeQueue(800 * 600 * 4); //whole screen
+	videoQueue = new FFmpegDecodeQueue(800 * 600 * 4*5); //whole screen
 	_play = new FFmpegMediaPlayerOperation();
 	_pause = new FFmpegMediaPlayerOperation();
 	_seek = new FFmpegMediaPlayerOperation();
@@ -524,7 +524,16 @@ void FFmpegMediaPlayer::coreInit() {
 		if (shouldEnd()) {
 			waitEnd = true;
 		}
-		
+
+		//use better condition of unboost
+		/*
+		if (!sman.isSeeking() && videoOutputThread->boost) {
+			videoOutputThread->boost = false;
+		}
+		if (!sman.isSeeking() && FFmpegDecodeQueue::queueThread->boost) {
+			FFmpegDecodeQueue::queueThread->boost = false;
+		}
+		*/
 		if (SDL_GetTicks() - lastOnScreenTime > 100) {
 			onScreen = false;
 		}
@@ -634,6 +643,10 @@ FFmpegDecodeSetting FFmpegMediaPlayer::getAppliedSetting() {
 }
 
 void FFmpegMediaPlayer::seek_internal(double sec) {
+	/*
+	videoOutputThread->boost = true;
+	FFmpegDecodeQueue::queueThread->boost = true;
+	*/
 	std::lock_guard<std::mutex>lock1(soundQueue->mtx1);
 	std::lock_guard<std::mutex>lock2(videoQueue->mtx1);
 	soundQueue->rawClear();
