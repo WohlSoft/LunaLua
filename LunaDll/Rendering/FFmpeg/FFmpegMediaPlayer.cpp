@@ -521,7 +521,7 @@ void FFmpegMediaPlayer::coreInit() {
 		if (shouldEnd()) {
 			waitEnd = true;
 		}
-		GM_STAR_COUNT = SDL_GetTicks() - lastOnScreenTime;
+		
 		if (SDL_GetTicks() - lastOnScreenTime > 100) {
 			onScreen = false;
 		}
