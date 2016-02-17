@@ -83,17 +83,14 @@ const GLSprite* GLTextureStore::SpriteFromSMBXBitmap(HDC hdc) {
 const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, bool noUpdate)
 {
 	if (bmp.m_hbmp == NULL) return NULL;
-
-	if (bmp.lastRenderRequestedGFrame < gFrames && !noUpdate) {
-		((BMPBox*)&bmp)->updateVideoFrame();
-	}
 	// Get associated texture from cache if possible
+	
 	bool cacheFound = false;
 	auto it = mLunaTexMap.find(&bmp);
 	cacheFound = it != mLunaTexMap.end();
 
 	//image
-	if (!bmp.m_modified.load() && cacheFound)return it->second;
+	if (!bmp.hasVideo && cacheFound)return it->second;
 
 	// The bitmap of BMPBox is known to be a DIB one, with pre-multiplied BGRA.
 	// This makes things easy.
@@ -143,9 +140,11 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 	GLERRORCHECK("glTexSubImage2D", bmp.m_Filename, tex.pw, tex.ph);
 
+	const_cast<BMPBox*>(&bmp)->setOnScreen(true); //sorry for const_cast'ing
+
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 	//GLERRORCHECK();
-	((BMPBox*)&bmp)->m_modified.store(false, std::memory_order_relaxed);
+	//((BMPBox*)&bmp)->m_modified.store(false, std::memory_order_relaxed);
 	// Cache new texture
 	if (cacheFound) {
 		return it->second;
@@ -155,19 +154,16 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 		mLunaTexMap[&bmp] = pTex;
 		return pTex;
 	}
+	
 }
 
 void GLTextureStore::checkRendered() {
-	//std::vector<const BMPBox*> deleteTmp;
-	//do this at last
+	
+	/*
 	for (auto i : mLunaTexMap) {
-		if (i.first->musicPlayed && i.first->lastRenderRequestedGFrame < gFrames - 7) {
-
-			((BMPBox*)i.first)->stopPlay();
-			//deleteTmp.push_back(i.first);
-			//TextureFromLunaBitmap(*(i.first), true);
-		}
+		const_cast<BMPBox*>(i.first)->setOnScreen(true); 
 	}
+	*/
 	/*
 	for (int i = 0; i < deleteTmp.size(); i++) {
 	ClearLunaTexture(*deleteTmp[i]);

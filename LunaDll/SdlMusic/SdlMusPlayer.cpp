@@ -3,6 +3,15 @@
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
 #include "MusicManager.h"
+#include <mutex>
+
+PGE_PostMixFunc::PGE_PostMixFunc() {
+	userdata = NULL;
+}
+
+PGE_PostMixFunc::PGE_PostMixFunc(std::function<void(void *udata, uint8_t *stream, int len)>& _func) :PGE_PostMixFunc() {
+	func = _func;
+}
 
 /***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
@@ -30,10 +39,15 @@ Mix_Music *PGE_MusPlayer::play_mus = NULL;
 std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
+int PGE_MusPlayer::chunkSize = 2048;
+int PGE_MusPlayer::_sampleFormat = AUDIO_S16;
+int PGE_MusPlayer::_channels = 2;
+std::mutex PGE_MusPlayer::mtx1;
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
 std::atomic<unsigned __int64> PGE_MusPlayer::sCount = 0;
 std::atomic<unsigned __int64> PGE_MusPlayer::musSCount = 0;
+std::vector<PGE_PostMixFunc*> PGE_MusPlayer::postMixFuncSet;
 
 void PGE_MusPlayer::MUS_playMusic()
 {
@@ -174,7 +188,7 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
 {
     sRate=sampleRate;
     Mix_CloseAudio();
-    Mix_OpenAudio(sRate, AUDIO_S16, 2, 2048);
+    Mix_OpenAudio(sRate, _sampleFormat, _channels, chunkSize);
 	Mix_AllocateChannels(32);
 
 	// Reset music sample count
@@ -191,6 +205,14 @@ int PGE_MusPlayer::sampleRate()
 int PGE_MusPlayer::currentVolume()
 {
     return volume;
+}
+
+int PGE_MusPlayer::sampleFormat() {
+	return _sampleFormat;
+}
+
+int PGE_MusPlayer::channels() {
+	return _channels;
 }
 
 
@@ -245,6 +267,11 @@ void PGE_MusPlayer::postMixCallback(void *udata, Uint8 *stream, int len)
 	{
 		musSCount += len/4;
 	}
+
+	std::lock_guard<std::mutex>lock(mtx1);
+	for (int i = 0; i < postMixFuncSet.size(); ++i) {
+		postMixFuncSet[i]->func(postMixFuncSet[i]->userdata, stream, len);
+	}
 }
 
 unsigned __int64 PGE_MusPlayer::sampleCount()
@@ -255,6 +282,25 @@ unsigned __int64 PGE_MusPlayer::sampleCount()
 unsigned __int64 PGE_MusPlayer::MUS_sampleCount()
 {
 	return musSCount;
+}
+
+void PGE_MusPlayer::addPostMixFunc(PGE_PostMixFunc* f) {
+	std::lock_guard<std::mutex>lock(mtx1);
+	postMixFuncSet.push_back(f);
+}
+bool PGE_MusPlayer::removePostMixFunc(PGE_PostMixFunc* f) {
+	if (f == NULL)return false;
+	std::lock_guard<std::mutex>lock(mtx1);
+	if (postMixFuncSet.empty())return false;
+	int i = 0; bool found=false;
+	for (; i < postMixFuncSet.size(); i++) {
+		if (postMixFuncSet[i] == f) {
+			found = true;
+			break;
+		}
+	}
+	if(found)postMixFuncSet.erase(postMixFuncSet.begin() + i);
+	return found;
 }
 
 /***********************************PGE_Sounds********************************************/

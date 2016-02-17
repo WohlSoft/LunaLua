@@ -1193,6 +1193,7 @@ namespace LuaProxy {
         class LuaImageResource {
         public:
             std::shared_ptr<BMPBox> img;
+			LuaImageResource() :img(nullptr){}
             LuaImageResource(const std::shared_ptr<BMPBox>& img);
             ~LuaImageResource();
             int GetWidth() const;

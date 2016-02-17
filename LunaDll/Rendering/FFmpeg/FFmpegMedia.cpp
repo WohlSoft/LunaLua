@@ -2,10 +2,29 @@
 #include "../../GlobalFuncs.h"
 #include <math.h>
 
+FFmpegMedia::~FFmpegMedia() {
+	
+	if (vidCodecCtx) {
+		avcodec_close(vidCodecCtx);
+		//avcodec_free_context(&vidCodecCtx);
+	}
+	if (audCodecCtx) {
+		avcodec_close(audCodecCtx);
+		//avcodec_free_context(&audCodecCtx);
+	}
+	
+	if (fmtCtx) {
+		avformat_close_input(&fmtCtx);
+	}
+}
+
 void FFmpegMedia::init() {
 	vidStreamIdx = audStreamIdx = -1;
 	_videoAvailable = _audioAvailable = false;
 	fmtCtx = NULL;
+	FPS = { 0,1 };
+	video = NULL; audio = NULL;
+	vidCodecCtx = audCodecCtx = NULL;
 	//rawBitmapBuffer = NULL;
 	//rawBufferFrameNum = 0;
 }
@@ -57,12 +76,16 @@ FFmpegMedia::FFmpegMedia(std::wstring filepath):FFmpegMedia() {
 		/* init codec */
 		vidCodecCtx = fmtCtx->streams[vidStreamIdx]->codec;
 		_videoAvailable = (avcodec_open2(vidCodecCtx, vidCodec, NULL) >=0);
-		
+		if (_videoAvailable) {
+			video = fmtCtx->streams[vidStreamIdx];
+			FPS = video->avg_frame_rate;
+		}
 	}
 
 	if (audStreamIdx >= 0 && audCodec != NULL) { 
 		audCodecCtx = fmtCtx->streams[audStreamIdx]->codec;
 		_audioAvailable = (avcodec_open2(audCodecCtx, audCodec, NULL) >= 0);
+		if (_audioAvailable)audio = fmtCtx->streams[audStreamIdx];
 	}
 
 end:

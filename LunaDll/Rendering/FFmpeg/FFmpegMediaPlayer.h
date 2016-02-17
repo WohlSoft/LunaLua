@@ -5,13 +5,20 @@
 #include "FFmpegMedia.h"
 #include "FFmpegDecodeQueue.h"
 #include "FFmpegThread.h"
+#include "FFmpegComponent.h"
+#include "../../SdlMusic/SdlMusPlayer.h"
 #include <SDL2/SDL.h>
 #include <string>
 #include <functional>
+#include <atomic>
+#include <chrono>
+#include <mutex>
+#include <Windows.h>
 
 #define FFMP_AUDIO_BUFFER_SIZE 176400
 #define SDL_AUDIO_BUFFER_SIZE 4096
 /* about 0.09 sec */
+
 
 struct FFmpegVideoDecodeSetting {
 	AVPixelFormat pixFmt;
@@ -32,48 +39,186 @@ struct FFmpegDecodeSetting {
 	FFmpegVideoDecodeSetting video;
 };
 
+
+class FFmpegPlayerStateManager {
+public:
+	//request these operations
+	void play();
+	void pause();
+	void stop();
+	void seek(double sec);
+
+	//get position(msec)
+	double playPosition();
+	double pausePosition();
+	
+	//know whether these actions should be done
+	bool audioShouldPlay();
+	bool videoShouldPlay();
+	bool shouldBegin();
+	bool shouldPause();
+	bool shouldSeek();
+	bool shouldPauseByVideo();
+	bool shouldBookPause();
+	bool videoShouldKeepUp();
+	bool shouldRenderVideo();
+
+	//plan future actions
+	void pauseBooking(double currentTime, double remainTime);
+	void stopBooking();
+
+	//misc proc
+	void startProc(double currentTime, double delay);
+	void seekProc();
+	void pauseProc();
+
+	bool isSeeking();
+
+	void updateState(double currentTime);
+	void refreshVideoState(double currentFrameTime);
+	
+	//states; "w" means "wait"
+	bool playing;
+	bool wPlay;
+	bool wPause;
+	bool wSeek;
+	bool wStop;
+	bool pauseBooked;
+	bool stopBooked;
+
+	bool needAudioPosReset;
+	bool needVideoPosReset;
+	
+	bool videoRendered;
+	bool videoMemResetFlag;
+
+	//Time:absolute time
+	//Pos:relative time from start
+	//unit=msec
+	double startTime;
+	double playTime;
+	double pauseTime;
+	double plannedStartTime;
+
+	double videoPos;
+	double seekPos;
+
+	FFmpegPlayerStateManager()
+		:playing(false),
+		playTime(0),
+		videoPos(0),
+		startTime(0), plannedStartTime(0),
+		pauseTime(0),
+		wPlay(false), //!
+		wPause(false),
+		wStop(false),
+		wSeek(false),
+		pauseBooked(false),
+		videoRendered(false),
+		needAudioPosReset(false),
+		needVideoPosReset(false), videoMemResetFlag(false),
+		stopBooked(false) {};
+
+};
+
+class FFmpegMediaPlayerOperation {
+public:
+	
+	std::function<void(void*)> initOp;
+	void* data;
+	std::function<bool(void)> endCond;
+	FFmpegMediaPlayerOperation():data(NULL){}
+};
+
+class FFmpegMediaPlayerOpQueue {
+public:
+	void push(FFmpegMediaPlayerOperation*& op);
+
+	bool pop(FFmpegMediaPlayerOperation*& op);
+
+	void clear();
+
+	void proc();
+
+	FFmpegMediaPlayerOperation* wait;
+
+	FFmpegMediaPlayerOpQueue() :wait(NULL){}
+	std::mutex mtx1;
+private:
+
+	std::deque<FFmpegMediaPlayerOperation*> Ops;
+	int size_;
+};
+
 class FFmpegMediaPlayer {
 public:
-	FFmpegDecodeSetting decodeSetting;
-	FFmpegMedia media;
-	FFmpegMediaPlayer();
-	FFmpegMediaPlayer(std::wstring filePath, FFmpegDecodeSetting desiredDecodeSetting);
-	void setVideoBufferDest(void* videoBuffer);
+	void play();
+	void pause();
+	void seek(double sec);
+	void stop();
+	void setVolume(int volume);
+	bool loop;
+	enum OffScreenMode {
+		CONTINUE,PAUSE,STOP
+	};
+	
+	bool onScreen;
+	
 	bool isVideoPlayable() const;
 	bool isAudioPlayable() const;
+	FFmpegDecodeSetting getAppliedSetting();
+	void setVideoBufferDest(void* videoBuffer);
+
+	FFmpegMediaPlayer();
+	FFmpegMediaPlayer(std::wstring filePath, FFmpegDecodeSetting desiredDecodeSetting);
+	~FFmpegMediaPlayer();
+
 	static FFmpegThread* videoOutputThread;
+	void DebugMsgBox(LPCSTR pszFormat, ...);
+	void setOffScreenMode(OffScreenMode mode);
+	void setOnScreen(bool onScreen);
 private:
-	void init();
-	bool initVideo(FFmpegMedia media,FFmpegVideoDecodeSetting *vSet);
-	bool initAudio(FFmpegMedia media, FFmpegAudioDecodeSetting *aSet);
-	AVFrame *vidSrcFrame, *vidDestFrame,*audFrame;
-	uint8_t* vBuffer;
-	SwsContext* swsCtx;
-	SwrContext* swrCtx;
-	uint8_t* outBuffer;
-	AVPacket pkt,vPkt,aPkt;
-	int got_picture,got_sound;
-	int audDestMaxSamples, audDestSamples;
-	uint8_t **audDestData;
-	uint8_t *audPktData;
-	int audPktSize;
-	int audDestLSize;
-	uint8_t* audBuf; // [FFMP_AUDIO_BUFFER_SIZE];
-	int audBufSize;
-	int audBufOffset;
-	FFmpegDecodeQueue soundQueue;
-	FFmpegDecodeQueue videoQueue;
-	void SDLCallback(void* userdata, uint8_t* stream, int len);
-	static void SDLCALL __SDLCallbackWrapper(void* userdata, uint8_t* stream, int len);
-	bool isSettingValid(FFmpegDecodeSetting s);
+	int aL[8]; //garbage
+	int _SDLSoundFormat;
+	double __seekVal;
+	uint8_t* outBuffer;//no init needed
+	AVPacket pkt;
 	bool _videoPlayable, _audioPlayable;
-	FFmpegThreadFunc __queue,__outputVideoBuffer;
-	//FFmpegThreadFuncController queueController, outputVideoController;
+	bool loadViaPlayer;
+	bool loadCompleted;
+	FFmpegMedia* media;
+	FFmpegDecodeQueue *soundQueue;
+	FFmpegDecodeQueue *videoQueue;
+	PGE_PostMixFunc* postMixCallback;
+	FFmpegMediaPlayerOpQueue* opq;
+	FFmpegMediaPlayerOperation* _play;
+	FFmpegMediaPlayerOperation* _pause;
+	FFmpegMediaPlayerOperation* _seek;
+	FFmpegPlayerStateManager sman;
+	FFmpegDecodeSetting decodeSetting;
+	FFmpegAudioDecodeComponent FFADC;
+	FFmpegVideoDecodeComponent FFVDC;
+	FFmpegThreadFunc *__queue, *__outputVideoBuffer;
+	
+	void init();
+	void coreInit();
+	bool initVideo(FFmpegMedia* media,FFmpegVideoDecodeSetting *vSet);
+	bool initAudio(FFmpegMedia* media, FFmpegAudioDecodeSetting *aSet);
+	bool isSettingValid(FFmpegDecodeSetting s);
 	int resampleAudio(AVFrame* decodedFrame,uint8_t ***dest_data);
-	volatile int decodedFrameCount;
-	int decodeAudioFrame(uint8_t* buffer,int buffer_size);
-	SDL_AudioSpec sdlSpec;
+	int decodeAudioFrame(uint8_t* buffer,int buffer_size,double* head_time);
 	bool setSDLAudioDevice(FFmpegAudioDecodeSetting* as);
+	
+	void seek_internal(double sec);
+	bool needMute();
+	bool shouldEnd();
+	
+	bool waitEnd;
+	int _volume;
+	bool offScreenProcessed;
+	double lastOnScreenTime;
+	OffScreenMode OScrMode;
 };
+
 
 #endif
