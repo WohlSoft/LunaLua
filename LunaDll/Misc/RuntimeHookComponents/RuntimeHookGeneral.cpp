@@ -465,9 +465,7 @@ void TrySkipPatch()
     // -10: Foreground Blocks
     PATCH(0x92BAC0).NOP().NOP().CALL(GetRenderBelowPriorityHook<-5>()).Apply();
     //  -5: Foreground Effects (all not at 0091DD90)
-        //0x92BF96
-        //0x92EC24
-    PATCH(0x92FC3F).NOP().NOP().CALL(GetRenderBelowPriorityHook<5>()).Apply();
+    // Handle Priority 5 from LevelHUDHook
     //   5: HUD
     PATCH(0x939977).NOP().NOP().CALL(GetRenderBelowPriorityHook<100>()).Apply();
 
