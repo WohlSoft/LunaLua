@@ -58,6 +58,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             obj->mTex = nullptr;
             obj->mVertColor = nullptr;
             obj->mCount = 4;
+            obj->mSceneCoords = false;
             g_GLEngine.QueueCmd(obj);
         }
         if (borderColor.a > 0.0f)
@@ -80,6 +81,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             obj->mTex = nullptr;
             obj->mVertColor = nullptr;
             obj->mCount = 4;
+            obj->mSceneCoords = false;
             g_GLEngine.QueueCmd(obj);
         }
     }

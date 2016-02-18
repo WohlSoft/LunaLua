@@ -22,6 +22,8 @@ private:
 
     AsyncGifRecorder mGifRecorder;
 
+    double mCameraX, mCameraY;
+
 public:
     GLEngine();
     ~GLEngine();
@@ -45,6 +47,9 @@ public:
 
     bool GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     void GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+
+    inline void SetCamera(double x, double y) { mCameraX = x; mCameraY = y; }
+    inline void GetCamera(double &x, double &y) { x = mCameraX; y = mCameraY; }
 };
 
 #include "GLEngineProxy.h"

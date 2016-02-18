@@ -118,6 +118,8 @@ public:
     const float* mTex;
     const float* mVertColor;
     uint32_t mCount;
+    bool mSceneCoords;
+
     virtual void run(GLEngine& glEngine) const;
     virtual ~GLEngineCmd_LuaDraw() {
         if (mVert) {
@@ -133,6 +135,12 @@ public:
             mVertColor = NULL;
         }
     }
+};
+
+class GLEngineCmd_SetCamera : public GLEngineCmd {
+public:
+    double mX, mY;
+    virtual void run(GLEngine& glEngine) const;
 };
 
 #endif

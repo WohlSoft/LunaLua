@@ -227,6 +227,7 @@ extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
         skipStarCountPatch.Unapply();
     }
 
+    gLunaRender.RenderBelowPriority(5);
     if (!gSMBXHUDSettings.skip) {
         native_renderLevelHud(cameraIdx, unknown0x4002);
     }
