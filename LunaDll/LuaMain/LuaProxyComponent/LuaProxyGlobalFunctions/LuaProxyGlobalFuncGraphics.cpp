@@ -214,6 +214,20 @@ void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, d
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, false, priority, L);
 }
 
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos,double destWidth,double destHeight, double priority, lua_State* L)
+{
+	drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0,destWidth,destHeight, 1.0f, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth, double destHeight, float opacity, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, destWidth, destHeight, opacity, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, destWidth, destHeight, 1.0f, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, float opacity, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, destWidth, destHeight, opacity, false, priority, L);
+}
+
 
 
 void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L)
@@ -276,6 +290,31 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, double xP
     renderOp->m_renderPriority = priority; 
 
     gLunaRender.AddOp(renderOp);
+}
+
+void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight,double destWidth,double destHeight, float opacity, bool sceneCoords, double priority, lua_State* L)
+{
+	if (priority < RENDEROP_PRIORITY_MIN || priority > RENDEROP_PRIORITY_MAX) {
+		luaL_error(L, "Priority value is not valid (must be between %f and %f, got %f).", RENDEROP_PRIORITY_MIN, RENDEROP_PRIORITY_MAX, priority);
+		return;
+	}
+
+	RenderBitmapOp* renderOp = new RenderBitmapOp();
+	renderOp->direct_img = img.img;
+	renderOp->x = xPos;
+	renderOp->y = yPos;
+	renderOp->sx = (sourceX <= 0.0 ? 0.0 : sourceX);
+	renderOp->sy = (sourceY <= 0.0 ? 0.0 : sourceY);
+	renderOp->sw = (sourceWidth <= 0.0 ? static_cast<double>(img.img->m_W) : sourceWidth);
+	renderOp->sh = (sourceHeight <= 0.0 ? static_cast<double>(img.img->m_H) : sourceHeight);
+	renderOp->dw = (destWidth <= 0.0 ? renderOp->sw : destWidth);
+	renderOp->dh = (destHeight <= 0.0 ? renderOp->sh : destHeight);
+	renderOp->scaling = true;
+	renderOp->opacity = opacity;
+	renderOp->sceneCoords = sceneCoords;
+	renderOp->m_renderPriority = priority;
+
+	gLunaRender.AddOp(renderOp);
 }
 
 

@@ -517,6 +517,16 @@ void CLunaLua::bindAll()
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+
+				//add
+				
+				def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+				def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+				//too many args
+				//def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double,double, double,double,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+				
+				//def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double,double,double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+				
                 def("draw", &LuaProxy::Graphics::draw),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),

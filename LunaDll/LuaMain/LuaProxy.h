@@ -1232,7 +1232,13 @@ namespace LuaProxy {
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
+		
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth,double destHeight,double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth, double destHeight, float opacity, double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, float opacity, double priority, lua_State* L);
+
+		void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
@@ -1241,7 +1247,8 @@ namespace LuaProxy {
         void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
         void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
         void drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
-        void draw(const luabind::object& namedArgs, lua_State* L);
+		void drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight,double destWidth,double destHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
+		void draw(const luabind::object& namedArgs, lua_State* L);
 
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);

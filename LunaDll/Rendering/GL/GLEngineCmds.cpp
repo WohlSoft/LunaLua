@@ -69,8 +69,13 @@ void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
     if (mBmp == NULL) return;
     const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     if (tex == NULL) return;
+	if (mBmp->hasVideo) {
+		g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+	}
+	else {
 
-    g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+		g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+	}
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
