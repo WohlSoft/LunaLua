@@ -58,8 +58,14 @@ public:
 	void stop();
 	void pause();
 	void seek(double src);
+	void colTest(int scrX, int scrY, int destWidth, int destHeight);
+	static void procPendingHarm();
+	int hurtMode;//0= no hurt,1=use alphachannel,2=use custom hurt mask
+	int hurtMaskIndex;//stream index
+	int maskThreshold;//when value >= maskThreshold it is hurt area
 private:
 	void* bmpPtr;
+	static bool pendingHarm;
 
 };
 

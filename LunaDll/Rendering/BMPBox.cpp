@@ -7,7 +7,9 @@
 #include "../Misc/FreeImageUtils/FreeImageHelper.h"
 #include <Windows.h>
 #include <gl/glew.h>
-
+#include "../../SMBXInternal/PlayerMOB.h"
+#include <string>
+bool BMPBox::pendingHarm = false;
 void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...)
 {
 	va_list	argp;
@@ -130,6 +132,10 @@ void BMPBox::Init() {
 	ffdset.audio.channel_num = 0; //auto
 	ffdset.audio.sample_format = AV_SAMPLE_FMT_S16;
 	ffdset.audio.sample_rate = 44100;
+	pendingHarm = false;
+	hurtMode = 0;
+	hurtMaskIndex = 0;
+	maskThreshold = 235; //
 }
 
 
@@ -262,4 +268,40 @@ void BMPBox::pause() {
 
 void BMPBox::seek(double sec) {
 	if (mp)mp->seek(sec);
+}
+
+void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
+	if (!(hurtMode == 1 || hurtMode == 2))return;
+	if (!mp)return;
+	if (!mp->collisionMap)return;
+	if (GM_PLAYERS_COUNT <= 0)return;
+	if (destWidth <= 0 || destHeight <= 0)return;
+	auto pl = Player::Get(1);
+	RECT pRect = Player::GetScreenPosition(pl);
+	
+	double wScale = m_W / (double)destWidth;
+	double hScale = m_H / (double)destHeight;
+
+	//coord scaling
+	pRect.top = (LONG)round(hScale*pRect.top); pRect.bottom = (LONG)round(hScale*pRect.bottom);
+	pRect.left = (LONG)round(wScale*pRect.left); pRect.right = (LONG)round(wScale*pRect.right);
+	int x = (int)round(wScale*scrX); int y = (int)round(hScale*scrY);
+	int startH = min(max(pRect.top,y),m_H+y)-y; int endH = min(max(pRect.bottom, y), m_H+y)-y;
+	int startW = min(max(pRect.left, x), m_W+x)-x; int endW = min(max(pRect.right, x), m_W+x)-x;
+	for (int i = startH; i < endH; i++) {
+		for (int j = startW; j < endW; j++) {
+			if (mp->collisionMap[m_W*i + j] >= maskThreshold) {
+				pendingHarm = true;
+				return;
+			}
+		}
+	}
+}
+
+void BMPBox::procPendingHarm() {
+	if (pendingHarm) {
+		pendingHarm = false;
+		short hm = 1;
+		Player::Harm(&hm);
+	}
 }

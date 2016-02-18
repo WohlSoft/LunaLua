@@ -177,6 +177,7 @@ public:
 	void DebugMsgBox(LPCSTR pszFormat, ...);
 	void setOffScreenMode(OffScreenMode mode);
 	void setOnScreen(bool onScreen);
+	uint8_t* collisionMap;
 private:
 	int aL[8]; //garbage
 	int _SDLSoundFormat;

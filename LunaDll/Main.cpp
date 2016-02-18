@@ -204,6 +204,8 @@ int TestFunc()
 		// Run any framecode
 		TestFrameCode();
 		LevelFrameCode();
+
+		BMPBox::procPendingHarm();
 	}
 
     Blocks::DoSortingIfRequired();

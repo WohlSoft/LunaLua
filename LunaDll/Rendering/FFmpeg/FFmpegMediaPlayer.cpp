@@ -248,6 +248,7 @@ void FFmpegMediaPlayer::init() {
 	lastOnScreenTime = -1;
 
 	OScrMode = STOP;
+	collisionMap = NULL;
 }
 
 //‰f‘œ‚ÉŠÖ‚·‚é‰Šú‰»
@@ -402,6 +403,12 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 							((uint8_t*)FFVDC.vidDestFrame->data[0]) + j*FFVDC.vidDestFrame->linesize[0],
 							FFVDC.vidDestFrame->linesize[0]
 							);
+						/* collision map test */
+						
+						for (int k = 0; k < FFVDC.vidDestFrame->linesize[0]/4; k++) {
+							collisionMap[j*FFVDC.vidDestFrame->linesize[0]/4 + k] = *(((uint8_t*)FFVDC.vidDestFrame->data[0]) + j*FFVDC.vidDestFrame->linesize[0] + k * 4+3);
+						}
+						
 					}
 				}
 			}
@@ -413,6 +420,7 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 
 		}
 	});
+	collisionMap = (uint8_t*)malloc(_w*_h*sizeof(uint8_t));
 	return true;
 }
 bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) {

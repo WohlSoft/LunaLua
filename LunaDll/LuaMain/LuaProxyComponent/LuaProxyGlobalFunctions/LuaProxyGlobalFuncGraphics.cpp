@@ -62,6 +62,14 @@ void LuaProxy::Graphics::LuaMovieResource::pause() {
 void LuaProxy::Graphics::LuaMovieResource::seek(double sec) {
 	if (img)img->seek(sec);
 }
+void LuaProxy::Graphics::LuaMovieResource::setHurtMode(int m) { if (img)img->hurtMode = m; }
+int LuaProxy::Graphics::LuaMovieResource::getHurtMode() const {
+	return img ? img->hurtMode : 0;
+}
+void LuaProxy::Graphics::LuaMovieResource::setHurtMaskIndex(int idx) { if (img)img->hurtMaskIndex = idx; }
+int LuaProxy::Graphics::LuaMovieResource::getHurtMaskIndex() const { return img ? img->hurtMaskIndex : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setMaskThreshold(int th) { if (img)img->maskThreshold = th; }
+int LuaProxy::Graphics::LuaMovieResource::getMaskThreshold() const { return img ? img->maskThreshold : 0; }
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {
