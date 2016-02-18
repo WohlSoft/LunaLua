@@ -12,7 +12,8 @@
 GLEngine::GLEngine() :
     mEnabled(true), mBitwiseCompat(false),
     mHwnd(NULL),
-    mScreenshot(false)
+    mScreenshot(false),
+    mCameraX(0.0), mCameraY(0.0)
 {
 }
 

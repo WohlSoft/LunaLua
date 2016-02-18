@@ -573,6 +573,8 @@ void CLunaLua::bindAll()
                 def("unpause", &LuaProxy::Misc::unpause),
                 def("isPausedByLua", &LuaProxy::Misc::isPausedByLua),
                 def("warning", &LuaProxy::Misc::warning),
+                def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
+                def("warning", &LuaProxy::Misc::warning),
 				def("updateWarp", &LuaProxy::Misc::updateWarp)
             ],
 
