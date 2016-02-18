@@ -21,6 +21,7 @@
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
 #include "SMBXInternal/Level.h"
+#include "Misc/RuntimeHook.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -283,6 +284,8 @@ void ResetLunaModule()
     gCellMan.Reset();
     gSavedVarBank.ClearBank();
     Input::ResetAll();
+
+    runtimeHookCharacterIdReset();
 
     gHook_SkipTestMsgBox = false;
 
