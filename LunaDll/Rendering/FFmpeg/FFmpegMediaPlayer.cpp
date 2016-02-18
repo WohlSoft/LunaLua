@@ -218,6 +218,8 @@ FFmpegMediaPlayer::~FFmpegMediaPlayer() {
 	/* 中にあるAVPacketはデストラクタにfreeされる */
 	if (soundQueue) delete soundQueue;
 	if (videoQueue) delete videoQueue;
+	if (maskQueue) delete maskQueue;
+
 
 	/* このplayerのコンストラクタで読み込まれたmediaなら削除 */
 	if (media && loadViaPlayer)delete media;
@@ -232,9 +234,11 @@ void FFmpegMediaPlayer::init() {
 	_videoPlayable = _audioPlayable = false;
 	_SDLSoundFormat = AUDIO_S16SYS;
 	av_init_packet(&pkt);
+	av_init_packet(&mPkt);
+	av_init_packet(&tmpMPkt);
 	media = NULL;
 	_play = _pause = _seek = NULL;
-	soundQueue = videoQueue = NULL;
+	soundQueue = videoQueue = maskQueue = NULL;
 	__queue = __outputVideoBuffer = NULL;
 	postMixCallback = NULL;
 	loop = true;
@@ -249,6 +253,8 @@ void FFmpegMediaPlayer::init() {
 
 	OScrMode = STOP;
 	collisionMap = NULL;
+	maskMode = 0;
+	mPktConsumed = true;
 }
 
 //映像に関する初期化
@@ -364,7 +370,8 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 			*/
 			if (FFVDC.got_picture) {
 				/* 再生位置の取得 */
-				sman.refreshVideoState(1000 * av_q2d(media->video->time_base)*av_frame_get_best_effort_timestamp(FFVDC.srcPtr));
+				double sec = av_q2d(media->video->time_base)*av_frame_get_best_effort_timestamp(FFVDC.srcPtr);
+				sman.refreshVideoState(1000 * sec);
 				/* シーク時の処理 ここでシーク処理を終了する */
 				if (posReset) {
 					posReset = false;
@@ -405,10 +412,50 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 							);
 						/* collision map test */
 						
-						for (int k = 0; k < FFVDC.vidDestFrame->linesize[0]/4; k++) {
-							collisionMap[j*FFVDC.vidDestFrame->linesize[0]/4 + k] = *(((uint8_t*)FFVDC.vidDestFrame->data[0]) + j*FFVDC.vidDestFrame->linesize[0] + k * 4+3);
-						}
 						
+						
+					}
+
+					switch (maskMode) {
+					//case 0:
+						//break;
+					case 1:
+						for (int j = 0; j < decodeSetting.video.height; ++j) {
+							for (int k = 0; k < FFVDC.vidDestFrame->linesize[0] / 4; k++) {
+								collisionMap[j*FFVDC.vidDestFrame->linesize[0] / 4 + k] = *(((uint8_t*)FFVDC.vidDestFrame->data[0]) + j*FFVDC.vidDestFrame->linesize[0] + k * 4 + 3);
+							}
+						}
+						break;
+					case 2:
+						//double tmptime;
+						while (maskQueue->pop(MaskVDC.vPkt)) {
+							avcodec_decode_video2(media->maskCodecCtx, MaskVDC.vidSrcFrame, &MaskVDC.got_picture, &MaskVDC.vPkt);
+							av_free_packet(&MaskVDC.vPkt);
+							if (MaskVDC.got_picture) {
+								if (av_q2d(media->mask->time_base)*av_frame_get_best_effort_timestamp(MaskVDC.vidSrcFrame) >= sec) {
+									sws_scale(
+										MaskVDC.swsCtx,
+										MaskVDC.vidSrcFrame->data,
+										MaskVDC.vidSrcFrame->linesize,
+										0,
+										MaskVDC.vidSrcFrame->height,
+										MaskVDC.vidDestFrame->data,
+										MaskVDC.vidDestFrame->linesize
+										);
+									for (int j = 0; j < decodeSetting.video.height; ++j) {
+										for (int k = 0; k < FFVDC.vidDestFrame->linesize[0] / 4; k++) {
+											collisionMap[j*MaskVDC.vidDestFrame->linesize[0] / 4 + k] = *(((uint8_t*)MaskVDC.vidDestFrame->data[0]) + j*MaskVDC.vidDestFrame->linesize[0] + k * 4);//[B]GRA
+										}
+									}
+									break;
+								}
+							}
+						}
+						break;
+					default:
+						memset(collisionMap, 0, _w*_h*sizeof(uint8_t));
+						break;
+
 					}
 				}
 			}
@@ -421,6 +468,34 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 		}
 	});
 	collisionMap = (uint8_t*)malloc(_w*_h*sizeof(uint8_t));
+
+
+	/* mask init */
+	if (!m->isMaskAvailable())return true;
+	MaskVDC.swsCtx = sws_getContext(
+		m->maskCodecCtx->width,				//src info
+		m->maskCodecCtx->height,
+		m->vidCodecCtx->pix_fmt,
+		_w,	//dest info
+		_h,
+		pixFmt,
+		decodeSetting.video.resampling_mode,
+		NULL,
+		NULL,
+		NULL);
+
+	if (MaskVDC.swsCtx == NULL)return true;
+	MaskVDC.vBuffer = (uint8_t*)av_malloc(avpicture_get_size(pixFmt, _w, _h)*sizeof(uint8_t));
+	if (MaskVDC.vBuffer == NULL)return true;
+	/* alloc frame buffer */
+	MaskVDC.vidDestFrame = av_frame_alloc();
+	MaskVDC.vidSrcFrame = av_frame_alloc();
+	//FFVDC.booked = av_frame_alloc();
+	if (MaskVDC.vidDestFrame == NULL || MaskVDC.vidSrcFrame == NULL)return true;
+	/* assign buffer to frame */
+	avpicture_fill((AVPicture*)MaskVDC.vidDestFrame, MaskVDC.vBuffer, pixFmt, _w, _h);
+
+
 	return true;
 }
 bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) {
@@ -498,7 +573,8 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 }
 void FFmpegMediaPlayer::coreInit() {
 	soundQueue = new FFmpegDecodeQueue(44100 * 2); //0.5sec
-	videoQueue = new FFmpegDecodeQueue(800 * 600 * 4*5); //whole screen
+	videoQueue = new FFmpegDecodeQueue(800 * 600 * 4*8); //whole raw screen*8
+	maskQueue = new FFmpegDecodeQueue(800 * 600 * 4 * 8); //whole raw screen*8
 	_play = new FFmpegMediaPlayerOperation();
 	_pause = new FFmpegMediaPlayerOperation();
 	_seek = new FFmpegMediaPlayerOperation();
@@ -565,7 +641,7 @@ void FFmpegMediaPlayer::coreInit() {
 			play();
 			offScreenProcessed = false;
 		}
-		int end = 0;
+		int end = 0,mend=0;
 		opq->proc();
 
 		if (sman.shouldSeek()) {
@@ -580,7 +656,7 @@ void FFmpegMediaPlayer::coreInit() {
 				end = av_read_frame(media->fmtCtx, &pkt);
 				if (end < 0) {
 					loadCompleted = (end == AVERROR_EOF);
-					return;
+					break;
 				}
 				if (pkt.stream_index == media->audStreamIdx) {
 					soundQueue->push(pkt);
@@ -592,6 +668,24 @@ void FFmpegMediaPlayer::coreInit() {
 					av_free_packet(&pkt);
 				}
 				
+			}
+
+			if (media->isMaskAvailable()) {
+				while (!ctrl->quit && maskQueue->dataSize() < maskQueue->MAX_SIZE) {
+
+					mend = av_read_frame(media->mFmtCtx, &mPkt);
+					if (mend < 0) {
+						//loadCompleted = (end == AVERROR_EOF);
+						break;
+					}
+					if (mPkt.stream_index == media->maskStreamIdx) {
+						maskQueue->push(mPkt);
+					}
+					else {
+						av_free_packet(&mPkt);
+					}
+
+				}
 			}
 	});
 }

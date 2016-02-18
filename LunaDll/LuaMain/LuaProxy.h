@@ -1214,8 +1214,8 @@ namespace LuaProxy {
 			void seek(double sec);
 			void setHurtMode(int m);
 			int getHurtMode() const;
-			void setHurtMaskIndex(int idx);
-			int getHurtMaskIndex() const;
+			//void setHurtMaskIndex(int idx);
+			//int getHurtMaskIndex() const;
 			void setMaskThreshold(int th);
 			int getMaskThreshold() const;
 

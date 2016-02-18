@@ -14,14 +14,15 @@ public:
 	~FFmpegMedia();
 	bool isVideoAvailable() const;
 	bool isAudioAvailable() const;
+	bool isMaskAvailable() const;
 	int width() const;
 	int height() const;
 	AVRational FPS;
-	AVStream *video, *audio;
+	AVStream *video, *audio,*mask;
 	double duration() const;
-	AVFormatContext* fmtCtx;
-	AVCodecContext* vidCodecCtx, *audCodecCtx;
-	int vidStreamIdx, audStreamIdx;
+	AVFormatContext* fmtCtx,*mFmtCtx;
+	AVCodecContext* vidCodecCtx, *audCodecCtx,*maskCodecCtx;
+	int vidStreamIdx, audStreamIdx,maskStreamIdx;
 	void DebugMsgBox(LPCSTR pszFormat, ...)
 	{
 		va_list	argp;
@@ -35,7 +36,7 @@ private:
 	void init();
 	
 	
-	bool _videoAvailable, _audioAvailable;
+	bool _videoAvailable, _audioAvailable,_maskAvailable;
 };
 
 #endif

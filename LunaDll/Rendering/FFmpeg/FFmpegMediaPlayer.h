@@ -177,19 +177,22 @@ public:
 	void DebugMsgBox(LPCSTR pszFormat, ...);
 	void setOffScreenMode(OffScreenMode mode);
 	void setOnScreen(bool onScreen);
+	int maskMode;
 	uint8_t* collisionMap;
 private:
 	int aL[8]; //garbage
 	int _SDLSoundFormat;
 	double __seekVal;
 	uint8_t* outBuffer;//no init needed
-	AVPacket pkt;
+	AVPacket pkt,mPkt,tmpMPkt;
+	bool mPktConsumed;
 	bool _videoPlayable, _audioPlayable;
 	bool loadViaPlayer;
 	bool loadCompleted;
 	FFmpegMedia* media;
 	FFmpegDecodeQueue *soundQueue;
 	FFmpegDecodeQueue *videoQueue;
+	FFmpegDecodeQueue *maskQueue;
 	PGE_PostMixFunc* postMixCallback;
 	FFmpegMediaPlayerOpQueue* opq;
 	FFmpegMediaPlayerOperation* _play;
@@ -199,6 +202,7 @@ private:
 	FFmpegDecodeSetting decodeSetting;
 	FFmpegAudioDecodeComponent FFADC;
 	FFmpegVideoDecodeComponent FFVDC;
+	FFmpegVideoDecodeComponent MaskVDC;
 	FFmpegThreadFunc *__queue, *__outputVideoBuffer;
 	
 	void init();

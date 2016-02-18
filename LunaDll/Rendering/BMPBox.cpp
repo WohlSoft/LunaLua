@@ -60,11 +60,10 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
 	if (m_hbmp != NULL) {
 		// Load any image, converted to pre-multiplied BGRA
 		//m_hbmp = LoadGfxAsBitmap(filename);
-
 		//gLogger.Log(L"Requested handle for: " + filename, LOG_STD);
 		//int lasterr = GetLastError();
 		//gLogger.Log(L"Last error: " + to_wstring((long long)lasterr), LOG_STD);
-
+		
 		SelectObject(m_hdc, m_hbmp);
 
 		// Get dimensions
@@ -133,8 +132,6 @@ void BMPBox::Init() {
 	ffdset.audio.sample_format = AV_SAMPLE_FMT_S16;
 	ffdset.audio.sample_rate = 44100;
 	pendingHarm = false;
-	hurtMode = 0;
-	hurtMaskIndex = 0;
 	maskThreshold = 235; //
 }
 
@@ -271,9 +268,12 @@ void BMPBox::seek(double sec) {
 }
 
 void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
-	if (!(hurtMode == 1 || hurtMode == 2))return;
 	if (!mp)return;
 	if (!mp->collisionMap)return;
+	int mode = getHurtMode();
+	if (!(mode == 1 || mode == 2))return;
+	
+	
 	if (GM_PLAYERS_COUNT <= 0)return;
 	if (destWidth <= 0 || destHeight <= 0)return;
 	auto pl = Player::Get(1);
@@ -304,4 +304,10 @@ void BMPBox::procPendingHarm() {
 		short hm = 1;
 		Player::Harm(&hm);
 	}
+}
+void BMPBox::setHurtMode(int m) {
+	if (mp)mp->maskMode = m;
+}
+int BMPBox::getHurtMode() const {
+	return mp ? mp->maskMode : -1;
 }

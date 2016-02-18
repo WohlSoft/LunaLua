@@ -473,14 +473,14 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Text")[
-                def("windowDebug", &LuaProxy::Text::windowDebug),
-                def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
-                def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
-                def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
-                def("printWP", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWP),
-                def("printWP", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWP)
-            ],
-
+				def("windowDebug", &LuaProxy::Text::windowDebug),
+					def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
+					def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
+					def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
+					def("printWP", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWP),
+					def("printWP", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWP)
+			],
+					
             namespace_("Graphics")[
                 LUAHELPER_DEF_CLASS(LuaImageResource)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
@@ -491,7 +491,7 @@ void CLunaLua::bindAll()
                     .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
 				class_<LuaProxy::Graphics::LuaMovieResource,LuaProxy::Graphics::LuaImageResource>("LuaMovieResource")
 					.property("hurtMode", &LuaProxy::Graphics::LuaMovieResource::getHurtMode, &LuaProxy::Graphics::LuaMovieResource::setHurtMode)
-					.property("hurtMaskIndex", &LuaProxy::Graphics::LuaMovieResource::getHurtMaskIndex, &LuaProxy::Graphics::LuaMovieResource::setHurtMaskIndex)
+					//.property("hurtMaskIndex", &LuaProxy::Graphics::LuaMovieResource::getHurtMaskIndex, &LuaProxy::Graphics::LuaMovieResource::setHurtMaskIndex)
 					.property("maskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold, &LuaProxy::Graphics::LuaMovieResource::setMaskThreshold)
 					.def("play", &LuaProxy::Graphics::LuaMovieResource::play)
 					.def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
