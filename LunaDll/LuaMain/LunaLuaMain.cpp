@@ -484,10 +484,12 @@ void CLunaLua::bindAll()
             namespace_("Graphics")[
                 LUAHELPER_DEF_CLASS(LuaImageResource)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+					.def("setScaleUpMode",&LuaProxy::Graphics::LuaImageResource::setScaleUpMode)
+					.def("setScaleDownMode", &LuaProxy::Graphics::LuaImageResource::setScaleDownMode)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
                     .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
-				class_<LuaProxy::Graphics::LuaImageResource, LuaProxy::Graphics::LuaMovieResource>("LuaMovieResource")
+				class_<LuaProxy::Graphics::LuaMovieResource,LuaProxy::Graphics::LuaImageResource>("LuaMovieResource")
 					.def("play", &LuaProxy::Graphics::LuaMovieResource::play)
 					.def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
 					.def("pause", &LuaProxy::Graphics::LuaMovieResource::pause)
