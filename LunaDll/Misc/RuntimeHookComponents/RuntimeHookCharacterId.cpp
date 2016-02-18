@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "../AsmPatch.h"
 
 // Prototype
@@ -1541,23 +1542,69 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     nullptr
 };
 
+// TODO: Extend this map to use a structure instead of short, because in the future we
+//       will do more than just map this to a base character
+static std::unordered_map<short, short> runtimeHookCharacterIdMap;
+static bool runtimeHookCharacterIdApplied = false;
+
 static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
 {
-    return 1;
+    short characterId = *idPtr;
+
+    // Vanilla ones are always unchanged
+    if (characterId <= 5)
+    {
+        return characterId;
+    }
+
+    // Return mapped character id
+    auto it = runtimeHookCharacterIdMap.find(characterId);
+    if (it != runtimeHookCharacterIdMap.end())
+    {
+        return it->second;
+    }
+
+    return 0;
 }
 
-void runtimeHookCharacterIdApplyPatch(void)
+static void runtimeHookCharacterIdApplyPatch(void)
 {
+    if (runtimeHookCharacterIdApplied) return;
     for (unsigned int i = 0; runtimeHookCharacterIdPatchList[i] != nullptr; i++)
     {
         runtimeHookCharacterIdPatchList[i]->Apply();
     }
+    runtimeHookCharacterIdApplied = true;
 }
 
-void runtimeHookCharacterIdUnpplyPatch(void)
+static void runtimeHookCharacterIdUnpplyPatch(void)
 {
+    if (!runtimeHookCharacterIdApplied) return;
     for (unsigned int i = 0; runtimeHookCharacterIdPatchList[i] != nullptr; i++)
     {
         runtimeHookCharacterIdPatchList[i]->Unapply();
     }
+    runtimeHookCharacterIdApplied = false;
 }
+
+void runtimeHookCharacterIdRegister(short id, short base)
+{
+    runtimeHookCharacterIdMap[id] = base;
+    runtimeHookCharacterIdApplyPatch();
+}
+
+void runtimeHookCharacterIdUnregister(short id)
+{
+    runtimeHookCharacterIdMap.erase(id);
+    if (runtimeHookCharacterIdMap.size() == 0)
+    {
+        runtimeHookCharacterIdUnpplyPatch();
+    }
+}
+
+void runtimeHookCharacterIdReset()
+{
+    runtimeHookCharacterIdMap.clear();
+    runtimeHookCharacterIdUnpplyPatch();
+}
+

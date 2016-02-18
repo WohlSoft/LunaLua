@@ -168,5 +168,10 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
     return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookImpl<priority>);
 }
 
+// Extended Character Id Support
+void runtimeHookCharacterIdRegister(short id, short base);
+void runtimeHookCharacterIdUnregister(short id);
+void runtimeHookCharacterIdReset();
+
 #endif
 

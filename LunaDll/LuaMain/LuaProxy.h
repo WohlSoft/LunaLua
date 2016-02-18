@@ -1186,6 +1186,7 @@ namespace LuaProxy {
         void unpause();
         bool isPausedByLua();
         void warning(const std::string& str);
+        void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
 		void updateWarp();
     }
 

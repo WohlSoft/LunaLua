@@ -5,6 +5,7 @@
 #include "../../../GameConfig/GameAutostart.h"
 #include "../../../SMBXInternal/PlayerMOB.h"
 #include "../../../EventStateMachine.h"
+#include "../../../Misc/RuntimeHook.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -204,6 +205,29 @@ bool LuaProxy::Misc::isPausedByLua()
 void LuaProxy::Misc::warning(const std::string& str)
 {
     gLunaLua.setWarning(str);
+}
+
+void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_State* L)
+{
+    short id;
+    short base;
+
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, id);
+    LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, base);
+
+    if (id >= 0 && id <= 5)
+    {
+        luaL_error(L, "Cannot register character id %d, it is reserved", id);
+        return;
+    }
+
+    if (base < 1 || base > 5)
+    {
+        luaL_error(L, "Base character must be a vanilla character", base);
+        return;
+    }
+
+    runtimeHookCharacterIdRegister(id, base);
 }
 
 
