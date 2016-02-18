@@ -591,6 +591,24 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 	return r;
 }
 
+LuaProxy::BGO LuaProxy::spawnBGO(const luabind::object &value, unsigned short id, double x, double y, lua_State* L)
+{
+	if (GM_BGO_COUNT >= 5000) {
+		luaL_error(L, "Over 5000 BGOs, cannnot spawn more!");
+		return LuaProxy::BGO(-1);
+	}
+
+	LuaProxy::BGO theNewBGO(GM_BGO_COUNT);
+
+	theNewBGO.setId(id, L);
+	theNewBGO.setX(x, L);
+	theNewBGO.setY(y, L);
+
+	++(GM_BGO_COUNT);
+
+	return theNewBGO;
+}
+
 LuaProxy::Warp LuaProxy::spawnWarp(const luabind::object &value , double entranceX, double entranceY, double exitX, double exitY, lua_State* L)
 {
 	if (GM_WARP_COUNT >= 5000) {
@@ -612,6 +630,7 @@ LuaProxy::Warp LuaProxy::spawnWarp(const luabind::object &value , double entranc
 	//theNewWarp.mem(0x32, LuaProxy::L_FIELDTYPE::LFT_STRING, luabind::adl::object(L, "Default"), L); <- Crash. Not required?
 
 	native_updateWarp();
+	native_initLevelEnvironment();
 
 	++(GM_WARP_COUNT);
 

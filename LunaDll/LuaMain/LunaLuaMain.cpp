@@ -1283,7 +1283,8 @@ void CLunaLua::bindAll()
                         def("count", &LuaProxy::BGO::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
-                        def("getIntersecting", &LuaProxy::BGO::getIntersecting)
+                        def("getIntersecting", &LuaProxy::BGO::getIntersecting),
+						def("spawn", static_cast<LuaProxy::BGO(*)(const luabind::object&, unsigned short, double, double, lua_State*)>(&LuaProxy::spawnBGO))
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::BGO, m_index))
                 .def(constructor<int>())
