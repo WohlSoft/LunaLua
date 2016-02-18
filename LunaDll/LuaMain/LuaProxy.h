@@ -15,6 +15,7 @@
 #include "../Defines.h"
 #include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SMBXInternal/Warp.h"
 
 class BMPBox;
 
@@ -81,6 +82,27 @@ namespace LuaProxy {
     };
 //&LuaProxy::luaUserdataIndexCompare<LuaProxy::Player, decltype(LuaProxy::Player::m_index), &LuaProxy::Player::m_index>
 #define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
+
+
+    // NOTE: This class is currently not actually used.
+    //       m_index must be accessed somehow properly.
+    template<class VB_STRUCT>
+    class CommonVB6Wrapper {
+    public:
+
+        template<typename DataType, DataType VB_STRUCT::* Ptr>
+        void Setter(DataType data)
+        {
+            VB_STRUCT::Get(m_index)->*Ptr = data;
+        }
+        template<typename DataType, DataType VB_STRUCT::* Ptr>
+        DataType Getter() const
+        {
+            return VB_STRUCT::Get(m_index)->*Ptr;
+        }
+
+    };
+
 
     enum L_FIELDTYPE{
         LFT_INVALID = FT_INVALID,
@@ -211,7 +233,7 @@ namespace LuaProxy {
 
 
 
-    class Warp{
+    class Warp : public CommonVB6Wrapper<SMBX_Warp> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
