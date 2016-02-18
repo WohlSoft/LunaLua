@@ -17,6 +17,8 @@ LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMP
     this->img = img;
 }
 
+
+
 // Deconstructor for when a loaded image resource is no longer referenced by Lua
 LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
 }
@@ -37,6 +39,29 @@ uintptr_t LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr()
     return (uintptr_t)img.get();
 }
 
+void  LuaProxy::Graphics::LuaImageResource::setScaleUpMode(int m) {
+	if (img)img->setScaleUpMode(m);
+}
+
+void  LuaProxy::Graphics::LuaImageResource::setScaleDownMode(int m) {
+	if (img)img->setScaleDownMode(m);
+}
+
+void LuaProxy::Graphics::LuaMovieResource::play() {
+	if (img)img->play();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::stop() {
+	if (img)img->stop();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::pause() {
+	if (img)img->pause();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::seek(double sec) {
+	if (img)img->seek(sec);
+}
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {
@@ -57,9 +82,28 @@ WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
 {
     return gSMBXHUDSettings.overworldHudState;
 }
+std::shared_ptr<BMPBox> LuaProxy::Graphics::loadMedia(const std::string& filename) {
+	std::wstring full_path;
 
+	if (!isAbsolutePath(filename)) {
+		full_path = getCustomFolderPath() + Str2WStr(filename);
+	}
+	else
+	{
+		full_path = Str2WStr(filename);
+	}
+
+	std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.GetScreenDC());
+
+	if (img->ImageLoaded() == false) {
+		// If image loading failed, return null
+		return NULL;
+	}
+	return img;
+}
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::string& filename, lua_State* L)
 {
+	/*
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
@@ -76,9 +120,21 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
         // If image loading failed, return null
         return NULL;
     }
+	*/
+	std::shared_ptr<BMPBox> img = loadMedia(filename);
+	if (img == NULL)return NULL;
 
     // Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
     return new LuaProxy::Graphics::LuaImageResource(img);
+}
+
+LuaProxy::Graphics::LuaMovieResource* LuaProxy::Graphics::loadMovie(const std::string& filename, lua_State* L)
+{
+	std::shared_ptr<BMPBox> img = loadMedia(filename);
+	if (img == NULL)return NULL;
+
+	// Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
+	return new LuaProxy::Graphics::LuaMovieResource(img);
 }
 
 luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)

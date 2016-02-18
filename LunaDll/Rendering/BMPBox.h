@@ -1,6 +1,7 @@
 #ifndef BMPBox_hhhhhh
 #define BMPBox_hhhhhh
 
+
 #include "FFmpeg/FFmpeg.h"
 #include "../../GlobalFuncs.h"
 #include "../Defines.h"
@@ -48,7 +49,15 @@ public:
 	FFmpegDecodeSetting ffdset;
 	FFmpegDecodeSetting realffdset;
 	bool hasVideo;
+	int scaleUpMode;
+	int scaleDownMode;
 	void setOnScreen(bool onScreen);
+	void setScaleUpMode(int m);
+	void setScaleDownMode(int m);
+	void play();
+	void stop();
+	void pause();
+	void seek(double src);
 private:
 	void* bmpPtr;
 

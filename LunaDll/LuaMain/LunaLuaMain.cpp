@@ -487,11 +487,17 @@ void CLunaLua::bindAll()
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
                     .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
+				class_<LuaProxy::Graphics::LuaImageResource, LuaProxy::Graphics::LuaMovieResource>("LuaMovieResource")
+					.def("play", &LuaProxy::Graphics::LuaMovieResource::play)
+					.def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
+					.def("pause", &LuaProxy::Graphics::LuaMovieResource::pause)
+					.def("seek", &LuaProxy::Graphics::LuaMovieResource::seek),
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
-                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
+				def("loadMovie", (LuaProxy::Graphics::LuaMovieResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadMovie, adopt(result)),
+				def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),

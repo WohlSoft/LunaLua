@@ -6,7 +6,7 @@
 #include "GL/GLEngine.h"
 #include "../Misc/FreeImageUtils/FreeImageHelper.h"
 #include <Windows.h>
-
+#include <gl/glew.h>
 
 void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...)
 {
@@ -20,7 +20,7 @@ void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...)
 
 
 // CTOR
-BMPBox::BMPBox():mp(NULL) {
+BMPBox::BMPBox():mp(NULL),scaleUpMode(GL_NEAREST),scaleDownMode(GL_NEAREST) {
     Init();
 }
 
@@ -120,6 +120,8 @@ void BMPBox::Init() {
 	m_hbmp = NULL;
 	m_hdc = NULL;
 	hasVideo = false;
+	scaleDownMode = GL_NEAREST;
+	scaleUpMode = GL_NEAREST;
 	ffdset.video.pixFmt = AV_PIX_FMT_BGRA;
 	ffdset.video.resampling_mode = SWS_FAST_BILINEAR;
 	ffdset.video.width = 0;		//use almost original size
@@ -214,4 +216,50 @@ BMPBox* BMPBox::loadIfExist(const std::wstring& filename, HDC screen_dc)
 
 void BMPBox::setOnScreen(bool onScreen) {
 	if(mp)mp->setOnScreen(onScreen);
+}
+
+void BMPBox::setScaleUpMode(int m) {
+	switch (m) {
+	case 0:
+		scaleUpMode = GL_NEAREST;
+		break;
+	case 1:
+		scaleUpMode = GL_LINEAR;
+		break;
+	default:
+		scaleUpMode = GL_NEAREST;
+		break;
+
+	}
+}
+
+void BMPBox::setScaleDownMode(int m) {
+	switch (m) {
+	case 0:
+		scaleDownMode = GL_NEAREST;
+		break;
+	case 1:
+		scaleDownMode = GL_LINEAR;
+		break;
+	default:
+		scaleDownMode = GL_NEAREST;
+		break;
+
+	}
+}
+
+void BMPBox::play() {
+	if (mp)mp->play();
+}
+
+void BMPBox::stop() {
+	if (mp)mp->stop();
+}
+
+void BMPBox::pause() {
+	if (mp)mp->pause();
+}
+
+void BMPBox::seek(double sec) {
+	if (mp)mp->seek(sec);
 }

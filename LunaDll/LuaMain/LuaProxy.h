@@ -1199,8 +1199,21 @@ namespace LuaProxy {
             int GetWidth() const;
             int GetHeight() const;
             uintptr_t __BMPBoxPtr();
-
+			void setScaleUpMode(int m);
+			void setScaleDownMode(int m);
         };
+
+		class LuaMovieResource :public LuaImageResource {
+		public:
+			LuaMovieResource() :LuaImageResource() {}
+			LuaMovieResource(const std::shared_ptr<BMPBox>& img):LuaImageResource(img){}
+			//~LuaMovieResource();
+			void play();
+			void stop();
+			void pause();
+			void seek(double sec);
+
+		};
         enum RENDER_TYPE {
             RTYPE_IMAGE,
             RTYPE_TEXT
@@ -1213,7 +1226,9 @@ namespace LuaProxy {
         //CSprite functions
         bool loadImage(const std::string&, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
+		std::shared_ptr<BMPBox> loadMedia(const std::string&);
         LuaImageResource* loadImage(const std::string&, lua_State* L);
+		LuaMovieResource* loadMovie(const std::string&, lua_State* L);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
