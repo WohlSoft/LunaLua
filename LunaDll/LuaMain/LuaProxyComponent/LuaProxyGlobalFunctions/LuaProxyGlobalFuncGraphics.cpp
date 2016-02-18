@@ -396,6 +396,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     float r, g, b, a;
     unsigned int rawVer, rawTex, rawCol, rawCnt;
     unsigned int primitive;
+    bool sceneCoords;
 
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
@@ -408,6 +409,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, g, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, b, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, a, 1.0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sceneCoords, false);
 
     const BMPBox* bmp = nullptr;
     if (texture && texture->img && texture->img->ImageLoaded()) {
@@ -425,6 +427,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     obj->mTex = (const float*)rawTex;
     obj->mVertColor = (const float*)rawCol;
     obj->mCount = rawCnt;
+    obj->mSceneCoords = sceneCoords;
     gLunaRender.GLCmd(obj, priority);
 }
 

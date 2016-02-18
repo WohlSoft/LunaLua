@@ -183,7 +183,7 @@ local function initFFIBasedAPIs()
         vertColor = convertGlArray(vertColor, arr_len*4)
     
         Graphics.__glInternalDraw{
-            priority=priority, primitive=args['primitive'], texture=texture,
+            priority=priority, primitive=args['primitive'], sceneCoords=args['sceneCoords'], texture=texture,
             r=color[1], g=color[2], b=color[3], a=color[4],
             rawVer=vertCoords, rawTex=texCoords, rawCol=vertColor, rawCnt=arr_len}
     end
