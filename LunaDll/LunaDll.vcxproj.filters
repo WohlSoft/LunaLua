@@ -513,6 +513,9 @@
     <ClInclude Include="Rendering\GL\GLFramebuffer.h">
       <Filter>Rendering\GL</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\FrameCapture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -983,6 +986,9 @@
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\FrameCapture.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

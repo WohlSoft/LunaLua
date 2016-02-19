@@ -131,6 +131,9 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     if (mBmp) {
         tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     }
+    else if (mCapBuff) {
+        tex = &mCapBuff->mFramebuffer->AsTexture();
+    }
 
     glBlendEquationANY(GL_FUNC_ADD);
     GLERRORCHECK();

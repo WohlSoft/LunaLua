@@ -392,7 +392,8 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
 void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_State* L)
 {
     double priority;
-    const LuaProxy::Graphics::LuaImageResource* texture;
+    const LuaProxy::Graphics::LuaImageResource* luaImageResource;
+    std::shared_ptr<CaptureBuffer> capBuff = nullptr;
     float r, g, b, a;
     unsigned int rawVer, rawTex, rawCol, rawCnt;
     unsigned int primitive;
@@ -400,7 +401,16 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
-    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, texture, nullptr);
+    {
+        const LuaProxy::Graphics::LuaImageResource* texture;
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_NOERROR(namedArgs, texture, nullptr);
+        luaImageResource = texture;
+    }
+    if (luaImageResource == nullptr) {
+        std::shared_ptr<CaptureBuffer> texture;
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, texture, nullptr);
+        capBuff = texture;
+    }
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawVer, (unsigned int)nullptr);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawTex, (unsigned int)nullptr);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, rawCol, (unsigned int)nullptr);
@@ -412,12 +422,13 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sceneCoords, false);
 
     const BMPBox* bmp = nullptr;
-    if (texture && texture->img && texture->img->ImageLoaded()) {
-        bmp = texture->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
+    if (luaImageResource && luaImageResource->img && luaImageResource->img->ImageLoaded()) {
+        bmp = luaImageResource->img.get(); // Get a raw pointer, because currently the BMPBox destructor tells the render thread to cut it out
     }
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
     obj->mBmp = bmp;
+    obj->mCapBuff = capBuff;
     obj->mColor[0] = r;
     obj->mColor[1] = g;
     obj->mColor[2] = b;

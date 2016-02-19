@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <GL/glew.h>
 #include "../BMPBox.h"
+#include "../FrameCapture.h"
 class GLEngine;
 
 /****************************************************/
@@ -111,6 +112,7 @@ public:
 class GLEngineCmd_LuaDraw : public GLEngineCmd {
 public:
     const BMPBox* mBmp;
+    std::shared_ptr<CaptureBuffer> mCapBuff;
     float mColor[4];
 
     GLuint mType;

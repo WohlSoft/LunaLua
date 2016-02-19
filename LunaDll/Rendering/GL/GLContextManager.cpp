@@ -50,6 +50,13 @@ void GLContextManager::BindScreen() {
 	GLERRORCHECK();
 }
 
+void GLContextManager::BindFramebuffer() {
+    if (mFramebuffer == nullptr) return;
+
+    // Bind the main screen framebuffer
+    mFramebuffer->Bind();
+}
+
 void GLContextManager::BindAndClearFramebuffer() {
     if (mFramebuffer == nullptr) return;
 

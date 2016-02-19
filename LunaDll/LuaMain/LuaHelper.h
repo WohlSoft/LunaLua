@@ -147,7 +147,12 @@ namespace std {
         } \
     }
 
-
+#define LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_NOERROR(tableObj, elemKey, defValue) \
+    try { \
+        elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
+    } catch (luabind::cast_failed&) { \
+        elemKey = defValue; \
+    }
 
 
 #endif
