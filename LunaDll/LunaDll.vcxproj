@@ -161,6 +161,7 @@
     <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeQueue.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
+    <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
@@ -329,6 +330,7 @@
     <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
+    <ClCompile Include="Rendering\FrameCapture.cpp" />
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />

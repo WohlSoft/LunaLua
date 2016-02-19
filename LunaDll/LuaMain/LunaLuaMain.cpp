@@ -11,6 +11,8 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/NPCs.h"
 
+#include "../Rendering/FrameCapture.h"
+
 #include "LuaHelper.h"
 #include "LuaProxy.h"
 #include "LuaProxyComponent/LuaProxyAudio.h"
@@ -491,6 +493,7 @@ void CLunaLua::setupDefaults()
 }
 
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(CaptureBuffer, CaptureBuffer);
 LUAHELPER_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
 LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
@@ -569,6 +572,10 @@ void CLunaLua::bindAll()
 					,
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
+                LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
+                    .def(constructor<int, int>())
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+                    .def("captureAt", &CaptureBuffer::captureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
 				def("loadMovie", (LuaProxy::Graphics::LuaMovieResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadMovie, adopt(result)),
