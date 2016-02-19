@@ -24,5 +24,7 @@ extern "C" {
         return reinterpret_cast<uint32_t*>(reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->getBits());
     }
 
-
+	FFI_EXPORT(void) LunaLuaSetMovieHitCallback(uintptr_t bmpBoxIntPtr,void(*fn)(int)) {
+		reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->setCallback(fn);
+	}
 }

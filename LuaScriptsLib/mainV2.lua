@@ -69,6 +69,7 @@ local function initFFIBasedAPIs()
         void* LunaLuaAlloc(size_t size);
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
         uint32_t* LunaLuaGetImageResourceBits(uint32_t bmpBoxIntPtr);
+        void LunaLuaSetMovieHitCallback(uint32_t bmpBoxIntPtr,void(*fn)(int));
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
     
@@ -125,6 +126,12 @@ if(type(resImg) ~= "userdata")then
         })
         
         return bitMT
+    end
+Graphics.setMovieHitCallback=function(movie,fn)
+        if type(fn) ~= "function" then
+        error("Wrong type for setMovieHitCallback argument #2 (expected void(*)(int), got " .. type(fn) .. ")", 2)
+        end
+        LunaDLL.LunaLuaSetMovieHitCallback(movie.__BMPBoxPtr,fn)
     end
     
     local function convertGlArray(arr, arr_len)

@@ -11,7 +11,6 @@
 #include "../../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
-
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMPBox>& img) {
     this->img = img;
@@ -66,11 +65,27 @@ void LuaProxy::Graphics::LuaMovieResource::setHurtMode(int m) { if (img)img->set
 int LuaProxy::Graphics::LuaMovieResource::getHurtMode() const {
 	return img ? img->getHurtMode() : 0;
 }
-
+/*
+void LuaProxy::Graphics::LuaMovieResource::setCallback(int idx,luabind::object cl,lua_State* L) {
+	if (img && 0<=idx && idx <8 && luabind::type(cl) == LUA_TFUNCTION) {
+		
+		img->callbacks[idx] = gLunaLua.registerPassedLuaObj(idx,L,cl);
+	}
+}
+*/
+/*
+luabind::object LuaProxy::Graphics::LuaMovieResource::getCallback(int idx, lua_State* L) {
+	if (img && 0 <= idx && idx <8) {
+		return img->callbacks[idx];
+	}
+}
+*/
 //void LuaProxy::Graphics::LuaMovieResource::setHurtMaskIndex(int idx) { if (img)img->hurtMaskIndex = idx; }
 //int LuaProxy::Graphics::LuaMovieResource::getHurtMaskIndex() const { return img ? img->hurtMaskIndex : -1; }
-void LuaProxy::Graphics::LuaMovieResource::setMaskThreshold(int th) { if (img)img->maskThreshold = th; }
-int LuaProxy::Graphics::LuaMovieResource::getMaskThreshold() const { return img ? img->maskThreshold : 0; }
+void LuaProxy::Graphics::LuaMovieResource::setMaskThreshold(int idx,int value) { if (img&& 0 <= idx && idx <8)img->maskThreshold[idx] = value; }
+int LuaProxy::Graphics::LuaMovieResource::getMaskThreshold(int idx) const { if (img && 0 <= idx && idx <8)return img->maskThreshold[idx]; }
+void LuaProxy::Graphics::LuaMovieResource::setVideoDelay(double d) { if (img)img->setVideoDelay(d); }
+//int LuaProxy::Graphics::LuaMovieResource::getMaskThreshold(int idx) const { return img ? img->maskThreshold : 0; }
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {

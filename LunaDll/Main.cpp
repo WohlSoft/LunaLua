@@ -200,12 +200,14 @@ int TestFunc()
 		gFrames++;	
 		gDeathCounter.UpdateDeaths(true);
 		gSavedVarBank.SaveIfNeeded();
-
+		for (auto bmp : g_GLTextureStore.mLunaTexMap) {
+			const_cast<BMPBox*>(bmp.first)->procCallback();
+		}
 		// Run any framecode
 		TestFrameCode();
 		LevelFrameCode();
-
-		BMPBox::procPendingHarm();
+		
+		
 	}
 
     Blocks::DoSortingIfRequired();

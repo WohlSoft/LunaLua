@@ -73,9 +73,73 @@ bool CLunaLua::shutdown()
     m_ready = false;
     m_eventLoopOnceExecuted = false;
     LuaProxy::Audio::resetMciSections();
+	deletePassedLuaObj();
     lua_close(L);
     L = NULL;
     return true;
+}
+
+luabind::object* CLunaLua::registerPassedLuaObj(int index,lua_State* L,luabind::object& obj) {
+	//test
+	luabind::object* test = NULL;
+#define PYPY luabind::object(L,obj,adopt(_2))
+	switch (index+1) {
+	case 1:
+		obj1 = PYPY;
+		test = &obj1;
+		break;
+	case 2:
+		obj2 = PYPY;
+		test = &obj2;
+		break;
+	case 3:
+		obj3 = PYPY;
+		test = &obj3;
+		break;
+	case 4:
+		obj4 = PYPY;
+		test = &obj4;
+		break;
+	case 5:
+		obj5 = PYPY;
+		test = &obj5;
+		break;
+	case 6:
+		obj6 = PYPY;
+		test = &obj6;
+		break;
+	case 7:
+		obj7 = PYPY;
+		test = &obj7;
+		break;
+	case 8:
+		obj8 = PYPY;
+		test = &obj8;
+		break;
+	default:
+		break;
+	}
+#undef PYPY
+	return test;
+
+}
+void CLunaLua::deletePassedLuaObj() {
+	//testetstetstett
+	//if (objList.empty())return;
+	if (obj1.is_valid())obj1 = luabind::object();
+	if (obj2.is_valid())obj2 = luabind::object();
+	if (obj3.is_valid())obj3 = luabind::object();
+	if (obj4.is_valid())obj4 = luabind::object();
+	if (obj5.is_valid())obj5 = luabind::object();
+	if (obj6.is_valid())obj6 = luabind::object();
+	if (obj7.is_valid())obj7 = luabind::object();
+	if (obj8.is_valid())obj8 = luabind::object();
+	/*
+	for (int i = 0; i < objList.size(); i++) {
+		delete objList[i];
+	}
+	*/
+	//objList.clear(); //DESTROYED
 }
 
 void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelPath /*= std::wstring()*/)
@@ -482,21 +546,27 @@ void CLunaLua::bindAll()
 			],
 					
             namespace_("Graphics")[
-                LUAHELPER_DEF_CLASS(LuaImageResource)
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
-					.def("setScaleUpMode",&LuaProxy::Graphics::LuaImageResource::setScaleUpMode)
+				LUAHELPER_DEF_CLASS(LuaImageResource)
+					.def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+					.def("setScaleUpMode", &LuaProxy::Graphics::LuaImageResource::setScaleUpMode)
 					.def("setScaleDownMode", &LuaProxy::Graphics::LuaImageResource::setScaleDownMode)
-                    .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
-                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
-                    .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
-				class_<LuaProxy::Graphics::LuaMovieResource,LuaProxy::Graphics::LuaImageResource>("LuaMovieResource")
+					.property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
+					.property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
+					.property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
+					class_<LuaProxy::Graphics::LuaMovieResource, LuaProxy::Graphics::LuaImageResource>("LuaMovieResource")
 					.property("hurtMode", &LuaProxy::Graphics::LuaMovieResource::getHurtMode, &LuaProxy::Graphics::LuaMovieResource::setHurtMode)
 					//.property("hurtMaskIndex", &LuaProxy::Graphics::LuaMovieResource::getHurtMaskIndex, &LuaProxy::Graphics::LuaMovieResource::setHurtMaskIndex)
-					.property("maskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold, &LuaProxy::Graphics::LuaMovieResource::setMaskThreshold)
+					//.property("maskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold, )
+					.def("setMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::setMaskThreshold)
+					.def("getMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold)
 					.def("play", &LuaProxy::Graphics::LuaMovieResource::play)
 					.def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
 					.def("pause", &LuaProxy::Graphics::LuaMovieResource::pause)
-					.def("seek", &LuaProxy::Graphics::LuaMovieResource::seek),
+					.def("seek", &LuaProxy::Graphics::LuaMovieResource::seek)
+					.def("setVideoDelay", &LuaProxy::Graphics::LuaMovieResource::setVideoDelay)
+					//.def("setHitCallback", &LuaProxy::Graphics::LuaMovieResource::setCallback)
+					//.def("getHitCallback", &LuaProxy::Graphics::LuaMovieResource::getCallback)
+					,
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),

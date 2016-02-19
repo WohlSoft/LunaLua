@@ -5,6 +5,7 @@
 #include <mutex>
 #include <Windows.h>
 
+FFmpegThread* FFmpegMediaPlayer::videoOutputThread = new FFmpegThread();
 //wrap回避
 #define UINT32SUB(a,b) ((uint32_t)max(0,(int64_t)a-(int64_t)b))
 
@@ -46,6 +47,30 @@ void FFmpegMediaPlayerOpQueue::proc() {
 /*
 	適当に変数まとめたかっただけのクラス　ひどいわこれ
 */
+void FFmpegPlayerStateManager::init() {
+	playing = false;
+		playTime=0;
+		videoPos=0;
+		startTime=0;
+		plannedStartTime=0;
+		pauseTime=0;
+		wPlay=false;
+		wPause=false;
+		wStop=false;
+		wSeek=false;
+		pauseBooked=false;
+		videoRendered=false;
+		needAudioPosReset=false;
+		needVideoPosReset=false;
+		videoMemResetFlag=false;
+		stopBooked=false;
+		seekCount=0;
+		audioMemResetFlag = false;
+		audioInitReq = false;
+		videoInitReq = false;
+		lastAudioDelay = 0;
+		videoDelay = 0;
+}
 void FFmpegPlayerStateManager::play() {
 	//プレイ中でない場合のみ再生を待つ
 	if(!playing)wPlay = true;
@@ -73,6 +98,7 @@ bool FFmpegPlayerStateManager::shouldSeek() {
 void FFmpegPlayerStateManager::seekProc() {
 	//シーク時の操作特に無し
 	wSeek = false;
+	seekCount++;
 }
 
 bool FFmpegPlayerStateManager::audioShouldPlay() {
@@ -103,6 +129,7 @@ void FFmpegPlayerStateManager::startProc(double cur, double delay) {
 	//3.再生する
 	playing = true;
 	//開始時間設定前に再生開始フラグを立てると他のスレッドが不正な開始時間を読み取るので注意
+	lastAudioDelay = delay;
 }
 
 //使わない
@@ -179,7 +206,7 @@ void FFmpegPlayerStateManager::refreshVideoState(double curFT) {
 	//レンダリングされていない状態にする
 	//再生位置の更新
 	videoRendered = false;
-	videoPos = curFT;
+	videoPos = curFT+videoDelay;
 }
 
 bool FFmpegPlayerStateManager::shouldRenderVideo() {
@@ -188,7 +215,7 @@ bool FFmpegPlayerStateManager::shouldRenderVideo() {
 	return videoPos >= playPosition() && !videoRendered && playing;
 }
 
-FFmpegThread* FFmpegMediaPlayer::videoOutputThread = new FFmpegThread();
+
 
 void FFmpegMediaPlayer::DebugMsgBox(LPCSTR pszFormat, ...)
 {
@@ -256,7 +283,9 @@ void FFmpegMediaPlayer::init() {
 	maskMode = 0;
 	mPktConsumed = true;
 }
-
+void FFmpegMediaPlayer::setVideoDelay(double d) {
+	sman.videoDelay = d;
+}
 //映像に関する初期化
 bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) {
 	if (!m->isVideoAvailable())return false;
@@ -314,19 +343,30 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 		bool posReset = sman.needVideoPosReset && !sman.needAudioPosReset;
 
 		//シーク処理を行う条件を満たした最初のループのみ行う処理
-		if (posReset && !sman.videoMemResetFlag) {
+		if ((posReset || sman.videoInitReq)&& !sman.videoMemResetFlag) {
 			/*
 				次のパケットのタイムスタンプでどこにシークされたかを確認するため、シーク後の位置のパケットを確実に取得する。
 
 				(シーク処理を行う条件を満たした時、キューにある次のパケットはシーク後の位置のものになっているので、
 				ここでバッファをクリアして確実に読み込みに行けばよい。)
 			*/
+			
+			if (media->isMaskAvailable()) {
+				avcodec_flush_buffers(media->maskCodecCtx);
+				av_free_packet(&MaskVDC.vPkt);
+				av_init_packet(&MaskVDC.vPkt);
+				av_frame_free(&MaskVDC.vidSrcFrame);
+				MaskVDC.vidSrcFrame = av_frame_alloc();
+			}
+			avcodec_flush_buffers(media->vidCodecCtx);
 			av_free_packet(&FFVDC.vPkt);
 			av_init_packet(&FFVDC.vPkt);
 			av_frame_free(&FFVDC.vidSrcFrame);
 			FFVDC.vidSrcFrame = av_frame_alloc();
+			
 			//この初期化処理は一回きり
 			sman.videoMemResetFlag = true;
+			if (sman.videoInitReq)sman.videoInitReq = false;
 		}
 
 		//現在の再生時刻に比べて動画の時刻(タイムスタンプ)が遅れているなら進める
@@ -352,6 +392,7 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 			else {
 				/* キューからの読み込み */
 				if (!videoQueue->pop(FFVDC.vPkt)) {
+					//onQueueEnd
 					if (videoQueue->dataSize() == 0 && loadCompleted && loop) {
 						seek(0);
 					}
@@ -412,22 +453,9 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 							);
 						/* collision map test */
 						
-						
-						
 					}
-
-					switch (maskMode) {
-					//case 0:
-						//break;
-					case 1:
-						for (int j = 0; j < decodeSetting.video.height; ++j) {
-							for (int k = 0; k < FFVDC.vidDestFrame->linesize[0] / 4; k++) {
-								collisionMap[j*FFVDC.vidDestFrame->linesize[0] / 4 + k] = *(((uint8_t*)FFVDC.vidDestFrame->data[0]) + j*FFVDC.vidDestFrame->linesize[0] + k * 4 + 3);
-							}
-						}
-						break;
-					case 2:
 						//double tmptime;
+					if (media->isMaskAvailable()) {
 						while (maskQueue->pop(MaskVDC.vPkt)) {
 							avcodec_decode_video2(media->maskCodecCtx, MaskVDC.vidSrcFrame, &MaskVDC.got_picture, &MaskVDC.vPkt);
 							av_free_packet(&MaskVDC.vPkt);
@@ -443,20 +471,27 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 										MaskVDC.vidDestFrame->linesize
 										);
 									for (int j = 0; j < decodeSetting.video.height; ++j) {
+										memcpy(
+											(uint32_t*)collisionMap + j*decodeSetting.video.width,
+											((uint8_t*)MaskVDC.vidDestFrame->data[0]) + j*MaskVDC.vidDestFrame->linesize[0],
+											MaskVDC.vidDestFrame->linesize[0]
+											);
+										/* collision map test */
+
+									}
+									/*
+									for (int j = 0; j < decodeSetting.video.height; ++j) {
 										for (int k = 0; k < FFVDC.vidDestFrame->linesize[0] / 4; k++) {
 											collisionMap[j*MaskVDC.vidDestFrame->linesize[0] / 4 + k] = *(((uint8_t*)MaskVDC.vidDestFrame->data[0]) + j*MaskVDC.vidDestFrame->linesize[0] + k * 4);//[B]GRA
 										}
 									}
+									*/
 									break;
 								}
 							}
 						}
-						break;
-					default:
-						memset(collisionMap, 0, _w*_h*sizeof(uint8_t));
-						break;
-
 					}
+					
 				}
 			}
 			//bookedにフレームをコピーした場合はここまで来ない(何かコード書き換えるならここまで来させないように)
@@ -467,7 +502,7 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 
 		}
 	});
-	collisionMap = (uint8_t*)malloc(_w*_h*sizeof(uint8_t));
+	collisionMap = (uint8_t*)malloc(avpicture_get_size(pixFmt, _w, _h)*sizeof(uint8_t));
 
 
 	/* mask init */
@@ -498,6 +533,9 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 
 	return true;
 }
+
+//dirty
+
 bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) {
 	if (!m->isAudioAvailable())return false;
 	FFADC.swrCtx = swr_alloc();
@@ -525,12 +563,15 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 		bool first_send = true;
 		//Check reset request before popping packet
 		bool posReset = sman.needAudioPosReset;
-		if (posReset) {
+		if ((posReset || sman.audioInitReq) && !sman.audioMemResetFlag) {
+			avcodec_flush_buffers(media->audCodecCtx);
 			av_free_packet(&FFADC.aPkt);
 			av_init_packet(&FFADC.aPkt);
 			//this cause popping
 			FFADC.audPktData = NULL;
 			FFADC.audPktSize = 0;
+			sman.audioMemResetFlag = true;
+			if (sman.audioInitReq)sman.audioInitReq = false;
 		}
 		while (len > 0) {
 
@@ -552,8 +593,7 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 			stream += len1;
 			FFADC.audBufOffset += len1;
 			if (sman.shouldBegin()) {
-
-				sman.startProc(SDL_GetTicks(), 2*1000 * len / ((double)PGE_MusPlayer::sampleRate()*PGE_MusPlayer::channels()));
+				sman.startProc(SDL_GetTicks(), -15.6);// 2*1000 * len / ((double)PGE_MusPlayer::sampleRate()*PGE_MusPlayer::channels()));
 			}
 			if (sman.shouldBookPause()) {
 
@@ -565,6 +605,7 @@ bool FFmpegMediaPlayer::initAudio(FFmpegMedia* m, FFmpegAudioDecodeSetting* as) 
 				sman.plannedStartTime = (double)SDL_GetTicks() - max(0, time_stamp) + 2*1000 * len / ((double)PGE_MusPlayer::sampleRate()*PGE_MusPlayer::channels()) -15;
 				sman.needAudioPosReset = false;
 				first_send = false;
+				
 			}
 		}
 	});
@@ -610,14 +651,14 @@ void FFmpegMediaPlayer::coreInit() {
 		}
 
 		//use better condition of unboost
-		/*
+		
 		if (!sman.isSeeking() && videoOutputThread->boost) {
 			videoOutputThread->boost = false;
 		}
 		if (!sman.isSeeking() && FFmpegDecodeQueue::queueThread->boost) {
 			FFmpegDecodeQueue::queueThread->boost = false;
 		}
-		*/
+		
 		if (SDL_GetTicks() - lastOnScreenTime > 100) {
 			onScreen = false;
 		}
@@ -650,8 +691,8 @@ void FFmpegMediaPlayer::coreInit() {
 		}			
 			//av_init_packet(&pkt);
 		
-		
-			while (!ctrl->quit && soundQueue->dataSize() < soundQueue->MAX_SIZE && videoQueue->dataSize() < videoQueue->MAX_SIZE) {
+		int vqc = 0, aqc = 0,mqc=0;
+			while (!ctrl->quit && vqc<MAX_QUEUE_ONCE && aqc<MAX_QUEUE_ONCE && soundQueue->dataSize() < soundQueue->MAX_SIZE && videoQueue->dataSize() < videoQueue->MAX_SIZE) {
 				
 				end = av_read_frame(media->fmtCtx, &pkt);
 				if (end < 0) {
@@ -660,9 +701,11 @@ void FFmpegMediaPlayer::coreInit() {
 				}
 				if (pkt.stream_index == media->audStreamIdx) {
 					soundQueue->push(pkt);
+					aqc++;
 				}
 				else if (pkt.stream_index == media->vidStreamIdx) {
 					videoQueue->push(pkt);
+					vqc++;
 				}
 				else {
 					av_free_packet(&pkt);
@@ -670,8 +713,9 @@ void FFmpegMediaPlayer::coreInit() {
 				
 			}
 
+			
 			if (media->isMaskAvailable()) {
-				while (!ctrl->quit && maskQueue->dataSize() < maskQueue->MAX_SIZE) {
+				while (!ctrl->quit && mqc<MAX_QUEUE_ONCE&& maskQueue->dataSize() < maskQueue->MAX_SIZE) {
 
 					mend = av_read_frame(media->mFmtCtx, &mPkt);
 					if (mend < 0) {
@@ -680,6 +724,7 @@ void FFmpegMediaPlayer::coreInit() {
 					}
 					if (mPkt.stream_index == media->maskStreamIdx) {
 						maskQueue->push(mPkt);
+						mqc++;
 					}
 					else {
 						av_free_packet(&mPkt);
@@ -716,12 +761,31 @@ void FFmpegMediaPlayer::pause() {
 	opq->push(_pause);
 }
 void FFmpegMediaPlayer::seek(double sec) {
-	__seekVal = sec;
-	opq->push(_seek);
+	
+	if (sec <= 0) {
+		soundQueue->clear();
+		videoQueue->clear();
+		if (media->isMaskAvailable())maskQueue->clear();
+		av_seek_frame(media->fmtCtx, media->vidStreamIdx, 0, AVSEEK_FLAG_BACKWARD);
+		if (media->isMaskAvailable())av_seek_frame(media->mFmtCtx, media->maskStreamIdx, 0, AVSEEK_FLAG_BACKWARD);
+
+		sman.init();
+		sman.wPlay = true;
+		sman.videoMemResetFlag = false;
+		sman.audioMemResetFlag = false;
+		sman.videoInitReq = true;
+		sman.audioInitReq = true;
+	}
+	else {
+	
+		__seekVal = sec;
+		opq->push(_seek);
+	}
 }
 void FFmpegMediaPlayer::stop() {
 	seek(0);
-	pause();
+	sman.wPlay = false;
+	//pause();
 }
 void FFmpegMediaPlayer::setVolume(int vol) {
 	_volume = min(127, max(0, vol));
@@ -744,23 +808,31 @@ FFmpegDecodeSetting FFmpegMediaPlayer::getAppliedSetting() {
 	return decodeSetting;
 }
 
+//Do this on queue thread
 void FFmpegMediaPlayer::seek_internal(double sec) {
-	/*
-	videoOutputThread->boost = true;
+	
+	//videoOutputThread->boost = true;
 	FFmpegDecodeQueue::queueThread->boost = true;
-	*/
+	
+	/*
 	std::lock_guard<std::mutex>lock1(soundQueue->mtx1);
 	std::lock_guard<std::mutex>lock2(videoQueue->mtx1);
-	soundQueue->rawClear();
-	videoQueue->rawClear();
+	*/
+	soundQueue->clear();
+	videoQueue->clear();
+	if (media->isMaskAvailable())maskQueue->clear();
 	av_seek_frame(media->fmtCtx, media->vidStreamIdx, (int64_t)round(sec / av_q2d(media->video->time_base)), AVSEEK_FLAG_BACKWARD);
-	avcodec_flush_buffers(media->audCodecCtx);
-	avcodec_flush_buffers(media->vidCodecCtx);
+	//EnterCriticalSection(&crSectionA); EnterCriticalSection(&crSectionV); EnterCriticalSection(&crSectionM);
+
+	if (media->isMaskAvailable())av_seek_frame(media->mFmtCtx, media->maskStreamIdx, (int64_t)round(sec / av_q2d(media->mask->time_base)), AVSEEK_FLAG_BACKWARD);
+	
 	if (FFVDC.booked) {
 		av_frame_free(&FFVDC.booked);
 		FFVDC.booked = NULL;
 	}
+	//LeaveCriticalSection(&crSectionA); LeaveCriticalSection(&crSectionV); LeaveCriticalSection(&crSectionM);
 	sman.videoMemResetFlag = false;
+	sman.audioMemResetFlag = false;
 	sman.needAudioPosReset = true;
 	sman.needVideoPosReset = true;
 }

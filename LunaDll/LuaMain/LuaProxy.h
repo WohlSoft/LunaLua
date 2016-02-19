@@ -1237,10 +1237,13 @@ namespace LuaProxy {
 			void seek(double sec);
 			void setHurtMode(int m);
 			int getHurtMode() const;
+			void setVideoDelay(double d);
+			//void setCallback(int m,luabind::object fn,lua_State* L);
+			//luabind::object getCallback(int m,lua_State* L);
 			//void setHurtMaskIndex(int idx);
 			//int getHurtMaskIndex() const;
-			void setMaskThreshold(int th);
-			int getMaskThreshold() const;
+			void setMaskThreshold(int idx,int val);
+			int getMaskThreshold(int idx) const;
 
 		};
         enum RENDER_TYPE {

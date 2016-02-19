@@ -44,6 +44,8 @@ public:
     //If the lua module is valid
     bool isValid(){return L != 0;}
 
+	luabind::object* registerPassedLuaObj(int index,lua_State* L,luabind::object& obj);
+
     //Setting "ready" field
     bool isReady() const { return m_ready;  }
     void setReady(bool ready) { m_ready = ready; }
@@ -108,7 +110,17 @@ private:
     void setupDefaults();
 
     void checkWarnings();
-    
+	void deletePassedLuaObj();
+	//std::vector<luabind::object> objList;
+	//test
+	luabind::object obj1=luabind::object();
+	luabind::object obj2 = luabind::object();
+	luabind::object obj3 = luabind::object();
+	luabind::object obj4 = luabind::object();
+	luabind::object obj5 = luabind::object();
+	luabind::object obj6 = luabind::object();
+	luabind::object obj7 = luabind::object();
+	luabind::object obj8 = luabind::object();
     lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
     bool m_eventLoopOnceExecuted; //This should be an alternative to "onLoad". With this flag the event "onStart" is beeing called, if it is false.

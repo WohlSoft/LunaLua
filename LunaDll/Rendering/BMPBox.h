@@ -64,11 +64,16 @@ public:
 	int getHurtMode() const;
 	//int hurtMode;//0= no hurt,1=use alphachannel,2=use custom hurt mask
 	//int hurtMaskIndex;//stream index
-	int maskThreshold;//when value >= maskThreshold it is hurt area
+	int maskThreshold[8];//when value >= maskThreshold it is hurt area
+	//luabind::object* callbacks[8];
+	void procCallback();
+	void setVideoDelay(double d);
+	void setCallback(void(*fn)(int));
+	void(*clbc)(int);
 private:
 	void* bmpPtr;
 	static bool pendingHarm;
-
+	bool pendingHarmArr[8];
 };
 
 #endif

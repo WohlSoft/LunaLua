@@ -55,6 +55,8 @@ public:
 	//know whether these actions should be done
 	bool audioShouldPlay();
 	bool videoShouldPlay();
+	bool shouldInitVideo();
+	bool shouldInitAudio();
 	bool shouldBegin();
 	bool shouldPause();
 	bool shouldSeek();
@@ -88,9 +90,14 @@ public:
 
 	bool needAudioPosReset;
 	bool needVideoPosReset;
-	
+
 	bool videoRendered;
 	bool videoMemResetFlag;
+
+	bool audioMemResetFlag;
+
+	bool audioInitReq;
+	bool videoInitReq;
 
 	//Time:absolute time
 	//Pos:relative time from start
@@ -102,22 +109,15 @@ public:
 
 	double videoPos;
 	double seekPos;
+	double lastAudioDelay;
 
-	FFmpegPlayerStateManager()
-		:playing(false),
-		playTime(0),
-		videoPos(0),
-		startTime(0), plannedStartTime(0),
-		pauseTime(0),
-		wPlay(false), //!
-		wPause(false),
-		wStop(false),
-		wSeek(false),
-		pauseBooked(false),
-		videoRendered(false),
-		needAudioPosReset(false),
-		needVideoPosReset(false), videoMemResetFlag(false),
-		stopBooked(false) {};
+	double videoDelay;
+
+	int seekCount;
+	void init();
+	FFmpegPlayerStateManager() {
+		init();
+	};
 
 };
 
@@ -152,6 +152,7 @@ private:
 
 class FFmpegMediaPlayer {
 public:
+	static const int MAX_QUEUE_ONCE = 10;
 	void play();
 	void pause();
 	void seek(double sec);
@@ -179,6 +180,7 @@ public:
 	void setOnScreen(bool onScreen);
 	int maskMode;
 	uint8_t* collisionMap;
+	void setVideoDelay(double d);
 private:
 	int aL[8]; //garbage
 	int _SDLSoundFormat;
@@ -204,6 +206,8 @@ private:
 	FFmpegVideoDecodeComponent FFVDC;
 	FFmpegVideoDecodeComponent MaskVDC;
 	FFmpegThreadFunc *__queue, *__outputVideoBuffer;
+	CRITICAL_SECTION crSectionA,crSectionV,crSectionM;
+
 	
 	void init();
 	void coreInit();
@@ -224,6 +228,5 @@ private:
 	double lastOnScreenTime;
 	OffScreenMode OScrMode;
 };
-
 
 #endif

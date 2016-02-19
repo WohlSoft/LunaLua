@@ -1,16 +1,22 @@
 #include "FFmpegDecodeQueue.h"
 #include "../../Defines.h"
-#include <mutex>
 FFmpegThread* FFmpegDecodeQueue::queueThread = new FFmpegThread();
 
-FFmpegDecodeQueue::FFmpegDecodeQueue() : size_(0) {}
+FFmpegDecodeQueue::FFmpegDecodeQueue() : size_(0) {
+	InitializeCriticalSection(&crSect);
+}
 
 FFmpegDecodeQueue::FFmpegDecodeQueue(int msize) :FFmpegDecodeQueue(){
 	MAX_SIZE = msize > 0 ? msize : 0;
 }
 
 void FFmpegDecodeQueue::push(AVPacket& packet) {
-	std::lock_guard<std::mutex> lock(mtx1);
+	EnterCriticalSection(&crSect);
+	rawPush(packet);
+	LeaveCriticalSection(&crSect);
+}
+
+void FFmpegDecodeQueue::rawPush(AVPacket& packet) {
 	//AVPacket p;
 	av_dup_packet(&packet);
 	//av_copy_packet(&p, &packet);
@@ -19,7 +25,13 @@ void FFmpegDecodeQueue::push(AVPacket& packet) {
 }
 
 bool FFmpegDecodeQueue::pop(AVPacket& packet) {
-	std::lock_guard<std::mutex> lock(mtx1);
+	EnterCriticalSection(&crSect);
+	bool __tmp = rawPop(packet);
+	LeaveCriticalSection(&crSect);
+	return __tmp;
+}
+
+bool FFmpegDecodeQueue::rawPop(AVPacket& packet) {
 	if (packets_.empty()) return false;
 	packet = packets_.front();
 	packets_.pop_front();
@@ -40,10 +52,12 @@ void FFmpegDecodeQueue::rawClear() {
 }
 
 void FFmpegDecodeQueue::clear() {
-	std::lock_guard<std::mutex> lock(mtx1);
+	EnterCriticalSection(&crSect);
 	rawClear();
+	LeaveCriticalSection(&crSect);
 }
 
 FFmpegDecodeQueue::~FFmpegDecodeQueue() {
 	clear();
+	DeleteCriticalSection(&crSect);
 }

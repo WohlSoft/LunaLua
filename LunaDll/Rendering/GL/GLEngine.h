@@ -8,6 +8,7 @@
 #include "GLDraw.h"
 #include "../BMPBox.h"
 #include "../AsyncGifRecorder.h"
+#include "GLTextureStore.h"
 
 typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
 

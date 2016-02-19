@@ -5,7 +5,7 @@
 #include "FFmpegThread.h"
 #include <deque>
 #include <functional>
-#include <mutex>
+#include <Windows.h>
 class FFmpegDecodeQueue {
 public:
 	FFmpegDecodeQueue();
@@ -13,8 +13,10 @@ public:
 	~FFmpegDecodeQueue();
 
 	void push(AVPacket& packet);
+	void rawPush(AVPacket& packet);
 
 	bool pop(AVPacket& packet);
+	bool rawPop(AVPacket& packet);
 
 	void rawClear();
 	void clear();
@@ -24,7 +26,8 @@ public:
 	int MAX_SIZE;
 
 	static FFmpegThread* queueThread;
-	std::mutex mtx1, mtx2;
+	CRITICAL_SECTION crSect;
+	//std::mutex mtx1, mtx2;
 private:
 	
 	std::deque<AVPacket> packets_;

@@ -46,7 +46,11 @@ BMPBox::~BMPBox() {
 		DeleteDC(m_hdc);
 		m_hdc = NULL;
 	}
-
+	/*
+	for (int i = 0; i < 8; i++) {
+		callbacks[i] = luabind::object();
+	}
+	*/
 }
 
 // CTOR - Load from a file path
@@ -132,7 +136,11 @@ void BMPBox::Init() {
 	ffdset.audio.sample_format = AV_SAMPLE_FMT_S16;
 	ffdset.audio.sample_rate = 44100;
 	pendingHarm = false;
-	maskThreshold = 235; //
+	for (int i = 0; i < 8; i++)maskThreshold[i] = 256;
+	//callbacks->
+	//memset(callbacks, 0, sizeof(luabind::object*) * 8);
+	//memset(pendingCallback, 0, sizeof(bool) * 8);
+	memset(pendingHarmArr, 0, sizeof(bool) * 8);
 }
 
 
@@ -267,11 +275,18 @@ void BMPBox::seek(double sec) {
 	if (mp)mp->seek(sec);
 }
 
+void BMPBox::setVideoDelay(double d) {
+	if (mp)mp->setVideoDelay(d);
+}
+void BMPBox::setCallback(void(*fn)(int)) {
+	clbc = fn;
+}
+
 void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 	if (!mp)return;
-	if (!mp->collisionMap)return;
-	int mode = getHurtMode();
-	if (!(mode == 1 || mode == 2))return;
+	//if (!mp->collisionMap)return;
+	//int mode = getHurtMode();
+	//if (!(mode == 1 || mode == 2))return;
 	
 	
 	if (GM_PLAYERS_COUNT <= 0)return;
@@ -288,17 +303,76 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 	int x = (int)round(wScale*scrX); int y = (int)round(hScale*scrY);
 	int startH = min(max(pRect.top,y),m_H+y)-y; int endH = min(max(pRect.bottom, y), m_H+y)-y;
 	int startW = min(max(pRect.left, x), m_W+x)-x; int endW = min(max(pRect.right, x), m_W+x)-x;
+	bool brk;
+	for (int k = 0; k < 4; k++) {
+		//fxxxxxxxxxxxxxxxxxxxxxxxx
+		/*
+		if (!callbacks[k])continue;
+		if (!callbacks[k]->is_valid())continue;
+		if (luabind::type(*(callbacks[k])) != LUA_TFUNCTION)continue;
+		*/
+		brk = false;
+		for (int i = startH; i < endH; i++) {
+			for (int j = startW; j < endW; j++) {
+				if (((uint8_t*)bmpPtr)[m_W * 4 * i + j * 4+k] >= maskThreshold[k]) { //BGRA
+					
+					pendingHarmArr[k] = true;
+					brk = true;
+					break;
+				}
+			}
+			if (brk)break;
+		}
+		
+	}
+	if (mp->collisionMap) {
+		for (int k = 0; k < 4; k++) {
+			/*
+			if (!callbacks[k+4])continue;
+			if (!callbacks[k+4]->is_valid())continue;
+			if (luabind::type(*(callbacks[k+4])) != LUA_TFUNCTION)continue;
+			*/
+			brk = false;
+			for (int i = startH; i < endH; i++) {
+				for (int j = startW; j < endW; j++) {
+					if (mp->collisionMap[m_W * 4 * i + j * 4 + k] >= maskThreshold[k+4]) { //BGRA
+
+						pendingHarmArr[k+4] = true;
+						brk = true;
+						break;
+					}
+				}
+				if (brk)break;
+			}
+			
+		}
+	}
+	/*
 	for (int i = startH; i < endH; i++) {
 		for (int j = startW; j < endW; j++) {
-			if (mp->collisionMap[m_W*i + j] >= maskThreshold) {
+			if (mp->collisionMap[m_W*4*i + j*4] >= maskThreshold) { //b
 				pendingHarm = true;
 				return;
 			}
 		}
 	}
+	*/
 }
-
+void BMPBox::procCallback() {
+	if (GM_PLAYERS_COUNT <= 0 || !clbc)return;
+	for (int i = 0; i < 8; i++) {
+		if (pendingHarmArr[i]) {
+			clbc(i);
+			/*
+			short hm = 1;
+			Player::Harm(&hm);
+			*/
+			pendingHarmArr[i] = false;
+		}
+	}
+}
 void BMPBox::procPendingHarm() {
+	
 	if (pendingHarm) {
 		pendingHarm = false;
 		short hm = 1;
