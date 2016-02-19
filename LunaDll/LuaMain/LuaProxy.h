@@ -1317,13 +1317,12 @@ namespace LuaProxy {
     //Non-Member-Constructors:
     RECT newRECT();
     RECTd newRECTd();
-
-
 #ifdef _MSC_VER //DEPRECATED STUFF
 #pragma region
 #endif
 	// AirpLunaLua
-	LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
+    LuaProxy::BGO spawnBGO(const luabind::object & value, unsigned short id, double x, double y, lua_State * L);
+    LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
 	//Moved as static functions
     NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
