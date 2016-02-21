@@ -177,7 +177,7 @@ static void testModePauseMenu(bool allowContinue)
         KeyMap keymap = Player::Get(1)->keymap;
 
         // Process selected item input
-        if (menuItems[selectedOption]->ProcessInput(keymap, lastKeymap))
+        if ((menuItems[selectedOption] != nullptr) && menuItems[selectedOption]->ProcessInput(keymap, lastKeymap))
         {
             break;
         }
