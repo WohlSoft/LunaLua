@@ -252,11 +252,12 @@ DECL_HOOK(HOOK_0x9A008E, ebx + 0xF0, MOV_ecx);
 DECL_HOOK(HOOK_0x9A04B6, ebx + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0x9A13BE, ebx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9A32CB, ebx + 0xF0, CMP_2);
-DECL_HOOK(HOOK_0x9A3CD9, ebx + 0xF0, CMP_1);
-DECL_HOOK(HOOK_0x9A3D13, ebx + 0xF0, CMP_2);
-DECL_HOOK(HOOK_0x9A3D4D, ebx + 0xF0, CMP_3);
-DECL_HOOK(HOOK_0x9A3D87, ebx + 0xF0, CMP_4);
-DECL_HOOK(HOOK_0x9A3DC1, ebx + 0xF0, CMP_5);
+// Character ! blocks
+// DECL_HOOK(HOOK_0x9A3CD9, ebx + 0xF0, CMP_1);
+// DECL_HOOK(HOOK_0x9A3D13, ebx + 0xF0, CMP_2);
+// DECL_HOOK(HOOK_0x9A3D4D, ebx + 0xF0, CMP_3);
+// DECL_HOOK(HOOK_0x9A3D87, ebx + 0xF0, CMP_4);
+// DECL_HOOK(HOOK_0x9A3DC1, ebx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9A5015, ebx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9A504D, ebx + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0x9A5367, ebx + 0xF0, CMP_3);
@@ -480,11 +481,12 @@ DECL_HOOK(HOOK_0x9D9463, esi + 0xF0, MOV_edi);
 DECL_HOOK(HOOK_0x9D9AF3, esi + 0xF0, MOV_eax);
 DECL_HOOK(HOOK_0x9D9C6A, esi + 0xF0, MOV_eax);
 DECL_HOOK(HOOK_0x9DA7CA, edx + ecx * 4 + 0xF0, MOV_esi);
-DECL_HOOK(HOOK_0x9DA827, ecx + eax * 4 + 0xF0, CMP_1);
-DECL_HOOK(HOOK_0x9DA863, ecx + eax * 4 + 0xF0, CMP_2);
-DECL_HOOK(HOOK_0x9DA893, ecx + eax * 4 + 0xF0, CMP_3);
-DECL_HOOK(HOOK_0x9DA8C3, ecx + eax * 4 + 0xF0, CMP_di);
-DECL_HOOK(HOOK_0x9DA8F2, ecx + eax * 4 + 0xF0, CMP_5);
+// Character change block can activate
+// DECL_HOOK(HOOK_0x9DA827, ecx + eax * 4 + 0xF0, CMP_1);
+// DECL_HOOK(HOOK_0x9DA863, ecx + eax * 4 + 0xF0, CMP_2);
+// DECL_HOOK(HOOK_0x9DA893, ecx + eax * 4 + 0xF0, CMP_3);
+// DECL_HOOK(HOOK_0x9DA8C3, ecx + eax * 4 + 0xF0, CMP_di);
+// DECL_HOOK(HOOK_0x9DA8F2, ecx + eax * 4 + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9DAAA2, eax + edx * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DAB17, ecx + eax * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DAB8C, edx + ecx * 4 + 0xF0, MOV_ebx);
@@ -507,13 +509,14 @@ DECL_HOOK(HOOK_0x9DE6C4, edx + ecx * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DEF81, edx + ecx * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DF01D, ecx + eax * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9E086C, eax + edx * 4 + 0xF0, CMP_4);
-DECL_HOOK(HOOK_0x9E19BE, eax + edx * 4 + 0xF0, CMP_1);
-DECL_HOOK(HOOK_0x9E19F3, eax + edx * 4 + 0xF0, CMP_2);
-DECL_HOOK(HOOK_0x9E1A28, eax + edx * 4 + 0xF0, CMP_3);
-DECL_HOOK(HOOK_0x9E1A63, ecx + edx * 4 + 0xF0, CMP_ax);
-DECL_HOOK(HOOK_0x9E1A96, ecx + eax * 4 + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x9E1BD6, edx + ecx * 4 + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x9E1BF9, ecx + eax * 4 + 0xF0, MOV_esi);
+// Character block animation
+// DECL_HOOK(HOOK_0x9E19BE, eax + edx * 4 + 0xF0, CMP_1);
+// DECL_HOOK(HOOK_0x9E19F3, eax + edx * 4 + 0xF0, CMP_2);
+// DECL_HOOK(HOOK_0x9E1A28, eax + edx * 4 + 0xF0, CMP_3);
+// DECL_HOOK(HOOK_0x9E1A63, ecx + edx * 4 + 0xF0, CMP_ax);
+// DECL_HOOK(HOOK_0x9E1A96, ecx + eax * 4 + 0xF0, CMP_5);
+// DECL_HOOK(HOOK_0x9E1BD6, edx + ecx * 4 + 0xF0, CMP_5);
+// DECL_HOOK(HOOK_0x9E1BF9, ecx + eax * 4 + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0xA02866, eax + ecx * 4 + 0xF0, MOV_cx);
 DECL_HOOK(HOOK_0xA02899, edx + ecx * 4 + 0xF0, CMP_0);
 DECL_HOOK(HOOK_0xA028F1, eax + edx * 4 + 0xF0, MOV_edi);
@@ -749,11 +752,12 @@ static auto patch_0x9A008E = PATCH(0x9A008E).CALL(HOOK_0x9A008E).NOP_PAD_TO_SIZE
 static auto patch_0x9A04B6 = PATCH(0x9A04B6).CALL(HOOK_0x9A04B6).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9A13BE = PATCH(0x9A13BE).CALL(HOOK_0x9A13BE).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9A32CB = PATCH(0x9A32CB).CALL(HOOK_0x9A32CB).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A3CD9 = PATCH(0x9A3CD9).CALL(HOOK_0x9A3CD9).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A3D13 = PATCH(0x9A3D13).CALL(HOOK_0x9A3D13).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A3D4D = PATCH(0x9A3D4D).CALL(HOOK_0x9A3D4D).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A3D87 = PATCH(0x9A3D87).CALL(HOOK_0x9A3D87).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A3DC1 = PATCH(0x9A3DC1).CALL(HOOK_0x9A3DC1).NOP_PAD_TO_SIZE<8>();
+// Character ! blocks
+// static auto patch_0x9A3CD9 = PATCH(0x9A3CD9).CALL(HOOK_0x9A3CD9).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9A3D13 = PATCH(0x9A3D13).CALL(HOOK_0x9A3D13).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9A3D4D = PATCH(0x9A3D4D).CALL(HOOK_0x9A3D4D).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9A3D87 = PATCH(0x9A3D87).CALL(HOOK_0x9A3D87).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9A3DC1 = PATCH(0x9A3DC1).CALL(HOOK_0x9A3DC1).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9A5015 = PATCH(0x9A5015).CALL(HOOK_0x9A5015).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9A504D = PATCH(0x9A504D).CALL(HOOK_0x9A504D).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9A5367 = PATCH(0x9A5367).CALL(HOOK_0x9A5367).NOP_PAD_TO_SIZE<8>();
@@ -977,11 +981,12 @@ static auto patch_0x9D9463 = PATCH(0x9D9463).CALL(HOOK_0x9D9463).NOP_PAD_TO_SIZE
 static auto patch_0x9D9AF3 = PATCH(0x9D9AF3).CALL(HOOK_0x9D9AF3).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9D9C6A = PATCH(0x9D9C6A).CALL(HOOK_0x9D9C6A).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9DA7CA = PATCH(0x9DA7CA).CALL(HOOK_0x9DA7CA).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9DA827 = PATCH(0x9DA827).CALL(HOOK_0x9DA827).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9DA863 = PATCH(0x9DA863).CALL(HOOK_0x9DA863).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9DA893 = PATCH(0x9DA893).CALL(HOOK_0x9DA893).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9DA8C3 = PATCH(0x9DA8C3).CALL(HOOK_0x9DA8C3).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9DA8F2 = PATCH(0x9DA8F2).CALL(HOOK_0x9DA8F2).NOP_PAD_TO_SIZE<9>();
+// Character change block can activate
+// static auto patch_0x9DA827 = PATCH(0x9DA827).CALL(HOOK_0x9DA827).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9DA863 = PATCH(0x9DA863).CALL(HOOK_0x9DA863).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9DA893 = PATCH(0x9DA893).CALL(HOOK_0x9DA893).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9DA8C3 = PATCH(0x9DA8C3).CALL(HOOK_0x9DA8C3).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9DA8F2 = PATCH(0x9DA8F2).CALL(HOOK_0x9DA8F2).NOP_PAD_TO_SIZE<9>();
 static auto patch_0x9DAAA2 = PATCH(0x9DAAA2).CALL(HOOK_0x9DAAA2).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9DAB17 = PATCH(0x9DAB17).CALL(HOOK_0x9DAB17).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9DAB8C = PATCH(0x9DAB8C).CALL(HOOK_0x9DAB8C).NOP_PAD_TO_SIZE<8>();
@@ -1004,13 +1009,14 @@ static auto patch_0x9DE6C4 = PATCH(0x9DE6C4).CALL(HOOK_0x9DE6C4).NOP_PAD_TO_SIZE
 static auto patch_0x9DEF81 = PATCH(0x9DEF81).CALL(HOOK_0x9DEF81).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9DF01D = PATCH(0x9DF01D).CALL(HOOK_0x9DF01D).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9E086C = PATCH(0x9E086C).CALL(HOOK_0x9E086C).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E19BE = PATCH(0x9E19BE).CALL(HOOK_0x9E19BE).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E19F3 = PATCH(0x9E19F3).CALL(HOOK_0x9E19F3).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E1A28 = PATCH(0x9E1A28).CALL(HOOK_0x9E1A28).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E1A63 = PATCH(0x9E1A63).CALL(HOOK_0x9E1A63).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9E1A96 = PATCH(0x9E1A96).CALL(HOOK_0x9E1A96).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E1BD6 = PATCH(0x9E1BD6).CALL(HOOK_0x9E1BD6).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9E1BF9 = PATCH(0x9E1BF9).CALL(HOOK_0x9E1BF9).NOP_PAD_TO_SIZE<8>();
+// Character block animation
+// static auto patch_0x9E19BE = PATCH(0x9E19BE).CALL(HOOK_0x9E19BE).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9E19F3 = PATCH(0x9E19F3).CALL(HOOK_0x9E19F3).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9E1A28 = PATCH(0x9E1A28).CALL(HOOK_0x9E1A28).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9E1A63 = PATCH(0x9E1A63).CALL(HOOK_0x9E1A63).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9E1A96 = PATCH(0x9E1A96).CALL(HOOK_0x9E1A96).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9E1BD6 = PATCH(0x9E1BD6).CALL(HOOK_0x9E1BD6).NOP_PAD_TO_SIZE<9>();
+// static auto patch_0x9E1BF9 = PATCH(0x9E1BF9).CALL(HOOK_0x9E1BF9).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA02866 = PATCH(0xA02866).CALL(HOOK_0xA02866).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA02899 = PATCH(0xA02899).CALL(HOOK_0xA02899).NOP_PAD_TO_SIZE<9>();
 static auto patch_0xA028F1 = PATCH(0xA028F1).CALL(HOOK_0xA028F1).NOP_PAD_TO_SIZE<8>();
@@ -1247,11 +1253,12 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9A04B6,
     &patch_0x9A13BE,
     &patch_0x9A32CB,
-    &patch_0x9A3CD9,
-    &patch_0x9A3D13,
-    &patch_0x9A3D4D,
-    &patch_0x9A3D87,
-    &patch_0x9A3DC1,
+// Character ! blocks
+//    &patch_0x9A3CD9,
+//    &patch_0x9A3D13,
+//    &patch_0x9A3D4D,
+//    &patch_0x9A3D87,
+//    &patch_0x9A3DC1,
     &patch_0x9A5015,
     &patch_0x9A504D,
     &patch_0x9A5367,
@@ -1475,11 +1482,12 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9D9AF3,
     &patch_0x9D9C6A,
     &patch_0x9DA7CA,
-    &patch_0x9DA827,
-    &patch_0x9DA863,
-    &patch_0x9DA893,
-    &patch_0x9DA8C3,
-    &patch_0x9DA8F2,
+// Character change block can activate
+//    &patch_0x9DA827,
+//    &patch_0x9DA863,
+//    &patch_0x9DA893,
+//    &patch_0x9DA8C3,
+//    &patch_0x9DA8F2,
     &patch_0x9DAAA2,
     &patch_0x9DAB17,
     &patch_0x9DAB8C,
@@ -1502,13 +1510,14 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9DEF81,
     &patch_0x9DF01D,
     &patch_0x9E086C,
-    &patch_0x9E19BE,
-    &patch_0x9E19F3,
-    &patch_0x9E1A28,
-    &patch_0x9E1A63,
-    &patch_0x9E1A96,
-    &patch_0x9E1BD6,
-    &patch_0x9E1BF9,
+// Character block animation
+//    &patch_0x9E19BE,
+//    &patch_0x9E19F3,
+//    &patch_0x9E1A28,
+//    &patch_0x9E1A63,
+//    &patch_0x9E1A96,
+//    &patch_0x9E1BD6,
+//    &patch_0x9E1BF9,
     &patch_0xA02866,
     &patch_0xA02899,
     &patch_0xA028F1,
