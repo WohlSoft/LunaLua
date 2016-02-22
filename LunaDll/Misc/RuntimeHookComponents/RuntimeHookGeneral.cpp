@@ -441,7 +441,7 @@ void TrySkipPatch()
     // -70: Held NPCs
     PATCH(0x91D422).NOP().NOP().CALL(GetRenderBelowPriorityHook<-65>()).Apply();
     // -65: Normal Blocks
-    PATCH(0x91DD90).NOP().NOP().CALL(GetRenderBelowPriorityHook<-60>()).Apply();
+    PATCH(0x91DD44).NOP().NOP().CALL(GetRenderBelowPriorityHook<-60>()).Apply();
     // -60: Furthest Back Effects (doors, pressed p-switches, some other stuff)
     PATCH(0x91E1F2).NOP().NOP().CALL(GetRenderBelowPriorityHook<-55>()).Apply();
     // -55: Some NPCs (i.e. coins, clown car, chompy, herb, wood rocket, koopaling fire)

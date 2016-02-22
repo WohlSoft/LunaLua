@@ -582,7 +582,7 @@ static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
     {
         mainArray = GM_GFX_BLOCKS_PTR;
         maskArray = GM_GFX_BLOCKS_MASK_PTR;
-        maxIndex = 638;
+        maxIndex = 700;
     }
     else if (t == "background2")
     {
