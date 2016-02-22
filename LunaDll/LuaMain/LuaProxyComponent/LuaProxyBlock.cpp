@@ -64,8 +64,8 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
 
 LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
 {
-    if (blockid < 1 || blockid > 638) {
-        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-638\nGot Block-ID: %d", blockid);
+    if (blockid < 1 || blockid > 700) {
+        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-700\nGot Block-ID: %d", blockid);
         return LuaProxy::Block(-1);
     }
 

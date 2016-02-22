@@ -49,7 +49,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
 
 void RenderOverrideManager::loadLevelGFX()
 {
-    loadOverrides(L"block", GM_GFX_BLOCKS_PTR, 638, GM_GFX_BLOCKS_MASK_PTR);
+    loadOverrides(L"block", GM_GFX_BLOCKS_PTR, 700, GM_GFX_BLOCKS_MASK_PTR);
     loadOverrides(L"background2", GM_GFX_BACKGROUND2_PTR, 58);
     loadOverrides(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR);
     loadOverrides(L"effect", GM_GFX_EFFECTS_PTR, 148, GM_GFX_EFFECTS_MASK_PTR);
