@@ -25,6 +25,7 @@
 #include "Rendering/GL/GLEngine.h"
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
+#include "Rendering/FFmpeg/FFmpegMediaPlayer2.h"
 
 #define PATCHIT 1
 
@@ -176,7 +177,6 @@ int OnLvlLoad() {
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	
 	// Clean up
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
@@ -200,8 +200,13 @@ int TestFunc()
 		gFrames++;	
 		gDeathCounter.UpdateDeaths(true);
 		gSavedVarBank.SaveIfNeeded();
+		BMPBox* tmpb;
 		for (auto bmp : g_GLTextureStore.mLunaTexMap) {
-			const_cast<BMPBox*>(bmp.first)->procCallback();
+			tmpb = const_cast<BMPBox*>(bmp.first);
+			if (gFrames - tmpb->lastDecodedFrame > 7) {
+				tmpb->setOnScreen(false);
+			}
+			tmpb->procCallback();
 		}
 		// Run any framecode
 		TestFrameCode();

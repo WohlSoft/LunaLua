@@ -9,7 +9,6 @@
 #include <gl/glew.h>
 #include "../../SMBXInternal/PlayerMOB.h"
 #include <string>
-bool BMPBox::pendingHarm = false;
 void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...)
 {
 	va_list	argp;
@@ -46,11 +45,7 @@ BMPBox::~BMPBox() {
 		DeleteDC(m_hdc);
 		m_hdc = NULL;
 	}
-	/*
-	for (int i = 0; i < 8; i++) {
-		callbacks[i] = luabind::object();
-	}
-	*/
+	if (maskOutput)free(maskOutput);
 }
 
 // CTOR - Load from a file path
@@ -78,16 +73,31 @@ BMPBox::BMPBox(std::wstring filename, HDC screen_dc) {
 		m_W = bm.bmWidth;
 	}
 	else {
-		mp = new FFmpegMediaPlayer(filename, ffdset);
-		realffdset = mp->getAppliedSetting();
-		if (mp->isVideoPlayable()) {
-			m_H = realffdset.video.height;
-			m_W = realffdset.video.width;
+		
+		mp = new FFmpegMediaPlayer2(filename);
+		
+		if (mp->playable()) {
+			
+			m_W = mp->getWidth();
+			m_H = mp->getHeight();
 			m_hbmp = FreeImageHelper::CreateEmptyBitmap(m_W, m_H, 32, &bmpPtr);
 			SelectObject(m_hdc, m_hbmp);
 			hasVideo = true;
-			mp->setVideoBufferDest(bmpPtr);
+			mp->setVideoOutput((uint8_t*)bmpPtr, m_W, m_H);
+			
+			if (mp->maskExist()) {
+				maskW = mp->getMaskWidth();
+				maskH = mp->getMaskHeight();
+				maskOutput = (uint8_t*)malloc(maskW*maskH*4*sizeof(uint8_t));
+				mp->setMaskOutput(maskOutput, maskW, maskH);
+				hasMask = true;
+			}
 		}
+
+		else {
+			
+		}
+		
 	}
 	m_Filename = filename;
 
@@ -127,20 +137,21 @@ void BMPBox::Init() {
 	hasVideo = false;
 	scaleDownMode = GL_NEAREST;
 	scaleUpMode = GL_NEAREST;
-	ffdset.video.pixFmt = AV_PIX_FMT_BGRA;
-	ffdset.video.resampling_mode = SWS_FAST_BILINEAR;
-	ffdset.video.width = 0;		//use almost original size
-	ffdset.video.height = 0;
-	ffdset.audio.channelLayout = AV_CH_LAYOUT_STEREO;
-	ffdset.audio.channel_num = 0; //auto
-	ffdset.audio.sample_format = AV_SAMPLE_FMT_S16;
-	ffdset.audio.sample_rate = 44100;
-	pendingHarm = false;
 	for (int i = 0; i < 8; i++)maskThreshold[i] = 256;
-	//callbacks->
-	//memset(callbacks, 0, sizeof(luabind::object*) * 8);
-	//memset(pendingCallback, 0, sizeof(bool) * 8);
 	memset(pendingHarmArr, 0, sizeof(bool) * 8);
+	clbc = NULL;
+	hasMask = false;
+	maskOutput = NULL;
+	bmpPtr = false;
+	maskW = 0;
+	maskH = 0;
+	mp = NULL;
+	nowOnScreen = false;
+	lastDecodedFrame = -1;
+	offScrMode = PAUSE;
+	onScrMode = PLAY;
+	onScrClbk = NULL;
+	offScrClbk = NULL;
 }
 
 
@@ -226,7 +237,38 @@ BMPBox* BMPBox::loadIfExist(const std::wstring& filename, HDC screen_dc)
 }
 
 void BMPBox::setOnScreen(bool onScreen) {
-	if(mp)mp->setOnScreen(onScreen);
+	if (nowOnScreen && !onScreen) {
+
+			switch (offScrMode) {
+			case CONTINUE:
+				break;
+			case PAUSE:
+				pause();
+				break;
+			case STOP:
+				stop();
+				break;
+			default:
+				break;
+			}
+			
+			nowOnScreen = false;
+			shouldCallOffScrClbk = true;
+	}
+	else if(!nowOnScreen && onScreen) {
+		switch (onScrMode) {
+		case NOTHING:
+			break;
+		case PLAY:
+			play();
+			break;
+		default:
+			break;
+		}
+
+		nowOnScreen = true;
+		shouldCallOnScrClbk = true;
+	}
 }
 
 void BMPBox::setScaleUpMode(int m) {
@@ -244,6 +286,10 @@ void BMPBox::setScaleUpMode(int m) {
 	}
 }
 
+int BMPBox::getScaleUpMode() {
+	return scaleUpMode;
+}
+
 void BMPBox::setScaleDownMode(int m) {
 	switch (m) {
 	case 0:
@@ -257,6 +303,35 @@ void BMPBox::setScaleDownMode(int m) {
 		break;
 
 	}
+}
+
+int BMPBox::getScaleDownMode() {
+	return scaleDownMode;
+}
+
+void BMPBox::setOffScreenMode(int m) {
+	offScrMode = (OffScreenMode)m;
+}
+
+int BMPBox::getOffScreenMode() {
+	return offScrMode;
+}
+
+void BMPBox::setOnScreenMode(int m) {
+	onScrMode = (OnScreenMode)m;
+}
+
+void BMPBox::setOnScreenCallback(void(*fn)()) {
+	
+	onScrClbk = fn;
+}
+
+void BMPBox::setOffScreenCallback(void(*fn)()) {
+	offScrClbk = fn;
+}
+
+int BMPBox::getOnScreenMode() {
+	return onScrMode;
 }
 
 void BMPBox::play() {
@@ -278,11 +353,41 @@ void BMPBox::seek(double sec) {
 void BMPBox::setVideoDelay(double d) {
 	if (mp)mp->setVideoDelay(d);
 }
+
+double BMPBox::getVideoDelay() {
+	return mp ? mp->getVideoDelay() : 0;
+}
+
+void BMPBox::setMaskDelay(double d) {
+	if (mp)mp->setMaskDelay(d);
+}
+
+double BMPBox::getMaskDelay() {
+	return mp ? mp->getMaskDelay() : 0;
+}
+void BMPBox::setLoop(bool l) {
+	if (mp)mp->loop = l;
+}
+
+bool BMPBox::getLoop() {
+	return mp ? mp->loop : false;
+}
+
+void BMPBox::setAltAlpha(int ch) {
+	if (mp)mp->setAltAlpha(ch);
+}
+
+
+int BMPBox::getAltAlpha() {
+	return mp ? mp->getAltAlpha() : -1;
+}
 void BMPBox::setCallback(void(*fn)(int)) {
 	clbc = fn;
 }
 
 void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
+	
+
 	if (!mp)return;
 	//if (!mp->collisionMap)return;
 	//int mode = getHurtMode();
@@ -303,15 +408,12 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 	int x = (int)round(wScale*scrX); int y = (int)round(hScale*scrY);
 	int startH = min(max(pRect.top,y),m_H+y)-y; int endH = min(max(pRect.bottom, y), m_H+y)-y;
 	int startW = min(max(pRect.left, x), m_W+x)-x; int endW = min(max(pRect.right, x), m_W+x)-x;
-	bool brk;
+	//bool brk;
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(4)
+#endif
 	for (int k = 0; k < 4; k++) {
-		//fxxxxxxxxxxxxxxxxxxxxxxxx
-		/*
-		if (!callbacks[k])continue;
-		if (!callbacks[k]->is_valid())continue;
-		if (luabind::type(*(callbacks[k])) != LUA_TFUNCTION)continue;
-		*/
-		brk = false;
+		bool brk = false;
 		for (int i = startH; i < endH; i++) {
 			for (int j = startW; j < endW; j++) {
 				if (((uint8_t*)bmpPtr)[m_W * 4 * i + j * 4+k] >= maskThreshold[k]) { //BGRA
@@ -325,17 +427,25 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 		}
 		
 	}
-	if (mp->collisionMap) {
+	if (hasMask) {
+		double mwScale = maskW / (double)destWidth;
+		double mhScale = maskH / (double)destHeight;
+
+		//coord scaling
+		pRect.top = (LONG)round(mhScale*pRect.top); pRect.bottom = (LONG)round(mhScale*pRect.bottom);
+		pRect.left = (LONG)round(mwScale*pRect.left); pRect.right = (LONG)round(mwScale*pRect.right);
+		int mx = (int)round(mwScale*scrX); int my = (int)round(mhScale*scrY);
+		int mstartH = min(max(pRect.top, my), maskH + my) - my; int mendH = min(max(pRect.bottom, my), maskH + my) - my;
+		int mstartW = min(max(pRect.left, mx), maskW + mx) - mx; int mendW = min(max(pRect.right, mx), maskW + mx) - mx;
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(4) 
+#endif
 		for (int k = 0; k < 4; k++) {
-			/*
-			if (!callbacks[k+4])continue;
-			if (!callbacks[k+4]->is_valid())continue;
-			if (luabind::type(*(callbacks[k+4])) != LUA_TFUNCTION)continue;
-			*/
-			brk = false;
-			for (int i = startH; i < endH; i++) {
-				for (int j = startW; j < endW; j++) {
-					if (mp->collisionMap[m_W * 4 * i + j * 4 + k] >= maskThreshold[k+4]) { //BGRA
+			
+			bool brk = false;
+			for (int i = mstartH; i < mendH; i++) {
+				for (int j = mstartW; j < mendW; j++) {
+					if (maskOutput[maskW * 4 * i + j * 4 + k] >= maskThreshold[k+4]) { //BGRA
 
 						pendingHarmArr[k+4] = true;
 						brk = true;
@@ -347,41 +457,27 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 			
 		}
 	}
-	/*
-	for (int i = startH; i < endH; i++) {
-		for (int j = startW; j < endW; j++) {
-			if (mp->collisionMap[m_W*4*i + j*4] >= maskThreshold) { //b
-				pendingHarm = true;
-				return;
-			}
-		}
-	}
-	*/
+
 }
 void BMPBox::procCallback() {
-	if (GM_PLAYERS_COUNT <= 0 || !clbc)return;
+	
+	//if (GM_PLAYERS_COUNT <= 0 || !clbc)return;
+	if (shouldCallOffScrClbk) {
+
+		if(offScrClbk)offScrClbk();
+		shouldCallOffScrClbk = false;
+	}
+
+	if (shouldCallOnScrClbk) {
+		if (onScrClbk)onScrClbk();
+		shouldCallOnScrClbk = false;
+	}
 	for (int i = 0; i < 8; i++) {
 		if (pendingHarmArr[i]) {
-			clbc(i);
-			/*
-			short hm = 1;
-			Player::Harm(&hm);
-			*/
+			if(clbc)clbc(i);
+			
 			pendingHarmArr[i] = false;
 		}
 	}
-}
-void BMPBox::procPendingHarm() {
 	
-	if (pendingHarm) {
-		pendingHarm = false;
-		short hm = 1;
-		Player::Harm(&hm);
-	}
-}
-void BMPBox::setHurtMode(int m) {
-	if (mp)mp->maskMode = m;
-}
-int BMPBox::getHurtMode() const {
-	return mp ? mp->maskMode : -1;
 }

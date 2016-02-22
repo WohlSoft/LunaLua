@@ -70,6 +70,8 @@ local function initFFIBasedAPIs()
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
         uint32_t* LunaLuaGetImageResourceBits(uint32_t bmpBoxIntPtr);
         void LunaLuaSetMovieHitCallback(uint32_t bmpBoxIntPtr,void(*fn)(int));
+        void LunaLuaSetMovieOnScreenCallback(uint32_t bmpBoxIntPtr,void(*fn)());
+        void LunaLuaSetMovieOffScreenCallback(uint32_t bmpBoxIntPtr,void(*fn)());
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
     
@@ -127,12 +129,29 @@ if(type(resImg) ~= "userdata")then
         
         return bitMT
     end
-Graphics.setMovieHitCallback=function(movie,fn)
+    Graphics.setMovieHitCallback=function(movie,fn)
         if type(fn) ~= "function" then
         error("Wrong type for setMovieHitCallback argument #2 (expected void(*)(int), got " .. type(fn) .. ")", 2)
         end
         LunaDLL.LunaLuaSetMovieHitCallback(movie.__BMPBoxPtr,fn)
     end
+    
+    Graphics.setMovieOnScreenCallback=function(movie,fn)
+        if type(fn) ~= "function" then
+        error("Wrong type for setMovieOnScreen argument #2 (expected void(*)(), got " .. type(fn) .. ")", 2)
+        end
+        LunaDLL.LunaLuaSetMovieOnScreenCallback(movie.__BMPBoxPtr,fn)
+    end
+    
+    Graphics.setMovieOffScreenCallback=function(movie,fn)
+        if type(fn) ~= "function" then
+        error("Wrong type for setMovieOffScreen argument #2 (expected void(*)(), got " .. type(fn) .. ")", 2)
+        end
+        LunaDLL.LunaLuaSetMovieOffScreenCallback(movie.__BMPBoxPtr,fn)
+    end
+    Graphics.movieHitEvent=Graphics.setMovieHitCallback
+    Graphics.movieOnScreenEvent=Graphics.setMovieOnScreenCallback
+    Graphics.movieOffScreenEvent=Graphics.setMovieOffScreenCallback
     
     local function convertGlArray(arr, arr_len)
         if (arr == nil) then return 0 end

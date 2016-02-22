@@ -5,7 +5,7 @@ struct FFmpegVideoDecodeComponent {
 	AVFrame* vidSrcFrame, *vidDestFrame, *booked, *srcPtr;
 	uint8_t* vBuffer;
 	SwsContext* swsCtx;
-	AVPacket vPkt;
+	CustomAVPacket vPkt;
 	int got_picture;
 	FFmpegVideoDecodeComponent();
 	~FFmpegVideoDecodeComponent();
@@ -14,7 +14,7 @@ struct FFmpegVideoDecodeComponent {
 struct FFmpegAudioDecodeComponent {
 	AVFrame* audFrame;
 	SwrContext* swrCtx;
-	AVPacket aPkt;
+	CustomAVPacket aPkt;
 	int got_sound;
 	int audDestMaxSamples, audDestSamples;
 	uint8_t **audDestData;

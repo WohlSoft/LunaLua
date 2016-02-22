@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <memory>
 #include <atomic>
-#include "FFmpeg/FFmpegMediaPlayer.h"
+#include "FFmpeg/FFmpegMediaPlayer2.h"
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
 
@@ -35,6 +35,12 @@ public:
 
     void forEachPixelValue(std::function<void(BYTE)> forEachFunc);
     void* getBits();
+	enum OffScreenMode{
+	CONTINUE=0,PAUSE=1,STOP=2
+	};
+	enum OnScreenMode {
+		NOTHING=0,PLAY=1
+	};
 
 	/// Members ///
 	std::wstring m_Filename;  // Original filename
@@ -45,34 +51,55 @@ public:
 	std::atomic<bool> m_modified;       // If the image was modified and needs a reload
 	// Static function
 	static BMPBox* loadIfExist(const std::wstring& filename, HDC screen_dc);
-	FFmpegMediaPlayer* mp;
-	FFmpegDecodeSetting ffdset;
-	FFmpegDecodeSetting realffdset;
+	FFmpegMediaPlayer2* mp;
+	int maskW, maskH;
 	bool hasVideo;
+	bool hasMask;
 	int scaleUpMode;
 	int scaleDownMode;
+	bool nowOnScreen;
 	void setOnScreen(bool onScreen);
 	void setScaleUpMode(int m);
 	void setScaleDownMode(int m);
+	int getScaleUpMode();
+	int getScaleDownMode();
+	void setOffScreenMode(int m);
+	int getOffScreenMode();
+	void setOnScreenMode(int m);
+	int getOnScreenMode();
+	void setVideoDelay(double d);
+	double getVideoDelay();
+	void setMaskDelay(double d);
+	void setLoop(bool enable);
+	bool getLoop();
+	void setAltAlpha(int altCh);
+	int getAltAlpha();
+	double getMaskDelay();
+	void setCallback(void(*fn)(int));
+	void setOnScreenCallback(void(*fn)());
+	void setOffScreenCallback(void(*fn)());
+
 	void play();
 	void stop();
 	void pause();
 	void seek(double src);
 	void colTest(int scrX, int scrY, int destWidth, int destHeight);
-	static void procPendingHarm();
-	void setHurtMode(int m);
-	int getHurtMode() const;
-	//int hurtMode;//0= no hurt,1=use alphachannel,2=use custom hurt mask
-	//int hurtMaskIndex;//stream index
 	int maskThreshold[8];//when value >= maskThreshold it is hurt area
-	//luabind::object* callbacks[8];
 	void procCallback();
-	void setVideoDelay(double d);
-	void setCallback(void(*fn)(int));
+	
 	void(*clbc)(int);
+
+	//used for offscreen check
+	int lastDecodedFrame;
+	OffScreenMode offScrMode;
+	OnScreenMode onScrMode;
+	uint8_t* maskOutput;
+	void(*onScrClbk)();
+	void(*offScrClbk)();
+	bool shouldCallOnScrClbk;
+	bool shouldCallOffScrClbk;
 private:
 	void* bmpPtr;
-	static bool pendingHarm;
 	bool pendingHarmArr[8];
 };
 

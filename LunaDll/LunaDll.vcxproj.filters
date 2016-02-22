@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -513,15 +513,16 @@
     <ClInclude Include="Rendering\GL\GLFramebuffer.h">
       <Filter>Rendering\GL</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\FFmpeg\FFmpegMedia.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegInit.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpeg.h" />
-    <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeQueue.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
     <ClInclude Include="Rendering\FrameCapture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMedia2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -990,17 +991,17 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp">
       <Filter>Rendering\GL</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\FFmpeg\FFmpegMedia.cpp" />
-    <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
     <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
-    <ClCompile Include="Rendering\FFmpeg\FFmpegComponent.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\FrameCapture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMedia2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

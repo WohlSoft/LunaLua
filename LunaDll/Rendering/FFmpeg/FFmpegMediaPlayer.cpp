@@ -242,7 +242,7 @@ FFmpegMediaPlayer::~FFmpegMediaPlayer() {
 	if (_pause)delete _pause;
 	if (_seek)delete _seek;
 
-	/* 中にあるAVPacketはデストラクタにfreeされる */
+	/* 中にあるCustomAVPacketはデストラクタにfreeされる */
 	if (soundQueue) delete soundQueue;
 	if (videoQueue) delete videoQueue;
 	if (maskQueue) delete maskQueue;
@@ -400,7 +400,7 @@ bool FFmpegMediaPlayer::initVideo(FFmpegMedia* m, FFmpegVideoDecodeSetting* vs) 
 				}
 
 				/* デコード */
-				avcodec_decode_video2(media->vidCodecCtx, FFVDC.vidSrcFrame, &FFVDC.got_picture, &FFVDC.vPkt);
+				
 				FFVDC.srcPtr = FFVDC.vidSrcFrame;
 				/* vPktはもう使わないのでfree */
 				av_free_packet(&FFVDC.vPkt);

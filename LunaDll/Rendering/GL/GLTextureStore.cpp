@@ -84,7 +84,6 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 {
 	if (bmp.m_hbmp == NULL) return NULL;
 	// Get associated texture from cache if possible
-	
 	bool cacheFound = false;
 	auto it = mLunaTexMap.find(&bmp);
 	cacheFound = it != mLunaTexMap.end();
@@ -140,7 +139,10 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp, 
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 	GLERRORCHECK("glTexSubImage2D", bmp.m_Filename, tex.pw, tex.ph);
 
-	const_cast<BMPBox*>(&bmp)->setOnScreen(true); //sorry for const_cast'ing
+	BMPBox* bmpp = const_cast<BMPBox*>(&bmp);
+	
+	bmpp->setOnScreen(true);
+	bmpp->lastDecodedFrame = gFrames;
 
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, bm.bmBits);
 	//GLERRORCHECK();

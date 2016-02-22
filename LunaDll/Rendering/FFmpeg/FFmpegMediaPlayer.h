@@ -186,7 +186,7 @@ private:
 	int _SDLSoundFormat;
 	double __seekVal;
 	uint8_t* outBuffer;//no init needed
-	AVPacket pkt,mPkt,tmpMPkt;
+	CustomAVPacket pkt,mPkt,tmpMPkt;
 	bool mPktConsumed;
 	bool _videoPlayable, _audioPlayable;
 	bool loadViaPlayer;

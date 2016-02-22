@@ -113,7 +113,7 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
     GLERRORCHECK();
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices); //leak
     GLERRORCHECK();
 
     // Disable color logic op if we enabled it

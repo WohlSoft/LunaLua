@@ -3,40 +3,48 @@
 FFmpegThread* FFmpegDecodeQueue::queueThread = new FFmpegThread();
 
 FFmpegDecodeQueue::FFmpegDecodeQueue() : size_(0) {
-	InitializeCriticalSection(&crSect);
+	InitializeCriticalSectionEx(&crSect,4000, CRITICAL_SECTION_NO_DEBUG_INFO);
 }
 
 FFmpegDecodeQueue::FFmpegDecodeQueue(int msize) :FFmpegDecodeQueue(){
 	MAX_SIZE = msize > 0 ? msize : 0;
 }
 
-void FFmpegDecodeQueue::push(AVPacket& packet) {
+FFmpegDecodeQueue::FFmpegDecodeQueue(int msize,int mcount) : FFmpegDecodeQueue(msize) {
+	MAX_COUNT = mcount > 0 ? mcount : 10;
+}
+
+void FFmpegDecodeQueue::push(CustomAVPacket& packet) {
 	EnterCriticalSection(&crSect);
 	rawPush(packet);
 	LeaveCriticalSection(&crSect);
 }
 
-void FFmpegDecodeQueue::rawPush(AVPacket& packet) {
-	//AVPacket p;
+void FFmpegDecodeQueue::rawPush(CustomAVPacket& packet) {
+	//CustomAVPacket p;
 	av_dup_packet(&packet);
 	//av_copy_packet(&p, &packet);
 	packets_.push_back(packet);
 	size_ += packet.size;
 }
 
-bool FFmpegDecodeQueue::pop(AVPacket& packet) {
+bool FFmpegDecodeQueue::pop(CustomAVPacket& packet) {
 	EnterCriticalSection(&crSect);
 	bool __tmp = rawPop(packet);
 	LeaveCriticalSection(&crSect);
 	return __tmp;
 }
 
-bool FFmpegDecodeQueue::rawPop(AVPacket& packet) {
-	if (packets_.empty()) return false;
+bool FFmpegDecodeQueue::rawPop(CustomAVPacket& packet) {
+	if (packets_.empty() || !packets_.front().decodeReady) return false;
 	packet = packets_.front();
 	packets_.pop_front();
 	size_ -= packet.size;
 	return true;
+}
+
+CustomAVPacket& FFmpegDecodeQueue::lastPacket() {
+	return packets_.back();
 }
 
 void FFmpegDecodeQueue::rawClear() {
@@ -56,7 +64,9 @@ void FFmpegDecodeQueue::clear() {
 	rawClear();
 	LeaveCriticalSection(&crSect);
 }
-
+bool FFmpegDecodeQueue::queueable() {
+	return dataSize() < MAX_SIZE && dataCount() < MAX_COUNT;
+}
 FFmpegDecodeQueue::~FFmpegDecodeQueue() {
 	clear();
 	DeleteCriticalSection(&crSect);

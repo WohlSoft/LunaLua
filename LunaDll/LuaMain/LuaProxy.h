@@ -1235,15 +1235,24 @@ namespace LuaProxy {
 			void stop();
 			void pause();
 			void seek(double sec);
-			void setHurtMode(int m);
-			int getHurtMode() const;
 			void setVideoDelay(double d);
-			//void setCallback(int m,luabind::object fn,lua_State* L);
-			//luabind::object getCallback(int m,lua_State* L);
-			//void setHurtMaskIndex(int idx);
-			//int getHurtMaskIndex() const;
+			double getVideoDelay();
+			void setMaskDelay(double d);
+			double getMaskDelay();
+			void setScaleUpMode(int m);
+			int getScaleUpMode();
+			void setScaleDownMode(int m);
+			int getScaleDownMode();
+			void setOffScreenMode(int m);
+			int getOffScreenMode();
+			void setOnScreenMode(int m);
+			int getOnScreenMode();
+			void setLoop(bool enable);
+			bool getLoop();
 			void setMaskThreshold(int idx,int val);
 			int getMaskThreshold(int idx) const;
+			void setAltAlpha(int ch);
+			int getAltAlpha();
 
 		};
         enum RENDER_TYPE {

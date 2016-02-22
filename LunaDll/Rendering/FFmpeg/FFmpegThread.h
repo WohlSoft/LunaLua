@@ -46,6 +46,7 @@ private:
 	std::atomic<bool> workHasStarted;
 	std::atomic<bool> pendingKill;
 	std::mutex mtx1;
+	
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 FFmpegThreadFunc::FFmpegThreadFunc() {
 	memset(&ctrl, 0, sizeof(FFmpegThreadFuncController));
-
+	
 }
 
 FFmpegThreadFunc::FFmpegThreadFunc(std::function<void(FFmpegThreadFuncController*)>& _func):FFmpegThreadFunc() {
@@ -13,7 +13,13 @@ FFmpegThreadFunc::FFmpegThreadFunc(std::function<void(FFmpegThreadFuncController
 }
 
 void FFmpegThread::worker() {
+	
 	while (true) {
+		/*
+		while (!frameStarted) {
+			Sleep(0);
+		}
+		*/
 		//do not use for(auto& x:workList) 
 		//GM_STAR_COUNT = workList.size();
 		mtx1.lock();
@@ -44,7 +50,7 @@ bool FFmpegThread::delWork(FFmpegThreadFunc* work) {
 	if(found)workList.erase(workList.begin() + i);
 	return found;
 }
-FFmpegThread::FFmpegThread():pendingKill(false),workHasStarted(false),boost(false),th(NULL) {
+FFmpegThread::FFmpegThread():pendingKill(false),workHasStarted(false),boost(false),th(NULL){
 }
 
 void FFmpegThread::addWork(FFmpegThreadFunc* work) {

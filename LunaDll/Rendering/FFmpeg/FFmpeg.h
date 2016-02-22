@@ -9,5 +9,9 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libswresample/swresample.h"
 }
-
+struct CustomAVPacket :AVPacket {
+	uint64_t userdata;
+	bool decodeReady;
+	CustomAVPacket() :AVPacket(), userdata(0),decodeReady(false) {}
+};
 #endif

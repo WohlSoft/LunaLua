@@ -145,6 +145,8 @@ void SMBXMaskedImage::DrawWithOverride(int dx, int dy, int w, int h, int sx, int
         overrideFunc.sy = sy;
         overrideFunc.sw = w;
         overrideFunc.sh = h;
+		overrideFunc.dw = w;
+		overrideFunc.dh = h;
         overrideFunc.Draw(&gLunaRender);
     }
     else
