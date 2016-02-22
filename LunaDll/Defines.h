@@ -454,7 +454,9 @@ DEFMEM(GM_GFX_PATH_MASK_PTR,        HDC*, 0x00B2D548);
 DEFMEM(GM_GFX_PLAYER_PTR,           HDC*, 0x00B2D608);
 DEFMEM(GM_GFX_PLAYER_MASK_PTR,      HDC*, 0x00B2D624);
 
-
+// Block Animation
+DEFMEM(GM_BLOCK_ANIM_TIMER,       short*, 0x00B2BEBC);
+DEFMEM(GM_BLOCK_ANIM_FRAME,       short*, 0x00B2BEA0);
 
 DEFMEM(npc_gfxoffsetx,          short*, 0x00B25B70);
 DEFMEM(npc_gfxoffsety,          short*, 0x00B25B8C);

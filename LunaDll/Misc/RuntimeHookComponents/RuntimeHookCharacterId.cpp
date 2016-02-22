@@ -1,8 +1,47 @@
 #include <unordered_map>
+#include <memory>
 #include "../AsmPatch.h"
+#include "../../SMBXInternal/PlayerMOB.h"
+#include "../../SMBXInternal/Blocks.h"
+#include "../../Defines.h"
 
 // Prototype
 static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
+static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
+static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx);
+static void __stdcall runtimeHookCharacterIdAnimateBlocks(void);
+static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx);
+static int __stdcall runtimeHookCharacterIdSwitchBlockCheck(int blockId);
+static void __stdcall runtimeHookCharacterIdSwitchBlockTransform(int playerIdx, Block* block);
+
+// Data structures
+struct CharacterDataStruct {
+public:
+    CharacterDataStruct(short id, short base, short filterBlock, short switchBlock)
+    {
+        mId = id;
+        mBaseCharacter = base;
+        mFilterBlock = filterBlock;
+        mSwitchBlock = switchBlock;
+        memset(&mStoredTemplate, 0, sizeof(PlayerMOB));
+        mStoredTemplate.Identity = (Characters)id;
+        mStoredTemplate.CurrentPowerup = 0;
+        mStoredTemplate.PowerupBoxContents = 0;
+        mStoredTemplate.MountType = 0;
+        mStoredTemplate.MountColor = 0;
+        mStoredTemplate.Hearts = 1;
+    }
+public:
+    short mId;
+    short mBaseCharacter;
+    short mFilterBlock;
+    short mSwitchBlock;
+    PlayerMOB mStoredTemplate;
+};
+
+// Static Data
+static std::unordered_map<short, std::unique_ptr<CharacterDataStruct>> runtimeHookCharacterIdMap;
+static bool runtimeHookCharacterIdApplied = false;
 
 // Declare assembly snippets
 #define ASM_ARG(ARGUMENT) __asm { __asm pushf __asm push eax __asm push ecx __asm push edx __asm lea eax, dword ptr ds : [ ARGUMENT ] __asm push eax __asm call runtimeHookCharacterIdTranslateHook }
@@ -60,9 +99,9 @@ DECL_HOOK(HOOK_0x8D3DCB, eax + 0xF0, MOV_ecx);
 DECL_HOOK(HOOK_0x8D3ED1, edx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x8D416E, edx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x8D5F06, edx + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x8E4857, ecx + eax * 4 + 0xF0, MOV_edi);
+//DECL_HOOK(HOOK_0x8E4857, ecx + eax * 4 + 0xF0, MOV_edi);
 DECL_HOOK(HOOK_0x8E540F, ecx + eax * 4 + 0xF0, MOV_edi);
-DECL_HOOK(HOOK_0x8E5557, ecx + eax * 4 + 0xF0, MOV_edi);
+//DECL_HOOK(HOOK_0x8E5557, ecx + eax * 4 + 0xF0, MOV_edi);
 DECL_HOOK(HOOK_0x8E5CB1, edx + ecx * 4 + 0xF0, CMP_1);
 DECL_HOOK(HOOK_0x8E5CD8, ecx + eax * 4 + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x8E5F55, eax + ecx * 4 + 0xF0, MOV_dx);
@@ -480,18 +519,20 @@ DECL_HOOK(HOOK_0x9D93EF, esi + 0xF0, CMP_di);
 DECL_HOOK(HOOK_0x9D9463, esi + 0xF0, MOV_edi);
 DECL_HOOK(HOOK_0x9D9AF3, esi + 0xF0, MOV_eax);
 DECL_HOOK(HOOK_0x9D9C6A, esi + 0xF0, MOV_eax);
-DECL_HOOK(HOOK_0x9DA7CA, edx + ecx * 4 + 0xF0, MOV_esi);
+// Get template:
+// DECL_HOOK(HOOK_0x9DA7CA, edx + ecx * 4 + 0xF0, MOV_esi);
 // Character change block can activate
 // DECL_HOOK(HOOK_0x9DA827, ecx + eax * 4 + 0xF0, CMP_1);
 // DECL_HOOK(HOOK_0x9DA863, ecx + eax * 4 + 0xF0, CMP_2);
 // DECL_HOOK(HOOK_0x9DA893, ecx + eax * 4 + 0xF0, CMP_3);
 // DECL_HOOK(HOOK_0x9DA8C3, ecx + eax * 4 + 0xF0, CMP_di);
 // DECL_HOOK(HOOK_0x9DA8F2, ecx + eax * 4 + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x9DAAA2, eax + edx * 4 + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x9DAB17, ecx + eax * 4 + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x9DAB8C, edx + ecx * 4 + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x9DABFE, eax + edx * 4 + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x9DAC73, ecx + eax * 4 + 0xF0, MOV_ebx);
+// Set template:
+// DECL_HOOK(HOOK_0x9DAAA2, eax + edx * 4 + 0xF0, MOV_ebx);
+// DECL_HOOK(HOOK_0x9DAB17, ecx + eax * 4 + 0xF0, MOV_ebx);
+// DECL_HOOK(HOOK_0x9DAB8C, edx + ecx * 4 + 0xF0, MOV_ebx);
+// DECL_HOOK(HOOK_0x9DABFE, eax + edx * 4 + 0xF0, MOV_ebx);
+// DECL_HOOK(HOOK_0x9DAC73, ecx + eax * 4 + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DAD04, esi + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x9DB9CC, eax + edx * 4 + 0xF0, CMP_4);
 DECL_HOOK(HOOK_0x9DBA82, ecx + eax * 4 + 0xF0, CMP_2);
@@ -519,7 +560,7 @@ DECL_HOOK(HOOK_0x9E086C, eax + edx * 4 + 0xF0, CMP_4);
 // DECL_HOOK(HOOK_0x9E1BF9, ecx + eax * 4 + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0xA02866, eax + ecx * 4 + 0xF0, MOV_cx);
 DECL_HOOK(HOOK_0xA02899, edx + ecx * 4 + 0xF0, CMP_0);
-DECL_HOOK(HOOK_0xA028F1, eax + edx * 4 + 0xF0, MOV_edi);
+//DECL_HOOK(HOOK_0xA028F1, eax + edx * 4 + 0xF0, MOV_edi);
 DECL_HOOK(HOOK_0xA02A72, edx + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0xA02AA4, eax + ecx * 4 + 0xF0, CMP_di);
 DECL_HOOK(HOOK_0xA03801, edx + ecx * 4 + 0xF0, CMP_3);
@@ -560,9 +601,9 @@ static auto patch_0x8D3DCB = PATCH(0x8D3DCB).CALL(HOOK_0x8D3DCB).NOP_PAD_TO_SIZE
 static auto patch_0x8D3ED1 = PATCH(0x8D3ED1).CALL(HOOK_0x8D3ED1).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x8D416E = PATCH(0x8D416E).CALL(HOOK_0x8D416E).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x8D5F06 = PATCH(0x8D5F06).CALL(HOOK_0x8D5F06).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x8E4857 = PATCH(0x8E4857).CALL(HOOK_0x8E4857).NOP_PAD_TO_SIZE<8>();
+//static auto patch_0x8E4857 = PATCH(0x8E4857).CALL(HOOK_0x8E4857).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x8E540F = PATCH(0x8E540F).CALL(HOOK_0x8E540F).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x8E5557 = PATCH(0x8E5557).CALL(HOOK_0x8E5557).NOP_PAD_TO_SIZE<8>();
+//static auto patch_0x8E5557 = PATCH(0x8E5557).CALL(HOOK_0x8E5557).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x8E5CB1 = PATCH(0x8E5CB1).CALL(HOOK_0x8E5CB1).NOP_PAD_TO_SIZE<9>();
 static auto patch_0x8E5CD8 = PATCH(0x8E5CD8).CALL(HOOK_0x8E5CD8).NOP_PAD_TO_SIZE<9>();
 static auto patch_0x8E5F55 = PATCH(0x8E5F55).CALL(HOOK_0x8E5F55).NOP_PAD_TO_SIZE<8>();
@@ -980,18 +1021,20 @@ static auto patch_0x9D93EF = PATCH(0x9D93EF).CALL(HOOK_0x9D93EF).NOP_PAD_TO_SIZE
 static auto patch_0x9D9463 = PATCH(0x9D9463).CALL(HOOK_0x9D9463).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9D9AF3 = PATCH(0x9D9AF3).CALL(HOOK_0x9D9AF3).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9D9C6A = PATCH(0x9D9C6A).CALL(HOOK_0x9D9C6A).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x9DA7CA = PATCH(0x9DA7CA).CALL(HOOK_0x9DA7CA).NOP_PAD_TO_SIZE<8>();
+// Get template:
+// static auto patch_0x9DA7CA = PATCH(0x9DA7CA).CALL(HOOK_0x9DA7CA).NOP_PAD_TO_SIZE<8>();
 // Character change block can activate
 // static auto patch_0x9DA827 = PATCH(0x9DA827).CALL(HOOK_0x9DA827).NOP_PAD_TO_SIZE<9>();
 // static auto patch_0x9DA863 = PATCH(0x9DA863).CALL(HOOK_0x9DA863).NOP_PAD_TO_SIZE<9>();
 // static auto patch_0x9DA893 = PATCH(0x9DA893).CALL(HOOK_0x9DA893).NOP_PAD_TO_SIZE<9>();
 // static auto patch_0x9DA8C3 = PATCH(0x9DA8C3).CALL(HOOK_0x9DA8C3).NOP_PAD_TO_SIZE<9>();
 // static auto patch_0x9DA8F2 = PATCH(0x9DA8F2).CALL(HOOK_0x9DA8F2).NOP_PAD_TO_SIZE<9>();
-static auto patch_0x9DAAA2 = PATCH(0x9DAAA2).CALL(HOOK_0x9DAAA2).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9DAB17 = PATCH(0x9DAB17).CALL(HOOK_0x9DAB17).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9DAB8C = PATCH(0x9DAB8C).CALL(HOOK_0x9DAB8C).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9DABFE = PATCH(0x9DABFE).CALL(HOOK_0x9DABFE).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9DAC73 = PATCH(0x9DAC73).CALL(HOOK_0x9DAC73).NOP_PAD_TO_SIZE<8>();
+// Set template:
+// static auto patch_0x9DAAA2 = PATCH(0x9DAAA2).CALL(HOOK_0x9DAAA2).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9DAB17 = PATCH(0x9DAB17).CALL(HOOK_0x9DAB17).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9DAB8C = PATCH(0x9DAB8C).CALL(HOOK_0x9DAB8C).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9DABFE = PATCH(0x9DABFE).CALL(HOOK_0x9DABFE).NOP_PAD_TO_SIZE<8>();
+// static auto patch_0x9DAC73 = PATCH(0x9DAC73).CALL(HOOK_0x9DAC73).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9DAD04 = PATCH(0x9DAD04).CALL(HOOK_0x9DAD04).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9DB9CC = PATCH(0x9DB9CC).CALL(HOOK_0x9DB9CC).NOP_PAD_TO_SIZE<9>();
 static auto patch_0x9DBA82 = PATCH(0x9DBA82).CALL(HOOK_0x9DBA82).NOP_PAD_TO_SIZE<9>();
@@ -1019,7 +1062,7 @@ static auto patch_0x9E086C = PATCH(0x9E086C).CALL(HOOK_0x9E086C).NOP_PAD_TO_SIZE
 // static auto patch_0x9E1BF9 = PATCH(0x9E1BF9).CALL(HOOK_0x9E1BF9).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA02866 = PATCH(0xA02866).CALL(HOOK_0xA02866).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA02899 = PATCH(0xA02899).CALL(HOOK_0xA02899).NOP_PAD_TO_SIZE<9>();
-static auto patch_0xA028F1 = PATCH(0xA028F1).CALL(HOOK_0xA028F1).NOP_PAD_TO_SIZE<8>();
+//static auto patch_0xA028F1 = PATCH(0xA028F1).CALL(HOOK_0xA028F1).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA02A72 = PATCH(0xA02A72).CALL(HOOK_0xA02A72).NOP_PAD_TO_SIZE<7>();
 static auto patch_0xA02AA4 = PATCH(0xA02AA4).CALL(HOOK_0xA02AA4).NOP_PAD_TO_SIZE<8>();
 static auto patch_0xA03801 = PATCH(0xA03801).CALL(HOOK_0xA03801).NOP_PAD_TO_SIZE<9>();
@@ -1048,6 +1091,123 @@ static auto patch_0xA60B96 = PATCH(0xA60B96).CALL(HOOK_0xA60B96).NOP_PAD_TO_SIZE
 static auto patch_0xA60BB9 = PATCH(0xA60BB9).CALL(HOOK_0xA60BB9).NOP_PAD_TO_SIZE<9>();
 static auto patch_0xA60BE3 = PATCH(0xA60BE3).CALL(HOOK_0xA60BE3).NOP_PAD_TO_SIZE<9>();
 
+// Player template patches
+static auto patch_play2temp_0x8E485F = PATCH(0x8E485F)
+    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSH_ESI().PUSH_EDI() // Arguments
+    .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
+    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .JMP(0x8E4897)
+    .NOP_PAD_TO_SIZE<56>();
+static auto patch_play2temp_0x8E555F = PATCH(0x8E555F)
+    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSH_ESI().PUSH_EDI() // Arguments
+    .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
+    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .JMP(0x8E5597)
+    .NOP_PAD_TO_SIZE<56>();
+static auto patch_play2temp_0x9DA7D2 = PATCH(0x9DA7D2)
+    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSH_EDI().PUSH_ESI() // Arguments
+    .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
+    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .JMP(0x9DA808)
+    .NOP_PAD_TO_SIZE<54>();
+static auto patch_temp2play_0x9DAAAA = PATCH(0x9DAAAA)
+    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSH_EDI().PUSH_EBX() // Arguments
+    .CALL(runtimeHookCharacterIdCopyTemplateToPlayer)
+    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .JMP(0x9DACC0)
+    .NOP_PAD_TO_SIZE<534>();
+static auto patch_play2temp_0xA028F9 = PATCH(0xA028F9)
+    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSH_ESI().PUSH_EDI() // Arguments
+    .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
+    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .JMP(0xA02933)
+    .NOP_PAD_TO_SIZE<58>();
+
+// Animation hook, a bit messy, but ehh
+__declspec(naked) static void  __stdcall HOOK_0x9E1CA9() {
+    __asm {
+        pushf
+        push ecx
+        push edx
+        call runtimeHookCharacterIdAnimateBlocks
+        mov eax, dword ptr ds : [0xB2BEA0]
+        pop edx
+        pop ecx
+        popf
+        ret
+    }
+}
+static auto patch_animate_hook_0x9E1CA9 = PATCH(0x9E1CA9).CALL(HOOK_0x9E1CA9);
+
+// Check to allow player to pass through their own filter block type
+__declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
+    __asm {
+        pushf
+        push ecx
+        push edx
+        push esi // Args #2
+        push ebx // Args #1
+        call runtimeHookCharacterIdBlockPlayerCheck
+        and dword ptr ds:[ebp-0x54], eax
+        pop edx
+        pop ecx
+        popf
+        mov eax, dword ptr ds : [0xB25A04]
+        ret
+    }
+}
+static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).CALL(HOOK_0x9A3CC5);
+
+// Check if this is a hittable switch block... 
+__declspec(naked) static void  __stdcall HOOK_0x9DA747() {
+    __asm {
+        push eax
+        push ecx
+        push edx
+        movsx eax, cx
+        push eax // Args #1
+        call runtimeHookCharacterIdSwitchBlockCheck
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        cmp cx, 0x277
+        push 0x9DA74C
+        ret
+alternate_exit:
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9DA752
+        ret
+    }
+}
+static auto patch_switch_block_check_0x9DA747 = PATCH(0x9DA747).JMP(HOOK_0x9DA747);
+
+__declspec(naked) static void  __stdcall HOOK_0x9DAA31() {
+    __asm {
+        push eax
+        push ecx
+        push edx
+        push ebx // Args #2
+        movsx ecx, word ptr ds:[edi]
+        push ecx // Args #1
+        call runtimeHookCharacterIdSwitchBlockTransform
+        pop edx
+        pop ecx
+        pop eax
+        cmp word ptr ds : [ebx + 0x1E], 0x277
+        ret
+    }
+}
+static auto patch_switch_block_transform_0x9DAA31 = PATCH(0x9DAA31).CALL(HOOK_0x9DAA31).NOP_PAD_TO_SIZE<6>();
+
 // Patch list
 static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x8C0329,
@@ -1061,9 +1221,11 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x8D3ED1,
     &patch_0x8D416E,
     &patch_0x8D5F06,
-    &patch_0x8E4857,
+    //&patch_0x8E4857,
+    &patch_play2temp_0x8E485F,
     &patch_0x8E540F,
-    &patch_0x8E5557,
+    //&patch_0x8E5557,
+    &patch_play2temp_0x8E555F,
     &patch_0x8E5CB1,
     &patch_0x8E5CD8,
     &patch_0x8E5F55,
@@ -1253,6 +1415,7 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9A04B6,
     &patch_0x9A13BE,
     &patch_0x9A32CB,
+    &patch_block_passthrough_0x9A3CC5,
 // Character ! blocks
 //    &patch_0x9A3CD9,
 //    &patch_0x9A3D13,
@@ -1481,18 +1644,22 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9D9463,
     &patch_0x9D9AF3,
     &patch_0x9D9C6A,
-    &patch_0x9DA7CA,
+    &patch_switch_block_check_0x9DA747,
+    //&patch_0x9DA7CA,
+    &patch_play2temp_0x9DA7D2,
 // Character change block can activate
 //    &patch_0x9DA827,
 //    &patch_0x9DA863,
 //    &patch_0x9DA893,
 //    &patch_0x9DA8C3,
 //    &patch_0x9DA8F2,
-    &patch_0x9DAAA2,
-    &patch_0x9DAB17,
-    &patch_0x9DAB8C,
-    &patch_0x9DABFE,
-    &patch_0x9DAC73,
+    //&patch_0x9DAAA2,
+    &patch_switch_block_transform_0x9DAA31,
+    &patch_temp2play_0x9DAAAA,// 0x9DACC0
+    //&patch_0x9DAB17,
+    //&patch_0x9DAB8C,
+    //&patch_0x9DABFE,
+    //&patch_0x9DAC73,
     &patch_0x9DAD04,
     &patch_0x9DB9CC,
     &patch_0x9DBA82,
@@ -1518,9 +1685,11 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 //    &patch_0x9E1A96,
 //    &patch_0x9E1BD6,
 //    &patch_0x9E1BF9,
+    &patch_animate_hook_0x9E1CA9,
     &patch_0xA02866,
     &patch_0xA02899,
-    &patch_0xA028F1,
+//    &patch_0xA028F1,
+    &patch_play2temp_0xA028F9,
     &patch_0xA02A72,
     &patch_0xA02AA4,
     &patch_0xA03801,
@@ -1551,10 +1720,37 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     nullptr
 };
 
-// TODO: Extend this map to use a structure instead of short, because in the future we
-//       will do more than just map this to a base character
-static std::unordered_map<short, short> runtimeHookCharacterIdMap;
-static bool runtimeHookCharacterIdApplied = false;
+///////////////////////
+// Hook support code //
+///////////////////////
+
+static PlayerMOB* getTemplateForCharacter(int id)
+{
+    static PlayerMOB dummyPlayerStruct = { 0 };
+
+    // Return vanilla character template
+    if (id >= 1 && id <= 5) {
+        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[id];
+        return playerTemplate;
+    }
+
+    // Return mapped character template
+    auto it = runtimeHookCharacterIdMap.find(id);
+    if (it != runtimeHookCharacterIdMap.end())
+    {
+        return &it->second->mStoredTemplate;
+    }
+
+    // None found, return dummy character template, because hey, let's not crash
+    memset(&dummyPlayerStruct, 0, sizeof(PlayerMOB));
+    dummyPlayerStruct.Identity = (Characters)id;
+    dummyPlayerStruct.Hearts = 1;
+    return &dummyPlayerStruct;
+}
+
+///////////////////////
+// Hook support code //
+///////////////////////
 
 static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
 {
@@ -1570,11 +1766,157 @@ static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
     auto it = runtimeHookCharacterIdMap.find(characterId);
     if (it != runtimeHookCharacterIdMap.end())
     {
-        return it->second;
+        return it->second->mBaseCharacter;
     }
 
     return 0;
 }
+
+///////////
+// Hooks //
+///////////
+
+static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx)
+{
+    PlayerMOB* temp = getTemplateForCharacter(characterId);
+    PlayerMOB* player = &((PlayerMOB*)GM_PLAYERS_PTR)[playerIdx];
+    memcpy(temp, player, sizeof(PlayerMOB));
+}
+
+static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx)
+{
+    PlayerMOB* temp = getTemplateForCharacter(characterId);
+    PlayerMOB* player = &((PlayerMOB*)GM_PLAYERS_PTR)[playerIdx];
+    player->CurrentPowerup     = temp->CurrentPowerup;
+    player->PowerupBoxContents = temp->PowerupBoxContents;
+    player->MountType          = temp->MountType;
+    player->MountColor         = temp->MountColor;
+    player->Hearts             = temp->Hearts;
+}
+
+static void __stdcall runtimeHookCharacterIdAnimateBlocks(void)
+{
+    // Get current filter block frame
+    short filterBlockTimer = GM_BLOCK_ANIM_TIMER[626 - 1] + 1;
+    short filterBlockFrame;
+    if (filterBlockTimer == 0 || filterBlockTimer >= 0x10)
+    {
+        filterBlockFrame = 1;
+    }
+    else if (filterBlockTimer >= 8)
+    {
+        filterBlockFrame = 2;
+    }
+    else
+    {
+        filterBlockFrame = 3;
+    }
+
+    // Get current switch block frame
+    short switchBlockFrame = GM_BLOCK_ANIM_FRAME[4 - 1];
+
+    // Loop over registered character IDs to check their block types
+    for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
+        if (it->second->mFilterBlock == 0 && it->second->mSwitchBlock == 0) continue;
+        short id = it->second->mId;
+        bool anyIsNot = (GM_PLAYERS_COUNT == 0);
+        bool anyIs = false;
+
+        // Check if any characters
+        for (short playerIdx = 1; playerIdx <= GM_PLAYERS_COUNT; playerIdx++) {
+            PlayerMOB* player = Player::Get(playerIdx);
+            if (player->Identity == id)
+            {
+                anyIs = true;
+            }
+            else
+            {
+                anyIsNot = true;
+            }
+        }
+
+        // Filter block handling
+        short filterBlockId = it->second->mFilterBlock;
+        if (filterBlockId != 0)
+        {
+            if (anyIs) // Any player is the character
+            {
+                GM_BLOCK_ANIM_FRAME[filterBlockId - 1] = filterBlockFrame;
+            }
+            else
+            {
+                GM_BLOCK_ANIM_FRAME[filterBlockId - 1] = 0;
+            }
+        }
+
+        // Switch block handling
+        short switchBlockId = it->second->mSwitchBlock;
+        if (switchBlockId != 0)
+        {
+            if (anyIsNot) // Any player is not the character
+            {
+                GM_BLOCK_ANIM_FRAME[switchBlockId - 1] = switchBlockFrame;
+            }
+            else
+            {
+                GM_BLOCK_ANIM_FRAME[switchBlockId - 1] = 4;
+            }
+        }
+    }
+}
+
+static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx)
+{
+    short characterId = (short)player->Identity;
+    if (characterId >= 1 && characterId <= 5)
+    {
+        return -1;
+    }
+
+    auto it = runtimeHookCharacterIdMap.find(characterId);
+    if (it != runtimeHookCharacterIdMap.end())
+    {
+        short filterBlockId = it->second->mFilterBlock;
+        if ((filterBlockId != 0) && (filterBlockId == Block::GetRaw(blockIdx)->BlockType)) {
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+static int __stdcall runtimeHookCharacterIdSwitchBlockCheck(int blockId)
+{
+    if (blockId == 0) return 0;
+
+    for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
+        if (it->second->mSwitchBlock == blockId)
+        {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+static void __stdcall runtimeHookCharacterIdSwitchBlockTransform(int playerIdx, Block* block)
+{
+    short blockId = block->BlockType;
+    if (blockId == 0) return;
+
+    for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
+        if (it->second->mSwitchBlock == blockId)
+        {
+            PlayerMOB* player = Player::Get(playerIdx);
+            player->Identity = (Characters)it->second->mId;
+            return;
+        }
+    }
+}
+
+/////////////////////
+// Management code //
+/////////////////////
 
 static void runtimeHookCharacterIdApplyPatch(void)
 {
@@ -1596,9 +1938,9 @@ static void runtimeHookCharacterIdUnpplyPatch(void)
     runtimeHookCharacterIdApplied = false;
 }
 
-void runtimeHookCharacterIdRegister(short id, short base)
+void runtimeHookCharacterIdRegister(short id, short base, short filterBlock, short switchBlock)
 {
-    runtimeHookCharacterIdMap[id] = base;
+    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, base, filterBlock, switchBlock);
     runtimeHookCharacterIdApplyPatch();
 }
 
