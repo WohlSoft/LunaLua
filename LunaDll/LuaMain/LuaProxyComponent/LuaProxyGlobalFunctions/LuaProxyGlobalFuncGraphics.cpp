@@ -521,7 +521,36 @@ static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
         maskArray = GM_GFX_YOSHIT_MASK_PTR;
         maxIndex = 8;
     }
-    
+    else if (t == "tile")
+    {
+        mainArray = GM_GFX_TILES_PTR;
+        maskArray = nullptr;
+        maxIndex = 328;
+    }
+    else if (t == "level")
+    {
+        mainArray = GM_GFX_LEVEL_PTR;
+        maskArray = GM_GFX_LEVEL_MASK_PTR;
+        maxIndex = 32;
+    }
+    else if (t == "scene")
+    {
+        mainArray = GM_GFX_SCENE_PTR;
+        maskArray = GM_GFX_SCENE_MASK_PTR;
+        maxIndex = 65;
+    }
+    else if (t == "path")
+    {
+        mainArray = GM_GFX_PATH_PTR;
+        maskArray = GM_GFX_PATH_MASK_PTR;
+        maxIndex = 32;
+    }
+    else if (t == "player")
+    {
+        mainArray = GM_GFX_PLAYER_PTR;
+        maskArray = GM_GFX_PLAYER_MASK_PTR;
+        maxIndex = 5;
+    }
 
     // Check range on index and get HDCs
     if (index < 1 || index > maxIndex) return nullptr;
