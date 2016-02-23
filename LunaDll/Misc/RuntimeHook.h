@@ -2,6 +2,7 @@
 #define RuntimeHook_hhh
 
 #include <vector>
+#include <string>
 #include "../Defines.h"
 
 /************************************************************************/
@@ -169,7 +170,7 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
 }
 
 // Extended Character Id Support
-void runtimeHookCharacterIdRegister(short id, short base, short filterBlock, short switchBlock);
+void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock);
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 

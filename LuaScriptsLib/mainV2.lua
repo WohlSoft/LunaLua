@@ -840,6 +840,7 @@ function __onInit(episodePath, lvlName)
         __episodePath = episodePath
         __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
         local noFileLoaded = true
+        if(UserCodeManager.loadCodeFile("lunabase", getSMBXPath().."\\LuaScriptsLib\\basegame\\lunabase.lua")) then noFileLoaded = false end
         if(not isOverworld)then
             if(UserCodeManager.loadCodeFile("lunadll", __customFolderPath.."lunadll.lua")) then noFileLoaded = false end
             if(UserCodeManager.loadCodeFile("lunaworld", episodePath .. "lunaworld.lua")) then noFileLoaded = false end
