@@ -1,9 +1,16 @@
 #include <unordered_map>
 #include <memory>
+#include <string>
 #include "../AsmPatch.h"
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/Blocks.h"
 #include "../../Defines.h"
+#include "../RuntimeHook.h"
+#include "../../Rendering/BMPBox.h"
+#include "../../Rendering/RenderOps/RenderBitmapOp.h"
+#include "../../Globals.h"
+#include "../../GlobalFuncs.h"
+
 
 // Prototype
 static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
@@ -14,12 +21,20 @@ static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, i
 static int __stdcall runtimeHookCharacterIdSwitchBlockCheck(int blockId);
 static void __stdcall runtimeHookCharacterIdSwitchBlockTransform(int playerIdx, Block* block);
 
+// TODO: Consider moving the following hook outside of this file
+static BOOL __stdcall PlayerBitBltHook(
+    PlayerMOB* player,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    );
+
 // Data structures
 struct CharacterDataStruct {
 public:
-    CharacterDataStruct(short id, short base, short filterBlock, short switchBlock)
+    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, const std::vector<std::shared_ptr<BMPBox>> &sprites)
     {
         mId = id;
+        mName = name;
         mBaseCharacter = base;
         mFilterBlock = filterBlock;
         mSwitchBlock = switchBlock;
@@ -30,12 +45,15 @@ public:
         mStoredTemplate.MountType = 0;
         mStoredTemplate.MountColor = 0;
         mStoredTemplate.Hearts = 1;
+        mSprites = sprites;
     }
 public:
     short mId;
+    std::string mName;
     short mBaseCharacter;
     short mFilterBlock;
     short mSwitchBlock;
+    std::vector<std::shared_ptr<BMPBox>> mSprites;
     PlayerMOB mStoredTemplate;
 };
 
@@ -1190,6 +1208,7 @@ alternate_exit:
 }
 static auto patch_switch_block_check_0x9DA747 = PATCH(0x9DA747).JMP(HOOK_0x9DA747);
 
+// Perform character switch block transformation for custom block types
 __declspec(naked) static void  __stdcall HOOK_0x9DAA31() {
     __asm {
         push eax
@@ -1207,6 +1226,41 @@ __declspec(naked) static void  __stdcall HOOK_0x9DAA31() {
     }
 }
 static auto patch_switch_block_transform_0x9DAA31 = PATCH(0x9DAA31).CALL(HOOK_0x9DAA31).NOP_PAD_TO_SIZE<6>();
+
+// Patch player rendering so that we can do custom character sprites
+__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop eax
+        push dword ptr ds : [ebp - 0x74] // Attach player argument
+        push eax
+        jmp PlayerBitBltHook
+    }
+}
+static auto patch_player_bitblt_0x98A5CA = PATCH(0x98A5CA).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98A85D = PATCH(0x98A85D).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98ABD3 = PATCH(0x98ABD3).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98AF2E = PATCH(0x98AF2E).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98B65A = PATCH(0x98B65A).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98B912 = PATCH(0x98B912).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98BBC8 = PATCH(0x98BBC8).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98BE5E = PATCH(0x98BE5E).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98C1D8 = PATCH(0x98C1D8).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98C52E = PATCH(0x98C52E).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98CC5A = PATCH(0x98CC5A).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98CF0F = PATCH(0x98CF0F).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98D1BF = PATCH(0x98D1BF).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98D44B = PATCH(0x98D44B).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98D7A6 = PATCH(0x98D7A6).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98DAE4 = PATCH(0x98DAE4).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98E202 = PATCH(0x98E202).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98E492 = PATCH(0x98E492).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98E82B = PATCH(0x98E82B).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98EB8B = PATCH(0x98EB8B).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98EED4 = PATCH(0x98EED4).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98F22A = PATCH(0x98F22A).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98F943 = PATCH(0x98F943).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98FBD4 = PATCH(0x98FBD4).CALL(PlayerBitBltRawHook);
+
 
 // Patch list
 static Patchable* runtimeHookCharacterIdPatchList[] = {
@@ -1316,10 +1370,34 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9879D4,
     &patch_0x987A78,
     &patch_0x98A331,
+    &patch_player_bitblt_0x98A5CA,
+    &patch_player_bitblt_0x98A85D,
+    &patch_player_bitblt_0x98ABD3,
+    &patch_player_bitblt_0x98AF2E,
+    &patch_player_bitblt_0x98B65A,
+    &patch_player_bitblt_0x98B912,
     &patch_0x98B92C,
+    &patch_player_bitblt_0x98BBC8,
+    &patch_player_bitblt_0x98BE5E,
+    &patch_player_bitblt_0x98C1D8,
+    &patch_player_bitblt_0x98C52E,
+    &patch_player_bitblt_0x98CC5A,
+    &patch_player_bitblt_0x98CF0F,
     &patch_0x98CF29,
+    &patch_player_bitblt_0x98D1BF,
+    &patch_player_bitblt_0x98D44B,
+    &patch_player_bitblt_0x98D7A6,
+    &patch_player_bitblt_0x98DAE4,
     &patch_0x98DF6B,
+    &patch_player_bitblt_0x98E202,
+    &patch_player_bitblt_0x98E492,
+    &patch_player_bitblt_0x98E82B,
+    &patch_player_bitblt_0x98EB8B,
+    &patch_player_bitblt_0x98EED4,
+    &patch_player_bitblt_0x98F22A,
     &patch_0x98F6B1,
+    &patch_player_bitblt_0x98F943,
+    &patch_player_bitblt_0x98FBD4,
     &patch_0x98FBE9,
     &patch_0x98FBF6,
     &patch_0x994764,
@@ -1914,6 +1992,44 @@ static void __stdcall runtimeHookCharacterIdSwitchBlockTransform(int playerIdx, 
     }
 }
 
+static BOOL __stdcall PlayerBitBltHook(
+    PlayerMOB* player,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    short characterId = player->Identity;
+    if (!(characterId >= 1 && characterId <= 5))
+    {
+        auto it = runtimeHookCharacterIdMap.find(characterId);
+        if (it != runtimeHookCharacterIdMap.end())
+        {
+            // If we have a custom character with this character ID...
+            const std::vector<std::shared_ptr<BMPBox>>& sprites = it->second->mSprites;
+            short powerupIdx = player->CurrentPowerup - 1;
+            if (powerupIdx >= 0 && (unsigned long)powerupIdx < sprites.size() && sprites[powerupIdx])
+            {
+                // If we have a valid sprite for this powerup...
+                if (GM_PLAYER_SHADOWSTAR || (dwRop != SRCAND)) {
+                    RenderBitmapOp overrideFunc;
+                    overrideFunc.direct_img = sprites[powerupIdx];
+                    overrideFunc.x = nXDest;
+                    overrideFunc.y = nYDest;
+                    overrideFunc.sx = nXSrc;
+                    overrideFunc.sy = nYSrc;
+                    overrideFunc.sw = nWidth;
+                    overrideFunc.sh = nHeight;
+                    overrideFunc.Draw(&gLunaRender);
+                }
+                return TRUE;
+            }
+        }
+    }
+
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight,
+        hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
 /////////////////////
 // Management code //
 /////////////////////
@@ -1938,9 +2054,40 @@ static void runtimeHookCharacterIdUnpplyPatch(void)
     runtimeHookCharacterIdApplied = false;
 }
 
-void runtimeHookCharacterIdRegister(short id, short base, short filterBlock, short switchBlock)
+void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock)
 {
-    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, base, filterBlock, switchBlock);
+    std::vector<std::shared_ptr<BMPBox>> sprites;
+
+    if (name.size() > 0)
+    {
+        std::wstring wName = Str2WStr(name);
+        std::vector<std::wstring> searchPath;
+        if (!gIsOverworld)
+            searchPath.push_back(getCustomFolderPath()); // Check custom folder
+        searchPath.push_back(GM_FULLDIR); // Check episode dir
+        searchPath.push_back(getModulePath() + L"\\graphics\\" + wName + L"\\"); // Check base game
+
+        for (int powerupId = 1; powerupId <= 10; powerupId++)
+        {
+            std::shared_ptr<BMPBox> img = nullptr;
+            for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
+            {
+                std::wstring imgPath = *pathIt + wName + L"-" + std::to_wstring(powerupId) + L".png";
+                img = std::make_shared<BMPBox>(imgPath, gLunaRender.GetScreenDC());
+                if (img && img->ImageLoaded())
+                {
+                    break;
+                }
+                else
+                {
+                    img = nullptr;
+                }
+            }
+            sprites.push_back(img);
+        }
+    }
+
+    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, sprites);
     runtimeHookCharacterIdApplyPatch();
 }
 

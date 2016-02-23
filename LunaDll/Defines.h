@@ -375,6 +375,7 @@ DEFMEM(GM_CUR_SAVE_SLOT,    WORD,  0x00B2C62A);      // 1 2 or 3
 // Cheats
 DEFMEM(GM_PLAYER_INVULN,    WORD,  0x00B2C8C0);      // 0xFFFF = invuln
 DEFMEM(GM_PLAYER_INFJUMP,   WORD,  0x00B2C8AC);      // 0xFFFF = infinite jumps
+DEFMEM(GM_PLAYER_SHADOWSTAR, WORD, 0x00B2C8AA);      // 0xFFFF = shadowstar
 DEFMEM(GM_CHEATED,          WORD,  0x00B2C8C4);      // 0xFFFF = cheated
 
 // Miscs
