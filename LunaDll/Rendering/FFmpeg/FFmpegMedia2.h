@@ -61,19 +61,19 @@ public:
 	//double getTimeBase(MediaType mt);
 	//bool mediaAvailable(MediaType mt);
 
-	inline bool mediaAvailable(MediaType mt) {
+	inline bool mediaAvailable(MediaType mt)const {
 		return streamIdx[mt] >= 0;
 	}
 
-	inline double getAvgFrameRate(MediaType mt) {
+	inline double getAvgFrameRate(MediaType mt) const {
 		return av_q2d(fmtCtx[mt]->streams[streamIdx[mt]]->avg_frame_rate);
 	}
 
-	inline double getTimeBase(MediaType mt) {
+	inline double getTimeBase(MediaType mt) const {
 		return av_q2d(fmtCtx[mt]->streams[streamIdx[mt]]->time_base);
 	}
 
-	inline AVRational getTimeBaseQ(MediaType mt) {
+	inline AVRational getTimeBaseQ(MediaType mt)const {
 		return fmtCtx[mt]->streams[streamIdx[mt]]->time_base;
 	}
 

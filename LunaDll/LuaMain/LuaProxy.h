@@ -1253,6 +1253,8 @@ namespace LuaProxy {
 			int getMaskThreshold(int idx) const;
 			void setAltAlpha(int ch);
 			int getAltAlpha();
+			void setAlphaType(int mode);
+			int getAlphaType();
 
 		};
         enum RENDER_TYPE {

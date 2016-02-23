@@ -68,7 +68,6 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     // Don't render if no size
     if ((width <= 0) || (height <= 0) || dw<=0 || dh<=0)
     {
-		dbgboxA("no size ??");
         return;
     }
 

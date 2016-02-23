@@ -3,10 +3,13 @@
 #include "FFmpegDecodeQueue.h"
 #include <functional>
 #include "../../SdlMusic/SdlMusPlayer.h"
-
+#include "../GL/GLDraw.h"
 
 class FFmpegMediaPlayer2 {
 public:
+	enum AlphaType {
+		PMUL=0,STR=1
+	};
 	void init();
 	void setVideoOutput(uint8_t* out,int w,int h);
 	void setMaskOutput(uint8_t* out, int w, int h);
@@ -17,18 +20,20 @@ public:
 	~FFmpegMediaPlayer2();
 	FFmpegMediaPlayer2();
 	FFmpegMediaPlayer2(std::wstring filename);
-	int getWidth();
-	int getHeight();
-	int getMaskWidth();
-	int getMaskHeight();
+	int getWidth()const;
+	int getHeight()const;
+	int getMaskWidth()const;
+	int getMaskHeight()const;
 	void setAltAlpha(int altCh);
-	int getAltAlpha();
+	int getAltAlpha() const;
+	void setAlphaType(int mode);
+	int getAlphaType()const;
 	void setVideoDelay(double d);
-	double getVideoDelay();
+	double getVideoDelay()const;
 	void setMaskDelay(double d);
-	double getMaskDelay();
-	bool playable();
-	bool maskExist();
+	double getMaskDelay()const;
+	bool playable()const;
+	bool maskExist()const;
 	bool loop;
 	static FFmpegThread* videoOutputThread;
 private:
@@ -82,26 +87,29 @@ private:
 	void initVars();
 	void initWorks();
 	void initDecoder();
-	bool shouldEnd();
-	bool needPlay();
+	bool shouldEnd()const;
+	bool needPlay()const;
 	void mixIntoSDLBuffer(uint8_t* sdlBuf, uint8_t* dataPtr, int dataLen);
-	double calcAudioSampleDuration(int bytes);
+	double calcAudioSampleDuration(int bytes)const;
 	void setCurrentAudioTime(double time,int loop);
-	double getCurrentAudioTime(int loop);
+	double getCurrentAudioTime(int loop)const;
 	void writeVideoIntoBuffer(uint8_t* buffer, int bufW, int bufH, uint8_t* vData, int dataW, int dataH, uint8_t* altAlpha, int alphaW, int alphaH,int altCh);
 	bool setAudioDecodePktPtr(FFmpegAudioDecodeComponent2* decoder,CustomAVPacket** pktPtr);
-	double getTimestampFromVideoFrame(FMEDIA vmt, AVFrame* vframe,double lastFrameTime);
+	double getTimestampFromVideoFrame(FMEDIA vmt, AVFrame* vframe,double lastFrameTime) const;
 	int __mediaSeek(FMEDIA mt, double pos);
 	void __mediaFlush(FMEDIA mt);
 	void __setVMediaOutput(FMEDIA mt, uint8_t* out, int w, int h);
-	int __getVMediaHeight(FMEDIA vmt);
-	int __getVMediaWidth(FMEDIA vmt);
+	int __getVMediaHeight(FMEDIA vmt)const;
+	int __getVMediaWidth(FMEDIA vmt)const;
 	FFmpegThreadFunc* __videoOutputFuncGen(FMEDIA vmt);
 	void packetQueue(FMEDIA mt);
 	void setAlphaByChannel(uint8_t* dest, int destW, int destH, uint8_t* src, int srcW, int srcH, int srcCh);
 	FFmpegMedia2* media;
 	
+	AlphaType alphaType;
+
 	int altAlpha;
+
 	SwsContext* alphaSws;
 	uint8_t* swsAlphaBuf;
 };

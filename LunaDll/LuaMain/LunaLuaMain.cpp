@@ -571,6 +571,7 @@ void CLunaLua::bindAll()
 					.property("onScreenMode", &LuaProxy::Graphics::LuaMovieResource::getOnScreenMode, &LuaProxy::Graphics::LuaMovieResource::setOnScreenMode)
 					.property("loop", &LuaProxy::Graphics::LuaMovieResource::getLoop, &LuaProxy::Graphics::LuaMovieResource::setLoop)
 					.property("altAlpha", &LuaProxy::Graphics::LuaMovieResource::getAltAlpha, &LuaProxy::Graphics::LuaMovieResource::setAltAlpha)
+					.property("alphaType", &LuaProxy::Graphics::LuaMovieResource::getAlphaType, &LuaProxy::Graphics::LuaMovieResource::setAlphaType)
 					,
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),

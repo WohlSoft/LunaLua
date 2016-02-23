@@ -193,7 +193,7 @@ void BMPBox::MakeColorTransparent(int rgb_color) {
 }
 
 // IMAGE LOADED - Returns true if this object loaded correctly / the bitmap handle isn't null
-bool BMPBox::ImageLoaded() {
+bool BMPBox::ImageLoaded()const {
     if (m_hbmp == NULL)
         return false;
     return true;
@@ -286,8 +286,22 @@ void BMPBox::setScaleUpMode(int m) {
 	}
 }
 
-int BMPBox::getScaleUpMode() {
-	return scaleUpMode;
+int BMPBox::getScaleUpMode()const {
+	int m;
+	switch (scaleUpMode) {
+	case GL_NEAREST:
+		m = 0;
+		break;
+	case GL_LINEAR:
+		m = 1;
+		break;
+	default:
+		m = 0;
+		break;
+
+	}
+
+	return m;
 }
 
 void BMPBox::setScaleDownMode(int m) {
@@ -305,15 +319,29 @@ void BMPBox::setScaleDownMode(int m) {
 	}
 }
 
-int BMPBox::getScaleDownMode() {
-	return scaleDownMode;
+int BMPBox::getScaleDownMode()const {
+	int m;
+	switch (scaleDownMode) {
+	case GL_NEAREST:
+		m = 0;
+		break;
+	case GL_LINEAR:
+		m = 1;
+		break;
+	default:
+		m = 0;
+		break;
+
+	}
+
+	return m;
 }
 
 void BMPBox::setOffScreenMode(int m) {
 	offScrMode = (OffScreenMode)m;
 }
 
-int BMPBox::getOffScreenMode() {
+int BMPBox::getOffScreenMode()const {
 	return offScrMode;
 }
 
@@ -330,8 +358,16 @@ void BMPBox::setOffScreenCallback(void(*fn)()) {
 	offScrClbk = fn;
 }
 
-int BMPBox::getOnScreenMode() {
+int BMPBox::getOnScreenMode()const {
 	return onScrMode;
+}
+
+void BMPBox::setAlphaType(int m) {
+	if (mp)mp->setAlphaType(m);
+}
+
+int BMPBox::getAlphaType()const {
+	return mp ? mp->getAlphaType() : 0;
 }
 
 void BMPBox::play() {
@@ -354,7 +390,7 @@ void BMPBox::setVideoDelay(double d) {
 	if (mp)mp->setVideoDelay(d);
 }
 
-double BMPBox::getVideoDelay() {
+double BMPBox::getVideoDelay()const {
 	return mp ? mp->getVideoDelay() : 0;
 }
 
@@ -362,14 +398,14 @@ void BMPBox::setMaskDelay(double d) {
 	if (mp)mp->setMaskDelay(d);
 }
 
-double BMPBox::getMaskDelay() {
+double BMPBox::getMaskDelay()const {
 	return mp ? mp->getMaskDelay() : 0;
 }
 void BMPBox::setLoop(bool l) {
 	if (mp)mp->loop = l;
 }
 
-bool BMPBox::getLoop() {
+bool BMPBox::getLoop()const {
 	return mp ? mp->loop : false;
 }
 
@@ -378,7 +414,7 @@ void BMPBox::setAltAlpha(int ch) {
 }
 
 
-int BMPBox::getAltAlpha() {
+int BMPBox::getAltAlpha()const {
 	return mp ? mp->getAltAlpha() : -1;
 }
 void BMPBox::setCallback(void(*fn)(int)) {

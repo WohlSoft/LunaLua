@@ -73,8 +73,8 @@ void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
 	//not safe
 
 	const_cast<BMPBox*>(mBmp)->colTest(mXDest, mYDest, mWidthDest, mHeightDest);
-	
-	g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+	GLDraw::RenderMode m = mBmp->getAlphaType() == 1 ? GLDraw::RENDER_MODE_S_ALPHA : GLDraw::RENDER_MODE_ALPHA;
+	g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity,m);
 	
 }
 

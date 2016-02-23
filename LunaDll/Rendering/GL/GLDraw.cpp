@@ -81,6 +81,12 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
         glLogicOp(GL_OR);
         GLERRORCHECK();
         break;
+	case RENDER_MODE_S_ALPHA:
+		glBlendEquationANY(GL_FUNC_ADD);
+		GLERRORCHECK();
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		GLERRORCHECK();
+		break;
     case RENDER_MODE_ALPHA:
     default:
         glBlendEquationANY(GL_FUNC_ADD);
@@ -161,7 +167,7 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 }
 
 
-void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity)
+void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity,RenderMode mode)
 {
     // Bind Post-Processing Shader here
 
@@ -178,10 +184,49 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     float ty2 = ty1 + nSrcHeight / texh;
 
     // Set rendering mode for this draw operation
-    glBlendEquationANY(GL_FUNC_ADD);
-    GLERRORCHECK();
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    GLERRORCHECK();
+	switch (mode) {
+	case RENDER_MODE_MULTIPLY:
+		glBlendEquationANY(GL_FUNC_ADD);
+		GLERRORCHECK();
+		glBlendFuncSeparateANY(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
+		GLERRORCHECK();
+		break;
+	case RENDER_MODE_MAX:
+		glBlendEquationANY(GL_MAX);
+		GLERRORCHECK();
+		break;
+	case RENDER_MODE_AND:
+		glBlendEquationANY(GL_LOGIC_OP);
+		while (glGetError() != GL_NO_ERROR);
+		GLERRORCHECK();
+		glEnable(GL_COLOR_LOGIC_OP);
+		GLERRORCHECK();
+		glLogicOp(GL_AND);
+		GLERRORCHECK();
+		break;
+	case RENDER_MODE_OR:
+		glBlendEquationANY(GL_LOGIC_OP);
+		while (glGetError() != GL_NO_ERROR);
+		GLERRORCHECK();
+		glEnable(GL_COLOR_LOGIC_OP);
+		GLERRORCHECK();
+		glLogicOp(GL_OR);
+		GLERRORCHECK();
+		break;
+	case RENDER_MODE_S_ALPHA:
+		glBlendEquationANY(GL_FUNC_ADD);
+		GLERRORCHECK();
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		GLERRORCHECK();
+		break;
+	case RENDER_MODE_ALPHA:
+	default:
+		glBlendEquationANY(GL_FUNC_ADD);
+		GLERRORCHECK();
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		GLERRORCHECK();
+		break;
+	}
 
     BindTexture(tex);
     GLERRORCHECK();

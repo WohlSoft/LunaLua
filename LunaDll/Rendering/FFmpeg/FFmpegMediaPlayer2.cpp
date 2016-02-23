@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include "../../SdlMusic/SdlMusPlayer.h"
 #include "../../Globals.h"
+#include <emmintrin.h>
 
 #define THDEC (std::function<void(FFmpegThreadFuncController*)>)[&](FFmpegThreadFuncController* a)
 
@@ -46,6 +47,7 @@ void FFmpegMediaPlayer2::initVars() {
 	altAlpha=-1;
 	alphaSws = NULL;
 	swsAlphaBuf = NULL;
+	alphaType = PMUL;
 }
 
 FFmpegMediaPlayer2::~FFmpegMediaPlayer2() {
@@ -124,12 +126,12 @@ FFmpegMediaPlayer2::FFmpegMediaPlayer2(std::wstring filename) :FFmpegMediaPlayer
 	
 }
 
-bool FFmpegMediaPlayer2::shouldEnd() {
+bool FFmpegMediaPlayer2::shouldEnd()const {
 	return !gLunaLua.isReady() && (GM_EPISODE_MODE || GM_LEVEL_MODE);
 }
 
 
-bool FFmpegMediaPlayer2::needPlay() {
+bool FFmpegMediaPlayer2::needPlay()const {
 	return gLunaLua.isReady() && gFrames > 0 && shouldPlay;
 }
 
@@ -146,19 +148,19 @@ void FFmpegMediaPlayer2::stop() {
 	pause();
 }
 
-int FFmpegMediaPlayer2::getWidth() {
+int FFmpegMediaPlayer2::getWidth()const {
 	return __getVMediaWidth(FVIDEO);
 }
 
-int FFmpegMediaPlayer2::getMaskWidth() {
+int FFmpegMediaPlayer2::getMaskWidth()const {
 	return __getVMediaWidth(FMASK);
 }
 
-int FFmpegMediaPlayer2::getHeight() {
+int FFmpegMediaPlayer2::getHeight()const {
 	return __getVMediaHeight(FVIDEO);
 }
 
-int FFmpegMediaPlayer2::getMaskHeight() {
+int FFmpegMediaPlayer2::getMaskHeight()const {
 	return __getVMediaHeight(FMASK);
 }
 
@@ -166,16 +168,23 @@ void FFmpegMediaPlayer2::setAltAlpha(int altCh) {
 	altAlpha = altCh;
 }
 
-int FFmpegMediaPlayer2::getAltAlpha() {
+int FFmpegMediaPlayer2::getAltAlpha()const {
 	return altAlpha;
 }
 
+void FFmpegMediaPlayer2::setAlphaType(int mode) {
+	alphaType = (AlphaType)mode;
+}
+
+int FFmpegMediaPlayer2::getAlphaType()const {
+	return alphaType;
+}
 
 void FFmpegMediaPlayer2::setVideoDelay(double d) {
 	vMediaDelay[FVIDEO] = d;
 }
 
-double FFmpegMediaPlayer2::getVideoDelay() {
+double FFmpegMediaPlayer2::getVideoDelay() const {
 	return vMediaDelay[FVIDEO];
 }
 
@@ -183,7 +192,7 @@ void FFmpegMediaPlayer2::setMaskDelay(double d) {
 	vMediaDelay[FMASK] = d;
 }
 
-double FFmpegMediaPlayer2::getMaskDelay() {
+double FFmpegMediaPlayer2::getMaskDelay()const {
 	return vMediaDelay[FMASK];
 }
 
@@ -194,11 +203,11 @@ void FFmpegMediaPlayer2::setVideoOutput(uint8_t* out, int w, int h) {
 void FFmpegMediaPlayer2::setMaskOutput(uint8_t* out, int w, int h) {
 	__setVMediaOutput(FMASK, out, w, h);
 }
-bool FFmpegMediaPlayer2::playable() {
+bool FFmpegMediaPlayer2::playable()const {
 	return media->mediaAvailable(FVIDEO);
 }
 
-bool FFmpegMediaPlayer2::maskExist() {
+bool FFmpegMediaPlayer2::maskExist()const {
 	return media->mediaAvailable(FMASK);
 }
 
@@ -239,7 +248,7 @@ void FFmpegMediaPlayer2::seek(double pos) {
 }
 
 
-int FFmpegMediaPlayer2::__getVMediaWidth(FMEDIA vmt) {
+int FFmpegMediaPlayer2::__getVMediaWidth(FMEDIA vmt)const {
 	if (media->mediaAvailable(vmt)) {
 		return vMediaDecoder[vmt]->reqW;
 	}
@@ -248,7 +257,7 @@ int FFmpegMediaPlayer2::__getVMediaWidth(FMEDIA vmt) {
 	}
 }
 
-int FFmpegMediaPlayer2::__getVMediaHeight(FMEDIA vmt) {
+int FFmpegMediaPlayer2::__getVMediaHeight(FMEDIA vmt)const {
 	if (media->mediaAvailable(vmt)) {
 		return vMediaDecoder[vmt]->reqH;
 	}
@@ -288,7 +297,7 @@ inline void FFmpegMediaPlayer2::mixIntoSDLBuffer(uint8_t* sdlBuf, uint8_t* dataP
 		100); //set volume
 }
 
-inline double FFmpegMediaPlayer2::calcAudioSampleDuration(int bytes) {
+inline double FFmpegMediaPlayer2::calcAudioSampleDuration(int bytes)const {
 	return 1000 * bytes / (double)(FFmpegAudioDecodeComponent2::DEFAULT_OUT_CHANNELS * 2 * FFmpegAudioDecodeComponent2::DEFAULT_OUT_SAMPLE_RATE);
 }
 
@@ -297,7 +306,7 @@ inline void FFmpegMediaPlayer2::setCurrentAudioTime(double msec,int loop) {
 	audioAbsTime[loop%LOOP_OVERWRAP] = SDL_GetTicks();
 }
 
-inline double FFmpegMediaPlayer2::getCurrentAudioTime(int loop) {
+inline double FFmpegMediaPlayer2::getCurrentAudioTime(int loop)const {
 	if (loop > audioLoopCount)return 0;
 	int q_loop = loop%LOOP_OVERWRAP;
 	double currentTime = SDL_GetTicks() - audioAbsTime[q_loop] + audioTime[q_loop];
@@ -310,14 +319,16 @@ inline double FFmpegMediaPlayer2::getCurrentAudioTime(int loop) {
 	}
 }
 
-inline double FFmpegMediaPlayer2::getTimestampFromVideoFrame(FMEDIA vmt, AVFrame* fr, double lastFrameTime) {
+inline double FFmpegMediaPlayer2::getTimestampFromVideoFrame(FMEDIA vmt, AVFrame* fr, double lastFrameTime)const {
 	return 1000 * ((av_frame_get_best_effort_timestamp(fr) + fr->repeat_pict / 2)*media->getTimeBase(vmt));
 }
 
 void FFmpegMediaPlayer2::writeVideoIntoBuffer(uint8_t* buffer, int bufW, int bufH, uint8_t* vData, int dataW, int dataH,uint8_t* altAlphaData,int alphaW,int alphaH,int altCh) {
 	if (buffer == NULL || vData == NULL)return;
 	int h = min(bufH, dataH);
-	if (altAlphaData == NULL || altCh<0 || altCh>3 ||(buffer == altAlphaData && altCh == 3)) {
+	int l_dataW = min(dataW, bufW);
+
+	if (altAlphaData == NULL || altCh<0 || altCh>3) {
 		
 		if (bufW == dataW) {
 			memcpy(buffer, vData, dataW*h);
@@ -325,51 +336,60 @@ void FFmpegMediaPlayer2::writeVideoIntoBuffer(uint8_t* buffer, int bufW, int buf
 		else {
 
 			for (int i = 0; i < h; i++) {
-				memcpy(buffer + i*bufW, vData + i*dataW, dataW);
+				memcpy(buffer + i*bufW, vData + i*dataW, l_dataW);
 			}
 		}
 	}
 	else {
-		float alp = 0;
-		if (buffer != altAlphaData) {
-			for (int i = 0; i < h; i++) {
-				for (int j = 0; j < dataW / 4; j++) {
-					if (j < alphaW / 4) {
-						if (vData[i*dataW + j * 4 + 3] == 0) {
-							buffer[i*bufW + j * 4] = 0;
-							buffer[i*bufW + j * 4 + 1] = 0;
-							buffer[i*bufW + j * 4 + 2] = 0;
-							buffer[i*bufW + j * 4 + 3] = altAlphaData[i*alphaW + j * 4 + altCh];
+		int l_alphaW = min(alphaW, bufW);
+		int l_loop = min(l_alphaW, l_dataW);
+			switch (alphaType) {
+			case STR:
+					for (int i = 0; i < h; i++) {
+						for (int j = 0; j < l_loop; j += 4) {
+							buffer[i*bufW + j + 0] = vData[i*dataW + j + 0];
+							buffer[i*bufW + j + 1] = vData[i*dataW + j + 1];
+							buffer[i*bufW + j + 2] = vData[i*dataW + j + 2];
+							buffer[i*bufW + j + 3] = altAlphaData[i*alphaW + j + altCh];
 						}
-						else {
-							buffer[i*bufW + j * 4] = (uint8_t)(vData[i*dataW + j * 4] * (alp = altAlphaData[i*alphaW + j * 4 + altCh] / (float)vData[i*dataW + j * 4 + 3]));
-							buffer[i*bufW + j * 4 + 1] = (uint8_t)(vData[i*dataW + j * 4 + 1] * alp);
-							buffer[i*bufW + j * 4 + 2] = (uint8_t)(vData[i*dataW + j * 4 + 2] * alp);
-							buffer[i*bufW + j * 4 + 3] = altAlphaData[i*alphaW + j * 4 + altCh];
+						for (int j = l_loop; j < l_dataW; j += 4) {
+							*(uint32_t*)&(buffer[i*bufW + j]) = *(uint32_t*)&(vData[i*dataW + j]);
 						}
 					}
-					else {
-						*(uint32_t*)&(buffer[i*bufW + j * 4]) = *(uint32_t*)&(vData[i*dataW + j * 4]);
+				
+				break;
+
+
+			case PMUL:
+			default:
+					for (int i = 0; i < h; i++) {
+						for (int j = 0; j < l_loop; j += 4) {
+							if (vData[i*dataW + j + 3] == 255) {
+								buffer[i*bufW + j + 0] = (vData[i*dataW + j + 0] * altAlphaData[i*alphaW + j + altCh] * 257 + 257) >> 16;
+								buffer[i*bufW + j + 1] = (vData[i*dataW + j + 1] * altAlphaData[i*alphaW + j + altCh] * 257 + 257) >> 16;
+								buffer[i*bufW + j + 2] = (vData[i*dataW + j + 2] * altAlphaData[i*alphaW + j + altCh] * 257 + 257) >> 16;
+								buffer[i*bufW + j + 3] = altAlphaData[i*alphaW + j + altCh];
+							}else if (vData[i*dataW + j + 3] == 0) {
+								buffer[i*bufW + j + 0] = buffer[i*bufW + j + 1] = buffer[i*bufW + j + 2] = 0;
+								buffer[i*bufW + j + 3] = altAlphaData[i*alphaW + j + altCh];
+							}
+							else {
+								buffer[i*bufW + j + 0] = vData[i*dataW + j + 0] * altAlphaData[i*alphaW + j + altCh] / vData[i*dataW + j + 3];
+								buffer[i*bufW + j + 1] = vData[i*dataW + j + 1] * altAlphaData[i*alphaW + j + altCh] / vData[i*dataW + j + 3];
+								buffer[i*bufW + j + 2] = vData[i*dataW + j + 2] * altAlphaData[i*alphaW + j + altCh] / vData[i*dataW + j + 3];
+								buffer[i*bufW + j + 3] = altAlphaData[i*alphaW + j + altCh];
+							}
+							
+						}
+						for (int j = l_loop; j < l_dataW; j += 4) {
+							*(uint32_t*)&(buffer[i*bufW + j]) = *(uint32_t*)&(vData[i*dataW + j]);
+						}
 					}
-				}
+				
+				break;
+
+
 			}
-		}
-		else {
-			for (int i = 0; i < h; i++) {
-				for (int j = 0; j < dataW / 4; j++) {
-					if (vData[i*dataW + j * 4 + 3] == 0) {
-						*(uint32_t*)&(buffer[i*bufW + j * 4]) = 0;
-					}
-					else {
-						
-						buffer[i*bufW + j * 4] = (uint8_t)(vData[i*dataW + j * 4] * (alp = vData[i*dataW + j * 4 + altCh] / (float)vData[i*dataW + j * 4 + 3]));
-						buffer[i*bufW + j * 4 + 1] = (uint8_t)(vData[i*dataW + j * 4 + 1] * alp);
-						buffer[i*bufW + j * 4 + 2] = (uint8_t)(vData[i*dataW + j * 4 + 2] * alp);
-						buffer[i*bufW + j * 4 + 3] = vData[i*dataW + j * 4 + altCh];
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -525,7 +545,7 @@ FFmpegThreadFunc* FFmpegMediaPlayer2::__videoOutputFuncGen(FMEDIA vmt) {
 			if (vmt == FVIDEO) {
 				if (0 <= altAlpha && altAlpha <= 2) { //3==id
 					writeVideoIntoBuffer(vMediaOutput[vmt], vMediaOutW[vmt] * 4, vMediaOutH[vmt], outputFrame->data[0], outputFrame->linesize[0], height,
-						vMediaOutput[vmt], outputFrame->linesize[0], height, altAlpha);
+						outputFrame->data[0], outputFrame->linesize[0], height, altAlpha);
 				}
 				else if (vMediaOutput[FMASK] && 4 <= altAlpha && altAlpha <= 7) {
 					writeVideoIntoBuffer(vMediaOutput[vmt], vMediaOutW[vmt] * 4, vMediaOutH[vmt], outputFrame->data[0], outputFrame->linesize[0], height,

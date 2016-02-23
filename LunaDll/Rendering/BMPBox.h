@@ -31,7 +31,7 @@ public:
     
     void Init();
     void MakeColorTransparent(int transparency_color);
-    bool ImageLoaded();
+    bool ImageLoaded()const;
 
     void forEachPixelValue(std::function<void(BYTE)> forEachFunc);
     void* getBits();
@@ -61,20 +61,23 @@ public:
 	void setOnScreen(bool onScreen);
 	void setScaleUpMode(int m);
 	void setScaleDownMode(int m);
-	int getScaleUpMode();
-	int getScaleDownMode();
+	int getScaleUpMode()const;
+	int getScaleDownMode()const;
 	void setOffScreenMode(int m);
-	int getOffScreenMode();
+	int getOffScreenMode()const;
 	void setOnScreenMode(int m);
-	int getOnScreenMode();
+	int getOnScreenMode()const;
 	void setVideoDelay(double d);
-	double getVideoDelay();
+	double getVideoDelay()const;
 	void setMaskDelay(double d);
 	void setLoop(bool enable);
-	bool getLoop();
+	bool getLoop()const;
 	void setAltAlpha(int altCh);
-	int getAltAlpha();
-	double getMaskDelay();
+	int getAltAlpha()const;
+	void setAlphaType(int m);
+	int getAlphaType()const;
+
+	double getMaskDelay()const;
 	void setCallback(void(*fn)(int));
 	void setOnScreenCallback(void(*fn)());
 	void setOffScreenCallback(void(*fn)());

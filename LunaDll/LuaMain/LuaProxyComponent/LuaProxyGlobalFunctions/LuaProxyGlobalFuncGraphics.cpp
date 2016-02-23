@@ -94,6 +94,8 @@ void LuaProxy::Graphics::LuaMovieResource::setLoop(bool enable) { if (img)img->s
 bool LuaProxy::Graphics::LuaMovieResource::getLoop() { return img ? img->getLoop() : false; }
 void LuaProxy::Graphics::LuaMovieResource::setAltAlpha(int ch) { if (img)img->setAltAlpha(ch); }
 int LuaProxy::Graphics::LuaMovieResource::getAltAlpha() { return img ? img->getAltAlpha() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setAlphaType(int m) { if (img)img->setAlphaType(m); }
+int LuaProxy::Graphics::LuaMovieResource::getAlphaType() { return img ? img->getAlphaType() : 0; }
 
 
 void LuaProxy::Graphics::activateHud(bool activate)
