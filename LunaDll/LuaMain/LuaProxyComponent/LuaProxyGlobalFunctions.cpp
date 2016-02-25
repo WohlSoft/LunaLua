@@ -591,21 +591,22 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 	return r;
 }
 
-LuaProxy::BGO LuaProxy::spawnBGO(const luabind::object &value, unsigned short id, double x, double y, lua_State* L)
+LuaProxy::BGO LuaProxy::spawnBGO(unsigned short id, double x, double y, lua_State* L)
 {
 	if (GM_BGO_COUNT >= 5000) {
 		luaL_error(L, "Over 5000 BGOs, cannnot spawn more!");
 		return LuaProxy::BGO(-1);
 	}
-
-	LuaProxy::BGO theNewBGO(GM_BGO_COUNT);
+	++(GM_BGO_COUNT);
+	LuaProxy::BGO theNewBGO(GM_BGO_COUNT-1);
 
 	theNewBGO.setId(id, L);
 	theNewBGO.setX(x, L);
 	theNewBGO.setY(y, L);
 
-	++(GM_BGO_COUNT);
-
+	
+	short start = 1, end = GM_BGO_COUNT;
+	native_bgoSortingRelated(&start, &end);
 	return theNewBGO;
 }
 

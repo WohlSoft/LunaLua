@@ -192,14 +192,6 @@ int TestFunc()
         Playground::doPlaygroundStuff();
 #endif
         g_EventHandler.hookLevelLoop();
-
-		// Run autocode
-		gAutoMan.DoEvents(false);
-
-		// Update some stuff
-		gFrames++;	
-		gDeathCounter.UpdateDeaths(true);
-		gSavedVarBank.SaveIfNeeded();
 		BMPBox* tmpb;
 		for (auto bmp : g_GLTextureStore.mLunaTexMap) {
 			tmpb = const_cast<BMPBox*>(bmp.first);
@@ -208,6 +200,15 @@ int TestFunc()
 			}
 			tmpb->procCallback();
 		}
+		// Run autocode
+		gAutoMan.DoEvents(false);
+
+		// Update some stuff
+		gFrames++;	
+		gDeathCounter.UpdateDeaths(true);
+		gSavedVarBank.SaveIfNeeded();
+		
+
 		// Run any framecode
 		TestFrameCode();
 		LevelFrameCode();

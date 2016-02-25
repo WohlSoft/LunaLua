@@ -824,7 +824,7 @@ static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_I
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
 
 static const auto native_updateWarp = (void(__stdcall *)(void))GF_UPDATE_WARP;
-static const auto native_bgoSortingRelated = (void(__stdcall *)(void))GF_BGO_SORTINGRELATED;
+static const auto native_bgoSortingRelated = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BGO_SORTINGRELATED;
 static const auto native_initLevelEnvironment = (void(__stdcall *)(void))GF_INIT_ENVIRONMENT;
 
 

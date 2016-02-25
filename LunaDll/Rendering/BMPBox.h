@@ -76,6 +76,8 @@ public:
 	int getAltAlpha()const;
 	void setAlphaType(int m);
 	int getAlphaType()const;
+	void setVolume(int m);
+	int getVolume()const;
 
 	double getMaskDelay()const;
 	void setCallback(void(*fn)(int));

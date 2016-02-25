@@ -48,6 +48,7 @@ void FFmpegMediaPlayer2::initVars() {
 	alphaSws = NULL;
 	swsAlphaBuf = NULL;
 	alphaType = PMUL;
+	volume = 100;
 }
 
 FFmpegMediaPlayer2::~FFmpegMediaPlayer2() {
@@ -294,7 +295,7 @@ inline void FFmpegMediaPlayer2::mixIntoSDLBuffer(uint8_t* sdlBuf, uint8_t* dataP
 		dataPtr,
 		AUDIO_S16,
 		dataLen,
-		100); //set volume
+		min(max(volume,0),MIX_MAX_VOLUME)); //set volume
 }
 
 inline double FFmpegMediaPlayer2::calcAudioSampleDuration(int bytes)const {

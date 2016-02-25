@@ -35,6 +35,7 @@ public:
 	bool playable()const;
 	bool maskExist()const;
 	bool loop;
+	int volume;
 	static FFmpegThread* videoOutputThread;
 private:
 	

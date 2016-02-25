@@ -417,6 +417,14 @@ void BMPBox::setAltAlpha(int ch) {
 int BMPBox::getAltAlpha()const {
 	return mp ? mp->getAltAlpha() : -1;
 }
+
+void BMPBox::setVolume(int v) {
+	if (mp)mp->volume = min(max(v,0),128);
+}
+
+int BMPBox::getVolume()const {
+	return mp ? mp->volume : 0;
+}
 void BMPBox::setCallback(void(*fn)(int)) {
 	clbc = fn;
 }

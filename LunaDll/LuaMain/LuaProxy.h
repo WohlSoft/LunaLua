@@ -1255,6 +1255,8 @@ namespace LuaProxy {
 			int getAltAlpha();
 			void setAlphaType(int mode);
 			int getAlphaType();
+			void setVolume(int v);
+			int getVolume();
 
 		};
         enum RENDER_TYPE {
@@ -1332,7 +1334,7 @@ namespace LuaProxy {
 #pragma region
 #endif
 	// AirpLunaLua
-    LuaProxy::BGO spawnBGO(const luabind::object & value, unsigned short id, double x, double y, lua_State * L);
+    LuaProxy::BGO spawnBGO(unsigned short id, double x, double y, lua_State * L);
     LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
 	//Moved as static functions
     NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);

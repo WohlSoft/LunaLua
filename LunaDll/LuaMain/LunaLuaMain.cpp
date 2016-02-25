@@ -572,6 +572,7 @@ void CLunaLua::bindAll()
 					.property("loop", &LuaProxy::Graphics::LuaMovieResource::getLoop, &LuaProxy::Graphics::LuaMovieResource::setLoop)
 					.property("altAlpha", &LuaProxy::Graphics::LuaMovieResource::getAltAlpha, &LuaProxy::Graphics::LuaMovieResource::setAltAlpha)
 					.property("alphaType", &LuaProxy::Graphics::LuaMovieResource::getAlphaType, &LuaProxy::Graphics::LuaMovieResource::setAlphaType)
+					.property("volume", &LuaProxy::Graphics::LuaMovieResource::getVolume, &LuaProxy::Graphics::LuaMovieResource::setVolume)
 					,
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
@@ -1364,7 +1365,7 @@ void CLunaLua::bindAll()
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
                         def("getIntersecting", &LuaProxy::BGO::getIntersecting),
-						def("spawn", static_cast<LuaProxy::BGO(*)(const luabind::object&, unsigned short, double, double, lua_State*)>(&LuaProxy::spawnBGO))
+						def("spawn",&LuaProxy::spawnBGO)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::BGO, m_index))
                 .def(constructor<int>())

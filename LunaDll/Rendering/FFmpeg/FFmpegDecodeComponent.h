@@ -47,7 +47,6 @@ struct FFmpegAudioDecodeComponent2{
 	FFmpegAudioDecodeComponent2();
 	FFmpegAudioDecodeComponent2(AVCodecContext* src);
 	~FFmpegAudioDecodeComponent2();
-	
 	bool needPacket();
 	//negative == fail by error,0==decoded but no sound, >1 == success got sound,size
 	int decode(AVPacket* pkt, uint8_t* out);
