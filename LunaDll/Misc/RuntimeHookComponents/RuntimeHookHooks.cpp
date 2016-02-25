@@ -1035,7 +1035,9 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
+	if (!npcIndex || !objType)return 0;
     NPCMOB* npcObj = ::NPC::Get(*npcIndex - 1);
+	if (!npcObj)return 0;
     if (npcdef_isVegetableNPC[npcObj->id]) {
         if (*objType == 6) {
             npcObj->killFlag = 6;

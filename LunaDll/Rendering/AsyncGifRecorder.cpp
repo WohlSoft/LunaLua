@@ -36,7 +36,7 @@ void AsyncGifRecorder::addNextFrameToProcess(int width, int height, BYTE* pData)
 
 void AsyncGifRecorder::init()
 {
-    m_workerThread = new std::thread([this](){ workerFunc(); });
+    m_workerThread = new std::thread([this](){ workerFunc();});
 }
 
 void AsyncGifRecorder::exitWorkerThread()
@@ -49,6 +49,7 @@ void AsyncGifRecorder::exitWorkerThread()
 void AsyncGifRecorder::workerFunc()
 {
     while (true) {
+		if (nextFrames.empty())return;
         GifRecorderCMDItem nextData = nextFrames.pop();
         
         std::unique_ptr<BYTE[]> wrappedData;
