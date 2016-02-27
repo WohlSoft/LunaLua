@@ -34,6 +34,9 @@ copy "%CurDir%\LunaDll\libs\glew\bin\Release\Win32\*.dll" "%DeployDir%"  > NUL
 
 copy "%CurDir%\LunaDll\Changelog.txt" "%DeployDir%" > NUL
 
+echo Installing FFmpeg...
+copy "%CurDir%\ffmpegdlls\*.dll" "%DeployDir%" > NUL
+
 echo Packing LunaLUA...
 "%SEVENZIP%\7z" a -tzip "LunaLUA-bin.zip" %DeployDir%\*.* "%DeployDir%\LuaScriptsLib"  > NUL
 echo Packing LunaLoader...
