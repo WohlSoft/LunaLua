@@ -445,17 +445,14 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 	
 	double wScale = m_W / (double)destWidth;
 	double hScale = m_H / (double)destHeight;
-
+	LONG top, bottom, left, right;
 	//coord scaling
-	pRect.top = (LONG)round(hScale*pRect.top); pRect.bottom = (LONG)round(hScale*pRect.bottom);
-	pRect.left = (LONG)round(wScale*pRect.left); pRect.right = (LONG)round(wScale*pRect.right);
+	top = (LONG)round(hScale*pRect.top); bottom = (LONG)round(hScale*pRect.bottom);
+	left = (LONG)round(wScale*pRect.left); right = (LONG)round(wScale*pRect.right);
 	int x = (int)round(wScale*scrX); int y = (int)round(hScale*scrY);
-	int startH = min(max(pRect.top,y),m_H+y)-y; int endH = min(max(pRect.bottom, y), m_H+y)-y;
-	int startW = min(max(pRect.left, x), m_W+x)-x; int endW = min(max(pRect.right, x), m_W+x)-x;
+	int startH = min(max(top,y),m_H+y)-y; int endH = min(max(bottom, y), m_H+y)-y;
+	int startW = min(max(left, x), m_W+x)-x; int endW = min(max(right, x), m_W+x)-x;
 	//bool brk;
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(4)
-#endif
 	for (int k = 0; k < 4; k++) {
 		bool brk = false;
 		for (int i = startH; i < endH; i++) {
@@ -476,14 +473,11 @@ void BMPBox::colTest(int scrX,int scrY,int destWidth,int destHeight) {
 		double mhScale = maskH / (double)destHeight;
 
 		//coord scaling
-		pRect.top = (LONG)round(mhScale*pRect.top); pRect.bottom = (LONG)round(mhScale*pRect.bottom);
-		pRect.left = (LONG)round(mwScale*pRect.left); pRect.right = (LONG)round(mwScale*pRect.right);
+		top = (LONG)round(mhScale*pRect.top);bottom = (LONG)round(mhScale*pRect.bottom);
+		left = (LONG)round(mwScale*pRect.left); right = (LONG)round(mwScale*pRect.right);
 		int mx = (int)round(mwScale*scrX); int my = (int)round(mhScale*scrY);
-		int mstartH = min(max(pRect.top, my), maskH + my) - my; int mendH = min(max(pRect.bottom, my), maskH + my) - my;
-		int mstartW = min(max(pRect.left, mx), maskW + mx) - mx; int mendW = min(max(pRect.right, mx), maskW + mx) - mx;
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(4) 
-#endif
+		int mstartH = min(max(top, my), maskH + my) - my; int mendH = min(max(bottom, my), maskH + my) - my;
+		int mstartW = min(max(left, mx), maskW + mx) - mx; int mendW = min(max(right, mx), maskW + mx) - mx;
 		for (int k = 0; k < 4; k++) {
 			
 			bool brk = false;
