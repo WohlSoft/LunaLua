@@ -53,6 +53,7 @@ Mix_Linked_Version
 Mix_LoadMUS
 Mix_LoadMUSType_RW
 Mix_LoadMUS_RW
+Mix_LoadMUS_RW_GME
 Mix_LoadWAV_RW
 Mix_OpenAudio
 Mix_Pause
