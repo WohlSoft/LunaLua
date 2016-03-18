@@ -1,4 +1,7 @@
 /*
+  SDL_mixer_ext:  An extended audio mixer library, forked from SDL_mixer
+  Copyright (C) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+
   SDL_mixer:  An audio mixer library based on the SDL library
   Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
 
@@ -30,6 +33,16 @@
 #include <SDL2/SDL_endian.h>
 #include <SDL2/SDL_version.h>
 #include "begin_code.h"
+
+#if defined(FORCE_STDCALLS) && defined(_WIN32)
+#ifdef SDLCALL
+#undef SDLCALL
+#endif
+#define SDLCALL   __stdcall
+#define SDLCALLCC __stdcall
+#else
+#define SDLCALLCC
+#endif
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -128,6 +141,14 @@ typedef enum {
     MUS_SPC
 } Mix_MusicType;
 
+typedef enum {
+    MIDI_ADLMIDI,
+    MIDI_Native,
+    MIDI_Timidity,
+    MIDI_Fluidsynth
+} Mix_MIDI_Device;
+
+
 /* The internal format for a music chunk interpreted via mikmod */
 typedef struct _Mix_Music Mix_Music;
 
@@ -146,14 +167,33 @@ extern DECLSPEC int SDLCALL Mix_AllocateChannels(int numchans);
  */
 extern DECLSPEC int SDLCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *channels);
 
-/* Load a wave file or a music (.mod .s3m .it .xm) file */
+/* Load a wave file (.wav, .ogg, .flac, .voc) file */
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
+/*
+Load a music (.ogg, .flac, .wav, .mp3, .voc, .mod .s3m .it .xm, .mid, .rmi, .spc, .nsf, etc.)
+IMPORTANT: To choice a track number of NSF, GBM, HES, etc file,
+           you must append "|xxx" to end of file path for 
+           Mix_LoadMUS function.
+           Where xxx - actual number of chip track, (from 0 to N-1)
+           Examples: "file.nsf|12", "file.hes|2"
+*/
 #define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
 
 /* Load a music file from an SDL_RWop object (Ogg and MikMod specific currently)
    Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW(SDL_RWops *src, int freesrc);
+
+/* Load a music file from an SDL_RWop object with custom arguments (trackID for GME or settings for a MIDI playing)
+ * Arguments are taking no effect for file formats which are not supports extra arguments.
+  */
+extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW_ARG(SDL_RWops *src, int freesrc, char *args);
+
+/* Load a music file from an SDL_RWop object with custom trackID for GME.
+ * trackID argument takes no effect for non-NSF,HES,GBM,etc. file formats.
+ * Default value should be 0
+ */
+extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW_GME(SDL_RWops *src, int freesrc, int trackID);
 
 /* Load a music file from an SDL_RWop object assuming a specific format */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUSType_RW(SDL_RWops *src, Mix_MusicType type, int freesrc);
@@ -632,6 +672,19 @@ extern DECLSPEC void SDLCALL Mix_CloseAudio(void);
 
 /* Add additional Timidity bank path */
 extern DECLSPEC void SDLCALL MIX_Timidity_addToPathList(const char *path);
+
+/* ADLMIDI Setup functions */
+extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getBankID();
+extern DECLSPEC void SDLCALL MIX_ADLMIDI_setBankID(int bnk);
+extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getTremolo();
+extern DECLSPEC void SDLCALL MIX_ADLMIDI_setTremolo(int tr);
+extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVibrato();
+extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVibrato(int vib);
+extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getScaleMod();
+extern DECLSPEC void SDLCALL MIX_ADLMIDI_setScaleMod(int sc);
+extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults();
+
+extern DECLSPEC int SDLCALL MIX_SetMidiDevice(int device);
 
 /* We'll use SDL for reporting errors */
 #define Mix_SetError    SDL_SetError

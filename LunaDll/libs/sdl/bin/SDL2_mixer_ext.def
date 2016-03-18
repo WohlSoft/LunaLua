@@ -1,9 +1,11 @@
 EXPORTS
+MIX_ADLMIDI_getBankID
 MIX_ADLMIDI_getScaleMod
 MIX_ADLMIDI_getTremolo
 MIX_ADLMIDI_getVibrato
 MIX_ADLMIDI_setBankID
 MIX_ADLMIDI_setScaleMod
+MIX_ADLMIDI_setSetDefaults
 MIX_ADLMIDI_setTremolo
 MIX_ADLMIDI_setVibrato
 MIX_SetMidiDevice
@@ -53,6 +55,7 @@ Mix_Linked_Version
 Mix_LoadMUS
 Mix_LoadMUSType_RW
 Mix_LoadMUS_RW
+Mix_LoadMUS_RW_ARG
 Mix_LoadMUS_RW_GME
 Mix_LoadWAV_RW
 Mix_OpenAudio
