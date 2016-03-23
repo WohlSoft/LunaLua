@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     PGE_File_Formats/wld_filedata.cpp \
     controlconfig.cpp \
     launcherconfiguration.cpp \
-    ../../LunaLoader/LunaLoaderPatch.cpp
+    ../../LunaLoader/LunaLoaderPatch.cpp \
+    NetworkUtils/networkutils.cpp \
+    NetworkUtils/qreplytimeout.cpp
 
 HEADERS  += mainlauncherwindow.h \
     smbxconfig.h \
@@ -63,7 +65,9 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/wld_filedata.h \
     controlconfig.h \
     launcherconfiguration.h \
-    qjsonutil.h
+    qjsonutil.h \
+    NetworkUtils/networkutils.h \
+    NetworkUtils/qreplytimeout.h
 
 FORMS    += mainlauncherwindow.ui
 

@@ -14,7 +14,10 @@ enum class VALIDATE_ERROR {
 template<typename T>
 inline bool qJsonValidate(const QJsonObject& val, const QString& child, const std::function<void(VALIDATE_ERROR, const QString&)>& errFunc)
 {
-    throw "err";
+    Q_UNUSED(val)
+    Q_UNUSED(child)
+    Q_UNUSED(errFunc)
+    static_assert(std::is_same<T, int>::value, "This template must be specialized.");
     return true;
 }
 

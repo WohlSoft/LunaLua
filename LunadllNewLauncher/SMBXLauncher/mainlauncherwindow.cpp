@@ -1,12 +1,12 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
 #include "../../LunaLoader/LunaLoaderPatch.h"
+#include "NetworkUtils/networkutils.h"
 
 #include <QtWebKit/QtWebKit>
 #include <QWebFrame>
 #include <QMessageBox>
 #include <QDesktopServices>
-
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -148,54 +148,59 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::checkForUpdates()
 {
-    QJsonDocument output;
-    LauncherConfiguration::UpdateCheckerErrCodes err;
-    QString errDesc;
-    if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
-        auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-            jsonErrHandler(errType, errChild);
-        };
+    if(NetworkUtils::checkInternetConnection(4000)){
+        QJsonDocument output;
+        LauncherConfiguration::UpdateCheckerErrCodes err;
+        QString errDesc;
+        if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
+            auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+                jsonErrHandler(errType, errChild);
+            };
 
-        if(!output.isObject()){
-            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
-            return;
-        }
-
-        QJsonObject outputObj = output.object();
-        if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
-        if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
-        if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
-
-        QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
-        if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
-
-
-        if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
-                                                currentVersionObj.value("version-2").toInt(),
-                                                currentVersionObj.value("version-3").toInt(),
-                                                currentVersionObj.value("version-4").toInt())){
-            QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
-            QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
-            if(urlOfUpdatePage.isValid()){
-                QDesktopServices::openUrl(urlOfUpdatePage);
+            if(!output.isObject()){
+                errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+                return;
             }
-        }
-    }else{
-        switch (err) {
-        case LauncherConfiguration::UERR_CONNECTION_FAILED:
-            QMessageBox::warning(this, "Error", QString("Failed while connecting to update server:\n") + errDesc);
-            break;
-        case LauncherConfiguration::UERR_INVALID_JSON:
-            QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
-            break;
-        case LauncherConfiguration::UERR_INVALID_URL:
-            QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
-            break;
-        default:
-            break;
+
+            QJsonObject outputObj = output.object();
+            if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
+            if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
+            if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
+
+            QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
+            if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
+            if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
+            if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
+            if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
+
+            if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
+                                                    currentVersionObj.value("version-2").toInt(),
+                                                    currentVersionObj.value("version-3").toInt(),
+                                                    currentVersionObj.value("version-4").toInt())){
+                QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
+                QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
+                if(urlOfUpdatePage.isValid()){
+                    QDesktopServices::openUrl(urlOfUpdatePage);
+                }
+            }
+        }else{
+            switch (err) {
+            case LauncherConfiguration::UERR_INVALID_JSON:
+                QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
+                break;
+            case LauncherConfiguration::UERR_INVALID_URL:
+                QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
+                break;
+            default:
+                QString errMsg = m_launcherSettings->getErrConnectionMsg();
+                if(errMsg != ""){
+                    QMessageBox::warning(this, "Error", m_launcherSettings->getErrConnectionMsg());
+                }
+                QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
+                if(urlOfErrorPage.isValid()){
+                    QDesktopServices::openUrl(urlOfErrorPage);
+                }
+            }
         }
     }
 }
