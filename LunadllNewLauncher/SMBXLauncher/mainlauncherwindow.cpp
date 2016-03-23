@@ -164,6 +164,7 @@ void MainLauncherWindow::checkForUpdates()
         QJsonObject outputObj = output.object();
         if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
         if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
+        if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
 
         QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
         if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
@@ -177,10 +178,11 @@ void MainLauncherWindow::checkForUpdates()
                                                 currentVersionObj.value("version-3").toInt(),
                                                 currentVersionObj.value("version-4").toInt())){
             QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
+            QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
+            if(urlOfUpdatePage.isValid()){
+                QDesktopServices::openUrl(urlOfUpdatePage);
+            }
         }
-
-
-
     }else{
         switch (err) {
         case LauncherConfiguration::UERR_CONNECTION_FAILED:

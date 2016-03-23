@@ -67,8 +67,6 @@ bool LauncherConfiguration::setConfigurationAndValidate(const QJsonDocument &set
     return true;
 }
 
-#include <iostream>
-
 bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription)
 {
     return loadUpdateJson(updateCheckWebsite, result, errCode, errDescription);
@@ -106,8 +104,15 @@ bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDoc
     while(!replyFinished)
         qApp->processEvents();
 
+    int statusCode = rpl->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if(statusCode == 404){
+        errCode = UERR_NOT_FOUND;
+        errDescription = rpl->errorString();
+        return false;
+    }
+
     QByteArray data = rpl->readAll();
-    if(data.isEmpty()){
+    if(data.isEmpty() || statusCode == 404){
         errCode = UERR_CONNECTION_FAILED;
         errDescription = rpl->errorString();
         return false;
