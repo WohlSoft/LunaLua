@@ -25,6 +25,7 @@
 #include "Rendering/GL/GLEngine.h"
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
+#include "Rendering/FFmpeg/FFmpegMediaPlayer2.h"
 
 #define PATCHIT 1
 
@@ -133,7 +134,7 @@ int OnLvlLoad() {
     }
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
-
+//	BMPBox::initMovieCache();
 	if(gLunaEnabled) {
 		// Load autocode
 		gAutoMan.Clear(false);		
@@ -176,7 +177,6 @@ int OnLvlLoad() {
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	
 	// Clean up
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
@@ -192,7 +192,14 @@ int TestFunc()
         Playground::doPlaygroundStuff();
 #endif
         g_EventHandler.hookLevelLoop();
-
+		BMPBox* tmpb;
+		for (auto bmp : g_GLTextureStore.mLunaTexMap) {
+			tmpb = const_cast<BMPBox*>(bmp.first);
+			if (gFrames - tmpb->lastDecodedFrame > 7) {
+				tmpb->setOnScreen(false);
+			}
+			tmpb->procCallback();
+		}
 		// Run autocode
 		gAutoMan.DoEvents(false);
 
@@ -200,10 +207,13 @@ int TestFunc()
 		gFrames++;	
 		gDeathCounter.UpdateDeaths(true);
 		gSavedVarBank.SaveIfNeeded();
+		
 
 		// Run any framecode
 		TestFrameCode();
 		LevelFrameCode();
+		
+		
 	}
 
     Blocks::DoSortingIfRequired();

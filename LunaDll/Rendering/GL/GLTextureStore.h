@@ -23,7 +23,8 @@ public:
 
 	void ClearLunaTextures();
     void ClearLunaTexture(const BMPBox& bmp);
-    const GLDraw::Texture* TextureFromLunaBitmap(const BMPBox& bmp);
+	const GLDraw::Texture* TextureFromLunaBitmap(const BMPBox& bmp, bool noUpdate = false);
+	void checkRendered();
 };
 
 // Instance

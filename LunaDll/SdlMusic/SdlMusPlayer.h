@@ -10,6 +10,17 @@
 #include <map>
 #include <string>
 #include <atomic>
+#include <vector>
+#include <functional>
+#include <mutex>
+
+class PGE_PostMixFunc {
+public:
+	std::function<void(void *udata, uint8_t *stream, int len)> func;
+	void *userdata;
+	PGE_PostMixFunc();
+	PGE_PostMixFunc(std::function<void(void *udata, uint8_t *stream, int len)>& func);
+};
 
 class PGE_SDL_Manager
 {
@@ -40,6 +51,8 @@ public:
     static void setSampleRate(int sampleRate);
     static int sampleRate();
     static int currentVolume();
+	static int sampleFormat();
+	static int channels();
 
 	static bool MUS_IsPlaying();
     static bool MUS_IsPaused();
@@ -47,16 +60,26 @@ public:
 
 	static unsigned __int64 sampleCount();
     static unsigned __int64 MUS_sampleCount();
+	static void addPostMixFunc(PGE_PostMixFunc* func);
+	static bool removePostMixFunc(PGE_PostMixFunc* func);
+
+	
 private:
     static Mix_Music *play_mus;
-    static int volume;
-    static int sRate;
+	static int volume;
+	static int sRate;
+	static int chunkSize;
+	static int _sampleFormat;
+	static int _channels;
+
 	static bool showMsg;
 	static std::string showMsg_for;
 	
 	static std::atomic<unsigned __int64> sCount;
 	static std::atomic<unsigned __int64> musSCount;
 	static void postMixCallback(void *udata, Uint8 *stream, int len);
+	static std::vector<PGE_PostMixFunc*> postMixFuncSet;
+	static std::mutex mtx1;
 };
 
 

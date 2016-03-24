@@ -1,3 +1,23 @@
+v0.7.3 BETA : 2016/02/17 <AirpLunaLua>
+  * Huge optimization of video rendering/audio decoding
+
+v0.7.3 BETA : 2016/02/15 <AirpLunaLua>
+  + Based on LunaDLL Git revision d7e3eec047e8cb2f45486bd4cbfea3132b17cb7b.
+  * Added Warp.spawn - You can spawn warp point.
+  * Added getWorldPath().
+  * Deprecated Misc.updateWarp, use Warp.spawn.
+
+v0.7.3 BETA : 2016/02/14 <AirpLunaLua>
+  + Based on LunaDLL Git revision 7af75f7c60a20f0b2226905493af2d5cbc0f5e61.
+  * Fixed conflict.
+
+v0.7.3 BETA : 2016/02/13 <AirpLunaLua>
+  + Based on LunaDLL Git revision 47e55099e7d52b85f27ad243c79152cdbf8d61ae.
+  * Add responseBody properties to AsyncHTTPRequest.
+  * Added Video support for LuaImageResource. (Required ffmpeg)
+  * Disabled SdlMusPlayer error message.
+  * Add Misc.updateWarp() from APLib.
+
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
   * Added new event onKeyboardPress which handles raw keyboard input

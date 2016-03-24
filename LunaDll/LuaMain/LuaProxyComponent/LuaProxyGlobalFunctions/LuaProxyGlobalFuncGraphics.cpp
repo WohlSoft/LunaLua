@@ -11,11 +11,12 @@
 #include "../../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
-
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMPBox>& img) {
     this->img = img;
 }
+
+
 
 // Deconstructor for when a loaded image resource is no longer referenced by Lua
 LuaProxy::Graphics::LuaImageResource::~LuaImageResource() {
@@ -37,6 +38,67 @@ uintptr_t LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr()
     return (uintptr_t)img.get();
 }
 
+void  LuaProxy::Graphics::LuaImageResource::setScaleUpMode(int m) {
+	if (img)img->setScaleUpMode(m);
+}
+
+void  LuaProxy::Graphics::LuaImageResource::setScaleDownMode(int m) {
+	if (img)img->setScaleDownMode(m);
+}
+
+void LuaProxy::Graphics::LuaMovieResource::play() {
+	if (img)img->play();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::stop() {
+	if (img)img->stop();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::pause() {
+	if (img)img->pause();
+}
+
+void LuaProxy::Graphics::LuaMovieResource::seek(double sec) {
+	if (img)img->seek(sec);
+}
+/*
+void LuaProxy::Graphics::LuaMovieResource::setCallback(int idx,luabind::object cl,lua_State* L) {
+	if (img && 0<=idx && idx <8 && luabind::type(cl) == LUA_TFUNCTION) {
+		
+		img->callbacks[idx] = gLunaLua.registerPassedLuaObj(idx,L,cl);
+	}
+}
+*/
+/*
+luabind::object LuaProxy::Graphics::LuaMovieResource::getCallback(int idx, lua_State* L) {
+	if (img && 0 <= idx && idx <8) {
+		return img->callbacks[idx];
+	}
+}
+*/
+void LuaProxy::Graphics::LuaMovieResource::setMaskThreshold(int idx,int value) { if (img&& 0 <= idx && idx <8)img->maskThreshold[idx] = value; }
+int LuaProxy::Graphics::LuaMovieResource::getMaskThreshold(int idx) const { if (img && 0 <= idx && idx <8)return img->maskThreshold[idx]; }
+void LuaProxy::Graphics::LuaMovieResource::setVideoDelay(double d) { if (img)img->setVideoDelay(d); }
+double LuaProxy::Graphics::LuaMovieResource::getVideoDelay() { return img ? img->getVideoDelay():0; }
+void LuaProxy::Graphics::LuaMovieResource::setMaskDelay(double d) { if (img)img->setMaskDelay(d); }
+double LuaProxy::Graphics::LuaMovieResource::getMaskDelay() { return img ? img->getMaskDelay() : 0; }
+void LuaProxy::Graphics::LuaMovieResource::setScaleUpMode(int m) { if (img)img->setScaleUpMode(m); }
+int LuaProxy::Graphics::LuaMovieResource::getScaleUpMode() { return img ? img->getScaleUpMode() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setScaleDownMode(int m) { if (img)img->setScaleDownMode(m); }
+int LuaProxy::Graphics::LuaMovieResource::getScaleDownMode() { return img ? img->getScaleDownMode() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setOffScreenMode(int m) { if (img)img->setOffScreenMode(m); }
+int LuaProxy::Graphics::LuaMovieResource::getOffScreenMode() { return img ? img->getOffScreenMode() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setOnScreenMode(int m) { if (img)img->setOnScreenMode(m); }
+int LuaProxy::Graphics::LuaMovieResource::getOnScreenMode() { return img ? img->getOnScreenMode() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setLoop(bool enable) { if (img)img->setLoop(enable); }
+bool LuaProxy::Graphics::LuaMovieResource::getLoop() { return img ? img->getLoop() : false; }
+void LuaProxy::Graphics::LuaMovieResource::setAltAlpha(int ch) { if (img)img->setAltAlpha(ch); }
+int LuaProxy::Graphics::LuaMovieResource::getAltAlpha() { return img ? img->getAltAlpha() : -1; }
+void LuaProxy::Graphics::LuaMovieResource::setAlphaType(int m) { if (img)img->setAlphaType(m); }
+int LuaProxy::Graphics::LuaMovieResource::getAlphaType() { return img ? img->getAlphaType() : 0; }
+void LuaProxy::Graphics::LuaMovieResource::setVolume(int m) { if (img)img->setVolume(m); }
+int LuaProxy::Graphics::LuaMovieResource::getVolume() { return img ? img->getVolume() : 0; }
+
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {
@@ -57,9 +119,28 @@ WORLD_HUD_CONTROL LuaProxy::Graphics::getOverworldHudState()
 {
     return gSMBXHUDSettings.overworldHudState;
 }
+std::shared_ptr<BMPBox> LuaProxy::Graphics::loadMedia(const std::string& filename) {
+	std::wstring full_path;
 
+	if (!isAbsolutePath(filename)) {
+		full_path = getCustomFolderPath() + Str2WStr(filename);
+	}
+	else
+	{
+		full_path = Str2WStr(filename);
+	}
+
+	std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(full_path, gLunaRender.GetScreenDC());
+
+	if (img->ImageLoaded() == false) {
+		// If image loading failed, return null
+		return NULL;
+	}
+	return img;
+}
 LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::string& filename, lua_State* L)
 {
+	/*
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
@@ -76,9 +157,21 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
         // If image loading failed, return null
         return NULL;
     }
+	*/
+	std::shared_ptr<BMPBox> img = loadMedia(filename);
+	if (img == NULL)return NULL;
 
     // Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
     return new LuaProxy::Graphics::LuaImageResource(img);
+}
+
+LuaProxy::Graphics::LuaMovieResource* LuaProxy::Graphics::loadMovie(const std::string& filename, lua_State* L)
+{
+	std::shared_ptr<BMPBox> img = loadMedia(filename);
+	if (img == NULL)return NULL;
+
+	// Allocate a LuaImageResource to allow us to automatically garbage collect the image when no longer referenced in Lua
+	return new LuaProxy::Graphics::LuaMovieResource(img);
 }
 
 luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)
@@ -214,6 +307,20 @@ void LuaProxy::Graphics::drawImageWP(const LuaImageResource& img, double xPos, d
     drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, opacity, false, priority, L);
 }
 
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos,double destWidth,double destHeight, double priority, lua_State* L)
+{
+	drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0,destWidth,destHeight, 1.0f, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth, double destHeight, float opacity, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, 0, 0, 0, 0, destWidth, destHeight, opacity, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, destWidth, destHeight, 1.0f, false, priority, L);
+}
+void LuaProxy::Graphics::drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, float opacity, double priority, lua_State* L) {
+	drawImageGeneric(img, xPos, yPos, sourceX, sourceY, sourceWidth, sourceHeight, destWidth, destHeight, opacity, false, priority, L);
+}
+
 
 
 void LuaProxy::Graphics::drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L)
@@ -276,6 +383,31 @@ void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, double xP
     renderOp->m_renderPriority = priority; 
 
     gLunaRender.AddOp(renderOp);
+}
+
+void LuaProxy::Graphics::drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight,double destWidth,double destHeight, float opacity, bool sceneCoords, double priority, lua_State* L)
+{
+	if (priority < RENDEROP_PRIORITY_MIN || priority > RENDEROP_PRIORITY_MAX) {
+		luaL_error(L, "Priority value is not valid (must be between %f and %f, got %f).", RENDEROP_PRIORITY_MIN, RENDEROP_PRIORITY_MAX, priority);
+		return;
+	}
+
+	RenderBitmapOp* renderOp = new RenderBitmapOp();
+	renderOp->direct_img = img.img;
+	renderOp->x = xPos;
+	renderOp->y = yPos;
+	renderOp->sx = (sourceX <= 0.0 ? 0.0 : sourceX);
+	renderOp->sy = (sourceY <= 0.0 ? 0.0 : sourceY);
+	renderOp->sw = (sourceWidth <= 0.0 ? static_cast<double>(img.img->m_W) : sourceWidth);
+	renderOp->sh = (sourceHeight <= 0.0 ? static_cast<double>(img.img->m_H) : sourceHeight);
+	renderOp->dw = (destWidth <= 0.0 ? renderOp->sw : destWidth);
+	renderOp->dh = (destHeight <= 0.0 ? renderOp->sh : destHeight);
+	renderOp->scaling = true;
+	renderOp->opacity = opacity;
+	renderOp->sceneCoords = sceneCoords;
+	renderOp->m_renderPriority = priority;
+
+	gLunaRender.AddOp(renderOp);
 }
 
 
@@ -579,19 +711,29 @@ void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, co
         return;
     }
 
-    boost::optional<SMBXMaskedImage*> maskImg = luabind::object_cast_nothrow<SMBXMaskedImage*>(overrideImg);
-    if (maskImg != boost::none) {
-        img->SetOverride(*maskImg);
-        return;
-    }
+	//I found that 'object_cast_nothrow' sometimes casts between incompatible types without returning 'boost::none'
+	//switch order to avoid invalid casting from LIR to SMBXMI
+	boost::optional<LuaProxy::Graphics::LuaImageResource*> rgbaImg = luabind::object_cast_nothrow<LuaProxy::Graphics::LuaImageResource*>(overrideImg);
+	if (rgbaImg != boost::none) {
 
-    boost::optional<LuaProxy::Graphics::LuaImageResource*> rgbaImg = luabind::object_cast_nothrow<LuaProxy::Graphics::LuaImageResource*>(overrideImg);
-    if (rgbaImg != boost::none) {
-        if (*rgbaImg != nullptr && (*rgbaImg)->img) {
-            img->SetOverride((*rgbaImg)->img);
-        }
-        return;
-    }
+		if (*rgbaImg != nullptr && (*rgbaImg)->img) {
+			img->SetOverride((*rgbaImg)->img);
+		}
+		return;
+	}
+
+
+	boost::optional<SMBXMaskedImage*> maskImg = luabind::object_cast_nothrow<SMBXMaskedImage*>(overrideImg);
+	if (maskImg != boost::none) {
+		img->SetOverride(*maskImg);
+		return;
+	}
+
+	
+
+    
+
+    
 
     luaL_error(L, "Cannot set Graphics.sprite.%s[%d], invalid input type", t.c_str(), index);
 }
@@ -654,7 +796,13 @@ luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, in
     }
 
     std::shared_ptr<BMPBox> loadedPng = img->GetLoadedPng();
-    if (rgbaOverride)
+	/*
+	FIXED?
+
+	if(rgbaOverride) -> if(loadedPng)
+
+	*/
+	if (loadedPng)
     {
         return luabind::object(L, new LuaImageResource(loadedPng), luabind::adopt(luabind::result));
     }

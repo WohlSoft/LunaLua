@@ -22,6 +22,7 @@
 #include "Input/Input.h"
 #include "SMBXInternal/Level.h"
 #include "Misc/RuntimeHook.h"
+#include "Rendering/FFmpeg/FFmpeg.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -319,6 +320,9 @@ static bool IsWindowsVistaOrNewer() {
 /// INIT GLOBALS
 void InitGlobals()
 {
+	avcodec_register_all();
+	avdevice_register_all();
+	av_register_all();
     //char* dbg = "GLOBAL INIT DBG";
 	
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
