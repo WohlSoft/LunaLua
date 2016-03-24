@@ -516,6 +516,9 @@
     <ClInclude Include="Rendering\FrameCapture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\UniPath.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -989,6 +992,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\FrameCapture.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\UniPath.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -18,6 +18,8 @@ INCLUDEPATH += $$PWD/LunaDll/libs/lua_mingw/include
 INCLUDEPATH += $$PWD/LunaDll/libs/luabind-include
 INCLUDEPATH += $$PWD/LunaDll/libs/sdl/include
 INCLUDEPATH += $$PWD/LunaDll/libs/glew/include
+INCLUDEPATH += $$PWD/LunaDll/libs/glew/include
+INCLUDEPATH += $$PWD/LunaDll/libs/freeimage
 LIBS += -L$$PWD/LunaDll/libs/lua_mingw/lib
 LIBS += -L$$PWD/LunaDll/libs/sdl_mingw/lib
 LIBS += -static -lkernel32 -static -luser32 -static -lgdi32 -static -lcomdlg32 -static -lmsimg32 #-static -lcomsuppw
@@ -252,7 +254,15 @@ HEADERS += \
     LunaDll/SMBXInternal/Scenery.h \
     LunaDll/SMBXInternal/Tile.h \
     LunaDll/Misc/PerfTracker.h \
-    LunaDll/EventStateMachine.h
+    LunaDll/EventStateMachine.h \
+    LunaDll/Misc/UniPath.h \
+    LunaDll/Misc/TestMode.h \
+    LunaDll/Rendering/GL/GLFramebuffer.h \
+    LunaDll/Rendering/BitBltEmulation.h \
+    LunaDll/Rendering/FrameCapture.h \
+    LunaDll/Rendering/SMBXMaskedImage.h \
+    LunaDll/SMBXInternal/BaseItemArray.h \
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -430,5 +440,14 @@ SOURCES += \
     LunaDll/Rendering/Shaders/GLShader.cpp \
     LunaDll/Misc/PerfTracker.cpp \
     LunaDll/Rendering/GL/GLEngineCmds.cpp \
-    LunaDll/EventStateMachine.cpp
+    LunaDll/EventStateMachine.cpp \
+    LunaDll/Misc/UniPath.cpp \
+    LunaDll/LuaMain/LuaProxyFFI.cpp \
+    LunaDll/Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp \
+    LunaDll/Misc/TestMode.cpp \
+    LunaDll/Rendering/GL/GLFramebuffer.cpp \
+    LunaDll/Rendering/BitBltEmulation.cpp \
+    LunaDll/Rendering/FrameCapture.cpp \
+    LunaDll/Rendering/SMBXMaskedImage.cpp \
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp
 

@@ -81,3 +81,10 @@ GeneralLunaConfig    gGeneralConfig;
 CLunaLua gLunaLua;
 
 
+// Paths
+std::string  gAppPathANSI;
+
+std::string  gAppPathUTF8;
+
+std::wstring gAppPathWCHAR;
+

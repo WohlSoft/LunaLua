@@ -112,6 +112,11 @@ extern GeneralLunaConfig    gGeneralConfig;
 
 extern CLunaLua				gLunaLua;
 
+// Paths
+extern std::string  gAppPathANSI;
+extern std::string  gAppPathUTF8;
+extern std::wstring gAppPathWCHAR;
+
 /// HELPER MACROS ///
 /*
 if(!hRunProc){

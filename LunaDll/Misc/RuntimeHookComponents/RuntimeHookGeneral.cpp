@@ -200,12 +200,12 @@ void TrySkipPatch()
     fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
-    
+
     /************************************************************************/
     /* Replaced Imports                                                     */
     /************************************************************************/
     IMP_vbaStrCmp = &replacement_VbaStrCmp;
-    
+
     /************************************************************************/
     /* Set Hook                                                             */
     /************************************************************************/
@@ -277,7 +277,7 @@ void TrySkipPatch()
 
     PATCH(0xA755D2).CALL(&UpdateInputHook_Wrapper).Apply();
 
-    
+
     PATCH(0x902D3D).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902DFC).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902EBB).CALL(&WorldOverlayHUDBitBltHook).Apply();
@@ -345,7 +345,7 @@ void TrySkipPatch()
 
     PATCH(0x909217).CALL(&GenerateScreenshotHook).Apply();
     PATCH(0x94D5E7).CALL(&GenerateScreenshotHook).Apply();
-    
+
     PATCH(0x8C03DC).CALL(&InitLevelEnvironmentHook).Apply();
     PATCH(0x8C0A1A).CALL(&InitLevelEnvironmentHook).Apply();
     PATCH(0x8C1383).CALL(&InitLevelEnvironmentHook).Apply();
@@ -367,7 +367,7 @@ void TrySkipPatch()
 
     PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
     PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
-    
+
     //PATCH(0x4242D0).JMP(GET_RETADDR_TRACE_HOOK<&BitBltTraceHook>()).Apply();
     PATCH(0x4242D0).JMP(&BitBltHook).Apply();
     PATCH(0x424314).JMP(&StretchBltHook).Apply();
@@ -431,7 +431,7 @@ void TrySkipPatch()
     // -95: Furthest back BGOs
     PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
     // -90: Sizable Blocks
-    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply(); 
+    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply();
     // -85: Some more BGOs
     PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHook<-80>()).Apply();
     // -80: Warp - Derived BGOs (locks on doors and stuff)

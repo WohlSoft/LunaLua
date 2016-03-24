@@ -415,7 +415,7 @@ bool testModeEnable(const std::wstring& path)
     }
     else
     {
-        fullPath = getModulePath() + L"\\worlds\\" + path;
+        fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
     }
 
     // Check that the file exists

@@ -55,7 +55,13 @@ bool file_existsX(const std::string& name);
 bool isAbsolutePath(const std::wstring& path);
 bool isAbsolutePath(const std::string& path);
 
+extern void removeFilePathW(std::wstring &path);
+extern void removeFilePathW(wchar_t*path, int length);
+void removeFilePathA(std::string &path);
+void removeFilePathA(char*path, int length);
+
 /// Functions ///
+void initAppPaths();
 void ResetLunaModule();
 void InitGlobals();
 void ResetFreeGlob();
@@ -67,7 +73,7 @@ std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
 std::string url_encode(const std::string &value);
 // Module Helper Funcs
-HMODULE getModule(std::string moduleName);
+//HMODULE getModule(std::string moduleName);
 
 // File/Path Helper Funcs
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
@@ -75,7 +81,7 @@ bool readFile(std::string &content, std::string path, std::string errMsg = std::
 bool writeFile(const std::string &content, const std::string &path);
 std::vector<std::string> listFilesOfDir(const std::string& path);
 std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes);
-std::wstring getModulePath();
+//std::wstring getModulePath();
 std::wstring getCustomFolderPath();
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths);
 std::wstring getLatestConfigFile(const std::wstring& configname);

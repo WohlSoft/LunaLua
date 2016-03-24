@@ -3,6 +3,7 @@
 #include <math.h>
 #include <Windows.h>
 #include <GdiPlus.h>
+
 #include "Main.h"
 #include "Globals.h"
 #include "GlobalFuncs.h"
@@ -30,13 +31,18 @@
 
 static bool LevelCustomSounds = false;
 
-// Standard DLL loader main
-BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID lpvReserved)
+/*!
+ * \brief Standard DLL loader main
+ */
+BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID /*lpvReserved*/)
 {
 	switch (dwReason)
 	{
 	case DLL_PROCESS_ATTACH:
+        //Init file paths variables
+        initAppPaths();
 		gHInstance = (HINSTANCE)hinstDLL;
+        //Init hooks and main LunaLUA modules
         SetupThunRTMainHook();
         timeBeginPeriod(1);
 		break;

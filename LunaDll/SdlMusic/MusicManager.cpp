@@ -317,8 +317,8 @@ void MusicManager::loadSounds(std::string path, std::string root)
 {
     if( !file_existsX(path) ) return;
 
-    INIReader hitBoxFile( path.c_str() );
-    if (hitBoxFile.ParseError() < 0)
+    INIReader SoundsIni( path );
+    if (SoundsIni.ParseError() < 0)
     {
         MessageBoxA(0, std::string(path+"\n\nError of read INI file").c_str(), "Error", 0);
         return;
@@ -331,10 +331,10 @@ void MusicManager::loadSounds(std::string path, std::string root)
         std::string fileName;
         std::string reserveChannel;
 
-        fileName = hitBoxFile.Get(head, "file", "");
+        fileName = SoundsIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
 
-        reserveChannel = hitBoxFile.Get(head, "single-channel", "0");
+        reserveChannel = SoundsIni.Get(head, "single-channel", "0");
 
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
@@ -369,7 +369,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 {
     if( !file_existsX(path) ) return;
 
-    INIReader MusicIni( path.c_str() );
+    INIReader MusicIni( path );
     if (MusicIni.ParseError() < 0)
     {
         MessageBoxA(0, std::string(path+"\n\nError of read INI file").c_str(), "Error", 0);

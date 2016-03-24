@@ -7,12 +7,22 @@
 #include <QNetworkReply>
 #include <QApplication>
 #include "qjsonutil.h"
+#include "NetworkUtils/networkutils.h"
 
 
+QString LauncherConfiguration::getErrConnectionMsg() const
+{
+    return errConnectionMsg;
+}
+
+QString LauncherConfiguration::getErrConnectionUrl() const
+{
+    return errConnectionUrl;
+}
 QJsonDocument LauncherConfiguration::generateDefault()
 {
     return QJsonDocument(
-        QJsonObject
+                QJsonObject
         {
             {"game", QJsonObject
                 {
@@ -36,6 +46,8 @@ LauncherConfiguration::LauncherConfiguration(const QJsonDocument &settingsToPars
     QJsonObject mainObject = settingsToParse.object();
     QJsonObject gameValue = mainObject.value("game").toObject();
     updateCheckWebsite = gameValue.value("update-check-website").toString(".");
+    errConnectionUrl = gameValue.value("update-error-website").toString(".");
+    errConnectionMsg = gameValue.value("update-error-message").toString("");
     version1 = gameValue.value("version-1").toInt(0);
     version2 = gameValue.value("version-2").toInt(0);
     version3 = gameValue.value("version-3").toInt(0);
@@ -55,19 +67,21 @@ bool LauncherConfiguration::setConfigurationAndValidate(const QJsonDocument &set
 
     QJsonObject gameObject = mainObject.value("game").toObject();
     if(!qJsonValidate<QString>(gameObject, "update-check-website", errFunc)) return false;
+    if(!qJsonValidate<QString>(gameObject, "update-error-website", errFunc)) return false;
+    if(!qJsonValidate<QString>(gameObject, "update-error-message", errFunc)) return false;
     if(!qJsonValidate<int>(gameObject, "version-1", errFunc)) return false;
     if(!qJsonValidate<int>(gameObject, "version-2", errFunc)) return false;
     if(!qJsonValidate<int>(gameObject, "version-3", errFunc)) return false;
     if(!qJsonValidate<int>(gameObject, "version-4", errFunc)) return false;
     updateCheckWebsite = gameObject.value("update-check-website").toString(".");
+    errConnectionUrl = gameObject.value("update-error-website").toString(".");
+    errConnectionMsg = gameObject.value("update-error-message").toString("");
     version1 = gameObject.value("version-1").toInt(0);
     version2 = gameObject.value("version-2").toInt(0);
     version3 = gameObject.value("version-3").toInt(0);
     version4 = gameObject.value("version-4").toInt(0);
     return true;
 }
-
-#include <iostream>
 
 bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription)
 {
@@ -89,27 +103,11 @@ bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDoc
         return false;
     }
 
-    QNetworkReply * rpl = nullptr;
-    bool replyFinished = false;
-
-    QNetworkAccessManager downloader;
-    downloader.setNetworkAccessible(QNetworkAccessManager::Accessible);
-
-    QObject::connect(&downloader, &QNetworkAccessManager::finished, [&rpl, &replyFinished](QNetworkReply *reply){
-        replyFinished = true;
-        rpl = reply;
-    });
-
-    QNetworkRequest jsonRequest(urlToUpdateChecker);
-    downloader.get(jsonRequest);
-
-    while(!replyFinished)
-        qApp->processEvents();
-
-    QByteArray data = rpl->readAll();
-    if(data.isEmpty()){
+    QByteArray data;
+    bool success = NetworkUtils::getString(urlToUpdateChecker, &data, nullptr, 4000);
+    if(!success){
         errCode = UERR_CONNECTION_FAILED;
-        errDescription = rpl->errorString();
+        errDescription = "Failed to establish connection";
         return false;
     }
 
@@ -122,7 +120,6 @@ bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDoc
         return false;
     }
 
-    rpl->deleteLater();
 
     errCode = UERR_NO_ERR;
     return true;

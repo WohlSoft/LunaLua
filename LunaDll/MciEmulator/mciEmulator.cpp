@@ -66,7 +66,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
         if(spCmd[0] == "open" && spCmd[2] == "alias") {
 			//register music/sound file
 			regSoundFile snFile;
-			snFile.fileName = std::string(spCmd[1]);
+            std::wstring wfile = StrA2WStr(std::string(spCmd[1]));//Convert ANSI string into WStrnig
+            snFile.fileName = WStr2Str(wfile);//And then into UTF-8
 			snFile.volume = 400;
 			registeredFiles[spCmd[3]] = snFile;
 			/******/MusicManager::addSound(spCmd[3], snFile.fileName);/******/

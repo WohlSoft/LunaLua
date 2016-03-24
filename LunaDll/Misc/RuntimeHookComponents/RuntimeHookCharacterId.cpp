@@ -2065,7 +2065,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         if (!gIsOverworld)
             searchPath.push_back(getCustomFolderPath()); // Check custom folder
         searchPath.push_back(GM_FULLDIR); // Check episode dir
-        searchPath.push_back(getModulePath() + L"\\graphics\\" + wName + L"\\"); // Check base game
+        searchPath.push_back(gAppPathWCHAR + L"\\graphics\\" + wName + L"\\"); // Check base game
 
         for (int powerupId = 1; powerupId <= 10; powerupId++)
         {
