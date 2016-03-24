@@ -160,26 +160,27 @@ size_t utf8len(const char *s)
 std::wstring Str2WStr(const std::string &str)
 {
     std::wstring dest;
-    dest.resize(utf8len(str.c_str()));
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), (wchar_t*)dest.c_str(), str.length());
+    dest.resize(str.size());
+    int newlen=MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), (wchar_t*)dest.c_str(), str.length());
+    dest.resize(newlen);
     return dest;
 }
 
 std::string WStr2Str(const std::wstring &wstr)
 {
     std::string dest;
-    int dest_len = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), 0, NULL, NULL);
-    dest.resize(dest_len);
-    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest_len, NULL, NULL);
+    dest.resize((wstr.size()*2));
+    int newlen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest.size(), NULL, NULL);
+    dest.resize(newlen);
     return dest;
 }
 
 std::string WStr2StrA(const std::wstring &wstr)
 {
     std::string dest;
-    int dest_len = wstr.length();//WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), 0, NULL, NULL);
-    dest.resize(dest_len);
-    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest_len, NULL, NULL);
+    dest.resize((wstr.size()*2));
+    int newlen = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.length(), (LPSTR)dest.c_str(), dest.size(), NULL, NULL);
+    dest.resize(newlen);
     return dest;
 }
 

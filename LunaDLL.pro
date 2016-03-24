@@ -252,7 +252,8 @@ HEADERS += \
     LunaDll/SMBXInternal/Scenery.h \
     LunaDll/SMBXInternal/Tile.h \
     LunaDll/Misc/PerfTracker.h \
-    LunaDll/EventStateMachine.h
+    LunaDll/EventStateMachine.h \
+    LunaDll/Misc/UniPath.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -430,5 +431,6 @@ SOURCES += \
     LunaDll/Rendering/Shaders/GLShader.cpp \
     LunaDll/Misc/PerfTracker.cpp \
     LunaDll/Rendering/GL/GLEngineCmds.cpp \
-    LunaDll/EventStateMachine.cpp
+    LunaDll/EventStateMachine.cpp \
+    LunaDll/Misc/UniPath.cpp
 

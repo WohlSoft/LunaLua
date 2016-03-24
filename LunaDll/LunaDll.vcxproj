@@ -78,6 +78,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;NDEBUG;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(LUA_DEV);$(MSBuildProjectDirectory)\libs\boost</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,10 +101,10 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\libs\boost;$(LUA_DEV)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,8 +134,8 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <MinimalRebuild>false</MinimalRebuild>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(LUA_DEV)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\TestMode.h" />
+    <ClInclude Include="Misc\UniPath.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
@@ -290,6 +292,7 @@
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
+    <ClCompile Include="Misc\UniPath.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
