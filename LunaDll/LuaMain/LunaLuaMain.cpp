@@ -5,6 +5,7 @@
 
 
 #include "LunaLuaMain.h"
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
 #include "../Misc/MiscFuncs.h"
@@ -27,7 +28,7 @@ using namespace luabind;
 
 std::wstring CLunaLua::getLuaLibsPath()
 {
-    std::wstring lapi = getModulePath();
+    std::wstring lapi = gAppPathWCHAR;
     lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
     return lapi;
 }
@@ -128,7 +129,6 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     lua_setfield(L, -2, "mime.core");
     
     //SOCKET TESTING STUFF
-
 
     //Remove unsafe apis
     {

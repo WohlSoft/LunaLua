@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include "FreeImageData.h"
 #include "FreeImageHelper.h"
+#include "../../GlobalFuncs.h"
 
 FreeImageData::FreeImageData() : m_bitmap(NULL)
 {}
@@ -9,6 +10,20 @@ FreeImageData::FreeImageData() : m_bitmap(NULL)
 FreeImageData::~FreeImageData()
 {
     reset();
+}
+
+bool FreeImageData::loadMem(unsigned char*data, unsigned long size, std::string filename)
+{
+    FIMEMORY * mem = FreeImage_OpenMemory(data, size);
+    FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, size);
+    if (fif == FIF_UNKNOWN){
+        fif = FreeImage_GetFIFFromFilename(filename.c_str());
+    }
+    if(fif == FIF_UNKNOWN)
+        return false;
+    m_bitmap = FreeImage_LoadFromMemory(fif, mem);
+    FreeImage_CloseMemory(mem);
+    return m_bitmap != NULL;
 }
 
 bool FreeImageData::loadFile(const std::string& filename)
@@ -22,6 +37,40 @@ bool FreeImageData::loadFile(const std::string& filename)
     
     m_bitmap = FreeImage_Load(fif, filename.c_str());
     return m_bitmap != NULL;
+}
+
+bool FreeImageData::loadFile(const std::wstring &filename)
+{
+    void* theFile;
+    void* theMap;
+    void* theAddress;
+    theFile = CreateFileW(filename.c_str(), GENERIC_READ, 1, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (theFile == INVALID_HANDLE_VALUE)
+        return false;
+
+    DWORD size = GetFileSize(theFile, NULL);
+
+    theMap = CreateFileMappingW(theFile, NULL, PAGE_READONLY, 0, 0, NULL);
+    if( theMap == NULL )
+    {
+        CloseHandle(theFile);
+        return false;
+    }
+    theAddress = MapViewOfFile(theMap, FILE_MAP_READ, 0, 0, size);
+    if(theAddress == NULL)
+    {
+        CloseHandle(theMap);
+        CloseHandle(theFile);
+        return false;
+    }
+
+    bool reply = loadMem((unsigned char*)theAddress, size, WStr2Str(filename));
+
+    try{ UnmapViewOfFile(theAddress); } catch(void * /*e*/) {}
+    try{ CloseHandle(theMap); } catch(void * /*e*/) {}
+    try{ CloseHandle(theFile);} catch(void* /*e*/) {}
+
+    return reply;
 }
 
 bool FreeImageData::saveFile(const std::string& filename) const

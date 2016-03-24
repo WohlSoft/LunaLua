@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "ErrorReporter.h"
 #include <dbghelp.h>
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
 #include <array>
@@ -19,7 +20,7 @@ std::string ErrorReport::generateStackTrace(CONTEXT* context)
 
 void ErrorReport::writeErrorLog(const std::string &text)
 {
-    std::string smbxPath = WStr2Str(getModulePath());
+    std::string smbxPath = gAppPathUTF8;
     smbxPath += "\\";
     smbxPath += "ERROR_";
     smbxPath += generateTimestampForFilename();

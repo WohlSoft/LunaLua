@@ -241,12 +241,56 @@ bool is_number(const std::string& s)
 
 bool file_existsX(const std::string& name)
 {
-    if (FILE *file = fopen(name.c_str(), "r")) {
+    if (FILE *file = _wfopen(Str2WStr(name).c_str(), L"r")) {
         fclose(file);
         return true;
     } else {
         return false;
     }   
+}
+
+void removeFilePathW(std::wstring &path)
+{
+    for(int i = path.size(); i > 3; i--) {
+        if((path[i] == L'\\')||(path[i] == L'/'))
+        {
+            path.resize(i);
+            break;
+        }
+    }
+}
+
+void removeFilePathW(wchar_t*path, int length)
+{
+    for(int i = length; i > 3; i--) {
+        if((path[i] == L'\\')||(path[i] == L'/'))
+        {
+            path[i] = 0;
+            break;
+        }
+    }
+}
+
+void removeFilePathA(std::string &path)
+{
+    for(int i = path.size(); i > 3; i--) {
+        if((path[i] == '\\')||(path[i] == '/'))
+        {
+            path.resize(i);
+            break;
+        }
+    }
+}
+
+void removeFilePathA(char*path, int length)
+{
+    for(int i = length; i > 3; i--) {
+        if((path[i] == '\\')||(path[i] == '/'))
+        {
+            path[i] = 0;
+            break;
+        }
+    }
 }
 
 void ResetLunaModule() 
@@ -317,6 +361,38 @@ static bool IsWindowsVistaOrNewer() {
         conditionMask);
 }
 
+/*!
+ * \brief Initializes game root folder variables
+ */
+void initAppPaths()
+{
+    HMODULE hModule = GetModuleHandleW(NULL);
+    wchar_t fullPath[MAX_PATH];
+    int count = GetModuleFileNameW(hModule, fullPath, MAX_PATH);
+
+    //Check is path has a mixed charsets
+    std::string apath=WStr2StrA(fullPath);
+    FILE *mainexe=fopen(apath.c_str(), "r");
+    removeFilePathW(fullPath, count);
+
+    if(!mainexe)
+    {
+        std::wstringstream msg;
+        msg << L"LunaLUA is located in a path which contains mixed charsets (for example, your locale is configured to Europan, "
+            << L"but in the path are Cyrillic or Chinese characters which are not fits into your local charset). "
+            << L"SMBX will crash if you will continue running of it.\n\nPlease move SMBX folder into path which has "
+            << L" only characters of your current locale or ASCII-only to avoid this warning message.\n\nDetected full path:\n"
+            << fullPath;
+        MessageBoxW(NULL, msg.str().c_str(), L"Mixed charsets in path has been detected", MB_OK|MB_ICONWARNING);
+    } else {
+        fclose(mainexe);
+    }
+
+    gAppPathWCHAR = fullPath;
+    gAppPathUTF8 = WStr2Str(fullPath);
+    gAppPathANSI = WStr2StrA(fullPath);
+}
+
 /// INIT GLOBALS
 void InitGlobals()
 {
@@ -352,12 +428,14 @@ void InitGlobals()
 	/// Init autocode manager	
 
 	gAutoMan.Clear(true);
-	gAutoMan.ReadGlobals(getModulePath());
+    gAutoMan.ReadGlobals(gAppPathWCHAR);
 	gAutoMan.m_GlobalEnabled = true;
 
+    std::wstring configFolderPath = gAppPathWCHAR+L"\\config";
+
     // Be sure that the config folder exist
-    if (GetFileAttributesW(L"config") & INVALID_FILE_ATTRIBUTES) {
-        CreateDirectoryW(L"config", NULL);
+    if (GetFileAttributesW(configFolderPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+        CreateDirectoryW(configFolderPath.c_str(), NULL);
     }
 
 }
@@ -437,28 +515,28 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
 	return false;
 }
 
-HMODULE getModule(std::string moduleName)
-{
-	HMODULE ret = 0;
-	if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
-		ret = LoadLibraryA(moduleName.c_str());
-	}
-	return ret;
-}
+//HMODULE getModule(std::string moduleName)
+//{
+//	HMODULE ret = 0;
+//	if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
+//		ret = LoadLibraryA(moduleName.c_str());
+//	}
+//	return ret;
+//}
 
-std::wstring getModulePath()
-{
-	HMODULE hModule = GetModuleHandleW(NULL);
-	WCHAR path[MAX_PATH];
-	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-	for(int i = count; i > 3; i--) {
-		if(path[i] == L'\\') {
-			path[i] = 0;
-			break;
-		}
-	}
-	return std::wstring(path);
-}
+//std::wstring getModulePath()
+//{
+//	HMODULE hModule = GetModuleHandleW(NULL);
+//	WCHAR path[MAX_PATH];
+//	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+//	for(int i = count; i > 3; i--) {
+//		if(path[i] == L'\\') {
+//			path[i] = 0;
+//			break;
+//		}
+//	}
+//	return std::wstring(path);
+//}
 
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
@@ -466,7 +544,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 	if(!theFile.is_open()){
 		theFile.close();
 		if(!errMsg.empty())
-			MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
+            MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
 		return false;
 	}
 
@@ -476,15 +554,30 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
 {
-    std::ifstream theFile(path, std::ios::binary | std::ios::in);
-    if (!theFile.is_open()) {
-        theFile.close();
-        if (!errMsg.empty())
-            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+    std::wstring wpath = Str2WStr(path);
+    FILE* theFile = _wfopen(wpath.c_str(), L"rb");
+    if(!theFile)
+    {
+        MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
         return false;
     }
-
-    content = std::string((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+    fseek(theFile, 0, SEEK_END);
+    size_t len = ftell(theFile);
+    if(len>0)
+    {
+        content.resize(len);
+        fread((char*)content.c_str(), 1, len, theFile);
+        fclose(theFile);
+    }
+//    bool res=readFile(wcontent, wpath, )
+//    std::wifstream theFile(wpath, std::ios::binary | std::ios::in);
+//    if (!theFile.is_open()) {
+//        theFile.close();
+//        if (!errMsg.empty())
+//            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+//        return false;
+//    }
+    //content = std::string((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
     return true;
 }
 
@@ -518,14 +611,22 @@ std::string generateTimestampForFilename()
 
 bool writeFile(const std::string &content, const std::string &path)
 {
-    std::ofstream theFile(path, std::ios::binary | std::ios::out);
-    if (!theFile.is_open()){
-        theFile.close();
+    std::wstring wpath = Str2WStr(path);
+    FILE* theFile = _wfopen(wpath.c_str(), L"wb");
+    if(!theFile)
+    {
         return false;
     }
-    theFile << content;
-    theFile.close();
+    fwrite(content.c_str(), 1, content.size(), theFile);
+    fclose(theFile);
     return true;
+//    std::ofstream theFile(path, std::ios::binary | std::ios::out);
+//    if (!theFile.is_open()){
+//        theFile.close();
+//        return false;
+//    }
+//    theFile << content;
+//    theFile.close();
 }
 
 
@@ -572,23 +673,24 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
 {
     std::vector<std::string> out;
     HANDLE dir;
-    WIN32_FIND_DATAA file_data;
+    WIN32_FIND_DATAW file_data;
+    std::wstring wpath = Str2WStr(path);
     
-    if ((dir = FindFirstFileA((path + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+    if ((dir = FindFirstFileW((wpath + L"/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
         return out; /* No files found */
 
     do {
-        const std::string file_name = file_data.cFileName;
+        const std::wstring wfile_name = file_data.cFileName;
         const bool skipFile = (file_data.dwFileAttributes & fileAttributes) == 0;
         
-        if (file_name[0] == '.')
+        if (wfile_name[0] == L'.')
             continue;
 
         if (skipFile)
             continue;
-
+        std::string file_name = WStr2Str(wfile_name);
         out.push_back(file_name);
-    } while (FindNextFileA(dir, &file_data));
+    } while (FindNextFileW(dir, &file_data));
 
     FindClose(dir);
 
@@ -639,8 +741,8 @@ std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 std::wstring getLatestConfigFile(const std::wstring& configname)
 {
     return getLatestFile({
-        getModulePath() + L"//" + configname,
-        getModulePath() + L"//config//" + configname
+        gAppPathWCHAR + L"//" + configname,
+        gAppPathWCHAR + L"//config//" + configname
     });
 }
 

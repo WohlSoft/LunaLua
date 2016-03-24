@@ -36,39 +36,22 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     int powerup = _powerup - 1;
     int character = _character - 1;
 
-    std::wstring full_path;
-    if (isAbsolutePath(ini_file))
+    std::wstring wfull_path;
+    if( isAbsolutePath(ini_file) )
     {
-        full_path = Str2WStr(ini_file);
+        wfull_path = Str2WStr(ini_file);
     } else {
-        full_path = getCustomFolderPath() + Str2WStr(ini_file);
+        wfull_path = getCustomFolderPath() + Str2WStr(ini_file);
     }
 
-	std::wstring ws = full_path;
-	std::string s;
-	const std::locale locale("");
-	typedef std::codecvt<wchar_t, char, std::mbstate_t> converter_type;
-	const converter_type& converter = std::use_facet<converter_type>(locale);
-	std::vector<char> to(ws.length() * converter.max_length());
-	std::mbstate_t state;
-	const wchar_t* from_next;
-	char* to_next;
-	const converter_type::result result = converter.out(state,
-		full_path.data(), full_path.data() + full_path.length(),
-		from_next, &to[0], &to[0] + to.size(), to_next);
-	if (result == converter_type::ok || result == converter_type::noconv)
-	{
-		s = std::string(&to[0], to_next);
-	}
+    std::string full_path = WStr2Str(wfull_path);
 
-
-	INIReader hitBoxFile( s.c_str() );
-	if (hitBoxFile.ParseError() < 0)
-	{
-		MessageBoxA(0, std::string(s+"\n\nError of read INI file").c_str(), "Error", 0);
-		return;
-	}
-
+    INIReader hitBoxFile( full_path );
+    if (hitBoxFile.ParseError() < 0)
+    {
+        MessageBoxA(0, std::string(full_path+"\n\nError of read INI file").c_str(), "Error", 0);
+        return;
+    }
 
     short* hitbox_width = &GM_HITBOX_W_PTR;
     short* hitbox_height = &GM_HITBOX_H_PTR;
@@ -76,89 +59,87 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     short* hitbox_grab_offset_X = &GM_HITBOX_GRABOFF_X;
     short* hitbox_grab_offset_Y = &GM_HITBOX_GRABOFF_Y;
 
+    //Parser of hitbox properties from PGE Calibrator INI File
 
-	//Parser of hitbox properties from PGE Calibrator INI File
+    //Frames X and Y on playable character sprite from 0 to 9
 
-	//Frames X and Y on playable character sprite from 0 to 9
+    // SMBX FrameID <-> X-Y Conversion formulas:
+    // TO:
+    //FrameID = (Y+10*X)-49
+    // FROM:
+    //X = ((FrameID+49)-(FrameID+49)%10)/10
+    //Y = (FrameID+49)%10
 
-	// SMBX FrameID <-> X-Y Conversion formulas:
-	// TO:
-	//FrameID = (Y+10*X)-49
-	// FROM:
-	//X = ((FrameID+49)-(FrameID+49)%10)/10
-	//Y = (FrameID+49)%10
+    std::string width = "";
+    std::string height = "";
+    std::string height_duck = "";
+    std::string grab_offset_x = "";
+    std::string grab_offset_y = "";
+    std::string isUsed;
+    std::string offsetX;
+    std::string offsetY;
 
+    switch(character)
+    {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        //normal
+        width =  hitBoxFile.Get("common", "width", "");
+        height = hitBoxFile.Get("common", "height", "");
+        //duck
+        height_duck = hitBoxFile.Get("common", "height-duck", "");
 
-	std::string width = "";
-	std::string height = "";
-	std::string height_duck = "";
-	std::string grab_offset_x = "";
-	std::string grab_offset_y = "";
-	std::string isUsed;
-	std::string offsetX;
-	std::string offsetY;
+        //grab offsets
+        grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
+        grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
 
-	switch(character)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-		//normal
-		width = hitBoxFile.Get("common", "width", "");
-		height = hitBoxFile.Get("common", "height", "");
-		//duck
-		height_duck = hitBoxFile.Get("common", "height-duck", "");
+        for (int x = 0; x<10; x++)
+        {
+            for (int y = 0; y<10; y++)
+            {
+                isUsed.clear();
+                offsetX.clear();
+                offsetY.clear();
+                std::stringstream xx;
+                xx << "frame-" << x << "-" << y;
+                std::string tFrame = xx.str();
+                isUsed = hitBoxFile.Get(tFrame, "used", "false");
+                if (isUsed == "true") //--> skip this frame
+                {
+                    //Offset relative to
+                    offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
+                    offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
+                    if (!offsetX.empty() && !offsetY.empty())
+                    {
+                        SMBX_CustomGraphics::setOffsetX((Characters)_character,
+                            SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+                            (PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
+                        SMBX_CustomGraphics::setOffsetY((Characters)_character,
+                            SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+                            (PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
+                    }
+                }
+            }
+        }
+        break;
+    default:
+        MessageBoxA(0, "Wrong character ID", "Error", 0);
+        return;
+    }
 
-		//grab offsets
-		grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
-		grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
-
-		for (int x = 0; x<10; x++)
-		{
-			for (int y = 0; y<10; y++)
-			{
-				isUsed.clear();
-				offsetX.clear();
-				offsetY.clear();
-				std::stringstream xx;
-				xx << "frame-" << x << "-" << y;
-				std::string tFrame = xx.str();
-				isUsed = hitBoxFile.Get(tFrame, "used", "false");
-				if (isUsed == "true") //--> skip this frame
-				{
-					//Offset relative to
-					offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
-					offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
-					if (!offsetX.empty() && !offsetY.empty())
-					{
-						SMBX_CustomGraphics::setOffsetX((Characters)_character,
-							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-							(PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
-						SMBX_CustomGraphics::setOffsetY((Characters)_character,
-							SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-							(PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
-					}
-				}
-			}
-		}
-		break;
-	default:
-		MessageBoxA(0, "Wrong character ID", "Error", 0);
-		return;
-	}
-
-	if( !width.empty() )
-		hitbox_width[powerup*5+character] = (short)atoi(width.c_str());
-	if( !height.empty() )
-		hitbox_height[powerup*5+character] = (short)atoi(height.c_str());
-	if( !height_duck.empty() )
-		hitbox_height_duck[powerup*5+character] = (short)atoi(height_duck.c_str());
-	if( !grab_offset_x.empty() )
-		hitbox_grab_offset_X[powerup*5+character] = (short)atoi(grab_offset_x.c_str());
-	if( !grab_offset_y.empty() )
-		hitbox_grab_offset_Y[powerup*5+character] = (short)atoi(grab_offset_y.c_str());
+    if( !width.empty() )
+        hitbox_width[powerup*5+character] = (short)atoi(width.c_str());
+    if( !height.empty() )
+        hitbox_height[powerup*5+character] = (short)atoi(height.c_str());
+    if( !height_duck.empty() )
+        hitbox_height_duck[powerup*5+character] = (short)atoi(height_duck.c_str());
+    if( !grab_offset_x.empty() )
+        hitbox_grab_offset_X[powerup*5+character] = (short)atoi(grab_offset_x.c_str());
+    if( !grab_offset_y.empty() )
+        hitbox_grab_offset_Y[powerup*5+character] = (short)atoi(grab_offset_y.c_str());
 }
 
 

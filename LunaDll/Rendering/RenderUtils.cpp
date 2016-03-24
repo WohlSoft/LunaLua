@@ -5,12 +5,10 @@
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
 
-
-
 HBITMAP LoadGfxAsBitmap(const std::wstring& filename)
 {
     FreeImageData bitmapData;
-    bitmapData.loadFile(WStr2Str(filename));
+    bitmapData.loadFile(filename);
     return bitmapData.toHBITMAP();
 }
 
@@ -19,7 +17,7 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
     std::vector<HBITMAP> allBitmapFrames;
     short sumFrameDelay = 0;
 
-    FreeImageGifData gifData(WStr2Str(filename), false);
+    FreeImageGifData gifData(WStr2StrA(filename), false);
     if (!gifData.isOpen())
         return make_tuple(allBitmapFrames, 9);
     
@@ -40,7 +38,7 @@ void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& heade
 {
     FreeImageData screenshotFile;
     screenshotFile.init(header.biWidth, header.biHeight, (BYTE*)pData);
-    screenshotFile.saveFile(WStr2Str(fName));
+    screenshotFile.saveFile(WStr2StrA(fName));
 }
 
 HBITMAP CopyBitmapFromHdc(HDC hdc)

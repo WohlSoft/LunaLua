@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ios>
 #include "../LuaProxy.h"
+#include "../../Globals.h"
 #include "../../GlobalFuncs.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../Misc/MiscFuncs.h"
@@ -71,7 +72,7 @@ std::string LuaProxy::Data::resolvePathFromSection()
 {
 	std::string levelName = WStr2Str(::Level::GetName());
 	std::string episodePath = (std::string)GM_FULLDIR;
-	std::string smbxPath = WStr2Str(getModulePath());
+    std::string smbxPath = gAppPathUTF8;
 	std::string returnPath = "";
 	switch (m_dataType)
 	{

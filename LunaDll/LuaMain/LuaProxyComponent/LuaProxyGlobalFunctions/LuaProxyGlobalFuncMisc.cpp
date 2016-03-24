@@ -78,7 +78,7 @@ luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
     std::string modulePath = path;
     if (!isAbsolutePath(path))
     {
-        modulePath = WStr2Str(getModulePath());
+        modulePath = gAppPathUTF8;
         modulePath += "\\";
         modulePath += path;
     }
@@ -101,8 +101,8 @@ luabind::object luabindResolveFile(std::string file, lua_State* L){
     std::vector<std::string> paths = {
         WStr2Str(getCustomFolderPath()),
         (std::string)GM_FULLDIR,
-        WStr2Str(getModulePath()) + "\\LuaScriptsLib\\",
-        WStr2Str(getModulePath()) + "\\"
+        gAppPathUTF8 + "\\LuaScriptsLib\\",
+        gAppPathUTF8 + "\\"
     };
 
 

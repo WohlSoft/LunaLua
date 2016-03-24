@@ -1,5 +1,6 @@
 #include <iostream>
 #include "AsyncGifRecorder.h"
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #define FREEIMAGE_LIB
 #include <FreeImageLite.h>
@@ -65,7 +66,7 @@ void AsyncGifRecorder::workerFunc()
         {
             if (m_isRunning.load(std::memory_order_relaxed))
                 continue;
-            std::wstring screenshotPath = getModulePath() + std::wstring(L"\\gif-recordings");
+            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\gif-recordings");
             if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }

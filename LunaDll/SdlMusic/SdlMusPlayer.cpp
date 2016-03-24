@@ -1,5 +1,6 @@
 #ifndef NO_SDL
 
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
 #include "MusicManager.h"
@@ -16,10 +17,10 @@ void PGE_SDL_Manager::initSDL()
 		isInit=true;
 		PGE_MusPlayer::setSampleRate(44100);
 		PGE_MusPlayer::MUS_changeVolume(80);
-
-		std::wstring smbxPath = getModulePath();
-		smbxPath = smbxPath.append(L"\\");
-        appPath = WStr2Str(smbxPath);
+        //std::wstring smbxPath = gAppPathWCHAR;
+        //smbxPath = smbxPath.append(L"\\");
+        appPath = gAppPathUTF8;
+        appPath.append("\\");
 	}
 }
 
@@ -196,7 +197,7 @@ int PGE_MusPlayer::currentVolume()
 
 void PGE_MusPlayer::MUS_openFile(const char *musFile)
 {
-	PGE_SDL_Manager::initSDL();
+    PGE_SDL_Manager::initSDL();
 	if(currentTrack==std::string(musFile))
 	{
 		if(Mix_PlayingMusic()==1)

@@ -166,7 +166,7 @@ extern int __stdcall LoadIntro()
     std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
     if (file_existsX(autostartFile)) {
-        INIReader autostartConfig(autostartFile);
+        INIReader autostartConfig( autostartFile );
         if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
             if (!gAutostartRan) {
                 GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
@@ -1007,7 +1007,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         short screenshotSoundID = 12;
         native_playSFX(&screenshotSoundID);
         g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            std::wstring screenshotPath = getModulePath() + std::wstring(L"\\screenshots");
+            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
             if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }

@@ -19,6 +19,8 @@ public:
     ~FreeImageData();
 
     bool loadFile(const std::string& filename);
+    bool loadFile(const std::wstring& filename);
+    bool loadMem(unsigned char *data, unsigned long size, std::string filename);
     bool saveFile(const std::string& filename) const;
     bool isValid() const;
 

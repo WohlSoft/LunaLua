@@ -5,6 +5,7 @@
 
 #include "HardcodedGraphicsManager.h"
 #include "../Defines.h"
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SdlMusic/MusicManager.h" //Need to get SMBX's application path
 #include "../libs/ini-reader/INIReader.h" //Ini files reader
@@ -98,7 +99,7 @@ void HardcodedGraphicsManager::loadGraphics()
 	if(hardcoded_data_map.empty())
 		buildMap();
 
-    std::wstring smbxPath = getModulePath();
+    std::wstring smbxPath = gAppPathWCHAR;
     smbxPath = smbxPath.append(L"\\");
     root = WStr2Str(smbxPath);
 

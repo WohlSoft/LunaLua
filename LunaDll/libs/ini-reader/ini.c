@@ -13,6 +13,10 @@ http://code.google.com/p/inih/
 
 #include "ini.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #if !INI_USE_STACK
 #include <stdlib.h>
 #endif
@@ -171,8 +175,17 @@ int ini_parse(const char* filename,
 {
     FILE* file;
     int error;
-
+    #ifdef _WIN32
+    //MessageBoxA(NULL, filename, "TEST", MB_OK|MB_ICONINFORMATION);
+    wchar_t newpath[MAX_PATH];
+    int newlen = MultiByteToWideChar(CP_UTF8, 0, filename, strlen(filename), newpath, MAX_PATH);
+    if(newlen>=MAX_PATH) return -1;
+    newpath[newlen]=L'\0';
+    //MessageBoxW(NULL, newpath, L"TEST", MB_OK|MB_ICONINFORMATION);
+    file = _wfopen(newpath, L"r");
+    #else
     file = fopen(filename, "r");
+    #endif
     if (!file)
         return -1;
     error = ini_parse_file(file, handler, user);
