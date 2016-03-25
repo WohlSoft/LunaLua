@@ -1333,7 +1333,7 @@ namespace LuaProxy {
 #ifdef _MSC_VER //DEPRECATED STUFF
 #pragma region
 #endif
-	// AirpLunaLua
+    // Made by Airpo
     LuaProxy::BGO spawnBGO(unsigned short id, double x, double y, lua_State * L);
     LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
 	//Moved as static functions

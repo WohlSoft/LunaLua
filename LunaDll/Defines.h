@@ -14,10 +14,10 @@
 
 #if NORMAL_VER_NUM
 #define LUNALUA_VER_PREFIX   "LUNALUA V"
-#define LUNALUA_VER_SUFFIX   " BETA <AIRPLUNALUA>"
+#define LUNALUA_VER_SUFFIX   " BETA"
 #define LUNALUA_VERSION      LUNALUA_VER_PREFIX LUNALUA_VER_STR LUNALUA_VER_SUFFIX
 #else
-#define LUNALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
+#define LUNALUA_VERSION      "LUNALUA V0.7.3.1 BETA"
 #endif
 
 // Common PGE Engine and LunaLUA constant to identify which engine is uses to run lunadll.lua script
@@ -745,7 +745,7 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
-// AirpLunaLua
+// Made by Airpo
 #define GF_UPDATE_WARP			0x008F7D70
 #define GF_INIT_ENVIRONMENT		0x009944F0
 #define GF_BGO_SORTINGRELATED	0x00A98C20
