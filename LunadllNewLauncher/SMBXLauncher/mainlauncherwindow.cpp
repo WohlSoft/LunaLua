@@ -18,6 +18,7 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     connect(ui->webLauncherPage->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
     connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
     ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    ui->webLauncherPage->page()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 }
 
 MainLauncherWindow::~MainLauncherWindow()
