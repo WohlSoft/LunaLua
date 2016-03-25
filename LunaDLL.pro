@@ -20,6 +20,7 @@ INCLUDEPATH += $$PWD/LunaDll/libs/sdl/include
 INCLUDEPATH += $$PWD/LunaDll/libs/glew/include
 INCLUDEPATH += $$PWD/LunaDll/libs/glew/include
 INCLUDEPATH += $$PWD/LunaDll/libs/freeimage
+INCLUDEPATH += $$PWD/LunaDll/libs/ffmpeg
 LIBS += -L$$PWD/LunaDll/libs/lua_mingw/lib
 LIBS += -L$$PWD/LunaDll/libs/sdl_mingw/lib
 LIBS += -static -lkernel32 -static -luser32 -static -lgdi32 -static -lcomdlg32 -static -lmsimg32 #-static -lcomsuppw
@@ -262,7 +263,17 @@ HEADERS += \
     LunaDll/Rendering/FrameCapture.h \
     LunaDll/Rendering/SMBXMaskedImage.h \
     LunaDll/SMBXInternal/BaseItemArray.h \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h \
+    LunaDll/Rendering/FFmpeg/FFmpeg.h \
+    LunaDll/Rendering/FFmpeg/FFmpegComponent.h \
+    LunaDll/Rendering/FFmpeg/FFmpegDecodeComponent.h \
+    LunaDll/Rendering/FFmpeg/FFmpegDecodeQueue.h \
+    LunaDll/Rendering/FFmpeg/FFmpegDecoder2.h \
+    LunaDll/Rendering/FFmpeg/FFmpegMedia.h \
+    LunaDll/Rendering/FFmpeg/FFmpegMedia2.h \
+    LunaDll/Rendering/FFmpeg/FFmpegMediaPlayer.h \
+    LunaDll/Rendering/FFmpeg/FFmpegMediaPlayer2.h \
+    LunaDll/Rendering/FFmpeg/FFmpegThread.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -449,5 +460,14 @@ SOURCES += \
     LunaDll/Rendering/BitBltEmulation.cpp \
     LunaDll/Rendering/FrameCapture.cpp \
     LunaDll/Rendering/SMBXMaskedImage.cpp \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegComponent.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegDecodeComponent.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegDecodeQueue.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegDecoder2.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegMedia.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegMedia2.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegMediaPlayer.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegMediaPlayer2.cpp \
+    LunaDll/Rendering/FFmpeg/FFmpegThread.cpp
 
