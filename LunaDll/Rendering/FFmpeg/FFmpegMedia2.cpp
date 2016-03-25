@@ -114,7 +114,7 @@ inline int FFmpegMedia2::loadMedia(std::wstring filepath, AVFormatContext*& dest
 	/* open file */
 	ret = avformat_open_input(
 		&dest,					//get format context
-		WStr2Str(filepath).c_str(), //filepath(cast from wstring to char)
+        WStr2StrA(filepath).c_str(), //filepath(cast from wstring to char)
 		NULL,						//nothing to specify about input format
 		NULL);						//no options
 
@@ -157,7 +157,7 @@ inline bool FFmpegMedia2::openFile(std::wstring filepath, AVFormatContext** dest
 	if (filepath.length() < 1)return false;
 	return avformat_open_input(
 		dest,
-		WStr2Str(filepath).c_str(),
+        WStr2StrA(filepath).c_str(),
 		NULL,
 		NULL) == 0;
 }

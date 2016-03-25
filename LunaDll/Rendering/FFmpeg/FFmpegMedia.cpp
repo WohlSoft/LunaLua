@@ -45,9 +45,9 @@ FFmpegMedia::FFmpegMedia(std::wstring filepath):FFmpegMedia() {
 	int ret = 0;
 
 	/* open file */
-	ret = avformat_open_input(
+    ret = avformat_open_input(
 				&fmtCtx,					//get format context
-				WStr2Str(filepath).c_str(), //filepath(cast from wstring to char)
+                WStr2StrA(filepath).c_str(), //filepath(cast from wstring to char)
 				NULL,						//nothing to specify about input format
 				NULL);						//no options
 
@@ -105,7 +105,7 @@ FFmpegMedia::FFmpegMedia(std::wstring filepath):FFmpegMedia() {
 	std::wstring mainName = extPos == std::wstring::npos ? filepath : filepath.substr(0, extPos);
 	ret = avformat_open_input(
 		&mFmtCtx,					
-		WStr2Str(mainName+L"_m"+ext).c_str(),
+        WStr2StrA(mainName+L"_m"+ext).c_str(),
 		NULL,						
 		NULL);
 	
