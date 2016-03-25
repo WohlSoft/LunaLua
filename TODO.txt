@@ -1,9 +1,11 @@
-
 * Finish up socket debugger (maybe add env sandbox)
 * Finish up hardcode graphics manager (need to research some addresses of item slot border and some HUD images)
 * Implement ability to restore default hardcode images to provide ability use episode/level specific hardcoded images
 * Where SMBX asks ANSI-based paths, force it to use unicode paths (or use relative to SMBX-root path, but then convert full path to unicode. That needed to allow mixed charsets in same path [Example of path with mixed charsets is "C:\_Repos\LunaLUA_bin\Привет\你好"]).
+* Check ffmpeg license
+* Make more optimized ffmpeg binary
 
 DONE:
 * Add a list-function, which list up a folder
 * Fix isAPILoaded (include the overworld code)
+* Support movie textures

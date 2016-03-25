@@ -128,7 +128,7 @@ void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidt
     auto obj = std::make_shared<GLEngineCmd_LunaDrawSprite>();
     obj->mXDest = nXOriginDest;
     obj->mYDest = nYOriginDest;
-    obj->mWidthDest = nWidthDest;
+	obj->mWidthDest = nWidthDest;
     obj->mHeightDest = nHeightDest;
     obj->mXSrc = nXOriginSrc;
     obj->mYSrc = nYOriginSrc;

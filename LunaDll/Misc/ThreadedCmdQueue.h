@@ -35,6 +35,11 @@ public:
 
         while (!mQueue.empty()) mCond.wait(lck);
     }
+
+	inline bool empty() {
+		std::unique_lock<std::mutex> lck(mMutex);
+		return mQueue.empty();
+	}
 };
 
 #endif

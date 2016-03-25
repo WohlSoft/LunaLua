@@ -11,6 +11,36 @@ luabind::object LuaProxy::Warp::get(lua_State* L)
     return LuaHelper::getObjList(::SMBX_Warp::Count(), [](unsigned short i){ return LuaProxy::Warp(i); }, L);
 }
 
+LuaProxy::Warp LuaProxy::Warp::spawn(const luabind::object &value, double entranceX, double entranceY, double exitX, double exitY, lua_State* L)
+{
+	// Currently not use this code. read "LuaProxyGlobalFunctions.cpp".
+	// "LuaProxyNPC.cpp" have same problems.
+
+	if (GM_WARP_COUNT >= 5000) {
+		luaL_error(L, "Over 5000 Warps, cannot spawn more!");
+		return LuaProxy::Warp(-1);
+	}
+
+	LuaProxy::Warp theNewWarp(GM_WARP_COUNT);
+	
+	theNewWarp.setEntranceX(entranceX);
+	theNewWarp.setEntranceY(entranceY);
+	theNewWarp.setExitX(exitX);
+	theNewWarp.setExitY(exitY);
+
+	theNewWarp.mem(0x0E, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, -1), L);
+	theNewWarp.mem(0x10, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, -1), L);
+	theNewWarp.mem(0x2A, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, 16448), L);
+	theNewWarp.mem(0x32, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, 16448), L);
+	theNewWarp.mem(0x32, LuaProxy::L_FIELDTYPE::LFT_STRING, luabind::adl::object(L, "Default"), L);
+
+	++(GM_WARP_COUNT);
+
+	native_updateWarp();
+
+	return theNewWarp;
+}
+
 luabind::object LuaProxy::Warp::getIntersectingEntrance(double x1, double y1, double x2, double y2, lua_State* L)
 {
     return LuaHelper::getObjList(

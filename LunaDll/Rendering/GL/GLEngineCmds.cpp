@@ -4,7 +4,7 @@
 #include "GLDraw.h"
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
-
+#include "../../Globals.h"
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
@@ -70,7 +70,12 @@ void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
     const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     if (tex == NULL) return;
 
-    g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+	//not safe
+
+	const_cast<BMPBox*>(mBmp)->colTest(mXDest, mYDest, mWidthDest, mHeightDest);
+	GLDraw::RenderMode m = mBmp->getAlphaType() == 1 ? GLDraw::RENDER_MODE_S_ALPHA : GLDraw::RENDER_MODE_ALPHA;
+	g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity,m);
+	
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {

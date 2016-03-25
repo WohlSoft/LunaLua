@@ -235,3 +235,9 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
 
     runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock);
 }
+
+
+void LuaProxy::Misc::updateWarp()
+{
+	native_updateWarp();
+}

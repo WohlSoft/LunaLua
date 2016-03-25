@@ -24,5 +24,15 @@ extern "C" {
         return reinterpret_cast<uint32_t*>(reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->getBits());
     }
 
+	FFI_EXPORT(void) LunaLuaSetMovieHitCallback(uintptr_t bmpBoxIntPtr,void(*fn)(int)) {
+		reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->setCallback(fn);
+	}
 
+	FFI_EXPORT(void) LunaLuaSetMovieOnScreenCallback(uintptr_t bmpBoxIntPtr, void(*fn)()) {
+		reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->setOnScreenCallback(fn);
+	}
+
+	FFI_EXPORT(void) LunaLuaSetMovieOffScreenCallback(uintptr_t bmpBoxIntPtr, void(*fn)()) {
+		reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->setOffScreenCallback(fn);
+	}
 }

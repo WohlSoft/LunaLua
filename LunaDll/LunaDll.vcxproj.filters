@@ -513,6 +513,13 @@
     <ClInclude Include="Rendering\GL\GLFramebuffer.h">
       <Filter>Rendering\GL</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\FFmpeg\FFmpegInit.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpeg.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeQueue.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMedia2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeComponent.h" />
     <ClInclude Include="Rendering\FrameCapture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -987,6 +994,11 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp">
       <Filter>Rendering\GL</Filter>
     </ClCompile>
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMedia2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeComponent.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
     </ClCompile>

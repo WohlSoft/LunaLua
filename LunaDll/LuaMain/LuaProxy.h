@@ -183,6 +183,7 @@ namespace LuaProxy {
         bool isProcessing() const;
         bool isFinished() const;
         std::string responseText(lua_State* L) const;
+		std::string responseBody(lua_State* L) const;
         int statusCode(lua_State* L) const;
         
     };
@@ -239,6 +240,7 @@ namespace LuaProxy {
         static luabind::object getIntersectingEntrance(double x1, double y1, double x2, double y2, lua_State* L);
         static luabind::object getIntersectingExit(double x1, double y1, double x2, double y2, lua_State* L);
 
+		LuaProxy::Warp spawn(const luabind::object & value, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
         Warp(int warpIndex);
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
@@ -258,6 +260,9 @@ namespace LuaProxy {
 
         std::string levelFilename();
         void setLevelFilename(const luabind::object &value, lua_State* L);
+
+		//not bound functions
+		void * getNativeAddr() const;
 
         int m_index;
     };
@@ -1158,6 +1163,7 @@ namespace LuaProxy {
     //undocumented
     namespace Native{
         std::string getSMBXPath();
+		std::string getWorldPath();
         void simulateError(short errcode);
     }
     //Debug/Text functions
@@ -1203,19 +1209,56 @@ namespace LuaProxy {
         bool isPausedByLua();
         void warning(const std::string& str);
         void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
+		void updateWarp();
     }
 
     namespace Graphics{
         class LuaImageResource {
         public:
             std::shared_ptr<BMPBox> img;
+			LuaImageResource() :img(nullptr){}
             LuaImageResource(const std::shared_ptr<BMPBox>& img);
             ~LuaImageResource();
             int GetWidth() const;
             int GetHeight() const;
             uintptr_t __BMPBoxPtr();
-
+			void setScaleUpMode(int m);
+			void setScaleDownMode(int m);
         };
+
+		class LuaMovieResource :public LuaImageResource {
+		public:
+			LuaMovieResource() :LuaImageResource() {}
+			LuaMovieResource(const std::shared_ptr<BMPBox>& img):LuaImageResource(img){}
+			//~LuaMovieResource();
+			void play();
+			void stop();
+			void pause();
+			void seek(double sec);
+			void setVideoDelay(double d);
+			double getVideoDelay();
+			void setMaskDelay(double d);
+			double getMaskDelay();
+			void setScaleUpMode(int m);
+			int getScaleUpMode();
+			void setScaleDownMode(int m);
+			int getScaleDownMode();
+			void setOffScreenMode(int m);
+			int getOffScreenMode();
+			void setOnScreenMode(int m);
+			int getOnScreenMode();
+			void setLoop(bool enable);
+			bool getLoop();
+			void setMaskThreshold(int idx,int val);
+			int getMaskThreshold(int idx) const;
+			void setAltAlpha(int ch);
+			int getAltAlpha();
+			void setAlphaType(int mode);
+			int getAlphaType();
+			void setVolume(int v);
+			int getVolume();
+
+		};
         enum RENDER_TYPE {
             RTYPE_IMAGE,
             RTYPE_TEXT
@@ -1228,7 +1271,9 @@ namespace LuaProxy {
         //CSprite functions
         bool loadImage(const std::string&, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
+		std::shared_ptr<BMPBox> loadMedia(const std::string&);
         LuaImageResource* loadImage(const std::string&, lua_State* L);
+		LuaMovieResource* loadMovie(const std::string&, lua_State* L);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
@@ -1247,7 +1292,13 @@ namespace LuaProxy {
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
         void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
+		
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth,double destHeight,double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double destWidth, double destHeight, float opacity, double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, double priority, lua_State* L);
+		void drawImageScaleWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double destWidth, double destHeight, float opacity, double priority, lua_State* L);
+
+		void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
         void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
@@ -1256,7 +1307,8 @@ namespace LuaProxy {
         void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
         void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
         void drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
-        void draw(const luabind::object& namedArgs, lua_State* L);
+		void drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight,double destWidth,double destHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
+		void draw(const luabind::object& namedArgs, lua_State* L);
 
         bool isOpenGLEnabled();
         void glSetTexture(const LuaImageResource* img, uint32_t color);
@@ -1278,12 +1330,13 @@ namespace LuaProxy {
     //Non-Member-Constructors:
     RECT newRECT();
     RECTd newRECTd();
-
-
 #ifdef _MSC_VER //DEPRECATED STUFF
 #pragma region
 #endif
-    //Moved as static functions
+	// AirpLunaLua
+    LuaProxy::BGO spawnBGO(unsigned short id, double x, double y, lua_State * L);
+    LuaProxy::Warp spawnWarp(const luabind::object &, double entranceX, double entranceY, double exitX, double exitY, lua_State * L);
+	//Moved as static functions
     NPC spawnNPC(short npcid, double x, double y, short section, lua_State* L);
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L);
     NPC spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L);
