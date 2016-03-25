@@ -572,8 +572,52 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 	return r;
 }
 
+LuaProxy::BGO LuaProxy::spawnBGO(unsigned short id, double x, double y, lua_State* L)
+{
+	if (GM_BGO_COUNT >= 5000) {
+		luaL_error(L, "Over 5000 BGOs, cannnot spawn more!");
+		return LuaProxy::BGO(-1);
+	}
+	++(GM_BGO_COUNT);
+	LuaProxy::BGO theNewBGO(GM_BGO_COUNT-1);
 
+	theNewBGO.setId(id, L);
+	theNewBGO.setX(x, L);
+	theNewBGO.setY(y, L);
 
+	
+	short start = 1, end = GM_BGO_COUNT;
+	native_bgoSortingRelated(&start, &end);
+	return theNewBGO;
+}
+
+LuaProxy::Warp LuaProxy::spawnWarp(const luabind::object &value , double entranceX, double entranceY, double exitX, double exitY, lua_State* L)
+{
+	if (GM_WARP_COUNT >= 5000) {
+		luaL_error(L, "Over 5000 Warps, cannot spawn more!");
+		return LuaProxy::Warp(-1);
+	}
+
+	LuaProxy::Warp theNewWarp(GM_WARP_COUNT);
+
+	theNewWarp.setEntranceX(entranceX);
+	theNewWarp.setEntranceY(entranceY);
+	theNewWarp.setExitX(exitX);
+	theNewWarp.setExitY(exitY);
+
+	theNewWarp.mem(0x0E, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, -1), L);
+	theNewWarp.mem(0x10, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, -1), L);
+	theNewWarp.mem(0x2A, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, 16448), L);
+	theNewWarp.mem(0x32, LuaProxy::L_FIELDTYPE::LFT_WORD, luabind::adl::object(L, 16448), L);
+	//theNewWarp.mem(0x32, LuaProxy::L_FIELDTYPE::LFT_STRING, luabind::adl::object(L, "Default"), L); <- Crash. Not required?
+
+	native_updateWarp();
+	native_initLevelEnvironment();
+
+	++(GM_WARP_COUNT);
+
+	return theNewWarp;
+}
 
 
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, lua_State* L)

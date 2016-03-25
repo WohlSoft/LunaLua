@@ -52,7 +52,8 @@ public:
         RENDER_MODE_MULTIPLY,
         RENDER_MODE_MAX,
         RENDER_MODE_AND,
-        RENDER_MODE_OR
+        RENDER_MODE_OR,
+		RENDER_MODE_S_ALPHA
     };
 
 public:
@@ -82,7 +83,7 @@ public:
     }
     void DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode);
     void DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight);
-    void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity);
+    void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity,RenderMode mode=RENDER_MODE_ALPHA);
 };
 
 // Instance

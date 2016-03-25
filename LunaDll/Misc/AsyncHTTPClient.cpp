@@ -8,8 +8,8 @@
 
 
 AsyncHTTPClient::AsyncHTTPClient() :
-    m_url(""),
-    m_currentStatus(AsyncHTTPClient::HTTP_READY),
+	m_url(""),
+	m_currentStatus(AsyncHTTPClient::HTTP_READY),
     m_response(""),
     m_responseCode(0)
 {}
@@ -106,10 +106,10 @@ void AsyncHTTPClient::asyncSendWorker()
         m_responseCode = statusCode;
     }
 
-    BSTR responseText = 0;
+	_variant_t responseRaw("");
     if (SUCCEEDED(hr)) {
         if (m_responseCode == 200) {
-            hr = pIWinHttpRequest->get_ResponseText(&responseText);
+			hr = pIWinHttpRequest->get_ResponseBody(&responseRaw);
         }
         else {
             hr = E_FAIL;
@@ -117,7 +117,24 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
     if (SUCCEEDED(hr)) {
-        m_response = ConvertBSTRToMBS(responseText);
+		// body
+		long upperBounds;
+		long lowerBounds;
+		byte* buff;
+		if (responseRaw.vt == (VT_ARRAY | VT_UI1)) {
+			long dims = SafeArrayGetDim(responseRaw.parray);
+
+			if (dims == 1) {
+				SafeArrayGetLBound(responseRaw.parray, 1, &lowerBounds);
+				SafeArrayGetUBound(responseRaw.parray, 1, &upperBounds);
+				upperBounds++;
+
+				SafeArrayAccessData(responseRaw.parray, (void**)&buff);
+				m_response = std::string(reinterpret_cast<const char *>(buff), upperBounds-lowerBounds);
+				SafeArrayUnaccessData(responseRaw.parray);
+			}
+		}
+
     }
 
     m_currentStatus.store(HTTP_FINISHED, std::memory_order_relaxed);

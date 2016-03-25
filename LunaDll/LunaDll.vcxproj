@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
@@ -61,8 +61,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\ffmpeg;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(MSBuildProjectDirectory)\libs\ffmpeg\libavcodec;$(MSBuildProjectDirectory)\libs\ffmpeg\libavformat;$(MSBuildProjectDirectory)\libs\ffmpeg\libavdevice;$(MSBuildProjectDirectory)\libs\ffmpeg\libavutil;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(MSBuildProjectDirectory)\libs\ffmpeg\libswscale;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(MSBuildProjectDirectory)\libs\ffmpeg\libswresample;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,7 +83,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;FreeImage.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2_mixer_ext.lib;SDL2main.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;avcodec.lib;avformat.lib;avdevice.lib;avutil.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -95,7 +95,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <AssemblerOutput>All</AssemblerOutput>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -105,18 +105,26 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <OpenMPSupport>false</OpenMPSupport>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalOptions>/Qpar-report:1 /Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;shlwapi.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;avcodec.lib;avformat.lib;avdevice.lib;avutil.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
@@ -142,7 +150,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;FreeImage.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;Gdiplus.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;comsuppw.lib;opengl32.lib;glew32s.lib;avcodec.lib;avformat.lib;avdevice.lib;avutil.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>MultiplyDefinedSymbolOnly</ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
       <MapExports>true</MapExports>
@@ -152,6 +160,13 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\UniPath.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpeg.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeComponent.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegInit.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMedia2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeQueue.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegMediaPlayer2.h" />
+    <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
@@ -317,6 +332,11 @@
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
     <ClCompile Include="Autocode\Commands\AC_LunaControl.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeComponent.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMedia2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegDecodeQueue.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegMediaPlayer2.cpp" />
+    <ClCompile Include="Rendering\FFmpeg\FFmpegThread.cpp" />
     <ClCompile Include="Rendering\FrameCapture.cpp" />
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />

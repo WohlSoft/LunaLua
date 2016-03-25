@@ -14,7 +14,10 @@ RenderBitmapOp::RenderBitmapOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
     sy(0.0),
     sw(0.0),
     sh(0.0),
+	dw(0.0),
+	dh(0.0),
     opacity(1.0f),
+	scaling(false),
     sceneCoords(false),
     direct_img(nullptr)
 {}
@@ -46,7 +49,9 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     int sy = static_cast<int>(round(this->sy));
     int width = static_cast<int>(round(this->sw));
     int height = static_cast<int>(round(this->sh));
-
+	int dw = static_cast<int>(round(this->dw));
+	int dh = static_cast<int>(round(this->dh));
+	
     // Trim height/width if necessary
     if (direct_img->m_W < width + sx)
     {
@@ -56,9 +61,12 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     {
         height = direct_img->m_H - sy;
     }
-
+	if (!this->scaling) {
+		dw = width; dh = height;
+	}
+	
     // Don't render if no size
-    if ((width <= 0) || (height <= 0))
+    if ((width <= 0) || (height <= 0) || dw<=0 || dh<=0)
     {
         return;
     }
@@ -66,7 +74,7 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     if (g_GLEngine.IsEnabled())
     {
         g_GLEngine.DrawLunaSprite(
-            x, y, width, height,
+            x, y, dw, dh,
             *(direct_img.get()), sx, sy, width, height, opacity);
     }
     else

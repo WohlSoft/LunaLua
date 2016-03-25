@@ -1,5 +1,11 @@
 v0.7.3.1 BETA
   * Added non-ASCII paths support! (LunaLUA-SMBX's root finally can be placed into path with non-ASCII characters. But limit is: don't mix codepages (example: both Russian and Chinese characters in a path, or you will get VB Error "File not found". Same happens on Vanilla SMBX if you have been used non-local characters.))
+  * Added Video support for LuaImageResource. (Required ffmpeg)
+  * Add Misc.updateWarp() from APLib.
+  * Add responseBody properties to AsyncHTTPRequest.
+  * Added Warp.spawn - You can spawn warp point.
+  * Added getWorldPath().
+  * Deprecated Misc.updateWarp, use Warp.spawn.
 
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking

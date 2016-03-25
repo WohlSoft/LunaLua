@@ -14,7 +14,7 @@
 
 #if NORMAL_VER_NUM
 #define LUNALUA_VER_PREFIX   "LUNALUA V"
-#define LUNALUA_VER_SUFFIX   " BETA"
+#define LUNALUA_VER_SUFFIX   " BETA <AIRPLUNALUA>"
 #define LUNALUA_VERSION      LUNALUA_VER_PREFIX LUNALUA_VER_STR LUNALUA_VER_SUFFIX
 #else
 #define LUNALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
@@ -745,6 +745,11 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
+// AirpLunaLua
+#define GF_UPDATE_WARP			0x008F7D70
+#define GF_INIT_ENVIRONMENT		0x009944F0
+#define GF_BGO_SORTINGRELATED	0x00A98C20
+
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
 static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 
@@ -817,6 +822,11 @@ static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
+
+static const auto native_updateWarp = (void(__stdcall *)(void))GF_UPDATE_WARP;
+static const auto native_bgoSortingRelated = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BGO_SORTINGRELATED;
+static const auto native_initLevelEnvironment = (void(__stdcall *)(void))GF_INIT_ENVIRONMENT;
+
 
 /*
 Function name                                
