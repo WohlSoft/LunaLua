@@ -119,6 +119,9 @@
     <Filter Include="Rendering\GL">
       <UniqueIdentifier>{56db33a4-2b5e-4d78-9f38-d622cfc903d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IPC">
+      <UniqueIdentifier>{230f7155-7710-423e-b01c-3c8ae5762ffd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -518,6 +521,9 @@
     </ClInclude>
     <ClInclude Include="Misc\UniPath.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="IPC\IPCPipeServer.h">
+      <Filter>IPC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -995,6 +1001,9 @@
     </ClCompile>
     <ClCompile Include="Misc\UniPath.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="IPC\IPCPipeServer.cpp">
+      <Filter>IPC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
