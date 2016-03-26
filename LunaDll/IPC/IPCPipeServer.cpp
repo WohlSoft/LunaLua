@@ -91,7 +91,7 @@ void IPCPipeServer::ReadThread()
         if ((pkt.find("jsonrpc") == pkt.end()) || (pkt["jsonrpc"] != "2.0") ||
             (pkt.find("method") == pkt.end()) || (!pkt["method"].is_string()) ||
             (pkt.find("id") == pkt.end()) || !(pkt["id"].is_null() || pkt["id"].is_string() || pkt["id"].is_number()) ||
-            ((pkt.find("params") == pkt.end()) && !pkt["params"].is_structured())
+            ((pkt.find("params") != pkt.end()) && !pkt["params"].is_structured())
             )
         {
             SendJsonError(-32600, "Invalid Request");
