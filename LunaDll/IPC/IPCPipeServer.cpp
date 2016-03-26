@@ -109,16 +109,24 @@ void IPCPipeServer::ReadThread()
             // If any exceptions occur, report as internal error
             try {
                 json resultData = cb(pktParams);
-                json replyPkt = {
-                    { "jsonrpc", "2.0" },
-                    { "result", resultData },
-                    { "id", pktId }
-                };
-                SendMsgString(replyPkt.dump());
+
+                // Send reply if id is not null
+                if (!pktId.is_null())
+                {
+                    json replyPkt = {
+                        { "jsonrpc", "2.0" },
+                        { "result", resultData },
+                        { "id", pktId }
+                    };
+                    SendMsgString(replyPkt.dump());
+                }
             }
             catch (std::exception)
             {
-                SendJsonError(-32603, "Internal error");
+                if (!pktId.is_null())
+                {
+                    SendJsonError(-32603, "Internal error");
+                }
             }
             continue;
         }
