@@ -28,6 +28,8 @@
 
 #include "../PerfTracker.h"
 
+#include "../../Misc/TestMode.h"
+
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -1143,4 +1145,30 @@ extern void __stdcall RenderWorldHook()
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();
     gLunaRender.EndFrameRender();
+}
+
+static void runtimeHookSmbxChangeModeHook(void)
+{
+    // Handler for test mode if it's enabled
+    testModeSmbxChangeModeHook();
+}
+
+__declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
+{
+    __asm {
+        pushf
+            push eax
+            push ecx
+            push edx
+    }
+    runtimeHookSmbxChangeModeHook();
+    __asm {
+        pop edx
+            pop ecx
+            pop eax
+            popf
+            or ebx, 0xFFFFFFFF
+            cmp word ptr ds : [0xB2C620], bx
+            ret
+    }
 }

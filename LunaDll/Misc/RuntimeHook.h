@@ -174,5 +174,8 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 
+// Game Mode Handling
+void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
+
 #endif
 

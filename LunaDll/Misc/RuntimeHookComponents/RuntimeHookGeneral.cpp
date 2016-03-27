@@ -469,6 +469,9 @@ void TrySkipPatch()
     //   5: HUD
     PATCH(0x939977).NOP().NOP().CALL(GetRenderBelowPriorityHook<100>()).Apply();
 
+    // Change Mode Hook
+    // Runs when the game starts or the game mode changes.
+    PATCH(0x8BF4E3).CALL(runtimeHookSmbxChangeModeHookRaw).NOP_PAD_TO_SIZE<10>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

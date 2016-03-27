@@ -35,6 +35,7 @@ struct STestModePlayerSettings
 
 struct STestModeSettings
 {
+    bool enabled;
     std::wstring levelPath;
     int playerCount;
     STestModePlayerSettings players[2];
@@ -45,6 +46,7 @@ struct STestModeSettings
     }
     void ResetToDefault(void)
     {
+        enabled = false;
         levelPath = L"";
         playerCount = 1;
         players[0].identity = CHARACTER_MARIO;
@@ -150,7 +152,7 @@ static void testModePauseMenu(bool allowContinue)
 {
     KeyMap lastKeymap = Player::Get(1)->keymap;
     
-    unsigned int selectedOption = 0;
+    int selectedOption = 0;
     std::vector<MenuItem*> menuItems;
     if (allowContinue)
     {
@@ -353,37 +355,18 @@ static void testModeRestartLevel(void)
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
 
-static void smbxChangeModeHook(void)
+void testModeSmbxChangeModeHook(void)
 {
+    // Skip if not enabled
+    if (!testModeSettings.enabled) return;
+
     if (GM_ISLEVELEDITORMODE || GM_CREDITS_MODE || GM_LEVEL_MODE ||
         (GM_EPISODE_MODE && (GM_NEXT_LEVEL_FILENAME.length() == 0)))
     {
+        // Preprate to load/reload
         testModeSetupForLoading();
     }
 }
-static __declspec(naked) void __stdcall smbxChangeModeHookRaw(void)
-{
-    __asm {
-        pushf
-        push eax
-        push ecx
-        push edx
-    }
-    smbxChangeModeHook();
-    __asm {
-        pop edx
-        pop ecx
-        pop eax
-        popf
-        or ebx, 0xFFFFFFFF
-        cmp word ptr ds : [0xB2C620], bx
-        ret
-    }
-}
-static AsmPatch<10U> smbxChangeModePatch =
-    PATCH(0x8BF4E3)
-    .CALL(smbxChangeModeHookRaw)
-    .NOP_PAD_TO_SIZE<10>();
 
 static AsmPatch<10U> shortenReloadPatch =
     PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>();
@@ -425,12 +408,22 @@ bool testModeEnable(const std::wstring& path)
     }
 
     testModeSettings.ResetToDefault();
+    testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
 
-    smbxChangeModePatch.Apply();
     shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
 
     return true;
+}
+
+void testModeDisable(void)
+{
+    testModeSettings.ResetToDefault();
+    testModeSettings.enabled = false;
+
+    shortenReloadPatch.Unapply();
+    playerDeathOverridePatch.Unapply();
+    pauseOverridePatch.Unapply();
 }
