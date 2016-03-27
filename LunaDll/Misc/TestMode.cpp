@@ -153,7 +153,7 @@ static void testModePauseMenu(bool allowContinue)
 {
     KeyMap lastKeymap = Player::Get(1)->keymap;
     
-    int selectedOption = 0;
+    unsigned int selectedOption = 0;
     std::vector<MenuItem*> menuItems;
     if (allowContinue)
     {
@@ -187,8 +187,11 @@ static void testModePauseMenu(bool allowContinue)
 
         if (keymap.downKeyState && !lastKeymap.downKeyState)
         {
-            selectedOption++;
-            if (selectedOption >= menuItems.size())
+            if (selectedOption + 1 < menuItems.size())
+            {
+                selectedOption++;
+            }
+            else
             {
                 selectedOption = 0;
             }
@@ -196,8 +199,11 @@ static void testModePauseMenu(bool allowContinue)
         }
         if (keymap.upKeyState && !lastKeymap.upKeyState)
         {
-            selectedOption--;
-            if (selectedOption < 0)
+            if (selectedOption > 0)
+            {
+                selectedOption--;
+            }
+            else
             {
                 selectedOption = menuItems.size() - 1;
             }
