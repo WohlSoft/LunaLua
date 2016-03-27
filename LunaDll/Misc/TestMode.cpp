@@ -8,6 +8,7 @@
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Rendering/RenderOps/RenderRectOp.h"
+#include "../EventStateMachine.h"
 #include "MiscFuncs.h"
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
@@ -221,26 +222,8 @@ static void testModePauseMenu(bool allowContinue)
             menuItems[i]->Render(menuX, yIdx, selectedOption == i);
         }
 
-        // Render the world
-        native_updateBlockAnim();
-        native_renderLevel();
-    
-        // Audio management...
-        native_audioManagement();
-
-        // Wait for next frame
-        if (gIsWindowsVistaOrNewer) {
-            FrameTimingMaxFPSHookQPC();
-        }
-        else {
-            FrameTimingMaxFPSHook();
-        }
-
-        MSG msg;
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
+        // Render the frame and wait
+        LunaDllRenderAndWaitFrame();
     }
 }
 

@@ -53,4 +53,7 @@ public:
 // Global instance
 extern EventStateMachine g_EventHandler;
 
+// Utility Method 
+void LunaDllRenderAndWaitFrame(void);
+
 #endif
