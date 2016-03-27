@@ -135,6 +135,12 @@ void ParseArgs(const std::vector<std::wstring>& args)
             break;
         }
     }
+
+    if (vecStrFind(args, L"--waitForIPC"))
+    {
+        gStartupSettings.waitForIPC = true;
+        gStartupSettings.patch = true;
+    }
 }
 
 static unsigned int __stdcall LatePatch(void)

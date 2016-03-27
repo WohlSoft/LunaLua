@@ -1149,6 +1149,11 @@ extern void __stdcall RenderWorldHook()
 
 static void runtimeHookSmbxChangeModeHook(void)
 {
+    while (gStartupSettings.waitForIPC)
+    {
+        LunaDllWaitFrame();
+    }
+
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
 }
