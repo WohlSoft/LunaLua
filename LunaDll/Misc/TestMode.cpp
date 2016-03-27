@@ -430,20 +430,76 @@ void testModeDisable(void)
 
 // IPC Command
 json IPCTestLevel(const json& params)
-{    
+{
     if (!params.is_object()) throw IPCInvalidParams();
-    if ((params.find("filename") == params.end()) || (!params["filename"].is_string())) throw IPCInvalidParams();
-    std::wstring filename = Str2WStr(params["filename"]);
+    json::const_iterator filenameIt = params.find("filename");
+    if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
+
+    // Get character/player information
+    STestModeSettings settings;
+    settings.enabled = true;
+    settings.levelPath = Str2WStr(filenameIt.value());
+
+    json::const_iterator playersIt = params.find("players");
+    if (playersIt != params.cend())
+    {
+        const json& players = playersIt.value();
+        if (!players.is_array()) throw IPCInvalidParams();
+        if (players.size() < 1 || players.size() > 2) throw IPCInvalidParams();
+        settings.playerCount = players.size();
+
+        int i = 0;
+        for (json::const_iterator playersIt = players.cbegin(); playersIt != players.cend(); playersIt++, i++) {
+            const json& player = playersIt.value();
+            STestModePlayerSettings& playerSettings = settings.players[i];
+            if (!player.is_object()) throw IPCInvalidParams();
+
+            // Set character
+            json::const_iterator characterIt = player.find("character");
+            if (characterIt != player.cend())
+            {
+                if (!characterIt.value().is_number_integer()) throw IPCInvalidParams();
+                short characterInt = static_cast<short>(characterIt.value());
+                playerSettings.identity = static_cast<Characters>(characterInt);
+            }
+            
+            // Set powerup
+            json::const_iterator powerupIt = player.find("powerup");
+            if (powerupIt != player.cend())
+            {
+                if (!powerupIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.powerup = static_cast<short>(powerupIt.value());
+            }
+
+            // Set mountType
+            json::const_iterator mountTypeIt = player.find("mountType");
+            if (mountTypeIt != player.cend())
+            {
+                if (!mountTypeIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.mountType = static_cast<short>(mountTypeIt.value());
+            }
+
+            // Set mountColor
+            json::const_iterator mountColorIt = player.find("mountColor");
+            if (mountColorIt != player.cend())
+            {
+                if (!mountColorIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.mountColor = static_cast<short>(mountColorIt.value());
+            }
+        }
+    }
 
     {
         // Make sure we're at a tick end
         WaitForTickEnd tickEndLock;
 
         // Attempt to enable the test
-        if (!testModeEnable(filename))
+        if (!testModeEnable(settings.levelPath))
         {
             return false;
         }
+        settings.levelPath = testModeSettings.levelPath;
+        testModeSettings = settings;
         testModeRestartLevel();
 
         // If we were waiting on IPC, stop waiting
