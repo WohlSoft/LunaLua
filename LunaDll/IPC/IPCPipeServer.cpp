@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <io.h>
-#include "../Defines.h"
-#include "../Globals.h"
-#include "IPCPipeServer.h"
-#include "../libs/json/json.hpp"
-
 #include <thread>
 #include <iostream>
 #include <sstream>
 #include <exception>
+#include "../Defines.h"
+#include "../Globals.h"
+#include "IPCPipeServer.h"
+#include "../libs/json/json.hpp"
 
 using json = nlohmann::json;
 
@@ -120,17 +119,24 @@ void IPCPipeServer::ReadThread()
                     });
                 }
             }
+            catch (IPCInvalidParams)
+            {
+                if (!pktId.is_null())
+                {
+                    SendJsonError(-32602, "Invalid params", pktId);
+                }
+            }
             catch (std::exception)
             {
                 if (!pktId.is_null())
                 {
-                    SendJsonError(-32603, "Internal error");
+                    SendJsonError(-32603, "Internal error", pktId);
                 }
             }
             continue;
         }
 
-        SendJsonError(-32601, "Method not found");
+        SendJsonError(-32601, "Method not found", pktId);
     }
 }
 
@@ -224,16 +230,16 @@ std::string IPCPipeServer::ReadMsgString()
     }
 }
 
-json IPCPipeServer::MakeJsonError(int errCode, const std::string& errStr)
+json IPCPipeServer::MakeJsonError(int errCode, const std::string& errStr, const json& id)
 {
     return {
         { "jsonrpc", "2.0" },
         { "error",{ { "code", errCode },{ "message", errStr } } },
-        { "id", nullptr }
+        { "id", id }
     };
 }
 
-void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr)
+void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr, const json& id)
 {
-    SendMsg(MakeJsonError(errCode, errStr));
+    SendMsg(MakeJsonError(errCode, errStr, id));
 }
