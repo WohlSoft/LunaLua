@@ -525,6 +525,9 @@
     <ClInclude Include="IPC\IPCPipeServer.h">
       <Filter>IPC</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\WaitForTickEnd.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1004,6 +1007,9 @@
     </ClCompile>
     <ClCompile Include="IPC\IPCPipeServer.cpp">
       <Filter>IPC</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\WaitForTickEnd.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

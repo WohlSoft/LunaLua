@@ -153,6 +153,7 @@
     <ClInclude Include="IPC\IPCPipeServer.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\UniPath.h" />
+    <ClInclude Include="Misc\WaitForTickEnd.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
@@ -295,6 +296,7 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
     <ClCompile Include="Misc\UniPath.cpp" />
+    <ClCompile Include="Misc\WaitForTickEnd.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />

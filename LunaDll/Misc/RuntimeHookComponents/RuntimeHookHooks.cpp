@@ -29,6 +29,7 @@
 #include "../PerfTracker.h"
 
 #include "../../Misc/TestMode.h"
+#include "../../Misc/WaitForTickEnd.h"
 
 
 // Simple init hook to run the main LunaDLL initialization
@@ -732,6 +733,7 @@ extern void SetSMBXFrameTiming(double ms)
 
 extern void __stdcall FrameTimingHookQPC()
 {
+    WaitForTickEnd::RunQueued();
     g_PerfTracker.endFrame();
     static int64_t lastFrameTime = 0;
     static double frameError = 0.0;
@@ -806,7 +808,11 @@ extern void __stdcall FrameTimingHookQPC()
 extern void __stdcall FrameTimingMaxFPSHookQPC()
 {
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
-    if (GM_MAX_FPS_MODE) return;
+    if (GM_MAX_FPS_MODE)
+    {
+        WaitForTickEnd::RunQueued();
+        return;
+    }
 
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHookQPC();
@@ -814,6 +820,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
 
 extern void __stdcall FrameTimingHook()
 {
+    WaitForTickEnd::RunQueued();
     g_PerfTracker.endFrame();
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
@@ -870,7 +877,11 @@ extern void __stdcall FrameTimingHook()
 extern void __stdcall FrameTimingMaxFPSHook()
 {
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
-    if (GM_MAX_FPS_MODE) return;
+    if (GM_MAX_FPS_MODE)
+    {
+        WaitForTickEnd::RunQueued();
+        return;
+    }
 
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHook();
