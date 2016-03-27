@@ -9,8 +9,10 @@ class IPCPipeServer
 private:
     void ReadThread();
 
+    void IPCPipeServer::SendMsg(const nlohmann::json& pkt);
     void SendMsgString(const std::string& pkt);
     std::string ReadMsgString();
+    nlohmann::json IPCPipeServer::MakeJsonError(int errCode, const std::string& errStr);
     void SendJsonError(int errCode, const std::string& errStr);
 
 public:

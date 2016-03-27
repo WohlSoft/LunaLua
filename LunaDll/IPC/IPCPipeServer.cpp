@@ -113,12 +113,11 @@ void IPCPipeServer::ReadThread()
                 // Send reply if id is not null
                 if (!pktId.is_null())
                 {
-                    json replyPkt = {
+                    SendMsg({
                         { "jsonrpc", "2.0" },
                         { "result", resultData },
                         { "id", pktId }
-                    };
-                    SendMsgString(replyPkt.dump());
+                    });
                 }
             }
             catch (std::exception)
@@ -133,6 +132,13 @@ void IPCPipeServer::ReadThread()
 
         SendJsonError(-32601, "Method not found");
     }
+}
+
+void IPCPipeServer::SendMsg(const json& pkt)
+{
+    if (mOutFD == -1) return;
+
+    SendMsgString(pkt.dump());
 }
 
 // Sends a string message to the pipe, in "netstring" encoding as defined http://cr.yp.to/proto/netstrings.txt
@@ -218,12 +224,16 @@ std::string IPCPipeServer::ReadMsgString()
     }
 }
 
-void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr)
+json IPCPipeServer::MakeJsonError(int errCode, const std::string& errStr)
 {
-    json err = {
+    return {
         { "jsonrpc", "2.0" },
         { "error",{ { "code", errCode },{ "message", errStr } } },
         { "id", nullptr }
     };
-    SendMsgString(err.dump());
+}
+
+void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr)
+{
+    SendMsg(MakeJsonError(errCode, errStr));
 }
