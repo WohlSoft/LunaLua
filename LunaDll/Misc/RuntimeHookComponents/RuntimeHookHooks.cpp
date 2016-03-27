@@ -746,6 +746,9 @@ extern void __stdcall FrameTimingHookQPC()
         LARGE_INTEGER sFreqStruct;
         QueryPerformanceFrequency(&sFreqStruct);
         qpcFactor = 1000.0 / sFreqStruct.QuadPart;
+        if (qpcFactor > 1.0) {
+            qpcFactor = 0.0;
+        }
     }
 
     // Get the desired duration for this frame
@@ -753,7 +756,7 @@ extern void __stdcall FrameTimingHookQPC()
 
     QueryPerformanceCounter(&currentTime);
     frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
-    if (lastFrameTime == 0 || frameTime > 100.0) {
+    if (qpcFactor == 0.0 || lastFrameTime == 0 || frameTime > 100.0) {
         // If we've lost track of time, synchronize with scheduler because it turns out if we
         // call Sleep at the wrong time Windows likes to eat too much CPU during the Sleep call.
         // Yeah. This is weird.
