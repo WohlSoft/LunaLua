@@ -53,8 +53,8 @@ void IPCPipeServer::AttachStdinStdout() {
         }
     }
 
-    // If we have both streams, start the read thread
-    if ((mOutFD != -1) && (mOutFD != -1))
+    // If we have an input stream, start the thread
+    if (mInFD != -1)
     {
         std::thread* readThread = new std::thread([this]() {
             this->ReadThread();
@@ -141,6 +141,8 @@ void IPCPipeServer::SendMsgString(const std::string& pkt)
     // Note: This is not written to be particularly efficient right now. Just
     //       readable enough and safe.
 
+    if (mOutFD == -1) return;
+
     std::ostringstream pktStringStream;
     pktStringStream << pkt.length() << ":" << pkt << ",";
 
@@ -154,6 +156,9 @@ std::string IPCPipeServer::ReadMsgString()
 {
     // Note: This is not written to be particularly efficient right now. Just
     //       readable enough and safe.
+
+    if (mInFD == -1) return "";
+
     char c;
     std::vector<char> data;
     while (1)
