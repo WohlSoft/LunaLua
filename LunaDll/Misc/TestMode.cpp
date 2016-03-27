@@ -27,6 +27,14 @@ static void testModePauseMenu(bool allowContinue);
 static bool testModeSetupForLoading();
 static void testModeRestartLevel(void);
 
+///////////////////////////////////////////////
+//============== UTILITY PATCH ==============//
+///////////////////////////////////////////////
+
+// Patch to allow exiting the pause menu. Apply when the vanilla pause/textbox
+// should be instantly exited always. Unapply when this should not be the case.
+static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
+
 //////////////////////////////////////////////
 //================ SETTINGS ================//
 //////////////////////////////////////////////
@@ -317,6 +325,9 @@ static bool testModeSetupForLoading()
     GM_EPISODE_MODE = -1;
     GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
 
+    // Unapply exit pause patch
+    exitPausePatch.Unapply();
+
     return true;
 }
 
@@ -324,6 +335,13 @@ static void testModeRestartLevel(void)
 {
     // Start by stopping any Lua things
     gLunaLua.exitLevel();
+
+    // Make sure we unpause
+    exitPausePatch.Apply();
+    GM_STR_MSGBOX = "";
+    GM_PAUSE_OPEN = 0;
+    GM_CUR_MENUCHOICE = 0;
+    GM_CUR_MENUTYPE = 0;
 
     // Exit level with no destination set
     GM_ISLEVELEDITORMODE = 0;
@@ -496,6 +514,7 @@ void testModeDisable(void)
     shortenReloadPatch.Unapply();
     playerDeathOverridePatch.Unapply();
     pauseOverridePatch.Unapply();
+    exitPausePatch.Unapply();
 }
 
 // IPC Command
