@@ -130,7 +130,9 @@ void ParseArgs(const std::vector<std::wstring>& args)
         const std::wstring& arg = args[i];
         if (arg.find(L"--testLevel=") == 0)
         {
-            testModeEnable(arg.substr(12));
+            STestModeSettings settings;
+            settings.levelPath = arg.substr(12);
+            testModeEnable(settings);
             gStartupSettings.patch = true;
             break;
         }

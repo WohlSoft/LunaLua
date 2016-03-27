@@ -31,40 +31,24 @@ static void testModeRestartLevel(void);
 //================ SETTINGS ================//
 //////////////////////////////////////////////
 
-struct STestModePlayerSettings
+STestModeSettings::STestModeSettings()
 {
-    Characters identity;
-    short powerup;
-    short mountType;
-    short mountColor;
-};
-
-struct STestModeSettings
+    ResetToDefault();
+}
+void STestModeSettings::ResetToDefault(void)
 {
-    bool enabled;
-    std::wstring levelPath;
-    int playerCount;
-    STestModePlayerSettings players[2];
-
-    STestModeSettings()
-    {
-        ResetToDefault();
-    }
-    void ResetToDefault(void)
-    {
-        enabled = false;
-        levelPath = L"";
-        playerCount = 1;
-        players[0].identity = CHARACTER_MARIO;
-        players[0].powerup = 1;
-        players[0].mountType = 0;
-        players[0].mountColor = 0;
-        players[1].identity = CHARACTER_LUIGI;
-        players[1].powerup = 1;
-        players[1].mountType = 0;
-        players[1].mountColor = 0;
-    }
-};
+    enabled = false;
+    levelPath = L"";
+    playerCount = 1;
+    players[0].identity = CHARACTER_MARIO;
+    players[0].powerup = 1;
+    players[0].mountType = 0;
+    players[0].mountColor = 0;
+    players[1].identity = CHARACTER_LUIGI;
+    players[1].powerup = 1;
+    players[1].mountType = 0;
+    players[1].mountColor = 0;
+}
 
 static STestModeSettings testModeSettings;
 
@@ -389,9 +373,10 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-bool testModeEnable(const std::wstring& path)
+bool testModeEnable(const STestModeSettings& settings)
 {
     // Get the full path if necessary
+    std::wstring path = settings.levelPath;
     std::wstring fullPath;
     if (isAbsolutePath(path)) {
         fullPath = path;
@@ -420,7 +405,7 @@ bool testModeEnable(const std::wstring& path)
 
 void testModeDisable(void)
 {
-    testModeSettings.ResetToDefault();
+    testModeSettings = settings;
     testModeSettings.enabled = false;
 
     shortenReloadPatch.Unapply();
@@ -494,12 +479,10 @@ json IPCTestLevel(const json& params)
         WaitForTickEnd tickEndLock;
 
         // Attempt to enable the test
-        if (!testModeEnable(settings.levelPath))
+        if (!testModeEnable(settings))
         {
             return false;
         }
-        settings.levelPath = testModeSettings.levelPath;
-        testModeSettings = settings;
         testModeRestartLevel();
 
         // If we were waiting on IPC, stop waiting
