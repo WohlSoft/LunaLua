@@ -50,15 +50,6 @@ void LunaDllRenderAndWaitFrame(void)
     }
 
     LunaDllProcessWindowsMessageQueue();
-
-    if (gIsWindowsVistaOrNewer) {
-        FrameTimingMaxFPSHookQPC();
-    }
-    else {
-        FrameTimingMaxFPSHook();
-    }
-
-    LunaDllProcessWindowsMessageQueue();
 }
 
 // Public methods (Notifications of State)
