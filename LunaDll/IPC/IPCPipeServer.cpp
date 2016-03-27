@@ -104,39 +104,43 @@ void IPCPipeServer::ReadThread()
         const auto it = mCallbacks.find(pktMethod);
         if (it != mCallbacks.cend()) {
             IPCCallback cb = (*it).second;
-
-            // If any exceptions occur, report as internal error
-            try {
-                json resultData = cb(pktParams);
-
-                // Send reply if id is not null
-                if (!pktId.is_null())
-                {
-                    SendMsg({
-                        { "jsonrpc", "2.0" },
-                        { "result", resultData },
-                        { "id", pktId }
-                    });
-                }
-            }
-            catch (IPCInvalidParams)
-            {
-                if (!pktId.is_null())
-                {
-                    SendJsonError(-32602, "Invalid params", pktId);
-                }
-            }
-            catch (std::exception)
-            {
-                if (!pktId.is_null())
-                {
-                    SendJsonError(-32603, "Internal error", pktId);
-                }
-            }
+            RunCallback(cb, pktParams, pktId);
             continue;
         }
 
         SendJsonError(-32601, "Method not found", pktId);
+    }
+}
+
+void IPCPipeServer::RunCallback(IPCCallback cb, const nlohmann::json& params, const nlohmann::json& id)
+{
+    // If any exceptions occur, report as internal error
+    try {
+        json resultData = cb(params);
+
+        // Send reply if id is not null
+        if (!id.is_null())
+        {
+            SendMsg({
+                { "jsonrpc", "2.0" },
+                { "result", resultData },
+                { "id", id }
+            });
+        }
+    }
+    catch (IPCInvalidParams)
+    {
+        if (!id.is_null())
+        {
+            SendJsonError(-32602, "Invalid params", id);
+        }
+    }
+    catch (std::exception)
+    {
+        if (!id.is_null())
+        {
+            SendJsonError(-32603, "Internal error", id);
+        }
     }
 }
 

@@ -7,8 +7,13 @@
 
 class IPCPipeServer
 {
+public:
+    typedef nlohmann::json(*IPCCallback)(const nlohmann::json& params);
+
 private:
     void ReadThread();
+
+    void RunCallback(IPCCallback cb, const nlohmann::json& params, const nlohmann::json& id);
 
     void IPCPipeServer::SendMsg(const nlohmann::json& pkt);
     void SendMsgString(const std::string& pkt);
@@ -17,8 +22,6 @@ private:
     void SendJsonError(int errCode, const std::string& errStr, const nlohmann::json& id = nullptr);
 
 public:
-    typedef nlohmann::json(*IPCCallback)(const nlohmann::json& params);
-
     IPCPipeServer();
     ~IPCPipeServer();
 
