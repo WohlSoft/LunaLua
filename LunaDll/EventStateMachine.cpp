@@ -40,6 +40,11 @@ void LunaDllRenderAndWaitFrame(void)
     // Audio management...
     native_audioManagement();
 
+    LunaDllWaitFrame();
+}
+
+void LunaDllWaitFrame(void)
+{
     LunaDllProcessWindowsMessageQueue();
 
     if (gIsWindowsVistaOrNewer) {
