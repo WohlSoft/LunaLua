@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <string>
+#include "../../libs/json/json.hpp"
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
@@ -9,10 +10,14 @@
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Rendering/RenderOps/RenderRectOp.h"
 #include "../EventStateMachine.h"
+#include "../IPC/IPCPipeServer.h"
 #include "MiscFuncs.h"
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
+#include "WaitForTickEnd.h"
 #include "TestMode.h"
+
+using json = nlohmann::json;
 
 /////////////////////////////////////////////
 //================ DEFINES ================//
@@ -230,11 +235,14 @@ static void testModePauseMenu(bool allowContinue)
 
         // Render the frame and wait
         LunaDllRenderAndWaitFrame();
+
+        // Exit pause if we're trying to switch
+        if (GM_EPISODE_MODE) break;
     }
 }
 
 /////////////////////////////////////////////
-//============ GAME MODE sETUP ============//
+//============ GAME MODE SETUP ============//
 /////////////////////////////////////////////
 
 static bool testModeSetupForLoading()
@@ -329,6 +337,9 @@ static bool testModeSetupForLoading()
 
 static void testModeRestartLevel(void)
 {
+    // Start by stopping any Lua things
+    gLunaLua.exitLevel();
+
     // Exit level with no destination set
     GM_ISLEVELEDITORMODE = 0;
     GM_CREDITS_MODE = 0;
@@ -415,4 +426,28 @@ void testModeDisable(void)
     shortenReloadPatch.Unapply();
     playerDeathOverridePatch.Unapply();
     pauseOverridePatch.Unapply();
+}
+
+// IPC Command
+json IPCTestLevel(const json& params)
+{    
+    if (!params.is_object()) throw IPCInvalidParams();
+    if ((params.find("filename") == params.end()) || (!params["filename"].is_string())) throw IPCInvalidParams();
+    std::wstring filename = Str2WStr(params["filename"]);
+
+    {
+        // Make sure we're at a tick end
+        WaitForTickEnd tickEndLock;
+
+        // Attempt to enable the test
+        if (!testModeEnable(filename))
+        {
+            return false;
+        }
+        testModeRestartLevel();
+
+        // If we were waiting on IPC, stop waiting
+        gStartupSettings.waitForIPC = false;
+    }
+    return true;
 }

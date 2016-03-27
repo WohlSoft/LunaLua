@@ -62,6 +62,9 @@ void CLunaLua::exitLevel()
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
+
+        // Don't be paused by Lua
+        g_EventHandler.requestUnpause();
     }
 }
 

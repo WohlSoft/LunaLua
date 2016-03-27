@@ -17,10 +17,14 @@ static json echoMethod(const json& params)
     return params;
 }
 
+// Method prototypes
+json IPCTestLevel(const json& params);
+
 IPCPipeServer::IPCPipeServer() :
     mOutFD(-1), mInFD(-1)
 {
     RegisterMethod("echo", echoMethod);
+    RegisterMethod("testLevel", IPCTestLevel);
 }
 
 IPCPipeServer::~IPCPipeServer()
