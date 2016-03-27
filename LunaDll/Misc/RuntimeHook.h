@@ -176,6 +176,8 @@ void runtimeHookCharacterIdReset();
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
+void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename);
+void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
 
 #endif
 

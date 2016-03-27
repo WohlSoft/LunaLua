@@ -2,6 +2,7 @@
 #define TestMode_hhhh
 
 #include <string>
+#include "VB6StrPtr.h"
 
 struct STestModePlayerSettings
 {
@@ -15,6 +16,7 @@ struct STestModeSettings
 {
     bool enabled;
     std::wstring levelPath;
+    std::string levelData;
     int playerCount;
     STestModePlayerSettings players[2];
 
@@ -26,5 +28,6 @@ bool testModeEnable(const STestModeSettings& settings);
 void testModeDisable(void);
 
 void testModeSmbxChangeModeHook(void);
+bool testModeLoadLevelHook(VB6StrPtr* filename);
 
 #endif

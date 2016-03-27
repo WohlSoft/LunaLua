@@ -39,6 +39,7 @@ void STestModeSettings::ResetToDefault(void)
 {
     enabled = false;
     levelPath = L"";
+    levelData = "";
     playerCount = 1;
     players[0].identity = CHARACTER_MARIO;
     players[0].powerup = 1;
@@ -339,6 +340,90 @@ static void testModeRestartLevel(void)
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
 
+// Utility function to create a temporary file and write data to it. The
+// filename is returned if successful, or an empty string if unsuccessful.
+static std::wstring WriteTemporaryFile(const std::string& data)
+{
+    wchar_t tempPath[MAX_PATH];
+    wchar_t tempFileName[MAX_PATH];
+
+    // Get a temporary file allocated, first try to use the temporary path
+    // specified by Windows, but if this fails, we can also try the application
+    // path.
+    uint32_t pathRet = GetTempPathW(MAX_PATH, tempPath);
+    uint32_t tempNameRet = 0;
+    if (pathRet < MAX_PATH-14 && pathRet != 0)
+    {
+        tempNameRet = GetTempFileNameW(tempPath, L"LunaLevel", 0, tempFileName);
+    }
+    if (tempNameRet == 0)
+    {
+        tempNameRet = GetTempFileNameW(gAppPathWCHAR.c_str(), L"LunaLevel", 0, tempFileName);
+    }
+    if (tempNameRet == 0)
+    {
+        return L"";
+    }
+
+    FILE* file = nullptr;
+    if (_wfopen_s(&file, tempFileName, L"wb") != 0)
+    {
+        DeleteFileW(tempFileName);
+        return L"";
+    }
+
+    if (fwrite(data.c_str(), 1, data.size(), file) != data.size())
+    {
+        fclose(file);
+        DeleteFileW(tempFileName);
+        return L"";
+    }
+
+    fclose(file);
+    return tempFileName;
+}
+
+static VB6StrPtr temporaryLevelFn;
+void __stdcall testModeVbaFileOpenHook(DWORD arg1, DWORD arg2, DWORD arg3, BSTR* filename)
+{
+    auto vbaFileOpenPtr = (void(__stdcall *)(DWORD, DWORD, DWORD, BSTR*))IMP_vbaFileOpen;
+
+    vbaFileOpenPtr(arg1, arg2, arg3, (BSTR*)temporaryLevelFn.ptr);
+}
+
+bool testModeLoadLevelHook(VB6StrPtr* filename)
+{
+    // Skip if not enabled
+    if (!testModeSettings.enabled) return false;
+    
+    // If the filename matches the one we're testing, and we have raw level data, let's use it
+    if (*filename == testModeSettings.levelPath && testModeSettings.levelData.size() > 0)
+    {
+        auto testModeVbaFileOpenHookPatch = PATCH(0x8D97D1).CALL(testModeVbaFileOpenHook).NOP_PAD_TO_SIZE<6>();
+
+        // Create a temporary file with the level data
+        std::wstring tempFile = WriteTemporaryFile(testModeSettings.levelData).c_str();
+        if (tempFile.size() == 0)
+        {
+            dbgboxA("Could not write temporary file!");
+            return false;
+        }
+        
+        // Load level with data from the temporary file
+        temporaryLevelFn = tempFile;
+        testModeVbaFileOpenHookPatch.Apply();
+        loadLevel_OrigFunc(filename);
+        testModeVbaFileOpenHookPatch.Unapply();
+
+        // Delete the temporary file
+        DeleteFileW(tempFile.c_str());
+
+        return true;
+    }
+
+    return false;
+}
+
 void testModeSmbxChangeModeHook(void)
 {
     // Skip if not enabled
@@ -392,7 +477,7 @@ bool testModeEnable(const STestModeSettings& settings)
         return false;
     }
 
-    testModeSettings.ResetToDefault();
+    testModeSettings = settings;
     testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
 
@@ -405,7 +490,7 @@ bool testModeEnable(const STestModeSettings& settings)
 
 void testModeDisable(void)
 {
-    testModeSettings = settings;
+    testModeSettings.ResetToDefault();
     testModeSettings.enabled = false;
 
     shortenReloadPatch.Unapply();
@@ -472,6 +557,13 @@ json IPCTestLevel(const json& params)
                 playerSettings.mountColor = static_cast<short>(mountColorIt.value());
             }
         }
+    }
+
+    json::const_iterator levelDataIt = params.find("leveldata");
+    if (levelDataIt != params.cend() && !levelDataIt.value().is_null())
+    {
+        if (!levelDataIt.value().is_string()) throw IPCInvalidParams();
+        settings.levelData = static_cast<const std::string&>(levelDataIt.value()); 
     }
 
     {

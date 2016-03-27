@@ -568,6 +568,7 @@ DEFMEM(IMP_vbaStrCmp,       void*, 0x004010F8); // Ptr to __stdcall
 DEFMEM(IMP_vbaStrCopy,      void*, 0x004011b0); // Ptr to __fastcall
 DEFMEM(IMP_vbaFreeStr,      void*, 0x00401248); // Ptr to __fastcall
 DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
+DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 ////////////////////////
 ///    -Functions-   ///

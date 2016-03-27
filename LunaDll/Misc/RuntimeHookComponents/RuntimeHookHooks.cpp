@@ -1191,3 +1191,25 @@ __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
             ret
     }
 }
+
+_declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x08D8F46
+        RET
+    }
+}
+
+void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
+{
+    if (testModeLoadLevelHook(filename))
+    {
+        // If handled by testModeLoadLevelHook, skip
+        return;
+    }
+    
+    loadLevel_OrigFunc(filename);
+}

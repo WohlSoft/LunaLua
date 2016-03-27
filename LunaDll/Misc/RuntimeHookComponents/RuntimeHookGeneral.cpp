@@ -481,6 +481,9 @@ void TrySkipPatch()
     // Runs when the game starts or the game mode changes.
     PATCH(0x8BF4E3).CALL(runtimeHookSmbxChangeModeHookRaw).NOP_PAD_TO_SIZE<10>().Apply();
 
+    // Load level hook
+    PATCH(0x8D8F40).JMP(runtimeHookLoadLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
