@@ -242,8 +242,8 @@ static bool testModeSetupForLoading()
 {
     const std::wstring& path = testModeSettings.levelPath;
 
-    // Check that the file exists
-    if (FileExists(path.c_str()) == 0)
+    // Check that the file exists, but only if we don't have raw level data
+    if ((testModeSettings.levelData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
         return false;
     }
@@ -489,8 +489,8 @@ bool testModeEnable(const STestModeSettings& settings)
         fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
     }
 
-    // Check that the file exists
-    if (FileExists(fullPath.c_str()) == 0)
+    // Check that the file exists, but only if we don't have raw level data
+    if ((settings.levelData.size() == 0) && (FileExists(fullPath.c_str()) == 0))
     {
         return false;
     }
