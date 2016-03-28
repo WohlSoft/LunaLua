@@ -350,11 +350,14 @@ json IPCTestLevel(const json& params)
     json::const_iterator filenameIt = params.find("filename");
     if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
 
-    // Get character/player information
-    STestModeSettings settings;
+    // Default to the last settings for characters, if not changed by IPC
+    // command
+    STestModeSettings settings = testModeSettings;
     settings.enabled = true;
+    settings.levelData = "";
     settings.levelPath = Str2WStr(filenameIt.value());
 
+    // Get character/player information
     json::const_iterator playersIt = params.find("players");
     if (playersIt != params.cend())
     {
