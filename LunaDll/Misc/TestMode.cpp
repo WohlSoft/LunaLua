@@ -51,6 +51,15 @@ void STestModeSettings::ResetToDefault(void)
 
 static STestModeSettings testModeSettings;
 
+STestModeSettings getTestModeSettings()
+{
+    return testModeSettings;
+}
+void setTestModeSettings(const STestModeSettings& settings)
+{
+    testModeSettings = settings;
+}
+
 /////////////////////////////////////////////
 //============ GAME MODE SETUP ============//
 /////////////////////////////////////////////
