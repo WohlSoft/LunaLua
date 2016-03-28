@@ -152,6 +152,7 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="IPC\IPCPipeServer.h" />
     <ClInclude Include="Misc\TestMode.h" />
+    <ClInclude Include="Misc\TestModeMenu.h" />
     <ClInclude Include="Misc\UniPath.h" />
     <ClInclude Include="Misc\WaitForTickEnd.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
@@ -295,6 +296,7 @@
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
+    <ClCompile Include="Misc\TestModeMenu.cpp" />
     <ClCompile Include="Misc\UniPath.cpp" />
     <ClCompile Include="Misc\WaitForTickEnd.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />

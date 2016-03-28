@@ -26,8 +26,13 @@ struct STestModeSettings
 
 bool testModeEnable(const STestModeSettings& settings);
 void testModeDisable(void);
+void testModeRestartLevel(void);
 
 void testModeSmbxChangeModeHook(void);
 bool testModeLoadLevelHook(VB6StrPtr* filename);
+
+// The following function decleration is not included in this header, to
+// avoid applying a json.hpp dependency to this header.
+//   json IPCTestLevel(const json& params)
 
 #endif

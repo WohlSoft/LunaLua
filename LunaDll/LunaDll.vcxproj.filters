@@ -528,6 +528,9 @@
     <ClInclude Include="Misc\WaitForTickEnd.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\TestModeMenu.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -779,9 +782,6 @@
     <ClCompile Include="libs\stackwalker\StackWalker.cpp">
       <Filter>libs\stackwalker</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
-      <Filter>Misc\RuntimeHookComponents</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncLevel.cpp">
       <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
@@ -1009,6 +1009,12 @@
       <Filter>IPC</Filter>
     </ClCompile>
     <ClCompile Include="Misc\WaitForTickEnd.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
+      <Filter>Misc\RuntimeHookUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\TestModeMenu.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
