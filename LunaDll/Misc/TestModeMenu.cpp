@@ -6,6 +6,9 @@
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Rendering/RenderOps/RenderRectOp.h"
+#include "../Rendering/RenderOps/RenderSpriteOp.h"
+#include "../Rendering/SMBXMaskedImage.h"
+#include "../SMBXInternal/CustomGraphics.h"
 
 #include "TestMode.h"
 #include "TestModeMenu.h"
@@ -19,7 +22,7 @@ class MenuItem
 public:
     MenuItem() {};
     virtual ~MenuItem() {};
-    virtual void Render(float x, float y, bool selected) = 0;
+    virtual float Render(float x, float y, bool selected) = 0;
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) = 0;
 };
 class TextMenuItem : public virtual MenuItem
@@ -32,7 +35,7 @@ public:
     {};
     virtual ~TextMenuItem() {};
     virtual std::wstring GetText() = 0;
-    virtual void Render(float x, float y, bool selected)
+    virtual float Render(float x, float y, bool selected)
     {
         if (selected && renderCounter < 20) {
             gLunaRender.AddOp(new RenderStringOp(L">", 4, x, y));
@@ -40,6 +43,7 @@ public:
         gLunaRender.AddOp(new RenderStringOp(GetText(), 4, x + 20, y));
 
         renderCounter = (renderCounter + 1) % 40;
+        return 20.0f;
     }
 };
 class RunnableMenuItem : public virtual MenuItem
@@ -70,7 +74,7 @@ public:
     virtual ~TextSelectorItem() {};
     virtual short GetSelection() = 0;
     virtual void ProcessSelection(short option) = 0;
-    virtual void Render(float x, float y, bool selected)
+    virtual float Render(float x, float y, bool selected)
     {
         short option = GetSelection();
         auto optionIt = options.find(option);
@@ -84,6 +88,7 @@ public:
         gLunaRender.AddOp(new RenderStringOp(text, 4, x + 20, y));
 
         renderCounter = (renderCounter + 1) % 40;
+        return 20.0f;
     }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap)
     {
@@ -115,7 +120,7 @@ public:
 class MenuItemContinue : public TextMenuItem, public RunnableMenuItem
 {
 public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
     virtual std::wstring GetText() { return L"Continue"; };
     virtual bool Run() {
@@ -128,7 +133,7 @@ public:
 class MenuItemRestartLevel : public TextMenuItem, public RunnableMenuItem
 {
 public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
     virtual std::wstring GetText() { return L"Restart Level"; };
     virtual bool Run() {
@@ -141,7 +146,7 @@ public:
 class MenuItemQuit : public TextMenuItem, public RunnableMenuItem
 {
 public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
+    virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
     virtual std::wstring GetText() { return L"Quit"; };
     virtual bool Run() {
@@ -151,35 +156,6 @@ public:
         return true;
     };
     static MenuItemQuit inst;
-};
-
-class CharacterSelectorItem : public TextSelectorItem
-{
-public:
-    CharacterSelectorItem() :
-        TextSelectorItem()
-    {
-        options[1] = L"Mario";
-        options[2] = L"Luigi";
-        options[3] = L"Peach";
-        options[4] = L"Toad";
-        options[5] = L"Link";
-    };
-    virtual ~CharacterSelectorItem() {};
-    virtual short GetSelection()
-    {
-        STestModeSettings settings = getTestModeSettings();
-        return static_cast<short>(settings.players[0].identity);
-    }
-
-    virtual void ProcessSelection(short option)
-    {
-        STestModeSettings settings = getTestModeSettings();
-        settings.players[0].identity = static_cast<Characters>(option);
-        setTestModeSettings(settings);
-    }
-
-    static CharacterSelectorItem player1Inst;
 };
 
 class PowerupSelectorItem : public TextSelectorItem
@@ -213,10 +189,68 @@ public:
     static PowerupSelectorItem player1Inst;
 };
 
+class CharacterSelectorItem : public TextSelectorItem
+{
+private:
+    int mPlayerIdx;
+public:
+    CharacterSelectorItem(int playerIdx) :
+        TextSelectorItem(),
+        mPlayerIdx(playerIdx)
+    {
+        options[1] = L"";
+        options[2] = L"";
+        options[3] = L"";
+        options[4] = L"";
+        options[5] = L"";
+    };
+    virtual ~CharacterSelectorItem() {};
+    virtual short GetSelection()
+    {
+        STestModeSettings settings = getTestModeSettings();
+        return static_cast<short>(settings.players[mPlayerIdx].identity);
+    }
+
+    virtual void ProcessSelection(short option)
+    {
+        STestModeSettings settings = getTestModeSettings();
+        settings.players[mPlayerIdx].identity = static_cast<Characters>(option);
+        setTestModeSettings(settings);
+    }
+    virtual float Render(float x, float y, bool selected)
+    {
+        STestModeSettings settings = getTestModeSettings();
+        short charId = static_cast<short>(settings.players[mPlayerIdx].identity);
+        short powerup = settings.players[mPlayerIdx].powerup;
+
+        int offX = SMBX_CustomGraphics::getOffsetX(static_cast<Characters>(charId), 1, static_cast<PowerupID>(powerup));
+        int offY = SMBX_CustomGraphics::getOffsetY(static_cast<Characters>(charId), 1, static_cast<PowerupID>(powerup));
+        int w = SMBX_CustomGraphics::getPlayerHitboxWidth(static_cast<PowerupID>(powerup), static_cast<Characters>(charId));
+        int h = SMBX_CustomGraphics::getPlayerHitboxHeight(static_cast<PowerupID>(powerup), static_cast<Characters>(charId));
+        int padding = 6;
+
+        SMBXMaskedImage* sprite = SMBXMaskedImage::getCharacterSprite(charId, powerup);
+        if (sprite != nullptr)
+        {
+            sprite->QueueDraw(x + 20 + offX + padding, y + offY + padding, 100, 100, 500, 0, false);
+        }
+
+        if (selected && renderCounter < 20) {
+            gLunaRender.AddOp(new RenderStringOp(L"<", 4, x, y + (h + padding * 2) / 2 - 10));
+            gLunaRender.AddOp(new RenderStringOp(L">", 4, x + 20 + w + padding * 2, y + (h + padding * 2) / 2 - 10));
+        }
+
+        renderCounter = (renderCounter + 1) % 40;
+        return (h + padding * 2);
+    }
+
+    static CharacterSelectorItem player1Inst;
+};
+
 MenuItemContinue MenuItemContinue::inst;
 MenuItemRestartLevel MenuItemRestartLevel::inst;
 MenuItemQuit MenuItemQuit::inst;
-CharacterSelectorItem CharacterSelectorItem::player1Inst;
+CharacterSelectorItem CharacterSelectorItem::player1Inst(0);
 PowerupSelectorItem PowerupSelectorItem::player1Inst;
 
 //////////////////////////////////////////////
@@ -298,10 +332,10 @@ void testModePauseMenu(bool allowContinue)
 
 
         gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
+        float yIdx = menuY + lineSpacing*1.5f;
         for (unsigned int i = 0; i < menuItems.size(); i++)
         {
-            float yIdx = menuY + lineSpacing*(i + 1.5f);
-            menuItems[i]->Render(menuX, yIdx, selectedOption == i);
+            yIdx += menuItems[i]->Render(menuX, yIdx, selectedOption == i);
         }
 
         // Render the frame and wait

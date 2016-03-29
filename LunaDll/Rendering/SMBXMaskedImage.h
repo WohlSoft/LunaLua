@@ -51,6 +51,7 @@ public:
 
     void getSize(int& w, int& h, bool followOverride = true);
 
+    void QueueDraw(double x, double y, double w, double h, double sx, double sy, bool sceneCoords, double priority=2.0);
 public:
     static SMBXMaskedImage* getCharacterSprite(short charId, short powerup);
     static SMBXMaskedImage* getByName(const std::string& t, int index);

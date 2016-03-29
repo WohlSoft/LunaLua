@@ -1,6 +1,8 @@
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "../Rendering/RenderOps/RenderSpriteOp.h"
+#include "../Rendering/Rendering.h"
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "SMBXMaskedImage.h"
 #include "RenderOps/RenderBitmapOp.h"
@@ -229,6 +231,21 @@ void SMBXMaskedImage::getSize(int& w, int& h, bool followOverride)
         w = bmp.bmWidth;
         h = bmp.bmHeight;
     }
+}
+
+void SMBXMaskedImage::QueueDraw(double x, double y, double w, double h, double sx, double sy, bool sceneCoords, double priority)
+{
+    RenderSpriteOp* maskedRenderOp = new RenderSpriteOp();
+    maskedRenderOp->sprite = this;
+    maskedRenderOp->sx = sx;
+    maskedRenderOp->sy = sy;
+    maskedRenderOp->sw = w;
+    maskedRenderOp->sh = h;
+    maskedRenderOp->x = x;
+    maskedRenderOp->y = y;
+    maskedRenderOp->sceneCoords = sceneCoords;
+    maskedRenderOp->m_renderPriority = priority;
+    gLunaRender.AddOp(maskedRenderOp);
 }
 
 SMBXMaskedImage* SMBXMaskedImage::getCharacterSprite(short charId, short powerup)
