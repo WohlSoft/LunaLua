@@ -189,3 +189,209 @@ void SMBXMaskedImage::UnsetOverride()
     rgbaOverrideImage = nullptr;
     maskedOverrideImage = nullptr;
 }
+
+void SMBXMaskedImage::getSize(int& w, int& h, bool followOverride)
+{
+    if ((maskedOverrideImage != nullptr) && followOverride)
+    {
+        maskedOverrideImage->getSize(w, h, false);
+    }
+    else if (rgbaOverrideImage || loadedPngImage)
+    {
+        std::shared_ptr<BMPBox> img = rgbaOverrideImage ? rgbaOverrideImage : loadedPngImage;
+        if (img && img->ImageLoaded())
+        {
+            w = img->m_W;
+            h = img->m_H;
+        }
+        else
+        {
+            w = 0;
+            h = 0;
+        }
+    }
+    else
+    {
+        HDC sizeHdc = (mainHdc != mainHdc) ? mainHdc : maskHdc;
+        h = 0;
+        w = 0;
+        if (sizeHdc == nullptr) return;
+        
+        BITMAP bmp;
+        HBITMAP hbmp;
+
+        // Get handle to bitmap
+        hbmp = (HBITMAP)GetCurrentObject(sizeHdc, OBJ_BITMAP);
+        if (hbmp == nullptr) return;
+
+        // Get bitmap structure to check the height/width
+        GetObject(hbmp, sizeof(BITMAP), &bmp);
+        w = bmp.bmWidth;
+        h = bmp.bmHeight;
+    }
+}
+
+SMBXMaskedImage* SMBXMaskedImage::getCharacterSprite(short charId, short powerup)
+{
+    HDC* mainArray = nullptr;
+    HDC* maskArray = nullptr;
+    HDC mainHdc;
+    HDC maskHdc;
+
+    // Sanity check
+    if (powerup < 1 || powerup > 7) return nullptr;
+
+    switch (charId)
+    {
+    case 1:
+        mainArray = GM_GFX_MARIO_PTR;
+        maskArray = GM_GFX_MARIO_MASK_PTR;
+        break;
+    case 2:
+        mainArray = GM_GFX_LUIGI_PTR;
+        maskArray = GM_GFX_LUIGI_MASK_PTR;
+        break;
+    case 3:
+        mainArray = GM_GFX_PEACH_PTR;
+        maskArray = GM_GFX_PEACH_MASK_PTR;
+        break;
+    case 4:
+        mainArray = GM_GFX_TOAD_PTR;
+        maskArray = GM_GFX_TOAD_MASK_PTR;
+        break;
+    case 5:
+        mainArray = GM_GFX_LINK_PTR;
+        maskArray = GM_GFX_LINK_MASK_PTR;
+        break;
+    default:
+        return nullptr;
+    }
+
+    mainHdc = (mainArray != nullptr) ? mainArray[powerup - 1] : nullptr;
+    maskHdc = (maskArray != nullptr) ? maskArray[powerup - 1] : nullptr;
+    if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
+
+    return SMBXMaskedImage::get(maskHdc, mainHdc);
+}
+
+SMBXMaskedImage* SMBXMaskedImage::getByName(const std::string& t, int index)
+{
+    HDC* mainArray = nullptr;
+    HDC* maskArray = nullptr;
+    HDC mainHdc;
+    HDC maskHdc;
+    int maxIndex = 0;
+
+    if (t == "block")
+    {
+        mainArray = GM_GFX_BLOCKS_PTR;
+        maskArray = GM_GFX_BLOCKS_MASK_PTR;
+        maxIndex = 700;
+    }
+    else if (t == "background2")
+    {
+        mainArray = GM_GFX_BACKGROUND2_PTR;
+        maxIndex = 58;
+    }
+    else if (t == "npc")
+    {
+        mainArray = GM_GFX_NPC_PTR;
+        maskArray = GM_GFX_NPC_MASK_PTR;
+        maxIndex = 300;
+    }
+    else if (t == "effect")
+    {
+        mainArray = GM_GFX_EFFECTS_PTR;
+        maskArray = GM_GFX_EFFECTS_MASK_PTR;
+        maxIndex = 148;
+    }
+    else if (t == "background")
+    {
+        mainArray = GM_GFX_BACKGROUND_PTR;
+        maskArray = GM_GFX_BACKGROUND_MASK_PTR;
+        maxIndex = 190;
+    }
+    else if (t == "mario")
+    {
+        mainArray = GM_GFX_MARIO_PTR;
+        maskArray = GM_GFX_MARIO_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "luigi")
+    {
+        mainArray = GM_GFX_LUIGI_PTR;
+        maskArray = GM_GFX_LUIGI_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "peach")
+    {
+        mainArray = GM_GFX_PEACH_PTR;
+        maskArray = GM_GFX_PEACH_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "toad")
+    {
+        mainArray = GM_GFX_TOAD_PTR;
+        maskArray = GM_GFX_TOAD_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "link")
+    {
+        mainArray = GM_GFX_LINK_PTR;
+        maskArray = GM_GFX_LINK_MASK_PTR;
+        maxIndex = 7;
+    }
+    else if (t == "yoshib")
+    {
+        mainArray = GM_GFX_YOSHIB_PTR;
+        maskArray = GM_GFX_YOSHIB_MASK_PTR;
+        maxIndex = 8;
+    }
+    else if (t == "yoshit")
+    {
+        mainArray = GM_GFX_YOSHIT_PTR;
+        maskArray = GM_GFX_YOSHIT_MASK_PTR;
+        maxIndex = 8;
+    }
+    else if (t == "tile")
+    {
+        mainArray = GM_GFX_TILES_PTR;
+        maskArray = nullptr;
+        maxIndex = 328;
+    }
+    else if (t == "level")
+    {
+        mainArray = GM_GFX_LEVEL_PTR;
+        maskArray = GM_GFX_LEVEL_MASK_PTR;
+        maxIndex = 32;
+    }
+    else if (t == "scene")
+    {
+        mainArray = GM_GFX_SCENE_PTR;
+        maskArray = GM_GFX_SCENE_MASK_PTR;
+        maxIndex = 65;
+    }
+    else if (t == "path")
+    {
+        mainArray = GM_GFX_PATH_PTR;
+        maskArray = GM_GFX_PATH_MASK_PTR;
+        maxIndex = 32;
+    }
+    else if (t == "player")
+    {
+        mainArray = GM_GFX_PLAYER_PTR;
+        maskArray = GM_GFX_PLAYER_MASK_PTR;
+        maxIndex = 5;
+    }
+
+    // Check range on index and get HDCs
+    if (index < 1 || index > maxIndex) return nullptr;
+    mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
+    maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
+
+    // If we have no HDC abort
+    if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
+
+    // Get the image
+    return SMBXMaskedImage::get(maskHdc, mainHdc);
+}

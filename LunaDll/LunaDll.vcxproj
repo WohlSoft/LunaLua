@@ -157,6 +157,7 @@
     <ClInclude Include="Misc\WaitForTickEnd.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
+    <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -326,6 +327,7 @@
     <ClCompile Include="Rendering\FrameCapture.cpp" />
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
+    <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />

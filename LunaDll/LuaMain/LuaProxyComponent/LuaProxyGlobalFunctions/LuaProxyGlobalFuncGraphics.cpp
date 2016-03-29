@@ -4,6 +4,7 @@
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
+#include "../../../Rendering/RenderOps/RenderSpriteOp.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
 #include "../../../Rendering/GL/GLEngineProxy.h"
@@ -290,7 +291,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     double x, y;
     RENDER_TYPE type;
     double priority;
-    RenderOp* renderOperation;
+    RenderOp* renderOperation = nullptr;
     bool isSceneCoordinates;
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, x);
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, y);
@@ -320,37 +321,83 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     {
         priority = RENDEROP_DEFAULT_PRIORITY_RENDEROP;
         
-        LuaImageResource* image;
+        LuaImageResource* rgbaImage = nullptr;
+        SMBXMaskedImage* maskedImage = nullptr;
         double sourceX;
         double sourceY;
         double sourceWidth;
         double sourceHeight;
         float opacity;
         
-        LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
+        {
+            LuaImageResource* image;
+            LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_NOERROR(namedArgs, image, nullptr);
+            rgbaImage = image;
+        }
+        if (rgbaImage == nullptr) {
+            SMBXMaskedImage* image;
+            LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, image);
+            maskedImage = image;
+        }
 
-        if (!image || !image->img || !image->img->ImageLoaded()) {
+        if ((!rgbaImage || !rgbaImage->img || !rgbaImage->img->ImageLoaded()) && (!maskedImage)) {
             luaL_error(L, "Image may not be nil.");
             return;
         }
 
+        int defW = 0, defH = 0;
+        if (rgbaImage != nullptr)
+        {
+            defW = rgbaImage->img->m_W;
+            defH = rgbaImage->img->m_H;
+        }
+        else if (maskedImage != nullptr)
+        {
+            maskedImage->getSize(defW, defH);
+        }
+
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceX, 0.0);
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceY, 0.0);
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, static_cast<double>(image->img->m_W));
-        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, static_cast<double>(image->img->m_H));
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceWidth, static_cast<double>(defW));
+        LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sourceHeight, static_cast<double>(defH));
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, opacity, 1.0f);
         
-        RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
-        bitmapRenderOp->direct_img = image->img;
-        bitmapRenderOp->sx = sourceX;
-        bitmapRenderOp->sy = sourceY;
-        bitmapRenderOp->sw = sourceWidth;
-        bitmapRenderOp->sh = sourceHeight;
-        bitmapRenderOp->x = x;
-        bitmapRenderOp->y = y;
-        bitmapRenderOp->sceneCoords = isSceneCoordinates;
-        bitmapRenderOp->opacity = opacity;
-        renderOperation = bitmapRenderOp;
+        // Exit fast if opacity is 0
+        if (opacity == 0.0f) return;
+
+        if (rgbaImage != nullptr)
+        {
+            RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
+            bitmapRenderOp->direct_img = rgbaImage->img;
+            bitmapRenderOp->sx = sourceX;
+            bitmapRenderOp->sy = sourceY;
+            bitmapRenderOp->sw = sourceWidth;
+            bitmapRenderOp->sh = sourceHeight;
+            bitmapRenderOp->x = x;
+            bitmapRenderOp->y = y;
+            bitmapRenderOp->sceneCoords = isSceneCoordinates;
+            bitmapRenderOp->opacity = opacity;
+            renderOperation = bitmapRenderOp;
+        }
+        else if (maskedImage != nullptr)
+        {
+            if (opacity != 1.0f)
+            {
+                luaL_error(L, "Opacity cannot be used for masked image rendering");
+                return;
+            }
+
+            RenderSpriteOp* maskedRenderOp = new RenderSpriteOp();
+            maskedRenderOp->sprite = maskedImage;
+            maskedRenderOp->sx = sourceX;
+            maskedRenderOp->sy = sourceY;
+            maskedRenderOp->sw = sourceWidth;
+            maskedRenderOp->sh = sourceHeight;
+            maskedRenderOp->x = x;
+            maskedRenderOp->y = y;
+            maskedRenderOp->sceneCoords = isSceneCoordinates;
+            renderOperation = maskedRenderOp;
+        }
     }
     else
     {
@@ -359,8 +406,11 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     }
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, priority);
  
-    renderOperation->m_renderPriority = priority;
-    gLunaRender.AddOp(renderOperation);
+    if (renderOperation != nullptr)
+    {
+        renderOperation->m_renderPriority = priority;
+        gLunaRender.AddOp(renderOperation);
+    }
 }
 
 
@@ -442,131 +492,9 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     gLunaRender.GLCmd(obj, priority);
 }
 
-static SMBXMaskedImage* getMaskedImage(const std::string& t, int index)
-{
-    HDC* mainArray = nullptr;
-    HDC* maskArray = nullptr;
-    HDC mainHdc;
-    HDC maskHdc;
-    int maxIndex = 0;
-
-    if (t == "block")
-    {
-        mainArray = GM_GFX_BLOCKS_PTR;
-        maskArray = GM_GFX_BLOCKS_MASK_PTR;
-        maxIndex = 700;
-    }
-    else if (t == "background2")
-    {
-        mainArray = GM_GFX_BACKGROUND2_PTR;
-        maxIndex = 58;
-    }
-    else if (t == "npc")
-    {
-        mainArray = GM_GFX_NPC_PTR;
-        maskArray = GM_GFX_NPC_MASK_PTR;
-        maxIndex = 300;
-    }
-    else if (t == "effect")
-    {
-        mainArray = GM_GFX_EFFECTS_PTR;
-        maskArray = GM_GFX_EFFECTS_MASK_PTR;
-        maxIndex = 148;
-    }
-    else if (t == "background")
-    {
-        mainArray = GM_GFX_BACKGROUND_PTR;
-        maskArray = GM_GFX_BACKGROUND_MASK_PTR;
-        maxIndex = 190;
-    }
-    else if (t == "mario")
-    {
-        mainArray = GM_GFX_MARIO_PTR;
-        maskArray = GM_GFX_MARIO_MASK_PTR;
-        maxIndex = 7;
-    }
-    else if (t == "luigi")
-    {
-        mainArray = GM_GFX_LUIGI_PTR;
-        maskArray = GM_GFX_LUIGI_MASK_PTR;
-        maxIndex = 7;
-    }
-    else if (t == "peach")
-    {
-        mainArray = GM_GFX_PEACH_PTR;
-        maskArray = GM_GFX_PEACH_MASK_PTR;
-        maxIndex = 7;
-    }
-    else if (t == "toad")
-    {
-        mainArray = GM_GFX_TOAD_PTR;
-        maskArray = GM_GFX_TOAD_MASK_PTR;
-        maxIndex = 7;
-    }
-    else if (t == "link")
-    {
-        mainArray = GM_GFX_LINK_PTR;
-        maskArray = GM_GFX_LINK_MASK_PTR;
-        maxIndex = 7;
-    }
-    else if (t == "yoshib")
-    {
-        mainArray = GM_GFX_YOSHIB_PTR;
-        maskArray = GM_GFX_YOSHIB_MASK_PTR;
-        maxIndex = 8;
-    }
-    else if (t == "yoshit")
-    {
-        mainArray = GM_GFX_YOSHIT_PTR;
-        maskArray = GM_GFX_YOSHIT_MASK_PTR;
-        maxIndex = 8;
-    }
-    else if (t == "tile")
-    {
-        mainArray = GM_GFX_TILES_PTR;
-        maskArray = nullptr;
-        maxIndex = 328;
-    }
-    else if (t == "level")
-    {
-        mainArray = GM_GFX_LEVEL_PTR;
-        maskArray = GM_GFX_LEVEL_MASK_PTR;
-        maxIndex = 32;
-    }
-    else if (t == "scene")
-    {
-        mainArray = GM_GFX_SCENE_PTR;
-        maskArray = GM_GFX_SCENE_MASK_PTR;
-        maxIndex = 65;
-    }
-    else if (t == "path")
-    {
-        mainArray = GM_GFX_PATH_PTR;
-        maskArray = GM_GFX_PATH_MASK_PTR;
-        maxIndex = 32;
-    }
-    else if (t == "player")
-    {
-        mainArray = GM_GFX_PLAYER_PTR;
-        maskArray = GM_GFX_PLAYER_MASK_PTR;
-        maxIndex = 5;
-    }
-
-    // Check range on index and get HDCs
-    if (index < 1 || index > maxIndex) return nullptr;
-    mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
-    maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
-
-    // If we have no HDC abort
-    if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
-
-    // Get the image
-    return SMBXMaskedImage::get(maskHdc, mainHdc);
-}
-
 void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, const luabind::object& overrideImg, lua_State* L)
 {
-    SMBXMaskedImage* img = getMaskedImage(t, index);
+    SMBXMaskedImage* img = SMBXMaskedImage::getByName(t, index);
     if (img == nullptr)
     {
         luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);
@@ -634,7 +562,7 @@ void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, con
 
 luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, int index, lua_State* L)
 {
-    SMBXMaskedImage* img = getMaskedImage(t, index);
+    SMBXMaskedImage* img = SMBXMaskedImage::getByName(t, index);
     if (img == nullptr)
     {
         luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);

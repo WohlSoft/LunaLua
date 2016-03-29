@@ -531,6 +531,9 @@
     <ClInclude Include="Misc\TestModeMenu.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
+      <Filter>Rendering\RenderOps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1016,6 +1019,9 @@
     </ClCompile>
     <ClCompile Include="Misc\TestModeMenu.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp">
+      <Filter>Rendering\RenderOps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

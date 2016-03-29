@@ -47,7 +47,13 @@ public:
     bool HasLoadedPng() { return (bool)loadedPngImage; };
     std::shared_ptr<BMPBox> GetLoadedPng() { return loadedPngImage; };
     std::shared_ptr<BMPBox> GetRGBAOverride() { return rgbaOverrideImage; };
-    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; }
+    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; };
+
+    void getSize(int& w, int& h, bool followOverride = true);
+
+public:
+    static SMBXMaskedImage* getCharacterSprite(short charId, short powerup);
+    static SMBXMaskedImage* getByName(const std::string& t, int index);
 };
 
 #endif
