@@ -414,6 +414,40 @@ json IPCTestLevel(const json& params)
         settings.levelData = static_cast<const std::string&>(levelDataIt.value()); 
     }
 
+    // Before checking for tick end... bring to top if we need to
+
+    // This here is a big mess of a workaround... but it works
+    HWND hWindow = NULL;
+    DWORD dwCurrentProcessId = GetCurrentProcessId();
+    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
+        DWORD dwCurrentProcessId = GetCurrentProcessId();
+        HWND& hWindow = *reinterpret_cast<HWND*>(lParam);
+        // Check that it's our process
+        DWORD dwProcessId = 0x0;
+        GetWindowThreadProcessId(hWnd, &dwProcessId);
+        if (dwCurrentProcessId == dwProcessId) {
+            // Now check the class and if it's top level
+            wchar_t className[24] = {0};
+            wchar_t windowName[24] = { 0 };
+            HWND hParent = GetParent(hWnd);
+            GetWindowTextW(hWnd, windowName, sizeof(windowName));
+            GetClassNameW(hWnd, className, sizeof(className));
+            if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0) )
+            {
+                hWindow = hWnd;
+                SetLastError(ERROR_SUCCESS);
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&hWindow));
+    if (hWindow)
+    {
+        ShowWindow(hWindow, SW_SHOW);
+        BringWindowToTop(hWindow);
+        SetForegroundWindow(hWindow);
+    }
+
     {
         // Make sure we're at a tick end
         WaitForTickEnd tickEndLock;
