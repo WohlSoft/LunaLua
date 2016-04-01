@@ -17,14 +17,6 @@ static inline void sendSimpleLuaEvent(const std::string& eventName, Ts&&... args
     }
 }
 
-static inline void LunaDllProcessWindowsMessageQueue(void) {
-    MSG msg;
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-}
-
 void LunaDllRenderAndWaitFrame(void)
 {
     // Render the world
@@ -43,18 +35,30 @@ void LunaDllRenderAndWaitFrame(void)
     LunaDllWaitFrame();
 }
 
-void LunaDllWaitFrame(void)
+void LunaDllWaitFrame(bool allowMaxFPS)
 {
-    LunaDllProcessWindowsMessageQueue();
+    native_rtcDoEvents();
 
-    if (gIsWindowsVistaOrNewer) {
-        FrameTimingMaxFPSHookQPC();
+    if (allowMaxFPS)
+    {
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingMaxFPSHookQPC();
+        }
+        else {
+            FrameTimingMaxFPSHook();
+        }
     }
-    else {
-        FrameTimingMaxFPSHook();
+    else
+    {
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingHookQPC();
+        }
+        else {
+            FrameTimingHook();
+        }
     }
 
-    LunaDllProcessWindowsMessageQueue();
+    native_rtcDoEvents();
 }
 
 // Public methods (Notifications of State)

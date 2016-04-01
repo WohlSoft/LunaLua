@@ -141,6 +141,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--waitForIPC"))
     {
         gStartupSettings.waitForIPC = true;
+        gStartupSettings.currentlyWaitingForIPC = true;
         gStartupSettings.patch = true;
     }
 }
@@ -483,6 +484,9 @@ void TrySkipPatch()
 
     // Load level hook
     PATCH(0x8D8F40).JMP(runtimeHookLoadLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Close window hook
+    PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

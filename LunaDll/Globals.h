@@ -44,6 +44,7 @@ struct startUpSettings{
     bool console;
     bool noGL;
     bool waitForIPC;
+    volatile bool currentlyWaitingForIPC;
 };
 
 struct SMBXHUDSettings {

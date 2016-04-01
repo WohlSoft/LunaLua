@@ -151,8 +151,10 @@ public:
     virtual std::wstring GetText() { return L"Quit"; };
     virtual bool Run() {
         // Exit
-        // TODO: If launched by something with IPC (PGE Editor) hide window instead of exit
-        _exit(0);
+        if (!TestModeCheckHideWindow())
+        {
+            _exit(0);
+        }
         return true;
     };
     static MenuItemQuit inst;

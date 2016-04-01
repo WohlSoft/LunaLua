@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <string>
+#include <mutex>
 #include "../../libs/json/json.hpp"
 #include "../Defines.h"
 #include "../Globals.h"
@@ -16,6 +17,11 @@
 #include "TestMode.h"
 
 using json = nlohmann::json;
+
+//////////////////////////////////////////////
+//============ GLOBAL VARIABLES ============//
+//////////////////////////////////////////////
+static std::mutex g_testModeMutex;
 
 ///////////////////////////////////////////////
 //============== UTILITY PATCH ==============//
@@ -184,6 +190,39 @@ static bool testModeSetupForLoading()
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
 
+// Helper function to get the main window
+// TODO: Consider replacing with something better, that uses some memory
+//       address or something instead.
+static HWND GetMainWindow(void)
+{
+    // This here is a big mess of a workaround... but it works
+    HWND hWindow = NULL;
+    DWORD dwCurrentProcessId = GetCurrentProcessId();
+    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
+        DWORD dwCurrentProcessId = GetCurrentProcessId();
+        HWND& hWindow = *reinterpret_cast<HWND*>(lParam);
+        // Check that it's our process
+        DWORD dwProcessId = 0x0;
+        GetWindowThreadProcessId(hWnd, &dwProcessId);
+        if (dwCurrentProcessId == dwProcessId) {
+            // Now check the class and if it's top level
+            wchar_t className[24] = { 0 };
+            wchar_t windowName[24] = { 0 };
+            HWND hParent = GetParent(hWnd);
+            GetWindowTextW(hWnd, windowName, sizeof(windowName));
+            GetClassNameW(hWnd, className, sizeof(className));
+            if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0))
+            {
+                hWindow = hWnd;
+                SetLastError(ERROR_SUCCESS);
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&hWindow));
+    return hWindow;
+}
+
 // Utility function to create a temporary file and write data to it. The
 // filename is returned if successful, or an empty string if unsuccessful.
 static std::wstring WriteTemporaryFile(const std::string& data)
@@ -346,6 +385,8 @@ void testModeDisable(void)
 // IPC Command
 json IPCTestLevel(const json& params)
 {
+    std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+
     if (!params.is_object()) throw IPCInvalidParams();
     json::const_iterator filenameIt = params.find("filename");
     if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
@@ -415,37 +456,17 @@ json IPCTestLevel(const json& params)
     }
 
     // Before checking for tick end... bring to top if we need to
-
-    // This here is a big mess of a workaround... but it works
-    HWND hWindow = NULL;
-    DWORD dwCurrentProcessId = GetCurrentProcessId();
-    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
-        DWORD dwCurrentProcessId = GetCurrentProcessId();
-        HWND& hWindow = *reinterpret_cast<HWND*>(lParam);
-        // Check that it's our process
-        DWORD dwProcessId = 0x0;
-        GetWindowThreadProcessId(hWnd, &dwProcessId);
-        if (dwCurrentProcessId == dwProcessId) {
-            // Now check the class and if it's top level
-            wchar_t className[24] = {0};
-            wchar_t windowName[24] = { 0 };
-            HWND hParent = GetParent(hWnd);
-            GetWindowTextW(hWnd, windowName, sizeof(windowName));
-            GetClassNameW(hWnd, className, sizeof(className));
-            if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0) )
-            {
-                hWindow = hWnd;
-                SetLastError(ERROR_SUCCESS);
-                return FALSE;
-            }
-        }
-        return TRUE;
-    }, reinterpret_cast<LPARAM>(&hWindow));
+    HWND hWindow = GetMainWindow();
     if (hWindow)
     {
         ShowWindow(hWindow, SW_SHOW);
+
+        SetWindowPos(hWindow, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+        SetWindowPos(hWindow, HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+
         BringWindowToTop(hWindow);
         SetForegroundWindow(hWindow);
+        SetFocus(hWindow);
     }
 
     {
@@ -460,7 +481,31 @@ json IPCTestLevel(const json& params)
         testModeRestartLevel();
 
         // If we were waiting on IPC, stop waiting
-        gStartupSettings.waitForIPC = false;
+        gStartupSettings.currentlyWaitingForIPC = false;
     }
     return true;
 }
+
+bool TestModeCheckHideWindow(void)
+{
+    // If we started by waiting for IPC, we want to hide the window in place of exiting
+    if (gStartupSettings.waitForIPC)
+    {
+        std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+        
+        // Close the level using testModeRestartLevel, but flag that we'll be
+        // waiting for IPC again.
+        testModeRestartLevel();
+        gStartupSettings.currentlyWaitingForIPC = true;
+        HWND hWindow = GetMainWindow();
+        if (hWindow)
+        {
+            ShowWindow(hWindow, SW_HIDE);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+

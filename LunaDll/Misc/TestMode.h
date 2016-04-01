@@ -34,6 +34,8 @@ bool testModeLoadLevelHook(VB6StrPtr* filename);
 STestModeSettings getTestModeSettings();
 void setTestModeSettings(const STestModeSettings& settings);
 
+bool TestModeCheckHideWindow(void);
+
 // The following function decleration is not included in this header, to
 // avoid applying a json.hpp dependency to this header.
 //   json IPCTestLevel(const json& params)

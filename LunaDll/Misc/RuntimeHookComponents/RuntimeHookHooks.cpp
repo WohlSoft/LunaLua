@@ -1163,9 +1163,10 @@ extern void __stdcall RenderWorldHook()
 
 static void runtimeHookSmbxChangeModeHook(void)
 {
-    while (gStartupSettings.waitForIPC)
+    while (gStartupSettings.currentlyWaitingForIPC)
     {
-        LunaDllWaitFrame();
+        WaitMessage();
+        LunaDllWaitFrame(false);
     }
 
     // Handler for test mode if it's enabled
@@ -1212,4 +1213,15 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
     }
     
     loadLevel_OrigFunc(filename);
+}
+
+void __stdcall runtimeHookCloseWindow(void)
+{
+    if (TestModeCheckHideWindow())
+    {
+        // If handled by TestModeCheckHideWindow, skip
+        return;
+    }
+
+    native_exitMainGame();
 }

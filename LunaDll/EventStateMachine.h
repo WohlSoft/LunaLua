@@ -55,6 +55,6 @@ extern EventStateMachine g_EventHandler;
 
 // Utility Methods
 void LunaDllRenderAndWaitFrame(void);
-void LunaDllWaitFrame(void);
+void LunaDllWaitFrame(bool allowMaxFPS = true);
 
 #endif

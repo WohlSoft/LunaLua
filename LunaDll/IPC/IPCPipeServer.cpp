@@ -114,6 +114,13 @@ void IPCPipeServer::ReadThread()
 
         SendJsonError(-32601, "Method not found", pktId);
     }
+    
+    // If we get here, the IPC pipe has been broken, which means we know the parent process has exited
+    if (gStartupSettings.waitForIPC)
+    {
+        // And if we were started in dedicated waitForIPC mode, take a broken pipe as a signal to exit
+        _exit(0);
+    }
 }
 
 void IPCPipeServer::RunCallback(IPCCallback cb, const nlohmann::json& params, const nlohmann::json& id)

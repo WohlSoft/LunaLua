@@ -744,6 +744,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 #define GF_AUDIO_MANAGEMENT 0x00A74460
 //0x008E6F70
 
+#define GF_EXIT_MAIN_GAME   0x008D6BB0
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -818,6 +820,8 @@ static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
+
+static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
 
 /*
 Function name                                
