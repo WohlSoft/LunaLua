@@ -3,7 +3,6 @@
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 
-
 #include "LunaLuaMain.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
@@ -1098,11 +1097,11 @@ void CLunaLua::bindAll()
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Warp::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Warp::mem))
-                .property("isHidden", &LuaProxy::Warp::isHidden, &LuaProxy::Warp::setIsHidden)
-                .property("exitX", &LuaProxy::Warp::exitX, &LuaProxy::Warp::setExitX)
-                .property("exitY", &LuaProxy::Warp::exitY, &LuaProxy::Warp::setExitY)
-                .property("entranceX", &LuaProxy::Warp::entranceX, &LuaProxy::Warp::setEntranceX)
-                .property("entranceY", &LuaProxy::Warp::entranceY, &LuaProxy::Warp::setEntranceY)
+                .property("isHidden", LUAPROXY_REG_RW_CUSTOM(LuaProxy::Warp, isHidden, bool))
+                .property("exitX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, exit, x))
+                .property("exitY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, exit, y))
+                .property("entranceX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, entrance, x))
+                .property("entranceY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, entrance, y))
                 .property("levelFilename", &LuaProxy::Warp::levelFilename, &LuaProxy::Warp::setLevelFilename),
 
 
