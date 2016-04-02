@@ -574,7 +574,7 @@ extern void __stdcall LoadLocalGfxHook()
 {
     // Clear data based on loaded SMBX sprites
     g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::clearLookupTable();
+    SMBXMaskedImage::ClearLookupTable();
 
     native_loadLocalGfx();
 
@@ -589,7 +589,7 @@ extern void __stdcall LoadLocalOverworldGfxHook()
 {
     // Clear data based on loaded SMBX sprites
     g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::clearLookupTable();
+    SMBXMaskedImage::ClearLookupTable();
 
     native_loadWorldGfx();
 

@@ -98,7 +98,7 @@ void BitBltEmulation::drawMasked(HDC maskSrc, HDC src, int dx, int dy, int w, in
 {
     if (maskSrc == nullptr && src == nullptr) return;
 
-    SMBXMaskedImage* img = SMBXMaskedImage::get(maskSrc, src);
+    SMBXMaskedImage* img = SMBXMaskedImage::Get(maskSrc, src);
 
     if (img) {
         // If src is null, we want to draw only the mask
@@ -110,7 +110,7 @@ void BitBltEmulation::drawOpaque(HDC src, int dx, int dy, int w, int h, int sx, 
 {
     if (src == nullptr) return;
 
-    SMBXMaskedImage* img = SMBXMaskedImage::get(nullptr, src);
+    SMBXMaskedImage* img = SMBXMaskedImage::Get(nullptr, src);
 
     if (img) {
         img->DrawWithOverride(dx, dy, w, h, sx, sy, true, true);
