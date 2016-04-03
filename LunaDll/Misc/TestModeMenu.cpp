@@ -231,7 +231,7 @@ public:
         int h = SMBX_CustomGraphics::getPlayerHitboxHeight(static_cast<PowerupID>(powerup), static_cast<Characters>(charId));
         int padding = 6;
 
-        SMBXMaskedImage* sprite = SMBXMaskedImage::getCharacterSprite(charId, powerup);
+        SMBXMaskedImage* sprite = SMBXMaskedImage::GetCharacterSprite(charId, powerup);
         if (sprite != nullptr)
         {
             sprite->QueueDraw(x + 20 + offX + padding, y + offY + padding, 100, 100, 500, 0, false);
@@ -243,7 +243,7 @@ public:
         }
 
         renderCounter = (renderCounter + 1) % 40;
-        return (h + padding * 2);
+        return static_cast<float>(h + padding * 2);
     }
 
     static CharacterSelectorItem player1Inst;

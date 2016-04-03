@@ -494,7 +494,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
 void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, const luabind::object& overrideImg, lua_State* L)
 {
-    SMBXMaskedImage* img = SMBXMaskedImage::getByName(t, index);
+    SMBXMaskedImage* img = SMBXMaskedImage::GetByName(t, index);
     if (img == nullptr)
     {
         luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);
@@ -537,7 +537,7 @@ void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, con
         return;
     }
     
-    SMBXMaskedImage* img = SMBXMaskedImage::get(mainHdc, maskHdc);
+    SMBXMaskedImage* img = SMBXMaskedImage::Get(mainHdc, maskHdc);
     if (!overrideImg.is_valid())
     {
         img->UnsetOverride();
@@ -562,7 +562,7 @@ void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, con
 
 luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, int index, lua_State* L)
 {
-    SMBXMaskedImage* img = SMBXMaskedImage::getByName(t, index);
+    SMBXMaskedImage* img = SMBXMaskedImage::GetByName(t, index);
     if (img == nullptr)
     {
         luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);

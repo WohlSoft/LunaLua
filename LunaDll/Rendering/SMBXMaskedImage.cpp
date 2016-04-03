@@ -10,7 +10,7 @@
 // Lookup table instance
 std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> SMBXMaskedImage::lookupTable;
 
-SMBXMaskedImage* SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
+SMBXMaskedImage* SMBXMaskedImage::Get(HDC maskHdc, HDC mainHdc)
 {
     if (maskHdc == nullptr && mainHdc == nullptr) {
         return nullptr;
@@ -58,7 +58,7 @@ SMBXMaskedImage* SMBXMaskedImage::get(HDC maskHdc, HDC mainHdc)
     return img.get();
 }
 
-void SMBXMaskedImage::clearLookupTable(void)
+void SMBXMaskedImage::ClearLookupTable(void)
 {
     lookupTable.clear();
 }
@@ -248,7 +248,7 @@ void SMBXMaskedImage::QueueDraw(double x, double y, double w, double h, double s
     gLunaRender.AddOp(maskedRenderOp);
 }
 
-SMBXMaskedImage* SMBXMaskedImage::getCharacterSprite(short charId, short powerup)
+SMBXMaskedImage* SMBXMaskedImage::GetCharacterSprite(short charId, short powerup)
 {
     HDC* mainArray = nullptr;
     HDC* maskArray = nullptr;
@@ -288,10 +288,10 @@ SMBXMaskedImage* SMBXMaskedImage::getCharacterSprite(short charId, short powerup
     maskHdc = (maskArray != nullptr) ? maskArray[powerup - 1] : nullptr;
     if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
 
-    return SMBXMaskedImage::get(maskHdc, mainHdc);
+    return SMBXMaskedImage::Get(maskHdc, mainHdc);
 }
 
-SMBXMaskedImage* SMBXMaskedImage::getByName(const std::string& t, int index)
+SMBXMaskedImage* SMBXMaskedImage::GetByName(const std::string& t, int index)
 {
     HDC* mainArray = nullptr;
     HDC* maskArray = nullptr;
@@ -410,5 +410,13 @@ SMBXMaskedImage* SMBXMaskedImage::getByName(const std::string& t, int index)
     if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
 
     // Get the image
-    return SMBXMaskedImage::get(maskHdc, mainHdc);
+    return SMBXMaskedImage::Get(maskHdc, mainHdc);
+}
+
+SMBXMaskedImage* SMBXMaskedImage::GetHardcoded(const std::string& name)
+{
+    HDC mainHdc = nullptr;
+    HDC maskHdc = nullptr;
+    HardcodedGraphicsItem::GetHDCByName(name, &mainHdc, &maskHdc);
+    return SMBXMaskedImage::Get(maskHdc, mainHdc);
 }
