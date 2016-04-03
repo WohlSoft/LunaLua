@@ -2,6 +2,7 @@
 #ifndef PlayerMob_hhhhh
 #define PlayerMob_hhhhh
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 #ifndef __MINGW32__
 #pragma region Lookup
@@ -196,7 +197,7 @@
 
 // SMBX player structure (INCOMPLETE)
 #pragma pack(push, 4)
-struct PlayerMOB {
+struct PlayerMOB : public SMBX_FullBaseItemArray<PlayerMOB, -1, GM_PLAYERS_COUNT_CONSTPTR, GM_PLAYERS_PTR_CONSTPTR> {
     short ToadDoubleJReady;             // +0x00
     short SparklingEffect;              // +0x02
     short UnknownCTRLLock1;             // +0x04

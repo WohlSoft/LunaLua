@@ -579,7 +579,7 @@ namespace LuaProxy {
         
     };
 
-    class Player{
+    class Player : public CommonVB6Wrapper<Player, PlayerMOB> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
@@ -592,24 +592,6 @@ namespace LuaProxy {
         void kill(lua_State *L);
         void harm(lua_State *L);
         RECT screen(lua_State *L) const;
-        double x(lua_State *L) const;
-        void setX(double x, lua_State *L);
-        double y(lua_State *L) const;
-        void setY(double y, lua_State *L);
-        double width(lua_State *L) const;
-        void setWidth(double width, lua_State *L);
-        double height(lua_State *L) const;
-        void setHeight(double height, lua_State *L);
-        double speedX(lua_State *L) const;
-        void setSpeedX(double speedX, lua_State *L);
-        double speedY(lua_State *L) const;
-        void setSpeedY(double speedY, lua_State *L);
-        PowerupID powerup(lua_State *L) const;
-        void setPowerup(PowerupID powerup, lua_State *L);
-        Characters character(lua_State *L) const;
-        void setCharacter(Characters character, lua_State *L);
-        int reservePowerup(lua_State *L) const;
-        void setReservePowerup(int reservePowerup, lua_State *L);
         luabind::object holdingNPC(lua_State *L) const;
         bool upKeyPressing(lua_State *L) const;
         void setUpKeyPressing(bool upKeyPressing, lua_State *L);
