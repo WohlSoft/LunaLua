@@ -197,7 +197,7 @@
 
 // SMBX player structure (INCOMPLETE)
 #pragma pack(push, 4)
-struct PlayerMOB : public SMBX_FullBaseItemArray<PlayerMOB, -1, GM_PLAYERS_COUNT_CONSTPTR, GM_PLAYERS_PTR_CONSTPTR> {
+struct PlayerMOB {
     short ToadDoubleJReady;             // +0x00
     short SparklingEffect;              // +0x02
     short UnknownCTRLLock1;             // +0x04
@@ -359,6 +359,19 @@ struct PlayerMOB : public SMBX_FullBaseItemArray<PlayerMOB, -1, GM_PLAYERS_COUNT
     short Unused17E;
     short Unused180;
     short Unused182;
+
+    static PlayerMOB* Get(int index) {
+        if (index >= 1000 && index <= 1010) {
+            int templateIndex = index - 1000;
+            return &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[templateIndex];
+        }
+
+        if (index > GM_PLAYERS_COUNT || index < 0)
+            return 0;
+        return &((PlayerMOB*)GM_PLAYERS_PTR)[index];
+    }
+
+
 };
 #pragma pack(pop)
 

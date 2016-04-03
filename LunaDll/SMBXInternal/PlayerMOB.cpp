@@ -5,14 +5,7 @@
 
 // ACCESSORS
 PlayerMOB* Player::Get(int index) {
-    if (index >= 1000 && index <= 1010){
-        int templateIndex = index - 1000;
-        return &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[templateIndex];
-    }
-    
-    if(index > GM_PLAYERS_COUNT || index < 0)
-		return 0;
-	return &((PlayerMOB*)GM_PLAYERS_PTR)[index];
+    return PlayerMOB::Get(index);
 }
 
 
