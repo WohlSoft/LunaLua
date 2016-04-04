@@ -72,10 +72,9 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
 
     foreach (QFileInfo fileInfo, episodeDir.entryInfoList(wldFileFilter, QDir::Files))
     {
-        worldData = FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath());
-
         // Break upon first valid world file
-        if (worldData.ReadFileValid) break;
+        if (FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath(), worldData))
+            break;
     }
 
     // If we didn't get valid data, return null
@@ -199,7 +198,8 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
         QMap<QString, QVariant> map;
         data.ReadFileValid = false;
         if(saveFile.open(QIODevice::ReadOnly)){
-            data = FileFormats::ReadSMBX64SavFile(saveFile.readAll(), saveFilePath);
+            QString savData = QString(saveFile.readAll());
+            FileFormats::ReadSMBX64SavFileRaw(savData, saveFilePath, data);
             saveFile.close();
         }
 
