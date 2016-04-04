@@ -78,7 +78,7 @@ std::string LuaProxy::Data::resolvePathFromSection()
 	{
 	case LuaProxy::Data::DATA_LEVEL:
 		returnPath += episodePath;
-		returnPath += removeExtension(levelName);
+		returnPath += RemoveExtension(levelName);
 		returnPath += "\\";
 		returnPath += "LuaData_";
 		if (m_useSaveSlot)

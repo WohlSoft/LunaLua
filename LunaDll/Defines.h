@@ -618,6 +618,9 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 //      Arg1 = int* SoundIndex
 #define GF_PLAY_SFX         0x00A73FD0
 
+//      no args
+#define GM_SETUP_SFX        0x00A74420
+
 //      Arg1 = POS* structure of player, POS* structure of block
 //      1=Collision from top, 2=From right, 3=From bottom, 4=From left, 5=?
 #define GF_MOB_BLOCK_COL    0x00994250
@@ -718,6 +721,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 #define GF_LOAD_LOCAL_GFX   0x00ACD220
 
+#define GF_LOAD_GRAPHICS_FROM_FOLDER 0x00AD9DC0
+
 #define GF_LOAD_WORLD_GFX   0x00ADFF90
 
 //      Arg1 = VB6StrPtr* Added text to the cheat buffer and execute
@@ -726,6 +731,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 #define GF_LOAD_WORLD_LIST  0x008E35E0
 
 #define GF_LOAD_SAVE_STATES 0x008E41D0
+
+#define GF_LOAD_NPC_CONFIG  0x00B20E50
 
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
@@ -771,6 +778,7 @@ static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerInde
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_stopMusic      = (void(__stdcall *)())GF_STOP_MUSIC;
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
+static const auto native_setupSFX       = (void(__stdcall *)())GM_SETUP_SFX;
 
 static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short* /**/))GF_NPC_CLEANUP;
 
@@ -822,6 +830,10 @@ static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
+
+static const auto native_loadNPCConfig  = (void(__stdcall *)(VB6StrPtr* /*customPath*/))GF_LOAD_NPC_CONFIG;
+
+static const auto native_loadGraphicsFromFolder = (void(__stdcall *)(VB6StrPtr* /*customFolder*/))GF_LOAD_GRAPHICS_FROM_FOLDER;
 
 static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
 

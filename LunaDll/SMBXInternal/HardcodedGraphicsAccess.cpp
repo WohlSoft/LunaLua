@@ -135,7 +135,7 @@ bool HardcodedGraphicsItem::GetHDCByName(std::string text, HDC* colorHDC, HDC* m
     // 1. PARSE TEXT
     // If it has an ending, then remove it:
     if (text.find("."))
-        text = removeExtension(text);
+        text = RemoveExtension(text);
 
     // First extract the name:
     if (text.find("hardcoded-") != 0)
