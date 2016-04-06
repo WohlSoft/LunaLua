@@ -244,6 +244,7 @@ DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
 // Star counting
 DEFMEM(GM_STAR_COUNT,       WORD, 0x00B251E0);
 DEFMEM(GM_STARS_PTR,        void*, 0x00B25714);
+DEFMEM(GM_STAR_COUNT_LEVEL, WORD, 0x00B2C8A8);
 
 // HUD stuff
 DEFMEM(GM_COINS,            WORD,  0x00B2C5A8);
@@ -333,7 +334,8 @@ DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
 DEFMEM(GM_BLOCKS_PTR,       void*, 0x00B25A04);
 
 // Backgrounds
-DEFMEM(GM_SEC_BG_ARRAY,     short*,  0x00B258B8); //Define for sections
+DEFMEM(GM_SEC_BG_ID,     short*,  0x00B258B8); //Define for sections background id
+DEFMEM(GM_SEC_ORIG_BG_ID,   WORD*, 0x00B25860);   // Same as above but used for events (initial data)
 DEFMEM(GM_BG_XPOS_PTR,      double*, 0x00B2B984);
 
 // Animations
@@ -538,6 +540,9 @@ DEFMEM_PTR(npcdef_nogravity,        short, 0x00B2B6C4);
 DEFMEM(blockdef_isResizeableBlock, short*, 0x00B2B930);
 DEFMEM(blockdef_width, short*, 0x00B2B9F8);
 DEFMEM(blockdef_height, short*, 0x00B2BA14);
+
+DEFMEM(bgodef_width, WORD*, 0x00B2CCF4);
+DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);
 
 
 // Frame timing related references
@@ -774,6 +779,7 @@ static const auto native_initLevelEnv   = (void(__stdcall *)())GF_INIT_LEVEL_ENV
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
 static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;
+static const auto native_updateNPC      = (void(__stdcall *)(short* /*npcID*/))GF_UPDATE_NPC;
 
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_stopMusic      = (void(__stdcall *)())GF_STOP_MUSIC;

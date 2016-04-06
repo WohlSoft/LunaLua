@@ -951,7 +951,7 @@ extern void __stdcall LoadLevelHook(VB6StrPtr* path)
     SMBXLevelFileBase base;
     base.ReadFile(static_cast<std::wstring>(*path));
     
-    native_loadLevel(reinterpret_cast<VB6StrPtr*>(path));
+    // native_loadLevel(reinterpret_cast<VB6StrPtr*>(path));
 
     std::wcout << L"GM_LVLFILENAME_PTR: " << static_cast<std::wstring>(GM_LVLFILENAME_PTR) << std::endl
         << L"GM_LVLNAME_PTR: " << static_cast<std::wstring>(GM_LVLNAME_PTR) << std::endl
