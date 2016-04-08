@@ -11,6 +11,8 @@
 #include "../SMBXInternal/BGOs.h"
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/CollectedStarRecord.h"
+#include "../SMBXInternal/Warp.h"
+#include "../SMBXInternal/Water.h"
 
 
 SMBXLevelFileBase::SMBXLevelFileBase() :
@@ -256,9 +258,54 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             }
 
         }
-
     }
 
+    int numOfDoors = outData.doors.size();
+    GM_WARP_COUNT = numOfDoors;
+    for (int i = 0; i < outData.doors.size(); i++) {
+        SMBX_Warp* nextDoor = SMBX_Warp::Get(i);
+        memset(nextDoor, 0, sizeof(SMBX_Warp));
+        const LevelDoor& nextDataLevelDoor = outData.doors[i];
+        nextDoor->unknown_0E = -1;
+        nextDoor->unknown_10 = -1;
+        nextDoor->entrance.x = static_cast<double>(nextDataLevelDoor.ix);
+        nextDoor->entrance.y = static_cast<double>(nextDataLevelDoor.iy);
+        nextDoor->exit.x = static_cast<double>(nextDataLevelDoor.ox);
+        nextDoor->exit.y = static_cast<double>(nextDataLevelDoor.oy);
+        nextDoor->entranceDirection = static_cast<SMBX_EntranceDir>(nextDataLevelDoor.idirect);
+        nextDoor->exitDirection = static_cast<SMBX_ExitDir>(nextDataLevelDoor.odirect);
+        nextDoor->warpType = static_cast<SMBX_WarpType>(nextDataLevelDoor.type);
+        nextDoor->warpToLevelFileName = nextDataLevelDoor.lname;
+        nextDoor->toWarpIndex = nextDataLevelDoor.warpto;
+        nextDoor->isLevelEntrance = COMBOOL(nextDataLevelDoor.lvl_i);
+        nextDoor->isLevelExit = COMBOOL(nextDataLevelDoor.lvl_o);
+        nextDoor->warpToWorldmapX = nextDataLevelDoor.world_x;
+        nextDoor->warpToWorldmapY = nextDataLevelDoor.world_y;
+        nextDoor->starsRequired = nextDataLevelDoor.star_num_hide;
+        nextDoor->ptLayerName = nextDataLevelDoor.layer;
+        nextDoor->isHidden = COMBOOL(nextDataLevelDoor.unknown);
+        nextDoor->noYoshi = COMBOOL(nextDataLevelDoor.novehicles);
+        nextDoor->allowCarryNPC = COMBOOL(nextDataLevelDoor.allownpc);
+        nextDoor->entrance.width = 32.0;
+        nextDoor->entrance.height = 32.0;
+        nextDoor->exit.width = 32.0;
+        nextDoor->exit.height = 32.0;
+    }
+
+    int numOfWater = outData.physez.size();
+    GM_WATER_AREA_COUNT = numOfWater;
+    for (int i = 0; i < numOfWater; i++) {
+        SMBX_Water* nextWater = SMBX_Water::Get(i);
+        memset(nextWater, 0, sizeof(SMBX_Water));
+        const LevelPhysEnv& nextLevelPhysEnv = outData.physez[i];
+        nextWater->momentum.x = static_cast<double>(nextLevelPhysEnv.x);
+        nextWater->momentum.y = static_cast<double>(nextLevelPhysEnv.y);
+        nextWater->momentum.width = static_cast<double>(nextLevelPhysEnv.w);
+        nextWater->momentum.height = static_cast<double>(nextLevelPhysEnv.h);
+        nextWater->unknown_08 = static_cast<float>(nextLevelPhysEnv.unknown);
+        nextWater->isQuicksand = COMBOOL(nextLevelPhysEnv.env_type);
+        nextWater->ptLayerName = nextLevelPhysEnv.layer;
+    }
 
 
 }
