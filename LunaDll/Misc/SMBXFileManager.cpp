@@ -147,18 +147,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextBlock->pNoMoreObjInLayerEventName = nextDataLevelBlock.event_emptylayer;
         nextBlock->pLayerName = nextDataLevelBlock.layer;
         nextBlock->IsInvisible2 = COMBOOL(nextDataLevelBlock.invisible);
-        nextBlock->ContentsID = static_cast<short>(nextDataLevelBlock.npc_id);
-        // Special rules for special npcs
-        auto& contentIDOfBlock = nextBlock->ContentsID;
-        if (contentIDOfBlock == 100)
-            contentIDOfBlock = 1009;
-        if (contentIDOfBlock == 102)
-            contentIDOfBlock = 1014;
-        if (contentIDOfBlock == 103)
-            contentIDOfBlock = 1034;
-        if (contentIDOfBlock == 105)
-            contentIDOfBlock = 1095;
-        nextBlock->ContentIDRelated = contentIDOfBlock;
+        nextBlock->ContentsID = static_cast<short>((nextDataLevelBlock.npc_id > 0) ? nextDataLevelBlock.npc_id + 1000 : -1 * nextDataLevelBlock.npc_id);
+        nextBlock->ContentIDRelated = nextBlock->ContentsID;
         nextBlock->Slippery = COMBOOL(nextDataLevelBlock.slippery);
     }
 
