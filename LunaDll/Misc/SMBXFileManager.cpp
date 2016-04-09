@@ -22,6 +22,14 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
     m_isValid(false)
 {}
 
+#define LIMIT_BLOCKS   16384
+#define LIMIT_BGOS     8000
+#define LIMIT_NPCS     5000
+#define LIMIT_WARPS    2000
+#define LIMIT_PHYSENV  450
+#define LIMIT_LAYERS   100
+#define LIMIT_EVENTS   100
+
 // TODO: Return Error?
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 {
@@ -130,6 +138,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfBlocks = outData.blocks.size();
+    if(numOfBlocks > LIMIT_BLOCKS)
+        numOfBlocks = LIMIT_BLOCKS;
     GM_BLOCK_COUNT = numOfBlocks;
     for (int i = 0; i < numOfBlocks; i++)
     {
@@ -153,6 +163,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfBGO = outData.bgo.size();
+    if(numOfBGO > LIMIT_BGOS)
+        numOfBGO = LIMIT_BGOS;
     GM_BGO_COUNT = numOfBGO;
     for (int i = 0; i < numOfBGO; i++) {
         SMBX_BGO* nextBGO = SMBX_BGO::Get(i);
@@ -169,6 +181,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfNPC = outData.npc.size();
+    if(numOfNPC > LIMIT_NPCS)
+        numOfNPC = LIMIT_NPCS;
     GM_NPCS_COUNT = numOfNPC;
     for (int i = 0; i < numOfNPC; i++) {
         NPCMOB* nextNPC = NPC::Get(i);
@@ -260,6 +274,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfDoors = outData.doors.size();
+    if(numOfDoors > LIMIT_WARPS)
+        numOfDoors = LIMIT_WARPS;
     GM_WARP_COUNT = numOfDoors;
     for (unsigned int i = 0; i < outData.doors.size(); i++) {
         SMBX_Warp* nextDoor = SMBX_Warp::Get(i);
@@ -292,6 +308,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfWater = outData.physez.size();
+    if(numOfDoors > LIMIT_PHYSENV)
+        numOfDoors = LIMIT_PHYSENV;
     GM_WATER_AREA_COUNT = numOfWater;
     for (int i = 0; i < numOfWater; i++) {
         SMBX_Water* nextWater = SMBX_Water::Get(i);
@@ -307,6 +325,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfLayers = outData.layers.size();
+    if(numOfLayers > LIMIT_LAYERS)
+        numOfLayers = LIMIT_LAYERS;
     memset(GM_LAYER_ARRAY_PTR, 0, sizeof(LayerControl) * 100);
     for (int i = 0; i < numOfLayers; i++) {
         LayerControl* nextLayer = LayerControl::Get(i);
@@ -320,6 +340,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfEvents = outData.events.size();
+    if(numOfEvents > LIMIT_EVENTS)
+        numOfEvents = LIMIT_EVENTS;
     memset(GM_EVENTS_PTR, 0, sizeof(SMBXEvent) * 100);
     for (int i = 0; i < numOfEvents; i++) {
         
