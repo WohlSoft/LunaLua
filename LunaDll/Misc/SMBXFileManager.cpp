@@ -73,13 +73,17 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     
 
     LevelData outData;
-    if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)){
+    if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)) {
         // TODO: What to do on error?
         MessageBoxA(NULL, (outData.ERROR_info + "\nat line number" + std::to_string(outData.ERROR_linenum)).c_str(), "Error when parsing level file!", NULL);
 
         return;
     }
     
+    dir = utf8_decode(outData.path);
+    levelname = utf8_decode(outData.filename);
+    std::string customFolderU8 = outData.path+"/"+outData.filename+"/";
+    customFolder = Str2WStr(customFolderU8);
 
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
@@ -91,7 +95,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
 
-    
+
 
     // Init Config-Txt
     VB6StrPtr customFolderVB6 = customFolder;
@@ -108,9 +112,14 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     
 
     int numOfSections = outData.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
-    for (int i = 0; i < numOfSections; i++) {
+    for(int i = 0; i < numOfSections; i++)
+    {
         LevelSection& nextDataLevelSection = outData.sections[i];
-        Level::SetSectionBounds(i, nextDataLevelSection.size_left, nextDataLevelSection.size_top, nextDataLevelSection.size_right, nextDataLevelSection.size_bottom);
+        Level::SetSectionBounds(i,
+                                (double)nextDataLevelSection.size_left,
+                                (double)nextDataLevelSection.size_top,
+                                (double)nextDataLevelSection.size_right,
+                                (double)nextDataLevelSection.size_bottom);
         GM_SEC_BG_ID[i] = nextDataLevelSection.background;
         GM_SEC_ISUNDERWATER[i] = COMBOOL(nextDataLevelSection.underwater);
         GM_SEC_ISWARP[i] = COMBOOL(nextDataLevelSection.wrap_h);
@@ -119,18 +128,41 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         GM_SEC_OFFSCREEN[i] = nextDataLevelSection.OffScreenEn;
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
     }
+
+    if(outData.RecentFormatVersion <= 7)//Fill others with zeros
+    {
+        for(int i=6; i<21; i++)
+        {
+            Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
+            GM_SEC_BG_ID[i] = 0;
+            GM_SEC_ISUNDERWATER[i] = -1;
+            GM_SEC_ISWARP[i] = -1;
+            GM_SEC_MUSIC_TBL[i] = 0;
+            GM_SEC_NOTURNBACK[i] = -1;
+            GM_SEC_OFFSCREEN[i] = -1;
+            GM_MUSIC_PATHS_PTR[i] = "";
+        }
+    }
     // Copy initial values for events
     memcpy(GM_ORIG_LVL_BOUNDS, GM_LVL_BOUNDARIES, 6 * sizeof(double) * numOfSections);
     memcpy(GM_SEC_ORIG_BG_ID, GM_SEC_BG_ID, sizeof(WORD) * numOfSections);
 
-    int numOfPlayers = outData.players.size();
-    if (numOfPlayers > 2)
-        numOfPlayers = 2;
-    GM_PLAYERS_COUNT = numOfPlayers;
-    for (int i = 0; i < numOfPlayers; i++) {
+
+    //Fill with zeros
+    for(int i=0;i<2;i++)
+    {
         Momentum* nextPlayerPos = &GM_PLAYER_POS[i];
         memset(nextPlayerPos, 0, sizeof(Momentum));
+    }
+    //GM_PLAYERS_COUNT = numOfPlayers;
+    int numOfPlayers = outData.players.size();
+    for (int i = 0; i < numOfPlayers; i++)
+    {
         const PlayerPoint& nextDataLevelPoint = outData.players[i];
+        if((nextDataLevelPoint.id>2)||(nextDataLevelPoint.id<0))//Skip invalid player points!
+            continue;
+        Momentum* nextPlayerPos = &GM_PLAYER_POS[nextDataLevelPoint.id-1];
+        //memset(nextPlayerPos, 0, sizeof(Momentum));
         nextPlayerPos->x = static_cast<double>(nextDataLevelPoint.x);
         nextPlayerPos->y = static_cast<double>(nextDataLevelPoint.y);
         nextPlayerPos->width = static_cast<double>(nextDataLevelPoint.w);
