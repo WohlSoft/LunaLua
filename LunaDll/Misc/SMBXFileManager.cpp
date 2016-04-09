@@ -451,4 +451,26 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     native_sort_bgo();
     native_sort_finalize2();
 
+    if((GM_ISLEVELEDITORMODE==-1)||(GM_IS_EDITOR_TESTING_NON_FULLSCREEN==-1))
+    {
+//        DEFMEM(dword_B2DD60, WORD, 0x00B2DD60);
+//        WORD v126 = dword_B2DD60;
+//        if ( !dword_B2DD60 )
+//        {
+//            //004011A0 Call this function:
+//            //__fastcall();
+//           (v119)(&Pub_Obj_Inf22_wRefCount, &dword_B2DD60);
+//            v126 = dword_B2DD60;
+//        }
+    }
+
+    if(GM_ISLEVELEDITORMODE == -1)
+    {
+        //Do big mad job here. Still WIP
+    }
+
+    GM_WINNING = 0;
+
+    //Next work to setup doors and their star counters, also states of the layers, etc.
+
 }
