@@ -67,7 +67,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     LevelData outData;
     if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)){
         // TODO: What to do on error?
-        MessageBoxA(NULL, (outData.ERROR_info + "\n at line number" + std::to_string(outData.ERROR_linenum)).c_str(), "Error when parsing level file!", NULL);
+        MessageBoxA(NULL, (outData.ERROR_info + "\nat line number" + std::to_string(outData.ERROR_linenum)).c_str(), "Error when parsing level file!", NULL);
 
         return;
     }
@@ -171,6 +171,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextBGO->id = static_cast<short>(nextDataLevelBGO.id);
         nextBGO->momentum.x = static_cast<double>(nextDataLevelBGO.x);
         nextBGO->momentum.y = static_cast<double>(nextDataLevelBGO.y);
+        //IDEA: A way to customize BGO's sizes - while taking custom images,
+        //      map their sizes into bgodef_width and bgodef_height arrays
         nextBGO->momentum.width = static_cast<double>(bgodef_width[nextBGO->id]);
         nextBGO->momentum.height = static_cast<double>(bgodef_height[nextBGO->id]);
         nextBGO->ptLayerName = nextDataLevelBGO.layer;
@@ -189,13 +191,13 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->id = npcID;
 
         // Special rules by id:
-        if (npcID == 91 || npcID == 96 || npcID == 283 || npcID == 284) {
-            nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
+        if ((npcID == 91) || (npcID == 96) || (npcID == 283) || (npcID == 284)) {
+            nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.contents);
             nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
         }
-        if (npcID == 91 || npcID == 288 || npcID == 289) {
-            nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data2);
-            nextNPC->unknown_E0 = static_cast<short>(nextDataLevelNPC.special_data2);
+        if ((npcID == 91) || (npcID == 288) || (npcID == 289)) {
+            nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_E0 = static_cast<short>(nextDataLevelNPC.special_data);
         }
         if (npc_isflying[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);

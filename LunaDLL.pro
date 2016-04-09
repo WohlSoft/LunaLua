@@ -262,7 +262,12 @@ HEADERS += \
     LunaDll/Rendering/FrameCapture.h \
     LunaDll/Rendering/SMBXMaskedImage.h \
     LunaDll/SMBXInternal/BaseItemArray.h \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h \
+    LunaDll/IPC/IPCPipeServer.h \
+    LunaDll/Misc/SMBXFileManager.h \
+    LunaDll/Misc/TestModeMenu.h \
+    LunaDll/Misc/WaitForTickEnd.h \
+    LunaDll/Rendering/RenderOps/RenderSpriteOp.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -449,5 +454,10 @@ SOURCES += \
     LunaDll/Rendering/BitBltEmulation.cpp \
     LunaDll/Rendering/FrameCapture.cpp \
     LunaDll/Rendering/SMBXMaskedImage.cpp \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
+    LunaDll/IPC/IPCPipeServer.cpp \
+    LunaDll/Misc/SMBXFileManager.cpp \
+    LunaDll/Misc/TestModeMenu.cpp \
+    LunaDll/Misc/WaitForTickEnd.cpp \
+    LunaDll/Rendering/RenderOps/RenderSpriteOp.cpp
 
