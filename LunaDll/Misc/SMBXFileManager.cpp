@@ -146,9 +146,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextBlock->pHitEventName = nextDataLevelBlock.event_hit;
         nextBlock->pNoMoreObjInLayerEventName = nextDataLevelBlock.event_emptylayer;
         nextBlock->pLayerName = nextDataLevelBlock.layer;
-        nextBlock->IsHidden = COMBOOL(nextDataLevelBlock.invisible);
         nextBlock->IsInvisible2 = COMBOOL(nextDataLevelBlock.invisible);
-        nextBlock->IsInvisible3 = COMBOOL(nextDataLevelBlock.invisible);
         nextBlock->ContentsID = static_cast<short>(nextDataLevelBlock.npc_id);
         // Special rules for special npcs
         auto& contentIDOfBlock = nextBlock->ContentsID;
@@ -402,6 +400,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextEvent->AutoscrollSecNum = static_cast<short>(nextDataEvent.scroll_section);
     }
 
-    
+
+    native_sort_finalize1();
+    native_sort_bgo();
+    native_sort_finalize2();
 
 }

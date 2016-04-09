@@ -715,6 +715,9 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 //      No Args
 #define GF_BLOCKSORT_FIN2   0x00A99870
 
+//      No Args
+#define GF_BGOSORT_RELATED  0x00A9A000
+
 //      Arg1 = VB6StrPtr* layerName
 //      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_SHOW_LAYER       0x00AA2760
@@ -808,6 +811,7 @@ static const auto native_sortY          = (void(__stdcall *)(short* /*startIndex
 static const auto native_sortX          = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BLOCKSORT_X;
 static const auto native_sort_finalize1 = (void(__stdcall *)())GF_BLOCKSORT_FIN1;
 static const auto native_sort_finalize2 = (void(__stdcall *)())GF_BLOCKSORT_FIN2;
+static const auto native_sort_bgo       = (void(__stdcall *)())GF_BGOSORT_RELATED;
 
 static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/))GF_TRIGGER_EVENT;
 
