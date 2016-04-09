@@ -240,6 +240,7 @@ DEFMEM(GM_PLAYERS_PTR,      void*, 0x00B25A20);
 DEFMEM(GM_PLAYERS_TEMPLATE, void*, 0x00B2C91C);     // Editor Template
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
 DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
+DEFMEM(GM_PLAYER_POS,       Momentum*, 0x00B25148);
 
 // Star counting
 DEFMEM(GM_STAR_COUNT,       WORD, 0x00B251E0);

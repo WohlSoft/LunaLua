@@ -3,6 +3,7 @@
 #define SMBXEvents_hhhhhh
 
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 // - SMBX Event Struct. size = 0x588 (1416 bytes)
 //
@@ -108,7 +109,7 @@
 //+0x588	w	= Auto start
 
 #pragma pack(push, 1)
-struct SMBXEvent
+struct SMBXEvent : SMBX_StaticBaseItemArray<SMBXEvent, 100, GM_EVENTS_PTR_CONSTPTR>
 {
     short NoSmoke;                  // 0x00 (0xFFFF == no smoke, 0 == smoke)
     short SoundID;                  // 0x02
@@ -128,8 +129,8 @@ struct SMBXEvent
     float Delay;                    // 0x554
     short unknown_558;              // 0x558
     short unknown_55A;              // 0x55A
-    KeyMap forceKeyboard;           // 0x55C
-    VB6StrPtr LayerToMovement;      // 0x570
+    KeyMap ForceKeyboard;           // 0x55C
+    VB6StrPtr LayerToMove;          // 0x570
     float LayerHSpeed;              // 0x574
     float LayerVSpeed;              // 0x578
     float AutoscrollHSpeed;         // 0x57C

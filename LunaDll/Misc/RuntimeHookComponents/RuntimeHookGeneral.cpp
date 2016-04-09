@@ -125,6 +125,9 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--nogl"))
         gStartupSettings.noGL = true;
 
+    if (vecStrFind(args, L"--experimental-file-parser"))
+        gStartupSettings.experimentalFileParser = true;
+
     for (unsigned int i = 0; i < args.size(); i++)
     {
         const std::wstring& arg = args[i];
@@ -400,20 +403,21 @@ void TrySkipPatch()
         .Apply();
 
     // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
-    PATCH(0x8C0169).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C09C2).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C148F).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C14E0).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C2659).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8CE3C9).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8E1AAA).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8FE8CF).CALL(&LoadLevelHook).Apply();
-    PATCH(0x9B7B20).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
-
-
+    if (gStartupSettings.experimentalFileParser) {
+        PATCH(0x8C0169).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8C09C2).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8C148F).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8C14E0).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8C2659).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8CE3C9).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8E1AAA).CALL(&LoadLevelHook).Apply();
+        PATCH(0x8FE8CF).CALL(&LoadLevelHook).Apply();
+        PATCH(0x9B7B20).CALL(&LoadLevelHook).Apply();
+        PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
+        PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
+        PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
+    }
+    
 
 
     // Don't trust QPC as much on WinXP

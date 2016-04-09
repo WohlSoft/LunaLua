@@ -13,19 +13,20 @@
 #include "../SMBXInternal/CollectedStarRecord.h"
 #include "../SMBXInternal/Warp.h"
 #include "../SMBXInternal/Water.h"
+#include "../SMBXInternal/Layer.h"
+#include "../SMBXInternal/SMBXEvents.h"
+
 
 
 SMBXLevelFileBase::SMBXLevelFileBase() :
     m_isValid(false)
 {}
 
-#include <iostream>
-
 // TODO: Return Error?
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 {
     m_isValid = false; // Ensure that we are not valid right now
-
+    
     *(DWORD*)0xB2B9E4 = 0; // Unknown
     native_cleanupLevel();
     native_setupSFX();
@@ -37,7 +38,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_NPCS_COUNT = 0;
     GM_WARP_COUNT = 0;
     GM_WATER_AREA_COUNT = 0;
-
+    
     // Check if Attributes is valid
     if (GetFileAttributesW(fullPath.c_str()) == INVALID_FILE_ATTRIBUTES)
         return;
@@ -48,18 +49,20 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     if (findLastSlash == std::wstring::npos)
         return;
 
+
     std::wstring dir = fullPath.substr(0U, findLastSlash + 1);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
     std::wstring levelname = RemoveExtension(filename);
     std::wstring customFolder = dir + levelname;
 
+    
 
     std::wcout << L"Calc --> fullPath: \"" << fullPath << "\"" << std::endl
         << L"Calc --> path: \"" << dir << "\"" << std::endl
         << L"Calc --> filename: \"" << filename << "\"" << std::endl
         << L"Calc --> levelname: \"" << levelname << "\"" << std::endl
         << L"Calc --> custom folder: \"" << customFolder << "\"" << std::endl;
-
+    
 
     LevelData outData;
     if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)){
@@ -68,12 +71,19 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
         return;
     }
+    
+
+    FileFormats::smbx64LevelPrepare(outData);
+    FileFormats::smbx64LevelSortBlocks(outData);
+    FileFormats::smbx64LevelSortBGOs(outData);
 
     // If we are successful then set the variables
     GM_LVLFILENAME_PTR = filename;
     GM_LVLNAME_PTR = levelname;
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
+
+    
 
     // Init Config-Txt
     VB6StrPtr customFolderVB6 = customFolder;
@@ -87,6 +97,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
+    
 
     int numOfSections = outData.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
     for (int i = 0; i < numOfSections; i++) {
@@ -101,23 +112,21 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
     }
     // Copy initial values for events
-    memcpy(&GM_ORIG_LVL_BOUNDS, &GM_LVL_BOUNDARIES, 6 * sizeof(double) * numOfSections);
-    memcpy(&GM_SEC_ORIG_BG_ID, &GM_SEC_BG_ID, sizeof(WORD) * numOfSections);
-
+    memcpy(GM_ORIG_LVL_BOUNDS, GM_LVL_BOUNDARIES, 6 * sizeof(double) * numOfSections);
+    memcpy(GM_SEC_ORIG_BG_ID, GM_SEC_BG_ID, sizeof(WORD) * numOfSections);
 
     int numOfPlayers = outData.players.size();
     if (numOfPlayers > 2)
         numOfPlayers = 2;
     GM_PLAYERS_COUNT = numOfPlayers;
     for (int i = 0; i < numOfPlayers; i++) {
-        PlayerMOB* nextPlayer = Player::Get(i);
-        memset(nextPlayer, 0, sizeof(nextPlayer));
+        Momentum* nextPlayerPos = &GM_PLAYER_POS[i];
+        memset(nextPlayerPos, 0, sizeof(Momentum));
         const PlayerPoint& nextDataLevelPoint = outData.players[i];
-        nextPlayer->FacingDirection = nextDataLevelPoint.direction;
-        nextPlayer->momentum.x = static_cast<double>(nextDataLevelPoint.x);
-        nextPlayer->momentum.y = static_cast<double>(nextDataLevelPoint.y);
-        nextPlayer->momentum.width = static_cast<double>(nextDataLevelPoint.w);
-        nextPlayer->momentum.height = static_cast<double>(nextDataLevelPoint.h);
+        nextPlayerPos->x = static_cast<double>(nextDataLevelPoint.x);
+        nextPlayerPos->y = static_cast<double>(nextDataLevelPoint.y);
+        nextPlayerPos->width = static_cast<double>(nextDataLevelPoint.w);
+        nextPlayerPos->height = static_cast<double>(nextDataLevelPoint.h);
     }
 
     int numOfBlocks = outData.blocks.size();
@@ -131,8 +140,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextBlock->momentum.y = static_cast<double>(nextDataLevelBlock.y);
         nextBlock->momentum.width = static_cast<double>(nextDataLevelBlock.w);
         nextBlock->momentum.height = static_cast<double>(nextDataLevelBlock.h);
-        nextBlock->BlockType = nextDataLevelBlock.id;
-        nextBlock->BlockType2 = nextDataLevelBlock.id;
+        nextBlock->BlockType = static_cast<short>(nextDataLevelBlock.id);
+        nextBlock->BlockType2 = static_cast<short>(nextDataLevelBlock.id);
         nextBlock->pDestroyEventName = nextDataLevelBlock.event_destroy;
         nextBlock->pHitEventName = nextDataLevelBlock.event_hit;
         nextBlock->pNoMoreObjInLayerEventName = nextDataLevelBlock.event_emptylayer;
@@ -140,7 +149,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextBlock->IsHidden = COMBOOL(nextDataLevelBlock.invisible);
         nextBlock->IsInvisible2 = COMBOOL(nextDataLevelBlock.invisible);
         nextBlock->IsInvisible3 = COMBOOL(nextDataLevelBlock.invisible);
-        nextBlock->ContentsID = nextDataLevelBlock.npc_id;
+        nextBlock->ContentsID = static_cast<short>(nextDataLevelBlock.npc_id);
         // Special rules for special npcs
         auto& contentIDOfBlock = nextBlock->ContentsID;
         if (contentIDOfBlock == 100)
@@ -161,7 +170,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         SMBX_BGO* nextBGO = SMBX_BGO::Get(i);
         memset(nextBGO, 0, sizeof(SMBX_BGO));
         const LevelBGO& nextDataLevelBGO = outData.bgo[i];
-        nextBGO->id = nextDataLevelBGO.id;
+        nextBGO->id = static_cast<short>(nextDataLevelBGO.id);
         nextBGO->momentum.x = static_cast<double>(nextDataLevelBGO.x);
         nextBGO->momentum.y = static_cast<double>(nextDataLevelBGO.y);
         nextBGO->momentum.width = static_cast<double>(bgodef_width[nextBGO->id]);
@@ -184,23 +193,23 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         // Special rules by id:
         if (npcID == 91 || npcID == 96 || npcID == 283 || npcID == 284) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = nextDataLevelNPC.special_data;
+            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
         }
         if (npcID == 91 || npcID == 288 || npcID == 289) {
             nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data2);
-            nextNPC->unknown_E0 = nextDataLevelNPC.special_data2;
+            nextNPC->unknown_E0 = static_cast<short>(nextDataLevelNPC.special_data2);
         }
         if (npc_isflying[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = nextDataLevelNPC.special_data;
+            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
         }
         if (npc_isWaterNPC[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = nextDataLevelNPC.special_data;
+            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
         }
         if (npcID == 260) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = nextDataLevelNPC.special_data;
+            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
         }
 
         nextNPC->isGenerator = COMBOOL(nextDataLevelNPC.generator);
@@ -262,7 +271,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     int numOfDoors = outData.doors.size();
     GM_WARP_COUNT = numOfDoors;
-    for (int i = 0; i < outData.doors.size(); i++) {
+    for (unsigned int i = 0; i < outData.doors.size(); i++) {
         SMBX_Warp* nextDoor = SMBX_Warp::Get(i);
         memset(nextDoor, 0, sizeof(SMBX_Warp));
         const LevelDoor& nextDataLevelDoor = outData.doors[i];
@@ -276,11 +285,11 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextDoor->exitDirection = static_cast<SMBX_ExitDir>(nextDataLevelDoor.odirect);
         nextDoor->warpType = static_cast<SMBX_WarpType>(nextDataLevelDoor.type);
         nextDoor->warpToLevelFileName = nextDataLevelDoor.lname;
-        nextDoor->toWarpIndex = nextDataLevelDoor.warpto;
+        nextDoor->toWarpIndex = static_cast<short>(nextDataLevelDoor.warpto);
         nextDoor->isLevelEntrance = COMBOOL(nextDataLevelDoor.lvl_i);
         nextDoor->isLevelExit = COMBOOL(nextDataLevelDoor.lvl_o);
-        nextDoor->warpToWorldmapX = nextDataLevelDoor.world_x;
-        nextDoor->warpToWorldmapY = nextDataLevelDoor.world_y;
+        nextDoor->warpToWorldmapX = static_cast<short>(nextDataLevelDoor.world_x);
+        nextDoor->warpToWorldmapY = static_cast<short>(nextDataLevelDoor.world_y);
         nextDoor->starsRequired = nextDataLevelDoor.star_num_hide;
         nextDoor->ptLayerName = nextDataLevelDoor.layer;
         nextDoor->isHidden = COMBOOL(nextDataLevelDoor.unknown);
@@ -307,5 +316,92 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextWater->ptLayerName = nextLevelPhysEnv.layer;
     }
 
+    int numOfLayers = outData.layers.size();
+    memset(GM_LAYER_ARRAY_PTR, 0, sizeof(LayerControl) * 100);
+    for (int i = 0; i < numOfLayers; i++) {
+        LayerControl* nextLayer = LayerControl::Get(i);
+        const LevelLayer& nextDataLevelLayer = outData.layers[i];
+        nextLayer->ptLayerName = nextDataLevelLayer.name;
+        nextLayer->isHidden = nextDataLevelLayer.hidden;
+        if (nextLayer->isHidden) {
+            short noSmoke = -1;
+            native_hideLayer(&nextLayer->ptLayerName, &noSmoke);
+        }
+    }
+
+    int numOfEvents = outData.events.size();
+    memset(GM_EVENTS_PTR, 0, sizeof(SMBXEvent) * 100);
+    for (int i = 0; i < numOfEvents; i++) {
+        
+        SMBXEvent* nextEvent = SMBXEvent::Get(i);
+        const LevelSMBX64Event& nextDataEvent = outData.events[i];
+        nextEvent->pName = nextDataEvent.name;
+        nextEvent->pTextMsg = nextDataEvent.msg;
+        nextEvent->SoundID = static_cast<short>(nextDataEvent.sound_id);
+        nextEvent->EndGame = COMBOOL(nextDataEvent.end_game);
+        
+        int hideLayersNum = nextDataEvent.layers_hide.size();
+        int showLayersNum = nextDataEvent.layers_show.size();
+        int toggleLayersNum = nextDataEvent.layers_toggle.size();
+        
+
+        for (int i = 0; i < 21; i++) {
+            if (i < hideLayersNum)
+                nextEvent->pHideLayerTarg[i] = nextDataEvent.layers_hide[i];
+            else
+                nextEvent->pHideLayerTarg[i] = "";
+
+            if (i < showLayersNum)
+                nextEvent->pShowLayerTarg[i] = nextDataEvent.layers_show[i];
+            else
+                nextEvent->pShowLayerTarg[i] = "";
+
+            if (i < toggleLayersNum)
+                nextEvent->pToggleLayerTarg[i] = nextDataEvent.layers_toggle[i];
+            else
+                nextEvent->pToggleLayerTarg[i] = "";
+        }
+        
+        
+        int numOfSets = nextDataEvent.sets.size();
+        if (numOfSets > 21)
+            numOfSets = 21;
+
+        for (int i = 0; i < numOfSets; i++) {
+            const LevelEvent_Sets& nextDataEventSet = nextDataEvent.sets[i];
+            nextEvent->SectionMusicID[i] = static_cast<short>(nextDataEventSet.music_id);
+            nextEvent->SectionBackgroundID[i] = static_cast<short>(nextDataEventSet.background_id);
+            nextEvent->SectionBounds[i].left = nextDataEventSet.position_left;
+            nextEvent->SectionBounds[i].top = nextDataEventSet.position_top;
+            nextEvent->SectionBounds[i].bottom = nextDataEventSet.position_bottom;
+            nextEvent->SectionBounds[i].right = nextDataEventSet.position_right;
+        }
+        
+        nextEvent->EventToTrigger = nextDataEvent.trigger;
+        nextEvent->Delay = static_cast<float>(nextDataEvent.trigger_timer);
+        nextEvent->NoSmoke = COMBOOL(nextDataEvent.nosmoke);
+        
+        nextEvent->ForceKeyboard.altJumpKeyState = COMBOOL(nextDataEvent.ctrl_altjump);
+        nextEvent->ForceKeyboard.altRunKeyState = COMBOOL(nextDataEvent.ctrl_altrun);
+        nextEvent->ForceKeyboard.downKeyState = COMBOOL(nextDataEvent.ctrl_down);
+        nextEvent->ForceKeyboard.dropItemKeyState = COMBOOL(nextDataEvent.ctrl_drop);
+        nextEvent->ForceKeyboard.jumpKeyState = COMBOOL(nextDataEvent.ctrl_jump);
+        nextEvent->ForceKeyboard.leftKeyState = COMBOOL(nextDataEvent.ctrl_left);
+        nextEvent->ForceKeyboard.pauseKeyState = COMBOOL(nextDataEvent.ctrl_start);
+        nextEvent->ForceKeyboard.rightKeyState = COMBOOL(nextDataEvent.ctrl_right);
+        nextEvent->ForceKeyboard.runKeyState = COMBOOL(nextDataEvent.ctrl_run);
+        nextEvent->ForceKeyboard.upKeyState = COMBOOL(nextDataEvent.ctrl_up);
+        
+        nextEvent->AutoStart = COMBOOL(nextDataEvent.autostart);
+        nextEvent->LayerToMove = nextDataEvent.movelayer;
+        nextEvent->LayerHSpeed = nextDataEvent.layer_speed_x;
+        nextEvent->LayerVSpeed = nextDataEvent.layer_speed_y;
+        
+        nextEvent->AutoscrollHSpeed = nextDataEvent.move_camera_x;
+        nextEvent->AutoscrollVSpeed = nextDataEvent.move_camera_y;
+        nextEvent->AutoscrollSecNum = static_cast<short>(nextDataEvent.scroll_section);
+    }
+
+    
 
 }
