@@ -689,7 +689,7 @@ bool FileFormats::WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata,
     PGE_FileFormats_misc::RawTextOutput file;
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Fail to open file for write";
+        errorString="Failed to open raw string for write";
         return false;
     }
     return WriteSMBX64LvlFile(file, FileData, file_format);

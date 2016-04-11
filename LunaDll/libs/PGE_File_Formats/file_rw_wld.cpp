@@ -130,13 +130,33 @@ badfile:
 
 bool FileFormats::ReadSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData)
 {
-    PGE_FileFormats_misc::TextFileInput file(filePath, false);
+    errorString.clear();
+    PGE_FileFormats_misc::TextFileInput file;
+    if(!file.open(filePath, false))
+    {
+        errorString="Failed to open file for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadSMBX64WldFile(file, FileData);
 }
 
 bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  WorldData &FileData)
 {
-    PGE_FileFormats_misc::RawTextInput file(&rawdata, filePath);
+    errorString.clear();
+    PGE_FileFormats_misc::RawTextInput file;
+    if(!file.open(&rawdata, filePath))
+    {
+        errorString="Failed to open raw string for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadSMBX64WldFile(file, FileData);
 }
 
@@ -365,17 +385,25 @@ return false;
 
 bool FileFormats::WriteSMBX64WldFileF(PGESTRING filePath, WorldData &FileData, int file_format)
 {
+    errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
+    {
+        errorString="Failed to open file for write";
         return false;
+    }
     return WriteSMBX64WldFile(file, FileData, file_format);
 }
 
 bool FileFormats::WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata, int file_format)
 {
+    errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
+    {
+        errorString="Failed to open raw string for write";
         return false;
+    }
     return WriteSMBX64WldFile(file, FileData, file_format);
 }
 

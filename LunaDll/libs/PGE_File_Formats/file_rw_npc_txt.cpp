@@ -39,9 +39,10 @@ bool FileFormats::ReadNpcTXTFileF(PGESTRING filePath, NPCConfigFile &FileData, b
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
-    if(!file.open(filePath, IgnoreBad))
+    if(!file.open(filePath, false))
     {
         errorString="Failed to open file for read";
+        FileData.ReadFileValid = false;
         return false;
     }
     return ReadNpcTXTFile(file, FileData, IgnoreBad);
@@ -54,6 +55,7 @@ bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData,
     if(!file.open(&rawdata))
     {
         errorString="Failed to open raw string for read";
+        FileData.ReadFileValid = false;
         return false;
     }
     return ReadNpcTXTFile(file, FileData, IgnoreBad);

@@ -34,13 +34,33 @@
 //*********************************************************
 bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
 {
-    PGE_FileFormats_misc::TextFileInput file(filePath, true);
+    errorString.clear();
+    PGE_FileFormats_misc::TextFileInput file;
+    if(!file.open(filePath, true))
+    {
+        errorString="Failed to open file for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadExtendedSaveFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, PGESTRING filePath, GamesaveData &FileData)
 {
-    PGE_FileFormats_misc::RawTextInput file(&rawdata, filePath);
+    errorString.clear();
+    PGE_FileFormats_misc::RawTextInput file;
+    if(!file.open(&rawdata, filePath))
+    {
+        errorString="Failed to open raw string for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadExtendedSaveFile(file, FileData);
 }
 
@@ -241,17 +261,25 @@ badfile:    //If file format not corrects
 
 bool FileFormats::WriteExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
 {
+    errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
-    if(!file.open(filePath, false, false, PGE_FileFormats_misc::TextOutput::truncate))
+    if(!file.open(filePath, true, false, PGE_FileFormats_misc::TextOutput::truncate))
+    {
+        errorString="Failed to open file for write";
         return false;
+    }
     return WriteExtendedSaveFile(file, FileData);
 }
 
 bool FileFormats::WriteExtendedSaveFileRaw(GamesaveData &FileData, PGESTRING &rawdata)
 {
+    errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
+    {
+        errorString="Failed to open raw string for write";
         return false;
+    }
     return WriteExtendedSaveFile(file, FileData);
 }
 

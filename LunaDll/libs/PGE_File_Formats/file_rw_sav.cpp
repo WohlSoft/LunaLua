@@ -36,13 +36,33 @@
 
 bool FileFormats::ReadSMBX64SavFileF(PGESTRING  filePath, GamesaveData &FileData)
 {
-    PGE_FileFormats_misc::TextFileInput file(filePath, false);
+    errorString.clear();
+    PGE_FileFormats_misc::TextFileInput file;
+    if(!file.open(filePath, false))
+    {
+        errorString="Failed to open file for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadSMBX64SavFile(file, FileData);
 }
 
 bool FileFormats::ReadSMBX64SavFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  GamesaveData &FileData)
 {
-    PGE_FileFormats_misc::RawTextInput file(&rawdata, filePath);
+    errorString.clear();
+    PGE_FileFormats_misc::RawTextInput file;
+    if(!file.open(&rawdata, filePath))
+    {
+        errorString="Failed to open raw string for read";
+        FileData.ERROR_info = errorString;
+        FileData.ERROR_linedata = "";
+        FileData.ERROR_linenum = -1;
+        FileData.ReadFileValid = false;
+        return false;
+    }
     return ReadSMBX64SavFile(file, FileData);
 }
 
