@@ -27,13 +27,13 @@ Mix_FreeChunk
 Mix_FreeMusic
 Mix_GetChunk
 Mix_GetChunkDecoder
+Mix_GetMusicAlbumTag
+Mix_GetMusicArtistTag
+Mix_GetMusicCopyrightTag
 Mix_GetMusicDecoder
 Mix_GetMusicHookData
 Mix_GetMusicTitle
 Mix_GetMusicTitleTag
-Mix_GetMusicArtistTag
-Mix_GetMusicAlbumTag
-Mix_GetMusicCopyrightTag
 Mix_GetMusicType
 Mix_GetNumChunkDecoders
 Mix_GetNumMusicDecoders
@@ -59,6 +59,7 @@ Mix_LoadMUS_RW_ARG
 Mix_LoadMUS_RW_GME
 Mix_LoadWAV_RW
 Mix_OpenAudio
+Mix_OpenAudioDevice
 Mix_Pause
 Mix_PauseMusic
 Mix_Paused

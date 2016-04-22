@@ -1,116 +1,92 @@
-Microsoft (R) COFF/PE Dumper Version 14.00.23026.0
-Copyright (C) Microsoft Corporation.  All rights reserved.
-
-
-Dump of file SDL2_mixer_ext.dll
-
-File Type: DLL
-
-  Section contains the following exports for SDL2_mixer_ext.dll
-
-    00000000 characteristics
-           0 time date stamp Thu Jan  1 03:00:00 1970
-        0.00 version
-           1 ordinal base
-          91 number of functions
-          91 number of names
-
-    ordinal hint RVA      name
-
-          1    0 0000B1B0 MIX_ADLMIDI_getBankID
-          2    1 0000B210 MIX_ADLMIDI_getScaleMod
-          3    2 0000B1D0 MIX_ADLMIDI_getTremolo
-          4    3 0000B1F0 MIX_ADLMIDI_getVibrato
-          5    4 0000B1C0 MIX_ADLMIDI_setBankID
-          6    5 0000B220 MIX_ADLMIDI_setScaleMod
-          7    6 0000B230 MIX_ADLMIDI_setSetDefaults
-          8    7 0000B1E0 MIX_ADLMIDI_setTremolo
-          9    8 0000B200 MIX_ADLMIDI_setVibrato
-         10    9 0000B240 MIX_SetMidiDevice
-         11    A 0000B1A0 MIX_Timidity_addToPathList
-         12    B 00009260 Mix_AllocateChannels
-         13    C 00007F90 Mix_ChannelFinished
-         14    D 00009340 Mix_CloseAudio
-         15    E 0000B0E0 Mix_EachSoundFont
-         16    F 00007FD0 Mix_ExpireChannel
-         17   10 00008980 Mix_FadeInChannelTimed
-         18   11 0000AA20 Mix_FadeInMusic
-         19   12 0000A930 Mix_FadeInMusicPos
-         20   13 00008620 Mix_FadeOutChannel
-         21   14 000086F0 Mix_FadeOutGroup
-         22   15 0000AD50 Mix_FadeOutMusic
-         23   16 00008750 Mix_FadingChannel
-         24   17 0000AE40 Mix_FadingMusic
-         25   18 00007E60 Mix_FreeChunk
-         26   19 0000A530 Mix_FreeMusic
-         27   1A 00008B10 Mix_GetChunk
-         28   1B 00007770 Mix_GetChunkDecoder
-         29   1C 0000A810 Mix_GetMusicAlbumTag
-         30   1D 0000A780 Mix_GetMusicArtistTag
-         31   1E 0000A8A0 Mix_GetMusicCopyrightTag
-         32   1F 0000A110 Mix_GetMusicDecoder
-         33   20 00007F80 Mix_GetMusicHookData
-         34   21 0000A750 Mix_GetMusicTitle
-         35   22 0000A6C0 Mix_GetMusicTitleTag
-         36   23 0000A670 Mix_GetMusicType
-         37   24 00007760 Mix_GetNumChunkDecoders
-         38   25 0000A100 Mix_GetNumMusicDecoders
-         39   26 0000B090 Mix_GetSoundFonts
-         40   27 0000AFB0 Mix_GetSynchroValue
-         41   28 00008D90 Mix_GroupAvailable
-         42   29 00008CC0 Mix_GroupChannel
-         43   2A 00008D10 Mix_GroupChannels
-         44   2B 00008DF0 Mix_GroupCount
-         45   2C 00008EE0 Mix_GroupNewer
-         46   2D 00008E50 Mix_GroupOldest
-         47   2E 00008500 Mix_HaltChannel
-         48   2F 000085C0 Mix_HaltGroup
-         49   30 0000AD20 Mix_HaltMusic
-         50   31 00007F30 Mix_HookMusic
-         51   32 0000A140 Mix_HookMusicFinished
-         52   33 000077C0 Mix_Init
-         53   34 000077A0 Mix_Linked_Version
-         54   35 0000B850 Mix_LoadMUS
-         55   36 0000B3F0 Mix_LoadMUSType_RW
-         56   37 0000BC80 Mix_LoadMUS_RW
-         57   38 0000BCB0 Mix_LoadMUS_RW_ARG
-         58   39 0000BD20 Mix_LoadMUS_RW_GME
-         59   3A 00007960 Mix_LoadWAV_RW
-         60   3B 000093F0 Mix_OpenAudio
-         61   3C 00008B40 Mix_Pause
-         62   3D 0000AE80 Mix_PauseMusic
-         63   3E 00008C50 Mix_Paused
-         64   3F 0000AEC0 Mix_PausedMusic
-         65   40 00008800 Mix_PlayChannelTimed
-         66   41 0000AA50 Mix_PlayMusic
-         67   42 00008780 Mix_Playing
-         68   43 0000AED0 Mix_PlayingMusic
-         69   44 00007910 Mix_QuerySpec
-         70   45 00007DF0 Mix_QuickLoad_RAW
-         71   46 00007D10 Mix_QuickLoad_WAV
-         72   47 000078A0 Mix_Quit
-         73   48 00009060 Mix_RegisterEffect
-         74   49 00007FB0 Mix_ReserveChannels
-         75   4A 00008BB0 Mix_Resume
-         76   4B 0000AE90 Mix_ResumeMusic
-         77   4C 0000AEA0 Mix_RewindMusic
-         78   4D 000047F0 Mix_SetDistance
-         79   4E 0000AF30 Mix_SetMusicCMD
-         80   4F 0000AA80 Mix_SetMusicPosition
-         81   50 00005790 Mix_SetPanning
-         82   51 000048F0 Mix_SetPosition
-         83   52 00007F00 Mix_SetPostMix
-         84   53 000059D0 Mix_SetReverseStereo
-         85   54 0000B030 Mix_SetSoundFonts
-         86   55 0000AFA0 Mix_SetSynchroValue
-         87   56 00009230 Mix_UnregisterAllEffects
-         88   57 000091B0 Mix_UnregisterEffect
-         89   58 00008070 Mix_Volume
-         90   59 000084D0 Mix_VolumeChunk
-         91   5A 0000AAF0 Mix_VolumeMusic
-
-  Summary
-
-      1BB000 UPX0
-       BB000 UPX1
-        1000 UPX2
+MIX_ADLMIDI_getBankID
+MIX_ADLMIDI_getScaleMod
+MIX_ADLMIDI_getTremolo
+MIX_ADLMIDI_getVibrato
+MIX_ADLMIDI_setBankID
+MIX_ADLMIDI_setScaleMod
+MIX_ADLMIDI_setSetDefaults
+MIX_ADLMIDI_setTremolo
+MIX_ADLMIDI_setVibrato
+MIX_SetMidiDevice
+MIX_Timidity_addToPathList
+Mix_AllocateChannels
+Mix_ChannelFinished
+Mix_CloseAudio
+Mix_EachSoundFont
+Mix_ExpireChannel
+Mix_FadeInChannelTimed
+Mix_FadeInMusic
+Mix_FadeInMusicPos
+Mix_FadeOutChannel
+Mix_FadeOutGroup
+Mix_FadeOutMusic
+Mix_FadingChannel
+Mix_FadingMusic
+Mix_FreeChunk
+Mix_FreeMusic
+Mix_GetChunk
+Mix_GetChunkDecoder
+Mix_GetMusicAlbumTag
+Mix_GetMusicArtistTag
+Mix_GetMusicCopyrightTag
+Mix_GetMusicDecoder
+Mix_GetMusicHookData
+Mix_GetMusicTitle
+Mix_GetMusicTitleTag
+Mix_GetMusicType
+Mix_GetNumChunkDecoders
+Mix_GetNumMusicDecoders
+Mix_GetSoundFonts
+Mix_GetSynchroValue
+Mix_GroupAvailable
+Mix_GroupChannel
+Mix_GroupChannels
+Mix_GroupCount
+Mix_GroupNewer
+Mix_GroupOldest
+Mix_HaltChannel
+Mix_HaltGroup
+Mix_HaltMusic
+Mix_HookMusic
+Mix_HookMusicFinished
+Mix_Init
+Mix_Linked_Version
+Mix_LoadMUS
+Mix_LoadMUSType_RW
+Mix_LoadMUS_RW
+Mix_LoadMUS_RW_ARG
+Mix_LoadMUS_RW_GME
+Mix_LoadWAV_RW
+Mix_OpenAudio
+Mix_OpenAudioDevice
+Mix_Pause
+Mix_PauseMusic
+Mix_Paused
+Mix_PausedMusic
+Mix_PlayChannelTimed
+Mix_PlayMusic
+Mix_Playing
+Mix_PlayingMusic
+Mix_QuerySpec
+Mix_QuickLoad_RAW
+Mix_QuickLoad_WAV
+Mix_Quit
+Mix_RegisterEffect
+Mix_ReserveChannels
+Mix_Resume
+Mix_ResumeMusic
+Mix_RewindMusic
+Mix_SetDistance
+Mix_SetMusicCMD
+Mix_SetMusicPosition
+Mix_SetPanning
+Mix_SetPosition
+Mix_SetPostMix
+Mix_SetReverseStereo
+Mix_SetSoundFonts
+Mix_SetSynchroValue
+Mix_UnregisterAllEffects
+Mix_UnregisterEffect
+Mix_Volume
+Mix_VolumeChunk
+Mix_VolumeMusic
