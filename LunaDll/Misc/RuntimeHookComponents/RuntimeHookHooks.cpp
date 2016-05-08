@@ -28,6 +28,9 @@
 
 #include "../PerfTracker.h"
 
+#include "../../Misc/TestMode.h"
+#include "../../Misc/WaitForTickEnd.h"
+
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -571,7 +574,7 @@ extern void __stdcall LoadLocalGfxHook()
 {
     // Clear data based on loaded SMBX sprites
     g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::clearLookupTable();
+    SMBXMaskedImage::ClearLookupTable();
 
     native_loadLocalGfx();
 
@@ -586,7 +589,7 @@ extern void __stdcall LoadLocalOverworldGfxHook()
 {
     // Clear data based on loaded SMBX sprites
     g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::clearLookupTable();
+    SMBXMaskedImage::ClearLookupTable();
 
     native_loadWorldGfx();
 
@@ -730,6 +733,7 @@ extern void SetSMBXFrameTiming(double ms)
 
 extern void __stdcall FrameTimingHookQPC()
 {
+    WaitForTickEnd::RunQueued();
     g_PerfTracker.endFrame();
     static int64_t lastFrameTime = 0;
     static double frameError = 0.0;
@@ -742,6 +746,9 @@ extern void __stdcall FrameTimingHookQPC()
         LARGE_INTEGER sFreqStruct;
         QueryPerformanceFrequency(&sFreqStruct);
         qpcFactor = 1000.0 / sFreqStruct.QuadPart;
+        if (qpcFactor > 1.0) {
+            qpcFactor = 0.0;
+        }
     }
 
     // Get the desired duration for this frame
@@ -749,7 +756,7 @@ extern void __stdcall FrameTimingHookQPC()
 
     QueryPerformanceCounter(&currentTime);
     frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
-    if (lastFrameTime == 0 || frameTime > 100.0) {
+    if (qpcFactor == 0.0 || lastFrameTime == 0 || frameTime > 100.0) {
         // If we've lost track of time, synchronize with scheduler because it turns out if we
         // call Sleep at the wrong time Windows likes to eat too much CPU during the Sleep call.
         // Yeah. This is weird.
@@ -804,7 +811,11 @@ extern void __stdcall FrameTimingHookQPC()
 extern void __stdcall FrameTimingMaxFPSHookQPC()
 {
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
-    if (GM_MAX_FPS_MODE) return;
+    if (GM_MAX_FPS_MODE)
+    {
+        WaitForTickEnd::RunQueued();
+        return;
+    }
 
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHookQPC();
@@ -812,6 +823,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
 
 extern void __stdcall FrameTimingHook()
 {
+    WaitForTickEnd::RunQueued();
     g_PerfTracker.endFrame();
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
@@ -868,7 +880,11 @@ extern void __stdcall FrameTimingHook()
 extern void __stdcall FrameTimingMaxFPSHook()
 {
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
-    if (GM_MAX_FPS_MODE) return;
+    if (GM_MAX_FPS_MODE)
+    {
+        WaitForTickEnd::RunQueued();
+        return;
+    }
 
     // If we're not in "max FPS" mode, run the frame timing as normal
     FrameTimingHook();
@@ -1145,4 +1161,69 @@ extern void __stdcall RenderWorldHook()
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();
     gLunaRender.EndFrameRender();
+}
+
+static void runtimeHookSmbxChangeModeHook(void)
+{
+    while (gStartupSettings.currentlyWaitingForIPC)
+    {
+        WaitMessage();
+        LunaDllWaitFrame(false);
+    }
+
+    // Handler for test mode if it's enabled
+    testModeSmbxChangeModeHook();
+}
+
+__declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
+{
+    __asm {
+        pushf
+            push eax
+            push ecx
+            push edx
+    }
+    runtimeHookSmbxChangeModeHook();
+    __asm {
+        pop edx
+            pop ecx
+            pop eax
+            popf
+            or ebx, 0xFFFFFFFF
+            cmp word ptr ds : [0xB2C620], bx
+            ret
+    }
+}
+
+_declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x08D8F46
+        RET
+    }
+}
+
+void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
+{
+    if (testModeLoadLevelHook(filename))
+    {
+        // If handled by testModeLoadLevelHook, skip
+        return;
+    }
+    
+    loadLevel_OrigFunc(filename);
+}
+
+void __stdcall runtimeHookCloseWindow(void)
+{
+    if (TestModeCheckHideWindow())
+    {
+        // If handled by TestModeCheckHideWindow, skip
+        return;
+    }
+
+    native_exitMainGame();
 }

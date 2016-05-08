@@ -130,10 +130,19 @@ void ParseArgs(const std::vector<std::wstring>& args)
         const std::wstring& arg = args[i];
         if (arg.find(L"--testLevel=") == 0)
         {
-            testModeEnable(arg.substr(12));
+            STestModeSettings settings;
+            settings.levelPath = arg.substr(12);
+            testModeEnable(settings);
             gStartupSettings.patch = true;
             break;
         }
+    }
+
+    if (vecStrFind(args, L"--waitForIPC"))
+    {
+        gStartupSettings.waitForIPC = true;
+        gStartupSettings.currentlyWaitingForIPC = true;
+        gStartupSettings.patch = true;
     }
 }
 
@@ -469,6 +478,15 @@ void TrySkipPatch()
     //   5: HUD
     PATCH(0x939977).NOP().NOP().CALL(GetRenderBelowPriorityHook<100>()).Apply();
 
+    // Change Mode Hook
+    // Runs when the game starts or the game mode changes.
+    PATCH(0x8BF4E3).CALL(runtimeHookSmbxChangeModeHookRaw).NOP_PAD_TO_SIZE<10>().Apply();
+
+    // Load level hook
+    PATCH(0x8D8F40).JMP(runtimeHookLoadLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Close window hook
+    PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

@@ -1,257 +1,104 @@
 #include <Windows.h>
 #include <string>
+#include <mutex>
+#include "../../libs/json/json.hpp"
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/PlayerMOB.h"
-#include "../SMBXInternal/Sound.h"
-#include "../Rendering/Rendering.h"
-#include "../Rendering/RenderOps/RenderStringOp.h"
-#include "../Rendering/RenderOps/RenderRectOp.h"
+#include "../EventStateMachine.h"
+#include "../IPC/IPCPipeServer.h"
 #include "MiscFuncs.h"
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
+#include "WaitForTickEnd.h"
+
+#include "TestModeMenu.h"
 #include "TestMode.h"
 
-/////////////////////////////////////////////
-//================ DEFINES ================//
-/////////////////////////////////////////////
+using json = nlohmann::json;
 
-static void testModePauseMenu(bool allowContinue);
-static bool testModeSetupForLoading();
-static void testModeRestartLevel(void);
+//////////////////////////////////////////////
+//============ GLOBAL VARIABLES ============//
+//////////////////////////////////////////////
+static std::mutex g_testModeMutex;
+
+///////////////////////////////////////////////
+//============== UTILITY PATCH ==============//
+///////////////////////////////////////////////
+
+// Patch to allow exiting the pause menu. Apply when the vanilla pause/textbox
+// should be instantly exited always. Unapply when this should not be the case.
+static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
 
 //////////////////////////////////////////////
 //================ SETTINGS ================//
 //////////////////////////////////////////////
 
-struct STestModePlayerSettings
+STestModeSettings::STestModeSettings()
 {
-    Characters identity;
-    short powerup;
-    short mountType;
-    short mountColor;
-};
-
-struct STestModeSettings
+    ResetToDefault();
+}
+void STestModeSettings::ResetToDefault(void)
 {
-    std::wstring levelPath;
-    int playerCount;
-    STestModePlayerSettings players[2];
-
-    STestModeSettings()
-    {
-        ResetToDefault();
-    }
-    void ResetToDefault(void)
-    {
-        levelPath = L"";
-        playerCount = 1;
-        players[0].identity = CHARACTER_MARIO;
-        players[0].powerup = 1;
-        players[0].mountType = 0;
-        players[0].mountColor = 0;
-        players[1].identity = CHARACTER_LUIGI;
-        players[1].powerup = 1;
-        players[1].mountType = 0;
-        players[1].mountColor = 0;
-    }
-};
+    enabled = false;
+    levelPath = L"";
+    levelData = "";
+    playerCount = 1;
+    players[0].identity = CHARACTER_MARIO;
+    players[0].powerup = 1;
+    players[0].mountType = 0;
+    players[0].mountColor = 0;
+    players[1].identity = CHARACTER_LUIGI;
+    players[1].powerup = 1;
+    players[1].mountType = 0;
+    players[1].mountColor = 0;
+}
 
 static STestModeSettings testModeSettings;
 
-////////////////////////////////////////////////
-//================ PAUSE MENU ================//
-////////////////////////////////////////////////
-
-class MenuItem
+STestModeSettings getTestModeSettings()
 {
-public:
-    MenuItem() {};
-    virtual ~MenuItem() {};
-    virtual void Render(float x, float y, bool selected) = 0;
-    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) = 0;
-};
-class TextMenuItem : public virtual MenuItem
+    return testModeSettings;
+}
+void setTestModeSettings(const STestModeSettings& settings)
 {
-public:
-    TextMenuItem() {};
-    virtual ~TextMenuItem() {};
-    virtual std::wstring GetText() = 0;
-    virtual void Render(float x, float y, bool selected)
-    {
-        if (selected) {
-            gLunaRender.AddOp(new RenderStringOp(L">", 4, x, y));
-        }
-        gLunaRender.AddOp(new RenderStringOp(GetText(), 4, x + 20, y));
-    }
-};
-class RunnableMenuItem : public virtual MenuItem
-{
-public:
-    RunnableMenuItem() {};
-    virtual ~RunnableMenuItem() {};
-    virtual bool Run() = 0;
-    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap)
-    {
-        if ((keymap.jumpKeyState && !lastKeymap.jumpKeyState) || (GetKeyState(VK_RETURN) & 0x1000))
-        {
-            return Run();
-        }
-        return false;
-    }
-};
-
-class MenuItemContinue : public TextMenuItem, public RunnableMenuItem
-{
-public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
-    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Continue"; };
-    virtual bool Run() {
-        // Pause Sound
-        SMBXSound::PlaySFX(30);
-        return true;
-    };
-    static MenuItemContinue inst;
-};
-class MenuItemRestartLevel : public TextMenuItem, public RunnableMenuItem
-{
-public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
-    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Restart Level"; };
-    virtual bool Run() {
-        // Restart Level
-        testModeRestartLevel();
-        return true;
-    };
-    static MenuItemRestartLevel inst;
-};
-class MenuItemQuit : public TextMenuItem, public RunnableMenuItem
-{
-public:
-    virtual void Render(float x, float y, bool selected) { TextMenuItem::Render(x, y, selected); }
-    virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Quit"; };
-    virtual bool Run() {
-        // Exit
-        // TODO: If launched by something with IPC (PGE Editor) hide window instead of exit
-        _exit(0);
-        return true;
-    };
-    static MenuItemQuit inst;
-};
-MenuItemContinue MenuItemContinue::inst;
-MenuItemRestartLevel MenuItemRestartLevel::inst;
-MenuItemQuit MenuItemQuit::inst;
-
-static void testModePauseMenu(bool allowContinue)
-{
-    KeyMap lastKeymap = Player::Get(1)->keymap;
-    
-    unsigned int selectedOption = 0;
-    std::vector<MenuItem*> menuItems;
-    if (allowContinue)
-    {
-        menuItems.push_back(&MenuItemContinue::inst);
-    }
-    menuItems.push_back(&MenuItemRestartLevel::inst);
-    menuItems.push_back(&MenuItemQuit::inst);
-
-    float menuX = 200.0f;
-    float menuY = 200.0f;
-    float menuW = 400.0f;
-    float menuH = 200.0f;
-    float lineSpacing = 20.0f;
-    float charWidth = 20.0f;
-
-    // Pause Sound
-    SMBXSound::PlaySFX(30);
-
-    while(true)
-    {
-        // Read input...
-        native_updateInput();
-
-        KeyMap keymap = Player::Get(1)->keymap;
-
-        // Process selected item input
-        if ((menuItems[selectedOption] != nullptr) && menuItems[selectedOption]->ProcessInput(keymap, lastKeymap))
-        {
-            break;
-        }
-
-        if (keymap.downKeyState && !lastKeymap.downKeyState)
-        {
-            selectedOption++;
-            if (selectedOption >= menuItems.size())
-            {
-                selectedOption = 0;
-            }
-            SMBXSound::PlaySFX(71);
-        }
-        if (keymap.upKeyState && !lastKeymap.upKeyState)
-        {
-            selectedOption--;
-            if (selectedOption < 0)
-            {
-                selectedOption = menuItems.size() - 1;
-            }
-            SMBXSound::PlaySFX(71);
-        }
-        lastKeymap = keymap;
-
-        RenderRectOp* rect = new RenderRectOp();
-        rect->x1 = menuX - 5;
-        rect->y1 = menuY - 5;
-        rect->x2 = menuX + menuW + 5;
-        rect->y2 = menuY + menuH + 5;
-        rect->fillColor = RenderOpColor(0.0f, 0.0f, 0.0f, 0.7f);
-        rect->borderColor = RenderOpColor(0.5f, 0.0f, 0.0f, 1.0f);
-        gLunaRender.AddOp(rect);
-
-
-        gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
-        for (unsigned int i = 0; i < menuItems.size(); i++)
-        {
-            float yIdx = menuY + lineSpacing*(i + 1.5f);
-            menuItems[i]->Render(menuX, yIdx, selectedOption == i);
-        }
-
-        // Render the world
-        native_updateBlockAnim();
-        native_renderLevel();
-    
-        // Audio management...
-        native_audioManagement();
-
-        // Wait for next frame
-        if (gIsWindowsVistaOrNewer) {
-            FrameTimingMaxFPSHookQPC();
-        }
-        else {
-            FrameTimingMaxFPSHook();
-        }
-
-        MSG msg;
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+    testModeSettings = settings;
 }
 
 /////////////////////////////////////////////
-//============ GAME MODE sETUP ============//
+//============ GAME MODE SETUP ============//
 /////////////////////////////////////////////
+
+void testModeRestartLevel(void)
+{
+    // Start by stopping any Lua things
+    gLunaLua.exitLevel();
+
+    // Make sure we unpause
+    exitPausePatch.Apply();
+    GM_STR_MSGBOX = "";
+    GM_PAUSE_OPEN = 0;
+    GM_CUR_MENUCHOICE = 0;
+    GM_CUR_MENUTYPE = 0;
+
+    // Exit level with no destination set
+    GM_ISLEVELEDITORMODE = 0;
+    GM_CREDITS_MODE = 0;
+    GM_LEVEL_MODE = 0; // Intro
+    GM_EPISODE_MODE = -1;
+    GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
+
+    GM_NEXT_LEVEL_WARPIDX = 0;
+    GM_NEXT_LEVEL_FILENAME = "";
+}
 
 static bool testModeSetupForLoading()
 {
     const std::wstring& path = testModeSettings.levelPath;
 
-    // Check that the file exists
-    if (FileExists(path.c_str()) == 0)
+    // Check that the file exists, but only if we don't have raw level data
+    if ((testModeSettings.levelData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
         return false;
     }
@@ -333,57 +180,145 @@ static bool testModeSetupForLoading()
     GM_EPISODE_MODE = -1;
     GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
 
+    // Unapply exit pause patch
+    exitPausePatch.Unapply();
+
     return true;
-}
-
-static void testModeRestartLevel(void)
-{
-    // Exit level with no destination set
-    GM_ISLEVELEDITORMODE = 0;
-    GM_CREDITS_MODE = 0;
-    GM_LEVEL_MODE = 0; // Intro
-    GM_EPISODE_MODE = -1;
-    GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
-
-    GM_NEXT_LEVEL_WARPIDX = 0;
-    GM_NEXT_LEVEL_FILENAME = "";
 }
 
 //////////////////////////////////////////////
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
 
-static void smbxChangeModeHook(void)
+// Helper function to get the main window
+// TODO: Consider replacing with something better, that uses some memory
+//       address or something instead.
+static HWND GetMainWindow(void)
 {
+    // This here is a big mess of a workaround... but it works
+    HWND hWindow = NULL;
+    DWORD dwCurrentProcessId = GetCurrentProcessId();
+    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
+        DWORD dwCurrentProcessId = GetCurrentProcessId();
+        HWND& hWindow = *reinterpret_cast<HWND*>(lParam);
+        // Check that it's our process
+        DWORD dwProcessId = 0x0;
+        GetWindowThreadProcessId(hWnd, &dwProcessId);
+        if (dwCurrentProcessId == dwProcessId) {
+            // Now check the class and if it's top level
+            wchar_t className[24] = { 0 };
+            wchar_t windowName[24] = { 0 };
+            HWND hParent = GetParent(hWnd);
+            GetWindowTextW(hWnd, windowName, sizeof(windowName));
+            GetClassNameW(hWnd, className, sizeof(className));
+            if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0))
+            {
+                hWindow = hWnd;
+                SetLastError(ERROR_SUCCESS);
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&hWindow));
+    return hWindow;
+}
+
+// Utility function to create a temporary file and write data to it. The
+// filename is returned if successful, or an empty string if unsuccessful.
+static std::wstring WriteTemporaryFile(const std::string& data)
+{
+    wchar_t tempPath[MAX_PATH];
+    wchar_t tempFileName[MAX_PATH];
+
+    // Get a temporary file allocated, first try to use the temporary path
+    // specified by Windows, but if this fails, we can also try the application
+    // path.
+    uint32_t pathRet = GetTempPathW(MAX_PATH, tempPath);
+    uint32_t tempNameRet = 0;
+    if (pathRet < MAX_PATH-14 && pathRet != 0)
+    {
+        tempNameRet = GetTempFileNameW(tempPath, L"LunaLevel", 0, tempFileName);
+    }
+    if (tempNameRet == 0)
+    {
+        tempNameRet = GetTempFileNameW(gAppPathWCHAR.c_str(), L"LunaLevel", 0, tempFileName);
+    }
+    if (tempNameRet == 0)
+    {
+        return L"";
+    }
+
+    FILE* file = nullptr;
+    if (_wfopen_s(&file, tempFileName, L"wb") != 0)
+    {
+        DeleteFileW(tempFileName);
+        return L"";
+    }
+
+    if (fwrite(data.c_str(), 1, data.size(), file) != data.size())
+    {
+        fclose(file);
+        DeleteFileW(tempFileName);
+        return L"";
+    }
+
+    fclose(file);
+    return tempFileName;
+}
+
+static VB6StrPtr temporaryLevelFn;
+void __stdcall testModeVbaFileOpenHook(DWORD arg1, DWORD arg2, DWORD arg3, BSTR* filename)
+{
+    auto vbaFileOpenPtr = (void(__stdcall *)(DWORD, DWORD, DWORD, BSTR*))IMP_vbaFileOpen;
+
+    vbaFileOpenPtr(arg1, arg2, arg3, (BSTR*)temporaryLevelFn.ptr);
+}
+
+bool testModeLoadLevelHook(VB6StrPtr* filename)
+{
+    // Skip if not enabled
+    if (!testModeSettings.enabled) return false;
+    
+    // If the filename matches the one we're testing, and we have raw level data, let's use it
+    if (*filename == testModeSettings.levelPath && testModeSettings.levelData.size() > 0)
+    {
+        auto testModeVbaFileOpenHookPatch = PATCH(0x8D97D1).CALL(testModeVbaFileOpenHook).NOP_PAD_TO_SIZE<6>();
+
+        // Create a temporary file with the level data
+        std::wstring tempFile = WriteTemporaryFile(testModeSettings.levelData).c_str();
+        if (tempFile.size() == 0)
+        {
+            dbgboxA("Could not write temporary file!");
+            return false;
+        }
+        
+        // Load level with data from the temporary file
+        temporaryLevelFn = tempFile;
+        testModeVbaFileOpenHookPatch.Apply();
+        loadLevel_OrigFunc(filename);
+        testModeVbaFileOpenHookPatch.Unapply();
+
+        // Delete the temporary file
+        DeleteFileW(tempFile.c_str());
+
+        return true;
+    }
+
+    return false;
+}
+
+void testModeSmbxChangeModeHook(void)
+{
+    // Skip if not enabled
+    if (!testModeSettings.enabled) return;
+
     if (GM_ISLEVELEDITORMODE || GM_CREDITS_MODE || GM_LEVEL_MODE ||
         (GM_EPISODE_MODE && (GM_NEXT_LEVEL_FILENAME.length() == 0)))
     {
+        // Preprate to load/reload
         testModeSetupForLoading();
     }
 }
-static __declspec(naked) void __stdcall smbxChangeModeHookRaw(void)
-{
-    __asm {
-        pushf
-        push eax
-        push ecx
-        push edx
-    }
-    smbxChangeModeHook();
-    __asm {
-        pop edx
-        pop ecx
-        pop eax
-        popf
-        or ebx, 0xFFFFFFFF
-        cmp word ptr ds : [0xB2C620], bx
-        ret
-    }
-}
-static AsmPatch<10U> smbxChangeModePatch =
-    PATCH(0x8BF4E3)
-    .CALL(smbxChangeModeHookRaw)
-    .NOP_PAD_TO_SIZE<10>();
 
 static AsmPatch<10U> shortenReloadPatch =
     PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>();
@@ -406,9 +341,10 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-bool testModeEnable(const std::wstring& path)
+bool testModeEnable(const STestModeSettings& settings)
 {
     // Get the full path if necessary
+    std::wstring path = settings.levelPath;
     std::wstring fullPath;
     if (isAbsolutePath(path)) {
         fullPath = path;
@@ -418,19 +354,158 @@ bool testModeEnable(const std::wstring& path)
         fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
     }
 
-    // Check that the file exists
-    if (FileExists(fullPath.c_str()) == 0)
+    // Check that the file exists, but only if we don't have raw level data
+    if ((settings.levelData.size() == 0) && (FileExists(fullPath.c_str()) == 0))
     {
         return false;
     }
 
-    testModeSettings.ResetToDefault();
+    testModeSettings = settings;
+    testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
 
-    smbxChangeModePatch.Apply();
     shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
 
     return true;
 }
+
+void testModeDisable(void)
+{
+    testModeSettings.ResetToDefault();
+    testModeSettings.enabled = false;
+
+    shortenReloadPatch.Unapply();
+    playerDeathOverridePatch.Unapply();
+    pauseOverridePatch.Unapply();
+    exitPausePatch.Unapply();
+}
+
+// IPC Command
+json IPCTestLevel(const json& params)
+{
+    std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+
+    if (!params.is_object()) throw IPCInvalidParams();
+    json::const_iterator filenameIt = params.find("filename");
+    if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
+
+    // Default to the last settings for characters, if not changed by IPC
+    // command
+    STestModeSettings settings = testModeSettings;
+    settings.enabled = true;
+    settings.levelData = "";
+    settings.levelPath = Str2WStr(filenameIt.value());
+
+    // Get character/player information
+    json::const_iterator playersIt = params.find("players");
+    if (playersIt != params.cend())
+    {
+        const json& players = playersIt.value();
+        if (!players.is_array()) throw IPCInvalidParams();
+        if (players.size() < 1 || players.size() > 2) throw IPCInvalidParams();
+        settings.playerCount = players.size();
+
+        int i = 0;
+        for (json::const_iterator playersIt = players.cbegin(); playersIt != players.cend(); playersIt++, i++) {
+            const json& player = playersIt.value();
+            STestModePlayerSettings& playerSettings = settings.players[i];
+            if (!player.is_object()) throw IPCInvalidParams();
+
+            // Set character
+            json::const_iterator characterIt = player.find("character");
+            if (characterIt != player.cend())
+            {
+                if (!characterIt.value().is_number_integer()) throw IPCInvalidParams();
+                short characterInt = static_cast<short>(characterIt.value());
+                playerSettings.identity = static_cast<Characters>(characterInt);
+            }
+            
+            // Set powerup
+            json::const_iterator powerupIt = player.find("powerup");
+            if (powerupIt != player.cend())
+            {
+                if (!powerupIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.powerup = static_cast<short>(powerupIt.value());
+            }
+
+            // Set mountType
+            json::const_iterator mountTypeIt = player.find("mountType");
+            if (mountTypeIt != player.cend())
+            {
+                if (!mountTypeIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.mountType = static_cast<short>(mountTypeIt.value());
+            }
+
+            // Set mountColor
+            json::const_iterator mountColorIt = player.find("mountColor");
+            if (mountColorIt != player.cend())
+            {
+                if (!mountColorIt.value().is_number_integer()) throw IPCInvalidParams();
+                playerSettings.mountColor = static_cast<short>(mountColorIt.value());
+            }
+        }
+    }
+
+    json::const_iterator levelDataIt = params.find("leveldata");
+    if (levelDataIt != params.cend() && !levelDataIt.value().is_null())
+    {
+        if (!levelDataIt.value().is_string()) throw IPCInvalidParams();
+        settings.levelData = static_cast<const std::string&>(levelDataIt.value()); 
+    }
+
+    // Before checking for tick end... bring to top if we need to
+    HWND hWindow = GetMainWindow();
+    if (hWindow)
+    {
+        ShowWindow(hWindow, SW_SHOW);
+
+        SetWindowPos(hWindow, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+        SetWindowPos(hWindow, HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+
+        BringWindowToTop(hWindow);
+        SetForegroundWindow(hWindow);
+        SetFocus(hWindow);
+    }
+
+    {
+        // Make sure we're at a tick end
+        WaitForTickEnd tickEndLock;
+
+        // Attempt to enable the test
+        if (!testModeEnable(settings))
+        {
+            return false;
+        }
+        testModeRestartLevel();
+
+        // If we were waiting on IPC, stop waiting
+        gStartupSettings.currentlyWaitingForIPC = false;
+    }
+    return true;
+}
+
+bool TestModeCheckHideWindow(void)
+{
+    // If we started by waiting for IPC, we want to hide the window in place of exiting
+    if (gStartupSettings.waitForIPC)
+    {
+        std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+        
+        // Close the level using testModeRestartLevel, but flag that we'll be
+        // waiting for IPC again.
+        testModeRestartLevel();
+        gStartupSettings.currentlyWaitingForIPC = true;
+        HWND hWindow = GetMainWindow();
+        if (hWindow)
+        {
+            ShowWindow(hWindow, SW_HIDE);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+

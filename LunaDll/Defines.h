@@ -264,6 +264,8 @@ DEFMEM(GM_EP_LIST_COUNT,    WORD,  0x00B250E8);
 DEFMEM(GM_EP_LIST_PTR,      void*, 0x00B250FC);
 
 // Interaction
+DEFMEM(GM_MOUSE_X,        double,  0x00B2D6BC);
+DEFMEM(GM_MOUSE_Y,        double,  0x00B2D6C4);
 DEFMEM(GM_MOUSEMOVING,      WORD,  0x00B2D6D2);
 DEFMEM(GM_MOUSERELEASED,    WORD,  0x00B2D6D0);
 DEFMEM(GM_MOUSEPRESSING,    WORD,  0x00B2D6CC);
@@ -568,6 +570,7 @@ DEFMEM(IMP_vbaStrCmp,       void*, 0x004010F8); // Ptr to __stdcall
 DEFMEM(IMP_vbaStrCopy,      void*, 0x004011b0); // Ptr to __fastcall
 DEFMEM(IMP_vbaFreeStr,      void*, 0x00401248); // Ptr to __fastcall
 DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
+DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 ////////////////////////
 ///    -Functions-   ///
@@ -743,6 +746,8 @@ DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 #define GF_AUDIO_MANAGEMENT 0x00A74460
 //0x008E6F70
 
+#define GF_EXIT_MAIN_GAME   0x008D6BB0
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 // Made by Airpo
@@ -826,6 +831,7 @@ static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MAN
 static const auto native_updateWarp = (void(__stdcall *)(void))GF_UPDATE_WARP;
 static const auto native_bgoSortingRelated = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BGO_SORTINGRELATED;
 static const auto native_initLevelEnvironment = (void(__stdcall *)(void))GF_INIT_ENVIRONMENT;
+static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
 
 
 /*

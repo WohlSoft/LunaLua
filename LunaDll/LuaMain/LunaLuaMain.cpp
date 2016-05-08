@@ -3,7 +3,6 @@
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
 
-
 #include "LunaLuaMain.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
@@ -62,6 +61,9 @@ void CLunaLua::exitLevel()
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
+
+        // Don't be paused by Lua
+        g_EventHandler.requestUnpause();
     }
 }
 
@@ -836,15 +838,15 @@ void CLunaLua::bindAll()
             .property("screen", &LuaProxy::Player::screen)
             .property("section", &LuaProxy::Player::section)
             .property("sectionObj", &LuaProxy::Player::sectionObj)
-            .property("x", &LuaProxy::Player::x, &LuaProxy::Player::setX)
-            .property("y", &LuaProxy::Player::y, &LuaProxy::Player::setY)
-            .property("width", &LuaProxy::Player::width, &LuaProxy::Player::setWidth)
-            .property("height", &LuaProxy::Player::height, &LuaProxy::Player::setHeight)
-            .property("speedX", &LuaProxy::Player::speedX, &LuaProxy::Player::setSpeedX)
-            .property("speedY", &LuaProxy::Player::speedY, &LuaProxy::Player::setSpeedY)
-            .property("powerup", &LuaProxy::Player::powerup, &LuaProxy::Player::setPowerup)
-            .property("character", &LuaProxy::Player::character, &LuaProxy::Player::setCharacter)
-            .property("reservePowerup", &LuaProxy::Player::reservePowerup, &LuaProxy::Player::setReservePowerup)
+            .property("x", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, x))
+            .property("y", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, y))
+            .property("width", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, width))
+            .property("height", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, height))
+            .property("speedX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, speedX))
+            .property("speedY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, speedY))
+            .property("powerup", LUAPROXY_REG_RW(LuaProxy::Player, CurrentPowerup)) // TODO: Limit range?
+            .property("character", LUAPROXY_REG_RW(LuaProxy::Player, Identity))
+            .property("reservePowerup", LUAPROXY_REG_RW(LuaProxy::Player, PowerupBoxContents)) // TODO: >= 0 check?
             .property("holdingNPC", &LuaProxy::Player::holdingNPC)
             .property("upKeyPressing", &LuaProxy::Player::upKeyPressing, &LuaProxy::Player::setUpKeyPressing)
             .property("downKeyPressing", &LuaProxy::Player::downKeyPressing, &LuaProxy::Player::setDownKeyPressing)
@@ -915,8 +917,8 @@ void CLunaLua::bindAll()
             .property("HasJumped", &LuaProxy::Player::hasJumped, &LuaProxy::Player::setHasJumped)
             .property("CurXPos", &LuaProxy::Player::curXPos, &LuaProxy::Player::setCurXPos)
             .property("CurYPos", &LuaProxy::Player::curYPos, &LuaProxy::Player::setCurYPos)
-            .property("Height", &LuaProxy::Player::height, &LuaProxy::Player::setHeight)
-            .property("Width", &LuaProxy::Player::width, &LuaProxy::Player::setWidth)
+            .property("Height", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, height))
+            .property("Width", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, width))
             .property("CurXSpeed", &LuaProxy::Player::curXSpeed, &LuaProxy::Player::setCurXSpeed)
             .property("CurYSpeed", &LuaProxy::Player::curYSpeed, &LuaProxy::Player::setCurYSpeed)
             .property("Identity", &LuaProxy::Player::identity, &LuaProxy::Player::setIdentity)
@@ -1195,11 +1197,11 @@ void CLunaLua::bindAll()
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Warp::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::Warp::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Warp::mem))
-                .property("isHidden", &LuaProxy::Warp::isHidden, &LuaProxy::Warp::setIsHidden)
-                .property("exitX", &LuaProxy::Warp::exitX, &LuaProxy::Warp::setExitX)
-                .property("exitY", &LuaProxy::Warp::exitY, &LuaProxy::Warp::setExitY)
-                .property("entranceX", &LuaProxy::Warp::entranceX, &LuaProxy::Warp::setEntranceX)
-                .property("entranceY", &LuaProxy::Warp::entranceY, &LuaProxy::Warp::setEntranceY)
+                .property("isHidden", LUAPROXY_REG_RW_CUSTOM(LuaProxy::Warp, isHidden, bool))
+                .property("exitX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, exit, x))
+                .property("exitY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, exit, y))
+                .property("entranceX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, entrance, x))
+                .property("entranceY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Warp, entrance, y))
                 .property("levelFilename", &LuaProxy::Warp::levelFilename, &LuaProxy::Warp::setLevelFilename),
 
 

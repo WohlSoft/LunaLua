@@ -84,24 +84,111 @@ namespace LuaProxy {
 #define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
 
 
+    template<typename ConvertedType>
+    struct vb6_converter {
+        typedef ConvertedType from_type; // vb6
+        typedef ConvertedType to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return data;
+        }
+    };
+
+    template<>
+    struct vb6_converter<bool> {
+        typedef short from_type; // vb6
+        typedef bool to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data == -1;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return COMBOOL(data);
+        }
+    };
+
+    template<>
+    struct vb6_converter<std::string> {
+        typedef VB6StrPtr from_type; // vb6
+        typedef std::string to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return data;
+        }
+    };
+
+
     // NOTE: This class is currently not actually used.
     //       m_index must be accessed somehow properly.
-    template<class VB_STRUCT>
+    template<class WrapperClass, class InternalClass>
     class CommonVB6Wrapper {
     public:
+        typedef InternalClass internal_class;
+        
+        template<typename DataType, DataType InternalClass::* Ptr, typename InputType = DataType>
+        void Setter(InputType data)
+        {
+            typedef vb6_converter<InputType> converter;
 
-        template<typename DataType, DataType VB_STRUCT::* Ptr>
-        void Setter(DataType data)
-        {
-            VB_STRUCT::Get(m_index)->*Ptr = data;
-        }
-        template<typename DataType, DataType VB_STRUCT::* Ptr>
-        DataType Getter() const
-        {
-            return VB_STRUCT::Get(m_index)->*Ptr;
+            InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr = converter::ConvertForSetter(data);
         }
 
+        template<typename DataType, DataType InternalClass::* Ptr, typename OutputType = DataType>
+        OutputType Getter() const
+        {
+            typedef vb6_converter<OutputType> converter;
+
+            return converter::ConvertForGetter(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr);
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        void MomentumSetter(double data)
+        {
+            (&(InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr = data;
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        double MomentumGetter() const
+        {
+            return (&(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr;
+        }
     };
+
+    // &LuaProxy::Warp::MomentumGetter<&LuaProxy::Warp::internal_class::exit, &Momentum::x>, &LuaProxy::Warp::MomentumSetter<&LuaProxy::Warp::internal_class::exit, &Momentum::x>
+#define LUAPROXY_REG_R_MOMENTUM(WrapperCls, MomentumField, MomentumSubField) \
+    &WrapperCls::MomentumGetter<&WrapperCls::internal_class::MomentumField, &Momentum:: MomentumSubField>
+#define LUAPROXY_REG_W_MOMENTUM(WrapperCls, MomentumField, MomentumSubField) \
+    &WrapperCls::MomentumSetter<&WrapperCls::internal_class::MomentumField, &Momentum:: MomentumSubField>
+
+#define LUAPROXY_REG_RW_MOMENTUM(WrapperCls, MomentumField, MomentumSubField) \
+    LUAPROXY_REG_R_MOMENTUM(WrapperCls, MomentumField, MomentumSubField), \
+    LUAPROXY_REG_W_MOMENTUM(WrapperCls, MomentumField, MomentumSubField)
+
+    // &LuaProxy::Warp::Getter<decltype(SMBX_Warp::isHidden), &SMBX_Warp::isHidden>, &LuaProxy::Warp::Setter<decltype(SMBX_Warp::isHidden), &SMBX_Warp::isHidden>
+#define LUAPROXY_REG_R(WrapperCls, StructField) \
+    &WrapperCls::Getter<decltype(WrapperCls::internal_class::StructField), &WrapperCls::internal_class::StructField>
+#define LUAPROXY_REG_W(WrapperCls, StructField) \
+    &WrapperCls::Setter<decltype(WrapperCls::internal_class::StructField), &WrapperCls::internal_class::StructField>
+#define LUAPROXY_REG_RW(WrapperCls, StructField) \
+    LUAPROXY_REG_R(WrapperCls, StructField), \
+    LUAPROXY_REG_W(WrapperCls, StructField)
+
+#define LUAPROXY_REG_R_CUSTOM(WrapperCls, StructField, CustomField) \
+    &WrapperCls::Getter<decltype(WrapperCls::internal_class::StructField), &WrapperCls::internal_class::StructField, CustomField>
+#define LUAPROXY_REG_W_CUSTOM(WrapperCls, StructField, CustomField) \
+    &WrapperCls::Setter<decltype(WrapperCls::internal_class::StructField), &WrapperCls::internal_class::StructField, CustomField>
+#define LUAPROXY_REG_RW_CUSTOM(WrapperCls, StructField, CustomField) \
+    LUAPROXY_REG_R_CUSTOM(WrapperCls, StructField, CustomField), \
+    LUAPROXY_REG_W_CUSTOM(WrapperCls, StructField, CustomField)
 
 
     enum L_FIELDTYPE{
@@ -233,7 +320,7 @@ namespace LuaProxy {
 
 
 
-    class Warp : public CommonVB6Wrapper<SMBX_Warp> {
+    class Warp : public CommonVB6Wrapper<Warp, SMBX_Warp> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
@@ -497,7 +584,7 @@ namespace LuaProxy {
         
     };
 
-    class Player{
+    class Player : public CommonVB6Wrapper<Player, PlayerMOB> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
@@ -510,24 +597,6 @@ namespace LuaProxy {
         void kill(lua_State *L);
         void harm(lua_State *L);
         RECT screen(lua_State *L) const;
-        double x(lua_State *L) const;
-        void setX(double x, lua_State *L);
-        double y(lua_State *L) const;
-        void setY(double y, lua_State *L);
-        double width(lua_State *L) const;
-        void setWidth(double width, lua_State *L);
-        double height(lua_State *L) const;
-        void setHeight(double height, lua_State *L);
-        double speedX(lua_State *L) const;
-        void setSpeedX(double speedX, lua_State *L);
-        double speedY(lua_State *L) const;
-        void setSpeedY(double speedY, lua_State *L);
-        PowerupID powerup(lua_State *L) const;
-        void setPowerup(PowerupID powerup, lua_State *L);
-        Characters character(lua_State *L) const;
-        void setCharacter(Characters character, lua_State *L);
-        int reservePowerup(lua_State *L) const;
-        void setReservePowerup(int reservePowerup, lua_State *L);
         luabind::object holdingNPC(lua_State *L) const;
         bool upKeyPressing(lua_State *L) const;
         void setUpKeyPressing(bool upKeyPressing, lua_State *L);

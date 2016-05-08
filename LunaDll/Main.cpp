@@ -3,6 +3,8 @@
 #include <math.h>
 #include <Windows.h>
 #include <GdiPlus.h>
+#include <io.h>
+#include <fcntl.h>
 
 #include "Main.h"
 #include "Globals.h"
@@ -27,10 +29,13 @@
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
 #include "Rendering/FFmpeg/FFmpegMediaPlayer2.h"
+#include "IPC/IPCPipeServer.h"
 
 #define PATCHIT 1
 
 static bool LevelCustomSounds = false;
+
+static IPCPipeServer ipcServer;
 
 /*!
  * \brief Standard DLL loader main
@@ -46,6 +51,7 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID /*lpvReserved*/)
         //Init hooks and main LunaLUA modules
         SetupThunRTMainHook();
         timeBeginPeriod(1);
+
 		break;
 	case DLL_THREAD_ATTACH:
 		break;
@@ -75,6 +81,9 @@ static DWORD __stdcall GetCurrentProcessorNumberXP(void)
 // SetupLunaDLLInitHook that runs from DLL_PROCESS_ATTACH
 void LunaDLLInit()
 {
+    // If we have stdin/stdout, attach to the IPC server
+    ipcServer.AttachStdinStdout();
+
     InitGlobals();
 #if PATCHIT
     TrySkipPatch();

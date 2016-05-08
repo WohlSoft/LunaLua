@@ -111,10 +111,14 @@ void MusicManager::initAudioEngine()
 
 void MusicManager::rebuildSoundCache()
 {
-    //Reinit reserved channels list
-    int numberOfReservedChannels=0;
-
+    // Reinit reserved channels list
+    int numberOfReservedChannels = 0;
+    
+    // For sounds which are failing to load
     std::string failedSounds;
+    int countOfFailedSounds = 0;
+    constexpr static int MaxFailedSoundToDisplay = 15;
+
     for(int i=0; i<91; i++)
     {
         if(sounds[i].channel != -1)
@@ -125,19 +129,26 @@ void MusicManager::rebuildSoundCache()
         {
             if(!sounds[i].doLoad())
             {
-                failedSounds += " "+sounds[i].fullPath;
+                countOfFailedSounds++;
+                if(countOfFailedSounds > MaxFailedSoundToDisplay)
+                    continue;
+                failedSounds += " " + sounds[i].fullPath + "\n";
             }
         }
     }
-    if(numberOfReservedChannels>32)
-        Mix_AllocateChannels(numberOfReservedChannels+32);
+    if(numberOfReservedChannels > 32)
+        Mix_AllocateChannels(numberOfReservedChannels + 32);
     Mix_ReserveChannels(numberOfReservedChannels);
+
+    if (countOfFailedSounds > MaxFailedSoundToDisplay)
+    {
+        failedSounds += "And " + std::to_string(countOfFailedSounds - MaxFailedSoundToDisplay) + " more sounds...\n";
+    }
 
     if(!failedSounds.empty())
     {
-        std::string errorMsg="Some sound files are failed to load:\n"+
-                failedSounds;
-        MessageBoxA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK|MB_ICONWARNING);
+        std::string errorMsg = "Some audio files failed to load:\n" + failedSounds;
+        MessageBoxA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK | MB_ICONWARNING);
     }
 }
 
