@@ -1,0 +1,39 @@
+
+Testing: 
+* Graphics.loadMovie --> Grahpics.loadMedia
+* Graphics.__setSpriteOverride
+* Warp.spawn
+* BGO.spawn
+* [LunaLua FFI] Graphics.LunaLuaSetMovieHitCallback
+* [LunaLua FFI] Graphics.LunaLuaSetMovieOnScreenCallback
+* [LunaLua FFI] Graphics.LunaLuaSetMovieOffScreenCallback
+* LuaMovieResource.* (all fields)
+* Misc.warning
+* Misc.updateWarp --> Why do we need it?
+* (Obj of AsyncHTTPRequest).responseBody
+* Native.getWorldPath
+
+Remove? 
+* CLunaLua::registerPassedLuaObj
+* CLunaLua::deletePassedLuaObj
+* CLunaLua::obj1 = luabind::object();
+* CLunaLua::obj2 = luabind::object();
+* CLunaLua::obj3 = luabind::object();
+* CLunaLua::obj4 = luabind::object();
+* CLunaLua::obj5 = luabind::object();
+* CLunaLua::obj6 = luabind::object();
+* CLunaLua::obj7 = luabind::object();
+* CLunaLua::obj8 = luabind::object();
+* void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...) @ BMPBox.cpp
+
+Update:
+* Registrate LuaMovieResource with LUAHELPER_DEF_CLAS
+* All Tabs --> 4 Spaces
+* Uncomment #pragma STDC FENV_ACCESS ON @ SafeFPUControl.cpp
+* FFmpegMediaPlayer2* mp; --> Smart pointer (std::unique_ptr?)
+* BMPBox
+** Callbacks --> Better way? std::function<> or LunaLua event?
+** void setCallback(void(*fn)(int));
+** void setOnScreenCallback(void(*fn)());
+** void setOffScreenCallback(void(*fn)());
+** Move spriteoverride code to C++ @ worlds/lunaall.lua

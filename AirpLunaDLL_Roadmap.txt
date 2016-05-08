@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
--- AirpLunaDLL Roadmap
--- 
--- rev : 2016/02/14
--------------------------------------------------------------------------------
-* Merge APLib to AirpEngine.
-* Exclude ffi dependency. (Some DLL functions move to LunaDLL.)
-* Create "enable-ffi" section to "config/luna.ini".
-* Support make LuaImageResource from std::string.
