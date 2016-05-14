@@ -13,13 +13,12 @@ Testing:
 * (Obj of AsyncHTTPRequest).responseBody
 * Native.getWorldPath
 
-Remove? 
+Verify:
+GLEngineCmd_LunaDrawSprite::run @ GLEngineCmds.cpp Line 74...
 
 Update:
-* Registrate LuaMovieResource with LUAHELPER_DEF_CLAS
+* Registrate LuaMovieResource with LUAHELPER_DEF_CLASS
 * All Tabs --> 4 Spaces
-* Uncomment #pragma STDC FENV_ACCESS ON @ SafeFPUControl.cpp
-* FFmpegMediaPlayer2* mp; --> Smart pointer (std::unique_ptr?)
 * BMPBox
 ** Callbacks --> Better way? std::function<> or LunaLua event?
 ** void setCallback(void(*fn)(int));
