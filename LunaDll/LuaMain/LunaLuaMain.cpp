@@ -431,6 +431,7 @@ void CLunaLua::setupDefaults()
 }
 
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaMovieResource, LuaMovieResource);
 LUAHELPER_DEF_CLASS_HELPER(CaptureBuffer, CaptureBuffer);
 LUAHELPER_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
 LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
@@ -473,45 +474,45 @@ void CLunaLua::bindAll()
 
             namespace_("Native")[
                 def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
-				def("getWorldPath", &LuaProxy::Native::getWorldPath),
+                def("getWorldPath", &LuaProxy::Native::getWorldPath),
                 def("simulateError", &LuaProxy::Native::simulateError)
             ],
 
             namespace_("Text")[
-				def("windowDebug", &LuaProxy::Text::windowDebug),
-					def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
-					def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
-					def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
-					def("printWP", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWP),
-					def("printWP", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWP)
-			],
-					
+                def("windowDebug", &LuaProxy::Text::windowDebug),
+                    def("windowDebugSimple", &LuaProxy::Text::windowDebugSimple),
+                    def("print", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print),
+                    def("print", (void(*)(const luabind::object&, int, int, int)) &LuaProxy::Text::print),
+                    def("printWP", (void(*)(const luabind::object&, int, int, double)) &LuaProxy::Text::printWP),
+                    def("printWP", (void(*)(const luabind::object&, int, int, int, double)) &LuaProxy::Text::printWP)
+            ],
+                    
             namespace_("Graphics")[
-				LUAHELPER_DEF_CLASS(LuaImageResource)
-					.def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
-					.def("setScaleUpMode", &LuaProxy::Graphics::LuaImageResource::setScaleUpMode)
-					.def("setScaleDownMode", &LuaProxy::Graphics::LuaImageResource::setScaleDownMode)
-					.property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
-					.property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
-					.property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
-				class_<LuaProxy::Graphics::LuaMovieResource, LuaProxy::Graphics::LuaImageResource>("LuaMovieResource")
-					.def("setMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::setMaskThreshold)
-					.def("getMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold)
-					.def("play", &LuaProxy::Graphics::LuaMovieResource::play)
-					.def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
-					.def("pause", &LuaProxy::Graphics::LuaMovieResource::pause)
-					.def("seek", &LuaProxy::Graphics::LuaMovieResource::seek)
-					.property("videoDelay", &LuaProxy::Graphics::LuaMovieResource::getVideoDelay, &LuaProxy::Graphics::LuaMovieResource::setVideoDelay)
-					.property("maskDelay", &LuaProxy::Graphics::LuaMovieResource::getMaskDelay, &LuaProxy::Graphics::LuaMovieResource::setMaskDelay)
-					.property("scaleUpMode", &LuaProxy::Graphics::LuaMovieResource::getScaleUpMode, &LuaProxy::Graphics::LuaMovieResource::setScaleUpMode)
-					.property("scaleDownMode", &LuaProxy::Graphics::LuaMovieResource::getScaleDownMode, &LuaProxy::Graphics::LuaMovieResource::setScaleDownMode)
-					.property("offScreenMode", &LuaProxy::Graphics::LuaMovieResource::getOffScreenMode, &LuaProxy::Graphics::LuaMovieResource::setOffScreenMode)
-					.property("onScreenMode", &LuaProxy::Graphics::LuaMovieResource::getOnScreenMode, &LuaProxy::Graphics::LuaMovieResource::setOnScreenMode)
-					.property("loop", &LuaProxy::Graphics::LuaMovieResource::getLoop, &LuaProxy::Graphics::LuaMovieResource::setLoop)
-					.property("altAlpha", &LuaProxy::Graphics::LuaMovieResource::getAltAlpha, &LuaProxy::Graphics::LuaMovieResource::setAltAlpha)
-					.property("alphaType", &LuaProxy::Graphics::LuaMovieResource::getAlphaType, &LuaProxy::Graphics::LuaMovieResource::setAlphaType)
-					.property("volume", &LuaProxy::Graphics::LuaMovieResource::getVolume, &LuaProxy::Graphics::LuaMovieResource::setVolume)
-					,
+                LUAHELPER_DEF_CLASS(LuaImageResource)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+                    .def("setScaleUpMode", &LuaProxy::Graphics::LuaImageResource::setScaleUpMode)
+                    .def("setScaleDownMode", &LuaProxy::Graphics::LuaImageResource::setScaleDownMode)
+                    .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
+                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
+                    .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
+                LUAHELPER_DEF_CLASS_WITH_BASE(LuaMovieResource, LuaImageResource)
+                    .def("setMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::setMaskThreshold)
+                    .def("getMaskThreshold", &LuaProxy::Graphics::LuaMovieResource::getMaskThreshold)
+                    .def("play", &LuaProxy::Graphics::LuaMovieResource::play)
+                    .def("stop", &LuaProxy::Graphics::LuaMovieResource::stop)
+                    .def("pause", &LuaProxy::Graphics::LuaMovieResource::pause)
+                    .def("seek", &LuaProxy::Graphics::LuaMovieResource::seek)
+                    .property("videoDelay", &LuaProxy::Graphics::LuaMovieResource::getVideoDelay, &LuaProxy::Graphics::LuaMovieResource::setVideoDelay)
+                    .property("maskDelay", &LuaProxy::Graphics::LuaMovieResource::getMaskDelay, &LuaProxy::Graphics::LuaMovieResource::setMaskDelay)
+                    .property("scaleUpMode", &LuaProxy::Graphics::LuaMovieResource::getScaleUpMode, &LuaProxy::Graphics::LuaMovieResource::setScaleUpMode)
+                    .property("scaleDownMode", &LuaProxy::Graphics::LuaMovieResource::getScaleDownMode, &LuaProxy::Graphics::LuaMovieResource::setScaleDownMode)
+                    .property("offScreenMode", &LuaProxy::Graphics::LuaMovieResource::getOffScreenMode, &LuaProxy::Graphics::LuaMovieResource::setOffScreenMode)
+                    .property("onScreenMode", &LuaProxy::Graphics::LuaMovieResource::getOnScreenMode, &LuaProxy::Graphics::LuaMovieResource::setOnScreenMode)
+                    .property("loop", &LuaProxy::Graphics::LuaMovieResource::getLoop, &LuaProxy::Graphics::LuaMovieResource::setLoop)
+                    .property("altAlpha", &LuaProxy::Graphics::LuaMovieResource::getAltAlpha, &LuaProxy::Graphics::LuaMovieResource::setAltAlpha)
+                    .property("alphaType", &LuaProxy::Graphics::LuaMovieResource::getAlphaType, &LuaProxy::Graphics::LuaMovieResource::setAlphaType)
+                    .property("volume", &LuaProxy::Graphics::LuaMovieResource::getVolume, &LuaProxy::Graphics::LuaMovieResource::setVolume)
+                    ,
                 LUAHELPER_DEF_CLASS(SMBXMaskedImage)
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
@@ -520,8 +521,8 @@ void CLunaLua::bindAll()
                     .def("captureAt", &CaptureBuffer::captureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
-				def("loadMovie", (LuaProxy::Graphics::LuaMovieResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadMovie, adopt(result)),
-				def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
+                def("loadMovie", (LuaProxy::Graphics::LuaMovieResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadMovie, adopt(result)),
+                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
@@ -548,15 +549,15 @@ void CLunaLua::bindAll()
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
 
-				//add
-				
-				def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
-				def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
-				//too many args
-				//def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double,double, double,double,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
-				
-				//def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double,double,double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
-				
+                //add
+                
+                def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+                def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+                //too many args
+                //def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double,double, double,double,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+                
+                //def("drawImageScaleWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double,double,double, float,double, lua_State*))&LuaProxy::Graphics::drawImageScaleWP),
+                
                 def("draw", &LuaProxy::Graphics::draw),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),
@@ -594,7 +595,7 @@ void CLunaLua::bindAll()
                 def("warning", &LuaProxy::Misc::warning),
                 def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
                 def("warning", &LuaProxy::Misc::warning),
-				def("updateWarp", &LuaProxy::Misc::updateWarp)
+                def("updateWarp", &LuaProxy::Misc::updateWarp)
             ],
 
             namespace_("Audio")[
@@ -735,7 +736,7 @@ void CLunaLua::bindAll()
             .property("processing", &LuaProxy::AsyncHTTPRequest::isProcessing)
             .property("finished", &LuaProxy::AsyncHTTPRequest::isFinished)
             .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
-			.property("responseBody", &LuaProxy::AsyncHTTPRequest::responseBody)
+            .property("responseBody", &LuaProxy::AsyncHTTPRequest::responseBody)
             .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
 
             LUAHELPER_DEF_CLASS(PlayerSettings)
@@ -1127,7 +1128,7 @@ void CLunaLua::bindAll()
                         def("get", &LuaProxy::Warp::get),
                         def("getIntersectingEntrance", &LuaProxy::Warp::getIntersectingEntrance),
                         def("getIntersectingExit", &LuaProxy::Warp::getIntersectingExit),
-						def("spawn", static_cast<LuaProxy::Warp(*)(const luabind::object&, double, double, double, double, lua_State*)>(&LuaProxy::spawnWarp))
+                        def("spawn", static_cast<LuaProxy::Warp(*)(const luabind::object&, double, double, double, double, lua_State*)>(&LuaProxy::spawnWarp))
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Warp, m_index))
                 .def(constructor<int>())
@@ -1303,7 +1304,7 @@ void CLunaLua::bindAll()
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
                         def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
                         def("getIntersecting", &LuaProxy::BGO::getIntersecting),
-						def("spawn",&LuaProxy::spawnBGO)
+                        def("spawn",&LuaProxy::spawnBGO)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::BGO, m_index))
                 .def(constructor<int>())
@@ -1328,7 +1329,7 @@ void CLunaLua::bindAllDeprecated()
     module(L)
         [
             def("getSMBXPath", &LuaProxy::Native::getSMBXPath), //DONE
-			def("getWorldPath", &LuaProxy::Native::getWorldPath),
+            def("getWorldPath", &LuaProxy::Native::getWorldPath),
             def("simulateError", &LuaProxy::Native::simulateError), //DONE
             def("windowDebug", &LuaProxy::Text::windowDebug), //DONE
             def("printText", (void(*)(const luabind::object&, int, int)) &LuaProxy::Text::print), //DONE

@@ -126,6 +126,10 @@ namespace std {
     luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls, smartPtrClass ## < LUAHELPER_HELPCLASS_NAME(name) ::cls > >( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
         .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
 
+#define LUAHELPER_DEF_CLASS_WITH_BASE(name, nameBase) \
+    luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls, LUAHELPER_HELPCLASS_NAME(nameBase) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
+        .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
+
 #define LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(tableObj, elemKey) \
     try { \
         elemKey = luabind::object_cast< decltype(elemKey) >( tableObj [ #elemKey ] ); \
