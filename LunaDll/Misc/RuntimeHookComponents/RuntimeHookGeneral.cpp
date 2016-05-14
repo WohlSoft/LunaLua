@@ -187,6 +187,9 @@ void TrySkipPatch()
     // Init freeimage:
     gFreeImgInit.init();
 
+    // Init Audio Engine:
+    MusicManager::initAudioEngine();
+
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
     PATCH(0x8BEC61).CALL(&LatePatch).Apply();

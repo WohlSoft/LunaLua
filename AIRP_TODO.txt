@@ -26,3 +26,7 @@ Update:
 ** void setOnScreenCallback(void(*fn)());
 ** void setOffScreenCallback(void(*fn)());
 ** Move spriteoverride code to C++ @ worlds/lunaall.lua
+* Don't load Audio Engine if nosound is true
+
+Need To Fix:
+* Full Link Time Optimization Crashes
