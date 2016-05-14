@@ -9,15 +9,6 @@
 #include <gl/glew.h>
 #include "../../SMBXInternal/PlayerMOB.h"
 #include <string>
-void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...)
-{
-	va_list	argp;
-	char pszBuf[256];
-	va_start(argp, pszFormat);
-	vsprintf(pszBuf, pszFormat, argp);
-	va_end(argp);
-	MessageBoxA(NULL, pszBuf, "debug info", MB_OK);
-}
 
 
 // CTOR

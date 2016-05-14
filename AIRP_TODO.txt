@@ -14,17 +14,6 @@ Testing:
 * Native.getWorldPath
 
 Remove? 
-* CLunaLua::registerPassedLuaObj
-* CLunaLua::deletePassedLuaObj
-* CLunaLua::obj1 = luabind::object();
-* CLunaLua::obj2 = luabind::object();
-* CLunaLua::obj3 = luabind::object();
-* CLunaLua::obj4 = luabind::object();
-* CLunaLua::obj5 = luabind::object();
-* CLunaLua::obj6 = luabind::object();
-* CLunaLua::obj7 = luabind::object();
-* CLunaLua::obj8 = luabind::object();
-* void BMPBox::DebugMsgBox(LPCSTR pszFormat, ...) @ BMPBox.cpp
 
 Update:
 * Registrate LuaMovieResource with LUAHELPER_DEF_CLAS

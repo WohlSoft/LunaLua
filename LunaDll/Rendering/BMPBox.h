@@ -27,8 +27,6 @@ public:
     BMPBox(HBITMAP bitmapData, HDC screen_dc);
     BMPBox(BMPBox&) = default;
 
-	void DebugMsgBox(LPCSTR pszFormat, ...);
-    
     void Init();
     void MakeColorTransparent(int transparency_color);
     bool ImageLoaded()const;
