@@ -2,6 +2,8 @@
 #ifndef LuaHelper_HHH
 #define LuaHelper_HHH
 
+#include "LunaGenerator/LunaGenHelperUtils.h"
+
 #include <type_traits>
 #include <lua.hpp>
 #include <luabind/luabind.hpp>
@@ -56,25 +58,6 @@ namespace LuaHelper {
         return getObjList(count, wrapFunc, [](unsigned int i) { return true; }, L);
     }
 
-
-    template<class T, char const* clsName>
-    struct LuaBaseClassUtils 
-    {
-        using cls = T;
-
-        static luabind::class_<T> defClass() {
-            return luabind::class_<T>(clsName);
-        }
-
-        static std::string getName(T& cls) {
-            return std::string(clsName);
-        }
-
-        static const char *getRawName() {
-            return clsName;
-        }
-    };
-
 };
 
 
@@ -111,20 +94,6 @@ namespace std {
 
 #define LUAHELPER_DEF_CONST(luabindObj, defName) luabindObj [ #defName ] = defName
 
-#define LUAHELPER_HELPCLASS_NAME(name) HelperClass_ ## name
-#define LUAHELPER_HELPCLASS_STR_NAME(name) _cls_ ## name
-
-#define LUAHELPER_DEF_CLASS_HELPER(classType, name) \
-    extern const char LUAHELPER_HELPCLASS_STR_NAME(name) [] = #name ; \
-    typedef LuaHelper::LuaBaseClassUtils< classType , LUAHELPER_HELPCLASS_STR_NAME(name) > LUAHELPER_HELPCLASS_NAME(name) ;
-
-#define LUAHELPER_DEF_CLASS(name) \
-    luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
-        .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
-
-#define LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(name, smartPtrClass) \
-    luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls, smartPtrClass ## < LUAHELPER_HELPCLASS_NAME(name) ::cls > >( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \
-        .property("__type", & LUAHELPER_HELPCLASS_NAME(name) ::getName)
 
 #define LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(tableObj, elemKey) \
     try { \

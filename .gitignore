@@ -248,4 +248,8 @@ HardcodedGraphicsData
 /LunaLUA-bin.zip
 /LunaLoader-bin.zip
 
+# Notepad++ Backup file
 *.bak
+
+# PyCharm Project
+.idea

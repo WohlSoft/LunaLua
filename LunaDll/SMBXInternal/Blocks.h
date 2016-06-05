@@ -1,6 +1,8 @@
 #ifndef Blocks_Hhhhh
 #define Blocks_Hhhhh
 
+#include "../LuaMain/LunaGenerator/LunaGenHelperUtils.h"
+
 #include "BaseItemArray.h"
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
@@ -9,6 +11,7 @@ struct PlayerMOB;
 #pragma pack(push, 4)
 struct Block : SMBX_FullBaseItemArray<Block, 700, GM_BLOCK_COUNT_CONSTPTR, GM_BLOCKS_PTR_CONSTPTR> {
 
+    LUNAGEN_ATTR_NAMES("slippery", "hello")
     short               Slippery;                           // 0x00 0xFFFF = yes
     short               Unknown02;                          // 0x02
 

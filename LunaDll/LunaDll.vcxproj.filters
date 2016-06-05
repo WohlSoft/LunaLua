@@ -534,6 +534,7 @@
     <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
       <Filter>Rendering\RenderOps</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LunaGenerator\LunaGenHelperUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
