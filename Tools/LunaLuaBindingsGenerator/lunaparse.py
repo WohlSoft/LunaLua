@@ -3,6 +3,7 @@ import clang.cindex
 from clang.cindex import Cursor
 import os
 
+
 class LunaField:
     def __init__(self, cursor):
         """
@@ -12,22 +13,23 @@ class LunaField:
         self.name = cursor.spelling
         self.alt_names = []
         self.hidden = False
-        #: :type nextChild: clang.cindex.Cursor
-        for nextChild in cursor.get_children():
-            if nextChild.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
-                #: :type attrSpelling: str
-                attrSpelling = nextChild.spelling
-                #: :type attrVals: list
-                attrVals = attrSpelling.split(":")
+        for next_child in cursor.get_children(): # type: Cursor
+            if next_child.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+                attr_spelling = next_child.spelling # type: str
+                # If element is empty, then skip it
+                if attr_spelling == "":
+                    continue
+                attr_vals = attr_spelling.split(":") # type: list[str]
                 # Annotation with args
-                if len(attrVals) >= 2:
-                    attrKey = attrVals[0]
-                    if attrKey == "lunagen_alt_name":
-                        self.alt_names.append(attrVals[1])
-                
-        
-        
-        
+                attr_key = attr_vals[0]
+                if len(attr_vals) >= 2:
+                    if attr_key == "lunagen_alt_name":
+                        self.alt_names.append(attr_vals[1])
+                else:
+                    if attr_key == "lunagen_hidden":
+                        self.hidden = True
+
+
 class LunaClass:
     def __init__(self, cursor):
         """
@@ -38,6 +40,6 @@ class LunaClass:
         self.fields = []
         self.file_path = str(cursor.location.file)
 
-        for subChild in cursor.get_children():
-            if subChild.kind == clang.cindex.CursorKind.FIELD_DECL:
-                self.fields.append(LunaField(subChild))
+        for sub_child in cursor.get_children():
+            if sub_child.kind == clang.cindex.CursorKind.FIELD_DECL:
+                self.fields.append(LunaField(sub_child))

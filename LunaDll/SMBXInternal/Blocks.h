@@ -13,6 +13,7 @@ struct Block : SMBX_FullBaseItemArray<Block, 700, GM_BLOCK_COUNT_CONSTPTR, GM_BL
 
     LUNAGEN_ATTR_NAMES("slippery", "hello")
     short               Slippery;                           // 0x00 0xFFFF = yes
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown02;                          // 0x02
 
     short               RepeatingHits;                      // 0x04
