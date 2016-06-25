@@ -170,7 +170,7 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
 }
 
 // Extended Character Id Support
-void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock);
+void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect);
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 

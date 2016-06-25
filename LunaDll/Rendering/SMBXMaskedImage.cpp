@@ -320,13 +320,13 @@ SMBXMaskedImage* SMBXMaskedImage::GetByName(const std::string& t, int index)
     {
         mainArray = GM_GFX_EFFECTS_PTR;
         maskArray = GM_GFX_EFFECTS_MASK_PTR;
-        maxIndex = 148;
+        maxIndex = 200;
     }
     else if (t == "background")
     {
         mainArray = GM_GFX_BACKGROUND_PTR;
         maskArray = GM_GFX_BACKGROUND_MASK_PTR;
-        maxIndex = 190;
+        maxIndex = 200;
     }
     else if (t == "mario")
     {

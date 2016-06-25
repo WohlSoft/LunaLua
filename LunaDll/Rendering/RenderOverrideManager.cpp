@@ -52,8 +52,8 @@ void RenderOverrideManager::loadLevelGFX()
     loadOverrides(L"block", GM_GFX_BLOCKS_PTR, 700, GM_GFX_BLOCKS_MASK_PTR);
     loadOverrides(L"background2", GM_GFX_BACKGROUND2_PTR, 58);
     loadOverrides(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR);
-    loadOverrides(L"effect", GM_GFX_EFFECTS_PTR, 148, GM_GFX_EFFECTS_MASK_PTR);
-    loadOverrides(L"background", GM_GFX_BACKGROUND_PTR, 190, GM_GFX_BACKGROUND_MASK_PTR);
+    loadOverrides(L"effect", GM_GFX_EFFECTS_PTR, 200, GM_GFX_EFFECTS_MASK_PTR);
+    loadOverrides(L"background", GM_GFX_BACKGROUND_PTR, 200, GM_GFX_BACKGROUND_MASK_PTR);
     loadOverrides(L"mario", GM_GFX_MARIO_PTR, 7, GM_GFX_MARIO_MASK_PTR);
     loadOverrides(L"luigi", GM_GFX_LUIGI_PTR, 7, GM_GFX_LUIGI_MASK_PTR);
     loadOverrides(L"peach", GM_GFX_PEACH_PTR, 7, GM_GFX_PEACH_MASK_PTR);

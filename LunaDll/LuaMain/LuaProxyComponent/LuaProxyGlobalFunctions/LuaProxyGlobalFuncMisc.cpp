@@ -213,6 +213,7 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
     short base;
     short filterBlock;
     short switchBlock;
+    short deathEffect;
     std::string name;
 
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, id);
@@ -220,6 +221,7 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
     LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(namedArgs, base);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, filterBlock, 0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, switchBlock, 0);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, deathEffect, 0);
 
     if (id >= 0 && id <= 5)
     {
@@ -233,5 +235,5 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
         return;
     }
 
-    runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock);
+    runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock, deathEffect);
 }
