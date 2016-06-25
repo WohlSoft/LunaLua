@@ -563,7 +563,9 @@ void CLunaLua::bindAll()
                 def("unpause", &LuaProxy::Misc::unpause),
                 def("isPausedByLua", &LuaProxy::Misc::isPausedByLua),
                 def("warning", &LuaProxy::Misc::warning),
-                def("registerCharacterId", &LuaProxy::Misc::registerCharacterId)
+                def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
+                // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
+                def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
             ],
 
             namespace_("Audio")[
@@ -1081,6 +1083,7 @@ void CLunaLua::bindAll()
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
+                    // This isn't just useful in level situation... it is useful for overworld too, so, there's a copy in Misc too
                     def("loadPlayerHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
                 ],
 
