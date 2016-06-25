@@ -2320,6 +2320,13 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         {
             int w, h;
             maskedImg->getSize(w, h);
+
+            // If the base character is 5, there are left/right frames
+            if (base == 5)
+            {
+                h /= 2;
+            }
+
             effectdef_width[deathEffect - 1] = w;
             effectdef_height[deathEffect - 1] = h;
         }
