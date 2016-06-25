@@ -28,10 +28,15 @@ static BOOL __stdcall PlayerBitBltHook(
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     );
 
+static BOOL __stdcall OwSpriteBitBltHook(
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    );
+
 // Data structures
 struct CharacterDataStruct {
 public:
-    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, const std::vector<std::shared_ptr<BMPBox>> &sprites)
+    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, const std::vector<std::shared_ptr<BMPBox>> &sprites, std::shared_ptr<BMPBox> &owSprite)
     {
         mId = id;
         mName = name;
@@ -46,6 +51,7 @@ public:
         mStoredTemplate.MountColor = 0;
         mStoredTemplate.Hearts = 1;
         mSprites = sprites;
+        mOwSprite = owSprite;
     }
 public:
     short mId;
@@ -54,6 +60,7 @@ public:
     short mFilterBlock;
     short mSwitchBlock;
     std::vector<std::shared_ptr<BMPBox>> mSprites;
+    std::shared_ptr<BMPBox> mOwSprite;
     PlayerMOB mStoredTemplate;
 };
 
@@ -1261,6 +1268,33 @@ static auto patch_player_bitblt_0x98F22A = PATCH(0x98F22A).CALL(PlayerBitBltRawH
 static auto patch_player_bitblt_0x98F943 = PATCH(0x98F943).CALL(PlayerBitBltRawHook);
 static auto patch_player_bitblt_0x98FBD4 = PATCH(0x98FBD4).CALL(PlayerBitBltRawHook);
 
+__declspec(naked) static BOOL  __stdcall PlayerOwBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop eax
+        push esi // Attach player argument
+        push eax
+        jmp PlayerBitBltHook
+    }
+}
+static auto patch_player_bitblt_0x9034E7 = PATCH(0x9034E7).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x9036BC = PATCH(0x9036BC).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x903D66 = PATCH(0x903D66).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x90411B = PATCH(0x90411B).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x9042F0 = PATCH(0x9042F0).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x90499A = PATCH(0x90499A).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x904D4F = PATCH(0x904D4F).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x904F24 = PATCH(0x904F24).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x9055CE = PATCH(0x9055CE).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x905990 = PATCH(0x905990).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x905D29 = PATCH(0x905D29).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x905F00 = PATCH(0x905F00).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x9065DE = PATCH(0x9065DE).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x906973 = PATCH(0x906973).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x906B31 = PATCH(0x906B31).CALL(PlayerOwBitBltRawHook);
+
+// Patch overworld sprite rendering
+static auto patch_owsprite_bitblt_0x902BA4 = PATCH(0x902BA4).CALL(OwSpriteBitBltHook);
+static auto patch_owsprite_bitblt_0x902C86 = PATCH(0x902C86).CALL(OwSpriteBitBltHook);
 
 // Patch list
 static Patchable* runtimeHookCharacterIdPatchList[] = {
@@ -1315,7 +1349,24 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x8F0741,
     &patch_0x8F0BA1,
     &patch_0x8F0E20,
+    &patch_owsprite_bitblt_0x902BA4,
+    &patch_owsprite_bitblt_0x902C86,
     &patch_0x9032F4,
+    &patch_player_bitblt_0x9034E7,
+    &patch_player_bitblt_0x9036BC,
+    &patch_player_bitblt_0x903D66,
+    &patch_player_bitblt_0x90411B,
+    &patch_player_bitblt_0x9042F0,
+    &patch_player_bitblt_0x90499A,
+    &patch_player_bitblt_0x904D4F,
+    &patch_player_bitblt_0x904F24,
+    &patch_player_bitblt_0x9055CE,
+    &patch_player_bitblt_0x905990,
+    &patch_player_bitblt_0x905D29,
+    &patch_player_bitblt_0x905F00,
+    &patch_player_bitblt_0x9065DE,
+    &patch_player_bitblt_0x906973,
+    &patch_player_bitblt_0x906B31,
     &patch_0x916B7E,
     &patch_0x917FF7,
     &patch_0x919470,
@@ -2030,6 +2081,45 @@ static BOOL __stdcall PlayerBitBltHook(
         hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
+static BOOL __stdcall OwSpriteBitBltHook(
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    )
+{
+    // Always first player in this case
+    PlayerMOB* player = Player::Get(1);
+    short characterId = player->Identity;
+
+    if (!(characterId >= 1 && characterId <= 5))
+    {
+        auto it = runtimeHookCharacterIdMap.find(characterId);
+        if (it != runtimeHookCharacterIdMap.end())
+        {
+            // If we have a custom character with this character ID...
+            const std::shared_ptr<BMPBox>& owSprite = it->second->mOwSprite;
+            if (owSprite)
+            {
+                // If we have a valid overworld sprite...
+                if (dwRop != SRCAND) {
+                    RenderBitmapOp overrideFunc;
+                    overrideFunc.direct_img = owSprite;
+                    overrideFunc.x = nXDest;
+                    overrideFunc.y = nYDest;
+                    overrideFunc.sx = nXSrc;
+                    overrideFunc.sy = nYSrc;
+                    overrideFunc.sw = nWidth;
+                    overrideFunc.sh = nHeight;
+                    overrideFunc.Draw(&gLunaRender);
+                }
+                return TRUE;
+            }
+        }
+    }
+
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight,
+        hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
 /////////////////////
 // Management code //
 /////////////////////
@@ -2056,8 +2146,8 @@ static void runtimeHookCharacterIdUnpplyPatch(void)
 
 void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock)
 {
+    // Load Sprites
     std::vector<std::shared_ptr<BMPBox>> sprites;
-
     if (name.size() > 0)
     {
         std::wstring wName = Str2WStr(name);
@@ -2087,7 +2177,32 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         }
     }
 
-    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, sprites);
+    // Load overworld sprite
+    std::shared_ptr<BMPBox> owsprite = nullptr;
+    {
+        std::wstring wName = Str2WStr(name);
+        std::vector<std::wstring> searchPath;
+        if (!gIsOverworld)
+            searchPath.push_back(getCustomFolderPath()); // Check custom folder
+        searchPath.push_back(GM_FULLDIR); // Check episode dir
+        searchPath.push_back(gAppPathWCHAR + L"\\graphics\\player\\"); // Check base game
+
+        for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
+        {
+            std::wstring imgPath = *pathIt + L"player-" + std::to_wstring(id) + L".png";
+            owsprite = std::make_shared<BMPBox>(imgPath, gLunaRender.GetScreenDC());
+            if (owsprite && owsprite->ImageLoaded())
+            {
+                break;
+            }
+            else
+            {
+                owsprite = nullptr;
+            }
+        }
+    }
+
+    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, sprites, owsprite);
     runtimeHookCharacterIdApplyPatch();
 }
 
