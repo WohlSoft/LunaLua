@@ -8,7 +8,6 @@
 
 inline luabind::scope GenerateBindingBlock()
 {
-
 }
 
 #endif

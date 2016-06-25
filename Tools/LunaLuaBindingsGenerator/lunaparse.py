@@ -37,8 +37,8 @@ class LunaClass:
         @type cursor: Cursor
         """
         self.name = cursor.spelling # type: str
-        self.fields = []
-        self.file_path = str(cursor.location.file)
+        self.fields = [] # type: list[LunaField]
+        self.file_path = str(cursor.location.file) # type: str
 
         for sub_child in cursor.get_children():
             if sub_child.kind == clang.cindex.CursorKind.FIELD_DECL:

@@ -6,6 +6,7 @@ from optparse import OptionParser
 import lunaparse
 import lunagen
 import sys, os
+import ccsyspath
 
 
 def get_info(node, max_depth, depth=0):
@@ -14,14 +15,15 @@ def get_info(node, max_depth, depth=0):
     else:
         children = [get_info(c, max_depth, depth + 1)
                     for c in node.get_children()]
-    return { 'kind' : node.kind,
+    return {'kind': node.kind,
              # 'usr' : node.get_usr(),
-             'spelling' : node.spelling,
+             'spelling': node.spelling,
              # 'location' : node.location,
              # 'extent.start' : node.extent.start,
              # 'extent.end' : node.extent.end,
-             'is_definition' : node.is_definition(),
-             'children' : children }
+             'type': node.type.kind,
+             'is_definition': node.is_definition(),
+             'children': children }
 
 
 def parse_class(classDecl):
@@ -40,8 +42,8 @@ def find_and_parse_struct(node, className):
         return lunaparse.LunaClass(node)
 
     for nextChild in node.get_children():
-        callResult = find_and_parse_struct(nextChild, className);
-        if callResult != None:
+        callResult = find_and_parse_struct(nextChild, className)
+        if callResult is not None:
             return callResult
 
 # Arg 1 - File to parse
@@ -68,11 +70,16 @@ def main():
     input_file = args[0]
     struct_name = args[1]
     output_dir = options_result.output
-    if output_dir == None:
+    if output_dir is None:
         output_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     lunalua_index = Index.create()
-    example_file = lunalua_index.parse(input_file, ['-x', 'c++', '-std=c++1z', '-D__LUNA_CODE_GENERATOR__']);
+    args = '-x c++ --std=c++1z -D__LUNA_CODE_GENERATOR__'.split()
+    syspath = ccsyspath.system_include_paths('clang++')
+    incargs = [b'-I' + inc for inc in syspath]
+    args = args + incargs
+    print args
+    example_file = lunalua_index.parse(input_file, args)
     
     if not example_file:
         print("Failed to load example file!")
@@ -80,7 +87,7 @@ def main():
     
     my_cur = example_file.cursor
     parsed_class = find_and_parse_struct(my_cur, struct_name)
-    if parsed_class == None:
+    if parsed_class is None:
         print("Failed to find class to parse!")
         return
     

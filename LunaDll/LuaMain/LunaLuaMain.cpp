@@ -21,6 +21,9 @@
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/SMBXMaskedImage.h"
 
+#include "LunaGenerator/LunaGenHelperUtils.h"
+
+
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
@@ -457,6 +460,7 @@ LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Layer, Layer);
 LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Section, Section);
 LUNAGEN_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
 LUNAGEN_DEF_CLASS_HELPER(LuaProxy::BGO, BGO);
+LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Block, Block);
 
 
 // LUAHELPER_DEF_CLASS(LuaImageResource)
