@@ -1246,7 +1246,7 @@ __declspec(naked) static void  __stdcall HOOK_0x9DAA31() {
 static auto patch_switch_block_transform_0x9DAA31 = PATCH(0x9DAA31).CALL(HOOK_0x9DAA31).NOP_PAD_TO_SIZE<6>();
 
 // Patch player rendering so that we can do custom character sprites
-__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook_74(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
     __asm {
         pop eax
         push dword ptr ds : [ebp - 0x74] // Attach player argument
@@ -1254,30 +1254,107 @@ __declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook(HDC hdcDest, int nX
         jmp PlayerBitBltHook
     }
 }
-static auto patch_player_bitblt_0x98A5CA = PATCH(0x98A5CA).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98A85D = PATCH(0x98A85D).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98ABD3 = PATCH(0x98ABD3).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98AF2E = PATCH(0x98AF2E).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98B65A = PATCH(0x98B65A).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98B912 = PATCH(0x98B912).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98BBC8 = PATCH(0x98BBC8).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98BE5E = PATCH(0x98BE5E).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98C1D8 = PATCH(0x98C1D8).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98C52E = PATCH(0x98C52E).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98CC5A = PATCH(0x98CC5A).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98CF0F = PATCH(0x98CF0F).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98D1BF = PATCH(0x98D1BF).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98D44B = PATCH(0x98D44B).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98D7A6 = PATCH(0x98D7A6).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98DAE4 = PATCH(0x98DAE4).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98E202 = PATCH(0x98E202).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98E492 = PATCH(0x98E492).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98E82B = PATCH(0x98E82B).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98EB8B = PATCH(0x98EB8B).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98EED4 = PATCH(0x98EED4).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98F22A = PATCH(0x98F22A).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98F943 = PATCH(0x98F943).CALL(PlayerBitBltRawHook);
-static auto patch_player_bitblt_0x98FBD4 = PATCH(0x98FBD4).CALL(PlayerBitBltRawHook);
+static auto patch_player_bitblt_0x98A5CA = PATCH(0x98A5CA).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98A85D = PATCH(0x98A85D).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98ABD3 = PATCH(0x98ABD3).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98AF2E = PATCH(0x98AF2E).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98B65A = PATCH(0x98B65A).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98B912 = PATCH(0x98B912).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98BBC8 = PATCH(0x98BBC8).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98BE5E = PATCH(0x98BE5E).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98C1D8 = PATCH(0x98C1D8).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98C52E = PATCH(0x98C52E).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98CC5A = PATCH(0x98CC5A).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98CF0F = PATCH(0x98CF0F).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98D1BF = PATCH(0x98D1BF).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98D44B = PATCH(0x98D44B).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98D7A6 = PATCH(0x98D7A6).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98DAE4 = PATCH(0x98DAE4).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98E202 = PATCH(0x98E202).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98E492 = PATCH(0x98E492).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98E82B = PATCH(0x98E82B).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98EB8B = PATCH(0x98EB8B).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98EED4 = PATCH(0x98EED4).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98F22A = PATCH(0x98F22A).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98F943 = PATCH(0x98F943).CALL(PlayerBitBltRawHook_74);
+static auto patch_player_bitblt_0x98FBD4 = PATCH(0x98FBD4).CALL(PlayerBitBltRawHook_74);
+
+__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook_25C(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop eax
+        push dword ptr ds : [ebp - 0x25C] // Attach player argument
+        push eax
+        jmp PlayerBitBltHook
+    }
+}
+static auto patch_player_bitblt_0x91712C = PATCH(0x91712C).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x917345 = PATCH(0x917345).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x917DAD = PATCH(0x917DAD).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x917FDA = PATCH(0x917FDA).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x9185A5 = PATCH(0x9185A5).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x9187BE = PATCH(0x9187BE).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x919226 = PATCH(0x919226).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x919453 = PATCH(0x919453).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x919A1E = PATCH(0x919A1E).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x919C37 = PATCH(0x919C37).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91A69F = PATCH(0x91A69F).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91A8CC = PATCH(0x91A8CC).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91AF7A = PATCH(0x91AF7A).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91B191 = PATCH(0x91B191).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91BBFB = PATCH(0x91BBFB).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91BE2B = PATCH(0x91BE2B).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91C2B5 = PATCH(0x91C2B5).CALL(PlayerBitBltRawHook_25C);
+static auto patch_player_bitblt_0x91C4E2 = PATCH(0x91C4E2).CALL(PlayerBitBltRawHook_25C);
+
+__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook_340(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop eax
+        push dword ptr ds : [ebp - 0x340] // Attach player argument
+        push eax
+        jmp PlayerBitBltHook
+    }
+}
+static auto patch_player_bitblt_0x923D28 = PATCH(0x923D28).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x924176 = PATCH(0x924176).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x924B40 = PATCH(0x924B40).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x924F91 = PATCH(0x924F91).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x92595E = PATCH(0x92595E).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x925DB0 = PATCH(0x925DB0).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x92677D = PATCH(0x92677D).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x926BCB = PATCH(0x926BCB).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x92756F = PATCH(0x92756F).CALL(PlayerBitBltRawHook_340);
+static auto patch_player_bitblt_0x9279C1 = PATCH(0x9279C1).CALL(PlayerBitBltRawHook_340);
+
+__declspec(naked) static BOOL  __stdcall PlayerBitBltRawHook_Editor(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop eax
+        mov edx, dword ptr ds : [ebp - 0x1CC]
+        imul edx, edx, 0x184
+        add edx, dword ptr ds : [0xB250C8]
+        push edx // Attach player argument
+        push eax
+        jmp PlayerBitBltHook
+    }
+}
+static auto patch_player_bitblt_0x93E01D = PATCH(0x93E01D).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93E26F = PATCH(0x93E26F).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93E51B = PATCH(0x93E51B).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93E76D = PATCH(0x93E76D).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93EA19 = PATCH(0x93EA19).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93EC6B = PATCH(0x93EC6B).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93EF17 = PATCH(0x93EF17).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93F169 = PATCH(0x93F169).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93F415 = PATCH(0x93F415).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x93F667 = PATCH(0x93F667).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x944CCD = PATCH(0x944CCD).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x9450ED = PATCH(0x9450ED).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x9452D0 = PATCH(0x9452D0).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x94550D = PATCH(0x94550D).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x9456F0 = PATCH(0x9456F0).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x94592D = PATCH(0x94592D).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x945B10 = PATCH(0x945B10).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x945D4D = PATCH(0x945D4D).CALL(PlayerBitBltRawHook_Editor);
+static auto patch_player_bitblt_0x945F30 = PATCH(0x945F30).CALL(PlayerBitBltRawHook_Editor);
 
 __declspec(naked) static BOOL  __stdcall PlayerOwBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
     __asm {
@@ -1433,36 +1510,83 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_player_bitblt_0x906B31,
     &patch_0x916B7E,
     &patch_0x917FF7,
+    &patch_player_bitblt_0x91712C,
+    &patch_player_bitblt_0x917345,
+    &patch_player_bitblt_0x917DAD,
+    &patch_player_bitblt_0x917FDA,
+    &patch_player_bitblt_0x9185A5,
+    &patch_player_bitblt_0x9187BE,
+    &patch_player_bitblt_0x919226,
+    &patch_player_bitblt_0x919453,
     &patch_0x919470,
+    &patch_player_bitblt_0x919A1E,
+    &patch_player_bitblt_0x919C37,
+    &patch_player_bitblt_0x91A69F,
+    &patch_player_bitblt_0x91A8CC,
     &patch_0x91A8E9,
+    &patch_player_bitblt_0x91AF7A,
+    &patch_player_bitblt_0x91B191,
+    &patch_player_bitblt_0x91BBFB,
+    &patch_player_bitblt_0x91BE2B,
     &patch_0x91BE48,
+    &patch_player_bitblt_0x91C2B5,
+    &patch_player_bitblt_0x91C4E2,
     &patch_0x9238B0,
     &patch_0x923AFD,
+    &patch_player_bitblt_0x923D28,
     &patch_0x923F4F,
+    &patch_player_bitblt_0x924176,
     &patch_0x9246CC,
     &patch_0x924919,
+    &patch_player_bitblt_0x924B40,
     &patch_0x924D67,
+    &patch_player_bitblt_0x924F91,
     &patch_0x9254E7,
     &patch_0x925734,
+    &patch_player_bitblt_0x92595E,
     &patch_0x925B85,
+    &patch_player_bitblt_0x925DB0,
     &patch_0x926305,
     &patch_0x926552,
+    &patch_player_bitblt_0x92677D,
     &patch_0x9269A4,
+    &patch_player_bitblt_0x926BCB,
     &patch_0x927121,
     &patch_0x927345,
+    &patch_player_bitblt_0x92756F,
     &patch_0x927796,
+    &patch_player_bitblt_0x9279C1,
     &patch_0x93DC2C,
     &patch_0x93DDC7,
+    &patch_player_bitblt_0x93E01D,
+    &patch_player_bitblt_0x93E26F,
     &patch_0x93E2C5,
+    &patch_player_bitblt_0x93E51B,
+    &patch_player_bitblt_0x93E76D,
     &patch_0x93E7C3,
+    &patch_player_bitblt_0x93EA19,
+    &patch_player_bitblt_0x93EC6B,
     &patch_0x93ECC1,
+    &patch_player_bitblt_0x93EF17,
+    &patch_player_bitblt_0x93F169,
     &patch_0x93F1BF,
+    &patch_player_bitblt_0x93F415,
+    &patch_player_bitblt_0x93F667,
     &patch_0x944970,
     &patch_0x944AE6,
+    &patch_player_bitblt_0x944CCD,
     &patch_0x944F06,
+    &patch_player_bitblt_0x9450ED,
+    &patch_player_bitblt_0x9452D0,
     &patch_0x945326,
+    &patch_player_bitblt_0x94550D,
+    &patch_player_bitblt_0x9456F0,
     &patch_0x945746,
+    &patch_player_bitblt_0x94592D,
+    &patch_player_bitblt_0x945B10,
     &patch_0x945B66,
+    &patch_player_bitblt_0x945D4D,
+    &patch_player_bitblt_0x945F30,
     &patch_0x96C063,
     &patch_0x96E1A7,
     &patch_0x974CFC,
