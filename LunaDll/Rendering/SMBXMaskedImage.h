@@ -19,10 +19,14 @@ private:
 
 // Public static methods
 public:
-    static SMBXMaskedImage* get(HDC maskHdc, HDC mainHdc);
+    static SMBXMaskedImage* Get(HDC maskHdc, HDC mainHdc);
 
     // IMPORTANT: Before this is called, ensure no SMBXMaskedImage remain in use!
-    static void clearLookupTable(void);
+    static void ClearLookupTable(void);
+
+    static SMBXMaskedImage* GetCharacterSprite(short charId, short powerup);
+    static SMBXMaskedImage* GetHardcoded(const std::string& name);
+    static SMBXMaskedImage* GetByName(const std::string& t, int index);
 
 // Private data storage
 private:
@@ -47,7 +51,11 @@ public:
     bool HasLoadedPng() { return (bool)loadedPngImage; };
     std::shared_ptr<BMPBox> GetLoadedPng() { return loadedPngImage; };
     std::shared_ptr<BMPBox> GetRGBAOverride() { return rgbaOverrideImage; };
-    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; }
+    SMBXMaskedImage* GetMaskedOverride() { return maskedOverrideImage; };
+
+    void getSize(int& w, int& h, bool followOverride = true);
+
+    void QueueDraw(double x, double y, double w, double h, double sx, double sy, bool sceneCoords, double priority=2.0);
 };
 
 #endif

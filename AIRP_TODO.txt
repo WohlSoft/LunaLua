@@ -1,0 +1,31 @@
+
+Testing: 
+* Graphics.loadMovie --> Grahpics.loadMedia
+* Graphics.__setSpriteOverride
+* Warp.spawn
+* BGO.spawn
+* [LunaLua FFI] Graphics.LunaLuaSetMovieHitCallback
+* [LunaLua FFI] Graphics.LunaLuaSetMovieOnScreenCallback
+* [LunaLua FFI] Graphics.LunaLuaSetMovieOffScreenCallback
+* LuaMovieResource.* (all fields)
+* Misc.warning
+* Misc.updateWarp --> Why do we need it?
+* (Obj of AsyncHTTPRequest).responseBody
+* Native.getWorldPath
+
+Verify:
+GLEngineCmd_LunaDrawSprite::run @ GLEngineCmds.cpp Line 74...
+
+Update:
+* Registrate LuaMovieResource with LUAHELPER_DEF_CLASS
+* All Tabs --> 4 Spaces
+* BMPBox
+** Callbacks --> Better way? std::function<> or LunaLua event?
+** void setCallback(void(*fn)(int));
+** void setOnScreenCallback(void(*fn)());
+** void setOffScreenCallback(void(*fn)());
+** Move spriteoverride code to C++ @ worlds/lunaall.lua
+* Don't load Audio Engine if nosound is true
+
+Need To Fix:
+* Full Link Time Optimization Crashes

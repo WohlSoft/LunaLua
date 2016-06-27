@@ -30,7 +30,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140_xp</PlatformToolset>
   </PropertyGroup>
@@ -109,7 +109,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/Qpar-report:1 /Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -158,8 +158,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="IPC\IPCPipeServer.h" />
     <ClInclude Include="Misc\TestMode.h" />
+    <ClInclude Include="Misc\TestModeMenu.h" />
     <ClInclude Include="Misc\UniPath.h" />
+    <ClInclude Include="Misc\WaitForTickEnd.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpeg.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegDecodeComponent.h" />
     <ClInclude Include="Rendering\FFmpeg\FFmpegInit.h" />
@@ -169,6 +172,7 @@
     <ClInclude Include="Rendering\FFmpeg\FFmpegThread.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
+    <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -304,10 +308,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="IPC\IPCPipeServer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
+    <ClCompile Include="Misc\TestModeMenu.cpp" />
     <ClCompile Include="Misc\UniPath.cpp" />
+    <ClCompile Include="Misc\WaitForTickEnd.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
     <ClCompile Include="Misc\RuntimeHookManagers\LevelHUDController.cpp" />
@@ -340,6 +347,7 @@
     <ClCompile Include="Rendering\FrameCapture.cpp" />
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
+    <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp" />
     <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />

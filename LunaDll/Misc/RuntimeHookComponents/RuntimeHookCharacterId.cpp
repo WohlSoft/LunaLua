@@ -1804,7 +1804,7 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 
 static PlayerMOB* getTemplateForCharacter(int id)
 {
-    static PlayerMOB dummyPlayerStruct = { 0 };
+    static PlayerMOB dummyPlayerStruct;
 
     // Return vanilla character template
     if (id >= 1 && id <= 5) {

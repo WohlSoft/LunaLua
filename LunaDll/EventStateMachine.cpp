@@ -17,12 +17,48 @@ static inline void sendSimpleLuaEvent(const std::string& eventName, Ts&&... args
     }
 }
 
-static inline void ProcessWindowsMessageQueue(void) {
-    MSG msg;
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+void LunaDllRenderAndWaitFrame(void)
+{
+    // Render the world
+    if (gIsOverworld) {
+        // TODO: Is there any animation we want to update in the overworld?
+        native_renderWorld();
     }
+    else {
+        native_updateBlockAnim();
+        native_renderLevel();
+    }
+
+    // Audio management...
+    native_audioManagement();
+
+    LunaDllWaitFrame();
+}
+
+void LunaDllWaitFrame(bool allowMaxFPS)
+{
+    native_rtcDoEvents();
+
+    if (allowMaxFPS)
+    {
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingMaxFPSHookQPC();
+        }
+        else {
+            FrameTimingMaxFPSHook();
+        }
+    }
+    else
+    {
+        if (gIsWindowsVistaOrNewer) {
+            FrameTimingHookQPC();
+        }
+        else {
+            FrameTimingHook();
+        }
+    }
+
+    native_rtcDoEvents();
 }
 
 // Public methods (Notifications of State)
@@ -153,29 +189,11 @@ void EventStateMachine::checkPause(void) {
 void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
+        // Read input
         native_updateInput();
 
-        // Render the world
-        if (gIsOverworld) {
-            // TODO: Is there any animation we want to update in the overworld?
-            native_renderWorld();
-        } else {
-            native_updateBlockAnim();
-            native_renderLevel();
-        }
-
-        // Audio management...
-        native_audioManagement();
-
-        ProcessWindowsMessageQueue();
-
-        if (gIsWindowsVistaOrNewer) {
-            FrameTimingMaxFPSHookQPC();
-        } else {
-            FrameTimingMaxFPSHook();
-        }
-
-        ProcessWindowsMessageQueue();
+        // Render the frame and wait
+        LunaDllRenderAndWaitFrame();
     }
     m_RequestUnpause = false;
     m_IsPaused = false;

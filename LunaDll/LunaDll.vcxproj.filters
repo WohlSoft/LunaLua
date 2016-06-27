@@ -119,6 +119,9 @@
     <Filter Include="Rendering\GL">
       <UniqueIdentifier>{56db33a4-2b5e-4d78-9f38-d622cfc903d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IPC">
+      <UniqueIdentifier>{230f7155-7710-423e-b01c-3c8ae5762ffd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -526,6 +529,18 @@
     <ClInclude Include="Misc\UniPath.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="IPC\IPCPipeServer.h">
+      <Filter>IPC</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\WaitForTickEnd.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\TestModeMenu.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
+      <Filter>Rendering\RenderOps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -777,9 +792,6 @@
     <ClCompile Include="libs\stackwalker\StackWalker.cpp">
       <Filter>libs\stackwalker</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
-      <Filter>Misc\RuntimeHookComponents</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncLevel.cpp">
       <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
@@ -1007,6 +1019,21 @@
     </ClCompile>
     <ClCompile Include="Misc\UniPath.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="IPC\IPCPipeServer.cpp">
+      <Filter>IPC</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\WaitForTickEnd.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp">
+      <Filter>Misc\RuntimeHookUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\TestModeMenu.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp">
+      <Filter>Rendering\RenderOps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

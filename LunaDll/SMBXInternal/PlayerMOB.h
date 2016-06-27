@@ -2,6 +2,7 @@
 #ifndef PlayerMob_hhhhh
 #define PlayerMob_hhhhh
 #include "../Defines.h"
+#include "BaseItemArray.h"
 
 #ifndef __MINGW32__
 #pragma region Lookup
@@ -358,6 +359,19 @@ struct PlayerMOB {
     short Unused17E;
     short Unused180;
     short Unused182;
+
+    static PlayerMOB* Get(int index) {
+        if (index >= 1000 && index <= 1010) {
+            int templateIndex = index - 1000;
+            return &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[templateIndex];
+        }
+
+        if (index > GM_PLAYERS_COUNT || index < 0)
+            return 0;
+        return &((PlayerMOB*)GM_PLAYERS_PTR)[index];
+    }
+
+
 };
 #pragma pack(pop)
 

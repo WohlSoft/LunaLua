@@ -70,12 +70,12 @@ void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
     const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     if (tex == NULL) return;
 
-	//not safe
 
-	const_cast<BMPBox*>(mBmp)->colTest(mXDest, mYDest, mWidthDest, mHeightDest);
-	GLDraw::RenderMode m = mBmp->getAlphaType() == 1 ? GLDraw::RENDER_MODE_S_ALPHA : GLDraw::RENDER_MODE_ALPHA;
-	g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity,m);
-	
+    //not safe
+    const_cast<BMPBox*>(mBmp)->colTest(mXDest, mYDest, mWidthDest, mHeightDest);
+    GLDraw::RenderMode m = mBmp->getAlphaType() == 1 ? GLDraw::RENDER_MODE_S_ALPHA : GLDraw::RENDER_MODE_ALPHA;
+    g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity,m);
+    
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {

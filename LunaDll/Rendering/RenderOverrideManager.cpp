@@ -36,7 +36,7 @@ void RenderOverrideManager::loadOverrides(const std::wstring& path, const std::w
         if (!bmp->ImageLoaded())
             continue;
 
-        SMBXMaskedImage* img = SMBXMaskedImage::get(nextHdcMaskPtr, nextHdcPtr);
+        SMBXMaskedImage* img = SMBXMaskedImage::Get(nextHdcMaskPtr, nextHdcPtr);
         if (img == nullptr)
             continue;
 
@@ -106,7 +106,7 @@ void RenderOverrideManager::loadHardcodedOverrides()
                     
                     if (mainHDC != nullptr || maskHDC != nullptr)
                     {
-                        SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
+                        SMBXMaskedImage* img = SMBXMaskedImage::Get(maskHDC, mainHDC);
 
                         if (img != nullptr) {
                             img->SetLoadedPng(bmpObj);
@@ -132,7 +132,7 @@ void RenderOverrideManager::loadHardcodedOverrides()
 
                 if (mainHDC != nullptr || maskHDC != nullptr)
                 {
-                    SMBXMaskedImage* img = SMBXMaskedImage::get(maskHDC, mainHDC);
+                    SMBXMaskedImage* img = SMBXMaskedImage::Get(maskHDC, mainHDC);
 
                     if (img != nullptr) {
                         img->SetLoadedPng(bmpObj);

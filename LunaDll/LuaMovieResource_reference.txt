@@ -1,98 +1,99 @@
-LuaImageResourceを継承しているので画像としての操作はここに載っていなくても可能。
+﻿LuaMovieResource can be treated as LuaImageResource
 
-チャンネル番号とチャンネルの対応(B:青 G:緑 R:赤 A:アルファ)
+Mapping:Channel num -> Channel
 	0->B
 	1->G
 	2->R
 	3->A
-	4->マスクB
-	5->マスクG
-	6->マスクR
-	7->マスクA
+	4->Additional B
+	5->Additional G
+	6->Additional R
+	7->Additional A
 
-通常のグラフィック置き換えのようにnpc-1.mp4やbackground2-4.avi等をワールドフォルダかレベルフォルダに置くと対応するグラフィックが置き換わる。
-(ファイル名はgraphicsフォルダ参照)
+SMBX Graphics can be overriden in the same way of replacing with gif.(need lunaall.lua)
+(e.g. npc-1.mp4 replaces the graphics of the npc ID:1)
 
 ・Graphics.loadMovie(string filepath)
+	Load a movie file and return an instance of LuaMovieResource.
+	The file with suffix "_m" is also loaded as additional channels if the file exists.
+	(e.g. filepath=smbx.mp4 -> additional channel file = smbx_m.mp4)
 
-	filepathにある動画を読み込んでLuaMovieResourceを返す。
-    ここで指定されたファイル名(拡張子除く)の末尾に _m の付いたファイルがあればそれをマスクとして読み込む。
-	複数あっても一つだけ読み込まれる。(どれが読み込まれるかは不明)
-	(例:filepath=C:\SMBX\eggme.mp4 の時、C:\SMBX\eggme_m.*にマッチしたファイルの中から一つマスクとして読み込む。)
-
-・Graphics.drawImage, Graphics.drawImageWP, Graphics.drawImageToScene, Graphics.drawImageToSceneWP
-
-	(1フレーム)表示する。(http://wohlsoft.ru/pgewiki/LunaLua_global_functions の Graphics Functions 参照)
-	毎フレーム呼び出すことで再生される。音声と同期して表示される。
+・Graphics.draw****
+	Draw(refresh) one frame of the movie.
+	When the movie is rendered, the audio is also played.
+	The rendered frame is synchronized with audio. 
 
 ・Graphics.drawImageScaleWP(LuaMovieResource img,number screenX,number screenY,number width,number height,number priority)
 ・Graphics.drawImageScaleWP(LuaMovieResource img,number screenX,number screenY,number width,number height,number opacity,number priority)
-	上と基本的に同じだが拡大縮小が出来るようにしたもの。
-	動画の1フレームを画面上の座標(screenX,screenY)に幅width x 高さheightで表示する。
-	opacityは0.0～1.0の範囲
-	priorityは http://wohlsoft.ru/pgewiki/LunaLua_Render_Priority 参照
+	Additional draw function with scaling.
+	Draw a frame with the size width x height at (screenX,screenY)
 
-・Graphics.sprites.グラフィックグループ名[*].img = LuaMovieResource movie
-	SMBXのグラフィックをmovieで置き換える。
-	グラフィックグループ名とはSMBXのグラフィックファイルの先頭の文字列のこと。
-	(npc-1.gifやbackground2-4.gifのnpc,background2の部分、graphicsフォルダ直下にあるフォルダ名)
-
-	例:Graphics.sprites.npc[1].img = myNewMovieResource (ID:1のNPC(クリボー)をmyNewMovieResourceで置き換える)
+・Graphics.sprites.####[*].img = LuaMovieResource movie
+	This is same as LuaImageResource.
     
 ・Graphics.movieHitEvent(LuaMovieResource img,function callback(number))
-	当たり判定に接触した時に呼び出されるコールバックを設定する。
-	コールバックの引数として接触したチャンネル番号が与えられる。
+	Set a callback function that is called when the player touched the hit area.
+	The argument is channel number.
 
 ・movie:play()
-	動画を再生する。
+	Play the movie.
 
 ・movie:pause()
-	動画を一時停止する。
+	Pause the movie.
 
 ・movie:stop()
-	動画を停止する(最初に戻る)。
+	Stop the movie.(Back to start)
 
 ・movie:seek(number seconds)
-	seconds秒へシークする。(再生時間を超えた値を指定すると挙動がおかしくなるかも)
+	Seek the movie to the specified time (in second)
 
 ・movie:setMaskThreshold(number ch,number threshold)
-	chで指定されたチャンネルの当たり判定のしきい値を設定する。
-	threshold以上の値を持つ部分が当たり判定となる。
-    thresholdのデフォルト値=256 (>255なので当たり判定無し)
+	Set the hit area threshold of the specified channel.
+	Pixels larger than this value are treated as hit area.
+	Default:256 (>255 no hit area)
     
 ・movie.videoDelay = number delay
-	ミリ秒単位で映像の遅れを設定する。負の値も可能。
-    デフォルト値=0
+	Set the delay of the video.
+	Default:0
     
 ・movie.maskDelay = number delay
-	ミリ秒単位でマスクの遅れを設定する。負の値も可能。
-    デフォルト値=0
+	Set the delay of the additional video.
+	Default:0
+	
     
 ・movie.scaleUpMode = number mode
-	拡大時のアルゴリズムを設定する。 0=Nearest neighbor,1=Bilinear,不正な値=Nearest neightbor
-    デフォルト値=0
+	Set the algorithm used when scale up
+	0=Nearest neighbor,1=Bilinear,other=Nearest neightbor
+    	Default:0
 
 ・movie.scaleDownMode = number mode
-	縮小時のアルゴリズムを設定する。 0=Nearest neighbor,1=Bilinear,不正な値=Nearest neightbor
-    デフォルト値=0
+	Set the algorithm used when scale down
+	0=Nearest neighbor,1=Bilinear,other=Nearest neightbor
+    	Default:0
 
 ・movie.offScreenMode = number mode
-	画面から消えた時の挙動を設定する。0=何もしない,1=一時停止,2=停止(再生位置は最初に戻る),不正な値=何もしない
-	(複数表示している(NPCに貼り付けて複数出す等)場合はその全てが消えた時に起こる)
-    デフォルト値=1
+	Set the behavior when the movie went out of the screen.
+	0=do nothing,1=pause,2=stop,other=do nothing
+    	Default:1
 	
 ・movie.onScreenMode = number mode
-	(表示されていない状態から)画面に表示された時の挙動を設定する。0=何もしない,1=再生
-    デフォルト値=1
+	Set the behavior when the movie came into the screen.
+	0=do nothing,1=play
+   	Default:1
 	
 ・movie.loop = bool enable
-	ループするかしないかの設定
-    デフォルト値=true
+	Set whether movie loops or not/
+	Default:true
 
 ・movie.altAlpha = number channel
-	アルファチャンネルとして使うチャンネルを指定。-1で無効。
-    デフォルト値=-1
+	Set the alternative alpha channel. -1=Unused
+    	Default:-1
     
 ・movie.alphaType = number mode
-	アルファチャンネルの扱い方の設定。0=プレマルチプライドアルファ,1=ストレートアルファ
-    デフォルト値=0
+	Set how to treat alpha channel.
+	0=premultiplied,1=straight
+	Default:0
+
+・movie.volume = number volume
+	Set the volume of audio.
+	Default:100
