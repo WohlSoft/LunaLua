@@ -1,13 +1,16 @@
 EXPORTS
+MIX_ADLMIDI_getAdLibMode
 MIX_ADLMIDI_getBankID
 MIX_ADLMIDI_getScaleMod
 MIX_ADLMIDI_getTremolo
 MIX_ADLMIDI_getVibrato
+MIX_ADLMIDI_setAdLibMode
 MIX_ADLMIDI_setBankID
 MIX_ADLMIDI_setScaleMod
 MIX_ADLMIDI_setSetDefaults
 MIX_ADLMIDI_setTremolo
 MIX_ADLMIDI_setVibrato
+MIX_SetLockMIDIArgs
 MIX_SetMidiDevice
 MIX_Timidity_addToPathList
 Mix_AllocateChannels
