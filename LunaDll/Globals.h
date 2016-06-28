@@ -94,6 +94,12 @@ extern short	gNumpad8;
 extern short	gNumpad2;
 extern short	gNumpad6;
 
+// Raw player keymap
+extern KeyMap   gRawKeymap[2];
+
+// Test mode pause note
+extern bool     gIsTestModePauseActive;
+
 // Level init
 extern LvlEnum	gLevelEnum;
 

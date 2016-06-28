@@ -49,6 +49,10 @@ DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
 LvlEnum gLevelEnum;
 
+KeyMap gRawKeymap[2];
+
+bool gIsTestModePauseActive;
+
 // Global objs
 Renderer gLunaRender;
 

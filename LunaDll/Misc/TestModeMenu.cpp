@@ -261,7 +261,8 @@ PowerupSelectorItem PowerupSelectorItem::player1Inst;
 
 void testModePauseMenu(bool allowContinue)
 {
-    KeyMap lastKeymap = Player::Get(1)->keymap;
+    gIsTestModePauseActive = true;
+    KeyMap lastKeymap = gRawKeymap[0];
 
     unsigned int selectedOption = 0;
     std::vector<MenuItem*> menuItems;
@@ -289,7 +290,7 @@ void testModePauseMenu(bool allowContinue)
         // Read input...
         native_updateInput();
 
-        KeyMap keymap = Player::Get(1)->keymap;
+        const KeyMap& keymap = gRawKeymap[0];
 
         // Process selected item input
         if ((menuItems[selectedOption] != nullptr) && menuItems[selectedOption]->ProcessInput(keymap, lastKeymap))
@@ -346,4 +347,5 @@ void testModePauseMenu(bool allowContinue)
         // Exit pause if we're trying to switch
         if (GM_EPISODE_MODE) break;
     }
+    gIsTestModePauseActive = false;
 }

@@ -75,21 +75,34 @@ void EventStateMachine::hookLevelLoop(void) {
     // Check if we should pause
     checkPause();
 
-    sendOnLoop();
+    if (!gIsTestModePauseActive)
+    {
+        sendOnLoop();
+    }
 }
 
 void EventStateMachine::hookWorldLoop(void) {
     // Check if we should pause
     checkPause();
 
-    sendOnLoop();
+    if (!gIsTestModePauseActive)
+    {
+        sendOnLoop();
+    }
 }
 
 void EventStateMachine::hookInputUpdate(void) {
-    sendOnInputUpdate();
+    // Record raw input state before sending Lua event
+    gRawKeymap[0] = ((PlayerMOB*)GM_PLAYERS_PTR)[1].keymap;
+    gRawKeymap[1] = ((PlayerMOB*)GM_PLAYERS_PTR)[2].keymap;
+    
+    if (!gIsTestModePauseActive)
+    {
+        sendOnInputUpdate();
 
-    if (m_onTickReady) {
-        sendOnTick();
+        if (m_onTickReady) {
+            sendOnTick();
+        }
     }
 }
 
