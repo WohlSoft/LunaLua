@@ -1,6 +1,20 @@
 #ifndef LunaGenHelperUtils_hhhhh
 #define LunaGenHelperUtils_hhhhh
 
+#include <string>
+
+struct Momentum
+{
+    double x;
+    double y;
+    double height;
+    double width;
+    double speedX;
+    double speedY;
+};
+
+#define COMBOOL(b) (b ? -1 : 0)
+
 
 // Macro Utils
 // Found from http://stackoverflow.com/a/1872506/5082374
@@ -53,6 +67,72 @@ namespace LunaGen
         template<typename ClassT>
         struct LunaGenTraits;
     }
+
+    template<typename ConvertedType>
+    struct vb6_converter {
+        typedef ConvertedType from_type; // vb6
+        typedef ConvertedType to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return data;
+        }
+    };
+
+    template<>
+    struct vb6_converter<bool> {
+        typedef short from_type; // vb6
+        typedef bool to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data == -1;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return COMBOOL(data);
+        }
+    };
+
+    // NOTE: This class is currently not actually used.
+    //       m_index must be accessed somehow properly. --> Indexable Subclass ?
+    //                                                  --> Move m_index to THIS subclass?
+    template<class WrapperClass, class InternalClass>
+    class CommonVB6Wrapper {
+    public:
+        typedef InternalClass internal_class;
+
+        template<typename DataType, DataType InternalClass::* Ptr, typename InputType = DataType>
+        void Setter(InputType data)
+        {
+            typedef vb6_converter<InputType> converter;
+
+            InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr = converter::ConvertForSetter(data);
+        }
+
+        template<typename DataType, DataType InternalClass::* Ptr, typename OutputType = DataType>
+        OutputType Getter() const
+        {
+            typedef vb6_converter<OutputType> converter;
+
+            return converter::ConvertForGetter(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr);
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        void MomentumSetter(double data)
+        {
+            (&(InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr = data;
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        double MomentumGetter() const
+        {
+            return (&(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr;
+        }
+
+    };
     
     template<typename ClassT>
     struct LunaGenHelper {

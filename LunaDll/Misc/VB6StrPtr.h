@@ -2,6 +2,7 @@
 #define _VB6StrPtr_H_
 
 #include <string>
+#include "../LuaMain/LunaGenerator/LunaGenHelperUtils.h"
 
 #define _vbaStrCopy ((void(__fastcall *)(VB6StrPtr*, const wchar_t*))IMP_vbaStrCopy)
 #define _vbaFreeStr ((void(__fastcall *)(VB6StrPtr*))IMP_vbaFreeStr)
@@ -32,5 +33,22 @@ struct VB6StrPtr {
 	bool operator==(const std::string &other) const;
 };
 #pragma pack(pop)
+
+namespace LunaGen {
+    template<>
+    struct vb6_converter<std::string> {
+        typedef VB6StrPtr from_type; // vb6
+        typedef std::string to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return data;
+        }
+    };
+}
+
 
 #endif

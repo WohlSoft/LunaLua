@@ -83,87 +83,6 @@ namespace LuaProxy {
 //&LuaProxy::luaUserdataIndexCompare<LuaProxy::Player, decltype(LuaProxy::Player::m_index), &LuaProxy::Player::m_index>
 #define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
 
-
-    template<typename ConvertedType>
-    struct vb6_converter {
-        typedef ConvertedType from_type; // vb6
-        typedef ConvertedType to_type; // C++
-
-        static to_type ConvertForGetter(const from_type& data) {
-            return data;
-        }
-
-        static from_type ConvertForSetter(const to_type& data) {
-            return data;
-        }
-    };
-
-    template<>
-    struct vb6_converter<bool> {
-        typedef short from_type; // vb6
-        typedef bool to_type; // C++
-
-        static to_type ConvertForGetter(const from_type& data) {
-            return data == -1;
-        }
-
-        static from_type ConvertForSetter(const to_type& data) {
-            return COMBOOL(data);
-        }
-    };
-
-    template<>
-    struct vb6_converter<std::string> {
-        typedef VB6StrPtr from_type; // vb6
-        typedef std::string to_type; // C++
-
-        static to_type ConvertForGetter(const from_type& data) {
-            return data;
-        }
-
-        static from_type ConvertForSetter(const to_type& data) {
-            return data;
-        }
-    };
-
-
-    // NOTE: This class is currently not actually used.
-    //       m_index must be accessed somehow properly. --> Indexable Subclass ?
-    //                                                  --> Move m_index to THIS subclass?
-    template<class WrapperClass, class InternalClass>
-    class CommonVB6Wrapper {
-    public:
-        typedef InternalClass internal_class;
-        
-        template<typename DataType, DataType InternalClass::* Ptr, typename InputType = DataType>
-        void Setter(InputType data)
-        {
-            typedef vb6_converter<InputType> converter;
-
-            InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr = converter::ConvertForSetter(data);
-        }
-
-        template<typename DataType, DataType InternalClass::* Ptr, typename OutputType = DataType>
-        OutputType Getter() const
-        {
-            typedef vb6_converter<OutputType> converter;
-
-            return converter::ConvertForGetter(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr);
-        }
-
-        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
-        void MomentumSetter(double data)
-        {
-            (&(InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr = data;
-        }
-
-        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
-        double MomentumGetter() const
-        {
-            return (&(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr;
-        }
-    };
-
     // &LuaProxy::Warp::MomentumGetter<&LuaProxy::Warp::internal_class::exit, &Momentum::x>, &LuaProxy::Warp::MomentumSetter<&LuaProxy::Warp::internal_class::exit, &Momentum::x>
 #define LUAPROXY_REG_R_MOMENTUM(WrapperCls, MomentumField, MomentumSubField) \
     &WrapperCls::MomentumGetter<&WrapperCls::internal_class::MomentumField, &Momentum:: MomentumSubField>
@@ -320,7 +239,7 @@ namespace LuaProxy {
 
 
 
-    class Warp : public CommonVB6Wrapper<Warp, SMBX_Warp> {
+    class Warp : public LunaGen::CommonVB6Wrapper<Warp, SMBX_Warp> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
@@ -580,7 +499,7 @@ namespace LuaProxy {
         
     };
 
-    class Player : public CommonVB6Wrapper<Player, PlayerMOB> {
+    class Player : public LunaGen::CommonVB6Wrapper<Player, PlayerMOB> {
     public:
         static int count();
         static luabind::object get(lua_State* L);
