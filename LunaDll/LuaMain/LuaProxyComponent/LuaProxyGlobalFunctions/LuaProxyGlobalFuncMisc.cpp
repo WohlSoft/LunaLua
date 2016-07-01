@@ -67,7 +67,7 @@ std::string LuaProxy::Misc::cheatBuffer()
 void LuaProxy::Misc::cheatBuffer(const luabind::object &value, lua_State* L)
 {
     LuaHelper::assignVB6StrPtr(&GM_INPUTSTR_BUF_PTR, value, L);
-    VB6StrPtr triggerStr = " ";
+    VB6StrPtr triggerStr = std::string(" ");
     native_updateCheatbuf(&triggerStr);
 }
 
@@ -96,24 +96,23 @@ luabind::object LuaProxy::Misc::listLocalFiles(std::string path, lua_State* L)
     return listFiles(WStr2Str(getCustomFolderPath()) + path, L);
 }
 
-template<const DWORD FILTER>
-luabind::object luabindResolveFile(std::string file, lua_State* L){
-    std::vector<std::string> paths = {
-        WStr2Str(getCustomFolderPath()),
-        (std::string)GM_FULLDIR,
-        gAppPathUTF8 + "\\LuaScriptsLib\\",
-        gAppPathUTF8 + "\\"
+template<const DWORD FILTER, const bool FILTER_TYPE>
+luabind::object luabindResolveFile(const std::string& file, lua_State* L){
+    std::vector<std::wstring> paths = {
+        getCustomFolderPath(),
+        Str2WStr((std::string)GM_FULLDIR),
+        Str2WStr(gAppPathUTF8 + "\\LuaScriptsLib\\"),
+        Str2WStr(gAppPathUTF8 + "\\")
     };
 
-
-
-    for (std::string nextSearchPath : paths) {
-        std::string nextEntry = nextSearchPath + file;
-        DWORD objectAttributes = GetFileAttributesA(nextEntry.c_str());
+    std::wstring wFile = Str2WStr(file);
+    for (std::wstring nextSearchPath : paths) {
+        std::wstring nextEntry = nextSearchPath + wFile;
+        DWORD objectAttributes = GetFileAttributesW(nextEntry.c_str());
         if(objectAttributes == INVALID_FILE_ATTRIBUTES)
             continue;
-        if(objectAttributes & FILTER)
-            return luabind::object(L, nextEntry);
+        if(((objectAttributes & FILTER) != 0) == FILTER_TYPE)
+            return luabind::object(L, WStr2Str(nextEntry));
     }
 
     return luabind::object();
@@ -121,19 +120,52 @@ luabind::object luabindResolveFile(std::string file, lua_State* L){
 
 luabind::object LuaProxy::Misc::resolveFile(const std::string& file, lua_State* L)
 {
-    return luabindResolveFile<~FILE_ATTRIBUTE_DIRECTORY>(file, L);
+    return luabindResolveFile<FILE_ATTRIBUTE_DIRECTORY, false>(file, L);
 }
 
 luabind::object LuaProxy::Misc::resolveDirectory(const std::string& directory, lua_State* L)
 {
-    return luabindResolveFile<FILE_ATTRIBUTE_DIRECTORY>(directory, L);
+    return luabindResolveFile<FILE_ATTRIBUTE_DIRECTORY, true>(directory, L);
+}
+
+luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua_State* L)
+{
+    std::vector<std::wstring> paths = {
+        getCustomFolderPath(),
+        Str2WStr((std::string)GM_FULLDIR),
+        Str2WStr(gAppPathUTF8 + "\\graphics\\"),
+    };
+    std::wstring wFile = Str2WStr(file);
+
+    // Add prefix folder as an option
+    std::wstring wFilePrefix;
+    if (wFile.find(L'/') == std::wstring::npos && wFile.find(L'\\') == std::wstring::npos)
+    {
+        size_t dashPos = wFile.find(L'-');
+        if (dashPos != std::wstring::npos)
+        {
+            std::wstring dashPrefix = wFile.substr(0, dashPos);
+            paths.push_back(Str2WStr(gAppPathUTF8 + "\\graphics\\") + dashPrefix + L"\\");
+        }
+    }
+
+    for (std::wstring nextSearchPath : paths) {
+        std::wstring nextEntry = nextSearchPath + wFile;
+        DWORD objectAttributes = GetFileAttributesW(nextEntry.c_str());
+        if (objectAttributes == INVALID_FILE_ATTRIBUTES)
+            continue;
+        if ((objectAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+            return luabind::object(L, WStr2Str(nextEntry));
+    }
+
+    return luabind::object();
 }
 
 bool LuaProxy::Misc::isSamePath(const std::string first, const std::string second) 
 {
-    HANDLE hFileFirst = CreateFileA(first.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileFirst = CreateFileW(Str2WStr(first).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileFirst == INVALID_HANDLE_VALUE) return false;
-    HANDLE hFileSecond = CreateFileA(second.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileSecond = CreateFileW(Str2WStr(second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileSecond == INVALID_HANDLE_VALUE) {
         CloseHandle(hFileFirst);
         return false;

@@ -1262,6 +1262,7 @@ namespace LuaProxy {
         luabind::object listLocalFiles(std::string path, lua_State* L);
         luabind::object resolveFile(const std::string& relativePath, lua_State* L);
         luabind::object resolveDirectory(const std::string& relativePath, lua_State* L);
+        luabind::object resolveGraphicsFile(const std::string& file, lua_State* L);
         bool isSamePath(const std::string first, const std::string second);
         void openPauseMenu();
         void saveGame();

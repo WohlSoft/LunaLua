@@ -551,6 +551,7 @@ void CLunaLua::bindAll()
                 def("listLocalFiles", &LuaProxy::Misc::listLocalFiles),
                 def("resolveFile", &LuaProxy::Misc::resolveFile),
                 def("resolveDirectory", &LuaProxy::Misc::resolveDirectory),
+                def("resolveGraphicsFile", &LuaProxy::Misc::resolveGraphicsFile),
                 def("isSamePath", &LuaProxy::Misc::isSamePath),
                 def("openPauseMenu", &LuaProxy::Misc::openPauseMenu),
                 def("saveGame", &LuaProxy::Misc::saveGame),
