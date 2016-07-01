@@ -49,31 +49,34 @@
 
 namespace LunaGen
 {
-
-    template<typename InternalStructT>
-    struct LunaGenTraits;
-
-    template<typename InternalStructT, typename TraitsT = LunaGenTraits<InternalStructT>>
+    namespace detail {
+        template<typename ClassT>
+        struct LunaGenTraits;
+    }
+    
+    template<typename ClassT>
     struct LunaGenHelper {
-        using internal_class_type = InternalStructT;
+        using internal_class_type = ClassT;
+        using internal_class_info = detail::LunaGenTraits<ClassT>;
 
         // enable_if, with SMBX_FullBaseArray, ...
-        static luabind::class_<internal_class_type> defClass() {
-            return luabind::class_<internal_class_type>(TraitsT::clsName)
+        // TODO: Get, Count, ... methods in CommonVB6Wrapper
+        static auto defClass() {
+            return luabind::class_<internal_class_type>(internal_class_info::clsName)
                 .property("__type", &getName);
         }
 
-        static luabind::class_<internal_class_type, std::shared_ptr<internal_class_type>> defClassSharedPtr() {
-            return luabind::class_<internal_class_type, std::shared_ptr<internal_class_type>>(TraitsT::clsName)
+        static auto defClassSharedPtr() {
+            return luabind::class_<internal_class_type, std::shared_ptr<internal_class_type>>(internal_class_info::clsName)
                 .property("__type", &getName);
         }
 
-        static std::string getName(InternalStructT& cls) {
-            return std::string(TraitsT::clsName);
+        static std::string getName(internal_class_type& cls) {
+            return std::string(internal_class_info::clsName);
         }
 
         static const char *getRawName() {
-            return TraitsT::clsName;
+            return internal_class_info::clsName;
         }
     };
 }
@@ -99,14 +102,16 @@ namespace LunaGen
 #define LUNAGEN_ATTR_HIDDEN
 #endif
 
-#define LUNAGEN_DEF_CLASS2(classType, name) \
+#define LUNAGEN_DEF_CLASS(classType, name) \
     namespace LunaGen \
     { \
-        template<> \
-        struct LunaGenTraits<classType> \
-        { \
-            static constexpr const char clsName[] = #name; \
-        }; \
+        namespace detail { \
+            template<> \
+            struct LunaGenTraits<classType> \
+            { \
+                static constexpr const char clsName[] = #name; \
+            }; \
+        } \
     }
 
 

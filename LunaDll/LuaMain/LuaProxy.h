@@ -128,7 +128,8 @@ namespace LuaProxy {
 
 
     // NOTE: This class is currently not actually used.
-    //       m_index must be accessed somehow properly.
+    //       m_index must be accessed somehow properly. --> Indexable Subclass ?
+    //                                                  --> Move m_index to THIS subclass?
     template<class WrapperClass, class InternalClass>
     class CommonVB6Wrapper {
     public:
