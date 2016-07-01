@@ -17,6 +17,9 @@ private:
     // the same SMBXMaskedImage.
     static std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> lookupTable;
 
+    // Registration of custom images that can be overridden
+    static std::unordered_map<std::string, std::shared_ptr<SMBXMaskedImage>> customOverridable;
+
 // Public static methods
 public:
     static SMBXMaskedImage* Get(HDC maskHdc, HDC mainHdc);
@@ -27,6 +30,9 @@ public:
     static SMBXMaskedImage* GetCharacterSprite(short charId, short powerup);
     static SMBXMaskedImage* GetHardcoded(const std::string& name);
     static SMBXMaskedImage* GetByName(const std::string& t, int index);
+
+    static SMBXMaskedImage* RegisterCustomOverridable(const std::string& t, int index, const std::shared_ptr<BMPBox>& img);
+    static void UnregisterCustomOverridable(const std::string& t, int index);
 
 // Private data storage
 private:

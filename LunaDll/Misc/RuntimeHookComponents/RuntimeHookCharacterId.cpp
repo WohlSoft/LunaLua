@@ -45,7 +45,7 @@ static int __stdcall EffectUpdateHook(short* effectId);
 // Data structures
 struct CharacterDataStruct {
 public:
-    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect, const std::vector<std::shared_ptr<BMPBox>> &sprites, std::shared_ptr<BMPBox> &owSprite)
+    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect, const std::vector<SMBXMaskedImage*> &sprites, SMBXMaskedImage* owSprite)
     {
         mId = id;
         mName = name;
@@ -63,6 +63,14 @@ public:
         mSprites = sprites;
         mOwSprite = owSprite;
     }
+    ~CharacterDataStruct()
+    {
+        for (int powerupId = 1; powerupId <= 10; powerupId++)
+        {
+            SMBXMaskedImage::UnregisterCustomOverridable(mName, powerupId);
+        }
+        SMBXMaskedImage::UnregisterCustomOverridable("player", mId);
+    }
 public:
     short mId;
     std::string mName;
@@ -70,8 +78,8 @@ public:
     short mFilterBlock;
     short mSwitchBlock;
     short mDeathEffect;
-    std::vector<std::shared_ptr<BMPBox>> mSprites;
-    std::shared_ptr<BMPBox> mOwSprite;
+    std::vector<SMBXMaskedImage*> mSprites;
+    SMBXMaskedImage* mOwSprite;
     PlayerMOB mStoredTemplate;
 };
 
@@ -2251,21 +2259,13 @@ static BOOL __stdcall PlayerBitBltHook(
         if (it != runtimeHookCharacterIdMap.end())
         {
             // If we have a custom character with this character ID...
-            const std::vector<std::shared_ptr<BMPBox>>& sprites = it->second->mSprites;
+            const std::vector<SMBXMaskedImage*>& sprites = it->second->mSprites;
             short powerupIdx = player->CurrentPowerup - 1;
             if (powerupIdx >= 0 && (unsigned long)powerupIdx < sprites.size() && sprites[powerupIdx])
             {
                 // If we have a valid sprite for this powerup...
                 if (GM_PLAYER_SHADOWSTAR || (dwRop != SRCAND)) {
-                    RenderBitmapOp overrideFunc;
-                    overrideFunc.direct_img = sprites[powerupIdx];
-                    overrideFunc.x = nXDest;
-                    overrideFunc.y = nYDest;
-                    overrideFunc.sx = nXSrc;
-                    overrideFunc.sy = nYSrc;
-                    overrideFunc.sw = nWidth;
-                    overrideFunc.sh = nHeight;
-                    overrideFunc.Draw(&gLunaRender);
+                    sprites[powerupIdx]->DrawWithOverride(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, true, true);
                 }
                 return TRUE;
             }
@@ -2291,20 +2291,12 @@ static BOOL __stdcall OwSpriteBitBltHook(
         if (it != runtimeHookCharacterIdMap.end())
         {
             // If we have a custom character with this character ID...
-            const std::shared_ptr<BMPBox>& owSprite = it->second->mOwSprite;
+            SMBXMaskedImage* owSprite = it->second->mOwSprite;
             if (owSprite)
             {
                 // If we have a valid overworld sprite...
                 if (dwRop != SRCAND) {
-                    RenderBitmapOp overrideFunc;
-                    overrideFunc.direct_img = owSprite;
-                    overrideFunc.x = nXDest;
-                    overrideFunc.y = nYDest;
-                    overrideFunc.sx = nXSrc;
-                    overrideFunc.sy = nYSrc;
-                    overrideFunc.sw = nWidth;
-                    overrideFunc.sh = nHeight;
-                    overrideFunc.Draw(&gLunaRender);
+                    owSprite->DrawWithOverride(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, true, true);
                 }
                 return TRUE;
             }
@@ -2382,7 +2374,7 @@ static void runtimeHookCharacterIdUnpplyPatch(void)
 void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect)
 {
     // Load Sprites
-    std::vector<std::shared_ptr<BMPBox>> sprites;
+    std::vector<SMBXMaskedImage*> sprites;
     if (name.size() > 0)
     {
         std::wstring wName = Str2WStr(name);
@@ -2404,12 +2396,12 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
                     break;
                 }
             }
-            sprites.push_back(img);
+            sprites.push_back(SMBXMaskedImage::RegisterCustomOverridable(name, powerupId, img));
         }
     }
 
     // Load overworld sprite
-    std::shared_ptr<BMPBox> owsprite = nullptr;
+    SMBXMaskedImage* owsprite = nullptr;
     {
         std::wstring wName = Str2WStr(name);
         std::vector<std::wstring> searchPath;
@@ -2421,9 +2413,10 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
         {
             std::wstring imgPath = *pathIt + L"player-" + std::to_wstring(id) + L".png";
-            owsprite = BMPBox::loadShared(imgPath);
-            if (owsprite)
+            std::shared_ptr<BMPBox> img = BMPBox::loadShared(imgPath);
+            if (img)
             {
+                owsprite = SMBXMaskedImage::RegisterCustomOverridable("player", id, img);
                 break;
             }
         }

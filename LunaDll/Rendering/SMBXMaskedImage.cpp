@@ -10,6 +10,9 @@
 // Lookup table instance
 std::unordered_map<HDC, std::shared_ptr<SMBXMaskedImage>> SMBXMaskedImage::lookupTable;
 
+// Custom overridables instance
+std::unordered_map<std::string, std::shared_ptr<SMBXMaskedImage>> SMBXMaskedImage::customOverridable;
+
 SMBXMaskedImage* SMBXMaskedImage::Get(HDC maskHdc, HDC mainHdc)
 {
     if (maskHdc == nullptr && mainHdc == nullptr) {
@@ -252,8 +255,8 @@ SMBXMaskedImage* SMBXMaskedImage::GetCharacterSprite(short charId, short powerup
 {
     HDC* mainArray = nullptr;
     HDC* maskArray = nullptr;
-    HDC mainHdc;
-    HDC maskHdc;
+    HDC mainHdc = nullptr;
+    HDC maskHdc = nullptr;
 
     // Sanity check
     if (powerup < 1 || powerup > 7) return nullptr;
@@ -295,8 +298,8 @@ SMBXMaskedImage* SMBXMaskedImage::GetByName(const std::string& t, int index)
 {
     HDC* mainArray = nullptr;
     HDC* maskArray = nullptr;
-    HDC mainHdc;
-    HDC maskHdc;
+    HDC mainHdc = nullptr;
+    HDC maskHdc = nullptr;
     int maxIndex = 0;
 
     if (t == "block")
@@ -402,12 +405,26 @@ SMBXMaskedImage* SMBXMaskedImage::GetByName(const std::string& t, int index)
     }
 
     // Check range on index and get HDCs
-    if (index < 1 || index > maxIndex) return nullptr;
-    mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
-    maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
+    if (index >= 1 && index <= maxIndex)
+    {
+        mainHdc = (mainArray != nullptr) ? mainArray[index - 1] : nullptr;
+        maskHdc = (maskArray != nullptr) ? maskArray[index - 1] : nullptr;
+    }
 
-    // If we have no HDC abort
-    if (mainHdc == nullptr && maskHdc == nullptr) return nullptr;
+    // If we have no HDC abort, or check for a custom one...
+    if (mainHdc == nullptr && maskHdc == nullptr)
+    {
+        std::string keyStr = t + "-" + std::to_string(index);
+        {
+            auto it = customOverridable.find(keyStr);
+            if (it != customOverridable.end())
+            {
+                return it->second.get();
+            }
+        }
+
+        return nullptr;
+    }
 
     // Get the image
     return SMBXMaskedImage::Get(maskHdc, mainHdc);
@@ -419,4 +436,28 @@ SMBXMaskedImage* SMBXMaskedImage::GetHardcoded(const std::string& name)
     HDC maskHdc = nullptr;
     HardcodedGraphicsItem::GetHDCByName(name, &mainHdc, &maskHdc);
     return SMBXMaskedImage::Get(maskHdc, mainHdc);
+}
+
+SMBXMaskedImage* SMBXMaskedImage::RegisterCustomOverridable(const std::string& t, int index, const std::shared_ptr<BMPBox>& img)
+{
+    std::string keyStr = t + "-" + std::to_string(index);
+    {
+        auto it = customOverridable.find(keyStr);
+        if (it != customOverridable.end())
+        {
+            if (img) it->second->SetLoadedPng(img);
+            return it->second.get();
+        }
+    }
+
+    std::shared_ptr<SMBXMaskedImage> obj = std::make_shared<SMBXMaskedImage>();
+    if (img) obj->SetLoadedPng(img);
+    customOverridable[keyStr] = obj;
+    return obj.get();
+}
+
+void SMBXMaskedImage::UnregisterCustomOverridable(const std::string& t, int index)
+{
+    std::string keyStr = t + "-" + std::to_string(index);
+    customOverridable.erase(keyStr);
 }
