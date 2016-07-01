@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include <memory>
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
 
@@ -36,6 +37,9 @@ public:
 
     // Static function
     static BMPBox* loadIfExist(const std::wstring& filename, HDC screen_dc);
+
+    // Wrapper for std::make_shared<BMPBox> that will cache base-game images
+    static std::shared_ptr<BMPBox> loadShared(const std::wstring& filename);
 };
 
 #endif

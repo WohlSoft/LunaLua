@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "BMPBox.h"
 #include "../Globals.h"
 #include "RenderUtils.h"
@@ -72,6 +73,55 @@ BMPBox::BMPBox(HBITMAP bitmapData, HDC screen_dc)
     GetObject(m_hbmp, sizeof(BITMAP), &bm);
     m_H = bm.bmHeight;
     m_W = bm.bmWidth;
+}
+
+std::shared_ptr<BMPBox> BMPBox::loadShared(const std::wstring& filename)
+{
+    static std::map<std::wstring, std::shared_ptr<BMPBox>> basegameImageCache;
+
+    // Check for in basegameImageCache
+    {
+        auto it = basegameImageCache.find(filename);
+        if (it != basegameImageCache.end())
+        {
+            return it->second;
+        }
+    }
+
+    // Try to load the image
+    std::shared_ptr<BMPBox> img = std::make_shared<BMPBox>(filename, gLunaRender.GetScreenDC());
+
+    if (img->ImageLoaded() == false) {
+        // If image loading failed, return null
+        return nullptr;
+    }
+
+    // Check if this image path is within the basegame's graphics folder
+    {
+        std::wstring basePath = gAppPathWCHAR + L"\\graphics\\";
+        bool notInPath = false;
+        for (auto i1 = basePath.cbegin(), i2 = filename.cbegin();
+            (i1 != basePath.cend()) && (i2 != filename.cend()); ++i1, ++i2)
+        {
+            wchar_t w1 = ::towlower(*i1);
+            wchar_t w2 = ::towlower(*i2);
+            if (w1 == L'/') w1 = L'\\';
+            if (w2 == L'/') w2 = L'\\';
+            if (w1 != w2)
+            {
+                notInPath = true;
+                break;
+            }
+        }
+        
+        // If it is in the basegame path, cache it
+        if (!notInPath)
+        {
+            basegameImageCache[filename] = img;
+        }
+    }
+
+    return img;
 }
 
 // INIT

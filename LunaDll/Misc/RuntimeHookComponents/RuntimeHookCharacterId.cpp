@@ -2398,14 +2398,10 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
             for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
             {
                 std::wstring imgPath = *pathIt + wName + L"-" + std::to_wstring(powerupId) + L".png";
-                img = std::make_shared<BMPBox>(imgPath, gLunaRender.GetScreenDC());
-                if (img && img->ImageLoaded())
+                img = BMPBox::loadShared(imgPath);
+                if (img)
                 {
                     break;
-                }
-                else
-                {
-                    img = nullptr;
                 }
             }
             sprites.push_back(img);
@@ -2425,14 +2421,10 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
         {
             std::wstring imgPath = *pathIt + L"player-" + std::to_wstring(id) + L".png";
-            owsprite = std::make_shared<BMPBox>(imgPath, gLunaRender.GetScreenDC());
-            if (owsprite && owsprite->ImageLoaded())
+            owsprite = BMPBox::loadShared(imgPath);
+            if (owsprite)
             {
                 break;
-            }
-            else
-            {
-                owsprite = nullptr;
             }
         }
     }

@@ -63,8 +63,8 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 
     //MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
     // Create and store the image resource
-    std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(full_path, GetScreenDC());
-    if (pNewbox->ImageLoaded() == false) {
+    std::shared_ptr<BMPBox> pNewbox = BMPBox::loadShared(full_path);
+    if (!pNewbox) {
         gLogger.Log(L"BMPBox image load failed", LOG_STD);
         return false;
     }
@@ -123,7 +123,7 @@ std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::w
     for (HBITMAP nextBitmap : bitmaps) {
         std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(nextBitmap, GetScreenDC());
         pNewbox->m_Filename = filename;
-        if (pNewbox->ImageLoaded() == false) {
+        if (!pNewbox->ImageLoaded() == false) {
             gLogger.Log(L"BMPBox image load failed", LOG_STD);
             continue;
         }
