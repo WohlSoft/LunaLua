@@ -77,7 +77,7 @@ BMPBox::BMPBox(HBITMAP bitmapData, HDC screen_dc)
 
 std::shared_ptr<BMPBox> BMPBox::loadShared(const std::wstring& filename)
 {
-    static std::map<std::wstring, std::shared_ptr<BMPBox>> basegameImageCache;
+    static std::unordered_map<std::wstring, std::shared_ptr<BMPBox>> basegameImageCache;
 
     // Check for in basegameImageCache
     {
