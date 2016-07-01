@@ -787,7 +787,7 @@ namespace LuaProxy {
     };
 
 
-    class Block
+    class Block : public LunaGen::CommonVB6Wrapper<Block, ::Block>
     {
     public:
         static int count();

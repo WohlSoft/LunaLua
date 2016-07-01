@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="IPC\IPCPipeServer.h" />
+    <ClInclude Include="LuaMain\LunaGenerator\LunaGenBlock.h" />
     <ClInclude Include="LuaMain\LunaGenerator\LunaGenHelperUtils.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\TestModeMenu.h" />

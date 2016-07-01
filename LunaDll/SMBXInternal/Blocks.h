@@ -11,7 +11,7 @@ struct PlayerMOB;
 #pragma pack(push, 4)
 struct Block : SMBX_FullBaseItemArray<Block, 700, GM_BLOCK_COUNT_CONSTPTR, GM_BLOCKS_PTR_CONSTPTR> {
 
-    LUNAGEN_ATTR_NAMES("slippery", "hello")
+    LUNAGEN_ATTR_NAMES("slippery")
     short               Slippery;                           // 0x00 0xFFFF = yes
     LUNAGEN_ATTR_HIDDEN
     short               Unknown02;                          // 0x02
@@ -19,31 +19,42 @@ struct Block : SMBX_FullBaseItemArray<Block, 700, GM_BLOCK_COUNT_CONSTPTR, GM_BL
     short               RepeatingHits;                      // 0x04
     short               BlockType2;                         // 0x06
     short               ContentIDRelated;                   // 0x08
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown10;                          // 0x0A
 
     VB6StrPtr           pHitEventName;                      // 0x0C
     VB6StrPtr           pDestroyEventName;                  // 0x10
     VB6StrPtr           pNoMoreObjInLayerEventName;         // 0x14
+    LUNAGEN_ATTR_NAMES("layerName")
     VB6StrPtr           pLayerName;                         // 0x18
 
+    LUNAGEN_ATTR_NAMES("isHidden", "invisible")
     short               IsHidden;                           // 0x1C
+    LUNAGEN_ATTR_NAMES("id")
     short               BlockType;                          // 0x1E
 
     Momentum            momentum;                           // 0x20
 
+    LUNAGEN_ATTR_NAMES("contentID")
     short               ContentsID;                         // 0x50
     short               BeingHitStatus1;                    // 0x52
     short               BeingHitTimer;                      // 0x54
     short               HitOffset;                          // 0x56 Render Offset when got hit
 
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown58;                          // 0x58
     short               IsInvisible2;                       // 0x5A
     unsigned short      IsInvisible3;                       // 0x5C (todo: verify!)
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown5E;                          // 0x5E
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown60;                          // 0x60
 
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown62;                          // 0x62
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown64;                          // 0x64
+    LUNAGEN_ATTR_HIDDEN
     short               Unknown66;                          // 0x66
 
 };

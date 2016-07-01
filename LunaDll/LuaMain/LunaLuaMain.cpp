@@ -11,6 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/NPCs.h"
 
+
 #include "../Rendering/FrameCapture.h"
 
 #include "LuaHelper.h"
@@ -22,7 +23,7 @@
 #include "../Rendering/SMBXMaskedImage.h"
 
 #include "LunaGenerator/LunaGenHelperUtils.h"
-
+#include "LunaGenerator/LunaGenBlock.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -1233,7 +1234,7 @@ void CLunaLua::bindAll()
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
-                LunaGen::LunaGenHelper<LuaProxy::Block>::defClass()
+                GenerateBindingBlock<LuaProxy::Block>()
                 .scope[ //static functions
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
@@ -1253,18 +1254,6 @@ void CLunaLua::bindAll()
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool)>(&LuaProxy::Block::hit))
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player)>(&LuaProxy::Block::hit))
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player, int)>(&LuaProxy::Block::hit))
-                .property("x", &LuaProxy::Block::x, &LuaProxy::Block::setX)
-                .property("y", &LuaProxy::Block::y, &LuaProxy::Block::setY)
-                .property("width", &LuaProxy::Block::width, &LuaProxy::Block::setWidth)
-                .property("height", &LuaProxy::Block::height, &LuaProxy::Block::setHeight)
-                .property("speedX", &LuaProxy::Block::speedX, &LuaProxy::Block::setSpeedX)
-                .property("speedY", &LuaProxy::Block::speedY, &LuaProxy::Block::setSpeedY)
-                .property("id", &LuaProxy::Block::id, &LuaProxy::Block::setId)
-                .property("contentID", &LuaProxy::Block::contentID, &LuaProxy::Block::setContentID)
-                .property("isHidden", &LuaProxy::Block::isHidden, &LuaProxy::Block::setIsHidden)
-                .property("invisible", &LuaProxy::Block::isHidden, &LuaProxy::Block::setIsHidden)
-                .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery)
-                .property("layerName", &LuaProxy::Block::layerName)
                 .property("layerObj", &LuaProxy::Block::layerObj),
 
                 LunaGen::LunaGenHelper<LuaProxy::BGO>::defClass()
