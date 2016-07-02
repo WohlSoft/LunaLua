@@ -356,7 +356,8 @@ DECL_HOOK(HOOK_0x9A8348, eax + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9AA469, edx + ecx * 4 + 0xF0, MOV_eax);
 DECL_HOOK(HOOK_0x9AA6B9, eax + edx * 4 + 0xF0, MOV_ecx);
 DECL_HOOK(HOOK_0x9AAA0E, eax + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x9AAF8C, ecx + 0xF0, CMP_5);
+// If Link, become fairy for climbing. Conflicts with defines.player_link_fairyVineEnabled so commented out, and all current extended characters use defines.player_link_fairyVineEnabled to disable this anyway.
+//DECL_HOOK(HOOK_0x9AAF8C, ecx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9ABE80, eax + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9ABFB5, edi + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0x9AC153, edx + 0xF0, MOV_ax);
@@ -858,7 +859,8 @@ static auto patch_0x9A8348 = PATCH(0x9A8348).CALL(HOOK_0x9A8348).NOP_PAD_TO_SIZE
 static auto patch_0x9AA469 = PATCH(0x9AA469).CALL(HOOK_0x9AA469).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9AA6B9 = PATCH(0x9AA6B9).CALL(HOOK_0x9AA6B9).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9AAA0E = PATCH(0x9AAA0E).CALL(HOOK_0x9AAA0E).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9AAF8C = PATCH(0x9AAF8C).CALL(HOOK_0x9AAF8C).NOP_PAD_TO_SIZE<8>();
+// If Link, become fairy for climbing. Conflicts with defines.player_link_fairyVineEnabled so commented out, and all current extended characters use defines.player_link_fairyVineEnabled to disable this anyway.
+//static auto patch_0x9AAF8C = PATCH(0x9AAF8C).CALL(HOOK_0x9AAF8C).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9ABE80 = PATCH(0x9ABE80).CALL(HOOK_0x9ABE80).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9ABFB5 = PATCH(0x9ABFB5).CALL(HOOK_0x9ABFB5).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9AC153 = PATCH(0x9AC153).CALL(HOOK_0x9AC153).NOP_PAD_TO_SIZE<7>();
@@ -1762,7 +1764,8 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9AA469,
     &patch_0x9AA6B9,
     &patch_0x9AAA0E,
-    &patch_0x9AAF8C,
+    // If Link, become fairy for climbing. Conflicts with defines.player_link_fairyVineEnabled so commented out, and all current extended characters use defines.player_link_fairyVineEnabled to disable this anyway.
+    // &patch_0x9AAF8C,
     &patch_0x9ABE80,
     &patch_0x9ABFB5,
     &patch_0x9AC153,
