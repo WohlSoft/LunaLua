@@ -3,6 +3,7 @@
 #define LuaProxyAudio_H
 
 #include <string>
+#include <memory>
 struct Mix_Chunk;
 class MciEmulator;
 
@@ -64,6 +65,37 @@ namespace LuaProxy
         Mix_Chunk* __getChunkForAlias(const std::string& alias);
         void __setMuteForAlias(const std::string& alias, bool muted);
         bool __getMuteForAlias(const std::string& alias);
+
+        class PlayingSfxInstance {
+        private:
+            int mChannel;
+            bool mFinished;
+        public:
+            PlayingSfxInstance(int channel);
+            ~PlayingSfxInstance();
+
+            // Callback when the channel is finished
+            void OnChannelFinished();
+
+            void Pause();
+            void Resume();
+            void Stop();
+            void Expire(int ms);
+            void FadeOut(int ms);
+            bool IsPlaying();
+            bool IsPaused();
+            bool IsFading();
+            void Volume(int vlm);
+            void SetPanning(uint8_t left, uint8_t right);
+            void SetDistance(uint8_t distance);
+            void Set3DPosition(int16_t angle, uint8_t distance);
+            void SetReverseStereo(bool flip);
+        };
+
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxPlayObj(Mix_Chunk &chunk, int loops);
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxPlayObjTimed(Mix_Chunk &chunk, int loops, int ticks);
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObj(Mix_Chunk &chunk, int loops, int ms);
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObjTimed(Mix_Chunk &chunk, int loops, int ms, int ticks);
     }
 }
 #endif

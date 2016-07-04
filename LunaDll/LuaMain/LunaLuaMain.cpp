@@ -458,6 +458,7 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Section, Section);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Block, Block);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::BGO, BGO);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Audio::PlayingSfxInstance, PlayingSfxInstance);
 
 
 // LUAHELPER_DEF_CLASS(LuaImageResource)
@@ -621,7 +622,27 @@ void CLunaLua::bindAll()
                 def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
                 def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
                 def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
+                
+                LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(PlayingSfxInstance, std::shared_ptr)
+                    .def("Pause", &LuaProxy::Audio::PlayingSfxInstance::Pause)
+                    .def("Resume", &LuaProxy::Audio::PlayingSfxInstance::Resume)
+                    .def("Stop", &LuaProxy::Audio::PlayingSfxInstance::Stop)
+                    .def("Expire", &LuaProxy::Audio::PlayingSfxInstance::Expire)
+                    .def("FadeOut", &LuaProxy::Audio::PlayingSfxInstance::FadeOut)
+                    .def("IsPlaying", &LuaProxy::Audio::PlayingSfxInstance::IsPlaying)
+                    .def("IsPaused", &LuaProxy::Audio::PlayingSfxInstance::IsPaused)
+                    .def("IsFading", &LuaProxy::Audio::PlayingSfxInstance::IsFading)
+                    .def("Volume", &LuaProxy::Audio::PlayingSfxInstance::Volume)
+                    .def("SetPanning", &LuaProxy::Audio::PlayingSfxInstance::SetPanning)
+                    .def("SetDistance", &LuaProxy::Audio::PlayingSfxInstance::SetDistance)
+                    .def("Set3DPosition", &LuaProxy::Audio::PlayingSfxInstance::Set3DPosition)
+                    .def("SetReverseStereo", &LuaProxy::Audio::PlayingSfxInstance::SetReverseStereo),
 
+                def("SfxPlayObj", &LuaProxy::Audio::SfxPlayObj),
+                def("SfxPlayObjTimed", &LuaProxy::Audio::SfxPlayObjTimed),
+                def("SfxFadeInObj", &LuaProxy::Audio::SfxFadeInObj),
+                def("SfxFadeInObjTimed", &LuaProxy::Audio::SfxFadeInObjTimed),
+                
                 //Time
                 def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
                 def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock),
