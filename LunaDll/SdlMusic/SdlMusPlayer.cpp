@@ -285,8 +285,6 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
         tmpChunk = chunksBuffer[filePath];
     }
 
-    Mix_ReserveChannels(chunksBuffer.size()>4 ? 4: chunksBuffer.size());
-
     return tmpChunk;
 }
 
@@ -331,7 +329,6 @@ void PGE_Sounds::clearSoundBuffer()
 		Mix_FreeChunk(it->second);
 	}
 	chunksBuffer.clear();
-    Mix_ReserveChannels(0);
 }
 
 void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)

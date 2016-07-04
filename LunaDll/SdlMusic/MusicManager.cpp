@@ -136,8 +136,7 @@ void MusicManager::rebuildSoundCache()
             }
         }
     }
-    if(numberOfReservedChannels > 32)
-        Mix_AllocateChannels(numberOfReservedChannels + 32);
+    Mix_AllocateChannels(numberOfReservedChannels + 32);
     Mix_ReserveChannels(numberOfReservedChannels);
 
     if (countOfFailedSounds > MaxFailedSoundToDisplay)
