@@ -19,12 +19,14 @@ static json echoMethod(const json& params)
 
 // Method prototypes
 json IPCTestLevel(const json& params);
+json IPCGetWindowHandle(const json& params);
 
 IPCPipeServer::IPCPipeServer() :
     mOutFD(-1), mInFD(-1)
 {
     RegisterMethod("echo", echoMethod);
     RegisterMethod("testLevel", IPCTestLevel);
+    RegisterMethod("getWindowHandle", IPCGetWindowHandle);
 }
 
 IPCPipeServer::~IPCPipeServer()
