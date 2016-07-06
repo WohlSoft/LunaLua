@@ -60,13 +60,21 @@ end
 local defines = {
     --[[ Movement Defines ]]--
     gravity                         = {defValue = 12 , minVal = 0, maxVal = nil, address = 0x00B2C6F4, size = FIELD_WORD,
-                                        n = 1, group = "Movement", desc = "The gravity of the player."},
+                                        n = 1, group = "Movement", desc = "The maximum falling speed of the player. Note that gravity is a bit of a misnomer."},
     earthquake                      = {defValue = 0  , minVal = 0, maxVal = nil, address = 0x00B250AC, size = FIELD_WORD,
                                         n = 2, group = "Movement", desc = "The earthquake factor of the Level. It resets to 0 after time."},
     jumpheight                      = {defValue = 20 , minVal = 0, maxVal = nil, address = 0x00B2C6DC, size = FIELD_WORD,
-                                        n = 3, group = "Movement", desc = "The jumpheight of the player."},
+                                        n = 3, group = "Movement", desc = "The upward force for a jumping player. Counts down each tick during the jump."},
     jumpheight_bounce               = {defValue = 20 , minVal = 0, maxVal = nil, address = 0x00B2C6E2, size = FIELD_WORD,
-                                        n = 4, group = "Movement", desc = "The jumpheight of the player when bouncing of a enemy."},
+                                        n = 4, group = "Movement", desc = "The upward force for a player when bouncing of a enemy. Counts down each tick during the jump."},
+    player_runspeed                 = {defValue = 6.0 , minVal = 0, maxVal = nil, address = 0x00B2C6EC, size = FIELD_FLOAT,
+                                        n = 5, group = "Movement", desc = "The normal top running speed for a player."},
+    player_walkspeed                = {defValue = 3.0 , minVal = 0, maxVal = nil, address = 0x00B2C6F0, size = FIELD_FLOAT,
+                                        n = 6, group = "Movement", desc = "The normal top walking speed for a player."},
+    player_grav                     = {defValue = 0.4 , minVal = 0, maxVal = nil, address = 0x00B2C6F8, size = FIELD_FLOAT,
+                                        n = 7, group = "Movement", desc = "The gravitational force for players."},
+    npc_grav                        = {defValue = 0.26 , minVal = 0, maxVal = nil, address = 0x00B2C878, size = FIELD_FLOAT,
+                                        n = 8, group = "Movement", desc = "The gravitational force for NPCs."},
     
     --[[ Effect Modification Defines ]]--
     effect_NpcToCoin                = {defValue = 11 , minVal = 0, maxVal = nil, address = 0x00A3C86E, size = FIELD_BYTE,
