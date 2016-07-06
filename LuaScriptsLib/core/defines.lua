@@ -363,12 +363,12 @@ local definesLib  = setmetatable({
         if type(value) ~= "number" and type(value) ~= "boolean" and type(value) ~= "nil" then
             error("Value is not a number: Need number or boolean, got "..type(value).."!", 2)
         end
-        if theDefine.minVal then
+        if theDefine.minVal and (value ~= nil) then
             if theDefine.minVal > value then
                 error("Value "..value.." is smaller than the minimum value of "..theDefine.minVal.."!", 2)
             end
         end
-        if theDefine.maxVal then
+        if theDefine.maxVal and (value ~= nil) then
             if theDefine.maxVal < value then
                 error("Value "..value.." is bigger than the maximum value of "..theDefine.maxVal.."!", 2)
             end
