@@ -1,6 +1,20 @@
 #ifndef LunaGenHelperUtils_hhhhh
 #define LunaGenHelperUtils_hhhhh
 
+#include <string>
+
+struct Momentum
+{
+    double x;
+    double y;
+    double height;
+    double width;
+    double speedX;
+    double speedY;
+};
+
+#define COMBOOL(b) (b ? -1 : 0)
+
 
 // Macro Utils
 // Found from http://stackoverflow.com/a/1872506/5082374
@@ -47,29 +61,105 @@
 #include <string>
 #include <luabind/luabind.hpp>
 
-namespace LunaGen 
+namespace LunaGen
 {
-    template<class T, char const* clsName>
-    struct LunaGenBaseClassUtils
-    {
-        using cls = T;
+    namespace detail {
+        template<typename ClassT>
+        struct LunaGenTraits;
+    }
 
-        static luabind::class_<T> defClass() {
-            return luabind::class_<T>(clsName);
+    template<typename ConvertedType>
+    struct vb6_converter {
+        typedef ConvertedType from_type; // vb6
+        typedef ConvertedType to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data;
         }
 
-        static std::string getName(T& cls) {
-            return std::string(clsName);
+        static from_type ConvertForSetter(const to_type& data) {
+            return data;
+        }
+    };
+
+    template<>
+    struct vb6_converter<bool> {
+        typedef short from_type; // vb6
+        typedef bool to_type; // C++
+
+        static to_type ConvertForGetter(const from_type& data) {
+            return data == -1;
+        }
+
+        static from_type ConvertForSetter(const to_type& data) {
+            return COMBOOL(data);
+        }
+    };
+
+    // NOTE: This class is currently not actually used.
+    //       m_index must be accessed somehow properly. --> Indexable Subclass ?
+    //                                                  --> Move m_index to THIS subclass?
+    template<class WrapperClass, class InternalClass>
+    class CommonVB6Wrapper {
+    public:
+        typedef InternalClass internal_class;
+
+        template<typename DataType, DataType InternalClass::* Ptr, typename InputType = DataType>
+        void Setter(InputType data)
+        {
+            typedef vb6_converter<InputType> converter;
+
+            InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr = converter::ConvertForSetter(data);
+        }
+
+        template<typename DataType, DataType InternalClass::* Ptr, typename OutputType = DataType>
+        OutputType Getter() const
+        {
+            typedef vb6_converter<OutputType> converter;
+
+            return converter::ConvertForGetter(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr);
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        void MomentumSetter(double data)
+        {
+            (&(InternalClass::Get(static_cast<WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr = data;
+        }
+
+        template<Momentum InternalClass::* Ptr, double Momentum::* SubPtr>
+        double MomentumGetter() const
+        {
+            return (&(InternalClass::Get(static_cast<const WrapperClass*>(this)->m_index)->*Ptr))->*SubPtr;
+        }
+
+    };
+    
+    template<typename ClassT>
+    struct LunaGenHelper {
+        using internal_class_type = ClassT;
+        using internal_class_info = detail::LunaGenTraits<ClassT>;
+
+        // enable_if, with SMBX_FullBaseArray, ...
+        // TODO: Get, Count, ... methods in CommonVB6Wrapper
+        static auto defClass() {
+            return luabind::class_<internal_class_type>(internal_class_info::clsName)
+                .property("__type", &getName);
+        }
+
+        static auto defClassSharedPtr() {
+            return luabind::class_<internal_class_type, std::shared_ptr<internal_class_type>>(internal_class_info::clsName)
+                .property("__type", &getName);
+        }
+
+        static std::string getName(internal_class_type& cls) {
+            return std::string(internal_class_info::clsName);
         }
 
         static const char *getRawName() {
-            return clsName;
+            return internal_class_info::clsName;
         }
     };
 }
-
-
-
 
 
 #ifdef __LUNA_CODE_GENERATOR__
@@ -92,20 +182,19 @@ namespace LunaGen
 #define LUNAGEN_ATTR_HIDDEN
 #endif
 
-#define LUNAGEN_HELPCLASS_NAME(name) HelperClass_ ## name
-#define LUNAGEN_HELPCLASS_STR_NAME(name) _cls_ ## name
+#define LUNAGEN_DEF_CLASS(classType, name) \
+    namespace LunaGen \
+    { \
+        namespace detail { \
+            template<> \
+            struct LunaGenTraits<classType> \
+            { \
+                static constexpr const char clsName[] = #name; \
+            }; \
+        } \
+    }
 
-#define LUNAGEN_DEF_CLASS_HELPER(classType, name) \
-    extern const char LUNAGEN_HELPCLASS_STR_NAME(name) [] = #name ; \
-    typedef LunaGen::LunaGenBaseClassUtils< classType , LUNAGEN_HELPCLASS_STR_NAME(name) > LUNAGEN_HELPCLASS_NAME(name) ;
 
-#define LUNAGEN_DEF_CLASS(name) \
-    luabind::class_< LUNAGEN_HELPCLASS_NAME(name) ::cls>( LUNAGEN_HELPCLASS_NAME(name) ::getRawName()) \
-        .property("__type", & LUNAGEN_HELPCLASS_NAME(name) ::getName)
-
-#define LUNAGEN_DEF_CLASS_SMART_PTR_SHARED(name, smartPtrClass) \
-    luabind::class_< LUNAGEN_HELPCLASS_NAME(name) ::cls, smartPtrClass ## < LUNAGEN_HELPCLASS_NAME(name) ::cls > >( LUNAGEN_HELPCLASS_NAME(name) ::getRawName()) \
-        .property("__type", & LUNAGEN_HELPCLASS_NAME(name) ::getName)
 
 
 #endif

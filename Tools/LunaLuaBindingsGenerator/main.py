@@ -1,54 +1,11 @@
 
 # Requires 
-from clang.cindex import Config, CursorKind
-from clang.cindex import Index
+from clang.cindex import Index, CursorKind
 from optparse import OptionParser
 import lunaparse
 import lunagen
 import sys, os
 import ccsyspath
-
-
-def get_info(node, max_depth, depth=0):
-    if max_depth is not None and depth >= max_depth:
-        children = None
-    else:
-        children = [get_info(c, max_depth, depth + 1)
-                    for c in node.get_children()]
-    return {'kind': node.kind,
-             # 'usr' : node.get_usr(),
-             'spelling': node.spelling,
-             # 'location' : node.location,
-             # 'extent.start' : node.extent.start,
-             # 'extent.end' : node.extent.end,
-             'type': node.type.kind,
-             'is_definition': node.is_definition(),
-             'children': children }
-
-
-def parse_class(classDecl):
-    print(get_info(classDecl, 10))
-    #for subChild in classDecl.get_children():
-    #    print(subChild)
-
-
-def find_and_parse_struct(node, className):
-    """
-    Find classes
-    """
-    
-    if node.spelling == className and node.kind == CursorKind.STRUCT_DECL:
-        parse_class(node)
-        return lunaparse.LunaClass(node)
-
-    for nextChild in node.get_children():
-        callResult = find_and_parse_struct(nextChild, className)
-        if callResult is not None:
-            return callResult
-
-# Arg 1 - File to parse
-# Arg 2 - Struct Name
-# Arg 3 - Out file
 
 
 def main():
@@ -86,7 +43,7 @@ def main():
         return
     
     my_cur = example_file.cursor
-    parsed_class = find_and_parse_struct(my_cur, struct_name)
+    parsed_class = lunaparse.find_and_parse_class(my_cur, CursorKind.STRUCT_DECL, struct_name)
     if parsed_class is None:
         print("Failed to find class to parse!")
         return
