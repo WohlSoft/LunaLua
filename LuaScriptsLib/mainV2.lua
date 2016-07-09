@@ -280,6 +280,25 @@ local function initFFIBasedAPIs()
     }
     Audio.sounds = {}
     setmetatable(Audio.sounds, soundsMetatable);
+	local setmusvol = Audio.MusicVolume;
+	local musvol = 80;
+	Audio.MusicVolume(musvol);
+	Audio.MusicVolume = function(volume)
+		if(volume == nil) then return musvol;
+		else
+			musvol = volume;
+			setmusvol(volume);
+		end
+	end
+    
+    -- Helper function for loadImage
+    Graphics.loadImageResolved = function(file)
+        local path = Misc.resolveGraphicsFile(file)
+        if (path == nil) then
+            error("Cannot find image: " .. file) 
+        end
+        return Graphics.loadImage(path)
+    end
     
     -- Limit access to FFI
     package.preload['ffi'] = nil
@@ -357,37 +376,6 @@ function __xpcallCheck(returnData)
     return true
 end
 
-function registerCustomEvent(obj, eventName)
-    local queue = {};
-    local mt = getmetatable(obj);
-    if(mt == nil) then
-        mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
-    end
-    local index_f = mt.__index;
-    local newindex_f = mt.__newindex;
-    
-    mt.__index = function(tbl, key)
-        if(key == eventName) then
-            return function(...)
-                for _,v in ipairs(queue) do
-                    v(...);
-                end
-            end
-        else
-            return index_f(tbl, key);
-        end
-    end
-    
-    mt.__newindex = function (tbl,key,val)
-        if(key == eventName) then
-            table.insert(queue, val);
-        else
-            newindex_f(tbl,key,val);
-        end
-    end
-    
-    setmetatable(obj,mt);
-end
 
 
 local function findLast(haystack, needle)
@@ -429,8 +417,6 @@ function compareLunaVersion(...)
     end
     return 0
 end
-
-
 
 --=====================================================================
 --[[ API Functions ]]--
@@ -552,7 +538,37 @@ end
 function unregisterEvent(apiTable, event, eventHandler)
     return EventManager.removeAPIListener(apiTable, event, eventHandler)
 end
-
+function registerCustomEvent(obj, eventName)
+    local queue = {};
+    local mt = getmetatable(obj);
+    if(mt == nil) then
+        mt = {__index = function(tbl,key) return rawget(tbl,key) end, __newindex = function(tbl,key,val) rawset(tbl,key,val) end}
+    end
+    local index_f = mt.__index;
+    local newindex_f = mt.__newindex;
+    
+    mt.__index = function(tbl, key)
+        if(key == eventName) then
+            return function(...)
+                for _,v in ipairs(queue) do
+                    v(...);
+                end
+            end
+        else
+            return index_f(tbl, key);
+        end
+    end
+    
+    mt.__newindex = function (tbl,key,val)
+        if(key == eventName) then
+            table.insert(queue, val);
+        else
+            newindex_f(tbl,key,val);
+        end
+    end
+    
+    setmetatable(obj,mt);
+end
 
 
 
@@ -810,6 +826,7 @@ function __onInit(episodePath, lvlName)
         DBG = APIHelper.doAPI(_G, "core\\dbg")
         __ClassicEvents = APIHelper.doAPI(_G, "core\\classicevents")
         Profiler = APIHelper.doAPI(_G, "core\\profiler")
+        LunaTime = APIHelper.doAPI(_G, "core\\lunatime")
         --SEGMENT TO ADD PRELOADED APIS END
         
         __episodePath = episodePath
