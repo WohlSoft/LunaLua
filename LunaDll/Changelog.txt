@@ -9,8 +9,10 @@ v0.7.3.1 BETA
   * Overworld sprite can be patched at runtime
   * Added Misc.registerCharacterId which allows to register new characters
   * Added Misc.resolveGraphicsFile which only resolve a file from custom folder, episode folder or the graphics folder from SMBX.
+  * Added Graphics.loadImageResolved which is a handy combination of Graphics.loadImage and Misc.resolveGraphicsFile, with a useful error message if it can't find anything.
   * Added PlayingSfxInstance class which represents a sound
   * Added some new defines
+  * Enhanced profile.lua to be useful. Usable by hitting F3 to start and F3 to finish.
 
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
