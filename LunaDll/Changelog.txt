@@ -1,5 +1,16 @@
 v0.7.3.1 BETA
   * Added non-ASCII paths support! (LunaLUA-SMBX's root finally can be placed into path with non-ASCII characters. But limit is: don't mix codepages (example: both Russian and Chinese characters in a path, or you will get VB Error "File not found". Same happens on Vanilla SMBX if you have been used non-local characters.))
+  * Added a test-mode system which can be controlled by PGE.
+  * Added Graphics.getBits32 which is a fast way to access the bits of a image resource
+  * glDraw can draw with scene coordinates (sceneCoords=true as named arg)
+  * Added CaptureBuffer class which allows to capture the screen at a specific render priority
+  * The max id of Blocks has been increased to 700
+  * Added lunabase.lua to LuaScriptsLib which is a global user script file.
+  * Overworld sprite can be patched at runtime
+  * Added Misc.registerCharacterId which allows to register new characters
+  * Added Misc.resolveGraphicsFile which only resolve a file from custom folder, episode folder or the graphics folder from SMBX.
+  * Added PlayingSfxInstance class which represents a sound
+  * Added some new defines
 
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
