@@ -46,7 +46,6 @@ end
 function autoscroll.onInitAPI()
 	if (player.isValid) then
 		registerEvent(autoscroll, "onLoop", "_onLoop", false)
-		--registerEvent(characters, "onExitLevel", "onExitLevel", false)
 	end
 end
 
@@ -55,7 +54,6 @@ local function transiton(from, to, deadline)
 end
 
 function autoscroll._onLoop()
-    Text.print("bao", 100, 150)
 	for section, state in pairs(active_scrolls) do
 		local x1, y1, y2, x2 = getSectionBounds(section)
 		
