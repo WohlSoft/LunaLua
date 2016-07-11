@@ -750,7 +750,8 @@ void CLunaLua::bindAll()
             .scope[ //static functions
                 def("count", &LuaProxy::Player::count),
                     def("get", &LuaProxy::Player::get),
-                    def("getTemplates", &LuaProxy::Player::getTemplates)
+                    def("getTemplates", &LuaProxy::Player::getTemplates),
+                    def("getIntersecting", &LuaProxy::Player::getIntersecting)
             ]
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Player, m_index))
 

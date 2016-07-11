@@ -19,6 +19,21 @@ luabind::object LuaProxy::Player::getTemplates(lua_State* L)
     return LuaHelper::getObjList(5, [](unsigned short i){ return LuaProxy::Player(i + 1001); }, L);
 }
 
+luabind::object LuaProxy::Player::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        GM_PLAYERS_COUNT,
+        [](unsigned short i) { return LuaProxy::Player(i + 1); },
+        [x1, y1, x2, y2](unsigned short i) {
+        ::PlayerMOB *obj = ::Player::Get(i+1);
+        if (obj == NULL) return false;
+        if (x2 <= obj->momentum.x) return false;
+        if (y2 <= obj->momentum.y) return false;
+        if (obj->momentum.x + obj->momentum.width <= x1) return false;
+        if (obj->momentum.y + obj->momentum.height <= y1) return false;
+        return true;
+    }, L);
+}
 
 LuaProxy::Player::Player() : m_index(1)
 {}

@@ -584,6 +584,7 @@ namespace LuaProxy {
         static int count();
         static luabind::object get(lua_State* L);
         static luabind::object getTemplates(lua_State* L);
+        static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
         
         Player ();
         Player (int index);
