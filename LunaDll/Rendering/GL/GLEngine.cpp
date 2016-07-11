@@ -212,13 +212,36 @@ bool GLEngine::GifRecorderToggle()
 
 void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-    BYTE* pixData = new BYTE[w * h * 3];
+    // Skip every second frame
+    static bool skipFrame = false;
+    if (skipFrame)
+    {
+        skipFrame = false;
+        return;
+    }
+    else
+    {
+        skipFrame = true;
+    }
+
+    BYTE* pixData = new BYTE[w * h * 4];
     
     // Read pixels
-    glReadPixels(x, y, w, h, GL_BGR, GL_UNSIGNED_BYTE, pixData);
+    glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixData);
     if (glGetError() != GL_NO_ERROR) {
         return;
     }
+
+    // Flip pixels
+    BYTE* tmpRow = new BYTE[w*4];
+    for (int y = 0; y < h / 2; y++)
+    {
+        int y2 = h - 1 - y;
+        memcpy(tmpRow, &pixData[y2 * w * 4], w*4);
+        memcpy(&pixData[y2 * w * 4], &pixData[y * w * 4], w * 4);
+        memcpy(&pixData[y * w * 4], tmpRow, w * 4);
+    }
+    delete tmpRow; tmpRow = nullptr;
 
     mGifRecorder.addNextFrameToProcess(w, h, pixData);
 }

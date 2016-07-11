@@ -2,12 +2,13 @@
 #include "AsyncGifRecorder.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
-#define FREEIMAGE_LIB
-#include <FreeImageLite.h>
+#include "../../libs/gif-h/gif.h"
 
 AsyncGifRecorder::AsyncGifRecorder() : 
     m_workerThread(nullptr),
-    m_isRunning()
+    m_isRunning(),
+    m_fileName(),
+    m_error(false), m_opened(false)
 {
     m_isRunning.store(false, std::memory_order_relaxed);
 }
@@ -72,7 +73,11 @@ void AsyncGifRecorder::workerFunc()
             }
             screenshotPath += L"\\";
             screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".gif");
-            m_gifWriter.reset(new FreeImageGifData(WStr2Str(screenshotPath)));
+
+            m_fileName = screenshotPath;
+            m_opened = false;
+            m_error = false;
+            memset(&m_gifWriter, 0, sizeof(GIF_H::GifWriter));
 
             m_isRunning.store(true, std::memory_order_relaxed);
             break;
@@ -81,14 +86,36 @@ void AsyncGifRecorder::workerFunc()
         {
             if (!m_isRunning.load(std::memory_order_relaxed))
                 continue;
-            m_gifWriter->add24bitBGRDataPage(nextData.width, nextData.height, nextData.data);
+
+            if ((!m_opened) && (!m_error))
+            {
+                m_opened = GIF_H::GifBegin(&m_gifWriter, WStr2Str(m_fileName).c_str(), nextData.width, nextData.height, 3, 8, false);
+                m_error = !m_opened;
+            }
+
+            if (!m_error)
+            {
+                if (!GIF_H::GifWriteFrame(&m_gifWriter, nextData.data, nextData.width, nextData.height, 3, 8, false))
+                {
+                    GIF_H::GifEnd(&m_gifWriter);
+                    m_error = true;
+                    m_opened = false;
+                }
+            }
+
             break;
         }
         case GIFREC_STOP:
         {
             if (!m_isRunning.load(std::memory_order_relaxed))
                 continue;
-            m_gifWriter->closeAndCleanup();
+            
+            if (!m_error)
+            {
+                GIF_H::GifEnd(&m_gifWriter);
+            }
+            memset(&m_gifWriter, 0, sizeof(GIF_H::GifWriter));
+            m_opened = false;
 
             m_isRunning.store(false, std::memory_order_relaxed);
             break;
