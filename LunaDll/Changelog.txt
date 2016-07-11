@@ -13,6 +13,8 @@ v0.7.3.1 BETA
   * Added PlayingSfxInstance class which represents a sound
   * Added some new defines
   * Enhanced profile.lua to be useful. Usable by hitting F3 to start and F3 to finish.
+  * Add force_disable_fullscreen option to luna.ini because the smbx fullscreen is acting up for some
+  * Add Player.getIntersecting
 
 v0.7.3 BETA
   * Added new compareLunaVersion for version checking
