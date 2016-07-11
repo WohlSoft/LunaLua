@@ -6,6 +6,7 @@
 class GeneralLunaConfig
 {
     bool m_renderer_useLetterbox;
+    bool m_renderer_forceDisableFullscreen;
     bool m_lua_enable_http;
 
     std::wstring m_settingFilename;
@@ -24,6 +25,8 @@ public:
 
     inline void setRendererUseLetterbox(bool rendererUseLetterbox) { m_renderer_useLetterbox = rendererUseLetterbox; }
     inline bool getRendererUseLetterbox() const { return m_renderer_useLetterbox; }
+    inline void setForceDisableFullscreen(bool forceDisableFullscreen) { m_renderer_forceDisableFullscreen = forceDisableFullscreen; }
+    inline bool getForceDisableFullscreen() const { return m_renderer_forceDisableFullscreen; }
     bool getLuaEnableHTTP() const { return m_lua_enable_http; }
     void getLuaEnableHTTP(bool val) { m_lua_enable_http = val; }
 };

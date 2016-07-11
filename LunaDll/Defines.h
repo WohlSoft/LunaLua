@@ -222,6 +222,7 @@ DEFMEM(GM_UNK_B2C5A0,       WORD,  0x00B2C5A0);
 DEFMEM(GM_UNK_B2C6DA,       WORD,  0x00B2C6DA);
 DEFMEM(GM_UNK_B2C8E4,       WORD,  0x00B2C8E4);
 DEFMEM(GM_UNK_B2D742,       WORD,  0x00B2D742);
+DEFMEM(GM_UNK_WINDOWED,   WORD,  0x00B250D8);
 
 // NPC Settings
 DEFMEM(GM_CONF_WIDTH,       WORD*, 0x00B25BA8);
@@ -750,6 +751,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 #define GF_EXIT_MAIN_GAME   0x008D6BB0
 
+#define GF_APPLY_FULLSCREEN 0x00A98190
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -826,6 +829,8 @@ static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_I
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
 
 static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
+
+static const auto native_applyFullscreen = (void(__stdcall *)(void* arg1, void* arg2, void* arg3, void* arg4))GF_APPLY_FULLSCREEN;
 
 /*
 Function name                                

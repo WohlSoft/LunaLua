@@ -488,6 +488,12 @@ void TrySkipPatch()
     // Close window hook
     PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 
+    // Anti-Fullscreen hook
+    PATCH(0x95429A).CALL(runtimeHookChangeResolution).Apply();
+    PATCH(0xA98142).CALL(runtimeHookChangeResolution).Apply();
+    PATCH(0xA98166).CALL(runtimeHookChangeResolution).Apply();
+    PATCH(0x96ADD7).CALL(runtimeHookSmbxCheckWindowedRaw).NOP_PAD_TO_SIZE<8>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

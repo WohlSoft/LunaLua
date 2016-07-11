@@ -180,5 +180,8 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename);
 void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
 void __stdcall runtimeHookCloseWindow(void);
 
+void __stdcall runtimeHookChangeResolution(void* arg1, void* arg2, void* arg3, void* arg4);
+void __stdcall runtimeHookSmbxCheckWindowedRaw(void);
+
 #endif
 
