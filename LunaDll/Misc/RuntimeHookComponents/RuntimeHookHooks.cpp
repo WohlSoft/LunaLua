@@ -1260,3 +1260,34 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         ret
     }
 }
+
+static __declspec(naked) void __stdcall collideNPCOriginal(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp, 8
+        push 0xA281B6
+        ret
+    }
+    
+}
+
+void __stdcall runtimeHookCollideNPCTrace(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
+{
+    static FILE* f = nullptr;
+    if ((typeOfObject) && (npcIndexToCollide) && (*typeOfObject == HARM_TYPE_SPINJUMP))
+    {
+        ::NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
+        if (f == nullptr)
+        {
+            f = fopen("collideNPCTrace.txt", "w");
+        }
+        if (f != nullptr)
+        {
+            fprintf(f, "0x%x: Spinjump on %d\n", retAddr, npc->id);
+            fflush(f);
+        }
+    }
+    collideNPCOriginal(npcIndexToCollide, typeOfObject, objectIndex);
+}
