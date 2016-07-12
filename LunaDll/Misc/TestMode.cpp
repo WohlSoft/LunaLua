@@ -509,7 +509,9 @@ bool TestModeCheckHideWindow(void)
     return false;
 }
 
-json IPCGetWindowHandle(const json& params)
+json IPCGetWindowHandle(const json& /*params*/)
 {
-    return GetMainWindow();
+	HWND window = GetMainWindow();
+	unsigned long ptr = ULONG_PTR(window);
+	return ptr;
 }
