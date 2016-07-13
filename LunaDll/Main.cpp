@@ -28,13 +28,10 @@
 #include "Rendering/GL/GLEngine.h"
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
-#include "IPC/IPCPipeServer.h"
 
 #define PATCHIT 1
 
 static bool LevelCustomSounds = false;
-
-static IPCPipeServer ipcServer;
 
 /*!
  * \brief Standard DLL loader main
@@ -80,9 +77,6 @@ static DWORD __stdcall GetCurrentProcessorNumberXP(void)
 // SetupLunaDLLInitHook that runs from DLL_PROCESS_ATTACH
 void LunaDLLInit()
 {
-    // If we have stdin/stdout, attach to the IPC server
-    ipcServer.AttachStdinStdout();
-
     InitGlobals();
 #if PATCHIT
     TrySkipPatch();

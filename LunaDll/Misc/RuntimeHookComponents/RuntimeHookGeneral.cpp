@@ -13,6 +13,8 @@
 #include "../SHMemServer.h"
 
 #include "../TestMode.h"
+#include "../../IPC/IPCPipeServer.h"
+
 
 #ifndef NO_SDL
 bool episodeStarted = false;
@@ -172,10 +174,14 @@ static unsigned int __stdcall LatePatch(void)
     return *((unsigned int*)(0xB2D788));
 }
 
+static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
     ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
+
+    // If we have stdin/stdout, attach to the IPC server
+    ipcServer.AttachStdinStdout();
 
     if (gStartupSettings.patch){
         PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
