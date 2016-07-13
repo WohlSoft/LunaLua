@@ -183,7 +183,5 @@ void __stdcall runtimeHookCloseWindow(void);
 void __stdcall runtimeHookChangeResolution(void* arg1, void* arg2, void* arg3, void* arg4);
 void __stdcall runtimeHookSmbxCheckWindowedRaw(void);
 
-void __stdcall runtimeHookCollideNPCTrace(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex);
-
 #endif
 

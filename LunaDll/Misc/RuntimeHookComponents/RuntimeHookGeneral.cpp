@@ -494,8 +494,6 @@ void TrySkipPatch()
     PATCH(0xA98166).CALL(runtimeHookChangeResolution).Apply();
     PATCH(0x96ADD7).CALL(runtimeHookSmbxCheckWindowedRaw).NOP_PAD_TO_SIZE<8>().Apply();
 
-    // Test code to log collision causes
-    // PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&runtimeHookCollideNPCTrace>()).NOP_PAD_TO_SIZE<6>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
