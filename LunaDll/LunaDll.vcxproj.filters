@@ -534,6 +534,9 @@
     <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
       <Filter>Rendering\RenderOps</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\pge_editor_feedback.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1022,6 +1025,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp">
       <Filter>Rendering\RenderOps</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\pge_editor_feedback.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

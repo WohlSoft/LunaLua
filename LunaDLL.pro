@@ -262,7 +262,8 @@ HEADERS += \
     LunaDll/Rendering/FrameCapture.h \
     LunaDll/Rendering/SMBXMaskedImage.h \
     LunaDll/SMBXInternal/BaseItemArray.h \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h \
+    LunaDll/Misc/pge_editor_feedback.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -449,5 +450,6 @@ SOURCES += \
     LunaDll/Rendering/BitBltEmulation.cpp \
     LunaDll/Rendering/FrameCapture.cpp \
     LunaDll/Rendering/SMBXMaskedImage.cpp \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
+    LunaDll/Misc/pge_editor_feedback.cpp
 

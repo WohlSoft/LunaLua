@@ -12,6 +12,20 @@
 
 #include "TestMode.h"
 #include "TestModeMenu.h"
+#include "pge_editor_feedback.h"
+
+static void sendTestSettingsToPgeEditor(STestModeSettings &settings)
+{
+    PGE_EditorFeedBack feedBack;
+    std::string cmd = "CMD:testSetup:";
+    cmd += std::to_string(0) + ",";
+    cmd += std::to_string(settings.players[0].identity)     + ",";
+    cmd += std::to_string(settings.players[0].powerup)      + ",";
+    cmd += std::to_string(settings.players[0].mountType)    + ",";
+    cmd += std::to_string(settings.players[0].mountColor);
+    feedBack.sendCommandUTF8(cmd);
+}
+
 
 ///////////////////////////////////////////////
 //============ MENU ITEM CLASSES ============//
@@ -185,6 +199,7 @@ public:
     {
         STestModeSettings settings = getTestModeSettings();
         settings.players[0].powerup = option;
+        sendTestSettingsToPgeEditor(settings);
         setTestModeSettings(settings);
     }
 
@@ -217,6 +232,7 @@ public:
     {
         STestModeSettings settings = getTestModeSettings();
         settings.players[mPlayerIdx].identity = static_cast<Characters>(option);
+        sendTestSettingsToPgeEditor(settings);
         setTestModeSettings(settings);
     }
     virtual float Render(float x, float y, bool selected)
@@ -329,10 +345,9 @@ void testModePauseMenu(bool allowContinue)
         rect->y1 = menuY - 5;
         rect->x2 = menuX + menuW + 5;
         rect->y2 = menuY + menuH + 5;
-        rect->fillColor = RenderOpColor(0.0f, 0.0f, 0.0f, 0.7f);
-        rect->borderColor = RenderOpColor(0.5f, 0.0f, 0.0f, 1.0f);
+        rect->fillColor     = RenderOpColor(0.0f, 0.0f, 0.0f, 0.7f);
+        rect->borderColor   = RenderOpColor(0.5f, 0.0f, 0.0f, 1.0f);
         gLunaRender.AddOp(rect);
-
 
         gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
         float yIdx = menuY + lineSpacing*1.5f;
