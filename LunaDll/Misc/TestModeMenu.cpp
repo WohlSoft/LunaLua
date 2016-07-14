@@ -20,8 +20,8 @@
 class MenuItem
 {
 public:
-    MenuItem() {};
-    virtual ~MenuItem() {};
+    MenuItem() {}
+    virtual ~MenuItem() {}
     virtual float Render(float x, float y, bool selected) = 0;
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) = 0;
 };
@@ -33,7 +33,7 @@ public:
     TextMenuItem() :
         renderCounter(0)
     {};
-    virtual ~TextMenuItem() {};
+    virtual ~TextMenuItem() {}
     virtual std::wstring GetText() = 0;
     virtual float Render(float x, float y, bool selected)
     {
@@ -49,8 +49,8 @@ public:
 class RunnableMenuItem : public virtual MenuItem
 {
 public:
-    RunnableMenuItem() {};
-    virtual ~RunnableMenuItem() {};
+    RunnableMenuItem() {}
+    virtual ~RunnableMenuItem() {}
     virtual bool Run() = 0;
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap)
     {
@@ -70,8 +70,8 @@ protected:
 public:
     TextSelectorItem() :
         renderCounter(0), options()
-    {};
-    virtual ~TextSelectorItem() {};
+    {}
+    virtual ~TextSelectorItem() {}
     virtual short GetSelection() = 0;
     virtual void ProcessSelection(short option) = 0;
     virtual float Render(float x, float y, bool selected)
@@ -122,7 +122,7 @@ class MenuItemContinue : public TextMenuItem, public RunnableMenuItem
 public:
     virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Continue"; };
+    virtual std::wstring GetText() { return L"Continue"; }
     virtual bool Run() {
         // Pause Sound
         SMBXSound::PlaySFX(30);
@@ -135,7 +135,7 @@ class MenuItemRestartLevel : public TextMenuItem, public RunnableMenuItem
 public:
     virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Restart Level"; };
+    virtual std::wstring GetText() { return L"Restart Level"; }
     virtual bool Run() {
         // Restart Level
         testModeRestartLevel();
@@ -148,7 +148,7 @@ class MenuItemQuit : public TextMenuItem, public RunnableMenuItem
 public:
     virtual float Render(float x, float y, bool selected) { return TextMenuItem::Render(x, y, selected); }
     virtual bool ProcessInput(const KeyMap& keymap, const KeyMap& lastKeymap) { return RunnableMenuItem::ProcessInput(keymap, lastKeymap); }
-    virtual std::wstring GetText() { return L"Quit"; };
+    virtual std::wstring GetText() { return L"Quit"; }
     virtual bool Run() {
         // Exit
         if (!TestModeCheckHideWindow())
@@ -174,7 +174,7 @@ public:
         options[6] = L"Hammer";
         options[7] = L"Ice";
     };
-    virtual ~PowerupSelectorItem() {};
+    virtual ~PowerupSelectorItem() {}
     virtual short GetSelection()
     {
         STestModeSettings settings = getTestModeSettings();
@@ -205,8 +205,8 @@ public:
         options[3] = L"";
         options[4] = L"";
         options[5] = L"";
-    };
-    virtual ~CharacterSelectorItem() {};
+    }
+    virtual ~CharacterSelectorItem() {}
     virtual short GetSelection()
     {
         STestModeSettings settings = getTestModeSettings();
