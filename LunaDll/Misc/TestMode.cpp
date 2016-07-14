@@ -45,6 +45,8 @@ void STestModeSettings::ResetToDefault(void)
     levelPath = L"";
     levelData = "";
     playerCount = 1;
+	showFPS = false;
+	godMode = false;
     players[0].identity = CHARACTER_MARIO;
     players[0].powerup = 1;
     players[0].mountType = 0;
@@ -151,6 +153,9 @@ static bool testModeSetupForLoading()
     ep->unknown_C = 0;
     ep->unknown_10 = 0;
     ep->unknown_14 = "";
+
+	// God Mode cheat code
+	GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
     // Select dummy episode entry
     GM_CUR_MENULEVEL = 1;
@@ -454,6 +459,14 @@ json IPCTestLevel(const json& params)
     {
         if (!levelDataIt.value().is_string()) throw IPCInvalidParams();
         settings.levelData = static_cast<const std::string&>(levelDataIt.value()); 
+    }
+
+    // Set godMode flag
+    json::const_iterator godModeFlag = params.find("godMode");
+    if (godModeFlag != params.cend() && !levelDataIt.value().is_null())
+    {
+	    if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
+	    settings.godMode = static_cast<bool>(godModeFlag.value());
     }
 
     // Before checking for tick end... bring to top if we need to
