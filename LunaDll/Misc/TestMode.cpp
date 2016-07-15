@@ -158,7 +158,12 @@ static bool testModeSetupForLoading()
 	GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
     // Show FPS counter
-    GM_SHOW_FPS_COUNT = COMBOOL(testModeSettings.showFPS);
+    GM_SHOW_FPS = COMBOOL(testModeSettings.showFPS);
+    if(!testModeSettings.showFPS);
+    {
+        //Must be zeroed or it will still shown!
+        GM_SHOW_FPS = 0.0;
+    }
 
     // Select dummy episode entry
     GM_CUR_MENULEVEL = 1;

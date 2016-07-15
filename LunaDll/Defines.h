@@ -376,11 +376,14 @@ DEFMEM(GM_INPUTSTR_BUF_PTR, VB6StrPtr, 0x00B2C898);
 DEFMEM(GM_CUR_SAVE_SLOT,    WORD,  0x00B2C62A);      // 1 2 or 3
 
 // Cheats
-DEFMEM(GM_PLAYER_INVULN,    WORD,  0x00B2C8C0);      // 0xFFFF = invuln
-DEFMEM(GM_PLAYER_INFJUMP,   WORD,  0x00B2C8AC);      // 0xFFFF = infinite jumps
-DEFMEM(GM_PLAYER_SHADOWSTAR,WORD,  0x00B2C8AA);       // 0xFFFF = shadowstar
-DEFMEM(GM_CHEATED,          WORD,  0x00B2C8C4);      // 0xFFFF = cheated
-DEFMEM(GM_SHOW_FPS_COUNT,   WORD,  0x00B25108);       // 0xFFFF = show FPS counter
+DEFMEM(GM_PLAYER_INVULN,    WORD,   0x00B2C8C0);    // 0xFFFF = invuln
+DEFMEM(GM_PLAYER_INFJUMP,   WORD,   0x00B2C8AC);    // 0xFFFF = infinite jumps
+DEFMEM(GM_PLAYER_SHADOWSTAR,WORD,   0x00B2C8AA);    // 0xFFFF = shadowstar
+DEFMEM(GM_CHEATED,          WORD,   0x00B2C8C4);    // 0xFFFF = cheated
+
+// Frame counter
+DEFMEM(GM_SHOW_FPS,         WORD,   0x00B25108);    // 0xFFFF = show FPS counter
+DEFMEM(GM_FPS_VALUE,        double, 0x00B2510C);    // Must be zeroed on disabling FPS counter showing
 
 // Miscs
 DEFMEM(GM_GRAVITY,          WORD,  0x00B2C6F4);      // 12 = default, 0 = non-falling
