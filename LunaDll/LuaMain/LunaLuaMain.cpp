@@ -564,7 +564,8 @@ void CLunaLua::bindAll()
                 def("warning", &LuaProxy::Misc::warning),
                 def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
                 // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
-                def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
+                def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
+                def("showRichDialog", &LuaProxy::Misc::showRichDialog)
             ],
 
             namespace_("Audio")[

@@ -6,6 +6,7 @@
 #include "../../../SMBXInternal/PlayerMOB.h"
 #include "../../../EventStateMachine.h"
 #include "../../../Misc/RuntimeHook.h"
+#include "../../../Misc/Gui/RichTextDialog.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -268,4 +269,10 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
     }
 
     runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock, deathEffect);
+}
+
+void LuaProxy::Misc::showRichDialog(const std::string& title, const std::string& rtfText)
+{
+    RichTextDialog dialog(title, rtfText);
+    dialog.show();
 }

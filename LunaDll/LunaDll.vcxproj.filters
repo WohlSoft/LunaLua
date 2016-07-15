@@ -459,7 +459,6 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="httprequest.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\PerfTracker.h">
@@ -537,6 +536,11 @@
     <ClInclude Include="Misc\pge_editor_feedback.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Misc\Gui\RichTextDialog.h">
+      <Filter>Misc\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Gui\GuiUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1028,6 +1032,9 @@
     </ClCompile>
     <ClCompile Include="Misc\pge_editor_feedback.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Gui\RichTextDialog.cpp">
+      <Filter>Misc\Gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

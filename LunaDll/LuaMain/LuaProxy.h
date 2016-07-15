@@ -1274,6 +1274,7 @@ namespace LuaProxy {
         bool isPausedByLua();
         void warning(const std::string& str);
         void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
+        void showRichDialog(const std::string& title, const std::string& rtfText);
     }
 
     namespace Graphics{
