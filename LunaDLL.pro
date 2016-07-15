@@ -31,7 +31,9 @@ OTHER_FILES += \
     LunaDll/scratch.txt
 
 DISTFILES += \
-    LunaDll/scrappedcode.txt
+    LunaDll/scrappedcode.txt \
+    LunaDll/Misc/scrappedcode.txt \
+    LunaDll/Misc/scratch.txt
 
 HEADERS += \
     LunaDll/Autocode/Autocode.h \
@@ -263,7 +265,8 @@ HEADERS += \
     LunaDll/Rendering/SMBXMaskedImage.h \
     LunaDll/SMBXInternal/BaseItemArray.h \
     LunaDll/SMBXInternal/HardcodedGraphicsAccess.h \
-    LunaDll/Misc/pge_editor_feedback.h
+    LunaDll/Misc/PGEEditorCmdSender.h \
+    LunaDll/IPC/IPCPipeServer.h
 
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
@@ -451,5 +454,7 @@ SOURCES += \
     LunaDll/Rendering/FrameCapture.cpp \
     LunaDll/Rendering/SMBXMaskedImage.cpp \
     LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
-    LunaDll/Misc/pge_editor_feedback.cpp
+    LunaDll/Misc/PGEEditorCmdSender.cpp \
+    LunaDll/Misc/TestModeMenu.cpp \
+    LunaDll/IPC/IPCPipeServer.cpp
 

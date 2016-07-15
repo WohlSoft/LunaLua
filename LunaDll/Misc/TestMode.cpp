@@ -157,6 +157,14 @@ static bool testModeSetupForLoading()
 	// God Mode cheat code
 	GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
+    // Show FPS counter
+    GM_SHOW_FPS = COMBOOL(testModeSettings.showFPS);
+    if(!testModeSettings.showFPS);
+    {
+        //Must be zeroed or it will still shown!
+        GM_FPS_VALUE = 0.0;
+    }
+
     // Select dummy episode entry
     GM_CUR_MENULEVEL = 1;
 
@@ -467,6 +475,14 @@ json IPCTestLevel(const json& params)
     {
 	    if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
 	    settings.godMode = static_cast<bool>(godModeFlag.value());
+    }
+
+    // Set godMode flag
+    json::const_iterator showFpsFlag = params.find("showFPS");
+    if (showFpsFlag != params.cend() && !levelDataIt.value().is_null())
+    {
+        if (!showFpsFlag.value().is_boolean()) throw IPCInvalidParams();
+        settings.showFPS = static_cast<bool>(showFpsFlag.value());
     }
 
     // Before checking for tick end... bring to top if we need to

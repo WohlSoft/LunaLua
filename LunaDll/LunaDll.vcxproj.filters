@@ -533,7 +533,7 @@
     <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
       <Filter>Rendering\RenderOps</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\pge_editor_feedback.h">
+    <ClInclude Include="Misc\PGEEditorCmdSender.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
@@ -1030,7 +1030,7 @@
     <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp">
       <Filter>Rendering\RenderOps</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\pge_editor_feedback.cpp">
+    <ClCompile Include="Misc\PGEEditorCmdSender.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp">

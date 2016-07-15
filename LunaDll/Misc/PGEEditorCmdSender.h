@@ -24,6 +24,14 @@ public:
     void close();
 };
 
+class WinSemaphoreLocker
+{
+    WinSemaphore* m_sema;
+public:
+    WinSemaphoreLocker(WinSemaphore* sema);
+    ~WinSemaphoreLocker();
+};
+
 class WinSHMemAttacher
 {
     HANDLE          m_shmem;
@@ -40,12 +48,12 @@ public:
 };
 
 
-class PGE_EditorFeedBack
+class PGE_EditorCommandSender
 {
     WinSemaphore     m_sema;
     WinSHMemAttacher m_shmem;
 public:
-    PGE_EditorFeedBack();
+    PGE_EditorCommandSender();
     void sendCommandW(const std::wstring &command);
     void sendCommandUTF8(const std::string &command);
 };

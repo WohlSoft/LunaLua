@@ -12,11 +12,11 @@
 
 #include "TestMode.h"
 #include "TestModeMenu.h"
-#include "pge_editor_feedback.h"
+#include "PGEEditorCmdSender.h"
 
 static void sendTestSettingsToPgeEditor(STestModeSettings &settings)
 {
-    PGE_EditorFeedBack feedBack;
+    PGE_EditorCommandSender feedBack;
     std::string cmd = "CMD:testSetup:";
     cmd += std::to_string(0) + ",";
     cmd += std::to_string(settings.players[0].identity)     + ",";
