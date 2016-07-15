@@ -162,7 +162,7 @@ static bool testModeSetupForLoading()
     if(!testModeSettings.showFPS);
     {
         //Must be zeroed or it will still shown!
-        GM_SHOW_FPS = 0.0;
+        GM_FPS_VALUE = 0.0;
     }
 
     // Select dummy episode entry
