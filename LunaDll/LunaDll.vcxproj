@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="IPC\IPCPipeServer.h" />
-    <ClInclude Include="Misc\pge_editor_feedback.h" />
+    <ClInclude Include="Misc\PGEEditorCmdSender.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\TestModeMenu.h" />
     <ClInclude Include="Misc\UniPath.h" />
@@ -296,7 +296,7 @@
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="IPC\IPCPipeServer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
-    <ClCompile Include="Misc\pge_editor_feedback.cpp" />
+    <ClCompile Include="Misc\PGEEditorCmdSender.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
     <ClCompile Include="Misc\TestModeMenu.cpp" />

@@ -1,4 +1,4 @@
-#include "pge_editor_feedback.h"
+#include "PGEEditorCmdSender.h"
 #include "../GlobalFuncs.h"
 
 WinSemaphore::WinSemaphore(const std::wstring &key, int initialValue) :
@@ -99,17 +99,17 @@ void *WinSHMemAttacher::data()
 
 
 
-PGE_EditorFeedBack::PGE_EditorFeedBack() :
+PGE_EditorCommandSender::PGE_EditorCommandSender() :
     m_sema(PGE_EDITOR_SEMAPHORE, 1),
     m_shmem(PGE_EDITOR_SHARED_MEMORY, 4096)
 {}
 
-void PGE_EditorFeedBack::sendCommandW(const std::wstring &command)
+void PGE_EditorCommandSender::sendCommandW(const std::wstring &command)
 {
     sendCommandUTF8(WStr2Str(command));
 }
 
-void PGE_EditorFeedBack::sendCommandUTF8(const std::string &command)
+void PGE_EditorCommandSender::sendCommandUTF8(const std::string &command)
 {
     bool needAgain = false;
     do
