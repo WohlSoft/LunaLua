@@ -34,7 +34,7 @@ std::wstring WinSemaphore::key() const
 bool WinSemaphore::acquire()
 {
     DWORD r  =  WaitForSingleObject(m_semaphore, 3000L);
-    return r == WAIT_OBJECT_0;
+    return (r == WAIT_OBJECT_0);
 }
 
 bool WinSemaphore::release(int n)
@@ -47,6 +47,26 @@ void WinSemaphore::close()
 {
     CloseHandle(m_semaphore);
 }
+
+
+
+WinSemaphoreLocker::WinSemaphoreLocker(WinSemaphore *sema) :
+    m_sema(sema)
+{
+    if(m_sema)
+    {
+        if(!m_sema->acquire())
+            m_sema=nullptr;
+    }
+}
+
+WinSemaphoreLocker::~WinSemaphoreLocker()
+{
+    if(m_sema)
+        m_sema->release();
+}
+
+
 
 
 
@@ -112,12 +132,12 @@ void PGE_EditorCommandSender::sendCommandW(const std::wstring &command)
 void PGE_EditorCommandSender::sendCommandUTF8(const std::string &command)
 {
     bool needAgain = false;
-    do
+    if(m_shmem.attach())
     {
-        if(m_sema.acquire())
+        do
         {
-            if(m_shmem.attach())
             {
+                WinSemaphoreLocker semaLock(&m_sema); (void)semaLock;
                 char* data = (char*) m_shmem.data();
                 if( data[0] == 0 )
                 {
@@ -132,11 +152,10 @@ void PGE_EditorCommandSender::sendCommandUTF8(const std::string &command)
                 {
                     needAgain = true;
                 }
-                m_shmem.detach();
             }
-        }
-        m_sema.release();
-        if(needAgain)
-            Sleep(50);
-    } while(needAgain);
+            if(needAgain)
+                Sleep(50);
+        } while(needAgain);
+        m_shmem.detach();
+    }
 }

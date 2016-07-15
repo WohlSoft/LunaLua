@@ -24,6 +24,14 @@ public:
     void close();
 };
 
+class WinSemaphoreLocker
+{
+    WinSemaphore* m_sema;
+public:
+    WinSemaphoreLocker(WinSemaphore* sema);
+    ~WinSemaphoreLocker();
+};
+
 class WinSHMemAttacher
 {
     HANDLE          m_shmem;
