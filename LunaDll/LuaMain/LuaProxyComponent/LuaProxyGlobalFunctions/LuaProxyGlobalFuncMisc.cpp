@@ -271,8 +271,9 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
     runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock, deathEffect);
 }
 
-void LuaProxy::Misc::showRichDialog(const std::string& title, const std::string& rtfText)
+std::string LuaProxy::Misc::showRichDialog(const std::string& title, const std::string& rtfText, bool isReadOnly)
 {
-    RichTextDialog dialog(title, rtfText);
+    RichTextDialog dialog(title, rtfText, isReadOnly);
     dialog.show();
+    return dialog.getRtfText();
 }
