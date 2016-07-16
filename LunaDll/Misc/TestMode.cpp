@@ -159,7 +159,7 @@ static bool testModeSetupForLoading()
 
     // Show FPS counter
     GM_SHOW_FPS = COMBOOL(testModeSettings.showFPS);
-    if(!testModeSettings.showFPS);
+    if(!testModeSettings.showFPS)
     {
         //Must be zeroed or it will still shown!
         GM_FPS_VALUE = 0.0;

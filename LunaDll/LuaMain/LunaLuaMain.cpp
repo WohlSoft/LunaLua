@@ -58,6 +58,8 @@ void CLunaLua::exitLevel()
         callEvent(shutdownEvent);
         shutdown();
 
+        g_PerfTracker.disable();
+
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
@@ -565,7 +567,10 @@ void CLunaLua::bindAll()
                 def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
                 // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
                 def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
-                def("showRichDialog", &LuaProxy::Misc::showRichDialog)
+                def("showRichDialog", &LuaProxy::Misc::showRichDialog),
+                def("__enablePerfTracker", &LuaProxy::Misc::__enablePerfTracker),
+                def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
+                def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData)
             ],
 
             namespace_("Audio")[

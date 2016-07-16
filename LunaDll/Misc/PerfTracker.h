@@ -19,6 +19,7 @@ public:
 private:
     bool m_Enabled;
     bool m_FrameStarted;
+    bool m_SnapshotValid;
     double m_LastTime;
     PerfType m_CurrentType;
     double m_PerfTimes[PERF_MAX];
@@ -50,12 +51,16 @@ public:
     }
 
     inline void endFrame() {
-        if (!m_FrameStarted) return;
+        if (!m_FrameStarted) {
+            m_SnapshotValid = false;
+            return;
+        };
         m_FrameStarted = false;
         endCurrentTag();
         for (int i = 0; i < PERF_MAX; i++) {
             m_PerfTimesSnapshot[i] = m_PerfTimes[i];
         }
+        m_SnapshotValid = true;
     }
 
     inline void tag(PerfType type) {
@@ -68,10 +73,21 @@ public:
         return m_CurrentType;
     }
 
-    inline void getPerfSnapshot(double out[PERF_MAX]) const {
+    inline bool getPerfSnapshot(double out[PERF_MAX]) const {
+        if (!m_SnapshotValid) return false;
         for (int i = 0; i < PERF_MAX; i++) {
             out[i] = m_PerfTimesSnapshot[i];
         }
+        return true;
+    }
+
+    inline void disable() {
+        m_Enabled = false;
+        m_FrameStarted = false;
+    }
+
+    inline void enable() {
+        m_Enabled = true;
     }
 
     void renderStats() const;
