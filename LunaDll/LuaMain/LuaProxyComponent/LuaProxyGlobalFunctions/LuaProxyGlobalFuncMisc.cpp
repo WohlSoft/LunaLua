@@ -7,6 +7,7 @@
 #include "../../../EventStateMachine.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
+#include "../../../Misc/PerfTracker.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -276,3 +277,33 @@ void LuaProxy::Misc::showRichDialog(const std::string& title, const std::string&
     RichTextDialog dialog(title, rtfText);
     dialog.show();
 }
+
+// Internal use profiler functions
+void LuaProxy::Misc::__enablePerfTracker()
+{
+    g_PerfTracker.enable();
+}
+
+void LuaProxy::Misc::__disablePerfTracker()
+{
+    g_PerfTracker.disable();
+}
+
+luabind::object LuaProxy::Misc::__getPerfTrackerData(lua_State* L)
+{
+    double snapshot[PerfTracker::PERF_MAX];
+    if (!g_PerfTracker.getPerfSnapshot(snapshot))
+    {
+        // Return nil if no valid snapshot
+        return luabind::object();
+    }
+
+    luabind::object retTable = luabind::newtable(L);
+    for (int i = 0; i < PerfTracker::PERF_MAX; i++)
+    {
+        const char* typeName = PerfTracker::PerfTypeNames[i];
+        retTable[typeName] = snapshot[i];
+    }
+    return retTable;
+}
+

@@ -1275,6 +1275,11 @@ namespace LuaProxy {
         void warning(const std::string& str);
         void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
         void showRichDialog(const std::string& title, const std::string& rtfText);
+
+        // Internal use profiler functions
+        void __enablePerfTracker();
+        void __disablePerfTracker();
+        luabind::object __getPerfTrackerData(lua_State* L);
     }
 
     namespace Graphics{

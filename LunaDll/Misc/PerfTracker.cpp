@@ -11,14 +11,15 @@
 PerfTracker g_PerfTracker;
 
 const char* const PerfTracker::PerfTypeNames[PERF_MAX] = {
-    "UNK",
-    "DRAW",
-    "LUA"
+    "other",
+    "draw",
+    "lua"
 };
 
 PerfTracker::PerfTracker() :
     m_Enabled(false),
     m_FrameStarted(false),
+    m_SnapshotValid(false),
     m_LastTime(0.0),
     m_CurrentType(PERF_UNKNOWN),
     m_PerfTimes(), m_PerfTimesSnapshot(),
