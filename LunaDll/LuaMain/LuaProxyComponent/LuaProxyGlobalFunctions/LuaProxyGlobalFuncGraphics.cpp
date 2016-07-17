@@ -560,7 +560,7 @@ void LuaProxy::Graphics::__setHardcodedSpriteOverride(const std::string & name, 
     luaL_error(L, "Invalid input for sprite override!");
 }
 
-luabind::object extractComaptibleImage(SMBXMaskedImage* img, lua_State* L) {
+luabind::object extractCurrentOverrideImage(SMBXMaskedImage* img, lua_State* L) {
     SMBXMaskedImage* maskOverride = img->GetMaskedOverride();
     if (maskOverride != nullptr)
     {
@@ -574,7 +574,7 @@ luabind::object extractComaptibleImage(SMBXMaskedImage* img, lua_State* L) {
     }
 
     std::shared_ptr<BMPBox> loadedPng = img->GetLoadedPng();
-    if (rgbaOverride)
+    if (loadedPng)
     {
         return luabind::object(L, new LuaProxy::Graphics::LuaImageResource(loadedPng), luabind::adopt(luabind::result));
     }
@@ -597,7 +597,7 @@ luabind::object LuaProxy::Graphics::__getHardcodedSpriteOverride(const std::stri
         return luabind::object();
     }
 
-    return extractComaptibleImage(SMBXMaskedImage::Get(mainHdc, maskHdc), L);
+    return extractCurrentOverrideImage(SMBXMaskedImage::Get(mainHdc, maskHdc), L);
 }
 
 
@@ -609,5 +609,5 @@ luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, in
         luaL_error(L, "Graphics.sprite.%s[%d] does not exist", t.c_str(), index);
         return luabind::object();
     }
-    return extractComaptibleImage(img, L);
+    return extractCurrentOverrideImage(img, L);
 }
