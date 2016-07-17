@@ -192,15 +192,27 @@ local function initFFIBasedAPIs()
     local function makeSpriteTable(spriteTypeKey, spriteIdx)
         local spriteMT = {
             __index = function(tbl, key)
-                if (key == "img") then
-                    return Graphics.__getSpriteOverride(spriteTypeKey, spriteIdx)
+                if (spriteTypeKey == "hardcoded") then
+                    if (key == "img") then
+                        return Graphics.__getHardcodedSpriteOverride("hardcoded-"..spriteIdx)
+                    end
+                else
+                    if (key == "img") then
+                        return Graphics.__getSpriteOverride(spriteTypeKey, spriteIdx)
+                    end
                 end
                 error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
             end,
             __newindex = function(tbl,key,val)
-                if (key == "img") then
-                    Graphics.__setSpriteOverride(spriteTypeKey, spriteIdx, val)
-                    return
+                if (spriteTypeKey == "hardcoded") then
+                    if (key == "img") then
+                        return Graphics.__setHardcodedSpriteOverride("hardcoded-"..spriteIdx, val)
+                    end
+                else
+                    if (key == "img") then
+                        Graphics.__setSpriteOverride(spriteTypeKey, spriteIdx, val)
+                        return
+                    end
                 end
                 error("Graphics.sprites." .. tostring(spriteTypeKey) .. "[" .. tostring(spriteIdx) .. "]." .. tostring(key) .. " does not exist")
             end
