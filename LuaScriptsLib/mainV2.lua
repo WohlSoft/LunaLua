@@ -111,7 +111,8 @@ local function initFFIBasedAPIs()
         local bitMT = setmetatable({
         -- Normal Fields
             __data = nativeBitArray,
-            __size = resImg.width * resImg.height - 1
+            __size = resImg.width * resImg.height - 1,
+            __resImgRef = resImg -- Hold a strong reference, to prevent deallocation to the data
         }, {
         -- Metamethods
             __index = function(tbl, key)
@@ -839,6 +840,7 @@ function __onInit(episodePath, lvlName)
         __ClassicEvents = APIHelper.doAPI(_G, "core\\classicevents")
         Profiler = APIHelper.doAPI(_G, "core\\profiler")
         LunaTime = APIHelper.doAPI(_G, "core\\lunatime")
+        Warn = APIHelper.doAPI(_G, "core\\warn")
         --SEGMENT TO ADD PRELOADED APIS END
         
         __episodePath = episodePath
