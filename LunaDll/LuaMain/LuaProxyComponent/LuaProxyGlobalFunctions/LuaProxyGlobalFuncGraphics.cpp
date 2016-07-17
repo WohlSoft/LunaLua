@@ -524,9 +524,9 @@ void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, co
     luaL_error(L, "Cannot set Graphics.sprite.%s[%d], invalid input type", t.c_str(), index);
 }
 
-void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, const luabind::object & overrideImg, lua_State * L)
+void LuaProxy::Graphics::__setHardcodedSpriteOverride(const std::string & name, const luabind::object & overrideImg, lua_State * L)
 {
-    HDC mainHdc, maskHdc;
+    HDC mainHdc = nullptr, maskHdc = nullptr;
     if (name.find("hardcoded-") == 0)
     {
         // If non of the above applies, then try with the hardcoded ones:
@@ -559,6 +559,45 @@ void LuaProxy::Graphics::__setSimpleSpriteOverride(const std::string & name, con
     }
     luaL_error(L, "Invalid input for sprite override!");
 }
+
+
+luabind::object LuaProxy::Graphics::__getHardcodedSpriteOverride(const std::string& name, lua_State* L)
+{
+    HDC mainHdc = nullptr, maskHdc = nullptr;
+    if (name.find("hardcoded-") == 0)
+    {
+        // If non of the above applies, then try with the hardcoded ones:
+        HardcodedGraphicsItem::GetHDCByName(name, &mainHdc, &maskHdc);
+    }
+    
+    if (mainHdc == nullptr && maskHdc == nullptr) {
+        luaL_error(L, "Failed to get hardcoded image!");
+        return luabind::object();
+    }
+
+    SMBXMaskedImage* img = SMBXMaskedImage::Get(mainHdc, maskHdc);
+
+    SMBXMaskedImage* maskOverride = img->GetMaskedOverride();
+    if (maskOverride != nullptr)
+    {
+        return luabind::object(L, maskOverride);
+    }
+
+    std::shared_ptr<BMPBox> rgbaOverride = img->GetRGBAOverride();
+    if (rgbaOverride)
+    {
+        return luabind::object(L, new LuaImageResource(rgbaOverride), luabind::adopt(luabind::result));
+    }
+
+    std::shared_ptr<BMPBox> loadedPng = img->GetLoadedPng();
+    if (rgbaOverride)
+    {
+        return luabind::object(L, new LuaImageResource(loadedPng), luabind::adopt(luabind::result));
+    }
+
+    return luabind::object(L, img);
+}
+
 
 luabind::object LuaProxy::Graphics::__getSpriteOverride(const std::string& t, int index, lua_State* L)
 {

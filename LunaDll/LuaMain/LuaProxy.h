@@ -1340,7 +1340,8 @@ namespace LuaProxy {
         void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
         void __glInternalDraw(const luabind::object& namedArgs, lua_State* L);
         void __setSpriteOverride(const std::string& type, int index, const luabind::object& img, lua_State* L);
-        void __setSimpleSpriteOverride(const std::string& name, const luabind::object& overrideImg, lua_State* L);
+        void __setHardcodedSpriteOverride(const std::string& name, const luabind::object& overrideImg, lua_State* L);
+        luabind::object __getHardcodedSpriteOverride(const std::string& name, lua_State* L);
         luabind::object __getSpriteOverride(const std::string& type, int index, lua_State* L);
     }
 
