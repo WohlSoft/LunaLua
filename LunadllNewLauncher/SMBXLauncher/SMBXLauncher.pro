@@ -4,13 +4,11 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkitwidgets
+QT       += core gui widgets webenginewidgets
 
 CONFIG += c++11
 
 DEFINES += PGE_FILES_QT
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SMBXLauncher
 TEMPLATE = app
@@ -44,7 +42,9 @@ SOURCES += main.cpp\
     launcherconfiguration.cpp \
     ../../LunaLoader/LunaLoaderPatch.cpp \
     NetworkUtils/networkutils.cpp \
-    NetworkUtils/qreplytimeout.cpp
+    NetworkUtils/qreplytimeout.cpp \
+    PGE_File_Formats/file_rw_lvl_38a.cpp \
+    PGE_File_Formats/ConvertUTF.c
 
 HEADERS  += mainlauncherwindow.h \
     smbxconfig.h \
@@ -67,7 +67,12 @@ HEADERS  += mainlauncherwindow.h \
     launcherconfiguration.h \
     qjsonutil.h \
     NetworkUtils/networkutils.h \
-    NetworkUtils/qreplytimeout.h
+    NetworkUtils/qreplytimeout.h \
+    PGE_File_Formats/charsetconvert.h \
+    PGE_File_Formats/ConvertUTF.h \
+    PGE_File_Formats/CSVReader.h \
+    PGE_File_Formats/CSVReaderPGE.h \
+    PGE_File_Formats/CSVUtils.h
 
 FORMS    += mainlauncherwindow.ui
 

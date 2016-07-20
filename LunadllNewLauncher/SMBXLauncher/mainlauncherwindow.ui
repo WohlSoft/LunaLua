@@ -35,13 +35,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QWebView" name="webLauncherPage">
-      <property name="url">
-       <url>
-        <string>about:blank</string>
-       </url>
-      </property>
-     </widget>
+     <widget class="QWebEngineView" name="webLauncherPage" native="true"/>
     </item>
    </layout>
   </widget>
@@ -49,9 +43,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
+   <class>QWebEngineView</class>
    <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
+   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
   </customwidget>
  </customwidgets>
  <resources>

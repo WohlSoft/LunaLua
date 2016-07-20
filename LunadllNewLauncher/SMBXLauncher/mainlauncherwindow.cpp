@@ -3,8 +3,9 @@
 #include "../../LunaLoader/LunaLoaderPatch.h"
 #include "NetworkUtils/networkutils.h"
 
-#include <QtWebKit/QtWebKit>
-#include <QWebFrame>
+#include <QtWebEngineWidgets/QtWebEngineWidgets>
+#include <QWebEnginePage>
+#include <QWebEngineSettings>
 #include <QMessageBox>
 #include <QDesktopServices>
 
@@ -15,10 +16,10 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->webLauncherPage->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
+    connect(ui->webLauncherPage->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
     connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
-    ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    ui->webLauncherPage->page()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    //ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebEnginePage::DelegateAllLinks);
+    ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
 }
 
 MainLauncherWindow::~MainLauncherWindow()
@@ -29,7 +30,11 @@ MainLauncherWindow::~MainLauncherWindow()
 void MainLauncherWindow::addJavascriptObject()
 {
     m_smbxConfig.reset(new SMBXConfig());
-    ui->webLauncherPage->page()->mainFrame()->addToJavaScriptWindowObject("Launcher", m_smbxConfig.data());
+
+    QWebChannel * channel = ui->webLauncherPage->page()->webChannel();//new QWebChannel(ui->webLauncherPage->page());
+    //ui->webLauncherPage->page()->setWebChannel(channel);
+    channel->registerObject(QString("Launcher"), m_smbxConfig.data());
+    //ui->webLauncherPage->page()->addToJavaScriptWindowObject("Launcher", m_smbxConfig.data());
 
     connect(m_smbxConfig.data(), SIGNAL(runSMBX()), this, SLOT(runSMBX()));
     connect(m_smbxConfig.data(), SIGNAL(runSMBXEditor()), this, SLOT(runSMBXEditor()));
