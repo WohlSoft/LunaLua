@@ -1,0 +1,3 @@
+[submodule "LunadllNewLauncher/SMBXLauncher/PGE_File_Formats"]
+	path = LunadllNewLauncher/SMBXLauncher/PGE_File_Formats
+	url = https://github.com/Wohlhabend-Networks/PGE-File-Library-STL.git
