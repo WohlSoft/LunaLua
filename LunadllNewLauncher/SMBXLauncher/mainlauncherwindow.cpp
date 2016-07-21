@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
+//Still need a porting http://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html
+
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
     m_ApplyLunaLoaderPatch(false),
@@ -16,9 +18,17 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->webLauncherPage->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
-    connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
+    //connect(ui->webLauncherPage->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
+    //connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
     //ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebEnginePage::DelegateAllLinks);
+    /*
+    There is no way to connect a signal to run C++ code when a link is clicked.
+    However, link clicks can be delegated to the Qt application instead of having the HTML handler
+    engine process them by overloading the QWebEnginePage::acceptNavigationRequest() function.
+    This is necessary when an HTML document is used as part of the user interface, and not to display
+    external data, for example, when displaying a list of results.
+    */
+
     ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
 }
 
