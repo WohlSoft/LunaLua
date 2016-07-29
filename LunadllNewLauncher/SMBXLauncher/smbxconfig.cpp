@@ -68,18 +68,18 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
     QFileInfo episodeDirFile(episodeDirPath);
     QMap<QString, QVariant> ret;
     WorldData worldData;
-    worldData.ReadFileValid = false;
+    FileFormats::CreateWorldData(worldData);
 
     foreach (QFileInfo fileInfo, episodeDir.entryInfoList(wldFileFilter, QDir::Files))
     {
-        worldData = FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath());
+        FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath(), worldData);
 
         // Break upon first valid world file
-        if (worldData.ReadFileValid) break;
+        if (worldData.meta.ReadFileValid) break;
     }
 
     // If we didn't get valid data, return null
-    if (!worldData.ReadFileValid)
+    if (!worldData.meta.ReadFileValid)
     {
         return QVariant();
     }
@@ -194,17 +194,12 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
     QVariantList ret;
     for (int i=1; i<=3; i++) {
         QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(i) + ".sav";
-        QFile saveFile(saveFilePath);
         GamesaveData data;
         QMap<QString, QVariant> map;
-        data.ReadFileValid = false;
-        if(saveFile.open(QIODevice::ReadOnly)){
-            data = FileFormats::ReadSMBX64SavFile(saveFile.readAll(), saveFilePath);
-            saveFile.close();
-        }
+        FileFormats::ReadSMBX64SavFileF(saveFilePath, data);
 
-        map.insert("isPresent", data.ReadFileValid);
-        if (data.ReadFileValid) {
+        map.insert("isPresent", data.meta.ReadFileValid);
+        if (data.meta.ReadFileValid) {
             map.insert("starCount", data.gottenStars.length());
             map.insert("gameCompleted", data.gameCompleted);
             map.insert("coinCount", data.coins);

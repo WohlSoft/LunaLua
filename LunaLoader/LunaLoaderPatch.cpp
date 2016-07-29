@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <string>
 #include <cstring>
+#include <stdint.h>
 #include "LunaLoaderPatch.h"
 
 static void setJmpAddr(uint8_t* patch, DWORD patchAddr, DWORD patchOffset, DWORD target) {

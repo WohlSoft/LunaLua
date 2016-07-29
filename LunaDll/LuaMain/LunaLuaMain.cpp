@@ -609,6 +609,7 @@ void CLunaLua::bindAll()
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
                 def("clearSFXBuffer", (void(*)())&LuaProxy::Audio::clearSFXBuffer),
+                def("playSFX", (void(*)(int))&LuaProxy::playSFX),
                 def("playSFX", (void(*)(const std::string&))&LuaProxy::Audio::playSFX),
                 def("SfxOpen", (Mix_Chunk*(*)(const std::string&))&LuaProxy::Audio::SfxOpen),
                 def("SfxPlayCh", (int(*)(int, Mix_Chunk*,int))&LuaProxy::Audio::SfxPlayCh),

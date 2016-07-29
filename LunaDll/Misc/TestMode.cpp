@@ -539,6 +539,22 @@ bool TestModeCheckHideWindow(void)
     return false;
 }
 
+json IPCResetCheckPoint(const json& /*params*/)
+{
+    GM_STR_CHECKPOINT = "";
+    return true;
+}
+
+json IPCSetCheckPoint(const json& params)
+{
+    if (!params.is_object()) throw IPCInvalidParams();
+    json::const_iterator warpEntranceIt = params.find("warpEntrance");
+    if ((warpEntranceIt == params.cend()) || (!warpEntranceIt.value().is_string())) throw IPCInvalidParams();
+
+    return true;
+}
+
+
 json IPCGetWindowHandle(const json& /*params*/)
 {
     HWND window = GetMainWindow();

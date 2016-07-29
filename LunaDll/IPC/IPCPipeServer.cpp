@@ -18,8 +18,10 @@ static json echoMethod(const json& params)
 }
 
 // Method prototypes
-json IPCTestLevel(const json& params);
-json IPCGetWindowHandle(const json& params);
+json IPCTestLevel(const json& params);          //Start level testing
+json IPCGetWindowHandle(const json& params);    //Fetch HWND of SMBX game window
+json IPCSetCheckPoint(const json& params);      //Set custom checkpoint, start position, warp entrance/exit
+json IPCResetCheckPoint(const json& params);    //Clear checkpoint
 
 IPCPipeServer::IPCPipeServer() :
     mOutFD(-1), mInFD(-1)
@@ -27,6 +29,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("echo", echoMethod);
     RegisterMethod("testLevel", IPCTestLevel);
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
+    RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
 }
 
 IPCPipeServer::~IPCPipeServer()
