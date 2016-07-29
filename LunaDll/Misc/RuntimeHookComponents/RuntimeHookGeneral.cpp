@@ -506,6 +506,7 @@ void TrySkipPatch()
     PATCH(0xA98166).CALL(runtimeHookChangeResolution).Apply();
     PATCH(0x96ADD7).CALL(runtimeHookSmbxCheckWindowedRaw).NOP_PAD_TO_SIZE<8>().Apply();
 
+    PATCH(0x9DB1D8).JMP(runtimeHookBlockBumpableRaw).NOP_PAD_TO_SIZE<6>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

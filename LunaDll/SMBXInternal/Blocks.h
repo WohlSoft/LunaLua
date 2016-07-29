@@ -67,6 +67,10 @@ namespace Blocks {
     //Sorting releated
     void DoSortingIfRequired(); // Will the block array sort if needed.
     void SetNextFrameSorting(); // This will activate the flag for making sorting available through "DoSortingIfRequired"
+
+    void InitBlockProperties();
+    bool GetBlockBumpable(int id);
+    void SetBlockBumpable(int id, bool bumpable);
 }
 
 

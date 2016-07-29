@@ -110,3 +110,43 @@ void Blocks::HideAll(int type) {
 		}		
 	}
 }
+
+static bool isBlockBumpable[Block::MAX_ID] = {false};
+void Blocks::InitBlockProperties() {
+    for (int id = 1; id <= Block::MAX_ID; id++)
+    {
+        SetBlockBumpable(id, false);
+    }
+
+    // Default game config
+    SetBlockBumpable(0x4, true);
+    SetBlockBumpable(0x267, true);
+    SetBlockBumpable(0x37, true);
+    SetBlockBumpable(0x3C, true);
+    SetBlockBumpable(0x5A, true);
+    SetBlockBumpable(0x9F, true);
+    SetBlockBumpable(0xA9, true);
+    SetBlockBumpable(0xAA, true);
+    SetBlockBumpable(0xAD, true);
+    SetBlockBumpable(0xB0, true);
+    SetBlockBumpable(0xB3, true);
+    SetBlockBumpable(0xBC, true);
+    SetBlockBumpable(0xE2, true);
+    SetBlockBumpable(0x119, true);
+    SetBlockBumpable(0x11A, true);
+    SetBlockBumpable(0x11B, true);
+    for (int id = 0x26E; id <= 0x271; id++)
+    {
+        SetBlockBumpable(id, true);
+    }
+}
+
+bool Blocks::GetBlockBumpable(int id) {
+    if ((id < 1) || (id > Block::MAX_ID)) return false;
+    return isBlockBumpable[id - 1];
+}
+
+void Blocks::SetBlockBumpable(int id, bool bumpable) {
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    isBlockBumpable[id - 1] = bumpable;
+}

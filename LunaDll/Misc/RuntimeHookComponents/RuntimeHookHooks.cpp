@@ -1260,3 +1260,33 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         ret
     }
 }
+
+static int __stdcall runtimeHookBlockBumpable(int id)
+{
+    return Blocks::GetBlockBumpable(id) ? -1 : 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        movsx eax, ax
+        push eax // Args #1
+        call runtimeHookBlockBumpable
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9DB25D
+        ret
+        alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9DB240
+        ret
+    }
+}

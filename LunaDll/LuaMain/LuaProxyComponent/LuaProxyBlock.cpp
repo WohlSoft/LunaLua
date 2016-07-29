@@ -98,7 +98,15 @@ LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_Stat
     return theNewBlock;
 }
 
+bool LuaProxy::Block::_getBumpable(int id)
+{
+    return ::Blocks::GetBlockBumpable(id);
+}
 
+void LuaProxy::Block::_setBumpable(int id, bool bumpable)
+{
+    ::Blocks::SetBlockBumpable(id, bumpable);
+}
 
 LuaProxy::Block::Block(int index) : m_index(index)
 {}

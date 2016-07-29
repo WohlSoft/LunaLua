@@ -1266,8 +1266,9 @@ void CLunaLua::bindAll()
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
                         def("get", (luabind::object(*)(luabind::object, lua_State* L))&LuaProxy::Block::get),
                         def("getIntersecting", &LuaProxy::Block::getIntersecting),
-                        def("spawn", &LuaProxy::Block::spawn)
-
+                        def("spawn", &LuaProxy::Block::spawn),
+                        def("_getBumpable", &LuaProxy::Block::_getBumpable),
+                        def("_setBumpable", &LuaProxy::Block::_setBumpable)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Block, m_index))
                 .def(constructor<int>())

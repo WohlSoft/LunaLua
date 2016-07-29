@@ -17,7 +17,7 @@
      ########: ##::. ##:. ######:::'####: ##::. ##: ########::::
     ........::..::::..:::......::::....::..::::..::........:::::
 
-This is currently a second version of main.lua 
+This is currently a second version of main.lua
 
 It is a attempt to merge lunaworld.lua and lunadll.lua in one state.
 
@@ -31,7 +31,7 @@ __isLuaError = false
 __episodePath = ""
 __customFolderPath = ""
 
--- Modified Native functions: 
+-- Modified Native functions:
 os.exit = function() error("Shutdown") end
 
 -- FFI-based APIs (remove direct acccess to FFI though)
@@ -58,7 +58,7 @@ local function initFFIBasedAPIs()
             return nil
         end
         return tonumber(anum[0])
-    end   
+    end
     local performanceCounterFreq = GetPerformanceFrequency()
     Misc.clock = function()
         return GetPerformanceCounter() / performanceCounterFreq
@@ -292,24 +292,36 @@ local function initFFIBasedAPIs()
     }
     Audio.sounds = {}
     setmetatable(Audio.sounds, soundsMetatable);
-	local setmusvol = Audio.MusicVolume;
-	local musvol = 80;
-	Audio.MusicVolume(musvol);
-	Audio.MusicVolume = function(volume)
-		if(volume == nil) then return musvol;
-		else
-			musvol = volume;
-			setmusvol(volume);
-		end
-	end
+    local setmusvol = Audio.MusicVolume;
+    local musvol = 80;
+    Audio.MusicVolume(musvol);
+    Audio.MusicVolume = function(volume)
+        if(volume == nil) then return musvol;
+        else
+            musvol = volume;
+            setmusvol(volume);
+        end
+    end
     
     -- Helper function for loadImage
     Graphics.loadImageResolved = function(file)
         local path = Misc.resolveGraphicsFile(file)
         if (path == nil) then
-            error("Cannot find image: " .. file) 
+            error("Cannot find image: " .. file)
         end
         return Graphics.loadImage(path)
+    end
+    
+    if (not isOverworld) then
+        local bumpableMetatable = {
+            __index = function(tbl, id)
+                return Block._getBumpable(id)
+            end,
+            __newindex = function(tbl, id, val)
+                Block._setBumpable(id, val)
+            end
+        }
+        Block.bumpable = setmetatable({}, bumpableMetatable);
     end
     
     -- Limit access to FFI
@@ -725,7 +737,7 @@ function EventManager.callEvent(name, ...)
 end
 
 function EventManager.queueEvent(name, ...)
-    local newQueueEntry = 
+    local newQueueEntry =
     {
         eventName = name,
         parameters = {...}
@@ -739,7 +751,7 @@ function EventManager.manageEventObj(eventObj, ...)
     end
     EventManager.callEvent(directEventName, eventObj, ...)
     if(eventObj.loopable)then
-        EventManager.queueEvent(eventObj.eventName, ...) 
+        EventManager.queueEvent(eventObj.eventName, ...)
     end
 end
 
@@ -755,9 +767,9 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
         error("\nOutdated version of API is trying to use registerEvent with string\nPlease contact the api developer to fix this issue!",2)
     end
     eventHandler = eventHandler or event --FIXME: Handle ==> NPC:onKill
-	if (beforeMainCall == nil) then
-		beforeMainCall = true
-	end
+    if (beforeMainCall == nil) then
+        beforeMainCall = true
+    end
     local newApiHandler =
     {
         api = thisTable,
@@ -773,7 +785,7 @@ end
 function EventManager.removeAPIListener(apiTable, event, eventHandler)
     for i=1,#EventManager.apiListeners do
         local apiObj = EventManager.apiListeners[i]
-        if(apiObj.api == apiTable and 
+        if(apiObj.api == apiTable and
             apiObj.eventName == event and
             apiObj.eventHandlerName == eventHandler)then
             table.remove(apiTable, i)
@@ -807,7 +819,7 @@ end
 
 --[[
     The new core uses three functions:
-        * __callEvent(...)  
+        * __callEvent(...)
             - This function is called when LunaLua grabs a new event. This event is then futher processed and queued if possible.
               The first argument is always an event object by LunaLua core.
               The function which process it is called 'EventManager.manageEventObj'.
@@ -817,7 +829,7 @@ end
         * __onInit(episodePath, lvlName)
             - This function is doing the initializing.
  
-]] 
+]]
 function __callEvent(...)
     local pcallReturns = {__xpcall(EventManager.manageEventObj, ...)}
     __xpcallCheck(pcallReturns)

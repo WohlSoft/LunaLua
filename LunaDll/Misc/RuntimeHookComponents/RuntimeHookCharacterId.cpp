@@ -2444,6 +2444,9 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         }
     }
 
+    // Switch blocks are generally bumpable
+    if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
+
     runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect, sprites, owsprite);
     runtimeHookCharacterIdApplyPatch();
 }
