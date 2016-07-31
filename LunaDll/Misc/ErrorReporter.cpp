@@ -67,13 +67,16 @@ void ErrorReport::manageErrorReport(const std::string &url, std::string &errText
     GuiCrashNotify notifier(errText);
     notifier.show();
 
+    const std::string& username = notifier.getUsername();
+    const std::string& usercomment = notifier.getUsercomment();
+
     errText += "\n\n\nUSERNAME: \n";
-    errText += (notifier.username.length() == 0 ? "(NONE)" : notifier.username);
+    errText += (username.length() == 0 ? "(NONE)" : username);
     errText += "\n\n\nUSERCOMMENT: \n";
-    errText += (notifier.usercomment.length() == 0 ? "(NONE)" : notifier.usercomment);
+    errText += (usercomment.length() == 0 ? "(NONE)" : usercomment);
     errText += "\n";
 
-    if (notifier.doSend){
+    if (notifier.shouldSend()){
         sendPUTRequest(url, errText);
     }
 }

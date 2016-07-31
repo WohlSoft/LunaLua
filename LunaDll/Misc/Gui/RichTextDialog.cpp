@@ -34,8 +34,7 @@ void RichTextDialog::show()
             setWindowToCenter(hwnd);
 
             // Get dialog data
-            RichTextDialog* dialogCls = reinterpret_cast<RichTextDialog*>(lParam);
-            SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG>(dialogCls));
+            RichTextDialog* dialogCls = bindParentClassParam<RichTextDialog>(hwnd, lParam);
             const std::string& txt = dialogCls->getRtfText();
 
             SetWindowTextA(hwnd, dialogCls->getTitle().c_str());
@@ -55,7 +54,7 @@ void RichTextDialog::show()
             switch (LOWORD(wParam))
             {
             case IDOK:
-                RichTextDialog* dialogCls = reinterpret_cast<RichTextDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+                RichTextDialog* dialogCls = getParentClass<RichTextDialog>(hwnd);
                 HWND richEditControl = GetDlgItem(hwnd, IDC_RICHTEXTCONTENT);
 
                 GETTEXTLENGTHEX textLengthProps;
