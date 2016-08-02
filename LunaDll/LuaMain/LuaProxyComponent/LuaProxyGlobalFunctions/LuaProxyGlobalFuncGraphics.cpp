@@ -442,7 +442,8 @@ void LuaProxy::Graphics::glSetTextureRGBA(const LuaImageResource* img, uint32_t 
 void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_State* L)
 {
     double priority;
-    const LuaProxy::Graphics::LuaImageResource* luaImageResource;
+    const LuaProxy::Graphics::LuaImageResource* luaImageResource = nullptr;
+    const LuaProxy::NativeShader* shader = nullptr;
     std::shared_ptr<CaptureBuffer> capBuff = nullptr;
     float r, g, b, a;
     unsigned int rawVer, rawTex, rawCol, rawCnt;
@@ -470,6 +471,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, b, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, a, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sceneCoords, false);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, shader, nullptr);
 
     const BMPBox* bmp = nullptr;
     if (luaImageResource && luaImageResource->img && luaImageResource->img->ImageLoaded()) {
@@ -489,6 +491,11 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     obj->mVertColor = (const float*)rawCol;
     obj->mCount = rawCnt;
     obj->mSceneCoords = sceneCoords;
+
+    if (shader) {
+        obj->mShader = shader->getInternalShader();
+    }
+
     gLunaRender.GLCmd(obj, priority);
 }
 

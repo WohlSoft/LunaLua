@@ -5,6 +5,7 @@
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
 
+
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
@@ -141,7 +142,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     GLERRORCHECK();
 
     g_GLDraw.BindTexture(tex);
-
+    if (mShader) {
+        mShader->bind();
+        GLERRORCHECK();
+    }
+    
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
 
@@ -203,6 +208,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
+        GLERRORCHECK();
+    }
+
+    if (mShader) {
+        mShader->unbind();
         GLERRORCHECK();
     }
 }

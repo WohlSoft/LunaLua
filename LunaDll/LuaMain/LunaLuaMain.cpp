@@ -700,14 +700,10 @@ void CLunaLua::bindAll()
             .def("write", &LuaProxy::Logger::write),
 
             LUAHELPER_DEF_CLASS(NativeShader)
-                .enum_("ShaderType")
-                    [
-                        value("SHADER_FRAGMENT", LuaProxy::NativeShader::SHADER_FRAGMENT),
-                        value("SHADER_VERTEX", LuaProxy::NativeShader::SHADER_VERTEX)
-                    ]
-            .def(constructor<LuaProxy::NativeShader::ShaderType>())
+            .def(constructor<>())
             .def("compileFromSource", &LuaProxy::NativeShader::compileFromSource)
-            .def("compileFromFile", &LuaProxy::NativeShader::compileFromFile),
+            .def("compileFromFile", &LuaProxy::NativeShader::compileFromFile)
+            .property("isCompiled", &LuaProxy::NativeShader::isCompiled),
 
             LUAHELPER_DEF_CLASS(Data)
                 .enum_("DataTypes")

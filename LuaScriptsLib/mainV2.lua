@@ -183,10 +183,19 @@ local function initFFIBasedAPIs()
         texCoords = convertGlArray(texCoords, arr_len*2)
         vertColor = convertGlArray(vertColor, arr_len*4)
     
+        local shader = args['shader'];
+        if(shader)then
+            if(not shader.isCompiled)then
+                error("Shader is not compiled!", 2)
+            end
+        end
+    
         Graphics.__glInternalDraw{
-            priority=priority, primitive=args['primitive'], sceneCoords=args['sceneCoords'], texture=texture,
-            r=color[1], g=color[2], b=color[3], a=color[4],
-            rawVer=vertCoords, rawTex=texCoords, rawCol=vertColor, rawCnt=arr_len}
+            priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], texture = texture,
+            r = color[1], g = color[2], b = color[3], a = color[4],
+            rawVer = vertCoords, rawTex = texCoords, rawCol = vertColor, rawCnt = arr_len,
+            shader = shader
+        }
     end
 
     -- This function creates the "virtual" attributes for the sprite table.

@@ -1230,17 +1230,13 @@ namespace LuaProxy {
 
     class NativeShader {
     public:
-        enum ShaderType {
-            SHADER_FRAGMENT,
-            SHADER_VERTEX
-        };
+        NativeShader();
+        void compileFromSource(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, lua_State* L);
+        void compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L);
 
-        NativeShader(ShaderType type);
-        void compileFromSource(const std::string& name, const std::string& source, lua_State* L);
-        void compileFromFile(const std::string& name, const std::string& fileName, lua_State* L);
-
+        bool isCompiled() const;
+        std::shared_ptr<GLShader> getInternalShader() const;
     private:
-        ShaderType m_shaderType;
         std::shared_ptr<GLShader> m_internalShader;
     };
     

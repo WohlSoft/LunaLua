@@ -78,7 +78,7 @@ void GLShader::load()
     if(isVertexSourceValid) 
         vertex = glCreateShader(GL_VERTEX_SHADER);
     GLERRORCHECK();
-    if (isVertexSourceValid) 
+    if (isFragmentSourceValid)
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
     GLERRORCHECK();
     
