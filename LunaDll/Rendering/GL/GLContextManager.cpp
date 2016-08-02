@@ -9,7 +9,7 @@ GLContextManager g_GLContextManager;
 
 // Constructor
 GLContextManager::GLContextManager() :
-	hDC(nullptr), hCTX(nullptr),
+	hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
 	mInitialized(false), mHadError(false),
     mCurrentFB(nullptr), mFramebuffer(nullptr) {
 }
@@ -57,6 +57,16 @@ void GLContextManager::BindFramebuffer() {
     mFramebuffer->Bind();
 }
 
+void GLContextManager::SwitchToQueueThreadCTX()
+{
+    wglMakeCurrent(hDC, hQueueThreadCTX);
+}
+
+void GLContextManager::SwitchToMainThreadCTX()
+{
+    wglMakeCurrent(hDC, hMainThreadCTX);
+}
+
 void GLContextManager::BindAndClearFramebuffer() {
     if (mFramebuffer == nullptr) return;
 
@@ -87,21 +97,31 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     if (FALSE == bResult)
         return false;
 
-    HGLRC tempContext = wglCreateContext(hDC);
-    if (NULL == tempContext)
+    // TODO: Set queueThreadCTX and mainThreadCTX
+    HGLRC queueThreadTempCTX = wglCreateContext(hDC);
+    HGLRC mainThreadTempCTX = wglCreateContext(hDC);
+    if (NULL == queueThreadTempCTX || NULL == mainThreadTempCTX)
         return false;
 
-    bResult = wglMakeCurrent(hDC, tempContext);
+    bResult = wglShareLists(queueThreadTempCTX, mainThreadTempCTX);
     if (FALSE == bResult)
     {
-        wglDeleteContext(tempContext);
+        wglDeleteContext(queueThreadTempCTX);
+        wglDeleteContext(mainThreadTempCTX);
+        return false;
+    }
+
+    bResult = wglMakeCurrent(hDC, queueThreadTempCTX);
+    if (FALSE == bResult)
+    {
+        wglDeleteContext(queueThreadTempCTX);
         return false;
     }
 
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         wglMakeCurrent(nullptr, nullptr);
-        wglDeleteContext(tempContext);
+        wglDeleteContext(queueThreadTempCTX);
         return false;
     }
 
@@ -121,7 +141,8 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     }
 
     this->hDC = hDC;
-    this->hCTX = tempContext;
+    this->hQueueThreadCTX = queueThreadTempCTX;
+    this->hMainThreadCTX = mainThreadTempCTX;
     return true;
 }
 
@@ -176,10 +197,10 @@ void GLContextManager::ReleaseFramebuffer() {
 
 void GLContextManager::ReleaseContext() {
 	// Delete Context
-	if (hCTX) {
+	if (hQueueThreadCTX) {
 		wglMakeCurrent(nullptr, nullptr);
-		wglDeleteContext(hCTX);
-		hCTX = nullptr;
+		wglDeleteContext(hQueueThreadCTX);
+		hQueueThreadCTX = nullptr;
 	}
 
 	// Restore pixel format if necessary

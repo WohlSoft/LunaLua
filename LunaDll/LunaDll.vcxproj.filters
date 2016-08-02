@@ -1036,6 +1036,7 @@
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp">
       <Filter>Misc\Gui</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

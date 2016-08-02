@@ -441,6 +441,7 @@ LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::RECTd, RECTd);
 LUAHELPER_DEF_CLASS_HELPER(Event, Event);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Logger, Logger);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NativeShader, NativeShader);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Data, Data);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
@@ -697,6 +698,16 @@ void CLunaLua::bindAll()
             LUAHELPER_DEF_CLASS(Logger)
             .def(constructor<std::string>())
             .def("write", &LuaProxy::Logger::write),
+
+            LUAHELPER_DEF_CLASS(NativeShader)
+                .enum_("ShaderType")
+                    [
+                        value("SHADER_FRAGMENT", LuaProxy::NativeShader::SHADER_FRAGMENT),
+                        value("SHADER_VERTEX", LuaProxy::NativeShader::SHADER_VERTEX)
+                    ]
+            .def(constructor<LuaProxy::NativeShader::ShaderType>())
+            .def("compileFromSource", &LuaProxy::NativeShader::compileFromSource)
+            .def("compileFromFile", &LuaProxy::NativeShader::compileFromFile),
 
             LUAHELPER_DEF_CLASS(Data)
                 .enum_("DataTypes")

@@ -562,7 +562,8 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
     FILE* theFile = _wfopen(wpath.c_str(), L"rb");
     if(!theFile)
     {
-        MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+        if (!errMsg.empty())
+            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
         return false;
     }
     fseek(theFile, 0, SEEK_END);
@@ -594,6 +595,28 @@ bool isAbsolutePath(const std::string& path)
 {
 	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
+
+std::wstring resolveIfNotAbsolutePath(std::wstring filename)
+{
+    if (!isAbsolutePath(filename)) {
+        return getCustomFolderPath() + filename;
+    }
+    else
+    {
+        return filename;
+    }
+}
+
+std::string resolveIfNotAbsolutePath(std::string filename) {
+    if (!isAbsolutePath(filename)) {
+        return WStr2Str(getCustomFolderPath()) + filename;
+    }
+    else
+    {
+        return filename;
+    }
+}
+
 
 std::string generateTimestamp(std::string format)
 {

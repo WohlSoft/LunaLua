@@ -99,18 +99,13 @@ std::shared_ptr<BMPBox> Renderer::GetImageForResourceCode(int resource_code)
     return nullptr;
 }
 
+
 std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
 {
-    // Concoct full filepath
-    wstring full_path = L"";
+    // construct full filepath
+    
+    std::wstring full_path = resolveIfNotAbsolutePath(filename);
 
-    if (!isAbsolutePath(filename)) {
-        full_path = getCustomFolderPath() + filename;
-    }
-    else
-    {
-        full_path = filename;
-    }
 
     std::tuple<std::vector<HBITMAP>, int> ret = LoadAnimatedGfx(filename);
     std::vector<HBITMAP>& bitmaps = std::get<0>(ret);

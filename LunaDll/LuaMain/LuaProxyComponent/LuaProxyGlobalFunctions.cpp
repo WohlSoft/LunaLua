@@ -36,15 +36,7 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     int powerup = _powerup - 1;
     int character = _character - 1;
 
-    std::wstring wfull_path;
-    if( isAbsolutePath(ini_file) )
-    {
-        wfull_path = Str2WStr(ini_file);
-    } else {
-        wfull_path = getCustomFolderPath() + Str2WStr(ini_file);
-    }
-
-    std::string full_path = WStr2Str(wfull_path);
+    std::string full_path = resolveIfNotAbsolutePath(ini_file);
 
     INIReader hitBoxFile( full_path );
     if (hitBoxFile.ParseError() < 0)

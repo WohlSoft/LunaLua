@@ -250,16 +250,7 @@ int LuaProxy::Audio::SfxIsPaused(int channel)
 
 std::string LuaProxy::Audio::getSfxPath(const std::string& filename)
 {
-    std::string full_paths;
-    if(!isAbsolutePath(filename))
-    {
-        full_paths = WStr2Str(getCustomFolderPath()) + filename;
-    }
-    else
-    {
-        full_paths = filename;
-    }
-    return full_paths;
+    return resolveIfNotAbsolutePath(filename);
 }
 
 

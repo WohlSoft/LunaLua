@@ -48,17 +48,17 @@ void GLShader::unbind()
     glUseProgram(0);
 }
 
-GLuint GLShader::getAttribute(const std::string& name)
+GLuint GLShader::getAttribute(const std::string& name) const
 {
-    std::cout << "Get Attribute: " << name << std::endl;
+    // std::cout << "Get Attribute: " << name << std::endl;
     GLuint ret = glGetAttribLocation(m_shaderID, name.c_str());
     GLERRORCHECK();
     return ret;
 }
 
-GLuint GLShader::getUniform(const std::string& name)
+GLuint GLShader::getUniform(const std::string& name) const
 {
-    std::cout << "Get Uniform: " << name << std::endl;
+    // std::cout << "Get Uniform: " << name << std::endl;
     GLuint ret = glGetUniformLocation(m_shaderID, name.c_str());
     GLERRORCHECK();
     return ret;
@@ -72,29 +72,31 @@ void GLShader::load()
         return;
     
     GLuint program = glCreateProgram();
+    GLERRORCHECK();
     GLuint vertex; 
     GLuint fragment;
     if(isVertexSourceValid) 
         vertex = glCreateShader(GL_VERTEX_SHADER);
+    GLERRORCHECK();
     if (isVertexSourceValid) 
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
+    GLERRORCHECK();
     
     if (isVertexSourceValid) {
         if (!compileShaderSource(vertex, m_vertexSource))
         {
-            std::cout << "Failed to compile vertex shader: " << std::endl
-                << getLastShaderError(vertex) << std::endl;
+            m_lastErrorMsg = getLastShaderError(vertex);
             glDeleteShader(vertex);
+            GLERRORCHECK();
             return;
         }
     }
     if (isFragmentSourceValid) {
         if (!compileShaderSource(fragment, m_fragmentSource))
         {
-            std::cout << "Failed to compile fragment shader: " << std::endl
-                << getLastShaderError(fragment) << std::endl;
+            m_lastErrorMsg = getLastShaderError(fragment);
             glDeleteShader(fragment);
+            GLERRORCHECK();
             return;
         }
     }

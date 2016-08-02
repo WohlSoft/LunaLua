@@ -9,14 +9,19 @@
 #include "GLDraw.h"
 #include "GLEngineCmds.h"
 #include "GLEngine.h"
+#include "../Shaders/GLShader.h"
+
 
 class GLEngineProxy {
+    friend class GLLock;
 private:
     std::thread* mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
     std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
+    // This is needed, if we need to do GL-stuff, but on another thread
+    std::recursive_mutex mProxyLock; 
 
 public:
     GLEngine mInternalGLEngine;
@@ -24,6 +29,7 @@ protected:
     // Internal routines
     void Init();
     void ThreadMain();
+    inline std::recursive_mutex& getLock() { return mProxyLock; };
 
 public:
     GLEngineProxy();
@@ -36,6 +42,9 @@ public:
     void GLEngineProxy::QueueCmd(const std::shared_ptr<T>& cmd) {
         QueueCmd(std::static_pointer_cast<GLEngineCmd>(cmd));
     }
+
+    // Functions which run on the main thread, but needs to access GL resources
+    std::shared_ptr<GLShader> CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
 
     // Convenience command functions
     void ClearSMBXSprites();
@@ -54,6 +63,19 @@ public:
     inline void TriggerScreenshot() { mInternalGLEngine.TriggerScreenshot(); }
     inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& func) { mInternalGLEngine.TriggerScreenshot(func); }
     inline bool GifRecorderToggle() { return mInternalGLEngine.GifRecorderToggle(); }
+};
+
+class GLLock {
+    friend class GLEngineProxy;
+private:
+    std::unique_lock<std::recursive_mutex> internal_lock;
+protected:
+    enum GLLockType {
+        QueueThread,
+        MainThread
+    };
+    
+    inline GLLock(GLEngineProxy& engineToLock, GLLockType type);
 };
 
 // Instance

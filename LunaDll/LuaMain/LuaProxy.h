@@ -16,6 +16,7 @@
 #include "../Misc/AsyncHTTPClient.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SMBXInternal/Warp.h"
+#include "../Rendering/Shaders/GLShader.h"
 
 class BMPBox;
 
@@ -1222,10 +1223,27 @@ namespace LuaProxy {
         Logger(const Logger &lg) = default;
         ~Logger();
         void write(const std::string& line);
+    private:
         std::string filePath;
         FILE* file;
     };
 
+    class NativeShader {
+    public:
+        enum ShaderType {
+            SHADER_FRAGMENT,
+            SHADER_VERTEX
+        };
+
+        NativeShader(ShaderType type);
+        void compileFromSource(const std::string& name, const std::string& source, lua_State* L);
+        void compileFromFile(const std::string& name, const std::string& fileName, lua_State* L);
+
+    private:
+        ShaderType m_shaderType;
+        std::shared_ptr<GLShader> m_internalShader;
+    };
+    
 
     //undocumented
     namespace Native{

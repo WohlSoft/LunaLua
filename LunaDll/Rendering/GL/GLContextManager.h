@@ -26,6 +26,8 @@ public:
     }
     inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
     inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
+    void SwitchToQueueThreadCTX();
+    void SwitchToMainThreadCTX();
 
 private:
     bool  mInitialized;
@@ -34,7 +36,8 @@ private:
 	// Context variables
 	int   mOldPixelFormat;
     HDC   hDC;
-    HGLRC hCTX;
+    HGLRC hQueueThreadCTX;
+    HGLRC hMainThreadCTX;
 
 	// Framebuffer variables
     GLFramebuffer* mCurrentFB;

@@ -14,6 +14,7 @@ private:
     std::string m_name;
     std::string m_vertexSource;
     std::string m_fragmentSource;
+    std::string m_lastErrorMsg;
     bool m_isValid;
 
 public:
@@ -21,12 +22,13 @@ public:
     GLShader(const GLShader& other) = delete;
     ~GLShader();
 
-    inline bool isValid() { return m_isValid; }
+    inline bool isValid() const { return m_isValid; }
+    inline std::string getLastErrorMsg() const { return m_lastErrorMsg; }
     void bind();
     void unbind();
 
-    GLuint getAttribute(const std::string& name);
-    GLuint getUniform(const std::string& name);
+    GLuint getAttribute(const std::string& name) const;
+    GLuint getUniform(const std::string& name) const;
 private:
     void load();
 

@@ -54,6 +54,8 @@ bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 bool isAbsolutePath(const std::wstring& path);
 bool isAbsolutePath(const std::string& path);
+std::wstring resolveIfNotAbsolutePath(std::wstring filename);
+std::string resolveIfNotAbsolutePath(std::string filename);
 
 extern void removeFilePathW(std::wstring &path);
 extern void removeFilePathW(wchar_t*path, int length);

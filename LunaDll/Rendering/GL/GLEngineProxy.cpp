@@ -4,6 +4,7 @@
 #include "../../Misc/ThreadedCmdQueue.h"
 #include "GLEngineProxy.h"
 #include "GLEngineCmds.h"
+#include "GLContextManager.h"
 
 // Instance
 GLEngineProxy g_GLEngine;
@@ -36,6 +37,7 @@ void GLEngineProxy::ThreadMain() {
         std::shared_ptr<GLEngineCmd> cmd = mQueue.pop();
 
         if (cmd->shouldBeSynchronous() || (mPendingClear == 0 && !mSkipFrame)) {
+            GLLock lock(*this, GLLock::QueueThread);
             cmd->run(mInternalGLEngine);
         }
 
@@ -78,6 +80,17 @@ void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
     }
 }
 
+
+std::shared_ptr<GLShader> GLEngineProxy::CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
+{
+    GLLock lock(*this, GLLock::MainThread);
+
+    return std::shared_ptr<GLShader>(new GLShader(name, vertexSource, fragmentSource), 
+        [this](GLShader* shaderToDelete) { // TODO: We might have a better solution for deletion
+        GLLock lockForDeleter(*this, GLLock::MainThread);
+        delete shaderToDelete;
+    });
+}
 
 void GLEngineProxy::ClearSMBXSprites() {
     QueueCmd(std::make_shared<GLEngineCmd_ClearSMBXSprites>());
@@ -144,4 +157,13 @@ void GLEngineProxy::EndFrame(HDC hdcDest)
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
     QueueCmd(obj);
+}
+
+GLLock::GLLock(GLEngineProxy& engineToLock, GLLockType type) : internal_lock(engineToLock.getLock())
+{
+    if (type == QueueThread) {
+        g_GLContextManager.SwitchToQueueThreadCTX();
+    } else if (type == MainThread) {
+        g_GLContextManager.SwitchToMainThreadCTX();
+    }
 }
