@@ -5,6 +5,7 @@
 #include "GLEngineProxy.h"
 #include "GLEngineCmds.h"
 #include "GLContextManager.h"
+#include "../Shaders/GLShader.h"
 
 // Instance
 GLEngineProxy g_GLEngine;

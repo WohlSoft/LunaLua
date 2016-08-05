@@ -128,11 +128,12 @@ local function initFFIBasedAPIs()
         return bitMT
     end
     
-    local function convertGlArray(arr, arr_len)
+    local function convertGlArray(arr, arr_len, glArrayType)
         if (arr == nil) then return 0 end
         local arr_offset = 0
         if (arr[0] == nil) then arr_offset = 1 end
-        local arr_raw = safeMallocArray("float", arr_len)
+        local mallocType = glArrayType or "float"
+        local arr_raw = safeMallocArray(mallocType, arr_len)
         for i = 0,arr_len-1 do
             arr_raw[i] = arr[i+arr_offset] or 0
         end
@@ -144,6 +145,76 @@ local function initFFIBasedAPIs()
         if (arr[0] ~= nil) then len_offset = 1 end
         return math.floor((#arr + len_offset) / divisor)
     end
+    
+    
+    Graphics.glTypeTable = {
+        [GL_FLOAT]              = {glType = "number",   rawType = "float"},
+        [GL_FLOAT_VEC2]         = {glType = "table",    rawType = "float",          glTableSize = 2},   -- 1x2
+        [GL_FLOAT_VEC3]         = {glType = "table",    rawType = "float",          glTableSize = 3},   -- 1x3
+        [GL_FLOAT_VEC4]         = {glType = "table",    rawType = "float",          glTableSize = 4},   -- 1x4
+        [GL_FLOAT_MAT2]         = {glType = "table",    rawType = "float",          glTableSize = 4},   -- 2x2
+        [GL_FLOAT_MAT3]         = {glType = "table",    rawType = "float",          glTableSize = 9},   -- 3x3
+        [GL_FLOAT_MAT4]         = {glType = "table",    rawType = "float",          glTableSize = 16},  -- 4x4
+        [GL_FLOAT_MAT2x3]       = {glType = "table",    rawType = "float",          glTableSize = 6},   -- 2x3
+        [GL_FLOAT_MAT2x4]       = {glType = "table",    rawType = "float",          glTableSize = 8},   -- 2x4
+        [GL_FLOAT_MAT3x2]       = {glType = "table",    rawType = "float",          glTableSize = 6},   -- 3x2
+        [GL_FLOAT_MAT3x4]       = {glType = "table",    rawType = "float",          glTableSize = 12},  -- 3x4
+        [GL_FLOAT_MAT4x2]       = {glType = "table",    rawType = "float",          glTableSize = 8},   -- 4x2
+        [GL_FLOAT_MAT4x3]       = {glType = "table",    rawType = "float",          glTableSize = 12},  -- 4x3
+        [GL_INT]                = {glType = "number",   rawType = "int"},  
+        [GL_INT_VEC2]           = {glType = "table",    rawType = "int",            glTableSize = 2},   -- 1x2
+        [GL_INT_VEC3]           = {glType = "table",    rawType = "int",            glTableSize = 3},   -- 1x3
+        [GL_INT_VEC4]           = {glType = "table",    rawType = "int",            glTableSize = 4},   -- 1x4
+        [GL_UNSIGNED_INT]       = {glType = "number",   rawType = "unsigned int"},  
+        [GL_UNSIGNED_INT_VEC2]  = {glType = "table",    rawType = "unsigned int",   glTableSize = 2},   -- 1x2
+        [GL_UNSIGNED_INT_VEC3]  = {glType = "table",    rawType = "unsigned int",   glTableSize = 3},   -- 1x3
+        [GL_UNSIGNED_INT_VEC4]  = {glType = "table",    rawType = "unsigned int",   glTableSize = 4},   -- 1x4
+        [GL_DOUBLE]             = {glType = "number",   rawType = "double"},
+        [GL_DOUBLE_VEC2]        = {glType = "table",    rawType = "double",         glTableSize = 2},   -- 1x2
+        [GL_DOUBLE_VEC3]        = {glType = "table",    rawType = "double",         glTableSize = 3},   -- 1x3
+        [GL_DOUBLE_VEC4]        = {glType = "table",    rawType = "double",         glTableSize = 4},   -- 1x4
+        [GL_DOUBLE_MAT2]        = {glType = "table",    rawType = "double",         glTableSize = 4},   -- 2x2
+        [GL_DOUBLE_MAT3]        = {glType = "table",    rawType = "double",         glTableSize = 9},   -- 3x3
+        [GL_DOUBLE_MAT4]        = {glType = "table",    rawType = "double",         glTableSize = 16},  -- 4x4
+        [GL_DOUBLE_MAT2x3]      = {glType = "table",    rawType = "double",         glTableSize = 6},   -- 2x3
+        [GL_DOUBLE_MAT2x4]      = {glType = "table",    rawType = "double",         glTableSize = 8},   -- 2x4
+        [GL_DOUBLE_MAT3x2]      = {glType = "table",    rawType = "double",         glTableSize = 6},   -- 3x2
+        [GL_DOUBLE_MAT3x4]      = {glType = "table",    rawType = "double",         glTableSize = 12},  -- 3x4
+        [GL_DOUBLE_MAT4x2]      = {glType = "table",    rawType = "double",         glTableSize = 8},   -- 4x2
+        [GL_DOUBLE_MAT4x3]      = {glType = "table",    rawType = "double",         glTableSize = 12}   -- 4x3
+    }
+    
+    local function validateAndConvertVariableTable(variableArgs, variableInfoTable, variableTypeName)
+        local formattedReturn = {}
+        for varName, varValue in pairs(variableArgs) do
+            local varInfo = variableInfoTable[varName]
+            if(varInfo == nil)then
+                error("Invalid " .. variableTypeName .. " " .. varName .. " (does not exists)", 3)
+            end
+            
+            local variableType = varInfo.type
+            local glTypeOfVariable = Graphics.glTypeTable[variableType]
+            local glTypeOfVariableInArg = type(varValue)
+            if(glTypeOfVariableInArg ~= glTypeOfVariable.glType)then
+                error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected " .. glTypeOfVariable.glType .. " got " .. type(varValue) .. ")", 3)
+            end
+            if(glTypeOfVariableInArg == "table")then
+                if(#varValue ~= glTypeOfVariable.glTableSize)then
+                    error("Invalid table-size for " .. variableTypeName .. " " .. varName .. " (expected size " .. glTypeOfVariable.glTableSize .. " got size " .. #varValue .. ")", 3)
+                end
+            end
+            
+            local valueToConvert = varValue
+            local sizeOfArray = glTypeOfVariable.glTableSize or 1
+            if(type(varValue) ~= "table")then
+                valueToConvert = {valueToConvert}
+            end
+            
+            formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(valueToConvert, sizeOfArray, glTypeOfVariable.rawType)}
+        end
+        return formattedReturn
+    end
+    
     
     Graphics.GL_POINTS         = 0
     Graphics.GL_LINES          = 1
@@ -189,12 +260,27 @@ local function initFFIBasedAPIs()
                 error("Shader is not compiled!", 2)
             end
         end
+        
+        -- Validate uniforms
+        -- TODO: Also accept uniforms/attributes with named argument, i.e. {x = 5, y = 5}
+        local uniformArgs = args['uniforms'] -- should be converted to [offsetID] = {type = [glEnumId], data = glArrayPtr}
+        local uniformArgsConverted = nil
+        if(uniformArgs ~= nil and shader ~= nil)then
+            uniformArgsConverted = validateAndConvertVariableTable(uniformArgs, shader:getUniformInfo(), "uniform")
+        end
+        
+        -- Validate attributes
+        local attributeArgs = args['attributes'] -- should be converted to [offsetID] = {type = [glEnumId], data = glArrayPtr}
+        local attributeArgsConverted = nil
+        if(attributeArgs ~= nil and shader ~= nil)then
+            attributeArgsConverted = validateAndConvertVariableTable(attributeArgs, shader:getAttributeInfo(), "attribute")
+        end
     
         Graphics.__glInternalDraw{
             priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], texture = texture,
             r = color[1], g = color[2], b = color[3], a = color[4],
             rawVer = vertCoords, rawTex = texCoords, rawCol = vertColor, rawCnt = arr_len,
-            shader = shader
+            shader = shader, uniforms = uniformArgsConverted, attributes = attributeArgsConverted
         }
     end
 

@@ -14,6 +14,9 @@ void LuaProxy::NativeShader::compileFromSource(const std::string& name, const st
         luaL_error(L, "Failed to compile shader: %s", m_internalShader->getLastErrorMsg());
         return;
     }
+
+    m_cachedAttributeInfo = m_internalShader->getAllAttributes();
+    m_cachedUniformInfo = m_internalShader->getAllUniforms();
 }
 
 void LuaProxy::NativeShader::compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L)
@@ -54,8 +57,54 @@ bool LuaProxy::NativeShader::isCompiled() const
     return m_internalShader->isValid();
 }
 
+
+luabind::object convertShaderVariableInfo(const GLShaderVariableInfo* info, lua_State* L)
+{
+    luabind::object infoTbl = luabind::newtable(L);
+    infoTbl["id"] = info->getId();
+    infoTbl["name"] = info->getName();
+    infoTbl["sizeOfVariable"] = info->getSizeOfVariable();
+    infoTbl["type"] = info->getType();
+    infoTbl["varInfoType"] = info->getVarType();
+    return infoTbl;
+}
+
+luabind::object LuaProxy::NativeShader::getAttributeInfo(lua_State* L) const
+{
+    if (!isCompiled()) {
+        luaL_error(L, "Tried to get attributes on invalid shader!");
+        return luabind::object();
+    }
+    
+    luabind::object resultTbl = luabind::newtable(L);
+    for (const GLShaderAttributeInfo& nextInfo : m_cachedAttributeInfo) // TODO: Make it named --> tbl[attribute_name] = {}
+        resultTbl[nextInfo.getName()] = convertShaderVariableInfo(&nextInfo, L);
+
+    return resultTbl;
+    
+}
+
+luabind::object LuaProxy::NativeShader::getUniformInfo(lua_State* L) const
+{
+    if (!isCompiled()) {
+        luaL_error(L, "Tried to get uniforms on invalid shader!");
+        return luabind::object();
+    }
+
+    luabind::object resultTbl = luabind::newtable(L);
+    for(const GLShaderUniformInfo& nextInfo : m_cachedUniformInfo) // TODO: Make it named --> tbl[uniform_name] = {}
+        resultTbl[nextInfo.getName()] = convertShaderVariableInfo(&nextInfo, L);
+
+    return resultTbl;
+}
+
 std::shared_ptr<GLShader> LuaProxy::NativeShader::getInternalShader() const
 {
     return m_internalShader;
 }
+
+
+
+
+
 

@@ -1235,8 +1235,14 @@ namespace LuaProxy {
         void compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L);
 
         bool isCompiled() const;
+        luabind::object getAttributeInfo(lua_State* L) const;
+        luabind::object getUniformInfo(lua_State* L) const;
+
+
         std::shared_ptr<GLShader> getInternalShader() const;
     private:
+        std::vector<GLShaderAttributeInfo> m_cachedAttributeInfo;
+        std::vector<GLShaderUniformInfo> m_cachedUniformInfo;
         std::shared_ptr<GLShader> m_internalShader;
     };
     

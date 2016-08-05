@@ -541,6 +541,15 @@
       <Filter>Misc\Gui</Filter>
     </ClInclude>
     <ClInclude Include="Misc\Gui\GuiUtils.h" />
+    <ClInclude Include="Rendering\Shaders\GLShaderVariableInfo.h">
+      <Filter>Rendering\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Shaders\GLShaderUniformInfo.h">
+      <Filter>Rendering\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Shaders\GLShaderAttributeInfo.h">
+      <Filter>Rendering\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1037,6 +1046,15 @@
       <Filter>Misc\Gui</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeShader.cpp" />
+    <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp">
+      <Filter>Rendering\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Shaders\GLShaderAttributeInfo.cpp">
+      <Filter>Rendering\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Shaders\GLShaderUniformInfo.cpp">
+      <Filter>Rendering\Shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

@@ -77,7 +77,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;NDEBUG;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(LUA_DEV);$(MSBuildProjectDirectory)\libs\boost</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -150,6 +150,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Rendering\Shaders\GLShaderAttributeInfo.h" />
+    <ClInclude Include="Rendering\Shaders\GLShaderUniformInfo.h" />
+    <ClInclude Include="Rendering\Shaders\GLShaderVariableInfo.h" />
     <ClInclude Include="IPC\IPCPipeServer.h" />
     <ClInclude Include="Misc\Gui\GuiUtils.h" />
     <ClInclude Include="Misc\Gui\RichTextDialog.h" />
@@ -296,6 +299,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Rendering\Shaders\GLShaderAttributeInfo.cpp" />
+    <ClCompile Include="Rendering\Shaders\GLShaderUniformInfo.cpp" />
+    <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp" />
     <ClCompile Include="IPC\IPCPipeServer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeShader.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />

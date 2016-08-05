@@ -4,6 +4,7 @@
 #include "GLDraw.h"
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
+#include "../Shaders/GLShader.h"
 
 
 // Special puropose command handled by GLEngineProxy internally
@@ -144,6 +145,15 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     g_GLDraw.BindTexture(tex);
     if (mShader) {
         mShader->bind();
+        GLERRORCHECK();
+
+        for (const auto& nextPair : mAttributes) {
+            mShader->applyAttribute(nextPair.first, nextPair.second.type, nextPair.second.data);
+        }
+        for (const auto& nextPair : mUniforms) {
+            mShader->applyUniform(nextPair.first, nextPair.second.type, nextPair.second.data);
+        }
+        
         GLERRORCHECK();
     }
     

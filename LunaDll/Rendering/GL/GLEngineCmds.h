@@ -6,10 +6,11 @@
 #include <GL/glew.h>
 #include "../BMPBox.h"
 #include "../FrameCapture.h"
-#include "../Shaders/GLShader.h"
-
+#include <unordered_map>
+#include <algorithm>
 
 class GLEngine;
+class GLShader;
 
 /****************************************************/
 /* Common argumets for bitmap rendering coordinates */
@@ -114,9 +115,16 @@ public:
 
 class GLEngineCmd_LuaDraw : public GLEngineCmd {
 public:
+    struct LuaDrawShaderEntry {
+        GLenum type;
+        void* data;
+    };
+    
     const BMPBox* mBmp;
     std::shared_ptr<CaptureBuffer> mCapBuff;
     std::shared_ptr<GLShader> mShader;
+    std::unordered_map<GLint, LuaDrawShaderEntry> mAttributes;
+    std::unordered_map<GLint, LuaDrawShaderEntry> mUniforms;
     float mColor[4];
 
     GLuint mType;
@@ -140,6 +148,12 @@ public:
             free((void*)mVertColor);
             mVertColor = NULL;
         }
+
+        auto freeShaderEntry = [](const std::pair<const GLint, LuaDrawShaderEntry> nextPair) {
+            free(nextPair.second.data);
+        };
+        std::for_each(mAttributes.begin(), mAttributes.end(), freeShaderEntry);
+        std::for_each(mUniforms.begin(), mUniforms.end(), freeShaderEntry);
     }
 };
 

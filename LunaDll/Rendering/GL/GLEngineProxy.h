@@ -9,8 +9,6 @@
 #include "GLDraw.h"
 #include "GLEngineCmds.h"
 #include "GLEngine.h"
-#include "../Shaders/GLShader.h"
-
 
 class GLEngineProxy {
     friend class GLLock;
@@ -46,6 +44,13 @@ public:
     // Functions which run on the main thread, but needs to access GL resources
     std::shared_ptr<GLShader> CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
 
+    // Other function on main thread
+    template<typename FuncT>
+    void SafeCall(FuncT func) {
+        GLLock lock(*this, GLLock::MainThread);
+        func();
+    }
+
     // Convenience command functions
     void ClearSMBXSprites();
     void ClearLunaTexture(const BMPBox& bmp);
@@ -68,14 +73,14 @@ public:
 class GLLock {
     friend class GLEngineProxy;
 private:
-    std::unique_lock<std::recursive_mutex> internal_lock;
-protected:
+    std::unique_lock<std::recursive_mutex> internal_lock;    
+public:
     enum GLLockType {
         QueueThread,
         MainThread
     };
-    
-    inline GLLock(GLEngineProxy& engineToLock, GLLockType type);
+
+    GLLock(GLEngineProxy& engineToLock, GLLockType type);
 };
 
 // Instance

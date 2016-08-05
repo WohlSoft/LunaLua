@@ -494,6 +494,58 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
     if (shader) {
         obj->mShader = shader->getInternalShader();
+
+        bool success = false;
+        auto collectVars = [L, &success](std::unordered_map<GLint, GLEngineCmd_LuaDraw::LuaDrawShaderEntry>& mapTo, const luabind::object& varTbl, const std::string& typeOfVar) -> void {
+            if (!varTbl.is_valid()) // If it is nil, then just skip
+            {
+                success = true;
+                return;
+            }
+
+            int typeVal = luabind::type(varTbl);
+            if (typeVal == LUA_TNIL) {  // If it is nil, then just skip
+                success = true;
+                return;
+            }
+            if (typeVal != LUA_TTABLE) {
+                luaL_error(L, (typeOfVar + " is not a table (internal error)").c_str());
+                return;
+            }
+                
+            for (luabind::iterator i(varTbl), end; i != end; ++i) {
+                // i->key()
+                luabind::object val = *i;
+
+                // Values
+                unsigned int data;
+                GLenum glType;
+                LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, data);
+                LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, glType);
+
+                // Keys
+                luabind::object key = i.key();
+                GLint location;
+                try {
+                    location = luabind::object_cast<GLint>(key);
+                }
+                catch (luabind::cast_failed&) {
+                    luaL_error(L, (typeOfVar + " key is invalid (internal error)").c_str());
+                    return;
+                }
+
+                mapTo.insert({ location,{ glType, reinterpret_cast<void*>(data) } });
+            }
+            success = true;
+        };
+
+        collectVars(obj->mUniforms, namedArgs["uniforms"], "Uniform");
+        if (!success)
+            return;
+        success = false;
+        collectVars(obj->mAttributes, namedArgs["attributes"], "Attribute");
+        if (!success)
+            return;
     }
 
     gLunaRender.GLCmd(obj, priority);
