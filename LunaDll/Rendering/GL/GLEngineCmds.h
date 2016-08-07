@@ -3,11 +3,12 @@
 
 #include <windows.h>
 #include <cstdint>
+#include <vector>
 #include <GL/glew.h>
+
 #include "../BMPBox.h"
 #include "../FrameCapture.h"
-#include <unordered_map>
-#include <algorithm>
+#include "../Shaders/GLShaderVariableEntry.h"
 
 class GLEngine;
 class GLShader;
@@ -123,8 +124,8 @@ public:
     const BMPBox* mBmp;
     std::shared_ptr<CaptureBuffer> mCapBuff;
     std::shared_ptr<GLShader> mShader;
-    std::unordered_map<GLint, LuaDrawShaderEntry> mAttributes;
-    std::unordered_map<GLint, LuaDrawShaderEntry> mUniforms;
+    std::vector<GLShaderVariableEntry> mAttributes;
+    std::vector<GLShaderVariableEntry> mUniforms;
     float mColor[4];
 
     GLuint mType;
@@ -148,12 +149,6 @@ public:
             free((void*)mVertColor);
             mVertColor = NULL;
         }
-
-        auto freeShaderEntry = [](const std::pair<const GLint, LuaDrawShaderEntry> nextPair) {
-            free(nextPair.second.data);
-        };
-        std::for_each(mAttributes.begin(), mAttributes.end(), freeShaderEntry);
-        std::for_each(mUniforms.begin(), mUniforms.end(), freeShaderEntry);
     }
 };
 

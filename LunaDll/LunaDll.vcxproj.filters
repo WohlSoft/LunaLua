@@ -550,6 +550,12 @@
     <ClInclude Include="Rendering\Shaders\GLShaderAttributeInfo.h">
       <Filter>Rendering\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Shaders\GLShaderVariableEntry.h">
+      <Filter>Rendering\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h">
+      <Filter>Rendering\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1053,6 +1059,9 @@
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Shaders\GLShaderUniformInfo.cpp">
+      <Filter>Rendering\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp">
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
   </ItemGroup>

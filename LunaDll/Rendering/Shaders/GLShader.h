@@ -24,6 +24,7 @@ private:
 
 public:
     GLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+    GLShader(const std::string& name, const std::string& fragmentSource);
     GLShader(const GLShader& other) = delete;
     ~GLShader();
 
@@ -37,8 +38,8 @@ public:
     void bind();
     void unbind();
 
-    void applyAttribute(GLint location, GLenum type, void* data);
-    void applyUniform(GLint location, GLenum type, void* data);
+    void applyAttribute(const GLShaderVariableEntry& entry);
+    void applyUniform(const GLShaderVariableEntry& entry);
 
 private:
     void load();
@@ -80,13 +81,6 @@ private:
         return results;
     }
 
-    union UniversalArray {
-        float* farr;
-        double* darr;
-        int* iarr;
-        unsigned int* uiarr;
-        void* data;
-    };
 
 };
 

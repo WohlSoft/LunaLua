@@ -496,7 +496,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
         obj->mShader = shader->getInternalShader();
 
         bool success = false;
-        auto collectVars = [L, &success](std::unordered_map<GLint, GLEngineCmd_LuaDraw::LuaDrawShaderEntry>& mapTo, const luabind::object& varTbl, const std::string& typeOfVar) -> void {
+        auto collectVars = [L, &success](std::vector<GLShaderVariableEntry>& mapTo, const luabind::object& varTbl, GLShaderVariableType typeOfVar) -> void {
             if (!varTbl.is_valid()) // If it is nil, then just skip
             {
                 success = true;
@@ -509,7 +509,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
                 return;
             }
             if (typeVal != LUA_TTABLE) {
-                luaL_error(L, (typeOfVar + " is not a table (internal error)").c_str());
+                luaL_error(L, (std::string(getGLShaderVariableTypeName(typeOfVar)) + " is not a table (internal error)").c_str());
                 return;
             }
                 
@@ -525,25 +525,26 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
                 // Keys
                 luabind::object key = i.key();
-                GLint location;
+                GLuint location;
                 try {
-                    location = luabind::object_cast<GLint>(key);
+                    location = luabind::object_cast<GLuint>(key);
                 }
                 catch (luabind::cast_failed&) {
-                    luaL_error(L, (typeOfVar + " key is invalid (internal error)").c_str());
+                    luaL_error(L, (std::string(getGLShaderVariableTypeName(typeOfVar)) + " key is invalid (internal error)").c_str());
                     return;
                 }
 
-                mapTo.insert({ location,{ glType, reinterpret_cast<void*>(data) } });
+                // GLShaderVariableType type, GLenum typeData, size_t m_count, void* data
+                mapTo.emplace_back(typeOfVar, location, glType, 1u, reinterpret_cast<void*>(data));
             }
             success = true;
         };
 
-        collectVars(obj->mUniforms, namedArgs["uniforms"], "Uniform");
+        collectVars(obj->mUniforms, namedArgs["uniforms"], GLShaderVariableType::Uniform);
         if (!success)
             return;
         success = false;
-        collectVars(obj->mAttributes, namedArgs["attributes"], "Attribute");
+        collectVars(obj->mAttributes, namedArgs["attributes"], GLShaderVariableType::Attribute);
         if (!success)
             return;
     }

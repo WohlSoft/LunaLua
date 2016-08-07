@@ -1,7 +1,7 @@
 #include "GLShaderVariableInfo.h"
 
 
-GLShaderVariableInfo::GLShaderVariableInfo(VariableType varType, GLint id, GLint sizeOfVariable, GLint type, const std::string& name) :
+GLShaderVariableInfo::GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint sizeOfVariable, GLint type, const std::string& name) :
     m_varType(varType),
     m_id(id),
     m_sizeOfVariable(sizeOfVariable),
@@ -12,7 +12,7 @@ GLShaderVariableInfo::GLShaderVariableInfo(VariableType varType, GLint id, GLint
 GLShaderVariableInfo::~GLShaderVariableInfo()
 {}
 
-GLShaderVariableInfo::VariableType GLShaderVariableInfo::getVarType() const
+GLShaderVariableType GLShaderVariableInfo::getVarType() const
 {
     return m_varType;
 }

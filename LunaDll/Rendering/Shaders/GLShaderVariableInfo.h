@@ -2,6 +2,7 @@
 
 #include <gl/glew.h>
 #include <string>
+#include "GLShaderVariableType.h"
 
 class GLShaderVariableInfo
 {
@@ -10,10 +11,10 @@ public:
         Attribute,
         Uniform
     };
-    GLShaderVariableInfo(VariableType varType, GLint id, GLint sizeOfVariable, GLint type, const std::string& name);
+    GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint sizeOfVariable, GLint type, const std::string& name);
     ~GLShaderVariableInfo();
 
-    VariableType getVarType() const;
+    GLShaderVariableType getVarType() const;
     GLint getId() const;
     GLint getSizeOfVariable() const;
     GLenum getType() const;
@@ -21,7 +22,7 @@ public:
 
 
 private:
-    VariableType m_varType;
+    GLShaderVariableType m_varType;
     GLint m_id;
     GLint m_sizeOfVariable;
     GLenum m_type;

@@ -6,7 +6,6 @@
 #include "GLContextManager.h"
 #include "../Shaders/GLShader.h"
 
-
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
@@ -146,14 +145,12 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     if (mShader) {
         mShader->bind();
         GLERRORCHECK();
-
-        for (const auto& nextPair : mAttributes) {
-            mShader->applyAttribute(nextPair.first, nextPair.second.type, nextPair.second.data);
-        }
-        for (const auto& nextPair : mUniforms) {
-            mShader->applyUniform(nextPair.first, nextPair.second.type, nextPair.second.data);
-        }
         
+        for (const auto& nextAttr : mAttributes)
+            mShader->applyAttribute(nextAttr);
+        for (const auto& nextUniform : mUniforms)
+            mShader->applyUniform(nextUniform);
+
         GLERRORCHECK();
     }
     

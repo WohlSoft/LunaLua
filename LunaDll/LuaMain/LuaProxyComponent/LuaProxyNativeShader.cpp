@@ -65,7 +65,7 @@ luabind::object convertShaderVariableInfo(const GLShaderVariableInfo* info, lua_
     infoTbl["name"] = info->getName();
     infoTbl["sizeOfVariable"] = info->getSizeOfVariable();
     infoTbl["type"] = info->getType();
-    infoTbl["varInfoType"] = info->getVarType();
+    infoTbl["varInfoType"] = static_cast<int>(info->getVarType());
     return infoTbl;
 }
 
