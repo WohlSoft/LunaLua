@@ -44,7 +44,8 @@ GLShader::GLShader(const std::string& name, const std::string& fragmentSource) :
 
 GLShader::~GLShader()
 {
-    glDeleteProgram(m_shaderID);
+    if(m_isValid)
+        glDeleteProgram(m_shaderID);
 }
 
 
@@ -178,6 +179,7 @@ void GLShader::load()
         if (!compileShaderSource(fragment, m_fragmentSource))
         {
             m_lastErrorMsg = getLastShaderError(fragment);
+            glDeleteShader(vertex);
             glDeleteShader(fragment);
             GLERRORCHECK();
             return;
