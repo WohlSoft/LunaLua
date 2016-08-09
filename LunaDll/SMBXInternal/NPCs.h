@@ -498,6 +498,12 @@ namespace NPC {
 	void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
 	void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
 
+    void InitProperties();
+    uint32_t GetVulnerableHarmTypes(int id);
+    void SetVulnerableHarmTypes(int id, uint32_t value);
+    bool GetSpinjumpSafe(int id);
+    void SetSpinjumpSafe(int id, bool value);
+
     static const short MAX_ID = 300;
 }
 

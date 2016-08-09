@@ -112,7 +112,7 @@ void Blocks::HideAll(int type) {
 }
 
 static bool isBlockBumpable[Block::MAX_ID] = {false};
-void Blocks::InitBlockProperties() {
+void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
     {
         SetBlockBumpable(id, false);
