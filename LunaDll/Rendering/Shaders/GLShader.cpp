@@ -100,6 +100,7 @@ void GLShader::applyAttribute(const GLShaderVariableEntry& entry)
     GLERRORCHECK();
 }
 
+
 void GLShader::applyUniform(const GLShaderVariableEntry& entry)
 {
     

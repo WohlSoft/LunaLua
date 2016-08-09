@@ -520,8 +520,10 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
                 // Values
                 unsigned int data;
                 GLenum glType;
+                unsigned int count;
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, data);
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, glType);
+                LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, count);
 
                 // Keys
                 luabind::object key = i.key();
@@ -535,7 +537,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
                 }
 
                 // GLShaderVariableType type, GLenum typeData, size_t m_count, void* data
-                mapTo.emplace_back(typeOfVar, location, glType, 1u, reinterpret_cast<void*>(data));
+                mapTo.emplace_back(typeOfVar, location, glType, count, reinterpret_cast<void*>(data));
             }
             success = true;
         };

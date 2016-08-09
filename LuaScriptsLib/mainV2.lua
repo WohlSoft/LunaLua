@@ -191,26 +191,53 @@ local function initFFIBasedAPIs()
             if(varInfo == nil)then
                 error("Invalid " .. variableTypeName .. " " .. varName .. " (does not exists)", 3)
             end
+            -- TODO: Support multi-dimensional arrays
+            if(varInfo.arrayDepth > 1)then
+                error("Multi-dimensional arrays are not supported yet!", 3)
+            end
             
             local variableType = varInfo.type
             local glTypeOfVariable = Graphics.glTypeTable[variableType]
             local glTypeOfVariableInArg = type(varValue)
-            if(glTypeOfVariableInArg ~= glTypeOfVariable.glType)then
-                error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected " .. glTypeOfVariable.glType .. " got " .. type(varValue) .. ")", 3)
-            end
-            if(glTypeOfVariableInArg == "table")then
-                if(#varValue ~= glTypeOfVariable.glTableSize)then
-                    error("Invalid table-size for " .. variableTypeName .. " " .. varName .. " (expected size " .. glTypeOfVariable.glTableSize .. " got size " .. #varValue .. ")", 3)
+            
+            local flatternedResult = nil -- This array will be the input array
+            if(glTypeOfVariable.glType == "number")then -- myUniformVar = 1.0
+                if(glTypeOfVariableInArg == "number")then
+                    flatternedResult = {varValue}
+                elseif(glTypeOfVariableInArg == "table")then -- myUniformVar = {1.0, 1.0, 1.0}
+                    flatternedResult = varValue
+                else
+                    error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected number or table got " .. type(varValue) .. ")", 3)
+                end
+            elseif(glTypeOfVariable.glType == "table")then
+                if(glTypeOfVariableInArg ~= "table")then
+                    error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected table got " .. type(varValue) .. ")", 3)
+                end
+                local firstElem = varValue[1]
+                local typeOfFirstElem = type(firstElem)
+                if(typeOfFirstElem == "number")then -- myUniformVar = {1.0, 1.0, 1.0, 1.0}
+                    flatternedResult = varValue
+                elseif(typeOfFirstElem == "table")then -- myUniformVar = {{1.0, 1.0}, {1.0, 1.0}}
+                    flatternedResult = {}
+                    for i = 1, #varValue do
+                        local nextElem = varValue[i]
+                        for j = 1, #nextElem do
+                            flatternedResult[#flatternedResult + 1] = nextElem[j]
+                        end
+                    end
+                else
+                    error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected number or table got " .. type(varValue) .. ")", 3)
                 end
             end
-            
-            local valueToConvert = varValue
-            local sizeOfArray = glTypeOfVariable.glTableSize or 1
-            if(type(varValue) ~= "table")then
-                valueToConvert = {valueToConvert}
+
+            local sizeOfType = glTypeOfVariable.glTableSize or 1
+            local totalNumberOfExpectedElements = varInfo.arrayCount * sizeOfType
+            local actualNumberOfExpectedElements = #flatternedResult
+            if(totalNumberOfExpectedElements ~= actualNumberOfExpectedElements)then
+                error("Invalid number of elements for " .. variableTypeName .. " " .. varName .. " (expected " .. totalNumberOfExpectedElements .. " [" .. varInfo.arrayCount .. "x" .. sizeOfType .. "], got " .. actualNumberOfExpectedElements .. ")", 3)
             end
             
-            formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(valueToConvert, sizeOfArray, glTypeOfVariable.rawType)}
+            formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(flatternedResult, totalNumberOfExpectedElements, glTypeOfVariable.rawType), count = varInfo.arrayCount}
         end
         return formattedReturn
     end

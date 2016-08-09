@@ -11,21 +11,24 @@ public:
         Attribute,
         Uniform
     };
-    GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint sizeOfVariable, GLint type, const std::string& name);
+    GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint arrayCount, GLint type, const std::string& name);
     ~GLShaderVariableInfo();
 
     GLShaderVariableType getVarType() const;
     GLint getId() const;
-    GLint getSizeOfVariable() const;
+    GLint arrayCount() const;
     GLenum getType() const;
-    std::string getName() const;
-
+    std::string getName() const; // The name with array signature, if it is an array
+    std::string getRawName() const; // The name without any array signature
+    size_t getArrayDepth() const; // If it is 0, then it is not an array
 
 private:
     GLShaderVariableType m_varType;
     GLint m_id;
-    GLint m_sizeOfVariable;
+    GLint m_arrayCount;
     GLenum m_type;
     std::string m_name;
+    std::string m_rawName;
+    size_t m_arrayDepth;
 };
 

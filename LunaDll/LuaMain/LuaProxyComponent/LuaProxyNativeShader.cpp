@@ -63,9 +63,11 @@ luabind::object convertShaderVariableInfo(const GLShaderVariableInfo* info, lua_
     luabind::object infoTbl = luabind::newtable(L);
     infoTbl["id"] = info->getId();
     infoTbl["name"] = info->getName();
-    infoTbl["sizeOfVariable"] = info->getSizeOfVariable();
+    infoTbl["rawName"] = info->getRawName();
+    infoTbl["arrayCount"] = info->arrayCount();
     infoTbl["type"] = info->getType();
     infoTbl["varInfoType"] = static_cast<int>(info->getVarType());
+    infoTbl["arrayDepth"] = info->getArrayDepth();
     return infoTbl;
 }
 
@@ -78,7 +80,7 @@ luabind::object LuaProxy::NativeShader::getAttributeInfo(lua_State* L) const
     
     luabind::object resultTbl = luabind::newtable(L);
     for (const GLShaderAttributeInfo& nextInfo : m_cachedAttributeInfo) // TODO: Make it named --> tbl[attribute_name] = {}
-        resultTbl[nextInfo.getName()] = convertShaderVariableInfo(&nextInfo, L);
+        resultTbl[nextInfo.getRawName()] = convertShaderVariableInfo(&nextInfo, L);
 
     return resultTbl;
     
@@ -93,7 +95,7 @@ luabind::object LuaProxy::NativeShader::getUniformInfo(lua_State* L) const
 
     luabind::object resultTbl = luabind::newtable(L);
     for(const GLShaderUniformInfo& nextInfo : m_cachedUniformInfo) // TODO: Make it named --> tbl[uniform_name] = {}
-        resultTbl[nextInfo.getName()] = convertShaderVariableInfo(&nextInfo, L);
+        resultTbl[nextInfo.getRawName()] = convertShaderVariableInfo(&nextInfo, L);
 
     return resultTbl;
 }
