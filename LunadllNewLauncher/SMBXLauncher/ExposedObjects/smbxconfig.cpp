@@ -14,6 +14,8 @@ SMBXConfig::SMBXConfig(QObject *parent) :
 {
     m_Autostart = new AutostartConfig();
     m_Controls = new ControlConfig();
+    emit AutostartUpdated();
+    emit ControlsUpdated();
 }
 
 SMBXConfig::~SMBXConfig()
@@ -228,4 +230,24 @@ void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
     if (saveFile.exists()){
         saveFile.remove();
     }
+}
+
+void SMBXConfig::runSMBX()
+{
+    emit runSMBXExecuted();
+}
+
+void SMBXConfig::runSMBXEditor()
+{
+    emit runSMBXEditorExecuted();
+}
+
+void SMBXConfig::runPGEEditor()
+{
+    emit runPGEEditorExecuted();
+}
+
+void SMBXConfig::loadEpisodeWebpage(const QString &file)
+{
+    emit loadEpisodeWebpageExecuted(file);
 }

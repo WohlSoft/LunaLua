@@ -2,10 +2,11 @@
 #define MAINLAUNCHERWINDOW_H
 
 #include <QMainWindow>
-#include <smbxconfig.h>
 #include <QScopedPointer>
 #include <QProcess>
 #include <QUrl>
+
+#include "ExposedObjects/smbxconfig.h"
 #include "launcherconfiguration.h"
 
 namespace Ui {
@@ -22,7 +23,7 @@ public:
 
 public slots:
     //Webkit Stuff
-    void addJavascriptObject();
+    void loadJavascriptBridge();
     void loadDefaultWebpage();
     void loadConfig(const QString& configName);
 

@@ -29,7 +29,16 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     external data, for example, when displaying a list of results.
     */
 
+
+
     ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
+            [this](bool ok){
+        if(ok)
+        {
+            this->loadJavascriptBridge();
+        }
+    });
 }
 
 MainLauncherWindow::~MainLauncherWindow()
@@ -37,19 +46,55 @@ MainLauncherWindow::~MainLauncherWindow()
     delete ui;
 }
 
-void MainLauncherWindow::addJavascriptObject()
+void MainLauncherWindow::loadJavascriptBridge()
 {
+    QWebEnginePage* currentPage = ui->webLauncherPage->page();
+    qDebug() << "Init Javascript Bridge";
+
+
+    // Get or create new web channel
+    QWebChannel * channel = currentPage->webChannel();
+    if(channel == nullptr)
+        channel = new QWebChannel(currentPage);
+
+    qDebug() << "Placing Launcher object!";
+    if(m_smbxConfig)
+        channel->deregisterObject(m_smbxConfig.data());
     m_smbxConfig.reset(new SMBXConfig());
-
-    QWebChannel * channel = ui->webLauncherPage->page()->webChannel();//new QWebChannel(ui->webLauncherPage->page());
-    //ui->webLauncherPage->page()->setWebChannel(channel);
     channel->registerObject(QString("Launcher"), m_smbxConfig.data());
-    //ui->webLauncherPage->page()->addToJavaScriptWindowObject("Launcher", m_smbxConfig.data());
 
-    connect(m_smbxConfig.data(), SIGNAL(runSMBX()), this, SLOT(runSMBX()));
-    connect(m_smbxConfig.data(), SIGNAL(runSMBXEditor()), this, SLOT(runSMBXEditor()));
-    connect(m_smbxConfig.data(), SIGNAL(runPGEEditor()), this, SLOT(runPGEEditor()));
-    connect(m_smbxConfig.data(), SIGNAL(loadEpisodeWebpage(QString)), this, SLOT(loadEpisodeWebpage(QString)));
+    qDebug() << "Setting web channel!";
+    currentPage->setWebChannel(nullptr); // This is a bit hackish, but without it the 'qt' global object would not be set
+    currentPage->setWebChannel(channel);
+
+    qDebug() << "Connecting QObject signal & slots";
+    connect(m_smbxConfig.data(), &SMBXConfig::runSMBXExecuted, this, &MainLauncherWindow::runSMBX);
+    connect(m_smbxConfig.data(), &SMBXConfig::runSMBXEditorExecuted, this, &MainLauncherWindow::runSMBXEditor);
+    connect(m_smbxConfig.data(), &SMBXConfig::runPGEEditorExecuted, this, &MainLauncherWindow::runPGEEditor);
+    connect(m_smbxConfig.data(), &SMBXConfig::loadEpisodeWebpageExecuted, this, &MainLauncherWindow::loadEpisodeWebpage);
+
+    qDebug() << "Running init javascript!";
+    currentPage->runJavaScript(
+                "var head = document.getElementsByTagName('head')[0];"
+                ""
+                "var qWebchannelImporter = document.createElement('script');"
+                "qWebchannelImporter.type = 'text/javascript';"
+                "qWebchannelImporter.src = 'qrc:///qtwebchannel/qwebchannel.js';"
+                ""
+                "var callback = function(){"
+                "    console.log('Script loaded!');"
+                "    new QWebChannel(qt.webChannelTransport, function (channel) {"
+                "        console.log('QWebChannel works!');"
+                "        Launcher = channel.objects.Launcher;"
+                "        if(typeof onInitLauncher === 'function'){"
+                "            onInitLauncher(); "
+                "        }"
+                "    });"
+                "};"
+                "qWebchannelImporter.onload = callback;"
+                ""
+                "head.appendChild(qWebchannelImporter);"
+    );
 }
 
 void MainLauncherWindow::loadDefaultWebpage()
@@ -164,61 +209,67 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::checkForUpdates()
 {
-    if(NetworkUtils::checkInternetConnection(4000)){
-        QJsonDocument output;
-        LauncherConfiguration::UpdateCheckerErrCodes err;
-        QString errDesc;
-        if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
-            auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-                jsonErrHandler(errType, errChild);
-            };
+    if(!m_launcherSettings->hasValidUpdateSite())
+        return;
 
-            if(!output.isObject()){
-                errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
-                return;
+    if(!NetworkUtils::checkInternetConnection(4000))
+        return;
+
+
+    QJsonDocument output;
+    LauncherConfiguration::UpdateCheckerErrCodes err;
+    QString errDesc;
+    if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
+        auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
+            jsonErrHandler(errType, errChild);
+        };
+
+        if(!output.isObject()){
+            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+            return;
+        }
+
+        QJsonObject outputObj = output.object();
+        if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
+        if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
+        if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
+
+        QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
+        if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
+        if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
+
+        if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
+                                                currentVersionObj.value("version-2").toInt(),
+                                                currentVersionObj.value("version-3").toInt(),
+                                                currentVersionObj.value("version-4").toInt())){
+            QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
+            QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
+            if(urlOfUpdatePage.isValid()){
+                QDesktopServices::openUrl(urlOfUpdatePage);
             }
-
-            QJsonObject outputObj = output.object();
-            if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
-            if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
-            if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
-
-            QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
-            if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
-
-            if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
-                                                    currentVersionObj.value("version-2").toInt(),
-                                                    currentVersionObj.value("version-3").toInt(),
-                                                    currentVersionObj.value("version-4").toInt())){
-                QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
-                QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
-                if(urlOfUpdatePage.isValid()){
-                    QDesktopServices::openUrl(urlOfUpdatePage);
-                }
+        }
+    }else{
+        switch (err) {
+        case LauncherConfiguration::UERR_INVALID_JSON:
+            QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
+            break;
+        case LauncherConfiguration::UERR_INVALID_URL:
+            QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
+            break;
+        default:
+            QString errMsg = m_launcherSettings->getErrConnectionMsg();
+            if(errMsg != ""){
+                QMessageBox::warning(this, "Error", m_launcherSettings->getErrConnectionMsg());
             }
-        }else{
-            switch (err) {
-            case LauncherConfiguration::UERR_INVALID_JSON:
-                QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
-                break;
-            case LauncherConfiguration::UERR_INVALID_URL:
-                QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
-                break;
-            default:
-                QString errMsg = m_launcherSettings->getErrConnectionMsg();
-                if(errMsg != ""){
-                    QMessageBox::warning(this, "Error", m_launcherSettings->getErrConnectionMsg());
-                }
-                QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
-                if(urlOfErrorPage.isValid()){
-                    QDesktopServices::openUrl(urlOfErrorPage);
-                }
+            QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
+            if(urlOfErrorPage.isValid()){
+                QDesktopServices::openUrl(urlOfErrorPage);
             }
         }
     }
+
 }
 
 void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &errChild)
@@ -260,6 +311,12 @@ void MainLauncherWindow::writeLunaConfig()
 
 void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList<QString> &args)
 {
+    QFileInfo exeFileInfo(smbxExeFile);
+    if(!exeFileInfo.exists()){
+        qWarning() << "SMBX file does not exist!";
+        return;
+    }
+
     QList<QString> runArgs(args);
     runArgs << "--patch";
 

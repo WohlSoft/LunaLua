@@ -22,11 +22,13 @@ QString LauncherConfiguration::getErrConnectionUrl() const
 QJsonDocument LauncherConfiguration::generateDefault()
 {
     return QJsonDocument(
-                QJsonObject
+    QJsonObject
         {
             {"game", QJsonObject
                 {
                     {"update-check-website", "."},
+                    {"update-error-website", "."},
+                    {"update-error-message", "<Default error message>"},
                     {"version-1", 0},
                     {"version-2", 0},
                     {"version-3", 0},
@@ -123,6 +125,11 @@ bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDoc
 
     errCode = UERR_NO_ERR;
     return true;
+}
+
+bool LauncherConfiguration::hasValidUpdateSite() const
+{
+    return !(updateCheckWebsite.isEmpty() || updateCheckWebsite == ".");
 }
 
 bool LauncherConfiguration::hasHigherVersion(int ver1, int ver2, int ver3, int ver4)

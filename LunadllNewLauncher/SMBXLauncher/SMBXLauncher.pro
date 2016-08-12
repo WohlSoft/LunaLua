@@ -16,8 +16,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainlauncherwindow.cpp \
-    smbxconfig.cpp \
-    autostartconfig.cpp \
+    ExposedObjects/smbxconfig.cpp \
+    ExposedObjects/autostartconfig.cpp \
     PGE_File_Formats/file_formats.cpp \
     PGE_File_Formats/file_rw_lvl.cpp \
     PGE_File_Formats/file_rw_lvlx.cpp \
@@ -38,7 +38,7 @@ SOURCES += main.cpp\
     PGE_File_Formats/smbx64.cpp \
     PGE_File_Formats/smbx64_cnf_filedata.cpp \
     PGE_File_Formats/wld_filedata.cpp \
-    controlconfig.cpp \
+    ExposedObjects/controlconfig.cpp \
     launcherconfiguration.cpp \
     ../../LunaLoader/LunaLoaderPatch.cpp \
     NetworkUtils/networkutils.cpp \
@@ -47,8 +47,8 @@ SOURCES += main.cpp\
     PGE_File_Formats/ConvertUTF.c
 
 HEADERS  += mainlauncherwindow.h \
-    smbxconfig.h \
-    autostartconfig.h \
+    ExposedObjects/smbxconfig.h \
+    ExposedObjects/autostartconfig.h \
     PGE_File_Formats/file_formats.h \
     PGE_File_Formats/file_strlist.h \
     PGE_File_Formats/lvl_filedata.h \
@@ -63,7 +63,7 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/smbx64_cnf_filedata.h \
     PGE_File_Formats/smbx64_macro.h \
     PGE_File_Formats/wld_filedata.h \
-    controlconfig.h \
+    ExposedObjects/controlconfig.h \
     launcherconfiguration.h \
     qjsonutil.h \
     NetworkUtils/networkutils.h \

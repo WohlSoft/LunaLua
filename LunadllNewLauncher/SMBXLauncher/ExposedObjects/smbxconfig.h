@@ -2,16 +2,16 @@
 #define SMBXCONFIG_H
 
 #include <QObject>
-#include <autostartconfig.h>
 #include <QVariant>
 
-#include <controlconfig.h>
+#include "autostartconfig.h"
+#include "controlconfig.h"
 
 class SMBXConfig : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(AutostartConfig* Autostart READ Autostart)
-    Q_PROPERTY(ControlConfig* Controls READ Controls)
+    Q_PROPERTY(AutostartConfig* Autostart READ Autostart NOTIFY AutostartUpdated)
+    Q_PROPERTY(ControlConfig* Controls READ Controls NOTIFY ControlsUpdated)
 public:
     explicit SMBXConfig(QObject *parent = 0);
     ~SMBXConfig();
@@ -36,11 +36,20 @@ public slots:
     QVariantList getSaveInfo(const QString& directoryName);
     void deleteSaveSlot(const QString& directoryName, int slot);
 
-signals:
     void runSMBX();
     void runSMBXEditor();
     void runPGEEditor();
     void loadEpisodeWebpage(const QString& file);
+
+
+signals:
+    void runSMBXExecuted();
+    void runSMBXEditorExecuted();
+    void runPGEEditorExecuted();
+    void loadEpisodeWebpageExecuted(const QString& file);
+
+    void AutostartUpdated();
+    void ControlsUpdated();
 
 private:
 
