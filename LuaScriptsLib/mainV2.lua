@@ -323,6 +323,51 @@ local function initFFIBasedAPIs()
             end
         }
         Block.bumpable = setmetatable({}, bumpableMetatable);
+        
+        local harmTypeMap = {
+            [HARM_TYPE_JUMP]=true,
+            [HARM_TYPE_FROMBELOW]=true,
+            [HARM_TYPE_NPC]=true,
+            [HARM_TYPE_PROJECTILE_USED]=true,
+            [HARM_TYPE_LAVA]=true,
+            [HARM_TYPE_HELD]=true,
+            [HARM_TYPE_TAIL]=true,
+            [HARM_TYPE_SPINJUMP]=true,
+            [HARM_TYPE_OFFSCREEN]=true,
+            [HARM_TYPE_SWORD]=true
+        }
+        local vulnerableHarmTypesMetatable = {
+            __index = function(tbl, id)
+                local mskVal = NPC._getVulnerableHarmTypes(id)
+                local tblVal = {}
+                for v,_ in pairs(harmTypeMap) do
+                    if (bit.band(mskVal, bit.lshift(1, v)) ~= 0) then
+                        table.insert(tblVal, v)
+                    end
+                end
+                return tblVal
+            end,
+            __newindex = function(tbl, id, tblVal)
+                local mskVal = 0
+                for _,v in ipairs(tblVal) do
+                    if harmTypeMap[v] then
+                        mskVal = bit.bor(mskVal, bit.lshift(1, v))
+                    end
+                end
+                NPC._setVulnerableHarmTypes(id, mskVal)
+            end
+        }
+        NPC.vulnerableHarmTypes = setmetatable({}, vulnerableHarmTypesMetatable);
+        
+        local spinjumpSafeMetatable = {
+            __index = function(tbl, id)
+                return NPC._getSpinjumpSafe(id)
+            end,
+            __newindex = function(tbl, id, val)
+                NPC._setSpinjumpSafe(id, val)
+            end
+        }
+        NPC.spinjumpSafe = setmetatable({}, spinjumpSafeMetatable);
     end
     
     -- Limit access to FFI

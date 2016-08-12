@@ -25,6 +25,7 @@
 #include "../../Rendering/RenderOps/RenderStringOp.h"
 
 #include "../../SMBXInternal/NPCs.h"
+#include "../../SMBXInternal/Blocks.h"
 
 #include "../PerfTracker.h"
 
@@ -1287,6 +1288,84 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
         pop ecx
         pop eax
         push 0x9DB240
+        ret
+    }
+}
+
+static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)
+{
+    if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
+{
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+        push [ebp + 0x10] // Args #3
+        push [ebp + 0xC] // Args #2
+        push esi // Args #1
+        call runtimeHookNPCVulnerability
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        mov eax, dword ptr ds : [0xB25D14]
+        push 0xA28FE8
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        push 0xA2FA6F
+        ret
+    }
+}
+
+static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
+{
+    if (NPC::GetSpinjumpSafe(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
+{
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+        lea edx, dword ptr ds : [eax + edx * 8]
+        push edx // Args #1
+        call runtimeHookNPCSpinjumpSafe
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        push 0x9AA9EA
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        push 0x9AA365
         ret
     }
 }

@@ -114,3 +114,62 @@ void NPC::AllFace(int identity, int section, double x) {
 		}
 	}	
 }
+
+static bool isSpinjumpSafe[NPC::MAX_ID] = { false };
+static uint32_t vulnerableHarmTypes[NPC::MAX_ID] = { 0 };
+void NPC::InitProperties() {
+    for (int i = 1; i <= NPC::MAX_ID; i++)
+    {
+        SetVulnerableHarmTypes(i, 0);
+        SetSpinjumpSafe(i, false);
+    }
+
+    SetSpinjumpSafe(0xB3, true);
+    SetSpinjumpSafe(0x25, true);
+    SetSpinjumpSafe(0xB4, true);
+    SetSpinjumpSafe(0x26, true);
+    SetSpinjumpSafe(0x2A, true);
+    SetSpinjumpSafe(0x2B, true);
+    SetSpinjumpSafe(0x2C, true);
+    SetSpinjumpSafe(0x8, true);
+    SetSpinjumpSafe(0xC, true);
+    SetSpinjumpSafe(0x24, true);
+    SetSpinjumpSafe(0x33, true);
+    SetSpinjumpSafe(0x34, true);
+    SetSpinjumpSafe(0x35, true);
+    SetSpinjumpSafe(0x36, true);
+    SetSpinjumpSafe(0x4A, true);
+    SetSpinjumpSafe(0x5D, true);
+    SetSpinjumpSafe(0xC8, true);
+    SetSpinjumpSafe(0xCD, true);
+    SetSpinjumpSafe(0xCF, true);
+    SetSpinjumpSafe(0xC9, true);
+    SetSpinjumpSafe(0xC7, true);
+    SetSpinjumpSafe(0xF5, true);
+    SetSpinjumpSafe(0x100, true);
+    SetSpinjumpSafe(0x105, true);
+    SetSpinjumpSafe(0x113, true);
+    SetSpinjumpSafe(0x11D, true);
+    SetSpinjumpSafe(0x11E, true);
+    SetSpinjumpSafe(0x10E, true);
+}
+
+uint32_t NPC::GetVulnerableHarmTypes(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return 0;
+    return vulnerableHarmTypes[id - 1];
+}
+
+void NPC::SetVulnerableHarmTypes(int id, uint32_t value) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return;
+    vulnerableHarmTypes[id - 1] = value;
+}
+
+bool NPC::GetSpinjumpSafe(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return isSpinjumpSafe[id - 1];
+}
+
+void NPC::SetSpinjumpSafe(int id, bool value) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return;
+    isSpinjumpSafe[id - 1] = value;
+}

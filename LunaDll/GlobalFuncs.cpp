@@ -22,6 +22,7 @@
 #include "Input/Input.h"
 #include "SMBXInternal/Level.h"
 #include "SMBXInternal/Blocks.h"
+#include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
@@ -335,8 +336,9 @@ void ResetLunaModule()
 
     gHook_SkipTestMsgBox = false;
 
-    // Default block properties
-    Blocks::InitBlockProperties();
+    // Default properties
+    Blocks::InitProperties();
+    NPC::InitProperties();
 
     // Static default hitboxes and other values
     native_initStaticVals();

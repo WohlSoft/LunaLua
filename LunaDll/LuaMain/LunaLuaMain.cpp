@@ -1210,7 +1210,12 @@ void CLunaLua::bindAll()
                     def("getIntersecting", &LuaProxy::NPC::getIntersecting),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
+                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
+
+                    def("_getVulnerableHarmTypes", NPC::GetVulnerableHarmTypes),
+                    def("_setVulnerableHarmTypes", NPC::SetVulnerableHarmTypes),
+                    def("_getSpinjumpSafe", NPC::GetSpinjumpSafe),
+                    def("_setSpinjumpSafe", NPC::SetSpinjumpSafe)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::NPC, m_index))
                 .def(constructor<int>())
