@@ -1,11 +1,8 @@
 #include "networkutils.h"
 #include "qreplytimeout.h"
 
-#if _MSC_VER > 1800
-constexpr char timeoutURL[] = "http://google.com";
-#else
-const char timeoutURL[] = "http://google.com";
-#endif
+
+Q_CONSTEXPR char timeoutURL[] = "http://google.com";
 
 bool NetworkUtils::getString(const QUrl &url, QByteArray *out, QNetworkReply::NetworkError *error, int timeout)
 {

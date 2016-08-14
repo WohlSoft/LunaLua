@@ -41,10 +41,15 @@ SOURCES += main.cpp\
     ExposedObjects/controlconfig.cpp \
     launcherconfiguration.cpp \
     ../../LunaLoader/LunaLoaderPatch.cpp \
-    NetworkUtils/networkutils.cpp \
-    NetworkUtils/qreplytimeout.cpp \
+    Utils/networkutils.cpp \
+    Utils/qreplytimeout.cpp \
     PGE_File_Formats/file_rw_lvl_38a.cpp \
-    PGE_File_Formats/ConvertUTF.c
+    PGE_File_Formats/ConvertUTF.c \
+    Utils/filesysutils.cpp \
+    Utils/Json/extendedqjsonreader.cpp \
+    Utils/Json/qjsonparseexception.cpp \
+    Utils/Json/qjsonfileopenexception.cpp \
+    Utils/Json/qjsonvalidationexception.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -66,13 +71,19 @@ HEADERS  += mainlauncherwindow.h \
     ExposedObjects/controlconfig.h \
     launcherconfiguration.h \
     qjsonutil.h \
-    NetworkUtils/networkutils.h \
-    NetworkUtils/qreplytimeout.h \
+    Utils/networkutils.h \
+    Utils/qreplytimeout.h \
     PGE_File_Formats/charsetconvert.h \
     PGE_File_Formats/ConvertUTF.h \
     PGE_File_Formats/CSVReader.h \
     PGE_File_Formats/CSVReaderPGE.h \
-    PGE_File_Formats/CSVUtils.h
+    PGE_File_Formats/CSVUtils.h \
+    Utils/filesysutils.h \
+    Utils/Json/extendedqjsonreader.h \
+    Utils/Json/qjsonparseexception.h \
+    Utils/Json/qjsonfileopenexception.h \
+    Utils/Json/qjsonvalidationexception.h \
+    Utils/Json/qjsonextractor.h
 
 FORMS    += mainlauncherwindow.ui
 

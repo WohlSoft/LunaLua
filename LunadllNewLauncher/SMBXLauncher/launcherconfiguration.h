@@ -4,7 +4,9 @@
 #include <QJsonDocument>
 #include <QPair>
 #include <functional>
+
 #include "qjsonutil.h"
+#include "Utils/Json/extendedqjsonreader.h"
 
 class LauncherConfiguration
 {
@@ -30,7 +32,7 @@ public:
     LauncherConfiguration();
     LauncherConfiguration(const QJsonDocument &settingsToParse);
 
-    bool setConfigurationAndValidate(const QJsonDocument &settingsToParse, const std::function<void(VALIDATE_ERROR, const QString&)>& errFunc);
+    void setConfigurationAndValidate(ExtendedQJsonReader& settingsToParse);
 
     bool hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
     bool checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);

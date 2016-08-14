@@ -1,0 +1,25 @@
+#ifndef QJSONVALIDATIONEXCEPTION_H
+#define QJSONVALIDATIONEXCEPTION_H
+
+#include <stdexcept>
+#include <QString>
+
+class QJsonValidationException : public std::exception
+{
+public:
+    enum class ValidationError {
+        WrongType,
+        MissingType
+    };
+private:
+    QString m_fieldName;
+    ValidationError m_errorType;
+public:
+
+    QJsonValidationException(const QString& fieldName, ValidationError errorType);
+
+    QString fieldName() const;
+    ValidationError errorType() const;
+};
+
+#endif // QJSONVALIDATIONEXCEPTION_H

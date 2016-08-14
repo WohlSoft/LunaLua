@@ -1,7 +1,11 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
 #include "../../LunaLoader/LunaLoaderPatch.h"
-#include "NetworkUtils/networkutils.h"
+#include "Utils/networkutils.h"
+#include "Utils/filesysutils.h"
+#include "Utils/Json/extendedqjsonreader.h"
+#include "Utils/Json/qjsonfileopenexception.h"
+#include "Utils/Json/qjsonparseexception.h"
 
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
@@ -9,7 +13,6 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-//Still need a porting http://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,19 +20,6 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
-
-    //connect(ui->webLauncherPage->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
-    //connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
-    //ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebEnginePage::DelegateAllLinks);
-    /*
-    There is no way to connect a signal to run C++ code when a link is clicked.
-    However, link clicks can be delegated to the Qt application instead of having the HTML handler
-    engine process them by overloading the QWebEnginePage::acceptNavigationRequest() function.
-    This is necessary when an HTML document is used as part of the user interface, and not to display
-    external data, for example, when displaying a list of results.
-    */
-
-
 
     ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
@@ -104,52 +94,56 @@ void MainLauncherWindow::loadDefaultWebpage()
 
 void MainLauncherWindow::loadConfig(const QString &configName)
 {
-    auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-        jsonErrHandler(errType, errChild);
-    };
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
 
-    // Check for the launcher config dir
-    QDir launcherDir = QDir::current();
-    if(!launcherDir.exists("launcher"))
-        launcherDir.mkdir("launcher");
+    // Create launcher dir if not exist
+    QDir::current().mkdir("launcher");
 
     // Check for the main configuration file
     QFile configurationJSON("launcher/settings.json");
 
     // If not exist then write the configuration file
-    if(!configurationJSON.exists()){
-        if(configurationJSON.open(QIODevice::WriteOnly)){
-            configurationJSON.write(LauncherConfiguration::generateDefault().toJson());
-            configurationJSON.close();
-        }
-    }
+    FilesysUtils::writeDefaultIfNotExist(configurationJSON, LauncherConfiguration::generateDefault().toJson());
 
-    // The errors are surpressed.
-    if(configurationJSON.open(QIODevice::ReadOnly)){
-        QByteArray rawData = configurationJSON.readAll();
-
-        QJsonParseError jsonErrCode;
-        QJsonDocument jsonSettingsFile = QJsonDocument::fromJson(rawData, &jsonErrCode);
-        if(jsonErrCode.error != QJsonParseError::NoError){
-            QMessageBox::warning(this, "Error", QString("Failed to parse settings.json:\n") + jsonErrCode.errorString());
-            m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
-        }else{
+    // Game specific settings
+    try {
+        try {
+            ExtendedQJsonReader reader(configurationJSON);
             m_launcherSettings.reset(new LauncherConfiguration());
-            m_launcherSettings->setConfigurationAndValidate(jsonSettingsFile, errFunc);
+            m_launcherSettings->setConfigurationAndValidate(reader);
+        } catch (const QJsonValidationException& ex)  {
+            switch(ex.errorType()){
+            case QJsonValidationException::ValidationError::WrongType:
+                warnError(QString("Settings.json - wrong type for field:\n") + ex.fieldName());
+                break;
+            case QJsonValidationException::ValidationError::MissingType:
+                warnError(QString("Settings.json - missing field:\n") + ex.fieldName());
+                break;
+            default:
+                warnError(QString("Settings.json - unknown validation error:\n") + ex.fieldName());
+                break;
+            }
+            throw;
+        } catch (const QJsonParseException& ex) {
+           warnError(QString("Settings.json - failed to parse settings.json:\n") + ex.getParseError().errorString());
+            throw;
+        } catch (const QJsonFileOpenException&) {
+           warnError("Settings.json - failed to load config, using default!");
+            throw;
         }
-    }else{
-        QMessageBox::warning(this, "Error", "Failed to load config, using default!");
+    } catch(...) {
         m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
     }
 
+
+    // check for updates with the information from settings.json
     checkForUpdates();
 
     QSettings settingFile(configName, QSettings::IniFormat);
     settingFile.setIniCodec("UTF-8");
 
-
+    // Load launcher settings
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
         m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
@@ -179,18 +173,14 @@ void MainLauncherWindow::loadConfig(const QString &configName)
 void MainLauncherWindow::runSMBX()
 {
     writeLunaConfig();
-    QList<QString> args;
-    args << "--game";
-    internalRunSMBX(m_smbxExe, args);
+    internalRunSMBX(m_smbxExe, {"--game"});
     close();
 }
 
 void MainLauncherWindow::runSMBXEditor()
 {
     // Don't need to write luna config for editor
-    QList<QString> args;
-    args << "--leveleditor";
-    internalRunSMBX(m_smbxExe, args);
+    internalRunSMBX(m_smbxExe, {"--leveleditor"});
     close();
 }
 
@@ -278,6 +268,11 @@ void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &e
         QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
     if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
         QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
+}
+
+void MainLauncherWindow::warnError(const QString &msg)
+{
+    QMessageBox::warning(this, "Error", msg);
 }
 
 void MainLauncherWindow::openURL(QUrl url)
