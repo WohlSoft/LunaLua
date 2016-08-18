@@ -5,7 +5,6 @@
 #include <QPair>
 #include <functional>
 
-#include "qjsonutil.h"
 #include "Utils/Json/extendedqjsonreader.h"
 
 class LauncherConfiguration
@@ -35,8 +34,7 @@ public:
     void setConfigurationAndValidate(ExtendedQJsonReader& settingsToParse);
 
     bool hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
-    bool checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
-    static bool loadUpdateJson(const QString& checkWebsite, QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription);
+    ExtendedQJsonReader checkForUpdate();
 
     bool hasValidUpdateSite() const;
     QString getErrConnectionMsg() const;

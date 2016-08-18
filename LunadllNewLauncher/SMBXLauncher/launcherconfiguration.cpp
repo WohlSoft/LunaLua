@@ -6,9 +6,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QApplication>
-#include "qjsonutil.h"
-#include "Utils/networkutils.h"
-
+#include "Utils/Network/networkutils.h"
+#include "Utils/networkjsonutils.h"
 
 QString LauncherConfiguration::getErrConnectionMsg() const
 {
@@ -45,15 +44,8 @@ LauncherConfiguration::LauncherConfiguration() : LauncherConfiguration(generateD
 
 LauncherConfiguration::LauncherConfiguration(const QJsonDocument &settingsToParse)
 {
-    QJsonObject mainObject = settingsToParse.object();
-    QJsonObject gameValue = mainObject.value("game").toObject();
-    updateCheckWebsite = gameValue.value("update-check-website").toString(".");
-    errConnectionUrl = gameValue.value("update-error-website").toString(".");
-    errConnectionMsg = gameValue.value("update-error-message").toString("");
-    version1 = gameValue.value("version-1").toInt(0);
-    version2 = gameValue.value("version-2").toInt(0);
-    version3 = gameValue.value("version-3").toInt(0);
-    version4 = gameValue.value("version-4").toInt(0);
+    ExtendedQJsonReader reader(settingsToParse);
+    setConfigurationAndValidate(reader);
 }
 
 void LauncherConfiguration::setConfigurationAndValidate(ExtendedQJsonReader& settingsToParse)
@@ -69,46 +61,9 @@ void LauncherConfiguration::setConfigurationAndValidate(ExtendedQJsonReader& set
     );
 }
 
-bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription)
+ExtendedQJsonReader LauncherConfiguration::checkForUpdate()
 {
-    return loadUpdateJson(updateCheckWebsite, result, errCode, errDescription);
-}
-
-bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDocument *result, UpdateCheckerErrCodes& errCode, QString& errDescription)
-{
-    errDescription = "";
-    if(checkWebsite.isEmpty() || checkWebsite == "."){
-        errCode = UERR_NO_URL;
-        return false;
-    }
-
-    QUrl urlToUpdateChecker(checkWebsite);
-    if(!urlToUpdateChecker.isValid()){
-        errCode = UERR_INVALID_URL;
-        errDescription = urlToUpdateChecker.errorString();
-        return false;
-    }
-
-    QByteArray data;
-    bool success = NetworkUtils::getString(urlToUpdateChecker, &data, nullptr, 4000);
-    if(!success){
-        errCode = UERR_CONNECTION_FAILED;
-        errDescription = "Failed to establish connection";
-        return false;
-    }
-
-    QJsonParseError err;
-    *result = QJsonDocument::fromJson(data, &err);
-
-    if(err.error != QJsonParseError::NoError){
-        errCode = UERR_INVALID_JSON;
-        errDescription = err.errorString();
-        return false;
-    }
-
-
-    errCode = UERR_NO_ERR;
-    return true;
+    return NetworkJsonUtils::getJSON(updateCheckWebsite);
 }
 
 bool LauncherConfiguration::hasValidUpdateSite() const

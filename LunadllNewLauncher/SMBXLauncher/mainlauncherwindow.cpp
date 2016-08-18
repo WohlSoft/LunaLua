@@ -1,8 +1,11 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
 #include "../../LunaLoader/LunaLoaderPatch.h"
-#include "Utils/networkutils.h"
 #include "Utils/filesysutils.h"
+#include "Utils/Network/networkutils.h"
+#include "Utils/Network/qnetworkreplyexception.h"
+#include "Utils/Network/qnetworkreplytimeoutexception.h"
+#include "Utils/Network/qurlinvalidexception.h"
 #include "Utils/Json/extendedqjsonreader.h"
 #include "Utils/Json/qjsonfileopenexception.h"
 #include "Utils/Json/qjsonparseexception.h"
@@ -92,7 +95,7 @@ void MainLauncherWindow::loadDefaultWebpage()
     ui->webLauncherPage->load(QUrl("qrc:///emptyPage.html"));
 }
 
-void MainLauncherWindow::loadConfig(const QString &configName)
+void MainLauncherWindow::loadConfigAndInit(const QString &configName)
 {
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
@@ -202,73 +205,78 @@ void MainLauncherWindow::checkForUpdates()
     if(!m_launcherSettings->hasValidUpdateSite())
         return;
 
-    if(!NetworkUtils::checkInternetConnection(4000))
-        return;
-
-
-    QJsonDocument output;
-    LauncherConfiguration::UpdateCheckerErrCodes err;
-    QString errDesc;
-    if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
-        auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-            jsonErrHandler(errType, errChild);
-        };
-
-        if(!output.isObject()){
-            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
+    try {
+        if(!NetworkUtils::checkInternetConnection(4000))
             return;
-        }
-
-        QJsonObject outputObj = output.object();
-        if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
-        if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
-        if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
-
-        QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
-        if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
-        if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
-
-        if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
-                                                currentVersionObj.value("version-2").toInt(),
-                                                currentVersionObj.value("version-3").toInt(),
-                                                currentVersionObj.value("version-4").toInt())){
-            QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
-            QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
-            if(urlOfUpdatePage.isValid()){
-                QDesktopServices::openUrl(urlOfUpdatePage);
-            }
-        }
-    }else{
-        switch (err) {
-        case LauncherConfiguration::UERR_INVALID_JSON:
-            QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
-            break;
-        case LauncherConfiguration::UERR_INVALID_URL:
-            QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
-            break;
-        default:
-            QString errMsg = m_launcherSettings->getErrConnectionMsg();
-            if(errMsg != ""){
-                QMessageBox::warning(this, "Error", m_launcherSettings->getErrConnectionMsg());
-            }
-            QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
-            if(urlOfErrorPage.isValid()){
-                QDesktopServices::openUrl(urlOfErrorPage);
-            }
-        }
+    } catch (const QNetworkReplyException& ex) {
+        warnError("Failed to check internet connection: " + ex.errorString() + "\nSkipping update check...");
+        return;
     }
 
+    try {
+        try {
+            ExtendedQJsonReader reader(m_launcherSettings->checkForUpdate());
+
+            int verNum[4];
+            reader.extractSafe("current-version",
+                std::make_pair("version-1", &verNum[0]),
+                std::make_pair("version-2", &verNum[1]),
+                std::make_pair("version-1", &verNum[2]),
+                std::make_pair("version-2", &verNum[3])
+            );
+            if(m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3])){
+                QString updateMessage;
+                QString updateUrl;
+                reader.extractSafe("",
+                    std::make_pair("update-message", &updateMessage),
+                    std::make_pair("update-url-page", &updateUrl)
+                );
+
+                QUrl updateUrlObj(updateUrl);
+                if(!updateUrlObj.isValid()){
+                    warnError(QString("Episode updater json - invalid update-url-page - Invalid url:\n") + updateUrlObj.errorString());
+                    return;
+                }
+
+                QMessageBox::information(this, "New Update!", updateMessage);
+                QDesktopServices::openUrl(updateUrlObj);
+            }
+
+        } catch (const QJsonValidationException& ex)  {
+            switch(ex.errorType()){
+            case QJsonValidationException::ValidationError::WrongType:
+                warnError(QString("Episode updater json - wrong type for field:\n") + ex.fieldName());
+                break;
+            case QJsonValidationException::ValidationError::MissingType:
+                warnError(QString("Episode updater json - missing field:\n") + ex.fieldName());
+                break;
+            default:
+                warnError(QString("Episode updater json - unknown validation error:\n") + ex.fieldName());
+                break;
+            }
+        } catch (const QJsonParseException& ex) {
+            warnError(QString("Episode updater json - failed to parse settings.json:\n") + ex.getParseError().errorString());
+        } catch (const QJsonFileOpenException&) {
+            warnError("Episode updater json - failed to load config, using default!");
+        } catch (const QUrlInvalidException& ex) {
+            warnError(QString("Episode updater json - invalid url for updater json: ") + ex.errorString());
+        } catch (const QNetworkReplyException& ex) {
+            // Hide this error, and throw to the custom error message
+            qWarning() << "Episode updater json - network reply exception: " << ex.errorString();
+            throw;
+        } catch (const QNetworkReplyTimeoutException&) {
+            qWarning() << "Episode updater json - timeout when trying to access ";
+            throw;
+        }
+    } catch(...) {
+        warnError(m_launcherSettings->getErrConnectionMsg());
+        QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
+        if(urlOfErrorPage.isValid()){
+            QDesktopServices::openUrl(urlOfErrorPage);
+        }
+    }
 }
 
-void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &errChild)
-{
-    if(errType == VALIDATE_ERROR::VALIDATE_NO_CHILD)
-        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
-    if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
-        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
-}
 
 void MainLauncherWindow::warnError(const QString &msg)
 {

@@ -25,7 +25,7 @@ public slots:
     //Webkit Stuff
     void loadJavascriptBridge();
     void loadDefaultWebpage();
-    void loadConfig(const QString& configName);
+    void loadConfigAndInit(const QString& configName);
 
     void runSMBX();
     void runSMBXEditor();
@@ -36,7 +36,7 @@ public slots:
     void checkForUpdates();
 
     //Error handlers
-    void jsonErrHandler(VALIDATE_ERROR errType, const QString& errChild);
+    void warnError(const QString& msg);
 private slots:
     void openURL(QUrl url);
 private:

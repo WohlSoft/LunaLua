@@ -12,8 +12,23 @@ class ExtendedQJsonReader
 {
     QJsonDocument m_internalDocument;
 public:
+    //!
+    //! \brief ExtendedQJsonReader
+    //! \throws QJsonParseException
+    //! \throws QJsonFileOpenException
+    //! \param file The file to read out
+    //!
     ExtendedQJsonReader(QFile &file);
+    //!
+    //! \brief ExtendedQJsonReader
+    //! \throws QJsonParseException
+    //! \param data
+    //!
+    ExtendedQJsonReader(const QByteArray &data);
+    ExtendedQJsonReader(const QJsonDocument &document);
     QJsonDocument getQJsonDocument() const;
+    QVariantMap toMap() const;
+    bool canConvertToMap() const;
 
     template<typename... Args>
     void extractSafe(const QString& jsonNamespace, Args&&... args){
@@ -41,6 +56,8 @@ private:
     }
 
     void extractNext(const QJsonObject&) {}
+
+    void initJson(const QByteArray& data);
 
 };
 

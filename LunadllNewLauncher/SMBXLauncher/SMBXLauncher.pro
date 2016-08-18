@@ -41,15 +41,19 @@ SOURCES += main.cpp\
     ExposedObjects/controlconfig.cpp \
     launcherconfiguration.cpp \
     ../../LunaLoader/LunaLoaderPatch.cpp \
-    Utils/networkutils.cpp \
-    Utils/qreplytimeout.cpp \
+    Utils/Network/networkutils.cpp \
+    Utils/Network/qreplytimeout.cpp \
     PGE_File_Formats/file_rw_lvl_38a.cpp \
     PGE_File_Formats/ConvertUTF.c \
     Utils/filesysutils.cpp \
     Utils/Json/extendedqjsonreader.cpp \
     Utils/Json/qjsonparseexception.cpp \
     Utils/Json/qjsonfileopenexception.cpp \
-    Utils/Json/qjsonvalidationexception.cpp
+    Utils/Json/qjsonvalidationexception.cpp \
+    Utils/Network/qnetworkreplytimeoutexception.cpp \
+    Utils/Network/qnetworkreplyexception.cpp \
+    Utils/Network/qurlinvalidexception.cpp \
+    Utils/networkjsonutils.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -70,9 +74,8 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/wld_filedata.h \
     ExposedObjects/controlconfig.h \
     launcherconfiguration.h \
-    qjsonutil.h \
-    Utils/networkutils.h \
-    Utils/qreplytimeout.h \
+    Utils/Network/networkutils.h \
+    Utils/Network/qreplytimeout.h \
     PGE_File_Formats/charsetconvert.h \
     PGE_File_Formats/ConvertUTF.h \
     PGE_File_Formats/CSVReader.h \
@@ -83,7 +86,11 @@ HEADERS  += mainlauncherwindow.h \
     Utils/Json/qjsonparseexception.h \
     Utils/Json/qjsonfileopenexception.h \
     Utils/Json/qjsonvalidationexception.h \
-    Utils/Json/qjsonextractor.h
+    Utils/Json/qjsonextractor.h \
+    Utils/Network/qnetworkreplytimeoutexception.h \
+    Utils/Network/qnetworkreplyexception.h \
+    Utils/Network/qurlinvalidexception.h \
+    Utils/networkjsonutils.h
 
 FORMS    += mainlauncherwindow.ui
 
