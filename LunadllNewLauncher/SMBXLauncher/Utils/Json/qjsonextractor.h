@@ -7,6 +7,7 @@
 #include <QJsonValue>
 
 #include "qjsonvalidationexception.h"
+#include "qjsonurlvalidationexception.h"
 
 
 namespace detail {
@@ -54,6 +55,17 @@ template<>
 struct QJsonExtractor<QJsonObject> {
     QJsonObject operator()(const QJsonObject& obj, const QString& child){
         return detail::json::extractByFunctions<QJsonObject>(obj, child, &QJsonValue::isObject, &QJsonValue::toObject);
+    }
+};
+
+template<>
+struct QJsonExtractor<QUrl> {
+    QUrl operator()(const QJsonObject& obj, const QString& child){
+        QString urlString = QJsonExtractor<QString>()(obj, child);
+        QUrl urlObj(urlString);
+        if(!urlObj.isValid())
+            throw QJsonUrlValidationException(child, urlObj);
+        return urlObj;
     }
 };
 

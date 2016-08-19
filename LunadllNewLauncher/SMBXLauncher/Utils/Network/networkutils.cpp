@@ -2,7 +2,7 @@
 #include "qreplytimeout.h"
 #include "qnetworkreplytimeoutexception.h"
 #include "qnetworkreplyexception.h"
-#include "qurlinvalidexception.h"
+#include "../Common/qurlinvalidexception.h"
 
 Q_CONSTEXPR char timeoutURL[] = "http://google.com";
 

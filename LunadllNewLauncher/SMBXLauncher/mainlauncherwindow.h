@@ -25,7 +25,7 @@ public slots:
     //Webkit Stuff
     void loadJavascriptBridge();
     void loadDefaultWebpage();
-    void loadConfigAndInit(const QString& configName);
+    void init(const QString& configName);
 
     void runSMBX();
     void runSMBXEditor();
@@ -37,8 +37,6 @@ public slots:
 
     //Error handlers
     void warnError(const QString& msg);
-private slots:
-    void openURL(QUrl url);
 private:
     void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);

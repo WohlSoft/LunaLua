@@ -5,10 +5,11 @@
 #include "Utils/Network/networkutils.h"
 #include "Utils/Network/qnetworkreplyexception.h"
 #include "Utils/Network/qnetworkreplytimeoutexception.h"
-#include "Utils/Network/qurlinvalidexception.h"
+#include "Utils/Common/qurlinvalidexception.h"
 #include "Utils/Json/extendedqjsonreader.h"
 #include "Utils/Json/qjsonfileopenexception.h"
 #include "Utils/Json/qjsonparseexception.h"
+#include "Utils/Json/qjsonurlvalidationexception.h"
 
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
@@ -25,6 +26,7 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui->setupUi(this);
 
     ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
             [this](bool ok){
         if(ok)
@@ -95,7 +97,7 @@ void MainLauncherWindow::loadDefaultWebpage()
     ui->webLauncherPage->load(QUrl("qrc:///emptyPage.html"));
 }
 
-void MainLauncherWindow::loadConfigAndInit(const QString &configName)
+void MainLauncherWindow::init(const QString &configName)
 {
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
@@ -226,22 +228,19 @@ void MainLauncherWindow::checkForUpdates()
             );
             if(m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3])){
                 QString updateMessage;
-                QString updateUrl;
+                QUrl updateUrlObj;
                 reader.extractSafe("",
                     std::make_pair("update-message", &updateMessage),
-                    std::make_pair("update-url-page", &updateUrl)
+                    std::make_pair("update-url-page", &updateUrlObj)
                 );
-
-                QUrl updateUrlObj(updateUrl);
-                if(!updateUrlObj.isValid()){
-                    warnError(QString("Episode updater json - invalid update-url-page - Invalid url:\n") + updateUrlObj.errorString());
-                    return;
-                }
 
                 QMessageBox::information(this, "New Update!", updateMessage);
                 QDesktopServices::openUrl(updateUrlObj);
             }
-
+        } catch (const QJsonUrlValidationException& ex) {
+            warnError(QString("Episode updater json - Invalid url for field: ") + ex.fieldName() +
+                      "\nError url msg: " + ex.errorString() +
+                      "\nUrl: " + ex.url());
         } catch (const QJsonValidationException& ex)  {
             switch(ex.errorType()){
             case QJsonValidationException::ValidationError::WrongType:
@@ -259,7 +258,7 @@ void MainLauncherWindow::checkForUpdates()
         } catch (const QJsonFileOpenException&) {
             warnError("Episode updater json - failed to load config, using default!");
         } catch (const QUrlInvalidException& ex) {
-            warnError(QString("Episode updater json - invalid url for updater json: ") + ex.errorString());
+            warnError(QString("Episode updater json - invalid url for updater json: ") + ex.errorString() + "\nUrl: " + ex.url());
         } catch (const QNetworkReplyException& ex) {
             // Hide this error, and throw to the custom error message
             qWarning() << "Episode updater json - network reply exception: " << ex.errorString();
@@ -281,11 +280,6 @@ void MainLauncherWindow::checkForUpdates()
 void MainLauncherWindow::warnError(const QString &msg)
 {
     QMessageBox::warning(this, "Error", msg);
-}
-
-void MainLauncherWindow::openURL(QUrl url)
-{
-    QDesktopServices::openUrl(url);
 }
 
 void MainLauncherWindow::writeLunaConfig()

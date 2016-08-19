@@ -60,7 +60,7 @@ QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QStr
             return QVariant();
         }
         return reader.toMap();
-    }catch(const QJsonFileOpenException& ex){
+    }catch(const QJsonFileOpenException&){
         qWarning() << "Could not open " << fullPath;
     }catch(const QJsonParseError& ex){
         qWarning() << "Json parse error: " << ex.errorString();
@@ -180,7 +180,7 @@ QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QStr
         qWarning() << "Failed to check episode update with parse exception: " << ex.getParseError().errorString();
     }catch(const QNetworkReplyException& ex){
         qWarning() << "Failed to check for episode update: " << ex.errorString();
-    }catch(const QNetworkReplyTimeoutException& ex){
+    }catch(const QNetworkReplyTimeoutException&){
         qWarning() << "Failed to check for episode update: Timeout";
     }
     return QVariant();

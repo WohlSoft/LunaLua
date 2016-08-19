@@ -9,7 +9,8 @@ class QJsonValidationException : public std::exception
 public:
     enum class ValidationError {
         WrongType,
-        MissingType
+        MissingType,
+        InvalidUrl
     };
 private:
     QString m_fieldName;

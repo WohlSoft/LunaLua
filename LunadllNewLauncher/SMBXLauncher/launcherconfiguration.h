@@ -19,15 +19,6 @@ class LauncherConfiguration
 public:
     static QJsonDocument generateDefault();
 
-    enum UpdateCheckerErrCodes {
-        UERR_NO_ERR,
-        UERR_NO_URL,
-        UERR_INVALID_URL,
-        UERR_CONNECTION_FAILED,
-        UERR_NOT_FOUND,
-        UERR_INVALID_JSON
-    };
-
     LauncherConfiguration();
     LauncherConfiguration(const QJsonDocument &settingsToParse);
 

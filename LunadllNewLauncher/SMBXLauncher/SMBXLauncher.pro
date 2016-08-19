@@ -52,8 +52,9 @@ SOURCES += main.cpp\
     Utils/Json/qjsonvalidationexception.cpp \
     Utils/Network/qnetworkreplytimeoutexception.cpp \
     Utils/Network/qnetworkreplyexception.cpp \
-    Utils/Network/qurlinvalidexception.cpp \
-    Utils/networkjsonutils.cpp
+    Utils/Common/qurlinvalidexception.cpp \
+    Utils/networkjsonutils.cpp \
+    Utils/Json/qjsonurlvalidationexception.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -89,8 +90,9 @@ HEADERS  += mainlauncherwindow.h \
     Utils/Json/qjsonextractor.h \
     Utils/Network/qnetworkreplytimeoutexception.h \
     Utils/Network/qnetworkreplyexception.h \
-    Utils/Network/qurlinvalidexception.h \
-    Utils/networkjsonutils.h
+    Utils/Common/qurlinvalidexception.h \
+    Utils/networkjsonutils.h \
+    Utils/Json/qjsonurlvalidationexception.h
 
 FORMS    += mainlauncherwindow.ui
 
