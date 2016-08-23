@@ -1327,6 +1327,9 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
         pop ecx
         pop eax
         popf
+        mov edi, dword ptr ds : [ebp + 0xC]
+        mov ax, word ptr ds : [edi]
+        movsx edi, word ptr ds : [esi + 0xE2]
         push 0xA2FA6F
         ret
     }
