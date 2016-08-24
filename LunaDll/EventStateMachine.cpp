@@ -92,10 +92,6 @@ void EventStateMachine::hookWorldLoop(void) {
 }
 
 void EventStateMachine::hookInputUpdate(void) {
-    // Record raw input state before sending Lua event
-    gRawKeymap[0] = ((PlayerMOB*)GM_PLAYERS_PTR)[1].keymap;
-    gRawKeymap[1] = ((PlayerMOB*)GM_PLAYERS_PTR)[2].keymap;
-    
     if (!gIsTestModePauseActive)
     {
         sendOnInputUpdate();

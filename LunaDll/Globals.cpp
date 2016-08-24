@@ -49,7 +49,7 @@ DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
 LvlEnum gLevelEnum;
 
-KeyMap gRawKeymap[2];
+KeyMap gRawKeymap[2] = {0};
 
 bool gIsTestModePauseActive;
 
