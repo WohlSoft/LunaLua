@@ -203,7 +203,10 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Read input
+        short oldPauseOpen = GM_PAUSE_OPEN;
+        GM_PAUSE_OPEN = COMBOOL(true);
         native_updateInput();
+        GM_PAUSE_OPEN = oldPauseOpen;
 
         // Render the frame and wait
         LunaDllRenderAndWaitFrame();
