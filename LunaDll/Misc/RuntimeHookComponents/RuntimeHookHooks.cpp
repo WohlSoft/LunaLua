@@ -1372,3 +1372,32 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
         ret
     }
 }
+
+static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
+{
+    if (playerIdx >= 0 && playerIdx <= 1)
+    {
+        gRawKeymap[playerIdx] = *keymap;
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
+{
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+        push ebx // Args #2 (keymap ptr)
+        push esi // Args #1 (player idx)
+        call runtimeHookCheckInput
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        or edi, 0xFFFFFFFF
+        cmp word ptr ds : [ebx + 0x4], di
+        push 0xA75080
+        ret
+    }
+}
