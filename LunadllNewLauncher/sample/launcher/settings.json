@@ -1,0 +1,11 @@
+{
+    "game": {
+        "update-check-website": ".",
+        "update-error-message": "<Default error message>",
+        "update-error-website": ".",
+        "version-1": 0,
+        "version-2": 0,
+        "version-3": 0,
+        "version-4": 0
+    }
+}

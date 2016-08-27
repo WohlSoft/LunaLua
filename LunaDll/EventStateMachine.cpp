@@ -92,10 +92,6 @@ void EventStateMachine::hookWorldLoop(void) {
 }
 
 void EventStateMachine::hookInputUpdate(void) {
-    // Record raw input state before sending Lua event
-    gRawKeymap[0] = ((PlayerMOB*)GM_PLAYERS_PTR)[1].keymap;
-    gRawKeymap[1] = ((PlayerMOB*)GM_PLAYERS_PTR)[2].keymap;
-    
     if (!gIsTestModePauseActive)
     {
         sendOnInputUpdate();
@@ -203,7 +199,10 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Read input
+        short oldPauseOpen = GM_PAUSE_OPEN;
+        GM_PAUSE_OPEN = COMBOOL(true);
         native_updateInput();
+        GM_PAUSE_OPEN = oldPauseOpen;
 
         // Render the frame and wait
         LunaDllRenderAndWaitFrame();

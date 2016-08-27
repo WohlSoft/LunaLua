@@ -6,9 +6,8 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QApplication>
-#include "qjsonutil.h"
-#include "NetworkUtils/networkutils.h"
-
+#include "Utils/Network/networkutils.h"
+#include "Utils/networkjsonutils.h"
 
 QString LauncherConfiguration::getErrConnectionMsg() const
 {
@@ -22,11 +21,13 @@ QString LauncherConfiguration::getErrConnectionUrl() const
 QJsonDocument LauncherConfiguration::generateDefault()
 {
     return QJsonDocument(
-                QJsonObject
+    QJsonObject
         {
             {"game", QJsonObject
                 {
                     {"update-check-website", "."},
+                    {"update-error-website", "."},
+                    {"update-error-message", "<Default error message>"},
                     {"version-1", 0},
                     {"version-2", 0},
                     {"version-3", 0},
@@ -43,86 +44,31 @@ LauncherConfiguration::LauncherConfiguration() : LauncherConfiguration(generateD
 
 LauncherConfiguration::LauncherConfiguration(const QJsonDocument &settingsToParse)
 {
-    QJsonObject mainObject = settingsToParse.object();
-    QJsonObject gameValue = mainObject.value("game").toObject();
-    updateCheckWebsite = gameValue.value("update-check-website").toString(".");
-    errConnectionUrl = gameValue.value("update-error-website").toString(".");
-    errConnectionMsg = gameValue.value("update-error-message").toString("");
-    version1 = gameValue.value("version-1").toInt(0);
-    version2 = gameValue.value("version-2").toInt(0);
-    version3 = gameValue.value("version-3").toInt(0);
-    version4 = gameValue.value("version-4").toInt(0);
+    ExtendedQJsonReader reader(settingsToParse);
+    setConfigurationAndValidate(reader);
 }
 
-bool LauncherConfiguration::setConfigurationAndValidate(const QJsonDocument &settingsToParse, const std::function<void (VALIDATE_ERROR, const QString &)> &errFunc)
+void LauncherConfiguration::setConfigurationAndValidate(ExtendedQJsonReader& settingsToParse)
 {
-    if(!settingsToParse.isObject()){
-        if(errFunc)
-            errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
-        return false;
-    }
-
-    QJsonObject mainObject = settingsToParse.object();
-    if(!qJsonValidate<QJsonObject>(mainObject, "game", errFunc)) return false;
-
-    QJsonObject gameObject = mainObject.value("game").toObject();
-    if(!qJsonValidate<QString>(gameObject, "update-check-website", errFunc)) return false;
-    if(!qJsonValidate<QString>(gameObject, "update-error-website", errFunc)) return false;
-    if(!qJsonValidate<QString>(gameObject, "update-error-message", errFunc)) return false;
-    if(!qJsonValidate<int>(gameObject, "version-1", errFunc)) return false;
-    if(!qJsonValidate<int>(gameObject, "version-2", errFunc)) return false;
-    if(!qJsonValidate<int>(gameObject, "version-3", errFunc)) return false;
-    if(!qJsonValidate<int>(gameObject, "version-4", errFunc)) return false;
-    updateCheckWebsite = gameObject.value("update-check-website").toString(".");
-    errConnectionUrl = gameObject.value("update-error-website").toString(".");
-    errConnectionMsg = gameObject.value("update-error-message").toString("");
-    version1 = gameObject.value("version-1").toInt(0);
-    version2 = gameObject.value("version-2").toInt(0);
-    version3 = gameObject.value("version-3").toInt(0);
-    version4 = gameObject.value("version-4").toInt(0);
-    return true;
+    settingsToParse.extractSafe("game",
+        std::make_pair("update-check-website", &updateCheckWebsite),
+        std::make_pair("update-error-website", &errConnectionUrl),
+        std::make_pair("update-error-message", &errConnectionMsg),
+        std::make_pair("version-1", &version1),
+        std::make_pair("version-2", &version2),
+        std::make_pair("version-3", &version3),
+        std::make_pair("version-4", &version4)
+    );
 }
 
-bool LauncherConfiguration::checkForUpdate(QJsonDocument *result, UpdateCheckerErrCodes &errCode, QString& errDescription)
+ExtendedQJsonReader LauncherConfiguration::checkForUpdate()
 {
-    return loadUpdateJson(updateCheckWebsite, result, errCode, errDescription);
+    return NetworkJsonUtils::getJSON(updateCheckWebsite);
 }
 
-bool LauncherConfiguration::loadUpdateJson(const QString& checkWebsite, QJsonDocument *result, UpdateCheckerErrCodes& errCode, QString& errDescription)
+bool LauncherConfiguration::hasValidUpdateSite() const
 {
-    errDescription = "";
-    if(checkWebsite.isEmpty() || checkWebsite == "."){
-        errCode = UERR_NO_URL;
-        return false;
-    }
-
-    QUrl urlToUpdateChecker(checkWebsite);
-    if(!urlToUpdateChecker.isValid()){
-        errCode = UERR_INVALID_URL;
-        errDescription = urlToUpdateChecker.errorString();
-        return false;
-    }
-
-    QByteArray data;
-    bool success = NetworkUtils::getString(urlToUpdateChecker, &data, nullptr, 4000);
-    if(!success){
-        errCode = UERR_CONNECTION_FAILED;
-        errDescription = "Failed to establish connection";
-        return false;
-    }
-
-    QJsonParseError err;
-    *result = QJsonDocument::fromJson(data, &err);
-
-    if(err.error != QJsonParseError::NoError){
-        errCode = UERR_INVALID_JSON;
-        errDescription = err.errorString();
-        return false;
-    }
-
-
-    errCode = UERR_NO_ERR;
-    return true;
+    return !(updateCheckWebsite.isEmpty() || updateCheckWebsite == ".");
 }
 
 bool LauncherConfiguration::hasHigherVersion(int ver1, int ver2, int ver3, int ver4)

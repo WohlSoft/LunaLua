@@ -445,6 +445,51 @@ local function initFFIBasedAPIs()
             end
         }
         Block.bumpable = setmetatable({}, bumpableMetatable);
+        
+        local harmTypeMap = {
+            [HARM_TYPE_JUMP]=true,
+            [HARM_TYPE_FROMBELOW]=true,
+            [HARM_TYPE_NPC]=true,
+            [HARM_TYPE_PROJECTILE_USED]=true,
+            [HARM_TYPE_LAVA]=true,
+            [HARM_TYPE_HELD]=true,
+            [HARM_TYPE_TAIL]=true,
+            [HARM_TYPE_SPINJUMP]=true,
+            [HARM_TYPE_OFFSCREEN]=true,
+            [HARM_TYPE_SWORD]=true
+        }
+        local vulnerableHarmTypesMetatable = {
+            __index = function(tbl, id)
+                local mskVal = NPC._getVulnerableHarmTypes(id)
+                local tblVal = {}
+                for v,_ in pairs(harmTypeMap) do
+                    if (bit.band(mskVal, bit.lshift(1, v)) ~= 0) then
+                        table.insert(tblVal, v)
+                    end
+                end
+                return tblVal
+            end,
+            __newindex = function(tbl, id, tblVal)
+                local mskVal = 0
+                for _,v in ipairs(tblVal) do
+                    if harmTypeMap[v] then
+                        mskVal = bit.bor(mskVal, bit.lshift(1, v))
+                    end
+                end
+                NPC._setVulnerableHarmTypes(id, mskVal)
+            end
+        }
+        NPC.vulnerableHarmTypes = setmetatable({}, vulnerableHarmTypesMetatable);
+        
+        local spinjumpSafeMetatable = {
+            __index = function(tbl, id)
+                return NPC._getSpinjumpSafe(id)
+            end,
+            __newindex = function(tbl, id, val)
+                NPC._setSpinjumpSafe(id, val)
+            end
+        }
+        NPC.spinjumpSafe = setmetatable({}, spinjumpSafeMetatable);
     end
     
     -- Limit access to FFI
@@ -542,6 +587,10 @@ local function filenameOfPath(path)
     return path:sub(lastIndex + 1)
 end
 
+local function isAbsolutePath(possiblePath)
+    return possiblePath:find("%a:[/\\]") == 1 -- Either returns the first character with the matching search pattern or nil
+end
+
 
 -- Version check
 function compareLunaVersion(...)
@@ -568,6 +617,28 @@ end
 --=====================================================================
 --[[ API Functions ]]--
 local APIHelper = {}
+
+local function loadAPIByPath(path)
+    local endings = {
+        ".lua",
+        ".dll"
+    }
+    for _,ending in pairs(endings) do
+        func, err = loadfile(path..ending)
+        if(func)then
+            local loadedAPI = func()
+            if(type(loadedAPI) ~= "table")then
+                error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
+            end
+            return loadedAPI
+        else
+            if(not err:find("such file"))then
+                error(err, 2)
+            end
+        end
+    end
+end
+
 function APIHelper.doAPI(apiTableHolder, apiPath)
     local apiName = filenameOfPath(apiPath)
     if(apiTableHolder[apiName])then
@@ -575,33 +646,23 @@ function APIHelper.doAPI(apiTableHolder, apiPath)
     end
     
     local loadedAPI = nil
-    local searchInPath = {
-    __episodePath,
-    __customFolderPath,
-    getSMBXPath().."\\LuaScriptsLib\\"}
-    local endings = {
-        ".lua",
-        ".dll"}
-    local func, err
-    for _,apiSearchPath in pairs(searchInPath) do
-        for _,ending in pairs(endings) do
-            func, err = loadfile(apiSearchPath..apiPath..ending)
-            if(func)then
-                loadedAPI = func()
-                if(type(loadedAPI) ~= "table")then
-                    error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
-                end
-            else
-                if(not err:find("such file"))then
-                    error(err,2)
-                end
-            end
+    if(isAbsolutePath(apiPath))then
+        loadedAPI = loadAPIByPath(apiPath)
+    else
+        local searchInPath = {
+            __episodePath,
+            __customFolderPath,
+            getSMBXPath().."\\LuaScriptsLib\\"
+        }
+        local func, err
+        for _,apiSearchPath in pairs(searchInPath) do
+            loadedAPI = loadAPIByPath(apiSearchPath..apiPath)
             if(loadedAPI) then break end
         end
-        if(loadedAPI) then break end
     end
-    if(not loadedAPI) then error("No API found \""..apiPath.."\"",2) end
     
+    if(not loadedAPI) then error("No API found \""..apiPath.."\"",2) end
+   
     apiTableHolder[apiName] = loadedAPI
     if(type(loadedAPI["onInitAPI"])=="function")then
         loadedAPI.onInitAPI()
@@ -685,6 +746,10 @@ end
 function unregisterEvent(apiTable, event, eventHandler)
     return EventManager.removeAPIListener(apiTable, event, eventHandler)
 end
+function clearEvents(apiTable)
+    EventManager.clearAPIListeners(apiTable)
+end
+
 function registerCustomEvent(obj, eventName)
     local queue = {};
     local mt = getmetatable(obj);
@@ -904,14 +969,23 @@ function EventManager.addAPIListener(thisTable, event, eventHandler, beforeMainC
     table.insert(EventManager.apiListeners, newApiHandler)
 end
 
+function EventManager.clearAPIListeners(apiTable)
+    for i = #EventManager.apiListeners, 1, -1 do
+        local apiObj = EventManager.apiListeners[i]
+        if(apiObj.api == apiTable) then
+            table.remove(EventManager.apiListeners, i)
+        end
+    end
+end
+
 -- FIXME: Check also if "beforeMainCall"
 function EventManager.removeAPIListener(apiTable, event, eventHandler)
-    for i=1,#EventManager.apiListeners do
+    for i = 1, #EventManager.apiListeners do
         local apiObj = EventManager.apiListeners[i]
         if(apiObj.api == apiTable and
             apiObj.eventName == event and
             apiObj.eventHandlerName == eventHandler)then
-            table.remove(apiTable, i)
+            table.remove(EventManager.apiListeners, i)
             return true
         end
     end

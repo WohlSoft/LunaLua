@@ -74,7 +74,7 @@ void LuaProxy::Misc::cheatBuffer(const luabind::object &value, lua_State* L)
 }
 
 
-luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
+luabind::object listByAttributes(const std::string& path, DWORD attributes, lua_State* L) 
 {
     luabind::object theList = luabind::newtable(L);
     std::string modulePath = path;
@@ -84,18 +84,31 @@ luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
         modulePath += "\\";
         modulePath += path;
     }
-    std::vector<std::string> listedFiles = listFilesOfDir(modulePath);
-    for (unsigned int i = 0; i < listedFiles.size(); ++i){
+    std::vector<std::string> listedFiles = listOfDir(path, attributes);
+    for (unsigned int i = 0; i < listedFiles.size(); ++i) {
         theList[i + 1] = listedFiles[i];
     }
     return theList;
-
 }
 
+luabind::object LuaProxy::Misc::listFiles(const std::string& path, lua_State* L)
+{
+    return listByAttributes(path, ~FILE_ATTRIBUTE_DIRECTORY, L);
+}
 
-luabind::object LuaProxy::Misc::listLocalFiles(std::string path, lua_State* L)
+luabind::object LuaProxy::Misc::listDirectories(const std::string& path, lua_State* L)
+{
+    return listByAttributes(path, FILE_ATTRIBUTE_DIRECTORY, L);
+}
+
+luabind::object LuaProxy::Misc::listLocalFiles(const std::string& path, lua_State* L)
 {
     return listFiles(WStr2Str(getCustomFolderPath()) + path, L);
+}
+
+luabind::object LuaProxy::Misc::listLocalDirectories(const std::string& path, lua_State* L)
+{
+    return listDirectories(WStr2Str(getCustomFolderPath()) + path, L);
 }
 
 template<const DWORD FILTER, const bool FILTER_TYPE>

@@ -1,11 +1,19 @@
 #include "smbxconfig.h"
 #include "PGE_File_Formats/file_formats.h"
-#include "launcherconfiguration.h"
+#include "../Utils/networkjsonutils.h"
+#include "../Utils/Json/extendedqjsonreader.h"
+#include "../Utils/Json/qjsonfileopenexception.h"
+#include "../Utils/Json/qjsonparseexception.h"
+#include "../Utils/Network/qnetworkreplyexception.h"
+#include "../Utils/Network/qnetworkreplytimeoutexception.h"
+#include "../Utils/Network/qnetworkrequestexception.h"
 
 #include <QDir>
 #include <QJsonDocument>
 #include <QtDebug>
 #include <QMessageBox>
+#include <QDebug>
+
 
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
 
@@ -14,6 +22,8 @@ SMBXConfig::SMBXConfig(QObject *parent) :
 {
     m_Autostart = new AutostartConfig();
     m_Controls = new ControlConfig();
+    emit AutostartUpdated();
+    emit ControlsUpdated();
 }
 
 SMBXConfig::~SMBXConfig()
@@ -23,41 +33,40 @@ SMBXConfig::~SMBXConfig()
 
 QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
 {
+    // {SMBX-Root}/worlds
     QDir episodeDir(episodeDirPath);
 
+    // {SMBX-Root}/worlds/{episode-folder}
     if (jsonSubDirPerEpisode.length() > 0) {
         if(!episodeDir.cd(jsonSubDirPerEpisode)){
-            //dbg("Couldn't find launcher folder \"" + subDirPerEpisode + "\" at " + absoluteDir.canonicalPath());
+            qWarning() << "Couldn't not enter episode folder \"" << jsonSubDirPerEpisode<< "\" at " << episodeDir;
             return QVariant();
         }
     }
 
+    // {SMBX-Root}/worlds/{episode-folder}/{relative-path-to-json}
     if(!episodeDir.exists(jsonFileName)){
-        //dbg("Couldn't find \"" + jsonFileName + "\" at " + absoluteDir.canonicalPath());
+        qWarning() << "Couldn't find \"" << jsonFileName << "\" at " << episodeDir;
         return QVariant();
     }
 
-    QFile episodeJSONInfoFile(episodeDir.canonicalPath() + "/" + jsonFileName);
-    if(!episodeJSONInfoFile.open(QIODevice::ReadOnly)){
-        //dbg("Could not open json file at " + absoluteDir.canonicalPath());
-        return QVariant();
+    QString fullPath = episodeDir.canonicalPath() + "/" + jsonFileName;
+    try{
+        // {SMBX-Root}/worlds/{episode-folder} + /{relative-path-to-json}
+        QFile fileToRead(fullPath);
+        ExtendedQJsonReader reader(fileToRead);
+        if(!reader.canConvertToMap()){
+            qWarning() << "Invalid JSON format, expected json map for " << fullPath;
+            return QVariant();
+        }
+        return reader.toMap();
+    }catch(const QJsonFileOpenException&){
+        qWarning() << "Could not open " << fullPath;
+    }catch(const QJsonParseError& ex){
+        qWarning() << "Json parse error: " << ex.errorString();
     }
 
-    QJsonParseError possibleError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(episodeJSONInfoFile.readAll(), &possibleError);
-
-    if(possibleError.error != QJsonParseError::NoError){
-        //dbg("Couldn't parse json (json error): " + possibleError.errorString());
-        return QVariant();
-    }
-
-    QVariant jsonData = jsonDoc.toVariant().toMap();
-    if(jsonData.type() != QVariant::Map){
-        //dbg(QString("Invalid JSON Data Type, required map, got ") + jsonData.typeName());
-        return QVariant();
-    }
-
-    return jsonData;
+    return QVariant();
 }
 
 QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
@@ -122,12 +131,10 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
 
 QVariantList SMBXConfig::getEpisodeInfo(const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
 {
-    //dbg("Getting Episode Info");
     QVariantList episodesInfo;
     QDir worldsDir = QDir::current();
 
     if(!worldsDir.cd("worlds")){
-        //dbg("Did not find worlds folder");
         return QVariantList();
     }
 
@@ -167,15 +174,16 @@ QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QStr
         return QVariant();
     }
     QString updateWebsite = it.value().toString();
-
-    QJsonDocument updateOut;
-    LauncherConfiguration::UpdateCheckerErrCodes updateErr;
-    QString updateErrDesc;
-    if (!LauncherConfiguration::loadUpdateJson(updateWebsite, &updateOut, updateErr, updateErrDesc)) {
-        return QVariant();
+    try{
+        return NetworkJsonUtils::getJSON(updateWebsite).toMap();
+    }catch(const QJsonParseException& ex){
+        qWarning() << "Failed to check episode update with parse exception: " << ex.getParseError().errorString();
+    }catch(const QNetworkReplyException& ex){
+        qWarning() << "Failed to check for episode update: " << ex.errorString();
+    }catch(const QNetworkReplyTimeoutException&){
+        qWarning() << "Failed to check for episode update: Timeout";
     }
-
-    return updateOut.toVariant().toMap();
+    return QVariant();
 }
 
 QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
@@ -228,4 +236,24 @@ void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
     if (saveFile.exists()){
         saveFile.remove();
     }
+}
+
+void SMBXConfig::runSMBX()
+{
+    emit runSMBXExecuted();
+}
+
+void SMBXConfig::runSMBXEditor()
+{
+    emit runSMBXEditorExecuted();
+}
+
+void SMBXConfig::runPGEEditor()
+{
+    emit runPGEEditorExecuted();
+}
+
+void SMBXConfig::loadEpisodeWebpage(const QString &file)
+{
+    emit loadEpisodeWebpageExecuted(file);
 }

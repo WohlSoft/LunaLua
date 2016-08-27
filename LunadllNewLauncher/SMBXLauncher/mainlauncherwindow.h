@@ -2,10 +2,11 @@
 #define MAINLAUNCHERWINDOW_H
 
 #include <QMainWindow>
-#include <smbxconfig.h>
 #include <QScopedPointer>
 #include <QProcess>
 #include <QUrl>
+
+#include "ExposedObjects/smbxconfig.h"
 #include "launcherconfiguration.h"
 
 namespace Ui {
@@ -22,9 +23,9 @@ public:
 
 public slots:
     //Webkit Stuff
-    void addJavascriptObject();
+    void loadJavascriptBridge();
     void loadDefaultWebpage();
-    void loadConfig(const QString& configName);
+    void init(const QString& configName);
 
     void runSMBX();
     void runSMBXEditor();
@@ -35,9 +36,7 @@ public slots:
     void checkForUpdates();
 
     //Error handlers
-    void jsonErrHandler(VALIDATE_ERROR errType, const QString& errChild);
-private slots:
-    void openURL(QUrl url);
+    void warnError(const QString& msg);
 private:
     void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);

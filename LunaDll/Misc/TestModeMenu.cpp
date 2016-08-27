@@ -304,7 +304,10 @@ void testModePauseMenu(bool allowContinue)
     while (true)
     {
         // Read input...
+        short oldPauseOpen = GM_PAUSE_OPEN;
+        GM_PAUSE_OPEN = COMBOOL(true);
         native_updateInput();
+        GM_PAUSE_OPEN = oldPauseOpen;
 
         const KeyMap& keymap = gRawKeymap[0];
 

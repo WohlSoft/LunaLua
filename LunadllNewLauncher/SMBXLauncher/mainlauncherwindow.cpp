@@ -1,7 +1,15 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
 #include "../../LunaLoader/LunaLoaderPatch.h"
-#include "NetworkUtils/networkutils.h"
+#include "Utils/filesysutils.h"
+#include "Utils/Network/networkutils.h"
+#include "Utils/Network/qnetworkreplyexception.h"
+#include "Utils/Network/qnetworkreplytimeoutexception.h"
+#include "Utils/Common/qurlinvalidexception.h"
+#include "Utils/Json/extendedqjsonreader.h"
+#include "Utils/Json/qjsonfileopenexception.h"
+#include "Utils/Json/qjsonparseexception.h"
+#include "Utils/Json/qjsonurlvalidationexception.h"
 
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
@@ -9,7 +17,6 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 
-//Still need a porting http://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,18 +25,15 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //connect(ui->webLauncherPage->page(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJavascriptObject()));
-    //connect(ui->webLauncherPage->page(), SIGNAL(linkClicked(QUrl)), this, SLOT(openURL(QUrl)));
-    //ui->webLauncherPage->page()->setLinkDelegationPolicy(QWebEnginePage::DelegateAllLinks);
-    /*
-    There is no way to connect a signal to run C++ code when a link is clicked.
-    However, link clicks can be delegated to the Qt application instead of having the HTML handler
-    engine process them by overloading the QWebEnginePage::acceptNavigationRequest() function.
-    This is necessary when an HTML document is used as part of the user interface, and not to display
-    external data, for example, when displaying a list of results.
-    */
-
     ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    // Only load the javascript bridge when the website has correctly loaded
+    connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
+            [this](bool ok){
+        if(ok)
+        {
+            this->loadJavascriptBridge();
+        }
+    });
 }
 
 MainLauncherWindow::~MainLauncherWindow()
@@ -37,19 +41,55 @@ MainLauncherWindow::~MainLauncherWindow()
     delete ui;
 }
 
-void MainLauncherWindow::addJavascriptObject()
+void MainLauncherWindow::loadJavascriptBridge()
 {
+    QWebEnginePage* currentPage = ui->webLauncherPage->page();
+    qDebug() << "Init Javascript Bridge";
+
+
+    // Get or create new web channel
+    QWebChannel * channel = currentPage->webChannel();
+    if(channel == nullptr)
+        channel = new QWebChannel(currentPage);
+
+    qDebug() << "Placing Launcher object!";
+    if(m_smbxConfig)
+        channel->deregisterObject(m_smbxConfig.data());
     m_smbxConfig.reset(new SMBXConfig());
-
-    QWebChannel * channel = ui->webLauncherPage->page()->webChannel();//new QWebChannel(ui->webLauncherPage->page());
-    //ui->webLauncherPage->page()->setWebChannel(channel);
     channel->registerObject(QString("Launcher"), m_smbxConfig.data());
-    //ui->webLauncherPage->page()->addToJavaScriptWindowObject("Launcher", m_smbxConfig.data());
 
-    connect(m_smbxConfig.data(), SIGNAL(runSMBX()), this, SLOT(runSMBX()));
-    connect(m_smbxConfig.data(), SIGNAL(runSMBXEditor()), this, SLOT(runSMBXEditor()));
-    connect(m_smbxConfig.data(), SIGNAL(runPGEEditor()), this, SLOT(runPGEEditor()));
-    connect(m_smbxConfig.data(), SIGNAL(loadEpisodeWebpage(QString)), this, SLOT(loadEpisodeWebpage(QString)));
+    qDebug() << "Setting web channel!";
+    currentPage->setWebChannel(nullptr); // This is a bit hackish, but without it the 'qt' global object would not be set
+    currentPage->setWebChannel(channel);
+
+    qDebug() << "Connecting QObject signal & slots";
+    connect(m_smbxConfig.data(), &SMBXConfig::runSMBXExecuted, this, &MainLauncherWindow::runSMBX);
+    connect(m_smbxConfig.data(), &SMBXConfig::runSMBXEditorExecuted, this, &MainLauncherWindow::runSMBXEditor);
+    connect(m_smbxConfig.data(), &SMBXConfig::runPGEEditorExecuted, this, &MainLauncherWindow::runPGEEditor);
+    connect(m_smbxConfig.data(), &SMBXConfig::loadEpisodeWebpageExecuted, this, &MainLauncherWindow::loadEpisodeWebpage);
+
+    qDebug() << "Running init javascript!";
+    currentPage->runJavaScript(
+                "var head = document.getElementsByTagName('head')[0];"
+                ""
+                "var qWebchannelImporter = document.createElement('script');"
+                "qWebchannelImporter.type = 'text/javascript';"
+                "qWebchannelImporter.src = 'qrc:///qtwebchannel/qwebchannel.js';"
+                ""
+                "var callback = function(){"
+                "    console.log('Script loaded!');"
+                "    new QWebChannel(qt.webChannelTransport, function (channel) {"
+                "        console.log('QWebChannel works!');"
+                "        Launcher = channel.objects.Launcher;"
+                "        if(typeof onInitLauncher === 'function'){"
+                "            onInitLauncher(); "
+                "        }"
+                "    });"
+                "};"
+                "qWebchannelImporter.onload = callback;"
+                ""
+                "head.appendChild(qWebchannelImporter);"
+    );
 }
 
 void MainLauncherWindow::loadDefaultWebpage()
@@ -57,54 +97,58 @@ void MainLauncherWindow::loadDefaultWebpage()
     ui->webLauncherPage->load(QUrl("qrc:///emptyPage.html"));
 }
 
-void MainLauncherWindow::loadConfig(const QString &configName)
+void MainLauncherWindow::init(const QString &configName)
 {
-    auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-        jsonErrHandler(errType, errChild);
-    };
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
 
-    // Check for the launcher config dir
-    QDir launcherDir = QDir::current();
-    if(!launcherDir.exists("launcher"))
-        launcherDir.mkdir("launcher");
+    // Create launcher dir if not exist
+    QDir::current().mkdir("launcher");
 
     // Check for the main configuration file
     QFile configurationJSON("launcher/settings.json");
 
     // If not exist then write the configuration file
-    if(!configurationJSON.exists()){
-        if(configurationJSON.open(QIODevice::WriteOnly)){
-            configurationJSON.write(LauncherConfiguration::generateDefault().toJson());
-            configurationJSON.close();
-        }
-    }
+    FilesysUtils::writeDefaultIfNotExist(configurationJSON, LauncherConfiguration::generateDefault().toJson());
 
-    // The errors are surpressed.
-    if(configurationJSON.open(QIODevice::ReadOnly)){
-        QByteArray rawData = configurationJSON.readAll();
-
-        QJsonParseError jsonErrCode;
-        QJsonDocument jsonSettingsFile = QJsonDocument::fromJson(rawData, &jsonErrCode);
-        if(jsonErrCode.error != QJsonParseError::NoError){
-            QMessageBox::warning(this, "Error", QString("Failed to parse settings.json:\n") + jsonErrCode.errorString());
-            m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
-        }else{
+    // Game specific settings
+    try {
+        try {
+            ExtendedQJsonReader reader(configurationJSON);
             m_launcherSettings.reset(new LauncherConfiguration());
-            m_launcherSettings->setConfigurationAndValidate(jsonSettingsFile, errFunc);
+            m_launcherSettings->setConfigurationAndValidate(reader);
+        } catch (const QJsonValidationException& ex)  {
+            switch(ex.errorType()){
+            case QJsonValidationException::ValidationError::WrongType:
+                warnError(QString("Settings.json - wrong type for field:\n") + ex.fieldName());
+                break;
+            case QJsonValidationException::ValidationError::MissingType:
+                warnError(QString("Settings.json - missing field:\n") + ex.fieldName());
+                break;
+            default:
+                warnError(QString("Settings.json - unknown validation error:\n") + ex.fieldName());
+                break;
+            }
+            throw;
+        } catch (const QJsonParseException& ex) {
+           warnError(QString("Settings.json - failed to parse settings.json:\n") + ex.getParseError().errorString());
+            throw;
+        } catch (const QJsonFileOpenException&) {
+           warnError("Settings.json - failed to load config, using default!");
+            throw;
         }
-    }else{
-        QMessageBox::warning(this, "Error", "Failed to load config, using default!");
+    } catch(...) {
         m_launcherSettings.reset(new LauncherConfiguration(LauncherConfiguration::generateDefault()));
     }
 
+
+    // check for updates with the information from settings.json
     checkForUpdates();
 
     QSettings settingFile(configName, QSettings::IniFormat);
     settingFile.setIniCodec("UTF-8");
 
-
+    // Load launcher settings
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
         m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
@@ -134,18 +178,14 @@ void MainLauncherWindow::loadConfig(const QString &configName)
 void MainLauncherWindow::runSMBX()
 {
     writeLunaConfig();
-    QList<QString> args;
-    args << "--game";
-    internalRunSMBX(m_smbxExe, args);
+    internalRunSMBX(m_smbxExe, {"--game"});
     close();
 }
 
 void MainLauncherWindow::runSMBXEditor()
 {
     // Don't need to write luna config for editor
-    QList<QString> args;
-    args << "--leveleditor";
-    internalRunSMBX(m_smbxExe, args);
+    internalRunSMBX(m_smbxExe, {"--leveleditor"});
     close();
 }
 
@@ -164,74 +204,82 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::checkForUpdates()
 {
-    if(NetworkUtils::checkInternetConnection(4000)){
-        QJsonDocument output;
-        LauncherConfiguration::UpdateCheckerErrCodes err;
-        QString errDesc;
-        if(m_launcherSettings->checkForUpdate(&output, err, errDesc)){
-            auto errFunc = [this](VALIDATE_ERROR errType, const QString& errChild){
-                jsonErrHandler(errType, errChild);
-            };
+    if(!m_launcherSettings->hasValidUpdateSite())
+        return;
 
-            if(!output.isObject()){
-                errFunc(VALIDATE_ERROR::VALIDATE_NO_CHILD, "<root>");
-                return;
+    try {
+        if(!NetworkUtils::checkInternetConnection(4000))
+            return;
+    } catch (const QNetworkReplyException& ex) {
+        warnError("Failed to check internet connection: " + ex.errorString() + "\nSkipping update check...");
+        return;
+    }
+
+    try {
+        try {
+            ExtendedQJsonReader reader(m_launcherSettings->checkForUpdate());
+
+            int verNum[4];
+            reader.extractSafe("current-version",
+                std::make_pair("version-1", &verNum[0]),
+                std::make_pair("version-2", &verNum[1]),
+                std::make_pair("version-1", &verNum[2]),
+                std::make_pair("version-2", &verNum[3])
+            );
+            if(m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3])){
+                QString updateMessage;
+                QUrl updateUrlObj;
+                reader.extractSafe("",
+                    std::make_pair("update-message", &updateMessage),
+                    std::make_pair("update-url-page", &updateUrlObj)
+                );
+
+                QMessageBox::information(this, "New Update!", updateMessage);
+                QDesktopServices::openUrl(updateUrlObj);
             }
-
-            QJsonObject outputObj = output.object();
-            if(!qJsonValidate<QJsonObject>(outputObj, "current-version", errFunc)) return;
-            if(!qJsonValidate<QString>(outputObj, "update-message", errFunc)) return;
-            if(!qJsonValidate<QString>(outputObj, "update-url-page", errFunc)) return;
-
-            QJsonObject currentVersionObj = outputObj.value("current-version").toObject();
-            if(!qJsonValidate<int>(currentVersionObj, "version-1", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-2", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-3", errFunc)) return;
-            if(!qJsonValidate<int>(currentVersionObj, "version-4", errFunc)) return;
-
-            if(m_launcherSettings->hasHigherVersion(currentVersionObj.value("version-1").toInt(),
-                                                    currentVersionObj.value("version-2").toInt(),
-                                                    currentVersionObj.value("version-3").toInt(),
-                                                    currentVersionObj.value("version-4").toInt())){
-                QMessageBox::information(this, "New Update!", outputObj.value("update-message").toString());
-                QUrl urlOfUpdatePage(outputObj.value("update-url-page").toString());
-                if(urlOfUpdatePage.isValid()){
-                    QDesktopServices::openUrl(urlOfUpdatePage);
-                }
-            }
-        }else{
-            switch (err) {
-            case LauncherConfiguration::UERR_INVALID_JSON:
-                QMessageBox::warning(this, "Error", QString("Invalid update server JSON response:\n") + errDesc);
+        } catch (const QJsonUrlValidationException& ex) {
+            warnError(QString("Episode updater json - Invalid url for field: ") + ex.fieldName() +
+                      "\nError url msg: " + ex.errorString() +
+                      "\nUrl: " + ex.url());
+        } catch (const QJsonValidationException& ex)  {
+            switch(ex.errorType()){
+            case QJsonValidationException::ValidationError::WrongType:
+                warnError(QString("Episode updater json - wrong type for field:\n") + ex.fieldName());
                 break;
-            case LauncherConfiguration::UERR_INVALID_URL:
-                QMessageBox::warning(this, "Error", QString("Invalid update server URL:\n") + errDesc);
+            case QJsonValidationException::ValidationError::MissingType:
+                warnError(QString("Episode updater json - missing field:\n") + ex.fieldName());
                 break;
             default:
-                QString errMsg = m_launcherSettings->getErrConnectionMsg();
-                if(errMsg != ""){
-                    QMessageBox::warning(this, "Error", m_launcherSettings->getErrConnectionMsg());
-                }
-                QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
-                if(urlOfErrorPage.isValid()){
-                    QDesktopServices::openUrl(urlOfErrorPage);
-                }
+                warnError(QString("Episode updater json - unknown validation error:\n") + ex.fieldName());
+                break;
             }
+        } catch (const QJsonParseException& ex) {
+            warnError(QString("Episode updater json - failed to parse settings.json:\n") + ex.getParseError().errorString());
+        } catch (const QJsonFileOpenException&) {
+            warnError("Episode updater json - failed to load config, using default!");
+        } catch (const QUrlInvalidException& ex) {
+            warnError(QString("Episode updater json - invalid url for updater json: ") + ex.errorString() + "\nUrl: " + ex.url());
+        } catch (const QNetworkReplyException& ex) {
+            // Hide this error, and throw to the custom error message
+            qWarning() << "Episode updater json - network reply exception: " << ex.errorString();
+            throw;
+        } catch (const QNetworkReplyTimeoutException&) {
+            qWarning() << "Episode updater json - timeout when trying to access ";
+            throw;
+        }
+    } catch(...) {
+        warnError(m_launcherSettings->getErrConnectionMsg());
+        QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
+        if(urlOfErrorPage.isValid()){
+            QDesktopServices::openUrl(urlOfErrorPage);
         }
     }
 }
 
-void MainLauncherWindow::jsonErrHandler(VALIDATE_ERROR errType, const QString &errChild)
-{
-    if(errType == VALIDATE_ERROR::VALIDATE_NO_CHILD)
-        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: No \"") + errChild + "\" JSON value.");
-    if(errType == VALIDATE_ERROR::VALIDATE_WRONG_TYPE)
-        QMessageBox::warning(this, "Error", QString("Invalid Update Server JSON: Invalid \"") + errChild + "\" JSON value. (Wrong Type?)");
-}
 
-void MainLauncherWindow::openURL(QUrl url)
+void MainLauncherWindow::warnError(const QString &msg)
 {
-    QDesktopServices::openUrl(url);
+    QMessageBox::warning(this, "Error", msg);
 }
 
 void MainLauncherWindow::writeLunaConfig()
@@ -260,6 +308,12 @@ void MainLauncherWindow::writeLunaConfig()
 
 void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList<QString> &args)
 {
+    QFileInfo exeFileInfo(smbxExeFile);
+    if(!exeFileInfo.exists()){
+        qWarning() << "SMBX file does not exist!";
+        return;
+    }
+
     QList<QString> runArgs(args);
     runArgs << "--patch";
 

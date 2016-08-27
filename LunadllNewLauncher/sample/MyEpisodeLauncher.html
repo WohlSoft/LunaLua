@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    
     <script language="JavaScript" type="text/javascript">
 
         /*
@@ -51,18 +52,19 @@
         }
         
         
-        window.onload = function(){
+        onInitLauncher = function(){         
             //Note: File Path with this paramter is: {SMBX Main Dir}/worlds/{episode}/launcher/info.json
-            var someData = Launcher.getEpisodeInfo("launcher", "info.json");
-            document.getElementById('episodeInfo').innerHTML = JSON.stringify(someData);
-            
-            // For control-fields see here: https://github.com/Wohlhabend-Networks/LunaDLL/blob/master/LunadllNewLauncher/SMBXLauncher/controlconfig.h
-            var controlTest = document.getElementById('player1Keyboard');
-            if(Launcher.Controls.read()){
-                controlTest.innerHTML = "Keyboard up key: " + Launcher.Controls.keyboardUp1;
-            }else{
-                controlTest.innerHTML = "Couldn't read config.dat!"
-            }
+            Launcher.getEpisodeInfo("launcher", "info.json", function(someData){
+                document.getElementById('episodeInfo').innerHTML = JSON.stringify(someData);
+                var controlTest = document.getElementById('player1Keyboard');
+                Launcher.Controls.read(function(success){
+                    if(success){
+                        controlTest.innerHTML = "Keyboard up key: " + Launcher.Controls.keyboardUp1;
+                    }else{
+                        controlTest.innerHTML = "Couldn't read config.dat!"
+                    }
+                });
+            });
         }
         
         function saveConfig(){

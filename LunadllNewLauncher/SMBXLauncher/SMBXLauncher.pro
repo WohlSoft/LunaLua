@@ -16,8 +16,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainlauncherwindow.cpp \
-    smbxconfig.cpp \
-    autostartconfig.cpp \
+    ExposedObjects/smbxconfig.cpp \
+    ExposedObjects/autostartconfig.cpp \
     PGE_File_Formats/file_formats.cpp \
     PGE_File_Formats/file_rw_lvl.cpp \
     PGE_File_Formats/file_rw_lvlx.cpp \
@@ -38,17 +38,27 @@ SOURCES += main.cpp\
     PGE_File_Formats/smbx64.cpp \
     PGE_File_Formats/smbx64_cnf_filedata.cpp \
     PGE_File_Formats/wld_filedata.cpp \
-    controlconfig.cpp \
+    ExposedObjects/controlconfig.cpp \
     launcherconfiguration.cpp \
     ../../LunaLoader/LunaLoaderPatch.cpp \
-    NetworkUtils/networkutils.cpp \
-    NetworkUtils/qreplytimeout.cpp \
+    Utils/Network/networkutils.cpp \
+    Utils/Network/qreplytimeout.cpp \
     PGE_File_Formats/file_rw_lvl_38a.cpp \
-    PGE_File_Formats/ConvertUTF.c
+    PGE_File_Formats/ConvertUTF.c \
+    Utils/filesysutils.cpp \
+    Utils/Json/extendedqjsonreader.cpp \
+    Utils/Json/qjsonparseexception.cpp \
+    Utils/Json/qjsonfileopenexception.cpp \
+    Utils/Json/qjsonvalidationexception.cpp \
+    Utils/Network/qnetworkreplytimeoutexception.cpp \
+    Utils/Network/qnetworkreplyexception.cpp \
+    Utils/Common/qurlinvalidexception.cpp \
+    Utils/networkjsonutils.cpp \
+    Utils/Json/qjsonurlvalidationexception.cpp
 
 HEADERS  += mainlauncherwindow.h \
-    smbxconfig.h \
-    autostartconfig.h \
+    ExposedObjects/smbxconfig.h \
+    ExposedObjects/autostartconfig.h \
     PGE_File_Formats/file_formats.h \
     PGE_File_Formats/file_strlist.h \
     PGE_File_Formats/lvl_filedata.h \
@@ -63,16 +73,26 @@ HEADERS  += mainlauncherwindow.h \
     PGE_File_Formats/smbx64_cnf_filedata.h \
     PGE_File_Formats/smbx64_macro.h \
     PGE_File_Formats/wld_filedata.h \
-    controlconfig.h \
+    ExposedObjects/controlconfig.h \
     launcherconfiguration.h \
-    qjsonutil.h \
-    NetworkUtils/networkutils.h \
-    NetworkUtils/qreplytimeout.h \
+    Utils/Network/networkutils.h \
+    Utils/Network/qreplytimeout.h \
     PGE_File_Formats/charsetconvert.h \
     PGE_File_Formats/ConvertUTF.h \
     PGE_File_Formats/CSVReader.h \
     PGE_File_Formats/CSVReaderPGE.h \
-    PGE_File_Formats/CSVUtils.h
+    PGE_File_Formats/CSVUtils.h \
+    Utils/filesysutils.h \
+    Utils/Json/extendedqjsonreader.h \
+    Utils/Json/qjsonparseexception.h \
+    Utils/Json/qjsonfileopenexception.h \
+    Utils/Json/qjsonvalidationexception.h \
+    Utils/Json/qjsonextractor.h \
+    Utils/Network/qnetworkreplytimeoutexception.h \
+    Utils/Network/qnetworkreplyexception.h \
+    Utils/Common/qurlinvalidexception.h \
+    Utils/networkjsonutils.h \
+    Utils/Json/qjsonurlvalidationexception.h
 
 FORMS    += mainlauncherwindow.ui
 
