@@ -5,18 +5,18 @@ LunaHexer - a tool which physically patches raw SMBX.EXE file with loading dll f
 #include <memory.h>
 #include <string.h>
 
-void patch(FILE* f, unsigned int at, void* data, unsigned int size)
+static void patch(FILE* f, unsigned int at, void* data, unsigned int size)
 {
     fseek(f, at, SEEK_SET);
     fwrite(data, 1, size, f);
 }
 
-void patchAStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
+static void patchAStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
 {
     char data[maxlen];
     memset(data, 0, maxlen);
-    int i;
-    int len = strlen(str);
+    unsigned int i;
+    unsigned int len = strlen(str);
     for(i=0; (i<len) && (i<maxlen-1); i++)
     {
         data[i] = str[i];
@@ -25,12 +25,12 @@ void patchAStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
     fwrite(data, 1, maxlen, f);
 }
 
-void patchUStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
+static void patchUStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
 {
     char data[maxlen];
     memset(data, 0, maxlen);
-    int i, j;
-    int len = strlen(str);
+    unsigned int i, j;
+    unsigned int len = strlen(str);
     for(i=0, j=0; (i<len) && (j<maxlen); i++, j+=2)
     {
         data[j] = str[i];
@@ -40,7 +40,7 @@ void patchUStr(FILE* f, unsigned int at, char* str, unsigned int maxlen)
     fwrite(data, 1, maxlen, f);
 }
 
-char lunaPatch[132] =
+static unsigned char lunaPatch[132] =
 {
     0x1C, 0x40, 0x72, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0x70, 0x42, 0x72, 0x00, 0x00, 0x10, 0x00, 0x00,
@@ -85,34 +85,34 @@ int patchSMBX(const LUNACHAR* srcexe, const LUNACHAR* dstexe)
         fwrite(&ch, 1, 1, dst);
     fclose(src);
 
-    patch(dst, 0xBE,  "\x04", 1);
-    patch(dst, 0x109, "\x70", 1);
-    patch(dst, 0x138, "\x00\x60\x74\x00\x3C", 5);
-    patch(dst, 0x188, "\x00\x00\x00\x00\x00", 5);
-    patch(dst, 0x1D7, "\xE0", 1);
-    patch(dst, 0x228, "\x2E\x4E\x65\x77\x49\x54\x00\x00\x89", 9);
-    patch(dst, 0x235, "\x60\x74\x00\x00\x10\x00\x00\x00\xD0\x72\x00\x00\x00\x00\x00", 15);
-    patch(dst, 0x24F, "\xC0", 1);
-    patchUStr(dst, 0x27614, "LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
-    patchAStr(dst, 0x67F6A, "LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
-    patchAStr(dst, 0xA1FE3, "LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
-    patchAStr(dst, 0xC9FC0, "LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
+    patch(dst, 0xBE,  (void*)"\x04", 1);
+    patch(dst, 0x109, (void*)"\x70", 1);
+    patch(dst, 0x138, (void*)"\x00\x60\x74\x00\x3C", 5);
+    patch(dst, 0x188, (void*)"\x00\x00\x00\x00\x00", 5);
+    patch(dst, 0x1D7, (void*)"\xE0", 1);
+    patch(dst, 0x228, (void*)"\x2E\x4E\x65\x77\x49\x54\x00\x00\x89", 9);
+    patch(dst, 0x235, (void*)"\x60\x74\x00\x00\x10\x00\x00\x00\xD0\x72\x00\x00\x00\x00\x00", 15);
+    patch(dst, 0x24F, (void*)"\xC0", 1);
+    patchUStr(dst, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
+    patchAStr(dst, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
+    patchAStr(dst, 0xA1FE3, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
+    patchAStr(dst, 0xC9FC0, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
 
-    patchUStr(dst, 0x31A34, "about:blank", 82);//Kill annoying web viewer!
+    patchUStr(dst, 0x31A34, (char*)"about:blank", 82);//Kill annoying web viewer!
 
     #ifdef OVERRIDE_VERSIONINFO_1301 //in Redigit's 1.3 exe version info offset is different
-    patchUStr(dst, 0x72C584, "Hacked with LunaLUA", 46);//Comment
-    patchUStr(dst, 0x72C5D4, "WohlSoft Team", 46);//Company
-    patchUStr(dst, 0x72C62C, "www.wohlsoft.ru", 46);//File description
-    patchUStr(dst, 0x72C680, "sucks!", 54);//Copyright
-    patchUStr(dst, 0x72C6E4, "triple sucks!", 54);//Trade marks
-    patchUStr(dst, 0x72C740, "LunaLUA-SMBX", 38);//Product name
-    patchUStr(dst, 0x72C788, "1.3.0.2", 14);//Version 1
-    patchUStr(dst, 0x72C7BC, "1.3.0.2", 14);//Version 2
+    patchUStr(dst, 0x72C584, (char*)"Hacked with LunaLUA", 46);//Comment
+    patchUStr(dst, 0x72C5D4, (char*)"WohlSoft Team", 46);//Company
+    patchUStr(dst, 0x72C62C, (char*)"www.wohlsoft.ru", 46);//File description
+    patchUStr(dst, 0x72C680, (char*)"sucks!", 54);//Copyright
+    patchUStr(dst, 0x72C6E4, (char*)"triple sucks!", 54);//Trade marks
+    patchUStr(dst, 0x72C740, (char*)"LunaLUA-SMBX", 38);//Product name
+    patchUStr(dst, 0x72C788, (char*)"1.3.0.2", 14);//Version 1
+    patchUStr(dst, 0x72C7BC, (char*)"1.3.0.2", 14);//Version 2
     #endif
-    patch(dst, 0x4CA23B, "\xFF\x15\x71\x60\xB4\x00", 6);
-    patch(dst, 0x4D9446, "\xFF\x15\x6D\x60\xB4\x00\x90", 7);
-    patch(dst, 0x56C030, "\xFF\x15\x69\x60\xB4\x00", 6);
+    patch(dst, 0x4CA23B, (void*)"\xFF\x15\x71\x60\xB4\x00", 6);
+    patch(dst, 0x4D9446, (void*)"\xFF\x15\x6D\x60\xB4\x00\x90", 7);
+    patch(dst, 0x56C030, (void*)"\xFF\x15\x69\x60\xB4\x00", 6);
     patch(dst, 0x72D000, null, 4096);
     patch(dst, 0x72D000, lunaPatch, 132);
     fclose(dst);
