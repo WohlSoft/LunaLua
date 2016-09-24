@@ -5,9 +5,18 @@
 // GET
 NPCMOB* NPC::Get(int index) {
 	if(index < 0 || index > GM_NPCS_COUNT)
-		return 0;
+		return nullptr;
 		
     return &((NPCMOB*)GM_NPCS_PTR)[index + 129]; // +129 makes an offset of 0xAD58
+}
+
+// GET where 0 is the Dummy NPC
+NPCMOB * NPC::GetRaw(int index)
+{
+    if (index < 0 || index > GM_NPCS_COUNT)
+        return nullptr;
+
+    return &((NPCMOB*)GM_NPCS_PTR)[index + 128];
 }
 
 NPCMOB * NPC::GetDummyNPC()
