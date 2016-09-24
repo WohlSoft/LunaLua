@@ -1311,6 +1311,12 @@ static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *har
             }
         }
 
+        // If friendly, immune to everything but despawn
+        if ((npc->friendly != 0) && (*harmType != HARM_TYPE_OFFSCREEN))
+        {
+            return 0;
+        }
+
         return -1;
     }
 
