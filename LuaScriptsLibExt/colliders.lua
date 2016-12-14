@@ -1,16 +1,16 @@
 --*********************************************--
---**   _____	  _ _ _	 _				**--
---**  / ____|	| | (_)   | |			   **--
---** | |	 ___ | | |_  __| | ___ _ __ ___  **--
---** | |	/ _ \| | | |/ _` |/ _ \ '__/ __| **--
+--**   _____      _ _ _     _                **--
+--**  / ____|    | | (_)   | |               **--
+--** | |     ___ | | |_  __| | ___ _ __ ___  **--
+--** | |    / _ \| | | |/ _` |/ _ \ '__/ __| **--
 --** | |___| (_) | | | | (_| |  __/ |  \__ \ **--
 --**  \_____\___/|_|_|_|\__,_|\___|_|  |___/ **--
---**										 **--
---*********************************************--									   
+--**                                         **--
+--*********************************************--                                       
 -------------Created by Hoeloe - 2015------------
 -----Open-Source Collision Detection Library-----
 --------------For Super Mario Bros X-------------
----------------------v2.1.4g---------------------
+---------------------v2.1.4----------------------
 ---------------REQUIRES VECTR.lua----------------
 
 local colliders = {}
@@ -25,10 +25,6 @@ local TYPE_CIRCLE = 6;
 local TYPE_POINT = 7;
 local TYPE_POLY = 8;
 local TYPE_TRI = 9;
-local COLLIDERS_TYPES = {
-	TYPE_PLAYER, TYPE_NPC, TYPE_BLOCK, TYPE_ANIM,
-	TYPE_BOX, TYPE_CIRCLE, TYPE_POINT, TYPE_POLY, TYPE_TRI
-};
 
 colliders.BLOCK_SOLID = {};
 colliders.BLOCK_SEMISOLID = {8,25,26,27,28,38,69,121,122,123,130,161,168,240,241,242,243,244,245,259,260,261,287,288,289,290,372,373,374,375,379,380,381,382,389,391,392,437,438,439,440,441,442,443,444,445,446,447,448,506,507,508,568,572,579};
@@ -36,24 +32,6 @@ colliders.BLOCK_NONSOLID = {172,175,179,181};
 colliders.BLOCK_LAVA = {30,371,404,405,406,420,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487};
 colliders.BLOCK_HURT = {109,110,267,268,269,407,408,428,429,430,431,511,598};
 colliders.BLOCK_PLAYER = {626,627,628,629,632};
-
-local function MakeBlockIdTestMap(src)
-	local ret = {}
-	for i=1,638 do
-		ret[i] = false
-	end
-	for i=1,#src do
-		ret[src[i]] = true
-	end
-	return ret
-end
-
-colliders.BLOCK_SOLID_MAP = {}
-colliders.BLOCK_SEMISOLID_MAP = MakeBlockIdTestMap(colliders.BLOCK_SEMISOLID)
-colliders.BLOCK_NONSOLID_MAP = MakeBlockIdTestMap(colliders.BLOCK_NONSOLID)
-colliders.BLOCK_LAVA_MAP = MakeBlockIdTestMap(colliders.BLOCK_LAVA)
-colliders.BLOCK_HURT_MAP = MakeBlockIdTestMap(colliders.BLOCK_HURT)
-colliders.BLOCK_PLAYER_MAP = MakeBlockIdTestMap(colliders.BLOCK_PLAYER)
 
 local blockscache = {};
 
@@ -118,7 +96,6 @@ function colliders.onInitAPI()
 			table.insert(colliders.BLOCK_SOLID,i);
 		end
 	end
-	colliders.BLOCK_SOLID_MAP = MakeBlockIdTestMap(colliders.BLOCK_SOLID)
 
 	registerEvent(colliders, "onLoop", "update", false) --Register the loop event
 end
@@ -127,8 +104,8 @@ local function getScreenBounds()
 	local h = (player:mem(0xD0, FIELD_DFLOAT));
 	local b = { left = player.x-400+player.speedX, right = player.x+400+player.speedX, top = player.y-260+player.speedY, bottom = player.y+340+player.speedY };
 	
-	local sect = Section(player.section);
-	local bounds = sect.boundary;
+    local sect = Section(player.section);
+    local bounds = sect.boundary;
 
 	if(b.left < bounds.left - 10) then
 		b.left = bounds.left - 10;
@@ -163,28 +140,28 @@ end
 
 local colliderList = {};
 
-local debugList = {};
+local debugList = {}
 
-local function colliderSetDebug(object, bool)
-	if(debugList[object] ~= nil and not bool) then
-		debugList[object] = nil;
-	elseif(debugList[object] == nil and bool) then
-		debugList[object] = object;
-	end
+local function createMeta(t)
+	local mt = {}
+	mt.__index = function(obj, key)
+					if(key=="TYPE") then return t; end;
+					if(key=="Debug") then
+					return function(object, bool)
+								if(debugList[object] ~= nil and not bool) then
+									debugList[object] = nil;
+								elseif(debugList[object] == nil and bool) then
+									debugList[object] = object;
+								end
+							end;
+					end;
+				end;
+	return mt;
 end
 
-local collidersTypeMetatables = {};
-for _,t in ipairs(COLLIDERS_TYPES) do
-	local mt = {};
-	mt.__index = {
-		TYPE = t,
-		Debug = colliderSetDebug
-	};
-	collidersTypeMetatables[t] = mt;
-end
-
-do -- Declare Box methods
-	collidersTypeMetatables[TYPE_BOX].__index.Draw = function(obj, c)
+function colliders.Box(x,y,width,height)
+	local b = { x = x, y = y, width = width, height = height };
+	b.Draw = function(obj, c)
 		c = c or 0xFF000099;
 		Graphics.glSetTextureRGBA(nil, c);
 		local pts = {};
@@ -199,10 +176,7 @@ do -- Declare Box methods
 		Graphics.glDrawTriangles(pts, {}, 6);
 		Graphics.glSetTextureRGBA(nil, 0xFFFFFFFF);
 	end
-end
-function colliders.Box(x,y,width,height)
-	local b = { x = x, y = y, width = width, height = height };
-	setmetatable(b,collidersTypeMetatables[TYPE_BOX]);
+	setmetatable(b,createMeta(TYPE_BOX));
 	return b;
 end
 
@@ -249,8 +223,9 @@ local function circleToTris(obj)
 		return pts;
 end
 
-do -- Declare Circle methods
-	collidersTypeMetatables[TYPE_CIRCLE].__index.Draw = function(obj, c)
+function colliders.Circle(x,y,radius)
+	local c = { x = x, y = y, radius = radius };
+	c.Draw = function(obj, co)
 		co = co or 0xFF00FF99;
 		Graphics.glSetTextureRGBA(nil, co);
 		local x1,y1 = worldToScreen(obj.x - 10, obj.y + 10);
@@ -268,15 +243,13 @@ do -- Declare Circle methods
 		Graphics.glDrawTriangles(pts, {}, (#pts + 1)/2);
 		Graphics.glSetTexture(nil, 0xFFFFFFFF);
 	end
-end
-function colliders.Circle(x,y,radius)
-	local c = { x = x, y = y, radius = radius };
-	setmetatable(c,collidersTypeMetatables[TYPE_CIRCLE]);
+	setmetatable(c,createMeta(TYPE_CIRCLE));
 	return c;
 end
 
-do -- Declare Point methods
-	collidersTypeMetatables[TYPE_POINT].__index.Draw = function(obj, c)
+function colliders.Point(x,y)
+	local p = { x = x, y = y };
+	p.Draw = function(obj, c)
 		c = c or 0x0099FF99;
 		Graphics.glSetTextureRGBA(nil, c);
 		local pts = {};
@@ -291,71 +264,10 @@ do -- Declare Point methods
 		Graphics.glDrawTriangles(pts, {}, 6);
 		Graphics.glSetTextureRGBA(nil, 0xFFFFFFFF);
 	end
-end
-function colliders.Point(x,y)
-	local p = { x = x, y = y };
-	setmetatable(p,collidersTypeMetatables[TYPE_POINT]);
+	setmetatable(p,createMeta(TYPE_POINT));
 	return p;
 end
 
-do -- Declare Tri methods
-	collidersTypeMetatables[TYPE_TRI].__index.Get = function(obj, index)
-		if(index < 1 or index >= 4) then
-			error("Invalid triangle index.", 2);
-		end
-		return { obj.v[index][1]+obj.x, obj.v[index][2]+obj.y };
-	end
-	
-	collidersTypeMetatables[TYPE_TRI].__index.Rotate = function(obj, angle)
-		local s = math.sin(math.pi*angle/180);
-		local c = math.cos(math.pi*angle/180);
-		
-		local t = colliders.Tri(obj.x, obj.y, 
-		{obj.v[1][1]*c - obj.v[1][2]*s, obj.v[1][1]*s + obj.v[1][2]*c},
-		{obj.v[2][1]*c - obj.v[2][2]*s, obj.v[2][1]*s + obj.v[2][2]*c},
-		{obj.v[3][1]*c - obj.v[3][2]*s, obj.v[3][1]*s + obj.v[3][2]*c});
-		
-		obj.v = t.v;
-		obj.minX = t.minX;
-		obj.maxX = t.maxX;
-		obj.minY = t.minY;
-		obj.maxY = t.maxY;
-	end
-	
-	collidersTypeMetatables[TYPE_TRI].__index.Translate = function(obj, x, y)
-		for i=1,3 do
-			obj.v[i] = {obj.v[i][1]+x, obj.v[i][2]+y};
-		end
-		obj.minX = obj.minX + x;
-		obj.maxX = obj.maxX + x;
-		obj.minY = obj.minY + y;
-		obj.maxY = obj.maxY + y;
-	end
-	
-	collidersTypeMetatables[TYPE_TRI].__index.Scale = function(obj, x, y)
-		y = y or x;
-		for i=1,3 do
-			obj.v[i] = {obj.v[i][1]*x, obj.v[i][2]*y};
-		end
-		obj.minX = obj.minX*x;
-		obj.maxX = obj.maxX*x;
-		obj.minY = obj.minY*y;
-		obj.maxY = obj.maxY*y;
-	end
-	
-	collidersTypeMetatables[TYPE_TRI].__index.Draw = function(obj, c)
-		c = c or 0x00FF0099;
-		Graphics.glSetTextureRGBA(nil, c);
-		local pts = {};
-		local x1,y1 = worldToScreen(obj.x - 10, obj.y + 10);
-		pts[0] = x1+obj.v[1][1]; pts[1] = y1+obj.v[1][2];
-		pts[2] = x1+obj.v[2][1]; pts[3] = y1+obj.v[2][2];
-		pts[4] = x1+obj.v[3][1]; pts[5] = y1+obj.v[3][2];
-		
-		Graphics.glDrawTriangles(pts, {}, 3);
-		Graphics.glSetTextureRGBA(nil, 0xFFFFFFFF);
-	end
-end
 function colliders.Tri(x,y,p1,p2,p3)
 	local p = { x=x, y=y, v={p1,p2,p3} };
 	
@@ -393,23 +305,81 @@ function colliders.Tri(x,y,p1,p2,p3)
 		p.v[3] = pv;
 	end
 	
-	setmetatable(p,collidersTypeMetatables[TYPE_TRI]);
+	p.Get = function(obj, index)
+		if(index < 1 or index >= 4) then
+			error("Invalid triangle index.", 2);
+		end
+		return { obj.v[index][1]+obj.x, obj.v[index][2]+obj.y };
+	end
+	
+	p.Rotate = function(obj, angle)
+		local s = math.sin(math.pi*angle/180);
+		local c = math.cos(math.pi*angle/180);
+		
+		local t = colliders.Tri(obj.x, obj.y, 
+		{obj.v[1][1]*c - obj.v[1][2]*s, obj.v[1][1]*s + obj.v[1][2]*c},
+		{obj.v[2][1]*c - obj.v[2][2]*s, obj.v[2][1]*s + obj.v[2][2]*c},
+		{obj.v[3][1]*c - obj.v[3][2]*s, obj.v[3][1]*s + obj.v[3][2]*c});
+		
+		obj.v = t.v;
+		obj.minX = t.minX;
+		obj.maxX = t.maxX;
+		obj.minY = t.minY;
+		obj.maxY = t.maxY;
+	end
+	
+	p.Translate = function(obj, x, y)
+		for i=1,3 do
+			obj.v[i] = {obj.v[i][1]+x, obj.v[i][2]+y};
+		end
+		obj.minX = obj.minX + x;
+		obj.maxX = obj.maxX + x;
+		obj.minY = obj.minY + y;
+		obj.maxY = obj.maxY + y;
+	end
+	
+	p.Scale = function(obj, x, y)
+		y = y or x;
+		for i=1,3 do
+			obj.v[i] = {obj.v[i][1]*x, obj.v[i][2]*y};
+		end
+		obj.minX = obj.minX*x;
+		obj.maxX = obj.maxX*x;
+		obj.minY = obj.minY*y;
+		obj.maxY = obj.maxY*y;
+	end
+	
+	p.Draw = function(obj, c)
+		c = c or 0x00FF0099;
+		Graphics.glSetTextureRGBA(nil, c);
+		local pts = {};
+		local x1,y1 = worldToScreen(obj.x - 10, obj.y + 10);
+		pts[0] = x1+obj.v[1][1]; pts[1] = y1+obj.v[1][2];
+		pts[2] = x1+obj.v[2][1]; pts[3] = y1+obj.v[2][2];
+		pts[4] = x1+obj.v[3][1]; pts[5] = y1+obj.v[3][2];
+		
+		Graphics.glDrawTriangles(pts, {}, 3);
+		Graphics.glSetTextureRGBA(nil, 0xFFFFFFFF);
+	end
+	
+	setmetatable(p,createMeta(TYPE_TRI));
 	return p;
 end
 
-local __typeStringMap = {Player=TYPE_PLAYER, Block=TYPE_BLOCK, Animation=TYPE_ANIM, NPC=TYPE_NPC}
 local function getType(obj)
 	if(obj.TYPE ~= nil) then
 		return obj.TYPE;
+	elseif(obj.powerup ~= nil) then
+		return TYPE_PLAYER;
+	elseif(obj.slippery ~= nil) then
+		return TYPE_BLOCK;
+	elseif(obj.timer ~= nil) then
+		return TYPE_ANIM;
+	elseif(obj.id ~= nil) then
+		return TYPE_NPC;
+	else
+		error("Unknown collider type.", 2);
 	end
-	local t1 = obj.__type
-	if (t1 ~= nil) then
-		local t2 = __typeStringMap[t1]
-		if (t2 ~= nil) then
-			return t2
-		end
-	end
-	error("Unknown collider type.", 2);
 end
 
 local function convertPoints(p)
@@ -566,48 +536,6 @@ local function testTriPoly(a,b)
 	return false;
 end
 
-do -- Declare Poly methods
-	collidersTypeMetatables[TYPE_POLY].__index.Rotate = function(obj, angle)
-		for k,v in ipairs(obj.tris) do
-			v:Rotate(angle);
-			if(v.minX < obj.minX) then obj.minX = v.minX; end
-			if(v.maxX > obj.maxX) then obj.maxX = v.maxX; end
-			if(v.minY < obj.minY) then obj.minY = v.minY; end
-			if(v.maxY > obj.maxY) then obj.maxY = v.maxY; end
-		end
-	end
-	
-	collidersTypeMetatables[TYPE_POLY].__index.Translate = function(obj, x, y)
-		for k,v in ipairs(obj.tris) do
-			v:Translate(x,y);
-		end
-		obj.minX = obj.minX + x;
-		obj.maxX = obj.maxX + x;
-		obj.minY = obj.minY + y;
-		obj.maxY = obj.maxY + y;
-	end
-	
-	collidersTypeMetatables[TYPE_POLY].__index.Scale = function(obj, x, y)
-		y = y or x;
-		for k,v in ipairs(obj.tris) do
-			v:Scale(x,y);
-		end
-		obj.minX = obj.minX*x;
-		obj.maxX = obj.maxX*x;
-		obj.minY = obj.minY*y;
-		obj.maxY = obj.maxY*y;
-	end
-	
-	collidersTypeMetatables[TYPE_POLY].__index.Draw = function(obj, c)
-		c = c or 0x0000FF99;
-		for _,v in ipairs(obj.tris) do
-			v.x = obj.x;
-			v.y = obj.y;
-			Graphics.glSetTextureRGBA(nil, c);
-			v:Draw(c);
-		end
-	end
-end
 function colliders.Poly(x,y,...)
 	local arg = {...};
 	
@@ -706,7 +634,48 @@ function colliders.Poly(x,y,...)
 	
 	p.tris = trilist;
 	
-	setmetatable(p,collidersTypeMetatables[TYPE_POLY])
+	p.Rotate = function(obj, angle)
+		for k,v in ipairs(obj.tris) do
+			v:Rotate(angle);
+			if(v.minX < obj.minX) then obj.minX = v.minX; end
+			if(v.maxX > obj.maxX) then obj.maxX = v.maxX; end
+			if(v.minY < obj.minY) then obj.minY = v.minY; end
+			if(v.maxY > obj.maxY) then obj.maxY = v.maxY; end
+		end
+	end
+	
+	p.Translate = function(obj, x, y)
+		for k,v in ipairs(obj.tris) do
+			v:Translate(x,y);
+		end
+		obj.minX = obj.minX + x;
+		obj.maxX = obj.maxX + x;
+		obj.minY = obj.minY + y;
+		obj.maxY = obj.maxY + y;
+	end
+	
+	p.Scale = function(obj, x, y)
+		y = y or x;
+		for k,v in ipairs(obj.tris) do
+			v:Scale(x,y);
+		end
+		obj.minX = obj.minX*x;
+		obj.maxX = obj.maxX*x;
+		obj.minY = obj.minY*y;
+		obj.maxY = obj.maxY*y;
+	end
+	
+	p.Draw = function(obj, c)
+		c = c or 0x0000FF99;
+		for _,v in ipairs(obj.tris) do
+			v.x = obj.x;
+			v.y = obj.y;
+			Graphics.glSetTextureRGBA(nil, c);
+			v:Draw(c);
+		end
+	end
+	
+	setmetatable(p,createMeta(TYPE_POLY))
 	
 	return p;
 end
@@ -804,27 +773,25 @@ local function testPolyCircle(a,b)
 	return false;
 end
 
-
-local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
+function colliders.linecast(startPoint,endPoint,collider)
+	
+	local a,sp,v1 = convertPoints(startPoint);
+	local b,ep,v2 = convertPoints(endPoint);
+	
 	local c1n = collider[1] ~= nil;
 	local c0n = collider[0] ~= nil;
+	
 	
 	if(collider[1] ~= nil) then	
 		local hit;
 		local norm;
 		local col;
-		for _,v in pairs(collider) do
-			local bl,pt,nm,_,sqrDist = linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,v,maxSqrDist);
-			if(bl) then
-				if (sqrDist == nil) then
-					sqrDist = (pt-v1).sqrlength;
-				end
-				if(sqrDist < maxSqrDist) then
-					maxSqrDist = sqrDist;
-					hit = pt;
-					norm = nm;
-					col = v;
-				end
+		for _,v in  pairs(collider) do
+			local bl,pt,nm = colliders.linecast(startPoint,endPoint,v);
+			if(bl and (hit == nil or (pt-v1).sqrlength < (hit-v1).sqrlength)) then
+				hit = pt;
+				norm = nm;
+				col = v;
 			end
 		end
 		if(hit ~= nil) then
@@ -836,7 +803,7 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 	
 	local c = colliders.getHitbox(collider);
 	
-	
+	local aabb = colliders.Box(math.min(v1.x,v2.x),math.min(v1.y,v2.y),math.abs(v2.x-v1.x),math.abs(v2.y-v1.y));
 	local cbb = colliders.getAABB(collider);
 	
 	if(not colliders.collide(aabb,cbb)) then
@@ -846,7 +813,7 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 	if(sp.x == ep.x and sp.y == ep.y) then
 		local b = colliders.collide(sp,c);
 		if(b) then
-			return true, v1, vect.zero2, collider;
+			return true, vect.v2(sp), vect.zero2, collider;
 		else
 			return false, nil, nil, nil;
 		end
@@ -864,68 +831,41 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 			or intersect(a,b,{c.x+c.width,c.y},{c.x+c.width,c.y+c.height})
 			or intersect(a,b,{c.x+c.width,c.y+c.height},{c.x,c.y+c.height})
 			or intersect(a,b,{c.x,c.y+c.height},{c.x,c.y}));--]]
-			
-		local hit,nm,col,p;
-		local top = c.y
-		local right = c.x + c.width
-		local bottom = c.y + c.height
-		local left = c.x
-		if (dy > 0) and ((top - a[2])*(top - a[2]) < maxSqrDist) then
-			col,p = intersectpoint(a,b,{left,top},{right,top}); -- Top
-			if(col) then
-				local sqrDist = (p-v1).sqrlength
-				if (hit == nil) or (sqrDist < maxSqrDist) then
-					maxSqrDist = sqrDist;
-					hit = p;
-					nm = -vect.up2;
-				end
-			end
+		local hit,nm;
+		local col,p = intersectpoint(a,b,{c.x,c.y},{c.x+c.width,c.y});
+		if(col) then
+			hit = p;
+			nm = -vect.up2;
 		end
-		if (dx < 0) and ((right - a[1])*(right - a[1]) < maxSqrDist) then
-			col,p = intersectpoint(a,b,{right,top},{right,bottom}) -- Right
-			if(col) then
-				local sqrDist = (p-v1).sqrlength
-				if (hit == nil) or (sqrDist < maxSqrDist) then
-					maxSqrDist = sqrDist;
-					hit = p;
-					nm = vect.right2;
-				end
-			end
+		col,p = intersectpoint(a,b,{c.x+c.width,c.y},{c.x+c.width,c.y+c.height})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = vect.right2;
 		end
-		if (dy < 0) and ((bottom - a[2])*(bottom - a[2]) < maxSqrDist) then
-			col,p = intersectpoint(a,b,{left,bottom},{right,bottom}) -- Bottom
-			if(col) then
-				local sqrDist = (p-v1).sqrlength
-				if (hit == nil) or (sqrDist < maxSqrDist) then
-					maxSqrDist = sqrDist;
-					hit = p;
-					nm = vect.up2;
-				end
-			end
+		col,p = intersectpoint(a,b,{c.x+c.width,c.y+c.height},{c.x,c.y+c.height})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = vect.up2;
 		end
-		if (dx > 0) and ((left - a[1])*(left - a[1]) < maxSqrDist) then
-			col,p = intersectpoint(a,b,{left,top},{left,bottom}) -- Left
-			if(col) then
-				local sqrDist = (p-v1).sqrlength
-				if (hit == nil) or (sqrDist < maxSqrDist) then
-					maxSqrDist = sqrDist;
-					hit = p;
-					nm = -vect.right2;
-				end
-			end
+		col,p = intersectpoint(a,b,{c.x,c.y+c.height},{c.x,c.y})
+		if(col and (hit == nil or (p-v1).sqrlength < (hit-v1).sqrlength)) then
+			hit = p;
+			nm = -vect.right2;
 		end
 		if(hit ~= nil) then
-			return true, hit, nm, collider, maxSqrDist;
+			return true, hit, nm, collider;
 		else
-			return false, nil, nil, nil, nil;
+			return false, nil, nil, nil;
 		end
 	elseif(t == TYPE_CIRCLE) then
 		local centre = vect.v2(c.x,c.y);
 		local t1 = v1-centre;
 		local t2 = v2-centre;
-		local drsqr = dx*dx + dy*dy;
+		local dx = t2.x-t1.x;
+		local dy = t2.y-t1.y;
+		local dr = math.sqrt(dx*dx + dy*dy);
 		local D = t1.x*t2.y - t2.x*t1.y;
-		local delta = c.radius*c.radius*drsqr - D*D;
+		local delta = c.radius*c.radius*dr*dr - D*D;
 		if(delta < 0) then
 			return false, nil, nil, nil;
 		else
@@ -933,10 +873,10 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 			if(dy < 0) then sdy=-1; else sdy = 1; end
 			local qx = sdy*dx*math.sqrt(delta);
 			local qy = math.abs(dy)*math.sqrt(delta);
-			local px1 = (D*dy + qx)/drsqr;
-			local px2 = (D*dy - qx)/drsqr;
-			local py1 = (-D*dx + qy)/drsqr;
-			local py2 = (-D*dx - qy)/drsqr;
+			local px1 = (D*dy + qx)/(dr*dr);
+			local px2 = (D*dy - qx)/(dr*dr);
+			local py1 = (-D*dx + qy)/(dr*dr);
+			local py2 = (-D*dx - qy)/(dr*dr);
 			local p1 = vect.v2(px1,py1);
 			local p2 = vect.v2(px2,py2);
 			if((p2-t1).sqrlength < (p1-t1).sqrlength) then
@@ -980,13 +920,13 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 		end
 		return false;]]
 		local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
-		if(not linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,bb,maxSqrDist)) then return false,nil,nil,nil; end
+		if(not colliders.linecast(startPoint, endPoint, bb)) then return false,nil,nil,nil; end
 		
 		local hit;
 		local norm;
 		
 		for k,v in ipairs(c.tris) do
-			local ht,pt,nm = linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,v,maxSqrDist);
+			local ht,pt,nm = colliders.linecast(startPoint,endPoint,v);
 			if(ht and (hit == nil or (pt-v1).sqrlength < (hit-v1).sqrlength)) then
 				hit = pt;
 				norm = nm;
@@ -1001,7 +941,7 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 		
 	elseif(t == TYPE_TRI) then
 			local bb = colliders.Box(c.minX+c.x, c.minY+c.y, c.maxX-c.minX, c.maxY-c.minY);
-			if(not linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,bb,maxSqrDist)) then return false,nil,nil,nil; end
+			if(not colliders.linecast(startPoint, endPoint, bb)) then return false,nil,nil,nil; end
 			
 			local hit;
 			local dir;
@@ -1026,63 +966,57 @@ local function linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,maxSqrDist)
 	end
 end
 
-function colliders.linecast(startPoint,endPoint,collider)
-	local a,sp,v1 = convertPoints(startPoint);
-	local b,ep,v2 = convertPoints(endPoint);
-	local aabb = colliders.Box(math.min(v1.x,v2.x),math.min(v1.y,v2.y),math.abs(v2.x-v1.x),math.abs(v2.y-v1.y));
-	local dx = b[1] - a[1];
-	local dy = b[2] - a[2];
-	return linecast_internal(a,sp,v1,b,ep,v2,dx,dy,aabb,collider,dx*dx+dy*dy);
-end
-
 function colliders.raycast(startPoint,direction,collider)
 	local _,_,sp = convertPoints(startPoint);
 	local _,_,dir = convertPoints(direction);
 	return colliders.linecast(sp,sp-dir,collider);
 end
 
---	 /|
---	/_|
---Slope bottomleft to topright floor
-local getBlockHitbox_lrslope_floor = {452,321,365,316,357,358,306,305,302,616,299,340,341,472,480,636,635,326,324,604,600,332}; 
-
---	|\
---	|_\
---Slope topleft to bottomright floor
-local getBlockHitbox_rlslope_floor = {451,319,366,315,359,360,308,307,301,617,300,343,342,474,482,638,637,327,325,601,605,333}; 
-
---	|-/
---	|/
---Slope bottomleft to topright ceil	
-local getBlockHitbox_lrslope_ceil = {318,367,363,364,314,313,310,479,485,328,614,613,334};
-	
---	\-|
---	 \|
---Slope topleft to bottomright ceil			
-local getBlockHitbox_rlslope_ceil = {317,368,361,362,312,311,309,476,486,329,77,78,335}; 
-
---	[][]
---
---Vertical half block
-local getBlockHitbox_uphalf = {289,168,69};
-
--- Create mappings for fast access
-local getBlockHitbox_lrslope_floor_map = MakeBlockIdTestMap(getBlockHitbox_lrslope_floor)
-local getBlockHitbox_rlslope_floor_map = MakeBlockIdTestMap(getBlockHitbox_rlslope_floor)
-local getBlockHitbox_lrslope_ceil_map = MakeBlockIdTestMap(getBlockHitbox_lrslope_ceil)
-local getBlockHitbox_rlslope_ceil_map = MakeBlockIdTestMap(getBlockHitbox_rlslope_ceil)
-local getBlockHitbox_uphalf_map = MakeBlockIdTestMap(getBlockHitbox_uphalf)
-
 local function getBlockHitbox(id, x, y, wid, hei)
-	if getBlockHitbox_lrslope_floor_map[id] then --Slope bottomleft to topright floor
+	
+	--	 /|
+	--	/_|
+	--Slope bottomleft to topright floor
+	local lrslope_floor = {452,321,365,316,357,358,306,305,302,616,299,340,341,472,480,636,635,326,324,604,600,332}; 
+	
+	--	|\
+	--	|_\
+	--Slope topleft to bottomright floor
+	local rlslope_floor = {451,319,366,315,359,360,308,307,301,617,300,343,342,474,482,638,637,327,325,601,605,333}; 
+	
+	--	|-/
+	--	|/
+	--Slope bottomleft to topright ceil	
+	local lrslope_ceil = {318,367,363,364,314,313,310,479,485,328,614,613,334};
+		
+	--	\-|
+	--	 \|
+	--Slope topleft to bottomright ceil			
+	local rlslope_ceil = {317,368,361,362,312,311,309,476,486,329,77,78,335}; 
+
+	--	[][]
+	--
+	--Vertical half block
+	local uphalf = {289,168,69};
+
+	local isAny = function(tbl, val) 
+		for _,v in ipairs(tbl) do 
+			if v == val then
+				return true;
+			end
+		end
+		return false;
+	end
+
+	if isAny(lrslope_floor,id) then --Slope bottomleft to topright floor
 		return colliders.Tri(x,y,{0,hei},{wid,0},{wid,hei});
-	elseif getBlockHitbox_rlslope_floor_map[id] then --Slope topleft to bottomright floor
+	elseif isAny(rlslope_floor,id) then --Slope topleft to bottomright floor
 		return colliders.Tri(x,y,{0,0},{wid,hei},{0,hei});
-	elseif getBlockHitbox_lrslope_ceil_map[id] then --Slope bottomleft to topright ceil
+	elseif isAny(lrslope_ceil,id) then --Slope bottomleft to topright ceil
 		return colliders.Tri(x,y,{0,0},{wid,0},{0,hei});
-	elseif getBlockHitbox_rlslope_ceil_map[id] then --Slope topleft to bottomright ceil
+	elseif isAny(rlslope_ceil,id) then --Slope topleft to bottomright ceil
 		return colliders.Tri(x,y,{0,0},{wid,0},{wid,hei});
-	elseif getBlockHitbox_uphalf_map[id] then --Vertical half block
+	elseif isAny(uphalf,id) then --Vertical half block
 		return colliders.Box(x,y,wid,hei/2);
 	else
 		return colliders.Box(x,y,wid,hei);
@@ -1090,11 +1024,12 @@ local function getBlockHitbox(id, x, y, wid, hei)
 end
 
 function colliders.getAABB(a)
+	local ta = getType(a);
+	
+	
 	if(a.TYPE == TYPE_BOX) then
 		return a;
 	end
-
-	local ta = getType(a);
 	
 	if(ta == TYPE_BLOCK or ta == TYPE_PLAYER or ta == TYPE_NPC or ta == TYPE_ANIM) then
 		return colliders.getHitbox(a);
@@ -1108,11 +1043,11 @@ function colliders.getAABB(a)
 end
 
 function colliders.getHitbox(a)
+	local ta = getType(a);
+	
 	if(a.TYPE ~= nil) then
 		return a;
 	end
-	
-	local ta = getType(a);
 	
 	if(ta == TYPE_BLOCK) then
 			return getBlockHitbox(a.id, a.x, a.y, a.width, a.height);

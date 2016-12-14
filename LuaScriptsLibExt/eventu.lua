@@ -1,6 +1,20 @@
---eventu.lua 
---v1.0.4
---Created by Hoeloe, 2015
+-----------------------------------------
+-----------------------------------------
+--*************************************--
+--*  ______               _   _    _  *--
+--* |  ____|             | | | |  | | *--
+--* | |____   _____ _ __ | |_| |  | | *--
+--* |  __\ \ / / _ \ '_ \| __| |  | | *--
+--* | |___\ V /  __/ | | | |_| |__| | *--
+--* |______\_/ \___|_| |_|\__|\____/  *--
+--*                                   *--
+--*************************************--
+-----------------------------------------
+-----------------------------------------     
+--------Created by Hoeloe - 2015---------
+------Open-Source Coroutine Library------
+---------For Super Mario Bros X----------
+-----------------v1.1.0------------------
 local eventu = {}
 
 local secondsQueue = {}
@@ -163,6 +177,7 @@ function eventu.waitEvent(name)
 end
 
 function eventu.signal(name)
+		if(signalQueue[name] == nil) then return end;
 		local waketable = {}
 		for k,v in pairs(signalQueue[name]) do
 			signalQueue[name][k] = nil;
@@ -175,9 +190,12 @@ function eventu.signal(name)
 		end
 end
 
-function eventu.setTimer(secs, func, repeated)
-		repeated = repeated or false;
-		local _,c = eventu.run(function()
+function eventu.setTimer(secs, func, repeated)	
+		local f;
+		if(repeated == nil or type(repeated) ~= "number") then
+			repeated = repeated or false;
+			
+			f = function()	
 						repeat
 							eventu.waitSeconds(secs);
 							func();
@@ -187,13 +205,30 @@ function eventu.setTimer(secs, func, repeated)
 								repeated = false;
 							end
 						until repeated == false;
-					end);
+					end
+		else
+			f = function()	
+						for i=1,repeated do
+							eventu.waitSeconds(secs);
+							func(i);
+							local co = getCurrentCoroutine();
+							if(breakQueue[co] == true) then
+								breakQueue[co] = nil;
+								break;
+							end
+						end
+					end
+		end
+		local _,c = eventu.run(f);
 		return c;
 end
 
 function eventu.setFrameTimer(frames, func, repeated)
-		repeated = repeated or false;
-		local _,c = eventu.run(function()
+		local f;
+		if(repeated == nil or type(repeated) ~= "number") then
+			repeated = repeated or false;
+			
+			f = function()
 						repeat
 							eventu.waitFrames(frames);
 							func();
@@ -203,7 +238,22 @@ function eventu.setFrameTimer(frames, func, repeated)
 								repeated = false;
 							end
 						until repeated == false;
-					end);
+					end
+			
+		else
+			f = function()
+						for i = 1,repeated do
+							eventu.waitFrames(frames);
+							func(i);
+							local co = getCurrentCoroutine();	
+							if(breakQueue[co] == true) then
+								breakQueue[co] = nil;
+								break;
+							end
+						end
+					end
+		end
+		local _,c = eventu.run(f);
 		return c;
 end
 
@@ -230,9 +280,34 @@ function eventu.breakTimer()
 		breakQueue[co] = true;
 end
 
+function eventu.abort(co)
+	if(co ~= nil) then
+	secondsQueue[co] = nil;
+	framesQueue[co] = nil;
+	inputQueue[co] = nil;
+	for k,v in pairs(signalQueue) do
+		for l,w in ipairs(v) do
+			if(w == co) then
+				table.remove(v,l);
+				break;
+			end
+		end
+	end
+	for k,v in pairs(eventQueue) do
+		for l,w in ipairs(v) do
+			if(w == co) then
+				table.remove(v,l);
+				break;
+			end
+		end
+	end
+	pausedQueue[co] = nil;
+	end
+end
+
 function eventu.registerKeyEvent(key, func, consume)
 		consume = consume or false;
-		eventu.run(function()
+		local _,c = eventu.run(function()
 						repeat
 							eventu.waitForInput(key);
 							func();
@@ -243,11 +318,12 @@ function eventu.registerKeyEvent(key, func, consume)
 							end
 						until consume == true;
 					end);
+		return c;
 end
 
 function eventu.registerSMBXEvent(event, func, repeated)
 		repeated = repeated or false;
-		eventu.run(function()
+		local _,c = eventu.run(function()
 						repeat
 							eventu.waitEvent(event);
 							func();
@@ -258,6 +334,7 @@ function eventu.registerSMBXEvent(event, func, repeated)
 							end
 						until repeated == false;
 					end);
+		return c;
 end
 
 return eventu;
