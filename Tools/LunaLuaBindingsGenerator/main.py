@@ -15,7 +15,7 @@ def get_info(node, max_depth, depth=0):
         children = [get_info(c, max_depth, depth + 1)
                     for c in node.get_children()]
     return { 'kind' : node.kind,
-             # 'usr' : node.get_usr(),
+             'usr' : node.get_usr(),
              'spelling' : node.spelling,
              # 'location' : node.location,
              # 'extent.start' : node.extent.start,
@@ -40,16 +40,16 @@ def find_and_parse_struct(node, className):
         return lunaparse.LunaClass(node)
 
     for nextChild in node.get_children():
-        callResult = find_and_parse_struct(nextChild, className);
+        callResult = find_and_parse_struct(nextChild, className)
         if callResult != None:
             return callResult
 
-# Arg 1 - File to parse
-# Arg 2 - Struct Name
-# Arg 3 - Out file
-
 
 def main():
+    # Arg 1 - File to parse i.e. (.../SMBXInternal/Blocks.h)
+    # Arg 2 - Struct class to search i.e. (Block)
+    # Options:
+    # -o {Folder} i.e. (-o .../LuaMain/LunaGenerator/)
     parser = OptionParser("usage: %prog filename struct-name [options]")
     parser.add_option("-o", "--output-dir", dest="output",
                    help="The output directory for the generated files", type="string")
@@ -72,7 +72,7 @@ def main():
         output_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     lunalua_index = Index.create()
-    example_file = lunalua_index.parse(input_file, ['-x', 'c++', '-std=c++1z', '-D__LUNA_CODE_GENERATOR__']);
+    example_file = lunalua_index.parse(input_file, ['-x', 'c++', '-std=c++1z', '-D__LUNA_CODE_GENERATOR__'], options=0);
     
     if not example_file:
         print("Failed to load example file!")
@@ -80,7 +80,7 @@ def main():
     
     my_cur = example_file.cursor
     parsed_class = find_and_parse_struct(my_cur, struct_name)
-    if parsed_class == None:
+    if parsed_class is None:
         print("Failed to find class to parse!")
         return
     
