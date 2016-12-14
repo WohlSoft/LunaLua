@@ -16,7 +16,7 @@ build:
   verbosity: minimal
   
 after_build:
-- cmd: deploy.bat nopause 
+- cmd: deploy-full.bat nopause
 
 artifacts:
 - path: LunaLUA-bin.zip
