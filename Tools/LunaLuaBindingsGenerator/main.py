@@ -1,11 +1,11 @@
 
 # Requires 
-from clang.cindex import Config, CursorKind
-from clang.cindex import Index
+from clang.cindex import Index, CursorKind
 from optparse import OptionParser
 import lunaparse
 import lunagen
 import sys, os
+import ccsyspath
 
 
 def get_info(node, max_depth, depth=0):
@@ -44,7 +44,6 @@ def find_and_parse_struct(node, className):
         if callResult != None:
             return callResult
 
-
 def main():
     # Arg 1 - File to parse i.e. (.../SMBXInternal/Blocks.h)
     # Arg 2 - Struct class to search i.e. (Block)
@@ -68,18 +67,24 @@ def main():
     input_file = args[0]
     struct_name = args[1]
     output_dir = options_result.output
-    if output_dir == None:
+    if output_dir is None:
         output_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     lunalua_index = Index.create()
-    example_file = lunalua_index.parse(input_file, ['-x', 'c++', '-std=c++1z', '-D__LUNA_CODE_GENERATOR__'], options=0);
-    
+
+    args = '-x c++ --std=c++1z -D__LUNA_CODE_GENERATOR__'.split()
+    syspath = ccsyspath.system_include_paths('clang++')
+    incargs = [b'-I' + inc for inc in syspath]
+    args = args + incargs
+    print args
+    example_file = lunalua_index.parse(input_file, args)
+   
     if not example_file:
         print("Failed to load example file!")
         return
     
     my_cur = example_file.cursor
-    parsed_class = find_and_parse_struct(my_cur, struct_name)
+    parsed_class = lunaparse.find_and_parse_class(my_cur, CursorKind.STRUCT_DECL, struct_name)
     if parsed_class is None:
         print("Failed to find class to parse!")
         return

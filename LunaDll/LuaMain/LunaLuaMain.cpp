@@ -11,6 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/NPCs.h"
 
+
 #include "../Rendering/FrameCapture.h"
 
 #include "LuaHelper.h"
@@ -20,6 +21,9 @@
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/SMBXMaskedImage.h"
+
+#include "LunaGenerator/LunaGenHelperUtils.h"
+#include "LunaGenerator/LunaGenBlock.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -430,33 +434,34 @@ void CLunaLua::setupDefaults()
     _G["console"] = LuaProxy::Console();
 }
 
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
-LUNAGEN_DEF_CLASS_HELPER(CaptureBuffer, CaptureBuffer);
-LUNAGEN_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
-LUNAGEN_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
-LUNAGEN_DEF_CLASS_HELPER(RECT, RECT);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::RECTd, RECTd);
-LUNAGEN_DEF_CLASS_HELPER(Event, Event);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Logger, Logger);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Data, Data);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Player, Player);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Camera, Camera);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::VBStr, VBStr);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::World, World);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Path, Path);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Musicbox, Musicbox);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::LevelObject, Level);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Warp, Warp);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Animation, Animation);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Layer, Layer);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::Section, Section);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
-LUNAGEN_DEF_CLASS_HELPER(LuaProxy::BGO, BGO);
+LUNAGEN_DEF_CLASS(LuaProxy::Graphics::LuaImageResource, LuaImageResource)
+LUNAGEN_DEF_CLASS(CaptureBuffer, CaptureBuffer)
+LUNAGEN_DEF_CLASS(SMBXMaskedImage, SMBXMaskedImage)
+LUNAGEN_DEF_CLASS(Mix_Chunk, Mix_Chunk)
+LUNAGEN_DEF_CLASS(LuaProxy::InputConfig, NativeInputConfig)
+LUNAGEN_DEF_CLASS(RECT, RECT)
+LUNAGEN_DEF_CLASS(LuaProxy::RECTd, RECTd)
+LUNAGEN_DEF_CLASS(Event, Event)
+LUNAGEN_DEF_CLASS(LuaProxy::Logger, Logger)
+LUNAGEN_DEF_CLASS(LuaProxy::Data, Data)
+LUNAGEN_DEF_CLASS(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest)
+LUNAGEN_DEF_CLASS(LuaProxy::PlayerSettings, PlayerSettings)
+LUNAGEN_DEF_CLASS(LuaProxy::Player, Player)
+LUNAGEN_DEF_CLASS(LuaProxy::Camera, Camera)
+LUNAGEN_DEF_CLASS(LuaProxy::VBStr, VBStr)
+LUNAGEN_DEF_CLASS(LuaProxy::World, World)
+LUNAGEN_DEF_CLASS(LuaProxy::Tile, Tile)
+LUNAGEN_DEF_CLASS(LuaProxy::Scenery, Scenery)
+LUNAGEN_DEF_CLASS(LuaProxy::Path, Path)
+LUNAGEN_DEF_CLASS(LuaProxy::Musicbox, Musicbox)
+LUNAGEN_DEF_CLASS(LuaProxy::LevelObject, Level)
+LUNAGEN_DEF_CLASS(LuaProxy::Warp, Warp)
+LUNAGEN_DEF_CLASS(LuaProxy::Animation, Animation)
+LUNAGEN_DEF_CLASS(LuaProxy::Layer, Layer)
+LUNAGEN_DEF_CLASS(LuaProxy::Section, Section)
+LUNAGEN_DEF_CLASS(LuaProxy::NPC, NPC)
+LUNAGEN_DEF_CLASS(LuaProxy::BGO, BGO)
+LUNAGEN_DEF_CLASS(LuaProxy::Block, Block)
 
 
 // LUAHELPER_DEF_CLASS(LuaImageResource)
@@ -485,14 +490,14 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                LUNAGEN_DEF_CLASS(LuaImageResource)
+                LunaGen::LunaGenHelper<LuaProxy::Graphics::LuaImageResource>::defClass()
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
                     .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
                     .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
-                LUNAGEN_DEF_CLASS(SMBXMaskedImage)
+                LunaGen::LunaGenHelper<SMBXMaskedImage>::defClass()
                     .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
-                LUNAGEN_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
+                LunaGen::LunaGenHelper<CaptureBuffer>::defClassSharedPtr()
                     .def(constructor<int, int>())
                     .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
                     .def("captureAt", &CaptureBuffer::captureAt),
@@ -559,12 +564,14 @@ void CLunaLua::bindAll()
                 def("unpause", &LuaProxy::Misc::unpause),
                 def("isPausedByLua", &LuaProxy::Misc::isPausedByLua),
                 def("warning", &LuaProxy::Misc::warning),
-                def("registerCharacterId", &LuaProxy::Misc::registerCharacterId)
+                def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
+                // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
+                def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
             ],
 
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure
-                LUNAGEN_DEF_CLASS(Mix_Chunk)
+                LunaGen::LunaGenHelper<Mix_Chunk>::defClass()
                     .property("allocated", &Mix_Chunk::allocated)
                     .property("abuf", &Mix_Chunk::abuf)
                     .def_readwrite("alen", &Mix_Chunk::alen)
@@ -629,7 +636,7 @@ void CLunaLua::bindAll()
             ],
             /*************************Audio*end*************************/
 
-            LUNAGEN_DEF_CLASS(NativeInputConfig)
+            LunaGen::LunaGenHelper<LuaProxy::InputConfig>::defClass()
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
             .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
             .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
@@ -642,30 +649,30 @@ void CLunaLua::bindAll()
             .property("dropitem", &LuaProxy::InputConfig::dropitem, &LuaProxy::InputConfig::setDropItem)
             .property("pause", &LuaProxy::InputConfig::pause, &LuaProxy::InputConfig::setPause),
 
-            LUNAGEN_DEF_CLASS(RECT)
+            LunaGen::LunaGenHelper<RECT>::defClass()
             .def_readwrite("left", &RECT::left)
             .def_readwrite("top", &RECT::top)
             .def_readwrite("right", &RECT::right)
             .def_readwrite("bottom", &RECT::bottom),
 
-            LUNAGEN_DEF_CLASS(RECTd)
+            LunaGen::LunaGenHelper<LuaProxy::RECTd>::defClass()
             .def_readwrite("left", &LuaProxy::RECTd::left)
             .def_readwrite("top", &LuaProxy::RECTd::top)
             .def_readwrite("right", &LuaProxy::RECTd::right)
             .def_readwrite("bottom", &LuaProxy::RECTd::bottom),
 
-            LUNAGEN_DEF_CLASS_SMART_PTR_SHARED(Event, std::shared_ptr)
+            LunaGen::LunaGenHelper<Event>::defClassSharedPtr()
             .property("eventName", &Event::eventName)
             .property("cancellable", &Event::isCancellable)
             .property("cancelled", &Event::cancelled, &Event::setCancelled)
             .property("loopable", &Event::getLoopable, &Event::setLoopable)
             .property("directEventName", &Event::getDirectEventName, &Event::setDirectEventName),
 
-            LUNAGEN_DEF_CLASS(Logger)
+            LunaGen::LunaGenHelper<LuaProxy::Logger>::defClass()
             .def(constructor<std::string>())
             .def("write", &LuaProxy::Logger::write),
 
-            LUNAGEN_DEF_CLASS(Data)
+            LunaGen::LunaGenHelper<LuaProxy::Data>::defClass()
                 .enum_("DataTypes")
                 [
                     value("DATA_LEVEL", LuaProxy::Data::DATA_LEVEL),
@@ -685,7 +692,7 @@ void CLunaLua::bindAll()
             .property("sectionName", &LuaProxy::Data::sectionName, &LuaProxy::Data::setSectionName)
             .property("useSaveSlot", &LuaProxy::Data::useSaveSlot, &LuaProxy::Data::setUseSaveSlot),
 
-            LUNAGEN_DEF_CLASS(AsyncHTTPRequest)
+            LunaGen::LunaGenHelper<LuaProxy::AsyncHTTPRequest>::defClass()
             .enum_("HTTP_METHOD")[
                 value("HTTP_POST", AsyncHTTPClient::HTTP_POST),
                 value("HTTP_GET", AsyncHTTPClient::HTTP_GET)
@@ -702,7 +709,7 @@ void CLunaLua::bindAll()
             .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
             .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
 
-            LUNAGEN_DEF_CLASS(PlayerSettings)
+            LunaGen::LunaGenHelper<LuaProxy::PlayerSettings>::defClass()
             .scope[
                 def("get", &LuaProxy::PlayerSettings::get)
             ]
@@ -721,7 +728,7 @@ void CLunaLua::bindAll()
             .property("powerup", &LuaProxy::PlayerSettings::getPowerupID, &LuaProxy::PlayerSettings::setPowerupID),
 
 
-            LUNAGEN_DEF_CLASS(Player)
+            LunaGen::LunaGenHelper<LuaProxy::Player>::defClass()
             .scope[ //static functions
                 def("count", &LuaProxy::Player::count),
                     def("get", &LuaProxy::Player::get),
@@ -894,7 +901,7 @@ void CLunaLua::bindAll()
 #pragma endregion
 #endif
 
-            LUNAGEN_DEF_CLASS(Camera)
+            LunaGen::LunaGenHelper<LuaProxy::Camera>::defClass()
             .scope[ //static functions
                 def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Camera::get)),
                 def("getX", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getX)),
@@ -922,7 +929,7 @@ void CLunaLua::bindAll()
                     def("save", &LuaProxy::SaveBankProxy::save)
             ],
 
-            LUNAGEN_DEF_CLASS(VBStr)
+            LunaGen::LunaGenHelper<LuaProxy::VBStr>::defClass()
             .def(constructor<long>())
             .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
             .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
@@ -942,7 +949,7 @@ void CLunaLua::bindAll()
                     def("getOverworldHudState", &LuaProxy::Graphics::getOverworldHudState)
                 ],
 
-                LUNAGEN_DEF_CLASS(World)
+                LunaGen::LunaGenHelper<LuaProxy::World>::defClass()
                 .property("playerX", &LuaProxy::World::playerX, &LuaProxy::World::setPlayerX)
                 .property("playerY", &LuaProxy::World::playerY, &LuaProxy::World::setPlayerY)
                 .property("playerWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
@@ -957,7 +964,7 @@ void CLunaLua::bindAll()
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
-                LUNAGEN_DEF_CLASS(Tile)
+                LunaGen::LunaGenHelper<LuaProxy::Tile>::defClass()
                 .scope[ //static functions
                     def("count", &LuaProxy::Tile::count),
                     def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Tile::get)),
@@ -973,7 +980,7 @@ void CLunaLua::bindAll()
                 .property("height", &LuaProxy::Tile::height, &LuaProxy::Tile::setHeight)
                 .property("isValid", &LuaProxy::Tile::isValid),
 
-                LUNAGEN_DEF_CLASS(Scenery)
+                LunaGen::LunaGenHelper<LuaProxy::Scenery>::defClass()
                 .scope[ //static functions
                     def("count", &LuaProxy::Scenery::count),
                     def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Scenery::get)),
@@ -989,7 +996,7 @@ void CLunaLua::bindAll()
                 .property("height", &LuaProxy::Scenery::height, &LuaProxy::Scenery::setHeight)
                 .property("isValid", &LuaProxy::Scenery::isValid),
 
-                LUNAGEN_DEF_CLASS(Path)
+                LunaGen::LunaGenHelper<LuaProxy::Path>::defClass()
                 .scope[ //static functions
                     def("count", &LuaProxy::Path::count),
                     def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Path::get)),
@@ -1005,7 +1012,7 @@ void CLunaLua::bindAll()
                 .property("height", &LuaProxy::Path::height, &LuaProxy::Path::setHeight)
                 .property("isValid", &LuaProxy::Path::isValid),
 
-                LUNAGEN_DEF_CLASS(Musicbox)
+                LunaGen::LunaGenHelper<LuaProxy::Musicbox>::defClass()
                 .scope[ //static functions
                     def("count", &LuaProxy::Musicbox::count),
                     def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Musicbox::get)),
@@ -1021,7 +1028,7 @@ void CLunaLua::bindAll()
                 .property("height", &LuaProxy::Musicbox::height, &LuaProxy::Musicbox::setHeight)
                 .property("isValid", &LuaProxy::Musicbox::isValid),
 
-                LUNAGEN_DEF_CLASS(Level)
+                LunaGen::LunaGenHelper<LuaProxy::LevelObject>::defClass()
                 .scope[ //static functions
                         def("count", &LuaProxy::LevelObject::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::LevelObject::get),
@@ -1077,6 +1084,7 @@ void CLunaLua::bindAll()
                     def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
+                    // This isn't just useful in level situation... it is useful for overworld too, so, there's a copy in Misc too
                     def("loadPlayerHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
                 ],
 
@@ -1085,7 +1093,7 @@ void CLunaLua::bindAll()
                     def("isHudActivated", &LuaProxy::Graphics::isHudActivated)
                 ],
 
-                LUNAGEN_DEF_CLASS(Warp)
+                LunaGen::LunaGenHelper<LuaProxy::Warp>::defClass()
                 .scope[
                         def("count", &LuaProxy::Warp::count),
                         def("get", &LuaProxy::Warp::get),
@@ -1105,7 +1113,7 @@ void CLunaLua::bindAll()
 
 
 
-                LUNAGEN_DEF_CLASS(Animation)
+                LunaGen::LunaGenHelper<LuaProxy::Animation>::defClass()
                 .scope[ //static functions
                         def("count", &LuaProxy::Animation::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Animation::get)),
@@ -1132,7 +1140,7 @@ void CLunaLua::bindAll()
                 .property("drawOnlyMask", &LuaProxy::Animation::drawOnlyMask, &LuaProxy::Animation::setDrawOnlyMask)
                 .property("isValid", &LuaProxy::Animation::isValid),
 
-                LUNAGEN_DEF_CLASS(Layer)
+                LunaGen::LunaGenHelper<LuaProxy::Layer>::defClass()
                 .scope[ //static functions
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Layer::get),
                         def("get", (luabind::object(*)(const std::string& , lua_State* L))&LuaProxy::Layer::get),
@@ -1149,7 +1157,7 @@ void CLunaLua::bindAll()
                 .property("speedY", &LuaProxy::Layer::speedY, &LuaProxy::Layer::setSpeedY)
                 .property("layerName", &LuaProxy::Layer::layerName),
 
-                LUNAGEN_DEF_CLASS(Section)
+                LunaGen::LunaGenHelper<LuaProxy::Section>::defClass()
                 .scope[
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Section::get),
                     def("get", (LuaProxy::Section(*)(short, lua_State* L))&LuaProxy::Section::get)
@@ -1164,7 +1172,7 @@ void CLunaLua::bindAll()
                 .property("noTurnBack", &LuaProxy::Section::noTurnBack, &LuaProxy::Section::setNoTurnBack)
                 .property("isUnderwater", &LuaProxy::Section::isUnderwater, &LuaProxy::Section::setIsUnderwater),
 
-                LUNAGEN_DEF_CLASS(NPC)
+                LunaGen::LunaGenHelper<LuaProxy::NPC>::defClass()
                 .scope[ //static functions
                     def("count", &LuaProxy::NPC::count),
                     def("get", (luabind::object(*)(lua_State* L))&LuaProxy::NPC::get),
@@ -1226,7 +1234,7 @@ void CLunaLua::bindAll()
                 .property("isValid", &LuaProxy::NPC::isValid),
 
 
-                LUNAGEN_DEF_CLASS(Block)
+                GenerateBindingBlock<LuaProxy::Block>()
                 .scope[ //static functions
                         def("count", &LuaProxy::Block::count),
                         def("get", (luabind::object(*)(lua_State* L))&LuaProxy::Block::get),
@@ -1246,21 +1254,9 @@ void CLunaLua::bindAll()
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool)>(&LuaProxy::Block::hit))
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player)>(&LuaProxy::Block::hit))
                 .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player, int)>(&LuaProxy::Block::hit))
-                .property("x", &LuaProxy::Block::x, &LuaProxy::Block::setX)
-                .property("y", &LuaProxy::Block::y, &LuaProxy::Block::setY)
-                .property("width", &LuaProxy::Block::width, &LuaProxy::Block::setWidth)
-                .property("height", &LuaProxy::Block::height, &LuaProxy::Block::setHeight)
-                .property("speedX", &LuaProxy::Block::speedX, &LuaProxy::Block::setSpeedX)
-                .property("speedY", &LuaProxy::Block::speedY, &LuaProxy::Block::setSpeedY)
-                .property("id", &LuaProxy::Block::id, &LuaProxy::Block::setId)
-                .property("contentID", &LuaProxy::Block::contentID, &LuaProxy::Block::setContentID)
-                .property("isHidden", &LuaProxy::Block::isHidden, &LuaProxy::Block::setIsHidden)
-                .property("invisible", &LuaProxy::Block::isHidden, &LuaProxy::Block::setIsHidden)
-                .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery)
-                .property("layerName", &LuaProxy::Block::layerName)
                 .property("layerObj", &LuaProxy::Block::layerObj),
 
-                LUNAGEN_DEF_CLASS(BGO)
+                LunaGen::LunaGenHelper<LuaProxy::BGO>::defClass()
                 .scope[ //static functions
                         def("count", &LuaProxy::BGO::count),
                         def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),

@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include "version.h"
 #include "Misc/VB6StrPtr.h"
+#include "LuaMain/LunaGenerator/LunaGenHelperUtils.h"
 
 // The version number is now defined in resource.h, as it now compiled as meta-data too.
 // If you want to define your "custom" version number anyway, then set NORMAL_VER_NUM to 0 and modify the LUNALUA_VERSION string.
@@ -28,7 +29,6 @@
 
 #define LUNA_VERSION        8
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
-#define COMBOOL(b) (b ? -1 : 0)
 
 enum FIELDTYPE {
     FT_INVALID = 0,
@@ -87,15 +87,7 @@ enum LEVEL_HUD_CONTROL {
 /// -Shared Strcuts- ///
 ////////////////////////
 
-struct Momentum
-{
-    double x;
-    double y;
-    double height;
-    double width;
-    double speedX;
-    double speedY;
-};
+// Momentum struct moved to LuaMain/LunaGenerator/LunaGenHelperUtils.h
 
 struct Bounds
 {
