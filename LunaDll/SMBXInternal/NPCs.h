@@ -481,6 +481,7 @@ namespace NPC {
 
 	// NPC ACCESS
 	NPCMOB* Get(int index); //Get ptr to an NPC
+    NPCMOB* GetRaw(int index);
     NPCMOB* GetDummyNPC();
 	NPCMOB* GetFirstMatch(int ID, int section); // Get first NPC found with the set ID and section, or 0 if no matches. -1 for ANY
 

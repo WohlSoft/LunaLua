@@ -9,14 +9,14 @@ configuration: Release
 
 clone_depth: 1
 
-clone_folder: C:\_Repos\LunaDLL
+clone_folder: C:\_Repos\LunaLUA
 
 build:
   project: LunaDll.sln
   verbosity: minimal
   
 after_build:
-- cmd: deploy.bat nopause 
+- cmd: deploy-full.bat nopause
 
 artifacts:
 - path: LunaLUA-bin.zip

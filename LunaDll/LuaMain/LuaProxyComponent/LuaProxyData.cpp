@@ -44,6 +44,9 @@ LuaProxy::Data::Data(DataType dataType, const std::string &sectionName, bool use
 void LuaProxy::Data::init()
 {
 	std::string path = resolvePathFromSection();
+    if (m_dataType == DATA_LEVEL) // Create custom data folder. If it already exists, then it will fail anyway. 
+        CreateDirectoryW((static_cast<std::wstring>(GM_FULLDIR) + removeExtension(::Level::GetName())).c_str(), NULL);
+
 	std::ifstream luaData(path, std::ios::binary | std::ios::in);
 	if (!luaData.is_open()){
 		std::ofstream luaDataCreate(path, std::ios::binary | std::ios::out);

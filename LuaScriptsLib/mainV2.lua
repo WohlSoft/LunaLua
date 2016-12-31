@@ -1056,9 +1056,16 @@ function __onInit(episodePath, lvlName)
         local noFileLoaded = true
         if(UserCodeManager.loadCodeFile("lunabase", getSMBXPath().."\\LuaScriptsLib\\basegame\\lunabase.lua")) then noFileLoaded = false end
         if(not isOverworld)then
+            -- Modern
+            if(UserCodeManager.loadCodeFile("lunaglobal", episodePath .. "luna.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("lunalocal", __customFolderPath.."luna.lua")) then noFileLoaded = false end
+            -- Deprecated
             if(UserCodeManager.loadCodeFile("lunadll", __customFolderPath.."lunadll.lua")) then noFileLoaded = false end
             if(UserCodeManager.loadCodeFile("lunaworld", episodePath .. "lunaworld.lua")) then noFileLoaded = false end
         else
+            -- Modern
+            if(UserCodeManager.loadCodeFile("mapglobal", episodePath .. "map.lua")) then noFileLoaded = false end
+            -- Deprecated
             if(UserCodeManager.loadCodeFile("lunaoverworld", episodePath .. "lunaoverworld.lua")) then noFileLoaded = false end
         end
         

@@ -1296,6 +1296,27 @@ static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *har
 {
     if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
     {
+        // If damage type is HARM_TYPE_NPC, respect nofireball/etc
+        if (*harmType == HARM_TYPE_NPC)
+        {
+            NPCMOB* otherNpc = NPC::GetRaw(*otherIdx);
+            if ((otherNpc != nullptr) && (otherNpc->id == NPCID_PLAYERFIREBALL) && npc_nofireball[npc->id])
+            {
+                return 0;
+            }
+            
+            if ((otherNpc != nullptr) && (otherNpc->id == NPCID_PLAYERICEBALL) && npc_noiceball[npc->id])
+            {
+                return 0;
+            }
+        }
+
+        // If friendly, immune to everything but despawn
+        if ((npc->friendly != 0) && (*harmType != HARM_TYPE_OFFSCREEN))
+        {
+            return 0;
+        }
+
         return -1;
     }
 

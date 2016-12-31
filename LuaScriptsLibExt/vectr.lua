@@ -9,7 +9,7 @@
 ------Created by Hoeloe - 2015------
 -----Open-Source Vector Library-----
 -------For Super Mario Bros X-------
-----------------v1.0a---------------
+----------------v1.0----------------
 
 local vectr = {};
 local version = "1.0";
@@ -27,10 +27,166 @@ end
 
 do --Vector 2
 
+--METATABLE
+local createmt2;
+local v2mt = {};
+function v2mt.dot(a,b) 
+	return a.x*b.x + a.y*b.y 
+end
+
+function v2mt.typecheck(a)
+	if(type(a) == "number") then
+		return "number";
+	elseif(a._type ~= nil and a._type == "vector2") then
+		return "vector2";
+	else
+		error("Calculation cannot be performed on an object of this type.", 2);
+	end
+end
+
+function v2mt.newindex(obj,key,val)
+		    if(key == "x") then setmetatable(obj,createmt2(val,obj.y))
+		elseif(key == "y") then setmetatable(obj,createmt2(obj.x,val))
+		elseif(key == "length" or key == "sqrlength") then
+			error("Cannot set the length of a vector directly. Try changing the component values.",2)
+		elseif(key == "_type") then
+			error("Cannot set the type of an object.",2)
+		else
+			error("Field "..key.." does not exist in the vector2 data structure.",2);
+		end
+end
+	
+function v2mt.tostring(obj) 
+	return "("..tostring(obj.x)..", "..tostring(obj.y)..")" 
+end
+
+function v2mt.add(a,b) 
+	local ta = v2mt.typecheck(a);
+	local tb = v2mt.typecheck(b);
+	if(ta == "number") then
+		if(tb == "number") then
+			return a+b;
+		else
+			return vectr.v2(a+b.x,a+b.y)
+		end
+	elseif(type(b) == "number") then
+			return vectr.v2(a.x+b,a.y+b)
+	else
+		return vectr.v2(a.x+b.x,a.y+b.y)
+	end
+end
+
+function v2mt.sub(a,b) 
+	local ta = v2mt.typecheck(a);
+	local tb = v2mt.typecheck(b);
+	if(ta == "number") then
+		if(tb == "number") then
+			return a-b;
+		else
+			return vectr.v2(a-b.x,a-b.y)
+		end
+	elseif(type(b) == "number") then
+			return vectr.v2(a.x-b,a.y-b)
+	else
+		return vectr.v2(a.x-b.x,a.y-b.y)
+	end
+end
+
+function v2mt.neg(a)
+	return vectr.v2(-a.x,-a.y) 
+end
+
+function v2mt.mul(a,b) 
+	local ta = v2mt.typecheck(a);
+	local tb = v2mt.typecheck(b);
+	if(ta == "number") then
+		if(tb == "number") then
+			return a*b;
+		else
+			return vectr.v2(a*b.x,a*b.y)
+		end
+	elseif(tb == "number") then
+		return vectr.v2(a.x*b,a.y*b)
+	else
+		return vectr.v2(a.x*b.x,a.y*b.y) 
+	end
+end
+			   
+function v2mt.div(a,b) 
+	local ta = v2mt.typecheck(a);
+	local tb = v2mt.typecheck(b);
+	if(ta == "number") then
+		if(tb == "number") then
+			return a/b;
+		else
+			return vectr.v2(a/b.x,a/b.y)
+		end
+	elseif(tb == "number") then
+			return vectr.v2(a.x/b,a.y/b)
+	else
+		return vectr.v2(a.x/b.x,a.y/b.y) 
+	end
+end
+			   
+function v2mt.equals(a,b)
+	if(a == nil or b == nil or typecheck(a) ~= "vector2" or typecheck(b) ~= "vector2") then 
+		return false; 
+	else
+		return a.x==b.x and a.y==b.y
+	end
+end
+
+function v2mt.len(a)
+	return 2;
+end
+
+createmt2 = function(x,y,sl,l)
+	local mt = {}
+	mt.__index = 
+	function(obj,key)
+		    if(key == "x") then return x
+		elseif(key == "y") then return y
+		elseif(key == "sqrlength") then
+			if(sl == nil) then
+				local sm = x*x + y*y;
+				setmetatable(obj,createmt2(x,y,sm));
+				return sm;
+			else
+				return sl;
+			end
+		elseif(key == "length") then
+			if(l == nil) then
+				local sm = sl or (x*x + y*y);
+				local mag = math.sqrt(sm);
+				setmetatable(obj,createmt2(x,y,sm,mag));
+				return mag;
+			else
+				return l;
+			end
+		elseif(key == "_type") then
+			return "vector2";
+		else
+			return nil;
+		end
+	end
+	mt.__newindex = v2mt.newindex;
+	mt.__tostring = v2mt.tostring;
+	mt.__add = v2mt.add;
+	mt.__sub = v2mt.sub;
+	mt.__unm = v2mt.neg;
+	mt.__mul = v2mt.mul;
+	mt.__div = v2mt.div;
+	mt.__concat = v2mt.dot;
+	mt.__mod = proj;
+	mt.__eq = v2mt.equals;
+	mt.__len = v2mt.len;
+	--mt.__metatable = mthide;
+	
+	return mt;
+end
+
 --CLASS DEF
 local vect2 = {};
-local v2mt = {};
-
 function vect2.normalise(a)
 	if(a.sqrlength == 0) then 
 		return vectr.v2(0,0)
@@ -50,7 +206,7 @@ end
 
 function vect2.lookat(a,x1,y1)
 	local v;
-	local t = v2mt_typecheck(x1);
+	local t = v2mt.typecheck(x1);
 	if(t == "number") then
 		v = vectr.v2(x1,y1):normalise();
 	else
@@ -67,151 +223,28 @@ function vect2.tov4(a)
 	return vectr.v3(a.x,a.y,0,0);
 end
 
-function vect2.dot(a,b) 
-	return a.x*b.x + a.y*b.y 
-end
-
 vect2.normalize = vect2.normalise;
+vect2.dot = v2mt.dot;
 vect2.project = proj;
-
---METATABLE
-
-local function v2mt_typecheck(a)
-	if(type(a) == "number") then
-		return "number";
-	elseif(a._type ~= nil and a._type == "vector2") then
-		return "vector2";
-	else
-		error("Calculation cannot be performed on an object of this type.", 2);
-	end
-end
-
-function v2mt.__index(obj,key)
-		if(key == "x") then return rawget(obj, "x")
-	elseif(key == "y") then return rawget(obj, "y")
-	elseif(key == "sqrlength") then
-		return obj.x*obj.x + obj.y*obj.y
-	elseif(key == "length") then
-		return math.sqrt(obj.x*obj.x + obj.y*obj.y)
-	elseif(key == "_type") then
-		return "vector2";
-	else
-		return vect2[key]
-	end
-end
-
-function v2mt.__newindex(obj,key,val)
-		    if(key == "x") then rawset(obj, "x", val);
-		elseif(key == "y") then rawset(obj, "y", val);
-		elseif(key == "length" or key == "sqrlength") then
-			error("Cannot set the length of a vector directly. Try changing the component values.",2)
-		elseif(key == "_type") then
-			error("Cannot set the type of an object.",2)
-		else
-			error("Field "..key.." does not exist in the vector2 data structure.",2);
-		end
-end
-	
-function v2mt.__tostring(obj) 
-	return "("..tostring(obj.x)..", "..tostring(obj.y)..")" 
-end
-
-function v2mt.__add(a,b) 
-	local ta = v2mt_typecheck(a);
-	local tb = v2mt_typecheck(b);
-	if(ta == "number") then
-		if(tb == "number") then
-			return a+b;
-		else
-			return vectr.v2(a+b.x,a+b.y)
-		end
-	elseif(type(b) == "number") then
-			return vectr.v2(a.x+b,a.y+b)
-	else
-		return vectr.v2(a.x+b.x,a.y+b.y)
-	end
-end
-
-function v2mt.__sub(a,b) 
-	local ta = v2mt_typecheck(a);
-	local tb = v2mt_typecheck(b);
-	if(ta == "number") then
-		if(tb == "number") then
-			return a-b;
-		else
-			return vectr.v2(a-b.x,a-b.y)
-		end
-	elseif(type(b) == "number") then
-			return vectr.v2(a.x-b,a.y-b)
-	else
-		return vectr.v2(a.x-b.x,a.y-b.y)
-	end
-end
-
-function v2mt.__unm(a)
-	return vectr.v2(-a.x,-a.y) 
-end
-
-function v2mt.__mul(a,b) 
-	local ta = v2mt_typecheck(a);
-	local tb = v2mt_typecheck(b);
-	if(ta == "number") then
-		if(tb == "number") then
-			return a*b;
-		else
-			return vectr.v2(a*b.x,a*b.y)
-		end
-	elseif(tb == "number") then
-		return vectr.v2(a.x*b,a.y*b)
-	else
-		return vectr.v2(a.x*b.x,a.y*b.y) 
-	end
-end
-			   
-function v2mt.__div(a,b) 
-	local ta = v2mt_typecheck(a);
-	local tb = v2mt_typecheck(b);
-	if(ta == "number") then
-		if(tb == "number") then
-			return a/b;
-		else
-			return vectr.v2(a/b.x,a/b.y)
-		end
-	elseif(tb == "number") then
-			return vectr.v2(a.x/b,a.y/b)
-	else
-		return vectr.v2(a.x/b.x,a.y/b.y) 
-	end
-end
-			   
-function v2mt.__eq(a,b)
-	if(a == nil or b == nil or typecheck(a) ~= "vector2" or typecheck(b) ~= "vector2") then 
-		return false; 
-	else
-		return a.x==b.x and a.y==b.y
-	end
-end
-
-function v2mt.__len(a)
-	return 2;
-end
-
-v2mt.__concat = vect2.dot;
-v2mt.__mod = proj;
 
 --CONSTRUCTOR
 function vectr.v2(x,y)
+	local v = {};
+	
+	for m,n in pairs(vect2) do
+		v[m] = n;
+	end
+	
 	if(type(x) == "number") then
 		y = y or x;
 	elseif(x ~= nil and x._type ~= nil and x._type == "vector2") then
 		y = x.y;
 		x = x.x;
 	else
-		error("Invalid vector definition.",2);
+		error("Invalid vector definition.",2)
 	end
 	
-	local v = {x=x, y=y};
-	setmetatable(v, v2mt);
+	setmetatable(v,createmt2(x,y));
 	return v;
 end
 

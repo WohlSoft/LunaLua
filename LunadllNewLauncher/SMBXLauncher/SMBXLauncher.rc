@@ -1,1 +1,36 @@
+#include <winresrc.h>
 IDI_ICON1               ICON    DISCARDABLE     "smbxIcon.ico"
+
+// Executable version information.
+VS_VERSION_INFO    VERSIONINFO
+FILEVERSION        2,0,0,0
+PRODUCTVERSION     2,0,0,0
+FILEFLAGSMASK      VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+  FILEFLAGS        VS_FF_DEBUG | VS_FF_PRERELEASE
+#else
+  FILEFLAGS        0
+#endif
+FILEOS             VOS_NT_WINDOWS32
+FILETYPE           VFT_APP
+FILESUBTYPE        VFT2_UNKNOWN
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904b0"
+    BEGIN
+      VALUE "CompanyName", L"SuperMarioBrosX.org"
+      VALUE "FileDescription", L"Super Mario Bros. X 2.0"
+      VALUE "FileVersion", L"1.0.0.0"
+      VALUE "InternalName", L"SMBXLauncher"
+      VALUE "LegalCopyright", L"(C) 2015-2016 Talkhaus and WohlSoft"
+      VALUE "OriginalFilename", L"SMBXLauncher.exe"
+      VALUE "ProductName", L"Super Mario Bros. X 2.0"
+      VALUE "ProductVersion", L"2.0.0.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x809, 1200
+  END
+END

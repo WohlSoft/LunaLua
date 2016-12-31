@@ -34,7 +34,7 @@
 --------------------Created by Hoeloe - 2015-------------------
 -------------Open-Source Currency and Shop Library-------------
 ---------------------For Super Mario Bros X--------------------
-----------------------------v2.0.8-----------------------------
+---------------------------v2.0.10-----------------------------
 ----------------------REQUIRES ENCRYPT.dll---------------------
 ---------------------REQUIRES COLLIDERS.lua--------------------
 -----------------------REQUIRES PNPC.lua-----------------------
@@ -354,8 +354,9 @@ function raocoin.update()
 		end]]
 		
 		if(memcurrencyCache[v.id] < mem(v.id,v.type)) then
-			raocoin.onCollect(v, currencyCache[k].lastCount - currencyCache[k].count);
-			v:onCollect(currencyCache[k].lastCount - currencyCache[k].count);
+
+			raocoin.onCollect(v,  mem(v.id,v.type) - memcurrencyCache[k]);
+			v:onCollect(mem(v.id,v.type) - memcurrencyCache[k]);
 		end
 		memcurrencyCache[v.id] = mem(v.id,v.type);
 	end
@@ -383,7 +384,7 @@ function raocoin.update()
 	
 	if(doBuyAnim) then
 		player:mem(0x122,FIELD_WORD,7); --Set state to "going through door"
-		player.y = sourceY+35-player.height;
+		player.y = sourceY+32-player.height;
 		if(player:mem(0x12A,FIELD_WORD) >= 16440) then --Warp timer counts from 16368 to 16444 by twos. 16440 is an acceptable buffer to ensure it doesn't try to warp, which will crash the game.
 			player:mem(0x122,FIELD_WORD,0);
 			player:mem(0x12A,FIELD_WORD,0);
@@ -398,16 +399,15 @@ function raocoin.update()
 		if(not k:isBought()) then
 		
 			--npc icon
-			if(v.npc == nil and v.npcID ~= nil and v.enableTimer <= 0) then
-				n = pnpc.wrap(spawnNPC(v.npcID,v.x,v.y-70-64,v.section));
-				n:mem(0x46,FIELD_WORD,0xFFFF);
-				n:mem(0x48,FIELD_WORD,0xFFFF);
-				n:mem(0x12A,FIELD_WORD,100);
-				n.speedX = 0;
-				n.speedY = 0;
-				v.npc = n;
+			if((v.npc == nil or not v.npc.isValid) and v.npcID ~= nil and v.enableTimer <= 0) then
+				v.npc = pnpc.wrap(NPC.spawn(v.npcID,v.x,v.y-70-64,v.section));
+				v.npc:mem(0x46,FIELD_WORD,0xFFFF);
+				v.npc:mem(0x48,FIELD_WORD,0xFFFF);
+				v.npc:mem(0x12A,FIELD_WORD,100);
+				v.npc.speedX = 0;
+				v.npc.speedY = 0;
 			end
-			if(v.npc ~= nil) then
+			if(v.npc ~= nil and v.npc.isValid) then
 				v.npc.x = v.npc:mem(0xA8,FIELD_DFLOAT);
 				v.npc.y = v.npc:mem(0xB0,FIELD_DFLOAT);
 				v.npc.speedX = 0;
@@ -424,14 +424,14 @@ function raocoin.update()
 			
 			--bmp icon
 			if(v.image ~= nil and v.enableTimer <= 0) then
-				Graphics.drawImageWP(v.image,v.x,v.y-70-64,1);
+				Graphics.drawImageWP(v.image,v.x,v.y-70-64,-1);
 			end
 			
 			--text
 			if(v.text ~= nil and v.enableTimer <= 0) then
 				table.insert(drawQueue, function()
 					local x1,y1 = raocoin.worldToScreen(v.x+12,v.y-72);
-					Text.printWP(v.text,x1+8-string.len(v.text)*9,y1-26,1);
+					Text.printWP(v.text,x1+8-string.len(v.text)*9,y1-26,-1);
 				end);
 			end
 		
@@ -456,7 +456,7 @@ function raocoin.update()
 							Audio.playSFX(getSMBXPath().."\\LuaScriptsLib\\raocoin\\buy.ogg");
 						spawnEffect(132,v.x,v.y);
 						v.enableTimer = 50;
-						if(v.npc ~= nil) then
+						if(v.npc ~= nil and v.npc.isValid) then
 							v.npc:mem(0x40,FIELD_WORD,0xFFFF);
 							v.npc = nil;
 						end
