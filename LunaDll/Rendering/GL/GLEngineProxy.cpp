@@ -160,11 +160,10 @@ void GLEngineProxy::EndFrame(HDC hdcDest)
     QueueCmd(obj);
 }
 
-GLLock::GLLock(GLEngineProxy& engineToLock, GLLockType type) : internal_lock(engineToLock.getLock())
+GLLock::GLLock(GLEngineProxy& engineToLock, GLLockType type)
 {
-    if (type == QueueThread) {
-        g_GLContextManager.SwitchToQueueThreadCTX();
-    } else if (type == MainThread) {
-        g_GLContextManager.SwitchToMainThreadCTX();
+    if (type == MainThread)
+    {
+        g_GLContextManager.EnsureMainThreadCTXApplied();
     }
 }

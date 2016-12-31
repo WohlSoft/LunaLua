@@ -9,9 +9,10 @@ GLContextManager g_GLContextManager;
 
 // Constructor
 GLContextManager::GLContextManager() :
-	hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
-	mInitialized(false), mHadError(false),
-    mCurrentFB(nullptr), mFramebuffer(nullptr) {
+    hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
+    mInitialized(false), mHadError(false), mMainThreadCTXApplied(false), 
+    mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr)
+{
 }
 
 bool GLContextManager::Init(HDC hDC) {
@@ -57,14 +58,13 @@ void GLContextManager::BindFramebuffer() {
     mFramebuffer->Bind();
 }
 
-void GLContextManager::SwitchToQueueThreadCTX()
+void GLContextManager::EnsureMainThreadCTXApplied()
 {
-    wglMakeCurrent(hDC, hQueueThreadCTX);
-}
-
-void GLContextManager::SwitchToMainThreadCTX()
-{
-    wglMakeCurrent(hDC, hMainThreadCTX);
+    if(!mMainThreadCTXApplied)
+    {
+        wglMakeCurrent(hDC, hMainThreadCTX);
+        mMainThreadCTXApplied = true;
+    }
 }
 
 void GLContextManager::BindAndClearFramebuffer() {

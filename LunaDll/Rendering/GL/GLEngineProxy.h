@@ -18,17 +18,14 @@ private:
     std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
-    // This is needed, if we need to do GL-stuff, but on another thread
-    std::recursive_mutex mProxyLock; 
-
+    
 public:
     GLEngine mInternalGLEngine;
 protected:
     // Internal routines
     void Init();
     void ThreadMain();
-    inline std::recursive_mutex& getLock() { return mProxyLock; };
-
+    
 public:
     GLEngineProxy();
     ~GLEngineProxy();
@@ -72,8 +69,6 @@ public:
 
 class GLLock {
     friend class GLEngineProxy;
-private:
-    std::unique_lock<std::recursive_mutex> internal_lock;    
 public:
     enum GLLockType {
         QueueThread,

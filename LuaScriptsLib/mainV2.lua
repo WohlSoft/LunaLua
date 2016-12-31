@@ -185,6 +185,31 @@ local function initFFIBasedAPIs()
     }
     
     local function validateAndConvertVariableTable(variableArgs, variableInfoTable, variableTypeName)
+        
+        --[[
+        variableArgs 
+            --> named table where each key (attribute/uniform name) maps to a value
+                i.e. { x = 50, y = 50}
+                type: table
+                key: attribute/uniform name
+                value: value for the attribute/uniform
+        variableInfoTable
+            --> The info (attribute/uniform) table from a shader (returned from shader:getUniformInfo() or shader:getAttributeInfo())
+                type: table
+        variableTypeName
+            --> Type name (either "attribute" or "uniform"). Required for proper error handling.
+                type: string
+                
+        returns:
+            --> named table with the converted data
+                type: table
+                key: the attribute/uniform id
+                value: table containing following values:
+                    glType: the used gltype from Graphics.glTypeTable
+                    data: the raw allocated data
+                    count: how many elements of this type (if >1 then it is an array)
+        ]]
+        
         local formattedReturn = {}
         for varName, varValue in pairs(variableArgs) do
             local varInfo = variableInfoTable[varName]

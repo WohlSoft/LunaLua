@@ -26,12 +26,12 @@ public:
     }
     inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
     inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
-    void SwitchToQueueThreadCTX();
-    void SwitchToMainThreadCTX();
+    void EnsureMainThreadCTXApplied();
 
 private:
     bool  mInitialized;
     bool  mHadError;
+    bool  mMainThreadCTXApplied;  // Whether wglMakeCurrent has been called for the main thread or not
 
 	// Context variables
 	int   mOldPixelFormat;

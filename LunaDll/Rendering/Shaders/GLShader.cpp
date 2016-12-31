@@ -151,15 +151,15 @@ void GLShader::applyUniform(const GLShaderVariableEntry& entry)
 
 void GLShader::load()
 {
-    bool isVertexSourceValid = m_vertexSource != "";
-    bool isFragmentSourceValid = m_vertexSource != "";
+    bool isVertexSourceValid = !m_vertexSource.empty();
+    bool isFragmentSourceValid = !m_vertexSource.empty();
     if (!isVertexSourceValid && !isFragmentSourceValid)
         return;
     
     GLuint program = glCreateProgram();
     GLERRORCHECK();
-    GLuint vertex; 
-    GLuint fragment;
+    GLuint vertex = 0; 
+    GLuint fragment = 0;
     if(isVertexSourceValid) 
         vertex = glCreateShader(GL_VERTEX_SHADER);
     GLERRORCHECK();
