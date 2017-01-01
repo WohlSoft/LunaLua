@@ -1231,8 +1231,8 @@ namespace LuaProxy {
     class Shader {
     public:
         Shader();
-        void compileFromSource(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, lua_State* L);
-        void compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L);
+        void compileFromSource(const std::string& vertexSource, const std::string& fragmentSource, lua_State* L);
+        void compileFromFile(const std::string& fileNameVertex, const std::string& fileNameFragment, lua_State* L);
 
         bool isCompiled() const;
         luabind::object getAttributeInfo(lua_State* L) const;

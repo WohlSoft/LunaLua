@@ -565,26 +565,19 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
     if(!theFile)
     {
         if (!errMsg.empty())
-            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+            MessageBoxA(nullptr, errMsg.c_str(), "Error", 0);
         return false;
     }
     fseek(theFile, 0, SEEK_END);
     size_t len = ftell(theFile);
-    if(len>0)
+    rewind(theFile);
+    if(len > 0)
     {
         content.resize(len);
-        fread((char*)content.c_str(), 1, len, theFile);
-        fclose(theFile);
+        fread(&content[0], 1, len, theFile);
     }
-//    bool res=readFile(wcontent, wpath, )
-//    std::wifstream theFile(wpath, std::ios::binary | std::ios::in);
-//    if (!theFile.is_open()) {
-//        theFile.close();
-//        if (!errMsg.empty())
-//            MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
-//        return false;
-//    }
-    //content = std::string((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+    fclose(theFile);
+
     return true;
 }
 

@@ -24,8 +24,8 @@ private:
 
     std::vector<GLuint> m_attributeBuffers;
 public:
-    GLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
-    GLShader(const std::string& name, const std::string& fragmentSource);
+    GLShader(const std::string& vertexSource, const std::string& fragmentSource);
+    GLShader(const std::string& fragmentSource);
     GLShader(const GLShader& other) = delete;
     ~GLShader();
 

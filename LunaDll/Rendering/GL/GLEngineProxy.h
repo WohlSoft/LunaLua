@@ -58,18 +58,11 @@ public:
 
     // Stuff that run at the main thread:
     // Functions which run on the main thread, but needs to access GL resources
-    std::shared_ptr<GLShader> CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+    std::shared_ptr<GLShader> CreateNewShader(const std::string& vertexSource, const std::string& fragmentSource);
 
     // With this we don't need SafeCall anymore. 
     // However, before any GL operations at the main thread this function has to be call first.
     void EnsureMainThreadCTXApplied();
-
-    // Other function on main thread
-    template<typename FuncT>
-    void SafeCall(FuncT func) {
-        GLLock lock(*this, GLLock::MainThread);
-        func();
-    }
 };
 
 // Instance

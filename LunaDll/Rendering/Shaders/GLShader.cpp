@@ -29,8 +29,7 @@ std::string GLShader::getLastShaderError(GLuint shaderID)
     return errorStr;
 }
 
-GLShader::GLShader(const std::string & name, const std::string & vertexSource, const std::string & fragementSource) :
-    m_name(name),
+GLShader::GLShader(const std::string & vertexSource, const std::string & fragementSource) :
     m_vertexSource(vertexSource),
     m_fragmentSource(fragementSource),
     m_isValid(false)
@@ -38,8 +37,9 @@ GLShader::GLShader(const std::string & name, const std::string & vertexSource, c
     load();
 }
 
-GLShader::GLShader(const std::string& name, const std::string& fragmentSource) :
-    GLShader(name, DefaultBaseVertexShaderSRC, fragmentSource)
+// TODO: This constructor is actually not used.
+GLShader::GLShader(const std::string& fragmentSource) :
+    GLShader(DefaultBaseVertexShaderSRC, fragmentSource)
 {}
 
 GLShader::~GLShader()
@@ -225,7 +225,7 @@ void GLShader::load()
     if (isVertexSourceValid) {
         if (!compileShaderSource(vertex, m_vertexSource))
         {
-            m_lastErrorMsg = getLastShaderError(vertex);
+            m_lastErrorMsg = std::string("Vertex Shader Error: \n") + getLastShaderError(vertex);
             glDeleteShader(vertex);
             GLERRORCHECK();
             return;
@@ -234,7 +234,7 @@ void GLShader::load()
     if (isFragmentSourceValid) {
         if (!compileShaderSource(fragment, m_fragmentSource))
         {
-            m_lastErrorMsg = getLastShaderError(fragment);
+            m_lastErrorMsg = std::string("Fragment Shader Error: \n") + getLastShaderError(fragment);
             glDeleteShader(vertex);
             glDeleteShader(fragment);
             GLERRORCHECK();

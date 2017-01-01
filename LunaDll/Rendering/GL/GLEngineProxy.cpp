@@ -81,12 +81,12 @@ void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
 }
 
 
-std::shared_ptr<GLShader> GLEngineProxy::CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
+std::shared_ptr<GLShader> GLEngineProxy::CreateNewShader(const std::string& vertexSource, const std::string& fragmentSource)
 {
     // Be sure that the main thread has the CTX applied before creating our shader.
     g_GLContextManager.EnsureMainThreadCTXApplied();
     
-    return std::make_shared<GLShader>(name, vertexSource, fragmentSource);
+    return std::make_shared<GLShader>(vertexSource, fragmentSource);
 }
 
 void GLEngineProxy::EnsureMainThreadCTXApplied()
