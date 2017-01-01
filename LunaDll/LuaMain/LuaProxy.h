@@ -1228,9 +1228,9 @@ namespace LuaProxy {
         FILE* file;
     };
 
-    class NativeShader {
+    class Shader {
     public:
-        NativeShader();
+        Shader();
         void compileFromSource(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, lua_State* L);
         void compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L);
 

@@ -443,7 +443,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 {
     double priority;
     const LuaProxy::Graphics::LuaImageResource* luaImageResource = nullptr;
-    const LuaProxy::NativeShader* shader = nullptr;
+    const LuaProxy::Shader* shader = nullptr;
     std::shared_ptr<CaptureBuffer> capBuff = nullptr;
     float r, g, b, a;
     unsigned int rawVer, rawTex, rawCol, rawCnt;

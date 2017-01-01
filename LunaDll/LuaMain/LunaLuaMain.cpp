@@ -476,7 +476,7 @@ LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::RECTd, RECTd);
 LUAHELPER_DEF_CLASS_HELPER(Event, Event);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Logger, Logger);
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NativeShader, NativeShader);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Shader, Shader);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Data, Data);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
@@ -736,13 +736,13 @@ void CLunaLua::bindAll()
             .def(constructor<std::string>())
             .def("write", &LuaProxy::Logger::write),
 
-            LUAHELPER_DEF_CLASS(NativeShader)
+            LUAHELPER_DEF_CLASS(Shader)
             .def(constructor<>())
-            .def("compileFromSource", &LuaProxy::NativeShader::compileFromSource)
-            .def("compileFromFile", &LuaProxy::NativeShader::compileFromFile)
-            .def("getAttributeInfo", &LuaProxy::NativeShader::getAttributeInfo)
-            .def("getUniformInfo", &LuaProxy::NativeShader::getUniformInfo)
-            .property("isCompiled", &LuaProxy::NativeShader::isCompiled),
+            .def("compileFromSource", &LuaProxy::Shader::compileFromSource)
+            .def("compileFromFile", &LuaProxy::Shader::compileFromFile)
+            .def("getAttributeInfo", &LuaProxy::Shader::getAttributeInfo)
+            .def("getUniformInfo", &LuaProxy::Shader::getUniformInfo)
+            .property("isCompiled", &LuaProxy::Shader::isCompiled),
 
             LUAHELPER_DEF_CLASS(Data)
                 .enum_("DataTypes")

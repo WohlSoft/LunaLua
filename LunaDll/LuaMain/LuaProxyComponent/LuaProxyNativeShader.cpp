@@ -3,10 +3,10 @@
 #include "../../GlobalFuncs.h"
 #include "../../Rendering/GL/GLEngineProxy.h"
 
-LuaProxy::NativeShader::NativeShader()
+LuaProxy::Shader::Shader()
 {}
 
-void LuaProxy::NativeShader::compileFromSource(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, lua_State* L)
+void LuaProxy::Shader::compileFromSource(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource, lua_State* L)
 {
     m_internalShader = g_GLEngine.CreateNewShader(name, vertexSource, fragmentSource);
     
@@ -19,7 +19,7 @@ void LuaProxy::NativeShader::compileFromSource(const std::string& name, const st
     m_cachedUniformInfo = m_internalShader->getAllUniforms();
 }
 
-void LuaProxy::NativeShader::compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L)
+void LuaProxy::Shader::compileFromFile(const std::string& name, const luabind::object& fileNameVertex, const luabind::object& fileNameFragment, lua_State* L)
 {
     std::string vertexSource("");
     std::string fragmentSource("");
@@ -50,7 +50,7 @@ void LuaProxy::NativeShader::compileFromFile(const std::string& name, const luab
     compileFromSource(name, vertexSource, fragmentSource, L);
 }
 
-bool LuaProxy::NativeShader::isCompiled() const
+bool LuaProxy::Shader::isCompiled() const
 {
     if (!m_internalShader)
         return false;
@@ -71,7 +71,7 @@ luabind::object convertShaderVariableInfo(const GLShaderVariableInfo* info, lua_
     return infoTbl;
 }
 
-luabind::object LuaProxy::NativeShader::getAttributeInfo(lua_State* L) const
+luabind::object LuaProxy::Shader::getAttributeInfo(lua_State* L) const
 {
     if (!isCompiled()) {
         luaL_error(L, "Tried to get attributes on invalid shader!");
@@ -79,14 +79,14 @@ luabind::object LuaProxy::NativeShader::getAttributeInfo(lua_State* L) const
     }
     
     luabind::object resultTbl = luabind::newtable(L);
-    for (const GLShaderAttributeInfo& nextInfo : m_cachedAttributeInfo) // TODO: Make it named --> tbl[attribute_name] = {}
+    for (const GLShaderAttributeInfo& nextInfo : m_cachedAttributeInfo)
         resultTbl[nextInfo.getRawName()] = convertShaderVariableInfo(&nextInfo, L);
 
     return resultTbl;
     
 }
 
-luabind::object LuaProxy::NativeShader::getUniformInfo(lua_State* L) const
+luabind::object LuaProxy::Shader::getUniformInfo(lua_State* L) const
 {
     if (!isCompiled()) {
         luaL_error(L, "Tried to get uniforms on invalid shader!");
@@ -94,13 +94,13 @@ luabind::object LuaProxy::NativeShader::getUniformInfo(lua_State* L) const
     }
 
     luabind::object resultTbl = luabind::newtable(L);
-    for(const GLShaderUniformInfo& nextInfo : m_cachedUniformInfo) // TODO: Make it named --> tbl[uniform_name] = {}
+    for(const GLShaderUniformInfo& nextInfo : m_cachedUniformInfo)
         resultTbl[nextInfo.getRawName()] = convertShaderVariableInfo(&nextInfo, L);
 
     return resultTbl;
 }
 
-std::shared_ptr<GLShader> LuaProxy::NativeShader::getInternalShader() const
+std::shared_ptr<GLShader> LuaProxy::Shader::getInternalShader() const
 {
     return m_internalShader;
 }
