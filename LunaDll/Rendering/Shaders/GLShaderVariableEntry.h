@@ -12,7 +12,7 @@ class GLShaderVariableEntry
 public:
     GLShaderVariableEntry(GLShaderVariableType type, GLuint location, GLenum typeData, size_t m_count, void* data);
     GLShaderVariableEntry(const GLShaderVariableEntry& other) = delete; // To prevent double-freeing
-    GLShaderVariableEntry(GLShaderVariableEntry&& other);
+    GLShaderVariableEntry(GLShaderVariableEntry&& other) noexcept;
     ~GLShaderVariableEntry();
 
     GLShaderVariableType getVariableType() const;

@@ -22,6 +22,7 @@ private:
     std::string m_lastErrorMsg;
     bool m_isValid;
 
+    std::vector<GLuint> m_attributeBuffers;
 public:
     GLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
     GLShader(const std::string& name, const std::string& fragmentSource);
@@ -56,6 +57,8 @@ private:
 
         GLint count = 0;
         glGetProgramiv(m_shaderID, programVariableType, &count);
+        GLERRORCHECK();
+
         results.reserve(count);
 
         for (GLuint i = 0; i < count; i++)

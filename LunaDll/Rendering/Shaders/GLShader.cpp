@@ -67,36 +67,91 @@ void GLShader::bind()
 
 void GLShader::unbind()
 {
+    // Delete buffers
+    if(m_attributeBuffers.size() > 0)
+    {
+        glDeleteBuffers(m_attributeBuffers.size(), &m_attributeBuffers[0]);
+        GLERRORCHECK();
+        m_attributeBuffers.clear();
+    }
+
     glUseProgram(0);
 }
 
 
-
 void GLShader::applyAttribute(const GLShaderVariableEntry& entry)
 {
-    
-    switch (entry.getGLType()) {
-    case GL_FLOAT:              glVertexAttrib1fv(entry.getLocation(), entry.getFloatPtr()); break;
-    case GL_FLOAT_VEC2:         glVertexAttrib2fv(entry.getLocation(), entry.getFloatPtr()); break;
-    case GL_FLOAT_VEC3:         glVertexAttrib3fv(entry.getLocation(), entry.getFloatPtr()); break;
-    case GL_FLOAT_VEC4:         glVertexAttrib4fv(entry.getLocation(), entry.getFloatPtr()); break;
-    case GL_INT:                glVertexAttribI1iv(entry.getLocation(), entry.getIntPtr()); break;
-    case GL_INT_VEC2:           glVertexAttribI2iv(entry.getLocation(), entry.getIntPtr()); break;
-    case GL_INT_VEC3:           glVertexAttribI3iv(entry.getLocation(), entry.getIntPtr()); break;
-    case GL_INT_VEC4:           glVertexAttribI4iv(entry.getLocation(), entry.getIntPtr()); break;
-    case GL_UNSIGNED_INT:       glVertexAttribI1uiv(entry.getLocation(), entry.getUIntPtr()); break;
-    case GL_UNSIGNED_INT_VEC2:  glVertexAttribI2uiv(entry.getLocation(), entry.getUIntPtr()); break;
-    case GL_UNSIGNED_INT_VEC3:  glVertexAttribI3uiv(entry.getLocation(), entry.getUIntPtr()); break;
-    case GL_UNSIGNED_INT_VEC4:  glVertexAttribI4uiv(entry.getLocation(), entry.getUIntPtr()); break;
-    case GL_DOUBLE:             glVertexAttrib1dv(entry.getLocation(), entry.getDoublePtr()); break;
-    case GL_DOUBLE_VEC2:        glVertexAttrib2dv(entry.getLocation(), entry.getDoublePtr()); break;
-    case GL_DOUBLE_VEC3:        glVertexAttrib3dv(entry.getLocation(), entry.getDoublePtr()); break;
-    case GL_DOUBLE_VEC4:        glVertexAttrib4dv(entry.getLocation(), entry.getDoublePtr()); break;
 
+    // 1. Get the size of an element:
+    int numberOfValuesInDatatype;
+    switch(entry.getGLType())
+    {
+        case GL_FLOAT_VEC2:
+        case GL_INT_VEC2:
+        case GL_UNSIGNED_INT_VEC2:
+        case GL_DOUBLE_VEC2:
+            numberOfValuesInDatatype = 2;
+            break;
+        case GL_FLOAT_VEC3:
+        case GL_INT_VEC3:
+        case GL_UNSIGNED_INT_VEC3:
+        case GL_DOUBLE_VEC3:
+            numberOfValuesInDatatype = 3;
+            break;
+        case GL_FLOAT_VEC4:
+        case GL_INT_VEC4:           
+        case GL_UNSIGNED_INT_VEC4:  
+        case GL_DOUBLE_VEC4:        
+            numberOfValuesInDatatype = 4;
+            break;
+        case GL_FLOAT:
+        case GL_INT:
+        case GL_UNSIGNED_INT:
+        case GL_DOUBLE:
+        default:
+            numberOfValuesInDatatype = 1;
+    }
+    
+    // 2. Allocate and bind buffer
+    GLuint bufID;
+    glGenBuffers(1, &bufID);
+    GLERRORCHECK();
+    glBindBuffer(GL_ARRAY_BUFFER, bufID);
+    GLERRORCHECK();
+
+    m_attributeBuffers.push_back(bufID);
+    
+    // 3. Set data
+    glBufferData(GL_ARRAY_BUFFER, entry.getNumberOfElements() * sizeof(float) * numberOfValuesInDatatype, entry.getDataPtr(), GL_STATIC_DRAW);
+    GLERRORCHECK();
+    glEnableVertexAttribArray(entry.getLocation());
+    GLERRORCHECK();
+
+    // Apply to attribute
+    switch (entry.getGLType())
+    {
+        case GL_FLOAT:              glVertexAttribPointer(entry.getLocation(), 1, GL_FLOAT, GL_FALSE, 0, nullptr); break;
+        case GL_FLOAT_VEC2:         glVertexAttribPointer(entry.getLocation(), 2, GL_FLOAT, GL_FALSE, 0, nullptr); break;
+        case GL_FLOAT_VEC3:         glVertexAttribPointer(entry.getLocation(), 3, GL_FLOAT, GL_FALSE, 0, nullptr); break;
+        case GL_FLOAT_VEC4:         glVertexAttribPointer(entry.getLocation(), 4, GL_FLOAT, GL_FALSE, 0, nullptr); break;
+        case GL_INT:                glVertexAttribIPointer(entry.getLocation(), 1, GL_INT, 0, nullptr); break;
+        case GL_INT_VEC2:           glVertexAttribIPointer(entry.getLocation(), 2, GL_INT, 0, nullptr); break;
+        case GL_INT_VEC3:           glVertexAttribIPointer(entry.getLocation(), 3, GL_INT, 0, nullptr); break;
+        case GL_INT_VEC4:           glVertexAttribIPointer(entry.getLocation(), 4, GL_INT, 0, nullptr); break;
+        case GL_UNSIGNED_INT:       glVertexAttribIPointer(entry.getLocation(), 1, GL_UNSIGNED_INT, 0, nullptr); break;
+        case GL_UNSIGNED_INT_VEC2:  glVertexAttribIPointer(entry.getLocation(), 2, GL_UNSIGNED_INT, 0, nullptr); break;
+        case GL_UNSIGNED_INT_VEC3:  glVertexAttribIPointer(entry.getLocation(), 3, GL_UNSIGNED_INT, 0, nullptr); break;
+        case GL_UNSIGNED_INT_VEC4:  glVertexAttribIPointer(entry.getLocation(), 4, GL_UNSIGNED_INT, 0, nullptr); break;
+        case GL_DOUBLE:             glVertexAttribLPointer(entry.getLocation(), 1, GL_DOUBLE, 0, nullptr); break;
+        case GL_DOUBLE_VEC2:        glVertexAttribLPointer(entry.getLocation(), 2, GL_DOUBLE, 0, nullptr); break;
+        case GL_DOUBLE_VEC3:        glVertexAttribLPointer(entry.getLocation(), 3, GL_DOUBLE, 0, nullptr); break;
+        case GL_DOUBLE_VEC4:        glVertexAttribLPointer(entry.getLocation(), 4, GL_DOUBLE, 0, nullptr); break;
     default:
         break;
     }
+    GLERRORCHECK();
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     GLERRORCHECK();
 }
 

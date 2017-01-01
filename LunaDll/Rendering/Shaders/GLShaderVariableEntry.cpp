@@ -11,7 +11,7 @@ GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableType type, GLuint l
     m_data(data)
 {}
 
-GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableEntry&& other)
+GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableEntry&& other) noexcept
 {
     m_type = other.m_type;
     m_location = other.m_location;

@@ -184,7 +184,7 @@ local function initFFIBasedAPIs()
         [GL_DOUBLE_MAT4x3]      = {glType = "table",    rawType = "double",         glTableSize = 12}   -- 4x3
     }
     
-    local function validateAndConvertVariableTable(variableArgs, variableInfoTable, variableTypeName)
+    local function validateAndConvertVariableTable(variableArgs, variableInfoTable, variableTypeName, arrayLen)
         
         --[[
         variableArgs 
@@ -192,13 +192,16 @@ local function initFFIBasedAPIs()
                 i.e. { x = 50, y = 50}
                 type: table
                 key: attribute/uniform name
-                value: value for the attribute/uniform
+                value: value for the attribute/uniform [number or table]
         variableInfoTable
             --> The info (attribute/uniform) table from a shader (returned from shader:getUniformInfo() or shader:getAttributeInfo())
                 type: table
         variableTypeName
             --> Type name (either "attribute" or "uniform"). Required for proper error handling.
                 type: string
+        arrayLen
+            --> Vertex only: How many vertices (Value pack per vertex)
+                Note: With attribute this value is always 1
                 
         returns:
             --> named table with the converted data
@@ -212,6 +215,7 @@ local function initFFIBasedAPIs()
         
         local formattedReturn = {}
         for varName, varValue in pairs(variableArgs) do
+            -- Get vatiable info
             local varInfo = variableInfoTable[varName]
             if(varInfo == nil)then
                 error("Invalid " .. variableTypeName .. " " .. varName .. " (does not exists)", 3)
@@ -221,12 +225,15 @@ local function initFFIBasedAPIs()
                 error("Multi-dimensional arrays are not supported yet!", 3)
             end
             
+            -- Variable type: GL_FLOAT, GL_FLOAT_VEC2, ...
             local variableType = varInfo.type
+            -- Get metadata of the given type
             local glTypeOfVariable = Graphics.glTypeTable[variableType]
+            -- Get the lua type of the value
             local glTypeOfVariableInArg = type(varValue)
             
             local flatternedResult = nil -- This array will be the input array
-            if(glTypeOfVariable.glType == "number")then -- myUniformVar = 1.0
+            if(glTypeOfVariable.glType == "number" and arrayLen == 1)then -- myUniformVar = 1.0
                 if(glTypeOfVariableInArg == "number")then
                     flatternedResult = {varValue}
                 elseif(glTypeOfVariableInArg == "table")then -- myUniformVar = {1.0, 1.0, 1.0}
@@ -234,7 +241,7 @@ local function initFFIBasedAPIs()
                 else
                     error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected number or table got " .. type(varValue) .. ")", 3)
                 end
-            elseif(glTypeOfVariable.glType == "table")then
+            elseif(glTypeOfVariable.glType == "table" or (glTypeOfVariable.glType == "number" and arrayLen > 1))then -- arrayLen > 1
                 if(glTypeOfVariableInArg ~= "table")then
                     error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected table got " .. type(varValue) .. ")", 3)
                 end
@@ -242,27 +249,26 @@ local function initFFIBasedAPIs()
                 local typeOfFirstElem = type(firstElem)
                 if(typeOfFirstElem == "number")then -- myUniformVar = {1.0, 1.0, 1.0, 1.0}
                     flatternedResult = varValue
-                elseif(typeOfFirstElem == "table")then -- myUniformVar = {{1.0, 1.0}, {1.0, 1.0}}
-                    flatternedResult = {}
-                    for i = 1, #varValue do
-                        local nextElem = varValue[i]
-                        for j = 1, #nextElem do
-                            flatternedResult[#flatternedResult + 1] = nextElem[j]
-                        end
-                    end
                 else
-                    error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected number or table got " .. type(varValue) .. ")", 3)
+                    error("Invalid type for " .. variableTypeName .. " " .. varName .. " (expected table got " .. type(varValue) .. ")", 3)
                 end
+            else
+                error("Internal error! Cannot convert unknown type: " + glTypeOfVariable.glType)
             end
 
             local sizeOfType = glTypeOfVariable.glTableSize or 1
-            local totalNumberOfExpectedElements = varInfo.arrayCount * sizeOfType
+            local totalNumberOfExpectedElements = varInfo.arrayCount * sizeOfType * arrayLen
             local actualNumberOfExpectedElements = #flatternedResult
             if(totalNumberOfExpectedElements ~= actualNumberOfExpectedElements)then
-                error("Invalid number of elements for " .. variableTypeName .. " " .. varName .. " (expected " .. totalNumberOfExpectedElements .. " [" .. varInfo.arrayCount .. "x" .. sizeOfType .. "], got " .. actualNumberOfExpectedElements .. ")", 3)
+                optionalVerticesMultiplierStr = ""
+                if arrayLen > 1 then
+                    optionalVerticesMultiplierStr = " * " .. arrayLen .. " vertices"
+                end
+            
+                error("Invalid number of elements for " .. variableTypeName .. " " .. varName .. " (expected " .. totalNumberOfExpectedElements .. " [" .. varInfo.arrayCount .. "x" .. sizeOfType .. "]" .. optionalVerticesMultiplierStr .. ", got " .. actualNumberOfExpectedElements .. ")", 3)
             end
             
-            formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(flatternedResult, totalNumberOfExpectedElements, glTypeOfVariable.rawType), count = varInfo.arrayCount}
+            formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(flatternedResult, totalNumberOfExpectedElements, glTypeOfVariable.rawType), count = varInfo.arrayCount * arrayLen}
         end
         return formattedReturn
     end
@@ -313,21 +319,21 @@ local function initFFIBasedAPIs()
             end
         end
         
+        -- Validate attributes
+        local attributeArgs = args['attributes'] -- should be converted to [offsetID] = {type = [glEnumId], data = glArrayPtr}
+        local attributeArgsConverted = nil
+        if(attributeArgs ~= nil and shader ~= nil)then
+            attributeArgsConverted = validateAndConvertVariableTable(attributeArgs, shader:getAttributeInfo(), "attribute", arr_len)
+        end
+        
         -- Validate uniforms
         -- TODO: Also accept uniforms/attributes with named argument, i.e. {x = 5, y = 5}
         local uniformArgs = args['uniforms'] -- should be converted to [offsetID] = {type = [glEnumId], data = glArrayPtr}
         local uniformArgsConverted = nil
         if(uniformArgs ~= nil and shader ~= nil)then
-            uniformArgsConverted = validateAndConvertVariableTable(uniformArgs, shader:getUniformInfo(), "uniform")
+            uniformArgsConverted = validateAndConvertVariableTable(uniformArgs, shader:getUniformInfo(), "uniform", 1)
         end
         
-        -- Validate attributes
-        local attributeArgs = args['attributes'] -- should be converted to [offsetID] = {type = [glEnumId], data = glArrayPtr}
-        local attributeArgsConverted = nil
-        if(attributeArgs ~= nil and shader ~= nil)then
-            attributeArgsConverted = validateAndConvertVariableTable(attributeArgs, shader:getAttributeInfo(), "attribute")
-        end
-    
         Graphics.__glInternalDraw{
             priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], texture = texture,
             r = color[1], g = color[2], b = color[3], a = color[4],
