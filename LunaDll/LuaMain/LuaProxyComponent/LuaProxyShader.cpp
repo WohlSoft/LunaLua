@@ -25,8 +25,6 @@ void LuaProxy::Shader::compileFromSource(const std::string& vertexSource, const 
     m_cachedUniformInfo = m_internalShader->getAllUniforms();
 }
 
-#include <iostream>
-
 void LuaProxy::Shader::compileFromFile(const std::string& fileNameVertex, const std::string& fileNameFragment, lua_State* L)
 {
     if (isCompiled())
@@ -51,9 +49,6 @@ void LuaProxy::Shader::compileFromFile(const std::string& fileNameVertex, const 
         return;
     if (!readFromObject(fragmentSource, fileNameFragment, "fragment"))
         return;
-
-    std::cout << "Vert: " << vertexSource << std::endl;
-    std::cout << "Frag: " << fragmentSource << std::endl;
 
     compileFromSource(vertexSource, fragmentSource, L);
 }
