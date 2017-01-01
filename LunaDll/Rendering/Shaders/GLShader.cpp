@@ -12,7 +12,7 @@ static constexpr char* DefaultBaseVertexShaderSRC =
 bool GLShader::compileShaderSource(GLuint shaderID, const std::string& source)
 {
     const char* sources[] = { source.c_str() };
-    glShaderSource(shaderID, 1, sources, NULL);
+    glShaderSource(shaderID, 1, sources, nullptr);
     glCompileShader(shaderID);
 
     GLint result;

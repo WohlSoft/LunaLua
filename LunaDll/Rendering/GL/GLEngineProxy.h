@@ -38,16 +38,6 @@ public:
         QueueCmd(std::static_pointer_cast<GLEngineCmd>(cmd));
     }
 
-    // Functions which run on the main thread, but needs to access GL resources
-    std::shared_ptr<GLShader> CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
-
-    // Other function on main thread
-    template<typename FuncT>
-    void SafeCall(FuncT func) {
-        GLLock lock(*this, GLLock::MainThread);
-        func();
-    }
-
     // Convenience command functions
     void ClearSMBXSprites();
     void ClearLunaTexture(const BMPBox& bmp);
@@ -65,17 +55,21 @@ public:
     inline void TriggerScreenshot() { mInternalGLEngine.TriggerScreenshot(); }
     inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& func) { mInternalGLEngine.TriggerScreenshot(func); }
     inline bool GifRecorderToggle() { return mInternalGLEngine.GifRecorderToggle(); }
-};
 
-class GLLock {
-    friend class GLEngineProxy;
-public:
-    enum GLLockType {
-        QueueThread,
-        MainThread
-    };
+    // Stuff that run at the main thread:
+    // Functions which run on the main thread, but needs to access GL resources
+    std::shared_ptr<GLShader> CreateNewShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
 
-    GLLock(GLEngineProxy& engineToLock, GLLockType type);
+    // With this we don't need SafeCall anymore. 
+    // However, before any GL operations at the main thread this function has to be call first.
+    void EnsureMainThreadCTXApplied();
+
+    // Other function on main thread
+    template<typename FuncT>
+    void SafeCall(FuncT func) {
+        GLLock lock(*this, GLLock::MainThread);
+        func();
+    }
 };
 
 // Instance

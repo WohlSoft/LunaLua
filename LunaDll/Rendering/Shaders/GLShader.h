@@ -47,36 +47,38 @@ private:
     // using GetActiveVariableFunc = void (__stdcall *) (GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
     // TODO: Move to local source file
     template<typename VariableInfoT, typename GetActiveVariableFunc, typename GetVariableLocationFunc>
-    std::vector<VariableInfoT> getAllVariables(GLint programAttribute, GetActiveVariableFunc getActiveVariableFunc, GetVariableLocationFunc getVariableLocationFunc) const
+    std::vector<VariableInfoT> getAllVariables(GLint programVariableType, GetActiveVariableFunc getActiveVariableFunc, GetVariableLocationFunc getVariableLocationFunc) const
     {
         std::vector<VariableInfoT> results;
 
-        g_GLEngine.SafeCall([this, &results, programAttribute, getActiveVariableFunc, getVariableLocationFunc] {
+        // GL operation on the main thread
+        g_GLEngine.EnsureMainThreadCTXApplied();
 
-            GLint count = 0;
-            glGetProgramiv(m_shaderID, programAttribute, &count);
-            results.reserve(count);
+        GLint count = 0;
+        glGetProgramiv(m_shaderID, programVariableType, &count);
+        results.reserve(count);
 
-            for (GLint i = 0; i < count; i++)
-            {
-                constexpr static const GLsizei MAX_LENGTH_NAME = 512;
-                // GLint id, GLint sizeOfVariable, GLint type, const std::string& name
-                GLsizei lengthOfName = 0;
-                GLint count = 0;
-                GLenum variableType = 0;
-                std::string nameBuffer(MAX_LENGTH_NAME, ' ');
+        for (GLuint i = 0; i < count; i++)
+        {
+            constexpr static const GLsizei MAX_LENGTH_NAME = 512;
+            // GLint id, GLint sizeOfVariable, GLint type, const std::string& name
+            GLsizei lengthOfName = 0;
+            GLint sizeOfVariable = 0;
+            GLenum variableType = 0;
+            std::string nameBuffer(MAX_LENGTH_NAME, ' ');
 
-                getActiveVariableFunc(m_shaderID, (GLuint)i, MAX_LENGTH_NAME, &lengthOfName, &count, &variableType, &nameBuffer[0]);
-                GLERRORCHECK();
-                nameBuffer.resize(lengthOfName);
+            // Get variable propertiess
+            getActiveVariableFunc(m_shaderID, i, MAX_LENGTH_NAME, &lengthOfName, &sizeOfVariable, &variableType, &nameBuffer[0]);
+            GLERRORCHECK();
+            nameBuffer.resize(lengthOfName);
 
-                GLint location = getVariableLocationFunc(m_shaderID, nameBuffer.c_str());
-                GLERRORCHECK();
+            // Get location (ID)
+            GLint location = getVariableLocationFunc(m_shaderID, nameBuffer.c_str());
+            GLERRORCHECK();
 
-                results.emplace_back(location, count, variableType, nameBuffer);
-            }
+            results.emplace_back(location, sizeOfVariable, variableType, nameBuffer);
+        }
 
-        });
 
         return results;
     }

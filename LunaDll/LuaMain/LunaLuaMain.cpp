@@ -996,10 +996,10 @@ void CLunaLua::bindAll()
 
             namespace_("UserData")[
                 def("setValue", &LuaProxy::SaveBankProxy::setValue),
-                    def("getValue", &LuaProxy::SaveBankProxy::getValue),
-                    def("isValueSet", &LuaProxy::SaveBankProxy::isValueSet),
-                    def("values", &LuaProxy::SaveBankProxy::values),
-                    def("save", &LuaProxy::SaveBankProxy::save)
+                def("getValue", &LuaProxy::SaveBankProxy::getValue),
+                def("isValueSet", &LuaProxy::SaveBankProxy::isValueSet),
+                def("values", &LuaProxy::SaveBankProxy::values),
+                def("save", &LuaProxy::SaveBankProxy::save)
             ],
 
             LUAHELPER_DEF_CLASS(VBStr)
