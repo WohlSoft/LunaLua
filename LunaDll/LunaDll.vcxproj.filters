@@ -1051,7 +1051,6 @@
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp">
       <Filter>Misc\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeShader.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp">
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
@@ -1064,6 +1063,7 @@
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp">
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

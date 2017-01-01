@@ -306,7 +306,7 @@
     <ClCompile Include="Rendering\Shaders\GLShaderUniformInfo.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp" />
     <ClCompile Include="IPC\IPCPipeServer.cpp" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeShader.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp" />
     <ClCompile Include="Misc\PGEEditorCmdSender.cpp" />

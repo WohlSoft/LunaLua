@@ -265,7 +265,7 @@ local function initFFIBasedAPIs()
                     optionalVerticesMultiplierStr = " * " .. arrayLen .. " vertices"
                 end
             
-                error("Invalid number of elements for " .. variableTypeName .. " " .. varName .. " (expected " .. totalNumberOfExpectedElements .. " [" .. varInfo.arrayCount .. "x" .. sizeOfType .. "]" .. optionalVerticesMultiplierStr .. ", got " .. actualNumberOfExpectedElements .. ")", 3)
+                error("Invalid number of elements for " .. variableTypeName .. " " .. varName .. " (expected " .. totalNumberOfExpectedElements .. " values --> [" .. varInfo.arrayCount .. "x" .. sizeOfType .. "]" .. optionalVerticesMultiplierStr .. ", got " .. actualNumberOfExpectedElements .. ")", 3)
             end
             
             formattedReturn[varInfo.id] = {glType = varInfo.type, data = convertGlArray(flatternedResult, totalNumberOfExpectedElements, glTypeOfVariable.rawType), count = varInfo.arrayCount * arrayLen}
