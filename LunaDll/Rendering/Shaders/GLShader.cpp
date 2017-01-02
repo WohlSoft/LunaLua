@@ -83,33 +83,59 @@ void GLShader::applyAttribute(const GLShaderVariableEntry& entry)
 {
 
     // 1. Get the size of an element:
-    int numberOfValuesInDatatype;
+    int datatypeByteSize;
     switch(entry.getGLType())
     {
+        case GL_FLOAT:
+            datatypeByteSize = sizeof(GLfloat);
+            break;
+        case GL_INT:
+            datatypeByteSize = sizeof(GLint);
+            break;
+        case GL_UNSIGNED_INT:
+            datatypeByteSize = sizeof(GLuint);
+            break;
+        case GL_DOUBLE:
+            datatypeByteSize = sizeof(GLdouble);
+            break;
         case GL_FLOAT_VEC2:
+            datatypeByteSize = sizeof(GLfloat) * 2;
+            break;
         case GL_INT_VEC2:
+            datatypeByteSize = sizeof(GLint) * 2;
+            break;
         case GL_UNSIGNED_INT_VEC2:
+            datatypeByteSize = sizeof(GLuint) * 2;
+            break;
         case GL_DOUBLE_VEC2:
-            numberOfValuesInDatatype = 2;
+            datatypeByteSize = sizeof(GLdouble) * 2;
             break;
         case GL_FLOAT_VEC3:
+            datatypeByteSize = sizeof(GLfloat) * 3;
+            break;
         case GL_INT_VEC3:
+            datatypeByteSize = sizeof(GLint) * 3;
+            break;
         case GL_UNSIGNED_INT_VEC3:
+            datatypeByteSize = sizeof(GLuint) * 3;
+            break;
         case GL_DOUBLE_VEC3:
-            numberOfValuesInDatatype = 3;
+            datatypeByteSize = sizeof(GLdouble) * 3;
             break;
         case GL_FLOAT_VEC4:
-        case GL_INT_VEC4:           
-        case GL_UNSIGNED_INT_VEC4:  
-        case GL_DOUBLE_VEC4:        
-            numberOfValuesInDatatype = 4;
+            datatypeByteSize = sizeof(GLfloat) * 4;
             break;
-        case GL_FLOAT:
-        case GL_INT:
-        case GL_UNSIGNED_INT:
-        case GL_DOUBLE:
+        case GL_INT_VEC4:
+            datatypeByteSize = sizeof(GLint) * 4;
+            break;
+        case GL_UNSIGNED_INT_VEC4:
+            datatypeByteSize = sizeof(GLuint) * 4;
+            break;
+        case GL_DOUBLE_VEC4:
+            datatypeByteSize = sizeof(GLdouble) * 4;
+            break;
         default:
-            numberOfValuesInDatatype = 1;
+            datatypeByteSize = sizeof(float);
     }
     
     // 2. Allocate and bind buffer
@@ -122,7 +148,7 @@ void GLShader::applyAttribute(const GLShaderVariableEntry& entry)
     m_attributeBuffers.push_back(bufID);
     
     // 3. Set data
-    glBufferData(GL_ARRAY_BUFFER, entry.getNumberOfElements() * sizeof(float) * numberOfValuesInDatatype, entry.getDataPtr(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, entry.getNumberOfElements() * datatypeByteSize, entry.getDataPtr(), GL_STATIC_DRAW);
     GLERRORCHECK();
     glEnableVertexAttribArray(entry.getLocation());
     GLERRORCHECK();
