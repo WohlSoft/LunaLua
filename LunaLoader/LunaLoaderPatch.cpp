@@ -78,7 +78,7 @@ static int patchUStr(HANDLE f, unsigned int at, char* str, unsigned int maxlen)
 
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir)
 {
-    STARTUPINFO si;
+    STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     memset(&si, 0, sizeof(si));
     memset(&pi, 0, sizeof(pi));
