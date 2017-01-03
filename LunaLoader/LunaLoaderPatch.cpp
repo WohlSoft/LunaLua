@@ -154,15 +154,9 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     }
 
     // Wait for the remote thread to terminate
-    DWORD result = WaitForSingleObject(hThread, INFINITE);
-
+    WaitForSingleObject(hThread, INFINITE);
     if(hThread != NULL)
         CloseHandle(hThread);
-
-    if(!result)
-    {
-        return LUNALOADER_PATCH_FAIL;
-    }
 #else
     // Patch 1 (jump to Patch 2)
     uintptr_t LoaderPatchAddr1 = 0x40BDD8;
@@ -193,9 +187,6 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
 
     // Allocate space for Patch 2
     DWORD LoaderPatchAddr2 =
-    #if 0
-            0xB24C00;
-    #else
             (DWORD)VirtualAllocEx(
             pi.hProcess,           // Target process
             NULL,                  // Don't request any particular address
@@ -203,11 +194,10 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
             MEM_COMMIT,            // Type of memory allocation
             PAGE_EXECUTE_READWRITE // Memory protection type
             );
-        if(LoaderPatchAddr2 == (DWORD)NULL)
-        {
-            return LUNALOADER_PATCH_FAIL;
-        }
-    #endif
+    if(LoaderPatchAddr2 == (DWORD)NULL)
+    {
+        return LUNALOADER_PATCH_FAIL;
+    }
 
     // Set Patch1 Addresses
     setJmpAddr(LoaderPatch1, LoaderPatchAddr1, 0x00, LoaderPatchAddr2);

@@ -70,7 +70,11 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
     }
 
     FILE *test;
+    #ifdef _MSC_VER
+    _wfopen_s(&test, pathToSMBX.c_str(), L"rb");
+    #else
     test = _wfopen(pathToSMBX.c_str(), L"rb");
+    #endif
     if(!test)
     {
         pathToSMBX = curPath + L"\\smbx.legacy";
