@@ -4,12 +4,80 @@
 #include <stdint.h>
 #include "LunaLoaderPatch.h"
 
-static void setJmpAddr(uint8_t* patch, DWORD patchAddr, DWORD patchOffset, DWORD target) {
+
+//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+std::wstring GetLastErrorAsString()
+{
+    //Get the error message, if any.
+    DWORD errorMessageID = ::GetLastError();
+    if(errorMessageID == 0)
+        return std::wstring(); //No error message has been recorded
+
+    LPWSTR messageBuffer = nullptr;
+    size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
+
+    std::wstring message(messageBuffer, size);
+
+    //Free the buffer.
+    LocalFree(messageBuffer);
+
+    return message;
+}
+
+static void setJmpAddr(uint8_t* patch, DWORD patchAddr, DWORD patchOffset, DWORD target)
+{
     DWORD* dwordAddr = (DWORD*)&patch[patchOffset+1];
     *dwordAddr = (DWORD)target - (DWORD)(patchAddr + patchOffset + 5);
 }
 
-LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir) {
+static int patchAStr(HANDLE f, unsigned int at, char* str, unsigned int maxlen)
+{
+    char data[1024];
+    memset(data, 0, maxlen);
+    unsigned int i;
+    unsigned int len = strlen(str);
+    for(i=0; (i<len) && (i<maxlen-1); i++)
+    {
+        data[i] = str[i];
+    }
+//    fseek(f, at, SEEK_SET);
+//    fwrite(data, 1, maxlen, f);
+    SIZE_T bytes = 0;
+    BOOL res = WriteProcessMemory(f, (void*)at, (void*)data, maxlen, &bytes);
+    if(res == 0)
+    {
+        std::wstring msg = GetLastErrorAsString();
+        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+    }
+    return bytes;
+}
+
+static int patchUStr(HANDLE f, unsigned int at, char* str, unsigned int maxlen)
+{
+    char data[1024];
+    memset(data, 0, maxlen);
+    unsigned int i, j;
+    unsigned int len = strlen(str);
+    for(i=0, j=0; (i<len) && (j<maxlen); i++, j+=2)
+    {
+        data[j] = str[i];
+        data[j+1] = 0;
+    }
+//    fseek(f, at, SEEK_SET);
+//    fwrite(data, 1, maxlen, f);
+    SIZE_T bytes = 0;
+    BOOL res = WriteProcessMemory(f, (void*)at, (void*)data, maxlen, &bytes);
+    if(res == 0)
+    {
+        std::wstring msg = GetLastErrorAsString();
+        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+    }
+    return bytes;
+}
+
+LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir)
+{
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     memset(&si, 0, sizeof(si));
@@ -18,20 +86,23 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     // Prepare command line
     size_t pos = 0;
     std::wstring quotedPathToSMBX(pathToSMBX);
-    while ((pos = quotedPathToSMBX.find(L"\"", pos)) != std::string::npos) {
+    while ((pos = quotedPathToSMBX.find(L"\"", pos)) != std::string::npos)
+    {
         quotedPathToSMBX.replace(pos, 1, L"\\\"");
         pos += 2;
     }
+
     std::wstring strCmdLine = (
         std::wstring(L"\"") + quotedPathToSMBX + std::wstring(L"\" ") +
         std::wstring(cmdLineArgs)
         );
+
     uint32_t cmdLineMemoryLen = sizeof(wchar_t) * (strCmdLine.length() + 1); // Include null terminator
     wchar_t* cmdLine = (wchar_t*)malloc(cmdLineMemoryLen);
     std::memcpy(cmdLine, strCmdLine.c_str(), cmdLineMemoryLen);
 
     // Create process
-    if (!CreateProcessW(pathToSMBX, // Launch smbx.exe
+    if(!CreateProcessW(pathToSMBX, // Launch smbx.exe
         cmdLine,          // Command line
         NULL,             // Process handle not inheritable
         NULL,             // Thread handle not inheritable
@@ -46,10 +117,56 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         free(cmdLine); cmdLine = NULL;
         return LUNALOADER_CREATEPROCESS_FAIL;
     }
-    free(cmdLine); cmdLine = NULL;
+    free(cmdLine);
+    cmdLine = NULL;
 
+#if 0// Remote thread way
+    std::string dllname = "LunaDll.dll";
+    int dllname_size = (dllname.size() + 1) * sizeof(char);
+
+    HMODULE kernel32 = LoadLibraryW(L"kernel32.dll");
+    if(!kernel32)
+    {
+        std::wstring msg = GetLastErrorAsString();
+        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+        return LUNALOADER_PATCH_FAIL;
+    }
+
+    PWSTR pszLibFileRemote = (PWSTR)VirtualAllocEx(pi.hProcess, NULL, dllname_size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    LPTHREAD_START_ROUTINE pfnThreadRtn =
+            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "LoadLibraryA");
+            //(LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"user32.dll"), "MessageBoxA");
+
+    if(WriteProcessMemory(pi.hProcess, (void*)pszLibFileRemote, (void*)dllname.c_str(), dllname_size, NULL) == 0)
+    {
+        return LUNALOADER_PATCH_FAIL;
+    }
+//    patchUStr(pi.hProcess, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
+//    patchAStr(pi.hProcess, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
+//    patchAStr(pi.hProcess, 0xA1FE3, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
+//    patchAStr(pi.hProcess, 0xC9FC0, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
+    HANDLE hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
+    if(!hThread)
+    {
+        if(hThread != NULL)
+            CloseHandle(hThread);
+        return LUNALOADER_PATCH_FAIL;
+    }
+
+    // Wait for the remote thread to terminate
+    DWORD result = WaitForSingleObject(hThread, INFINITE);
+
+    if(hThread != NULL)
+        CloseHandle(hThread);
+
+    if(!result)
+    {
+        return LUNALOADER_PATCH_FAIL;
+    }
+#else
     // Patch 1 (jump to Patch 2)
     uintptr_t LoaderPatchAddr1 = 0x40BDD8;
+
     unsigned char LoaderPatch1[] =
     {
         0xE9, 0x00, 0x00, 0x00, 0x00  // 0x40BDD8 JMP <Patch2>
@@ -69,44 +186,59 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
     };
 
+    //patchUStr(pi.hProcess, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
+    //patchAStr(pi.hProcess, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
+    //patchAStr(pi.hProcess, 0xA1FE3, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
+    //patchAStr(pi.hProcess, 0xC9FC0, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
+
     // Allocate space for Patch 2
-    DWORD LoaderPatchAddr2 = (DWORD)VirtualAllocEx(
-        pi.hProcess,           // Target process
-        NULL,                  // Don't request any particular address
-        sizeof(LoaderPatch2),  // Length of Patch 2
-        MEM_COMMIT,            // Type of memory allocation
-        PAGE_READWRITE         // Memory protection type
-        );
-    if (LoaderPatchAddr2 == (DWORD)NULL) {
-        return LUNALOADER_PATCH_FAIL;
-    }
+    DWORD LoaderPatchAddr2 =
+    #if 0
+            0xB24C00;
+    #else
+            (DWORD)VirtualAllocEx(
+            pi.hProcess,           // Target process
+            NULL,                  // Don't request any particular address
+            sizeof(LoaderPatch2),  // Length of Patch 2
+            MEM_COMMIT,            // Type of memory allocation
+            PAGE_EXECUTE_READWRITE // Memory protection type
+            );
+        if(LoaderPatchAddr2 == (DWORD)NULL)
+        {
+            return LUNALOADER_PATCH_FAIL;
+        }
+    #endif
 
     // Set Patch1 Addresses
     setJmpAddr(LoaderPatch1, LoaderPatchAddr1, 0x00, LoaderPatchAddr2);
 
+    DWORD pfnThreadRtn = (DWORD)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "LoadLibraryA");
+
     // Set Patch2 Addresses
-    setJmpAddr(LoaderPatch2, LoaderPatchAddr2, 0x10, (DWORD)&LoadLibraryA);
+    setJmpAddr(LoaderPatch2, LoaderPatchAddr2, 0x10, (DWORD)pfnThreadRtn/*&LoadLibraryA*/);
     setJmpAddr(LoaderPatch2, LoaderPatchAddr2, 0x1D, LoaderPatchAddr1 + 5);
 
     // Patch the entry point...
-    if (WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr1, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
-        WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr2, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
+    if(WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr1, LoaderPatch1, sizeof(LoaderPatch1), NULL) == 0 ||
+       WriteProcessMemory(pi.hProcess, (void*)LoaderPatchAddr2, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
     {
+        std::wstring msg = GetLastErrorAsString();
+        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
         return LUNALOADER_PATCH_FAIL;
     }
-
     // Change Patch2 memory protection type
     DWORD TmpDword = 0;
-    if (VirtualProtectEx(
+    if( VirtualProtectEx(
         pi.hProcess,
         (void*)LoaderPatchAddr2,
         sizeof(LoaderPatch2),
         PAGE_EXECUTE,
         &TmpDword
-    ) == 0) {
+    ) == 0)
+    {
         return LUNALOADER_PATCH_FAIL;
     }
-
+#endif
     // Resume the main program thread
     ResumeThread(pi.hThread);
 
