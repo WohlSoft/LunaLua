@@ -249,3 +249,5 @@ HardcodedGraphicsData
 /LunaLoader-bin.zip
 
 *.bak
+
+/build-*
