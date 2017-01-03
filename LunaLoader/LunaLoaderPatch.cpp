@@ -120,32 +120,44 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     free(cmdLine);
     cmdLine = NULL;
 
-#if 0// Remote thread way
-    std::string dllname = "LunaDll.dll";
-    int dllname_size = (dllname.size() + 1) * sizeof(char);
+#if 1// Remote thread way
+    std::wstring dllname = L"nothing";
+    int          dllname_size = 1024;
 
-    HMODULE kernel32 = LoadLibraryW(L"kernel32.dll");
-    if(!kernel32)
+    HMODULE msvbvm = LoadLibraryW(L"msvbvm60.dll");
+    if(!msvbvm)
     {
         std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+        MessageBoxW(NULL, msg.c_str(), L"msvbvm60 Error!", MB_ICONERROR);
         return LUNALOADER_PATCH_FAIL;
     }
+
+    /*
+    HMODULE lunadlldll = LoadLibraryW(L"lunadll.dll");
+    if(!lunadlldll)
+    {
+        std::wstring msg = GetLastErrorAsString();
+        MessageBoxW(NULL, msg.c_str(), L"lunadll Error!", MB_ICONERROR);
+        return LUNALOADER_PATCH_FAIL;
+    }*/
 
     PWSTR pszLibFileRemote = (PWSTR)VirtualAllocEx(pi.hProcess, NULL, dllname_size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     LPTHREAD_START_ROUTINE pfnThreadRtn =
-            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "LoadLibraryA");
+            (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "LoadLibraryW");
             //(LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"user32.dll"), "MessageBoxA");
 
-    if(WriteProcessMemory(pi.hProcess, (void*)pszLibFileRemote, (void*)dllname.c_str(), dllname_size, NULL) == 0)
+    HANDLE hThread = NULL;
+
+    dllname = L"msvbvm60.dll";
+    if(WriteProcessMemory(pi.hProcess,
+                          (void*)pszLibFileRemote,
+                          (void*)dllname.c_str(),
+                          (dllname.size()+1) * sizeof(wchar_t),
+                          NULL) == 0)
     {
         return LUNALOADER_PATCH_FAIL;
     }
-//    patchUStr(pi.hProcess, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
-//    patchAStr(pi.hProcess, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
-//    patchAStr(pi.hProcess, 0xA1FE3, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
-//    patchAStr(pi.hProcess, 0xC9FC0, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
-    HANDLE hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
+    hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
     if(!hThread)
     {
         if(hThread != NULL)
@@ -157,6 +169,36 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     WaitForSingleObject(hThread, INFINITE);
     if(hThread != NULL)
         CloseHandle(hThread);
+
+
+    dllname = L"LunaDll.dll";
+    if(WriteProcessMemory(pi.hProcess,
+                          (void*)pszLibFileRemote,
+                          (void*)dllname.c_str(),
+                          (dllname.size()+1) * sizeof(wchar_t),
+                          NULL) == 0)
+    {
+        if(hThread != NULL)
+            CloseHandle(hThread);
+        return LUNALOADER_PATCH_FAIL;
+    }
+    hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
+    if(!hThread)
+    {
+        if(hThread != NULL)
+            CloseHandle(hThread);
+        return LUNALOADER_PATCH_FAIL;
+    }
+    // Wait for the remote thread to terminate
+    WaitForSingleObject(hThread, INFINITE);
+    if(hThread != NULL)
+        CloseHandle(hThread);
+
+//    patchUStr(pi.hProcess, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
+//    patchAStr(pi.hProcess, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
+//    patchAStr(pi.hProcess, 0xA1FE3, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 78);
+//    patchAStr(pi.hProcess, 0xC9FC0, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 65);
+
 #else
     // Patch 1 (jump to Patch 2)
     uintptr_t LoaderPatchAddr1 = 0x40BDD8;
@@ -229,6 +271,7 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         return LUNALOADER_PATCH_FAIL;
     }
 #endif
+
     // Resume the main program thread
     ResumeThread(pi.hThread);
 

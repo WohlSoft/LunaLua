@@ -1,8 +1,8 @@
 TEMPLATE = app
 TARGET = LunaLoader
 CONFIG -= qt
-CONFIG += console
-CONFIG -= windows
+CONFIG -= console
+CONFIG += windows
 
 RC_FILE += $$PWD/LunaLoader.rc
 
