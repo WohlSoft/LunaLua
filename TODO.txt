@@ -6,8 +6,12 @@
 
 * CMAKE:
 ** Automate all dependencies
+*** Copy DLL for INSTALL
+
+* CMAKE Depedencies
 ** FreeImage - Dependency
 *** Copy PDB when installing
+
 
 
 DONE:
