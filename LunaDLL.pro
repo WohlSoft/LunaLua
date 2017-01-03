@@ -26,248 +26,6 @@ LIBS += -static -lkernel32 -static -luser32 -static -lgdi32 -static -lcomdlg32 -
 LIBS += -static -lmsimg32 -static -ldsound -static -lwinspool -static -ladvapi32 -static -lole32 -static -loleaut32 -static -llua5.1
 LIBS += -static -lwinmm -static -lSDL2main -lSDL2.dll -static -lSDL2_mixer.dll libversion -lDbghelp -lvorbisfile -lvorbis -lmad -lmikmod.dll -lflac -logg
 
-
-OTHER_FILES += \
-    LunaDll/scratch.txt
-
-DISTFILES += \
-    LunaDll/scrappedcode.txt \
-    LunaDll/Misc/scrappedcode.txt \
-    LunaDll/Misc/scratch.txt
-
-HEADERS += \
-    LunaDll/Autocode/Autocode.h \
-    LunaDll/Autocode/AutocodeManager.h \
-    LunaDll/CellManager/CellManager.h \
-    LunaDll/CustomSprites/Hitbox/Hitbox.h \
-    LunaDll/CustomSprites/SpritesFuncs/SpriteFuncs.h \
-    LunaDll/CustomSprites/CSprite.h \
-    LunaDll/CustomSprites/CSpriteManager.h \
-    LunaDll/CustomSprites/SpriteComponent.h \
-    LunaDll/DeathCounter/DeathCounter.h \
-    LunaDll/DeathCounter/DeathRecord.h \
-    LunaDll/GameConfig/GameAutostart.h \
-    LunaDll/GameConfig/GameConfiguration.h \
-    LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h \
-    LunaDll/Input/Input.h \
-    LunaDll/LevelCodes/LevelCodes.h \
-    LunaDll/libs/ini-reader/ini.h \
-    LunaDll/libs/ini-reader/INIReader.h \
-    LunaDll/libs/lua_mingw/include/lauxlib.h \
-    LunaDll/libs/lua_mingw/include/lua.h \
-    LunaDll/libs/lua_mingw/include/lua.hpp \
-    LunaDll/libs/lua_mingw/include/luaconf.h \
-    LunaDll/libs/lua_mingw/include/lualib.h \
-    LunaDll/libs/luabind-include/luabind/detail/calc_arity.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/call.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/call_function.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/call_member.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/call_operator_iterate.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/class_cache.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/class_registry.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/class_rep.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/compute_score.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/constructor.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/conversion_storage.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/convert_to_lua.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/debug.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/decorate_type.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/deduce_signature.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/enum_maker.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/format_signature.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/garbage_collector.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/has_get_pointer.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/inheritance.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/instance_holder.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/is_indirect_const.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/link_compatibility.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/make_instance.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/most_derived.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/object_call.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/object_funs.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/object_rep.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/open.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/operator_id.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/other.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/pcall.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/pointee_sizeof.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/pointee_typeid.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/policy.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/primitives.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/property.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/ref.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/signature_match.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/stack_utils.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/typetraits.hpp \
-    LunaDll/libs/luabind-include/luabind/detail/yes_no.hpp \
-    LunaDll/libs/luabind-include/luabind/adopt_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/back_reference.hpp \
-    LunaDll/libs/luabind-include/luabind/back_reference_fwd.hpp \
-    LunaDll/libs/luabind-include/luabind/class.hpp \
-    LunaDll/libs/luabind-include/luabind/class_info.hpp \
-    LunaDll/libs/luabind-include/luabind/config.hpp \
-    LunaDll/libs/luabind-include/luabind/container_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/copy_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/dependency_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/discard_result_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/error.hpp \
-    LunaDll/libs/luabind-include/luabind/exception_handler.hpp \
-    LunaDll/libs/luabind-include/luabind/from_stack.hpp \
-    LunaDll/libs/luabind-include/luabind/function.hpp \
-    LunaDll/libs/luabind-include/luabind/get_main_thread.hpp \
-    LunaDll/libs/luabind-include/luabind/get_pointer.hpp \
-    LunaDll/libs/luabind-include/luabind/handle.hpp \
-    LunaDll/libs/luabind-include/luabind/iterator_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/lua_include.hpp \
-    LunaDll/libs/luabind-include/luabind/luabind.hpp \
-    LunaDll/libs/luabind-include/luabind/make_function.hpp \
-    LunaDll/libs/luabind-include/luabind/nil.hpp \
-    LunaDll/libs/luabind-include/luabind/object.hpp \
-    LunaDll/libs/luabind-include/luabind/open.hpp \
-    LunaDll/libs/luabind-include/luabind/operator.hpp \
-    LunaDll/libs/luabind-include/luabind/out_value_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/prefix.hpp \
-    LunaDll/libs/luabind-include/luabind/raw_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/return_reference_to_policy.hpp \
-    LunaDll/libs/luabind-include/luabind/scope.hpp \
-    LunaDll/libs/luabind-include/luabind/shared_ptr_converter.hpp \
-    LunaDll/libs/luabind-include/luabind/tag_function.hpp \
-    LunaDll/libs/luabind-include/luabind/typeid.hpp \
-    LunaDll/libs/luabind-include/luabind/value_wrapper.hpp \
-    LunaDll/libs/luabind-include/luabind/version.hpp \
-    LunaDll/libs/luabind-include/luabind/weak_ref.hpp \
-    LunaDll/libs/luabind-include/luabind/wrapper_base.hpp \
-    LunaDll/libs/luabind-include/luabind/yield_policy.hpp \
-    LunaDll/libs/luasocket/auxiliar.h \
-    LunaDll/libs/luasocket/buffer.h \
-    LunaDll/libs/luasocket/except.h \
-    LunaDll/libs/luasocket/inet.h \
-    LunaDll/libs/luasocket/io.h \
-    LunaDll/libs/luasocket/luasocket.h \
-    LunaDll/libs/luasocket/mime.h \
-    LunaDll/libs/luasocket/options.h \
-    LunaDll/libs/luasocket/pierror.h \
-    LunaDll/libs/luasocket/select.h \
-    LunaDll/libs/luasocket/socket.h \
-    LunaDll/libs/luasocket/tcp.h \
-    LunaDll/libs/luasocket/timeout.h \
-    LunaDll/libs/luasocket/udp.h \
-    LunaDll/libs/luasocket/unix.h \
-    LunaDll/libs/luasocket/usocket.h \
-    LunaDll/libs/luasocket/wsocket.h \
-    LunaDll/libs/simpleini/SimpleIni.h \
-    LunaDll/libs/stackwalker/StackWalker.h \
-    LunaDll/Logging/Logging.h \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyAudio.h \
-    LunaDll/LuaMain/LuabindIncludes.h \
-    LunaDll/LuaMain/LuaEvents.h \
-    LunaDll/LuaMain/LuaHelper.h \
-    LunaDll/LuaMain/LuaProxy.h \
-    LunaDll/LuaMain/LuaSharedProxy.h \
-    LunaDll/LuaMain/LunaLuaMain.h \
-    LunaDll/MciEmulator/mciEmulator.h \
-    LunaDll/Minigames/CGUI/CGUI.h \
-    LunaDll/Minigames/GameboyRPG.h \
-    LunaDll/Minigames/Minigames.h \
-    LunaDll/Misc/FreeImageUtils/FreeImageData.h \
-    LunaDll/Misc/FreeImageUtils/FreeImageGifData.h \
-    LunaDll/Misc/FreeImageUtils/FreeImageHelper.h \
-    LunaDll/Misc/FreeImageUtils/FreeImageInit.h \
-    LunaDll/Misc/Gui/GuiCrashNotify.h \
-    LunaDll/Misc/MemoryScanner/MemoryScanner.h \
-    LunaDll/Misc/MemoryScanner/MemoryScannerDefines.h \
-    LunaDll/Misc/RuntimeHookUtils/APIHook.h \
-    LunaDll/Misc/RuntimeHookUtils/CmnHdr.h \
-    LunaDll/Misc/RuntimeHookUtils/Toolhelp.h \
-    LunaDll/Misc/ErrorReporter.h \
-    LunaDll/Misc/GeneralLunaConfig.h \
-    LunaDll/Misc/MiscFuncs.h \
-    LunaDll/Misc/Playground.h \
-    LunaDll/Misc/RunningStat.h \
-    LunaDll/Misc/RuntimeHook.h \
-    LunaDll/Misc/SHMemServer.h \
-    LunaDll/Misc/ThreadedCmdQueue.h \
-    LunaDll/Misc/VB6StrPtr.h \
-    LunaDll/Rendering/RenderOps/RenderBitmapOp.h \
-    LunaDll/Rendering/RenderOps/RenderEffectOp.h \
-    LunaDll/Rendering/RenderOps/RenderGLOp.h \
-    LunaDll/Rendering/RenderOps/RenderOp.h \
-    LunaDll/Rendering/RenderOps/RenderRectOp.h \
-    LunaDll/Rendering/RenderOps/RenderStringOp.h \
-    LunaDll/Rendering/AsyncGifRecorder.h \
-    LunaDll/Rendering/BMPBox.h \
-    LunaDll/Rendering/GL/GLCompat.h \
-    LunaDll/Rendering/GL/GLContextManager.h \
-    LunaDll/Rendering/GL/GLDraw.h \
-    LunaDll/Rendering/GL/GLEngine.h \
-    LunaDll/Rendering/GL/GLEngineCmds.h \
-    LunaDll/Rendering/GL/GLEngineProxy.h \
-    LunaDll/Rendering/GL/GLInitTest.h \
-    LunaDll/Rendering/GL/GLSplitSprite.h \
-    LunaDll/Rendering/GL/GLSprite.h \
-    LunaDll/Rendering/GL/GLTextureStore.h \
-    LunaDll/Rendering/Rendering.h \
-    LunaDll/Rendering/RenderOverrideManager.h \
-    LunaDll/Rendering/RenderUtils.h \
-    LunaDll/SdlMusic/MusicManager.h \
-    LunaDll/SdlMusic/SdlMusPlayer.h \
-    LunaDll/SMBXInternal/Reconstructed/Util/NpcToCoins.h \
-    LunaDll/SMBXInternal/Reconstructed/ReconstructedDefines.h \
-    LunaDll/SMBXInternal/Animation.h \
-    LunaDll/SMBXInternal/BGOs.h \
-    LunaDll/SMBXInternal/Blocks.h \
-    LunaDll/SMBXInternal/CameraInfo.h \
-    LunaDll/SMBXInternal/CustomGraphics.h \
-    LunaDll/SMBXInternal/Layer.h \
-    LunaDll/SMBXInternal/Level.h \
-    LunaDll/SMBXInternal/Menu.h \
-    LunaDll/SMBXInternal/NativeInput.h \
-    LunaDll/SMBXInternal/NPCs.h \
-    LunaDll/SMBXInternal/Overworld.h \
-    LunaDll/SMBXInternal/PlayerMOB.h \
-    LunaDll/SMBXInternal/SMBXEvents.h \
-    LunaDll/SMBXInternal/Sound.h \
-    LunaDll/SMBXInternal/Warp.h \
-    LunaDll/SMBXInternal/Water.h \
-    LunaDll/SMBXInternal/WorldLevel.h \
-    LunaDll/UserSaves/UserSaving.h \
-    LunaDll/CGUIContainer.h \
-    LunaDll/Defines.h \
-    LunaDll/GlobalFuncs.h \
-    LunaDll/Globals.h \
-    LunaDll/httprequest.h \
-    LunaDll/Main.h \
-    LunaDll/PerformanceTimer.h \
-    LunaDll/PngRender.h \
-    LunaDll/resource.h \
-    LunaDll/version.h \
-    LunaDll/GameConfig/GeneralLunaConfig.h \
-    LunaDll/Misc/RuntimeHookManagers/LevelHUDController.h \
-    LunaDll/Misc/AsmPatch.h \
-    LunaDll/Misc/AsyncHTTPClient.h \
-    LunaDll/Misc/SafeFPUControl.h \
-    LunaDll/Misc/TypeLib.h \
-    LunaDll/Misc/VariantHelper.h \
-    LunaDll/Misc/win32_Unicode.h \
-    LunaDll/Rendering/Shaders/GLShader.h \
-    LunaDll/SMBXInternal/CollectedStarRecord.h \
-    LunaDll/SMBXInternal/Musicbox.h \
-    LunaDll/SMBXInternal/Path.h \
-    LunaDll/SMBXInternal/Scenery.h \
-    LunaDll/SMBXInternal/Tile.h \
-    LunaDll/Misc/PerfTracker.h \
-    LunaDll/EventStateMachine.h \
-    LunaDll/Misc/UniPath.h \
-    LunaDll/Misc/TestMode.h \
-    LunaDll/Rendering/GL/GLFramebuffer.h \
-    LunaDll/Rendering/BitBltEmulation.h \
-    LunaDll/Rendering/FrameCapture.h \
-    LunaDll/Rendering/SMBXMaskedImage.h \
-    LunaDll/SMBXInternal/BaseItemArray.h \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.h \
-    LunaDll/Misc/PGEEditorCmdSender.h \
-    LunaDll/IPC/IPCPipeServer.h
-
 SOURCES += \
     LunaDll/Autocode/Commands/AC_HeartSystem.cpp \
     LunaDll/Autocode/Commands/AC_LunaControl.cpp \
@@ -286,9 +44,11 @@ SOURCES += \
     LunaDll/DeathCounter/DeathRecord.cpp \
     LunaDll/GameConfig/GameAutostart.cpp \
     LunaDll/GameConfig/GameConfiguration.cpp \
+    LunaDll/GameConfig/GeneralLunaConfig.cpp \
     LunaDll/HardcodedGraphics/HardcodedGraphicsManager.cpp \
     LunaDll/HardcodedGraphics/HardocodeGFXMap.cpp \
     LunaDll/Input/Input.cpp \
+    LunaDll/IPC/IPCPipeServer.cpp \
     LunaDll/LevelCodes/dlltestlvlCode.cpp \
     LunaDll/LevelCodes/Docopoper-AbstractAssault.lvl.cpp \
     LunaDll/LevelCodes/Docopoper-Calleoca.cpp \
@@ -329,26 +89,34 @@ SOURCES += \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyGlobalFunctions/LuaProxyGlobalFuncNative.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyGlobalFunctions/LuaProxyGlobalFuncText.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyAnimation.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyAsyncHTTPRequest.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyAudio.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyBGO.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyBlock.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyCameraInfo.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyConsole.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyData.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyGlobalFunctions.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyLayer.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyLogger.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyMusicbox.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyNativeInput.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyNPC.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyPath.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyPlayer.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyPlayerSettings.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxySaveBank.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyScenery.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxySection.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyShader.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyTile.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyVBStr.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyWarp.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyWorld.cpp \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyWorldLevel.cpp \
-    LunaDll/LuaMain/LuaEvents.cpp \
     LunaDll/LuaMain/LuaHelper.cpp \
     LunaDll/LuaMain/LuaProxy.cpp \
+    LunaDll/LuaMain/LuaProxyFFI.cpp \
     LunaDll/LuaMain/LuaSharedProxy.cpp \
     LunaDll/LuaMain/LunaLuaMain.cpp \
     LunaDll/MciEmulator/mciEmulator.cpp \
@@ -360,36 +128,60 @@ SOURCES += \
     LunaDll/Misc/FreeImageUtils/FreeImageHelper.cpp \
     LunaDll/Misc/FreeImageUtils/FreeImageInit.cpp \
     LunaDll/Misc/Gui/GuiCrashNotify.cpp \
+    LunaDll/Misc/Gui/RichTextDialog.cpp \
     LunaDll/Misc/MemoryScanner/MemoryScanner.cpp \
+    LunaDll/Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp \
     LunaDll/Misc/RuntimeHookComponents/RuntimeHookFixups.cpp \
     LunaDll/Misc/RuntimeHookComponents/RuntimeHookGeneral.cpp \
     LunaDll/Misc/RuntimeHookComponents/RuntimeHookHooks.cpp \
     LunaDll/Misc/RuntimeHookComponents/RuntimeHookPublicFunctions.cpp \
+    LunaDll/Misc/RuntimeHookManagers/LevelHUDController.cpp \
     LunaDll/Misc/RuntimeHookUtils/APIHook.cpp \
+    LunaDll/Misc/AsyncHTTPClient.cpp \
     LunaDll/Misc/ErrorReporter.cpp \
-    LunaDll/Misc/GeneralLunaConfig.cpp \
     LunaDll/Misc/MiscFuncs.cpp \
+    LunaDll/Misc/PerfTracker.cpp \
+    LunaDll/Misc/PGEEditorCmdSender.cpp \
     LunaDll/Misc/Playground.cpp \
     LunaDll/Misc/RuntimeHook.cpp \
+    LunaDll/Misc/SafeFPUControl.cpp \
     LunaDll/Misc/SHMemServer.cpp \
+    LunaDll/Misc/TestMode.cpp \
+    LunaDll/Misc/TestModeMenu.cpp \
+    LunaDll/Misc/TypeLib.cpp \
+    LunaDll/Misc/UniPath.cpp \
+    LunaDll/Misc/VariantHelper.cpp \
     LunaDll/Misc/VB6StrPtr.cpp \
-    LunaDll/Rendering/RenderOps/RenderBitmapOp.cpp \
-    LunaDll/Rendering/RenderOps/RenderEffectOp.cpp \
-    LunaDll/Rendering/RenderOps/RenderGLOp.cpp \
-    LunaDll/Rendering/RenderOps/RenderRectOp.cpp \
-    LunaDll/Rendering/AsyncGifRecorder.cpp \
-    LunaDll/Rendering/BMPBox.cpp \
+    LunaDll/Misc/WaitForTickEnd.cpp \
+    LunaDll/Misc/win32_Unicode.cpp \
     LunaDll/Rendering/GL/GLContextManager.cpp \
     LunaDll/Rendering/GL/GLDraw.cpp \
     LunaDll/Rendering/GL/GLEngine.cpp \
+    LunaDll/Rendering/GL/GLEngineCmds.cpp \
     LunaDll/Rendering/GL/GLEngineProxy.cpp \
+    LunaDll/Rendering/GL/GLFramebuffer.cpp \
     LunaDll/Rendering/GL/GLInitTest.cpp \
     LunaDll/Rendering/GL/GLSplitSprite.cpp \
     LunaDll/Rendering/GL/GLSprite.cpp \
     LunaDll/Rendering/GL/GLTextureStore.cpp \
+    LunaDll/Rendering/RenderOps/RenderBitmapOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderEffectOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderGLOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderRectOp.cpp \
+    LunaDll/Rendering/RenderOps/RenderSpriteOp.cpp \
+    LunaDll/Rendering/Shaders/GLShader.cpp \
+    LunaDll/Rendering/Shaders/GLShaderAttributeInfo.cpp \
+    LunaDll/Rendering/Shaders/GLShaderUniformInfo.cpp \
+    LunaDll/Rendering/Shaders/GLShaderVariableEntry.cpp \
+    LunaDll/Rendering/Shaders/GLShaderVariableInfo.cpp \
+    LunaDll/Rendering/AsyncGifRecorder.cpp \
+    LunaDll/Rendering/BitBltEmulation.cpp \
+    LunaDll/Rendering/BMPBox.cpp \
+    LunaDll/Rendering/FrameCapture.cpp \
     LunaDll/Rendering/Rendering.cpp \
     LunaDll/Rendering/RenderOverrideManager.cpp \
     LunaDll/Rendering/RenderUtils.cpp \
+    LunaDll/Rendering/SMBXMaskedImage.cpp \
     LunaDll/SdlMusic/MusicDefList.cpp \
     LunaDll/SdlMusic/MusicManager.cpp \
     LunaDll/SdlMusic/SdlMusPlayer.cpp \
@@ -397,6 +189,7 @@ SOURCES += \
     LunaDll/SMBXInternal/Animation.cpp \
     LunaDll/SMBXInternal/Blocks.cpp \
     LunaDll/SMBXInternal/CustomGraphics.cpp \
+    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
     LunaDll/SMBXInternal/Layer.cpp \
     LunaDll/SMBXInternal/Level.cpp \
     LunaDll/SMBXInternal/NPCs.cpp \
@@ -406,6 +199,7 @@ SOURCES += \
     LunaDll/SMBXInternal/Sound.cpp \
     LunaDll/SMBXInternal/WorldLevel.cpp \
     LunaDll/UserSaves/UserSaving.cpp \
+    LunaDll/EventStateMachine.cpp \
     LunaDll/GlobalFuncs.cpp \
     LunaDll/Globals.cpp \
     LunaDll/Main.cpp \
@@ -426,35 +220,5 @@ SOURCES += \
     LunaDll/libs/luasocket/udp.c \
     LunaDll/libs/luasocket/unix.c \
     LunaDll/libs/luasocket/usocket.c \
-    LunaDll/libs/luasocket/wsocket.c \
-    LunaDll/GameConfig/GeneralLunaConfig.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyAsyncHTTPRequest.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyConsole.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyLogger.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyMusicbox.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyPath.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyScenery.cpp \
-    LunaDll/LuaMain/LuaProxyComponent/LuaProxyTile.cpp \
-    LunaDll/Misc/RuntimeHookManagers/LevelHUDController.cpp \
-    LunaDll/Misc/AsyncHTTPClient.cpp \
-    LunaDll/Misc/SafeFPUControl.cpp \
-    LunaDll/Misc/TypeLib.cpp \
-    LunaDll/Misc/VariantHelper.cpp \
-    LunaDll/Misc/win32_Unicode.cpp \
-    LunaDll/Rendering/Shaders/GLShader.cpp \
-    LunaDll/Misc/PerfTracker.cpp \
-    LunaDll/Rendering/GL/GLEngineCmds.cpp \
-    LunaDll/EventStateMachine.cpp \
-    LunaDll/Misc/UniPath.cpp \
-    LunaDll/LuaMain/LuaProxyFFI.cpp \
-    LunaDll/Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp \
-    LunaDll/Misc/TestMode.cpp \
-    LunaDll/Rendering/GL/GLFramebuffer.cpp \
-    LunaDll/Rendering/BitBltEmulation.cpp \
-    LunaDll/Rendering/FrameCapture.cpp \
-    LunaDll/Rendering/SMBXMaskedImage.cpp \
-    LunaDll/SMBXInternal/HardcodedGraphicsAccess.cpp \
-    LunaDll/Misc/PGEEditorCmdSender.cpp \
-    LunaDll/Misc/TestModeMenu.cpp \
-    LunaDll/IPC/IPCPipeServer.cpp
+    LunaDll/libs/luasocket/wsocket.c
 
