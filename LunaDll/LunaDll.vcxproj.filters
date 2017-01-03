@@ -373,9 +373,6 @@
     <ClInclude Include="SMBXInternal\NativeInput.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\RunningStat.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="SMBXInternal\CameraInfo.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
@@ -415,13 +412,7 @@
     <ClInclude Include="Rendering\Shaders\GLShader.h">
       <Filter>Rendering\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\VariantHelper.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="Misc\win32_Unicode.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Misc\TypeLib.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Misc\SafeFPUControl.h">
@@ -517,9 +508,6 @@
     </ClInclude>
     <ClInclude Include="Rendering\FrameCapture.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Misc\UniPath.h">
-      <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="IPC\IPCPipeServer.h">
       <Filter>IPC</Filter>
@@ -912,13 +900,7 @@
     <ClCompile Include="Misc\RuntimeHookUtils\APIHook.cpp">
       <Filter>Misc\RuntimeHookUtils</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\VariantHelper.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
     <ClCompile Include="Misc\win32_Unicode.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Misc\TypeLib.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
@@ -1026,9 +1008,6 @@
     </ClCompile>
     <ClCompile Include="Rendering\FrameCapture.cpp">
       <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Misc\UniPath.cpp">
-      <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="IPC\IPCPipeServer.cpp">
       <Filter>IPC</Filter>

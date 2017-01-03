@@ -17,7 +17,6 @@
 #include "../../Main.h"
 #include "../../libs/ini-reader/INIReader.h"
 
-#include "../RunningStat.h"
 #include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderOverrideManager.h"
 #include "../../Rendering/SMBXMaskedImage.h"

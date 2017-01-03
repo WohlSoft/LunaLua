@@ -161,7 +161,6 @@
     <ClInclude Include="Misc\PGEEditorCmdSender.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\TestModeMenu.h" />
-    <ClInclude Include="Misc\UniPath.h" />
     <ClInclude Include="Misc\WaitForTickEnd.h" />
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
@@ -181,8 +180,6 @@
     <ClInclude Include="Misc\RuntimeHookUtils\APIHook.h" />
     <ClInclude Include="Misc\RuntimeHookUtils\CmnHdr.h" />
     <ClInclude Include="Misc\RuntimeHookUtils\Toolhelp.h" />
-    <ClInclude Include="Misc\TypeLib.h" />
-    <ClInclude Include="Misc\VariantHelper.h" />
     <ClInclude Include="Misc\win32_Unicode.h" />
     <ClInclude Include="Rendering\AsyncGifRecorder.h" />
     <ClInclude Include="Rendering\RenderOverrideManager.h" />
@@ -211,7 +208,6 @@
     <ClInclude Include="libs\luasocket\timeout.h" />
     <ClInclude Include="libs\luasocket\udp.h" />
     <ClInclude Include="libs\luasocket\wsocket.h" />
-    <ClInclude Include="Misc\RunningStat.h" />
     <ClInclude Include="Rendering\GL\GLInitTest.h" />
     <ClInclude Include="Rendering\GL\GLSplitSprite.h" />
     <ClInclude Include="Rendering\GL\GLSprite.h" />
@@ -313,7 +309,6 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookCharacterId.cpp" />
     <ClCompile Include="Misc\TestMode.cpp" />
     <ClCompile Include="Misc\TestModeMenu.cpp" />
-    <ClCompile Include="Misc\UniPath.cpp" />
     <ClCompile Include="Misc\WaitForTickEnd.cpp" />
     <ClCompile Include="Rendering\BitBltEmulation.cpp" />
     <ClCompile Include="Misc\PerfTracker.cpp" />
@@ -332,8 +327,6 @@
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp" />
     <ClCompile Include="Misc\FreeImageUtils\FreeImageGifData.cpp" />
     <ClCompile Include="Misc\RuntimeHookUtils\APIHook.cpp" />
-    <ClCompile Include="Misc\TypeLib.cpp" />
-    <ClCompile Include="Misc\VariantHelper.cpp" />
     <ClCompile Include="Misc\win32_Unicode.cpp" />
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp" />
     <ClCompile Include="Autocode\Commands\AC_HeartSystem.cpp" />
