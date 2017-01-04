@@ -13,6 +13,7 @@ include(CMake/ucm.cmake)
 # Include Dependencies
 include(CMake/DownloadAndConfigureDepends/FreeImage/FreeImage.cmake)
 include(CMake/DownloadAndConfigureDepends/glew/glew.cmake)
+include(CMake/DownloadAndConfigureDepends/luajit/luajit.cmake)
 include(CMake/DownloadAndConfigureDepends/boost/boost.cmake)
 
 
@@ -35,6 +36,12 @@ target_link_libraries(LunaLuaLib ${FREEIMAGE_LIBRARY_FILES})
 include_directories(${GLEW_INCLUDE_DIR})
 add_dependencies(LunaLuaLib glew)
 target_link_libraries(LunaLuaLib ${GLEW_LIBRARY_STATIC_FILES}) # TODO: Support Shared!
+
+# Set luajit dependency
+include_directories(${LUAJIT_INCLUDE_DIR})
+add_dependencies(LunaLuaLib luajit)
+target_link_libraries(LunaLuaLib ${LUAJIT_LIBRARY_FILES})
+
 
 # =============  LUNALUA CORE LIB END  ================
 
