@@ -6,7 +6,7 @@ SHMemServer::SHMemServer()
 {
 	isInit=false;
     wchar_t szName[]=SHMEM_NAME;
-    hMapFile = CreateFileMapping(
+    hMapFile = CreateFileMappingW(
                   INVALID_HANDLE_VALUE,    // use paging file
                   NULL,                    // default security
                   PAGE_READWRITE,          // read/write access

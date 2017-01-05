@@ -1,6 +1,6 @@
 #include "FreeImageInit.h"
 #define FREEIMAGE_LIB
-#include <FreeImageLite.h>
+#include <FreeImage/FreeImage.h>
 #include <iostream>
 
 void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {

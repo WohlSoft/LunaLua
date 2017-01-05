@@ -11,7 +11,7 @@ It is mostly used by the ending function (if the Player hits the exit)
 
 
 #include "NpcToCoins.h"
-#include "../../Defines.h"
+#include "../../../Defines.h"
 #include "../../Animation.h"
 
 

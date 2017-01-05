@@ -8,7 +8,7 @@
 #include <thread>
 #include "RenderUtils.h"
 #include <atomic>
-#include "../../libs/gif-h/gif.h"
+#include <gif.h>
 
 class AsyncGifRecorder
 {

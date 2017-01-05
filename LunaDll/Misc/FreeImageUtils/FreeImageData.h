@@ -3,7 +3,7 @@
 
 #include <string>
 #define FREEIMAGE_LIB
-#include <FreeImageLite.h>
+#include <FreeImage/FreeImage.h>
 
 class FreeImageData
 {

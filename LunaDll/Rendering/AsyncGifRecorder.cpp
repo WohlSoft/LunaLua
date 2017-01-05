@@ -2,7 +2,7 @@
 #include "AsyncGifRecorder.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
-#include "../../libs/gif-h/gif.h"
+#include <gif.h>
 
 AsyncGifRecorder::AsyncGifRecorder() : 
     m_workerThread(nullptr),

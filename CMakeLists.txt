@@ -7,6 +7,11 @@ if(NOT MSVC)
     message(FATAL_ERROR "NON-Microsoft Compilers are not supported right now")
 endif()
 
+# Compiler settings
+# Force unicode for all projects
+add_definitions(-DUNICODE)
+add_definitions(-D_UNICODE)
+
 # Includes
 include(CMake/ucm.cmake)
 
@@ -15,8 +20,10 @@ include(CMake/DownloadAndConfigureDepends/FreeImage/FreeImage.cmake)
 include(CMake/DownloadAndConfigureDepends/glew/glew.cmake)
 include(CMake/DownloadAndConfigureDepends/luajit/luajit.cmake)
 include(CMake/DownloadAndConfigureDepends/boost/boost.cmake)
+include(CMake/DownloadAndConfigureDepends/luabind/luabind.cmake) # Depends on boost and luajit!
 
-
+# SETTINGS
+set(LUNALUA_3RDPARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
 
 # ============= LUNALUA CORE LIB START ================
 
@@ -25,6 +32,11 @@ ucm_add_dirs(LunaDll TO LUNALUA_LIB_FILES RECURSIVE FILTER_POP 1)
 # Remove 'libs' because it is not part of the LunaLua source
 ucm_remove_directories(libs FROM LUNALUA_LIB_FILES)
 
+# Set stackwalker dependency as raw source
+ucm_add_dirs(3rdparty/stackwalker TO LUNALUA_LIB_FILES)
+include_directories(${LUNALUA_3RDPARTY_DIR}/stackwalker)
+
+# Make LunaLuaLib target
 add_library (LunaLuaLib MODULE ${LUNALUA_LIB_FILES})
 
 # Set FreeImage dependency
@@ -42,6 +54,27 @@ include_directories(${LUAJIT_INCLUDE_DIR})
 add_dependencies(LunaLuaLib luajit)
 target_link_libraries(LunaLuaLib ${LUAJIT_LIBRARY_FILES})
 
+# Set luabind dependency
+include_directories(${LUABIND_INCLUDE_DIR})
+add_dependencies(LunaLuaLib luabind)
+target_link_libraries(LunaLuaLib ${LUABIND_LIBRARY_FILES})
+
+# Set gif-h dependency
+include_directories(${LUNALUA_3RDPARTY_DIR}/gif-h/include)
+
+# Set SDL Mixer dependency
+include_directories(${LUNALUA_3RDPARTY_DIR}/sdl/include)
+target_link_libraries(LunaLuaLib ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib)
+
+# Set nlohmann json dependency
+include_directories(${LUNALUA_3RDPARTY_DIR}/json)
+
 
 # =============  LUNALUA CORE LIB END  ================
+
+# Disable boost (non-header-only) libraries
+foreach(BoostTarget ${AllBoostLibs})
+    set_target_properties(${BoostTarget} PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+endforeach()
+
 

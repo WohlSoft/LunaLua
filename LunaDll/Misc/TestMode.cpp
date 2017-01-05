@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <string>
 #include <mutex>
-#include "../../libs/json/json.hpp"
+#include <json.hpp>
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
