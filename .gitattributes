@@ -61,3 +61,17 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Skip
+*.bat          linguist-vendored
+*.sh           linguist-vendored
+*.ini          linguist-vendored
+*.pro          linguist-vendored
+*.pri          linguist-vendored
+appveyor.yml   linguist-vendored
+LunaDll/libs/* linguist-vendored
+luadoc/*       linguist-vendored
+ini_examples/* linguist-vendored
+HelpLua/*      linguist-vendored
+HelpAutocode/* linguist-vendored
+Analysis/*     linguist-vendored
