@@ -78,6 +78,7 @@
 *.xml          linguist-vendored
 *.vcxproj      linguist-vendored
 *.filters      linguist-vendored
+*.cs           linguist-vendored
 appveyor.yml   linguist-vendored
 LunaDll/libs/* linguist-vendored
 luadoc/*       linguist-vendored
