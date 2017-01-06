@@ -214,22 +214,6 @@ FakesAssemblies/
 #*.dll
 *.dylib
 
-# Qt-es
-
-*.pro.user
-*.pro.user.*
-moc_*.cpp
-ui_*.h
-qrc_*.cpp
-Makefile
-*-build-*
-*build-*
-bin
-
-# ignore Qt-Makefile
-*.Debug
-*.Release
-
 #git related
 
 +*.swp
