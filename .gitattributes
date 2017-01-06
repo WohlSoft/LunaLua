@@ -69,7 +69,10 @@
 *.sh           linguist-vendored
 *.ini          linguist-vendored
 *.pro          linguist-vendored
+*.txt          linguist-vendored
 *.pri          linguist-vendored
+*.vcxproj      linguist-vendored
+*.filters      linguist-vendored
 appveyor.yml   linguist-vendored
 LunaDll/libs/* linguist-vendored
 luadoc/*       linguist-vendored
