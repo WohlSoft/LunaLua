@@ -70,7 +70,12 @@
 *.ini          linguist-vendored
 *.pro          linguist-vendored
 *.txt          linguist-vendored
+*.dpr          linguist-vendored
+*.dfm          linguist-vendored
+*.pas          linguist-vendored
 *.pri          linguist-vendored
+*.htm*         linguist-vendored
+*.xml          linguist-vendored
 *.vcxproj      linguist-vendored
 *.filters      linguist-vendored
 appveyor.yml   linguist-vendored
