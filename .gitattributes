@@ -76,9 +76,11 @@
 *.pri          linguist-vendored
 *.htm*         linguist-vendored
 *.xml          linguist-vendored
-*.vcxproj      linguist-vendored
+*.*proj        linguist-vendored
 *.filters      linguist-vendored
 *.cs           linguist-vendored
+*.csproj       linguist-vendored
+*.resx         linguist-vendored
 appveyor.yml   linguist-vendored
 LunaDll/libs/* linguist-vendored
 luadoc/*       linguist-vendored
