@@ -36,6 +36,13 @@ ucm_remove_directories(libs FROM LUNALUA_LIB_FILES)
 ucm_add_dirs(3rdparty/stackwalker TO LUNALUA_LIB_FILES)
 include_directories(${LUNALUA_3RDPARTY_DIR}/stackwalker)
 
+# Set luasocket dependency as raw source
+ucm_add_dirs(3rdparty/luasocket TO LUNALUA_LIB_FILES)
+ucm_remove_files(3rdparty/luasocket/usocket.c 3rdparty/luasocket/unix.c 3rdparty/luasocket/serial.c FROM LUNALUA_LIB_FILES)
+
+# Set initreader dependency as raw sourc
+ucm_add_dirs(3rdparty/ini-reader TO LUNALUA_LIB_FILES)
+
 # Make LunaLuaLib target
 add_library (LunaLuaLib MODULE ${LUNALUA_LIB_FILES})
 
@@ -64,11 +71,13 @@ include_directories(${LUNALUA_3RDPARTY_DIR}/gif-h/include)
 
 # Set SDL Mixer dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/sdl/include)
-target_link_libraries(LunaLuaLib ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib)
+target_link_libraries(LunaLuaLib ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2main.lib)
 
 # Set nlohmann json dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/json)
 
+# Additional windows depedencies
+target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib)
 
 # =============  LUNALUA CORE LIB END  ================
 
@@ -77,4 +86,8 @@ foreach(BoostTarget ${AllBoostLibs})
     set_target_properties(${BoostTarget} PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 endforeach()
 
+# Enable multi-processor build
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
 

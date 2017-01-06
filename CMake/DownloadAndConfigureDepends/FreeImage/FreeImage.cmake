@@ -32,6 +32,7 @@ ExternalProject_Add(
     BUILD_IN_SOURCE 1
     TIMEOUT 10
     UPDATE_COMMAND ""
+    BUILD_COMMAND cmake --build . --config $<CONFIG>
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${FREEIMAGE_INSTALL_DIR}"
 )
 

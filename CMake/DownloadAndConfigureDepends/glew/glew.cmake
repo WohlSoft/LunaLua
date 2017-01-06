@@ -17,10 +17,15 @@ find_package(Git REQUIRED)
 set(GLEW_INSTALL_DIR ${CMAKE_BINARY_DIR}/external/glew-install)
 set(GLEW_INCLUDE_DIR ${GLEW_INSTALL_DIR}/include)
 set(GLEW_LIBRARY_DIR ${GLEW_INSTALL_DIR}/lib)
-set(GLEW_LIBRARY_STATIC_FILES ${GLEW_LIBRARY_DIR}/glew.lib)
-set(GLEW_LIBRARY_SHARED_FILES ${GLEW_LIBRARY_DIR}/libglew_shared.lib)
+set(GLEW_LIBRARY_STATIC_FILES ${GLEW_LIBRARY_DIR}/glew$<$<CONFIG:Debug>:d>.lib)
+set(GLEW_LIBRARY_SHARED_FILES ${GLEW_LIBRARY_DIR}/libglew_shared$<$<CONFIG:Debug>:d>.lib)
 set(GLEW_BINARY_DIR ${GLEW_INSTALL_DIR}/lib)
-set(GLEW_BINARY_FILES ${GLEW_BINARY_DIR}/glew.dll)
+set(GLEW_BINARY_FILES ${GLEW_BINARY_DIR}/glew$<$<CONFIG:Debug>:d>.dll)
+
+if(NOT GLEW_BUILD_SHARED)
+    add_definitions(-DGLEW_STATIC) 
+endif()
+
 
 ExternalProject_Add(
     glew
