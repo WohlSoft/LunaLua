@@ -659,7 +659,7 @@ local function loadAPIByPath(path)
         if(func)then
             local loadedAPI = func()
             if(type(loadedAPI) ~= "table")then
-                error("API \""..apiPath.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
+                error("API \""..path.."\" did not return the api-table (got "..type(loadedAPI)..")", 2)
             end
             return loadedAPI
         else
