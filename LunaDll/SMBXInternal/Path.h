@@ -7,7 +7,7 @@
 struct SMBXPath : SMBX_FullBaseItemArray<SMBXPath, 32, GM_PATH_COUNT_CONSTPTR, GM_PATH_PTR_CONSTPTR>
 {
     Momentum momentum;
-    short unkField;
+    short visible;
     short id;
 };
 #pragma pack(pop)

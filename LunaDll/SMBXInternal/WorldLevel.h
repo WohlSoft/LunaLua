@@ -16,7 +16,7 @@ struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 32, GM_LEVEL_COUNT_CONSTP
     ExitType leftExitType;
     ExitType bottomExitType;
     ExitType rightExitType;
-    short field_40;
+    short visible;
     short field_42;
     VB6StrPtr levelTitle;
     short levelWarpNumber;
