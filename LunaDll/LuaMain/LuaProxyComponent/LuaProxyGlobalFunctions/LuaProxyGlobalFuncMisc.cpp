@@ -115,9 +115,9 @@ template<const DWORD FILTER, const bool FILTER_TYPE>
 luabind::object luabindResolveFile(const std::string& file, lua_State* L){
     std::vector<std::wstring> paths = {
         getCustomFolderPath(),
-        Str2WStr((std::string)GM_FULLDIR),
-        Str2WStr(gAppPathUTF8 + "\\LuaScriptsLib\\"),
-        Str2WStr(gAppPathUTF8 + "\\")
+        GM_FULLDIR,
+        gAppPathWCHAR + L"\\LuaScriptsLib\\",
+        gAppPathWCHAR + L"\\"
     };
 
     std::wstring wFile = Str2WStr(file);
@@ -147,8 +147,8 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
 {
     std::vector<std::wstring> paths = {
         getCustomFolderPath(),
-        Str2WStr((std::string)GM_FULLDIR),
-        Str2WStr(gAppPathUTF8 + "\\graphics\\"),
+        GM_FULLDIR,
+        gAppPathWCHAR + L"\\graphics\\"
     };
     std::wstring wFile = Str2WStr(file);
 
@@ -160,7 +160,7 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
         if (dashPos != std::wstring::npos)
         {
             std::wstring dashPrefix = wFile.substr(0, dashPos);
-            paths.push_back(Str2WStr(gAppPathUTF8 + "\\graphics\\") + dashPrefix + L"\\");
+            paths.push_back(gAppPathWCHAR + L"\\graphics\\" + dashPrefix + L"\\");
         }
     }
 
