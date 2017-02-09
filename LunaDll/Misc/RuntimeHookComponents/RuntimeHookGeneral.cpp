@@ -14,6 +14,7 @@
 
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
+#include "../../Rendering/RenderOverrideManager.h"
 
 
 #ifndef NO_SDL
@@ -167,6 +168,9 @@ static unsigned int __stdcall LatePatch(void)
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
     fixup_ErrorReporting();
+
+    // Get initial HDCs set up...
+    gRenderOverride.loadDefaultGraphics();
 
     // Be sure that all values are init.
     ResetLunaModule();
@@ -378,17 +382,6 @@ void TrySkipPatch()
     PATCH(0x9B7B2C).CALL(&InitLevelEnvironmentHook).Apply();
     PATCH(0xA02AD3).CALL(&InitLevelEnvironmentHook).Apply();
 
-
-    // Graphics Bitblt hooks
-    PATCH(0x8C137E).CALL(&LoadLocalGfxHook).Apply();
-    PATCH(0x8D8BF1).CALL(&LoadLocalGfxHook).Apply();
-    PATCH(0x8D9611).CALL(&LoadLocalGfxHook).Apply();
-    PATCH(0x8DF52B).CALL(&LoadLocalGfxHook).Apply();
-    PATCH(0x8DFF7C).CALL(&LoadLocalGfxHook).Apply();
-
-    PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
-    PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
-
     //PATCH(0x4242D0).JMP(GET_RETADDR_TRACE_HOOK<&BitBltTraceHook>()).Apply();
     PATCH(0x4242D0).JMP(&BitBltHook).Apply();
     PATCH(0x424314).JMP(&StretchBltHook).Apply();
@@ -513,6 +506,36 @@ void TrySkipPatch()
     PATCH(0x9A9D33).JMP(runtimeHookNPCSpinjumpSafeRaw).NOP_PAD_TO_SIZE<10>().Apply();
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
+
+    //-----------------------------------------------------------------------//
+    // In general, we want to disable default graphics loading code, which   //
+    // means nop-ing out the calls except for ones we want to hook.          //
+    // ----------------------------------------------------------------------//
+
+    // Calls to loadDefaultGraphics
+    PATCH(0x8BF327).NOP_PAD_TO_SIZE<5>().Apply();
+    // Calls to loadDefaultWorldGraphics
+    PATCH(0x8DEF6E).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8E3204).NOP_PAD_TO_SIZE<5>().Apply();
+    // Calls to unkLoadGraphics
+    PATCH(0x8D8BEC).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8DC7BB).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8DF526).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8E31FF).NOP_PAD_TO_SIZE<5>().Apply();
+    // Calls to unkLoadLocalGraphics
+    PATCH(0x8D8C78).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x8D978A).NOP_PAD_TO_SIZE<6>().Apply();
+    // Calls to clearGraphics
+    PATCH(0x8D6CA0).NOP_PAD_TO_SIZE<5>().Apply();
+    // Calls to loadLocalGraphics
+    PATCH(0x8C137E).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8D8BF1).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8D9611).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8DF52B).CALL(&LoadLocalGfxHook).Apply();
+    PATCH(0x8DFF7C).CALL(&LoadLocalGfxHook).Apply();
+    // Calls to loadCustomWorldGraphics
+    PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
+    PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
