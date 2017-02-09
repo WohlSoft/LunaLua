@@ -182,7 +182,9 @@ static void dumpHardcodedImages()
     }
 }
 
-void RenderOverrideManager::loadDefaultGraphics(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask)
+void RenderOverrideManager::loadDefaultGraphics(
+    const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask,
+    short* widthArray, short* heightArray)
 {
     // Silly special case
     std::wstring folderPrefix = prefix;
@@ -195,18 +197,29 @@ void RenderOverrideManager::loadDefaultGraphics(const std::wstring& prefix, HDC*
 
     for (int i = 1; i < numElements+1; i++)
     {
+        short arrIdx = i - 1;
+
+        if (prefix == L"level") arrIdx = i; // Sillier special case... why???
+
+        short width = 0, height = 0;
+
         if (graphicsArray != nullptr)
         {
             std::wstring imgPath = folderPath + std::to_wstring(i) + L".gif";
 
             // Create HDC if not existing
-            graphicsArray[i - 1] = nullptr;
-            if (graphicsArray[i-1] == nullptr) graphicsArray[i-1] = CreateCompatibleDC(NULL);
+            graphicsArray[arrIdx] = nullptr;
+            if (graphicsArray[arrIdx] == nullptr) graphicsArray[arrIdx] = CreateCompatibleDC(NULL);
 
             HBITMAP img = LoadGfxAsBitmap(imgPath);
             if (img != nullptr)
             {
-                SelectObject(graphicsArray[i-1], img);
+                SelectObject(graphicsArray[arrIdx], img);
+
+                BITMAP bmp;
+                GetObject(img, sizeof(BITMAP), &bmp);
+                if (width < bmp.bmWidth) width = bmp.bmWidth;
+                if (height < bmp.bmHeight) height = bmp.bmHeight;
             }
         }
         else { dbgbox((L"No Ptr for " + prefix).c_str());  }
@@ -216,35 +229,49 @@ void RenderOverrideManager::loadDefaultGraphics(const std::wstring& prefix, HDC*
             std::wstring imgPath = folderPath + std::to_wstring(i) + L"m.gif";
 
             // Create HDC if not existing
-            graphicsArray_Mask[i - 1] = nullptr;
-            if (graphicsArray_Mask[i-1] == nullptr) graphicsArray_Mask[i-1] = CreateCompatibleDC(NULL);
+            graphicsArray_Mask[arrIdx] = nullptr;
+            if (graphicsArray_Mask[arrIdx] == nullptr) graphicsArray_Mask[arrIdx] = CreateCompatibleDC(NULL);
 
             HBITMAP img = LoadGfxAsBitmap(imgPath);
             if (img != nullptr)
             {
-                SelectObject(graphicsArray_Mask[i-1], img);
+                SelectObject(graphicsArray_Mask[arrIdx], img);
+
+                BITMAP bmp;
+                GetObject(img, sizeof(BITMAP), &bmp);
+                if (width < bmp.bmWidth) width = bmp.bmWidth;
+                if (height < bmp.bmHeight) height = bmp.bmHeight;
             }
+        }
+
+        if (widthArray != nullptr)
+        {
+            widthArray[arrIdx] = width;
+        }
+        if (heightArray != nullptr)
+        {
+            heightArray[arrIdx] = height;
         }
     }
 }
 
 void RenderOverrideManager::loadDefaultGraphics(void)
 {
-    loadDefaultGraphics(L"block", GM_GFX_BLOCKS_PTR, 638, GM_GFX_BLOCKS_MASK_PTR);
-    loadDefaultGraphics(L"background2", GM_GFX_BACKGROUND2_PTR, 58);
-    loadDefaultGraphics(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR);
-    loadDefaultGraphics(L"effect", GM_GFX_EFFECTS_PTR, 148, GM_GFX_EFFECTS_MASK_PTR);
-    loadDefaultGraphics(L"background", GM_GFX_BACKGROUND_PTR, 190, GM_GFX_BACKGROUND_MASK_PTR);
-    loadDefaultGraphics(L"mario", GM_GFX_MARIO_PTR, 7, GM_GFX_MARIO_MASK_PTR);
-    loadDefaultGraphics(L"luigi", GM_GFX_LUIGI_PTR, 7, GM_GFX_LUIGI_MASK_PTR);
-    loadDefaultGraphics(L"peach", GM_GFX_PEACH_PTR, 7, GM_GFX_PEACH_MASK_PTR);
-    loadDefaultGraphics(L"toad", GM_GFX_TOAD_PTR, 7, GM_GFX_TOAD_MASK_PTR);
-    loadDefaultGraphics(L"link", GM_GFX_LINK_PTR, 7, GM_GFX_LINK_MASK_PTR);
+    loadDefaultGraphics(L"block", GM_GFX_BLOCKS_PTR, 700, GM_GFX_BLOCKS_MASK_PTR);
+    loadDefaultGraphics(L"background2", GM_GFX_BACKGROUND2_PTR, 100, nullptr, GM_GFX_BACKGROUND2_W_PTR, GM_GFX_BACKGROUND2_H_PTR);
+    loadDefaultGraphics(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR, GM_GFX_NPC_W_PTR, GM_GFX_NPC_H_PTR);
+    loadDefaultGraphics(L"effect", GM_GFX_EFFECTS_PTR, 200, GM_GFX_EFFECTS_MASK_PTR, GM_GFX_EFFECTS_W_PTR, GM_GFX_EFFECTS_H_PTR);
+    loadDefaultGraphics(L"background", GM_GFX_BACKGROUND_PTR, 200, GM_GFX_BACKGROUND_MASK_PTR, GM_GFX_BACKGROUND_W_PTR, GM_GFX_BACKGROUND_H_PTR);
+    loadDefaultGraphics(L"mario", GM_GFX_MARIO_PTR, 10, GM_GFX_MARIO_MASK_PTR, GM_GFX_MARIO_W_PTR, GM_GFX_MARIO_H_PTR);
+    loadDefaultGraphics(L"luigi", GM_GFX_LUIGI_PTR, 10, GM_GFX_LUIGI_MASK_PTR, GM_GFX_LUIGI_W_PTR, GM_GFX_LUIGI_H_PTR);
+    loadDefaultGraphics(L"peach", GM_GFX_PEACH_PTR, 10, GM_GFX_PEACH_MASK_PTR, GM_GFX_PEACH_W_PTR, GM_GFX_PEACH_H_PTR);
+    loadDefaultGraphics(L"toad", GM_GFX_TOAD_PTR, 10, GM_GFX_TOAD_MASK_PTR, GM_GFX_TOAD_W_PTR, GM_GFX_TOAD_H_PTR);
+    loadDefaultGraphics(L"link", GM_GFX_LINK_PTR, 10, GM_GFX_LINK_MASK_PTR, GM_GFX_LINK_W_PTR, GM_GFX_LINK_H_PTR);
     loadDefaultGraphics(L"yoshib", GM_GFX_YOSHIB_PTR, 8, GM_GFX_YOSHIB_MASK_PTR);
     loadDefaultGraphics(L"yoshit", GM_GFX_YOSHIT_PTR, 8, GM_GFX_YOSHIT_MASK_PTR);
-    loadDefaultGraphics(L"tile", GM_GFX_TILES_PTR, 328);
-    loadDefaultGraphics(L"level", GM_GFX_LEVEL_PTR, 32, GM_GFX_LEVEL_MASK_PTR);
-    loadDefaultGraphics(L"scene", GM_GFX_SCENE_PTR, 65, GM_GFX_SCENE_MASK_PTR);
-    loadDefaultGraphics(L"path", GM_GFX_PATH_PTR, 32, GM_GFX_PATH_MASK_PTR);
-    loadDefaultGraphics(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR);
+    loadDefaultGraphics(L"tile", GM_GFX_TILES_PTR, 400, nullptr, GM_GFX_TILES_W_PTR, GM_GFX_TILES_H_PTR);
+    loadDefaultGraphics(L"level", GM_GFX_LEVEL_PTR, 100, GM_GFX_LEVEL_MASK_PTR, GM_GFX_LEVEL_W_PTR, GM_GFX_LEVEL_H_PTR);
+    loadDefaultGraphics(L"scene", GM_GFX_SCENE_PTR, 100, GM_GFX_SCENE_MASK_PTR, GM_GFX_SCENE_W_PTR, GM_GFX_SCENE_H_PTR);
+    loadDefaultGraphics(L"path", GM_GFX_PATH_PTR, 100, GM_GFX_PATH_MASK_PTR, GM_GFX_PATH_W_PTR, GM_GFX_PATH_H_PTR);
+    loadDefaultGraphics(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR, GM_GFX_PLAYER_W_PTR, GM_GFX_PLAYER_H_PTR);
 }

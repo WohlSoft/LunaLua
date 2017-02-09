@@ -23,7 +23,8 @@ public:
     void loadWorldGFX();
     void loadHardcodedOverrides();
 
-    void loadDefaultGraphics(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = 0);
+    void loadDefaultGraphics(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask = nullptr,
+        short* widthArray = nullptr, short* heightArray = nullptr);
     void loadDefaultGraphics(void);
 };
 
