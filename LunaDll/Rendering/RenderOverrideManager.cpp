@@ -274,4 +274,10 @@ void RenderOverrideManager::loadDefaultGraphics(void)
     loadDefaultGraphics(L"scene", GM_GFX_SCENE_PTR, 100, GM_GFX_SCENE_MASK_PTR, GM_GFX_SCENE_W_PTR, GM_GFX_SCENE_H_PTR);
     loadDefaultGraphics(L"path", GM_GFX_PATH_PTR, 100, GM_GFX_PATH_MASK_PTR, GM_GFX_PATH_W_PTR, GM_GFX_PATH_H_PTR);
     loadDefaultGraphics(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR, GM_GFX_PLAYER_W_PTR, GM_GFX_PLAYER_H_PTR);
+
+    for (int i = 0; i < 200; i++)
+    {
+        GM_GFX_BACKGROUND_W_UNK_PTR[i] = GM_GFX_BACKGROUND_W_PTR[i];
+        GM_GFX_BACKGROUND_H_UNK_PTR[i] = GM_GFX_BACKGROUND_H_PTR[i];
+    }
 }
