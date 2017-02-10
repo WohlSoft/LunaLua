@@ -5,6 +5,7 @@
 #include "SMBXMaskedImage.h"
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "RenderUtils.h"
+#include "ImageLoader.h"
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
@@ -182,98 +183,84 @@ static void dumpHardcodedImages()
     }
 }
 
-void RenderOverrideManager::loadDefaultGraphics(
-    const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask,
-    short* widthArray, short* heightArray)
+void RenderOverrideManager::loadDefaultGraphics(const SMBXImageCategory &imageCategory)
 {
-    // Silly special case
-    std::wstring folderPrefix = prefix;
-    if ((prefix == L"yoshib") || (prefix == L"yoshit"))
+    std::wstring folderPath = gAppPathWCHAR + L"/graphics/" + imageCategory.getFolderPrefix() + L"/" + imageCategory.getPrefix() + L"-";
+
+    for (int i = 1; i <= imageCategory.getArrayLength(); i++)
     {
-        folderPrefix = L"yoshi";
-    }
-
-    std::wstring folderPath = gAppPathWCHAR + L"/graphics/" + folderPrefix + L"/" + prefix + L"-";
-
-    for (int i = 1; i < numElements+1; i++)
-    {
-        short arrIdx = i - 1;
-
-        if (prefix == L"level") arrIdx = i; // Sillier special case... why???
-
         short width = 0, height = 0;
 
-        if (graphicsArray != nullptr)
+        if (imageCategory.haveImagePtrArray())
         {
             std::wstring imgPath = folderPath + std::to_wstring(i) + L".gif";
 
             // Create HDC if not existing
-            graphicsArray[arrIdx] = nullptr;
-            if (graphicsArray[arrIdx] == nullptr) graphicsArray[arrIdx] = CreateCompatibleDC(NULL);
+            HDC imgPtr = imageCategory.getImagePtr(i);
+            if (imgPtr == nullptr) {
+                imgPtr = CreateCompatibleDC(NULL);
+                imageCategory.setImagePtr(i, imgPtr);
+            }
 
             HBITMAP img = LoadGfxAsBitmap(imgPath);
             if (img != nullptr)
             {
-                SelectObject(graphicsArray[arrIdx], img);
+                SelectObject(imgPtr, img);
 
                 BITMAP bmp;
                 GetObject(img, sizeof(BITMAP), &bmp);
-                if (width < bmp.bmWidth) width = bmp.bmWidth;
-                if (height < bmp.bmHeight) height = bmp.bmHeight;
+                if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
+                if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
             }
         }
-        else { dbgbox((L"No Ptr for " + prefix).c_str());  }
 
-        if (graphicsArray_Mask != nullptr)
+        if (imageCategory.haveMaskPtrArray())
         {
             std::wstring imgPath = folderPath + std::to_wstring(i) + L"m.gif";
 
             // Create HDC if not existing
-            graphicsArray_Mask[arrIdx] = nullptr;
-            if (graphicsArray_Mask[arrIdx] == nullptr) graphicsArray_Mask[arrIdx] = CreateCompatibleDC(NULL);
+            HDC imgPtr = imageCategory.getMaskPtr(i);
+            if (imgPtr == nullptr) {
+                imgPtr = CreateCompatibleDC(NULL);
+                imageCategory.setMaskPtr(i, imgPtr);
+            }
 
             HBITMAP img = LoadGfxAsBitmap(imgPath);
             if (img != nullptr)
             {
-                SelectObject(graphicsArray_Mask[arrIdx], img);
+                SelectObject(imgPtr, img);
 
                 BITMAP bmp;
                 GetObject(img, sizeof(BITMAP), &bmp);
-                if (width < bmp.bmWidth) width = bmp.bmWidth;
-                if (height < bmp.bmHeight) height = bmp.bmHeight;
+                if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
+                if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
             }
         }
 
-        if (widthArray != nullptr)
-        {
-            widthArray[arrIdx] = width;
-        }
-        if (heightArray != nullptr)
-        {
-            heightArray[arrIdx] = height;
-        }
+        imageCategory.setWidth(i, width);
+        imageCategory.setHeight(i, height);
     }
 }
 
 void RenderOverrideManager::loadDefaultGraphics(void)
 {
-    loadDefaultGraphics(L"block", GM_GFX_BLOCKS_PTR, 700, GM_GFX_BLOCKS_MASK_PTR);
-    loadDefaultGraphics(L"background2", GM_GFX_BACKGROUND2_PTR, 100, nullptr, GM_GFX_BACKGROUND2_W_PTR, GM_GFX_BACKGROUND2_H_PTR);
-    loadDefaultGraphics(L"npc", GM_GFX_NPC_PTR, 300, GM_GFX_NPC_MASK_PTR, GM_GFX_NPC_W_PTR, GM_GFX_NPC_H_PTR);
-    loadDefaultGraphics(L"effect", GM_GFX_EFFECTS_PTR, 200, GM_GFX_EFFECTS_MASK_PTR, GM_GFX_EFFECTS_W_PTR, GM_GFX_EFFECTS_H_PTR);
-    loadDefaultGraphics(L"background", GM_GFX_BACKGROUND_PTR, 200, GM_GFX_BACKGROUND_MASK_PTR, GM_GFX_BACKGROUND_W_PTR, GM_GFX_BACKGROUND_H_PTR);
-    loadDefaultGraphics(L"mario", GM_GFX_MARIO_PTR, 10, GM_GFX_MARIO_MASK_PTR, GM_GFX_MARIO_W_PTR, GM_GFX_MARIO_H_PTR);
-    loadDefaultGraphics(L"luigi", GM_GFX_LUIGI_PTR, 10, GM_GFX_LUIGI_MASK_PTR, GM_GFX_LUIGI_W_PTR, GM_GFX_LUIGI_H_PTR);
-    loadDefaultGraphics(L"peach", GM_GFX_PEACH_PTR, 10, GM_GFX_PEACH_MASK_PTR, GM_GFX_PEACH_W_PTR, GM_GFX_PEACH_H_PTR);
-    loadDefaultGraphics(L"toad", GM_GFX_TOAD_PTR, 10, GM_GFX_TOAD_MASK_PTR, GM_GFX_TOAD_W_PTR, GM_GFX_TOAD_H_PTR);
-    loadDefaultGraphics(L"link", GM_GFX_LINK_PTR, 10, GM_GFX_LINK_MASK_PTR, GM_GFX_LINK_W_PTR, GM_GFX_LINK_H_PTR);
-    loadDefaultGraphics(L"yoshib", GM_GFX_YOSHIB_PTR, 8, GM_GFX_YOSHIB_MASK_PTR);
-    loadDefaultGraphics(L"yoshit", GM_GFX_YOSHIT_PTR, 8, GM_GFX_YOSHIT_MASK_PTR);
-    loadDefaultGraphics(L"tile", GM_GFX_TILES_PTR, 400, nullptr, GM_GFX_TILES_W_PTR, GM_GFX_TILES_H_PTR);
-    loadDefaultGraphics(L"level", GM_GFX_LEVEL_PTR, 100, GM_GFX_LEVEL_MASK_PTR, GM_GFX_LEVEL_W_PTR, GM_GFX_LEVEL_H_PTR);
-    loadDefaultGraphics(L"scene", GM_GFX_SCENE_PTR, 100, GM_GFX_SCENE_MASK_PTR, GM_GFX_SCENE_W_PTR, GM_GFX_SCENE_H_PTR);
-    loadDefaultGraphics(L"path", GM_GFX_PATH_PTR, 100, GM_GFX_PATH_MASK_PTR, GM_GFX_PATH_W_PTR, GM_GFX_PATH_H_PTR);
-    loadDefaultGraphics(L"player", GM_GFX_PLAYER_PTR, 5, GM_GFX_PLAYER_MASK_PTR, GM_GFX_PLAYER_W_PTR, GM_GFX_PLAYER_H_PTR);
+    loadDefaultGraphics(smbxImageCategoryBlock);
+    loadDefaultGraphics(smbxImageCategoryBackground2);
+    loadDefaultGraphics(smbxImageCategoryNpc);
+    loadDefaultGraphics(smbxImageCategoryEffect);
+    loadDefaultGraphics(smbxImageCategoryBackground);
+    loadDefaultGraphics(smbxImageCategoryMario);
+    loadDefaultGraphics(smbxImageCategoryLuigi);
+    loadDefaultGraphics(smbxImageCategoryPeach);
+    loadDefaultGraphics(smbxImageCategoryToad);
+    loadDefaultGraphics(smbxImageCategoryLink);
+    loadDefaultGraphics(smbxImageCategoryYoshiB);
+    loadDefaultGraphics(smbxImageCategoryYoshiT);
+    loadDefaultGraphics(smbxImageCategoryTile);
+    loadDefaultGraphics(smbxImageCategoryLevel);
+    loadDefaultGraphics(smbxImageCategoryScene);
+    loadDefaultGraphics(smbxImageCategoryPath);
+    loadDefaultGraphics(smbxImageCategoryPlayer);
 
     for (int i = 0; i < 200; i++)
     {

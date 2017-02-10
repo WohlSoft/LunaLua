@@ -556,6 +556,9 @@
     <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h">
       <Filter>Rendering\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\ImageLoader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1064,6 +1067,9 @@
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
+    <ClCompile Include="Rendering\ImageLoader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
