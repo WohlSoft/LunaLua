@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\ResourceFileMapper.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableEntry.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h" />
+    <ClInclude Include="Rendering\SMBXImageCategories.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -302,6 +304,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Misc\ResourceFileMapper.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderAttributeInfo.cpp" />

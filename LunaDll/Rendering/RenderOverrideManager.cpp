@@ -5,7 +5,6 @@
 #include "SMBXMaskedImage.h"
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "RenderUtils.h"
-#include "ImageLoader.h"
 
 void RenderOverrideManager::loadOverrides(const std::wstring& prefix, HDC* graphicsArray, int numElements, HDC* graphicsArray_Mask /*= 0*/)
 {
@@ -180,91 +179,5 @@ static void dumpHardcodedImages()
             if (mainHDC) SaveMaskedHDCToFile(nextGIFName, mainHDC, maskHDC);
         }
 
-    }
-}
-
-void RenderOverrideManager::loadDefaultGraphics(const SMBXImageCategory &imageCategory)
-{
-    std::wstring folderPath = gAppPathWCHAR + L"/graphics/" + imageCategory.getFolderPrefix() + L"/" + imageCategory.getPrefix() + L"-";
-
-    for (int i = 1; i <= imageCategory.getArrayLength(); i++)
-    {
-        short width = 0, height = 0;
-
-        if (imageCategory.haveImagePtrArray())
-        {
-            std::wstring imgPath = folderPath + std::to_wstring(i) + L".gif";
-
-            // Create HDC if not existing
-            HDC imgPtr = imageCategory.getImagePtr(i);
-            if (imgPtr == nullptr) {
-                imgPtr = CreateCompatibleDC(NULL);
-                imageCategory.setImagePtr(i, imgPtr);
-            }
-
-            HBITMAP img = LoadGfxAsBitmap(imgPath);
-            if (img != nullptr)
-            {
-                SelectObject(imgPtr, img);
-
-                BITMAP bmp;
-                GetObject(img, sizeof(BITMAP), &bmp);
-                if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
-                if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
-            }
-        }
-
-        if (imageCategory.haveMaskPtrArray())
-        {
-            std::wstring imgPath = folderPath + std::to_wstring(i) + L"m.gif";
-
-            // Create HDC if not existing
-            HDC imgPtr = imageCategory.getMaskPtr(i);
-            if (imgPtr == nullptr) {
-                imgPtr = CreateCompatibleDC(NULL);
-                imageCategory.setMaskPtr(i, imgPtr);
-            }
-
-            HBITMAP img = LoadGfxAsBitmap(imgPath);
-            if (img != nullptr)
-            {
-                SelectObject(imgPtr, img);
-
-                BITMAP bmp;
-                GetObject(img, sizeof(BITMAP), &bmp);
-                if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
-                if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
-            }
-        }
-
-        imageCategory.setWidth(i, width);
-        imageCategory.setHeight(i, height);
-    }
-}
-
-void RenderOverrideManager::loadDefaultGraphics(void)
-{
-    loadDefaultGraphics(smbxImageCategoryBlock);
-    loadDefaultGraphics(smbxImageCategoryBackground2);
-    loadDefaultGraphics(smbxImageCategoryNpc);
-    loadDefaultGraphics(smbxImageCategoryEffect);
-    loadDefaultGraphics(smbxImageCategoryBackground);
-    loadDefaultGraphics(smbxImageCategoryMario);
-    loadDefaultGraphics(smbxImageCategoryLuigi);
-    loadDefaultGraphics(smbxImageCategoryPeach);
-    loadDefaultGraphics(smbxImageCategoryToad);
-    loadDefaultGraphics(smbxImageCategoryLink);
-    loadDefaultGraphics(smbxImageCategoryYoshiB);
-    loadDefaultGraphics(smbxImageCategoryYoshiT);
-    loadDefaultGraphics(smbxImageCategoryTile);
-    loadDefaultGraphics(smbxImageCategoryLevel);
-    loadDefaultGraphics(smbxImageCategoryScene);
-    loadDefaultGraphics(smbxImageCategoryPath);
-    loadDefaultGraphics(smbxImageCategoryPlayer);
-
-    for (int i = 0; i < 200; i++)
-    {
-        GM_GFX_BACKGROUND_W_UNK_PTR[i] = GM_GFX_BACKGROUND_W_PTR[i];
-        GM_GFX_BACKGROUND_H_UNK_PTR[i] = GM_GFX_BACKGROUND_H_PTR[i];
     }
 }

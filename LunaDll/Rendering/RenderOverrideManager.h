@@ -9,7 +9,6 @@
 #include <memory.h>
 class BMPBox;
 class SMBXMaskedImage;
-struct SMBXImageCategory;
 
 class RenderOverrideManager
 {
@@ -23,9 +22,6 @@ public:
     void loadLevelGFX();
     void loadWorldGFX();
     void loadHardcodedOverrides();
-
-    void loadDefaultGraphics(const SMBXImageCategory &imageCategory);
-    void loadDefaultGraphics(void);
 };
 
 #endif

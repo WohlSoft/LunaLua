@@ -14,7 +14,7 @@
 
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
-#include "../../Rendering/RenderOverrideManager.h"
+#include "../../Rendering/ImageLoader.h"
 
 
 #ifndef NO_SDL
@@ -170,7 +170,7 @@ static unsigned int __stdcall LatePatch(void)
     fixup_ErrorReporting();
 
     // Get initial HDCs set up...
-    gRenderOverride.loadDefaultGraphics();
+    ImageLoader::Run(true);
 
     // Be sure that all values are init.
     ResetLunaModule();

@@ -559,6 +559,12 @@
     <ClInclude Include="Rendering\ImageLoader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\ResourceFileMapper.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\SMBXImageCategories.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1069,6 +1075,9 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\ResourceFileMapper.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
