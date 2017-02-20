@@ -187,6 +187,10 @@ void __stdcall runtimeHookBlockBumpableRaw(void);
 void __stdcall runtimeHookNPCVulnerabilityRaw(void);
 void __stdcall runtimeHookNPCSpinjumpSafeRaw(void);
 void __stdcall runtimeHookCheckInputRaw(void);
+void __stdcall runtimeHookSetHDCRaw(void);
+
+void __stdcall runtimeHookInitGameHDC(void);
+void __stdcall runtimeHookInitGameWindow(void);
 
 #endif
 

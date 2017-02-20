@@ -192,7 +192,7 @@ enum CollidersType : short {
 #define DEFMEM_PTR(name, type, addr) static constexpr auto name = (const type*)(addr)
 
 // General
-DEFMEM(GM_SCRN_HDC,         DWORD, 0x00B25028);
+DEFMEM(GM_SCRN_HDC,         HDC,   0x00B25028);
 DEFMEM(GM_DO_SCREENSHOT,    short, 0x00B2504C);
 
 // Modes

@@ -537,6 +537,19 @@ void TrySkipPatch()
     PATCH(0x8DEF73).CALL(&LoadLocalOverworldGfxHook).Apply();
     PATCH(0x8DF808).CALL(&LoadLocalOverworldGfxHook).Apply();
 
+    // Implement hook for when the render target HDC is set...
+    PATCH(0x94F71A).CALL(&runtimeHookSetHDCRaw).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x96B4B0).CALL(&runtimeHookSetHDCRaw).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x96AE66).CALL(&runtimeHookSetHDCRaw).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Hooks got initGameHDC and initGameWindow
+    PATCH(0x8BF2AD).CALL(&runtimeHookInitGameHDC).Apply();
+    PATCH(0x8BD9A0).CALL(&runtimeHookInitGameWindow).Apply();
+    PATCH(0x8BF596).CALL(&runtimeHookInitGameWindow).Apply();
+    PATCH(0x8CE9FA).CALL(&runtimeHookInitGameWindow).Apply();
+    PATCH(0x8E6C75).CALL(&runtimeHookInitGameWindow).Apply();
+    PATCH(0xA02AEE).CALL(&runtimeHookInitGameWindow).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

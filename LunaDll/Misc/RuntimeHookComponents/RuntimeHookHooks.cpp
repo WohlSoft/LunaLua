@@ -1440,3 +1440,38 @@ __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
         ret
     }
 }
+
+
+static void __stdcall runtimeHookSetHDC(HDC newHDC)
+{
+    GM_SCRN_HDC = newHDC;
+}
+
+__declspec(naked) void __stdcall runtimeHookSetHDCRaw(void)
+{
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+        push esi // Arg #1 (new HDC)
+        call runtimeHookSetHDC
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        ret
+    }
+}
+
+void __stdcall runtimeHookInitGameHDC(void)
+{
+    auto initGameHDC = (void(__stdcall *)(void)) (void*)0x94F680;
+    initGameHDC();
+}
+
+void __stdcall runtimeHookInitGameWindow(void)
+{
+    auto initGameWindow = (void(__stdcall *)(void)) (void*)0x96AD80;
+    initGameWindow();
+}
