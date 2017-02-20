@@ -30,23 +30,29 @@ void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
     g_GLTextureStore.ClearLunaTexture(bmp);
 }
 
+void GLEngine::InitForHDC(HDC hdcDest)
+{
+    static bool runOnce = true;
+    if (!g_GLContextManager.Init(hdcDest)) {
+        dbgboxA("Failed to init...");
+    }
+    else {
+        // TODO: Move mGifRecorder initialization somewhere else. It can't be
+        //       in the constructor due to when the constructor 
+        if (runOnce) {
+            mGifRecorder.init();
+            runOnce = false;
+        }
+    }
+}
+
 BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
 	// Load Post-Processing Shader somewhere here
 
-	static bool runOnce = true;
-    if (!g_GLContextManager.Init(hdcDest)) {
-        dbgboxA("Failed to init...");
-    } else {
-		// TODO: Move mGifRecorder initialization somewhere else. It can't be
-		//       in the constructor due to when the constructor 
-		if (runOnce) {
-			mGifRecorder.init();
-			runOnce = false;
-		}
-    }
+    InitForHDC(hdcDest);
 
 	if (!g_GLContextManager.IsInitialized()) return FALSE;
 

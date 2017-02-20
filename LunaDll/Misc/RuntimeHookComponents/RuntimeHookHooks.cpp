@@ -1170,6 +1170,19 @@ static void runtimeHookSmbxChangeModeHook(void)
         LunaDllWaitFrame(false);
     }
 
+    // Get the HDC that will be the render target early if possible 
+    void* mainFrmPtr = *((void**)0xB25010);
+    if ((mainFrmPtr != nullptr) && g_GLEngine.IsEnabled())
+    {
+        auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
+        HDC targetHdc = nullptr;
+        frmGetHDC(mainFrmPtr, &targetHdc);
+
+        if (targetHdc != nullptr) {
+            g_GLEngine.InitForHDC(targetHdc);
+        }
+    }
+
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
 }
