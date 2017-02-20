@@ -133,6 +133,22 @@ void LuaProxy::Path::setHeight(double height, lua_State* L)
     SMBXPath::Get(m_index)->momentum.height = height;
 }
 
+bool LuaProxy::Path::visible(lua_State * L) const
+{
+    if (!isValid_throw(L))
+        return false;
+    return static_cast<bool>(SMBXPath::Get(m_index)->visible);
+}
+
+void LuaProxy::Path::setVisible(bool visible, lua_State * L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBXPath::Get(m_index)->visible = COMBOOL(visible);
+}
+
+
+
 bool LuaProxy::Path::isValid() const
 {
     return (m_index < ::SMBXPath::Count());
