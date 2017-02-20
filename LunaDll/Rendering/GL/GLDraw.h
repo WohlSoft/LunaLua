@@ -5,6 +5,7 @@
 #include <gl/glew.h>
 #include <cstdint>
 #include "GLCompat.h"
+#include "../../Misc/SRect.h"
 
 class GLDraw {
 private:
@@ -80,7 +81,8 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
         GLERRORCHECK();
     }
-    void DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode);
+    
+    void DrawSprite(const SRect<double>& dest, const Texture* tex, const SRect<double>& src, float opacity, RenderMode mode);
     void DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight);
     void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity);
 };

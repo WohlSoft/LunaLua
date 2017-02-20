@@ -83,15 +83,10 @@ GLBasicSprite::~GLBasicSprite() {
     GLERRORCHECK();
 }
 
-void GLBasicSprite::Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const {
+void GLBasicSprite::Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const {
     if (!valid) return;
 
-    if (xSrc >= tex.w) return;
-    if (ySrc >= tex.h) return;
-    if (xSrc + width <= 0) return;
-    if (ySrc + height <= 0) return;
-
-    g_GLDraw.DrawSprite(xDest, yDest, width, height, &tex, xSrc, ySrc, mode);
+    g_GLDraw.DrawSprite(dest, &tex, src, opacity, mode);
 }
 
 void GLBasicSprite::BindTexture() const {

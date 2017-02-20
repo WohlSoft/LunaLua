@@ -42,50 +42,51 @@ GLSplitSprite::~GLSplitSprite() {
     subSprites.clear();
 }
 
-void GLSplitSprite::Draw(int xDest, int yDest, int dWidth, int dHeight, int xSrc, int ySrc, GLDraw::RenderMode mode) const {
+void GLSplitSprite::Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const {
     if (!valid) return;
 
-    if (dWidth <= 0) return;
-    if (dHeight <= 0) return;
-    if (xSrc >= (int32_t)width) return;
-    if (ySrc >= (int32_t)height) return;
-    if (xSrc + dWidth <= 0) return;
-    if (ySrc + dHeight <= 0) return;
-    if ((int32_t)width - xSrc < dWidth) dWidth = (int32_t)width - xSrc;
-    if ((int32_t)height - ySrc < dHeight) dHeight = (int32_t)height - ySrc;
+    if (dest.isEmpty() || src.isEmpty()) return;
+    
+    // Trim the coordinates to fit the texture
+    SRect<double> tSrc = src.intersection(SRect<double>::fromXYWH(0, 0, width, height));
+    if (tSrc.isEmpty()) return;
+    SRect<double> tDest = dest.shrinkProportionately(src, tSrc);
+    if (tDest.isEmpty()) return;
 
     int32_t maxTextureSize = getMaxTextureSize();
 
-    int32_t initXSeg = xSrc / maxTextureSize;
-    int32_t initYSeg = ySrc / maxTextureSize;
-    int32_t maxXSeg = (xSrc + dWidth + maxTextureSize - 1) / maxTextureSize;
-    int32_t maxYSeg = (ySrc + dHeight + maxTextureSize - 1) / maxTextureSize;
+    int32_t initXSeg = (int32_t)std::floor(tSrc.x1 / maxTextureSize);
+    int32_t initYSeg = (int32_t)std::floor(tSrc.y1 / maxTextureSize);
+    int32_t maxXSeg = (int32_t)std::ceil(tSrc.x2 / maxTextureSize);
+    int32_t maxYSeg = (int32_t)std::ceil(tSrc.y2 / maxTextureSize);
+    if (initXSeg < 0) initXSeg = 0;
+    if (initYSeg < 0) initYSeg = 0;
+    if (maxXSeg > segsWide - 1) maxXSeg = segsWide - 1;
+    if (maxYSeg > segsTall - 1) maxYSeg = segsTall - 1;
     for (int32_t i = initYSeg; i < (int32_t)segsTall && i <= maxYSeg; i++) {
-        int32_t yOff = i * maxTextureSize;
-        int32_t ySrcRel = (int32_t)ySrc - (int32_t)yOff;
-        int32_t ySrcSub = (ySrcRel >= 0) ? ySrcRel : 0;
-        int32_t yDestOffset = ySrcSub - ySrcRel;
-
-        int32_t subHeight = dHeight - yDestOffset;
-        subHeight = (subHeight < (int32_t)maxTextureSize - ySrcSub) ? subHeight : (int32_t)maxTextureSize - ySrcSub;
-
-        if (subHeight <= 0) break;
+        double yOff = i * (double)maxTextureSize;
         
         for (int32_t j = initXSeg; j < (int32_t)segsWide && j <= maxXSeg; j++) {
-            int32_t xOff = j * maxTextureSize;
+            double xOff = j * (double)maxTextureSize;
+
+            // Calculate intersecting of this subtexture with the src rect, and get corrosponding dest rect
+            SRect<double> subRect = SRect<double>::fromXYWH(xOff, yOff, maxTextureSize, maxTextureSize);
+            SRect<double> subSrc = tSrc.intersection(subRect);
+            if (subSrc.isEmpty()) continue;
+            SRect<double> subDest = tDest.shrinkProportionately(tSrc, subSrc);
+            if (subDest.isEmpty()) continue;
             
-            int32_t xSrcRel = (int32_t)xSrc - (int32_t)xOff;
-            int32_t xSrcSub = (xSrcRel >= 0) ? xSrcRel : 0;
-            int32_t xDestOffset = xSrcSub - xSrcRel;
-
-            int32_t subWidth = dWidth - xDestOffset;
-            subWidth = (subWidth < (int32_t)maxTextureSize - xSrcSub) ? subWidth : (int32_t)maxTextureSize - xSrcSub;
-
-            if (subWidth <= 0) break;
-
+            // Subtract offset of the sub-texture...
+            SRect<double> relSubSrc(
+                subSrc.x1 - xOff,
+                subSrc.y1 - yOff,
+                subSrc.x2 - xOff,
+                subSrc.y2 - yOff
+                );
+            
             const GLBasicSprite* subSprite = subSprites[i*segsWide+j];
             if (subSprite) {
-                subSprite->Draw(xDest + xDestOffset, yDest + yDestOffset, subWidth, subHeight, xSrcSub, ySrcSub, mode);
+                subSprite->Draw(subDest, relSubSrc, opacity, mode);
             }
         }
     }

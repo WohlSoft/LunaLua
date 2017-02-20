@@ -565,6 +565,12 @@
     <ClInclude Include="Rendering\SMBXImageCategories.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\LunaImage.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\SRect.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1078,6 +1084,9 @@
     </ClCompile>
     <ClCompile Include="Misc\ResourceFileMapper.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\LunaImage.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

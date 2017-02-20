@@ -14,41 +14,21 @@ GLDraw::GLDraw() :
 {
 }
 
-void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode)
+void GLDraw::DrawSprite(const SRect<double>& dest, const Texture* tex, const SRect<double>& src, float opacity, RenderMode mode)
 {
+    if (dest.isEmpty() || src.isEmpty()) return;
+
     // Trim the coordinates to fit the texture
-    if (nXSrc < 0) {
-        nXDest -= nXSrc;
-        nWidth += nXSrc;
-        nXSrc = 0;
-    }
-    if (nYSrc < 0) {
-        nYDest -= nYSrc;
-        nHeight += nYSrc;
-        nYSrc = 0;
-    }
-    if (nWidth > ((int)tex->w - nXSrc)) {
-        nWidth = (int)tex->w - nXSrc;
-    }
-    if (nHeight > ((int)tex->h - nYSrc)) {
-        nHeight = (int)tex->h - nYSrc;
-    }
+    SRect<double> trimmedSrc = src.intersection(SRect<double>::fromXYWH(0, 0, (double)tex->w, (double)tex->h));
+    if (trimmedSrc.isEmpty()) return;
+    SRect<double> trimmedDest = dest.shrinkProportionately(src, trimmedSrc);
+    if (trimmedDest.isEmpty()) return;
 
-    // Don't render if calculated width or height is <= 0
-    if (nHeight <= 0) return;
-    if (nWidth <= 0) return;
-
-    // Generate our floating point coordinates
-    float texw = (float)tex->pw;
-    float texh = (float)tex->ph;
-    float x1 = (float)nXDest;
-    float y1 = (float)nYDest;
-    float x2 = x1 + nWidth;
-    float y2 = y1 + nHeight;
-    float tx1 = (nXSrc + 0.0f) / texw;
-    float ty1 = (nYSrc + 0.0f) / texh;
-    float tx2 = tx1 + nWidth / texw;
-    float ty2 = ty1 + nHeight / texh;
+    // Convert src coords to UVs
+    trimmedSrc.x1 /= (double)tex->pw;
+    trimmedSrc.y1 /= (double)tex->ph;
+    trimmedSrc.x2 /= (double)tex->pw;
+    trimmedSrc.y2 /= (double)tex->ph;
 
     // Set rendering mode for this draw operation
     switch (mode) {
@@ -92,22 +72,28 @@ void GLDraw::DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const T
     BindTexture(tex);
 
     GLfloat Vertices[] = {
-        x1, y1, 0,
-        x2, y1, 0,
-        x2, y2, 0,
-        x1, y2, 0
+        (GLfloat)trimmedDest.x1, (GLfloat)trimmedDest.y1, 0,
+        (GLfloat)trimmedDest.x2, (GLfloat)trimmedDest.y1, 0,
+        (GLfloat)trimmedDest.x2, (GLfloat)trimmedDest.y2, 0,
+        (GLfloat)trimmedDest.x1, (GLfloat)trimmedDest.y2, 0
     };
     GLfloat TexCoord[] = {
-        tx1, ty1,
-        tx2, ty1,
-        tx2, ty2,
-        tx1, ty2
+        (GLfloat)trimmedSrc.x1, (GLfloat)trimmedSrc.y1,
+        (GLfloat)trimmedSrc.x2, (GLfloat)trimmedSrc.y1,
+        (GLfloat)trimmedSrc.x2, (GLfloat)trimmedSrc.y2,
+        (GLfloat)trimmedSrc.x1, (GLfloat)trimmedSrc.y2
     };
     GLubyte indices[] = {
         0, 1, 2, // (bottom left - top left - top right)
         0, 2, 3  // (bottom left - top right - bottom right)
     };
 
+    if (opacity < 1.0f)
+    {
+        // Apply opacity for pre-multiplied alpha
+        glColor4f(opacity, opacity, opacity, opacity);
+        GLERRORCHECK();
+    }
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     GLERRORCHECK();
     glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);

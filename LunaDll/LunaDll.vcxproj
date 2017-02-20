@@ -151,7 +151,9 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
+    <ClInclude Include="Misc\SRect.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
+    <ClInclude Include="Rendering\LunaImage.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableEntry.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderAttributeInfo.h" />
@@ -306,6 +308,7 @@
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
+    <ClCompile Include="Rendering\LunaImage.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderAttributeInfo.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderUniformInfo.cpp" />

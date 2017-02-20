@@ -12,7 +12,7 @@ FreeImageData::~FreeImageData()
     reset();
 }
 
-bool FreeImageData::loadMem(unsigned char*data, unsigned long size, std::string filename)
+bool FreeImageData::loadMem(unsigned char* data, unsigned long size, const std::string& filename)
 {
     FIMEMORY * mem = FreeImage_OpenMemory(data, size);
     FREE_IMAGE_FORMAT fif = FreeImage_GetFileTypeFromMemory(mem, size);
@@ -152,4 +152,23 @@ HBITMAP FreeImageData::toHBITMAP()
     return nullptr;
 }
 
+uint32_t FreeImageData::getWidth()
+{
+    if (m_bitmap)
+        return FreeImage_GetWidth(m_bitmap);
+    return 0;
+}
 
+uint32_t FreeImageData::getHeight()
+{
+    if (m_bitmap)
+        return FreeImage_GetHeight(m_bitmap);
+    return 0;
+}
+
+bool FreeImageData::toRawBGRA(void* out)
+{
+    if (m_bitmap)
+        return FreeImageHelper::ToRawBGRA(m_bitmap, out);
+    return false;
+}

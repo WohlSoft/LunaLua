@@ -25,7 +25,7 @@ public:
     GLSplitSprite(void* data, GLint format, int32_t width, int32_t height);
     virtual ~GLSplitSprite();
 
-    virtual void Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const;
+    virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const;
     virtual void BindTexture() const;
 
     virtual bool IsValid() const { return valid; }

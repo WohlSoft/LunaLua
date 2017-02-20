@@ -1,5 +1,8 @@
 #include "FreeImageHelper.h"
+#include <Windows.h>
 
+#define FREEIMAGE_LIB
+#include <FreeImageLite.h>
 
 HBITMAP FreeImageHelper::CreateEmptyBitmap(int width, int height, int bpp, void** data)
 {
@@ -27,11 +30,9 @@ HBITMAP FreeImageHelper::CreateEmptyBitmap(int width, int height, int bpp, void*
 
 
 #include <iostream>
-HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
+
+bool FreeImageHelper::ToRawBGRA(FIBITMAP* bitmap, void* out)
 {
-    int width = FreeImage_GetWidth(bitmap);
-    int height = FreeImage_GetHeight(bitmap);
-    
     /*
     std::cout << "Original Image: " << std::hex << std::endl;
     std::cout << "R: " << FreeImage_GetRedMask(bitmap) << std::endl;
@@ -45,8 +46,16 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
 
     // Convert to 32bit so we can be sure that it is compatible.
     FIBITMAP* frame32bit = FreeImage_ConvertTo32Bits(bitmap);
+    if (frame32bit == nullptr)
+    {
+        return false;
+    }
+
     // Make it premultiplied so we can use it for opengl
-    FreeImage_PreMultiplyWithAlpha(frame32bit);
+    if (!FreeImage_PreMultiplyWithAlpha(frame32bit)) {
+        FreeImage_Unload(frame32bit);
+        return false;
+    }
 
     /*
     std::cout << "Converted Image: " << std::hex << std::endl;
@@ -59,14 +68,26 @@ HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
     std::cout << "================================" << std::endl;
     */
 
+    // Copy the bits from out FI bitmap to raw data
+    FreeImage_ConvertToRawBits((BYTE*)out, frame32bit, FreeImage_GetPitch(frame32bit), 32, 0x0000FF, 0x00FF00, 0xFF0000, true);
+
+    // Free and return
+    FreeImage_Unload(frame32bit);
+
+    return true;
+}
+
+HBITMAP FreeImageHelper::FromFreeImage(FIBITMAP* bitmap)
+{
+    int width = FreeImage_GetWidth(bitmap);
+    int height = FreeImage_GetHeight(bitmap);
+
     // Make HBITMAP handle
     BYTE* out; //BGRA
     HBITMAP outBitmap = FreeImageHelper::CreateEmptyBitmap(width, height, 32, (void**)&out);
 
-    // Copy the bits from out FI bitmap to HBITMAP
-    FreeImage_ConvertToRawBits(out, frame32bit, FreeImage_GetPitch(frame32bit), 32, 0x0000FF, 0x00FF00, 0xFF0000, true);
+    // Convert to the needed raw BGRA data
+    ToRawBGRA(bitmap, out);
 
-    // Free and return
-    FreeImage_Unload(frame32bit);
     return outBitmap;
 }

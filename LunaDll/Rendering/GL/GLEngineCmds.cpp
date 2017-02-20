@@ -67,11 +67,22 @@ void GLEngineCmd_EmulateBitBlt::run(GLEngine& glEngine) const {
 void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
     if (!g_GLContextManager.IsInitialized()) return;
 
-    if (mBmp == NULL) return;
-    const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
-    if (tex == NULL) return;
-
-    g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+    if (mImg)
+    {
+        const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
+        if (sprite == nullptr) return;
+        sprite->Draw(
+            SRect<double>::fromXYWH(mXDest, mYDest, mWidthDest, mHeightDest),
+            SRect<double>::fromXYWH(mXSrc, mYSrc, mWidthSrc, mHeightSrc),
+            mOpacity,
+            GLDraw::RenderMode::RENDER_MODE_ALPHA);
+    }
+    else if (mBmp != nullptr)
+    {
+        const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
+        if (tex == nullptr) return;
+        g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
+    }
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
@@ -129,7 +140,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     if (!g_GLContextManager.IsInitialized()) return;
 
     const GLDraw::Texture* tex = NULL;
-    if (mBmp) {
+    const GLSprite* sprite = NULL;
+    if (mImg) {
+        sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
+    }
+    else if (mBmp) {
         tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     }
     else if (mCapBuff) {
@@ -141,7 +156,19 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
 
-    g_GLDraw.BindTexture(tex);
+    if (sprite != nullptr)
+    {
+        sprite->BindTexture();
+    }
+    else if (tex != nullptr)
+    {
+        g_GLDraw.BindTexture(tex);
+    }
+    else
+    {
+        g_GLDraw.UnbindTexture();
+    }
+
     if (mShader) {
         mShader->bind();
         GLERRORCHECK();
