@@ -19,6 +19,14 @@ public:
         mCond.notify_all();
     }
 
+    inline T peek() {
+        T cmd;
+        std::unique_lock<std::mutex> lck(mMutex);
+
+        while (mQueue.empty()) mCond.wait(lck);
+        return mQueue.front();
+    }
+
     inline T pop() {
         T cmd;
         std::unique_lock<std::mutex> lck(mMutex);

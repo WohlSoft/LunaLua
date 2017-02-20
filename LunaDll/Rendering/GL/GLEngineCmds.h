@@ -79,6 +79,12 @@ public:
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
 };
+class GLEngineCmd_InitForHDC : public GLEngineCmd {
+public:
+    HDC mHdcDest;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+};
 class GLEngineCmd_LunaDrawSprite : public GLEngineCmd, public GLBitmapRenderCoords {
 public:
     std::shared_ptr<LunaImageData> mImg;

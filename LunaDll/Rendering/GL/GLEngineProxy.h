@@ -48,6 +48,7 @@ public:
     void DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity);
     void EndFrame(HDC hdcDest);
+    void InitForHDC(HDC hdcDest);
 
     inline bool IsEnabled() { return mInternalGLEngine.IsEnabled(); };
     inline void Enable() { mInternalGLEngine.Enable(); };

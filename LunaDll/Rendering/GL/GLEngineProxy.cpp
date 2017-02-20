@@ -35,7 +35,7 @@ void GLEngineProxy::Init() {
 
 void GLEngineProxy::ThreadMain() {
     while (1) {
-        std::shared_ptr<GLEngineCmd> cmd = mQueue.pop();
+        std::shared_ptr<GLEngineCmd> cmd = mQueue.peek();
 
         if (cmd->shouldBeSynchronous() || (mPendingClear == 0 && !mSkipFrame)) {
             cmd->run(mInternalGLEngine);
@@ -52,6 +52,8 @@ void GLEngineProxy::ThreadMain() {
                 mSkipFrame = false;
             }
         }
+
+        mQueue.pop();
 
         // Upon exit command, exit the thread
         if (cmd->isExitCmd()) return;
@@ -157,6 +159,13 @@ void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidt
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
+    obj->mHdcDest = hdcDest;
+    QueueCmd(obj);
+}
+
+void GLEngineProxy::InitForHDC(HDC hdcDest)
+{
+    auto obj = std::make_shared<GLEngineCmd_InitForHDC>();
     obj->mHdcDest = hdcDest;
     QueueCmd(obj);
 }
