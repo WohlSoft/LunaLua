@@ -8,6 +8,8 @@
 
 void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut, ResourceFileInfo** maskFileInfoOut) const
 {
+    uint32_t firstIdx = m_Category.getFirstIdx();
+    uint32_t lastIdx = m_Category.getLastIdx();
     uint32_t arrLen = m_Category.getArrayLength();
     std::wstring prefix = m_Category.getPrefix();
 
@@ -19,10 +21,10 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
     {
         ResourceFileInfo* imgFileInfo = new ResourceFileInfo[arrLen];
         if (levelPath != episodePath) {
-            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".gif", arrLen, imgFileInfo);
+            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
         }
-        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".gif", arrLen, imgFileInfo);
-        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".gif", arrLen, imgFileInfo);
+        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
+        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
         (*imgFileInfoOut) = imgFileInfo;
     }
 
@@ -30,29 +32,30 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
     {
         ResourceFileInfo* maskFileInfo = new ResourceFileInfo[arrLen];
         if (levelPath != episodePath) {
-            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L"m.gif", arrLen, maskFileInfo);
+            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
         }
-        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L"m.gif", arrLen, maskFileInfo);
-        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L"m.gif", arrLen, maskFileInfo);
+        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
+        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
         (*maskFileInfoOut) = maskFileInfo;
     }
 }
 
 void ImageLoaderCategory::updateLoadedImages()
 {
-    uint32_t arrLen = m_Category.getArrayLength();
+    uint32_t firstIdx = m_Category.getFirstIdx();
+    uint32_t lastIdx = m_Category.getLastIdx();
     ResourceFileInfo* newImgFileInfo = nullptr;
     ResourceFileInfo* newMaskFileInfo = nullptr;
 
     // Get new image resource file infomration
     getImageResourceInfo(&newImgFileInfo, &newMaskFileInfo);
 
-    for (uint32_t i = 1; i <= arrLen; i++)
+    for (uint32_t i = firstIdx; i <= lastIdx; i++)
     {
-        ResourceFileInfo* newImg = (newImgFileInfo != nullptr) ? &newImgFileInfo[i - 1] : nullptr;
-        ResourceFileInfo* oldImg = (m_ImgFileInfo != nullptr) ? &m_ImgFileInfo[i - 1] : nullptr;
-        ResourceFileInfo* newMask = (newMaskFileInfo != nullptr) ? &newMaskFileInfo[i - 1] : nullptr;
-        ResourceFileInfo* oldMask = (m_MaskFileInfo != nullptr) ? &m_MaskFileInfo[i - 1] : nullptr;
+        ResourceFileInfo* newImg = (newImgFileInfo != nullptr) ? &newImgFileInfo[i - firstIdx] : nullptr;
+        ResourceFileInfo* oldImg = (m_ImgFileInfo != nullptr) ? &m_ImgFileInfo[i - firstIdx] : nullptr;
+        ResourceFileInfo* newMask = (newMaskFileInfo != nullptr) ? &newMaskFileInfo[i - firstIdx] : nullptr;
+        ResourceFileInfo* oldMask = (m_MaskFileInfo != nullptr) ? &m_MaskFileInfo[i - firstIdx] : nullptr;
         // If anything has changed, reload
         if (
             ((newImg == nullptr) != (oldImg == nullptr)) || ((newImg != nullptr) && (oldImg != nullptr) && (*newImg != *oldImg)) ||
@@ -178,12 +181,6 @@ void ImageLoader::Run(bool initialLoad)
     smbxImageLoaderPath.updateLoadedImages();
     smbxImageLoaderPlayer.updateLoadedImages();
 
-    // Set special case mapping...
-    GM_GFX_LEVEL_PTR[0] = GM_GFX_PATH_PTR[2];
-    GM_GFX_LEVEL_MASK_PTR[0] = GM_GFX_PATH_MASK_PTR[2];
-    GM_GFX_LEVEL_W_PTR[0] = GM_GFX_PATH_W_PTR[2];
-    GM_GFX_LEVEL_H_PTR[0] = GM_GFX_PATH_H_PTR[2];
-
     if (initialLoad)
     {
         for (int i = 0; i < smbxImageCategoryBackground.getArrayLength(); i++)
@@ -195,6 +192,6 @@ void ImageLoader::Run(bool initialLoad)
 
     for (int i = 0; i < smbxImageCategoryBlock.getArrayLength(); i++)
     {
-        GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + 1) == nullptr) ? -1 : 0;
+        GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + smbxImageCategoryBlock.getFirstIdx()) == nullptr) ? -1 : 0;
     }
 }

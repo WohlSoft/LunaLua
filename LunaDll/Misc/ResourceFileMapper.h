@@ -32,6 +32,6 @@ static inline bool operator!=(const ResourceFileInfo& lhs, const ResourceFileInf
 
 // Fills an array of ResourceFileInfo based on files found matching the specified pattern.
 // Skips anything already filled out...
-void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint16_t maxId, ResourceFileInfo* outData);
+void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint16_t firstIdx, uint16_t lastIdx, ResourceFileInfo* outData);
 
 #endif
