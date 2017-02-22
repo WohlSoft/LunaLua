@@ -7,13 +7,13 @@
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
 
-uint64_t LunaImageData::getNewUID()
+uint64_t LunaImage::getNewUID()
 {
     static std::atomic<uint64_t> uidCounter = 1;
     return uidCounter.fetch_add(1, std::memory_order_relaxed);
 }
 
-void LunaImageData::load(const wchar_t* file)
+void LunaImage::load(const wchar_t* file)
 {
     std::lock_guard<std::mutex> lock(mut);
 
@@ -47,7 +47,7 @@ void LunaImageData::load(const wchar_t* file)
     }
 }
 
-void LunaImageData::clearInternal()
+void LunaImage::clearInternal()
 {
     if (hbmp != nullptr)
     {
@@ -67,14 +67,14 @@ void LunaImageData::clearInternal()
     h = 0;
 }
 
-void LunaImageData::clear()
+void LunaImage::clear()
 {
     std::lock_guard<std::mutex> lock(mut);
 
     clearInternal();
 }
 
-HBITMAP LunaImageData::asHBITMAP()
+HBITMAP LunaImage::asHBITMAP()
 {
     std::lock_guard<std::mutex> lock(mut);
 
@@ -91,16 +91,4 @@ HBITMAP LunaImageData::asHBITMAP()
     data = newData;
 
     return hbmp;
-}
-
-LunaImage::LunaImage() :
-    m_img(), m_mask()
-{}
-
-void LunaImage::load(const wchar_t* imgFile, const wchar_t* maskFile)
-{
-    // TODO: Clear auxilary render data if any?
-
-    m_img.load(imgFile);
-    m_img.load(maskFile);
 }

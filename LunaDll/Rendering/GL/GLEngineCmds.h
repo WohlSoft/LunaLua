@@ -12,7 +12,7 @@
 
 class GLEngine;
 class GLShader;
-class LunaImageData;
+class LunaImage;
 
 /****************************************************/
 /* Common argumets for bitmap rendering coordinates */
@@ -87,7 +87,7 @@ public:
 };
 class GLEngineCmd_LunaDrawSprite : public GLEngineCmd, public GLBitmapRenderCoords {
 public:
-    std::shared_ptr<LunaImageData> mImg;
+    std::shared_ptr<LunaImage> mImg;
     const BMPBox* mBmp;
     float mOpacity;
     virtual void run(GLEngine& glEngine) const;
@@ -129,7 +129,7 @@ public:
         void* data;
     };
     
-    std::shared_ptr<LunaImageData> mImg;
+    std::shared_ptr<LunaImage> mImg;
     const BMPBox* mBmp;
     std::shared_ptr<CaptureBuffer> mCapBuff;
     std::shared_ptr<GLShader> mShader;

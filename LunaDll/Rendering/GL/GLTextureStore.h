@@ -10,7 +10,7 @@
 #include "GLDraw.h"
 #include "GLSprite.h"
 class BMPBox;
-class LunaImageData;
+class LunaImage;
 
 class GLTextureStore {
 public:
@@ -30,7 +30,7 @@ public:
 
     void ClearLunaImageTextures();
     void ClearLunaImageTexture(uint64_t uid);
-    const GLSprite* SpriteFromLunaImage(const std::shared_ptr<LunaImageData>& img);
+    const GLSprite* SpriteFromLunaImage(const std::shared_ptr<LunaImage>& img);
 };
 
 // Instance

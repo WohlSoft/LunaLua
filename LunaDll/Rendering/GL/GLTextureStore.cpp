@@ -155,7 +155,7 @@ void GLTextureStore::ClearLunaImageTexture(uint64_t uid)
     }
 }
 
-const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaImageData>& img)
+const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaImage>& img)
 {
     img->Lock();
 

@@ -3,36 +3,41 @@
 
 #include <cstdint>
 #include <mutex>
+#include <memory>
 
 // Forward declerations
 struct HBITMAP__;
 typedef HBITMAP__ *HBITMAP;
 class GLSprite;
 
-class LunaImageData
+class LunaImage
 {
 private:
     static uint64_t getNewUID();
 private:
-    uint64_t   uid;
-    std::mutex mut;
-    void*      data;
-    uint32_t   w;
-    uint32_t   h;
-    HBITMAP    hbmp;
+    uint64_t   uid;  // Unique identifier for the currently loaded image state
+    std::mutex mut;  // Mutex for loading/unloading
+    void*      data; // Pointer to BGRA image data
+    uint32_t   w;    // Image width
+    uint32_t   h;    // Image height
+    HBITMAP    hbmp; // Cached HBITMAP if this
+private:
+    // Pointer to an associated mask image
+    std::shared_ptr<LunaImage> mask;
 private:
     void clearInternal();
 public:
-    LunaImageData & operator=(const LunaImageData&) = delete;
-    LunaImageData(const LunaImageData&) = delete;
-    LunaImageData() :
+    LunaImage & operator=(const LunaImage&) = delete;
+    LunaImage(const LunaImage&) = delete;
+    LunaImage() :
         uid(getNewUID()),
 
         data(nullptr), w(0), h(0),
-        hbmp(nullptr)
+        hbmp(nullptr),
+        mask(nullptr)
     {
     }
-    ~LunaImageData()
+    ~LunaImage()
     {
         clear();
     }
@@ -47,20 +52,8 @@ public:
     uint32_t getH() { return h; }
     void Lock() { mut.lock(); }
     void Unlock() { mut.unlock(); }
-};
-
-class LunaImage
-{
-private:
-    LunaImageData m_img;
-    LunaImageData m_mask;
-public:
-    LunaImage & operator=(const LunaImage&) = delete;
-    LunaImage(const LunaImage&) = delete;
-    LunaImage();
-
-    // Loads an image file. The mask is optional.
-    void load(const wchar_t* imgFile, const wchar_t* maskFile);
+    std::shared_ptr<LunaImage> getMask() { return mask; }
+    void setMask(std::shared_ptr<LunaImage> _mask) { mask = std::move(_mask); }
 };
 
 #endif
