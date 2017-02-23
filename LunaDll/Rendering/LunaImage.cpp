@@ -6,6 +6,7 @@
 #include "../Misc/FreeImageUtils/FreeImageHelper.h"
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
+#include "GL/GLEngineProxy.h"
 
 uint64_t LunaImage::getNewUID()
 {
@@ -67,13 +68,6 @@ void LunaImage::clearInternal()
     h = 0;
 }
 
-void LunaImage::clear()
-{
-    std::lock_guard<std::mutex> lock(mut);
-
-    clearInternal();
-}
-
 HBITMAP LunaImage::asHBITMAP()
 {
     std::lock_guard<std::mutex> lock(mut);
@@ -91,4 +85,63 @@ HBITMAP LunaImage::asHBITMAP()
     data = newData;
 
     return hbmp;
+}
+
+void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
+{
+    if (g_GLEngine.IsEnabled())
+    {
+        if (mask && drawMask) {
+            auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
+            obj->mXDest = dx;
+            obj->mYDest = dy;
+            obj->mWidthDest = w;
+            obj->mHeightDest = h;
+            obj->mXSrc = sx;
+            obj->mYSrc = sy;
+            obj->mWidthSrc = w;
+            obj->mHeightSrc = h;
+
+            obj->mImg = mask;
+            obj->mOpacity = 1.0f;
+            obj->mMode = GLDraw::RENDER_MODE_MULTIPLY; //  GLDraw::RENDER_MODE_AND
+            g_GLEngine.QueueCmd(obj);
+        }
+
+        if (mask && drawMain)
+        {
+            auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
+            obj->mXDest = dx;
+            obj->mYDest = dy;
+            obj->mWidthDest = w;
+            obj->mHeightDest = h;
+            obj->mXSrc = sx;
+            obj->mYSrc = sy;
+            obj->mWidthSrc = w;
+            obj->mHeightSrc = h;
+
+            obj->mImg = shared_from_this();
+            obj->mOpacity = 1.0f;
+            obj->mMode = GLDraw::RENDER_MODE_MAX; //  GLDraw::RENDER_MODE_OR
+            g_GLEngine.QueueCmd(obj);
+        }
+
+        if (!mask && drawMain)
+        {
+            auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
+            obj->mXDest = dx;
+            obj->mYDest = dy;
+            obj->mWidthDest = w;
+            obj->mHeightDest = h;
+            obj->mXSrc = sx;
+            obj->mYSrc = sy;
+            obj->mWidthSrc = w;
+            obj->mHeightSrc = h;
+
+            obj->mImg = shared_from_this();
+            obj->mOpacity = 1.0f;
+            obj->mMode = GLDraw::RENDER_MODE_ALPHA;
+            g_GLEngine.QueueCmd(obj);
+        }
+    }
 }

@@ -4,6 +4,8 @@
 #include "../Rendering/GL/GLEngineProxy.h"
 #include "BitBltEmulation.h"
 #include "SMBXMaskedImage.h"
+#include "LunaImage.h"
+#include "Imageloader.h"
 
 // Global instance
 BitBltEmulation g_BitBltEmulation;
@@ -98,23 +100,18 @@ void BitBltEmulation::drawMasked(HDC maskSrc, HDC src, int dx, int dy, int w, in
 {
     if (maskSrc == nullptr && src == nullptr) return;
 
-    SMBXMaskedImage* img = SMBXMaskedImage::Get(maskSrc, src);
-
-    if (img) {
-        // If src is null, we want to draw only the mask
-        img->DrawWithOverride(dx, dy, w, h, sx, sy, maskSrc != nullptr, src != nullptr);
-    }
+    std::shared_ptr<LunaImage> img = ImageLoader::GetByHDC((src != nullptr) ? src : maskSrc);
+    if (!img) return;
+    img->draw(dx, dy, w, h, sx, sy, maskSrc != nullptr, src != nullptr);
 }
 
 void BitBltEmulation::drawOpaque(HDC src, int dx, int dy, int w, int h, int sx, int sy)
 {
     if (src == nullptr) return;
 
-    SMBXMaskedImage* img = SMBXMaskedImage::Get(nullptr, src);
-
-    if (img) {
-        img->DrawWithOverride(dx, dy, w, h, sx, sy, true, true);
-    }
+    std::shared_ptr<LunaImage> img = ImageLoader::GetByHDC(src);
+    if (!img) return;
+    img->draw(dx, dy, w, h, sx, sy, true, true);
 }
 
 void BitBltEmulation::drawBlackRectangle(int dx, int dy, int w, int h)

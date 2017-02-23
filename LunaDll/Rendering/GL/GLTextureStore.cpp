@@ -157,21 +157,21 @@ void GLTextureStore::ClearLunaImageTexture(uint64_t uid)
 
 const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaImage>& img)
 {
-    img->Lock();
+    img->lock();
 
     uint64_t uid = img->getUID();
 
     // Get associated texture from cache if possible
     auto it = mLunaImageTexMap.find(uid);
     if (it != mLunaImageTexMap.end()) {
-        img->Unlock();
+        img->unlock();
         return it->second;
     }
 
     // Try to allocate the GLSprite
     GLSprite* sprite;
     sprite = GLSprite::Create(img->getDataPtr(), GL_BGRA, img->getW(), img->getH());
-    img->Unlock();
+    img->unlock();
 
     // Handle failure
     if (sprite == NULL || !sprite->IsValid())

@@ -10,8 +10,30 @@ struct HBITMAP__;
 typedef HBITMAP__ *HBITMAP;
 class GLSprite;
 
-class LunaImage
+class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
+public:
+    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, bool forceOpaque=false)
+    {
+        std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
+        img->load(filename);
+        if ((img->getW() == 0) && (img->getH() == 0))
+        {
+            return nullptr;
+        }
+        
+        // Set alpha channel to 0xFF, if it's always supposed to be
+        if (forceOpaque)
+        {
+            uint32_t pixelCount = img->getW() * img->getH();
+            void* data = img->getDataPtr();
+            for (uint32_t idx = 0; idx < pixelCount; idx++) {
+                ((uint8_t*)data)[idx * 4 + 3] = 0xFF;
+            }
+        }
+
+        return std::move(img);
+    }
 private:
     static uint64_t getNewUID();
 private:
@@ -26,6 +48,7 @@ private:
     std::shared_ptr<LunaImage> mask;
 private:
     void clearInternal();
+    void load(const wchar_t* file);
 public:
     LunaImage & operator=(const LunaImage&) = delete;
     LunaImage(const LunaImage&) = delete;
@@ -39,21 +62,22 @@ public:
     }
     ~LunaImage()
     {
-        clear();
+        clearInternal();
+        // TODO: Send UID to GL Renderer to trigger texture deletion
     }
-
-    // Load an image file. If the filename is null or empty, the image will be cleared.
-    void load(const wchar_t* file);
-    void clear();
+    
     HBITMAP asHBITMAP();
     uint64_t getUID() { return uid; }
     inline void* getDataPtr() { return data; }
     uint32_t getW() { return w; }
     uint32_t getH() { return h; }
-    void Lock() { mut.lock(); }
-    void Unlock() { mut.unlock(); }
+    void lock() { mut.lock(); }
+    void unlock() { mut.unlock(); }
     std::shared_ptr<LunaImage> getMask() { return mask; }
     void setMask(std::shared_ptr<LunaImage> _mask) { mask = std::move(_mask); }
+
+    // Basic draw operation
+    void draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include "../BMPBox.h"
 #include "../FrameCapture.h"
 #include "../Shaders/GLShaderVariableEntry.h"
+#include "GLDraw.h"
 
 class GLEngine;
 class GLShader;
@@ -48,19 +49,19 @@ public:
 /* Specific GLEngine Commands */
 /******************************/
 
-class GLEngineCmd_ClearSMBXSprites : public GLEngineCmd {
+class GLEngineCmd_ClearSMBXSprites : public GLEngineCmd { // DEPRECATED
 public:
     virtual void run(GLEngine& glEngine) const;
     virtual bool shouldBeSynchronous(void) const { return true; }
     virtual bool isSmbxClearCmd(void) const { return true; }
 };
-class GLEngineCmd_ClearLunaTexture : public GLEngineCmd {
+class GLEngineCmd_ClearLunaTexture : public GLEngineCmd { // DEPRECATED
 public:
     const BMPBox* mBmp;
     virtual void run(GLEngine& glEngine) const;
     virtual bool shouldBeSynchronous(void) const { return true; }
 };
-class GLEngineCmd_EmulateBitBlt : public GLEngineCmd, public GLBitmapRenderCoords {
+class GLEngineCmd_EmulateBitBlt : public GLEngineCmd, public GLBitmapRenderCoords { // DEPRECATED
 public:
     HDC mHdcSrc;
     DWORD mRop;
@@ -85,11 +86,17 @@ public:
     virtual void run(GLEngine& glEngine) const;
     virtual bool shouldBeSynchronous(void) const { return true; }
 };
-class GLEngineCmd_LunaDrawSprite : public GLEngineCmd, public GLBitmapRenderCoords {
+class GLEngineCmd_LunaDrawSprite : public GLEngineCmd, public GLBitmapRenderCoords { // DEPRECATED
 public:
-    std::shared_ptr<LunaImage> mImg;
     const BMPBox* mBmp;
     float mOpacity;
+    virtual void run(GLEngine& glEngine) const;
+};
+class GLEngineCmd_DrawSprite : public GLEngineCmd, public GLBitmapRenderCoords {
+public:
+    std::shared_ptr<LunaImage> mImg;
+    float mOpacity;
+    GLDraw::RenderMode mMode;
     virtual void run(GLEngine& glEngine) const;
 };
 class GLEngineCmd_Exit : public GLEngineCmd {
@@ -97,13 +104,13 @@ public:
     virtual void run(GLEngine& glEngine) const;
     virtual bool isExitCmd(void) const { return true; }
 };
-class GLEngineCmd_SetTexture : public GLEngineCmd {
+class GLEngineCmd_SetTexture : public GLEngineCmd { // DEPRECATED
 public:
     const BMPBox* mBmp;
     uint32_t mColor;
     virtual void run(GLEngine& glEngine) const;
 };
-class GLEngineCmd_Draw2DArray : public GLEngineCmd {
+class GLEngineCmd_Draw2DArray : public GLEngineCmd { // DEPRECATED
 public:
     GLuint mType;
     const float* mVert;

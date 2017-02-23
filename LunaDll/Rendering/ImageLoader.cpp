@@ -5,6 +5,10 @@
 #include "SMBXImageCategories.h"
 #include "RenderUtils.h"
 #include "../Misc/ResourceFileMapper.h"
+#include "LunaImage.h"
+
+// Loaded image map decleration
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> ImageLoader::loadedImages;
 
 void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut, ResourceFileInfo** maskFileInfoOut) const
 {
@@ -38,6 +42,8 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
         FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
         (*maskFileInfoOut) = maskFileInfo;
     }
+
+    // TODO: Handle PNG graphics
 }
 
 void ImageLoaderCategory::updateLoadedImages()
@@ -62,70 +68,63 @@ void ImageLoaderCategory::updateLoadedImages()
             ((newMask == nullptr) != (oldMask == nullptr)) || ((newMask != nullptr) && (oldMask != nullptr) && (*newMask != *oldMask))
             )
         {
-            short width = 0, height = 0;
+            uint32_t width = 0, height = 0;
 
+            HDC mainImgHdc = nullptr;
+            std::shared_ptr<LunaImage> mainImg = nullptr;
             if (m_Category.haveImagePtrArray())
             {
-                // Clear old HBITMAP if any
-                HDC hdcPtr = m_Category.getImagePtr(i);
-                if (hdcPtr)
+                // Make HDC if-needed
+                mainImgHdc = m_Category.getImagePtr(i);
+                if (mainImgHdc == nullptr)
                 {
-                    HGDIOBJ oldImg = GetCurrentObject(hdcPtr, OBJ_BITMAP);
-                    if (oldImg) DeleteObject(oldImg);
-                    DeleteDC(hdcPtr);
-                    m_Category.setMaskPtr(i, nullptr);
+                    mainImgHdc = CreateCompatibleDC(NULL);
+                    m_Category.setImagePtr(i, mainImgHdc);
                 }
 
-                HBITMAP img = nullptr;
+                // Try to load image
                 if ((newImg != nullptr) && (newImg->path.length() > 0))
                 {
-                    img = LoadGfxAsBitmap(newImg->path);
+                    mainImg = LunaImage::fromFile(newImg->path.c_str(), true);
                 }
-                if (img != nullptr)
-                {
-                    hdcPtr = CreateCompatibleDC(NULL);
-                    m_Category.setImagePtr(i, hdcPtr);
-                    SelectObject(hdcPtr, img);
 
-                    BITMAP bmp;
-                    GetObject(img, sizeof(BITMAP), &bmp);
-                    if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
-                    if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
+                // Assign image, note size
+                ImageLoader::loadedImages[(uintptr_t)mainImgHdc] = mainImg;
+                if (mainImg != nullptr)
+                {
+                    if (width < mainImg->getW()) width = mainImg->getW();
+                    if (height < mainImg->getH()) height = mainImg->getH();
                 }
             }
-
-            if (m_Category.haveMaskPtrArray())
+            else
             {
-                // Clear old HBITMAP if any
-                HDC hdcPtr = m_Category.getMaskPtr(i);
-                if (hdcPtr)
-                {
-                    HGDIOBJ oldImg = GetCurrentObject(hdcPtr, OBJ_BITMAP);
-                    if (oldImg) DeleteObject(oldImg);
-                    DeleteDC(hdcPtr);
-                    m_Category.setMaskPtr(i, nullptr);
-                }
+                // That's required...
+                throw;
+            }
 
-                HBITMAP img = nullptr;
+            if (m_Category.haveMaskPtrArray() && mainImg)
+            {
+                // Match HDC to non-mask version
+                m_Category.setMaskPtr(i, mainImgHdc);
+
+                // Try to load image
+                std::shared_ptr<LunaImage> maskImg = nullptr;
                 if ((newMask != nullptr) && (newMask->path.length() > 0))
                 {
-                    img = LoadGfxAsBitmap(newMask->path);
+                    maskImg = LunaImage::fromFile(newMask->path.c_str(), true);
                 }
-                if (img != nullptr)
-                {
-                    hdcPtr = CreateCompatibleDC(NULL);
-                    m_Category.setMaskPtr(i, hdcPtr);
-                    SelectObject(hdcPtr, img);
 
-                    BITMAP bmp;
-                    GetObject(img, sizeof(BITMAP), &bmp);
-                    if (width < bmp.bmWidth) width = (int16_t)min(bmp.bmWidth, 0x7FFF);
-                    if (height < bmp.bmHeight) height = (int16_t)min(bmp.bmHeight, 0x7FFF);
+                // Assign image, note size
+                mainImg->setMask(maskImg);
+                if (maskImg != nullptr)
+                {
+                    if (width < maskImg->getW()) width = maskImg->getW();
+                    if (height < maskImg->getH()) height = maskImg->getH();
                 }
             }
 
-            m_Category.setWidth(i, width);
-            m_Category.setHeight(i, height);
+            m_Category.setWidth(i, (int16_t)min(width, 0x7FFF));
+            m_Category.setHeight(i, (int16_t)min(height, 0x7FFF));
         }
     }
 
@@ -157,12 +156,6 @@ static ImageLoaderCategory smbxImageLoaderPlayer(smbxImageCategoryPlayer);
 
 void ImageLoader::Run(bool initialLoad)
 {
-    // Clear special case mapping
-    GM_GFX_LEVEL_PTR[0] = nullptr;
-    GM_GFX_LEVEL_MASK_PTR[0] = nullptr;
-    GM_GFX_LEVEL_W_PTR[0] = 0;
-    GM_GFX_LEVEL_H_PTR[0] = 0;
-
     smbxImageLoaderBlock.updateLoadedImages();
     smbxImageLoaderBackground2.updateLoadedImages();
     smbxImageLoaderNpc.updateLoadedImages();
@@ -181,6 +174,8 @@ void ImageLoader::Run(bool initialLoad)
     smbxImageLoaderPath.updateLoadedImages();
     smbxImageLoaderPlayer.updateLoadedImages();
 
+    // TODO: Read 'hardcoded' GFX
+
     if (initialLoad)
     {
         for (int i = 0; i < smbxImageCategoryBackground.getArrayLength(); i++)
@@ -194,4 +189,13 @@ void ImageLoader::Run(bool initialLoad)
     {
         GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + smbxImageCategoryBlock.getFirstIdx()) == nullptr) ? -1 : 0;
     }
+}
+
+std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc) {
+    auto it = loadedImages.find((uintptr_t)hdc);
+    if (it != loadedImages.end())
+    {
+        return it->second;
+    }
+    return nullptr;
 }

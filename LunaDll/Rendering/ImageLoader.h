@@ -2,6 +2,7 @@
 #define ImageLoader_hhhh
 
 #include <cstdint>
+#include <unordered_map>
 #include "SMBXImageCategories.h"
 #include "../Misc/ResourceFileMapper.h"
 
@@ -30,11 +31,17 @@ private:
 class ImageLoader
 {
 public:
+    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> loadedImages;
+public:
     ImageLoader & operator=(const ImageLoader&) = delete;
     ImageLoader(const ImageLoader&) = delete;
     ImageLoader() = delete;
 public:
     static void Run(bool initialLoad = false);
+    static std::shared_ptr<LunaImage> GetByHDC(HDC hdc);
+
+    // TODO: Implement override system
+    // TODO: Implement get-by-* queries similar to SMBXMaskedImage
 };
 
 #endif

@@ -71,22 +71,25 @@ void GLEngineCmd_EmulateBitBlt::run(GLEngine& glEngine) const {
 void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
     if (!g_GLContextManager.IsInitialized()) return;
 
-    if (mImg)
-    {
-        const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
-        if (sprite == nullptr) return;
-        sprite->Draw(
-            SRect<double>::fromXYWH(mXDest, mYDest, mWidthDest, mHeightDest),
-            SRect<double>::fromXYWH(mXSrc, mYSrc, mWidthSrc, mHeightSrc),
-            mOpacity,
-            GLDraw::RenderMode::RENDER_MODE_ALPHA);
-    }
-    else if (mBmp != nullptr)
+    if (mBmp != nullptr)
     {
         const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
         if (tex == nullptr) return;
         g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
     }
+}
+
+void GLEngineCmd_DrawSprite::run(GLEngine& glEngine) const {
+    if (!g_GLContextManager.IsInitialized()) return;
+
+    if (!mImg) return;
+    const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
+    if (sprite == nullptr) return;
+    sprite->Draw(
+        SRect<double>::fromXYWH(mXDest, mYDest, mWidthDest, mHeightDest),
+        SRect<double>::fromXYWH(mXSrc, mYSrc, mWidthSrc, mHeightSrc),
+        mOpacity,
+        mMode);
 }
 
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
