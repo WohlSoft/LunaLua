@@ -6,6 +6,8 @@
 #include <memory>
 
 // Forward declerations
+struct HDC__;
+typedef HDC__ *HDC;
 struct HBITMAP__;
 typedef HBITMAP__ *HBITMAP;
 class GLSprite;
@@ -13,27 +15,8 @@ class GLSprite;
 class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
 public:
-    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, bool forceOpaque=false)
-    {
-        std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
-        img->load(filename);
-        if ((img->getW() == 0) && (img->getH() == 0))
-        {
-            return nullptr;
-        }
-        
-        // Set alpha channel to 0xFF, if it's always supposed to be
-        if (forceOpaque)
-        {
-            uint32_t pixelCount = img->getW() * img->getH();
-            void* data = img->getDataPtr();
-            for (uint32_t idx = 0; idx < pixelCount; idx++) {
-                ((uint8_t*)data)[idx * 4 + 3] = 0xFF;
-            }
-        }
-
-        return std::move(img);
-    }
+    static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
+    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename);
 private:
     static uint64_t getNewUID();
 private:

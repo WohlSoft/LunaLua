@@ -14,6 +14,49 @@ uint64_t LunaImage::getNewUID()
     return uidCounter.fetch_add(1, std::memory_order_relaxed);
 }
 
+std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
+{
+    if (hdc == nullptr) return nullptr;
+
+    HBITMAP convHBMP = CopyBitmapFromHdc(hdc);
+    if (convHBMP == nullptr) return nullptr;
+
+    BITMAP bmp;
+    GetObject(convHBMP, sizeof(BITMAP), &bmp);
+
+    // Allocate and copy into LunaImage
+    std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
+    img->w = bmp.bmWidth;
+    img->h = bmp.bmHeight;
+    img->data = std::malloc(4 * img->w*img->h);
+    if (img->data != nullptr)
+    {
+        memcpy(img->data, bmp.bmBits, 4 * img->w*img->h);
+    }
+    else
+    {
+        img = nullptr;
+    }
+
+    // Deallocate temporary conversion memory
+    DeleteObject(convHBMP);
+    convHBMP = NULL;
+
+    return img;
+}
+
+std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename)
+{
+    std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
+    img->load(filename);
+    if ((img->getW() == 0) && (img->getH() == 0))
+    {
+        return nullptr;
+    }
+
+    return std::move(img);
+}
+
 void LunaImage::load(const wchar_t* file)
 {
     std::lock_guard<std::mutex> lock(mut);

@@ -38,6 +38,7 @@ public:
     ImageLoader() = delete;
 public:
     static void Run(bool initialLoad = false);
+    static void LoadHardcodedGfx();
     static std::shared_ptr<LunaImage> GetByHDC(HDC hdc);
 
     // TODO: Implement override system

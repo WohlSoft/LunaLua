@@ -6,6 +6,7 @@
 #include "RenderUtils.h"
 #include "../Misc/ResourceFileMapper.h"
 #include "LunaImage.h"
+#include "../SMBXInternal/HardcodedGraphicsAccess.h"
 
 // Loaded image map decleration
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> ImageLoader::loadedImages;
@@ -85,7 +86,7 @@ void ImageLoaderCategory::updateLoadedImages()
                 // Try to load image
                 if ((newImg != nullptr) && (newImg->path.length() > 0))
                 {
-                    mainImg = LunaImage::fromFile(newImg->path.c_str(), true);
+                    mainImg = LunaImage::fromFile(newImg->path.c_str());
                 }
 
                 // Assign image, note size
@@ -111,7 +112,7 @@ void ImageLoaderCategory::updateLoadedImages()
                 std::shared_ptr<LunaImage> maskImg = nullptr;
                 if ((newMask != nullptr) && (newMask->path.length() > 0))
                 {
-                    maskImg = LunaImage::fromFile(newMask->path.c_str(), true);
+                    maskImg = LunaImage::fromFile(newMask->path.c_str());
                 }
 
                 // Assign image, note size
@@ -174,7 +175,13 @@ void ImageLoader::Run(bool initialLoad)
     smbxImageLoaderPath.updateLoadedImages();
     smbxImageLoaderPlayer.updateLoadedImages();
 
-    // TODO: Read 'hardcoded' GFX
+    // Read 'hardcoded' GFX
+    static bool haveLoadedHardcoded = false;
+    if ((!haveLoadedHardcoded) && (GM_FORM_GFX != nullptr))
+    {
+        LoadHardcodedGfx();
+        haveLoadedHardcoded = true;
+    }
 
     if (initialLoad)
     {
@@ -189,6 +196,53 @@ void ImageLoader::Run(bool initialLoad)
     {
         GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + smbxImageCategoryBlock.getFirstIdx()) == nullptr) ? -1 : 0;
     }
+}
+
+void ImageLoader::LoadHardcodedGfx()
+{
+
+
+    for (int idx1 = 1; idx1 <= HardcodedGraphicsItem::Size(); idx1++)
+    {
+        HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(idx1);
+        
+        // No processing invalid or mask items here
+        if ((hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_NORMAL) && (hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_ARRAY))
+            continue;
+
+        int minItem = hItemInfo.isArray() ? hItemInfo.minItem : -1;
+        int maxItem = hItemInfo.isArray() ? hItemInfo.maxItem : -1;
+        for (int idx2 = minItem; idx2 <= maxItem; idx2++)
+        {
+            if (hItemInfo.isArray() && !hItemInfo.isValidArrayIndex(idx2))
+            {
+                // If this index isn't valid, skip it
+                continue;
+            }
+            HDC colorHDC = nullptr;
+            HDC maskHDC = nullptr;
+            hItemInfo.getHDC(idx2, &colorHDC, &maskHDC);
+
+            if (colorHDC == nullptr)
+            {
+                // No such thing as mask-only graphics
+                continue;
+            }
+
+            std::shared_ptr<LunaImage> img  = LunaImage::fromHDC(colorHDC);
+            std::shared_ptr<LunaImage> mask = LunaImage::fromHDC(maskHDC);
+            if (img && mask)
+            {
+                img->setMask(mask);
+            }
+            if (img)  ImageLoader::loadedImages[(uintptr_t)colorHDC] = img;
+            if (mask) ImageLoader::loadedImages[(uintptr_t)maskHDC]  = mask;
+
+            // TODO: Consider special case for maskless hardcoded graphics, where black should be made transparent
+        }
+    }
+
+    // TODO: Support loading replacement hardcoded graphics
 }
 
 std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc) {
