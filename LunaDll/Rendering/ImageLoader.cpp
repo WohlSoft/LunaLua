@@ -22,13 +22,17 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
     std::wstring levelPath = getCustomFolderPath();
     std::wstring episodePath = GM_FULLDIR;
     
+    ResourceFileInfo* imgFileInfo = nullptr;
     if (imgFileInfoOut != nullptr)
     {
-        ResourceFileInfo* imgFileInfo = new ResourceFileInfo[arrLen];
+        imgFileInfo = new ResourceFileInfo[arrLen];
         if (levelPath != episodePath) {
+            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
             FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
         }
+        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
         FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
+        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
         FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
         (*imgFileInfoOut) = imgFileInfo;
     }
@@ -36,6 +40,20 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
     if ((maskFileInfoOut != nullptr) && m_Category.haveMaskPtrArray())
     {
         ResourceFileInfo* maskFileInfo = new ResourceFileInfo[arrLen];
+
+        // Don't load masks when a PNG is loaded in the slot
+        if (imgFileInfo != nullptr)
+        {
+            for (uint32_t idx = firstIdx; idx <= lastIdx; idx++)
+            {
+                uint32_t i = idx - firstIdx;
+                if (imgFileInfo[i].done && imgFileInfo[i].extension == L".png")
+                {
+                    maskFileInfo[i].done = true;
+                }
+            }
+        }
+
         if (levelPath != episodePath) {
             FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
         }
@@ -43,8 +61,6 @@ void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut
         FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
         (*maskFileInfoOut) = maskFileInfo;
     }
-
-    // TODO: Handle PNG graphics
 }
 
 void ImageLoaderCategory::updateLoadedImages()

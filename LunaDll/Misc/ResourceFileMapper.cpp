@@ -7,7 +7,7 @@ void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint
 
     WIN32_FILE_ATTRIBUTE_DATA fileData;
     for (uint16_t id = firstIdx; id <= lastIdx; id++) {
-        if (outData[id - firstIdx].path.length() > 0) continue;
+        if (outData[id - firstIdx].done) continue;
 
         std::wstring path = pathHead + std::to_wstring(id) + pathTail;
         if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &fileData) == 0)
@@ -22,7 +22,9 @@ void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint
             continue;
         }
 
+        outData[id - firstIdx].done = true;
         outData[id - firstIdx].path = path;
+        outData[id - firstIdx].extension = pathTail;
         outData[id - firstIdx].size = ((uint64_t)fileData.nFileSizeLow) | (((uint64_t)fileData.nFileSizeHigh) << 32);
         outData[id - firstIdx].timestamp = ((uint64_t)fileData.ftLastWriteTime.dwLowDateTime) | (((uint64_t)fileData.ftLastWriteTime.dwHighDateTime) << 32);
     }

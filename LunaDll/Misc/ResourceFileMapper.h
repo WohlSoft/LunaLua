@@ -7,12 +7,14 @@
 
 class ResourceFileInfo {
 public:
+    bool         done;
     std::wstring path;
+    std::wstring extension;
     uint64_t     timestamp;
     uint64_t     size;
 
     ResourceFileInfo() :
-        path(), timestamp(0), size(0)
+        done(false), path(), extension(), timestamp(0), size(0)
     {}
 };
 
