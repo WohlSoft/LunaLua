@@ -1,31 +1,83 @@
+#include <algorithm>
+#include <string> 
 #include "ResourceFileMapper.h"
 #include <Windows.h>
 
-void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint16_t firstIdx, uint16_t lastIdx, ResourceFileInfo* outData)
+ResourceFileInfo GetResourceFileInfo(const std::wstring& searchPath, const std::wstring& baseName, const std::wstring& fileExt)
 {
-    // TODO: Check if using FindFirstFile/FindNextFile would yield better performance?
+    ResourceFileInfo entry;
+    std::wstring filePath = searchPath + baseName + L"." + fileExt;
 
     WIN32_FILE_ATTRIBUTE_DATA fileData;
-    for (uint16_t id = firstIdx; id <= lastIdx; id++) {
-        if (outData[id - firstIdx].done) continue;
-
-        std::wstring path = pathHead + std::to_wstring(id) + pathTail;
-        if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &fileData) == 0)
-        {
-            // Failed to get attributes
-            continue;
-        }
-
-        if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        {
-            // Ignore directories
-            continue;
-        }
-
-        outData[id - firstIdx].done = true;
-        outData[id - firstIdx].path = path;
-        outData[id - firstIdx].extension = pathTail;
-        outData[id - firstIdx].size = ((uint64_t)fileData.nFileSizeLow) | (((uint64_t)fileData.nFileSizeHigh) << 32);
-        outData[id - firstIdx].timestamp = ((uint64_t)fileData.ftLastWriteTime.dwLowDateTime) | (((uint64_t)fileData.ftLastWriteTime.dwHighDateTime) << 32);
+    if (GetFileAttributesExW(filePath.c_str(), GetFileExInfoStandard, &fileData) == 0)
+    {
+        // Failed to get attributes
+        return entry;
     }
+
+    if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    {
+        // Ignore directories
+        return entry;
+    }
+
+    entry.done = true;
+    entry.path = filePath;
+    entry.extension = fileExt;
+    entry.size = ((uint64_t)fileData.nFileSizeLow) | (((uint64_t)fileData.nFileSizeHigh) << 32);
+    entry.timestamp = ((uint64_t)fileData.ftLastWriteTime.dwLowDateTime) | (((uint64_t)fileData.ftLastWriteTime.dwHighDateTime) << 32);
+
+    return entry;
+}
+
+void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
+{
+    std::wstring searchPattern = searchPath;
+    if ((searchPattern.back() != L'/') && (searchPattern.back() != L'\\'))
+    {
+        searchPattern += L"/*";
+    }
+    else
+    {
+        searchPattern += L"*";
+    }
+
+    HANDLE dir;
+    WIN32_FIND_DATAW fileData;
+    if ((dir = FindFirstFileW(searchPattern.c_str(), &fileData)) == INVALID_HANDLE_VALUE)
+    {
+        return; /* No files found */
+    }
+
+    do {
+        if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+
+        std::wstring filePath = searchPath + fileData.cFileName;
+        std::wstring fileName = fileData.cFileName;
+        std::transform(fileName.begin(), fileName.end(), fileName.begin(), ::towlower);
+
+        size_t sepIdx = fileName.find_last_of(L'.');
+        if (sepIdx == std::wstring::npos)
+        {
+            continue;
+        }
+        std::wstring fileExt = fileName.substr(sepIdx + 1);
+
+        // Limit file types handled (for now?)
+        if ((fileExt != L"gif") && (fileExt != L"png"))
+        {
+            continue;
+        }
+        
+        ResourceFileInfo entry;
+        entry.done = true;
+        entry.path = filePath;
+        entry.extension = fileExt;
+        entry.size = ((uint64_t)fileData.nFileSizeLow) | (((uint64_t)fileData.nFileSizeHigh) << 32);
+        entry.timestamp = ((uint64_t)fileData.ftLastWriteTime.dwLowDateTime) | (((uint64_t)fileData.ftLastWriteTime.dwHighDateTime) << 32);
+
+        outData[fileName] = entry;
+    } while (FindNextFileW(dir, &fileData));
+
+    FindClose(dir);
 }

@@ -47,6 +47,7 @@ std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
 
 std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename)
 {
+    if ((filename == nullptr) || (filename[0] == L'\0')) return nullptr;
     std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
     img->load(filename);
     if ((img->getW() == 0) && (img->getH() == 0))

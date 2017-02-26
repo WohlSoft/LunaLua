@@ -4,6 +4,8 @@
 
 #include <cstdint>
 #include <string>
+#include <memory>
+#include <unordered_map>
 
 class ResourceFileInfo {
 public:
@@ -32,8 +34,7 @@ static inline bool operator!=(const ResourceFileInfo& lhs, const ResourceFileInf
     return !(lhs == rhs);
 }
 
-// Fills an array of ResourceFileInfo based on files found matching the specified pattern.
-// Skips anything already filled out...
-void FillResourceFileInfo(const wchar_t* pathHead, const wchar_t* pathTail, uint16_t firstIdx, uint16_t lastIdx, ResourceFileInfo* outData);
+ResourceFileInfo GetResourceFileInfo(const std::wstring& searchPath, const std::wstring& baseName, const std::wstring& fileExt);
+void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map<std::wstring, ResourceFileInfo>& outData);
 
 #endif

@@ -11,79 +11,107 @@
 // Loaded image map decleration
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> ImageLoader::loadedImages;
 
-void ImageLoaderCategory::getImageResourceInfo(ResourceFileInfo** imgFileInfoOut, ResourceFileInfo** maskFileInfoOut) const
+static void resolveImageResource(
+    const std::wstring& basegamePath,
+    const std::wstring& fileRoot,
+    std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
+    std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
+    std::unordered_map<std::wstring, ResourceFileInfo>& outData)
 {
-    uint32_t firstIdx = m_Category.getFirstIdx();
-    uint32_t lastIdx = m_Category.getLastIdx();
-    uint32_t arrLen = m_Category.getArrayLength();
-    std::wstring prefix = m_Category.getPrefix();
+    std::wstring pngName = fileRoot + L".png";
+    std::wstring gifName = fileRoot + L".gif";
 
-    std::wstring basegamePath = gAppPathWCHAR + L"/graphics/" + m_Category.getFolderPrefix() + L"/";
-    std::wstring levelPath = getCustomFolderPath();
-    std::wstring episodePath = GM_FULLDIR;
-    
-    ResourceFileInfo* imgFileInfo = nullptr;
-    if (imgFileInfoOut != nullptr)
+    bool mainIsGif;
     {
-        imgFileInfo = new ResourceFileInfo[arrLen];
-        if (levelPath != episodePath) {
-            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
-            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
+        ResourceFileInfo resource;
+        auto it = levelFiles.find(pngName);
+        if (it == levelFiles.end())
+            it = levelFiles.find(gifName);
+        if (it == levelFiles.end())
+            it = episodeFiles.find(pngName);
+        if (it == episodeFiles.end())
+            it = episodeFiles.find(gifName);
+        if (it != episodeFiles.end())
+            resource = it->second;
+        if (resource.path.length() == 0)
+            resource = GetResourceFileInfo(basegamePath, fileRoot, L"png");
+        if (resource.path.length() == 0)
+            resource = GetResourceFileInfo(basegamePath, fileRoot, L"gif");
+        mainIsGif = (resource.extension == L"gif");
+        if (resource.path.length() > 0)
+        {
+            outData[fileRoot] = std::move(resource);
         }
-        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
-        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
-        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".png", firstIdx, lastIdx, imgFileInfo);
-        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L".gif", firstIdx, lastIdx, imgFileInfo);
-        (*imgFileInfoOut) = imgFileInfo;
     }
 
-    if ((maskFileInfoOut != nullptr) && m_Category.haveMaskPtrArray())
+    if (mainIsGif)
     {
-        ResourceFileInfo* maskFileInfo = new ResourceFileInfo[arrLen];
-
-        // Don't load masks when a PNG is loaded in the slot
-        if (imgFileInfo != nullptr)
-        {
-            for (uint32_t idx = firstIdx; idx <= lastIdx; idx++)
-            {
-                uint32_t i = idx - firstIdx;
-                if (imgFileInfo[i].done && imgFileInfo[i].extension == L".png")
-                {
-                    maskFileInfo[i].done = true;
-                }
-            }
+        std::wstring maskName = fileRoot + L"m.gif";
+        ResourceFileInfo maskResource;
+        auto it = levelFiles.find(maskName);
+        if (it == levelFiles.end())
+            it = episodeFiles.find(maskName);
+        if (it != episodeFiles.end())
+            maskResource = it->second;
+        if (maskResource.path.length() == 0)
+            maskResource = GetResourceFileInfo(basegamePath, fileRoot + L"m", L"gif");
+        if (maskResource.path.length() > 0) {
+            outData[fileRoot + L"m"] = std::move(maskResource);
         }
-
-        if (levelPath != episodePath) {
-            FillResourceFileInfo((levelPath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
-        }
-        FillResourceFileInfo((episodePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
-        FillResourceFileInfo((basegamePath + prefix + L"-").c_str(), L"m.gif", firstIdx, lastIdx, maskFileInfo);
-        (*maskFileInfoOut) = maskFileInfo;
     }
 }
 
-void ImageLoaderCategory::updateLoadedImages()
+void ImageLoaderCategory::resolveResources(
+    std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
+    std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
+    std::unordered_map<std::wstring, ResourceFileInfo>& outData) const
 {
     uint32_t firstIdx = m_Category.getFirstIdx();
     uint32_t lastIdx = m_Category.getLastIdx();
-    ResourceFileInfo* newImgFileInfo = nullptr;
-    ResourceFileInfo* newMaskFileInfo = nullptr;
+    std::wstring prefix = m_Category.getPrefix();
 
-    // Get new image resource file infomration
-    getImageResourceInfo(&newImgFileInfo, &newMaskFileInfo);
+    std::wstring basegamePath = gAppPathWCHAR + L"/graphics/" + m_Category.getFolderPrefix() + L"/";
 
+    for (uint32_t idx = firstIdx; idx <= lastIdx; idx++)
+    {
+        std::wstring fileRoot = prefix + L"-" + std::to_wstring(idx);
+        resolveImageResource(basegamePath, fileRoot, levelFiles, episodeFiles, outData);
+    }
+}
+
+static void getImageResource(const std::wstring& imageName,
+    const std::unordered_map<std::wstring, ResourceFileInfo>& fileData,
+    ResourceFileInfo& mainResource,
+    ResourceFileInfo& maskResource)
+{
+    auto it = fileData.find(imageName);
+    if (it == fileData.end()) return;
+    mainResource = it->second;
+
+    it = fileData.find(imageName + L"m");
+    if (it == fileData.end()) return;
+    maskResource = it->second;
+}
+
+void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstring, ResourceFileInfo>* fileData, const std::unordered_map<std::wstring, ResourceFileInfo>* oldFileData)
+{
+    uint32_t firstIdx = m_Category.getFirstIdx();
+    uint32_t lastIdx = m_Category.getLastIdx();
+
+    std::wstring prefix = m_Category.getPrefix();
     for (uint32_t i = firstIdx; i <= lastIdx; i++)
     {
-        ResourceFileInfo* newImg = (newImgFileInfo != nullptr) ? &newImgFileInfo[i - firstIdx] : nullptr;
-        ResourceFileInfo* oldImg = (m_ImgFileInfo != nullptr) ? &m_ImgFileInfo[i - firstIdx] : nullptr;
-        ResourceFileInfo* newMask = (newMaskFileInfo != nullptr) ? &newMaskFileInfo[i - firstIdx] : nullptr;
-        ResourceFileInfo* oldMask = (m_MaskFileInfo != nullptr) ? &m_MaskFileInfo[i - firstIdx] : nullptr;
+        std::wstring imageName = prefix + L"-" + std::to_wstring(i);
+        ResourceFileInfo newMain, newMask;
+        ResourceFileInfo oldMain, oldMask;
+        getImageResource(imageName, *fileData, newMain, newMask);
+        if (oldFileData != nullptr)
+        {
+            getImageResource(imageName, *oldFileData, oldMain, oldMask);
+        }
+
         // If anything has changed, reload
-        if (
-            ((newImg == nullptr) != (oldImg == nullptr)) || ((newImg != nullptr) && (oldImg != nullptr) && (*newImg != *oldImg)) ||
-            ((newMask == nullptr) != (oldMask == nullptr)) || ((newMask != nullptr) && (oldMask != nullptr) && (*newMask != *oldMask))
-            )
+        if ((oldFileData == nullptr) || (newMain != oldMain) || (newMask != oldMask))
         {
             uint32_t width = 0, height = 0;
 
@@ -100,14 +128,14 @@ void ImageLoaderCategory::updateLoadedImages()
                 }
 
                 // Try to load image
-                if ((newImg != nullptr) && (newImg->path.length() > 0))
+                if (newMain.path.length() > 0)
                 {
-                    mainImg = LunaImage::fromFile(newImg->path.c_str());
+                    mainImg = LunaImage::fromFile(newMain.path.c_str());
                 }
 
                 // Assign image, note size
                 ImageLoader::loadedImages[(uintptr_t)mainImgHdc] = mainImg;
-                if (mainImg != nullptr)
+                if (mainImg)
                 {
                     if (width < mainImg->getW()) width = mainImg->getW();
                     if (height < mainImg->getH()) height = mainImg->getH();
@@ -126,14 +154,14 @@ void ImageLoaderCategory::updateLoadedImages()
 
                 // Try to load image
                 std::shared_ptr<LunaImage> maskImg = nullptr;
-                if ((newMask != nullptr) && (newMask->path.length() > 0))
+                if (newMask.path.length() > 0)
                 {
-                    maskImg = LunaImage::fromFile(newMask->path.c_str());
+                    maskImg = LunaImage::fromFile(newMask.path.c_str());
                 }
 
                 // Assign image, note size
                 mainImg->setMask(maskImg);
-                if (maskImg != nullptr)
+                if (maskImg)
                 {
                     if (width < maskImg->getW()) width = maskImg->getW();
                     if (height < maskImg->getH()) height = maskImg->getH();
@@ -144,12 +172,6 @@ void ImageLoaderCategory::updateLoadedImages()
             m_Category.setHeight(i, (int16_t)min(height, 0x7FFF));
         }
     }
-
-    // Replace old file information
-    if (m_ImgFileInfo) { delete m_ImgFileInfo; m_ImgFileInfo = nullptr; };
-    if (m_MaskFileInfo) { delete m_MaskFileInfo; m_MaskFileInfo = nullptr; };
-    m_ImgFileInfo = newImgFileInfo;
-    m_MaskFileInfo = newMaskFileInfo;
 }
 
 
@@ -170,33 +192,64 @@ static ImageLoaderCategory smbxImageLoaderLevel(smbxImageCategoryLevel);
 static ImageLoaderCategory smbxImageLoaderScene(smbxImageCategoryScene);
 static ImageLoaderCategory smbxImageLoaderPath(smbxImageCategoryPath);
 static ImageLoaderCategory smbxImageLoaderPlayer(smbxImageCategoryPlayer);
+static ImageLoaderCategory* smbxImageLoaderCategories[] = {
+    &smbxImageLoaderBlock,
+    &smbxImageLoaderBackground2,
+    &smbxImageLoaderNpc,
+    &smbxImageLoaderEffect,
+    &smbxImageLoaderBackground,
+    &smbxImageLoaderMario,
+    &smbxImageLoaderLuigi,
+    &smbxImageLoaderPeach,
+    &smbxImageLoaderToad,
+    &smbxImageLoaderLink,
+    &smbxImageLoaderYoshiB,
+    &smbxImageLoaderYoshiT,
+    &smbxImageLoaderTile,
+    &smbxImageLoaderLevel,
+    &smbxImageLoaderScene,
+    &smbxImageLoaderPath,
+    &smbxImageLoaderPlayer,
+    nullptr
+};
 
 void ImageLoader::Run(bool initialLoad)
 {
-    smbxImageLoaderBlock.updateLoadedImages();
-    smbxImageLoaderBackground2.updateLoadedImages();
-    smbxImageLoaderNpc.updateLoadedImages();
-    smbxImageLoaderEffect.updateLoadedImages();
-    smbxImageLoaderBackground.updateLoadedImages();
-    smbxImageLoaderMario.updateLoadedImages();
-    smbxImageLoaderLuigi.updateLoadedImages();
-    smbxImageLoaderPeach.updateLoadedImages();
-    smbxImageLoaderToad.updateLoadedImages();
-    smbxImageLoaderLink.updateLoadedImages();
-    smbxImageLoaderYoshiB.updateLoadedImages();
-    smbxImageLoaderYoshiT.updateLoadedImages();
-    smbxImageLoaderTile.updateLoadedImages();
-    smbxImageLoaderLevel.updateLoadedImages();
-    smbxImageLoaderScene.updateLoadedImages();
-    smbxImageLoaderPath.updateLoadedImages();
-    smbxImageLoaderPlayer.updateLoadedImages();
+    static std::unordered_map<std::wstring, ResourceFileInfo>* lastResources = nullptr;
+    std::unordered_map<std::wstring, ResourceFileInfo>* foundResources = nullptr;
+    foundResources = new std::unordered_map<std::wstring, ResourceFileInfo>();
+
+    // Read level directory listing
+    std::wstring levelPath = getCustomFolderPath();
+    std::unordered_map<std::wstring, ResourceFileInfo> levelFiles;
+    ListResourceFilesFromDir(levelPath.c_str(), levelFiles);
+
+    // Read episode directory listing
+    std::wstring episodePath = GM_FULLDIR;
+    std::unordered_map<std::wstring, ResourceFileInfo> episodeFiles;
+    ListResourceFilesFromDir(episodePath.c_str(), episodeFiles);
+
+    // Resolve correct resource file info for each category
+    for (int i = 0; smbxImageLoaderCategories[i] != nullptr; i++)
+    {
+        smbxImageLoaderCategories[i]->resolveResources(
+            levelFiles, episodeFiles, *foundResources
+            );
+    }
+
+    // Load each normal category's GFX
+    for (int i = 0; smbxImageLoaderCategories[i] != nullptr; i++)
+    {
+        smbxImageLoaderCategories[i]->updateLoadedImages(foundResources, lastResources);
+    }
 
     // Read 'hardcoded' GFX
-    static bool haveLoadedHardcoded = false;
-    if ((!haveLoadedHardcoded) && (GM_FORM_GFX != nullptr))
+    static bool loadedHardcoded = false; // TODO: Won't need this odd 'loadedHardcoded' shenanigans when the initial run of ImageLoader::Run is moved to after GM_FORM_GFX is initialized
+    if (GM_FORM_GFX != nullptr)
     {
-        LoadHardcodedGfx();
-        haveLoadedHardcoded = true;
+        ResolveHardcodedGfx(levelFiles, episodeFiles, *foundResources);
+        LoadHardcodedGfx(foundResources, loadedHardcoded ? lastResources : nullptr);
+        loadedHardcoded = true;
     }
 
     if (initialLoad)
@@ -212,12 +265,45 @@ void ImageLoader::Run(bool initialLoad)
     {
         GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + smbxImageCategoryBlock.getFirstIdx()) == nullptr) ? -1 : 0;
     }
+
+    delete lastResources;
+    lastResources = foundResources;
 }
 
-void ImageLoader::LoadHardcodedGfx()
+void ImageLoader::ResolveHardcodedGfx(std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
 {
+    for (int idx1 = 1; idx1 <= HardcodedGraphicsItem::Size(); idx1++)
+    {
+        std::wstring basegamePath = gAppPathWCHAR + L"/graphics/hardcoded/";
+        HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(idx1);
 
+        // No processing invalid or mask items here
+        if ((hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_NORMAL) && (hItemInfo.state != HardcodedGraphicsItem::HITEMSTATE_ARRAY))
+            continue;
 
+        int minItem = hItemInfo.isArray() ? hItemInfo.minItem : -1;
+        int maxItem = hItemInfo.isArray() ? hItemInfo.maxItem : -1;
+        for (int idx2 = minItem; idx2 <= maxItem; idx2++)
+        {
+            if (hItemInfo.isArray() && !hItemInfo.isValidArrayIndex(idx2))
+            {
+                // If this index isn't valid, skip it
+                continue;
+            }
+
+            std::wstring hardcodedName = L"hardcoded-" + std::to_wstring(idx1);
+            if (hItemInfo.isArray())
+            {
+                hardcodedName += L"-" + std::to_wstring(idx2);
+            }
+
+            resolveImageResource(basegamePath, hardcodedName, levelFiles, episodeFiles, outData);
+        }
+    }
+}
+
+void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, ResourceFileInfo>* fileData, const std::unordered_map<std::wstring, ResourceFileInfo>* oldFileData)
+{
     for (int idx1 = 1; idx1 <= HardcodedGraphicsItem::Size(); idx1++)
     {
         HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(idx1);
@@ -245,20 +331,54 @@ void ImageLoader::LoadHardcodedGfx()
                 continue;
             }
 
-            std::shared_ptr<LunaImage> img  = LunaImage::fromHDC(colorHDC);
-            std::shared_ptr<LunaImage> mask = LunaImage::fromHDC(maskHDC);
-            if (img && mask)
+            std::wstring hardcodedName = L"hardcoded-" + std::to_wstring(idx1);
+            if (hItemInfo.isArray())
             {
-                img->setMask(mask);
+                hardcodedName +=  L"-" + std::to_wstring(idx2);
             }
-            if (img)  ImageLoader::loadedImages[(uintptr_t)colorHDC] = img;
-            if (mask) ImageLoader::loadedImages[(uintptr_t)maskHDC]  = mask;
 
-            // TODO: Consider special case for maskless hardcoded graphics, where black should be made transparent
+            ResourceFileInfo newMain, newMask;
+            ResourceFileInfo oldMain, oldMask;
+            getImageResource(hardcodedName, *fileData, newMain, newMask);
+            if (oldFileData != nullptr)
+            {
+                getImageResource(hardcodedName, *oldFileData, oldMain, oldMask);
+            }
+
+            // If anything has changed, reload
+            if ((oldFileData == nullptr) || (newMain != oldMain) || (newMask != oldMask))
+            {
+                std::shared_ptr<LunaImage> img = nullptr;
+                std::shared_ptr<LunaImage> mask = nullptr;
+
+                if (newMain.done)
+                {
+                    // If we found a file, load from it
+                    img = LunaImage::fromFile(newMain.path.c_str());
+                    mask = LunaImage::fromFile(newMask.path.c_str());
+                }
+                else
+                {
+                    // Otherwise, load from HDC
+                    img = LunaImage::fromHDC(colorHDC);
+                    mask = LunaImage::fromHDC(maskHDC);
+
+                    // TODO: Consider special case for maskless hardcoded graphics from HDC, where black should be made transparent
+                }
+
+                if (img && mask)
+                {
+                    img->setMask(mask);
+                }
+
+                if (img)
+                {
+                    if (colorHDC != nullptr) ImageLoader::loadedImages[(uintptr_t)colorHDC] = img;
+                    if (maskHDC != nullptr)  ImageLoader::loadedImages[(uintptr_t)maskHDC] = img;
+                }
+            }
         }
     }
-
-    // TODO: Support loading replacement hardcoded graphics
 }
 
 std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc) {
