@@ -11,6 +11,9 @@ void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
 void GLEngineCmd_ClearSMBXSprites::run(GLEngine& glEngine) const {
     glEngine.ClearSMBXSprites();
+
+    // TODO: Remove the following at a later point in time once some least-recently-used texture clearing mechanism is implemented
+    g_GLTextureStore.ClearLunaImageTextures();
 }
 
 void GLEngineCmd_ClearLunaTexture::run(GLEngine& glEngine) const {

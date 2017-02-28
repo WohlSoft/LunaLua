@@ -15,6 +15,7 @@ class GLEngineProxy {
 private:
     std::thread* mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
+    ThreadedCmdQueue<uint64_t> mDeletedTextures;
     std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
@@ -31,12 +32,14 @@ public:
     ~GLEngineProxy();
 
     // Queue command
-    void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd>& cmd);
+    void QueueCmd(const std::shared_ptr<GLEngineCmd>& cmd);
 
     template <typename T>
-    void GLEngineProxy::QueueCmd(const std::shared_ptr<T>& cmd) {
+    void QueueCmd(const std::shared_ptr<T>& cmd) {
         QueueCmd(std::static_pointer_cast<GLEngineCmd>(cmd));
     }
+
+    void NotifyTextureDeletion(uint64_t uid) { mDeletedTextures.push(uid); }
 
     // Convenience command functions
     void ClearSMBXSprites();

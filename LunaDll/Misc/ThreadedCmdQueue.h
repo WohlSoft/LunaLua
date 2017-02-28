@@ -19,6 +19,11 @@ public:
         mCond.notify_all();
     }
 
+    inline bool empty() {
+        std::unique_lock<std::mutex> lck(mMutex);
+        return mQueue.empty();
+    }
+
     inline T peek() {
         T cmd;
         std::unique_lock<std::mutex> lck(mMutex);

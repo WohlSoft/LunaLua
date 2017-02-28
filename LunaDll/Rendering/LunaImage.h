@@ -43,11 +43,7 @@ public:
         mask(nullptr)
     {
     }
-    ~LunaImage()
-    {
-        clearInternal();
-        // TODO: Send UID to GL Renderer to trigger texture deletion
-    }
+    virtual ~LunaImage();
     
     HBITMAP asHBITMAP();
     uint64_t getUID() { return uid; }

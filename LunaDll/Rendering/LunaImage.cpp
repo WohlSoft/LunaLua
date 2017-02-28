@@ -94,6 +94,10 @@ void LunaImage::load(const wchar_t* file)
 
 void LunaImage::clearInternal()
 {
+    if (mask)
+    {
+        mask = nullptr;
+    }
     if (hbmp != nullptr)
     {
         // If we hae a hbmp, then it's where data is allocated so we only need
@@ -188,4 +192,13 @@ void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask
             g_GLEngine.QueueCmd(obj);
         }
     }
+}
+
+LunaImage::~LunaImage()
+{
+    if (g_GLEngine.IsEnabled())
+    {
+        g_GLEngine.NotifyTextureDeletion(uid);
+    }
+    clearInternal();
 }

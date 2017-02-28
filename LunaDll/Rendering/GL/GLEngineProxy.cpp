@@ -51,6 +51,13 @@ void GLEngineProxy::ThreadMain() {
             else {
                 mSkipFrame = false;
             }
+
+            // Clean up deleted textures if any
+            while (!mDeletedTextures.empty())
+            {
+                uint64_t uid = mDeletedTextures.pop();
+                g_GLTextureStore.ClearLunaImageTexture(uid);
+            }
         }
 
         mQueue.pop();
