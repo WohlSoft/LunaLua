@@ -169,9 +169,6 @@ static unsigned int __stdcall LatePatch(void)
     // after we have the VB runtime running.
     fixup_ErrorReporting();
 
-    // Get initial HDCs set up...
-    ImageLoader::Run(true);
-
     // Be sure that all values are init.
     ResetLunaModule();
 
@@ -513,7 +510,7 @@ void TrySkipPatch()
     // ----------------------------------------------------------------------//
 
     // Calls to loadDefaultGraphics
-    PATCH(0x8BF327).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8BF327).CALL(&runtimeHookLoadDefaultGraphics).Apply();
     // Calls to loadDefaultWorldGraphics
     PATCH(0x8DEF6E).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0x8E3204).NOP_PAD_TO_SIZE<5>().Apply();

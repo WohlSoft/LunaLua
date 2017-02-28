@@ -192,5 +192,7 @@ void __stdcall runtimeHookSetHDCRaw(void);
 void __stdcall runtimeHookInitGameHDC(void);
 void __stdcall runtimeHookInitGameWindow(void);
 
+void __stdcall runtimeHookLoadDefaultGraphics(void);
+
 #endif
 

@@ -1475,3 +1475,14 @@ void __stdcall runtimeHookInitGameWindow(void)
     auto initGameWindow = (void(__stdcall *)(void)) (void*)0x96AD80;
     initGameWindow();
 }
+
+void __stdcall runtimeHookLoadDefaultGraphics(void)
+{
+    bool initDone = false;
+    if (!initDone)
+    {
+        // Get initial HDCs set up...
+        ImageLoader::Run(true);
+        initDone = true;
+    }
+}
