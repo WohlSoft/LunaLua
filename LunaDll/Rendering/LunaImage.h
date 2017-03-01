@@ -55,6 +55,10 @@ public:
     std::shared_ptr<LunaImage> getMask() { return mask; }
     void setMask(std::shared_ptr<LunaImage> _mask) { mask = std::move(_mask); }
 
+    // Function to attempt to convert an image with mask, into RGBA without
+    // mask, but only if it's completely safe to do so without inaccuracy.
+    bool tryMaskToRGBA();
+
     // Basic draw operation
     void draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
 };

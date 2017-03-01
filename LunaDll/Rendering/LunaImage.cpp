@@ -135,6 +135,67 @@ HBITMAP LunaImage::asHBITMAP()
     return hbmp;
 }
 
+bool LunaImage::tryMaskToRGBA()
+{
+    if (data == nullptr) return false;
+    if ((!mask) || (mask->data == nullptr)) return false;
+    if ((h != mask->h) || (w != mask->w)) return false;
+
+    uint32_t byteCount = 4*w*h;
+    for (uint32_t idx = 0; idx < byteCount; idx += 4)
+    {
+        uint32_t mainPix = (
+            ((uint32_t)(((uint8_t*)data)[idx + 0]) << 16) |
+            ((uint32_t)(((uint8_t*)data)[idx + 1]) << 8) |
+            ((uint32_t)(((uint8_t*)data)[idx + 2]) << 0)
+            );
+        uint32_t maskPix = (
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 0]) << 16) |
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 1]) << 8) |
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 2]) << 0)
+            );
+
+        // Transparent
+        if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF)) continue;
+
+        // Dark bits in the image, that the mask doesn't mask, are bad
+        if (((mainPix ^ 0xFFFFFF) & maskPix) != 0) return false;
+    }
+
+    // Set up alpha channel correctly
+    for (uint32_t idx = 0; idx < byteCount; idx += 4)
+    {
+        uint32_t mainPix = (
+            ((uint32_t)(((uint8_t*)data)[idx + 0]) << 16) |
+            ((uint32_t)(((uint8_t*)data)[idx + 1]) << 8) |
+            ((uint32_t)(((uint8_t*)data)[idx + 2]) << 0)
+            );
+        uint32_t maskPix = (
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 0]) << 16) |
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 1]) << 8) |
+            ((uint32_t)(((uint8_t*)mask->data)[idx + 2]) << 0)
+            );
+
+        // Transparent
+        if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF))
+        {
+            ((uint8_t*)data)[idx + 0] = 0x00;
+            ((uint8_t*)data)[idx + 1] = 0x00;
+            ((uint8_t*)data)[idx + 2] = 0x00;
+            ((uint8_t*)data)[idx + 3] = 0x00;
+        }
+        else
+        {
+            ((uint8_t*)data)[idx + 3] = 0xFF;
+        }
+    }
+
+    // Toss out the mask
+    mask = nullptr;
+
+    return true;
+}
+
 void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
 {
     if (g_GLEngine.IsEnabled())
