@@ -76,8 +76,6 @@ HardcodedGraphicsManager gGraphManager;
 
 SHMemServer gShMemServer;
 
-RenderOverrideManager gRenderOverride;
-
 FreeImageInit        gFreeImgInit;
 
 GeneralLunaConfig    gGeneralConfig;

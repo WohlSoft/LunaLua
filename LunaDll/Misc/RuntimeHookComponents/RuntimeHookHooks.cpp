@@ -581,11 +581,6 @@ extern void __stdcall LoadLocalGfxHook()
     // In the past, we would call native_loadLocalGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();
-
-    // Load render override graphics
-    gRenderOverride.loadLevelGFX();
-    gRenderOverride.loadWorldGFX();
-    gRenderOverride.loadHardcodedOverrides();
 }
 
 
@@ -598,9 +593,6 @@ extern void __stdcall LoadLocalOverworldGfxHook()
     // In the past, we would call native_loadWorldGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();
-
-    // Load render override graphics
-    gRenderOverride.loadWorldGFX();
 }
 
 extern BOOL __stdcall BitBltTraceHook(

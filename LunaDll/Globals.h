@@ -114,7 +114,6 @@ extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
-extern RenderOverrideManager gRenderOverride;
 extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
 
