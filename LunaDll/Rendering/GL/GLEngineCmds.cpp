@@ -32,6 +32,10 @@ void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
     glEngine.EndFrame(mHdcDest);
 }
 
+void GLEngineCmd_InitForHDC::run(GLEngine& glEngine) const {
+    glEngine.InitForHDC(mHdcDest);
+}
+
 void GLEngineCmd_EmulateBitBlt::run(GLEngine& glEngine) const {
     if (!g_GLContextManager.IsInitialized()) return;
 

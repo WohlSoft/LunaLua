@@ -1058,6 +1058,9 @@ namespace LuaProxy {
         double height(lua_State* L) const;
         void setHeight(double height, lua_State* L);
 
+        bool visible(lua_State* L) const;
+        void setVisible(bool visible, lua_State* L);
+
         bool isValid() const;
         bool isValid_throw(lua_State *L) const;
 
@@ -1097,6 +1100,8 @@ namespace LuaProxy {
         void setBottomExitType(ExitType bottomExitType);
         ExitType rightExitType() const;
         void setRightExitType(ExitType rightExitType);
+        bool visible() const;
+        void setVisible(bool isHidden);
         short levelWarpNumber() const;
         void setLevelWarpNumber(short levelWarpNumber);
         bool isPathBackground() const;

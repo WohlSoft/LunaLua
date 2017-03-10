@@ -6,7 +6,7 @@
 
 std::string LuaProxy::Native::getSMBXPath()
 {
-    return gAppPathUTF8;//WStr2Str(std::wstring(getModulePath()));
+    return gAppPathUTF8;
 }
 
 void LuaProxy::Native::simulateError(short errcode)

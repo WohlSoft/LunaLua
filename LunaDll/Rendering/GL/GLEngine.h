@@ -32,6 +32,7 @@ public:
 
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 
+    void InitForHDC(HDC hdcDest);
     BOOL RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);

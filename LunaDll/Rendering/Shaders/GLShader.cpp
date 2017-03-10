@@ -289,4 +289,7 @@ void GLShader::load()
 
     m_isValid = true; // Success!
     m_shaderID = program;
+
+    glFinish();
+
 }

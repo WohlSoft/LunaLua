@@ -235,6 +235,20 @@ void LuaProxy::LevelObject::setRightExitType(ExitType rightExitType)
     SMBXLevel::get(m_index)->rightExitType = rightExitType;
 }
 
+bool LuaProxy::LevelObject::visible() const
+{
+    if (!isValid())
+        return false;
+    return static_cast<bool>(SMBXLevel::get(m_index)->visible);
+}
+
+void LuaProxy::LevelObject::setVisible(bool isHidden)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->visible = COMBOOL(isHidden);
+}
+
 short LuaProxy::LevelObject::levelWarpNumber() const
 {
     if (!isValid())

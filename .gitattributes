@@ -3,6 +3,8 @@
 ###############################################################################
 * text=auto
 
+*.h       linguist-language=cpp
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
@@ -61,3 +63,28 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Skip
+*.bat          linguist-vendored
+*.sh           linguist-vendored
+*.ini          linguist-vendored
+*.pro          linguist-vendored
+*.txt          linguist-vendored
+*.dpr          linguist-vendored
+*.dfm          linguist-vendored
+*.pas          linguist-vendored
+*.pri          linguist-vendored
+*.htm*         linguist-vendored
+*.xml          linguist-vendored
+*.*proj        linguist-vendored
+*.filters      linguist-vendored
+*.cs           linguist-vendored
+*.csproj       linguist-vendored
+*.resx         linguist-vendored
+appveyor.yml   linguist-vendored
+LunaDll/libs/* linguist-vendored
+luadoc/*       linguist-vendored
+ini_examples/* linguist-vendored
+HelpLua/*      linguist-vendored
+HelpAutocode/* linguist-vendored
+Analysis/*     linguist-vendored
