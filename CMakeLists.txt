@@ -76,6 +76,9 @@ target_link_libraries(LunaLuaLib ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.
 # Set nlohmann json dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/json)
 
+# Set boost dependency
+include_directories(${BoostSourceDir})
+
 # Additional windows depedencies
 target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib)
 
