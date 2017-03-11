@@ -1,28 +1,47 @@
-version: 0.7.3.1.{build}
-branches:
-  only:
-  - master
-skip_tags: true
+- 
+  version: 0.7.3.1.{build}
+  branches:
+    only:
+    - master
+  skip_tags: true
 
-os: Visual Studio 2015
-configuration: Release
+  os: Visual Studio 2015
+  configuration: Release
 
-clone_depth: 1
+  clone_depth: 1
 
-clone_folder: C:\_Repos\LunaLUA
+  clone_folder: C:\_Repos\LunaLUA
 
-build:
-  project: LunaDll.sln
-  verbosity: minimal
+  build:
+    project: LunaDll.sln
+    verbosity: minimal
+
+  after_build:
+  - cmd: deploy-full.bat nopause
+
+  artifacts:
+  - path: LunaLUA-bin.zip
+  - path: LunaLoader-bin.zip
+  - path: Release\LunaDLL.dll
+
+  deploy:
+  - provider: Environment
+    name: WohlnetFTP
+
+- 
+  version: 0.7.3.1.{build}
+  branches:
+    only:
+    - cleanup
+  skip_tags: true
   
-after_build:
-- cmd: deploy-full.bat nopause
-
-artifacts:
-- path: LunaLUA-bin.zip
-- path: LunaLoader-bin.zip
-- path: Release\LunaDLL.dll
-
-deploy:
-- provider: Environment
-  name: WohlnetFTP
+  os: Visual Studio 2017
+  
+  clone_depth: 1
+  clone_folder: C:\_Repos\LunaLUA
+  
+  build_script:
+  - cmd: mkdir build-appveyor-vs2017
+  - cmd: cd build-appveyor-vs2017
+  - cmd: cmake ../. -G "Visual Studio 15 2017"
+  - cmd: cmake --build . --config release
