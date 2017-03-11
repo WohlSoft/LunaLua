@@ -20,16 +20,6 @@ GLEngine::GLEngine() :
 GLEngine::~GLEngine() {
 }
 
-void GLEngine::ClearSMBXSprites() {
-    g_GLDraw.UnbindTexture();
-    g_GLTextureStore.ClearSMBXSprites();
-}
-
-void GLEngine::ClearLunaTexture(const BMPBox& bmp) {
-    g_GLDraw.UnbindTexture();
-    g_GLTextureStore.ClearLunaTexture(bmp);
-}
-
 void GLEngine::InitForHDC(HDC hdcDest)
 {
     static bool runOnce = true;

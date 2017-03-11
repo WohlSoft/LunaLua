@@ -8,7 +8,6 @@
 #include "Logging/Logging.h"
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
-#include "Rendering/RenderOverrideManager.h"
 
 HINSTANCE gHInstance;
 

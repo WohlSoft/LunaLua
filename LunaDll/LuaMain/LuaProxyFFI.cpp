@@ -20,9 +20,10 @@ extern "C" {
         gLunaRender.GLCmd(obj);
     }
 
-    FFI_EXPORT(uint32_t*) LunaLuaGetImageResourceBits(uintptr_t bmpBoxIntPtr) {
+    // LUNAIMAGE_TODO: Implement this for LunaImage
+    /*FFI_EXPORT(uint32_t*) LunaLuaGetImageResourceBits(uintptr_t bmpBoxIntPtr) {
         return reinterpret_cast<uint32_t*>(reinterpret_cast<BMPBox*>(bmpBoxIntPtr)->getBits());
-    }
+    }*/
 
 
 }

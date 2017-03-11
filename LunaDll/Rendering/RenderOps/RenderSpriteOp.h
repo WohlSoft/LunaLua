@@ -2,7 +2,7 @@
 #define RenderSpriteOp_H
 
 #include "RenderOp.h"
-class SMBXMaskedImage;
+class LunaImage;
 
 class RenderSpriteOp : public RenderOp {
 public:
@@ -18,7 +18,7 @@ public:
 
     bool   sceneCoords;     // If true, x and y are scene coordinates
 
-    SMBXMaskedImage* sprite;
+    std::shared_ptr<LunaImage> sprite;
 };
 
 #endif

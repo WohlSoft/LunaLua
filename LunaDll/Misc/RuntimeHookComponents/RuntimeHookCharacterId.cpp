@@ -7,8 +7,8 @@
 #include "../../SMBXInternal/Animation.h"
 #include "../../Defines.h"
 #include "../RuntimeHook.h"
-#include "../../Rendering/BMPBox.h"
-#include "../../Rendering/SMBXMaskedImage.h"
+#include "../../Rendering/ImageLoader.h"
+#include "../../Rendering/LunaImage.h"
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
@@ -45,7 +45,7 @@ static int __stdcall EffectUpdateHook(short* effectId);
 // Data structures
 struct CharacterDataStruct {
 public:
-    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect, const std::vector<SMBXMaskedImage*> &sprites, SMBXMaskedImage* owSprite)
+    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect)
     {
         mId = id;
         mName = name;
@@ -60,16 +60,14 @@ public:
         mStoredTemplate.MountType = 0;
         mStoredTemplate.MountColor = 0;
         mStoredTemplate.Hearts = 1;
-        mSprites = sprites;
-        mOwSprite = owSprite;
     }
     ~CharacterDataStruct()
     {
         for (int powerupId = 1; powerupId <= 10; powerupId++)
         {
-            SMBXMaskedImage::UnregisterCustomOverridable(mName, powerupId);
+            ImageLoader::UnregisterExtraGfx(mName + "-" + std::to_string(powerupId));
         }
-        SMBXMaskedImage::UnregisterCustomOverridable("player", mId);
+        ImageLoader::UnregisterExtraGfx("player-" + std::to_string(mId));
     }
 public:
     short mId;
@@ -78,8 +76,6 @@ public:
     short mFilterBlock;
     short mSwitchBlock;
     short mDeathEffect;
-    std::vector<SMBXMaskedImage*> mSprites;
-    SMBXMaskedImage* mOwSprite;
     PlayerMOB mStoredTemplate;
 };
 
@@ -2262,13 +2258,12 @@ static BOOL __stdcall PlayerBitBltHook(
         if (it != runtimeHookCharacterIdMap.end())
         {
             // If we have a custom character with this character ID...
-            const std::vector<SMBXMaskedImage*>& sprites = it->second->mSprites;
-            short powerupIdx = player->CurrentPowerup - 1;
-            if (powerupIdx >= 0 && (unsigned long)powerupIdx < sprites.size() && sprites[powerupIdx])
+            std::shared_ptr<LunaImage> sprite = ImageLoader::GetByName(it->second->mName + "-" + std::to_string(player->CurrentPowerup));
+            if (sprite)
             {
                 // If we have a valid sprite for this powerup...
                 if (GM_PLAYER_SHADOWSTAR || (dwRop != SRCAND)) {
-                    sprites[powerupIdx]->DrawWithOverride(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, true, true);
+                    sprite->draw(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc);
                 }
                 return TRUE;
             }
@@ -2294,12 +2289,12 @@ static BOOL __stdcall OwSpriteBitBltHook(
         if (it != runtimeHookCharacterIdMap.end())
         {
             // If we have a custom character with this character ID...
-            SMBXMaskedImage* owSprite = it->second->mOwSprite;
+            std::shared_ptr<LunaImage> owSprite = ImageLoader::GetByName("player-" + std::to_string(it->second->mId));
             if (owSprite)
             {
                 // If we have a valid overworld sprite...
                 if (dwRop != SRCAND) {
-                    owSprite->DrawWithOverride(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, true, true);
+                    owSprite->draw(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc);
                 }
                 return TRUE;
             }
@@ -2377,61 +2372,28 @@ static void runtimeHookCharacterIdUnpplyPatch(void)
 void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect)
 {
     // Load Sprites
-    std::vector<SMBXMaskedImage*> sprites;
     if (name.size() > 0)
     {
-        std::wstring wName = Str2WStr(name);
-        std::vector<std::wstring> searchPath;
-        if (!gIsOverworld)
-            searchPath.push_back(getCustomFolderPath()); // Check custom folder
-        searchPath.push_back(GM_FULLDIR); // Check episode dir
-        searchPath.push_back(gAppPathWCHAR + L"\\graphics\\" + wName + L"\\"); // Check base game
-
         for (int powerupId = 1; powerupId <= 10; powerupId++)
         {
-            std::shared_ptr<BMPBox> img = nullptr;
-            for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
-            {
-                std::wstring imgPath = *pathIt + wName + L"-" + std::to_wstring(powerupId) + L".png";
-                img = BMPBox::loadShared(imgPath);
-                if (img)
-                {
-                    break;
-                }
-            }
-            sprites.push_back(SMBXMaskedImage::RegisterCustomOverridable(name, powerupId, img));
+            ImageLoader::RegisterExtraGfx(name, name + "-" + std::to_string(powerupId));
         }
     }
 
     // Load overworld sprite
-    SMBXMaskedImage* owsprite = nullptr;
+    std::shared_ptr<LunaImage> owsprite = nullptr;
     {
-        std::wstring wName = Str2WStr(name);
-        std::vector<std::wstring> searchPath;
-        if (!gIsOverworld)
-            searchPath.push_back(getCustomFolderPath()); // Check custom folder
-        searchPath.push_back(GM_FULLDIR); // Check episode dir
-        searchPath.push_back(gAppPathWCHAR + L"\\graphics\\player\\"); // Check base game
-
-        for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
-        {
-            std::wstring imgPath = *pathIt + L"player-" + std::to_wstring(id) + L".png";
-            std::shared_ptr<BMPBox> img = BMPBox::loadShared(imgPath);
-            if (img)
-            {
-                owsprite = SMBXMaskedImage::RegisterCustomOverridable("player", id, img);
-                break;
-            }
-        }
+        ImageLoader::RegisterExtraGfx("player", "player-" + std::to_string(id));
     }
 
     // Set death effect size based on death effect image
     if (deathEffect > 0) {
-        SMBXMaskedImage* maskedImg = SMBXMaskedImage::GetByName("effect", deathEffect);
-        if (maskedImg != nullptr)
+        std::shared_ptr<LunaImage> deathImage = ImageLoader::GetByName("effect-" + std::to_string(deathEffect));
+        if (deathImage)
         {
             int w, h;
-            maskedImg->getSize(w, h);
+            w = deathImage->getW();
+            h = deathImage->getH();
 
             // If the base character is 5, there are left/right frames
             if (base == 5)
@@ -2447,7 +2409,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     // Switch blocks are generally bumpable
     if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
 
-    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect, sprites, owsprite);
+    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect);
     runtimeHookCharacterIdApplyPatch();
 }
 

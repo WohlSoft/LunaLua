@@ -7,7 +7,7 @@
 #include "../Defines.h"
 #include "../SMBXInternal/Level.h"
 #include "../Misc/MiscFuncs.h"
-#include "BMPBox.h"
+#include "LunaImage.h"
 #include "RenderOps/RenderOp.h"
 #include "RenderOps/RenderRectOp.h"
 #include "RenderOps/RenderGLOp.h"
@@ -38,7 +38,10 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int 
 
         auto it = m_legacyResourceCodeImages.find(resource_code);
         if (it != m_legacyResourceCodeImages.end()) {
-            it->second->MakeColorTransparent(transparency_color);
+            
+            //it->second->MakeColorTransparent(transparency_color);
+
+            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
         }
         return true;
     }
@@ -63,9 +66,9 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 
     //MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
     // Create and store the image resource
-    std::shared_ptr<BMPBox> pNewbox = BMPBox::loadShared(full_path);
+    std::shared_ptr<LunaImage> pNewbox = LunaImage::fromFile(full_path.c_str());
     if (!pNewbox) {
-        gLogger.Log(L"BMPBox image load failed", LOG_STD);
+        gLogger.Log(L"LunaImage image load failed", LOG_STD);
         return false;
     }
 
@@ -75,7 +78,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
 }
 
 //STORE IMAGE
-void Renderer::StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code) {
+void Renderer::StoreImage(const std::shared_ptr<LunaImage>& bmp, int resource_code) {
     m_legacyResourceCodeImages[resource_code] = bmp;
 }
 
@@ -89,7 +92,7 @@ bool Renderer::DeleteImage(int resource_code) {
     return false;
 }
 
-std::shared_ptr<BMPBox> Renderer::GetImageForResourceCode(int resource_code)
+std::shared_ptr<LunaImage> Renderer::GetImageForResourceCode(int resource_code)
 {
     auto it = m_legacyResourceCodeImages.find(resource_code);
     if (it != m_legacyResourceCodeImages.end())
@@ -100,30 +103,34 @@ std::shared_ptr<BMPBox> Renderer::GetImageForResourceCode(int resource_code)
 }
 
 
-std::vector<std::shared_ptr<BMPBox>> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
+std::vector<std::shared_ptr<LunaImage>> Renderer::LoadAnimatedBitmapResource(std::wstring filename, int* frameTime)
 {
     // construct full filepath
     
     std::wstring full_path = resolveIfNotAbsolutePath(filename);
 
-
+    /*
     std::tuple<std::vector<HBITMAP>, int> ret = LoadAnimatedGfx(filename);
     std::vector<HBITMAP>& bitmaps = std::get<0>(ret);
     if (frameTime) {
         double avgFrameTime = (double)std::get<1>(ret);
         *frameTime = (int)((avgFrameTime / 100) * 65);
     }
+    */
 
-    std::vector<std::shared_ptr<BMPBox>> bitmapList;
-    for (HBITMAP nextBitmap : bitmaps) {
-        std::shared_ptr<BMPBox> pNewbox = std::make_shared<BMPBox>(nextBitmap, GetScreenDC());
+    std::vector<std::shared_ptr<LunaImage>> bitmapList;
+    /*for (HBITMAP nextBitmap : bitmaps) {
+        std::shared_ptr<LunaImage> pNewbox = std::make_shared<LunaImage>(nextBitmap, GetScreenDC());
         pNewbox->m_Filename = filename;
         if (!pNewbox->ImageLoaded() == false) {
             gLogger.Log(L"BMPBox image load failed", LOG_STD);
             continue;
         }
         bitmapList.push_back(pNewbox);
-    }
+    }*/
+
+    // LUNAIMAGE_TODO: Make this work for LunaImage.... also probably doesn't belong in this file
+    
     return bitmapList;
 }
 

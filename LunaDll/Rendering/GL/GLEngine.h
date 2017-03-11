@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <functional>
 #include "GLDraw.h"
-#include "../BMPBox.h"
 #include "../AsyncGifRecorder.h"
 
 typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
@@ -27,8 +26,6 @@ private:
 public:
     GLEngine();
     ~GLEngine();
-    void ClearSMBXSprites();
-    void ClearLunaTexture(const BMPBox& bmp);
 
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 

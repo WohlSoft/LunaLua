@@ -1,5 +1,5 @@
 #include "RenderBitmapOp.h"
-#include "../BMPBox.h"
+#include "../LunaImage.h"
 #include "../../Globals.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../GL/GLEngine.h"
@@ -21,7 +21,7 @@ RenderBitmapOp::RenderBitmapOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
 
 // DRAW
 void RenderBitmapOp::Draw(Renderer* renderer) {
-    if (!direct_img || !direct_img->ImageLoaded() || !direct_img->m_hdc) {
+    if (!direct_img || (direct_img->getH() == 0) || (direct_img->getW() == 0)) {
         return;
     }
     
@@ -35,10 +35,6 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         SMBX_CameraInfo::transformSceneToScreen(renderer->GetCameraIdx(), screenX, screenY);
     }
 
-    //BitBlt(renderer->m_hScreenDC, (int)x, (int)y, bmp->m_W, bmp->m_H, bmp->m_hdc, 0, 0, SRCCOPY);
-    //TransparentBlt(renderer->m_hScreenDC, (int)x, (int)y, (int)sx2, (int)sy2,
-    //    bmp->m_hdc, (int)sx1, (int)sy1, (int)sx2, (int)sy2, bmp->m_TransColor);
-
     // Get integer values as current rendering backends prefer that
     int x = static_cast<int>(round(screenX));
     int y = static_cast<int>(round(screenY));
@@ -48,13 +44,13 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     int height = static_cast<int>(round(this->sh));
 
     // Trim height/width if necessary
-    if (direct_img->m_W < width + sx)
+    if (direct_img->getW() < width + sx)
     {
-        width = direct_img->m_W - sx;
+        width = direct_img->getW() - sx;
     }
-    if (direct_img->m_H < height + sy)
+    if (direct_img->getH() < height + sy)
     {
-        height = direct_img->m_H - sy;
+        height = direct_img->getH() - sy;
     }
 
     // Don't render if no size
@@ -65,12 +61,28 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
 
     if (g_GLEngine.IsEnabled())
     {
-        g_GLEngine.DrawLunaSprite(
-            x, y, width, height,
-            *(direct_img.get()), sx, sy, width, height, opacity);
+        // LUNAIMAGE_TODO: Support masked images from RenderBitmapOp
+        // (Will need to think about how to handle the opacity argument)
+
+        auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
+        obj->mXDest = x;
+        obj->mYDest = y;
+        obj->mWidthDest = width;
+        obj->mHeightDest = height;
+        obj->mXSrc = sx;
+        obj->mYSrc = sy;
+        obj->mWidthSrc = width;
+        obj->mHeightSrc = height;
+
+        obj->mImg = direct_img;
+        obj->mOpacity = opacity;
+        obj->mMode = GLDraw::RENDER_MODE_ALPHA;
+        g_GLEngine.QueueCmd(obj);
     }
     else
     {
+        // LUNAIMAGE_TODO: Support GDI renderer
+        /*
         BLENDFUNCTION bf;
         bf.BlendOp = AC_SRC_OVER;
         bf.BlendFlags = 0;
@@ -78,5 +90,6 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         bf.AlphaFormat = AC_SRC_ALPHA;
         AlphaBlend(renderer->GetScreenDC(), x, y, width, height,
             direct_img->m_hdc, sx, sy, width, height, bf);
+        */
     }
 }

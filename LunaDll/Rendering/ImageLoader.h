@@ -6,6 +6,8 @@
 #include "SMBXImageCategories.h"
 #include "../Misc/ResourceFileMapper.h"
 
+class LunaImage;
+
 class ImageLoaderCategory
 {
 private:
@@ -29,8 +31,15 @@ private:
 
 class ImageLoader
 {
-public:
-    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> loadedImages;
+private:
+    static std::unordered_map<std::string, std::shared_ptr<LunaImage>> m_ExtraGfx;
+    static std::unordered_map<std::string, std::shared_ptr<LunaImage>> m_ExtraGfxOverride;
+    static std::unordered_map<std::string, uintptr_t>                  m_NameToHDC;
+    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   m_GfxOverride;
+    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   m_Gfx;
+
+    friend ImageLoaderCategory;
+
 public:
     ImageLoader & operator=(const ImageLoader&) = delete;
     ImageLoader(const ImageLoader&) = delete;
@@ -39,10 +48,16 @@ public:
     static void Run(bool initialLoad = false);
     static void ResolveHardcodedGfx(std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData);
     static void LoadHardcodedGfx(const std::unordered_map<std::wstring, ResourceFileInfo>* fileData, const std::unordered_map<std::wstring, ResourceFileInfo>* oldFileData);
-    static std::shared_ptr<LunaImage> GetByHDC(HDC hdc);
+    static std::shared_ptr<LunaImage> GetByHDC(HDC hdc, bool bypassOverride=false);
 
-    // TODO: Implement override system
-    // TODO: Implement get-by-* queries similar to SMBXMaskedImage
+    static std::shared_ptr<LunaImage> GetCharacterSprite(short charId, short powerup);
+
+    static void RegisterExtraGfx(const std::string& folderName, const std::string& name);
+    static void UnregisterExtraGfx(const std::string& name);
+
+    static std::shared_ptr<LunaImage> GetByName(const std::string& name, bool bypassOverride=false);
+    static bool OverrideByName(const std::string& name, const std::shared_ptr<LunaImage>& img);
+    // LUNAIMAGE_TODO: Test new override system better
 };
 
 #endif

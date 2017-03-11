@@ -1312,16 +1312,6 @@ namespace LuaProxy {
     }
 
     namespace Graphics{
-        class LuaImageResource {
-        public:
-            std::shared_ptr<BMPBox> img;
-            LuaImageResource(const std::shared_ptr<BMPBox>& img);
-            ~LuaImageResource();
-            int GetWidth() const;
-            int GetHeight() const;
-            uintptr_t __BMPBoxPtr();
-
-        };
         enum RENDER_TYPE {
             RTYPE_IMAGE,
             RTYPE_TEXT
@@ -1334,44 +1324,44 @@ namespace LuaProxy {
         //CSprite functions
         bool loadImage(const std::string&, int resNumber, int transColor);
         luabind::object loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L);
-        LuaImageResource* loadImage(const std::string&, lua_State* L);
+        std::shared_ptr<LunaImage> loadImage(const std::string&, lua_State* L);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra, int time);
         void placeSprite(int type, int imgResource, int xPos, int yPos, const std::string& extra);
         void placeSprite(int type, int imgResource, int xPos, int yPos);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra, int time);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos, const std::string& extra);
-        void placeSprite(int type, const LuaImageResource& img, int xPos, int yPos);
-        void unplaceSprites(const LuaImageResource& img, int xPos, int yPos);
-        void unplaceSprites(const LuaImageResource& img);
-        luabind::object getPixelData(const LuaImageResource& img, int& width, int& height, lua_State *L);
+        void placeSprite(int type, const std::shared_ptr<LunaImage>& img, int xPos, int yPos, const std::string& extra, int time);
+        void placeSprite(int type, const std::shared_ptr<LunaImage>& img, int xPos, int yPos, const std::string& extra);
+        void placeSprite(int type, const std::shared_ptr<LunaImage>& img, int xPos, int yPos);
+        void unplaceSprites(const std::shared_ptr<LunaImage>& img, int xPos, int yPos);
+        void unplaceSprites(const std::shared_ptr<LunaImage>& img);
+        luabind::object getPixelData(const std::shared_ptr<LunaImage>& img, int& width, int& height, lua_State *L);
 
-        void drawImage(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
-        void drawImage(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L);
-        void drawImage(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
-        void drawImage(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
-        void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double priority, lua_State* L);
-        void drawImageWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
-        void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
-        void drawImageWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, float opacity, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
-        void drawImageToScene(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
-        void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double priority, lua_State* L);
-        void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
-        void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
-        void drawImageToSceneWP(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
-        void drawImageGeneric(const LuaImageResource& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
+        void drawImage(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, lua_State* L);
+        void drawImage(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, float opacity, lua_State* L);
+        void drawImage(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
+        void drawImage(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
+        void drawImageWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double priority, lua_State* L);
+        void drawImageWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
+        void drawImageWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
+        void drawImageWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
+        void drawImageToScene(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, lua_State* L);
+        void drawImageToScene(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, float opacity, lua_State* L);
+        void drawImageToScene(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, lua_State* L);
+        void drawImageToScene(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, lua_State* L);
+        void drawImageToSceneWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double priority, lua_State* L);
+        void drawImageToSceneWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, float opacity, double priority, lua_State* L);
+        void drawImageToSceneWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, double priority, lua_State* L);
+        void drawImageToSceneWP(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, double priority, lua_State* L);
+        void drawImageGeneric(const std::shared_ptr<LunaImage>& img, double xPos, double yPos, double sourceX, double sourceY, double sourceWidth, double sourceHeight, float opacity, bool sceneCoords, double priority, lua_State* L);
         void draw(const luabind::object& namedArgs, lua_State* L);
 
         bool isOpenGLEnabled();
-        void glSetTexture(const LuaImageResource* img, uint32_t color);
-        void glSetTextureRGBA(const LuaImageResource* img, uint32_t color);
+        void glSetTexture(const std::shared_ptr<LunaImage>& img, uint32_t color);
+        void glSetTextureRGBA(const std::shared_ptr<LunaImage>& img, uint32_t color);
         void __glInternalDraw(const luabind::object& namedArgs, lua_State* L);
-        void __setSpriteOverride(const std::string& type, int index, const luabind::object& img, lua_State* L);
-        void __setHardcodedSpriteOverride(const std::string& name, const luabind::object& overrideImg, lua_State* L);
-        luabind::object __getHardcodedSpriteOverride(const std::string& name, lua_State* L);
-        luabind::object __getSpriteOverride(const std::string& type, int index, lua_State* L);
+        void __setSpriteOverride(const std::string& type, int index, std::shared_ptr<LunaImage>* pimg, lua_State* L);
+        void __setHardcodedSpriteOverride(const std::string& name, std::shared_ptr<LunaImage>* poverrideImg, lua_State* L);
+        std::shared_ptr<LunaImage> __getHardcodedSpriteOverride(const std::string& name, lua_State* L);
+        std::shared_ptr<LunaImage> __getSpriteOverride(const std::string& type, int index, lua_State* L);
     }
 
     namespace Effects{

@@ -19,8 +19,6 @@
 
 #include "../RunningStat.h"
 #include "../../Rendering/BitBltEmulation.h"
-#include "../../Rendering/RenderOverrideManager.h"
-#include "../../Rendering/SMBXMaskedImage.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
 
@@ -574,10 +572,6 @@ extern void __stdcall recordVBErrCode(int errCode)
 
 extern void __stdcall LoadLocalGfxHook()
 {
-    // Clear data based on loaded SMBX sprites
-    g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::ClearLookupTable();
-
     // In the past, we would call native_loadLocalGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();
@@ -586,10 +580,6 @@ extern void __stdcall LoadLocalGfxHook()
 
 extern void __stdcall LoadLocalOverworldGfxHook()
 {
-    // Clear data based on loaded SMBX sprites
-    g_GLEngine.ClearSMBXSprites();
-    SMBXMaskedImage::ClearLookupTable();
-
     // In the past, we would call native_loadWorldGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();

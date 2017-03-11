@@ -220,9 +220,6 @@
     <ClInclude Include="SMBXInternal\PlayerMOB.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\BMPBox.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\Rendering.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -382,9 +379,6 @@
     <ClInclude Include="SMBXInternal\CustomGraphics.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\RenderOverrideManager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Misc\FreeImageUtils\FreeImageInit.h">
       <Filter>Misc\FreeImageUtils</Filter>
     </ClInclude>
@@ -498,9 +492,6 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\AsyncGifRecorder.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="Rendering\SMBXMaskedImage.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="SMBXInternal\BaseItemArray.h">
@@ -717,9 +708,6 @@
     <ClCompile Include="SMBXInternal\PlayerMOB.cpp">
       <Filter>SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\BMPBox.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\Rendering.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -909,9 +897,6 @@
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp">
       <Filter>SMBXInternal</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\RenderOverrideManager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Misc\FreeImageUtils\FreeImageInit.cpp">
       <Filter>Misc\FreeImageUtils</Filter>
     </ClCompile>
@@ -1019,9 +1004,6 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\AsyncGifRecorder.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\SMBXMaskedImage.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp">

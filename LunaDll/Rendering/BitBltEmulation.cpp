@@ -1,11 +1,9 @@
 #include "../Defines.h"
 #include "../Globals.h"
-#include "../Rendering/RenderOverrideManager.h"
 #include "../Rendering/GL/GLEngineProxy.h"
-#include "BitBltEmulation.h"
-#include "SMBXMaskedImage.h"
 #include "LunaImage.h"
 #include "Imageloader.h"
+#include "BitBltEmulation.h"
 
 // Global instance
 BitBltEmulation g_BitBltEmulation;

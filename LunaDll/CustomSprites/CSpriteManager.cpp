@@ -2,7 +2,7 @@
 #include "CSpriteManager.h"
 #include "SpritesFuncs/SpriteFuncs.h"
 #include "../Globals.h"
-#include "../Rendering/BMPBox.h"
+#include "../Rendering/LunaImage.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../Misc/MiscFuncs.h"
 
@@ -293,7 +293,7 @@ void CSpriteManager::ClearSprites(int imgResourceCode)
     }
 }
 
-void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img, int xPos, int yPos)
+void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage>& img, int xPos, int yPos)
 {
     std::list<CSprite*>::iterator iter = m_SpriteList.begin();
     std::list<CSprite*>::iterator end = m_SpriteList.end();
@@ -301,7 +301,7 @@ void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img, int xPos, 
     while (iter != m_SpriteList.end()) {
         //CSprite* spr = *iter;
         CSprite* next = *iter;
-        if (!next->m_directImg && next->m_directImg == img && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos){
+        if (!next->m_directImg && next->m_directImg->getUID() == img->getUID() && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos){
             delete (*iter);
             iter = m_SpriteList.erase(iter);
         }
@@ -312,7 +312,7 @@ void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img, int xPos, 
 }
 
 
-void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img)
+void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage>& img)
 {
     std::list<CSprite*>::iterator iter = m_SpriteList.begin();
     std::list<CSprite*>::iterator end = m_SpriteList.end();
@@ -320,7 +320,7 @@ void CSpriteManager::ClearSprites(const std::shared_ptr<BMPBox>& img)
     while (iter != m_SpriteList.end()) {
         //CSprite* spr = *iter;
         CSprite* next = *iter;
-        if (next->m_directImg == img){
+        if (next->m_directImg->getUID() == img->getUID()){
             delete (*iter);
             iter = m_SpriteList.erase(iter);
         }
@@ -345,7 +345,7 @@ void CSpriteManager::BasicInit(CSprite* spr, CSpriteRequest* pReq, bool center) 
 
 // INITIALIZE DIMENSIONS -- Resets sprite hitbox according to image. Needs img code set and image loaded
 void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
-    std::shared_ptr<BMPBox> box = spr->m_directImg;
+    std::shared_ptr<LunaImage> box = spr->m_directImg;
     if (!box) {
         box = gLunaRender.GetImageForResourceCode(spr->m_ImgResCode);
     }
@@ -354,8 +354,8 @@ void CSpriteManager::InitializeDimensions(CSprite* spr, bool center_coords) {
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;
-		rect.right = box->m_W;
-		rect.bottom = box->m_H;
+		rect.right = box->getW();
+		rect.bottom = box->getH();
 		spr->m_GfxRects.clear();
 		spr->m_GfxRects.push_back(rect);
 

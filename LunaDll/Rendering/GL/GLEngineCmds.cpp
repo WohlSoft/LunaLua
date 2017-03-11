@@ -9,17 +9,6 @@
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
-void GLEngineCmd_ClearSMBXSprites::run(GLEngine& glEngine) const {
-    glEngine.ClearSMBXSprites();
-
-    // TODO: Remove the following at a later point in time once some least-recently-used texture clearing mechanism is implemented
-    g_GLTextureStore.ClearLunaImageTextures();
-}
-
-void GLEngineCmd_ClearLunaTexture::run(GLEngine& glEngine) const {
-    glEngine.ClearLunaTexture(*mBmp);
-}
-
 void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
     glEngine.RenderCameraToScreen(
         mHdcDest,
@@ -50,36 +39,7 @@ void GLEngineCmd_EmulateBitBlt::run(GLEngine& glEngine) const {
         return;
     }
 
-    GLDraw::RenderMode mode;
-    switch (mRop) {
-    case SRCAND:
-        mode = glEngine.IsBitwiseCompatEnabled() ? GLDraw::RENDER_MODE_AND : GLDraw::RENDER_MODE_MULTIPLY;
-        break;
-    case SRCPAINT:
-        mode = glEngine.IsBitwiseCompatEnabled() ? GLDraw::RENDER_MODE_OR : GLDraw::RENDER_MODE_MAX;
-        break;
-    default:
-        mode = GLDraw::RENDER_MODE_ALPHA;
-        break;
-    }
-
-    const GLSprite* sprite = g_GLTextureStore.SpriteFromSMBXBitmap(mHdcSrc);
-    if (sprite == NULL) {
-        return;
-    }
-
-    sprite->Draw(mXDest, mYDest, mWidthDest, mHeightDest, mXSrc, mYSrc, mode);
-}
-
-void GLEngineCmd_LunaDrawSprite::run(GLEngine& glEngine) const {
-    if (!g_GLContextManager.IsInitialized()) return;
-
-    if (mBmp != nullptr)
-    {
-        const GLDraw::Texture* tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
-        if (tex == nullptr) return;
-        g_GLDraw.DrawStretched(mXDest, mYDest, mWidthDest, mHeightDest, tex, mXSrc, mYSrc, mWidthSrc, mHeightSrc, mOpacity);
-    }
+    // Now only used for blackness drawing
 }
 
 void GLEngineCmd_DrawSprite::run(GLEngine& glEngine) const {
@@ -98,9 +58,9 @@ void GLEngineCmd_DrawSprite::run(GLEngine& glEngine) const {
 void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
     if (!g_GLContextManager.IsInitialized()) return;
 
-    const GLDraw::Texture* tex = NULL;
-    if (mBmp) {
-        tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
+    const GLSprite* sprite = NULL;
+    if (mImg) {
+        sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
     }
 
     glBlendEquationANY(GL_FUNC_ADD);
@@ -108,7 +68,14 @@ void GLEngineCmd_SetTexture::run(GLEngine& glEngine) const {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
 
-    g_GLDraw.BindTexture(tex);
+    if (sprite != nullptr)
+    {
+        sprite->BindTexture();
+    }
+    else
+    {
+        g_GLDraw.UnbindTexture();
+    }
 
     float r = ((0xFF000000 & mColor) >> 24) / 255.0f;
     float g = ((0x00FF0000 & mColor) >> 16) / 255.0f;
@@ -153,9 +120,6 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     const GLSprite* sprite = NULL;
     if (mImg) {
         sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
-    }
-    else if (mBmp) {
-        tex = g_GLTextureStore.TextureFromLunaBitmap(*mBmp);
     }
     else if (mCapBuff) {
         tex = &mCapBuff->mFramebuffer->AsTexture();

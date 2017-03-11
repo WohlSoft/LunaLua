@@ -19,7 +19,7 @@
 #include "../libs/luasocket/luasocket.h"
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
-#include "../Rendering/SMBXMaskedImage.h"
+#include "../Rendering/LunaImage.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -467,9 +467,8 @@ void CLunaLua::setupDefaults()
     _G["console"] = LuaProxy::Console();
 }
 
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Graphics::LuaImageResource, LuaImageResource);
+LUAHELPER_DEF_CLASS_HELPER(LunaImage, LuaImageResource);
 LUAHELPER_DEF_CLASS_HELPER(CaptureBuffer, CaptureBuffer);
-LUAHELPER_DEF_CLASS_HELPER(SMBXMaskedImage, SMBXMaskedImage);
 LUAHELPER_DEF_CLASS_HELPER(Mix_Chunk, Mix_Chunk);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::InputConfig, NativeInputConfig);
 LUAHELPER_DEF_CLASS_HELPER(RECT, RECT);
@@ -525,45 +524,44 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("Graphics")[
-                LUAHELPER_DEF_CLASS(LuaImageResource)
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
-                    .property("width", &LuaProxy::Graphics::LuaImageResource::GetWidth)
-                    .property("height", &LuaProxy::Graphics::LuaImageResource::GetHeight)
-                    .property("__BMPBoxPtr", &LuaProxy::Graphics::LuaImageResource::__BMPBoxPtr),
-                LUAHELPER_DEF_CLASS(SMBXMaskedImage)
-                    .def("__eq", &LuaProxy::luaUserdataCompare<SMBXMaskedImage>),
+                LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(LuaImageResource, std::shared_ptr)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LunaImage>)
+                    .property("width", &LunaImage::getW)
+                    .property("height", &LunaImage::getH),
+                    // LUNAIMAGE_TODO: Implement the following property for LunaImage
+                    //.property("__BMPBoxPtr", &LunaImage::__BMPBoxPtr),
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
                     .def(constructor<int, int>())
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LuaProxy::Graphics::LuaImageResource>)
+                    .def("__eq", &LuaProxy::luaUserdataCompare<LunaImage>)
                     .def("captureAt", &CaptureBuffer::captureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
-                def("loadImage", (LuaProxy::Graphics::LuaImageResource*(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage, adopt(result)),
+                def("loadImage", (std::shared_ptr<LunaImage>(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
-                def("placeSprite", (void(*)(int, const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::placeSprite),
-                def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img))&LuaProxy::Graphics::unplaceSprites),
-                def("unplaceSprites", (void(*)(const LuaProxy::Graphics::LuaImageResource& img, int, int))&LuaProxy::Graphics::unplaceSprites),
+                def("placeSprite", (void(*)(int, const std::shared_ptr<LunaImage>&  img, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const std::shared_ptr<LunaImage>&  img, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
+                def("placeSprite", (void(*)(int, const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::placeSprite),
+                def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img))&LuaProxy::Graphics::unplaceSprites),
+                def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::unplaceSprites),
                 def("getPixelData", &LuaProxy::Graphics::getPixelData, pure_out_value(_2) + pure_out_value(_3)),
-                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, lua_State*))&LuaProxy::Graphics::drawImage),
-                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
-                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImage),
-                def("drawImage", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
-                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
-                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
-                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
-                def("drawImageWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
-                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, lua_State*))&LuaProxy::Graphics::drawImageToScene),
-                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
-                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToScene),
-                def("drawImageToScene", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
-                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
-                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
-                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
-                def("drawImageToSceneWP", (void(*)(const LuaProxy::Graphics::LuaImageResource&, double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
+                def("drawImageWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageWP),
+                def("drawImageToScene", (void(*)(const std::shared_ptr<LunaImage>& , double, double, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToScene", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToScene", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToScene", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, float, lua_State*))&LuaProxy::Graphics::drawImageToScene),
+                def("drawImageToSceneWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
+                def("drawImageToSceneWP", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, float, double, lua_State*))&LuaProxy::Graphics::drawImageToSceneWP),
                 def("draw", &LuaProxy::Graphics::draw),
                 def("isOpenGLEnabled", &LuaProxy::Graphics::isOpenGLEnabled),
                 def("glSetTexture", &LuaProxy::Graphics::glSetTexture),

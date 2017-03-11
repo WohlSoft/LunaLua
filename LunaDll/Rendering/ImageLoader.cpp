@@ -9,7 +9,11 @@
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
 
 // Loaded image map decleration
-std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>> ImageLoader::loadedImages;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfx;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfxOverride;
+std::unordered_map<std::string, uintptr_t>                  ImageLoader::m_NameToHDC;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_GfxOverride;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_Gfx;
 
 static void resolveImageResource(
     const std::wstring& basegamePath,
@@ -125,6 +129,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 {
                     mainImgHdc = CreateCompatibleDC(NULL);
                     m_Category.setImagePtr(i, mainImgHdc);
+                    ImageLoader::m_NameToHDC[WStr2Str(imageName)] = (uintptr_t)mainImgHdc;
                 }
 
                 // Try to load image
@@ -134,7 +139,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 }
 
                 // Assign image, note size
-                ImageLoader::loadedImages[(uintptr_t)mainImgHdc] = mainImg;
+                ImageLoader::m_Gfx[(uintptr_t)mainImgHdc] = mainImg;
                 if (mainImg)
                 {
                     if (width < mainImg->getW()) width = mainImg->getW();
@@ -222,13 +227,16 @@ void ImageLoader::Run(bool initialLoad)
     foundResources = new std::unordered_map<std::wstring, ResourceFileInfo>();
 
     // Read level directory listing
-    std::wstring levelPath = getCustomFolderPath();
     std::unordered_map<std::wstring, ResourceFileInfo> levelFiles;
-    ListResourceFilesFromDir(levelPath.c_str(), levelFiles);
+    if (!gIsOverworld)
+    {
+        std::wstring levelPath = getCustomFolderPath();
+        ListResourceFilesFromDir(levelPath.c_str(), levelFiles);
+    }
 
     // Read episode directory listing
-    std::wstring episodePath = GM_FULLDIR;
     std::unordered_map<std::wstring, ResourceFileInfo> episodeFiles;
+    std::wstring episodePath = GM_FULLDIR;
     ListResourceFilesFromDir(episodePath.c_str(), episodeFiles);
 
     // Resolve correct resource file info for each category
@@ -339,6 +347,9 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
                 hardcodedName +=  L"-" + std::to_wstring(idx2);
             }
 
+            // Make note of name to HDC mapping
+            m_NameToHDC[WStr2Str(hardcodedName)] = (uintptr_t)colorHDC;
+
             ResourceFileInfo newMain, newMask;
             ResourceFileInfo oldMain, oldMask;
             getImageResource(hardcodedName, *fileData, newMain, newMask);
@@ -375,19 +386,165 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
 
                 if (img)
                 {
-                    if (colorHDC != nullptr) ImageLoader::loadedImages[(uintptr_t)colorHDC] = img;
-                    if (maskHDC != nullptr)  ImageLoader::loadedImages[(uintptr_t)maskHDC] = img;
+                    if (colorHDC != nullptr) ImageLoader::m_Gfx[(uintptr_t)colorHDC] = img;
+                    if (maskHDC != nullptr)  ImageLoader::m_Gfx[(uintptr_t)maskHDC] = img;
                 }
             }
         }
     }
 }
 
-std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc) {
-    auto it = loadedImages.find((uintptr_t)hdc);
-    if (it != loadedImages.end())
+std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc, bool bypassOverride) {
+    if (!bypassOverride)
+    {
+        auto it = m_GfxOverride.find((uintptr_t)hdc);
+        if (it != m_GfxOverride.end())
+        {
+            return it->second;
+        }
+    }
+
+    auto it = m_Gfx.find((uintptr_t)hdc);
+    if (it != m_Gfx.end())
     {
         return it->second;
     }
     return nullptr;
+}
+
+std::shared_ptr<LunaImage> ImageLoader::GetCharacterSprite(short charId, short powerup)
+{
+    HDC* mainArray = nullptr;
+    HDC mainHdc = nullptr;
+
+    // Sanity check
+    if (powerup < 1 || powerup > 10) return nullptr;
+
+    switch (charId)
+    {
+    case 1:
+        mainArray = GM_GFX_MARIO_PTR;
+        break;
+    case 2:
+        mainArray = GM_GFX_LUIGI_PTR;
+        break;
+    case 3:
+        mainArray = GM_GFX_PEACH_PTR;
+        break;
+    case 4:
+        mainArray = GM_GFX_TOAD_PTR;
+        break;
+    case 5:
+        mainArray = GM_GFX_LINK_PTR;
+        break;
+    default:
+        // TODO: Support custom characters from this call
+        return nullptr;
+    }
+
+    mainHdc = (mainArray != nullptr) ? mainArray[powerup - 1] : nullptr;
+    if (mainHdc == nullptr) return nullptr;
+
+    return GetByHDC(mainHdc);
+}
+
+void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::string& name)
+{
+    if (name.length() == 0) return;
+
+    std::wstring wFolderName = Str2WStr(folderName);
+    std::wstring wName = Str2WStr(name);
+    std::vector<std::wstring> searchPath;
+    if (!gIsOverworld)
+        searchPath.push_back(getCustomFolderPath()); // Check custom folder
+    searchPath.push_back(GM_FULLDIR); // Check episode dir
+    searchPath.push_back(gAppPathWCHAR + L"\\graphics\\" + wFolderName + L"\\"); // Check base game
+
+    std::shared_ptr<LunaImage> img = nullptr;
+    for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
+    {
+        std::wstring imgPath = *pathIt + wName + L".png";
+        img = LunaImage::fromFile(imgPath.c_str());
+        if (img)
+        {
+            break;
+        }
+    }
+    
+    // Add to map, even if null
+    m_ExtraGfx[name] = img;
+}
+
+void ImageLoader::UnregisterExtraGfx(const std::string& name)
+{
+    m_ExtraGfx.erase(name);
+    m_ExtraGfxOverride.erase(name);
+}
+
+std::shared_ptr<LunaImage> ImageLoader::GetByName(const std::string& name, bool bypassOverride)
+{
+    // Get image for the normal case where we're mapping through HDCs
+    {
+        auto it = m_NameToHDC.find(name);
+        if (it != m_NameToHDC.end()) {
+            return GetByHDC((HDC)it->second, bypassOverride);
+        }
+    }
+
+    // Handle returning "extra" gfx
+    {
+        auto it = m_ExtraGfx.find(name);
+        if (it != m_ExtraGfx.end())
+        {
+            if (!bypassOverride)
+            {
+                auto itOverride = m_ExtraGfxOverride.find(name);
+                if (itOverride != m_ExtraGfxOverride.end())
+                {
+                    return itOverride->second;
+                }
+            }
+
+            return it->second;
+        }
+    }
+
+    return nullptr;
+}
+
+bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<LunaImage>& img)
+{
+    // If we're mapping through an HDC, find it for this image name
+    {
+        auto it = m_NameToHDC.find(name);
+        if (it != m_NameToHDC.end()) {
+            if (img)
+            {
+                m_GfxOverride[it->second] = img;
+            }
+            else
+            {
+                m_GfxOverride.erase(it->second);
+            }
+
+            return true;
+        }
+    }
+
+    // Otherwise, for "extra gfx" we're mapping directly from name to image, so set the override that way
+    if (m_ExtraGfx.find(name) != m_ExtraGfx.end())
+    {
+        if (img)
+        {
+            m_ExtraGfxOverride[name] = img;
+        }
+        else
+        {
+            m_ExtraGfxOverride.erase(name);
+        }
+
+        return true;
+    }
+
+    return false;
 }

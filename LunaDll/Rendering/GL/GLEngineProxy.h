@@ -42,14 +42,10 @@ public:
     void NotifyTextureDeletion(uint64_t uid) { mDeletedTextures.push(uid); }
 
     // Convenience command functions
-    void ClearSMBXSprites();
-    void ClearLunaTexture(const BMPBox& bmp);
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     void RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
-    void DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity);
     void EndFrame(HDC hdcDest);
     void InitForHDC(HDC hdcDest);
 

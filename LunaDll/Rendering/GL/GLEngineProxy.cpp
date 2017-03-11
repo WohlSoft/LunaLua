@@ -103,14 +103,6 @@ void GLEngineProxy::EnsureMainThreadCTXApplied()
     g_GLContextManager.EnsureMainThreadCTXApplied();
 }
 
-void GLEngineProxy::ClearSMBXSprites() {
-    QueueCmd(std::make_shared<GLEngineCmd_ClearSMBXSprites>());
-}
-void GLEngineProxy::ClearLunaTexture(const BMPBox& bmp) {
-    auto obj = std::make_shared<GLEngineCmd_ClearLunaTexture>();
-    obj->mBmp = &bmp;
-    QueueCmd(obj);
-}
 void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
     auto obj = std::make_shared<GLEngineCmd_EmulateBitBlt>();
@@ -146,23 +138,7 @@ void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOr
     obj->mRop = dwRop;
     QueueCmd(obj);
 }
-void GLEngineProxy::DrawLunaSprite(int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    const BMPBox& bmp, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc, float opacity)
-{
-    auto obj = std::make_shared<GLEngineCmd_LunaDrawSprite>();
-    obj->mXDest = nXOriginDest;
-    obj->mYDest = nYOriginDest;
-    obj->mWidthDest = nWidthDest;
-    obj->mHeightDest = nHeightDest;
-    obj->mXSrc = nXOriginSrc;
-    obj->mYSrc = nYOriginSrc;
-    obj->mWidthSrc = nWidthSrc;
-    obj->mHeightSrc = nHeightSrc;
 
-    obj->mBmp = &bmp;
-    obj->mOpacity = opacity;
-    QueueCmd(obj);
-}
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();

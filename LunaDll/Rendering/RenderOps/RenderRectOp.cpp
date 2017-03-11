@@ -48,7 +48,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             vert[6] = static_cast<float>(x2); vert[7] = static_cast<float>(y2);
 
             auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
-            obj->mBmp = nullptr;
+            obj->mImg = nullptr;
             obj->mColor[0] = fillColor.r;
             obj->mColor[1] = fillColor.g;
             obj->mColor[2] = fillColor.b;
@@ -71,7 +71,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             vert[6] = static_cast<float>(x2); vert[7] = static_cast<float>(y1);
 
             auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
-            obj->mBmp = nullptr;
+            obj->mImg = nullptr;
             obj->mColor[0] = borderColor.r;
             obj->mColor[1] = borderColor.g;
             obj->mColor[2] = borderColor.b;

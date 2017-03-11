@@ -1,6 +1,8 @@
 #include "RenderSpriteOp.h"
 #include "../../SMBXInternal/CameraInfo.h"
-#include "../SMBXMaskedImage.h"
+#include "../LunaImage.h"
+
+// LUNAIMAGE_TODO: Consider tossing this out, in favor of only RenderBitmapOp
 
 // CTOR
 RenderSpriteOp::RenderSpriteOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
@@ -16,7 +18,7 @@ RenderSpriteOp::RenderSpriteOp() : RenderOp(RENDEROP_DEFAULT_PRIORITY_CGFX),
 
 // DRAW
 void RenderSpriteOp::Draw(Renderer* renderer) {
-    if (sprite == nullptr) {
+    if (!sprite) {
         return;
     }
 
@@ -34,5 +36,5 @@ void RenderSpriteOp::Draw(Renderer* renderer) {
     int width = static_cast<int>(round(this->sw));
     int height = static_cast<int>(round(this->sh));
 
-    sprite->DrawWithOverride(x, y, width, height, sx, sy, true, true);
+    sprite->draw(x, y, width, height, sx, sy);
 }

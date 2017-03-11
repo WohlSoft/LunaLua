@@ -14,19 +14,11 @@ class LunaImage;
 
 class GLTextureStore {
 public:
-    std::unordered_map<HDC, const GLSprite*> mSmbxTexMap;
-    std::unordered_map<const BMPBox*, const GLDraw::Texture*> mLunaTexMap;
     std::unordered_map<uint64_t, const GLSprite*> mLunaImageTexMap;
     
 	void Reset();
 
     GLTextureStore();
-    void ClearSMBXSprites();
-    const GLSprite* SpriteFromSMBXBitmap(HDC hdc);
-
-	void ClearLunaTextures();
-    void ClearLunaTexture(const BMPBox& bmp);
-    const GLDraw::Texture* TextureFromLunaBitmap(const BMPBox& bmp);
 
     void ClearLunaImageTextures();
     void ClearLunaImageTexture(uint64_t uid);

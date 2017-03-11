@@ -190,11 +190,9 @@
     <ClInclude Include="Misc\VariantHelper.h" />
     <ClInclude Include="Misc\win32_Unicode.h" />
     <ClInclude Include="Rendering\AsyncGifRecorder.h" />
-    <ClInclude Include="Rendering\RenderOverrideManager.h" />
     <ClInclude Include="Rendering\Shaders\GLShader.h" />
     <ClInclude Include="Misc\SafeFPUControl.h" />
     <ClInclude Include="SMBXInternal\BaseItemArray.h" />
-    <ClInclude Include="Rendering\SMBXMaskedImage.h" />
     <ClInclude Include="SMBXInternal\CollectedStarRecord.h" />
     <ClInclude Include="SMBXInternal\CustomGraphics.h" />
     <ClInclude Include="SMBXInternal\CameraInfo.h" />
@@ -256,7 +254,6 @@
     <ClInclude Include="Misc\SHMemServer.h" />
     <ClInclude Include="Misc\VB6StrPtr.h" />
     <ClInclude Include="Misc\Playground.h" />
-    <ClInclude Include="Rendering\BMPBox.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
@@ -351,10 +348,8 @@
     <ClCompile Include="Rendering\GL\GLEngineCmds.cpp" />
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp" />
-    <ClCompile Include="Rendering\RenderOverrideManager.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
-    <ClCompile Include="Rendering\SMBXMaskedImage.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
@@ -433,7 +428,6 @@
     <ClCompile Include="Misc\SHMemServer.cpp" />
     <ClCompile Include="Misc\VB6StrPtr.cpp" />
     <ClCompile Include="Misc\Playground.cpp" />
-    <ClCompile Include="Rendering\BMPBox.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />
     <ClCompile Include="Globals.cpp" />

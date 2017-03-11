@@ -3,11 +3,12 @@
 #include "../Globals.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/Sound.h"
+#include "../Rendering/LunaImage.h"
+#include "../Rendering/ImageLoader.h"
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Rendering/RenderOps/RenderRectOp.h"
 #include "../Rendering/RenderOps/RenderSpriteOp.h"
-#include "../Rendering/SMBXMaskedImage.h"
 #include "../SMBXInternal/CustomGraphics.h"
 
 #include "TestMode.h"
@@ -247,10 +248,19 @@ public:
         int h = SMBX_CustomGraphics::getPlayerHitboxHeight(static_cast<PowerupID>(powerup), static_cast<Characters>(charId));
         int padding = 6;
 
-        SMBXMaskedImage* sprite = SMBXMaskedImage::GetCharacterSprite(charId, powerup);
+        std::shared_ptr<LunaImage> sprite = ImageLoader::GetCharacterSprite(charId, powerup);
         if (sprite != nullptr)
         {
-            sprite->QueueDraw(x + 20 + offX + padding, y + offY + padding, 100, 100, 500, 0, false);
+            RenderSpriteOp* maskedRenderOp = new RenderSpriteOp();
+            maskedRenderOp->sprite = sprite;
+            maskedRenderOp->sx = x + 20 + offX + padding;
+            maskedRenderOp->sy = y + offY + padding;
+            maskedRenderOp->sw = 100;
+            maskedRenderOp->sh = 100;
+            maskedRenderOp->x = 500;
+            maskedRenderOp->y = 0;
+            maskedRenderOp->sceneCoords = false;
+            gLunaRender.AddOp(maskedRenderOp);
         }
 
         if (selected && renderCounter < 20) {

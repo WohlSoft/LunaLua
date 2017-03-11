@@ -237,6 +237,8 @@ void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask
 
         if (!mask && drawMain)
         {
+            // LUNAIMAGE_TODO: Implement silhouette drawing of RGBA images for the case of mask-only drawing
+
             auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
             obj->mXDest = dx;
             obj->mYDest = dy;
@@ -253,6 +255,8 @@ void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask
             g_GLEngine.QueueCmd(obj);
         }
     }
+
+    // LUNAIMAGE_TODO: Support GDI renderer
 }
 
 LunaImage::~LunaImage()

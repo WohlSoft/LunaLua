@@ -12,7 +12,7 @@
 #include "GL/GLEngineCmds.h"
 
 class RenderOp;
-class BMPBox;
+class LunaImage;
 
 // Main renderer object
 struct Renderer {
@@ -22,11 +22,11 @@ struct Renderer {
 
     bool LoadBitmapResource(std::wstring filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(std::wstring filename, int resource_code);
-    void StoreImage(const std::shared_ptr<BMPBox>& bmp, int resource_code);
+    void StoreImage(const std::shared_ptr<LunaImage>& bmp, int resource_code);
     bool DeleteImage(int resource_code);
-    std::shared_ptr<BMPBox> GetImageForResourceCode(int resource_code);
+    std::shared_ptr<LunaImage> GetImageForResourceCode(int resource_code);
 
-    std::vector<std::shared_ptr<BMPBox>> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
+    std::vector<std::shared_ptr<LunaImage>> LoadAnimatedBitmapResource(std::wstring filename, int* frameTime = 0);
 
     void AddOp(RenderOp* op);							// Add a drawing operation to the list
     void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
@@ -56,7 +56,7 @@ private:
     std::size_t m_renderOpsProcessedCount;
     std::vector<RenderOp*> m_currentRenderOps;  // render operations to be performed
 
-    std::map<int, std::shared_ptr<BMPBox>> m_legacyResourceCodeImages;  // loaded image resources
+    std::map<int, std::shared_ptr<LunaImage>> m_legacyResourceCodeImages;  // loaded image resources
 
     std::list<std::wstring> m_debugMessages;                // Debug message to be printed
 

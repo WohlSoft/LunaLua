@@ -12,7 +12,7 @@
 /// CSprite builtin custom variables
 #define CVAR_GEN_ANGLE L"_GenAngle"
 
-class BMPBox;
+class LunaImage;
 class CSprite;
 struct CSpriteRequest;
 
@@ -35,7 +35,7 @@ public:
 	void AddDeathComponent(SpriteComponent component);
 
 	void SetImageResource(int _resource_code);
-    void SetImage(const std::shared_ptr<BMPBox>& _img);
+    void SetImage(const std::shared_ptr<LunaImage>& _img);
 	void MakeLimitedLifetime(int new_lifetime);
 
 	void Birth();
@@ -49,7 +49,7 @@ public:
 
 	/// Members///
 	int m_ImgResCode;				// Image bank code of image resource the sprite uses
-    std::shared_ptr<BMPBox> m_directImg;
+    std::shared_ptr<LunaImage> m_directImg;
 	int m_CollisionCode;			// Collision code for collision blueprint bank (-1 == all blocks collide as solid)
 
 	int m_FramesLeft;				// How many frames are left if dying automatically	
@@ -98,7 +98,7 @@ struct CSpriteRequest {
 	int y;
 	int time;
 	int img_resource_code;
-    std::shared_ptr<BMPBox> direct_img;
+    std::shared_ptr<LunaImage> direct_img;
 	std::wstring str;
 
 	// Optional parameters

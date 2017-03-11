@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "RenderOp.h"
-class BMPBox;
+class LunaImage;
 
 class RenderBitmapOp : public RenderOp {
 public:
@@ -20,7 +20,7 @@ public:
     float  opacity;         // Opacity value
     bool   sceneCoords;     // If true, x and y are scene coordinates
 
-    std::shared_ptr<BMPBox> direct_img;
+    std::shared_ptr<LunaImage> direct_img;
 };
 
 #endif
