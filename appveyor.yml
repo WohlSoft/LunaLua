@@ -41,6 +41,7 @@
   clone_folder: C:\_Repos\LunaLUA
   
   build_script:
+  - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
   - cmd: mkdir build-appveyor-vs2017
   - cmd: cd build-appveyor-vs2017
   - cmd: cmake ../. -G "Visual Studio 15 2017"
