@@ -80,7 +80,7 @@ include_directories(${LUNALUA_3RDPARTY_DIR}/json)
 include_directories(${BoostSourceDir})
 
 # Additional windows depedencies
-target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib)
+target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib ws2_32.lib)
 
 # =============  LUNALUA CORE LIB END  ================
 
