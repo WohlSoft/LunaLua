@@ -6,6 +6,7 @@
 #include "../../GlobalFuncs.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../Misc/MiscFuncs.h"
+#include "../../Utils/StringUtils.h"
 
 LuaProxy::Data::Data(DataType dataType) :
 	m_dataType(dataType),
@@ -62,8 +63,8 @@ void LuaProxy::Data::init()
 			if (luaData.eof())
 				break;
 			std::getline(luaData, value);
-			replaceSubStr(key, "\\n", "\n");
-			replaceSubStr(value, "\\n", "\n");
+			LunaLua::StringUtils::replace(key, "\\n", "\n");
+            LunaLua::StringUtils::replace(value, "\\n", "\n");
 			m_data[key] = value;
 		}
 		luaData.close();
@@ -151,8 +152,8 @@ void LuaProxy::Data::save(const std::string &sectionName)
 		for (std::map<std::string, std::string>::iterator it = m_data.begin(); it != m_data.end(); ++it) {
 			std::string key = it->first;
 			std::string value = it->second;
-			replaceSubStr(key, "\n", "\\n");
-			replaceSubStr(value, "\n", "\\n");
+			LunaLua::StringUtils::replace(key, "\n", "\\n");
+            LunaLua::StringUtils::replace(value, "\n", "\\n");
 			luaData << key << std::endl;
 			luaData << value << std::endl;
 		}

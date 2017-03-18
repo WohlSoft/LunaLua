@@ -5,6 +5,7 @@
 #include "../GlobalFuncs.h"
 #include <math.h>
 #include "../libs/ini-reader/INIReader.h"
+#include "../Utils/StringUtils.h"
 
 
 ChunkEntry::ChunkEntry()
@@ -164,9 +165,9 @@ void MusicManager::addSound(std::string alias, std::string fileName)
     //Load custom music
     if(alias=="music24") {
         //clear junk
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         music_lvl[23].setPath(fileName);
     }
 }
@@ -346,9 +347,9 @@ void MusicManager::loadSounds(std::string path, std::string root)
 
         reserveChannel = SoundsIni.Get(head, "single-channel", "0");
 
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
 
         if( file_existsX(root+fileName) )
         {
@@ -397,9 +398,9 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
             music_wld[j-1].setPath(root+fileName.c_str());
@@ -414,9 +415,9 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
             music_spc[j-1].setPath(root+fileName.c_str());
@@ -432,9 +433,9 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
             music_lvl[j-1].setPath(root+fileName.c_str());

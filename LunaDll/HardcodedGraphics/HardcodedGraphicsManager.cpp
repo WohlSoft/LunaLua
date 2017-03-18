@@ -9,6 +9,7 @@
 #include "../GlobalFuncs.h"
 #include "../SdlMusic/MusicManager.h" //Need to get SMBX's application path
 #include "../libs/ini-reader/INIReader.h" //Ini files reader
+#include "../Utils/StringUtils.h"
 
 
 std::string HardcodedGraphicsManager::root="";
@@ -196,7 +197,8 @@ void HardcodedGraphicsManager::loadGraphics()
 	for(unsigned int i=0; i<list.size(); i++)
 	{
 		bool wrong=false;
-		RemoveSubStr(list[i], "0x");
+		LunaLua::StringUtils::replace(list[i], "0x", "");
+
 		for(unsigned int j=0;j<list[i].size();j++)
 		{
 			if(!isdigit(list[i][j]))

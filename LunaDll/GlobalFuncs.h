@@ -8,9 +8,6 @@
 #include <string.h>
 
 //String manupulation things
-void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
-void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
-void RemoveSubStr(std::string& sInput, const std::string& sub);
 std::vector<std::string> splitCmdArgs( std::string str);
 std::vector<std::wstring> splitCmdArgsW(std::wstring str);
 
@@ -66,12 +63,9 @@ void removeFilePathA(char*path, int length);
 void initAppPaths();
 void ResetLunaModule();
 void InitGlobals();
-void ResetFreeGlob();
 void CleanUp();
 
 /// HELPER FUNCTIONS ///
-std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
-std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
 std::string url_encode(const std::string &value);
 // Module Helper Funcs
@@ -98,6 +92,5 @@ void sendPUTRequest(const std::string& server, const std::string& data);
 
 // Debug stuff
 void RedirectIOToConsole();
-void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 #endif

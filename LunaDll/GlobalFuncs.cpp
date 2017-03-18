@@ -25,39 +25,6 @@
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
 
-void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
-{
-	dest.clear();
-	std::string st=str;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( separator );
-		std::string cur = st.substr( 0, pos );
-		dest.push_back( cur );
-		if ( pos == std::string::npos )
-			break;
-		st = st.substr( pos + 1 );
-	}
-}
-
-void replaceSubStr(std::string& str, const std::string& from, const std::string& to)
-{
-	if(from.empty())
-	return;
-	size_t start_pos = 0;
-	while((start_pos = str.find(from, start_pos)) != std::string::npos)
-	{
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-	}
-}
-
-void RemoveSubStr(std::string& sInput, const std::string& sub)
-{
-	std::string::size_type foundpos = sInput.find(sub);
-	if ( foundpos != std::string::npos )
-	sInput.erase(sInput.begin() + foundpos, sInput.begin() + foundpos + sub.length());
-}
 
 std::vector<std::string> splitCmdArgs( std::string str)
 {
@@ -454,40 +421,6 @@ void CleanUp() {
 }
 
 
-
-
-
-std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
-{
-    std::vector<std::wstring> ret;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( delimiter );
-		std::wstring cur = str.substr( 0, pos );
-		ret.push_back( cur );
-		if ( pos == std::wstring::npos )
-			break;
-		str = str.substr( pos + 1 );
-	}
-	return ret;
-}
-
-std::vector<std::string> split(std::string str, char delimiter)
-{
-    std::vector<std::string> ret;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( delimiter );
-		std::string cur = str.substr( 0, pos );
-		ret.push_back( cur );
-		if ( pos == std::string::npos )
-			break;
-		str = str.substr( pos + 1 );
-	}
-	return ret;
-}
-
-
 std::string url_encode(const std::string &value)
 {
     std::ostringstream escaped;
@@ -520,29 +453,6 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
 	}
 	return false;
 }
-
-//HMODULE getModule(std::string moduleName)
-//{
-//	HMODULE ret = 0;
-//	if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
-//		ret = LoadLibraryA(moduleName.c_str());
-//	}
-//	return ret;
-//}
-
-//std::wstring getModulePath()
-//{
-//	HMODULE hModule = GetModuleHandleW(NULL);
-//	WCHAR path[MAX_PATH];
-//	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-//	for(int i = count; i > 3; i--) {
-//		if(path[i] == L'\\') {
-//			path[i] = 0;
-//			break;
-//		}
-//	}
-//	return std::wstring(path);
-//}
 
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
@@ -642,13 +552,6 @@ bool writeFile(const std::string &content, const std::string &path)
     fwrite(content.c_str(), 1, content.size(), theFile);
     fclose(theFile);
     return true;
-//    std::ofstream theFile(path, std::ios::binary | std::ios::out);
-//    if (!theFile.is_open()){
-//        theFile.close();
-//        return false;
-//    }
-//    theFile << content;
-//    theFile.close();
 }
 
 
@@ -784,67 +687,4 @@ void RedirectIOToConsole()
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
 }
 
-#ifdef BUILD_WITH_ATL_STUFF
-// WIP 
-#include <atlbase.h>
-#include "Misc/TypeLib.h"
 
-#define COMUTILS_RETURN_IF_FAILED_START HRESULT ___errCodeUse_
-#define COMUTILS_RETURN_IF_FAILED(code, outputter, text) \
-    ___errCodeUse_ = code; \
-    if(FAILED(___errCodeUse_)){ \
-        outputter << L"ERROR: " << text << L" HRESULT = " << std::hex << (int)___errCodeUse_ << std::dec << std::endl; \
-        return; \
-    } 
-
-void dumpTYPEATTR(TYPEATTR* attr, std::wostream& toOutput) {
-    //toOutput << L"GUID: " << std::hex << attr->guid.Data1 << L"-" << attr->guid.Data2 << "-" << attr->guid.Data3 << "-"
-//        << *(long long*)(&attr->guid.Data4) << std::dec << std::endl;
-    toOutput << L"Num of functions: " << attr->cFuncs << std::endl;
-    toOutput << L"Num of vars: " << attr->cVars << std::endl;
-    toOutput << L"Num of implemented interfaces: " << attr->cImplTypes << std::endl;
-    toOutput << L"Version number: " << attr->wMajorVerNum << L"." << attr->wMinorVerNum << std::endl;
-    
-}
-
-void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
-{
-    toOutput << L"Start dumping!" << std::endl;
-    COMUTILS_RETURN_IF_FAILED_START;
-
-    UINT typeLibCount = 0;
-    COMUTILS_RETURN_IF_FAILED(dispatchToDump->GetTypeInfoCount(&typeLibCount), toOutput, L"Failed to get type count");
-
-    toOutput << "Type Library count: " << typeLibCount << std::endl;
-    if (typeLibCount == 0) return;
-
-    ATL::CComPtr<ITypeInfo> typeInfoOfObj = NULL;
-    COMUTILS_RETURN_IF_FAILED(dispatchToDump->GetTypeInfo(NULL, LOCALE_SYSTEM_DEFAULT, &typeInfoOfObj), toOutput, L"Failed to get type info");
-    toOutput << L"DEBUG: Got type info!" << std::endl;
-    toOutput << L"DEBUG: Ptr to ITypeLib: " << std::hex << (int)typeInfoOfObj.p << std::dec << std::endl;
-
-    ATL::CComPtr<ITypeLib> typeLibOfObj = NULL;
-    UINT index = 0;
-    COMUTILS_RETURN_IF_FAILED(typeInfoOfObj->GetContainingTypeLib(&typeLibOfObj, &index), toOutput, L"Failed to get type lib");
-    toOutput << "DEBUG: Got type lib with index " << index << std::endl;
-    
-    /*
-
-    TYPEATTR* descriptor = NULL;
-    COMUTILS_RETURN_IF_FAILED(typeInfoOfObj->GetTypeAttr(&descriptor), toOutput, L"Failed to get descriptor!");
-    toOutput << L"DEBUG: Got descriptor!" << std::endl;
-    toOutput << std::hex << (UINT)descriptor << std::dec << std::endl;
-
-    dumpTYPEATTR(descriptor, toOutput);
-    
-    
-    typeInfoOfObj->ReleaseTypeAttr(descriptor);
-
-    toOutput << L"DEBUG: Released descriptor!" << std::endl;
-
-    */
-
-}
-
-
-#endif

@@ -29,6 +29,8 @@
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
 
+#include "Utils/StringUtils.h"
+
 #define PATCHIT 1
 
 static bool LevelCustomSounds = false;
@@ -115,13 +117,13 @@ int OnLvlLoad() {
     std::string custPath = WStr2Str(getCustomFolderPath());
     std::string wldPath = WStr2Str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
-    replaceSubStr(wldPath, "\"", "");
-    replaceSubStr(wldPath, "\\\\", "\\");
-    replaceSubStr(wldPath, "/", "\\");
+    LunaLua::StringUtils::replace(wldPath, "\"", "");
+    LunaLua::StringUtils::replace(wldPath, "\\\\", "\\");
+    LunaLua::StringUtils::replace(wldPath, "/", "\\");
 
-    replaceSubStr(SndRoot, "\"", "");
-    replaceSubStr(SndRoot, "\\\\", "\\");
-    replaceSubStr(SndRoot, "/", "\\");
+    LunaLua::StringUtils::replace(SndRoot, "\"", "");
+    LunaLua::StringUtils::replace(SndRoot, "\\\\", "\\");
+    LunaLua::StringUtils::replace(SndRoot, "/", "\\");
 
     bool doSoundLoading = false;
 
