@@ -94,3 +94,14 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 
+# ============= TIMESTAMP FORCE TARGET =================
+add_custom_target(ZERO_CHECK_FORCE ALL 
+    COMMAND copy /b CMakeLists.txt +,,
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+set_target_properties(ZERO_CHECK_FORCE PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1)
+
+
+
+
+
