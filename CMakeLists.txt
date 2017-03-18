@@ -1,11 +1,15 @@
 # Header
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.8)
 project(LunaLua)
 
 # Checks
 if(NOT MSVC)
     message(FATAL_ERROR "NON-Microsoft Compilers are not supported right now")
 endif()
+
+# Set C++17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
 
 # Compiler settings
 # Force unicode for all projects
@@ -32,6 +36,7 @@ ucm_add_dirs(LunaDll TO LUNALUA_LIB_FILES RECURSIVE FILTER_POP 1)
 # Remove 'libs' because it is not part of the LunaLua source
 ucm_remove_directories(libs FROM LUNALUA_LIB_FILES)
 
+# DEPDENCIES:
 # Set stackwalker dependency as raw source
 ucm_add_dirs(3rdparty/stackwalker TO LUNALUA_LIB_FILES)
 include_directories(${LUNALUA_3RDPARTY_DIR}/stackwalker)

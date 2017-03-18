@@ -49,8 +49,8 @@ endfunction()
 
 # =============================
 
-set(BoostVersion 1.58.0)
-set(BoostSHA1 2fc96c1651ac6fe9859b678b165bd78dc211e881)
+set(BoostVersion 1.63.0)
+set(BoostSHA1 9f1dd4fa364a3e3156a77dc17aa562ef06404ff6)
 
 
 # Create build folder name derived from version
