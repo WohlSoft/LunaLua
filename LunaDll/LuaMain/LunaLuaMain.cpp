@@ -527,9 +527,8 @@ void CLunaLua::bindAll()
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(LuaImageResource, std::shared_ptr)
                     .def("__eq", &LuaProxy::luaUserdataCompare<LunaImage>)
                     .property("width", &LunaImage::getW)
-                    .property("height", &LunaImage::getH),
-                    // LUNAIMAGE_TODO: Implement the following property for LunaImage
-                    //.property("__BMPBoxPtr", &LunaImage::__BMPBoxPtr),
+                    .property("height", &LunaImage::getH)
+                    .property("__rawDataPtr", &LunaImage::getDataPtrAsInt),
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
                     .def(constructor<int, int>())
                     .def("__eq", &LuaProxy::luaUserdataCompare<LunaImage>)

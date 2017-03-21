@@ -46,14 +46,15 @@ public:
     virtual ~LunaImage();
     
     HBITMAP asHBITMAP();
-    uint64_t getUID() { return uid; }
+    inline uint64_t getUID() { return uid; }
     inline void* getDataPtr() { return data; }
-    uint32_t getW() { return w; }
-    uint32_t getH() { return h; }
-    void lock() { mut.lock(); }
-    void unlock() { mut.unlock(); }
-    std::shared_ptr<LunaImage> getMask() { return mask; }
-    void setMask(std::shared_ptr<LunaImage> _mask) { mask = std::move(_mask); }
+    uint32_t getDataPtrAsInt();
+    inline uint32_t getW() { return w; }
+    inline uint32_t getH() { return h; }
+    inline void lock() { mut.lock(); }
+    inline void unlock() { mut.unlock(); }
+    inline std::shared_ptr<LunaImage> getMask() { return mask; }
+    inline void setMask(std::shared_ptr<LunaImage> _mask) { mask = std::move(_mask); }
 
     // Function to attempt to convert an image with mask, into RGBA without
     // mask, but only if it's completely safe to do so without inaccuracy.

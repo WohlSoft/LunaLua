@@ -267,3 +267,7 @@ LunaImage::~LunaImage()
     }
     clearInternal();
 }
+
+uint32_t LunaImage::getDataPtrAsInt() {
+    return (uint32_t)data;
+}

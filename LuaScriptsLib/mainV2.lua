@@ -68,7 +68,6 @@ local function initFFIBasedAPIs()
     ffi.cdef[[
         void* LunaLuaAlloc(size_t size);
         void LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count);
-        uint32_t* LunaLuaGetImageResourceBits(uint32_t bmpBoxIntPtr);
     ]]
     local LunaDLL = ffi.load("LunaDll.dll")
     
@@ -103,9 +102,9 @@ local function initFFIBasedAPIs()
             error("Wrong type for getBits argument #1 (expected LuaResourceImage, got " .. type(resImg) .. ")", 2)
         end
         if(resImg.__type == "LuaResourceImage")then
-            error("Wrong type for getBits arguemnt #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
+            error("Wrong type for getBits argument #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
         end
-        local nativeBitArray = LunaDLL.LunaLuaGetImageResourceBits(resImg.__BMPBoxPtr)
+		local nativeBitArray = ffi.cast("uint32_t*", ffi.cast("uintptr_t", resImg.__rawDataPtr))
         
         -- get bits
         local bitMT = setmetatable({
