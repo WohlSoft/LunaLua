@@ -377,7 +377,9 @@ std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> LuaProxy::Audio::SfxPlayObj
         g_SfxPlayObjCallbackSet = true;
     }
 
+    lck.unlock();
     int channel = Mix_PlayChannel(-1, &chunk, loops);
+    lck.lock();
     std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> ret = std::make_shared<LuaProxy::Audio::PlayingSfxInstance>(channel);
     if (channel != -1) g_SfxPlayObjMap[channel] = ret;
     return ret;
@@ -393,7 +395,9 @@ std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> LuaProxy::Audio::SfxPlayObj
         g_SfxPlayObjCallbackSet = true;
     }
 
+    lck.unlock();
     int channel = Mix_PlayChannelTimed(-1, &chunk, loops, ticks);
+    lck.lock();
     std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> ret = std::make_shared<LuaProxy::Audio::PlayingSfxInstance>(channel);
     if (channel != -1) g_SfxPlayObjMap[channel] = ret;
     return ret;
@@ -409,7 +413,9 @@ std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> LuaProxy::Audio::SfxFadeInO
         g_SfxPlayObjCallbackSet = true;
     }
 
+    lck.unlock();
     int channel = Mix_FadeInChannel(-1, &chunk, loops, ms);
+    lck.lock();
     std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> ret = std::make_shared<LuaProxy::Audio::PlayingSfxInstance>(channel);
     if (channel != -1) g_SfxPlayObjMap[channel] = ret;
     return ret;
@@ -425,7 +431,9 @@ std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> LuaProxy::Audio::SfxFadeInO
         g_SfxPlayObjCallbackSet = true;
     }
 
+    lck.unlock();
     int channel = Mix_FadeInChannelTimed(-1, &chunk, loops, ms, ticks);
+    lck.lock();
     std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> ret = std::make_shared<LuaProxy::Audio::PlayingSfxInstance>(channel);
     if (channel != -1) g_SfxPlayObjMap[channel] = ret;
     return ret;
