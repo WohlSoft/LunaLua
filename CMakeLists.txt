@@ -25,6 +25,7 @@ include(CMake/DownloadAndConfigureDepends/glew/glew.cmake)
 include(CMake/DownloadAndConfigureDepends/luajit/luajit.cmake)
 include(CMake/DownloadAndConfigureDepends/boost/boost.cmake)
 include(CMake/DownloadAndConfigureDepends/luabind/luabind.cmake) # Depends on boost and luajit!
+include(CMake/DownloadAndConfigureDepends/catch/catch.cmake) # For testing
 
 # SETTINGS
 set(LUNALUA_3RDPARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
@@ -36,7 +37,7 @@ ucm_add_dirs(LunaDll TO LUNALUA_LIB_FILES RECURSIVE FILTER_POP 1)
 # Remove 'libs' because it is not part of the LunaLua source
 ucm_remove_directories(libs FROM LUNALUA_LIB_FILES)
 
-# DEPDENCIES:
+# DEPENDENCIES:
 # Set stackwalker dependency as raw source
 ucm_add_dirs(3rdparty/stackwalker TO LUNALUA_LIB_FILES)
 include_directories(${LUNALUA_3RDPARTY_DIR}/stackwalker)
@@ -49,7 +50,7 @@ ucm_remove_files(3rdparty/luasocket/usocket.c 3rdparty/luasocket/unix.c 3rdparty
 ucm_add_dirs(3rdparty/ini-reader TO LUNALUA_LIB_FILES)
 
 # Make LunaLuaLib target
-add_library (LunaLuaLib MODULE ${LUNALUA_LIB_FILES})
+add_library (LunaLuaLib SHARED ${LUNALUA_LIB_FILES})
 
 # Set FreeImage dependency
 include_directories(${FREEIMAGE_INCLUDE_DIR})
@@ -88,6 +89,25 @@ include_directories(${BoostSourceDir})
 target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib ws2_32.lib)
 
 # =============  LUNALUA CORE LIB END  ================
+
+# =============  LUNALUA TESTING START ================
+# Enable Testing
+enable_testing()
+
+# Get Test files and set test executable
+ucm_add_dirs(LunaLuaTest TO LUNALUA_TEST_FILES RECURSIVE FILTER_POP 1)
+add_executable(LunaLuaTest ${LUNALUA_TEST_FILES})
+
+# Setup dependency to the LunaLuaLib
+target_include_directories(LunaLuaTest PUBLIC ${CMAKE_SOURCE_DIR}/LunaDll PUBLIC ${CATCH_INCLUDE_DIR})
+target_link_libraries(LunaLuaTest LunaLuaLib)
+add_dependencies(LunaLuaTest catch LunaLuaLib)
+
+add_test(NAME LunaLuaTestProj COMMAND LunaLuaTest)
+# =============  LUNALUA TESTING END ================
+
+
+
 
 # Disable boost (non-header-only) libraries
 foreach(BoostTarget ${AllBoostLibs})

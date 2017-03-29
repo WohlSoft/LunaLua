@@ -80,7 +80,7 @@ namespace LunaLua::StringUtils {
                 }
                 else 
                 {
-                    buf.push_back(str[i]);
+                    buf.push_back(input[i]);
                 }
             } 
             else 
@@ -94,7 +94,7 @@ namespace LunaLua::StringUtils {
                 }
                 else 
                 {
-                    buf.push_back(str[i]);
+                    buf.push_back(input[i]);
                 }
             }            
         }
@@ -110,7 +110,7 @@ namespace LunaLua::StringUtils {
         return splitCmdArgs(std::basic_string_view<Elem, Traits>(input));
     }
 
-    template<typename Elem>
+    template<typename Elem, typename Traits = std::char_traits<Elem>>
     auto splitCmdArgs(const Elem* input) {
         return splitCmdArgs(std::basic_string_view<Elem, Traits>(input));
     }
