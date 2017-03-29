@@ -15,6 +15,8 @@
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
 
+#include "../../Utils/StringUtils.h"
+
 
 #ifndef NO_SDL
 bool episodeStarted = false;
@@ -184,7 +186,7 @@ static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
-    ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
+    ParseArgs(LunaLua::StringUtils::splitCmdArgs(GetCommandLineW()));
 
     // If we have stdin/stdout, attach to the IPC server
     ipcServer.AttachStdinStdout();

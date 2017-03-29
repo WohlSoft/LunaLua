@@ -7,7 +7,11 @@
 #include <string_view>
 #include <vector>
 
+
+
 namespace LunaLua::StringUtils {
+    // string/wstring literal: http://stackoverflow.com/q/9040247 (if I ever need it)
+
     template<typename Elem, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
     auto split(const std::basic_string_view<Elem, Traits>& input,
                const std::basic_string_view<Elem, Traits>& sep) {
@@ -55,8 +59,61 @@ namespace LunaLua::StringUtils {
         replace(str, std::basic_string_view<Elem, Traits>(from), std::basic_string_view<Elem, Traits>(to));
     }
 
+    template<typename Elem, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
+    auto splitCmdArgs(const std::basic_string_view<Elem, Traits>& input) {
+        std::vector<std::basic_string<Elem, Traits, Alloc>> args;
+        std::basic_string<Elem, Traits, Alloc> buf;
+        bool quote_opened = false;
+        for (unsigned int i = 0; i < input.size(); i++)
+        {
+            if (!quote_opened) 
+            {
+                if (input[i] == static_cast<Elem>(' ')) 
+                {
+                    if (!buf.empty())
+                        args.push_back(std::move(buf));
+                    buf.clear();
+                } 
+                else if (input[i] == static_cast<Elem>('\"'))
+                {
+                    quote_opened = true;
+                }
+                else 
+                {
+                    buf.push_back(str[i]);
+                }
+            } 
+            else 
+            {
+                if (input[i] == static_cast<Elem>('\"'))
+                {
+                    if (!buf.empty())
+                        args.push_back(std::move(buf));
+                    buf.clear();
+                    quote_opened = false;
+                }
+                else 
+                {
+                    buf.push_back(str[i]);
+                }
+            }            
+        }
 
+        if (!buf.empty())
+            args.push_back(buf);
 
+        return args;
+    }
+
+    template<typename Elem, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
+    auto splitCmdArgs(const std::basic_string<Elem, Traits, Alloc>& input) {
+        return splitCmdArgs(std::basic_string_view<Elem, Traits>(input));
+    }
+
+    template<typename Elem>
+    auto splitCmdArgs(const Elem* input) {
+        return splitCmdArgs(std::basic_string_view<Elem, Traits>(input));
+    }
 }
 
 #endif

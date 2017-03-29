@@ -7,9 +7,6 @@
 #include <wchar.h>
 #include <string.h>
 
-//String manupulation things
-std::vector<std::string> splitCmdArgs( std::string str);
-std::vector<std::wstring> splitCmdArgsW(std::wstring str);
 
 //Compatibility macroses left just in case
 #define utf8_encode(wstr) WStr2Str(wstr)
