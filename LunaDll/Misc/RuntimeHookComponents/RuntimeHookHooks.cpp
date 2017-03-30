@@ -572,6 +572,10 @@ extern void __stdcall recordVBErrCode(int errCode)
 
 extern void __stdcall LoadLocalGfxHook()
 {
+    // We should clear textures periodically for video memory reasons. At this
+    // point is probably good enough.
+    g_GLEngine.ClearTextures();
+
     // In the past, we would call native_loadLocalGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();

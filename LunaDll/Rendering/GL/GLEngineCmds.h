@@ -48,6 +48,12 @@ public:
 /* Specific GLEngine Commands */
 /******************************/
 
+class GLEngineCmd_ClearTextures : public GLEngineCmd {
+public:
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+    virtual bool isSmbxClearCmd(void) const { return true; }
+};
 class GLEngineCmd_EmulateBitBlt : public GLEngineCmd, public GLBitmapRenderCoords { // DEPRECATED
 public:
     HDC mHdcSrc;

@@ -9,6 +9,10 @@
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 
+void GLEngineCmd_ClearTextures::run(GLEngine& glEngine) const {
+    // In the future we should also consider some least-recently-used clearing, and other strategies
+    g_GLTextureStore.ClearLunaImageTextures();
+}
 void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
     glEngine.RenderCameraToScreen(
         mHdcDest,

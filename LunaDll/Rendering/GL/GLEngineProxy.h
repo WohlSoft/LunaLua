@@ -42,6 +42,7 @@ public:
     void NotifyTextureDeletion(uint64_t uid) { mDeletedTextures.push(uid); }
 
     // Convenience command functions
+    void ClearTextures();
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     void RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,

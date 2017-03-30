@@ -103,6 +103,9 @@ void GLEngineProxy::EnsureMainThreadCTXApplied()
     g_GLContextManager.EnsureMainThreadCTXApplied();
 }
 
+void GLEngineProxy::ClearTextures() {
+    QueueCmd(std::make_shared<GLEngineCmd_ClearTextures>());
+}
 void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
     auto obj = std::make_shared<GLEngineCmd_EmulateBitBlt>();
