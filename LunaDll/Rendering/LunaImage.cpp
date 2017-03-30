@@ -196,11 +196,11 @@ bool LunaImage::tryMaskToRGBA()
     return true;
 }
 
-void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
+void LunaImage::drawMasked(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain)
 {
     if (g_GLEngine.IsEnabled())
     {
-        if (mask && drawMask) {
+        if (drawMask) {
             auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
             obj->mXDest = dx;
             obj->mYDest = dy;
@@ -217,7 +217,7 @@ void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask
             g_GLEngine.QueueCmd(obj);
         }
 
-        if (mask && drawMain)
+        if (drawMain)
         {
             auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
             obj->mXDest = dx;
@@ -234,29 +234,54 @@ void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask
             obj->mMode = GLDraw::RENDER_MODE_MAX; //  GLDraw::RENDER_MODE_OR
             g_GLEngine.QueueCmd(obj);
         }
-
-        if (!mask && drawMain)
-        {
-            // LUNAIMAGE_TODO: Implement silhouette drawing of RGBA images for the case of mask-only drawing
-
-            auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
-            obj->mXDest = dx;
-            obj->mYDest = dy;
-            obj->mWidthDest = w;
-            obj->mHeightDest = h;
-            obj->mXSrc = sx;
-            obj->mYSrc = sy;
-            obj->mWidthSrc = w;
-            obj->mHeightSrc = h;
-
-            obj->mImg = shared_from_this();
-            obj->mOpacity = 1.0f;
-            obj->mMode = GLDraw::RENDER_MODE_ALPHA;
-            g_GLEngine.QueueCmd(obj);
-        }
     }
+    else
+    {
+        // LUNAIMAGE_TODO: Support GDI renderer
+    }
+}
 
-    // LUNAIMAGE_TODO: Support GDI renderer
+void LunaImage::drawRGBA(int dx, int dy, int w, int h, int sx, int sy, bool maskOnly, float opacity)
+{
+    if (g_GLEngine.IsEnabled())
+    {
+        // LUNAIMAGE_TODO: Implement silhouette drawing of RGBA images for the case of mask-only drawing
+
+        auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
+        obj->mXDest = dx;
+        obj->mYDest = dy;
+        obj->mWidthDest = w;
+        obj->mHeightDest = h;
+        obj->mXSrc = sx;
+        obj->mYSrc = sy;
+        obj->mWidthSrc = w;
+        obj->mHeightSrc = h;
+
+        obj->mImg = shared_from_this();
+        obj->mOpacity = opacity;
+        obj->mMode = GLDraw::RENDER_MODE_ALPHA;
+        g_GLEngine.QueueCmd(obj);
+    }
+    else
+    {
+        // LUNAIMAGE_TODO: Support GDI renderer
+    }
+}
+
+void LunaImage::draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask, bool drawMain, float opacity)
+{
+    if (opacity <= 0.0f) return;
+    if ((!drawMask) && (!drawMain)) return;
+
+    if (mask)
+    {
+        // LUNAIMAGE_TODO: If opacity is not 1.0, do a forced conversion to RGBA
+        drawMasked(dx, dy, w, h, sx, sy, drawMask, drawMain);
+    }
+    else
+    {
+        drawRGBA(dx, dy, w, h, sx, sy, !drawMain, opacity);
+    }
 }
 
 LunaImage::~LunaImage()

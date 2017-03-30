@@ -59,37 +59,5 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
         return;
     }
 
-    if (g_GLEngine.IsEnabled())
-    {
-        // LUNAIMAGE_TODO: Support masked images from RenderBitmapOp
-        // (Will need to think about how to handle the opacity argument)
-
-        auto obj = std::make_shared<GLEngineCmd_DrawSprite>();
-        obj->mXDest = x;
-        obj->mYDest = y;
-        obj->mWidthDest = width;
-        obj->mHeightDest = height;
-        obj->mXSrc = sx;
-        obj->mYSrc = sy;
-        obj->mWidthSrc = width;
-        obj->mHeightSrc = height;
-
-        obj->mImg = direct_img;
-        obj->mOpacity = opacity;
-        obj->mMode = GLDraw::RENDER_MODE_ALPHA;
-        g_GLEngine.QueueCmd(obj);
-    }
-    else
-    {
-        // LUNAIMAGE_TODO: Support GDI renderer
-        /*
-        BLENDFUNCTION bf;
-        bf.BlendOp = AC_SRC_OVER;
-        bf.BlendFlags = 0;
-        bf.SourceConstantAlpha = (int)roundf(255 * opacity);
-        bf.AlphaFormat = AC_SRC_ALPHA;
-        AlphaBlend(renderer->GetScreenDC(), x, y, width, height,
-            direct_img->m_hdc, sx, sy, width, height, bf);
-        */
-    }
+    direct_img->draw(x, y, width, height, sx, sy, true, true, opacity);
 }

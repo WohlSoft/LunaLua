@@ -61,7 +61,11 @@ public:
     bool tryMaskToRGBA();
 
     // Basic draw operation
-    void draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
+    void draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true, float opacity = 1.0f);
+
+private:
+    void drawMasked(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true);
+    void drawRGBA(int dx, int dy, int w, int h, int sx, int sy, bool maskOnly, float opacity = 1.0f);
 };
 
 #endif
