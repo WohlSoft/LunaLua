@@ -338,7 +338,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
     curRoot=root;
     for(int i=0; i<91; i++)
     {
-        std::string head = "sound-"+i2str(i+1);
+        std::string head = "sound-" + std::to_string(i + 1);
         std::string fileName;
         std::string reserveChannel;
 
@@ -393,7 +393,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //World music
     for(int j=1; (j<=16) && (i<74); i++, j++)
     {
-        std::string head = "world-music-"+i2str(j);
+        std::string head = "world-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");
@@ -410,7 +410,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //Special music
     for(int j=1; (j<=3) && (i<74); i++, j++)
     {
-        std::string head = "special-music-"+i2str(j);
+        std::string head = "special-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");
@@ -428,7 +428,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
     for(int j=1; (j<=56) && (i<74); i++, j++)
     {
         if(j==24) j++;
-        std::string head = "level-music-"+i2str(j);
+        std::string head = "level-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");

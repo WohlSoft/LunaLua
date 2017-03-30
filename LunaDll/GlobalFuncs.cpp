@@ -106,13 +106,6 @@ BSTR ConvertMBSToBSTR(const std::string & str)
     return wsdata;
 }
 
-std::string i2str(int source)
-{
-	std::stringstream s;
-	s<<source;
-	return s.str();
-}
-
 bool is_number(const std::string& s)
 {
     std::string::const_iterator it = s.begin();

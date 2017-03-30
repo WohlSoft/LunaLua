@@ -43,7 +43,6 @@ std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
 std::string ConvertBSTRToMBS(BSTR bstr);
 BSTR ConvertMBSToBSTR(const std::string & str);
 
-std::string i2str(int source);
 bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 bool isAbsolutePath(const std::wstring& path);
