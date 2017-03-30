@@ -17,17 +17,18 @@ namespace LunaLua::StringUtils {
                const std::basic_string_view<Elem, Traits>& sep) {
         using StringType = std::basic_string<Elem, Traits, Alloc>;
         using StringViewType = std::basic_string_view<Elem, Traits>;
+        std::size_t sizeOfSep = sep.size();
 
         std::vector<StringType> output;
         
         StringViewType st = input;
         while (true)
         {
-            size_t pos = input.find_first_of(sep);
+            size_t pos = st.find_first_of(sep);
             output.push_back(StringType(st.substr(0, pos)));
             if (pos == StringType::npos)
                 break;
-            st = st.substr(pos + 1);
+            st = st.substr(pos + sizeOfSep);
         }
 
         return output;
