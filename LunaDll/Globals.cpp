@@ -72,8 +72,6 @@ MciEmulator gMciEmulator;
 
 startUpSettings gStartupSettings;
 
-HardcodedGraphicsManager gGraphManager;
-
 SHMemServer gShMemServer;
 
 RenderOverrideManager gRenderOverride;

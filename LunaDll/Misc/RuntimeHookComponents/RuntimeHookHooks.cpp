@@ -7,7 +7,6 @@
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/MusicManager.h"
-#include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 
 #include "../SHMemServer.h"

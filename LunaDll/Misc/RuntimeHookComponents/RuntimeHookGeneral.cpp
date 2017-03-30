@@ -4,7 +4,6 @@
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/MusicManager.h"
-#include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 #include "../../GameConfig/GameConfiguration.h"
 #include "../../Globals.h"
@@ -204,9 +203,6 @@ void TrySkipPatch()
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
     PATCH(0x8BEC61).CALL(&LatePatch).Apply();
-
-    //Load graphics from the HardcodedGraphicsManager
-    HardcodedGraphicsManager::loadGraphics();
 
     // Either in root or in config folder. The config folder is recommended however.
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
