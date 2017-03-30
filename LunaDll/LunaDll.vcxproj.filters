@@ -521,9 +521,6 @@
     <ClInclude Include="Misc\TestModeMenu.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\RenderOps\RenderSpriteOp.h">
-      <Filter>Rendering\RenderOps</Filter>
-    </ClInclude>
     <ClInclude Include="Misc\PGEEditorCmdSender.h">
       <Filter>Misc</Filter>
     </ClInclude>
@@ -1038,9 +1035,6 @@
     </ClCompile>
     <ClCompile Include="Misc\TestModeMenu.cpp">
       <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\RenderOps\RenderSpriteOp.cpp">
-      <Filter>Rendering\RenderOps</Filter>
     </ClCompile>
     <ClCompile Include="Misc\PGEEditorCmdSender.cpp">
       <Filter>Misc</Filter>

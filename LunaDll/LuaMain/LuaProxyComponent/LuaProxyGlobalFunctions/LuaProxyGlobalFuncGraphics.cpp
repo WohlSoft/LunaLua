@@ -4,7 +4,6 @@
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderBitmapOp.h"
-#include "../../../Rendering/RenderOps/RenderSpriteOp.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 #include "../../../SMBXInternal/CameraInfo.h"
 #include "../../../Rendering/LunaImage.h"

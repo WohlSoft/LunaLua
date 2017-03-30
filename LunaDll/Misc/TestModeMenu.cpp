@@ -8,7 +8,7 @@
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Rendering/RenderOps/RenderRectOp.h"
-#include "../Rendering/RenderOps/RenderSpriteOp.h"
+#include "../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../SMBXInternal/CustomGraphics.h"
 
 #include "TestMode.h"
@@ -251,8 +251,8 @@ public:
         std::shared_ptr<LunaImage> sprite = ImageLoader::GetCharacterSprite(charId, powerup);
         if (sprite != nullptr)
         {
-            RenderSpriteOp* maskedRenderOp = new RenderSpriteOp();
-            maskedRenderOp->sprite = sprite;
+            RenderBitmapOp* maskedRenderOp = new RenderBitmapOp();
+            maskedRenderOp->direct_img = sprite;
             maskedRenderOp->sx = x + 20 + offX + padding;
             maskedRenderOp->sy = y + offY + padding;
             maskedRenderOp->sw = 100;
