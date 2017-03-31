@@ -6,7 +6,7 @@
 ResourceFileInfo GetResourceFileInfo(const std::wstring& searchPath, const std::wstring& baseName, const std::wstring& fileExt)
 {
     ResourceFileInfo entry;
-    std::wstring filePath = searchPath + baseName + L"." + fileExt;
+    std::wstring filePath = searchPath + L"/" + baseName + L"." + fileExt;
 
     WIN32_FILE_ATTRIBUTE_DATA fileData;
     if (GetFileAttributesExW(filePath.c_str(), GetFileExInfoStandard, &fileData) == 0)
@@ -32,15 +32,7 @@ ResourceFileInfo GetResourceFileInfo(const std::wstring& searchPath, const std::
 
 void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
 {
-    std::wstring searchPattern = searchPath;
-    if ((searchPattern.back() != L'/') && (searchPattern.back() != L'\\'))
-    {
-        searchPattern += L"/*";
-    }
-    else
-    {
-        searchPattern += L"*";
-    }
+    std::wstring searchPattern = searchPath + L"/*";
 
     HANDLE dir;
     WIN32_FIND_DATAW fileData;
@@ -52,7 +44,7 @@ void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map
     do {
         if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
 
-        std::wstring filePath = searchPath + fileData.cFileName;
+        std::wstring filePath = searchPath + L"/" + fileData.cFileName;
         std::wstring fileName = fileData.cFileName;
         std::transform(fileName.begin(), fileName.end(), fileName.begin(), ::towlower);
 

@@ -78,6 +78,7 @@ std::string url_encode(const std::string &value);
 //HMODULE getModule(std::string moduleName);
 
 // File/Path Helper Funcs
+std::wstring normalizePathSlashes(const std::wstring& input);
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
 bool readFile(std::string &content, std::string path, std::string errMsg = std::string());
 bool writeFile(const std::string &content, const std::string &path);

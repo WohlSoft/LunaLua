@@ -7,6 +7,7 @@
 #include "../Misc/ResourceFileMapper.h"
 #include "LunaImage.h"
 #include "../SMBXInternal/HardcodedGraphicsAccess.h"
+#include <Windows.h>
 
 // Loaded image map decleration
 std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfx;
@@ -15,11 +16,29 @@ std::unordered_map<std::string, uintptr_t>                  ImageLoader::m_NameT
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_GfxOverride;
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_Gfx;
 
+static bool checkDirectoryExistance(const std::wstring& path)
+{
+    WIN32_FILE_ATTRIBUTE_DATA fileData;
+    if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &fileData) == 0)
+    {
+        // Failed to get attributes
+        return false;
+    }
+
+    if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 static void resolveImageResource(
-    const std::wstring& basegamePath,
+    const std::wstring& appGfxTypeDir,
+    const std::wstring& episodeGfxTypeDir,
     const std::wstring& fileRoot,
-    std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
-    std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
+    const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
+    const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
     std::unordered_map<std::wstring, ResourceFileInfo>& outData)
 {
     std::wstring pngName = fileRoot + L".png";
@@ -37,10 +56,20 @@ static void resolveImageResource(
             it = episodeFiles.find(gifName);
         if (it != episodeFiles.end())
             resource = it->second;
-        if (resource.path.length() == 0)
-            resource = GetResourceFileInfo(basegamePath, fileRoot, L"png");
-        if (resource.path.length() == 0)
-            resource = GetResourceFileInfo(basegamePath, fileRoot, L"gif");
+        if (episodeGfxTypeDir.length() > 0)
+        {
+            if (resource.path.length() == 0)
+                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+            if (resource.path.length() == 0)
+                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
+        }
+        if (appGfxTypeDir.length() > 0)
+        {
+            if (resource.path.length() == 0)
+                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+            if (resource.path.length() == 0)
+                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
+        }
         mainIsGif = (resource.extension == L"gif");
         if (resource.path.length() > 0)
         {
@@ -57,8 +86,16 @@ static void resolveImageResource(
             it = episodeFiles.find(maskName);
         if (it != episodeFiles.end())
             maskResource = it->second;
-        if (maskResource.path.length() == 0)
-            maskResource = GetResourceFileInfo(basegamePath, fileRoot + L"m", L"gif");
+        if (episodeGfxTypeDir.length() > 0)
+        {
+            if (maskResource.path.length() == 0)
+                maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
+        }
+        if (appGfxTypeDir.length() > 0)
+        {
+            if (maskResource.path.length() == 0)
+                maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
+        }
         if (maskResource.path.length() > 0) {
             outData[fileRoot + L"m"] = std::move(maskResource);
         }
@@ -66,20 +103,24 @@ static void resolveImageResource(
 }
 
 void ImageLoaderCategory::resolveResources(
-    std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
-    std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
+    const std::wstring& appGfxDir,
+    const std::wstring& episodeGfxDir,
+    const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
+    const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
     std::unordered_map<std::wstring, ResourceFileInfo>& outData) const
 {
     uint32_t firstIdx = m_Category.getFirstIdx();
     uint32_t lastIdx = m_Category.getLastIdx();
     std::wstring prefix = m_Category.getPrefix();
 
-    std::wstring basegamePath = gAppPathWCHAR + L"/graphics/" + m_Category.getFolderPrefix() + L"/";
+    std::wstring gfxTypeSubdir = std::wstring(m_Category.getFolderPrefix());
+    std::wstring appGfxTypeDir = (appGfxDir.length() > 0) ? appGfxDir + L"/" + gfxTypeSubdir : L"";
+    std::wstring episodeGfxTypeDir = (episodeGfxDir.length() > 0) ? episodeGfxDir + L"/" + gfxTypeSubdir : L"";
 
     for (uint32_t idx = firstIdx; idx <= lastIdx; idx++)
     {
         std::wstring fileRoot = prefix + L"-" + std::to_wstring(idx);
-        resolveImageResource(basegamePath, fileRoot, levelFiles, episodeFiles, outData);
+        resolveImageResource(appGfxTypeDir, episodeGfxTypeDir, fileRoot, levelFiles, episodeFiles, outData);
     }
 }
 
@@ -222,28 +263,62 @@ static ImageLoaderCategory* smbxImageLoaderCategories[] = {
 
 void ImageLoader::Run(bool initialLoad)
 {
+
     static std::unordered_map<std::wstring, ResourceFileInfo>* lastResources = nullptr;
     std::unordered_map<std::wstring, ResourceFileInfo>* foundResources = nullptr;
     foundResources = new std::unordered_map<std::wstring, ResourceFileInfo>();
 
-    // Read level directory listing
-    std::unordered_map<std::wstring, ResourceFileInfo> levelFiles;
+    // Time to start figuring out our paths...
+
+    std::wstring episodePath = normalizePathSlashes(GM_FULLDIR);
+    std::wstring appPath = normalizePathSlashes(gAppPathWCHAR);
+    std::wstring episodeGfxDir = L"";
+    std::wstring appGfxDir = appPath + L"/graphics";
+    std::wstring levelGfxDir = L"";
+
+    // If we're not actually in an episode, make don't have an episode path
+    if (appPath == episodePath)
+    {
+        episodePath = L"";
+    }
+
+    // Check if we have a graphics subdirectory in the episode
+    if (episodePath.length() > 0)
+    {
+        std::wstring testSubdir = episodePath + L"/graphics";
+        if (checkDirectoryExistance(testSubdir))
+        {
+            episodeGfxDir = testSubdir;
+        }
+    }
+
+    // If not in the overworld, we have a level path, right?
     if (!gIsOverworld)
     {
-        std::wstring levelPath = getCustomFolderPath();
-        ListResourceFilesFromDir(levelPath.c_str(), levelFiles);
+        levelGfxDir = normalizePathSlashes(getCustomFolderPath());
+    }
+    
+    // Done figuring out our paths!
+
+    // Read level directory listing
+    std::unordered_map<std::wstring, ResourceFileInfo> levelFiles;
+    if (levelGfxDir.length() > 0)
+    {
+        ListResourceFilesFromDir(levelGfxDir.c_str(), levelFiles);
     }
 
     // Read episode directory listing
     std::unordered_map<std::wstring, ResourceFileInfo> episodeFiles;
-    std::wstring episodePath = GM_FULLDIR;
-    ListResourceFilesFromDir(episodePath.c_str(), episodeFiles);
+    if (episodePath.length() > 0)
+    {
+        ListResourceFilesFromDir(episodePath.c_str(), episodeFiles);
+    }
 
     // Resolve correct resource file info for each category
     for (int i = 0; smbxImageLoaderCategories[i] != nullptr; i++)
     {
         smbxImageLoaderCategories[i]->resolveResources(
-            levelFiles, episodeFiles, *foundResources
+            appGfxDir, episodeGfxDir, levelFiles, episodeFiles, *foundResources
             );
     }
 
@@ -257,7 +332,7 @@ void ImageLoader::Run(bool initialLoad)
     static bool loadedHardcoded = false; // TODO: Won't need this odd 'loadedHardcoded' shenanigans when the initial run of ImageLoader::Run is moved to after GM_FORM_GFX is initialized
     if (GM_FORM_GFX != nullptr)
     {
-        ResolveHardcodedGfx(levelFiles, episodeFiles, *foundResources);
+        ResolveHardcodedGfx(appGfxDir, episodeGfxDir, levelFiles, episodeFiles, *foundResources);
         LoadHardcodedGfx(foundResources, loadedHardcoded ? lastResources : nullptr);
         loadedHardcoded = true;
     }
@@ -280,11 +355,13 @@ void ImageLoader::Run(bool initialLoad)
     lastResources = foundResources;
 }
 
-void ImageLoader::ResolveHardcodedGfx(std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
+void ImageLoader::ResolveHardcodedGfx(const std::wstring& appGfxDir, const std::wstring& episodeGfxDir, const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
 {
+    std::wstring appGfxTypeDir = (appGfxDir.length() > 0) ? appGfxDir + L"/hardcoded" : L"";
+    std::wstring episodeGfxTypeDir = (episodeGfxDir.length() > 0) ? episodeGfxDir + L"/hardcoded" : L"";
+
     for (int idx1 = 1; idx1 <= HardcodedGraphicsItem::Size(); idx1++)
     {
-        std::wstring basegamePath = gAppPathWCHAR + L"/graphics/hardcoded/";
         HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(idx1);
 
         // No processing invalid or mask items here
@@ -307,7 +384,7 @@ void ImageLoader::ResolveHardcodedGfx(std::unordered_map<std::wstring, ResourceF
                 hardcodedName += L"-" + std::to_wstring(idx2);
             }
 
-            resolveImageResource(basegamePath, hardcodedName, levelFiles, episodeFiles, outData);
+            resolveImageResource(appGfxTypeDir, episodeGfxTypeDir, hardcodedName, levelFiles, episodeFiles, outData);
         }
     }
 }
@@ -456,14 +533,15 @@ void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::str
     std::wstring wName = Str2WStr(name);
     std::vector<std::wstring> searchPath;
     if (!gIsOverworld)
-        searchPath.push_back(getCustomFolderPath()); // Check custom folder
-    searchPath.push_back(GM_FULLDIR); // Check episode dir
-    searchPath.push_back(gAppPathWCHAR + L"\\graphics\\" + wFolderName + L"\\"); // Check base game
+        searchPath.push_back(normalizePathSlashes(getCustomFolderPath())); // Check custom folder
+    searchPath.push_back(normalizePathSlashes(GM_FULLDIR)); // Check episode dir
+    searchPath.push_back(normalizePathSlashes(GM_FULLDIR) + L"/graphics/" + wFolderName); // Check episode dir
+    searchPath.push_back(normalizePathSlashes(gAppPathWCHAR) + L"/graphics/" + wFolderName); // Check base game
 
     std::shared_ptr<LunaImage> img = nullptr;
     for (auto pathIt = searchPath.cbegin(); pathIt != searchPath.cend(); pathIt++)
     {
-        std::wstring imgPath = *pathIt + wName + L".png";
+        std::wstring imgPath = *pathIt + L"/" + wName + L".png";
         img = LunaImage::fromFile(imgPath.c_str());
         if (img)
         {

@@ -544,6 +544,35 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
 //	return std::wstring(path);
 //}
 
+// Function to normalize a path, in such a way that all slashes become forward
+// slashes, duplicate consecutive slashes are removed, and trailing slashes are
+// removed.
+std::wstring normalizePathSlashes(const std::wstring& input)
+{
+    std::wstring out;
+    out.reserve(input.length());
+
+    bool haveSlash = false;
+    for (const wchar_t & c : input)
+    {
+        if ((c == L'/') || (c == L'\\'))
+        {
+            haveSlash = true;
+        }
+        else
+        {
+            if (haveSlash)
+            {
+                out += L'/';
+                haveSlash = false;
+            }
+            out += c;
+        }
+    }
+
+    return out;
+}
+
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
     std::wifstream theFile(path, std::ios::binary| std::ios::in);

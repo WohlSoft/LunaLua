@@ -25,7 +25,7 @@ public:
     }
 
     void updateLoadedImages(const std::unordered_map<std::wstring, ResourceFileInfo>* fileData, const std::unordered_map<std::wstring, ResourceFileInfo>* oldFileData);
-    void resolveResources(std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData) const;
+    void resolveResources(const std::wstring& appGfxDir, const std::wstring& episodeGfxDir, const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData) const;
 private:
 };
 
@@ -46,7 +46,7 @@ public:
     ImageLoader() = delete;
 public:
     static void Run(bool initialLoad = false);
-    static void ResolveHardcodedGfx(std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData);
+    static void ResolveHardcodedGfx(const std::wstring& appGfxDir, const std::wstring& episodeGfxDir, const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData);
     static void LoadHardcodedGfx(const std::unordered_map<std::wstring, ResourceFileInfo>* fileData, const std::unordered_map<std::wstring, ResourceFileInfo>* oldFileData);
     static std::shared_ptr<LunaImage> GetByHDC(HDC hdc, bool bypassOverride=false);
 
