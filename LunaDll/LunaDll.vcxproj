@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
     <ClInclude Include="Misc\SRect.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
@@ -302,6 +303,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="Misc\NpcIdExtender.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
     <ClCompile Include="Rendering\LunaImage.cpp" />

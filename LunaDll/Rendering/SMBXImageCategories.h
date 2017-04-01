@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include "../Defines.h"
+#include "../Misc/NpcIdExtender.h"
 
 struct SMBXImageCategory
 {
@@ -75,7 +76,7 @@ public:
 
 static const SMBXImageCategory smbxImageCategoryBlock = { L"block",       700, GM_GFX_BLOCKS_PTR_CONSTPTR, GM_GFX_BLOCKS_MASK_PTR_CONSTPTR, nullptr, nullptr, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryBackground2 = { L"background2", 100, GM_GFX_BACKGROUND2_PTR_CONSTPTR, nullptr, GM_GFX_BACKGROUND2_W_PTR_CONSTPTR, GM_GFX_BACKGROUND2_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryNpc = { L"npc",         300, GM_GFX_NPC_PTR_CONSTPTR, GM_GFX_NPC_MASK_PTR_CONSTPTR, GM_GFX_NPC_W_PTR_CONSTPTR, GM_GFX_NPC_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryNpc = { L"npc",         PATCHED_NPC_ID_LIMIT, GM_GFX_NPC_PTR_CONSTPTR, GM_GFX_NPC_MASK_PTR_CONSTPTR, GM_GFX_NPC_W_PTR_CONSTPTR, GM_GFX_NPC_H_PTR_CONSTPTR, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryEffect = { L"effect",      200, GM_GFX_EFFECTS_PTR_CONSTPTR, GM_GFX_EFFECTS_MASK_PTR_CONSTPTR, GM_GFX_EFFECTS_W_PTR_CONSTPTR, GM_GFX_EFFECTS_H_PTR_CONSTPTR, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryBackground = { L"background",  200, GM_GFX_BACKGROUND_PTR_CONSTPTR, GM_GFX_BACKGROUND_MASK_PTR_CONSTPTR, GM_GFX_BACKGROUND_W_PTR_CONSTPTR, GM_GFX_BACKGROUND_H_PTR_CONSTPTR, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryMario = { L"mario",        10, GM_GFX_MARIO_PTR_CONSTPTR, GM_GFX_MARIO_MASK_PTR_CONSTPTR, GM_GFX_MARIO_W_PTR_CONSTPTR, GM_GFX_MARIO_H_PTR_CONSTPTR, nullptr, 1 };

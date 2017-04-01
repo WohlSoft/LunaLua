@@ -16,6 +16,7 @@
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
 
+#include "../NpcIdExtender.h"
 
 #ifndef NO_SDL
 bool episodeStarted = false;
@@ -165,6 +166,9 @@ static unsigned int __stdcall LatePatch(void)
     // warp array after it's been assigned to in the first place.
     fixup_WarpLimit();
 
+    // Set new NPC ID limit...
+    PatchNpcIdLimit();
+
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
     fixup_ErrorReporting();
@@ -174,7 +178,6 @@ static unsigned int __stdcall LatePatch(void)
 
     if (gStartupSettings.console)
         RedirectIOToConsole();
-
 
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */

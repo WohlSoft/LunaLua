@@ -559,6 +559,9 @@
     <ClInclude Include="Misc\SRect.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\NpcIdExtender.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1063,6 +1066,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\LunaImage.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\NpcIdExtender.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
