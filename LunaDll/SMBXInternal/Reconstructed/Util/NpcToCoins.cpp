@@ -24,7 +24,7 @@ extern bool* Reconstructed::Util::isNotCoinTransformable = 0;
 void Reconstructed::Util::npcToCoins_setup()
 {
     //dbgbox(L"Test");
-    isNotCoinTransformable = (bool*)calloc(300, sizeof(bool));
+    isNotCoinTransformable = (bool*)calloc(NPC::MAX_ID + 1, sizeof(bool));
     isNotCoinTransformable[NPCID_PLAYERFIREBALL] = true;
     isNotCoinTransformable[NPCID_YOSHIFIRE] = true;
     isNotCoinTransformable[NPCID_SPRING] = true;

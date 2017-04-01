@@ -10,6 +10,8 @@
 #include "../Misc/MiscFuncs.h"
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/NPCs.h"
+#include "../SMBXInternal/BGOs.h"
+#include "../SMBXInternal/Animation.h"
 
 #include "../Rendering/FrameCapture.h"
 
@@ -242,6 +244,11 @@ void CLunaLua::setupDefaults()
     _G["KEY_RUN"] = GM_PLAYER_KEY_RUN;
     _G["KEY_SEL"] = GM_PLAYER_KEY_SEL;
     _G["KEY_STR"] = GM_PLAYER_KEY_STR;
+
+    _G["NPC_MAX_ID"] = NPC::MAX_ID;
+    _G["BLOCK_MAX_ID"] = Block::MAX_ID;
+    _G["BGO_MAX_ID"] = SMBX_BGO::MAX_ID;
+    _G["ANIMATION_MAX_ID"] = SMBXAnimation::MAX_ID;
 
     LUAHELPER_DEF_CONST(_G, VK_LBUTTON);
     LUAHELPER_DEF_CONST(_G, VK_RBUTTON);

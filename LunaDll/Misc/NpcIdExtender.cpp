@@ -3,6 +3,7 @@
 #include <cstring>
 #include "AsmPatch.h"
 #include "NpcIdExtender.h"
+#include "../SMBXInternal/NPCs.h"
 
 class ResizableGameArray
 {
@@ -283,7 +284,7 @@ uint32_t GetNpcIdLimit()
 
 void PatchNpcIdLimit()
 {
-    uint32_t newLimit = PATCHED_NPC_ID_LIMIT;
+    uint32_t newLimit = NPC::MAX_ID;
 
     array_npc_gfxoffsetx_obj.Patch(newLimit + 1);
     array_npc_gfxoffsety_obj.Patch(newLimit + 1);

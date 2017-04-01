@@ -505,7 +505,8 @@ namespace NPC {
     bool GetSpinjumpSafe(int id);
     void SetSpinjumpSafe(int id, bool value);
 
-    static const short MAX_ID = 300;
+    // NOTE: This is the value we are patching it to. Originally 300
+    static const short MAX_ID = 400;
 }
 
 #endif

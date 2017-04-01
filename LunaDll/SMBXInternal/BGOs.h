@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct SMBX_BGO : SMBX_FullBaseItemArray<SMBX_BGO, 190, GM_BGO_COUNT_CONSTPTR, GM_BGOS_PTR_CONSTPTR> {				// Length should be 0x38
+struct SMBX_BGO : SMBX_FullBaseItemArray<SMBX_BGO, 200, GM_BGO_COUNT_CONSTPTR, GM_BGOS_PTR_CONSTPTR> {				// Length should be 0x38
 	VB6StrPtr	ptLayerName;	// +0x00
 	short		isHidden;		// +0x04
 	short		id;				// +0x06

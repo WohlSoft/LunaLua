@@ -4,7 +4,10 @@
 #include <cstdint>
 #include <string>
 #include "../Defines.h"
-#include "../Misc/NpcIdExtender.h"
+#include "../SMBXInternal/NPCs.h"
+#include "../SMBXInternal/BGOs.h"
+#include "../SMBXInternal/Animation.h"
+#include "../SMBXInternal/Blocks.h"
 
 struct SMBXImageCategory
 {
@@ -74,22 +77,22 @@ public:
     }
 };
 
-static const SMBXImageCategory smbxImageCategoryBlock = { L"block",       700, GM_GFX_BLOCKS_PTR_CONSTPTR, GM_GFX_BLOCKS_MASK_PTR_CONSTPTR, nullptr, nullptr, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryBackground2 = { L"background2", 100, GM_GFX_BACKGROUND2_PTR_CONSTPTR, nullptr, GM_GFX_BACKGROUND2_W_PTR_CONSTPTR, GM_GFX_BACKGROUND2_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryNpc = { L"npc",         PATCHED_NPC_ID_LIMIT, GM_GFX_NPC_PTR_CONSTPTR, GM_GFX_NPC_MASK_PTR_CONSTPTR, GM_GFX_NPC_W_PTR_CONSTPTR, GM_GFX_NPC_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryEffect = { L"effect",      200, GM_GFX_EFFECTS_PTR_CONSTPTR, GM_GFX_EFFECTS_MASK_PTR_CONSTPTR, GM_GFX_EFFECTS_W_PTR_CONSTPTR, GM_GFX_EFFECTS_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryBackground = { L"background",  200, GM_GFX_BACKGROUND_PTR_CONSTPTR, GM_GFX_BACKGROUND_MASK_PTR_CONSTPTR, GM_GFX_BACKGROUND_W_PTR_CONSTPTR, GM_GFX_BACKGROUND_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryMario = { L"mario",        10, GM_GFX_MARIO_PTR_CONSTPTR, GM_GFX_MARIO_MASK_PTR_CONSTPTR, GM_GFX_MARIO_W_PTR_CONSTPTR, GM_GFX_MARIO_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryLuigi = { L"luigi",        10, GM_GFX_LUIGI_PTR_CONSTPTR, GM_GFX_LUIGI_MASK_PTR_CONSTPTR, GM_GFX_LUIGI_W_PTR_CONSTPTR, GM_GFX_LUIGI_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryPeach = { L"peach",        10, GM_GFX_PEACH_PTR_CONSTPTR, GM_GFX_PEACH_MASK_PTR_CONSTPTR, GM_GFX_PEACH_W_PTR_CONSTPTR, GM_GFX_PEACH_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryToad = { L"toad",         10, GM_GFX_TOAD_PTR_CONSTPTR, GM_GFX_TOAD_MASK_PTR_CONSTPTR, GM_GFX_TOAD_W_PTR_CONSTPTR, GM_GFX_TOAD_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryLink = { L"link",         10, GM_GFX_LINK_PTR_CONSTPTR, GM_GFX_LINK_MASK_PTR_CONSTPTR, GM_GFX_LINK_W_PTR_CONSTPTR, GM_GFX_LINK_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryYoshiB = { L"yoshib",       10, GM_GFX_YOSHIB_PTR_CONSTPTR, GM_GFX_YOSHIB_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
-static const SMBXImageCategory smbxImageCategoryYoshiT = { L"yoshit",       10, GM_GFX_YOSHIT_PTR_CONSTPTR, GM_GFX_YOSHIT_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
-static const SMBXImageCategory smbxImageCategoryTile = { L"tile",        400, GM_GFX_TILES_PTR_CONSTPTR, nullptr, GM_GFX_TILES_W_PTR_CONSTPTR, GM_GFX_TILES_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryLevel = { L"level",       101, GM_GFX_LEVEL_PTR_CONSTPTR, GM_GFX_LEVEL_MASK_PTR_CONSTPTR, GM_GFX_LEVEL_W_PTR_CONSTPTR, GM_GFX_LEVEL_H_PTR_CONSTPTR, nullptr, 0 };
-static const SMBXImageCategory smbxImageCategoryScene = { L"scene",       100, GM_GFX_SCENE_PTR_CONSTPTR, GM_GFX_SCENE_MASK_PTR_CONSTPTR, GM_GFX_SCENE_W_PTR_CONSTPTR, GM_GFX_SCENE_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryPath = { L"path",        100, GM_GFX_PATH_PTR_CONSTPTR, GM_GFX_PATH_MASK_PTR_CONSTPTR, GM_GFX_PATH_W_PTR_CONSTPTR, GM_GFX_PATH_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryPlayer = { L"player",        5, GM_GFX_PLAYER_PTR_CONSTPTR, GM_GFX_PLAYER_MASK_PTR_CONSTPTR, GM_GFX_PLAYER_W_PTR_CONSTPTR, GM_GFX_PLAYER_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryBlock =       { L"block",                 Block::MAX_ID, GM_GFX_BLOCKS_PTR_CONSTPTR, GM_GFX_BLOCKS_MASK_PTR_CONSTPTR, nullptr, nullptr, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryBackground2 = { L"background2",                     100, GM_GFX_BACKGROUND2_PTR_CONSTPTR, nullptr, GM_GFX_BACKGROUND2_W_PTR_CONSTPTR, GM_GFX_BACKGROUND2_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryNpc =         { L"npc",                     NPC::MAX_ID, GM_GFX_NPC_PTR_CONSTPTR, GM_GFX_NPC_MASK_PTR_CONSTPTR, GM_GFX_NPC_W_PTR_CONSTPTR, GM_GFX_NPC_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryEffect =      { L"effect",        SMBXAnimation::MAX_ID, GM_GFX_EFFECTS_PTR_CONSTPTR, GM_GFX_EFFECTS_MASK_PTR_CONSTPTR, GM_GFX_EFFECTS_W_PTR_CONSTPTR, GM_GFX_EFFECTS_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryBackground =  { L"background",         SMBX_BGO::MAX_ID, GM_GFX_BACKGROUND_PTR_CONSTPTR, GM_GFX_BACKGROUND_MASK_PTR_CONSTPTR, GM_GFX_BACKGROUND_W_PTR_CONSTPTR, GM_GFX_BACKGROUND_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryMario =       { L"mario",                            10, GM_GFX_MARIO_PTR_CONSTPTR, GM_GFX_MARIO_MASK_PTR_CONSTPTR, GM_GFX_MARIO_W_PTR_CONSTPTR, GM_GFX_MARIO_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryLuigi =       { L"luigi",                            10, GM_GFX_LUIGI_PTR_CONSTPTR, GM_GFX_LUIGI_MASK_PTR_CONSTPTR, GM_GFX_LUIGI_W_PTR_CONSTPTR, GM_GFX_LUIGI_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryPeach =       { L"peach",                            10, GM_GFX_PEACH_PTR_CONSTPTR, GM_GFX_PEACH_MASK_PTR_CONSTPTR, GM_GFX_PEACH_W_PTR_CONSTPTR, GM_GFX_PEACH_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryToad =        { L"toad",                             10, GM_GFX_TOAD_PTR_CONSTPTR, GM_GFX_TOAD_MASK_PTR_CONSTPTR, GM_GFX_TOAD_W_PTR_CONSTPTR, GM_GFX_TOAD_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryLink =        { L"link",                             10, GM_GFX_LINK_PTR_CONSTPTR, GM_GFX_LINK_MASK_PTR_CONSTPTR, GM_GFX_LINK_W_PTR_CONSTPTR, GM_GFX_LINK_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryYoshiB =      { L"yoshib",                           10, GM_GFX_YOSHIB_PTR_CONSTPTR, GM_GFX_YOSHIB_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
+static const SMBXImageCategory smbxImageCategoryYoshiT =      { L"yoshit",                           10, GM_GFX_YOSHIT_PTR_CONSTPTR, GM_GFX_YOSHIT_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
+static const SMBXImageCategory smbxImageCategoryTile =        { L"tile",                            400, GM_GFX_TILES_PTR_CONSTPTR, nullptr, GM_GFX_TILES_W_PTR_CONSTPTR, GM_GFX_TILES_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryLevel =       { L"level",                           101, GM_GFX_LEVEL_PTR_CONSTPTR, GM_GFX_LEVEL_MASK_PTR_CONSTPTR, GM_GFX_LEVEL_W_PTR_CONSTPTR, GM_GFX_LEVEL_H_PTR_CONSTPTR, nullptr, 0 };
+static const SMBXImageCategory smbxImageCategoryScene =       { L"scene",                           100, GM_GFX_SCENE_PTR_CONSTPTR, GM_GFX_SCENE_MASK_PTR_CONSTPTR, GM_GFX_SCENE_W_PTR_CONSTPTR, GM_GFX_SCENE_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryPath =        { L"path",                            100, GM_GFX_PATH_PTR_CONSTPTR, GM_GFX_PATH_MASK_PTR_CONSTPTR, GM_GFX_PATH_W_PTR_CONSTPTR, GM_GFX_PATH_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryPlayer =      { L"player",                            5, GM_GFX_PLAYER_PTR_CONSTPTR, GM_GFX_PLAYER_MASK_PTR_CONSTPTR, GM_GFX_PLAYER_W_PTR_CONSTPTR, GM_GFX_PLAYER_H_PTR_CONSTPTR, nullptr, 1 };
 
 #endif
