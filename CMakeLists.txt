@@ -49,35 +49,52 @@ ucm_remove_files(3rdparty/luasocket/usocket.c 3rdparty/luasocket/unix.c 3rdparty
 # Set initreader dependency as raw sourc
 ucm_add_dirs(3rdparty/ini-reader TO LUNALUA_LIB_FILES)
 
-# Make LunaLuaLib target
-add_library (LunaLuaLib SHARED ${LUNALUA_LIB_FILES})
+# Make LunaLuaLib object target
+add_library (LunaLuaLib OBJECT ${LUNALUA_LIB_FILES})
+
+# shared libraries need PIC
+set_property(TARGET ${LunaLuaLib} PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+# Make LunaLuaLib shared target
+add_library(LunaLuaLibShared SHARED $<TARGET_OBJECTS:LunaLuaLib>)
+add_dependencies(LunaLuaLibShared LunaLuaLib)
+
+# Make LunaLuaLib static target
+add_library(LunaLuaLibStatic STATIC $<TARGET_OBJECTS:LunaLuaLib>)
+add_dependencies(LunaLuaLibStatic LunaLuaLib)
 
 # Set FreeImage dependency
 include_directories(${FREEIMAGE_INCLUDE_DIR})
 add_dependencies(LunaLuaLib FreeImage)
-target_link_libraries(LunaLuaLib ${FREEIMAGE_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibShared ${FREEIMAGE_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibStatic ${FREEIMAGE_LIBRARY_FILES})
+
 
 # Set glew dependency
 include_directories(${GLEW_INCLUDE_DIR})
 add_dependencies(LunaLuaLib glew)
-target_link_libraries(LunaLuaLib ${GLEW_LIBRARY_STATIC_FILES}) # TODO: Support Shared!
+target_link_libraries(LunaLuaLibShared ${GLEW_LIBRARY_STATIC_FILES}) # TODO: Support Shared!
+target_link_libraries(LunaLuaLibStatic ${GLEW_LIBRARY_STATIC_FILES})
 
 # Set luajit dependency
 include_directories(${LUAJIT_INCLUDE_DIR})
 add_dependencies(LunaLuaLib luajit)
-target_link_libraries(LunaLuaLib ${LUAJIT_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibShared ${LUAJIT_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibStatic ${LUAJIT_LIBRARY_FILES})
 
 # Set luabind dependency
 include_directories(${LUABIND_INCLUDE_DIR})
 add_dependencies(LunaLuaLib luabind)
-target_link_libraries(LunaLuaLib ${LUABIND_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibShared ${LUABIND_LIBRARY_FILES})
+target_link_libraries(LunaLuaLibStatic ${LUABIND_LIBRARY_FILES})
 
 # Set gif-h dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/gif-h/include)
 
 # Set SDL Mixer dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/sdl/include)
-target_link_libraries(LunaLuaLib ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2main.lib)
+target_link_libraries(LunaLuaLibShared ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2main.lib)
+target_link_libraries(LunaLuaLibStatic ${LUNALUA_3RDPARTY_DIR}/sdl/bin/SDL2_mixer_ext.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2.lib ${LUNALUA_3RDPARTY_DIR}/sdl/lib/SDL2main.lib)
 
 # Set nlohmann json dependency
 include_directories(${LUNALUA_3RDPARTY_DIR}/json)
@@ -86,7 +103,8 @@ include_directories(${LUNALUA_3RDPARTY_DIR}/json)
 include_directories(${BoostSourceDir})
 
 # Additional windows depedencies
-target_link_libraries(LunaLuaLib comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib ws2_32.lib)
+target_link_libraries(LunaLuaLibShared comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib ws2_32.lib)
+target_link_libraries(LunaLuaLibStatic comsuppw.lib opengl32.lib Gdiplus.lib Winmm.lib ws2_32.lib)
 
 # =============  LUNALUA CORE LIB END  ================
 
@@ -100,8 +118,8 @@ add_executable(LunaLuaTest ${LUNALUA_TEST_FILES})
 
 # Setup dependency to the LunaLuaLib
 target_include_directories(LunaLuaTest PUBLIC ${CMAKE_SOURCE_DIR}/LunaDll PUBLIC ${CATCH_INCLUDE_DIR})
-target_link_libraries(LunaLuaTest LunaLuaLib)
-add_dependencies(LunaLuaTest catch LunaLuaLib)
+target_link_libraries(LunaLuaTest PUBLIC LunaLuaLibStatic)
+add_dependencies(LunaLuaTest catch LunaLuaLibStatic)
 
 add_test(NAME LunaLuaTestProj COMMAND LunaLuaTest)
 # =============  LUNALUA TESTING END ================
