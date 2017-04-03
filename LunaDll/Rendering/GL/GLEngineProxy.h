@@ -64,6 +64,8 @@ public:
     // With this we don't need SafeCall anymore. 
     // However, before any GL operations at the main thread this function has to be call first.
     void EnsureMainThreadCTXApplied();
+
+    static void CheckRendererInit(void);
 };
 
 // Instance

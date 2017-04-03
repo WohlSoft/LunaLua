@@ -155,3 +155,26 @@ void GLEngineProxy::InitForHDC(HDC hdcDest)
     obj->mHdcDest = hdcDest;
     QueueCmd(obj);
 }
+
+void GLEngineProxy::CheckRendererInit(void)
+{
+    static bool ranEarlyInit = false;
+    if ((!ranEarlyInit) && g_GLEngine.IsEnabled())
+    {
+        void* mainFrmPtr = *((void**)0xB25010);
+        if (mainFrmPtr != nullptr)
+        {
+            auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
+            HDC targetHdc = nullptr;
+            frmGetHDC(mainFrmPtr, &targetHdc);
+
+            if (targetHdc != nullptr) {
+                //static char foo[256];
+                //sprintf(foo, "Early GL Init: 0x%08x", targetHdc);
+                //dbgboxA(foo);
+                ranEarlyInit = true;
+                g_GLEngine.InitForHDC(targetHdc);
+            }
+        }
+    }
+}
