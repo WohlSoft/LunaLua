@@ -125,6 +125,12 @@ extern void __stdcall forceTermination()
 
 extern int __stdcall LoadWorld()
 {
+    // We want to make sure we init the renderer before we start LunaLua when
+    // entering levels..... BUT we can't do this here, it likes to crash.
+    // Not sure why yet. Something about vanilla window initialization code
+    // probably.
+    //GLEngineProxy::CheckRendererInit();
+
     ResetLunaModule();
     gIsOverworld = true;
 
@@ -1169,20 +1175,7 @@ static void runtimeHookSmbxChangeModeHook(void)
         WaitMessage();
         LunaDllWaitFrame(false);
     }
-
-    // Get the HDC that will be the render target early if possible 
-    void* mainFrmPtr = *((void**)0xB25010);
-    if ((mainFrmPtr != nullptr) && g_GLEngine.IsEnabled())
-    {
-        auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
-        HDC targetHdc = nullptr;
-        frmGetHDC(mainFrmPtr, &targetHdc);
-
-        if (targetHdc != nullptr) {
-            g_GLEngine.InitForHDC(targetHdc);
-        }
-    }
-
+    
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
 }

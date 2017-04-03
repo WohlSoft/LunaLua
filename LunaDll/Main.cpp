@@ -106,6 +106,9 @@ int OnLvlLoad() {
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
     
+    // Make sure we init the renderer before we start LunaLua when entering levels
+    GLEngineProxy::CheckRendererInit();
+
     ResetLunaModule();
 
     // WIP
