@@ -5,6 +5,7 @@
 #include "../GlobalFuncs.h"
 #include <math.h>
 #include "../libs/ini-reader/INIReader.h"
+#include "../Utils/StringUtils.h"
 
 
 ChunkEntry::ChunkEntry()
@@ -164,9 +165,9 @@ void MusicManager::addSound(std::string alias, std::string fileName)
     //Load custom music
     if(alias=="music24") {
         //clear junk
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         music_lvl[23].setPath(fileName);
     }
 }
@@ -337,7 +338,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
     curRoot=root;
     for(int i=0; i<91; i++)
     {
-        std::string head = "sound-"+i2str(i+1);
+        std::string head = "sound-" + std::to_string(i + 1);
         std::string fileName;
         std::string reserveChannel;
 
@@ -346,9 +347,9 @@ void MusicManager::loadSounds(std::string path, std::string root)
 
         reserveChannel = SoundsIni.Get(head, "single-channel", "0");
 
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
 
         if( file_existsX(root+fileName) )
         {
@@ -392,14 +393,14 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //World music
     for(int j=1; (j<=16) && (i<74); i++, j++)
     {
-        std::string head = "world-music-"+i2str(j);
+        std::string head = "world-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
             music_wld[j-1].setPath(root+fileName.c_str());
@@ -409,14 +410,14 @@ void MusicManager::loadMusics(std::string path, std::string root)
     //Special music
     for(int j=1; (j<=3) && (i<74); i++, j++)
     {
-        std::string head = "special-music-"+i2str(j);
+        std::string head = "special-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
             music_spc[j-1].setPath(root+fileName.c_str());
@@ -427,14 +428,14 @@ void MusicManager::loadMusics(std::string path, std::string root)
     for(int j=1; (j<=56) && (i<74); i++, j++)
     {
         if(j==24) j++;
-        std::string head = "level-music-"+i2str(j);
+        std::string head = "level-music-" + std::to_string(j);
         std::string fileName;
 
         fileName = MusicIni.Get(head, "file", "");
         if(fileName.size()==0) continue;
-        replaceSubStr(fileName, "\"", "");
-        replaceSubStr(fileName, "\\\\",  "\\");
-        replaceSubStr(fileName, "/",  "\\");
+        LunaLua::StringUtils::replace(fileName, "\"", "");
+        LunaLua::StringUtils::replace(fileName, "\\\\",  "\\");
+        LunaLua::StringUtils::replace(fileName, "/",  "\\");
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
             music_lvl[j-1].setPath(root+fileName.c_str());

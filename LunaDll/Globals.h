@@ -16,7 +16,6 @@
 #include "CellManager/CellManager.h"
 #include "UserSaves/UserSaving.h"
 #include "MciEmulator/mciEmulator.h"
-#include "HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
@@ -112,7 +111,6 @@ extern Logger				gLogger;
 extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
-extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
 extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;

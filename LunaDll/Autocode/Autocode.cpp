@@ -230,7 +230,7 @@ void Autocode::Do(bool init) {
 					if(MyString.length() > 0) {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
 						std::wstring full_path = getCustomFolderPath() + MyString;
-						PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
+						PlaySoundW(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 					}
 
 				}
@@ -948,7 +948,7 @@ void Autocode::Do(bool init) {
 							 }
 							 			
 		case AT_DebugWindow: {
-			MessageBox(0, MyString.c_str(), L"LunaDLL debug message", 0);
+			MessageBoxW(0, MyString.c_str(), L"LunaDLL debug message", 0);
 			break;
 							 }
 

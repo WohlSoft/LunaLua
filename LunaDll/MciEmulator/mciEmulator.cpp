@@ -4,6 +4,7 @@
 //#include "Globals.h"
 #include "../GlobalFuncs.h"
 #include "../LuaMain/LuaProxyComponent/LuaProxyAudio.h"
+#include "../Utils/StringUtils.h"
 
 MciEmulator::MciEmulator(void)
 {}
@@ -18,7 +19,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 #ifndef NO_SDL
 
 	std::string cmd = lpstrCommand;
-	std::vector<std::string> spCmd = splitCmdArgs(cmd);
+	std::vector<std::string> spCmd = LunaLua::StringUtils::splitCmdArgs(cmd);
 	
 	if(spCmd.size() == 2){
         if(spCmd[0] == "pause" && spCmd[1] == "all") {
