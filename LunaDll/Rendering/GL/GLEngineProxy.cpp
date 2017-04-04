@@ -68,6 +68,9 @@ void GLEngineProxy::ThreadMain() {
 }
 
 void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
+    // Don't queue commands if we're not enabled
+    if (!IsEnabled()) return;
+
     // Ensure we're initialized
     Init();
 

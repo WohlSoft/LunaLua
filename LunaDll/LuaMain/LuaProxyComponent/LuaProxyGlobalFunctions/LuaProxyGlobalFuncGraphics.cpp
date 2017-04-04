@@ -392,6 +392,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     unsigned int rawVer, rawTex, rawCol, rawCnt;
     unsigned int primitive;
     bool sceneCoords;
+    bool depthTest;
 
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
@@ -414,6 +415,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, b, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, a, 1.0);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, sceneCoords, false);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, depthTest, false);
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, shader, nullptr);
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
@@ -429,6 +431,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     obj->mVertColor = (const float*)rawCol;
     obj->mCount = rawCnt;
     obj->mSceneCoords = sceneCoords;
+    obj->mDepthTest = depthTest;
 
     if (shader) {
         obj->mShader = shader->getInternalShader();

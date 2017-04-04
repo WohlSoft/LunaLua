@@ -927,6 +927,9 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
         messageBoxEvent->setLoopable(false);
         gLunaLua.callEvent(messageBoxEvent, cameraIdx);
     }
+
+    // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
+    gLunaRender.StoreCameraPosition(cameraIdx);
 }
 
 void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()

@@ -136,6 +136,23 @@ public:
     const float* mVertColor;
     uint32_t mCount;
     bool mSceneCoords;
+    bool mDepthTest;
+
+    GLEngineCmd_LuaDraw() :
+        mImg(nullptr),
+        mCapBuff(nullptr),
+        mShader(nullptr),
+        mAttributes(),
+        mUniforms(),
+        mColor{ 0, 0, 0, 0 },
+        mType(0),
+        mVert(nullptr),
+        mTex(nullptr),
+        mVertColor(nullptr),
+        mCount(0),
+        mSceneCoords(false),
+        mDepthTest(false)
+    {}
 
     virtual void run(GLEngine& glEngine) const;
     virtual ~GLEngineCmd_LuaDraw() {
