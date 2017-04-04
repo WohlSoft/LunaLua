@@ -181,6 +181,12 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         glTranslatef(static_cast<GLfloat>(-cameraX - 0.5), static_cast<GLfloat>(-cameraY - 0.5), 0.0f);
     }
 
+    // If depth testing is enabled, use it
+    if (mDepthTest) {
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+    }
+
     glVertexPointer(2, GL_FLOAT, 0, mVert);
     GLERRORCHECK();
 
@@ -209,6 +215,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     if (mVertColor != NULL) {
         glDisableClientState(GL_COLOR_ARRAY);
         GLERRORCHECK();
+    }
+
+    if (mDepthTest) {
+        glDepthMask(GL_FALSE);
+        glDisable(GL_DEPTH_TEST);
     }
 
     if (mSceneCoords) {
