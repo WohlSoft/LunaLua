@@ -7,12 +7,6 @@
 #include <wchar.h>
 #include <string.h>
 
-//String manupulation things
-void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
-void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
-void RemoveSubStr(std::string& sInput, const std::string& sub);
-std::vector<std::string> splitCmdArgs( std::string str);
-std::vector<std::wstring> splitCmdArgsW(std::wstring str);
 
 //Compatibility macroses left just in case
 #define utf8_encode(wstr) WStr2Str(wstr)
@@ -49,7 +43,6 @@ std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
 std::string ConvertBSTRToMBS(BSTR bstr);
 BSTR ConvertMBSToBSTR(const std::string & str);
 
-std::string i2str(int source);
 bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 bool isAbsolutePath(const std::wstring& path);
@@ -66,12 +59,9 @@ void removeFilePathA(char*path, int length);
 void initAppPaths();
 void ResetLunaModule();
 void InitGlobals();
-void ResetFreeGlob();
 void CleanUp();
 
 /// HELPER FUNCTIONS ///
-std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
-std::vector<std::string> split( std::string str, char delimiter);
 bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
 std::string url_encode(const std::string &value);
 // Module Helper Funcs
@@ -99,6 +89,5 @@ void sendPUTRequest(const std::string& server, const std::string& data);
 
 // Debug stuff
 void RedirectIOToConsole();
-void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 #endif

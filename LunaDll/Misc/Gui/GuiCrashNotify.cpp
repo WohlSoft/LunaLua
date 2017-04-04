@@ -6,6 +6,7 @@
 #include "../../resource.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
+#include "../../Utils/StringUtils.h"
 
 #pragma comment(linker, \
   "\"/manifestdependency:type='Win32' "\
@@ -35,7 +36,7 @@ void GuiCrashNotify::show()
     static bool defaultSkipMessageBox = false;
     static bool defaultDoSend = false;
 
-    replaceSubStr(m_crashText, "\n", "\r\n");
+    LunaLua::StringUtils::replace(m_crashText, "\n", "\r\n");
     if (!defaultSkipMessageBox){
         DialogBoxParam(gHInstance, MAKEINTRESOURCE(IDD_CRASHDIALOG), NULL,
             [](HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) -> BOOL

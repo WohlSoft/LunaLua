@@ -4,7 +4,6 @@
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/MusicManager.h"
-#include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 #include "../../GameConfig/GameConfiguration.h"
 #include "../../Globals.h"
@@ -15,6 +14,8 @@
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
+
+#include "../../Utils/StringUtils.h"
 
 #include "../NpcIdExtender.h"
 
@@ -188,7 +189,7 @@ static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
     //Check for arguments and write them in gStartupSettings
-    ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
+    ParseArgs(LunaLua::StringUtils::splitCmdArgs(GetCommandLineW()));
 
     // If we have stdin/stdout, attach to the IPC server
     ipcServer.AttachStdinStdout();
@@ -206,9 +207,6 @@ void TrySkipPatch()
     // Insert callback for patching which must occur after the runtime has started
     // (0x8BEC61 is not quite as early as would be ideal for this, but it's convenient)
     PATCH(0x8BEC61).CALL(&LatePatch).Apply();
-
-    //Load graphics from the HardcodedGraphicsManager
-    HardcodedGraphicsManager::loadGraphics();
 
     // Either in root or in config folder. The config folder is recommended however.
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));

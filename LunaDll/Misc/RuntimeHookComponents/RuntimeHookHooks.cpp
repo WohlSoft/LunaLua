@@ -7,7 +7,6 @@
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/MusicManager.h"
-#include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 
 #include "../SHMemServer.h"
@@ -17,7 +16,6 @@
 #include "../../Main.h"
 #include "../../libs/ini-reader/INIReader.h"
 
-#include "../RunningStat.h"
 #include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"

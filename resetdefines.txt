@@ -1,3 +1,0 @@
-0x00B2C6F4	w	12	Gravity
-0x00B2C6DC	w	20	Jumpheight
-0x00B2C6E2	w	20	Jumpheight bounce

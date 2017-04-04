@@ -71,8 +71,6 @@ MciEmulator gMciEmulator;
 
 startUpSettings gStartupSettings;
 
-HardcodedGraphicsManager gGraphManager;
-
 SHMemServer gShMemServer;
 
 FreeImageInit        gFreeImgInit;

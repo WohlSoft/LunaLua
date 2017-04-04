@@ -1,4 +1,5 @@
 #include "HardcodedGraphicsAccess.h"
+#include "../Utils/StringUtils.h"
 
 // Values for index and array-index: https://gist.github.com/KevinW1998/49417ab8b94712bee39c
 std::array<HardcodedGraphicsItem, 51> HardcodedGraphics =
@@ -152,7 +153,7 @@ bool HardcodedGraphicsItem::GetHDCByName(std::string text, HDC* colorHDC, HDC* m
     // hardcoded-1.png
     // --> [0] = hardcoded
     // --> [1] = 1
-    std::vector<std::string> textPattern = split(text, '-');
+    std::vector<std::string> textPattern = LunaLua::StringUtils::split(text, "-");
     if (textPattern.size() != 2 && textPattern.size() != 3) // Size must be 2 or three (see above)
         return false;
 

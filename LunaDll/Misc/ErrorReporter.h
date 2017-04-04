@@ -3,8 +3,7 @@
 
 #include <string>
 #include <sstream>
-#include "../libs/stackwalker/StackWalker.h"
-
+#include <StackWalker.h>
 
 
 namespace ErrorReport{
