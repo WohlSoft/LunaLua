@@ -260,11 +260,17 @@ void Renderer::StartCameraRender(int idx)
 {
     m_curCamIdx = idx;
     m_renderOpsProcessedCount = 0;
+}
 
-    std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
-    cmd->mX = SMBX_CameraInfo::getCameraX(idx);
-    cmd->mY = SMBX_CameraInfo::getCameraY(idx);
-    g_GLEngine.QueueCmd(cmd);
+void Renderer::StoreCameraPosition(int idx)
+{
+    if (g_GLEngine.IsEnabled())
+    {
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mX = SMBX_CameraInfo::getCameraX(idx);
+        cmd->mY = SMBX_CameraInfo::getCameraY(idx);
+        g_GLEngine.QueueCmd(cmd);
+    }
 }
 
 void Renderer::EndFrameRender()
