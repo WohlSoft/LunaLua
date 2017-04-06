@@ -61,6 +61,7 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* unknownVal);
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR cmp1, BSTR cmp2);
 extern void __stdcall checkLevelShutdown();       //Level Shutdown Check Function
 extern void __stdcall recordVBErrCode(int errCode);       //Error Handler
+extern void __stdcall recordVBErrCodeHandler();
 extern SEH_HANDLER* LunaDLLOriginalExceptionHandler;
 extern EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     EXCEPTION_RECORD *ExceptionRecord,

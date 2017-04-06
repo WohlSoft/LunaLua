@@ -87,7 +87,6 @@ void RenderOverrideManager::loadHardcodedOverrides()
         if(nextItem.isMask())
             continue;
 
-        HardcodedGraphicsItem* nextItemMask = nextItem.getMaskObj();
         if (nextItem.isArray()) {
             for (int j = nextItem.minItem; j <= nextItem.maxItem; j++) 
             {

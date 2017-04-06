@@ -562,12 +562,20 @@ extern void __stdcall recordVBErrCode(int errCode)
     // VB6's "error" object that stores this internally (would involve calling
     // rtcErrObj)
     lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+}
 
-    //HERE NEED ESI CMP CODE (ORIGINAL CODE)
-    __asm{
-        CMP     ESI, 0x9C68
+__declspec(naked) void __stdcall recordVBErrCodeHandler() {
+    __asm {
+        push ebp
+        mov ebp, esp
+        push [ebp + 8] // push for errCode
+        call    recordVBErrCode
+        cmp [ebp + 8], 0x9C68 // Ensure that we compare the value 40400
+        pop ebp
+        ret 4
     }
 }
+
 
 extern void __stdcall LoadLocalGfxHook()
 {
