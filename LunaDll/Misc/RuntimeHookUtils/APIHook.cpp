@@ -76,6 +76,7 @@ CAPIHook::~CAPIHook() {
             if (p->m_pNext == this) {
                 // Make the node that points to us point to the our next node
                 p->m_pNext = p->m_pNext->m_pNext;
+                fFound = TRUE;
                 break;
             }
         }

@@ -14,22 +14,22 @@ GLEngineProxy::GLEngineProxy() {
     mFrameCount = 0;
     mPendingClear = 0;
     mSkipFrame = false;
-    mpThread = NULL;
+    mIsDirty = false;
 }
 
 GLEngineProxy::~GLEngineProxy() {
-    if (mpThread != NULL) {
-        QueueCmd(std::make_shared<GLEngineCmd_Exit>());
-        mpThread->join();
-    }
+    Shutdown();
 }
 
 void GLEngineProxy::Init() {
+    if (mIsDirty)
+        return;
+    
     // Don't use built-in SMBX frameskip for OpenGL renderer.
     GM_FRAMESKIP = COMBOOL(false);
 
-    if (mpThread == NULL) {
-        mpThread = new std::thread( [this] {this->ThreadMain(); });
+    if (!mpThread) {
+        mpThread = std::make_unique<std::thread>([this] {this->ThreadMain(); });
     }
 }
 
@@ -61,6 +61,9 @@ void GLEngineProxy::ThreadMain() {
 }
 
 void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
+    if (mIsDirty)
+        return;
+    
     // Ensure we're initialized
     Init();
 
@@ -94,6 +97,20 @@ std::shared_ptr<GLShader> GLEngineProxy::CreateNewShader(const std::string& vert
 void GLEngineProxy::EnsureMainThreadCTXApplied()
 {
     g_GLContextManager.EnsureMainThreadCTXApplied();
+}
+
+void GLEngineProxy::Shutdown()
+{
+    if (mIsDirty)
+        return;
+    
+    if (mpThread) {
+        if (mpThread->joinable()) {
+            QueueCmd(std::make_shared<GLEngineCmd_Exit>());
+            mpThread->join();
+        }
+    }
+    mIsDirty = true;
 }
 
 void GLEngineProxy::ClearSMBXSprites() {
