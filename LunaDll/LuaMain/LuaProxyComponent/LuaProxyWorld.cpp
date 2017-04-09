@@ -86,15 +86,20 @@ bool LuaProxy::World::playerIsCurrentWalking() const
 
 luabind::object LuaProxy::World::levelTitle(lua_State* L)
 {
-	if(SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != GM_STR_NULL.ptr){
-		return luabind::object(L, VBStr(SMBXOverworld::get()->currentLevelTitle.ptr));
+    wchar_t* ptr = SMBXOverworld::get()->currentLevelTitle.ptr;
+	if((ptr != nullptr) && (ptr[0] != L'\0') && (ptr != GM_STR_NULL.ptr)) {
+		return luabind::object(L, VBStr(ptr));
 	}
 	return luabind::object();
 }
 
 luabind::object LuaProxy::World::levelObj(lua_State* L)
 {
-    if (SMBXOverworld::get()->currentLevelTitle.ptr[0] && SMBXOverworld::get()->currentLevelTitle.ptr != GM_STR_NULL.ptr){
+    // TODO: Fix this to be safer.... 
+    //       The current approach only works if level names are unique. We
+    //       should not count on this.
+    wchar_t* ptr = SMBXOverworld::get()->currentLevelTitle.ptr;
+    if ((ptr != nullptr) && (ptr[0] != L'\0') && (ptr != GM_STR_NULL.ptr)) {
         return LuaProxy::LevelObject::getByName(SMBXOverworld::get()->currentLevelTitle, L);
     }
     return luabind::object();

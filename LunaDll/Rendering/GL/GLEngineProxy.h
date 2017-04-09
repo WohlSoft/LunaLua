@@ -68,6 +68,8 @@ public:
 
     // Shutdown GL Engine:
     void Shutdown();
+	
+	static void CheckRendererInit(void);
 };
 
 // Instance
