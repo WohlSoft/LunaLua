@@ -115,10 +115,24 @@ extern void __stdcall InitHook()
     exitCall();*/
 }
 
+#pragma optimize( "", off )
 extern void __stdcall forceTermination()
 {
-    _exit(0);
+    g_GLEngine.Shutdown(); // FIXME: Works with dirty flag
+    
+    // README/FIXME:
+    // Currently the only way to actually skip the destructions is by calling TerminateProcess
+    // which is a very bad way of handling it. Due to the spaghetti of static object calling destructors
+    // of static objects leads to calling functions of already destructed objects
+    TerminateProcess(GetCurrentProcess(), 0);
+    for (;;);
+
+    // Other options which actually calls the destructors:
+    // ExitProcess(0);
+    // _exit(0);
+    // std::quick_exit(0);
 }
+#pragma optimize( "", on ) 
 
 extern int __stdcall LoadWorld()
 {
@@ -567,12 +581,20 @@ extern void __stdcall recordVBErrCode(int errCode)
     // VB6's "error" object that stores this internally (would involve calling
     // rtcErrObj)
     lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+}
 
-    //HERE NEED ESI CMP CODE (ORIGINAL CODE)
-    __asm{
-        CMP     ESI, 0x9C68
+__declspec(naked) void __stdcall recordVBErrCodeHandler() {
+    __asm {
+        push ebp
+        mov ebp, esp
+        push [ebp + 8] // push for errCode
+        call    recordVBErrCode
+        cmp [ebp + 8], 0x9C68 // Ensure that we compare the value 40400
+        pop ebp
+        ret 4
     }
 }
+
 
 extern void __stdcall LoadLocalGfxHook()
 {

@@ -30,8 +30,10 @@ endif()
 ExternalProject_Add(
     glew
     PREFIX ${CMAKE_BINARY_DIR}/external/glew
-    GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-    GIT_TAG 7be092340b60838bc860bf8bbde01f42b8d51125
+    # GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
+    GIT_REPOSITORY https://github.com/Bluenaxela/glew-cmake.git
+    # GIT_TAG 7be092340b60838bc860bf8bbde01f42b8d51125
+    GIT_TAG bce1c401f7f869be4268f6af9f1bb804f409eab7
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${GLEW_INSTALL_DIR}"
 )
 

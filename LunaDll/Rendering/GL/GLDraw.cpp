@@ -134,6 +134,8 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
         0, 2, 3  // (bottom left - top right - bottom right)
     };
 
+    
+    // TODO: Crashes
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
