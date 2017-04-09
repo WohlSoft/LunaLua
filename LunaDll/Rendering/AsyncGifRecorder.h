@@ -9,6 +9,7 @@
 #include "RenderUtils.h"
 #include <atomic>
 #include <gif.h>
+#include <memory>
 
 class AsyncGifRecorder
 {
@@ -30,7 +31,7 @@ public:
 private:
     ThreadedCmdQueue<GifRecorderCMDItem> nextFrames;
 
-    std::thread* m_workerThread;
+    std::unique_ptr<std::thread> m_workerThread;
     std::atomic_bool m_isRunning;
     
     //On worker Thread:

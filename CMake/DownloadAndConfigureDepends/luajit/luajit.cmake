@@ -15,12 +15,11 @@ include(ExternalProject)
 # SET OUTPUT VARS
 
 
-set(LUAJIT_COMPILE_ARGS "")
-set(LUAJIT_COMPILE_ARGS ${LUAJIT_COMPILE_ARGS} $<$<CONFIG:Debug>:debug>)
+set(LUAJIT_COMPILE_ARG_STATIC "")
 
 IF(LUAJIT_COMPILE_SHARED)
 ELSE()
-    set(LUAJIT_COMPILE_ARGS ${LUAJIT_COMPILE_ARGS} static)
+    set(LUAJIT_COMPILE_ARG_STATIC "static") # FIXME: Right now --> always static for release-mode
 ENDIF()
 
 set(LUAJIT_INSTALL_DIR ${CMAKE_BINARY_DIR}/external/luajit-install)
@@ -30,7 +29,6 @@ set(LUAJIT_LIBRARY_FILES ${LUAJIT_LIBRARY_DIR}/lua51.lib)
 set(LUAJIT_BINARY_DIR ${LUAJIT_INSTALL_DIR}/bin)
 set(LUAJIT_BINARY_FILES ${LUAJIT_BINARY_DIR}/lua51.dll)
 
-
 ExternalProject_Add(
     luajit
     PREFIX ${CMAKE_BINARY_DIR}/external/luajit
@@ -38,7 +36,8 @@ ExternalProject_Add(
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE 1
-    BUILD_COMMAND ${CMAKE_COMMAND} -E chdir src msvcbuild.bat ${LUAJIT_COMPILE_ARGS}
+    # Currently dirty hack to get it right:
+    BUILD_COMMAND ${CMAKE_COMMAND} -E chdir src msvcbuild.bat "$<$<CONFIG:Debug>:debug>$<$<NOT:$<CONFIG:Debug>>:static>" ${LUAJIT_COMPILE_ARG_STATIC}
     INSTALL_COMMAND ""
 )
 

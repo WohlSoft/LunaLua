@@ -13,12 +13,13 @@
 class GLEngineProxy {
     friend class GLLock;
 private:
-    std::thread* mpThread;
+    std::unique_ptr<std::thread> mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
     ThreadedCmdQueue<uint64_t> mDeletedTextures;
     std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
+    bool mIsDirty; // FIXME: This is currently due to a Deadlock because of the destructor of the BMPBox-Cache @ BMPBox.cpp/loadShared/basegameImageCache
     
 public:
     GLEngine mInternalGLEngine;
@@ -65,7 +66,10 @@ public:
     // However, before any GL operations at the main thread this function has to be call first.
     void EnsureMainThreadCTXApplied();
 
-    static void CheckRendererInit(void);
+    // Shutdown GL Engine:
+    void Shutdown();
+	
+	static void CheckRendererInit(void);
 };
 
 // Instance

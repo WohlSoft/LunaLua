@@ -15,9 +15,11 @@ AsyncGifRecorder::AsyncGifRecorder() :
 
 AsyncGifRecorder::~AsyncGifRecorder()
 {
-    if (m_workerThread->joinable()){
-        exitWorkerThread();
-        m_workerThread->join();
+    if (m_workerThread) {
+        if (m_workerThread->joinable()) {
+            exitWorkerThread();
+            m_workerThread->join();
+        }
     }
 }
 
@@ -38,7 +40,7 @@ void AsyncGifRecorder::addNextFrameToProcess(int width, int height, BYTE* pData)
 
 void AsyncGifRecorder::init()
 {
-    m_workerThread = new std::thread([this](){ workerFunc(); });
+    m_workerThread = std::make_unique<std::thread>([this]() { workerFunc(); });
 }
 
 void AsyncGifRecorder::exitWorkerThread()
