@@ -25,6 +25,7 @@ Mix_CloseAudio
 Mix_EachSoundFont
 Mix_ExpireChannel
 Mix_FadeInChannelTimed
+Mix_FadeInChannelTimedVolume
 Mix_FadeInMusic
 Mix_FadeInMusicPos
 Mix_FadeOutChannel
@@ -74,6 +75,7 @@ Mix_PauseMusic
 Mix_Paused
 Mix_PausedMusic
 Mix_PlayChannelTimed
+Mix_PlayChannelTimedVolume
 Mix_PlayMusic
 Mix_Playing
 Mix_PlayingMusic
