@@ -22,6 +22,7 @@ include(CMake/ucm.cmake)
 # Include Dependencies
 include(CMake/DownloadAndConfigureDepends/FreeImage/FreeImage.cmake)
 include(CMake/DownloadAndConfigureDepends/glew/glew.cmake)
+include(CMake/DownloadAndConfigureDepends/glbinding/glbinding.cmake)
 include(CMake/DownloadAndConfigureDepends/luajit/luajit.cmake)
 include(CMake/DownloadAndConfigureDepends/boost/boost.cmake)
 include(CMake/DownloadAndConfigureDepends/luabind/luabind.cmake) # Depends on boost and luajit!
@@ -70,11 +71,19 @@ target_link_libraries(LunaLuaLibShared ${FREEIMAGE_LIBRARY_FILES})
 target_link_libraries(LunaLuaLibStatic ${FREEIMAGE_LIBRARY_FILES})
 
 
-# Set glew dependency
+# Set glew dependency [NOTE: Should be removed when everything is ported to glbinding]
 include_directories(${GLEW_INCLUDE_DIR})
 add_dependencies(LunaLuaLib glew)
 target_link_libraries(LunaLuaLibShared ${GLEW_LIBRARY_STATIC_FILES}) # TODO: Support Shared!
 target_link_libraries(LunaLuaLibStatic ${GLEW_LIBRARY_STATIC_FILES})
+
+# Set glbinding dependency
+include_directories(${GLBINDING_INCLUDE_DIR})
+add_dependencies(LunaLuaLib glbinding)
+target_link_libraries(LunaLuaLibShared ${GLBINDING_LIBRARY_STATIC_FILES}) # TODO: Support Shared!
+target_link_libraries(LunaLuaLibStatic ${GLBINDING_LIBRARY_STATIC_FILES})
+
+
 
 # Set luajit dependency
 include_directories(${LUAJIT_INCLUDE_DIR})
