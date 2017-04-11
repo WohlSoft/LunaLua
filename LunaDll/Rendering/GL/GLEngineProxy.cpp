@@ -14,22 +14,22 @@ GLEngineProxy::GLEngineProxy() {
     mFrameCount = 0;
     mPendingClear = 0;
     mSkipFrame = false;
-    mpThread = NULL;
+    mIsDirty = false;
 }
 
 GLEngineProxy::~GLEngineProxy() {
-    if (mpThread != NULL) {
-        QueueCmd(std::make_shared<GLEngineCmd_Exit>());
-        mpThread->join();
-    }
+    Shutdown();
 }
 
 void GLEngineProxy::Init() {
+    if (mIsDirty)
+        return;
+    
     // Don't use built-in SMBX frameskip for OpenGL renderer.
     GM_FRAMESKIP = COMBOOL(false);
 
-    if (mpThread == NULL) {
-        mpThread = new std::thread( [this] {this->ThreadMain(); });
+    if (!mpThread) {
+        mpThread = std::make_unique<std::thread>([this] {this->ThreadMain(); });
     }
 }
 
@@ -61,6 +61,10 @@ void GLEngineProxy::ThreadMain() {
 }
 
 void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
+	// Don't queue commands if we're not enabled
+    if (mIsDirty || !IsEnabled())
+        return;
+	
     // Ensure we're initialized
     Init();
 
@@ -94,6 +98,20 @@ std::shared_ptr<GLShader> GLEngineProxy::CreateNewShader(const std::string& vert
 void GLEngineProxy::EnsureMainThreadCTXApplied()
 {
     g_GLContextManager.EnsureMainThreadCTXApplied();
+}
+
+void GLEngineProxy::Shutdown()
+{
+    if (mIsDirty)
+        return;
+    
+    if (mpThread) {
+        if (mpThread->joinable()) {
+            QueueCmd(std::make_shared<GLEngineCmd_Exit>());
+            mpThread->join();
+        }
+    }
+    mIsDirty = true;
 }
 
 void GLEngineProxy::ClearSMBXSprites() {
@@ -168,4 +186,27 @@ void GLEngineProxy::InitForHDC(HDC hdcDest)
     auto obj = std::make_shared<GLEngineCmd_InitForHDC>();
     obj->mHdcDest = hdcDest;
     QueueCmd(obj);
+}
+
+void GLEngineProxy::CheckRendererInit(void)
+{
+    static bool ranEarlyInit = false;
+    if ((!ranEarlyInit) && g_GLEngine.IsEnabled())
+    {
+        void* mainFrmPtr = *((void**)0xB25010);
+        if (mainFrmPtr != nullptr)
+        {
+            auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
+            HDC targetHdc = nullptr;
+            frmGetHDC(mainFrmPtr, &targetHdc);
+
+            if (targetHdc != nullptr) {
+                //static char foo[256];
+                //sprintf(foo, "Early GL Init: 0x%08x", targetHdc);
+                //dbgboxA(foo);
+                ranEarlyInit = true;
+                g_GLEngine.InitForHDC(targetHdc);
+            }
+        }
+    }
 }

@@ -53,7 +53,8 @@ void fixup_ErrorReporting()
         if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
 
             // Apply patch to call recordVBErrCode with ESI as an argument
-            PATCH(toPatch).PUSH_ESI().CALL(&recordVBErrCode).Apply();
+            // 660CE240
+            PATCH(toPatch).PUSH_ESI().CALL(&recordVBErrCodeHandler).Apply();
                 //NOP
 
             // Now get the protection back

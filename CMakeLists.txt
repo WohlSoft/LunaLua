@@ -59,6 +59,8 @@ set_property(TARGET ${LunaLuaLib} PROPERTY POSITION_INDEPENDENT_CODE 1)
 # Make LunaLuaLib shared target
 add_library(LunaLuaLibShared SHARED $<TARGET_OBJECTS:LunaLuaLib>)
 add_dependencies(LunaLuaLibShared LunaLuaLib)
+# We want the name as "LunaDll.dll"
+set_target_properties(LunaLuaLibShared PROPERTIES OUTPUT_NAME LunaDll)
 
 # Make LunaLuaLib static target
 add_library(LunaLuaLibStatic STATIC $<TARGET_OBJECTS:LunaLuaLib>)

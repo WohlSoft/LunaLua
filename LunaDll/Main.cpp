@@ -107,7 +107,13 @@ int OnLvlLoad() {
 
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
-    
+
+    // TODO: Figure out why early GL init crashes when using the launcher! In
+    //       the meantime, disable early GL init again... :/
+    //
+    // Make sure we init the renderer before we start LunaLua when entering levels
+    //GLEngineProxy::CheckRendererInit();
+
     ResetLunaModule();
 
     // WIP

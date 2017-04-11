@@ -335,7 +335,7 @@ local function initFFIBasedAPIs()
         end
         
         Graphics.__glInternalDraw{
-            priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], texture = texture,
+            priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], depthTest = args['depthTest'], texture = texture,
             r = color[1], g = color[2], b = color[3], a = color[4],
             rawVer = vertCoords, rawTex = texCoords, rawCol = vertColor, rawCnt = arr_len,
             shader = shader, uniforms = uniformArgsConverted, attributes = attributeArgsConverted

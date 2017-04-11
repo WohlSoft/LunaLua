@@ -116,13 +116,33 @@ extern void __stdcall InitHook()
     exitCall();*/
 }
 
+#pragma optimize( "", off )
 extern void __stdcall forceTermination()
 {
-    _exit(0);
+    g_GLEngine.Shutdown(); // FIXME: Works with dirty flag
+    
+    // README/FIXME:
+    // Currently the only way to actually skip the destructions is by calling TerminateProcess
+    // which is a very bad way of handling it. Due to the spaghetti of static object calling destructors
+    // of static objects leads to calling functions of already destructed objects
+    TerminateProcess(GetCurrentProcess(), 0);
+    for (;;);
+
+    // Other options which actually calls the destructors:
+    // ExitProcess(0);
+    // _exit(0);
+    // std::quick_exit(0);
 }
+#pragma optimize( "", on ) 
 
 extern int __stdcall LoadWorld()
 {
+    // We want to make sure we init the renderer before we start LunaLua when
+    // entering levels..... BUT we can't do this here, it likes to crash.
+    // Not sure why yet. Something about vanilla window initialization code
+    // probably.
+    //GLEngineProxy::CheckRendererInit();
+
     ResetLunaModule();
     gIsOverworld = true;
 
@@ -562,12 +582,20 @@ extern void __stdcall recordVBErrCode(int errCode)
     // VB6's "error" object that stores this internally (would involve calling
     // rtcErrObj)
     lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+}
 
-    //HERE NEED ESI CMP CODE (ORIGINAL CODE)
-    __asm{
-        CMP     ESI, 0x9C68
+__declspec(naked) void __stdcall recordVBErrCodeHandler() {
+    __asm {
+        push ebp
+        mov ebp, esp
+        push [ebp + 8] // push for errCode
+        call    recordVBErrCode
+        cmp [ebp + 8], 0x9C68 // Ensure that we compare the value 40400
+        pop ebp
+        ret 4
     }
 }
+
 
 extern void __stdcall LoadLocalGfxHook()
 {
@@ -930,6 +958,9 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
         messageBoxEvent->setLoopable(false);
         gLunaLua.callEvent(messageBoxEvent, cameraIdx);
     }
+
+    // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
+    gLunaRender.StoreCameraPosition(cameraIdx);
 }
 
 void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
@@ -1167,20 +1198,7 @@ static void runtimeHookSmbxChangeModeHook(void)
         WaitMessage();
         LunaDllWaitFrame(false);
     }
-
-    // Get the HDC that will be the render target early if possible 
-    void* mainFrmPtr = *((void**)0xB25010);
-    if ((mainFrmPtr != nullptr) && g_GLEngine.IsEnabled())
-    {
-        auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
-        HDC targetHdc = nullptr;
-        frmGetHDC(mainFrmPtr, &targetHdc);
-
-        if (targetHdc != nullptr) {
-            g_GLEngine.InitForHDC(targetHdc);
-        }
-    }
-
+    
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
 }
