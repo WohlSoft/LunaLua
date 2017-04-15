@@ -40,3 +40,12 @@ TEST_CASE("Test command argument split", "[lunalua-utils-string]") {
     REQUIRE(splittedWide[1] == L"--arg-2");
 }
 
+TEST_CASE("Test if string is number", "[lunalua-utils-string]")
+{
+    std::string_view validNumber = "44";
+    std::string_view invalidNumber = "Hello4u";
+
+    REQUIRE(LunaLua::StringUtils::isNumber(validNumber));
+    REQUIRE_FALSE(LunaLua::StringUtils::isNumber(invalidNumber));
+}
+

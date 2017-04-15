@@ -40,14 +40,6 @@ size_t utf8len(const char *s)
     return len;
 }
 
-bool is_number(const std::string& s)
-{
-    std::string::const_iterator it = s.begin();
-    while (it != s.end() && (isdigit(*it))) ++it;
-    return !s.empty() && it == s.end();
-}
-
-
 bool file_existsX(const std::string& name)
 {
     if (FILE *file = _wfopen(LunaLua::EncodeUtils::Str2WStr(name).c_str(), L"r")) {

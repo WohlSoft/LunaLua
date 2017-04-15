@@ -81,7 +81,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
     } else if(spCmd.size() == 5) {
 		if(spCmd[0] == "setaudio" && spCmd[2] == "volume" && spCmd[3] == "to"){
 			if(registeredFiles.find(spCmd[1])!=registeredFiles.end()){
-                if(is_number(spCmd[4])) {
+                if(LunaLua::StringUtils::isNumber(spCmd[4])) {
 					//set audio volume
                     /******/MusicManager::setVolume(atoi(spCmd[4].c_str()));/******/
                     registeredFiles[spCmd[1]].volume = atoi(spCmd[4].c_str());
