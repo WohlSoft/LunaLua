@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "../../GlobalFuncs.h"
+#include "../../Utils/EncodeUtils.h"
 
 LuaProxy::Logger::Logger(std::string filename)
 {
-    std::string custPath = WStr2Str(getCustomFolderPath());
+    std::string custPath = LunaLua::EncodeUtils::WStr2Str(getCustomFolderPath());
     filePath = custPath + "\\" + filename;
     file = fopen(filePath.c_str(), "a");
 }

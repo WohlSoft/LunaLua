@@ -5,6 +5,7 @@
 #include "../GlobalFuncs.h"
 #include "../LuaMain/LuaProxyComponent/LuaProxyAudio.h"
 #include "../Utils/StringUtils.h"
+#include "../Utils/EncodeUtils.h"
 
 MciEmulator::MciEmulator(void)
 {}
@@ -67,8 +68,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
         if(spCmd[0] == "open" && spCmd[2] == "alias") {
 			//register music/sound file
 			regSoundFile snFile;
-            std::wstring wfile = StrA2WStr(std::string(spCmd[1]));//Convert ANSI string into WStrnig
-            snFile.fileName = WStr2Str(wfile);//And then into UTF-8
+            std::wstring wfile = LunaLua::EncodeUtils::StrA2WStr(std::string(spCmd[1]));//Convert ANSI string into WStrnig
+            snFile.fileName = LunaLua::EncodeUtils::WStr2Str(wfile);//And then into UTF-8
 			snFile.volume = 400;
 			registeredFiles[spCmd[3]] = snFile;
 			/******/MusicManager::addSound(spCmd[3], snFile.fileName);/******/

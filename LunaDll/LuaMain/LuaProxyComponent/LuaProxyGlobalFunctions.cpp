@@ -18,6 +18,7 @@
 #include "../../Misc/RuntimeHook.h"
 #include "LuaProxyAudio.h"
 #include <sstream>
+#include "../../Utils/EncodeUtils.h"
 
 
 //type - Player's state/powerup
@@ -244,7 +245,7 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
 
 void LuaProxy::triggerEvent(const std::string& evName)
 {
-	SMBXEvents::TriggerEvent(Str2WStr(evName), 0);
+	SMBXEvents::TriggerEvent(LunaLua::EncodeUtils::Str2WStr(evName), 0);
 }
 
 
@@ -261,9 +262,9 @@ void LuaProxy::playSFX(const std::string& filename)
 #else
 	wstring full_path;
 	if(!isAbsolutePath(filename)){
-		full_path = getCustomFolderPath() + utf8_decode(filename);
+		full_path = getCustomFolderPath() + LunaLua::EncodeUtils::Str2WStr(filename);
 	}else{
-		full_path = utf8_decode(filename);
+		full_path = LunaLua::EncodeUtils::Str2WStr(filename);
 	}
 	
 	PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
@@ -441,7 +442,7 @@ luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 
 luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
-    std::wstring tarLayerName = Str2WStr(layername);
+    std::wstring tarLayerName = LunaLua::EncodeUtils::Str2WStr(layername);
 	for(int i = 0; i < 100; ++i){
 		LayerControl* ctrl = ::Layer::Get(i);
 		if(ctrl){
@@ -509,7 +510,7 @@ luabind::object LuaProxy::findlevels(const std::string &toFindName, lua_State* L
 	for(int i = 0, j = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
-			std::wstring tarLevelName = Str2WStr(std::string(toFindName));
+			std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
 			if(!ctrl->levelTitle)
 				continue;
 			std::wstring sourceLayerName(ctrl->levelTitle);
@@ -532,7 +533,7 @@ luabind::object LuaProxy::findlevel(const std::string &toFindName, lua_State* L)
 	for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
 		WorldLevel* ctrl = ::SMBXLevel::get(i);
 		if(ctrl){
-			std::wstring tarLevelName = Str2WStr(std::string(toFindName));
+			std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
 			if(!ctrl->levelTitle)
 				continue;
 			std::wstring sourceLevelName(ctrl->levelTitle);

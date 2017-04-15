@@ -4,6 +4,7 @@
 #include "../../../Rendering/Rendering.h"
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
+#include "../../../Utils/EncodeUtils.h"
 
 void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 {
@@ -43,7 +44,7 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
         return;
     }
     // FIXME: Use better method than calling the tostring function directly! (defensive programming?)
-    std::wstring txt = Str2WStr(luabind::call_function<std::string>(L, "tostring", toPrint));
+    std::wstring txt = LunaLua::EncodeUtils::Str2WStr(luabind::call_function<std::string>(L, "tostring", toPrint));
 
     if (type == 3)
         for (std::wstring::iterator it = txt.begin(); it != txt.end(); ++it)

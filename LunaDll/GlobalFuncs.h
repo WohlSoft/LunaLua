@@ -4,41 +4,9 @@
 #include <windows.h>
 #include <string>
 #include <vector>
-#include <wchar.h>
-#include <string.h>
 
 
 //Compatibility macroses left just in case
-#define utf8_encode(wstr) WStr2Str(wstr)
-#define utf8_decode(wstr) Str2WStr(wstr)
-/*!
- * \brief Converts std::wstring into UTF8-encoded std::string
- * \param wstr input std::wstring
- * \return output std::string
- */
-std::string WStr2Str(const std::wstring &wstr);
-
-/*!
- * \brief Converts UTF8-encoded std::string into std::wstring
- * \param str input std::string
- * \return output std::wstring
- */
-std::wstring Str2WStr(const std::string &str);
-
-/*!
- * \brief Converts std::wstring into Local ANSI-encoded std::string
- * \param wstr input std::wstring
- * \return output std::string
- */
-std::string WStr2StrA(const std::wstring &wstr);
-
-/*!
- * \brief Converts Local ANSI-encoded std::string into std::wstring
- * \param str input std::string
- * \return output std::wstring
- */
-std::wstring StrA2WStr(const std::string &str);
-
 std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
 std::string ConvertBSTRToMBS(BSTR bstr);
 BSTR ConvertMBSToBSTR(const std::string & str);

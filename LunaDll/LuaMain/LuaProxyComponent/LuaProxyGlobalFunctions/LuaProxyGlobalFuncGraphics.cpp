@@ -12,6 +12,7 @@
 #include "../../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
+#include "../../../Utils/EncodeUtils.h"
 
 // Stores reference to a loaded image
 LuaProxy::Graphics::LuaImageResource::LuaImageResource(const std::shared_ptr<BMPBox>& img) {
@@ -64,11 +65,11 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
-        full_path = getCustomFolderPath() + Str2WStr(filename);
+        full_path = getCustomFolderPath() + LunaLua::EncodeUtils::Str2WStr(filename);
     }
     else
     {
-        full_path = Str2WStr(filename);
+        full_path = LunaLua::EncodeUtils::Str2WStr(filename);
     }
 
     std::shared_ptr<BMPBox> img = BMPBox::loadShared(full_path);
@@ -85,7 +86,7 @@ LuaProxy::Graphics::LuaImageResource* LuaProxy::Graphics::loadImage(const std::s
 luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filename, int& smbxFrameTime, lua_State* L)
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
-    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(Str2WStr(filename), &smbxFrameTime);
+    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), &smbxFrameTime);
     for (unsigned int i = 0; i < frames.size(); i++){
         tLuaImageResources[i + 1] = luabind::object(L, new LuaProxy::Graphics::LuaImageResource(frames[i]), luabind::adopt(luabind::result));
     }
@@ -96,7 +97,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(Str2WStr(filename), resNumber, transColor);
+    return gLunaRender.LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), resNumber, transColor);
 }
 
 
@@ -109,7 +110,7 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = Str2WStr(extra);
+    req.str = LunaLua::EncodeUtils::Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -133,7 +134,7 @@ void LuaProxy::Graphics::placeSprite(int type, const LuaProxy::Graphics::LuaImag
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = Str2WStr(extra);
+    req.str = LunaLua::EncodeUtils::Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -307,7 +308,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
 
         RenderStringOp* strRenderOp = new RenderStringOp();
-        strRenderOp->m_String = Str2WStr(text);
+        strRenderOp->m_String = LunaLua::EncodeUtils::Str2WStr(text);
         if (fontType == 3)
             for (auto& nextChar : strRenderOp->m_String)
                 nextChar = towupper(nextChar);

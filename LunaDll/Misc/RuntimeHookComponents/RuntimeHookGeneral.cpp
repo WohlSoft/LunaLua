@@ -15,6 +15,7 @@
 #include "../../IPC/IPCPipeServer.h"
 
 #include "../../Utils/StringUtils.h"
+#include "../../Utils/EncodeUtils.h"
 
 
 #ifndef NO_SDL
@@ -208,7 +209,7 @@ void TrySkipPatch()
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
     gGeneralConfig.loadOrDefault();
     //game.ini reader
-    GameConfiguration::runPatchByIni(INIReader(WStr2Str(getLatestConfigFile(L"game.ini"))));
+    GameConfiguration::runPatchByIni(INIReader(LunaLua::EncodeUtils::WStr2Str(getLatestConfigFile(L"game.ini"))));
 
     /************************************************************************/
     /* Simple ASM Source Patches                                            */

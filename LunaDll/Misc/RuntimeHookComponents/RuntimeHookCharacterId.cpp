@@ -12,6 +12,7 @@
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
+#include "../../Utils/EncodeUtils.h"
 
 
 // Prototype
@@ -2380,7 +2381,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     std::vector<SMBXMaskedImage*> sprites;
     if (name.size() > 0)
     {
-        std::wstring wName = Str2WStr(name);
+        std::wstring wName = LunaLua::EncodeUtils::Str2WStr(name);
         std::vector<std::wstring> searchPath;
         if (!gIsOverworld)
             searchPath.push_back(getCustomFolderPath()); // Check custom folder
@@ -2406,7 +2407,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     // Load overworld sprite
     SMBXMaskedImage* owsprite = nullptr;
     {
-        std::wstring wName = Str2WStr(name);
+        std::wstring wName = LunaLua::EncodeUtils::Str2WStr(name);
         std::vector<std::wstring> searchPath;
         if (!gIsOverworld)
             searchPath.push_back(getCustomFolderPath()); // Check custom folder

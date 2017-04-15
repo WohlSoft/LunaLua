@@ -5,6 +5,7 @@
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
 #include "../Logging/Logging.h"
+#include "../Utils/EncodeUtils.h"
 
 
 using namespace std;
@@ -55,7 +56,7 @@ void AutocodeManager::ReadFile(wstring dir_path) {
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(AUTOCODE_FNAME);	
 
-    wifstream code_file(WStr2Str(full_path).c_str(), ios::binary|ios::in);
+    wifstream code_file(LunaLua::EncodeUtils::WStr2Str(full_path).c_str(), ios::binary|ios::in);
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
@@ -74,7 +75,7 @@ void AutocodeManager::ReadWorld(wstring dir_path) {
 	full_path = full_path.append(L"\\");
 	full_path = full_path.append(WORLDCODE_FNAME);	
 
-    wifstream code_file(WStr2Str(full_path).c_str(), ios::binary|ios::in);
+    wifstream code_file(LunaLua::EncodeUtils::WStr2Str(full_path).c_str(), ios::binary|ios::in);
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
@@ -90,7 +91,7 @@ void AutocodeManager::ReadGlobals(wstring dir_path) {
 	full_path = full_path.append(GLOBALCODE_FNAME);
 
 	// 
-    wifstream code_file(WStr2Str(full_path).c_str(), ios::binary|ios::in);
+    wifstream code_file(LunaLua::EncodeUtils::WStr2Str(full_path).c_str(), ios::binary|ios::in);
 	if(code_file.is_open() == false) {
 		code_file.close();
 		return;
