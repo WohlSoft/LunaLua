@@ -1,6 +1,9 @@
 #ifndef EncodeUtils_hhhhh
 #define EncodeUtils_hhhhh
 
+// BSTR
+#include <WTypes.h>
+
 #include <string>
 
 namespace LunaLua::EncodeUtils {
@@ -59,6 +62,13 @@ namespace LunaLua::EncodeUtils {
      * \return output std::wstring
      */
     std::wstring StrA2WStr(const std::string_view &str);
+
+    /**
+     * \brief Convers a BSTR to ANSI string
+     * \param str input BSTR
+     * \return output std::string
+     */
+    std::string BSTR2AStr(BSTR str);
 }
 
 #endif

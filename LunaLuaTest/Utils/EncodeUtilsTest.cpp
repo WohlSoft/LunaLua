@@ -3,6 +3,9 @@
 #include <string>
 #include <Utils/EncodeUtils.h>
 
+// For BSTR
+#include <WTypes.h>
+
 TEST_CASE("UTF-8 chars to UTF-16", "[lunalua-utils-encode]") {
     // צהü
     const char* char_utf8 = u8"צהü";
@@ -45,4 +48,11 @@ TEST_CASE("UTF-16 chars to ANSI", "[lunalua-utils-encode]")
 
 }
 
+TEST_CASE("BSTR to ANSI", "[lunalua-utils-encode]")
+{
+    BSTR bstr_utf16 = SysAllocStringLen(L"ÿÿÿ", 3);
+    std::string char_ansi = LunaLua::EncodeUtils::BSTR2AStr(bstr_utf16);
+    REQUIRE(char_ansi.length() == 3u);
+    REQUIRE(char_ansi == "ÿÿÿ");
+}
 

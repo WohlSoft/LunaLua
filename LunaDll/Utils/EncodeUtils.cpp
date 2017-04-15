@@ -115,3 +115,8 @@ std::wstring LunaLua::EncodeUtils::StrA2WStr(const std::string_view & str)
 {
     return LunaLua::EncodeUtils::detail::EncodeConvert<CP_ACP, wchar_t>(str);
 }
+
+std::string LunaLua::EncodeUtils::BSTR2AStr(BSTR str)
+{
+    return LunaLua::EncodeUtils::WStr2StrA(std::wstring_view(str, SysStringLen(str)));
+}

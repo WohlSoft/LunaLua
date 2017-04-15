@@ -5,6 +5,7 @@
 
 #include <comutil.h>
 #include <winhttp.h>
+#include "../Utils/EncodeUtils.h"
 
 
 AsyncHTTPClient::AsyncHTTPClient() :
@@ -117,7 +118,7 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
     if (SUCCEEDED(hr)) {
-        m_response = ConvertBSTRToMBS(responseText);
+        m_response = LunaLua::EncodeUtils::BSTR2AStr(responseText);
     }
 
     m_currentStatus.store(HTTP_FINISHED, std::memory_order_relaxed);

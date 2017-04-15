@@ -24,6 +24,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Utils/EncodeUtils.h"
 
 
 /*!
@@ -39,73 +40,6 @@ size_t utf8len(const char *s)
     return len;
 }
 
-std::wstring Str2WStr(const std::string &str)
-{
-    std::wstring dest;
-    dest.resize(str.size());
-    int newlen=MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &dest[0], str.length());
-    dest.resize(newlen);
-    return dest;
-}
-
-std::string WStr2Str(const std::wstring &wstr)
-{
-    std::string dest;
-    dest.resize((wstr.size()*2));
-    int newlen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), &dest[0], dest.size(), NULL, NULL);
-    dest.resize(newlen);
-    return dest;
-}
-
-std::string WStr2StrA(const std::wstring &wstr)
-{
-    std::string dest;
-    dest.resize((wstr.size()*2));
-    int newlen = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.length(), &dest[0], dest.size(), NULL, NULL);
-    dest.resize(newlen);
-    return dest;
-}
-
-std::wstring StrA2WStr(const std::string &str)
-{
-    std::wstring dest;
-    dest.resize(str.size());
-    MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), &dest[0], str.length());
-    return dest;
-}
-
-std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen)
-{
-    int len = ::WideCharToMultiByte(CP_ACP, 0, pstr, wslen, NULL, 0, NULL, NULL);
-
-    std::string dblstr(len, '\0');
-    len = ::WideCharToMultiByte(CP_ACP, 0 /* no flags */,
-        pstr, wslen /* not necessary NULL-terminated */,
-        &dblstr[0], len,
-        NULL, NULL /* no default char */);
-
-    return dblstr;
-}
-
-std::string ConvertBSTRToMBS(BSTR bstr)
-{
-    int wslen = ::SysStringLen(bstr);
-    return ConvertWCSToMBS((wchar_t*)bstr, wslen);
-}
-
-BSTR ConvertMBSToBSTR(const std::string & str)
-{
-    int wslen = ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
-        str.data(), str.length(),
-        NULL, 0);
-
-    BSTR wsdata = ::SysAllocStringLen(NULL, wslen);
-    ::MultiByteToWideChar(CP_ACP, 0 /* no flags */,
-        str.data(), str.length(),
-        wsdata, wslen);
-    return wsdata;
-}
-
 bool is_number(const std::string& s)
 {
     std::string::const_iterator it = s.begin();
@@ -116,7 +50,7 @@ bool is_number(const std::string& s)
 
 bool file_existsX(const std::string& name)
 {
-    if (FILE *file = _wfopen(Str2WStr(name).c_str(), L"r")) {
+    if (FILE *file = _wfopen(LunaLua::EncodeUtils::Str2WStr(name).c_str(), L"r")) {
         fclose(file);
         return true;
     } else {
@@ -250,7 +184,7 @@ void initAppPaths()
     int count = GetModuleFileNameW(hModule, fullPath, MAX_PATH);
 
     //Check is path has a mixed charsets
-    std::string apath=WStr2StrA(fullPath);
+    std::string apath= LunaLua::EncodeUtils::WStr2StrA(std::wstring_view(fullPath));
     FILE *mainexe=fopen(apath.c_str(), "r");
     removeFilePathW(fullPath, count);
 
@@ -268,8 +202,8 @@ void initAppPaths()
     }
 
     gAppPathWCHAR = fullPath;
-    gAppPathUTF8 = WStr2Str(fullPath);
-    gAppPathANSI = WStr2StrA(fullPath);
+    gAppPathUTF8 = LunaLua::EncodeUtils::WStr2Str(std::wstring_view(fullPath));
+    gAppPathANSI = LunaLua::EncodeUtils::WStr2StrA(std::wstring_view(fullPath));
 }
 
 /// INIT GLOBALS
@@ -376,7 +310,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
 {
-    std::wstring wpath = Str2WStr(path);
+    std::wstring wpath = LunaLua::EncodeUtils::Str2WStr(path);
     FILE* theFile = _wfopen(wpath.c_str(), L"rb");
     if(!theFile)
     {
@@ -420,7 +354,7 @@ std::wstring resolveIfNotAbsolutePath(std::wstring filename)
 
 std::string resolveIfNotAbsolutePath(std::string filename) {
     if (!isAbsolutePath(filename)) {
-        return WStr2Str(getCustomFolderPath()) + filename;
+        return LunaLua::EncodeUtils::WStr2Str(getCustomFolderPath()) + filename;
     }
     else
     {
@@ -449,7 +383,7 @@ std::string generateTimestampForFilename()
 
 bool writeFile(const std::string &content, const std::string &path)
 {
-    std::wstring wpath = Str2WStr(path);
+    std::wstring wpath = LunaLua::EncodeUtils::Str2WStr(path);
     FILE* theFile = _wfopen(wpath.c_str(), L"wb");
     if(!theFile)
     {
@@ -505,7 +439,7 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
     std::vector<std::string> out;
     HANDLE dir;
     WIN32_FIND_DATAW file_data;
-    std::wstring wpath = Str2WStr(path);
+    std::wstring wpath = LunaLua::EncodeUtils::Str2WStr(path);
     
     if ((dir = FindFirstFileW((wpath + L"/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
         return out; /* No files found */
@@ -519,7 +453,7 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
 
         if (skipFile)
             continue;
-        std::string file_name = WStr2Str(wfile_name);
+        std::string file_name = LunaLua::EncodeUtils::WStr2Str(wfile_name);
         out.push_back(file_name);
     } while (FindNextFileW(dir, &file_data));
 
