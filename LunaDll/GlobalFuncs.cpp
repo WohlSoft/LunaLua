@@ -260,40 +260,6 @@ void CleanUp() {
 	DeleteObject(ghGeneralDIB);
 }
 
-
-std::string url_encode(const std::string &value)
-{
-    std::ostringstream escaped;
-    escaped.fill('0');
-    escaped << std::hex;
-
-    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
-        std::string::value_type c = (*i);
-
-        // Keep alphanumeric and other accepted characters intact
-        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-            escaped << c;
-            continue;
-        }
-
-        // Any other characters are percent-encoded
-        escaped << std::uppercase;
-        escaped << '%' << std::setw(2) << int((unsigned char)c);
-        escaped << std::nouppercase;
-    }
-
-    return escaped.str();
-}
-
-bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find)
-{
-	for(int i = 0; i < (int)vecStr.size(); ++i){
-		if(vecStr[i] == find)
-			return true;
-	}
-	return false;
-}
-
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
     std::wifstream theFile(path, std::ios::binary| std::ios::in);

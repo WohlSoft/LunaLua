@@ -96,35 +96,38 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 void ParseArgs(const std::vector<std::wstring>& args)
 {
+    auto isInArgs = [&args](std::wstring toFind){
+        return std::find(args.cbegin(), args.cend(), toFind) != args.cend();
+    };
 
-    if (vecStrFind(args, L"--patch"))
+    if (isInArgs(L"--patch"))
         gStartupSettings.patch = true;
 
-    if (vecStrFind(args, L"--game"))
+    if (isInArgs(L"--game"))
         gStartupSettings.game = true;
 
-    if (vecStrFind(args, L"--leveleditor"))
+    if (isInArgs(L"--leveleditor"))
         gStartupSettings.lvlEditor = true;
 
-    if (vecStrFind(args, L"--noframeskip"))
+    if (isInArgs(L"--noframeskip"))
         gStartupSettings.frameskip = false;
 
-    if (vecStrFind(args, L"--nosound"))
+    if (isInArgs(L"--nosound"))
         gStartupSettings.noSound = true;
 
-    if (vecStrFind(args, L"--debugger"))
+    if (isInArgs(L"--debugger"))
         gStartupSettings.debugger = true;
 
-    if (vecStrFind(args, L"--logger"))
+    if (isInArgs(L"--logger"))
         gStartupSettings.logger = true;
 
-    if (vecStrFind(args, L"--newlauncher"))
+    if (isInArgs(L"--newlauncher"))
         gStartupSettings.newLauncher = true;
 
-    if (vecStrFind(args, L"--console"))
+    if (isInArgs(L"--console"))
         gStartupSettings.console = true;
 
-    if (vecStrFind(args, L"--nogl"))
+    if (isInArgs(L"--nogl"))
         gStartupSettings.noGL = true;
 
     for (unsigned int i = 0; i < args.size(); i++)
@@ -140,14 +143,14 @@ void ParseArgs(const std::vector<std::wstring>& args)
         }
     }
 
-    if (vecStrFind(args, L"--waitForIPC"))
+    if (isInArgs(L"--waitForIPC"))
     {
         gStartupSettings.waitForIPC = true;
         gStartupSettings.currentlyWaitingForIPC = true;
         gStartupSettings.patch = true;
     }
 
-    if (vecStrFind(args, L"--hideOnCloseIPC"))
+    if (isInArgs(L"--hideOnCloseIPC"))
     {
         gStartupSettings.waitForIPC = true;
         gStartupSettings.patch = true;

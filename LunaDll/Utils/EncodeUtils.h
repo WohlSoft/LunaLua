@@ -6,6 +6,10 @@
 
 #include <string>
 
+// For EncodeUrl
+#include <sstream>
+#include <iomanip>
+
 namespace LunaLua::EncodeUtils {
     /**
      * \brief Converts std::wstring into UTF8-encoded std::string
@@ -69,6 +73,44 @@ namespace LunaLua::EncodeUtils {
      * \return output std::string
      */
     std::string BSTR2AStr(BSTR str);
+
+    /**
+     * \brief Encodes text to comply with the URL encoding
+     * \param str The string to encode
+     * \return Encoded string
+     */
+    template<typename Elem, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
+    auto EncodeUrl(const std::basic_string_view<Elem, Traits>& str)
+    {
+        using StringStreamType = std::basic_stringstream<Elem, Traits, Alloc>;
+        using StringViewType = std::basic_string_view<Elem, Traits>;
+
+        StringStreamType escaped;
+        escaped.fill('0');
+        escaped << std::hex;
+
+        for (typename StringViewType::const_iterator i = str.begin(), n = str.end(); i != n; ++i) {
+            Elem c = (*i);
+
+            // Keep alphanumeric and other accepted characters intact
+            if (isalnum(c) || 
+                c == static_cast<Elem>('-') || 
+                c == static_cast<Elem>('_') || 
+                c == static_cast<Elem>('.') || 
+                c == static_cast<Elem>('~')) 
+            {
+                escaped << c;
+                continue;
+            }
+
+            // Any other characters are percent-encoded
+            escaped << std::uppercase;
+            escaped << static_cast<Elem>('%') << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
+            escaped << std::nouppercase;
+        }
+
+        return escaped.str();
+    }
 }
 
 #endif

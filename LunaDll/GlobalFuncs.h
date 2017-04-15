@@ -23,12 +23,6 @@ void ResetLunaModule();
 void InitGlobals();
 void CleanUp();
 
-/// HELPER FUNCTIONS ///
-bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
-std::string url_encode(const std::string &value);
-// Module Helper Funcs
-//HMODULE getModule(std::string moduleName);
-
 // File/Path Helper Funcs
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg = std::wstring());
 bool readFile(std::string &content, std::string path, std::string errMsg = std::string());

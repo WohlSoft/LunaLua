@@ -56,3 +56,15 @@ TEST_CASE("BSTR to ANSI", "[lunalua-utils-encode]")
     REQUIRE(char_ansi == "ÿÿÿ");
 }
 
+TEST_CASE("Encode URL", "[lunalua-utils-encode]")
+{
+    std::string_view textToEncode = "Hello World!";
+    std::wstring_view wideTextToEncode = L"Hello World in Wide!";
+
+    std::string out = LunaLua::EncodeUtils::EncodeUrl(textToEncode);
+    std::wstring out_wide = LunaLua::EncodeUtils::EncodeUrl(wideTextToEncode);
+
+    REQUIRE(out == "Hello%20World%21");
+    REQUIRE(out_wide == L"Hello%20World%20in%20Wide%21");
+}
+
