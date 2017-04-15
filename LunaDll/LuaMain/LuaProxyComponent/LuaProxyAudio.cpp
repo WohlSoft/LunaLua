@@ -14,127 +14,94 @@
 
 void LuaProxy::Audio::MusicOpen(const std::string& filename)
 {
-#ifndef NO_SDL
     std::string full_paths = getSfxPath(filename);
     PGE_MusPlayer::MUS_openFile(full_paths.c_str());
-#endif
 }
 
 
 void LuaProxy::Audio::MusicPlay()
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_playMusic();
-#endif
 }
 
 
 void LuaProxy::Audio::MusicPlayFadeIn(int ms)
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_playMusicFadeIn(ms);
-#endif
 }
 
 
 void LuaProxy::Audio::MusicStop()
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_stopMusic();
-#endif
 }
 
 
 void LuaProxy::Audio::MusicStopFadeOut(int ms)
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_stopMusicFadeOut(ms);
-#endif
+
 }
 
 
 void LuaProxy::Audio::MusicVolume(int vlm)
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_changeVolume(vlm);
-#endif
 }
 
 
 void LuaProxy::Audio::MusicPause()
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_pauseMusic();
-#endif
 }
 
 
 void LuaProxy::Audio::MusicResume()
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_playMusic();
-#endif
 }
 
 
 bool LuaProxy::Audio::MusicIsPlaying()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsPlaying();
-#else
-    return false;
-#endif
 }
 
 
 bool LuaProxy::Audio::MusicIsPaused()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsPaused();
-#endif
 }
 
 
 bool LuaProxy::Audio::MusicIsFading()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsFading();
-#endif
 }
 
 std::string LuaProxy::Audio::MusicTitle()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_MusicTitle();
-#endif
 }
 
 std::string LuaProxy::Audio::MusicTitleTag()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_MusicTitleTag();
-#endif
 }
 
 std::string LuaProxy::Audio::MusicArtistTag()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_MusicArtistTag();
-#endif
 }
 
 std::string LuaProxy::Audio::MusicAlbumTag()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_MusicAlbumTag();
-#endif
 }
 
 std::string LuaProxy::Audio::MusicCopyrightTag()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_MusicCopyrightTag();
-#endif
 }
 
 
@@ -166,12 +133,8 @@ void LuaProxy::Audio::clearSFXBuffer()
 
 void LuaProxy::Audio::playSFX(const std::string& filename)
 {
-#ifndef NO_SDL
     std::string full_paths = getSfxPath(filename);
     PGE_Sounds::SND_PlaySnd(full_paths.c_str());
-#else
-    ::LuaProxy::playSFX(filename);
-#endif
 }
 
 
@@ -301,52 +264,32 @@ int LuaProxy::Audio::SfxReverseStereo(int channel, int flip)
 
 double LuaProxy::Audio::AudioClock()
 {
-#ifndef NO_SDL
     return ((double)PGE_MusPlayer::sampleCount()) / PGE_MusPlayer::sampleRate();
-#else
-    return 0;
-#endif
 }
 
 double LuaProxy::Audio::MusicClock()
 {
-#ifndef NO_SDL
     return ((double)PGE_MusPlayer::MUS_sampleCount()) / PGE_MusPlayer::sampleRate();
-#else
-    return 0;
-#endif
 }
 
 void LuaProxy::Audio::__setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)
 {
-#ifndef NO_SDL
     PGE_Sounds::setOverrideForAlias(alias, chunk);
-#endif
 }
 
 Mix_Chunk* LuaProxy::Audio::__getChunkForAlias(const std::string& alias)
 {
-#ifndef NO_SDL
     return PGE_Sounds::getChunkForAlias(alias);
-#else
-    return nullptr;
-#endif
 }
 
 void LuaProxy::Audio::__setMuteForAlias(const std::string& alias, bool muted)
 {
-#ifndef NO_SDL
     PGE_Sounds::setMuteForAlias(alias, muted);
-#endif
 }
 
 bool LuaProxy::Audio::__getMuteForAlias(const std::string& alias)
 {
-#ifndef NO_SDL
     return PGE_Sounds::getMuteForAlias(alias);
-#else
-    return false;
-#endif
 }
 
 // Mutex for making sure this is safely handled

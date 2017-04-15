@@ -18,9 +18,7 @@
 #include "../../Utils/EncodeUtils.h"
 
 
-#ifndef NO_SDL
 bool episodeStarted = false;
-#endif
 
 void(*runAsyncDebuggerProc)(void) = 0;
 void(*runAsyncLoggerProc)(void) = 0;

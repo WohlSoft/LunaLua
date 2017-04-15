@@ -1,4 +1,4 @@
-#ifndef NO_SDL
+
 
 #include "MusicManager.h"
 #include "../Globals.h"
@@ -528,5 +528,4 @@ Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
     return nullptr;
 }
 
-#endif
 

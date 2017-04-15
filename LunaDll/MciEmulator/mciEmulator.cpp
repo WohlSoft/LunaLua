@@ -17,8 +17,6 @@ MciEmulator::~MciEmulator(void)
 #pragma warning(suppress: 6054)
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
-#ifndef NO_SDL
-
 	std::string cmd = lpstrCommand;
 	std::vector<std::string> spCmd = LunaLua::StringUtils::splitCmdArgs(cmd);
 	
@@ -103,7 +101,4 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 		lpstrReturnString[1] = '\0';
 	}
 	return 0;
-#else
-	return mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
-#endif
 }

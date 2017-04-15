@@ -257,105 +257,64 @@ void LuaProxy::playSFX(int index)
 
 void LuaProxy::playSFX(const std::string& filename)
 {
-#ifndef NO_SDL
 	playSFXSDL(filename);
-#else
-	wstring full_path;
-	if(!isAbsolutePath(filename)){
-		full_path = getCustomFolderPath() + LunaLua::EncodeUtils::Str2WStr(filename);
-	}else{
-		full_path = LunaLua::EncodeUtils::Str2WStr(filename);
-	}
-	
-	PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
-#endif
 }
 
 void LuaProxy::playSFXSDL(const std::string& filename)
 {
-#ifndef NO_SDL
     std::string full_paths = Audio::getSfxPath(filename);
 	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
-#else
-	playSFX(filename);
-#endif
 }
 
 void LuaProxy::clearSFXBuffer()
 {
-#ifndef NO_SDL
 	PGE_Sounds::clearSoundBuffer();
-#endif
 }
 
 void LuaProxy::MusicOpen(const std::string& filename)
 {
-#ifndef NO_SDL
     std::string full_paths = Audio::getSfxPath(filename);
 	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
-#endif
 }
 
 void LuaProxy::MusicPlay()
 {
-#ifndef NO_SDL
 	PGE_MusPlayer::MUS_playMusic();
-#endif
 }
 
 void LuaProxy::MusicPlayFadeIn(int ms)
 {
-#ifndef NO_SDL
 	PGE_MusPlayer::MUS_playMusicFadeIn(ms);
-#endif
 }
 
 void LuaProxy::MusicStop()
 {
-#ifndef NO_SDL
     PGE_MusPlayer::MUS_stopMusic();
-#endif
 }
 
 void LuaProxy::MusicStopFadeOut(int ms)
 {
-#ifndef NO_SDL
 	PGE_MusPlayer::MUS_stopMusicFadeOut(ms);
-#endif
 }
 
 void LuaProxy::MusicVolume(int vlm)
 {
-#ifndef NO_SDL
 	PGE_MusPlayer::MUS_changeVolume(vlm);
-#endif
 }
 
 bool LuaProxy::MusicIsPlaying()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsPlaying();
-#else
-    return false;
-#endif
 }
 
 bool LuaProxy::MusicIsPaused()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsPaused();
-#else
-    return false;
-#endif
 }
 
 bool LuaProxy::MusicIsFading()
 {
-#ifndef NO_SDL
     return PGE_MusPlayer::MUS_IsFading();
-#else
-    return false;
-#endif
 }
 
 

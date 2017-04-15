@@ -149,14 +149,12 @@ extern int __stdcall LoadWorld()
     ResetLunaModule();
     gIsOverworld = true;
 
-#ifndef NO_SDL
     if (!episodeStarted)
     {
         std::string wldPath = LunaLua::EncodeUtils::WStr2Str(GM_FULLDIR);
         MusicManager::loadCustomSounds(wldPath + "\\");
         episodeStarted = true;
     }
-#endif
 
     // Init var bank
     gSavedVarBank.TryLoadWorldVars();
@@ -261,13 +259,12 @@ extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
 {
-#ifndef NO_SDL
     if (episodeStarted)
     {   //Reset sounds to default when main menu is loaded
         MusicManager::resetSoundsToDefault();
         episodeStarted = false;
     }
-#endif
+
     RenderStringOp(LunaLua::EncodeUtils::Str2WStr(std::string_view(LUNALUA_VERSION)), 3, 5, 5).Draw(&gLunaRender);
     if (newDebugger)
     {
