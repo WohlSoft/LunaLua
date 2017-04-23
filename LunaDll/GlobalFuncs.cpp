@@ -614,7 +614,7 @@ void RedirectIOToConsole()
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
-    freopen("CONERR$", "w", stderr);
+    freopen("CONOUT$", "w", stderr);
 
     // set the screen buffer to be big enough to let us scroll text
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
