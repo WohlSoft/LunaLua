@@ -1,9 +1,10 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include "../../Defines.h"
 #include "../RenderUtils.h"
 #include "GLTextureStore.h"
 #include "../LunaImage.h"
+using namespace gl;
 
 // Instance
 GLTextureStore g_GLTextureStore;

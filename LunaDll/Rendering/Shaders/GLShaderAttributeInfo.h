@@ -5,7 +5,7 @@
 class GLShaderAttributeInfo : public GLShaderVariableInfo
 {
 public:
-    GLShaderAttributeInfo(GLint id, GLint sizeOfVariable, GLint type, const std::string& name);
+    GLShaderAttributeInfo(gl::GLint id, gl::GLint sizeOfVariable, gl::GLenum type, const std::string& name);
     ~GLShaderAttributeInfo();
 };
 

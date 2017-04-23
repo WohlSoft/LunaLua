@@ -1,6 +1,9 @@
 #include "GLFramebuffer.h"
 #include "GLContextManager.h"
 
+using namespace gl;
+using namespace glcompat;
+
 GLFramebuffer::GLFramebuffer(int w, int h) :
     mFB(0), mDepthRB(0),
     mBufTex(0, w, h)

@@ -4,6 +4,7 @@
 #include "../GlobalFuncs.h"
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
+#include "../Utils/EncodeUtils.h"
 
 HBITMAP LoadGfxAsBitmap(const std::wstring& filename)
 {
@@ -17,7 +18,7 @@ std::tuple<std::vector<HBITMAP>, int> LoadAnimatedGfx(const std::wstring& filena
     std::vector<HBITMAP> allBitmapFrames;
     short sumFrameDelay = 0;
 
-    FreeImageGifData gifData(WStr2StrA(filename), false);
+    FreeImageGifData gifData(LunaLua::EncodeUtils::WStr2StrA(filename), false);
     if (!gifData.isOpen())
         return make_tuple(allBitmapFrames, 9);
     
@@ -38,7 +39,7 @@ void GenerateScreenshot(const std::wstring& fName, const BITMAPINFOHEADER& heade
 {
     FreeImageData screenshotFile;
     screenshotFile.init(header.biWidth, header.biHeight, (BYTE*)pData);
-    screenshotFile.saveFile(WStr2StrA(fName));
+    screenshotFile.saveFile(LunaLua::EncodeUtils::WStr2StrA(fName));
 }
 
 HBITMAP CopyBitmapFromHdc(HDC hdc)
@@ -121,7 +122,7 @@ bool SaveMaskedHDCToFile(const std::wstring& fName, HDC hdc, HDC mhdc)
 
     FreeImageData imgFile;
     imgFile.init(bmp.bmWidth, bmp.bmHeight, (BYTE*)bmp.bmBits, FreeImageData::ColorMode::COLORMODE_BGR, 32);
-    imgFile.saveFile(WStr2Str(fName));
+    imgFile.saveFile(LunaLua::EncodeUtils::WStr2Str(fName));
 
     if (hbmp != nullptr) DeleteObject(hbmp);
     

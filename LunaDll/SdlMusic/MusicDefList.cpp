@@ -1,6 +1,5 @@
 #include "MusicManager.h"
 
-#ifndef NO_SDL
 
 std::string MusicManager::musAliasesList[75]=
 {
@@ -446,6 +445,3 @@ int MusicManager::chunksChannelsList[91] =
 };
 
 
-
-
-#endif

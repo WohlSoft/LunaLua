@@ -1,6 +1,3 @@
-#ifndef NO_SDL
-
-
 #ifndef SDL_MUS_PLAYER
 #define SDL_MUS_PLAYER
 
@@ -82,7 +79,5 @@ private:
     static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;
 };
-
-#endif
 
 #endif

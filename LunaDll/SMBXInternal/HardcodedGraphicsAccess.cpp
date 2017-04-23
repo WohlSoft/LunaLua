@@ -157,10 +157,10 @@ bool HardcodedGraphicsItem::GetHDCByName(std::string text, HDC* colorHDC, HDC* m
     if (textPattern.size() != 2 && textPattern.size() != 3) // Size must be 2 or three (see above)
         return false;
 
-    if (!is_number(textPattern[1])) // 2. value must be a number
+    if (!LunaLua::StringUtils::isNumber(textPattern[1])) // 2. value must be a number
         return false;
     if (textPattern.size() == 3) // If size is 3, then 3. value must be a number
-        if (!is_number(textPattern[2]))
+        if (!LunaLua::StringUtils::isNumber(textPattern[2]))
             return false;
 
     // Now convert them to numbers

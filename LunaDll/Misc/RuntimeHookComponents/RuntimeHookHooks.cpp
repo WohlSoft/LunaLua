@@ -28,6 +28,9 @@
 #include "../../Misc/TestMode.h"
 #include "../../Misc/WaitForTickEnd.h"
 #include "../../Rendering/ImageLoader.h"
+#include "../../Utils/EncodeUtils.h"
+
+#include <string>
 
 
 // Simple init hook to run the main LunaDLL initialization
@@ -145,14 +148,12 @@ extern int __stdcall LoadWorld()
     ResetLunaModule();
     gIsOverworld = true;
 
-#ifndef NO_SDL
     if (!episodeStarted)
     {
-        std::string wldPath = WStr2Str(GM_FULLDIR);
+        std::string wldPath = LunaLua::EncodeUtils::WStr2Str(GM_FULLDIR);
         MusicManager::loadCustomSounds(wldPath + "\\");
         episodeStarted = true;
     }
-#endif
 
     // Init var bank
     gSavedVarBank.TryLoadWorldVars();
@@ -184,7 +185,7 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+    std::string autostartFile = LunaLua::EncodeUtils::WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
     if (file_existsX(autostartFile)) {
         INIReader autostartConfig( autostartFile );
@@ -257,14 +258,13 @@ extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
 
 extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, unsigned int dwRop)
 {
-#ifndef NO_SDL
     if (episodeStarted)
     {   //Reset sounds to default when main menu is loaded
         MusicManager::resetSoundsToDefault();
         episodeStarted = false;
     }
-#endif
-    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
+
+    RenderStringOp(LunaLua::EncodeUtils::Str2WStr(std::string_view(LUNALUA_VERSION)), 3, 5, 5).Draw(&gLunaRender);
     if (newDebugger)
     {
         if (asyncBitBltProc){
@@ -528,7 +528,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");
-    gLunaLua.callEvent(triggerEventData, WStr2Str(eventName));
+    gLunaLua.callEvent(triggerEventData, LunaLua::EncodeUtils::WStr2Str(std::wstring_view(eventName)));
     if (triggerEventData->native_cancelled())
         return 0;
     return origCmp(nullStr, eventName);
@@ -815,7 +815,7 @@ extern void __stdcall FrameTimingHookQPC()
     {
         sFrameTime.Push(frameTime);
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    gLunaRender.SafePrint(LunaLua::EncodeUtils::Str2WStr(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     if (frameError > 5.0) frameError = 5.0;
@@ -889,7 +889,7 @@ extern void __stdcall FrameTimingHook()
         }
         sLastCount.QuadPart = sCount.QuadPart;
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    gLunaRender.SafePrint(LunaLua::EncodeUtils::Str2WStr(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     g_PerfTracker.startFrame();
@@ -1049,7 +1049,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }
             screenshotPath += L"\\";
-            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+            screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
 
             ::GenerateScreenshot(screenshotPath, *header, pData);
             return true;

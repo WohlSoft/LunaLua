@@ -5,6 +5,7 @@
 
 #include <comutil.h>
 #include <winhttp.h>
+#include "../Utils/EncodeUtils.h"
 
 
 AsyncHTTPClient::AsyncHTTPClient() :
@@ -33,7 +34,7 @@ void AsyncHTTPClient::asyncSendWorker()
     // FIXME: Only apply arg list in URL for GET, otherwise pass as data.
     std::string fullArgList = "";
     for (const std::pair<std::string, std::string>& argPack : m_args) {
-        fullArgList += argPack.first + "=" + url_encode(argPack.second) + "&";
+        fullArgList += argPack.first + "=" + LunaLua::EncodeUtils::EncodeUrl(std::string_view(argPack.second)) + "&";
     }
     if (fullArgList.length() > 0) {
         fullArgList = fullArgList.substr(0, fullArgList.length() - 1); // To remove the extra "&"
@@ -76,7 +77,7 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
     if (SUCCEEDED(hr)) {
-        _bstr_t method(method.c_str());
+        _bstr_t method_bstr(method.c_str());
         _bstr_t url;
         if (m_method == HTTP_GET) {
             url = ((m_url + (fullArgList.empty() ? "" : "?") + fullArgList).c_str());
@@ -85,7 +86,7 @@ void AsyncHTTPClient::asyncSendWorker()
         {
             url = m_url.c_str();
         }
-        hr = pIWinHttpRequest->Open(method, url, varFalse);
+        hr = pIWinHttpRequest->Open(method_bstr, url, varFalse);
     }
 
     if (m_method == HTTP_POST) {
@@ -117,7 +118,7 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
     if (SUCCEEDED(hr)) {
-        m_response = ConvertBSTRToMBS(responseText);
+        m_response = LunaLua::EncodeUtils::BSTR2AStr(responseText);
     }
 
     m_currentStatus.store(HTTP_FINISHED, std::memory_order_relaxed);

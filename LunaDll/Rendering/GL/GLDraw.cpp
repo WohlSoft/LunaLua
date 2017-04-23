@@ -1,8 +1,11 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include "../../Defines.h"
 #include "GLDraw.h"
 #include "GLCompat.h"
+
+using namespace gl;
+using namespace glcompat;
 
 // Instance
 GLDraw g_GLDraw;

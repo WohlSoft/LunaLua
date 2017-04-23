@@ -3,6 +3,7 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include <gif.h>
+#include "../Utils/EncodeUtils.h"
 
 AsyncGifRecorder::AsyncGifRecorder() : 
     m_workerThread(nullptr),
@@ -74,7 +75,7 @@ void AsyncGifRecorder::workerFunc()
                 CreateDirectoryW(screenshotPath.c_str(), NULL);
             }
             screenshotPath += L"\\";
-            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".gif");
+            screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".gif");
 
             m_fileName = screenshotPath;
             m_opened = false;
@@ -91,7 +92,7 @@ void AsyncGifRecorder::workerFunc()
 
             if ((!m_opened) && (!m_error))
             {
-                m_opened = GIF_H::GifBegin(&m_gifWriter, WStr2Str(m_fileName).c_str(), nextData.width, nextData.height, 3, 8, false);
+                m_opened = GIF_H::GifBegin(&m_gifWriter, LunaLua::EncodeUtils::WStr2Str(m_fileName).c_str(), nextData.width, nextData.height, 3, 8, false);
                 m_error = !m_opened;
             }
 

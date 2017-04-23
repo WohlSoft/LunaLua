@@ -53,7 +53,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             obj->mColor[1] = fillColor.g;
             obj->mColor[2] = fillColor.b;
             obj->mColor[3] = fillColor.a;
-            obj->mType = GL_TRIANGLE_STRIP;
+            obj->mType = gl::GL_TRIANGLE_STRIP;
             obj->mVert = vert;
             obj->mTex = nullptr;
             obj->mVertColor = nullptr;
@@ -76,7 +76,7 @@ void RenderRectOp::Draw(Renderer* renderer) {
             obj->mColor[1] = borderColor.g;
             obj->mColor[2] = borderColor.b;
             obj->mColor[3] = borderColor.a;
-            obj->mType = GL_LINE_LOOP;
+            obj->mType = gl::GL_LINE_LOOP;
             obj->mVert = vert;
             obj->mTex = nullptr;
             obj->mVertColor = nullptr;

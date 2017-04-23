@@ -22,6 +22,7 @@
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/LunaImage.h"
+#include "../Utils/EncodeUtils.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -156,7 +157,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         return;
     }
     //Convert to ASCII, as lua doesn't support unicode
-    std::string LuaCode = WStr2Str(wLuaCode);
+    std::string LuaCode = LunaLua::EncodeUtils::WStr2Str(wLuaCode);
 
     //Bind all functions, propeties ect...
     bindAll();
@@ -187,7 +188,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     //Call the lua api init funtion.
     const char* initName = "__onInit";
     if (LuaHelper::is_function(L, initName)) {
-        callLuaFunction(L, initName, WStr2Str(codePath), WStr2Str(levelPath));
+        callLuaFunction(L, initName, LunaLua::EncodeUtils::WStr2Str(codePath), LunaLua::EncodeUtils::WStr2Str(levelPath));
     }
 }
 
@@ -413,40 +414,40 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_ICE);
     LUAHELPER_DEF_CONST(_G, HARM_TYPE_EXT_HAMMER);
 
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_VEC2);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_VEC3);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_VEC4);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT2);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT3);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT4);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT2x3);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT2x4);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT3x2);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT3x4);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT4x2);
-    LUAHELPER_DEF_CONST(_G, GL_FLOAT_MAT4x3);
-    LUAHELPER_DEF_CONST(_G, GL_INT);
-    LUAHELPER_DEF_CONST(_G, GL_INT_VEC2);
-    LUAHELPER_DEF_CONST(_G, GL_INT_VEC3);
-    LUAHELPER_DEF_CONST(_G, GL_INT_VEC4);
-    LUAHELPER_DEF_CONST(_G, GL_UNSIGNED_INT);
-    LUAHELPER_DEF_CONST(_G, GL_UNSIGNED_INT_VEC2);
-    LUAHELPER_DEF_CONST(_G, GL_UNSIGNED_INT_VEC3);
-    LUAHELPER_DEF_CONST(_G, GL_UNSIGNED_INT_VEC4);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_VEC2);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_VEC3);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_VEC4);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT2);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT3);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT4);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT2x3);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT2x4);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT3x2);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT3x4);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT4x2);
-    LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT4x3);
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_VEC2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_VEC3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_VEC4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT2x3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT2x4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT3x2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT3x4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT4x2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_FLOAT_MAT4x3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_INT));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_INT_VEC2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_INT_VEC3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_INT_VEC4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_UNSIGNED_INT));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_UNSIGNED_INT_VEC2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_UNSIGNED_INT_VEC3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_UNSIGNED_INT_VEC4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_VEC2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_VEC3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_VEC4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT2x3));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT2x4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT3x2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT3x4));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT4x2));
+    LUAHELPER_DEF_CONST(_G, static_cast<unsigned int>(gl::GL_DOUBLE_MAT4x3));
 
     {
         using namespace LuaProxy::Graphics;
@@ -1506,7 +1507,7 @@ void CLunaLua::checkWarnings()
         message << L"Warnings occured during run:\r\n";
         for (auto iter = m_warningList.cbegin(), end = m_warningList.cend(); iter != end; ++iter)
         {
-            message << L" - " << Str2WStr(*iter) << L"\r\n";
+            message << L" - " << LunaLua::EncodeUtils::Str2WStr(*iter) << L"\r\n";
         }
         MessageBoxW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
     }

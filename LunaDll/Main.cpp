@@ -30,6 +30,7 @@
 #include "Misc/AsmPatch.h"
 
 #include "Utils/StringUtils.h"
+#include "Utils/EncodeUtils.h"
 
 #define PATCHIT 1
 
@@ -120,8 +121,8 @@ int OnLvlLoad() {
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
     
-    std::string custPath = WStr2Str(getCustomFolderPath());
-    std::string wldPath = WStr2Str(GM_FULLDIR);
+    std::string custPath = LunaLua::EncodeUtils::WStr2Str(getCustomFolderPath());
+    std::string wldPath = LunaLua::EncodeUtils::WStr2Str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
     LunaLua::StringUtils::replace(wldPath, "\"", "");
     LunaLua::StringUtils::replace(wldPath, "\\\\", "\\");

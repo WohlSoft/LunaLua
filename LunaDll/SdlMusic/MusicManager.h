@@ -1,5 +1,3 @@
-#ifndef NO_SDL
-
 #ifndef MusicManager_HHHH
 #define MusicManager_HHHH
 
@@ -102,7 +100,6 @@ class MusicManager
         static bool pausedNatively;
         static int curSection;
 };
-#endif
 
 
 #endif

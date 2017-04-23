@@ -6,6 +6,7 @@
 #include "../SMBXInternal/Level.h"
 #include "../GlobalFuncs.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
+#include "../Utils/EncodeUtils.h"
 using namespace std;
 
 // CTOR
@@ -257,11 +258,11 @@ void DeathCounter::DumpAllToFile(std::wstring file_name) {
 
 	// Create file if not existing
 	if(out_file.is_open() == false) {
-        out_file.open(WStr2Str(file_name).c_str(), ios::out);
+        out_file.open(LunaLua::EncodeUtils::WStr2Str(file_name).c_str(), ios::out);
 		out_file << L" *** DEATH RECORDS FILE ***" << endl;
 		out_file.flush();	
 		out_file.close();
-        out_file.open(WStr2Str(file_name).c_str(), ios::in|ios::out);;
+        out_file.open(LunaLua::EncodeUtils::WStr2Str(file_name).c_str(), ios::in|ios::out);;
 	}
 
 	// If create failed, get out

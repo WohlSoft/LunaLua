@@ -6,6 +6,7 @@
 #include "../Rendering/RenderOps/RenderStringOp.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
+#include "../Utils/EncodeUtils.h"
 
 // Global instance
 PerfTracker g_PerfTracker;
@@ -44,7 +45,7 @@ void PerfTracker::renderStats() const {
         std::ostringstream s;
         s << PerfTypeNames[i] << ": ";
         s << m_PerfTimesSnapshot[i];
-        RenderStringOp* printTextOp = new RenderStringOp(Str2WStr(s.str()), 3, 10, 100.0f+(float)i*15.0f);
+        RenderStringOp* printTextOp = new RenderStringOp(LunaLua::EncodeUtils::Str2WStr(s.str()), 3, 10, 100.0f+(float)i*15.0f);
         gLunaRender.AddOp(printTextOp);
     }
 }

@@ -2,7 +2,8 @@
 #define GLContextManager_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
+#include <glbinding/ContextHandle.h>
 #include "GLTextureStore.h"
 #include "GLFramebuffer.h"
 
@@ -38,6 +39,8 @@ private:
     HDC   hDC;
     HGLRC hQueueThreadCTX;
     HGLRC hMainThreadCTX;
+	
+	glbinding::ContextHandle mQueueThreadCTXHandle;
 
 	// Framebuffer variables
     GLFramebuffer* mCurrentFB;

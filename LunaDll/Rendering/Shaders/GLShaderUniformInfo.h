@@ -5,7 +5,7 @@
 class GLShaderUniformInfo : public GLShaderVariableInfo
 {
 public:
-    GLShaderUniformInfo(GLint id, GLint sizeOfVariable, GLint type, const std::string& name);
+    GLShaderUniformInfo(gl::GLint id, gl::GLint sizeOfVariable, gl::GLenum type, const std::string& name);
     ~GLShaderUniformInfo();
 };
 

@@ -2,7 +2,7 @@
 #define GLFramebuffer_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include "GLTextureStore.h"
 
 class GLFramebuffer {
@@ -16,8 +16,8 @@ public:
 
 private:
     // Framebuffer variables
-    GLuint mFB;
-    GLuint mDepthRB;
+	gl::GLuint mFB;
+	gl::GLuint mDepthRB;
     GLDraw::Texture mBufTex;
 };
 

@@ -12,6 +12,7 @@
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
+#include "../../Utils/EncodeUtils.h"
 
 
 // Prototype

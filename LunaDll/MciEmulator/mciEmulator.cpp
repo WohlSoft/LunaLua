@@ -5,6 +5,7 @@
 #include "../GlobalFuncs.h"
 #include "../LuaMain/LuaProxyComponent/LuaProxyAudio.h"
 #include "../Utils/StringUtils.h"
+#include "../Utils/EncodeUtils.h"
 
 MciEmulator::MciEmulator(void)
 {}
@@ -16,8 +17,6 @@ MciEmulator::~MciEmulator(void)
 #pragma warning(suppress: 6054)
 MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uReturnLength) LPSTR lpstrReturnString, __in UINT uReturnLength, __in_opt HWND hwndCallback)
 {
-#ifndef NO_SDL
-
 	std::string cmd = lpstrCommand;
 	std::vector<std::string> spCmd = LunaLua::StringUtils::splitCmdArgs(cmd);
 	
@@ -67,8 +66,8 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
         if(spCmd[0] == "open" && spCmd[2] == "alias") {
 			//register music/sound file
 			regSoundFile snFile;
-            std::wstring wfile = StrA2WStr(std::string(spCmd[1]));//Convert ANSI string into WStrnig
-            snFile.fileName = WStr2Str(wfile);//And then into UTF-8
+            std::wstring wfile = LunaLua::EncodeUtils::StrA2WStr(std::string(spCmd[1]));//Convert ANSI string into WStrnig
+            snFile.fileName = LunaLua::EncodeUtils::WStr2Str(wfile);//And then into UTF-8
 			snFile.volume = 400;
 			registeredFiles[spCmd[3]] = snFile;
 			/******/MusicManager::addSound(spCmd[3], snFile.fileName);/******/
@@ -82,7 +81,7 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
     } else if(spCmd.size() == 5) {
 		if(spCmd[0] == "setaudio" && spCmd[2] == "volume" && spCmd[3] == "to"){
 			if(registeredFiles.find(spCmd[1])!=registeredFiles.end()){
-                if(is_number(spCmd[4])) {
+                if(LunaLua::StringUtils::isNumber(spCmd[4])) {
 					//set audio volume
                     /******/MusicManager::setVolume(atoi(spCmd[4].c_str()));/******/
                     registeredFiles[spCmd[1]].volume = atoi(spCmd[4].c_str());
@@ -102,7 +101,4 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
 		lpstrReturnString[1] = '\0';
 	}
 	return 0;
-#else
-	return mciSendStringA(lpstrCommand, lpstrReturnString, uReturnLength, hwndCallback);
-#endif
 }

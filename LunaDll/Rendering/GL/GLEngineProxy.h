@@ -1,7 +1,7 @@
 #ifndef GLEngineProxy__hhhh
 #define GLEngineProxy__hhhh
 
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include <thread>
 #include <atomic>
 #include <memory>

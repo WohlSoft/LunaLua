@@ -16,10 +16,7 @@ typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
     );
 
 
-
-#ifndef NO_SDL
 extern bool episodeStarted;
-#endif
 
 /************************************************************************/
 /* Runtime Patch Main Functions                                         */

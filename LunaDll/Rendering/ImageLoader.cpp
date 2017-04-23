@@ -1,6 +1,7 @@
 #include <cstring>
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
+#include "../Utils/EncodeUtils.h"
 #include "ImageLoader.h"
 #include "SMBXImageCategories.h"
 #include "RenderUtils.h"
@@ -170,7 +171,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 {
                     mainImgHdc = CreateCompatibleDC(NULL);
                     m_Category.setImagePtr(i, mainImgHdc);
-                    ImageLoader::m_NameToHDC[WStr2Str(imageName)] = (uintptr_t)mainImgHdc;
+                    ImageLoader::m_NameToHDC[LunaLua::EncodeUtils::WStr2Str(imageName)] = (uintptr_t)mainImgHdc;
                 }
 
                 // Try to load image
@@ -425,7 +426,7 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
             }
 
             // Make note of name to HDC mapping
-            m_NameToHDC[WStr2Str(hardcodedName)] = (uintptr_t)colorHDC;
+            m_NameToHDC[LunaLua::EncodeUtils::WStr2Str(hardcodedName)] = (uintptr_t)colorHDC;
 
             ResourceFileInfo newMain, newMask;
             ResourceFileInfo oldMain, oldMask;
@@ -529,8 +530,8 @@ void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::str
 {
     if (name.length() == 0) return;
 
-    std::wstring wFolderName = Str2WStr(folderName);
-    std::wstring wName = Str2WStr(name);
+    std::wstring wFolderName = LunaLua::EncodeUtils::Str2WStr(folderName);
+    std::wstring wName = LunaLua::EncodeUtils::Str2WStr(name);
     std::vector<std::wstring> searchPath;
     if (!gIsOverworld)
         searchPath.push_back(normalizePathSlashes(getCustomFolderPath())); // Check custom folder

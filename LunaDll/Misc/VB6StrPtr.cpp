@@ -3,6 +3,7 @@
 #include "VB6StrPtr.h"
 #include "..\Defines.h"
 #include "..\GlobalFuncs.h"
+#include "../Utils/EncodeUtils.h"
 
 // Empty constructor
 VB6StrPtr::VB6StrPtr() : ptr(NULL) {}
@@ -56,7 +57,7 @@ void VB6StrPtr::operator=(const std::wstring &other) {
 
 // Assignment operator from std::string, assuming it's utf-8 encoding
 void VB6StrPtr::operator=(const std::string &other) {
-	*this = Str2WStr(other);
+	*this = LunaLua::EncodeUtils::Str2WStr(other);
 }
 
 // Cast operator to std::wstring
@@ -73,7 +74,7 @@ VB6StrPtr::operator std::string() const {
 	if (ptr == NULL)
 		return std::string("");
 
-	return std::string(WStr2Str(*this));
+	return std::string(LunaLua::EncodeUtils::WStr2Str(*this));
 }
 
 // Cast operator to bool, true if non-null
@@ -120,7 +121,7 @@ void VB6StrPtr::assignNoDestruct(const std::wstring & other)
 
 void VB6StrPtr::assignNoDestruct(const std::string & other)
 {
-    this->assignNoDestruct(Str2WStr(other));
+    this->assignNoDestruct(LunaLua::EncodeUtils::Str2WStr(other));
 }
 
 // Equality operator for VBStrPtr
@@ -152,5 +153,5 @@ bool VB6StrPtr::operator==(const std::wstring &other) const
 // Equality operator for str::string, assumes it's utf-8 encoded
 bool VB6StrPtr::operator==(const std::string &other) const
 {
-	return (*this == Str2WStr(other));
+	return (*this == LunaLua::EncodeUtils::Str2WStr(other));
 }
