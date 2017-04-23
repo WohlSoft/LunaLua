@@ -12,17 +12,17 @@
 class GLShader
 {
 private:
-    static bool compileShaderSource(GLuint shaderID, const std::string& source);
-    static std::string getLastShaderError(GLuint shaderID);
+    static bool compileShaderSource(gl::GLuint shaderID, const std::string& source);
+    static std::string getLastShaderError(gl::GLuint shaderID);
 
-    GLuint m_shaderID;
+	gl::GLuint m_shaderID;
     std::string m_name;
     std::string m_vertexSource;
     std::string m_fragmentSource;
     std::string m_lastErrorMsg;
     bool m_isValid;
 
-    std::vector<GLuint> m_attributeBuffers;
+    std::vector<gl::GLuint> m_attributeBuffers;
 public:
     GLShader(const std::string& vertexSource, const std::string& fragmentSource);
     GLShader(const std::string& fragmentSource);
@@ -48,26 +48,26 @@ private:
     // using GetActiveVariableFunc = void (__stdcall *) (GLuint program, GLuint index, GLsizei maxLength, GLsizei* length, GLint* size, GLenum* type, GLchar* name);
     // TODO: Move to local source file
     template<typename VariableInfoT, typename GetActiveVariableFunc, typename GetVariableLocationFunc>
-    std::vector<VariableInfoT> getAllVariables(GLint programVariableType, GetActiveVariableFunc getActiveVariableFunc, GetVariableLocationFunc getVariableLocationFunc) const
+    std::vector<VariableInfoT> getAllVariables(gl::GLenum programVariableType, GetActiveVariableFunc getActiveVariableFunc, GetVariableLocationFunc getVariableLocationFunc) const
     {
         std::vector<VariableInfoT> results;
 
         // GL operation on the main thread
         g_GLEngine.EnsureMainThreadCTXApplied();
 
-        GLint count = 0;
-        glGetProgramiv(m_shaderID, programVariableType, &count);
+		gl::GLint count = 0;
+		gl::glGetProgramiv(m_shaderID, programVariableType, &count);
         GLERRORCHECK();
 
         results.reserve(count);
 
-        for (GLuint i = 0; i < count; i++)
+        for (gl::GLuint i = 0; i < count; i++)
         {
-            constexpr static const GLsizei MAX_LENGTH_NAME = 512;
+            constexpr static const gl::GLsizei MAX_LENGTH_NAME = 512;
             // GLint id, GLint sizeOfVariable, GLint type, const std::string& name
-            GLsizei lengthOfName = 0;
-            GLint sizeOfVariable = 0;
-            GLenum variableType = 0;
+			gl::GLsizei lengthOfName = 0;
+			gl::GLint sizeOfVariable = 0;
+			gl::GLenum variableType = static_cast<gl::GLenum>(0);
             std::string nameBuffer(MAX_LENGTH_NAME, ' ');
 
             // Get variable propertiess

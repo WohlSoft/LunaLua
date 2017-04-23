@@ -1,7 +1,9 @@
 #include "GLSprite.h"
 #include "GLSplitSprite.h"
 
-GLSprite* GLSprite::Create(void* data, GLint format, int32_t width, int32_t height)
+using namespace gl;
+
+GLSprite* GLSprite::Create(void* data, GLenum format, int32_t width, int32_t height)
 {
     GLSprite* sprite;
 
@@ -24,7 +26,7 @@ GLSprite::GLSprite() {
 GLSprite::~GLSprite() {
 }
 
-GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint32_t dataHeight, uint32_t xOff, uint32_t yOff, uint32_t width, uint32_t height) :
+GLBasicSprite::GLBasicSprite(void* data, GLenum format, uint32_t dataWidth, uint32_t dataHeight, uint32_t xOff, uint32_t yOff, uint32_t width, uint32_t height) :
     tex(0, width, height)
 {
     valid = false;
@@ -56,7 +58,7 @@ GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint3
     GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     GLERRORCHECK();
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     GLERRORCHECK();
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, dataWidth);

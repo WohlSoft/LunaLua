@@ -1,6 +1,9 @@
 #include <windows.h>
-#include <gl/glew.h>
-#include <GL/wglew.h>
+#include <glbinding/gl/gl.h>
+#include <glbinding/Binding.h>
+#include <glbinding/Version.h>
+#include <glbinding/ContextInfo.h>
+#include "GLCompat.h"
 #include <exception>
 #include "../../Defines.h"
 
@@ -35,9 +38,12 @@ static HGLRC GetGLRCFromHDC(HDC dc) {
         if (NULL == rc) throw GLException("Couldn't create initial GL context");
         if (FALSE == wglMakeCurrent(dc, rc)) throw GLException("Couldn't make initial GL context current");
 
-        if (glewInit() != GLEW_OK) throw GLException("Couldn't initialize GLEW");
+		// Init binding for context
+		glbinding::Binding::useCurrentContext();
+		glcompat::SetupContext();
     }
     catch (const GLException &e) {
+		if (NULL != rc) glbinding::Binding::releaseCurrentContext();
         if (NULL != rc) wglMakeCurrent(NULL, NULL);
         if (NULL != rc) wglDeleteContext(rc);
         throw e;
@@ -60,10 +66,10 @@ bool LunaDLLTestGLFeatures(void)
         ZeroMemory(&wc, sizeof(WNDCLASSA));
         wc.hInstance = GetModuleHandle(NULL);
         wc.lpfnWndProc = DefWindowProc;
-        wc.lpszClassName = "GLEW";
-        if (0 == RegisterClassA(&wc)) return GL_TRUE;
+        wc.lpszClassName = "GLBINDING";
+        if (0 == RegisterClassA(&wc)) return true;
         // create window
-        wnd = CreateWindowA("GLEW", "GLEW", 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        wnd = CreateWindowA("GLBINDING", "GLBINDING", 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
             CW_USEDEFAULT, NULL, NULL, GetModuleHandle(NULL), NULL);
         if (NULL == wnd) throw GLException("Couldn't create GL test window");
         // get the device context
@@ -73,17 +79,32 @@ bool LunaDLLTestGLFeatures(void)
         // Get GL context
         rc = GetGLRCFromHDC(dc);
 
+		auto ext = glbinding::ContextInfo::extensions();
+
+		bool have_VERSION_1_1 = glbinding::ContextInfo::supported(glbinding::Version(1, 1));
+		bool have_VERSION_1_4 = glbinding::ContextInfo::supported(glbinding::Version(1, 4));
+		bool have_VERSION_3_0 = glbinding::ContextInfo::supported(glbinding::Version(3, 0));
+
+		bool have_ARB_blend_minmax = have_VERSION_1_4;
+		bool have_EXT_blend_minmax = (ext.find(gl::GLextension::GL_EXT_blend_minmax) != ext.end());
+
+		bool have_ARB_blend_func_separate = have_VERSION_1_4;
+		bool have_EXT_blend_func_separate = (ext.find(gl::GLextension::GL_EXT_blend_func_separate) != ext.end());
+
+		bool have_ARB_framebuffer_object = have_VERSION_3_0 || (ext.find(gl::GLextension::GL_ARB_framebuffer_object) != ext.end());
+		bool have_EXT_framebuffer_object = (ext.find(gl::GLextension::GL_EXT_framebuffer_object) != ext.end());
+
         // Test for optional OpenGL features we require
-        if (!GLEW_VERSION_1_1) {
+        if (!have_VERSION_1_1) {
             throw GLException("Missing OpenGL >=1.1 support");
         }
-        if (!(GLEW_VERSION_1_4 || GLEW_EXT_blend_minmax)) {
+        if (!(have_ARB_blend_minmax || have_EXT_blend_minmax)) {
             throw GLException("Missing EXT_blend_minmax");
         }
-        if (!(GLEW_VERSION_1_4 || GLEW_EXT_blend_func_separate)) {
+        if (!(have_ARB_blend_func_separate || have_EXT_blend_func_separate)) {
             throw GLException("Missing EXT_blend_func_separate");
         }
-        if (!(GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object || GLEW_EXT_framebuffer_object)) {
+        if (!(have_ARB_framebuffer_object || have_EXT_framebuffer_object)) {
             throw GLException("Missing EXT_framebuffer_object");
         }
     }
@@ -92,6 +113,7 @@ bool LunaDLLTestGLFeatures(void)
         dbgboxA(("Using GDI renderer, so some advanced LunaDLL effects may not be present in some levels.\r\n\r\nCould not use OpenGL Renderer because:\r\n\t" + e.msg).c_str());
     }
 
+	if (NULL != rc) glbinding::Binding::releaseCurrentContext();
     if (NULL != rc) wglMakeCurrent(NULL, NULL);
     if (NULL != rc) wglDeleteContext(rc);
     if (NULL != wnd && NULL != dc) ReleaseDC(wnd, dc);

@@ -2,7 +2,9 @@
 
 #include <regex>
 
-GLShaderVariableInfo::GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint arrayCount, GLint type, const std::string& name) :
+using namespace gl;
+
+GLShaderVariableInfo::GLShaderVariableInfo(GLShaderVariableType varType, GLint id, GLint arrayCount, GLenum type, const std::string& name) :
     m_varType(varType),
     m_id(id),
     m_arrayCount(arrayCount),

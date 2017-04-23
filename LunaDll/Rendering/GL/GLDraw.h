@@ -2,19 +2,19 @@
 #define GLDraw_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include <cstdint>
 #include "GLCompat.h"
 
 class GLDraw {
 private:
-    GLuint mLastTexName;
+	gl::GLuint mLastTexName;
 public:
     float mLastPwScale;
     float mLastPhScale;
 public:
     struct Texture {
-        GLuint name;
+		gl::GLuint name;
         int32_t w;
         int32_t h;
         int32_t pw; // Padded width
@@ -22,11 +22,11 @@ public:
         float   pwScale; // Padding width scaling
         float   phScale; // Padding height scaling
 
-        inline Texture(GLuint name, int32_t w, int32_t h) :
+        inline Texture(gl::GLuint name, int32_t w, int32_t h) :
             Texture(name, w, h, RoundDimension(w), RoundDimension(h))
         {
         }
-        inline Texture(GLuint name, int32_t w, int32_t h, int32_t pw, int32_t ph) :
+        inline Texture(gl::GLuint name, int32_t w, int32_t h, int32_t pw, int32_t ph) :
             name(name),
             w(w), h(h),
             pw(pw), ph(ph),
@@ -58,7 +58,7 @@ public:
 public:
     GLDraw();
     inline void BindTexture(const Texture* tex) {
-        GLuint textName = tex ? tex->name : 0;
+		gl::GLuint textName = tex ? tex->name : 0;
         if (mLastTexName != textName)
         {
             mLastTexName = textName;
@@ -66,10 +66,10 @@ public:
                 mLastPwScale = tex->pwScale;
                 mLastPhScale = tex->phScale;
             }
-            glBindTexture(GL_TEXTURE_2D, textName);
+			gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
             GLERRORCHECK();
         }
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		gl::glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         GLERRORCHECK();
     }
     inline void UnbindTexture() {
@@ -77,7 +77,7 @@ public:
         mLastTexName = 0;
         mLastPwScale = 1.0f;
         mLastPhScale = 1.0f;
-        glBindTexture(GL_TEXTURE_2D, 0);
+		gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
         GLERRORCHECK();
     }
     void DrawSprite(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, RenderMode mode);

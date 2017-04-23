@@ -1,9 +1,11 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include "../../Defines.h"
 #include "../RenderUtils.h"
 #include "../BMPBox.h"
 #include "GLTextureStore.h"
+
+using namespace gl;
 
 // Instance
 GLTextureStore g_GLTextureStore;
@@ -119,7 +121,7 @@ const GLDraw::Texture* GLTextureStore::TextureFromLunaBitmap(const BMPBox& bmp)
     GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     GLERRORCHECK();
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     GLERRORCHECK();
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);

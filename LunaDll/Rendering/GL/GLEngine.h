@@ -2,7 +2,7 @@
 #define GLEngine_hhhh
 
 #include <SDL2/SDL.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include <unordered_map>
 #include <functional>
 #include "GLDraw.h"

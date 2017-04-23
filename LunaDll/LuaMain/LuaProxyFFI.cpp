@@ -13,7 +13,7 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
         auto obj = std::make_shared<GLEngineCmd_Draw2DArray>();
-        obj->mType = GL_TRIANGLES;
+        obj->mType = gl::GL_TRIANGLES;
         obj->mVert = vert;
         obj->mTex = tex;
         obj->mCount = count;

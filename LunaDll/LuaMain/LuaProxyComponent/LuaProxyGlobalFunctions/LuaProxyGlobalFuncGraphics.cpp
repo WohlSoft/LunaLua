@@ -453,7 +453,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     bool depthTest;
 
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
-    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, (unsigned int)gl::GL_TRIANGLES);
     {
         const LuaProxy::Graphics::LuaImageResource* texture;
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_NOERROR(namedArgs, texture, nullptr);
@@ -488,7 +488,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     obj->mColor[1] = g;
     obj->mColor[2] = b;
     obj->mColor[3] = a;
-    obj->mType = primitive;
+    obj->mType = (gl::GLenum)primitive;
     obj->mVert = (const float*)rawVer;
     obj->mTex = (const float*)rawTex;
     obj->mVertColor = (const float*)rawCol;
@@ -523,7 +523,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
                 // Values
                 unsigned int data;
-                GLenum glType;
+                unsigned int glType;
                 unsigned int count;
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, data);
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, glType);
@@ -531,9 +531,9 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
                 // Keys
                 luabind::object key = i.key();
-                GLuint location;
+                unsigned int location;
                 try {
-                    location = luabind::object_cast<GLuint>(key);
+                    location = luabind::object_cast<unsigned int>(key);
                 }
                 catch (luabind::cast_failed&) {
                     luaL_error(L, (std::string(getGLShaderVariableTypeName(typeOfVar)) + " key is invalid (internal error)").c_str());
@@ -541,7 +541,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
                 }
 
                 // GLShaderVariableType type, GLenum typeData, size_t m_count, void* data
-                mapTo.emplace_back(typeOfVar, location, glType, count, reinterpret_cast<void*>(data));
+                mapTo.emplace_back(typeOfVar, (gl::GLuint)location, (gl::GLenum)glType, count, reinterpret_cast<void*>(data));
             }
             success = true;
         };

@@ -6,6 +6,9 @@
 #include "GLContextManager.h"
 #include "../Shaders/GLShader.h"
 
+using namespace gl;
+using namespace glcompat;
+
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
 

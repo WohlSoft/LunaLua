@@ -2,7 +2,7 @@
 #define GLSplitSprite_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include <stdint.h>
 #include <vector>
 #include "GLDraw.h"
@@ -10,19 +10,19 @@
 
 class GLSplitSprite : public GLSprite {
 public:
-    static GLint getMaxTextureSize() {
-        static GLint maxTextureSize = 0;
+    static gl::GLint getMaxTextureSize() {
+        static gl::GLint maxTextureSize = 0;
         if (maxTextureSize > 0) {
             return maxTextureSize;
         }
         maxTextureSize = 0;
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+		gl::glGetIntegerv(gl::GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         GLERRORCHECK();
         if (maxTextureSize <= 0) maxTextureSize = 1024;
         return maxTextureSize;
     }
 public:
-    GLSplitSprite(void* data, GLint format, int32_t width, int32_t height);
+    GLSplitSprite(void* data, gl::GLenum format, int32_t width, int32_t height);
     virtual ~GLSplitSprite();
 
     virtual void Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const;

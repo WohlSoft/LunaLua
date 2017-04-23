@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <cstdint>
 #include <vector>
-#include <GL/glew.h>
+#include <glbinding/gl/gl.h>
 
 #include "../BMPBox.h"
 #include "../FrameCapture.h"
@@ -103,7 +103,7 @@ public:
 };
 class GLEngineCmd_Draw2DArray : public GLEngineCmd {
 public:
-    GLuint mType;
+    gl::GLenum mType;
     const float* mVert;
     const float* mTex;
     uint32_t mCount;
@@ -123,7 +123,7 @@ public:
 class GLEngineCmd_LuaDraw : public GLEngineCmd {
 public:
     struct LuaDrawShaderEntry {
-        GLenum type;
+		gl::GLenum type;
         void* data;
     };
 
@@ -134,7 +134,7 @@ public:
     std::vector<GLShaderVariableEntry> mUniforms;
     float mColor[4];
 
-    GLuint mType;
+	gl::GLenum mType;
     const float* mVert;
     const float* mTex;
     const float* mVertColor;
@@ -142,14 +142,14 @@ public:
     bool mSceneCoords;
     bool mDepthTest;
 
-    GLEngineCmd_LuaDraw() :
-        mBmp(nullptr),
-        mCapBuff(nullptr),
-        mShader(nullptr),
-        mAttributes(),
-        mUniforms(),
-        mColor{ 0, 0, 0, 0 },
-        mType(0),
+	GLEngineCmd_LuaDraw() :
+		mBmp(nullptr),
+		mCapBuff(nullptr),
+		mShader(nullptr),
+		mAttributes(),
+		mUniforms(),
+		mColor{ 0, 0, 0, 0 },
+		mType(gl::GL_POINTS),
         mVert(nullptr),
         mTex(nullptr),
         mVertColor(nullptr),
