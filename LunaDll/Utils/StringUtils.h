@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <string_view>
 #include <vector>
-
+#include <algorithm>
 
 
 namespace LunaLua::StringUtils {
