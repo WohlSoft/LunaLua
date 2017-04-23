@@ -1,8 +1,12 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
+#include <glbinding/Binding.h>
 #include "../../Defines.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
+
+using namespace gl;
+using namespace glcompat;
 
 // Instance
 GLContextManager g_GLContextManager;
@@ -10,6 +14,7 @@ GLContextManager g_GLContextManager;
 // Constructor
 GLContextManager::GLContextManager() :
     hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
+	mQueueThreadCTXHandle(),
     mInitialized(false), mHadError(false), mMainThreadCTXApplied(false), 
     mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr)
 {
@@ -63,6 +68,8 @@ void GLContextManager::EnsureMainThreadCTXApplied()
     if(!mMainThreadCTXApplied)
     {
         wglMakeCurrent(hDC, hMainThreadCTX);
+		glbinding::Binding::useCurrentContext();
+		glcompat::SetupContext();
         mMainThreadCTXApplied = true;
     }
 }
@@ -118,12 +125,9 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
         return false;
     }
 
-    GLenum err = glewInit();
-    if (GLEW_OK != err) {
-        wglMakeCurrent(nullptr, nullptr);
-        wglDeleteContext(queueThreadTempCTX);
-        return false;
-    }
+	// Init binding for context
+	glbinding::Binding::useCurrentContext();
+	glcompat::SetupContext();
 
     glLoadIdentity();
     glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
@@ -143,6 +147,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     this->hDC = hDC;
     this->hQueueThreadCTX = queueThreadTempCTX;
     this->hMainThreadCTX = mainThreadTempCTX;
+	this->mQueueThreadCTXHandle = glbinding::getCurrentContext();
     return true;
 }
 
@@ -198,6 +203,7 @@ void GLContextManager::ReleaseFramebuffer() {
 void GLContextManager::ReleaseContext() {
 	// Delete Context
 	if (hQueueThreadCTX) {
+		glbinding::Binding::releaseContext(mQueueThreadCTXHandle);
 		wglMakeCurrent(nullptr, nullptr);
 		wglDeleteContext(hQueueThreadCTX);
 		hQueueThreadCTX = nullptr;

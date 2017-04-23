@@ -15,6 +15,7 @@
 
 #include "TestModeMenu.h"
 #include "TestMode.h"
+#include "../Utils/EncodeUtils.h"
 
 using json = nlohmann::json;
 
@@ -410,7 +411,7 @@ json IPCTestLevel(const json& params)
     STestModeSettings settings = testModeSettings;
     settings.enabled = true;
     settings.levelData = "";
-    settings.levelPath = Str2WStr(filenameIt.value());
+    settings.levelPath = LunaLua::EncodeUtils::Str2WStr(std::string_view(filenameIt.value()));
 
     // Get character/player information
     json::const_iterator playersIt = params.find("players");

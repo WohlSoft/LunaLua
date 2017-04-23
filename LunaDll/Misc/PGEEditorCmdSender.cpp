@@ -1,5 +1,6 @@
 #include "PGEEditorCmdSender.h"
 #include "../GlobalFuncs.h"
+#include "../Utils/EncodeUtils.h"
 
 WinSemaphore::WinSemaphore(const std::wstring &key, int initialValue) :
     m_semaphore(nullptr), m_key(key)
@@ -126,7 +127,7 @@ PGE_EditorCommandSender::PGE_EditorCommandSender() :
 
 void PGE_EditorCommandSender::sendCommandW(const std::wstring &command)
 {
-    sendCommandUTF8(WStr2Str(command));
+    sendCommandUTF8(LunaLua::EncodeUtils::WStr2Str(command));
 }
 
 void PGE_EditorCommandSender::sendCommandUTF8(const std::string &command)

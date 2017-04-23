@@ -1,6 +1,8 @@
 #include "GLSplitSprite.h"
 
-GLSplitSprite::GLSplitSprite(void* data, GLint format, int32_t width, int32_t height) :
+using namespace gl;
+
+GLSplitSprite::GLSplitSprite(void* data, GLenum format, int32_t width, int32_t height) :
 valid(false), segsTall(0), segsWide(0), subSprites(), width(width), height(height)
 {
     int32_t maxTextureSize = getMaxTextureSize();

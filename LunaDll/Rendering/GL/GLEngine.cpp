@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <glbinding/gl/gl.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
 #include "../RenderUtils.h"
@@ -8,6 +8,9 @@
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
 #include "GLEngine.h"
+
+using namespace gl;
+using namespace glcompat;
 
 GLEngine::GLEngine() :
     mEnabled(true), mBitwiseCompat(false),

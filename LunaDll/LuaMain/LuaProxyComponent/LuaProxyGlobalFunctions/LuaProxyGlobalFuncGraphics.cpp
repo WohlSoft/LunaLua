@@ -12,6 +12,7 @@
 #include "../../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include <luabind/adopt_policy.hpp>
 #include <luabind/out_value_policy.hpp>
+#include "../../../Utils/EncodeUtils.h"
 
 void LuaProxy::Graphics::activateHud(bool activate)
 {
@@ -38,11 +39,11 @@ std::shared_ptr<LunaImage> LuaProxy::Graphics::loadImage(const std::string& file
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
-        full_path = getCustomFolderPath() + Str2WStr(filename);
+        full_path = getCustomFolderPath() + LunaLua::EncodeUtils::Str2WStr(filename);
     }
     else
     {
-        full_path = Str2WStr(filename);
+        full_path = LunaLua::EncodeUtils::Str2WStr(filename);
     }
 
     std::shared_ptr<LunaImage> img = LunaImage::fromFile(full_path.c_str());
@@ -60,7 +61,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
     /*
-    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(Str2WStr(filename), &smbxFrameTime);
+    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), &smbxFrameTime);
     for (unsigned int i = 0; i < frames.size(); i++){
         tLuaImageResources[i + 1] = luabind::object(L, new LunaImage(frames[i]), luabind::adopt(luabind::result));
     }
@@ -73,7 +74,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(Str2WStr(filename), resNumber, transColor);
+    return gLunaRender.LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), resNumber, transColor);
 }
 
 
@@ -86,7 +87,7 @@ void LuaProxy::Graphics::placeSprite(int type, int imgResource, int xPos, int yP
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = Str2WStr(extra);
+    req.str = LunaLua::EncodeUtils::Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -110,7 +111,7 @@ void LuaProxy::Graphics::placeSprite(int type, const std::shared_ptr<LunaImage>&
     req.x = xPos;
     req.y = yPos;
     req.time = time;
-    req.str = Str2WStr(extra);
+    req.str = LunaLua::EncodeUtils::Str2WStr(extra);
     gSpriteMan.InstantiateSprite(&req, false);
 }
 
@@ -287,7 +288,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, fontType, 3);
 
         RenderStringOp* strRenderOp = new RenderStringOp();
-        strRenderOp->m_String = Str2WStr(text);
+        strRenderOp->m_String = LunaLua::EncodeUtils::Str2WStr(text);
         if (fontType == 3)
             for (auto& nextChar : strRenderOp->m_String)
                 nextChar = towupper(nextChar);
@@ -395,7 +396,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     bool depthTest;
 
     LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, priority, RENDEROP_DEFAULT_PRIORITY_RENDEROP);
-    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, GL_TRIANGLES);
+    LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_OR_RETURN_VOID(namedArgs, primitive, (unsigned int)gl::GL_TRIANGLES);
     {
         std::shared_ptr<LunaImage> texture;
         LUAHELPER_GET_NAMED_ARG_OR_DEFAULT_NOERROR(namedArgs, texture, nullptr);
@@ -425,7 +426,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
     obj->mColor[1] = g;
     obj->mColor[2] = b;
     obj->mColor[3] = a;
-    obj->mType = primitive;
+    obj->mType = (gl::GLenum)primitive;
     obj->mVert = (const float*)rawVer;
     obj->mTex = (const float*)rawTex;
     obj->mVertColor = (const float*)rawCol;
@@ -460,7 +461,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
                 // Values
                 unsigned int data;
-                GLenum glType;
+                unsigned int glType;
                 unsigned int count;
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, data);
                 LUAHELPER_GET_NAMED_ARG_OR_RETURN_VOID(val, glType);
@@ -468,9 +469,9 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
 
                 // Keys
                 luabind::object key = i.key();
-                GLuint location;
+                unsigned int location;
                 try {
-                    location = luabind::object_cast<GLuint>(key);
+                    location = luabind::object_cast<unsigned int>(key);
                 }
                 catch (luabind::cast_failed&) {
                     luaL_error(L, (std::string(getGLShaderVariableTypeName(typeOfVar)) + " key is invalid (internal error)").c_str());
@@ -478,7 +479,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
                 }
 
                 // GLShaderVariableType type, GLenum typeData, size_t m_count, void* data
-                mapTo.emplace_back(typeOfVar, location, glType, count, reinterpret_cast<void*>(data));
+                mapTo.emplace_back(typeOfVar, (gl::GLuint)location, (gl::GLenum)glType, count, reinterpret_cast<void*>(data));
             }
             success = true;
         };

@@ -4,46 +4,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
-#include <wchar.h>
-#include <string.h>
 
-
-//Compatibility macroses left just in case
-#define utf8_encode(wstr) WStr2Str(wstr)
-#define utf8_decode(wstr) Str2WStr(wstr)
-/*!
- * \brief Converts std::wstring into UTF8-encoded std::string
- * \param wstr input std::wstring
- * \return output std::string
- */
-std::string WStr2Str(const std::wstring &wstr);
-
-/*!
- * \brief Converts UTF8-encoded std::string into std::wstring
- * \param str input std::string
- * \return output std::wstring
- */
-std::wstring Str2WStr(const std::string &str);
-
-/*!
- * \brief Converts std::wstring into Local ANSI-encoded std::string
- * \param wstr input std::wstring
- * \return output std::string
- */
-std::string WStr2StrA(const std::wstring &wstr);
-
-/*!
- * \brief Converts Local ANSI-encoded std::string into std::wstring
- * \param str input std::string
- * \return output std::wstring
- */
-std::wstring StrA2WStr(const std::string &str);
-
-std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
-std::string ConvertBSTRToMBS(BSTR bstr);
-BSTR ConvertMBSToBSTR(const std::string & str);
-
-bool is_number(const std::string& s);
 bool file_existsX(const std::string& name);
 bool isAbsolutePath(const std::wstring& path);
 bool isAbsolutePath(const std::string& path);
@@ -60,12 +21,6 @@ void initAppPaths();
 void ResetLunaModule();
 void InitGlobals();
 void CleanUp();
-
-/// HELPER FUNCTIONS ///
-bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find);
-std::string url_encode(const std::string &value);
-// Module Helper Funcs
-//HMODULE getModule(std::string moduleName);
 
 // File/Path Helper Funcs
 std::wstring normalizePathSlashes(const std::wstring& input);

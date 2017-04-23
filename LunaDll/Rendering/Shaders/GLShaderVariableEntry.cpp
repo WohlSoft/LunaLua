@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <utility>
 
+using namespace gl;
+
 GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableType type, GLuint location, GLenum typeData, size_t count, void* data) : 
     m_type(type),
     m_location(location),

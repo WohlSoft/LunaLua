@@ -2,6 +2,7 @@
 #include "FreeImageData.h"
 #include "FreeImageHelper.h"
 #include "../../GlobalFuncs.h"
+#include "../../Utils/EncodeUtils.h"
 
 FreeImageData::FreeImageData() : m_bitmap(NULL)
 {}
@@ -64,7 +65,7 @@ bool FreeImageData::loadFile(const std::wstring &filename)
         return false;
     }
 
-    bool reply = loadMem((unsigned char*)theAddress, size, WStr2Str(filename));
+    bool reply = loadMem((unsigned char*)theAddress, size, LunaLua::EncodeUtils::WStr2Str(filename));
 
     try{ UnmapViewOfFile(theAddress); } catch(void * /*e*/) {}
     try{ CloseHandle(theMap); } catch(void * /*e*/) {}

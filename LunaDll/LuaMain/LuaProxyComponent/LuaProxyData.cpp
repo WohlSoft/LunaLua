@@ -7,6 +7,7 @@
 #include "../../SMBXInternal/Level.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../Utils/StringUtils.h"
+#include "../../Utils/EncodeUtils.h"
 
 LuaProxy::Data::Data(DataType dataType) :
 	m_dataType(dataType),
@@ -74,7 +75,7 @@ void LuaProxy::Data::init()
 
 std::string LuaProxy::Data::resolvePathFromSection()
 {
-	std::string levelName = WStr2Str(::Level::GetName());
+	std::string levelName = LunaLua::EncodeUtils::WStr2Str(::Level::GetName());
 	std::string episodePath = (std::string)GM_FULLDIR;
     std::string smbxPath = gAppPathUTF8;
 	std::string returnPath = "";

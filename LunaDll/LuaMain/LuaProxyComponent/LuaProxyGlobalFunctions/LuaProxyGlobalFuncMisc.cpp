@@ -8,6 +8,7 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
+#include "../../../Utils/EncodeUtils.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -103,12 +104,12 @@ luabind::object LuaProxy::Misc::listDirectories(const std::string& path, lua_Sta
 
 luabind::object LuaProxy::Misc::listLocalFiles(const std::string& path, lua_State* L)
 {
-    return listFiles(WStr2Str(getCustomFolderPath()) + path, L);
+    return listFiles(LunaLua::EncodeUtils::WStr2Str(getCustomFolderPath()) + path, L);
 }
 
 luabind::object LuaProxy::Misc::listLocalDirectories(const std::string& path, lua_State* L)
 {
-    return listDirectories(WStr2Str(getCustomFolderPath()) + path, L);
+    return listDirectories(LunaLua::EncodeUtils::WStr2Str(getCustomFolderPath()) + path, L);
 }
 
 template<const DWORD FILTER, const bool FILTER_TYPE>
@@ -120,14 +121,14 @@ luabind::object luabindResolveFile(const std::string& file, lua_State* L){
         gAppPathWCHAR + L"\\"
     };
 
-    std::wstring wFile = Str2WStr(file);
+    std::wstring wFile = LunaLua::EncodeUtils::Str2WStr(file);
     for (std::wstring nextSearchPath : paths) {
         std::wstring nextEntry = nextSearchPath + wFile;
         DWORD objectAttributes = GetFileAttributesW(nextEntry.c_str());
         if(objectAttributes == INVALID_FILE_ATTRIBUTES)
             continue;
         if(((objectAttributes & FILTER) != 0) == FILTER_TYPE)
-            return luabind::object(L, WStr2Str(nextEntry));
+            return luabind::object(L, LunaLua::EncodeUtils::WStr2Str(nextEntry));
     }
 
     return luabind::object();
@@ -150,7 +151,7 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
         GM_FULLDIR,
         gAppPathWCHAR + L"\\graphics\\"
     };
-    std::wstring wFile = Str2WStr(file);
+    std::wstring wFile = LunaLua::EncodeUtils::Str2WStr(file);
 
     // Add prefix folder as an option
     std::wstring wFilePrefix;
@@ -170,7 +171,7 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
         if (objectAttributes == INVALID_FILE_ATTRIBUTES)
             continue;
         if ((objectAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-            return luabind::object(L, WStr2Str(nextEntry));
+            return luabind::object(L, LunaLua::EncodeUtils::WStr2Str(nextEntry));
     }
 
     return luabind::object();
@@ -178,9 +179,9 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
 
 bool LuaProxy::Misc::isSamePath(const std::string first, const std::string second) 
 {
-    HANDLE hFileFirst = CreateFileW(Str2WStr(first).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileFirst = CreateFileW(LunaLua::EncodeUtils::Str2WStr(first).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileFirst == INVALID_HANDLE_VALUE) return false;
-    HANDLE hFileSecond = CreateFileW(Str2WStr(second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileSecond = CreateFileW(LunaLua::EncodeUtils::Str2WStr(second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileSecond == INVALID_HANDLE_VALUE) {
         CloseHandle(hFileFirst);
         return false;

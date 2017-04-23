@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+using namespace gl;
+
 static constexpr char* DefaultBaseVertexShaderSRC =
     "void main() {"
     "    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;"
@@ -17,7 +19,7 @@ bool GLShader::compileShaderSource(GLuint shaderID, const std::string& source)
 
     GLint result;
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
-    return result != GL_FALSE;
+    return result != (GLint)GL_FALSE;
 }
 
 std::string GLShader::getLastShaderError(GLuint shaderID)

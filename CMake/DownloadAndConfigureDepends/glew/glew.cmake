@@ -28,21 +28,11 @@ endif()
 
 
 ExternalProject_Add(
-    glew-download
+    glew
     PREFIX ${CMAKE_BINARY_DIR}/external/glew-download
     URL https://downloads.sourceforge.net/project/glew/glew/1.13.0/glew-1.13.0.zip
-	URL_HASH SHA256=bcbb058a14ef565bd3466864232206973fa801387e693177f42f660599aa6e99
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-)
-
-ExternalProject_Add(
-    glew
-	DEPENDS glew-download
-    PREFIX ${CMAKE_BINARY_DIR}/external/glew
-    DOWNLOAD_COMMAND ""
-	SOURCE_DIR ${CMAKE_BINARY_DIR}/external/glew-download/src/glew-download/build/cmake
+    URL_HASH SHA256=bcbb058a14ef565bd3466864232206973fa801387e693177f42f660599aa6e99
+    SOURCE_SUBDIR build/cmake
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${GLEW_INSTALL_DIR}"
 )
+

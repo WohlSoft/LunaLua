@@ -1,5 +1,3 @@
-#ifndef NO_SDL
-
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
@@ -411,4 +409,3 @@ bool PGE_Sounds::getMuteForAlias(const std::string& alias)
     return false;
 }
 
-#endif

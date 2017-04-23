@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <string_view>
 #include <vector>
-
+#include <algorithm>
 
 
 namespace LunaLua::StringUtils {
@@ -114,6 +114,16 @@ namespace LunaLua::StringUtils {
     template<typename Elem, typename Traits = std::char_traits<Elem>>
     auto splitCmdArgs(const Elem* input) {
         return splitCmdArgs(std::basic_string_view<Elem, Traits>(input));
+    }
+
+    template<typename Elem, typename Traits = std::char_traits<Elem>>
+    auto isNumber(const std::basic_string_view<Elem>& input) {
+        return std::all_of(input.cbegin(), input.cend(), isdigit);
+    }
+
+    template<typename Elem, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
+    auto isNumber(const std::basic_string<Elem, Traits, Alloc>& input) {
+        return isNumber(std::basic_string_view<Elem, Traits>(input));
     }
 }
 
