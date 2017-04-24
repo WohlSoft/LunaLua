@@ -68,3 +68,47 @@ TEST_CASE("Encode URL", "[lunalua-utils-encode]")
     REQUIRE(out_wide == L"Hello%20World%20in%20Wide%21");
 }
 
+TEST_CASE("Test Empty Strings", "[lunalua-utils-encode]")
+{
+	// ANSI to UTF-16
+	{
+		const char* char_ansi = "";
+		std::wstring wchar_utf16 = LunaLua::EncodeUtils::StrA2WStr(std::string_view(char_ansi));
+		REQUIRE(wchar_utf16.length() == 0u);
+	}
+
+	// ANSI to UTF-16
+	{
+		const char* char_utf8 = u8"";
+		std::wstring wchar_utf16 = LunaLua::EncodeUtils::Str2WStr(std::string_view(char_utf8));
+		REQUIRE(wchar_utf16.length() == 0u);
+	}
+
+	// UTF-16 to ANSI
+	{
+		const wchar_t* wchar_utf16 = L"";
+		std::string char_ansi = LunaLua::EncodeUtils::WStr2StrA(std::wstring_view(wchar_utf16));
+		REQUIRE(char_ansi.length() == 0u);
+	}
+
+	// UTF-16 to ANSI
+	{
+		const wchar_t* wchar_utf16 = L"";
+		std::string char_utf8 = LunaLua::EncodeUtils::WStr2Str(std::wstring_view(wchar_utf16));
+		REQUIRE(char_utf8.length() == 0u);
+	}
+
+	// BSTR to ANSI
+	{
+		BSTR bstr_utf16 = SysAllocStringLen(L"", 0);
+		std::string char_ansi = LunaLua::EncodeUtils::BSTR2AStr(bstr_utf16);
+		REQUIRE(char_ansi.length() == 0u);
+	}
+
+	// URL Encode
+	{
+		std::string_view textToEncode = "";
+		std::string out = LunaLua::EncodeUtils::EncodeUrl(textToEncode);
+		REQUIRE(out.length() == 0u);
+	}
+}
