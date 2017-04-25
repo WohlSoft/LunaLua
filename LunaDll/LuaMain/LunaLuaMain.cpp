@@ -613,7 +613,8 @@ void CLunaLua::bindAll()
                 def("showRichDialog", &LuaProxy::Misc::showRichDialog),
                 def("__enablePerfTracker", &LuaProxy::Misc::__enablePerfTracker),
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
-                def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData)
+                def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
+                def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress)
             ],
 
             namespace_("Audio")[
@@ -1260,12 +1261,7 @@ void CLunaLua::bindAll()
                     def("getIntersecting", &LuaProxy::NPC::getIntersecting),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, lua_State*)>(&LuaProxy::spawnNPC)),
                     def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC)),
-
-                    def("_getVulnerableHarmTypes", NPC::GetVulnerableHarmTypes),
-                    def("_setVulnerableHarmTypes", NPC::SetVulnerableHarmTypes),
-                    def("_getSpinjumpSafe", NPC::GetSpinjumpSafe),
-                    def("_setSpinjumpSafe", NPC::SetSpinjumpSafe)
+                    def("spawn", static_cast<LuaProxy::NPC(*)(short, double, double, short, bool, bool, lua_State*)>(&LuaProxy::spawnNPC))
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::NPC, m_index))
                 .def(constructor<int>())
