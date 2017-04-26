@@ -85,6 +85,7 @@ local propertyTables = {
 	-- Extended properties
 	vulnerableharmtypes = {name="vulnerableharmtypes", t=FIELD_DWORD, encoder=encodeHarmMask, decoder=decodeHarmMask},
 	spinjumpsafe        = {name="spinjumpsafe",        t=FIELD_BOOL},
+	nowaterphysics      = {name="nowaterphysics",      t=FIELD_BOOL},
 	}
 
 -- Deprecated aliases

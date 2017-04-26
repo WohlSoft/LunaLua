@@ -504,6 +504,7 @@ void TrySkipPatch()
     PATCH(0xA28FE3).JMP(runtimeHookNPCVulnerabilityRaw).Apply();
 
     PATCH(0x9A9D33).JMP(runtimeHookNPCSpinjumpSafeRaw).NOP_PAD_TO_SIZE<10>().Apply();
+    PATCH(0xA0A991).JMP(runtimeHookNPCNoWaterPhysicsRaw).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 

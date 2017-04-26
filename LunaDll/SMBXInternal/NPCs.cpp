@@ -125,8 +125,9 @@ void NPC::AllFace(int identity, int section, double x) {
 }
 
 // Declerations of inbuilt NPC property arrays
+static uint32_t npcprop_vulnerableharmtypes[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_spinjumpsafe[NPC::MAX_ID+1] = { 0 };
-static uint32_t npcprop_vulnerableharmtypes[NPC::MAX_ID+1] = { 0 };
+static int16_t npcprop_nowaterphysics[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -134,6 +135,7 @@ void NPC::InitProperties() {
     {
         npcprop_vulnerableharmtypes[i] = 0;
         npcprop_spinjumpsafe[i] = 0;
+        npcprop_nowaterphysics[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -178,16 +180,25 @@ bool NPC::GetSpinjumpSafe(int id) {
     return (npcprop_spinjumpsafe[id] != 0);
 }
 
+bool NPC::GetNoWaterPhysics(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_nowaterphysics[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
-    if (s == "spinjumpsafe")
+    if (s == "vulnerableharmtypes")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_vulnerableharmtypes);
+    }
+    else if (s == "spinjumpsafe")
     {
         return reinterpret_cast<uintptr_t>(npcprop_spinjumpsafe);
     }
-    else if (s == "vulnerableharmtypes")
+    else if (s == "nowaterphysics")
     {
-        return reinterpret_cast<uintptr_t>(npcprop_vulnerableharmtypes);
+        return reinterpret_cast<uintptr_t>(npcprop_nowaterphysics);
     }
     else
     {

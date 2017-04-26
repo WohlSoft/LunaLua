@@ -1394,6 +1394,47 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
     }
 }
 
+static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
+{
+    if (NPC::GetNoWaterPhysics(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
+{
+    // 00A0A991 | 0F 8E 89 01 00 00        | jle foo3.A0AB20                         |
+    // 00A0A997
+    __asm {
+        jle early_exit
+        pushf
+        push eax
+        push ecx
+        push edx
+        push esi // Args #1
+        call runtimeHookNPCNoWaterPhysics
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popf
+        push 0xA0A997
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popf
+    early_exit :
+        push 0xA0AB20
+        ret
+    }
+}
+
 static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 {
     if (playerIdx >= 0 && playerIdx <= 1)

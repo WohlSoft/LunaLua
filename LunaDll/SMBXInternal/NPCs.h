@@ -502,6 +502,7 @@ namespace NPC {
     void InitProperties();
     uint32_t GetVulnerableHarmTypes(int id);
     bool GetSpinjumpSafe(int id);
+    bool GetNoWaterPhysics(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
