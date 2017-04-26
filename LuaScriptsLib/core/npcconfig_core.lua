@@ -194,4 +194,9 @@ if (NPC ~= nil) then
 	NPC.spinjumpSafe = setmetatable({}, spinjumpSafeMetatable)
 end
 
+-- Patch in a 'config' member variable in the NPC namespace
+if (NPC ~= nil) then
+	NPC.config = npcconfig
+end
+
 return npcconfig

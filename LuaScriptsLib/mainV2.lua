@@ -1100,7 +1100,7 @@ function __onInit(episodePath, lvlName)
         
         -- Load core-npcconfig as shared (not exposed to global namespace by
         -- default, but we want to load anyway)
-        APIHelper.doAPI(UserCodeManager.sharedAPIs, "core\\npcconfig")
+        APIHelper.doAPI(UserCodeManager.sharedAPIs, "core\\npcconfig_core")
         
         __episodePath = episodePath
         __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
