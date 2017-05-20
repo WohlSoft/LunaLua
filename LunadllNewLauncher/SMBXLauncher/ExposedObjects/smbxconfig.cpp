@@ -18,17 +18,12 @@
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
 
 SMBXConfig::SMBXConfig(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_Autostart(new AutostartConfig()),
+    m_Controls(new ControlConfig())
 {
-    m_Autostart = new AutostartConfig();
-    m_Controls = new ControlConfig();
     emit AutostartUpdated();
     emit ControlsUpdated();
-}
-
-SMBXConfig::~SMBXConfig()
-{
-    delete m_Autostart;
 }
 
 QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)

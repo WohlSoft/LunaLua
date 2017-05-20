@@ -10,6 +10,7 @@
 #include "Utils/Json/qjsonfileopenexception.h"
 #include "Utils/Json/qjsonparseexception.h"
 #include "Utils/Json/qjsonurlvalidationexception.h"
+#include "launchercustomwebpage.h"
 
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
@@ -20,12 +21,25 @@
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_smbxConfig(new SMBXConfig()),
     m_ApplyLunaLoaderPatch(false),
+    m_jsBridgeAlreadInit(false),
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
 
-    ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
+
+    QWebEnginePage* page = ui->webLauncherPage->page();
+
+    // 1. General WebEngine Settings
+    QWebEngineSettings* pageSettings = page->settings();
+    pageSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    pageSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+
+    // 2. Page Settings
+    this->ui->webLauncherPage->page()->action(QWebEnginePage::InspectElement)->setEnabled(true);
+
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
             [this](bool ok){
@@ -52,15 +66,17 @@ void MainLauncherWindow::loadJavascriptBridge()
     if(channel == nullptr)
         channel = new QWebChannel(currentPage);
 
-    qDebug() << "Placing Launcher object!";
-    if(m_smbxConfig)
-        channel->deregisterObject(m_smbxConfig.data());
-    m_smbxConfig.reset(new SMBXConfig());
-    channel->registerObject(QString("Launcher"), m_smbxConfig.data());
+    if(!m_jsBridgeAlreadInit) {
+        qDebug() << "Placing Launcher object!";
+        channel->registerObject(QString("Launcher"), m_smbxConfig.data());
+        m_jsBridgeAlreadInit = true;
+    }
 
     qDebug() << "Setting web channel!";
-    currentPage->setWebChannel(nullptr); // This is a bit hackish, but without it the 'qt' global object would not be set
+    // currentPage->setWebChannel(nullptr); // This is a bit hackish, but without it the 'qt' global object would not be set
+    // currentPage->setWebChannel(channel);
     currentPage->setWebChannel(channel);
+
 
     qDebug() << "Connecting QObject signal & slots";
     connect(m_smbxConfig.data(), &SMBXConfig::runSMBXExecuted, this, &MainLauncherWindow::runSMBX);
@@ -83,7 +99,7 @@ void MainLauncherWindow::loadJavascriptBridge()
                 "        Launcher = channel.objects.Launcher;"
                 "        if(typeof onInitLauncher === 'function'){"
                 "            onInitLauncher(); "
-                "        }"
+                "        };"
                 "    });"
                 "};"
                 "qWebchannelImporter.onload = callback;"
@@ -94,7 +110,7 @@ void MainLauncherWindow::loadJavascriptBridge()
 
 void MainLauncherWindow::loadDefaultWebpage()
 {
-    ui->webLauncherPage->load(QUrl("qrc:///emptyPage.html"));
+    ui->webLauncherPage->load(QUrl("qrc:///featurePage.html"));
 }
 
 void MainLauncherWindow::init(const QString &configName)

@@ -13,6 +13,7 @@ DEFINES += PGE_FILES_QT
 TARGET = SMBXLauncher
 TEMPLATE = app
 
+LIBS += User32.lib
 
 SOURCES += main.cpp\
         mainlauncherwindow.cpp \
@@ -54,7 +55,8 @@ SOURCES += main.cpp\
     Utils/Network/qnetworkreplyexception.cpp \
     Utils/Common/qurlinvalidexception.cpp \
     Utils/networkjsonutils.cpp \
-    Utils/Json/qjsonurlvalidationexception.cpp
+    Utils/Json/qjsonurlvalidationexception.cpp \
+    launchercustomwebpage.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -92,7 +94,8 @@ HEADERS  += mainlauncherwindow.h \
     Utils/Network/qnetworkreplyexception.h \
     Utils/Common/qurlinvalidexception.h \
     Utils/networkjsonutils.h \
-    Utils/Json/qjsonurlvalidationexception.h
+    Utils/Json/qjsonurlvalidationexception.h \
+    launchercustomwebpage.h
 
 FORMS    += mainlauncherwindow.ui
 
@@ -101,3 +104,5 @@ RESOURCES += \
 
 
 RC_FILE = "SMBXLauncher.rc"
+
+DISTFILES +=

@@ -7,7 +7,9 @@
 ControlConfig::ControlConfig(QObject *parent) : ControlConfig("config.dat", parent)
 {}
 
-ControlConfig::ControlConfig(const QString &configFilename, QObject *parent) : QObject(parent), m_configFilename(configFilename)
+ControlConfig::ControlConfig(const QString &configFilename, QObject *parent) :
+    QObject(parent),
+    m_configFilename(configFilename)
 {
     while(m_data.players.size() < 2) m_data.players.push_back(SMBX64_ConfigPlayer());
     m_data.players[0].id = 1;

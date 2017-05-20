@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QPointer>
 
 #include "autostartconfig.h"
 #include "controlconfig.h"
@@ -14,16 +15,15 @@ class SMBXConfig : public QObject
     Q_PROPERTY(ControlConfig* Controls READ Controls NOTIFY ControlsUpdated)
 public:
     explicit SMBXConfig(QObject *parent = 0);
-    ~SMBXConfig();
 
     AutostartConfig* Autostart() const
     {
-        return m_Autostart;
+        return m_Autostart.data();
     }
 
     ControlConfig* Controls() const
     {
-        return m_Controls;
+        return m_Controls.data();
     }
 
 private:
@@ -55,8 +55,8 @@ private:
 
     QString m_Episode;
     QString m_SMBXExeFilename;
-    AutostartConfig* m_Autostart;
-    ControlConfig* m_Controls;
+    QScopedPointer<AutostartConfig> m_Autostart;
+    QScopedPointer<ControlConfig> m_Controls;
 };
 
 #endif // SMBXCONFIG_H
