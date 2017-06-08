@@ -11,10 +11,10 @@ bool LauncherCustomWebPage::acceptNavigationRequest(const QUrl &url, QWebEngineP
     if (type == QWebEnginePage::NavigationTypeLinkClicked)
     {
         qDebug() << url;
-        // if(!(url.isRelative() || !url.isLocalFile())) {
+        if(!url.isLocalFile()) {
             QDesktopServices::openUrl(url);
             return false;
-        // }
+        }
     }
     return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
 }
