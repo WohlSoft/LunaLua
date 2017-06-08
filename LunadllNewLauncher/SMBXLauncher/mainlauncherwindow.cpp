@@ -28,17 +28,16 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
+    // 1. General WebEngine Settings
+    QWebEngineSettings* globalSettings = QWebEngineSettings::globalSettings();
+    globalSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    globalSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
 
+    ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
     QWebEnginePage* page = ui->webLauncherPage->page();
 
-    // 1. General WebEngine Settings
-    QWebEngineSettings* pageSettings = page->settings();
-    pageSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
-    pageSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
-
     // 2. Page Settings
-    this->ui->webLauncherPage->page()->action(QWebEnginePage::InspectElement)->setEnabled(true);
+    page->action(QWebEnginePage::InspectElement)->setEnabled(true);
 
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
@@ -97,9 +96,13 @@ void MainLauncherWindow::loadJavascriptBridge()
                 "    new QWebChannel(qt.webChannelTransport, function (channel) {"
                 "        console.log('QWebChannel works!');"
                 "        Launcher = channel.objects.Launcher;"
+                "        if(Launcher === undefined){"
+                "            console.warn('Launcher object failed to bind. Please contact Kevsoft!');"
+                "        }"
                 "        if(typeof onInitLauncher === 'function'){"
+                "            console.log('Calling onInitLauncher callback');"
                 "            onInitLauncher(); "
-                "        };"
+                "        }"
                 "    });"
                 "};"
                 "qWebchannelImporter.onload = callback;"
