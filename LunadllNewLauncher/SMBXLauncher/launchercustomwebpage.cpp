@@ -18,3 +18,6 @@ bool LauncherCustomWebPage::acceptNavigationRequest(const QUrl &url, QWebEngineP
     }
     return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
 }
+
+void LauncherCustomWebPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID)
+{}

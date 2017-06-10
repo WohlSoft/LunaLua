@@ -15,6 +15,7 @@ public:
     // QWebEnginePage interface
 protected:
     bool acceptNavigationRequest(const QUrl &url, NavigationType type, bool isMainFrame);
+    void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID);
 };
 
 #endif // LAUNCHERCUSTOMWEBPAGE_H
