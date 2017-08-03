@@ -34,6 +34,11 @@ std::string PGE_MusPlayer::showMsg_for="";
 std::atomic<unsigned __int64> PGE_MusPlayer::sCount = 0;
 std::atomic<unsigned __int64> PGE_MusPlayer::musSCount = 0;
 
+Mix_Music *PGE_MusPlayer::currentMusic()
+{
+    return PGE_MusPlayer::play_mus;
+}
+
 void PGE_MusPlayer::MUS_playMusic()
 {
 	if(!PGE_SDL_Manager::isInit) return;

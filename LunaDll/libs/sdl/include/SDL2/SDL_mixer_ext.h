@@ -142,7 +142,9 @@ typedef enum
     MUS_FLAC,
     MUS_MODPLUG,
     MUS_SPC,
-    MUS_ADLMIDI
+    MUS_GME = MUS_SPC,
+    MUS_ADLMIDI,
+    MUS_KnownCodecs     /* Count of codec types */
 } Mix_MusicType;
 
 typedef enum
@@ -150,7 +152,9 @@ typedef enum
     MIDI_ADLMIDI,
     MIDI_Native,
     MIDI_Timidity,
-    MIDI_Fluidsynth
+    MIDI_OPNMIDI,
+    MIDI_Fluidsynth,
+    MIDI_KnuwnDevices   /* Count of MIDI device types */
 } Mix_MIDI_Device;
 
 /* Volume model type in the ADLMIDI */
@@ -604,12 +608,17 @@ extern DECLSPEC int SDLCALL Mix_GroupNewer(int tag);
 /* The same as above, but the sound is played at most 'ticks' milliseconds */
 extern DECLSPEC int SDLCALL Mix_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
 extern DECLSPEC int SDLCALL Mix_PlayMusic(Mix_Music *music, int loops);
+#define Mix_PlayChannelVol(channel,chunk,loops,vol) Mix_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)/*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);/*MIXER-X*/
 
 /* Fade in music or a channel over "ms" milliseconds, same semantics as the "Play" functions */
 extern DECLSPEC int SDLCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms);
 extern DECLSPEC int SDLCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int ms, double position);
 #define Mix_FadeInChannel(channel,chunk,loops,ms) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1)
 extern DECLSPEC int SDLCALL Mix_FadeInChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
+#define Mix_FadeInChannelVolume(channel,chunk,loops,ms,vol) Mix_FadeInChannelTimed(channel,chunk,loops,ms,-1,vol)/*MIXER-X*/
+extern DECLSPEC int SDLCALL Mix_FadeInChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);/*MIXER-X*/
+
 
 /* Set the volume in the range of 0-128 of a specific channel or chunk.
    If the specified channel is -1, set volume for all channels.
@@ -657,10 +666,37 @@ extern DECLSPEC int SDLCALL Mix_PausedMusic(void);
 /* Set the current position in the music stream.
    This returns 0 if successful, or -1 if it failed or isn't implemented.
    This function is only implemented for MOD music formats (set pattern
-   order number) and for OGG, FLAC, MP3_MAD, and MODPLUG music (set
+   order number) and for WAV, OGG, FLAC, MP3_MAD, and MODPLUG music (set
    position in seconds), at the moment.
 */
 extern DECLSPEC int SDLCALL Mix_SetMusicPosition(double position);
+/*
+    Get the time current position of music stream
+    returns -1.0 if this feature is not supported for some codec
+ */
+extern DECLSPEC double SDLCALLCC Mix_GetMusicPosition(Mix_Music *music);
+/*
+    Get the total time length of music stream
+    returns -1.0 if this feature is not supported for some codec
+ */
+extern DECLSPEC double SDLCALLCC Mix_GetMusicTotalTime(Mix_Music *music);
+
+/*
+    Get the loop start time position of music stream
+    returns -1.0 if this feature is not used for this music or not supported for some codec
+ */
+extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopStartTime(Mix_Music *music);
+/*
+    Get the loop end time position of music stream
+    returns -1.0 if this feature is not used for this music or not supported for some codec
+ */
+extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopEndTime(Mix_Music *music);
+/*
+    Get the loop time length of music stream
+    returns -1.0 if this feature is not used for this music or not supported for some codec
+ */
+extern DECLSPEC double SDLCALLCC Mix_GetMusicLoopLengthTime(Mix_Music *music);
+
 
 /* Check the status of a specific channel.
    If the specified channel is -1, check all channels.
@@ -726,6 +762,9 @@ extern DECLSPEC int  SDLCALL MIX_ADLMIDI_getVolumeModel();
 extern DECLSPEC void SDLCALL MIX_ADLMIDI_setVolumeModel(int vm);
 /* Reset all ADLMIDI properties to default state */
 extern DECLSPEC void SDLCALL MIX_ADLMIDI_setSetDefaults();
+
+/* Sets WOPN bank file for OPNMIDI playing device, affects on MIDI file reopen */
+extern DECLSPEC void SDLCALL MIX_OPNMIDI_setCustomBankFile(const char *bank_wonp_path);
 
 /* Change MIDI playing device (ADLMIDI, Timidity, Native MIDI (if available) and FluidSynth) */
 extern DECLSPEC int  SDLCALL MIX_SetMidiDevice(int device);

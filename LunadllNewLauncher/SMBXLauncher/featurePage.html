@@ -1,0 +1,35 @@
+<html>
+<head></head>
+
+<!-- TEMP -->
+<script type="text/javascript">
+    var request = new XMLHttpRequest();
+
+    request.open("GET","https://cors-test.appspot.com/test");
+    request.setRequestHeader("X-Test","test1");
+    request.addEventListener('load', function(event) {
+       if (request.status >= 200 && request.status < 300) {
+          console.log(request.responseText);
+       } else {
+          console.warn(request.statusText, request.responseText);
+       }
+    });
+    request.send();
+</script>
+<!-- TEMP END -->
+
+
+<body>
+
+<p style="font-size: 20px">Please configurate your webpage with Launcher.ini.<br>See Readme.md</p>
+<a href="http://google.at">Google</a>
+<button id="lol">Hello World</button>
+
+<script type="text/javascript">
+document.getElementById('lol').onclick = function() {
+    Launcher.loadEpisodeWebpage('emptyPage.html');
+}
+</script>
+
+</body>
+</html>

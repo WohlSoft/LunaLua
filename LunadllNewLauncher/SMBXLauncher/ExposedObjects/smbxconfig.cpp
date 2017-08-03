@@ -18,17 +18,12 @@
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
 
 SMBXConfig::SMBXConfig(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_Autostart(new AutostartConfig()),
+    m_Controls(new ControlConfig())
 {
-    m_Autostart = new AutostartConfig();
-    m_Controls = new ControlConfig();
     emit AutostartUpdated();
     emit ControlsUpdated();
-}
-
-SMBXConfig::~SMBXConfig()
-{
-    delete m_Autostart;
 }
 
 QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
@@ -154,8 +149,10 @@ QVariantList SMBXConfig::getEpisodeInfo(const QString& jsonSubDirPerEpisode, con
 QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
 {
     QDir cursorDir = QDir::current();
+    qDebug() << "Check episode update for " << directoryName;
 
     if(!cursorDir.cd("worlds")){
+        qWarning() << "Did not find worlds folder!";
         return QVariant();
     }
 
@@ -165,12 +162,14 @@ QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QStr
 
     QVariant episodeData = getDataForEpisode(cursorDir.canonicalPath(), jsonSubDirPerEpisode, jsonFileName);
     if(episodeData.type() != QVariant::Map){
+        qWarning() << "Invalid episode data type (expected map): " << episodeData.typeName();
         return QVariant();
     }
     QMap<QString, QVariant> episode = episodeData.toMap();
 
     auto it = episode.constFind("update-check-website");
     if ((it == episode.constEnd()) || (it.value().type() != QVariant::String)){
+        qWarning() << "No update-check-website field";
         return QVariant();
     }
     QString updateWebsite = it.value().toString();
