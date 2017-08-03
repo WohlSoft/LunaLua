@@ -9,10 +9,12 @@ QT       += core gui widgets webenginewidgets
 CONFIG += c++11
 
 DEFINES += PGE_FILES_QT
+DEFINES -= QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_INFO_OUTPUT
 
 TARGET = SMBXLauncher
 TEMPLATE = app
 
+LIBS += User32.lib
 
 SOURCES += main.cpp\
         mainlauncherwindow.cpp \
@@ -54,7 +56,9 @@ SOURCES += main.cpp\
     Utils/Network/qnetworkreplyexception.cpp \
     Utils/Common/qurlinvalidexception.cpp \
     Utils/networkjsonutils.cpp \
-    Utils/Json/qjsonurlvalidationexception.cpp
+    Utils/Json/qjsonurlvalidationexception.cpp \
+    launchercustomwebpage.cpp \
+    hybridlogger.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -92,7 +96,9 @@ HEADERS  += mainlauncherwindow.h \
     Utils/Network/qnetworkreplyexception.h \
     Utils/Common/qurlinvalidexception.h \
     Utils/networkjsonutils.h \
-    Utils/Json/qjsonurlvalidationexception.h
+    Utils/Json/qjsonurlvalidationexception.h \
+    launchercustomwebpage.h \
+    hybridlogger.h
 
 FORMS    += mainlauncherwindow.ui
 
@@ -101,3 +107,5 @@ RESOURCES += \
 
 
 RC_FILE = "SMBXLauncher.rc"
+
+DISTFILES +=

@@ -137,18 +137,40 @@ std::string LuaProxy::Audio::MusicCopyrightTag()
 #endif
 }
 
+void LuaProxy::Audio::MusicSetPosition(double seconds)
+{
+    Mix_SetMusicPosition(seconds);
+}
+
+double LuaProxy::Audio::MusicGetPosition()
+{
+    return Mix_GetMusicPosition(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetLoopStart()
+{
+    return Mix_GetMusicLoopStartTime(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetLoopEnd()
+{
+    return Mix_GetMusicLoopEndTime(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetLoopLength()
+{
+    return Mix_GetMusicLoopLengthTime(PGE_MusPlayer::currentMusic());
+}
 
 void LuaProxy::Audio::seizeStream(int section)
 {
     MusicManager::setSeized(section, true);
-
 }
 
 void LuaProxy::Audio::releaseStream(int section)
 {
     MusicManager::setSeized(section, false);
 }
-
 
 
 Mix_Chunk* LuaProxy::Audio::newMix_Chunk()

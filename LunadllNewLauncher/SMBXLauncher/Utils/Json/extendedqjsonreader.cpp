@@ -3,6 +3,7 @@
 #include "qjsonparseexception.h"
 
 #include <QVariant>
+#include <QDebug>
 
 ExtendedQJsonReader::ExtendedQJsonReader(QFile &file)
 {
