@@ -1,103 +1,142 @@
-MIX_ADLMIDI_getAdLibMode
-MIX_ADLMIDI_getBankID
-MIX_ADLMIDI_getBankNames
-MIX_ADLMIDI_getLogarithmicVolumes
-MIX_ADLMIDI_getScaleMod
-MIX_ADLMIDI_getTotalBanks
-MIX_ADLMIDI_getTremolo
-MIX_ADLMIDI_getVibrato
-MIX_ADLMIDI_getVolumeModel
-MIX_ADLMIDI_setAdLibMode
-MIX_ADLMIDI_setBankID
-MIX_ADLMIDI_setLogarithmicVolumes
-MIX_ADLMIDI_setScaleMod
-MIX_ADLMIDI_setSetDefaults
-MIX_ADLMIDI_setTremolo
-MIX_ADLMIDI_setVibrato
-MIX_ADLMIDI_setVolumeModel
-MIX_SetLockMIDIArgs
-MIX_SetMidiDevice
-MIX_Timidity_addToPathList
-Mix_AllocateChannels
-Mix_ChannelFinished
-Mix_CloseAudio
-Mix_EachSoundFont
-Mix_ExpireChannel
-Mix_FadeInChannelTimed
-Mix_FadeInChannelTimedVolume
-Mix_FadeInMusic
-Mix_FadeInMusicPos
-Mix_FadeOutChannel
-Mix_FadeOutGroup
-Mix_FadeOutMusic
-Mix_FadingChannel
-Mix_FadingMusic
-Mix_FreeChunk
-Mix_FreeMusic
-Mix_GetChunk
-Mix_GetChunkDecoder
-Mix_GetMusicAlbumTag
-Mix_GetMusicArtistTag
-Mix_GetMusicCopyrightTag
-Mix_GetMusicDecoder
-Mix_GetMusicHookData
-Mix_GetMusicTitle
-Mix_GetMusicTitleTag
-Mix_GetMusicType
-Mix_GetNumChunkDecoders
-Mix_GetNumMusicDecoders
-Mix_GetSoundFonts
-Mix_GetSynchroValue
-Mix_GroupAvailable
-Mix_GroupChannel
-Mix_GroupChannels
-Mix_GroupCount
-Mix_GroupNewer
-Mix_GroupOldest
-Mix_HaltChannel
-Mix_HaltGroup
-Mix_HaltMusic
-Mix_HookMusic
-Mix_HookMusicFinished
-Mix_Init
-Mix_Linked_Version
-Mix_LoadMUS
-Mix_LoadMUSType_RW
-Mix_LoadMUS_RW
-Mix_LoadMUS_RW_ARG
-Mix_LoadMUS_RW_GME
-Mix_LoadWAV_RW
-Mix_OpenAudio
-Mix_OpenAudioDevice
-Mix_Pause
-Mix_PauseMusic
-Mix_Paused
-Mix_PausedMusic
-Mix_PlayChannelTimed
-Mix_PlayChannelTimedVolume
-Mix_PlayMusic
-Mix_Playing
-Mix_PlayingMusic
-Mix_QuerySpec
-Mix_QuickLoad_RAW
-Mix_QuickLoad_WAV
-Mix_Quit
-Mix_RegisterEffect
-Mix_ReserveChannels
-Mix_Resume
-Mix_ResumeMusic
-Mix_RewindMusic
-Mix_SetDistance
-Mix_SetMusicCMD
-Mix_SetMusicPosition
-Mix_SetPanning
-Mix_SetPosition
-Mix_SetPostMix
-Mix_SetReverseStereo
-Mix_SetSoundFonts
-Mix_SetSynchroValue
-Mix_UnregisterAllEffects
-Mix_UnregisterEffect
-Mix_Volume
-Mix_VolumeChunk
-Mix_VolumeMusic
+Microsoft (R) COFF/PE Dumper Version 14.00.24215.1
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file SDL2_mixer_ext.dll
+
+File Type: DLL
+
+  Section contains the following exports for SDL2_mixer_ext.dll
+
+    00000000 characteristics
+    59418DCA time date stamp Wed Jun 14 22:26:02 2017
+        0.00 version
+           1 ordinal base
+         109 number of functions
+         109 number of names
+
+    ordinal hint RVA      name
+
+          1    0 000B1E30 MIX_ADLMIDI_getAdLibMode
+          2    1 000B1D70 MIX_ADLMIDI_getBankID
+          3    2 000B1D60 MIX_ADLMIDI_getBankNames
+          4    3 000B1E80 MIX_ADLMIDI_getLogarithmicVolumes
+          5    4 000B1E00 MIX_ADLMIDI_getScaleMod
+          6    5 000B1D50 MIX_ADLMIDI_getTotalBanks
+          7    6 000B1DA0 MIX_ADLMIDI_getTremolo
+          8    7 000B1DD0 MIX_ADLMIDI_getVibrato
+          9    8 000B1EA0 MIX_ADLMIDI_getVolumeModel
+         10    9 000B1E40 MIX_ADLMIDI_setAdLibMode
+         11    A 000B1D80 MIX_ADLMIDI_setBankID
+         12    B 000B1E90 MIX_ADLMIDI_setLogarithmicVolumes
+         13    C 000B1E10 MIX_ADLMIDI_setScaleMod
+         14    D 000B1E60 MIX_ADLMIDI_setSetDefaults
+         15    E 000B1DB0 MIX_ADLMIDI_setTremolo
+         16    F 000B1DE0 MIX_ADLMIDI_setVibrato
+         17   10 000B1EB0 MIX_ADLMIDI_setVolumeModel
+         18   11 000B1EC0 MIX_OPNMIDI_setCustomBankFile
+         19   12 000B1F10 MIX_SetLockMIDIArgs
+         20   13 000B1ED0 MIX_SetMidiDevice
+         21   14 000B1D40 MIX_Timidity_addToPathList
+         22   15 000AEF70 Mix_AllocateChannels
+         23   16 000ADB00 Mix_ChannelFinished
+         24   17 000AF070 Mix_CloseAudio
+         25   18 000B1C80 Mix_EachSoundFont
+         26   19 000ADB50 Mix_ExpireChannel
+         27   1A 000AE770 Mix_FadeInChannelTimed
+         28   1B 000AE5A0 Mix_FadeInChannelTimedVolume
+         29   1C 000B1200 Mix_FadeInMusic
+         30   1D 000B1110 Mix_FadeInMusicPos
+         31   1E 000AE1A0 Mix_FadeOutChannel
+         32   1F 000AE290 Mix_FadeOutGroup
+         33   20 000B1820 Mix_FadeOutMusic
+         34   21 000AE2F0 Mix_FadingChannel
+         35   22 000B1910 Mix_FadingMusic
+         36   23 000AD9A0 Mix_FreeChunk
+         37   24 000B0F40 Mix_FreeMusic
+         38   25 000AE7B0 Mix_GetChunk
+         39   26 000AD210 Mix_GetChunkDecoder
+         40   27 000B10B0 Mix_GetMusicAlbumTag
+         41   28 000B1080 Mix_GetMusicArtistTag
+         42   29 000B10E0 Mix_GetMusicCopyrightTag
+         43   2A 000AF7B0 Mix_GetMusicDecoder
+         44   2B 000ADAF0 Mix_GetMusicHookData
+         45   2C 000B14E0 Mix_GetMusicLoopEndTime
+         46   2D 000B1570 Mix_GetMusicLoopLengthTime
+         47   2E 000B1450 Mix_GetMusicLoopStartTime
+         48   2F 000B1330 Mix_GetMusicPosition
+         49   30 000B1010 Mix_GetMusicTitle
+         50   31 000B1050 Mix_GetMusicTitleTag
+         51   32 000B13C0 Mix_GetMusicTotalTime
+         52   33 000B0FD0 Mix_GetMusicType
+         53   34 000AD200 Mix_GetNumChunkDecoders
+         54   35 000AF7A0 Mix_GetNumMusicDecoders
+         55   36 000B1C30 Mix_GetSoundFonts
+         56   37 000B1B50 Mix_GetSynchroValue
+         57   38 000AEA60 Mix_GroupAvailable
+         58   39 000AE970 Mix_GroupChannel
+         59   3A 000AE9D0 Mix_GroupChannels
+         60   3B 000AEAC0 Mix_GroupCount
+         61   3C 000AEBB0 Mix_GroupNewer
+         62   3D 000AEB20 Mix_GroupOldest
+         63   3E 000AE070 Mix_HaltChannel
+         64   3F 000AE140 Mix_HaltGroup
+         65   40 000B17F0 Mix_HaltMusic
+         66   41 000ADA90 Mix_HookMusic
+         67   42 000AF7E0 Mix_HookMusicFinished
+         68   43 000AD260 Mix_Init
+         69   44 000AD240 Mix_Linked_Version
+         70   45 000B0BC0 Mix_LoadMUS
+         71   46 000B0840 Mix_LoadMUSType_RW
+         72   47 000B0E40 Mix_LoadMUS_RW
+         73   48 000B0E70 Mix_LoadMUS_RW_ARG
+         74   49 000B0ED0 Mix_LoadMUS_RW_GME
+         75   4A 000AD400 Mix_LoadWAV_RW
+         76   4B 000AF340 Mix_OpenAudio
+         77   4C 000AF140 Mix_OpenAudioDevice
+         78   4D 000AE7E0 Mix_Pause
+         79   4E 000B1950 Mix_PauseMusic
+         80   4F 000AE900 Mix_Paused
+         81   50 000B1A10 Mix_PausedMusic
+         82   51 000AE570 Mix_PlayChannelTimed
+         83   52 000AE3A0 Mix_PlayChannelTimedVolume
+         84   53 000B1230 Mix_PlayMusic
+         85   54 000AE320 Mix_Playing
+         86   55 000B1A80 Mix_PlayingMusic
+         87   56 000AD3B0 Mix_QuerySpec
+         88   57 000AD940 Mix_QuickLoad_RAW
+         89   58 000AD880 Mix_QuickLoad_WAV
+         90   59 000AD340 Mix_Quit
+         91   5A 000AED20 Mix_RegisterEffect
+         92   5B 000ADB30 Mix_ReserveChannels
+         93   5C 000AE850 Mix_Resume
+         94   5D 000B19A0 Mix_ResumeMusic
+         95   5E 000B19F0 Mix_RewindMusic
+         96   5F 000AAFD0 Mix_SetDistance
+         97   60 000B1AD0 Mix_SetMusicCMD
+         98   61 000B1260 Mix_SetMusicPosition
+         99   62 000ABE20 Mix_SetPanning
+        100   63 000AB0D0 Mix_SetPosition
+        101   64 000ADA50 Mix_SetPostMix
+        102   65 000AC060 Mix_SetReverseStereo
+        103   66 000B1BD0 Mix_SetSoundFonts
+        104   67 000B1B40 Mix_SetSynchroValue
+        105   68 000AEF30 Mix_UnregisterAllEffects
+        106   69 000AEEA0 Mix_UnregisterEffect
+        107   6A 000ADC00 Mix_Volume
+        108   6B 000AE040 Mix_VolumeChunk
+        109   6C 000B15D0 Mix_VolumeMusic
+
+  Summary
+
+        1000 .CRT
+       B1000 .bss
+        C000 .data
+        1000 .edata
+       22000 .eh_fram
+        2000 .idata
+       7A000 .rdata
+        9000 .reloc
+        1000 .rsrc
+       EF000 .text
+        1000 .tls
