@@ -10,6 +10,8 @@
 #include "Utils/Json/qjsonfileopenexception.h"
 #include "Utils/Json/qjsonparseexception.h"
 #include "Utils/Json/qjsonurlvalidationexception.h"
+#include "launchercustomwebpage.h"
+#include "hybridlogger.h"
 
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
@@ -20,12 +22,25 @@
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
+    m_smbxConfig(new SMBXConfig()),
     m_ApplyLunaLoaderPatch(false),
+    m_jsBridgeAlreadInit(false),
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
+    HybridLogger::init(ui->webLauncherPage);
 
-    ui->webLauncherPage->page()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    // 1. General WebEngine Settings
+    QWebEngineSettings* globalSettings = QWebEngineSettings::globalSettings();
+    globalSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    globalSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+
+    ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
+    QWebEnginePage* page = ui->webLauncherPage->page();
+
+    // 2. Page Settings
+    page->action(QWebEnginePage::InspectElement)->setEnabled(true);
+
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
             [this](bool ok){
@@ -52,15 +67,15 @@ void MainLauncherWindow::loadJavascriptBridge()
     if(channel == nullptr)
         channel = new QWebChannel(currentPage);
 
-    qDebug() << "Placing Launcher object!";
-    if(m_smbxConfig)
-        channel->deregisterObject(m_smbxConfig.data());
-    m_smbxConfig.reset(new SMBXConfig());
-    channel->registerObject(QString("Launcher"), m_smbxConfig.data());
+    if(!m_jsBridgeAlreadInit) {
+        qDebug() << "Placing Launcher object!";
+        channel->registerObject(QString("Launcher"), m_smbxConfig.data());
+        m_jsBridgeAlreadInit = true;
+    }
 
     qDebug() << "Setting web channel!";
-    currentPage->setWebChannel(nullptr); // This is a bit hackish, but without it the 'qt' global object would not be set
     currentPage->setWebChannel(channel);
+
 
     qDebug() << "Connecting QObject signal & slots";
     connect(m_smbxConfig.data(), &SMBXConfig::runSMBXExecuted, this, &MainLauncherWindow::runSMBX);
@@ -81,7 +96,11 @@ void MainLauncherWindow::loadJavascriptBridge()
                 "    new QWebChannel(qt.webChannelTransport, function (channel) {"
                 "        console.log('QWebChannel works!');"
                 "        Launcher = channel.objects.Launcher;"
+                "        if(Launcher === undefined){"
+                "            console.warn('Launcher object failed to bind. Please contact Kevsoft!');"
+                "        }"
                 "        if(typeof onInitLauncher === 'function'){"
+                "            console.log('Calling onInitLauncher callback');"
                 "            onInitLauncher(); "
                 "        }"
                 "    });"
@@ -94,11 +113,12 @@ void MainLauncherWindow::loadJavascriptBridge()
 
 void MainLauncherWindow::loadDefaultWebpage()
 {
-    ui->webLauncherPage->load(QUrl("qrc:///emptyPage.html"));
+    ui->webLauncherPage->load(QUrl("qrc:///featurePage.html"));
 }
 
 void MainLauncherWindow::init(const QString &configName)
 {
+    qDebug() << "Loading launcher configuration " << configName;
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
 
@@ -143,6 +163,7 @@ void MainLauncherWindow::init(const QString &configName)
 
 
     // check for updates with the information from settings.json
+    qDebug() << "Checking for updates...";
     checkForUpdates();
 
     QSettings settingFile(configName, QSettings::IniFormat);
@@ -204,8 +225,10 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::checkForUpdates()
 {
-    if(!m_launcherSettings->hasValidUpdateSite())
+    if(!m_launcherSettings->hasValidUpdateSite()) {
+        qWarning() << "Invalid update-check-website for launcher configuration";
         return;
+    }
 
     try {
         if(!NetworkUtils::checkInternetConnection(4000))
@@ -215,6 +238,7 @@ void MainLauncherWindow::checkForUpdates()
         return;
     }
 
+    qDebug() << "Checking launcher updates...";
     try {
         try {
             ExtendedQJsonReader reader(m_launcherSettings->checkForUpdate());
@@ -227,6 +251,7 @@ void MainLauncherWindow::checkForUpdates()
                 std::make_pair("version-2", &verNum[3])
             );
             if(m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3])){
+                qDebug() << "Higher version, notify user...";
                 QString updateMessage;
                 QUrl updateUrlObj;
                 reader.extractSafe("",
@@ -236,6 +261,8 @@ void MainLauncherWindow::checkForUpdates()
 
                 QMessageBox::information(this, "New Update!", updateMessage);
                 QDesktopServices::openUrl(updateUrlObj);
+            } else {
+                qDebug() << "No new updates, skipping notification...";
             }
         } catch (const QJsonUrlValidationException& ex) {
             warnError(QString("Episode updater json - Invalid url for field: ") + ex.fieldName() +

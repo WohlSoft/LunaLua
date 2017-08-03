@@ -46,6 +46,7 @@ private:
     QString m_smbxExe;
     QString m_pgeExe;
     bool m_ApplyLunaLoaderPatch;
+    bool m_jsBridgeAlreadInit;
     Ui::MainLauncherWindow *ui;
 };
 
