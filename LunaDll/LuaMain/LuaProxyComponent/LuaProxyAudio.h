@@ -28,6 +28,11 @@ namespace LuaProxy
         std::string MusicArtistTag();
         std::string MusicAlbumTag();
         std::string MusicCopyrightTag();
+        void    MusicSetPosition(double seconds);
+        double  MusicGetPosition();
+        double  MusicGetLoopStart();
+        double  MusicGetLoopEnd();
+        double  MusicGetLoopLength();
         void seizeStream(int section);
         void releaseStream(int section);
         

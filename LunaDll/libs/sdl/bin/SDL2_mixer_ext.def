@@ -16,6 +16,7 @@ MIX_ADLMIDI_setSetDefaults
 MIX_ADLMIDI_setTremolo
 MIX_ADLMIDI_setVibrato
 MIX_ADLMIDI_setVolumeModel
+MIX_OPNMIDI_setCustomBankFile
 MIX_SetLockMIDIArgs
 MIX_SetMidiDevice
 MIX_Timidity_addToPathList
@@ -42,8 +43,13 @@ Mix_GetMusicArtistTag
 Mix_GetMusicCopyrightTag
 Mix_GetMusicDecoder
 Mix_GetMusicHookData
+Mix_GetMusicLoopEndTime
+Mix_GetMusicLoopLengthTime
+Mix_GetMusicLoopStartTime
+Mix_GetMusicPosition
 Mix_GetMusicTitle
 Mix_GetMusicTitleTag
+Mix_GetMusicTotalTime
 Mix_GetMusicType
 Mix_GetNumChunkDecoders
 Mix_GetNumMusicDecoders

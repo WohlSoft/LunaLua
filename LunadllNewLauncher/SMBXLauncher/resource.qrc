@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>emptyPage.html</file>
         <file>smbxIcon.png</file>
+        <file>featurePage.html</file>
     </qresource>
 </RCC>

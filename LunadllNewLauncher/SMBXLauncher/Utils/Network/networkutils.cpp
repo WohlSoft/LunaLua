@@ -39,6 +39,8 @@ QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
     if(replyContent.isEmpty())
         throw QNetworkReplyException(reply->error(), reply->errorString());
 
+    qDebug() << "Received data from " << url << ":" << replyContent;
+
     return replyContent;
 }
 
