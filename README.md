@@ -1,8 +1,8 @@
-LunaLUA
+LunaLua
 =======
 [![Build status](https://ci.appveyor.com/api/projects/status/72ttgr33ggar3x21?svg=true)](https://ci.appveyor.com/project/Wohlstand/lunadll)
 
-LunaLUA - LunaDLL with LUA is a free extension for SMBX game engine
+LunaLua - LunaDLL with Lua is a free extension for SMBX game engine
 This version is based on LunaDLL ver. 8 with Lua Support.
 
 Quick Overview
@@ -18,7 +18,7 @@ Quick Overview
 * Added PGE's [sounds.ini](http://wohlsoft.ru/pgewiki/Game_Configuration_Pack_References#sounds.ini) and [music.ini](http://wohlsoft.ru/pgewiki/Game_Configuration_Pack_References#music.ini) support which gives ability to have custom musics (include world map musics!) and custom sound effects per episode.
 
 **Download links**
-* [Download LunaLUA](http://wohlsoft.ru/LunaLua/)
+* [Download LunaLua](http://wohlsoft.ru/LunaLua/)
 * [LunaLua Documenation](http://wohlsoft.ru/pgewiki/Category:LunaLua_API)
 
 Requirements to build LunaDLL yourself
