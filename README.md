@@ -21,7 +21,7 @@ Quick Overview
 * [Download LunaLua](http://wohlsoft.ru/LunaLua/)
 * [LunaLua Documenation](http://wohlsoft.ru/pgewiki/Category:LunaLua_API)
 
-Requirements to build LunaDLL yourself
+Requirements to build LunaLua yourself
 ------
 Visual Studio 2015 (msvc140 compiler)
 
