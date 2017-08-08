@@ -328,6 +328,7 @@ namespace LuaProxy {
         static luabind::object getIntersectingExit(double x1, double y1, double x2, double y2, lua_State* L);
 
         Warp(int warpIndex);
+        int idx() const;
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
 
@@ -360,6 +361,7 @@ namespace LuaProxy {
         static LuaProxy::Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 
         Animation (int animationIndex);
+        int idx() const;
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         short id() const;
@@ -400,6 +402,7 @@ namespace LuaProxy {
         static luabind::object find(const std::string& layerName, lua_State* L);
 
         Layer (int layerIndex);
+        int idx() const;
         VBStr layerName() const;
         float speedX() const;
         void setSpeedX(float speedX);
@@ -423,6 +426,7 @@ namespace LuaProxy {
         static LuaProxy::Section get(short secNumber, lua_State* L);
         
         Section (int sectionNum);
+        int idx() const;
         RECTd boundary() const;
         void setBoundary(const RECTd &boundary);
         short musicID() const;
@@ -589,6 +593,7 @@ namespace LuaProxy {
         
         Player ();
         Player (int index);
+        int idx() const;
         int section(lua_State *L) const;
         Section sectionObj(lua_State *L) const;
         void kill(lua_State *L);
@@ -881,6 +886,7 @@ namespace LuaProxy {
         static void _setBumpable(int id, bool bumpable);
 
         Block(int index);
+        int idx() const;
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         double x() const;
@@ -958,6 +964,7 @@ namespace LuaProxy {
 
         Tile(unsigned short index);
 
+        int idx() const;
         short id(lua_State* L) const;
         void setId(short id, lua_State* L);
 
@@ -987,6 +994,7 @@ namespace LuaProxy {
 
         Scenery(unsigned short index);
 
+        int idx() const;
         short id(lua_State* L) const;
         void setId(short id, lua_State* L);
 
@@ -1016,6 +1024,7 @@ namespace LuaProxy {
 
         Musicbox(unsigned short index);
 
+        int idx() const;
         short id(lua_State* L) const;
         void setId(short id, lua_State* L);
 
@@ -1045,6 +1054,7 @@ namespace LuaProxy {
 
         Path(unsigned short index);
 
+        int idx() const;
         short id(lua_State* L) const;
         void setId(short id, lua_State* L);
 
@@ -1082,6 +1092,7 @@ namespace LuaProxy {
 
 
         LevelObject(int index);
+        int idx() const;
         void mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L);
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         double x() const;
@@ -1129,6 +1140,7 @@ namespace LuaProxy {
 
         BGO(unsigned short index);
 
+        int idx() const;
         bool isHidden(lua_State* L) const;
         void setIsHidden(bool isHidden, lua_State* L);
         short id(lua_State* L) const;
@@ -1164,6 +1176,7 @@ namespace LuaProxy {
     public:
         InputConfig(unsigned short index);
        
+        int idx() const;
         short inputType(lua_State* L);
         void setInputType(short inputType, lua_State* L);
 
@@ -1204,6 +1217,7 @@ namespace LuaProxy {
 
         Camera(unsigned short index);
 
+        int idx() const;
         void mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L);
         luabind::object mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const;
         double x();

@@ -47,6 +47,11 @@ LuaProxy::BGO::BGO(unsigned short index)
     m_index = index;
 }
 
+int LuaProxy::BGO::idx() const
+{
+    return m_index;
+}
+
 luabind::object LuaProxy::BGO::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
 {
     return LuaHelper::getObjList(

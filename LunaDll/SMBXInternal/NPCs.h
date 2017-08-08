@@ -501,9 +501,10 @@ namespace NPC {
 
     void InitProperties();
     uint32_t GetVulnerableHarmTypes(int id);
-    void SetVulnerableHarmTypes(int id, uint32_t value);
     bool GetSpinjumpSafe(int id);
-    void SetSpinjumpSafe(int id, bool value);
+    bool GetNoWaterPhysics(int id);
+
+    uintptr_t GetPropertyTableAddress(const std::string& s);
 
     // NOTE: This is the value we are patching it to. Originally 300
     static const short MAX_ID = 1000;

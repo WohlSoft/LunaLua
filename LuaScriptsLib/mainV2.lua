@@ -102,9 +102,9 @@ local function initFFIBasedAPIs()
             error("Wrong type for getBits argument #1 (expected LuaResourceImage, got " .. type(resImg) .. ")", 2)
         end
         if(resImg.__type == "LuaResourceImage")then
-            error("Wrong type for getBits argument #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
+            error("Wrong type for getBits arguemnt #1 (expected LuaResourceImage, got " .. tostring(resImg.__type) .. ")", 2)
         end
-		local nativeBitArray = ffi.cast("uint32_t*", ffi.cast("uintptr_t", resImg.__rawDataPtr))
+        local nativeBitArray = ffi.cast("uint32_t*", ffi.cast("uintptr_t", resImg.__rawDataPtr))
         
         -- get bits
         local bitMT = setmetatable({
@@ -217,7 +217,7 @@ local function initFFIBasedAPIs()
             -- Get vatiable info
             local varInfo = variableInfoTable[varName]
             if(varInfo == nil)then
-                error("Invalid " .. variableTypeName .. " " .. varName .. " (does not exists)", 3)
+                error("Invalid " .. variableTypeName .. " " .. varName .. " (does not exist or has been optimised out)", 3)
             end
             -- TODO: Support multi-dimensional arrays
             if(varInfo.arrayDepth > 1)then
@@ -332,6 +332,8 @@ local function initFFIBasedAPIs()
         if(uniformArgs ~= nil and shader ~= nil)then
             uniformArgsConverted = validateAndConvertVariableTable(uniformArgs, shader:getUniformInfo(), "uniform", 1)
         end
+        
+        if shader ~= nil then shader = shader._obj end
         
         Graphics.__glInternalDraw{
             priority = priority, primitive = args['primitive'], sceneCoords = args['sceneCoords'], depthTest = args['depthTest'], texture = texture,
@@ -475,51 +477,66 @@ local function initFFIBasedAPIs()
             end
         }
         Block.bumpable = setmetatable({}, bumpableMetatable);
+    end
+    
+    do
+        local nativeShader = Shader
+        local standardVertexShader = getSMBXPath().."\\LuaScriptsLib\\shaders\\standard.vert"
+        local standardFragmentShader = getSMBXPath().."\\LuaScriptsLib\\shaders\\standard.frag"
+        local standardVertexSource;
+        local standardFragmentSource;
+        do
+            local shaderFile = io.open(standardVertexShader, "r");
+            standardVertexSource = shaderFile:read("*all");
+            shaderFile:close();
+            shaderFile = io.open(standardFragmentShader, "r");
+            standardFragmentSource = shaderFile:read("*all");
+            shaderFile:close();
+        end
         
-        local harmTypeMap = {
-            [HARM_TYPE_JUMP]=true,
-            [HARM_TYPE_FROMBELOW]=true,
-            [HARM_TYPE_NPC]=true,
-            [HARM_TYPE_PROJECTILE_USED]=true,
-            [HARM_TYPE_LAVA]=true,
-            [HARM_TYPE_HELD]=true,
-            [HARM_TYPE_TAIL]=true,
-            [HARM_TYPE_SPINJUMP]=true,
-            [HARM_TYPE_OFFSCREEN]=true,
-            [HARM_TYPE_SWORD]=true
-        }
-        local vulnerableHarmTypesMetatable = {
-            __index = function(tbl, id)
-                local mskVal = NPC._getVulnerableHarmTypes(id)
-                local tblVal = {}
-                for v,_ in pairs(harmTypeMap) do
-                    if (bit.band(mskVal, bit.lshift(1, v)) ~= 0) then
-                        table.insert(tblVal, v)
-                    end
-                end
-                return tblVal
+        local shaderMT = {}
+        local shaderCompileFromSource = function(obj, vertexSource, fragmentSource)
+            vertexSource = vertexSource or standardVertexSource;
+            fragmentSource = fragmentSource or standardFragmentSource;
+            obj._obj:compileFromSource(vertexSource, fragmentSource)
+            obj._attributeInfo = obj._obj:getAttributeInfo()
+            obj._uniformInfo = obj._obj:getUniformInfo()
+            obj._isCompiled = obj._obj.isCompiled
+        end
+        local shaderCompileFromFile = function(obj, vertexFile, fragmentFile)
+            vertexFile = vertexFile or standardVertexShader;
+            fragmentFile = fragmentFile or standardFragmentShader;
+            obj._obj:compileFromFile(vertexFile, fragmentFile)
+            obj._attributeInfo = obj._obj:getAttributeInfo()
+            obj._uniformInfo = obj._obj:getUniformInfo()
+            obj._isCompiled = obj._obj.isCompiled
+        end
+        local shaderGetUniformInfo = function(obj)
+            return obj._uniformInfo
+        end
+        local shaderGetAttributeInfo = function(obj)
+            return obj._attributeInfo
+        end
+        shaderMT.__index = function(obj, key)
+            if key == 'isCompiled' then return obj._isCompiled
+            elseif key == 'getAttributeInfo' then return shaderGetAttributeInfo
+            elseif key == 'getUniformInfo' then return shaderGetUniformInfo
+            elseif key == 'compileFromSource' then return shaderCompileFromSource
+            elseif key == 'compileFromFile' then return shaderCompileFromFile
+            else return nil end
+        end
+        shaderMT.__newindex = function(obj, key, val)
+        end
+        Shader = setmetatable({}, {
+            __call = function ()
+                return setmetatable({
+                    _obj=nativeShader(),
+                    _attributeInfo={},
+                    _uniformInfo={},
+                    _isCompiled=false
+                }, shaderMT)
             end,
-            __newindex = function(tbl, id, tblVal)
-                local mskVal = 0
-                for _,v in ipairs(tblVal) do
-                    if harmTypeMap[v] then
-                        mskVal = bit.bor(mskVal, bit.lshift(1, v))
-                    end
-                end
-                NPC._setVulnerableHarmTypes(id, mskVal)
-            end
-        }
-        NPC.vulnerableHarmTypes = setmetatable({}, vulnerableHarmTypesMetatable);
-        
-        local spinjumpSafeMetatable = {
-            __index = function(tbl, id)
-                return NPC._getSpinjumpSafe(id)
-            end,
-            __newindex = function(tbl, id, val)
-                NPC._setSpinjumpSafe(id, val)
-            end
-        }
-        NPC.spinjumpSafe = setmetatable({}, spinjumpSafeMetatable);
+        });
     end
     
     -- Limit access to FFI
@@ -670,7 +687,7 @@ local function loadAPIByPath(path)
 end
 
 function APIHelper.doAPI(apiTableHolder, apiPath)
-    local apiName = filenameOfPath(apiPath)
+    local apiName = string.lower(filenameOfPath(apiPath))
     if(apiTableHolder[apiName])then
         return apiTableHolder[apiName], false
     end
@@ -1071,7 +1088,7 @@ end
 --This code segment won't post any errors!
 function __onInit(episodePath, lvlName)
     local pcallReturns = {__xpcall(function()
-        --SEGMENT TO ADD PRELOADED APIS START
+        --SEGMENT TO ADD GLOBAL PRELOADED APIS START
         Defines = APIHelper.doAPI(_G, "core\\defines")
         APIHelper.doAPI(_G, "uservar")
         DBG = APIHelper.doAPI(_G, "core\\dbg")
@@ -1079,7 +1096,11 @@ function __onInit(episodePath, lvlName)
         Profiler = APIHelper.doAPI(_G, "core\\profiler")
         LunaTime = APIHelper.doAPI(_G, "core\\lunatime")
         Warn = APIHelper.doAPI(_G, "core\\warn")
-        --SEGMENT TO ADD PRELOADED APIS END
+        --SEGMENT TO ADD GLOBAL PRELOADED APIS END
+        
+        -- Load core-npcconfig as shared (not exposed to global namespace by
+        -- default, but we want to load anyway)
+        APIHelper.doAPI(UserCodeManager.sharedAPIs, "core\\npcconfig_core")
         
         __episodePath = episodePath
         __customFolderPath = episodePath..string.sub(lvlName, 0, -5).."\\"
@@ -1087,14 +1108,14 @@ function __onInit(episodePath, lvlName)
         if(UserCodeManager.loadCodeFile("lunabase", getSMBXPath().."\\LuaScriptsLib\\basegame\\lunabase.lua")) then noFileLoaded = false end
         if(not isOverworld)then
             -- Modern
-            if(UserCodeManager.loadCodeFile("lunaglobal", episodePath .. "luna.lua")) then noFileLoaded = false end
-            if(UserCodeManager.loadCodeFile("lunalocal", __customFolderPath.."luna.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("luna-episode", episodePath .. "luna.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("luna-level", __customFolderPath.."luna.lua")) then noFileLoaded = false end
             -- Deprecated
             if(UserCodeManager.loadCodeFile("lunadll", __customFolderPath.."lunadll.lua")) then noFileLoaded = false end
             if(UserCodeManager.loadCodeFile("lunaworld", episodePath .. "lunaworld.lua")) then noFileLoaded = false end
         else
             -- Modern
-            if(UserCodeManager.loadCodeFile("mapglobal", episodePath .. "map.lua")) then noFileLoaded = false end
+            if(UserCodeManager.loadCodeFile("luna-map", episodePath .. "map.lua")) then noFileLoaded = false end
             -- Deprecated
             if(UserCodeManager.loadCodeFile("lunaoverworld", episodePath .. "lunaoverworld.lua")) then noFileLoaded = false end
         end

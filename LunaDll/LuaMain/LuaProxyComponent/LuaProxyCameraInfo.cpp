@@ -21,6 +21,11 @@ double LuaProxy::Camera::getY(unsigned short index)
 LuaProxy::Camera::Camera(unsigned short index) : m_index(index)
 {}
 
+int LuaProxy::Camera::idx() const
+{
+    return m_index;
+}
+
 void LuaProxy::Camera::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
     SMBX_CameraInfo *pCamera = ::SMBX_CameraInfo::Get(m_index);

@@ -99,6 +99,11 @@ luabind::object LuaProxy::LevelObject::findByFilename(const std::string& levelFi
 LuaProxy::LevelObject::LevelObject(int index) : m_index(index)
 {}
 
+int LuaProxy::LevelObject::idx() const
+{
+    return m_index;
+}
+
 void LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)
 {
 	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
