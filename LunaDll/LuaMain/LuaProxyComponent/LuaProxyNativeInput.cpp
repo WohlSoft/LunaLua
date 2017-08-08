@@ -10,6 +10,10 @@
 LuaProxy::InputConfig::InputConfig(unsigned short index) : m_index(index)
 {}
 
+int LuaProxy::InputConfig::idx() const
+{
+    return m_index;
+}
 
 short LuaProxy::InputConfig::inputType(lua_State* L)
 {

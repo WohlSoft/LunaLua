@@ -95,6 +95,11 @@ LuaProxy::Animation::Animation(int animationIndex)
     m_animationIndex = animationIndex;
 }
 
+int LuaProxy::Animation::idx() const
+{
+    return m_animationIndex;
+}
+
 void LuaProxy::Animation::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
     SMBXAnimation* manimation = SMBXAnimation::Get(m_animationIndex);

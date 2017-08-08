@@ -110,6 +110,11 @@ void LuaProxy::Block::_setBumpable(int id, bool bumpable)
 LuaProxy::Block::Block(int index) : m_index(index)
 {}
 
+int LuaProxy::Block::idx() const
+{
+    return m_index;
+}
+
 void LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
 	::Block* pBlock = &::Blocks::GetBase()[m_index];
