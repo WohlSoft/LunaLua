@@ -41,6 +41,11 @@ LuaProxy::Player::Player() : m_index(1)
 LuaProxy::Player::Player(int index) : m_index(index)
 {}
 
+int LuaProxy::Player::idx() const
+{
+    return m_index;
+}
+
 int LuaProxy::Player::section(lua_State *L) const
 {
 	if(!isValid_throw(L))

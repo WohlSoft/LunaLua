@@ -53,6 +53,11 @@ LuaProxy::Layer::Layer(int layerIndex)
 	m_layerIndex = layerIndex;
 }
 
+int LuaProxy::Layer::idx() const
+{
+    return m_layerIndex;
+}
+
 LuaProxy::VBStr LuaProxy::Layer::layerName() const
 {
 	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
