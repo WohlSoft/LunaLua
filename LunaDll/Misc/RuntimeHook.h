@@ -195,5 +195,7 @@ void __stdcall runtimeHookInitGameWindow(void);
 
 void __stdcall runtimeHookLoadDefaultGraphics(void);
 
+void __stdcall runtimeHookSaveGame(void);
+
 #endif
 

@@ -490,6 +490,9 @@ void TrySkipPatch()
     // Load level hook
     PATCH(0x8D8F40).JMP(runtimeHookLoadLevel).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Save game hook
+    PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Close window hook
     PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 

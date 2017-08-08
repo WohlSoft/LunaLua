@@ -924,14 +924,28 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
     gLunaRender.StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onCameraUpdate", false);
-        messageBoxEvent->setDirectEventName("onCameraUpdate");
-        messageBoxEvent->setLoopable(false);
-        gLunaLua.callEvent(messageBoxEvent, cameraIdx);
+        std::shared_ptr<Event> cameraUpdateEvent = std::make_shared<Event>("onCameraUpdate", false);
+        cameraUpdateEvent->setDirectEventName("onCameraUpdate");
+        cameraUpdateEvent->setLoopable(false);
+        gLunaLua.callEvent(cameraUpdateEvent, cameraIdx);
     }
 
     // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
     gLunaRender.StoreCameraPosition(cameraIdx);
+
+    if (gLunaLua.isValid()) {
+        SMBX_CameraInfo cameraData;
+        SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
+        memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
+
+        std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
+        cameraDrawEvent->setDirectEventName("onCameraDraw");
+        cameraDrawEvent->setLoopable(false);
+        gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
+
+        // Disallow changes to this camera's settings in onCameraDraw, for reasons.
+        memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
+    }
 }
 
 void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
@@ -1508,4 +1522,28 @@ void __stdcall runtimeHookLoadDefaultGraphics(void)
         ImageLoader::Run(true);
         initDone = true;
     }
+}
+
+static _declspec(naked) void __stdcall saveGame_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E47D6
+        RET
+    }
+}
+
+void __stdcall runtimeHookSaveGame()
+{
+    // Hook for saving the game
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> saveGameEvent = std::make_shared<Event>("onSaveGame", false);
+        saveGameEvent->setDirectEventName("onSaveGame");
+        saveGameEvent->setLoopable(false);
+        gLunaLua.callEvent(saveGameEvent);
+    }
+
+    saveGame_OrigFunc();
 }
