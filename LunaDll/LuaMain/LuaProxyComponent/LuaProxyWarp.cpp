@@ -63,6 +63,10 @@ LuaProxy::Warp::Warp(int warpIndex)
     m_index = warpIndex;
 }
 
+int LuaProxy::Warp::idx() const
+{
+    return m_index;
+}
 
 void LuaProxy::Warp::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)
 {

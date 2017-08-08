@@ -21,6 +21,11 @@ LuaProxy::Section::Section(int sectionNum)
 	m_secNum = sectionNum;
 }
 
+int LuaProxy::Section::idx() const
+{
+    return m_secNum;
+}
+
 LuaProxy::RECTd LuaProxy::Section::boundary() const
 {
 	double* boundtable = (double*)GM_LVL_BOUNDARIES;
