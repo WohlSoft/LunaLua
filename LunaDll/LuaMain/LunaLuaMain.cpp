@@ -50,14 +50,34 @@ CLunaLua::~CLunaLua()
     shutdown();
 }
 
-void CLunaLua::exitLevel()
+void CLunaLua::exitContext()
 {
     if (isValid())
     {
-        std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExitLevel", false);
-        shutdownEvent->setDirectEventName("onExitLevel");
-        shutdownEvent->setLoopable(false);
-        callEvent(shutdownEvent);
+        {
+            const char* shutdownSpecificName = nullptr;
+            if (m_type == LUNALUA_LEVEL)
+            {
+                shutdownSpecificName = "onExitLevel";
+            }
+            else if (m_type == LUNALUA_WORLD)
+            {
+                shutdownSpecificName = "onExitMap";
+            }
+
+            if (shutdownSpecificName != nullptr)
+            {
+                std::shared_ptr<Event> shutdownSpecificEvent = std::make_shared<Event>(shutdownSpecificName, false);
+                shutdownSpecificEvent->setDirectEventName(shutdownSpecificName);
+                shutdownSpecificEvent->setLoopable(false);
+                callEvent(shutdownSpecificEvent);
+            }
+            
+            std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExit", false);
+            shutdownEvent->setDirectEventName("onExit");
+            shutdownEvent->setLoopable(false);
+            callEvent(shutdownEvent);
+        }
         shutdown();
 
         g_PerfTracker.disable();
@@ -65,9 +85,6 @@ void CLunaLua::exitLevel()
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
-
-        // Don't be paused by Lua
-        g_EventHandler.requestUnpause();
     }
 }
 
@@ -76,7 +93,10 @@ bool CLunaLua::shutdown()
     //Shutdown the lua module if possible
     if(!isValid())
         return false;
-    
+
+    // Don't be paused by Lua
+    g_EventHandler.requestUnpause();
+
     checkWarnings();
 
     m_ready = false;

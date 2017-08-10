@@ -197,5 +197,13 @@ void __stdcall runtimeHookLoadDefaultGraphics(void);
 
 void __stdcall runtimeHookSaveGame(void);
 
+void __stdcall runtimeHookCleanupLevel(void);
+
+void __stdcall runtimeHookExitMainGame(void);
+
+void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename);
+
+void __stdcall runtimeHookCleanupWorld(void);
+
 #endif
 

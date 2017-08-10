@@ -493,6 +493,14 @@ void TrySkipPatch()
     // Save game hook
     PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
 
+    PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8D6BB0).JMP(runtimeHookExitMainGame).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8DF5B0).JMP(runtimeHookLoadWorld).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8E2E40).JMP(runtimeHookCleanupWorld).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Close window hook
     PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 

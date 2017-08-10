@@ -75,7 +75,7 @@ void setTestModeSettings(const STestModeSettings& settings)
 void testModeRestartLevel(void)
 {
     // Start by stopping any Lua things
-    gLunaLua.exitLevel();
+    gLunaLua.exitContext();
 
     // Make sure we unpause
     exitPausePatch.Apply();
@@ -106,7 +106,7 @@ static bool testModeSetupForLoading()
     }
     
     // Start by stopping any Lua things
-    gLunaLua.exitLevel();
+    gLunaLua.exitContext();
 
     // Stop music if any is still going
     native_stopMusic();

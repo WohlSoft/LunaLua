@@ -24,6 +24,7 @@
 
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Blocks.h"
+#include "../../SMBXInternal/Level.h"
 
 #include "../PerfTracker.h"
 
@@ -147,7 +148,6 @@ extern int __stdcall LoadWorld()
     gSavedVarBank.CheckSaveDeletion();
     gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-    gLunaLua = CLunaLua();
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
@@ -524,9 +524,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 
 extern void __stdcall checkLevelShutdown()
 {
-    if (GM_EPISODE_MODE || GM_LEVEL_MODE){
-        gLunaLua.exitLevel();
-    }
+    // DEPRECATED HOOK
 
     __asm{
         CMP WORD PTR DS : [0x00B2C5B4], 0
@@ -1221,13 +1219,62 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
+    // Shut down Lua stuff before level loading just in case
+    gLunaLua.exitContext();
+
     if (testModeLoadLevelHook(filename))
     {
         // If handled by testModeLoadLevelHook, skip
-        return;
     }
-    
-    loadLevel_OrigFunc(filename);
+    else
+    {
+        loadLevel_OrigFunc(filename);
+    }
+
+    // TODO: Figure out why early GL init crashes when using the launcher! In
+    //       the meantime, disable early GL init again... :/
+    //
+    // Make sure we init the renderer before we start LunaLua when entering levels
+    //GLEngineProxy::CheckRendererInit();
+
+    // WIP
+    // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
+
+    if (gLunaEnabled) {
+        // Load autocode
+        gAutoMan.Clear(false);
+        gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
+
+        // Try to load world codes		
+        gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
+
+        // Init var bank
+        gSavedVarBank.TryLoadWorldVars();
+        gSavedVarBank.CheckSaveDeletion();
+        gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
+
+        //  Don't try to call the CLunaLua constructor... It's already
+        //  constructed automatically once, and trying to do this will call
+        //  the constructor extra times *without* ever calling the destructor,
+        //  which can result in a memory leak of the whole Lua state!
+        //    gLunaLua = CLunaLua();
+        gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
+        gLunaLua.setReady(true);
+
+        // Do some stuff
+        gAutoMan.DoEvents(true); // do with init
+
+                                 // Init some stuff
+        InitLevel();
+        gAutoMan.m_Hearts = 2;
+
+        // Recount deaths
+        gDeathCounter.Recount();
+    }
+
+    //PGE DBG STUFF
+    //readAndWriteNPCSettings();
+    //overwriteFunc();
 }
 
 void __stdcall runtimeHookCloseWindow(void)
@@ -1546,4 +1593,79 @@ void __stdcall runtimeHookSaveGame()
     }
 
     saveGame_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8DC6E6
+        RET
+    }
+}
+
+void __stdcall runtimeHookCleanupLevel()
+{
+    // Shut down Lua stuff before level cleanup
+    gLunaLua.exitContext();
+    ResetLunaModule();
+
+    cleanupLevel_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall exitMainGame_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8D6BB6
+        RET
+    }
+}
+
+void __stdcall runtimeHookExitMainGame()
+{
+    exitMainGame_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall loadWorld_OrigFunc(VB6StrPtr* filename)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8DF5B6
+        RET
+    }
+}
+
+void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
+{
+    // This only occurs when first loading the episode...
+    // this isn't repeated later on
+
+    loadWorld_OrigFunc(filename);
+}
+
+static _declspec(naked) void __stdcall cleanupWorld_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E2E46
+        RET
+    }
+}
+
+void __stdcall runtimeHookCleanupWorld()
+{
+    // Shut down Lua stuff before world cleanup
+    gLunaLua.exitContext();
+    ResetLunaModule();
+
+    cleanupWorld_OrigFunc();
 }
