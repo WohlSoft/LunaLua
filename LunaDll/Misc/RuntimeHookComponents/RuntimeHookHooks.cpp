@@ -898,17 +898,28 @@ extern short __stdcall MessageBoxOpenHook()
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
     // A note here: If the message is set, then the message box will called
     // However, if a message is not set, then this function is called when the menu opens.
-    if (GM_STR_MSGBOX){
-        if (GM_STR_MSGBOX.length() > 0){
-            if (gLunaLua.isValid()){
-                std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
-                messageBoxEvent->setDirectEventName("onMessageBox");
-                messageBoxEvent->setLoopable(false);
-                gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
-                isCancelled = messageBoxEvent->native_cancelled();
-            }
+
+    if ((GM_STR_MSGBOX) && (GM_STR_MSGBOX.length() > 0)) {
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
+            messageBoxEvent->setDirectEventName("onMessageBox");
+            messageBoxEvent->setLoopable(false);
+            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
+            isCancelled = messageBoxEvent->native_cancelled();
         }
     }
+    else
+    {
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onPause", true);
+            messageBoxEvent->setDirectEventName("onPause");
+            messageBoxEvent->setLoopable(false);
+            gLunaLua.callEvent(messageBoxEvent);
+            isCancelled = messageBoxEvent->native_cancelled();
+        }
+    }
+
+
     if (isCancelled)
         MessageBoxContinueCode.Apply();
     else
