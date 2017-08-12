@@ -106,6 +106,18 @@ int OnLvlLoad() {
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
 
+    // TODO: Figure out why early GL init crashes when using the launcher! In
+    //       the meantime, disable early GL init again... :/
+    //
+    // Make sure we init the renderer before we start LunaLua when entering levels
+    //GLEngineProxy::CheckRendererInit();
+
+    ResetLunaModule();
+
+    // WIP
+    // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
+
+    
     std::string custPath = WStr2Str(getCustomFolderPath());
     std::string wldPath = WStr2Str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
@@ -137,6 +149,41 @@ int OnLvlLoad() {
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
+	if(gLunaEnabled) {
+		// Load autocode
+		gAutoMan.Clear(false);		
+		gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
+
+		// Try to load world codes		
+		gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
+
+		// Init var bank
+		gSavedVarBank.TryLoadWorldVars();
+		gSavedVarBank.CheckSaveDeletion();
+		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
+
+        //  Don't try to call the CLunaLua constructor... It's already
+        //  constructed automatically once, and trying to do this will call
+        //  the constructor extra times *without* ever calling the destructor,
+        //  which can result in a memory leak of the whole Lua state!
+		//    gLunaLua = CLunaLua();
+		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
+        gLunaLua.setReady(true);
+
+		// Do some stuff
+		gAutoMan.DoEvents(true); // do with init
+
+		// Init some stuff
+		InitLevel();	
+		gAutoMan.m_Hearts = 2;	
+
+		// Recount deaths
+		gDeathCounter.Recount();
+	}
+
+    //PGE DBG STUFF
+    //readAndWriteNPCSettings();
+    //overwriteFunc();
 
 	return 0;
 }
