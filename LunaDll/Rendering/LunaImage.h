@@ -17,6 +17,9 @@ class LunaImage : public std::enable_shared_from_this<LunaImage>
 public:
     static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
     static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename);
+public:
+    static void holdCachedImages();
+    static void releaseCachedImages();
 private:
     static uint64_t getNewUID();
 private:

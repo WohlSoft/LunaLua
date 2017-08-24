@@ -378,7 +378,7 @@ bool testModeEnable(const STestModeSettings& settings)
     testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
 
-    shortenReloadPatch.Apply();
+    //shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
 
@@ -390,7 +390,7 @@ void testModeDisable(void)
     testModeSettings.ResetToDefault();
     testModeSettings.enabled = false;
 
-    shortenReloadPatch.Unapply();
+    //shortenReloadPatch.Unapply();
     playerDeathOverridePatch.Unapply();
     pauseOverridePatch.Unapply();
     exitPausePatch.Unapply();

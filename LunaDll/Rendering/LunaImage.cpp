@@ -8,6 +8,45 @@
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
 #include "GL/GLEngineProxy.h"
 
+
+static std::unordered_map<std::wstring, std::weak_ptr<LunaImage>> g_lunaImageCache;
+static std::vector<std::shared_ptr<LunaImage>> g_lunaImageHolder;
+
+void LunaImage::holdCachedImages()
+{
+    g_lunaImageHolder.clear();
+    for (auto cacheEntry = g_lunaImageCache.begin(); cacheEntry != g_lunaImageCache.end();)
+    {
+        std::shared_ptr<LunaImage> cachePtr = cacheEntry->second.lock();
+        if (cachePtr)
+        {
+            g_lunaImageHolder.push_back(std::move(cachePtr));
+            cacheEntry++;
+        }
+        else
+        {
+            g_lunaImageCache.erase(cacheEntry++);
+        }
+    }
+}
+
+void LunaImage::releaseCachedImages()
+{
+    g_lunaImageHolder.clear();
+    for (auto cacheEntry = g_lunaImageCache.begin(); cacheEntry != g_lunaImageCache.end();)
+    {
+        std::shared_ptr<LunaImage> cachePtr = cacheEntry->second.lock();
+        if (cachePtr)
+        {
+            cacheEntry++;
+        }
+        else
+        {
+            g_lunaImageCache.erase(cacheEntry++);
+        }
+    }
+}
+
 uint64_t LunaImage::getNewUID()
 {
     static std::atomic<uint64_t> uidCounter = 1;
@@ -48,12 +87,29 @@ std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
 std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename)
 {
     if ((filename == nullptr) || (filename[0] == L'\0')) return nullptr;
+
+    auto cacheSearchResult = g_lunaImageCache.find(filename);
+    if (cacheSearchResult != g_lunaImageCache.end())
+    {
+        std::shared_ptr<LunaImage> cachePtr = cacheSearchResult->second.lock();
+        if (cachePtr)
+        {
+            return std::move(cachePtr);
+        }
+        else
+        {
+            g_lunaImageCache.erase(cacheSearchResult);
+        }
+    }
+
     std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
     img->load(filename);
     if ((img->getW() == 0) && (img->getH() == 0))
     {
         return nullptr;
     }
+
+    g_lunaImageCache[filename] = img;
 
     return std::move(img);
 }

@@ -94,6 +94,9 @@ bool CLunaLua::shutdown()
     if(!isValid())
         return false;
 
+    // Request cached images be held onto for now
+    LunaImage::holdCachedImages();
+
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
 
@@ -209,6 +212,9 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     if (LuaHelper::is_function(L, initName)) {
         callLuaFunction(L, initName, WStr2Str(codePath), WStr2Str(levelPath));
     }
+
+    // Request cached images be held onto for now
+    LunaImage::releaseCachedImages();
 }
 
 //Setup default constants

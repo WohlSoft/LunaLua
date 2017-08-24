@@ -562,6 +562,9 @@ void TrySkipPatch()
     PATCH(0x8E6C75).CALL(&runtimeHookInitGameWindow).Apply();
     PATCH(0xA02AEE).CALL(&runtimeHookInitGameWindow).Apply();
 
+    //Shorten reload thingy? TEMP
+    PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
