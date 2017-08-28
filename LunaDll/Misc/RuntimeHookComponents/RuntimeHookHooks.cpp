@@ -1576,7 +1576,6 @@ void __stdcall runtimeHookCleanupLevel()
 {
     // Shut down Lua stuff before level cleanup
     gLunaLua.exitContext();
-    ResetLunaModule();
 
     cleanupLevel_OrigFunc();
 }
@@ -1631,7 +1630,6 @@ void __stdcall runtimeHookCleanupWorld()
 {
     // Shut down Lua stuff before world cleanup
     gLunaLua.exitContext();
-    ResetLunaModule();
 
     cleanupWorld_OrigFunc();
 }
