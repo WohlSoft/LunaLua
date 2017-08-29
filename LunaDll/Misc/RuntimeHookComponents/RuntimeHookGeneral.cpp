@@ -565,6 +565,10 @@ void TrySkipPatch()
     //Shorten reload thingy? TEMP
     PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>().Apply();
 
+    // Patch piranah divide by zero bug
+    PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

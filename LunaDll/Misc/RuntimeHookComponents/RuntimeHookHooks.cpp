@@ -1633,3 +1633,26 @@ void __stdcall runtimeHookCleanupWorld()
 
     cleanupWorld_OrigFunc();
 }
+
+static const float runtimeHookPiranahDivByZeroConst = 512.0f;
+static const float* runtimeHookPiranahDivByZeroConstPtr = &runtimeHookPiranahDivByZeroConst;
+static _declspec(naked) void __stdcall runtimeHookPiranahDivByZeroTrigger()
+{
+    __asm {
+        PUSH EAX
+        FSTP ST(0)
+        FCLEX
+        MOV EAX, runtimeHookPiranahDivByZeroConstPtr
+        FLD dword ptr[eax]
+        POP EAX
+        RET
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
+{
+    __asm {
+        JNE runtimeHookPiranahDivByZeroTrigger
+        RET
+    }
+}

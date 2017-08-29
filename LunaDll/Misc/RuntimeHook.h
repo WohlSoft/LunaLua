@@ -205,5 +205,7 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename);
 
 void __stdcall runtimeHookCleanupWorld(void);
 
+void __stdcall runtimeHookPiranahDivByZero();
+
 #endif
 
