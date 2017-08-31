@@ -148,7 +148,7 @@ void GLShader::applyAttribute(const GLShaderVariableEntry& entry)
     m_attributeBuffers.push_back(bufID);
     
     // 3. Set data
-    glBufferData(GL_ARRAY_BUFFER, entry.getNumberOfElements() * datatypeByteSize, entry.getDataPtr(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, entry.getNumberOfElements() * datatypeByteSize, entry.getDataPtr(), GL_STREAM_DRAW);
     GLERRORCHECK();
     glEnableVertexAttribArray(entry.getLocation());
     GLERRORCHECK();

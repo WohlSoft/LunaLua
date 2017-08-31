@@ -235,6 +235,12 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mShader) {
+        for (const auto& nextAttr : mAttributes)
+        {
+            glDisableVertexAttribArray(nextAttr.getLocation());
+            GLERRORCHECK();
+        }
+
         mShader->unbind();
         GLERRORCHECK();
     }
