@@ -22,6 +22,7 @@
 
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Blocks.h"
+#include "../../SMBXInternal/Level.h"
 
 #include "../PerfTracker.h"
 
@@ -160,7 +161,6 @@ extern int __stdcall LoadWorld()
     gSavedVarBank.CheckSaveDeletion();
     gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-    gLunaLua = CLunaLua();
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
@@ -536,9 +536,7 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 
 extern void __stdcall checkLevelShutdown()
 {
-    if (GM_EPISODE_MODE || GM_LEVEL_MODE){
-        gLunaLua.exitLevel();
-    }
+    // DEPRECATED HOOK
 
     __asm{
         CMP WORD PTR DS : [0x00B2C5B4], 0
@@ -920,17 +918,28 @@ extern short __stdcall MessageBoxOpenHook()
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
     // A note here: If the message is set, then the message box will called
     // However, if a message is not set, then this function is called when the menu opens.
-    if (GM_STR_MSGBOX){
-        if (GM_STR_MSGBOX.length() > 0){
-            if (gLunaLua.isValid()){
-                std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
-                messageBoxEvent->setDirectEventName("onMessageBox");
-                messageBoxEvent->setLoopable(false);
-                gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
-                isCancelled = messageBoxEvent->native_cancelled();
-            }
+
+    if ((GM_STR_MSGBOX) && (GM_STR_MSGBOX.length() > 0)) {
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
+            messageBoxEvent->setDirectEventName("onMessageBox");
+            messageBoxEvent->setLoopable(false);
+            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
+            isCancelled = messageBoxEvent->native_cancelled();
         }
     }
+    else
+    {
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onPause", true);
+            messageBoxEvent->setDirectEventName("onPause");
+            messageBoxEvent->setLoopable(false);
+            gLunaLua.callEvent(messageBoxEvent);
+            isCancelled = messageBoxEvent->native_cancelled();
+        }
+    }
+
+
     if (isCancelled)
         MessageBoxContinueCode.Apply();
     else
@@ -1241,13 +1250,17 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
+    // Shut down Lua stuff before level loading just in case
+    gLunaLua.exitContext();
+
     if (testModeLoadLevelHook(filename))
     {
         // If handled by testModeLoadLevelHook, skip
-        return;
     }
-    
-    loadLevel_OrigFunc(filename);
+    else
+    {
+        loadLevel_OrigFunc(filename);
+    }
 }
 
 void __stdcall runtimeHookCloseWindow(void)
@@ -1566,4 +1579,100 @@ void __stdcall runtimeHookSaveGame()
     }
 
     saveGame_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8DC6E6
+        RET
+    }
+}
+
+void __stdcall runtimeHookCleanupLevel()
+{
+    // Shut down Lua stuff before level cleanup
+    gLunaLua.exitContext();
+
+    cleanupLevel_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall exitMainGame_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8D6BB6
+        RET
+    }
+}
+
+void __stdcall runtimeHookExitMainGame()
+{
+    exitMainGame_OrigFunc();
+}
+
+static _declspec(naked) void __stdcall loadWorld_OrigFunc(VB6StrPtr* filename)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8DF5B6
+        RET
+    }
+}
+
+void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
+{
+    // This only occurs when first loading the episode...
+    // this isn't repeated later on
+
+    loadWorld_OrigFunc(filename);
+}
+
+static _declspec(naked) void __stdcall cleanupWorld_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E2E46
+        RET
+    }
+}
+
+void __stdcall runtimeHookCleanupWorld()
+{
+    // Shut down Lua stuff before world cleanup
+    gLunaLua.exitContext();
+
+    cleanupWorld_OrigFunc();
+}
+
+static const float runtimeHookPiranahDivByZeroConst = 512.0f;
+static const float* runtimeHookPiranahDivByZeroConstPtr = &runtimeHookPiranahDivByZeroConst;
+static _declspec(naked) void __stdcall runtimeHookPiranahDivByZeroTrigger()
+{
+    __asm {
+        PUSH EAX
+        FSTP ST(0)
+        FCLEX
+        MOV EAX, runtimeHookPiranahDivByZeroConstPtr
+        FLD dword ptr[eax]
+        POP EAX
+        RET
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
+{
+    __asm {
+        JNE runtimeHookPiranahDivByZeroTrigger
+        RET
+    }
 }

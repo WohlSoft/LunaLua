@@ -493,6 +493,14 @@ void TrySkipPatch()
     // Save game hook
     PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
 
+    PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8D6BB0).JMP(runtimeHookExitMainGame).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8DF5B0).JMP(runtimeHookLoadWorld).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0x8E2E40).JMP(runtimeHookCleanupWorld).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Close window hook
     PATCH(0x8BE3DA).CALL(runtimeHookCloseWindow).Apply();
 
@@ -553,6 +561,13 @@ void TrySkipPatch()
     PATCH(0x8CE9FA).CALL(&runtimeHookInitGameWindow).Apply();
     PATCH(0x8E6C75).CALL(&runtimeHookInitGameWindow).Apply();
     PATCH(0xA02AEE).CALL(&runtimeHookInitGameWindow).Apply();
+
+    //Shorten reload thingy? TEMP
+    PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>().Apply();
+
+    // Patch piranah divide by zero bug
+    PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+
 
     /************************************************************************/
     /* Import Table Patch                                                   */
