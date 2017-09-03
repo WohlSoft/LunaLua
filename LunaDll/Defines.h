@@ -24,7 +24,7 @@
 // This need to have able use same lunadll.lua script with both PGE Engine and LunaLUA.
 // PGE Engine going to have similar to LunaLUA API, but some super-special functions like mem() will NOT be made
 // at PGE Engine because useless with PGE's opened API.
-#define GAME_ENGINE        "LunaLUA"
+#define GAME_ENGINE        "LunaLua"
 
 #define LUNA_VERSION        8
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
