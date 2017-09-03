@@ -57,6 +57,8 @@ public:
 
     static std::shared_ptr<LunaImage> GetByName(const std::string& name, bool bypassOverride=false);
     static bool OverrideByName(const std::string& name, const std::shared_ptr<LunaImage>& img);
+
+    static void ClearOverrides();
 };
 
 #endif

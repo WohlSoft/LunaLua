@@ -626,3 +626,9 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
 
     return false;
 }
+
+void ImageLoader::ClearOverrides()
+{
+    m_GfxOverride.clear();
+    m_ExtraGfxOverride.clear();
+}

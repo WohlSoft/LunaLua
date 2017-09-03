@@ -22,6 +22,7 @@
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/LunaImage.h"
+#include "../Rendering/ImageLoader.h"
 
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
@@ -96,6 +97,9 @@ bool CLunaLua::shutdown()
 
     // Request cached images be held onto for now
     LunaImage::holdCachedImages();
+
+    // Clear image override map
+    ImageLoader::ClearOverrides();
 
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
