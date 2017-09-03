@@ -5,6 +5,8 @@
 #include <mutex>
 #include <memory>
 
+#include "../Misc/ResourceFileMapper.h"
+
 // Forward declerations
 struct HDC__;
 typedef HDC__ *HDC;
@@ -16,7 +18,7 @@ class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
 public:
     static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
-    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename);
+    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, const ResourceFileInfo* metadata=nullptr);
 public:
     static void holdCachedImages();
     static void releaseCachedImages();
@@ -29,6 +31,7 @@ private:
     uint32_t   w;    // Image width
     uint32_t   h;    // Image height
     HBITMAP    hbmp; // Cached HBITMAP if this
+    ResourceFileInfo fileMetadata;
 private:
     // Pointer to an associated mask image
     std::shared_ptr<LunaImage> mask;

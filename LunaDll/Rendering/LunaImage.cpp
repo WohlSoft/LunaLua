@@ -7,7 +7,7 @@
 #include "../Misc/FreeImageUtils/FreeImageData.h"
 #include "../Misc/FreeImageUtils/FreeImageGifData.h"
 #include "GL/GLEngineProxy.h"
-
+#include "../Misc/ResourceFileMapper.h"
 
 static std::unordered_map<std::wstring, std::weak_ptr<LunaImage>> g_lunaImageCache;
 static std::vector<std::shared_ptr<LunaImage>> g_lunaImageHolder;
@@ -84,15 +84,33 @@ std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
     return img;
 }
 
-std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename)
+std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename, const ResourceFileInfo* metadata)
 {
     if ((filename == nullptr) || (filename[0] == L'\0')) return nullptr;
+
+    // If we have no file metadata, try to get some
+    ResourceFileInfo localMetadata;
+    if ((metadata != nullptr) && (!metadata->done))
+    {
+        metadata = nullptr;
+    }
+    if (metadata == nullptr) {
+        localMetadata = GetResourceFileInfo(filename);
+        if (localMetadata.done)
+        {
+            metadata = &localMetadata;
+        }
+    }
+    if (metadata == nullptr)
+    {
+        return nullptr;
+    }
 
     auto cacheSearchResult = g_lunaImageCache.find(filename);
     if (cacheSearchResult != g_lunaImageCache.end())
     {
         std::shared_ptr<LunaImage> cachePtr = cacheSearchResult->second.lock();
-        if (cachePtr)
+        if (cachePtr && (cachePtr->fileMetadata == *metadata))
         {
             return std::move(cachePtr);
         }
@@ -108,6 +126,7 @@ std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename)
     {
         return nullptr;
     }
+    img->fileMetadata = *metadata;
 
     g_lunaImageCache[filename] = img;
 

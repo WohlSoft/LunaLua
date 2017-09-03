@@ -176,7 +176,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 // Try to load image
                 if (newMain.path.length() > 0)
                 {
-                    mainImg = LunaImage::fromFile(newMain.path.c_str());
+                    mainImg = LunaImage::fromFile(newMain.path.c_str(), &newMain);
                 }
 
                 // Assign image, note size
@@ -202,7 +202,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 std::shared_ptr<LunaImage> maskImg = nullptr;
                 if (newMask.path.length() > 0)
                 {
-                    maskImg = LunaImage::fromFile(newMask.path.c_str());
+                    maskImg = LunaImage::fromFile(newMask.path.c_str(), &newMask);
                 }
 
                 // Assign image, note size
@@ -444,8 +444,8 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
                 if (newMain.done)
                 {
                     // If we found a file, load from it
-                    img = LunaImage::fromFile(newMain.path.c_str());
-                    mask = LunaImage::fromFile(newMask.path.c_str());
+                    img = LunaImage::fromFile(newMain.path.c_str(), &newMain);
+                    mask = LunaImage::fromFile(newMask.path.c_str(), &newMask);
                 }
                 else
                 {
