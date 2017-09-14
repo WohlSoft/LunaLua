@@ -72,22 +72,28 @@ void EventStateMachine::reset(void) {
 }
 
 void EventStateMachine::hookLevelLoop(void) {
-    // Check if we should pause
-    checkPause();
-
-    if (!gIsTestModePauseActive)
+    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_LEVEL))
     {
-        sendOnLoop();
+        // Check if we should pause
+        checkPause();
+
+        if (!gIsTestModePauseActive)
+        {
+            sendOnLoop();
+        }
     }
 }
 
 void EventStateMachine::hookWorldLoop(void) {
-    // Check if we should pause
-    checkPause();
-
-    if (!gIsTestModePauseActive)
+    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_WORLD))
     {
-        sendOnLoop();
+        // Check if we should pause
+        checkPause();
+
+        if (!gIsTestModePauseActive)
+        {
+            sendOnLoop();
+        }
     }
 }
 
