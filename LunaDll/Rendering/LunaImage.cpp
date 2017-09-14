@@ -53,6 +53,25 @@ uint64_t LunaImage::getNewUID()
     return uidCounter.fetch_add(1, std::memory_order_relaxed);
 }
 
+std::shared_ptr<LunaImage> LunaImage::fromData(int width, int height, const uint8_t* data)
+{
+    // Allocate and copy into LunaImage
+    std::shared_ptr<LunaImage> img = std::make_shared<LunaImage>();
+    img->w = width;
+    img->h = height;
+    img->data = std::malloc(4 * width * height);
+    if (img->data != nullptr)
+    {
+        memcpy(img->data, data, 4 * width * height);
+    }
+    else
+    {
+        img = nullptr;
+    }
+
+    return img;
+}
+
 std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
 {
     if (hdc == nullptr) return nullptr;
@@ -368,6 +387,7 @@ LunaImage::~LunaImage()
     clearInternal();
 }
 
-uint32_t LunaImage::getDataPtrAsInt() {
+uint32_t LunaImage::getDataPtrAsInt()
+{
     return (uint32_t)data;
 }

@@ -153,6 +153,7 @@
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
     <ClInclude Include="Misc\SRect.h" />
+    <ClInclude Include="Rendering\AsyncGifRecorderImgs.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
     <ClInclude Include="Rendering\LunaImage.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h" />

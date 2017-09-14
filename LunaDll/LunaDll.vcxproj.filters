@@ -562,6 +562,9 @@
     <ClInclude Include="Misc\NpcIdExtender.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\AsyncGifRecorderImgs.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
