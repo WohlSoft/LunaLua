@@ -5,6 +5,7 @@
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
 #include "../Shaders/GLShader.h"
+#include "../../LuaMain/LuaProxyFFIGraphics.h"
 
 // Special puropose command handled by GLEngineProxy internally
 void GLEngineCmd_Exit::run(GLEngine& glEngine) const {}
@@ -249,4 +250,26 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
     glEngine.SetCamera(mX, mY);
+}
+
+void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
+{
+    if (!g_GLContextManager.IsInitialized()) return;
+    if (!mShaderObj) return;
+    if (mShaderObj->mError) return;
+
+    mShaderObj->mShader = std::make_shared<GLShader>(mShaderObj->mVertexSource, mShaderObj->mFragmentSource);
+
+    if (!mShaderObj->mShader->isValid())
+    {
+        // Failed to compile...
+        mShaderObj->mError = true;
+        mShaderObj->mErrorString = mShaderObj->mShader->getLastErrorMsg();
+        mShaderObj->mShader = nullptr;
+        return;
+    }
+
+    // Get attribute/uniform metadata
+    mShaderObj->mAttributeInfo = mShaderObj->mShader->getAllAttributes();
+    mShaderObj->mUniformInfo = mShaderObj->mShader->getAllUniforms();
 }

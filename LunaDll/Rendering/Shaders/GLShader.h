@@ -52,9 +52,6 @@ private:
     {
         std::vector<VariableInfoT> results;
 
-        // GL operation on the main thread
-        g_GLEngine.EnsureMainThreadCTXApplied();
-
         GLint count = 0;
         glGetProgramiv(m_shaderID, programVariableType, &count);
         GLERRORCHECK();

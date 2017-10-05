@@ -21,6 +21,9 @@ void LuaProxy::Shader::compileFromSource(const std::string& vertexSource, const 
         return;
     }
 
+    // GL operation on the main thread
+    g_GLEngine.EnsureMainThreadCTXApplied();
+
     m_cachedAttributeInfo = m_internalShader->getAllAttributes();
     m_cachedUniformInfo = m_internalShader->getAllUniforms();
 }

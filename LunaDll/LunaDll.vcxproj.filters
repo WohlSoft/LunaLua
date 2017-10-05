@@ -562,6 +562,9 @@
     <ClInclude Include="Misc\NpcIdExtender.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h">
+      <Filter>LuaMain</Filter>
+    </ClInclude>
     <ClInclude Include="Rendering\AsyncGifRecorderImgs.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -1072,6 +1075,9 @@
     </ClCompile>
     <ClCompile Include="Misc\NpcIdExtender.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp">
+      <Filter>LuaMain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

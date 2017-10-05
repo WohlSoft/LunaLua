@@ -13,6 +13,7 @@
 class GLEngine;
 class GLShader;
 class LunaImage;
+struct FFI_ShaderObj;
 
 /****************************************************/
 /* Common argumets for bitmap rendering coordinates */
@@ -175,6 +176,13 @@ class GLEngineCmd_SetCamera : public GLEngineCmd {
 public:
     double mX, mY;
     virtual void run(GLEngine& glEngine) const;
+};
+
+class GLEngineCmd_CompileShaderObj : public GLEngineCmd {
+public:
+    std::shared_ptr<FFI_ShaderObj> mShaderObj;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
 };
 
 #endif

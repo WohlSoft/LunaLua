@@ -3,6 +3,8 @@
 #include <memory>
 
 #include "../Globals.h"
+#include "../Rendering/LunaImage.h"
+#include "../Rendering/FrameCapture.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 

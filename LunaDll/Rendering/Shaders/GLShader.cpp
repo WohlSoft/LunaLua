@@ -220,6 +220,7 @@ void GLShader::applyUniform(const GLShaderVariableEntry& entry)
     case GL_DOUBLE_MAT3x4:       glUniformMatrix3x4dv(entry.getLocation(), entry.getNumberOfElements(), false, entry.getDoublePtr()); break;
     case GL_DOUBLE_MAT4x2:       glUniformMatrix4x2dv(entry.getLocation(), entry.getNumberOfElements(), false, entry.getDoublePtr()); break;
     case GL_DOUBLE_MAT4x3:       glUniformMatrix4x3dv(entry.getLocation(), entry.getNumberOfElements(), false, entry.getDoublePtr()); break;
+    //case GL_SAMPLER_2D:          glUniform1iv(entry.getLocation(), entry.getNumberOfElements(), entry.getIntPtr()); break;
 
     default:
         break;
