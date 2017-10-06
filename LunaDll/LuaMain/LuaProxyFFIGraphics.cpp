@@ -339,3 +339,27 @@ FFI_EXPORT void __cdecl FFI_CaptureBufferCaptureAt(CaptureBufferRef* img, double
     }
 }
 
+// Level HUD Control
+
+FFI_EXPORT void __fastcall FFI_GraphicsActivateHud(bool activate)
+{
+    gSMBXHUDSettings.skip = !activate;
+}
+
+FFI_EXPORT bool __fastcall FFI_GraphicsIsHudActivated()
+{
+    return !gSMBXHUDSettings.skip;
+}
+
+// Overworld HUD Control
+
+FFI_EXPORT void __fastcall FFI_GraphicsActivateOverworldHud(int activateFlag)
+{
+    gSMBXHUDSettings.overworldHudState = (WORLD_HUD_CONTROL)activateFlag;
+}
+
+FFI_EXPORT int __fastcall FFI_GraphicsGetOverworldHudState()
+{
+    return (int)gSMBXHUDSettings.overworldHudState;
+}
+
