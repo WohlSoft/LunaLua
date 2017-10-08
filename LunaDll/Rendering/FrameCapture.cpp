@@ -14,21 +14,34 @@ public:
     virtual void run(GLEngine& glEngine) const
     {
         // Create framebuffer if not yet existing
+        mBuff->EnsureFramebufferExists();
+
         GLFramebuffer* fb = mBuff->mFramebuffer;
-        int w = mBuff->mW, h = mBuff->mH;
-        if (fb == nullptr)
+        if (fb != nullptr)
         {
-            fb = new GLFramebuffer(w, h);
-            mBuff->mFramebuffer = fb;
+            int w = mBuff->mW, h = mBuff->mH;
+
+            // Bind framebuffer
+            fb->Bind();
+
+            g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetBufTex(), 0, 0, w, h, 1.0f);
+
+            // Bind old framebuffer
+            g_GLContextManager.BindFramebuffer();
         }
-        
-        // Bind framebuffer
-        fb->Bind();
+    }
+};
 
-        g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetBufTex(), 0, 0, w, h, 1.0f);
-
-        // Bind old framebuffer
-        g_GLContextManager.BindFramebuffer();
+class GLEngineCmd_ClearCaptureBuffer : public GLEngineCmd {
+public:
+    std::shared_ptr<CaptureBuffer> mBuff;
+    virtual void run(GLEngine& glEngine) const
+    {
+        if (mBuff->mFramebuffer != nullptr)
+        {
+            static const GLclampf colorTrans[] = { 0.0, 0.0, 0.0, 0.0 };
+            mBuff->mFramebuffer->Clear(colorTrans);
+        }
     }
 };
 
@@ -57,9 +70,25 @@ CaptureBuffer::~CaptureBuffer()
     }
 }
 
-void CaptureBuffer::captureAt(double priority)
+void CaptureBuffer::CaptureAt(double priority)
 {
     auto cmd = std::make_shared<GLEngineCmd_CaptureBuffer>();
     cmd->mBuff = shared_from_this();
     gLunaRender.GLCmd(cmd, priority);
+}
+
+void CaptureBuffer::Clear(double priority)
+{
+    auto cmd = std::make_shared<GLEngineCmd_ClearCaptureBuffer>();
+    cmd->mBuff = shared_from_this();
+    gLunaRender.GLCmd(cmd, priority);
+}
+
+void CaptureBuffer::EnsureFramebufferExists()
+{
+    // Create framebuffer if not yet existing
+    if (mFramebuffer == nullptr)
+    {
+        mFramebuffer = new GLFramebuffer(mW, mH, true);
+    }
 }

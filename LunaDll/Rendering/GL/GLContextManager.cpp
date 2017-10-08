@@ -149,7 +149,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 bool GLContextManager::InitFramebuffer() {
     try
     {
-        mFramebuffer = new GLFramebuffer(800, 600);
+        mFramebuffer = new GLFramebuffer(800, 600, false);
     }
     catch(...)
     {

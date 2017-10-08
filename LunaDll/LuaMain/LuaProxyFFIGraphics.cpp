@@ -97,6 +97,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     if (cmd == nullptr) return;
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
+    obj->mTarget = (cmd->mTarget != nullptr) ? (*cmd->mTarget) : nullptr;
     obj->mImg = (cmd->mImg != nullptr) ? (*cmd->mImg) : nullptr;
     obj->mCapBuff = (cmd->mCap != nullptr) ? (*cmd->mCap) : nullptr;
     obj->mColor[0] = cmd->mColor[0];
@@ -353,7 +354,15 @@ FFI_EXPORT void __cdecl FFI_CaptureBufferCaptureAt(CaptureBufferRef* img, double
 {
     if (img != nullptr)
     {
-        (*img)->captureAt(priority);
+        (*img)->CaptureAt(priority);
+    }
+}
+
+FFI_EXPORT void __cdecl FFI_CaptureBufferClear(CaptureBufferRef* img, double priority)
+{
+    if (img != nullptr)
+    {
+        (*img)->Clear(priority);
     }
 }
 

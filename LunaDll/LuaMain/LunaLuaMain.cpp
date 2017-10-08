@@ -570,7 +570,7 @@ void CLunaLua::bindAll()
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
                     .def(constructor<int, int>())
                     .def("__eq", &LuaProxy::luaUserdataCompare<CaptureBuffer>)
-                    .def("captureAt", &CaptureBuffer::captureAt),
+                    .def("captureAt", &CaptureBuffer::CaptureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (std::shared_ptr<LunaImage>(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),

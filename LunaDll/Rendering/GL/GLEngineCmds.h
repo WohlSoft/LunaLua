@@ -124,6 +124,8 @@ public:
         void* data;
     };
     
+    std::shared_ptr<CaptureBuffer> mTarget;
+
     std::shared_ptr<LunaImage> mImg;
     std::shared_ptr<CaptureBuffer> mCapBuff;
     std::shared_ptr<GLShader> mShader;
@@ -140,6 +142,7 @@ public:
     bool mDepthTest;
 
     GLEngineCmd_LuaDraw() :
+        mTarget(nullptr),
         mImg(nullptr),
         mCapBuff(nullptr),
         mShader(nullptr),

@@ -25,6 +25,7 @@ struct FFI_GL_Draw_Var
 
 struct FFI_GL_Draw_Cmd
 {
+    CaptureBufferRef* mTarget;
     LunaImageRef* mImg;
     CaptureBufferRef* mCap;
     float mColor[4];

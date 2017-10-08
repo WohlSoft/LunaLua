@@ -7,11 +7,12 @@
 
 class GLFramebuffer {
 public:
-    GLFramebuffer(int w, int h);
+    GLFramebuffer(int w, int h, bool haveAlpha);
     ~GLFramebuffer();
 
     void Bind();
     void Clear();
+    void Clear(const GLclampf color[4]);
     inline const GLDraw::Texture& AsTexture() const { return mBufTex; }
 
 private:

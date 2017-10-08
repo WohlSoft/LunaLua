@@ -123,11 +123,27 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
     const GLDraw::Texture* tex = NULL;
     const GLSprite* sprite = NULL;
-    if (mImg) {
+    if (mImg)
+    {
         sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
     }
-    else if (mCapBuff) {
-        tex = &mCapBuff->mFramebuffer->AsTexture();
+    else if (mCapBuff)
+    {
+        mCapBuff->EnsureFramebufferExists();
+        if (mCapBuff->mFramebuffer)
+        {
+            tex = &mCapBuff->mFramebuffer->AsTexture();
+        }
+    }
+
+    // Render Target
+    if (mTarget)
+    {
+        mTarget->EnsureFramebufferExists();
+        if (mTarget->mFramebuffer != nullptr)
+        {
+            mTarget->mFramebuffer->Bind();
+        }
     }
 
     glBlendEquationANY(GL_FUNC_ADD);
@@ -246,6 +262,16 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
         mShader->unbind();
         GLERRORCHECK();
+    }
+
+    // Render Target Time
+    if (mTarget)
+    {
+        if (mTarget->mFramebuffer != nullptr)
+        {
+            // Bind old framebuffer
+            g_GLContextManager.BindFramebuffer();
+        }
     }
 }
 
