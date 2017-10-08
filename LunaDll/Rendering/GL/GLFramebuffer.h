@@ -12,7 +12,7 @@ public:
 
     void Bind();
     void Clear();
-    inline GLDraw::Texture& AsTexture() { return mBufTex; }
+    inline const GLDraw::Texture& AsTexture() const { return mBufTex; }
 
 private:
     // Framebuffer variables

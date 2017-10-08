@@ -477,6 +477,7 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT3x4);
     LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT4x2);
     LUAHELPER_DEF_CONST(_G, GL_DOUBLE_MAT4x3);
+    LUAHELPER_DEF_CONST(_G, GL_SAMPLER_2D);
 
     {
         using namespace LuaProxy::Graphics;

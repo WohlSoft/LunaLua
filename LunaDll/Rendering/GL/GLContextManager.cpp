@@ -161,7 +161,8 @@ bool GLContextManager::InitFramebuffer() {
 
 bool GLContextManager::InitProjectionAndState() {
     if (mFramebuffer == nullptr) return false;
-    GLDraw::Texture& tex = mFramebuffer->AsTexture();
+    
+    const GLDraw::Texture& tex = mFramebuffer->AsTexture();
 
     // Set projection
     glMatrixMode(GL_MODELVIEW);

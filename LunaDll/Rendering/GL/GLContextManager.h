@@ -15,7 +15,7 @@ public:
 	void BindScreen();
 	void BindAndClearFramebuffer();
     void BindFramebuffer();
-	inline GLDraw::Texture& GetBufTex()
+	inline const GLDraw::Texture& GetBufTex()
     {
         static GLDraw::Texture nullTex(0, 0, 0);
         if (mFramebuffer == nullptr)

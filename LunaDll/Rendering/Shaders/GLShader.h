@@ -23,6 +23,8 @@ private:
     bool m_isValid;
 
     std::vector<GLuint> m_attributeBuffers;
+
+    std::vector<GLuint> m_samplerTexNames;
 public:
     GLShader(const std::string& vertexSource, const std::string& fragmentSource);
     GLShader(const std::string& fragmentSource);
@@ -36,11 +38,16 @@ public:
     std::vector<GLShaderUniformInfo> getAllUniforms() const;
 
     // Unsafe functions (can only be called from GL queue thread)
+    
     void bind();
     void unbind();
 
     void applyAttribute(const GLShaderVariableEntry& entry);
     void applyUniform(const GLShaderVariableEntry& entry);
+
+    void defaultSampler(GLuint name);
+    GLuint getSamplerForTexture(GLuint name);
+    void clearSamplers();
 
 private:
     void load();
@@ -58,7 +65,7 @@ private:
 
         results.reserve(count);
 
-        for (GLuint i = 0; i < count; i++)
+        for (GLint i = 0; i < count; i++)
         {
             constexpr static const GLsizei MAX_LENGTH_NAME = 512;
             // GLint id, GLint sizeOfVariable, GLint type, const std::string& name

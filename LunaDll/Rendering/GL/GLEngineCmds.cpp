@@ -149,6 +149,8 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mShader) {
+        mShader->defaultSampler(g_GLDraw.GetCurrentTexName());
+
         mShader->bind();
         GLERRORCHECK();
         

@@ -65,6 +65,33 @@ FFI_EXPORT uint32_t __fastcall FFI_ImageGetDataPtr(LunaImageRef* img)
 
 // GLDraw things
 
+static void GLPlaceAttributes(std::vector<GLShaderVariableEntry>& out, GLShaderVariableType type, FFI_GL_Draw_Var* vars, unsigned int count)
+{
+    for (unsigned int i = 0; i < count; i++)
+    {
+        auto& unif = vars[i];
+        if ((unif.mType == GL_SAMPLER_2D) && (unif.mData != nullptr))
+        {
+            // For Sampler2D we need to convert things
+            auto rawData = (void**)unif.mData;
+            auto data = new GLShaderVariableEntry::SamplerVector();
+            for (unsigned int j = 0; j < unif.mCount; j++)
+            {
+                auto img = (LunaImageRef*)rawData[2*j + 0];
+                auto cap = (CaptureBufferRef*)rawData[2*j + 1];
+                data->emplace_back(img ? *img : nullptr, cap ? *cap : nullptr);
+            }
+            free(unif.mData);
+
+            out.emplace_back(type, unif.mId, unif.mType, unif.mCount, nullptr, data);
+        }
+        else
+        {
+            out.emplace_back(type, unif.mId, unif.mType, unif.mCount, unif.mData);
+        }
+    }
+}
+
 FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
 {
     if (cmd == nullptr) return;
@@ -89,17 +116,8 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     {
         obj->mShader = (*shader)->mShader;
 
-        for (unsigned int i = 0; i < cmd->mAttrCount; i++)
-        {
-            auto& attr = cmd->mAttrs[i];
-            obj->mAttributes.emplace_back(GLShaderVariableType::Attribute, attr.mId, attr.mType, attr.mCount, attr.mData);
-        }
-
-        for (unsigned int i = 0; i < cmd->mUnifCount; i++)
-        {
-            auto& unif = cmd->mUnifs[i];
-            obj->mUniforms.emplace_back(GLShaderVariableType::Uniform, unif.mId, unif.mType, unif.mCount, unif.mData);
-        }
+        GLPlaceAttributes(obj->mAttributes, GLShaderVariableType::Attribute, cmd->mAttrs, cmd->mAttrCount);
+        GLPlaceAttributes(obj->mUniforms, GLShaderVariableType::Uniform, cmd->mUnifs, cmd->mUnifCount);
     }
 
     gLunaRender.GLCmd(obj, cmd->mPriority);

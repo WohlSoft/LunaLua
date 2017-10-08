@@ -16,6 +16,7 @@ public:
     virtual ~GLSprite();
     virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const = 0;
     virtual void BindTexture() const = 0;
+    virtual unsigned int GetTexId() const = 0;
     virtual bool IsValid() const = 0;
 
 
@@ -32,7 +33,11 @@ public:
 
     virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const;
     virtual void BindTexture() const;
-
+    virtual unsigned int GetTexId() const {
+        if (valid)
+            return tex.name;
+        return 0;
+    };
     virtual bool IsValid() const { return valid; }
 private:
     bool valid;
