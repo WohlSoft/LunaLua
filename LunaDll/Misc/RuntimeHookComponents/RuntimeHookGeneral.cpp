@@ -568,6 +568,15 @@ void TrySkipPatch()
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Patch 16384 block bug
+    PATCH(0xA98936).bytes(
+        0x0F, 0xBF, 0xF0, // movsx esi,ax
+        0x0F, 0xBF, 0xC1, // movsx eax,cx
+        0x01, 0xF0,       // add eax,esi
+        0xD1, 0xF8,       // sar eax,1
+        0x89, 0xC6,       // mov esi,eax
+        0xEB, 0x4B        // jmp 0xA9898F
+        ).NOP_PAD_TO_SIZE<98>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
