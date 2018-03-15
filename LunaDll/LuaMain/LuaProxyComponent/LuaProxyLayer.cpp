@@ -58,10 +58,10 @@ int LuaProxy::Layer::idx() const
     return m_layerIndex;
 }
 
-LuaProxy::VBStr LuaProxy::Layer::layerName() const
+std::string LuaProxy::Layer::layerName() const
 {
 	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	return VBStr(thislayer->ptLayerName.ptr);
+	return thislayer->ptLayerName;
 }
 
 float LuaProxy::Layer::speedX() const

@@ -16,6 +16,7 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
 #include "../../Misc/RuntimeHook.h"
+#include "../../Misc/VB6StrPtr.h"
 #include "LuaProxyAudio.h"
 #include <sstream>
 
@@ -230,7 +231,7 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
     }
 	case LFT_STRING:
     {
-        return luabind::object(L, VBStr((wchar_t*)*((int32_t*)ptr)));
+        return luabind::object(L, (std::string)*((VB6StrPtr*)ptr));
     }
     case LFT_BOOL:
     {
@@ -681,7 +682,7 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
     return LuaProxy::Animation(GM_ANIM_COUNT - 1);
 }
 
-LuaProxy::VBStr LuaProxy::getInput()
+std::string LuaProxy::getInput()
 {
-    return VBStr(*(wchar_t**)&GM_INPUTSTR_BUF_PTR);
+    return (*(VB6StrPtr*)&GM_INPUTSTR_BUF_PTR);
 }
