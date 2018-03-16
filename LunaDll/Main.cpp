@@ -176,9 +176,6 @@ int OnLvlLoad() {
 		// Init some stuff
 		InitLevel();	
 		gAutoMan.m_Hearts = 2;	
-
-		// Recount deaths
-		gDeathCounter.Recount();
 	}
 
     //PGE DBG STUFF
@@ -212,8 +209,7 @@ int TestFunc()
 		gAutoMan.DoEvents(false);
 
 		// Update some stuff
-		gFrames++;	
-		gDeathCounter.UpdateDeaths(true);
+        gFrames++;
 		gSavedVarBank.SaveIfNeeded();
 
 		// Run any framecode
@@ -226,8 +222,6 @@ int TestFunc()
 }
 
 void OnLevelHUDDraw(int cameraIdx) {
-	if(gShowDemoCounter)
-		gDeathCounter.Draw();
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);

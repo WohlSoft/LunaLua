@@ -14,9 +14,6 @@
     <Filter Include="Rendering">
       <UniqueIdentifier>{c5f40672-3206-43b1-9cc9-bde849893bf3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DeathCounter">
-      <UniqueIdentifier>{9c3f331d-cd02-4afd-94a7-771d65d59a82}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Autocode">
       <UniqueIdentifier>{c9bf9cf4-9398-45ed-b4fb-b1b7de72c151}</UniqueIdentifier>
     </Filter>
@@ -25,9 +22,6 @@
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{7355c692-c445-440b-81d2-6abe60fd7051}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Logging">
-      <UniqueIdentifier>{67f9a4bb-3fcd-447c-aff3-da17f6ed4c86}</UniqueIdentifier>
     </Filter>
     <Filter Include="CustomSprites">
       <UniqueIdentifier>{964b4b3e-3507-4d37-8826-0e95cac2998f}</UniqueIdentifier>
@@ -177,12 +171,6 @@
     </ClInclude>
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h">
       <Filter>CustomSprites\SpritesFuncs</Filter>
-    </ClInclude>
-    <ClInclude Include="DeathCounter\DeathCounter.h">
-      <Filter>DeathCounter</Filter>
-    </ClInclude>
-    <ClInclude Include="DeathCounter\DeathRecord.h">
-      <Filter>DeathCounter</Filter>
     </ClInclude>
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h">
       <Filter>HardcodedGraphics</Filter>
@@ -638,12 +626,6 @@
     </ClCompile>
     <ClCompile Include="CustomSprites\SpritesFuncs\SpriteDrawFuncs.cpp">
       <Filter>CustomSprites\SpritesFuncs</Filter>
-    </ClCompile>
-    <ClCompile Include="DeathCounter\DeathCounter.cpp">
-      <Filter>DeathCounter</Filter>
-    </ClCompile>
-    <ClCompile Include="DeathCounter\DeathRecord.cpp">
-      <Filter>DeathCounter</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedGraphics\HardcodedGraphicsManager.cpp">
       <Filter>HardcodedGraphics</Filter>

@@ -1,7 +1,6 @@
 #include "Input.h"
 #include "../Globals.h"
 #include "../SMBXInternal/Sound.h"
-#include "../DeathCounter/DeathCounter.h"
 #include "../Autocode/Autocode.h"
 #include "../Misc/RuntimeHook.h"
 
@@ -31,31 +30,6 @@ void Input::CheckSpecialCheats() {
 		return;
 	}
 
-	// toggledemocounter
-	org_len = curbuf.length();
-	sought_len = wcslen(TOGGLE_DEMO_COUNTER_CHT);
-	if(org_len >= sought_len && curbuf.substr(org_len - sought_len, sought_len) == TOGGLE_DEMO_COUNTER_CHT) {
-		if(gShowDemoCounter)
-			gShowDemoCounter = 0;
-		else
-			gShowDemoCounter = 1;
-		SMBXSound::PlaySFX(36);
-		ClearInputStringBuffer();
-		return;
-	}
-
-	// formatcdrive
-	org_len = curbuf.length();
-	sought_len = wcslen(DELETE_ALL_RECORDS_CHT);
-	if(org_len >= sought_len && curbuf.substr(org_len - sought_len, sought_len) == DELETE_ALL_RECORDS_CHT) {
-		gDeathCounter.ClearRecords();
-		gDeathCounter.TrySave();
-		gDeathCounter.Recount();
-		SMBXSound::PlaySFX(36);
-		ClearInputStringBuffer();
-		return;
-	}
-
 	//lunadebug
 	org_len = curbuf.length();
 	sought_len = wcslen(LUNA_DEBUG_CHT);
@@ -64,16 +38,6 @@ void Input::CheckSpecialCheats() {
 		Autocode* ac = new Autocode(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
 		gAutoMan.m_CustomCodes.push_back(ac);
 		SMBXSound::PlaySFX(14);
-		ClearInputStringBuffer();
-		return;
-	}
-
-	//death count dump
-	org_len = curbuf.length();
-	sought_len = wcslen(DUMP_DEATH_COUNT_FILE);
-	if(org_len >= sought_len && curbuf.substr(org_len - sought_len, sought_len) == DUMP_DEATH_COUNT_FILE) {
-		gDeathCounter.DumpAllToFile(L"democount.txt");
-		SMBXSound::PlaySFX(15);
 		ClearInputStringBuffer();
 		return;
 	}

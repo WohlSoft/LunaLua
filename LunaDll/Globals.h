@@ -9,7 +9,6 @@
 #endif
 #include "LevelCodes/LevelCodes.h"
 #include "Rendering/Rendering.h"
-#include "DeathCounter/DeathCounter.h"
 #include "Autocode/AutocodeManager.h"
 #include "CustomSprites/CSpriteManager.h"
 #include "CellManager/CellManager.h"
@@ -56,7 +55,6 @@ extern HINSTANCE	gHInstance;
 
 /// Global settings
 extern bool            gLunaEnabled;
-extern bool            gShowDemoCounter;
 extern bool            gPrintErrorsToScreen;
 extern bool            gIsOverworld;
 extern bool            gHook_SkipTestMsgBox;
@@ -104,7 +102,6 @@ extern LvlEnum	gLevelEnum;
 
 // Misc
 extern Renderer				gLunaRender;
-extern DeathCounter			gDeathCounter;
 extern AutocodeManager		gAutoMan;
 extern CSpriteManager		gSpriteMan;
 extern CellManager			gCellMan;

@@ -151,9 +151,6 @@ extern int __stdcall LoadWorld()
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
-    // Recount deaths
-    gDeathCounter.Recount();
-
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
     __asm {
@@ -265,9 +262,6 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 
 extern void* __stdcall WorldRender()
 {
-    if (gShowDemoCounter)
-        gDeathCounter.Draw();
-
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
         inputEvent->setDirectEventName("onHUDDraw");
