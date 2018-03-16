@@ -268,7 +268,6 @@
     <ClInclude Include="LevelCodes\LevelCodes.h" />
     <ClInclude Include="libs\ini-reader\ini.h" />
     <ClInclude Include="libs\ini-reader\INIReader.h" />
-    <ClInclude Include="Logging\Logging.h" />
     <ClInclude Include="LuaMain\LuaHelper.h" />
     <ClInclude Include="LuaMain\LuaProxy.h" />
     <ClInclude Include="LuaMain\LunaLuaMain.h" />
@@ -444,7 +443,6 @@
     <ClCompile Include="SMBXInternal\Level.cpp" />
     <ClCompile Include="libs\ini-reader\ini.c" />
     <ClCompile Include="libs\ini-reader\INIReader.cpp" />
-    <ClCompile Include="Logging\Logger.cpp" />
     <ClCompile Include="LuaMain\LuaHelper.cpp" />
     <ClCompile Include="LuaMain\LuaProxy.cpp" />
     <ClCompile Include="LuaMain\LunaLuaMain.cpp" />

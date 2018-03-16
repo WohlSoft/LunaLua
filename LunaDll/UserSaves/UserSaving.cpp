@@ -142,10 +142,6 @@ void SavedVariableBank::CheckSaveDeletion() {
 
 	// Reset save slot detected? Reset the user save file too
 	if(GM_STAR_COUNT < GetVar(SPECIAL_SAVE_STR)) {
-
-		if(true) //DEBUG
-			gLogger.Log(L"Deleting user save file - Star count: " + std::to_wstring((long long)GM_STAR_COUNT) + L" slot: " + std::to_wstring((long long)Saves::GetCurSaveSlot()), LOG_STD);
-
         std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 		ClearBank();
         std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out);

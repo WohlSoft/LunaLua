@@ -300,7 +300,6 @@ void ResetLunaModule()
     gLunaEnabled = true;
     gShowDemoCounter = false;
     gPrintErrorsToScreen = true;
-    gLogger.m_Enabled = false;
     gIsOverworld = false;
 
     gSMBXHUDSettings.skip = false;

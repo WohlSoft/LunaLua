@@ -5,7 +5,6 @@
 #include "LevelCodes/LevelCodes.h"
 #include "DeathCounter/DeathCounter.h"
 #include "Shlwapi.h"
-#include "Logging/Logging.h"
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
 
@@ -58,8 +57,6 @@ Renderer gLunaRender;
 DeathCounter gDeathCounter;
 
 AutocodeManager gAutoMan;
-
-Logger gLogger;
 
 CSpriteManager gSpriteMan;
 

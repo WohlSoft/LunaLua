@@ -196,9 +196,6 @@
     <ClInclude Include="SMBXInternal\Level.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
-    <ClInclude Include="Logging\Logging.h">
-      <Filter>Logging</Filter>
-    </ClInclude>
     <ClInclude Include="MciEmulator\mciEmulator.h">
       <Filter>MciEmulator</Filter>
     </ClInclude>
@@ -692,9 +689,6 @@
     </ClCompile>
     <ClCompile Include="LevelCodes\Talkhaus-Science_Final_Battle.cpp">
       <Filter>LevelCodes</Filter>
-    </ClCompile>
-    <ClCompile Include="Logging\Logger.cpp">
-      <Filter>Logging</Filter>
     </ClCompile>
     <ClCompile Include="MciEmulator\mciEmulator.cpp">
       <Filter>MciEmulator</Filter>
