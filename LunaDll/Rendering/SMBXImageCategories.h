@@ -8,6 +8,10 @@
 #include "../SMBXInternal/BGOs.h"
 #include "../SMBXInternal/Animation.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SMBXInternal/Tile.h"
+#include "../SMBXInternal/Path.h"
+#include "../SMBXInternal/Scenery.h"
+#include "../SMBXInternal/WorldLevel.h"
 
 struct SMBXImageCategory
 {
@@ -89,10 +93,10 @@ static const SMBXImageCategory smbxImageCategoryToad =        { L"toad",        
 static const SMBXImageCategory smbxImageCategoryLink =        { L"link",                             10, GM_GFX_LINK_PTR_CONSTPTR, GM_GFX_LINK_MASK_PTR_CONSTPTR, GM_GFX_LINK_W_PTR_CONSTPTR, GM_GFX_LINK_H_PTR_CONSTPTR, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryYoshiB =      { L"yoshib",                           10, GM_GFX_YOSHIB_PTR_CONSTPTR, GM_GFX_YOSHIB_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
 static const SMBXImageCategory smbxImageCategoryYoshiT =      { L"yoshit",                           10, GM_GFX_YOSHIT_PTR_CONSTPTR, GM_GFX_YOSHIT_MASK_PTR_CONSTPTR, nullptr, nullptr, L"yoshi", 1 };
-static const SMBXImageCategory smbxImageCategoryTile =        { L"tile",                            400, GM_GFX_TILES_PTR_CONSTPTR, nullptr, GM_GFX_TILES_W_PTR_CONSTPTR, GM_GFX_TILES_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryLevel =       { L"level",                           101, GM_GFX_LEVEL_PTR_CONSTPTR, GM_GFX_LEVEL_MASK_PTR_CONSTPTR, GM_GFX_LEVEL_W_PTR_CONSTPTR, GM_GFX_LEVEL_H_PTR_CONSTPTR, nullptr, 0 };
-static const SMBXImageCategory smbxImageCategoryScene =       { L"scene",                           100, GM_GFX_SCENE_PTR_CONSTPTR, GM_GFX_SCENE_MASK_PTR_CONSTPTR, GM_GFX_SCENE_W_PTR_CONSTPTR, GM_GFX_SCENE_H_PTR_CONSTPTR, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryPath =        { L"path",                            100, GM_GFX_PATH_PTR_CONSTPTR, GM_GFX_PATH_MASK_PTR_CONSTPTR, GM_GFX_PATH_W_PTR_CONSTPTR, GM_GFX_PATH_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryTile =        { L"tile",               SMBXTile::MAX_ID, GM_GFX_TILES_PTR_CONSTPTR, nullptr, GM_GFX_TILES_W_PTR_CONSTPTR, GM_GFX_TILES_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryLevel =       { L"level",          WorldLevel::MAX_ID+1, GM_GFX_LEVEL_PTR_CONSTPTR, GM_GFX_LEVEL_MASK_PTR_CONSTPTR, GM_GFX_LEVEL_W_PTR_CONSTPTR, GM_GFX_LEVEL_H_PTR_CONSTPTR, nullptr, 0 };
+static const SMBXImageCategory smbxImageCategoryScene =       { L"scene",           SMBXScenery::MAX_ID, GM_GFX_SCENE_PTR_CONSTPTR, GM_GFX_SCENE_MASK_PTR_CONSTPTR, GM_GFX_SCENE_W_PTR_CONSTPTR, GM_GFX_SCENE_H_PTR_CONSTPTR, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryPath =        { L"path",               SMBXPath::MAX_ID, GM_GFX_PATH_PTR_CONSTPTR, GM_GFX_PATH_MASK_PTR_CONSTPTR, GM_GFX_PATH_W_PTR_CONSTPTR, GM_GFX_PATH_H_PTR_CONSTPTR, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryPlayer =      { L"player",                            5, GM_GFX_PLAYER_PTR_CONSTPTR, GM_GFX_PLAYER_MASK_PTR_CONSTPTR, GM_GFX_PLAYER_W_PTR_CONSTPTR, GM_GFX_PLAYER_H_PTR_CONSTPTR, nullptr, 1 };
 
 #endif

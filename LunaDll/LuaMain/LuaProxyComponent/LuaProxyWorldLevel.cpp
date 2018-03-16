@@ -20,7 +20,7 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
 
     try
     {
-        lookupTableLevelObjectID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::WorldLevel::MAX_ID));
+        lookupTableLevelObjectID = std::unique_ptr<bool>(LuaHelper::generateFilterTable(L, idFilter, ::WorldLevel::MAX_ID, 0));
     }
     catch (LuaHelper::invalidIDException* e)
     {
@@ -46,7 +46,7 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
 
 luabind::object LuaProxy::LevelObject::getByName(const std::string& levelName, lua_State* L)
 {
-    for (int i = 0; i < 400; ++i){
+    for (int i = 0; i < ::WorldLevel::Count(); ++i){
         WorldLevel* theLevel = WorldLevel::Get(i);
         if (!theLevel)
             return luabind::object();
@@ -58,7 +58,7 @@ luabind::object LuaProxy::LevelObject::getByName(const std::string& levelName, l
 
 luabind::object LuaProxy::LevelObject::getByFilename(const std::string& levelFilename, lua_State* L)
 {
-    for (int i = 0; i < 400; ++i){
+    for (int i = 0; i < ::WorldLevel::Count(); ++i){
         WorldLevel* theLevel = WorldLevel::Get(i);
         if (!theLevel)
             return luabind::object();
@@ -71,7 +71,7 @@ luabind::object LuaProxy::LevelObject::getByFilename(const std::string& levelFil
 luabind::object LuaProxy::LevelObject::findByName(const std::string& levelName, lua_State* L)
 {
     luabind::object levels = luabind::newtable(L);
-    for (int i = 0, j = 0; i < 400; ++i){
+    for (int i = 0, j = 0; i < ::WorldLevel::Count(); ++i){
         WorldLevel* theLevel = WorldLevel::Get(i);
         if (!theLevel)
             break;
@@ -84,7 +84,7 @@ luabind::object LuaProxy::LevelObject::findByName(const std::string& levelName, 
 luabind::object LuaProxy::LevelObject::findByFilename(const std::string& levelFilename, lua_State* L)
 {
     luabind::object levels = luabind::newtable(L);
-    for (int i = 0, j = 0; i < 400; ++i){
+    for (int i = 0, j = 0; i < ::WorldLevel::Count(); ++i){
         WorldLevel* theLevel = WorldLevel::Get(i);
         if (!theLevel)
             break;

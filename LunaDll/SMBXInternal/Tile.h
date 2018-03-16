@@ -5,7 +5,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBXTile : SMBX_FullBaseItemArray<SMBXTile, 328, GM_TILE_COUNT_CONSTPTR, GM_TILE_PTR_CONSTPTR>
+struct SMBXTile : SMBX_FullBaseItemArray<SMBXTile, 400, GM_TILE_COUNT_CONSTPTR, GM_TILE_PTR_CONSTPTR>
 {
     Momentum momentum;
     short id;
