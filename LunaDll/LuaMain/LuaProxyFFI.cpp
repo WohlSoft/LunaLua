@@ -21,4 +21,14 @@ extern "C" {
         obj->mCount = count;
         gLunaRender.GLCmd(obj);
     }
+
+    FFI_EXPORT(void) LunaLuaKillPlayer(short playerIndex)
+    {
+        native_killPlayer(&playerIndex);
+    }
+
+    FFI_EXPORT(void) LunaLuaHarmPlayer(short playerIndex)
+    {
+        native_harmPlayer(&playerIndex);
+    }
 }
