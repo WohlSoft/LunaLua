@@ -7,6 +7,7 @@
 #include "../Misc/ResourceFileMapper.h"
 
 class LunaImage;
+struct SMBXImageCategory;
 
 class ImageLoaderCategory
 {
@@ -32,11 +33,12 @@ private:
 class ImageLoader
 {
 private:
-    static std::unordered_map<std::string, std::shared_ptr<LunaImage>> m_ExtraGfx;
-    static std::unordered_map<std::string, std::shared_ptr<LunaImage>> m_ExtraGfxOverride;
-    static std::unordered_map<std::string, uintptr_t>                  m_NameToHDC;
-    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   m_GfxOverride;
-    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   m_Gfx;
+    static std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  m_ExtraGfx;
+    static std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  m_ExtraGfxOverride;
+    static std::unordered_map<std::string, uintptr_t>                                   m_NameToHDC;
+    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    m_GfxOverride;
+    static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    m_Gfx;
+    static std::unordered_map<uintptr_t, std::pair<const SMBXImageCategory*, uint32_t>> m_HDCToCategoryAndIndex;
 
     friend ImageLoaderCategory;
 

@@ -10,11 +10,12 @@
 #include <Windows.h>
 
 // Loaded image map decleration
-std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfx;
-std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfxOverride;
-std::unordered_map<std::string, uintptr_t>                  ImageLoader::m_NameToHDC;
-std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_GfxOverride;
-std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_Gfx;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfx;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfxOverride;
+std::unordered_map<std::string, uintptr_t>                                   ImageLoader::m_NameToHDC;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_GfxOverride;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_Gfx;
+std::unordered_map<uintptr_t, std::pair<const SMBXImageCategory*, uint32_t>> ImageLoader::m_HDCToCategoryAndIndex;
 
 static bool checkDirectoryExistance(const std::wstring& path)
 {
@@ -171,6 +172,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                     mainImgHdc = CreateCompatibleDC(NULL);
                     m_Category.setImagePtr(i, mainImgHdc);
                     ImageLoader::m_NameToHDC[WStr2Str(imageName)] = (uintptr_t)mainImgHdc;
+                    ImageLoader::m_HDCToCategoryAndIndex[(uintptr_t)mainImgHdc] = std::pair<const SMBXImageCategory*, uint32_t>(&m_Category, i);
                 }
 
                 // Try to load image
@@ -605,6 +607,29 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
                 m_GfxOverride.erase(it->second);
             }
 
+            // Update height/width based on override
+            auto categoryIterator = m_HDCToCategoryAndIndex.find(it->second);
+            if (categoryIterator != m_HDCToCategoryAndIndex.end())
+            {
+                const SMBXImageCategory* category = categoryIterator->second.first;
+                uint32_t idx = categoryIterator->second.second;
+
+                if (img)
+                {
+                    category->setHeight(idx, img->getH());
+                    category->setWidth(idx, img->getW());
+                }
+                else
+                {
+                    auto currentImg = ImageLoader::GetByName(name);
+                    if (currentImg)
+                    {
+                        category->setHeight(idx, currentImg->getH());
+                        category->setWidth(idx, currentImg->getW());
+                    }
+                }
+            }
+
             return true;
         }
     }
@@ -629,6 +654,24 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
 
 void ImageLoader::ClearOverrides()
 {
+    // Reset widths/heights to default
+    for (auto overrideIterator : m_GfxOverride)
+    {
+        auto categoryIterator = m_HDCToCategoryAndIndex.find(overrideIterator.first);
+        if (categoryIterator != m_HDCToCategoryAndIndex.end())
+        {
+            const SMBXImageCategory* category = categoryIterator->second.first;
+            uint32_t idx = categoryIterator->second.second;
+
+            auto currentImg = m_Gfx[overrideIterator.first];
+            if (currentImg)
+            {
+                category->setHeight(idx, currentImg->getH());
+                category->setWidth(idx, currentImg->getW());
+            }
+        }
+    }
+
     m_GfxOverride.clear();
     m_ExtraGfxOverride.clear();
 }
