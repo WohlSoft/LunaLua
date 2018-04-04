@@ -8,6 +8,10 @@
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
+// Prototypes from RuntimeHookCharacterId.cpp
+short* getValidCharacterIDArray();
+PlayerMOB* getTemplateForCharacter(int id);
+
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
         return malloc(size);
@@ -31,4 +35,14 @@ extern "C" {
     {
         native_harmPlayer(&playerIndex);
     }
+
+	FFI_EXPORT(short*) LunaLuaGetValidCharacterIDArray()
+	{
+		return getValidCharacterIDArray();
+	}
+
+	FFI_EXPORT(unsigned int) LunaLuaGetTemplateAddressForCharacter(int id)
+	{
+		return (unsigned int)getTemplateForCharacter(id);
+	}
 }
