@@ -55,7 +55,7 @@ public:
         mDeathEffect = deathEffect;
         memset(&mStoredTemplate, 0, sizeof(PlayerMOB));
         mStoredTemplate.Identity = (Characters)id;
-        mStoredTemplate.CurrentPowerup = 0;
+        mStoredTemplate.CurrentPowerup = 1;
         mStoredTemplate.PowerupBoxContents = 0;
         mStoredTemplate.MountType = 0;
         mStoredTemplate.MountColor = 0;
