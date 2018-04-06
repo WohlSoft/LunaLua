@@ -36,6 +36,9 @@ private:
 private:
     // Pointer to an associated mask image
     std::shared_ptr<LunaImage> mask;
+
+	void* compressedDataPtr; // Pointer to compressed PNG data
+	uint32_t compressedDataSize;
 private:
     void clearInternal();
     void load(const wchar_t* file);
@@ -47,14 +50,16 @@ public:
 
         data(nullptr), w(0), h(0),
         hbmp(nullptr),
-        mask(nullptr)
+        mask(nullptr),
+		compressedDataPtr(nullptr),
+		compressedDataSize(0)
     {
     }
     virtual ~LunaImage();
     
     HBITMAP asHBITMAP();
     inline uint64_t getUID() { return uid; }
-    inline void* getDataPtr() { return data; }
+	void* getDataPtr();
     uint32_t getDataPtrAsInt();
     inline uint32_t getW() { return w; }
     inline uint32_t getH() { return h; }

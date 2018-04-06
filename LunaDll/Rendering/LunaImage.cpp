@@ -152,38 +152,181 @@ std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename, const Re
     return std::move(img);
 }
 
+static bool pathIsPNG(const wchar_t* file)
+{
+	// Null check
+	if (file == nullptr) return false;
+
+	// Get string length
+	uint32_t len = 0;
+	for (len = 0; file[len] != L'\0'; len++);
+
+	// Length check
+	if (len < 4) return false;
+
+	uint32_t pos = len - 4;
+	if (file[pos] != L'.') return false;
+	if ((file[pos + 1] != L'p') && (file[pos + 1] != L'P')) return false;
+	if ((file[pos + 2] != L'n') && (file[pos + 2] != L'N')) return false;
+	if ((file[pos + 3] != L'g') && (file[pos + 3] != L'G')) return false;
+	
+	return true;
+}
+
+static uint32_t readPngU32(const unsigned char* data)
+{
+	return (
+		(((uint32_t)data[0]) << 24) |
+		(((uint32_t)data[1]) << 16) |
+		(((uint32_t)data[2]) << 8) |
+		(((uint32_t)data[3]) << 0)
+		);
+}
+
+static bool ReadPNGImageSize(const unsigned char* data, uint32_t len, uint32_t sizeOut[2])
+{
+	static const unsigned char PNG_HEADER[8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+	static const unsigned char IHDR[4] = { 'I', 'H', 'D', 'R' };
+
+	// Check header
+	if ((len < 8) || (memcmp(data, PNG_HEADER, 8) != 0)) return false;
+	data = &data[8];
+	len -= 8;
+
+	// Read idat chunk length
+	if (len < 4) return false;
+	uint32_t ihdrLen = readPngU32(data);
+	data = &data[4];
+	len -= 4;
+
+	// Read idat chunk header
+	if ((len < (4 + ihdrLen)) || (memcmp(data, IHDR, 4) != 0)) return false;
+	data = &data[4];
+	len -= 4;
+
+	// Make sure idata chunk length is at least the standard size
+	if (ihdrLen < 13) return false;
+
+	// We won't check the CRC... if we got this far okay we'll trust it for these purposes
+	if (sizeOut)
+	{
+		sizeOut[0] = readPngU32(&data[0]);
+		sizeOut[1] = readPngU32(&data[4]);
+	}
+
+	return true;
+}
+
+void* CopyPNGAndGetMetadata(const wchar_t* filename, uint32_t sizeOut[2], uint32_t* fileSizeOut)
+{
+	HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE)
+		return nullptr;
+
+	DWORD fileSize = GetFileSize(hFile, NULL);
+	if (fileSize == INVALID_FILE_SIZE)
+	{
+		CloseHandle(hFile);
+		return nullptr;
+	}
+
+	HANDLE hMap = CreateFileMappingW(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	if (hMap == NULL)
+	{
+		CloseHandle(hFile);
+		return nullptr;
+	}
+
+	void* dataPtr = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, fileSize);
+	if (dataPtr == NULL)
+	{
+		CloseHandle(hMap);
+		CloseHandle(hFile);
+		return nullptr;
+	}
+
+	void* dataCopy = std::malloc(fileSize);
+	memcpy(dataCopy, dataPtr, fileSize);
+
+	UnmapViewOfFile(dataPtr);
+	dataPtr = nullptr;
+	CloseHandle(hMap);
+	CloseHandle(hFile);
+
+	if (fileSizeOut != nullptr)
+	{
+		*fileSizeOut = fileSize;
+	}
+	bool ret = ReadPNGImageSize((unsigned char*)dataCopy, fileSize, sizeOut);
+	if (!ret)
+	{
+		std::free(dataCopy);
+		dataCopy = nullptr;
+	}
+
+	return dataCopy;
+}
+
 void LunaImage::load(const wchar_t* file)
 {
     std::lock_guard<std::mutex> lock(mut);
 
     clearInternal();
 
-    FreeImageData bitmapData;
-    if ((file != nullptr) && (file[0] != '\0') && bitmapData.loadFile(file))
-    {
-        w = bitmapData.getWidth();
-        h = bitmapData.getHeight();
-        if ((w == 0) || (h == 0))
-        {
-            // Invalid size
-            clearInternal();
-            return;
-        }
-        data = std::malloc(4 * w*h);
-        if (data == nullptr)
-        {
-            // Unable to allocate?
-            clearInternal();
-            return;
-        }
-        // Convert/Copy image data
-        if (!bitmapData.toRawBGRA(data))
-        {
-            // Unable to convert?
-            clearInternal();
-            return;
-        }
-    }
+	if ((file == nullptr) || (file[0] == '\0'))
+	{
+		return;
+	}
+
+	if (pathIsPNG(file))
+	{
+		uint32_t imgSize[2];
+		uint32_t dataSize;
+		void* dataPtr = CopyPNGAndGetMetadata(file, imgSize, &dataSize);
+		if (dataPtr != nullptr)
+		{
+			w = imgSize[0];
+			h = imgSize[1];
+			if ((w == 0) || (h == 0))
+			{
+				// Invalid size
+				clearInternal();
+				return;
+			}
+
+			compressedDataPtr = dataPtr;
+			compressedDataSize = dataSize;
+		}
+	}
+	else
+	{
+		FreeImageData bitmapData;
+		if (bitmapData.loadFile(file))
+		{
+			w = bitmapData.getWidth();
+			h = bitmapData.getHeight();
+			if ((w == 0) || (h == 0))
+			{
+				// Invalid size
+				clearInternal();
+				return;
+			}
+			data = std::malloc(4 * w*h);
+			if (data == nullptr)
+			{
+				// Unable to allocate?
+				clearInternal();
+				return;
+			}
+			// Convert/Copy image data
+			if (!bitmapData.toRawBGRA(data))
+			{
+				// Unable to convert?
+				clearInternal();
+				return;
+			}
+		}
+	}
 }
 
 void LunaImage::clearInternal()
@@ -192,7 +335,8 @@ void LunaImage::clearInternal()
     {
         mask = nullptr;
     }
-    if (hbmp != nullptr)
+    
+	if (hbmp != nullptr)
     {
         // If we hae a hbmp, then it's where data is allocated so we only need
         // to deallocate the hbmp
@@ -206,6 +350,14 @@ void LunaImage::clearInternal()
         std::free(data);
         data = nullptr;
     }
+
+	if (compressedDataPtr != nullptr)
+	{
+		std::free(compressedDataPtr);
+		compressedDataPtr = nullptr;
+	}
+	compressedDataSize = 0;
+
     w = 0;
     h = 0;
 }
@@ -387,7 +539,40 @@ LunaImage::~LunaImage()
     clearInternal();
 }
 
+void* LunaImage::getDataPtr() {
+	if ((data == nullptr) && (compressedDataPtr != nullptr))
+	{
+		FreeImageData bitmapData;
+		if (bitmapData.loadMem((unsigned char*)compressedDataPtr, compressedDataSize, "c.png"))
+		{
+			if ((w != bitmapData.getWidth()) || (h != bitmapData.getHeight()))
+			{
+				// Unexpected size
+				clearInternal();
+				return nullptr;
+			}
+
+			data = std::malloc(4 * w*h);
+			if (data == nullptr)
+			{
+				// Unable to allocate?
+				clearInternal();
+				return nullptr;
+			}
+			// Convert/Copy image data
+			if (!bitmapData.toRawBGRA(data))
+			{
+				// Unable to convert?
+				clearInternal();
+				return nullptr;
+			}
+		}
+	}
+	return data;
+}
+
 uint32_t LunaImage::getDataPtrAsInt()
 {
-    return (uint32_t)data;
+	std::lock_guard<std::mutex> lock(mut);
+    return (uint32_t)getDataPtr();
 }

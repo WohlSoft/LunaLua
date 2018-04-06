@@ -47,8 +47,12 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
     }
 
     // Try to allocate the GLSprite
-    GLSprite* sprite;
-    sprite = GLSprite::Create(img->getDataPtr(), GL_BGRA, img->getW(), img->getH());
+    GLSprite* sprite = nullptr;
+	void* data = img->getDataPtr();
+	if (data != nullptr)
+	{
+		sprite = GLSprite::Create(data, GL_BGRA, img->getW(), img->getH());
+	}
     img->unlock();
 
     // Handle failure
