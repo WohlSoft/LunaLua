@@ -1,11 +1,14 @@
 
 #include <cstdlib>
 #include <memory>
+#include <Windows.h>
+#include <Psapi.h>
 
 #include "../Globals.h"
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SdlMusic/SdlMusPlayer.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -65,5 +68,34 @@ extern "C" {
 		if (hittingCount != -1) {
 			Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
 		}
+	}
+
+	#pragma comment(lib, "psapi.lib")
+	struct LunaLuaMemUsageData
+	{
+		uint32_t totalWorking;
+		uint32_t imgRawMem;
+		uint32_t imgCompMem;
+		uint32_t sndMem;
+	};
+	FFI_EXPORT(const LunaLuaMemUsageData*) LunaLuaGetMemUsage()
+	{
+		static LunaLuaMemUsageData out;
+		static PROCESS_MEMORY_COUNTERS psmemCounters;
+
+		if (GetProcessMemoryInfo(GetCurrentProcess(), &psmemCounters, sizeof(psmemCounters)))
+		{
+			out.totalWorking = (psmemCounters.WorkingSetSize + 512) / 1024;
+		}
+		else
+		{
+			out.totalWorking = 0;
+		}
+
+		out.imgRawMem = (LunaImage::totalRawMem + 512) / 1024;
+		out.imgCompMem = (LunaImage::totalCompMem + 512) / 1024;
+		out.sndMem = (PGE_Sounds::GetMemUsage() + 512) / 1024;
+
+		return &out;
 	}
 }

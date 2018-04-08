@@ -268,6 +268,12 @@ char *PGE_Sounds::current = "";
 std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
 bool PGE_Sounds::overrideArrayIsUsed=false;
 std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
+uint32_t PGE_Sounds::memUsage = 0;
+
+uint32_t PGE_Sounds::GetMemUsage()
+{
+	return PGE_Sounds::memUsage;
+}
 
 Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
 {
@@ -283,6 +289,8 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
             +std::string(sndFile)+"\n"
             +std::string(Mix_GetError())).c_str(), "Error", 0);
         }
+
+		PGE_Sounds::memUsage += tmpChunk->alen;
         chunksBuffer[filePath] = tmpChunk;
     }
     else
@@ -307,6 +315,7 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
             +std::string(Mix_GetError())).c_str(), "Error", 0);
         }
 
+		PGE_Sounds::memUsage += sound->alen;
         chunksBuffer[filePath] = sound;
         if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
         {
@@ -331,6 +340,7 @@ void PGE_Sounds::clearSoundBuffer()
     overrideArrayIsUsed=false;
 	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
 	{
+		PGE_Sounds::memUsage -= it->second->alen;
 		Mix_FreeChunk(it->second);
 	}
 	chunksBuffer.clear();

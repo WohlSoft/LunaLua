@@ -72,6 +72,8 @@ public:
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
     static void setMuteForAlias(const std::string& alias, bool muted);
     static bool getMuteForAlias(const std::string& alias);
+public:
+	static uint32_t GetMemUsage();
 private:
     struct ChunkOverrideSettings {
         Mix_Chunk* chunk;
@@ -82,6 +84,8 @@ private:
     static char *current;
     static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;
+public:
+	static uint32_t memUsage;
 };
 
 #endif

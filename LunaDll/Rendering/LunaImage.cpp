@@ -12,6 +12,9 @@
 static std::unordered_map<std::wstring, std::weak_ptr<LunaImage>> g_lunaImageCache;
 static std::vector<std::shared_ptr<LunaImage>> g_lunaImageHolder;
 
+uint32_t LunaImage::totalRawMem = 0;
+uint32_t LunaImage::totalCompMem = 0;
+
 void LunaImage::holdCachedImages()
 {
     g_lunaImageHolder.clear();
@@ -63,6 +66,7 @@ std::shared_ptr<LunaImage> LunaImage::fromData(int width, int height, const uint
     if (img->data != nullptr)
     {
         memcpy(img->data, data, 4 * width * height);
+		totalRawMem += 4 * width * height;
     }
     else
     {
@@ -90,6 +94,7 @@ std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
     if (img->data != nullptr)
     {
         memcpy(img->data, bmp.bmBits, 4 * img->w*img->h);
+		totalRawMem += 4 * img->w*img->h;
     }
     else
     {
@@ -296,6 +301,7 @@ void LunaImage::load(const wchar_t* file)
 
 			compressedDataPtr = dataPtr;
 			compressedDataSize = dataSize;
+			totalCompMem += dataSize;
 		}
 	}
 	else
@@ -318,6 +324,8 @@ void LunaImage::load(const wchar_t* file)
 				clearInternal();
 				return;
 			}
+			totalRawMem += 4 * w*h;
+
 			// Convert/Copy image data
 			if (!bitmapData.toRawBGRA(data))
 			{
@@ -347,12 +355,14 @@ void LunaImage::clearInternal()
     else if (data != nullptr)
     {
         // otherwise if we have data, directly deallocate that
+		totalRawMem -= 4 * w*h;
         std::free(data);
         data = nullptr;
     }
 
 	if (compressedDataPtr != nullptr)
 	{
+		totalCompMem -= compressedDataSize;
 		std::free(compressedDataPtr);
 		compressedDataPtr = nullptr;
 	}
@@ -560,6 +570,8 @@ void* LunaImage::getDataPtr() {
 				clearInternal();
 				return nullptr;
 			}
+			totalRawMem += 4 * w*h;
+
 			// Convert/Copy image data
 			if (!bitmapData.toRawBGRA(data))
 			{
@@ -583,7 +595,8 @@ void LunaImage::notifyTextureified()
 {
 	if ((compressedDataPtr != nullptr) && (!mustKeepData))
 	{
-		::free(data);
+		totalRawMem -= 4 * w*h;
+		std::free(data);
 		data = nullptr;
 	}
 }

@@ -17,6 +17,10 @@ class GLSprite;
 class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
 public:
+	static uint32_t totalRawMem;
+	static uint32_t totalCompMem;
+
+public:
     static std::shared_ptr<LunaImage> fromData(int width, int height, const uint8_t* data);
     static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
     static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, const ResourceFileInfo* metadata=nullptr);
