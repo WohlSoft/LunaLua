@@ -286,7 +286,7 @@ FFI_EXPORT void __cdecl FFI_ImageDraw(LunaImageRef* img, double x, double y, dou
 
 // FFI Text Drawing Call
 
-FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, double priority)
+FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, double priority, short sceneCoords)
 {
     if (text == nullptr) return;
 
@@ -298,6 +298,7 @@ FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, d
 
     RenderStringOp* printTextOp = new RenderStringOp(wText, type, (float)x, (float)y);
     printTextOp->m_renderPriority = priority;
+	printTextOp->sceneCoords = (sceneCoords != 0);
     gLunaRender.AddOp(printTextOp);
 }
 
