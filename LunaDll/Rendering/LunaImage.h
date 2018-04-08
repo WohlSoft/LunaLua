@@ -39,6 +39,7 @@ private:
 
 	void* compressedDataPtr; // Pointer to compressed PNG data
 	uint32_t compressedDataSize;
+	bool mustKeepData;
 private:
     void clearInternal();
     void load(const wchar_t* file);
@@ -52,7 +53,8 @@ public:
         hbmp(nullptr),
         mask(nullptr),
 		compressedDataPtr(nullptr),
-		compressedDataSize(0)
+		compressedDataSize(0),
+		mustKeepData(false)
     {
     }
     virtual ~LunaImage();
@@ -61,6 +63,9 @@ public:
     inline uint64_t getUID() { return uid; }
 	void* getDataPtr();
     uint32_t getDataPtrAsInt();
+
+	void notifyTextureified();
+
     inline uint32_t getW() { return w; }
     inline uint32_t getH() { return h; }
     inline void lock() { mut.lock(); }

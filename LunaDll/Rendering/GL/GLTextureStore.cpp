@@ -52,6 +52,8 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
 	if (data != nullptr)
 	{
 		sprite = GLSprite::Create(data, GL_BGRA, img->getW(), img->getH());
+		data = nullptr;
+		img->notifyTextureified();
 	}
     img->unlock();
 

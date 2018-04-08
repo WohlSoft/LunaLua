@@ -357,6 +357,7 @@ void LunaImage::clearInternal()
 		compressedDataPtr = nullptr;
 	}
 	compressedDataSize = 0;
+	mustKeepData = false;
 
     w = 0;
     h = 0;
@@ -574,5 +575,16 @@ void* LunaImage::getDataPtr() {
 uint32_t LunaImage::getDataPtrAsInt()
 {
 	std::lock_guard<std::mutex> lock(mut);
+	mustKeepData = true;
     return (uint32_t)getDataPtr();
 }
+
+void LunaImage::notifyTextureified()
+{
+	if ((compressedDataPtr != nullptr) && (!mustKeepData))
+	{
+		::free(data);
+		data = nullptr;
+	}
+}
+
