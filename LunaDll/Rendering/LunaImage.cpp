@@ -304,7 +304,8 @@ void LunaImage::load(const wchar_t* file)
 			totalCompMem += dataSize;
 		}
 	}
-	else
+
+	if (compressedDataPtr == nullptr)
 	{
 		FreeImageData bitmapData;
 		if (bitmapData.loadFile(file))
