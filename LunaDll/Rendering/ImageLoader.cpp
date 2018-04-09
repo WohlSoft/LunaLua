@@ -48,29 +48,47 @@ static void resolveImageResource(
     bool mainIsGif;
     {
         ResourceFileInfo resource;
+		bool gotImg = false;
         auto it = levelFiles.find(pngName);
-        if (it == levelFiles.end())
-            it = levelFiles.find(gifName);
-        if (it == levelFiles.end())
-            it = episodeFiles.find(pngName);
-        if (it == episodeFiles.end())
-            it = episodeFiles.find(gifName);
-        if (it != episodeFiles.end())
-            resource = it->second;
-        if (episodeGfxTypeDir.length() > 0)
-        {
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
-        }
-        if (appGfxTypeDir.length() > 0)
-        {
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
-        }
+		gotImg = (it != levelFiles.end());
+		if (!gotImg)
+		{
+			it = levelFiles.find(gifName);
+			gotImg = (it != levelFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(pngName);
+			gotImg = (it != episodeFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(gifName);
+			gotImg = (it != episodeFiles.end());
+		}
+
+		if (gotImg)
+		{
+			resource = it->second;
+		}
+		else
+		{
+			if (episodeGfxTypeDir.length() > 0)
+			{
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
+			}
+			if (appGfxTypeDir.length() > 0)
+			{
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
+			}
+		}
+
         mainIsGif = (resource.extension == L"gif");
         if (resource.path.length() > 0)
         {
@@ -82,21 +100,46 @@ static void resolveImageResource(
     {
         std::wstring maskName = fileRoot + L"m.gif";
         ResourceFileInfo maskResource;
-        auto it = levelFiles.find(maskName);
-        if (it == levelFiles.end())
-            it = episodeFiles.find(maskName);
-        if (it != episodeFiles.end())
-            maskResource = it->second;
-        if (episodeGfxTypeDir.length() > 0)
-        {
-            if (maskResource.path.length() == 0)
-                maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
-        }
-        if (appGfxTypeDir.length() > 0)
-        {
-            if (maskResource.path.length() == 0)
-                maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
-        }
+		bool gotImg = false;
+		auto it = levelFiles.find(maskName);
+		gotImg = (it != levelFiles.end());
+		if (!gotImg)
+		{
+			it = levelFiles.find(pngName);
+			gotImg = (it != levelFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(maskName);
+			gotImg = (it != episodeFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(pngName);
+			gotImg = (it != episodeFiles.end());
+		}
+
+		if (gotImg)
+		{
+			maskResource = it->second;
+		}
+		else
+		{
+			if (episodeGfxTypeDir.length() > 0)
+			{
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+			}
+			if (appGfxTypeDir.length() > 0)
+			{
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+			}
+		}
         if (maskResource.path.length() > 0) {
             outData[fileRoot + L"m"] = std::move(maskResource);
         }

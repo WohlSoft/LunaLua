@@ -44,6 +44,7 @@ private:
 	void* compressedDataPtr; // Pointer to compressed PNG data
 	uint32_t compressedDataSize;
 	bool mustKeepData;
+	bool isPngImage;
 private:
     void clearInternal();
     void load(const wchar_t* file);
@@ -58,7 +59,8 @@ public:
         mask(nullptr),
 		compressedDataPtr(nullptr),
 		compressedDataSize(0),
-		mustKeepData(false)
+		mustKeepData(false),
+		isPngImage(false)
     {
     }
     virtual ~LunaImage();
