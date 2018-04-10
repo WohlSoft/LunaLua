@@ -18,7 +18,7 @@ public:
     virtual void BindTexture() const = 0;
     virtual unsigned int GetTexId() const = 0;
     virtual bool IsValid() const = 0;
-
+	virtual uint32_t GetSizeBytes() const = 0;
 
     inline void Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const
     {
@@ -39,9 +39,11 @@ public:
         return 0;
     };
     virtual bool IsValid() const { return valid; }
+	virtual uint32_t GetSizeBytes() const;
 private:
     bool valid;
     GLDraw::Texture tex;
+	uint32_t w, h;
 };
 
 #include "GLSplitSprite.h"

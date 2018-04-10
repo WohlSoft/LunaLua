@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <mutex>
 #include <memory>
+#include <atomic>
 
 #include "../Misc/ResourceFileMapper.h"
 
@@ -17,8 +18,8 @@ class GLSprite;
 class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
 public:
-	static uint32_t totalRawMem;
-	static uint32_t totalCompMem;
+	static std::atomic<uint32_t> totalRawMem;
+	static std::atomic<uint32_t> totalCompMem;
 
 public:
     static std::shared_ptr<LunaImage> fromData(int width, int height, const uint8_t* data);

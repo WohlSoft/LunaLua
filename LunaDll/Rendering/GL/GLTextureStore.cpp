@@ -8,6 +8,8 @@
 // Instance
 GLTextureStore g_GLTextureStore;
 
+std::atomic<uint64_t> GLTextureStore::totalMem = 0;
+
 // Constructor
 GLTextureStore::GLTextureStore() {
 }
@@ -19,6 +21,7 @@ void GLTextureStore::Reset() {
 void GLTextureStore::ClearLunaImageTextures()
 {
     for (const auto i : mLunaImageTexMap) {
+		totalMem -= i.second->GetSizeBytes();
         delete i.second;
     }
     mLunaImageTexMap.clear();
@@ -28,6 +31,7 @@ void GLTextureStore::ClearLunaImageTexture(uint64_t uid)
 {
     auto it = mLunaImageTexMap.find(uid);
     if (it != mLunaImageTexMap.end()) {
+		totalMem -= it->second->GetSizeBytes();
         delete it->second;
         mLunaImageTexMap.erase(it);
     }
@@ -46,12 +50,15 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
         return it->second;
     }
 
+	uint32_t w = img->getW();
+	uint32_t h = img->getH();
+
     // Try to allocate the GLSprite
     GLSprite* sprite = nullptr;
 	void* data = img->getDataPtr();
 	if (data != nullptr)
 	{
-		sprite = GLSprite::Create(data, GL_BGRA, img->getW(), img->getH());
+		sprite = GLSprite::Create(data, GL_BGRA, w, h);
 		data = nullptr;
 		img->notifyTextureified();
 	}
@@ -64,8 +71,15 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
         return NULL;
     }
 
+	totalMem += sprite->GetSizeBytes();
+
     // Cache new texture
     mLunaImageTexMap[uid] = sprite;
 
     return sprite;
+}
+
+uint64_t GLTextureStore::GetTextureMemory()
+{
+	return totalMem;
 }

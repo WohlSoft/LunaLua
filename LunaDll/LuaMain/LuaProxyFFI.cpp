@@ -7,6 +7,7 @@
 #include "../Globals.h"
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
+#include "../Rendering/GL/GLTextureStore.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SdlMusic/SdlMusPlayer.h"
 
@@ -77,6 +78,7 @@ extern "C" {
 		uint32_t imgRawMem;
 		uint32_t imgCompMem;
 		uint32_t sndMem;
+		double   imgGpuMem;
 	};
 	FFI_EXPORT(const LunaLuaMemUsageData*) LunaLuaGetMemUsage()
 	{
@@ -95,6 +97,7 @@ extern "C" {
 		out.imgRawMem = (LunaImage::totalRawMem + 512) / 1024;
 		out.imgCompMem = (LunaImage::totalCompMem + 512) / 1024;
 		out.sndMem = (PGE_Sounds::GetMemUsage() + 512) / 1024;
+		out.imgGpuMem = ((double)GLTextureStore::GetTextureMemory()) / 1024.0;
 
 		return &out;
 	}

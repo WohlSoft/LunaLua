@@ -12,8 +12,8 @@
 static std::unordered_map<std::wstring, std::weak_ptr<LunaImage>> g_lunaImageCache;
 static std::vector<std::shared_ptr<LunaImage>> g_lunaImageHolder;
 
-uint32_t LunaImage::totalRawMem = 0;
-uint32_t LunaImage::totalCompMem = 0;
+std::atomic<uint32_t> LunaImage::totalRawMem = 0;
+std::atomic<uint32_t> LunaImage::totalCompMem = 0;
 
 void LunaImage::holdCachedImages()
 {

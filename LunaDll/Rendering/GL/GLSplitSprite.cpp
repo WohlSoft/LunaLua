@@ -97,3 +97,9 @@ void GLSplitSprite::BindTexture() const {
 
     subSprites[0]->BindTexture();
 }
+
+uint32_t GLSplitSprite::GetSizeBytes() const
+{
+	return 4 * width * height;
+}
+
