@@ -256,9 +256,8 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 {
                     if (width < maskImg->getW()) width = maskImg->getW();
                     if (height < maskImg->getH()) height = maskImg->getH();
+					mainImg->tryMaskToRGBA();
                 }
-
-                mainImg->tryMaskToRGBA();
             }
 
             m_Category.setWidth(i, (int16_t)min(width, 0x7FFF));
