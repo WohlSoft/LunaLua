@@ -437,6 +437,11 @@ void TrySkipPatch()
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
     PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
+	// Disable some frivolous RenderLevel calls in vanilla code. Was causing excess onDraw compared to onTick
+	PATCH(0x9BBC95).NOPS<5>().Apply(); // Tail hitting blocks case
+	PATCH(0xA2C6C1).NOPS<5>().Apply(); // Unknown (birdo hit sound related)
+	PATCH(0xA53053).NOPS<5>().Apply(); // Link shield case
+
     // Level rendering layering hooks
 
     //PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();

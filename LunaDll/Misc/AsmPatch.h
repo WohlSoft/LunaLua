@@ -240,7 +240,7 @@ public:
 
     template <std::uintptr_t NopCount>
     inline AsmPatch<Size + NopCount> NOPS() const {
-        return NOP_PADDING_TO<Size + NopCount>();
+        return NOP_PAD_TO_SIZE<Size + NopCount>();
     }
 
     inline AsmPatch<Size + 2> CONDJMP_TO_NOPJMP() const {
