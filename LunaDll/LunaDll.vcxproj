@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h" />
+    <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
     <ClInclude Include="Misc\SRect.h" />
@@ -303,6 +304,7 @@
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
+    <ClCompile Include="Misc\LoadScreen.cpp" />
     <ClCompile Include="Misc\NpcIdExtender.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />

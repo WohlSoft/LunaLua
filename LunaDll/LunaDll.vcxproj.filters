@@ -553,6 +553,9 @@
     <ClInclude Include="Rendering\AsyncGifRecorderImgs.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\LoadScreen.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1051,6 +1054,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp">
       <Filter>LuaMain</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\LoadScreen.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

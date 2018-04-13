@@ -24,6 +24,8 @@
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/ImageLoader.h"
 
+#include "../Misc/LoadScreen.h"
+
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
 using namespace luabind;
@@ -1496,6 +1498,8 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
+	LunaLoadScreenKill();
+
     //If the lua module is not valid anyway, then just return
     if(!isValid())
         return;

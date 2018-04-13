@@ -48,6 +48,24 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 {
 	// Load Post-Processing Shader somewhere here
 
+	static HDC cachedHDC = NULL;
+	if (hdcDest == NULL)
+	{
+		if (cachedHDC != NULL)
+		{
+			hdcDest = cachedHDC;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		cachedHDC = hdcDest;
+	}
+
+
     InitForHDC(hdcDest);
 
 	if (!g_GLContextManager.IsInitialized()) return FALSE;
@@ -107,6 +125,24 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 
 void GLEngine::EndFrame(HDC hdcDest)
 {
+
+	static HDC cachedHDC = NULL;
+	if (hdcDest == NULL)
+	{
+		if (cachedHDC != NULL)
+		{
+			hdcDest = cachedHDC;
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		cachedHDC = hdcDest;
+	}
+
 	// Bind screen
 	g_GLContextManager.BindScreen();
 

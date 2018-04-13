@@ -18,6 +18,8 @@
 
 #include "../NpcIdExtender.h"
 
+#include "../../Misc/LoadScreen.h"
+
 #ifndef NO_SDL
 bool episodeStarted = false;
 #endif
@@ -582,6 +584,9 @@ void TrySkipPatch()
         0x89, 0xC6,       // mov esi,eax
         0xEB, 0x4B        // jmp 0xA9898F
         ).NOP_PAD_TO_SIZE<98>().Apply();
+
+	// Enable custom load screens
+	LunaLoadScreenSetEnable(true);
 
     /************************************************************************/
     /* Import Table Patch                                                   */

@@ -219,7 +219,7 @@ public:
 
     template <std::uintptr_t PadSize>
     inline AsmPatch<PadSize> NOP_PAD_TO_SIZE() const {
-        static_assert(PadSize > Size, "Cannot pad smaller than old size");
+        static_assert(PadSize >= Size, "Cannot pad smaller than old size");
 
         AsmPatch<PadSize> ret(mAddr);
         for (std::uintptr_t i = 0; i < Size; i++) {
