@@ -13,6 +13,8 @@ public:
     std::shared_ptr<CaptureBuffer> mBuff;
     virtual void run(GLEngine& glEngine) const
     {
+		if (!g_GLContextManager.IsInitialized()) return;
+
         // Create framebuffer if not yet existing
         mBuff->EnsureFramebufferExists();
 
@@ -37,6 +39,8 @@ public:
     std::shared_ptr<CaptureBuffer> mBuff;
     virtual void run(GLEngine& glEngine) const
     {
+		if (!g_GLContextManager.IsInitialized()) return;
+
         if (mBuff->mFramebuffer != nullptr)
         {
             static const GLclampf colorTrans[] = { 0.0, 0.0, 0.0, 0.0 };
