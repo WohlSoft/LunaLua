@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "EventStateMachine.h"
 #include "Misc\RuntimeHook.h"
+#include "Rendering/GL/GLEngineProxy.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -163,12 +164,14 @@ void EventStateMachine::sendOnTickEnd(void) {
 }
 
 void EventStateMachine::sendOnDraw(void) {
+	GLEngineProxy::CheckRendererInit();
     sendSimpleLuaEvent("onDraw");
 
     m_onDrawEndReady = true;
 }
 
 void EventStateMachine::sendOnDrawEnd(void) {
+	GLEngineProxy::CheckRendererInit();
     m_onDrawEndReady = false;
 
     sendSimpleLuaEvent("onDrawEnd");

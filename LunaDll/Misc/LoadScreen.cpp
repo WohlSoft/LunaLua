@@ -182,6 +182,8 @@ static void __stdcall CustomLoadScreenHook(void)
 
 	if (loadThread != nullptr) return;
 
+	GLEngineProxy::CheckRendererInit();
+
 	killThreadFlag = false;
 	loadThread = new std::thread(LoadThread);
 }

@@ -126,10 +126,8 @@ extern void __stdcall forceTermination()
 extern int __stdcall LoadWorld()
 {
     // We want to make sure we init the renderer before we start LunaLua when
-    // entering levels..... BUT we can't do this here, it likes to crash.
-    // Not sure why yet. Something about vanilla window initialization code
-    // probably.
-    //GLEngineProxy::CheckRendererInit();
+    // entering levels...
+    GLEngineProxy::CheckRendererInit();
 
     ResetLunaModule();
     gIsOverworld = true;
