@@ -400,6 +400,12 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
+	// Hook for after camera updates have finished, just before drawing the background
+	PATCH(0x90D6FE)
+		.CALL(&PostCameraUpdateHook_Wrapper)
+		.NOP_PAD_TO_SIZE<7>()
+		.Apply();
+
     // Hook to fix 100% CPU when window is inactive
     PATCH(0x8E6FE1)
         .NOP()
