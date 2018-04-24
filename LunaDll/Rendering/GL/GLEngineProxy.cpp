@@ -46,7 +46,8 @@ void GLEngineProxy::ThreadMain() {
         }
         if (cmd->isFrameEnd()) {
             if (mFrameCount-- > 1) {
-                mSkipFrame = true;
+				// Disable skipping frames for now?
+				mSkipFrame = false;
             }
             else {
                 mSkipFrame = false;
