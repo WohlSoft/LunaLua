@@ -227,6 +227,7 @@ void TrySkipPatch()
     fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
+	fixup_RenderPlayerJiterX();
 
     /************************************************************************/
     /* Replaced Imports                                                     */

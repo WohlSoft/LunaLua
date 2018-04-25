@@ -144,6 +144,7 @@ void fixup_Mushbug();
 void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
+void fixup_RenderPlayerJiterX();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */
