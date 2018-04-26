@@ -208,8 +208,7 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
     // If depth testing is enabled, use it
     if (mDepthTest) {
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
+		// Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     glVertexPointer(2, GL_FLOAT, 0, mVert);
@@ -243,8 +242,7 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mDepthTest) {
-        glDepthMask(GL_FALSE);
-        glDisable(GL_DEPTH_TEST);
+		// Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     if (mSceneCoords) {

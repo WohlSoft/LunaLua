@@ -209,6 +209,7 @@ void GLEngine::EndFrame(HDC hdcDest)
 	// Clear screen backbuffer
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearDepth(100.0f);
     GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();

@@ -126,6 +126,7 @@ void GLFramebuffer::Clear(const GLclampf color[4])
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
     GLERRORCHECK();
     glClearColor(color[0], color[1], color[2], color[3]);
+    glClearDepth(100.0f);
     GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();
