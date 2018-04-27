@@ -155,7 +155,7 @@ static void LoadThread(void)
 	}
 
 	
-	while (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick)) {
+	do {
 		lua_getglobal(L, "onDraw");
 		if (lua_pcall(L, 0, 0, 0))
 		{
@@ -172,8 +172,12 @@ static void LoadThread(void)
 
 		gLunaRender.EndFrameRender();
 
-		Sleep(15);
-	}
+		if (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick))
+		{
+			Sleep(15);
+		}
+	} while (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick));
+	killThreadFlag = false;
 }
 
 static void __stdcall CustomLoadScreenHook(void)
@@ -192,6 +196,11 @@ void LunaLoadScreenKill()
 {
 	if (loadThread == nullptr) return;
 	killThreadFlag = true;
+	while (killThreadFlag)
+	{
+		native_rtcDoEvents();
+		Sleep(15);
+	}
 	loadThread->join();
 	delete loadThread;
 	loadThread = nullptr;
