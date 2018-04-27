@@ -101,4 +101,34 @@ extern "C" {
 
 		return &out;
 	}
+
+
+	FFI_EXPORT(const char*) LunaLuaMemReadString(unsigned int addr)
+	{
+		static std::string tmp;
+		void* ptr = ((&(*(byte*)addr)));
+
+		if (ptr == 0)
+		{
+			return nullptr;
+		}
+
+		tmp = *((VB6StrPtr*)ptr);
+		return tmp.c_str();
+	}
+
+	FFI_EXPORT(void) LunaLuaMemWriteString(unsigned int addr, const char* str)
+	{
+		static VB6StrPtr nullStr;
+		void* ptr = ((&(*(byte*)addr)));
+
+		if (str != nullptr)
+		{
+			*((VB6StrPtr*)ptr) = std::string(str);
+		}
+		else
+		{
+			*((VB6StrPtr*)ptr) = nullStr;
+		}
+	}
 }
