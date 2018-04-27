@@ -178,8 +178,8 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 
     npc->spawnMomentum.x = x;
     npc->spawnMomentum.y = y;
-    npc->spawnMomentum.height = gfxHeight;
-    npc->spawnMomentum.width = gfxWidth;
+    npc->spawnMomentum.height = height;
+    npc->spawnMomentum.width = width;
     npc->spawnMomentum.speedX = 0.0;
     npc->spawnMomentum.speedY = 0.0;
 
