@@ -151,19 +151,6 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
 
-    if (sprite != nullptr)
-    {
-        sprite->BindTexture();
-    }
-    else if (tex != nullptr)
-    {
-        g_GLDraw.BindTexture(tex);
-    }
-    else
-    {
-        g_GLDraw.UnbindTexture();
-    }
-
     if (mShader) {
         mShader->defaultSampler(g_GLDraw.GetCurrentTexName());
 
@@ -178,6 +165,19 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
     
+	if (sprite != nullptr)
+	{
+		sprite->BindTexture();
+	}
+	else if (tex != nullptr)
+	{
+		g_GLDraw.BindTexture(tex);
+	}
+	else
+	{
+		g_GLDraw.UnbindTexture();
+	}
+
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
 
