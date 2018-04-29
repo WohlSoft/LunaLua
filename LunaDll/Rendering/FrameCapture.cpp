@@ -32,6 +32,14 @@ public:
             g_GLContextManager.BindFramebuffer();
         }
     }
+
+	virtual bool allowFrameSkippability(void) const {
+		return !mBuff->mNonskippable;
+	}
+
+	virtual bool isSkippable(void) const {
+		return !mBuff->mNonskippable;
+	}
 };
 
 class GLEngineCmd_ClearCaptureBuffer : public GLEngineCmd {
@@ -47,6 +55,10 @@ public:
             mBuff->mFramebuffer->Clear(colorTrans);
         }
     }
+
+	virtual bool isSkippable(void) const {
+		return !mBuff->mNonskippable;
+	}
 };
 
 class GLEngineCmd_DeleteCaptureBuffer : public GLEngineCmd {
@@ -56,10 +68,14 @@ public:
     {
         delete mFb;
     }
+
+	virtual bool isSkippable(void) const {
+		return false;
+	}
 };
 
-CaptureBuffer::CaptureBuffer(int w, int h) :
-    mW(w), mH(h), mFramebuffer(nullptr)
+CaptureBuffer::CaptureBuffer(int w, int h, bool nonskippable) :
+    mW(w), mH(h), mNonskippable(nonskippable), mFramebuffer(nullptr)
 {
 }
 

@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <memory>
+#include <queue>
 #include "../../Misc/ThreadedCmdQueue.h"
 #include "GLDraw.h"
 #include "GLEngineCmds.h"
@@ -20,6 +21,9 @@ private:
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
     
+	bool mNextEndFrameIsSkippable;
+	std::queue<bool> mQueuedFrameSkippability;
+
 public:
     GLEngine mInternalGLEngine;
 protected:

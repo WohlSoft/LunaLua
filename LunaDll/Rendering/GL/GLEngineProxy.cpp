@@ -14,6 +14,7 @@ GLEngineProxy::GLEngineProxy() {
     mFrameCount = 0;
     mPendingClear = 0;
     mSkipFrame = false;
+	mNextEndFrameIsSkippable = true;
     mpThread = NULL;
 }
 
@@ -37,7 +38,7 @@ void GLEngineProxy::ThreadMain() {
     while (1) {
         std::shared_ptr<GLEngineCmd> cmd = mQueue.peek();
 
-        if (cmd->shouldBeSynchronous() || (mPendingClear == 0 && !mSkipFrame)) {
+        if ((mPendingClear == 0 && !mSkipFrame) || (!cmd->isSkippable()) || cmd->shouldBeSynchronous()) {
             cmd->run(mInternalGLEngine);
         }
 
@@ -45,9 +46,11 @@ void GLEngineProxy::ThreadMain() {
             mPendingClear--;
         }
         if (cmd->isFrameEnd()) {
+			bool mFrameSkippable = mQueuedFrameSkippability.front();
+			mQueuedFrameSkippability.pop();
+
             if (mFrameCount-- > 1) {
-				// Disable skipping frames for now?
-				mSkipFrame = false;
+				mSkipFrame = mFrameSkippable;
             }
             else {
                 mSkipFrame = false;
@@ -75,9 +78,14 @@ void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
     // Ensure we're initialized
     Init();
 
+	// Allow frame skippability to be invalidated by something
+	mNextEndFrameIsSkippable = mNextEndFrameIsSkippable && cmd->allowFrameSkippability();
+
     if (cmd->isFrameEnd()) { 
         // Increment count of stored frames
         mFrameCount++;
+		mQueuedFrameSkippability.push(mNextEndFrameIsSkippable);
+		mNextEndFrameIsSkippable = true;
     }
     if (cmd->isSmbxClearCmd())
     {

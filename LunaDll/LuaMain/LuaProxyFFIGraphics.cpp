@@ -332,9 +332,9 @@ FFI_EXPORT LunaImageRef* __fastcall FFI_GetSpriteOverride(const char* name, uint
 
 // CaptureBuffer class
 
-FFI_EXPORT CaptureBufferRef* __fastcall FFI_CaptureBuffer(uint32_t w, uint32_t h)
+FFI_EXPORT CaptureBufferRef* __fastcall FFI_CaptureBuffer(uint32_t w, uint32_t h, bool nonskippable)
 { 
-    std::shared_ptr<CaptureBuffer> ref = std::make_shared<CaptureBuffer>(w, h);
+    std::shared_ptr<CaptureBuffer> ref = std::make_shared<CaptureBuffer>(w, h, nonskippable);
     if (ref)
     {
         // Return heap-allocated shared_ptr
