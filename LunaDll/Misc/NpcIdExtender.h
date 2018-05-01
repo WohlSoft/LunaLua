@@ -3,4 +3,6 @@
 
 void PatchNpcIdLimit();
 
+void PatchBgoIdLimit();
+
 #endif // NPC_ID_EXTENDER_H_

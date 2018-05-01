@@ -171,6 +171,9 @@ static unsigned int __stdcall LatePatch(void)
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 
+	// Set new BGO ID limit...
+	PatchBgoIdLimit();
+
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
     fixup_ErrorReporting();
