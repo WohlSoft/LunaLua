@@ -433,7 +433,5 @@ void PatchBgoIdLimit()
 	array_IPictureDisp_Background_Mask_obj.Patch(newLimit);
 	array_unkBGOSetting_obj.Patch(newLimit+1);
 
-	PATCH(0x8C27D9).word(newLimit).Apply(); // Loop over B25B54
-
 	currentBgoIdLimit = newLimit;
 }
