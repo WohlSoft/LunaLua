@@ -131,4 +131,9 @@ extern "C" {
 			*((VB6StrPtr*)ptr) = nullStr;
 		}
 	}
+
+	FFI_EXPORT(void) LunaLuaSetBGORenderFlag(bool val)
+	{
+		gRenderBGOFlag = val;
+	}
 }

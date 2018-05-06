@@ -458,15 +458,15 @@ void TrySkipPatch()
 
     //PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
     //-100: Level Background
-    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
+    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-95, 0x910433, &gRenderBGOFlag>()).Apply();
     // -95: Furthest back BGOs
     PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
     // -90: Sizable Blocks
     PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply();
     // -85: Some more BGOs
-    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHook<-80>()).Apply();
+    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-80, 0x912748, &gRenderBGOFlag>()).Apply();
     // -80: Warp - Derived BGOs (locks on doors and stuff)
-    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHook<-75>()).Apply();
+    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-75, 0x915316, &gRenderBGOFlag>()).Apply();
     // -75: Background NPCs (vines, piranah plants, diggable sand, mother brain, things in MB jars)
     PATCH(0x915316).NOP().NOP().CALL(GetRenderBelowPriorityHook<-70>()).Apply();
     // -70: Held NPCs
@@ -488,7 +488,7 @@ void TrySkipPatch()
     // -30: Something else player mount related?
     PATCH(0x928EA5).NOP().NOP().CALL(GetRenderBelowPriorityHook<-25>()).Apply();
     // -25: Players
-    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHook<-20>()).Apply();
+    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-20, 0x929F81, &gRenderBGOFlag>()).Apply();
     // -20: Foreground BGOs
     PATCH(0x929F81).NOP().NOP().CALL(GetRenderBelowPriorityHook<-15>()).Apply();
     // -15: Foreground NPCs

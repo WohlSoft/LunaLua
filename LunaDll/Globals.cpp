@@ -21,6 +21,7 @@ SMBXHUDSettings gSMBXHUDSettings = {
     WHUD_ALL, // overworldHudControlFlag
     false     // skipStarCount
 };
+bool gRenderBGOFlag = true;
 
 // Global variables
 int	gFrames;
