@@ -13,12 +13,15 @@
 #include "launchercustomwebpage.h"
 #include "hybridlogger.h"
 
+#include "devtoolsdialog.h"
+
 #include <QtWebEngineWidgets/QtWebEngineWidgets>
 #include <QWebEnginePage>
 #include <QWebEngineSettings>
 #include <QMessageBox>
 #include <QDesktopServices>
 
+static DevToolsDialog* devDialogPtr = nullptr;
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,8 +41,22 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
     QWebEnginePage* page = ui->webLauncherPage->page();
 
-    // 2. Page Settings
+    // Set up the development tools dialog
+    if (devDialogPtr == nullptr)
+    {
+        devDialogPtr = new DevToolsDialog(this);
+    }
+    devDialogPtr->AssociateWithPage(page);
+
+    // Enable inspect element
     page->action(QWebEnginePage::InspectElement)->setEnabled(true);
+    connect(page->action(QWebEnginePage::InspectElement), &QAction::triggered, [this]() {
+        if (devDialogPtr != nullptr)
+        {
+            devDialogPtr->show();
+        }
+    });
+
 
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
