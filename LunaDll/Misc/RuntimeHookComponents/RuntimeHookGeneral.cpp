@@ -462,11 +462,11 @@ void TrySkipPatch()
     // -95: Furthest back BGOs
     PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
     // -90: Sizable Blocks
-    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply();
+    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-85, 0x911F19, &gRenderBGOFlag>()).Apply();
     // -85: Some more BGOs
     PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-80, 0x912748, &gRenderBGOFlag>()).Apply();
     // -80: Warp - Derived BGOs (locks on doors and stuff)
-    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-75, 0x915316, &gRenderBGOFlag>()).Apply();
+    PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHook<-75>()).Apply();
     // -75: Background NPCs (vines, piranah plants, diggable sand, mother brain, things in MB jars)
     PATCH(0x915316).NOP().NOP().CALL(GetRenderBelowPriorityHook<-70>()).Apply();
     // -70: Held NPCs
