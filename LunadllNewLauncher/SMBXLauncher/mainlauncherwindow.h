@@ -21,6 +21,9 @@ public:
     explicit MainLauncherWindow(QWidget *parent = 0);
     ~MainLauncherWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 public slots:
     //Webkit Stuff
     void loadJavascriptBridge();

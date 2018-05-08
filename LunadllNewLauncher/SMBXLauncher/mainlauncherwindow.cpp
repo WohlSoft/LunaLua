@@ -73,6 +73,16 @@ MainLauncherWindow::~MainLauncherWindow()
     delete ui;
 }
 
+void MainLauncherWindow::closeEvent(QCloseEvent *event)
+{
+    if (devDialogPtr != nullptr)
+    {
+        devDialogPtr->close();
+        delete devDialogPtr;
+        devDialogPtr = nullptr;
+    }
+}
+
 void MainLauncherWindow::loadJavascriptBridge()
 {
     QWebEnginePage* currentPage = ui->webLauncherPage->page();
