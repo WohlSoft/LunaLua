@@ -972,6 +972,23 @@ void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
 	};
 }
 
+#include "../SMBXFileManager.h"
+
+extern void __stdcall LoadLevelHook(VB6StrPtr* path)
+{
+    std::wcout << L"Load Level: " << *path << std::endl;
+    SMBXLevelFileBase base;
+    base.ReadFile(static_cast<std::wstring>(*path));
+    
+    // native_loadLevel(reinterpret_cast<VB6StrPtr*>(path));
+
+    std::wcout << L"GM_LVLFILENAME_PTR: " << static_cast<std::wstring>(GM_LVLFILENAME_PTR) << std::endl
+        << L"GM_LVLNAME_PTR: " << static_cast<std::wstring>(GM_LVLNAME_PTR) << std::endl
+        << L"GM_FULLPATH: " << static_cast<std::wstring>(GM_FULLPATH) << std::endl
+        << L"GM_FULLDIR: " << static_cast<std::wstring>(GM_FULLDIR) << std::endl;
+
+}
+
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
     if (gSMBXHUDSettings.overworldHudState == WHUD_ALL){

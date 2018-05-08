@@ -10,8 +10,26 @@
 
 void InfiniteFlying(int player);
 
-std::wstring removeExtension(const std::wstring filename);
-std::string removeExtension(const std::string filename);
+template<typename Elem, typename Traits, typename Alloc>
+auto RemoveTail(const std::basic_string<Elem, Traits, Alloc>& filename, Elem tail)
+{
+    typedef std::basic_string<Elem, Traits, Alloc> tstring;
+    size_t lastdot = filename.find_first_of(tail);
+    if (lastdot == tstring::npos) return filename;
+    return filename.substr(0, lastdot);
+}
+
+inline auto RemoveExtension(const std::string& filename) 
+{
+    return RemoveTail(filename, '.');
+}
+inline auto RemoveExtension(const std::wstring& filename)
+{
+    return RemoveTail(filename, L'.');
+}
+
+
+
 BOOL FileExists(LPCTSTR szPath);
 BOOL DirectoryExists(LPCTSTR szPath);
 

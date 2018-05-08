@@ -167,6 +167,25 @@
     <ClInclude Include="Misc\Gui\GuiUtils.h" />
     <ClInclude Include="Misc\Gui\RichTextDialog.h" />
     <ClInclude Include="Misc\PGEEditorCmdSender.h" />
+    <ClInclude Include="libs\PGE_File_Formats\charsetconvert.h" />
+    <ClInclude Include="libs\PGE_File_Formats\ConvertUTF.h" />
+    <ClInclude Include="libs\PGE_File_Formats\CSVReader.h" />
+    <ClInclude Include="libs\PGE_File_Formats\CSVReaderPGE.h" />
+    <ClInclude Include="libs\PGE_File_Formats\CSVUtils.h" />
+    <ClInclude Include="libs\PGE_File_Formats\file_formats.h" />
+    <ClInclude Include="libs\PGE_File_Formats\file_strlist.h" />
+    <ClInclude Include="libs\PGE_File_Formats\lvl_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\meta_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\npc_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_globs.h" />
+    <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_sys.h" />
+    <ClInclude Include="libs\PGE_File_Formats\pge_x.h" />
+    <ClInclude Include="libs\PGE_File_Formats\pge_x_macro.h" />
+    <ClInclude Include="libs\PGE_File_Formats\save_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\smbx64.h" />
+    <ClInclude Include="libs\PGE_File_Formats\smbx64_cnf_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\smbx64_macro.h" />
+    <ClInclude Include="libs\PGE_File_Formats\wld_filedata.h" />
     <ClInclude Include="Misc\TestMode.h" />
     <ClInclude Include="Misc\TestModeMenu.h" />
     <ClInclude Include="Misc\UniPath.h" />
@@ -174,6 +193,7 @@
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="Rendering\SMBXImageCategories.h" />
+    <ClInclude Include="Misc\SMBXFileManager.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -315,6 +335,28 @@
     <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp" />
     <ClCompile Include="IPC\IPCPipeServer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF.c" />
+    <ClCompile Include="libs\PGE_File_Formats\file_formats.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rwopen.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvl.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvlx.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvl_38a.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_meta.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_npc_txt.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_sav.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_savx.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_smbx64_cnf.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wld.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wldx.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_strlist.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\lvl_filedata.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\npc_filedata.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\pge_file_lib_globs.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\pge_x.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\save_filedata.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\smbx64.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\smbx64_cnf_filedata.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\wld_filedata.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp" />
     <ClCompile Include="Misc\PGEEditorCmdSender.cpp" />
@@ -352,6 +394,7 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
+    <ClCompile Include="Misc\SMBXFileManager.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
@@ -481,9 +524,16 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Changelog.txt" />
+    <Text Include="libs\PGE_File_Formats\file_rw_lvl_38a.old.txt" />
+    <Text Include="libs\PGE_File_Formats\Readme.txt" />
     <Text Include="SMBXInternal\Reconstructed\about.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="LunaDll.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

@@ -43,6 +43,7 @@ struct startUpSettings{
     bool noGL;
     bool waitForIPC;
     volatile bool currentlyWaitingForIPC;
+    bool experimentalFileParser;
 };
 
 struct SMBXHUDSettings {
