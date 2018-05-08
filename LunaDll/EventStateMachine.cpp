@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "EventStateMachine.h"
 #include "Misc\RuntimeHook.h"
+#include "Rendering/GL/GLEngineProxy.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -72,22 +73,28 @@ void EventStateMachine::reset(void) {
 }
 
 void EventStateMachine::hookLevelLoop(void) {
-    // Check if we should pause
-    checkPause();
-
-    if (!gIsTestModePauseActive)
+    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_LEVEL))
     {
-        sendOnLoop();
+        // Check if we should pause
+        checkPause();
+
+        if (!gIsTestModePauseActive)
+        {
+            sendOnLoop();
+        }
     }
 }
 
 void EventStateMachine::hookWorldLoop(void) {
-    // Check if we should pause
-    checkPause();
-
-    if (!gIsTestModePauseActive)
+    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_WORLD))
     {
-        sendOnLoop();
+        // Check if we should pause
+        checkPause();
+
+        if (!gIsTestModePauseActive)
+        {
+            sendOnLoop();
+        }
     }
 }
 
@@ -157,12 +164,14 @@ void EventStateMachine::sendOnTickEnd(void) {
 }
 
 void EventStateMachine::sendOnDraw(void) {
+	GLEngineProxy::CheckRendererInit();
     sendSimpleLuaEvent("onDraw");
 
     m_onDrawEndReady = true;
 }
 
 void EventStateMachine::sendOnDrawEnd(void) {
+	GLEngineProxy::CheckRendererInit();
     m_onDrawEndReady = false;
 
     sendSimpleLuaEvent("onDrawEnd");

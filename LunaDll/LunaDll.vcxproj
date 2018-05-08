@@ -150,9 +150,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h" />
+    <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
     <ClInclude Include="Misc\SRect.h" />
+    <ClInclude Include="Rendering\AsyncGifRecorderImgs.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
     <ClInclude Include="Rendering\LunaImage.h" />
     <ClInclude Include="Rendering\Shaders\GLShaderVariableType.h" />
@@ -243,8 +246,6 @@
     <ClInclude Include="Minigames\CGUI\CGUI.h" />
     <ClInclude Include="CustomSprites\CSprite.h" />
     <ClInclude Include="CustomSprites\CSpriteManager.h" />
-    <ClInclude Include="DeathCounter\DeathCounter.h" />
-    <ClInclude Include="DeathCounter\DeathRecord.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Minigames\GameboyRPG.h" />
     <ClInclude Include="Misc\SHMemServer.h" />
@@ -262,7 +263,6 @@
     <ClInclude Include="LevelCodes\LevelCodes.h" />
     <ClInclude Include="libs\ini-reader\ini.h" />
     <ClInclude Include="libs\ini-reader\INIReader.h" />
-    <ClInclude Include="Logging\Logging.h" />
     <ClInclude Include="LuaMain\LuaHelper.h" />
     <ClInclude Include="LuaMain\LuaProxy.h" />
     <ClInclude Include="LuaMain\LunaLuaMain.h" />
@@ -299,6 +299,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
+    <ClCompile Include="Misc\LoadScreen.cpp" />
     <ClCompile Include="Misc\NpcIdExtender.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
@@ -400,15 +402,12 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySection.cpp" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyVBStr.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorld.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorldLevel.cpp" />
     <ClCompile Include="LuaMain\LuaSharedProxy.cpp" />
     <ClCompile Include="Minigames\CGUI\CGUIContainer.cpp" />
     <ClCompile Include="CustomSprites\CSprite.cpp" />
     <ClCompile Include="CustomSprites\CSpriteManager.cpp" />
-    <ClCompile Include="DeathCounter\DeathCounter.cpp" />
-    <ClCompile Include="DeathCounter\DeathRecord.cpp" />
     <ClCompile Include="LevelCodes\dlltestlvlCode.cpp" />
     <ClCompile Include="LevelCodes\Docopoper-AbstractAssault.lvl.cpp" />
     <ClCompile Include="LevelCodes\Docopoper-Calleoca.cpp" />
@@ -435,7 +434,6 @@
     <ClCompile Include="SMBXInternal\Level.cpp" />
     <ClCompile Include="libs\ini-reader\ini.c" />
     <ClCompile Include="libs\ini-reader\INIReader.cpp" />
-    <ClCompile Include="Logging\Logger.cpp" />
     <ClCompile Include="LuaMain\LuaHelper.cpp" />
     <ClCompile Include="LuaMain\LuaProxy.cpp" />
     <ClCompile Include="LuaMain\LunaLuaMain.cpp" />

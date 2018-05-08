@@ -19,7 +19,9 @@ public:
 	gl::GLint arrayCount() const;
 	gl::GLenum getType() const;
     std::string getName() const; // The name with array signature, if it is an array
+    const char* getNamePtr() const;
     std::string getRawName() const; // The name without any array signature
+    const char* getRawNamePtr() const;
     size_t getArrayDepth() const; // If it is 0, then it is not an array
 
 private:

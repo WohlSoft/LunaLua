@@ -21,8 +21,7 @@ std::string ErrorReport::generateStackTrace(CONTEXT* context)
 void ErrorReport::writeErrorLog(const std::string &text)
 {
     std::string smbxPath = gAppPathUTF8;
-    smbxPath += "\\";
-    smbxPath += "ERROR_";
+    smbxPath += "\\logs\\ERROR_";
     smbxPath += generateTimestampForFilename();
     smbxPath += ".txt";
 

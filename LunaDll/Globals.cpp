@@ -3,9 +3,7 @@
 #include <cctype>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
-#include "DeathCounter/DeathCounter.h"
 #include "Shlwapi.h"
-#include "Logging/Logging.h"
 #include "UserSaves/UserSaving.h"
 #include "GlobalFuncs.h"
 
@@ -13,7 +11,6 @@ HINSTANCE gHInstance;
 
 // Global settings
 bool gLunaEnabled;
-bool gShowDemoCounter;
 bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
@@ -24,6 +21,7 @@ SMBXHUDSettings gSMBXHUDSettings = {
     WHUD_ALL, // overworldHudControlFlag
     false     // skipStarCount
 };
+bool gRenderBGOFlag = true;
 
 // Global variables
 int	gFrames;
@@ -55,11 +53,7 @@ bool gIsTestModePauseActive;
 // Global objs
 Renderer gLunaRender;
 
-DeathCounter gDeathCounter;
-
 AutocodeManager gAutoMan;
-
-Logger gLogger;
 
 CSpriteManager gSpriteMan;
 

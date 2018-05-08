@@ -117,7 +117,7 @@ luabind::object luabindResolveFile(const std::string& file, lua_State* L){
     std::vector<std::wstring> paths = {
         getCustomFolderPath(),
         GM_FULLDIR,
-        gAppPathWCHAR + L"\\LuaScriptsLib\\",
+        gAppPathWCHAR + L"\\scripts\\",
         gAppPathWCHAR + L"\\"
     };
 

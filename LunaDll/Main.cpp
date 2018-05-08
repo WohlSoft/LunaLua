@@ -109,11 +109,8 @@ int OnLvlLoad() {
 	// Restore some code the hook overwrote
 	*(DWORD*)0x00B25958 = 0;
 
-    // TODO: Figure out why early GL init crashes when using the launcher! In
-    //       the meantime, disable early GL init again... :/
-    //
     // Make sure we init the renderer before we start LunaLua when entering levels
-    //GLEngineProxy::CheckRendererInit();
+    GLEngineProxy::CheckRendererInit();
 
     ResetLunaModule();
 
@@ -179,9 +176,6 @@ int OnLvlLoad() {
 		// Init some stuff
 		InitLevel();	
 		gAutoMan.m_Hearts = 2;	
-
-		// Recount deaths
-		gDeathCounter.Recount();
 	}
 
     //PGE DBG STUFF
@@ -215,8 +209,7 @@ int TestFunc()
 		gAutoMan.DoEvents(false);
 
 		// Update some stuff
-		gFrames++;	
-		gDeathCounter.UpdateDeaths(true);
+        gFrames++;
 		gSavedVarBank.SaveIfNeeded();
 
 		// Run any framecode
@@ -229,8 +222,6 @@ int TestFunc()
 }
 
 void OnLevelHUDDraw(int cameraIdx) {
-	if(gShowDemoCounter)
-		gDeathCounter.Draw();
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);

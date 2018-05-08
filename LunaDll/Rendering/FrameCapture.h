@@ -6,11 +6,16 @@ class GLFramebuffer;
 
 class CaptureBuffer : public std::enable_shared_from_this<CaptureBuffer> {
 public:
-    CaptureBuffer(int w, int h);
+    CaptureBuffer(int w, int h, bool nonskippable);
     ~CaptureBuffer();
-    void captureAt(double priority);
+    void CaptureAt(double priority);
+    void Clear(double priority);
+
+    // Only call this from the GL thread
+    void EnsureFramebufferExists();
 public:
     int mW, mH;
+	bool mNonskippable;
     GLFramebuffer* mFramebuffer;
 };
 

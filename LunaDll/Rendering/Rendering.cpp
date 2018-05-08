@@ -68,7 +68,6 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
     // Create and store the image resource
     std::shared_ptr<LunaImage> pNewbox = LunaImage::fromFile(full_path.c_str());
     if (!pNewbox) {
-        gLogger.Log(L"LunaImage image load failed", LOG_STD);
         return false;
     }
 
@@ -123,7 +122,6 @@ std::vector<std::shared_ptr<LunaImage>> Renderer::LoadAnimatedBitmapResource(std
         std::shared_ptr<LunaImage> pNewbox = std::make_shared<LunaImage>(nextBitmap, GetScreenDC());
         pNewbox->m_Filename = filename;
         if (!pNewbox->ImageLoaded() == false) {
-            gLogger.Log(L"BMPBox image load failed", LOG_STD);
             continue;
         }
         bitmapList.push_back(pNewbox);

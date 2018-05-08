@@ -27,8 +27,13 @@ public:
 
     virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const;
     virtual void BindTexture() const;
-
+    virtual unsigned int GetTexId() const {
+        if (valid && (subSprites.size() > 0))
+            return subSprites[0]->GetTexId();
+        return 0;
+    }
     virtual bool IsValid() const { return valid; }
+	virtual uint32_t GetSizeBytes() const;
 private:
     bool valid;
     int32_t segsWide;

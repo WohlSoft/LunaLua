@@ -51,9 +51,19 @@ std::string GLShaderVariableInfo::getName() const
     return m_name;
 }
 
+const char* GLShaderVariableInfo::getNamePtr() const
+{
+    return m_name.c_str();
+}
+
 std::string GLShaderVariableInfo::getRawName() const
 {
     return m_rawName;
+}
+
+const char* GLShaderVariableInfo::getRawNamePtr() const
+{
+    return m_rawName.c_str();
 }
 
 size_t GLShaderVariableInfo::getArrayDepth() const

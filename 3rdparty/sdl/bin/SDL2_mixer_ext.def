@@ -16,6 +16,7 @@ MIX_ADLMIDI_setSetDefaults
 MIX_ADLMIDI_setTremolo
 MIX_ADLMIDI_setVibrato
 MIX_ADLMIDI_setVolumeModel
+MIX_OPNMIDI_setCustomBankFile
 MIX_SetLockMIDIArgs
 MIX_SetMidiDevice
 MIX_Timidity_addToPathList
@@ -25,6 +26,7 @@ Mix_CloseAudio
 Mix_EachSoundFont
 Mix_ExpireChannel
 Mix_FadeInChannelTimed
+Mix_FadeInChannelTimedVolume
 Mix_FadeInMusic
 Mix_FadeInMusicPos
 Mix_FadeOutChannel
@@ -41,8 +43,13 @@ Mix_GetMusicArtistTag
 Mix_GetMusicCopyrightTag
 Mix_GetMusicDecoder
 Mix_GetMusicHookData
+Mix_GetMusicLoopEndTime
+Mix_GetMusicLoopLengthTime
+Mix_GetMusicLoopStartTime
+Mix_GetMusicPosition
 Mix_GetMusicTitle
 Mix_GetMusicTitleTag
+Mix_GetMusicTotalTime
 Mix_GetMusicType
 Mix_GetNumChunkDecoders
 Mix_GetNumMusicDecoders
@@ -74,6 +81,7 @@ Mix_PauseMusic
 Mix_Paused
 Mix_PausedMusic
 Mix_PlayChannelTimed
+Mix_PlayChannelTimedVolume
 Mix_PlayMusic
 Mix_Playing
 Mix_PlayingMusic

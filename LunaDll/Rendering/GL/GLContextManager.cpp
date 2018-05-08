@@ -130,11 +130,13 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 	glcompat::SetupContext();
 
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
     glColor3f(1, 1, 1);
     glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
 
     // Prefer v-sync off (but will work fine if forced on too)
     typedef BOOL(APIENTRY * PFNWGLSWAPINTERVALEXTPROC)(int);
@@ -154,7 +156,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 bool GLContextManager::InitFramebuffer() {
     try
     {
-        mFramebuffer = new GLFramebuffer(800, 600);
+        mFramebuffer = new GLFramebuffer(800, 600, false);
     }
     catch(...)
     {
@@ -166,7 +168,8 @@ bool GLContextManager::InitFramebuffer() {
 
 bool GLContextManager::InitProjectionAndState() {
     if (mFramebuffer == nullptr) return false;
-    GLDraw::Texture& tex = mFramebuffer->AsTexture();
+    
+    const GLDraw::Texture& tex = mFramebuffer->AsTexture();
 
     // Set projection
     glMatrixMode(GL_MODELVIEW);
@@ -178,7 +181,10 @@ bool GLContextManager::InitProjectionAndState() {
     GLERRORCHECK();
     glDisable(GL_LIGHTING);
     GLERRORCHECK();
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    GLERRORCHECK();
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
     GLERRORCHECK();
     glDisable(GL_CULL_FACE);
     GLERRORCHECK();

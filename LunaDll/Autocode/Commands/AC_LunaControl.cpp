@@ -6,10 +6,6 @@ void Autocode::LunaControl(LunaControlAct act, int val) {
 	switch(act) {
 
 	case LCA_DemoCounter:
-		if(val == 1)
-			gShowDemoCounter = true;
-		else
-			gShowDemoCounter = false;
 		break;
 
 	case LCA_SMBXHUD:

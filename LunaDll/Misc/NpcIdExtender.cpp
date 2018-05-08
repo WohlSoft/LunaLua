@@ -4,6 +4,7 @@
 #include "AsmPatch.h"
 #include "NpcIdExtender.h"
 #include "../SMBXInternal/NPCs.h"
+#include "../SMBXInternal/BGOs.h"
 
 class ResizableGameArray
 {
@@ -386,3 +387,51 @@ void PatchNpcIdLimit()
     currentNpcIdLimit = newLimit;
 }
 
+static const uint32_t array_b25b54_patches[] = { 0x8c27bb, 0x99adc2, 0x9a74a8 };
+static ResizableGameArray array_b25b54_obj((void**)0xb25b54, 201, 2, array_b25b54_patches);
+static const uint32_t array_b2be30_patches[] = { 0x90f690, 0x90f832, 0x90fa83, 0x90fe23, 0x910060, 0x911140, 0x911379, 0x9115b7, 0x91193c, 0x911b79, 0x911dbb, 0x912177, 0x9123b0, 0x9125ee, 0x9293dc, 0x929615, 0x929be6, 0x929e23, 0x9460f8, 0x94633a, 0x946577, 0x9fdefe, 0xac5a72, 0xad59b6, 0xae664a, 0xae6695, 0xae6731, 0xae6890, 0xaf9f9d };
+static ResizableGameArray array_b2be30_obj((void**)0xb2be30, 200, 2, array_b2be30_patches);
+static const uint32_t array_b2be4c_patches[] = { 0x8d9dcc, 0x90f659, 0x90f7fb, 0x90fa4c, 0x90fd47, 0x90fdec, 0x90ff84, 0x910029, 0x9101fd, 0x9102a2, 0x911064, 0x911109, 0x91129d, 0x911342, 0x9114db, 0x911580, 0x911860, 0x911905, 0x911a9d, 0x911b42, 0x911cdf, 0x911d84, 0x91209b, 0x912140, 0x9122d4, 0x912379, 0x912512, 0x9125b7, 0x9290c2, 0x929167, 0x929300, 0x9293a5, 0x929539, 0x9295de, 0x9298c8, 0x92996d, 0x929b0a, 0x929baf, 0x929d47, 0x929dec, 0x94601c, 0x9460c1, 0x94625e, 0x946303, 0x94649b, 0x946540, 0x9fdf2f, 0xac5afa, 0xae665c, 0xae6683, 0xae6743, 0xae687e, 0xafa073 };
+static ResizableGameArray array_b2be4c_obj((void**)0xb2be4c, 200, 2, array_b2be4c_patches);
+static const uint32_t array_b2cc34_patches[] = { 0xacf152, 0xad5540, 0xad567a, 0xadbcdd };
+static ResizableGameArray array_b2cc34_obj((void**)0xb2cc34, 200, 2, array_b2cc34_patches);
+static const uint32_t array_b2ccd8_patches[] = { 0xac59e4, 0xac5ac9, 0xacf563, 0xacf5d1, 0xacf5e3, 0xad5acc, 0xadc0ee, 0xadc15c, 0xadc16e };
+static ResizableGameArray array_b2ccd8_obj((void**)0xb2ccd8, 200, 2, array_b2ccd8_patches);
+static const uint32_t array_b2ccf4_patches[] = { 0x8d9d98, 0x9102d9, 0x92919e, 0x9299a4, 0xac5816, 0xac5a41, 0xacf453, 0xacf592, 0xacf5a4, 0xad5972, 0xad59a4, 0xadbfde, 0xadc11d, 0xadc12f };
+static ResizableGameArray array_b2ccf4_obj((void**)0xb2ccf4, 200, 2, array_b2ccf4_patches);
+static const uint32_t array_GM_GFX_BACKGROUND_MASK_PTR_patches[] = { 0x90f622, 0x90fdb5, 0x9110d2, 0x9118ce, 0x912109, 0x92936e, 0x929b78, 0x9462cc, 0xac62d0, 0xac634e, 0xacbcc9, 0xacf85e, 0xad5e86, 0xadc3e7 };
+static ResizableGameArray array_GM_GFX_BACKGROUND_MASK_PTR_obj((void**)0xb2cc6c, 200, 4, array_GM_GFX_BACKGROUND_MASK_PTR_patches);
+static const uint32_t array_GM_GFX_BACKGROUND_PTR_patches[] = { 0x90f7c4, 0x90fa15, 0x90fff2, 0x91026b, 0x91130b, 0x911549, 0x911b0b, 0x911d4d, 0x912342, 0x912580, 0x929130, 0x9295a7, 0x929936, 0x929db5, 0x94608a, 0x946509, 0xac5c04, 0xac5c81, 0xacbbcf, 0xacbc14, 0xacf316, 0xad5b10, 0xadbea1, 0xae68a5 };
+static ResizableGameArray array_GM_GFX_BACKGROUND_PTR_obj((void**)0xb2cc50, 200, 4, array_GM_GFX_BACKGROUND_PTR_patches);
+static const uint32_t array_IPictureDisp_Background_patches[] = { 0xac561d, 0xac56a6, 0xac5873, 0xac5c50, 0xacbc5e, 0xacf2b4, 0xacf304, 0xacf374, 0xacf482, 0xad5834, 0xad588f, 0xad59e9, 0xad5afe, 0xadbe3f, 0xadbe8f, 0xadbeff, 0xadc00d };
+static ResizableGameArray array_IPictureDisp_Background_obj((void**)0xb2cc94, 200, 4, array_IPictureDisp_Background_patches);
+static const uint32_t array_IPictureDisp_Background_Mask_patches[] = { 0xac6196, 0xac631d, 0xacbd13, 0xacf7ec, 0xacf846, 0xad5e19, 0xad5e74, 0xadc375, 0xadc3cf };
+static ResizableGameArray array_IPictureDisp_Background_Mask_obj((void**)0xb2ccbc, 200, 4, array_IPictureDisp_Background_Mask_patches);
+static const uint32_t array_unkBGOSetting_patches[] = { 0x928fe0, 0xa99451 };
+static ResizableGameArray array_unkBGOSetting_obj((void**)0xb2be14, 201, 2, array_unkBGOSetting_patches);
+
+static uint32_t currentBgoIdLimit = 200;
+
+uint32_t GetBgoIdLimit()
+{
+	return currentBgoIdLimit;
+}
+
+void PatchBgoIdLimit()
+{
+	uint32_t newLimit = SMBX_BGO::MAX_ID;
+
+	array_b25b54_obj.Patch(newLimit + 1);
+	array_b2be30_obj.Patch(newLimit);
+	array_b2be4c_obj.Patch(newLimit);
+	array_b2cc34_obj.Patch(newLimit);
+	array_b2ccd8_obj.Patch(newLimit);
+	array_b2ccf4_obj.Patch(newLimit);
+	array_GM_GFX_BACKGROUND_MASK_PTR_obj.Patch(newLimit);
+	array_GM_GFX_BACKGROUND_PTR_obj.Patch(newLimit);
+	array_IPictureDisp_Background_obj.Patch(newLimit);
+	array_IPictureDisp_Background_Mask_obj.Patch(newLimit);
+	array_unkBGOSetting_obj.Patch(newLimit+1);
+
+	currentBgoIdLimit = newLimit;
+}

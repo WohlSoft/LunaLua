@@ -4,7 +4,6 @@
 #include "../Misc/MiscFuncs.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
-#include "../Logging/Logging.h"
 #include "../Utils/EncodeUtils.h"
 
 
@@ -184,23 +183,6 @@ void AutocodeManager::Parse(wifstream* code_file, bool add_to_globals) {
 			// Integer pass
 			int bhits = swscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
 
-
-			/*if(PARSEDEBUG) {
-			gLogger.Log(L"Parsed on decimal pass " + wstring(wbuf) + L" \\ ", LOG_STD);
-			gLogger.Log(to_wstring((long double)target), LOG_Space);
-			gLogger.Log(to_wstring((long double)param1), LOG_Space);
-			gLogger.Log(to_wstring((long double)param2), LOG_Space);
-			gLogger.Log(to_wstring((long double)param3), LOG_Space);
-			gLogger.Log(to_wstring((long double)length), LOG_Space | LOG_NewlineAfter);
-
-			gLogger.Log(L"Parsed on integer pass " + wstring(wbuf) + L" \\ ", LOG_STD);
-			gLogger.Log(to_wstring((long double)btarget), LOG_Space);
-			gLogger.Log(to_wstring((long double)bparam1), LOG_Space);
-			gLogger.Log(to_wstring((long double)bparam2), LOG_Space);
-			gLogger.Log(to_wstring((long double)bparam3), LOG_Space);
-			gLogger.Log(to_wstring((long double)blength), LOG_Space | LOG_NewlineAfter);
-			}*/
-
 			// Check for formatting failure
 			if(hits < 3 && bhits < 3) {
 				continue;
@@ -209,23 +191,18 @@ void AutocodeManager::Parse(wifstream* code_file, bool add_to_globals) {
 			// Check for hexadecimal inputs			
 			if(true) {
 				if(target == 0 && btarget != 0){
-					//gLogger.Log(L"Converted " + to_wstring((long double)target) + L" to " + to_wstring((long double)btarget), LOG_STD);
 					target = btarget;					
 				}
 				if(param1 == 0 && bparam1 != 0) {					
-					//gLogger.Log(L"Converted " + to_wstring((long double)param1) + L" to " + to_wstring((long double)bparam1), LOG_STD);
 					param1 = bparam1;
 				}
 				if(param2 == 0 && bparam2 != 0) {					
-					//gLogger.Log(L"Converted " + to_wstring((long double)param2) + L" to " + to_wstring((long double)bparam2), LOG_STD);
 					param2 = bparam2;
 				}
 				if(param3 == 0 && bparam3 != 0) {					
-					//gLogger.Log(L"Converted " + to_wstring((long double)param3) + L" to " + to_wstring((long double)bparam3), LOG_STD);
 					param3 = bparam3;
 				}
 				if(length == 0 && blength != 0) {					
-					//gLogger.Log(L"Converted " + to_wstring((long double)length) + L" to " + to_wstring((long double)blength), LOG_STD);
 					length = blength;
 				}
 			}

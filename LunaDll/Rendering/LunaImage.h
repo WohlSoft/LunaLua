@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <mutex>
 #include <memory>
+#include <atomic>
+
+#include "../Misc/ResourceFileMapper.h"
 
 // Forward declerations
 struct HDC__;
@@ -15,8 +18,13 @@ class GLSprite;
 class LunaImage : public std::enable_shared_from_this<LunaImage>
 {
 public:
+	static std::atomic<uint32_t> totalRawMem;
+	static std::atomic<uint32_t> totalCompMem;
+
+public:
+    static std::shared_ptr<LunaImage> fromData(int width, int height, const uint8_t* data);
     static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
-    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename);
+    static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, const ResourceFileInfo* metadata=nullptr);
 public:
     static void holdCachedImages();
     static void releaseCachedImages();
@@ -29,9 +37,15 @@ private:
     uint32_t   w;    // Image width
     uint32_t   h;    // Image height
     HBITMAP    hbmp; // Cached HBITMAP if this
+    ResourceFileInfo fileMetadata;
 private:
     // Pointer to an associated mask image
     std::shared_ptr<LunaImage> mask;
+
+	void* compressedDataPtr; // Pointer to compressed PNG data
+	uint32_t compressedDataSize;
+	bool mustKeepData;
+	bool isPngImage;
 private:
     void clearInternal();
     void load(const wchar_t* file);
@@ -43,15 +57,22 @@ public:
 
         data(nullptr), w(0), h(0),
         hbmp(nullptr),
-        mask(nullptr)
+        mask(nullptr),
+		compressedDataPtr(nullptr),
+		compressedDataSize(0),
+		mustKeepData(false),
+		isPngImage(false)
     {
     }
     virtual ~LunaImage();
     
     HBITMAP asHBITMAP();
     inline uint64_t getUID() { return uid; }
-    inline void* getDataPtr() { return data; }
+	void* getDataPtr();
     uint32_t getDataPtrAsInt();
+
+	void notifyTextureified();
+
     inline uint32_t getW() { return w; }
     inline uint32_t getH() { return h; }
     inline void lock() { mut.lock(); }

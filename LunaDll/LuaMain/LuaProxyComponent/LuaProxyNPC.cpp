@@ -178,8 +178,8 @@ LuaProxy::NPC LuaProxy::NPC::spawn(short npcid, double x, double y, short sectio
 
     npc->spawnMomentum.x = x;
     npc->spawnMomentum.y = y;
-    npc->spawnMomentum.height = gfxHeight;
-    npc->spawnMomentum.width = gfxWidth;
+    npc->spawnMomentum.height = height;
+    npc->spawnMomentum.width = width;
     npc->spawnMomentum.speedX = 0.0;
     npc->spawnMomentum.speedY = 0.0;
 
@@ -376,13 +376,13 @@ luabind::object LuaProxy::NPC::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_
 	return LuaProxy::mem((int)ptr, ftype, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::attachedLayerName(lua_State* L) const
+std::string LuaProxy::NPC::attachedLayerName(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->attachedLayerName.ptr);
+	return thisnpc->attachedLayerName;
 }
 
 void LuaProxy::NPC::setAttachedLayerName(const luabind::object &value, lua_State* L)
@@ -410,13 +410,13 @@ void LuaProxy::NPC::setAttachedLayerObj(const LuaProxy::Layer &value, lua_State 
 	thisnpc->attachedLayerName = ::Layer::Get(value.layerIndex())->ptLayerName;
 }
 
-LuaProxy::VBStr LuaProxy::NPC::activateEventName(lua_State* L) const
+std::string LuaProxy::NPC::activateEventName(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->activateEventLayerName.ptr);
+	return thisnpc->activateEventLayerName;
 }
 
 void LuaProxy::NPC::setActivateEventName(const luabind::object &value, lua_State* L)
@@ -427,13 +427,13 @@ void LuaProxy::NPC::setActivateEventName(const luabind::object &value, lua_State
 	LuaHelper::assignVB6StrPtr(&thisnpc->activateEventLayerName, value, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::deathEventName(lua_State* L) const
+std::string LuaProxy::NPC::deathEventName(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->deathEventName.ptr);
+	return thisnpc->deathEventName;
 }
 
 void LuaProxy::NPC::setDeathEventName(const luabind::object &value, lua_State* L)
@@ -444,13 +444,13 @@ void LuaProxy::NPC::setDeathEventName(const luabind::object &value, lua_State* L
 	LuaHelper::assignVB6StrPtr(&thisnpc->deathEventName, value, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::talkEventName(lua_State* L) const
+std::string LuaProxy::NPC::talkEventName(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->talkEventName.ptr);
+	return thisnpc->talkEventName;
 }
 
 void LuaProxy::NPC::setTalkEventName(const luabind::object &value, lua_State* L)
@@ -461,13 +461,13 @@ void LuaProxy::NPC::setTalkEventName(const luabind::object &value, lua_State* L)
 	LuaHelper::assignVB6StrPtr(&thisnpc->talkEventName, value, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::noMoreObjInLayer(lua_State* L) const
+std::string LuaProxy::NPC::noMoreObjInLayer(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->noMoreObjInLayerEventName.ptr);
+	return thisnpc->noMoreObjInLayerEventName;
 }
 
 void LuaProxy::NPC::setNoMoreObjInLayer(const luabind::object &value, lua_State* L)
@@ -478,13 +478,13 @@ void LuaProxy::NPC::setNoMoreObjInLayer(const luabind::object &value, lua_State*
 	LuaHelper::assignVB6StrPtr(&thisnpc->noMoreObjInLayerEventName, value, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::msg(lua_State* L) const
+std::string LuaProxy::NPC::msg(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->talkMsg.ptr);
+	return thisnpc->talkMsg;
 }
 
 void LuaProxy::NPC::setMsg(const luabind::object &value, lua_State* L)
@@ -495,13 +495,13 @@ void LuaProxy::NPC::setMsg(const luabind::object &value, lua_State* L)
 	LuaHelper::assignVB6StrPtr(&thisnpc->talkMsg, value, L);
 }
 
-LuaProxy::VBStr LuaProxy::NPC::layerName(lua_State* L) const
+std::string LuaProxy::NPC::layerName(lua_State* L) const
 {
 	if(!isValid_throw(L))
-		return VBStr((wchar_t*)0);
+		return "";
 
 	NPCMOB* thisnpc = ::NPC::Get(m_index);
-	return VBStr(thisnpc->layerName.ptr);
+	return thisnpc->layerName;
 }
 
 void LuaProxy::NPC::setLayerName(const luabind::object &value, lua_State* L)

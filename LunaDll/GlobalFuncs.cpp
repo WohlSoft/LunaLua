@@ -97,9 +97,7 @@ void removeFilePathA(char*path, int length)
 void ResetLunaModule() 
 {
     gLunaEnabled = true;
-    gShowDemoCounter = false;
     gPrintErrorsToScreen = true;
-    gLogger.m_Enabled = false;
     gIsOverworld = false;
 
     gSMBXHUDSettings.skip = false;
@@ -224,11 +222,6 @@ void InitGlobals()
 	gpScreenBits = 0;
 
 	ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
-
-	// Try to activate death counter, and disable it if there's some problem
-	gDeathCounter.TryLoadStats();
-	if(gDeathCounter.mStatFileOK == false)
-		gDeathCounter.mEnabled = false;
 
 	/// Init autocode manager	
 

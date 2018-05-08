@@ -9,9 +9,7 @@
 #endif
 #include "LevelCodes/LevelCodes.h"
 #include "Rendering/Rendering.h"
-#include "DeathCounter/DeathCounter.h"
 #include "Autocode/AutocodeManager.h"
-#include "Logging/Logging.h"
 #include "CustomSprites/CSpriteManager.h"
 #include "CellManager/CellManager.h"
 #include "UserSaves/UserSaving.h"
@@ -56,13 +54,13 @@ extern HINSTANCE	gHInstance;
 
 /// Global settings
 extern bool            gLunaEnabled;
-extern bool            gShowDemoCounter;
 extern bool            gPrintErrorsToScreen;
 extern bool            gIsOverworld;
 extern bool            gHook_SkipTestMsgBox;
 extern bool            gAutostartRan;
 extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
+extern bool            gRenderBGOFlag;
 
 extern startUpSettings gStartupSettings;
 
@@ -104,10 +102,8 @@ extern LvlEnum	gLevelEnum;
 
 // Misc
 extern Renderer				gLunaRender;
-extern DeathCounter			gDeathCounter;
 extern AutocodeManager		gAutoMan;
 extern CSpriteManager		gSpriteMan;
-extern Logger				gLogger;
 extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;

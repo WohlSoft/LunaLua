@@ -50,6 +50,8 @@ public:
 
     void setWarning(const std::string& str);
 
+    LuaLunaType getType() const { return m_type; }
+
     template<typename... Args>
     bool callLuaFunction(Args... args){
         if (!isValid())

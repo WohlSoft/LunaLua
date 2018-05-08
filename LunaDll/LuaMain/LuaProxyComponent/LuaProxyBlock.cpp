@@ -303,14 +303,12 @@ int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
 	return ::Blocks::TestCollision(tarPlayer, tarBlock);
 }
 
-LuaProxy::VBStr LuaProxy::Block::layerName() const
+std::string LuaProxy::Block::layerName() const
 {
 	if(!isValid())
-		return VBStr((wchar_t*)0);
+		return "";
 
-	::Block* thisblock = ::Blocks::Get(m_index);
-	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
-	return VBStr(ptr);
+	return ::Blocks::Get(m_index)->pLayerName;
 }
 
 luabind::object LuaProxy::Block::layerObj(lua_State *L) const

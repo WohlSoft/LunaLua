@@ -4,10 +4,12 @@
 using namespace gl;
 using namespace glcompat;
 
-GLFramebuffer::GLFramebuffer(int w, int h) :
+GLFramebuffer::GLFramebuffer(int w, int h, bool haveAlpha) :
     mFB(0), mDepthRB(0),
     mBufTex(0, w, h)
 {
+    GLenum glFormat = haveAlpha ? GL_RGBA : GL_RGB;
+
     // Set up framebuffer object
     glGenFramebuffersANY(1, &mFB);
     GLERRORCHECK();
@@ -18,7 +20,7 @@ GLFramebuffer::GLFramebuffer(int w, int h) :
     GLERRORCHECK();
     g_GLDraw.BindTexture(&mBufTex);
     GLERRORCHECK();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBufTex.pw, mBufTex.ph, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, glFormat, mBufTex.pw, mBufTex.ph, 0, glFormat, GL_UNSIGNED_BYTE, NULL);
     GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     GLERRORCHECK();
@@ -48,7 +50,16 @@ GLFramebuffer::GLFramebuffer(int w, int h) :
     }
 
     // Clear the new framebuffer
-    Clear();
+    if (haveAlpha)
+    {
+        static const GLclampf colorTrans[] = { 0.0, 0.0, 0.0, 0.0 };
+        Clear(colorTrans);
+    }
+    else
+    {
+        static const GLclampf colorBlack[] = { 0.0, 0.0, 0.0, 1.0 };
+        Clear(colorBlack);
+    }
 }
 
 GLFramebuffer::~GLFramebuffer()
@@ -101,6 +112,12 @@ void GLFramebuffer::Bind()
 
 void GLFramebuffer::Clear()
 {
+    static const GLclampf colorBlack[] = { 0.0, 0.0, 0.0, 1.0 };
+    Clear(colorBlack);
+}
+
+void GLFramebuffer::Clear(const GLclampf color[4])
+{
     GLFramebuffer* oldFB = g_GLContextManager.GetCurrentFB();
 
     if (oldFB != this)
@@ -111,7 +128,8 @@ void GLFramebuffer::Clear()
     // Bind framebuffer
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
     GLERRORCHECK();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(color[0], color[1], color[2], color[3]);
+    glClearDepth(100.0f);
     GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();

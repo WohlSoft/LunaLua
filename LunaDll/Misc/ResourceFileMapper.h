@@ -34,7 +34,9 @@ static inline bool operator!=(const ResourceFileInfo& lhs, const ResourceFileInf
     return !(lhs == rhs);
 }
 
+ResourceFileInfo GetResourceFileInfo(const std::wstring& filePath);
 ResourceFileInfo GetResourceFileInfo(const std::wstring& searchPath, const std::wstring& baseName, const std::wstring& fileExt);
+ResourceFileInfo GetResourceFileInfo(const std::wstring& filePath, const std::wstring& fileExt);
 void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map<std::wstring, ResourceFileInfo>& outData);
 
 #endif

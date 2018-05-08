@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <memory>
+#include <queue>
 #include "../../Misc/ThreadedCmdQueue.h"
 #include "GLDraw.h"
 #include "GLEngineCmds.h"
@@ -21,6 +22,9 @@ private:
     bool mSkipFrame;
     bool mIsDirty; // FIXME: This is currently due to a Deadlock because of the destructor of the BMPBox-Cache @ BMPBox.cpp/loadShared/basegameImageCache
     
+	bool mNextEndFrameIsSkippable;
+	std::queue<bool> mQueuedFrameSkippability;
+
 public:
     GLEngine mInternalGLEngine;
 protected:

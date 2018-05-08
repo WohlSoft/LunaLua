@@ -5,6 +5,7 @@
 #include "GLTextureStore.h"
 #include "GLContextManager.h"
 #include "../Shaders/GLShader.h"
+#include "../../LuaMain/LuaProxyFFIGraphics.h"
 
 using namespace gl;
 using namespace glcompat;
@@ -125,11 +126,27 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
     const GLDraw::Texture* tex = NULL;
     const GLSprite* sprite = NULL;
-    if (mImg) {
+    if (mImg)
+    {
         sprite = g_GLTextureStore.SpriteFromLunaImage(mImg);
     }
-    else if (mCapBuff) {
-        tex = &mCapBuff->mFramebuffer->AsTexture();
+    else if (mCapBuff)
+    {
+        mCapBuff->EnsureFramebufferExists();
+        if (mCapBuff->mFramebuffer)
+        {
+            tex = &mCapBuff->mFramebuffer->AsTexture();
+        }
+    }
+
+    // Render Target
+    if (mTarget)
+    {
+        mTarget->EnsureFramebufferExists();
+        if (mTarget->mFramebuffer != nullptr)
+        {
+            mTarget->mFramebuffer->Bind();
+        }
     }
 
     glBlendEquationANY(GL_FUNC_ADD);
@@ -137,20 +154,9 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
 
-    if (sprite != nullptr)
-    {
-        sprite->BindTexture();
-    }
-    else if (tex != nullptr)
-    {
-        g_GLDraw.BindTexture(tex);
-    }
-    else
-    {
-        g_GLDraw.UnbindTexture();
-    }
-
     if (mShader) {
+        mShader->defaultSampler(g_GLDraw.GetCurrentTexName());
+
         mShader->bind();
         GLERRORCHECK();
         
@@ -162,6 +168,19 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
     
+	if (sprite != nullptr)
+	{
+		sprite->BindTexture();
+	}
+	else if (tex != nullptr)
+	{
+		g_GLDraw.BindTexture(tex);
+	}
+	else
+	{
+		g_GLDraw.UnbindTexture();
+	}
+
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
 
@@ -176,18 +195,23 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     // For scene coordinates, translate appropriately
-    if (mSceneCoords) {
-        double cameraX, cameraY;
-        glEngine.GetCamera(cameraX, cameraY);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glTranslatef(static_cast<GLfloat>(-cameraX - 0.5), static_cast<GLfloat>(-cameraY - 0.5), 0.0f);
+	if (mSceneCoords) {
+		double cameraX, cameraY;
+		glEngine.GetCamera(cameraX, cameraY);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+
+		if ((mType == GL_LINE) || (mType == GL_LINES) || (mType == GL_LINE_LOOP) || (mType == GL_LINE_STRIP)) {
+			glTranslatef(static_cast<GLfloat>(-cameraX - 0.325), static_cast<GLfloat>(-cameraY - 0.325), 0.0f);
+		} else {
+			glTranslatef(static_cast<GLfloat>(-cameraX), static_cast<GLfloat>(-cameraY), 0.0f);
+		}
+        
     }
 
     // If depth testing is enabled, use it
     if (mDepthTest) {
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
+		// Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     glVertexPointer(2, GL_FLOAT, 0, mVert);
@@ -221,8 +245,7 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mDepthTest) {
-        glDepthMask(GL_FALSE);
-        glDisable(GL_DEPTH_TEST);
+		// Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     if (mSceneCoords) {
@@ -247,9 +270,41 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         mShader->unbind();
         GLERRORCHECK();
     }
+
+    // Render Target Time
+    if (mTarget)
+    {
+        if (mTarget->mFramebuffer != nullptr)
+        {
+            // Bind old framebuffer
+            g_GLContextManager.BindFramebuffer();
+        }
+    }
 }
 
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
     glEngine.SetCamera(mX, mY);
+}
+
+void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
+{
+    if (!g_GLContextManager.IsInitialized()) return;
+    if (!mShaderObj) return;
+    if (mShaderObj->mError) return;
+
+    mShaderObj->mShader = std::make_shared<GLShader>(mShaderObj->mVertexSource, mShaderObj->mFragmentSource);
+
+    if (!mShaderObj->mShader->isValid())
+    {
+        // Failed to compile...
+        mShaderObj->mError = true;
+        mShaderObj->mErrorString = mShaderObj->mShader->getLastErrorMsg();
+        mShaderObj->mShader = nullptr;
+        return;
+    }
+
+    // Get attribute/uniform metadata
+    mShaderObj->mAttributeInfo = mShaderObj->mShader->getAllAttributes();
+    mShaderObj->mUniformInfo = mShaderObj->mShader->getAllUniforms();
 }

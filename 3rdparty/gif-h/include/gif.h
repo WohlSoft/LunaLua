@@ -71,14 +71,16 @@ struct GifPalette
     // k-d tree over RGB space, organized in heap fashion
     // i.e. left child of node i is node i*2, right child is node i*2+1
     // nodes 256-511 are implicitly the leaves, containing a color
-    uint8_t treeSplitElt[255];
-    uint8_t treeSplit[255];
+    uint8_t treeSplitElt[256];
+    uint8_t treeSplit[256];
 };
 
 // max, min, and abs functions
 static int GifIMax(int l, int r) { return l>r?l:r; }
 static int GifIMin(int l, int r) { return l<r?l:r; }
 static int GifIAbs(int i) { return i<0?-i:i; }
+
+static const int colorDimScales[3] = {14, 20, 17};
 
 // walks the k-d tree to pick the palette entry for a desired color.
 // Takes as in/out parameters the current best color and its error -
@@ -96,8 +98,8 @@ static void GifGetClosestPaletteColor(GifPalette* pPal, int r, int g, int b, int
         int r_err = r - ((int32_t)pPal->r[ind]);
         int g_err = g - ((int32_t)pPal->g[ind]);
         int b_err = b - ((int32_t)pPal->b[ind]);
-        g_err *= 2; // RED: Increase green importance
-        int diff = GifIAbs(r_err)+GifIAbs(g_err)+GifIAbs(b_err);
+        // RED: Increase green importance
+        int diff = colorDimScales[0] * GifIAbs(r_err) + colorDimScales[1] * GifIAbs(g_err) + colorDimScales[2] * GifIAbs(b_err);
         
         if(diff < bestDiff)
         {
@@ -111,13 +113,14 @@ static void GifGetClosestPaletteColor(GifPalette* pPal, int r, int g, int b, int
     // take the appropriate color (r, g, or b) for this node of the k-d tree
     int comps[3]; comps[0] = r; comps[1] = g; comps[2] = b;
     int splitComp = comps[pPal->treeSplitElt[treeRoot]];
+    int dimScale = colorDimScales[pPal->treeSplitElt[treeRoot]];
     
     int splitPos = pPal->treeSplit[treeRoot];
     if(splitPos > splitComp)
     {
         // check the left subtree
         GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot*2);
-        if( bestDiff > splitPos - splitComp )
+        if( bestDiff > dimScale*(splitPos - splitComp) )
         {
             // cannot prove there's not a better value in the right subtree, check that too
             GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot*2+1);
@@ -126,7 +129,7 @@ static void GifGetClosestPaletteColor(GifPalette* pPal, int r, int g, int b, int
     else
     {
         GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot*2+1);
-        if( bestDiff > splitComp - splitPos )
+        if( bestDiff > dimScale*(splitComp - splitPos) )
         {
             GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot*2);
         }
@@ -301,7 +304,9 @@ static void GifSplitPalette(uint8_t* image, int numPixels, int firstElt, int las
     int rRange = maxR - minR;
     int gRange = maxG - minG;
     int bRange = maxB - minB;
-    gRange *= 2; // RED: Modification to increase green importance
+    rRange *= colorDimScales[0];
+    gRange *= colorDimScales[1]; // RED: Modification to increase green importance
+    bRange *= colorDimScales[2];
     
     // and split along that axis. (incidentally, this means this isn't a "proper" k-d tree but I don't know what else to call it)
     int splitCom = 1;
@@ -520,8 +525,7 @@ static void GifThresholdImage( const uint8_t* lastFrame, const uint8_t* nextFram
                 int r_err = (int)lastFrame[0] - (int)nextFrame[0];
                 int g_err = (int)lastFrame[1] - (int)nextFrame[1];
                 int b_err = (int)lastFrame[2] - (int)nextFrame[2];
-                g_err *= 2; // RED: Increase green importance
-                int oldDiff = GifIAbs(r_err) + GifIAbs(g_err) + GifIAbs(b_err);
+                int oldDiff = colorDimScales[0] * GifIAbs(r_err) + colorDimScales[1] * GifIAbs(g_err) + colorDimScales[2] * GifIAbs(b_err);
                 if (oldDiff <= bestDiff)
                 {
                     outFrame[0] = lastFrame[0];
@@ -629,13 +633,14 @@ static void GifWritePalette( const GifPalette* pPal, FILE* f )
 }
 
 // write the image header, LZW-compress and write out the image
-static void GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t top,  uint32_t width, uint32_t height, uint32_t delay, GifPalette* pPal)
+static void GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t top,  uint32_t width, uint32_t height, uint32_t delay, GifPalette* pPal, long int *delaypos)
 {
     // graphics control extension
     fputc(0x21, f);
     fputc(0xf9, f);
     fputc(0x04, f);
     fputc(0x05, f); // leave prev frame in place, this frame has transparency
+    if (delaypos) *delaypos = ftell(f);
     fputc(delay & 0xff, f);
     fputc((delay >> 8) & 0xff, f);
     fputc(kGifTransIndex, f); // transparent color index
@@ -747,6 +752,7 @@ struct GifWriter
     FILE* f;
     uint8_t* oldImage;
     bool firstFrame;
+    long int delaypos;
 };
 
 // Creates a gif file.
@@ -763,6 +769,7 @@ static bool GifBegin( GifWriter* writer, const char* filename, uint32_t width, u
     if(!writer->f) return false;
     
     writer->firstFrame = true;
+    writer->delaypos = -1;
     
     // allocate 
     writer->oldImage = (uint8_t*)GIF_MALLOC(width*height*4);
@@ -827,9 +834,21 @@ static bool GifWriteFrame( GifWriter* writer, const uint8_t* image, uint32_t wid
     else
         GifThresholdImage(oldImage, image, writer->oldImage, width, height, &pal);
     
-    GifWriteLzwImage(writer->f, writer->oldImage, 0, 0, width, height, delay, &pal);
+    GifWriteLzwImage(writer->f, writer->oldImage, 0, 0, width, height, delay, &pal, &writer->delaypos);
     
     return true;
+}
+
+static void GifOverwriteLastDelay(GifWriter* writer, uint32_t delay)
+{
+    if (writer->delaypos == -1) return;
+    FILE* f = writer->f;
+
+    long int pos = ftell(f);
+    fseek(f, writer->delaypos, SEEK_SET);
+    fputc(delay & 0xff, f);
+    fputc((delay >> 8) & 0xff, f);
+    fseek(f, pos, SEEK_SET);
 }
 
 // Writes the EOF code, closes the file handle, and frees temp memory used by a GIF.
@@ -845,6 +864,7 @@ static bool GifEnd( GifWriter* writer )
     
     writer->f = NULL;
     writer->oldImage = NULL;
+    writer->delaypos = -1;
     
     return true;
 }

@@ -2,15 +2,23 @@
 
 #include <cstdlib>
 #include <utility>
+#include <vector>
+#include <memory>
+#include "../GL/GLSprite.h"
+#include "../GL/GLTextureStore.h"
+#include "../GL/GLFramebuffer.h"
+#include "GLShader.h"
+class LunaImage;
 
 using namespace gl;
 
-GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableType type, GLuint location, GLenum typeData, size_t count, void* data) : 
+GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableType type, GLuint location, GLenum typeData, size_t count, void* data, void* imgs) :
     m_type(type),
     m_location(location),
     m_typeData(typeData),
     m_count(count),
-    m_data(data)
+    m_data(data),
+    m_imgs(imgs)
 {}
 
 GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableEntry&& other) noexcept
@@ -20,14 +28,23 @@ GLShaderVariableEntry::GLShaderVariableEntry(GLShaderVariableEntry&& other) noex
     m_typeData = other.m_typeData;
     m_count = other.m_count;
     m_data = other.m_data;
+    m_imgs = other.m_imgs;
 
     other.m_data = nullptr;
+    other.m_imgs = nullptr;
 }
 
 GLShaderVariableEntry::~GLShaderVariableEntry()
 {
     if (m_data)
+    {
         std::free(m_data);
+    }
+
+    if (m_imgs)
+    {
+        delete reinterpret_cast<GLShaderVariableEntry::SamplerVector*>(m_imgs);
+    }
 }
 
 GLShaderVariableType GLShaderVariableEntry::getVariableType() const
@@ -73,4 +90,43 @@ int* GLShaderVariableEntry::getIntPtr() const
 unsigned int* GLShaderVariableEntry::getUIntPtr() const
 {
     return reinterpret_cast<unsigned int*>(getDataPtr());
+}
+
+int* GLShaderVariableEntry::getTexPtr(GLShader& shader) const
+{
+    if ((m_typeData == GL_SAMPLER_2D) && (m_imgs != nullptr) && (m_data == nullptr))
+    {
+        auto& imgs = *reinterpret_cast<GLShaderVariableEntry::SamplerVector*>(m_imgs);
+        const_cast<GLShaderVariableEntry*>(this)->m_data = malloc(sizeof(unsigned int) * m_count);
+        auto texPtr = reinterpret_cast<unsigned int*>(m_data);
+
+        for (unsigned int i = 0; i < m_count; i++)
+        {
+            const GLSprite* sprite = nullptr;
+            const GLFramebuffer* fb = nullptr;
+            if (imgs[i].first)
+            {
+                sprite = g_GLTextureStore.SpriteFromLunaImage(imgs[i].first);
+            }
+            else if (imgs[i].second)
+            {
+                fb = imgs[i].second->mFramebuffer;
+            }
+
+            if (sprite != nullptr)
+            {
+                texPtr[i] = shader.getSamplerForTexture(sprite->GetTexId());
+            }
+            else if (fb != nullptr)
+            {
+                texPtr[i] = shader.getSamplerForTexture(fb->AsTexture().name);
+            }
+            else
+            {
+                texPtr[i] = shader.getSamplerForTexture(0);
+            }
+        }
+    }
+    //std::pai
+    return reinterpret_cast<int*>(m_data);
 }

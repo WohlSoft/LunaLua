@@ -82,6 +82,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
 extern short __stdcall MessageBoxOpenHook();
 extern void __stdcall CameraUpdateHook_Wrapper();
+extern void __stdcall PostCameraUpdateHook_Wrapper();
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);
 extern BOOL __stdcall WorldOverlayHUDBitBltHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
@@ -141,6 +142,7 @@ void fixup_Mushbug();
 void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
+void fixup_RenderPlayerJiterX();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */
@@ -165,6 +167,44 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
 template<int priority>
 static inline constexpr void* GetRenderBelowPriorityHook(void) {
     return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookImpl<priority>);
+}
+
+template <int priority, unsigned int skipTargetAddr, bool* skipAddr>
+_declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
+	__asm {
+		pushf
+		push eax
+		push ecx
+		push edx
+	}
+	static unsigned int skipTargetAddrTmp = skipTargetAddr;
+	gLunaRender.RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
+	if (*skipAddr)
+	{
+		__asm {
+			pop edx
+			pop ecx
+			pop eax
+			popf
+			ret
+		}
+	}
+	else
+	{
+		__asm {
+			pop edx
+			pop ecx
+			pop eax
+			popf
+			add esp, 4
+			push skipTargetAddrTmp
+			ret
+		}
+	}
+}
+template<int priority, unsigned int skipTargetAddr, bool* skipAddr>
+static inline constexpr void* GetRenderBelowPriorityHookWithSkip(void) {
+	return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookWithSkipImpl<priority, skipTargetAddr, skipAddr>);
 }
 
 // Extended Character Id Support

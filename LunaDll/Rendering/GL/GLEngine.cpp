@@ -12,6 +12,12 @@
 using namespace gl;
 using namespace glcompat;
 
+#include "../LunaImage.h"
+#include "../AsyncGifRecorderImgs.h"
+
+static std::shared_ptr<LunaImage> recImage = LunaImage::fromData(rec_image.width, rec_image.height, rec_image.pixel_data);
+static std::shared_ptr<LunaImage> encImage = LunaImage::fromData(enc_image.width, enc_image.height, enc_image.pixel_data);
+
 GLEngine::GLEngine() :
     mEnabled(true), mBitwiseCompat(false),
     mHwnd(NULL),
@@ -44,6 +50,24 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     DWORD dwRop)
 {
 	// Load Post-Processing Shader somewhere here
+
+	static HDC cachedHDC = NULL;
+	if (hdcDest == NULL)
+	{
+		if (cachedHDC != NULL)
+		{
+			hdcDest = cachedHDC;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		cachedHDC = hdcDest;
+	}
+
 
     InitForHDC(hdcDest);
 
@@ -104,6 +128,24 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 
 void GLEngine::EndFrame(HDC hdcDest)
 {
+
+	static HDC cachedHDC = NULL;
+	if (hdcDest == NULL)
+	{
+		if (cachedHDC != NULL)
+		{
+			hdcDest = cachedHDC;
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		cachedHDC = hdcDest;
+	}
+
 	// Bind screen
 	g_GLContextManager.BindScreen();
 
@@ -126,6 +168,42 @@ void GLEngine::EndFrame(HDC hdcDest)
             if (clientRect.bottom < 0) clientRect.bottom = 1;
             GifRecorderNextFrame(0, 0, clientRect.right, clientRect.bottom);
         }
+
+        GLEngineCmd_DrawSprite cmd;
+        cmd.mXDest = 10;
+        cmd.mYDest = clientRect.bottom - (10 + recImage->getH());
+        cmd.mWidthDest = recImage->getW();
+        cmd.mHeightDest = recImage->getH();
+        cmd.mXSrc = 0;
+        cmd.mYSrc = 0;
+        cmd.mWidthSrc = recImage->getW();
+        cmd.mHeightSrc = recImage->getH();
+        cmd.mImg = recImage;
+        cmd.mOpacity = 1.0;
+        cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+        cmd.run(*this);
+    }
+    else if (mGifRecorder.isEncoding())
+    {
+        RECT clientRect;
+        if (GetClientRect(mHwnd, &clientRect)) {
+            if (clientRect.right < 0) clientRect.right = 1;
+            if (clientRect.bottom < 0) clientRect.bottom = 1;
+        }
+
+        GLEngineCmd_DrawSprite cmd;
+        cmd.mXDest = 10;
+        cmd.mYDest = clientRect.bottom - (10 + encImage->getH());
+        cmd.mWidthDest = encImage->getW();
+        cmd.mHeightDest = encImage->getH();
+        cmd.mXSrc = 0;
+        cmd.mYSrc = 0;
+        cmd.mWidthSrc = encImage->getW();
+        cmd.mHeightSrc = encImage->getH();
+        cmd.mImg = encImage;
+        cmd.mOpacity = 1.0;
+        cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+        cmd.run(*this);
     }
 
 	// Display Frame
@@ -134,6 +212,7 @@ void GLEngine::EndFrame(HDC hdcDest)
 	// Clear screen backbuffer
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearDepth(100.0f);
     GLERRORCHECK();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();
@@ -223,16 +302,25 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
         skipFrame = true;
     }
 
-    BYTE* pixData = new BYTE[w * h * 4];
+    // Don't allow more than 4 seconds of raw buffered footage
+    if (mGifRecorder.bufferLen() > 4 * 32)
+    {
+        return;
+    }
+
+    BYTE* pixData = new BYTE[w * (h + 1) * 4];
     
+    DWORD timestamp = GetTickCount();
+
     // Read pixels
     glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixData);
     if (glGetError() != GL_NO_ERROR) {
+        delete pixData;
         return;
     }
 
     // Flip pixels
-    BYTE* tmpRow = new BYTE[w*4];
+    BYTE* tmpRow = &pixData[w * h * 4];
     for (int y = 0; y < h / 2; y++)
     {
         int y2 = h - 1 - y;
@@ -240,7 +328,6 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
         memcpy(&pixData[y2 * w * 4], &pixData[y * w * 4], w * 4);
         memcpy(&pixData[y * w * 4], tmpRow, w * 4);
     }
-    delete tmpRow; tmpRow = nullptr;
 
-    mGifRecorder.addNextFrameToProcess(w, h, pixData);
+    mGifRecorder.addNextFrameToProcess(w, h, pixData, timestamp);
 }

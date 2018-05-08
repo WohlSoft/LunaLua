@@ -23,6 +23,8 @@ private:
     bool m_isValid;
 
     std::vector<gl::GLuint> m_attributeBuffers;
+
+    std::vector<gl::GLuint> m_samplerTexNames;
 public:
     GLShader(const std::string& vertexSource, const std::string& fragmentSource);
     GLShader(const std::string& fragmentSource);
@@ -36,11 +38,16 @@ public:
     std::vector<GLShaderUniformInfo> getAllUniforms() const;
 
     // Unsafe functions (can only be called from GL queue thread)
+    
     void bind();
     void unbind();
 
     void applyAttribute(const GLShaderVariableEntry& entry);
     void applyUniform(const GLShaderVariableEntry& entry);
+
+    void defaultSampler(gl::GLuint name);
+    gl::GLuint getSamplerForTexture(gl::GLuint name);
+    void clearSamplers();
 
 private:
     void load();
@@ -51,9 +58,6 @@ private:
     std::vector<VariableInfoT> getAllVariables(gl::GLenum programVariableType, GetActiveVariableFunc getActiveVariableFunc, GetVariableLocationFunc getVariableLocationFunc) const
     {
         std::vector<VariableInfoT> results;
-
-        // GL operation on the main thread
-        g_GLEngine.EnsureMainThreadCTXApplied();
 
 		gl::GLint count = 0;
 		gl::glGetProgramiv(m_shaderID, programVariableType, &count);

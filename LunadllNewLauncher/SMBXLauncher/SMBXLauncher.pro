@@ -58,7 +58,8 @@ SOURCES += main.cpp\
     Utils/networkjsonutils.cpp \
     Utils/Json/qjsonurlvalidationexception.cpp \
     launchercustomwebpage.cpp \
-    hybridlogger.cpp
+    hybridlogger.cpp \
+    devtoolsdialog.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ExposedObjects/smbxconfig.h \
@@ -98,9 +99,11 @@ HEADERS  += mainlauncherwindow.h \
     Utils/networkjsonutils.h \
     Utils/Json/qjsonurlvalidationexception.h \
     launchercustomwebpage.h \
-    hybridlogger.h
+    hybridlogger.h \
+    devtoolsdialog.h
 
-FORMS    += mainlauncherwindow.ui
+FORMS    += mainlauncherwindow.ui \
+    devtoolsdialog.ui
 
 RESOURCES += \
     resource.qrc

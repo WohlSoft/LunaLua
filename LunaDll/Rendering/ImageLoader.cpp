@@ -11,11 +11,12 @@
 #include <Windows.h>
 
 // Loaded image map decleration
-std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfx;
-std::unordered_map<std::string, std::shared_ptr<LunaImage>> ImageLoader::m_ExtraGfxOverride;
-std::unordered_map<std::string, uintptr_t>                  ImageLoader::m_NameToHDC;
-std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_GfxOverride;
-std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>   ImageLoader::m_Gfx;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfx;
+std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfxOverride;
+std::unordered_map<std::string, uintptr_t>                                   ImageLoader::m_NameToHDC;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_GfxOverride;
+std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_Gfx;
+std::unordered_map<uintptr_t, std::pair<const SMBXImageCategory*, uint32_t>> ImageLoader::m_HDCToCategoryAndIndex;
 
 static bool checkDirectoryExistance(const std::wstring& path)
 {
@@ -48,29 +49,47 @@ static void resolveImageResource(
     bool mainIsGif;
     {
         ResourceFileInfo resource;
+		bool gotImg = false;
         auto it = levelFiles.find(pngName);
-        if (it == levelFiles.end())
-            it = levelFiles.find(gifName);
-        if (it == levelFiles.end())
-            it = episodeFiles.find(pngName);
-        if (it == episodeFiles.end())
-            it = episodeFiles.find(gifName);
-        if (it != episodeFiles.end())
-            resource = it->second;
-        if (episodeGfxTypeDir.length() > 0)
-        {
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
-        }
-        if (appGfxTypeDir.length() > 0)
-        {
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
-            if (resource.path.length() == 0)
-                resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
-        }
+		gotImg = (it != levelFiles.end());
+		if (!gotImg)
+		{
+			it = levelFiles.find(gifName);
+			gotImg = (it != levelFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(pngName);
+			gotImg = (it != episodeFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(gifName);
+			gotImg = (it != episodeFiles.end());
+		}
+
+		if (gotImg)
+		{
+			resource = it->second;
+		}
+		else
+		{
+			if (episodeGfxTypeDir.length() > 0)
+			{
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
+			}
+			if (appGfxTypeDir.length() > 0)
+			{
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+				if (resource.path.length() == 0)
+					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
+			}
+		}
+
         mainIsGif = (resource.extension == L"gif");
         if (resource.path.length() > 0)
         {
@@ -82,21 +101,46 @@ static void resolveImageResource(
     {
         std::wstring maskName = fileRoot + L"m.gif";
         ResourceFileInfo maskResource;
-        auto it = levelFiles.find(maskName);
-        if (it == levelFiles.end())
-            it = episodeFiles.find(maskName);
-        if (it != episodeFiles.end())
-            maskResource = it->second;
-        if (episodeGfxTypeDir.length() > 0)
-        {
-            if (maskResource.path.length() == 0)
-                maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
-        }
-        if (appGfxTypeDir.length() > 0)
-        {
-            if (maskResource.path.length() == 0)
-                maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
-        }
+		bool gotImg = false;
+		auto it = levelFiles.find(maskName);
+		gotImg = (it != levelFiles.end());
+		if (!gotImg)
+		{
+			it = levelFiles.find(pngName);
+			gotImg = (it != levelFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(maskName);
+			gotImg = (it != episodeFiles.end());
+		}
+		if (!gotImg)
+		{
+			it = episodeFiles.find(pngName);
+			gotImg = (it != episodeFiles.end());
+		}
+
+		if (gotImg)
+		{
+			maskResource = it->second;
+		}
+		else
+		{
+			if (episodeGfxTypeDir.length() > 0)
+			{
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+			}
+			if (appGfxTypeDir.length() > 0)
+			{
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
+				if (maskResource.path.length() == 0)
+					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+			}
+		}
         if (maskResource.path.length() > 0) {
             outData[fileRoot + L"m"] = std::move(maskResource);
         }
@@ -172,12 +216,13 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                     mainImgHdc = CreateCompatibleDC(NULL);
                     m_Category.setImagePtr(i, mainImgHdc);
                     ImageLoader::m_NameToHDC[LunaLua::EncodeUtils::WStr2Str(imageName)] = (uintptr_t)mainImgHdc;
+                    ImageLoader::m_HDCToCategoryAndIndex[(uintptr_t)mainImgHdc] = std::pair<const SMBXImageCategory*, uint32_t>(&m_Category, i);
                 }
 
                 // Try to load image
                 if (newMain.path.length() > 0)
                 {
-                    mainImg = LunaImage::fromFile(newMain.path.c_str());
+                    mainImg = LunaImage::fromFile(newMain.path.c_str(), &newMain);
                 }
 
                 // Assign image, note size
@@ -203,7 +248,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 std::shared_ptr<LunaImage> maskImg = nullptr;
                 if (newMask.path.length() > 0)
                 {
-                    maskImg = LunaImage::fromFile(newMask.path.c_str());
+                    maskImg = LunaImage::fromFile(newMask.path.c_str(), &newMask);
                 }
 
                 // Assign image, note size
@@ -212,9 +257,8 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 {
                     if (width < maskImg->getW()) width = maskImg->getW();
                     if (height < maskImg->getH()) height = maskImg->getH();
+					mainImg->tryMaskToRGBA();
                 }
-
-                mainImg->tryMaskToRGBA();
             }
 
             m_Category.setWidth(i, (int16_t)min(width, 0x7FFF));
@@ -445,8 +489,8 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
                 if (newMain.done)
                 {
                     // If we found a file, load from it
-                    img = LunaImage::fromFile(newMain.path.c_str());
-                    mask = LunaImage::fromFile(newMask.path.c_str());
+                    img = LunaImage::fromFile(newMain.path.c_str(), &newMain);
+                    mask = LunaImage::fromFile(newMask.path.c_str(), &newMask);
                 }
                 else
                 {
@@ -606,6 +650,29 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
                 m_GfxOverride.erase(it->second);
             }
 
+            // Update height/width based on override
+            auto categoryIterator = m_HDCToCategoryAndIndex.find(it->second);
+            if (categoryIterator != m_HDCToCategoryAndIndex.end())
+            {
+                const SMBXImageCategory* category = categoryIterator->second.first;
+                uint32_t idx = categoryIterator->second.second;
+
+                if (img)
+                {
+                    category->setHeight(idx, img->getH());
+                    category->setWidth(idx, img->getW());
+                }
+                else
+                {
+                    auto currentImg = ImageLoader::GetByName(name);
+                    if (currentImg)
+                    {
+                        category->setHeight(idx, currentImg->getH());
+                        category->setWidth(idx, currentImg->getW());
+                    }
+                }
+            }
+
             return true;
         }
     }
@@ -626,4 +693,28 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
     }
 
     return false;
+}
+
+void ImageLoader::ClearOverrides()
+{
+    // Reset widths/heights to default
+    for (auto overrideIterator : m_GfxOverride)
+    {
+        auto categoryIterator = m_HDCToCategoryAndIndex.find(overrideIterator.first);
+        if (categoryIterator != m_HDCToCategoryAndIndex.end())
+        {
+            const SMBXImageCategory* category = categoryIterator->second.first;
+            uint32_t idx = categoryIterator->second.second;
+
+            auto currentImg = m_Gfx[overrideIterator.first];
+            if (currentImg)
+            {
+                category->setHeight(idx, currentImg->getH());
+                category->setWidth(idx, currentImg->getW());
+            }
+        }
+    }
+
+    m_GfxOverride.clear();
+    m_ExtraGfxOverride.clear();
 }

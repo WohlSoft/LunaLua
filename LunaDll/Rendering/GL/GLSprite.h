@@ -16,8 +16,9 @@ public:
     virtual ~GLSprite();
     virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const = 0;
     virtual void BindTexture() const = 0;
+    virtual unsigned int GetTexId() const = 0;
     virtual bool IsValid() const = 0;
-
+	virtual uint32_t GetSizeBytes() const = 0;
 
     inline void Draw(int xDest, int yDest, int width, int height, int xSrc, int ySrc, GLDraw::RenderMode mode) const
     {
@@ -32,11 +33,17 @@ public:
 
     virtual void Draw(const SRect<double>& dest, const SRect<double>& src, float opacity, GLDraw::RenderMode mode) const;
     virtual void BindTexture() const;
-
+    virtual unsigned int GetTexId() const {
+        if (valid)
+            return tex.name;
+        return 0;
+    };
     virtual bool IsValid() const { return valid; }
+	virtual uint32_t GetSizeBytes() const;
 private:
     bool valid;
     GLDraw::Texture tex;
+	uint32_t w, h;
 };
 
 #include "GLSplitSprite.h"

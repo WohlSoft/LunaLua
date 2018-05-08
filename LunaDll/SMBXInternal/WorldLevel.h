@@ -6,7 +6,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 32, GM_LEVEL_COUNT_CONSTPTR, GM_LEVEL_BASE_CONSTPTR>
+struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 100, GM_LEVEL_COUNT_CONSTPTR, GM_LEVEL_BASE_CONSTPTR>
 {
     Momentum momentum;
     short id;

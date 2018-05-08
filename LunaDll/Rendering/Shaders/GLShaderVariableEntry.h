@@ -1,6 +1,14 @@
 #pragma once
+
+#include <vector>
+#include <memory>
 #include <glbinding/gl/gl.h>
 #include "GLShaderVariableType.h"
+
+
+class GLShader;
+class LunaImage;
+class CaptureBuffer;
 
 class GLShaderVariableEntry
 {
@@ -9,8 +17,11 @@ class GLShaderVariableEntry
 	gl::GLenum m_typeData;
     size_t m_count;
     void* m_data;
+    void* m_imgs;
 public:
-    GLShaderVariableEntry(GLShaderVariableType type, gl::GLuint location, gl::GLenum typeData, size_t m_count, void* data);
+    typedef std::vector<std::pair<std::shared_ptr<LunaImage>, std::shared_ptr<CaptureBuffer>>> SamplerVector;
+    
+    GLShaderVariableEntry(GLShaderVariableType type, gl::GLuint location, gl::GLenum typeData, size_t m_count, void* data, void* imgs=nullptr);
     GLShaderVariableEntry(const GLShaderVariableEntry& other) = delete; // To prevent double-freeing
     GLShaderVariableEntry(GLShaderVariableEntry&& other) noexcept;
     ~GLShaderVariableEntry();
@@ -25,7 +36,7 @@ public:
     float* getFloatPtr() const;
     int* getIntPtr() const;
     unsigned int* getUIntPtr() const;
-
+    int* getTexPtr(GLShader& shader) const;
 
 };
 

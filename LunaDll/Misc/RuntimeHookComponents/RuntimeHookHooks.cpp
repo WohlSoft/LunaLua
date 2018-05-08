@@ -141,10 +141,8 @@ extern void __stdcall forceTermination()
 extern int __stdcall LoadWorld()
 {
     // We want to make sure we init the renderer before we start LunaLua when
-    // entering levels..... BUT we can't do this here, it likes to crash.
-    // Not sure why yet. Something about vanilla window initialization code
-    // probably.
-    //GLEngineProxy::CheckRendererInit();
+    // entering levels...
+    GLEngineProxy::CheckRendererInit();
 
     ResetLunaModule();
     gIsOverworld = true;
@@ -163,9 +161,6 @@ extern int __stdcall LoadWorld()
 
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
-
-    // Recount deaths
-    gDeathCounter.Recount();
 
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
@@ -277,9 +272,6 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 
 extern void* __stdcall WorldRender()
 {
-    if (gShowDemoCounter)
-        gDeathCounter.Draw();
-
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
         inputEvent->setDirectEventName("onHUDDraw");
@@ -958,23 +950,6 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
         cameraUpdateEvent->setLoopable(false);
         gLunaLua.callEvent(cameraUpdateEvent, cameraIdx);
     }
-
-    // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-    gLunaRender.StoreCameraPosition(cameraIdx);
-
-    if (gLunaLua.isValid()) {
-        SMBX_CameraInfo cameraData;
-        SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
-        memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
-
-        std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
-        cameraDrawEvent->setDirectEventName("onCameraDraw");
-        cameraDrawEvent->setLoopable(false);
-        gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
-
-        // Disallow changes to this camera's settings in onCameraDraw, for reasons.
-        memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
-    }
 }
 
 void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
@@ -985,6 +960,36 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
         PUSH EAX                       // PUSH the return address
         JMP CameraUpdateHook           // JMP to CameraUpdateHook
     };
+}
+
+static void __stdcall PostCameraUpdateHook(int cameraIdx)
+{
+	// This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
+	gLunaRender.StoreCameraPosition(cameraIdx);
+
+	if (gLunaLua.isValid()) {
+		SMBX_CameraInfo cameraData;
+		SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
+		memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
+
+		std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
+		cameraDrawEvent->setDirectEventName("onCameraDraw");
+		cameraDrawEvent->setLoopable(false);
+		gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
+
+		// Disallow changes to this camera's settings in onCameraDraw, for reasons.
+		memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
+	}
+}
+
+void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
+{
+	__asm {
+		POP EAX                          // POP the return address
+		PUSH DWORD PTR DS : [EBP - 0x38] // Sneak a camera index argument in there
+		PUSH EAX                         // PUSH the return address
+		JMP PostCameraUpdateHook         // JMP to PostCameraUpdateHook
+	};
 }
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)

@@ -20,6 +20,8 @@
 
 #include "../NpcIdExtender.h"
 
+#include "../../Misc/LoadScreen.h"
+
 bool episodeStarted = false;
 
 void(*runAsyncDebuggerProc)(void) = 0;
@@ -172,6 +174,9 @@ static unsigned int __stdcall LatePatch(void)
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 
+	// Set new BGO ID limit...
+	PatchBgoIdLimit();
+
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
     fixup_ErrorReporting();
@@ -225,6 +230,7 @@ void TrySkipPatch()
     fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
+	fixup_RenderPlayerJiterX();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
@@ -398,6 +404,12 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
+	// Hook for after camera updates have finished, just before drawing the background
+	PATCH(0x90D6FE)
+		.CALL(&PostCameraUpdateHook_Wrapper)
+		.NOP_PAD_TO_SIZE<7>()
+		.Apply();
+
     // Hook to fix 100% CPU when window is inactive
     PATCH(0x8E6FE1)
         .NOP()
@@ -437,17 +449,22 @@ void TrySkipPatch()
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
     PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
+	// Disable some frivolous RenderLevel calls in vanilla code. Was causing excess onDraw compared to onTick
+	PATCH(0x9BBC95).NOPS<5>().Apply(); // Tail hitting blocks case
+	PATCH(0xA2C6C1).NOPS<5>().Apply(); // Unknown (birdo hit sound related)
+	PATCH(0xA53053).NOPS<5>().Apply(); // Link shield case
+
     // Level rendering layering hooks
 
     //PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
     //-100: Level Background
-    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
+    PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-95, 0x910433, &gRenderBGOFlag>()).Apply();
     // -95: Furthest back BGOs
     PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
     // -90: Sizable Blocks
-    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHook<-85>()).Apply();
+    PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-85, 0x911F19, &gRenderBGOFlag>()).Apply();
     // -85: Some more BGOs
-    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHook<-80>()).Apply();
+    PATCH(0x911F19).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-80, 0x912748, &gRenderBGOFlag>()).Apply();
     // -80: Warp - Derived BGOs (locks on doors and stuff)
     PATCH(0x912748).NOP().NOP().CALL(GetRenderBelowPriorityHook<-75>()).Apply();
     // -75: Background NPCs (vines, piranah plants, diggable sand, mother brain, things in MB jars)
@@ -471,7 +488,7 @@ void TrySkipPatch()
     // -30: Something else player mount related?
     PATCH(0x928EA5).NOP().NOP().CALL(GetRenderBelowPriorityHook<-25>()).Apply();
     // -25: Players
-    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHook<-20>()).Apply();
+    PATCH(0x928F0A).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-20, 0x929F81, &gRenderBGOFlag>()).Apply();
     // -20: Foreground BGOs
     PATCH(0x929F81).NOP().NOP().CALL(GetRenderBelowPriorityHook<-15>()).Apply();
     // -15: Foreground NPCs
@@ -568,6 +585,18 @@ void TrySkipPatch()
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Patch 16384 block bug
+    PATCH(0xA98936).bytes(
+        0x0F, 0xBF, 0xF0, // movsx esi,ax
+        0x0F, 0xBF, 0xC1, // movsx eax,cx
+        0x01, 0xF0,       // add eax,esi
+        0xD1, 0xF8,       // sar eax,1
+        0x89, 0xC6,       // mov esi,eax
+        0xEB, 0x4B        // jmp 0xA9898F
+        ).NOP_PAD_TO_SIZE<98>().Apply();
+
+	// Enable custom load screens
+	LunaLoadScreenSetEnable(true);
 
     /************************************************************************/
     /* Import Table Patch                                                   */

@@ -13,6 +13,7 @@
 class GLEngine;
 class GLShader;
 class LunaImage;
+struct FFI_ShaderObj;
 
 /****************************************************/
 /* Common argumets for bitmap rendering coordinates */
@@ -42,6 +43,9 @@ public:
     virtual bool isFrameEnd(void) const { return false; }
     virtual bool isSmbxClearCmd(void) const { return false; }
     virtual bool isExitCmd(void) const { return false; }
+
+	virtual bool allowFrameSkippability(void) const { return true; }
+	virtual bool isSkippable(void) const { return true; }
 };
 
 /******************************/
@@ -123,6 +127,8 @@ public:
         void* data;
     };
     
+    std::shared_ptr<CaptureBuffer> mTarget;
+
     std::shared_ptr<LunaImage> mImg;
     std::shared_ptr<CaptureBuffer> mCapBuff;
     std::shared_ptr<GLShader> mShader;
@@ -139,6 +145,7 @@ public:
     bool mDepthTest;
 
 	GLEngineCmd_LuaDraw() :
+        mTarget(nullptr),
         mImg(nullptr),
 		mCapBuff(nullptr),
 		mShader(nullptr),
@@ -169,12 +176,24 @@ public:
             mVertColor = NULL;
         }
     }
+
+	virtual bool isSkippable(void) const {
+		if (mTarget == nullptr) return true;
+		return !mTarget->mNonskippable;
+	}
 };
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {
 public:
     double mX, mY;
     virtual void run(GLEngine& glEngine) const;
+};
+
+class GLEngineCmd_CompileShaderObj : public GLEngineCmd {
+public:
+    std::shared_ptr<FFI_ShaderObj> mShaderObj;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
 };
 
 #endif

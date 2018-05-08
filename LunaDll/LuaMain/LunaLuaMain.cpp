@@ -22,16 +22,19 @@
 #include "../libs/luasocket/mime.h"
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/LunaImage.h"
+#include "../Rendering/ImageLoader.h"
 #include "../Utils/EncodeUtils.h"
 
+#include "../Misc/LoadScreen.h"
 
-const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
+
+const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
 using namespace luabind;
 
 std::wstring CLunaLua::getLuaLibsPath()
 {
     std::wstring lapi = gAppPathWCHAR;
-    lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
+    lapi = lapi.append(L"\\scripts\\base\\engine\\main.lua");
     return lapi;
 }
 
@@ -83,6 +86,8 @@ void CLunaLua::exitContext()
 
         g_PerfTracker.disable();
 
+		gRenderBGOFlag = true;
+
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
@@ -97,6 +102,9 @@ bool CLunaLua::shutdown()
 
     // Request cached images be held onto for now
     LunaImage::holdCachedImages();
+
+    // Clear image override map
+    ImageLoader::ClearOverrides();
 
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
@@ -114,6 +122,8 @@ bool CLunaLua::shutdown()
 void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelPath /*= std::wstring()*/)
 {
     SafeFPUControl noFPUExecptions;
+
+	LunaLoadScreenKill();
 
     //Just to be safe
     shutdown();
@@ -175,7 +185,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Read the API-File
     std::wstring wLuaCode;
-    if(!readFile(wLuaCode, getLuaLibsPath(), L"Since v0.3 the LuaScriptsLib-Folder with\nall its content is required.\nBe sure you installed everything correctly!")){
+    if(!readFile(wLuaCode, getLuaLibsPath(), L"\"scripts\\base\\engine\\main.lua\" is required.\nBe sure you installed everything correctly!")){
         shutdown();
         return;
     }
@@ -188,10 +198,10 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Setup default contants
     setupDefaults();
-
+    
     //Load the Lua API
     bool errLapi = false;
-    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=mainV2.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
+    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
     if(!(lapierrcode == 0)){
         object error_msg(from_stack(L, -1));
         MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
@@ -474,6 +484,7 @@ void CLunaLua::setupDefaults()
     _G["GL_DOUBLE_MAT3x4"]      = static_cast<unsigned int>(gl::GL_DOUBLE_MAT3x4);
     _G["GL_DOUBLE_MAT4x2"]      = static_cast<unsigned int>(gl::GL_DOUBLE_MAT4x2);
     _G["GL_DOUBLE_MAT4x3"]      = static_cast<unsigned int>(gl::GL_DOUBLE_MAT4x3);
+    _G["GL_SAMPLER_2D"]         = static_cast<unsigned int>(gl::GL_SAMPLER_2D);
 
     {
         using namespace LuaProxy::Graphics;
@@ -515,7 +526,6 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Player, Player);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Camera, Camera);
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::VBStr, VBStr);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::World, World);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
@@ -564,9 +574,9 @@ void CLunaLua::bindAll()
                     .property("height", &LunaImage::getH)
                     .property("__rawDataPtr", &LunaImage::getDataPtrAsInt),
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
-                    .def(constructor<int, int>())
-                    .def("__eq", &LuaProxy::luaUserdataCompare<LunaImage>)
-                    .def("captureAt", &CaptureBuffer::captureAt),
+                    .def(constructor<int, int, bool>())
+                    .def("__eq", &LuaProxy::luaUserdataCompare<CaptureBuffer>)
+                    .def("captureAt", &CaptureBuffer::CaptureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (std::shared_ptr<LunaImage>(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage),
                 def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(boost::placeholders::_2)),
@@ -741,6 +751,7 @@ void CLunaLua::bindAll()
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
             .property("idx", &LuaProxy::InputConfig::idx)
             .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
+			.property("up", &LuaProxy::InputConfig::up, &LuaProxy::InputConfig::setUp)
             .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
             .property("left", &LuaProxy::InputConfig::left, &LuaProxy::InputConfig::setLeft)
             .property("right", &LuaProxy::InputConfig::right, &LuaProxy::InputConfig::setRight)
@@ -1041,14 +1052,6 @@ void CLunaLua::bindAll()
                 def("values", &LuaProxy::SaveBankProxy::values),
                 def("save", &LuaProxy::SaveBankProxy::save)
             ],
-
-            LUAHELPER_DEF_CLASS(VBStr)
-            .def(constructor<long>())
-            .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
-            .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
-            .def("clear", &LuaProxy::VBStr::clear)
-            .def(tostring(self))
-            .def("__concat", &LuaProxy::VBStr::luaConcat),
 
             class_<LuaProxy::Console>("Console")
             .def("print", &LuaProxy::Console::print)
@@ -1501,6 +1504,10 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
+	LunaLoadScreenKill();
+
+	GLEngineProxy::CheckRendererInit();
+
     //If the lua module is not valid anyway, then just return
     if(!isValid())
         return;

@@ -56,7 +56,7 @@ public:
         mDeathEffect = deathEffect;
         memset(&mStoredTemplate, 0, sizeof(PlayerMOB));
         mStoredTemplate.Identity = (Characters)id;
-        mStoredTemplate.CurrentPowerup = 0;
+        mStoredTemplate.CurrentPowerup = 1;
         mStoredTemplate.PowerupBoxContents = 0;
         mStoredTemplate.MountType = 0;
         mStoredTemplate.MountColor = 0;
@@ -2056,28 +2056,80 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 // Hook support code //
 ///////////////////////
 
-static PlayerMOB* getTemplateForCharacter(int id)
+short* getValidCharacterIDArray()
 {
-    static PlayerMOB dummyPlayerStruct;
+	static short* ret = nullptr;
+	static unsigned int lastListSize = 0;
+	int newListSize = 5 + runtimeHookCharacterIdMap.size() + 1;
 
-    // Return vanilla character template
-    if (id >= 1 && id <= 5) {
-        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[id];
-        return playerTemplate;
-    }
+	if (lastListSize != newListSize)
+	{
+		// Free old memory if there was any
+		if (ret != nullptr)
+		{
+			delete[] ret;
+			ret = nullptr;
+		}
 
-    // Return mapped character template
-    auto it = runtimeHookCharacterIdMap.find(id);
-    if (it != runtimeHookCharacterIdMap.end())
-    {
-        return &it->second->mStoredTemplate;
-    }
+		// Allocate memory
+		ret = new short[newListSize]();
+	}
 
-    // None found, return dummy character template, because hey, let's not crash
-    memset(&dummyPlayerStruct, 0, sizeof(PlayerMOB));
-    dummyPlayerStruct.Identity = (Characters)id;
-    dummyPlayerStruct.Hearts = 1;
-    return &dummyPlayerStruct;
+	int idx = 0;
+
+	// Populate with vanilla IDs
+	for (int id = 1; id <= 5; id++)
+	{
+		ret[idx++] = id;
+	}
+
+	// Populate with extended IDs
+	for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
+		ret[idx++] = it->first;
+	}
+
+	// Terminate with 0
+	ret[idx++] = 0;
+
+	return ret;
+}
+
+PlayerMOB* getTemplateForCharacter(int id)
+{
+	// Return vanilla character template
+	if (id >= 1 && id <= 5) {
+		PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[id];
+		return playerTemplate;
+	}
+
+	// Return mapped character template
+	auto it = runtimeHookCharacterIdMap.find(id);
+	if (it != runtimeHookCharacterIdMap.end())
+	{
+		return &it->second->mStoredTemplate;
+	}
+
+	return nullptr;
+}
+
+static PlayerMOB* getTemplateForCharacterWithDummyFallback(int id)
+{
+	static PlayerMOB dummyPlayerStruct = {0};
+
+	PlayerMOB* ret = getTemplateForCharacter(id);
+
+	if (ret)
+	{
+		return ret;
+	}
+	else
+	{
+		// None found, return dummy character template, because hey, let's not crash
+		memset(&dummyPlayerStruct, 0, sizeof(PlayerMOB));
+		dummyPlayerStruct.Identity = (Characters)id;
+		dummyPlayerStruct.Hearts = 1;
+		return &dummyPlayerStruct;
+	}
 }
 
 ///////////////////////
@@ -2110,14 +2162,14 @@ static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
 
 static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx)
 {
-    PlayerMOB* temp = getTemplateForCharacter(characterId);
+    PlayerMOB* temp = getTemplateForCharacterWithDummyFallback(characterId);
     PlayerMOB* player = &((PlayerMOB*)GM_PLAYERS_PTR)[playerIdx];
     memcpy(temp, player, sizeof(PlayerMOB));
 }
 
 static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx)
 {
-    PlayerMOB* temp = getTemplateForCharacter(characterId);
+    PlayerMOB* temp = getTemplateForCharacterWithDummyFallback(characterId);
     PlayerMOB* player = &((PlayerMOB*)GM_PLAYERS_PTR)[playerIdx];
     player->CurrentPowerup     = temp->CurrentPowerup;
     player->PowerupBoxContents = temp->PowerupBoxContents;
