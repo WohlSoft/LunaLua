@@ -458,7 +458,6 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextEvent->AutoscrollSecNum = static_cast<short>(nextDataEvent.scroll_section);
     }
 
-
     native_sort_finalize1();
     native_sort_bgo();
     native_sort_finalize2();
@@ -491,8 +490,232 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     /* Put here extra BGOs */
 
-    
-    
+/*
+    local_iterator_v285 = 1;
+    while ( 1 )                             // Iterate through level section boundaries
+    {
+        local_j = local_iterator_v285;
+        if ( (signed __int16)local_iterator_v285 > 20 )
+        break;
+        local_iterator_v286 = (signed __int16)local_iterator_v285;
+        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
+        _vbaGenerateBoundsError();
+        local_iterator_v287 = (signed __int16)local_iterator_v285;
+        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
+        _vbaGenerateBoundsError();
+        _EAX = LVL_Bounds;
+        _ECX = 48 * local_iterator_v286;
+        __asm { fld     qword ptr [ecx+eax+10h]; Load Real }
+        _EDX = 48 * local_iterator_v287;
+        __asm
+        {
+        fsub    qword ptr [edx+eax+8]; Subtract Real
+        fnstsw  ax              ; Store Status Word (no wait)
+        }
+        if ( (unsigned __int8)_EAX & 0xD )
+        goto LABEL_603;
+        _vbaFpR8();
+        __asm
+        {
+        fcomp   ds:dbl_402558   ; Compare Real and Pop
+        fnstsw  ax              ; Store Status Word (no wait)
+        }
+        if ( HIBYTE(_AX) & 0x40 )
+        {
+        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
+            _vbaGenerateBoundsError();
+        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
+            _vbaGenerateBoundsError();
+        _ECX = LVL_Bounds;
+        _EAX = 48 * (signed __int16)local_j;
+        __asm
+        {
+            fld     qword ptr [eax+ecx+8]; Load Real
+            fadd    ds:dbl_4012D0   ; Add Real
+        }
+        local_v294 = (signed __int16)local_j;
+        __asm { fstp    qword ptr [edx+ecx+8]; Store Real and Pop }
+        _ECX[local_v294].top = _RT1;
+        __asm { fnstsw  ax              ; Store Status Word (no wait) }
+        if ( _EAX & 0xD )
+            goto LABEL_603;
+        }
+        local_iterator_v285 = (unsigned __int16)(local_j + 1);
+        if ( __OFADD__((_WORD)local_j, 1) )
+        goto OverflowShitHappen_604;
+    }
+*/
+
+
+
+/*
+        local_i = *(_DWORD *)&BGO_COUNT_word_B25958;
+        local_doorsCount_v342 = doors_count;
+        local_iterator_v296 = 1;
+        while ( 2 )                             // Iterate through doors and put extra BGOs
+        {
+          local_j = local_iterator_v296;
+          if ( (signed __int16)local_iterator_v296 > local_doorsCount_v342 )
+            goto FinalizeLevelLoad;
+          local_preIterator_v297 = (signed __int16)local_iterator_v296 - 1;
+          if ( local_preIterator_v297 >= 0xC8 )
+            _vbaGenerateBoundsError();
+          if ( doorData[local_preIterator_v297].warpType != 2 )
+            goto DoorsIterate_CheckStarsLogic;
+          local_preIterator_v298 = (signed __int16)local_iterator_v296 - 1;
+          if ( local_preIterator_v298 >= 0xC8 )
+            _vbaGenerateBoundsError();
+          if ( doorData[local_preIterator_v298].starsRequired <= (signed __int16)Star_Count )
+          {
+DoorsIterate_CheckStarsLogic:
+            local_preIterator_v323 = (signed __int16)local_iterator_v296 - 1;
+            if ( local_preIterator_v323 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            if ( doorData[local_preIterator_v323].warpType == 2 )// Is this warp a Door
+            {
+              local_preIterator_v324 = (signed __int16)local_iterator_v296 - 1;
+              if ( local_preIterator_v324 >= 0xC8 )
+                _vbaGenerateBoundsError();
+              if ( doorData[local_preIterator_v324].isLocked == -1 )
+              {
+                LOWORD(local_preIterator_v324) = local_i + 1;
+                if ( __OFADD__(1, (_WORD)local_i) )
+                  goto OverflowShitHappen_604;
+                local_i = local_preIterator_v324;
+                if ( __OFADD__(1, BGO_COUNT_LOCKS) )
+                  goto OverflowShitHappen_604;
+                local_doorId_v325 = (signed __int16)local_iterator_v296 - 1;
+                ++BGO_COUNT_LOCKS;
+                if ( local_doorId_v325 >= 0xC8 )
+                  _vbaGenerateBoundsError();
+                local_bgoId_v326 = (signed __int16)local_preIterator_v324 - 1;
+                if ( local_bgoId_v326 >= 0x1F40 )
+                  _vbaGenerateBoundsError();
+                _vbaStrCopy(
+                  (BSTR)&BackgroundData[local_bgoId_v326].ptLayerName,
+                  doorData[local_doorId_v325].ptLayerName);
+                local_doorIndex_v327 = (signed __int16)local_j - 1;
+                if ( local_doorIndex_v327 >= 0xC8 )
+                  _vbaGenerateBoundsError();
+                if ( local_bgoId_v326 >= 0x1F40 )
+                  _vbaGenerateBoundsError();
+                BackgroundData[local_bgoId_v326].isHidden = doorData[local_doorIndex_v327].isHidden;
+                local_doorIndex_v328 = (signed __int16)local_j - 1;
+                if ( local_doorIndex_v328 >= 0xC8 )
+                  _vbaGenerateBoundsError();
+                if ( local_bgoId_v326 >= 0x1F40 )
+                  _vbaGenerateBoundsError();
+                _vbaCopyBytes(48, &BackgroundData[local_bgoId_v326].momentum, &doorData[local_doorIndex_v328].entrance);
+                if ( local_bgoId_v326 >= 0x1F40 )
+                  _vbaGenerateBoundsError();
+                BackgroundData[local_bgoId_v326].id = 98;
+                if ( local_bgoId_v326 >= 0x1F40 )
+                  _vbaGenerateBoundsError();
+                local_v329 = 7 * local_bgoId_v326;
+                LODWORD(BackgroundData[8 * local_v329 / 0x38u].momentum.width) = 0;
+                HIDWORD(BackgroundData[8 * local_v329 / 0x38u].momentum.width) = 1076887552;
+                goto doorsIterate_Next;
+              }
+            }
+          }
+          else
+          {
+            LOWORD(local_preIterator_v298) = local_i + 1;
+            if ( __OFADD__(1, (_WORD)local_i) )
+              goto OverflowShitHappen_604;
+            local_i = local_preIterator_v298;
+            if ( __OFADD__(1, BGO_COUNT_LOCKS) )
+              goto OverflowShitHappen_604;
+            local_v299 = (signed __int16)local_iterator_v296 - 1;
+            ++BGO_COUNT_LOCKS;
+            if ( local_v299 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            local_v300 = (signed __int16)local_preIterator_v298 - 1;
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            _vbaStrCopy((BSTR)&BackgroundData[local_v300].ptLayerName, doorData[local_v299].ptLayerName);
+            local_doorId_v301 = (signed __int16)local_j - 1;
+            if ( local_doorId_v301 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            BackgroundData[local_v300].isHidden = doorData[local_doorId_v301].isHidden;
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            local_v302 = 7 * local_v300;
+            LODWORD(BackgroundData[8 * local_v302 / 0x38u].momentum.width) = 0;
+            HIDWORD(BackgroundData[8 * local_v302 / 0x38u].momentum.width) = 1077411840;
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            local_v303 = 7 * local_v300;
+            LODWORD(BackgroundData[8 * local_v303 / 0x38u].momentum.height) = 0;
+            HIDWORD(BackgroundData[8 * local_v303 / 0x38u].momentum.height) = 1077411840;
+            local_v304 = (signed __int16)local_j - 1;
+            if ( local_v304 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            _EAX = doorData;
+            _ECX = 144 * local_v304;
+            __asm { fld     qword ptr [ecx+eax+1Ch]; Load Real }
+            _ECX = BackgroundData;
+            _EDX = 7 * local_v300;
+            __asm { fsub    qword ptr [ecx+edx*8+18h]; Subtract Real }
+            local_v309 = 7 * local_v300;
+            __asm { fstp    qword ptr [ecx+edx*8+10h]; Store Real and Pop }
+            _ECX[8 * local_v309 / 0x38u].momentum.y = _RT1;
+            __asm { fnstsw  ax              ; Store Status Word (no wait) }
+            if ( (unsigned __int8)_EAX & 0xD )
+              goto LABEL_603;
+            local_v311 = (signed __int16)local_j - 1;
+            if ( local_v311 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            local_v312 = (signed __int16)local_j - 1;
+            if ( local_v312 >= 0xC8 )
+              _vbaGenerateBoundsError();
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            _EAX = doorData;
+            _ECX = 144 * local_v312;
+            local_v315 = 9 * local_v311;
+            __asm { fld     qword ptr [ecx+eax+2Ch]; Load Real }
+            if ( useSaveFDiv )
+              _EAX = (SMBX_Warp *)j__adj_fdiv_m64(SLODWORD(dbl_4012D8), SHIDWORD(dbl_4012D8));
+            else
+              __asm { fdiv    ds:dbl_4012D8   ; Divide Real }
+            _ECX = BackgroundData;
+            _EDX = 16 * local_v315;
+            __asm { fadd    qword ptr [edx+eax+14h]; Add Real }
+            local_v318 = 8 * local_v300;
+            _EAX = 7 * local_v300;
+            __asm { fld     qword ptr [ecx+eax*8+20h]; Load Real }
+            if ( useSaveFDiv )
+              j__adj_fdiv_m64(SLODWORD(dbl_4012D8), SHIDWORD(dbl_4012D8));
+            else
+              __asm { fdiv    ds:dbl_4012D8   ; Divide Real }
+            __asm { fsubp   st(1), st       ; Subtract Real and Pop }
+            local_v320 = local_v318 - local_v300;
+            __asm { fstp    qword ptr [ecx+edx*8+8]; Store Real and Pop }
+            *(&_ECX->momentum.x + local_v320) = _RT1;
+            __asm { fnstsw  ax              ; Store Status Word (no wait) }
+            if ( _AX & 0xD )
+              goto LABEL_603;
+            if ( local_v300 >= 0x1F40 )
+              _vbaGenerateBoundsError();
+            BackgroundData[local_v300].id = 160;
+doorsIterate_Next:
+            LOWORD(local_iterator_v296) = local_j;
+          }
+          HIWORD(local_v330) = 0;
+          if ( __OFADD__((_WORD)local_iterator_v296, 1) )
+            goto OverflowShitHappen_604;
+          LOWORD(local_v330) = local_iterator_v296 + 1;
+          local_iterator_v296 = local_v330;
+          continue;
+        }
+      }    
+*/
+
     /* Finalizing crap */
     
     //*(_WORD *)(unkSoundVolume + 24) = 100;
