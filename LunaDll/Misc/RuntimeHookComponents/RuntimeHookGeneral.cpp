@@ -614,7 +614,7 @@ void TrySkipPatch()
         ).NOP_PAD_TO_SIZE<98>().Apply();
 
 	// Enable custom load screens
-	LunaLoadScreenSetEnable(true);
+	//LunaLoadScreenSetEnable(true);
 
     /************************************************************************/
     /* Import Table Patch                                                   */
