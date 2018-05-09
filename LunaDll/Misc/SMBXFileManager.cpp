@@ -3,6 +3,7 @@
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
 #include "../Rendering/ImageLoader.h"
+#include "../Rendering/GL/GLEngine.h"
 
 #include "../libs/PGE_File_Formats/file_formats.h"
 
@@ -108,8 +109,13 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     // Load Episode GFX
     //native_loadLocalGfx();
     // Load GFX from custom folder
-    //native_loadGraphicsFromFolder(&customFolderVB6);
+    // native_loadGraphicsFromFolder(&customFolderVB6);
     
+    // We should clear textures periodically for video memory reasons. At this
+    // point is probably good enough.
+    g_GLEngine.ClearTextures();
+    // In the past, we would call native_loadLocalGfx() here, but that is now
+    // being replaced.
     ImageLoader::Run();
 
     // Total number of stars in the level
