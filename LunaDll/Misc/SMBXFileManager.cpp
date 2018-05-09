@@ -1,5 +1,6 @@
 #include "SMBXFileManager.h"
 #include "MiscFuncs.h"
+#include "../Main.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
 #include "../Rendering/ImageLoader.h"
@@ -102,6 +103,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
 
+    OnLvlLoad();
+
     // Init Config-Txt
     VB6StrPtr customFolderVB6 = customFolder;
     native_loadNPCConfig(&customFolderVB6);
@@ -120,7 +123,6 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
-
 
     int numOfSections = outData.meta.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
     for(int i = 0; i < numOfSections; i++)
@@ -234,8 +236,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->momentum.x = static_cast<double>(nextDataLevelNPC.x);
         nextNPC->momentum.y = static_cast<double>(nextDataLevelNPC.y);
         nextNPC->directionFaced = static_cast<float>(nextDataLevelNPC.direct);
-        int npcID = nextDataLevelNPC.id;
-        nextNPC->id = npcID;
+        uint64_t npcID = nextDataLevelNPC.id;
+        nextNPC->id = static_cast<short>(npcID);
 
         // Special rules by id:
         if ((npcID == 91) || (npcID == 96) || (npcID == 283) || (npcID == 284)) {
@@ -450,11 +452,11 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         
         nextEvent->AutoStart = COMBOOL(nextDataEvent.autostart);
         nextEvent->LayerToMove = nextDataEvent.movelayer;
-        nextEvent->LayerHSpeed = nextDataEvent.layer_speed_x;
-        nextEvent->LayerVSpeed = nextDataEvent.layer_speed_y;
+        nextEvent->LayerHSpeed = (float)nextDataEvent.layer_speed_x;
+        nextEvent->LayerVSpeed = (float)nextDataEvent.layer_speed_y;
         
-        nextEvent->AutoscrollHSpeed = nextDataEvent.move_camera_x;
-        nextEvent->AutoscrollVSpeed = nextDataEvent.move_camera_y;
+        nextEvent->AutoscrollHSpeed = (float)nextDataEvent.move_camera_x;
+        nextEvent->AutoscrollVSpeed = (float)nextDataEvent.move_camera_y;
         nextEvent->AutoscrollSecNum = static_cast<short>(nextDataEvent.scroll_section);
     }
 
