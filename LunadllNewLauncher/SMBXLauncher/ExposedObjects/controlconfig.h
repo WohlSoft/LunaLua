@@ -484,42 +484,6 @@ signals:
 private:
     QString m_configFilename;
     SMBX64_ConfigFile m_data;
-
-    bool m_fullscreen;
-    unsigned int m_controllerType1;
-    unsigned int m_keyboardUp1;
-    unsigned int m_keyboardDown1;
-    unsigned int m_keyboardLeft1;
-    unsigned int m_keyboardRight1;
-    unsigned int m_keyboardRun1;
-    unsigned int m_keyboardJump1;
-    unsigned int m_keyboardDrop1;
-    unsigned int m_keyboardPause1;
-    unsigned int m_keyboardAltJump1;
-    unsigned int m_keyboardAltRun1;
-    unsigned int m_joystickRun1;
-    unsigned int m_joystickJump1;
-    unsigned int m_joystickDrop1;
-    unsigned int m_joystickPause1;
-    unsigned int m_joystickAltJump1;
-    unsigned int m_joystickAltRun1;
-    unsigned int m_controllerType2;
-    unsigned int m_keyboardUp2;
-    unsigned int m_keyboardDown2;
-    unsigned int m_keyboardLeft2;
-    unsigned int m_keyboardRight2;
-    unsigned int m_keyboardRun2;
-    unsigned int m_keyboardJump2;
-    unsigned int m_keyboardDrop2;
-    unsigned int m_keyboardPause2;
-    unsigned int m_keyboardAltJump2;
-    unsigned int m_keyboardAltRun2;
-    unsigned int m_joystickRun2;
-    unsigned int m_joystickJump2;
-    unsigned int m_joystickDrop2;
-    unsigned int m_joystickPause2;
-    unsigned int m_joystickAltJump2;
-    unsigned int m_joystickAltRun2;
 };
 
 #endif // CONTROLCONFIG_H
