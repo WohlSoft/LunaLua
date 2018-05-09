@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,45 +20,45 @@
  *  \brief Contains definition of SMBX Engine settings data structure
  */
 
+#pragma once
 #ifndef SMBX64_CNF_FILEDATA_H
 #define SMBX64_CNF_FILEDATA_H
 
 #include "pge_file_lib_globs.h"
+#include "meta_filedata.h"
 
 struct SMBX64_ConfigPlayer
 {
-      SMBX64_ConfigPlayer();
-      unsigned int id;
-      unsigned int controllerType;
-      unsigned int k_up;
-      unsigned int k_down;
-      unsigned int k_left;
-      unsigned int k_right;
-      unsigned int k_run;
-      unsigned int k_jump;
-      unsigned int k_drop;
-      unsigned int k_pause;
-      unsigned int k_altjump;//>=19
-      unsigned int k_altrun;//>=19
-      unsigned int j_run;
-      unsigned int j_jump;
-      unsigned int j_drop;
-      unsigned int j_pause;
-      unsigned int j_altjump;//>=19
-      unsigned int j_altrun;//>=19
+    SMBX64_ConfigPlayer();
+    unsigned int id;
+    unsigned int controllerType;
+    unsigned int k_up;
+    unsigned int k_down;
+    unsigned int k_left;
+    unsigned int k_right;
+    unsigned int k_run;
+    unsigned int k_jump;
+    unsigned int k_drop;
+    unsigned int k_pause;
+    unsigned int k_altjump;//>=19
+    unsigned int k_altrun;//>=19
+    unsigned int j_run;
+    unsigned int j_jump;
+    unsigned int j_drop;
+    unsigned int j_pause;
+    unsigned int j_altjump;//>=19
+    unsigned int j_altrun;//>=19
 };
 
 struct SMBX64_ConfigFile
 {
     SMBX64_ConfigFile();
+
+    //!Helper meta-data
+    FileFormatMeta meta;
+
     bool fullScreen;//>=16
     PGEVECTOR<SMBX64_ConfigPlayer> players;
-
-    bool ReadFileValid;
-    PGESTRING ERROR_info;
-    PGESTRING ERROR_linedata;
-    int       ERROR_linenum;
 };
 
 #endif // SMBX64_CNF_FILEDATA_H
-

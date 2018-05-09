@@ -1,5 +1,6 @@
-#ifndef _PGE_FILE_LIB_SYS_H
-#define _PGE_FILE_LIB_SYS_H
+#pragma once
+#ifndef PGE_FILE_LIB_SYS_H_
+#define PGE_FILE_LIB_SYS_H_
 
 /*!
  * \file pge_file_lib_sys.h
@@ -22,6 +23,4 @@
 #include <limits.h> /* PATH_MAX */
 #endif
 
-
-#endif // _PGE_FILE_LIB_SYS_H
-
+#endif // PGE_FILE_LIB_SYS_H_

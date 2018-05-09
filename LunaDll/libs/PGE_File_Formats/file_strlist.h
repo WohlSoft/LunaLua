@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
  *        which automatically splits lines by line feeds
  */
 
+#pragma once
 #ifndef FILE_STRLIST_H
 #define FILE_STRLIST_H
 
@@ -71,7 +72,7 @@ public:
      * \brief Changes filedata and rebuilds list of lines
      * \param fileData file data which will be splited by line-feeds
      */
-    void addData(PGESTRING fileData);
+    void addData(const PGESTRING& fileData);
 
     /*!
      * \brief Returns current line contents and incements internal line counter

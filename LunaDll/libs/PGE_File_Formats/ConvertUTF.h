@@ -20,6 +20,10 @@
  * remains attached.
  */
 
+#pragma once
+#ifndef CONVERT_UTF_H
+#define CONVERT_UTF_H
+
 /* ---------------------------------------------------------------------
 
     Conversions between UTF32, UTF-16, and UTF-8.  Header file.
@@ -116,34 +120,35 @@ typedef enum {
 extern "C" {
 #endif
 
-ConversionResult ConvertUTF8toUTF16 (
+ConversionResult PGEFF_ConvertUTF8toUTF16 (
 		const UTF8** sourceStart, const UTF8* sourceEnd, 
 		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
 
-ConversionResult ConvertUTF16toUTF8 (
+ConversionResult PGEFF_ConvertUTF16toUTF8 (
 		const UTF16** sourceStart, const UTF16* sourceEnd, 
 		UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
 		
-ConversionResult ConvertUTF8toUTF32 (
+ConversionResult PGEFF_ConvertUTF8toUTF32 (
 		const UTF8** sourceStart, const UTF8* sourceEnd, 
 		UTF32** targetStart, UTF32* targetEnd, ConversionFlags flags);
 
-ConversionResult ConvertUTF32toUTF8 (
+ConversionResult PGEFF_ConvertUTF32toUTF8 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
 		UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
 		
-ConversionResult ConvertUTF16toUTF32 (
+ConversionResult PGEFF_ConvertUTF16toUTF32 (
 		const UTF16** sourceStart, const UTF16* sourceEnd, 
 		UTF32** targetStart, UTF32* targetEnd, ConversionFlags flags);
 
-ConversionResult ConvertUTF32toUTF16 (
+ConversionResult PGEFF_ConvertUTF32toUTF16 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
 		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
 
-Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
+Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 
 #ifdef __cplusplus
 }
 #endif
 
 /* --------------------------------------------------------------------- */
+#endif //CONVERT_UTF_H

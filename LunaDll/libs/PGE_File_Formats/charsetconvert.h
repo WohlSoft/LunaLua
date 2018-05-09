@@ -100,14 +100,14 @@ public:
             const UTF8 * pUtf8 = (const UTF8 *) a_pInputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 UTF32 * pUtf32 = (UTF32 *) a_pOutputData;
-                retval = ConvertUTF8toUTF32(
+                retval = PGEFF_ConvertUTF8toUTF32(
                     &pUtf8, pUtf8 + a_uInputDataLen,
                     &pUtf32, pUtf32 + a_uOutputDataSize,
                     lenientConversion);
             }
             else if (sizeof(SI_CHAR) == sizeof(UTF16)) {
                 UTF16 * pUtf16 = (UTF16 *) a_pOutputData;
-                retval = ConvertUTF8toUTF16(
+                retval = PGEFF_ConvertUTF8toUTF16(
                     &pUtf8, pUtf8 + a_uInputDataLen,
                     &pUtf16, pUtf16 + a_uOutputDataSize,
                     lenientConversion);
@@ -188,14 +188,14 @@ public:
             UTF8 * pUtf8 = (UTF8 *) a_pOutputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 const UTF32 * pUtf32 = (const UTF32 *) a_pInputData;
-                retval = ConvertUTF32toUTF8(
+                retval = PGEFF_ConvertUTF32toUTF8(
                     &pUtf32, pUtf32 + uInputLen,
                     &pUtf8, pUtf8 + a_uOutputDataSize,
                     lenientConversion);
             }
             else if (sizeof(SI_CHAR) == sizeof(UTF16)) {
                 const UTF16 * pUtf16 = (const UTF16 *) a_pInputData;
-                retval = ConvertUTF16toUTF8(
+                retval = PGEFF_ConvertUTF16toUTF8(
                     &pUtf16, pUtf16 + uInputLen,
                     &pUtf8, pUtf8 + a_uOutputDataSize,
                     lenientConversion);

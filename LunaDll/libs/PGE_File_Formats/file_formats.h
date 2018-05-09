@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  *  \brief Main header of PGE File Library which includes all provided features set
  */
 
-
+#pragma once
 #ifndef FILE_FORMATS_H
 #define FILE_FORMATS_H
 
@@ -55,7 +55,7 @@ class FileFormats
 
 public:
 
-/******************************non-SMBX64 Meda-data file***********************************/
+    /******************************non-SMBX64 Meda-data file***********************************/
     /*!
      * \brief Parses non-SMBX64 meta-data from additional *.meta files
      *        there are contains data which impossible to save into SMBX64 LVL file
@@ -107,14 +107,14 @@ public:
     static bool WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, MetaData /*Output*/ &metaData);
 
 
-/******************************Level files***********************************/
+    /******************************Level files***********************************/
     /*!
      * \brief Supported level file formats
      */
     enum LevelFileFormat
     {
         //! PGE-X LVLX Level File format
-        LVL_PGEX=0,
+        LVL_PGEX = 0,
         //! SMBX1...64 LVL Level File format
         LVL_SMBX64,
         //! SMBX-38A LVL Level File format
@@ -142,7 +142,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFileFormat format, unsigned int FormatVersion=64);
+    static bool SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFileFormat format, unsigned int FormatVersion = 64);
     /*!
      * \brief Save a level file to the raw string
      * \param FileData Level data structure
@@ -151,9 +151,9 @@ public:
      * \param FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion=64);
+    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion = 64);
 
-// SMBX64 LVL File
+    // SMBX64 LVL File
     /*!
      * \brief Parses SMBX1...64 level file header and skips other part of a file
      * \param [__in] filePath Full path to level file
@@ -190,7 +190,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData, int file_format=64);
+    static bool WriteSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates SMBX1...64 Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -198,7 +198,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, int file_format=64);
+    static bool WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
     /*!
      * \brief Generates SMBX1...64 Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
@@ -206,9 +206,9 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData /*output*/ &FileData, int file_format=64);
+    static bool WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData /*output*/ &FileData, unsigned int file_format = 64);
 
-// SMBX-38A LVL File
+    // SMBX-38A LVL File
     /*!
      * \brief Parses SMBX-38A level file header and skips other part of a file
      * \param [__in] filePath Full path to level file
@@ -269,7 +269,7 @@ public:
 
 
 
-// PGE Extended Level File
+    // PGE Extended Level File
     /*!
      * \brief Parses PGE-X Level file header from the file
      * \param filePath Full path to PGE-X Level file
@@ -321,7 +321,7 @@ public:
      */
     static bool WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData /*output*/ &FileData);
 
-// Lvl Data
+    // Lvl Data
     /*!
      * \brief Generates blank initialized level data structure
      * \return Level data structure
@@ -376,7 +376,7 @@ public:
      * \brief Initializes Level specific Player spawn point entry structure with default properties
      * \return Initialized with default properties level specific Player spawn point entry structure
      */
-    static PlayerPoint      CreateLvlPlayerPoint(int id=0);
+    static PlayerPoint      CreateLvlPlayerPoint(unsigned int id = 0);
     /*!
      * \brief Initializes Level specific Section Settings entry structure with default properties
      * \return Initialized with default properties level specific Section Settings entry structure
@@ -394,7 +394,7 @@ public:
      * \param lang language code of script (Lua, Luna-Autocode or Tea-Script)
      * \return Initialized with default properties level specific Script entry
      */
-    static LevelScript      CreateLvlScript(PGESTRING name, int lang=LevelScript::LANG_LUA);
+    static LevelScript      CreateLvlScript(PGESTRING name, int lang = LevelScript::LANG_LUA);
 
     /*!
      * \brief Appends internal layers and events if not exists
@@ -428,13 +428,14 @@ public:
     static void             smbx64LevelSortBGOs(LevelData &lvl);
 
 
-/******************************World map files***********************************/
+    /******************************World map files***********************************/
     /*!
      * \brief Supported world map file formats
      */
-    enum WorldFileFormat{
+    enum WorldFileFormat
+    {
         //! PGE-X WLDX World map file format
-        WLD_PGEX=0,
+        WLD_PGEX = 0,
         //! SMBX1...64 WLD World map file format
         WLD_SMBX64,
         //! SMBX-38A WLD World map file format
@@ -463,7 +464,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveWorldFile(WorldData &FileData, PGESTRING filePath, WorldFileFormat format, unsigned int FormatVersion=64);
+    static bool SaveWorldFile(WorldData &FileData, PGESTRING filePath, WorldFileFormat format, unsigned int FormatVersion = 64);
     /*!
      * \brief Save a world map file to the raw string
      * \param [__in] FileData World data structure
@@ -472,10 +473,10 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int FormatVersion=64);
+    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int FormatVersion = 64);
 
 
-// SMBX64 WLD File
+    // SMBX64 WLD File
     /*!
      * \brief Parsed SMBX1...64 World map file header only
      * \param [__in] filePath Full path to file to open
@@ -512,7 +513,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData, int file_format=64);
+    static bool WriteSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates raw data string in SMBX1...64 World map format
      * \param [__in] FileData World map data structure
@@ -520,7 +521,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata, int file_format=64);
+    static bool WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
     /*!
      * \brief Writes world map data into file output descriptor of SMBX1...64 World map format
      * \param [__inout] out Output file descriptor
@@ -528,9 +529,61 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData, int file_format=64);
+    static bool WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData, unsigned int file_format = 64);
 
-// PGE Extended World map File
+    // SMBX-38A WLD File
+    /*!
+     * \brief Parses SMBX-38A world map file header and skips other part of a file
+     * \param [__in] filePath Full path to world map file
+     * \param [__out] FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from file
+     * \param [__in] filePath Full path to flie
+     * \param [__out] FileData
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from raw data string
+     * \param [__in] rawdata Raw-data string contains SMBX-38A Level file data
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out] FileData Level data structure
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from raw data string
+     * \param [__in] in File input descriptor
+     * \param [__out] FileData FileData Level data structure
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput &in, WorldData /*output*/ &FileData);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves into file
+     * \param [__in] filePath Target file path
+     * \param [__in] FileData Level data structure
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves into raw string
+     * \param [__in] FileData Target file path
+     * \param [__out] rawdata Raw data string in the SMBX-38A world map format
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
+     * \param [__inout] out Output file descriptor
+     * \param [__in] FileData Target file path
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData);
+
+    // PGE Extended World map File
     /*!
      * \brief Parsed PGE-X World map file header only
      * \param filePath Full path to file which must be opened
@@ -582,7 +635,7 @@ public:
      */
     static bool WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData);
 
-//Wld Data
+    //Wld Data
     /*!
      * \brief Initializes world map structure header
      * \param [__out] NewFileData World map data structure with initialized header only
@@ -602,7 +655,7 @@ public:
      * \brief Initializes World map specific Tile entry structure with default properties
      * \return Initialized with default properties World map specific Tile entry structure
      */
-    static WorldTiles       CreateWldTile();
+    static WorldTerrainTile       CreateWldTile();
     /*!
      * \brief Initializes World map specific Scenery entry structure with default properties
      * \return Initialized with default properties World map specific Scenery entry structure
@@ -612,22 +665,22 @@ public:
      * \brief Initializes World map specific Path entry structure with default properties
      * \return Initialized with default properties World map specific Path entry structure
      */
-    static WorldPaths       CreateWldPath();
+    static WorldPathTile       CreateWldPath();
     /*!
      * \brief Initializes World map specific Level Entrance point entry structure with default properties
      * \return Initialized with default properties World map specific Level Entrance point entry structure
      */
-    static WorldLevels      CreateWldLevel();
+    static WorldLevelTile      CreateWldLevel();
     /*!
      * \brief Initializes World map specific Music Box entry structure with default properties
      * \return Initialized with default properties World map specific Music Box entry structure
      */
-    static WorldMusic       CreateWldMusicbox();
+    static WorldMusicBox       CreateWldMusicbox();
 
 
-/****************************Save of game file********************************/
+    /****************************Save of game file********************************/
 
-// SMBX1..64 SAV file
+    // SMBX1..64 SAV file
     /*!
      * \brief Parses SMBX1...64 Game save data from file
      * \param [__in] filePath File path to open
@@ -651,7 +704,7 @@ public:
      */
     static bool ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, GamesaveData /*output*/ &FileData);
 
-//PGE-X SAVX file
+    //PGE-X SAVX file
     /*!
      * \brief Parses PGE-X level file data from file
      * \param [__in] filePath Full path to the file
@@ -696,7 +749,7 @@ public:
      */
     static bool WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, GamesaveData &FileData);
 
-//Save Data
+    //Save Data
     /*!
      * \brief Initializes blank game save data structure with default preferences
      * \return Blank Game Save data structure
@@ -708,7 +761,7 @@ public:
      */
     static saveCharState    CreateSavCharacterState();
 
-/****************************SMBX64 Config file********************************/
+    /****************************SMBX64 Config file********************************/
 
     /*!
      * \brief Parses SMBX Engine config file raw data string
@@ -749,7 +802,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64)
      * \return raw data string in SMBX Engine config file format
      */
-    DEPRECATED(static PGESTRING WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, int file_format));
+    DEPRECATED(static PGESTRING WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, unsigned int file_format));
 
 
     /*!
@@ -759,7 +812,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &FileData, int file_format=64);
+    static bool WriteSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates raw data string in SMBX1...64 SMBX Engine specific config format
      * \param [__in] FileData World map data structure
@@ -767,7 +820,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, int file_format=64);
+    static bool WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
     /*!
      * \brief Writes data into file output descriptor of SMBX1...64 SMBX Engine specific config format
      * \param [__inout] out Output file descriptor
@@ -775,32 +828,32 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, int file_format=64);
+    static bool WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
 
 
-/******************************NPC.txt file***********************************/
-// SMBX64 NPC.TXT File
+    /******************************NPC.txt file***********************************/
+    // SMBX64 NPC.TXT File
     /*!
      * \brief Parses SMBX64 NPC.txt config data from file
      * \param [__in] filePath Filepath to open
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadNpcTXTFileF(PGESTRING  filePath, NPCConfigFile &FileData, bool IgnoreBad=false);
+    static bool ReadNpcTXTFileF(PGESTRING  filePath, NPCConfigFile &FileData, bool IgnoreBad = false);
     /*!
      * \brief Parses SMBX64 NPC.txt config data from raw data string
      * \param [__in] rawdata Raw data string contains SMBX Engine config data
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData, bool IgnoreBad=false);
+    static bool ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData, bool IgnoreBad = false);
     /*!
      * \brief Parses SMBX64 NPC.txt config data from file input descriptor
      * \param [__in] in File Input descriptor
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &in, NPCConfigFile &FileData, bool IgnoreBad=false);
+    static bool ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &in, NPCConfigFile &FileData, bool IgnoreBad = false);
 
     /*!
      * \brief Saves world map data into file of SMBX64 NPC.txt config data format
@@ -830,13 +883,14 @@ public:
      */
     static NPCConfigFile    CreateEmpytNpcTXT();
 
-/******************************Common stuff***********************************/
+    /******************************Common stuff***********************************/
     /*!
      * \brief File parse error codes
      */
-    enum ErrorCodes{
+    enum ErrorCodes
+    {
         //! file has been successfully parses
-        Success=0,
+        Success = 0,
         //! Requested file is not exist
         ERROR_NotExist,
         //! Access to requested file is denied by operation system
@@ -860,7 +914,8 @@ public:
     /*!
      * \brief SMBX64 Standrd specific violation codes
      */
-    enum SMBX64_violations {
+    enum SMBX64_violations
+    {
         //! File data is conforms to the SMBX64 Standard
         SMBX64_FINE             = 0x000,
         //! File data structure has exited limit of section entries
@@ -891,7 +946,7 @@ public:
         SMBX64EXC_MUSICBOXES    = 0x1000
     };
 
-//Check SMBX64 limits
+    //Check SMBX64 limits
     /*!
      * \brief Validates level file data structure to conformation to SMBX64 Standard
      * \param lvl Level file data structure
@@ -905,7 +960,7 @@ public:
      */
     static int              smbx64WorldCheckLimits(WorldData &wld);
 
-/******************************Internal stuff***********************************/
+    /******************************Internal stuff***********************************/
     /*!
      * \brief Removes edge dobule quoties characters from a string
      *        for example '"Meow"' (without signgle-quotes characters)
@@ -920,4 +975,3 @@ public:
 };
 
 #endif // FILE_FORMATS_H
-

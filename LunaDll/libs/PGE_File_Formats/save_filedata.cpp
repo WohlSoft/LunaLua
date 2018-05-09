@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,7 @@ GamesaveData FileFormats::CreateGameSaveData()
 {
     GamesaveData newData;
 
-    newData.ReadFileValid = true;
-
-    newData.version = 0;
+    newData.meta.RecentFormatVersion = 0;
 
     newData.lives = 3;
     newData.coins = 0;
@@ -59,11 +57,6 @@ GamesaveData FileFormats::CreateGameSaveData()
     newData.worldPosY = 0;
     newData.gameCompleted = false;
 
-    newData.modified = false;
-    newData.untitled = true;
-    newData.smbx64strict = false;
-    newData.filename = "";
-    newData.path = "";
     newData.characterStates.push_back(CreateSavCharacterState());
     newData.currentCharacter.push_back(1);
 

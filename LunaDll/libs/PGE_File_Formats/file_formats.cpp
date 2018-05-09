@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,8 @@
 #ifdef PGE_EDITOR
 #include <common_features/themes.h>
 #endif
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
 
-PGESTRING FileFormats::errorString="";
+PGESTRING FileFormats::errorString = "";
 
 PGESTRING FileFormats::removeQuotes(PGESTRING str)
 {
@@ -35,17 +32,17 @@ PGESTRING FileFormats::removeQuotes(PGESTRING str)
     #ifdef PGE_FILES_QT
     if(target.isEmpty())
         return target;
-    if(target[0]==QChar('\"'))
-        target.remove(0,1);
-    if((!target.isEmpty()) && (target[target.size()-1]==QChar('\"')))
-        target.remove(target.size()-1,1);
+    if(target[0] == QChar('\"'))
+        target.remove(0, 1);
+    if((!target.isEmpty()) && (target[target.size() - 1] == QChar('\"')))
+        target.remove(target.size() - 1, 1);
     #else
-        if(target.empty())
-            return target;
-        if(target[0]=='\"')
-            target.erase(target.begin()+0);
-        if((!target.empty()) && (target[target.size()-1]=='\"'))
-            target.erase(target.begin()+target.size()-1);
+    if(target.empty())
+        return target;
+    if(target[0] == '\"')
+        target.erase(target.begin() + 0);
+    if((!target.empty()) && (target[target.size() - 1] == '\"'))
+        target.erase(target.begin() + (std::string::difference_type)target.size() - 1);
     #endif
     return target;
 }
@@ -54,46 +51,59 @@ PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
 {
     switch(errCode)
     {
-        case Success: return "";
-        case ERROR_NotExist: return "File not exist";
-        case ERROR_AccessDenied: return "Access denied";
-        case ERROR_InvalidSyntax: return "Invalid file format";
-        case ERROR_PGEX_SectionNotClosed: return "PGE-X Section is not closed";
-        case ERROR_PGEX_InvalidSyntax: return "PGE-X Invalid data entry syntax";
-        case ERROR_PGEX_InvalidDataType: return "PGE-X Invalid data type";
-        default: return "Unknown error";
+    case Success:
+        return "";
+    case ERROR_NotExist:
+        return "File not exist";
+    case ERROR_AccessDenied:
+        return "Access denied";
+    case ERROR_InvalidSyntax:
+        return "Invalid file format";
+    case ERROR_PGEX_SectionNotClosed:
+        return "PGE-X Section is not closed";
+    case ERROR_PGEX_InvalidSyntax:
+        return "PGE-X Invalid data entry syntax";
+    case ERROR_PGEX_InvalidDataType:
+        return "PGE-X Invalid data type";
     }
+    return "Unknown error";
 }
 
 /***************************************************************************/
 #ifdef PGE_EDITOR
-CrashData::CrashData() : used(false),untitled(false), modifyed(false) {}
+CrashData::CrashData() : used(false), untitled(false), modifyed(false), fmtID(0), fmtVer(64) {}
 
 CrashData::CrashData(const CrashData &_cd)
 {
-    this->used=_cd.used;
-    this->untitled=_cd.untitled;
-    this->modifyed=_cd.modifyed;
-    this->fullPath=_cd.fullPath;
-    this->filename=_cd.filename;
+    this->used = _cd.used;
+    this->untitled = _cd.untitled;
+    this->modifyed = _cd.modifyed;
+    this->fmtID   = _cd.fmtID;
+    this->fmtVer  = _cd.fmtVer;
+    this->fullPath = _cd.fullPath;
+    this->filename = _cd.filename;
     this->path = _cd.path;
 }
 
 CrashData::CrashData(CrashData &_cd)
 {
-    this->used=_cd.used;
-    this->untitled=_cd.untitled;
-    this->modifyed=_cd.modifyed;
-    this->fullPath=_cd.fullPath;
-    this->filename=_cd.filename;
+    this->used = _cd.used;
+    this->untitled = _cd.untitled;
+    this->modifyed = _cd.modifyed;
+    this->fmtID   = _cd.fmtID;
+    this->fmtVer  = _cd.fmtVer;
+    this->fullPath = _cd.fullPath;
+    this->filename = _cd.filename;
     this->path = _cd.path;
 }
 
 void CrashData::reset()
 {
-    used=false;
-    untitled=false;
-    modifyed=false;
+    used = false;
+    untitled = false;
+    modifyed = false;
+    fmtID   = 0;
+    fmtVer  = 0;
     fullPath.clear();
     filename.clear();
     path.clear();

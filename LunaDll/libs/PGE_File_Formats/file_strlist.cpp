@@ -1,6 +1,6 @@
 /*
  * Platformer Game Engine by Wohlstand, a free platform for game making
- * Copyright (c) 2014-2016 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2017 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ FileStringList::~FileStringList()
     buffer.clear();
 }
 
-void FileStringList::addData(PGESTRING fileData)
+void FileStringList::addData(const PGESTRING &fileData)
 {
     buffer.clear();
     #ifdef PGE_FILES_QT
@@ -42,7 +42,7 @@ void FileStringList::addData(PGESTRING fileData)
     #else
     PGE_SPLITSTRING(buffer, fileData, "\n");
     #endif
-    lineID=0;
+    lineID = 0;
 }
 
 PGESTRING FileStringList::readLine()
@@ -51,7 +51,7 @@ PGESTRING FileStringList::readLine()
 
     if(!isEOF())
     {
-        sent = buffer[lineID];
+        sent = buffer[static_cast<pge_size_t>(lineID)];
         lineID++;
     }
     return sent;
