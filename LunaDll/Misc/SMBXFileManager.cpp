@@ -360,7 +360,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         numOfDoors = LIMIT_PHYSENV;
     GM_WATER_AREA_COUNT = numOfWater;
     for (int i = 0; i < numOfWater; i++) {
-        SMBX_Water* nextWater = SMBX_Water::Get(i + 1);
+        SMBX_Water* nextWater = SMBX_Water::Get(i);
         memset(nextWater, 0, sizeof(SMBX_Water));
         const LevelPhysEnv& nextLevelPhysEnv = outData.physez[i];
         nextWater->momentum.x = static_cast<double>(nextLevelPhysEnv.x);
@@ -436,7 +436,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         }
         
         nextEvent->EventToTrigger = nextDataEvent.trigger;
-        nextEvent->Delay = static_cast<float>(nextDataEvent.trigger_timer);
+        nextEvent->Delay = static_cast<double>(nextDataEvent.trigger_timer);
         nextEvent->NoSmoke = COMBOOL(nextDataEvent.nosmoke);
 
         nextEvent->ForceKeyboard.altJumpKeyState = COMBOOL(nextDataEvent.ctrl_altjump);

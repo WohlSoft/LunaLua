@@ -126,9 +126,7 @@ struct SMBXEvent : SMBX_StaticBaseItemArray<SMBXEvent, 100, GM_EVENTS_PTR_CONSTP
     short EndGame;                  // 0x54C (1 == bowser defeat, 0 = none)
     short unknown_54E;              // 0x55E
     VB6StrPtr EventToTrigger;       // 0x550
-    float Delay;                    // 0x554
-    short unknown_558;              // 0x558
-    short unknown_55A;              // 0x55A
+    double Delay;                   // 0x554
     KeyMap ForceKeyboard;           // 0x55C
     VB6StrPtr LayerToMove;          // 0x570
     float LayerHSpeed;              // 0x574
