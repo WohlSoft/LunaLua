@@ -14,6 +14,8 @@ ControlConfig::ControlConfig(const QString &configFilename, QObject *parent) :
     while(m_data.players.size() < 2) m_data.players.push_back(SMBX64_ConfigPlayer());
     m_data.players[0].id = 1;
     m_data.players[1].id = 2;
+
+    read();
 }
 
 bool ControlConfig::read()
@@ -32,6 +34,43 @@ bool ControlConfig::read()
     in.setLocale(QLocale::system());
     in.setCodec(QTextCodec::codecForLocale());
     m_data =  FileFormats::ReadSMBX64ConfigFile(in.readAll());
+
+    emit fullscreenUpdated();
+    emit controllerType1Updated();
+    emit keyboardUp1Updated();
+    emit keyboardDown1Updated();
+    emit keyboardLeft1Updated();
+    emit keyboardRight1Updated();
+    emit keyboardRun1Updated();
+    emit keyboardJump1Updated();
+    emit keyboardDrop1Updated();
+    emit keyboardPause1Updated();
+    emit keyboardAltJump1Updated();
+    emit keyboardAltRun1Updated();
+    emit joystickRun1Updated();
+    emit joystickJump1Updated();
+    emit joystickDrop1Updated();
+    emit joystickPause1Updated();
+    emit joystickAltJump1Updated();
+    emit joystickAltRun1Updated();
+    emit controllerType2Updated();
+    emit keyboardUp2Updated();
+    emit keyboardDown2Updated();
+    emit keyboardLeft2Updated();
+    emit keyboardRight2Updated();
+    emit keyboardRun2Updated();
+    emit keyboardJump2Updated();
+    emit keyboardDrop2Updated();
+    emit keyboardPause2Updated();
+    emit keyboardAltJump2Updated();
+    emit keyboardAltRun2Updated();
+    emit joystickRun2Updated();
+    emit joystickJump2Updated();
+    emit joystickDrop2Updated();
+    emit joystickPause2Updated();
+    emit joystickAltJump2Updated();
+    emit joystickAltRun2Updated();
+
     if(m_data.ReadFileValid)
         return true;
     else
