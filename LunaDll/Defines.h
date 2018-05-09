@@ -222,7 +222,9 @@ DEFMEM(GM_UNK_B2C5A0,       WORD,  0x00B2C5A0);
 DEFMEM(GM_UNK_B2C6DA,       WORD,  0x00B2C6DA);
 DEFMEM(GM_UNK_B2C8E4,       WORD,  0x00B2C8E4);
 DEFMEM(GM_UNK_B2D742,       WORD,  0x00B2D742);
-DEFMEM(GM_UNK_WINDOWED,   WORD,  0x00B250D8);
+DEFMEM(GM_UNK_WINDOWED,     WORD,  0x00B250D8);
+
+DEFMEM(GM_UNK_SOUND_VOLUME, WORD*, 0x00B2C590);
 
 // NPC Settings
 DEFMEM(GM_CONF_WIDTH,       WORD*, 0x00B25BA8);
@@ -231,8 +233,8 @@ DEFMEM(GM_CONF_GFXWIDTH,    WORD*, 0x00B25BE0);
 DEFMEM(GM_CONF_GFXHEIGHT,   WORD*, 0x00B25BFC);
 
 // Frame counters
-DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
-//DEFMEM(GM_ACTIVE_FRAMECT, DWORD, 0x00B2C67C);  Float?
+DEFMEM(GM_TRANS_FRAMECT,  DWORD,  0x00B2C670);
+DEFMEM(GM_ACTIVE_FRAMECT, double, 0x00B2C67C);
 
 // MOB Related memory
 DEFMEM(GM_NPCS_PTR,         void*, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
@@ -278,6 +280,8 @@ DEFMEM(GM_KEYRELEASED,      WORD,  0x00B2C884);
 // States
 DEFMEM(GM_FREEZWITCH_ACTIV, WORD,  0x00B2C8B4);
 DEFMEM(GM_PAUSE_OPEN,       WORD,  0x00B250E2);
+
+DEFMEM(GM_CHEAT_MONEYTREE_HAVEMONEY, DWORD, 0x00B2C8BA);
 
 // Camera
 DEFMEM(GM_CAMERA_X,         double*, 0x00B2B984);
@@ -615,6 +619,9 @@ DEFMEM(IMP_vbaStrCopy,      void*, 0x004011b0); // Ptr to __fastcall
 DEFMEM(IMP_vbaFreeStr,      void*, 0x00401248); // Ptr to __fastcall
 DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
+DEFMEM(IMP_vbaNew2,         void*, 0x004011A0); // Ptr to __stdcall
+DEFMEM(IMP_vbaHresultCheckObj, void*, 0x00401070); // Ptr to __stdcall
+DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 
 ////////////////////////
 ///    -Functions-   ///
@@ -804,6 +811,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 #define GF_APPLY_FULLSCREEN 0x00A98190
 
+#define GF_UNK_DOORS_COUNT  0x008F7D70
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -852,6 +861,8 @@ static const auto native_sortX          = (void(__stdcall *)(short* /*startIndex
 static const auto native_sort_finalize1 = (void(__stdcall *)())GF_BLOCKSORT_FIN1;
 static const auto native_sort_finalize2 = (void(__stdcall *)())GF_BLOCKSORT_FIN2;
 static const auto native_sort_bgo       = (void(__stdcall *)())GF_BGOSORT_RELATED;
+
+static const auto native_unkDoorsCount  = (int(__stdcall *)(int, int, int, int))GF_UNK_DOORS_COUNT;
 
 static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/))GF_TRIGGER_EVENT;
 

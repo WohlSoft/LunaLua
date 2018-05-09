@@ -619,6 +619,12 @@
     <ClInclude Include="libs\PGE_File_Formats\wld_filedata.h">
       <Filter>libs\PGE_File_Formats</Filter>
     </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_ff_units.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\smbx38a_private.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1124,9 +1130,6 @@
     <ClCompile Include="Misc\SMBXFileManager.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF.c">
-      <Filter>libs\PGE_File_Formats</Filter>
-    </ClCompile>
     <ClCompile Include="libs\PGE_File_Formats\file_formats.cpp">
       <Filter>libs\PGE_File_Formats</Filter>
     </ClCompile>
@@ -1190,6 +1193,12 @@
     <ClCompile Include="libs\PGE_File_Formats\wld_filedata.cpp">
       <Filter>libs\PGE_File_Formats</Filter>
     </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF_PGEFF.c">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wld_38a.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
@@ -1210,8 +1219,5 @@
     </Text>
     <Text Include="Changelog.txt" />
     <Text Include="libs\PGE_File_Formats\Readme.txt" />
-    <Text Include="libs\PGE_File_Formats\file_rw_lvl_38a.old.txt">
-      <Filter>libs\PGE_File_Formats</Filter>
-    </Text>
   </ItemGroup>
 </Project>

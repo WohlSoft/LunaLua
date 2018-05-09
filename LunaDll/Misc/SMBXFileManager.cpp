@@ -2,6 +2,7 @@
 #include "MiscFuncs.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
+#include "../Rendering/ImageLoader.h"
 
 #include "../libs/PGE_File_Formats/file_formats.h"
 
@@ -34,11 +35,12 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 {
     m_isValid = false; // Ensure that we are not valid right now
-    
+
     *(DWORD*)0xB2B9E4 = 0; // Unknown
     native_cleanupLevel();
     native_setupSFX();
     GM_FREEZWITCH_ACTIV = 0;
+    GM_CHEAT_MONEYTREE_HAVEMONEY = 0;
 
     // Reset counters (values where reset by native_cleanupLevel)
     GM_BLOCK_COUNT = 0;
@@ -58,7 +60,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         return;
 
 
-    std::wstring dir = fullPath.substr(0U, findLastSlash + 1);
+    std::wstring dir = fullPath.substr(0U, findLastSlash);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
     std::wstring levelname = RemoveExtension(filename);
     std::wstring customFolder = dir + levelname;
@@ -75,15 +77,19 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     LevelData outData;
     if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)) {
         // TODO: What to do on error?
-        MessageBoxA(NULL, (outData.ERROR_info + "\nat line number" + std::to_string(outData.ERROR_linenum)).c_str(), "Error when parsing level file!", NULL);
-
+        MessageBoxA(NULL, (outData.meta.ERROR_info + "\nat line number " + 
+                           std::to_string(outData.meta.ERROR_linenum)).c_str(),
+                            "Error when parsing level file!", NULL);
         return;
     }
     
-    dir = utf8_decode(outData.path);
-    levelname = utf8_decode(outData.filename);
-    std::string customFolderU8 = outData.path+"/"+outData.filename+"/";
-    customFolder = Str2WStr(customFolderU8);
+    dir = utf8_decode(outData.meta.path + "/");
+    replaceSubStrW(dir, L"/", L"\\");
+    levelname = utf8_decode(outData.meta.filename);
+    std::string customFolderU8 = outData.meta.path + "/" + outData.meta.filename + "/";
+    replaceSubStr(customFolderU8, "/", "\\");
+    //MessageBoxA(NULL, (customFolderU8.c_str()), "kkk", NULL);
+    customFolder = Str2WStr(customFolderU8);    
 
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
@@ -95,23 +101,22 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
 
-
-
     // Init Config-Txt
     VB6StrPtr customFolderVB6 = customFolder;
     native_loadNPCConfig(&customFolderVB6);
 
     // Load Episode GFX
-    native_loadLocalGfx();
-
+    //native_loadLocalGfx();
     // Load GFX from custom folder
-    native_loadGraphicsFromFolder(&customFolderVB6);
+    //native_loadGraphicsFromFolder(&customFolderVB6);
+    
+    ImageLoader::Run();
 
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
-    
 
-    int numOfSections = outData.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
+
+    int numOfSections = outData.meta.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
     for(int i = 0; i < numOfSections; i++)
     {
         LevelSection& nextDataLevelSection = outData.sections[i];
@@ -125,13 +130,13 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         GM_SEC_ISWARP[i] = COMBOOL(nextDataLevelSection.wrap_h);
         GM_SEC_MUSIC_TBL[i] = nextDataLevelSection.music_id;
         GM_SEC_NOTURNBACK[i] = COMBOOL(nextDataLevelSection.lock_left_scroll);
-        GM_SEC_OFFSCREEN[i] = nextDataLevelSection.OffScreenEn;
+        GM_SEC_OFFSCREEN[i] = COMBOOL(nextDataLevelSection.OffScreenEn);
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
     }
 
-    if(outData.RecentFormatVersion <= 7)//Fill others with zeros
+    if(outData.meta.RecentFormatVersion <= 7)//Fill others with zeros
     {
-        for(int i=6; i<21; i++)
+        for(int i = 6; i < 21; i++)
         {
             Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
             GM_SEC_BG_ID[i] = 0;
@@ -147,21 +152,21 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     memcpy(GM_ORIG_LVL_BOUNDS, GM_LVL_BOUNDARIES, 6 * sizeof(double) * numOfSections);
     memcpy(GM_SEC_ORIG_BG_ID, GM_SEC_BG_ID, sizeof(WORD) * numOfSections);
 
-
     //Fill with zeros
-    for(int i=0;i<2;i++)
+    for(int i=0; i < 2; i++)
     {
         Momentum* nextPlayerPos = &GM_PLAYER_POS[i];
         memset(nextPlayerPos, 0, sizeof(Momentum));
     }
+
     //GM_PLAYERS_COUNT = numOfPlayers;
     int numOfPlayers = outData.players.size();
     for (int i = 0; i < numOfPlayers; i++)
     {
         const PlayerPoint& nextDataLevelPoint = outData.players[i];
-        if((nextDataLevelPoint.id>2)||(nextDataLevelPoint.id<0))//Skip invalid player points!
+        if((nextDataLevelPoint.id > 2)||(nextDataLevelPoint.id < 0))//Skip invalid player points!
             continue;
-        Momentum* nextPlayerPos = &GM_PLAYER_POS[nextDataLevelPoint.id-1];
+        Momentum* nextPlayerPos = &GM_PLAYER_POS[nextDataLevelPoint.id - 1];
         //memset(nextPlayerPos, 0, sizeof(Momentum));
         nextPlayerPos->x = static_cast<double>(nextDataLevelPoint.x);
         nextPlayerPos->y = static_cast<double>(nextDataLevelPoint.y);
@@ -175,7 +180,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_BLOCK_COUNT = numOfBlocks;
     for (int i = 0; i < numOfBlocks; i++)
     {
-        Block* nextBlock = Block::Get(i);
+        Block* nextBlock = Block::Get(i + 1);
         memset(nextBlock, 0, sizeof(Block));
         const LevelBlock& nextDataLevelBlock = outData.blocks[i];
         nextBlock->momentum.x = static_cast<double>(nextDataLevelBlock.x);
@@ -229,23 +234,26 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         // Special rules by id:
         if ((npcID == 91) || (npcID == 96) || (npcID == 283) || (npcID == 284)) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.contents);
-            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
         }
-        if ((npcID == 91) || (npcID == 288) || (npcID == 289)) {
+        if (((nextDataLevelNPC.contents == 288) && (npcID == 91))// Grass contains magic potion
+            || (npcID == 288)  //Magic potion
+            || (npcID == 289)) //Subspace door
+        {
             nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_E0 = static_cast<short>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_E0 = static_cast<short>(nextNPC->ai2);
         }
         if (npc_isflying[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
         }
         if (npc_isWaterNPC[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
         }
         if (npcID == 260) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
         }
 
         nextNPC->isGenerator = COMBOOL(nextDataLevelNPC.generator);
@@ -277,7 +285,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->unknown_124 = -1;
         nextNPC->unknown_14C = 1;
 
-        short curI = static_cast<short>(i);
+        short curI = static_cast<short>(i + 1);
         native_updateNPC(&curI);
 
         if (npcID == 97 || npcID == 196) {
@@ -296,7 +304,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             if (markStarAsGotten) 
             {
                 nextNPC->ai1 = 1.0;
-                nextNPC->unknown_DE;
+                nextNPC->unknown_DE = 1;
                 if (npcID == 196) {
                     nextNPC->killFlag = 9;
                 }
@@ -344,7 +352,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         numOfDoors = LIMIT_PHYSENV;
     GM_WATER_AREA_COUNT = numOfWater;
     for (int i = 0; i < numOfWater; i++) {
-        SMBX_Water* nextWater = SMBX_Water::Get(i);
+        SMBX_Water* nextWater = SMBX_Water::Get(i + 1);
         memset(nextWater, 0, sizeof(SMBX_Water));
         const LevelPhysEnv& nextLevelPhysEnv = outData.physez[i];
         nextWater->momentum.x = static_cast<double>(nextLevelPhysEnv.x);
@@ -387,7 +395,6 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         int hideLayersNum = nextDataEvent.layers_hide.size();
         int showLayersNum = nextDataEvent.layers_show.size();
         int toggleLayersNum = nextDataEvent.layers_toggle.size();
-        
 
         for (int i = 0; i < 21; i++) {
             if (i < hideLayersNum)
@@ -405,8 +412,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             else
                 nextEvent->pToggleLayerTarg[i] = "";
         }
-        
-        
+
         int numOfSets = nextDataEvent.sets.size();
         if (numOfSets > 21)
             numOfSets = 21;
@@ -424,7 +430,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextEvent->EventToTrigger = nextDataEvent.trigger;
         nextEvent->Delay = static_cast<float>(nextDataEvent.trigger_timer);
         nextEvent->NoSmoke = COMBOOL(nextDataEvent.nosmoke);
-        
+
         nextEvent->ForceKeyboard.altJumpKeyState = COMBOOL(nextDataEvent.ctrl_altjump);
         nextEvent->ForceKeyboard.altRunKeyState = COMBOOL(nextDataEvent.ctrl_altrun);
         nextEvent->ForceKeyboard.downKeyState = COMBOOL(nextDataEvent.ctrl_down);
@@ -450,27 +456,49 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     native_sort_finalize1();
     native_sort_bgo();
     native_sort_finalize2();
+    
+    GM_WINNING = 0;
 
     if((GM_ISLEVELEDITORMODE==-1)||(GM_IS_EDITOR_TESTING_NON_FULLSCREEN==-1))
     {
-//        DEFMEM(dword_B2DD60, WORD, 0x00B2DD60);
-//        WORD v126 = dword_B2DD60;
-//        if ( !dword_B2DD60 )
-//        {
-//            //004011A0 Call this function:
-//            //__fastcall();
-//           (v119)(&Pub_Obj_Inf22_wRefCount, &dword_B2DD60);
-//            v126 = dword_B2DD60;
-//        }
+        // Skip this shit
+        //        DEFMEM(dword_B2DD60, WORD, 0x00B2DD60);
+        //        WORD v126 = dword_B2DD60;
+        //        if ( !dword_B2DD60 )
+        //        {
+        //            //004011A0 Call this function:
+        //            //__fastcall();
+        //           (v119)(&Pub_Obj_Inf22_wRefCount, &dword_B2DD60);
+        //            v126 = dword_B2DD60;
+        //        }
     }
 
     if(GM_ISLEVELEDITORMODE == -1)
     {
-        //Do big mad job here. Still WIP
+        // Skip this shit
     }
 
+    int doorsCnt = -1;
+    native_unkDoorsCount(doorsCnt, (int)IMP_vbaNew2, (int)IMP_vbaHresultCheckObj, (int)IMP_vbaInputFile);
+    
     GM_WINNING = 0;
 
-    //Next work to setup doors and their star counters, also states of the layers, etc.
+    /* Put here extra BGOs */
 
+    
+    
+    /* Finalizing crap */
+    
+    //*(_WORD *)(unkSoundVolume + 24) = 100;
+    GM_UNK_SOUND_VOLUME[12] = 100;//*(WORD*)(0x00B2C590 + 24) = 100;    
+    //*(_QWORD *)&dbl_B2C690 = 0i64;
+    *(double*)(0x00B2C690) = 0;
+    //local_getTicksCount_v346 = DeclareKernel32_GetTickCount();
+    int ticks = GetTickCount() + 1000;
+    //*(_QWORD *)&dbl_B2C67C = 0i64;
+    GM_ACTIVE_FRAMECT = 0; //*(double*)(0x00B2C67C) = 0;
+    //g_transFrameCounter = 0;
+    GM_TRANS_FRAMECT = 0;
+    //*(_QWORD *)&dbl_B2D72C = 0i64;
+    GM_LAST_FRAME_TIME = 0;//*(double*)(0x00B2D72C) = 0;   
 }

@@ -179,9 +179,11 @@
     <ClInclude Include="libs\PGE_File_Formats\npc_filedata.h" />
     <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_globs.h" />
     <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_sys.h" />
+    <ClInclude Include="libs\PGE_File_Formats\pge_ff_units.h" />
     <ClInclude Include="libs\PGE_File_Formats\pge_x.h" />
     <ClInclude Include="libs\PGE_File_Formats\pge_x_macro.h" />
     <ClInclude Include="libs\PGE_File_Formats\save_filedata.h" />
+    <ClInclude Include="libs\PGE_File_Formats\smbx38a_private.h" />
     <ClInclude Include="libs\PGE_File_Formats\smbx64.h" />
     <ClInclude Include="libs\PGE_File_Formats\smbx64_cnf_filedata.h" />
     <ClInclude Include="libs\PGE_File_Formats\smbx64_macro.h" />
@@ -335,7 +337,7 @@
     <ClCompile Include="Rendering\Shaders\GLShaderVariableInfo.cpp" />
     <ClCompile Include="IPC\IPCPipeServer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
-    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF.c" />
+    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF_PGEFF.c" />
     <ClCompile Include="libs\PGE_File_Formats\file_formats.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_rwopen.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_rw_lvl.cpp" />
@@ -347,6 +349,7 @@
     <ClCompile Include="libs\PGE_File_Formats\file_rw_savx.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_rw_smbx64_cnf.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_rw_wld.cpp" />
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wld_38a.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_rw_wldx.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\file_strlist.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\lvl_filedata.cpp" />
@@ -524,7 +527,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Changelog.txt" />
-    <Text Include="libs\PGE_File_Formats\file_rw_lvl_38a.old.txt" />
     <Text Include="libs\PGE_File_Formats\Readme.txt" />
     <Text Include="SMBXInternal\Reconstructed\about.txt" />
   </ItemGroup>
