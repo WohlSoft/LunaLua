@@ -271,7 +271,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             nextNPC->generatorDelaySetting = static_cast<float>(nextDataLevelNPC.generator_period);
         }
 
-        nextNPC->talkMsg = nextDataLevelNPC.event_talk;
+        nextNPC->talkMsg = nextDataLevelNPC.msg;
         nextNPC->friendly = COMBOOL(nextDataLevelNPC.friendly);
         nextNPC->dontMove = COMBOOL(nextDataLevelNPC.nomove);
         nextNPC->dontMove2 = nextNPC->dontMove;
