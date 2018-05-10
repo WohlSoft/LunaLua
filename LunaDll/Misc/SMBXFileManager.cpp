@@ -367,6 +367,12 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             SMBX_Warp* prevDoor = twoWayWarps[i];
             SMBX_Warp* nextDoor = SMBX_Warp::Get(GM_WARP_COUNT++);
             memcpy(nextDoor, prevDoor, sizeof(SMBX_Warp));
+            // Safely copy strings from original
+            nextDoor->ptLayerName.ptr = 0;
+            nextDoor->ptLayerName = prevDoor->ptLayerName;
+            nextDoor->warpToLevelFileName.ptr = 0;
+            nextDoor->warpToLevelFileName = prevDoor->warpToLevelFileName;
+            // Swap entrance and exit
             nextDoor->entrance.x = prevDoor->exit.x;
             nextDoor->entrance.y = prevDoor->exit.y;
             nextDoor->exit.x = prevDoor->entrance.x;
