@@ -25,7 +25,7 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
     m_isValid(false)
 {}
 
-#define LIMIT_BLOCKS   16384
+#define LIMIT_BLOCKS   20000
 #define LIMIT_BGOS     8000
 #define LIMIT_NPCS     5000
 #define LIMIT_WARPS    2000
