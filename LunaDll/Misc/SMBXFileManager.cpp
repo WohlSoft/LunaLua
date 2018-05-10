@@ -324,10 +324,14 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     if(numOfDoors > LIMIT_WARPS)
         numOfDoors = LIMIT_WARPS;
     GM_WARP_COUNT = numOfDoors;
+
+    std::vector<SMBX_Warp*> twoWayWarps;
     for (unsigned int i = 0; i < numOfDoors; i++) {
         SMBX_Warp* nextDoor = SMBX_Warp::Get(i);
         memset(nextDoor, 0, sizeof(SMBX_Warp));
         const LevelDoor& nextDataLevelDoor = outData.doors[i];
+        if (nextDataLevelDoor.two_way)
+            twoWayWarps.push_back(nextDoor);
         nextDoor->unknown_0E = -1;
         nextDoor->unknown_10 = -1;
         nextDoor->entrance.x = static_cast<double>(nextDataLevelDoor.ix);
@@ -352,6 +356,22 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextDoor->entrance.height = 32.0;
         nextDoor->exit.width = 32.0;
         nextDoor->exit.height = 32.0;
+    }
+
+    if (!twoWayWarps.empty())
+    {
+        for (unsigned int i = 0; i < twoWayWarps.size(); i++)
+        {
+            if (GM_WARP_COUNT >= LIMIT_WARPS)
+                break;//No more warp entries can be placed
+            SMBX_Warp* prevDoor = twoWayWarps[i];
+            SMBX_Warp* nextDoor = SMBX_Warp::Get(GM_WARP_COUNT++);
+            memcpy(nextDoor, prevDoor, sizeof(SMBX_Warp));
+            nextDoor->entrance.x = prevDoor->exit.x;
+            nextDoor->entrance.y = prevDoor->exit.y;
+            nextDoor->exit.x = prevDoor->entrance.x;
+            nextDoor->exit.y = prevDoor->entrance.y;
+        }
     }
 
     int numOfWater = outData.physez.size();
