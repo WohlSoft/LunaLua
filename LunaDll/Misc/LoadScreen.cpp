@@ -43,6 +43,8 @@ static void LoadThread(void)
 {
 	DWORD loadScreenStartTick = GetTickCount();
 
+	gLunaRender.SetOwningThread();
+
 	static std::string mainCode;
 	if (mainCode.length() == 0)
 	{
@@ -207,6 +209,8 @@ void LunaLoadScreenKill()
 	loadThread->join();
 	delete loadThread;
 	loadThread = nullptr;
+
+	gLunaRender.SetOwningThread();
 }
 
 void LunaLoadScreenSetEnable(bool skip)

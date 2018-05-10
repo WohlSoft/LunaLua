@@ -44,12 +44,17 @@ struct Renderer {
     void StartFrameRender();
     void EndFrameRender();
 
+	void ClearQueue();
+	void SetOwningThread();
+	bool IsInOwningThread();
+
 private:
     void DrawOp(RenderOp& render_operation);
     
 
     // Members //
 private:
+	DWORD m_owningThread;
     bool m_InFrameRender;
     int m_curCamIdx; // Camera state
     
