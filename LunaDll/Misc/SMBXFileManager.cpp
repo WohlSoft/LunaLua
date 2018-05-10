@@ -325,7 +325,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     if(numOfDoors > LIMIT_WARPS)
         numOfDoors = LIMIT_WARPS;
     GM_WARP_COUNT = numOfDoors;
-    for (unsigned int i = 0; i < outData.doors.size(); i++) {
+    for (unsigned int i = 0; i < numOfDoors; i++) {
         SMBX_Warp* nextDoor = SMBX_Warp::Get(i);
         memset(nextDoor, 0, sizeof(SMBX_Warp));
         const LevelDoor& nextDataLevelDoor = outData.doors[i];
@@ -356,8 +356,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     int numOfWater = outData.physez.size();
-    if(numOfDoors > LIMIT_PHYSENV)
-        numOfDoors = LIMIT_PHYSENV;
+    if(numOfWater > LIMIT_PHYSENV)
+		numOfWater = LIMIT_PHYSENV;
     GM_WATER_AREA_COUNT = numOfWater;
     for (int i = 0; i < numOfWater; i++) {
         SMBX_Water* nextWater = SMBX_Water::Get(i);
