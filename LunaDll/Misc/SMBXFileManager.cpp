@@ -142,20 +142,19 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
     }
 
-    if(outData.meta.RecentFormatVersion <= 7)//Fill others with zeros
+    //Fill others with zeros
+    for(int i = numOfSections; i < 21; i++)
     {
-        for(int i = 6; i < 21; i++)
-        {
-            Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
-            GM_SEC_BG_ID[i] = 0;
-            GM_SEC_ISUNDERWATER[i] = -1;
-            GM_SEC_ISWARP[i] = -1;
-            GM_SEC_MUSIC_TBL[i] = 0;
-            GM_SEC_NOTURNBACK[i] = -1;
-            GM_SEC_OFFSCREEN[i] = -1;
-            GM_MUSIC_PATHS_PTR[i] = "";
-        }
+        Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
+        GM_SEC_BG_ID[i] = 0;
+        GM_SEC_ISUNDERWATER[i] = -1;
+        GM_SEC_ISWARP[i] = -1;
+        GM_SEC_MUSIC_TBL[i] = 0;
+        GM_SEC_NOTURNBACK[i] = -1;
+        GM_SEC_OFFSCREEN[i] = -1;
+        GM_MUSIC_PATHS_PTR[i] = "";
     }
+    
     // Copy initial values for events
     memcpy(GM_ORIG_LVL_BOUNDS, GM_LVL_BOUNDARIES, 6 * sizeof(double) * numOfSections);
     memcpy(GM_SEC_ORIG_BG_ID, GM_SEC_BG_ID, sizeof(WORD) * numOfSections);
@@ -375,7 +374,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     int numOfLayers = outData.layers.size();
     if(numOfLayers > LIMIT_LAYERS)
         numOfLayers = LIMIT_LAYERS;
-    memset(GM_LAYER_ARRAY_PTR, 0, sizeof(LayerControl) * 100);
+    memset(GM_LAYER_ARRAY_PTR, 0, sizeof(LayerControl) * LIMIT_LAYERS);
     for (int i = 0; i < numOfLayers; i++) {
         LayerControl* nextLayer = LayerControl::Get(i);
         const LevelLayer& nextDataLevelLayer = outData.layers[i];
@@ -390,7 +389,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     int numOfEvents = outData.events.size();
     if(numOfEvents > LIMIT_EVENTS)
         numOfEvents = LIMIT_EVENTS;
-    memset(GM_EVENTS_PTR, 0, sizeof(SMBXEvent) * 100);
+    memset(GM_EVENTS_PTR, 0, sizeof(SMBXEvent) * LIMIT_EVENTS);
     for (int i = 0; i < numOfEvents; i++) {
         
         SMBXEvent* nextEvent = SMBXEvent::Get(i);
