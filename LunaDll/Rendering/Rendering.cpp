@@ -26,6 +26,7 @@ Renderer::Renderer() :
     m_renderOpsSortedCount(0),
     m_renderOpsProcessedCount(0)
 {
+	m_owningThread = GetCurrentThreadId();
 }
 
 // DTOR
@@ -134,6 +135,11 @@ std::vector<std::shared_ptr<LunaImage>> Renderer::LoadAnimatedBitmapResource(std
 
 // ADD OP
 void Renderer::AddOp(RenderOp* op) {
+	if (m_owningThread != GetCurrentThreadId())
+	{
+		delete op;
+		return;
+	}
     if (op->m_selectedCamera == 0)
     {
         // If the rendering operation was created in the middle of handling a
@@ -145,6 +151,7 @@ void Renderer::AddOp(RenderOp* op) {
 
 // GL Engine OP
 void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority) {
+	if (m_owningThread != GetCurrentThreadId()) return;
     RenderGLOp* op = new RenderGLOp(cmd);
     op->m_renderPriority = renderPriority;
     AddOp(op);
@@ -152,6 +159,7 @@ void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPrior
 
 // DRAW OP -- Process a render operation, draw
 void Renderer::DrawOp(RenderOp& op) {
+	if (m_owningThread != GetCurrentThreadId()) return;
     if ((op.m_selectedCamera == 0 || op.m_selectedCamera == m_curCamIdx) && (op.m_FramesLeft >= 1))
     {
         op.Draw(this);
@@ -166,6 +174,7 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 // RENDER ALL
 void Renderer::RenderBelowPriority(double maxPriority) {
     if (!m_InFrameRender) return;
+	if (m_owningThread != GetCurrentThreadId()) return;
 
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;
@@ -250,18 +259,21 @@ void Renderer::DebugPrint(std::wstring message, double val) {
 
 void Renderer::StartFrameRender()
 {
+	if (m_owningThread != GetCurrentThreadId()) return;
     m_curCamIdx = 0;
     m_InFrameRender = true;
 }
 
 void Renderer::StartCameraRender(int idx)
 {
+	if (m_owningThread != GetCurrentThreadId()) return;
     m_curCamIdx = idx;
     m_renderOpsProcessedCount = 0;
 }
 
 void Renderer::StoreCameraPosition(int idx)
 {
+	if (m_owningThread != GetCurrentThreadId()) return;
     if (g_GLEngine.IsEnabled())
     {
         std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
@@ -274,6 +286,7 @@ void Renderer::StoreCameraPosition(int idx)
 void Renderer::EndFrameRender()
 {
     if (!m_InFrameRender) return;
+	if (m_owningThread != GetCurrentThreadId()) return;
 
     m_curCamIdx = 0;
 
@@ -298,7 +311,26 @@ void Renderer::EndFrameRender()
     m_InFrameRender = false;
 }
 
+void Renderer::ClearQueue()
+{
+	if (m_owningThread != GetCurrentThreadId()) return;
+	m_curCamIdx = 0;
+	m_currentRenderOps.clear();
+	m_renderOpsProcessedCount = 0;
+	m_renderOpsSortedCount = 0;
+	m_InFrameRender = false;
+}
 
+void Renderer::SetOwningThread()
+{
+	m_owningThread = GetCurrentThreadId();
+	ClearQueue();
+}
+
+bool Renderer::IsInOwningThread()
+{
+	return (m_owningThread == GetCurrentThreadId());
+}
 
 // IS ON SCREEN
 bool Render::IsOnScreen(double x, double y, double w, double h) {

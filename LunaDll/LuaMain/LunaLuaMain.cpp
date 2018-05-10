@@ -122,8 +122,6 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 {
     SafeFPUControl noFPUExecptions;
 
-	LunaLoadScreenKill();
-
     //Just to be safe
     shutdown();
     //Open up a new Lua State
