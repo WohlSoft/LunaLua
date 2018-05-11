@@ -267,7 +267,11 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->momentum.x = static_cast<double>(nextDataLevelNPC.x);
         nextNPC->momentum.y = static_cast<double>(nextDataLevelNPC.y);
         nextNPC->directionFaced = static_cast<float>(nextDataLevelNPC.direct);
+
         uint64_t npcID = nextDataLevelNPC.id;
+		// TODO: Check ID is in range.
+		// TODO: Optionally consider special id handling if input is 38A.
+
         nextNPC->id = static_cast<short>(npcID);
 
         // Special rules by id:
@@ -315,7 +319,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->noMoreObjInLayerEventName = nextDataLevelNPC.event_emptylayer;
         nextNPC->attachedLayerName = nextDataLevelNPC.attach_layer;
 
-        nextNPC->spawnID = npcID;
+        nextNPC->spawnID = static_cast<short>(npcID);
         nextNPC->momentum.width = static_cast<double>(npc_width[npcID]);
         nextNPC->momentum.height = static_cast<double>(npc_height[npcID]);
         memcpy(&nextNPC->spawnMomentum, &nextNPC->momentum, sizeof(Momentum));
@@ -352,7 +356,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         }
     }
 
-    int numOfDoors = outData.doors.size();
+    unsigned int numOfDoors = outData.doors.size();
     if(numOfDoors > LIMIT_WARPS)
         numOfDoors = LIMIT_WARPS;
     GM_WARP_COUNT = numOfDoors;
@@ -567,7 +571,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     // Initialize starlocks and locks
     GM_BGO_LOCKS_COUNT = 0;
-    for (size_t i = 0; i < GM_WARP_COUNT; i++)
+    for (unsigned int i = 0; i < GM_WARP_COUNT; i++)
     {
         SMBX_Warp* nextWarp = SMBX_Warp::Get(i);
 
