@@ -133,7 +133,7 @@ public:
 
     unsigned int joystickAltJump1() const
     {
-        return m_data.players[0].j_jump;
+        return m_data.players[0].j_altjump;
     }
 
     unsigned int joystickAltRun1() const
@@ -220,7 +220,7 @@ public:
 
     unsigned int joystickAltJump2() const
     {
-        return m_data.players[1].j_jump;
+        return m_data.players[1].j_altjump;
     }
 
     unsigned int joystickAltRun2() const
