@@ -412,8 +412,10 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             // Swap entrance and exit
             nextDoor->entrance.x = prevDoor->exit.x;
             nextDoor->entrance.y = prevDoor->exit.y;
+			nextDoor->entranceDirection = static_cast<SMBX_EntranceDir>(prevDoor->exitDirection);
             nextDoor->exit.x = prevDoor->entrance.x;
             nextDoor->exit.y = prevDoor->entrance.y;
+			nextDoor->exitDirection = static_cast<SMBX_ExitDir>(prevDoor->entranceDirection);
         }
     }
 
