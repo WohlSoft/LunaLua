@@ -33,10 +33,36 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
 #define LIMIT_LAYERS   100
 #define LIMIT_EVENTS   100
 
+static void makeErrorLevel(LevelData &outData, const std::string &msg)
+{
+    FileFormats::CreateLevelData(outData);
+    LevelSection &s = outData.sections[0];
+    s.size_left = 0;
+    s.size_top = 0;
+    s.size_right = 800;
+    s.size_bottom = 600;
+
+    PlayerPoint player = FileFormats::CreateLvlPlayerPoint(1);
+    player.x = 400;
+    player.y = 300;
+    outData.players.push_back(player);
+
+    LevelSMBX64Event &levelStartEvent = outData.events[0];
+    levelStartEvent.msg = msg;
+
+    LevelNPC oneup = FileFormats::CreateLvlNpc();
+    oneup.meta.array_id = outData.npc_array_id++;
+    oneup.id = 90;
+    oneup.x = 400;
+    oneup.y = 300;
+    outData.npc.push_back(oneup);
+}
+
 // TODO: Return Error?
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 {
-    m_isValid = false; // Ensure that we are not valid right now
+    LevelData outData;
+    m_isValid = true; // Ensure that we are not valid right now
 
     *(DWORD*)0xB2B9E4 = 0; // Unknown
     native_cleanupLevel();
@@ -53,36 +79,39 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     
     // Check if Attributes is valid
     if (GetFileAttributesW(fullPath.c_str()) == INVALID_FILE_ATTRIBUTES)
-        return;
+    {
+        m_isValid = false;
+        makeErrorLevel(outData, "Can't load this level: File has an invalide attributes!");
+    }
 
     size_t findLastSlash = fullPath.find_last_of(L"/\\");
 
     // Check if path has slash, if not then invalid
-    if (findLastSlash == std::wstring::npos)
-        return;
-
+    if (m_isValid && (findLastSlash == std::wstring::npos))
+    {
+        m_isValid = false;
+        makeErrorLevel(outData, "Can't load this level: FindLastSlash has failed!");
+    }
 
     std::wstring dir = fullPath.substr(0U, findLastSlash);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
     std::wstring levelname = RemoveExtension(filename);
     std::wstring customFolder = dir + levelname;
-
     
-
     std::wcout << L"Calc --> fullPath: \"" << fullPath << "\"" << std::endl
         << L"Calc --> path: \"" << dir << "\"" << std::endl
         << L"Calc --> filename: \"" << filename << "\"" << std::endl
         << L"Calc --> levelname: \"" << levelname << "\"" << std::endl
         << L"Calc --> custom folder: \"" << customFolder << "\"" << std::endl;
     
-
-    LevelData outData;
-    if (!FileFormats::OpenLevelFile(utf8_encode(fullPath), outData)) {
-        // TODO: What to do on error?
-        MessageBoxA(NULL, (outData.meta.ERROR_info + "\nat line number " + 
-                           std::to_string(outData.meta.ERROR_linenum)).c_str(),
-                            "Error when parsing level file!", NULL);
-        return;
+    if (m_isValid && !FileFormats::OpenLevelFile(utf8_encode(fullPath), outData))
+    {
+        m_isValid = false;
+        makeErrorLevel(outData, (" There was an error while  "
+                                 "  parsing the level file!  "
+                                 "                           ") +
+                                outData.meta.ERROR_info + " at line " +
+                                std::to_string(outData.meta.ERROR_linenum));
     }
     
     dir = utf8_decode(outData.meta.path + "/");
