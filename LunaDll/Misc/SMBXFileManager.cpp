@@ -547,62 +547,20 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     /* Put here extra BGOs */
 
-/*
-    local_iterator_v285 = 1;
-    while ( 1 )                             // Iterate through level section boundaries
-    {
-        local_j = local_iterator_v285;
-        if ( (signed __int16)local_iterator_v285 > 20 )
-        break;
-        local_iterator_v286 = (signed __int16)local_iterator_v285;
-        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
-        _vbaGenerateBoundsError();
-        local_iterator_v287 = (signed __int16)local_iterator_v285;
-        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
-        _vbaGenerateBoundsError();
-        _EAX = LVL_Bounds;
-        _ECX = 48 * local_iterator_v286;
-        __asm { fld     qword ptr [ecx+eax+10h]; Load Real }
-        _EDX = 48 * local_iterator_v287;
-        __asm
-        {
-        fsub    qword ptr [edx+eax+8]; Subtract Real
-        fnstsw  ax              ; Store Status Word (no wait)
-        }
-        if ( (unsigned __int8)_EAX & 0xD )
-        goto LABEL_603;
-        _vbaFpR8();
-        __asm
-        {
-        fcomp   ds:dbl_402558   ; Compare Real and Pop
-        fnstsw  ax              ; Store Status Word (no wait)
-        }
-        if ( HIBYTE(_AX) & 0x40 )
-        {
-        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
-            _vbaGenerateBoundsError();
-        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
-            _vbaGenerateBoundsError();
-        _ECX = LVL_Bounds;
-        _EAX = 48 * (signed __int16)local_j;
-        __asm
-        {
-            fld     qword ptr [eax+ecx+8]; Load Real
-            fadd    ds:dbl_4012D0   ; Add Real
-        }
-        local_v294 = (signed __int16)local_j;
-        __asm { fstp    qword ptr [edx+ecx+8]; Store Real and Pop }
-        _ECX[local_v294].top = _RT1;
-        __asm { fnstsw  ax              ; Store Status Word (no wait) }
-        if ( _EAX & 0xD )
-            goto LABEL_603;
-        }
-        local_iterator_v285 = (unsigned __int16)(local_j + 1);
-        if ( __OFADD__((_WORD)local_j, 1) )
-        goto OverflowShitHappen_604;
-    }
-*/
-
+	// Decoded loop from 0x8DC04A
+	// If a section is exactly 608.0 tall, it is changed to 600.0 tall.
+	for (int i = 1; i < 21; i++)
+	{
+		// Bounds Check i < 21
+		double tmp = GM_LVL_BOUNDARIES[i].bottom - GM_LVL_BOUNDARIES[i].top;
+		// Check for FPU error
+		if (tmp == 608.0)
+		{
+			// Bounds Check i < 21
+			GM_LVL_BOUNDARIES[i].top += 8.0;
+			// Check for FPU error
+		}
+	}
 
     // Initialize starlocks and locks
     GM_BGO_LOCKS_COUNT = 0;
