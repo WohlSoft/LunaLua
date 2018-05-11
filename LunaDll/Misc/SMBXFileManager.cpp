@@ -478,11 +478,11 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         
         nextEvent->AutoStart = COMBOOL(nextDataEvent.autostart);
         nextEvent->LayerToMove = nextDataEvent.movelayer;
-        nextEvent->LayerHSpeed = (float)nextDataEvent.layer_speed_x;
-        nextEvent->LayerVSpeed = (float)nextDataEvent.layer_speed_y;
+        nextEvent->LayerHSpeed = static_cast<float>(nextDataEvent.layer_speed_x);
+        nextEvent->LayerVSpeed = static_cast<float>(nextDataEvent.layer_speed_y);
         
-        nextEvent->AutoscrollHSpeed = (float)nextDataEvent.move_camera_x;
-        nextEvent->AutoscrollVSpeed = (float)nextDataEvent.move_camera_y;
+        nextEvent->AutoscrollHSpeed = static_cast<float>(nextDataEvent.move_camera_x);
+        nextEvent->AutoscrollVSpeed = static_cast<float>(nextDataEvent.move_camera_y);
         nextEvent->AutoscrollSecNum = static_cast<short>(nextDataEvent.scroll_section);
     }
 
