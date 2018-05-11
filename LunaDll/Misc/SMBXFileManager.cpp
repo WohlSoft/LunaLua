@@ -347,8 +347,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextDoor->isLevelExit = COMBOOL(nextDataLevelDoor.lvl_o);
         nextDoor->warpToWorldmapX = static_cast<short>(nextDataLevelDoor.world_x);
         nextDoor->warpToWorldmapY = static_cast<short>(nextDataLevelDoor.world_y);
-        nextDoor->starsRequired = nextDataLevelDoor.star_num_hide;
+        nextDoor->starsRequired = static_cast<short>(nextDataLevelDoor.stars);
         nextDoor->ptLayerName = nextDataLevelDoor.layer;
+        nextDoor->isLocked = COMBOOL(nextDataLevelDoor.locked);
         nextDoor->isHidden = COMBOOL(nextDataLevelDoor.unknown);
         nextDoor->noYoshi = COMBOOL(nextDataLevelDoor.novehicles);
         nextDoor->allowCarryNPC = COMBOOL(nextDataLevelDoor.allownpc);
@@ -574,174 +575,44 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 */
 
 
+    // Initialize starlocks and locks
+    GM_BGO_LOCKS_COUNT = 0;
+    for (size_t i = 0; i < GM_WARP_COUNT; i++)
+    {
+        SMBX_Warp* nextWarp = SMBX_Warp::Get(i);
 
-/*
-        local_i = *(_DWORD *)&BGO_COUNT_word_B25958;
-        local_doorsCount_v342 = doors_count;
-        local_iterator_v296 = 1;
-        while ( 2 )                             // Iterate through doors and put extra BGOs
+        if (nextWarp->warpType == 2)
         {
-          local_j = local_iterator_v296;
-          if ( (signed __int16)local_iterator_v296 > local_doorsCount_v342 )
-            goto FinalizeLevelLoad;
-          local_preIterator_v297 = (signed __int16)local_iterator_v296 - 1;
-          if ( local_preIterator_v297 >= 0xC8 )
-            _vbaGenerateBoundsError();
-          if ( doorData[local_preIterator_v297].warpType != 2 )
-            goto DoorsIterate_CheckStarsLogic;
-          local_preIterator_v298 = (signed __int16)local_iterator_v296 - 1;
-          if ( local_preIterator_v298 >= 0xC8 )
-            _vbaGenerateBoundsError();
-          if ( doorData[local_preIterator_v298].starsRequired <= (signed __int16)Star_Count )
-          {
-DoorsIterate_CheckStarsLogic:
-            local_preIterator_v323 = (signed __int16)local_iterator_v296 - 1;
-            if ( local_preIterator_v323 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            if ( doorData[local_preIterator_v323].warpType == 2 )// Is this warp a Door
+            if ( (nextWarp->starsRequired > GM_STAR_COUNT))
             {
-              local_preIterator_v324 = (signed __int16)local_iterator_v296 - 1;
-              if ( local_preIterator_v324 >= 0xC8 )
-                _vbaGenerateBoundsError();
-              if ( doorData[local_preIterator_v324].isLocked == -1 )
-              {
-                LOWORD(local_preIterator_v324) = local_i + 1;
-                if ( __OFADD__(1, (_WORD)local_i) )
-                  goto OverflowShitHappen_604;
-                local_i = local_preIterator_v324;
-                if ( __OFADD__(1, BGO_COUNT_LOCKS) )
-                  goto OverflowShitHappen_604;
-                local_doorId_v325 = (signed __int16)local_iterator_v296 - 1;
-                ++BGO_COUNT_LOCKS;
-                if ( local_doorId_v325 >= 0xC8 )
-                  _vbaGenerateBoundsError();
-                local_bgoId_v326 = (signed __int16)local_preIterator_v324 - 1;
-                if ( local_bgoId_v326 >= 0x1F40 )
-                  _vbaGenerateBoundsError();
-                _vbaStrCopy(
-                  (BSTR)&BackgroundData[local_bgoId_v326].ptLayerName,
-                  doorData[local_doorId_v325].ptLayerName);
-                local_doorIndex_v327 = (signed __int16)local_j - 1;
-                if ( local_doorIndex_v327 >= 0xC8 )
-                  _vbaGenerateBoundsError();
-                if ( local_bgoId_v326 >= 0x1F40 )
-                  _vbaGenerateBoundsError();
-                BackgroundData[local_bgoId_v326].isHidden = doorData[local_doorIndex_v327].isHidden;
-                local_doorIndex_v328 = (signed __int16)local_j - 1;
-                if ( local_doorIndex_v328 >= 0xC8 )
-                  _vbaGenerateBoundsError();
-                if ( local_bgoId_v326 >= 0x1F40 )
-                  _vbaGenerateBoundsError();
-                _vbaCopyBytes(48, &BackgroundData[local_bgoId_v326].momentum, &doorData[local_doorIndex_v328].entrance);
-                if ( local_bgoId_v326 >= 0x1F40 )
-                  _vbaGenerateBoundsError();
-                BackgroundData[local_bgoId_v326].id = 98;
-                if ( local_bgoId_v326 >= 0x1F40 )
-                  _vbaGenerateBoundsError();
-                local_v329 = 7 * local_bgoId_v326;
-                LODWORD(BackgroundData[8 * local_v329 / 0x38u].momentum.width) = 0;
-                HIDWORD(BackgroundData[8 * local_v329 / 0x38u].momentum.width) = 1076887552;
-                goto doorsIterate_Next;
-              }
+                SMBX_BGO *nextBGO = SMBX_BGO::GetRaw(GM_BGO_COUNT + GM_BGO_LOCKS_COUNT);
+                GM_BGO_LOCKS_COUNT++;
+                memset(nextBGO, 0, sizeof(SMBX_BGO));
+                nextBGO->ptLayerName = nextWarp->ptLayerName;
+                nextBGO->isHidden = nextWarp->isHidden;
+                nextBGO->momentum = nextWarp->entrance;
+                nextBGO->momentum.width = 24;
+                nextBGO->momentum.height = 24;
+                nextBGO->momentum.x = nextWarp->entrance.x + (nextWarp->entrance.width / 2) - (nextBGO->momentum.width / 2);
+                nextBGO->momentum.y = nextWarp->entrance.y - nextBGO->momentum.height;
+                nextBGO->id = 160; // Setup a Starlock
             }
-          }
-          else
-          {
-            LOWORD(local_preIterator_v298) = local_i + 1;
-            if ( __OFADD__(1, (_WORD)local_i) )
-              goto OverflowShitHappen_604;
-            local_i = local_preIterator_v298;
-            if ( __OFADD__(1, BGO_COUNT_LOCKS) )
-              goto OverflowShitHappen_604;
-            local_v299 = (signed __int16)local_iterator_v296 - 1;
-            ++BGO_COUNT_LOCKS;
-            if ( local_v299 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            local_v300 = (signed __int16)local_preIterator_v298 - 1;
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            _vbaStrCopy((BSTR)&BackgroundData[local_v300].ptLayerName, doorData[local_v299].ptLayerName);
-            local_doorId_v301 = (signed __int16)local_j - 1;
-            if ( local_doorId_v301 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            BackgroundData[local_v300].isHidden = doorData[local_doorId_v301].isHidden;
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            local_v302 = 7 * local_v300;
-            LODWORD(BackgroundData[8 * local_v302 / 0x38u].momentum.width) = 0;
-            HIDWORD(BackgroundData[8 * local_v302 / 0x38u].momentum.width) = 1077411840;
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            local_v303 = 7 * local_v300;
-            LODWORD(BackgroundData[8 * local_v303 / 0x38u].momentum.height) = 0;
-            HIDWORD(BackgroundData[8 * local_v303 / 0x38u].momentum.height) = 1077411840;
-            local_v304 = (signed __int16)local_j - 1;
-            if ( local_v304 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            _EAX = doorData;
-            _ECX = 144 * local_v304;
-            __asm { fld     qword ptr [ecx+eax+1Ch]; Load Real }
-            _ECX = BackgroundData;
-            _EDX = 7 * local_v300;
-            __asm { fsub    qword ptr [ecx+edx*8+18h]; Subtract Real }
-            local_v309 = 7 * local_v300;
-            __asm { fstp    qword ptr [ecx+edx*8+10h]; Store Real and Pop }
-            _ECX[8 * local_v309 / 0x38u].momentum.y = _RT1;
-            __asm { fnstsw  ax              ; Store Status Word (no wait) }
-            if ( (unsigned __int8)_EAX & 0xD )
-              goto LABEL_603;
-            local_v311 = (signed __int16)local_j - 1;
-            if ( local_v311 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            local_v312 = (signed __int16)local_j - 1;
-            if ( local_v312 >= 0xC8 )
-              _vbaGenerateBoundsError();
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            _EAX = doorData;
-            _ECX = 144 * local_v312;
-            local_v315 = 9 * local_v311;
-            __asm { fld     qword ptr [ecx+eax+2Ch]; Load Real }
-            if ( useSaveFDiv )
-              _EAX = (SMBX_Warp *)j__adj_fdiv_m64(SLODWORD(dbl_4012D8), SHIDWORD(dbl_4012D8));
             else
-              __asm { fdiv    ds:dbl_4012D8   ; Divide Real }
-            _ECX = BackgroundData;
-            _EDX = 16 * local_v315;
-            __asm { fadd    qword ptr [edx+eax+14h]; Add Real }
-            local_v318 = 8 * local_v300;
-            _EAX = 7 * local_v300;
-            __asm { fld     qword ptr [ecx+eax*8+20h]; Load Real }
-            if ( useSaveFDiv )
-              j__adj_fdiv_m64(SLODWORD(dbl_4012D8), SHIDWORD(dbl_4012D8));
-            else
-              __asm { fdiv    ds:dbl_4012D8   ; Divide Real }
-            __asm { fsubp   st(1), st       ; Subtract Real and Pop }
-            local_v320 = local_v318 - local_v300;
-            __asm { fstp    qword ptr [ecx+edx*8+8]; Store Real and Pop }
-            *(&_ECX->momentum.x + local_v320) = _RT1;
-            __asm { fnstsw  ax              ; Store Status Word (no wait) }
-            if ( _AX & 0xD )
-              goto LABEL_603;
-            if ( local_v300 >= 0x1F40 )
-              _vbaGenerateBoundsError();
-            BackgroundData[local_v300].id = 160;
-doorsIterate_Next:
-            LOWORD(local_iterator_v296) = local_j;
-          }
-          HIWORD(local_v330) = 0;
-          if ( __OFADD__((_WORD)local_iterator_v296, 1) )
-            goto OverflowShitHappen_604;
-          LOWORD(local_v330) = local_iterator_v296 + 1;
-          local_iterator_v296 = local_v330;
-          continue;
+            if (nextWarp->isLocked == -1)
+            {
+                SMBX_BGO *nextBGO = SMBX_BGO::GetRaw(GM_BGO_COUNT + GM_BGO_LOCKS_COUNT);
+                GM_BGO_LOCKS_COUNT++;
+                memset(nextBGO, 0, sizeof(SMBX_BGO));
+                nextBGO->ptLayerName = nextWarp->ptLayerName;
+                nextBGO->isHidden = nextWarp->isHidden;
+                nextBGO->momentum = nextWarp->entrance;
+                nextBGO->id = 98; // Setup a locker
+                nextBGO->momentum.width = 16;
+                nextBGO->momentum.height = 32;
+            }
         }
-      }    
-*/
+    }
+
 
     /* Finalizing crap */
     
