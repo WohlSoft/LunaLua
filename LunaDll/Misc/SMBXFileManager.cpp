@@ -32,6 +32,7 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
 #define LIMIT_PHYSENV  450
 #define LIMIT_LAYERS   100
 #define LIMIT_EVENTS   100
+#define LIMIT_SECTIONS 21
 
 static void makeErrorLevel(LevelData &outData, const std::string &msg)
 {
@@ -154,8 +155,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     GM_STAR_COUNT_LEVEL = outData.stars;
 
 	int numOfSections = outData.sections.size();
-	if (numOfSections > 21)
-		numOfSections = 21;
+	if (numOfSections > LIMIT_SECTIONS)
+		numOfSections = LIMIT_SECTIONS;
     for(int i = 0; i < numOfSections; i++)
     {
         LevelSection& nextDataLevelSection = outData.sections[i];
@@ -174,7 +175,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     //Fill others with zeros
-    for(int i = numOfSections; i < 21; i++)
+    for(int i = numOfSections; i < LIMIT_SECTIONS; i++)
     {
         Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
         GM_SEC_BG_ID[i] = 0;
@@ -461,7 +462,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         int showLayersNum = nextDataEvent.layers_show.size();
         int toggleLayersNum = nextDataEvent.layers_toggle.size();
 
-        for (int i = 0; i < 21; i++) {
+        for (int i = 0; i < LIMIT_SECTIONS; i++) {
             if (i < hideLayersNum)
                 nextEvent->pHideLayerTarg[i] = nextDataEvent.layers_hide[i];
             else
@@ -479,8 +480,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         }
 
         int numOfSets = nextDataEvent.sets.size();
-        if (numOfSets > 21)
-            numOfSets = 21;
+        if (numOfSets > LIMIT_SECTIONS)
+            numOfSets = LIMIT_SECTIONS;
 
         for (int i = 0; i < numOfSets; i++) {
             const LevelEvent_Sets& nextDataEventSet = nextDataEvent.sets[i];
@@ -551,7 +552,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
 	// Decoded loop from 0x8DC04A
 	// If a section is exactly 608.0 tall, it is changed to 600.0 tall.
-	for (int i = 1; i < 21; i++)
+	for (int i = 1; i < LIMIT_SECTIONS; i++)
 	{
 		// Bounds Check i < 21
 		double tmp = GM_LVL_BOUNDARIES[i].bottom - GM_LVL_BOUNDARIES[i].top;
