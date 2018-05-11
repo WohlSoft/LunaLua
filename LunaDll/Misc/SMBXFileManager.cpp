@@ -153,7 +153,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
 
-    int numOfSections = outData.meta.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
+	int numOfSections = outData.sections.size();
+	if (numOfSections > 21)
+		numOfSections = 21;
     for(int i = 0; i < numOfSections; i++)
     {
         LevelSection& nextDataLevelSection = outData.sections[i];
