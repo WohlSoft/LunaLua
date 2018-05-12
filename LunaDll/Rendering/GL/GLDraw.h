@@ -64,7 +64,7 @@ public:
 	inline void BindTexture(GLuint textName)
 	{
 		if (mLastTexName == textName) return;
-		mLastTexName = 0;
+		mLastTexName = textName;
 		mLastPwScale = 1.0f;
 		mLastPhScale = 1.0f;
 		glBindTexture(GL_TEXTURE_2D, textName);
