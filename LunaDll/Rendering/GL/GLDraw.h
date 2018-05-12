@@ -61,6 +61,16 @@ public:
 
 public:
     GLDraw();
+	inline void BindTexture(gl::GLuint textName)
+	{
+		if (mLastTexName == textName) return;
+		mLastTexName = 0;
+		mLastPwScale = 1.0f;
+		mLastPhScale = 1.0f;
+		gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
+		GLERRORCHECK();
+	}
+
     inline void BindTexture(const Texture* tex) {
 		gl::GLuint textName = tex ? tex->name : 0;
         if (mLastTexName != textName)
@@ -70,6 +80,11 @@ public:
                 mLastPwScale = tex->pwScale;
                 mLastPhScale = tex->phScale;
             }
+			else
+			{
+				mLastPwScale = 1.0f;
+				mLastPhScale = 1.0f;
+			}
 			gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
             GLERRORCHECK();
         }

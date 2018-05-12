@@ -61,7 +61,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 {
     luabind::object tLuaImageResources = luabind::newtable(L);
     /*
-    std::vector<std::shared_ptr<BMPBox>> frames = gLunaRender.LoadAnimatedBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), &smbxFrameTime);
+    std::vector<std::shared_ptr<BMPBox>> frames = Renderer::Get().LoadAnimatedBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), &smbxFrameTime);
     for (unsigned int i = 0; i < frames.size(); i++){
         tLuaImageResources[i + 1] = luabind::object(L, new LunaImage(frames[i]), luabind::adopt(luabind::result));
     }
@@ -74,7 +74,7 @@ luabind::object LuaProxy::Graphics::loadAnimatedImage(const std::string& filenam
 
 bool LuaProxy::Graphics::loadImage(const std::string& filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), resNumber, transColor);
+    return Renderer::Get().LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(filename), resNumber, transColor);
 }
 
 
@@ -257,7 +257,7 @@ void LuaProxy::Graphics::drawImageGeneric(const std::shared_ptr<LunaImage>& img,
     renderOp->sceneCoords = sceneCoords;
     renderOp->m_renderPriority = priority; 
 
-    gLunaRender.AddOp(renderOp);
+    Renderer::Get().AddOp(renderOp);
 }
 
 
@@ -358,7 +358,7 @@ void LuaProxy::Graphics::draw(const luabind::object& namedArgs, lua_State* L)
     if (renderOperation != nullptr)
     {
         renderOperation->m_renderPriority = priority;
-        gLunaRender.AddOp(renderOperation);
+        Renderer::Get().AddOp(renderOperation);
     }
 }
 
@@ -380,7 +380,7 @@ void LuaProxy::Graphics::glSetTextureRGBA(const std::shared_ptr<LunaImage>& img,
     auto obj = std::make_shared<GLEngineCmd_SetTexture>();
     obj->mImg = img;
     obj->mColor = color;
-    gLunaRender.GLCmd(obj);
+    Renderer::Get().GLCmd(obj);
 }
 
 void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_State* L)
@@ -493,7 +493,7 @@ void LuaProxy::Graphics::__glInternalDraw(const luabind::object& namedArgs, lua_
             return;
     }
 
-    gLunaRender.GLCmd(obj, priority);
+    Renderer::Get().GLCmd(obj, priority);
 }
 
 void LuaProxy::Graphics::__setSpriteOverride(const std::string& t, int index, std::shared_ptr<LunaImage>* overrideImg, lua_State* L)

@@ -1,7 +1,7 @@
 #include <string>
 #include "Globals.h"
 #include "EventStateMachine.h"
-#include "Misc\RuntimeHook.h"
+#include "Misc/RuntimeHook.h"
 #include "Rendering/GL/GLEngineProxy.h"
 
 // Global instance

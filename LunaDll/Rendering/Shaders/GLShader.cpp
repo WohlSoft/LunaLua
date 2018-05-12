@@ -334,7 +334,7 @@ GLuint GLShader::getSamplerForTexture(GLuint name)
     m_samplerTexNames.emplace_back(name);
     glActiveTexture(GL_TEXTURE0 + idx);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, name);
+	g_GLDraw.BindTexture(name);
     glActiveTexture(GL_TEXTURE0);    
     GLERRORCHECK();
     
@@ -349,7 +349,7 @@ void GLShader::clearSamplers()
         for (GLuint i = 1; i < m_samplerTexNames.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, 0);
+			g_GLDraw.UnbindTexture();
             glDisable(GL_TEXTURE_2D);
         }
         glActiveTexture(GL_TEXTURE0);

@@ -133,12 +133,12 @@ public:
 
     unsigned int joystickAltJump1() const
     {
-        return m_data.players[0].j_jump;
+        return m_data.players[0].j_altjump;
     }
 
     unsigned int joystickAltRun1() const
     {
-        return m_data.players[0].j_run;
+        return m_data.players[0].j_altrun;
     }
 
 
@@ -220,12 +220,12 @@ public:
 
     unsigned int joystickAltJump2() const
     {
-        return m_data.players[1].j_jump;
+        return m_data.players[1].j_altjump;
     }
 
     unsigned int joystickAltRun2() const
     {
-        return m_data.players[1].j_run;
+        return m_data.players[1].j_altrun;
     }
 
 public slots:

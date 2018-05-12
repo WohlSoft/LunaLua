@@ -122,7 +122,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
         GLPlaceAttributes(obj->mUniforms, GLShaderVariableType::Uniform, cmd->mUnifs, cmd->mUnifCount);
     }
 
-    gLunaRender.GLCmd(obj, cmd->mPriority);
+    Renderer::Get().GLCmd(obj, cmd->mPriority);
 }
 
 // Shader FFI Calls
@@ -186,7 +186,7 @@ FFI_EXPORT bool __fastcall FFI_ShaderCompile(FFI_ShaderObjRef* obj)
 
 FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetAttributeInfo(FFI_ShaderObjRef* obj, uint32_t idx)
 {
-    static FFI_ShaderVariableInfo out;
+    static thread_local FFI_ShaderVariableInfo out;
 
     // Invalid pointer or error condition, early return
     if (obj == nullptr) return nullptr;
@@ -210,7 +210,7 @@ FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetAttributeInfo(FFI_ShaderObj
 
 FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetUniformInfo(FFI_ShaderObjRef* obj, uint32_t idx)
 {
-    static FFI_ShaderVariableInfo out;
+    static thread_local FFI_ShaderVariableInfo out;
 
     // Invalid pointer or error condition, early return
     if (obj == nullptr) return nullptr;
@@ -236,7 +236,7 @@ FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetUniformInfo(FFI_ShaderObjRe
 
 FFI_EXPORT bool __fastcall FFI_SpriteImageLoad(const char* filename, int resNumber, int transColor)
 {
-    return gLunaRender.LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(std::string_view(filename)), resNumber, transColor);
+    return Renderer::Get().LoadBitmapResource(LunaLua::EncodeUtils::Str2WStr(std::string_view(filename)), resNumber, transColor);
 }
 
 FFI_EXPORT void __cdecl FFI_SpritePlace(int type, int resNumber, LunaImageRef* img, int xPos, int yPos, const char* extra, int time)
@@ -282,7 +282,7 @@ FFI_EXPORT void __cdecl FFI_ImageDraw(LunaImageRef* img, double x, double y, dou
     bitmapRenderOp->m_renderPriority = priority;
     bitmapRenderOp->opacity = opacity;
     bitmapRenderOp->sceneCoords = sceneCoords;
-    gLunaRender.AddOp(bitmapRenderOp);
+    Renderer::Get().AddOp(bitmapRenderOp);
 }
 
 // FFI Text Drawing Call
@@ -300,7 +300,7 @@ FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, d
     RenderStringOp* printTextOp = new RenderStringOp(wText, type, (float)x, (float)y);
     printTextOp->m_renderPriority = priority;
 	printTextOp->sceneCoords = sceneCoords;
-    gLunaRender.AddOp(printTextOp);
+    Renderer::Get().AddOp(printTextOp);
 }
 
 // Sprites API Calls

@@ -28,6 +28,7 @@
 #include "Rendering/GL/GLEngine.h"
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
+#include "Misc/LoadScreen.h"
 
 #include "Utils/StringUtils.h"
 #include "Utils/EncodeUtils.h"
@@ -188,7 +189,8 @@ int OnLvlLoad() {
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	
+	LunaLoadScreenKill();
+
 	// Clean up
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
@@ -241,7 +243,7 @@ void TestFrameCode() {
 
 	//- Uncomment to test variable bank
 	//for each(pair<wstring, double> kvp in gSavedVarBank.m_VarBank) {
-	//	gLunaRender.DebugPrint(kvp.first, kvp.second);
+	//	Renderer::Get().DebugPrint(kvp.first, kvp.second);
 	//}
 
 	//static double bgX = 0;

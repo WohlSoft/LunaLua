@@ -1502,8 +1502,6 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
-	LunaLoadScreenKill();
-
 	GLEngineProxy::CheckRendererInit();
 
     //If the lua module is not valid anyway, then just return
