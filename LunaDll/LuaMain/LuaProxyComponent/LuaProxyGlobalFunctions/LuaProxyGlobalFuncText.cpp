@@ -51,7 +51,7 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
 
     RenderStringOp* printTextOp = new RenderStringOp(txt, type, (float)x, (float)y);
     printTextOp->m_renderPriority = priority;
-    gLunaRender.AddOp(printTextOp);
+    Renderer::Get().AddOp(printTextOp);
 }
 
 

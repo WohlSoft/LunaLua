@@ -50,8 +50,7 @@ KeyMap gRawKeymap[2] = {0};
 
 bool gIsTestModePauseActive;
 
-// Global objs
-Renderer gLunaRender;
+// Global obj
 
 AutocodeManager gAutoMan;
 

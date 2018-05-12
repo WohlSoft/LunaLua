@@ -45,6 +45,6 @@ void PerfTracker::renderStats() const {
         s << PerfTypeNames[i] << ": ";
         s << m_PerfTimesSnapshot[i];
         RenderStringOp* printTextOp = new RenderStringOp(Str2WStr(s.str()), 3, 10, 100.0f+(float)i*15.0f);
-        gLunaRender.AddOp(printTextOp);
+        Renderer::Get().AddOp(printTextOp);
     }
 }

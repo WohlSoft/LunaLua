@@ -53,9 +53,9 @@ public:
     virtual float Render(float x, float y, bool selected)
     {
         if (selected && renderCounter < 20) {
-            gLunaRender.AddOp(new RenderStringOp(L">", 4, x, y));
+            Renderer::Get().AddOp(new RenderStringOp(L">", 4, x, y));
         }
-        gLunaRender.AddOp(new RenderStringOp(GetText(), 4, x + 20, y));
+        Renderer::Get().AddOp(new RenderStringOp(GetText(), 4, x + 20, y));
 
         renderCounter = (renderCounter + 1) % 40;
         return 20.0f;
@@ -97,10 +97,10 @@ public:
         std::wstring text = optionIt->second; 
 
         if (selected && renderCounter < 20) {
-            gLunaRender.AddOp(new RenderStringOp(L"<", 4, x, y));
-            gLunaRender.AddOp(new RenderStringOp(L">", 4, x+20+text.size()*18, y));
+            Renderer::Get().AddOp(new RenderStringOp(L"<", 4, x, y));
+            Renderer::Get().AddOp(new RenderStringOp(L">", 4, x+20+text.size()*18, y));
         }
-        gLunaRender.AddOp(new RenderStringOp(text, 4, x + 20, y));
+        Renderer::Get().AddOp(new RenderStringOp(text, 4, x + 20, y));
 
         renderCounter = (renderCounter + 1) % 40;
         return 20.0f;
@@ -260,12 +260,12 @@ public:
             maskedRenderOp->x = 500;
             maskedRenderOp->y = 0;
             maskedRenderOp->sceneCoords = false;
-            gLunaRender.AddOp(maskedRenderOp);
+            Renderer::Get().AddOp(maskedRenderOp);
         }
 
         if (selected && renderCounter < 20) {
-            gLunaRender.AddOp(new RenderStringOp(L"<", 4, x, y + (h + padding * 2) / 2 - 10));
-            gLunaRender.AddOp(new RenderStringOp(L">", 4, x + 20 + w + padding * 2, y + (h + padding * 2) / 2 - 10));
+            Renderer::Get().AddOp(new RenderStringOp(L"<", 4, x, y + (h + padding * 2) / 2 - 10));
+            Renderer::Get().AddOp(new RenderStringOp(L">", 4, x + 20 + w + padding * 2, y + (h + padding * 2) / 2 - 10));
         }
 
         renderCounter = (renderCounter + 1) % 40;
@@ -360,9 +360,9 @@ void testModePauseMenu(bool allowContinue)
         rect->y2 = menuY + menuH + 5;
         rect->fillColor     = RenderOpColor(0.0f, 0.0f, 0.0f, 0.7f);
         rect->borderColor   = RenderOpColor(0.5f, 0.0f, 0.0f, 1.0f);
-        gLunaRender.AddOp(rect);
+        Renderer::Get().AddOp(rect);
 
-        gLunaRender.AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
+        Renderer::Get().AddOp(new RenderStringOp(L"Level Testing Menu", 4, menuX, menuY));
         float yIdx = menuY + lineSpacing*1.5f;
         for (unsigned int i = 0; i < menuItems.size(); i++)
         {

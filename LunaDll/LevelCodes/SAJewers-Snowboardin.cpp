@@ -39,7 +39,7 @@ namespace SAJSnowbordin
 			*shell_kills = combo_start;
 		}
 
-		//gLunaRender.SafePrint(std::wstring(L"KILLS: " + std::to_wstring(*shell_kills)), 3, 0, 256);
+		//Renderer::Get().SafePrint(std::wstring(L"KILLS: " + std::to_wstring(*shell_kills)), 3, 0, 256);
 
 	}
 

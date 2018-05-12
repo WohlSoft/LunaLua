@@ -552,7 +552,7 @@ void PrintSyntaxError(std::wstring errored_line) {
         render_str->m_String += L"- SYNTAX ERROR";
         render_str->m_X = 125;
         render_str->m_Y = (float)(errors % 600);
-        gLunaRender.AddOp(render_str);
+        Renderer::Get().AddOp(render_str);
 }
 
 bool SegmentIntersectRectangle(double a_rectangleMinX,

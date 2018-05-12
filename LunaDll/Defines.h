@@ -10,14 +10,14 @@
 
 // The version number is now defined in resource.h, as it now compiled as meta-data too.
 // If you want to define your "custom" version number anyway, then set NORMAL_VER_NUM to 0 and modify the LUNALUA_VERSION string.
-#define NORMAL_VER_NUM 1
+#define NORMAL_VER_NUM 0
 
 #if NORMAL_VER_NUM
 #define LUNALUA_VER_PREFIX   "LUNALUA V"
 #define LUNALUA_VER_SUFFIX   " BETA"
 #define LUNALUA_VERSION      LUNALUA_VER_PREFIX LUNALUA_VER_STR LUNALUA_VER_SUFFIX
 #else
-#define LUNALUA_VERSION      "LUNALUA V0.7.0.3 BETA"
+#define LUNALUA_VERSION      "LUNALUA UMMM"
 #endif
 
 // Common PGE Engine and LunaLUA constant to identify which engine is uses to run lunadll.lua script

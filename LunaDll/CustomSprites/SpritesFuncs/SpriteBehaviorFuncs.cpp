@@ -361,7 +361,7 @@ void SpriteFunc::BumpMove(CSprite* me, SpriteComponent* obj) {
 						//debug_rect.y1 = block->YPos - camtop;
 						//debug_rect.x2 = (block->XPos + block->W) - camleft;
 						//debug_rect.y2 = (block->YPos + block->H) - camtop;
-						//debug_rect.Draw(&gLunaRender);
+						//debug_rect.Draw(&Renderer::Get());
 					}
 
 					if(me->m_CollisionCode == -1) { // default solid collision
@@ -620,12 +620,12 @@ void SpriteFunc::Blink(CSprite* me, SpriteComponent* obj) {
 
 // SPRITE DEBUG
 void SpriteFunc::SpriteDebug(CSprite* me, SpriteComponent* obj) {
-	gLunaRender.DebugPrint(L"XPOS - ", me->m_Xpos);
-	gLunaRender.DebugPrint(L"YPOS - ", me->m_Ypos);
-	gLunaRender.DebugPrint(L"XSPD - ", me->m_Xspd);
-	gLunaRender.DebugPrint(L"YSPD - ", me->m_Yspd);
-	gLunaRender.DebugPrint(L"FRAME - ", me->m_AnimationFrame);
-	gLunaRender.DebugPrint(L"VISIBLE - ", me->m_Visible);
-	gLunaRender.DebugPrint(L"CVARS - ", me->m_CustomVars.size());
-	gLunaRender.DebugPrint(L"BEHAVIORS - ", me->m_BehavComponents.size());
+	Renderer::Get().DebugPrint(L"XPOS - ", me->m_Xpos);
+	Renderer::Get().DebugPrint(L"YPOS - ", me->m_Ypos);
+	Renderer::Get().DebugPrint(L"XSPD - ", me->m_Xspd);
+	Renderer::Get().DebugPrint(L"YSPD - ", me->m_Yspd);
+	Renderer::Get().DebugPrint(L"FRAME - ", me->m_AnimationFrame);
+	Renderer::Get().DebugPrint(L"VISIBLE - ", me->m_Visible);
+	Renderer::Get().DebugPrint(L"CVARS - ", me->m_CustomVars.size());
+	Renderer::Get().DebugPrint(L"BEHAVIORS - ", me->m_BehavComponents.size());
 }

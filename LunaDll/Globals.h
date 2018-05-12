@@ -102,7 +102,6 @@ extern bool     gIsTestModePauseActive;
 extern LvlEnum	gLevelEnum;
 
 // Misc
-extern Renderer				gLunaRender;
 extern AutocodeManager		gAutoMan;
 extern CSpriteManager		gSpriteMan;
 extern CellManager			gCellMan;
