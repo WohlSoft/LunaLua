@@ -339,8 +339,8 @@ void CalleocaCode()
 		calleoca_npc1->momentum.y = storage_y;
 	}
 
-	//gLunaRender.SafePrint(std::wstring(L"FUEL: " + std::to_wstring(missile_fuel)), 3, 0, 256);
-	//gLunaRender.SafePrint(std::wstring(L"DEMO X: " + std::to_wstring(demo->CurYPos)), 3, 0, 256 + 32);
+	//Renderer::Get().SafePrint(std::wstring(L"FUEL: " + std::to_wstring(missile_fuel)), 3, 0, 256);
+	//Renderer::Get().SafePrint(std::wstring(L"DEMO X: " + std::to_wstring(demo->CurYPos)), 3, 0, 256 + 32);
 }
 
 NPCMOB* FindNPC(short identity)

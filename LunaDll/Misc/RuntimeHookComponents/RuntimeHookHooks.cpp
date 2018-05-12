@@ -31,6 +31,7 @@
 #include "../../Misc/TestMode.h"
 #include "../../Misc/WaitForTickEnd.h"
 #include "../../Rendering/ImageLoader.h"
+#include "../../Misc/LoadScreen.h"
 
 
 // Simple init hook to run the main LunaDLL initialization
@@ -196,6 +197,8 @@ extern int __stdcall LoadIntro()
 
 extern DWORD __stdcall WorldLoop()
 {
+	LunaLoadScreenKill();
+
     gSavedVarBank.CheckSaveDeletion();
 
     // Update inputs
@@ -231,7 +234,7 @@ extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
         skipStarCountPatch.Unapply();
     }
 
-    gLunaRender.RenderBelowPriority(5);
+    Renderer::Get().RenderBelowPriority(5);
     if (!gSMBXHUDSettings.skip) {
         native_renderLevelHud(cameraIdx, unknown0x4002);
     }
@@ -247,7 +250,7 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
+    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
         if (asyncBitBltProc){
@@ -268,7 +271,7 @@ extern void* __stdcall WorldRender()
     }
 
     gSpriteMan.RunSprites();
-    gLunaRender.RenderBelowPriority(DBL_MAX);
+    Renderer::Get().RenderBelowPriority(DBL_MAX);
 
     return (void*)0xB25010;
 }
@@ -651,7 +654,7 @@ extern BOOL __stdcall StretchBltHook(
     }
 
     // If we're copying from our rendering screen, we're done with the frame
-    if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
+    if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
         g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 
@@ -785,7 +788,7 @@ extern void __stdcall FrameTimingHookQPC()
     {
         sFrameTime.Push(frameTime);
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     if (frameError > 5.0) frameError = 5.0;
@@ -859,7 +862,7 @@ extern void __stdcall FrameTimingHook()
         }
         sLastCount.QuadPart = sCount.QuadPart;
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     g_PerfTracker.startFrame();
@@ -922,7 +925,7 @@ extern short __stdcall MessageBoxOpenHook()
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
-    gLunaRender.StartCameraRender(cameraIdx);
+    Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> cameraUpdateEvent = std::make_shared<Event>("onCameraUpdate", false);
@@ -945,7 +948,7 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 static void __stdcall PostCameraUpdateHook(int cameraIdx)
 {
 	// This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-	gLunaRender.StoreCameraPosition(cameraIdx);
+	Renderer::Get().StoreCameraPosition(cameraIdx);
 
 	if (gLunaLua.isValid()) {
 		SMBX_CameraInfo cameraData;
@@ -1177,12 +1180,13 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
+	LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
-    gLunaRender.StartFrameRender();
+    Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
     g_EventHandler.hookLevelRenderEnd();
-    gLunaRender.EndFrameRender();
+    Renderer::Get().EndFrameRender();
 }
 
 static void __declspec(naked) __stdcall RenderWorldReal()
@@ -1199,12 +1203,13 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
+	LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
-    gLunaRender.StartFrameRender();
+    Renderer::Get().StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();
-    gLunaRender.EndFrameRender();
+    Renderer::Get().EndFrameRender();
 }
 
 static void runtimeHookSmbxChangeModeHook(void)

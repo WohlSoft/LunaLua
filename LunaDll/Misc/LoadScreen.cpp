@@ -39,8 +39,7 @@ static bool checkElapsedTime(lua_State* L, DWORD loadScreenStartTick)
 static void LoadThread(void)
 {
 	DWORD loadScreenStartTick = GetTickCount();
-
-	gLunaRender.SetOwningThread();
+	Renderer::Get().SetAltThread();
 
 	static std::string mainCode;
 	if (mainCode.length() == 0)
@@ -164,21 +163,22 @@ static void LoadThread(void)
 			MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
 		}
 
-		gLunaRender.StartFrameRender();
+		Renderer::Get().StartFrameRender();
 
-		gLunaRender.RenderBelowPriority(DBL_MAX);
+		Renderer::Get().RenderBelowPriority(DBL_MAX);
 
 		g_GLEngine.RenderCameraToScreen(NULL, 0, 0, 800, 600, NULL, 0, 0, 800, 600, 0);
 
 		g_GLEngine.EndFrame(NULL);
 
-		gLunaRender.EndFrameRender();
+		Renderer::Get().EndFrameRender();
 
 		if (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick))
 		{
 			Sleep(15);
 		}
 	} while (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick));
+	Renderer::Get().UnsetAltThread();
 	killThreadFlag = false;
 }
 
@@ -189,6 +189,7 @@ static void __stdcall CustomLoadScreenHook(void)
 	if (loadThread != nullptr) return;
 
 	GLEngineProxy::CheckRendererInit();
+	//Renderer::Get().ClearQueue();
 
 	killThreadFlag = false;
 	loadThread = new std::thread(LoadThread);
@@ -206,8 +207,6 @@ void LunaLoadScreenKill()
 	loadThread->join();
 	delete loadThread;
 	loadThread = nullptr;
-
-	gLunaRender.SetOwningThread();
 }
 
 void LunaLoadScreenSetEnable(bool skip)

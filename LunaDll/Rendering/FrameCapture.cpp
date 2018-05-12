@@ -94,14 +94,14 @@ void CaptureBuffer::CaptureAt(double priority)
 {
     auto cmd = std::make_shared<GLEngineCmd_CaptureBuffer>();
     cmd->mBuff = shared_from_this();
-    gLunaRender.GLCmd(cmd, priority);
+    Renderer::Get().GLCmd(cmd, priority);
 }
 
 void CaptureBuffer::Clear(double priority)
 {
     auto cmd = std::make_shared<GLEngineCmd_ClearCaptureBuffer>();
     cmd->mBuff = shared_from_this();
-    gLunaRender.GLCmd(cmd, priority);
+    Renderer::Get().GLCmd(cmd, priority);
 }
 
 void CaptureBuffer::EnsureFramebufferExists()
