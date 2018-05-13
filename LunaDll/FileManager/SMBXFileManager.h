@@ -15,7 +15,7 @@ public:
 
     // Common Level File Function
     void ReadFile(const std::wstring& path);
-
+    void ReadFileMem(std::string &rawData, const std::wstring& path = L"");
 
     // Status
     inline bool isValid() const { return m_isValid; }

@@ -1202,6 +1202,9 @@
     <ClCompile Include="FileManager\SMBXFileManager.cpp">
       <Filter>FileManager</Filter>
     </ClCompile>
+    <ClCompile Include="FileManager\LoadFile_Level.cpp">
+      <Filter>FileManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
