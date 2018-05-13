@@ -61,35 +61,30 @@ public:
 
 public:
     GLDraw();
-	inline void BindTexture(GLuint textName)
-	{
-		if (mLastTexName == textName) return;
-		mLastTexName = textName;
-		mLastPwScale = 1.0f;
-		mLastPhScale = 1.0f;
-		glBindTexture(GL_TEXTURE_2D, textName);
-		GLERRORCHECK();
-	}
 
-    inline void BindTexture(const Texture* tex) {
-        GLuint textName = tex ? tex->name : 0;
-        if (mLastTexName != textName)
-        {
-            mLastTexName = textName;
-            if (tex) {
-                mLastPwScale = tex->pwScale;
-                mLastPhScale = tex->phScale;
-            }
-			else
+	inline void BindTexture(const Texture* tex) {
+		GLuint textName = tex ? tex->name : 0;
+		if (textName == 0)
+		{
+			UnbindTexture();
+		}
+		else
+		{
+			if (mLastTexName != textName)
 			{
-				mLastPwScale = 1.0f;
-				mLastPhScale = 1.0f;
+				mLastPwScale = tex->pwScale;
+				mLastPhScale = tex->phScale;
+				if (mLastTexName == 0)
+				{
+					glEnable(GL_TEXTURE_2D);
+				}
+				glBindTexture(GL_TEXTURE_2D, textName);
+				GLERRORCHECK();
+				mLastTexName = textName;
 			}
-            glBindTexture(GL_TEXTURE_2D, textName);
-            GLERRORCHECK();
-        }
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GLERRORCHECK();
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			GLERRORCHECK();
+		}
     }
     inline void UnbindTexture() {
         if (mLastTexName == 0) return;
@@ -97,6 +92,7 @@ public:
         mLastPwScale = 1.0f;
         mLastPhScale = 1.0f;
         glBindTexture(GL_TEXTURE_2D, 0);
+		glDisable(GL_TEXTURE_2D);
         GLERRORCHECK();
     }
     inline GLuint GetCurrentTexName()
