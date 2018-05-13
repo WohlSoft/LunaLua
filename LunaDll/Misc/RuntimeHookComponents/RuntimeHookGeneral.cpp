@@ -228,6 +228,7 @@ void TrySkipPatch()
     /* Simple ASM Source Patches                                            */
     /************************************************************************/
     fixup_TypeMismatch13();
+    fixup_WebBox();
     fixup_Credits();
     fixup_Mushbug();
     fixup_Veggibug();
@@ -433,7 +434,6 @@ void TrySkipPatch()
     PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
     PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
     PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
-    
 
 
     // Don't trust QPC as much on WinXP

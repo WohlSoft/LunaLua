@@ -173,7 +173,23 @@ void fixup_WarpLimit()
     }
 }
 
+void fixup_WebBox()
+{
+    const wchar_t* aboutBlank = L"about:blank";
+    const wchar_t* webBoxTitle = L"LunaLua-SMBX " LUNALUA_VER_STR L"";
 
+    memcpy((void*)0x00431A34, aboutBlank, sizeof(wchar_t) * lstrlenW(aboutBlank) + 2);
+    memcpy((void*)0x00427614, webBoxTitle, sizeof(wchar_t) * lstrlenW(webBoxTitle) + 2);
+
+    //const unsigned char nullStrMove[] = { 0xBA, 0x00, 0x3D, 0x42, 0x00 };
+    //memcpy((void*)0x00B201AA, nullStrMove, sizeof(nullStrMove));//Heck off, WebBox!
+    //memcpy((void*)0x0096AF25, nullStrMove, sizeof(nullStrMove));//Heck off, WebBox!
+
+    //VB6StrPtr* aboutBlank = new VB6StrPtr(std::string("about:blank"));
+    //memcpy((void*)0x00B201AB, aboutBlank, 4);
+    //VB6StrPtr* webBoxTitle = new VB6StrPtr(std::string("What the heck?"));
+    //memcpy((void*)0x0096AF26, webBoxTitle, 4);
+}
 
 void fixup_Credits()
 {
