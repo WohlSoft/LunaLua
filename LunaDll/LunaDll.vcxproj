@@ -300,7 +300,6 @@
     <ClInclude Include="UserSaves\UserSaving.h" />
     <ClInclude Include="SMBXInternal\WorldLevel.h" />
     <ClInclude Include="version.h" />
-    <ClInclude Include="VersionString.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
@@ -472,6 +471,7 @@
     <ClCompile Include="LevelCodes\Talkhaus-Science_Final_Battle.cpp" />
     <ClCompile Include="UserSaves\UserSaving.cpp" />
     <ClCompile Include="SMBXInternal\WorldLevel.cpp" />
+    <ClCompile Include="VersionString.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scrappedcode.txt" />

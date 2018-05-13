@@ -556,7 +556,6 @@
     <ClInclude Include="Misc\LoadScreen.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="VersionString.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1059,6 +1058,7 @@
     <ClCompile Include="Misc\LoadScreen.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="VersionString.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

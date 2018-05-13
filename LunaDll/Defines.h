@@ -5,8 +5,10 @@
 // Includes
 #include <windows.h>
 #include <stddef.h>
-#include "version.h"
 #include "Misc/VB6StrPtr.h"
+
+extern const char* LUNALUA_VERSION;
+extern const char* GAME_ENGINE;
 
 #define LUNA_VERSION        8
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp

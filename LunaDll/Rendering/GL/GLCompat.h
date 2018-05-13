@@ -3,7 +3,6 @@
 
 #include <gl/glew.h>
 #include "../../Defines.h"
-#include "../../VersionString.h"
 #include <sstream>
 #include <ios>
 

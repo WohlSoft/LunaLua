@@ -1,5 +1,4 @@
 #include <comutil.h>
-#include "../../VersionString.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"

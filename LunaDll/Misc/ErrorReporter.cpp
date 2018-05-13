@@ -1,7 +1,6 @@
 #include <windows.h>
 #include "ErrorReporter.h"
 #include <dbghelp.h>
-#include "../VersionString.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
