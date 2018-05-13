@@ -39,7 +39,7 @@ static bool checkElapsedTime(lua_State* L, DWORD loadScreenStartTick)
 static void LoadThread(void)
 {
 	DWORD loadScreenStartTick = GetTickCount();
-	Renderer::Get().SetAltThread();
+	Renderer::SetAltThread();
 
 	static std::string mainCode;
 	if (mainCode.length() == 0)
@@ -178,7 +178,7 @@ static void LoadThread(void)
 			Sleep(15);
 		}
 	} while (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick));
-	Renderer::Get().UnsetAltThread();
+	Renderer::UnsetAltThread();
 	killThreadFlag = false;
 }
 
