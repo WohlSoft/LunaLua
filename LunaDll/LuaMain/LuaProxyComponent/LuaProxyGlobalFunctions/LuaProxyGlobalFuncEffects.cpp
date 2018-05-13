@@ -11,7 +11,7 @@ void LuaProxy::Effects::screenGlow(unsigned int color)
     op->blend_type = BLEND_Additive;
     op->color = color;
     op->m_FramesLeft = 1;
-    gLunaRender.AddOp(op);
+    Renderer::Get().AddOp(op);
 }
 
 void LuaProxy::Effects::screenGlowNegative(unsigned int color)
@@ -21,7 +21,7 @@ void LuaProxy::Effects::screenGlowNegative(unsigned int color)
     op->blend_type = BLEND_Subtractive;
     op->color = color;
     op->m_FramesLeft = 1;
-    gLunaRender.AddOp(op);
+    Renderer::Get().AddOp(op);
 }
 
 void LuaProxy::Effects::flipX()
@@ -30,7 +30,7 @@ void LuaProxy::Effects::flipX()
     op->effect_type = RNDEFF_Flip;
     op->flip_type = FLIP_TYPE_X;
     op->m_FramesLeft = 1;
-    gLunaRender.AddOp(op);
+    Renderer::Get().AddOp(op);
 }
 
 void LuaProxy::Effects::flipY()
@@ -39,7 +39,7 @@ void LuaProxy::Effects::flipY()
     op->effect_type = RNDEFF_Flip;
     op->flip_type = FLIP_TYPE_Y;
     op->m_FramesLeft = 1;
-    gLunaRender.AddOp(op);
+    Renderer::Get().AddOp(op);
 }
 
 void LuaProxy::Effects::flipXY()
@@ -48,5 +48,5 @@ void LuaProxy::Effects::flipXY()
     op->effect_type = RNDEFF_Flip;
     op->flip_type = FLIP_TYPE_XY;
     op->m_FramesLeft = 1;
-    gLunaRender.AddOp(op);
+    Renderer::Get().AddOp(op);
 }

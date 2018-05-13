@@ -25,8 +25,8 @@ void EuroShellRandDCode() {
 	//	if(gpFreeGlob[0] >= 0)
 	//		gpFreeGlob[0]--;
 
-	//	gLunaRender.SafePrint(L"TIMER", 3, 600, 27);
-	//	gLunaRender.SafePrint(std::to_wstring((long long)gpFreeGlob[0] / 60), 3, 618, 48);		
+	//	Renderer::Get().SafePrint(L"TIMER", 3, 600, 27);
+	//	Renderer::Get().SafePrint(std::to_wstring((long long)gpFreeGlob[0] / 60), 3, 618, 48);		
 	//}
 
 }

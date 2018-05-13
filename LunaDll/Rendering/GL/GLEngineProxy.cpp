@@ -6,7 +6,6 @@
 #include "GLEngineCmds.h"
 #include "GLContextManager.h"
 #include "../Shaders/GLShader.h"
-#include "../../Globals.h"
 
 // Instance
 GLEngineProxy g_GLEngine;
@@ -139,7 +138,6 @@ void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOr
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
-	if (!gLunaRender.IsInOwningThread()) return;
     auto obj = std::make_shared<GLEngineCmd_RenderCameraToScreen>();
     obj->mXDest = nXOriginDest;
     obj->mYDest = nYOriginDest;
@@ -158,7 +156,6 @@ void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOr
 
 void GLEngineProxy::EndFrame(HDC hdcDest)
 {
-	if (!gLunaRender.IsInOwningThread()) return;
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
     QueueCmd(obj);

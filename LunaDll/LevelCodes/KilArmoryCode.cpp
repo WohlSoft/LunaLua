@@ -16,7 +16,7 @@ void KilArmoryCode() {
 			intensity <<= 16;
 			RenderEffectOp* op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
 			op->m_FramesLeft = 1;
-			gLunaRender.AddOp(op);
+			Renderer::Get().AddOp(op);
 		}
 
 		// Section 1(0) glow effect code
@@ -25,7 +25,7 @@ void KilArmoryCode() {
 			intensity <<= 16;
 			RenderEffectOp* op = new RenderEffectOp(RNDEFF_ScreenGlow, BLEND_Additive, intensity, 100);
 			op->m_FramesLeft = 1;
-			gLunaRender.AddOp(op);
+			Renderer::Get().AddOp(op);
 		}
 	}
 }

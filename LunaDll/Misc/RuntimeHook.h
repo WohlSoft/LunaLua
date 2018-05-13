@@ -158,7 +158,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         push ecx
         push edx
     }
-    gLunaRender.RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
+    Renderer::Get().RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
     __asm {
         pop edx
         pop ecx
@@ -181,7 +181,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
 		push edx
 	}
 	static unsigned int skipTargetAddrTmp = skipTargetAddr;
-	gLunaRender.RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
+	Renderer::Get().RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
 	if (*skipAddr)
 	{
 		__asm {

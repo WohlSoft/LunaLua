@@ -122,8 +122,6 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 {
     SafeFPUControl noFPUExecptions;
 
-	LunaLoadScreenKill();
-
     //Just to be safe
     shutdown();
     //Open up a new Lua State
@@ -1503,8 +1501,6 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
-	LunaLoadScreenKill();
-
 	GLEngineProxy::CheckRendererInit();
 
     //If the lua module is not valid anyway, then just return

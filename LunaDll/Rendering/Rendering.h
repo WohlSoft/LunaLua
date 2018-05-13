@@ -16,6 +16,10 @@ class LunaImage;
 
 // Main renderer object
 struct Renderer {
+	static Renderer& Get();
+	static void SetAltThread();
+	static void UnsetAltThread();
+	static bool IsAltThreadActive();
 
     Renderer();
     ~Renderer();
@@ -45,16 +49,12 @@ struct Renderer {
     void EndFrameRender();
 
 	void ClearQueue();
-	void SetOwningThread();
-	bool IsInOwningThread();
-
 private:
     void DrawOp(RenderOp& render_operation);
     
 
     // Members //
 private:
-	DWORD m_owningThread;
     bool m_InFrameRender;
     int m_curCamIdx; // Camera state
     

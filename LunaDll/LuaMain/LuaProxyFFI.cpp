@@ -28,7 +28,7 @@ extern "C" {
         obj->mVert = vert;
         obj->mTex = tex;
         obj->mCount = count;
-        gLunaRender.GLCmd(obj);
+        Renderer::Get().GLCmd(obj);
     }
 
     FFI_EXPORT(void) LunaLuaKillPlayer(short playerIndex)
@@ -82,8 +82,8 @@ extern "C" {
 	};
 	FFI_EXPORT(const LunaLuaMemUsageData*) LunaLuaGetMemUsage()
 	{
-		static LunaLuaMemUsageData out;
-		static PROCESS_MEMORY_COUNTERS psmemCounters;
+		static thread_local LunaLuaMemUsageData out;
+		static thread_local PROCESS_MEMORY_COUNTERS psmemCounters;
 
 		if (GetProcessMemoryInfo(GetCurrentProcess(), &psmemCounters, sizeof(psmemCounters)))
 		{
@@ -105,7 +105,7 @@ extern "C" {
 
 	FFI_EXPORT(const char*) LunaLuaMemReadString(unsigned int addr)
 	{
-		static std::string tmp;
+		static thread_local std::string tmp;
 		void* ptr = ((&(*(byte*)addr)));
 
 		if (ptr == 0)
@@ -119,7 +119,7 @@ extern "C" {
 
 	FFI_EXPORT(void) LunaLuaMemWriteString(unsigned int addr, const char* str)
 	{
-		static VB6StrPtr nullStr;
+		static thread_local VB6StrPtr nullStr;
 		void* ptr = ((&(*(byte*)addr)));
 
 		if (str != nullptr)
