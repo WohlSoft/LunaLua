@@ -558,18 +558,16 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
 	// Decoded loop from 0x8DC04A
 	// If a section is exactly 608.0 tall, it is changed to 600.0 tall.
-	for (int i = 1; i < LIMIT_SECTIONS; i++)
+#if 1 //May be disabled as it's not so important
+	for (int i = 0; i < LIMIT_SECTIONS; i++)
 	{
 		// Bounds Check i < 21
 		double tmp = GM_LVL_BOUNDARIES[i].bottom - GM_LVL_BOUNDARIES[i].top;
 		// Check for FPU error
-		if (tmp == 608.0)
-		{
-			// Bounds Check i < 21
-			GM_LVL_BOUNDARIES[i].top += 8.0;
-			// Check for FPU error
-		}
+		if (tmp > 600.0 && tmp < 610.0)
+            GM_LVL_BOUNDARIES[i].top = GM_LVL_BOUNDARIES[i].bottom - 600;
 	}
+#endif
 
     // Initialize starlocks and locks
     GM_BGO_LOCKS_COUNT = 0;
