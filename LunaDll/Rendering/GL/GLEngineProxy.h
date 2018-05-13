@@ -17,12 +17,11 @@ private:
     std::thread* mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
     ThreadedCmdQueue<uint64_t> mDeletedTextures;
-    std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
     
 	bool mNextEndFrameIsSkippable;
-	std::queue<bool> mQueuedFrameSkippability;
+	ThreadedCmdQueue<bool> mQueuedFrameSkippability;
 
 public:
     GLEngine mInternalGLEngine;

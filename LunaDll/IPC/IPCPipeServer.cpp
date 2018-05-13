@@ -18,10 +18,13 @@ static json echoMethod(const json& params)
 }
 
 // Method prototypes
-json IPCTestLevel(const json& params);          //Start level testing
-json IPCGetWindowHandle(const json& params);    //Fetch HWND of SMBX game window
-json IPCSetCheckPoint(const json& params);      //Set custom checkpoint, start position, warp entrance/exit
-json IPCResetCheckPoint(const json& params);    //Clear checkpoint
+json IPCTestLevel(const json& params);            // Start level testing
+json IPCGetWindowHandle(const json& params);      // Fetch HWND of SMBX game window
+json IPCSetCheckPoint(const json& params);        // Set custom checkpoint, start position, warp entrance/exit
+json IPCResetCheckPoint(const json& params);      // Clear checkpoint
+json IPCGetSupportedFeatures(const json& params); // Get a supported features table
+
+
 
 IPCPipeServer::IPCPipeServer() :
     mOutFD(-1), mInFD(-1)
@@ -30,6 +33,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("testLevel", IPCTestLevel);
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
     RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
+	RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
 }
 
 IPCPipeServer::~IPCPipeServer()
@@ -262,4 +266,13 @@ json IPCPipeServer::MakeJsonError(int errCode, const std::string& errStr, const 
 void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr, const json& id)
 {
     SendMsg(MakeJsonError(errCode, errStr, id));
+}
+
+//=============================================================================
+
+json IPCGetSupportedFeatures(const json& params)
+{
+	return {
+		{"LVLX", false}
+	};
 }
