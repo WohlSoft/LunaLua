@@ -556,6 +556,7 @@
     <ClInclude Include="Misc\LoadScreen.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="VersionString.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">

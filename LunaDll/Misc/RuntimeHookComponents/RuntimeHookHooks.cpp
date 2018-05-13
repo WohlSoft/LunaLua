@@ -1,4 +1,5 @@
 #include <comutil.h>
+#include "../../VersionString.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
@@ -250,7 +251,9 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&Renderer::Get());
+	static std::string vStr = LUNALUA_VERSION;
+	std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
+    RenderStringOp(Str2WStr(vStr), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
         if (asyncBitBltProc){
