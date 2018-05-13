@@ -186,8 +186,6 @@ int OnLvlLoad() {
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	LunaLoadScreenKill();
-
 	// Clean up
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
@@ -195,8 +193,6 @@ int TestFunc()
 	// Update inputs
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
-
-
 
 	if(gLunaEnabled) {	
 #if COMPILE_PLAYGROUND

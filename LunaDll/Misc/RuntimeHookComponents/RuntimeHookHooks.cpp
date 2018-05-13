@@ -199,8 +199,6 @@ extern int __stdcall LoadIntro()
 
 extern DWORD __stdcall WorldLoop()
 {
-	LunaLoadScreenKill();
-
     gSavedVarBank.CheckSaveDeletion();
 
     // Update inputs
@@ -635,6 +633,9 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
+		// Make sure we kill the loadscreen before vanilla rendering
+		LunaLoadScreenKill();
+
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
     }
