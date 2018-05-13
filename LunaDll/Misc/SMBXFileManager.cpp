@@ -32,6 +32,7 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
 #define LIMIT_PHYSENV  450
 #define LIMIT_LAYERS   100
 #define LIMIT_EVENTS   100
+#define LIMIT_SECTIONS 21
 
 static void makeErrorLevel(LevelData &outData, const std::string &msg)
 {
@@ -153,7 +154,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
 
-    int numOfSections = outData.meta.RecentFormatVersion > 7 ? 21 : 6; // If file format is over 7, then we have 21 sections
+	int numOfSections = outData.sections.size();
+	if (numOfSections > LIMIT_SECTIONS)
+		numOfSections = LIMIT_SECTIONS;
     for(int i = 0; i < numOfSections; i++)
     {
         LevelSection& nextDataLevelSection = outData.sections[i];
@@ -172,7 +175,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     }
 
     //Fill others with zeros
-    for(int i = numOfSections; i < 21; i++)
+    for(int i = numOfSections; i < LIMIT_SECTIONS; i++)
     {
         Level::SetSectionBounds(i, 0.0, 0.0, 0.0, 0.0);
         GM_SEC_BG_ID[i] = 0;
@@ -264,7 +267,11 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->momentum.x = static_cast<double>(nextDataLevelNPC.x);
         nextNPC->momentum.y = static_cast<double>(nextDataLevelNPC.y);
         nextNPC->directionFaced = static_cast<float>(nextDataLevelNPC.direct);
+
         uint64_t npcID = nextDataLevelNPC.id;
+		// TODO: Check ID is in range.
+		// TODO: Optionally consider special id handling if input is 38A.
+
         nextNPC->id = static_cast<short>(npcID);
 
         // Special rules by id:
@@ -312,7 +319,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         nextNPC->noMoreObjInLayerEventName = nextDataLevelNPC.event_emptylayer;
         nextNPC->attachedLayerName = nextDataLevelNPC.attach_layer;
 
-        nextNPC->spawnID = npcID;
+        nextNPC->spawnID = static_cast<short>(npcID);
         nextNPC->momentum.width = static_cast<double>(npc_width[npcID]);
         nextNPC->momentum.height = static_cast<double>(npc_height[npcID]);
         memcpy(&nextNPC->spawnMomentum, &nextNPC->momentum, sizeof(Momentum));
@@ -349,7 +356,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         }
     }
 
-    int numOfDoors = outData.doors.size();
+    unsigned int numOfDoors = outData.doors.size();
     if(numOfDoors > LIMIT_WARPS)
         numOfDoors = LIMIT_WARPS;
     GM_WARP_COUNT = numOfDoors;
@@ -405,8 +412,10 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
             // Swap entrance and exit
             nextDoor->entrance.x = prevDoor->exit.x;
             nextDoor->entrance.y = prevDoor->exit.y;
+			nextDoor->entranceDirection = static_cast<SMBX_EntranceDir>(prevDoor->exitDirection);
             nextDoor->exit.x = prevDoor->entrance.x;
             nextDoor->exit.y = prevDoor->entrance.y;
+			nextDoor->exitDirection = static_cast<SMBX_ExitDir>(prevDoor->entranceDirection);
         }
     }
 
@@ -459,7 +468,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         int showLayersNum = nextDataEvent.layers_show.size();
         int toggleLayersNum = nextDataEvent.layers_toggle.size();
 
-        for (int i = 0; i < 21; i++) {
+        for (int i = 0; i < LIMIT_SECTIONS; i++) {
             if (i < hideLayersNum)
                 nextEvent->pHideLayerTarg[i] = nextDataEvent.layers_hide[i];
             else
@@ -477,8 +486,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
         }
 
         int numOfSets = nextDataEvent.sets.size();
-        if (numOfSets > 21)
-            numOfSets = 21;
+        if (numOfSets > LIMIT_SECTIONS)
+            numOfSets = LIMIT_SECTIONS;
 
         for (int i = 0; i < numOfSets; i++) {
             const LevelEvent_Sets& nextDataEventSet = nextDataEvent.sets[i];
@@ -547,66 +556,24 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     /* Put here extra BGOs */
 
-/*
-    local_iterator_v285 = 1;
-    while ( 1 )                             // Iterate through level section boundaries
-    {
-        local_j = local_iterator_v285;
-        if ( (signed __int16)local_iterator_v285 > 20 )
-        break;
-        local_iterator_v286 = (signed __int16)local_iterator_v285;
-        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
-        _vbaGenerateBoundsError();
-        local_iterator_v287 = (signed __int16)local_iterator_v285;
-        if ( (unsigned int)(signed __int16)local_iterator_v285 >= 0x15 )
-        _vbaGenerateBoundsError();
-        _EAX = LVL_Bounds;
-        _ECX = 48 * local_iterator_v286;
-        __asm { fld     qword ptr [ecx+eax+10h]; Load Real }
-        _EDX = 48 * local_iterator_v287;
-        __asm
-        {
-        fsub    qword ptr [edx+eax+8]; Subtract Real
-        fnstsw  ax              ; Store Status Word (no wait)
-        }
-        if ( (unsigned __int8)_EAX & 0xD )
-        goto LABEL_603;
-        _vbaFpR8();
-        __asm
-        {
-        fcomp   ds:dbl_402558   ; Compare Real and Pop
-        fnstsw  ax              ; Store Status Word (no wait)
-        }
-        if ( HIBYTE(_AX) & 0x40 )
-        {
-        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
-            _vbaGenerateBoundsError();
-        if ( (unsigned int)(signed __int16)local_j >= 0x15 )
-            _vbaGenerateBoundsError();
-        _ECX = LVL_Bounds;
-        _EAX = 48 * (signed __int16)local_j;
-        __asm
-        {
-            fld     qword ptr [eax+ecx+8]; Load Real
-            fadd    ds:dbl_4012D0   ; Add Real
-        }
-        local_v294 = (signed __int16)local_j;
-        __asm { fstp    qword ptr [edx+ecx+8]; Store Real and Pop }
-        _ECX[local_v294].top = _RT1;
-        __asm { fnstsw  ax              ; Store Status Word (no wait) }
-        if ( _EAX & 0xD )
-            goto LABEL_603;
-        }
-        local_iterator_v285 = (unsigned __int16)(local_j + 1);
-        if ( __OFADD__((_WORD)local_j, 1) )
-        goto OverflowShitHappen_604;
-    }
-*/
-
+	// Decoded loop from 0x8DC04A
+	// If a section is exactly 608.0 tall, it is changed to 600.0 tall.
+	for (int i = 1; i < LIMIT_SECTIONS; i++)
+	{
+		// Bounds Check i < 21
+		double tmp = GM_LVL_BOUNDARIES[i].bottom - GM_LVL_BOUNDARIES[i].top;
+		// Check for FPU error
+		if (tmp == 608.0)
+		{
+			// Bounds Check i < 21
+			GM_LVL_BOUNDARIES[i].top += 8.0;
+			// Check for FPU error
+		}
+	}
 
     // Initialize starlocks and locks
     GM_BGO_LOCKS_COUNT = 0;
-    for (size_t i = 0; i < GM_WARP_COUNT; i++)
+    for (unsigned int i = 0; i < GM_WARP_COUNT; i++)
     {
         SMBX_Warp* nextWarp = SMBX_Warp::Get(i);
 
