@@ -130,6 +130,8 @@ extern int __stdcall LoadWorld()
     // entering levels...
     GLEngineProxy::CheckRendererInit();
 
+	LunaLoadScreenStart();
+
     ResetLunaModule();
     gIsOverworld = true;
 
