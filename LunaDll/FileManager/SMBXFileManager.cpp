@@ -1,5 +1,5 @@
 #include "SMBXFileManager.h"
-#include "MiscFuncs.h"
+#include "../Misc/MiscFuncs.h"
 #include "../Main.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
@@ -114,6 +114,10 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
                                 outData.meta.ERROR_info + " at line " +
                                 std::to_string(outData.meta.ERROR_linenum));
     }
+
+    FileFormats::smbx64LevelPrepare(outData);
+    FileFormats::smbx64LevelSortBlocks(outData);
+    FileFormats::smbx64LevelSortBGOs(outData);
     
     dir = utf8_decode(outData.meta.path + "/");
     replaceSubStrW(dir, L"/", L"\\");
@@ -122,10 +126,6 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
     replaceSubStr(customFolderU8, "/", "\\");
     //MessageBoxA(NULL, (customFolderU8.c_str()), "kkk", NULL);
     customFolder = Str2WStr(customFolderU8);    
-
-    FileFormats::smbx64LevelPrepare(outData);
-    FileFormats::smbx64LevelSortBlocks(outData);
-    FileFormats::smbx64LevelSortBGOs(outData);
 
     // If we are successful then set the variables
     GM_LVLFILENAME_PTR = filename;
@@ -137,6 +137,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 
     // Init Config-Txt
     VB6StrPtr customFolderVB6 = customFolder;
+    /* TODO: Implement custom NPCtxt parser over PGE File Library */
     native_loadNPCConfig(&customFolderVB6);
 
     // Load Episode GFX

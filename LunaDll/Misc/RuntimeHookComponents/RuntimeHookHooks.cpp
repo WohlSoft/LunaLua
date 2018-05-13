@@ -975,7 +975,7 @@ void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
 	};
 }
 
-#include "../SMBXFileManager.h"
+#include "../../FileManager/SMBXFileManager.h"
 
 extern void __stdcall LoadLevelHook(VB6StrPtr* path)
 {

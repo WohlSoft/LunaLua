@@ -119,6 +119,9 @@
     <Filter Include="libs\PGE_File_Formats">
       <UniqueIdentifier>{d4e89256-a839-4fdb-b4dc-62144a84939d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FileManager">
+      <UniqueIdentifier>{c2655aeb-6086-4624-a167-d60761e77941}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -559,9 +562,6 @@
     <ClInclude Include="Misc\LoadScreen.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\SMBXFileManager.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="libs\PGE_File_Formats\charsetconvert.h">
       <Filter>libs\PGE_File_Formats</Filter>
     </ClInclude>
@@ -624,6 +624,9 @@
     </ClInclude>
     <ClInclude Include="libs\PGE_File_Formats\smbx38a_private.h">
       <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager\SMBXFileManager.h">
+      <Filter>FileManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1127,9 +1130,6 @@
     <ClCompile Include="Misc\LoadScreen.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="Misc\SMBXFileManager.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
     <ClCompile Include="libs\PGE_File_Formats\file_formats.cpp">
       <Filter>libs\PGE_File_Formats</Filter>
     </ClCompile>
@@ -1198,6 +1198,9 @@
     </ClCompile>
     <ClCompile Include="libs\PGE_File_Formats\file_rw_wld_38a.cpp">
       <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\SMBXFileManager.cpp">
+      <Filter>FileManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

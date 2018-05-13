@@ -9,14 +9,12 @@ struct SMBXDataInterface {
 };
 
 
-
 class SMBXLevelFileBase {
 public:
     SMBXLevelFileBase();
 
     // Common Level File Function
     void ReadFile(const std::wstring& path);
-    void ReadFile();
 
 
     // Status
