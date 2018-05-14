@@ -518,6 +518,7 @@
     <ClCompile Include="LevelCodes\Talkhaus-Science_Final_Battle.cpp" />
     <ClCompile Include="UserSaves\UserSaving.cpp" />
     <ClCompile Include="SMBXInternal\WorldLevel.cpp" />
+    <ClCompile Include="VersionString.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scrappedcode.txt" />

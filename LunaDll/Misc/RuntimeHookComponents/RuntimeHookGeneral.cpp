@@ -177,6 +177,9 @@ static unsigned int __stdcall LatePatch(void)
 	// Set new BGO ID limit...
 	PatchBgoIdLimit();
 
+	// Set new Block ID limit...
+	PatchBlockIdLimit();
+
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
     fixup_ErrorReporting();

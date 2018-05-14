@@ -4,6 +4,7 @@
 #include <luabind/out_value_policy.hpp>
 
 #include "LunaLuaMain.h"
+#include "../version.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"

@@ -130,6 +130,8 @@ extern int __stdcall LoadWorld()
     // entering levels...
     GLEngineProxy::CheckRendererInit();
 
+	LunaLoadScreenStart();
+
     ResetLunaModule();
     gIsOverworld = true;
 
@@ -197,8 +199,6 @@ extern int __stdcall LoadIntro()
 
 extern DWORD __stdcall WorldLoop()
 {
-	LunaLoadScreenKill();
-
     gSavedVarBank.CheckSaveDeletion();
 
     // Update inputs
@@ -250,7 +250,9 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&Renderer::Get());
+	static std::string vStr = LUNALUA_VERSION;
+	std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
+    RenderStringOp(Str2WStr(vStr), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
         if (asyncBitBltProc){
@@ -631,6 +633,9 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
+		// Make sure we kill the loadscreen before vanilla rendering
+		LunaLoadScreenKill();
+
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
     }

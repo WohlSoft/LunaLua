@@ -17,6 +17,7 @@
 #include "../GlobalFuncs.h"
 #include "GL/GLEngine.h"
 #include "BitBltEmulation.h"
+#include "../Misc/LoadScreen.h"
 
 using namespace std;
 
@@ -201,6 +202,12 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 // RENDER ALL
 void Renderer::RenderBelowPriority(double maxPriority) {
     if (!m_InFrameRender) return;
+
+	if (this == &sLunaRender)
+	{
+		// Make sure we kill the loadscreen before main thread rendering
+		LunaLoadScreenKill();
+	}
 
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;

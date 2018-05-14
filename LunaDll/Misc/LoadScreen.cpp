@@ -8,7 +8,9 @@
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/Rendering.h"
 #include <lua.hpp>
+#include "LoadScreen.h"
 
+static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
 static std::atomic<bool> killThreadFlag = false;
 
@@ -182,17 +184,23 @@ static void LoadThread(void)
 	killThreadFlag = false;
 }
 
+void LunaLoadScreenStart()
+{
+	if (!lunaLoadScreenEnabled) return;
+	if (loadThread != nullptr) return;
+
+	GLEngineProxy::CheckRendererInit();
+	Renderer::Get().ClearQueue();
+
+	killThreadFlag = false;
+	loadThread = new std::thread(LoadThread);
+}
+
 static void __stdcall CustomLoadScreenHook(void)
 {
 	native_cleanupLevel();
 
-	if (loadThread != nullptr) return;
-
-	GLEngineProxy::CheckRendererInit();
-	//Renderer::Get().ClearQueue();
-
-	killThreadFlag = false;
-	loadThread = new std::thread(LoadThread);
+	LunaLoadScreenStart();
 }
 
 void LunaLoadScreenKill()
@@ -232,6 +240,7 @@ void LunaLoadScreenSetEnable(bool skip)
 		nullptr
 	};
 
+	lunaLoadScreenEnabled = skip;
 	if (skip)
 	{
 		for (unsigned int idx = 0; patches[idx] != nullptr; idx++)
