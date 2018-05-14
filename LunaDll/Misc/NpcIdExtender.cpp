@@ -5,6 +5,7 @@
 #include "NpcIdExtender.h"
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/BGOs.h"
+#include "../SMBXInternal/Blocks.h"
 
 class ResizableGameArray
 {
@@ -387,6 +388,10 @@ void PatchNpcIdLimit()
     currentNpcIdLimit = newLimit;
 }
 
+//==============//
+// BGO ID Limit //
+//==============//
+
 static const uint32_t array_b25b54_patches[] = { 0x8c27bb, 0x99adc2, 0x9a74a8 };
 static ResizableGameArray array_b25b54_obj((void**)0xb25b54, 201, 2, array_b25b54_patches);
 static const uint32_t array_b2be30_patches[] = { 0x90f690, 0x90f832, 0x90fa83, 0x90fe23, 0x910060, 0x911140, 0x911379, 0x9115b7, 0x91193c, 0x911b79, 0x911dbb, 0x912177, 0x9123b0, 0x9125ee, 0x9293dc, 0x929615, 0x929be6, 0x929e23, 0x9460f8, 0x94633a, 0x946577, 0x9fdefe, 0xac5a72, 0xad59b6, 0xae664a, 0xae6695, 0xae6731, 0xae6890, 0xaf9f9d };
@@ -434,4 +439,83 @@ void PatchBgoIdLimit()
 	array_unkBGOSetting_obj.Patch(newLimit+1);
 
 	currentBgoIdLimit = newLimit;
+}
+
+//================//
+// Block ID Limit //
+//================//
+
+static const uint32_t array_b2b94c_patches[] = { 0x8d5861, 0x997b66, 0x997b0f, 0x997dfd, 0x9a11c1, 0x9a12a5, 0x9a1c5c, 0x9a24ac, 0x9a24fd, 0x9a2557, 0x9a286b, 0x9a2952, 0x9a2bc4, 0x9a2bf8, 0x9a2db5, 0x9a3055, 0x9a314b, 0x9a3267, 0x9a359f, 0x9a3740, 0x9a3698, 0x9a3921, 0x9a3ae4, 0x9a3c05, 0x9a4354, 0x9a483e, 0x9a4c76, 0x9a4e3e, 0x9a5156, 0x9c0a13, 0x9eeddb, 0x9ef5b6, 0xa0a24d, 0xa0a1fa, 0xa12e8d, 0xa13032, 0xa13110, 0xa13508, 0xa134b2, 0xa136cc, 0xa137b3, 0xa15fae, 0xa1a747, 0xa1bbfd, 0xa1bdfd, 0xa1c5a1, 0xa1cdd2, 0xa1cebb, 0xa1d0be, 0xa4fa63 };
+static ResizableGameArray array_b2b94c_obj((void**)0xb2b94c, 701, 2, array_b2b94c_patches);
+static const uint32_t array_b2b968_patches[] = { 0x9a1df7, 0x9a1eac, 0x9a1f94, 0x9a237e, 0x9c0a38, 0x9eee03, 0x9ef5e7, 0xa123cd, 0xa124dd, 0xa125c8, 0xa12756, 0xa12835, 0xa12d4f, 0xa50aee, 0xa50ee0, 0xa51336 };
+static ResizableGameArray array_b2b968_obj((void**)0xb2b968, 701, 2, array_b2b968_patches);
+static const uint32_t array_b2c048_patches[] = { 0x8d593e, 0x8d5d84, 0x9982ee, 0x9a17bc, 0x9aeebe, 0x9c0aea, 0x9dbb4f, 0x9dc306, 0x9e2d67, 0x9e3044, 0x9eeda7, 0xa1201f, 0xa1236e, 0xa1a6a4, 0xa4f9da, 0xa4fdc9, 0xa5029e, 0xa5061c, 0xa50a63, 0xa50e32, 0xa512ad, 0xa5167c, 0xa526c1, 0xa5b2b4 };
+static ResizableGameArray array_b2c048_obj((void**)0xb2c048, 701, 2, array_b2c048_patches);
+static const uint32_t array_b2c064_patches[] = { 0x8c982c, 0x91d755, 0x92b4db, 0x9a20cc, 0x9a38ed, 0x9a3a5e, 0xa139ca };
+static ResizableGameArray array_b2c064_obj((void**)0xb2c064, 701, 2, array_b2c064_patches);
+static const uint32_t array_b2c080_patches[] = { 0xa31330 };
+static ResizableGameArray array_b2c080_obj((void**)0xb2c080, 701, 2, array_b2c080_patches);
+static const uint32_t array_b2c09c_patches[] = { 0x9a1837, 0x9bbcf7, 0x9bbd46 };
+static ResizableGameArray array_b2c09c_obj((void**)0xb2c09c, 701, 2, array_b2c09c_patches);
+static const uint32_t array_b2c0b8_patches[] = { 0x9e39cc };
+static ResizableGameArray array_b2c0b8_obj((void**)0xb2c0b8, 701, 2, array_b2c0b8_patches);
+static const uint32_t array_b2c0d4_patches[] = { 0x8f7067, 0x998322, 0x9a1748, 0x9bba16, 0x9c03b1, 0x9c0b28, 0x9eed7a, 0xa11309, 0xa1c3cf, 0xa1c884, 0xa1cc2a, 0xa3bfba, 0xa4f927, 0xa4fd12, 0xa501e1, 0xa50563, 0xa509ac, 0xa50d7f, 0xa511fa, 0xa515c5, 0xa5260b, 0xa5b23d, 0xa5d3ea };
+static ResizableGameArray array_b2c0d4_obj((void**)0xb2c0d4, 701, 2, array_b2c0d4_patches);
+static const uint32_t array_blockdef_isResizeableBlock_patches[] = { 0x8d58cf, 0x8d5c86, 0x8f70de, 0x91055a, 0x91d6c8, 0x943714, 0x943f2e, 0x99827c, 0x9a1788, 0x9a2a03, 0x9aee88, 0x9bb9ba, 0x9c0430, 0x9c09dd, 0x9dbb7c, 0x9dc333, 0x9e2d2e, 0x9e300b, 0x9ed6d9, 0x9ed6c5, 0x9ed80c, 0x9eed4d, 0x9ef511, 0x9f10b4, 0x9f1823, 0x9f59ca, 0x9f974a, 0x9fd68c, 0xa06a48, 0xa11fa7, 0xa11fec, 0xa1233a, 0xa131bc, 0xa14aca, 0xa1a669, 0xa1c462, 0xa1c927, 0xa1cccd, 0xa2261d, 0xa4f9a1, 0xa4fd8f, 0xa50260, 0xa505df, 0xa50a29, 0xa50df9, 0xa51274, 0xa51642, 0xa52689, 0xa5b278, 0xa87089, 0xa998be, 0xaf7159 };
+static ResizableGameArray array_blockdef_isResizeableBlock_obj((void**)0xb2b930, 701, 2, array_blockdef_isResizeableBlock_patches);
+static const uint32_t array_blockdef_height_patches[] = { 0x8c81d8, 0x8c85d0, 0x9de91f, 0x9e387e, 0x9e4000, 0x9fd637, 0x9fd655, 0xae52ca, 0xae52f0, 0xae5365, 0xae53ad, 0xae54e7, 0xae66f9, 0xae6c89, 0xae720d };
+static ResizableGameArray array_blockdef_height_obj((void**)0xb2ba14, 701, 2, array_blockdef_height_patches);
+static const uint32_t array_blockdef_width_patches[] = { 0x8c81bd, 0x8c8588, 0x9de94b, 0x9e385d, 0x9e3fd2, 0x9fd5d5, 0x9fd5f3, 0xae52b9, 0xae5301, 0xae5376, 0xae539c, 0xae54f8, 0xae670a, 0xae6c9a, 0xae721e };
+static ResizableGameArray array_blockdef_width_obj((void**)0xb2b9f8, 701, 2, array_blockdef_width_patches);
+static const uint32_t array_b2bea0_patches[] = { 0x91d844, 0x91d9f3, 0x91db9d, 0x92b5bd, 0x92b76d, 0x92b918, 0x943ffd, 0x9441ac, 0x944356, 0x9da934 };
+static ResizableGameArray array_b2bea0_obj((void**)0xb2bea0, 700, 2, array_b2bea0_patches);
+static const uint32_t array_HasNoBlockMask_patches[] = { 0x91d7f0, 0x92b568, 0x943fa9, 0xac0780, 0xacb5c8 };
+static ResizableGameArray array_HasNoBlockMask_obj((void**)0xb2c010, 700, 2, array_HasNoBlockMask_patches);
+static const uint32_t array_unkLoadedCustomBlocks_patches[] = { 0xacd3f5, 0xad3495, 0xad35cc, 0xad9f9f };
+static ResizableGameArray array_unkLoadedCustomBlocks_obj((void**)0xb2c940, 700, 2, array_unkLoadedCustomBlocks_patches);
+static const uint32_t array_GM_GFX_BLOCKS_MASK_PTR_patches[] = { 0x910997, 0x91da2a, 0x92b7a4, 0x943a41, 0x9441e3, 0xac067d, 0xac06fa, 0xacb608, 0xacd86f, 0xad3b69, 0xada419 };
+static ResizableGameArray array_GM_GFX_BLOCKS_MASK_PTR_obj((void**)0xb2c978, 700, 4, array_GM_GFX_BLOCKS_MASK_PTR_patches);
+static const uint32_t array_GM_GFX_BLOCKS_PTR_patches[] = { 0x910b27, 0x910cb9, 0x91d87b, 0x91dbd4, 0x92b5f4, 0x92b94f, 0x943bce, 0x943d62, 0x944034, 0x94438d, 0xabffae, 0xac002c, 0xacb4e1, 0xacb51f, 0xacd5c1, 0xad37f3, 0xada16b, 0xae550d };
+static ResizableGameArray array_GM_GFX_BLOCKS_PTR_obj((void**)0xb2c95c, 700, 4, array_GM_GFX_BLOCKS_PTR_patches);
+static const uint32_t array_IPictureDisp_Blocks_patches[] = { 0xabfe73, 0xabfffb, 0xacb562, 0xacd54f, 0xacd5a9, 0xad3786, 0xad37e1, 0xada0f9, 0xada153 };
+static ResizableGameArray array_IPictureDisp_Blocks_obj((void**)0xb2c9a0, 700, 4, array_IPictureDisp_Blocks_patches);
+static const uint32_t array_IPictureDisp_Blocks_Mask_patches[] = { 0xac0542, 0xac06c9, 0xacb64c, 0xacd7fd, 0xacd857, 0xad3afc, 0xad3b57, 0xada3a7, 0xada401 };
+static ResizableGameArray array_IPictureDisp_Blocks_Mask_obj((void**)0xb2c9c8, 700, 4, array_IPictureDisp_Blocks_Mask_patches);
+
+static uint32_t currentBlockIdLimit = 700;
+
+uint32_t GetBlockIdLimit()
+{
+	return currentBlockIdLimit;
+}
+
+void PatchBlockIdLimit()
+{
+	uint32_t newLimit = Block::MAX_ID;
+
+	array_b2b94c_obj.Patch(newLimit + 1);
+	array_b2b968_obj.Patch(newLimit + 1);
+	array_b2c048_obj.Patch(newLimit + 1);
+	array_b2c064_obj.Patch(newLimit + 1);
+	array_b2c080_obj.Patch(newLimit + 1);
+	array_b2c09c_obj.Patch(newLimit + 1);
+	array_b2c0b8_obj.Patch(newLimit + 1);
+	array_b2c0d4_obj.Patch(newLimit + 1);
+	array_blockdef_isResizeableBlock_obj.Patch(newLimit + 1);
+	array_blockdef_height_obj.Patch(newLimit + 1);
+	array_blockdef_width_obj.Patch(newLimit + 1);
+
+	array_b2bea0_obj.Patch(newLimit);
+	array_HasNoBlockMask_obj.Patch(newLimit);
+	array_unkLoadedCustomBlocks_obj.Patch(newLimit);
+	array_GM_GFX_BLOCKS_MASK_PTR_obj.Patch(newLimit);
+	array_GM_GFX_BLOCKS_PTR_obj.Patch(newLimit);
+	array_IPictureDisp_Blocks_obj.Patch(newLimit);
+	array_IPictureDisp_Blocks_Mask_obj.Patch(newLimit);
+
+	PATCH(0xAD3495).dword(newLimit).Apply();
+	PATCH(0xACD342).dword(newLimit).Apply();
+	PATCH(0xAD9EE9).dword(newLimit).Apply();
+
+	currentBlockIdLimit = newLimit;
 }
