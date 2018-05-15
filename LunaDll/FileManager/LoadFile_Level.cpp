@@ -248,6 +248,13 @@ void LunaLua_loadLevelFile(LevelData &outData,
             nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
         }
 
+        if (npcID >= 293) {
+            nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.contents);
+            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data);
+            nextNPC->unknown_E0 = static_cast<short>(nextNPC->ai2);
+        }
+
         nextNPC->isGenerator = COMBOOL(nextDataLevelNPC.generator);
         if (nextNPC->isGenerator) {
             nextNPC->directionToGenerate = nextDataLevelNPC.generator_direct;
