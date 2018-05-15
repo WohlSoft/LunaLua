@@ -32,30 +32,42 @@ void ErrorReport::writeErrorLog(const std::string &text)
 std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
 {
     std::string errDesc = "";
-    errDesc += "VB6 Error Code: " + std::to_string(static_cast<int>(errCode)) + "\n";
+    errDesc += "VB6 Error Code: " + std::to_string(static_cast<int>(errCode));
 
     switch (errCode)
     {
+	case ErrorReport::VB6ERR_INVCALLARG:
+		errDesc += " (Invalid call or argument)\n";
+		break;
     case ErrorReport::VB6ERR_OVERFLOW:
-        errDesc += "VB6 Error Name: Overflow\n";
-        errDesc += "This happens when a number gets too big in the memory\n";
+        errDesc += " (Overflow)\n";
         break;
     case ErrorReport::VB6ERR_OUTOFMEMORY:
-        errDesc += "VB6 Error Name: Out of Memory\n";
-        errDesc += "This happens when you run out of memory.\n";
+        errDesc += " (Out of Memory)\n";
         break;
     case ErrorReport::VB6ERR_OUTOFRANGE:
-        errDesc += "VB6 Error Name: Subscript out of range\n";
-        errDesc += "This happens when too many items are in the scenery.\n";
+        errDesc += " (Subscript out of range)\n";
         break;
     case ErrorReport::VB6ERR_DIVBYZERO:
-        errDesc += "VB6 Error Name: Division by zero\n";
+        errDesc += " (Division by zero)\n";
         break;
     case ErrorReport::VB6ERR_TYPEMISMATCH:
-        errDesc += "VB6 Error Name: Type mismatch\n";
+        errDesc += " (Type mismatch)\n";
         break;
+	case ErrorReport::VB6ERR_FILENOTFOUND:
+		errDesc += " (File not found)\n";
+		break;
+	case ErrorReport::VB6ERR_INPUTPASTEOF:
+		errDesc += " (Input past end of file)\n";
+		break;
+	case ErrorReport::VB6ERR_PATHNOTFOUND:
+		errDesc += " (Path not found)\n";
+		break;
+	case ErrorReport::VB6ERR_OBJVARNOTSET:
+		errDesc += " (Object variable not set)\n";
+		break;
     default:
-        errDesc += "VB6 Error Name: Unknown\n";
+		errDesc += "\n";
         break;
     }
     return errDesc;
@@ -80,35 +92,47 @@ void ErrorReport::manageErrorReport(const std::string &url, std::string &errText
     }
 }
 
+static_assert(EXCEPTION_FLT_INEXACT_RESULT == 0xc000008f, "BOO");
+
 void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 {
-    bool isVB6Exception = (exception->ExceptionCode == 0xc000008f);
+    bool isVB6Exception = (exception->ExceptionCode == EXCEPTION_FLT_INEXACT_RESULT);
     std::string stackTrace = generateStackTrace(isVB6Exception ? &lastVB6ErrContext : context);
     std::stringstream fullErrorDescription;
 
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << "*                  Summary                       *\n";
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << "SMBX has crashed due an error. See the description for more information!\n";
+    fullErrorDescription << "== Crash Summary ==\n";
     fullErrorDescription << "LunaLua Version: " + std::string(LUNALUA_VERSION) + "\n";
-    fullErrorDescription << std::string("Time/Date: ") + generateTimestamp() + "\n";
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << "*              Description                       *\n";
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << "Exception code: 0x" << std::hex << exception->ExceptionCode << "\n";
+    fullErrorDescription << "Exception Code: 0x" << std::hex << exception->ExceptionCode;
+
+	switch (exception->ExceptionCode)
+	{
+	case EXCEPTION_FLT_INEXACT_RESULT:
+		fullErrorDescription << " (VB Error)\n";
+		break;
+	case EXCEPTION_ACCESS_VIOLATION:
+		fullErrorDescription << " (Access Violation)\n";
+		break;
+	case EXCEPTION_STACK_OVERFLOW:
+		fullErrorDescription << " (Stack Overflow)\n";
+		break;
+	default:
+		fullErrorDescription << "\n";
+		break;
+	}
+
     if (isVB6Exception) {
         fullErrorDescription << getCustomVB6ErrorDescription(lastVB6ErrCode);
     }
-    fullErrorDescription << "\n";
+
+	fullErrorDescription << "\n== Stack Trace ==\n";
+	fullErrorDescription << stackTrace;
+
+	fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
     fullErrorDescription << "* http://wohlsoft.ru/forum/ or\n";
     fullErrorDescription << "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";
     fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << "*              Stacktrace                        *\n";
-    fullErrorDescription << "**************************************************\n";
-    fullErrorDescription << stackTrace;
 
     lastErrDesc = fullErrorDescription.str();
 }
