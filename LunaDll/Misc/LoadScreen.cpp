@@ -189,8 +189,13 @@ void LunaLoadScreenStart()
 	if (!lunaLoadScreenEnabled) return;
 	if (loadThread != nullptr) return;
 
+	// Check renderer init, and clear main thread render queue
 	GLEngineProxy::CheckRendererInit();
 	Renderer::Get().ClearQueue();
+
+	// We should clear textures periodically for video memory reasons. At this
+	// point is probably good enough.
+	g_GLEngine.ClearTextures();
 
 	killThreadFlag = false;
 	loadThread = new std::thread(LoadThread);
