@@ -424,8 +424,8 @@ struct NPCMOB {
     Momentum spawnMomentum;                 //+0xA8
     float spawnDirection;                   //+0xD8
     short spawnID;                          //+0xDC
-    short unknown_DE;                       //+0xDE
-    short unknown_E0;                       //+0xE0
+    short ai1_initial;                       //+0xDE
+    short ai2_initial;                       //+0xE0
     short id;                               //+0xE2
     short animationFrame;                   //+0xE4
     short unknown_E6;                       //+0xE6

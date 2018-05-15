@@ -226,33 +226,33 @@ void LunaLua_loadLevelFile(LevelData &outData,
         // Special rules by id:
         if ((npcID == 91) || (npcID == 96) || (npcID == 283) || (npcID == 284)) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.contents);
-            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai1_initial = static_cast<short>(nextNPC->ai1);
         }
         if (((nextDataLevelNPC.contents == 288) && (npcID == 91))// Grass contains magic potion
             || (npcID == 288)  //Magic potion
             || (npcID == 289)) //Subspace door
         {
             nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_E0 = static_cast<short>(nextNPC->ai2);
+            nextNPC->ai2_initial = static_cast<short>(nextNPC->ai2);
         }
         if (npc_isflying[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai1_initial = static_cast<short>(nextNPC->ai1);
         }
         if (npc_isWaterNPC[npcID]) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai1_initial = static_cast<short>(nextNPC->ai1);
         }
         if (npcID == 260) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai1_initial = static_cast<short>(nextNPC->ai1);
         }
 
         if (npcID >= 293) {
             nextNPC->ai1 = static_cast<double>(nextDataLevelNPC.contents);
-            nextNPC->unknown_DE = static_cast<short>(nextNPC->ai1);
+            nextNPC->ai1_initial = static_cast<short>(nextNPC->ai1);
             nextNPC->ai2 = static_cast<double>(nextDataLevelNPC.special_data);
-            nextNPC->unknown_E0 = static_cast<short>(nextNPC->ai2);
+            nextNPC->ai2_initial = static_cast<short>(nextNPC->ai2);
         }
 
         nextNPC->isGenerator = COMBOOL(nextDataLevelNPC.generator);
@@ -303,7 +303,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
             if (markStarAsGotten)
             {
                 nextNPC->ai1 = 1.0;
-                nextNPC->unknown_DE = 1;
+                nextNPC->ai1_initial = 1;
                 if (npcID == 196) {
                     nextNPC->killFlag = 9;
                 }
