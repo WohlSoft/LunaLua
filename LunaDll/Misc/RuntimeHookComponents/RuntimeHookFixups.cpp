@@ -176,7 +176,7 @@ void fixup_WarpLimit()
 void fixup_WebBox()
 {
     const wchar_t* aboutBlank = L"about:blank";
-    const wchar_t* webBoxTitle = L"LunaLua-SMBX " LUNALUA_VER_STR L"";
+    const wchar_t* webBoxTitle = L"LunaLua-SMBX";
 
     memcpy((void*)0x00431A34, aboutBlank, sizeof(wchar_t) * lstrlenW(aboutBlank) + 2);
     memcpy((void*)0x00427614, webBoxTitle, sizeof(wchar_t) * lstrlenW(webBoxTitle) + 2);
