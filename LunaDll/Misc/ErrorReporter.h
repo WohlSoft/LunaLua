@@ -24,11 +24,16 @@ namespace ErrorReport{
 
 
     enum VB6ErrorCode{
+		VB6ERR_INVCALLARG = 5,
         VB6ERR_OVERFLOW = 6,
         VB6ERR_OUTOFMEMORY = 7,
         VB6ERR_OUTOFRANGE = 9,
         VB6ERR_DIVBYZERO = 11,
-        VB6ERR_TYPEMISMATCH = 13
+        VB6ERR_TYPEMISMATCH = 13,
+		VB6ERR_FILENOTFOUND = 53,
+		VB6ERR_INPUTPASTEOF = 62,
+		VB6ERR_PATHNOTFOUND = 76,
+		VB6ERR_OBJVARNOTSET = 91,
     };
     void manageErrorReport(const std::string &url, std::string &errText);
     void writeErrorLog(const std::string &text);

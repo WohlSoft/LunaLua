@@ -1006,7 +1006,9 @@ BOOL StackWalker::LoadModules()
         }
     }  // if SymBuildPath
 
+#ifdef STACKWALKER_OUTPUT_LIBRARY_INFORMATION
     this->OnOutput("\n\n**** LIBRARY INFORMATION ****\n");
+#endif
     // First Init the whole stuff...
     BOOL bRet = this->m_sw->Init(szSymPath);
     if (szSymPath != NULL) free(szSymPath); szSymPath = NULL;
@@ -1018,7 +1020,9 @@ BOOL StackWalker::LoadModules()
     }
 
     bRet = this->m_sw->LoadModules(this->m_hProcess, this->m_dwProcessId);
+#ifdef STACKWALKER_OUTPUT_LIBRARY_INFORMATION
     this->OnOutput("\n\n**** THE STACKTRACE ****\n");
+#endif
     if (bRet != FALSE)
         m_modulesLoaded = TRUE;
     return bRet;
@@ -1300,6 +1304,7 @@ BOOL __stdcall StackWalker::myReadProcMem(
 
 void StackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD size, DWORD result, LPCSTR symType, LPCSTR pdbName, ULONGLONG fileVersion)
 {
+#ifdef STACKWALKER_OUTPUT_LIBRARY_INFORMATION
     CHAR buffer[STACKWALK_MAX_NAMELEN];
     if (fileVersion == 0)
         sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s'\n", img, mod, (LPVOID)baseAddr, size, result, symType, pdbName);
@@ -1312,6 +1317,7 @@ void StackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD s
         sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s:%s (%p), size: %ld (result: %ld), SymType: '%s', PDB: '%s', fileVersion: %ld.%ld.%ld.%ld\n", img, mod, (LPVOID)baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
     }
     OnOutput(buffer);
+#endif
 }
 
 void StackWalker::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &entry)
@@ -1327,10 +1333,10 @@ void StackWalker::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &ent
             strncpy_sss(entry.name, STACKWALK_MAX_NAMELEN, entry.undFullName);
         if (entry.lineFileName[0] == 0)
         {
-            strncpy_sss(entry.lineFileName, STACKWALK_MAX_NAMELEN, "(filename not available)");
+            strncpy_sss(entry.lineFileName, STACKWALK_MAX_NAMELEN, "");
             if (entry.moduleName[0] == 0)
                 strncpy_sss(entry.moduleName, STACKWALK_MAX_NAMELEN, "(module-name not available)");
-            sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s: %s\n", (LPVOID)entry.offset, entry.moduleName, entry.lineFileName, entry.name);
+            sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%p (%s): %s\n", (LPVOID)entry.offset, entry.moduleName, entry.name);
         }
         else
             sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "%s (%ld): %s\n", entry.lineFileName, entry.lineNumber, entry.name);
@@ -1350,6 +1356,7 @@ void StackWalker::OnDbgHelpErr(LPCSTR /*szFuncName*/, DWORD /*gle*/, DWORD64 /*a
 
 void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName)
 {
+#ifdef STACKWALKER_OUTPUT_LIBRARY_INFORMATION
     CHAR buffer[STACKWALK_MAX_NAMELEN];
     sprintf_sss(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %ld, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
     OnOutput(buffer);
@@ -1377,6 +1384,7 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
             ver.szCSDVersion, ver.wSuiteMask, ver.wProductType);
         OnOutput(buffer);
     }
+#endif
 #endif
 }
 
