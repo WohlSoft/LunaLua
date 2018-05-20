@@ -1043,59 +1043,105 @@ extern void __stdcall GenerateScreenshotHook()
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    if (nCode < 0){
+	static BYTE keyState[256] = { 0 };
+	static WCHAR unicodeData[32] = { 0 };
+
+    if (nCode != 0){
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-    if ((lParam & 0x80000000) == 0) {
-        if (gLunaLua.isValid()) {
-            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
-            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(wParam));
-        }
-    }
-    
-    // Hook print screen key
-    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
-    {
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            GlobalUnlock(&globalMem);
-            // Write to clipboard
-            OpenClipboard(curHwnd);
-            EmptyClipboard();
-            SetClipboardData(CF_DIB, globalMem);
-            CloseClipboard();
-            return false;
-        });
-        return 1;
-    }
-    if (wParam == VK_F12 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short screenshotSoundID = 12;
-        native_playSFX(&screenshotSoundID);
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
-            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-                CreateDirectoryW(screenshotPath.c_str(), NULL);
-            }
-            screenshotPath += L"\\";
-            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+	bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
+	bool altPressed = ((lParam & 0x20000000) == 0x20000000);
+	bool keyDown = ((lParam & 0x80000000) == 0x0);
+	bool keyUp = ((lParam & 0x80000000) == 0x80000000);
+	unsigned int virtKey = wParam;
+	unsigned int scanCode = (lParam >> 16) & 0xFF;
 
-            ::GenerateScreenshot(screenshotPath, *header, pData);
-            return true;
-        });
-        return 1;
-    }
-    if (wParam == VK_F11 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
-        native_playSFX(&gifRecSoundID);
-    }
-    if (wParam == VK_F4 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
-        gGeneralConfig.save();
-    }
-    
+	if (virtKey < 256)
+	{
+		keyState[virtKey] = keyDown ? 0x80 : 0x00;
+		if (virtKey == VK_CAPITAL)
+		{
+			keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+		}
+	}
+	
+	bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
+	bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+
+	if (keyDown) {
+		if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+			std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+
+			int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
+			if (unicodeRet > 0)
+			{
+				std::wstring wStr(unicodeData, unicodeRet);
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, WStr2Str(wStr));
+			}
+			else
+			{
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+			}
+		}
+
+		if (virtKey == VK_F12)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short screenshotSoundID = 12;
+				native_playSFX(&screenshotSoundID);
+				g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+					std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+					if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+						CreateDirectoryW(screenshotPath.c_str(), NULL);
+					}
+					screenshotPath += L"\\";
+					screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+
+					::GenerateScreenshot(screenshotPath, *header, pData);
+					return true;
+				});
+			}
+			return 1;
+		}
+		if (virtKey == VK_F11)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+				native_playSFX(&gifRecSoundID);
+			}
+			return 1;
+		}
+		if ((virtKey == VK_F4) && !altPressed)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+				gGeneralConfig.save();
+			}
+			return 1;
+		}
+	} // keyDown
+
+	// Hook print screen key
+	if (virtKey == VK_SNAPSHOT)
+	{
+		if (g_GLEngine.IsEnabled())
+		{
+			g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+				GlobalUnlock(&globalMem);
+				// Write to clipboard
+				OpenClipboard(curHwnd);
+				EmptyClipboard();
+				SetClipboardData(CF_DIB, globalMem);
+				CloseClipboard();
+				return false;
+			});
+		}
+		return 1;
+	}
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
