@@ -180,6 +180,16 @@ bool NPC::GetSpinjumpSafe(int id) {
     return (npcprop_spinjumpsafe[id] != 0);
 }
 
+void NPC::SetVulnerableHarmTypes(int id, uint32_t val) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return;
+	npcprop_vulnerableharmtypes[id] = val;
+}
+
+void NPC::SetSpinjumpSafe(int id, bool val) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return;
+	npcprop_spinjumpsafe[id] = COMBOOL(val);
+}
+
 bool NPC::GetNoWaterPhysics(int id) {
     if ((id < 1) || (id > NPC::MAX_ID)) return false;
     return (npcprop_nowaterphysics[id] != 0);
