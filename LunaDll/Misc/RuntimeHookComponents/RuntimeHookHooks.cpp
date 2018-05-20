@@ -1043,10 +1043,14 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if (virtKey < 256)
 	{
 		keyState[virtKey] = keyDown ? 0x80 : 0x00;
+		if (virtKey == VK_CAPITAL)
+		{
+			keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+		}
 	}
 	
 	bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
-	bool plainPress = keyDown && (!repeated) && (!altPressed) && (!ctrlPressed);
+	bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
 	if (keyDown) {
 		if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
@@ -1064,23 +1068,6 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		// Hook print screen key
-		if (virtKey == VK_SNAPSHOT)
-		{
-			if (plainPress && g_GLEngine.IsEnabled())
-			{
-				g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-					GlobalUnlock(&globalMem);
-					// Write to clipboard
-					OpenClipboard(curHwnd);
-					EmptyClipboard();
-					SetClipboardData(CF_DIB, globalMem);
-					CloseClipboard();
-					return false;
-				});
-			}
-			return 1;
-		}
 		if (virtKey == VK_F12)
 		{
 			if (plainPress && g_GLEngine.IsEnabled())
@@ -1120,6 +1107,24 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 			return 1;
 		}
 	} // keyDown
+
+	// Hook print screen key
+	if (virtKey == VK_SNAPSHOT)
+	{
+		if (g_GLEngine.IsEnabled())
+		{
+			g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+				GlobalUnlock(&globalMem);
+				// Write to clipboard
+				OpenClipboard(curHwnd);
+				EmptyClipboard();
+				SetClipboardData(CF_DIB, globalMem);
+				CloseClipboard();
+				return false;
+			});
+		}
+		return 1;
+	}
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
