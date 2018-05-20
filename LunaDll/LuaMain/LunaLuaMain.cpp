@@ -28,13 +28,13 @@
 #include "../Misc/LoadScreen.h"
 
 
-const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
+const std::wstring CLunaLua::LuaLibsPath = L"\\LuaScriptsLib\\mainV2.lua";
 using namespace luabind;
 
 std::wstring CLunaLua::getLuaLibsPath()
 {
     std::wstring lapi = gAppPathWCHAR;
-    lapi = lapi.append(L"\\scripts\\base\\engine\\main.lua");
+    lapi = lapi.append(L"\\LuaScriptsLib\\mainV2.lua");
     return lapi;
 }
 
@@ -183,7 +183,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Read the API-File
     std::wstring wLuaCode;
-    if(!readFile(wLuaCode, getLuaLibsPath(), L"\"scripts\\base\\engine\\main.lua\" is required.\nBe sure you installed everything correctly!")){
+    if(!readFile(wLuaCode, getLuaLibsPath(), L"Since v0.3 the LuaScriptsLib-Folder with\nall its content is required.\nBe sure you installed everything correctly!")){
         shutdown();
         return;
     }
@@ -196,10 +196,10 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Setup default contants
     setupDefaults();
-    
+
     //Load the Lua API
     bool errLapi = false;
-    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
+    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=mainV2.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
     if(!(lapierrcode == 0)){
         object error_msg(from_stack(L, -1));
         MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
