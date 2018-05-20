@@ -6,6 +6,7 @@ class GLFramebuffer;
 
 class CaptureBuffer : public std::enable_shared_from_this<CaptureBuffer> {
 public:
+	CaptureBuffer(int w, int h);
     CaptureBuffer(int w, int h, bool nonskippable);
     ~CaptureBuffer();
     void CaptureAt(double priority);

@@ -74,6 +74,10 @@ public:
 	}
 };
 
+CaptureBuffer::CaptureBuffer(int w, int h) : CaptureBuffer(w, h, false)
+{
+}
+
 CaptureBuffer::CaptureBuffer(int w, int h, bool nonskippable) :
     mW(w), mH(h), mNonskippable(nonskippable), mFramebuffer(nullptr)
 {

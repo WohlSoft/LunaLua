@@ -572,6 +572,7 @@ void CLunaLua::bindAll()
                     .property("height", &LunaImage::getH)
                     .property("__rawDataPtr", &LunaImage::getDataPtrAsInt),
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(CaptureBuffer, std::shared_ptr)
+					.def(constructor<int, int>())
                     .def(constructor<int, int, bool>())
                     .def("__eq", &LuaProxy::luaUserdataCompare<CaptureBuffer>)
                     .def("captureAt", &CaptureBuffer::CaptureAt),
