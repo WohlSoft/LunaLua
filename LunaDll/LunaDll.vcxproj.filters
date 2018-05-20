@@ -726,6 +726,9 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorld.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyVBStr.cpp">
+      <Filter>LuaMain\LuaProxyComponent</Filter>
+    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySection.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>

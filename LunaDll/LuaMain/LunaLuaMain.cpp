@@ -524,6 +524,7 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Player, Player);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Camera, Camera);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::VBStr, VBStr);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::World, World);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
@@ -1051,6 +1052,14 @@ void CLunaLua::bindAll()
                 def("values", &LuaProxy::SaveBankProxy::values),
                 def("save", &LuaProxy::SaveBankProxy::save)
             ],
+
+            LUAHELPER_DEF_CLASS(VBStr)
+            .def(constructor<long>())
+            .property("str", &LuaProxy::VBStr::str, &LuaProxy::VBStr::setStr)
+            .property("length", &LuaProxy::VBStr::length, &LuaProxy::VBStr::setLength)
+            .def("clear", &LuaProxy::VBStr::clear)
+            .def(tostring(self))
+            .def("__concat", &LuaProxy::VBStr::luaConcat),
 
             class_<LuaProxy::Console>("Console")
             .def("print", &LuaProxy::Console::print)

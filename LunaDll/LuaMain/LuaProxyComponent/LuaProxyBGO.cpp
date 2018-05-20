@@ -211,7 +211,7 @@ void LuaProxy::BGO::setLayer(const Layer& layer, lua_State* L)
     if (!isValid_throw(L))
         return;
 
-    return SMBX_BGO::Get(m_index)->ptLayerName = layer.layerName();
+    return SMBX_BGO::Get(m_index)->ptLayerName = layer.layerName().str();
 }
 
 

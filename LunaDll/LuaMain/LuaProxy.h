@@ -282,6 +282,32 @@ namespace LuaProxy {
         double bottom;
     };
 
+    
+
+    class VBStr{
+    public:
+        VBStr (wchar_t* ptr);
+        VBStr (long ptr);
+        std::string str() const;
+        void setStr(const std::string &str);
+        int length() const;
+        void setLength(int len);
+        void clear();
+        bool isValid() const;
+        static std::string LuaProxy::VBStr::luaConcatToString(const luabind::object &value, lua_State *L);
+        static std::string luaConcat(const luabind::object &arg1, const luabind::object &arg2, lua_State *L);
+
+        // Allow << operator to act as friend
+        friend std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
+
+        // Allow assignVB6StrPtr access to m_wcharptr
+        friend void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L);
+    private:
+        wchar_t* m_wcharptr;
+    };
+
+    std::ostream& operator<<(std::ostream& os, const VBStr& wStr);
+
     class Console {
     public:
         Console();
@@ -377,7 +403,7 @@ namespace LuaProxy {
 
         Layer (int layerIndex);
         int idx() const;
-        std::string layerName() const;
+        VBStr layerName() const;
         float speedX() const;
         void setSpeedX(float speedX);
         float speedY() const;
@@ -454,21 +480,21 @@ namespace LuaProxy {
         luabind::object mem(int offset, L_FIELDTYPE ftype, lua_State* L) const;
         void kill(lua_State* L);
         void kill(int killEffectID, lua_State* L);
-        std::string attachedLayerName(lua_State* L) const;
+        VBStr attachedLayerName(lua_State* L) const;
         void setAttachedLayerName(const luabind::object &value, lua_State* L);
         luabind::object attachedLayerObj(lua_State *L) const;
         void setAttachedLayerObj(const LuaProxy::Layer &value, lua_State *L);
-        std::string activateEventName(lua_State* L) const;
+        VBStr activateEventName(lua_State* L) const;
         void setActivateEventName(const luabind::object &value, lua_State* L);
-        std::string deathEventName(lua_State* L) const;
+        VBStr deathEventName(lua_State* L) const;
         void setDeathEventName(const luabind::object &value, lua_State* L);
-        std::string talkEventName(lua_State* L) const;
+        VBStr talkEventName(lua_State* L) const;
         void setTalkEventName(const luabind::object &value, lua_State* L);
-        std::string noMoreObjInLayer(lua_State* L) const;
+        VBStr noMoreObjInLayer(lua_State* L) const;
         void setNoMoreObjInLayer(const luabind::object &value, lua_State* L);
-        std::string msg(lua_State* L) const;
+        VBStr msg(lua_State* L) const;
         void setMsg(const luabind::object &value, lua_State* L);
-        std::string layerName(lua_State* L) const;
+        VBStr layerName(lua_State* L) const;
         void setLayerName(const luabind::object &value, lua_State* L);
         luabind::object layerObj(lua_State *L) const;
         void setLayerObj(const LuaProxy::Layer &value, lua_State *L);
@@ -884,7 +910,7 @@ namespace LuaProxy {
         bool isHidden() const;
         void setIsHidden(bool isHidden);
         int collidesWith(const Player* player) const;
-        std::string layerName() const;
+        VBStr layerName() const;
         luabind::object layerObj(lua_State* L) const;
         void remove();
         void remove(bool playSoundEffect);
@@ -921,7 +947,7 @@ namespace LuaProxy {
         short currentWalkingTimer() const;
         void setCurrentWalkingTimer(short currentWalkingTimer);
         bool playerIsCurrentWalking() const;
-        std::string levelTitle(lua_State* L);
+        luabind::object levelTitle(lua_State* L);
         luabind::object levelObj(lua_State* L);
         short getCurrentDirection() const;
         short playerPowerup() const;
@@ -1377,7 +1403,7 @@ namespace LuaProxy {
 
     void loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L);
 
-    std::string getInput();
+    VBStr getInput();
 
     //NPC functions [Moved as static function]
     int totalNPCs();

@@ -25,6 +25,14 @@ void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lu
         return;
     }
 
+    // Copy from VBStr object
+    boost::optional<LuaProxy::VBStr const> opt_obj = luabind::object_cast_nothrow<LuaProxy::VBStr const>(value);
+    if (opt_obj != boost::none)
+    {
+        *ptr = *((VB6StrPtr*)&(*opt_obj).m_wcharptr);
+        return;
+    }
+
     luaL_error(L, "Cannot cast to string");
 }
 
