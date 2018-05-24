@@ -1059,6 +1059,9 @@
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="VersionString.cpp" />
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">
