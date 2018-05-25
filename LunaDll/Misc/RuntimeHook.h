@@ -102,7 +102,6 @@ extern void IsNPCCollidesWithVeggiHook_Wrapper();
 /************************************************************************/
 /* Hooks for analyze purpose                                            */
 /************************************************************************/
-extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex);
 extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern void __stdcall RenderLevelHook();
 extern void __stdcall RenderWorldHook();
@@ -247,6 +246,7 @@ void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
 
+void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);
 void __stdcall runtimeHookNpcHarmRaw_a293ee(void);

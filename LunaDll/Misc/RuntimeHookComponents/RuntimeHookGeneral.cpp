@@ -601,6 +601,8 @@ void TrySkipPatch()
 	// Enable custom load screens
 	LunaLoadScreenSetEnable(true);
 
+	// Hooks for onNPCHarm support
+	PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
 	PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
 	PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
 	PATCH(0xa293ea).JMP(&runtimeHookNpcHarmRaw_a293ee).NOP_PAD_TO_SIZE<6>().Apply();

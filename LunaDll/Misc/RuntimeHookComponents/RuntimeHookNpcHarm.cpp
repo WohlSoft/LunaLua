@@ -3,28 +3,42 @@
 //#include "../../LuaMain/LunaLuaMain.h"
 //#include "../../LuaMain/LuaProxy.h"
 
-//      Arg1 = short* The NPC Index which gets hit by an object
-//      Arg2 = CollidersType* object type
-//      Arg3 = short* The Object Index
-unsigned int __stdcall runtimeHookNpcHarm(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
-{
-	short& npcIdx = *pNpcIdx;
-	CollidersType& objType = *pObjType;
-	short& objIdx = *pObjIdx;
+static bool npcHarmCancelled = false;
+static bool npcHarmResultSet = false;
 
-	bool cancelled = false;
-	if (gLunaLua.isValid()) {
+// Stub to execute the original npc collision function
+_declspec(naked) static void __stdcall runtimeHookCollideNpc_OrigFunc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
+{
+	__asm {
+		push ebp
+		mov ebp, esp
+		sub esp, 8
+		push 0xa281b6
+		ret
+	}
+}
+
+// Hook for the start of the original npc collision function
+void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
+{
+	npcHarmResultSet = false;
+	runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+}
+
+// Hook to catch when NPC harm is about to occur
+static unsigned int __stdcall runtimeHookNpcHarm(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
+{
+	if (!npcHarmResultSet && gLunaLua.isValid()) {
 		std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCHarm", true);
 		npcKillEvent->setDirectEventName("onNPCHarm");
 		npcKillEvent->setLoopable(false);
-		gLunaLua.callEvent(npcKillEvent, (int)npcIdx, (int)objType, (int)objIdx);
-		if (npcKillEvent->native_cancelled())
-		{
-			cancelled = true;
-		}
+		gLunaLua.callEvent(npcKillEvent, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
+
+		npcHarmCancelled = npcKillEvent->native_cancelled();
+		npcHarmResultSet = true;
 	}
 
-	return cancelled ? -1 : 0;
+	return npcHarmCancelled ? -1 : 0;
 }
 
 __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a291d8(void)
