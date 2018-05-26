@@ -1,7 +1,6 @@
 #include "../../Defines.h"
 #include "../../Globals.h"
-//#include "../../LuaMain/LunaLuaMain.h"
-//#include "../../LuaMain/LuaProxy.h"
+#include "../RuntimeHook.h"
 
 static bool npcHarmCancelled = false;
 static bool npcHarmResultSet = false;
@@ -16,6 +15,13 @@ _declspec(naked) static void __stdcall runtimeHookCollideNpc_OrigFunc(short* pNp
 		push 0xa281b6
 		ret
 	}
+}
+
+// Logging function for diagnostics
+void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
+{
+	printf("addr=%06x npcIdx=%d type=%d culprit=%d\n", addr, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
+	runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
 }
 
 // Hook for the start of the original npc collision function

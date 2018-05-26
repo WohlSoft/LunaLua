@@ -1487,6 +1487,31 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
     }
 }
 
+static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
+{
+    if (NPC::GetHarmlessGrab(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
+{
+    __asm {
+        push esi // Args #1
+        call runtimeHookNPCHarmlessGrab
+        cmp eax, 0
+        jne alternate_exit
+        push 0xA0BA20
+        ret
+	alternate_exit :
+        push 0xA0C5AA
+        ret
+    }
+}
+
 static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 {
     if (playerIdx >= 0 && playerIdx <= 1)

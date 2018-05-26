@@ -226,6 +226,7 @@ void __stdcall runtimeHookBlockBumpableRaw(void);
 void __stdcall runtimeHookNPCVulnerabilityRaw(void);
 void __stdcall runtimeHookNPCSpinjumpSafeRaw(void);
 void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void);
+void __stdcall runtimeHookNPCHarmlessGrabRaw(void);
 void __stdcall runtimeHookCheckInputRaw(void);
 void __stdcall runtimeHookSetHDCRaw(void);
 
@@ -246,6 +247,7 @@ void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
 
+void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);

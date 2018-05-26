@@ -445,9 +445,6 @@ void TrySkipPatch()
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
 
-    // Logging for NPC collisions
-    //PATCH(0xA281B0).JMP(GET_RETADDR_TRACE_HOOK<&collideNPCLoggingHook>()).NOP().Apply();
-
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
     PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
@@ -536,6 +533,7 @@ void TrySkipPatch()
 
     PATCH(0x9A9D33).JMP(runtimeHookNPCSpinjumpSafeRaw).NOP_PAD_TO_SIZE<10>().Apply();
     PATCH(0xA0A991).JMP(runtimeHookNPCNoWaterPhysicsRaw).NOP_PAD_TO_SIZE<6>().Apply();
+	PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
@@ -600,6 +598,9 @@ void TrySkipPatch()
 
 	// Enable custom load screens
 	LunaLoadScreenSetEnable(true);
+
+	// Logging for NPC collisions
+	//PATCH(0xa281b0).JMP(GET_RETADDR_TRACE_HOOK<&runtimeHookLogCollideNpc>()).NOP_PAD_TO_SIZE<6>().Apply();
 
 	// Hooks for onNPCHarm support
 	PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
