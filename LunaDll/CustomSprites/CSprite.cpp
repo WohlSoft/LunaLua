@@ -147,7 +147,7 @@ void CSprite::Draw() {
 		op.x1 = m_Xpos; op.y1 = m_Ypos;
 		op.x2 = m_Xpos + m_Wd; op.y2 = m_Xpos + m_Ht; 
 		op.m_FramesLeft = 1;
-		op.Draw(&gLunaRender);
+		op.Draw(&Renderer::Get());
 	}
 }
 

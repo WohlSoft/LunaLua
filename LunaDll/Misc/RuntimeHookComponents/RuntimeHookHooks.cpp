@@ -31,6 +31,7 @@
 #include "../../Misc/TestMode.h"
 #include "../../Misc/WaitForTickEnd.h"
 #include "../../Rendering/ImageLoader.h"
+#include "../../Misc/LoadScreen.h"
 
 
 // Simple init hook to run the main LunaDLL initialization
@@ -128,6 +129,8 @@ extern int __stdcall LoadWorld()
     // We want to make sure we init the renderer before we start LunaLua when
     // entering levels...
     GLEngineProxy::CheckRendererInit();
+
+	LunaLoadScreenStart();
 
     ResetLunaModule();
     gIsOverworld = true;
@@ -231,7 +234,7 @@ extern void __stdcall LevelHUDHook(int* cameraIdx, int* unknown0x4002)
         skipStarCountPatch.Unapply();
     }
 
-    gLunaRender.RenderBelowPriority(5);
+    Renderer::Get().RenderBelowPriority(5);
     if (!gSMBXHUDSettings.skip) {
         native_renderLevelHud(cameraIdx, unknown0x4002);
     }
@@ -247,7 +250,9 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 #endif
-    RenderStringOp(Str2WStr(LUNALUA_VERSION), 3, 5, 5).Draw(&gLunaRender);
+	static std::string vStr = LUNALUA_VERSION;
+	std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
+    RenderStringOp(Str2WStr(vStr), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
         if (asyncBitBltProc){
@@ -268,7 +273,7 @@ extern void* __stdcall WorldRender()
     }
 
     gSpriteMan.RunSprites();
-    gLunaRender.RenderBelowPriority(DBL_MAX);
+    Renderer::Get().RenderBelowPriority(DBL_MAX);
 
     return (void*)0xB25010;
 }
@@ -568,10 +573,6 @@ extern void __stdcall recordVBErrCode(int errCode)
 
 extern void __stdcall LoadLocalGfxHook()
 {
-    // We should clear textures periodically for video memory reasons. At this
-    // point is probably good enough.
-    g_GLEngine.ClearTextures();
-
     // In the past, we would call native_loadLocalGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();
@@ -628,6 +629,9 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
+		// Make sure we kill the loadscreen before vanilla rendering
+		LunaLoadScreenKill();
+
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
     }
@@ -651,7 +655,7 @@ extern BOOL __stdcall StretchBltHook(
     }
 
     // If we're copying from our rendering screen, we're done with the frame
-    if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled())
+    if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
         g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 
@@ -785,7 +789,7 @@ extern void __stdcall FrameTimingHookQPC()
     {
         sFrameTime.Push(frameTime);
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     if (frameError > 5.0) frameError = 5.0;
@@ -859,7 +863,7 @@ extern void __stdcall FrameTimingHook()
         }
         sLastCount.QuadPart = sCount.QuadPart;
     }
-    gLunaRender.SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
+    Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
     g_PerfTracker.startFrame();
@@ -922,7 +926,7 @@ extern short __stdcall MessageBoxOpenHook()
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
-    gLunaRender.StartCameraRender(cameraIdx);
+    Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> cameraUpdateEvent = std::make_shared<Event>("onCameraUpdate", false);
@@ -945,7 +949,7 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 static void __stdcall PostCameraUpdateHook(int cameraIdx)
 {
 	// This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-	gLunaRender.StoreCameraPosition(cameraIdx);
+	Renderer::Get().StoreCameraPosition(cameraIdx);
 
 	if (gLunaLua.isValid()) {
 		SMBX_CameraInfo cameraData;
@@ -1022,59 +1026,105 @@ extern void __stdcall GenerateScreenshotHook()
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    if (nCode < 0){
+	static BYTE keyState[256] = { 0 };
+	static WCHAR unicodeData[32] = { 0 };
+
+    if (nCode != 0){
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-    if ((lParam & 0x80000000) == 0) {
-        if (gLunaLua.isValid()) {
-            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
-            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(wParam));
-        }
-    }
-    
-    // Hook print screen key
-    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
-    {
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            GlobalUnlock(&globalMem);
-            // Write to clipboard
-            OpenClipboard(curHwnd);
-            EmptyClipboard();
-            SetClipboardData(CF_DIB, globalMem);
-            CloseClipboard();
-            return false;
-        });
-        return 1;
-    }
-    if (wParam == VK_F12 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short screenshotSoundID = 12;
-        native_playSFX(&screenshotSoundID);
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
-            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-                CreateDirectoryW(screenshotPath.c_str(), NULL);
-            }
-            screenshotPath += L"\\";
-            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+	bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
+	bool altPressed = ((lParam & 0x20000000) == 0x20000000);
+	bool keyDown = ((lParam & 0x80000000) == 0x0);
+	bool keyUp = ((lParam & 0x80000000) == 0x80000000);
+	unsigned int virtKey = wParam;
+	unsigned int scanCode = (lParam >> 16) & 0xFF;
 
-            ::GenerateScreenshot(screenshotPath, *header, pData);
-            return true;
-        });
-        return 1;
-    }
-    if (wParam == VK_F11 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
-        native_playSFX(&gifRecSoundID);
-    }
-    if (wParam == VK_F4 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
-        gGeneralConfig.save();
-    }
-    
+	if (virtKey < 256)
+	{
+		keyState[virtKey] = keyDown ? 0x80 : 0x00;
+		if (virtKey == VK_CAPITAL)
+		{
+			keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+		}
+	}
+	
+	bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
+	bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+
+	if (keyDown) {
+		if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+			std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+
+			int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
+			if (unicodeRet > 0)
+			{
+				std::wstring wStr(unicodeData, unicodeRet);
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, WStr2Str(wStr));
+			}
+			else
+			{
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+			}
+		}
+
+		if (virtKey == VK_F12)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short screenshotSoundID = 12;
+				native_playSFX(&screenshotSoundID);
+				g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+					std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+					if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+						CreateDirectoryW(screenshotPath.c_str(), NULL);
+					}
+					screenshotPath += L"\\";
+					screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+
+					::GenerateScreenshot(screenshotPath, *header, pData);
+					return true;
+				});
+			}
+			return 1;
+		}
+		if (virtKey == VK_F11)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+				native_playSFX(&gifRecSoundID);
+			}
+			return 1;
+		}
+		if ((virtKey == VK_F4) && !altPressed)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+				gGeneralConfig.save();
+			}
+			return 1;
+		}
+	} // keyDown
+
+	// Hook print screen key
+	if (virtKey == VK_SNAPSHOT)
+	{
+		if (g_GLEngine.IsEnabled())
+		{
+			g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+				GlobalUnlock(&globalMem);
+				// Write to clipboard
+				OpenClipboard(curHwnd);
+				EmptyClipboard();
+				SetClipboardData(CF_DIB, globalMem);
+				CloseClipboard();
+				return false;
+			});
+		}
+		return 1;
+	}
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
@@ -1108,38 +1158,6 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
     }
 }
 
-
-
-// NPC Collision Logging Hook
-_declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    __asm {
-        PUSH EBP
-        MOV EBP,ESP
-        SUB ESP,8
-        PUSH 0xA281B6
-        RET
-    }
-}
-
-extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
-
-    static std::ofstream f;
-    if (!f.is_open()) {
-        f.open("npc_collide_log.txt", std::ios::out);
-    }
-    f << std::hex << (DWORD)retAddr << ": ";
-    f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
-    f << "type=" << std::dec << (WORD)*typeOfObject << " ";
-    f << "other=" << std::dec << (WORD)*objectIndex << " ";
-    f << std::endl;
-    f.flush();
-
-    collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
-}
-
 extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
     HWND destHwnd = WindowFromDC(hdcDest);
@@ -1160,12 +1178,13 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
+	LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
-    gLunaRender.StartFrameRender();
+    Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
     g_EventHandler.hookLevelRenderEnd();
-    gLunaRender.EndFrameRender();
+    Renderer::Get().EndFrameRender();
 }
 
 static void __declspec(naked) __stdcall RenderWorldReal()
@@ -1182,12 +1201,13 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
+	LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
-    gLunaRender.StartFrameRender();
+    Renderer::Get().StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     g_EventHandler.hookWorldRenderEnd();
-    gLunaRender.EndFrameRender();
+    Renderer::Get().EndFrameRender();
 }
 
 static void runtimeHookSmbxChangeModeHook(void)
@@ -1463,6 +1483,31 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
         popf
     early_exit :
         push 0xA0AB20
+        ret
+    }
+}
+
+static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
+{
+    if (NPC::GetHarmlessGrab(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
+{
+    __asm {
+        push esi // Args #1
+        call runtimeHookNPCHarmlessGrab
+        cmp eax, 0
+        jne alternate_exit
+        push 0xA0BA20
+        ret
+	alternate_exit :
+        push 0xA0C5AA
         ret
     }
 }

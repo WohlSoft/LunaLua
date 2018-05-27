@@ -11,7 +11,6 @@
 GLEngineProxy g_GLEngine;
 
 GLEngineProxy::GLEngineProxy() {
-    mFrameCount = 0;
     mPendingClear = 0;
     mSkipFrame = false;
 	mNextEndFrameIsSkippable = true;
@@ -46,15 +45,17 @@ void GLEngineProxy::ThreadMain() {
             mPendingClear--;
         }
         if (cmd->isFrameEnd()) {
-			bool mFrameSkippable = mQueuedFrameSkippability.front();
 			mQueuedFrameSkippability.pop();
 
-            if (mFrameCount-- > 1) {
-				mSkipFrame = mFrameSkippable;
-            }
-            else {
-                mSkipFrame = false;
-            }
+			// Determine frame skippability
+			// It is skippable if there is another FrameEnd queued with the
+			// flag for skippability set to true.
+			bool mFrameSkippable = false;
+			if (!mQueuedFrameSkippability.empty())
+			{
+				mFrameSkippable = mQueuedFrameSkippability.peek();
+			}
+			mSkipFrame = mFrameSkippable;
 
             // Clean up deleted textures if any
             while (!mDeletedTextures.empty())
@@ -82,8 +83,6 @@ void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
 	mNextEndFrameIsSkippable = mNextEndFrameIsSkippable && cmd->allowFrameSkippability();
 
     if (cmd->isFrameEnd()) { 
-        // Increment count of stored frames
-        mFrameCount++;
 		mQueuedFrameSkippability.push(mNextEndFrameIsSkippable);
 		mNextEndFrameIsSkippable = true;
     }

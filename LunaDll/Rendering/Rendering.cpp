@@ -1,6 +1,7 @@
 #include <climits>
 #include <tuple>
 #include <algorithm>
+#include <memory>
 #include "../Globals.h"
 #include "Rendering.h"
 #include "RenderUtils.h"
@@ -16,15 +17,50 @@
 #include "../GlobalFuncs.h"
 #include "GL/GLEngine.h"
 #include "BitBltEmulation.h"
+#include "../Misc/LoadScreen.h"
 
 using namespace std;
+
+static Renderer sLunaRender;
+static Renderer sAltLunaRender;
+static DWORD altLunaRenderThread = 0;
+static std::atomic<bool> altLunaRenderThreadValid = false;
+
+Renderer& Renderer::Get()
+{
+	if (altLunaRenderThreadValid && (altLunaRenderThread == GetCurrentThreadId()))
+	{
+		return sAltLunaRender;
+	}
+	return sLunaRender;
+}
+
+void Renderer::SetAltThread()
+{
+	altLunaRenderThread = GetCurrentThreadId();
+	altLunaRenderThreadValid = true;
+	sAltLunaRender.ClearQueue();
+}
+
+void Renderer::UnsetAltThread()
+{
+	altLunaRenderThreadValid = false;
+}
+
+bool Renderer::IsAltThreadActive()
+{
+	return altLunaRenderThreadValid;
+}
 
 // CTOR
 Renderer::Renderer() :
     m_InFrameRender(false),
     m_curCamIdx(1),
     m_renderOpsSortedCount(0),
-    m_renderOpsProcessedCount(0)
+    m_renderOpsProcessedCount(0),
+	m_currentRenderOps(),
+	m_legacyResourceCodeImages(),
+	m_debugMessages()
 {
 }
 
@@ -167,6 +203,12 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 void Renderer::RenderBelowPriority(double maxPriority) {
     if (!m_InFrameRender) return;
 
+	if (this == &sLunaRender)
+	{
+		// Make sure we kill the loadscreen before main thread rendering
+		LunaLoadScreenKill();
+	}
+
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;
 
@@ -298,6 +340,17 @@ void Renderer::EndFrameRender()
     m_InFrameRender = false;
 }
 
+void Renderer::ClearQueue()
+{
+	m_curCamIdx = 0;
+	for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+		delete *iter;
+	}
+	m_currentRenderOps.clear();
+	m_renderOpsProcessedCount = 0;
+	m_renderOpsSortedCount = 0;
+	m_InFrameRender = false;
+}
 
 
 // IS ON SCREEN

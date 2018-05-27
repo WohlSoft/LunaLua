@@ -4,6 +4,7 @@
 #include <luabind/out_value_policy.hpp>
 
 #include "LunaLuaMain.h"
+#include "../version.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/Level.h"
@@ -121,8 +122,6 @@ bool CLunaLua::shutdown()
 void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelPath /*= std::wstring()*/)
 {
     SafeFPUControl noFPUExecptions;
-
-	LunaLoadScreenKill();
 
     //Just to be safe
     shutdown();
@@ -1503,8 +1502,6 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
-	LunaLoadScreenKill();
-
 	GLEngineProxy::CheckRendererInit();
 
     //If the lua module is not valid anyway, then just return

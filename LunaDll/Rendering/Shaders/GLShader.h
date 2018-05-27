@@ -45,7 +45,6 @@ public:
     void applyAttribute(const GLShaderVariableEntry& entry);
     void applyUniform(const GLShaderVariableEntry& entry);
 
-    void defaultSampler(GLuint name);
     GLuint getSamplerForTexture(GLuint name);
     void clearSamplers();
 

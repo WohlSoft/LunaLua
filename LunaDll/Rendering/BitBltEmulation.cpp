@@ -4,6 +4,7 @@
 #include "LunaImage.h"
 #include "Imageloader.h"
 #include "BitBltEmulation.h"
+#include "../Rendering/Rendering.h"
 
 // Global instance
 BitBltEmulation g_BitBltEmulation;
@@ -21,6 +22,7 @@ BitBltEmulation::~BitBltEmulation()
 
 void BitBltEmulation::onBitBlt(HDC src, int dx, int dy, int w, int h, int sx, int sy, DWORD rop)
 {
+	if (Renderer::IsAltThreadActive()) return;
 
     if (m_LastMask.present)
     {

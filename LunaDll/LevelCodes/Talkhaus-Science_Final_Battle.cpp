@@ -63,7 +63,7 @@ namespace ScienceBattle
 		if (demo->HeldNPCIndex > 0)
 			throw_timer = 30;
 
-		//gLunaRender.SafePrint(std::wstring(L"ID: " + std::to_wstring(demo->HeldNPCIndex)), 3, 0, 256);
+		//Renderer::Get().SafePrint(std::wstring(L"ID: " + std::to_wstring(demo->HeldNPCIndex)), 3, 0, 256);
 
 		
 		if (grace_timer >= 0)

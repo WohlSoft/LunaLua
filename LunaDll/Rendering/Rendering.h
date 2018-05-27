@@ -16,6 +16,10 @@ class LunaImage;
 
 // Main renderer object
 struct Renderer {
+	static Renderer& Get();
+	static void SetAltThread();
+	static void UnsetAltThread();
+	static bool IsAltThreadActive();
 
     Renderer();
     ~Renderer();
@@ -44,6 +48,7 @@ struct Renderer {
     void StartFrameRender();
     void EndFrameRender();
 
+	void ClearQueue();
 private:
     void DrawOp(RenderOp& render_operation);
     

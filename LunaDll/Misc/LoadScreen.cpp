@@ -8,7 +8,9 @@
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/Rendering.h"
 #include <lua.hpp>
+#include "LoadScreen.h"
 
+static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
 static std::atomic<bool> killThreadFlag = false;
 
@@ -39,6 +41,7 @@ static bool checkElapsedTime(lua_State* L, DWORD loadScreenStartTick)
 static void LoadThread(void)
 {
 	DWORD loadScreenStartTick = GetTickCount();
+	Renderer::SetAltThread();
 
 	static std::string mainCode;
 	if (mainCode.length() == 0)
@@ -162,34 +165,47 @@ static void LoadThread(void)
 			MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
 		}
 
-		gLunaRender.StartFrameRender();
+		Renderer::Get().StartFrameRender();
 
-		gLunaRender.RenderBelowPriority(DBL_MAX);
+		Renderer::Get().RenderBelowPriority(DBL_MAX);
 
 		g_GLEngine.RenderCameraToScreen(NULL, 0, 0, 800, 600, NULL, 0, 0, 800, 600, 0);
 
 		g_GLEngine.EndFrame(NULL);
 
-		gLunaRender.EndFrameRender();
+		Renderer::Get().EndFrameRender();
 
 		if (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick))
 		{
 			Sleep(15);
 		}
 	} while (!killThreadFlag || !checkElapsedTime(L, loadScreenStartTick));
+	Renderer::UnsetAltThread();
 	killThreadFlag = false;
+}
+
+void LunaLoadScreenStart()
+{
+	if (!lunaLoadScreenEnabled) return;
+	if (loadThread != nullptr) return;
+
+	// Check renderer init, and clear main thread render queue
+	GLEngineProxy::CheckRendererInit();
+	Renderer::Get().ClearQueue();
+
+	// We should clear textures periodically for video memory reasons. At this
+	// point is probably good enough.
+	g_GLEngine.ClearTextures();
+
+	killThreadFlag = false;
+	loadThread = new std::thread(LoadThread);
 }
 
 static void __stdcall CustomLoadScreenHook(void)
 {
 	native_cleanupLevel();
 
-	if (loadThread != nullptr) return;
-
-	GLEngineProxy::CheckRendererInit();
-
-	killThreadFlag = false;
-	loadThread = new std::thread(LoadThread);
+	LunaLoadScreenStart();
 }
 
 void LunaLoadScreenKill()
@@ -229,6 +245,7 @@ void LunaLoadScreenSetEnable(bool skip)
 		nullptr
 	};
 
+	lunaLoadScreenEnabled = skip;
 	if (skip)
 	{
 		for (unsigned int idx = 0; patches[idx] != nullptr; idx++)

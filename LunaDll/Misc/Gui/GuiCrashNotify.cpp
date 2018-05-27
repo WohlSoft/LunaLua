@@ -50,6 +50,8 @@ void GuiCrashNotify::show()
 
                 // 2. Update the edit control with the actual crash message:
                 HWND editControl = GetDlgItem(hwnd, IDC_EDITTEXT_CRASHMSG);
+				HFONT font = CreateFontA(14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLEARTYPE_QUALITY, 0, "Courier New");
+				SendMessageA(editControl, WM_SETFONT, (WPARAM)font, TRUE);
                 SendMessageA(editControl, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(crashNotify->getCrashText().c_str()));
 
                 HWND usercommentCtrl = GetDlgItem(hwnd, IDC_EDITTEXT_WHATDIDYOUDO);
