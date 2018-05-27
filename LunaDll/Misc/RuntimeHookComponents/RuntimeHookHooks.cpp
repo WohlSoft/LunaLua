@@ -1175,38 +1175,6 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
     }
 }
 
-
-
-// NPC Collision Logging Hook
-_declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    __asm {
-        PUSH EBP
-        MOV EBP,ESP
-        SUB ESP,8
-        PUSH 0xA281B6
-        RET
-    }
-}
-
-extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
-
-    static std::ofstream f;
-    if (!f.is_open()) {
-        f.open("npc_collide_log.txt", std::ios::out);
-    }
-    f << std::hex << (DWORD)retAddr << ": ";
-    f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
-    f << "type=" << std::dec << (WORD)*typeOfObject << " ";
-    f << "other=" << std::dec << (WORD)*objectIndex << " ";
-    f << std::endl;
-    f.flush();
-
-    collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
-}
-
 extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
 {
     HWND destHwnd = WindowFromDC(hdcDest);
@@ -1532,6 +1500,31 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
         popf
     early_exit :
         push 0xA0AB20
+        ret
+    }
+}
+
+static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
+{
+    if (NPC::GetHarmlessGrab(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
+{
+    __asm {
+        push esi // Args #1
+        call runtimeHookNPCHarmlessGrab
+        cmp eax, 0
+        jne alternate_exit
+        push 0xA0BA20
+        ret
+	alternate_exit :
+        push 0xA0C5AA
         ret
     }
 }

@@ -44,6 +44,15 @@
 /LunaDll/libs/freeimage/src/FreeImageLite.VS2015/TestOfLinking/[Dd]ebug
 /LunaDll/libs/freeimage/src/FreeImageLite.VS2015/TestOfLinking/[Rr]elease
 
+/LunaDll/libs/sdl/bin/[Dd]ebug/
+/LunaDll/libs/sdl/bin/[Dd]ebugPublic/
+/LunaDll/libs/sdl/bin/[Rr]elease/
+/LunaDll/libs/sdl/bin/[Rr]elease without SDL/
+/LunaDll/libs/sdl/lib/[Dd]ebug/
+/LunaDll/libs/sdl/lib/[Dd]ebugPublic/
+/LunaDll/libs/sdl/lib/[Rr]elease/
+/LunaDll/libs/sdl/lib/[Rr]elease without SDL/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
