@@ -1527,6 +1527,7 @@ _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
 		push ecx
 		push edx
 
+		movsx eax, word ptr ds:[ebp-0x180]
 		push eax // Arg #1
 		call runtimeHookNPCHarmlessThrown
 		cmp eax, 0
