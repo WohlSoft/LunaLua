@@ -227,6 +227,7 @@ void __stdcall runtimeHookNPCVulnerabilityRaw(void);
 void __stdcall runtimeHookNPCSpinjumpSafeRaw(void);
 void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void);
 void __stdcall runtimeHookNPCHarmlessGrabRaw(void);
+void __stdcall runtimeHookNPCHarmlessThrownRaw(void);
 void __stdcall runtimeHookCheckInputRaw(void);
 void __stdcall runtimeHookSetHDCRaw(void);
 

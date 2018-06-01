@@ -1512,6 +1512,41 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
     }
 }
 
+static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
+{
+	
+	return NPC::GetHarmlessThrown(NPC::GetRaw(npcIdx)->id) ? -1 : 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
+{
+	__asm {
+		je harmlessRet
+
+		push eax
+		push ecx
+		push edx
+
+		push eax // Arg #1
+		call runtimeHookNPCHarmlessThrown
+		cmp eax, 0
+		jne harmlessRestoreRet
+		
+		pop edx
+		pop ecx
+		pop eax
+		push 0xA181B3
+		ret
+	harmlessRestoreRet:
+		pop edx
+		pop ecx
+		pop eax
+	harmlessRet:
+		push 0xA1BAD5
+		ret
+	}
+}
+
 static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 {
     if (playerIdx >= 0 && playerIdx <= 1)
