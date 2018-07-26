@@ -1346,6 +1346,11 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
 
 static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)
 {
+	if ((npc == nullptr) || (harmType == nullptr) || (otherIdx == nullptr))
+	{
+		return 0;
+	}
+
     if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
     {
         // If damage type is HARM_TYPE_NPC, respect nofireball/etc
@@ -1410,7 +1415,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
 
 static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
 {
-    if (NPC::GetSpinjumpSafe(npc->id))
+    if ((npc != nullptr) && NPC::GetSpinjumpSafe(npc->id))
     {
         return -1;
     }
@@ -1448,7 +1453,7 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
 
 static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
 {
-    if (NPC::GetNoWaterPhysics(npc->id))
+    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
     {
         return -1;
     }
@@ -1489,7 +1494,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
 
 static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
 {
-    if (NPC::GetHarmlessGrab(npc->id))
+    if ((npc != nullptr) && NPC::GetHarmlessGrab(npc->id))
     {
         return -1;
     }
@@ -1514,8 +1519,12 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
 
 static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
 {
-	
-	return NPC::GetHarmlessThrown(NPC::GetRaw(npcIdx)->id) ? -1 : 0;
+	NPCMOB* npc = NPC::GetRaw(npcIdx);
+	if (npc != nullptr)
+	{
+		return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
+	}
+	return 0;
 }
 
 _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
