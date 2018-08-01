@@ -266,11 +266,18 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 extern void* __stdcall WorldRender()
 {
     if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
-        inputEvent->setDirectEventName("onHUDDraw");
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
+        inputEvent->setDirectEventName("onHUDUpdate");
         inputEvent->setLoopable(false);
         gLunaLua.callEvent(inputEvent);
     }
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+		inputEvent->setDirectEventName("onHUDDraw");
+		inputEvent->setLoopable(false);
+		gLunaLua.callEvent(inputEvent);
+	}
 
     gSpriteMan.RunSprites();
     Renderer::Get().RenderBelowPriority(DBL_MAX);
