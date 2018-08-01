@@ -248,6 +248,8 @@ void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
 
+void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx);
+
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);

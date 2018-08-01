@@ -587,6 +587,9 @@ void TrySkipPatch()
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
 
+	// Hook block hits
+	PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(
         0x0F, 0xBF, 0xF0, // movsx esi,ax

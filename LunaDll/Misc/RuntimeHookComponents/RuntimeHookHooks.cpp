@@ -1758,3 +1758,32 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
         RET
     }
 }
+
+static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	__asm {
+		PUSH EBP
+		MOV EBP, ESP
+		SUB ESP, 0x8
+		PUSH 0x9DA626
+		RET
+	}
+}
+
+void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	bool isCancelled = false;
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onBlockHit", true);
+		blockHitEvent->setDirectEventName("onBlockHit");
+		blockHitEvent->setLoopable(false);
+		gLunaLua.callEvent(blockHitEvent, *blockIndex, *fromUpSide != 0, *playerIdx);
+		isCancelled = blockHitEvent->native_cancelled();
+	}
+
+	if (!isCancelled)
+	{
+		hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
+	}
+}
