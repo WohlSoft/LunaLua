@@ -1087,7 +1087,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if (unicodeRet > 0)
 			{
 				std::wstring wStr(unicodeData, unicodeRet);
-				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, WStr2Str(wStr));
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, LunaLua::EncodeUtils::WStr2Str(wStr));
 			}
 			else
 			{
