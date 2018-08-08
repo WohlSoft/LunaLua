@@ -49,7 +49,7 @@ public:
     explicit ControlConfig(QObject *parent = 0);
     explicit ControlConfig(const QString& configFilename, QObject *parent = 0);
 
-
+    void setDefaults();
 
     bool fullscreen() const
     {

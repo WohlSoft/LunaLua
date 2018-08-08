@@ -145,6 +145,8 @@ extern int __stdcall LoadWorld()
     // entering levels...
     GLEngineProxy::CheckRendererInit();
 
+	LunaLoadScreenStart();
+
     ResetLunaModule();
     gIsOverworld = true;
 
@@ -210,8 +212,6 @@ extern int __stdcall LoadIntro()
 
 extern DWORD __stdcall WorldLoop()
 {
-	LunaLoadScreenKill();
-
     gSavedVarBank.CheckSaveDeletion();
 
     // Update inputs
@@ -278,11 +278,18 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 extern void* __stdcall WorldRender()
 {
     if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
-        inputEvent->setDirectEventName("onHUDDraw");
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
+        inputEvent->setDirectEventName("onHUDUpdate");
         inputEvent->setLoopable(false);
         gLunaLua.callEvent(inputEvent);
     }
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+		inputEvent->setDirectEventName("onHUDDraw");
+		inputEvent->setLoopable(false);
+		gLunaLua.callEvent(inputEvent);
+	}
 
     gSpriteMan.RunSprites();
     Renderer::Get().RenderBelowPriority(DBL_MAX);
@@ -593,10 +600,6 @@ __declspec(naked) void __stdcall recordVBErrCodeHandler() {
 
 extern void __stdcall LoadLocalGfxHook()
 {
-    // We should clear textures periodically for video memory reasons. At this
-    // point is probably good enough.
-    g_GLEngine.ClearTextures();
-
     // In the past, we would call native_loadLocalGfx() here, but that is now
     // being replaced.
     ImageLoader::Run();
@@ -653,6 +656,9 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
+		// Make sure we kill the loadscreen before vanilla rendering
+		LunaLoadScreenKill();
+
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
     }
@@ -1047,59 +1053,105 @@ extern void __stdcall GenerateScreenshotHook()
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    if (nCode < 0){
+	static BYTE keyState[256] = { 0 };
+	static WCHAR unicodeData[32] = { 0 };
+
+    if (nCode != 0){
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-    if ((lParam & 0x80000000) == 0) {
-        if (gLunaLua.isValid()) {
-            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
-            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(wParam));
-        }
-    }
-    
-    // Hook print screen key
-    if (wParam == VK_SNAPSHOT && g_GLEngine.IsEnabled())
-    {
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            GlobalUnlock(&globalMem);
-            // Write to clipboard
-            OpenClipboard(curHwnd);
-            EmptyClipboard();
-            SetClipboardData(CF_DIB, globalMem);
-            CloseClipboard();
-            return false;
-        });
-        return 1;
-    }
-    if (wParam == VK_F12 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short screenshotSoundID = 12;
-        native_playSFX(&screenshotSoundID);
-        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd){
-            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
-            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-                CreateDirectoryW(screenshotPath.c_str(), NULL);
-            }
-            screenshotPath += L"\\";
-            screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+	bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
+	bool altPressed = ((lParam & 0x20000000) == 0x20000000);
+	bool keyDown = ((lParam & 0x80000000) == 0x0);
+	bool keyUp = ((lParam & 0x80000000) == 0x80000000);
+	unsigned int virtKey = wParam;
+	unsigned int scanCode = (lParam >> 16) & 0xFF;
 
-            ::GenerateScreenshot(screenshotPath, *header, pData);
-            return true;
-        });
-        return 1;
-    }
-    if (wParam == VK_F11 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
-        native_playSFX(&gifRecSoundID);
-    }
-    if (wParam == VK_F4 && g_GLEngine.IsEnabled() && ((lParam & 0x80000000) == 0))
-    {
-        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
-        gGeneralConfig.save();
-    }
-    
+	if (virtKey < 256)
+	{
+		keyState[virtKey] = keyDown ? 0x80 : 0x00;
+		if (virtKey == VK_CAPITAL)
+		{
+			keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+		}
+	}
+	
+	bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
+	bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+
+	if (keyDown) {
+		if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+			std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+
+			int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
+			if (unicodeRet > 0)
+			{
+				std::wstring wStr(unicodeData, unicodeRet);
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, WStr2Str(wStr));
+			}
+			else
+			{
+				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+			}
+		}
+
+		if (virtKey == VK_F12)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short screenshotSoundID = 12;
+				native_playSFX(&screenshotSoundID);
+				g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+					std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+					if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+						CreateDirectoryW(screenshotPath.c_str(), NULL);
+					}
+					screenshotPath += L"\\";
+					screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+
+					::GenerateScreenshot(screenshotPath, *header, pData);
+					return true;
+				});
+			}
+			return 1;
+		}
+		if (virtKey == VK_F11)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+				native_playSFX(&gifRecSoundID);
+			}
+			return 1;
+		}
+		if ((virtKey == VK_F4) && !altPressed)
+		{
+			if (plainPress && g_GLEngine.IsEnabled())
+			{
+				gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+				gGeneralConfig.save();
+			}
+			return 1;
+		}
+	} // keyDown
+
+	// Hook print screen key
+	if (virtKey == VK_SNAPSHOT)
+	{
+		if (g_GLEngine.IsEnabled())
+		{
+			g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+				GlobalUnlock(&globalMem);
+				// Write to clipboard
+				OpenClipboard(curHwnd);
+				EmptyClipboard();
+				SetClipboardData(CF_DIB, globalMem);
+				CloseClipboard();
+				return false;
+			});
+		}
+		return 1;
+	}
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
@@ -1131,38 +1183,6 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
         POPF
         RET
     }
-}
-
-
-
-// NPC Collision Logging Hook
-_declspec(naked) static void __stdcall collideNPCLoggingHook_OrigFunc(short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    __asm {
-        PUSH EBP
-        MOV EBP,ESP
-        SUB ESP,8
-        PUSH 0xA281B6
-        RET
-    }
-}
-
-extern void __stdcall collideNPCLoggingHook(DWORD retAddr, short* npcIndexToCollide, CollidersType* typeOfObject, short* objectIndex)
-{
-    NPCMOB* npc = ::NPC::Get(*npcIndexToCollide - 1);
-
-    static std::ofstream f;
-    if (!f.is_open()) {
-        f.open("npc_collide_log.txt", std::ios::out);
-    }
-    f << std::hex << (DWORD)retAddr << ": ";
-    f << "npc=" << std::dec << (WORD)*npcIndexToCollide << "(id:" << (npc->id) << ") ";
-    f << "type=" << std::dec << (WORD)*typeOfObject << " ";
-    f << "other=" << std::dec << (WORD)*objectIndex << " ";
-    f << std::endl;
-    f.flush();
-
-    collideNPCLoggingHook_OrigFunc(npcIndexToCollide, typeOfObject, objectIndex);
 }
 
 extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop)
@@ -1353,6 +1373,11 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
 
 static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)
 {
+	if ((npc == nullptr) || (harmType == nullptr) || (otherIdx == nullptr))
+	{
+		return 0;
+	}
+
     if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
     {
         // If damage type is HARM_TYPE_NPC, respect nofireball/etc
@@ -1417,7 +1442,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
 
 static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
 {
-    if (NPC::GetSpinjumpSafe(npc->id))
+    if ((npc != nullptr) && NPC::GetSpinjumpSafe(npc->id))
     {
         return -1;
     }
@@ -1455,7 +1480,7 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
 
 static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
 {
-    if (NPC::GetNoWaterPhysics(npc->id))
+    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
     {
         return -1;
     }
@@ -1492,6 +1517,71 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
         push 0xA0AB20
         ret
     }
+}
+
+static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
+{
+    if ((npc != nullptr) && NPC::GetHarmlessGrab(npc->id))
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
+{
+    __asm {
+        push esi // Args #1
+        call runtimeHookNPCHarmlessGrab
+        cmp eax, 0
+        jne alternate_exit
+        push 0xA0BA20
+        ret
+	alternate_exit :
+        push 0xA0C5AA
+        ret
+    }
+}
+
+static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
+{
+	NPCMOB* npc = NPC::GetRaw(npcIdx);
+	if (npc != nullptr)
+	{
+		return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
+	}
+	return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
+{
+	__asm {
+		je harmlessRet
+
+		push eax
+		push ecx
+		push edx
+
+		movsx eax, word ptr ds:[ebp-0x180]
+		push eax // Arg #1
+		call runtimeHookNPCHarmlessThrown
+		cmp eax, 0
+		jne harmlessRestoreRet
+		
+		pop edx
+		pop ecx
+		pop eax
+		push 0xA181B3
+		ret
+	harmlessRestoreRet:
+		pop edx
+		pop ecx
+		pop eax
+	harmlessRet:
+		push 0xA1BAD5
+		ret
+	}
 }
 
 static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
@@ -1687,4 +1777,33 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
         JNE runtimeHookPiranahDivByZeroTrigger
         RET
     }
+}
+
+static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	__asm {
+		PUSH EBP
+		MOV EBP, ESP
+		SUB ESP, 0x8
+		PUSH 0x9DA626
+		RET
+	}
+}
+
+void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	bool isCancelled = false;
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onBlockHit", true);
+		blockHitEvent->setDirectEventName("onBlockHit");
+		blockHitEvent->setLoopable(false);
+		gLunaLua.callEvent(blockHitEvent, *blockIndex, *fromUpSide != 0, *playerIdx);
+		isCancelled = blockHitEvent->native_cancelled();
+	}
+
+	if (!isCancelled)
+	{
+		hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
+	}
 }

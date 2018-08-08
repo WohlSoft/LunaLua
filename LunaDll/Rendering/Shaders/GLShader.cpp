@@ -327,8 +327,14 @@ GLuint GLShader::getSamplerForTexture(GLuint name)
 
     m_samplerTexNames.emplace_back(name);
     glActiveTexture(GL_TEXTURE0 + idx);
-    glEnable(GL_TEXTURE_2D);
+	if (name != 0)
+	{
+		glEnable(GL_TEXTURE_2D);
+	}
 	glBindTexture(GL_TEXTURE_2D, name);
+	if (name == 0) {
+		glDisable(GL_TEXTURE_2D);
+	}
     glActiveTexture(GL_TEXTURE0);    
     GLERRORCHECK();
     

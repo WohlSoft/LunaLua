@@ -63,13 +63,13 @@ luabind::object LuaProxy::Block::getIntersecting(double x1, double y1, double x2
 
 LuaProxy::Block LuaProxy::Block::spawn(int blockid, double x, double y, lua_State* L)
 {
-    if (blockid < 1 || blockid > 700) {
-        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-700\nGot Block-ID: %d", blockid);
+    if (blockid < 1 || blockid > ::Block::MAX_ID) {
+        luaL_error(L, "Invalid Block-ID!\nNeed Block-ID between 1-%d\nGot Block-ID: %d", ::Block::MAX_ID, blockid);
         return LuaProxy::Block(-1);
     }
 
-    if (GM_BLOCK_COUNT >= 16384) {
-        luaL_error(L, "Over 16384 Blocks, cannot spawn more!");
+    if (GM_BLOCK_COUNT >= 20000) {
+        luaL_error(L, "Over 20000 Blocks, cannot spawn more!");
         return LuaProxy::Block(-1);
     }
 
@@ -105,6 +105,15 @@ bool LuaProxy::Block::_getBumpable(int id)
 void LuaProxy::Block::_setBumpable(int id, bool bumpable)
 {
     ::Blocks::SetBlockBumpable(id, bumpable);
+}
+
+void LuaProxy::Block::_rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount)
+{
+	short unkFlag1VB = COMBOOL(fromUpSide);
+	native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
+	if (hittingCount != -1) {
+		Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
+	}
 }
 
 LuaProxy::Block::Block(int index) : m_index(index)

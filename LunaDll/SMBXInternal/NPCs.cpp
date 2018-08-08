@@ -128,6 +128,8 @@ void NPC::AllFace(int identity, int section, double x) {
 static uint32_t npcprop_vulnerableharmtypes[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_spinjumpsafe[NPC::MAX_ID+1] = { 0 };
 static int16_t npcprop_nowaterphysics[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_harmlessgrab[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -136,6 +138,8 @@ void NPC::InitProperties() {
         npcprop_vulnerableharmtypes[i] = 0;
         npcprop_spinjumpsafe[i] = 0;
         npcprop_nowaterphysics[i] = 0;
+		npcprop_harmlessgrab[i] = 0;
+		npcprop_harmlessthrown[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -167,6 +171,28 @@ void NPC::InitProperties() {
     npcprop_spinjumpsafe[0x11D] = -1;
     npcprop_spinjumpsafe[0x11E] = -1;
     npcprop_spinjumpsafe[0x10E] = -1;
+
+	// Set built-in harmless grab IDs
+	npcprop_harmlessgrab[0xC3] = -1;
+	npcprop_harmlessgrab[0x16] = -1;
+	npcprop_harmlessgrab[0x1A] = -1;
+	npcprop_harmlessgrab[0x20] = -1;
+	npcprop_harmlessgrab[0xEE] = -1;
+	npcprop_harmlessgrab[0xEF] = -1;
+	npcprop_harmlessgrab[0xC1] = -1;
+	npcprop_harmlessgrab[0x23] = -1;
+	npcprop_harmlessgrab[0xBF] = -1;
+	npcprop_harmlessgrab[0x31] = -1;
+	npcprop_harmlessgrab[0x86] = -1;
+	npcprop_harmlessgrab[0x9A] = -1;
+	npcprop_harmlessgrab[0x9B] = -1;
+	npcprop_harmlessgrab[0x9C] = -1;
+	npcprop_harmlessgrab[0x9D] = -1;
+	npcprop_harmlessgrab[0x1F] = -1;
+	npcprop_harmlessgrab[0xF0] = -1;
+	npcprop_harmlessgrab[0x116] = -1;
+	npcprop_harmlessgrab[0x117] = -1;
+	npcprop_harmlessgrab[0x124] = -1;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -185,6 +211,16 @@ bool NPC::GetNoWaterPhysics(int id) {
     return (npcprop_nowaterphysics[id] != 0);
 }
 
+bool NPC::GetHarmlessGrab(int id) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return false;
+	return (npcprop_harmlessgrab[id] != 0);
+}
+
+bool NPC::GetHarmlessThrown(int id) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return false;
+	return (npcprop_harmlessthrown[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -200,6 +236,14 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(npcprop_nowaterphysics);
     }
+	else if (s == "harmlessgrab")
+	{
+		return reinterpret_cast<uintptr_t>(npcprop_harmlessgrab);
+	}
+	else if (s == "harmlessthrown")
+	{
+		return reinterpret_cast<uintptr_t>(npcprop_harmlessthrown);
+	}
     else
     {
         return 0;

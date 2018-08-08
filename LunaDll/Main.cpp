@@ -189,8 +189,6 @@ int OnLvlLoad() {
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	LunaLoadScreenKill();
-
 	// Clean up
 	gAutoMan.ClearExpired();
 	gSavedVarBank.CheckSaveDeletion();
@@ -198,8 +196,6 @@ int TestFunc()
 	// Update inputs
 	Input::CheckSpecialCheats();
 	Input::UpdateInputTasks();	
-
-
 
 	if(gLunaEnabled) {	
 #if COMPILE_PLAYGROUND
@@ -224,6 +220,13 @@ int TestFunc()
 }
 
 void OnLevelHUDDraw(int cameraIdx) {
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
+		inputEvent->setDirectEventName("onHUDUpdate");
+		inputEvent->setLoopable(false);
+		gLunaLua.callEvent(inputEvent, cameraIdx);
+	}
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);

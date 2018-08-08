@@ -503,6 +503,8 @@ namespace NPC {
     uint32_t GetVulnerableHarmTypes(int id);
     bool GetSpinjumpSafe(int id);
     bool GetNoWaterPhysics(int id);
+	bool GetHarmlessGrab(int id);
+	bool GetHarmlessThrown(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
