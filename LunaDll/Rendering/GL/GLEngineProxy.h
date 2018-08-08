@@ -17,13 +17,12 @@ private:
     std::unique_ptr<std::thread> mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
     ThreadedCmdQueue<uint64_t> mDeletedTextures;
-    std::atomic<uint32_t> mFrameCount;
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
     bool mIsDirty; // FIXME: This is currently due to a Deadlock because of the destructor of the BMPBox-Cache @ BMPBox.cpp/loadShared/basegameImageCache
     
 	bool mNextEndFrameIsSkippable;
-	std::queue<bool> mQueuedFrameSkippability;
+	ThreadedCmdQueue<bool> mQueuedFrameSkippability;
 
 public:
     GLEngine mInternalGLEngine;

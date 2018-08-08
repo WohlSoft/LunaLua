@@ -262,7 +262,9 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 
-    RenderStringOp(LunaLua::EncodeUtils::Str2WStr(std::string_view(LUNALUA_VERSION)), 3, 5, 5).Draw(&Renderer::Get());
+	static std::string vStr = LUNALUA_VERSION;
+	std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
+    RenderStringOp(LunaLua::EncodeUtils::Str2WStr(vStr), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
         if (asyncBitBltProc){
