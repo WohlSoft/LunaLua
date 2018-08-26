@@ -388,5 +388,14 @@ void __stdcall runtimeHookNpcHarmRaw_a30166(void);
 void __stdcall runtimeHookNpcHarmRaw_a30180(void);
 void __stdcall runtimeHookNpcHarmRaw_a30465(void);
 
+void __stdcall runtimeHookColorSwitchRedNpc(void);
+void __stdcall runtimeHookColorSwitchGreenNpc(void);
+void __stdcall runtimeHookColorSwitchBlueNpc(void);
+void __stdcall runtimeHookColorSwitchYellowNpc(void);
+void __stdcall runtimeHookColorSwitchRedBlock(void);
+void __stdcall runtimeHookColorSwitchGreenBlock(void);
+void __stdcall runtimeHookColorSwitchBlueBlock(void);
+void __stdcall runtimeHookColorSwitchYellowBlock(void);
+
 #endif
 

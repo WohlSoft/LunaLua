@@ -1787,3 +1787,173 @@ void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, 
 		hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
 	}
 }
+
+static void __stdcall runtimeHookColorSwitch(unsigned int color)
+{
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", true);
+		blockHitEvent->setDirectEventName("onColorSwitch");
+		blockHitEvent->setLoopable(false);
+		gLunaLua.callEvent(blockHitEvent, color);
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 4 // RED
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 3 // GREEN
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 2 // BLUE
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 1 // YELLOW
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 1 // YELLOW
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB424
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 2 // BLUE
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB5BF
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 3 // GREEN
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB75F
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 4 // RED
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB8FA
+		ret
+	}
+}
