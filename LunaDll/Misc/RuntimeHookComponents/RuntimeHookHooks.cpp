@@ -1791,7 +1791,7 @@ void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, 
 static void __stdcall runtimeHookColorSwitch(unsigned int color)
 {
 	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", true);
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", false);
 		blockHitEvent->setDirectEventName("onColorSwitch");
 		blockHitEvent->setLoopable(false);
 		gLunaLua.callEvent(blockHitEvent, color);
