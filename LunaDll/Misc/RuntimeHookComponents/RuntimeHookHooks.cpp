@@ -266,11 +266,18 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
 extern void* __stdcall WorldRender()
 {
     if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
-        inputEvent->setDirectEventName("onHUDDraw");
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
+        inputEvent->setDirectEventName("onHUDUpdate");
         inputEvent->setLoopable(false);
         gLunaLua.callEvent(inputEvent);
     }
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+		inputEvent->setDirectEventName("onHUDDraw");
+		inputEvent->setLoopable(false);
+		gLunaLua.callEvent(inputEvent);
+	}
 
     gSpriteMan.RunSprites();
     Renderer::Get().RenderBelowPriority(DBL_MAX);
@@ -1363,6 +1370,11 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
 
 static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)
 {
+	if ((npc == nullptr) || (harmType == nullptr) || (otherIdx == nullptr))
+	{
+		return 0;
+	}
+
     if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
     {
         // If damage type is HARM_TYPE_NPC, respect nofireball/etc
@@ -1427,7 +1439,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
 
 static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
 {
-    if (NPC::GetSpinjumpSafe(npc->id))
+    if ((npc != nullptr) && NPC::GetSpinjumpSafe(npc->id))
     {
         return -1;
     }
@@ -1465,7 +1477,7 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
 
 static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
 {
-    if (NPC::GetNoWaterPhysics(npc->id))
+    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
     {
         return -1;
     }
@@ -1506,7 +1518,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
 
 static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
 {
-    if (NPC::GetHarmlessGrab(npc->id))
+    if ((npc != nullptr) && NPC::GetHarmlessGrab(npc->id))
     {
         return -1;
     }
@@ -1531,8 +1543,12 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
 
 static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
 {
-	
-	return NPC::GetHarmlessThrown(NPC::GetRaw(npcIdx)->id) ? -1 : 0;
+	NPCMOB* npc = NPC::GetRaw(npcIdx);
+	if (npc != nullptr)
+	{
+		return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
+	}
+	return 0;
 }
 
 _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
@@ -1758,4 +1774,203 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
         JNE runtimeHookPiranahDivByZeroTrigger
         RET
     }
+}
+
+static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	__asm {
+		PUSH EBP
+		MOV EBP, ESP
+		SUB ESP, 0x8
+		PUSH 0x9DA626
+		RET
+	}
+}
+
+void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+{
+	bool isCancelled = false;
+
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onBlockHit", true);
+		blockHitEvent->setDirectEventName("onBlockHit");
+		blockHitEvent->setLoopable(false);
+		gLunaLua.callEvent(blockHitEvent, *blockIndex, *fromUpSide != 0, *playerIdx);
+		isCancelled = blockHitEvent->native_cancelled();
+	}
+
+	if (!isCancelled)
+	{
+		hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
+	}
+}
+
+static void __stdcall runtimeHookColorSwitch(unsigned int color)
+{
+	if (gLunaLua.isValid()) {
+		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", false);
+		blockHitEvent->setDirectEventName("onColorSwitch");
+		blockHitEvent->setLoopable(false);
+		gLunaLua.callEvent(blockHitEvent, color);
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 4 // RED
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 3 // GREEN
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 2 // BLUE
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 1 // YELLOW
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0xA32558
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 1 // YELLOW
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB424
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 2 // BLUE
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB5BF
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 3 // GREEN
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB75F
+		ret
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
+{
+	__asm {
+		pushf
+		sub esp, 2
+		push eax
+		push ecx
+		push edx
+		push 4 // RED
+		call runtimeHookColorSwitch
+		pop edx
+		pop ecx
+		pop eax
+		add esp, 2
+		popf
+		push 0x9DB8FA
+		ret
+	}
 }

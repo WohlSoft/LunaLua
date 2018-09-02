@@ -250,6 +250,8 @@ void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
 
+void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx);
+
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
@@ -387,6 +389,15 @@ void __stdcall runtimeHookNpcHarmRaw_a3012c(void);
 void __stdcall runtimeHookNpcHarmRaw_a30166(void);
 void __stdcall runtimeHookNpcHarmRaw_a30180(void);
 void __stdcall runtimeHookNpcHarmRaw_a30465(void);
+
+void __stdcall runtimeHookColorSwitchRedNpc(void);
+void __stdcall runtimeHookColorSwitchGreenNpc(void);
+void __stdcall runtimeHookColorSwitchBlueNpc(void);
+void __stdcall runtimeHookColorSwitchYellowNpc(void);
+void __stdcall runtimeHookColorSwitchRedBlock(void);
+void __stdcall runtimeHookColorSwitchGreenBlock(void);
+void __stdcall runtimeHookColorSwitchBlueBlock(void);
+void __stdcall runtimeHookColorSwitchYellowBlock(void);
 
 #endif
 

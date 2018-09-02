@@ -108,6 +108,15 @@ void LuaProxy::Block::_setBumpable(int id, bool bumpable)
     ::Blocks::SetBlockBumpable(id, bumpable);
 }
 
+void LuaProxy::Block::_rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount)
+{
+	short unkFlag1VB = COMBOOL(fromUpSide);
+	native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
+	if (hittingCount != -1) {
+		Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
+	}
+}
+
 LuaProxy::Block::Block(int index) : m_index(index)
 {}
 

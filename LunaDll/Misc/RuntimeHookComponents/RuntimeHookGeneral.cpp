@@ -605,6 +605,9 @@ void TrySkipPatch()
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
 
+	// Hook block hits
+	PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(
         0x0F, 0xBF, 0xF0, // movsx esi,ax
@@ -758,6 +761,16 @@ void TrySkipPatch()
 	PATCH(0xa30162).JMP(&runtimeHookNpcHarmRaw_a30166).NOP_PAD_TO_SIZE<6>().Apply();
 	PATCH(0xa30180).JMP(&runtimeHookNpcHarmRaw_a30180).NOP_PAD_TO_SIZE<6>().Apply();
 	PATCH(0xa3045e).JMP(&runtimeHookNpcHarmRaw_a30465).NOP_PAD_TO_SIZE<9>().Apply();
+
+	// Hooks for color switch hitting (jg hooks to capture loop exits)
+	PATCH(0xA31FA0).JG(&runtimeHookColorSwitchRedNpc).Apply();
+	PATCH(0xA3214E).JG(&runtimeHookColorSwitchGreenNpc).Apply();
+	PATCH(0xA322FC).JG(&runtimeHookColorSwitchBlueNpc).Apply();
+	PATCH(0xA324AA).JG(&runtimeHookColorSwitchYellowNpc).Apply();
+	PATCH(0x9DB37E).JG(&runtimeHookColorSwitchYellowBlock).Apply();
+	PATCH(0x9DB519).JG(&runtimeHookColorSwitchBlueBlock).Apply();
+	PATCH(0x9DB6B9).JG(&runtimeHookColorSwitchGreenBlock).Apply();
+	PATCH(0x9DB84E).JG(&runtimeHookColorSwitchRedBlock).Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
