@@ -144,6 +144,8 @@
 /* #undef HAVE_COPYSIGNF */
 /* #undef HAVE_COS */
 /* #undef HAVE_COSF */
+/* #undef HAVE_EXP */
+/* #undef HAVE_EXPF */
 /* #undef HAVE_FABS */
 /* #undef HAVE_FABSF */
 /* #undef HAVE_FLOOR */
@@ -221,6 +223,7 @@
 /* #undef SDL_FILE_DISABLED */
 /* #undef SDL_JOYSTICK_DISABLED */
 /* #undef SDL_HAPTIC_DISABLED */
+#define SDL_SENSOR_DISABLED 1
 /* #undef SDL_LOADSO_DISABLED */
 /* #undef SDL_RENDER_DISABLED */
 /* #undef SDL_THREADS_DISABLED */
@@ -259,7 +262,7 @@
 /* #undef SDL_AUDIO_DRIVER_SNDIO */
 /* #undef SDL_AUDIO_DRIVER_SNDIO_DYNAMIC */
 /* #undef SDL_AUDIO_DRIVER_SUNAUDIO */
-#define SDL_AUDIO_DRIVER_WASAPI 1
+/* #undef SDL_AUDIO_DRIVER_WASAPI */
 #define SDL_AUDIO_DRIVER_WINMM 1
 
 /* Enable various input drivers */
@@ -284,6 +287,10 @@
 #define SDL_HAPTIC_DINPUT 1
 #define SDL_HAPTIC_XINPUT 1
 /* #undef SDL_HAPTIC_ANDROID */
+
+/* Enable various sensor drivers */
+/* #undef SDL_SENSOR_ANDROID */
+/* #undef SDL_SENSOR_DUMMY */
 
 /* Enable various shared object loading systems */
 /* #undef SDL_LOADSO_DLOPEN */

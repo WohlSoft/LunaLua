@@ -4,6 +4,9 @@
 * text=auto
 
 *.h       linguist-language=cpp
+*.txt     text eol=crlf
+*.lua     text eol=crlf
+*.ini     text eol=crlf
 
 ###############################################################################
 # Set default behavior for command prompt diff.

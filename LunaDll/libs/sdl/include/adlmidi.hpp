@@ -26,22 +26,15 @@
 
 #include "adlmidi.h"
 
-#include <stdint.h>
-#include <vector>
+struct ADL_MIDIPlayer;
 
-class OPL3;
-class MIDIplay;
-
-class AdlInstrumentTester
+class ADLMIDI_DECLSPEC AdlInstrumentTester
 {
-    uint32_t cur_gm;
-    uint32_t ins_idx;
-    std::vector<uint32_t> adl_ins_list;
-    OPL3 *opl;
-    MIDIplay * play;
+    struct Impl;
+    Impl *P;
 
 public:
-    AdlInstrumentTester(ADL_MIDIPlayer *device);
+    explicit AdlInstrumentTester(ADL_MIDIPlayer *device);
     virtual ~AdlInstrumentTester();
 
     // Find list of adlib instruments that supposedly implement this GM
@@ -51,6 +44,10 @@ public:
     void NextGM(int offset);
     void NextAdl(int offset);
     bool HandleInputChar(char ch);
+
+private:
+    AdlInstrumentTester(const AdlInstrumentTester &);
+    AdlInstrumentTester &operator=(const AdlInstrumentTester &);
 };
 
 #endif //ADLMIDI_HPP
