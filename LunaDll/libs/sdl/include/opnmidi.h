@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #define OPNMIDI_VERSION_MAJOR       1
-#define OPNMIDI_VERSION_MINOR       2
+#define OPNMIDI_VERSION_MINOR       4
 #define OPNMIDI_VERSION_PATCHLEVEL  0
 
 #define OPNMIDI_TOSTR_I(s) #s
@@ -58,7 +58,7 @@ enum OPNMIDI_VolumeModels
 {
     OPNMIDI_VolumeModel_AUTO = 0,
     OPNMIDI_VolumeModel_Generic,
-    OPNMIDI_VolumeModel_CMF,
+    OPNMIDI_VolumeModel_NativeOPN2,
     OPNMIDI_VolumeModel_DMX,
     OPNMIDI_VolumeModel_APOGEE,
     OPNMIDI_VolumeModel_9X
@@ -112,7 +112,7 @@ extern void opn2_setFullRangeBrightness(struct OPN2_MIDIPlayer *device, int fr_b
 /*Enable or disable built-in loop (built-in loop supports 'loopStart' and 'loopEnd' tags to loop specific part)*/
 extern void opn2_setLoopEnabled(struct OPN2_MIDIPlayer *device, int loopEn);
 
-/*Enable or disable Logariphmic volume changer (-1 sets default per bank, 0 disable, 1 enable) */
+/* !!!DEPRECATED!!! */
 extern void opn2_setLogarithmicVolumes(struct OPN2_MIDIPlayer *device, int logvol);
 
 /*Set different volume range model */
@@ -136,6 +136,7 @@ enum Opn2_Emulator
     OPNMIDI_EMU_MAME = 0,
     OPNMIDI_EMU_NUKED,
     OPNMIDI_EMU_GENS,
+    OPNMIDI_EMU_GX,
     OPNMIDI_EMU_end
 };
 
@@ -147,6 +148,9 @@ typedef struct {
     OPN2_UInt16 minor;
     OPN2_UInt16 patch;
 } OPN2_Version;
+
+/*Run emulator with PCM rate to reduce CPU usage on slow devices. May decrease sounding accuracy.*/
+extern int opn2_setRunAtPcmRate(struct OPN2_MIDIPlayer *device, int enabled);
 
 /*Returns string which contains a version number*/
 extern const char *opn2_linkedLibraryVersion();
@@ -162,6 +166,9 @@ extern const char *opn2_errorInfo(struct OPN2_MIDIPlayer *device);
 
 /*Initialize ADLMIDI Player device*/
 extern struct OPN2_MIDIPlayer *opn2_init(long sample_rate);
+
+/*Set 4-bit device identifier*/
+extern int opn2_setDeviceIdentifier(struct OPN2_MIDIPlayer *device, unsigned id);
 
 /*Load MIDI file from File System*/
 extern int opn2_openFile(struct OPN2_MIDIPlayer *device, const char *filePath);
@@ -192,6 +199,9 @@ extern void opn2_positionRewind(struct OPN2_MIDIPlayer *device);
 
 /*Set tempo multiplier: 1.0 - original tempo, >1 - play faster, <1 - play slower */
 extern void opn2_setTempo(struct OPN2_MIDIPlayer *device, double tempo);
+
+/*Get a textual description of the chip channel state. For display only.*/
+extern int opn2_describeChannels(struct OPN2_MIDIPlayer *device, char *text, char *attr, size_t size);
 
 /*Close and delete OPNMIDI device*/
 extern void opn2_close(struct OPN2_MIDIPlayer *device);
@@ -255,6 +265,34 @@ extern double opn2_tickEvents(struct OPN2_MIDIPlayer *device, double seconds, do
 /*Returns 1 if music position has reached end*/
 extern int opn2_atEnd(struct OPN2_MIDIPlayer *device);
 
+/**
+ * @brief Returns the number of tracks of the current sequence
+ * @param device Instance of the library
+ * @return Count of tracks in the current sequence
+ */
+extern size_t opn2_trackCount(struct OPN2_MIDIPlayer *device);
+
+/**
+ * @brief Track options
+ */
+enum OPNMIDI_TrackOptions
+{
+    /*! Enabled track */
+    OPNMIDI_TrackOption_On   = 1,
+    /*! Disabled track */
+    OPNMIDI_TrackOption_Off  = 2,
+    /*! Solo track */
+    OPNMIDI_TrackOption_Solo = 3,
+};
+
+/**
+ * @brief Sets options on a track of the current sequence
+ * @param device Instance of the library
+ * @param trackNumber Identifier of the designated track.
+ * @return 0 on success, <0 when any error has occurred
+ */
+extern int opn2_setTrackOptions(struct OPN2_MIDIPlayer *device, size_t trackNumber, unsigned trackOptions);
+
 /**RealTime**/
 
 /*Force Off all notes on all channels*/
@@ -292,6 +330,8 @@ extern void opn2_rt_bankChangeMSB(struct OPN2_MIDIPlayer *device, OPN2_UInt8 cha
 /*Change bank by absolute signed value*/
 extern void opn2_rt_bankChange(struct OPN2_MIDIPlayer *device, OPN2_UInt8 channel, OPN2_SInt16 bank);
 
+/*Perform a system exclusive message*/
+extern int opn2_rt_systemExclusive(struct OPN2_MIDIPlayer *device, const OPN2_UInt8 *msg, size_t size);
 
 /**Hooks**/
 
