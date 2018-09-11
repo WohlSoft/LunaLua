@@ -174,11 +174,11 @@ static unsigned int __stdcall LatePatch(void)
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 
-	// Set new BGO ID limit...
-	PatchBgoIdLimit();
+    // Set new BGO ID limit...
+    PatchBgoIdLimit();
 
-	// Set new Block ID limit...
-	PatchBlockIdLimit();
+    // Set new Block ID limit...
+    PatchBlockIdLimit();
 
     // Run this in LatePatch because overwriting the SEH handler only works
     // after we have the VB runtime running.
@@ -237,7 +237,7 @@ void TrySkipPatch()
     fixup_Veggibug();
     fixup_NativeFuncs();
     fixup_BGODepletion();
-	fixup_RenderPlayerJiterX();
+    fixup_RenderPlayerJiterX();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
@@ -411,11 +411,11 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
-	// Hook for after camera updates have finished, just before drawing the background
-	PATCH(0x90D6FE)
-		.CALL(&PostCameraUpdateHook_Wrapper)
-		.NOP_PAD_TO_SIZE<7>()
-		.Apply();
+    // Hook for after camera updates have finished, just before drawing the background
+    PATCH(0x90D6FE)
+        .CALL(&PostCameraUpdateHook_Wrapper)
+        .NOP_PAD_TO_SIZE<7>()
+        .Apply();
 
     // Hook to fix 100% CPU when window is inactive
     PATCH(0x8E6FE1)
@@ -425,18 +425,18 @@ void TrySkipPatch()
 
     // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
     /* Replace level file parser with PGE File Library */
-    PATCH(0x8C0169).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C09C2).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C148F).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C14E0).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8C2659).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8CE3C9).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8E1AAA).CALL(&LoadLevelHook).Apply();
-    PATCH(0x8FE8CF).CALL(&LoadLevelHook).Apply();
-    PATCH(0x9B7B20).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
-    PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8C0169).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8C09C2).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8C148F).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8C14E0).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8C2659).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8CE3C9).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8E1AAA).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x8FE8CF).CALL(&LoadLevelHook).Apply();
+//    PATCH(0x9B7B20).CALL(&LoadLevelHook).Apply();
+//    PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
+//    PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
+//    PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
 
 
     // Don't trust QPC as much on WinXP
@@ -467,10 +467,10 @@ void TrySkipPatch()
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
     PATCH(0x8FEB10).JMP(RenderWorldHook).NOP().Apply();
 
-	// Disable some frivolous RenderLevel calls in vanilla code. Was causing excess onDraw compared to onTick
-	PATCH(0x9BBC95).NOPS<5>().Apply(); // Tail hitting blocks case
-	PATCH(0xA2C6C1).NOPS<5>().Apply(); // Unknown (birdo hit sound related)
-	PATCH(0xA53053).NOPS<5>().Apply(); // Link shield case
+    // Disable some frivolous RenderLevel calls in vanilla code. Was causing excess onDraw compared to onTick
+    PATCH(0x9BBC95).NOPS<5>().Apply(); // Tail hitting blocks case
+    PATCH(0xA2C6C1).NOPS<5>().Apply(); // Unknown (birdo hit sound related)
+    PATCH(0xA53053).NOPS<5>().Apply(); // Link shield case
 
     // Level rendering layering hooks
 
@@ -551,8 +551,8 @@ void TrySkipPatch()
 
     PATCH(0x9A9D33).JMP(runtimeHookNPCSpinjumpSafeRaw).NOP_PAD_TO_SIZE<10>().Apply();
     PATCH(0xA0A991).JMP(runtimeHookNPCNoWaterPhysicsRaw).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
-	PATCH(0xA181AD).JMP(runtimeHookNPCHarmlessThrownRaw).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
+    PATCH(0xA181AD).JMP(runtimeHookNPCHarmlessThrownRaw).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
@@ -605,8 +605,8 @@ void TrySkipPatch()
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
 
-	// Hook block hits
-	PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+    // Hook block hits
+    PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(
@@ -618,159 +618,159 @@ void TrySkipPatch()
         0xEB, 0x4B        // jmp 0xA9898F
         ).NOP_PAD_TO_SIZE<98>().Apply();
 
-	// Enable custom load screens
-	LunaLoadScreenSetEnable(true);
+    // Enable custom load screens
+    LunaLoadScreenSetEnable(true);
 
-	// Logging for NPC collisions
-	//PATCH(0xa281b0).JMP(GET_RETADDR_TRACE_HOOK<&runtimeHookLogCollideNpc>()).NOP_PAD_TO_SIZE<6>().Apply();
+    // Logging for NPC collisions
+    //PATCH(0xa281b0).JMP(GET_RETADDR_TRACE_HOOK<&runtimeHookLogCollideNpc>()).NOP_PAD_TO_SIZE<6>().Apply();
 
-	// Hooks for onNPCHarm support
-	PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
-	PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa293ea).JMP(&runtimeHookNpcHarmRaw_a293ee).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa29442).JMP(&runtimeHookNpcHarmRaw_a29442).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2946b).JMP(&runtimeHookNpcHarmRaw_a2946b).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa294aa).JMP(&runtimeHookNpcHarmRaw_a294aa).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa29f8a).JMP(&runtimeHookNpcHarmRaw_a29f8a).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a24c).JMP(&runtimeHookNpcHarmRaw_a2a24c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a304).JMP(&runtimeHookNpcHarmRaw_a2a304).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a36e).JMP(&runtimeHookNpcHarmRaw_a2a36e).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a3e3).JMP(&runtimeHookNpcHarmRaw_a2a3e3).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a450).JMP(&runtimeHookNpcHarmRaw_a2a454).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a48c).JMP(&runtimeHookNpcHarmRaw_a2a48c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a542).JMP(&runtimeHookNpcHarmRaw_a2a542).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a55e).JMP(&runtimeHookNpcHarmRaw_a2a55e).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a57f).JMP(&runtimeHookNpcHarmRaw_a2a57f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a5f1).JMP(&runtimeHookNpcHarmRaw_a2a5f4).NOP_PAD_TO_SIZE<5>().Apply();
-	PATCH(0xa2a623).JMP(&runtimeHookNpcHarmRaw_a2a627).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a65f).JMP(&runtimeHookNpcHarmRaw_a2a662).NOP_PAD_TO_SIZE<5>().Apply();
-	PATCH(0xa2a691).JMP(&runtimeHookNpcHarmRaw_a2a695).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a6d9).JMP(&runtimeHookNpcHarmRaw_a2a6d9).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a700).JMP(&runtimeHookNpcHarmRaw_a2a704).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a77e).JMP(&runtimeHookNpcHarmRaw_a2a782).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a79f).JMP(&runtimeHookNpcHarmRaw_a2a7a3).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a7d8).JMP(&runtimeHookNpcHarmRaw_a2a7db).NOP_PAD_TO_SIZE<5>().Apply();
-	PATCH(0xa2a90e).JMP(&runtimeHookNpcHarmRaw_a2a90e).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2a92c).JMP(&runtimeHookNpcHarmRaw_a2a92c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2aa57).JMP(&runtimeHookNpcHarmRaw_a2aa5b).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2aa7f).JMP(&runtimeHookNpcHarmRaw_a2aa7f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2aaa3).JMP(&runtimeHookNpcHarmRaw_a2aaa3).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ab38).JMP(&runtimeHookNpcHarmRaw_a2ab3c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ab7b).JMP(&runtimeHookNpcHarmRaw_a2ab7f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ab99).JMP(&runtimeHookNpcHarmRaw_a2ab99).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ac38).JMP(&runtimeHookNpcHarmRaw_a2ac38).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2acaf).JMP(&runtimeHookNpcHarmRaw_a2acaf).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ad2a).JMP(&runtimeHookNpcHarmRaw_a2ad2a).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2adca).JMP(&runtimeHookNpcHarmRaw_a2adca).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2adef).JMP(&runtimeHookNpcHarmRaw_a2adef).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ae9e).JMP(&runtimeHookNpcHarmRaw_a2ae9e).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2af1e).JMP(&runtimeHookNpcHarmRaw_a2af22).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2af6e).JMP(&runtimeHookNpcHarmRaw_a2af72).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b019).JMP(&runtimeHookNpcHarmRaw_a2b01d).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b116).JMP(&runtimeHookNpcHarmRaw_a2b116).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b139).JMP(&runtimeHookNpcHarmRaw_a2b139).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b676).JMP(&runtimeHookNpcHarmRaw_a2b676).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b8ad).JMP(&runtimeHookNpcHarmRaw_a2b8b6).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2b8c0).JMP(&runtimeHookNpcHarmRaw_a2b8c4).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2b9c0).JMP(&runtimeHookNpcHarmRaw_a2b9c0).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ba11).JMP(&runtimeHookNpcHarmRaw_a2ba11).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ba77).JMP(&runtimeHookNpcHarmRaw_a2ba77).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2badd).JMP(&runtimeHookNpcHarmRaw_a2badd).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2bcdc).JMP(&runtimeHookNpcHarmRaw_a2bcdc).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2bdeb).JMP(&runtimeHookNpcHarmRaw_a2bdeb).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2be20).JMP(&runtimeHookNpcHarmRaw_a2be29).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2bf41).JMP(&runtimeHookNpcHarmRaw_a2bf45).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2bfc9).JMP(&runtimeHookNpcHarmRaw_a2bfc9).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c12c).JMP(&runtimeHookNpcHarmRaw_a2c130).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c13b).JMP(&runtimeHookNpcHarmRaw_a2c13f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c18b).JMP(&runtimeHookNpcHarmRaw_a2c18b).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c300).JMP(&runtimeHookNpcHarmRaw_a2c300).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c400).JMP(&runtimeHookNpcHarmRaw_a2c404).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c432).JMP(&runtimeHookNpcHarmRaw_a2c437).NOP_PAD_TO_SIZE<7>().Apply();
-	PATCH(0xa2c4b1).JMP(&runtimeHookNpcHarmRaw_a2c4b1).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c50b).JMP(&runtimeHookNpcHarmRaw_a2c50b).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c524).JMP(&runtimeHookNpcHarmRaw_a2c524).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c537).JMP(&runtimeHookNpcHarmRaw_a2c537).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c5ad).JMP(&runtimeHookNpcHarmRaw_a2c5ad).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c63c).JMP(&runtimeHookNpcHarmRaw_a2c640).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c69b).JMP(&runtimeHookNpcHarmRaw_a2c69f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c6bb).JMP(&runtimeHookNpcHarmRaw_a2c6bf).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c712).JMP(&runtimeHookNpcHarmRaw_a2c712).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c7ab).JMP(&runtimeHookNpcHarmRaw_a2c7ab).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c808).JMP(&runtimeHookNpcHarmRaw_a2c80c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c81a).JMP(&runtimeHookNpcHarmRaw_a2c81e).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c888).JMP(&runtimeHookNpcHarmRaw_a2c88b).NOP_PAD_TO_SIZE<5>().Apply();
-	PATCH(0xa2c8a1).JMP(&runtimeHookNpcHarmRaw_a2c8a1).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2c966).JMP(&runtimeHookNpcHarmRaw_a2c966).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2cd3c).JMP(&runtimeHookNpcHarmRaw_a2cd3c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2cffe).JMP(&runtimeHookNpcHarmRaw_a2cffe).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d1b9).JMP(&runtimeHookNpcHarmRaw_a2d1b9).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d2f1).JMP(&runtimeHookNpcHarmRaw_a2d2f5).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d30d).JMP(&runtimeHookNpcHarmRaw_a2d311).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d79f).JMP(&runtimeHookNpcHarmRaw_a2d79f).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d7ae).JMP(&runtimeHookNpcHarmRaw_a2d7ae).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d863).JMP(&runtimeHookNpcHarmRaw_a2d867).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d8e7).JMP(&runtimeHookNpcHarmRaw_a2d8ec).NOP_PAD_TO_SIZE<7>().Apply();
-	PATCH(0xa2d96c).JMP(&runtimeHookNpcHarmRaw_a2d96c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d977).JMP(&runtimeHookNpcHarmRaw_a2d977).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2d9b6).JMP(&runtimeHookNpcHarmRaw_a2d9bf).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2da36).JMP(&runtimeHookNpcHarmRaw_a2da36).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2dac4).JMP(&runtimeHookNpcHarmRaw_a2dac8).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2daca).JMP(&runtimeHookNpcHarmRaw_a2dace).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2dad0).JMP(&runtimeHookNpcHarmRaw_a2dad4).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2df69).JMP(&runtimeHookNpcHarmRaw_a2df6d).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2df77).JMP(&runtimeHookNpcHarmRaw_a2df77).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e018).JMP(&runtimeHookNpcHarmRaw_a2e01d).NOP_PAD_TO_SIZE<7>().Apply();
-	PATCH(0xa2e058).JMP(&runtimeHookNpcHarmRaw_a2e058).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e0c2).JMP(&runtimeHookNpcHarmRaw_a2e0c2).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e155).JMP(&runtimeHookNpcHarmRaw_a2e155).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e274).JMP(&runtimeHookNpcHarmRaw_a2e278).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e2f5).JMP(&runtimeHookNpcHarmRaw_a2e2f5).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e556).JMP(&runtimeHookNpcHarmRaw_a2e556).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e641).JMP(&runtimeHookNpcHarmRaw_a2e641).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e647).JMP(&runtimeHookNpcHarmRaw_a2e64b).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e6c2).JMP(&runtimeHookNpcHarmRaw_a2e6c2).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2e753).JMP(&runtimeHookNpcHarmRaw_a2e75c).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2e78c).JMP(&runtimeHookNpcHarmRaw_a2e795).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2e800).JMP(&runtimeHookNpcHarmRaw_a2e800).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f26c).JMP(&runtimeHookNpcHarmRaw_a2f26c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f272).JMP(&runtimeHookNpcHarmRaw_a2f27a).NOP_PAD_TO_SIZE<10>().Apply();
-	PATCH(0xa2f2e4).JMP(&runtimeHookNpcHarmRaw_a2f2ed).NOP_PAD_TO_SIZE<11>().Apply();
-	PATCH(0xa2f376).JMP(&runtimeHookNpcHarmRaw_a2f376).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f792).JMP(&runtimeHookNpcHarmRaw_a2f792).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f79d).JMP(&runtimeHookNpcHarmRaw_a2f79d).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f822).JMP(&runtimeHookNpcHarmRaw_a2f822).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f8f5).JMP(&runtimeHookNpcHarmRaw_a2f8fa).NOP_PAD_TO_SIZE<7>().Apply();
-	PATCH(0xa2f9b8).JMP(&runtimeHookNpcHarmRaw_a2f9bc).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2f9d9).JMP(&runtimeHookNpcHarmRaw_a2f9d9).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fa5d).JMP(&runtimeHookNpcHarmRaw_a2fa5d).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fae5).JMP(&runtimeHookNpcHarmRaw_a2fae5).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fb05).JMP(&runtimeHookNpcHarmRaw_a2fb09).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fb13).JMP(&runtimeHookNpcHarmRaw_a2fb13).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fb29).JMP(&runtimeHookNpcHarmRaw_a2fb29).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fb34).JMP(&runtimeHookNpcHarmRaw_a2fb34).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fbaf).JMP(&runtimeHookNpcHarmRaw_a2fbaf).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fde3).JMP(&runtimeHookNpcHarmRaw_a2fde3).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2fef5).JMP(&runtimeHookNpcHarmRaw_a2fef9).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ff2f).JMP(&runtimeHookNpcHarmRaw_a2ff33).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ff4d).JMP(&runtimeHookNpcHarmRaw_a2ff4d).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa2ff9a).JMP(&runtimeHookNpcHarmRaw_a2ff9f).NOP_PAD_TO_SIZE<7>().Apply();
-	PATCH(0xa30011).JMP(&runtimeHookNpcHarmRaw_a30011).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa30128).JMP(&runtimeHookNpcHarmRaw_a3012c).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa30162).JMP(&runtimeHookNpcHarmRaw_a30166).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa30180).JMP(&runtimeHookNpcHarmRaw_a30180).NOP_PAD_TO_SIZE<6>().Apply();
-	PATCH(0xa3045e).JMP(&runtimeHookNpcHarmRaw_a30465).NOP_PAD_TO_SIZE<9>().Apply();
+    // Hooks for onNPCHarm support
+    PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
+    PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa293ea).JMP(&runtimeHookNpcHarmRaw_a293ee).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa29442).JMP(&runtimeHookNpcHarmRaw_a29442).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2946b).JMP(&runtimeHookNpcHarmRaw_a2946b).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa294aa).JMP(&runtimeHookNpcHarmRaw_a294aa).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa29f8a).JMP(&runtimeHookNpcHarmRaw_a29f8a).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a24c).JMP(&runtimeHookNpcHarmRaw_a2a24c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a304).JMP(&runtimeHookNpcHarmRaw_a2a304).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a36e).JMP(&runtimeHookNpcHarmRaw_a2a36e).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a3e3).JMP(&runtimeHookNpcHarmRaw_a2a3e3).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a450).JMP(&runtimeHookNpcHarmRaw_a2a454).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a48c).JMP(&runtimeHookNpcHarmRaw_a2a48c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a542).JMP(&runtimeHookNpcHarmRaw_a2a542).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a55e).JMP(&runtimeHookNpcHarmRaw_a2a55e).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a57f).JMP(&runtimeHookNpcHarmRaw_a2a57f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a5f1).JMP(&runtimeHookNpcHarmRaw_a2a5f4).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xa2a623).JMP(&runtimeHookNpcHarmRaw_a2a627).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a65f).JMP(&runtimeHookNpcHarmRaw_a2a662).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xa2a691).JMP(&runtimeHookNpcHarmRaw_a2a695).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a6d9).JMP(&runtimeHookNpcHarmRaw_a2a6d9).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a700).JMP(&runtimeHookNpcHarmRaw_a2a704).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a77e).JMP(&runtimeHookNpcHarmRaw_a2a782).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a79f).JMP(&runtimeHookNpcHarmRaw_a2a7a3).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a7d8).JMP(&runtimeHookNpcHarmRaw_a2a7db).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xa2a90e).JMP(&runtimeHookNpcHarmRaw_a2a90e).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2a92c).JMP(&runtimeHookNpcHarmRaw_a2a92c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2aa57).JMP(&runtimeHookNpcHarmRaw_a2aa5b).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2aa7f).JMP(&runtimeHookNpcHarmRaw_a2aa7f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2aaa3).JMP(&runtimeHookNpcHarmRaw_a2aaa3).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ab38).JMP(&runtimeHookNpcHarmRaw_a2ab3c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ab7b).JMP(&runtimeHookNpcHarmRaw_a2ab7f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ab99).JMP(&runtimeHookNpcHarmRaw_a2ab99).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ac38).JMP(&runtimeHookNpcHarmRaw_a2ac38).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2acaf).JMP(&runtimeHookNpcHarmRaw_a2acaf).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ad2a).JMP(&runtimeHookNpcHarmRaw_a2ad2a).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2adca).JMP(&runtimeHookNpcHarmRaw_a2adca).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2adef).JMP(&runtimeHookNpcHarmRaw_a2adef).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ae9e).JMP(&runtimeHookNpcHarmRaw_a2ae9e).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2af1e).JMP(&runtimeHookNpcHarmRaw_a2af22).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2af6e).JMP(&runtimeHookNpcHarmRaw_a2af72).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b019).JMP(&runtimeHookNpcHarmRaw_a2b01d).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b116).JMP(&runtimeHookNpcHarmRaw_a2b116).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b139).JMP(&runtimeHookNpcHarmRaw_a2b139).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b676).JMP(&runtimeHookNpcHarmRaw_a2b676).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b8ad).JMP(&runtimeHookNpcHarmRaw_a2b8b6).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2b8c0).JMP(&runtimeHookNpcHarmRaw_a2b8c4).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2b9c0).JMP(&runtimeHookNpcHarmRaw_a2b9c0).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ba11).JMP(&runtimeHookNpcHarmRaw_a2ba11).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ba77).JMP(&runtimeHookNpcHarmRaw_a2ba77).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2badd).JMP(&runtimeHookNpcHarmRaw_a2badd).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2bcdc).JMP(&runtimeHookNpcHarmRaw_a2bcdc).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2bdeb).JMP(&runtimeHookNpcHarmRaw_a2bdeb).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2be20).JMP(&runtimeHookNpcHarmRaw_a2be29).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2bf41).JMP(&runtimeHookNpcHarmRaw_a2bf45).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2bfc9).JMP(&runtimeHookNpcHarmRaw_a2bfc9).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c12c).JMP(&runtimeHookNpcHarmRaw_a2c130).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c13b).JMP(&runtimeHookNpcHarmRaw_a2c13f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c18b).JMP(&runtimeHookNpcHarmRaw_a2c18b).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c300).JMP(&runtimeHookNpcHarmRaw_a2c300).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c400).JMP(&runtimeHookNpcHarmRaw_a2c404).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c432).JMP(&runtimeHookNpcHarmRaw_a2c437).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xa2c4b1).JMP(&runtimeHookNpcHarmRaw_a2c4b1).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c50b).JMP(&runtimeHookNpcHarmRaw_a2c50b).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c524).JMP(&runtimeHookNpcHarmRaw_a2c524).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c537).JMP(&runtimeHookNpcHarmRaw_a2c537).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c5ad).JMP(&runtimeHookNpcHarmRaw_a2c5ad).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c63c).JMP(&runtimeHookNpcHarmRaw_a2c640).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c69b).JMP(&runtimeHookNpcHarmRaw_a2c69f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c6bb).JMP(&runtimeHookNpcHarmRaw_a2c6bf).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c712).JMP(&runtimeHookNpcHarmRaw_a2c712).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c7ab).JMP(&runtimeHookNpcHarmRaw_a2c7ab).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c808).JMP(&runtimeHookNpcHarmRaw_a2c80c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c81a).JMP(&runtimeHookNpcHarmRaw_a2c81e).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c888).JMP(&runtimeHookNpcHarmRaw_a2c88b).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xa2c8a1).JMP(&runtimeHookNpcHarmRaw_a2c8a1).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2c966).JMP(&runtimeHookNpcHarmRaw_a2c966).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2cd3c).JMP(&runtimeHookNpcHarmRaw_a2cd3c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2cffe).JMP(&runtimeHookNpcHarmRaw_a2cffe).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d1b9).JMP(&runtimeHookNpcHarmRaw_a2d1b9).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d2f1).JMP(&runtimeHookNpcHarmRaw_a2d2f5).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d30d).JMP(&runtimeHookNpcHarmRaw_a2d311).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d79f).JMP(&runtimeHookNpcHarmRaw_a2d79f).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d7ae).JMP(&runtimeHookNpcHarmRaw_a2d7ae).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d863).JMP(&runtimeHookNpcHarmRaw_a2d867).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d8e7).JMP(&runtimeHookNpcHarmRaw_a2d8ec).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xa2d96c).JMP(&runtimeHookNpcHarmRaw_a2d96c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d977).JMP(&runtimeHookNpcHarmRaw_a2d977).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2d9b6).JMP(&runtimeHookNpcHarmRaw_a2d9bf).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2da36).JMP(&runtimeHookNpcHarmRaw_a2da36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2dac4).JMP(&runtimeHookNpcHarmRaw_a2dac8).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2daca).JMP(&runtimeHookNpcHarmRaw_a2dace).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2dad0).JMP(&runtimeHookNpcHarmRaw_a2dad4).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2df69).JMP(&runtimeHookNpcHarmRaw_a2df6d).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2df77).JMP(&runtimeHookNpcHarmRaw_a2df77).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e018).JMP(&runtimeHookNpcHarmRaw_a2e01d).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xa2e058).JMP(&runtimeHookNpcHarmRaw_a2e058).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e0c2).JMP(&runtimeHookNpcHarmRaw_a2e0c2).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e155).JMP(&runtimeHookNpcHarmRaw_a2e155).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e274).JMP(&runtimeHookNpcHarmRaw_a2e278).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e2f5).JMP(&runtimeHookNpcHarmRaw_a2e2f5).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e556).JMP(&runtimeHookNpcHarmRaw_a2e556).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e641).JMP(&runtimeHookNpcHarmRaw_a2e641).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e647).JMP(&runtimeHookNpcHarmRaw_a2e64b).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e6c2).JMP(&runtimeHookNpcHarmRaw_a2e6c2).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2e753).JMP(&runtimeHookNpcHarmRaw_a2e75c).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2e78c).JMP(&runtimeHookNpcHarmRaw_a2e795).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2e800).JMP(&runtimeHookNpcHarmRaw_a2e800).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f26c).JMP(&runtimeHookNpcHarmRaw_a2f26c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f272).JMP(&runtimeHookNpcHarmRaw_a2f27a).NOP_PAD_TO_SIZE<10>().Apply();
+    PATCH(0xa2f2e4).JMP(&runtimeHookNpcHarmRaw_a2f2ed).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0xa2f376).JMP(&runtimeHookNpcHarmRaw_a2f376).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f792).JMP(&runtimeHookNpcHarmRaw_a2f792).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f79d).JMP(&runtimeHookNpcHarmRaw_a2f79d).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f822).JMP(&runtimeHookNpcHarmRaw_a2f822).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f8f5).JMP(&runtimeHookNpcHarmRaw_a2f8fa).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xa2f9b8).JMP(&runtimeHookNpcHarmRaw_a2f9bc).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2f9d9).JMP(&runtimeHookNpcHarmRaw_a2f9d9).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fa5d).JMP(&runtimeHookNpcHarmRaw_a2fa5d).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fae5).JMP(&runtimeHookNpcHarmRaw_a2fae5).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fb05).JMP(&runtimeHookNpcHarmRaw_a2fb09).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fb13).JMP(&runtimeHookNpcHarmRaw_a2fb13).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fb29).JMP(&runtimeHookNpcHarmRaw_a2fb29).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fb34).JMP(&runtimeHookNpcHarmRaw_a2fb34).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fbaf).JMP(&runtimeHookNpcHarmRaw_a2fbaf).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fde3).JMP(&runtimeHookNpcHarmRaw_a2fde3).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2fef5).JMP(&runtimeHookNpcHarmRaw_a2fef9).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ff2f).JMP(&runtimeHookNpcHarmRaw_a2ff33).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ff4d).JMP(&runtimeHookNpcHarmRaw_a2ff4d).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa2ff9a).JMP(&runtimeHookNpcHarmRaw_a2ff9f).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xa30011).JMP(&runtimeHookNpcHarmRaw_a30011).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa30128).JMP(&runtimeHookNpcHarmRaw_a3012c).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa30162).JMP(&runtimeHookNpcHarmRaw_a30166).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa30180).JMP(&runtimeHookNpcHarmRaw_a30180).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xa3045e).JMP(&runtimeHookNpcHarmRaw_a30465).NOP_PAD_TO_SIZE<9>().Apply();
 
-	// Hooks for color switch hitting (jg hooks to capture loop exits)
-	PATCH(0xA31FA0).JG(&runtimeHookColorSwitchRedNpc).Apply();
-	PATCH(0xA3214E).JG(&runtimeHookColorSwitchGreenNpc).Apply();
-	PATCH(0xA322FC).JG(&runtimeHookColorSwitchBlueNpc).Apply();
-	PATCH(0xA324AA).JG(&runtimeHookColorSwitchYellowNpc).Apply();
-	PATCH(0x9DB37E).JG(&runtimeHookColorSwitchYellowBlock).Apply();
-	PATCH(0x9DB519).JG(&runtimeHookColorSwitchBlueBlock).Apply();
-	PATCH(0x9DB6B9).JG(&runtimeHookColorSwitchGreenBlock).Apply();
-	PATCH(0x9DB84E).JG(&runtimeHookColorSwitchRedBlock).Apply();
+    // Hooks for color switch hitting (jg hooks to capture loop exits)
+    PATCH(0xA31FA0).JG(&runtimeHookColorSwitchRedNpc).Apply();
+    PATCH(0xA3214E).JG(&runtimeHookColorSwitchGreenNpc).Apply();
+    PATCH(0xA322FC).JG(&runtimeHookColorSwitchBlueNpc).Apply();
+    PATCH(0xA324AA).JG(&runtimeHookColorSwitchYellowNpc).Apply();
+    PATCH(0x9DB37E).JG(&runtimeHookColorSwitchYellowBlock).Apply();
+    PATCH(0x9DB519).JG(&runtimeHookColorSwitchBlueBlock).Apply();
+    PATCH(0x9DB6B9).JG(&runtimeHookColorSwitchGreenBlock).Apply();
+    PATCH(0x9DB84E).JG(&runtimeHookColorSwitchRedBlock).Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

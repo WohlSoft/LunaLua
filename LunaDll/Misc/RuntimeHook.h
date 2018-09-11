@@ -122,9 +122,9 @@ extern void (*runAsyncLoggerProc)(void);
 extern void (*asyncLogProc)(const char*);
 
 struct resultStruct{
-	int result;
-	bool disableFrameskip;
-	bool NoSound;
+    int result;
+    bool disableFrameskip;
+    bool NoSound;
 };
 
 /************************************************************************/
@@ -174,40 +174,40 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
 
 template <int priority, unsigned int skipTargetAddr, bool* skipAddr>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
-	__asm {
-		pushf
-		push eax
-		push ecx
-		push edx
-	}
-	static unsigned int skipTargetAddrTmp = skipTargetAddr;
-	Renderer::Get().RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
-	if (*skipAddr)
-	{
-		__asm {
-			pop edx
-			pop ecx
-			pop eax
-			popf
-			ret
-		}
-	}
-	else
-	{
-		__asm {
-			pop edx
-			pop ecx
-			pop eax
-			popf
-			add esp, 4
-			push skipTargetAddrTmp
-			ret
-		}
-	}
+    __asm {
+        pushf
+        push eax
+        push ecx
+        push edx
+    }
+    static unsigned int skipTargetAddrTmp = skipTargetAddr;
+    Renderer::Get().RenderBelowPriority((priority >= 100) ? DBL_MAX : priority);
+    if (*skipAddr)
+    {
+        __asm {
+            pop edx
+            pop ecx
+            pop eax
+            popf
+            ret
+        }
+    }
+    else
+    {
+        __asm {
+            pop edx
+            pop ecx
+            pop eax
+            popf
+            add esp, 4
+            push skipTargetAddrTmp
+            ret
+        }
+    }
 }
 template<int priority, unsigned int skipTargetAddr, bool* skipAddr>
 static inline constexpr void* GetRenderBelowPriorityHookWithSkip(void) {
-	return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookWithSkipImpl<priority, skipTargetAddr, skipAddr>);
+    return static_cast<void(__stdcall *)(void)>(&_RenderBelowPriorityHookWithSkipImpl<priority, skipTargetAddr, skipAddr>);
 }
 
 // Extended Character Id Support
@@ -218,7 +218,7 @@ void runtimeHookCharacterIdReset();
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename);
-void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
+//void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
 void __stdcall runtimeHookCloseWindow(void);
 
 void __stdcall runtimeHookChangeResolution(void* arg1, void* arg2, void* arg3, void* arg4);

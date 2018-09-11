@@ -6,6 +6,7 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SMBXInternal/PlayerMOB.h"
+#include "../FileManager/SMBXFileManager.h"
 #include "../EventStateMachine.h"
 #include "../IPC/IPCPipeServer.h"
 #include "MiscFuncs.h"
@@ -35,6 +36,11 @@ static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP()
 //================ SETTINGS ================//
 //////////////////////////////////////////////
 
+void STestModeData::clear()
+{
+    levelData.clear();
+}
+
 STestModeSettings::STestModeSettings()
 {
     ResetToDefault();
@@ -43,10 +49,9 @@ void STestModeSettings::ResetToDefault(void)
 {
     enabled = false;
     levelPath = L"";
-    levelData = "";
     playerCount = 1;
-	showFPS = false;
-	godMode = false;
+    showFPS = false;
+    godMode = false;
     players[0].identity = CHARACTER_MARIO;
     players[0].powerup = 1;
     players[0].mountType = 0;
@@ -58,6 +63,7 @@ void STestModeSettings::ResetToDefault(void)
 }
 
 static STestModeSettings testModeSettings;
+static STestModeData     testModeData;
 
 STestModeSettings getTestModeSettings()
 {
@@ -100,11 +106,11 @@ static bool testModeSetupForLoading()
     const std::wstring& path = testModeSettings.levelPath;
 
     // Check that the file exists, but only if we don't have raw level data
-    if ((testModeSettings.levelData.size() == 0) && (FileExists(path.c_str()) == 0))
+    if ((testModeData.levelData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
         return false;
     }
-    
+
     // Start by stopping any Lua things
     gLunaLua.exitContext();
 
@@ -113,7 +119,7 @@ static bool testModeSetupForLoading()
 
     // Cleanup custom level resources
     native_cleanupLevel();
-	
+
     // Reset character templates
     for (int i = 1; i <= 5; i++)
     {
@@ -154,8 +160,8 @@ static bool testModeSetupForLoading()
     ep->unknown_10 = 0;
     ep->unknown_14 = "";
 
-	// God Mode cheat code
-	GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
+    // God Mode cheat code
+    GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
     // Show FPS counter
     GM_SHOW_FPS = COMBOOL(testModeSettings.showFPS);
@@ -291,28 +297,31 @@ bool testModeLoadLevelHook(VB6StrPtr* filename)
 {
     // Skip if not enabled
     if (!testModeSettings.enabled) return false;
-    
+
     // If the filename matches the one we're testing, and we have raw level data, let's use it
-    if (*filename == testModeSettings.levelPath && testModeSettings.levelData.size() > 0)
+    if (*filename == testModeSettings.levelPath && testModeData.levelData.size() > 0)
     {
-        auto testModeVbaFileOpenHookPatch = PATCH(0x8D97D1).CALL(testModeVbaFileOpenHook).NOP_PAD_TO_SIZE<6>();
+        // //auto testModeVbaFileOpenHookPatch = PATCH(0x8D97D1).CALL(testModeVbaFileOpenHook).NOP_PAD_TO_SIZE<6>();
 
         // Create a temporary file with the level data
-        std::wstring tempFile = WriteTemporaryFile(testModeSettings.levelData).c_str();
-        if (tempFile.size() == 0)
-        {
-            dbgboxA("Could not write temporary file!");
-            return false;
-        }
-        
+        // //std::wstring tempFile = WriteTemporaryFile(testModeData.levelData).c_str();
+        //if (tempFile.size() == 0)
+        //{
+        //    dbgboxA("Could not write temporary file!");
+        //    return false;
+        //}
+
         // Load level with data from the temporary file
-        temporaryLevelFn = tempFile;
-        testModeVbaFileOpenHookPatch.Apply();
-        loadLevel_OrigFunc(filename);
-        testModeVbaFileOpenHookPatch.Unapply();
+        // //temporaryLevelFn = tempFile;
+        // //testModeVbaFileOpenHookPatch.Apply();
+        // //loadLevel_OrigFunc(filename);
+        // //testModeVbaFileOpenHookPatch.Unapply();
 
         // Delete the temporary file
-        DeleteFileW(tempFile.c_str());
+        // //DeleteFileW(tempFile.c_str());
+
+        SMBXLevelFileBase base;
+        base.ReadFileMem(testModeData.levelData, testModeSettings.levelPath);
 
         return true;
     }
@@ -355,7 +364,7 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-bool testModeEnable(const STestModeSettings& settings)
+bool testModeEnable(const STestModeSettings& settings, const std::string &newLevelData)
 {
     // Get the full path if necessary
     std::wstring path = settings.levelPath;
@@ -369,11 +378,14 @@ bool testModeEnable(const STestModeSettings& settings)
     }
 
     // Check that the file exists, but only if we don't have raw level data
-    if ((settings.levelData.size() == 0) && (FileExists(fullPath.c_str()) == 0))
+    if ((!newLevelData.empty()) && (FileExists(fullPath.c_str()) == 0))
     {
         return false;
     }
 
+    testModeData.levelData.clear();
+    if(!newLevelData.empty())
+        testModeData.levelData = newLevelData;
     testModeSettings = settings;
     testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
@@ -387,6 +399,7 @@ bool testModeEnable(const STestModeSettings& settings)
 
 void testModeDisable(void)
 {
+    testModeData.clear();
     testModeSettings.ResetToDefault();
     testModeSettings.enabled = false;
 
@@ -408,8 +421,8 @@ json IPCTestLevel(const json& params)
     // Default to the last settings for characters, if not changed by IPC
     // command
     STestModeSettings settings = testModeSettings;
+    std::string       rawData;
     settings.enabled = true;
-    settings.levelData = "";
     settings.levelPath = Str2WStr(filenameIt.value());
 
     // Get character/player information
@@ -435,7 +448,7 @@ json IPCTestLevel(const json& params)
                 short characterInt = static_cast<short>(characterIt.value());
                 playerSettings.identity = static_cast<Characters>(characterInt);
             }
-            
+
             // Set powerup
             json::const_iterator powerupIt = player.find("powerup");
             if (powerupIt != player.cend())
@@ -466,15 +479,15 @@ json IPCTestLevel(const json& params)
     if (levelDataIt != params.cend() && !levelDataIt.value().is_null())
     {
         if (!levelDataIt.value().is_string()) throw IPCInvalidParams();
-        settings.levelData = static_cast<const std::string&>(levelDataIt.value()); 
+        rawData = static_cast<const std::string&>(levelDataIt.value());
     }
 
     // Set godMode flag
     json::const_iterator godModeFlag = params.find("godMode");
     if (godModeFlag != params.cend() && !levelDataIt.value().is_null())
     {
-	    if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
-	    settings.godMode = static_cast<bool>(godModeFlag.value());
+        if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
+        settings.godMode = static_cast<bool>(godModeFlag.value());
     }
 
     // Set godMode flag
@@ -504,7 +517,7 @@ json IPCTestLevel(const json& params)
         WaitForTickEnd tickEndLock;
 
         // Attempt to enable the test
-        if (!testModeEnable(settings))
+        if (!testModeEnable(settings, rawData))
         {
             return false;
         }
@@ -522,7 +535,7 @@ bool TestModeCheckHideWindow(void)
     if (gStartupSettings.waitForIPC)
     {
         std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
-        
+
         // Close the level using testModeRestartLevel, but flag that we'll be
         // waiting for IPC again.
         testModeRestartLevel();

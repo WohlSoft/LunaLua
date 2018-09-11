@@ -91,7 +91,7 @@ void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, const std::wstring& p
     LevelData outData;
     m_isValid = true; // Ensure that we are not valid right now
 
-    if (!FileFormats::ReadExtendedLvlFileRaw(rawData, utf8_encode(path), outData))
+    if (!FileFormats::ReadSMBX64LvlFileRaw(rawData, utf8_encode(path), outData))
     {
         m_isValid = false;
         makeErrorLevel(outData, (" There was an error while  "
