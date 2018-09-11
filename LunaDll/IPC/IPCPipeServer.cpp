@@ -273,6 +273,6 @@ void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr, const 
 json IPCGetSupportedFeatures(const json& params)
 {
     return {
-        {"LVLX", false}
+        {"LVLX", true}
     };
 }
