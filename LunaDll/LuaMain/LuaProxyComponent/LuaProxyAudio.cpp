@@ -173,6 +173,82 @@ void LuaProxy::Audio::releaseStream(int section)
 }
 
 
+void LuaProxy::Audio::changeMusic(int section, const std::string &filename)
+{
+    changeMusic(section, filename, -1);
+}
+
+void LuaProxy::Audio::changeMusic(int section, int musicId)
+{
+    changeMusic(section, musicId, -1);
+}
+
+void LuaProxy::Audio::changeMusic(int section, const std::string &filename, int fadeInDelayMs)
+{
+    if(filename.empty())
+    {
+        // If file path is empty, set to silence
+        changeMusic(section, 0);
+        return;
+    }
+
+    if((section < 0) || (section > 20))
+        return;
+
+    // music paths, set music id to custom and set path
+    GM_SEC_MUSIC_TBL[section] = 24;
+    GM_MUSIC_PATHS_PTR[section] = filename;
+
+    // If the specified section's music is what's
+    // currently playing, force the change in config to be picked up
+    if(section == GM_SEC_CURRENT_MUSIC)
+    {
+        playMusic(section);
+        if(fadeInDelayMs > 0)
+        {
+            MusicStop();
+            MusicPlayFadeIn(fadeInDelayMs);
+        }
+    }
+}
+
+void LuaProxy::Audio::changeMusic(int section, int musicId, int fadeInDelayMs)
+{
+    if((section < 0) || (section > 20))
+        return;
+
+    GM_SEC_MUSIC_TBL[section] = short(musicId >= 0 ? musicId : 0);
+
+    // If the specified section's music is what's
+    // currently playing, force the change in config to be picked up
+    if(section == GM_SEC_CURRENT_MUSIC)
+    {
+        if(fadeInDelayMs <= 0)
+            playMusic(section);
+        else
+        {
+            if(GM_SEC_MUSIC_TBL[section] != 0)
+            {
+                playMusic(section);
+                MusicStop();
+                MusicPlayFadeIn(fadeInDelayMs);
+            }
+            else
+            {
+                /* TODO: Replace this shit with own "playMusic(section)"
+                 * implementation to avoid MCI calls and let SMBX organize
+                 * it's internals correct
+                 */
+                seizeStream(section);
+                playMusic(section);
+                releaseStream(section);
+
+                MusicStopFadeOut(fadeInDelayMs);
+            }
+        }
+    }
+}
+
 Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
 {
     return NULL;
@@ -507,7 +583,7 @@ void LuaProxy::Audio::PlayingSfxInstance::FadeOut(int ms)
     Mix_FadeOutChannel(mChannel, ms);
 }
 
-bool LuaProxy::Audio::PlayingSfxInstance::IsPlaying() 
+bool LuaProxy::Audio::PlayingSfxInstance::IsPlaying()
 {
     if (mFinished) return false;
     return Mix_Playing(mChannel) != 0;

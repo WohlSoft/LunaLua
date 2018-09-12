@@ -2,6 +2,8 @@
 #ifndef Defines_hhhh
 #define Defines_hhhh
 
+#define NOMINMAX
+
 // Includes
 #include <windows.h>
 #include <stddef.h>
@@ -192,7 +194,7 @@ GM_EPISODE_MODE == -1 && GM_LEVEL_MODE == -1 --> Level
 */
 
 
-// Pre-Defined Strings      
+// Pre-Defined Strings
 DEFMEM(GM_STR_NULL,         VB6StrPtr, 0x00423D00);
 DEFMEM(GM_STR_MSGBOX,       VB6StrPtr, 0x00B250E4);
 DEFMEM(GM_STR_CHECKPOINT,   VB6StrPtr, 0x00B250B0);     //This contains the levelname (GM_FULLPATH) of the hitted checkpoint
@@ -296,6 +298,7 @@ DEFMEM(GM_ORIG_LVL_BOUNDS,  Bounds*, 0x00B2587C);     // Same as above, but alwa
 DEFMEM(GM_SEC_ISWARP,       short*, 0x00B257F0);
 DEFMEM(GM_SEC_OFFSCREEN,    short*, 0x00B2580C);
 DEFMEM(GM_SEC_NOTURNBACK,   short*, 0x00B2C5EC);
+DEFMEM(GM_SEC_CURRENT_MUSIC,short,  0x00B2C5D8);
 DEFMEM(GM_SEC_ISUNDERWATER, short*, 0x00B2C608);
 
 // Background objects
@@ -354,13 +357,13 @@ DEFMEM(GM_MUSICBOX_PTR,     void*,  0x00B25974);
 
 
 // Sound
-DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8); 
+DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8);
 DEFMEM(GM_SEC_MUSIC_TBL,    short*, 0x00B25828);     // 21 shorts containing music # for each section
 DEFMEM(GM_MUSIC_RESTORE_PL, WORD, 0x00B2C630); // If pswitch is active, then the music of the section of the player index is restored.
 
 
 // Input
-DEFMEM(GM_VKEY_TABLE_PTR,   void*,  0x00B25068); 
+DEFMEM(GM_VKEY_TABLE_PTR,   void*,  0x00B25068);
 DEFMEM(GM_VJOY_TABLE_PTR,   void*,  0x00B25084);
 DEFMEM(GM_INPUTTYPE,        short*, 0x00B250A0);
 DEFMEM(GM_INPUTSTR_BUF_PTR, VB6StrPtr, 0x00B2C898);
@@ -888,7 +891,7 @@ static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GA
 static const auto native_applyFullscreen = (void(__stdcall *)(void* arg1, void* arg2, void* arg3, void* arg4))GF_APPLY_FULLSCREEN;
 
 /*
-Function name                                
+Function name
                                            Segment Start    Length   Locals   Arguments
 sub_40B9B0                                   .text 0040B9B0 0000001D 00000000 FFFFFFFC R F . . . . .
 j___vbaChkstk                                .text 0040BA60 00000006                   R . . . . . .

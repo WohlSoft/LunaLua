@@ -76,7 +76,7 @@ void CLunaLua::exitContext()
                 shutdownSpecificEvent->setLoopable(false);
                 callEvent(shutdownSpecificEvent);
             }
-            
+
             std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExit", false);
             shutdownEvent->setDirectEventName("onExit");
             shutdownEvent->setLoopable(false);
@@ -86,7 +86,7 @@ void CLunaLua::exitContext()
 
         g_PerfTracker.disable();
 
-		gRenderBGOFlag = true;
+        gRenderBGOFlag = true;
 
         //Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
@@ -165,7 +165,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     lua_pushcfunction(L, luaopen_mime_core);
     lua_setfield(L, -2, "mime.core");
-    
+
     //SOCKET TESTING STUFF
 
     //Remove unsafe apis
@@ -196,7 +196,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Setup default contants
     setupDefaults();
-    
+
     //Load the Lua API
     bool errLapi = false;
     int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
@@ -208,8 +208,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     {
         errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
     }
-    
-    
+
+
     //Shutdown if an error happend.
     if(errLapi){
         shutdown();
@@ -233,7 +233,7 @@ void CLunaLua::setupDefaults()
     LUAHELPER_DEF_CONST(_G, GAME_ENGINE);
     LUAHELPER_DEF_CONST(_G, LUNALUA_VERSION);
     _G["LUNALUA_VER"] = LUNALUA_VERSION; // ALIAS
-    
+
     object verTable = newtable(L);
     verTable[1] = LUNA_VERNUM1;
     verTable[2] = LUNA_VERNUM2;
@@ -498,7 +498,7 @@ void CLunaLua::setupDefaults()
         _G["isOverworld"] = true;
         _G["world"] = LuaProxy::World();
     }
-    
+
     _G["player"] = LuaProxy::Player();
     LuaProxy::Player pl(2);
     if(pl.isValid())
@@ -506,7 +506,7 @@ void CLunaLua::setupDefaults()
 
     _G["inputConfig1"] = LuaProxy::InputConfig(1);
     _G["inputConfig2"] = LuaProxy::InputConfig(2);
-    
+
     _G["console"] = LuaProxy::Console();
 }
 
@@ -688,6 +688,10 @@ void CLunaLua::bindAll()
                 def("ReleaseStream", (void(*)(int))&LuaProxy::Audio::releaseStream),
                 //Release music stream for ALL sections
                 def("resetMciSections", (void(*)())&LuaProxy::Audio::resetMciSections),
+                def("MusicChange", (void(*)(int, int))&LuaProxy::Audio::changeMusic),
+                def("MusicChange", (void(*)(int, const std::string&))&LuaProxy::Audio::changeMusic),
+                def("MusicChange", (void(*)(int, int, int))&LuaProxy::Audio::changeMusic),
+                def("MusicChange", (void(*)(int, const std::string&, int))&LuaProxy::Audio::changeMusic),
 
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
@@ -713,7 +717,7 @@ void CLunaLua::bindAll()
                 def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),
                 def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
                 def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
-                
+
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(PlayingSfxInstance, std::shared_ptr)
                     .def("Pause", &LuaProxy::Audio::PlayingSfxInstance::Pause)
                     .def("Resume", &LuaProxy::Audio::PlayingSfxInstance::Resume)
@@ -733,7 +737,7 @@ void CLunaLua::bindAll()
                 def("SfxPlayObjTimed", &LuaProxy::Audio::SfxPlayObjTimed),
                 def("SfxFadeInObj", &LuaProxy::Audio::SfxFadeInObj),
                 def("SfxFadeInObjTimed", &LuaProxy::Audio::SfxFadeInObjTimed),
-                
+
                 //Time
                 def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
                 def("MusicClock", (double(*)())&LuaProxy::Audio::MusicClock),
@@ -749,7 +753,7 @@ void CLunaLua::bindAll()
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
             .property("idx", &LuaProxy::InputConfig::idx)
             .property("inputType", &LuaProxy::InputConfig::inputType, &LuaProxy::InputConfig::setInputType)
-			.property("up", &LuaProxy::InputConfig::up, &LuaProxy::InputConfig::setUp)
+            .property("up", &LuaProxy::InputConfig::up, &LuaProxy::InputConfig::setUp)
             .property("down", &LuaProxy::InputConfig::down, &LuaProxy::InputConfig::setDown)
             .property("left", &LuaProxy::InputConfig::left, &LuaProxy::InputConfig::setLeft)
             .property("right", &LuaProxy::InputConfig::right, &LuaProxy::InputConfig::setRight)
@@ -1068,7 +1072,7 @@ void CLunaLua::bindAll()
                 .property("playerY", &LuaProxy::World::playerY, &LuaProxy::World::setPlayerY)
                 .property("playerWalkingDirection", &LuaProxy::World::currentWalkingDirection, &LuaProxy::World::setCurrentWalkingDirection)
                 .property("playerWalkingTimer", &LuaProxy::World::currentWalkingTimer, &LuaProxy::World::setCurrentWalkingTimer)
-                .property("playerWalkingFrame", &LuaProxy::World::currentWalkingFrame, &LuaProxy::World::setCurrentWalkingFrame)    
+                .property("playerWalkingFrame", &LuaProxy::World::currentWalkingFrame, &LuaProxy::World::setCurrentWalkingFrame)
                 .property("playerWalkingFrameTimer", &LuaProxy::World::currentWalkingFrameTimer, &LuaProxy::World::setCurrentWalkingFrameTimer)
                 .property("playerIsCurrentWalking", &LuaProxy::World::playerIsCurrentWalking)
                 .property("levelTitle", &LuaProxy::World::levelTitle)
@@ -1187,7 +1191,7 @@ void CLunaLua::bindAll()
                 namespace_("Text")[
                     def("showMessageBox", &LuaProxy::Text::showMessageBox)
                 ],
-                
+
                 namespace_("Misc")[
                     def("npcToCoins", &LuaProxy::Misc::npcToCoins),
                     def("doPOW", &LuaProxy::Misc::doPOW),
@@ -1368,7 +1372,7 @@ void CLunaLua::bindAll()
                         def("spawn", &LuaProxy::Block::spawn),
                         def("_getBumpable", &LuaProxy::Block::_getBumpable),
                         def("_setBumpable", &LuaProxy::Block::_setBumpable),
-						def("_rawHitBlock", &LuaProxy::Block::_rawHitBlock)
+                        def("_rawHitBlock", &LuaProxy::Block::_rawHitBlock)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Block, m_index))
                 .def(constructor<int>())
@@ -1503,7 +1507,7 @@ void CLunaLua::bindAllDeprecated()
 
 void CLunaLua::doEvents()
 {
-	GLEngineProxy::CheckRendererInit();
+    GLEngineProxy::CheckRendererInit();
 
     //If the lua module is not valid anyway, then just return
     if(!isValid())
@@ -1513,7 +1517,7 @@ void CLunaLua::doEvents()
     if (!m_ready)
         return;
 
-    
+
     //If player is not valid then shutdown the lua module
     if(m_type == LUNALUA_LEVEL){
         if(!Player::Get(1)){
@@ -1530,7 +1534,7 @@ void CLunaLua::doEvents()
         onStartEvent->setDirectEventName("onStart");
         callEvent(onStartEvent);
         m_eventLoopOnceExecuted = true;
-    
+
         // If an error happened in onStart then return.
         if (!isValid())
             return;
@@ -1540,7 +1544,7 @@ void CLunaLua::doEvents()
     onLoopEvent->setLoopable(false);
     onLoopEvent->setDirectEventName("onLoop");
     callEvent(onLoopEvent);
-    
+
     callLuaFunction(L, "__doEventQueue");
 }
 
