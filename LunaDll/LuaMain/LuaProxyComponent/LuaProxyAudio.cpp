@@ -6,6 +6,7 @@
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
 #include "../../MciEmulator/mciEmulator.h"
+#include "../../SMBXInternal/PlayerMOB.h"
 
 #include "../../SMBXInternal/Level.h"
 
@@ -201,7 +202,10 @@ void LuaProxy::Audio::changeMusic(int section, const std::string &filename, int 
 
     // If the specified section's music is what's
     // currently playing, force the change in config to be picked up
-    if(section == GM_SEC_CURRENT_MUSIC)
+    if(
+        (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
+        (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
+    )
     {
         playMusic(section);
         if(fadeInDelayMs > 0)
@@ -221,7 +225,10 @@ void LuaProxy::Audio::changeMusic(int section, int musicId, int fadeInDelayMs)
 
     // If the specified section's music is what's
     // currently playing, force the change in config to be picked up
-    if(section == GM_SEC_CURRENT_MUSIC)
+    if(
+        (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
+        (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
+    )
     {
         if(fadeInDelayMs <= 0)
             playMusic(section);
