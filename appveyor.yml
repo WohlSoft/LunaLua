@@ -12,12 +12,9 @@
 
   clone_folder: C:\_Repos\LunaLUA
 
-  clone_script:
-  - cmd: >-
-      git clone -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
-      && cd %APPVEYOR_BUILD_FOLDER%
-      && git checkout -qf %APPVEYOR_REPO_COMMIT%
-      && git submodule update --init --recursive
+  install:
+  - cmd: git submodule init
+  - cmd: git submodule update
 
   build:
     project: LunaDll.sln
@@ -47,12 +44,9 @@
   clone_depth: 1
   clone_folder: C:\_Repos\LunaLUA
 
-  clone_script:
-  - cmd: >-
-      git clone -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
-      && cd %APPVEYOR_BUILD_FOLDER%
-      && git checkout -qf %APPVEYOR_REPO_COMMIT%
-      && git submodule update --init --recursive
+  install:
+  - cmd: git submodule init
+  - cmd: git submodule update
 
   build_script:
   - cmd: mkdir build-appveyor-vs2017
