@@ -35,7 +35,11 @@ namespace LuaProxy
         double  MusicGetLoopLength();
         void seizeStream(int section);
         void releaseStream(int section);
-        
+        void changeMusic(int section, const std::string &filename);
+        void changeMusic(int section, int musicId);
+        void changeMusic(int section, const std::string &filename, int fadeInDelayMs);
+        void changeMusic(int section, int musicId, int fadeInDelayMs);
+
         //SFX
         Mix_Chunk* newMix_Chunk();
         void clearSFXBuffer();
