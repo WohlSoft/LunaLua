@@ -249,6 +249,12 @@ void LuaProxy::Audio::changeMusic(int section, int musicId, int fadeInDelayMs)
     }
 }
 
+void LuaProxy::Audio::musicFadeOut(int section, int fadeInDelayMs)
+{
+    changeMusic(section, 0, fadeInDelayMs);
+}
+
+
 Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
 {
     return NULL;
@@ -630,4 +636,3 @@ void LuaProxy::Audio::PlayingSfxInstance::SetReverseStereo(bool flip)
     if (mFinished) return;
     Mix_SetReverseStereo(mChannel, flip ? 1 : 0);
 }
-
