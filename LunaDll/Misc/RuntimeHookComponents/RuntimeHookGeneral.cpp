@@ -131,9 +131,6 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--nogl"))
         gStartupSettings.noGL = true;
 
-    if (vecStrFind(args, L"--experimental-file-parser"))
-        gStartupSettings.experimentalFileParser = true;
-
     for (unsigned int i = 0; i < args.size(); i++)
     {
         const std::wstring& arg = args[i];
