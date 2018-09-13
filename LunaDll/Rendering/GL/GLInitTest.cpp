@@ -38,12 +38,12 @@ static HGLRC GetGLRCFromHDC(HDC dc) {
         if (NULL == rc) throw GLException("Couldn't create initial GL context");
         if (FALSE == wglMakeCurrent(dc, rc)) throw GLException("Couldn't make initial GL context current");
 
-		// Init binding for context
-		glbinding::Binding::useCurrentContext();
-		glcompat::SetupContext();
+        // Init binding for context
+        glbinding::Binding::useCurrentContext();
+        glcompat::SetupContext();
     }
     catch (const GLException &e) {
-		if (NULL != rc) glbinding::Binding::releaseCurrentContext();
+        if (NULL != rc) glbinding::Binding::releaseCurrentContext();
         if (NULL != rc) wglMakeCurrent(NULL, NULL);
         if (NULL != rc) wglDeleteContext(rc);
         throw e;
@@ -79,20 +79,20 @@ bool LunaDLLTestGLFeatures(void)
         // Get GL context
         rc = GetGLRCFromHDC(dc);
 
-		auto ext = glbinding::ContextInfo::extensions();
+        auto ext = glbinding::ContextInfo::extensions();
 
-		bool have_VERSION_1_1 = glbinding::ContextInfo::supported(glbinding::Version(1, 1));
-		bool have_VERSION_1_4 = glbinding::ContextInfo::supported(glbinding::Version(1, 4));
-		bool have_VERSION_3_0 = glbinding::ContextInfo::supported(glbinding::Version(3, 0));
+        bool have_VERSION_1_1 = glbinding::ContextInfo::supported(glbinding::Version(1, 1));
+        bool have_VERSION_1_4 = glbinding::ContextInfo::supported(glbinding::Version(1, 4));
+        bool have_VERSION_3_0 = glbinding::ContextInfo::supported(glbinding::Version(3, 0));
 
-		bool have_ARB_blend_minmax = have_VERSION_1_4;
-		bool have_EXT_blend_minmax = (ext.find(gl::GLextension::GL_EXT_blend_minmax) != ext.end());
+        bool have_ARB_blend_minmax = have_VERSION_1_4;
+        bool have_EXT_blend_minmax = (ext.find(gl::GLextension::GL_EXT_blend_minmax) != ext.end());
 
-		bool have_ARB_blend_func_separate = have_VERSION_1_4;
-		bool have_EXT_blend_func_separate = (ext.find(gl::GLextension::GL_EXT_blend_func_separate) != ext.end());
+        bool have_ARB_blend_func_separate = have_VERSION_1_4;
+        bool have_EXT_blend_func_separate = (ext.find(gl::GLextension::GL_EXT_blend_func_separate) != ext.end());
 
-		bool have_ARB_framebuffer_object = have_VERSION_3_0 || (ext.find(gl::GLextension::GL_ARB_framebuffer_object) != ext.end());
-		bool have_EXT_framebuffer_object = (ext.find(gl::GLextension::GL_EXT_framebuffer_object) != ext.end());
+        bool have_ARB_framebuffer_object = have_VERSION_3_0 || (ext.find(gl::GLextension::GL_ARB_framebuffer_object) != ext.end());
+        bool have_EXT_framebuffer_object = (ext.find(gl::GLextension::GL_EXT_framebuffer_object) != ext.end());
 
         // Test for optional OpenGL features we require
         if (!have_VERSION_1_1) {
@@ -113,7 +113,7 @@ bool LunaDLLTestGLFeatures(void)
         dbgboxA(("Using GDI renderer, so some advanced LunaDLL effects may not be present in some levels.\r\n\r\nCould not use OpenGL Renderer because:\r\n\t" + e.msg).c_str());
     }
 
-	if (NULL != rc) glbinding::Binding::releaseCurrentContext();
+    if (NULL != rc) glbinding::Binding::releaseCurrentContext();
     if (NULL != rc) wglMakeCurrent(NULL, NULL);
     if (NULL != rc) wglDeleteContext(rc);
     if (NULL != wnd && NULL != dc) ReleaseDC(wnd, dc);

@@ -145,7 +145,7 @@ extern int __stdcall LoadWorld()
     // entering levels...
     GLEngineProxy::CheckRendererInit();
 
-	LunaLoadScreenStart();
+    LunaLoadScreenStart();
 
     ResetLunaModule();
     gIsOverworld = true;
@@ -262,8 +262,8 @@ extern int __stdcall printLunaLuaVersion(HDC hdcDest, int nXDest, int nYDest, in
         episodeStarted = false;
     }
 
-	static std::string vStr = LUNALUA_VERSION;
-	std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
+    static std::string vStr = LUNALUA_VERSION;
+    std::transform(vStr.begin(), vStr.end(), vStr.begin(), ::toupper);
     RenderStringOp(LunaLua::EncodeUtils::Str2WStr(vStr), 3, 5, 5).Draw(&Renderer::Get());
     if (newDebugger)
     {
@@ -284,12 +284,12 @@ extern void* __stdcall WorldRender()
         gLunaLua.callEvent(inputEvent);
     }
 
-	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
-		inputEvent->setDirectEventName("onHUDDraw");
-		inputEvent->setLoopable(false);
-		gLunaLua.callEvent(inputEvent);
-	}
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
+        inputEvent->setDirectEventName("onHUDDraw");
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent);
+    }
 
     gSpriteMan.RunSprites();
     Renderer::Get().RenderBelowPriority(DBL_MAX);
@@ -656,8 +656,8 @@ extern BOOL __stdcall BitBltHook(
     // Only override if the BitBlt is for the screen
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
-		// Make sure we kill the loadscreen before vanilla rendering
-		LunaLoadScreenKill();
+        // Make sure we kill the loadscreen before vanilla rendering
+        LunaLoadScreenKill();
 
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
@@ -975,32 +975,32 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 
 static void __stdcall PostCameraUpdateHook(int cameraIdx)
 {
-	// This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-	Renderer::Get().StoreCameraPosition(cameraIdx);
+    // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
+    Renderer::Get().StoreCameraPosition(cameraIdx);
 
-	if (gLunaLua.isValid()) {
-		SMBX_CameraInfo cameraData;
-		SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
-		memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
+    if (gLunaLua.isValid()) {
+        SMBX_CameraInfo cameraData;
+        SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
+        memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
 
-		std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
-		cameraDrawEvent->setDirectEventName("onCameraDraw");
-		cameraDrawEvent->setLoopable(false);
-		gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
+        std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
+        cameraDrawEvent->setDirectEventName("onCameraDraw");
+        cameraDrawEvent->setLoopable(false);
+        gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
 
-		// Disallow changes to this camera's settings in onCameraDraw, for reasons.
-		memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
-	}
+        // Disallow changes to this camera's settings in onCameraDraw, for reasons.
+        memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
+    }
 }
 
 void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
 {
-	__asm {
-		POP EAX                          // POP the return address
-		PUSH DWORD PTR DS : [EBP - 0x38] // Sneak a camera index argument in there
-		PUSH EAX                         // PUSH the return address
-		JMP PostCameraUpdateHook         // JMP to PostCameraUpdateHook
-	};
+    __asm {
+        POP EAX                          // POP the return address
+        PUSH DWORD PTR DS : [EBP - 0x38] // Sneak a camera index argument in there
+        PUSH EAX                         // PUSH the return address
+        JMP PostCameraUpdateHook         // JMP to PostCameraUpdateHook
+    };
 }
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
@@ -1053,105 +1053,105 @@ extern void __stdcall GenerateScreenshotHook()
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	static BYTE keyState[256] = { 0 };
-	static WCHAR unicodeData[32] = { 0 };
+    static BYTE keyState[256] = { 0 };
+    static WCHAR unicodeData[32] = { 0 };
 
     if (nCode != 0){
         return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
     }
 
-	bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
-	bool altPressed = ((lParam & 0x20000000) == 0x20000000);
-	bool keyDown = ((lParam & 0x80000000) == 0x0);
-	bool keyUp = ((lParam & 0x80000000) == 0x80000000);
-	unsigned int virtKey = wParam;
-	unsigned int scanCode = (lParam >> 16) & 0xFF;
+    bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
+    bool altPressed = ((lParam & 0x20000000) == 0x20000000);
+    bool keyDown = ((lParam & 0x80000000) == 0x0);
+    bool keyUp = ((lParam & 0x80000000) == 0x80000000);
+    unsigned int virtKey = wParam;
+    unsigned int scanCode = (lParam >> 16) & 0xFF;
 
-	if (virtKey < 256)
-	{
-		keyState[virtKey] = keyDown ? 0x80 : 0x00;
-		if (virtKey == VK_CAPITAL)
-		{
-			keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
-		}
-	}
-	
-	bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
-	bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+    if (virtKey < 256)
+    {
+        keyState[virtKey] = keyDown ? 0x80 : 0x00;
+        if (virtKey == VK_CAPITAL)
+        {
+            keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+        }
+    }
+    
+    bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
+    bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
-	if (keyDown) {
-		if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
-			std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+    if (keyDown) {
+        if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
-			int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
-			if (unicodeRet > 0)
-			{
-				std::wstring wStr(unicodeData, unicodeRet);
-				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, LunaLua::EncodeUtils::WStr2Str(wStr));
-			}
-			else
-			{
-				gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
-			}
-		}
+            int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
+            if (unicodeRet > 0)
+            {
+                std::wstring wStr(unicodeData, unicodeRet);
+                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, LunaLua::EncodeUtils::WStr2Str(wStr));
+            }
+            else
+            {
+                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+            }
+        }
 
-		if (virtKey == VK_F12)
-		{
-			if (plainPress && g_GLEngine.IsEnabled())
-			{
-				short screenshotSoundID = 12;
-				native_playSFX(&screenshotSoundID);
-				g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-					std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
-					if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-						CreateDirectoryW(screenshotPath.c_str(), NULL);
-					}
-					screenshotPath += L"\\";
-					screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+        if (virtKey == VK_F12)
+        {
+            if (plainPress && g_GLEngine.IsEnabled())
+            {
+                short screenshotSoundID = 12;
+                native_playSFX(&screenshotSoundID);
+                g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+                    std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+                    if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+                        CreateDirectoryW(screenshotPath.c_str(), NULL);
+                    }
+                    screenshotPath += L"\\";
+                    screenshotPath += LunaLua::EncodeUtils::Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
 
-					::GenerateScreenshot(screenshotPath, *header, pData);
-					return true;
-				});
-			}
-			return 1;
-		}
-		if (virtKey == VK_F11)
-		{
-			if (plainPress && g_GLEngine.IsEnabled())
-			{
-				short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
-				native_playSFX(&gifRecSoundID);
-			}
-			return 1;
-		}
-		if ((virtKey == VK_F4) && !altPressed)
-		{
-			if (plainPress && g_GLEngine.IsEnabled())
-			{
-				gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
-				gGeneralConfig.save();
-			}
-			return 1;
-		}
-	} // keyDown
+                    ::GenerateScreenshot(screenshotPath, *header, pData);
+                    return true;
+                });
+            }
+            return 1;
+        }
+        if (virtKey == VK_F11)
+        {
+            if (plainPress && g_GLEngine.IsEnabled())
+            {
+                short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+                native_playSFX(&gifRecSoundID);
+            }
+            return 1;
+        }
+        if ((virtKey == VK_F4) && !altPressed)
+        {
+            if (plainPress && g_GLEngine.IsEnabled())
+            {
+                gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+                gGeneralConfig.save();
+            }
+            return 1;
+        }
+    } // keyDown
 
-	// Hook print screen key
-	if (virtKey == VK_SNAPSHOT)
-	{
-		if (g_GLEngine.IsEnabled())
-		{
-			g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-				GlobalUnlock(&globalMem);
-				// Write to clipboard
-				OpenClipboard(curHwnd);
-				EmptyClipboard();
-				SetClipboardData(CF_DIB, globalMem);
-				CloseClipboard();
-				return false;
-			});
-		}
-		return 1;
-	}
+    // Hook print screen key
+    if (virtKey == VK_SNAPSHOT)
+    {
+        if (g_GLEngine.IsEnabled())
+        {
+            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+                GlobalUnlock(&globalMem);
+                // Write to clipboard
+                OpenClipboard(curHwnd);
+                EmptyClipboard();
+                SetClipboardData(CF_DIB, globalMem);
+                CloseClipboard();
+                return false;
+            });
+        }
+        return 1;
+    }
 
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
@@ -1172,17 +1172,17 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
 {
     __asm {
         PUSHF
-		SUB ESP, 2
+        SUB ESP, 2
         PUSH EAX
         PUSH DWORD PTR DS : [EBP + 0xC] // objType
         PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
         CALL IsNPCCollidesWithVeggiHook
         MOV DX, AX
-		XOR ECX, ECX
+        XOR ECX, ECX
         POP EAX
-		ADD ESP, 2
+        ADD ESP, 2
         POPF
-		CMP DX, CX
+        CMP DX, CX
         RET
     }
 }
@@ -1207,7 +1207,7 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
-	LunaLoadScreenKill();
+    LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
@@ -1230,7 +1230,7 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
-	LunaLoadScreenKill();
+    LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
@@ -1375,10 +1375,10 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
 
 static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)
 {
-	if ((npc == nullptr) || (harmType == nullptr) || (otherIdx == nullptr))
-	{
-		return 0;
-	}
+    if ((npc == nullptr) || (harmType == nullptr) || (otherIdx == nullptr))
+    {
+        return 0;
+    }
 
     if (NPC::GetVulnerableHarmTypes(npc->id) & (1UL << *harmType))
     {
@@ -1540,7 +1540,7 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
         jne alternate_exit
         push 0xA0BA20
         ret
-	alternate_exit :
+    alternate_exit :
         push 0xA0C5AA
         ret
     }
@@ -1548,42 +1548,42 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
 
 static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
 {
-	NPCMOB* npc = NPC::GetRaw(npcIdx);
-	if (npc != nullptr)
-	{
-		return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
-	}
-	return 0;
+    NPCMOB* npc = NPC::GetRaw(npcIdx);
+    if (npc != nullptr)
+    {
+        return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
+    }
+    return 0;
 }
 
 _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
 {
-	__asm {
-		je harmlessRet
+    __asm {
+        je harmlessRet
 
-		push eax
-		push ecx
-		push edx
+        push eax
+        push ecx
+        push edx
 
-		movsx eax, word ptr ds:[ebp-0x180]
-		push eax // Arg #1
-		call runtimeHookNPCHarmlessThrown
-		cmp eax, 0
-		jne harmlessRestoreRet
-		
-		pop edx
-		pop ecx
-		pop eax
-		push 0xA181B3
-		ret
-	harmlessRestoreRet:
-		pop edx
-		pop ecx
-		pop eax
-	harmlessRet:
-		push 0xA1BAD5
-		ret
-	}
+        movsx eax, word ptr ds:[ebp-0x180]
+        push eax // Arg #1
+        call runtimeHookNPCHarmlessThrown
+        cmp eax, 0
+        jne harmlessRestoreRet
+        
+        pop edx
+        pop ecx
+        pop eax
+        push 0xA181B3
+        ret
+    harmlessRestoreRet:
+        pop edx
+        pop ecx
+        pop eax
+    harmlessRet:
+        push 0xA1BAD5
+        ret
+    }
 }
 
 static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
@@ -1783,199 +1783,199 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
 
 static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
-	__asm {
-		PUSH EBP
-		MOV EBP, ESP
-		SUB ESP, 0x8
-		PUSH 0x9DA626
-		RET
-	}
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x9DA626
+        RET
+    }
 }
 
 void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
-	bool isCancelled = false;
+    bool isCancelled = false;
 
-	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onBlockHit", true);
-		blockHitEvent->setDirectEventName("onBlockHit");
-		blockHitEvent->setLoopable(false);
-		gLunaLua.callEvent(blockHitEvent, *blockIndex, *fromUpSide != 0, *playerIdx);
-		isCancelled = blockHitEvent->native_cancelled();
-	}
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onBlockHit", true);
+        blockHitEvent->setDirectEventName("onBlockHit");
+        blockHitEvent->setLoopable(false);
+        gLunaLua.callEvent(blockHitEvent, *blockIndex, *fromUpSide != 0, *playerIdx);
+        isCancelled = blockHitEvent->native_cancelled();
+    }
 
-	if (!isCancelled)
-	{
-		hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
-	}
+    if (!isCancelled)
+    {
+        hitBlock_OrigFunc(blockIndex, fromUpSide, playerIdx);
+    }
 }
 
 static void __stdcall runtimeHookColorSwitch(unsigned int color)
 {
-	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", false);
-		blockHitEvent->setDirectEventName("onColorSwitch");
-		blockHitEvent->setLoopable(false);
-		gLunaLua.callEvent(blockHitEvent, color);
-	}
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> blockHitEvent = std::make_shared<Event>("onColorSwitch", false);
+        blockHitEvent->setDirectEventName("onColorSwitch");
+        blockHitEvent->setLoopable(false);
+        gLunaLua.callEvent(blockHitEvent, color);
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 4 // RED
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0xA32558
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 4 // RED
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0xA32558
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 3 // GREEN
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0xA32558
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 3 // GREEN
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0xA32558
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 2 // BLUE
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0xA32558
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 2 // BLUE
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0xA32558
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 1 // YELLOW
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0xA32558
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 1 // YELLOW
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0xA32558
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 1 // YELLOW
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0x9DB424
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 1 // YELLOW
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0x9DB424
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 2 // BLUE
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0x9DB5BF
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 2 // BLUE
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0x9DB5BF
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 3 // GREEN
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0x9DB75F
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 3 // GREEN
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0x9DB75F
+        ret
+    }
 }
 
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
 {
-	__asm {
-		pushf
-		sub esp, 2
-		push eax
-		push ecx
-		push edx
-		push 4 // RED
-		call runtimeHookColorSwitch
-		pop edx
-		pop ecx
-		pop eax
-		add esp, 2
-		popf
-		push 0x9DB8FA
-		ret
-	}
+    __asm {
+        pushf
+        sub esp, 2
+        push eax
+        push ecx
+        push edx
+        push 4 // RED
+        call runtimeHookColorSwitch
+        pop edx
+        pop ecx
+        pop eax
+        add esp, 2
+        popf
+        push 0x9DB8FA
+        ret
+    }
 }

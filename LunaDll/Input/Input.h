@@ -6,30 +6,30 @@
 
 namespace Input {
 
-	void CheckSpecialCheats();
+    void CheckSpecialCheats();
 
-	void UpdateInputTasks();
+    void UpdateInputTasks();
 
-	void ResetTaps();
-	void ResetAll();
-	void UpdateKeyRecords(PlayerMOB* player);
+    void ResetTaps();
+    void ResetAll();
+    void UpdateKeyRecords(PlayerMOB* player);
 
-	std::wstring GetInputStringCopy();
-	void ClearInputStringBuffer();
+    std::wstring GetInputStringCopy();
+    void ClearInputStringBuffer();
 
-	bool PressingUp();
-	bool PressingDown(); 
-	bool PressingLeft(); 
-	bool PressingRight(); 
-	bool PressingRun(); 
-	bool PressingJump();
+    bool PressingUp();
+    bool PressingDown(); 
+    bool PressingLeft(); 
+    bool PressingRight(); 
+    bool PressingRun(); 
+    bool PressingJump();
 
-	bool UpThisFrame(); 
-	bool DownThisFrame(); 
-	bool LeftThisFrame();
-	bool RightThisFrame(); 
-	bool RunThisFrame(); 
-	bool JumpThisFrame(); 
+    bool UpThisFrame(); 
+    bool DownThisFrame(); 
+    bool LeftThisFrame();
+    bool RightThisFrame(); 
+    bool RunThisFrame(); 
+    bool JumpThisFrame(); 
 }
 
 #endif

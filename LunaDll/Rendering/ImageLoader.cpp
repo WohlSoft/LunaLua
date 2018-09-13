@@ -49,46 +49,46 @@ static void resolveImageResource(
     bool mainIsGif;
     {
         ResourceFileInfo resource;
-		bool gotImg = false;
+        bool gotImg = false;
         auto it = levelFiles.find(pngName);
-		gotImg = (it != levelFiles.end());
-		if (!gotImg)
-		{
-			it = levelFiles.find(gifName);
-			gotImg = (it != levelFiles.end());
-		}
-		if (!gotImg)
-		{
-			it = episodeFiles.find(pngName);
-			gotImg = (it != episodeFiles.end());
-		}
-		if (!gotImg)
-		{
-			it = episodeFiles.find(gifName);
-			gotImg = (it != episodeFiles.end());
-		}
+        gotImg = (it != levelFiles.end());
+        if (!gotImg)
+        {
+            it = levelFiles.find(gifName);
+            gotImg = (it != levelFiles.end());
+        }
+        if (!gotImg)
+        {
+            it = episodeFiles.find(pngName);
+            gotImg = (it != episodeFiles.end());
+        }
+        if (!gotImg)
+        {
+            it = episodeFiles.find(gifName);
+            gotImg = (it != episodeFiles.end());
+        }
 
-		if (gotImg)
-		{
-			resource = it->second;
-		}
-		else
-		{
-			if (episodeGfxTypeDir.length() > 0)
-			{
-				if (resource.path.length() == 0)
-					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
-				if (resource.path.length() == 0)
-					resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
-			}
-			if (appGfxTypeDir.length() > 0)
-			{
-				if (resource.path.length() == 0)
-					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
-				if (resource.path.length() == 0)
-					resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
-			}
-		}
+        if (gotImg)
+        {
+            resource = it->second;
+        }
+        else
+        {
+            if (episodeGfxTypeDir.length() > 0)
+            {
+                if (resource.path.length() == 0)
+                    resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+                if (resource.path.length() == 0)
+                    resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
+            }
+            if (appGfxTypeDir.length() > 0)
+            {
+                if (resource.path.length() == 0)
+                    resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+                if (resource.path.length() == 0)
+                    resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
+            }
+        }
 
         mainIsGif = (resource.extension == L"gif");
         if (resource.path.length() > 0)
@@ -101,46 +101,46 @@ static void resolveImageResource(
     {
         std::wstring maskName = fileRoot + L"m.gif";
         ResourceFileInfo maskResource;
-		bool gotImg = false;
-		auto it = levelFiles.find(maskName);
-		gotImg = (it != levelFiles.end());
-		if (!gotImg)
-		{
-			it = levelFiles.find(pngName);
-			gotImg = (it != levelFiles.end());
-		}
-		if (!gotImg)
-		{
-			it = episodeFiles.find(maskName);
-			gotImg = (it != episodeFiles.end());
-		}
-		if (!gotImg)
-		{
-			it = episodeFiles.find(pngName);
-			gotImg = (it != episodeFiles.end());
-		}
+        bool gotImg = false;
+        auto it = levelFiles.find(maskName);
+        gotImg = (it != levelFiles.end());
+        if (!gotImg)
+        {
+            it = levelFiles.find(pngName);
+            gotImg = (it != levelFiles.end());
+        }
+        if (!gotImg)
+        {
+            it = episodeFiles.find(maskName);
+            gotImg = (it != episodeFiles.end());
+        }
+        if (!gotImg)
+        {
+            it = episodeFiles.find(pngName);
+            gotImg = (it != episodeFiles.end());
+        }
 
-		if (gotImg)
-		{
-			maskResource = it->second;
-		}
-		else
-		{
-			if (episodeGfxTypeDir.length() > 0)
-			{
-				if (maskResource.path.length() == 0)
-					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
-				if (maskResource.path.length() == 0)
-					maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
-			}
-			if (appGfxTypeDir.length() > 0)
-			{
-				if (maskResource.path.length() == 0)
-					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
-				if (maskResource.path.length() == 0)
-					maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
-			}
-		}
+        if (gotImg)
+        {
+            maskResource = it->second;
+        }
+        else
+        {
+            if (episodeGfxTypeDir.length() > 0)
+            {
+                if (maskResource.path.length() == 0)
+                    maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
+                if (maskResource.path.length() == 0)
+                    maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+            }
+            if (appGfxTypeDir.length() > 0)
+            {
+                if (maskResource.path.length() == 0)
+                    maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
+                if (maskResource.path.length() == 0)
+                    maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+            }
+        }
         if (maskResource.path.length() > 0) {
             outData[fileRoot + L"m"] = std::move(maskResource);
         }
@@ -257,7 +257,7 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 {
                     if (width < maskImg->getW()) width = maskImg->getW();
                     if (height < maskImg->getH()) height = maskImg->getH();
-					mainImg->tryMaskToRGBA();
+                    mainImg->tryMaskToRGBA();
                 }
             }
 

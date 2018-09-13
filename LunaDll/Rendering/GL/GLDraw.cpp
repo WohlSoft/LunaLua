@@ -132,12 +132,12 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
         x2, y2, 0,
         x1, y2, 0
     };
-	GLfloat TexCoord[] = {
-		0, 0,
-		0, 0,
-		0, 0,
-		0, 0
-	};
+    GLfloat TexCoord[] = {
+        0, 0,
+        0, 0,
+        0, 0,
+        0, 0
+    };
     GLubyte indices[] = {
         0, 1, 2, // (bottom left - top left - top right)
         0, 2, 3  // (bottom left - top right - bottom right)
@@ -147,8 +147,8 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
     // TODO: Crashes
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     GLERRORCHECK();
-	glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
-	GLERRORCHECK();
+    glTexCoordPointer(2, GL_FLOAT, 0, TexCoord);
+    GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
     GLERRORCHECK();
 

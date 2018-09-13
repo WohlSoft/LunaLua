@@ -56,12 +56,12 @@ namespace LunaLua::EncodeUtils::detail {
 
         std::basic_string<OutStrElem, OutStrTraits, OutStrAlloc> output(input.length() * max_widen, '\x0');
         
-		// When the input is empty, we can just return right away... and we need to,
-		// since failure of Convert is detected by 0 being returned.
-		if (input.length() == 0)
-		{
-			return output;
-		}
+        // When the input is empty, we can just return right away... and we need to,
+        // since failure of Convert is detected by 0 being returned.
+        if (input.length() == 0)
+        {
+            return output;
+        }
 
         // TODO: Use Constexpr If, when msvc support it
         int newlen = GenericConvert<OutStrElem>::Convert(ConversionType, 0, input.data(), input.length(), &output[0], output.length());

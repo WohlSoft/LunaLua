@@ -168,18 +168,18 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
     
-	if (sprite != nullptr)
-	{
-		sprite->BindTexture();
-	}
-	else if (tex != nullptr)
-	{
-		g_GLDraw.BindTexture(tex);
-	}
-	else
-	{
-		g_GLDraw.UnbindTexture();
-	}
+    if (sprite != nullptr)
+    {
+        sprite->BindTexture();
+    }
+    else if (tex != nullptr)
+    {
+        g_GLDraw.BindTexture(tex);
+    }
+    else
+    {
+        g_GLDraw.UnbindTexture();
+    }
 
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
@@ -195,23 +195,23 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     // For scene coordinates, translate appropriately
-	if (mSceneCoords) {
-		double cameraX, cameraY;
-		glEngine.GetCamera(cameraX, cameraY);
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
+    if (mSceneCoords) {
+        double cameraX, cameraY;
+        glEngine.GetCamera(cameraX, cameraY);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
 
-		if ((mType == GL_LINE) || (mType == GL_LINES) || (mType == GL_LINE_LOOP) || (mType == GL_LINE_STRIP)) {
-			glTranslatef(static_cast<GLfloat>(-cameraX - 0.325), static_cast<GLfloat>(-cameraY - 0.325), 0.0f);
-		} else {
-			glTranslatef(static_cast<GLfloat>(-cameraX), static_cast<GLfloat>(-cameraY), 0.0f);
-		}
+        if ((mType == GL_LINE) || (mType == GL_LINES) || (mType == GL_LINE_LOOP) || (mType == GL_LINE_STRIP)) {
+            glTranslatef(static_cast<GLfloat>(-cameraX - 0.325), static_cast<GLfloat>(-cameraY - 0.325), 0.0f);
+        } else {
+            glTranslatef(static_cast<GLfloat>(-cameraX), static_cast<GLfloat>(-cameraY), 0.0f);
+        }
         
     }
 
     // If depth testing is enabled, use it
     if (mDepthTest) {
-		// Actually, there's nothing that needs to be done for this... it's all in the shader
+        // Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     glVertexPointer(2, GL_FLOAT, 0, mVert);
@@ -245,7 +245,7 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mDepthTest) {
-		// Actually, there's nothing that needs to be done for this... it's all in the shader
+        // Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
     if (mSceneCoords) {

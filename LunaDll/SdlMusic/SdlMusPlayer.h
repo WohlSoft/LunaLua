@@ -70,19 +70,19 @@ public:
     static void setMuteForAlias(const std::string& alias, bool muted);
     static bool getMuteForAlias(const std::string& alias);
 public:
-	static uint32_t GetMemUsage();
+    static uint32_t GetMemUsage();
 private:
     struct ChunkOverrideSettings {
         Mix_Chunk* chunk;
         bool muted;
     };
-	static std::map<std::string, Mix_Chunk* > chunksBuffer;
+    static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static Mix_Chunk *sound;
     static char *current;
     static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;
 public:
-	static uint32_t memUsage;
+    static uint32_t memUsage;
 };
 
 #endif

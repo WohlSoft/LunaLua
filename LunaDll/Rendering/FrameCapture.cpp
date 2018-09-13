@@ -13,7 +13,7 @@ public:
     std::shared_ptr<CaptureBuffer> mBuff;
     virtual void run(GLEngine& glEngine) const
     {
-		if (!g_GLContextManager.IsInitialized()) return;
+        if (!g_GLContextManager.IsInitialized()) return;
 
         // Create framebuffer if not yet existing
         mBuff->EnsureFramebufferExists();
@@ -33,13 +33,13 @@ public:
         }
     }
 
-	virtual bool allowFrameSkippability(void) const {
-		return !mBuff->mNonskippable;
-	}
+    virtual bool allowFrameSkippability(void) const {
+        return !mBuff->mNonskippable;
+    }
 
-	virtual bool isSkippable(void) const {
-		return !mBuff->mNonskippable;
-	}
+    virtual bool isSkippable(void) const {
+        return !mBuff->mNonskippable;
+    }
 };
 
 class GLEngineCmd_ClearCaptureBuffer : public GLEngineCmd {
@@ -47,7 +47,7 @@ public:
     std::shared_ptr<CaptureBuffer> mBuff;
     virtual void run(GLEngine& glEngine) const
     {
-		if (!g_GLContextManager.IsInitialized()) return;
+        if (!g_GLContextManager.IsInitialized()) return;
 
         if (mBuff->mFramebuffer != nullptr)
         {
@@ -56,9 +56,9 @@ public:
         }
     }
 
-	virtual bool isSkippable(void) const {
-		return !mBuff->mNonskippable;
-	}
+    virtual bool isSkippable(void) const {
+        return !mBuff->mNonskippable;
+    }
 };
 
 class GLEngineCmd_DeleteCaptureBuffer : public GLEngineCmd {
@@ -69,9 +69,9 @@ public:
         delete mFb;
     }
 
-	virtual bool isSkippable(void) const {
-		return false;
-	}
+    virtual bool isSkippable(void) const {
+        return false;
+    }
 };
 
 CaptureBuffer::CaptureBuffer(int w, int h, bool nonskippable) :

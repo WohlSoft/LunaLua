@@ -17,8 +17,8 @@ public:
 
 private:
     // Framebuffer variables
-	gl::GLuint mFB;
-	gl::GLuint mDepthRB;
+    gl::GLuint mFB;
+    gl::GLuint mDepthRB;
     GLDraw::Texture mBufTex;
 };
 

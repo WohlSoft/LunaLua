@@ -36,7 +36,7 @@ static_assert(sizeof(WorldLevel) == 0x64, "sizeof(WorldLevel) must be 0x64");
 #endif
 
 namespace SMBXLevel{
-	WorldLevel* get(int index);
+    WorldLevel* get(int index);
 }
 
 #endif

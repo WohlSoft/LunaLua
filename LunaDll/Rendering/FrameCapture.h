@@ -15,7 +15,7 @@ public:
     void EnsureFramebufferExists();
 public:
     int mW, mH;
-	bool mNonskippable;
+    bool mNonskippable;
     GLFramebuffer* mFramebuffer;
 };
 

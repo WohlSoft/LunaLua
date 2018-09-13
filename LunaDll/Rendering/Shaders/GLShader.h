@@ -15,7 +15,7 @@ private:
     static bool compileShaderSource(gl::GLuint shaderID, const std::string& source);
     static std::string getLastShaderError(gl::GLuint shaderID);
 
-	gl::GLuint m_shaderID;
+    gl::GLuint m_shaderID;
     std::string m_name;
     std::string m_vertexSource;
     std::string m_fragmentSource;
@@ -58,8 +58,8 @@ private:
     {
         std::vector<VariableInfoT> results;
 
-		gl::GLint count = 0;
-		gl::glGetProgramiv(m_shaderID, programVariableType, &count);
+        gl::GLint count = 0;
+        gl::glGetProgramiv(m_shaderID, programVariableType, &count);
         GLERRORCHECK();
 
         results.reserve(count);
@@ -68,9 +68,9 @@ private:
         {
             constexpr static const gl::GLsizei MAX_LENGTH_NAME = 512;
             // GLint id, GLint sizeOfVariable, GLint type, const std::string& name
-			gl::GLsizei lengthOfName = 0;
-			gl::GLint sizeOfVariable = 0;
-			gl::GLenum variableType = static_cast<gl::GLenum>(0);
+            gl::GLsizei lengthOfName = 0;
+            gl::GLint sizeOfVariable = 0;
+            gl::GLenum variableType = static_cast<gl::GLenum>(0);
             std::string nameBuffer(MAX_LENGTH_NAME, ' ');
 
             // Get variable propertiess

@@ -14,8 +14,8 @@ struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 100, GM_LAYER_ARRAY
     short       isHidden;       // 0x08
     short       unknown;        // 0x0A
 
-	float		xSpeed;         // 0x0C
-	float		ySpeed;         // 0x10
+    float		xSpeed;         // 0x0C
+    float		ySpeed;         // 0x10
 };
 #pragma pack(pop)
 
@@ -26,13 +26,13 @@ static_assert(sizeof(LayerControl) == 0x14, "sizeof(LayerControl) must be 0x14")
 
 namespace Layer{
 
-	/// Functions ///
-	LayerControl* Get(int LayerIndex);
+    /// Functions ///
+    LayerControl* Get(int LayerIndex);
 
-	void Stop(LayerControl* layercontrol);
+    void Stop(LayerControl* layercontrol);
 
-	void SetXSpeed(LayerControl* layercontrol, float xSpeed);
-	void SetYSpeed(LayerControl* layercontrol, float ySpeed);
+    void SetXSpeed(LayerControl* layercontrol, float xSpeed);
+    void SetYSpeed(LayerControl* layercontrol, float ySpeed);
 }
 
 #endif

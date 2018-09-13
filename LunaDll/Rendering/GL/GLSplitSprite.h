@@ -16,7 +16,7 @@ public:
             return maxTextureSize;
         }
         maxTextureSize = 0;
-		gl::glGetIntegerv(gl::GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+        gl::glGetIntegerv(gl::GL_MAX_TEXTURE_SIZE, &maxTextureSize);
         GLERRORCHECK();
         if (maxTextureSize <= 0) maxTextureSize = 1024;
         return maxTextureSize;
@@ -33,7 +33,7 @@ public:
         return 0;
     }
     virtual bool IsValid() const { return valid; }
-	virtual uint32_t GetSizeBytes() const;
+    virtual uint32_t GetSizeBytes() const;
 private:
     bool valid;
     int32_t segsWide;

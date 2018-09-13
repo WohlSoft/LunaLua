@@ -7,27 +7,27 @@
 #include <ios>
 
 namespace glcompat {
-	enum GLCompatContext {
-		TEST_CONTEXT = 0,
-		RENDER_THREAD_CONTEXT,
+    enum GLCompatContext {
+        TEST_CONTEXT = 0,
+        RENDER_THREAD_CONTEXT,
 
-		CONTEXT_COUNT
-	};
+        CONTEXT_COUNT
+    };
 
-	bool SetupContext();
+    bool SetupContext();
 
-	extern thread_local void (*glGenFramebuffersANY)(gl::GLsizei n, gl::GLuint *ids);
-	extern thread_local void (*glBindFramebufferANY)(gl::GLenum target, gl::GLuint framebuffer);
-	extern thread_local void (*glGenRenderbuffersANY)(gl::GLsizei n, gl::GLuint *renderbuffers);
-	extern thread_local void (*glBindRenderbufferANY)(gl::GLenum target, gl::GLuint renderbuffer);
-	extern thread_local void (*glRenderbufferStorageANY)(gl::GLenum target, gl::GLenum internalformat, gl::GLsizei width, gl::GLsizei height);
-	extern thread_local void (*glFramebufferRenderbufferANY)(gl::GLenum target, gl::GLenum attachment, gl::GLenum renderbuffertarget, gl::GLuint renderbuffer);
-	extern thread_local void (*glFramebufferTexture2DANY)(gl::GLenum target, gl::GLenum attachment, gl::GLenum textarget, gl::GLuint texture, gl::GLint level);
-	extern thread_local gl::GLenum (*glCheckFramebufferStatusANY)(gl::GLenum target);
-	extern thread_local void (*glDeleteFramebuffersANY)(gl::GLsizei n, const gl::GLuint *framebuffers);
-	extern thread_local void (*glDeleteRenderbuffersANY)(gl::GLsizei n, const gl::GLuint *renderbuffers);
-	extern thread_local void (*glBlendFuncSeparateANY)(gl::GLenum srcRGB, gl::GLenum dstRGB, gl::GLenum srcAlpha, gl::GLenum dstAlpha);
-	extern thread_local void (*glBlendEquationANY)(gl::GLenum mode);
+    extern thread_local void (*glGenFramebuffersANY)(gl::GLsizei n, gl::GLuint *ids);
+    extern thread_local void (*glBindFramebufferANY)(gl::GLenum target, gl::GLuint framebuffer);
+    extern thread_local void (*glGenRenderbuffersANY)(gl::GLsizei n, gl::GLuint *renderbuffers);
+    extern thread_local void (*glBindRenderbufferANY)(gl::GLenum target, gl::GLuint renderbuffer);
+    extern thread_local void (*glRenderbufferStorageANY)(gl::GLenum target, gl::GLenum internalformat, gl::GLsizei width, gl::GLsizei height);
+    extern thread_local void (*glFramebufferRenderbufferANY)(gl::GLenum target, gl::GLenum attachment, gl::GLenum renderbuffertarget, gl::GLuint renderbuffer);
+    extern thread_local void (*glFramebufferTexture2DANY)(gl::GLenum target, gl::GLenum attachment, gl::GLenum textarget, gl::GLuint texture, gl::GLint level);
+    extern thread_local gl::GLenum (*glCheckFramebufferStatusANY)(gl::GLenum target);
+    extern thread_local void (*glDeleteFramebuffersANY)(gl::GLsizei n, const gl::GLuint *framebuffers);
+    extern thread_local void (*glDeleteRenderbuffersANY)(gl::GLsizei n, const gl::GLuint *renderbuffers);
+    extern thread_local void (*glBlendFuncSeparateANY)(gl::GLenum srcRGB, gl::GLenum dstRGB, gl::GLenum srcAlpha, gl::GLenum dstAlpha);
+    extern thread_local void (*glBlendEquationANY)(gl::GLenum mode);
 }
 
 ////////////////////////
@@ -69,7 +69,7 @@ static inline void _GLErrorMsgArgs(std::wostringstream& errMsg, X&& arg, Ts&&...
 // Error checking function
 template <typename... Ts>
 static inline void _GLErrorCheck(const char* fn, int line, const char* func, Ts... otherArgs) {
-	gl::GLenum err = gl::glGetError();
+    gl::GLenum err = gl::glGetError();
     if (err != gl::GL_NO_ERROR) {
         std::wostringstream errMsg;
 

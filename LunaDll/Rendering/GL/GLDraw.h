@@ -9,13 +9,13 @@
 
 class GLDraw {
 private:
-	gl::GLuint mLastTexName;
+    gl::GLuint mLastTexName;
 public:
     float mLastPwScale;
     float mLastPhScale;
 public:
     struct Texture {
-		gl::GLuint name;
+        gl::GLuint name;
         int32_t w;
         int32_t h;
         int32_t pw; // Padded width
@@ -62,39 +62,39 @@ public:
 public:
     GLDraw();
 
-	inline void BindTexture(const Texture* tex) {
-		gl::GLuint textName = tex ? tex->name : 0;
-		if (textName == 0)
-		{
-			UnbindTexture();
-			gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
-		}
-		else
-		{
-			gl::GLuint textName = tex ? tex->name : 0;
-			if (mLastTexName != textName)
-			{
-				mLastPwScale = tex->pwScale;
-				mLastPhScale = tex->phScale;
-				if (mLastTexName == 0)
-				{
-					gl::glEnable(gl::GL_TEXTURE_2D);
-				}
-				gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
-				GLERRORCHECK();
-				mLastTexName = textName;
-			}
-			gl::glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			GLERRORCHECK();
-		}
+    inline void BindTexture(const Texture* tex) {
+        gl::GLuint textName = tex ? tex->name : 0;
+        if (textName == 0)
+        {
+            UnbindTexture();
+            gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
+        }
+        else
+        {
+            gl::GLuint textName = tex ? tex->name : 0;
+            if (mLastTexName != textName)
+            {
+                mLastPwScale = tex->pwScale;
+                mLastPhScale = tex->phScale;
+                if (mLastTexName == 0)
+                {
+                    gl::glEnable(gl::GL_TEXTURE_2D);
+                }
+                gl::glBindTexture(gl::GL_TEXTURE_2D, textName);
+                GLERRORCHECK();
+                mLastTexName = textName;
+            }
+            gl::glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GLERRORCHECK();
+        }
     }
     inline void UnbindTexture() {
         if (mLastTexName == 0) return;
         mLastTexName = 0;
         mLastPwScale = 1.0f;
         mLastPhScale = 1.0f;
-		gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
-		gl::glDisable(gl::GL_TEXTURE_2D);
+        gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
+        gl::glDisable(gl::GL_TEXTURE_2D);
         GLERRORCHECK();
     }
     inline gl::GLuint GetCurrentTexName()

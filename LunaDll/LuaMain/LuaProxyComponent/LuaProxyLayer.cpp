@@ -50,7 +50,7 @@ luabind::object LuaProxy::Layer::find(const std::string& layerName, lua_State* L
 
 LuaProxy::Layer::Layer(int layerIndex)
 {
-	m_layerIndex = layerIndex;
+    m_layerIndex = layerIndex;
 }
 
 int LuaProxy::Layer::idx() const
@@ -60,32 +60,32 @@ int LuaProxy::Layer::idx() const
 
 std::string LuaProxy::Layer::layerName() const
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	return thislayer->ptLayerName;
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return thislayer->ptLayerName;
 }
 
 float LuaProxy::Layer::speedX() const
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	return (thislayer->xSpeed == 0.0001f ? 0 : thislayer->xSpeed);
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return (thislayer->xSpeed == 0.0001f ? 0 : thislayer->xSpeed);
 }
 
 void LuaProxy::Layer::setSpeedX(float speedX)
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	::Layer::SetXSpeed(thislayer, speedX);
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::SetXSpeed(thislayer, speedX);
 }
 
 float LuaProxy::Layer::speedY() const
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	return (thislayer->ySpeed == 0.0001f ? 0 : thislayer->ySpeed);
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    return (thislayer->ySpeed == 0.0001f ? 0 : thislayer->ySpeed);
 }
 
 void LuaProxy::Layer::setSpeedY(float speedY)
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	::Layer::SetYSpeed(thislayer, speedY);
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::SetYSpeed(thislayer, speedY);
 }
 
 bool LuaProxy::Layer::isHidden()
@@ -96,8 +96,8 @@ bool LuaProxy::Layer::isHidden()
 
 void LuaProxy::Layer::stop()
 {
-	LayerControl* thislayer = ::Layer::Get(m_layerIndex);
-	::Layer::Stop(thislayer);
+    LayerControl* thislayer = ::Layer::Get(m_layerIndex);
+    ::Layer::Stop(thislayer);
 }
 
 void LuaProxy::Layer::show(bool noSmoke)

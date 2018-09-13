@@ -14,36 +14,36 @@ GLContextManager g_GLContextManager;
 // Constructor
 GLContextManager::GLContextManager() :
     hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
-	mQueueThreadCTXHandle(),
+    mQueueThreadCTXHandle(),
     mInitialized(false), mHadError(false), mMainThreadCTXApplied(false), 
     mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr)
 {
 }
 
 bool GLContextManager::Init(HDC hDC) {
-	// If we're switching HDCs, deal with it...
-	if (mInitialized && !mHadError && hDC != this->hDC) {
-		// If we're switching HDCs, deal with it...
-		g_GLDraw.UnbindTexture(); // Unbind current texture
-		g_GLTextureStore.Reset(); // Delete all textures
-		ReleaseFramebuffer(); // Release framebuffer
-		ReleaseContext(); // Release context
-		mInitialized = false;
-	}
+    // If we're switching HDCs, deal with it...
+    if (mInitialized && !mHadError && hDC != this->hDC) {
+        // If we're switching HDCs, deal with it...
+        g_GLDraw.UnbindTexture(); // Unbind current texture
+        g_GLTextureStore.Reset(); // Delete all textures
+        ReleaseFramebuffer(); // Release framebuffer
+        ReleaseContext(); // Release context
+        mInitialized = false;
+    }
 
-	// Don't re-run if already run
+    // Don't re-run if already run
     if (mInitialized || mHadError) return true;
 
     if (InitContextFromHDC(hDC) &&
-		InitFramebuffer() &&
-		InitProjectionAndState())
-	{
-		mInitialized = true;
-	} else {
-		mHadError = true;
-	}
+        InitFramebuffer() &&
+        InitProjectionAndState())
+    {
+        mInitialized = true;
+    } else {
+        mHadError = true;
+    }
 
-	return mInitialized;
+    return mInitialized;
 }
 
 bool GLContextManager::IsInitialized() {
@@ -51,9 +51,9 @@ bool GLContextManager::IsInitialized() {
 }
 
 void GLContextManager::BindScreen() {
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
     g_GLContextManager.SetCurrentFB(nullptr);
-	GLERRORCHECK();
+    GLERRORCHECK();
 }
 
 void GLContextManager::BindFramebuffer() {
@@ -68,8 +68,8 @@ void GLContextManager::EnsureMainThreadCTXApplied()
     if(!mMainThreadCTXApplied)
     {
         wglMakeCurrent(hDC, hMainThreadCTX);
-		glbinding::Binding::useCurrentContext();
-		glcompat::SetupContext();
+        glbinding::Binding::useCurrentContext();
+        glcompat::SetupContext();
         mMainThreadCTXApplied = true;
     }
 }
@@ -94,7 +94,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     pfd.cDepthBits = 32;
     pfd.iLayerType = PFD_MAIN_PLANE;
 
-	mOldPixelFormat = GetPixelFormat(hDC);
+    mOldPixelFormat = GetPixelFormat(hDC);
 
     int nPixelFormat = ChoosePixelFormat(hDC, &pfd);
     if (0 == nPixelFormat)
@@ -125,9 +125,9 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
         return false;
     }
 
-	// Init binding for context
-	glbinding::Binding::useCurrentContext();
-	glcompat::SetupContext();
+    // Init binding for context
+    glbinding::Binding::useCurrentContext();
+    glcompat::SetupContext();
 
     glLoadIdentity();
     glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
@@ -149,7 +149,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     this->hDC = hDC;
     this->hQueueThreadCTX = queueThreadTempCTX;
     this->hMainThreadCTX = mainThreadTempCTX;
-	this->mQueueThreadCTXHandle = glbinding::getCurrentContext();
+    this->mQueueThreadCTXHandle = glbinding::getCurrentContext();
     return true;
 }
 
@@ -197,7 +197,7 @@ bool GLContextManager::InitProjectionAndState() {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     GLERRORCHECK();
 
-	return true;
+    return true;
 }
 
 
@@ -207,21 +207,21 @@ void GLContextManager::ReleaseFramebuffer() {
 }
 
 void GLContextManager::ReleaseContext() {
-	// Delete Context
-	if (hQueueThreadCTX) {
-		glbinding::Binding::releaseContext(mQueueThreadCTXHandle);
-		wglMakeCurrent(nullptr, nullptr);
-		wglDeleteContext(hQueueThreadCTX);
-		hQueueThreadCTX = nullptr;
-	}
+    // Delete Context
+    if (hQueueThreadCTX) {
+        glbinding::Binding::releaseContext(mQueueThreadCTXHandle);
+        wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(hQueueThreadCTX);
+        hQueueThreadCTX = nullptr;
+    }
 
-	// Restore pixel format if necessary
-	if (mOldPixelFormat != GetPixelFormat(hDC)) {
-		PIXELFORMATDESCRIPTOR pfd;
-		DescribePixelFormat(hDC, mOldPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-		SetPixelFormat(hDC, mOldPixelFormat, &pfd);
-	}
+    // Restore pixel format if necessary
+    if (mOldPixelFormat != GetPixelFormat(hDC)) {
+        PIXELFORMATDESCRIPTOR pfd;
+        DescribePixelFormat(hDC, mOldPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+        SetPixelFormat(hDC, mOldPixelFormat, &pfd);
+    }
 
-	// Clear hDC
-	hDC = nullptr;
+    // Clear hDC
+    hDC = nullptr;
 }

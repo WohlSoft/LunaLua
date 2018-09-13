@@ -24,24 +24,24 @@ public:
     int16_t      **_heightArray;
     const wchar_t* _folderPrefix;
     uint16_t       _firstIndex;
-	
-	SMBXImageCategory(
-		const wchar_t* prefix,
-		uint16_t       arrayLength,
-		uintptr_t      imagePtrArray,
-		uintptr_t      maskPtrArray,
-		uintptr_t      widthArray,
-		uintptr_t      heightArray,
-		const wchar_t* folderPrefix,
-		uint16_t       firstIndex
-	) :
-	_prefix(prefix), _arrayLength(arrayLength),
-	_imagePtrArray(reinterpret_cast<HDC**>(imagePtrArray)),
-	_maskPtrArray(reinterpret_cast<HDC**>(maskPtrArray)),
-	_widthArray(reinterpret_cast<int16_t**>(widthArray)),
-	_heightArray(reinterpret_cast<int16_t**>(heightArray)),
-	_folderPrefix(folderPrefix), _firstIndex(firstIndex)
-	{};
+    
+    SMBXImageCategory(
+        const wchar_t* prefix,
+        uint16_t       arrayLength,
+        uintptr_t      imagePtrArray,
+        uintptr_t      maskPtrArray,
+        uintptr_t      widthArray,
+        uintptr_t      heightArray,
+        const wchar_t* folderPrefix,
+        uint16_t       firstIndex
+    ) :
+    _prefix(prefix), _arrayLength(arrayLength),
+    _imagePtrArray(reinterpret_cast<HDC**>(imagePtrArray)),
+    _maskPtrArray(reinterpret_cast<HDC**>(maskPtrArray)),
+    _widthArray(reinterpret_cast<int16_t**>(widthArray)),
+    _heightArray(reinterpret_cast<int16_t**>(heightArray)),
+    _folderPrefix(folderPrefix), _firstIndex(firstIndex)
+    {};
 public:
     const wchar_t* getPrefix() const {
         return _prefix;

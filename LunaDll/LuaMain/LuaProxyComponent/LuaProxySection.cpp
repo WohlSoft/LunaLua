@@ -18,7 +18,7 @@ LuaProxy::Section LuaProxy::Section::get(short secNumber, lua_State * L)
 
 LuaProxy::Section::Section(int sectionNum)
 {
-	m_secNum = sectionNum;
+    m_secNum = sectionNum;
 }
 
 int LuaProxy::Section::idx() const
@@ -28,26 +28,26 @@ int LuaProxy::Section::idx() const
 
 LuaProxy::RECTd LuaProxy::Section::boundary() const
 {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (m_secNum * 6);
+    double* boundtable = (double*)GM_LVL_BOUNDARIES;
+    boundtable = boundtable + (m_secNum * 6);
 
-	RECTd rectd;
-	rectd.left = boundtable[0];
-	rectd.top = boundtable[1];
-	rectd.bottom = boundtable[2];
-	rectd.right = boundtable[3];
+    RECTd rectd;
+    rectd.left = boundtable[0];
+    rectd.top = boundtable[1];
+    rectd.bottom = boundtable[2];
+    rectd.right = boundtable[3];
 
-	return rectd;
+    return rectd;
 }
 
 void LuaProxy::Section::setBoundary(const LuaProxy::RECTd &boundary)
 {
-	double* boundtable = (double*)GM_LVL_BOUNDARIES;
-	boundtable = boundtable + (m_secNum * 6);
-	boundtable[0] = boundary.left;
-	boundtable[1] = boundary.top;
-	boundtable[2] = boundary.bottom;
-	boundtable[3] = boundary.right;
+    double* boundtable = (double*)GM_LVL_BOUNDARIES;
+    boundtable = boundtable + (m_secNum * 6);
+    boundtable[0] = boundary.left;
+    boundtable[1] = boundary.top;
+    boundtable[2] = boundary.bottom;
+    boundtable[3] = boundary.right;
 }
 
 short LuaProxy::Section::musicID() const

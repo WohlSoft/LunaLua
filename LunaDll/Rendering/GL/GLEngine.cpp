@@ -49,29 +49,29 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
     DWORD dwRop)
 {
-	// Load Post-Processing Shader somewhere here
+    // Load Post-Processing Shader somewhere here
 
-	static HDC cachedHDC = NULL;
-	if (hdcDest == NULL)
-	{
-		if (cachedHDC != NULL)
-		{
-			hdcDest = cachedHDC;
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
-	else
-	{
-		cachedHDC = hdcDest;
-	}
+    static HDC cachedHDC = NULL;
+    if (hdcDest == NULL)
+    {
+        if (cachedHDC != NULL)
+        {
+            hdcDest = cachedHDC;
+        }
+        else
+        {
+            return FALSE;
+        }
+    }
+    else
+    {
+        cachedHDC = hdcDest;
+    }
 
 
     InitForHDC(hdcDest);
 
-	if (!g_GLContextManager.IsInitialized()) return FALSE;
+    if (!g_GLContextManager.IsInitialized()) return FALSE;
 
     // Get window size
     RECT clientRect;
@@ -85,7 +85,7 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     g_GLDraw.UnbindTexture();
 
     // Unbind the texture from the framebuffer (Bind screen)
-	g_GLContextManager.BindScreen();
+    g_GLContextManager.BindScreen();
 
     // Implement letterboxing correction
     float scaledWidth = windowWidth / 800.0f;
@@ -121,7 +121,7 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     GLERRORCHECK();
 
     // Get ready to draw some more
-	g_GLContextManager.BindAndClearFramebuffer();
+    g_GLContextManager.BindAndClearFramebuffer();
 
     return TRUE;
 }
@@ -129,25 +129,25 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 void GLEngine::EndFrame(HDC hdcDest)
 {
 
-	static HDC cachedHDC = NULL;
-	if (hdcDest == NULL)
-	{
-		if (cachedHDC != NULL)
-		{
-			hdcDest = cachedHDC;
-		}
-		else
-		{
-			return;
-		}
-	}
-	else
-	{
-		cachedHDC = hdcDest;
-	}
+    static HDC cachedHDC = NULL;
+    if (hdcDest == NULL)
+    {
+        if (cachedHDC != NULL)
+        {
+            hdcDest = cachedHDC;
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        cachedHDC = hdcDest;
+    }
 
-	// Bind screen
-	g_GLContextManager.BindScreen();
+    // Bind screen
+    g_GLContextManager.BindScreen();
 
     // Generate screenshot...
     if (mScreenshot) {
@@ -206,10 +206,10 @@ void GLEngine::EndFrame(HDC hdcDest)
         cmd.run(*this);
     }
 
-	// Display Frame
+    // Display Frame
     SwapBuffers(hdcDest);
 
-	// Clear screen backbuffer
+    // Clear screen backbuffer
     GLERRORCHECK();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClearDepth(100.0f);
@@ -217,8 +217,8 @@ void GLEngine::EndFrame(HDC hdcDest)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERRORCHECK();
 
-	// Bind framebuffer
-	g_GLContextManager.BindAndClearFramebuffer();
+    // Bind framebuffer
+    g_GLContextManager.BindAndClearFramebuffer();
 }
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {

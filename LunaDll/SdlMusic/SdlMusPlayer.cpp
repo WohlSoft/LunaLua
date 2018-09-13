@@ -9,17 +9,17 @@ std::string PGE_SDL_Manager::appPath="";
 
 void PGE_SDL_Manager::initSDL()
 {
-	if(!isInit)
-	{
-		SDL_Init(SDL_INIT_AUDIO);
-		isInit=true;
-		PGE_MusPlayer::setSampleRate(44100);
-		PGE_MusPlayer::MUS_changeVolume(80);
+    if(!isInit)
+    {
+        SDL_Init(SDL_INIT_AUDIO);
+        isInit=true;
+        PGE_MusPlayer::setSampleRate(44100);
+        PGE_MusPlayer::MUS_changeVolume(80);
         //std::wstring smbxPath = gAppPathWCHAR;
         //smbxPath = smbxPath.append(L"\\");
         appPath = gAppPathUTF8;
         appPath.append("\\");
-	}
+    }
 }
 
 
@@ -41,47 +41,47 @@ Mix_Music *PGE_MusPlayer::currentMusic()
 
 void PGE_MusPlayer::MUS_playMusic()
 {
-	if(!PGE_SDL_Manager::isInit) return;
-	if(play_mus)
-	{
-		if (Mix_PlayingMusic() == 0)
-		{
-			// Reset music sample count
-			musSCount.store(0);
+    if(!PGE_SDL_Manager::isInit) return;
+    if(play_mus)
+    {
+        if (Mix_PlayingMusic() == 0)
+        {
+            // Reset music sample count
+            musSCount.store(0);
 
-			Mix_PlayMusic(play_mus, -1);
-		}
-		else
-		if(Mix_PausedMusic()==1)
-		{
-			Mix_ResumeMusic();
-		}
-	}
-	else
-	{
-		//MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-	}
+            Mix_PlayMusic(play_mus, -1);
+        }
+        else
+        if(Mix_PausedMusic()==1)
+        {
+            Mix_ResumeMusic();
+        }
+    }
+    else
+    {
+        //MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+    }
 }
 
 void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 {
-	if(!PGE_SDL_Manager::isInit) return;
+    if(!PGE_SDL_Manager::isInit) return;
 
-	if(play_mus)
+    if(play_mus)
     {
-		if(Mix_PausedMusic()==0)
-		{
-			// Reset music sample count
-			musSCount.store(0);
+        if(Mix_PausedMusic()==0)
+        {
+            // Reset music sample count
+            musSCount.store(0);
 
-			if(Mix_FadingMusic()!=MIX_FADING_IN)
-				if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
-				{
-					MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
-				}
-		}
-		else
-			Mix_ResumeMusic();
+            if(Mix_FadingMusic()!=MIX_FADING_IN)
+                if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
+                {
+                    MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+                }
+        }
+        else
+            Mix_ResumeMusic();
 
     }
     else
@@ -92,39 +92,39 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 
 void PGE_MusPlayer::MUS_pauseMusic()
 {
-	if(!PGE_SDL_Manager::isInit) return;
+    if(!PGE_SDL_Manager::isInit) return;
     Mix_PauseMusic();
 }
 
 void PGE_MusPlayer::MUS_stopMusic()
 {
-	if(!PGE_SDL_Manager::isInit) return;
+    if(!PGE_SDL_Manager::isInit) return;
     Mix_HaltMusic();
 }
 
 void PGE_MusPlayer::MUS_stopMusicFadeOut(int ms)
 {
-	if(!PGE_SDL_Manager::isInit) return;
-	if(Mix_FadingMusic()!=MIX_FADING_OUT)
-		Mix_FadeOutMusic(ms);
+    if(!PGE_SDL_Manager::isInit) return;
+    if(Mix_FadingMusic()!=MIX_FADING_OUT)
+        Mix_FadeOutMusic(ms);
 }
 
 std::string PGE_MusPlayer::MUS_MusicTitle()
 {
-	if (!PGE_SDL_Manager::isInit) return "";
-	if (play_mus)
-		return std::string(Mix_GetMusicTitle(play_mus));
-	else
-		return std::string("");
+    if (!PGE_SDL_Manager::isInit) return "";
+    if (play_mus)
+        return std::string(Mix_GetMusicTitle(play_mus));
+    else
+        return std::string("");
 }
 
 std::string PGE_MusPlayer::MUS_MusicTitleTag()
 {
-	if (!PGE_SDL_Manager::isInit) return "";
-	if (play_mus)
-		return std::string(Mix_GetMusicTitleTag(play_mus));
-	else
-		return std::string("");
+    if (!PGE_SDL_Manager::isInit) return "";
+    if (play_mus)
+        return std::string(Mix_GetMusicTitleTag(play_mus));
+    else
+        return std::string("");
 }
 
 std::string PGE_MusPlayer::MUS_MusicArtistTag()
@@ -179,12 +179,12 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
     sRate=sampleRate;
     Mix_CloseAudio();
     Mix_OpenAudio(sRate, AUDIO_S16, 2, 2048);
-	Mix_AllocateChannels(32);
+    Mix_AllocateChannels(32);
 
-	// Reset music sample count
+    // Reset music sample count
     sCount.store(0);
     musSCount.store(0);
-	Mix_SetPostMix(postMixCallback, NULL);
+    Mix_SetPostMix(postMixCallback, NULL);
 }
 
 int PGE_MusPlayer::sampleRate()
@@ -201,61 +201,61 @@ int PGE_MusPlayer::currentVolume()
 void PGE_MusPlayer::MUS_openFile(const char *musFile)
 {
     PGE_SDL_Manager::initSDL();
-	if(currentTrack==std::string(musFile))
-	{
-		if(Mix_PlayingMusic()==1)
-			return;
-	}
+    if(currentTrack==std::string(musFile))
+    {
+        if(Mix_PlayingMusic()==1)
+            return;
+    }
 
     if(play_mus!=NULL)
     {
         Mix_HaltMusic();
-		Mix_FreeMusic(play_mus);
-		play_mus=NULL;
+        Mix_FreeMusic(play_mus);
+        play_mus=NULL;
     }
 
-	play_mus = Mix_LoadMUS( musFile );
+    play_mus = Mix_LoadMUS( musFile );
 
     if(!play_mus)
-	{
-		if(showMsg_for!=musFile)
-			showMsg=true;
-		if(showMsg)
-		{
-			MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
-			+std::string(musFile)+"\n"
-			+std::string(Mix_GetError())).c_str(), "Error", 0);
-			showMsg_for = std::string(musFile);
-			showMsg=false;
-		}
+    {
+        if(showMsg_for!=musFile)
+            showMsg=true;
+        if(showMsg)
+        {
+            MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
+            +std::string(musFile)+"\n"
+            +std::string(Mix_GetError())).c_str(), "Error", 0);
+            showMsg_for = std::string(musFile);
+            showMsg=false;
+        }
     }
-	else
-	{
-		currentTrack = std::string(musFile);
-		showMsg=true;
-	}
+    else
+    {
+        currentTrack = std::string(musFile);
+        showMsg=true;
+    }
 }
 
 void PGE_MusPlayer::postMixCallback(void *udata, Uint8 *stream, int len)
 {
-	// This post mix callback has a simple purpose: count audio samples.
-	sCount += len/4;
+    // This post mix callback has a simple purpose: count audio samples.
+    sCount += len/4;
 
-	// (Approximate) sample count for only when music is playing
-	if ((Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0))
-	{
-		musSCount += len/4;
-	}
+    // (Approximate) sample count for only when music is playing
+    if ((Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0))
+    {
+        musSCount += len/4;
+    }
 }
 
 unsigned __int64 PGE_MusPlayer::sampleCount()
 {
-	return sCount;
+    return sCount;
 }
 
 unsigned __int64 PGE_MusPlayer::MUS_sampleCount()
 {
-	return musSCount;
+    return musSCount;
 }
 
 /***********************************PGE_Sounds********************************************/
@@ -270,7 +270,7 @@ uint32_t PGE_Sounds::memUsage = 0;
 
 uint32_t PGE_Sounds::GetMemUsage()
 {
-	return PGE_Sounds::memUsage;
+    return PGE_Sounds::memUsage;
 }
 
 Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
@@ -288,7 +288,7 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
             +std::string(Mix_GetError())).c_str(), "Error", 0);
         }
 
-		PGE_Sounds::memUsage += tmpChunk->alen;
+        PGE_Sounds::memUsage += tmpChunk->alen;
         chunksBuffer[filePath] = tmpChunk;
     }
     else
@@ -313,11 +313,11 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
             +std::string(Mix_GetError())).c_str(), "Error", 0);
         }
 
-		PGE_Sounds::memUsage += sound->alen;
+        PGE_Sounds::memUsage += sound->alen;
         chunksBuffer[filePath] = sound;
         if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
         {
-			if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
             MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }
@@ -325,7 +325,7 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
     {
         if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
         {
-			if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
             MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }
@@ -336,12 +336,12 @@ void PGE_Sounds::clearSoundBuffer()
     Mix_HaltChannel(-1);
     overrideSettings.clear();
     overrideArrayIsUsed=false;
-	for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
-	{
-		PGE_Sounds::memUsage -= it->second->alen;
-		Mix_FreeChunk(it->second);
-	}
-	chunksBuffer.clear();
+    for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
+    {
+        PGE_Sounds::memUsage -= it->second->alen;
+        Mix_FreeChunk(it->second);
+    }
+    chunksBuffer.clear();
 }
 
 void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)

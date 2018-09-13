@@ -28,7 +28,7 @@ GLSprite::~GLSprite() {
 
 GLBasicSprite::GLBasicSprite(void* data, GLenum format, uint32_t dataWidth, uint32_t dataHeight, uint32_t xOff, uint32_t yOff, uint32_t width, uint32_t height) :
     tex(0, width, height),
-	w(width), h(height)
+    w(width), h(height)
 {
     valid = false;
 
@@ -98,6 +98,6 @@ void GLBasicSprite::BindTexture() const {
 
 uint32_t GLBasicSprite::GetSizeBytes() const
 {
-	return 4 * w * h;
+    return 4 * w * h;
 }
 

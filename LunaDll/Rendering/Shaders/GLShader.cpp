@@ -317,7 +317,7 @@ GLuint GLShader::getSamplerForTexture(GLuint name)
             return i + 1;
         }
     }
-	
+    
     // If too many samplers already... oops
     GLuint idx = m_samplerTexNames.size() + 1;
     if (idx >= 8)
@@ -327,14 +327,14 @@ GLuint GLShader::getSamplerForTexture(GLuint name)
 
     m_samplerTexNames.emplace_back(name);
     glActiveTexture(GL_TEXTURE0 + idx);
-	if (name != 0)
-	{
-		glEnable(GL_TEXTURE_2D);
-	}
-	glBindTexture(GL_TEXTURE_2D, name);
-	if (name == 0) {
-		glDisable(GL_TEXTURE_2D);
-	}
+    if (name != 0)
+    {
+        glEnable(GL_TEXTURE_2D);
+    }
+    glBindTexture(GL_TEXTURE_2D, name);
+    if (name == 0) {
+        glDisable(GL_TEXTURE_2D);
+    }
     glActiveTexture(GL_TEXTURE0);    
     GLERRORCHECK();
     
@@ -349,7 +349,7 @@ void GLShader::clearSamplers()
         for (GLuint i = 1; i <= m_samplerTexNames.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
             glDisable(GL_TEXTURE_2D);
         }
         glActiveTexture(GL_TEXTURE0);

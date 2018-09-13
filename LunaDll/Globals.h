@@ -30,14 +30,14 @@ class RenderOverrideManager;
 #endif
 
 struct startUpSettings{
-	bool patch;
-	bool game;
-	bool lvlEditor;
-	bool frameskip;
-	bool noSound;
-	bool debugger;
-	bool logger;
-	bool newLauncher;
+    bool patch;
+    bool game;
+    bool lvlEditor;
+    bool frameskip;
+    bool noSound;
+    bool debugger;
+    bool logger;
+    bool newLauncher;
     bool console;
     bool noGL;
     bool waitForIPC;
@@ -129,14 +129,14 @@ return;
 }
 */
 #define GL_PROC_CHECK(procHandle, procName, moduleHandle, moduleName) \
-	if(!procHandle){\
-		std::string errMsg = "Failed to load 'procName' in moduleName D:!\nIs Lunadll.dll or moduleName different versions?\nError code:";\
-		errMsg += std::to_string((long long)GetLastError());\
+    if(!procHandle){\
+        std::string errMsg = "Failed to load 'procName' in moduleName D:!\nIs Lunadll.dll or moduleName different versions?\nError code:";\
+        errMsg += std::to_string((long long)GetLastError());\
         MessageBoxA(NULL, errMsg.c_str(), "Error", 0);\
-		FreeLibrary(moduleHandle);\
-		moduleHandle = NULL;\
-		return;\
-	}
+        FreeLibrary(moduleHandle);\
+        moduleHandle = NULL;\
+        return;\
+    }
 
 
 #endif

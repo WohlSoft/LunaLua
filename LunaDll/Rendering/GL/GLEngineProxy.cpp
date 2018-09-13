@@ -13,7 +13,7 @@ GLEngineProxy g_GLEngine;
 GLEngineProxy::GLEngineProxy() {
     mPendingClear = 0;
     mSkipFrame = false;
-	mNextEndFrameIsSkippable = true;
+    mNextEndFrameIsSkippable = true;
     mIsDirty = false;
 }
 
@@ -45,17 +45,17 @@ void GLEngineProxy::ThreadMain() {
             mPendingClear--;
         }
         if (cmd->isFrameEnd()) {
-			mQueuedFrameSkippability.pop();
+            mQueuedFrameSkippability.pop();
 
-			// Determine frame skippability
-			// It is skippable if there is another FrameEnd queued with the
-			// flag for skippability set to true.
-			bool mFrameSkippable = false;
-			if (!mQueuedFrameSkippability.empty())
-			{
-				mFrameSkippable = mQueuedFrameSkippability.peek();
-			}
-			mSkipFrame = mFrameSkippable;
+            // Determine frame skippability
+            // It is skippable if there is another FrameEnd queued with the
+            // flag for skippability set to true.
+            bool mFrameSkippable = false;
+            if (!mQueuedFrameSkippability.empty())
+            {
+                mFrameSkippable = mQueuedFrameSkippability.peek();
+            }
+            mSkipFrame = mFrameSkippable;
 
             // Clean up deleted textures if any
             while (!mDeletedTextures.empty())
@@ -73,19 +73,19 @@ void GLEngineProxy::ThreadMain() {
 }
 
 void GLEngineProxy::QueueCmd(const std::shared_ptr<GLEngineCmd> &cmd) {
-	// Don't queue commands if we're not enabled
+    // Don't queue commands if we're not enabled
     if (mIsDirty || !IsEnabled())
         return;
-	
+    
     // Ensure we're initialized
     Init();
 
-	// Allow frame skippability to be invalidated by something
-	mNextEndFrameIsSkippable = mNextEndFrameIsSkippable && cmd->allowFrameSkippability();
+    // Allow frame skippability to be invalidated by something
+    mNextEndFrameIsSkippable = mNextEndFrameIsSkippable && cmd->allowFrameSkippability();
 
     if (cmd->isFrameEnd()) { 
-		mQueuedFrameSkippability.push(mNextEndFrameIsSkippable);
-		mNextEndFrameIsSkippable = true;
+        mQueuedFrameSkippability.push(mNextEndFrameIsSkippable);
+        mNextEndFrameIsSkippable = true;
     }
     if (cmd->isSmbxClearCmd())
     {

@@ -139,39 +139,39 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
 
 int LuaProxy::totalNPCs()
 {
-	return (int)GM_NPCS_COUNT;
+    return (int)GM_NPCS_COUNT;
 }
 
 
 luabind::object LuaProxy::npcs(lua_State *L)
 {
-	luabind::object vnpcs = luabind::newtable(L);
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		vnpcs[i] = LuaProxy::NPC(i);
-	}
-	return vnpcs;
+    luabind::object vnpcs = luabind::newtable(L);
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        vnpcs[i] = LuaProxy::NPC(i);
+    }
+    return vnpcs;
 }
 
 
 luabind::object LuaProxy::findNPCs(int ID, int section, lua_State *L)
 {
-	luabind::object vnpcs = luabind::newtable(L);
-	int r = 0;
+    luabind::object vnpcs = luabind::newtable(L);
+    int r = 0;
 
-	bool anyID = (ID == -1 ? true : false);
-	bool anySec = (section == -1 ? true : false);
-	NPCMOB* thisnpc = NULL;
+    bool anyID = (ID == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc = NULL;
 
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = ::NPC::Get(i);
-		if(thisnpc->id == ID || anyID) {
-			if(::NPC::GetSection(thisnpc) == section || anySec) {
-				vnpcs[r] = LuaProxy::NPC(i);
-				++r;
-			}
-		}
-	}
-	return vnpcs;
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = ::NPC::Get(i);
+        if(thisnpc->id == ID || anyID) {
+            if(::NPC::GetSection(thisnpc) == section || anySec) {
+                vnpcs[r] = LuaProxy::NPC(i);
+                ++r;
+            }
+        }
+    }
+    return vnpcs;
 }
 
 void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
@@ -217,20 +217,20 @@ void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &
 
 luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L)
 {
-	int iftype = (int)ftype;
+    int iftype = (int)ftype;
     void* ptr = ((&(*(byte*)mem)));
 
-	switch (ftype) {
-	case LFT_BYTE:
-	case LFT_WORD:
-	case LFT_DWORD:
-	case LFT_FLOAT:
-	case LFT_DFLOAT:
+    switch (ftype) {
+    case LFT_BYTE:
+    case LFT_WORD:
+    case LFT_DWORD:
+    case LFT_FLOAT:
+    case LFT_DFLOAT:
     {
         double val = GetMem((int)ptr, (FIELDTYPE)ftype);
         return luabind::object(L, val);
     }
-	case LFT_STRING:
+    case LFT_STRING:
     {
         return luabind::object(L, (std::string)*((VB6StrPtr*)ptr));
     }
@@ -238,54 +238,54 @@ luabind::object LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, lua_State *L
     {
         return luabind::object(L, 0 != *((int16_t*)ptr));
     }
-	default:
-		return luabind::object();
-	}
+    default:
+        return luabind::object();
+    }
 }
 
 
 void LuaProxy::triggerEvent(const std::string& evName)
 {
-	SMBXEvents::TriggerEvent(LunaLua::EncodeUtils::Str2WStr(evName), 0);
+    SMBXEvents::TriggerEvent(LunaLua::EncodeUtils::Str2WStr(evName), 0);
 }
 
 
 void LuaProxy::playSFX(int index)
 {
-	SMBXSound::PlaySFX(index);
+    SMBXSound::PlaySFX(index);
 }
 
 
 void LuaProxy::playSFX(const std::string& filename)
 {
-	playSFXSDL(filename);
+    playSFXSDL(filename);
 }
 
 void LuaProxy::playSFXSDL(const std::string& filename)
 {
     std::string full_paths = Audio::getSfxPath(filename);
-	PGE_Sounds::SND_PlaySnd(full_paths.c_str());
+    PGE_Sounds::SND_PlaySnd(full_paths.c_str());
 }
 
 void LuaProxy::clearSFXBuffer()
 {
-	PGE_Sounds::clearSoundBuffer();
+    PGE_Sounds::clearSoundBuffer();
 }
 
 void LuaProxy::MusicOpen(const std::string& filename)
 {
     std::string full_paths = Audio::getSfxPath(filename);
-	PGE_MusPlayer::MUS_openFile(full_paths.c_str());
+    PGE_MusPlayer::MUS_openFile(full_paths.c_str());
 }
 
 void LuaProxy::MusicPlay()
 {
-	PGE_MusPlayer::MUS_playMusic();
+    PGE_MusPlayer::MUS_playMusic();
 }
 
 void LuaProxy::MusicPlayFadeIn(int ms)
 {
-	PGE_MusPlayer::MUS_playMusicFadeIn(ms);
+    PGE_MusPlayer::MUS_playMusicFadeIn(ms);
 }
 
 void LuaProxy::MusicStop()
@@ -295,12 +295,12 @@ void LuaProxy::MusicStop()
 
 void LuaProxy::MusicStopFadeOut(int ms)
 {
-	PGE_MusPlayer::MUS_stopMusicFadeOut(ms);
+    PGE_MusPlayer::MUS_stopMusicFadeOut(ms);
 }
 
 void LuaProxy::MusicVolume(int vlm)
 {
-	PGE_MusPlayer::MUS_changeVolume(vlm);
+    PGE_MusPlayer::MUS_changeVolume(vlm);
 }
 
 bool LuaProxy::MusicIsPlaying()
@@ -321,109 +321,109 @@ bool LuaProxy::MusicIsFading()
 
 void LuaProxy::playMusic(int section)
 {
-	SMBXSound::PlayMusic(section);
+    SMBXSound::PlayMusic(section);
 }
 
 unsigned short LuaProxy::gravity()
 {
-	return GM_GRAVITY;
+    return GM_GRAVITY;
 }
 
 
 void LuaProxy::gravity(unsigned short value)
 {
-	GM_GRAVITY = value;
+    GM_GRAVITY = value;
 }
 
 
 unsigned short LuaProxy::earthquake()
 {
-	return GM_EARTHQUAKE;
+    return GM_EARTHQUAKE;
 }
 
 
 void LuaProxy::earthquake(unsigned short value)
 {
-	GM_EARTHQUAKE = value;
+    GM_EARTHQUAKE = value;
 }
 
 
 unsigned short LuaProxy::jumpheight()
 {
-	return GM_JUMPHIGHT;
+    return GM_JUMPHIGHT;
 }
 
 
 void LuaProxy::jumpheight(unsigned short value)
 {
-	GM_JUMPHIGHT = value;
+    GM_JUMPHIGHT = value;
 }
 
 
 unsigned short LuaProxy::jumpheightBounce()
 {
-	return GM_JUMPHIGHT_BOUNCE;
+    return GM_JUMPHIGHT_BOUNCE;
 }
 
 
 void LuaProxy::jumpheightBounce(unsigned short value)
 {
-	GM_JUMPHIGHT_BOUNCE = value;
+    GM_JUMPHIGHT_BOUNCE = value;
 }
 
 
 luabind::object LuaProxy::blocks(lua_State *L)
 {
-	luabind::object vblocks = luabind::newtable(L);
-	for(int i = 0; i < GM_BLOCK_COUNT; i++) {
-		vblocks[i] = LuaProxy::Block(i);
-	}
-	return vblocks;
+    luabind::object vblocks = luabind::newtable(L);
+    for(int i = 0; i < GM_BLOCK_COUNT; i++) {
+        vblocks[i] = LuaProxy::Block(i);
+    }
+    return vblocks;
 }
 
 
 luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 {
-	luabind::object vblocks = luabind::newtable(L);
-	int r = 0;
+    luabind::object vblocks = luabind::newtable(L);
+    int r = 0;
 
-	bool anyID = (ID == -1 ? true : false);
-	::Block* thisblock = NULL;
+    bool anyID = (ID == -1 ? true : false);
+    ::Block* thisblock = NULL;
 
-	for(int i = 0; i < GM_BLOCK_COUNT; i++) {
-		thisblock = ::Blocks::Get(i);
-		if(thisblock->BlockType == ID || anyID) {
-			vblocks[r] = LuaProxy::Block(i);
-			++r;
-		}
-	}
-	return vblocks;
+    for(int i = 0; i < GM_BLOCK_COUNT; i++) {
+        thisblock = ::Blocks::Get(i);
+        if(thisblock->BlockType == ID || anyID) {
+            vblocks[r] = LuaProxy::Block(i);
+            ++r;
+        }
+    }
+    return vblocks;
 }
 
 luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
     std::wstring tarLayerName = LunaLua::EncodeUtils::Str2WStr(layername);
-	for(int i = 0; i < 100; ++i){
-		LayerControl* ctrl = ::Layer::Get(i);
-		if(ctrl){
-			if(!ctrl->ptLayerName)
-				continue;
-			std::wstring sourceLayerName(ctrl->ptLayerName);
-			if(tarLayerName == sourceLayerName){
-				return luabind::object(L, Layer(i));
-			}
-		}
-	}
-	return luabind::object();
+    for(int i = 0; i < 100; ++i){
+        LayerControl* ctrl = ::Layer::Get(i);
+        if(ctrl){
+            if(!ctrl->ptLayerName)
+                continue;
+            std::wstring sourceLayerName(ctrl->ptLayerName);
+            if(tarLayerName == sourceLayerName){
+                return luabind::object(L, Layer(i));
+            }
+        }
+    }
+    return luabind::object();
 }
 
 luabind::object LuaProxy::animations(lua_State *L)
 {
-	luabind::object vanimations = luabind::newtable(L);
-	for(int i = 0; i < GM_ANIM_COUNT; i++) {
-		vanimations[i] = LuaProxy::Animation(i);
-	}
-	return vanimations;
+    luabind::object vanimations = luabind::newtable(L);
+    for(int i = 0; i < GM_ANIM_COUNT; i++) {
+        vanimations[i] = LuaProxy::Animation(i);
+    }
+    return vanimations;
 }
 
 void LuaProxy::runAnimation(int id, double x, double y, double height, double width, double speedX, double speedY, int extraData)
@@ -456,73 +456,73 @@ void LuaProxy::runAnimation(int id, double x, double y, int extraData)
 
 luabind::object LuaProxy::levels(lua_State *L)
 {
-	luabind::object vlevels = luabind::newtable(L);
-	for(int i = 0; i < (signed)GM_LEVEL_COUNT; i++) {
-		vlevels[i+1] = LuaProxy::LevelObject(i);
-	}
-	return vlevels;
+    luabind::object vlevels = luabind::newtable(L);
+    for(int i = 0; i < (signed)GM_LEVEL_COUNT; i++) {
+        vlevels[i+1] = LuaProxy::LevelObject(i);
+    }
+    return vlevels;
 }
 
 luabind::object LuaProxy::findlevels(const std::string &toFindName, lua_State* L)
 {
-	luabind::object obj = luabind::newtable(L);
-	bool found = false;
-	for(int i = 0, j = 0; i < (signed)GM_LEVEL_COUNT; ++i){
-		WorldLevel* ctrl = ::SMBXLevel::get(i);
-		if(ctrl){
-			std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
-			if(!ctrl->levelTitle)
-				continue;
-			std::wstring sourceLayerName(ctrl->levelTitle);
-			if(sourceLayerName.find(tarLevelName) != std::wstring::npos){
-				if(!found)
-					found = true;
+    luabind::object obj = luabind::newtable(L);
+    bool found = false;
+    for(int i = 0, j = 0; i < (signed)GM_LEVEL_COUNT; ++i){
+        WorldLevel* ctrl = ::SMBXLevel::get(i);
+        if(ctrl){
+            std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
+            if(!ctrl->levelTitle)
+                continue;
+            std::wstring sourceLayerName(ctrl->levelTitle);
+            if(sourceLayerName.find(tarLevelName) != std::wstring::npos){
+                if(!found)
+                    found = true;
 
-				obj[j++] = LevelObject(i);
-			}
-		}
-	}
-	if(!found){
-		return luabind::object();
-	}
-	return obj;
+                obj[j++] = LevelObject(i);
+            }
+        }
+    }
+    if(!found){
+        return luabind::object();
+    }
+    return obj;
 }
 
 luabind::object LuaProxy::findlevel(const std::string &toFindName, lua_State* L)
 {
-	for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
-		WorldLevel* ctrl = ::SMBXLevel::get(i);
-		if(ctrl){
-			std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
-			if(!ctrl->levelTitle)
-				continue;
-			std::wstring sourceLevelName(ctrl->levelTitle);
-			if(tarLevelName == sourceLevelName){
-				return luabind::object(L, LevelObject(i));
-			}
-		}
-	}
-	return luabind::object();
+    for(int i = 0; i < (signed)GM_LEVEL_COUNT; ++i){
+        WorldLevel* ctrl = ::SMBXLevel::get(i);
+        if(ctrl){
+            std::wstring tarLevelName = LunaLua::EncodeUtils::Str2WStr(std::string(toFindName));
+            if(!ctrl->levelTitle)
+                continue;
+            std::wstring sourceLevelName(ctrl->levelTitle);
+            if(tarLevelName == sourceLevelName){
+                return luabind::object(L, LevelObject(i));
+            }
+        }
+    }
+    return luabind::object();
 }
 
 RECT LuaProxy::newRECT()
 {
-	RECT r;
-	r.bottom = 0;
-	r.left = 0;
-	r.right = 0;
-	r.top = 0;
-	return r;
+    RECT r;
+    r.bottom = 0;
+    r.left = 0;
+    r.right = 0;
+    r.top = 0;
+    return r;
 }
 
 LuaProxy::RECTd LuaProxy::newRECTd()
 {
-	RECTd r;
-	r.bottom = 0.0;
-	r.left = 0.0;
-	r.right = 0.0;
-	r.top = 0.0;
-	return r;
+    RECTd r;
+    r.bottom = 0.0;
+    r.left = 0.0;
+    r.right = 0.0;
+    r.top = 0.0;
+    return r;
 }
 
 
@@ -531,54 +531,54 @@ LuaProxy::RECTd LuaProxy::newRECTd()
 
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, lua_State* L)
 {
-	return LuaProxy::spawnNPC(npcid, x, y, section, false, false, L);
+    return LuaProxy::spawnNPC(npcid, x, y, section, false, false, L);
 }
 
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, lua_State* L)
 {
-	return LuaProxy::spawnNPC(npcid, x, y, section, respawn, false, L);
+    return LuaProxy::spawnNPC(npcid, x, y, section, respawn, false, L);
 }
 
 LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section, bool respawn, bool centered, lua_State* L)
 {
 
-	if(npcid < 1 || npcid > ::NPC::MAX_ID){
-		luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
-		return LuaProxy::NPC(-1);
-	}
-		
-	if(section < 0 || section > 20){
-		luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", section);
-		return LuaProxy::NPC(-1);
-	}
-		
-	if(GM_NPCS_COUNT >= 5000){
-		luaL_error(L, "Over 5000 NPCs, cannot spawn more!");
-		return LuaProxy::NPC(-1);
-	}
+    if(npcid < 1 || npcid > ::NPC::MAX_ID){
+        luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
+        return LuaProxy::NPC(-1);
+    }
+        
+    if(section < 0 || section > 20){
+        luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", section);
+        return LuaProxy::NPC(-1);
+    }
+        
+    if(GM_NPCS_COUNT >= 5000){
+        luaL_error(L, "Over 5000 NPCs, cannot spawn more!");
+        return LuaProxy::NPC(-1);
+    }
 
-	LuaProxy::NPC theNewNPC(GM_NPCS_COUNT);
-	void* nativeAddr = theNewNPC.getNativeAddr();
+    LuaProxy::NPC theNewNPC(GM_NPCS_COUNT);
+    void* nativeAddr = theNewNPC.getNativeAddr();
 
 
-	memset(nativeAddr, 0, 0x158);
-	WORD* widthArray = GM_CONF_WIDTH;
-	WORD* heightArray = GM_CONF_HEIGHT;
-	WORD* gfxWidthArray = GM_CONF_GFXWIDTH;
-	WORD* gfxHeightArray = GM_CONF_GFXHEIGHT;
+    memset(nativeAddr, 0, 0x158);
+    WORD* widthArray = GM_CONF_WIDTH;
+    WORD* heightArray = GM_CONF_HEIGHT;
+    WORD* gfxWidthArray = GM_CONF_GFXWIDTH;
+    WORD* gfxHeightArray = GM_CONF_GFXHEIGHT;
 
-	short width = widthArray[npcid];
-	short height = heightArray[npcid];
-	short gfxWidth = gfxWidthArray[npcid];
-	short gfxHeight = gfxHeightArray[npcid];
+    short width = widthArray[npcid];
+    short height = heightArray[npcid];
+    short gfxWidth = gfxWidthArray[npcid];
+    short gfxHeight = gfxHeightArray[npcid];
 
-	gfxWidth = (gfxWidth ? gfxWidth : width);
-	gfxHeight = (gfxHeight ? gfxHeight : height);
+    gfxWidth = (gfxWidth ? gfxWidth : width);
+    gfxHeight = (gfxHeight ? gfxHeight : height);
 
-	if (centered) {
-		x -= 0.5 * (double)width;
-		y -= 0.5 * (double)height;
-	}
+    if (centered) {
+        x -= 0.5 * (double)width;
+        y -= 0.5 * (double)height;
+    }
 
     NPCMOB* npc = (NPCMOB*)nativeAddr;
     npc->momentum.x = x;
@@ -604,9 +604,9 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
     npc->unknown_124 = -1;
     npc->currentSection = section;
 
-	++(GM_NPCS_COUNT);
+    ++(GM_NPCS_COUNT);
 
-	return theNewNPC;
+    return theNewNPC;
 }
 
 

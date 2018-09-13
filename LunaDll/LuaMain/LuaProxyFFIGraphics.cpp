@@ -299,7 +299,7 @@ FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, d
 
     RenderStringOp* printTextOp = new RenderStringOp(wText, type, (float)x, (float)y);
     printTextOp->m_renderPriority = priority;
-	printTextOp->sceneCoords = sceneCoords;
+    printTextOp->sceneCoords = sceneCoords;
     Renderer::Get().AddOp(printTextOp);
 }
 

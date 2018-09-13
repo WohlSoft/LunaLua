@@ -44,8 +44,8 @@ public:
     virtual bool isSmbxClearCmd(void) const { return false; }
     virtual bool isExitCmd(void) const { return false; }
 
-	virtual bool allowFrameSkippability(void) const { return true; }
-	virtual bool isSkippable(void) const { return true; }
+    virtual bool allowFrameSkippability(void) const { return true; }
+    virtual bool isSkippable(void) const { return true; }
 };
 
 /******************************/
@@ -123,7 +123,7 @@ public:
 class GLEngineCmd_LuaDraw : public GLEngineCmd {
 public:
     struct LuaDrawShaderEntry {
-		gl::GLenum type;
+        gl::GLenum type;
         void* data;
     };
     
@@ -136,7 +136,7 @@ public:
     std::vector<GLShaderVariableEntry> mUniforms;
     float mColor[4];
 
-	gl::GLenum mType;
+    gl::GLenum mType;
     const float* mVert;
     const float* mTex;
     const float* mVertColor;
@@ -144,15 +144,15 @@ public:
     bool mSceneCoords;
     bool mDepthTest;
 
-	GLEngineCmd_LuaDraw() :
+    GLEngineCmd_LuaDraw() :
         mTarget(nullptr),
         mImg(nullptr),
-		mCapBuff(nullptr),
-		mShader(nullptr),
-		mAttributes(),
-		mUniforms(),
-		mColor{ 0, 0, 0, 0 },
-		mType(gl::GL_POINTS),
+        mCapBuff(nullptr),
+        mShader(nullptr),
+        mAttributes(),
+        mUniforms(),
+        mColor{ 0, 0, 0, 0 },
+        mType(gl::GL_POINTS),
         mVert(nullptr),
         mTex(nullptr),
         mVertColor(nullptr),
@@ -177,10 +177,10 @@ public:
         }
     }
 
-	virtual bool isSkippable(void) const {
-		if (mTarget == nullptr) return true;
-		return !mTarget->mNonskippable;
-	}
+    virtual bool isSkippable(void) const {
+        if (mTarget == nullptr) return true;
+        return !mTarget->mNonskippable;
+    }
 };
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {

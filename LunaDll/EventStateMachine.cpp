@@ -164,14 +164,14 @@ void EventStateMachine::sendOnTickEnd(void) {
 }
 
 void EventStateMachine::sendOnDraw(void) {
-	GLEngineProxy::CheckRendererInit();
+    GLEngineProxy::CheckRendererInit();
     sendSimpleLuaEvent("onDraw");
 
     m_onDrawEndReady = true;
 }
 
 void EventStateMachine::sendOnDrawEnd(void) {
-	GLEngineProxy::CheckRendererInit();
+    GLEngineProxy::CheckRendererInit();
     m_onDrawEndReady = false;
 
     sendSimpleLuaEvent("onDrawEnd");

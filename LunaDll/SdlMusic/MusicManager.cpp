@@ -19,11 +19,11 @@ ChunkEntry::ChunkEntry()
 
 ChunkEntry::~ChunkEntry()
 {
-	if (chunk)
-	{
-		PGE_Sounds::memUsage -= chunk->alen;
-		Mix_FreeChunk(chunk);
-	}
+    if (chunk)
+    {
+        PGE_Sounds::memUsage -= chunk->alen;
+        Mix_FreeChunk(chunk);
+    }
     chunk=NULL;
 }
 
@@ -40,16 +40,16 @@ bool ChunkEntry::doLoad()
 {
     if(needReload)
     {
-		if (chunk)
-		{
-			PGE_Sounds::memUsage -= chunk->alen;
-			Mix_FreeChunk(chunk);
-		}
+        if (chunk)
+        {
+            PGE_Sounds::memUsage -= chunk->alen;
+            Mix_FreeChunk(chunk);
+        }
         chunk = Mix_LoadWAV( fullPath.c_str() );
-		if (chunk)
-		{
-			PGE_Sounds::memUsage += chunk->alen;
-		}
+        if (chunk)
+        {
+            PGE_Sounds::memUsage += chunk->alen;
+        }
         return (bool)chunk;
     }
     else

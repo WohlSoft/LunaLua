@@ -17,7 +17,7 @@ private:
     wchar_t *pBuf; //<--------- Shared memory!----------------
     std::wstring bufIn; //<----------------------------- Input WString buffer --------------------------------
     HANDLE hMapFile;
-	bool isInit;
+    bool isInit;
 };
 
 #endif // SHMEMSERVER_H

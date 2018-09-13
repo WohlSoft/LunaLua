@@ -13,8 +13,8 @@ class CaptureBuffer;
 class GLShaderVariableEntry
 {
     GLShaderVariableType m_type;
-	gl::GLuint m_location;
-	gl::GLenum m_typeData;
+    gl::GLuint m_location;
+    gl::GLenum m_typeData;
     size_t m_count;
     void* m_data;
     void* m_imgs;
@@ -27,8 +27,8 @@ public:
     ~GLShaderVariableEntry();
 
     GLShaderVariableType getVariableType() const;
-	gl::GLuint getLocation() const;
-	gl::GLenum getGLType() const;
+    gl::GLuint getLocation() const;
+    gl::GLenum getGLType() const;
     size_t getNumberOfElements() const;
     void* getDataPtr() const;
     

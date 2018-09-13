@@ -21,8 +21,8 @@ private:
     bool mSkipFrame;
     bool mIsDirty; // FIXME: This is currently due to a Deadlock because of the destructor of the BMPBox-Cache @ BMPBox.cpp/loadShared/basegameImageCache
     
-	bool mNextEndFrameIsSkippable;
-	ThreadedCmdQueue<bool> mQueuedFrameSkippability;
+    bool mNextEndFrameIsSkippable;
+    ThreadedCmdQueue<bool> mQueuedFrameSkippability;
 
 public:
     GLEngine mInternalGLEngine;
@@ -71,8 +71,8 @@ public:
 
     // Shutdown GL Engine:
     void Shutdown();
-	
-	static void CheckRendererInit(void);
+    
+    static void CheckRendererInit(void);
 };
 
 // Instance

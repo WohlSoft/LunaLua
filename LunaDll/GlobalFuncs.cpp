@@ -200,34 +200,34 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
-	
+    
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
-	//startup settings default
+    //startup settings default
     memset(&gStartupSettings, 0, sizeof(gStartupSettings));
 
-	srand((int)time(NULL));
+    srand((int)time(NULL));
 
-	// Get compatible handle for screen
-	ghMemDC = CreateCompatibleDC(NULL);
+    // Get compatible handle for screen
+    ghMemDC = CreateCompatibleDC(NULL);
 
-	BITMAPINFO bmi;
-	memset(&bmi, 0, sizeof(BITMAPINFO));
-	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth = 800;
-	bmi.bmiHeader.biHeight = -600;
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32;
-	bmi.bmiHeader.biCompression = BI_RGB;
-	gpScreenBits = 0;
+    BITMAPINFO bmi;
+    memset(&bmi, 0, sizeof(BITMAPINFO));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = 800;
+    bmi.bmiHeader.biHeight = -600;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    gpScreenBits = 0;
 
-	ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
+    ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
 
-	/// Init autocode manager	
+    /// Init autocode manager	
 
-	gAutoMan.Clear(true);
+    gAutoMan.Clear(true);
     gAutoMan.ReadGlobals(gAppPathWCHAR);
-	gAutoMan.m_GlobalEnabled = true;
+    gAutoMan.m_GlobalEnabled = true;
 
     std::wstring configFolderPath = gAppPathWCHAR+L"\\config";
 
@@ -241,8 +241,8 @@ void InitGlobals()
 /// CLEAN UP
 void CleanUp() {
     if(ghMemDC)
-		DeleteObject(ghMemDC);
-	DeleteObject(ghGeneralDIB);
+        DeleteObject(ghMemDC);
+    DeleteObject(ghGeneralDIB);
 }
 
 // Function to normalize a path, in such a way that all slashes become forward
@@ -277,15 +277,15 @@ std::wstring normalizePathSlashes(const std::wstring& input)
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
     std::wifstream theFile(path, std::ios::binary| std::ios::in);
-	if(!theFile.is_open()){
-		theFile.close();
-		if(!errMsg.empty())
+    if(!theFile.is_open()){
+        theFile.close();
+        if(!errMsg.empty())
             MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
-		return false;
-	}
+        return false;
+    }
 
-	content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
-	return true;
+    content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
+    return true;
 }
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
@@ -313,12 +313,12 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
 
 bool isAbsolutePath(const std::wstring& path)
 {
-	return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
+    return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
 }
 
 bool isAbsolutePath(const std::string& path)
 {
-	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
+    return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
 
 std::wstring resolveIfNotAbsolutePath(std::wstring filename)

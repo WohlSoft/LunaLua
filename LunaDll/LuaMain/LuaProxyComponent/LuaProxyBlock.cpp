@@ -109,11 +109,11 @@ void LuaProxy::Block::_setBumpable(int id, bool bumpable)
 
 void LuaProxy::Block::_rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount)
 {
-	short unkFlag1VB = COMBOOL(fromUpSide);
-	native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
-	if (hittingCount != -1) {
-		Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
-	}
+    short unkFlag1VB = COMBOOL(fromUpSide);
+    native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
+    if (hittingCount != -1) {
+        Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
+    }
 }
 
 LuaProxy::Block::Block(int index) : m_index(index)
@@ -126,37 +126,37 @@ int LuaProxy::Block::idx() const
 
 void LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, const luabind::object &value, lua_State *L)
 {
-	::Block* pBlock = &::Blocks::GetBase()[m_index];
-	void* ptr = ((&(*(byte*)pBlock)) + offset);
-	LuaProxy::mem((int)ptr, ftype, value, L);
+    ::Block* pBlock = &::Blocks::GetBase()[m_index];
+    void* ptr = ((&(*(byte*)pBlock)) + offset);
+    LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::Block::mem(int offset, LuaProxy::L_FIELDTYPE ftype, lua_State *L) const
 {
-	::Block* pBlock = &::Blocks::GetBase()[m_index];
-	void* ptr = ((&(*(byte*)pBlock)) + offset);
-	return LuaProxy::mem((int)ptr, ftype, L);
+    ::Block* pBlock = &::Blocks::GetBase()[m_index];
+    void* ptr = ((&(*(byte*)pBlock)) + offset);
+    return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 
 double LuaProxy::Block::x() const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
     return ::Blocks::Get(m_index)->momentum.x;
 }
 
 void LuaProxy::Block::setX(double x)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
     ::Blocks::Get(m_index)->momentum.x = x;
 }
 
 double LuaProxy::Block::y() const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
     return ::Blocks::Get(m_index)->momentum.y;
 }
 
@@ -190,52 +190,52 @@ void LuaProxy::Block::setHeight(double height)
 
 void LuaProxy::Block::setY(double y)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
     ::Blocks::Get(m_index)->momentum.y = y;
 }
 
 double LuaProxy::Block::speedX() const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
     return ::Blocks::Get(m_index)->momentum.speedX;
 }
 
 void LuaProxy::Block::setSpeedX(double speedX)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
     ::Blocks::Get(m_index)->momentum.speedX = speedX;
 }
 
 double LuaProxy::Block::speedY() const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
     return ::Blocks::Get(m_index)->momentum.speedY;
 }
 
 void LuaProxy::Block::setSpeedY(double speedY)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
     ::Blocks::Get(m_index)->momentum.speedY = speedY;
 }
 
 short LuaProxy::Block::id() const
 {
-	if(!isValid())
-		return 0;
-	return ::Blocks::Get(m_index)->BlockType;
+    if(!isValid())
+        return 0;
+    return ::Blocks::Get(m_index)->BlockType;
 }
 
 void LuaProxy::Block::setId(short id)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
 
-	::Blocks::Get(m_index)->BlockType = id;
+    ::Blocks::Get(m_index)->BlockType = id;
 }
 
 short LuaProxy::Block::contentID() const
@@ -256,47 +256,47 @@ void LuaProxy::Block::setContentID(short contentsID)
 
 bool LuaProxy::Block::slippery() const
 {
-	if(!isValid())
-		return false;
+    if(!isValid())
+        return false;
 
-	return 0 != ::Blocks::Get(m_index)->Slippery;
+    return 0 != ::Blocks::Get(m_index)->Slippery;
 }
 
 void LuaProxy::Block::setSlippery(bool slippery)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
 
-	::Blocks::Get(m_index)->Slippery = (slippery ? 0xFFFF : 0);
+    ::Blocks::Get(m_index)->Slippery = (slippery ? 0xFFFF : 0);
 }
 
 bool LuaProxy::Block::isHidden() const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
 
-	return 0 != ::Blocks::Get(m_index)->IsHidden;
+    return 0 != ::Blocks::Get(m_index)->IsHidden;
 }
 
 void LuaProxy::Block::setIsHidden(bool isHidden)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
 
-	::Blocks::Get(m_index)->IsHidden = (isHidden ? 0xFFFF : 0);
+    ::Blocks::Get(m_index)->IsHidden = (isHidden ? 0xFFFF : 0);
 }
 
 int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
 {
-	if(!isValid())
-		return 0;
+    if(!isValid())
+        return 0;
 
-	if(!player->isValid())
-		return 0;
+    if(!player->isValid())
+        return 0;
 
-	int ind = player->getIndex();
-	::Block* tarBlock = ::Blocks::Get(m_index);
-	PlayerMOB* tarPlayer = ::Player::Get(ind);
+    int ind = player->getIndex();
+    ::Block* tarBlock = ::Blocks::Get(m_index);
+    PlayerMOB* tarPlayer = ::Player::Get(ind);
 
     double playerX = tarPlayer->momentum.x - 0.20;
     double playerY = tarPlayer->momentum.y - 0.20;
@@ -307,27 +307,27 @@ int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
         playerX2 < tarBlock->momentum.x ||
         playerY > tarBlock->momentum.y + tarBlock->momentum.height ||
         playerY2 < tarBlock->momentum.y)
-		return 0;
+        return 0;
 
-	return ::Blocks::TestCollision(tarPlayer, tarBlock);
+    return ::Blocks::TestCollision(tarPlayer, tarBlock);
 }
 
 std::string LuaProxy::Block::layerName() const
 {
-	if(!isValid())
-		return "";
+    if(!isValid())
+        return "";
 
-	return ::Blocks::Get(m_index)->pLayerName;
+    return ::Blocks::Get(m_index)->pLayerName;
 }
 
 luabind::object LuaProxy::Block::layerObj(lua_State *L) const
 {
-	if(!isValid())
-		return luabind::object();
+    if(!isValid())
+        return luabind::object();
 
-	::Block* thisblock = ::Blocks::Get(m_index);
-	wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
-	return findlayer(LunaLua::EncodeUtils::WStr2Str(std::wstring(ptr)).c_str(),L);
+    ::Block* thisblock = ::Blocks::Get(m_index);
+    wchar_t* ptr = *(wchar_t**)((&(*(byte*)thisblock)) + 0x18);
+    return findlayer(LunaLua::EncodeUtils::WStr2Str(std::wstring(ptr)).c_str(),L);
 }
 
 void LuaProxy::Block::remove()
@@ -377,6 +377,6 @@ void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player, int hittingC
 
 bool LuaProxy::Block::isValid() const
 {
-	return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
+    return !(m_index < 0 || m_index > GM_BLOCK_COUNT);
 }
 

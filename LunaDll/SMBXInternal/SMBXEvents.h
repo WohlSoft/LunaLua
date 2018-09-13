@@ -109,158 +109,158 @@
 
 struct SMBXEvent {
 
-	short		NoSmoke; //(0xFFFF == no smoke, 0 == smoke)
-	short		SoundID;
-	VB6StrPtr	pName;
-	VB6StrPtr	pTextMsg;
+    short		NoSmoke; //(0xFFFF == no smoke, 0 == smoke)
+    short		SoundID;
+    VB6StrPtr	pName;
+    VB6StrPtr	pTextMsg;
 
-	VB6StrPtr	pHideLayerTarg1;
-	VB6StrPtr	pHideLayerTarg2;
-	VB6StrPtr	pHideLayerTarg3;
-	VB6StrPtr	pHideLayerTarg4;
-	VB6StrPtr	pHideLayerTarg5;
-	VB6StrPtr	pHideLayerTarg6;
-	VB6StrPtr	pHideLayerTarg7;
-	VB6StrPtr	pHideLayerTarg8;
-	VB6StrPtr	pHideLayerTarg9;
-	VB6StrPtr	pHideLayerTarg10;
-	VB6StrPtr	pHideLayerTarg11;
-	VB6StrPtr	pHideLayerTarg12;
-	VB6StrPtr	pHideLayerTarg13;
-	VB6StrPtr	pHideLayerTarg14;
-	VB6StrPtr	pHideLayerTarg15;
-	VB6StrPtr	pHideLayerTarg16;
-	VB6StrPtr	pHideLayerTarg17;
-	VB6StrPtr	pHideLayerTarg18;
-	VB6StrPtr	pHideLayerTarg19;
-	VB6StrPtr	pHideLayerTarg20;
-	VB6StrPtr	pHideLayerTarg21;
+    VB6StrPtr	pHideLayerTarg1;
+    VB6StrPtr	pHideLayerTarg2;
+    VB6StrPtr	pHideLayerTarg3;
+    VB6StrPtr	pHideLayerTarg4;
+    VB6StrPtr	pHideLayerTarg5;
+    VB6StrPtr	pHideLayerTarg6;
+    VB6StrPtr	pHideLayerTarg7;
+    VB6StrPtr	pHideLayerTarg8;
+    VB6StrPtr	pHideLayerTarg9;
+    VB6StrPtr	pHideLayerTarg10;
+    VB6StrPtr	pHideLayerTarg11;
+    VB6StrPtr	pHideLayerTarg12;
+    VB6StrPtr	pHideLayerTarg13;
+    VB6StrPtr	pHideLayerTarg14;
+    VB6StrPtr	pHideLayerTarg15;
+    VB6StrPtr	pHideLayerTarg16;
+    VB6StrPtr	pHideLayerTarg17;
+    VB6StrPtr	pHideLayerTarg18;
+    VB6StrPtr	pHideLayerTarg19;
+    VB6StrPtr	pHideLayerTarg20;
+    VB6StrPtr	pHideLayerTarg21;
 
-	VB6StrPtr	pShowLayerTarg1;
-	VB6StrPtr	pShowLayerTarg2;
-	VB6StrPtr	pShowLayerTarg3;
-	VB6StrPtr	pShowLayerTarg4;
-	VB6StrPtr	pShowLayerTarg5;
-	VB6StrPtr	pShowLayerTarg6;
-	VB6StrPtr	pShowLayerTarg7;
-	VB6StrPtr	pShowLayerTarg8;
-	VB6StrPtr	pShowLayerTarg9;
-	VB6StrPtr	pShowLayerTarg10;
-	VB6StrPtr	pShowLayerTarg11;
-	VB6StrPtr	pShowLayerTarg12;
-	VB6StrPtr	pShowLayerTarg13;
-	VB6StrPtr	pShowLayerTarg14;
-	VB6StrPtr	pShowLayerTarg15;
-	VB6StrPtr	pShowLayerTarg16;
-	VB6StrPtr	pShowLayerTarg17;
-	VB6StrPtr	pShowLayerTarg18;
-	VB6StrPtr	pShowLayerTarg19;
-	VB6StrPtr	pShowLayerTarg20;
-	VB6StrPtr	pShowLayerTarg21;
+    VB6StrPtr	pShowLayerTarg1;
+    VB6StrPtr	pShowLayerTarg2;
+    VB6StrPtr	pShowLayerTarg3;
+    VB6StrPtr	pShowLayerTarg4;
+    VB6StrPtr	pShowLayerTarg5;
+    VB6StrPtr	pShowLayerTarg6;
+    VB6StrPtr	pShowLayerTarg7;
+    VB6StrPtr	pShowLayerTarg8;
+    VB6StrPtr	pShowLayerTarg9;
+    VB6StrPtr	pShowLayerTarg10;
+    VB6StrPtr	pShowLayerTarg11;
+    VB6StrPtr	pShowLayerTarg12;
+    VB6StrPtr	pShowLayerTarg13;
+    VB6StrPtr	pShowLayerTarg14;
+    VB6StrPtr	pShowLayerTarg15;
+    VB6StrPtr	pShowLayerTarg16;
+    VB6StrPtr	pShowLayerTarg17;
+    VB6StrPtr	pShowLayerTarg18;
+    VB6StrPtr	pShowLayerTarg19;
+    VB6StrPtr	pShowLayerTarg20;
+    VB6StrPtr	pShowLayerTarg21;
 
-	VB6StrPtr	pToggleLayerTarg1;
-	VB6StrPtr	pToggleLayerTarg2;
-	VB6StrPtr	pToggleLayerTarg3;
-	VB6StrPtr	pToggleLayerTarg4;
-	VB6StrPtr	pToggleLayerTarg5;
-	VB6StrPtr	pToggleLayerTarg6;
-	VB6StrPtr	pToggleLayerTarg7;
-	VB6StrPtr	pToggleLayerTarg8;
-	VB6StrPtr	pToggleLayerTarg9;
-	VB6StrPtr	pToggleLayerTarg10;
-	VB6StrPtr	pToggleLayerTarg11;
-	VB6StrPtr	pToggleLayerTarg12;
-	VB6StrPtr	pToggleLayerTarg13;
-	VB6StrPtr	pToggleLayerTarg14;
-	VB6StrPtr	pToggleLayerTarg15;
-	VB6StrPtr	pToggleLayerTarg16;
-	VB6StrPtr	pToggleLayerTarg17;
-	VB6StrPtr	pToggleLayerTarg18;
-	VB6StrPtr	pToggleLayerTarg19;
-	VB6StrPtr	pToggleLayerTarg20;
-	VB6StrPtr	pToggleLayerTarg21;
+    VB6StrPtr	pToggleLayerTarg1;
+    VB6StrPtr	pToggleLayerTarg2;
+    VB6StrPtr	pToggleLayerTarg3;
+    VB6StrPtr	pToggleLayerTarg4;
+    VB6StrPtr	pToggleLayerTarg5;
+    VB6StrPtr	pToggleLayerTarg6;
+    VB6StrPtr	pToggleLayerTarg7;
+    VB6StrPtr	pToggleLayerTarg8;
+    VB6StrPtr	pToggleLayerTarg9;
+    VB6StrPtr	pToggleLayerTarg10;
+    VB6StrPtr	pToggleLayerTarg11;
+    VB6StrPtr	pToggleLayerTarg12;
+    VB6StrPtr	pToggleLayerTarg13;
+    VB6StrPtr	pToggleLayerTarg14;
+    VB6StrPtr	pToggleLayerTarg15;
+    VB6StrPtr	pToggleLayerTarg16;
+    VB6StrPtr	pToggleLayerTarg17;
+    VB6StrPtr	pToggleLayerTarg18;
+    VB6StrPtr	pToggleLayerTarg19;
+    VB6StrPtr	pToggleLayerTarg20;
+    VB6StrPtr	pToggleLayerTarg21;
 
-	short		Section1MusicID; //(FFFF == don't change)
-	short		Section2MusicID; //(FFFF == don't change)
-	short		Section3MusicID; //(FFFF == don't change)
-	short		Section4MusicID; //(FFFF == don't change)
-	short		Section5MusicID; //(FFFF == don't change)
-	short		Section6MusicID; //(FFFF == don't change)
-	short		Section7MusicID; //(FFFF == don't change)
-	short		Section8MusicID; //(FFFF == don't change)
-	short		Section9MusicID; //(FFFF == don't change)
-	short		Section10MusicID; //(FFFF == don't change)
-	short		Section11MusicID; //(FFFF == don't change)
-	short		Section12MusicID; //(FFFF == don't change)
-	short		Section13MusicID; //(FFFF == don't change)
-	short		Section14MusicID; //(FFFF == don't change)
-	short		Section15MusicID; //(FFFF == don't change)
-	short		Section16MusicID; //(FFFF == don't change)
-	short		Section17MusicID; //(FFFF == don't change)
-	short		Section18MusicID; //(FFFF == don't change)
-	short		Section19MusicID; //(FFFF == don't change)
-	short		Section20MusicID; //(FFFF == don't change)
-	short		Section21MusicID; //(FFFF == don't change)
+    short		Section1MusicID; //(FFFF == don't change)
+    short		Section2MusicID; //(FFFF == don't change)
+    short		Section3MusicID; //(FFFF == don't change)
+    short		Section4MusicID; //(FFFF == don't change)
+    short		Section5MusicID; //(FFFF == don't change)
+    short		Section6MusicID; //(FFFF == don't change)
+    short		Section7MusicID; //(FFFF == don't change)
+    short		Section8MusicID; //(FFFF == don't change)
+    short		Section9MusicID; //(FFFF == don't change)
+    short		Section10MusicID; //(FFFF == don't change)
+    short		Section11MusicID; //(FFFF == don't change)
+    short		Section12MusicID; //(FFFF == don't change)
+    short		Section13MusicID; //(FFFF == don't change)
+    short		Section14MusicID; //(FFFF == don't change)
+    short		Section15MusicID; //(FFFF == don't change)
+    short		Section16MusicID; //(FFFF == don't change)
+    short		Section17MusicID; //(FFFF == don't change)
+    short		Section18MusicID; //(FFFF == don't change)
+    short		Section19MusicID; //(FFFF == don't change)
+    short		Section20MusicID; //(FFFF == don't change)
+    short		Section21MusicID; //(FFFF == don't change)
 
-	short		Section1BackgroundID; //(FFFF == don't change)
-	short		Section2BackgroundID; //(FFFF == don't change)
-	short		Section3BackgroundID; //(FFFF == don't change)
-	short		Section4BackgroundID; //(FFFF == don't change)
-	short		Section5BackgroundID; //(FFFF == don't change)
-	short		Section6BackgroundID; //(FFFF == don't change)
-	short		Section7BackgroundID; //(FFFF == don't change)
-	short		Section8BackgroundID; //(FFFF == don't change)
-	short		Section9BackgroundID; //(FFFF == don't change)
-	short		Section10BackgroundID; //(FFFF == don't change)
-	short		Section11BackgroundID; //(FFFF == don't change)
-	short		Section12BackgroundID; //(FFFF == don't change)
-	short		Section13BackgroundID; //(FFFF == don't change)
-	short		Section14BackgroundID; //(FFFF == don't change)
-	short		Section15BackgroundID; //(FFFF == don't change)
-	short		Section16BackgroundID; //(FFFF == don't change)
-	short		Section17BackgroundID; //(FFFF == don't change)
-	short		Section18BackgroundID; //(FFFF == don't change)
-	short		Section19BackgroundID; //(FFFF == don't change)
-	short		Section20BackgroundID; //(FFFF == don't change)
-	short		Section21BackgroundID; //(FFFF == don't change)
+    short		Section1BackgroundID; //(FFFF == don't change)
+    short		Section2BackgroundID; //(FFFF == don't change)
+    short		Section3BackgroundID; //(FFFF == don't change)
+    short		Section4BackgroundID; //(FFFF == don't change)
+    short		Section5BackgroundID; //(FFFF == don't change)
+    short		Section6BackgroundID; //(FFFF == don't change)
+    short		Section7BackgroundID; //(FFFF == don't change)
+    short		Section8BackgroundID; //(FFFF == don't change)
+    short		Section9BackgroundID; //(FFFF == don't change)
+    short		Section10BackgroundID; //(FFFF == don't change)
+    short		Section11BackgroundID; //(FFFF == don't change)
+    short		Section12BackgroundID; //(FFFF == don't change)
+    short		Section13BackgroundID; //(FFFF == don't change)
+    short		Section14BackgroundID; //(FFFF == don't change)
+    short		Section15BackgroundID; //(FFFF == don't change)
+    short		Section16BackgroundID; //(FFFF == don't change)
+    short		Section17BackgroundID; //(FFFF == don't change)
+    short		Section18BackgroundID; //(FFFF == don't change)
+    short		Section19BackgroundID; //(FFFF == don't change)
+    short		Section20BackgroundID; //(FFFF == don't change)
+    short		Section21BackgroundID; //(FFFF == don't change)
 
-	int			Unknown15C;
+    int			Unknown15C;
 
-	float		PositionSettings[251];
+    float		PositionSettings[251];
 
-	int			EndGame; //(1 == bowser defeat, 0 = none)
-	VB6StrPtr	EventToTrigger;
-	float		Delay;
+    int			EndGame; //(1 == bowser defeat, 0 = none)
+    VB6StrPtr	EventToTrigger;
+    float		Delay;
 
-	short		ForceUp; //(0xFFFF = checked)
-	short		ForceDown; //(0xFFFF = checked)
-	short		ForceLeft; //(0xFFFF = checked)
-	short		ForceRight; //(0xFFFF = checked)
-	short		ForceJump; //(0xFFFF = checked)
-	short		ForceAltJump; //(0xFFFF = checked)
-	short		ForceRun; //(0xFFFF = checked)
-	short		ForceAltRun; //(0xFFFF = checked)
-	short		ForceDrop; //(0xFFFF = checked)
-	short		ForceStart; //(0xFFFF = checked)
+    short		ForceUp; //(0xFFFF = checked)
+    short		ForceDown; //(0xFFFF = checked)
+    short		ForceLeft; //(0xFFFF = checked)
+    short		ForceRight; //(0xFFFF = checked)
+    short		ForceJump; //(0xFFFF = checked)
+    short		ForceAltJump; //(0xFFFF = checked)
+    short		ForceRun; //(0xFFFF = checked)
+    short		ForceAltRun; //(0xFFFF = checked)
+    short		ForceDrop; //(0xFFFF = checked)
+    short		ForceStart; //(0xFFFF = checked)
 
-	VB6StrPtr	LayerToMoveName;
-	float		LayerHSpeed;
-	float		LayerVSpeed;
+    VB6StrPtr	LayerToMoveName;
+    float		LayerHSpeed;
+    float		LayerVSpeed;
 
-	float		AutoscrollHSpeed;
-	float		AutoscrollVSpeed;
-	short		AutoscrollSectionNum;
+    float		AutoscrollHSpeed;
+    float		AutoscrollVSpeed;
+    short		AutoscrollSectionNum;
 
-	short		AutoStart; //(0xFFFF = checked)
+    short		AutoStart; //(0xFFFF = checked)
 };
 
 namespace SMBXEvents {
 
-	SMBXEvent* Get(int index);
-	SMBXEvent* GetByName(std::wstring Name);
-	short Count();
+    SMBXEvent* Get(int index);
+    SMBXEvent* GetByName(std::wstring Name);
+    short Count();
 
-	void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
+    void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
     void TriggerEvent(std::wstring eventName, short forceNoSmoke);
 
 }
