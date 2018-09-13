@@ -4,7 +4,7 @@
 
 SHMemServer::SHMemServer()
 {
-	isInit=false;
+    isInit=false;
     wchar_t szName[]=SHMEM_NAME;
     hMapFile = CreateFileMapping(
                   INVALID_HANDLE_VALUE,    // use paging file
@@ -31,7 +31,7 @@ SHMemServer::SHMemServer()
         CloseHandle(hMapFile);
         return;
     }
-	isInit=true;
+    isInit=true;
     //MessageBoxA(NULL, "Installed!", "Shared memory server", MB_OK);
 }
 
@@ -44,7 +44,7 @@ SHMemServer::~SHMemServer()
 
 std::wstring SHMemServer::read()
 {
-	if(!isInit) return std::wstring(L"");
+    if(!isInit) return std::wstring(L"");
     bufIn = std::wstring(pBuf);
     return bufIn;
 }

@@ -8,15 +8,15 @@
 #include "../Rendering/Rendering.h"
 
 class Minigame {
-	virtual bool Initialize() =0;
-	virtual void Process() =0;
-	virtual void Draw(Renderer g) =0;
-	virtual void End() =0;
+    virtual bool Initialize() =0;
+    virtual void Process() =0;
+    virtual void Draw(Renderer g) =0;
+    virtual void End() =0;
 
-	virtual void OnPause();				// Should be called if user tries to pause SMBX, to disable pausing
+    virtual void OnPause();				// Should be called if user tries to pause SMBX, to disable pausing
 
-	Minigame* m_ChildGame;
-	std::list<CGUIElement*> m_GUIElements;	
+    Minigame* m_ChildGame;
+    std::list<CGUIElement*> m_GUIElements;	
 };
 
 //class MinigameController {

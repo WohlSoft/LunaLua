@@ -3,30 +3,30 @@
 
 namespace ScienceBattle
 {
-	void ScienceCode();
-	void ScienceInitCode();
+    void ScienceCode();
+    void ScienceInitCode();
 }
 
 namespace SAJSnowbordin
 {
-	void SnowbordinCode();
-	void SnowbordinInitCode();
+    void SnowbordinCode();
+    void SnowbordinInitCode();
 }
 
 // <-- ADD NEW LEVELS TO THIS --> //
 enum LvlEnum {
-	Invalid,
-	DllTestLvl,
-	QraestoliaCaverns,
-	TheFloorIsLava,
-	CurtainTortoise,
-	AbstractAssault,
-	DemosBrain,
-	EuroShellRandD,
-	Calleoca,
-	Science,
-	Snowbordin,
-	ThouStartsANewVideo,
+    Invalid,
+    DllTestLvl,
+    QraestoliaCaverns,
+    TheFloorIsLava,
+    CurtainTortoise,
+    AbstractAssault,
+    DemosBrain,
+    EuroShellRandD,
+    Calleoca,
+    Science,
+    Snowbordin,
+    ThouStartsANewVideo,
 };
 
 // Add function declarations for specific level functions here (unless the level doesn't need its own)

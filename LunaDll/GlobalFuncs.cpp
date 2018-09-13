@@ -27,29 +27,29 @@
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
-	dest.clear();
-	std::string st=str;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( separator );
-		std::string cur = st.substr( 0, pos );
-		dest.push_back( cur );
-		if ( pos == std::string::npos )
-			break;
-		st = st.substr( pos + 1 );
-	}
+    dest.clear();
+    std::string st=str;
+    while ( true )
+    {
+        size_t pos = str.find_first_of( separator );
+        std::string cur = st.substr( 0, pos );
+        dest.push_back( cur );
+        if ( pos == std::string::npos )
+            break;
+        st = st.substr( pos + 1 );
+    }
 }
 
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to)
 {
-	if(from.empty())
-	return;
-	size_t start_pos = 0;
-	while((start_pos = str.find(from, start_pos)) != std::string::npos)
-	{
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-	}
+    if(from.empty())
+    return;
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
 }
 
 void replaceSubStrW(std::wstring& str, const std::wstring& from, const std::wstring& to)
@@ -66,52 +66,52 @@ void replaceSubStrW(std::wstring& str, const std::wstring& from, const std::wstr
 
 void RemoveSubStr(std::string& sInput, const std::string& sub)
 {
-	std::string::size_type foundpos = sInput.find(sub);
-	if ( foundpos != std::string::npos )
-	sInput.erase(sInput.begin() + foundpos, sInput.begin() + foundpos + sub.length());
+    std::string::size_type foundpos = sInput.find(sub);
+    if ( foundpos != std::string::npos )
+    sInput.erase(sInput.begin() + foundpos, sInput.begin() + foundpos + sub.length());
 }
 
 std::vector<std::string> splitCmdArgs( std::string str)
 {
-	std::vector<std::string> args;
-	std::string arg;
-	arg.clear();
-	bool quote_opened=false;
-	for(unsigned int i=0; i<str.size();i++)
-	{
-		if(quote_opened)
-			goto qstr;
-		if(str[i] == ' ')
-		{
-			if(!arg.empty())
-				args.push_back(arg);
-			arg.clear();
-			continue;
-		}
-		if(str[i] == '\"')
-		{
-			quote_opened=true;
-			continue;
-		}
-		arg.push_back(str[i]);
-	continue;
+    std::vector<std::string> args;
+    std::string arg;
+    arg.clear();
+    bool quote_opened=false;
+    for(unsigned int i=0; i<str.size();i++)
+    {
+        if(quote_opened)
+            goto qstr;
+        if(str[i] == ' ')
+        {
+            if(!arg.empty())
+                args.push_back(arg);
+            arg.clear();
+            continue;
+        }
+        if(str[i] == '\"')
+        {
+            quote_opened=true;
+            continue;
+        }
+        arg.push_back(str[i]);
+    continue;
 
-		qstr:
-			if(str[i] == '\"')
-			{
-				if(!arg.empty())
-					args.push_back(arg);
-				arg.clear();
-				quote_opened=false;
-				continue;
-			}
-			arg.push_back(str[i]);
-	}
+        qstr:
+            if(str[i] == '\"')
+            {
+                if(!arg.empty())
+                    args.push_back(arg);
+                arg.clear();
+                quote_opened=false;
+                continue;
+            }
+            arg.push_back(str[i]);
+    }
 
-	if(!arg.empty())
-				args.push_back(arg);
+    if(!arg.empty())
+                args.push_back(arg);
 
-	return args;
+    return args;
 }
 
 
@@ -240,9 +240,9 @@ BSTR ConvertMBSToBSTR(const std::string & str)
 
 std::string i2str(int source)
 {
-	std::stringstream s;
-	s<<source;
-	return s.str();
+    std::stringstream s;
+    s<<source;
+    return s.str();
 }
 
 bool is_number(const std::string& s)
@@ -413,34 +413,34 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
-	
+    
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
-	//startup settings default
+    //startup settings default
     memset(&gStartupSettings, 0, sizeof(gStartupSettings));
 
-	srand((int)time(NULL));
+    srand((int)time(NULL));
 
-	// Get compatible handle for screen
-	ghMemDC = CreateCompatibleDC(NULL);
+    // Get compatible handle for screen
+    ghMemDC = CreateCompatibleDC(NULL);
 
-	BITMAPINFO bmi;
-	memset(&bmi, 0, sizeof(BITMAPINFO));
-	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth = 800;
-	bmi.bmiHeader.biHeight = -600;
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32;
-	bmi.bmiHeader.biCompression = BI_RGB;
-	gpScreenBits = 0;
+    BITMAPINFO bmi;
+    memset(&bmi, 0, sizeof(BITMAPINFO));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = 800;
+    bmi.bmiHeader.biHeight = -600;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    gpScreenBits = 0;
 
-	ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
+    ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
 
-	/// Init autocode manager	
+    /// Init autocode manager	
 
-	gAutoMan.Clear(true);
+    gAutoMan.Clear(true);
     gAutoMan.ReadGlobals(gAppPathWCHAR);
-	gAutoMan.m_GlobalEnabled = true;
+    gAutoMan.m_GlobalEnabled = true;
 
     std::wstring configFolderPath = gAppPathWCHAR+L"\\config";
 
@@ -454,8 +454,8 @@ void InitGlobals()
 /// CLEAN UP
 void CleanUp() {
     if(ghMemDC)
-		DeleteObject(ghMemDC);
-	DeleteObject(ghGeneralDIB);
+        DeleteObject(ghMemDC);
+    DeleteObject(ghGeneralDIB);
 }
 
 
@@ -465,31 +465,31 @@ void CleanUp() {
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter )
 {
     std::vector<std::wstring> ret;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( delimiter );
-		std::wstring cur = str.substr( 0, pos );
-		ret.push_back( cur );
-		if ( pos == std::wstring::npos )
-			break;
-		str = str.substr( pos + 1 );
-	}
-	return ret;
+    while ( true )
+    {
+        size_t pos = str.find_first_of( delimiter );
+        std::wstring cur = str.substr( 0, pos );
+        ret.push_back( cur );
+        if ( pos == std::wstring::npos )
+            break;
+        str = str.substr( pos + 1 );
+    }
+    return ret;
 }
 
 std::vector<std::string> split(std::string str, char delimiter)
 {
     std::vector<std::string> ret;
-	while ( true )
-	{
-		size_t pos = str.find_first_of( delimiter );
-		std::string cur = str.substr( 0, pos );
-		ret.push_back( cur );
-		if ( pos == std::string::npos )
-			break;
-		str = str.substr( pos + 1 );
-	}
-	return ret;
+    while ( true )
+    {
+        size_t pos = str.find_first_of( delimiter );
+        std::string cur = str.substr( 0, pos );
+        ret.push_back( cur );
+        if ( pos == std::string::npos )
+            break;
+        str = str.substr( pos + 1 );
+    }
+    return ret;
 }
 
 
@@ -519,11 +519,11 @@ std::string url_encode(const std::string &value)
 
 bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& find)
 {
-	for(int i = 0; i < (int)vecStr.size(); ++i){
-		if(vecStr[i] == find)
-			return true;
-	}
-	return false;
+    for(int i = 0; i < (int)vecStr.size(); ++i){
+        if(vecStr[i] == find)
+            return true;
+    }
+    return false;
 }
 
 //HMODULE getModule(std::string moduleName)
@@ -581,15 +581,15 @@ std::wstring normalizePathSlashes(const std::wstring& input)
 bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= std::wstring()*/)
 {
     std::wifstream theFile(path, std::ios::binary| std::ios::in);
-	if(!theFile.is_open()){
-		theFile.close();
-		if(!errMsg.empty())
+    if(!theFile.is_open()){
+        theFile.close();
+        if(!errMsg.empty())
             MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
-		return false;
-	}
+        return false;
+    }
 
-	content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
-	return true;
+    content = std::wstring((std::istreambuf_iterator<wchar_t>(theFile)), std::istreambuf_iterator<wchar_t>());
+    return true;
 }
 
 bool readFile(std::string &content, std::string path, std::string errMsg /*= std::string()*/)
@@ -617,12 +617,12 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
 
 bool isAbsolutePath(const std::wstring& path)
 {
-	return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
+    return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
 }
 
 bool isAbsolutePath(const std::string& path)
 {
-	return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
+    return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
 
 std::wstring resolveIfNotAbsolutePath(std::wstring filename)

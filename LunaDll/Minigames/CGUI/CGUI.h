@@ -6,13 +6,13 @@
 // Top class for all GUI elements
 class CGUIElement {
 protected:
-	virtual void Process() =0;
-	virtual void Draw() =0;
+    virtual void Process() =0;
+    virtual void Draw() =0;
 
-	int m_X;		// Screen X position
-	int m_Y;		// Screen Y position
-	int m_W;		// Element width
-	int m_H;		// Element height
+    int m_X;		// Screen X position
+    int m_Y;		// Screen Y position
+    int m_W;		// Element width
+    int m_H;		// Element height
 
 };
 

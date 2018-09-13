@@ -12,10 +12,10 @@ public:
     bool Init(HDC hDC);
     bool IsInitialized();
 
-	void BindScreen();
-	void BindAndClearFramebuffer();
+    void BindScreen();
+    void BindAndClearFramebuffer();
     void BindFramebuffer();
-	inline const GLDraw::Texture& GetBufTex()
+    inline const GLDraw::Texture& GetBufTex()
     {
         static GLDraw::Texture nullTex(0, 0, 0);
         if (mFramebuffer == nullptr)
@@ -33,24 +33,24 @@ private:
     bool  mHadError;
     bool  mMainThreadCTXApplied;  // Whether wglMakeCurrent has been called for the main thread or not
 
-	// Context variables
-	int   mOldPixelFormat;
+    // Context variables
+    int   mOldPixelFormat;
     HDC   hDC;
     HGLRC hQueueThreadCTX;
     HGLRC hMainThreadCTX;
 
-	// Framebuffer variables
+    // Framebuffer variables
     GLFramebuffer* mCurrentFB;
     GLFramebuffer* mFramebuffer;
 
-	// Init functions
+    // Init functions
     bool InitContextFromHDC(HDC hDC);
     bool InitFramebuffer();
-	bool InitProjectionAndState();
+    bool InitProjectionAndState();
 
-	// Release functions
-	void ReleaseContext();
-	void ReleaseFramebuffer();
+    // Release functions
+    void ReleaseContext();
+    void ReleaseFramebuffer();
 };
 
 // Instance

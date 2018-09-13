@@ -106,52 +106,52 @@ int LuaProxy::LevelObject::idx() const
 
 void LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)
 {
-	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
-	void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
-	LuaProxy::mem((int)ptr, ftype, value, L);
+    WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
+    void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+    LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::LevelObject::mem(int offset, L_FIELDTYPE ftype, lua_State* L) const
 {
-	WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
-	void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
-	return LuaProxy::mem((int)ptr, ftype, L);
+    WorldLevel* pWorldLevel = ::SMBXLevel::get(m_index);
+    void* ptr = ((&(*(byte*)pWorldLevel)) + offset);
+    return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 bool LuaProxy::LevelObject::isValid() const
 {
-	if((m_index < 0) || (m_index > (signed)GM_LEVEL_COUNT))
-		return false;
-	return true;
+    if((m_index < 0) || (m_index > (signed)GM_LEVEL_COUNT))
+        return false;
+    return true;
 }
 
 
 double LuaProxy::LevelObject::x() const
 {
-	if(!isValid())
-		return 0;
-	return SMBXLevel::get(m_index)->momentum.x;
+    if(!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->momentum.x;
 }
 
 
 void LuaProxy::LevelObject::setX(double x)
 {
-	if(!isValid())
-		return;
-	SMBXLevel::get(m_index)->momentum.x = x;
+    if(!isValid())
+        return;
+    SMBXLevel::get(m_index)->momentum.x = x;
 }
 
 double LuaProxy::LevelObject::y() const
 {
-	if(!isValid())
-		return 0;
-	return SMBXLevel::get(m_index)->momentum.y;
+    if(!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->momentum.y;
 }
 
 void LuaProxy::LevelObject::setY(double y)
 {
-	if(!isValid())
-		return;
+    if(!isValid())
+        return;
     SMBXLevel::get(m_index)->momentum.y = y;
 }
 
@@ -326,9 +326,9 @@ void LuaProxy::LevelObject::setIsAlwaysVisible(bool isAlwaysVisible)
 
 std::string LuaProxy::LevelObject::title() const
 {
-	if(!isValid())
-		return "";
-	return SMBXLevel::get(m_index)->levelTitle;
+    if(!isValid())
+        return "";
+    return SMBXLevel::get(m_index)->levelTitle;
 }
 
 

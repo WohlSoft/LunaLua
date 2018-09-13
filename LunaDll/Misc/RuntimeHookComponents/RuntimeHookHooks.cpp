@@ -1169,17 +1169,17 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
 {
     __asm {
         PUSHF
-		SUB ESP, 2
+        SUB ESP, 2
         PUSH EAX
         PUSH DWORD PTR DS : [EBP + 0xC] // objType
         PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
         CALL IsNPCCollidesWithVeggiHook
         MOV DX, AX
-		XOR ECX, ECX
+        XOR ECX, ECX
         POP EAX
-		ADD ESP, 2
+        ADD ESP, 2
         POPF
-		CMP DX, CX
+        CMP DX, CX
         RET
     }
 }

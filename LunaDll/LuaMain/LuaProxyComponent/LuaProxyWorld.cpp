@@ -7,81 +7,81 @@ LuaProxy::World::World()
 
 double LuaProxy::World::playerX() const
 {
-	return SMBXOverworld::get()->momentum.x;
+    return SMBXOverworld::get()->momentum.x;
 }
 
 void LuaProxy::World::setPlayerX(double playerX)
 {
-	SMBXOverworld::get()->momentum.x = playerX;
+    SMBXOverworld::get()->momentum.x = playerX;
 }
 
 double LuaProxy::World::playerY() const
 {
-	return SMBXOverworld::get()->momentum.y;
+    return SMBXOverworld::get()->momentum.y;
 }
 
 void LuaProxy::World::setPlayerY(double playerY)
 {
-	SMBXOverworld::get()->momentum.y = playerY;
+    SMBXOverworld::get()->momentum.y = playerY;
 }
 
 void LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, const luabind::object &value, lua_State* L)
 {
-	Overworld* pOverworld = ::SMBXOverworld::get();
-	void* ptr = ((&(*(byte*)pOverworld)) + offset);
-	LuaProxy::mem((int)ptr, ftype, value, L);
+    Overworld* pOverworld = ::SMBXOverworld::get();
+    void* ptr = ((&(*(byte*)pOverworld)) + offset);
+    LuaProxy::mem((int)ptr, ftype, value, L);
 }
 
 luabind::object LuaProxy::World::mem(int offset, L_FIELDTYPE ftype, lua_State* L) const
 {
-	Overworld* pOverworld = ::SMBXOverworld::get();
-	void* ptr = ((&(*(byte*)pOverworld)) + offset);
-	return LuaProxy::mem((int)ptr, ftype, L);
+    Overworld* pOverworld = ::SMBXOverworld::get();
+    void* ptr = ((&(*(byte*)pOverworld)) + offset);
+    return LuaProxy::mem((int)ptr, ftype, L);
 }
 
 short LuaProxy::World::currentWalkingDirection() const
 {
-	return SMBXOverworld::get()->currentWalkingDirection;
+    return SMBXOverworld::get()->currentWalkingDirection;
 }
 
 void LuaProxy::World::setCurrentWalkingDirection(short currentWalkingDirection)
 {
-	SMBXOverworld::get()->currentWalkingDirection = currentWalkingDirection;
+    SMBXOverworld::get()->currentWalkingDirection = currentWalkingDirection;
 }
 
 short LuaProxy::World::currentWalkingFrame() const
 {
-	return SMBXOverworld::get()->currentWalkingFrame;
+    return SMBXOverworld::get()->currentWalkingFrame;
 }
 
 void LuaProxy::World::setCurrentWalkingFrame(short currentWalkingFrame)
 {
-	SMBXOverworld::get()->currentWalkingFrame = currentWalkingFrame;
+    SMBXOverworld::get()->currentWalkingFrame = currentWalkingFrame;
 }
 
 short LuaProxy::World::currentWalkingFrameTimer() const
 {
-	return SMBXOverworld::get()->currentWalkingFrameTimer;
+    return SMBXOverworld::get()->currentWalkingFrameTimer;
 }
 
 void LuaProxy::World::setCurrentWalkingFrameTimer(short currentWalkingFrameTimer)
 {
-	SMBXOverworld::get()->currentWalkingFrameTimer = currentWalkingFrameTimer;
+    SMBXOverworld::get()->currentWalkingFrameTimer = currentWalkingFrameTimer;
 }
 
 short LuaProxy::World::currentWalkingTimer() const
 {
-	return SMBXOverworld::get()->currentWalkingTimer;
+    return SMBXOverworld::get()->currentWalkingTimer;
 }
 
 void LuaProxy::World::setCurrentWalkingTimer(short currentWalkingTimer)
 {
-	SMBXOverworld::get()->currentWalkingTimer = currentWalkingTimer;
+    SMBXOverworld::get()->currentWalkingTimer = currentWalkingTimer;
 }
 
 bool LuaProxy::World::playerIsCurrentWalking() const
 {
-	return (SMBXOverworld::get()->currentWalkingDirection || SMBXOverworld::get()->isCurrentlyWalking ? true : false);
+    return (SMBXOverworld::get()->currentWalkingDirection || SMBXOverworld::get()->isCurrentlyWalking ? true : false);
 }
 
 std::string LuaProxy::World::levelTitle(lua_State* L)
@@ -103,17 +103,17 @@ luabind::object LuaProxy::World::levelObj(lua_State* L)
 
 short LuaProxy::World::getCurrentDirection() const
 {
-	short val = SMBXOverworld::get()->currentWalkingFrame;
-	if(val == 0 || val == 1)
-		return 3;
-	if(val == 2 || val == 3)
-		return 4;
-	if(val == 4 || val == 5)
-		return 2;
-	if(val == 6 || val == 7)
-		return 1;
+    short val = SMBXOverworld::get()->currentWalkingFrame;
+    if(val == 0 || val == 1)
+        return 3;
+    if(val == 2 || val == 3)
+        return 4;
+    if(val == 4 || val == 5)
+        return 2;
+    if(val == 6 || val == 7)
+        return 1;
 
-	return 0;
+    return 0;
 }
 
 short LuaProxy::World::playerPowerup() const

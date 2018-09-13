@@ -100,6 +100,6 @@ void GLSplitSprite::BindTexture() const {
 
 uint32_t GLSplitSprite::GetSizeBytes() const
 {
-	return 4 * width * height;
+    return 4 * width * height;
 }
 

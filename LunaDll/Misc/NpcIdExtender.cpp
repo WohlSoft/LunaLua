@@ -419,26 +419,26 @@ static uint32_t currentBgoIdLimit = 200;
 
 uint32_t GetBgoIdLimit()
 {
-	return currentBgoIdLimit;
+    return currentBgoIdLimit;
 }
 
 void PatchBgoIdLimit()
 {
-	uint32_t newLimit = SMBX_BGO::MAX_ID;
+    uint32_t newLimit = SMBX_BGO::MAX_ID;
 
-	array_b25b54_obj.Patch(newLimit + 1);
-	array_b2be30_obj.Patch(newLimit);
-	array_b2be4c_obj.Patch(newLimit);
-	array_b2cc34_obj.Patch(newLimit);
-	array_b2ccd8_obj.Patch(newLimit);
-	array_b2ccf4_obj.Patch(newLimit);
-	array_GM_GFX_BACKGROUND_MASK_PTR_obj.Patch(newLimit);
-	array_GM_GFX_BACKGROUND_PTR_obj.Patch(newLimit);
-	array_IPictureDisp_Background_obj.Patch(newLimit);
-	array_IPictureDisp_Background_Mask_obj.Patch(newLimit);
-	array_unkBGOSetting_obj.Patch(newLimit+1);
+    array_b25b54_obj.Patch(newLimit + 1);
+    array_b2be30_obj.Patch(newLimit);
+    array_b2be4c_obj.Patch(newLimit);
+    array_b2cc34_obj.Patch(newLimit);
+    array_b2ccd8_obj.Patch(newLimit);
+    array_b2ccf4_obj.Patch(newLimit);
+    array_GM_GFX_BACKGROUND_MASK_PTR_obj.Patch(newLimit);
+    array_GM_GFX_BACKGROUND_PTR_obj.Patch(newLimit);
+    array_IPictureDisp_Background_obj.Patch(newLimit);
+    array_IPictureDisp_Background_Mask_obj.Patch(newLimit);
+    array_unkBGOSetting_obj.Patch(newLimit+1);
 
-	currentBgoIdLimit = newLimit;
+    currentBgoIdLimit = newLimit;
 }
 
 //================//
@@ -488,57 +488,57 @@ static uint32_t currentBlockIdLimit = 700;
 
 uint32_t GetBlockIdLimit()
 {
-	return currentBlockIdLimit;
+    return currentBlockIdLimit;
 }
 
 void PatchBlockIdLimit()
 {
-	uint32_t newLimit = Block::MAX_ID;
+    uint32_t newLimit = Block::MAX_ID;
 
-	array_b2b94c_obj.Patch(newLimit + 1);
-	array_b2b968_obj.Patch(newLimit + 1);
-	array_b2c048_obj.Patch(newLimit + 1);
-	array_b2c064_obj.Patch(newLimit + 1);
-	array_b2c080_obj.Patch(newLimit + 1);
-	array_b2c09c_obj.Patch(newLimit + 1);
-	array_b2c0b8_obj.Patch(newLimit + 1);
-	array_b2c0d4_obj.Patch(newLimit + 1);
-	array_blockdef_isResizeableBlock_obj.Patch(newLimit + 1);
-	array_blockdef_height_obj.Patch(newLimit + 1);
-	array_blockdef_width_obj.Patch(newLimit + 1);
+    array_b2b94c_obj.Patch(newLimit + 1);
+    array_b2b968_obj.Patch(newLimit + 1);
+    array_b2c048_obj.Patch(newLimit + 1);
+    array_b2c064_obj.Patch(newLimit + 1);
+    array_b2c080_obj.Patch(newLimit + 1);
+    array_b2c09c_obj.Patch(newLimit + 1);
+    array_b2c0b8_obj.Patch(newLimit + 1);
+    array_b2c0d4_obj.Patch(newLimit + 1);
+    array_blockdef_isResizeableBlock_obj.Patch(newLimit + 1);
+    array_blockdef_height_obj.Patch(newLimit + 1);
+    array_blockdef_width_obj.Patch(newLimit + 1);
 
-	array_b2bebc_obj.Patch(newLimit);
-	array_b2bea0_obj.Patch(newLimit);
-	array_HasNoBlockMask_obj.Patch(newLimit);
-	array_unkLoadedCustomBlocks_obj.Patch(newLimit);
-	array_GM_GFX_BLOCKS_MASK_PTR_obj.Patch(newLimit);
-	array_GM_GFX_BLOCKS_PTR_obj.Patch(newLimit);
-	array_IPictureDisp_Blocks_obj.Patch(newLimit);
-	array_IPictureDisp_Blocks_Mask_obj.Patch(newLimit);
+    array_b2bebc_obj.Patch(newLimit);
+    array_b2bea0_obj.Patch(newLimit);
+    array_HasNoBlockMask_obj.Patch(newLimit);
+    array_unkLoadedCustomBlocks_obj.Patch(newLimit);
+    array_GM_GFX_BLOCKS_MASK_PTR_obj.Patch(newLimit);
+    array_GM_GFX_BLOCKS_PTR_obj.Patch(newLimit);
+    array_IPictureDisp_Blocks_obj.Patch(newLimit);
+    array_IPictureDisp_Blocks_Mask_obj.Patch(newLimit);
 
-	// Some others that were missed...
-	PATCH(0x9DC913).dword(newLimit).Apply();
-	PATCH(0x9DC92B).dword(newLimit).Apply();
-	PATCH(0x9DC9B9).dword(newLimit).Apply();
-	PATCH(0x9DC9D7).dword(newLimit).Apply();
-	PATCH(0x9DDA85).dword(newLimit).Apply();
-	PATCH(0x9DDA94).dword(newLimit).Apply();
-	PATCH(0x9DE1C5).dword(newLimit).Apply();
-	PATCH(0x9DE1E2).dword(newLimit).Apply();
-	PATCH(0x9DF2C0).dword(newLimit).Apply();
-	PATCH(0x9DF2DD).dword(newLimit).Apply();
-	PATCH(0x9DF6DC).dword(newLimit).Apply();
-	PATCH(0x9DF6FA).dword(newLimit).Apply();
-	PATCH(0x9DFBF2).dword(newLimit).Apply();
-	PATCH(0x9DFC10).dword(newLimit).Apply();
-	PATCH(0x9E0104).dword(newLimit).Apply();
-	PATCH(0x9E0122).dword(newLimit).Apply();
-	PATCH(0xA1257A).dword(newLimit).Apply();
-	PATCH(0xA52740).word(newLimit).Apply();
+    // Some others that were missed...
+    PATCH(0x9DC913).dword(newLimit).Apply();
+    PATCH(0x9DC92B).dword(newLimit).Apply();
+    PATCH(0x9DC9B9).dword(newLimit).Apply();
+    PATCH(0x9DC9D7).dword(newLimit).Apply();
+    PATCH(0x9DDA85).dword(newLimit).Apply();
+    PATCH(0x9DDA94).dword(newLimit).Apply();
+    PATCH(0x9DE1C5).dword(newLimit).Apply();
+    PATCH(0x9DE1E2).dword(newLimit).Apply();
+    PATCH(0x9DF2C0).dword(newLimit).Apply();
+    PATCH(0x9DF2DD).dword(newLimit).Apply();
+    PATCH(0x9DF6DC).dword(newLimit).Apply();
+    PATCH(0x9DF6FA).dword(newLimit).Apply();
+    PATCH(0x9DFBF2).dword(newLimit).Apply();
+    PATCH(0x9DFC10).dword(newLimit).Apply();
+    PATCH(0x9E0104).dword(newLimit).Apply();
+    PATCH(0x9E0122).dword(newLimit).Apply();
+    PATCH(0xA1257A).dword(newLimit).Apply();
+    PATCH(0xA52740).word(newLimit).Apply();
 
-	PATCH(0xAD3495).dword(newLimit).Apply();
-	PATCH(0xACD342).dword(newLimit).Apply();
-	PATCH(0xAD9EE9).dword(newLimit).Apply();
+    PATCH(0xAD3495).dword(newLimit).Apply();
+    PATCH(0xACD342).dword(newLimit).Apply();
+    PATCH(0xAD9EE9).dword(newLimit).Apply();
 
-	currentBlockIdLimit = newLimit;
+    currentBlockIdLimit = newLimit;
 }

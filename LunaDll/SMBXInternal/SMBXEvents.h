@@ -144,11 +144,11 @@ static_assert(sizeof(SMBXEvent) == 0x588, "sizeof(SMBXEvent) must be 0x588");
 
 namespace SMBXEvents {
 
-	SMBXEvent* Get(int index);
-	SMBXEvent* GetByName(std::wstring Name);
-	short Count();
+    SMBXEvent* Get(int index);
+    SMBXEvent* GetByName(std::wstring Name);
+    short Count();
 
-	void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
+    void TriggerEvent(int Index, int UnknownArg); // doesn't work yet
     void TriggerEvent(std::wstring eventName, short forceNoSmoke);
 
 }

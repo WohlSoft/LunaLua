@@ -4,9 +4,9 @@
 
 // GET
 NPCMOB* NPC::Get(int index) {
-	if(index < 0 || index > GM_NPCS_COUNT)
-		return nullptr;
-		
+    if(index < 0 || index > GM_NPCS_COUNT)
+        return nullptr;
+        
     return &((NPCMOB*)GM_NPCS_PTR)[index + 129]; // +129 makes an offset of 0xAD58
 }
 
@@ -26,102 +26,102 @@ NPCMOB * NPC::GetDummyNPC()
 
 // GET FIRST MATCH
 NPCMOB* NPC::GetFirstMatch(int ID, int section) {
-	bool anyID = (ID == -1 ? true : false);
-	bool anySec = (section == -1 ? true : false);
-	NPCMOB* thisnpc = NULL;
+    bool anyID = (ID == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc = NULL;
 
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = Get(i);
-		if(thisnpc->id == ID || anyID) {
-			if(GetSection(thisnpc) == section || anySec) {
-				return thisnpc; //matched
-			}
-		}
-	}
-	return NULL; //not matched
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = Get(i);
+        if(thisnpc->id == ID || anyID) {
+            if(GetSection(thisnpc) == section || anySec) {
+                return thisnpc; //matched
+            }
+        }
+    }
+    return NULL; //not matched
 }
 
 // FIND ALL
 void NPC::FindAll(int ID, int section, std::list<NPCMOB*>* return_list) {
-	bool anyID = (ID == -1 ? true : false);
-	bool anySec = (section == -1 ? true : false);
-	NPCMOB* thisnpc = NULL;	
+    bool anyID = (ID == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc = NULL;	
 
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = Get(i);
-		if(thisnpc->id == ID || anyID) {
-			if(GetSection(thisnpc) == section || anySec) {
-				return_list->push_back(thisnpc);
-			}
-		}
-	}
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = Get(i);
+        if(thisnpc->id == ID || anyID) {
+            if(GetSection(thisnpc) == section || anySec) {
+                return_list->push_back(thisnpc);
+            }
+        }
+    }
 }
 
 // SET HITS
 void NPC::SetHits(NPCMOB* npc, float hits) {
-	npc->hitCount = hits;
+    npc->hitCount = hits;
 }
 
 // GET SECTION
 short NPC::GetSection(NPCMOB* npc) {
-	return npc->currentSection;
+    return npc->currentSection;
 }
 
 // FACE DIRECTION
 void NPC::FaceDirection(NPCMOB* npc, float direction) {
-	npc->directionFaced2 = direction; // The version at 0x118
+    npc->directionFaced2 = direction; // The version at 0x118
 }
 
 // MEM SET
 void NPC::MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE ftype) {
-	char* dbg =  "MemSetDbg";
-	if(ftype == FT_INVALID || offset > 0x15C)
-		return;
-	bool anyID = (ID == -1 ? true : false);
-	NPCMOB* thisnpc;
+    char* dbg =  "MemSetDbg";
+    if(ftype == FT_INVALID || offset > 0x15C)
+        return;
+    bool anyID = (ID == -1 ? true : false);
+    NPCMOB* thisnpc;
 
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = Get(i);
-		if(anyID || thisnpc->id == ID) {
-			void* ptr = ((&(*(byte*)thisnpc)) + offset);
-			MemAssign((int)ptr, value, operation, ftype);
-		}
-	}//for
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = Get(i);
+        if(anyID || thisnpc->id == ID) {
+            void* ptr = ((&(*(byte*)thisnpc)) + offset);
+            MemAssign((int)ptr, value, operation, ftype);
+        }
+    }//for
 }
 
 // ALL SET HITS
 void NPC::AllSetHits(int identity, int section, float hits) {
-	bool anyID = (identity == -1 ? true : false);
-	bool anySec = (section == -1 ? true : false);
-	NPCMOB* thisnpc;
+    bool anyID = (identity == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc;
 
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = Get(i);
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = Get(i);
         if (anyID || thisnpc->id == identity) {
-			if(anySec || GetSection(thisnpc) == section) {
-				SetHits(thisnpc, hits);
-			}
-		}
-	}	
+            if(anySec || GetSection(thisnpc) == section) {
+                SetHits(thisnpc, hits);
+            }
+        }
+    }	
 }
 
 // ALL FACE
 void NPC::AllFace(int identity, int section, double x) {
-	bool anyID = (identity == -1 ? true : false);
-	bool anySec = (section == -1 ? true : false);
-	NPCMOB* thisnpc;
-	for(int i = 0; i < GM_NPCS_COUNT; i++) {
-		thisnpc = Get(i);
+    bool anyID = (identity == -1 ? true : false);
+    bool anySec = (section == -1 ? true : false);
+    NPCMOB* thisnpc;
+    for(int i = 0; i < GM_NPCS_COUNT; i++) {
+        thisnpc = Get(i);
         if (anyID || thisnpc->id == identity) {
-			if(anySec || GetSection(thisnpc) == section) {
-				if(x < thisnpc->momentum.x) {
-					FaceDirection(thisnpc, -1);
-				} else {
-					FaceDirection(thisnpc, 1);
-				}
-			}
-		}
-	}	
+            if(anySec || GetSection(thisnpc) == section) {
+                if(x < thisnpc->momentum.x) {
+                    FaceDirection(thisnpc, -1);
+                } else {
+                    FaceDirection(thisnpc, 1);
+                }
+            }
+        }
+    }	
 }
 
 // Declerations of inbuilt NPC property arrays
@@ -138,8 +138,8 @@ void NPC::InitProperties() {
         npcprop_vulnerableharmtypes[i] = 0;
         npcprop_spinjumpsafe[i] = 0;
         npcprop_nowaterphysics[i] = 0;
-		npcprop_harmlessgrab[i] = 0;
-		npcprop_harmlessthrown[i] = 0;
+        npcprop_harmlessgrab[i] = 0;
+        npcprop_harmlessthrown[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -172,27 +172,27 @@ void NPC::InitProperties() {
     npcprop_spinjumpsafe[0x11E] = -1;
     npcprop_spinjumpsafe[0x10E] = -1;
 
-	// Set built-in harmless grab IDs
-	npcprop_harmlessgrab[0xC3] = -1;
-	npcprop_harmlessgrab[0x16] = -1;
-	npcprop_harmlessgrab[0x1A] = -1;
-	npcprop_harmlessgrab[0x20] = -1;
-	npcprop_harmlessgrab[0xEE] = -1;
-	npcprop_harmlessgrab[0xEF] = -1;
-	npcprop_harmlessgrab[0xC1] = -1;
-	npcprop_harmlessgrab[0x23] = -1;
-	npcprop_harmlessgrab[0xBF] = -1;
-	npcprop_harmlessgrab[0x31] = -1;
-	npcprop_harmlessgrab[0x86] = -1;
-	npcprop_harmlessgrab[0x9A] = -1;
-	npcprop_harmlessgrab[0x9B] = -1;
-	npcprop_harmlessgrab[0x9C] = -1;
-	npcprop_harmlessgrab[0x9D] = -1;
-	npcprop_harmlessgrab[0x1F] = -1;
-	npcprop_harmlessgrab[0xF0] = -1;
-	npcprop_harmlessgrab[0x116] = -1;
-	npcprop_harmlessgrab[0x117] = -1;
-	npcprop_harmlessgrab[0x124] = -1;
+    // Set built-in harmless grab IDs
+    npcprop_harmlessgrab[0xC3] = -1;
+    npcprop_harmlessgrab[0x16] = -1;
+    npcprop_harmlessgrab[0x1A] = -1;
+    npcprop_harmlessgrab[0x20] = -1;
+    npcprop_harmlessgrab[0xEE] = -1;
+    npcprop_harmlessgrab[0xEF] = -1;
+    npcprop_harmlessgrab[0xC1] = -1;
+    npcprop_harmlessgrab[0x23] = -1;
+    npcprop_harmlessgrab[0xBF] = -1;
+    npcprop_harmlessgrab[0x31] = -1;
+    npcprop_harmlessgrab[0x86] = -1;
+    npcprop_harmlessgrab[0x9A] = -1;
+    npcprop_harmlessgrab[0x9B] = -1;
+    npcprop_harmlessgrab[0x9C] = -1;
+    npcprop_harmlessgrab[0x9D] = -1;
+    npcprop_harmlessgrab[0x1F] = -1;
+    npcprop_harmlessgrab[0xF0] = -1;
+    npcprop_harmlessgrab[0x116] = -1;
+    npcprop_harmlessgrab[0x117] = -1;
+    npcprop_harmlessgrab[0x124] = -1;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -212,13 +212,13 @@ bool NPC::GetNoWaterPhysics(int id) {
 }
 
 bool NPC::GetHarmlessGrab(int id) {
-	if ((id < 1) || (id > NPC::MAX_ID)) return false;
-	return (npcprop_harmlessgrab[id] != 0);
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_harmlessgrab[id] != 0);
 }
 
 bool NPC::GetHarmlessThrown(int id) {
-	if ((id < 1) || (id > NPC::MAX_ID)) return false;
-	return (npcprop_harmlessthrown[id] != 0);
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_harmlessthrown[id] != 0);
 }
 
 // Getter for address of NPC property arrays
@@ -236,14 +236,14 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(npcprop_nowaterphysics);
     }
-	else if (s == "harmlessgrab")
-	{
-		return reinterpret_cast<uintptr_t>(npcprop_harmlessgrab);
-	}
-	else if (s == "harmlessthrown")
-	{
-		return reinterpret_cast<uintptr_t>(npcprop_harmlessthrown);
-	}
+    else if (s == "harmlessgrab")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_harmlessgrab);
+    }
+    else if (s == "harmlessthrown")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_harmlessthrown);
+    }
     else
     {
         return 0;

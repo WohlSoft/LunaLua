@@ -72,20 +72,20 @@ static inline GLenum glCheckFramebufferStatusANY(GLenum target) {
     return GL_FRAMEBUFFER_UNSUPPORTED_EXT;
 }
 static inline void glDeleteFramebuffersANY(GLsizei n, GLuint *framebuffers) {
-	if (GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object) {
-		glDeleteFramebuffers(n, framebuffers);
-	}
-	else if (GLEW_EXT_framebuffer_object) {
-		glDeleteFramebuffersEXT(n, framebuffers);
-	}
+    if (GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object) {
+        glDeleteFramebuffers(n, framebuffers);
+    }
+    else if (GLEW_EXT_framebuffer_object) {
+        glDeleteFramebuffersEXT(n, framebuffers);
+    }
 }
 static inline void glDeleteRenderbuffersANY(GLsizei n, GLuint *renderbuffers) {
-	if (GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object) {
-		glDeleteRenderbuffers(n, renderbuffers);
-	}
-	else if (GLEW_EXT_framebuffer_object) {
-		glDeleteRenderbuffersEXT(n, renderbuffers);
-	}
+    if (GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object) {
+        glDeleteRenderbuffers(n, renderbuffers);
+    }
+    else if (GLEW_EXT_framebuffer_object) {
+        glDeleteRenderbuffersEXT(n, renderbuffers);
+    }
 }
 
 // Core in OpenGL >=1.4

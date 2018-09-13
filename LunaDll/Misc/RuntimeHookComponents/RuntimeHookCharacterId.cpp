@@ -2057,78 +2057,78 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 
 short* getValidCharacterIDArray()
 {
-	static short* ret = nullptr;
-	static unsigned int lastListSize = 0;
-	int newListSize = 5 + runtimeHookCharacterIdMap.size() + 1;
+    static short* ret = nullptr;
+    static unsigned int lastListSize = 0;
+    int newListSize = 5 + runtimeHookCharacterIdMap.size() + 1;
 
-	if (lastListSize != newListSize)
-	{
-		// Free old memory if there was any
-		if (ret != nullptr)
-		{
-			delete[] ret;
-			ret = nullptr;
-		}
+    if (lastListSize != newListSize)
+    {
+        // Free old memory if there was any
+        if (ret != nullptr)
+        {
+            delete[] ret;
+            ret = nullptr;
+        }
 
-		// Allocate memory
-		ret = new short[newListSize]();
-	}
+        // Allocate memory
+        ret = new short[newListSize]();
+    }
 
-	int idx = 0;
+    int idx = 0;
 
-	// Populate with vanilla IDs
-	for (int id = 1; id <= 5; id++)
-	{
-		ret[idx++] = id;
-	}
+    // Populate with vanilla IDs
+    for (int id = 1; id <= 5; id++)
+    {
+        ret[idx++] = id;
+    }
 
-	// Populate with extended IDs
-	for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
-		ret[idx++] = it->first;
-	}
+    // Populate with extended IDs
+    for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
+        ret[idx++] = it->first;
+    }
 
-	// Terminate with 0
-	ret[idx++] = 0;
+    // Terminate with 0
+    ret[idx++] = 0;
 
-	return ret;
+    return ret;
 }
 
 PlayerMOB* getTemplateForCharacter(int id)
 {
-	// Return vanilla character template
-	if (id >= 1 && id <= 5) {
-		PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[id];
-		return playerTemplate;
-	}
+    // Return vanilla character template
+    if (id >= 1 && id <= 5) {
+        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[id];
+        return playerTemplate;
+    }
 
-	// Return mapped character template
-	auto it = runtimeHookCharacterIdMap.find(id);
-	if (it != runtimeHookCharacterIdMap.end())
-	{
-		return &it->second->mStoredTemplate;
-	}
+    // Return mapped character template
+    auto it = runtimeHookCharacterIdMap.find(id);
+    if (it != runtimeHookCharacterIdMap.end())
+    {
+        return &it->second->mStoredTemplate;
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 static PlayerMOB* getTemplateForCharacterWithDummyFallback(int id)
 {
-	static PlayerMOB dummyPlayerStruct = {0};
+    static PlayerMOB dummyPlayerStruct = {0};
 
-	PlayerMOB* ret = getTemplateForCharacter(id);
+    PlayerMOB* ret = getTemplateForCharacter(id);
 
-	if (ret)
-	{
-		return ret;
-	}
-	else
-	{
-		// None found, return dummy character template, because hey, let's not crash
-		memset(&dummyPlayerStruct, 0, sizeof(PlayerMOB));
-		dummyPlayerStruct.Identity = (Characters)id;
-		dummyPlayerStruct.Hearts = 1;
-		return &dummyPlayerStruct;
-	}
+    if (ret)
+    {
+        return ret;
+    }
+    else
+    {
+        // None found, return dummy character template, because hey, let's not crash
+        memset(&dummyPlayerStruct, 0, sizeof(PlayerMOB));
+        dummyPlayerStruct.Identity = (Characters)id;
+        dummyPlayerStruct.Hearts = 1;
+        return &dummyPlayerStruct;
+    }
 }
 
 ///////////////////////

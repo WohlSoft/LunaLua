@@ -44,8 +44,8 @@ public:
     virtual bool isSmbxClearCmd(void) const { return false; }
     virtual bool isExitCmd(void) const { return false; }
 
-	virtual bool allowFrameSkippability(void) const { return true; }
-	virtual bool isSkippable(void) const { return true; }
+    virtual bool allowFrameSkippability(void) const { return true; }
+    virtual bool isSkippable(void) const { return true; }
 };
 
 /******************************/
@@ -177,10 +177,10 @@ public:
         }
     }
 
-	virtual bool isSkippable(void) const {
-		if (mTarget == nullptr) return true;
-		return !mTarget->mNonskippable;
-	}
+    virtual bool isSkippable(void) const {
+        if (mTarget == nullptr) return true;
+        return !mTarget->mNonskippable;
+    }
 };
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {

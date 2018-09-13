@@ -4,8 +4,8 @@
 
 WorldLevel* SMBXLevel::get(int index)
 {
-	if(index < 0 || index > 400)
-		return 0;
+    if(index < 0 || index > 400)
+        return 0;
 
-	return &(((WorldLevel*)GM_LEVEL_BASE)[index]);
+    return &(((WorldLevel*)GM_LEVEL_BASE)[index]);
 }
