@@ -48,7 +48,7 @@ void AutocodeManager::Clear(bool clear_global_codes) {
 void AutocodeManager::ReadFile(wstring dir_path) {
 
     // Form full path
-    //wstring full_path = removeExtension(dir_path);
+    //wstring full_path = RemoveExtension(dir_path);
     wstring full_path = dir_path.append(Level::GetName());	
     full_path = RemoveExtension(full_path);
     full_path = full_path.append(L"\\");
