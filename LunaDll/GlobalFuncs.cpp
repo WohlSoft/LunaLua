@@ -747,7 +747,7 @@ std::wstring getCustomFolderPath()
     std::wstring world_dir = (std::wstring)GM_FULLDIR;
     std::wstring full_path = (gIsOverworld ? world_dir : world_dir.append(Level::GetName()));
     if (!gIsOverworld){
-        full_path = removeExtension(full_path);
+        full_path = RemoveExtension(full_path);
         full_path = full_path.append(L"\\"); // < path into level folder
     }
     return full_path;
