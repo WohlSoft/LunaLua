@@ -321,7 +321,8 @@ DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
 DEFMEM(GM_BLOCKS_PTR,       void*, 0x00B25A04);
 
 // Backgrounds
-DEFMEM(GM_SEC_BG_ARRAY,     short*,  0x00B258B8); //Define for sections
+DEFMEM(GM_SEC_BG_ID,     short*,  0x00B258B8); //Define for sections background id
+DEFMEM(GM_SEC_ORIG_BG_ID,   WORD*, 0x00B25860);   // Same as above but used for events (initial data)
 DEFMEM(GM_BG_XPOS_PTR,      double*, 0x00B2B984);
 
 // Animations

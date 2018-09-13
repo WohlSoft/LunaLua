@@ -414,8 +414,7 @@ struct NPCMOB {
     short unknown_62;                       //+0x62
     short isGenerator;                      //+0x64
     short unknown_66;                       //+0x66
-    short generatorDelaySetting;            //+0x68  NOTE: In the wiki we have float noted, but it does not match with the 4-Byte size! Needs more investigating.
-    short generatorFiringRate;              //+0x6A
+    float generatorDelaySetting;            //+0x68
     float generatorDelayCountdown;          //+0x6C
     short directionToGenerate;              //+0x70
     short generatorType;                    //+0x72

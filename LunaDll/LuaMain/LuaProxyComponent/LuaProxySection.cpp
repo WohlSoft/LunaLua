@@ -82,12 +82,12 @@ void LuaProxy::Section::setHasOffscreenExit(bool hasOffscreenExit)
 
 short LuaProxy::Section::backgroundID() const
 {
-    return GM_SEC_BG_ARRAY[m_secNum];
+    return GM_SEC_BG_ID[m_secNum];
 }
 
 void LuaProxy::Section::setBackgroundID(short backgroundID)
 {
-    GM_SEC_BG_ARRAY[m_secNum] = backgroundID;
+    GM_SEC_BG_ID[m_secNum] = backgroundID;
 }
 
 bool LuaProxy::Section::noTurnBack() const
