@@ -18,7 +18,7 @@ bool Event::isCancellable()
 bool Event::cancelled(lua_State* L)
 {
     if (!isCancellable())
-        luaL_error(L, "Cannot cancle a non-cancleable event");
+        luaL_error(L, "Cannot cancel a non-cancleable event");
     return m_isCancelled;
 }
 
@@ -30,7 +30,7 @@ bool Event::native_cancelled()
 void Event::setCancelled(bool cancled, lua_State* L)
 {
     if (!isCancellable())
-        luaL_error(L, "Cannot cancle a non-cancleable event");
+        luaL_error(L, "Cannot cancel a non-cancleable event");
     m_isCancelled = cancled;
 }
 
