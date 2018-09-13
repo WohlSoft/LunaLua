@@ -220,7 +220,7 @@ void fixup_Mushbug()
 void fixup_Veggibug()
 {
     PATCH(0xA2B17D)
-        .CALL(&IsNPCCollidesWithVeggiHook_Wrapper).NOP().Apply();
+        .CALL(&IsNPCCollidesWithVeggiHook_Wrapper).NOP_PAD_TO_SIZE<10>().Apply();
 }
 
 
