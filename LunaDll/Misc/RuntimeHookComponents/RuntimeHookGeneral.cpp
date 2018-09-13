@@ -228,6 +228,7 @@ void TrySkipPatch()
     /* Simple ASM Source Patches                                            */
     /************************************************************************/
     fixup_TypeMismatch13();
+    fixup_WebBox();
     fixup_Credits();
     fixup_Mushbug();
     fixup_Veggibug();
