@@ -18,9 +18,9 @@ struct STestModeSettings
     std::wstring levelPath;
     std::string levelData;
     int playerCount;
-	bool showFPS;
-	bool godMode;
-	STestModePlayerSettings players[2];
+    bool showFPS;
+    bool godMode;
+    STestModePlayerSettings players[2];
 
     STestModeSettings();
     void ResetToDefault(void);

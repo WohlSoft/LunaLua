@@ -16,29 +16,29 @@ GLContextManager::GLContextManager() :
 }
 
 bool GLContextManager::Init(HDC hDC) {
-	// If we're switching HDCs, deal with it...
-	if (mInitialized && !mHadError && hDC != this->hDC) {
-		// If we're switching HDCs, deal with it...
-		g_GLDraw.UnbindTexture(); // Unbind current texture
-		g_GLTextureStore.Reset(); // Delete all textures
-		ReleaseFramebuffer(); // Release framebuffer
-		ReleaseContext(); // Release context
-		mInitialized = false;
-	}
+    // If we're switching HDCs, deal with it...
+    if (mInitialized && !mHadError && hDC != this->hDC) {
+        // If we're switching HDCs, deal with it...
+        g_GLDraw.UnbindTexture(); // Unbind current texture
+        g_GLTextureStore.Reset(); // Delete all textures
+        ReleaseFramebuffer(); // Release framebuffer
+        ReleaseContext(); // Release context
+        mInitialized = false;
+    }
 
-	// Don't re-run if already run
+    // Don't re-run if already run
     if (mInitialized || mHadError) return true;
 
     if (InitContextFromHDC(hDC) &&
-		InitFramebuffer() &&
-		InitProjectionAndState())
-	{
-		mInitialized = true;
-	} else {
-		mHadError = true;
-	}
+        InitFramebuffer() &&
+        InitProjectionAndState())
+    {
+        mInitialized = true;
+    } else {
+        mHadError = true;
+    }
 
-	return mInitialized;
+    return mInitialized;
 }
 
 bool GLContextManager::IsInitialized() {
@@ -46,9 +46,9 @@ bool GLContextManager::IsInitialized() {
 }
 
 void GLContextManager::BindScreen() {
-	glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferANY(GL_FRAMEBUFFER_EXT, 0);
     g_GLContextManager.SetCurrentFB(nullptr);
-	GLERRORCHECK();
+    GLERRORCHECK();
 }
 
 void GLContextManager::BindFramebuffer() {
@@ -87,7 +87,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     pfd.cDepthBits = 32;
     pfd.iLayerType = PFD_MAIN_PLANE;
 
-	mOldPixelFormat = GetPixelFormat(hDC);
+    mOldPixelFormat = GetPixelFormat(hDC);
 
     int nPixelFormat = ChoosePixelFormat(hDC, &pfd);
     if (0 == nPixelFormat)
@@ -192,7 +192,7 @@ bool GLContextManager::InitProjectionAndState() {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     GLERRORCHECK();
 
-	return true;
+    return true;
 }
 
 
@@ -202,20 +202,20 @@ void GLContextManager::ReleaseFramebuffer() {
 }
 
 void GLContextManager::ReleaseContext() {
-	// Delete Context
-	if (hQueueThreadCTX) {
-		wglMakeCurrent(nullptr, nullptr);
-		wglDeleteContext(hQueueThreadCTX);
-		hQueueThreadCTX = nullptr;
-	}
+    // Delete Context
+    if (hQueueThreadCTX) {
+        wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(hQueueThreadCTX);
+        hQueueThreadCTX = nullptr;
+    }
 
-	// Restore pixel format if necessary
-	if (mOldPixelFormat != GetPixelFormat(hDC)) {
-		PIXELFORMATDESCRIPTOR pfd;
-		DescribePixelFormat(hDC, mOldPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-		SetPixelFormat(hDC, mOldPixelFormat, &pfd);
-	}
+    // Restore pixel format if necessary
+    if (mOldPixelFormat != GetPixelFormat(hDC)) {
+        PIXELFORMATDESCRIPTOR pfd;
+        DescribePixelFormat(hDC, mOldPixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+        SetPixelFormat(hDC, mOldPixelFormat, &pfd);
+    }
 
-	// Clear hDC
-	hDC = nullptr;
+    // Clear hDC
+    hDC = nullptr;
 }

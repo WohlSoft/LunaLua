@@ -39,27 +39,27 @@ static bool LevelCustomSounds = false;
  */
 BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID /*lpvReserved*/)
 {
-	switch (dwReason)
-	{
-	case DLL_PROCESS_ATTACH:
+    switch (dwReason)
+    {
+    case DLL_PROCESS_ATTACH:
         //Init file paths variables
         initAppPaths();
-		gHInstance = (HINSTANCE)hinstDLL;
+        gHInstance = (HINSTANCE)hinstDLL;
         //Init hooks and main LunaLUA modules
         SetupThunRTMainHook();
         timeBeginPeriod(1);
 
-		break;
-	case DLL_THREAD_ATTACH:
-		break;
-	case DLL_THREAD_DETACH:
-		break;
-	case DLL_PROCESS_DETACH:
+        break;
+    case DLL_THREAD_ATTACH:
+        break;
+    case DLL_THREAD_DETACH:
+        break;
+    case DLL_PROCESS_DETACH:
         timeEndPeriod(1);
-		CleanUp();
-		break;
-	}
-	return TRUE;
+        CleanUp();
+        break;
+    }
+    return TRUE;
 }
 
 static DWORD __stdcall GetCurrentProcessorNumberXP(void)
@@ -104,8 +104,8 @@ void LunaDLLInit()
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)
 int OnLvlLoad() {
 
-	// Restore some code the hook overwrote
-	*(DWORD*)0x00B25958 = 0;
+    // Restore some code the hook overwrote
+    *(DWORD*)0x00B25958 = 0;
 
     // Make sure we init the renderer before we start LunaLua when entering levels
     GLEngineProxy::CheckRendererInit();
@@ -147,83 +147,83 @@ int OnLvlLoad() {
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
-	if(gLunaEnabled) {
-		// Load autocode
-		gAutoMan.Clear(false);		
-		gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
+    if(gLunaEnabled) {
+        // Load autocode
+        gAutoMan.Clear(false);		
+        gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
 
-		// Try to load world codes		
-		gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
+        // Try to load world codes		
+        gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
 
-		// Init var bank
-		gSavedVarBank.TryLoadWorldVars();
-		gSavedVarBank.CheckSaveDeletion();
-		gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
+        // Init var bank
+        gSavedVarBank.TryLoadWorldVars();
+        gSavedVarBank.CheckSaveDeletion();
+        gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
         //  Don't try to call the CLunaLua constructor... It's already
         //  constructed automatically once, and trying to do this will call
         //  the constructor extra times *without* ever calling the destructor,
         //  which can result in a memory leak of the whole Lua state!
-		//    gLunaLua = CLunaLua();
-		gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
+        //    gLunaLua = CLunaLua();
+        gLunaLua.init(CLunaLua::LUNALUA_LEVEL, (std::wstring)GM_FULLDIR, Level::GetName());
         gLunaLua.setReady(true);
 
-		// Do some stuff
-		gAutoMan.DoEvents(true); // do with init
+        // Do some stuff
+        gAutoMan.DoEvents(true); // do with init
 
-		// Init some stuff
-		InitLevel();	
-		gAutoMan.m_Hearts = 2;	
-	}
+        // Init some stuff
+        InitLevel();	
+        gAutoMan.m_Hearts = 2;	
+    }
 
     //PGE DBG STUFF
     //readAndWriteNPCSettings();
     //overwriteFunc();
 
-	return 0;
+    return 0;
 }
 
 // *EXPORT* Test Func -- Run once per gameplay frame
 int TestFunc()
 {
-	// Clean up
-	gAutoMan.ClearExpired();
-	gSavedVarBank.CheckSaveDeletion();
+    // Clean up
+    gAutoMan.ClearExpired();
+    gSavedVarBank.CheckSaveDeletion();
 
-	// Update inputs
-	Input::CheckSpecialCheats();
-	Input::UpdateInputTasks();	
+    // Update inputs
+    Input::CheckSpecialCheats();
+    Input::UpdateInputTasks();	
 
-	if(gLunaEnabled) {	
+    if(gLunaEnabled) {	
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
 #endif
         g_EventHandler.hookLevelLoop();
 
-		// Run autocode
-		gAutoMan.DoEvents(false);
+        // Run autocode
+        gAutoMan.DoEvents(false);
 
-		// Update some stuff
+        // Update some stuff
         gFrames++;
-		gSavedVarBank.SaveIfNeeded();
+        gSavedVarBank.SaveIfNeeded();
 
-		// Run any framecode
-		TestFrameCode();
-		LevelFrameCode();
-	}
+        // Run any framecode
+        TestFrameCode();
+        LevelFrameCode();
+    }
 
     Blocks::DoSortingIfRequired();
-	return 0;
+    return 0;
 }
 
 void OnLevelHUDDraw(int cameraIdx) {
 
-	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
-		inputEvent->setDirectEventName("onHUDUpdate");
-		inputEvent->setLoopable(false);
-		gLunaLua.callEvent(inputEvent, cameraIdx);
-	}
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDUpdate", false);
+        inputEvent->setDirectEventName("onHUDUpdate");
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent, cameraIdx);
+    }
 
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onHUDDraw", false);
@@ -232,159 +232,159 @@ void OnLevelHUDDraw(int cameraIdx) {
         gLunaLua.callEvent(inputEvent, cameraIdx);
     }
 
-	gSpriteMan.RunSprites();
+    gSpriteMan.RunSprites();
 }
 
 
 // TEST CODE - This code will run every frame everywhere, making for easy testing
 void TestFrameCode() {
 
-	/// DEBUG STUFF//
+    /// DEBUG STUFF//
 
-	//- Uncomment to test variable bank
-	//for each(pair<wstring, double> kvp in gSavedVarBank.m_VarBank) {
-	//	Renderer::Get().DebugPrint(kvp.first, kvp.second);
-	//}
+    //- Uncomment to test variable bank
+    //for each(pair<wstring, double> kvp in gSavedVarBank.m_VarBank) {
+    //	Renderer::Get().DebugPrint(kvp.first, kvp.second);
+    //}
 
-	//static double bgX = 0;
-	//double** pBGs = (double **)0x00B2B984;
-	//pBGs[0][1] = bgX;
-	//bgX -= 0.1;
+    //static double bgX = 0;
+    //double** pBGs = (double **)0x00B2B984;
+    //pBGs[0][1] = bgX;
+    //bgX -= 0.1;
 
 }
 
 // LEVEL FRAME CODE - This will be run every frame of leveltime. Currently a low-cost enumeration switch based on the loaded level
 void LevelFrameCode() {
 
-	switch(gLevelEnum)
-	{
+    switch(gLevelEnum)
+    {
 
-	case DllTestLvl:
-		dlltestlvlCode();
-		break;
+    case DllTestLvl:
+        dlltestlvlCode();
+        break;
 
-	case QraestoliaCaverns:
-		QraestoliaCavernsCode();
-		break;
+    case QraestoliaCaverns:
+        QraestoliaCavernsCode();
+        break;
 
-	case TheFloorIsLava:
-		TheFloorisLavaCode();
-		break;
+    case TheFloorIsLava:
+        TheFloorisLavaCode();
+        break;
 
-	case Calleoca:
-		CalleocaCode();
-		break;
+    case Calleoca:
+        CalleocaCode();
+        break;
 
-	case Snowbordin:
-		SAJSnowbordin::SnowbordinCode();
-		break;
+    case Snowbordin:
+        SAJSnowbordin::SnowbordinCode();
+        break;
 
-	case Science:
-		ScienceBattle::ScienceCode();
+    case Science:
+        ScienceBattle::ScienceCode();
 
-	case CurtainTortoise:
-		//CurtainTortoiseCode();
-		break;
+    case CurtainTortoise:
+        //CurtainTortoiseCode();
+        break;
 
-	case AbstractAssault:
-		AbstractAssaultCode();
-		break;
-		
-	case DemosBrain:
-		DemosBrainCode();
-		break;
+    case AbstractAssault:
+        AbstractAssaultCode();
+        break;
+        
+    case DemosBrain:
+        DemosBrainCode();
+        break;
 
-	case EuroShellRandD:
-		//EuroShellRandDCode();
-		break;
+    case EuroShellRandD:
+        //EuroShellRandDCode();
+        break;
 
-	case ThouStartsANewVideo:
-		KilArmoryCode();
-		break;
+    case ThouStartsANewVideo:
+        KilArmoryCode();
+        break;
 
-	case Invalid:
-	default:
-		break;
-	}
+    case Invalid:
+    default:
+        break;
+    }
 }
 
 // INIT LEVEL - This should be called during the level load hook function. It'll also figure out which level is being played.
 //				Also put init code in here if you want.
 void InitLevel() {
 
-	// Reset some variables
-	gFrames = 0;
-	gLevelEnum = Invalid;
+    // Reset some variables
+    gFrames = 0;
+    gLevelEnum = Invalid;
 
-	std::wstring curlvl = Level::GetName();
-	PlayerMOB* demo = Player::Get(1);
+    std::wstring curlvl = Level::GetName();
+    PlayerMOB* demo = Player::Get(1);
 
 
-	/// INITIALIZATION BLOCKS ///
+    /// INITIALIZATION BLOCKS ///
 
-	// Example init block
-	if(curlvl == L"dlltest.lvl") {
-		gLevelEnum = DllTestLvl;
-	}
+    // Example init block
+    if(curlvl == L"dlltest.lvl") {
+        gLevelEnum = DllTestLvl;
+    }
 
-	// Qraestolia Caverns init block
-	else if(curlvl == L"SAJewers-QraestoliaCaverns.lvl") {
-		gLevelEnum = QraestoliaCaverns;
-	}
+    // Qraestolia Caverns init block
+    else if(curlvl == L"SAJewers-QraestoliaCaverns.lvl") {
+        gLevelEnum = QraestoliaCaverns;
+    }
 
-	// The Floor is Lava init block
-	else if(curlvl == L"Docopoper-TheFloorisLava.lvl") {
-		gLevelEnum = TheFloorIsLava;
-		demo -> Identity = CHARACTER_MARIO;
-	}
+    // The Floor is Lava init block
+    else if(curlvl == L"Docopoper-TheFloorisLava.lvl") {
+        gLevelEnum = TheFloorIsLava;
+        demo -> Identity = CHARACTER_MARIO;
+    }
 
-	// Curtain Tortoise init block
-	else if(curlvl == L"JosephStaleknight-CurtainTortoise.lvl") {
-		gLevelEnum = CurtainTortoise;
-	}
+    // Curtain Tortoise init block
+    else if(curlvl == L"JosephStaleknight-CurtainTortoise.lvl") {
+        gLevelEnum = CurtainTortoise;
+    }
 
-	// Abtract Assault init block
-	else if(curlvl == L"Docopoper-AbstractAssault.lvl") {
-		gLevelEnum = AbstractAssault;
-	}
+    // Abtract Assault init block
+    else if(curlvl == L"Docopoper-AbstractAssault.lvl") {
+        gLevelEnum = AbstractAssault;
+    }
 
-	// Snowbordin init block
-	else if(curlvl == L"SAJewers-Snowboardin.lvl") {
-		gLevelEnum = Snowbordin;
-		SAJSnowbordin::SnowbordinInitCode();
-	}
+    // Snowbordin init block
+    else if(curlvl == L"SAJewers-Snowboardin.lvl") {
+        gLevelEnum = Snowbordin;
+        SAJSnowbordin::SnowbordinInitCode();
+    }
 
-	// Calleoca init block
-	else if(curlvl == L"Docopoper-Calleoca.lvl") {
-		gLevelEnum = Calleoca;
-		CalleocaInitCode();
-	}
+    // Calleoca init block
+    else if(curlvl == L"Docopoper-Calleoca.lvl") {
+        gLevelEnum = Calleoca;
+        CalleocaInitCode();
+    }
 
-	// Science init block
-	else if(curlvl == L"Talkhaus-Science_Final_Battle.lvl") {
-		gLevelEnum = Science;
-		ScienceBattle::ScienceInitCode();
-	}
-	
-	// EuroShellRandD
-	else if(curlvl == L"ztarwuff-EuroShellRandD.lvl") {
-		gLevelEnum = EuroShellRandD;
-	}
+    // Science init block
+    else if(curlvl == L"Talkhaus-Science_Final_Battle.lvl") {
+        gLevelEnum = Science;
+        ScienceBattle::ScienceInitCode();
+    }
+    
+    // EuroShellRandD
+    else if(curlvl == L"ztarwuff-EuroShellRandD.lvl") {
+        gLevelEnum = EuroShellRandD;
+    }
 
-	else if(curlvl == L"Kil-DemosBrain.lvl") {
-		gLevelEnum = DemosBrain;
-		Player::FilterToSmall(Player::Get(1));
-		Player::FilterMount(Player::Get(1));
-		Player::FilterReservePowerup(Player::Get(1));
-	}
+    else if(curlvl == L"Kil-DemosBrain.lvl") {
+        gLevelEnum = DemosBrain;
+        Player::FilterToSmall(Player::Get(1));
+        Player::FilterMount(Player::Get(1));
+        Player::FilterReservePowerup(Player::Get(1));
+    }
 
-	else if(curlvl == L"LUNA12-thou_starts_a_new_video.lvl") {
-		gLevelEnum = ThouStartsANewVideo;
-		Player::FilterToBig(Player::Get(1));
-		Player::FilterMount(Player::Get(1));
-		Player::FilterReservePowerup(Player::Get(1));
-		Player::Get(1)->Identity = CHARACTER_MARIO;
-	}
+    else if(curlvl == L"LUNA12-thou_starts_a_new_video.lvl") {
+        gLevelEnum = ThouStartsANewVideo;
+        Player::FilterToBig(Player::Get(1));
+        Player::FilterMount(Player::Get(1));
+        Player::FilterReservePowerup(Player::Get(1));
+        Player::Get(1)->Identity = CHARACTER_MARIO;
+    }
 
 }
 

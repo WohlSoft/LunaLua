@@ -15,11 +15,11 @@ class LunaImage;
 
 class GLTextureStore {
 private:
-	static std::atomic<uint64_t> totalMem;
+    static std::atomic<uint64_t> totalMem;
 public:
     std::unordered_map<uint64_t, const GLSprite*> mLunaImageTexMap;
     
-	void Reset();
+    void Reset();
 
     GLTextureStore();
 
@@ -27,7 +27,7 @@ public:
     void ClearLunaImageTexture(uint64_t uid);
     const GLSprite* SpriteFromLunaImage(const std::shared_ptr<LunaImage>& img);
 
-	static uint64_t GetTextureMemory();
+    static uint64_t GetTextureMemory();
 };
 
 // Instance

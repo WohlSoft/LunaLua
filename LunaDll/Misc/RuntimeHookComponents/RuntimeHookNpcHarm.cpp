@@ -8,43 +8,43 @@ static bool npcHarmResultSet = false;
 // Stub to execute the original npc collision function
 _declspec(naked) static void __stdcall runtimeHookCollideNpc_OrigFunc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
-	__asm {
-		push ebp
-		mov ebp, esp
-		sub esp, 8
-		push 0xa281b6
-		ret
-	}
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp, 8
+        push 0xa281b6
+        ret
+    }
 }
 
 // Logging function for diagnostics
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
-	printf("addr=%06x npcIdx=%d type=%d culprit=%d\n", addr, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
-	runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
+    printf("addr=%06x npcIdx=%d type=%d culprit=%d\n", addr, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
+    runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
 }
 
 // Hook for the start of the original npc collision function
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
-	npcHarmResultSet = false;
-	runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+    npcHarmResultSet = false;
+    runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
 }
 
 // Hook to catch when NPC harm is about to occur
 static unsigned int __stdcall runtimeHookNpcHarm(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
-	if (!npcHarmResultSet && gLunaLua.isValid()) {
-		std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCHarm", true);
-		npcKillEvent->setDirectEventName("onNPCHarm");
-		npcKillEvent->setLoopable(false);
-		gLunaLua.callEvent(npcKillEvent, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
+    if (!npcHarmResultSet && gLunaLua.isValid()) {
+        std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCHarm", true);
+        npcKillEvent->setDirectEventName("onNPCHarm");
+        npcKillEvent->setLoopable(false);
+        gLunaLua.callEvent(npcKillEvent, (int)*pNpcIdx, (int)*pObjType, (int)*pObjIdx);
 
-		npcHarmCancelled = npcKillEvent->native_cancelled();
-		npcHarmResultSet = true;
-	}
+        npcHarmCancelled = npcKillEvent->native_cancelled();
+        npcHarmResultSet = true;
+    }
 
-	return npcHarmCancelled ? -1 : 0;
+    return npcHarmCancelled ? -1 : 0;
 }
 
 __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a291d8(void)

@@ -33,7 +33,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("testLevel", IPCTestLevel);
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
     RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
-	RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
+    RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
 }
 
 IPCPipeServer::~IPCPipeServer()
@@ -272,7 +272,7 @@ void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr, const 
 
 json IPCGetSupportedFeatures(const json& params)
 {
-	return {
-		{"LVLX", false}
-	};
+    return {
+        {"LVLX", false}
+    };
 }

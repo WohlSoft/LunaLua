@@ -21,7 +21,7 @@ void GLTextureStore::Reset() {
 void GLTextureStore::ClearLunaImageTextures()
 {
     for (const auto i : mLunaImageTexMap) {
-		totalMem -= i.second->GetSizeBytes();
+        totalMem -= i.second->GetSizeBytes();
         delete i.second;
     }
     mLunaImageTexMap.clear();
@@ -31,7 +31,7 @@ void GLTextureStore::ClearLunaImageTexture(uint64_t uid)
 {
     auto it = mLunaImageTexMap.find(uid);
     if (it != mLunaImageTexMap.end()) {
-		totalMem -= it->second->GetSizeBytes();
+        totalMem -= it->second->GetSizeBytes();
         delete it->second;
         mLunaImageTexMap.erase(it);
     }
@@ -50,18 +50,18 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
         return it->second;
     }
 
-	uint32_t w = img->getW();
-	uint32_t h = img->getH();
+    uint32_t w = img->getW();
+    uint32_t h = img->getH();
 
     // Try to allocate the GLSprite
     GLSprite* sprite = nullptr;
-	void* data = img->getDataPtr();
-	if (data != nullptr)
-	{
-		sprite = GLSprite::Create(data, GL_BGRA, w, h);
-		data = nullptr;
-		img->notifyTextureified();
-	}
+    void* data = img->getDataPtr();
+    if (data != nullptr)
+    {
+        sprite = GLSprite::Create(data, GL_BGRA, w, h);
+        data = nullptr;
+        img->notifyTextureified();
+    }
     img->unlock();
 
     // Handle failure
@@ -71,7 +71,7 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
         return NULL;
     }
 
-	totalMem += sprite->GetSizeBytes();
+    totalMem += sprite->GetSizeBytes();
 
     // Cache new texture
     mLunaImageTexMap[uid] = sprite;
@@ -81,5 +81,5 @@ const GLSprite* GLTextureStore::SpriteFromLunaImage(const std::shared_ptr<LunaIm
 
 uint64_t GLTextureStore::GetTextureMemory()
 {
-	return totalMem;
+    return totalMem;
 }

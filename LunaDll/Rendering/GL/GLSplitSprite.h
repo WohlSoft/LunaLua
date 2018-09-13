@@ -33,7 +33,7 @@ public:
         return 0;
     }
     virtual bool IsValid() const { return valid; }
-	virtual uint32_t GetSizeBytes() const;
+    virtual uint32_t GetSizeBytes() const;
 private:
     bool valid;
     int32_t segsWide;

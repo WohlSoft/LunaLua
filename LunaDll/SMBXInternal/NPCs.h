@@ -370,7 +370,7 @@ enum NPCID : short
 
 #pragma pack(push, 4)
 struct NPCMOB {
-	VB6StrPtr attachedLayerName;            //+0x00
+    VB6StrPtr attachedLayerName;            //+0x00
     short unknown_04;                       //+0x04
     short unknown_06;                       //+0x06 Unknown decrementing Timer
     short unknown_08;                       //+0x08 
@@ -390,18 +390,18 @@ struct NPCMOB {
     short invincibilityToSword;             //+0x26
     short isMaskOnly;                       //+0x28
     short unknown_2A;                       //+0x2A
-	VB6StrPtr activateEventLayerName;       //+0x2C
-	VB6StrPtr deathEventName;               //+0x30
-	VB6StrPtr talkEventName;                //+0x34
-	VB6StrPtr noMoreObjInLayerEventName;    //+0x38
-	VB6StrPtr layerName;                    //+0x3C
+    VB6StrPtr activateEventLayerName;       //+0x2C
+    VB6StrPtr deathEventName;               //+0x30
+    VB6StrPtr talkEventName;                //+0x34
+    VB6StrPtr noMoreObjInLayerEventName;    //+0x38
+    VB6StrPtr layerName;                    //+0x3C
     short isHidden;                         //+0x40
     short legacyBoss;                       //+0x42
     short activated;                        //+0x44
     short friendly;                         //+0x46
     short dontMove;                         //+0x48
     short dontMove2;                        //+0x4A
-	VB6StrPtr talkMsg;                      //+0x4C
+    VB6StrPtr talkMsg;                      //+0x4C
     short unknown_50;                       //+0x50
     short unknown_52;                       //+0x52
     short unknown_54;                       //+0x54
@@ -477,34 +477,34 @@ static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 
 namespace NPC {
 
-	/// Player functions ///
+    /// Player functions ///
 
-	// NPC ACCESS
-	NPCMOB* Get(int index); //Get ptr to an NPC
+    // NPC ACCESS
+    NPCMOB* Get(int index); //Get ptr to an NPC
     NPCMOB* GetRaw(int index);
     NPCMOB* GetDummyNPC();
-	NPCMOB* GetFirstMatch(int ID, int section); // Get first NPC found with the set ID and section, or 0 if no matches. -1 for ANY
+    NPCMOB* GetFirstMatch(int ID, int section); // Get first NPC found with the set ID and section, or 0 if no matches. -1 for ANY
 
-	void FindAll(int target, int internal_section, std::list<NPCMOB*>* return_list);
+    void FindAll(int target, int internal_section, std::list<NPCMOB*>* return_list);
 
-	short GetSection(NPCMOB* npc);
+    short GetSection(NPCMOB* npc);
 
-	void MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
+    void MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
 
-	// STATES
-	void SetHits(NPCMOB* npc, float hits); // Set hits of passed NPC
-	void FaceDirection(NPCMOB* npc, float direction);
+    // STATES
+    void SetHits(NPCMOB* npc, float hits); // Set hits of passed NPC
+    void FaceDirection(NPCMOB* npc, float direction);
 
-	// ITERATORS
-	void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
-	void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
+    // ITERATORS
+    void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
+    void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
 
     void InitProperties();
     uint32_t GetVulnerableHarmTypes(int id);
     bool GetSpinjumpSafe(int id);
     bool GetNoWaterPhysics(int id);
-	bool GetHarmlessGrab(int id);
-	bool GetHarmlessThrown(int id);
+    bool GetHarmlessGrab(int id);
+    bool GetHarmlessThrown(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 

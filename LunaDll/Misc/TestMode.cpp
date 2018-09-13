@@ -45,8 +45,8 @@ void STestModeSettings::ResetToDefault(void)
     levelPath = L"";
     levelData = "";
     playerCount = 1;
-	showFPS = false;
-	godMode = false;
+    showFPS = false;
+    godMode = false;
     players[0].identity = CHARACTER_MARIO;
     players[0].powerup = 1;
     players[0].mountType = 0;
@@ -113,7 +113,7 @@ static bool testModeSetupForLoading()
 
     // Cleanup custom level resources
     native_cleanupLevel();
-	
+    
     // Reset character templates
     for (int i = 1; i <= 5; i++)
     {
@@ -154,8 +154,8 @@ static bool testModeSetupForLoading()
     ep->unknown_10 = 0;
     ep->unknown_14 = "";
 
-	// God Mode cheat code
-	GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
+    // God Mode cheat code
+    GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
     // Show FPS counter
     GM_SHOW_FPS = COMBOOL(testModeSettings.showFPS);
@@ -473,8 +473,8 @@ json IPCTestLevel(const json& params)
     json::const_iterator godModeFlag = params.find("godMode");
     if (godModeFlag != params.cend() && !levelDataIt.value().is_null())
     {
-	    if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
-	    settings.godMode = static_cast<bool>(godModeFlag.value());
+        if (!godModeFlag.value().is_boolean()) throw IPCInvalidParams();
+        settings.godMode = static_cast<bool>(godModeFlag.value());
     }
 
     // Set godMode flag

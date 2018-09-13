@@ -858,7 +858,7 @@ namespace LuaProxy {
         static LuaProxy::Block spawn(int npcid, double x, double y, lua_State* L);
         static bool _getBumpable(int id);
         static void _setBumpable(int id, bool bumpable);
-		static void _rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount);
+        static void _rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount);
 
         Block(int index);
         int idx() const;

@@ -28,28 +28,28 @@ static std::atomic<bool> altLunaRenderThreadValid = false;
 
 Renderer& Renderer::Get()
 {
-	if (altLunaRenderThreadValid && (altLunaRenderThread == GetCurrentThreadId()))
-	{
-		return sAltLunaRender;
-	}
-	return sLunaRender;
+    if (altLunaRenderThreadValid && (altLunaRenderThread == GetCurrentThreadId()))
+    {
+        return sAltLunaRender;
+    }
+    return sLunaRender;
 }
 
 void Renderer::SetAltThread()
 {
-	altLunaRenderThread = GetCurrentThreadId();
-	altLunaRenderThreadValid = true;
-	sAltLunaRender.ClearQueue();
+    altLunaRenderThread = GetCurrentThreadId();
+    altLunaRenderThreadValid = true;
+    sAltLunaRender.ClearQueue();
 }
 
 void Renderer::UnsetAltThread()
 {
-	altLunaRenderThreadValid = false;
+    altLunaRenderThreadValid = false;
 }
 
 bool Renderer::IsAltThreadActive()
 {
-	return altLunaRenderThreadValid;
+    return altLunaRenderThreadValid;
 }
 
 // CTOR
@@ -58,9 +58,9 @@ Renderer::Renderer() :
     m_curCamIdx(1),
     m_renderOpsSortedCount(0),
     m_renderOpsProcessedCount(0),
-	m_currentRenderOps(),
-	m_legacyResourceCodeImages(),
-	m_debugMessages()
+    m_currentRenderOps(),
+    m_legacyResourceCodeImages(),
+    m_debugMessages()
 {
 }
 
@@ -203,11 +203,11 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 void Renderer::RenderBelowPriority(double maxPriority) {
     if (!m_InFrameRender) return;
 
-	if (this == &sLunaRender)
-	{
-		// Make sure we kill the loadscreen before main thread rendering
-		LunaLoadScreenKill();
-	}
+    if (this == &sLunaRender)
+    {
+        // Make sure we kill the loadscreen before main thread rendering
+        LunaLoadScreenKill();
+    }
 
     auto& ops = m_currentRenderOps;
     if (ops.size() <= m_renderOpsProcessedCount) return;
@@ -342,14 +342,14 @@ void Renderer::EndFrameRender()
 
 void Renderer::ClearQueue()
 {
-	m_curCamIdx = 0;
-	for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
-		delete *iter;
-	}
-	m_currentRenderOps.clear();
-	m_renderOpsProcessedCount = 0;
-	m_renderOpsSortedCount = 0;
-	m_InFrameRender = false;
+    m_curCamIdx = 0;
+    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+        delete *iter;
+    }
+    m_currentRenderOps.clear();
+    m_renderOpsProcessedCount = 0;
+    m_renderOpsSortedCount = 0;
+    m_InFrameRender = false;
 }
 
 

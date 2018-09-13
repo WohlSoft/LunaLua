@@ -202,91 +202,91 @@ public:
         return byte(0xE9).dword(addr - cursor() - 5);
     }
 
-	inline AsmPatch<Size + 6> JE(void* addr) const { return JE((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JE(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x84).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JE(void* addr) const { return JE((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JE(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x84).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JZ(T addr) const { return JE(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JZ(T addr) const { return JE(addr); }
 
-	inline AsmPatch<Size + 6> JNE(void* addr) const { return JNE((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JNE(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x85).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JNE(void* addr) const { return JNE((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JNE(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x85).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNZ(T addr) const { return JNE(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNZ(T addr) const { return JNE(addr); }
 
-	inline AsmPatch<Size + 6> JB(void* addr) const { return JB((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JB(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x82).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JB(void* addr) const { return JB((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JB(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x82).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNAE(T addr) const { return JB(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNAE(T addr) const { return JB(addr); }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JC(T addr) const { return JB(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JC(T addr) const { return JB(addr); }
 
-	inline AsmPatch<Size + 6> JNB(void* addr) const { return JNB((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JNB(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x83).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JNB(void* addr) const { return JNB((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JNB(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x83).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JAE(T addr) const { return JNB(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JAE(T addr) const { return JNB(addr); }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNC(T addr) const { return JNB(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNC(T addr) const { return JNB(addr); }
 
-	inline AsmPatch<Size + 6> JBE(void* addr) const { return JBE((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JBE(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x86).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JBE(void* addr) const { return JBE((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JBE(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x86).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNA(T addr) const { return JBE(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNA(T addr) const { return JBE(addr); }
 
-	inline AsmPatch<Size + 6> JA(void* addr) const { return JA((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JA(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x87).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JA(void* addr) const { return JA((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JA(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x87).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNBE(T addr) const { return JA(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNBE(T addr) const { return JA(addr); }
 
-	inline AsmPatch<Size + 6> JL(void* addr) const { return JL((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JL(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x8C).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JL(void* addr) const { return JL((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JL(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x8C).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNGE(T addr) const { return JL(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNGE(T addr) const { return JL(addr); }
 
-	inline AsmPatch<Size + 6> JGE(void* addr) const { return JGE((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JGE(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x8D).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JGE(void* addr) const { return JGE((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JGE(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x8D).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNL(T addr) const { return JGE(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNL(T addr) const { return JGE(addr); }
 
-	inline AsmPatch<Size + 6> JLE(void* addr) const { return JLE((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JLE(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x8E).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JLE(void* addr) const { return JLE((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JLE(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x8E).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNG(T addr) const { return JLE(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNG(T addr) const { return JLE(addr); }
 
-	inline AsmPatch<Size + 6> JG(void* addr) const { return JG((std::uintptr_t)addr); }
-	inline AsmPatch<Size + 6> JG(std::uintptr_t addr) const {
-		return bytes(0x0F, 0x8F).dword(addr - cursor() - 6);
-	}
+    inline AsmPatch<Size + 6> JG(void* addr) const { return JG((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JG(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x8F).dword(addr - cursor() - 6);
+    }
 
-	template<typename T>
-	inline AsmPatch<Size + 6> JNLE(T addr) const { return JG(addr); }
+    template<typename T>
+    inline AsmPatch<Size + 6> JNLE(T addr) const { return JG(addr); }
 
     inline AsmPatch<Size + 13> SAFE_CALL(void* func) const { return SAFE_CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 13> SAFE_CALL(std::uintptr_t func) const {

@@ -20,8 +20,8 @@ private:
     std::atomic<uint32_t> mPendingClear;
     bool mSkipFrame;
     
-	bool mNextEndFrameIsSkippable;
-	ThreadedCmdQueue<bool> mQueuedFrameSkippability;
+    bool mNextEndFrameIsSkippable;
+    ThreadedCmdQueue<bool> mQueuedFrameSkippability;
 
 public:
     GLEngine mInternalGLEngine;

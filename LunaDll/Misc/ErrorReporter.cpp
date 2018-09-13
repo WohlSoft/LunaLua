@@ -36,9 +36,9 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
 
     switch (errCode)
     {
-	case ErrorReport::VB6ERR_INVCALLARG:
-		errDesc += " (Invalid call or argument)\n";
-		break;
+    case ErrorReport::VB6ERR_INVCALLARG:
+        errDesc += " (Invalid call or argument)\n";
+        break;
     case ErrorReport::VB6ERR_OVERFLOW:
         errDesc += " (Overflow)\n";
         break;
@@ -54,20 +54,20 @@ std::string ErrorReport::getCustomVB6ErrorDescription(VB6ErrorCode errCode)
     case ErrorReport::VB6ERR_TYPEMISMATCH:
         errDesc += " (Type mismatch)\n";
         break;
-	case ErrorReport::VB6ERR_FILENOTFOUND:
-		errDesc += " (File not found)\n";
-		break;
-	case ErrorReport::VB6ERR_INPUTPASTEOF:
-		errDesc += " (Input past end of file)\n";
-		break;
-	case ErrorReport::VB6ERR_PATHNOTFOUND:
-		errDesc += " (Path not found)\n";
-		break;
-	case ErrorReport::VB6ERR_OBJVARNOTSET:
-		errDesc += " (Object variable not set)\n";
-		break;
+    case ErrorReport::VB6ERR_FILENOTFOUND:
+        errDesc += " (File not found)\n";
+        break;
+    case ErrorReport::VB6ERR_INPUTPASTEOF:
+        errDesc += " (Input past end of file)\n";
+        break;
+    case ErrorReport::VB6ERR_PATHNOTFOUND:
+        errDesc += " (Path not found)\n";
+        break;
+    case ErrorReport::VB6ERR_OBJVARNOTSET:
+        errDesc += " (Object variable not set)\n";
+        break;
     default:
-		errDesc += "\n";
+        errDesc += "\n";
         break;
     }
     return errDesc;
@@ -104,30 +104,30 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     fullErrorDescription << "LunaLua Version: " + std::string(LUNALUA_VERSION) + "\n";
     fullErrorDescription << "Exception Code: 0x" << std::hex << exception->ExceptionCode;
 
-	switch (exception->ExceptionCode)
-	{
-	case EXCEPTION_FLT_INEXACT_RESULT:
-		fullErrorDescription << " (VB Error)\n";
-		break;
-	case EXCEPTION_ACCESS_VIOLATION:
-		fullErrorDescription << " (Access Violation)\n";
-		break;
-	case EXCEPTION_STACK_OVERFLOW:
-		fullErrorDescription << " (Stack Overflow)\n";
-		break;
-	default:
-		fullErrorDescription << "\n";
-		break;
-	}
+    switch (exception->ExceptionCode)
+    {
+    case EXCEPTION_FLT_INEXACT_RESULT:
+        fullErrorDescription << " (VB Error)\n";
+        break;
+    case EXCEPTION_ACCESS_VIOLATION:
+        fullErrorDescription << " (Access Violation)\n";
+        break;
+    case EXCEPTION_STACK_OVERFLOW:
+        fullErrorDescription << " (Stack Overflow)\n";
+        break;
+    default:
+        fullErrorDescription << "\n";
+        break;
+    }
 
     if (isVB6Exception) {
         fullErrorDescription << getCustomVB6ErrorDescription(lastVB6ErrCode);
     }
 
-	fullErrorDescription << "\n== Stack Trace ==\n";
-	fullErrorDescription << stackTrace;
+    fullErrorDescription << "\n== Stack Trace ==\n";
+    fullErrorDescription << stackTrace;
 
-	fullErrorDescription << "\n== Reporting ==\n";
+    fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
     fullErrorDescription << "* http://wohlsoft.ru/forum/ or\n";
     fullErrorDescription << "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";

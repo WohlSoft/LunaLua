@@ -387,53 +387,53 @@ static_assert(sizeof(PlayerMOB) == 0x184, "sizeof(PlayerMOB) must be 0x184");
 
 namespace Player {
 
-	/// Player functions ///
+    /// Player functions ///
 
-	// PLAYER ACCESS -- (Currently only returns the ptr to the main player)
-	PlayerMOB* Get(int player);
+    // PLAYER ACCESS -- (Currently only returns the ptr to the main player)
+    PlayerMOB* Get(int player);
 
-	// PLAYER MANAGEMENT
-	bool InternalSwap(int player1, int player2); // swaps position of two players in the object list
-	bool InternalSwap(PlayerMOB* player1, PlayerMOB* player2);
-	void MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype);
+    // PLAYER MANAGEMENT
+    bool InternalSwap(int player1, int player2); // swaps position of two players in the object list
+    bool InternalSwap(PlayerMOB* player1, PlayerMOB* player2);
+    void MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype);
 
-	// PLAYER BUTTONS
-	bool PressingDown(PlayerMOB* player);
-	bool PressingUp(PlayerMOB* player);
-	bool PressingLeft(PlayerMOB* player);
-	bool PressingRight(PlayerMOB* player);
-	bool PressingJump(PlayerMOB* player);
-	bool PressingRun(PlayerMOB* player);
-	bool PressingSEL(PlayerMOB* pPlayer);
+    // PLAYER BUTTONS
+    bool PressingDown(PlayerMOB* player);
+    bool PressingUp(PlayerMOB* player);
+    bool PressingLeft(PlayerMOB* player);
+    bool PressingRight(PlayerMOB* player);
+    bool PressingJump(PlayerMOB* player);
+    bool PressingRun(PlayerMOB* player);
+    bool PressingSEL(PlayerMOB* pPlayer);
 
-	void ConsumeAllKeys(PlayerMOB* pPlayer);
+    void ConsumeAllKeys(PlayerMOB* pPlayer);
 
-	// CYCLE PLAYER
-	void CycleRight(PlayerMOB* player);	// Changes player identity to the next character, or around to Demo
-	void CycleLeft(PlayerMOB* player);	// Changes player identity to the previous character, or around to Sheath
+    // CYCLE PLAYER
+    void CycleRight(PlayerMOB* player);	// Changes player identity to the next character, or around to Demo
+    void CycleLeft(PlayerMOB* player);	// Changes player identity to the previous character, or around to Sheath
 
-	// PLAYER STATES
-	bool UsesHearts(PlayerMOB* players);
-	bool IsSpinjumping(PlayerMOB* player);
-	bool IsInForcedAnimation(PlayerMOB* player);
-	bool IsHoldingSpriteType(PlayerMOB* player, int NPC_ID);
-	int	IsStandingOnNPC(PlayerMOB* player); // Returns the index of the NPC being stood on, or 0 if not standing on one
+    // PLAYER STATES
+    bool UsesHearts(PlayerMOB* players);
+    bool IsSpinjumping(PlayerMOB* player);
+    bool IsInForcedAnimation(PlayerMOB* player);
+    bool IsHoldingSpriteType(PlayerMOB* player, int NPC_ID);
+    int	IsStandingOnNPC(PlayerMOB* player); // Returns the index of the NPC being stood on, or 0 if not standing on one
 
-	// FILTERS
-	void FilterToFire(PlayerMOB* player);	// Lowers player's powerup state so they have, at most, a fire flower
-	void FilterToBig(PlayerMOB* player);	// Lowers player's powerup state so they have, at most, mushroom big-ness
-	void FilterToSmall(PlayerMOB* player);	// Lowers player's powerup state to small demo
-	void FilterReservePowerup(PlayerMOB* player);
-	void FilterMount(PlayerMOB* player);
+    // FILTERS
+    void FilterToFire(PlayerMOB* player);	// Lowers player's powerup state so they have, at most, a fire flower
+    void FilterToBig(PlayerMOB* player);	// Lowers player's powerup state so they have, at most, mushroom big-ness
+    void FilterToSmall(PlayerMOB* player);	// Lowers player's powerup state to small demo
+    void FilterReservePowerup(PlayerMOB* player);
+    void FilterMount(PlayerMOB* player);
 
-	// HEARTS
-	void SetHearts(PlayerMOB* player, int new_hearts);
+    // HEARTS
+    void SetHearts(PlayerMOB* player, int new_hearts);
 
-	// ACTIONS
-	void Harm(short* index);
-	void Kill(short* index);
+    // ACTIONS
+    void Harm(short* index);
+    void Kill(short* index);
 
-	RECT GetScreenPosition(PlayerMOB* player);
+    RECT GetScreenPosition(PlayerMOB* player);
 };
 
 #endif

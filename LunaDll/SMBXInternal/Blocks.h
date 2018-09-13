@@ -52,17 +52,17 @@ static_assert(sizeof(Block) == 0x68, "sizeof(Block) must be 0x68");
 
 namespace Blocks {
 
-	Block* Get(int index);			// Get ptr to a block
-	inline Block* GetBase();		// Get base of block array
-	inline short Count();			// Get block count
-	int TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS);
+    Block* Get(int index);			// Get ptr to a block
+    inline Block* GetBase();		// Get base of block array
+    inline short Count();			// Get block count
+    int TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS);
 
-	void SetAll(int type1, int type2);  // Set ID of all blocks of type 1 to type 2
-	void SwapAll(int type1, int type2); // Swap ID of all blocks of type 1 to type 2, and vice versa
-	void ShowAll(int type);				// Show all blocks of type
-	void HideAll(int type);				// Hide all blocks of type
+    void SetAll(int type1, int type2);  // Set ID of all blocks of type 1 to type 2
+    void SwapAll(int type1, int type2); // Swap ID of all blocks of type 1 to type 2, and vice versa
+    void ShowAll(int type);				// Show all blocks of type
+    void HideAll(int type);				// Hide all blocks of type
 
-	bool IsPlayerTouchingType(int BlockType, int sought_collision, PlayerMOB* pMobPOS); // See if player touching block of BlockType
+    bool IsPlayerTouchingType(int BlockType, int sought_collision, PlayerMOB* pMobPOS); // See if player touching block of BlockType
 
     //Sorting releated
     void DoSortingIfRequired(); // Will the block array sort if needed.
