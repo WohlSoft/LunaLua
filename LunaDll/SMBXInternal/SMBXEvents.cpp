@@ -2,13 +2,7 @@
 
 // GET
 SMBXEvent* SMBXEvents::Get(int index) {
-    if(GM_EVENTS_PTR == 0 || index < 0 || index > 100) {
-        return NULL;
-    } else {
-        
-        SMBXEvent* pEventBase = (SMBXEvent*)GM_EVENTS_PTR;
-        return &(pEventBase[index]);
-    }	
+    return SMBXEvent::Get(index);
 }
 
 // GET BY NAME

@@ -11,7 +11,7 @@ struct SMBX_StaticBaseItemArray
 {
     static inline T* Get(unsigned short index) {
         if (index >= MAX_SIZE_VAL) return NULL;
-        return &((T*)*ARRAY_VAL_PTR)[index];
+        return &((T*)*ARRAY_VAL_PTR)[index + OFFSET_VAL];
     }
 };
 
