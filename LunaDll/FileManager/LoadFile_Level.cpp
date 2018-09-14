@@ -45,18 +45,11 @@ void LunaLua_loadLevelFile(LevelData &outData,
     std::wstring levelname = RemoveExtension(filename);
     std::wstring customFolder = dir + levelname;
 
-    std::wcout << L"Calc --> fullPath: \"" << fullPath << "\"" << std::endl
-        << L"Calc --> path: \"" << dir << "\"" << std::endl
-        << L"Calc --> filename: \"" << filename << "\"" << std::endl
-        << L"Calc --> levelname: \"" << levelname << "\"" << std::endl
-        << L"Calc --> custom folder: \"" << customFolder << "\"" << std::endl;
-
     dir = utf8_decode(outData.meta.path + "/");
     replaceSubStrW(dir, L"/", L"\\");
     levelname = utf8_decode(outData.meta.filename);
     std::string customFolderU8 = outData.meta.path + "/" + outData.meta.filename + "/";
     replaceSubStr(customFolderU8, "/", "\\");
-    //MessageBoxA(NULL, (customFolderU8.c_str()), "kkk", NULL);
     customFolder = Str2WStr(customFolderU8);
 
     *(DWORD*)0xB2B9E4 = 0; // Unknown

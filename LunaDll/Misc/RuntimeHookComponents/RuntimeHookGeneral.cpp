@@ -156,6 +156,11 @@ void ParseArgs(const std::vector<std::wstring>& args)
         gStartupSettings.waitForIPC = true;
         gStartupSettings.patch = true;
     }
+
+    if (vecStrFind(args, L"--oldLvlLoader"))
+    {
+        gStartupSettings.oldLvlLoader = true;
+    }
 }
 
 static unsigned int __stdcall LatePatch(void)
@@ -421,20 +426,6 @@ void TrySkipPatch()
         .Apply();
 
     // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
-    /* Replace level file parser with PGE File Library */
-//    PATCH(0x8C0169).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8C09C2).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8C148F).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8C14E0).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8C2659).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8CE3C9).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8E1AAA).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x8FE8CF).CALL(&LoadLevelHook).Apply();
-//    PATCH(0x9B7B20).CALL(&LoadLevelHook).Apply();
-//    PATCH(0xA02BF0).CALL(&LoadLevelHook).Apply();
-//    PATCH(0xA7659C).CALL(&LoadLevelHook).Apply();
-//    PATCH(0xA76916).CALL(&LoadLevelHook).Apply();
-
 
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;

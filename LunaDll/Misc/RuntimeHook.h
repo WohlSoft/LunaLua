@@ -84,7 +84,6 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
 extern short __stdcall MessageBoxOpenHook();
 extern void __stdcall CameraUpdateHook_Wrapper();
-extern void __stdcall LoadLevelHook(VB6StrPtr* path);
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y);
@@ -218,7 +217,7 @@ void runtimeHookCharacterIdReset();
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename);
-//void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
+void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
 void __stdcall runtimeHookCloseWindow(void);
 
 void __stdcall runtimeHookChangeResolution(void* arg1, void* arg2, void* arg3, void* arg4);
