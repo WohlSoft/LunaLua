@@ -26,7 +26,15 @@ SMBXLevelFileBase::SMBXLevelFileBase() :
 
 static void makeErrorLevel(LevelData &outData, const std::string &msg)
 {
+    PGESTRING metaPath = outData.meta.path;
+    PGESTRING metaFilename = outData.meta.filename;
+
     FileFormats::CreateLevelData(outData);
+
+    // Preserve the path/filename so things that depend on this will be happy.
+    outData.meta.path = metaPath;
+    outData.meta.filename = metaFilename;
+
     LevelSection &s = outData.sections[0];
     s.size_left = 0;
     s.size_top = 0;
