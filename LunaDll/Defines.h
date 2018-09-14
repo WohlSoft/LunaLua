@@ -851,7 +851,7 @@ static const auto native_sort_finalize1 = (void(__stdcall *)())GF_BLOCKSORT_FIN1
 static const auto native_sort_finalize2 = (void(__stdcall *)())GF_BLOCKSORT_FIN2;
 static const auto native_sort_bgo       = (void(__stdcall *)())GF_BGOSORT_RELATED;
 
-static const auto native_unkDoorsCount  = (int(__stdcall *)(int, int, int, int))GF_UNK_DOORS_COUNT;
+static const auto native_unkDoorsCount  = (void(__stdcall *)())GF_UNK_DOORS_COUNT;
 
 static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/))GF_TRIGGER_EVENT;
 

@@ -505,8 +505,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         // Skip this shit
     }
 
-    int doorsCnt = -1;
-    native_unkDoorsCount(doorsCnt, (int)IMP_vbaNew2, (int)IMP_vbaHresultCheckObj, (int)IMP_vbaInputFile);
+    native_unkDoorsCount();
 
     GM_WINNING = 0;
 
