@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <time.h>
 #include <cctype>
+#include <cstdarg>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "Shlwapi.h"
@@ -82,3 +83,23 @@ std::string  gAppPathUTF8;
 
 std::wstring gAppPathWCHAR;
 
+// Printf-like message boxes
+void printBoxW(const wchar_t *fmt, ...)
+{
+    wchar_t buf[32768];
+    va_list ap;
+    va_start(ap, fmt);
+    std::vswprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+    dbgbox(buf);
+}
+
+void printBoxA(const char *fmt, ...)
+{
+    char buf[32768];
+    va_list ap;
+    va_start(ap, fmt);
+    std::vsnprintf(buf, sizeof(buf), fmt, ap);
+    va_end(ap);
+    dbgboxA(buf);
+}
