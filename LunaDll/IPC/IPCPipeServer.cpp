@@ -192,64 +192,73 @@ std::string IPCPipeServer::ReadMsgString()
 {
     // Note: This is not written to be particularly efficient right now. Just
     //       readable enough and safe.
-
-    if (mInFD == -1) return "";
-
+    if(mInFD == -1)
+        return "";
     char c;
     std::vector<char> data;
-    while (1)
+    while(1)
     {
         data.clear();
-
         // Read until : delimiter
         bool err = false;
-        while (1)
+        while(true)
         {
             int bytesRead = read(mInFD, &c, 1);
-            if (bytesRead != 1)
-            {
+
+            if(bytesRead != 1)
                 return "";
-            }
-            if (c == ':') break;
-            if ((c > '9') || (c < '0'))
+
+            if(c == ':')
+                break;
+
+            if((c > '9') || (c < '0'))
             {
                 err = true;
                 break;
             }
+
             data.push_back(c);
         }
-        if (err) continue;
+
+        if(err)
+            continue;
+
         std::string byteCountStr = std::string(&data[0], data.size());
         data.clear();
-
-        // Interpret as number
-        int byteCount = std::stoi(byteCountStr);
-        if (byteCount <= 0) continue;
-
-        int byteCursor = 0;
-        data.resize(byteCount);
-        while (byteCursor < byteCount)
+        try
         {
-            int bytesRead = read(mInFD, &data[byteCursor], byteCount - byteCursor);
-            if (bytesRead < 0)
-            {
-                return "";
-            }
-            byteCursor += bytesRead;
-        }
-
-        // Get following comma
-        {
-            int bytesRead = read(mInFD, &c, 1);
-            if (bytesRead != 1) {
-                return "";
-            }
-            if (c != ',')
-            {
+            // Interpret as number
+            int byteCount = byteCountStr.empty() ? 0 : std::stoi(byteCountStr);
+            if(byteCount <= 0)
                 continue;
+            int byteCursor = 0;
+            data.resize(byteCount);
+            while(byteCursor < byteCount)
+            {
+                int bytesRead = read(mInFD, &data[byteCursor], byteCount - byteCursor);
+                if(bytesRead < 0)
+                    return "";
+                byteCursor += bytesRead;
+            }
+            // Get following comma
+            {
+                int bytesRead = read(mInFD, &c, 1);
+
+                if(bytesRead != 1)
+                    return "";
+
+                if(c != ',')
+                    continue;
             }
         }
-
+        catch(const std::exception &)
+        {
+            return "";
+        }
+        catch(...)
+        {
+            return "";
+        }
         return std::string(&data[0], data.size());
     }
 }
