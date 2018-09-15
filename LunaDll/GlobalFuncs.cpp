@@ -52,6 +52,18 @@ void replaceSubStr(std::string& str, const std::string& from, const std::string&
     }
 }
 
+void replaceSubStrW(std::wstring& str, const std::wstring& from, const std::wstring& to)
+{
+    if (from.empty())
+        return;
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::wstring::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+
 void RemoveSubStr(std::string& sInput, const std::string& sub)
 {
     std::string::size_type foundpos = sInput.find(sub);

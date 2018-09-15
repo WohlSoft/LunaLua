@@ -208,7 +208,9 @@ DEFMEM(GM_UNK_B2C5A0,       WORD,  0x00B2C5A0);
 DEFMEM(GM_UNK_B2C6DA,       WORD,  0x00B2C6DA);
 DEFMEM(GM_UNK_B2C8E4,       WORD,  0x00B2C8E4);
 DEFMEM(GM_UNK_B2D742,       WORD,  0x00B2D742);
-DEFMEM(GM_UNK_WINDOWED,   WORD,  0x00B250D8);
+DEFMEM(GM_UNK_WINDOWED,     WORD,  0x00B250D8);
+
+DEFMEM(GM_UNK_SOUND_VOLUME, WORD*, 0x00B2C590);
 
 // NPC Settings
 DEFMEM(GM_CONF_WIDTH,       WORD*, 0x00B25BA8);
@@ -217,8 +219,8 @@ DEFMEM(GM_CONF_GFXWIDTH,    WORD*, 0x00B25BE0);
 DEFMEM(GM_CONF_GFXHEIGHT,   WORD*, 0x00B25BFC);
 
 // Frame counters
-DEFMEM(GM_TRANS_FRAMECT,  DWORD, 0x00B2C670);
-//DEFMEM(GM_ACTIVE_FRAMECT, DWORD, 0x00B2C67C);  Float?
+DEFMEM(GM_TRANS_FRAMECT,  DWORD,  0x00B2C670);
+DEFMEM(GM_ACTIVE_FRAMECT, double, 0x00B2C67C);
 
 // MOB Related memory
 DEFMEM(GM_NPCS_PTR,         void*, 0x00B259E8);     // +0xAD58 + 0x20  to NPCs
@@ -227,10 +229,12 @@ DEFMEM(GM_PLAYERS_PTR,      void*, 0x00B25A20);
 DEFMEM(GM_PLAYERS_TEMPLATE, void*, 0x00B2C91C);     // Editor Template
 DEFMEM(GM_PLAYERS_COUNT,    WORD,  0x00B2595E);
 DEFMEM(GM_EDIT_PLAYERS_PTR, void*, 0x00CF74D8);     // Editor Template player
+DEFMEM(GM_PLAYER_POS,       Momentum*, 0x00B25148);
 
 // Star counting
 DEFMEM(GM_STAR_COUNT,       WORD, 0x00B251E0);
 DEFMEM(GM_STARS_PTR,        void*, 0x00B25714);
+DEFMEM(GM_STAR_COUNT_LEVEL, WORD, 0x00B2C8A8);
 
 // HUD stuff
 DEFMEM(GM_COINS,            WORD,  0x00B2C5A8);
@@ -262,6 +266,8 @@ DEFMEM(GM_KEYRELEASED,      WORD,  0x00B2C884);
 // States
 DEFMEM(GM_FREEZWITCH_ACTIV, WORD,  0x00B2C8B4);
 DEFMEM(GM_PAUSE_OPEN,       WORD,  0x00B250E2);
+
+DEFMEM(GM_CHEAT_MONEYTREE_HAVEMONEY, DWORD, 0x00B2C8BA);
 
 // Camera
 DEFMEM(GM_CAMERA_X,         double*, 0x00B2B984);
@@ -298,6 +304,8 @@ DEFMEM(GM_SEC_CURRENT_MUSIC_ID,short, 0x00B25888);
 // Background objects
 DEFMEM(GM_BGO_COUNT,        WORD,  0x00B25958);
 DEFMEM(GM_BGOS_PTR,         void*, 0x00B259B0);
+
+DEFMEM(GM_BGO_LOCKS_COUNT,  WORD,  0x00B250D6);
 
 // Warps
 DEFMEM(GM_WARP_COUNT,       WORD,  0x00B258E2);
@@ -563,6 +571,9 @@ DEFMEM(blockdef_isResizeableBlock, short*, 0x00B2B930);
 DEFMEM(blockdef_width, short*, 0x00B2B9F8);
 DEFMEM(blockdef_height, short*, 0x00B2BA14);
 
+DEFMEM(bgodef_width, WORD*, 0x00B2CCF4);
+DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);
+
 DEFMEM(effectdef_width, short*, 0x00B2BA68);
 DEFMEM(effectdef_height, short*, 0x00B2BA84);
 
@@ -597,6 +608,9 @@ DEFMEM(IMP_vbaStrCopy,      void*, 0x004011b0); // Ptr to __fastcall
 DEFMEM(IMP_vbaFreeStr,      void*, 0x00401248); // Ptr to __fastcall
 DEFMEM(IMP_rtcRandomize,    void*, 0x00401090); // Ptr to __stdcall
 DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
+DEFMEM(IMP_vbaNew2,         void*, 0x004011A0); // Ptr to __stdcall
+DEFMEM(IMP_vbaHresultCheckObj, void*, 0x00401070); // Ptr to __stdcall
+DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 
 ////////////////////////
 ///    -Functions-   ///
@@ -643,6 +657,9 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 //      Arg1 = int* SoundIndex
 #define GF_PLAY_SFX         0x00A73FD0
+
+//      no args
+#define GM_SETUP_SFX        0x00A74420
 
 //      Arg1 = POS* structure of player, POS* structure of block
 //      1=Collision from top, 2=From right, 3=From bottom, 4=From left, 5=?
@@ -732,6 +749,9 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 //      No Args
 #define GF_BLOCKSORT_FIN2   0x00A99870
 
+//      No Args
+#define GF_BGOSORT_RELATED  0x00A9A000
+
 //      Arg1 = VB6StrPtr* layerName
 //      Arg2 = short* [VB 6 Bool] NoSmoke: False, to display the smoke effect
 #define GF_SHOW_LAYER       0x00AA2760
@@ -744,6 +764,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 #define GF_LOAD_LOCAL_GFX   0x00ACD220
 
+#define GF_LOAD_GRAPHICS_FROM_FOLDER 0x00AD9DC0
+
 #define GF_LOAD_WORLD_GFX   0x00ADFF90
 
 //      Arg1 = VB6StrPtr* Added text to the cheat buffer and execute
@@ -752,6 +774,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 #define GF_LOAD_WORLD_LIST  0x008E35E0
 
 #define GF_LOAD_SAVE_STATES 0x008E41D0
+
+#define GF_LOAD_NPC_CONFIG  0x00B20E50
 
 //      Arg1 = Pointer to structure
 #define GF_THUN_RT_MAIN     0x0040BDD2
@@ -776,6 +800,8 @@ DEFMEM(IMP_vbaFileOpen,     void*, 0x00401194); // Ptr to __stdcall
 
 #define GF_APPLY_FULLSCREEN 0x00A98190
 
+#define GF_UNK_DOORS_COUNT  0x008F7D70
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -795,10 +821,12 @@ static const auto native_initLevelEnv   = (void(__stdcall *)())GF_INIT_LEVEL_ENV
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
 static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;
+static const auto native_updateNPC      = (void(__stdcall *)(short* /*npcID*/))GF_UPDATE_NPC;
 
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_stopMusic      = (void(__stdcall *)())GF_STOP_MUSIC;
 static const auto native_playSFX        = (void(__stdcall *)(short* /*soundIndex*/))GF_PLAY_SFX;
+static const auto native_setupSFX       = (void(__stdcall *)())GM_SETUP_SFX;
 
 static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short* /**/))GF_NPC_CLEANUP;
 
@@ -821,6 +849,9 @@ static const auto native_sortY          = (void(__stdcall *)(short* /*startIndex
 static const auto native_sortX          = (void(__stdcall *)(short* /*startIndex*/, short* /*endIndex*/))GF_BLOCKSORT_X;
 static const auto native_sort_finalize1 = (void(__stdcall *)())GF_BLOCKSORT_FIN1;
 static const auto native_sort_finalize2 = (void(__stdcall *)())GF_BLOCKSORT_FIN2;
+static const auto native_sort_bgo       = (void(__stdcall *)())GF_BGOSORT_RELATED;
+
+static const auto native_unkDoorsCount  = (void(__stdcall *)())GF_UNK_DOORS_COUNT;
 
 static const auto native_triggerEvent   = (void(__stdcall *)(VB6StrPtr* /*eventName*/, short* /*forceNoSmoke*/))GF_TRIGGER_EVENT;
 
@@ -850,6 +881,10 @@ static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
 static const auto native_audioManagement = (void(__stdcall *)(void))GF_AUDIO_MANAGEMENT;
+
+static const auto native_loadNPCConfig  = (void(__stdcall *)(VB6StrPtr* /*customPath*/))GF_LOAD_NPC_CONFIG;
+
+static const auto native_loadGraphicsFromFolder = (void(__stdcall *)(VB6StrPtr* /*customFolder*/))GF_LOAD_GRAPHICS_FROM_FOLDER;
 
 static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
 

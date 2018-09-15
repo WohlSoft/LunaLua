@@ -116,6 +116,12 @@
     <Filter Include="IPC">
       <UniqueIdentifier>{230f7155-7710-423e-b01c-3c8ae5762ffd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\PGE_File_Formats">
+      <UniqueIdentifier>{d4e89256-a839-4fdb-b4dc-62144a84939d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileManager">
+      <UniqueIdentifier>{c2655aeb-6086-4624-a167-d60761e77941}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -555,6 +561,72 @@
     </ClInclude>
     <ClInclude Include="Misc\LoadScreen.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\charsetconvert.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\ConvertUTF.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\CSVReader.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\CSVReaderPGE.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\CSVUtils.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\file_formats.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\file_strlist.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\lvl_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\meta_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\npc_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_globs.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_file_lib_sys.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_x.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_x_macro.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\save_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\smbx64.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\smbx64_cnf_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\smbx64_macro.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\wld_filedata.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\pge_ff_units.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\PGE_File_Formats\smbx38a_private.h">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager\SMBXFileManager.h">
+      <Filter>FileManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1058,6 +1130,81 @@
     <ClCompile Include="Misc\LoadScreen.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_formats.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvl.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvl_38a.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_lvlx.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_meta.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_npc_txt.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_sav.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_savx.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_smbx64_cnf.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wld.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wldx.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rwopen.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_strlist.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\lvl_filedata.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\npc_filedata.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\pge_file_lib_globs.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\pge_x.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\save_filedata.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\smbx64.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\smbx64_cnf_filedata.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\wld_filedata.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\ConvertUTF_PGEFF.c">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\PGE_File_Formats\file_rw_wld_38a.cpp">
+      <Filter>libs\PGE_File_Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\SMBXFileManager.cpp">
+      <Filter>FileManager</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\LoadFile_Level.cpp">
+      <Filter>FileManager</Filter>
+    </ClCompile>
     <ClCompile Include="VersionString.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
@@ -1081,5 +1228,6 @@
       <Filter>SMBXInternal\Reconstructed</Filter>
     </Text>
     <Text Include="Changelog.txt" />
+    <Text Include="libs\PGE_File_Formats\Readme.txt" />
   </ItemGroup>
 </Project>

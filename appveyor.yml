@@ -1,4 +1,4 @@
-- 
+-
   version: 0.7.3.1.{build}
   branches:
     only:
@@ -11,6 +11,10 @@
   clone_depth: 1
 
   clone_folder: C:\_Repos\LunaLUA
+
+  install:
+  - cmd: git submodule init
+  - cmd: git submodule update
 
   build:
     project: LunaDll.sln
@@ -28,18 +32,22 @@
   - provider: Environment
     name: WohlnetFTP
 
-- 
+-
   version: 0.7.3.1.{build}
   branches:
     only:
     - cleanup
   skip_tags: true
-  
+
   os: Visual Studio 2017
-  
+
   clone_depth: 1
   clone_folder: C:\_Repos\LunaLUA
-  
+
+  install:
+  - cmd: git submodule init
+  - cmd: git submodule update
+
   build_script:
   - cmd: mkdir build-appveyor-vs2017
   - cmd: cd build-appveyor-vs2017

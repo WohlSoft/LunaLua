@@ -86,7 +86,7 @@ void IPCPipeServer::ReadThread()
         // Read a string packet
         std::string pktStr = ReadMsgString();
         if (pktStr.size() == 0) break;
-        
+
         // Try to parse as JSON
         json pkt;
         try
@@ -123,7 +123,7 @@ void IPCPipeServer::ReadThread()
 
         SendJsonError(-32601, "Method not found", pktId);
     }
-    
+
     // If we get here, the IPC pipe has been broken, which means we know the parent process has exited
     if (gStartupSettings.waitForIPC)
     {
@@ -273,6 +273,6 @@ void IPCPipeServer::SendJsonError(int errCode, const std::string& errStr, const 
 json IPCGetSupportedFeatures(const json& params)
 {
     return {
-        {"LVLX", false}
+        {"LVLX", true}
     };
 }

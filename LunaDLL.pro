@@ -234,6 +234,8 @@ SOURCES += \
     LunaDll/CustomSprites/CSprite.cpp \
     LunaDll/CustomSprites/CSpriteManager.cpp \
     LunaDll/CustomSprites/SpriteComponent.cpp \
+    LunaDll/FileManager/LoadFile_Level.cpp \
+    LunaDll/FileManager/SMBXFileManager.cpp \
     LunaDll/GameConfig/GameAutostart.cpp \
     LunaDll/GameConfig/GameConfiguration.cpp \
     LunaDll/GameConfig/GeneralLunaConfig.cpp \
@@ -391,6 +393,7 @@ HEADERS += \
     LunaDll/CustomSprites/CSprite.h \
     LunaDll/CustomSprites/CSpriteManager.h \
     LunaDll/CustomSprites/SpriteComponent.h \
+    LunaDll/FileManager/SMBXFileManager.h \
     LunaDll/GameConfig/GameAutostart.h \
     LunaDll/GameConfig/GameConfiguration.h \
     LunaDll/GameConfig/GeneralLunaConfig.h \
@@ -518,3 +521,4 @@ HEADERS += \
     LunaDll/PngRender.h \
     LunaDll/resource.h \
     LunaDll/version.h
+

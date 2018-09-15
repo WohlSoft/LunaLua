@@ -10,6 +10,7 @@
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
+void replaceSubStrW(std::wstring& str, const std::wstring& from, const std::wstring& to);
 void RemoveSubStr(std::string& sInput, const std::string& sub);
 std::vector<std::string> splitCmdArgs( std::string str);
 std::vector<std::wstring> splitCmdArgsW(std::wstring str);

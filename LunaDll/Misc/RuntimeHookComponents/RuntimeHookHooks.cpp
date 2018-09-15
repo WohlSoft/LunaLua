@@ -849,7 +849,7 @@ extern void __stdcall FrameTimingHook()
     frameError = GM_CURRENT_TIME - nextFrameTime;
     if (frameError > 5.0) frameError = 5.0;
     if (frameError < -5.0) frameError = -5.0;
-    
+
 #if defined(ENABLE_FRAME_TIMING_BENCHMARK)
     static RunningStat sFrameTime;
     static double dDivisor = 0.0;
@@ -927,7 +927,7 @@ extern short __stdcall MessageBoxOpenHook()
         MessageBoxContinueCode.Apply();
     else
         MessageBoxContinueCode.Unapply();
-    
+
     return (short)GM_PLAYERS_COUNT;
 }
 
@@ -982,6 +982,8 @@ void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
         JMP PostCameraUpdateHook         // JMP to PostCameraUpdateHook
     };
 }
+
+#include "../../FileManager/SMBXFileManager.h"
 
 extern void __stdcall WorldHUDPrintTextController(VB6StrPtr* Text, short* fonttype, float* x, float* y)
 {
@@ -1055,7 +1057,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
         }
     }
-    
+
     bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
@@ -1226,7 +1228,7 @@ static void runtimeHookSmbxChangeModeHook(void)
         WaitMessage();
         LunaDllWaitFrame(false);
     }
-    
+
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
 }
@@ -1273,7 +1275,15 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
     }
     else
     {
-        loadLevel_OrigFunc(filename);
+        if (gStartupSettings.oldLvlLoader)
+        {
+            loadLevel_OrigFunc(filename);
+        }
+        else
+        {
+            SMBXLevelFileBase base;
+            base.ReadFile(static_cast<std::wstring>(*filename));
+        }
     }
 }
 
@@ -1370,7 +1380,7 @@ static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *har
             {
                 return 0;
             }
-            
+
             if ((otherNpc != nullptr) && (otherNpc->id == NPCID_PLAYERICEBALL) && npc_noiceball[npc->id])
             {
                 return 0;
@@ -1550,7 +1560,7 @@ _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
         call runtimeHookNPCHarmlessThrown
         cmp eax, 0
         jne harmlessRestoreRet
-        
+
         pop edx
         pop ecx
         pop eax

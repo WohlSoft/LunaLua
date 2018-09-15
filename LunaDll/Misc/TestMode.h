@@ -12,21 +12,40 @@ struct STestModePlayerSettings
     short mountColor;
 };
 
+struct STestModeData
+{
+    //! Currently using level data
+    std::string levelData;
+
+    /**
+     * @brief Clear the data
+     */
+    void clear(void);
+};
+
 struct STestModeSettings
 {
+    //! Testing mode is enabled
     bool enabled;
+    //! Path to actual level file to try open it when raw data wasn't sent
     std::wstring levelPath;
-    std::string levelData;
+    //! Count of players
     int playerCount;
+    //! Turn on FPS counter printing
     bool showFPS;
+    //! Turn on god mode
     bool godMode;
+    //! Settings of playable characters per player
     STestModePlayerSettings players[2];
 
     STestModeSettings();
+    /**
+     * @brief Reset settings to initial state
+     */
     void ResetToDefault(void);
 };
 
-bool testModeEnable(const STestModeSettings& settings);
+bool testModeEnable(const STestModeSettings& settings, const std::string &newLevelData = std::string());
 void testModeDisable(void);
 void testModeRestartLevel(void);
 

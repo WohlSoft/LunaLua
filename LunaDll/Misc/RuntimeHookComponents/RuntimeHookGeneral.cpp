@@ -156,6 +156,11 @@ void ParseArgs(const std::vector<std::wstring>& args)
         gStartupSettings.waitForIPC = true;
         gStartupSettings.patch = true;
     }
+
+    if (vecStrFind(args, L"--oldLvlLoader"))
+    {
+        gStartupSettings.oldLvlLoader = true;
+    }
 }
 
 static unsigned int __stdcall LatePatch(void)

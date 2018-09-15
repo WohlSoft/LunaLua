@@ -43,6 +43,7 @@ struct startUpSettings{
     bool noGL;
     bool waitForIPC;
     volatile bool currentlyWaitingForIPC;
+    bool oldLvlLoader;
 };
 
 struct SMBXHUDSettings {
@@ -118,6 +119,10 @@ extern CLunaLua				gLunaLua;
 extern std::string  gAppPathANSI;
 extern std::string  gAppPathUTF8;
 extern std::wstring gAppPathWCHAR;
+
+// Message boxes with printf-like syntax
+void printBoxA(const char *fmt, ...);
+void printBoxW(const wchar_t *fmt, ...);
 
 /// HELPER MACROS ///
 /*
