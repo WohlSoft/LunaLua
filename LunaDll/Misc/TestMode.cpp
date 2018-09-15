@@ -307,7 +307,7 @@ bool testModeEnable(const STestModeSettings& settings, const std::string &newLev
     }
 
     // Check that the file exists, but only if we don't have raw level data
-    if ((!newLevelData.empty()) && (FileExists(fullPath.c_str()) == 0))
+    if (newLevelData.empty() && (FileExists(fullPath.c_str()) == 0))
     {
         return false;
     }
