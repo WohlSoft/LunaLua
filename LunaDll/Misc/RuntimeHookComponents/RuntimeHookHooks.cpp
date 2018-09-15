@@ -1282,7 +1282,7 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
         else
         {
             SMBXLevelFileBase base;
-            base.ReadFile(static_cast<std::wstring>(*filename));
+            base.ReadFile(static_cast<std::wstring>(*filename), getCurrentLevelData());
         }
     }
 }

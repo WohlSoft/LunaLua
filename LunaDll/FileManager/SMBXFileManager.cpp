@@ -59,9 +59,9 @@ static void makeErrorLevel(LevelData &outData, const std::string &msg)
 
 extern void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath);
 
-void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
+void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outData)
 {
-    LevelData outData;
+    FileFormats::CreateLevelData(outData);
     m_isValid = true; // Ensure that we are not valid right now
 
     // Check if Attributes is valid
@@ -94,12 +94,12 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath)
 }
 
 
-void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, const std::wstring& path)
+void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, LevelData &outData, const std::wstring& fakePath)
 {
-    LevelData outData;
+    FileFormats::CreateLevelData(outData);
     m_isValid = true; // Ensure that we are not valid right now
 
-    if (!FileFormats::OpenLevelRaw(rawData, utf8_encode(path), outData))
+    if (!FileFormats::OpenLevelRaw(rawData, utf8_encode(fakePath), outData))
     {
         m_isValid = false;
         makeErrorLevel(outData, (" There was an error while  "
@@ -109,6 +109,6 @@ void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, const std::wstring& p
         std::to_string(outData.meta.ERROR_linenum));
     }
 
-    LunaLua_loadLevelFile(outData, path);
+    LunaLua_loadLevelFile(outData, fakePath);
 }
 

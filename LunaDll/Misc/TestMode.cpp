@@ -2,6 +2,7 @@
 #include <string>
 #include <mutex>
 #include "../../libs/json/json.hpp"
+#include "../../libs/PGE_File_Formats/file_formats.h"
 #include "../Defines.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
@@ -38,7 +39,8 @@ static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP()
 
 void STestModeData::clear()
 {
-    levelData.clear();
+    levelRawData.clear();
+    FileFormats::CreateLevelData(levelData);
 }
 
 STestModeSettings::STestModeSettings()
@@ -74,6 +76,12 @@ void setTestModeSettings(const STestModeSettings& settings)
     testModeSettings = settings;
 }
 
+LevelData &getCurrentLevelData()
+{
+    return testModeData.levelData;
+}
+
+
 /////////////////////////////////////////////
 //============ GAME MODE SETUP ============//
 /////////////////////////////////////////////
@@ -106,7 +114,7 @@ static bool testModeSetupForLoading()
     const std::wstring& path = testModeSettings.levelPath;
 
     // Check that the file exists, but only if we don't have raw level data
-    if ((testModeData.levelData.size() == 0) && (FileExists(path.c_str()) == 0))
+    if ((testModeData.levelRawData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
         return false;
     }
@@ -248,10 +256,10 @@ bool testModeLoadLevelHook(VB6StrPtr* filename)
     if (!testModeSettings.enabled) return false;
 
     // If the filename matches the one we're testing, and we have raw level data, let's use it
-    if (*filename == testModeSettings.levelPath && testModeData.levelData.size() > 0)
+    if (*filename == testModeSettings.levelPath && testModeData.levelRawData.size() > 0)
     {
         SMBXLevelFileBase base;
-        base.ReadFileMem(testModeData.levelData, testModeSettings.levelPath);
+        base.ReadFileMem(testModeData.levelRawData, getCurrentLevelData(), testModeSettings.levelPath);
         return true;
     }
 
@@ -312,9 +320,9 @@ bool testModeEnable(const STestModeSettings& settings, const std::string &newLev
         return false;
     }
 
-    testModeData.levelData.clear();
+    testModeData.levelRawData.clear();
     if(!newLevelData.empty())
-        testModeData.levelData = newLevelData;
+        testModeData.levelRawData = newLevelData;
     testModeSettings = settings;
     testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;

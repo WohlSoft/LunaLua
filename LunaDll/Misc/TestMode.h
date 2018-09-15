@@ -3,6 +3,7 @@
 
 #include <string>
 #include "VB6StrPtr.h"
+#include "../libs/PGE_File_Formats/lvl_filedata.h"
 
 struct STestModePlayerSettings
 {
@@ -15,8 +16,9 @@ struct STestModePlayerSettings
 struct STestModeData
 {
     //! Currently using level data
-    std::string levelData;
-
+    std::string levelRawData;
+    //! Current cache of the level data
+    LevelData   levelData;
     /**
      * @brief Clear the data
      */
@@ -54,6 +56,8 @@ bool testModeLoadLevelHook(VB6StrPtr* filename);
 
 STestModeSettings getTestModeSettings();
 void setTestModeSettings(const STestModeSettings& settings);
+
+LevelData &getCurrentLevelData();
 
 bool TestModeCheckHideWindow(void);
 
