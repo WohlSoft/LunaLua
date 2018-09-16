@@ -19,7 +19,7 @@ auto RemoveTail(const std::basic_string<Elem, Traits, Alloc>& filename, Elem tai
     return filename.substr(0, lastdot);
 }
 
-inline auto RemoveExtension(const std::string& filename) 
+inline auto RemoveExtension(const std::string& filename)
 {
     return RemoveTail(filename, '.');
 }
@@ -32,6 +32,12 @@ inline auto RemoveExtension(const std::wstring& filename)
 
 BOOL FileExists(LPCTSTR szPath);
 BOOL DirectoryExists(LPCTSTR szPath);
+
+bool fileExists(const std::wstring &szPath);
+bool directoryExists(const std::wstring &szPath);
+
+bool hasSuffix(const std::string &path, const std::string &suffix);
+bool hasSuffix(const std::wstring &path, const std::wstring &suffix);
 
 FIELDTYPE StrToFieldtype(std::wstring string);
 void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype);
@@ -54,7 +60,7 @@ void InitIfMissing(std::map<std::wstring, double>* map, std::wstring sought_key,
 
 #ifndef __MINGW32__
 static inline double round(double val)
-{    
+{
     return floor(val + 0.5);
 }
 #endif
@@ -71,12 +77,12 @@ const wchar_t* BoolToString(bool b);
 
 #ifndef __MINGW32__
 static inline float roundf(float val)
-{    
+{
     return (float)floor(val + 0.5);
 }
 #endif
 
-//PGE Debug stuff: 
+//PGE Debug stuff:
 void readAndWriteNPCSettings();
 
 #endif

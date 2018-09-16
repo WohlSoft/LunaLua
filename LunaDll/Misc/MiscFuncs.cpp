@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <math.h>
 #include <string>
+#include <cctype>
+#include <clocale>
 #include <fstream>
 #include "MiscFuncs.h"
 #include "../Globals.h"
@@ -9,7 +11,7 @@
 #include "../Rendering/RenderOps/RenderStringOp.h"
 
 #ifdef __MINGW32__
-wstring std::to_wstring(long long src)
+std::wstring std::to_wstring(long long src)
 {
     wstringstream tg;
     tg<<src;
@@ -17,10 +19,10 @@ wstring std::to_wstring(long long src)
 }
 
 
-string std::to_string(long long src)
+std::string std::to_string(long long src)
 {
     stringstream tg;
-    tg<<src;
+    tg << src;
     return tg.str();
 }
 #endif
@@ -36,7 +38,7 @@ void InfiniteFlying(int player) {
 BOOL FileExists(LPCTSTR szPath) {
   DWORD dwAttrib = GetFileAttributes(szPath);
 
-  return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+  return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
          !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -44,9 +46,43 @@ BOOL DirectoryExists(LPCTSTR szPath)
 {
   DWORD dwAttrib = GetFileAttributes(szPath);
 
-  return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
+  return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
          (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
+
+bool fileExists(const std::wstring &szPath)
+{
+    return (FileExists(szPath.c_str()) != FALSE);
+}
+
+bool directoryExists(const std::wstring &szPath)
+{
+    return (DirectoryExists(szPath.c_str()) != FALSE);
+}
+
+
+bool hasSuffix(const std::string &path, const std::string &suffix)
+{
+    if(suffix.size() > path.size())
+        return false;
+
+    std::string f = path.substr(path.size() - suffix.size(), suffix.size());
+    for(char &c : f)
+        c = tolower(c);
+    return (f.compare(suffix) == 0);
+}
+
+bool hasSuffix(const std::wstring &path, const std::wstring &suffix)
+{
+    if(suffix.size() > path.size())
+        return false;
+
+    std::wstring f = path.substr(path.size() - suffix.size(), suffix.size());
+    for(wchar_t &c : f)
+        c = towlower(c);
+    return (f.compare(suffix) == 0);
+}
+
 
 FIELDTYPE StrToFieldtype(std::wstring string) {
     string.erase(string.find_last_not_of(L" \n\r\t")+1);
@@ -257,7 +293,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             return *((byte*)address) == (byte)value;
             break;
                           }
-                          
+
         case CMPT_GREATER: {
             return *((byte*)address) > (byte)value;
             break;
@@ -275,7 +311,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
         }
         break;
                   }
-                  
+
 
     case FT_WORD: {
         switch(ctype) {
@@ -283,7 +319,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             return *((short*)address) == (short)value;
             break;
                           }
-                          
+
         case CMPT_GREATER: {
             return *((short*)address) > (short)value;
             break;
@@ -305,7 +341,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             return *((int*)address) == (int)value;
             break;
                           }
-                          
+
         case CMPT_GREATER: {
             return *((int*)address) > (int)value;
             break;
@@ -327,7 +363,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             return *((float*)address) == (float)value;
             break;
                           }
-                          
+
         case CMPT_GREATER: {
             return *((float*)address) > (float)value;
             break;
@@ -349,7 +385,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             return *((double*)address) == value;
             break;
                           }
-                          
+
         case CMPT_GREATER: {
             return *((double*)address) > value;
             break;
@@ -363,7 +399,7 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype) {
             break;
         }
         break;
-                  }					
+                  }
     default:
         break;
     }
@@ -396,7 +432,7 @@ void InitIfMissing(std::map<std::wstring, double>* pMap, std::wstring sought_key
     }
 }
 
-int ComputeLevelSection(int x, int y) {	
+int ComputeLevelSection(int x, int y) {
     int x_sec = ToSection(x);
     int y_sec = ToSection(y);
     if(x_sec != y_sec)
@@ -501,7 +537,7 @@ int ToSection(int coord) {
     }
 }
 
-void RandomPointInRadius(double* ox, double* oy, double cx, double cy, int radius) {	
+void RandomPointInRadius(double* ox, double* oy, double cx, double cy, int radius) {
     double phase1 = rand() % 360;
     double phase2 = rand() % 360;
     double xoff = sin(phase1) * radius;
@@ -719,3 +755,4 @@ const wchar_t *BoolToString(bool b)
 {
     return (b ? L"TRUE" : L"FALSE");
 }
+

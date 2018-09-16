@@ -63,15 +63,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
 {
     FileFormats::CreateLevelData(outData);
     m_isValid = true; // Ensure that we are not valid right now
+    std::wstring filePath = fullPath;
 
-    // Check if Attributes is valid
-    if (GetFileAttributesW(fullPath.c_str()) == INVALID_FILE_ATTRIBUTES)
-    {
-        m_isValid = false;
-        makeErrorLevel(outData, "Can't load this level: File has an invalide attributes!");
-    }
-
-    size_t findLastSlash = fullPath.find_last_of(L"/\\");
+    size_t findLastSlash = filePath.find_last_of(L"/\\");
 
     // Check if path has slash, if not then invalid
     if (m_isValid && (findLastSlash == std::wstring::npos))
@@ -80,7 +74,22 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
         makeErrorLevel(outData, "Can't load this level: FindLastSlash has failed!");
     }
 
-    if (m_isValid && !FileFormats::OpenLevelFile(utf8_encode(fullPath), outData))
+    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
+    // Append missing extension
+    if (m_isValid && (findLastDot == std::wstring::npos))
+    {
+        if(!hasSuffix(filePath, L".lvl") && !hasSuffix(filePath, L".lvlx"))
+            filePath.append(L".lvl");
+    }
+
+    // Check if Attributes is valid
+    if (GetFileAttributesW(filePath.c_str()) == INVALID_FILE_ATTRIBUTES)
+    {
+        m_isValid = false;
+        makeErrorLevel(outData, "Can't load this level: File has an invalide attributes!");
+    }
+
+    if (m_isValid && !FileFormats::OpenLevelFile(utf8_encode(filePath), outData))
     {
         m_isValid = false;
         makeErrorLevel(outData, (" There was an error while  "
@@ -90,7 +99,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
                                 std::to_string(outData.meta.ERROR_linenum));
     }
 
-    LunaLua_loadLevelFile(outData, fullPath);
+    LunaLua_loadLevelFile(outData, filePath);
 }
 
 
