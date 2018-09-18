@@ -64,6 +64,10 @@ void LunaLua_loadLevelFile(LevelData &outData,
     GM_NPCS_COUNT = 0;
     GM_WARP_COUNT = 0;
     GM_WATER_AREA_COUNT = 0;
+    GM_ANIM_COUNT = 0;
+
+    // We should clear the anim array apparently though
+    memset(GM_ANIM_PTR, 0, 1000*sizeof(SMBXAnimation));
 
     // If we are successful then set the variables
     GM_LVLFILENAME_PTR = filename;
