@@ -388,7 +388,6 @@ void LunaLua_loadLevelFile(LevelData &outData,
     int numOfLayers = outData.layers.size();
     if (numOfLayers > LIMIT_LAYERS)
         numOfLayers = LIMIT_LAYERS;
-    memset(GM_LAYER_ARRAY_PTR, 0, sizeof(LayerControl) * LIMIT_LAYERS);
     for (int i = 0; i < numOfLayers; i++) {
         LayerControl* nextLayer = LayerControl::Get(i);
         const LevelLayer& nextDataLevelLayer = outData.layers[i];
@@ -398,6 +397,16 @@ void LunaLua_loadLevelFile(LevelData &outData,
             short noSmoke = -1;
             native_hideLayer(&nextLayer->ptLayerName, &noSmoke);
         }
+    }
+    for (int i = numOfLayers; i < LIMIT_LAYERS; i++) {
+        LayerControl* nextLayer = LayerControl::Get(i);
+        nextLayer->IsStopped = 0;
+        nextLayer->Unknown1 = 0;
+        nextLayer->ptLayerName = L"";
+        nextLayer->isHidden = 0;
+        nextLayer->unknown = 0;
+        nextLayer->xSpeed = 0.0f;
+        nextLayer->ySpeed = 0.0f;
     }
 
     int numOfEvents = outData.events.size();
