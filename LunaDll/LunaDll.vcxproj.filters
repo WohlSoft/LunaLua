@@ -628,6 +628,9 @@
     <ClInclude Include="FileManager\SMBXFileManager.h">
       <Filter>FileManager</Filter>
     </ClInclude>
+    <ClInclude Include="FileManager\CustomParamStore.h">
+      <Filter>FileManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1208,6 +1211,9 @@
     <ClCompile Include="VersionString.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\CustomParamStore.cpp">
+      <Filter>FileManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

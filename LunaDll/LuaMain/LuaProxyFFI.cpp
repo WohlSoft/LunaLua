@@ -10,6 +10,7 @@
 #include "../Rendering/GL/GLTextureStore.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SdlMusic/SdlMusPlayer.h"
+#include "../FileManager/CustomParamStore.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -135,5 +136,15 @@ extern "C" {
     FFI_EXPORT(void) LunaLuaSetBGORenderFlag(bool val)
     {
         gRenderBGOFlag = val;
+    }
+
+    FFI_EXPORT(const char**) LunaLuaGetNpcCustomParams(void)
+    {
+        return g_NpcCustomParams.getCharPtrArray();
+    }
+
+    FFI_EXPORT(const char**) LunaLuaGetBlockCustomParams(void)
+    {
+        return g_BlockCustomParams.getCharPtrArray();
     }
 }

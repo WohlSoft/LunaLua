@@ -19,6 +19,8 @@
 #include "../SMBXInternal/Layer.h"
 #include "../SMBXInternal/SMBXEvents.h"
 
+#include "CustomParamStore.h"
+
 #define LIMIT_BLOCKS   20000
 #define LIMIT_BGOS     8000
 #define LIMIT_NPCS     5000
@@ -180,6 +182,9 @@ void LunaLua_loadLevelFile(LevelData &outData,
         nextBlock->ContentsID = static_cast<short>((nextDataLevelBlock.npc_id > 0) ? nextDataLevelBlock.npc_id + 1000 : -1 * nextDataLevelBlock.npc_id);
         nextBlock->ContentIDRelated = nextBlock->ContentsID;
         nextBlock->Slippery = COMBOOL(nextDataLevelBlock.slippery);
+
+        // Store custom params
+        g_NpcCustomParams.setData(i, nextDataLevelBlock.meta.custom_params);
     }
 
     int numOfBGO = outData.bgo.size();
@@ -307,6 +312,9 @@ void LunaLua_loadLevelFile(LevelData &outData,
             }
 
         }
+
+        // Store custom params
+        g_NpcCustomParams.setData(i, nextDataLevelNPC.meta.custom_params);
     }
 
     unsigned int numOfDoors = outData.doors.size();
