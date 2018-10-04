@@ -184,7 +184,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         nextBlock->Slippery = COMBOOL(nextDataLevelBlock.slippery);
 
         // Store custom params
-        g_NpcCustomParams.setData(i, nextDataLevelBlock.meta.custom_params);
+        g_BlockCustomParams.setData(i, nextDataLevelBlock.meta.custom_params);
     }
 
     int numOfBGO = outData.bgo.size();
