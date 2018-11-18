@@ -51,7 +51,9 @@ namespace LuaProxy
         int SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
         int SfxPlayChTimedVol(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume);
         int SfxFadeInCh(int channel, Mix_Chunk *chunk, int loops, int ms);
+        int SfxFadeInChVol(int channel, Mix_Chunk *chunk, int loops, int ms, int volume);
         int SfxFadeInChTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks);
+        int SfxFadeInChTimedVol(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume);
         void SfxPause(int channel);
         void SfxResume(int channel);
         int SfxStop(int channel);
@@ -109,7 +111,9 @@ namespace LuaProxy
         std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxPlayObjTimed(Mix_Chunk &chunk, int loops, int ticks);
         std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxPlayObjTimedVol(Mix_Chunk &chunk, int loops, int ticks, int volume);
         std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObj(Mix_Chunk &chunk, int loops, int ms);
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObjVol(Mix_Chunk &chunk, int loops, int ms, int volume);
         std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObjTimed(Mix_Chunk &chunk, int loops, int ms, int ticks);
+        std::shared_ptr<LuaProxy::Audio::PlayingSfxInstance> SfxFadeInObjTimedVol(Mix_Chunk &chunk, int loops, int ms, int ticks, int volume);
     }
 }
 #endif
