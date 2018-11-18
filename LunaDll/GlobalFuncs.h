@@ -86,6 +86,7 @@ bool writeFile(const std::string &content, const std::string &path);
 std::vector<std::string> listFilesOfDir(const std::string& path);
 std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes);
 //std::wstring getModulePath();
+std::wstring getEpisodeFolderPath();
 std::wstring getCustomFolderPath();
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths);
 std::wstring getLatestConfigFile(const std::wstring& configname);

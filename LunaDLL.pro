@@ -379,7 +379,8 @@ SOURCES += \
     LunaDll/PerformanceTimer.cpp \
     LunaDll/PngRender.cpp \
     LunaDll/SMBXEvents.cpp \
-    LunaDll/VersionString.cpp
+    LunaDll/VersionString.cpp \
+    LunaDll/LuaMain/LuaProxyComponent/LuaProxyFileFormats.cpp
 
 DISTFILES += \
     LunaDll/LunaDll.rc

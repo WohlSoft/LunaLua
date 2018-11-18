@@ -260,7 +260,7 @@ bool file_existsX(const std::string& name)
         return true;
     } else {
         return false;
-    }   
+    }
 }
 
 void removeFilePathW(std::wstring &path)
@@ -307,7 +307,7 @@ void removeFilePathA(char*path, int length)
     }
 }
 
-void ResetLunaModule() 
+void ResetLunaModule()
 {
     gLunaEnabled = true;
     gPrintErrorsToScreen = true;
@@ -413,7 +413,7 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
-    
+
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
     //startup settings default
@@ -436,7 +436,7 @@ void InitGlobals()
 
     ghGeneralDIB = CreateDIBSection(ghMemDC, &bmi, DIB_RGB_COLORS, (void**)&gpScreenBits, 0, 0);
 
-    /// Init autocode manager	
+    /// Init autocode manager
 
     gAutoMan.Clear(true);
     gAutoMan.ReadGlobals(gAppPathWCHAR);
@@ -731,14 +731,14 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
     HANDLE dir;
     WIN32_FIND_DATAW file_data;
     std::wstring wpath = Str2WStr(path);
-    
+
     if ((dir = FindFirstFileW((wpath + L"/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
         return out; /* No files found */
 
     do {
         const std::wstring wfile_name = file_data.cFileName;
         const bool skipFile = (file_data.dwFileAttributes & fileAttributes) == 0;
-        
+
         if (wfile_name[0] == L'.')
             continue;
 
@@ -753,6 +753,12 @@ std::vector<std::string> listOfDir(const std::string& path, DWORD fileAttributes
     return out;
 }
 
+std::wstring getEpisodeFolderPath()
+{
+    std::wstring full_path = (std::wstring)GM_FULLDIR;
+    full_path = full_path.append(L"\\"); // < path into episode folder
+    return full_path;
+}
 
 std::wstring getCustomFolderPath()
 {
@@ -819,7 +825,7 @@ void RedirectIOToConsole()
 }
 
 #ifdef BUILD_WITH_ATL_STUFF
-// WIP 
+// WIP
 #include <atlbase.h>
 #include "Misc/TypeLib.h"
 
@@ -829,7 +835,7 @@ void RedirectIOToConsole()
     if(FAILED(___errCodeUse_)){ \
         outputter << L"ERROR: " << text << L" HRESULT = " << std::hex << (int)___errCodeUse_ << std::dec << std::endl; \
         return; \
-    } 
+    }
 
 void dumpTYPEATTR(TYPEATTR* attr, std::wostream& toOutput) {
     //toOutput << L"GUID: " << std::hex << attr->guid.Data1 << L"-" << attr->guid.Data2 << "-" << attr->guid.Data3 << "-"
@@ -838,7 +844,7 @@ void dumpTYPEATTR(TYPEATTR* attr, std::wostream& toOutput) {
     toOutput << L"Num of vars: " << attr->cVars << std::endl;
     toOutput << L"Num of implemented interfaces: " << attr->cImplTypes << std::endl;
     toOutput << L"Version number: " << attr->wMajorVerNum << L"." << attr->wMinorVerNum << std::endl;
-    
+
 }
 
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
@@ -861,7 +867,7 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
     UINT index = 0;
     COMUTILS_RETURN_IF_FAILED(typeInfoOfObj->GetContainingTypeLib(&typeLibOfObj, &index), toOutput, L"Failed to get type lib");
     toOutput << "DEBUG: Got type lib with index " << index << std::endl;
-    
+
     /*
 
     TYPEATTR* descriptor = NULL;
@@ -870,8 +876,8 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput)
     toOutput << std::hex << (UINT)descriptor << std::dec << std::endl;
 
     dumpTYPEATTR(descriptor, toOutput);
-    
-    
+
+
     typeInfoOfObj->ReleaseTypeAttr(descriptor);
 
     toOutput << L"DEBUG: Released descriptor!" << std::endl;

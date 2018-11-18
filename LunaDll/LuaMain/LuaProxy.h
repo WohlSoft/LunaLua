@@ -17,6 +17,9 @@
 #include "../SMBXInternal/Blocks.h"
 #include "../SMBXInternal/Warp.h"
 #include "../Rendering/Shaders/GLShader.h"
+#include "../libs/PGE_File_Formats/lvl_filedata.h"
+#include "../libs/PGE_File_Formats/wld_filedata.h"
+#include "../libs/PGE_File_Formats/npc_filedata.h"
 
 class BMPBox;
 
@@ -29,11 +32,11 @@ namespace LuaProxy {
 
         T* rawArg1 = nullptr;
         T* rawArg2 = nullptr;
-        if (arg1Casted != boost::none) 
+        if (arg1Casted != boost::none)
         {
             rawArg1 = arg1Casted.get();
         }
-        else 
+        else
         {
             luaL_error(L, "Failed to compare %s == %s:\nLeft compare argument is not %s", typeid(T).name(), typeid(T).name(), typeid(T).name());
             return false;
@@ -134,7 +137,7 @@ namespace LuaProxy {
     class CommonVB6Wrapper {
     public:
         typedef InternalClass internal_class;
-        
+
         template<typename DataType, DataType InternalClass::* Ptr, typename InputType = DataType>
         void Setter(InputType data)
         {
@@ -203,7 +206,7 @@ namespace LuaProxy {
         LFT_BOOL = FT_MAX + 2
     };
 
-    
+
     //Deprecated
     namespace SaveBankProxy {
         void setValue(const std::string& key, double value);
@@ -272,7 +275,7 @@ namespace LuaProxy {
         bool isFinished() const;
         std::string responseText(lua_State* L) const;
         int statusCode(lua_State* L) const;
-        
+
     };
 
     struct RECTd{
@@ -383,7 +386,7 @@ namespace LuaProxy {
         float speedY() const;
         void setSpeedY(float speedY);
         bool isHidden();
-        
+
         void stop();
         void show(bool noSmoke);
         void hide(bool noSmoke);
@@ -398,7 +401,7 @@ namespace LuaProxy {
     public:
         static luabind::object get(lua_State* L);
         static LuaProxy::Section get(short secNumber, lua_State* L);
-        
+
         Section (int sectionNum);
         int idx() const;
         RECTd boundary() const;
@@ -550,12 +553,12 @@ namespace LuaProxy {
         void setPowerupID(PowerupID val, lua_State* L);
         Characters getCharacter(lua_State* L) const;
         void setCharacter(Characters val, lua_State* L);
-    
+
         bool isValid_throw(lua_State* L) const;
     private:
         PowerupID m_powerupID;
         Characters m_character;
-        
+
     };
 
     class Player : public CommonVB6Wrapper<Player, PlayerMOB> {
@@ -564,7 +567,7 @@ namespace LuaProxy {
         static luabind::object get(lua_State* L);
         static luabind::object getTemplates(lua_State* L);
         static luabind::object getIntersecting(double x1, double y1, double x2, double y2, lua_State* L);
-        
+
         Player ();
         Player (int index);
         int idx() const;
@@ -843,7 +846,7 @@ namespace LuaProxy {
         void setUnused182(short var_unused182, lua_State *L);
         //internal use
         int getIndex() const;
-        
+
         int m_index;
     };
 
@@ -900,7 +903,7 @@ namespace LuaProxy {
     };
 
     //more functions:
-    
+
 
     //For world exclusive:
     class World
@@ -1150,7 +1153,7 @@ namespace LuaProxy {
     class InputConfig{
     public:
         InputConfig(unsigned short index);
-       
+
         int idx() const;
         short inputType(lua_State* L);
         void setInputType(short inputType, lua_State* L);
@@ -1186,7 +1189,7 @@ namespace LuaProxy {
     class Camera {
     public:
         static luabind::object get(lua_State *L);
-        
+
         static double getX(unsigned short index);
         static double getY(unsigned short index);
 
@@ -1207,7 +1210,7 @@ namespace LuaProxy {
         double height();
         void setWidth(double width);
         void setHeight(double height);
-        
+
         unsigned short m_index;
     };
 
@@ -1239,7 +1242,7 @@ namespace LuaProxy {
         std::vector<GLShaderUniformInfo> m_cachedUniformInfo;
         std::shared_ptr<GLShader> m_internalShader;
     };
-    
+
 
     //undocumented
     namespace Native{
@@ -1360,7 +1363,15 @@ namespace LuaProxy {
         void flipY();
         void flipXY();
     }
-    
+
+    namespace Formats{
+        LevelData openLevel(const std::string &filePath, lua_State *L);
+        LevelData openLevelHeader(const std::string &filePath, lua_State *L);
+        WorldData openWorld(const std::string &filePath, lua_State *L);
+        WorldData openWorldHeader(const std::string &filePath, lua_State *L);
+        NPCConfigFile openNpcConfig(const std::string &filePath, lua_State *L);
+    }
+
     //Non-Member-Constructors:
     RECT newRECT();
     RECTd newRECTd();

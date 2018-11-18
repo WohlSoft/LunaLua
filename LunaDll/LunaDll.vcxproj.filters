@@ -1215,6 +1215,9 @@
     <ClCompile Include="FileManager\CustomParamStore.cpp">
       <Filter>FileManager</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp">
+      <Filter>LuaMain\LuaProxyComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

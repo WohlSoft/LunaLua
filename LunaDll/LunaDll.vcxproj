@@ -329,6 +329,7 @@
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
     <ClCompile Include="Misc\LoadScreen.cpp" />
     <ClCompile Include="Misc\NpcIdExtender.cpp" />

@@ -652,6 +652,27 @@ void CLunaLua::bindAll()
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress)
             ],
 
+            #if 1
+            /*TODO: Implement the binding */
+            namespace_("FileFormats")[
+                luabind::class_<LevelData>("LevelData")
+                    .property("stars", &::LevelData::stars)
+                    .property("meta", &::LevelData::meta),
+
+                luabind::class_<WorldData>("WorldData")
+                    .property("stars", &::WorldData::stars)
+                    .property("meta", &::WorldData::meta),
+
+                def("openLevel", &LuaProxy::Formats::openLevel),
+                def("openLevelHeader", &LuaProxy::Formats::openLevelHeader),
+                def("openWorld", &LuaProxy::Formats::openWorld),
+                def("openWorldHeader", &LuaProxy::Formats::openWorldHeader),
+                def("openNpcConfig", &LuaProxy::Formats::openNpcConfig)
+            ],
+            #endif
+
+            /*************************FileFormats*end*************************/
+
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure
                 LUAHELPER_DEF_CLASS(Mix_Chunk)
