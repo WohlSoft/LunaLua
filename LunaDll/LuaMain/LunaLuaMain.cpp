@@ -705,7 +705,9 @@ void CLunaLua::bindAll()
                 def("SfxPlayChTimed", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxPlayChTimed),
                 def("SfxPlayChTimedVol", (int(*)(int, Mix_Chunk*, int, int,int))&LuaProxy::Audio::SfxPlayChTimedVol),
                 def("SfxFadeInCh", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxFadeInCh),
+                def("SfxFadeInChVol", (int(*)(int, Mix_Chunk*, int, int, int))&LuaProxy::Audio::SfxFadeInChVol),
                 def("SfxFadeInChTimed", (int(*)(int, Mix_Chunk*, int, int, int))&LuaProxy::Audio::SfxFadeInChTimed),
+                def("SfxFadeInChTimedVol", (int(*)(int, Mix_Chunk*, int, int, int, int))&LuaProxy::Audio::SfxFadeInChTimedVol),
                 def("SfxPause", (void(*)(int))&LuaProxy::Audio::SfxPause),
                 def("SfxResume", (void(*)(int))&LuaProxy::Audio::SfxResume),
                 def("SfxStop", (int(*)(int))&LuaProxy::Audio::SfxStop),
@@ -737,9 +739,13 @@ void CLunaLua::bindAll()
                     .def("SetReverseStereo", &LuaProxy::Audio::PlayingSfxInstance::SetReverseStereo),
 
                 def("SfxPlayObj", &LuaProxy::Audio::SfxPlayObj),
+                def("SfxPlayObjVol", &LuaProxy::Audio::SfxPlayObjVol),
                 def("SfxPlayObjTimed", &LuaProxy::Audio::SfxPlayObjTimed),
+                def("SfxPlayObjTimedVol", &LuaProxy::Audio::SfxPlayObjTimedVol),
                 def("SfxFadeInObj", &LuaProxy::Audio::SfxFadeInObj),
+                def("SfxFadeInObjVol", &LuaProxy::Audio::SfxFadeInObjVol),
                 def("SfxFadeInObjTimed", &LuaProxy::Audio::SfxFadeInObjTimed),
+                def("SfxFadeInObjTimedVol", &LuaProxy::Audio::SfxFadeInObjTimedVol),
 
                 //Time
                 def("AudioClock", (double(*)())&LuaProxy::Audio::AudioClock),
