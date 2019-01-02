@@ -1772,7 +1772,7 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
     }
 }
 
-static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
     __asm {
         PUSH EBP
@@ -1783,7 +1783,7 @@ static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockInde
     }
 }
 
-void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
     bool isCancelled = false;
 
