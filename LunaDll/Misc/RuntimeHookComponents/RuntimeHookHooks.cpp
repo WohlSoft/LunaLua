@@ -768,6 +768,7 @@ extern void __stdcall FrameTimingHookQPC()
         lastFrameTime = currentTime.QuadPart;
         frameError = -2.0;
 
+        g_PerfTracker.startFrame();
         return;
     }
 
