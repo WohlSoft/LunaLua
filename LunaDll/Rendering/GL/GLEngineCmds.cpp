@@ -201,8 +201,8 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
         for (int i=0; i<mCount; i++)
         {
-            adjVerts[i * 2 + 0] = static_cast<GLfloat>((mVert[i * 2 + 0] - cameraX));
-            adjVerts[i * 2 + 1] = static_cast<GLfloat>((mVert[i * 2 + 1] - cameraY));
+            adjVerts[i * 2 + 0] = static_cast<GLfloat>(round((mVert[i * 2 + 0] - cameraX)));
+            adjVerts[i * 2 + 1] = static_cast<GLfloat>(round((mVert[i * 2 + 1] - cameraY)));
         }
 
         vertData = adjVerts;
