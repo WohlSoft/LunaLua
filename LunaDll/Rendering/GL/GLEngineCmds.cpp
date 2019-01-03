@@ -191,19 +191,23 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         GLERRORCHECK();
     }
 
-    // For scene coordinates, translate appropriately
-    if (mSceneCoords) {
+    const GLfloat* vertData = mVert;
+    if (mSceneCoords)
+    {
         double cameraX, cameraY;
         glEngine.GetCamera(cameraX, cameraY);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
+        GLfloat fCameraX = static_cast<GLfloat>(cameraX);
+        GLfloat fCameraY = static_cast<GLfloat>(cameraY);
 
-        if ((mType == GL_LINE) || (mType == GL_LINES) || (mType == GL_LINE_LOOP) || (mType == GL_LINE_STRIP)) {
-            glTranslatef(static_cast<GLfloat>(-cameraX - 0.325), static_cast<GLfloat>(-cameraY - 0.325), 0.0f);
-        } else {
-            glTranslatef(static_cast<GLfloat>(-cameraX), static_cast<GLfloat>(-cameraY), 0.0f);
+        float* adjVerts = new GLfloat[mCount*2];
+
+        for (int i=0; i<mCount; i++)
+        {
+            adjVerts[i * 2 + 0] = roundf(mVert[i * 2 + 0] - fCameraX);
+            adjVerts[i * 2 + 1] = roundf(mVert[i * 2 + 1] - fCameraY);
         }
-        
+
+        vertData = adjVerts;
     }
 
     // If depth testing is enabled, use it
@@ -211,7 +215,7 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         // Actually, there's nothing that needs to be done for this... it's all in the shader
     }
 
-    glVertexPointer(2, GL_FLOAT, 0, mVert);
+    glVertexPointer(2, GL_FLOAT, 0, vertData);
     GLERRORCHECK();
 
     if (mTex != NULL) {
@@ -246,8 +250,8 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     if (mSceneCoords) {
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
+        delete[] (GLfloat*)vertData;
+        vertData = nullptr;
     }
 
     if ((mTex != NULL) && texIsPadded) {
