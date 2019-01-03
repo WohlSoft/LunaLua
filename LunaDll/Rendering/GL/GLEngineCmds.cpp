@@ -196,15 +196,13 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     {
         double cameraX, cameraY;
         glEngine.GetCamera(cameraX, cameraY);
-        GLfloat fCameraX = static_cast<GLfloat>(cameraX);
-        GLfloat fCameraY = static_cast<GLfloat>(cameraY);
 
         float* adjVerts = new GLfloat[mCount*2];
 
         for (int i=0; i<mCount; i++)
         {
-            adjVerts[i * 2 + 0] = roundf(mVert[i * 2 + 0] - fCameraX);
-            adjVerts[i * 2 + 1] = roundf(mVert[i * 2 + 1] - fCameraY);
+            adjVerts[i * 2 + 0] = static_cast<GLfloat>((mVert[i * 2 + 0] - cameraX));
+            adjVerts[i * 2 + 1] = static_cast<GLfloat>((mVert[i * 2 + 1] - cameraY));
         }
 
         vertData = adjVerts;
