@@ -751,7 +751,7 @@ extern void __stdcall FrameTimingHookQPC()
     }
 
     // Get the desired duration for this frame
-    frameDuration = FRAME_TIMING_MS - frameError * 0.5;
+    frameDuration = FRAME_TIMING_MS - frameError * 0.90;
 
     QueryPerformanceCounter(&currentTime);
     frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
@@ -788,7 +788,7 @@ extern void __stdcall FrameTimingHookQPC()
     GM_CURRENT_TIME = GetTickCount();
 
     // Compensate for errors in frame timing
-    frameError = frameError * 0.5 + frameTime - frameDuration;
+    frameError = frameError * 0.1 + frameTime - frameDuration;
 
 #if defined(ENABLE_FRAME_TIMING_BENCHMARK)
     static RunningStat sFrameTime;
@@ -800,8 +800,8 @@ extern void __stdcall FrameTimingHookQPC()
     Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
-    if (frameError > 5.0) frameError = 5.0;
-    if (frameError < -5.0) frameError = -5.0;
+    if (frameError > 10.0) frameError = 10.0;
+    if (frameError < -10.0) frameError = -10.0;
     lastFrameTime = currentTime.QuadPart;
 
     g_PerfTracker.startFrame();
