@@ -49,9 +49,9 @@ GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint3
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
     GLERRORCHECK();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     GLERRORCHECK();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     GLERRORCHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     GLERRORCHECK();
@@ -64,11 +64,19 @@ GLBasicSprite::GLBasicSprite(void* data, GLint format, uint32_t dataWidth, uint3
     GLERRORCHECK();
     char* subData = (char*)data + (xOff + yOff*dataWidth) * 4;
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, NULL);
-    GLERRORCHECK();
+    if ((tex.pw == tex.w) && (tex.ph == tex.h))
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, subData);
+        GLERRORCHECK();
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, NULL);
+        GLERRORCHECK();
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, format, GL_UNSIGNED_BYTE, subData);
-    GLERRORCHECK();
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.w, tex.h, format, GL_UNSIGNED_BYTE, subData);
+        GLERRORCHECK();
+    }
 
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, tex.pw, tex.ph, 0, format, GL_UNSIGNED_BYTE, subData);
     //GLERRORCHECK();

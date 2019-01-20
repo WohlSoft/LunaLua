@@ -113,7 +113,11 @@ static inline void glBlendEquationANY(GLenum mode)
 ////////////////////////
 
 // Macro inserting the arguments
+#if defined(ENABLE_GLERRORCHECK)
 #define GLERRORCHECK(...) _GLErrorCheck(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+#else
+#define GLERRORCHECK(...)
+#endif
 
 // Don't depend on gluErrorString, because 1) It's deprecated, 2) It's unreliable, 3) adds a dependency on glu32.lib, 4) There aren't many options anyway
 static const char* _GLGetErrorString(GLenum err) {
