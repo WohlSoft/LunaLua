@@ -39,11 +39,11 @@ public:
 
     static inline void setCameraX(unsigned short index, double value) {
         if (index >= 201) return;
-        ((double*)GM_CAMERA_X)[index] = -value;
+        ((double*)GM_CAMERA_X)[index] = -std::round(value);
     }
     static inline void setCameraY(unsigned short index, double value) {
         if (index >= 201) return;
-        ((double*)GM_CAMERA_Y)[index] = -value;
+        ((double*)GM_CAMERA_Y)[index] = -std::round(value);
     }
 
     template<typename T>
