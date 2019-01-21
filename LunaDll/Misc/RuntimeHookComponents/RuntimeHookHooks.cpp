@@ -730,6 +730,8 @@ extern void SetSMBXFrameTiming(double ms)
     FRAME_TIMING_MS = ms;
 }
 
+bool g_ResetFrameTiming = false;
+
 extern void __stdcall FrameTimingHookQPC()
 {
     WaitForTickEnd::RunQueued();
@@ -748,6 +750,13 @@ extern void __stdcall FrameTimingHookQPC()
         if (qpcFactor > 1.0) {
             qpcFactor = 0.0;
         }
+    }
+
+    if (g_ResetFrameTiming)
+    {
+        g_ResetFrameTiming = false;
+        lastFrameTime = 0;
+        frameError = 0;
     }
 
     // Get the desired duration for this frame
@@ -828,6 +837,15 @@ extern void __stdcall FrameTimingHook()
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
     static double frameError = 0.0;
+
+    if (g_ResetFrameTiming)
+    {
+        g_ResetFrameTiming = false;
+        GM_CURRENT_TIME = GetTickCount();
+        lastFrameTime = GM_CURRENT_TIME;
+        nextFrameTime = lastFrameTime;
+        frameError = 0;
+    }
 
     // Compensate for error in the last frame's timing
     nextFrameTime += FRAME_TIMING_MS - frameError;
@@ -934,6 +952,10 @@ extern short __stdcall MessageBoxOpenHook()
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
+    // Enforce rounded camera position
+    SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
+    SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
+
     Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
@@ -956,6 +978,10 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 
 static void __stdcall PostCameraUpdateHook(int cameraIdx)
 {
+    // Enforce rounded camera position
+    SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
+    SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
+
     // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
     Renderer::Get().StoreCameraPosition(cameraIdx);
 

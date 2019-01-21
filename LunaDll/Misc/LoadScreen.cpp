@@ -208,6 +208,7 @@ static void __stdcall CustomLoadScreenHook(void)
     LunaLoadScreenStart();
 }
 
+extern bool g_ResetFrameTiming;
 void LunaLoadScreenKill()
 {
     if (loadThread == nullptr) return;
@@ -220,6 +221,7 @@ void LunaLoadScreenKill()
     loadThread->join();
     delete loadThread;
     loadThread = nullptr;
+    g_ResetFrameTiming = true;
 }
 
 void LunaLoadScreenSetEnable(bool skip)
