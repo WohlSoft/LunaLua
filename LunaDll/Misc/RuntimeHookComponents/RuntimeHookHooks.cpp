@@ -1607,7 +1607,8 @@ static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 {
     if (playerIdx >= 0 && playerIdx <= 1)
     {
-        gRawKeymap[playerIdx] = *keymap;
+        gRawKeymap[playerIdx+2] = gRawKeymap[playerIdx]; // Update prev values
+        gRawKeymap[playerIdx] = *keymap; // Set new values
     }
 }
 

@@ -14,6 +14,7 @@
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
 #include "WaitForTickEnd.h"
+#include "PGEEditorCmdSender.h"
 
 #include "TestModeMenu.h"
 #include "TestMode.h"
@@ -71,8 +72,22 @@ STestModeSettings getTestModeSettings()
 {
     return testModeSettings;
 }
+
+static void sendTestSettingsToPgeEditor(const STestModeSettings &settings)
+{
+    PGE_EditorCommandSender feedBack;
+    std::string cmd = "CMD:testSetup:";
+    cmd += std::to_string(0) + ",";
+    cmd += std::to_string(settings.players[0].identity) + ",";
+    cmd += std::to_string(settings.players[0].powerup) + ",";
+    cmd += std::to_string(settings.players[0].mountType) + ",";
+    cmd += std::to_string(settings.players[0].mountColor);
+    feedBack.sendCommandUTF8(cmd);
+}
+
 void setTestModeSettings(const STestModeSettings& settings)
 {
+    sendTestSettingsToPgeEditor(settings);
     testModeSettings = settings;
 }
 

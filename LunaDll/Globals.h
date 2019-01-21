@@ -94,7 +94,7 @@ extern short	gNumpad2;
 extern short	gNumpad6;
 
 // Raw player keymap
-extern KeyMap   gRawKeymap[2];
+extern KeyMap   gRawKeymap[4];
 
 // Test mode pause note
 extern bool     gIsTestModePauseActive;
