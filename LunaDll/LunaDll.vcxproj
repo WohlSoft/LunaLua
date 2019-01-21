@@ -418,11 +418,9 @@
     <ClCompile Include="libs\luasocket\timeout.c" />
     <ClCompile Include="libs\luasocket\udp.c" />
     <ClCompile Include="libs\luasocket\wsocket.c" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWarp.cpp" />
     <ClCompile Include="Misc\MemoryScanner\MemoryScanner.cpp" />
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBGO.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEffects.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncGraphics.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncLevel.cpp" />
@@ -456,7 +454,6 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyLayer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNativeInput.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNPC.cpp" />
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayer.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySection.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyWorld.cpp" />

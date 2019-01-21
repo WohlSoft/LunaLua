@@ -287,32 +287,6 @@ void LuaProxy::Block::setIsHidden(bool isHidden)
     ::Blocks::Get(m_index)->IsHidden = (isHidden ? 0xFFFF : 0);
 }
 
-int LuaProxy::Block::collidesWith(const LuaProxy::Player *player) const
-{
-    if(!isValid())
-        return 0;
-
-    if(!player->isValid())
-        return 0;
-
-    int ind = player->getIndex();
-    ::Block* tarBlock = ::Blocks::Get(m_index);
-    PlayerMOB* tarPlayer = ::Player::Get(ind);
-
-    double playerX = tarPlayer->momentum.x - 0.20;
-    double playerY = tarPlayer->momentum.y - 0.20;
-    double playerX2 = tarPlayer->momentum.x + tarPlayer->momentum.width + 0.20;
-    double playerY2 = tarPlayer->momentum.y + tarPlayer->momentum.height + 0.20;
-
-    if (playerX > tarBlock->momentum.x + tarBlock->momentum.width ||
-        playerX2 < tarBlock->momentum.x ||
-        playerY > tarBlock->momentum.y + tarBlock->momentum.height ||
-        playerY2 < tarBlock->momentum.y)
-        return 0;
-
-    return ::Blocks::TestCollision(tarPlayer, tarBlock);
-}
-
 std::string LuaProxy::Block::layerName() const
 {
     if(!isValid())
@@ -342,33 +316,6 @@ void LuaProxy::Block::remove(bool playSoundEffect)
     short doPlaySoundAndEffects = COMBOOL(playSoundEffect);
     native_removeBlock(&blockIndex, &doPlaySoundAndEffects);
 }
-
-void LuaProxy::Block::hit()
-{
-    hit(false);
-}
-
-void LuaProxy::Block::hit(bool fromUpSide)
-{
-    hit(fromUpSide, Player(1));
-}
-
-void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player)
-{
-    hit(fromUpSide, player, -1);
-}
-
-void LuaProxy::Block::hit(bool fromUpSide, LuaProxy::Player player, int hittingCount)
-{
-    unsigned int blockIndex = m_index;
-    short unkFlag1VB = COMBOOL(fromUpSide);
-    unsigned short unkFlag2VB = player.getIndex();
-    native_hitBlock(&blockIndex, &unkFlag1VB, &unkFlag2VB);
-    if (hittingCount != -1) {
-        Blocks::Get(blockIndex)->RepeatingHits = hittingCount;
-    }
-}
-
 
 ::Block* LuaProxy::Block::getBlockPtr()
 {

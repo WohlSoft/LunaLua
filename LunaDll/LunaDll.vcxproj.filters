@@ -23,19 +23,10 @@
     <Filter Include="Input">
       <UniqueIdentifier>{7355c692-c445-440b-81d2-6abe60fd7051}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CustomSprites">
-      <UniqueIdentifier>{964b4b3e-3507-4d37-8826-0e95cac2998f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CustomSprites\SpritesFuncs">
-      <UniqueIdentifier>{c8aabf8d-5bc6-42b4-9791-c2bfc7d35eaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Rendering\RenderOps">
       <UniqueIdentifier>{bc8d7f50-4c07-47e3-9677-38aa03081cff}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Shaders">
-    </Filter>
-    <Filter Include="CustomSprites\Hitbox">
-      <UniqueIdentifier>{a0baf83b-5d12-413f-9ea1-0d4108d7c0fd}</UniqueIdentifier>
     </Filter>
     <Filter Include="PerformanceTimer">
       <UniqueIdentifier>{f1f71b76-ea37-465a-9e66-873a202fe7bd}</UniqueIdentifier>
@@ -122,6 +113,15 @@
     <Filter Include="FileManager">
       <UniqueIdentifier>{c2655aeb-6086-4624-a167-d60761e77941}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LuaMain\LuaProxyComponent\CustomSprites">
+      <UniqueIdentifier>{964b4b3e-3507-4d37-8826-0e95cac2998f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaMain\LuaProxyComponent\CustomSprites\SpritesFuncs">
+      <UniqueIdentifier>{c8aabf8d-5bc6-42b4-9791-c2bfc7d35eaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaMain\LuaProxyComponent\CustomSprites\Hitbox">
+      <UniqueIdentifier>{a0baf83b-5d12-413f-9ea1-0d4108d7c0fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -164,19 +164,19 @@
       <Filter>CellManager</Filter>
     </ClInclude>
     <ClInclude Include="CustomSprites\CSprite.h">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClInclude>
     <ClInclude Include="CustomSprites\CSpriteManager.h">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClInclude>
     <ClInclude Include="CustomSprites\SpriteComponent.h">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClInclude>
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h">
-      <Filter>CustomSprites\Hitbox</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites\Hitbox</Filter>
     </ClInclude>
     <ClInclude Include="CustomSprites\SpritesFuncs\SpriteFuncs.h">
-      <Filter>CustomSprites\SpritesFuncs</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites\SpritesFuncs</Filter>
     </ClInclude>
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h">
       <Filter>HardcodedGraphics</Filter>
@@ -688,22 +688,22 @@
       <Filter>CellManager</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\CSprite.cpp">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\CSpriteManager.cpp">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\SpriteComponent.cpp">
-      <Filter>CustomSprites</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\Hitbox\Hitbox.cpp">
-      <Filter>CustomSprites\Hitbox</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites\Hitbox</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\SpritesFuncs\SpriteBehaviorFuncs.cpp">
-      <Filter>CustomSprites\SpritesFuncs</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites\SpritesFuncs</Filter>
     </ClCompile>
     <ClCompile Include="CustomSprites\SpritesFuncs\SpriteDrawFuncs.cpp">
-      <Filter>CustomSprites\SpritesFuncs</Filter>
+      <Filter>LuaMain\LuaProxyComponent\CustomSprites\SpritesFuncs</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedGraphics\HardcodedGraphicsManager.cpp">
       <Filter>HardcodedGraphics</Filter>
@@ -807,9 +807,6 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxySaveBank.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayer.cpp">
-      <Filter>LuaMain\LuaProxyComponent</Filter>
-    </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyNPC.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
@@ -878,9 +875,6 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp">
       <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyBGO.cpp">
-      <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEffects.cpp">
       <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
@@ -979,9 +973,6 @@
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyPlayerSettings.cpp">
-      <Filter>LuaMain\LuaProxyComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyCameraInfo.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyConsole.cpp">
