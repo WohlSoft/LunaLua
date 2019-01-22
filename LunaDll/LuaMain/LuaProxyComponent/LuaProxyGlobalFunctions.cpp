@@ -37,9 +37,6 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
         }
     }
 
-    int powerup = _powerup - 1;
-    int character = _character - 1;
-
     std::string full_path = resolveIfNotAbsolutePath(ini_file);
 
     INIReader hitBoxFile( full_path );
@@ -109,15 +106,15 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     }
 
     if( !width.empty() )
-        SMBX_CustomGraphics::setPlayerHitboxWidth((PowerupID)powerup, (Characters)character, (short)atoi(width.c_str()));
+        SMBX_CustomGraphics::setPlayerHitboxWidth((PowerupID)_powerup, (Characters)_character, (short)atoi(width.c_str()));
     if( !height.empty() )
-        SMBX_CustomGraphics::setPlayerHitboxHeight((PowerupID)powerup, (Characters)character, (short)atoi(height.c_str()));
+        SMBX_CustomGraphics::setPlayerHitboxHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height.c_str()));
     if (!height_duck.empty())
-        SMBX_CustomGraphics::setPlayerHitboxDuckHeight((PowerupID)powerup, (Characters)character, (short)atoi(height_duck.c_str()));
+        SMBX_CustomGraphics::setPlayerHitboxDuckHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height_duck.c_str()));
     if (!grab_offset_x.empty())
-        SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)powerup, (Characters)character, (short)atoi(grab_offset_x.c_str()));
+        SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_x.c_str()));
     if (!grab_offset_y.empty())
-        SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)powerup, (Characters)character, (short)atoi(grab_offset_y.c_str()));
+        SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_y.c_str()));
 }
 
 
