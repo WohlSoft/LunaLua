@@ -213,6 +213,7 @@ static inline constexpr void* GetRenderBelowPriorityHookWithSkip(void) {
 void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect);
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
+CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId);
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);

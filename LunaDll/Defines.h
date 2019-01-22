@@ -106,6 +106,16 @@ struct KeyMap{
     short    pauseKeyState; //Pause
 };
 
+struct CharacterHitBoxData {
+    short hitbox_h;
+    short hitbox_h_d;
+    short hitbox_w;
+    short hitbox_graboff_x;
+    short hitbox_graboff_y;
+    short gfxoffset_x[100];
+    short gfxoffset_y[100];
+};
+
 enum Characters : short {
     CHARACTER_UNKNOWN = 0,
     CHARACTER_MARIO = 1,    //DEMO

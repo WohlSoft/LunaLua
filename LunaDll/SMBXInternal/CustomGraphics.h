@@ -2,6 +2,7 @@
 #define CustomGraphics_hhhhh
 
 #include "../Defines.h"
+#include "../Misc/RuntimeHook.h"
 
 class SMBX_CustomGraphics
 {
@@ -10,34 +11,94 @@ public:
     SMBX_CustomGraphics(SMBX_CustomGraphics& other) = delete;
 
     static inline void setPlayerHitboxWidth(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) hitbox->hitbox_w = value;
+            return;
+        }
         (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerHitboxHeight(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) hitbox->hitbox_h = value;
+            return;
+        }
         (&GM_HITBOX_H_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerHitboxDuckHeight(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) hitbox->hitbox_h_d = value;
+            return;
+        }
         (&GM_HITBOX_H_D_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerGrabOffsetX(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) hitbox->hitbox_graboff_x = value;
+            return;
+        }
         (&GM_HITBOX_GRABOFF_X)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
     static inline void setPlayerGrabOffsetY(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) hitbox->hitbox_graboff_y = value;
+            return;
+        }
         (&GM_HITBOX_GRABOFF_Y)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
     }
 
     static inline int getPlayerHitboxWidth(PowerupID powerupID, Characters characterID) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) return hitbox->hitbox_w;
+            return 0;
+        }
         return (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerHitboxHeight(PowerupID powerupID, Characters characterID) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) return hitbox->hitbox_h;
+            return 0;
+        }
         return (&GM_HITBOX_H_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerHitboxDuckHeight(PowerupID powerupID, Characters characterID) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) return hitbox->hitbox_h_d;
+            return 0;
+        }
         return (&GM_HITBOX_H_D_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerGrabOffsetX(PowerupID powerupID, Characters characterID) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) return hitbox->hitbox_graboff_x;
+            return 0;
+        }
         return (&GM_HITBOX_GRABOFF_X)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
     static inline int getPlayerGrabOffsetY(PowerupID powerupID, Characters characterID) {
+        if (characterID > 5)
+        {
+            CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+            if (hitbox) return hitbox->hitbox_graboff_y;
+            return 0;
+        }
         return (&GM_HITBOX_GRABOFF_Y)[((int)powerupID - 1) * 5 + ((int)characterID - 1)];
     }
 
@@ -97,7 +158,13 @@ public:
             offsetVal = GM_GFXOFFSET_LINK_X[spriteIndex + ((int)powerupID * 100)];
             break;
         default:
-            break;
+            {
+                CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+                if (hitbox)
+                {
+                    offsetVal = hitbox->gfxoffset_x[spriteIndex+49];
+                }
+            } break;
         }
         return offsetVal;
     }
@@ -132,7 +199,13 @@ public:
             offsetVal = GM_GFXOFFSET_LINK_Y[spriteIndex + ((int)powerupID * 100)];
             break;
         default:
-            break;
+            {
+                CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+                if (hitbox)
+                {
+                    offsetVal = hitbox->gfxoffset_y[spriteIndex + 49];
+                }
+            } break;
         }
         return offsetVal;
     }
@@ -166,7 +239,13 @@ public:
             GM_GFXOFFSET_LINK_X[spriteIndex + ((int)powerupID * 100)] = value;
             break;
         default:
-            break;
+            {
+                CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+                if (hitbox)
+                {
+                    hitbox->gfxoffset_x[spriteIndex + 49] = value;
+                }
+            } break;
         }
     }
 
@@ -199,7 +278,13 @@ public:
             GM_GFXOFFSET_LINK_Y[spriteIndex + ((int)powerupID * 100)] = value;
             break;
         default:
-            break;
+            {
+                CharacterHitBoxData* hitbox = runtimeHookGetExtCharacterHitBoxData(characterID, powerupID);
+                if (hitbox)
+                {
+                    hitbox->gfxoffset_y[spriteIndex + 49] = value;
+                }
+            } break;
         }
     }
 };
