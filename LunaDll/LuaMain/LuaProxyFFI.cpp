@@ -155,6 +155,7 @@ extern "C" {
         bool showFPS;
         bool godMode;
         STestModePlayerSettings players[2];
+        unsigned int entranceIndex;
     };
     FFITestModeSettings testModeSettings;
 
@@ -168,6 +169,7 @@ extern "C" {
         testModeSettings.godMode = settings.godMode;
         testModeSettings.players[0] = settings.players[0];
         testModeSettings.players[1] = settings.players[1];
+        testModeSettings.entranceIndex = settings.entranceIndex;
 
         return &testModeSettings;
     }
@@ -182,6 +184,7 @@ extern "C" {
         settings.godMode = pTestModeSettings->godMode;
         settings.players[0] = pTestModeSettings->players[0];
         settings.players[1] = pTestModeSettings->players[1];
+        settings.entranceIndex = pTestModeSettings->entranceIndex;
 
         setTestModeSettings(settings);
     }

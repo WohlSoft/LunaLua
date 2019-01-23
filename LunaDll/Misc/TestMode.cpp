@@ -63,6 +63,7 @@ void STestModeSettings::ResetToDefault(void)
     players[1].powerup = 1;
     players[1].mountType = 0;
     players[1].mountColor = 0;
+    entranceIndex = 0;
 }
 
 static STestModeSettings testModeSettings;
@@ -198,7 +199,7 @@ static bool testModeSetupForLoading()
     GM_CUR_MENULEVEL = 1;
 
     // Write warp destination data
-    GM_NEXT_LEVEL_WARPIDX = 0;
+    GM_NEXT_LEVEL_WARPIDX = testModeSettings.entranceIndex;
     GM_NEXT_LEVEL_FILENAME = path.substr(pos+1);
 
     // Don't use any save slot
