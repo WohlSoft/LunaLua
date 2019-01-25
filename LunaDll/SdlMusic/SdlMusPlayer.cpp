@@ -16,7 +16,7 @@ void PGE_SDL_Manager::initSDL()
         SDL_Init(SDL_INIT_AUDIO);
         isInit=true;
         PGE_MusPlayer::setSampleRate(44100);
-        PGE_MusPlayer::MUS_changeVolume(80);
+        PGE_MusPlayer::MUS_changeVolume(51);
         //std::wstring smbxPath = gAppPathWCHAR;
         //smbxPath = smbxPath.append(L"\\");
         appPath = gAppPathUTF8;
