@@ -17,6 +17,7 @@ namespace LuaProxy
         void MusicPlayFadeIn(int ms);
         void MusicStop();
         void MusicStopFadeOut(int ms);
+        int  MusicVolume(void);
         void MusicVolume(int vlm);
         void MusicPause();
         void MusicResume();

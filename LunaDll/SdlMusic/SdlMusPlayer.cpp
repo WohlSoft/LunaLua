@@ -29,7 +29,6 @@ void PGE_SDL_Manager::initSDL()
 /***********************************PGE_MusPlayer********************************************/
 Mix_Music *PGE_MusPlayer::play_mus = NULL;
 std::string PGE_MusPlayer::currentTrack="";
-int PGE_MusPlayer::volume=100;
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
@@ -159,8 +158,7 @@ std::string PGE_MusPlayer::MUS_MusicCopyrightTag()
 
 void PGE_MusPlayer::MUS_changeVolume(int vlm)
 {
-    volume = vlm;
-    Mix_VolumeMusic(volume);
+    Mix_VolumeMusic(vlm);
 }
 
 bool PGE_MusPlayer::MUS_IsPlaying()
@@ -194,9 +192,9 @@ int PGE_MusPlayer::sampleRate()
     return sRate;
 }
 
-int PGE_MusPlayer::currentVolume()
+int PGE_MusPlayer::MUS_currentVolume()
 {
-    return volume;
+    return Mix_GetVolumeMusicStream(NULL);
 }
 
 

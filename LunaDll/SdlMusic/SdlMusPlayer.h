@@ -40,7 +40,7 @@ public:
     static void MUS_openFile(const char *musFile);
     static void setSampleRate(int sampleRate);
     static int sampleRate();
-    static int currentVolume();
+    static int MUS_currentVolume();
 
     static bool MUS_IsPlaying();
     static bool MUS_IsPaused();
@@ -50,7 +50,6 @@ public:
     static unsigned __int64 MUS_sampleCount();
 private:
     static Mix_Music *play_mus;
-    static int volume;
     static int sRate;
     static bool showMsg;
     static std::string showMsg_for;

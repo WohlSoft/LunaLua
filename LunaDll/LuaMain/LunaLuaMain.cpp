@@ -663,6 +663,7 @@ void CLunaLua::bindAll()
                 def("MusicIsPlaying", (bool(*)())&LuaProxy::Audio::MusicIsPlaying),
                 def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
                 def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
+                def("MusicVolume", (int(*)(void))&LuaProxy::Audio::MusicVolume),
                 def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),
                 def("MusicTitle", (std::string(*)())&LuaProxy::Audio::MusicTitle),
                 def("MusicTitleTag", (std::string(*)())&LuaProxy::Audio::MusicTitleTag),
