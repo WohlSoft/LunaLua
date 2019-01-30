@@ -112,6 +112,30 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
 
+    // If we have vertex colors, multiply it with the other color
+    if ((obj->mVertColor != nullptr) &&
+        (
+            (obj->mColor[0] != 1.0) ||
+            (obj->mColor[1] != 1.0) || 
+            (obj->mColor[2] != 1.0) || 
+            (obj->mColor[3] != 1.0)
+        ))
+    {
+        float* vertColorData = (float*)obj->mVertColor;
+        for (int i = 0; i < obj->mCount; i++)
+        {
+            vertColorData[4*i+0] *= obj->mColor[0];
+            vertColorData[4*i+1] *= obj->mColor[1];
+            vertColorData[4*i+2] *= obj->mColor[2];
+            vertColorData[4*i+3] *= obj->mColor[3];
+        }
+        obj->mColor[0] = 1.0;
+        obj->mColor[1] = 1.0;
+        obj->mColor[2] = 1.0;
+        obj->mColor[3] = 1.0;
+        obj->mVertColor = vertColorData;
+    }
+
     FFI_ShaderObjRef* shader = cmd->mShader;
     if ((shader != nullptr) && (*shader) && (*shader)->mShader && (*shader)->mShader->isValid())
     {
