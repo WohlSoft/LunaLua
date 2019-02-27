@@ -235,6 +235,17 @@ void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
     if (saveFile.exists()){
         saveFile.remove();
     }
+	//Extended save files, likely temporary
+    QString tmpSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".tmp";
+    QFile tmpSaveFile(tmpSavePath);
+    if (tmpSaveFile.exists()){
+        tmpSaveFile.remove();
+    }
+    QString extSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + "-ext.dat";
+    QFile extSaveFile(extSavePath);
+    if (extSaveFile.exists()){
+        extSaveFile.remove();
+    }
 }
 
 void SMBXConfig::runSMBX()
