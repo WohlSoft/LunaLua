@@ -152,6 +152,9 @@ extern int __stdcall LoadWorld()
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
+    // Overworld is guaranteed to be loaded by this point, so trigger onStart
+    gLunaLua.triggerOnStart();
+
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
     __asm {
@@ -1312,6 +1315,9 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             base.ReadFile(static_cast<std::wstring>(*filename), getCurrentLevelData());
         }
     }
+
+    // Trigger onStart here, as this is the earliest it could be safe to do so
+    gLunaLua.triggerOnStart();
 }
 
 void __stdcall runtimeHookCloseWindow(void)

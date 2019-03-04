@@ -44,7 +44,7 @@ CLunaLua::CLunaLua() :
         m_luaEventTableName(""),
         L(0),
         m_ready(false),
-        m_eventLoopOnceExecuted(false),
+        m_onStartRan(false),
         m_warningList()
 {}
 
@@ -112,7 +112,7 @@ bool CLunaLua::shutdown()
     checkWarnings();
 
     m_ready = false;
-    m_eventLoopOnceExecuted = false;
+    m_onStartRan = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -1290,6 +1290,30 @@ void CLunaLua::bindAllDeprecated()
     }
 }
 
+void CLunaLua::triggerOnStart()
+{
+    GLEngineProxy::CheckRendererInit();
+
+    //If the lua module is not valid anyway, then just return
+    if (!isValid())
+    {
+        return;
+    }
+
+    // If is not ready (SMBX not init), then skip event loop
+    if (!m_ready)
+    {
+        return;
+    }
+
+    if (!m_onStartRan) {
+        std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
+        onStartEvent->setLoopable(false);
+        onStartEvent->setDirectEventName("onStart");
+        callEvent(onStartEvent);
+        m_onStartRan = true;
+    }
+}
 
 void CLunaLua::doEvents()
 {
@@ -1314,17 +1338,11 @@ void CLunaLua::doEvents()
 
     MusicManager::setCurrentSection(Player::Get(1)->CurrentSection);
 
-    if (!m_eventLoopOnceExecuted) {
-        std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
-        onStartEvent->setLoopable(false);
-        onStartEvent->setDirectEventName("onStart");
-        callEvent(onStartEvent);
-        m_eventLoopOnceExecuted = true;
+    triggerOnStart();
 
-        // If an error happened in onStart then return.
-        if (!isValid())
-            return;
-    }
+    // If an error happened in onStart then return.
+    if (!isValid())
+        return;
 
     std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
     onLoopEvent->setLoopable(false);

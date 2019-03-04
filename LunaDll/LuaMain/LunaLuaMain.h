@@ -35,16 +35,18 @@ public:
 
     //Init a lua code file
     void init(LuaLunaType type, std::wstring codePath, std::wstring levelPath = std::wstring());
-    //Does the event queue
+    // Trigger onStart
+    void triggerOnStart();
+    // Does the event queue
     void doEvents();
     // Exit level/world
     void exitContext();
-    //Shutdown lua module
+    // Shutdown lua module
     bool shutdown();
-    //If the lua module is valid
+    // If the lua module is valid
     bool isValid(){return L != 0;}
 
-    //Setting "ready" field
+    // Setting "ready" field
     bool isReady() const { return m_ready;  }
     void setReady(bool ready) { m_ready = ready; }
 
@@ -113,7 +115,7 @@ private:
     
     lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
-    bool m_eventLoopOnceExecuted; //This should be an alternative to "onLoad". With this flag the event "onStart" is beeing called, if it is false.
+    bool m_onStartRan;
 };
 
 
