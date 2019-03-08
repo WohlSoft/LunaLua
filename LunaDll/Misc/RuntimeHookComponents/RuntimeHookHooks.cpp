@@ -521,6 +521,10 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
+
+    // Trigger onStart here to ensure it happens just before the "Level - Start" event
+    gLunaLua.triggerOnStart();
+
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");
     gLunaLua.callEvent(triggerEventData, WStr2Str(eventName));
@@ -1315,9 +1319,6 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             base.ReadFile(static_cast<std::wstring>(*filename), getCurrentLevelData());
         }
     }
-
-    // Trigger onStart here, as this is the earliest it could be safe to do so
-    gLunaLua.triggerOnStart();
 }
 
 void __stdcall runtimeHookCloseWindow(void)
