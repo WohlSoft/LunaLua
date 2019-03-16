@@ -399,5 +399,7 @@ void __stdcall runtimeHookColorSwitchGreenBlock(void);
 void __stdcall runtimeHookColorSwitchBlueBlock(void);
 void __stdcall runtimeHookColorSwitchYellowBlock(void);
 
+void __stdcall runtimeHookLoadDefaultControls(void);
+
 #endif
 

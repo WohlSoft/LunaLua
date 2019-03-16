@@ -760,6 +760,8 @@ void TrySkipPatch()
     PATCH(0x9DB6B9).JG(&runtimeHookColorSwitchGreenBlock).Apply();
     PATCH(0x9DB84E).JG(&runtimeHookColorSwitchRedBlock).Apply();
 
+    PATCH(0x8BF020).CALL(&runtimeHookLoadDefaultControls).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

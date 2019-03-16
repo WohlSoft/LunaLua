@@ -33,6 +33,8 @@
 #include "../../Rendering/ImageLoader.h"
 #include "../../Misc/LoadScreen.h"
 
+#include "../../SMBXInternal/HardcodedGraphicsAccess.h"
+#include "../../Rendering/LunaImage.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -2003,4 +2005,51 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
         push 0x9DB8FA
         ret
     }
+}
+
+static void drawReplacementSplashScreen(void)
+{
+    // Get form to draw on
+    HDC frmHDC = nullptr;
+    uintptr_t mainFrm = *reinterpret_cast<uintptr_t*>(0xB25010);
+    uintptr_t mainFrmClass = *reinterpret_cast<uintptr_t*>(mainFrm);
+    auto frmGetHDC = (HRESULT(__stdcall *)(uintptr_t, HDC*)) *(void**)(mainFrmClass + 0xD8);
+    frmGetHDC(mainFrm, &frmHDC);
+    if (!frmHDC) return;
+
+    // Load splash image
+    std::shared_ptr<LunaImage> splashReplacement = LunaImage::fromFile(L"graphics/hardcoded/hardcoded-30-4.png");
+    if (!splashReplacement) return;
+
+    // Get image as HBITMAP
+    HBITMAP splashBMP = splashReplacement->asHBITMAP();
+    if (!splashBMP) return;
+
+    // Generate HDC for drawing...
+    HDC splashHDC = CreateCompatibleDC(frmHDC);
+    if (!splashHDC) return;
+    SelectObject(splashHDC, splashBMP);
+
+    // Clear HDC...
+    BitBlt(frmHDC, 0, 0, 800, 600, frmHDC, 0, 0, WHITENESS);
+
+    // Draw with respecting alpha channel
+    BLENDFUNCTION bf;
+    bf.BlendOp = AC_SRC_OVER;
+    bf.BlendFlags = 0;
+    bf.AlphaFormat = AC_SRC_ALPHA;
+    bf.SourceConstantAlpha = 0xff;
+    AlphaBlend(frmHDC, 0, 0, 800, 600, splashHDC, 0, 0, 800, 600, bf);
+
+    // Cleanup
+    DeleteDC(splashHDC);
+}
+
+void __stdcall runtimeHookLoadDefaultControls(void)
+{
+    // Draw replacement splash screen if we have one
+    drawReplacementSplashScreen();
+
+    // Run the regular load default controls...
+    native_loadDefaultControls();
 }

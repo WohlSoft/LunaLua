@@ -36,8 +36,13 @@ void GLEngine::InitForHDC(HDC hdcDest)
         // TODO: Move mGifRecorder initialization somewhere else. It can't be
         //       in the constructor due to when the constructor 
         if (runOnce) {
-            mGifRecorder.init();
             runOnce = false;
+            mGifRecorder.init();
+
+            // A little trick to ensure early rendering works
+            RenderCameraToScreen(hdcDest, 0, 0, 800, 600,
+                hdcDest, 0, 0, 800, 600, 0);
+            EndFrame(hdcDest);
         }
     }
 }

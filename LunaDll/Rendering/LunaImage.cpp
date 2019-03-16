@@ -352,6 +352,7 @@ void LunaImage::clearInternal()
     {
         // If we hae a hbmp, then it's where data is allocated so we only need
         // to deallocate the hbmp
+        totalRawMem -= 4 * w*h;
         ::DeleteObject(hbmp);
         hbmp = nullptr;
         data = nullptr;
@@ -383,6 +384,7 @@ HBITMAP LunaImage::asHBITMAP()
     std::lock_guard<std::mutex> lock(mut);
 
     if (hbmp != nullptr) return hbmp;
+    data = getDataPtr();
     if (data == nullptr) return nullptr;
 
     // Convert this to a HBITMAP
@@ -644,9 +646,22 @@ void LunaImage::notifyTextureified()
 {
     if ((compressedDataPtr != nullptr) && (!mustKeepData))
     {
-        totalRawMem -= 4 * w*h;
-        std::free(data);
-        data = nullptr;
+        if (hbmp != nullptr)
+        {
+            // If we hae a hbmp, then it's where data is allocated so we only need
+            // to deallocate the hbmp
+            totalRawMem -= 4 * w*h;
+            ::DeleteObject(hbmp);
+            hbmp = nullptr;
+            data = nullptr;
+        }
+        else if (data != nullptr)
+        {
+            // otherwise if we have data, directly deallocate that
+            totalRawMem -= 4 * w*h;
+            std::free(data);
+            data = nullptr;
+        }
     }
 }
 
