@@ -1098,7 +1098,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
     if (keyDown) {
-        if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+        if (gLunaLua.isValid() && !ctrlPressed) {
             std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
             int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
