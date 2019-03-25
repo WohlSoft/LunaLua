@@ -545,6 +545,7 @@ void CLunaLua::bindAll()
 
             namespace_("Native")[
                 def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
+                def("getEpisodePath", &LuaProxy::Native::getEpisodePath),
                 def("simulateError", &LuaProxy::Native::simulateError)
             ],
 

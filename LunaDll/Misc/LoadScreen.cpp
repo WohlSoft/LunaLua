@@ -90,6 +90,8 @@ static void LoadThread(void)
 
         lua_pushstring(L, WStr2Str(gAppPathWCHAR).c_str());
         lua_setglobal(L, "_smbxPath");
+        lua_pushstring(L, ((std::string)GM_FULLDIR).c_str());
+        lua_setglobal(L, "_episodePath");
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");

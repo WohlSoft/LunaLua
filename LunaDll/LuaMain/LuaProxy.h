@@ -879,6 +879,7 @@ namespace LuaProxy {
     //undocumented
     namespace Native{
         std::string getSMBXPath();
+        std::string getEpisodePath();
         void simulateError(short errcode);
     }
     //Debug/Text functions
