@@ -184,6 +184,9 @@ static bool testModeSetupForLoading()
     ep->unknown_10 = 0;
     ep->unknown_14 = "";
 
+    // Set episode path...
+    GM_FULLDIR = path.substr(0, pos + 1);
+
     // God Mode cheat code
     GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
