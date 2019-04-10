@@ -401,9 +401,14 @@ void TrySkipPatch()
     PATCH(0x4242D0).JMP(&BitBltHook).Apply();
     PATCH(0x424314).JMP(&StretchBltHook).Apply();
 
-    PATCH(0x8E54EC)
-        .CALL(&MessageBoxOpenHook)
-        .NOP()
+    PATCH(0x8E54C0)
+        .JMP(&runtimeHookMsgbox)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+
+    PATCH(0x9B22BF)
+        .CALL(&runtimeHookNpcMsgbox_Wrapper)
+        .NOP_PAD_TO_SIZE<5>()
         .Apply();
 
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!

@@ -82,7 +82,8 @@ extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
-extern short __stdcall MessageBoxOpenHook();
+extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 

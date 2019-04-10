@@ -923,19 +923,29 @@ extern void __stdcall InitLevelEnvironmentHook()
     native_initLevelEnv();
 }
 
-static auto MessageBoxContinueCode = PATCH(0x8E54F2).RET_STDCALL_FULL();
-extern short __stdcall MessageBoxOpenHook()
+static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E54C6
+        RET
+    }
+}
+
+void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
 {
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
-    // A note here: If the message is set, then the message box will called
-    // However, if a message is not set, then this function is called when the menu opens.
+                              // A note here: If the message is set, then the message box will called
+                              // However, if a message is not set, then this function is called when the menu opens.
 
     if ((GM_STR_MSGBOX) && (GM_STR_MSGBOX.length() > 0)) {
         if (gLunaLua.isValid()) {
             std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
             messageBoxEvent->setDirectEventName("onMessageBox");
             messageBoxEvent->setLoopable(false);
-            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
+            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX, *pPlayerIdx);
             isCancelled = messageBoxEvent->native_cancelled();
         }
     }
@@ -945,18 +955,45 @@ extern short __stdcall MessageBoxOpenHook()
             std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onPause", true);
             messageBoxEvent->setDirectEventName("onPause");
             messageBoxEvent->setLoopable(false);
-            gLunaLua.callEvent(messageBoxEvent);
+            gLunaLua.callEvent(messageBoxEvent, *pPlayerIdx);
             isCancelled = messageBoxEvent->native_cancelled();
         }
     }
 
+    if (!isCancelled)
+    {
+        msgbox_OrigFunc(pPlayerIdx);
+    }
+}
 
-    if (isCancelled)
-        MessageBoxContinueCode.Apply();
-    else
-        MessageBoxContinueCode.Unapply();
+static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsigned int* pPlayerIdx)
+{
+    unsigned int npcIdx = npcIdxWithOffset - 128;
 
-    return (short)GM_PLAYERS_COUNT;
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
+        messageBoxEvent->setDirectEventName("onMessageBox");
+        messageBoxEvent->setLoopable(false);
+        gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX, *pPlayerIdx, npcIdx);
+        isCancelled = messageBoxEvent->native_cancelled();
+    }
+
+    if (!isCancelled)
+    {
+        msgbox_OrigFunc(pPlayerIdx);
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx)
+{
+    __asm {
+        POP ECX
+        PUSH EDI
+        PUSH ECX
+        JMP runtimeHookNpcMsgbox
+    }
 }
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
