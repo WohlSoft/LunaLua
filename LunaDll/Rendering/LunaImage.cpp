@@ -408,7 +408,6 @@ bool LunaImage::tryMaskToRGBA()
     if (mask == nullptr) return false;
 
     std::lock_guard<std::mutex> mlock(mask->mut);
-    if ((h != mask->h) || (w != mask->w)) return false;
     auto mdata = (const uint8_t*)mask->getDataPtr();
     if (mdata == nullptr) return false;
 
@@ -417,73 +416,114 @@ bool LunaImage::tryMaskToRGBA()
     {
         // Handle regular GIF masks
 
-        for (uint32_t idx = 0; idx < byteCount; idx += 4)
+        for (uint32_t x = 0; x < w; x++)
         {
-            uint32_t mainPix = (
-                ((uint32_t)(sdata[idx + 0]) << 16) |
-                ((uint32_t)(sdata[idx + 1]) << 8) |
-                ((uint32_t)(sdata[idx + 2]) << 0)
-                );
-            uint32_t maskPix = (
-                ((uint32_t)(mdata[idx + 0]) << 16) |
-                ((uint32_t)(mdata[idx + 1]) << 8) |
-                ((uint32_t)(mdata[idx + 2]) << 0)
-                );
-
-            // Transparent
-            if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF)) continue;
-
-            // Dark bits in the image, that the mask doesn't mask, are bad
-            if (((mainPix ^ 0xFFFFFF) & maskPix) != 0)
+            for (uint32_t y = 0; y < h; y++)
             {
-                mask->notifyTextureified();
-                return false;
+                uint32_t mainPix, maskPix;
+                uint32_t mainIdx = (y*w + x) * 4;
+                mainPix = (
+                    ((uint32_t)(sdata[mainIdx + 0]) << 16) |
+                    ((uint32_t)(sdata[mainIdx + 1]) << 8) |
+                    ((uint32_t)(sdata[mainIdx + 2]) << 0)
+                    );
+                if ((x < mask->w) && (y < mask->h))
+                {
+                    uint32_t maskIdx = (y*mask->w + x) * 4;
+                    maskPix = (
+                        ((uint32_t)(mdata[maskIdx + 0]) << 16) |
+                        ((uint32_t)(mdata[maskIdx + 1]) << 8) |
+                        ((uint32_t)(mdata[maskIdx + 2]) << 0)
+                        );
+                }
+                else
+                {
+                    maskPix = 0x000000;
+                }
+
+                // Transparent
+                if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF)) continue;
+
+                // Dark bits in the image, that the mask doesn't mask, are bad
+                if (((mainPix ^ 0xFFFFFF) & maskPix) != 0)
+                {
+                    mask->notifyTextureified();
+                    return false;
+                }
             }
         }
 
         // Set up alpha channel correctly
-        for (uint32_t idx = 0; idx < byteCount; idx += 4)
+        for (uint32_t x = 0; x < w; x++)
         {
-            uint32_t mainPix = (
-                ((uint32_t)(sdata[idx + 0]) << 16) |
-                ((uint32_t)(sdata[idx + 1]) << 8) |
-                ((uint32_t)(sdata[idx + 2]) << 0)
-                );
-            uint32_t maskPix = (
-                ((uint32_t)(mdata[idx + 0]) << 16) |
-                ((uint32_t)(mdata[idx + 1]) << 8) |
-                ((uint32_t)(mdata[idx + 2]) << 0)
-                );
+            for (uint32_t y = 0; y < h; y++)
+            {
+                uint32_t mainPix, maskPix;
+                uint32_t mainIdx = (y*w + x) * 4;
+                mainPix = (
+                    ((uint32_t)(sdata[mainIdx + 0]) << 16) |
+                    ((uint32_t)(sdata[mainIdx + 1]) << 8) |
+                    ((uint32_t)(sdata[mainIdx + 2]) << 0)
+                    );
+                if ((x < mask->w) && (y < mask->h))
+                {
+                    uint32_t maskIdx = (y*mask->w + x) * 4;
+                    maskPix = (
+                        ((uint32_t)(mdata[maskIdx + 0]) << 16) |
+                        ((uint32_t)(mdata[maskIdx + 1]) << 8) |
+                        ((uint32_t)(mdata[maskIdx + 2]) << 0)
+                        );
+                }
+                else
+                {
+                    maskPix = 0x000000;
+                }
 
-            // Transparent
-            if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF))
-            {
-                sdata[idx + 0] = 0x00;
-                sdata[idx + 1] = 0x00;
-                sdata[idx + 2] = 0x00;
-                sdata[idx + 3] = 0x00;
-            }
-            else
-            {
-                sdata[idx + 3] = 0xFF;
+                // Transparent
+                if ((mainPix == 0x000000) && (maskPix == 0xFFFFFF))
+                {
+                    sdata[mainIdx + 0] = 0x00;
+                    sdata[mainIdx + 1] = 0x00;
+                    sdata[mainIdx + 2] = 0x00;
+                    sdata[mainIdx + 3] = 0x00;
+                }
+                else
+                {
+                    sdata[mainIdx + 3] = 0xFF;
+                }
             }
         }
     }
     else
     {
         // Handle when the thing to use for a mask is a PNG's alpha channel
-        for (uint32_t idx = 0; idx < byteCount; idx += 4)
+        for (uint32_t x = 0; x < w; x++)
         {
-            if (mdata[idx + 3] == 0x00)
+            for (uint32_t y = 0; y < h; y++)
             {
-                sdata[idx + 0] = 0x00;
-                sdata[idx + 1] = 0x00;
-                sdata[idx + 2] = 0x00;
-                sdata[idx + 3] = 0x00;
-            }
-            else
-            {
-                sdata[idx + 3] = 0xFF;
+                uint32_t mainIdx = (y*w + x) * 4;
+                uint8_t maskAlpha;
+                if ((x < mask->w) && (y < mask->h))
+                {
+                    uint32_t maskIdx = (y*mask->w + x) * 4;
+                    maskAlpha = mdata[maskIdx + 3];
+                }
+                else
+                {
+                    maskAlpha = 0xFF;
+                }
+
+                if (maskAlpha == 0x00)
+                {
+                    sdata[mainIdx + 0] = 0x00;
+                    sdata[mainIdx + 1] = 0x00;
+                    sdata[mainIdx + 2] = 0x00;
+                    sdata[mainIdx + 3] = 0x00;
+                }
+                else
+                {
+                    sdata[mainIdx + 3] = 0xFF;
+                }
             }
         }
     }
