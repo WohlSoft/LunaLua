@@ -11,21 +11,27 @@
 void InfiniteFlying(int player);
 
 template<typename Elem, typename Traits, typename Alloc>
-auto RemoveTail(const std::basic_string<Elem, Traits, Alloc>& filename, Elem tail)
+static inline auto RemoveTail(const std::basic_string<Elem, Traits, Alloc>& filename, Elem tail, size_t pos= std::basic_string<Elem, Traits, Alloc>::npos)
 {
     typedef std::basic_string<Elem, Traits, Alloc> tstring;
-    size_t lastdot = filename.find_first_of(tail);
-    if (lastdot == tstring::npos) return filename;
+    size_t lastdot = filename.find_last_of(tail);
+    if ((lastdot == tstring::npos) ||
+        ((pos != tstring::npos) && (lastdot < pos)))
+    {
+        return filename;
+    }
     return filename.substr(0, lastdot);
 }
 
-inline auto RemoveExtension(const std::string& filename)
+static inline auto RemoveExtension(const std::string& filename)
 {
-    return RemoveTail(filename, '.');
+    size_t pos = filename.find_last_of("/\\");
+    return RemoveTail(filename, '.', pos);
 }
-inline auto RemoveExtension(const std::wstring& filename)
+static inline auto RemoveExtension(const std::wstring& filename)
 {
-    return RemoveTail(filename, L'.');
+    size_t pos = filename.find_last_of(L"/\\");
+    return RemoveTail(filename, L'.', pos);
 }
 
 
