@@ -675,17 +675,6 @@ extern BOOL __stdcall StretchBltHook(
     {
         g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 
-        // Heuristic for the last StretchBlt of the frame
-        if ((nWidthSrc == 800 && nHeightSrc == 600) || (callCount == 1))
-        {
-            g_GLEngine.EndFrame(hdcDest);
-            callCount = 0;
-        }
-        else
-        {
-            callCount++;
-        }
-
         return TRUE;
     }
 
@@ -1267,6 +1256,10 @@ extern void __stdcall RenderLevelHook()
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        g_GLEngine.EndFrame(g_GLEngine.GetHDC());
+    }
     g_EventHandler.hookLevelRenderEnd();
     Renderer::Get().EndFrameRender();
 }
@@ -1290,6 +1283,10 @@ extern void __stdcall RenderWorldHook()
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        g_GLEngine.EndFrame(g_GLEngine.GetHDC());
+    }
     g_EventHandler.hookWorldRenderEnd();
     Renderer::Get().EndFrameRender();
 }

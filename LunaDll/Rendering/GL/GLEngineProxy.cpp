@@ -167,25 +167,30 @@ void GLEngineProxy::InitForHDC(HDC hdcDest)
     QueueCmd(obj);
 }
 
+HDC GLEngineProxy::GetHDC(void)
+{
+    void* mainFrmPtr = *((void**)0xB25010);
+    if (mainFrmPtr == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
+    HDC targetHdc = nullptr;
+    frmGetHDC(mainFrmPtr, &targetHdc);
+    return targetHdc;
+}
+
 void GLEngineProxy::CheckRendererInit(void)
 {
     static bool ranEarlyInit = false;
     if ((!ranEarlyInit) && g_GLEngine.IsEnabled())
     {
-        void* mainFrmPtr = *((void**)0xB25010);
-        if (mainFrmPtr != nullptr)
-        {
-            auto frmGetHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)mainFrmPtr + 0xD8);
-            HDC targetHdc = nullptr;
-            frmGetHDC(mainFrmPtr, &targetHdc);
+        HDC targetHdc = GetHDC();
 
-            if (targetHdc != nullptr) {
-                //static char foo[256];
-                //sprintf(foo, "Early GL Init: 0x%08x", targetHdc);
-                //dbgboxA(foo);
-                ranEarlyInit = true;
-                g_GLEngine.InitForHDC(targetHdc);
-            }
+        if (targetHdc != nullptr) {
+            ranEarlyInit = true;
+            g_GLEngine.InitForHDC(targetHdc);
         }
     }
 }

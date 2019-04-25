@@ -68,6 +68,7 @@ public:
     // However, before any GL operations at the main thread this function has to be call first.
     void EnsureMainThreadCTXApplied();
 
+    static HDC GetHDC(void);
     static void CheckRendererInit(void);
 };
 
