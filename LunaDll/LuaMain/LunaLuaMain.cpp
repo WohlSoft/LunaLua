@@ -1311,8 +1311,8 @@ void CLunaLua::triggerOnStart()
         std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
-        callEvent(onStartEvent);
         m_onStartRan = true;
+        callEvent(onStartEvent);
     }
 }
 
