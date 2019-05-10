@@ -30,7 +30,7 @@ extern "C" {
 
 #define ADLMIDI_VERSION_MAJOR       1
 #define ADLMIDI_VERSION_MINOR       4
-#define ADLMIDI_VERSION_PATCHLEVEL  0
+#define ADLMIDI_VERSION_PATCHLEVEL  1
 
 #define ADLMIDI_TOSTR_I(s) #s
 #define ADLMIDI_TOSTR(s) ADLMIDI_TOSTR_I(s)
@@ -39,6 +39,7 @@ extern "C" {
         ADLMIDI_TOSTR(ADLMIDI_VERSION_MINOR) "." \
         ADLMIDI_TOSTR(ADLMIDI_VERSION_PATCHLEVEL)
 
+#define ADL_CHIP_SAMPLE_RATE        49716
 
 #include <stddef.h>
 
@@ -479,11 +480,14 @@ extern ADLMIDI_DECLSPEC int adl_getNumFourOpsChnObtained(struct ADL_MIDIPlayer *
 /**
  * @brief Override Enable(1) or Disable(0) AdLib percussion mode. -1 - use bank default AdLib percussion mode
  *
+ * [DEPRECATED] This function is no more useful and now it makes nothing. Kept for ABI compatibility. Rhythm mode can be set by the bank data only.
+ *
  * This function forces rhythm-mode on any bank. The result will work glitchy.
  *
  * @param device Instance of the library
  * @param percmod 0 - disabled, 1 - enabled
  */
+ADLMIDI_DEPRECATED("This function is no more useful and now it makes nothing. Kept for ABI compatibility. Rhythm mode can be set by the bank data only.")
 extern ADLMIDI_DECLSPEC void adl_setPercMode(struct ADL_MIDIPlayer *device, int percmod);
 
 /**
@@ -620,6 +624,10 @@ enum ADL_Emulator
     ADLMIDI_EMU_NUKED_174,
     /*! DosBox */
     ADLMIDI_EMU_DOSBOX,
+    /*! Opal */
+    ADLMIDI_EMU_OPAL,
+    /*! Java */
+    ADLMIDI_EMU_JAVA,
     /*! Count instrument on the level */
     ADLMIDI_EMU_end
 };
@@ -706,6 +714,7 @@ extern ADLMIDI_DECLSPEC const char *adl_errorInfo(struct ADL_MIDIPlayer *device)
  * Tip 1: You can initialize multiple instances and run them in parallel
  * Tip 2: Library is NOT thread-safe, therefore don't use same instance in different threads or use mutexes
  * Tip 3: Changing of sample rate on the fly is not supported. Re-create the instance again.
+ * Top 4: To generate output in OPL chip native sample rate, please initialize it with sample rate value as `ADL_CHIP_SAMPLE_RATE`
  *
  * @param sample_rate Output sample rate
  * @return Instance of the library. If NULL was returned, check the `adl_errorString` message for more info.
