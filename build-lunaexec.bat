@@ -16,3 +16,4 @@ cd "%BUILD_DIR%"
 "%MINGW_DIR%\bin\mingw32-make.exe" -j 2
 
 echo === Built! ===
+cd "%CurDir%"
