@@ -7,6 +7,8 @@ set MINGW_DIR=C:\Qt\Tools\mingw730_32\
 set BUILD_DIR=%CurDir%\build-LunaExec
 set SOURCE_DIR=%CurDir%\LunaLoader
 
+PATH=%QT_DIR%\bin;%MINGW_DIR%\bin;%PATH%
+
 if not exist "%BUILD_DIR%\*" md "%BUILD_DIR%"
 
 cd "%BUILD_DIR%"
