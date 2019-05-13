@@ -123,7 +123,11 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         cmdLine,          // Command line
         NULL,             // Process handle not inheritable
         NULL,             // Thread handle not inheritable
+#ifdef LUNALOADER_EXEC
+        TRUE,             // Set handle inheritance to TRUE
+#else
         FALSE,            // Set handle inheritance to FALSE
+#endif
         CREATE_SUSPENDED, // Create in suspended state
         NULL,             // Use parent's environment block
         workingDir,       // Use parent's starting directory
