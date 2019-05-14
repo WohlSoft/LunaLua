@@ -28,7 +28,7 @@
   - path: LunaLUA-bin.zip
   - path: LunaLoader-bin.zip
   - path: Release\LunaDLL.dll
-  - path: build-LunaExec\bin\LunaLoader-exec.exe
+  - path: LunaLoader-exec.7z
 
   deploy:
   - provider: Environment
