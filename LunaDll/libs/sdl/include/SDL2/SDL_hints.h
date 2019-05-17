@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -263,6 +263,16 @@ extern "C" {
 #define SDL_HINT_GRAB_KEYBOARD              "SDL_GRAB_KEYBOARD"
 
 /**
+ *  \brief  A variable setting the double click time, in milliseconds.
+ */
+#define SDL_HINT_MOUSE_DOUBLE_CLICK_TIME    "SDL_MOUSE_DOUBLE_CLICK_TIME"
+
+/**
+ *  \brief  A variable setting the double click radius, in pixels.
+ */
+#define SDL_HINT_MOUSE_DOUBLE_CLICK_RADIUS    "SDL_MOUSE_DOUBLE_CLICK_RADIUS"
+
+/**
  *  \brief  A variable setting the speed scale for mouse motion, in floating point, when the mouse is not in relative mode
  */
 #define SDL_HINT_MOUSE_NORMAL_SPEED_SCALE    "SDL_MOUSE_NORMAL_SPEED_SCALE"
@@ -306,6 +316,16 @@ extern "C" {
 #define SDL_HINT_TOUCH_MOUSE_EVENTS    "SDL_TOUCH_MOUSE_EVENTS"
 
 /**
+ *  \brief  A variable controlling whether mouse events should generate synthetic touch events
+ *
+ *  This variable can be set to the following values:
+ *    "0"       - Mouse events will not generate touch events (default for desktop platforms)
+ *    "1"       - Mouse events will generate touch events (default for mobile platforms, such as Android and iOS)
+ */
+
+#define SDL_HINT_MOUSE_TOUCH_EVENTS    "SDL_MOUSE_TOUCH_EVENTS"
+
+/**
  *  \brief Minimize your SDL_Window if it loses key focus when in fullscreen mode. Defaults to true.
  *
  */
@@ -329,7 +349,7 @@ extern "C" {
 #define SDL_HINT_IDLE_TIMER_DISABLED "SDL_IOS_IDLE_TIMER_DISABLED"
 
 /**
- *  \brief  A variable controlling which orientations are allowed on iOS.
+ *  \brief  A variable controlling which orientations are allowed on iOS/Android.
  *
  *  In some circumstances it is necessary to be able to explicitly control
  *  which UI orientations are allowed.
@@ -425,6 +445,16 @@ extern "C" {
  *  You can update mappings after the system is initialized with SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
  */
 #define SDL_HINT_GAMECONTROLLERCONFIG "SDL_GAMECONTROLLERCONFIG"
+
+/**
+ *  \brief  A variable that lets you provide a file with extra gamecontroller db entries.
+ *
+ *  The file should contain lines of gamecontroller config data, see SDL_gamecontroller.h
+ *
+ *  This hint must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
+ *  You can update mappings after the system is initialized with SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
+ */
+#define SDL_HINT_GAMECONTROLLERCONFIG_FILE "SDL_GAMECONTROLLERCONFIG_FILE"
 
 /**
  *  \brief  A variable containing a list of devices to skip when scanning for game controllers.
@@ -536,6 +566,17 @@ extern "C" {
 #define SDL_HINT_JOYSTICK_HIDAPI_XBOX   "SDL_JOYSTICK_HIDAPI_XBOX"
 
 /**
+ *  \brief  A variable controlling whether the HIDAPI driver for Nintendo GameCube controllers should be used.
+ *
+ *  This variable can be set to the following values:
+ *    "0"       - HIDAPI driver is not used
+ *    "1"       - HIDAPI driver is used
+ *
+ *  The default is the value of SDL_HINT_JOYSTICK_HIDAPI
+ */
+#define SDL_HINT_JOYSTICK_HIDAPI_GAMECUBE "SDL_JOYSTICK_HIDAPI_GAMECUBE"
+
+/**
  *  \brief  A variable that controls whether Steam Controllers should be exposed using the SDL joystick and game controller APIs
  *
  *  The variable can be set to the following values:
@@ -609,6 +650,10 @@ extern "C" {
 *  This is specially useful if you build SDL against a non glibc libc library (such as musl) which
 *  provides a relatively small default thread stack size (a few kilobytes versus the default 8MB glibc uses).
 *  Support for this hint is currently available only in the pthread, Windows, and PSP backend.
+*
+*  Instead of this hint, in 2.0.9 and later, you can use
+*  SDL_CreateThreadWithStackSize(). This hint only works with the classic
+*  SDL_CreateThread().
 */
 #define SDL_HINT_THREAD_STACK_SIZE              "SDL_THREAD_STACK_SIZE"
 
@@ -822,19 +867,7 @@ extern "C" {
  */
 #define SDL_HINT_IME_INTERNAL_EDITING "SDL_IME_INTERNAL_EDITING"
 
- /**
- * \brief A variable to control whether mouse and touch events are to be treated together or separately
- *
- * The variable can be set to the following values:
- *   "0"       - Mouse events will be handled as touch events, and touch will raise fake mouse
- *               events. This is the behaviour of SDL <= 2.0.3. (default)
- *   "1"       - Mouse events will be handled separately from pure touch events.
- *
- * The value of this hint is used at runtime, so it can be changed at any time.
- */
-#define SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH "SDL_ANDROID_SEPARATE_MOUSE_AND_TOUCH"
-
- /**
+/**
  * \brief A variable to control whether we trap the Android back button to handle it manually.
  *        This is necessary for the right mouse button to work on some Android devices, or
  *        to be able to trap the back button for use in your code reliably.  If set to true,
@@ -850,6 +883,17 @@ extern "C" {
  * The value of this hint is used at runtime, so it can be changed at any time.
  */
 #define SDL_HINT_ANDROID_TRAP_BACK_BUTTON "SDL_ANDROID_TRAP_BACK_BUTTON"
+
+/**
+ * \brief A variable to control whether the event loop will block itself when the app is paused.
+ *
+ * The variable can be set to the following values:
+ *   "0"       - Non blocking.
+ *   "1"       - Blocking. (default)
+ *
+ * The value should be set before SDL is initialized.
+ */
+#define SDL_HINT_ANDROID_BLOCK_ON_PAUSE "SDL_ANDROID_BLOCK_ON_PAUSE"
 
  /**
  * \brief A variable to control whether the return key on the soft keyboard
@@ -1028,6 +1072,54 @@ extern "C" {
  *  https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionCategoriesandModes/AudioSessionCategoriesandModes.html
  */
 #define SDL_HINT_AUDIO_CATEGORY   "SDL_AUDIO_CATEGORY"
+
+/**
+ *  \brief  A variable controlling whether the 2D render API is compatible or efficient.
+ *
+ *  This variable can be set to the following values:
+ *
+ *    "0"     - Don't use batching to make rendering more efficient.
+ *    "1"     - Use batching, but might cause problems if app makes its own direct OpenGL calls.
+ *
+ *  Up to SDL 2.0.9, the render API would draw immediately when requested. Now
+ *  it batches up draw requests and sends them all to the GPU only when forced
+ *  to (during SDL_RenderPresent, when changing render targets, by updating a
+ *  texture that the batch needs, etc). This is significantly more efficient,
+ *  but it can cause problems for apps that expect to render on top of the
+ *  render API's output. As such, SDL will disable batching if a specific
+ *  render backend is requested (since this might indicate that the app is
+ *  planning to use the underlying graphics API directly). This hint can
+ *  be used to explicitly request batching in this instance. It is a contract
+ *  that you will either never use the underlying graphics API directly, or
+ *  if you do, you will call SDL_RenderFlush() before you do so any current
+ *  batch goes to the GPU before your work begins. Not following this contract
+ *  will result in undefined behavior.
+ */
+#define SDL_HINT_RENDER_BATCHING  "SDL_RENDER_BATCHING"
+
+
+/**
+ *  \brief  A variable controlling whether SDL logs all events pushed onto its internal queue.
+ *
+ *  This variable can be set to the following values:
+ *
+ *    "0"     - Don't log any events (default)
+ *    "1"     - Log all events except mouse and finger motion, which are pretty spammy.
+ *    "2"     - Log all events.
+ *
+ *  This is generally meant to be used to debug SDL itself, but can be useful
+ *  for application developers that need better visibility into what is going
+ *  on in the event queue. Logged events are sent through SDL_Log(), which
+ *  means by default they appear on stdout on most platforms or maybe
+ *  OutputDebugString() on Windows, and can be funneled by the app with
+ *  SDL_LogSetOutputFunction(), etc.
+ *
+ *  This hint can be toggled on and off at runtime, if you only need to log
+ *  events for a small subset of program execution.
+ */
+#define SDL_HINT_EVENT_LOGGING   "SDL_EVENT_LOGGING"
+
+
 
 /**
  *  \brief  An enumeration of hint priorities

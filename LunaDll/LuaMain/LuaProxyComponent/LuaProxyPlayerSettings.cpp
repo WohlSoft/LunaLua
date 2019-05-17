@@ -167,6 +167,10 @@ void LuaProxy::PlayerSettings::setCharacter(Characters val, lua_State* L)
 
 bool LuaProxy::PlayerSettings::isValid_throw(lua_State* L) const
 {
+    if (runtimeHookGetExtCharacterHitBoxData(m_character, m_powerupID) != nullptr)
+    {
+        return true;
+    }
     if ((int)m_character < CHARACTER_MARIO || (int)m_character > CHARACTER_LINK){
         luaL_error(L, "Invalid character id %d!", m_character);
         return false;

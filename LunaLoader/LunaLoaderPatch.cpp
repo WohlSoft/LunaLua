@@ -25,6 +25,7 @@ std::wstring GetLastErrorAsString()
     return message;
 }
 
+#if 0 // unused
 static void setJmpAddr(uint8_t* patch, DWORD patchAddr, DWORD patchOffset, DWORD target)
 {
     DWORD* dwordAddr = (DWORD*)&patch[patchOffset+1];
@@ -75,14 +76,30 @@ static int patchUStr(HANDLE f, unsigned int at, char* str, unsigned int maxlen)
     }
     return bytes;
 }
+#endif
 
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir)
 {
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
+#ifdef LUNALOADER_EXEC
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE),
+           hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    if((hStdout == INVALID_HANDLE_VALUE) ||(hStdin == INVALID_HANDLE_VALUE))
+        return LUNALOADER_CREATEPROCESS_FAIL;
+#endif
+
     memset(&si, 0, sizeof(si));
     memset(&pi, 0, sizeof(pi));
-    
+
+#ifdef LUNALOADER_EXEC
+    si.cb = sizeof(STARTUPINFO);
+    si.hStdError = hStdout;
+    si.hStdOutput = hStdout;
+    si.hStdInput = hStdin;
+    si.dwFlags |= STARTF_USESTDHANDLES;
+#endif
+
     // Prepare command line
     size_t pos = 0;
     std::wstring quotedPathToSMBX(pathToSMBX);
@@ -95,7 +112,7 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
     std::wstring strCmdLine = (
         std::wstring(L"\"") + quotedPathToSMBX + std::wstring(L"\" ") +
         std::wstring(cmdLineArgs)
-        );
+    );
 
     uint32_t cmdLineMemoryLen = sizeof(wchar_t) * (strCmdLine.length() + 1); // Include null terminator
     wchar_t* cmdLine = (wchar_t*)malloc(cmdLineMemoryLen);
@@ -106,10 +123,14 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         cmdLine,          // Command line
         NULL,             // Process handle not inheritable
         NULL,             // Thread handle not inheritable
+#ifdef LUNALOADER_EXEC
+        TRUE,             // Set handle inheritance to TRUE
+#else
         FALSE,            // Set handle inheritance to FALSE
+#endif
         CREATE_SUSPENDED, // Create in suspended state
         NULL,             // Use parent's environment block
-        workingDir,       // Use parent's starting directory 
+        workingDir,       // Use parent's starting directory
         &si,              // Pointer to STARTUPINFO structure
         &pi)              // Pointer to PROCESS_INFORMATION structure
         )
@@ -274,6 +295,11 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
 
     // Resume the main program thread
     ResumeThread(pi.hThread);
+
+#ifdef LUNALOADER_EXEC
+    // Keep this running until LunaLua will finish it's work
+    WaitForSingleObject(pi.hThread, INFINITE);
+#endif
 
     // Close handles
     CloseHandle(pi.hThread);

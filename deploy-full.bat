@@ -22,6 +22,7 @@ echo Copying LunaLUA binaries...
 copy "%CurDir%\Release\LunaDll.dll" "%DeployDir%" > NUL
 copy "%CurDir%\Release\LunaDll.pdb" "%DeployDir%" > NUL
 copy "%CurDir%\Release\LunaLoader.exe" "%DeployDirL%"  > NUL
+if exist "%CurDir%\build-LunaExec\bin\LunaLoader-exec.exe" copy "%CurDir%\build-LunaExec\bin\LunaLoader-exec.exe" "%DeployDirL%"  > NUL
 
 echo Installing SDL2 and SDL2_mixer_ext...
 copy "%CurDir%\LunaDll\libs\sdl\bin\*.dll" "%DeployDir%"  > NUL
@@ -39,6 +40,10 @@ echo Packing LunaLUA...
 "%SEVENZIP%\7z" a -tzip "LunaLUA-bin.zip" %DeployDir%\*.* "%DeployDir%\LuaScriptsLib"  > NUL
 echo Packing LunaLoader...
 "%SEVENZIP%\7z" a -tzip "LunaLoader-bin.zip" %DeployDirL%\*.* > NUL
+if exist "%CurDir%\build-LunaExec\bin\LunaLoader-exec.exe" (
+    echo Packing LunaLoader-exec...
+    "%SEVENZIP%\7z" a -t7z "LunaLoader-exec.7z" "%CurDir%\build-LunaExec\bin\LunaLoader-exec.exe" > NUL
+)
 
 echo.
 echo "Everything is completed!"

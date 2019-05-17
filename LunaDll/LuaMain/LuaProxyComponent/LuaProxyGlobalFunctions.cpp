@@ -25,17 +25,17 @@
 //ini_file - path to INI-file which contains the hitbox redefinations
 void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
 {
-    if ((_powerup < 1) || (_powerup>7)) {
-        luaL_error(L, "Powerup ID must be from 1 to 7.");
+    if ((_powerup < 1) || (_powerup>10)) {
+        luaL_error(L, "Powerup ID must be from 1 to 10.");
         return;
     }
     if ((_character < 1) || (_character > 5)) {
-        luaL_error(L, "Character ID must be from 1 to 5.");
-        return;
+        if (runtimeHookGetExtCharacterHitBoxData(_character, _powerup) == nullptr)
+        {
+            luaL_error(L, "Invalid character ID.");
+            return;
+        }
     }
-
-    int powerup = _powerup - 1;
-    int character = _character - 1;
 
     std::string full_path = resolveIfNotAbsolutePath(ini_file);
 
@@ -45,12 +45,6 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
         MessageBoxA(0, std::string(full_path+"\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
-
-    short* hitbox_width = &GM_HITBOX_W_PTR;
-    short* hitbox_height = &GM_HITBOX_H_PTR;
-    short* hitbox_height_duck = &GM_HITBOX_H_D_PTR;
-    short* hitbox_grab_offset_X = &GM_HITBOX_GRABOFF_X;
-    short* hitbox_grab_offset_Y = &GM_HITBOX_GRABOFF_Y;
 
     //Parser of hitbox properties from PGE Calibrator INI File
 
@@ -72,67 +66,55 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     std::string offsetX;
     std::string offsetY;
 
-    switch(character)
+    //normal
+    width =  hitBoxFile.Get("common", "width", "");
+    height = hitBoxFile.Get("common", "height", "");
+    //duck
+    height_duck = hitBoxFile.Get("common", "height-duck", "");
+
+    //grab offsets
+    grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
+    grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
+
+    for (int x = 0; x<10; x++)
     {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-        //normal
-        width =  hitBoxFile.Get("common", "width", "");
-        height = hitBoxFile.Get("common", "height", "");
-        //duck
-        height_duck = hitBoxFile.Get("common", "height-duck", "");
-
-        //grab offsets
-        grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
-        grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
-
-        for (int x = 0; x<10; x++)
+        for (int y = 0; y<10; y++)
         {
-            for (int y = 0; y<10; y++)
+            isUsed.clear();
+            offsetX.clear();
+            offsetY.clear();
+            std::stringstream xx;
+            xx << "frame-" << x << "-" << y;
+            std::string tFrame = xx.str();
+            isUsed = hitBoxFile.Get(tFrame, "used", "false");
+            if (isUsed == "true") //--> skip this frame
             {
-                isUsed.clear();
-                offsetX.clear();
-                offsetY.clear();
-                std::stringstream xx;
-                xx << "frame-" << x << "-" << y;
-                std::string tFrame = xx.str();
-                isUsed = hitBoxFile.Get(tFrame, "used", "false");
-                if (isUsed == "true") //--> skip this frame
+                //Offset relative to
+                offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
+                offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
+                if (!offsetX.empty() && !offsetY.empty())
                 {
-                    //Offset relative to
-                    offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
-                    offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
-                    if (!offsetX.empty() && !offsetY.empty())
-                    {
-                        SMBX_CustomGraphics::setOffsetX((Characters)_character,
-                            SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-                            (PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
-                        SMBX_CustomGraphics::setOffsetY((Characters)_character,
-                            SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-                            (PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
-                    }
+                    SMBX_CustomGraphics::setOffsetX((Characters)_character,
+                        SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+                        (PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
+                    SMBX_CustomGraphics::setOffsetY((Characters)_character,
+                        SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
+                        (PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
                 }
             }
         }
-        break;
-    default:
-        MessageBoxA(0, "Wrong character ID", "Error", 0);
-        return;
     }
 
     if( !width.empty() )
-        hitbox_width[powerup*5+character] = (short)atoi(width.c_str());
+        SMBX_CustomGraphics::setPlayerHitboxWidth((PowerupID)_powerup, (Characters)_character, (short)atoi(width.c_str()));
     if( !height.empty() )
-        hitbox_height[powerup*5+character] = (short)atoi(height.c_str());
-    if( !height_duck.empty() )
-        hitbox_height_duck[powerup*5+character] = (short)atoi(height_duck.c_str());
-    if( !grab_offset_x.empty() )
-        hitbox_grab_offset_X[powerup*5+character] = (short)atoi(grab_offset_x.c_str());
-    if( !grab_offset_y.empty() )
-        hitbox_grab_offset_Y[powerup*5+character] = (short)atoi(grab_offset_y.c_str());
+        SMBX_CustomGraphics::setPlayerHitboxHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height.c_str()));
+    if (!height_duck.empty())
+        SMBX_CustomGraphics::setPlayerHitboxDuckHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height_duck.c_str()));
+    if (!grab_offset_x.empty())
+        SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_x.c_str()));
+    if (!grab_offset_y.empty())
+        SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_y.c_str()));
 }
 
 

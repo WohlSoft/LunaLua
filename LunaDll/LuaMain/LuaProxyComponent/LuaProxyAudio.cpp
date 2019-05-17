@@ -53,6 +53,14 @@ void LuaProxy::Audio::MusicStopFadeOut(int ms)
 #endif
 }
 
+int LuaProxy::Audio::GetMusicVolume(void)
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_currentVolume();
+#else
+    return 0;
+#endif
+}
 
 void LuaProxy::Audio::MusicVolume(int vlm)
 {

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -184,6 +184,7 @@
 /* #undef HAVE_SEM_TIMEDWAIT */
 /* #undef HAVE_GETAUXVAL */
 /* #undef HAVE_POLL */
+/* #undef HAVE__EXIT */
 
 #elif __WIN32__
 #define HAVE_STDARG_H 1
@@ -209,6 +210,11 @@
 #define HAVE_DINPUT_H 1
 #define HAVE_XINPUT_H 1
 #define HAVE_DXGI_H 1
+
+#define HAVE_ENDPOINTVOLUME_H 1
+#define HAVE_MMDEVICEAPI_H 1
+#define HAVE_AUDIOCLIENT_H 1
+
 /* #undef HAVE_XINPUT_GAMEPAD_EX */
 /* #undef HAVE_XINPUT_STATE_EX */
 
@@ -223,7 +229,7 @@
 /* #undef SDL_FILE_DISABLED */
 /* #undef SDL_JOYSTICK_DISABLED */
 /* #undef SDL_HAPTIC_DISABLED */
-#define SDL_SENSOR_DISABLED 1
+/* #undef SDL_SENSOR_DISABLED */
 /* #undef SDL_LOADSO_DISABLED */
 /* #undef SDL_RENDER_DISABLED */
 /* #undef SDL_THREADS_DISABLED */
@@ -262,7 +268,7 @@
 /* #undef SDL_AUDIO_DRIVER_SNDIO */
 /* #undef SDL_AUDIO_DRIVER_SNDIO_DYNAMIC */
 /* #undef SDL_AUDIO_DRIVER_SUNAUDIO */
-/* #undef SDL_AUDIO_DRIVER_WASAPI */
+#define SDL_AUDIO_DRIVER_WASAPI 1
 #define SDL_AUDIO_DRIVER_WINMM 1
 
 /* Enable various input drivers */
@@ -290,7 +296,7 @@
 
 /* Enable various sensor drivers */
 /* #undef SDL_SENSOR_ANDROID */
-/* #undef SDL_SENSOR_DUMMY */
+#define SDL_SENSOR_DUMMY 1
 
 /* Enable various shared object loading systems */
 /* #undef SDL_LOADSO_DLOPEN */
@@ -334,9 +340,6 @@
 /* #undef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR */
 /* #undef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON */
 
-/* #undef SDL_VIDEO_DRIVER_MIR */
-/* #undef SDL_VIDEO_DRIVER_MIR_DYNAMIC */
-/* #undef SDL_VIDEO_DRIVER_MIR_DYNAMIC_XKBCOMMON */
 /* #undef SDL_VIDEO_DRIVER_EMSCRIPTEN */
 /* #undef SDL_VIDEO_DRIVER_X11 */
 /* #undef SDL_VIDEO_DRIVER_X11_DYNAMIC */

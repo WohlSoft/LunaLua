@@ -82,7 +82,8 @@ extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
-extern short __stdcall MessageBoxOpenHook();
+extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 
@@ -213,6 +214,7 @@ static inline constexpr void* GetRenderBelowPriorityHookWithSkip(void) {
 void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect);
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
+CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId);
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
@@ -249,7 +251,7 @@ void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
 
-void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx);
+void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
@@ -397,6 +399,8 @@ void __stdcall runtimeHookColorSwitchRedBlock(void);
 void __stdcall runtimeHookColorSwitchGreenBlock(void);
 void __stdcall runtimeHookColorSwitchBlueBlock(void);
 void __stdcall runtimeHookColorSwitchYellowBlock(void);
+
+void __stdcall runtimeHookLoadDefaultControls(void);
 
 #endif
 

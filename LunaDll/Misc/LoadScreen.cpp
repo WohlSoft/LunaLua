@@ -90,6 +90,8 @@ static void LoadThread(void)
 
         lua_pushstring(L, WStr2Str(gAppPathWCHAR).c_str());
         lua_setglobal(L, "_smbxPath");
+        lua_pushstring(L, ((std::string)GM_FULLDIR).c_str());
+        lua_setglobal(L, "_episodePath");
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");
@@ -208,6 +210,7 @@ static void __stdcall CustomLoadScreenHook(void)
     LunaLoadScreenStart();
 }
 
+extern bool g_ResetFrameTiming;
 void LunaLoadScreenKill()
 {
     if (loadThread == nullptr) return;
@@ -220,6 +223,7 @@ void LunaLoadScreenKill()
     loadThread->join();
     delete loadThread;
     loadThread = nullptr;
+    g_ResetFrameTiming = true;
 }
 
 void LunaLoadScreenSetEnable(bool skip)

@@ -106,6 +106,16 @@ struct KeyMap{
     short    pauseKeyState; //Pause
 };
 
+struct CharacterHitBoxData {
+    short hitbox_h;
+    short hitbox_h_d;
+    short hitbox_w;
+    short hitbox_graboff_x;
+    short hitbox_graboff_y;
+    short gfxoffset_x[100];
+    short gfxoffset_y[100];
+};
+
 enum Characters : short {
     CHARACTER_UNKNOWN = 0,
     CHARACTER_MARIO = 1,    //DEMO
@@ -802,6 +812,8 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 
 #define GF_UNK_DOORS_COUNT  0x008F7D70
 
+#define GF_LOAD_DEFAULT_CONTROLS 0x008E6700
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -889,6 +901,8 @@ static const auto native_loadGraphicsFromFolder = (void(__stdcall *)(VB6StrPtr* 
 static const auto native_exitMainGame = (void(__stdcall *)(void))GF_EXIT_MAIN_GAME;
 
 static const auto native_applyFullscreen = (void(__stdcall *)(void* arg1, void* arg2, void* arg3, void* arg4))GF_APPLY_FULLSCREEN;
+
+static const auto native_loadDefaultControls = (void(__stdcall *)(void))GF_LOAD_DEFAULT_CONTROLS;
 
 /*
 Function name

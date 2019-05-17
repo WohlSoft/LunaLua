@@ -33,6 +33,8 @@
 #include "../../Rendering/ImageLoader.h"
 #include "../../Misc/LoadScreen.h"
 
+#include "../../SMBXInternal/HardcodedGraphicsAccess.h"
+#include "../../Rendering/LunaImage.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
@@ -151,6 +153,9 @@ extern int __stdcall LoadWorld()
 
     gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
     gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
+
+    // Overworld is guaranteed to be loaded by this point, so trigger onStart
+    gLunaLua.triggerOnStart();
 
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
@@ -518,6 +523,10 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
+
+    // Trigger onStart here to ensure it happens just before the "Level - Start" event
+    gLunaLua.triggerOnStart();
+
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");
     gLunaLua.callEvent(triggerEventData, WStr2Str(eventName));
@@ -666,17 +675,6 @@ extern BOOL __stdcall StretchBltHook(
     {
         g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 
-        // Heuristic for the last StretchBlt of the frame
-        if ((nWidthSrc == 800 && nHeightSrc == 600) || (callCount == 1))
-        {
-            g_GLEngine.EndFrame(hdcDest);
-            callCount = 0;
-        }
-        else
-        {
-            callCount++;
-        }
-
         return TRUE;
     }
 
@@ -730,6 +728,8 @@ extern void SetSMBXFrameTiming(double ms)
     FRAME_TIMING_MS = ms;
 }
 
+bool g_ResetFrameTiming = false;
+
 extern void __stdcall FrameTimingHookQPC()
 {
     WaitForTickEnd::RunQueued();
@@ -750,8 +750,15 @@ extern void __stdcall FrameTimingHookQPC()
         }
     }
 
+    if (g_ResetFrameTiming)
+    {
+        g_ResetFrameTiming = false;
+        lastFrameTime = 0;
+        frameError = 0;
+    }
+
     // Get the desired duration for this frame
-    frameDuration = FRAME_TIMING_MS - frameError * 0.5;
+    frameDuration = FRAME_TIMING_MS - frameError * 0.90;
 
     QueryPerformanceCounter(&currentTime);
     frameTime = (currentTime.QuadPart - lastFrameTime) * qpcFactor;
@@ -768,6 +775,7 @@ extern void __stdcall FrameTimingHookQPC()
         lastFrameTime = currentTime.QuadPart;
         frameError = -2.0;
 
+        g_PerfTracker.startFrame();
         return;
     }
 
@@ -787,7 +795,7 @@ extern void __stdcall FrameTimingHookQPC()
     GM_CURRENT_TIME = GetTickCount();
 
     // Compensate for errors in frame timing
-    frameError = frameError * 0.5 + frameTime - frameDuration;
+    frameError = frameError * 0.1 + frameTime - frameDuration;
 
 #if defined(ENABLE_FRAME_TIMING_BENCHMARK)
     static RunningStat sFrameTime;
@@ -799,8 +807,8 @@ extern void __stdcall FrameTimingHookQPC()
     Renderer::Get().SafePrint(utf8_decode(sFrameTime.Str()), 3, 5, 5);
 #endif
 
-    if (frameError > 5.0) frameError = 5.0;
-    if (frameError < -5.0) frameError = -5.0;
+    if (frameError > 10.0) frameError = 10.0;
+    if (frameError < -10.0) frameError = -10.0;
     lastFrameTime = currentTime.QuadPart;
 
     g_PerfTracker.startFrame();
@@ -827,6 +835,15 @@ extern void __stdcall FrameTimingHook()
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
     static double frameError = 0.0;
+
+    if (g_ResetFrameTiming)
+    {
+        g_ResetFrameTiming = false;
+        GM_CURRENT_TIME = GetTickCount();
+        lastFrameTime = GM_CURRENT_TIME;
+        nextFrameTime = lastFrameTime;
+        frameError = 0;
+    }
 
     // Compensate for error in the last frame's timing
     nextFrameTime += FRAME_TIMING_MS - frameError;
@@ -895,19 +912,29 @@ extern void __stdcall InitLevelEnvironmentHook()
     native_initLevelEnv();
 }
 
-static auto MessageBoxContinueCode = PATCH(0x8E54F2).RET_STDCALL_FULL();
-extern short __stdcall MessageBoxOpenHook()
+static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E54C6
+        RET
+    }
+}
+
+void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
 {
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
-    // A note here: If the message is set, then the message box will called
-    // However, if a message is not set, then this function is called when the menu opens.
+                              // A note here: If the message is set, then the message box will called
+                              // However, if a message is not set, then this function is called when the menu opens.
 
     if ((GM_STR_MSGBOX) && (GM_STR_MSGBOX.length() > 0)) {
         if (gLunaLua.isValid()) {
             std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
             messageBoxEvent->setDirectEventName("onMessageBox");
             messageBoxEvent->setLoopable(false);
-            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX);
+            gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX, *pPlayerIdx);
             isCancelled = messageBoxEvent->native_cancelled();
         }
     }
@@ -917,22 +944,53 @@ extern short __stdcall MessageBoxOpenHook()
             std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onPause", true);
             messageBoxEvent->setDirectEventName("onPause");
             messageBoxEvent->setLoopable(false);
-            gLunaLua.callEvent(messageBoxEvent);
+            gLunaLua.callEvent(messageBoxEvent, *pPlayerIdx);
             isCancelled = messageBoxEvent->native_cancelled();
         }
     }
 
+    if (!isCancelled)
+    {
+        msgbox_OrigFunc(pPlayerIdx);
+    }
+}
 
-    if (isCancelled)
-        MessageBoxContinueCode.Apply();
-    else
-        MessageBoxContinueCode.Unapply();
+static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsigned int* pPlayerIdx)
+{
+    unsigned int npcIdx = npcIdxWithOffset - 128;
 
-    return (short)GM_PLAYERS_COUNT;
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> messageBoxEvent = std::make_shared<Event>("onMessageBox", true);
+        messageBoxEvent->setDirectEventName("onMessageBox");
+        messageBoxEvent->setLoopable(false);
+        gLunaLua.callEvent(messageBoxEvent, (std::string)GM_STR_MSGBOX, *pPlayerIdx, npcIdx);
+        isCancelled = messageBoxEvent->native_cancelled();
+    }
+
+    if (!isCancelled)
+    {
+        msgbox_OrigFunc(pPlayerIdx);
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx)
+{
+    __asm {
+        POP ECX
+        PUSH EDI
+        PUSH ECX
+        JMP runtimeHookNpcMsgbox
+    }
 }
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
+    // Enforce rounded camera position
+    SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
+    SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
+
     Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
@@ -955,6 +1013,10 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 
 static void __stdcall PostCameraUpdateHook(int cameraIdx)
 {
+    // Enforce rounded camera position
+    SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
+    SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
+
     // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
     Renderer::Get().StoreCameraPosition(cameraIdx);
 
@@ -1062,7 +1124,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
     if (keyDown) {
-        if (gLunaLua.isValid() && !altPressed && !ctrlPressed) {
+        if (gLunaLua.isValid() && !ctrlPressed) {
             std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
             int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
@@ -1194,6 +1256,10 @@ extern void __stdcall RenderLevelHook()
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
     RenderLevelReal();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        g_GLEngine.EndFrame(g_GLEngine.GetHDC());
+    }
     g_EventHandler.hookLevelRenderEnd();
     Renderer::Get().EndFrameRender();
 }
@@ -1217,6 +1283,10 @@ extern void __stdcall RenderWorldHook()
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        g_GLEngine.EndFrame(g_GLEngine.GetHDC());
+    }
     g_EventHandler.hookWorldRenderEnd();
     Renderer::Get().EndFrameRender();
 }
@@ -1580,7 +1650,8 @@ static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 {
     if (playerIdx >= 0 && playerIdx <= 1)
     {
-        gRawKeymap[playerIdx] = *keymap;
+        gRawKeymap[playerIdx+2] = gRawKeymap[playerIdx]; // Update prev values
+        gRawKeymap[playerIdx] = *keymap; // Set new values
     }
 }
 
@@ -1771,7 +1842,7 @@ _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
     }
 }
 
-static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
     __asm {
         PUSH EBP
@@ -1782,7 +1853,7 @@ static _declspec(naked) void __stdcall hitBlock_OrigFunc(unsigned int* blockInde
     }
 }
 
-void __stdcall runtimeHookHitBlock(unsigned int* blockIndex, short* fromUpSide, unsigned short* playerIdx)
+void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx)
 {
     bool isCancelled = false;
 
@@ -1968,4 +2039,51 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
         push 0x9DB8FA
         ret
     }
+}
+
+static void drawReplacementSplashScreen(void)
+{
+    // Get form to draw on
+    HDC frmHDC = nullptr;
+    uintptr_t mainFrm = *reinterpret_cast<uintptr_t*>(0xB25010);
+    uintptr_t mainFrmClass = *reinterpret_cast<uintptr_t*>(mainFrm);
+    auto frmGetHDC = (HRESULT(__stdcall *)(uintptr_t, HDC*)) *(void**)(mainFrmClass + 0xD8);
+    frmGetHDC(mainFrm, &frmHDC);
+    if (!frmHDC) return;
+
+    // Load splash image
+    std::shared_ptr<LunaImage> splashReplacement = LunaImage::fromFile(L"graphics/hardcoded/hardcoded-30-4.png");
+    if (!splashReplacement) return;
+
+    // Get image as HBITMAP
+    HBITMAP splashBMP = splashReplacement->asHBITMAP();
+    if (!splashBMP) return;
+
+    // Generate HDC for drawing...
+    HDC splashHDC = CreateCompatibleDC(frmHDC);
+    if (!splashHDC) return;
+    SelectObject(splashHDC, splashBMP);
+
+    // Clear HDC...
+    BitBlt(frmHDC, 0, 0, 800, 600, frmHDC, 0, 0, WHITENESS);
+
+    // Draw with respecting alpha channel
+    BLENDFUNCTION bf;
+    bf.BlendOp = AC_SRC_OVER;
+    bf.BlendFlags = 0;
+    bf.AlphaFormat = AC_SRC_ALPHA;
+    bf.SourceConstantAlpha = 0xff;
+    AlphaBlend(frmHDC, 0, 0, 800, 600, splashHDC, 0, 0, 800, 600, bf);
+
+    // Cleanup
+    DeleteDC(splashHDC);
+}
+
+void __stdcall runtimeHookLoadDefaultControls(void)
+{
+    // Draw replacement splash screen if we have one
+    drawReplacementSplashScreen();
+
+    // Run the regular load default controls...
+    native_loadDefaultControls();
 }

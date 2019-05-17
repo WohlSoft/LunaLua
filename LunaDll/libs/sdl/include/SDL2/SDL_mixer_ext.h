@@ -1,9 +1,9 @@
 /*
   SDL Mixer X:  An extended audio mixer library, forked from SDL_mixer
-  Copyright (C) 2014-2018 Vitaly Novichkov <admin@wohlnet.ru>
+  Copyright (C) 2014-2019 Vitaly Novichkov <admin@wohlnet.ru>
 
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -80,7 +80,7 @@ extern "C" {
 /* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
 */
 #define SDL_MIXER_MAJOR_VERSION 2
-#define SDL_MIXER_MINOR_VERSION 2
+#define SDL_MIXER_MINOR_VERSION 4
 #define SDL_MIXER_PATCHLEVEL    0
 
 /* This macro can be used to fill a version structure with the compile-time
@@ -210,14 +210,20 @@ typedef enum {
     ADLMIDI_OPL3_EMU_NUKED = 0,
     ADLMIDI_OPL3_EMU_NUKED_1_7_4,
     ADLMIDI_OPL3_EMU_DOSBOX,
+    ADLMIDI_OPL3_EMU_OPAL,
+    ADLMIDI_OPL3_EMU_JAVA
 } Mix_ADLMIDI_Emulator;
 
 /* OPN2 chip emulators for OPNMIDI */
 typedef enum {
     OPNMIDI_OPN2_EMU_DEFAULT = -1,
-    OPNMIDI_OPN2_EMU_MIME = 0,
+    OPNMIDI_OPN2_EMU_MIME = 0,/*!!!TYPO!!!*/
+    OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
     OPNMIDI_OPN2_EMU_NUKED,
     OPNMIDI_OPN2_EMU_GENS,
+    /* OPNMIDI_OPN2_EMU_GX, [THIS emulator is inavailable by default] */
+    OPNMIDI_OPN2_EMU_NP2 = 5,
+    OPNMIDI_OPN2_EMU_MAME_OPNA
 } Mix_OPNMIDI_Emulator;
 
 /* The internal format for a music chunk interpreted via mikmod */
@@ -358,7 +364,7 @@ extern DECLSPEC void SDLCALL Mix_ChannelFinished(void (SDLCALL *channel_finished
 
 /* Special Effects API by ryan c. gordon. (icculus@icculus.org) */
 
-#define MIX_CHANNEL_POST  -2
+#define MIX_CHANNEL_POST  (-2)
 
 /* This is the format of a special effect callback:
  *
@@ -692,6 +698,8 @@ extern DECLSPEC int SDLCALL Mix_VolumeChunk(Mix_Chunk *chunk, int volume);
 extern DECLSPEC int SDLCALL Mix_VolumeMusicStream(Mix_Music *music, int volume);
 /* MIXERX_DEPRECATED("Use Mix_VolumeMusicStream(Mix_Music*,int) instead") */
 extern DECLSPEC int SDLCALL Mix_VolumeMusic(int volume);
+/* Get the current volume value in the range of 0-128 of a music stream */
+extern DECLSPEC int SDLCALL Mix_GetVolumeMusicStream(Mix_Music *music);
 
 /* Halt playing of a particular channel */
 extern DECLSPEC int SDLCALL Mix_HaltChannel(int channel);
@@ -841,8 +849,10 @@ extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getScaleMod(void);
 /* Set scalable modulation mode (0 off, 1 on) (Applying on stop/play) */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setScaleMod(int sc);
 /* Get state of adlib drums mode */
+MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getAdLibMode(void);
 /* Set adlib drums mode mode (0 off, 1 on) (Applying on stop/play) */
+MIXERX_DEPRECATED("This function is no more useful, rhythm-mode is now fully automated")
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setAdLibMode(int tr);
 /* Get state of logarithmic mode */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getLogarithmicVolumes(void);
@@ -856,6 +866,10 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setVolumeModel(int vm);
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);
+/* Get full panning stereo mode */
+extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getFullPanStereo(void);
+/* Set full panning stereo mode */
+extern DECLSPEC void SDLCALL Mix_ADLMIDI_setFullPanStereo(int fp);
 /* Get the current OPL3 Emulator for ADLMIDI */
 extern DECLSPEC int  SDLCALL Mix_ADLMIDI_getEmulator(void);
 /* Select the OPL3 Emulator for ADLMIDI */
@@ -868,10 +882,18 @@ extern DECLSPEC void SDLCALL Mix_ADLMIDI_setCustomBankFile(const char *bank_wonl
 
 /* Reset all OPNMIDI properties to default state */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setSetDefaults(void);
+/* Get current volume model ID */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getVolumeModel(void);
+/* Change current volumes model (Applying on stop/play) */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setVolumeModel(int vm);
 /* Get full range mode for CC74-Brightness controller */
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullRangeBrightness(void);
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);
+/* Get full panning stereo mode */
+extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getFullPanStereo(void);
+/* Set full panning stereo mode */
+extern DECLSPEC void SDLCALL Mix_OPNMIDI_setFullPanStereo(int fp);
 /* Get the OPN2 Emulator for OPNMIDI */
 extern DECLSPEC int  SDLCALL Mix_OPNMIDI_getEmulator(void);
 /* Select the OPN2 Emulator for OPNMIDI */

@@ -21,12 +21,14 @@
     verbosity: minimal
 
   after_build:
+  - cmd: build-lunaexec.bat
   - cmd: deploy-full.bat nopause
 
   artifacts:
   - path: LunaLUA-bin.zip
   - path: LunaLoader-bin.zip
   - path: Release\LunaDLL.dll
+  - path: LunaLoader-exec.7z
 
   deploy:
   - provider: Environment

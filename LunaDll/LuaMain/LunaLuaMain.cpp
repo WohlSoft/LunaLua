@@ -44,7 +44,7 @@ CLunaLua::CLunaLua() :
         m_luaEventTableName(""),
         L(0),
         m_ready(false),
-        m_eventLoopOnceExecuted(false),
+        m_onStartRan(false),
         m_warningList()
 {}
 
@@ -112,7 +112,7 @@ bool CLunaLua::shutdown()
     checkWarnings();
 
     m_ready = false;
-    m_eventLoopOnceExecuted = false;
+    m_onStartRan = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -499,11 +499,6 @@ void CLunaLua::setupDefaults()
         _G["world"] = LuaProxy::World();
     }
 
-    _G["player"] = LuaProxy::Player();
-    LuaProxy::Player pl(2);
-    if(pl.isValid())
-        _G["player2"] = pl;
-
     _G["inputConfig1"] = LuaProxy::InputConfig(1);
     _G["inputConfig2"] = LuaProxy::InputConfig(2);
 
@@ -522,8 +517,6 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Shader, Shader);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Data, Data);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Player, Player);
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Camera, Camera);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::World, World);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
@@ -536,7 +529,6 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Layer, Layer);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Section, Section);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Block, Block);
-LUAHELPER_DEF_CLASS_HELPER(LuaProxy::BGO, BGO);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Audio::PlayingSfxInstance, PlayingSfxInstance);
 
 
@@ -553,6 +545,7 @@ void CLunaLua::bindAll()
 
             namespace_("Native")[
                 def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
+                def("getEpisodePath", &LuaProxy::Native::getEpisodePath),
                 def("simulateError", &LuaProxy::Native::simulateError)
             ],
 
@@ -692,6 +685,7 @@ void CLunaLua::bindAll()
                 def("MusicIsPlaying", (bool(*)())&LuaProxy::Audio::MusicIsPlaying),
                 def("MusicIsPaused", (bool(*)())&LuaProxy::Audio::MusicIsPaused),
                 def("MusicIsFading", (bool(*)())&LuaProxy::Audio::MusicIsFading),
+                def("_GetMusicVolume", (int(*)(void))&LuaProxy::Audio::GetMusicVolume),
                 def("MusicVolume", (void(*)(int))&LuaProxy::Audio::MusicVolume),
                 def("MusicTitle", (std::string(*)())&LuaProxy::Audio::MusicTitle),
                 def("MusicTitleTag", (std::string(*)())&LuaProxy::Audio::MusicTitleTag),
@@ -880,200 +874,6 @@ void CLunaLua::bindAll()
             .property("character", &LuaProxy::PlayerSettings::getCharacter, &LuaProxy::PlayerSettings::setCharacter)
             .property("powerup", &LuaProxy::PlayerSettings::getPowerupID, &LuaProxy::PlayerSettings::setPowerupID),
 
-
-            LUAHELPER_DEF_CLASS(Player)
-            .scope[ //static functions
-                def("count", &LuaProxy::Player::count),
-                    def("get", &LuaProxy::Player::get),
-                    def("getTemplates", &LuaProxy::Player::getTemplates),
-                    def("getIntersecting", &LuaProxy::Player::getIntersecting)
-            ]
-            .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Player, m_index))
-
-            .def(constructor<>())
-            .def(constructor<int>())
-            .def("mem", static_cast<void (LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Player::mem))
-            .def("mem", static_cast<luabind::object(LuaProxy::Player::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Player::mem))
-            .def("kill", &LuaProxy::Player::kill)
-            .def("harm", &LuaProxy::Player::harm)
-            .property("idx", &LuaProxy::Player::idx)
-            .property("screen", &LuaProxy::Player::screen)
-            .property("section", &LuaProxy::Player::section)
-            .property("sectionObj", &LuaProxy::Player::sectionObj)
-            .property("x", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, x))
-            .property("y", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, y))
-            .property("width", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, width))
-            .property("height", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, height))
-            .property("speedX", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, speedX))
-            .property("speedY", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, speedY))
-            .property("powerup", LUAPROXY_REG_RW(LuaProxy::Player, CurrentPowerup)) // TODO: Limit range?
-            .property("character", LUAPROXY_REG_RW(LuaProxy::Player, Identity))
-            .property("reservePowerup", LUAPROXY_REG_RW(LuaProxy::Player, PowerupBoxContents)) // TODO: >= 0 check?
-            .property("holdingNPC", &LuaProxy::Player::holdingNPC)
-            .property("upKeyPressing", &LuaProxy::Player::upKeyPressing, &LuaProxy::Player::setUpKeyPressing)
-            .property("downKeyPressing", &LuaProxy::Player::downKeyPressing, &LuaProxy::Player::setDownKeyPressing)
-            .property("leftKeyPressing", &LuaProxy::Player::leftKeyPressing, &LuaProxy::Player::setLeftKeyPressing)
-            .property("rightKeyPressing", &LuaProxy::Player::rightKeyPressing, &LuaProxy::Player::setRightKeyPressing)
-            .property("jumpKeyPressing", &LuaProxy::Player::jumpKeyPressing, &LuaProxy::Player::setJumpKeyPressing)
-            .property("altJumpKeyPressing", &LuaProxy::Player::altJumpKeyPressing, &LuaProxy::Player::setAltJumpKeyPressing)
-            .property("runKeyPressing", &LuaProxy::Player::runKeyPressing, &LuaProxy::Player::setRunKeyPressing)
-            .property("altRunKeyPressing", &LuaProxy::Player::altRunKeyPressing, &LuaProxy::Player::setAltRunKeyPressing)
-            .property("dropItemKeyPressing", &LuaProxy::Player::dropItemKeyPressing, &LuaProxy::Player::setDropItemKeyPressing)
-            .property("pauseKeyPressing", &LuaProxy::Player::pauseKeyPressing, &LuaProxy::Player::setPauseKeyPressing)
-            .def("getCurrentPlayerSetting", &LuaProxy::Player::getCurrentPlayerSetting)
-            .def("getCurrentSpriteIndex", &LuaProxy::Player::getCurrentSpriteIndex, pure_out_value(_2) + pure_out_value(_3))
-            .def("setCurrentSpriteIndex", &LuaProxy::Player::setCurrentSpriteIndex)
-            .property("isValid", &LuaProxy::Player::isValid)
-            /*Generated by code*/
-#ifdef _MSC_VER //Generated by code
-#pragma region
-#endif
-            .property("ToadDoubleJReady", &LuaProxy::Player::toadDoubleJReady, &LuaProxy::Player::setToadDoubleJReady)
-            .property("SparklingEffect", &LuaProxy::Player::sparklingEffect, &LuaProxy::Player::setSparklingEffect)
-            .property("UnknownCTRLLock1", &LuaProxy::Player::unknownCTRLLock1, &LuaProxy::Player::setUnknownCTRLLock1)
-            .property("UnknownCTRLLock2", &LuaProxy::Player::unknownCTRLLock2, &LuaProxy::Player::setUnknownCTRLLock2)
-            .property("QuicksandEffectTimer", &LuaProxy::Player::quicksandEffectTimer, &LuaProxy::Player::setQuicksandEffectTimer)
-            .property("OnSlipperyGround", &LuaProxy::Player::onSlipperyGround, &LuaProxy::Player::setOnSlipperyGround)
-            .property("IsAFairy", &LuaProxy::Player::isAFairy, &LuaProxy::Player::setIsAFairy)
-            .property("FairyAlreadyInvoked", &LuaProxy::Player::fairyAlreadyInvoked, &LuaProxy::Player::setFairyAlreadyInvoked)
-            .property("FairyFramesLeft", &LuaProxy::Player::fairyFramesLeft, &LuaProxy::Player::setFairyFramesLeft)
-            .property("SheathHasKey", &LuaProxy::Player::sheathHasKey, &LuaProxy::Player::setSheathHasKey)
-            .property("SheathAttackCooldown", &LuaProxy::Player::sheathAttackCooldown, &LuaProxy::Player::setSheathAttackCooldown)
-            .property("Hearts", &LuaProxy::Player::hearts, &LuaProxy::Player::setHearts)
-            .property("PeachHoverAvailable", &LuaProxy::Player::peachHoverAvailable, &LuaProxy::Player::setPeachHoverAvailable)
-            .property("PressingHoverButton", &LuaProxy::Player::pressingHoverButton, &LuaProxy::Player::setPressingHoverButton)
-            .property("PeachHoverTimer", &LuaProxy::Player::peachHoverTimer, &LuaProxy::Player::setPeachHoverTimer)
-            .property("Unused1", &LuaProxy::Player::unused1, &LuaProxy::Player::setUnused1)
-            .property("PeachHoverTrembleSpeed", &LuaProxy::Player::peachHoverTrembleSpeed, &LuaProxy::Player::setPeachHoverTrembleSpeed)
-            .property("PeachHoverTrembleDir", &LuaProxy::Player::peachHoverTrembleDir, &LuaProxy::Player::setPeachHoverTrembleDir)
-            .property("ItemPullupTimer", &LuaProxy::Player::itemPullupTimer, &LuaProxy::Player::setItemPullupTimer)
-            .property("ItemPullupMomentumSave", &LuaProxy::Player::itemPullupMomentumSave, &LuaProxy::Player::setItemPullupMomentumSave)
-            .property("Unused2", &LuaProxy::Player::unused2, &LuaProxy::Player::setUnused2)
-            .property("UnkClimbing1", &LuaProxy::Player::unkClimbing1, &LuaProxy::Player::setUnkClimbing1)
-            .property("UnkClimbing2", &LuaProxy::Player::unkClimbing2, &LuaProxy::Player::setUnkClimbing2)
-            .property("UnkClimbing3", &LuaProxy::Player::unkClimbing3, &LuaProxy::Player::setUnkClimbing3)
-            .property("WaterState", &LuaProxy::Player::waterOrQuicksandState, &LuaProxy::Player::setWaterOrQuicksandState) // Compat (this was undocumented auto-generated anyway)
-            .property("WaterOrQuicksandState", &LuaProxy::Player::waterOrQuicksandState, &LuaProxy::Player::setWaterOrQuicksandState)
-            .property("IsInWater", &LuaProxy::Player::isInWater, &LuaProxy::Player::setIsInWater)
-            .property("WaterStrokeTimer", &LuaProxy::Player::waterStrokeTimer, &LuaProxy::Player::setWaterStrokeTimer)
-            .property("UnknownHoverTimer", &LuaProxy::Player::unknownHoverTimer, &LuaProxy::Player::setUnknownHoverTimer)
-            .property("SlidingState", &LuaProxy::Player::slidingState, &LuaProxy::Player::setSlidingState)
-            .property("SlidingGroundPuffs", &LuaProxy::Player::slidingGroundPuffs, &LuaProxy::Player::setSlidingGroundPuffs)
-            .property("ClimbingState", &LuaProxy::Player::climbingState, &LuaProxy::Player::setClimbingState)
-            .property("UnknownTimer", &LuaProxy::Player::unknownTimer, &LuaProxy::Player::setUnknownTimer)
-            .property("UnknownFlag", &LuaProxy::Player::unknownFlag, &LuaProxy::Player::setUnknownFlag)
-            .property("UnknownPowerupState", &LuaProxy::Player::unknownPowerupState, &LuaProxy::Player::setUnknownPowerupState)
-            .property("SlopeRelated", &LuaProxy::Player::slopeRelated, &LuaProxy::Player::setSlopeRelated)
-            .property("TanookiStatueActive", &LuaProxy::Player::tanookiStatueActive, &LuaProxy::Player::setTanookiStatueActive)
-            .property("TanookiMorphCooldown", &LuaProxy::Player::tanookiMorphCooldown, &LuaProxy::Player::setTanookiMorphCooldown)
-            .property("TanookiActiveFrameCount", &LuaProxy::Player::tanookiActiveFrameCount, &LuaProxy::Player::setTanookiActiveFrameCount)
-            .property("IsSpinjumping", &LuaProxy::Player::isSpinjumping, &LuaProxy::Player::setIsSpinjumping)
-            .property("SpinjumpStateCounter", &LuaProxy::Player::spinjumpStateCounter, &LuaProxy::Player::setSpinjumpStateCounter)
-            .property("SpinjumpLandDirection", &LuaProxy::Player::spinjumpLandDirection, &LuaProxy::Player::setSpinjumpLandDirection)
-            .property("CurrentKillCombo", &LuaProxy::Player::currentKillCombo, &LuaProxy::Player::setCurrentKillCombo)
-            .property("GroundSlidingPuffsState", &LuaProxy::Player::groundSlidingPuffsState, &LuaProxy::Player::setGroundSlidingPuffsState)
-            .property("WarpNearby", &LuaProxy::Player::nearbyWarpIndex, &LuaProxy::Player::setNearbyWarpIndex) // Compat (this was undocumented auto-generated anyway)
-            .property("NearbyWarpIndex", &LuaProxy::Player::nearbyWarpIndex, &LuaProxy::Player::setNearbyWarpIndex)
-            .property("Unknown5C", &LuaProxy::Player::unknown5C, &LuaProxy::Player::setUnknown5C)
-            .property("Unknown5E", &LuaProxy::Player::unknown5E, &LuaProxy::Player::setUnknown5E)
-            .property("HasJumped", &LuaProxy::Player::hasJumped, &LuaProxy::Player::setHasJumped)
-            .property("CurXPos", &LuaProxy::Player::curXPos, &LuaProxy::Player::setCurXPos)
-            .property("CurYPos", &LuaProxy::Player::curYPos, &LuaProxy::Player::setCurYPos)
-            .property("Height", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, height))
-            .property("Width", LUAPROXY_REG_RW_MOMENTUM(LuaProxy::Player, momentum, width))
-            .property("CurXSpeed", &LuaProxy::Player::curXSpeed, &LuaProxy::Player::setCurXSpeed)
-            .property("CurYSpeed", &LuaProxy::Player::curYSpeed, &LuaProxy::Player::setCurYSpeed)
-            .property("Identity", &LuaProxy::Player::identity, &LuaProxy::Player::setIdentity)
-            .property("UKeyState", &LuaProxy::Player::uKeyState, &LuaProxy::Player::setUKeyState)
-            .property("DKeyState", &LuaProxy::Player::dKeyState, &LuaProxy::Player::setDKeyState)
-            .property("LKeyState", &LuaProxy::Player::lKeyState, &LuaProxy::Player::setLKeyState)
-            .property("RKeyState", &LuaProxy::Player::rKeyState, &LuaProxy::Player::setRKeyState)
-            .property("JKeyState", &LuaProxy::Player::jKeyState, &LuaProxy::Player::setJKeyState)
-            .property("SJKeyState", &LuaProxy::Player::sJKeyState, &LuaProxy::Player::setSJKeyState)
-            .property("XKeyState", &LuaProxy::Player::xKeyState, &LuaProxy::Player::setXKeyState)
-            .property("RNKeyState", &LuaProxy::Player::rNKeyState, &LuaProxy::Player::setRNKeyState)
-            .property("SELKeyState", &LuaProxy::Player::sELKeyState, &LuaProxy::Player::setSELKeyState)
-            .property("STRKeyState", &LuaProxy::Player::sTRKeyState, &LuaProxy::Player::setSTRKeyState)
-            .property("FacingDirection", &LuaProxy::Player::facingDirection, &LuaProxy::Player::setFacingDirection)
-            .property("MountType", &LuaProxy::Player::mountType, &LuaProxy::Player::setMountType)
-            .property("MountColor", &LuaProxy::Player::mountColor, &LuaProxy::Player::setMountColor)
-            .property("MountState", &LuaProxy::Player::mountState, &LuaProxy::Player::setMountState)
-            .property("MountHeightOffset", &LuaProxy::Player::mountHeightOffset, &LuaProxy::Player::setMountHeightOffset)
-            .property("MountGfxIndex", &LuaProxy::Player::mountGfxIndex, &LuaProxy::Player::setMountGfxIndex)
-            .property("CurrentPowerup", &LuaProxy::Player::currentPowerup, &LuaProxy::Player::setCurrentPowerup)
-            .property("CurrentPlayerSprite", &LuaProxy::Player::currentPlayerSprite, &LuaProxy::Player::setCurrentPlayerSprite)
-            .property("Unused116", &LuaProxy::Player::unused116, &LuaProxy::Player::setUnused116)
-            .property("GfxMirrorX", &LuaProxy::Player::gfxMirrorX, &LuaProxy::Player::setGfxMirrorX)
-            .property("UpwardJumpingForce", &LuaProxy::Player::upwardJumpingForce, &LuaProxy::Player::setUpwardJumpingForce)
-            .property("JumpButtonHeld", &LuaProxy::Player::jumpButtonHeld, &LuaProxy::Player::setJumpButtonHeld)
-            .property("SpinjumpButtonHeld", &LuaProxy::Player::spinjumpButtonHeld, &LuaProxy::Player::setSpinjumpButtonHeld)
-            .property("ForcedAnimationState", &LuaProxy::Player::forcedAnimationState, &LuaProxy::Player::setForcedAnimationState)
-            .property("ForcedAnimationTimer", &LuaProxy::Player::forcedAnimationTimer, &LuaProxy::Player::setForcedAnimationTimer)
-            .property("DownButtonMirror", &LuaProxy::Player::downButtonMirror, &LuaProxy::Player::setDownButtonMirror)
-            .property("InDuckingPosition", &LuaProxy::Player::inDuckingPosition, &LuaProxy::Player::setInDuckingPosition)
-            .property("SelectButtonMirror", &LuaProxy::Player::selectButtonMirror, &LuaProxy::Player::setSelectButtonMirror)
-            .property("Unknown132", &LuaProxy::Player::unknown132, &LuaProxy::Player::setUnknown132)
-            .property("DownButtonTapped", &LuaProxy::Player::downButtonTapped, &LuaProxy::Player::setDownButtonTapped)
-            .property("Unknown136", &LuaProxy::Player::unknown136, &LuaProxy::Player::setUnknown136)
-            .property("XMomentumPush", &LuaProxy::Player::xMomentumPush, &LuaProxy::Player::setXMomentumPush)
-            .property("DeathState", &LuaProxy::Player::deathState, &LuaProxy::Player::setDeathState)
-            .property("DeathTimer", &LuaProxy::Player::deathTimer, &LuaProxy::Player::setDeathTimer)
-            .property("BlinkTimer", &LuaProxy::Player::blinkTimer, &LuaProxy::Player::setBlinkTimer)
-            .property("BlinkState", &LuaProxy::Player::blinkState, &LuaProxy::Player::setBlinkState)
-            .property("Unknown144", &LuaProxy::Player::unknown144, &LuaProxy::Player::setUnknown144)
-            .property("LayerStateStanding", &LuaProxy::Player::layerStateStanding, &LuaProxy::Player::setLayerStateStanding)
-            .property("LayerStateLeftContact", &LuaProxy::Player::layerStateLeftContact, &LuaProxy::Player::setLayerStateLeftContact)
-            .property("LayerStateTopContact", &LuaProxy::Player::layerStateTopContact, &LuaProxy::Player::setLayerStateTopContact)
-            .property("LayerStateRightContact", &LuaProxy::Player::layerStateRightContact, &LuaProxy::Player::setLayerStateRightContact)
-            .property("PushedByMovingLayer", &LuaProxy::Player::pushedByMovingLayer, &LuaProxy::Player::setPushedByMovingLayer)
-            .property("Unused150", &LuaProxy::Player::unused150, &LuaProxy::Player::setUnused150)
-            .property("Unused152", &LuaProxy::Player::unused152, &LuaProxy::Player::setUnused152)
-            .property("HeldNPCIndex", &LuaProxy::Player::heldNPCIndex, &LuaProxy::Player::setHeldNPCIndex)
-            .property("Unknown156", &LuaProxy::Player::unknown156, &LuaProxy::Player::setUnknown156)
-            .property("PowerupBoxContents", &LuaProxy::Player::powerupBoxContents, &LuaProxy::Player::setPowerupBoxContents)
-            .property("CurrentSection", &LuaProxy::Player::currentSection, &LuaProxy::Player::setCurrentSection)
-            .property("WarpTimer", &LuaProxy::Player::warpCooldownTimer, &LuaProxy::Player::setWarpCooldownTimer) // Compat (this was undocumented auto-generated anyway)
-            .property("WarpCooldownTimer", &LuaProxy::Player::warpCooldownTimer, &LuaProxy::Player::setWarpCooldownTimer)
-            .property("TargetWarpIndex", &LuaProxy::Player::targetWarpIndex, &LuaProxy::Player::setTargetWarpIndex)
-            .property("ProjectileTimer1", &LuaProxy::Player::projectileTimer1, &LuaProxy::Player::setProjectileTimer1)
-            .property("ProjectileTimer2", &LuaProxy::Player::projectileTimer2, &LuaProxy::Player::setProjectileTimer2)
-            .property("TailswipeTimer", &LuaProxy::Player::tailswipeTimer, &LuaProxy::Player::setTailswipeTimer)
-            .property("Unknown166", &LuaProxy::Player::unknown166, &LuaProxy::Player::setUnknown166)
-            .property("TakeoffSpeed", &LuaProxy::Player::takeoffSpeed, &LuaProxy::Player::setTakeoffSpeed)
-            .property("CanFly", &LuaProxy::Player::canFly, &LuaProxy::Player::setCanFly)
-            .property("IsFlying", &LuaProxy::Player::isFlying, &LuaProxy::Player::setIsFlying)
-            .property("FlightTimeRemaining", &LuaProxy::Player::flightTimeRemaining, &LuaProxy::Player::setFlightTimeRemaining)
-            .property("HoldingFlightRunButton", &LuaProxy::Player::holdingFlightRunButton, &LuaProxy::Player::setHoldingFlightRunButton)
-            .property("HoldingFlightButton", &LuaProxy::Player::holdingFlightButton, &LuaProxy::Player::setHoldingFlightButton)
-            .property("NPCBeingStoodOnIndex", &LuaProxy::Player::nPCBeingStoodOnIndex, &LuaProxy::Player::setNPCBeingStoodOnIndex)
-            .property("Unknown178", &LuaProxy::Player::unknown178, &LuaProxy::Player::setUnknown178)
-            .property("Unknown17A", &LuaProxy::Player::unknown17A, &LuaProxy::Player::setUnknown17A)
-            .property("Unused17C", &LuaProxy::Player::unused17C, &LuaProxy::Player::setUnused17C)
-            .property("Unused17E", &LuaProxy::Player::unused17E, &LuaProxy::Player::setUnused17E)
-            .property("Unused180", &LuaProxy::Player::unused180, &LuaProxy::Player::setUnused180)
-            .property("Unused182", &LuaProxy::Player::unused182, &LuaProxy::Player::setUnused182),
-#ifdef _MSC_VER //Generated by code
-#pragma endregion
-#endif
-
-            LUAHELPER_DEF_CLASS(Camera)
-            .scope[ //static functions
-                def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::Camera::get)),
-                def("getX", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getX)),
-                def("getY", static_cast<double(*)(unsigned short)>(&LuaProxy::Camera::getY))
-            ]
-            .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::Camera, m_index))
-            .def("mem", static_cast<void (LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::Camera::mem))
-            .def("mem", static_cast<luabind::object(LuaProxy::Camera::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Camera::mem))
-            .property("idx", &LuaProxy::Camera::idx)
-            .property("x", &LuaProxy::Camera::x, &LuaProxy::Camera::setX)
-            .property("y", &LuaProxy::Camera::y, &LuaProxy::Camera::setY)
-            .property("renderX", &LuaProxy::Camera::renderX, &LuaProxy::Camera::setRenderX)
-            .property("renderY", &LuaProxy::Camera::renderY, &LuaProxy::Camera::setRenderY)
-            .property("width", &LuaProxy::Camera::width, &LuaProxy::Camera::setWidth)
-            .property("height", &LuaProxy::Camera::height, &LuaProxy::Camera::setHeight),
-
-
             def("newRECT", &LuaProxy::newRECT),
             def("newRECTd", &LuaProxy::newRECTd),
 
@@ -1228,8 +1028,8 @@ void CLunaLua::bindAll()
                     def("doPSwitchRaw", &LuaProxy::Misc::doPSwitchRaw),
                     def("doPSwitch", (void(*)())&LuaProxy::Misc::doPSwitch),
                     def("doPSwitch", (void(*)(bool))&LuaProxy::Misc::doPSwitch),
-                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
-                    def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
+                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion)
+                    //def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
 
                 namespace_("Level")[
@@ -1408,13 +1208,13 @@ void CLunaLua::bindAll()
                 .def(constructor<int>())
                 .def("mem", static_cast<void (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object&, lua_State*)>(&LuaProxy::Block::mem))
                 .def("mem", static_cast<luabind::object (LuaProxy::Block::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::Block::mem))
-                .def("collidesWith", &LuaProxy::Block::collidesWith)
+                //.def("collidesWith", &LuaProxy::Block::collidesWith)
                 .def("remove", static_cast<void (LuaProxy::Block::*)()>(&LuaProxy::Block::remove))
                 .def("remove", static_cast<void (LuaProxy::Block::*)(bool)>(&LuaProxy::Block::remove))
-                .def("hit", static_cast<void (LuaProxy::Block::*)()>(&LuaProxy::Block::hit))
-                .def("hit", static_cast<void (LuaProxy::Block::*)(bool)>(&LuaProxy::Block::hit))
-                .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player)>(&LuaProxy::Block::hit))
-                .def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player, int)>(&LuaProxy::Block::hit))
+                //.def("hit", static_cast<void (LuaProxy::Block::*)()>(&LuaProxy::Block::hit))
+                //.def("hit", static_cast<void (LuaProxy::Block::*)(bool)>(&LuaProxy::Block::hit))
+                //.def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player)>(&LuaProxy::Block::hit))
+                //.def("hit", static_cast<void (LuaProxy::Block::*)(bool, LuaProxy::Player, int)>(&LuaProxy::Block::hit))
                 .property("idx", &LuaProxy::Block::idx)
                 .property("x", &LuaProxy::Block::x, &LuaProxy::Block::setX)
                 .property("y", &LuaProxy::Block::y, &LuaProxy::Block::setY)
@@ -1428,29 +1228,7 @@ void CLunaLua::bindAll()
                 .property("invisible", &LuaProxy::Block::isHidden, &LuaProxy::Block::setIsHidden)
                 .property("slippery", &LuaProxy::Block::slippery, &LuaProxy::Block::setSlippery)
                 .property("layerName", &LuaProxy::Block::layerName)
-                .property("layerObj", &LuaProxy::Block::layerObj),
-
-                LUAHELPER_DEF_CLASS(BGO)
-                .scope[ //static functions
-                        def("count", &LuaProxy::BGO::count),
-                        def("get", static_cast<luabind::object(*)(lua_State* L)>(&LuaProxy::BGO::get)),
-                        def("get", static_cast<luabind::object(*)(luabind::object, lua_State* L)>(&LuaProxy::BGO::get)),
-                        def("getIntersecting", &LuaProxy::BGO::getIntersecting)
-                ]
-                .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::BGO, m_index))
-                .def(constructor<int>())
-                .property("idx", &LuaProxy::BGO::idx)
-                .property("id", &LuaProxy::BGO::id, &LuaProxy::BGO::setId)
-                .property("isHidden", &LuaProxy::BGO::isHidden, &LuaProxy::BGO::setIsHidden)
-                .property("x", &LuaProxy::BGO::x, &LuaProxy::BGO::setX)
-                .property("y", &LuaProxy::BGO::y, &LuaProxy::BGO::setY)
-                .property("width", &LuaProxy::BGO::width, &LuaProxy::BGO::setWidth)
-                .property("height", &LuaProxy::BGO::height, &LuaProxy::BGO::setHeight)
-                .property("speedX", &LuaProxy::BGO::speedX, &LuaProxy::BGO::setSpeedX)
-                .property("speedY", &LuaProxy::BGO::speedY, &LuaProxy::BGO::setSpeedY)
-                .property("layerName", &LuaProxy::BGO::layerName, &LuaProxy::BGO::setLayerName)
-                .property("layer", &LuaProxy::BGO::layer, &LuaProxy::BGO::setLayer)
-                .property("isValid", &LuaProxy::BGO::isValid)
+                .property("layerObj", &LuaProxy::Block::layerObj)
             ];
     }
 }
@@ -1534,6 +1312,30 @@ void CLunaLua::bindAllDeprecated()
     }
 }
 
+void CLunaLua::triggerOnStart()
+{
+    GLEngineProxy::CheckRendererInit();
+
+    //If the lua module is not valid anyway, then just return
+    if (!isValid())
+    {
+        return;
+    }
+
+    // If is not ready (SMBX not init), then skip event loop
+    if (!m_ready)
+    {
+        return;
+    }
+
+    if (!m_onStartRan) {
+        std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
+        onStartEvent->setLoopable(false);
+        onStartEvent->setDirectEventName("onStart");
+        m_onStartRan = true;
+        callEvent(onStartEvent);
+    }
+}
 
 void CLunaLua::doEvents()
 {
@@ -1558,17 +1360,11 @@ void CLunaLua::doEvents()
 
     MusicManager::setCurrentSection(Player::Get(1)->CurrentSection);
 
-    if (!m_eventLoopOnceExecuted) {
-        std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
-        onStartEvent->setLoopable(false);
-        onStartEvent->setDirectEventName("onStart");
-        callEvent(onStartEvent);
-        m_eventLoopOnceExecuted = true;
+    triggerOnStart();
 
-        // If an error happened in onStart then return.
-        if (!isValid())
-            return;
-    }
+    // If an error happened in onStart then return.
+    if (!isValid())
+        return;
 
     std::shared_ptr<Event> onLoopEvent = std::make_shared<Event>("onLoop", false);
     onLoopEvent->setLoopable(false);

@@ -89,19 +89,23 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
     case LUNALOADER_OK:
         return 0;
     case LUNALOADER_CREATEPROCESS_FAIL:
+#ifdef LUNALOADER_EXEC
+        ErrorBox(L"Error: Couldn't run SMBX",
+                 L"Couldn't run SMBX");
+#else
         ErrorBox(L"Error: Couldn't run SMBX\n"
                  "However you can try to drag and drop the SMBX exe file to LunaLoader.exe\n"
                  "If this doesn't work then ask on the forums.",
                  L"Couldn't run SMBX");
+#endif
         return 1;
     case LUNALOADER_PATCH_FAIL:
         ErrorBox(L"Error: Failed to patch SMBX",
                  L"Failed to patch SMBX");
-        return 1;
+        return 2;
     default:
         ErrorBox(L"Unknown Error in LunaLoader.",
                  L"Unknown Error");
-        return 1;
+        return 3;
     }
 }
-

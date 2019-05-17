@@ -39,6 +39,8 @@ struct STestModeSettings
     bool godMode;
     //! Settings of playable characters per player
     STestModePlayerSettings players[2];
+    //! Warp Index
+    unsigned int entranceIndex;
 
     STestModeSettings();
     /**

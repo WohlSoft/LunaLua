@@ -11,6 +11,8 @@
 #include "../SMBXInternal/Blocks.h"
 #include "../SdlMusic/SdlMusPlayer.h"
 #include "../FileManager/CustomParamStore.h"
+#include "../Misc/TestMode.h"
+#include "../Misc/TestModeMenu.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -146,5 +148,64 @@ extern "C" {
     FFI_EXPORT(const char**) LunaLuaGetBlockCustomParams(void)
     {
         return g_BlockCustomParams.getCharPtrArray();
+    }
+
+    struct FFITestModeSettings {
+        int playerCount;
+        bool showFPS;
+        bool godMode;
+        STestModePlayerSettings players[2];
+        unsigned int entranceIndex;
+    };
+    FFITestModeSettings testModeSettings;
+
+    FFI_EXPORT(FFITestModeSettings*) LunaLuaGetTestModeSettings(void)
+    {
+        static FFITestModeSettings testModeSettings;
+        static STestModeSettings settings;
+        settings = getTestModeSettings();
+        testModeSettings.playerCount = settings.playerCount;
+        testModeSettings.showFPS = settings.showFPS;
+        testModeSettings.godMode = settings.godMode;
+        testModeSettings.players[0] = settings.players[0];
+        testModeSettings.players[1] = settings.players[1];
+        testModeSettings.entranceIndex = settings.entranceIndex;
+
+        return &testModeSettings;
+    }
+
+    FFI_EXPORT(void) LunaLuaSetTestModeSettings(const FFITestModeSettings* pTestModeSettings)
+    {
+        static STestModeSettings settings;
+        settings = getTestModeSettings();
+
+        settings.playerCount = pTestModeSettings->playerCount;
+        settings.showFPS = pTestModeSettings->showFPS;
+        settings.godMode = pTestModeSettings->godMode;
+        settings.players[0] = pTestModeSettings->players[0];
+        settings.players[1] = pTestModeSettings->players[1];
+        settings.entranceIndex = pTestModeSettings->entranceIndex;
+
+        setTestModeSettings(settings);
+    }
+
+    FFI_EXPORT(void) LunaLuaTestModeExit(void)
+    {
+        testModeClosePauseMenu(false, true);
+    }
+
+    FFI_EXPORT(void) LunaLuaTestModeRestart(void)
+    {
+        testModeClosePauseMenu(true, false);
+    }
+
+    FFI_EXPORT(void) LunaLuaTestModeContinue(void)
+    {
+        testModeClosePauseMenu(false, false);
+    }
+
+    FFI_EXPORT(KeyMap*) LunaLuaGetRawKeymapArray(void)
+    {
+        return gRawKeymap;
     }
 }

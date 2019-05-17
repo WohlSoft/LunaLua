@@ -47,7 +47,9 @@ DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
 LvlEnum gLevelEnum;
 
-KeyMap gRawKeymap[2] = {0};
+// First two array entries are players 1+2
+// Last two array entries are copies of the above for last tick
+KeyMap gRawKeymap[4] = {0};
 
 bool gIsTestModePauseActive;
 

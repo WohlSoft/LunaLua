@@ -14,6 +14,7 @@
 #include "AsmPatch.h"
 #include "RuntimeHook.h"
 #include "WaitForTickEnd.h"
+#include "PGEEditorCmdSender.h"
 
 #include "TestModeMenu.h"
 #include "TestMode.h"
@@ -62,6 +63,7 @@ void STestModeSettings::ResetToDefault(void)
     players[1].powerup = 1;
     players[1].mountType = 0;
     players[1].mountColor = 0;
+    entranceIndex = 0;
 }
 
 static STestModeSettings testModeSettings;
@@ -71,8 +73,22 @@ STestModeSettings getTestModeSettings()
 {
     return testModeSettings;
 }
+
+static void sendTestSettingsToPgeEditor(const STestModeSettings &settings)
+{
+    PGE_EditorCommandSender feedBack;
+    std::string cmd = "CMD:testSetup:";
+    cmd += std::to_string(0) + ",";
+    cmd += std::to_string(settings.players[0].identity) + ",";
+    cmd += std::to_string(settings.players[0].powerup) + ",";
+    cmd += std::to_string(settings.players[0].mountType) + ",";
+    cmd += std::to_string(settings.players[0].mountColor);
+    feedBack.sendCommandUTF8(cmd);
+}
+
 void setTestModeSettings(const STestModeSettings& settings)
 {
+    sendTestSettingsToPgeEditor(settings);
     testModeSettings = settings;
 }
 
@@ -168,6 +184,9 @@ static bool testModeSetupForLoading()
     ep->unknown_10 = 0;
     ep->unknown_14 = "";
 
+    // Set episode path...
+    GM_FULLDIR = path.substr(0, pos + 1);
+
     // God Mode cheat code
     GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
@@ -183,7 +202,7 @@ static bool testModeSetupForLoading()
     GM_CUR_MENULEVEL = 1;
 
     // Write warp destination data
-    GM_NEXT_LEVEL_WARPIDX = 0;
+    GM_NEXT_LEVEL_WARPIDX = testModeSettings.entranceIndex;
     GM_NEXT_LEVEL_FILENAME = path.substr(pos+1);
 
     // Don't use any save slot
