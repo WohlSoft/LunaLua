@@ -393,6 +393,84 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
                     ll[counter_2++] = l;
                 e["layersToToggle"] = ll;
             }
+
+            {
+                size_t counter_2 = 0;
+                luabind::object sets = luabind::newtable(L);
+                for(LevelEvent_Sets &s : event.sets)
+                {
+                    luabind::object set = luabind::newtable(L);
+                    set["id"] = s.id;
+                    set["musicId"] = s.music_id;
+                    set["musicFile"] = s.music_file;
+                    set["backgroundId"] = s.background_id;
+
+                    set["positionLeft"] = s.position_left;
+                    set["positionTop"] = s.position_top;
+                    set["positionBottom"] = s.position_bottom;
+                    set["positionRight"] = s.position_right;
+
+                    set["expressionPosX"] = s.expression_pos_x;
+                    set["expressionPosY"] = s.expression_pos_y;
+                    set["expressionPosW"] = s.expression_pos_w;
+                    set["expressionPosH"] = s.expression_pos_h;
+
+                    set["autoscroll"] = s.autoscrol;
+                    set["autoscrollSpeedX"] = s.autoscrol_x;
+                    set["autoscrollSpeedY"] = s.autoscrol_y;
+
+                    set["expressionAutoscroolSpeedX"] = s.expression_autoscrool_x;
+                    set["expressionAutoscroolSpeedY"] = s.expression_autoscrool_y;
+
+                    sets[counter_2++] = set;
+                }
+                e["sectionSets"] = sets;
+            }
+
+            e["triggerEvent"] = event.trigger;
+            e["triggerEventTimeUnit"] = event.trigger_timer_unit;
+            e["triggerEventTimer"] = event.trigger_timer;
+            e["triggerEventTimerOrig"] = event.trigger_timer_orig;
+
+            e["controlsEnable"] = event.ctrls_enable;
+
+            e["controlUp"] = event.ctrl_up;
+            e["controlDown"] = event.ctrl_down;
+            e["controlLeft"] = event.ctrl_left;
+            e["controlRight"] = event.ctrl_right;
+
+            e["controlJump"] = event.ctrl_jump;
+            e["controlAltJump"] = event.ctrl_altjump;
+            e["controlRun"] = event.ctrl_run;
+            e["controlAltRun"] = event.ctrl_altrun;
+
+            e["controlStart"] = event.ctrl_start;
+            e["controlDrop"] = event.ctrl_drop;
+
+            e["controlLockKeyboard"] = event.ctrl_lock_keyboard;
+
+            // TODO: BIND ENUMS, OTHERWISE UNBUILDABLE!!!
+            e["autostart"] = event.autostart;
+
+            e["autostartCondition"] = event.autostart_condition;
+
+            // Move layers
+            // Spawn Effect
+            // Spawn NPC
+            // Update variable
+            // timerDef
+
+            e["triggerScript"] = event.trigger_script;
+            e["triggerApiId"] = event.trigger_api_id;
+
+            e["moveLayer"] = event.movelayer;
+            e["moveLayerSpeedX"] = event.layer_speed_x;
+            e["moveLayerSpeedY"] = event.layer_speed_y;
+
+            e["moveCameraX"] = event.move_camera_x;
+            e["moveCameraY"] = event.move_camera_y;
+            e["moveCameraSection"] = event.scroll_section;
+
             e["meta"] = getMeta(event.meta, L);
             arr[counter++] = e;
         }
