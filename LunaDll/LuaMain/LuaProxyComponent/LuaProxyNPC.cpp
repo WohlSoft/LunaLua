@@ -639,6 +639,8 @@ void LuaProxy::NPC::harm(short harmType, lua_State * L)
     // Get dummy NPC, make note of it's old ID so we can restore it afterward
     NPCMOB* dummy = ::NPC::GetDummyNPC();
     short oldDummyId = dummy->id;
+    short oldDummyScoreRelated = dummy->unknown_24;
+    dummy->unknown_24 = 0;
 
     short indexCollideWith = 0;
     short targetIndex = m_index + 1;
@@ -686,6 +688,7 @@ void LuaProxy::NPC::harm(short harmType, lua_State * L)
 
     // Restore dummy NPC ID, in case we changed it
     dummy->id = oldDummyId;
+    dummy->unknown_24 = oldDummyScoreRelated;
 }
 
 void LuaProxy::NPC::harm(short harmType, float damage, lua_State * L)
