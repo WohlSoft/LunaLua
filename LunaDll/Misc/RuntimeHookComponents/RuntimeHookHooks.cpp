@@ -1259,6 +1259,155 @@ _declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
     }
 }
 
+static void __stdcall runtimeHookSetMountColor(PlayerMOB* player, NPCMOB* npc)
+{
+	short col = NPC::GetMountColor(npc->id);
+	if (col != 0)
+		player->MountColor = col;
+}
+
+_declspec(naked) void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* player, NPCMOB* npc)
+{
+	__asm {
+		LEA EDX, [EDX + ECX * 8] // NPC address
+		POP ECX
+		PUSH EDX  // NPC
+		PUSH EDI // Player
+		PUSH ECX
+		JMP runtimeHookSetMountColor
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookSetMountColor_YoshiWrapper(PlayerMOB* player, NPCMOB* npc)
+{
+	__asm {
+		POP ECX
+		LEA EDX, [EAX + EDX * 8] // NPC address
+		PUSH EDX // NPC
+		PUSH EDI // Player
+		PUSH ECX
+		JMP runtimeHookSetMountColor
+	}
+}
+
+static void __stdcall runtimeHookDismount(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+{
+	int npcID = -1;
+
+	switch (mountType) {
+	case 1:
+		// if here to stop the compiler from complaining that effectID isn't defined in the lower part of the code
+		if (true) {
+			short effectID = -1;
+
+			// Default boots
+			switch (player->MountColor) {
+				case 1: npcID = 35; effectID = 26; break;
+				case 2: npcID = 191; effectID = 101; break;
+				case 3: npcID = 193; effectID = 102; break;
+			}
+
+			if (fromDamage && effectID != -1) {
+				// Play effect
+				Momentum coor = { 0 };
+				coor.x = player->momentum.x + player->momentum.width / 2;
+				coor.y = player->momentum.y + player->momentum.height / 2;
+				coor.speedX = -5 * player->FacingDirection;
+				coor.speedY = -11;
+				short npcID = 0;
+				float animationFrame = 0;
+				short showOnlyMask = COMBOOL(false);
+				native_runEffect(&effectID, &coor, &animationFrame, &npcID, &showOnlyMask);
+			}
+		}
+
+		break;
+	case 3:
+		// Default yoshis
+		switch (player->MountColor) {
+			case 1: npcID = 95; break;
+			case 2: npcID = 98; break;
+			case 3: npcID = 99; break;
+			case 4: npcID = 100; break;
+			case 5: npcID = 148; break;
+			case 6: npcID = 149; break;
+			case 7: npcID = 150; break;
+			case 8: npcID = 228; break;
+		}
+
+		if (npc != NULL && fromDamage) {
+			// Running away flag
+			npc->ai1 = 1;
+		}
+
+		break;
+	}
+
+	if (npc != NULL && npcID >= 1 && npcID <= NPC::MAX_ID) {
+		npc->id = npcID;
+
+		WORD* widthArray = GM_CONF_WIDTH;
+		WORD* heightArray = GM_CONF_HEIGHT;
+		npc->momentum.width = widthArray[npcID];
+		npc->momentum.height = widthArray[npcID];
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookDismount_BootWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+{
+	__asm {
+		POP ECX
+		LEA EAX, [EAX + EDX * 4] // Player address
+		PUSH ESI // NPC
+		push 0 // Damaged flag
+		PUSH 1 // Mount type
+		PUSH EAX // Player
+		PUSH ECX
+		JMP runtimeHookDismount
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookDismount_BootDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+{
+	__asm {
+		POP ECX
+		PUSH 0 // NPC
+		push 1 // Damaged flag
+		PUSH 1 // Mount type
+		PUSH ESI // Player
+		PUSH ECX
+		JMP runtimeHookDismount
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookDismount_YoshiWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+{
+	__asm {
+		LEA EDX, [EDX + ECX * 4] // Player address
+		POP ECX
+		PUSH ESI // NPC
+		push 0 // Damaged flag
+		PUSH 3 // Mount type
+		PUSH EDX // Player
+		PUSH ECX
+		JMP runtimeHookDismount
+	}
+}
+
+_declspec(naked) void __stdcall runtimeHookDismount_YoshiDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+{
+	__asm {
+		LEA EDX, [ECX + EAX * 4] // Player address
+		POP ECX
+		PUSH EDI // NPC
+		push 1 // Damaged flag
+		PUSH 3 // Mount type
+		PUSH EDX // Player
+		PUSH ECX
+		JMP runtimeHookDismount
+	}
+}
+
 static short g_renderDoneCameraUpdate = 0;
 static bool g_ranOnDrawThisFrame = false;
 

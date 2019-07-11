@@ -274,6 +274,7 @@ static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_luahandlesspeed[NPC::MAX_ID + 1] = { 0 };
 static double npcprop_terminalvelocity[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_mountcolor[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
 static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
@@ -294,6 +295,7 @@ void NPC::InitProperties() {
         npcprop_staticdirection[i] = 0;
         npcprop_luahandlesspeed[i] = 0;
         npcprop_terminalvelocity[i] = 0;
+		npcprop_mountcolor[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -504,6 +506,19 @@ void NPC::InitProperties() {
     npcprop_terminalvelocity[259] = -1;
     npcprop_terminalvelocity[260] = -1;
 
+	// Set built-in boot / yoshi colors
+	npcprop_mountcolor[0x23] = 1;
+	npcprop_mountcolor[0xBF] = 2;
+	npcprop_mountcolor[0xC1] = 3;
+	npcprop_mountcolor[0x5F] = 1;
+	npcprop_mountcolor[0x62] = 2;
+	npcprop_mountcolor[0x63] = 3;
+	npcprop_mountcolor[0x64] = 4;
+	npcprop_mountcolor[0x94] = 5;
+	npcprop_mountcolor[0x95] = 6;
+	npcprop_mountcolor[0x96] = 7;
+	npcprop_mountcolor[0xE4] = 8;
+
     npc_semisolidCollidingFlyTypeMap.clear();
     npc_semisolidCollidingFlyTypeMap[1] = true;
 }
@@ -530,8 +545,13 @@ bool NPC::GetHarmlessGrab(int id) {
 }
 
 bool NPC::GetHarmlessThrown(int id) {
-    if ((id < 1) || (id > NPC::MAX_ID)) return false;
-    return (npcprop_harmlessthrown[id] != 0);
+	if ((id < 1) || (id > NPC::MAX_ID)) return false;
+	return (npcprop_harmlessthrown[id] != 0);
+}
+
+int16_t NPC::GetMountColor(int id) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return 0;
+	return (npcprop_mountcolor[id]);
 }
 
 bool NPC::GetIgnoreThrownNPCs(int id) {
@@ -626,6 +646,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(npcprop_terminalvelocity);
     }
+	else if (s == "mountcolor")
+	{
+		return reinterpret_cast<uintptr_t>(npcprop_mountcolor);
+	}
     else
     {
         return 0;
