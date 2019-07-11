@@ -406,10 +406,46 @@ void TrySkipPatch()
         .NOP_PAD_TO_SIZE<6>()
         .Apply();
 
-    PATCH(0x9B22BF)
-        .CALL(&runtimeHookNpcMsgbox_Wrapper)
-        .NOP_PAD_TO_SIZE<5>()
-        .Apply();
+	PATCH(0x9B22BF)
+		.CALL(&runtimeHookNpcMsgbox_Wrapper)
+		.NOP_PAD_TO_SIZE<5>()
+		.Apply();
+
+	// Stepping on a boot NPC
+	PATCH(0x9AC04E)
+		.SAFE_CALL(&runtimeHookSetMountColor_BootWrapper)
+		.NOP_PAD_TO_SIZE<150>()
+		.Apply();
+
+	// Stepping on a yoshi NPC
+	PATCH(0x9AC1E5)
+		.SAFE_CALL(&runtimeHookSetMountColor_YoshiWrapper)
+		.NOP_PAD_TO_SIZE<497>()
+		.Apply();
+
+	// Dismounting from a boot mount
+	PATCH(0x99CC5B)
+		.SAFE_CALL(&runtimeHookDismount_BootWrapper)
+		.NOP_PAD_TO_SIZE<165>()
+		.Apply();
+
+	// Dismounting from a boot mount by damage
+	PATCH(0x9B571E)
+		.SAFE_CALL(&runtimeHookDismount_BootDamageWrapper)
+		.NOP_PAD_TO_SIZE<198>()
+		.Apply();
+
+	// Dismounting from a yoshi mount
+	PATCH(0x99D105)
+		.SAFE_CALL(&runtimeHookDismount_YoshiWrapper)
+		.NOP_PAD_TO_SIZE<463>()
+		.Apply();
+
+	// Dismounting from a yoshi mount by damage
+	PATCH(0x9B5A16)
+		.SAFE_CALL(&runtimeHookDismount_YoshiDamageWrapper)
+		.NOP_PAD_TO_SIZE<477>()
+		.Apply();
 
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)

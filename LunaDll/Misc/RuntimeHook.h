@@ -15,11 +15,12 @@ typedef EXCEPTION_DISPOSITION __cdecl SEH_HANDLER(
     _Inout_ void * _DispatcherContext
     );
 
-
-
 #ifndef NO_SDL
 extern bool episodeStarted;
 #endif
+
+struct PlayerMOB;
+struct NPCMOB;
 
 /************************************************************************/
 /* Runtime Patch Main Functions                                         */
@@ -84,6 +85,12 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
 extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* player, NPCMOB* npc);
+extern void __stdcall runtimeHookSetMountColor_YoshiWrapper(PlayerMOB* player, NPCMOB* npc);
+extern void __stdcall runtimeHookDismount_BootWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
+extern void __stdcall runtimeHookDismount_YoshiWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
+extern void __stdcall runtimeHookDismount_BootDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
+extern void __stdcall runtimeHookDismount_YoshiDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 

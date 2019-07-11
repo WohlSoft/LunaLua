@@ -130,6 +130,7 @@ static int16_t npcprop_spinjumpsafe[NPC::MAX_ID+1] = { 0 };
 static int16_t npcprop_nowaterphysics[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessgrab[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_mountcolor[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -140,7 +141,8 @@ void NPC::InitProperties() {
         npcprop_nowaterphysics[i] = 0;
         npcprop_harmlessgrab[i] = 0;
         npcprop_harmlessthrown[i] = 0;
-    }
+		npcprop_mountcolor[i] = 0;
+	}
 
     // Set built-in spinjump safe IDs
     npcprop_spinjumpsafe[0xB3]  = -1;
@@ -193,6 +195,19 @@ void NPC::InitProperties() {
     npcprop_harmlessgrab[0x116] = -1;
     npcprop_harmlessgrab[0x117] = -1;
     npcprop_harmlessgrab[0x124] = -1;
+
+	// Set built-in boot / yoshi colors
+	npcprop_mountcolor[0x23] = 1;
+	npcprop_mountcolor[0xBF] = 2;
+	npcprop_mountcolor[0xC1] = 3;
+	npcprop_mountcolor[0x5F] = 1;
+	npcprop_mountcolor[0x62] = 2;
+	npcprop_mountcolor[0x63] = 3;
+	npcprop_mountcolor[0x64] = 4;
+	npcprop_mountcolor[0x94] = 5;
+	npcprop_mountcolor[0x95] = 6;
+	npcprop_mountcolor[0x96] = 7;
+	npcprop_mountcolor[0xE4] = 8;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -217,8 +232,13 @@ bool NPC::GetHarmlessGrab(int id) {
 }
 
 bool NPC::GetHarmlessThrown(int id) {
-    if ((id < 1) || (id > NPC::MAX_ID)) return false;
-    return (npcprop_harmlessthrown[id] != 0);
+	if ((id < 1) || (id > NPC::MAX_ID)) return false;
+	return (npcprop_harmlessthrown[id] != 0);
+}
+
+int16_t NPC::GetMountColor(int id) {
+	if ((id < 1) || (id > NPC::MAX_ID)) return 0;
+	return (npcprop_mountcolor[id]);
 }
 
 // Getter for address of NPC property arrays
@@ -240,10 +260,14 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(npcprop_harmlessgrab);
     }
-    else if (s == "harmlessthrown")
-    {
-        return reinterpret_cast<uintptr_t>(npcprop_harmlessthrown);
-    }
+	else if (s == "harmlessthrown")
+	{
+		return reinterpret_cast<uintptr_t>(npcprop_harmlessthrown);
+	}
+	else if (s == "mountcolor")
+	{
+		return reinterpret_cast<uintptr_t>(npcprop_mountcolor);
+	}
     else
     {
         return 0;
