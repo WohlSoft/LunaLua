@@ -87,10 +87,11 @@ extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* player, NPCMOB* npc);
 extern void __stdcall runtimeHookSetMountColor_YoshiWrapper(PlayerMOB* player, NPCMOB* npc);
-extern void __stdcall runtimeHookDismount_BootWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
-extern void __stdcall runtimeHookDismount_YoshiWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
-extern void __stdcall runtimeHookDismount_BootDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
-extern void __stdcall runtimeHookDismount_YoshiDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc);
+extern void __stdcall runtimeHookDismount_BootWrapper();
+extern void __stdcall runtimeHookDismount_YoshiWrapper();
+extern void __stdcall runtimeHookDismount_BootDamageWrapper();
+extern void __stdcall runtimeHookDismount_YoshiDamageWrapper();
+extern void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper();
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 

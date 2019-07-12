@@ -131,6 +131,7 @@ static int16_t npcprop_nowaterphysics[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessgrab[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_mountcolor[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -142,6 +143,7 @@ void NPC::InitProperties() {
         npcprop_harmlessgrab[i] = 0;
         npcprop_harmlessthrown[i] = 0;
         npcprop_mountcolor[i] = 0;
+        npcprop_ignorethrownnpcs[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -241,6 +243,11 @@ int16_t NPC::GetMountColor(int id) {
     return (npcprop_mountcolor[id]);
 }
 
+bool NPC::GetIgnoreThrownNPCs(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_ignorethrownnpcs[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -267,6 +274,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "mountcolor")
     {
         return reinterpret_cast<uintptr_t>(npcprop_mountcolor);
+    }
+    else if (s == "ignorethrownnpcs")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_ignorethrownnpcs);
     }
     else
     {

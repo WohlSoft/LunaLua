@@ -447,6 +447,12 @@ void TrySkipPatch()
         .NOP_PAD_TO_SIZE<477>()
         .Apply();
 
+    // ignoreThrownNPCs check
+    PATCH(0xA1AA52)
+        .CALL(&runtimeHookIgnoreThrownNPCs_Wrapper)
+        .NOP_PAD_TO_SIZE<35>()
+        .Apply();
+
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)
         .CALL(&CameraUpdateHook_Wrapper)

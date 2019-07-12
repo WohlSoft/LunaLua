@@ -505,6 +505,7 @@ namespace NPC {
     bool GetHarmlessGrab(int id);
     bool GetHarmlessThrown(int id);
     int16_t GetMountColor(int id);
+    bool GetIgnoreThrownNPCs(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 

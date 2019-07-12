@@ -1079,7 +1079,7 @@ static void __stdcall runtimeHookDismount(PlayerMOB* player, int mountType, bool
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookDismount_BootWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookDismount_BootWrapper()
 {
     __asm {
         POP ECX
@@ -1093,7 +1093,7 @@ _declspec(naked) void __stdcall runtimeHookDismount_BootWrapper(PlayerMOB* playe
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookDismount_BootDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookDismount_BootDamageWrapper()
 {
     __asm {
         POP ECX
@@ -1106,7 +1106,7 @@ _declspec(naked) void __stdcall runtimeHookDismount_BootDamageWrapper(PlayerMOB*
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookDismount_YoshiWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookDismount_YoshiWrapper()
 {
     __asm {
         LEA EDX, [EDX + ECX * 4] // Player address
@@ -1120,7 +1120,7 @@ _declspec(naked) void __stdcall runtimeHookDismount_YoshiWrapper(PlayerMOB* play
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookDismount_YoshiDamageWrapper(PlayerMOB* player, int mountType, bool fromDamage, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookDismount_YoshiDamageWrapper()
 {
     __asm {
         LEA EDX, [ECX + EAX * 4] // Player address
@@ -1133,6 +1133,49 @@ _declspec(naked) void __stdcall runtimeHookDismount_YoshiDamageWrapper(PlayerMOB
         JMP runtimeHookDismount
     }
 }
+
+static int __stdcall runtimeHookIgnoreThrownNPCs(NPCMOB* npc)
+{
+    // Only takes the NPC which is being collided with, not the thrown NPC itself
+    int npcID = npc->id;
+    if (npcID >= 1 && npcID <= NPC::MAX_ID) {
+        // Vanilla check overwritten by hook
+        WORD* interactableArray = (WORD*)isInteractableNPC_ptr;
+        if (interactableArray[npcID] != 0) {
+            return 1;
+        }
+        // Custom flag check
+        if (NPC::GetIgnoreThrownNPCs(npcID)) {
+            return 1;
+        }
+
+    }
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper()
+{
+    __asm {
+        LEA ECX, [ECX + EAX * 8] // Get NPC address
+        POP EAX // Remove return address from stack
+        PUSHFD // Save pre-call state
+        PUSH ECX 
+        PUSH EDX
+        PUSH ECX // Push NPC argument
+        CALL runtimeHookIgnoreThrownNPCs // Call the target function
+        POP EDX // Restore state
+        POP ECX
+        POPFD
+        CMP EAX, 0 // Check if return value is false
+        JE runtimeHookIgnoreThrownNPCs_IsFalse
+        PUSH 0xA1BAD5 // Otherwise exits to path of code where killing is skipped
+        RET
+runtimeHookIgnoreThrownNPCs_IsFalse:
+        PUSH 0xA1AA75 // Exits to path of code where NPC is killed
+        RET
+    }
+}
+
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
