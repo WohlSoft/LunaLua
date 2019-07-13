@@ -72,11 +72,15 @@ void testModePauseMenu(bool allowContinue)
     
     while (keepRunningPauseMenu)
     {
-        // Read input...
-        short oldPauseOpen = GM_PAUSE_OPEN;
-        GM_PAUSE_OPEN = COMBOOL(true);
-        native_updateInput();
-        GM_PAUSE_OPEN = oldPauseOpen;
+        // Only do input reading if window is in focus
+        if (GetMainSMBXWindow() == GetForegroundWindow())
+        {
+            // Read input...
+            short oldPauseOpen = GM_PAUSE_OPEN;
+            GM_PAUSE_OPEN = COMBOOL(true);
+            native_updateInput();
+            GM_PAUSE_OPEN = oldPauseOpen;
+        }
 
         if (gLunaLua.isValid()) {
             std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onTestModeMenu", false);

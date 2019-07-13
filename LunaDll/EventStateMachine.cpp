@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "EventStateMachine.h"
 #include "Misc/RuntimeHook.h"
+#include "Misc/TestMode.h"
 #include "Rendering/GL/GLEngineProxy.h"
 
 // Global instance
@@ -207,11 +208,15 @@ void EventStateMachine::checkPause(void) {
 void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
-        // Read input
-        short oldPauseOpen = GM_PAUSE_OPEN;
-        GM_PAUSE_OPEN = COMBOOL(true);
-        native_updateInput();
-        GM_PAUSE_OPEN = oldPauseOpen;
+        // Only do input reading if window is in focus
+        if (GetMainSMBXWindow() == GetForegroundWindow())
+        {
+            // Read input
+            short oldPauseOpen = GM_PAUSE_OPEN;
+            GM_PAUSE_OPEN = COMBOOL(true);
+            native_updateInput();
+            GM_PAUSE_OPEN = oldPauseOpen;
+        }
 
         // Render the frame and wait
         LunaDllRenderAndWaitFrame();

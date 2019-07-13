@@ -1581,6 +1581,36 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
     }
 }
 
+static unsigned int __stdcall runtimeHookNPCWaterSplashAnim(NPCMOB* npc, short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask)
+{
+    native_runEffect(effectID, coor, effectFrame, npcID, showOnlyMask);
+
+    // Return non-zero for ignoring water physics
+    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
+    {
+        return -1;
+    }
+
+    // Return 0 for behaving as-normal
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCWaterSplashAnimRaw(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask)
+{
+    __asm {
+        POP EAX
+        PUSH ESI
+        CALL runtimeHookNPCWaterSplashAnim
+        CMP EAX, 0
+        JNE skip_water_physics_exit
+        PUSH 0xA0A700
+        RET
+    skip_water_physics_exit:
+        PUSH 0xA0A822
+        RET
+    }
+}
+
 static int __stdcall runtimeHookNPCHarmlessGrab(NPCMOB* npc)
 {
     if ((npc != nullptr) && NPC::GetHarmlessGrab(npc->id))

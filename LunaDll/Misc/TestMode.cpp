@@ -239,7 +239,7 @@ static bool testModeSetupForLoading()
 // Helper function to get the main window
 // TODO: Consider replacing with something better, that uses some memory
 //       address or something instead.
-static HWND GetMainWindow(void)
+HWND GetMainSMBXWindow(void)
 {
     // This here is a big mess of a workaround... but it works
     HWND hWindow = NULL;
@@ -455,7 +455,7 @@ json IPCTestLevel(const json& params)
     }
 
     // Before checking for tick end... bring to top if we need to
-    HWND hWindow = GetMainWindow();
+    HWND hWindow = GetMainSMBXWindow();
     if (hWindow)
     {
         ShowWindow(hWindow, SW_SHOW);
@@ -496,7 +496,7 @@ bool TestModeCheckHideWindow(void)
         // waiting for IPC again.
         testModeRestartLevel();
         gStartupSettings.currentlyWaitingForIPC = true;
-        HWND hWindow = GetMainWindow();
+        HWND hWindow = GetMainSMBXWindow();
         if (hWindow)
         {
             ShowWindow(hWindow, SW_HIDE);
@@ -526,7 +526,7 @@ json IPCSetCheckPoint(const json& params)
 
 json IPCGetWindowHandle(const json& /*params*/)
 {
-    HWND window = GetMainWindow();
+    HWND window = GetMainSMBXWindow();
     unsigned long ptr = ULONG_PTR(window);
     return ptr;
 }
