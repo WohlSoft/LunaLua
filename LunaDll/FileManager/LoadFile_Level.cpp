@@ -432,7 +432,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         nextEvent->pName = nextDataEvent.name;
         nextEvent->pTextMsg = nextDataEvent.msg;
         nextEvent->SoundID = static_cast<short>(nextDataEvent.sound_id);
-        nextEvent->EndGame = COMBOOL(nextDataEvent.end_game);
+        nextEvent->EndGame = nextDataEvent.end_game;
 
         int hideLayersNum = nextDataEvent.layers_hide.size();
         int showLayersNum = nextDataEvent.layers_show.size();
