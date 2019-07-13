@@ -85,8 +85,8 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
 extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
-extern void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* player, NPCMOB* npc);
-extern void __stdcall runtimeHookSetMountColor_YoshiWrapper(PlayerMOB* player, NPCMOB* npc);
+extern void __stdcall runtimeHookSetMountColor_BootWrapper();
+extern void __stdcall runtimeHookSetMountColor_YoshiWrapper();
 extern void __stdcall runtimeHookDismount_BootWrapper();
 extern void __stdcall runtimeHookDismount_YoshiWrapper();
 extern void __stdcall runtimeHookDismount_BootDamageWrapper();
@@ -105,6 +105,8 @@ extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // Hooks which are helping fixups
 extern void IsNPCCollidesWithVeggiHook_Wrapper();
+
+
 
 
 
@@ -223,6 +225,17 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId);
+
+// Player hitbox
+void __stdcall playerGetHitboxHD_99986D();
+void __stdcall playerGetHitboxHD_9A04B6();
+void __stdcall playerGetHitboxHD_9AEA8A();
+void __stdcall playerGetHitboxHD_9BE963();
+void __stdcall playerGetHitboxHD_9C1030();
+void __stdcall playerGetHitboxHD_9C0F86();
+void __stdcall playerGetHitboxHD_9C10E6();
+void __stdcall playerGetHitboxHD_9C126E();
+void __stdcall playerGetHitboxHD_9C11A5();
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);

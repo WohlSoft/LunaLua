@@ -992,7 +992,7 @@ static void __stdcall runtimeHookSetMountColor(PlayerMOB* player, NPCMOB* npc)
         player->MountColor = col;
 }
 
-_declspec(naked) void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* player, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookSetMountColor_BootWrapper()
 {
     __asm {
         LEA EDX, [EDX + ECX * 8] // NPC address
@@ -1004,7 +1004,7 @@ _declspec(naked) void __stdcall runtimeHookSetMountColor_BootWrapper(PlayerMOB* 
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookSetMountColor_YoshiWrapper(PlayerMOB* player, NPCMOB* npc)
+_declspec(naked) void __stdcall runtimeHookSetMountColor_YoshiWrapper()
 {
     __asm {
         POP ECX

@@ -1206,6 +1206,9 @@
     <ClCompile Include="FileManager\CustomParamStore.cpp">
       <Filter>FileManager</Filter>
     </ClCompile>
+    <ClCompile Include="RuntimeHookPlayerHitbox.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

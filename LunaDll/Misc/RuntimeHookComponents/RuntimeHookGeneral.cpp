@@ -472,6 +472,25 @@ void TrySkipPatch()
         .CALL(&WindowInactiveHook)
         .Apply();
 
+    // Player hitbox hooks
+    /* (commented out until an actual replacement function is made and not just debug)
+    PATCH(0x99986D).CALL(playerGetHitboxHD_99986D).NOP_PAD_TO_SIZE<44>().Apply();
+    PATCH(0x9A04B6).CALL(playerGetHitboxHD_9A04B6).NOP_PAD_TO_SIZE<51>().Apply();
+    PATCH(0x9A5054).CALL(playerGetHitboxHD_9A04B6).NOP_PAD_TO_SIZE<44>().Apply(); // Reuses hook from 0x9A04B6
+    PATCH(0x9AEA14).NOPS<37>().Apply(); // NOP out bounds check for next patch
+    PATCH(0x9AEA8A).CALL(playerGetHitboxHD_9AEA8A).NOP_PAD_TO_SIZE<10>().Apply();
+    PATCH(0x9BE947).NOPS<14>().Apply(); // NOP out bounds check for next patch
+    PATCH(0x9BE963).CALL(playerGetHitboxHD_9BE963).NOP_PAD_TO_SIZE<64>().Apply();
+    PATCH(0x9C100F).NOPS<30>().Apply(); // NOP out bounds check for next patch
+    PATCH(0x9C1030).CALL(playerGetHitboxHD_9C1030).NOP_PAD_TO_SIZE<59>().Apply();
+    PATCH(0x9C0F65).NOPS<30>().Apply(); // NOP out bounds check for next patch
+    PATCH(0x9C0F86).CALL(playerGetHitboxHD_9C0F86).NOP_PAD_TO_SIZE<56>().Apply();
+    PATCH(0x9C10C5).NOPS<30>().Apply(); // NOP out bounds check for next patch
+    PATCH(0x9C10E6).CALL(playerGetHitboxHD_9C10E6).NOP_PAD_TO_SIZE<56>().Apply();
+    PATCH(0x9C126E).CALL(playerGetHitboxHD_9C126E).NOP_PAD_TO_SIZE<96>().Apply();
+    PATCH(0x9C11A5).CALL(playerGetHitboxHD_9C11A5).NOP_PAD_TO_SIZE<99>().Apply();
+    */
+
     // PATCH(0x96CC61).TRACE_CALL<&HardcodedGraphicsBitBltHook>().Apply();
 
     // Don't trust QPC as much on WinXP
