@@ -131,6 +131,7 @@ static int16_t npcprop_nowaterphysics[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessgrab[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_linkshieldable[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -142,6 +143,7 @@ void NPC::InitProperties() {
         npcprop_harmlessgrab[i] = 0;
         npcprop_harmlessthrown[i] = 0;
         npcprop_ignorethrownnpcs[i] = 0;
+        npcprop_linkshieldable[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -195,6 +197,18 @@ void NPC::InitProperties() {
     npcprop_harmlessgrab[0x116] = -1;
     npcprop_harmlessgrab[0x117] = -1;
     npcprop_harmlessgrab[0x124] = -1;
+
+    // Set built-in link shieldable NPCs
+    // Player projectiles aren't here since they're only shieldable in battle mode
+    npcprop_linkshieldable[0x57] = -1;
+    npcprop_linkshieldable[0x114] = -1;
+    npcprop_linkshieldable[0x55] = -1;
+    npcprop_linkshieldable[0x85] = -1;
+    npcprop_linkshieldable[0xF6] = -1;
+    npcprop_linkshieldable[0x1E] = -1;
+    npcprop_linkshieldable[0xCA] = -1;
+    npcprop_linkshieldable[0xD2] = -1;
+
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -228,6 +242,11 @@ bool NPC::GetIgnoreThrownNPCs(int id) {
     return (npcprop_ignorethrownnpcs[id] != 0);
 }
 
+bool NPC::GetLinkShieldable(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_linkshieldable[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -254,6 +273,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "ignorethrownnpcs")
     {
         return reinterpret_cast<uintptr_t>(npcprop_ignorethrownnpcs);
+    }
+    else if (s == "linkshieldable")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_linkshieldable);
     }
     else
     {

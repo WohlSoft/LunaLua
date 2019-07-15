@@ -417,6 +417,12 @@ void TrySkipPatch()
         .NOP_PAD_TO_SIZE<35>()
         .Apply();
 
+    // linkShieldable check
+    PATCH(0xA52CB5)
+        .CALL(&runtimeHookLinkShieldable_Wrapper)
+        .NOP_PAD_TO_SIZE<56>()
+        .Apply();
+
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)
         .CALL(&CameraUpdateHook_Wrapper)

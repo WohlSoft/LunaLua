@@ -85,6 +85,7 @@ extern void __stdcall InitLevelEnvironmentHook();
 extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper();
+extern void __stdcall runtimeHookLinkShieldable_Wrapper();
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 

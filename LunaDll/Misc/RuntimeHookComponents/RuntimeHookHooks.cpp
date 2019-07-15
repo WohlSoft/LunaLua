@@ -1027,6 +1027,44 @@ runtimeHookIgnoreThrownNPCs_IsFalse:
     }
 }
 
+static int __stdcall runtimeHookLinkShieldable(NPCMOB* npc)
+{
+    if (NPC::GetLinkShieldable(npc->id))
+        return 1;
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookLinkShieldable_Wrapper()
+{
+    __asm {
+        PUSH EAX // Store EAX if needed in false branch
+        LEA EAX, [EAX + EDX * 8] // Get NPC address
+
+        PUSHFD // Save pre-call state
+        PUSH ECX
+        PUSH EDX
+
+        PUSH EAX // Push NPC argument
+        CALL runtimeHookLinkShieldable // Call the target function
+
+        POP EDX // Restore state
+        POP ECX
+        POPFD
+
+        CMP EAX, 0 // Check if return value is false
+        JE runtimeHookLinkShieldable_IsFalse
+
+        POP EAX // Remove old eax from the stack
+        POP EAX // Remove return address from stack
+        PUSH 0xA52D11 // And skip checks
+        RET
+
+        runtimeHookLinkShieldable_IsFalse :
+        POP EAX // Restore old value of EAX
+        RET // Continue on with battle mode checks
+    }
+}
+
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
