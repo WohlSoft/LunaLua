@@ -132,6 +132,7 @@ static int16_t npcprop_harmlessgrab[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_linkshieldable[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -144,6 +145,7 @@ void NPC::InitProperties() {
         npcprop_harmlessthrown[i] = 0;
         npcprop_ignorethrownnpcs[i] = 0;
         npcprop_linkshieldable[i] = 0;
+        npcprop_noshieldfireeffect[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -208,7 +210,12 @@ void NPC::InitProperties() {
     npcprop_linkshieldable[0x1E] = -1;
     npcprop_linkshieldable[0xCA] = -1;
     npcprop_linkshieldable[0xD2] = -1;
-
+    // And which shouldn't create fire effects
+    npcprop_noshieldfireeffect[0xCA] = -1;
+    npcprop_noshieldfireeffect[0xD2] = -1;
+    npcprop_noshieldfireeffect[0xAB] = -1;
+    npcprop_noshieldfireeffect[0xD] = -1;
+    npcprop_noshieldfireeffect[0x109] = -1;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -247,6 +254,11 @@ bool NPC::GetLinkShieldable(int id) {
     return (npcprop_linkshieldable[id] != 0);
 }
 
+bool NPC::GetNoShieldFireEffect(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_linkshieldable[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -277,6 +289,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "linkshieldable")
     {
         return reinterpret_cast<uintptr_t>(npcprop_linkshieldable);
+    }
+    else if (s == "noshieldfireeffect")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_noshieldfireeffect);
     }
     else
     {

@@ -1065,6 +1065,36 @@ _declspec(naked) void __stdcall runtimeHookLinkShieldable_Wrapper()
     }
 }
 
+static int __stdcall runtimeHookNoShieldFireEffect(NPCMOB* npc)
+{
+    if (NPC::GetNoShieldFireEffect(npc->id))
+        return 1;
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
+{
+    __asm {
+        PUSHFD // Save pre-call state
+        PUSH EAX
+        PUSH EDX 
+
+        PUSH ESI // Push NPC argument
+        CALL runtimeHookNoShieldFireEffect // Call the target function
+
+        CMP EAX, 0 // Check if return value is false
+        POP EDX // Restore state
+        POP EAX
+        POPFD
+        JNE runtimeHookNoShieldFireEffect_IsTrue
+
+        POP ECX // Remove return address from stack
+        PUSH 0xA53384 // And skip effects
+        runtimeHookNoShieldFireEffect_IsTrue :
+        RET
+    }
+}
+
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {

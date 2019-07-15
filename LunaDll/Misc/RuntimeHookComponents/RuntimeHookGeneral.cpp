@@ -423,6 +423,13 @@ void TrySkipPatch()
         .NOP_PAD_TO_SIZE<56>()
         .Apply();
 
+    // noShieldFireEffect check
+    PATCH(0xA530B7)
+        .CALL(&runtimeHookNoShieldFireEffect_Wrapper)
+        .NOP_PAD_TO_SIZE<56>()
+        .Apply();
+
+
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)
         .CALL(&CameraUpdateHook_Wrapper)
