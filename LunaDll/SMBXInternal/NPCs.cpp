@@ -216,6 +216,7 @@ void NPC::InitProperties() {
     npcprop_noshieldfireeffect[0xAB] = -1;
     npcprop_noshieldfireeffect[0xD] = -1;
     npcprop_noshieldfireeffect[0x109] = -1;
+    npcprop_noshieldfireeffect[0x1E] = -1;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -256,7 +257,7 @@ bool NPC::GetLinkShieldable(int id) {
 
 bool NPC::GetNoShieldFireEffect(int id) {
     if ((id < 1) || (id > NPC::MAX_ID)) return false;
-    return (npcprop_linkshieldable[id] != 0);
+    return (npcprop_noshieldfireeffect[id] != 0);
 }
 
 // Getter for address of NPC property arrays

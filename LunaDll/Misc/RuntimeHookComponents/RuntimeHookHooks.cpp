@@ -1083,14 +1083,19 @@ _declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
         CALL runtimeHookNoShieldFireEffect // Call the target function
 
         CMP EAX, 0 // Check if return value is false
+        JNE runtimeHookNoShieldFireEffect_IsTrue
+
         POP EDX // Restore state
         POP EAX
         POPFD
-        JNE runtimeHookNoShieldFireEffect_IsTrue
+        RET
 
+        runtimeHookNoShieldFireEffect_IsTrue :
+        POP EDX // Restore state
+        POP EAX
+        POPFD
         POP ECX // Remove return address from stack
         PUSH 0xA53384 // And skip effects
-        runtimeHookNoShieldFireEffect_IsTrue :
         RET
     }
 }
