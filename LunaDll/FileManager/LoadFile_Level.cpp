@@ -26,7 +26,8 @@
 #define LIMIT_NPCS     5000
 #define LIMIT_WARPS    2000
 #define LIMIT_PHYSENV  450
-#define LIMIT_LAYERS   100
+// Old: #define LIMIT_LAYERS   100
+#define LIMIT_LAYERS   255
 // Old: #define LIMIT_EVENTS   100
 #define LIMIT_EVENTS   255
 #define LIMIT_SECTIONS 21

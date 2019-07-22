@@ -5,7 +5,7 @@
 luabind::object LuaProxy::Layer::get(lua_State *L)
 {
     luabind::object layers = luabind::newtable(L);
-    for (int i = 0; i < 100; ++i){
+    for (int i = 0; i < 255; ++i){
         ::LayerControl* l = LayerControl::Get(i);
         if (!l->ptLayerName)
             break;
@@ -18,7 +18,7 @@ luabind::object LuaProxy::Layer::get(lua_State *L)
 
 luabind::object LuaProxy::Layer::get(const std::string& layerName, lua_State* L)
 {
-    for (int i = 0; i < 100; ++i){
+    for (int i = 0; i < 255; ++i){
         ::LayerControl* l = LayerControl::Get(i);
         if (!l->ptLayerName)
             break;
@@ -33,7 +33,7 @@ luabind::object LuaProxy::Layer::get(const std::string& layerName, lua_State* L)
 luabind::object LuaProxy::Layer::find(const std::string& layerName, lua_State* L)
 {
     luabind::object foundLayers = luabind::newtable(L);
-    for (int i = 0, j = 0; i < 100; ++i){
+    for (int i = 0, j = 0; i < 255; ++i){
         ::LayerControl* l = LayerControl::Get(i);
         if (!l->ptLayerName)
             break;

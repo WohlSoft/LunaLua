@@ -176,6 +176,9 @@ static unsigned int __stdcall LatePatch(void)
     // Patch the event limit...
     fixup_EventLimit();
 
+    // Patch the layer limit...
+    fixup_LayerLimit();
+
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 

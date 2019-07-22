@@ -4,7 +4,7 @@
 
 // Get a pointer to a layer based on index
 LayerControl* Layer::Get(int index) {
-    if(index > 100 && index >= 0)
+    if(index > 255 && index >= 0)
         return 0;
 
     LayerControl* layers = (LayerControl*)GM_LAYER_ARRAY_PTR;
