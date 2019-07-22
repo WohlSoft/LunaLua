@@ -9,7 +9,7 @@ SMBXEvent* SMBXEvents::Get(int index) {
 SMBXEvent* SMBXEvents::GetByName(std::wstring Name) {	
     SMBXEvent* pEventBase = (SMBXEvent*)GM_EVENTS_PTR;
 
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 255; i++) {
         if(pEventBase[i].pName == Name)
             return &(pEventBase[i]);
     }

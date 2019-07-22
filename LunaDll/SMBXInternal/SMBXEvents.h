@@ -109,7 +109,7 @@
 //+0x588	w	= Auto start
 
 #pragma pack(push, 1)
-struct SMBXEvent : SMBX_StaticBaseItemArray<SMBXEvent, 100, GM_EVENTS_PTR_CONSTPTR>
+struct SMBXEvent : SMBX_StaticBaseItemArray<SMBXEvent, 255, GM_EVENTS_PTR_CONSTPTR>
 {
     short NoSmoke;                  // 0x00 (0xFFFF == no smoke, 0 == smoke)
     short SoundID;                  // 0x02

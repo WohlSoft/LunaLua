@@ -142,6 +142,7 @@ extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 void fixup_TypeMismatch13();
 void fixup_ErrorReporting();
 void fixup_WarpLimit();
+void fixup_EventLimit();
 void fixup_WebBox();
 void fixup_Credits();
 void fixup_Mushbug();

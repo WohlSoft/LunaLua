@@ -173,6 +173,9 @@ static unsigned int __stdcall LatePatch(void)
     // warp array after it's been assigned to in the first place.
     fixup_WarpLimit();
 
+    // Patch the event limit...
+    fixup_EventLimit();
+
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 
