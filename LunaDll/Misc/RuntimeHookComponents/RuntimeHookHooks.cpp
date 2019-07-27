@@ -985,6 +985,122 @@ _declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlay
     }
 }
 
+static int __stdcall runtimeHookIgnoreThrownNPCs(NPCMOB* npc)
+{
+    // Only takes the NPC which is being collided with, not the thrown NPC itself
+    int npcID = npc->id;
+    if (npcID >= 1 && npcID <= NPC::MAX_ID) {
+        // Vanilla check overwritten by hook
+        WORD* interactableArray = (WORD*)isInteractableNPC_ptr;
+        if (interactableArray[npcID] != 0) {
+            return 1;
+        }
+        // Custom flag check
+        if (NPC::GetIgnoreThrownNPCs(npcID)) {
+            return 1;
+        }
+
+    }
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper()
+{
+    __asm {
+        LEA ECX, [ECX + EAX * 8] // Get NPC address
+        POP EAX // Remove return address from stack
+        PUSHFD // Save pre-call state
+        PUSH ECX 
+        PUSH EDX
+        PUSH ECX // Push NPC argument
+        CALL runtimeHookIgnoreThrownNPCs // Call the target function
+        POP EDX // Restore state
+        POP ECX
+        POPFD
+        CMP EAX, 0 // Check if return value is false
+        JE runtimeHookIgnoreThrownNPCs_IsFalse
+        PUSH 0xA1BAD5 // Otherwise exits to path of code where killing is skipped
+        RET
+runtimeHookIgnoreThrownNPCs_IsFalse:
+        PUSH 0xA1AA75 // Exits to path of code where NPC is killed
+        RET
+    }
+}
+
+static int __stdcall runtimeHookLinkShieldable(NPCMOB* npc)
+{
+    if (NPC::GetLinkShieldable(npc->id))
+        return 1;
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookLinkShieldable_Wrapper()
+{
+    __asm {
+        PUSH EAX // Store EAX if needed in false branch
+        LEA EAX, [EAX + EDX * 8] // Get NPC address
+
+        PUSHFD // Save pre-call state
+        PUSH ECX
+        PUSH EDX
+
+        PUSH EAX // Push NPC argument
+        CALL runtimeHookLinkShieldable // Call the target function
+
+        POP EDX // Restore state
+        POP ECX
+        POPFD
+
+        CMP EAX, 0 // Check if return value is false
+        JE runtimeHookLinkShieldable_IsFalse
+
+        POP EAX // Remove old eax from the stack
+        POP EAX // Remove return address from stack
+        PUSH 0xA52D11 // And skip checks
+        RET
+
+        runtimeHookLinkShieldable_IsFalse :
+        POP EAX // Restore old value of EAX
+        RET // Continue on with battle mode checks
+    }
+}
+
+static int __stdcall runtimeHookNoShieldFireEffect(NPCMOB* npc)
+{
+    if (NPC::GetNoShieldFireEffect(npc->id))
+        return 1;
+    return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
+{
+    __asm {
+        PUSHFD // Save pre-call state
+        PUSH EAX
+        PUSH EDX 
+
+        PUSH ESI // Push NPC argument
+        CALL runtimeHookNoShieldFireEffect // Call the target function
+
+        CMP EAX, 0 // Check if return value is false
+        JNE runtimeHookNoShieldFireEffect_IsTrue
+
+        POP EDX // Restore state
+        POP EAX
+        POPFD
+        RET
+
+        runtimeHookNoShieldFireEffect_IsTrue :
+        POP EDX // Restore state
+        POP EAX
+        POPFD
+        POP ECX // Remove return address from stack
+        PUSH 0xA53384 // And skip effects
+        RET
+    }
+}
+
+
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
     // Enforce rounded camera position

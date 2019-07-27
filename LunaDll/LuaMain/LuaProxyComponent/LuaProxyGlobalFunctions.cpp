@@ -425,7 +425,7 @@ luabind::object LuaProxy::findblocks(int ID, lua_State *L)
 luabind::object LuaProxy::findlayer(const std::string& layername, lua_State *L)
 {
     std::wstring tarLayerName = Str2WStr(layername);
-    for(int i = 0; i < 100; ++i){
+    for(int i = 0; i < 255; ++i){
         LayerControl* ctrl = ::Layer::Get(i);
         if(ctrl){
             if(!ctrl->ptLayerName)

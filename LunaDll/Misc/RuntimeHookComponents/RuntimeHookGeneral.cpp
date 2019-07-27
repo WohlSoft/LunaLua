@@ -173,6 +173,12 @@ static unsigned int __stdcall LatePatch(void)
     // warp array after it's been assigned to in the first place.
     fixup_WarpLimit();
 
+    // Patch the event limit...
+    fixup_EventLimit();
+
+    // Patch the layer limit...
+    fixup_LayerLimit();
+
     // Set new NPC ID limit...
     PatchNpcIdLimit();
 
@@ -410,6 +416,25 @@ void TrySkipPatch()
         .CALL(&runtimeHookNpcMsgbox_Wrapper)
         .NOP_PAD_TO_SIZE<5>()
         .Apply();
+
+    // ignoreThrownNPCs check
+    PATCH(0xA1AA52)
+        .CALL(&runtimeHookIgnoreThrownNPCs_Wrapper)
+        .NOP_PAD_TO_SIZE<35>()
+        .Apply();
+
+    // linkShieldable check
+    PATCH(0xA52CB5)
+        .CALL(&runtimeHookLinkShieldable_Wrapper)
+        .NOP_PAD_TO_SIZE<56>()
+        .Apply();
+
+    // noShieldFireEffect check
+    PATCH(0xA530B7)
+        .CALL(&runtimeHookNoShieldFireEffect_Wrapper)
+        .NOP_PAD_TO_SIZE<56>()
+        .Apply();
+
 
     // Okay redigit, I know your debug values are in general pretty dumb, but right now they are awesome for easy patching! Thx mate!
     PATCH(0x90C856)

@@ -84,6 +84,9 @@ extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
 extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
 extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper();
+extern void __stdcall runtimeHookLinkShieldable_Wrapper();
+extern void __stdcall runtimeHookNoShieldFireEffect_Wrapper();
 extern void __stdcall CameraUpdateHook_Wrapper();
 extern void __stdcall PostCameraUpdateHook_Wrapper();
 
@@ -139,6 +142,8 @@ extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 void fixup_TypeMismatch13();
 void fixup_ErrorReporting();
 void fixup_WarpLimit();
+void fixup_EventLimit();
+void fixup_LayerLimit();
 void fixup_WebBox();
 void fixup_Credits();
 void fixup_Mushbug();
