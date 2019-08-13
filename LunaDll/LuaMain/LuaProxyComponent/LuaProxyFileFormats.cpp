@@ -508,6 +508,50 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
 
+
+    outData["episodeTitle"]           = data.EpisodeTitle;
+    {
+        size_t counter = 0;
+        luabind::object sets = luabind::newtable(L);
+        for(bool &noCharacter : data.nocharacter)
+        {
+            sets[counter++] = noCharacter;
+        }
+        outData["disableCharacters"] = sets;
+    }
+
+    outData["introLevel"]           = data.IntroLevel_file;
+    outData["gameOverLevel"]        = data.GameOverLevel_file;
+    outData["isHubStyleWorld"]      = data.HubStyledWorld;
+    outData["autoRestartLevel"]     = data.restartlevel;
+    outData["restrictSinglePlayer"] = data.restrictSinglePlayer;
+    outData["restrictSecureGameSave"] = data.restrictSecureGameSave;
+    outData["disableEnterScreen"]   = data.disableEnterScreen;
+
+    outData["cheatsPolicy"] = data.cheatsPolicy;
+    {
+        size_t counter = 0;
+        luabind::object sets = luabind::newtable(L);
+        for(PGESTRING &cheat : data.cheatsList)
+        {
+            sets[counter++] = cheat;
+        }
+        outData["cheatsList"] = sets;
+    }
+    outData["saveResumePolicy"] = data.saveResumePolicy;
+    outData["saveAuto"]         = data.saveAuto;
+    outData["saveLocker"]       = data.saveLocker;
+    outData["saveLockerEx"]     = data.saveLockerEx;
+    outData["saveLockerMsg"]    = data.saveLockerMsg;
+    outData["showEverything"]   = data.showEverything;
+
+    outData["stars"]            = data.stars;
+    outData["inventoryLimit"]   = data.inventoryLimit;
+
+    outData["authors"]          = data.authors;
+
+    // TODO: Implement reading of in-map elements
+
     return outData;
 }
 
@@ -520,6 +564,47 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
 
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
+
+    outData["episodeTitle"]           = data.EpisodeTitle;
+    {
+        size_t counter = 0;
+        luabind::object sets = luabind::newtable(L);
+        for(bool &noCharacter : data.nocharacter)
+        {
+            sets[counter++] = noCharacter;
+        }
+        outData["disableCharacters"] = sets;
+    }
+
+    outData["introLevel"]           = data.IntroLevel_file;
+    outData["gameOverLevel"]        = data.GameOverLevel_file;
+    outData["isHubStyleWorld"]      = data.HubStyledWorld;
+    outData["autoRestartLevel"]     = data.restartlevel;
+    outData["restrictSinglePlayer"] = data.restrictSinglePlayer;
+    outData["restrictSecureGameSave"] = data.restrictSecureGameSave;
+    outData["disableEnterScreen"]   = data.disableEnterScreen;
+
+    outData["cheatsPolicy"] = data.cheatsPolicy;
+    {
+        size_t counter = 0;
+        luabind::object sets = luabind::newtable(L);
+        for(PGESTRING &cheat : data.cheatsList)
+        {
+            sets[counter++] = cheat;
+        }
+        outData["cheatsList"] = sets;
+    }
+    outData["saveResumePolicy"] = data.saveResumePolicy;
+    outData["saveAuto"]         = data.saveAuto;
+    outData["saveLocker"]       = data.saveLocker;
+    outData["saveLockerEx"]     = data.saveLockerEx;
+    outData["saveLockerMsg"]    = data.saveLockerMsg;
+    outData["showEverything"]   = data.showEverything;
+
+    outData["stars"]            = data.stars;
+    outData["inventoryLimit"]   = data.inventoryLimit;
+
+    outData["authors"]          = data.authors;
 
     return outData;
 }
