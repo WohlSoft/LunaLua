@@ -44,11 +44,11 @@ void RenderBitmapOp::Draw(Renderer* renderer) {
     int height = static_cast<int>(round(this->sh));
 
     // Trim height/width if necessary
-    if (direct_img->getW() < width + sx)
+    if (direct_img->getW() < static_cast<unsigned int>(width + sx))
     {
         width = direct_img->getW() - sx;
     }
-    if (direct_img->getH() < height + sy)
+    if (direct_img->getH() < static_cast<unsigned int>(height + sy))
     {
         height = direct_img->getH() - sy;
     }

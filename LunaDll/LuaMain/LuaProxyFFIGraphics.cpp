@@ -122,7 +122,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
         ))
     {
         float* vertColorData = (float*)obj->mVertColor;
-        for (int i = 0; i < obj->mCount; i++)
+        for (unsigned int i = 0; i < obj->mCount; i++)
         {
             vertColorData[4*i+0] *= obj->mColor[0];
             vertColorData[4*i+1] *= obj->mColor[1];

@@ -1004,7 +1004,7 @@ namespace LuaProxy {
         luabind::object openLevelHeader(const std::string &filePath, lua_State *L);
         luabind::object openWorld(const std::string &filePath, lua_State *L);
         luabind::object openWorldHeader(const std::string &filePath, lua_State *L);
-        NPCConfigFile openNpcConfig(const std::string &filePath, lua_State *L);
+        luabind::object openNpcConfig(const std::string &filePath, lua_State *L);
     }
 
     //Non-Member-Constructors:

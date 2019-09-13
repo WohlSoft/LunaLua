@@ -428,7 +428,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             }
 
             e["triggerEvent"] = event.trigger;
-            e["triggerEventTimeUnit"] = event.trigger_timer_unit;
+            e["triggerEventTimeUnit"] = static_cast<int>(event.trigger_timer_unit);
             e["triggerEventTimer"] = event.trigger_timer;
             e["triggerEventTimerOrig"] = event.trigger_timer_orig;
 
@@ -513,7 +513,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         size_t counter = 0;
         luabind::object sets = luabind::newtable(L);
-        for(bool &noCharacter : data.nocharacter)
+        for(bool noCharacter : data.nocharacter)
         {
             sets[counter++] = noCharacter;
         }
@@ -569,7 +569,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     {
         size_t counter = 0;
         luabind::object sets = luabind::newtable(L);
-        for(bool &noCharacter : data.nocharacter)
+        for(bool noCharacter : data.nocharacter)
         {
             sets[counter++] = noCharacter;
         }
@@ -606,14 +606,220 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
 
     outData["authors"]          = data.authors;
 
+    // Terrain tiles
+    {
+        luabind::object arr = luabind::newtable(L);
+        size_t counter = 0;
+        for(WorldTerrainTile & terra : data.tiles)
+        {
+            luabind::object e = luabind::newtable(L);
+            e["x"]         = terra.x;
+            e["y"]         = terra.y;
+            e["id"]        = terra.id;
+            e["gfx_dx"]    = terra.gfx_dx;
+            e["gfx_dy"]    = terra.gfx_dy;
+            e["layer"]     = terra.layer;
+            e["meta"] = getMeta(terra.meta, L);
+            arr[counter++] = e;
+        }
+        outData["terrain"] = arr;
+    }
+
+    // Scenery
+    {
+        luabind::object arr = luabind::newtable(L);
+        size_t counter = 0;
+        for(WorldScenery & scene : data.scenery)
+        {
+            luabind::object e = luabind::newtable(L);
+            e["x"]         = scene.x;
+            e["y"]         = scene.y;
+            e["id"]        = scene.id;
+            e["gfx_dx"]    = scene.gfx_dx;
+            e["gfx_dy"]    = scene.gfx_dy;
+            e["layer"]     = scene.layer;
+            e["meta"] = getMeta(scene.meta, L);
+            arr[counter++] = e;
+        }
+        outData["scenery"] = arr;
+    }
+
+    // Paths
+    {
+        luabind::object arr = luabind::newtable(L);
+        size_t counter = 0;
+        for(WorldPathTile & path : data.paths)
+        {
+            luabind::object e = luabind::newtable(L);
+            e["x"]         = path.x;
+            e["y"]         = path.y;
+            e["id"]        = path.id;
+            e["gfx_dx"]    = path.gfx_dx;
+            e["gfx_dy"]    = path.gfx_dy;
+            e["layer"]     = path.layer;
+            e["meta"]      = getMeta(path.meta, L);
+            arr[counter++] = e;
+        }
+        outData["paths"] = arr;
+    }
+
+    // Levels
+    {
+        luabind::object arr = luabind::newtable(L);
+        size_t counter = 0;
+        for(WorldLevelTile & path : data.levels)
+        {
+            luabind::object e = luabind::newtable(L);
+            e["x"]         = path.x;
+            e["y"]         = path.y;
+            e["id"]        = path.id;
+            e["gfx_dx"]    = path.gfx_dx;
+            e["gfx_dy"]    = path.gfx_dy;
+
+            e["levelFile"] = path.lvlfile;
+            e["title"]     = path.title;
+            e["exitTop"]   = path.top_exit;
+            e["exitLeft"]  = path.left_exit;
+            e["exitRight"] = path.right_exit;
+            e["exitBottom"] = path.bottom_exit;
+
+            e["isAlwaysVisible"]  = path.alwaysVisible;
+            e["pathBg"]         = path.pathbg;
+            e["pathBigBg"]      = path.bigpathbg;
+            e["isGameStartPoint"] = path.gamestart;
+            e["isForceStart"] = path.forceStart;
+            e["disableStartCoinsCount"] = path.disableStarCoinsCount;
+            e["destroyOnCompleting"] = path.destroyOnCompleting;
+
+            e["goToX"] = path.gotox;
+            e["goToY"] = path.gotoy;
+
+            e["layer"]     = path.layer;
+            e["meta"]      = getMeta(path.meta, L);
+            arr[counter++] = e;
+        }
+        outData["levels"] = arr;
+    }
+
+    // Music
+    {
+        luabind::object arr = luabind::newtable(L);
+        size_t counter = 0;
+        for(WorldMusicBox & musicBox : data.music)
+        {
+            luabind::object e = luabind::newtable(L);
+            e["x"]         = musicBox.x;
+            e["y"]         = musicBox.y;
+            e["id"]        = musicBox.id;
+            e["musicFile"] = musicBox.music_file;
+            e["layer"]     = musicBox.layer;
+            e["meta"]      = getMeta(musicBox.meta, L);
+            arr[counter++] = e;
+        }
+        outData["musicBoxes"] = arr;
+    }
+
     return outData;
 }
 
 
-NPCConfigFile LuaProxy::Formats::openNpcConfig(const std::string &filePath, lua_State *L)
+luabind::object LuaProxy::Formats::openNpcConfig(const std::string &filePath, lua_State *L)
 {
     NPCConfigFile data;
     std::string full_path = getFullPath(filePath);
     FileFormats::ReadNpcTXTFileF(full_path, data);
-    return data;
+
+    luabind::object outData = luabind::newtable(L);
+
+    outData["isValid"] = data.ReadFileValid;
+    outData["errorString"] = data.errorString;
+    outData["unknownLines"] = data.unknownLines;
+
+    /* SMBX64 */
+
+    if(data.en_gfxoffsetx)
+        outData["gfxoffsetx"] = data.gfxoffsetx;
+    if(data.en_gfxoffsety)
+        outData["gfxoffsety"] = data.gfxoffsety;
+    if(data.en_width)
+        outData["width"] = data.width;
+    if(data.en_height)
+        outData["height"] = data.height;
+    if(data.en_gfxwidth)
+        outData["gfxwidth"] = data.gfxwidth;
+    if(data.en_gfxheight)
+        outData["gfxheight"] = data.gfxheight;
+    if(data.en_score)
+        outData["score"] = data.score;
+    if(data.en_playerblock)
+        outData["playerblock"] = data.playerblock;
+    if(data.en_playerblocktop)
+        outData["playerblocktop"] = data.playerblocktop;
+    if(data.en_npcblock)
+        outData["npcblock"] = data.npcblock;
+    if(data.en_npcblocktop)
+        outData["npcblocktop"] = data.npcblocktop;
+    if(data.en_grabside)
+        outData["grabside"] = data.grabside;
+    if(data.en_grabtop)
+        outData["grabtop"] = data.grabtop;
+    if(data.en_jumphurt)
+        outData["jumphurt"] = data.jumphurt;
+    if(data.en_nohurt)
+        outData["nohurt"] = data.nohurt;
+    if(data.en_noblockcollision)
+        outData["noblockcollision"] = data.noblockcollision;
+    if(data.en_cliffturn)
+        outData["cliffturn"] = data.cliffturn;
+    if(data.en_noyoshi)
+        outData["noyoshi"] = data.noyoshi;
+    if(data.en_foreground)
+        outData["foreground"] = data.foreground;
+    if(data.en_speed)
+        outData["speed"] = data.speed;
+    if(data.en_nofireball)
+        outData["nofireball"] = data.nofireball;
+    if(data.en_nogravity)
+        outData["nogravity"] = data.nogravity;
+    if(data.en_frames)
+        outData["frames"] = data.frames;
+    if(data.en_framespeed)
+        outData["framespeed"] = data.framespeed;
+    if(data.en_framestyle)
+        outData["framestyle"] = data.framestyle;
+    if(data.en_noiceball)
+        outData["noiceball"] = data.noiceball;
+
+    /* Extended */
+
+    if(data.en_nohammer)
+        outData["nohammer"] = data.nohammer;
+    if(data.en_noshell)
+        outData["noshell"] = data.noshell;
+    if(data.en_name)
+        outData["name"] = data.name;
+    if(data.en_description)
+        outData["description"] = data.description;
+    if(data.en_health)
+        outData["health"] = data.health;
+    if(data.en_image)
+        outData["image"] = data.image;
+    if(data.en_icon)
+        outData["icon"] = data.icon;
+    if(data.en_script)
+        outData["script"] = data.script;
+    if(data.en_group)
+        outData["group"] = data.group;
+    if(data.en_category)
+        outData["category"] = data.category;
+    if(data.en_grid)
+        outData["grid"] = data.grid;
+    if(data.en_gridoffsetx)
+        outData["gridoffsetx"] = data.gridoffsetx;
+    if(data.en_gridoffsety)
+        outData["gridoffsety"] = data.gridoffsety;
+    if(data.en_gridalign)
+        outData["gridalign"] = data.gridalign;
+
+    return outData;
 }
