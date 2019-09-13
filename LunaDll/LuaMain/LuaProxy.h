@@ -1000,10 +1000,10 @@ namespace LuaProxy {
     }
 
     namespace Formats{
-        luabind::object openLevel(const std::string &filePath, lua_State *L);
         luabind::object openLevelHeader(const std::string &filePath, lua_State *L);
-        luabind::object openWorld(const std::string &filePath, lua_State *L);
+        luabind::object openLevel(const std::string &filePath, lua_State *L);
         luabind::object openWorldHeader(const std::string &filePath, lua_State *L);
+        luabind::object openWorld(const std::string &filePath, lua_State *L);
         luabind::object openNpcConfig(const std::string &filePath, lua_State *L);
     }
 

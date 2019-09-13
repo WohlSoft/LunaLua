@@ -42,6 +42,22 @@ static luabind::object getMeta(const ElementMeta &inMeta, lua_State *L)
     return meta;
 }
 
+luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, lua_State *L)
+{
+    LevelData data;
+    std::string full_path = getFullPath(filePath);
+    FileFormats::OpenLevelFileHeader(full_path, data);
+
+    luabind::object outData = luabind::newtable(L);
+    outData["meta"] = getMeta(data.meta, L);
+
+    outData["levelName"]              = data.LevelName;
+    outData["openLevelOnFail"]        = data.open_level_on_fail;
+    outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
+
+    return outData;
+}
+
 luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_State *L)
 {
     LevelData data;
@@ -482,28 +498,11 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 }
 
 
-luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, lua_State *L)
-{
-    LevelData data;
-    std::string full_path = getFullPath(filePath);
-    FileFormats::OpenLevelFileHeader(full_path, data);
-
-    luabind::object outData = luabind::newtable(L);
-    outData["meta"] = getMeta(data.meta, L);
-
-    outData["levelName"]              = data.LevelName;
-    outData["openLevelOnFail"]        = data.open_level_on_fail;
-    outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-
-    return outData;
-}
-
-
-luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_State *L)
+luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, lua_State *L)
 {
     WorldData data;
     std::string full_path = getFullPath(filePath);
-    FileFormats::OpenWorldFile(full_path, data);
+    FileFormats::OpenWorldFileHeader(full_path, data);
 
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
@@ -550,17 +549,15 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
 
     outData["authors"]          = data.authors;
 
-    // TODO: Implement reading of in-map elements
-
     return outData;
 }
 
 
-luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, lua_State *L)
+luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_State *L)
 {
     WorldData data;
     std::string full_path = getFullPath(filePath);
-    FileFormats::OpenWorldFileHeader(full_path, data);
+    FileFormats::OpenWorldFile(full_path, data);
 
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
