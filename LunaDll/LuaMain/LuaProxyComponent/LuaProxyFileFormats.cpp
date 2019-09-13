@@ -77,7 +77,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
         for(LevelData::MusicOverrider & mo : data.music_overrides)
         {
             luabind::object e = luabind::newtable(L);
-            e["type"]       = mo.type;
+            e["type"]       = static_cast<int>(mo.type);
             e["id"]         = mo.id;
             e["fileName"]   = mo.fileName;
             arr[counter++] = e;
@@ -91,7 +91,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
         for(LevelData::MusicOverrider & mo : data.sound_overrides)
         {
             luabind::object e = luabind::newtable(L);
-            e["type"]       = mo.type;
+            e["type"]       = static_cast<int>(mo.type);
             e["id"]         = mo.id;
             e["fileName"]   = mo.fileName;
             arr[counter++] = e;
@@ -120,6 +120,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["wrapH"]      = sct.wrap_h;
             e["wrapV"]      = sct.wrap_v;
             e["offScreenExit"] = sct.OffScreenEn;
+            e["lightingValue"] = sct.lighting_value;
             e["lockLeftScrool"] = sct.lock_left_scroll;
             e["lockRightScrool"] = sct.lock_right_scroll;
             e["lockUpScrool"] = sct.lock_up_scroll;
@@ -231,6 +232,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
                 gen["type"] = npc.generator_type;
                 gen["period"] = npc.generator_period;
                 gen["periodFrames"] = npc.generator_period_orig;
+                gen["periodOrignUnit"] = static_cast<int>(npc.generator_period_orig_unit);
                 gen["customAngle"] = npc.generator_custom_angle;
                 gen["initialSpeed"] = npc.generator_initial_speed;
                 e["generator"]     = gen;
@@ -444,8 +446,8 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             }
 
             e["triggerEvent"] = event.trigger;
-            e["triggerEventTimeUnit"] = static_cast<int>(event.trigger_timer_unit);
             e["triggerEventTimer"] = event.trigger_timer;
+            e["triggerEventTimerOrigUnit"] = static_cast<int>(event.trigger_timer_unit);
             e["triggerEventTimerOrig"] = event.trigger_timer_orig;
 
             e["controlsEnable"] = event.ctrls_enable;
@@ -492,7 +494,6 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
         }
         outData["events"] = arr;
     }
-
 
     return outData;
 }
