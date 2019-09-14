@@ -15,7 +15,7 @@
 namespace LuaHelper {
     bool is_function(struct lua_State * luaState, const char * fname);
     void assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L);
-    
+
     class invalidIDException : std::exception {
     public:
         invalidIDException(int usedID) : std::exception() {
@@ -58,7 +58,7 @@ namespace LuaHelper {
 
 
     template<class T, char const* clsName>
-    struct LuaBaseClassUtils 
+    struct LuaBaseClassUtils
     {
         using cls = T;
 
@@ -117,6 +117,9 @@ namespace std {
 #define LUAHELPER_DEF_CLASS_HELPER(classType, name) \
     extern const char LUAHELPER_HELPCLASS_STR_NAME(name) [] = #name ; \
     typedef LuaHelper::LuaBaseClassUtils< classType , LUAHELPER_HELPCLASS_STR_NAME(name) > LUAHELPER_HELPCLASS_NAME(name) ;
+
+#define LUARAW_DEF_CLASS(name) \
+    luabind::class_< name >( #name )
 
 #define LUAHELPER_DEF_CLASS(name) \
     luabind::class_< LUAHELPER_HELPCLASS_NAME(name) ::cls>( LUAHELPER_HELPCLASS_NAME(name) ::getRawName()) \

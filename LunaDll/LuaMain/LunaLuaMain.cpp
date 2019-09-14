@@ -646,6 +646,115 @@ void CLunaLua::bindAll()
             ],
 
             namespace_("FileFormats")[
+                LUARAW_DEF_CLASS(LevelData)
+                    .enum_("Format")
+                    [
+                        value("PGEX",    LevelData::PGEX),
+                        value("SMBX64",  LevelData::SMBX64),
+                        value("SMBX38A", LevelData::SMBX38A)
+                    ],
+                LUARAW_DEF_CLASS(WorldData)
+                    .enum_("Format")
+                    [
+                        value("PGEX",    WorldData::PGEX),
+                        value("SMBX64",  WorldData::SMBX64),
+                        value("SMBX38A", WorldData::SMBX38A)
+                    ],
+                LUARAW_DEF_CLASS(LevelSection)
+                    .enum_("LightingValue")
+                    [
+                        value("LIGHTING_NOT_SET",       LevelSection::LIGHTING_NOT_SET),
+                        value("LIGHTING_DISABLED",      LevelSection::LIGHTING_DISABLED),
+                        value("LIGHTING_PIXELS_BEGIN",  LevelSection::LIGHTING_PIXELS_BEGIN)
+                    ],
+                LUARAW_DEF_CLASS(LevelBGO)
+                    .enum_("zmodes")
+                    [
+                        value("Background2", LevelBGO::Background2),
+                        value("Background1", LevelBGO::Background1),
+                        value("ZDefault",    LevelBGO::ZDefault),
+                        value("Foreground1", LevelBGO::Foreground1),
+                        value("Foreground2", LevelBGO::Foreground2)
+                    ],
+                LUARAW_DEF_CLASS(LevelNPC)
+                    .enum_("GeneratorDirection")
+                    [
+                        value("NPC_GEN_CENTER", LevelNPC::NPC_GEN_CENTER),
+                        value("NPC_GEN_UP", LevelNPC::NPC_GEN_UP),
+                        value("NPC_GEN_LEFT", LevelNPC::NPC_GEN_LEFT),
+                        value("NPC_GEN_DOWN", LevelNPC::NPC_GEN_DOWN),
+                        value("NPC_GEN_RIGHT", LevelNPC::NPC_GEN_RIGHT),
+                        value("NPC_GEN_UP_LEFT", LevelNPC::NPC_GEN_UP_LEFT),
+                        value("NPC_GEN_LEFT_DOWN", LevelNPC::NPC_GEN_LEFT_DOWN),
+                        value("NPC_GEN_DOWN_RIGHT", LevelNPC::NPC_GEN_DOWN_RIGHT),
+                        value("NPC_GEN_RIGHT_UP", LevelNPC::NPC_GEN_RIGHT_UP)
+                    ]
+                    .enum_("GeneratorTypes")
+                    [
+                        value("NPC_GENERATOR_APPEAR", LevelNPC::NPC_GENERATOR_APPEAR),
+                        value("NPC_GENERATOR_WARP", LevelNPC::NPC_GENERATOR_WARP),
+                        value("NPC_GENERATPR_PROJECTILE", LevelNPC::NPC_GENERATPR_PROJECTILE),
+                        value("NPC_GENERATPR_CUSTOM1", LevelNPC::NPC_GENERATPR_CUSTOM1),
+                        value("NPC_GENERATPR_CUSTOM2", LevelNPC::NPC_GENERATPR_CUSTOM2)
+                    ],
+                LUARAW_DEF_CLASS(LevelDoor)
+                    .enum_("EntranceDirectopn")
+                    [
+                        value("ENTRANCE_UP",    LevelDoor::ENTRANCE_UP),
+                        value("ENTRANCE_LEFT",  LevelDoor::ENTRANCE_LEFT),
+                        value("ENTRANCE_DOWN",  LevelDoor::ENTRANCE_DOWN),
+                        value("ENTRANCE_RIGHT", LevelDoor::ENTRANCE_RIGHT)
+                    ]
+                    .enum_("ExitDirectopn")
+                    [
+                        value("EXIT_UP",    LevelDoor::EXIT_UP),
+                        value("EXIT_LEFT",  LevelDoor::EXIT_LEFT),
+                        value("EXIT_DOWN",  LevelDoor::EXIT_DOWN),
+                        value("EXIT_RIGHT", LevelDoor::EXIT_RIGHT)
+                    ]
+                    .enum_("WarpType")
+                    [
+                        value("WARP_INSTANT",   LevelDoor::WARP_INSTANT),
+                        value("WARP_PIPE",      LevelDoor::WARP_PIPE),
+                        value("WARP_DOOR",      LevelDoor::WARP_DOOR),
+                        value("WARP_PORTAL",    LevelDoor::WARP_PORTAL)
+                    ]
+                    .enum_("WarpTransitEffect")
+                    [
+                        value("TRANSIT_NONE",           LevelDoor::TRANSIT_NONE),
+                        value("TRANSIT_SCROLL",         LevelDoor::TRANSIT_SCROLL),
+                        value("TRANSIT_FADE",           LevelDoor::TRANSIT_FADE),
+                        value("TRANSIT_CIRCLE_FADE",    LevelDoor::TRANSIT_CIRCLE_FADE),
+                        value("TRANSIT_FLIP_H",         LevelDoor::TRANSIT_FLIP_H),
+                        value("TRANSIT_FLIP_V",         LevelDoor::TRANSIT_FLIP_V)
+                    ],
+                LUARAW_DEF_CLASS(LevelPhysEnv)
+                    .enum_("EnvTypes")
+                    [
+                        value("ENV_WATER",           LevelPhysEnv::ENV_WATER),
+                        value("ENV_QUICKSAND",       LevelPhysEnv::ENV_QUICKSAND),
+                        value("ENV_CUSTOM_LIQUID",   LevelPhysEnv::ENV_CUSTOM_LIQUID),
+                        value("ENV_GRAVITATIONAL_FIELD",   LevelPhysEnv::ENV_GRAVITATIONAL_FIELD),
+                        value("ENV_TOUCH_EVENT_ONCE_PLAYER",   LevelPhysEnv::ENV_TOUCH_EVENT_ONCE_PLAYER),
+                        value("ENV_TOUCH_EVENT_PLAYER",   LevelPhysEnv::ENV_TOUCH_EVENT_PLAYER),
+                        value("ENV_TOUCH_EVENT_ONCE_NPC",   LevelPhysEnv::ENV_TOUCH_EVENT_ONCE_NPC),
+                        value("ENV_TOUCH_EVENT_NPC",   LevelPhysEnv::ENV_TOUCH_EVENT_NPC),
+                        value("ENV_CLICK_EVENT",   LevelPhysEnv::ENV_CLICK_EVENT),
+                        value("ENV_COLLISION_SCRIPT",   LevelPhysEnv::ENV_COLLISION_SCRIPT),
+                        value("ENV_CLICK_SCRIPT",   LevelPhysEnv::ENV_CLICK_SCRIPT),
+                        value("ENV_COLLISION_EVENT",   LevelPhysEnv::ENV_COLLISION_EVENT),
+                        value("ENV_AIR",   LevelPhysEnv::ENV_AIR),
+                        value("ENV_TOUCH_EVENT_ONCE_NPC1",   LevelPhysEnv::ENV_TOUCH_EVENT_ONCE_NPC1),
+                        value("ENV_TOUCH_EVENT_NPC1",   LevelPhysEnv::ENV_TOUCH_EVENT_NPC1),
+                        value("ENV_NPC_HURTING_FIELD",   LevelPhysEnv::ENV_NPC_HURTING_FIELD),
+                        value("ENV_SUBAREA",   LevelPhysEnv::ENV_SUBAREA)
+                    ],
+                LUARAW_DEF_CLASS(LevelEvent_Sets)
+                    .enum_("SetActions")
+                    [
+                        value("LESet_Nothing",   LevelEvent_Sets::LESet_Nothing),
+                        value("LESet_ResetDefault",   LevelEvent_Sets::LESet_ResetDefault)
+                    ],
                 def("openLevel", &LuaProxy::Formats::openLevel),
                 def("openLevelHeader", &LuaProxy::Formats::openLevelHeader),
                 def("openWorld", &LuaProxy::Formats::openWorld),
