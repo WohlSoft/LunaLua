@@ -216,7 +216,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["x"]         = npc.x;
             e["y"]         = npc.y;
             e["direction"] = npc.direct;
-            e["id"]        = npc.id;
+            e["id"]        = static_cast<unsigned long>(npc.id);
 
             e["gfxName"]   = npc.gfx_name;
             e["gfx_dx"]    = npc.gfx_dx;
