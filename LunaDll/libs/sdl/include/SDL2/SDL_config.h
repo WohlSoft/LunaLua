@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -184,6 +184,7 @@
 /* #undef HAVE_SEM_TIMEDWAIT */
 /* #undef HAVE_GETAUXVAL */
 /* #undef HAVE_POLL */
+/* #undef HAVE__EXIT */
 
 #elif __WIN32__
 #define HAVE_STDARG_H 1
@@ -267,7 +268,7 @@
 /* #undef SDL_AUDIO_DRIVER_SNDIO */
 /* #undef SDL_AUDIO_DRIVER_SNDIO_DYNAMIC */
 /* #undef SDL_AUDIO_DRIVER_SUNAUDIO */
-#define SDL_AUDIO_DRIVER_WASAPI 1
+/* #undef SDL_AUDIO_DRIVER_WASAPI */
 #define SDL_AUDIO_DRIVER_WINMM 1
 
 /* Enable various input drivers */
@@ -285,6 +286,7 @@
 /* #undef SDL_JOYSTICK_WINMM */
 /* #undef SDL_JOYSTICK_USBHID */
 /* #undef SDL_JOYSTICK_USBHID_MACHINE_JOYSTICK_H */
+#define SDL_JOYSTICK_HIDAPI 1
 /* #undef SDL_JOYSTICK_EMSCRIPTEN */
 /* #undef SDL_HAPTIC_DUMMY */
 /* #undef SDL_HAPTIC_LINUX */
@@ -339,9 +341,6 @@
 /* #undef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_CURSOR */
 /* #undef SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON */
 
-/* #undef SDL_VIDEO_DRIVER_MIR */
-/* #undef SDL_VIDEO_DRIVER_MIR_DYNAMIC */
-/* #undef SDL_VIDEO_DRIVER_MIR_DYNAMIC_XKBCOMMON */
 /* #undef SDL_VIDEO_DRIVER_EMSCRIPTEN */
 /* #undef SDL_VIDEO_DRIVER_X11 */
 /* #undef SDL_VIDEO_DRIVER_X11_DYNAMIC */
