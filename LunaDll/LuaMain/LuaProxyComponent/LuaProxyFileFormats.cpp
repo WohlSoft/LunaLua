@@ -18,7 +18,7 @@ static luabind::object getMeta(const FileFormatMeta &inMeta, lua_State *L)
     {
         luabind::object metaError = luabind::newtable(L);
         metaError["line"]       = inMeta.ERROR_linenum;
-        metaError["lineDate"]   = inMeta.ERROR_linedata;
+        metaError["lineData"]   = inMeta.ERROR_linedata;
         metaError["info"]       = inMeta.ERROR_info;
         meta["error"] = metaError;
     }
