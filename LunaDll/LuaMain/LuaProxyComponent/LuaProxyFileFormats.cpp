@@ -127,6 +127,8 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["lockDownScrool"] = sct.lock_down_scroll;
             e["isUnderWater"] = sct.underwater;
 
+            e["customParams"] = sct.custom_params;
+
             arr[counter++] = e;
         }
         outData["sections"] = arr;
