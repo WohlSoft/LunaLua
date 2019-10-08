@@ -38,7 +38,7 @@ static luabind::object getMeta(const ElementMeta &inMeta, lua_State *L)
     luabind::object meta = luabind::newtable(L);
     meta["arrayId"] = inMeta.array_id;
     meta["index"] = inMeta.index;
-    meta["customParams"] = inMeta.custom_params;
+    meta["data"] = inMeta.custom_params;
     return meta;
 }
 
@@ -54,7 +54,7 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["customParams"]           = data.custom_params;
+    outData["data"]                   = data.custom_params;
 
     return outData;
 }
@@ -71,7 +71,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["customParams"]           = data.custom_params;
+    outData["data"]                   = data.custom_params;
 
     {
         luabind::object arr = luabind::newtable(L);
@@ -129,7 +129,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["lockDownScrool"] = sct.lock_down_scroll;
             e["isUnderWater"] = sct.underwater;
 
-            e["customParams"] = sct.custom_params;
+            e["data"] = sct.custom_params;
 
             arr[counter++] = e;
         }
@@ -553,7 +553,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["customParams"]     = data.custom_params;
+    outData["data"]             = data.custom_params;
 
     return outData;
 }
@@ -608,7 +608,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["customParams"]     = data.custom_params;
+    outData["data"]             = data.custom_params;
 
     // Terrain tiles
     {
