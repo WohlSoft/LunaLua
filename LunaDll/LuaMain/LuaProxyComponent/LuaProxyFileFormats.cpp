@@ -54,6 +54,7 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
+    outData["customParams"]           = data.custom_params;
 
     return outData;
 }
@@ -70,6 +71,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
+    outData["customParams"]           = data.custom_params;
 
     {
         luabind::object arr = luabind::newtable(L);
@@ -551,6 +553,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
+    outData["customParams"]     = data.custom_params;
 
     return outData;
 }
@@ -605,6 +608,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
+    outData["customParams"]     = data.custom_params;
 
     // Terrain tiles
     {
