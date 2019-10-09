@@ -40,7 +40,10 @@ void LunaLua_loadLevelFile(LevelData &outData,
 
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
-    FileFormats::smbx64LevelSortBGOs(outData);
+    if(outData.meta.RecentFormat == LevelData::SMBX64)
+        FileFormats::smbx64LevelSortBGOs(outData);
+    else
+        FileFormats::smbx2bLevelSortBGOs(outData);
 
     size_t findLastSlash = fullPath.find_last_of(L"/\\");
 
