@@ -82,7 +82,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["type"]       = static_cast<int>(mo.type);
             e["id"]         = mo.id;
             e["fileName"]   = mo.fileName;
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["musicOverrides"] = arr;
     }
@@ -96,7 +96,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["type"]       = static_cast<int>(mo.type);
             e["id"]         = mo.id;
             e["fileName"]   = mo.fileName;
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["soundOverrides"] = arr;
     }
@@ -131,7 +131,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["data"] = sct.custom_params;
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["sections"] = arr;
     }
@@ -148,7 +148,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["w"]         = plr.w;
             e["h"]         = plr.h;
             e["direction"] = plr.direction;
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["players"] = arr;
     }
@@ -182,7 +182,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["meta"] = getMeta(block.meta, L);
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["blocks"] = arr;
     }
@@ -206,7 +206,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["meta"] = getMeta(bgo.meta, L);
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["bgo"] = arr;
     }
@@ -266,7 +266,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["meta"] = getMeta(npc.meta, L);
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["npc"] = arr;
     }
@@ -334,7 +334,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["meta"] = getMeta(warp.meta, L);
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["warps"] = arr;
     }
@@ -361,7 +361,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
 
             e["meta"] = getMeta(pez.meta, L);
 
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["physEnvZones"] = arr;
     }
@@ -376,7 +376,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["hidden"]       = layer.hidden;
             e["locked"]       = layer.locked;
             e["meta"] = getMeta(layer.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["layers"] = arr;
     }
@@ -398,21 +398,21 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
                 for(PGESTRING &l : event.layers_hide)
-                    ll[counter_2++] = l;
+                    ll[++counter_2] = l;
                 e["layersToHide"] = ll;
             }
             {
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
                 for(PGESTRING &l : event.layers_show)
-                    ll[counter_2++] = l;
+                    ll[++counter_2] = l;
                 e["layersToShow"] = ll;
             }
             {
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
                 for(PGESTRING &l : event.layers_toggle)
-                    ll[counter_2++] = l;
+                    ll[++counter_2] = l;
                 e["layersToToggle"] = ll;
             }
 
@@ -444,7 +444,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
                     set["expressionAutoscroolSpeedX"] = s.expression_autoscrool_x;
                     set["expressionAutoscroolSpeedY"] = s.expression_autoscrool_y;
 
-                    sets[counter_2++] = set;
+                    sets[++counter_2] = set;
                 }
                 e["sectionSets"] = sets;
             }
@@ -494,7 +494,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["moveCameraSection"] = event.scroll_section;
 
             e["meta"] = getMeta(event.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["events"] = arr;
     }
@@ -519,7 +519,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
         luabind::object sets = luabind::newtable(L);
         for(bool noCharacter : data.nocharacter)
         {
-            sets[counter++] = noCharacter;
+            sets[++counter] = noCharacter;
         }
         outData["disableCharacters"] = sets;
     }
@@ -538,7 +538,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
         luabind::object sets = luabind::newtable(L);
         for(PGESTRING &cheat : data.cheatsList)
         {
-            sets[counter++] = cheat;
+            sets[++counter] = cheat;
         }
         outData["cheatsList"] = sets;
     }
@@ -574,7 +574,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
         luabind::object sets = luabind::newtable(L);
         for(bool noCharacter : data.nocharacter)
         {
-            sets[counter++] = noCharacter;
+            sets[++counter] = noCharacter;
         }
         outData["disableCharacters"] = sets;
     }
@@ -593,7 +593,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
         luabind::object sets = luabind::newtable(L);
         for(PGESTRING &cheat : data.cheatsList)
         {
-            sets[counter++] = cheat;
+            sets[++counter] = cheat;
         }
         outData["cheatsList"] = sets;
     }
@@ -624,7 +624,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
             e["gfx_dy"]    = terra.gfx_dy;
             e["layer"]     = terra.layer;
             e["meta"] = getMeta(terra.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["terrain"] = arr;
     }
@@ -643,7 +643,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
             e["gfx_dy"]    = scene.gfx_dy;
             e["layer"]     = scene.layer;
             e["meta"] = getMeta(scene.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["scenery"] = arr;
     }
@@ -662,7 +662,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
             e["gfx_dy"]    = path.gfx_dy;
             e["layer"]     = path.layer;
             e["meta"]      = getMeta(path.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["paths"] = arr;
     }
@@ -700,7 +700,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
 
             e["layer"]     = path.layer;
             e["meta"]      = getMeta(path.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["levels"] = arr;
     }
@@ -718,7 +718,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
             e["musicFile"] = musicBox.music_file;
             e["layer"]     = musicBox.layer;
             e["meta"]      = getMeta(musicBox.meta, L);
-            arr[counter++] = e;
+            arr[++counter] = e;
         }
         outData["musicBoxes"] = arr;
     }
