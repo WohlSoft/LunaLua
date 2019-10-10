@@ -34,7 +34,7 @@ void GLEngine::InitForHDC(HDC hdcDest)
     }
     else {
         // TODO: Move mGifRecorder initialization somewhere else. It can't be
-        //       in the constructor due to when the constructor 
+        //       in the constructor due to when the constructor
         if (runOnce) {
             runOnce = false;
             mGifRecorder.init();
@@ -226,7 +226,7 @@ void GLEngine::EndFrame(HDC hdcDest)
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
     uint32_t byteSize = 3 * w * h;
 
-    // Generate handle 
+    // Generate handle
     HANDLE handle = (HANDLE)GlobalAlloc(GHND, sizeof(BITMAPINFOHEADER) + byteSize);
     if (handle == NULL) return false;
 
@@ -258,7 +258,7 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
         return false;
     }
 
-    
+
     bool releaseMem = true;
     if (mScreenshotCallback) {
         bool releaseMem = mScreenshotCallback(handle, &header, (void*)pPixelData, mHwnd);
@@ -271,7 +271,7 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
     if (releaseMem){
         GlobalFree(handle);
     }
-    
+
     mScreenshotCallback = nullptr;
     return true;
 }
@@ -311,7 +311,7 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
     }
 
     BYTE* pixData = new BYTE[w * (h + 1) * 4];
-    
+
     DWORD timestamp = GetTickCount();
 
     // Read pixels
@@ -323,7 +323,7 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
 
     // Flip pixels
     BYTE* tmpRow = &pixData[w * h * 4];
-    for (int y = 0; y < h / 2; y++)
+    for (int y = 0; y < static_cast<int>(h) / 2; y++)
     {
         int y2 = h - 1 - y;
         memcpy(tmpRow, &pixData[y2 * w * 4], w*4);

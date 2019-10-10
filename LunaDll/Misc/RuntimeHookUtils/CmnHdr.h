@@ -31,7 +31,7 @@
 
 #pragma warning(push, 3)
 #include <Windows.h>
-#pragma warning(pop) 
+#pragma warning(pop)
 #pragma warning(push, 4)
 
 
@@ -53,7 +53,7 @@
 // unreferenced formal parameter
 #pragma warning(disable:4100)
 
-// Note: Creating precompiled header 
+// Note: Creating precompiled header
 #pragma warning(disable:4699)
 
 // function not inlined
@@ -69,7 +69,7 @@
 ///////////////////////// Pragma message helper macro /////////////////////////
 
 
-/* 
+/*
 When the compiler sees a line like this:
    #pragma chMSG(Fix this later)
 
@@ -95,17 +95,17 @@ You can easily jump directly to this line and examine the surrounding code.
 //////////////////////////////// chDIMOF Macro ////////////////////////////////
 
 
-// This macro evaluates to the number of elements in an array. 
+// This macro evaluates to the number of elements in an array.
 #define chDIMOF(Array) (sizeof(Array) / sizeof(Array[0]))
 
 
 ///////////////////////////// chBEGINTHREADEX Macro ///////////////////////////
 
 
-// This macro function calls the C runtime's _beginthreadex function. 
-// The C runtime library doesn't want to have any reliance on Windows' data 
+// This macro function calls the C runtime's _beginthreadex function.
+// The C runtime library doesn't want to have any reliance on Windows' data
 // types such as HANDLE. This means that a Windows programmer needs to cast
-// values when using _beginthreadex. Since this is terribly inconvenient, 
+// values when using _beginthreadex. Since this is terribly inconvenient,
 // I created this macro to perform the casting.
 typedef unsigned (__stdcall *PTHREAD_START) (void *);
 
@@ -199,21 +199,23 @@ inline void chASSERTFAIL(LPCSTR file, int line, PCSTR expr) {
 
 // Sets the dialog box icons
 inline void chSETDLGICONS(HWND hwnd, int idi) {
-   SendMessage(hwnd, WM_SETICON, TRUE,  (LPARAM) 
-      LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE), 
+   SendMessage(hwnd, WM_SETICON, TRUE,  (LPARAM)
+      LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
          MAKEINTRESOURCE(idi)));
-   SendMessage(hwnd, WM_SETICON, FALSE, (LPARAM) 
-      LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE), 
+   SendMessage(hwnd, WM_SETICON, FALSE, (LPARAM)
+      LoadIcon((HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
       MAKEINTRESOURCE(idi)));
 }
-    
+
 
 /////////////////////////// OS Version Check Macros ///////////////////////////
 
+#pragma warning(push)
+#pragma warning(disable : 4996)
 
 inline void chWindows9xNotAllowed() {
-   OSVERSIONINFO vi = { sizeof(vi) };
-   GetVersionEx(&vi);
+   OSVERSIONINFOW vi = { sizeof(vi) };
+   GetVersionExW(&vi);
    if (vi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
       chMB("This application requires features not present in Windows 9x.");
       ExitProcess(0);
@@ -222,13 +224,15 @@ inline void chWindows9xNotAllowed() {
 
 
 inline void chWindows2000Required() {
-   OSVERSIONINFO vi = { sizeof(vi) };
-   GetVersionEx(&vi);
+   OSVERSIONINFOW vi = { sizeof(vi) };
+   GetVersionExW(&vi);
    if ((vi.dwPlatformId != VER_PLATFORM_WIN32_NT) && (vi.dwMajorVersion < 5)) {
       chMB("This application requires features present in Windows 2000.");
       ExitProcess(0);
    }
 }
+
+#pragma warning(pop)
 
 
 ///////////////////////////// UNICODE Check Macro /////////////////////////////
@@ -237,7 +241,7 @@ inline void chWindows2000Required() {
 // Since Windows 98 does not support Unicode, issue an error and terminate
 // the process if this is a native Unicode build running on Windows 98
 
-// This is accomplished by creating a global C++ object. Its constructor is 
+// This is accomplished by creating a global C++ object. Its constructor is
 // executed before WinMain.
 
 #ifdef UNICODE

@@ -244,7 +244,7 @@ bool LuaProxy::LevelObject::visible() const
 {
     if (!isValid())
         return false;
-    return static_cast<bool>(SMBXLevel::get(m_index)->visible);
+    return static_cast<bool>(SMBXLevel::get(m_index)->visible != 0);
 }
 
 void LuaProxy::LevelObject::setVisible(bool isHidden)

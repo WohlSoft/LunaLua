@@ -31,7 +31,7 @@ public:
             name(name),
             w(w), h(h),
             pw(pw), ph(ph),
-            pwScale(((float)w) / pw), phScale(((float)h) / ph)
+            pwScale(((float)w) / (pw != 0 ? pw : 1)), phScale(((float)h) / (ph != 0 ? ph : 1))
         {}
 
         static inline int32_t RoundDimension(int32_t v)

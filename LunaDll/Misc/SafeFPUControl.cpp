@@ -5,7 +5,7 @@
 #include <cfenv>
 
 #pragma fenv_access (on)
-#pragma STDC FENV_ACCESS ON
+#pragma STDC FENV_ACCESS on
 
 
 /*

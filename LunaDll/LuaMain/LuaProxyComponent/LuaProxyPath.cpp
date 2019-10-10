@@ -142,7 +142,7 @@ bool LuaProxy::Path::visible(lua_State * L) const
 {
     if (!isValid_throw(L))
         return false;
-    return static_cast<bool>(SMBXPath::Get(m_index)->visible);
+    return static_cast<bool>(SMBXPath::Get(m_index)->visible != 0);
 }
 
 void LuaProxy::Path::setVisible(bool visible, lua_State * L)
