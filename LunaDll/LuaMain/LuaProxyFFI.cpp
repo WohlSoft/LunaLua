@@ -140,9 +140,24 @@ extern "C" {
         gRenderBGOFlag = val;
     }
 
+    FFI_EXPORT(const char*) LunaLuaGetLevelCustomParams(void)
+    {
+        return g_LevelCustomParams.getCharPtrArray()[0];
+    }
+
+    FFI_EXPORT(const char**) LunaLuaGetSectionCustomParams(void)
+    {
+        return g_SectionCustomParams.getCharPtrArray();
+    }
+
     FFI_EXPORT(const char**) LunaLuaGetNpcCustomParams(void)
     {
         return g_NpcCustomParams.getCharPtrArray();
+    }
+
+    FFI_EXPORT(const char**) LunaLuaGetBgiCustomParams(void)
+    {
+        return g_BgoCustomParams.getCharPtrArray();
     }
 
     FFI_EXPORT(const char**) LunaLuaGetBlockCustomParams(void)

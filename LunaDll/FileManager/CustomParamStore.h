@@ -58,7 +58,10 @@ private:
 };
 
 // Global Instances
-extern CustomParamStore<5000> g_NpcCustomParams;
+extern CustomParamStore<1>     g_LevelCustomParams;
+extern CustomParamStore<21>    g_SectionCustomParams;
+extern CustomParamStore<5000>  g_NpcCustomParams;
+extern CustomParamStore<8000>  g_BgoCustomParams;
 extern CustomParamStore<20000> g_BlockCustomParams;
 
 #endif

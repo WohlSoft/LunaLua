@@ -105,6 +105,9 @@ void LunaLua_loadLevelFile(LevelData &outData,
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
 
+    // Store custom params
+    g_LevelCustomParams.setData(0, outData.custom_params);
+
     int numOfSections = outData.sections.size();
     if (numOfSections > LIMIT_SECTIONS)
         numOfSections = LIMIT_SECTIONS;
@@ -123,6 +126,9 @@ void LunaLua_loadLevelFile(LevelData &outData,
         GM_SEC_NOTURNBACK[i] = COMBOOL(nextDataLevelSection.lock_left_scroll);
         GM_SEC_OFFSCREEN[i] = COMBOOL(nextDataLevelSection.OffScreenEn);
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
+
+        // Store custom params
+        g_SectionCustomParams.setData(i, nextDataLevelSection.custom_params);
     }
 
     //Fill others with zeros
@@ -210,6 +216,9 @@ void LunaLua_loadLevelFile(LevelData &outData,
             nextBGO->momentum.height = static_cast<double>(bgodef_height[nextBGO->id]);
         }
         nextBGO->ptLayerName = nextDataLevelBGO.layer;
+
+        // Store custom params
+        g_BgoCustomParams.setData(i, nextDataLevelBGO.meta.custom_params);
     }
 
     int numOfNPC = outData.npc.size();
