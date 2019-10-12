@@ -2,6 +2,155 @@
 #include "../../../Globals.h"
 #include "../../../GlobalFuncs.h"
 #include "../../libs/PGE_File_Formats/file_formats.h"
+#include "../../libs/json/json.hpp"
+#include <stack>
+
+using json = nlohmann::json;
+
+struct LuaSACKS : public nlohmann::json_sax<json>
+{
+    struct State
+    {
+        std::string     key;
+        size_t          couter = 0;
+        size_t          totalElements = 0;
+        bool            isArray = false;
+        luabind::object lua;
+    };
+
+    std::stack<State> stackKey;
+    State             cs;
+    bool              isRoot = false;
+
+    template<class T>
+    void addValue(const T &value)
+    {
+        if(cs.isArray)
+            cs.lua[cs.couter++] = value;
+        else
+            cs.lua[cs.key] = value;
+    }
+
+    // called when null is parsed
+    bool null()
+    {
+        addValue(nullptr);
+        return true;
+    }
+
+    // called when a boolean is parsed; value is passed
+    bool boolean(bool val)
+    {
+        addValue(val);
+        return true;
+    }
+
+    // called when a signed or unsigned integer number is parsed; value is passed
+    bool number_integer(number_integer_t val)
+    {
+        addValue(val);
+        return true;
+    }
+    bool number_unsigned(number_unsigned_t val)
+    {
+        addValue(val);
+        return true;
+    }
+
+    // called when a floating-point number is parsed; value and original string is passed
+    bool number_float(number_float_t val, const string_t& s)
+    {
+        addValue(val);
+        return true;
+    }
+
+    // called when a string is parsed; value is passed and can be safely moved away
+    bool string(string_t& val)
+    {
+        addValue(val);
+        return true;
+    }
+
+    // called when an object or array begins or ends, resp. The number of elements is passed (or -1 if not known)
+    bool start_object(std::size_t elements)
+    {
+        if(isRoot)
+            isRoot = false;
+        else
+            stackKey.push(cs);
+        cs.couter = 0;
+        cs.totalElements = elements;
+        cs.isArray = false;
+        cs.key.clear();
+        return true;
+    }
+    bool end_object()
+    {
+        if(stackKey.empty())
+            isRoot = true;
+        else
+        {
+            luabind::object o = cs.lua;
+            cs = stackKey.top();
+            if(cs.isArray)
+                cs.lua[cs.couter++] = o;
+            else
+                cs.lua[cs.key] = o;
+            stackKey.pop();
+        }
+        return true;
+    }
+
+    bool start_array(std::size_t elements)
+    {
+        if(isRoot)
+            isRoot = false;
+        else
+            stackKey.push(cs);
+        cs.couter = 0;
+        cs.totalElements = elements;
+        cs.isArray = false;
+        cs.key.clear();
+        return true;
+    }
+
+    bool end_array()
+    {
+        if(stackKey.empty())
+            isRoot = true;
+        else
+        {
+            luabind::object o = cs.lua;
+            cs = stackKey.top();
+            if(cs.isArray)
+                cs.lua[cs.couter++] = o;
+            else
+                cs.lua[cs.key] = o;
+            stackKey.pop();
+        }
+        return true;
+    }
+
+    // called when an object key is parsed; value is passed and can be safely moved away
+    bool key(string_t &val)
+    {
+        cs.key = val;
+        return true;
+    }
+
+    // called when a parse error occurs; byte position, the last token, and an exception is passed
+    bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::detail::exception& ex)
+    {
+        return true;
+    }
+};
+
+static luabind::object dumpFromJson(const std::string &son)
+{
+    LuaSACKS out;
+    json::sax_parse(son, &out);
+    return out.cs.lua;
+}
 
 static std::string getFullPath(const std::string &p)
 {
@@ -38,7 +187,7 @@ static luabind::object getMeta(const ElementMeta &inMeta, lua_State *L)
     luabind::object meta = luabind::newtable(L);
     meta["arrayId"] = inMeta.array_id;
     meta["index"] = inMeta.index;
-    meta["data"] = inMeta.custom_params;
+    meta["data"] = dumpFromJson(inMeta.custom_params);
     return meta;
 }
 
@@ -54,7 +203,7 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["data"]                   = data.custom_params;
+    outData["data"]                   = dumpFromJson(data.custom_params);
 
     return outData;
 }
@@ -71,7 +220,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["data"]                   = data.custom_params;
+    outData["data"]                   = dumpFromJson(data.custom_params);
 
     {
         luabind::object arr = luabind::newtable(L);
@@ -129,7 +278,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["lockDownScrool"] = sct.lock_down_scroll;
             e["isUnderWater"] = sct.underwater;
 
-            e["data"] = sct.custom_params;
+            e["data"] = dumpFromJson(sct.custom_params);
 
             arr[++counter] = e;
         }
@@ -553,7 +702,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["data"]             = data.custom_params;
+    outData["data"]             = dumpFromJson(data.custom_params);
 
     return outData;
 }
@@ -608,7 +757,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["data"]             = data.custom_params;
+    outData["data"]             = dumpFromJson(data.custom_params);
 
     // Terrain tiles
     {
