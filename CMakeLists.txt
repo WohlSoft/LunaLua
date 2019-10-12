@@ -8,45 +8,43 @@ if(NOT MSVC)
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "MinSizeRel")
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-set(CompilerFlags
-    CMAKE_CXX_FLAGS
-    CMAKE_CXX_FLAGS_DEBUG
-    CMAKE_CXX_FLAGS_RELEASE
-    CMAKE_CXX_FLAGS_MINSIZEREL
-    CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    CMAKE_C_FLAGS
-    CMAKE_C_FLAGS_DEBUG
-    CMAKE_C_FLAGS_RELEASE
-    CMAKE_C_FLAGS_MINSIZEREL
-    CMAKE_C_FLAGS_RELWITHDEBINFO
-)
-foreach(CompilerFlag ${CompilerFlags})
-    string(REPLACE "/MD" "/MT" ${CompilerFlag}_OUT "${${CompilerFlag}}")
-    set(${CompilerFlag} ${${CompilerFlag}_OUT})
-endforeach()
+# /Fd\"Release\\vc140.pdb\"
+set(CMAKE_CXX_FLAGS "" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/Zi /Gm- /O2 /Zc:inline /fp:precise /errorReport:prompt /WX- /Zc:forScope /Gd /Oy- /Oi /MT /EHsc /nologo /FAcs /Ot" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
 
-# Remove "/showIncludes" flag
-if(CMAKE_CXX_FLAGS MATCHES "/showIncludes")
-    string(REGEX REPLACE "/showIncludes" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-endif()
-if(CMAKE_C_FLAGS MATCHES "/showIncludes")
-    string(REGEX REPLACE "/showIncludes" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-endif()
+set(CMAKE_C_FLAGS "" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Zi /Gm- /O2 /Zc:inline /fp:precise /errorReport:prompt /WX- /Zc:forScope /Gd /Oy- /Oi /MT /EHsc /nologo /FAcs /Ot" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
 
-# Add debug information into release builds
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi")
-set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} /Zi")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
-set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /Zi")
-set(CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL "${CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL} /debug /INCREMENTAL" CACHE STRING "linker flags" FORCE)
-
-foreach(CompilerFlag ${CompilerFlags})
-    message("== ${CompilerFlag} = ${${CompilerFlag}} ==")
-    set(${CompilerFlag} ${${CompilerFlag}} CACHE STRING "compiler flags" FORCE)
-endforeach()
+# /PDB:"C:\Repos\LunaLUA\Release\LunaDll.pdb"
+set(CMAKE_SHARED_LINKER_FLAGS "" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "/NXCOMPAT /DYNAMICBASE /MAPINFO:EXPORTS /DEBUG /DLL /MACHINE:X86 /OPT:REF /SAFESEH:NO /INCREMENTAL:NO /SUBSYSTEM:WINDOWS\",5.01\" /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" /MAP /OPT:ICF /ERRORREPORT:PROMPT /NOLOGO /TLBID:1" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}" CACHE
+    STRING "compiler flags" FORCE)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
