@@ -9,22 +9,40 @@ using json = nlohmann::json;
 
 struct LuaSACKS : public nlohmann::json_sax<json>
 {
+    luabind::object data;
+    lua_State *L = nullptr;
+
+    LuaSACKS() : nlohmann::json_sax<json>()
+    {}
+
+    ~LuaSACKS()
+    {
+        cleanStack();
+    }
+
+    void cleanStack()
+    {
+        while(!stack.empty())
+            stack.pop();
+    }
+
     struct State
     {
         std::string     key;
-        size_t          couter = 0;
+        size_t          couter = 1;
         size_t          totalElements = 0;
         bool            isArray = false;
         luabind::object lua;
     };
 
-    std::stack<State> stackKey;
+    std::stack<State> stack;
     State             cs;
-    bool              isRoot = false;
+    bool              isRoot = true;
 
     template<class T>
     void addValue(const T &value)
     {
+        assert(cs.lua.is_valid());
         if(cs.isArray)
             cs.lua[cs.couter++] = value;
         else
@@ -58,7 +76,7 @@ struct LuaSACKS : public nlohmann::json_sax<json>
     }
 
     // called when a floating-point number is parsed; value and original string is passed
-    bool number_float(number_float_t val, const string_t& s)
+    bool number_float(number_float_t val, const string_t &)
     {
         addValue(val);
         return true;
@@ -71,64 +89,71 @@ struct LuaSACKS : public nlohmann::json_sax<json>
         return true;
     }
 
-    // called when an object or array begins or ends, resp. The number of elements is passed (or -1 if not known)
-    bool start_object(std::size_t elements)
+    bool startObj(std::size_t elements, bool isArray)
     {
         if(isRoot)
+        {
             isRoot = false;
+            cs = State();
+            data = luabind::newtable(L);
+            cs.lua = data;
+        }
         else
-            stackKey.push(cs);
-        cs.couter = 0;
+        {
+            State ncs = State();
+            if(cs.isArray)
+            {
+                size_t count = cs.couter++;
+                cs.lua[count] = luabind::newtable(L);
+                ncs.lua = cs.lua[count];
+            }
+            else
+            {
+                cs.lua[cs.key] = luabind::newtable(L);
+                ncs.lua = cs.lua[cs.key];
+            }
+            stack.push(cs);
+            cs = ncs;
+        }
+        cs.couter = 1;
         cs.totalElements = elements;
-        cs.isArray = false;
+        cs.isArray = isArray;
         cs.key.clear();
         return true;
     }
-    bool end_object()
+
+    bool endObj()
     {
-        if(stackKey.empty())
+        if(stack.empty())
+        {
             isRoot = true;
+        }
         else
         {
-            luabind::object o = cs.lua;
-            cs = stackKey.top();
-            if(cs.isArray)
-                cs.lua[cs.couter++] = o;
-            else
-                cs.lua[cs.key] = o;
-            stackKey.pop();
+            cs = stack.top();
+            stack.pop();
         }
         return true;
+    }
+
+    // called when an object or array begins or ends, resp. The number of elements is passed (or -1 if not known)
+    bool start_object(std::size_t elements)
+    {
+        return startObj(elements, false);
+    }
+    bool end_object()
+    {
+        return endObj();
     }
 
     bool start_array(std::size_t elements)
     {
-        if(isRoot)
-            isRoot = false;
-        else
-            stackKey.push(cs);
-        cs.couter = 0;
-        cs.totalElements = elements;
-        cs.isArray = false;
-        cs.key.clear();
-        return true;
+        return startObj(elements, true);
     }
 
     bool end_array()
     {
-        if(stackKey.empty())
-            isRoot = true;
-        else
-        {
-            luabind::object o = cs.lua;
-            cs = stackKey.top();
-            if(cs.isArray)
-                cs.lua[cs.couter++] = o;
-            else
-                cs.lua[cs.key] = o;
-            stackKey.pop();
-        }
-        return true;
+        return endObj();
     }
 
     // called when an object key is parsed; value is passed and can be safely moved away
@@ -139,17 +164,30 @@ struct LuaSACKS : public nlohmann::json_sax<json>
     }
 
     // called when a parse error occurs; byte position, the last token, and an exception is passed
-    bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::detail::exception& ex)
+    bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::detail::exception &ex)
     {
+        if(!data.is_valid())
+            data = luabind::newtable(L);
+        data["error"] = luabind::newtable(L);
+        data["error"]["position"] = position;
+        data["error"]["last_token"] = last_token;
+        data["error"]["exception"] = ex.what();
+        cleanStack();
         return true;
     }
 };
 
-static luabind::object dumpFromJson(const std::string &son)
+static luabind::object dumpFromJson(const std::string &son, lua_State *L)
 {
-    LuaSACKS out;
-    json::sax_parse(son, &out);
-    return out.cs.lua;
+    if(!son.empty())
+    {
+        LuaSACKS sax;
+        sax.L = L;
+        json::sax_parse(son, &sax);
+        return sax.data;
+    }
+    else
+        return luabind::newtable(L);
 }
 
 static std::string getFullPath(const std::string &p)
@@ -187,7 +225,7 @@ static luabind::object getMeta(const ElementMeta &inMeta, lua_State *L)
     luabind::object meta = luabind::newtable(L);
     meta["arrayId"] = inMeta.array_id;
     meta["index"] = inMeta.index;
-    meta["data"] = dumpFromJson(inMeta.custom_params);
+    meta["data"] = dumpFromJson(inMeta.custom_params, L);
     return meta;
 }
 
@@ -203,7 +241,7 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["data"]                   = dumpFromJson(data.custom_params);
+    outData["data"]                   = dumpFromJson(data.custom_params, L);
 
     return outData;
 }
@@ -220,7 +258,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     outData["levelName"]              = data.LevelName;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
-    outData["data"]                   = dumpFromJson(data.custom_params);
+    outData["data"]                   = dumpFromJson(data.custom_params, L);
 
     {
         luabind::object arr = luabind::newtable(L);
@@ -278,7 +316,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             e["lockDownScrool"] = sct.lock_down_scroll;
             e["isUnderWater"] = sct.underwater;
 
-            e["data"] = dumpFromJson(sct.custom_params);
+            e["data"] = dumpFromJson(sct.custom_params, L);
 
             arr[++counter] = e;
         }
@@ -702,7 +740,7 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["data"]             = dumpFromJson(data.custom_params);
+    outData["data"]             = dumpFromJson(data.custom_params, L);
 
     return outData;
 }
@@ -757,7 +795,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     outData["inventoryLimit"]   = data.inventoryLimit;
 
     outData["authors"]          = data.authors;
-    outData["data"]             = dumpFromJson(data.custom_params);
+    outData["data"]             = dumpFromJson(data.custom_params, L);
 
     // Terrain tiles
     {
