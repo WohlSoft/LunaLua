@@ -315,18 +315,18 @@ void PGE_Sounds::SND_PlaySnd(const char *sndFile)
 
         PGE_Sounds::memUsage += sound->alen;
         chunksBuffer[filePath] = sound;
-        if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+        if(Mix_PlayChannelVol( -1, chunksBuffer[filePath], 0, MIX_MAX_VOLUME) == -1)
         {
             if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }
     else
     {
-        if(Mix_PlayChannel( -1, chunksBuffer[filePath], 0 )==-1)
+        if(Mix_PlayChannelVol( -1, chunksBuffer[filePath], 0, MIX_MAX_VOLUME) == -1)
         {
             if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ")+std::string(Mix_GetError())).c_str(), "Error", 0);
+            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
         }
     }
 }
@@ -386,7 +386,7 @@ bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
 
         if (ch != -1)
             Mix_HaltChannel(ch);
-        if (Mix_PlayChannelTimed(ch, it->second.chunk, 0, -1) == -1)
+        if (Mix_PlayChannelTimedVolume(ch, it->second.chunk, 0, -1, MIX_MAX_VOLUME) == -1)
         {
             if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
                 MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
