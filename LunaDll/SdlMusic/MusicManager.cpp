@@ -63,7 +63,7 @@ bool ChunkEntry::play()
         Mix_HaltChannel(channel);
     if(!chunk)
         return false;
-    return (Mix_PlayChannelTimed(channel, chunk, 0, -1) != -1);
+    return (Mix_PlayChannelTimedVolume(channel, chunk, 0, -1, MIX_MAX_VOLUME) != -1);
 }
 
 
@@ -123,7 +123,7 @@ void MusicManager::rebuildSoundCache()
 {
     // Reinit reserved channels list
     int numberOfReservedChannels = 0;
-    
+
     // For sounds which are failing to load
     std::string failedSounds;
     int countOfFailedSounds = 0;
