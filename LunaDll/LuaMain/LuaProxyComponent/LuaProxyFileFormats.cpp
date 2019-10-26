@@ -239,6 +239,7 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     outData["meta"] = getMeta(data.meta, L);
 
     outData["levelName"]              = data.LevelName;
+    outData["stars"]                  = data.stars;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
     outData["data"]                   = dumpFromJson(data.custom_params, L);
@@ -256,6 +257,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     outData["meta"] = getMeta(data.meta, L);
 
     outData["levelName"]              = data.LevelName;
+    outData["stars"]                  = data.stars;
     outData["openLevelOnFail"]        = data.open_level_on_fail;
     outData["openLevelOnFailWarpId"]  = data.open_level_on_fail_warpID;
     outData["data"]                   = dumpFromJson(data.custom_params, L);
