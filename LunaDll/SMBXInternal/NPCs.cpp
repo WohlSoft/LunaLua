@@ -133,6 +133,7 @@ static int16_t npcprop_harmlessthrown[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_linkshieldable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -146,6 +147,7 @@ void NPC::InitProperties() {
         npcprop_ignorethrownnpcs[i] = 0;
         npcprop_linkshieldable[i] = 0;
         npcprop_noshieldfireeffect[i] = 0;
+        npcprop_notcointransformable[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -217,6 +219,120 @@ void NPC::InitProperties() {
     npcprop_noshieldfireeffect[0xD] = -1;
     npcprop_noshieldfireeffect[0x109] = -1;
     npcprop_noshieldfireeffect[0x1E] = -1;
+
+    // Directly default non-transformable
+    npcprop_notcointransformable[13] = -1;
+    npcprop_notcointransformable[108] = -1;
+    npcprop_notcointransformable[26] = -1;
+    npcprop_notcointransformable[91] = -1;
+    npcprop_notcointransformable[171] = -1;
+    npcprop_notcointransformable[56] = -1;
+    npcprop_notcointransformable[60] = -1;
+    npcprop_notcointransformable[62] = -1;
+    npcprop_notcointransformable[64] = -1;
+    npcprop_notcointransformable[66] = -1;
+    npcprop_notcointransformable[104] = -1;
+    npcprop_notcointransformable[30] = -1;
+    npcprop_notcointransformable[17] = -1;
+    npcprop_notcointransformable[291] = -1;
+    npcprop_notcointransformable[292] = -1;
+    npcprop_notcointransformable[266] = -1;
+    npcprop_notcointransformable[57] = -1;
+    npcprop_notcointransformable[58] = -1;
+    npcprop_notcointransformable[78] = -1;
+    npcprop_notcointransformable[79] = -1;
+    npcprop_notcointransformable[80] = -1;
+    npcprop_notcointransformable[81] = -1;
+    npcprop_notcointransformable[82] = -1;
+    npcprop_notcointransformable[83] = -1;
+    npcprop_notcointransformable[91] = -1;
+    npcprop_notcointransformable[260] = -1;
+    npcprop_notcointransformable[259] = -1;
+    // implied by default isInteractableNPC_ptr
+    npcprop_notcointransformable[9] = -1;
+    npcprop_notcointransformable[10] = -1;
+    npcprop_notcointransformable[11] = -1;
+    npcprop_notcointransformable[14] = -1;
+    npcprop_notcointransformable[16] = -1;
+    npcprop_notcointransformable[33] = -1;
+    npcprop_notcointransformable[34] = -1;
+    npcprop_notcointransformable[41] = -1;
+    npcprop_notcointransformable[75] = -1;
+    npcprop_notcointransformable[88] = -1;
+    npcprop_notcointransformable[90] = -1;
+    npcprop_notcointransformable[94] = -1;
+    npcprop_notcointransformable[97] = -1;
+    npcprop_notcointransformable[101] = -1;
+    npcprop_notcointransformable[102] = -1;
+    npcprop_notcointransformable[103] = -1;
+    npcprop_notcointransformable[107] = -1;
+    npcprop_notcointransformable[138] = -1;
+    npcprop_notcointransformable[152] = -1;
+    npcprop_notcointransformable[153] = -1;
+    npcprop_notcointransformable[169] = -1;
+    npcprop_notcointransformable[170] = -1;
+    npcprop_notcointransformable[178] = -1;
+    npcprop_notcointransformable[182] = -1;
+    npcprop_notcointransformable[183] = -1;
+    npcprop_notcointransformable[184] = -1;
+    npcprop_notcointransformable[185] = -1;
+    npcprop_notcointransformable[186] = -1;
+    npcprop_notcointransformable[187] = -1;
+    npcprop_notcointransformable[188] = -1;
+    npcprop_notcointransformable[192] = -1;
+    npcprop_notcointransformable[196] = -1;
+    npcprop_notcointransformable[197] = -1;
+    npcprop_notcointransformable[198] = -1;
+    npcprop_notcointransformable[240] = -1;
+    npcprop_notcointransformable[248] = -1;
+    npcprop_notcointransformable[249] = -1;
+    npcprop_notcointransformable[250] = -1;
+    npcprop_notcointransformable[251] = -1;
+    npcprop_notcointransformable[252] = -1;
+    npcprop_notcointransformable[253] = -1;
+    npcprop_notcointransformable[254] = -1;
+    npcprop_notcointransformable[258] = -1;
+    npcprop_notcointransformable[264] = -1;
+    npcprop_notcointransformable[273] = -1;
+    npcprop_notcointransformable[274] = -1;
+    npcprop_notcointransformable[277] = -1;
+    // implied by default isYoshi
+    npcprop_notcointransformable[95] = -1;
+    npcprop_notcointransformable[98] = -1;
+    npcprop_notcointransformable[99] = -1;
+    npcprop_notcointransformable[100] = -1;
+    npcprop_notcointransformable[148] = -1;
+    npcprop_notcointransformable[149] = -1;
+    npcprop_notcointransformable[150] = -1;
+    npcprop_notcointransformable[228] = -1;
+    // implied by default isShoe
+    npcprop_notcointransformable[35] = -1;
+    npcprop_notcointransformable[191] = -1;
+    npcprop_notcointransformable[193] = -1;
+    // implied by default isVegetable
+    npcprop_notcointransformable[92] = -1;
+    npcprop_notcointransformable[139] = -1;
+    npcprop_notcointransformable[140] = -1;
+    npcprop_notcointransformable[141] = -1;
+    npcprop_notcointransformable[142] = -1;
+    npcprop_notcointransformable[143] = -1;
+    npcprop_notcointransformable[144] = -1;
+    npcprop_notcointransformable[145] = -1;
+    npcprop_notcointransformable[146] = -1;
+    npcprop_notcointransformable[147] = -1;
+    // implied by default IsVine
+    npcprop_notcointransformable[213] = -1;
+    npcprop_notcointransformable[214] = -1;
+    npcprop_notcointransformable[215] = -1;
+    npcprop_notcointransformable[216] = -1;
+    npcprop_notcointransformable[217] = -1;
+    npcprop_notcointransformable[218] = -1;
+    npcprop_notcointransformable[219] = -1;
+    npcprop_notcointransformable[220] = -1;
+    npcprop_notcointransformable[221] = -1;
+    npcprop_notcointransformable[222] = -1;
+    npcprop_notcointransformable[223] = -1;
+    npcprop_notcointransformable[224] = -1;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -260,6 +376,11 @@ bool NPC::GetNoShieldFireEffect(int id) {
     return (npcprop_noshieldfireeffect[id] != 0);
 }
 
+bool NPC::GetNotCoinTransformable(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_notcointransformable[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -294,6 +415,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "noshieldfireeffect")
     {
         return reinterpret_cast<uintptr_t>(npcprop_noshieldfireeffect);
+    }
+    else if (s == "notcointransformable")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_notcointransformable);
     }
     else
     {

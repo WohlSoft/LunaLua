@@ -14,139 +14,6 @@ It is mostly used by the ending function (if the Player hits the exit)
 #include "../../Defines.h"
 #include "../../Animation.h"
 
-
-
-//Setup Code Start (when patched)
-extern bool* Reconstructed::Util::isNotCoinTransformable = 0;
-
-
-
-void Reconstructed::Util::npcToCoins_setup()
-{
-    //dbgbox(L"Test");
-    isNotCoinTransformable = (bool*)calloc(NPC::MAX_ID + 1, sizeof(bool));
-    isNotCoinTransformable[NPCID_PLAYERFIREBALL] = true;
-    isNotCoinTransformable[NPCID_YOSHIFIRE] = true;
-    isNotCoinTransformable[NPCID_SPRING] = true;
-    
-    isNotCoinTransformable[NPCID_BURIEDPLANT] = true;
-    isNotCoinTransformable[NPCID_PLAYERHAMMER] = true;
-
-    isNotCoinTransformable[NPCID_CLOWNCAR] = true;
-    isNotCoinTransformable[NPCID_YELBLOCKS] = true;
-    isNotCoinTransformable[NPCID_BLUBLOCKS] = true;
-    isNotCoinTransformable[NPCID_GRNBLOCKS] = true;
-    isNotCoinTransformable[NPCID_REDBLOCKS] = true;
-    isNotCoinTransformable[NPCID_PLATFORM_SMB3] = true;
-    isNotCoinTransformable[NPCID_ENEMYHAMMER] = true;
-    isNotCoinTransformable[NPCID_BULLET_SMB3] = true;
-    isNotCoinTransformable[NPCID_PEACHBOMB] = true;
-    isNotCoinTransformable[NPCID_BOOMERANG] = true;
-    isNotCoinTransformable[NPCID_SWORDBEAM] = true;
-    isNotCoinTransformable[NPCID_CONVEYER] = true;
-    isNotCoinTransformable[NPCID_METALBARREL] = true;
-    isNotCoinTransformable[NPCID_TANKTREADS] = true;
-    isNotCoinTransformable[NPCID_SHORTWOOD] = true;
-    isNotCoinTransformable[NPCID_LONGWOOD] = true;
-    isNotCoinTransformable[NPCID_SLANTWOOD_L] = true;
-    isNotCoinTransformable[NPCID_SLANTWOOD_R] = true;
-    isNotCoinTransformable[NPCID_SLANTWOOD_M] = true;
-
-    isNotCoinTransformable[NPCID_BURIEDPLANT] = true;
-    isNotCoinTransformable[NPCID_FIREBAR] = true;
-    isNotCoinTransformable[NPCID_ROTODISK] = true;
-
-    //isInteractableNPC_ptr
-    isNotCoinTransformable[9] = true; //Mushroom
-    isNotCoinTransformable[10] = true; //Coin
-    isNotCoinTransformable[11] = true; //Star
-    isNotCoinTransformable[14] = true; //Flower
-    isNotCoinTransformable[16] = true; //Question Item
-    isNotCoinTransformable[33] = true; //Coin
-    isNotCoinTransformable[34] = true; //Leaf
-    isNotCoinTransformable[41] = true; //Crystal Ball
-    isNotCoinTransformable[75] = true; //Toad
-    isNotCoinTransformable[88] = true; //Coin
-    isNotCoinTransformable[90] = true; //Life
-    isNotCoinTransformable[94] = true; //Toad
-    isNotCoinTransformable[97] = true; //Star
-    isNotCoinTransformable[101] = true; //Luigi
-    isNotCoinTransformable[102] = true; //Link
-    isNotCoinTransformable[103] = true; //Red Coin
-    isNotCoinTransformable[107] = true; //Bob-omb
-    isNotCoinTransformable[138] = true; //Coin
-    isNotCoinTransformable[152] = true; //Ring
-    isNotCoinTransformable[153] = true; //Killer Mushroom
-    isNotCoinTransformable[169] = true; //Tanookie
-    isNotCoinTransformable[170] = true; //Tanookie
-    isNotCoinTransformable[178] = true; //Axe
-    isNotCoinTransformable[182] = true; //Flower
-    isNotCoinTransformable[183] = true; //Flower
-    isNotCoinTransformable[184] = true; //Red mushroom
-    isNotCoinTransformable[185] = true; //Red mushroom
-    isNotCoinTransformable[186] = true; //Green mushroom
-    isNotCoinTransformable[187] = true; //Green mushroom
-    isNotCoinTransformable[188] = true; //Moon
-    isNotCoinTransformable[192] = true; //Checkpoint
-    isNotCoinTransformable[196] = true; //Star
-    isNotCoinTransformable[197] = true; //Goalline
-    isNotCoinTransformable[198] = true; //Peach
-    isNotCoinTransformable[240] = true; //Stopwatch
-    isNotCoinTransformable[248] = true; //Stopwatch
-    isNotCoinTransformable[249] = true; //Mushroom
-    isNotCoinTransformable[250] = true; //Heart
-    isNotCoinTransformable[251] = true; //Green Ruby
-    isNotCoinTransformable[252] = true; //Blue Ruby
-    isNotCoinTransformable[253] = true; //Red Ruby
-    isNotCoinTransformable[254] = true; //???
-    isNotCoinTransformable[258] = true; //Blue Coin
-    isNotCoinTransformable[264] = true; //Ice Flower
-    isNotCoinTransformable[273] = true; //Random
-    isNotCoinTransformable[274] = true; //Yoshi Coin
-    isNotCoinTransformable[277] = true; //Ice Flower
-
-    //isYoshi
-    isNotCoinTransformable[95] = true;
-    isNotCoinTransformable[98] = true;
-    isNotCoinTransformable[99] = true;
-    isNotCoinTransformable[100] = true;
-    isNotCoinTransformable[148] = true;
-    isNotCoinTransformable[149] = true;
-    isNotCoinTransformable[150] = true;
-    isNotCoinTransformable[228] = true;
-
-    //isShoe
-    isNotCoinTransformable[35] = true;
-    isNotCoinTransformable[191] = true;
-    isNotCoinTransformable[193] = true;
-
-    //isVegetable
-    isNotCoinTransformable[92] = true;
-    isNotCoinTransformable[139] = true;
-    isNotCoinTransformable[140] = true;
-    isNotCoinTransformable[141] = true;
-    isNotCoinTransformable[142] = true;
-    isNotCoinTransformable[143] = true;
-    isNotCoinTransformable[144] = true;
-    isNotCoinTransformable[145] = true;
-    isNotCoinTransformable[146] = true;
-    isNotCoinTransformable[147] = true;
-
-    //IsVine
-    isNotCoinTransformable[213] = true;
-    isNotCoinTransformable[214] = true;
-    isNotCoinTransformable[215] = true;
-    isNotCoinTransformable[216] = true;
-    isNotCoinTransformable[217] = true;
-    isNotCoinTransformable[218] = true;
-    isNotCoinTransformable[219] = true;
-    isNotCoinTransformable[220] = true;
-    isNotCoinTransformable[221] = true;
-    isNotCoinTransformable[222] = true;
-    isNotCoinTransformable[223] = true;
-    isNotCoinTransformable[224] = true;
-}
-
 void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
 {
     if (mob->unknown_124 && !mob->isGenerator) {
@@ -156,7 +23,7 @@ void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
             && !mob->killFlag // is currently not killed
             && !mob->friendly // is not friendly
             && !isCollectableGoalNPC_ptr[id]) { //check the built-in isCollectableGoal, if it is a collectable coin then skip
-            if (isNotCoinTransformable[id]) { // check our array, if the npc is NOT Transformable
+            if (NPC::GetNotCoinTransformable(id)) { // check our array, if the npc is NOT Transformable
                 if (id == NPCID_GOALTAPE //If it is NOT transformable then check for these special npcs
                     || id == NPCID_FIREBAR
                     || id == NPCID_ROTODISK)

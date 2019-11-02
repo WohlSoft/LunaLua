@@ -359,7 +359,6 @@ void fixup_NativeFuncs()
 {
     // Patch the whole native function
     PATCH(0xA3C580).JMP(&Reconstructed::Util::npcToCoins).NOP_PAD_TO_SIZE<0x40B>().Apply();
-    Reconstructed::Util::npcToCoins_setup();
 }
 
 __declspec(naked) static void fixup_BGODepletionASM()
