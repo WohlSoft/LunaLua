@@ -88,9 +88,11 @@ void CLunaLua::exitContext()
 
         gRenderBGOFlag = true;
 
-        //Clean & stop all user started sounds and musics
+        // Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
+        // Reset music volume overrider
+        MusicManager::setVolumeOverride(-1);
     }
 }
 
