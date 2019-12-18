@@ -61,7 +61,7 @@ HEADERS  += mainlauncherwindow.h \
     devtoolsdialog.h
 
 # LunaLoader
-win32: SOURCES += ../../LunaLoader/LunaLoaderPatch.cpp
+# win32: SOURCES += ../../LunaLoader/LunaLoaderPatch.cpp
 
 # PGE File Library
 INCLUDEPATH += $$PWD/../../LunaDll/libs

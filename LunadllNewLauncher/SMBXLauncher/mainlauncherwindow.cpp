@@ -1,6 +1,6 @@
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
-#include "../../LunaLoader/LunaLoaderPatch.h"
+//#include "../../LunaLoader/LunaLoaderPatch.h"
 #include "Utils/filesysutils.h"
 #include "Utils/Network/networkutils.h"
 #include "Utils/Network/qnetworkreplyexception.h"
@@ -282,8 +282,25 @@ void MainLauncherWindow::checkForUpdates()
                 qDebug() << "Higher version, notify user...";
                 QString updateMessage;
                 QUrl updateUrlObj;
+                char updatefield[17];
+                // I'm sorry for this. C++ isn't my strong suit.
+                switch (higher) {
+                    case 1:
+                        strcpy_s(updatefield, "update-message-1");
+                    break;
+                    case 2:
+                        strcpy_s(updatefield, "update-message-2");
+                    break;
+                    case 3:
+                        strcpy_s(updatefield, "update-message-3");
+                    break;
+                    case 4:
+                        strcpy_s(updatefield, "update-message-4");
+                    break;
+                }
+
                 reader.extractSafe("",
-                    std::make_pair("update-message-" + std::to_string(higher), &updateMessage),
+                    std::make_pair(updatefield, &updateMessage),
                     std::make_pair("update-url-page", &updateUrlObj)
                 );
 
@@ -374,6 +391,11 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
 
     if (m_ApplyLunaLoaderPatch) {
         // We're not handling quoting here... but all the arguments currently don't use spaces or quotes so...
+        QString loader = qApp->applicationDirPath() + "/LunaLoader.exe";
+        runArgs.push_front(smbxExeFile);
+        QProcess::startDetached(loader, runArgs);
+
+        /*
         QString argString;
         for (int i=0; i<runArgs.length(); i++) {
             if (i > 0) {
@@ -382,6 +404,7 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
             argString += runArgs[i];
         }
         LunaLoaderRun(smbxExeFile.toStdWString().c_str(), argString.toStdWString().c_str());
+        */
     }
     else {
         QProcess::startDetached(smbxExeFile, runArgs);

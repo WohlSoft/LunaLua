@@ -27,7 +27,7 @@ namespace detail {
             if(!(containedValue.*isFunction)())
                 throw QJsonValidationException(child, QJsonValidationException::ValidationError::WrongType);
 
-            return static_cast<Ret>((containedValue.*toFunction)(std::decay<ToFunctionParamDefault>::type()));
+            return static_cast<Ret>((containedValue.*toFunction)(typename std::decay<ToFunctionParamDefault>::type()));
         }
     }
 }
@@ -48,6 +48,13 @@ template<>
 struct QJsonExtractor<int> {
     int operator()(const QJsonObject& obj, const QString& child){
         return detail::json::extractByFunctions<int>(obj, child, &QJsonValue::isDouble, &QJsonValue::toDouble);
+    }
+};
+
+template<>
+struct QJsonExtractor<bool> {
+    int operator()(const QJsonObject& obj, const QString& child){
+        return detail::json::extractByFunctions<bool>(obj, child, &QJsonValue::isBool, &QJsonValue::toBool);
     }
 };
 
