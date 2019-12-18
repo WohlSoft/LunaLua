@@ -16,6 +16,10 @@ class LauncherConfiguration
     int version2;
     int version3;
     int version4;
+    bool version1u;
+    bool version2u;
+    bool version3u;
+    bool version4u;
 public:
     static QJsonDocument generateDefault();
 
@@ -24,7 +28,7 @@ public:
 
     void setConfigurationAndValidate(ExtendedQJsonReader& settingsToParse);
 
-    bool hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
+    int hasHigherVersion(int ver1, int ver2, int ver3, int ver4);
     ExtendedQJsonReader checkForUpdate();
 
     bool hasValidUpdateSite() const;

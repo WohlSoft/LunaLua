@@ -199,7 +199,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 
     // For each possible savefile
     QVariantList ret;
-    for (int i=1; i<=3; i++) {
+    for (int i=1; i<=32767; i++) {
         QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(i) + ".sav";
         GamesaveData data;
         QMap<QString, QVariant> map;
@@ -218,7 +218,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 
 void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
 {
-    if (slot < 1 || slot > 3) return;
+    if (slot < 1 || slot > 32767) return;
 
     QDir episodeDir = QDir::current();
 

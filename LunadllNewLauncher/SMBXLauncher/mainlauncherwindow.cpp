@@ -274,15 +274,16 @@ void MainLauncherWindow::checkForUpdates()
             reader.extractSafe("current-version",
                 std::make_pair("version-1", &verNum[0]),
                 std::make_pair("version-2", &verNum[1]),
-                std::make_pair("version-1", &verNum[2]),
-                std::make_pair("version-2", &verNum[3])
+                std::make_pair("version-3", &verNum[2]),
+                std::make_pair("version-4", &verNum[3])
             );
-            if(m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3])){
+            int higher = m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3]);
+            if(higher > 0){
                 qDebug() << "Higher version, notify user...";
                 QString updateMessage;
                 QUrl updateUrlObj;
                 reader.extractSafe("",
-                    std::make_pair("update-message", &updateMessage),
+                    std::make_pair("update-message-" + std::to_string(higher), &updateMessage),
                     std::make_pair("update-url-page", &updateUrlObj)
                 );
 
