@@ -282,25 +282,9 @@ void MainLauncherWindow::checkForUpdates()
                 qDebug() << "Higher version, notify user...";
                 QString updateMessage;
                 QUrl updateUrlObj;
-                char updatefield[17];
-                // I'm sorry for this. C++ isn't my strong suit.
-                switch (higher) {
-                    case 1:
-                        strcpy_s(updatefield, "update-message-1");
-                    break;
-                    case 2:
-                        strcpy_s(updatefield, "update-message-2");
-                    break;
-                    case 3:
-                        strcpy_s(updatefield, "update-message-3");
-                    break;
-                    case 4:
-                        strcpy_s(updatefield, "update-message-4");
-                    break;
-                }
 
                 reader.extractSafe("",
-                    std::make_pair(updatefield, &updateMessage),
+                    std::make_pair("update-message-" + QString::number(higher), &updateMessage),
                     std::make_pair("update-url-page", &updateUrlObj)
                 );
 
