@@ -196,7 +196,7 @@ bool MusicManager::seizedSections[21] =
 bool MusicManager::pausedNatively=false;
 int MusicManager::curSection=0;
 // Music volume overrider. -1 to use default behavior, 0~128 - enforce specific music volume
-static int MusicManager::musicVolume = -1;
+int MusicManager::musicVolume = -1;
 
 //Music stream seizing
 void MusicManager::resetSeizes()
@@ -323,14 +323,14 @@ void MusicManager::setVolume(int _volume)
             int converted = (int)floor((piece*128.0) + 0.5);
             PGE_MusPlayer::MUS_changeVolume(converted);
         }
-        else 
+        else
         {
             PGE_MusPlayer::MUS_changeVolume(MusicManager::musicVolume);
         }
     }
 }
 
-static void setVolumeOverride(int _volume)
+void MusicManager::setVolumeOverride(int _volume)
 {
     MusicManager::musicVolume = _volume;
 }
