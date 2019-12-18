@@ -101,6 +101,7 @@ class MusicManager
         static bool seizedSections[21];
         static bool pausedNatively;
         static int curSection;
+        static int musicVolume;
 };
 #endif
 
