@@ -58,6 +58,7 @@ class MusicManager
         static void pause();
         static void stop(std::string alias);
         static void setVolume(int _volume);
+        static void setVolumeOverride(int _volume);
         static std::string lenght();
         static std::string position();
         

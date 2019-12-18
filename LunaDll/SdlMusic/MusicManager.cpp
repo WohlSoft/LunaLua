@@ -330,6 +330,11 @@ void MusicManager::setVolume(int _volume)
     }
 }
 
+static void setVolumeOverride(int _volume)
+{
+    MusicManager::musicVolume = _volume;
+}
+
 
 std::string MusicManager::lenght()
 {

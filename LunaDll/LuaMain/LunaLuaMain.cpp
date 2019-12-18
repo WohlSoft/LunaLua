@@ -92,7 +92,7 @@ void CLunaLua::exitContext()
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
         // Reset music volume overrider
-        MusicManager::musicVolume = -1;
+        MusicManager::setVolumeOverride(-1);
     }
 }
 

@@ -66,7 +66,7 @@ void LuaProxy::Audio::MusicVolume(int vlm)
 {
 #ifndef NO_SDL
     // Set the music volume overrider to avoid SMBX to break it
-    MusicManager::musicVolume = vlm;
+    MusicManager::setVolumeOverride(vlm);
     PGE_MusPlayer::MUS_changeVolume(vlm);
 #endif
 }
