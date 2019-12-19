@@ -11,8 +11,8 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QtDebug>
+#include <QApplication>
 #include <QMessageBox>
-#include <QDebug>
 
 
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
@@ -67,16 +67,21 @@ QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QStr
 QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
 {
     QStringList wldFileFilter;
-    wldFileFilter << "*.wld";
+    wldFileFilter << "*.wld" << "*.wldx";
     QDir episodeDir(episodeDirPath);
     QFileInfo episodeDirFile(episodeDirPath);
     QMap<QString, QVariant> ret;
     WorldData worldData;
     FileFormats::CreateWorldData(worldData);
+    worldData.meta.ReadFileValid = false;
 
     foreach (QFileInfo fileInfo, episodeDir.entryInfoList(wldFileFilter, QDir::Files))
     {
-        FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath(), worldData);
+        if (fileInfo.suffix().toLower() == "wldx") {
+            FileFormats::ReadExtendedWldFileHeader(fileInfo.canonicalFilePath(), worldData);
+        } else {
+            FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath(), worldData);
+        }
 
         // Break upon first valid world file
         if (worldData.meta.ReadFileValid) break;
@@ -90,6 +95,7 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
 
     ret.insert("directoryName", episodeDirFile.baseName());
     ret.insert("title", worldData.EpisodeTitle);
+    ret.insert("__rawtitle", worldData.EpisodeTitle);
     ret.insert("credits", worldData.authors);
     ret.insert("stars", worldData.stars);
     ret.insert("isHubWorld", worldData.HubStyledWorld);
@@ -133,7 +139,7 @@ QVariantList SMBXConfig::getEpisodeInfo(const QString& jsonSubDirPerEpisode, con
         return QVariantList();
     }
 
-    foreach (QFileInfo fileInfo, worldsDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name)) {
+    foreach (QFileInfo fileInfo, worldsDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name | QDir::IgnoreCase)) {
         if(!fileInfo.isDir()){
             continue;
         }
@@ -199,7 +205,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 
     // For each possible savefile
     QVariantList ret;
-    for (int i=1; i<=32767; i++) {
+    for (int i=1; i<=20; i++) {
         QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(i) + ".sav";
         GamesaveData data;
         QMap<QString, QVariant> map;
@@ -218,7 +224,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 
 void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
 {
-    if (slot < 1 || slot > 32767) return;
+    if (slot < 1 || slot > 20) return;
 
     QDir episodeDir = QDir::current();
 
@@ -230,21 +236,30 @@ void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
         return;
     }
 
-    QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".sav";
-    QFile saveFile(saveFilePath);
-    if (saveFile.exists()){
-        saveFile.remove();
-    }
-	//Extended save files, likely temporary
-    QString tmpSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".tmp";
-    QFile tmpSaveFile(tmpSavePath);
-    if (tmpSaveFile.exists()){
-        tmpSaveFile.remove();
-    }
-    QString extSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + "-ext.dat";
-    QFile extSaveFile(extSavePath);
-    if (extSaveFile.exists()){
-        extSaveFile.remove();
+    QMessageBox reply;
+    reply.setWindowTitle("Confirm Save Slot Deletion");
+    reply.setText("Are you sure you want to permanently delete this save slot?");
+    reply.setStandardButtons(QMessageBox::Yes);
+    reply.addButton(QMessageBox::Cancel);
+    reply.setDefaultButton(QMessageBox::Cancel);
+
+    if (reply.exec() == QMessageBox::Yes) {
+        QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".sav";
+        QFile saveFile(saveFilePath);
+        if (saveFile.exists()){
+            saveFile.remove();
+        }
+        //Extended save files, likely temporary
+        QString tmpSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".tmp";
+        QFile tmpSaveFile(tmpSavePath);
+        if (tmpSaveFile.exists()){
+            tmpSaveFile.remove();
+        }
+        QString extSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + "-ext.dat";
+        QFile extSaveFile(extSavePath);
+        if (extSaveFile.exists()){
+            extSaveFile.remove();
+        }
     }
 }
 
