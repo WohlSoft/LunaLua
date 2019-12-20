@@ -68,8 +68,8 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
     if (!fileExists(filePath))
     {
         m_isValid = false;
-        makeErrorLevel(outData, "Can't open level because   " + 
-                                "file is not exist:         " +
+        makeErrorLevel(outData, "Can't open level because   "
+                                "file is not exist:         "
                                 "                           " +
                                  utf8_encode(fullPath));
     }
