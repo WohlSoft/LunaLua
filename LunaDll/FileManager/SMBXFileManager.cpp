@@ -65,6 +65,15 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
     m_isValid = true; // Ensure that we are not valid right now
     std::wstring filePath = fullPath;
 
+    if (!fileExists(filePath))
+    {
+        m_isValid = false;
+        makeErrorLevel(outData, "Can't open level because   "
+                                "file is not exist:         "
+                                "                           " +
+                                 utf8_encode(fullPath));
+    }
+
     size_t findLastSlash = filePath.find_last_of(L"/\\");
 
     // Check if path has slash, if not then invalid
@@ -86,7 +95,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
     if (GetFileAttributesW(filePath.c_str()) == INVALID_FILE_ATTRIBUTES)
     {
         m_isValid = false;
-        makeErrorLevel(outData, "Can't load this level: File has an invalide attributes!");
+        makeErrorLevel(outData, "Can't load this level: File has invalid attributes!");
     }
 
     if (m_isValid && !FileFormats::OpenLevelFile(utf8_encode(filePath), outData))
