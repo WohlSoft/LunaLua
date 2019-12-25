@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>768</height>
+    <width>16</width>
+    <height>16</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>SMBX Launcher</string>
+   <string>SMBX2 Launcher</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">

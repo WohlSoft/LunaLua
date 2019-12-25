@@ -20,6 +20,7 @@
 #include <QWebEngineSettings>
 #include <QMessageBox>
 #include <QDesktopServices>
+#include <QDesktopWidget>
 
 static DevToolsDialog* devDialogPtr = nullptr;
 
@@ -145,6 +146,30 @@ void MainLauncherWindow::loadDefaultWebpage()
 
 void MainLauncherWindow::init(const QString &configName)
 {
+    QRect dw = QApplication::desktop()->screenGeometry();
+    float baseSize = dw.height() * 0.6;
+    if (baseSize > 1080) {
+        baseSize = 1080;
+    } else if (baseSize > 640) {
+        baseSize = 640;
+    }
+
+    baseSize = baseSize / 9;
+
+    if (dw.width()/16 < dw.height()/9) {
+        baseSize = dw.width() * 0.6;
+
+        if (baseSize > 1920) {
+            baseSize = 1920;
+        }
+        if (baseSize < 800) {
+            baseSize = 800;
+        }
+        baseSize = baseSize / 16;
+    }
+
+    this->resize(baseSize * 16, baseSize * 9);
+
     qDebug() << "Loading launcher configuration " << configName;
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
