@@ -3,6 +3,7 @@
 #include "../../../GlobalFuncs.h"
 #include "../../libs/PGE_File_Formats/file_formats.h"
 #include "../../libs/json/json.hpp"
+#include "../../Misc/TestMode.h"
 #include <stack>
 
 using json = nlohmann::json;
@@ -247,12 +248,9 @@ luabind::object LuaProxy::Formats::openLevelHeader(const std::string &filePath, 
     return outData;
 }
 
-luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_State *L)
-{
-    LevelData data;
-    std::string full_path = getFullPath(filePath);
-    FileFormats::OpenLevelFile(full_path, data);
 
+static luabind::object openLevelInternal(const LevelData &data, lua_State *L)
+{
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
 
@@ -265,7 +263,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelData::MusicOverrider & mo : data.music_overrides)
+        for(const LevelData::MusicOverrider & mo : data.music_overrides)
         {
             luabind::object e = luabind::newtable(L);
             e["type"]       = static_cast<int>(mo.type);
@@ -279,7 +277,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelData::MusicOverrider & mo : data.sound_overrides)
+        for(const LevelData::MusicOverrider & mo : data.sound_overrides)
         {
             luabind::object e = luabind::newtable(L);
             e["type"]       = static_cast<int>(mo.type);
@@ -293,7 +291,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelSection & sct : data.sections)
+        for(const LevelSection & sct : data.sections)
         {
             luabind::object e = luabind::newtable(L);
             e["id"]         = sct.id;
@@ -328,7 +326,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(PlayerPoint & plr : data.players)
+        for(const PlayerPoint & plr : data.players)
         {
             luabind::object e = luabind::newtable(L);
             e["id"]        = plr.id;
@@ -345,7 +343,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelBlock & block : data.blocks)
+        for(const LevelBlock & block : data.blocks)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = block.x;
@@ -379,7 +377,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelBGO & bgo : data.bgo)
+        for(const LevelBGO & bgo : data.bgo)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = bgo.x;
@@ -403,7 +401,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelNPC & npc : data.npc)
+        for(const LevelNPC & npc : data.npc)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = npc.x;
@@ -463,7 +461,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelDoor & warp : data.doors)
+        for(const LevelDoor & warp : data.doors)
         {
             luabind::object e = luabind::newtable(L);
             e["ix"]         = warp.ix;
@@ -531,7 +529,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelPhysEnv & pez : data.physez)
+        for(const LevelPhysEnv & pez : data.physez)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = pez.x;
@@ -558,7 +556,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelLayer & layer : data.layers)
+        for(const LevelLayer & layer : data.layers)
         {
             luabind::object e = luabind::newtable(L);
             e["name"]         = layer.name;
@@ -573,7 +571,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(LevelSMBX64Event & event : data.events)
+        for(const LevelSMBX64Event & event : data.events)
         {
             luabind::object e = luabind::newtable(L);
             e["name"]         = event.name;
@@ -586,21 +584,21 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             {
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
-                for(PGESTRING &l : event.layers_hide)
+                for(const PGESTRING &l : event.layers_hide)
                     ll[++counter_2] = l;
                 e["layersToHide"] = ll;
             }
             {
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
-                for(PGESTRING &l : event.layers_show)
+                for(const PGESTRING &l : event.layers_show)
                     ll[++counter_2] = l;
                 e["layersToShow"] = ll;
             }
             {
                 luabind::object ll = luabind::newtable(L);
                 size_t counter_2 = 0;
-                for(PGESTRING &l : event.layers_toggle)
+                for(const PGESTRING &l : event.layers_toggle)
                     ll[++counter_2] = l;
                 e["layersToToggle"] = ll;
             }
@@ -608,7 +606,7 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
             {
                 size_t counter_2 = 0;
                 luabind::object sets = luabind::newtable(L);
-                for(LevelEvent_Sets &s : event.sets)
+                for(const LevelEvent_Sets &s : event.sets)
                 {
                     luabind::object set = luabind::newtable(L);
                     set["id"] = s.id;
@@ -691,6 +689,18 @@ luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_St
     return outData;
 }
 
+luabind::object LuaProxy::Formats::openLevel(const std::string &filePath, lua_State *L)
+{
+    LevelData data;
+    std::string full_path = getFullPath(filePath);
+    FileFormats::OpenLevelFile(full_path, data);
+    return openLevelInternal(data, L);
+}
+
+luabind::object LuaProxy::Formats::getLevelData(lua_State *L)
+{
+    return openLevelInternal(getCurrentLevelData(), L);
+}
 
 luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, lua_State *L)
 {

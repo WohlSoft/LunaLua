@@ -759,6 +759,7 @@ void CLunaLua::bindAll()
                     ],
                 def("openLevel", &LuaProxy::Formats::openLevel),
                 def("openLevelHeader", &LuaProxy::Formats::openLevelHeader),
+                def("getLevelData", &LuaProxy::Formats::getLevelData),
                 def("openWorld", &LuaProxy::Formats::openWorld),
                 def("openWorldHeader", &LuaProxy::Formats::openWorldHeader),
                 def("openNpcConfig", &LuaProxy::Formats::openNpcConfig)

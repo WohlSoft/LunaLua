@@ -1002,8 +1002,10 @@ namespace LuaProxy {
     namespace Formats{
         luabind::object openLevelHeader(const std::string &filePath, lua_State *L);
         luabind::object openLevel(const std::string &filePath, lua_State *L);
+        luabind::object getLevelData(lua_State *L);
         luabind::object openWorldHeader(const std::string &filePath, lua_State *L);
         luabind::object openWorld(const std::string &filePath, lua_State *L);
+        //luabind::object getWorldData(lua_State *L); // TODO: Implement this once PGEFL will handle WorldMap reading
         luabind::object openNpcConfig(const std::string &filePath, lua_State *L);
     }
 
