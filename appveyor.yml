@@ -38,6 +38,37 @@
   version: 0.7.3.1.{build}
   branches:
     only:
+    - master
+  skip_tags: true
+
+  os: Visual Studio 2017
+  configuration: Release
+
+  clone_depth: 1
+
+  clone_folder: C:\_Repos\LunaLUA
+
+  install:
+  - cmd: git submodule init
+  - cmd: git submodule update
+
+  build:
+  - cmd: build_launcher_2017.bat
+
+  after_build:
+  - cmd: deploy-full.bat nopause
+
+  artifacts:
+  - path: SMBX-Launcher.zip
+
+  deploy:
+  - provider: Environment
+    name: WohlnetFTP
+
+-
+  version: 0.7.3.1.{build}
+  branches:
+    only:
     - cleanup
   skip_tags: true
 
