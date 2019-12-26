@@ -66,12 +66,12 @@ struct LuaSACKS : public nlohmann::json_sax<json>
     // called when a signed or unsigned integer number is parsed; value is passed
     bool number_integer(number_integer_t val)
     {
-        addValue(static_cast<int64_t>(val));
+        addValue(static_cast<long>(val));
         return true;
     }
     bool number_unsigned(number_unsigned_t val)
     {
-        addValue(static_cast<uint64_t>(val));
+        addValue(static_cast<unsigned long>(val));
         return true;
     }
 
