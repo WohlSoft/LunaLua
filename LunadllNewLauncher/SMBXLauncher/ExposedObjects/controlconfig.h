@@ -380,7 +380,7 @@ public slots:
     void setKeyboardJump2(unsigned int keyboardJump2)
     {
         m_data.players[1].k_jump = keyboardJump2;
-        emit keyboardRun2Updated();
+        emit keyboardJump2Updated();
     }
 
     void setKeyboardDrop2(unsigned int keyboardDrop2)
