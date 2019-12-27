@@ -35,6 +35,7 @@ build_script:
   - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact LunaLoader-exec.7z
   - if [%TOBUILD%]==[Launcher] build_launcher_2017.bat
   - if [%TOBUILD%]==[Launcher] deploy-launcher.bat nopause
+  - if [%TOBUILD%]==[Launcher] appveyor PushArtifact SMBX-Launcher.zip
 
 deploy:
   - provider: Environment
