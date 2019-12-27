@@ -1,7 +1,7 @@
 @echo off
 
 set CurDir=%CD%
-set QT_DIR=C:\Qt\5.12.2\mingw73_32
+set QT_DIR=C:\Qt\5.13.2\mingw73_32
 set MINGW_DIR=C:\Qt\Tools\mingw730_32\
 
 set BUILD_DIR=%CurDir%\build-LunaExec
