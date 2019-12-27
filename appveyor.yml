@@ -1,88 +1,95 @@
--
-  version: 0.7.3.1.{build}
-  branches:
-    only:
+version: "{APPVEYOR_REPO_COMMIT}"
+
+branches:
+  only:
     - master
-  skip_tags: true
+skip_tags: true
 
-  os: Visual Studio 2015
-  configuration: Release
+clone_depth: 1
 
-  clone_depth: 1
+clone_folder: C:\_Repos\LunaLUA
 
-  clone_folder: C:\_Repos\LunaLUA
-
-  install:
+install:
   - cmd: git submodule init
   - cmd: git submodule update
 
-  build:
-    project: LunaDll.sln
-    verbosity: minimal
+environment:
+  matrix:
+    - CONFIG: Release
+      TOBUILD: LunaLua
+      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
+      PLATFORMTOOLSET: "v140_xp"
+    - CONFIG: Release
+      TOBUILD: Launcher
+      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
+      PLATFORMTOOLSET: "v141"
 
-  after_build:
-  - cmd: build-lunaexec.bat
-  - cmd: deploy-full.bat nopause
+build_script:
+  - if [%TOBUILD%]==[LunaLua] build.bat
+  - if [%TOBUILD%]==[LunaLua] build-lunaexec.bat
+  - if [%TOBUILD%]==[LunaLua] deploy-full.bat nopause
+  - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact LunaLUA-bin.zip
+  - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact LunaLoader-bin.zip
+  - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact Release\LunaDLL.dll
+  - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact Release\LunaDLL.pdb
+  - if [%TOBUILD%]==[LunaLua] appveyor PushArtifact LunaLoader-exec.7z
+  - if [%TOBUILD%]==[Launcher] build_launcher_2017.bat
+  - if [%TOBUILD%]==[Launcher] deploy-launcher.bat nopause
 
-  artifacts:
-  - path: LunaLUA-bin.zip
-  - path: LunaLoader-bin.zip
-  - path: Release\LunaDLL.dll
-  - path: LunaLoader-exec.7z
-
-  deploy:
+deploy:
   - provider: Environment
     name: WohlnetFTP
 
--
-  version: 0.7.3.1.{build}
-  branches:
-    only:
-    - master
-  skip_tags: true
-
-  os: Visual Studio 2017
-  configuration: Release
-
-  clone_depth: 1
-
-  clone_folder: C:\_Repos\LunaLUA
-
-  install:
-  - cmd: git submodule init
-  - cmd: git submodule update
-
-  build_script:
-  - cmd: build_launcher_2017.bat
-
-  after_build:
-  - cmd: deploy-full.bat nopause
-
-  artifacts:
-  - path: SMBX-Launcher.zip
-
-  deploy:
-  - provider: Environment
-    name: WohlnetFTP
-
--
-  version: 0.7.3.1.{build}
-  branches:
-    only:
-    - cleanup
-  skip_tags: true
-
-  os: Visual Studio 2017
-
-  clone_depth: 1
-  clone_folder: C:\_Repos\LunaLUA
-
-  install:
-  - cmd: git submodule init
-  - cmd: git submodule update
-
-  build_script:
-  - cmd: mkdir build-appveyor-vs2017
-  - cmd: cd build-appveyor-vs2017
-  - cmd: cmake ../. -G "Visual Studio 15 2017"
-  - cmd: cmake --build . --config release
+#
+#-
+#  version: 0.7.3.1.{build}
+#  branches:
+#    only:
+#    - master
+#  skip_tags: true
+#
+#  os: Visual Studio 2017
+#  configuration: Release
+#
+#  clone_depth: 1
+#
+#  clone_folder: C:\_Repos\LunaLUA
+#
+#  install:
+#  - cmd: git submodule init
+#  - cmd: git submodule update
+#
+#  build_script:
+#  - cmd: build_launcher_2017.bat
+#
+#  after_build:
+#  - cmd: deploy-full.bat nopause
+#
+#  artifacts:
+#  - path: SMBX-Launcher.zip
+#
+#  deploy:
+#  - provider: Environment
+#    name: WohlnetFTP
+#
+#-
+#  version: 0.7.3.1.{build}
+#  branches:
+#    only:
+#    - cleanup
+#  skip_tags: true
+#
+#  os: Visual Studio 2017
+#
+#  clone_depth: 1
+#  clone_folder: C:\_Repos\LunaLUA
+#
+#  install:
+#  - cmd: git submodule init
+#  - cmd: git submodule update
+#
+#  build_script:
+#  - cmd: mkdir build-appveyor-vs2017
+#  - cmd: cd build-appveyor-vs2017
+#  - cmd: cmake ../. -G "Visual Studio 15 2017"
+#  - cmd: cmake --build . --config release
