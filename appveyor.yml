@@ -52,7 +52,7 @@
   - cmd: git submodule init
   - cmd: git submodule update
 
-  build:
+  build_script:
   - cmd: build_launcher_2017.bat
 
   after_build:
