@@ -87,6 +87,7 @@ void CLunaLua::exitContext()
         g_PerfTracker.disable();
 
         gRenderBGOFlag = true;
+        gRenderSizableFlag = true;
 
         // Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();

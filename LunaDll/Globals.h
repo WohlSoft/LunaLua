@@ -63,6 +63,7 @@ extern bool            gAutostartRan;
 extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
+extern bool            gRenderSizableFlag;
 
 extern startUpSettings gStartupSettings;
 

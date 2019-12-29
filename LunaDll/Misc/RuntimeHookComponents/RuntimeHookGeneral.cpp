@@ -496,7 +496,7 @@ void TrySkipPatch()
     //-100: Level Background
     PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-95, 0x910433, &gRenderBGOFlag>()).Apply();
     // -95: Furthest back BGOs
-    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
+    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-90, 0x911F19, &gRenderSizableFlag>()).Apply();
     // -90: Sizable Blocks
     PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-85, 0x911F19, &gRenderBGOFlag>()).Apply();
     // -85: Some more BGOs
