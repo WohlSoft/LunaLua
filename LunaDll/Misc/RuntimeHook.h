@@ -5,6 +5,8 @@
 #include <string>
 #include "../Defines.h"
 
+struct SMBX_Warp;
+
 /************************************************************************/
 /* Typedefs                                                             */
 /************************************************************************/
@@ -224,6 +226,7 @@ CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, sho
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename);
+void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename);
 void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename);
 void __stdcall runtimeHookCloseWindow(void);
 

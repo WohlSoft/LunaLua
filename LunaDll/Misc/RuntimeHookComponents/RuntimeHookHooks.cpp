@@ -36,6 +36,8 @@
 #include "../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "../../Rendering/LunaImage.h"
 
+#include "../../libs/PGE_File_Formats/file_formats.h"
+
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
@@ -1471,6 +1473,46 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             base.ReadFile(static_cast<std::wstring>(*filename), getCurrentLevelData());
         }
     }
+}
+
+void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename)
+{
+    static LevelData levelData;
+
+    if ((filename == nullptr) || (*filename == L'\0'))
+    {
+        return;
+    }
+
+    FileFormats::CreateLevelData(levelData);
+    std::wstring filePath(filename);
+    
+    if (!fileExists(filePath))
+    {
+        return;
+    }
+
+    // Check if path has slash, if not then invalid
+    size_t findLastSlash = filePath.find_last_of(L"/\\");
+    if (findLastSlash == std::wstring::npos)
+    {
+        return;
+    }
+
+    // Append missing extension
+    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
+    if (findLastDot == std::wstring::npos)
+    {
+        if (!hasSuffix(filePath, L".lvl") && !hasSuffix(filePath, L".lvlx"))
+            filePath.append(L".lvl");
+    }
+
+    if (!FileFormats::OpenLevelFileHeader(utf8_encode(filePath), levelData))
+    {
+        return;
+    }
+
+    warp->unknown_8C = levelData.stars;
 }
 
 void __stdcall runtimeHookCloseWindow(void)
