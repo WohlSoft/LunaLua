@@ -32,9 +32,24 @@ link_directories(
 set(LunaLua_LibsSources
     libs/ini-reader/INIReader.cpp
     libs/ini-reader/ini.c
+
+    libs/IniProcessor/ini_processing.cpp
+
+    libs/DirManager/dirman.cpp
+    libs/DirManager/dirman_winapi.cpp
+
+    libs/Utils/files.cpp
+
+    libs/fmt/fmt_format.cpp
+    libs/fmt/fmt_ostream.cpp
+    libs/fmt/fmt_posix.cpp
+    libs/fmt/fmt_printf.cpp
+
     libs/luasocket/luasocket.cpp
     libs/luasocket/mime.cpp
+
     libs/stackwalker/StackWalker.cpp
+
     libs/luasocket/auxiliar.c
     libs/luasocket/buffer.c
     libs/luasocket/except.c
@@ -63,6 +78,7 @@ set(LunaLua_Sources
     CustomSprites/SpritesFuncs/SpriteBehaviorFuncs.cpp
     CustomSprites/SpritesFuncs/SpriteDrawFuncs.cpp
     EventStateMachine.cpp
+    FileManager/config_manager.cpp
     FileManager/CustomParamStore.cpp
     FileManager/LoadFile_Level.cpp
     FileManager/SMBXFileManager.cpp
