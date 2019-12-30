@@ -132,3 +132,83 @@ void ConfigPackMiniManager::setCustomPath(const std::string &custom_path)
     addSlashToTail(m_custom_path);
     removeDoubleSlash(m_custom_path);
 }
+
+std::string ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManager::EntryType type, uint64_t id)
+{
+    switch (type)
+    {
+    case BLOCKS:
+    {
+        auto it = m_blocks.data.find(id);
+        if(it == m_blocks.data.end())
+            return std::string();
+        return findFile(it->second.extra_settings_filename, m_blocks.extra_settings_root);
+    }
+
+    case BGO:
+    {
+        auto it = m_bgo.data.find(id);
+        if(it == m_bgo.data.end())
+            return std::string();
+        return findFile(it->second.extra_settings_filename, m_bgo.extra_settings_root);
+    }
+
+    case NPC:
+    {
+        auto it = m_npc.data.find(id);
+        if(it == m_npc.data.end())
+            return std::string();
+        return findFile(it->second.extra_settings_filename, m_npc.extra_settings_root);
+    }
+
+    default:
+        return std::string();
+    }
+}
+
+std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniManager::EntryType type)
+{
+    switch (type)
+    {
+    case BLOCKS:
+    {
+        std::string f = m_cp_root_path + "global_block.json";
+        if (Files::fileExists(f))
+            return f;
+        return std::string();
+    }
+
+    case BGO:
+    {
+        std::string f = m_cp_root_path + "global_bgo.json";
+        if (Files::fileExists(f))
+            return f;
+        return std::string();
+    }
+
+    case NPC:
+    {
+        std::string f = m_cp_root_path + "global_npc.json";
+        if (Files::fileExists(f))
+            return f;
+        return std::string();
+    }
+
+    default:
+        return std::string();
+    }
+}
+
+std::string ConfigPackMiniManager::findFile(const std::string &fileName, const std::string &root)
+{
+    if(Files::fileExists(m_custom_path + fileName))
+        return m_custom_path + fileName;
+
+    if(Files::fileExists(m_episode_path + fileName))
+        return m_episode_path + fileName;
+
+    if(Files::fileExists(root + fileName))
+        return root + fileName;
+
+    return std::string();
+}

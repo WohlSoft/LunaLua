@@ -16,6 +16,13 @@ public:
     ConfigPackMiniManager();
     ~ConfigPackMiniManager() {}
 
+    enum EntryType
+    {
+        BLOCKS = 1,
+        BGO,
+        NPC
+    };
+
     struct ConfigEntry
     {
         uint64_t id;
@@ -42,6 +49,11 @@ public:
 
     void setEpisodePath(const std::string &episode_path);
     void setCustomPath(const std::string &custom_path);
+
+    std::string getLocalExtraSettingsFile(EntryType type, uint64_t id);
+    std::string getGlobalExtraSettingsFile(EntryType type);
+
+    std::string findFile(const std::string &fileName, const std::string &root);
 
 private:
     ConfigStore             m_blocks;
