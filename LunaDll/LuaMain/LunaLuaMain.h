@@ -100,6 +100,12 @@ public:
         }
     }
 
+    luabind::object newTable()
+    {
+        if (!m_ready) return luabind::object();
+        return luabind::newtable(L);
+    }
+
 private:
     LuaLunaType m_type;
     std::string m_luaEventTableName;

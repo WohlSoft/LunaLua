@@ -798,6 +798,9 @@ void TrySkipPatch()
 
     PATCH(0x8BF020).CALL(&runtimeHookLoadDefaultControls).Apply();
 
+    // Hook for animation spawning
+    PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

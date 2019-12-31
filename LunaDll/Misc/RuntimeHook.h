@@ -412,5 +412,7 @@ void __stdcall runtimeHookColorSwitchYellowBlock(void);
 
 void __stdcall runtimeHookLoadDefaultControls(void);
 
+void __stdcall runtimeHookRunAnimInternal(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask);
+
 #endif
 

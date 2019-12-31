@@ -2275,3 +2275,42 @@ void __stdcall runtimeHookLoadDefaultControls(void)
     // Run the regular load default controls...
     native_loadDefaultControls();
 }
+
+static _declspec(naked) void __stdcall runtimeHookRunAnim_OrigFunc(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x9E7386
+        RET
+    }
+}
+
+void __stdcall runtimeHookRunAnimInternal(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask)
+{
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> runEffectInternalEvent = std::make_shared<Event>("onRunEffectInternal", true);
+        runEffectInternalEvent->setDirectEventName("onRunEffectInternal");
+        runEffectInternalEvent->setLoopable(false);
+
+        luabind::object coorCopy = gLunaLua.newTable();
+        coorCopy["x"] = coor->x;
+        coorCopy["y"] = coor->y;
+        coorCopy["speedX"] = coor->speedX;
+        coorCopy["speedY"] = coor->speedY;
+        coorCopy["width"] = coor->width;
+        coorCopy["height"] = coor->height;
+
+        // onRunEffectInternal(eventObj, id, coords, variant, npcID, drawOnlyMask)
+        gLunaLua.callEvent(runEffectInternalEvent, *effectID, coorCopy, *effectFrame, *npcID, ((*showOnlyMask) != 0));
+        isCancelled = runEffectInternalEvent->native_cancelled();
+    }
+
+    if (!isCancelled)
+    {
+        runtimeHookRunAnim_OrigFunc(effectID, coor, effectFrame, npcID, showOnlyMask);
+    }
+}
