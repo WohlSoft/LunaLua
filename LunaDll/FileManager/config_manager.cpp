@@ -99,7 +99,7 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
 
         ConfigEntry e;
         e.id = it;
-        e.extra_settings_filename;
+        e.extra_settings_filename = std::string();
 
         for(const std::string &f : files_to_read)
         {
