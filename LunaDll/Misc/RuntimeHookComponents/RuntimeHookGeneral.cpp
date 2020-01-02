@@ -799,7 +799,11 @@ void TrySkipPatch()
     PATCH(0x8BF020).CALL(&runtimeHookLoadDefaultControls).Apply();
 
     // Hook for animation spawning
-    PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
+    // CURRENTLY DISABLED: Sometimes this can be triggered by things currentely handled by FFI
+    //                     function, making this an unsafe event to emit at present.
+    //                     Also, cancelling this is not entirely safe for now, because of lots
+    //                     of code that assumes success of GM_RUN_ANIM.
+    // PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
