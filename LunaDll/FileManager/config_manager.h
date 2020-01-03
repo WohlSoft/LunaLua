@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include <json/json.hpp>
 
 extern std::string g_ApplicationPath;
 
@@ -27,12 +28,14 @@ public:
     {
         uint64_t id;
         std::string extra_settings_filename;
+        nlohmann::json default_extra_settings;
     };
 
     struct ConfigStore
     {
         std::string extra_settings_root;
         std::string setup_root;
+        nlohmann::json default_global_extra_settings;
         std::unordered_map<uint64_t, ConfigEntry> data;
     };
 
@@ -54,6 +57,8 @@ public:
     std::string getGlobalExtraSettingsFile(EntryType type);
 
     std::string findFile(const std::string &fileName, const std::string &root);
+
+    void loadExtraSettings(nlohmann::json &dst, const std::string &path);
 
 private:
     ConfigStore             m_blocks;

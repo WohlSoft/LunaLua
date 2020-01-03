@@ -5,6 +5,10 @@
 #include <Utils/files.h>
 #include <algorithm>
 #include <fmt/fmt_format.h>
+#include <SDL2/SDL.h>
+#ifdef UNIT_TEST
+#include <stdio.h>
+#endif
 
 std::string g_ApplicationPath = "./";
 
@@ -29,6 +33,33 @@ static void removeDoubleSlash(std::string &dir)
         c_prev = (c == '/') ? c : 0;
     }
     dir = dirN;
+}
+
+static std::string dump_file(const std::string &path)
+{
+    SDL_RWops *f = SDL_RWFromFile(path.c_str(), "r");
+    std::string out;
+    if(!f)
+        return std::string();
+
+    Sint64 f_size = SDL_RWsize(f);
+
+    if(f_size < 0)
+    {
+        SDL_RWclose(f);
+        return std::string();
+    }
+
+    out.resize(static_cast<size_t>(f_size));
+
+    if(SDL_RWread(f, &out[0], 1, static_cast<size_t>(f_size)) != static_cast<size_t>(f_size))
+    {
+        SDL_RWclose(f);
+        return std::string();
+    }
+
+    SDL_RWclose(f);
+    return out;
 }
 
 ConfigPackMiniManager::ConfigPackMiniManager() :
@@ -63,11 +94,22 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
     IniProcessing store_set(file);
     size_t total;
 
+#ifdef UNIT_TEST
+    printf("Loading store %s:\n", file.c_str());
+#endif
+
     store_set.beginGroup(hive_head);
     store_set.read("total", total, 0);
     store_set.read("config-dir", dst.setup_root, "items");
     store_set.read("extra-settings", dst.extra_settings_root, dst.setup_root);
     store_set.endGroup();
+
+#ifdef UNIT_TEST
+    printf("-- Total: %zu\n", total);
+    printf("-- Config dir: %s\n", dst.setup_root.c_str());
+    printf("-- Extra settings root: %s\n", dst.extra_settings_root.c_str());
+    fflush(stdout);
+#endif
 
     dst.setup_root = m_cp_root_path + dst.setup_root;
     addSlashToTail(dst.setup_root);
@@ -82,17 +124,17 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
         std::vector<std::string> files_to_read;
         std::string fname;
 
-        fname = fmt::format("%s%s-%zu.ini", dst.setup_root, item_head, it);
+        fname = fmt::format("{0}{1}-{2}.ini", dst.setup_root, item_head, it);
         removeDoubleSlash(fname);
         if(Files::fileExists(fname))
             files_to_read.push_back(fname);
 
-        fname = fmt::format("%s%s-%zu.ini", m_episode_path, item_head, it);
+        fname = fmt::format("{0}{1}-{2}.ini", m_episode_path, item_head, it);
         removeDoubleSlash(fname);
         if(Files::fileExists(fname))
             files_to_read.push_back(fname);
 
-        fname = fmt::format("%s%s-%zu.ini", m_custom_path, item_head, it);
+        fname = fmt::format("{0}{1}-{2}.ini", m_custom_path, item_head, it);
         removeDoubleSlash(fname);
         if(Files::fileExists(fname))
             files_to_read.push_back(fname);
@@ -111,8 +153,27 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
                 item_set.beginGroup("General");
 
             item_set.read("extra-settings", e.extra_settings_filename, e.extra_settings_filename);
-
+#ifdef UNIT_TEST
+            if(!e.extra_settings_filename.empty())
+            {
+                printf("-- Extra settins filename %s found in %s\n", e.extra_settings_filename.c_str(), f.c_str());
+                fflush(stdout);
+            }
+#endif
             item_set.endGroup();
+        }
+
+        if(!e.extra_settings_filename.empty())
+        {
+            std::string path = findFile(e.extra_settings_filename, dst.extra_settings_root);
+#ifdef UNIT_TEST
+            printf("-- Trying to figure out [%s]\n", path.c_str());
+            fflush(stdout);
+#endif
+            if(!path.empty())
+            {
+                loadExtraSettings(e.default_extra_settings, path);
+            }
         }
 
         dst.data.insert({e.id, e});
@@ -124,6 +185,10 @@ void ConfigPackMiniManager::setEpisodePath(const std::string &episode_path)
     m_episode_path = episode_path;
     addSlashToTail(m_episode_path);
     removeDoubleSlash(m_episode_path);
+#ifdef UNIT_TEST
+    printf("Episode path: %s\n", m_episode_path.c_str());
+    fflush(stdout);
+#endif
 }
 
 void ConfigPackMiniManager::setCustomPath(const std::string &custom_path)
@@ -131,6 +196,10 @@ void ConfigPackMiniManager::setCustomPath(const std::string &custom_path)
     m_custom_path = custom_path;
     addSlashToTail(m_custom_path);
     removeDoubleSlash(m_custom_path);
+#ifdef UNIT_TEST
+    printf("Custom path: %s\n", m_custom_path.c_str());
+    fflush(stdout);
+#endif
 }
 
 std::string ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManager::EntryType type, uint64_t id)
@@ -211,4 +280,48 @@ std::string ConfigPackMiniManager::findFile(const std::string &fileName, const s
         return root + fileName;
 
     return std::string();
+}
+
+void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::string &path)
+{
+#ifdef UNIT_TEST
+    printf("-- Loading extra settings file %s\n", path.c_str());
+    fflush(stdout);
+#endif
+    dst.clear();
+
+    std::string src = dump_file(path);
+    if(!src.empty())
+    {
+        try
+        {
+            dst = nlohmann::json::parse(src);
+#ifdef UNIT_TEST
+            printf("-- Parsed content of length %zu, %s\n", src.size(), dst.is_object() ? "is object" : "odd crap");
+            fflush(stdout);
+#endif
+        }
+        catch(const nlohmann::json::parse_error &e)
+        {
+#ifdef UNIT_TEST
+            printf("-- ERROR: fail to parse: %s\n", e.what());
+            fflush(stdout);
+#endif
+        }
+        catch(const nlohmann::json::exception &e)
+        {
+#ifdef UNIT_TEST
+            printf("-- ERROR: exception: %s\n", e.what());
+            fflush(stdout);
+#endif
+        }
+
+    }
+#ifdef UNIT_TEST
+    else
+    {
+        printf("-- failed to read: blank output\n");
+        fflush(stdout);
+    }
+#endif
 }

@@ -18,6 +18,10 @@ add_executable(lles_test
     ${INIPROCESSOR_SRCS}
 )
 
+target_compile_definitions(lles_test PRIVATE
+    -DUNIT_TEST
+)
+
 target_include_directories(lles_test PRIVATE
     ${LL_ROOT}
     ${LL_ROOT}/libs
@@ -26,4 +30,5 @@ target_include_directories(lles_test PRIVATE
 target_link_libraries(lles_test
     PRIVATE
     ${UTILS_LIBS}
+    SDL2
 )
