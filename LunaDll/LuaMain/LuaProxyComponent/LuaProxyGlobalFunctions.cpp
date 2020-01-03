@@ -237,10 +237,10 @@ void LuaProxy::playSFX(int index)
 }
 
 
-void LuaProxy::playSFX(const std::string& filename)
+void LuaProxy::playSFX(const std::string& filename, lua_State* L)
 {
 #ifndef NO_SDL
-    playSFXSDL(filename);
+    playSFXSDL(filename, L);
 #else
     wstring full_path;
     if(!isAbsolutePath(filename)){
@@ -253,11 +253,15 @@ void LuaProxy::playSFX(const std::string& filename)
 #endif
 }
 
-void LuaProxy::playSFXSDL(const std::string& filename)
+void LuaProxy::playSFXSDL(const std::string& filename, lua_State* L)
 {
 #ifndef NO_SDL
     std::string full_paths = Audio::getSfxPath(filename);
-    PGE_Sounds::SND_PlaySnd(full_paths.c_str());
+    if (!PGE_Sounds::SND_PlaySnd(full_paths.c_str()))
+    {
+        // If error, pass to Lua
+        luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
+    }
 #else
     playSFX(filename);
 #endif

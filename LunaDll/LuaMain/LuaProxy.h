@@ -1044,8 +1044,8 @@ namespace LuaProxy {
     void triggerEvent(const std::string& evName);
     //Music related
     void playSFX(int index);
-    void playSFX(const std::string& filename);
-    void playSFXSDL(const std::string& filename);
+    void playSFX(const std::string& filename, lua_State* L);
+    void playSFXSDL(const std::string& filename, lua_State* L);
     void clearSFXBuffer();
     void MusicOpen(const std::string& filename);
     void MusicPlay();

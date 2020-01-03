@@ -285,21 +285,32 @@ void LuaProxy::Audio::clearSFXBuffer()
 }
 
 
-void LuaProxy::Audio::playSFX(const std::string& filename)
+void LuaProxy::Audio::playSFX(const std::string& filename, lua_State* L)
 {
 #ifndef NO_SDL
     std::string full_paths = getSfxPath(filename);
-    PGE_Sounds::SND_PlaySnd(full_paths.c_str());
+    if (!PGE_Sounds::SND_PlaySnd(full_paths.c_str()))
+    {
+        // If error, pass to Lua
+        luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
+    }
 #else
     ::LuaProxy::playSFX(filename);
 #endif
 }
 
 
-Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename)
+Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
 {
     std::string full_paths = getSfxPath(filename);
-    return PGE_Sounds::SND_OpenSnd(full_paths.c_str());
+    Mix_Chunk* chunk = PGE_Sounds::SND_OpenSnd(full_paths.c_str());
+    if (!chunk)
+    {
+        // If error, pass to Lua
+        luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
+    }
+
+    return chunk;
 }
 
 
