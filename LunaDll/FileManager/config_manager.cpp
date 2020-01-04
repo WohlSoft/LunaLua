@@ -119,7 +119,7 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
     addSlashToTail(dst.extra_settings_root);
     removeDoubleSlash(dst.extra_settings_root);
 
-    for(size_t it = 1; it < total; it++)
+    for(size_t it = 1; it <= total; it++)
     {
         std::vector<std::string> files_to_read;
         std::string fname;
@@ -147,9 +147,7 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
         {
             IniProcessing item_set(f);
 
-            if(item_set.hasKey(item_head))
-                item_set.beginGroup(item_head);
-            else
+            if(!item_set.beginGroup(item_head))
                 item_set.beginGroup("General");
 
             item_set.read("extra-settings", e.extra_settings_filename, e.extra_settings_filename);
@@ -282,6 +280,240 @@ std::string ConfigPackMiniManager::findFile(const std::string &fileName, const s
     return std::string();
 }
 
+static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, nlohmann::json &src)
+{
+    for(auto it = src.begin(); it != src.end(); it++)
+    {
+        nlohmann::json &entry = *it;
+        if(entry.find("control") == entry.end())
+            continue; // invalid entry: missing required key
+        if(entry.find("name") == entry.end())
+            continue; // invalid entry: missing required key
+
+        std::string control = entry["control"];
+        std::string name = entry["name"];
+
+        if(SDL_strncasecmp(control.c_str(), "group", 6) == 0)
+        {
+            if(entry.find("children") == entry.end())
+                continue; // Invalid entry: missing a required key
+            read_layout_branches(typetree[name], dst[name], entry["children"]);
+        }
+        else if(SDL_strncasecmp(control.c_str(), "spinbox", 8) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+
+            std::string type = "int";
+            if(entry.find("type") == entry.end())
+                type = entry["type"];
+
+            if(type == "int")
+            {
+                int v = entry["value-default"];
+                if(entry.find("value-min") != entry.end() &&
+                   entry.find("value-max") != entry.end())
+                {
+                    int min = entry["value-min"];
+                    int max = entry["value-max"];
+                    if(v < min)
+                        v = min;
+                    if(v > max)
+                        v = max;
+                }
+                dst[name] = v;
+            }
+            else if(type == "double")
+            {
+                double v = entry["value-default"];
+                if(entry.find("value-min") != entry.end() &&
+                   entry.find("value-max") != entry.end())
+                {
+                    double min = entry["value-min"];
+                    double max = entry["value-max"];
+                    if(v < min)
+                        v = min;
+                    if(v > max)
+                        v = max;
+                }
+                dst[name] = v;
+            }
+            else
+            {
+                dst[name] = "<invalid value format>";
+                continue; // Invalid type name
+            }
+        }
+        else if(SDL_strncasecmp(control.c_str(), "checkbox", 9) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+            bool v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "color", 6) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+            std::string v = entry["value-default"];
+            dst[name] = v;
+            typetree[name] = "color";
+        }
+        else if(SDL_strncasecmp(control.c_str(), "combobox", 9) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+            int v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "flagbox", 8) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+            unsigned long v = entry["value-default"];
+            dst[name] = v;
+            typetree[name] = "flags";
+        }
+        else if(SDL_strncasecmp(control.c_str(), "lineedit", 9) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+            std::string v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "sizebox", 8) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+
+            std::string type = "int";
+            if(entry.find("type") != entry.end())
+                type = entry["type"];
+
+            nlohmann::json v = entry["value-default"];
+            if(v.find("w") != v.end() && v.find("h") != v.end())
+            {
+                if(type == "int")
+                {
+                    int w = v["w"];
+                    int h = v["h"];
+                    dst[name]["w"] = w;
+                    dst[name]["h"] = h;
+                }
+                else if(type == "double")
+                {
+                    double w = v["w"];
+                    double h = v["h"];
+                    dst[name]["w"] = w;
+                    dst[name]["h"] = h;
+                }
+                else
+                {
+                    dst[name] = "<invalid value format>";
+                    continue; // Invalid type name
+                }
+
+                typetree[name] = "size";
+            }
+            else
+            {
+                dst[name] = "<invalid value format>";
+            }
+        }
+        else if(SDL_strncasecmp(control.c_str(), "pointbox", 9) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+
+            std::string type = "int";
+            if(entry.find("type") != entry.end())
+                type = entry["type"];
+
+            nlohmann::json v = entry["value-default"];
+            if(v.find("x") != v.end() && v.find("y") != v.end())
+            {
+                if(type == "int")
+                {
+                    int x = v["x"];
+                    int y = v["y"];
+                    dst[name]["x"] = x;
+                    dst[name]["y"] = y;
+                }
+                else if(type == "double")
+                {
+                    double x = v["x"];
+                    double y = v["y"];
+                    dst[name]["x"] = x;
+                    dst[name]["y"] = y;
+                }
+                else
+                {
+                    dst[name] = "<invalid value format>";
+                    continue; // Invalid type name
+                }
+
+                typetree[name] = "point";
+            }
+            else
+            {
+                dst[name] = "<invalid value format>";
+            }
+        }
+        else if(SDL_strncasecmp(control.c_str(), "rectbox", 8) == 0)
+        {
+            if(entry.find("value-default") == entry.end())
+                continue; // invalid entry: missing required key
+
+            std::string type = "int";
+            if(entry.find("type") != entry.end())
+                type = entry["type"];
+
+            nlohmann::json v = entry["value-default"];
+            if(v.find("x") != v.end() && v.find("y") != v.end() &&
+               v.find("w") != v.end() && v.find("w") != v.end())
+            {
+                if(type == "int")
+                {
+                    int x = v["x"];
+                    int y = v["y"];
+                    int w = v["w"];
+                    int h = v["h"];
+                    dst[name]["x"] = x;
+                    dst[name]["y"] = y;
+                    dst[name]["w"] = w;
+                    dst[name]["h"] = h;
+                }
+                else if(type == "double")
+                {
+                    double x = v["x"];
+                    double y = v["y"];
+                    double w = v["w"];
+                    double h = v["h"];
+                    dst[name]["x"] = x;
+                    dst[name]["y"] = y;
+                    dst[name]["w"] = w;
+                    dst[name]["h"] = h;
+                }
+                else
+                {
+                    dst[name] = "<invalid value format>";
+                    continue; // Invalid type name
+                }
+
+                typetree[name] = "rect";
+            }
+            else
+            {
+                dst[name] = "<invalid value format>";
+            }
+        }
+        else
+        {
+            dst[name] = "<unknown entry type>";
+        }
+    }
+}
+
 void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::string &path)
 {
 #ifdef UNIT_TEST
@@ -295,9 +527,19 @@ void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::st
     {
         try
         {
-            dst = nlohmann::json::parse(src);
+            nlohmann::json layout = nlohmann::json::parse(src);
+            auto items = layout.find("layout");
+            if(items->is_array())
+            {
+                if(dst.find("__type") == dst.end())
+                    dst["__type"] = nlohmann::json();
+                read_layout_branches(dst["__type"], dst, *items);
+            }
+
 #ifdef UNIT_TEST
             printf("-- Parsed content of length %zu, %s\n", src.size(), dst.is_object() ? "is object" : "odd crap");
+            std::string out_tree = dst.dump(4, ' ');
+            printf("-- Generated a tree:%s\n", out_tree.c_str());
             fflush(stdout);
 #endif
         }
