@@ -240,8 +240,8 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                     map.insert("starCount", data.gottenStars.length());
                     map.insert("gameCompleted", data.gameCompleted);
                     map.insert("coinCount", data.coins);
+                    ret << map;
                 }
-                ret << map;
             }
         }
     }
