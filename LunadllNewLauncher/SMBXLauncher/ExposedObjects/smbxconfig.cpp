@@ -231,12 +231,40 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
             }
 
             if (index != 0 && index <= 32767 && index >= -32768) {
+
+                QFile ext(episodeDir.canonicalPath() + "/save" + QString::number(index) + "-ext.dat");
+                double progress = 0;
+                if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    QTextStream in(&ext);
+                    
+                    QString line("");
+                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,\\s*$");
+                    
+                    while (!in.atEnd() && QString::compare(line, "}") != 0) {
+                        line = in.readLine();
+                        const std::string ln = line.toUtf8().constData();
+                        if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
+                            try {
+                                progress = std::stod(match[1]);
+                            } catch (std::invalid_argument const &e) {
+                                progress = 0;
+                            } catch (std::out_of_range const &e) {
+                                progress = 0;
+                            }
+                            break;
+                        }
+                    }
+                    
+                }
+
+
                 GamesaveData data;
                 QMap<QString, QVariant> map;
                 FileFormats::ReadSMBX64SavFileF(episodeDir.canonicalPath() + "/" + filename, data);
 
                 if (data.meta.ReadFileValid) {
                     map.insert("id", index);
+                    map.insert("progress", progress);
                     map.insert("starCount", data.gottenStars.length());
                     map.insert("gameCompleted", data.gameCompleted);
                     map.insert("coinCount", data.coins);
