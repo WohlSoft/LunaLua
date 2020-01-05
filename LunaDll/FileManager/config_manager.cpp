@@ -81,12 +81,13 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
 
     m_cp_root_path = confDir.absolutePath() + "/";
 
-    loadStore(m_blocks, m_cp_root_path + "lvl_blocks.ini", "blocks-main", "block");
-    loadStore(m_bgo, m_cp_root_path + "lvl_bgo.ini", "background-main", "background");
-    loadStore(m_npc, m_cp_root_path + "lvl_npc.ini", "npc-main", "npc");
+    loadStore(BLOCKS, m_blocks, m_cp_root_path + "lvl_blocks.ini", "blocks-main", "block");
+    loadStore(BGO, m_bgo, m_cp_root_path + "lvl_bgo.ini", "background-main", "background");
+    loadStore(NPC, m_npc, m_cp_root_path + "lvl_npc.ini", "npc-main", "npc");
 }
 
-void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
+void ConfigPackMiniManager::loadStore(EntryType type,
+                                      ConfigPackMiniManager::ConfigStore &dst,
                                       const std::string &file,
                                       const std::string &hive_head,
                                       const std::string &item_head)
@@ -118,6 +119,10 @@ void ConfigPackMiniManager::loadStore(ConfigPackMiniManager::ConfigStore &dst,
     dst.extra_settings_root = m_cp_root_path + dst.extra_settings_root;
     addSlashToTail(dst.extra_settings_root);
     removeDoubleSlash(dst.extra_settings_root);
+
+    std::string global_layout_path = getGlobalExtraSettingsFile(type);
+    if(!global_layout_path.empty())
+        loadExtraSettings(dst.default_global_extra_settings, global_layout_path);
 
     for(size_t it = 1; it <= total; it++)
     {
@@ -261,6 +266,96 @@ std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniMana
         return std::string();
     }
 
+    default:
+        return std::string();
+    }
+}
+
+
+static void mergeJsonSettingsCB(nlohmann::json &dst, nlohmann::json &src)
+{
+    if(!src.is_object())
+        return;
+    for(auto it = src.begin(); it != src.end(); it++)
+    {
+        if(it->is_object())
+        {
+            mergeJsonSettingsCB(dst[it.key()], *it);
+            continue;
+        }
+        dst[it.key()] = *it;
+    }
+}
+
+
+static std::string mergeJsonSettings(const nlohmann::json &dst, const std::string &src, bool beautify = false)
+{
+    nlohmann::json res = dst;
+
+    try {
+        nlohmann::json j_src = nlohmann::json::parse(src);
+        mergeJsonSettingsCB(res, j_src);
+    } catch(...) {
+        if(beautify)
+            return res.dump(4, ' ');
+        else
+            return res.dump();
+    }
+
+    if(beautify)
+        return res.dump(4, ' ');
+    else
+        return res.dump();
+}
+
+std::string ConfigPackMiniManager::mergeLocalExtraSettings(ConfigPackMiniManager::EntryType type,
+                                                           uint64_t id,
+                                                           const std::string &input,
+                                                           bool beautify)
+{
+    switch (type)
+    {
+    case BLOCKS:
+    {
+        auto it = m_blocks.data.find(id);
+        if(it == m_blocks.data.end())
+            return std::string();
+        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
+    }
+
+    case BGO:
+    {
+        auto it = m_bgo.data.find(id);
+        if(it == m_bgo.data.end())
+            return std::string();
+        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
+    }
+
+    case NPC:
+    {
+        auto it = m_npc.data.find(id);
+        if(it == m_npc.data.end())
+            return std::string();
+        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
+    }
+
+    default:
+        return std::string();
+    }
+}
+
+std::string ConfigPackMiniManager::mergeGlobalExtraSettings(ConfigPackMiniManager::EntryType type,
+                                                            const std::string &input,
+                                                            bool beautify)
+{
+    switch (type)
+    {
+    case BLOCKS:
+        return mergeJsonSettings(m_blocks.default_global_extra_settings, input, beautify);
+    case BGO:
+        return mergeJsonSettings(m_bgo.default_global_extra_settings, input, beautify);
+    case NPC:
+        return mergeJsonSettings(m_npc.default_global_extra_settings, input, beautify);
     default:
         return std::string();
     }

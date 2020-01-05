@@ -45,7 +45,8 @@ public:
      */
     void loadConfigPack(const std::string &config_dir);
 
-    void loadStore(ConfigStore &dst,
+    void loadStore(EntryType type,
+                   ConfigStore &dst,
                    const std::string &file,
                    const std::string &hive_head,
                    const std::string &item_head);
@@ -55,6 +56,14 @@ public:
 
     std::string getLocalExtraSettingsFile(EntryType type, uint64_t id);
     std::string getGlobalExtraSettingsFile(EntryType type);
+
+    std::string mergeLocalExtraSettings(EntryType type,
+                                        uint64_t id,
+                                        const std::string &input,
+                                        bool beautify = false);
+    std::string mergeGlobalExtraSettings(EntryType type,
+                                         const std::string &input,
+                                         bool beautify = false);
 
     std::string findFile(const std::string &fileName, const std::string &root);
 
