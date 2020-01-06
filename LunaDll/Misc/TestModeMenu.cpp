@@ -73,7 +73,7 @@ void testModePauseMenu(bool allowContinue)
     while (keepRunningPauseMenu)
     {
         // Only do input reading if window is in focus
-        if (GetMainSMBXWindow() == GetForegroundWindow())
+        if (gMainWindowFocused)
         {
             // Read input...
             short oldPauseOpen = GM_PAUSE_OPEN;

@@ -236,39 +236,6 @@ static bool testModeSetupForLoading()
 //================ NEW HOOK ================//
 //////////////////////////////////////////////
 
-// Helper function to get the main window
-// TODO: Consider replacing with something better, that uses some memory
-//       address or something instead.
-HWND GetMainSMBXWindow(void)
-{
-    // This here is a big mess of a workaround... but it works
-    HWND hWindow = NULL;
-    DWORD dwCurrentProcessId = GetCurrentProcessId();
-    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
-        DWORD dwCurrentProcessId = GetCurrentProcessId();
-        HWND& hWindow = *reinterpret_cast<HWND*>(lParam);
-        // Check that it's our process
-        DWORD dwProcessId = 0x0;
-        GetWindowThreadProcessId(hWnd, &dwProcessId);
-        if (dwCurrentProcessId == dwProcessId) {
-            // Now check the class and if it's top level
-            wchar_t className[24] = { 0 };
-            wchar_t windowName[24] = { 0 };
-            HWND hParent = GetParent(hWnd);
-            GetWindowTextW(hWnd, windowName, sizeof(windowName));
-            GetClassNameW(hWnd, className, sizeof(className));
-            if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0))
-            {
-                hWindow = hWnd;
-                SetLastError(ERROR_SUCCESS);
-                return FALSE;
-            }
-        }
-        return TRUE;
-    }, reinterpret_cast<LPARAM>(&hWindow));
-    return hWindow;
-}
-
 bool testModeLoadLevelHook(VB6StrPtr* filename)
 {
     // Skip if not enabled
@@ -455,7 +422,7 @@ json IPCTestLevel(const json& params)
     }
 
     // Before checking for tick end... bring to top if we need to
-    HWND hWindow = GetMainSMBXWindow();
+    HWND hWindow = gMainWindowHwnd;
     if (hWindow)
     {
         ShowWindow(hWindow, SW_SHOW);
@@ -496,7 +463,7 @@ bool TestModeCheckHideWindow(void)
         // waiting for IPC again.
         testModeRestartLevel();
         gStartupSettings.currentlyWaitingForIPC = true;
-        HWND hWindow = GetMainSMBXWindow();
+        HWND hWindow = gMainWindowHwnd;
         if (hWindow)
         {
             ShowWindow(hWindow, SW_HIDE);
@@ -526,7 +493,6 @@ json IPCSetCheckPoint(const json& params)
 
 json IPCGetWindowHandle(const json& /*params*/)
 {
-    HWND window = GetMainSMBXWindow();
-    unsigned long ptr = ULONG_PTR(window);
+    unsigned long ptr = ULONG_PTR(gMainWindowHwnd);
     return ptr;
 }

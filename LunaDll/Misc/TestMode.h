@@ -63,8 +63,6 @@ LevelData &getCurrentLevelData();
 
 bool TestModeCheckHideWindow(void);
 
-extern HWND GetMainSMBXWindow(void);
-
 // The following function decleration is not included in this header, to
 // avoid applying a json.hpp dependency to this header.
 //   json IPCTestLevel(const json& params)

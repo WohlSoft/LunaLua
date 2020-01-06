@@ -10,6 +10,9 @@
 
 HINSTANCE gHInstance;
 
+HWND gMainWindowHwnd = NULL;
+bool gMainWindowFocused = false;
+
 // Global settings
 bool gLunaEnabled;
 bool gPrintErrorsToScreen;

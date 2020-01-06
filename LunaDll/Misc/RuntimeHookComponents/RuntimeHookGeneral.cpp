@@ -57,44 +57,64 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(HookWnd, nCode, wParam, lParam);
     }
 
-    //CWPRETSTRUCT* wData = (CWPRETSTRUCT*)lParam;
     LPCWPSTRUCT wData = (LPCWPSTRUCT)lParam;
 
-
-    if (wData->message == WM_COPYDATA){
-        PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
-        if (pcds->cbData == 1){
-            if (pcds->dwData == 0xDEADC0DE){
-                std::wstring lvlName = gShMemServer.read();
-                if (!lvlName.empty()){
-                    GM_FULLPATH = lvlName;
+    switch (wData->message)
+    {
+    case WM_COPYDATA:
+        {
+            PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
+            if (pcds->cbData == 1) {
+                if (pcds->dwData == 0xDEADC0DE) {
+                    std::wstring lvlName = gShMemServer.read();
+                    if (!lvlName.empty()) {
+                        GM_FULLPATH = lvlName;
+                    }
+                    gHook_SkipTestMsgBox = true;
+                    ((void(*)())0x00A02220)();
                 }
-                gHook_SkipTestMsgBox = true;
-                ((void(*)())0x00A02220)();
             }
         }
-    }
-
-    /*if(wData->message == WM_CREATE){
-    wchar_t clName[501];
-    GetClassNameW(wData->hwnd, clName, 500);
-    if(!wcscmp(clName, L"ThunderRT6MDIForm")){
-    TBBUTTON * bnt = new TBBUTTON;
-    bnt->iBitmap = I_IMAGENONE;
-    bnt->idCommand = 1000;
-    bnt->fsState = TBSTATE_ENABLED;
-    bnt->fsStyle = TBSTYLE_AUTOSIZE;
-    bnt->dwData = NULL;
-    char* myText = "Hallo";
-    const int numButtons = 1;
-    TBBUTTON tbButtonsAdd[numButtons] =
+        break;
+    case WM_CREATE:
     {
-    *bnt
-    };
-    SendMessage(wData->hwnd, TB_ADDBUTTONS, numButtons, (LPARAM)tbButtonsAdd);
+        static wchar_t className[64];
+        static wchar_t windowName[64];
+        GetWindowTextW(wData->hwnd, windowName, sizeof(windowName));
+        GetClassNameW(wData->hwnd, className, sizeof(className));
+        if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0))
+        {
+            // Store main window handle
+            gMainWindowHwnd = wData->hwnd;
+        }
     }
-    }*/
-
+    break;
+    case WM_DESTROY:
+        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
+        {
+            // Our main window was destroyed? Clear hwnd and mark as unfocused
+            gMainWindowHwnd = NULL;
+            gMainWindowFocused = false;
+        }
+        break;
+    case WM_SETFOCUS:
+        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
+        {
+            // Our main window gained focus? Keep track of that.
+            gMainWindowFocused = true;
+        }
+        break;
+    case WM_KILLFOCUS:
+        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
+        {
+            // Our main window lost focus? Keep track of that.
+            gMainWindowFocused = false;
+        }
+        break;
+    default:
+        break;
+    }
+    
     return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
 

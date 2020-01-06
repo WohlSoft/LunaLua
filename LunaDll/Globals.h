@@ -54,6 +54,10 @@ struct SMBXHUDSettings {
 
 extern HINSTANCE	gHInstance;
 
+/// Global main window state
+extern HWND gMainWindowHwnd;
+extern bool gMainWindowFocused;
+
 /// Global settings
 extern bool            gLunaEnabled;
 extern bool            gPrintErrorsToScreen;

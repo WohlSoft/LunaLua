@@ -209,7 +209,7 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Only do input reading if window is in focus
-        if (GetMainSMBXWindow() == GetForegroundWindow())
+        if (gMainWindowFocused)
         {
             // Read input
             short oldPauseOpen = GM_PAUSE_OPEN;
