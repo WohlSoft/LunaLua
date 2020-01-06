@@ -67,6 +67,12 @@ ConfigPackMiniManager::ConfigPackMiniManager() :
 
 void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
 {
+    m_blocks.clear();
+    m_bgo.clear();
+    m_npc.clear();
+    m_sections_ex.clear();
+    m_level_ex.clear();
+
     if(config_dir.empty())
         return;
 

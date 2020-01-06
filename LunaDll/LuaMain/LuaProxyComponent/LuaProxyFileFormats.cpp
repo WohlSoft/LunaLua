@@ -53,7 +53,7 @@ struct LuaSACKS : public nlohmann::json_sax<json>
     // called when null is parsed
     bool null()
     {
-        addValue(nullptr);
+        // Do nothing
         return true;
     }
 

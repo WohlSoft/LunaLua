@@ -59,6 +59,8 @@ void LunaLua_loadLevelFile(LevelData &outData,
     replaceSubStr(customFolderU8, "/", "\\");
     customFolder = Str2WStr(customFolderU8);
 
+    loadConfigPack(outData.meta.path, outData.meta.filename);
+
     *(DWORD*)0xB2B9E4 = 0; // Unknown
     native_cleanupLevel();
     native_setupSFX();
@@ -105,6 +107,8 @@ void LunaLua_loadLevelFile(LevelData &outData,
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
 
+    outData.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_LEVELFILE, 0, outData.custom_params);
+
     // Store custom params
     g_LevelCustomParams.setData(0, outData.custom_params);
 
@@ -127,6 +131,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         GM_SEC_OFFSCREEN[i] = COMBOOL(nextDataLevelSection.OffScreenEn);
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
 
+        nextDataLevelSection.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_SECTIONS, 0, nextDataLevelSection.custom_params);
         // Store custom params
         g_SectionCustomParams.setData(i, nextDataLevelSection.custom_params);
     }
@@ -178,7 +183,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
     {
         Block* nextBlock = Block::Get(i + 1);
         memset(nextBlock, 0, sizeof(Block));
-        const LevelBlock& nextDataLevelBlock = outData.blocks[i];
+        LevelBlock& nextDataLevelBlock = outData.blocks[i];
         nextBlock->momentum.x = static_cast<double>(nextDataLevelBlock.x);
         nextBlock->momentum.y = static_cast<double>(nextDataLevelBlock.y);
         nextBlock->momentum.width = static_cast<double>(nextDataLevelBlock.w);
@@ -194,6 +199,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         nextBlock->ContentIDRelated = nextBlock->ContentsID;
         nextBlock->Slippery = COMBOOL(nextDataLevelBlock.slippery);
 
+        nextDataLevelBlock.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BLOCKS, nextDataLevelBlock.id, nextDataLevelBlock.meta.custom_params);
         // Store custom params
         g_BlockCustomParams.setData(i, nextDataLevelBlock.meta.custom_params);
     }
@@ -205,7 +211,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
     for (int i = 0; i < numOfBGO; i++) {
         SMBX_BGO* nextBGO = SMBX_BGO::Get(i);
         memset(nextBGO, 0, sizeof(SMBX_BGO));
-        const LevelBGO& nextDataLevelBGO = outData.bgo[i];
+        LevelBGO& nextDataLevelBGO = outData.bgo[i];
         nextBGO->id = static_cast<short>(nextDataLevelBGO.id);
         nextBGO->momentum.x = static_cast<double>(nextDataLevelBGO.x);
         nextBGO->momentum.y = static_cast<double>(nextDataLevelBGO.y);
@@ -217,6 +223,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
         }
         nextBGO->ptLayerName = nextDataLevelBGO.layer;
 
+        nextDataLevelBGO.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BGO, nextDataLevelBGO.id, nextDataLevelBGO.meta.custom_params);
         // Store custom params
         g_BgoCustomParams.setData(i, nextDataLevelBGO.meta.custom_params);
     }
@@ -228,7 +235,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
     for (int i = 0; i < numOfNPC; i++) {
         NPCMOB* nextNPC = NPC::Get(i);
         memset(nextNPC, 0, sizeof(NPCMOB));
-        const LevelNPC& nextDataLevelNPC = outData.npc[i];
+        LevelNPC& nextDataLevelNPC = outData.npc[i];
         nextNPC->momentum.x = static_cast<double>(nextDataLevelNPC.x);
         nextNPC->momentum.y = static_cast<double>(nextDataLevelNPC.y);
         nextNPC->directionFaced = static_cast<float>(nextDataLevelNPC.direct);
@@ -327,6 +334,7 @@ void LunaLua_loadLevelFile(LevelData &outData,
 
         }
 
+        nextDataLevelNPC.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, nextDataLevelNPC.id, nextDataLevelNPC.meta.custom_params);
         // Store custom params
         g_NpcCustomParams.setData(i, nextDataLevelNPC.meta.custom_params);
     }

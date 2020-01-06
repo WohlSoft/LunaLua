@@ -39,6 +39,13 @@ public:
         std::string setup_root;
         nlohmann::json default_global_extra_settings;
         std::unordered_map<uint64_t, ConfigEntry> data;
+        void clear()
+        {
+            extra_settings_root.clear();
+            setup_root.clear();
+            default_global_extra_settings.clear();
+            data.clear();
+        }
     };
 
     /**

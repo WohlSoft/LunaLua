@@ -2,6 +2,7 @@
 #define CUSTOMPARAMSTORE_H_
 
 #include <string>
+#include "config_manager.h"
 
 // Class definition
 template<size_t SIZE>
@@ -63,5 +64,9 @@ extern CustomParamStore<21>    g_SectionCustomParams;
 extern CustomParamStore<5000>  g_NpcCustomParams;
 extern CustomParamStore<8000>  g_BgoCustomParams;
 extern CustomParamStore<20000> g_BlockCustomParams;
+
+extern ConfigPackMiniManager   g_configManager;
+
+void loadConfigPack(const std::string &episodePath, const std::string &customDirectoryName);
 
 #endif
