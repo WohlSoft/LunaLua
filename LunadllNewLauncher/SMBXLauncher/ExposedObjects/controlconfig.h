@@ -37,7 +37,7 @@ class ControlConfig : public QObject
     Q_PROPERTY(unsigned int keyboardDrop2 READ keyboardDrop2 WRITE setKeyboardDrop2 NOTIFY keyboardDrop2Updated)
     Q_PROPERTY(unsigned int keyboardPause2 READ keyboardPause2 WRITE setKeyboardPause2 NOTIFY keyboardPause2Updated)
     Q_PROPERTY(unsigned int keyboardAltJump2 READ keyboardAltJump2 WRITE setKeyboardAltJump2 NOTIFY keyboardAltJump2Updated)
-    Q_PROPERTY(unsigned int keyboardAltRun2 READ keyboardAltRun2 WRITE setKeyboardRun2 NOTIFY keyboardAltRun2Updated)
+    Q_PROPERTY(unsigned int keyboardAltRun2 READ keyboardAltRun2 WRITE setKeyboardAltRun2 NOTIFY keyboardAltRun2Updated)
     Q_PROPERTY(unsigned int joystickRun2 READ joystickRun2 WRITE setJoystickRun2 NOTIFY joystickRun2Updated)
     Q_PROPERTY(unsigned int joystickJump2 READ joystickJump2 WRITE setJoystickJump2 NOTIFY joystickJump2Updated)
     Q_PROPERTY(unsigned int joystickDrop2 READ joystickDrop2 WRITE setJoystickDrop2 NOTIFY joystickDrop2Updated)
@@ -380,7 +380,7 @@ public slots:
     void setKeyboardJump2(unsigned int keyboardJump2)
     {
         m_data.players[1].k_jump = keyboardJump2;
-        emit keyboardRun2Updated();
+        emit keyboardJump2Updated();
     }
 
     void setKeyboardDrop2(unsigned int keyboardDrop2)

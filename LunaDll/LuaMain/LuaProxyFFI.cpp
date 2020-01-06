@@ -140,6 +140,11 @@ extern "C" {
         gRenderBGOFlag = val;
     }
 
+    FFI_EXPORT(void) LunaLuaSetSizableRenderFlag(bool val)
+    {
+        gRenderSizableFlag = val;
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetLevelCustomParams(void)
     {
         return g_LevelCustomParams.getCharPtrArray()[0];

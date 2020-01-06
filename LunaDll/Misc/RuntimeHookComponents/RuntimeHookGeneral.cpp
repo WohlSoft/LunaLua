@@ -496,7 +496,7 @@ void TrySkipPatch()
     //-100: Level Background
     PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-95, 0x910433, &gRenderBGOFlag>()).Apply();
     // -95: Furthest back BGOs
-    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHook<-90>()).Apply();
+    PATCH(0x910433).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-90, 0x911F19, &gRenderSizableFlag>()).Apply();
     // -90: Sizable Blocks
     PATCH(0x910E5D).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-85, 0x911F19, &gRenderBGOFlag>()).Apply();
     // -85: Some more BGOs
@@ -542,6 +542,10 @@ void TrySkipPatch()
 
     // Load level hook
     PATCH(0x8D8F40).JMP(runtimeHookLoadLevel).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // .lvl header reading hooks
+    PATCH(0x8F7E8E).PUSH_EBX().CALL(runtimeHookLoadLevelHeader).NOP_PAD_TO_SIZE<12>().Apply();
+    PATCH(0x8F7EA3).JMP(0x8F7EDB).NOP_PAD_TO_SIZE<56>().Apply();
 
     // Save game hook
     PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
@@ -793,6 +797,13 @@ void TrySkipPatch()
     PATCH(0x9DB84E).JG(&runtimeHookColorSwitchRedBlock).Apply();
 
     PATCH(0x8BF020).CALL(&runtimeHookLoadDefaultControls).Apply();
+
+    // Hook for animation spawning
+    // CURRENTLY DISABLED: Sometimes this can be triggered by things currentely handled by FFI
+    //                     function, making this an unsafe event to emit at present.
+    //                     Also, cancelling this is not entirely safe for now, because of lots
+    //                     of code that assumes success of GM_RUN_ANIM.
+    // PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

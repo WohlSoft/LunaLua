@@ -6,6 +6,7 @@
 #include <memory>
 struct Mix_Chunk;
 class MciEmulator;
+struct lua_State;
 
 namespace LuaProxy
 {
@@ -45,8 +46,8 @@ namespace LuaProxy
         //SFX
         Mix_Chunk* newMix_Chunk();
         void clearSFXBuffer();
-        void playSFX(const std::string& filename);
-        Mix_Chunk* SfxOpen(const std::string& filename);
+        void playSFX(const std::string& filename, lua_State* L);
+        Mix_Chunk* SfxOpen(const std::string& filename, lua_State* L);
         int SfxPlayCh(int channel, Mix_Chunk* chunk, int loops);
         int SfxPlayChVol(int channel, Mix_Chunk* chunk, int loops, int volume);
         int SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);

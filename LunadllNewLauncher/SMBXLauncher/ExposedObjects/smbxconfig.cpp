@@ -13,6 +13,7 @@
 #include <QtDebug>
 #include <QApplication>
 #include <QMessageBox>
+#include <regex>
 
 
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
@@ -191,6 +192,11 @@ QVariant SMBXConfig::checkEpisodeUpdate(const QString& directoryName, const QStr
     return QVariant();
 }
 
+bool SMBXConfig::sortSaveSlots(const QVariant slot1, const QVariant slot2)
+{
+    return slot1.toMap().value("id").toInt() < slot2.toMap().value("id").toInt();
+}
+
 QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 {
     QDir episodeDir = QDir::current();
@@ -203,9 +209,76 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
         return QVariantList();
     }
 
+
+    QVariantList ret;
+    QDir directory(episodeDir.canonicalPath());
+    QStringList files = directory.entryList(QStringList() << "*.sav" << "*.SAV", QDir::Files);
+    foreach(QString filename, files) {
+        if (filename != "save0.sav") {   
+            std::regex rgx("^save(-?[0-9]*).sav$", std::regex_constants::icase);
+            std::smatch match;
+            const std::string fname = filename.toUtf8().constData();
+            int index = 0;
+
+            if (std::regex_search(fname.begin(), fname.end(), match, rgx)) {
+                try {
+                    index = std::stoi(match[1]);
+                } catch (std::invalid_argument const &e) {
+                    index = 0;
+                } catch (std::out_of_range const &e) {
+                    index = 0;
+                }
+            }
+
+            if (index != 0 && index <= 32767 && index >= -32768) {
+
+                QFile ext(episodeDir.canonicalPath() + "/save" + QString::number(index) + "-ext.dat");
+                double progress = 0;
+                if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    QTextStream in(&ext);
+                    
+                    QString line("");
+                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,\\s*$");
+                    
+                    while (!in.atEnd() && QString::compare(line, "}") != 0) {
+                        line = in.readLine();
+                        const std::string ln = line.toUtf8().constData();
+                        if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
+                            try {
+                                progress = std::stod(match[1]);
+                            } catch (std::invalid_argument const &e) {
+                                progress = 0;
+                            } catch (std::out_of_range const &e) {
+                                progress = 0;
+                            }
+                            break;
+                        }
+                    }
+                    
+                }
+
+
+                GamesaveData data;
+                QMap<QString, QVariant> map;
+                FileFormats::ReadSMBX64SavFileF(episodeDir.canonicalPath() + "/" + filename, data);
+
+                if (data.meta.ReadFileValid) {
+                    map.insert("id", index);
+                    map.insert("progress", progress);
+                    map.insert("starCount", data.gottenStars.length());
+                    map.insert("gameCompleted", data.gameCompleted);
+                    map.insert("coinCount", data.coins);
+                    ret << map;
+                }
+            }
+        }
+    }
+
+    qSort(ret.begin(), ret.end(), sortSaveSlots);
+    /*
     // For each possible savefile
     QVariantList ret;
-    for (int i=1; i<=20; i++) {
+    for (int i=1; i<=255; i++) {
         QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(i) + ".sav";
         GamesaveData data;
         QMap<QString, QVariant> map;
@@ -219,12 +292,13 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
         }
         ret << map;
     }
+    */
     return ret;
 }
 
 void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
 {
-    if (slot < 1 || slot > 20) return;
+    if (slot < 1 || slot > 255) return;
 
     QDir episodeDir = QDir::current();
 

@@ -395,6 +395,27 @@ void ImageLoader::Run(bool initialLoad)
         GM_GFX_BLOCKS_NO_MASK[i] = (smbxImageCategoryBlock.getMaskPtr(i + smbxImageCategoryBlock.getFirstIdx()) == nullptr) ? -1 : 0;
     }
 
+    #ifdef _LUNALUA_DBG_DUMP_EFFECT_RATIOS
+        if (initialLoad)
+        {
+            FILE* f = fopen("effect1.csv", "w");
+            for (int i = 0; i < SMBXAnimation::MAX_ID; i++)
+            {
+                double ratio = ((double)GM_GFX_EFFECTS_H_PTR[i] / (double)effectdef_height[i]);
+                fprintf(f, "eff, %d, %g, %g, %g, %d\n", i, (double)GM_GFX_EFFECTS_H_PTR[i], (double)effectdef_height[i], ratio, (int)(ratio + 0.5));
+            }
+            fclose(f);
+        }
+    #endif
+
+    // This is rather ugly, but best replicates the 1.3 behaviour from what I can tell.
+    static const double effectFrameCounts[148] = { 4, 34.0 / 32.0, 1, 2, 1, 1, 2, 1, 1, 4, 7, 3, 3, 4, 2, 2, 8, 8, 1, 8, 4, 2, 1, 8, 94.0 / 48.0, 4, 4, 24.0 / 32.0, 2, 4, 2, 1, 2, 2, 1, 2, 34.0 / 32.0, 2, 34.0 / 32.0, 2, 34.0 / 32.0, 2, 34.0 / 32.0, 2, 1, 2, 1, 1, 2, 2, 4, 1, 2, 5, 5, 17, 4, 16, 5, 4, 16, 4, 3, 8, 8, 8, 8, 1, 2, 1, 4, 2, 4, 3, 2, 1, 15, 3, 13, 3, 1, 4, 8, 2, 4, 4, 4, 4, 2, 64.0 / 96.0, 4, 4, 4, 4, 1, 1, 4, 1, 2, 4, 4, 4, 5, 2, 2, 2, 3, 7, 16, 2, 14, 2, 2, 5, 4, 4, 2, 4, 4, 4, 2, 4, 1, 1, 4, 1, 2, 6, 1, 1, 4, 2, 4, 2, 4, 5, 4, 2, 3, 8, 2, 2, 2, 1, 2, 4, 4, 4 };
+    for (int i = 0; i < 148; i++)
+    {
+        effectdef_width[i] = GM_GFX_EFFECTS_W_PTR[i];
+        effectdef_height[i] = (int)((double)GM_GFX_EFFECTS_H_PTR[i] / effectFrameCounts[i] + 0.5);
+    }
+
     delete lastResources;
     lastResources = foundResources;
 }

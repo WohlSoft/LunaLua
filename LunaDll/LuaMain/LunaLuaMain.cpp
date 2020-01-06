@@ -87,6 +87,7 @@ void CLunaLua::exitContext()
         g_PerfTracker.disable();
 
         gRenderBGOFlag = true;
+        gRenderSizableFlag = true;
 
         // Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
@@ -813,8 +814,8 @@ void CLunaLua::bindAll()
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
                 def("clearSFXBuffer", (void(*)())&LuaProxy::Audio::clearSFXBuffer),
                 def("playSFX", (void(*)(int))&LuaProxy::playSFX),
-                def("playSFX", (void(*)(const std::string&))&LuaProxy::Audio::playSFX),
-                def("SfxOpen", (Mix_Chunk*(*)(const std::string&))&LuaProxy::Audio::SfxOpen),
+                def("playSFX", (void(*)(const std::string&, lua_State*))&LuaProxy::Audio::playSFX),
+                def("SfxOpen", (Mix_Chunk*(*)(const std::string&, lua_State*))&LuaProxy::Audio::SfxOpen),
                 def("SfxPlayCh", (int(*)(int, Mix_Chunk*,int))&LuaProxy::Audio::SfxPlayCh),
                 def("SfxPlayChVol", (int(*)(int, Mix_Chunk*,int,int))&LuaProxy::Audio::SfxPlayChVol),
                 def("SfxPlayChTimed", (int(*)(int, Mix_Chunk*, int, int))&LuaProxy::Audio::SfxPlayChTimed),
@@ -1351,8 +1352,8 @@ void CLunaLua::bindAllDeprecated()
             /*************************Audio*****************************/
             //Old Audio stuff
             def("playSFX", (void(*)(int))&LuaProxy::playSFX),
-            def("playSFX", (void(*)(const std::string&))&LuaProxy::playSFX),
-            def("playSFXSDL", (void(*)(const std::string&))&LuaProxy::playSFXSDL),
+            def("playSFX", (void(*)(const std::string&, lua_State*))&LuaProxy::playSFX),
+            def("playSFXSDL", (void(*)(const std::string&, lua_State*))&LuaProxy::playSFXSDL),
             def("clearSFXBuffer", (void(*)())&LuaProxy::clearSFXBuffer),
             def("MusicOpen", (void(*)(const std::string&))&LuaProxy::MusicOpen),
             def("MusicPlay", (void(*)())&LuaProxy::MusicPlay),

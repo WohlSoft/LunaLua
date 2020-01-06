@@ -23,6 +23,7 @@ SMBXHUDSettings gSMBXHUDSettings = {
     false     // skipStarCount
 };
 bool gRenderBGOFlag = true;
+bool gRenderSizableFlag = true;
 
 // Global variables
 int	gFrames;

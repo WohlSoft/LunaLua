@@ -260,7 +260,7 @@ unsigned __int64 PGE_MusPlayer::MUS_sampleCount()
 
 /***********************************PGE_Sounds********************************************/
 
-Mix_Chunk *PGE_Sounds::sound = NULL;
+std::string PGE_Sounds::lastError = "";
 char *PGE_Sounds::current = "";
 
 std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
@@ -278,57 +278,47 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
     PGE_SDL_Manager::initSDL();
     std::string filePath = sndFile;
     std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
-    Mix_Chunk* tmpChunk = NULL;
+    Mix_Chunk* chunk = NULL;
     if(it == chunksBuffer.end())
     {
-        tmpChunk = Mix_LoadWAV( sndFile );
-        if(!tmpChunk) {
-            MessageBoxA(0, std::string(std::string("OpenSFX: Mix_LoadWAV: ")
-            +std::string(sndFile)+"\n"
-            +std::string(Mix_GetError())).c_str(), "Error", 0);
-        }
+        chunk = Mix_LoadWAV( sndFile );
 
-        PGE_Sounds::memUsage += tmpChunk->alen;
-        chunksBuffer[filePath] = tmpChunk;
+        // Cache the result regardless of if null or not, so we don't waste time re-reading things we can't read
+        chunksBuffer[filePath] = chunk;
+
+        // Only increment memory usage if we successfully opened something
+        if(chunk) {
+            PGE_Sounds::memUsage += chunk->alen;
+        }
     }
     else
     {
-        tmpChunk = chunksBuffer[filePath];
+        chunk = chunksBuffer[filePath];
     }
 
-    return tmpChunk;
+    if (!chunk)
+    {
+        PGE_Sounds::lastError = "Could not read ";
+        PGE_Sounds::lastError += filePath;
+    }
+
+    return chunk;
 }
 
-void PGE_Sounds::SND_PlaySnd(const char *sndFile)
+bool PGE_Sounds::SND_PlaySnd(const char *sndFile)
 {
-    PGE_SDL_Manager::initSDL();
-    std::string filePath = sndFile;
-    std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
-    if(it == chunksBuffer.end())
-    {
-        sound = Mix_LoadWAV( sndFile );
-        if(!sound) {
-            MessageBoxA(0, std::string(std::string("Mix_LoadWAV: ")
-            +std::string(sndFile)+"\n"
-            +std::string(Mix_GetError())).c_str(), "Error", 0);
-        }
+    Mix_Chunk* chunk = SND_OpenSnd(sndFile);
 
-        PGE_Sounds::memUsage += sound->alen;
-        chunksBuffer[filePath] = sound;
-        if(Mix_PlayChannelVol( -1, chunksBuffer[filePath], 0, MIX_MAX_VOLUME) == -1)
-        {
-            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
-        }
-    }
-    else
+    if (chunk && (Mix_PlayChannelVol(-1, chunk, 0, MIX_MAX_VOLUME) == -1))
     {
-        if(Mix_PlayChannelVol( -1, chunksBuffer[filePath], 0, MIX_MAX_VOLUME) == -1)
+        if (std::string(Mix_GetError()) != "No free channels available") //Don't show overflow messagebox
         {
-            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-            MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
+            PGE_Sounds::lastError = Mix_GetError();
+            return false;
         }
     }
+
+    return chunk != nullptr;
 }
 
 void PGE_Sounds::clearSoundBuffer()
@@ -338,8 +328,11 @@ void PGE_Sounds::clearSoundBuffer()
     overrideArrayIsUsed=false;
     for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
     {
-        PGE_Sounds::memUsage -= it->second->alen;
-        Mix_FreeChunk(it->second);
+        if (it->second)
+        {
+            PGE_Sounds::memUsage -= it->second->alen;
+            Mix_FreeChunk(it->second);
+        }
     }
     chunksBuffer.clear();
 }

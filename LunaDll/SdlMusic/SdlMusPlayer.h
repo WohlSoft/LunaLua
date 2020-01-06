@@ -62,8 +62,11 @@ private:
 
 class PGE_Sounds
 {
+private:
+    static std::string lastError;
 public:
-    static void SND_PlaySnd(const char *sndFile);
+    static const char* SND_getLastError() { return lastError.c_str(); }
+    static bool SND_PlaySnd(const char *sndFile);
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
     static bool playOverrideForAlias(const std::string& alias, int ch);
@@ -79,7 +82,6 @@ private:
         bool muted;
     };
     static std::map<std::string, Mix_Chunk* > chunksBuffer;
-    static Mix_Chunk *sound;
     static char *current;
     static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;
