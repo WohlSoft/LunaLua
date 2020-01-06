@@ -584,7 +584,7 @@ static void read_layout_branches(nlohmann::json &typetree,
                 continue; // invalid entry: missing required key
             std::string v = entry["value-default"];
             dst[name] = v;
-            append_type_entry(typetree, path_arr, "Color", name);
+            append_type_entry(typetree, path_arr, "color", name);
         }
         else if(SDL_strncasecmp(control.c_str(), "combobox", 9) == 0)
         {
@@ -599,7 +599,7 @@ static void read_layout_branches(nlohmann::json &typetree,
                 continue; // invalid entry: missing required key
             unsigned long v = entry["value-default"];
             dst[name] = v;
-            append_type_entry(typetree, path_arr, "Flags", name);
+            append_type_entry(typetree, path_arr, "flags", name);
         }
         else if(SDL_strncasecmp(control.c_str(), "lineedit", 9) == 0)
         {
@@ -640,7 +640,7 @@ static void read_layout_branches(nlohmann::json &typetree,
                     continue; // Invalid type name
                 }
 
-                append_type_entry(typetree, path_arr, "Size", name);
+                append_type_entry(typetree, path_arr, "size", name);
             }
             else
             {
@@ -679,7 +679,7 @@ static void read_layout_branches(nlohmann::json &typetree,
                     continue; // Invalid type name
                 }
 
-                append_type_entry(typetree, path_arr, "Point", name);
+                append_type_entry(typetree, path_arr, "point", name);
             }
             else
             {
@@ -727,7 +727,7 @@ static void read_layout_branches(nlohmann::json &typetree,
                     continue; // Invalid type name
                 }
 
-                append_type_entry(typetree, path_arr, "Rect", name);
+                append_type_entry(typetree, path_arr, "rect", name);
             }
             else
             {
