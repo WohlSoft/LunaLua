@@ -81,6 +81,14 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
 
     m_cp_root_path = confDir.absolutePath() + "/";
 
+    std::string sections_path = getGlobalExtraSettingsFile(X_SECTIONS);
+    if(!sections_path.empty())
+        loadExtraSettings(m_sections_ex, sections_path);
+
+    std::string levelfile_path = getGlobalExtraSettingsFile(X_LEVELFILE);
+    if(!levelfile_path.empty())
+        loadExtraSettings(m_level_ex, levelfile_path);
+
     loadStore(BLOCKS, m_blocks, m_cp_root_path + "lvl_blocks.ini", "blocks-main", "block");
     loadStore(BGO, m_bgo, m_cp_root_path + "lvl_bgo.ini", "background-main", "background");
     loadStore(NPC, m_npc, m_cp_root_path + "lvl_npc.ini", "npc-main", "npc");
@@ -261,6 +269,22 @@ std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniMana
     case NPC:
     {
         std::string f = findFile("global_npc.json", m_cp_root_path);
+        if (Files::fileExists(f))
+            return f;
+        return std::string();
+    }
+
+    case X_SECTIONS:
+    {
+        std::string f = findFile("lvl_section.json", m_cp_root_path);
+        if (Files::fileExists(f))
+            return f;
+        return std::string();
+    }
+
+    case X_LEVELFILE:
+    {
+        std::string f = findFile("lvl_settings.json", m_cp_root_path);
         if (Files::fileExists(f))
             return f;
         return std::string();

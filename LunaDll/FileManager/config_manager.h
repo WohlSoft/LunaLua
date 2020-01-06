@@ -21,7 +21,9 @@ public:
     {
         BLOCKS = 1,
         BGO,
-        NPC
+        NPC,
+        X_SECTIONS,
+        X_LEVELFILE
     };
 
     struct ConfigEntry
@@ -77,6 +79,9 @@ private:
     ConfigStore             m_blocks;
     ConfigStore             m_bgo;
     ConfigStore             m_npc;
+
+    nlohmann::json          m_sections_ex;
+    nlohmann::json          m_level_ex;
 
     bool                    m_is_using;
     std::string             m_cp_root_path;
