@@ -461,6 +461,16 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
                                    beautify);
     }
 
+    case X_SECTIONS:
+    {
+        return mergeJsonSettings(m_sections_ex, input, beautify);
+    }
+
+    case X_LEVELFILE:
+    {
+        return mergeJsonSettings(m_level_ex, input, beautify);
+    }
+
     default:
         return std::string();
     }
