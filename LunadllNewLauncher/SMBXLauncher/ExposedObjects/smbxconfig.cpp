@@ -238,7 +238,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                     QTextStream in(&ext);
                     
                     QString line("");
-                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,\\s*$");
+                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
                     
                     while (!in.atEnd() && QString::compare(line, "}") != 0) {
                         line = in.readLine();
