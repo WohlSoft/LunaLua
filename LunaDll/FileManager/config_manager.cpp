@@ -456,7 +456,22 @@ std::string ConfigPackMiniManager::findFile(const std::string &fileName, const s
     return std::string();
 }
 
-static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, nlohmann::json &src)
+
+static void append_type_entry(nlohmann::json &typetree,
+                              nlohmann::json path,
+                              const std::string &type,
+                              const std::string &value)
+{
+    path.push_back(value);
+    if(typetree.find(type) == typetree.end())
+        typetree[type] = nlohmann::json::array();
+    typetree[type].push_back(path);
+}
+
+static void read_layout_branches(nlohmann::json &typetree,
+                                 nlohmann::json &dst,
+                                 nlohmann::json &src,
+                                 nlohmann::json path_arr)
 {
     for(auto it = src.begin(); it != src.end(); it++)
     {
@@ -473,7 +488,9 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
         {
             if(entry.find("children") == entry.end())
                 continue; // Invalid entry: missing a required key
-            read_layout_branches(typetree[name], dst[name], entry["children"]);
+            nlohmann::json path_arr_next = path_arr;
+            path_arr_next.push_back(name);
+            read_layout_branches(typetree, dst[name], entry["children"], path_arr_next);
         }
         else if(SDL_strncasecmp(control.c_str(), "spinbox", 8) == 0)
         {
@@ -533,7 +550,7 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
                 continue; // invalid entry: missing required key
             std::string v = entry["value-default"];
             dst[name] = v;
-            typetree[name] = "color";
+            append_type_entry(typetree, path_arr, "Color", name);
         }
         else if(SDL_strncasecmp(control.c_str(), "combobox", 9) == 0)
         {
@@ -548,7 +565,7 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
                 continue; // invalid entry: missing required key
             unsigned long v = entry["value-default"];
             dst[name] = v;
-            typetree[name] = "flags";
+            append_type_entry(typetree, path_arr, "Flags", name);
         }
         else if(SDL_strncasecmp(control.c_str(), "lineedit", 9) == 0)
         {
@@ -589,7 +606,7 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
                     continue; // Invalid type name
                 }
 
-                typetree[name] = "size";
+                append_type_entry(typetree, path_arr, "Size", name);
             }
             else
             {
@@ -628,7 +645,7 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
                     continue; // Invalid type name
                 }
 
-                typetree[name] = "point";
+                append_type_entry(typetree, path_arr, "Point", name);
             }
             else
             {
@@ -676,7 +693,7 @@ static void read_layout_branches(nlohmann::json &typetree, nlohmann::json &dst, 
                     continue; // Invalid type name
                 }
 
-                typetree[name] = "rect";
+                append_type_entry(typetree, path_arr, "Rect", name);
             }
             else
             {
@@ -709,7 +726,8 @@ void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::st
             {
                 if(dst.find("__type") == dst.end())
                     dst["__type"] = nlohmann::json();
-                read_layout_branches(dst["__type"], dst, *items);
+                nlohmann::json path_arr = nlohmann::json::array();
+                read_layout_branches(dst["__type"], dst, *items, path_arr);
             }
 
 #ifdef UNIT_TEST
