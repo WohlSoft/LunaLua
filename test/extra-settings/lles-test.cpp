@@ -53,7 +53,7 @@ int main(int argc, char**argv)
     ku.loadConfigPack(argv[1]);
 
     {
-        std::string res1 = ku.mergeLocalExtraSettings(ConfigPackMiniManager::NPC, 1000, test_str1, true);
+        std::string res1 = ku.mergeExtraSettings(ConfigPackMiniManager::NPC, 1000, test_str1, true);
         printf("Merging source:\n"
                "------------------\n"
                "%s\n"
@@ -67,7 +67,7 @@ int main(int argc, char**argv)
     }
 
     {
-        std::string res1 = ku.mergeLocalExtraSettings(ConfigPackMiniManager::NPC, 1000, test_str2, true);
+        std::string res1 = ku.mergeExtraSettings(ConfigPackMiniManager::NPC, 1000, test_str2, true);
         printf("Merging source:\n"
                "------------------\n"
                "%s\n"
@@ -81,7 +81,7 @@ int main(int argc, char**argv)
     }
 
     {
-        std::string res1 = ku.mergeLocalExtraSettings(ConfigPackMiniManager::NPC, 1000, "", true);
+        std::string res1 = ku.mergeExtraSettings(ConfigPackMiniManager::NPC, 1000, "", true);
         printf("Merging source:\n"
                "------------------\n"
                "<blank string>\n"

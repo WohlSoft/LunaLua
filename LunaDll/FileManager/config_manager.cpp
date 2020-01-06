@@ -244,7 +244,7 @@ std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniMana
     {
     case BLOCKS:
     {
-        std::string f = m_cp_root_path + "global_block.json";
+        std::string f = findFile("global_block.json", m_cp_root_path);
         if (Files::fileExists(f))
             return f;
         return std::string();
@@ -252,7 +252,7 @@ std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniMana
 
     case BGO:
     {
-        std::string f = m_cp_root_path + "global_bgo.json";
+        std::string f = findFile("global_bgo.json", m_cp_root_path);
         if (Files::fileExists(f))
             return f;
         return std::string();
@@ -260,7 +260,7 @@ std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniMana
 
     case NPC:
     {
-        std::string f = m_cp_root_path + "global_npc.json";
+        std::string f = findFile("global_npc.json", m_cp_root_path);
         if (Files::fileExists(f))
             return f;
         return std::string();
@@ -307,6 +307,43 @@ static std::string mergeJsonSettings(const nlohmann::json &dst, const std::strin
     else
         return res.dump();
 }
+
+static std::string mergeJsonSettingsLG(const nlohmann::json &global,
+                                       const nlohmann::json &local,
+                                       const std::string &src, bool beautify = false)
+{
+    nlohmann::json res;
+    res["local"] = local;
+    res["global"] = global;
+
+    try {
+        nlohmann::json j_src = nlohmann::json::parse(src);
+        if(j_src.find("local") != j_src.end())
+        {
+            mergeJsonSettingsCB(res["local"], j_src["local"]);
+        }
+        else
+        {
+            nlohmann::json j_src_c = j_src;
+            if(j_src_c.find("global") != j_src_c.end())
+                j_src_c.erase("global");
+            mergeJsonSettingsCB(res["local"], j_src_c);
+        }
+        if(j_src.find("global") != j_src.end())
+            mergeJsonSettingsCB(res["global"], j_src["global"]);
+    } catch(...) {
+        if(beautify)
+            return res.dump(4, ' ');
+        else
+            return res.dump();
+    }
+
+    if(beautify)
+        return res.dump(4, ' ');
+    else
+        return res.dump();
+}
+
 
 std::string ConfigPackMiniManager::mergeLocalExtraSettings(ConfigPackMiniManager::EntryType type,
                                                            uint64_t id,
@@ -356,6 +393,50 @@ std::string ConfigPackMiniManager::mergeGlobalExtraSettings(ConfigPackMiniManage
         return mergeJsonSettings(m_bgo.default_global_extra_settings, input, beautify);
     case NPC:
         return mergeJsonSettings(m_npc.default_global_extra_settings, input, beautify);
+    default:
+        return std::string();
+    }
+}
+
+std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::EntryType type,
+                                                      uint64_t id,
+                                                      const std::string &input,
+                                                      bool beautify)
+{
+    switch (type)
+    {
+    case BLOCKS:
+    {
+        auto it = m_blocks.data.find(id);
+        if(it == m_blocks.data.end())
+            return std::string();
+        return mergeJsonSettingsLG(m_blocks.default_global_extra_settings,
+                                   it->second.default_extra_settings,
+                                   input,
+                                   beautify);
+    }
+
+    case BGO:
+    {
+        auto it = m_bgo.data.find(id);
+        if(it == m_bgo.data.end())
+            return std::string();
+        return mergeJsonSettingsLG(m_bgo.default_global_extra_settings,
+                                   it->second.default_extra_settings,
+                                   input, beautify);
+    }
+
+    case NPC:
+    {
+        auto it = m_npc.data.find(id);
+        if(it == m_npc.data.end())
+            return std::string();
+        return mergeJsonSettingsLG(m_npc.default_global_extra_settings,
+                                   it->second.default_extra_settings,
+                                   input,
+                                   beautify);
+    }
+
     default:
         return std::string();
     }

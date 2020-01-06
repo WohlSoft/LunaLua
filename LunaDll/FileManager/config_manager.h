@@ -64,6 +64,10 @@ public:
     std::string mergeGlobalExtraSettings(EntryType type,
                                          const std::string &input,
                                          bool beautify = false);
+    std::string mergeExtraSettings(EntryType type,
+                                   uint64_t id,
+                                   const std::string &input,
+                                   bool beautify = false);
 
     std::string findFile(const std::string &fileName, const std::string &root);
 
