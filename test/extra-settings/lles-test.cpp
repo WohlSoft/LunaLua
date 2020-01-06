@@ -23,7 +23,10 @@ static const char *test_str1 =
 "   \"whereIsMySombrero\": {"
 "       \"x\": 9,"
 "       \"y\": 12"
-"   }"
+"   },"
+"\"zzzzzzzzzzzzzzzzzzzzzzzz1\": 28,"
+"\"zzzzzzzzzzzzzzzzzzzzzzzz2\": \"22r`2`r2r``2r\","
+"\"zzzzzzzzzzzzzzzzzzzzzzzz3\": \"popa\""
 "}";
 
 static const char *test_str2 =

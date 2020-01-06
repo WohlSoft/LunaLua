@@ -515,21 +515,35 @@ static void read_layout_branches(nlohmann::json &typetree,
     for(auto it = src.begin(); it != src.end(); it++)
     {
         nlohmann::json &entry = *it;
-        if(entry.find("control") == entry.end())
-            continue; // invalid entry: missing required key
-        if(entry.find("name") == entry.end())
-            continue; // invalid entry: missing required key
+        std::string name;
+        std::string control;
 
-        std::string control = entry["control"];
-        std::string name = entry["name"];
+        if(entry.find("control") == entry.end())
+            control = "invalid";
+        else
+            control = entry["control"];
+
+        if(entry.find("name") == entry.end())
+            name = control;
+        else
+            name = entry["name"];
 
         if(SDL_strncasecmp(control.c_str(), "group", 6) == 0)
         {
             if(entry.find("children") == entry.end())
                 continue; // Invalid entry: missing a required key
             nlohmann::json path_arr_next = path_arr;
-            path_arr_next.push_back(name);
-            read_layout_branches(typetree, dst[name], entry["children"], path_arr_next);
+            if(name != "..")
+            {
+                // Create a new named branch and store all children inside
+                path_arr_next.push_back(name);
+                read_layout_branches(typetree, dst[name], entry["children"], path_arr_next);
+            }
+            else
+            {
+                // Store all children in a current branch
+                read_layout_branches(typetree, dst, entry["children"], path_arr_next);
+            }
         }
         else if(SDL_strncasecmp(control.c_str(), "spinbox", 8) == 0)
         {
