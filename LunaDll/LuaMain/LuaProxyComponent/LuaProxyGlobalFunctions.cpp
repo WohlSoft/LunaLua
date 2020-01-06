@@ -1,6 +1,6 @@
 #include "../LuaProxy.h"
 #include "../../Rendering/Rendering.h"
-#include "../../libs/ini-reader/INIReader.h"
+#include <IniProcessor/ini_processing.h>
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Animation.h"
@@ -25,11 +25,13 @@
 //ini_file - path to INI-file which contains the hitbox redefinations
 void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
 {
-    if ((_powerup < 1) || (_powerup>10)) {
+    if((_powerup < 1) || (_powerup>10))
+    {
         luaL_error(L, "Powerup ID must be from 1 to 10.");
         return;
     }
-    if ((_character < 1) || (_character > 5)) {
+    if ((_character < 1) || (_character > 5))
+    {
         if (runtimeHookGetExtCharacterHitBoxData(_character, _powerup) == nullptr)
         {
             luaL_error(L, "Invalid character ID.");
@@ -39,10 +41,10 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
 
     std::string full_path = resolveIfNotAbsolutePath(ini_file);
 
-    INIReader hitBoxFile( full_path );
-    if (hitBoxFile.ParseError() < 0)
+    IniProcessing hitBoxFile(full_path);
+    if(!hitBoxFile.isOpened())
     {
-        MessageBoxA(0, std::string(full_path+"\n\nError of read INI file").c_str(), "Error", 0);
+        luaL_error(L, ("Failed to read an INI file: " + full_path).c_str());
         return;
     }
 
@@ -57,64 +59,73 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     //X = ((FrameID+49)-(FrameID+49)%10)/10
     //Y = (FrameID+49)%10
 
-    std::string width = "";
-    std::string height = "";
-    std::string height_duck = "";
-    std::string grab_offset_x = "";
-    std::string grab_offset_y = "";
-    std::string isUsed;
-    std::string offsetX;
-    std::string offsetY;
+    const short UNDEFINED = 0x7FFF;
+    short width = UNDEFINED;
+    short height = UNDEFINED;
+    short height_duck = UNDEFINED;
+    short grab_offset_x = UNDEFINED;
+    short grab_offset_y = UNDEFINED;
+    bool isUsed = false;
+    short offsetX = UNDEFINED;
+    short offsetY = UNDEFINED;
 
+    hitBoxFile.beginGroup("common");
     //normal
-    width =  hitBoxFile.Get("common", "width", "");
-    height = hitBoxFile.Get("common", "height", "");
+    hitBoxFile.read("width", width, UNDEFINED);
+    hitBoxFile.read("height", height, UNDEFINED);
     //duck
-    height_duck = hitBoxFile.Get("common", "height-duck", "");
+    hitBoxFile.read("height-duck", height_duck, UNDEFINED);
 
     //grab offsets
-    grab_offset_x = hitBoxFile.Get("common", "grab-offset-x", "");
-    grab_offset_y = hitBoxFile.Get("common", "grab-offset-y", "");
+    hitBoxFile.read("grab-offset-x", grab_offset_x, UNDEFINED);
+    hitBoxFile.read("grab-offset-y", grab_offset_y, UNDEFINED);
 
-    for (int x = 0; x<10; x++)
+    hitBoxFile.endGroup();
+
+    for (int x = 0; x < 10; x++)
     {
-        for (int y = 0; y<10; y++)
+        for (int y = 0; y < 10; y++)
         {
-            isUsed.clear();
-            offsetX.clear();
-            offsetY.clear();
+            isUsed = false;
+            offsetX = UNDEFINED;
+            offsetY = UNDEFINED;
+
             std::stringstream xx;
             xx << "frame-" << x << "-" << y;
+
             std::string tFrame = xx.str();
-            isUsed = hitBoxFile.Get(tFrame, "used", "false");
-            if (isUsed == "true") //--> skip this frame
+            hitBoxFile.beginGroup(tFrame);
+
+            hitBoxFile.read("used", isUsed, false);
+            if(isUsed) //--> skip this frame
             {
                 //Offset relative to
-                offsetX = hitBoxFile.Get(tFrame, "offsetX", "default value");
-                offsetY = hitBoxFile.Get(tFrame, "offsetY", "default value");
-                if (!offsetX.empty() && !offsetY.empty())
+                hitBoxFile.read("offsetX", offsetX, UNDEFINED);
+                hitBoxFile.read("offsetY", offsetY, UNDEFINED);
+                if(offsetX != UNDEFINED && offsetY != UNDEFINED)
                 {
                     SMBX_CustomGraphics::setOffsetX((Characters)_character,
                         SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-                        (PowerupID)_powerup, -(int)atoi(offsetX.c_str()));
+                        (PowerupID)_powerup, -offsetX);
                     SMBX_CustomGraphics::setOffsetY((Characters)_character,
                         SMBX_CustomGraphics::convIndexCoorToSpriteIndex(x, y),
-                        (PowerupID)_powerup, -(int)atoi(offsetY.c_str()));
+                        (PowerupID)_powerup, -offsetY);
                 }
             }
+            hitBoxFile.endGroup();
         }
     }
 
-    if( !width.empty() )
-        SMBX_CustomGraphics::setPlayerHitboxWidth((PowerupID)_powerup, (Characters)_character, (short)atoi(width.c_str()));
-    if( !height.empty() )
-        SMBX_CustomGraphics::setPlayerHitboxHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height.c_str()));
-    if (!height_duck.empty())
-        SMBX_CustomGraphics::setPlayerHitboxDuckHeight((PowerupID)_powerup, (Characters)_character, (short)atoi(height_duck.c_str()));
-    if (!grab_offset_x.empty())
-        SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_x.c_str()));
-    if (!grab_offset_y.empty())
-        SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)_powerup, (Characters)_character, (short)atoi(grab_offset_y.c_str()));
+    if(width != UNDEFINED)
+        SMBX_CustomGraphics::setPlayerHitboxWidth((PowerupID)_powerup, (Characters)_character, width);
+    if(height != UNDEFINED)
+        SMBX_CustomGraphics::setPlayerHitboxHeight((PowerupID)_powerup, (Characters)_character, height);
+    if(height_duck != UNDEFINED)
+        SMBX_CustomGraphics::setPlayerHitboxDuckHeight((PowerupID)_powerup, (Characters)_character, height_duck);
+    if(grab_offset_x != UNDEFINED)
+        SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)_powerup, (Characters)_character, grab_offset_x);
+    if(grab_offset_y != UNDEFINED)
+        SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)_powerup, (Characters)_character, grab_offset_y);
 }
 
 
@@ -248,7 +259,7 @@ void LuaProxy::playSFX(const std::string& filename, lua_State* L)
     }else{
         full_path = utf8_decode(filename);
     }
-    
+
     PlaySound(full_path.c_str(), 0, SND_FILENAME | SND_ASYNC);
 #endif
 }
@@ -572,12 +583,12 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
         luaL_error(L, "Invalid NPC-ID!\nNeed NPC-ID between 1-%d\nGot NPC-ID: %d", ::NPC::MAX_ID, npcid);
         return LuaProxy::NPC(-1);
     }
-        
+
     if(section < 0 || section > 20){
         luaL_error(L, "Invalid Section!\nNeed Section-Index between 0-20\nGot Section-Index: %d", section);
         return LuaProxy::NPC(-1);
     }
-        
+
     if(GM_NPCS_COUNT >= 5000){
         luaL_error(L, "Over 5000 NPCs, cannot spawn more!");
         return LuaProxy::NPC(-1);
@@ -640,7 +651,7 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
 LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, lua_State* L)
 {
     return spawnEffect(effectID, x, y, 1.0f, L);
-} 
+}
 
 
 LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L)

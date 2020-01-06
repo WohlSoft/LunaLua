@@ -15,7 +15,7 @@
 
 #include "../../Rendering/GL/GLEngine.h"
 #include "../../Main.h"
-#include "../../libs/ini-reader/INIReader.h"
+#include <IniProcessor/ini_processing.h>
 
 #include "../RunningStat.h"
 #include "../../Rendering/BitBltEmulation.h"
@@ -179,21 +179,30 @@ extern int __stdcall LoadIntro()
 {
     std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
-    if (file_existsX(autostartFile)) {
-        INIReader autostartConfig( autostartFile );
-        if (autostartConfig.GetBoolean("autostart", "do-autostart", false)) {
-            if (!gAutostartRan) {
-                GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-                autostarter.applyAutostart();
-                gAutostartRan = true;
-                if (autostartConfig.GetBoolean("autostart", "transient", false)) {
-                    remove(autostartFile.c_str());
+    if (file_existsX(autostartFile))
+    {
+        IniProcessing autostartConfig(autostartFile);
+        if(autostartConfig.beginGroup("autostart"))
+        {
+            if(autostartConfig.value("do-autostart", false).toBool())
+            {
+                if (!gAutostartRan)
+                {
+                    GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                    autostarter.applyAutostart();
+                    gAutostartRan = true;
+                    if(autostartConfig.value("transient", false).toBool())
+                    {
+                        remove(autostartFile.c_str());
+                    }
                 }
             }
         }
+        autostartConfig.endGroup();
     }
 
-    if (GameAutostartConfig::nextAutostartConfig) {
+    if (GameAutostartConfig::nextAutostartConfig)
+    {
         GameAutostartConfig::nextAutostartConfig->doAutostart();
         GameAutostartConfig::nextAutostartConfig.reset();
     }
@@ -1012,7 +1021,7 @@ _declspec(naked) void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper()
         LEA ECX, [ECX + EAX * 8] // Get NPC address
         POP EAX // Remove return address from stack
         PUSHFD // Save pre-call state
-        PUSH ECX 
+        PUSH ECX
         PUSH EDX
         PUSH ECX // Push NPC argument
         CALL runtimeHookIgnoreThrownNPCs // Call the target function
@@ -1079,7 +1088,7 @@ _declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
     __asm {
         PUSHFD // Save pre-call state
         PUSH EAX
-        PUSH EDX 
+        PUSH EDX
 
         PUSH ESI // Push NPC argument
         CALL runtimeHookNoShieldFireEffect // Call the target function
@@ -1486,7 +1495,7 @@ void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename)
 
     FileFormats::CreateLevelData(levelData);
     std::wstring filePath(filename);
-    
+
     if (!fileExists(filePath))
     {
         return;

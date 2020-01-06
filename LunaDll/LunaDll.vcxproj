@@ -56,12 +56,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
     <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
@@ -94,7 +94,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <AssemblerOutput>All</AssemblerOutput>
@@ -138,7 +138,6 @@
     <ClInclude Include="libs\IniProcessor\ini_processing_variant.h" />
     <ClInclude Include="libs\json\json.hpp" />
     <ClInclude Include="libs\Utils\files.h" />
-    <ClInclude Include="libs\Utils\sdl_file.h" />
     <ClInclude Include="libs\Utils\strings.h" />
     <ClInclude Include="libs\Utils\vptrlist.h" />
     <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h" />
@@ -277,8 +276,6 @@
     <ClInclude Include="SMBXInternal\Layer.h" />
     <ClInclude Include="SMBXInternal\Level.h" />
     <ClInclude Include="LevelCodes\LevelCodes.h" />
-    <ClInclude Include="libs\ini-reader\ini.h" />
-    <ClInclude Include="libs\ini-reader\INIReader.h" />
     <ClInclude Include="LuaMain\LuaHelper.h" />
     <ClInclude Include="LuaMain\LuaProxy.h" />
     <ClInclude Include="LuaMain\LunaLuaMain.h" />
@@ -327,7 +324,6 @@
     <ClCompile Include="libs\fmt\fmt_printf.cpp" />
     <ClCompile Include="libs\IniProcessor\ini_processing.cpp" />
     <ClCompile Include="libs\Utils\files.cpp" />
-    <ClCompile Include="libs\Utils\sdl_file.cpp" />
     <ClCompile Include="libs\Utils\strings.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
@@ -487,8 +483,6 @@
     <ClCompile Include="SMBXInternal\HardcodedGraphicsAccess.cpp" />
     <ClCompile Include="SMBXInternal\Layer.cpp" />
     <ClCompile Include="SMBXInternal\Level.cpp" />
-    <ClCompile Include="libs\ini-reader\ini.c" />
-    <ClCompile Include="libs\ini-reader\INIReader.cpp" />
     <ClCompile Include="LuaMain\LuaHelper.cpp" />
     <ClCompile Include="LuaMain\LuaProxy.cpp" />
     <ClCompile Include="LuaMain\LunaLuaMain.cpp" />

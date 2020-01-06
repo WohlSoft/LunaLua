@@ -1,6 +1,9 @@
 #include <string>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <algorithm>
+using std::min;//Workaround for GDI+ that requires MINMAX be presented
+using std::max;
 #include <Windows.h>
 #include <GdiPlus.h>
 #include <io.h>
@@ -115,7 +118,7 @@ int OnLvlLoad() {
     // WIP
     // dumpTypeLibrary((IDispatch*)*(DWORD*)0xB2D7E8, std::wcout);
 
-    
+
     std::string custPath = WStr2Str(getCustomFolderPath());
     std::string wldPath = WStr2Str(GM_FULLDIR);
     std::string SndRoot = MusicManager::SndRoot();
@@ -149,10 +152,10 @@ int OnLvlLoad() {
 
     if(gLunaEnabled) {
         // Load autocode
-        gAutoMan.Clear(false);		
+        gAutoMan.Clear(false);
         gAutoMan.ReadFile((std::wstring)GM_FULLDIR);
 
-        // Try to load world codes		
+        // Try to load world codes
         gAutoMan.ReadWorld((std::wstring)GM_FULLDIR);
 
         // Init var bank
@@ -172,8 +175,8 @@ int OnLvlLoad() {
         gAutoMan.DoEvents(true); // do with init
 
         // Init some stuff
-        InitLevel();	
-        gAutoMan.m_Hearts = 2;	
+        InitLevel();
+        gAutoMan.m_Hearts = 2;
     }
 
     //PGE DBG STUFF
@@ -192,9 +195,9 @@ int TestFunc()
 
     // Update inputs
     Input::CheckSpecialCheats();
-    Input::UpdateInputTasks();	
+    Input::UpdateInputTasks();
 
-    if(gLunaEnabled) {	
+    if(gLunaEnabled) {
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
 #endif
@@ -289,7 +292,7 @@ void LevelFrameCode() {
     case AbstractAssault:
         AbstractAssaultCode();
         break;
-        
+
     case DemosBrain:
         DemosBrainCode();
         break;
@@ -365,7 +368,7 @@ void InitLevel() {
         gLevelEnum = Science;
         ScienceBattle::ScienceInitCode();
     }
-    
+
     // EuroShellRandD
     else if(curlvl == L"ztarwuff-EuroShellRandD.lvl") {
         gLevelEnum = EuroShellRandD;

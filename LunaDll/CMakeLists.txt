@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 add_definitions(
     -DUNICODE
     -D_UNICODE
+    -DNOMINMAX
 )
 
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
@@ -30,9 +31,6 @@ link_directories(
 )
 
 set(LunaLua_LibsSources
-    libs/ini-reader/INIReader.cpp
-    libs/ini-reader/ini.c
-
     libs/IniProcessor/ini_processing.cpp
 
     libs/DirManager/dirman.cpp

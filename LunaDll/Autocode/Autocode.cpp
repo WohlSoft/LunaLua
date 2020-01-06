@@ -18,10 +18,10 @@ using namespace std;
 
 // CTORS
 Autocode::Autocode() {
-    m_Type = AT_Invalid;	
+    m_Type = AT_Invalid;
 }
 
-Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, double _p3, 
+Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, double _p3,
     std::wstring _p4, double _Length, int _Section, std::wstring _VarRef) {
     m_Type = _Type;
     Target = _Target;
@@ -29,7 +29,7 @@ Autocode::Autocode(AutocodeType _Type, double _Target, double _p1, double _p2, d
     Param2 = _p2;
     Param3 = _p3;
     Length = _Length;
-    MyString = _p4;	
+    MyString = _p4;
     MyRef = _VarRef;
     m_OriginalTime = _Length;
     ftype = FT_INVALID;
@@ -55,7 +55,7 @@ Autocode* Autocode::MakeCopy() {
     newcode->MyRef = MyRef;
     newcode->m_OriginalTime = m_OriginalTime;
     newcode->m_Type = m_Type;
-    newcode->Param1 = Param1;	
+    newcode->Param1 = Param1;
     newcode->Param2 = Param2;
     newcode->Param3 = Param3;
     newcode->Target = Target;
@@ -93,30 +93,30 @@ void Autocode::Do(bool init) {
         switch(m_Type) {
 
         // INVALID
-        case Invalid:			
+        case Invalid:
         default:
             break;
 
         // FILTERS
         case AT_FilterToSmall: {
             Player::FilterToSmall(demo);
-            break;		
-                            }	
+            break;
+                            }
         case AT_FilterToBig: {
             Player::FilterToBig(demo);
-            break;		
-                          }	
+            break;
+                          }
         case AT_FilterToFire: {
             Player::FilterToFire(demo);
-            break;		
+            break;
                            }
         case AT_FilterMount: {
             Player::FilterMount(demo);
-            break;		
-                          }	
+            break;
+                          }
         case AT_FilterReservePowerup: {
             Player::FilterReservePowerup(demo);
-            break;		
+            break;
                                    }
 
         case AT_FilterPlayer: {
@@ -126,9 +126,9 @@ void Autocode::Do(bool init) {
                     if(Param2 > 0 && Param2 < 6)
                         demo->Identity = static_cast<Characters>((int)Param2);
             }
-            break;		
+            break;
                                    }
-        
+
         // INFINITE FLYING
         case AT_InfiniteFlying:
             InfiniteFlying(1);
@@ -210,7 +210,7 @@ void Autocode::Do(bool init) {
             int base_health = _wtoi(MyString.data());
             NPCMOB* npc = NPC::GetFirstMatch((int)Target, (int)Param3 - 1);
             if(npc != NULL) {
-                float hits = *(((float*)((&(*(byte*)npc)) + 0x148)));				
+                float hits = *(((float*)((&(*(byte*)npc)) + 0x148)));
                 Renderer::Get().AddOp(new RenderStringOp(std::to_wstring((long long)(base_health - hits)), 3, (float)Param1, (float)Param2));
             } else {
                 Renderer::Get().AddOp(new RenderStringOp(L"?", 3, (float)Param1, (float)Param2));
@@ -219,11 +219,11 @@ void Autocode::Do(bool init) {
                             }
 
         // AUDIO
-        case AT_SFX: {			
+        case AT_SFX: {
             if(this->Length <= 1) { // Play once when delay runs out
                 // Play built in sound
                 if(Param1 > 0) {
-                    SMBXSound::PlaySFX((int)Param1);				
+                    SMBXSound::PlaySFX((int)Param1);
                 }
                 else {
                     // Sound from level folder
@@ -279,21 +279,21 @@ void Autocode::Do(bool init) {
                     Expired = false;
                     Length = m_OriginalTime;
                 }
-            }			
+            }
             break;
 
         case AT_IfNPC: {
             if(GM_NPCS_COUNT < 1)
                 break;
             if(NPCConditional((int)Target, (int)Param1)) {
-                RunSelfOption();				
-                gAutoMan.ActivateCustomEvents((int)Param2, (int)Param3);				
+                RunSelfOption();
+                gAutoMan.ActivateCustomEvents((int)Param2, (int)Param3);
             }
             break;
                        }
 
         case AT_BlockTrigger: {
-            if(Target == 0){ //if target is player						
+            if(Target == 0){ //if target is player
                 if(Blocks::IsPlayerTouchingType((int)Param1, (int)Param2, demo)) {
                     RunSelfOption();
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
@@ -349,7 +349,7 @@ void Autocode::Do(bool init) {
             double U_edge = 0 + depth;
             double D_edge = 600 - depth;
             double R_edge = 800 - depth;
-            
+
             if(demo->WarpCooldownTimer < 1) {
                 if(player_screen_rect.left <= L_edge && demo->momentum.speedX < 0) {
                     gAutoMan.ActivateCustomEvents(0, (int)Target);
@@ -370,8 +370,8 @@ void Autocode::Do(bool init) {
             }
             break;
                                      }
-        
-        case AT_OnInput: {			
+
+        case AT_OnInput: {
             switch((int)Param1) {
             case 1: // Up
                 if(Param2 == 1 && Input::UpThisFrame()) // First frame press only
@@ -417,7 +417,7 @@ void Autocode::Do(bool init) {
             }
             break;
                          }
-                         
+
         case AT_OnPlayerMem: {
             if(ftype == FT_INVALID) {
                 ftype = FT_BYTE;
@@ -446,16 +446,16 @@ void Autocode::Do(bool init) {
 
         // USER VARS
         case AT_SetVar: {
-            if(ReferenceOK()) {				
+            if(ReferenceOK()) {
                 gAutoMan.VarOperation(MyRef, Param2, (OPTYPE)(int)Param1);
             }
-            else { 
+            else {
                 gAutoMan.VarOperation(MyString, Param2, (OPTYPE)(int)Param1);
-            }			
+            }
             break;
                         }
 
-        case AT_LoadPlayerVar: {			
+        case AT_LoadPlayerVar: {
             if(!this->ReferenceOK() || Param1 > (0x184 * 99))
                 break;
             if(ftype == FT_INVALID) {
@@ -471,7 +471,7 @@ void Autocode::Do(bool init) {
             // Perform the load/add/sub/etc operation on the banked variable using the ref as the name
             gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
 
-            break;			
+            break;
                         }
 
         case AT_LoadNPCVar: {
@@ -495,13 +495,13 @@ void Autocode::Do(bool init) {
                             }
 
         case AT_LoadGlobalVar: {
-            if(Target >= GM_BASE && Param1 <=  GM_END && ReferenceOK()) {				
+            if(Target >= GM_BASE && Param1 <=  GM_END && ReferenceOK()) {
                 if(ftype == FT_INVALID) {
                     ftype = FT_BYTE;
                     ftype = StrToFieldtype(MyString);
                 }
 
-                byte* ptr = (byte*)(int)Target;				
+                byte* ptr = (byte*)(int)Target;
                 double gotval = GetMem((int)ptr, ftype);
 
                 gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param1);
@@ -510,7 +510,7 @@ void Autocode::Do(bool init) {
                                }
 
         case AT_IfVar: {
-            if(!ReferenceOK()) {	
+            if(!ReferenceOK()) {
                 InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);// Initalize var if not existing
             }
             double varval;
@@ -523,9 +523,9 @@ void Autocode::Do(bool init) {
 
             // Check if the value meets the criteria and activate event if so
             switch((COMPARETYPE)(int)Param1) {
-            case CMPT_EQUALS:				
-                if(varval == Param2) 
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);									
+            case CMPT_EQUALS:
+                if(varval == Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 break;
             case CMPT_GREATER:
                 if(varval > Param2)
@@ -536,8 +536,8 @@ void Autocode::Do(bool init) {
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 break;
             case CMPT_NOTEQ:
-                if(varval != Param2) 
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);									
+                if(varval != Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 break;
             default:
                 break;
@@ -549,7 +549,7 @@ void Autocode::Do(bool init) {
             if(ReferenceOK()) {
                 COMPARETYPE compare_type = (COMPARETYPE)(int)Param1;
                 if(true) {
-                    InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);						
+                    InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);
                     InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
 
                     double var1 = gAutoMan.m_UserVars[MyRef];
@@ -574,14 +574,14 @@ void Autocode::Do(bool init) {
                         break;
                     default:
                         break;
-                    }			
+                    }
                 }
             }
             break;
                              }
 
         case AT_ShowVar: {
-            if(ReferenceOK()) {				
+            if(ReferenceOK()) {
                 std::wstring str = std::to_wstring((long double)gAutoMan.GetVar(MyRef));
                 if(MyString.length() > 0)
                     str = MyString + str;
@@ -611,12 +611,12 @@ void Autocode::Do(bool init) {
 
 
         // DELETE COMMAND
-        case AT_DeleteCommand: {			
+        case AT_DeleteCommand: {
                 gAutoMan.DeleteEvent(MyString);
             break;
                                }
 
-        // MOD PARAM 
+        // MOD PARAM
         case AT_ModParam: {
             if(Target < 6 && Target > 0) {
                 Autocode* coderef = 0;
@@ -655,11 +655,11 @@ void Autocode::Do(bool init) {
                             }
 
         // INPUT BUFFER STUFF
-        case AT_OnCustomCheat: {			
-            std::wstring curbuf = Input::GetInputStringCopy();			
+        case AT_OnCustomCheat: {
+            std::wstring curbuf = Input::GetInputStringCopy();
             int org_len = curbuf.length();
             int sought_len = MyString.length();
-            if(org_len >= sought_len && 
+            if(org_len >= sought_len &&
                 curbuf.substr(org_len - sought_len, sought_len) == MyString) {
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 Input::ClearInputStringBuffer();
@@ -667,19 +667,19 @@ void Autocode::Do(bool init) {
                     this->Expired = true;
             }
             break;
-                               }		
+                               }
 
         case AT_ClearInputString: {
             //wchar_t* dbg = L"ClearInputString debug";
             Input::ClearInputStringBuffer();
             break;
                                   }
-                                  
+
         case AT_DeleteEventsFrom: {
             gAutoMan.ForceExpire((int)Target);
             break;
                                   }
-        
+
         // LAYER CONTROL
         case AT_LayerXSpeed: {
             LayerControl* layer = Layer::Get((int)Target);
@@ -700,7 +700,7 @@ void Autocode::Do(bool init) {
             }
             break;
                        }
-                
+
         case AT_AccelerateLayerX: {
             LayerControl* layer = Layer::Get((int)Target);
             if(layer) {
@@ -730,8 +730,8 @@ void Autocode::Do(bool init) {
         case AT_DeccelerateLayerX: {
             LayerControl* layer = Layer::Get((int)Target);
             if(layer) {
-                float deccel = (float)_wtof(MyString.c_str());				
-                deccel = std::abs(deccel);				
+                float deccel = (float)_wtof(MyString.c_str());
+                deccel = std::abs(deccel);
                 if(layer->xSpeed > 0) {
                     layer->xSpeed -= deccel;
                     if(layer->xSpeed < 0)
@@ -744,13 +744,13 @@ void Autocode::Do(bool init) {
             }
             break;
                                    }
-            
+
 
         case AT_DeccelerateLayerY: {
             LayerControl* layer = Layer::Get((int)Target);
             if(layer) {
-                float deccel = (float)_wtof(MyString.c_str());				
-                deccel = std::abs(deccel);				
+                float deccel = (float)_wtof(MyString.c_str());
+                deccel = std::abs(deccel);
                 if(layer->ySpeed > 0) {
                     layer->ySpeed -= deccel;
                     if(layer->ySpeed < 0)
@@ -763,7 +763,7 @@ void Autocode::Do(bool init) {
             }
             break;
                                    }
-        
+
         // BLOCK MODIFIERS
         case AT_SetAllBlocksID: {
             Blocks::SetAll((int)Target, (int)Param1);
@@ -794,7 +794,7 @@ void Autocode::Do(bool init) {
         case AT_SnapSectionBounds: {
             if(Target > 0 && Target < 22) { // Make sure valid section
                 //RECT current_bounds;
-                //int sec = ((int)Target) - 1;				
+                //int sec = ((int)Target) - 1;
                 //Level::GetBoundary(&current_bounds, sec);
                 //double x_dist = Param1 - current_bounds.left;
                 //double y_dist = Param2 - current_bounds.top;
@@ -805,7 +805,7 @@ void Autocode::Do(bool init) {
                 //Level::SetSectionBounds(sec, x_stepped,  y_stepped, x_stepped + 800, y_stepped + 600);
 
                 //if(Length <= 1) { // When travel time is up, force screen into the right place
-                    Level::SetSectionBounds((int)Target - 1, Param1, Param2, Param1 + 800, Param2 + 600);					
+                    Level::SetSectionBounds((int)Target - 1, Param1, Param2, Param1 + 800, Param2 + 600);
                 //}
             }
             break;
@@ -820,11 +820,11 @@ void Autocode::Do(bool init) {
         case AT_CyclePlayerLeft: {
             Player::CycleLeft(demo);
             break;
-                               }	
+                               }
 
 
         // SET HITS
-        case AT_SetHits: {			
+        case AT_SetHits: {
             NPC::AllSetHits((int)Target, (int)Param1 - 1, (float)Param2);
             break;
                          }
@@ -860,9 +860,9 @@ void Autocode::Do(bool init) {
                 RunSelfOption();
             break;
                     }
-        
+
         // NPC MEMORY SET
-        case AT_NPCMemSet: {			
+        case AT_NPCMemSet: {
             if(ftype == FT_INVALID) {
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(MyString);
@@ -895,7 +895,7 @@ void Autocode::Do(bool init) {
             }
             break;
                               }
-                              
+
 
         // MEM ASSIGN
         case AT_MemAssign: {
@@ -946,7 +946,7 @@ void Autocode::Do(bool init) {
 
             break;
                              }
-                                        
+
         case AT_DebugWindow: {
             MessageBox(0, MyString.c_str(), L"LunaDLL debug message", 0);
             break;
@@ -960,7 +960,7 @@ void Autocode::Do(bool init) {
         // SPRITE FUNCTIONS
         case AT_LoadImage: {
             if(init) { // Only allow loading image during init phase
-                Renderer::Get().LoadBitmapResource(MyString, (int)Target, (int)Param1);				
+                Renderer::Get().LoadBitmapResource(MyString, (int)Target, (int)Param1);
             }
             Expired = true;
             break;
@@ -987,7 +987,7 @@ void Autocode::Do(bool init) {
                             pSpr->AddBehaviorComponent(GenerateComponent(pComponent));
                             break;
                         case BPAT_Draw:
-                            pSpr->AddDrawComponent(GetDrawFunc(pComponent));							
+                            pSpr->AddDrawComponent(GetDrawFunc(pComponent));
                             break;
                         case BPAT_Birth:
                             pSpr->AddBirthComponent(GenerateComponent(pComponent));

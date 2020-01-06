@@ -2,6 +2,9 @@
 #ifndef LuaProxy_Hhh
 #define LuaProxy_Hhh
 
+#include <algorithm>
+using std::min;
+using std::max;
 #include <windows.h>
 #include <type_traits>
 #include <memory>

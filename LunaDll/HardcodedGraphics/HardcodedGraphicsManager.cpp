@@ -8,7 +8,7 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../SdlMusic/MusicManager.h" //Need to get SMBX's application path
-#include "../libs/ini-reader/INIReader.h" //Ini files reader
+#include <IniProcessor/ini_processing.h> //Ini files reader
 
 
 std::string HardcodedGraphicsManager::root="";
@@ -64,12 +64,18 @@ int HardcodedGraphicsManager::patchGraphics(unsigned int offset_i, const char* f
     return -1;
 }
 
-void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m, INIReader &ini, std::string sct, std::string value)
+void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m,
+                                            IniProcessing &ini, std::string value)
 {
-    std::string imageFile = ini.Get(sct, value, "");
-    if(imageFile.empty()) return;
+    std::string imageFile;
+
+    ini.read(value.c_str(), imageFile, "");
+
+    if(imageFile.empty())
+        return;
+
     std::string imageFile_src = imageFile;
-    imageFile = root+"graphics\\common\\"+imageFile;
+    imageFile = root + "graphics\\common\\" + imageFile;
 
     const char *str = imageFile.c_str();
 
@@ -78,18 +84,20 @@ void HardcodedGraphicsManager::loadIniImage(unsigned int hex, unsigned int hex_m
     patchGraphics(hex, str);
 
     //if mask no used - abort
-    if(hex_m==0) return;
+    if(hex_m == 0) return;
 
     //get filename of mask
     imageFile = imageFile_src;
-    for(int i=imageFile.size()-1; i>0; i--)
+    for(int i = imageFile.size() - 1; i > 0; i--)
+    {
         if(imageFile[i]=='.')
         {
             imageFile.insert(i, "m");
             break;
         }
+    }
 
-    imageFile = root+"graphics\\common\\"+imageFile;
+    imageFile = root + "graphics\\common\\" + imageFile;
     const char *str2 = imageFile.c_str();
     patchGraphics(hex_m, str2);
 }
@@ -103,23 +111,27 @@ void HardcodedGraphicsManager::loadGraphics()
     smbxPath = smbxPath.append(L"\\");
     root = WStr2Str(smbxPath);
 
-    std::string ttscrpath=root+"graphics.ini";
-    if( !file_existsX(ttscrpath) ) return;
+    std::string ttscrpath = root + "graphics.ini";
+    if(!file_existsX(ttscrpath))
+        return;
 
-    INIReader GraphicsINI( ttscrpath );
-    if (GraphicsINI.ParseError() < 0)
+    IniProcessing graphicsINI(ttscrpath);
+    if(!graphicsINI.isOpened())
     {
-        MessageBoxA(0, std::string(ttscrpath+"\n\nError of read INI file").c_str(), "Error", 0);
+        MessageBoxA(0, std::string(ttscrpath + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
-    
+
     //Splash
-    loadIniImage(0x000ca018, 0 ,GraphicsINI, "splash", "game");
-    loadIniImage(0x00032a21, 0 ,GraphicsINI, "splash", "editor");
+    graphicsINI.beginGroup("splash");
+    loadIniImage(0x000ca018, 0, graphicsINI, "game");
+    loadIniImage(0x00032a21, 0, graphicsINI, "editor");
+    graphicsINI.endGroup();
 
     //Title
-    loadIniImage(0x002f460c, 0x002f3a8d, GraphicsINI, "title", "title");
-
+    graphicsINI.beginGroup("title");
+    loadIniImage(0x002f460c, 0x002f3a8d, graphicsINI, "title");
+    graphicsINI.endGroup();
 
     /*
     ;Note: Mask should be detected automatically (file with m suffix like other stuff)
@@ -192,42 +204,52 @@ void HardcodedGraphicsManager::loadGraphics()
     */
 
     /******************Hex section************************************/
-    std::vector<std::string > list= GraphicsINI.getAllSectionKeys("hex");
-    for(unsigned int i=0; i<list.size(); i++)
+    graphicsINI.beginGroup("hex");
+
+    std::vector<std::string> list = graphicsINI.allKeys();
+    for(std::string &l : list)
     {
-        bool wrong=false;
-        RemoveSubStr(list[i], "0x");
-        for(unsigned int j=0;j<list[i].size();j++)
+        bool wrong = false;
+        RemoveSubStr(l, "0x");
+
+        for(char &c : l)
         {
-            if(!isdigit(list[i][j]))
+            if(!isdigit(c))
             {
-                if((list[i][j]!='a')&&(list[i][j]!='A')&&
-                    (list[i][j]!='b')&&(list[i][j]!='B')&&
-                    (list[i][j]!='c')&&(list[i][j]!='C')&&
-                    (list[i][j]!='d')&&(list[i][j]!='D')&&
-                    (list[i][j]!='e')&&(list[i][j]!='E')&&
-                    (list[i][j]!='f')&&(list[i][j]!='F'))
+                if((c != 'a')&&(c != 'A')&&
+                   (c != 'b')&&(c != 'B')&&
+                   (c != 'c')&&(c != 'C')&&
+                   (c != 'd')&&(c != 'D')&&
+                   (c != 'e')&&(c != 'E')&&
+                   (c != 'f')&&(c != 'F'))
                 {
-                    wrong=true; break;
+                    wrong = true;
+                    break;
                 }
             }
         }
-        if(wrong) continue;
 
-        unsigned int hexKey;   
+        if(wrong)
+            continue;
+
+        unsigned int hexKey;
         std::stringstream ss;
-        ss << std::hex << list[i];
+        ss << std::hex << l;
         ss >> hexKey;
-        std::string imageFile = GraphicsINI.Get("hex", list[i], "");
-        if(imageFile.empty()) continue;
-        
-        imageFile = root+"graphics\\common\\"+imageFile;
+
+        std::string imageFile;
+        graphicsINI.read(l.c_str(), imageFile, "");
+        if(imageFile.empty())
+            continue;
+
+        imageFile = root + "graphics\\common\\" + imageFile;
         const char *str = imageFile.c_str();
 
         //Here we should load file  hexKey - address, imageFile:
         //is a name of image file in the <SMBX>\graphics\common
         patchGraphics(hexKey, str);
     }
+    graphicsINI.endGroup();
     /******************Hex section**end*******************************/
 
 }

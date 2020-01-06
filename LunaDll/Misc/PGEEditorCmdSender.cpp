@@ -1,6 +1,8 @@
 #include "PGEEditorCmdSender.h"
 #include "../GlobalFuncs.h"
 
+#include <algorithm>
+
 WinSemaphore::WinSemaphore(const std::wstring &key, int initialValue) :
     m_semaphore(nullptr), m_key(key)
 {
@@ -17,7 +19,7 @@ void WinSemaphore::setKey(const std::wstring &key, int initialValue)
     if(m_semaphore)
         CloseHandle(m_semaphore);
     m_key = key;
-    m_semaphore = (HANDLE*)CreateSemaphoreW(NULL, initialValue, max(initialValue, 1), m_key.c_str());
+    m_semaphore = (HANDLE*)CreateSemaphoreW(NULL, initialValue, std::max(initialValue, 1), m_key.c_str());
     if (m_semaphore == NULL)
     {
         m_semaphore = (HANDLE*)OpenSemaphoreW(SEMAPHORE_ALL_ACCESS, 0, m_key.c_str());
@@ -144,9 +146,9 @@ void PGE_EditorCommandSender::sendCommandUTF8(const std::string &command)
                     data[0] = 1;
                     int *size = (int*)(data+1);
                     *size = command.size();
-                    memcpy(data+1+sizeof(int),
+                    memcpy(data + 1 + sizeof(int),
                            command.c_str(),
-                           min(command.size(), int(4095-sizeof(int))));
+                           std::min(command.size(), size_t(4095 - sizeof(int))));
                 }
                 else
                 {

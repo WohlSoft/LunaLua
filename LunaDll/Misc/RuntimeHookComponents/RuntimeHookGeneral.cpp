@@ -233,7 +233,7 @@ void TrySkipPatch()
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
     gGeneralConfig.loadOrDefault();
     //game.ini reader
-    GameConfiguration::runPatchByIni(INIReader(WStr2Str(getLatestConfigFile(L"game.ini"))));
+    GameConfiguration::runPatchByIni(IniProcessing(WStr2Str(getLatestConfigFile(L"game.ini"))));
 
     /************************************************************************/
     /* Simple ASM Source Patches                                            */

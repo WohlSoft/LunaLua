@@ -2,8 +2,6 @@
 #ifndef Defines_hhhh
 #define Defines_hhhh
 
-#define NOMINMAX
-
 // Includes
 #include <windows.h>
 #include <stddef.h>

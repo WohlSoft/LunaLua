@@ -260,8 +260,8 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
                 }
             }
 
-            m_Category.setWidth(i, (int16_t)min(width, 0x7FFF));
-            m_Category.setHeight(i, (int16_t)min(height, 0x7FFF));
+            m_Category.setWidth(i, (int16_t)std::min(width, 0x7FFFu));
+            m_Category.setHeight(i, (int16_t)std::min(height, 0x7FFFu));
         }
     }
 }

@@ -4,7 +4,7 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include <math.h>
-#include "../libs/ini-reader/INIReader.h"
+#include <IniProcessor/ini_processing.h>
 
 
 ChunkEntry::ChunkEntry()
@@ -349,39 +349,49 @@ std::string MusicManager::position()
 
 void MusicManager::loadSounds(std::string path, std::string root)
 {
-    if( !file_existsX(path) ) return;
+    if(!file_existsX(path))
+        return;
 
-    INIReader SoundsIni( path );
-    if (SoundsIni.ParseError() < 0)
+    IniProcessing soundsList(path);
+    if(!soundsList.isOpened())
     {
-        MessageBoxA(0, std::string(path+"\n\nError of read INI file").c_str(), "Error", 0);
+        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 
-    curRoot=root;
-    for(int i=0; i<91; i++)
+    curRoot = root;
+    for(int i = 0; i < 91; i++)
     {
         std::string head = "sound-"+i2str(i+1);
         std::string fileName;
-        std::string reserveChannel;
+        int reserveChannel;
 
-        fileName = SoundsIni.Get(head, "file", "");
-        if(fileName.size()==0) continue;
+        if(!soundsList.beginGroup(head))
+            continue;
+        soundsList.read("file", fileName, "");
+        
+        if(fileName.size() == 0)
+        {
+            soundsList.endGroup();
+            continue;
+        }
 
-        reserveChannel = SoundsIni.Get(head, "single-channel", "0");
+        soundsList.read("single-channel", reserveChannel, 0);
 
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
 
-        if( file_existsX(root+fileName) )
+        if(file_existsX(root + fileName))
         {
-            sounds[i].setPath(root+fileName.c_str());
-            if(reserveChannel=="1")
+            sounds[i].setPath(root + fileName.c_str());
+            if(reserveChannel != 0)
                 sounds[i].channel = 0;
             else
                 sounds[i].channel = -1;
         }
+
+        soundsList.endGroup();
     }
 }
 
@@ -401,49 +411,64 @@ static std::string clearTrackNumber(std::string in)
 
 void MusicManager::loadMusics(std::string path, std::string root)
 {
-    if( !file_existsX(path) ) return;
+    if(!file_existsX(path))
+        return;
 
-    INIReader MusicIni( path );
-    if (MusicIni.ParseError() < 0)
+    IniProcessing musicList(path);
+    if (!musicList.isOpened())
     {
-        MessageBoxA(0, std::string(path+"\n\nError of read INI file").c_str(), "Error", 0);
+        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 
-    curRoot=root;
-    int i=0;
+    curRoot = root;
+    int i = 0;
 
     //World music
-    for(int j=1; (j<=16) && (i<74); i++, j++)
+    for(int j = 1; (j <= 16) && (i < 74); i++, j++)
     {
-        std::string head = "world-music-"+i2str(j);
+        std::string head = "world-music-" + i2str(j);
         std::string fileName;
 
-        fileName = MusicIni.Get(head, "file", "");
-        if(fileName.size()==0) continue;
+        if(!musicList.beginGroup(head))
+            continue; // Group doesn't exist
+        musicList.read("file", fileName, "");
+        musicList.endGroup();
+
+        if(fileName.size() == 0)
+            continue;
+
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
+
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
-            music_wld[j-1].setPath(root+fileName.c_str());
+            music_wld[j-1].setPath(root + fileName);
         }
     }
 
     //Special music
-    for(int j=1; (j<=3) && (i<74); i++, j++)
+    for(int j = 1; (j <= 3) && (i < 74); i++, j++)
     {
         std::string head = "special-music-"+i2str(j);
         std::string fileName;
 
-        fileName = MusicIni.Get(head, "file", "");
-        if(fileName.size()==0) continue;
+        if(!musicList.beginGroup(head))
+            continue; // Group doesn't exist
+        musicList.read("file", fileName, "");
+        musicList.endGroup();
+
+        if(fileName.size() == 0)
+            continue;
+
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
+
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            music_spc[j-1].setPath(root+fileName.c_str());
+            music_spc[j-1].setPath(root + fileName);
         }
     }
 
@@ -454,14 +479,21 @@ void MusicManager::loadMusics(std::string path, std::string root)
         std::string head = "level-music-"+i2str(j);
         std::string fileName;
 
-        fileName = MusicIni.Get(head, "file", "");
-        if(fileName.size()==0) continue;
+        if(!musicList.beginGroup(head))
+            continue; // Group doesn't exist
+        musicList.read("file", fileName, "");
+        musicList.endGroup();
+
+        if(fileName.size() == 0)
+            continue;
+
         replaceSubStr(fileName, "\"", "");
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
+
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            music_lvl[j-1].setPath(root+fileName.c_str());
+            music_lvl[j-1].setPath(root + fileName);
         }
     }
 }

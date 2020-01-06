@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-class INIReader;
+class IniProcessing;
 
 class HardcodedGraphicsManager
 {
@@ -11,11 +11,11 @@ public:
     HardcodedGraphicsManager();
     ~HardcodedGraphicsManager();
 
-    
+
     //************************************
     // Method:    patchGraphics
     // FullName:  HardcodedGraphicsManager::patchGraphics
-    // Access:    public 
+    // Access:    public
     // Returns:   int -1 if Successful, -2 If file not found or the size of the file if too big to be patched.
     // Qualifier:
     // Parameter: void * offset The memory offset from the beginning of the EXE file.
@@ -31,7 +31,7 @@ private:
         static std::map<unsigned int, int> hardcoded_data_map;
 
         static std::string root;
-        static void loadIniImage(unsigned int hex, unsigned int hex_m, INIReader &ini, std::string sct, std::string value);
+        static void loadIniImage(unsigned int hex, unsigned int hex_m, IniProcessing &ini, std::string value);
 };
 
 #endif

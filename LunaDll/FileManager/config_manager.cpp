@@ -1,5 +1,4 @@
 #include "config_manager.h"
-
 #include <IniProcessor/ini_processing.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -773,6 +772,7 @@ void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::st
         }
         catch(const nlohmann::json::parse_error &e)
         {
+            (void)e;
 #ifdef UNIT_TEST
             printf("-- ERROR: fail to parse: %s\n", e.what());
             fflush(stdout);
@@ -780,6 +780,7 @@ void ConfigPackMiniManager::loadExtraSettings(nlohmann::json &dst, const std::st
         }
         catch(const nlohmann::json::exception &e)
         {
+            (void)e;
 #ifdef UNIT_TEST
             printf("-- ERROR: exception: %s\n", e.what());
             fflush(stdout);

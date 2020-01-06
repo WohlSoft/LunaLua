@@ -32,32 +32,39 @@ namespace general {
     VB6StrPtr& gameTitle_3 = *(VB6StrPtr*)0x96AF26;
 }
 
-void GameConfiguration::runPatchByIni(INIReader& reader)
+void GameConfiguration::runPatchByIni(IniProcessing &reader)
 {
-    if (reader.ParseError() != 0)
+    if (!reader.isOpened())
         return;
 
+    reader.beginGroup("game-characters");
+    gameCharacters::marioGame = reader.value("mario-game", std::string(gameCharacters::marioGame)).toString();
+    gameCharacters::luigiGame = reader.value("luigi-game", std::string(gameCharacters::luigiGame)).toString();
+    gameCharacters::peachGame = reader.value("peach-game", std::string(gameCharacters::peachGame)).toString();
+    gameCharacters::toadGame = reader.value("toad-game", std::string(gameCharacters::toadGame)).toString();
+    gameCharacters::linkGame = reader.value("link-game", std::string(gameCharacters::linkGame)).toString();
+    reader.endGroup();
 
-    gameCharacters::marioGame = reader.Get("game-characters", "mario-game", gameCharacters::marioGame);
-    gameCharacters::luigiGame = reader.Get("game-characters", "luigi-game", gameCharacters::luigiGame);
-    gameCharacters::peachGame = reader.Get("game-characters", "peach-game", gameCharacters::peachGame);
-    gameCharacters::toadGame = reader.Get("game-characters", "toad-game", gameCharacters::toadGame);
-    gameCharacters::linkGame = reader.Get("game-characters", "link-game", gameCharacters::linkGame);
+    reader.beginGroup("main-menu");
+    mainMenu::player1Game = reader.value("player1-game", std::string(mainMenu::player1Game)).toString();
+    mainMenu::player2Game = reader.value("player2-game", std::string(mainMenu::player2Game)).toString();
+    mainMenu::battleGame = reader.value("battle-game", std::string(mainMenu::battleGame)).toString();
+    mainMenu::options = reader.value("options", std::string(mainMenu::options)).toString();
+    mainMenu::exit = reader.value("exit", std::string(mainMenu::exit)).toString();
+    reader.endGroup();
 
-    mainMenu::player1Game = reader.Get("main-menu", "player1-game", mainMenu::player1Game);
-    mainMenu::player2Game = reader.Get("main-menu", "player2-game", mainMenu::player2Game);
-    mainMenu::battleGame = reader.Get("main-menu", "battle-game", mainMenu::battleGame);
-    mainMenu::options = reader.Get("main-menu", "options", mainMenu::options);
-    mainMenu::exit = reader.Get("main-menu", "exit", mainMenu::exit);
+    reader.beginGroup("option-menu");
+    optionsMenu::player1Controls = reader.value("player1-controls", std::string(optionsMenu::player1Controls)).toString();
+    optionsMenu::player2Controls = reader.value("player2-controls", std::string(optionsMenu::player2Controls)).toString();
+    optionsMenu::fullscreenMode = reader.value("fullscreen-mode", std::string(optionsMenu::fullscreenMode)).toString();
+    optionsMenu::windowedMode = reader.value("windowed-mode", std::string(optionsMenu::windowedMode)).toString();
+    optionsMenu::viewCredits = reader.value("view-credits", std::string(optionsMenu::viewCredits)).toString();
+    reader.endGroup();
 
-    optionsMenu::player1Controls = reader.Get("option-menu", "player1-controls", optionsMenu::player1Controls);
-    optionsMenu::player2Controls = reader.Get("option-menu", "player2-controls", optionsMenu::player2Controls);
-    optionsMenu::fullscreenMode = reader.Get("option-menu", "fullscreen-mode", optionsMenu::fullscreenMode);
-    optionsMenu::windowedMode = reader.Get("option-menu", "windowed-mode", optionsMenu::windowedMode);
-    optionsMenu::viewCredits = reader.Get("option-menu", "view-credits", optionsMenu::viewCredits);
-
-    // References the same string memory, so do not destruct those. 
-    general::gameTitle_1.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_1));
-    general::gameTitle_2.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_2));
-    general::gameTitle_3.assignNoDestruct(reader.Get("general", "game-title", general::gameTitle_3));
+    // References the same string memory, so do not destruct those.
+    reader.beginGroup("general");
+    general::gameTitle_1.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_1)).toString());
+    general::gameTitle_2.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_2)).toString());
+    general::gameTitle_3.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_3)).toString());
+    reader.endGroup();
 }

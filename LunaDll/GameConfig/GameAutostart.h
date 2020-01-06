@@ -2,7 +2,7 @@
 #define GameAutostart_hhhhh
 
 #include "../SMBXInternal/Menu.h"
-#include "../libs/ini-reader/INIReader.h"
+#include <IniProcessor/ini_processing.h>
 #include <memory>
 
 class GameAutostart
@@ -18,8 +18,8 @@ private:
 public:
     GameAutostart();
     ~GameAutostart();
-    static GameAutostart createGameAutostartByIniConfig(INIReader& reader);
-    
+    static GameAutostart createGameAutostartByIniConfig(IniProcessing& reader);
+
 
     std::string getSelectedEpisode() const { return selectedEpisode; }
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
@@ -32,7 +32,7 @@ public:
     int getSaveSlot() const { return saveSlot; }
     void setSaveSlot(int val) { saveSlot = val; }
 
-    
+
     bool applyAutostart();
     void doAutostart();
 };

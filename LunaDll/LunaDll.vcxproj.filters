@@ -51,9 +51,6 @@
     </Filter>
     <Filter Include="libs">
     </Filter>
-    <Filter Include="libs\ini-reader">
-      <UniqueIdentifier>{5269dd47-723b-4f06-94a5-5ae087f667a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="libs\stackwalker">
     </Filter>
     <Filter Include="libs\luasocket">
@@ -147,12 +144,6 @@
     </ClInclude>
     <ClInclude Include="LuaMain\LunaLuaMain.h">
       <Filter>LuaMain</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\ini-reader\ini.h">
-      <Filter>libs\ini-reader</Filter>
-    </ClInclude>
-    <ClInclude Include="libs\ini-reader\INIReader.h">
-      <Filter>libs\ini-reader</Filter>
     </ClInclude>
     <ClInclude Include="SdlMusic\SdlMusPlayer.h">
       <Filter>SdlMusic</Filter>
@@ -682,9 +673,6 @@
     <ClInclude Include="libs\fmt\fmt_format.h">
       <Filter>libs\fmt</Filter>
     </ClInclude>
-    <ClInclude Include="libs\Utils\sdl_file.h">
-      <Filter>libs\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="libs\Utils\strings.h">
       <Filter>libs\Utils</Filter>
     </ClInclude>
@@ -710,12 +698,6 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LunaLuaMain.cpp">
       <Filter>LuaMain</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\ini-reader\ini.c">
-      <Filter>libs\ini-reader</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\ini-reader\INIReader.cpp">
-      <Filter>libs\ini-reader</Filter>
     </ClCompile>
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp">
       <Filter>SdlMusic</Filter>
@@ -1300,9 +1282,6 @@
       <Filter>libs\fmt</Filter>
     </ClCompile>
     <ClCompile Include="libs\Utils\files.cpp">
-      <Filter>libs\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\Utils\sdl_file.cpp">
       <Filter>libs\Utils</Filter>
     </ClCompile>
     <ClCompile Include="libs\Utils\strings.cpp">

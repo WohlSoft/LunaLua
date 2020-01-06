@@ -35,7 +35,7 @@ bool GameAutostart::applyAutostart()
             GM_CUR_MENUPLAYER2 = static_cast<int>(secondCharacter);
             //Load the selected episode
             GM_CUR_MENULEVEL = i + 1;
-            
+
             //Load save states
             native_loadSaveStates();
 
@@ -45,7 +45,7 @@ bool GameAutostart::applyAutostart()
             //When the intro loads, then do the VK_RETURN patch
             //Set doAutostart() function
             GameAutostartConfig::nextAutostartConfig.reset(new GameAutostart(*this));
-            
+
             //We're done here
             return true;
         }
@@ -60,13 +60,15 @@ void GameAutostart::doAutostart()
     *(WORD*)0xB2D6D4 = -1;
 }
 
-GameAutostart GameAutostart::createGameAutostartByIniConfig(INIReader& reader)
+GameAutostart GameAutostart::createGameAutostartByIniConfig(IniProcessing &reader)
 {
     GameAutostart autostarter;
-    autostarter.setSelectedEpisode(reader.Get("autostart", "episode-name", ""));
-    autostarter.setSingleplayer(reader.GetBoolean("autostart", "singleplayer", true));
-    autostarter.setFirstCharacter(static_cast<Characters>(reader.GetInteger("autostart", "character-player1", 1)));
-    autostarter.setSecondCharacter(static_cast<Characters>(reader.GetInteger("autostart", "character-player2", 2)));
-    autostarter.setSaveSlot(reader.GetInteger("autostart", "save-slot", 1));
+    reader.beginGroup("autostart");
+    autostarter.setSelectedEpisode(reader.value("episode-name", "").toString());
+    autostarter.setSingleplayer(reader.value("singleplayer", true).toBool());
+    autostarter.setFirstCharacter(static_cast<Characters>(reader.value("character-player1", 1).toInt()));
+    autostarter.setSecondCharacter(static_cast<Characters>(reader.value("character-player2", 2).toInt()));
+    autostarter.setSaveSlot(reader.value("save-slot", 1).toInt());
+    reader.endGroup();
     return autostarter;
 }
