@@ -122,6 +122,21 @@
     <Filter Include="LuaMain\LuaProxyComponent\CustomSprites\Hitbox">
       <UniqueIdentifier>{a0baf83b-5d12-413f-9ea1-0d4108d7c0fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\IniProcessor">
+      <UniqueIdentifier>{5d3963c9-d5be-462e-97d6-fa2bfa9d77f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\DirManager">
+      <UniqueIdentifier>{8bfb1473-0003-4960-bf11-2e4879fdac27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\fmt">
+      <UniqueIdentifier>{cfc4bb68-d728-4637-8cf6-dc97aeaa9a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\Utils">
+      <UniqueIdentifier>{46bcc0c2-7970-4297-a586-3d7a9820e328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs\json">
+      <UniqueIdentifier>{35f2e9ba-fba0-48ac-ae82-40ba81b273f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -630,6 +645,60 @@
     </ClInclude>
     <ClInclude Include="FileManager\CustomParamStore.h">
       <Filter>FileManager</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\IniProcessor\ini_processing.h">
+      <Filter>libs\IniProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\IniProcessor\ini_processing_variant.h">
+      <Filter>libs\IniProcessor</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\DirManager\dirman_private.h">
+      <Filter>libs\DirManager</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\DirManager\dirman.h">
+      <Filter>libs\DirManager</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_ostream.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_posix.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_printf.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_qformat.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_string.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_time.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_container.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\fmt\fmt_format.h">
+      <Filter>libs\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Utils\sdl_file.h">
+      <Filter>libs\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Utils\strings.h">
+      <Filter>libs\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Utils\vptrlist.h">
+      <Filter>libs\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\Utils\files.h">
+      <Filter>libs\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager\config_manager.h">
+      <Filter>FileManager</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\json\json.hpp">
+      <Filter>libs\json</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1208,6 +1277,39 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp">
       <Filter>LuaMain\LuaProxyComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\IniProcessor\ini_processing.cpp">
+      <Filter>libs\IniProcessor</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\DirManager\dirman_winapi.cpp">
+      <Filter>libs\DirManager</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\DirManager\dirman.cpp">
+      <Filter>libs\DirManager</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\fmt\fmt_ostream.cpp">
+      <Filter>libs\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\fmt\fmt_posix.cpp">
+      <Filter>libs\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\fmt\fmt_printf.cpp">
+      <Filter>libs\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\fmt\fmt_format.cpp">
+      <Filter>libs\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\Utils\files.cpp">
+      <Filter>libs\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\Utils\sdl_file.cpp">
+      <Filter>libs\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\Utils\strings.cpp">
+      <Filter>libs\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\config_manager.cpp">
+      <Filter>FileManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

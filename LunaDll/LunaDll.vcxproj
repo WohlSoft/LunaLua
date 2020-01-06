@@ -121,8 +121,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EventStateMachine.h" />
+    <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
+    <ClInclude Include="libs\DirManager\dirman.h" />
+    <ClInclude Include="libs\DirManager\dirman_private.h" />
+    <ClInclude Include="libs\fmt\fmt_container.h" />
+    <ClInclude Include="libs\fmt\fmt_format.h" />
+    <ClInclude Include="libs\fmt\fmt_ostream.h" />
+    <ClInclude Include="libs\fmt\fmt_posix.h" />
+    <ClInclude Include="libs\fmt\fmt_printf.h" />
+    <ClInclude Include="libs\fmt\fmt_qformat.h" />
+    <ClInclude Include="libs\fmt\fmt_string.h" />
+    <ClInclude Include="libs\fmt\fmt_time.h" />
+    <ClInclude Include="libs\IniProcessor\ini_processing.h" />
+    <ClInclude Include="libs\IniProcessor\ini_processing_variant.h" />
+    <ClInclude Include="libs\json\json.hpp" />
+    <ClInclude Include="libs\Utils\files.h" />
+    <ClInclude Include="libs\Utils\sdl_file.h" />
+    <ClInclude Include="libs\Utils\strings.h" />
+    <ClInclude Include="libs\Utils\vptrlist.h" />
     <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h" />
     <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
@@ -297,9 +315,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventStateMachine.cpp" />
+    <ClCompile Include="FileManager\config_manager.cpp" />
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
+    <ClCompile Include="libs\DirManager\dirman.cpp" />
+    <ClCompile Include="libs\DirManager\dirman_winapi.cpp" />
+    <ClCompile Include="libs\fmt\fmt_format.cpp" />
+    <ClCompile Include="libs\fmt\fmt_ostream.cpp" />
+    <ClCompile Include="libs\fmt\fmt_posix.cpp" />
+    <ClCompile Include="libs\fmt\fmt_printf.cpp" />
+    <ClCompile Include="libs\IniProcessor\ini_processing.cpp" />
+    <ClCompile Include="libs\Utils\files.cpp" />
+    <ClCompile Include="libs\Utils\sdl_file.cpp" />
+    <ClCompile Include="libs\Utils\strings.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
     <ClCompile Include="Misc\LoadScreen.cpp" />
