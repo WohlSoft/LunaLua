@@ -2323,3 +2323,24 @@ void __stdcall runtimeHookRunAnimInternal(short* effectID, Momentum* coor, float
         runtimeHookRunAnim_OrigFunc(effectID, coor, effectFrame, npcID, showOnlyMask);
     }
 }
+
+static unsigned int __stdcall runtimeHookSemisolidInteractionHook(NPCMOB* npc)
+{
+    unsigned short npcID = npc->id;
+    if (npc_isflying[npcID] != 0) {
+        // Flying NPCs generally don't collide with semisolids... unless it's just a hop?
+        return NPC::CheckSemisolidCollidingFlyType(npc->ai1) ? -1 : 0;
+    }
+    return -1; // Collides
+}
+
+_declspec(naked) void __stdcall runtimeHookSemisolidInteractionHook_Raw()
+{
+    __asm {
+        PUSH ESI
+        CALL runtimeHookSemisolidInteractionHook
+        TEST eax,eax
+        PUSH 0xA12095
+        RET
+    }
+}

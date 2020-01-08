@@ -86,9 +86,6 @@ void CLunaLua::exitContext()
 
         g_PerfTracker.disable();
 
-        gRenderBGOFlag = true;
-        gRenderSizableFlag = true;
-
         // Clean & stop all user started sounds and musics
         PGE_MusPlayer::MUS_stopMusic();
         PGE_Sounds::clearSoundBuffer();
@@ -102,6 +99,10 @@ bool CLunaLua::shutdown()
     //Shutdown the lua module if possible
     if(!isValid())
         return false;
+
+    // Unset flags of things Lua code was processing
+    gRenderBGOFlag = true;
+    gRenderSizableFlag = true;
 
     // Request cached images be held onto for now
     LunaImage::holdCachedImages();
@@ -1129,7 +1130,8 @@ void CLunaLua::bindAll()
                     def("doPSwitchRaw", &LuaProxy::Misc::doPSwitchRaw),
                     def("doPSwitch", (void(*)())&LuaProxy::Misc::doPSwitch),
                     def("doPSwitch", (void(*)(bool))&LuaProxy::Misc::doPSwitch),
-                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion)
+                    def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
+                    def("_setSemisolidCollidingFlyType", &NPC::SetSemisolidCollidingFlyType)
                     //def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
 

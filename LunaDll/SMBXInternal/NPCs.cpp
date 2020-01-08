@@ -1,6 +1,7 @@
 #include "NPCs.h"
 #include "../Misc/MiscFuncs.h"
 #include <list>
+#include <unordered_map>
 
 // GET
 NPCMOB* NPC::Get(int index) {
@@ -134,6 +135,9 @@ static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_linkshieldable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
+
+// Other NPC-related config data, not by ID
+static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -333,6 +337,9 @@ void NPC::InitProperties() {
     npcprop_notcointransformable[222] = -1;
     npcprop_notcointransformable[223] = -1;
     npcprop_notcointransformable[224] = -1;
+
+    npc_semisolidCollidingFlyTypeMap.clear();
+    npc_semisolidCollidingFlyTypeMap[1] = true;
 }
 
 // Internal C++ getters for inbuilt NPC property arrays
@@ -424,4 +431,19 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     {
         return 0;
     }
+}
+
+bool NPC::CheckSemisolidCollidingFlyType(unsigned int flyType)
+{
+    auto it = npc_semisolidCollidingFlyTypeMap.find(flyType);
+    if (it != npc_semisolidCollidingFlyTypeMap.end())
+    {
+        return it->second;
+    }
+    return false;
+}
+
+void NPC::SetSemisolidCollidingFlyType(unsigned int flyType, bool shouldCollide)
+{
+    npc_semisolidCollidingFlyTypeMap[flyType] = shouldCollide;
 }

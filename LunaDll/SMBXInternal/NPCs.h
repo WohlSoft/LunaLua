@@ -511,6 +511,9 @@ namespace NPC {
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
+    bool CheckSemisolidCollidingFlyType(unsigned int flyType);
+    void SetSemisolidCollidingFlyType(unsigned int flyType, bool shouldCollide);
+
     // NOTE: This is the value we are patching it to. Originally 300
     static const short MAX_ID = 1000;
 }
