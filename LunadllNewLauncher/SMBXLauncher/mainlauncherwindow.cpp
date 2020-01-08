@@ -32,7 +32,7 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
-    this->setMinimumSize(400, 300);
+    this->setMinimumSize(640, 360);
     HybridLogger::init(ui->webLauncherPage);
 
     // 1. General WebEngine Settings
