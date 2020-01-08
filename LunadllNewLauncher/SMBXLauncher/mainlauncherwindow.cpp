@@ -146,9 +146,9 @@ void MainLauncherWindow::loadDefaultWebpage()
     ui->webLauncherPage->load(QUrl("qrc:///featurePage.html"));
 }
 
-void MainLauncherWindow::init(const QString &configName)
+void MainLauncherWindow::autoSize()
 {
-    QRect dw = QApplication::desktop()->screenGeometry();
+    QSize dw = QGuiApplication::primaryScreen()->availableSize();
     float baseSize = dw.height() * 0.6;
     if (baseSize > 1080) {
         baseSize = 1080;
@@ -170,8 +170,30 @@ void MainLauncherWindow::init(const QString &configName)
         baseSize = baseSize / 16;
     }
 
+    m_initWidth = 0;
+    m_initHeight = 0;
     this->resize(baseSize * 16, baseSize * 9);
+}
 
+void MainLauncherWindow::initSize()
+{
+    //Corrects maximum sizes to account for taskbars and the like - has to be done after the show()
+    if(m_initWidth > 0 && m_initHeight > 0){
+
+        QSize dw = QGuiApplication::primaryScreen()->availableSize();
+
+        QSize frameSize = this->frameGeometry().size();
+        QSize winSize = this->geometry().size();
+
+        m_initWidth = std::min(m_initWidth, dw.width() - frameSize.width() + winSize.width());
+        m_initHeight = std::min(m_initHeight, dw.height() - frameSize.height() + winSize.height());
+
+        this->resize(m_initWidth, m_initHeight);
+    }
+}
+
+void MainLauncherWindow::init(const QString &configName)
+{
     qDebug() << "Loading launcher configuration " << configName;
     // FIXME: This is a fast hack written for Horikawa, however I would like to remove the old INI at the end anyway.
     // In addition I would like to put all launcher data in the "launcher" folder.
@@ -235,6 +257,29 @@ void MainLauncherWindow::init(const QString &configName)
             ui->webLauncherPage->load(QUrl::fromUserInput(webpage, QDir::currentPath(), QUrl::AssumeLocalFile));
         }
 
+        QString resolution = settingFile.value("resolution", "auto").toString();
+        if(resolution == "auto"){
+            autoSize();
+        }else{
+            QStringList resVals = resolution.split('x');
+            if (resVals.length() == 2){
+                int w = resVals[0].toInt();
+                int h = resVals[1].toInt();
+                if(w > 0 && h > 0){
+                    QSize dw = QGuiApplication::primaryScreen()->availableSize();
+                    w = std::min(std::max(w, this->minimumWidth()), dw.width());
+                    h = std::min(std::max(h, this->minimumHeight()), dw.height());
+                    m_initWidth = w;
+                    m_initHeight = h;
+                    this->resize(w, h);
+                }else{
+                    autoSize();
+                }
+            }else{
+                autoSize();
+            }
+        }
+
         QString iconFilePath = settingFile.value("icon", "").toString();
         if(!iconFilePath.isEmpty()){
             if(QFile(iconFilePath).exists()){
@@ -243,6 +288,7 @@ void MainLauncherWindow::init(const QString &configName)
         }
         m_ApplyLunaLoaderPatch = (settingFile.value("apply-lunaloader-patch", "false").toString() == "true");
     }else{
+        autoSize();
         m_pgeExe = "PGE/pge_editor.exe";
         ui->mainWindowWidget->setWindowTitle("SMBX Launcher");
         m_ApplyLunaLoaderPatch = false;

@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     MainLauncherWindow w;
     w.init("Launcher.ini");
     w.show();
+    w.initSize();
 
     return a.exec();
 }

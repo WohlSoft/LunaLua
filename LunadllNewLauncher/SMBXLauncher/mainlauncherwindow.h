@@ -28,7 +28,9 @@ public slots:
     //Webkit Stuff
     void loadJavascriptBridge();
     void loadDefaultWebpage();
+    void autoSize();
     void init(const QString& configName);
+    void initSize();
 
     void runSMBX();
     void runSMBXEditor();
@@ -51,6 +53,8 @@ private:
     QString m_pgeExe;
     bool m_ApplyLunaLoaderPatch;
     bool m_jsBridgeAlreadInit;
+    int m_initWidth;
+    int m_initHeight;
     Ui::MainLauncherWindow *ui;
 };
 
