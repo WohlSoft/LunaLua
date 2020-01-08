@@ -9,6 +9,7 @@
 #include "../Rendering/FrameCapture.h"
 #include "../Rendering/GL/GLTextureStore.h"
 #include "../SMBXInternal/Blocks.h"
+#include "../SMBXInternal/Layer.h"
 #include "../SdlMusic/SdlMusPlayer.h"
 #include "../FileManager/CustomParamStore.h"
 #include "../Misc/TestMode.h"
@@ -227,5 +228,17 @@ extern "C" {
     FFI_EXPORT(KeyMap*) LunaLuaGetRawKeymapArray(void)
     {
         return gRawKeymap;
+    }
+
+    FFI_EXPORT(void) LunaLuaShowLayer(short layerIndex, bool noSmoke)
+    {
+        short noSmokeNative = COMBOOL(noSmoke);
+        native_showLayer(&::Layer::Get(layerIndex)->ptLayerName, &noSmokeNative);
+    }
+
+    FFI_EXPORT(void) LunaLuaHideLayer(short layerIndex, bool noSmoke)
+    {
+        short noSmokeNative = COMBOOL(noSmoke);
+        native_hideLayer(&::Layer::Get(layerIndex)->ptLayerName, &noSmokeNative);
     }
 }
