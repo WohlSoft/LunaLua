@@ -77,18 +77,17 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_CREATE:
-    {
-        static wchar_t className[64];
-        static wchar_t windowName[64];
-        GetWindowTextW(wData->hwnd, windowName, sizeof(windowName));
-        GetClassNameW(wData->hwnd, className, sizeof(className));
-        if ((wcscmp(className, L"ThunderRT6FormDC") == 0) && (wcscmp(windowName, L"Graphics") != 0))
+        if (wData->lParam != NULL)
         {
-            // Store main window handle
-            gMainWindowHwnd = wData->hwnd;
+            CREATESTRUCTA* createData = reinterpret_cast<CREATESTRUCTA*>(wData->lParam);
+            LPCSTR winName = createData->lpszName;
+            if ((gMainWindowHwnd == NULL) && (winName != NULL) && (strncmp("- Version 1.2.2 -", &winName[20], 17) == 0))
+            {
+                // Store main window handle
+                gMainWindowHwnd = wData->hwnd;
+            }
         }
-    }
-    break;
+        break;
     case WM_DESTROY:
         if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
         {
