@@ -34,6 +34,7 @@ public slots:
     void runSMBXEditor();
     void runPGEEditor();
     void loadEpisodeWebpage(const QString& file);
+    void runSMBXLevel(const QString& file);
 
     //General stuff
     void checkForUpdates();

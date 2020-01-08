@@ -32,6 +32,7 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     ui(new Ui::MainLauncherWindow)
 {
     ui->setupUi(this);
+    this->setMinimumSize(400, 300);
     HybridLogger::init(ui->webLauncherPage);
 
     // 1. General WebEngine Settings
@@ -110,6 +111,7 @@ void MainLauncherWindow::loadJavascriptBridge()
     connect(m_smbxConfig.data(), &SMBXConfig::runSMBXEditorExecuted, this, &MainLauncherWindow::runSMBXEditor);
     connect(m_smbxConfig.data(), &SMBXConfig::runPGEEditorExecuted, this, &MainLauncherWindow::runPGEEditor);
     connect(m_smbxConfig.data(), &SMBXConfig::loadEpisodeWebpageExecuted, this, &MainLauncherWindow::loadEpisodeWebpage);
+    connect(m_smbxConfig.data(), &SMBXConfig::runSMBXLevelExecuted, this, &MainLauncherWindow::runSMBXLevel);
 
     qDebug() << "Running init javascript!";
     currentPage->runJavaScript(
@@ -275,6 +277,12 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
     ui->webLauncherPage->setUrl(QUrl::fromUserInput(file, QDir::currentPath(), QUrl::AssumeLocalFile));
 }
 
+void MainLauncherWindow::runSMBXLevel(const QString& file)
+{
+    internalRunSMBX(m_smbxExe, {"--testLevel="+file});
+    close();
+}
+
 void MainLauncherWindow::checkForUpdates()
 {
     if(!m_launcherSettings->hasValidUpdateSite()) {
@@ -402,6 +410,7 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
         // We're not handling quoting here... but all the arguments currently don't use spaces or quotes so...
         QString loader = qApp->applicationDirPath() + "/LunaLoader.exe";
         runArgs.push_front(smbxExeFile);
+
         QProcess::startDetached(loader, runArgs);
 
         /*

@@ -14,6 +14,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <regex>
+#include <QFileDialog>
 
 
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
@@ -333,6 +334,21 @@ void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
         QFile extSaveFile(extSavePath);
         if (extSaveFile.exists()){
             extSaveFile.remove();
+        }
+    }
+}
+
+
+void SMBXConfig::openLevelDialog()
+{
+    QFileDialog open;
+    open.setFileMode(QFileDialog::FileMode::ExistingFile);
+    open.setAcceptMode(QFileDialog::AcceptMode::AcceptOpen);
+    open.setNameFilter(tr("SMBX Levels (*.lvl *.lvlx)"));
+    open.setDirectory(open.directory().path() + "/worlds");
+    if (open.exec()) {
+        if (open.selectedFiles().length() > 0) {
+            emit runSMBXLevelExecuted(open.selectedFiles().first());
         }
     }
 }

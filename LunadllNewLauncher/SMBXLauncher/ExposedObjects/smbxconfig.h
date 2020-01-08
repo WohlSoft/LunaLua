@@ -36,6 +36,7 @@ public slots:
     QVariant checkEpisodeUpdate(const QString& directoryName, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
     QVariantList getSaveInfo(const QString& directoryName);
     void deleteSaveSlot(const QString& directoryName, int slot);
+    void openLevelDialog();
 
     void runSMBX();
     void runSMBXEditor();
@@ -48,6 +49,7 @@ signals:
     void runSMBXEditorExecuted();
     void runPGEEditorExecuted();
     void loadEpisodeWebpageExecuted(const QString& file);
+    void runSMBXLevelExecuted(const QString& file);
 
     void AutostartUpdated();
     void ControlsUpdated();
