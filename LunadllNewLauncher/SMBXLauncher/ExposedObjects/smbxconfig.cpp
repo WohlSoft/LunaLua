@@ -235,13 +235,17 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
 
                 QFile ext(episodeDir.canonicalPath() + "/save" + QString::number(index) + "-ext.dat");
                 double progress = 0;
+                QString savefilename = "";
                 if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     QTextStream in(&ext);
                     
                     QString line("");
                     std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
+                    std::regex savename("^\\s*\\[\\s*\"__savefilename\"\\s*\\]\\s*=\\s*\"(.*)\"\\s*,?\\s*$");
                     
-                    while (!in.atEnd() && QString::compare(line, "}") != 0) {
+                    int count = 0;
+
+                    while (!in.atEnd() && QString::compare(line, "},") != 0 && QString::compare(line, "}") != 0) {
                         line = in.readLine();
                         const std::string ln = line.toUtf8().constData();
                         if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
@@ -252,7 +256,17 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                             } catch (std::out_of_range const &e) {
                                 progress = 0;
                             }
-                            break;
+                            count++;
+                            if (count >= 2) {
+                                break;
+                            }
+                        } else if (std::regex_search(ln.begin(), ln.end(), match, savename)) {
+                            savefilename = QString::fromStdString(match[1]);
+
+                            count++;
+                            if (count >= 2) {
+                                break;
+                            }
                         }
                     }
                     
@@ -266,6 +280,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                 if (data.meta.ReadFileValid) {
                     map.insert("id", index);
                     map.insert("progress", progress);
+                    map.insert("savefilename", savefilename);
                     map.insert("starCount", data.gottenStars.length());
                     map.insert("gameCompleted", data.gameCompleted);
                     map.insert("coinCount", data.coins);
