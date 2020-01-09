@@ -271,6 +271,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                         }
                     }
                     
+                    ext.close();
                 }
 
 
