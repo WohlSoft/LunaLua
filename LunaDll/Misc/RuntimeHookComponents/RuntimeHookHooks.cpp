@@ -519,7 +519,7 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
         std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCKill", true);
         npcKillEvent->setDirectEventName("onNPCKill");
         npcKillEvent->setLoopable(false);
-        gLunaLua.callEvent(npcKillEvent, LuaProxy::NPC(*npcIndex_ptr - 1), *killReason);
+        gLunaLua.callEvent(npcKillEvent, *npcIndex_ptr, *killReason);
         if (npcKillEvent->native_cancelled())
         {
             ::NPC::Get(*npcIndex_ptr - 1)->killFlag = 0;
