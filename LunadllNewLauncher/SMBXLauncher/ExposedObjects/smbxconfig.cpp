@@ -238,6 +238,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                 QString savefilename = "";
                 if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     QTextStream in(&ext);
+                    in.setCodec("UTF-8");
                     
                     QString line("");
                     std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
