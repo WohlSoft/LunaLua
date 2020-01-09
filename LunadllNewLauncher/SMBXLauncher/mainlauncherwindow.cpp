@@ -112,6 +112,7 @@ void MainLauncherWindow::loadJavascriptBridge()
     connect(m_smbxConfig.data(), &SMBXConfig::runPGEEditorExecuted, this, &MainLauncherWindow::runPGEEditor);
     connect(m_smbxConfig.data(), &SMBXConfig::loadEpisodeWebpageExecuted, this, &MainLauncherWindow::loadEpisodeWebpage);
     connect(m_smbxConfig.data(), &SMBXConfig::runSMBXLevelExecuted, this, &MainLauncherWindow::runSMBXLevel);
+    connect(m_smbxConfig.data(), &SMBXConfig::setWindowHeaderExecuted, this, &MainLauncherWindow::setWindowHeader);
 
     qDebug() << "Running init javascript!";
     currentPage->runJavaScript(
@@ -249,7 +250,14 @@ void MainLauncherWindow::init(const QString &configName)
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
         m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
-        setWindowTitle(settingFile.value("title", "SMBX Launcher").toString());
+
+        QString wintitle = settingFile.value("title", "SMBX Launcher").toString();
+        m_autoWindowTitle = wintitle == "auto";
+        if (m_autoWindowTitle) {
+            wintitle = "SMBX Launcher";
+        }
+        setWindowTitle(wintitle);
+
         QString webpage = settingFile.value("episode-webpage", "").toString();
         if(webpage == ""){
             loadDefaultWebpage();
@@ -315,6 +323,13 @@ void MainLauncherWindow::runPGEEditor()
     if (m_pgeExe.length() > 0) {
         QProcess::startDetached(m_pgeExe);
         close();
+    }
+}
+
+void MainLauncherWindow::setWindowHeader(const QString &title)
+{
+    if (m_autoWindowTitle) {
+        setWindowTitle(title);
     }
 }
 

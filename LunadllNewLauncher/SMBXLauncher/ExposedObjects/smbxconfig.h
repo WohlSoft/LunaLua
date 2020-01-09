@@ -41,6 +41,7 @@ public slots:
     void runSMBX();
     void runSMBXEditor();
     void runPGEEditor();
+    void setWindowHeader(const QString& title);
     void loadEpisodeWebpage(const QString& file);
 
 
@@ -48,6 +49,7 @@ signals:
     void runSMBXExecuted();
     void runSMBXEditorExecuted();
     void runPGEEditorExecuted();
+    void setWindowHeaderExecuted(const QString& title);
     void loadEpisodeWebpageExecuted(const QString& file);
     void runSMBXLevelExecuted(const QString& file);
 

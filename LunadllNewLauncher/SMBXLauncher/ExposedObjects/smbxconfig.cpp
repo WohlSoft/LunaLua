@@ -385,6 +385,11 @@ void SMBXConfig::runPGEEditor()
     emit runPGEEditorExecuted();
 }
 
+void SMBXConfig::setWindowHeader(const QString &title)
+{
+    emit setWindowHeaderExecuted(title);
+}
+
 void SMBXConfig::loadEpisodeWebpage(const QString &file)
 {
     emit loadEpisodeWebpageExecuted(file);

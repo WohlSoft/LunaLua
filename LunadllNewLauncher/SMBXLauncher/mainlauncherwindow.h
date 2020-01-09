@@ -35,6 +35,7 @@ public slots:
     void runSMBX();
     void runSMBXEditor();
     void runPGEEditor();
+    void setWindowHeader(const QString& title);
     void loadEpisodeWebpage(const QString& file);
     void runSMBXLevel(const QString& file);
 
@@ -55,6 +56,7 @@ private:
     bool m_jsBridgeAlreadInit;
     int m_initWidth;
     int m_initHeight;
+    bool m_autoWindowTitle;
     Ui::MainLauncherWindow *ui;
 };
 
