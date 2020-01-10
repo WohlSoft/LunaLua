@@ -329,6 +329,8 @@ void TrySkipPatch()
     PATCH(0xA0664E).CALL(&NPCKillHook).Apply();
     PATCH(0xA23278).CALL(&NPCKillHook).Apply();
 
+    PATCH(0xA3A679).CALL(runtimeHookNPCRemovalConfirmHook).NOP_PAD_TO_SIZE<6>().Apply();
+
     PATCH(0xAA4352)
         .CALL(&__vbaStrCmp_TriggerSMBXEventHook)
         .NOP()

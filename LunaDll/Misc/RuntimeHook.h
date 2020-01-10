@@ -57,6 +57,7 @@ extern float __stdcall vbaR4VarHook(VARIANTARG* variant);       //The Converter 
 extern int __stdcall rtcMsgBoxHook(VARIANTARG* msgText, DWORD, DWORD, DWORD, DWORD);        //The Messagebox Hook Code
 extern void __stdcall doEventsLevelEditorHook();        //Reset Level Editor
 extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* unknownVal);
+extern void __stdcall runtimeHookNPCRemovalConfirmHook();
 //Keyboard Hook
 //extern short __stdcall GetKeyState(int vKey);
 //TriggerSMBXEvent cmp function

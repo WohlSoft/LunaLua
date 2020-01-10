@@ -512,24 +512,53 @@ extern void __stdcall doEventsLevelEditorHook()
     GetProcAddress(vmVB6Lib, "rtcDoEvents")();*/
 }
 
+static unsigned short npcRemovalConfirmed = 0;
 
 extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 {
+    short npcIdx = *npcIndex_ptr;
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onNPCKill", true);
         npcKillEvent->setDirectEventName("onNPCKill");
         npcKillEvent->setLoopable(false);
-        gLunaLua.callEvent(npcKillEvent, *npcIndex_ptr, *killReason);
+        gLunaLua.callEvent(npcKillEvent, npcIdx, *killReason);
         if (npcKillEvent->native_cancelled())
         {
-            ::NPC::Get(*npcIndex_ptr - 1)->killFlag = 0;
+            ::NPC::Get(npcIdx - 1)->killFlag = 0;
             return;
         }
     }
 
+    short oldNpcRemovalConfirmed = npcRemovalConfirmed;
+    npcRemovalConfirmed = 0;
+
     native_cleanupKillNPC(npcIndex_ptr, killReason);
+
+    if (npcRemovalConfirmed != 0)
+    {
+        short newIdx = npcIdx - 1;    // 0 based
+        short oldIdx = GM_NPCS_COUNT; // 0 based
+
+        // The NPC was indeed removed
+        if (gLunaLua.isValid() && (newIdx >= 0) && (oldIdx >= 0)) {
+            std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onPostNPCRearrangeInternal", false);
+            npcKillEvent->setDirectEventName("onPostNPCRearrangeInternal");
+            npcKillEvent->setLoopable(false);
+            gLunaLua.callEvent(npcKillEvent, newIdx, oldIdx);
+        }
+    }
+
+    npcRemovalConfirmed = oldNpcRemovalConfirmed;
 }
 
+// 00A3A679
+__declspec(naked) void __stdcall runtimeHookNPCRemovalConfirmHook()
+{
+    __asm {
+        MOV npcRemovalConfirmed, -1
+        RET
+    }
+}
 
 extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventName)
 {
