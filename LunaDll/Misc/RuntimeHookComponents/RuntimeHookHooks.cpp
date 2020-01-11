@@ -1332,6 +1332,55 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
             return 1;
         }
+        if ((virtKey == 0x56) && ctrlPressed)
+        {
+            // Ctrl-V
+            if (OpenClipboard(nullptr) == 0)
+            {
+                // Couldn't open clipboard
+                return 1;
+            }
+
+            // Get unicode text handle
+            bool textIsUnicode = true;
+            HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+            if (hData == nullptr)
+            {
+                // Couldn't get text handle, try non-unicode
+                hData = GetClipboardData(CF_TEXT);
+                textIsUnicode = false;
+                if (hData == nullptr)
+                {
+                    // Couldn't get any text
+                    CloseClipboard();
+                    return 1;
+                }
+            }
+
+            // Lock data
+            void* dataPtr = GlobalLock(hData);
+            if (dataPtr == nullptr)
+            {
+                // Couldn't get pointer
+                GlobalUnlock(hData);
+                CloseClipboard();
+            }
+
+            // Convert to std::string
+            std::string pastedText = textIsUnicode ? WStr2Str(static_cast<const wchar_t*>(dataPtr)) : std::string(static_cast<const char*>(dataPtr));
+
+            // Unlock Data and close clipboard
+            GlobalUnlock(hData);
+            CloseClipboard();
+
+            // Call event
+            if ((pastedText.length() > 0) && gLunaLua.isValid()) {
+                std::shared_ptr<Event> pasteTextEvent = std::make_shared<Event>("onPasteText", false);
+                pasteTextEvent->setDirectEventName("onPasteText");
+                pasteTextEvent->setLoopable(false);
+                gLunaLua.callEvent(pasteTextEvent, pastedText);
+            }
+        }
     } // keyDown
 
     // Hook print screen key
