@@ -161,7 +161,7 @@ extern "C" {
         return g_NpcCustomParams.getCharPtrArray();
     }
 
-    FFI_EXPORT(const char**) LunaLuaGetBgiCustomParams(void)
+    FFI_EXPORT(const char**) LunaLuaGetBgoCustomParams(void)
     {
         return g_BgoCustomParams.getCharPtrArray();
     }
@@ -169,6 +169,41 @@ extern "C" {
     FFI_EXPORT(const char**) LunaLuaGetBlockCustomParams(void)
     {
         return g_BlockCustomParams.getCharPtrArray();
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetDefaultLevelCustomParams(void)
+    {
+        static std::string ret; // Static so it's temporarially stored after returning
+        ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_LEVELFILE, 0, "{}");
+        return ret.c_str();
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetDefaultSectionCustomParams(void)
+    {
+        static std::string ret; // Static so it's temporarially stored after returning
+        ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_SECTIONS, 0, "{}");
+        return ret.c_str();
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetDefaultNpcCustomParams(unsigned int id)
+    {
+        static std::string ret; // Static so it's temporarially stored after returning
+        ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, id, "{}");
+        return ret.c_str();
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetDefaultBgoCustomParams(unsigned int id)
+    {
+        static std::string ret; // Static so it's temporarially stored after returning
+        ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BGO, id, "{}");
+        return ret.c_str();
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetDefaultBlockCustomParams(unsigned int id)
+    {
+        static std::string ret; // Static so it's temporarially stored after returning
+        ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BLOCKS, id, "{}");
+        return ret.c_str();
     }
 
     struct FFITestModeSettings {
