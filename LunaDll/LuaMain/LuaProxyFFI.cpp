@@ -276,4 +276,9 @@ extern "C" {
         short noSmokeNative = COMBOOL(noSmoke);
         native_hideLayer(&::Layer::Get(layerIndex)->ptLayerName, &noSmokeNative);
     }
+
+    FFI_EXPORT(unsigned char*) LunaLuaGetKeyStateArray()
+    {
+        return gKeyState;
+    }
 }

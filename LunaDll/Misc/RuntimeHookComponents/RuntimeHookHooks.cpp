@@ -1253,7 +1253,6 @@ extern void __stdcall GenerateScreenshotHook()
 extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    static BYTE keyState[256] = { 0 };
     static WCHAR unicodeData[32] = { 0 };
 
     if (nCode != 0){
@@ -1269,25 +1268,25 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     if (virtKey < 256)
     {
-        keyState[virtKey] = keyDown ? 0x80 : 0x00;
+        gKeyState[virtKey] = keyDown ? 0x80 : 0x00;
         if (virtKey == VK_CAPITAL)
         {
-            keyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+            gKeyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
         }
     }
 
-    bool ctrlPressed = ((keyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
+    bool ctrlPressed = ((gKeyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
     if (keyDown) {
         if (gLunaLua.isValid() && !ctrlPressed) {
             std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
-            int unicodeRet = ToUnicode(virtKey, scanCode, keyState, unicodeData, 32, 0);
+            int unicodeRet = ToUnicode(virtKey, scanCode, gKeyState, unicodeData, 32, 0);
             if (unicodeRet > 0)
             {
-                std::wstring wStr(unicodeData, unicodeRet);
-                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, WStr2Str(wStr));
+                std::string charStr = WStr2Str(std::wstring(unicodeData, unicodeRet));
+                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, charStr);
             }
             else
             {

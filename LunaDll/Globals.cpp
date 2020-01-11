@@ -45,6 +45,8 @@ int gJumpTapped;
 int gLastRunPress;
 int gRunTapped;
 
+BYTE gKeyState[256] = { 0 };
+
 HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
