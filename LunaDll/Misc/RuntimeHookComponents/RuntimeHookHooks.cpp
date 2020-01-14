@@ -2406,7 +2406,7 @@ static unsigned int __stdcall runtimeHookSemisolidInteractionHook(NPCMOB* npc)
     unsigned short npcID = npc->id;
     if (npc_isflying[npcID] != 0) {
         // Flying NPCs generally don't collide with semisolids... unless it's just a hop?
-        return NPC::CheckSemisolidCollidingFlyType(npc->ai1) ? -1 : 0;
+        return NPC::CheckSemisolidCollidingFlyType((unsigned int)npc->ai1) ? -1 : 0;
     }
     return -1; // Collides
 }
