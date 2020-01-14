@@ -107,11 +107,13 @@ extern void IsNPCCollidesWithVeggiHook_Wrapper();
 
 
 /************************************************************************/
-/* Hooks for analyze purpose                                            */
+/* Hooks for some rendering purposes                                    */
 /************************************************************************/
 extern BOOL __stdcall HardcodedGraphicsBitBltHook(DWORD retAddr, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
 extern void __stdcall RenderLevelHook();
 extern void __stdcall RenderWorldHook();
+extern void __stdcall runtimeHookRestartCameraLoop();
+extern void __stdcall runtimeHookSkipCamera();
 
 /************************************************************************/
 /* Libs                                                                 */

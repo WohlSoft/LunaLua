@@ -470,6 +470,36 @@ void TrySkipPatch()
         .NOP_PAD_TO_SIZE<7>()
         .Apply();
 
+    // Hook to restart the camera loop in RenderLevel to allow updating all cameras
+    PATCH(0x90C64E)
+        .JG(&runtimeHookRestartCameraLoop)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+
+    // Hook to skip camera updates during the second repetition of the camera loop
+    PATCH(0x90C762)
+        .JMP(&runtimeHookSkipCamera)
+        .NOP_PAD_TO_SIZE<7>()
+        .Apply();
+
+    // Patches to make iterations of the camera loop that update cameras skip the rendering itself
+    PATCH(0x90D6F8)
+        .JMP(0x90C62E)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+    PATCH(0x90D285)
+        .JNE(0x90C62E)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+    PATCH(0x90D312)
+        .JNE(0x90C62E)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+    PATCH(0x90D569)
+        .JNE(0x90C62E)
+        .NOP_PAD_TO_SIZE<6>()
+        .Apply();
+
     // Hook to fix 100% CPU when window is inactive
     PATCH(0x8E6FE1)
         .NOP()

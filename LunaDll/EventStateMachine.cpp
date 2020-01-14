@@ -114,9 +114,12 @@ void EventStateMachine::hookLevelRenderStart(void) {
     if (m_onTickEndReady) {
         sendOnTickEnd();
     }
+}
 
+void EventStateMachine::hookLevelRenderFirstCameraStart(void) {
     sendOnDraw();
 }
+
 void EventStateMachine::hookLevelRenderEnd(void) {
     if (m_onDrawEndReady) {
         sendOnDrawEnd();

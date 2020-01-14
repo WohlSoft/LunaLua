@@ -1140,6 +1140,8 @@ _declspec(naked) void __stdcall runtimeHookNoShieldFireEffect_Wrapper()
     }
 }
 
+static short g_renderDoneCameraUpdate = 0;
+static bool g_ranOnDrawThisFrame = false;
 
 static void __stdcall CameraUpdateHook(int cameraIdx)
 {
@@ -1167,14 +1169,30 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
     };
 }
 
-static void __stdcall PostCameraUpdateHook(int cameraIdx)
+static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
 {
-    // Enforce rounded camera position
-    SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
-    SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
+    // Run onDraw at this point, before the first camera starts rendering
+    if (!g_ranOnDrawThisFrame)
+    {
+        g_ranOnDrawThisFrame = true;
 
-    // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-    Renderer::Get().StoreCameraPosition(cameraIdx);
+        // Store camera states
+        for (int i=1; i<=maxCameraIdx; i++)
+        {
+            // Enforce rounded camera position
+            SMBX_CameraInfo::setCameraX(i, std::round(SMBX_CameraInfo::getCameraX(i)));
+            SMBX_CameraInfo::setCameraY(i, std::round(SMBX_CameraInfo::getCameraY(i)));
+
+            // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
+            Renderer::Get().StoreCameraPosition(i);
+        }
+
+        Renderer::Get().StartFrameRender();
+        g_EventHandler.hookLevelRenderFirstCameraStart();
+    }
+
+    // Start camera render for this camera
+    Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
         SMBX_CameraInfo cameraData;
@@ -1194,10 +1212,11 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx)
 void __declspec(naked) __stdcall PostCameraUpdateHook_Wrapper()
 {
     __asm {
-        POP EAX                          // POP the return address
-        PUSH DWORD PTR DS : [EBP - 0x38] // Sneak a camera index argument in there
-        PUSH EAX                         // PUSH the return address
-        JMP PostCameraUpdateHook         // JMP to PostCameraUpdateHook
+        POP EAX                           // POP the return address
+        PUSH DWORD PTR DS : [EBP - 0x3E0] // Sneak max camera index argument in there
+        PUSH DWORD PTR DS : [EBP - 0x38]  // Sneak a camera index argument in there
+        PUSH EAX                          // PUSH the return address
+        JMP PostCameraUpdateHook          // JMP to PostCameraUpdateHook
     };
 }
 
@@ -1459,13 +1478,56 @@ extern void __stdcall RenderLevelHook()
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
     g_EventHandler.hookLevelRenderStart();
+
+    short oldRenderDoneCameraUpdate = g_renderDoneCameraUpdate;
+    bool oldRanOnDrawThisFrame = g_ranOnDrawThisFrame;
+    g_renderDoneCameraUpdate = 0;
+    g_ranOnDrawThisFrame = false;
+    
     RenderLevelReal();
+
+    g_renderDoneCameraUpdate = oldRenderDoneCameraUpdate;
+    g_ranOnDrawThisFrame = oldRanOnDrawThisFrame;
+
     if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
         g_GLEngine.EndFrame(g_GLEngine.GetHDC());
     }
     g_EventHandler.hookLevelRenderEnd();
     Renderer::Get().EndFrameRender();
+}
+
+// Hook to restart the camera loop in RenderLevel to allow updating all cameras
+// Reroute 6 byte JG at 0x90C64E to this
+void __declspec(naked) __stdcall runtimeHookRestartCameraLoop()
+{
+    __asm {
+        MOV AX, g_renderDoneCameraUpdate
+        TEST AX, AX
+        JNE runtimeHookRestartCameraLoopExitLoop
+        MOV g_renderDoneCameraUpdate, -1
+        PUSH 0x90C61D // Restart loop
+        RET
+    runtimeHookRestartCameraLoopExitLoop:
+        PUSH 0x94D5CF // Exit loop
+        RET
+    };
+}
+
+// Hook to skip camera updates during the second repetition of the camera loop
+// Replace 7 bytes at 0x90C762 with JMP to this
+void __declspec(naked) __stdcall runtimeHookSkipCamera()
+{
+    __asm {
+        MOV AX, g_renderDoneCameraUpdate
+        TEST AX, AX
+        JNE runtimeHookSkipCameraExit
+        PUSH 0x90C769 // Exit to camera update code
+        RET
+    runtimeHookSkipCameraExit:
+        PUSH 0x90D6FE // Jump to rendering code
+        RET
+    };
 }
 
 static void __declspec(naked) __stdcall RenderWorldReal()

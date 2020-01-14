@@ -24,6 +24,7 @@ public:
     void hookWorldLoop(void);
     void hookInputUpdate(void);
     void hookLevelRenderStart(void);
+    void hookLevelRenderFirstCameraStart(void);
     void hookLevelRenderEnd(void);
     void hookWorldRenderStart(void);
     void hookWorldRenderEnd(void);
