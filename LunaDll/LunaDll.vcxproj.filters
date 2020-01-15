@@ -134,6 +134,9 @@
     <Filter Include="libs\json">
       <UniqueIdentifier>{35f2e9ba-fba0-48ac-ae82-40ba81b273f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LunaLoader">
+      <UniqueIdentifier>{bfb6190e-4738-4465-8020-4a003075249a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -687,6 +690,9 @@
     </ClInclude>
     <ClInclude Include="libs\json\json.hpp">
       <Filter>libs\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LunaLoader\LunaLoaderPatch.h">
+      <Filter>LunaLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1289,6 +1295,9 @@
     </ClCompile>
     <ClCompile Include="FileManager\config_manager.cpp">
       <Filter>FileManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LunaLoader\LunaLoaderPatch.cpp">
+      <Filter>LunaLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

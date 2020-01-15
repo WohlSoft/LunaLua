@@ -40,10 +40,11 @@ struct startUpSettings{
     bool logger;
     bool newLauncher;
     bool console;
-    bool noGL;
     bool waitForIPC;
     volatile bool currentlyWaitingForIPC;
     bool oldLvlLoader;
+    bool softwareGL;
+    bool forceHardGL;
 };
 
 struct SMBXHUDSettings {

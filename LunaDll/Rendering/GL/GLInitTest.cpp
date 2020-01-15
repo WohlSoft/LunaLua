@@ -46,6 +46,8 @@ static HGLRC GetGLRCFromHDC(HDC dc) {
     return rc;
 }
 
+static std::string testGlFeaturesMsg;
+
 bool LunaDLLTestGLFeatures(void)
 {
     int pixelformat = -1, major = 0, minor = 0, profile = 0, flags = 0;
@@ -86,10 +88,11 @@ bool LunaDLLTestGLFeatures(void)
         if (!(GLEW_VERSION_3_0 || GLEW_ARB_framebuffer_object || GLEW_EXT_framebuffer_object)) {
             throw GLException("Missing EXT_framebuffer_object");
         }
+        testGlFeaturesMsg = "";
     }
     catch (const GLException &e) {
         ret = false;
-        dbgboxA(("Using GDI renderer, so some advanced LunaDLL effects may not be present in some levels.\r\n\r\nCould not use OpenGL Renderer because:\r\n\t" + e.msg).c_str());
+        testGlFeaturesMsg = e.msg;
     }
 
     if (NULL != rc) wglMakeCurrent(NULL, NULL);
@@ -101,3 +104,7 @@ bool LunaDLLTestGLFeatures(void)
     return ret;
 }
 
+const char* LunaDLLTestGLFeaturesGetMessage()
+{
+    return testGlFeaturesMsg.c_str();
+}

@@ -8,6 +8,7 @@ using std::max;
 #include <GdiPlus.h>
 #include <io.h>
 #include <fcntl.h>
+#include <delayimp.h>
 
 #include "Main.h"
 #include "Globals.h"
@@ -32,8 +33,7 @@ using std::max;
 #include "Rendering/GL/GLInitTest.h"
 #include "Misc/AsmPatch.h"
 #include "Misc/LoadScreen.h"
-
-#define PATCHIT 1
+#include "../LunaLoader/LunaLoaderPatch.h"
 
 static bool LevelCustomSounds = false;
 
@@ -82,16 +82,84 @@ static DWORD __stdcall GetCurrentProcessorNumberXP(void)
 void LunaDLLInit()
 {
     InitGlobals();
-#if PATCHIT
-    TrySkipPatch();
-#endif // PATCHIT
+
+    //Check for arguments and write them in gStartupSettings
+    ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
+
+    // Load Luna Config
+    // Either in root or in config folder. The config folder is recommended however.
+    gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
+    gGeneralConfig.loadOrDefault();
+
+    // If command line arguments did not specify a mode, see if the config file specifies
+    if (!gStartupSettings.softwareGL && !gStartupSettings.forceHardGL)
+    {
+        GeneralLunaConfig::GLMode glMode = gGeneralConfig.getRendererOpenGL();
+        switch (glMode)
+        {
+        case GeneralLunaConfig::GLModeHard:
+            gStartupSettings.forceHardGL = true;
+            break;
+        case GeneralLunaConfig::GLModeSoft:
+            gStartupSettings.softwareGL = true;
+            break;
+        }
+    }
+
+    // Get whether the DLL for software GL is found
+    bool haveSoftwareGLSupport = (GetFileAttributesA("softgl/OPENGL32.dll") != INVALID_FILE_ATTRIBUTES);
+
+    // If loading in software GL mode, set the DLL directory appropriately before trying
+    if (gStartupSettings.softwareGL)
+    {
+        if (!haveSoftwareGLSupport)
+        {
+            MessageBoxA(0, "Missing DLL for Software GL support", "Error", 0);
+            exit(1);
+        }
+        SetDllDirectoryA("softgl");
+    }
+    __HrLoadAllImportsForDll("OPENGL32.dll");
 
     // Test OpenGL support
-    if (!gStartupSettings.noGL && LunaDLLTestGLFeatures()) {
+    if (LunaDLLTestGLFeatures()) {
+        // Success. OpenGL works
         g_GLEngine.Enable();
-    } else {
-        g_GLEngine.Disable();
     }
+    else if (haveSoftwareGLSupport && !gStartupSettings.softwareGL && !gStartupSettings.forceHardGL)
+    {
+        // Regular GL doesn't work, but we've not tried software GL yet, so make a child process for that
+
+        // Make new command line
+        std::wstring newCmdLine(GetCommandLineW());
+        newCmdLine += L" --softGL";
+
+        // Get working dir
+        unsigned int workingDirLen = GetCurrentDirectoryW(0, NULL) + 1;
+        std::unique_ptr<wchar_t[]> workingDir(new wchar_t[workingDirLen]);
+        GetCurrentDirectoryW(workingDirLen, workingDir.get());
+
+        // Get module filename
+        wchar_t moduleFileName[4096];
+        GetModuleFileNameW(nullptr, moduleFileName, 4096);
+
+        // Launch child process, inheriting stdin/stdout
+        LunaLoaderResult ret = LunaLoaderRun(moduleFileName, newCmdLine.c_str(), workingDir.get());
+        exit(0);
+    }
+    else
+    {
+        std::string errmsg("Could not start renderer for the following reason:\n");
+        errmsg += LunaDLLTestGLFeaturesGetMessage();
+        if (gStartupSettings.softwareGL)
+        {
+            errmsg += "\n(Error using software renderer)";
+        }
+        MessageBoxA(0, errmsg.c_str(), "Error", 0);
+        exit(1);
+    }
+
+    TrySkipPatch();
 
     // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
     DWORD curProcessor = GetCurrentProcessorNumberXP();

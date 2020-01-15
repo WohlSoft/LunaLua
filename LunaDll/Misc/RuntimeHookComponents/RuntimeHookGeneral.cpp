@@ -148,7 +148,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
         gStartupSettings.console = true;
 
     if (vecStrFind(args, L"--nogl"))
-        gStartupSettings.noGL = true;
+        gStartupSettings.softwareGL = true;
 
     for (unsigned int i = 0; i < args.size(); i++)
     {
@@ -179,6 +179,16 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--oldLvlLoader"))
     {
         gStartupSettings.oldLvlLoader = true;
+    }
+
+    if (vecStrFind(args, L"--softGL"))
+    {
+        gStartupSettings.softwareGL = true;
+    }
+
+    if (vecStrFind(args, L"--forceHardGL"))
+    {
+        gStartupSettings.forceHardGL = true;
     }
 }
 
@@ -225,9 +235,6 @@ static unsigned int __stdcall LatePatch(void)
 static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
-    //Check for arguments and write them in gStartupSettings
-    ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
-
     // If we have stdin/stdout, attach to the IPC server
     ipcServer.AttachStdinStdout();
 
@@ -248,9 +255,6 @@ void TrySkipPatch()
     //Load graphics from the HardcodedGraphicsManager
     HardcodedGraphicsManager::loadGraphics();
 
-    // Either in root or in config folder. The config folder is recommended however.
-    gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
-    gGeneralConfig.loadOrDefault();
     //game.ini reader
     GameConfiguration::runPatchByIni(IniProcessing(WStr2Str(getLatestConfigFile(L"game.ini"))));
 

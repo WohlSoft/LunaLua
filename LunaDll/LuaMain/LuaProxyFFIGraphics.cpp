@@ -415,3 +415,7 @@ FFI_EXPORT int __fastcall FFI_GraphicsGetOverworldHudState()
     return (int)gSMBXHUDSettings.overworldHudState;
 }
 
+FFI_EXPORT bool __fastcall FFI_GraphicsIsSoftwareGL()
+{
+    return gStartupSettings.softwareGL;
+}
