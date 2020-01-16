@@ -38,6 +38,9 @@
 
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
+extern HHOOK HookWnd;
+extern HHOOK KeyHookWnd;
+
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
@@ -598,6 +601,10 @@ EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
     if (isVB6Exception && lastVB6ErrCode == 40040) {
         return LunaDLLOriginalExceptionHandler(ExceptionRecord, EstablisherFrame, ContextRecord, DispatcherContext);
     }
+
+    // Remove some hooks first
+    if (HookWnd) UnhookWindowsHookEx(HookWnd);
+    if (KeyHookWnd) UnhookWindowsHookEx(KeyHookWnd);
 
     ErrorReport::SnapshotError(ExceptionRecord, ContextRecord);
     ErrorReport::report();
@@ -1269,7 +1276,6 @@ extern void __stdcall GenerateScreenshotHook()
 }
 
 
-extern HHOOK KeyHookWnd;
 LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     static WCHAR unicodeData[32] = { 0 };
@@ -1297,7 +1303,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     bool ctrlPressed = ((gKeyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
-    if (keyDown) {
+    if (keyDown && gMainWindowFocused) {
         if (gLunaLua.isValid() && !ctrlPressed) {
             std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
@@ -1403,7 +1409,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     } // keyDown
 
     // Hook print screen key
-    if (virtKey == VK_SNAPSHOT)
+    if ((virtKey == VK_SNAPSHOT) && gMainWindowFocused)
     {
         if (g_GLEngine.IsEnabled())
         {

@@ -33,8 +33,8 @@ int(__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD) = 0;
 
 HMODULE newLauncherLib = 0;
 HMODULE newDebugger = 0;
-HHOOK HookWnd;
-HHOOK KeyHookWnd;
+HHOOK HookWnd = nullptr;
+HHOOK KeyHookWnd = nullptr;
 
 #include <CommCtrl.h>
 
