@@ -27,6 +27,7 @@ public: // Constructor and destructor
         parentLock((const CLunaFFILock*)TlsGetValue(currentLockTlsIdx))
     {
         TlsSetValue(currentLockTlsIdx, this);
+        SafeFPUControl::clear(); // Make sure no FPU exceptions are set when we enter a FFI call
     }
     ~CLunaFFILock() {
         if ((const CLunaFFILock*)TlsGetValue(currentLockTlsIdx) == this)

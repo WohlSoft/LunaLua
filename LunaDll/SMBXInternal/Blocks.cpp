@@ -1,10 +1,6 @@
 #include "Blocks.h"
 #include "PlayerMOB.h"
 
-#include <cfenv>
-#pragma fenv_access (on)
-#pragma STDC FENV_ACCESS on
-
 bool isBlocksSortingRequired = false;
 
 Block* Blocks::Get(int index) {
@@ -71,7 +67,6 @@ void Blocks::SetNextFrameSorting()
 int Blocks::TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS) {	
     typedef int __stdcall colfunc(void*, void*);
     colfunc* f = (colfunc*)GF_MOB_BLOCK_COL;	
-    std::feclearexcept(FE_ALL_EXCEPT);
     return f(&pMobPOS->momentum.x, &pBlockPOS->momentum.x);
 }
 

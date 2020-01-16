@@ -2,13 +2,16 @@
 #define SafeFPUControl_hhhhh
 
 #include <cfenv>
+#pragma fenv_access (on)
 
 class SafeFPUControl
 {
 public:
-    SafeFPUControl() = default;
+    inline static void clear() { std::feclearexcept(FE_ALL_EXCEPT);  }
+public:
+    inline SafeFPUControl() {}
     SafeFPUControl(SafeFPUControl& other) = delete;
-    ~SafeFPUControl();
+    inline ~SafeFPUControl() { clear(); }
 };
 
 
