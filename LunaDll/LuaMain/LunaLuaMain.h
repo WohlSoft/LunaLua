@@ -14,6 +14,41 @@
 
 #include <luabind/adopt_policy.hpp>
 
+class CLunaFFILock
+{
+private: // Static members
+    static DWORD currentLockTlsIdx;
+private: // Local members
+    const char* const funcName;
+    const CLunaFFILock* const parentLock;
+public: // Constructor and destructor
+    CLunaFFILock(const char* _funcName) :
+        funcName(_funcName),
+        parentLock((const CLunaFFILock*)TlsGetValue(currentLockTlsIdx))
+    {
+        TlsSetValue(currentLockTlsIdx, this);
+    }
+    ~CLunaFFILock() {
+        if ((const CLunaFFILock*)TlsGetValue(currentLockTlsIdx) == this)
+        {
+            TlsSetValue(currentLockTlsIdx, (void*)parentLock);
+        }
+    }
+public: // Static methods
+    static void reset()
+    {
+        TlsSetValue(currentLockTlsIdx, nullptr);
+    }
+    static const char* getCurrentFuncName()
+    {
+        const CLunaFFILock* const currentLock = (const CLunaFFILock*)TlsGetValue(currentLockTlsIdx);
+        if (currentLock == nullptr)
+        {
+            return nullptr;
+        }
+        return currentLock->funcName;
+    }
+};
 
 class CLunaLua
 {
@@ -96,6 +131,17 @@ public:
     template<typename... Args>
     void callEvent(const std::shared_ptr<Event>& e, Args... args){
         if (m_ready) {
+            const char* currentFFIFunc = CLunaFFILock::getCurrentFuncName();
+            if (currentFFIFunc != nullptr)
+            {
+                std::string errMsg("Error! The event ");
+                errMsg += e->eventName();
+                errMsg += " was called during ";
+                errMsg += currentFFIFunc;
+                MessageBoxA(0, errMsg.c_str(), "Error", MB_ICONWARNING | MB_TASKMODAL);
+                _exit(1);
+            }
+
             callLuaFunction(L, "__callEvent", e, args...);
         }
     }

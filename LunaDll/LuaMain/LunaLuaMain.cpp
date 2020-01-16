@@ -27,6 +27,7 @@
 
 #include "../Misc/LoadScreen.h"
 
+/*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
 using namespace luabind;

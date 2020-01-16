@@ -14,6 +14,7 @@
 #include "../Rendering/Shaders/GLShaderAttributeInfo.h"
 #include "../Rendering/Shaders/GLShaderUniformInfo.h"
 #include "LuaProxyFFIGraphics.h"
+#include "LunaLuaMain.h"
 
 #define FFI_EXPORT extern "C" __declspec(dllexport)
 
@@ -21,6 +22,7 @@
 
 FFI_EXPORT LunaImageRef* __fastcall FFI_ImageLoad(const char* filename, uint32_t* sizeOut)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     std::wstring full_path;
 
     if (!isAbsolutePath(filename)) {
@@ -48,6 +50,7 @@ FFI_EXPORT LunaImageRef* __fastcall FFI_ImageLoad(const char* filename, uint32_t
 
 FFI_EXPORT void __fastcall FFI_ImageFree(LunaImageRef* img)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img != nullptr)
     {
         delete img;
@@ -56,6 +59,7 @@ FFI_EXPORT void __fastcall FFI_ImageFree(LunaImageRef* img)
 
 FFI_EXPORT uint32_t __fastcall FFI_ImageGetDataPtr(LunaImageRef* img)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if ((img != nullptr) && *img)
     {
         return (*img)->getDataPtrAsInt();
@@ -67,6 +71,7 @@ FFI_EXPORT uint32_t __fastcall FFI_ImageGetDataPtr(LunaImageRef* img)
 
 static void GLPlaceAttributes(std::vector<GLShaderVariableEntry>& out, GLShaderVariableType type, FFI_GL_Draw_Var* vars, unsigned int count)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     for (unsigned int i = 0; i < count; i++)
     {
         auto& unif = vars[i];
@@ -94,6 +99,7 @@ static void GLPlaceAttributes(std::vector<GLShaderVariableEntry>& out, GLShaderV
 
 FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (cmd == nullptr) return;
 
     auto obj = std::make_shared<GLEngineCmd_LuaDraw>();
@@ -152,6 +158,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
 
 FFI_EXPORT FFI_ShaderObjRef* __fastcall FFI_ShaderFromStrings(const char* vertexSource, const char* fragmentSource)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (vertexSource && fragmentSource)
     {
         FFI_ShaderObjRef obj = std::make_shared<FFI_ShaderObj>();
@@ -174,6 +181,7 @@ FFI_EXPORT FFI_ShaderObjRef* __fastcall FFI_ShaderFromStrings(const char* vertex
 
 FFI_EXPORT void __fastcall FFI_ShaderFree(FFI_ShaderObjRef* obj)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (obj != nullptr)
     {
         delete obj;
@@ -182,6 +190,7 @@ FFI_EXPORT void __fastcall FFI_ShaderFree(FFI_ShaderObjRef* obj)
 
 FFI_EXPORT const char* __fastcall FFI_ShaderError(FFI_ShaderObjRef* obj)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (obj == nullptr) return nullptr;
     if (!*obj) return nullptr;
     if ((*obj)->mError == false) return nullptr;
@@ -191,6 +200,7 @@ FFI_EXPORT const char* __fastcall FFI_ShaderError(FFI_ShaderObjRef* obj)
 
 FFI_EXPORT bool __fastcall FFI_ShaderCompile(FFI_ShaderObjRef* obj)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     // Invalid pointer or error condition, early return
     if (obj == nullptr) return false;
     if (!*obj) return false;
@@ -209,6 +219,7 @@ FFI_EXPORT bool __fastcall FFI_ShaderCompile(FFI_ShaderObjRef* obj)
 
 FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetAttributeInfo(FFI_ShaderObjRef* obj, uint32_t idx)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     static thread_local FFI_ShaderVariableInfo out;
 
     // Invalid pointer or error condition, early return
@@ -233,6 +244,7 @@ FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetAttributeInfo(FFI_ShaderObj
 
 FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetUniformInfo(FFI_ShaderObjRef* obj, uint32_t idx)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     static thread_local FFI_ShaderVariableInfo out;
 
     // Invalid pointer or error condition, early return
@@ -259,11 +271,13 @@ FFI_EXPORT FFI_ShaderVariableInfo* __fastcall FFI_GetUniformInfo(FFI_ShaderObjRe
 
 FFI_EXPORT bool __fastcall FFI_SpriteImageLoad(const char* filename, int resNumber, int transColor)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     return Renderer::Get().LoadBitmapResource(Str2WStr(filename), resNumber, transColor);
 }
 
 FFI_EXPORT void __cdecl FFI_SpritePlace(int type, int resNumber, LunaImageRef* img, int xPos, int yPos, const char* extra, int time)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if ((resNumber == -1) && (img == nullptr)) return;
 
     CSpriteRequest req;
@@ -279,12 +293,14 @@ FFI_EXPORT void __cdecl FFI_SpritePlace(int type, int resNumber, LunaImageRef* i
 
 FFI_EXPORT void __fastcall FFI_SpriteUnplace(LunaImageRef* img)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img == nullptr) return;
     gSpriteMan.ClearSprites(*img);
 }
 
 FFI_EXPORT void __cdecl FFI_SpriteUnplaceWithPos(LunaImageRef* img, int x, int y)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img == nullptr) return;
     gSpriteMan.ClearSprites(*img, x, y);
 }
@@ -293,6 +309,7 @@ FFI_EXPORT void __cdecl FFI_SpriteUnplaceWithPos(LunaImageRef* img, int x, int y
 
 FFI_EXPORT void __cdecl FFI_ImageDraw(LunaImageRef* img, double x, double y, double sx, double sy, double sw, double sh, double priority, float opacity, bool sceneCoords)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img == nullptr) return;
     RenderBitmapOp* bitmapRenderOp = new RenderBitmapOp();
     bitmapRenderOp->direct_img = *img;
@@ -312,6 +329,7 @@ FFI_EXPORT void __cdecl FFI_ImageDraw(LunaImageRef* img, double x, double y, dou
 
 FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, double priority, bool sceneCoords)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (text == nullptr) return;
 
     std::wstring wText = Str2WStr(text);
@@ -330,12 +348,14 @@ FFI_EXPORT void __cdecl FFI_TextDraw(const char* text, int type, int x, int y, d
 
 FFI_EXPORT void __fastcall FFI_SetSpriteOverride(const char* name, LunaImageRef* img)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     ImageLoader::OverrideByName(name, img ? *img : nullptr);
     // LUNAIMAGE_TODO: Use return value to error
 }
 
 FFI_EXPORT LunaImageRef* __fastcall FFI_GetSpriteOverride(const char* name, uint32_t* sizeOut)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     std::shared_ptr<LunaImage> img = ImageLoader::GetByName(name);
 
     if (img)
@@ -357,7 +377,8 @@ FFI_EXPORT LunaImageRef* __fastcall FFI_GetSpriteOverride(const char* name, uint
 // CaptureBuffer class
 
 FFI_EXPORT CaptureBufferRef* __fastcall FFI_CaptureBuffer(uint32_t w, uint32_t h, bool nonskippable)
-{ 
+{
+    CLunaFFILock ffiLock(__FUNCTION__);
     std::shared_ptr<CaptureBuffer> ref = std::make_shared<CaptureBuffer>(w, h, nonskippable);
     if (ref)
     {
@@ -369,6 +390,7 @@ FFI_EXPORT CaptureBufferRef* __fastcall FFI_CaptureBuffer(uint32_t w, uint32_t h
 
 FFI_EXPORT void __fastcall FFI_CaptureBufferFree(CaptureBufferRef* img)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img != nullptr)
     {
         delete img;
@@ -377,6 +399,7 @@ FFI_EXPORT void __fastcall FFI_CaptureBufferFree(CaptureBufferRef* img)
 
 FFI_EXPORT void __cdecl FFI_CaptureBufferCaptureAt(CaptureBufferRef* img, double priority)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img != nullptr)
     {
         (*img)->CaptureAt(priority);
@@ -385,6 +408,7 @@ FFI_EXPORT void __cdecl FFI_CaptureBufferCaptureAt(CaptureBufferRef* img, double
 
 FFI_EXPORT void __cdecl FFI_CaptureBufferClear(CaptureBufferRef* img, double priority)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     if (img != nullptr)
     {
         (*img)->Clear(priority);
@@ -395,11 +419,13 @@ FFI_EXPORT void __cdecl FFI_CaptureBufferClear(CaptureBufferRef* img, double pri
 
 FFI_EXPORT void __fastcall FFI_GraphicsActivateHud(bool activate)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     gSMBXHUDSettings.skip = !activate;
 }
 
 FFI_EXPORT bool __fastcall FFI_GraphicsIsHudActivated()
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     return !gSMBXHUDSettings.skip;
 }
 
@@ -407,15 +433,18 @@ FFI_EXPORT bool __fastcall FFI_GraphicsIsHudActivated()
 
 FFI_EXPORT void __fastcall FFI_GraphicsActivateOverworldHud(int activateFlag)
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     gSMBXHUDSettings.overworldHudState = (WORLD_HUD_CONTROL)activateFlag;
 }
 
 FFI_EXPORT int __fastcall FFI_GraphicsGetOverworldHudState()
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     return (int)gSMBXHUDSettings.overworldHudState;
 }
 
 FFI_EXPORT bool __fastcall FFI_GraphicsIsSoftwareGL()
 {
+    CLunaFFILock ffiLock(__FUNCTION__);
     return gStartupSettings.softwareGL;
 }

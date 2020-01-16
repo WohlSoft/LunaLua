@@ -14,6 +14,7 @@
 #include "../FileManager/CustomParamStore.h"
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
+#include "LunaLuaMain.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -23,10 +24,12 @@ PlayerMOB* getTemplateForCharacter(int id);
 
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return malloc(size);
     }
 
     FFI_EXPORT(void) LunaLuaGlDrawTriangles(const float* vert, const float* tex, unsigned int count) {
+        CLunaFFILock ffiLock(__FUNCTION__);
         auto obj = std::make_shared<GLEngineCmd_Draw2DArray>();
         obj->mType = GL_TRIANGLES;
         obj->mVert = vert;
@@ -37,37 +40,44 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaKillPlayer(short playerIndex)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         native_killPlayer(&playerIndex);
     }
 
     FFI_EXPORT(void) LunaLuaHarmPlayer(short playerIndex)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         native_harmPlayer(&playerIndex);
     }
 
     FFI_EXPORT(short*) LunaLuaGetValidCharacterIDArray()
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return getValidCharacterIDArray();
     }
 
     FFI_EXPORT(unsigned int) LunaLuaGetTemplateAddressForCharacter(int id)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return (unsigned int)getTemplateForCharacter(id);
     }
 
     FFI_EXPORT(int) LunaLuaBlocksTestCollision(unsigned int plAddr, unsigned int blAddr)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return Blocks::TestCollision((PlayerMOB*)plAddr, (Block*)blAddr);
     }
 
     FFI_EXPORT(void) LunaLuaBlockRemove(unsigned int idx, short playSoundEffect)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         short doPlaySoundAndEffects = COMBOOL(playSoundEffect);
         native_removeBlock(&idx, &doPlaySoundAndEffects);
     }
 
     FFI_EXPORT(void) LunaLuaBlockHit(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         short unkFlag1VB = COMBOOL(fromUpSide);
         native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
         if (hittingCount != -1) {
@@ -86,6 +96,7 @@ extern "C" {
     };
     FFI_EXPORT(const LunaLuaMemUsageData*) LunaLuaGetMemUsage()
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static thread_local LunaLuaMemUsageData out;
         static thread_local PROCESS_MEMORY_COUNTERS psmemCounters;
 
@@ -109,6 +120,7 @@ extern "C" {
 
     FFI_EXPORT(const char*) LunaLuaMemReadString(unsigned int addr)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static thread_local std::string tmp;
         void* ptr = ((&(*(byte*)addr)));
 
@@ -123,6 +135,7 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaMemWriteString(unsigned int addr, const char* str)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static thread_local VB6StrPtr nullStr;
         void* ptr = ((&(*(byte*)addr)));
 
@@ -138,41 +151,49 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaSetBGORenderFlag(bool val)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         gRenderBGOFlag = val;
     }
 
     FFI_EXPORT(void) LunaLuaSetSizableRenderFlag(bool val)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         gRenderSizableFlag = val;
     }
 
     FFI_EXPORT(const char*) LunaLuaGetLevelCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return g_LevelCustomParams.getCharPtrArray()[0];
     }
 
     FFI_EXPORT(const char**) LunaLuaGetSectionCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return g_SectionCustomParams.getCharPtrArray();
     }
 
     FFI_EXPORT(const char**) LunaLuaGetNpcCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return g_NpcCustomParams.getCharPtrArray();
     }
 
     FFI_EXPORT(const char**) LunaLuaGetBgoCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return g_BgoCustomParams.getCharPtrArray();
     }
 
     FFI_EXPORT(const char**) LunaLuaGetBlockCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return g_BlockCustomParams.getCharPtrArray();
     }
 
     FFI_EXPORT(const char*) LunaLuaGetDefaultLevelCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static std::string ret; // Static so it's temporarially stored after returning
         ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_LEVELFILE, 0, "{}");
         return ret.c_str();
@@ -180,6 +201,7 @@ extern "C" {
 
     FFI_EXPORT(const char*) LunaLuaGetDefaultSectionCustomParams(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static std::string ret; // Static so it's temporarially stored after returning
         ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_SECTIONS, 0, "{}");
         return ret.c_str();
@@ -187,6 +209,7 @@ extern "C" {
 
     FFI_EXPORT(const char*) LunaLuaGetDefaultNpcCustomParams(unsigned int id)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static std::string ret; // Static so it's temporarially stored after returning
         ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, id, "{}");
         return ret.c_str();
@@ -194,6 +217,7 @@ extern "C" {
 
     FFI_EXPORT(const char*) LunaLuaGetDefaultBgoCustomParams(unsigned int id)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static std::string ret; // Static so it's temporarially stored after returning
         ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BGO, id, "{}");
         return ret.c_str();
@@ -201,6 +225,7 @@ extern "C" {
 
     FFI_EXPORT(const char*) LunaLuaGetDefaultBlockCustomParams(unsigned int id)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static std::string ret; // Static so it's temporarially stored after returning
         ret = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BLOCKS, id, "{}");
         return ret.c_str();
@@ -217,6 +242,7 @@ extern "C" {
 
     FFI_EXPORT(FFITestModeSettings*) LunaLuaGetTestModeSettings(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static FFITestModeSettings testModeSettings;
         static STestModeSettings settings;
         settings = getTestModeSettings();
@@ -232,6 +258,7 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaSetTestModeSettings(const FFITestModeSettings* pTestModeSettings)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         static STestModeSettings settings;
         settings = getTestModeSettings();
 
@@ -247,38 +274,45 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaTestModeExit(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         testModeClosePauseMenu(false, true);
     }
 
     FFI_EXPORT(void) LunaLuaTestModeRestart(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         testModeClosePauseMenu(true, false);
     }
 
     FFI_EXPORT(void) LunaLuaTestModeContinue(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         testModeClosePauseMenu(false, false);
     }
 
     FFI_EXPORT(KeyMap*) LunaLuaGetRawKeymapArray(void)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return gRawKeymap;
     }
 
     FFI_EXPORT(void) LunaLuaShowLayer(short layerIndex, bool noSmoke)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         short noSmokeNative = COMBOOL(noSmoke);
         native_showLayer(&::Layer::Get(layerIndex)->ptLayerName, &noSmokeNative);
     }
 
     FFI_EXPORT(void) LunaLuaHideLayer(short layerIndex, bool noSmoke)
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         short noSmokeNative = COMBOOL(noSmoke);
         native_hideLayer(&::Layer::Get(layerIndex)->ptLayerName, &noSmokeNative);
     }
 
     FFI_EXPORT(unsigned char*) LunaLuaGetKeyStateArray()
     {
+        CLunaFFILock ffiLock(__FUNCTION__);
         return gKeyState;
     }
 }
