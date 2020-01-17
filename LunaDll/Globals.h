@@ -21,6 +21,7 @@
 #include "Misc/FreeImageUtils/FreeImageInit.h"
 #include "GameConfig/GeneralLunaConfig.h"
 #include "EventStateMachine.h"
+#include "Input/LunaGameController.h"
 
 class RenderOverrideManager;
 
@@ -120,6 +121,7 @@ extern HardcodedGraphicsManager gGraphManager;
 extern SHMemServer			gShMemServer;
 extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
+extern LunaGameControllerManager gLunaGameControllerManager;
 
 extern CLunaLua				gLunaLua;
 

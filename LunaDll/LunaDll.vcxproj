@@ -127,6 +127,7 @@
     <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
+    <ClInclude Include="Input\LunaGameController.h" />
     <ClInclude Include="libs\DirManager\dirman.h" />
     <ClInclude Include="libs\DirManager\dirman_private.h" />
     <ClInclude Include="libs\fmt\fmt_container.h" />
@@ -320,6 +321,7 @@
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
+    <ClCompile Include="Input\LunaGameController.cpp" />
     <ClCompile Include="libs\DirManager\dirman.cpp" />
     <ClCompile Include="libs\DirManager\dirman_winapi.cpp" />
     <ClCompile Include="libs\fmt\fmt_format.cpp" />

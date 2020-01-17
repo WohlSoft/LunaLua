@@ -81,6 +81,8 @@ FreeImageInit        gFreeImgInit;
 
 GeneralLunaConfig    gGeneralConfig;
 
+LunaGameControllerManager gLunaGameControllerManager;
+
 CLunaLua gLunaLua;
 
 

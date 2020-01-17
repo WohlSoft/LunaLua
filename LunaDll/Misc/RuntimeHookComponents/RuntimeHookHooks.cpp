@@ -748,6 +748,7 @@ __declspec(naked) void UpdateInputHook_Wrapper()
 
 extern void __stdcall UpdateInputHook()
 {
+    gLunaGameControllerManager.pollInputs();
     g_EventHandler.hookInputUpdate();
 }
 
