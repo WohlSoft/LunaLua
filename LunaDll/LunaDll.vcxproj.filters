@@ -1162,7 +1162,6 @@
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp">
       <Filter>Rendering\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1298,6 +1297,9 @@
     </ClCompile>
     <ClCompile Include="..\LunaLoader\LunaLoaderPatch.cpp">
       <Filter>LunaLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyShader.cpp">
+      <Filter>LuaMain\LuaProxyComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
