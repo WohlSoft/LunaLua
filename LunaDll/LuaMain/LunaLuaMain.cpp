@@ -111,6 +111,9 @@ bool CLunaLua::shutdown()
     // Clear image override map
     ImageLoader::ClearOverrides();
 
+    // Clear lua-based extra gfx
+    ImageLoader::LuaUnregisterAllExtraGfx();
+
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
 

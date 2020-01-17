@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 #include "SMBXImageCategories.h"
 #include "../Misc/ResourceFileMapper.h"
 
@@ -35,6 +36,7 @@ class ImageLoader
 private:
     static std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  m_ExtraGfx;
     static std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  m_ExtraGfxOverride;
+    static std::unordered_set<std::string>                                              m_ExtraGfxFromLua;
     static std::unordered_map<std::string, uintptr_t>                                   m_NameToHDC;
     static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    m_GfxOverride;
     static std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    m_Gfx;
@@ -56,6 +58,9 @@ public:
 
     static void RegisterExtraGfx(const std::string& folderName, const std::string& name);
     static void UnregisterExtraGfx(const std::string& name);
+
+    static void LuaRegisterExtraGfx(const std::string& folderName, const std::string& name);
+    static void LuaUnregisterAllExtraGfx();
 
     static std::shared_ptr<LunaImage> GetByName(const std::string& name, bool bypassOverride=false);
     static bool OverrideByName(const std::string& name, const std::shared_ptr<LunaImage>& img);

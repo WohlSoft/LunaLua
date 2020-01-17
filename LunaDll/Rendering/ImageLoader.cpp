@@ -12,6 +12,7 @@
 // Loaded image map decleration
 std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfx;
 std::unordered_map<std::string, std::shared_ptr<LunaImage>>                  ImageLoader::m_ExtraGfxOverride;
+std::unordered_set<std::string>                                              ImageLoader::m_ExtraGfxFromLua;
 std::unordered_map<std::string, uintptr_t>                                   ImageLoader::m_NameToHDC;
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_GfxOverride;
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_Gfx;
@@ -616,12 +617,36 @@ void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::str
     
     // Add to map, even if null
     m_ExtraGfx[name] = img;
+    m_ExtraGfxFromLua.erase(name);
 }
 
 void ImageLoader::UnregisterExtraGfx(const std::string& name)
 {
     m_ExtraGfx.erase(name);
     m_ExtraGfxOverride.erase(name);
+    m_ExtraGfxFromLua.erase(name);
+}
+
+void ImageLoader::LuaRegisterExtraGfx(const std::string& folderName, const std::string& name)
+{
+    // Abort if already existing
+    if (m_ExtraGfx.find(name) != m_ExtraGfx.end()) return;
+
+    RegisterExtraGfx(folderName, name);
+    m_ExtraGfxFromLua.emplace(name);
+}
+
+void ImageLoader::LuaUnregisterAllExtraGfx()
+{
+    std::vector<std::string> gfxNames;
+    for (const std::string& it : m_ExtraGfxFromLua)
+    {
+        gfxNames.push_back(it);
+    }
+    for (const std::string& it : gfxNames)
+    {
+        UnregisterExtraGfx(it);
+    }
 }
 
 std::shared_ptr<LunaImage> ImageLoader::GetByName(const std::string& name, bool bypassOverride)
