@@ -1,6 +1,8 @@
 
 #include <cstdlib>
 #include <memory>
+#include <vector>
+#include <cstring>
 #include <Windows.h>
 #include <Psapi.h>
 
@@ -314,5 +316,54 @@ extern "C" {
     {
         CLunaFFILock ffiLock(__FUNCTION__);
         return gKeyState;
+    }
+
+    typedef struct
+    {
+        int len;
+        char data[0];
+    } GameDataStruct;
+
+    static GameDataStruct* gameData;
+    static std::mutex gameDataMutex;
+    FFI_EXPORT(void) LunaLuaSetGameData(const char* dataPtr, int dataLen)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        std::unique_lock<std::mutex> lck(gameDataMutex);
+        if (gameData != nullptr)
+        {
+            free(gameData);
+            gameData = nullptr;
+        }
+        gameData = (GameDataStruct*)malloc(dataLen + sizeof(int));
+        if (gameData != nullptr)
+        {
+            gameData->len = dataLen;
+            ::memcpy(gameData->data, dataPtr, dataLen);
+        }
+    }
+
+    FFI_EXPORT(GameDataStruct*) LunaLuaGetGameData()
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        std::unique_lock<std::mutex> lck(gameDataMutex);
+        if (gameData == nullptr)
+        {
+            return nullptr;
+        }
+        GameDataStruct* cpy = (GameDataStruct*)malloc(gameData->len + sizeof(int));
+        cpy->len = gameData->len;
+        ::memcpy(cpy->data, gameData->data, gameData->len);
+        return cpy;
+    }
+
+    FFI_EXPORT(void) LunaLuaFreeReturnedGameData(GameDataStruct* cpy)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        if (cpy == nullptr)
+        {
+            return;
+        }
+        free(cpy);
     }
 }
