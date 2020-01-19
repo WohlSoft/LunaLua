@@ -101,6 +101,9 @@ bool CLunaLua::shutdown()
     if(!isValid())
         return false;
 
+    // Make sure the loadscreen is gone by the time we kill the main Lua instance
+    LunaLoadScreenKill();
+
     // Unset flags of things Lua code was processing
     gRenderBGOFlag = true;
     gRenderSizableFlag = true;
