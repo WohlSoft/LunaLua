@@ -21,36 +21,39 @@ bool SavedVariableBank::TryLoadWorldVars() {
 
     ClearBank();
 
-    // Try to open the file
-    std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);
+    if (fileExists(full_path))
+    {
+        // Try to open the file
+        std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);
 
-    // If open failed, try to create empty file
-    if(var_file.is_open() == false) {
-        var_file.open(WStr2Str(full_path).c_str(), std::ios::out);
-        var_file.flush();	
-        var_file.close();
-        var_file.open(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);;
-    }
+        // If open failed, try to create empty file
+        if (var_file.is_open() == false) {
+            var_file.open(WStr2Str(full_path).c_str(), std::ios::out);
+            var_file.flush();
+            var_file.close();
+            var_file.open(WStr2Str(full_path).c_str(), std::ios::in | std::ios::out);;
+        }
 
-    // If create failed, get out
-    if(var_file.is_open() == false)
-        return false;
+        // If create failed, get out
+        if (var_file.is_open() == false)
+            return false;
 
-    // If size < 2 bytes, init new save file
-    var_file.seekg(0, std::fstream::end);
-    int cursize = (int)var_file.tellg();
-    var_file.seekg(0, std::fstream::beg);
-
-    if(cursize < 2) {
-        InitSaveFile(&var_file);
-        var_file.flush();		
+        // If size < 2 bytes, init new save file
+        var_file.seekg(0, std::fstream::end);
+        int cursize = (int)var_file.tellg();
         var_file.seekg(0, std::fstream::beg);
-    }
 
-    ReadFile(&var_file);
-    
-    var_file.flush();
-    var_file.close();
+        if (cursize < 2) {
+            InitSaveFile(&var_file);
+            var_file.flush();
+            var_file.seekg(0, std::fstream::beg);
+        }
+
+        ReadFile(&var_file);
+
+        var_file.flush();
+        var_file.close();
+    }
     return true; 
 }
 
@@ -122,6 +125,23 @@ void SavedVariableBank::WriteBank() {
         return;
     std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
 
+    // Don't save unless the file already exists or we have actual data to write
+    if (fileExists(full_path) || (m_VarBank.size() > 0))
+    {
+        return;
+    }
+
+    if (m_VarBank.size() == 0)
+    {
+        std::wfstream var_file_init(WStr2Str(full_path).c_str(), std::ios::out);
+        InitSaveFile(&var_file_init);
+        var_file_init.flush();
+        var_file_init.close();
+        std::wfstream var_file_in(WStr2Str(full_path).c_str(), std::ios::in);
+        ReadFile(&var_file_in);
+        var_file_in.close();
+    }
+
     std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out | std::ios::trunc);
 
     for(std::map<std::wstring, double>::iterator it = m_VarBank.begin(); it != m_VarBank.end(); ++it) {
@@ -144,10 +164,13 @@ void SavedVariableBank::CheckSaveDeletion() {
     if(GM_STAR_COUNT < GetVar(SPECIAL_SAVE_STR)) {
         std::wstring full_path = GetSaveFileFullPath(GetSaveFileName());
         ClearBank();
-        std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out);
-        InitSaveFile(&var_file);
-        var_file.flush();
-        var_file.close();
+        if (fileExists(full_path))
+        {
+            std::wfstream var_file(WStr2Str(full_path).c_str(), std::ios::out);
+            InitSaveFile(&var_file);
+            var_file.flush();
+            var_file.close();
+        }
     }
 }
 
