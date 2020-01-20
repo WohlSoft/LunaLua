@@ -94,6 +94,7 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             // Our main window was destroyed? Clear hwnd and mark as unfocused
             gMainWindowHwnd = NULL;
             gMainWindowFocused = false;
+            gMainWindowSize = 0;
         }
         break;
     case WM_SETFOCUS:
@@ -108,6 +109,13 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
             // Our main window lost focus? Keep track of that.
             gMainWindowFocused = false;
+        }
+        break;
+    case WM_SIZE:
+        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
+        {
+            // Store size of main window (low word is width, high word is height)
+            gMainWindowSize = wData->lParam;
         }
         break;
     default:

@@ -101,6 +101,9 @@ bool CLunaLua::shutdown()
     if(!isValid())
         return false;
 
+    // Make sure the loadscreen is gone by the time we kill the main Lua instance
+    LunaLoadScreenKill();
+
     // Unset flags of things Lua code was processing
     gRenderBGOFlag = true;
     gRenderSizableFlag = true;
@@ -110,6 +113,9 @@ bool CLunaLua::shutdown()
 
     // Clear image override map
     ImageLoader::ClearOverrides();
+
+    // Clear lua-based extra gfx
+    ImageLoader::LuaUnregisterAllExtraGfx();
 
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();

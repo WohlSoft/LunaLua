@@ -27,6 +27,7 @@ SMBXHUDSettings gSMBXHUDSettings = {
 };
 bool gRenderBGOFlag = true;
 bool gRenderSizableFlag = true;
+std::atomic<uint32_t> gMainWindowSize = 0; // Low word is width, height word is height
 
 // Global variables
 int	gFrames;

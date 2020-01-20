@@ -374,6 +374,11 @@ FFI_EXPORT LunaImageRef* __fastcall FFI_GetSpriteOverride(const char* name, uint
     }
 }
 
+FFI_EXPORT void __fastcall FFI_RegisterExtraSprite(const char* folderName, const char* name)
+{
+    ImageLoader::LuaRegisterExtraGfx(folderName, name);
+}
+
 // CaptureBuffer class
 
 FFI_EXPORT CaptureBufferRef* __fastcall FFI_CaptureBuffer(uint32_t w, uint32_t h, bool nonskippable)

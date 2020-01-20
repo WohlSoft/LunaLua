@@ -76,13 +76,10 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     if (!g_GLContextManager.IsInitialized()) return FALSE;
 
     // Get window size
-    RECT clientRect;
-    mHwnd = WindowFromDC(hdcDest);
-    if (!GetClientRect(mHwnd, &clientRect)) return FALSE;
-    if (clientRect.right <= 0) clientRect.right = 1;
-    if (clientRect.bottom <= 0) clientRect.bottom = 1;
-    int32_t windowWidth = clientRect.right;
-    int32_t windowHeight = clientRect.bottom;
+    uint32_t windowSize = gMainWindowSize;
+    if (windowSize == 0) return FALSE;
+    int32_t windowWidth = windowSize & 0xFFFF;
+    int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
 
     g_GLDraw.UnbindTexture();
 
@@ -153,59 +150,64 @@ void GLEngine::EndFrame(HDC hdcDest)
 
     // Generate screenshot...
     if (mScreenshot) {
-        RECT clientRect;
         mScreenshot = false;
-        if (GetClientRect(mHwnd, &clientRect)) {
-            if (clientRect.right < 0) clientRect.right = 1;
-            if (clientRect.bottom < 0) clientRect.bottom = 1;
-            GenerateScreenshot(0, 0, clientRect.right, clientRect.bottom);
+
+        // Get window size
+        uint32_t windowSize = gMainWindowSize;
+        if (windowSize != 0)
+        {
+            int32_t windowWidth = windowSize & 0xFFFF;
+            int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
+            GenerateScreenshot(0, 0, windowWidth, windowHeight);
         }
     }
 
     if (mGifRecorder.isRunning())
     {
-        RECT clientRect;
-        if (GetClientRect(mHwnd, &clientRect)) {
-            if (clientRect.right < 0) clientRect.right = 1;
-            if (clientRect.bottom < 0) clientRect.bottom = 1;
-            GifRecorderNextFrame(0, 0, clientRect.right, clientRect.bottom);
-        }
+        // Get window size
+        uint32_t windowSize = gMainWindowSize;
+        if (windowSize != 0)
+        {
+            int32_t windowWidth = windowSize & 0xFFFF;
+            int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
+            GifRecorderNextFrame(0, 0, windowWidth, windowHeight);
 
-        GLEngineCmd_DrawSprite cmd;
-        cmd.mXDest = 10;
-        cmd.mYDest = clientRect.bottom - (10 + recImage->getH());
-        cmd.mWidthDest = recImage->getW();
-        cmd.mHeightDest = recImage->getH();
-        cmd.mXSrc = 0;
-        cmd.mYSrc = 0;
-        cmd.mWidthSrc = recImage->getW();
-        cmd.mHeightSrc = recImage->getH();
-        cmd.mImg = recImage;
-        cmd.mOpacity = 1.0;
-        cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-        cmd.run(*this);
+            GLEngineCmd_DrawSprite cmd;
+            cmd.mXDest = 10;
+            cmd.mYDest = windowHeight - (10 + recImage->getH());
+            cmd.mWidthDest = recImage->getW();
+            cmd.mHeightDest = recImage->getH();
+            cmd.mXSrc = 0;
+            cmd.mYSrc = 0;
+            cmd.mWidthSrc = recImage->getW();
+            cmd.mHeightSrc = recImage->getH();
+            cmd.mImg = recImage;
+            cmd.mOpacity = 1.0;
+            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+            cmd.run(*this);
+        }
     }
     else if (mGifRecorder.isEncoding())
     {
-        RECT clientRect;
-        if (GetClientRect(mHwnd, &clientRect)) {
-            if (clientRect.right < 0) clientRect.right = 1;
-            if (clientRect.bottom < 0) clientRect.bottom = 1;
-        }
+        uint32_t windowSize = gMainWindowSize;
+        if (windowSize != 0)
+        {
+            int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
 
-        GLEngineCmd_DrawSprite cmd;
-        cmd.mXDest = 10;
-        cmd.mYDest = clientRect.bottom - (10 + encImage->getH());
-        cmd.mWidthDest = encImage->getW();
-        cmd.mHeightDest = encImage->getH();
-        cmd.mXSrc = 0;
-        cmd.mYSrc = 0;
-        cmd.mWidthSrc = encImage->getW();
-        cmd.mHeightSrc = encImage->getH();
-        cmd.mImg = encImage;
-        cmd.mOpacity = 1.0;
-        cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-        cmd.run(*this);
+            GLEngineCmd_DrawSprite cmd;
+            cmd.mXDest = 10;
+            cmd.mYDest = windowHeight - (10 + encImage->getH());
+            cmd.mWidthDest = encImage->getW();
+            cmd.mHeightDest = encImage->getH();
+            cmd.mXSrc = 0;
+            cmd.mYSrc = 0;
+            cmd.mWidthSrc = encImage->getW();
+            cmd.mHeightSrc = encImage->getH();
+            cmd.mImg = encImage;
+            cmd.mOpacity = 1.0;
+            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+            cmd.run(*this);
+        }
     }
 
     // Display Frame

@@ -171,7 +171,17 @@ static void LoadThread(void)
 
         Renderer::Get().RenderBelowPriority(DBL_MAX);
 
-        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, 800, 600, NULL, 0, 0, 800, 600, 0);
+        // Get window size
+        uint32_t windowSize = gMainWindowSize;
+        int32_t windowWidth = windowSize & 0xFFFF;
+        int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
+        if (windowSize == 0)
+        {
+            windowWidth = 800;
+            windowHeight = 600;
+        }
+
+        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, 800, 600, 0);
 
         g_GLEngine.EndFrame(NULL);
 
