@@ -235,10 +235,10 @@ static unsigned int __stdcall LatePatch(void)
     if (gStartupSettings.console)
     {
         RedirectIOToConsole();
-        
-        // TEST
-        gLunaGameControllerManager.init();
     }
+
+    // Init controller support
+    gLunaGameControllerManager.init();
 
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
