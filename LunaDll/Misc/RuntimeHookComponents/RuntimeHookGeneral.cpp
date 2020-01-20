@@ -875,6 +875,9 @@ void TrySkipPatch()
 
     PATCH(0xA12050).JMP(runtimeHookSemisolidInteractionHook_Raw).NOP_PAD_TO_SIZE<69>().Apply();
 
+    // Hook for controller handling
+    PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

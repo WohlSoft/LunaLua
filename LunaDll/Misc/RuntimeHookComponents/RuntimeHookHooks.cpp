@@ -1305,6 +1305,12 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
 
     if (keyDown && gMainWindowFocused) {
+        // Notify game controller manager
+        if (!repeated)
+        {
+            gLunaGameControllerManager.notifyKeyboardPress(virtKey);
+        }
+
         if (gLunaLua.isValid() && !ctrlPressed) {
             std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
 
@@ -2489,4 +2495,9 @@ _declspec(naked) void __stdcall runtimeHookSemisolidInteractionHook_Raw()
         PUSH 0xA12095
         RET
     }
+}
+
+MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji)
+{
+    return gLunaGameControllerManager.emulatedJoyGetPosEx(uJoyID, pji);
 }

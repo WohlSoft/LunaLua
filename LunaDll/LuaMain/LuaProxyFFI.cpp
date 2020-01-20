@@ -321,7 +321,7 @@ extern "C" {
     typedef struct
     {
         int len;
-        char data[0];
+        char data[1];
     } GameDataStruct;
 
     static GameDataStruct* gameData;
@@ -365,5 +365,11 @@ extern "C" {
             return;
         }
         free(cpy);
+    }
+
+
+    FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(void)
+    {
+        return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel();
     }
 }
