@@ -277,7 +277,7 @@ void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
     }
 
     // Copy button state
-    player.buttonState = controller->getButtonState() & 0xFFFF;
+    player.buttonState = controller->getButtonState() & 0x7FFF;
 }
 
 // Function to emulate joyGetPosEx
