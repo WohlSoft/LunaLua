@@ -368,8 +368,8 @@ extern "C" {
     }
 
 
-    FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(void)
+    FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(int playerNum)
     {
-        return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel();
+        return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel(playerNum);
     }
 }

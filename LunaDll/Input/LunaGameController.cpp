@@ -17,9 +17,7 @@ static JOYINFOEX test1;
 LunaGameControllerManager::LunaGameControllerManager() :
     initDone(false),
     controllerMap(),
-    xAxis(0),
-    yAxis(0),
-    buttonState(0)
+    players()
 {
 }
 
@@ -101,95 +99,185 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
 
 void LunaGameControllerManager::handleInputs()
 {
-    // TODO: We need to handle multiplayer
+    if (GM_PLAYERS_COUNT <= 1) {
+        // For the case of 1-player, use a controll switching style where player 1 is always controlled by the most recently active control source
 
-    // Check what connected controllers we already considered selected or were active
-    LunaGameController* selectedController = nullptr;
-    LunaGameController* activeController = nullptr;
-    bool wasActive = false;
-    for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
-    {
-        if (it.second.isSelected())
-        {
-            wasActive = it.second.isActive();
-            selectedController = &it.second;
-        }
-        if (it.second.isActive())
-        {
-            it.second.clearActive();
-            activeController = &it.second;
-        }
-    }
+        // Get selected controller and whether it was active
+        LunaGameController* selectedController = getController(1);
+        bool wasSelectedActive = (selectedController != nullptr) ? selectedController->isActive() : selectedController;
 
-    // Handle controller switch
-    if (activeController != nullptr)
-    {
-        // If selected was inactive, but something else was active, clear selected
-        if ((selectedController != nullptr) && !wasActive)
+        // Get active controller and clear flags
+        LunaGameController* activeController = nullptr;
+        SDL_JoystickID activeJoyId;
+        for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
         {
-            selectedController->clearSelected();
-            selectedController = nullptr;
+            if (it.second.isActive())
+            {
+                it.second.clearActive();
+                if (activeController == nullptr)
+                {
+                    activeJoyId = it.first;
+                    activeController = &it.second;
+                }
+            }
         }
 
-        if (selectedController == nullptr)
+        // Handle controller switch, if the selected one wasn't active but now it is active
+        if (!wasSelectedActive && (activeController != nullptr))
         {
-            wasActive = true;
             selectedController = activeController;
-            selectedController->setSelected();
+            players[0].joyId = activeJoyId;
+            players[0].haveController = true;
 
-            SMBXInput::setPlayerInputType(1, 1); // Set player 1 input type to 'joystick'
+            SMBXInput::setPlayerInputType(1, 1); // Set player 1 input type to 'joystick 1'
             #if defined(CONTROLLER_DEBUG)
                 printf("Selected controller: %s\n", selectedController->getName().c_str());
             #endif
 
-            sendSelectedController(selectedController->getName());
+            sendSelectedController(selectedController->getName(), 1);
+        }
+
+        // Nothing for further players
+        for (int playerNum = 2; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
+        {
+            players[playerNum - 1].haveController = false;
+            players[playerNum - 1].joyId = 0;
+        }
+    }
+    else
+    {
+        // For 2+(?) players up to player count
+        for (int playerNum = 1; (playerNum <= CONTROLLER_MAX_PLAYERS) && (playerNum <= GM_PLAYERS_COUNT); playerNum++)
+        {
+            LunaGameController* selectedController = getController(playerNum);
+
+            // If already have a controller, we're done
+            if (selectedController != nullptr) continue;
+
+            // Check if we have an active controller that is not selected already
+            SDL_JoystickID newJoyId;
+            for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
+            {
+                if (it.second.isActive())
+                {
+                    it.second.clearActive();
+                    bool alreadyUsed = false;
+                    for (int otherPlayerNum = 1; (otherPlayerNum <= CONTROLLER_MAX_PLAYERS) && (otherPlayerNum <= GM_PLAYERS_COUNT); otherPlayerNum++)
+                    {
+                        if (otherPlayerNum == playerNum) continue;
+                        if (players[otherPlayerNum - 1].haveController && players[otherPlayerNum - 1].joyId == it.first)
+                        {
+                            alreadyUsed = true;
+                            break;
+                        }
+                    }
+
+                    if (!alreadyUsed)
+                    {
+                        newJoyId = it.first;
+                        selectedController = &it.second;
+                        break;
+                    }
+                }
+            }
+
+            // If we got a new selected controller
+            if (selectedController != nullptr)
+            {
+                players[playerNum - 1].joyId = newJoyId;
+                players[playerNum - 1].haveController = true;
+
+                SMBXInput::setPlayerInputType(playerNum, playerNum); // Set player n input type to 'joystick n'
+                #if defined(CONTROLLER_DEBUG)
+                    printf("Selected controller: %s\n", selectedController->getName().c_str());
+                #endif
+
+                sendSelectedController(selectedController->getName(), playerNum);
+            }
+        }
+
+        // Clear stray activity flags
+        for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
+        {
+            if (it.second.isActive())
+            {
+                it.second.clearActive();
+            }
+        }
+
+        // Nothing for further(?) players
+        for (int playerNum = GM_PLAYERS_COUNT + 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
+        {
+            players[playerNum - 1].haveController = false;
+            players[playerNum - 1].joyId = 0;
         }
     }
 
-    // No selected controller? Nothing to do
-    if (selectedController == nullptr)
+    // Update controller state for each player
+    for (int playerNum = 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
     {
-        if (SMBXInput::getPlayerInputType(1) != 0)
+        handleInputsForPlayer(playerNum);
+    }
+}
+
+// Function to process inputs for a player
+void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
+{
+    // Sanity check
+    if ((playerNum < 1) || (playerNum > CONTROLLER_MAX_PLAYERS))
+    {
+        return;
+    }
+
+    // Get and player controller
+    LunaGameControllerPlayer& player = players[playerNum - 1];
+    LunaGameController* controller = getController(playerNum);
+
+    // No selected controller? Nothing to do
+    if (controller == nullptr)
+    {
+        if (SMBXInput::getPlayerInputType(playerNum) != 0)
         {
-            SMBXInput::setPlayerInputType(1, 0); // Set player 1 input type to 'keyboard'
+            SMBXInput::setPlayerInputType(playerNum, 0); // Set player 1 input type to 'keyboard'
             #if defined(CONTROLLER_DEBUG)
                 printf("Selected controller: Keyboard\n");
             #endif
-            sendSelectedController("Keyboard");
+            sendSelectedController("Keyboard", playerNum);
         }
         return;
     }
 
+
     // Convert pad state to axis for later emulatedJoyGetPosEx calls
-    unsigned int padState = selectedController->getPadState();
+    unsigned int padState = controller->getPadState();
     if ((padState & (LunaGameController::CONTROLLER_PAD_UP_MASK | LunaGameController::CONTROLLER_PAD_DOWN_MASK)) == LunaGameController::CONTROLLER_PAD_UP_MASK)
     {
-        yAxis = 0x0000; // Up
+        player.yAxis = 0x0000; // Up
     }
     else if ((padState & (LunaGameController::CONTROLLER_PAD_UP_MASK | LunaGameController::CONTROLLER_PAD_DOWN_MASK)) == LunaGameController::CONTROLLER_PAD_DOWN_MASK)
     {
-        yAxis = 0xFFFF; // Down
+        player.yAxis = 0xFFFF; // Down
     }
     else
     {
-        yAxis = 0x7FFF; // Neutral
+        player.yAxis = 0x7FFF; // Neutral
     }
 
     if ((padState & (LunaGameController::CONTROLLER_PAD_LEFT_MASK | LunaGameController::CONTROLLER_PAD_RIGHT_MASK)) == LunaGameController::CONTROLLER_PAD_LEFT_MASK)
     {
-        xAxis = 0x0000; // Left
+        player.xAxis = 0x0000; // Left
     }
     else if ((padState & (LunaGameController::CONTROLLER_PAD_LEFT_MASK | LunaGameController::CONTROLLER_PAD_RIGHT_MASK)) == LunaGameController::CONTROLLER_PAD_RIGHT_MASK)
     {
-        xAxis = 0xFFFF; // Right
+        player.xAxis = 0xFFFF; // Right
     }
     else
     {
-        xAxis = 0x7FFF; // Neutral
+        player.xAxis = 0x7FFF; // Neutral
     }
 
     // Copy button state
-    buttonState = selectedController->getButtonState();
+    player.buttonState = controller->getButtonState() & 0xFFFF;
 }
 
 // Function to emulate joyGetPosEx
@@ -200,11 +288,27 @@ unsigned int LunaGameControllerManager::emulatedJoyGetPosEx(unsigned int uJoyID,
     if (pji->dwSize < sizeof(JOYINFOEX)) return 0;
 
     // For our purposes, we ignore dwFlags. We know what we need to fill in.
-    pji->dwXpos = xAxis;
-    pji->dwYpos = yAxis;
-    pji->dwPOV = 0x7FFF;
-    pji->dwButtons = buttonState;
-    pji->dwButtonNumber = __popcnt(buttonState);
+
+    // Get player number from uJoyID
+    int playerNum = uJoyID + 1;
+
+    if ((playerNum >= 1) && (playerNum <= CONTROLLER_MAX_PLAYERS))
+    {
+        LunaGameControllerPlayer& player = players[playerNum - 1];
+        pji->dwXpos = player.xAxis;
+        pji->dwYpos = player.yAxis;
+        pji->dwPOV = 0x7FFF;
+        pji->dwButtons = player.buttonState;
+        pji->dwButtonNumber = __popcnt(player.buttonState);
+    }
+    else
+    {
+        pji->dwXpos = 0x7FFF;
+        pji->dwYpos = 0x7FFF;
+        pji->dwPOV = 0x7FFF;
+        pji->dwButtons = 0;
+        pji->dwButtonNumber = 0;
+    }
 
     return 0;
 }
@@ -217,10 +321,10 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
         return;
     }
 
-    // If the selected input type is not keyboard, maybe switch to keyboard
-    if (SMBXInput::getPlayerInputType(1) != 0)
+    for (int playerNum = 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
     {
-        SMBXNativeKeyboard* keyboardConfig = SMBXNativeKeyboard::Get(1);
+        // If the selected input type is not keyboard, maybe switch to keyboard
+        SMBXNativeKeyboard* keyboardConfig = SMBXNativeKeyboard::Get(playerNum);
         bool isConfiguredKey = (
             (keycode == keyboardConfig->up) ||
             (keycode == keyboardConfig->down) ||
@@ -232,46 +336,59 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
             (keycode == keyboardConfig->pause) ||
             (keycode == keyboardConfig->altjump) ||
             (keycode == keyboardConfig->altrun)
-        );
+            );
 
         // If the key that is pressed is configured as an input, switch to keyboard control
         if (isConfiguredKey)
         {
-            // Clear selected flag if set
-            for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
+            if (SMBXInput::getPlayerInputType(playerNum) != 0)
             {
-                it.second.clearSelected();
+                // Clear selected flag if set
+                players[playerNum - 1].haveController = false;
+
+                SMBXInput::setPlayerInputType(playerNum, 0); // Set player 1 input type to 'keyboard'
+                #if defined(CONTROLLER_DEBUG)
+                    printf("Selected controller: Keyboard\n");
+                #endif
+                sendSelectedController("Keyboard", playerNum);
             }
 
-            SMBXInput::setPlayerInputType(1, 0); // Set player 1 input type to 'keyboard'
-            #if defined(CONTROLLER_DEBUG)
-                printf("Selected controller: Keyboard\n");
-            #endif
-            sendSelectedController("Keyboard");
+            // Don't consider this input in switching player 2 if it's set for player 1
+            break;
         }
     }
 }
 
-SDL_JoystickPowerLevel LunaGameControllerManager::getSelectedControllerPowerLevel()
+SDL_JoystickPowerLevel LunaGameControllerManager::getSelectedControllerPowerLevel(int playerNum)
 {
-    for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
     {
-        if (it.second.isSelected())
-        {
-            return it.second.getPowerLevel();
-            break;
-        }
+        return controller->getPowerLevel();
     }
     return SDL_JOYSTICK_POWER_UNKNOWN;
 }
 
-void LunaGameControllerManager::sendSelectedController(const std::string& name)
+LunaGameController* LunaGameControllerManager::getController(int playerNum)
+{
+    if ((playerNum >= 1) && (playerNum <= CONTROLLER_MAX_PLAYERS) && players[playerNum - 1].haveController)
+    {
+        auto& it = controllerMap.find(players[playerNum - 1].joyId);
+        if (it != controllerMap.end())
+        {
+            return &it->second;
+        }
+    }
+    return nullptr;
+}
+
+void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum)
 {
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onChangeController", false);
         changeControllerEvent->setDirectEventName("onChangeController");
         changeControllerEvent->setLoopable(false);
-        gLunaLua.callEvent(changeControllerEvent, name);
+        gLunaLua.callEvent(changeControllerEvent, name, playerNum);
     }
 }
 
@@ -309,6 +426,17 @@ void LunaGameControllerManager::addJoystickEvent(int joyIdx)
 
 void LunaGameControllerManager::removeJoystickEvent(SDL_JoystickID joyId)
 {
+    // Unassign if assigned
+    for (int playerNum = 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
+    {
+        if (players[playerNum - 1].haveController && (players[playerNum - 1].joyId == joyId))
+        {
+            players[playerNum - 1].haveController = false;
+            players[playerNum - 1].joyId = 0;
+        }
+    }
+
+    // Delete joystick
     auto it = controllerMap.find(joyId);
     if (it != controllerMap.end())
     {
@@ -363,10 +491,9 @@ LunaGameController::LunaGameController(SDL_Joystick* _joyPtr, SDL_GameController
     axisPadState(0),
     padState(0),
     buttonState(0),
-    activeFlag(false),
-    selectedFlag(false)
+    activeFlag(false)
 {
-    // Open for haptic feedback if possible, because
+    // Open for haptic feedback if possible, because at least checking sometimes this helps keep a controller awake (really?)
     if (joyPtr && SDL_JoystickIsHaptic(joyPtr))
     {
         hapticPtr = SDL_HapticOpenFromJoystick(joyPtr);
@@ -414,7 +541,6 @@ LunaGameController::LunaGameController(LunaGameController &&other)
     padState        = other.padState;
     buttonState     = other.buttonState;
     activeFlag      = other.activeFlag;
-    selectedFlag    = other.selectedFlag;
     other.joyPtr    = nullptr;
     other.ctrlPtr   = nullptr;
     other.hapticPtr = nullptr;
@@ -434,7 +560,6 @@ LunaGameController & LunaGameController::operator=(LunaGameController &&other)
     padState        = other.padState;
     buttonState     = other.buttonState;
     activeFlag      = other.activeFlag;
-    selectedFlag    = other.selectedFlag;
     other.joyPtr    = nullptr;
     other.ctrlPtr   = nullptr;
     other.hapticPtr = nullptr;

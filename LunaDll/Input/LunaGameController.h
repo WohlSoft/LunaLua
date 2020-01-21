@@ -7,15 +7,33 @@
 struct joyinfoex_tag;
 class LunaGameController;
 
+class LunaGameControllerPlayer
+{
+public:
+    bool haveController;
+    SDL_JoystickID joyId;
+    unsigned int xAxis;
+    unsigned int yAxis;
+    unsigned int buttonState;
+public:
+    inline LunaGameControllerPlayer() :
+        haveController(false),
+        joyId(0),
+        xAxis(0x7FFF),
+        yAxis(0x7FFF),
+        buttonState(0)
+    {}
+};
+
 class LunaGameControllerManager
 {
+private:
+    const static int CONTROLLER_MAX_PLAYERS = 2;
 private:
     bool initDone;
     std::unordered_map<SDL_JoystickID, LunaGameController> controllerMap;
 
-    unsigned int xAxis;
-    unsigned int yAxis;
-    unsigned int buttonState;
+    LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
 public:
     LunaGameControllerManager();
     ~LunaGameControllerManager();
@@ -25,11 +43,15 @@ public:
     void pollInputs();
     void processSDLEvent(const SDL_Event& event);
     void handleInputs();
+private:
+    void handleInputsForPlayer(int playerNum);
+public:
     unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
     void notifyKeyboardPress(int keycode);
-    SDL_JoystickPowerLevel getSelectedControllerPowerLevel();
+    SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
 private:
-    void LunaGameControllerManager::sendSelectedController(const std::string& name);
+    LunaGameController* getController(int playerNum);
+    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
     void addJoystickEvent(int joyIdx);
     void removeJoystickEvent(SDL_JoystickID joyId);
     void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
@@ -59,9 +81,6 @@ public:
     inline std::string getName() const { return name; }
     inline bool isActive() const { return activeFlag; }
     inline void clearActive() { activeFlag = false; }
-    inline bool isSelected() const { return selectedFlag; }
-    inline void clearSelected() { selectedFlag = false; }
-    inline void setSelected() { selectedFlag = true; }
     inline unsigned int getPadState() const { return padState; }
     inline unsigned int getButtonState() const { return buttonState; }
 
@@ -114,7 +133,6 @@ private:
     unsigned int padState;
     unsigned int buttonState;
     bool activeFlag;
-    bool selectedFlag;
 };
 
 #endif
