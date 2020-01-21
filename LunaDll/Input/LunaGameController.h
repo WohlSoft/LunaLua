@@ -27,7 +27,7 @@ public:
 
 class LunaGameControllerManager
 {
-private:
+public:
     const static int CONTROLLER_MAX_PLAYERS = 2;
 private:
     bool initDone;
@@ -49,8 +49,8 @@ public:
     unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
     void notifyKeyboardPress(int keycode);
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
-private:
     LunaGameController* getController(int playerNum);
+private:
     void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
     void addJoystickEvent(int joyIdx);
     void removeJoystickEvent(SDL_JoystickID joyId);

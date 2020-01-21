@@ -828,6 +828,30 @@ void LunaGameController::buttonEvent(int which, bool newState)
     }
 
     activeFlag = activeFlag || newState;
+
+    if (newState)
+    {
+        if (gLunaLua.isValid()) {
+            // Get associated playerNum, or 0 if unassociated
+            int playerNum;
+            for (int playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
+            {
+                if (gLunaGameControllerManager.getController(playerNum) == this)
+                {
+                    break;
+                }
+            }
+            if (playerNum > LunaGameControllerManager::CONTROLLER_MAX_PLAYERS)
+            {
+                playerNum = 0;
+            }
+
+            std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onControllerButtonPress", false);
+            changeControllerEvent->setDirectEventName("onControllerButtonPress");
+            changeControllerEvent->setLoopable(false);
+            gLunaLua.callEvent(changeControllerEvent, which, playerNum, name);
+        }
+    }
 }
 
 /*static*/ bool LunaGameController::axisValueToState(int value, bool oldState)
