@@ -688,7 +688,7 @@ void LunaGameController::directionalEvent(int which, bool newState, bool fromAna
     }
 
     padState = *maskPtr; // Assign current source of pad state
-    activeFlag = true;
+    activeFlag = activeFlag || newState;
 }
 
 void LunaGameController::buttonEvent(int which, bool newState)
@@ -702,7 +702,7 @@ void LunaGameController::buttonEvent(int which, bool newState)
         buttonState &= 0xFFFFFFFF ^ (1UL << which);
     }
 
-    activeFlag = true;
+    activeFlag = activeFlag || newState;
 }
 
 /*static*/ bool LunaGameController::axisValueToState(int value, bool oldState)
