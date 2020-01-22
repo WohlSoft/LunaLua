@@ -17,7 +17,8 @@ static JOYINFOEX test1;
 LunaGameControllerManager::LunaGameControllerManager() :
     initDone(false),
     controllerMap(),
-    players()
+    players(),
+    pressQueue()
 {
 }
 
@@ -99,7 +100,9 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
 
 void LunaGameControllerManager::handleInputs()
 {
-    if (GM_PLAYERS_COUNT <= 1) {
+    int playerCount = GM_PLAYERS_COUNT;
+
+    if (playerCount <= 1) {
         // For the case of 1-player, use a controll switching style where player 1 is always controlled by the most recently active control source
 
         // Get selected controller and whether it was active
@@ -125,6 +128,7 @@ void LunaGameControllerManager::handleInputs()
         {
             selectedController = activeController;
             players[0].joyId = selectedController->getJoyId();
+            players[0].haveKeyboard = false;
             players[0].haveController = true;
 
             SMBXInput::setPlayerInputType(1, 1); // Set player 1 input type to 'joystick 1'
@@ -138,6 +142,7 @@ void LunaGameControllerManager::handleInputs()
         // Nothing for further players
         for (int playerNum = 2; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
         {
+            players[playerNum - 1].haveKeyboard = false;
             players[playerNum - 1].haveController = false;
             players[playerNum - 1].joyId = 0;
         }
@@ -145,12 +150,15 @@ void LunaGameControllerManager::handleInputs()
     else
     {
         // For 2+(?) players up to player count
-        for (int playerNum = 1; (playerNum <= CONTROLLER_MAX_PLAYERS) && (playerNum <= GM_PLAYERS_COUNT); playerNum++)
+        for (int playerNum = 1; (playerNum <= CONTROLLER_MAX_PLAYERS) && (playerNum <= playerCount); playerNum++)
         {
             LunaGameController* selectedController = getController(playerNum);
 
             // If already have a controller, we're done
             if (selectedController != nullptr) continue;
+
+            // If we're already locked to keyboard, we're done
+            if (players[playerNum - 1].haveKeyboard) continue;
 
             // Check if we have an active controller that is not selected already
             for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
@@ -159,7 +167,7 @@ void LunaGameControllerManager::handleInputs()
                 {
                     it.second.clearActive();
                     bool alreadyUsed = false;
-                    for (int otherPlayerNum = 1; (otherPlayerNum <= CONTROLLER_MAX_PLAYERS) && (otherPlayerNum <= GM_PLAYERS_COUNT); otherPlayerNum++)
+                    for (int otherPlayerNum = 1; (otherPlayerNum <= CONTROLLER_MAX_PLAYERS) && (otherPlayerNum <= playerCount); otherPlayerNum++)
                     {
                         if (otherPlayerNum == playerNum) continue;
                         if (players[otherPlayerNum - 1].haveController && players[otherPlayerNum - 1].joyId == it.first)
@@ -181,6 +189,7 @@ void LunaGameControllerManager::handleInputs()
             if (selectedController != nullptr)
             {
                 players[playerNum - 1].joyId = selectedController->getJoyId();
+                players[playerNum - 1].haveKeyboard = false;
                 players[playerNum - 1].haveController = true;
 
                 SMBXInput::setPlayerInputType(playerNum, playerNum); // Set player n input type to 'joystick n'
@@ -202,15 +211,16 @@ void LunaGameControllerManager::handleInputs()
         }
 
         // Nothing for further(?) players
-        for (int playerNum = GM_PLAYERS_COUNT + 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
+        for (int playerNum = playerCount + 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
         {
+            players[playerNum - 1].haveKeyboard = false;
             players[playerNum - 1].haveController = false;
             players[playerNum - 1].joyId = 0;
         }
     }
 
     // Update controller state for each player
-    for (int playerNum = 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
+    for (int playerNum = 1; (playerNum <= CONTROLLER_MAX_PLAYERS) && (playerNum <= playerCount); playerNum++)
     {
         handleInputsForPlayer(playerNum);
     }
@@ -352,6 +362,12 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
 
     for (int playerNum = 1; playerNum <= CONTROLLER_MAX_PLAYERS; playerNum++)
     {
+        // If multiplayer, and already locked to controller, ignore
+        if ((GM_PLAYERS_COUNT > 1) && (players[playerNum - 1].haveController))
+        {
+            continue;
+        }
+
         // If the selected input type is not keyboard, maybe switch to keyboard
         SMBXNativeKeyboard* keyboardConfig = SMBXNativeKeyboard::Get(playerNum);
         bool isConfiguredKey = (
@@ -370,16 +386,19 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
         // If the key that is pressed is configured as an input, switch to keyboard control
         if (isConfiguredKey)
         {
-            if (SMBXInput::getPlayerInputType(playerNum) != 0)
-            {
-                // Clear selected flag if set
-                players[playerNum - 1].haveController = false;
+            if ((GM_PLAYERS_COUNT <= 1) || (!players[playerNum - 1].haveController)) {
+                if (SMBXInput::getPlayerInputType(playerNum) != 0)
+                {
+                    // Clear selected flag if set
+                    players[playerNum - 1].haveKeyboard = true;
+                    players[playerNum - 1].haveController = false;
 
-                SMBXInput::setPlayerInputType(playerNum, 0); // Set player 1 input type to 'keyboard'
-                #if defined(CONTROLLER_DEBUG)
-                    printf("Selected controller: Keyboard\n");
-                #endif
-                sendSelectedController("Keyboard", playerNum);
+                    SMBXInput::setPlayerInputType(playerNum, 0); // Set player 1 input type to 'keyboard'
+                    #if defined(CONTROLLER_DEBUG)
+                        printf("Selected controller: Keyboard\n");
+                    #endif
+                    sendSelectedController("Keyboard", playerNum);
+                }
             }
 
             // Don't consider this input in switching player 2 if it's set for player 1

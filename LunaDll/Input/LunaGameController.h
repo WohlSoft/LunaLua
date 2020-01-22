@@ -11,6 +11,7 @@ class LunaGameController;
 class LunaGameControllerPlayer
 {
 public:
+    bool haveKeyboard;
     bool haveController;
     SDL_JoystickID joyId;
     unsigned int xAxis;
@@ -18,6 +19,7 @@ public:
     unsigned int buttonState;
 public:
     inline LunaGameControllerPlayer() :
+        haveKeyboard(false),
         haveController(false),
         joyId(0),
         xAxis(0x7FFF),
