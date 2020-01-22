@@ -38,6 +38,9 @@ void LunaGameControllerManager::init()
     // Avoid excess init
     if (initDone) return;
 
+    // Set hints
+    SDL_SetHintWithPriority(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1", SDL_HINT_OVERRIDE);
+
     // Init SDL subssytems
     int ret = SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
     if (ret != 0)
@@ -45,6 +48,10 @@ void LunaGameControllerManager::init()
         // Error
         return;
     }
+
+    // Enable events
+    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_GameControllerEventState(SDL_ENABLE);
 
     // Flag init done
     initDone = true;
