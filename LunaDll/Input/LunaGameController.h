@@ -2,6 +2,7 @@
 #define LUNA_GAME_CONTROLLER_H_
 
 #include <SDL2/SDL.h>
+#include <vector>
 #include <unordered_map>
 
 struct joyinfoex_tag;
@@ -34,6 +35,8 @@ private:
     std::unordered_map<SDL_JoystickID, LunaGameController> controllerMap;
 
     LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
+
+    std::vector<std::pair<SDL_JoystickID, int>> pressQueue;
 public:
     LunaGameControllerManager();
     ~LunaGameControllerManager();
@@ -58,12 +61,14 @@ private:
     void controllerButtonEvent(const SDL_ControllerButtonEvent& event, bool down);
     void joyAxisEvent(const SDL_JoyAxisEvent& event);
     void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
+public:
+    inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }
 };
 
 class LunaGameController
 {
 public:
-    LunaGameController(SDL_Joystick* _joyPtr, SDL_GameController* _ctrlPtr);
+    LunaGameController(LunaGameControllerManager* _managerPtr, SDL_JoystickID _joyId, SDL_Joystick* _joyPtr, SDL_GameController* _ctrlPtr);
     ~LunaGameController();
 
     LunaGameController(const LunaGameController&) = delete;
@@ -85,6 +90,8 @@ public:
     inline unsigned int getButtonState() const { return buttonState; }
 
     SDL_JoystickPowerLevel getPowerLevel();
+
+    inline SDL_JoystickID getJoyId() { return joyId;  }
 private:
     void translateFromAxis(bool axisAsButton, bool axisAsDirectional, int posPadNumber, int negPadNumber, int value);
     void directionalEvent(int which, bool newState, bool fromAnalog);
@@ -124,6 +131,8 @@ public:
     static const int axisThresholdOff = (25 * 0x7FFF) / 100;
     static bool axisValueToState(int value, bool oldState);
 private:
+    LunaGameControllerManager* managerPtr;
+    SDL_JoystickID joyId;
     SDL_Joystick* joyPtr;
     SDL_GameController* ctrlPtr;
     SDL_Haptic* hapticPtr;

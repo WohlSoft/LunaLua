@@ -108,7 +108,6 @@ void LunaGameControllerManager::handleInputs()
 
         // Get active controller and clear flags
         LunaGameController* activeController = nullptr;
-        SDL_JoystickID activeJoyId;
         for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
         {
             if (it.second.isActive())
@@ -116,7 +115,6 @@ void LunaGameControllerManager::handleInputs()
                 it.second.clearActive();
                 if (activeController == nullptr)
                 {
-                    activeJoyId = it.first;
                     activeController = &it.second;
                 }
             }
@@ -126,7 +124,7 @@ void LunaGameControllerManager::handleInputs()
         if (!wasSelectedActive && (activeController != nullptr))
         {
             selectedController = activeController;
-            players[0].joyId = activeJoyId;
+            players[0].joyId = selectedController->getJoyId();
             players[0].haveController = true;
 
             SMBXInput::setPlayerInputType(1, 1); // Set player 1 input type to 'joystick 1'
@@ -155,7 +153,6 @@ void LunaGameControllerManager::handleInputs()
             if (selectedController != nullptr) continue;
 
             // Check if we have an active controller that is not selected already
-            SDL_JoystickID newJoyId;
             for (std::pair<const SDL_JoystickID, LunaGameController>& it : controllerMap)
             {
                 if (it.second.isActive())
@@ -174,7 +171,6 @@ void LunaGameControllerManager::handleInputs()
 
                     if (!alreadyUsed)
                     {
-                        newJoyId = it.first;
                         selectedController = &it.second;
                         break;
                     }
@@ -184,7 +180,7 @@ void LunaGameControllerManager::handleInputs()
             // If we got a new selected controller
             if (selectedController != nullptr)
             {
-                players[playerNum - 1].joyId = newJoyId;
+                players[playerNum - 1].joyId = selectedController->getJoyId();
                 players[playerNum - 1].haveController = true;
 
                 SMBXInput::setPlayerInputType(playerNum, playerNum); // Set player n input type to 'joystick n'
@@ -218,6 +214,39 @@ void LunaGameControllerManager::handleInputs()
     {
         handleInputsForPlayer(playerNum);
     }
+
+    // Send button press events
+    for (auto& press : pressQueue)
+    {
+        SDL_JoystickID joyId = press.first;
+        int which = press.second;
+
+        auto& it = controllerMap.find(joyId);
+        if (it != controllerMap.end())
+        {
+            if (gLunaLua.isValid()) {
+                // Get associated playerNum, or 0 if unassociated
+                int playerNum;
+                for (playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
+                {
+                    if (players[playerNum - 1].haveController && (players[playerNum - 1].joyId == joyId))
+                    {
+                        break;
+                    }
+                }
+                if (playerNum > LunaGameControllerManager::CONTROLLER_MAX_PLAYERS)
+                {
+                    playerNum = 0;
+                }
+
+                std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onControllerButtonPress", false);
+                changeControllerEvent->setDirectEventName("onControllerButtonPress");
+                changeControllerEvent->setLoopable(false);
+                gLunaLua.callEvent(changeControllerEvent, which, playerNum, it->second.getName());
+            }
+        }
+    }
+    pressQueue.clear();
 }
 
 // Function to process inputs for a player
@@ -421,7 +450,7 @@ void LunaGameControllerManager::addJoystickEvent(int joyIdx)
         ctrlPtr = SDL_GameControllerOpen(joyIdx);
     }
 
-    controllerMap.emplace(joyId, LunaGameController(joyPtr, ctrlPtr));
+    controllerMap.emplace(joyId, LunaGameController(this, joyId, joyPtr, ctrlPtr));
 }
 
 void LunaGameControllerManager::removeJoystickEvent(SDL_JoystickID joyId)
@@ -436,11 +465,29 @@ void LunaGameControllerManager::removeJoystickEvent(SDL_JoystickID joyId)
         }
     }
 
-    // Delete joystick
-    auto it = controllerMap.find(joyId);
-    if (it != controllerMap.end())
+    // Remove pending presses associated with this joyId
     {
-        controllerMap.erase(it);
+        auto it = pressQueue.begin();
+        while (it != pressQueue.end())
+        {
+            if (it->first == joyId)
+            {
+                it = pressQueue.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+    }
+
+    // Delete joystick
+    {
+        auto it = controllerMap.find(joyId);
+        if (it != controllerMap.end())
+        {
+            controllerMap.erase(it);
+        }
     }
 }
 
@@ -482,7 +529,9 @@ void LunaGameControllerManager::controllerAxisEvent(const SDL_ControllerAxisEven
 
 //=================================================================================================
 
-LunaGameController::LunaGameController(SDL_Joystick* _joyPtr, SDL_GameController* _ctrlPtr) :
+LunaGameController::LunaGameController(LunaGameControllerManager* _managerPtr, SDL_JoystickID _joyId, SDL_Joystick* _joyPtr, SDL_GameController* _ctrlPtr) :
+    managerPtr(_managerPtr),
+    joyId(_joyId),
     joyPtr(_joyPtr),
     ctrlPtr(_ctrlPtr),
     hapticPtr(nullptr),
@@ -532,6 +581,8 @@ LunaGameController::~LunaGameController()
 // Move constructors
 LunaGameController::LunaGameController(LunaGameController &&other)
 {
+    managerPtr      = other.managerPtr;
+    joyId           = other.joyId;
     joyPtr          = other.joyPtr;
     ctrlPtr         = other.ctrlPtr;
     hapticPtr       = other.hapticPtr;
@@ -551,6 +602,8 @@ LunaGameController & LunaGameController::operator=(LunaGameController &&other)
 {
     close();
 
+    managerPtr      = other.managerPtr;
+    joyId           = other.joyId;
     joyPtr          = other.joyPtr;
     ctrlPtr         = other.ctrlPtr;
     hapticPtr       = other.hapticPtr;
@@ -831,26 +884,7 @@ void LunaGameController::buttonEvent(int which, bool newState)
 
     if (newState)
     {
-        if (gLunaLua.isValid()) {
-            // Get associated playerNum, or 0 if unassociated
-            int playerNum;
-            for (playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
-            {
-                if (gLunaGameControllerManager.getController(playerNum) == this)
-                {
-                    break;
-                }
-            }
-            if (playerNum > LunaGameControllerManager::CONTROLLER_MAX_PLAYERS)
-            {
-                playerNum = 0;
-            }
-
-            std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onControllerButtonPress", false);
-            changeControllerEvent->setDirectEventName("onControllerButtonPress");
-            changeControllerEvent->setLoopable(false);
-            gLunaLua.callEvent(changeControllerEvent, which, playerNum, name);
-        }
+        managerPtr->storePressEvent(joyId, which);
     }
 }
 
