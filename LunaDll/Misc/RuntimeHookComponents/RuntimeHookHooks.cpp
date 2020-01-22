@@ -1341,6 +1341,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
                     screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
 
                     ::GenerateScreenshot(screenshotPath, *header, pData);
+                    GlobalFree(globalMem);
                     return true;
                 });
             }

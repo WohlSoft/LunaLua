@@ -150,8 +150,6 @@ void GLEngine::EndFrame(HDC hdcDest)
 
     // Generate screenshot...
     if (mScreenshot) {
-        mScreenshot = false;
-
         // Get window size
         uint32_t windowSize = gMainWindowSize;
         if (windowSize != 0)
@@ -254,9 +252,8 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
     // Read pixels
     glReadPixels(x, y, w, h, GL_BGR, GL_UNSIGNED_BYTE, pPixelData);
     if (glGetError() != GL_NO_ERROR) {
-        GlobalUnlock(handle);
         GlobalFree(handle);
-        mScreenshotCallback = nullptr;
+        handle = nullptr;
         return false;
     }
 
@@ -265,16 +262,15 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
     if (mScreenshotCallback) {
         bool releaseMem = mScreenshotCallback(handle, &header, (void*)pPixelData, mHwnd);
     }
-
-    if ((GlobalFlags(handle) & GMEM_LOCKCOUNT) >= 1){
-        GlobalUnlock(handle);
-    }
-
-    if (releaseMem){
+    else
+    {
         GlobalFree(handle);
+        handle = nullptr;
+        return false;
     }
 
     mScreenshotCallback = nullptr;
+    mScreenshot = false;
     return true;
 }
 
