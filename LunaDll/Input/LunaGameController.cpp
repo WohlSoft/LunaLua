@@ -834,7 +834,7 @@ void LunaGameController::buttonEvent(int which, bool newState)
         if (gLunaLua.isValid()) {
             // Get associated playerNum, or 0 if unassociated
             int playerNum;
-            for (int playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
+            for (playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
             {
                 if (gLunaGameControllerManager.getController(playerNum) == this)
                 {
