@@ -2502,3 +2502,38 @@ MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji)
 {
     return gLunaGameControllerManager.emulatedJoyGetPosEx(uJoyID, pji);
 }
+
+MMRESULT __stdcall runtimeHookJoyGetPosExNull(UINT uJoyID, LPJOYINFOEX pji)
+{
+    pji->dwXpos = 0x7FFF;
+    pji->dwYpos = 0x7FFF;
+    pji->dwPOV = 0x7FFF;
+    pji->dwButtons = 0;
+    pji->dwButtonNumber = 0;
+    return JOYERR_NOERROR;
+}
+
+MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT cbjc)
+{
+    if (uJoyID < 2)
+    {
+        memset(pjc, 0, sizeof(cbjc));
+        pjc->wXmin = 0;
+        pjc->wXmax = 0xFFFF;
+        pjc->wYmin = 0;
+        pjc->wYmax = 0xFFFF;
+        pjc->wZmin = 0;
+        pjc->wZmax = 0xFFFF;
+        pjc->wNumButtons = 32;
+        pjc->wRmin = 0;
+        pjc->wRmax = 0xFFFF;
+        pjc->wUmin = 0;
+        pjc->wUmax = 0xFFFF;
+        pjc->wVmin = 0;
+        pjc->wVmax = 0xFFFF;
+        pjc->wNumAxes = 1;
+        pjc->wMaxButtons = 32;
+        return JOYERR_NOERROR;
+    }
+    return MMSYSERR_NODRIVER;
+}

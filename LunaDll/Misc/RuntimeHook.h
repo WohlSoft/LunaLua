@@ -420,6 +420,8 @@ void __stdcall runtimeHookRunAnimInternal(short* effectID, Momentum* coor, float
 void __stdcall runtimeHookSemisolidInteractionHook_Raw();
 
 MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
+MMRESULT __stdcall runtimeHookJoyGetPosExNull(UINT uJoyID, LPJOYINFOEX pji);
+MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT cbjc);
 
 #endif
 

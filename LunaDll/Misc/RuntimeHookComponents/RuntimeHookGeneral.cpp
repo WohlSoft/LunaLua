@@ -877,6 +877,8 @@ void TrySkipPatch()
 
     // Hook for controller handling
     PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA75726).CALL(runtimeHookJoyGetPosExNull).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA756CD).CALL(runtimeHookJoyGetDevCapsA).NOP_PAD_TO_SIZE<5>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
