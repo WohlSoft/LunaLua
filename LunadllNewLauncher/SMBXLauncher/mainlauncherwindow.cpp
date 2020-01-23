@@ -29,7 +29,8 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     m_smbxConfig(new SMBXConfig()),
     m_ApplyLunaLoaderPatch(false),
     m_jsBridgeAlreadInit(false),
-    ui(new Ui::MainLauncherWindow)
+    ui(new Ui::MainLauncherWindow),
+    m_ControlPollTimer(this)
 {
     ui->setupUi(this);
     this->setMinimumSize(640, 360);
@@ -66,6 +67,9 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
         if(ok)
         {
             this->loadJavascriptBridge();
+
+            connect(&m_ControlPollTimer, &QTimer::timeout, this, &MainLauncherWindow::pollControlTimeout);
+            m_ControlPollTimer.start(32);
         }
     });
 }
@@ -73,6 +77,11 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 MainLauncherWindow::~MainLauncherWindow()
 {
     delete ui;
+}
+
+void MainLauncherWindow::pollControlTimeout()
+{
+    m_smbxConfig->pollControls();
 }
 
 void MainLauncherWindow::closeEvent(QCloseEvent *event)

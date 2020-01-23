@@ -22,7 +22,8 @@
 SMBXConfig::SMBXConfig(QObject *parent) :
     QObject(parent),
     m_Autostart(new AutostartConfig()),
-    m_Controls(new ControlConfig())
+    m_Controls(new ControlConfig()),
+    m_ControllerManager()
 {
     emit AutostartUpdated();
     emit ControlsUpdated();
@@ -393,4 +394,23 @@ void SMBXConfig::setWindowHeader(const QString &title)
 void SMBXConfig::loadEpisodeWebpage(const QString &file)
 {
     emit loadEpisodeWebpageExecuted(file);
+}
+
+void SMBXConfig::pollControls()
+{
+    static bool ranInit = false;
+    if (!ranInit)
+    {
+        m_ControllerManager.init();
+        ranInit = true;
+    }
+
+    m_ControllerManager.pollInputs();
+
+    for (auto it : m_ControllerManager.getPressQueue())
+    {
+        QString controllerName = QString::fromUtf8(m_ControllerManager.getControllerName(it.first).c_str());
+        emit ControllerButtonPress(it.second, controllerName);
+    }
+    m_ControllerManager.clearPressQueue();
 }

@@ -5,6 +5,7 @@
 #include <QScopedPointer>
 #include <QProcess>
 #include <QUrl>
+#include <QTimer>
 
 #include "ExposedObjects/smbxconfig.h"
 #include "launcherconfiguration.h"
@@ -41,6 +42,7 @@ public slots:
 
     //General stuff
     void checkForUpdates();
+    void pollControlTimeout();
 
     //Error handlers
     void warnError(const QString& msg);
@@ -58,6 +60,7 @@ private:
     int m_initHeight;
     bool m_autoWindowTitle;
     Ui::MainLauncherWindow *ui;
+    QTimer m_ControlPollTimer;
 };
 
 #endif // MAINLAUNCHERWINDOW_H

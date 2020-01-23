@@ -47,16 +47,20 @@ public:
     void init();
     void pollInputs();
     void processSDLEvent(const SDL_Event& event);
+#if !defined(BUILDING_SMBXLAUNCHER)
+public:
     void handleInputs();
 private:
     void handleInputsForPlayer(int playerNum);
 public:
     unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
     void notifyKeyboardPress(int keycode);
+    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
+#endif // !define(BUILDING_SMBXLAUNCHER)
+public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
     LunaGameController* getController(int playerNum);
 private:
-    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
     void addJoystickEvent(int joyIdx);
     void removeJoystickEvent(SDL_JoystickID joyId);
     void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
@@ -65,6 +69,9 @@ private:
     void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
 public:
     inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }
+    inline const std::vector<std::pair<SDL_JoystickID, int>>& getPressQueue() { return pressQueue; }
+    inline void clearPressQueue() { pressQueue.clear(); }
+    std::string getControllerName(SDL_JoystickID joyId);
 };
 
 class LunaGameController

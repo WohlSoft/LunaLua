@@ -8,15 +8,15 @@ QT       += core gui widgets webenginewidgets
 
 CONFIG += c++11
 
-DEFINES += PGE_FILES_QT
+DEFINES += PGE_FILES_QT BUILDING_SMBXLAUNCHER
 DEFINES -= QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_INFO_OUTPUT
 
 TARGET = SMBXLauncher
 TEMPLATE = app
-
-LIBS += User32.lib
+LIBS += User32.lib -L$$PWD/../../LunaDll/libs/sdl/lib/ -lSDL2 -lSDL2main
 
 SOURCES += main.cpp\
+    ../../LunaDll/Input/LunaGameController.cpp \
     mainlauncherwindow.cpp \
     ExposedObjects/smbxconfig.cpp \
     ExposedObjects/autostartconfig.cpp \
@@ -39,6 +39,7 @@ SOURCES += main.cpp\
     devtoolsdialog.cpp
 
 HEADERS  += mainlauncherwindow.h \
+    ../../LunaDll/Input/LunaGameController.h \
     ExposedObjects/smbxconfig.h \
     ExposedObjects/autostartconfig.h \
     ExposedObjects/controlconfig.h \
@@ -64,7 +65,7 @@ HEADERS  += mainlauncherwindow.h \
 # win32: SOURCES += ../../LunaLoader/LunaLoaderPatch.cpp
 
 # PGE File Library
-INCLUDEPATH += $$PWD/../../LunaDll/libs
+INCLUDEPATH += $$PWD/../../LunaDll/libs $$PWD/../../LunaDll/libs/sdl/include
 SOURCES += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.cpp)
 SOURCES += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.c)
 HEADERS += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.h)

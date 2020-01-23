@@ -1,17 +1,17 @@
-#include <Windows.h>
 #include <SDL2/SDL.h>
 #include <memory>
 #include "LunaGameController.h"
-#include "../LuaMain/LunaLuaMain.h"
-#include "../SMBXInternal/NativeInput.h"
-#include "../Globals.h"
+#if !defined(BUILDING_SMBXLAUNCHER)
+    #include <Windows.h>
+    #include "../LuaMain/LunaLuaMain.h"
+    #include "../SMBXInternal/NativeInput.h"
+    #include "../Globals.h"
+#endif
 
 //#define CONTROLLER_DEBUG
 #if defined(CONTROLLER_DEBUG)
     #include <stdio.h>
 #endif
-
-static JOYINFOEX test1;
 
 // Constructor
 LunaGameControllerManager::LunaGameControllerManager() :
@@ -70,7 +70,9 @@ void LunaGameControllerManager::pollInputs()
     while (SDL_PollEvent(&event)) {
         processSDLEvent(event);
     }
-    handleInputs();
+    #if !defined(BUILDING_SMBXLAUNCHER)
+        handleInputs();
+    #endif // !defined(BUILDING_SMBXLAUNCHER)
 }
 
 // Function to process an SDL event that is incoming
@@ -105,6 +107,7 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
     }
 }
 
+#if !defined(BUILDING_SMBXLAUNCHER)
 void LunaGameControllerManager::handleInputs()
 {
     int playerCount = GM_PLAYERS_COUNT;
@@ -265,8 +268,10 @@ void LunaGameControllerManager::handleInputs()
     }
     pressQueue.clear();
 }
+#endif // !defined(BUILDING_SMBXLAUNCHER)
 
 // Function to process inputs for a player
+#if !defined(BUILDING_SMBXLAUNCHER)
 void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
 {
     // Sanity check
@@ -325,8 +330,10 @@ void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
     // Copy button state
     player.buttonState = controller->getButtonState() & 0x7FFF;
 }
+#endif // !defined(BUILDING_SMBXLAUNCHER)
 
 // Function to emulate joyGetPosEx
+#if !defined(BUILDING_SMBXLAUNCHER)
 unsigned int LunaGameControllerManager::emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji)
 {
     // Sanity checks
@@ -358,7 +365,9 @@ unsigned int LunaGameControllerManager::emulatedJoyGetPosEx(unsigned int uJoyID,
 
     return 0;
 }
+#endif // !defined(BUILDING_SMBXLAUNCHER)
 
+#if !defined(BUILDING_SMBXLAUNCHER)
 void LunaGameControllerManager::notifyKeyboardPress(int keycode)
 {
     // Return if init not done
@@ -413,6 +422,7 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
         }
     }
 }
+#endif // !defined(BUILDING_SMBXLAUNCHER)
 
 SDL_JoystickPowerLevel LunaGameControllerManager::getSelectedControllerPowerLevel(int playerNum)
 {
@@ -428,7 +438,7 @@ LunaGameController* LunaGameControllerManager::getController(int playerNum)
 {
     if ((playerNum >= 1) && (playerNum <= CONTROLLER_MAX_PLAYERS) && players[playerNum - 1].haveController)
     {
-        auto& it = controllerMap.find(players[playerNum - 1].joyId);
+        auto it = controllerMap.find(players[playerNum - 1].joyId);
         if (it != controllerMap.end())
         {
             return &it->second;
@@ -437,6 +447,7 @@ LunaGameController* LunaGameControllerManager::getController(int playerNum)
     return nullptr;
 }
 
+#if !defined(BUILDING_SMBXLAUNCHER)
 void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum)
 {
     if (gLunaLua.isValid()) {
@@ -446,6 +457,7 @@ void LunaGameControllerManager::sendSelectedController(const std::string& name, 
         gLunaLua.callEvent(changeControllerEvent, name, playerNum);
     }
 }
+#endif
 
 void LunaGameControllerManager::addJoystickEvent(int joyIdx)
 {
@@ -551,6 +563,16 @@ void LunaGameControllerManager::controllerAxisEvent(const SDL_ControllerAxisEven
     {
         it->second.controllerAxisEvent(event);
     }
+}
+
+std::string LunaGameControllerManager::getControllerName(SDL_JoystickID joyId)
+{
+    auto it = controllerMap.find(joyId);
+    if (it != controllerMap.end())
+    {
+        return it->second.getName();
+    }
+    return "<NULL>";
 }
 
 //=================================================================================================

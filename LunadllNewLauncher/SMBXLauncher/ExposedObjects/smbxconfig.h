@@ -7,6 +7,7 @@
 
 #include "autostartconfig.h"
 #include "controlconfig.h"
+#include "../../LunaDll/Input/LunaGameController.h"
 
 class SMBXConfig : public QObject
 {
@@ -25,6 +26,8 @@ public:
     {
         return m_Controls.data();
     }
+
+    void pollControls();
 
 private:
     QVariant getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
@@ -56,12 +59,16 @@ signals:
     void AutostartUpdated();
     void ControlsUpdated();
 
+    void ControllerButtonPress(int buttonId, const QString& controllerName);
+
 private:
 
     QString m_Episode;
     QString m_SMBXExeFilename;
     QScopedPointer<AutostartConfig> m_Autostart;
     QScopedPointer<ControlConfig> m_Controls;
+
+    LunaGameControllerManager m_ControllerManager;
 };
 
 #endif // SMBXCONFIG_H
