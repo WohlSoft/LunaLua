@@ -2490,9 +2490,12 @@ static unsigned int __stdcall runtimeHookSemisolidInteractionHook(NPCMOB* npc)
 _declspec(naked) void __stdcall runtimeHookSemisolidInteractionHook_Raw()
 {
     __asm {
+        MOVSX EDI, word ptr ds:[ESI+0xE2]
         PUSH ESI
         CALL runtimeHookSemisolidInteractionHook
-        TEST eax,eax
+        XOR EDX, EDX
+        MOV ECX, EAX
+        TEST EAX, EAX
         PUSH 0xA12095
         RET
     }
