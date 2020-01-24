@@ -217,7 +217,8 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
     QStringList files = directory.entryList(QStringList() << "*.sav" << "*.SAV", QDir::Files);
     foreach(QString filename, files) {
         if (filename != "save0.sav") {   
-            std::regex rgx("^save(-?[0-9]*).sav$", std::regex_constants::icase);
+            std::regex rgx("^save(-?[0-9]+)\.sav$", std::regex_constants::icase);
+
             std::smatch match;
             const std::string fname = filename.toUtf8().constData();
             int index = 0;
