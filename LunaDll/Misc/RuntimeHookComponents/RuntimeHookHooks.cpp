@@ -156,11 +156,16 @@ extern int __stdcall LoadWorld()
     gSavedVarBank.CheckSaveDeletion();
     gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
-    gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
-    gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
+    // Check that we're not just transiently going though having the world loaded...
 
-    // Overworld is guaranteed to be loaded by this point, so trigger onStart
-    gLunaLua.triggerOnStart();
+    if (GM_NEXT_LEVEL_FILENAME.length() == 0)
+    {
+        gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
+        gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
+
+        // Overworld is guaranteed to be loaded by this point, so trigger onStart
+        gLunaLua.triggerOnStart();
+    }
 
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
