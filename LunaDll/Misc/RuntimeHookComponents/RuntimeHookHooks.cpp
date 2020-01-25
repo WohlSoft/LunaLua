@@ -962,7 +962,15 @@ extern void __stdcall FrameTimingMaxFPSHook()
 // Also know as "Player init" hook. This method is called when the player resets.
 extern void __stdcall InitLevelEnvironmentHook()
 {
-    native_initLevelEnv();
+    // This function will fail if the player is a custom character but Lua is not yet loaded
+    // This failure condition would occur for cross level warp and test mode restart, because
+    // that briefly transitions through overworld load state without actually loading Lua.
+    // To work around this, just don't perform an excess unnecessary reset of the player during
+    // this transition.
+    if (GM_NEXT_LEVEL_FILENAME.length() == 0)
+    {
+        native_initLevelEnv();
+    }
 }
 
 static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
