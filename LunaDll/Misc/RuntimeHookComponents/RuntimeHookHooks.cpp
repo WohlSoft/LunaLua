@@ -2553,3 +2553,41 @@ MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT c
     }
     return MMSYSERR_NODRIVER;
 }
+
+static _declspec(naked) void __stdcall runtimeHookDoExplosion_OrigFunc(Momentum* coor, short* bombType, short* playerIdx)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0xA3BA96
+        RET
+    }
+}
+
+void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, short* playerIdx)
+{
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> onExplosionInternalEvent = std::make_shared<Event>("onExplosionInternal", true);
+        onExplosionInternalEvent->setDirectEventName("onExplosionInternal");
+        onExplosionInternalEvent->setLoopable(false);
+
+        luabind::object coorCopy = gLunaLua.newTable();
+        coorCopy["x"] = coor->x;
+        coorCopy["y"] = coor->y;
+        coorCopy["speedX"] = coor->speedX;
+        coorCopy["speedY"] = coor->speedY;
+        coorCopy["width"] = coor->width;
+        coorCopy["height"] = coor->height;
+
+        gLunaLua.callEvent(onExplosionInternalEvent, coorCopy, *bombType, *playerIdx);
+        isCancelled = onExplosionInternalEvent->native_cancelled();
+    }
+
+    if (!isCancelled)
+    {
+        runtimeHookDoExplosion_OrigFunc(coor, bombType, playerIdx);
+    }
+}

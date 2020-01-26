@@ -423,5 +423,7 @@ MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
 MMRESULT __stdcall runtimeHookJoyGetPosExNull(UINT uJoyID, LPJOYINFOEX pji);
 MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT cbjc);
 
+void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, short* playerIdx);
+
 #endif
 

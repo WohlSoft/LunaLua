@@ -880,6 +880,9 @@ void TrySkipPatch()
     PATCH(0xA75726).CALL(runtimeHookJoyGetPosExNull).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0xA756CD).CALL(runtimeHookJoyGetDevCapsA).NOP_PAD_TO_SIZE<5>().Apply();
 
+    // Hook for explosions
+    PATCH(0xA3BA90).JMP(runtimeHookDoExplosionInternal).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
