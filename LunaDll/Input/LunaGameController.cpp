@@ -28,6 +28,7 @@ LunaGameControllerManager::~LunaGameControllerManager()
     if (initDone)
     {
         initDone = false;
+        controllerMap.clear();
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
     }
 }
