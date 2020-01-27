@@ -2591,3 +2591,26 @@ void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, s
         runtimeHookDoExplosion_OrigFunc(coor, bombType, playerIdx);
     }
 }
+
+static void __stdcall runtimeHookNpcGenerated_Main(short genIdx, short* npcIdx)
+{
+    native_updateNPC(npcIdx); // This hook overwrites this call, but let this happen first
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> onNPCGeneratedEvent = std::make_shared<Event>("onNPCGenerated", false);
+        onNPCGeneratedEvent->setDirectEventName("onNPCGenerated");
+        onNPCGeneratedEvent->setLoopable(false);
+
+        gLunaLua.callEvent(onNPCGeneratedEvent, (int)genIdx, (int)*npcIdx);
+    }
+}
+
+void __declspec(naked) __stdcall runtimeHookNpcGenerated(short* npcIdx)
+{
+    __asm {
+        POP EAX                           // POP the return address
+        PUSH DWORD PTR DS : [EBP - 0x180] // Source NPC argument argument in there
+        PUSH EAX                          // PUSH the return address
+        JMP runtimeHookNpcGenerated_Main  // JMP to CameraUpdateHook
+    };
+}

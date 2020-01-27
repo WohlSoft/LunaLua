@@ -425,5 +425,7 @@ MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT c
 
 void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, short* playerIdx);
 
+void __stdcall runtimeHookNpcGenerated(short* npcIdx);
+
 #endif
 

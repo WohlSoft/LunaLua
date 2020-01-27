@@ -902,6 +902,8 @@ static const auto native_applyFullscreen = (void(__stdcall *)(void* arg1, void* 
 
 static const auto native_loadDefaultControls = (void(__stdcall *)(void))GF_LOAD_DEFAULT_CONTROLS;
 
+static const auto native_initNPC = (int(__stdcall *)(short* npcId, float* dir, void* arg3))GF_INIT_NPC;
+
 /*
 Function name
                                            Segment Start    Length   Locals   Arguments

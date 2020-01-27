@@ -883,6 +883,9 @@ void TrySkipPatch()
     // Hook for explosions
     PATCH(0xA3BA90).JMP(runtimeHookDoExplosionInternal).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hook for npc generation
+    PATCH(0xA07D2E).CALL(runtimeHookNpcGenerated).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
