@@ -18,7 +18,9 @@ LunaGameControllerManager::LunaGameControllerManager() :
     initDone(false),
     controllerMap(),
     players(),
-    pressQueue()
+    pressQueue(),
+    reconnectTimeout(0),
+    reconnectFlag(false)
 {
 }
 
@@ -67,10 +69,22 @@ void LunaGameControllerManager::init()
 // Function to poll inputs
 void LunaGameControllerManager::pollInputs()
 {
+    // If we needed to connect things in a deferred fashion, handle that
+    if (reconnectFlag && (SDL_GetTicks() >= reconnectTimeout))
+    {
+        reconnectFlag = false;
+        int numJoy = SDL_NumJoysticks();
+        for (int i = 0; i < numJoy; i++)
+        {
+            addJoystickEvent(i);
+        }
+    }
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         processSDLEvent(event);
     }
+
     #if !defined(BUILDING_SMBXLAUNCHER)
         handleInputs();
     #endif // !defined(BUILDING_SMBXLAUNCHER)
@@ -82,6 +96,12 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
     switch (event.type)
     {
         case SDL_JOYDEVICEADDED:
+            if (strcmp(SDL_JoystickNameForIndex(event.jdevice.which), "Nintendo Switch Pro Controller") == 0)
+            {
+                reconnectTimeout = SDL_GetTicks() + 4000;
+                reconnectFlag = true;
+                break;
+            }
             addJoystickEvent(event.jdevice.which);
             break;
         case SDL_JOYDEVICEREMOVED:

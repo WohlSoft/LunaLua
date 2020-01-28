@@ -39,6 +39,9 @@ private:
     LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
 
     std::vector<std::pair<SDL_JoystickID, int>> pressQueue;
+
+    unsigned int reconnectTimeout;
+    bool reconnectFlag;
 public:
     LunaGameControllerManager();
     ~LunaGameControllerManager();
