@@ -1230,7 +1230,7 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
         std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
         cameraDrawEvent->setDirectEventName("onCameraDraw");
         cameraDrawEvent->setLoopable(false);
-        gLunaLua.callEvent(cameraDrawEvent, cameraIdx);
+        gLunaLua.callEvent(cameraDrawEvent, cameraIdx, maxCameraIdx);
 
         // Disallow changes to this camera's settings in onCameraDraw, for reasons.
         memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
