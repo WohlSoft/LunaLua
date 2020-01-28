@@ -1192,6 +1192,8 @@ void __declspec(naked) __stdcall CameraUpdateHook_Wrapper()
 
 static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
 {
+    static double cameraPos[3][2] = {0};
+
     // Run onDraw at this point, before the first camera starts rendering
     if (!g_ranOnDrawThisFrame)
     {
@@ -1204,13 +1206,18 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
             SMBX_CameraInfo::setCameraX(i, std::round(SMBX_CameraInfo::getCameraX(i)));
             SMBX_CameraInfo::setCameraY(i, std::round(SMBX_CameraInfo::getCameraY(i)));
 
-            // This is done outside of StartCameraRender to give onCameraUpdate code a chance to change the camera
-            Renderer::Get().StoreCameraPosition(i);
+            cameraPos[i][0] = SMBX_CameraInfo::getCameraX(i);
+            cameraPos[i][1] = SMBX_CameraInfo::getCameraY(i);
         }
 
         Renderer::Get().StartFrameRender();
         g_EventHandler.hookLevelRenderFirstCameraStart();
     }
+
+    // Send camera position to GLEngine
+    SMBX_CameraInfo::setCameraX(cameraIdx, cameraPos[cameraIdx][0]);
+    SMBX_CameraInfo::setCameraY(cameraIdx, cameraPos[cameraIdx][1]);
+    Renderer::Get().StoreCameraPosition(cameraIdx);
 
     // Start camera render for this camera
     Renderer::Get().StartCameraRender(cameraIdx);
