@@ -455,6 +455,16 @@ SDL_JoystickPowerLevel LunaGameControllerManager::getSelectedControllerPowerLeve
     return SDL_JOYSTICK_POWER_UNKNOWN;
 }
 
+std::string LunaGameControllerManager::getSelectedControllerName(int playerNum)
+{
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
+    {
+        return controller->getName();
+    }
+    return "Keyboard";
+}
+
 LunaGameController* LunaGameControllerManager::getController(int playerNum)
 {
     if ((playerNum >= 1) && (playerNum <= CONTROLLER_MAX_PLAYERS) && players[playerNum - 1].haveController)

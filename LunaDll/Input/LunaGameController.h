@@ -62,6 +62,7 @@ public:
 #endif // !define(BUILDING_SMBXLAUNCHER)
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
+    std::string getSelectedControllerName(int playerNum);
     LunaGameController* getController(int playerNum);
 private:
     void addJoystickEvent(int joyIdx);

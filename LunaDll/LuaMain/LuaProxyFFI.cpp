@@ -372,4 +372,12 @@ extern "C" {
     {
         return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel(playerNum);
     }
+
+    FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
+    {
+        static std::string name;
+        name = gLunaGameControllerManager.getSelectedControllerName(playerNum);
+        return name.c_str();
+    }
+
 }
