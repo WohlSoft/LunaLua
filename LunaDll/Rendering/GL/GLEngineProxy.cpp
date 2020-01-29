@@ -15,6 +15,7 @@ GLEngineProxy::GLEngineProxy() {
     mSkipFrame = false;
     mNextEndFrameIsSkippable = true;
     mpThread = NULL;
+    mFrameStats = { 0, 0 };
 }
 
 GLEngineProxy::~GLEngineProxy() {
@@ -45,6 +46,15 @@ void GLEngineProxy::ThreadMain() {
             mPendingClear--;
         }
         if (cmd->isFrameEnd()) {
+            // Track frame stats
+            FrameStatStruct frameStats = mFrameStats.load();
+            if (mSkipFrame)
+            {
+                frameStats.skipCount++;
+            }
+            frameStats.totalCount++;
+            mFrameStats.store(frameStats);
+
             mQueuedFrameSkippability.pop();
 
             // Determine frame skippability

@@ -453,3 +453,9 @@ FFI_EXPORT bool __fastcall FFI_GraphicsIsSoftwareGL()
     CLunaFFILock ffiLock(__FUNCTION__);
     return gStartupSettings.softwareGL;
 }
+
+FFI_EXPORT void __fastcall FFI_GraphicsGetFrameStats(GLEngineProxy::FrameStatStruct* frameStats)
+{
+    CLunaFFILock ffiLock(__FUNCTION__);
+    *frameStats = g_GLEngine.GetFrameStats();
+}

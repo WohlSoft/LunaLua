@@ -13,6 +13,12 @@
 
 class GLEngineProxy {
     friend class GLLock;
+public:
+    struct FrameStatStruct
+    {
+        unsigned long long skipCount;
+        unsigned long long totalCount;
+    };
 private:
     std::thread* mpThread;
     ThreadedCmdQueue<std::shared_ptr<GLEngineCmd>> mQueue;
@@ -22,6 +28,8 @@ private:
     
     bool mNextEndFrameIsSkippable;
     ThreadedCmdQueue<bool> mQueuedFrameSkippability;
+
+    std::atomic<FrameStatStruct> mFrameStats;
 
 public:
     GLEngine mInternalGLEngine;
@@ -70,6 +78,8 @@ public:
 
     static HDC GetHDC(void);
     static void CheckRendererInit(void);
+
+    FrameStatStruct GetFrameStats(void) { return mFrameStats.load(std::memory_order_relaxed); }
 };
 
 // Instance
