@@ -110,7 +110,7 @@ void testModeRestartLevel(void)
     gLunaLua.exitContext();
 
     // Make sure load screen is started
-    LunaLoadScreenStart();
+    //LunaLoadScreenStart();
 
     // Make sure we unpause
     exitPausePatch.Apply();
@@ -144,9 +144,6 @@ static bool testModeSetupForLoading()
 
     // Start by stopping any Lua things
     gLunaLua.exitContext();
-
-    // Make sure load screen is started
-    LunaLoadScreenStart();
 
     // Stop music if any is still going
     native_stopMusic();
@@ -238,6 +235,9 @@ static bool testModeSetupForLoading()
 
     // Unapply exit pause patch
     exitPausePatch.Unapply();
+
+    // Make sure load screen is started
+    LunaLoadScreenStart();
 
     return true;
 }
