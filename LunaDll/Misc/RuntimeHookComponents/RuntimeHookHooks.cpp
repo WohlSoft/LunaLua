@@ -1437,6 +1437,27 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
                 gLunaLua.callEvent(pasteTextEvent, pastedText);
             }
         }
+
+        if ((virtKey == VK_RETURN) && altPressed)
+        {
+            if (gMainWindowHwnd != NULL)
+            {
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+                {
+                    if (wndpl.showCmd == SW_MAXIMIZE)
+                    {
+                        ShowWindow(gMainWindowHwnd, SW_RESTORE);
+                    }
+                    else
+                    {
+                        ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+                    }
+                }
+            }
+            return 1;
+        }
     } // keyDown
 
     // Hook print screen key
