@@ -165,7 +165,13 @@ void ParseArgs(const std::vector<std::wstring>& args)
         {
             STestModeSettings settings;
             settings.levelPath = arg.substr(12);
-            testModeEnable(settings);
+            if (!testModeEnable(settings))
+            {
+                // Invalid level name
+                std::wstring path = L"SMBX could not open \"" + settings.levelPath + L"\"";
+                MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+                _exit(1);
+            }
             gStartupSettings.patch = true;
             break;
         }
