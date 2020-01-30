@@ -698,7 +698,10 @@ extern BOOL __stdcall BitBltHook(
     if (hdcDest == (HDC)GM_SCRN_HDC)
     {
         // Make sure we kill the loadscreen before vanilla rendering
-        LunaLoadScreenKill();
+        if (!TestModeIsLoadPending())
+        {
+            LunaLoadScreenKill();
+        }
 
         g_BitBltEmulation.onBitBlt(hdcSrc, nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc, dwRop);
         return -1;
@@ -1508,6 +1511,7 @@ static void __declspec(naked) __stdcall RenderLevelReal()
 
 extern void __stdcall RenderLevelHook()
 {
+    if (TestModeIsLoadPending()) return;
     LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
@@ -1578,6 +1582,7 @@ static void __declspec(naked) __stdcall RenderWorldReal()
 
 extern void __stdcall RenderWorldHook()
 {
+    if (TestModeIsLoadPending()) return;
     LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();

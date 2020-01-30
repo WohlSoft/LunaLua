@@ -15,6 +15,7 @@
 #include "RuntimeHook.h"
 #include "WaitForTickEnd.h"
 #include "PGEEditorCmdSender.h"
+#include "LoadScreen.h"
 
 #include "TestModeMenu.h"
 #include "TestMode.h"
@@ -25,6 +26,7 @@ using json = nlohmann::json;
 //============ GLOBAL VARIABLES ============//
 //////////////////////////////////////////////
 static std::mutex g_testModeMutex;
+static volatile bool g_testModePendingLoad = false;
 
 ///////////////////////////////////////////////
 //============== UTILITY PATCH ==============//
@@ -107,6 +109,9 @@ void testModeRestartLevel(void)
     // Start by stopping any Lua things
     gLunaLua.exitContext();
 
+    // Make sure load screen is started
+    LunaLoadScreenStart();
+
     // Make sure we unpause
     exitPausePatch.Apply();
     GM_STR_MSGBOX = "";
@@ -123,6 +128,8 @@ void testModeRestartLevel(void)
 
     GM_NEXT_LEVEL_WARPIDX = 0;
     GM_NEXT_LEVEL_FILENAME = "";
+
+    g_testModePendingLoad = true;
 }
 
 static bool testModeSetupForLoading()
@@ -137,6 +144,9 @@ static bool testModeSetupForLoading()
 
     // Start by stopping any Lua things
     gLunaLua.exitContext();
+
+    // Make sure load screen is started
+    LunaLoadScreenStart();
 
     // Stop music if any is still going
     native_stopMusic();
@@ -240,6 +250,9 @@ bool testModeLoadLevelHook(VB6StrPtr* filename)
 {
     // Skip if not enabled
     if (!testModeSettings.enabled) return false;
+
+    // Clear pending load status
+    g_testModePendingLoad = false;
 
     // If the filename matches the one we're testing, and we have raw level data, let's use it
     if (*filename == testModeSettings.levelPath && testModeData.levelRawData.size() > 0)
@@ -473,6 +486,11 @@ bool TestModeCheckHideWindow(void)
     }
 
     return false;
+}
+
+bool TestModeIsLoadPending(void)
+{
+    return testModeSettings.enabled && g_testModePendingLoad;
 }
 
 json IPCResetCheckPoint(const json& /*params*/)

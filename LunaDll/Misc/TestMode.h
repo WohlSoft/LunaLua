@@ -63,6 +63,8 @@ LevelData &getCurrentLevelData();
 
 bool TestModeCheckHideWindow(void);
 
+bool TestModeIsLoadPending(void);
+
 // The following function decleration is not included in this header, to
 // avoid applying a json.hpp dependency to this header.
 //   json IPCTestLevel(const json& params)
