@@ -213,6 +213,11 @@ void LunaLoadScreenStart()
     loadThread = new std::thread(LoadThread);
 }
 
+bool LunaLoadScreenIsActive()
+{
+    return loadThread != nullptr;
+}
+
 static void __stdcall CustomLoadScreenHook(void)
 {
     native_cleanupLevel();

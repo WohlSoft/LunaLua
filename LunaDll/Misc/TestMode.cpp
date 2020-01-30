@@ -109,9 +109,6 @@ void testModeRestartLevel(void)
     // Start by stopping any Lua things
     gLunaLua.exitContext();
 
-    // Make sure load screen is started
-    //LunaLoadScreenStart();
-
     // Make sure we unpause
     exitPausePatch.Apply();
     GM_STR_MSGBOX = "";
@@ -350,6 +347,12 @@ json IPCTestLevel(const json& params)
 {
     std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
 
+    // Skip if already pending
+    if (g_testModePendingLoad || LunaLoadScreenIsActive())
+    {
+        return true;
+    }
+
     if (!params.is_object()) throw IPCInvalidParams();
     json::const_iterator filenameIt = params.find("filename");
     if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
@@ -455,6 +458,9 @@ json IPCTestLevel(const json& params)
         // Attempt to enable the test
         if (!testModeEnable(settings, rawData))
         {
+            std::wstring path = L"SMBX received no level data from the editor. Please try again.";
+            MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+            _exit(1);
             return false;
         }
         testModeRestartLevel();
@@ -470,16 +476,38 @@ bool TestModeCheckHideWindow(void)
     // If we started by waiting for IPC, we want to hide the window in place of exiting
     if (gStartupSettings.waitForIPC)
     {
-        std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
-
-        // Close the level using testModeRestartLevel, but flag that we'll be
-        // waiting for IPC again.
-        testModeRestartLevel();
-        gStartupSettings.currentlyWaitingForIPC = true;
-        HWND hWindow = gMainWindowHwnd;
-        if (hWindow)
+        if (g_testModePendingLoad || LunaLoadScreenIsActive())
         {
-            ShowWindow(hWindow, SW_HIDE);
+            // Ignore close request if mid-loading
+            return true;
+        }
+
+        {
+            std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+
+            // Start by stopping any Lua things
+            gLunaLua.exitContext();
+
+            // Kill any active load screen
+            LunaLoadScreenKill();
+
+            // Stop music if any is still going
+            native_stopMusic();
+
+            // Close the level using testModeRestartLevel, but flag that we'll be
+            // waiting for IPC again.
+            gStartupSettings.currentlyWaitingForIPC = true;
+            HWND hWindow = gMainWindowHwnd;
+            if (hWindow)
+            {
+                ShowWindow(hWindow, SW_HIDE);
+            }
+        }
+
+        while (gStartupSettings.currentlyWaitingForIPC)
+        {
+            WaitMessage();
+            LunaDllWaitFrame(false);
         }
 
         return true;
