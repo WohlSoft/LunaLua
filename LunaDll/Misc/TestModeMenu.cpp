@@ -10,6 +10,7 @@
 #include "../Rendering/RenderOps/RenderRectOp.h"
 #include "../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../SMBXInternal/CustomGraphics.h"
+#include "../SdlMusic/SdlMusPlayer.h"
 
 #include "TestMode.h"
 #include "TestModeMenu.h"
@@ -72,15 +73,36 @@ void testModePauseMenu(bool allowContinue)
     
     while (keepRunningPauseMenu)
     {
-        // Only do input reading if window is in focus
-        if (gMainWindowFocused)
+        // Handle un-focused state
+        if (!gMainWindowFocused)
         {
-            // Read input...
-            short oldPauseOpen = GM_PAUSE_OPEN;
-            GM_PAUSE_OPEN = COMBOOL(true);
-            native_updateInput();
-            GM_PAUSE_OPEN = oldPauseOpen;
+            // Pause music if it was playing
+            bool musicWasPlaying = PGE_MusPlayer::MUS_IsPlaying();
+            if (musicWasPlaying)
+            {
+                PGE_MusPlayer::MUS_pauseMusic();
+            }
+
+            // Wait for focus
+            while (!gMainWindowFocused && keepRunningPauseMenu && !GM_EPISODE_MODE)
+            {
+                WaitMessage();
+                LunaDllWaitFrame(false);
+            }
+            if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
+
+            // Start music again
+            if (musicWasPlaying)
+            {
+                PGE_MusPlayer::MUS_playMusic();
+            }
         }
+
+        // Read input...
+        short oldPauseOpen = GM_PAUSE_OPEN;
+        GM_PAUSE_OPEN = COMBOOL(true);
+        native_updateInput();
+        GM_PAUSE_OPEN = oldPauseOpen;
 
         if (gLunaLua.isValid()) {
             std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onTestModeMenu", false);

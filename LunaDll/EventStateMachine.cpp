@@ -4,6 +4,7 @@
 #include "Misc/RuntimeHook.h"
 #include "Misc/TestMode.h"
 #include "Rendering/GL/GLEngineProxy.h"
+#include "SdlMusic/SdlMusPlayer.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -211,15 +212,36 @@ void EventStateMachine::checkPause(void) {
 void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
-        // Only do input reading if window is in focus
-        if (gMainWindowFocused)
+        // Handle un-focused state
+        if (!gMainWindowFocused)
         {
-            // Read input
-            short oldPauseOpen = GM_PAUSE_OPEN;
-            GM_PAUSE_OPEN = COMBOOL(true);
-            native_updateInput();
-            GM_PAUSE_OPEN = oldPauseOpen;
+            // Pause music if it was playing
+            bool musicWasPlaying = PGE_MusPlayer::MUS_IsPlaying();
+            if (musicWasPlaying)
+            {
+                PGE_MusPlayer::MUS_pauseMusic();
+            }
+
+            // Wait for focus
+            while (!gMainWindowFocused && !m_RequestUnpause)
+            {
+                WaitMessage();
+                LunaDllWaitFrame(false);
+            }
+            if (m_RequestUnpause) break;
+
+            // Start music again
+            if (musicWasPlaying)
+            {
+                PGE_MusPlayer::MUS_playMusic();
+            }
         }
+
+        // Read input
+        short oldPauseOpen = GM_PAUSE_OPEN;
+        GM_PAUSE_OPEN = COMBOOL(true);
+        native_updateInput();
+        GM_PAUSE_OPEN = oldPauseOpen;
 
         // Render the frame and wait
         LunaDllRenderAndWaitFrame();
