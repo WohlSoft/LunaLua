@@ -465,6 +465,15 @@ std::string LunaGameControllerManager::getSelectedControllerName(int playerNum)
     return "Keyboard";
 }
 
+void LunaGameControllerManager::rumbleSelectedController(int playerNum, int ms, float strength)
+{
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
+    {
+        return controller->rumble(ms, strength);
+    }
+}
+
 LunaGameController* LunaGameControllerManager::getController(int playerNum)
 {
     if ((playerNum >= 1) && (playerNum <= CONTROLLER_MAX_PLAYERS) && players[playerNum - 1].haveController)
@@ -930,6 +939,25 @@ SDL_JoystickPowerLevel LunaGameController::getPowerLevel()
         return SDL_JoystickCurrentPowerLevel(joyPtr);
     }
     return SDL_JOYSTICK_POWER_UNKNOWN;
+}
+
+void LunaGameController::rumble(int ms, float strength)
+{
+    if (hapticPtr)
+    {
+        if (SDL_HapticRumblePlay(hapticPtr, strength, ms) == 0) return;
+    }
+    int intStrength = (int)(0xFFFF * strength + 0.5f);
+    if (intStrength > 0xFFFF) intStrength = 0xFFFF;
+    if (intStrength < 0) intStrength = 0;
+    if (ctrlPtr)
+    {
+        if (SDL_GameControllerRumble(ctrlPtr, intStrength, intStrength, ms) == 0) return;
+    }
+    if (joyPtr)
+    {
+        SDL_JoystickRumble(joyPtr, intStrength, intStrength, ms);
+    }
 }
 
 void LunaGameController::directionalEvent(int which, bool newState, bool fromAnalog)

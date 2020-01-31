@@ -63,6 +63,7 @@ public:
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
     std::string getSelectedControllerName(int playerNum);
+    void rumbleSelectedController(int playerNum, int ms, float strength);
     LunaGameController* getController(int playerNum);
 private:
     void addJoystickEvent(int joyIdx);
@@ -103,6 +104,8 @@ public:
     inline unsigned int getButtonState() const { return buttonState; }
 
     SDL_JoystickPowerLevel getPowerLevel();
+
+    void rumble(int ms, float strength);
 
     inline SDL_JoystickID getJoyId() { return joyId;  }
 private:

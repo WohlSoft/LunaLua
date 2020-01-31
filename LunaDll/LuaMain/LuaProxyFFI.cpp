@@ -380,4 +380,8 @@ extern "C" {
         return name.c_str();
     }
 
+    FFI_EXPORT(void) LunaLuaRumbleSelectedController(int playerNum, int ms, float strength)
+    {
+        gLunaGameControllerManager.rumbleSelectedController(playerNum, ms, strength);
+    }
 }
