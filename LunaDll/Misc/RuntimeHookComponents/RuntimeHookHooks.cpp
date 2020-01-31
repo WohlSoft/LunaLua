@@ -575,11 +575,14 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 {
     int(__stdcall *origCmp)(BSTR, BSTR) = (int(__stdcall *)(BSTR, BSTR))IMP_vbaStrCmp;
 
-    // Trigger onStart here to ensure it happens just before the "Level - Start" event
-    gLunaLua.triggerOnStart();
+    if (wcscmp(eventName, L"Level - Start") == 0)
+    {
+        // Trigger onStart here to ensure it happens just before the "Level - Start" event
+        gLunaLua.triggerOnStart();
 
-    // Mark next render frame as the 'first'
-    g_GLEngine.SetFirstFramePending();
+        // Mark next render frame as the 'first'
+        g_GLEngine.SetFirstFramePending();
+    }
 
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");
