@@ -3,7 +3,7 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../GlobalFuncs.h"
-
+#include "../../Misc/SafeFPUControl.h"
 
 
 
@@ -111,6 +111,7 @@ void LuaProxy::Block::_setBumpable(int id, bool bumpable)
 void LuaProxy::Block::_rawHitBlock(unsigned int blockIdx, short fromUpSide, unsigned short playerIdx, int hittingCount)
 {
     short unkFlag1VB = COMBOOL(fromUpSide);
+    SafeFPUControl::clear();
     native_hitBlock(&blockIdx, &unkFlag1VB, &playerIdx);
     if (hittingCount != -1) {
         Blocks::Get(blockIdx)->RepeatingHits = hittingCount;
@@ -314,6 +315,7 @@ void LuaProxy::Block::remove(bool playSoundEffect)
 {
     unsigned int blockIndex = m_index;
     short doPlaySoundAndEffects = COMBOOL(playSoundEffect);
+    SafeFPUControl::clear();
     native_removeBlock(&blockIndex, &doPlaySoundAndEffects);
 }
 
