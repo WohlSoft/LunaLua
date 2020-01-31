@@ -14,6 +14,7 @@ GeneralLunaConfig::~GeneralLunaConfig()
 void GeneralLunaConfig::doDefaults()
 {
     m_renderer_opengl = GLModeAuto;
+    m_renderer_vsync = VSyncModeOff;
     m_renderer_useLetterbox = true;
     m_renderer_forceDisableFullscreen = false;
     m_lua_enable_http = false;
@@ -26,11 +27,22 @@ bool GeneralLunaConfig::save()
     const wchar_t* openglValueStr;
     switch (m_renderer_opengl)
     {
-    case GLModeHard: openglValueStr = L"hard"; break;
-    case GLModeSoft: openglValueStr = L"soft"; break;
-    default:         openglValueStr = L"auto"; break;
+        default:
+        case GLModeAuto: openglValueStr = L"auto"; break;
+        case GLModeHard: openglValueStr = L"hard"; break;
+        case GLModeSoft: openglValueStr = L"soft"; break;
     }
     generalConfig.SetValue(L"Renderer", L"opengl", openglValueStr, L"# Choose 'soft' to force software gl only, or 'hard' to force hardware gl only, or 'auto' for automatic selection.", true);
+
+    const wchar_t* vsyncValueStr;
+    switch (m_renderer_vsync)
+    {
+        default:
+        case VSyncModeOff:      vsyncValueStr = L"off"; break;
+        case VSyncModeOn:       vsyncValueStr = L"on"; break;
+        case VSyncModeAdaptive: vsyncValueStr = L"adaptive"; break;
+    }
+    generalConfig.SetValue(L"Renderer", L"vsync", vsyncValueStr, L"# Valid options are 'off', 'on', or 'adaptive'. Being enabled eliminates tearing, but worsens latency.", true);
 
     generalConfig.SetBoolValue(L"Renderer", L"use_letterbox", m_renderer_useLetterbox, L"# Choose true if you want to use forced 4:3. Otherwise it will use the default scretch mode.", true);
     
@@ -66,6 +78,21 @@ bool GeneralLunaConfig::load()
     {
         m_renderer_opengl = GLModeAuto;
     }
+
+    const wchar_t* vsyncValueStr = configToLoad.GetValue(L"Renderer", L"vsync", L"off");
+    if (_wcsicmp(vsyncValueStr, L"on") == 0)
+    {
+        m_renderer_vsync = VSyncModeOn;
+    }
+    else if (_wcsicmp(vsyncValueStr, L"adaptive") == 0)
+    {
+        m_renderer_vsync = VSyncModeAdaptive;
+    }
+    else
+    {
+        m_renderer_vsync = VSyncModeOff;
+    }
+
     m_renderer_useLetterbox = configToLoad.GetBoolValue(L"Renderer", L"use_letterbox", true);
     m_renderer_forceDisableFullscreen = configToLoad.GetBoolValue(L"Renderer", L"force_disable_fullscreen", false);
     m_lua_enable_http = configToLoad.GetBoolValue(L"Lua", L"enable-http", false);

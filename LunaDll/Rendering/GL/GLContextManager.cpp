@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <gl/glew.h>
 #include "../../Defines.h"
+#include "../../Globals.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
 
@@ -139,7 +140,12 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
     static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = 0;
     wglSwapIntervalEXT = reinterpret_cast<PFNWGLSWAPINTERVALEXTPROC>(wglGetProcAddress("wglSwapIntervalEXT"));
     if (wglSwapIntervalEXT != 0) {
-        wglSwapIntervalEXT(0);
+        switch (gGeneralConfig.getRendererVSync())
+        {
+            case GeneralLunaConfig::VSyncModeOff:      wglSwapIntervalEXT(0); break;
+            case GeneralLunaConfig::VSyncModeOn:       wglSwapIntervalEXT(1); break;
+            case GeneralLunaConfig::VSyncModeAdaptive: wglSwapIntervalEXT(-1); break;
+        }
     }
 
     this->hDC = hDC;
