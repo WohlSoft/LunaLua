@@ -21,13 +21,14 @@ public:
     };
 
 private:
-    GLMode    m_renderer_opengl;
-    VSyncMode m_renderer_vsync;
-    bool      m_renderer_useLetterbox;
-    bool      m_renderer_forceDisableFullscreen;
-    int       m_audio_samplerate;
-    int       m_audio_bufferlen;
-    bool      m_lua_enable_http;
+    GLMode      m_renderer_opengl;
+    VSyncMode   m_renderer_vsync;
+    bool        m_renderer_useLetterbox;
+    bool        m_renderer_forceDisableFullscreen;
+    int         m_audio_samplerate;
+    int         m_audio_bufferlen;
+    std::string m_audio_driver;
+    bool        m_lua_enable_http;
 
     std::wstring m_settingFilename;
 public:
@@ -51,6 +52,7 @@ public:
     inline bool getForceDisableFullscreen() const { return m_renderer_forceDisableFullscreen; }
     inline int getAudioSampleRate() const { return m_audio_samplerate; }
     inline int getAudioBufferLength() const { return m_audio_bufferlen; }
+    inline std::string getAudioDriver() const { return m_audio_driver; }
     bool getLuaEnableHTTP() const { return m_lua_enable_http; }
     void getLuaEnableHTTP(bool val) { m_lua_enable_http = val; }
 };

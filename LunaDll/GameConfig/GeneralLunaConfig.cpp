@@ -1,5 +1,5 @@
 #include "GeneralLunaConfig.h"
-
+#include "../GlobalFuncs.h"
 #include "../libs/simpleini/SimpleIni.h"
 
 GeneralLunaConfig::GeneralLunaConfig()
@@ -19,6 +19,7 @@ void GeneralLunaConfig::doDefaults()
     m_renderer_forceDisableFullscreen = false;
     m_audio_samplerate = 44100;
     m_audio_bufferlen = 2048;
+    m_audio_driver = "default";
     m_lua_enable_http = false;
 }
 
@@ -53,6 +54,8 @@ bool GeneralLunaConfig::save()
     generalConfig.SetLongValue(L"Audio", L"sample_rate", m_audio_samplerate, L"# Native audio sample rate for the engine. Default is 44100Hz");
 
     generalConfig.SetLongValue(L"Audio", L"buffer_length", m_audio_bufferlen, L"# Audio buffer length. Default is 2048. Smaller may be lower latency but carries risk of audio issues.");
+
+    generalConfig.SetValue(L"Audio", L"driver", Str2WStr(m_audio_driver).c_str(), L"# Audio driver. Valid options are 'default', 'directsound', 'winmm' and 'wasapi'");
 
     generalConfig.SetBoolValue(L"Lua", L"enable-http", m_lua_enable_http, L"# Set to true if you want to have the HTTP API enabled. This might be a security risk, only activate if you trust the episode/api.", true);
 
@@ -103,6 +106,7 @@ bool GeneralLunaConfig::load()
     m_renderer_forceDisableFullscreen = configToLoad.GetBoolValue(L"Renderer", L"force_disable_fullscreen", false);
     m_audio_samplerate = configToLoad.GetLongValue(L"Audio", L"sample_rate", 44100);
     m_audio_bufferlen = configToLoad.GetLongValue(L"Audio", L"buffer_length", 2048);
+    m_audio_driver = WStr2Str(configToLoad.GetValue(L"Audio", L"driver", L"default"));
     m_lua_enable_http = configToLoad.GetBoolValue(L"Lua", L"enable-http", false);
 
     save();

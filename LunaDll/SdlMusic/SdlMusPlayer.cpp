@@ -13,7 +13,22 @@ void PGE_SDL_Manager::initSDL()
 {
     if(!isInit)
     {
-        SDL_Init(SDL_INIT_AUDIO);
+        // Allow driver override
+        std::string driver = gGeneralConfig.getAudioDriver();
+        if (driver != "default")
+        {
+            SDL_setenv("SDL_AUDIODRIVER", driver.c_str(), 1);
+        }
+
+        int ret = SDL_Init(SDL_INIT_AUDIO);
+        if (ret != 0)
+        {
+            std::string msg = "Could not initialize audio subsystem.\r\n";
+            msg += SDL_GetError();
+            MessageBoxA(0, msg.c_str(), "Error", MB_ICONERROR);
+            _exit(1);
+        }
+
         isInit=true;
         PGE_MusPlayer::setSampleRate(gGeneralConfig.getAudioSampleRate());
         PGE_MusPlayer::MUS_changeVolume(51);
