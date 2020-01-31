@@ -28,6 +28,9 @@ void PGE_SDL_Manager::initSDL()
 
 /***********************************PGE_MusPlayer********************************************/
 Mix_Music *PGE_MusPlayer::play_mus = NULL;
+bool PGE_MusPlayer::deferringMusic = false;
+bool PGE_MusPlayer::musicGotDeferred = false;
+int PGE_MusPlayer::musicDeferredFadeIn = -1;
 std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
@@ -45,15 +48,19 @@ void PGE_MusPlayer::MUS_playMusic()
     if(!PGE_SDL_Manager::isInit) return;
     if(play_mus)
     {
-        if (Mix_PlayingMusic() == 0)
+        if (deferringMusic)
+        {
+            musicGotDeferred = true;
+            musicDeferredFadeIn = -1;
+        }
+        else if (Mix_PlayingMusic() == 0)
         {
             // Reset music sample count
             musSCount.store(0);
 
             Mix_PlayMusic(play_mus, -1);
         }
-        else
-        if(Mix_PausedMusic()==1)
+        else if (Mix_PausedMusic()==1)
         {
             Mix_ResumeMusic();
         }
@@ -70,7 +77,12 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
 
     if(play_mus)
     {
-        if(Mix_PausedMusic()==0)
+        if (deferringMusic)
+        {
+            musicGotDeferred = true;
+            musicDeferredFadeIn = ms;
+        }
+        else if(Mix_PausedMusic()==0)
         {
             // Reset music sample count
             musSCount.store(0);
@@ -82,7 +94,9 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
                 }
         }
         else
+        {
             Mix_ResumeMusic();
+        }
 
     }
     else
@@ -95,19 +109,24 @@ void PGE_MusPlayer::MUS_pauseMusic()
 {
     if(!PGE_SDL_Manager::isInit) return;
     Mix_PauseMusic();
+    musicGotDeferred = false;
 }
 
 void PGE_MusPlayer::MUS_stopMusic()
 {
     if(!PGE_SDL_Manager::isInit) return;
     Mix_HaltMusic();
+    musicGotDeferred = false;
 }
 
 void PGE_MusPlayer::MUS_stopMusicFadeOut(int ms)
 {
     if(!PGE_SDL_Manager::isInit) return;
-    if(Mix_FadingMusic()!=MIX_FADING_OUT)
+    if(Mix_FadingMusic() != MIX_FADING_OUT)
+    {
         Mix_FadeOutMusic(ms);
+        musicGotDeferred = false;
+    }
 }
 
 std::string PGE_MusPlayer::MUS_MusicTitle()
@@ -212,6 +231,7 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
         Mix_HaltMusic();
         Mix_FreeMusic(play_mus);
         play_mus=NULL;
+        musicGotDeferred = false;
     }
 
     play_mus = Mix_LoadMUS( musFile );
@@ -256,6 +276,38 @@ unsigned __int64 PGE_MusPlayer::sampleCount()
 unsigned __int64 PGE_MusPlayer::MUS_sampleCount()
 {
     return musSCount;
+}
+
+void PGE_MusPlayer::MUS_StartDeferring()
+{
+    if (deferringMusic) return;
+
+    musicGotDeferred = (Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0);
+    if (musicGotDeferred)
+    {
+        musicDeferredFadeIn = -1;
+        MUS_pauseMusic();
+    }
+    deferringMusic = true;
+}
+
+void PGE_MusPlayer::MUS_StopDeferring()
+{
+    if (!deferringMusic) return;
+
+    if (musicGotDeferred)
+    {
+        if (musicDeferredFadeIn >= 0)
+        {
+            MUS_playMusicFadeIn(musicDeferredFadeIn);
+        }
+        else
+        {
+            MUS_playMusic();
+        }
+    }
+    musicGotDeferred = false;
+    deferringMusic = false;
 }
 
 /***********************************PGE_Sounds********************************************/

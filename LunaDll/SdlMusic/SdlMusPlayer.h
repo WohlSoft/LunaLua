@@ -48,8 +48,15 @@ public:
 
     static unsigned __int64 sampleCount();
     static unsigned __int64 MUS_sampleCount();
+
+    static void MUS_StartDeferring();
+    static void MUS_StopDeferring();
 private:
     static Mix_Music *play_mus;
+    static bool deferringMusic;
+    static bool musicGotDeferred;
+    static int musicDeferredFadeIn;
+
     static int sRate;
     static bool showMsg;
     static std::string showMsg_for;

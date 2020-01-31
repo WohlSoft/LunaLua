@@ -218,6 +218,9 @@ int OnLvlLoad() {
 
     if (doSoundLoading) MusicManager::loadCustomSounds(wldPath + "\\", custPath);
 
+    // Start deferring music
+    g_EventHandler.loadTimeDeferMusic();
+
     if(gLunaEnabled) {
         // Load autocode
         gAutoMan.Clear(false);

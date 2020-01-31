@@ -12,9 +12,11 @@ private:
     bool m_RequestUnpause;
     bool m_IsPaused;
 
+    bool m_MusicDeferred;
+
 // Constructor and Destructor
 public:
-    EventStateMachine() { reset(); }
+    EventStateMachine() { m_MusicDeferred = false; reset(); }
     ~EventStateMachine() { }
 
 // Public methods (Notifications of State)
@@ -28,6 +30,7 @@ public:
     void hookLevelRenderEnd(void);
     void hookWorldRenderStart(void);
     void hookWorldRenderEnd(void);
+    void loadTimeDeferMusic(void);
 
 // Private methods (Outgoing events)
 private:

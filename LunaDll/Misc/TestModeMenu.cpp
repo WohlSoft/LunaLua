@@ -77,11 +77,7 @@ void testModePauseMenu(bool allowContinue)
         if (!gMainWindowFocused)
         {
             // Pause music if it was playing
-            bool musicWasPlaying = PGE_MusPlayer::MUS_IsPlaying();
-            if (musicWasPlaying)
-            {
-                PGE_MusPlayer::MUS_pauseMusic();
-            }
+            PGE_MusPlayer::MUS_StartDeferring();
 
             // Wait for focus
             while (!gMainWindowFocused && keepRunningPauseMenu && !GM_EPISODE_MODE)
@@ -92,10 +88,7 @@ void testModePauseMenu(bool allowContinue)
             if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
 
             // Start music again
-            if (musicWasPlaying)
-            {
-                PGE_MusPlayer::MUS_playMusic();
-            }
+            PGE_MusPlayer::MUS_StopDeferring();
         }
 
         // Read input...

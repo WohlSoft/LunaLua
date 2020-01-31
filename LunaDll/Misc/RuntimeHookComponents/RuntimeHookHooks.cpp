@@ -160,6 +160,9 @@ extern int __stdcall LoadWorld()
 
     if (GM_NEXT_LEVEL_FILENAME.length() == 0)
     {
+        // Start deferring music
+        g_EventHandler.loadTimeDeferMusic();
+
         gLunaLua.init(CLunaLua::LUNALUA_WORLD, (std::wstring)GM_FULLDIR);
         gLunaLua.setReady(true); // We assume that the SMBX engine is already ready when loading the world
 
