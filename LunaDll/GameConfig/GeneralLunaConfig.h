@@ -25,6 +25,8 @@ private:
     VSyncMode m_renderer_vsync;
     bool      m_renderer_useLetterbox;
     bool      m_renderer_forceDisableFullscreen;
+    int       m_audio_samplerate;
+    int       m_audio_bufferlen;
     bool      m_lua_enable_http;
 
     std::wstring m_settingFilename;
@@ -47,6 +49,8 @@ public:
     inline bool getRendererUseLetterbox() const { return m_renderer_useLetterbox; }
     inline void setForceDisableFullscreen(bool forceDisableFullscreen) { m_renderer_forceDisableFullscreen = forceDisableFullscreen; }
     inline bool getForceDisableFullscreen() const { return m_renderer_forceDisableFullscreen; }
+    inline int getAudioSampleRate() const { return m_audio_samplerate; }
+    inline int getAudioBufferLength() const { return m_audio_bufferlen; }
     bool getLuaEnableHTTP() const { return m_lua_enable_http; }
     void getLuaEnableHTTP(bool val) { m_lua_enable_http = val; }
 };

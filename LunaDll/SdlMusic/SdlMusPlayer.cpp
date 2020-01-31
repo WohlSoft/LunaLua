@@ -15,7 +15,7 @@ void PGE_SDL_Manager::initSDL()
     {
         SDL_Init(SDL_INIT_AUDIO);
         isInit=true;
-        PGE_MusPlayer::setSampleRate(44100);
+        PGE_MusPlayer::setSampleRate(gGeneralConfig.getAudioSampleRate());
         PGE_MusPlayer::MUS_changeVolume(51);
         //std::wstring smbxPath = gAppPathWCHAR;
         //smbxPath = smbxPath.append(L"\\");
@@ -197,7 +197,7 @@ void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
 {
     sRate=sampleRate;
     Mix_CloseAudio();
-    Mix_OpenAudio(sRate, AUDIO_S16, 2, 2048);
+    Mix_OpenAudio(sRate, AUDIO_S16, 2, gGeneralConfig.getAudioBufferLength());
     Mix_AllocateChannels(32);
 
     // Reset music sample count
