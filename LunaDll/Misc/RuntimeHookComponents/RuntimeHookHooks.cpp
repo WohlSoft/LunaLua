@@ -165,6 +165,9 @@ extern int __stdcall LoadWorld()
 
         // Overworld is guaranteed to be loaded by this point, so trigger onStart
         gLunaLua.triggerOnStart();
+
+        // Mark next render frame as the 'first'
+        g_GLEngine.SetFirstFramePending();
     }
 
     short plValue = GM_PLAYERS_COUNT;
@@ -574,6 +577,9 @@ extern int __stdcall __vbaStrCmp_TriggerSMBXEventHook(BSTR nullStr, BSTR eventNa
 
     // Trigger onStart here to ensure it happens just before the "Level - Start" event
     gLunaLua.triggerOnStart();
+
+    // Mark next render frame as the 'first'
+    g_GLEngine.SetFirstFramePending();
 
     std::shared_ptr<Event> triggerEventData = std::make_shared<Event>("onEvent", true);
     triggerEventData->setDirectEventName("onEventDirect");

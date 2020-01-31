@@ -31,6 +31,7 @@ private:
 
     std::atomic<FrameStatStruct> mFrameStats;
 
+    bool mFirstFramePending;
 public:
     GLEngine mInternalGLEngine;
 protected:
@@ -58,7 +59,7 @@ public:
     void RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
-    void EndFrame(HDC hdcDest);
+    void EndFrame(HDC hdcDest, bool isLoadScreen=false);
     void InitForHDC(HDC hdcDest);
 
     inline bool IsEnabled() { return mInternalGLEngine.IsEnabled(); };
@@ -80,6 +81,8 @@ public:
     static void CheckRendererInit(void);
 
     FrameStatStruct GetFrameStats(void) { return mFrameStats.load(std::memory_order_relaxed); }
+
+    void SetFirstFramePending(void) { mFirstFramePending = true; }
 };
 
 // Instance

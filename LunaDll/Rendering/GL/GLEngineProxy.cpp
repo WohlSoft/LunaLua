@@ -16,6 +16,7 @@ GLEngineProxy::GLEngineProxy() {
     mNextEndFrameIsSkippable = true;
     mpThread = NULL;
     mFrameStats = { 0, 0 };
+    mFirstFramePending = true;
 }
 
 GLEngineProxy::~GLEngineProxy() {
@@ -163,10 +164,19 @@ void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOr
     QueueCmd(obj);
 }
 
-void GLEngineProxy::EndFrame(HDC hdcDest)
+void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
+    if (isLoadScreen)
+    {
+        obj->mIsFirstFrame = false;
+    }
+    else
+    {
+        obj->mIsFirstFrame = mFirstFramePending;
+        mFirstFramePending = false;
+    }
     QueueCmd(obj);
 }
 

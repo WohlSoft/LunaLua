@@ -183,7 +183,7 @@ static void LoadThread(void)
 
         g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, 800, 600, 0);
 
-        g_GLEngine.EndFrame(NULL);
+        g_GLEngine.EndFrame(NULL, true);
 
         Renderer::Get().EndFrameRender();
 
