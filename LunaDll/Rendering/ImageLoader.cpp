@@ -1,4 +1,5 @@
 #include <cstring>
+#include <mutex>
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "ImageLoader.h"
@@ -17,6 +18,9 @@ std::unordered_map<std::string, uintptr_t>                                   Ima
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_GfxOverride;
 std::unordered_map<uintptr_t, std::shared_ptr<LunaImage>>                    ImageLoader::m_Gfx;
 std::unordered_map<uintptr_t, std::pair<const SMBXImageCategory*, uint32_t>> ImageLoader::m_HDCToCategoryAndIndex;
+
+static std::recursive_mutex g_ExtraGfxMutex;
+static std::recursive_mutex g_OverrideMutex;
 
 static bool checkDirectoryExistance(const std::wstring& path)
 {
@@ -540,6 +544,7 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
 std::shared_ptr<LunaImage> ImageLoader::GetByHDC(HDC hdc, bool bypassOverride) {
     if (!bypassOverride)
     {
+        std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
         auto it = m_GfxOverride.find((uintptr_t)hdc);
         if (it != m_GfxOverride.end())
         {
@@ -593,6 +598,8 @@ std::shared_ptr<LunaImage> ImageLoader::GetCharacterSprite(short charId, short p
 
 void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::string& name)
 {
+    std::lock_guard<std::recursive_mutex> extraGfxLock(g_ExtraGfxMutex);
+
     if (name.length() == 0) return;
 
     std::wstring wFolderName = Str2WStr(folderName);
@@ -622,6 +629,9 @@ void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::str
 
 void ImageLoader::UnregisterExtraGfx(const std::string& name)
 {
+    std::lock_guard<std::recursive_mutex> extraGfxLock(g_ExtraGfxMutex);
+    std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
+
     m_ExtraGfx.erase(name);
     m_ExtraGfxOverride.erase(name);
     m_ExtraGfxFromLua.erase(name);
@@ -629,6 +639,8 @@ void ImageLoader::UnregisterExtraGfx(const std::string& name)
 
 void ImageLoader::LuaRegisterExtraGfx(const std::string& folderName, const std::string& name)
 {
+    std::lock_guard<std::recursive_mutex> extraGfxLock(g_ExtraGfxMutex);
+
     // Abort if already existing
     if (m_ExtraGfx.find(name) != m_ExtraGfx.end()) return;
 
@@ -638,6 +650,9 @@ void ImageLoader::LuaRegisterExtraGfx(const std::string& folderName, const std::
 
 void ImageLoader::LuaUnregisterAllExtraGfx()
 {
+    std::lock_guard<std::recursive_mutex> extraGfxLock(g_ExtraGfxMutex);
+    std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
+
     std::vector<std::string> gfxNames;
     for (const std::string& it : m_ExtraGfxFromLua)
     {
@@ -661,11 +676,13 @@ std::shared_ptr<LunaImage> ImageLoader::GetByName(const std::string& name, bool 
 
     // Handle returning "extra" gfx
     {
+        std::lock_guard<std::recursive_mutex> extraGfxLock(g_ExtraGfxMutex);
         auto it = m_ExtraGfx.find(name);
         if (it != m_ExtraGfx.end())
         {
             if (!bypassOverride)
             {
+                std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
                 auto itOverride = m_ExtraGfxOverride.find(name);
                 if (itOverride != m_ExtraGfxOverride.end())
                 {
@@ -682,6 +699,8 @@ std::shared_ptr<LunaImage> ImageLoader::GetByName(const std::string& name, bool 
 
 bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<LunaImage>& img)
 {
+    std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
+
     // If we're mapping through an HDC, find it for this image name
     {
         auto it = m_NameToHDC.find(name);
@@ -742,6 +761,8 @@ bool ImageLoader::OverrideByName(const std::string& name, const std::shared_ptr<
 
 void ImageLoader::ClearOverrides()
 {
+    std::lock_guard<std::recursive_mutex> overrideLock(g_OverrideMutex);
+
     // Reset widths/heights to default
     for (auto overrideIterator : m_GfxOverride)
     {
