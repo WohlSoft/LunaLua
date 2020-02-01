@@ -1,6 +1,7 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/Animation.h"
 #include "../../Misc/MiscFuncs.h"
+#include "../../Misc/SafeFPUControl.h"
 
 int LuaProxy::Animation::count()
 {
@@ -83,6 +84,7 @@ LuaProxy::Animation LuaProxy::Animation::spawnEffect(short effectID, double x, d
     short npcID = 0;                        //Arg 4
     short onlyDrawMask = COMBOOL(false);    //Arg 5
 
+    SafeFPUControl::clear();
     spawnEffectFunc(&effectID, &coor, &animationFrame, &npcID, &onlyDrawMask);
     return LuaProxy::Animation(GM_ANIM_COUNT - 1);
 }

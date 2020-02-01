@@ -9,6 +9,7 @@
 #include "../../Misc/RuntimeHook.h"
 #include "../../SMBXInternal/Reconstructed/Util/NpcToCoins.h"
 #include "../../Misc/AsmPatch.h"
+#include "../../Misc/SafeFPUControl.h"
 
 int LuaProxy::NPC::count()
 {
@@ -613,6 +614,7 @@ void LuaProxy::NPC::toIce(lua_State * L)
     short indexCollideWith = 0;
     short targetIndex = m_index + 1;
     CollidersType targetType = HARM_TYPE_NPC;
+    SafeFPUControl::clear();
     native_collideNPC(&targetIndex, &targetType, &indexCollideWith);
 
     // Restore dummy NPC ID, this prevents bomb explosions from becoming
@@ -684,6 +686,7 @@ void LuaProxy::NPC::harm(short harmType, lua_State * L)
     }
 
     // Call native_collideNPC for the type of harm we wish to do
+    SafeFPUControl::clear();
     native_collideNPC(&targetIndex, (CollidersType*)&harmType, &indexCollideWith);
 
     // Restore dummy NPC ID, in case we changed it

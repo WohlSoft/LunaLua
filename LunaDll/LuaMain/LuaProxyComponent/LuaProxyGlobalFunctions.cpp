@@ -19,6 +19,7 @@
 #include "../../Misc/VB6StrPtr.h"
 #include "LuaProxyAudio.h"
 #include <sstream>
+#include "../../Misc/SafeFPUControl.h"
 
 
 //type - Player's state/powerup
@@ -477,6 +478,7 @@ void LuaProxy::runAnimation(int id, double x, double y, double height, double wi
     tmp.speedY = speedY;
     int a4 = 0;
     int a5 = 0;
+    SafeFPUControl::clear();
     f((int)&id, (int)&tmp, (int)&extraData, (int)&a4, (int)&a5);
 }
 
@@ -675,6 +677,7 @@ LuaProxy::Animation LuaProxy::spawnEffect(short effectID, double x, double y, fl
     short npcID = 0;                        //Arg 4
     short onlyDrawMask = COMBOOL(false);    //Arg 5
 
+    SafeFPUControl::clear();
     spawnEffectFunc(&effectID, &coor, &animationFrame, &npcID, &onlyDrawMask);
     return LuaProxy::Animation(GM_ANIM_COUNT - 1);
 }

@@ -1,6 +1,6 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/Layer.h"
-
+#include "../../Misc/SafeFPUControl.h"
 
 luabind::object LuaProxy::Layer::get(lua_State *L)
 {
@@ -103,12 +103,14 @@ void LuaProxy::Layer::stop()
 void LuaProxy::Layer::show(bool noSmoke)
 {
     short noSmokeNative = COMBOOL(noSmoke);
+    SafeFPUControl::clear();
     native_showLayer(&::Layer::Get(m_layerIndex)->ptLayerName, &noSmokeNative);
 }
 
 void LuaProxy::Layer::hide(bool noSmoke)
 {
     short noSmokeNative = COMBOOL(noSmoke);
+    SafeFPUControl::clear();
     native_hideLayer(&::Layer::Get(m_layerIndex)->ptLayerName, &noSmokeNative);
 }
 
