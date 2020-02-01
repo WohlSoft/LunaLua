@@ -310,8 +310,10 @@ void PGE_MusPlayer::MUS_StopDeferring()
 {
     if (!deferringMusic) return;
 
+    deferringMusic = false;
     if (musicGotDeferred)
     {
+        musicGotDeferred = false;
         if (musicDeferredFadeIn >= 0)
         {
             MUS_playMusicFadeIn(musicDeferredFadeIn);
@@ -321,8 +323,6 @@ void PGE_MusPlayer::MUS_StopDeferring()
             MUS_playMusic();
         }
     }
-    musicGotDeferred = false;
-    deferringMusic = false;
 }
 
 /***********************************PGE_Sounds********************************************/
