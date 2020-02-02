@@ -1,3 +1,5 @@
+#include <string>
+#include <algorithm>
 #include "SMBXFileManager.h"
 #include "../Misc/MiscFuncs.h"
 #include "../Main.h"
@@ -57,22 +59,14 @@ static void makeErrorLevel(LevelData &outData, const std::string &msg)
     outData.npc.push_back(oneup);
 }
 
-extern void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath);
+extern void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isValid);
 
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outData)
 {
     FileFormats::CreateLevelData(outData);
     m_isValid = true; // Ensure that we are not valid right now
     std::wstring filePath = fullPath;
-
-    if (!fileExists(filePath))
-    {
-        m_isValid = false;
-        makeErrorLevel(outData, "Can't open level because   "
-                                "file is not exist:         "
-                                "                           " +
-                                 utf8_encode(fullPath));
-    }
+    std::replace(filePath.begin(), filePath.end(), L'/', L'\\');
 
     size_t findLastSlash = filePath.find_last_of(L"/\\");
 
@@ -80,7 +74,9 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
     if (m_isValid && (findLastSlash == std::wstring::npos))
     {
         m_isValid = false;
-        makeErrorLevel(outData, "Can't load this level: FindLastSlash has failed!");
+        makeErrorLevel(outData, "Can't load this level,    "
+                                "because there is no slash "
+                                "in the full path.");
     }
 
     size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
@@ -91,11 +87,31 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
             filePath.append(L".lvl");
     }
 
-    // Check if Attributes is valid
-    if (GetFileAttributesW(filePath.c_str()) == INVALID_FILE_ATTRIBUTES)
+    if (!fileExists(filePath))
     {
         m_isValid = false;
-        makeErrorLevel(outData, "Can't load this level: File has invalid attributes!");
+        std::string msg = "Can't load this level,     "
+                          "because the file does not  "
+                          "exist:                     ";
+        for (unsigned int i = 0; i < filePath.length(); i+=26)
+        {
+            msg += WStr2Str(filePath.substr(i, 26)) + " ";
+        }
+        makeErrorLevel(outData, msg);
+    }
+
+    // Check if Attributes is valid
+    if (m_isValid && GetFileAttributesW(filePath.c_str()) == INVALID_FILE_ATTRIBUTES)
+    {
+        m_isValid = false;
+        std::string msg = "Can't load this level,     "
+                          "because the file cannot be "
+                          "opened:                    ";
+        for (unsigned int i = 0; i < filePath.length(); i += 26)
+        {
+            msg += WStr2Str(filePath.substr(i, 26)) + " ";
+        }
+        makeErrorLevel(outData, msg);
     }
 
     if (m_isValid && !FileFormats::OpenLevelFile(utf8_encode(filePath), outData))
@@ -108,7 +124,7 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
                                 std::to_string(outData.meta.ERROR_linenum));
     }
 
-    LunaLua_loadLevelFile(outData, filePath);
+    LunaLua_loadLevelFile(outData, filePath, m_isValid);
 }
 
 
@@ -127,6 +143,6 @@ void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, LevelData &outData, c
         std::to_string(outData.meta.ERROR_linenum));
     }
 
-    LunaLua_loadLevelFile(outData, fakePath);
+    LunaLua_loadLevelFile(outData, fakePath, m_isValid);
 }
 

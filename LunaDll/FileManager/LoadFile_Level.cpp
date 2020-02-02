@@ -32,8 +32,7 @@
 #define LIMIT_EVENTS   255
 #define LIMIT_SECTIONS 21
 
-void LunaLua_loadLevelFile(LevelData &outData,
-    std::wstring fullPath)
+void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isValid)
 {
     if (fullPath.empty())
         fullPath = gAppPathWCHAR + L"/untitled.lvlx";
@@ -84,13 +83,17 @@ void LunaLua_loadLevelFile(LevelData &outData,
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
 
-    /* Must be called to trigger Lua events and initialize some other stuff */
-    OnLvlLoad();
+    // Skip a few things if this is just an error display level
+    if (isValid)
+    {
+        /* Must be called to trigger Lua events and initialize some other stuff */
+        OnLvlLoad();
 
-    // Init Config-Txt
-    VB6StrPtr customFolderVB6 = customFolder;
-    /* TODO: Implement custom NPCtxt parser over PGE File Library */
-    native_loadNPCConfig(&customFolderVB6);
+        // Init Config-Txt
+        VB6StrPtr customFolderVB6 = customFolder;
+        /* TODO: Implement custom NPCtxt parser over PGE File Library */
+        native_loadNPCConfig(&customFolderVB6);
+    }
 
     // Load Episode GFX
     //native_loadLocalGfx();
