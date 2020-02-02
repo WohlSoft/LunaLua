@@ -373,7 +373,6 @@ unsigned int LunaGameControllerManager::emulatedJoyGetPosEx(unsigned int uJoyID,
         pji->dwYpos = player.yAxis;
         pji->dwPOV = 0x7FFF;
         pji->dwButtons = player.buttonState;
-        pji->dwButtonNumber = __popcnt(player.buttonState);
     }
     else
     {
@@ -381,7 +380,6 @@ unsigned int LunaGameControllerManager::emulatedJoyGetPosEx(unsigned int uJoyID,
         pji->dwYpos = 0x7FFF;
         pji->dwPOV = 0x7FFF;
         pji->dwButtons = 0;
-        pji->dwButtonNumber = 0;
     }
 
     return 0;
