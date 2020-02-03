@@ -128,6 +128,8 @@ extern LunaGameControllerManager gLunaGameControllerManager;
 
 extern CLunaLua				gLunaLua;
 
+extern FILE* conout;
+
 // Paths
 extern std::string  gAppPathANSI;
 extern std::string  gAppPathUTF8;

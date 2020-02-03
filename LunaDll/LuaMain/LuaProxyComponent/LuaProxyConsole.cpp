@@ -1,18 +1,17 @@
 #include "../LuaProxy.h"
+#include "../../GlobalFuncs.h"
 
-#include <iostream>
-#include <stdio.h>
 LuaProxy::Console::Console() :
     m_isDefaultConsole(true)
 {}
 
 void LuaProxy::Console::print(const std::string& outText)
 {
-    std::cout << outText;
+    DebugPrint("%s", outText.c_str());
 }
 
 void LuaProxy::Console::println(const std::string& outText)
 {
-    print(outText + "\n");
+    DebugPrint("%s\n", outText.c_str());
 }
 

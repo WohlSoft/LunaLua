@@ -4,7 +4,8 @@
 #include <clocale>
 #include <stdlib.h>
 #include <ctype.h>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdarg>
 #include <locale>
 #include <vector>
 #include "Globals.h"
@@ -808,20 +809,33 @@ std::wstring getLatestConfigFile(const std::wstring& configname)
     });
 }
 
-void RedirectIOToConsole()
+void InitDebugConsole()
 {
     CONSOLE_SCREEN_BUFFER_INFO coninfo;
 
     // allocate a console for this app
     AllocConsole();
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONIN$", "r", stdin);
-    freopen("CONOUT$", "w", stderr);
+    conout = fopen("CONOUT$", "w");
 
     // set the screen buffer to be big enough to let us scroll text
+    SetConsoleTitleA("LunaLua Debug Output Console");
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
     coninfo.dwSize.Y = 500;
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
+}
+
+int DebugPrint(const char * format, ...)
+{
+    if (conout)
+    {
+        va_list args;
+        va_start(args, format);
+        int ret = vfprintf_s(conout, format, args);
+        va_end(args);
+        fflush(conout);
+        return ret;
+    }
+    return 0;
 }
 
 #ifdef BUILD_WITH_ATL_STUFF

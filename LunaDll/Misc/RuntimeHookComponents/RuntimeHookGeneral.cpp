@@ -240,7 +240,7 @@ static unsigned int __stdcall LatePatch(void)
 
     if (gStartupSettings.console)
     {
-        RedirectIOToConsole();
+        InitDebugConsole();
     }
 
     // Init controller support

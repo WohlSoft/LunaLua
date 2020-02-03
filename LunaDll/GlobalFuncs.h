@@ -100,7 +100,8 @@ std::string generateTimestamp();
 void sendPUTRequest(const std::string& server, const std::string& data);
 
 // Debug stuff
-void RedirectIOToConsole();
+void InitDebugConsole();
+int DebugPrint(const char * format, ...);
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 #endif

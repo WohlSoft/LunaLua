@@ -514,6 +514,8 @@ void CLunaLua::setupDefaults()
     _G["inputConfig2"] = LuaProxy::InputConfig(2);
 
     _G["console"] = LuaProxy::Console();
+
+    _G["print"] = object();
 }
 
 LUAHELPER_DEF_CLASS_HELPER(LunaImage, LuaImageResource);

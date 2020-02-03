@@ -86,6 +86,8 @@ LunaGameControllerManager gLunaGameControllerManager;
 
 CLunaLua gLunaLua;
 
+FILE* conout = nullptr;
+
 
 // Paths
 std::string  gAppPathANSI;
