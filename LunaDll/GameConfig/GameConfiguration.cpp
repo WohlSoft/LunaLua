@@ -1,6 +1,7 @@
 #include "GameConfiguration.h"
 #include "../Misc/VB6StrPtr.h"
 #include "../Defines.h"
+#include "../Globals.h"
 
 namespace gameCharacters{
     VB6StrPtr& marioGame = *(VB6StrPtr*)0x9339C2;
@@ -61,10 +62,17 @@ void GameConfiguration::runPatchByIni(IniProcessing &reader)
     optionsMenu::viewCredits = reader.value("view-credits", std::string(optionsMenu::viewCredits)).toString();
     reader.endGroup();
 
+    // Special case: in softwareGL mode, append to the title to it's clear.
+    std::string gameTitleSuffix = "";
+    if (gStartupSettings.softwareGL)
+    {
+        gameTitleSuffix = " (Software Renderer)";
+    }
+
     // References the same string memory, so do not destruct those.
     reader.beginGroup("general");
-    general::gameTitle_1.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_1)).toString());
-    general::gameTitle_2.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_2)).toString());
-    general::gameTitle_3.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_3)).toString());
+    general::gameTitle_1.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_1)).toString() + gameTitleSuffix);
+    general::gameTitle_2.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_2)).toString() + gameTitleSuffix);
+    general::gameTitle_3.assignNoDestruct(reader.value("game-title", std::string(general::gameTitle_3)).toString() + gameTitleSuffix);
     reader.endGroup();
 }
