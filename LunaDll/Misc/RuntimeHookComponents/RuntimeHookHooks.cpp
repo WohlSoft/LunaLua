@@ -191,34 +191,44 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
-
-    if (file_existsX(autostartFile))
+    if (!gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
-        IniProcessing autostartConfig(autostartFile);
-        if(autostartConfig.beginGroup("autostart"))
+        std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+
+        if (file_existsX(autostartFile))
         {
-            if(autostartConfig.value("do-autostart", false).toBool())
+            IniProcessing autostartConfig(autostartFile);
+            if (autostartConfig.beginGroup("autostart"))
             {
-                if (!gAutostartRan)
+                bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
+                autostartConfig.endGroup();
+                if (doAutostart)
                 {
-                    GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-                    autostarter.applyAutostart();
-                    gAutostartRan = true;
-                    if(autostartConfig.value("transient", false).toBool())
+
+                    if (!gAutostartRan)
                     {
-                        remove(autostartFile.c_str());
+                        // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                        GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                        autostarter.applyAutostart();
+                        gAutostartRan = true;
+
+                        autostartConfig.beginGroup("autostart");
+                        if (autostartConfig.value("transient", false).toBool())
+                        {
+                            remove(autostartFile.c_str());
+                        }
+                        autostartConfig.endGroup();
                     }
                 }
             }
+            autostartConfig.endGroup();
         }
-        autostartConfig.endGroup();
-    }
 
-    if (GameAutostartConfig::nextAutostartConfig)
-    {
-        GameAutostartConfig::nextAutostartConfig->doAutostart();
-        GameAutostartConfig::nextAutostartConfig.reset();
+        if (GameAutostartConfig::nextAutostartConfig)
+        {
+            GameAutostartConfig::nextAutostartConfig->doAutostart();
+            GameAutostartConfig::nextAutostartConfig.reset();
+        }
     }
 
 

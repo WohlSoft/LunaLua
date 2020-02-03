@@ -63,6 +63,8 @@ LevelData &getCurrentLevelData();
 
 bool TestModeCheckHideWindow(void);
 
+bool TestModeIsEnabled(void);
+
 bool TestModeIsLoadPending(void);
 
 // The following function decleration is not included in this header, to

@@ -516,6 +516,11 @@ bool TestModeCheckHideWindow(void)
     return false;
 }
 
+bool TestModeIsEnabled(void)
+{
+    return testModeSettings.enabled;
+}
+
 bool TestModeIsLoadPending(void)
 {
     return testModeSettings.enabled && g_testModePendingLoad;
