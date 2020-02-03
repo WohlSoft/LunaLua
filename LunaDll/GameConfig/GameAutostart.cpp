@@ -1,6 +1,8 @@
 #include "GameAutostart.h"
+#include "../Misc/AsmPatch.h"
 
-std::unique_ptr<GameAutostart> GameAutostartConfig::nextAutostartConfig;
+// Patch for making introLoop skip to the right place
+static auto skipIntoPatch = PATCH(0x8CA6A4).JMP(0x8CD13C).NOP_PAD_TO_SIZE<7>();
 
 GameAutostart::GameAutostart() :
     selectedEpisode(""),
@@ -12,8 +14,6 @@ GameAutostart::GameAutostart() :
 
 
 GameAutostart::~GameAutostart() {}
-
-
 
 bool GameAutostart::applyAutostart()
 {
@@ -42,22 +42,16 @@ bool GameAutostart::applyAutostart()
             //First save slot
             GM_CUR_MENUCHOICE = saveSlot - 1;
 
-            //When the intro loads, then do the VK_RETURN patch
-            //Set doAutostart() function
-            GameAutostartConfig::nextAutostartConfig.reset(new GameAutostart(*this));
+            GM_FULLDIR = item->episodePath;
+
+            // Apply patch to make introLoop immediately skip to loading the episode
+            skipIntoPatch.Apply();
 
             //We're done here
             return true;
         }
     }
     return false;
-}
-
-
-void GameAutostart::doAutostart()
-{
-    //Now simulate an VK_RETURN and enter the episode
-    *(WORD*)0xB2D6D4 = -1;
 }
 
 GameAutostart GameAutostart::createGameAutostartByIniConfig(IniProcessing &reader)
@@ -71,4 +65,9 @@ GameAutostart GameAutostart::createGameAutostartByIniConfig(IniProcessing &reade
     autostarter.setSaveSlot(reader.value("save-slot", 1).toInt());
     reader.endGroup();
     return autostarter;
+}
+
+/*static*/ void GameAutostart::ClearAutostartPatch()
+{
+    skipIntoPatch.Unapply();
 }

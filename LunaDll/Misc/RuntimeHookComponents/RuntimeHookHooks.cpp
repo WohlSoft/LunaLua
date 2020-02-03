@@ -191,8 +191,10 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-    if (!gStartupSettings.waitForIPC && !TestModeIsEnabled())
+
+    if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
+        gAutostartRan = true;
         std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
         if (file_existsX(autostartFile))
@@ -204,30 +206,19 @@ extern int __stdcall LoadIntro()
                 autostartConfig.endGroup();
                 if (doAutostart)
                 {
+                    // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                    GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                    autostarter.applyAutostart();
 
-                    if (!gAutostartRan)
+                    autostartConfig.beginGroup("autostart");
+                    if (autostartConfig.value("transient", false).toBool())
                     {
-                        // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
-                        GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-                        autostarter.applyAutostart();
-                        gAutostartRan = true;
-
-                        autostartConfig.beginGroup("autostart");
-                        if (autostartConfig.value("transient", false).toBool())
-                        {
-                            remove(autostartFile.c_str());
-                        }
-                        autostartConfig.endGroup();
+                        remove(autostartFile.c_str());
                     }
+                    autostartConfig.endGroup();
                 }
             }
             autostartConfig.endGroup();
-        }
-
-        if (GameAutostartConfig::nextAutostartConfig)
-        {
-            GameAutostartConfig::nextAutostartConfig->doAutostart();
-            GameAutostartConfig::nextAutostartConfig.reset();
         }
     }
 
@@ -2214,6 +2205,9 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
 {
     // This only occurs when first loading the episode...
     // this isn't repeated later on
+
+    // Clear the autostart patch at this point
+    GameAutostart::ClearAutostartPatch();
 
     loadWorld_OrigFunc(filename);
 }

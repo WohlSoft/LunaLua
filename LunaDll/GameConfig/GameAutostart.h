@@ -19,7 +19,7 @@ public:
     GameAutostart();
     ~GameAutostart();
     static GameAutostart createGameAutostartByIniConfig(IniProcessing& reader);
-
+    static void ClearAutostartPatch();
 
     std::string getSelectedEpisode() const { return selectedEpisode; }
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
@@ -32,13 +32,7 @@ public:
     int getSaveSlot() const { return saveSlot; }
     void setSaveSlot(int val) { saveSlot = val; }
 
-
     bool applyAutostart();
-    void doAutostart();
 };
-
-namespace GameAutostartConfig {
-    extern std::unique_ptr<GameAutostart> nextAutostartConfig;
-}
 
 #endif
