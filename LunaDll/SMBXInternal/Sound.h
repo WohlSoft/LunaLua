@@ -8,6 +8,6 @@ namespace SMBXSound {
 
     void SetMusic(int musicnum, int section);
     void SetMusicPath(int section, std::wstring path);
-    void PlayMusic(short section);
+    void PlayMusic(short section, bool forceRestart);
 }
 #endif

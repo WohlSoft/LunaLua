@@ -250,7 +250,7 @@ void Autocode::Do(bool init) {
 
         case AT_PlayMusic: {
             if(Length <= 1) { // Play once when delay runs out
-                SMBXSound::PlayMusic((int)Param1-1);
+                SMBXSound::PlayMusic((int)Param1-1, true);
                 Expired = true;
             }
             break;

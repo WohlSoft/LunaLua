@@ -1,5 +1,6 @@
 #include "../Defines.h"
 #include "Sound.h"
+#include "../SMBXInternal/PlayerMOB.h"
 
 // PLAY SFX
 void SMBXSound::PlaySFX(short soundindex) {
@@ -22,6 +23,28 @@ void SMBXSound::SetMusicPath(int section, std::wstring newpath) {
 }
 
 // PLAY MUSIC
-void SMBXSound::PlayMusic(short section) {
-    native_playMusic(&section);
+void SMBXSound::PlayMusic(short section, bool forceRestart) {
+    // If forcing a restart, just do that
+    if (forceRestart)
+    {
+        native_playMusic(&section);
+        return;
+    }
+
+    // Otherwise, check if we need to restart music. Try to act like section switch.
+    short oldMusic = GM_SEC_CURRENT_MUSIC_ID;
+    short newMusic = GM_SEC_MUSIC_TBL[section];
+    bool isMusicDifferent = (oldMusic != newMusic);
+
+    // If it's both custom music, check if the path has changed
+    if (!isMusicDifferent && (oldMusic == 24) && (newMusic == 24))
+    {
+        isMusicDifferent = GM_MUSIC_PATHS_PTR[section] != GM_MUSIC_PATHS_PTR[::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection];
+    }
+    
+    // If the music is different, change music
+    if (isMusicDifferent)
+    {
+        native_playMusic(&section);
+    }
 }

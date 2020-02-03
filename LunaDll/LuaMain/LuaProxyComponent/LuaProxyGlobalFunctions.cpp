@@ -359,7 +359,7 @@ bool LuaProxy::MusicIsFading()
 
 void LuaProxy::playMusic(int section)
 {
-    SMBXSound::PlayMusic(section);
+    SMBXSound::PlayMusic(section, false);
 }
 
 unsigned short LuaProxy::gravity()

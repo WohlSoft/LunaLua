@@ -7,8 +7,8 @@
 #include "../../GlobalFuncs.h"
 #include "../../MciEmulator/mciEmulator.h"
 #include "../../SMBXInternal/PlayerMOB.h"
-
 #include "../../SMBXInternal/Level.h"
+#include "../../SMBXInternal/Sound.h"
 
 #include <memory>
 #include <mutex>
@@ -206,22 +206,28 @@ void LuaProxy::Audio::changeMusic(int section, const std::string &filename, int 
     if((section < 0) || (section > 20))
         return;
 
-    // music paths, set music id to custom and set path
-    GM_SEC_MUSIC_TBL[section] = 24;
-    GM_MUSIC_PATHS_PTR[section] = filename;
+    // Convert string
+    std::wstring wFilename = Str2WStr(filename);
 
-    // If the specified section's music is what's
-    // currently playing, force the change in config to be picked up
-    if(
-        (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
-        (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
-    )
+    // music paths, set music id to custom and set path
+    if ((GM_SEC_MUSIC_TBL[section] != 24) || (wFilename != (std::wstring)GM_MUSIC_PATHS_PTR[section]))
     {
-        playMusic(section);
-        if(fadeInDelayMs > 0)
+        GM_SEC_MUSIC_TBL[section] = 24;
+        GM_MUSIC_PATHS_PTR[section] = wFilename;
+
+        // If the specified section's music is what's
+        // currently playing, force the change in config to be picked up
+        if (
+            (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
+            (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
+            )
         {
-            MusicStop();
-            MusicPlayFadeIn(fadeInDelayMs);
+            SMBXSound::PlayMusic(section, true);
+            if (fadeInDelayMs > 0)
+            {
+                MusicStop();
+                MusicPlayFadeIn(fadeInDelayMs);
+            }
         }
     }
 }
@@ -231,36 +237,42 @@ void LuaProxy::Audio::changeMusic(int section, int musicId, int fadeInDelayMs)
     if((section < 0) || (section > 20))
         return;
 
-    GM_SEC_MUSIC_TBL[section] = short(musicId >= 0 ? musicId : 0);
+    // Disallow negative
+    musicId = short(musicId >= 0 ? musicId : 0);
 
-    // If the specified section's music is what's
-    // currently playing, force the change in config to be picked up
-    if(
-        (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
-        (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
-    )
+    if (GM_SEC_MUSIC_TBL[section] != musicId)
     {
-        if(fadeInDelayMs <= 0)
-            playMusic(section);
-        else
+        GM_SEC_MUSIC_TBL[section] = musicId;
+
+        // If the specified section's music is what's
+        // currently playing, force the change in config to be picked up
+        if (
+            (GM_SEC_CURRENT_MUSIC_ID >= 0) &&
+            (section == ::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection)
+            )
         {
-            if(GM_SEC_MUSIC_TBL[section] != 0)
-            {
-                playMusic(section);
-                MusicStop();
-                MusicPlayFadeIn(fadeInDelayMs);
-            }
+            if (fadeInDelayMs <= 0)
+                SMBXSound::PlayMusic(section, true);
             else
             {
-                /* TODO: Replace this shit with own "playMusic(section)"
-                 * implementation to avoid MCI calls and let SMBX organize
-                 * it's internals correct
-                 */
-                seizeStream(section);
-                playMusic(section);
-                releaseStream(section);
+                if (GM_SEC_MUSIC_TBL[section] != 0)
+                {
+                    SMBXSound::PlayMusic(section, true);
+                    MusicStop();
+                    MusicPlayFadeIn(fadeInDelayMs);
+                }
+                else
+                {
+                    /* TODO: Replace this shit with own "playMusic(section)"
+                     * implementation to avoid MCI calls and let SMBX organize
+                     * it's internals correct
+                     */
+                    seizeStream(section);
+                    SMBXSound::PlayMusic(section, true);
+                    releaseStream(section);
 
-                MusicStopFadeOut(fadeInDelayMs);
+                    MusicStopFadeOut(fadeInDelayMs);
+                }
             }
         }
     }
