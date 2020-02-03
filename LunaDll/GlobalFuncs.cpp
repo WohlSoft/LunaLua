@@ -804,8 +804,8 @@ std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 std::wstring getLatestConfigFile(const std::wstring& configname)
 {
     return getLatestFile({
-        gAppPathWCHAR + L"//" + configname,
-        gAppPathWCHAR + L"//config//" + configname
+        gAppPathWCHAR + L"/" + configname,
+        gAppPathWCHAR + L"/config/" + configname
     });
 }
 
