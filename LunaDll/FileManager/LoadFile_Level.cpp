@@ -1,3 +1,6 @@
+#include <future>
+#include <chrono>
+#include <thread>
 #include "../Defines.h"
 #include "../Main.h"
 #include "../Misc/MiscFuncs.h"
@@ -58,8 +61,6 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     replaceSubStr(customFolderU8, "/", "\\");
     customFolder = Str2WStr(customFolderU8);
 
-    loadConfigPack(outData.meta.path, outData.meta.filename);
-
     *(DWORD*)0xB2B9E4 = 0; // Unknown
     native_cleanupLevel();
     native_setupSFX();
@@ -103,9 +104,26 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     // We should clear textures periodically for video memory reasons. At this
     // point is probably good enough.
     g_GLEngine.ClearTextures();
-    // In the past, we would call native_loadLocalGfx() here, but that is now
-    // being replaced.
-    ImageLoader::Run();
+
+    auto imageLoaderFuture = std::async(std::launch::async, [] {
+        // In the past, we would call native_loadLocalGfx() here, but that is now
+        // being replaced.
+        ImageLoader::Run();
+    });
+
+    auto configPackFuture = std::async(std::launch::async, [&outData] {
+        // Load config pack for extra settings default value purposes
+        loadConfigPack(outData.meta.path, outData.meta.filename);
+    });
+
+    // Wait for both image loading and config pack loading to finish, while also serving native_rtcDoEvents() as to avoid the unresponsive window state
+    {
+        using namespace std::chrono_literals;
+        while ((imageLoaderFuture.wait_for(15ms) != std::future_status::ready) || (configPackFuture.wait_for(15ms) != std::future_status::ready))
+        {
+            native_rtcDoEvents();
+        }
+    }
 
     // Total number of stars in the level
     GM_STAR_COUNT_LEVEL = outData.stars;
