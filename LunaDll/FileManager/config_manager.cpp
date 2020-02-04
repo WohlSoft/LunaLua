@@ -69,19 +69,28 @@ ConfigPackMiniManager::ConfigPackMiniManager() :
 
 void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
 {
-    m_blocks.clear();
-    m_bgo.clear();
-    m_npc.clear();
+    // Note: Don't need to clear m_blocks/m_bgo/m_npc normally because loadStore will now clear out anything old
+    // TODO: Do similar for m_sections_ex and m_level_ex
     m_sections_ex.clear();
     m_level_ex.clear();
 
-    if(config_dir.empty())
+    if (config_dir.empty())
+    {
+        m_blocks.clear();
+        m_bgo.clear();
+        m_npc.clear();
         return;
+    }
 
     DirMan confDir(config_dir);
 
-    if(!confDir.exists())
+    if (!confDir.exists())
+    {
+        m_blocks.clear();
+        m_bgo.clear();
+        m_npc.clear();
         return;
+    }
 
     m_cp_root_path = confDir.absolutePath() + "/";
 
@@ -160,13 +169,25 @@ void ConfigPackMiniManager::loadStore(EntryType type,
         ListResourceFilesFromDir(Str2WStr(dst.extra_settings_root), dst.extra_settings_files);
     }
     
+    // Load global seta settings for this
     ResourceFileInfo global_layout_file = getGlobalExtraSettingsFile(type);
-    if(global_layout_file.done)
-        loadExtraSettings(dst.default_global_extra_settings, WStr2Str(global_layout_file.path));
+    if (global_layout_file != dst.default_global_extra_settings_fileinfo)
+    {
+        dst.default_global_extra_settings_fileinfo = global_layout_file;
+        if (global_layout_file.done)
+        {
+            loadExtraSettings(dst.default_global_extra_settings, WStr2Str(global_layout_file.path));
+        }
+        else
+        {
+            dst.default_global_extra_settings.clear();
+        }
+    }
 
+    dst.data.resize(total);
     for(size_t it = 1; it <= total; it++)
     {
-        std::string fname = fmt::format("{1}-{2}.ini", dst.setup_root, item_head, it);
+        std::string fname = fmt::format("{0}-{1}.ini", item_head, it);
         std::wstring wfname = Str2WStr(fname);
 
         // idx 0=setup, 1=episode, 2=custom
@@ -190,44 +211,65 @@ void ConfigPackMiniManager::loadStore(EntryType type,
             iniFiles[2] = custom_files_it->second;
         }
 
-        ConfigEntry e;
-        e.id = it;
-        e.extra_settings_filename = std::string();
-
-        for(int fileIdx =0; fileIdx < 3; fileIdx++)
+        // If the file information for the ini files has changed, read the ini files
+        ConfigEntry& e = dst.data[it-1];
+        if ((e.id != it) ||
+            (e.ini_fileinfo[0] != iniFiles[0]) ||
+            (e.ini_fileinfo[1] != iniFiles[1]) ||
+            (e.ini_fileinfo[2] != iniFiles[2]))
         {
-            ResourceFileInfo& file = iniFiles[fileIdx];
-            if (!file.done) continue;
-            IniProcessing item_set(WStr2Str(file.path));
+            e.id = it;
+            e.ini_fileinfo[0] = iniFiles[0];
+            e.ini_fileinfo[1] = iniFiles[1];
+            e.ini_fileinfo[2] = iniFiles[2];
+            e.extra_settings_filename = std::string();
 
-            if(!item_set.beginGroup(item_head))
-                item_set.beginGroup("General");
-
-            item_set.read("extra-settings", e.extra_settings_filename, e.extra_settings_filename);
-#ifdef UNIT_TEST
-            if(!e.extra_settings_filename.empty())
+            for (int fileIdx = 0; fileIdx < 3; fileIdx++)
             {
-                printf("-- Extra settins filename %s found in %s\n", e.extra_settings_filename.c_str(), f.c_str());
-                fflush(stdout);
-            }
+                ResourceFileInfo& file = iniFiles[fileIdx];
+                if (!file.done) continue;
+                DebugPrint(">ld> %s\n", WStr2Str(file.path).c_str());
+                IniProcessing item_set(WStr2Str(file.path));
+
+                if (!item_set.beginGroup(item_head))
+                    item_set.beginGroup("General");
+
+                item_set.read("extra-settings", e.extra_settings_filename, e.extra_settings_filename);
+#ifdef UNIT_TEST
+                if (!e.extra_settings_filename.empty())
+                {
+                    printf("-- Extra settins filename %s found in %s\n", e.extra_settings_filename.c_str(), f.c_str());
+                    fflush(stdout);
+                }
 #endif
-            item_set.endGroup();
+                item_set.endGroup();
+            }
         }
 
         if(!e.extra_settings_filename.empty())
         {
             ResourceFileInfo file = findFile(e.extra_settings_filename, dst.extra_settings_files);
-#ifdef UNIT_TEST
-            printf("-- Trying to figure out [%s]\n", path.c_str());
-            fflush(stdout);
-#endif
-            if(file.done)
+            // If the file to load extra settings has changed, load it
+            if (file != e.extra_settings_fileinfo)
             {
-                loadExtraSettings(e.default_extra_settings, WStr2Str(file.path));
+#ifdef UNIT_TEST
+                printf("-- Trying to figure out [%s]\n", path.c_str());
+                fflush(stdout);
+#endif
+                e.extra_settings_fileinfo = file;
+                e.default_extra_settings.clear();
+                if (file.done)
+                {
+                    loadExtraSettings(e.default_extra_settings, WStr2Str(file.path));
+                }
             }
         }
-
-        dst.data.insert({e.id, e});
+        else
+        {
+            // If there is no file, make sure data is cleared
+            e.extra_settings_fileinfo.done = false;
+            e.default_extra_settings.clear();
+        }
     }
 }
 
@@ -251,39 +293,6 @@ void ConfigPackMiniManager::setCustomPath(const std::string &custom_path)
     printf("Custom path: %s\n", m_custom_path.c_str());
     fflush(stdout);
 #endif
-}
-
-ResourceFileInfo ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManager::EntryType type, uint64_t id)
-{
-    switch (type)
-    {
-    case BLOCKS:
-    {
-        auto it = m_blocks.data.find(id);
-        if(it == m_blocks.data.end())
-            return ResourceFileInfo();
-        return findFile(it->second.extra_settings_filename, m_blocks.extra_settings_files);
-    }
-
-    case BGO:
-    {
-        auto it = m_bgo.data.find(id);
-        if(it == m_bgo.data.end())
-            return ResourceFileInfo();
-        return findFile(it->second.extra_settings_filename, m_bgo.extra_settings_files);
-    }
-
-    case NPC:
-    {
-        auto it = m_npc.data.find(id);
-        if(it == m_npc.data.end())
-            return ResourceFileInfo();
-        return findFile(it->second.extra_settings_filename, m_npc.extra_settings_files);
-    }
-
-    default:
-        return ResourceFileInfo();
-    }
 }
 
 ResourceFileInfo ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniManager::EntryType type)
@@ -394,42 +403,6 @@ static std::string mergeJsonSettingsLG(const nlohmann::json &global,
 }
 
 
-std::string ConfigPackMiniManager::mergeLocalExtraSettings(ConfigPackMiniManager::EntryType type,
-                                                           uint64_t id,
-                                                           const std::string &input,
-                                                           bool beautify)
-{
-    switch (type)
-    {
-    case BLOCKS:
-    {
-        auto it = m_blocks.data.find(id);
-        if(it == m_blocks.data.end())
-            return std::string();
-        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
-    }
-
-    case BGO:
-    {
-        auto it = m_bgo.data.find(id);
-        if(it == m_bgo.data.end())
-            return std::string();
-        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
-    }
-
-    case NPC:
-    {
-        auto it = m_npc.data.find(id);
-        if(it == m_npc.data.end())
-            return std::string();
-        return mergeJsonSettings(it->second.default_extra_settings, input, beautify);
-    }
-
-    default:
-        return std::string();
-    }
-}
-
 std::string ConfigPackMiniManager::mergeGlobalExtraSettings(ConfigPackMiniManager::EntryType type,
                                                             const std::string &input,
                                                             bool beautify)
@@ -448,7 +421,7 @@ std::string ConfigPackMiniManager::mergeGlobalExtraSettings(ConfigPackMiniManage
 }
 
 std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::EntryType type,
-                                                      uint64_t id,
+                                                      size_t id,
                                                       const std::string &input,
                                                       bool beautify)
 {
@@ -456,34 +429,38 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
     {
     case BLOCKS:
     {
-        auto it = m_blocks.data.find(id);
-        if(it == m_blocks.data.end())
-            return std::string();
-        return mergeJsonSettingsLG(m_blocks.default_global_extra_settings,
-                                   it->second.default_extra_settings,
-                                   input,
-                                   beautify);
+        if (id <= m_blocks.data.size())
+        {
+            return mergeJsonSettingsLG(m_blocks.default_global_extra_settings,
+                m_blocks.data[id - 1].default_extra_settings,
+                input,
+                beautify);
+        }
+        return std::string(); // Should this be 'input'?
     }
 
     case BGO:
     {
-        auto it = m_bgo.data.find(id);
-        if(it == m_bgo.data.end())
-            return std::string();
-        return mergeJsonSettingsLG(m_bgo.default_global_extra_settings,
-                                   it->second.default_extra_settings,
-                                   input, beautify);
+        if (id <= m_bgo.data.size())
+        {
+            return mergeJsonSettingsLG(m_bgo.default_global_extra_settings,
+                m_bgo.data[id - 1].default_extra_settings,
+                input,
+                beautify);
+        }
+        return std::string(); // Should this be 'input'?
     }
 
     case NPC:
     {
-        auto it = m_npc.data.find(id);
-        if(it == m_npc.data.end())
-            return std::string();
-        return mergeJsonSettingsLG(m_npc.default_global_extra_settings,
-                                   it->second.default_extra_settings,
-                                   input,
-                                   beautify);
+        if (id <= m_npc.data.size())
+        {
+            return mergeJsonSettingsLG(m_npc.default_global_extra_settings,
+                m_npc.data[id - 1].default_extra_settings,
+                input,
+                beautify);
+        }
+        return std::string(); // Should this be 'input'?
     }
 
     case X_SECTIONS:

@@ -29,7 +29,9 @@ public:
 
     struct ConfigEntry
     {
-        uint64_t id;
+        size_t id;
+        ResourceFileInfo ini_fileinfo[3];
+        ResourceFileInfo extra_settings_fileinfo;
         std::string extra_settings_filename;
         nlohmann::json default_extra_settings;
     };
@@ -40,14 +42,16 @@ public:
         ResourceFileMap extra_settings_files;
         std::string extra_settings_root;
         std::string setup_root;
+        ResourceFileInfo default_global_extra_settings_fileinfo;
         nlohmann::json default_global_extra_settings;
-        std::unordered_map<uint64_t, ConfigEntry> data;
+        std::vector<ConfigEntry> data;
         void clear()
         {
             setup_files.clear();
             extra_settings_files.clear();
             extra_settings_root.clear();
             setup_root.clear();
+            default_global_extra_settings_fileinfo.done = false;
             default_global_extra_settings.clear();
             data.clear();
         }
@@ -68,18 +72,13 @@ public:
     void setEpisodePath(const std::string &episode_path);
     void setCustomPath(const std::string &custom_path);
 
-    ResourceFileInfo getLocalExtraSettingsFile(EntryType type, uint64_t id);
     ResourceFileInfo getGlobalExtraSettingsFile(EntryType type);
 
-    std::string mergeLocalExtraSettings(EntryType type,
-                                        uint64_t id,
-                                        const std::string &input,
-                                        bool beautify = false);
     std::string mergeGlobalExtraSettings(EntryType type,
                                          const std::string &input,
                                          bool beautify = false);
     std::string mergeExtraSettings(EntryType type,
-                                   uint64_t id,
+                                   size_t id,
                                    const std::string &input,
                                    bool beautify = false);
 
