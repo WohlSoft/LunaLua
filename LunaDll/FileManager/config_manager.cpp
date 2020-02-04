@@ -228,7 +228,6 @@ void ConfigPackMiniManager::loadStore(EntryType type,
             {
                 ResourceFileInfo& file = iniFiles[fileIdx];
                 if (!file.done) continue;
-                DebugPrint(">ld> %s\n", WStr2Str(file.path).c_str());
                 IniProcessing item_set(WStr2Str(file.path));
 
                 if (!item_set.beginGroup(item_head))
