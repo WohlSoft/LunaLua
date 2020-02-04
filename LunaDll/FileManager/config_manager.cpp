@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <fmt/fmt_format.h>
 #include <SDL2/SDL.h>
+#include "../Misc/ResourceFileMapper.h"
+#include "../GlobalFuncs.h"
 #ifdef UNIT_TEST
 #include <stdio.h>
 #endif
@@ -81,18 +83,27 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
     if(!confDir.exists())
         return;
 
-    if(!Files::fileExists(confDir.absolutePath() + "/main.ini"))
-        return;
-
     m_cp_root_path = confDir.absolutePath() + "/";
 
-    std::string sections_path = getGlobalExtraSettingsFile(X_SECTIONS);
-    if(!sections_path.empty())
-        loadExtraSettings(m_sections_ex, sections_path);
+    // Get config pack files
+    m_cp_files.clear();
+    ListResourceFilesFromDir(Str2WStr(m_cp_root_path), m_cp_files);
 
-    std::string levelfile_path = getGlobalExtraSettingsFile(X_LEVELFILE);
-    if(!levelfile_path.empty())
-        loadExtraSettings(m_level_ex, levelfile_path);
+    // Get episode files
+    m_episode_files.clear();
+    ListResourceFilesFromDir(Str2WStr(m_episode_path), m_episode_files);
+
+    // Get custom files
+    m_custom_files.clear();
+    ListResourceFilesFromDir(Str2WStr(m_custom_path), m_custom_files);
+
+    ResourceFileInfo sections_file = getGlobalExtraSettingsFile(X_SECTIONS);
+    if(sections_file.done)
+        loadExtraSettings(m_sections_ex, WStr2Str(sections_file.path));
+
+    ResourceFileInfo levelfile_file = getGlobalExtraSettingsFile(X_LEVELFILE);
+    if(levelfile_file.done)
+        loadExtraSettings(m_level_ex, WStr2Str(levelfile_file.path));
 
     loadStore(BLOCKS, m_blocks, m_cp_root_path + "lvl_blocks.ini", "blocks-main", "block");
     loadStore(BGO, m_bgo, m_cp_root_path + "lvl_bgo.ini", "background-main", "background");
@@ -133,37 +144,61 @@ void ConfigPackMiniManager::loadStore(EntryType type,
     addSlashToTail(dst.extra_settings_root);
     removeDoubleSlash(dst.extra_settings_root);
 
-    std::string global_layout_path = getGlobalExtraSettingsFile(type);
-    if(!global_layout_path.empty())
-        loadExtraSettings(dst.default_global_extra_settings, global_layout_path);
+    // Get file list for setup_root
+    dst.setup_files.clear();
+    ListResourceFilesFromDir(Str2WStr(dst.setup_root), dst.setup_files);
+
+    // Get file list for extra_settings_root
+    if (dst.setup_root == dst.extra_settings_root)
+    {
+        // If the directory is the same, just copy the map
+        dst.extra_settings_files = dst.setup_files;
+    }
+    else
+    {
+        dst.extra_settings_files.clear();
+        ListResourceFilesFromDir(Str2WStr(dst.extra_settings_root), dst.extra_settings_files);
+    }
+    
+    ResourceFileInfo global_layout_file = getGlobalExtraSettingsFile(type);
+    if(global_layout_file.done)
+        loadExtraSettings(dst.default_global_extra_settings, WStr2Str(global_layout_file.path));
 
     for(size_t it = 1; it <= total; it++)
     {
-        std::vector<std::string> files_to_read;
-        std::string fname;
+        std::string fname = fmt::format("{1}-{2}.ini", dst.setup_root, item_head, it);
+        std::wstring wfname = Str2WStr(fname);
 
-        fname = fmt::format("{0}{1}-{2}.ini", dst.setup_root, item_head, it);
-        removeDoubleSlash(fname);
-        if(Files::fileExists(fname))
-            files_to_read.push_back(fname);
+        // idx 0=setup, 1=episode, 2=custom
+        ResourceFileInfo iniFiles[3];
 
-        fname = fmt::format("{0}{1}-{2}.ini", m_episode_path, item_head, it);
-        removeDoubleSlash(fname);
-        if(Files::fileExists(fname))
-            files_to_read.push_back(fname);
+        auto& setup_files_it = dst.setup_files.find(wfname);
+        if (setup_files_it != dst.setup_files.end())
+        {
+            iniFiles[0] = setup_files_it->second;
+        }
 
-        fname = fmt::format("{0}{1}-{2}.ini", m_custom_path, item_head, it);
-        removeDoubleSlash(fname);
-        if(Files::fileExists(fname))
-            files_to_read.push_back(fname);
+        auto& episode_files_it = m_episode_files.find(wfname);
+        if (episode_files_it != m_episode_files.end())
+        {
+            iniFiles[1] = episode_files_it->second;
+        }
+
+        auto& custom_files_it = m_custom_files.find(wfname);
+        if (custom_files_it != m_custom_files.end())
+        {
+            iniFiles[2] = custom_files_it->second;
+        }
 
         ConfigEntry e;
         e.id = it;
         e.extra_settings_filename = std::string();
 
-        for(const std::string &f : files_to_read)
+        for(int fileIdx =0; fileIdx < 3; fileIdx++)
         {
-            IniProcessing item_set(f);
+            ResourceFileInfo& file = iniFiles[fileIdx];
+            if (!file.done) continue;
+            IniProcessing item_set(WStr2Str(file.path));
 
             if(!item_set.beginGroup(item_head))
                 item_set.beginGroup("General");
@@ -181,14 +216,14 @@ void ConfigPackMiniManager::loadStore(EntryType type,
 
         if(!e.extra_settings_filename.empty())
         {
-            std::string path = findFile(e.extra_settings_filename, dst.extra_settings_root);
+            ResourceFileInfo file = findFile(e.extra_settings_filename, dst.extra_settings_files);
 #ifdef UNIT_TEST
             printf("-- Trying to figure out [%s]\n", path.c_str());
             fflush(stdout);
 #endif
-            if(!path.empty())
+            if(file.done)
             {
-                loadExtraSettings(e.default_extra_settings, path);
+                loadExtraSettings(e.default_extra_settings, WStr2Str(file.path));
             }
         }
 
@@ -218,7 +253,7 @@ void ConfigPackMiniManager::setCustomPath(const std::string &custom_path)
 #endif
 }
 
-std::string ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManager::EntryType type, uint64_t id)
+ResourceFileInfo ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManager::EntryType type, uint64_t id)
 {
     switch (type)
     {
@@ -226,77 +261,62 @@ std::string ConfigPackMiniManager::getLocalExtraSettingsFile(ConfigPackMiniManag
     {
         auto it = m_blocks.data.find(id);
         if(it == m_blocks.data.end())
-            return std::string();
-        return findFile(it->second.extra_settings_filename, m_blocks.extra_settings_root);
+            return ResourceFileInfo();
+        return findFile(it->second.extra_settings_filename, m_blocks.extra_settings_files);
     }
 
     case BGO:
     {
         auto it = m_bgo.data.find(id);
         if(it == m_bgo.data.end())
-            return std::string();
-        return findFile(it->second.extra_settings_filename, m_bgo.extra_settings_root);
+            return ResourceFileInfo();
+        return findFile(it->second.extra_settings_filename, m_bgo.extra_settings_files);
     }
 
     case NPC:
     {
         auto it = m_npc.data.find(id);
         if(it == m_npc.data.end())
-            return std::string();
-        return findFile(it->second.extra_settings_filename, m_npc.extra_settings_root);
+            return ResourceFileInfo();
+        return findFile(it->second.extra_settings_filename, m_npc.extra_settings_files);
     }
 
     default:
-        return std::string();
+        return ResourceFileInfo();
     }
 }
 
-std::string ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniManager::EntryType type)
+ResourceFileInfo ConfigPackMiniManager::getGlobalExtraSettingsFile(ConfigPackMiniManager::EntryType type)
 {
     switch (type)
     {
     case BLOCKS:
     {
-        std::string f = findFile("global_block.json", m_cp_root_path);
-        if (Files::fileExists(f))
-            return f;
-        return std::string();
+        return findFile("global_block.json", m_cp_files);
     }
 
     case BGO:
     {
-        std::string f = findFile("global_bgo.json", m_cp_root_path);
-        if (Files::fileExists(f))
-            return f;
-        return std::string();
+        return findFile("global_bgo.json", m_cp_files);
     }
 
     case NPC:
     {
-        std::string f = findFile("global_npc.json", m_cp_root_path);
-        if (Files::fileExists(f))
-            return f;
-        return std::string();
+        return findFile("global_npc.json", m_cp_files);
     }
 
     case X_SECTIONS:
     {
-        std::string f = findFile("lvl_section.json", m_cp_root_path);
-        if (Files::fileExists(f))
-            return f;
-        return std::string();
+        return findFile("lvl_section.json", m_cp_files);
     }
 
     case X_LEVELFILE:
     {
-        std::string f = findFile("lvl_settings.json", m_cp_root_path);
-        if (Files::fileExists(f))
-            return f;
-        return std::string();
+        return findFile("lvl_settings.json", m_cp_files);
     }
 
     default:
-        return std::string();
+        return ResourceFileInfo();
     }
 }
 
@@ -481,18 +501,23 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
     }
 }
 
-std::string ConfigPackMiniManager::findFile(const std::string &fileName, const std::string &root)
+ResourceFileInfo ConfigPackMiniManager::findFile(const std::string &filename, const ResourceFileMap &root_files)
 {
-    if(Files::fileExists(m_custom_path + fileName))
-        return m_custom_path + fileName;
+    std::wstring wFilename = Str2WStr(filename);
 
-    if(Files::fileExists(m_episode_path + fileName))
-        return m_episode_path + fileName;
+    auto& custom_it = m_custom_files.find(wFilename);
+    if (custom_it != m_custom_files.end())
+        return custom_it->second;
 
-    if(Files::fileExists(root + fileName))
-        return root + fileName;
+    auto& episode_it = m_episode_files.find(wFilename);
+    if (episode_it != m_episode_files.end())
+        return episode_it->second;
 
-    return std::string();
+    auto& cp_it = root_files.find(wFilename);
+    if (cp_it != root_files.end())
+        return cp_it->second;
+
+    return ResourceFileInfo();
 }
 
 

@@ -57,7 +57,7 @@ ResourceFileInfo GetResourceFileInfo(const std::wstring& filePath, const std::ws
     return entry;
 }
 
-void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map<std::wstring, ResourceFileInfo>& outData)
+void ListResourceFilesFromDir(const std::wstring& searchPath, ResourceFileMap& outData)
 {
     std::wstring searchPattern = searchPath + L"/*";
 
@@ -81,12 +81,6 @@ void ListResourceFilesFromDir(const std::wstring& searchPath, std::unordered_map
             continue;
         }
         std::wstring fileExt = fileName.substr(sepIdx + 1);
-
-        // Limit file types handled (for now?)
-        if ((fileExt != L"gif") && (fileExt != L"png"))
-        {
-            continue;
-        }
         
         ResourceFileInfo entry;
         entry.done = true;

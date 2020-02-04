@@ -7,6 +7,7 @@
 #include <set>
 #include <unordered_map>
 #include <json/json.hpp>
+#include "../Misc/ResourceFileMapper.h"
 
 extern std::string g_ApplicationPath;
 
@@ -35,12 +36,16 @@ public:
 
     struct ConfigStore
     {
+        ResourceFileMap setup_files;
+        ResourceFileMap extra_settings_files;
         std::string extra_settings_root;
         std::string setup_root;
         nlohmann::json default_global_extra_settings;
         std::unordered_map<uint64_t, ConfigEntry> data;
         void clear()
         {
+            setup_files.clear();
+            extra_settings_files.clear();
             extra_settings_root.clear();
             setup_root.clear();
             default_global_extra_settings.clear();
@@ -63,8 +68,8 @@ public:
     void setEpisodePath(const std::string &episode_path);
     void setCustomPath(const std::string &custom_path);
 
-    std::string getLocalExtraSettingsFile(EntryType type, uint64_t id);
-    std::string getGlobalExtraSettingsFile(EntryType type);
+    ResourceFileInfo getLocalExtraSettingsFile(EntryType type, uint64_t id);
+    ResourceFileInfo getGlobalExtraSettingsFile(EntryType type);
 
     std::string mergeLocalExtraSettings(EntryType type,
                                         uint64_t id,
@@ -78,11 +83,15 @@ public:
                                    const std::string &input,
                                    bool beautify = false);
 
-    std::string findFile(const std::string &fileName, const std::string &root);
+    ResourceFileInfo findFile(const std::string &filename, const ResourceFileMap &root_files);
 
     void loadExtraSettings(nlohmann::json &dst, const std::string &path);
 
 private:
+    ResourceFileMap         m_cp_files;
+    ResourceFileMap         m_episode_files;
+    ResourceFileMap         m_custom_files;
+
     ConfigStore             m_blocks;
     ConfigStore             m_bgo;
     ConfigStore             m_npc;
