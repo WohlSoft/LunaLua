@@ -247,7 +247,17 @@ void ConfigPackMiniManager::loadStore(EntryType type,
 
         if(!e.extra_settings_filename.empty())
         {
-            ResourceFileInfo file = findFile(e.extra_settings_filename, dst.extra_settings_files);
+            ResourceFileInfo file;
+            if (e.extra_settings_filename.find_first_of("/\\") != std::string::npos)
+            {
+                // If the filename for the JSON contains a slash, we can't rely on our pre-obtained directory listings
+                file = findFileInSubfolder(e.extra_settings_filename, dst.extra_settings_root);
+            }
+            else
+            {
+                // Otherwise, we can use our directory listing data
+                file = findFile(e.extra_settings_filename, dst.extra_settings_files);
+            }
             // If the file to load extra settings has changed, load it
             if (file != e.extra_settings_fileinfo)
             {
@@ -496,6 +506,21 @@ ResourceFileInfo ConfigPackMiniManager::findFile(const std::string &filename, co
     return ResourceFileInfo();
 }
 
+ResourceFileInfo ConfigPackMiniManager::findFileInSubfolder(const std::string &filename, const std::string &root_path)
+{
+    ResourceFileInfo info;
+
+    info = GetResourceFileInfo(Str2WStr(m_custom_path + filename));
+    if (info.done)
+        return info;
+
+    info = GetResourceFileInfo(Str2WStr(m_episode_path + filename));
+    if (info.done)
+        return info;
+
+    info = GetResourceFileInfo(Str2WStr(root_path + filename));
+    return info;
+}
 
 static void append_type_entry(nlohmann::json &typetree,
                               nlohmann::json path,

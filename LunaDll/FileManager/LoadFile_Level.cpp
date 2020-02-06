@@ -355,7 +355,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
         }
 
-        nextDataLevelNPC.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, nextDataLevelNPC.id, nextDataLevelNPC.meta.custom_params);
+        nextDataLevelNPC.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, (size_t)nextDataLevelNPC.id, nextDataLevelNPC.meta.custom_params);
         // Store custom params
         g_NpcCustomParams.setData(i, nextDataLevelNPC.meta.custom_params);
     }

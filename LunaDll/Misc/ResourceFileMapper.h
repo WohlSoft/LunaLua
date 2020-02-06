@@ -25,6 +25,7 @@ static inline bool operator==(const ResourceFileInfo& lhs, const ResourceFileInf
     return (
         (lhs.size == rhs.size) &&
         (lhs.timestamp == rhs.timestamp) &&
+        (lhs.done == rhs.done) &&
         (lhs.path == rhs.path)
     );
 }

@@ -83,6 +83,7 @@ public:
                                    bool beautify = false);
 
     ResourceFileInfo findFile(const std::string &filename, const ResourceFileMap &root_files);
+    ResourceFileInfo findFileInSubfolder(const std::string &filename, const std::string &root_path);
 
     void loadExtraSettings(nlohmann::json &dst, const std::string &path);
 
