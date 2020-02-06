@@ -64,21 +64,33 @@ static std::string dump_file(const std::string &path)
 }
 
 ConfigPackMiniManager::ConfigPackMiniManager() :
-    m_is_using(false)
+    m_cp_files(),
+    m_episode_files(),
+    m_custom_files(),
+    m_blocks(),
+    m_bgo(),
+    m_npc(),
+    m_sections_ex_fileinfo(),
+    m_level_ex_fileinfo(),
+    m_sections_ex(),
+    m_level_ex(),
+    m_is_using(false),
+    m_cp_root_path(),
+    m_episode_path(),
+    m_custom_path()
 {}
 
 void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
 {
-    // Note: Don't need to clear m_blocks/m_bgo/m_npc normally because loadStore will now clear out anything old
-    // TODO: Do similar for m_sections_ex and m_level_ex
-    m_sections_ex.clear();
-    m_level_ex.clear();
+    // Note: Don't need to clear m_blocks/m_bgo/m_npc/m_sections_ex/m_level_ex normally because loadStore will now clear out anything old
 
     if (config_dir.empty())
     {
         m_blocks.clear();
         m_bgo.clear();
         m_npc.clear();
+        m_sections_ex.clear();
+        m_level_ex.clear();
         return;
     }
 
@@ -89,6 +101,8 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
         m_blocks.clear();
         m_bgo.clear();
         m_npc.clear();
+        m_sections_ex.clear();
+        m_level_ex.clear();
         return;
     }
 
@@ -107,12 +121,34 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
     ListResourceFilesFromDir(Str2WStr(m_custom_path), m_custom_files);
 
     ResourceFileInfo sections_file = getGlobalExtraSettingsFile(X_SECTIONS);
-    if(sections_file.done)
-        loadExtraSettings(m_sections_ex, WStr2Str(sections_file.path));
+    if (sections_file != m_sections_ex_fileinfo)
+    {
+        if (sections_file.done)
+        {
+            m_sections_ex_fileinfo = sections_file;
+            loadExtraSettings(m_sections_ex, WStr2Str(sections_file.path));
+        }
+        else
+        {
+            m_sections_ex_fileinfo = ResourceFileInfo();
+            m_sections_ex.clear();
+        }
+    }
 
     ResourceFileInfo levelfile_file = getGlobalExtraSettingsFile(X_LEVELFILE);
-    if(levelfile_file.done)
-        loadExtraSettings(m_level_ex, WStr2Str(levelfile_file.path));
+    if (levelfile_file != m_level_ex_fileinfo)
+    {
+        if (levelfile_file.done)
+        {
+            m_level_ex_fileinfo = levelfile_file;
+            loadExtraSettings(m_level_ex, WStr2Str(levelfile_file.path));
+        }
+        else
+        {
+            m_level_ex_fileinfo = ResourceFileInfo();
+            m_level_ex.clear();
+        }
+    }
 
     loadStore(BLOCKS, m_blocks, m_cp_root_path + "lvl_blocks.ini", "blocks-main", "block");
     loadStore(BGO, m_bgo, m_cp_root_path + "lvl_bgo.ini", "background-main", "background");
@@ -276,7 +312,7 @@ void ConfigPackMiniManager::loadStore(EntryType type,
         else
         {
             // If there is no file, make sure data is cleared
-            e.extra_settings_fileinfo.done = false;
+            e.extra_settings_fileinfo = ResourceFileInfo();
             e.default_extra_settings.clear();
         }
     }

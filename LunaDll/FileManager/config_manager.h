@@ -96,6 +96,9 @@ private:
     ConfigStore             m_bgo;
     ConfigStore             m_npc;
 
+    ResourceFileInfo        m_sections_ex_fileinfo;
+    ResourceFileInfo        m_level_ex_fileinfo;
+
     nlohmann::json          m_sections_ex;
     nlohmann::json          m_level_ex;
 
