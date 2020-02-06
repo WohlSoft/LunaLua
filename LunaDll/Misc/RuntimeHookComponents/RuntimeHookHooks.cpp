@@ -2663,3 +2663,30 @@ void __declspec(naked) __stdcall runtimeHookNpcGenerated(short* npcIdx)
         JMP runtimeHookNpcGenerated_Main  // JMP to CameraUpdateHook
     };
 }
+
+static unsigned int __stdcall runtimeHookStaticDirection(unsigned int npcId)
+{
+    if (NPC::GetStaticDirection(npcId))
+    {
+        return 0xA0F18C; // Skip setting direction
+    }
+    return 0xA0F150; // Allow setting direction
+}
+
+_declspec(naked) void __stdcall runtimeHookStaticDirectionWrapper(void)
+{
+    __asm {
+        push ecx
+        push edx
+
+        movzx eax, ax
+        push eax // eax = NPC ID 
+        call runtimeHookStaticDirection
+
+        pop edx
+        pop ecx
+
+        push eax
+        ret
+    }
+}

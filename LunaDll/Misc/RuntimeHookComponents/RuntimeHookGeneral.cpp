@@ -893,6 +893,9 @@ void TrySkipPatch()
     // Hook for npc generation
     PATCH(0xA07D2E).CALL(runtimeHookNpcGenerated).Apply();
 
+    // Hook for npc 'staticdirection' config field
+    PATCH(0xA0F0D6).JMP(runtimeHookStaticDirectionWrapper).NOP_PAD_TO_SIZE<122>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

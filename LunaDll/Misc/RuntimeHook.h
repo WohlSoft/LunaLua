@@ -427,5 +427,7 @@ void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, s
 
 void __stdcall runtimeHookNpcGenerated(short* npcIdx);
 
+void __stdcall runtimeHookStaticDirectionWrapper(void);
+
 #endif
 

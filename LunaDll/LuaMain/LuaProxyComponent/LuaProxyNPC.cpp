@@ -238,7 +238,10 @@ void LuaProxy::NPC::setDirection(float direction, lua_State* L)
         return;
 
     NPCMOB* npc =  ::NPC::Get(m_index);
-    setSpeedX(0.0, L);
+    if (!::NPC::GetStaticDirection(npc->id))
+    {
+        setSpeedX(0.0, L);
+    }
     npc->directionFaced = direction;
 }
 

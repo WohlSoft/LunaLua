@@ -508,6 +508,7 @@ namespace NPC {
     bool GetLinkShieldable(int id);
     bool GetNoShieldFireEffect(int id);
     bool GetNotCoinTransformable(int id);
+    bool GetStaticDirection(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 

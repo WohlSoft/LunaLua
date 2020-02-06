@@ -135,6 +135,7 @@ static int16_t npcprop_ignorethrownnpcs[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_linkshieldable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
 static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
@@ -338,6 +339,26 @@ void NPC::InitProperties() {
     npcprop_notcointransformable[223] = -1;
     npcprop_notcointransformable[224] = -1;
 
+    // Default staticdirection NPCs
+    npcprop_staticdirection[22] = -1;
+    npcprop_staticdirection[39] = -1;
+    npcprop_staticdirection[46] = -1;
+    npcprop_staticdirection[49] = -1;
+    npcprop_staticdirection[50] = -1;
+    npcprop_staticdirection[56] = -1;
+    npcprop_staticdirection[57] = -1;
+    npcprop_staticdirection[60] = -1;
+    npcprop_staticdirection[62] = -1;
+    npcprop_staticdirection[64] = -1;
+    npcprop_staticdirection[66] = -1;
+    npcprop_staticdirection[84] = -1;
+    npcprop_staticdirection[85] = -1;
+    npcprop_staticdirection[104] = -1;
+    npcprop_staticdirection[105] = -1;
+    npcprop_staticdirection[106] = -1;
+    npcprop_staticdirection[181] = -1;
+    npcprop_staticdirection[212] = -1;
+
     npc_semisolidCollidingFlyTypeMap.clear();
     npc_semisolidCollidingFlyTypeMap[1] = true;
 }
@@ -388,6 +409,11 @@ bool NPC::GetNotCoinTransformable(int id) {
     return (npcprop_notcointransformable[id] != 0);
 }
 
+bool NPC::GetStaticDirection(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_staticdirection[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -426,6 +452,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "notcointransformable")
     {
         return reinterpret_cast<uintptr_t>(npcprop_notcointransformable);
+    }
+    else if (s == "staticdirection")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_staticdirection);
     }
     else
     {
