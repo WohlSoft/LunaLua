@@ -25,6 +25,7 @@
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Blocks.h"
 #include "../../SMBXInternal/Level.h"
+#include "../../SMBXInternal/Sound.h"
 
 #include "../PerfTracker.h"
 
@@ -2687,6 +2688,32 @@ _declspec(naked) void __stdcall runtimeHookStaticDirectionWrapper(void)
         pop ecx
 
         push eax
+        ret
+    }
+}
+
+static void __stdcall runtimeHookStoreCustomMusicPath(unsigned int section)
+{
+    SMBXSound::StoreActiveCustomMusicPath(section);
+}
+
+_declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
+{
+    // JMP from 00A61EDA
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push ebx
+        call runtimeHookStoreCustomMusicPath
+
+        pop edx
+        pop ecx
+        pop eax
+
+        mov dword ptr ss : [ebp - 0xE8], eax
+        push 0xA61EE0
         ret
     }
 }

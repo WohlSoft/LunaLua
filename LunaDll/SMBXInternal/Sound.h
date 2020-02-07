@@ -9,5 +9,7 @@ namespace SMBXSound {
     void SetMusic(int musicnum, int section);
     void SetMusicPath(int section, std::wstring path);
     void PlayMusic(short section, bool forceRestart);
+    void StoreActiveCustomMusicPath(unsigned int section);
+    std::wstring GetActiveCustomMusicPath();
 }
 #endif

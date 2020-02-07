@@ -429,5 +429,7 @@ void __stdcall runtimeHookNpcGenerated(short* npcIdx);
 
 void __stdcall runtimeHookStaticDirectionWrapper(void);
 
+void __stdcall runtimeHookStoreCustomMusicPathWrapper(void);
+
 #endif
 

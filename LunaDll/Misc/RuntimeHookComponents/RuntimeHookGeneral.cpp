@@ -896,6 +896,9 @@ void TrySkipPatch()
     // Hook for npc 'staticdirection' config field
     PATCH(0xA0F0D6).JMP(runtimeHookStaticDirectionWrapper).NOP_PAD_TO_SIZE<122>().Apply();
 
+    // Hook to make sure we catch which custom music path is active
+    PATCH(0xA61EDA).JMP(runtimeHookStoreCustomMusicPathWrapper).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

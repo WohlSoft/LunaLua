@@ -39,7 +39,7 @@ void SMBXSound::PlayMusic(short section, bool forceRestart) {
     // If it's both custom music, check if the path has changed
     if (!isMusicDifferent && (oldMusic == 24) && (newMusic == 24))
     {
-        isMusicDifferent = GM_MUSIC_PATHS_PTR[section] != GM_MUSIC_PATHS_PTR[::Player::Get(GM_MUSIC_RESTORE_PL > 0 ? GM_MUSIC_RESTORE_PL : 1)->CurrentSection];
+        isMusicDifferent = (std::wstring)GM_MUSIC_PATHS_PTR[section] != GetActiveCustomMusicPath();
     }
     
     // If the music is different, change music
@@ -47,4 +47,16 @@ void SMBXSound::PlayMusic(short section, bool forceRestart) {
     {
         native_playMusic(&section);
     }
+}
+
+static std::wstring g_LastActiveCustomMusicPath = L"";
+
+void SMBXSound::StoreActiveCustomMusicPath(unsigned int section)
+{
+    g_LastActiveCustomMusicPath = GM_MUSIC_PATHS_PTR[section];
+}
+
+std::wstring SMBXSound::GetActiveCustomMusicPath()
+{
+    return g_LastActiveCustomMusicPath;
 }
