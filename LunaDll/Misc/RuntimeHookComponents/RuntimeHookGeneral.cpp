@@ -899,6 +899,8 @@ void TrySkipPatch()
     // Hook to make sure we catch which custom music path is active
     PATCH(0xA61EDA).JMP(runtimeHookStoreCustomMusicPathWrapper).NOP_PAD_TO_SIZE<6>().Apply();
 
+    PATCH(0x8E6F70).JMP(runtimeHookCheckWindowFocus).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

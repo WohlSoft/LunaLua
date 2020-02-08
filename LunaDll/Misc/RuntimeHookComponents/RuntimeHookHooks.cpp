@@ -2717,3 +2717,22 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
         ret
     }
 }
+
+void __stdcall runtimeHookCheckWindowFocus()
+{
+    if (!gMainWindowFocused)
+    {
+        // Pause music if it was playing
+        PGE_MusPlayer::MUS_StartDeferring();
+
+        // Wait for focus
+        while (!gMainWindowFocused)
+        {
+            WaitMessage();
+            LunaDllWaitFrame(false);
+        }
+
+        // Start music again
+        PGE_MusPlayer::MUS_StopDeferring();
+    }
+}

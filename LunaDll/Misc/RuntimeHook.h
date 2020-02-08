@@ -431,5 +431,7 @@ void __stdcall runtimeHookStaticDirectionWrapper(void);
 
 void __stdcall runtimeHookStoreCustomMusicPathWrapper(void);
 
+void __stdcall runtimeHookCheckWindowFocus(void);
+
 #endif
 
