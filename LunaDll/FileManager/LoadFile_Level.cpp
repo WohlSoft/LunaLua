@@ -435,7 +435,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextWater->momentum.y = static_cast<double>(nextLevelPhysEnv.y);
         nextWater->momentum.width = static_cast<double>(nextLevelPhysEnv.w);
         nextWater->momentum.height = static_cast<double>(nextLevelPhysEnv.h);
-        nextWater->unknown_08 = static_cast<float>(nextLevelPhysEnv.unknown);
+        nextWater->buoy = nextLevelPhysEnv.buoy;
         nextWater->isQuicksand = COMBOOL(nextLevelPhysEnv.env_type);
         nextWater->ptLayerName = nextLevelPhysEnv.layer;
     }

@@ -8,13 +8,13 @@
 
 #pragma pack(push, 4)
 struct SMBX_Water : SMBX_FullBaseItemArray<SMBX_Water, -1, GM_WATER_AREA_COUNT_CONSTPTR, GM_WATER_AREAS_PTR_CONSTPTR, 1> // Length should be 0x40
-{ 
+{
     VB6StrPtr ptLayerName;          // +0x00
-    short isHidden;                 // +0x04
-    short unknown_06;               // +0x06
-    float unknown_08;               // +0x08
-    short isQuicksand;              // +0x0C
-    short unknown_0E;               // +0x0E
+    short isHidden;                 // +0x04 // boolean
+    short unknown_06;               // +0x06 // Padding, not a value
+    float buoy;                     // +0x08 // REALLY unused field, called as "buoy". Name gotten from original SMBX's source code
+    short isQuicksand;              // +0x0C // boolean
+    short unknown_0E;               // +0x0E // Padding, not a value
     Momentum momentum;              // +0x10
 };
 #pragma pack(pop)
