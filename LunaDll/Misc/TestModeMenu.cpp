@@ -85,10 +85,11 @@ void testModePauseMenu(bool allowContinue)
                 WaitMessage();
                 LunaDllWaitFrame(false);
             }
-            if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
 
             // Start music again
             PGE_MusPlayer::MUS_StopDeferring();
+
+            if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
         }
 
         // Read input...

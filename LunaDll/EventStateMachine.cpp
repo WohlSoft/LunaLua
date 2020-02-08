@@ -239,10 +239,11 @@ void EventStateMachine::runPause(void) {
                 WaitMessage();
                 LunaDllWaitFrame(false);
             }
-            if (m_RequestUnpause) break;
 
             // Start music again
             PGE_MusPlayer::MUS_StopDeferring();
+
+            if (m_RequestUnpause) break;
         }
 
         // Read input
