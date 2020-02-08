@@ -43,25 +43,41 @@ IPCPipeServer::~IPCPipeServer()
 }
 
 void IPCPipeServer::AttachStdinStdout() {
+    HANDLE process = GetCurrentProcess();
+
     HANDLE stdOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (stdOutHandle != INVALID_HANDLE_VALUE && stdOutHandle != 0)
+    if (stdOutHandle != INVALID_HANDLE_VALUE)
     {
-        int fileDescriptor = _open_osfhandle((intptr_t)stdOutHandle, 0);
-        if (fileDescriptor != -1)
+        HANDLE dupOutHandle = INVALID_HANDLE_VALUE;
+        if (DuplicateHandle(process, stdOutHandle, process, &dupOutHandle, 0, FALSE, DUPLICATE_SAME_ACCESS))
         {
-            SetStdHandle(STD_OUTPUT_HANDLE, 0);
-            mOutFD = fileDescriptor;
+            CloseHandle(stdOutHandle);
+            SetStdHandle(STD_OUTPUT_HANDLE, INVALID_HANDLE_VALUE);
+            freopen("NUL", "w", stdout);
+
+            int fileDescriptor = _open_osfhandle((intptr_t)dupOutHandle, 0);
+            if (fileDescriptor != -1)
+            {
+                mOutFD = fileDescriptor;
+            }
         }
     }
 
     HANDLE stdInHandle = GetStdHandle(STD_INPUT_HANDLE);
-    if (stdInHandle != INVALID_HANDLE_VALUE && stdInHandle != 0)
+    if (stdInHandle != INVALID_HANDLE_VALUE)
     {
-        int fileDescriptor = _open_osfhandle((intptr_t)stdInHandle, 0);
-        if (fileDescriptor != -1)
+        HANDLE dupInHandle = INVALID_HANDLE_VALUE;
+        if (DuplicateHandle(process, stdInHandle, process, &dupInHandle, 0, FALSE, DUPLICATE_SAME_ACCESS))
         {
-            SetStdHandle(STD_INPUT_HANDLE, 0);
-            mInFD = fileDescriptor;
+            CloseHandle(stdInHandle);
+            SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE);
+            freopen("NUL", "w", stdin);
+
+            int fileDescriptor = _open_osfhandle((intptr_t)dupInHandle, 0);
+            if (fileDescriptor != -1)
+            {
+                mInFD = fileDescriptor;
+            }
         }
     }
 

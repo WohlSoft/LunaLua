@@ -815,10 +815,13 @@ void InitDebugConsole()
 
     // allocate a console for this app
     AllocConsole();
-    conout = fopen("CONOUT$", "w");
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONIN$", "r", stdin);
+    freopen("CONOUT$", "w", stderr);
+    conout = stdout;
 
     // set the screen buffer to be big enough to let us scroll text
-    SetConsoleTitleA("LunaLua Debug Output Console");
+    SetConsoleTitleA("LunaLua Debug Console");
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &coninfo);
     coninfo.dwSize.Y = 500;
     SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coninfo.dwSize);
