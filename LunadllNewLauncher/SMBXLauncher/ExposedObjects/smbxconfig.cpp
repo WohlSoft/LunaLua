@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <regex>
 #include <QFileDialog>
+#include <QDesktopServices>
 
 
 //#define dbg(text) QMessageBox::information(NULL, "Dbg", text);
@@ -369,6 +370,13 @@ void SMBXConfig::openLevelDialog()
         if (open.selectedFiles().length() > 0) {
             emit runSMBXLevelExecuted(open.selectedFiles().first());
         }
+    }
+}
+
+void SMBXConfig::openUpdateWindow()
+{
+    if(m_hasUpdate) {
+        QDesktopServices::openUrl(m_updateLink);
     }
 }
 

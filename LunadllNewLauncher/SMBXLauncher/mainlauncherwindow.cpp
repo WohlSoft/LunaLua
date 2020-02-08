@@ -369,30 +369,42 @@ void MainLauncherWindow::checkForUpdates()
     }
 
     qDebug() << "Checking launcher updates...";
+    m_smbxConfig->m_hasUpdate = false;
     try {
         try {
             ExtendedQJsonReader reader(m_launcherSettings->checkForUpdate());
 
-            int verNum[4];
+            int verNum[7];
             reader.extractSafe("current-version",
                 std::make_pair("version-1", &verNum[0]),
                 std::make_pair("version-2", &verNum[1]),
                 std::make_pair("version-3", &verNum[2]),
-                std::make_pair("version-4", &verNum[3])
+                std::make_pair("version-4", &verNum[3]),
+                std::make_pair("version-5", &verNum[4]),
+                std::make_pair("version-6", &verNum[5]),
+                std::make_pair("version-7", &verNum[6])
             );
-            int higher = m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3]);
+            int higher = m_launcherSettings->hasHigherVersion(verNum[0], verNum[1], verNum[2], verNum[3], verNum[4], verNum[5], verNum[6]);
             if(higher > 0){
                 qDebug() << "Higher version, notify user...";
                 QString updateMessage;
                 QUrl updateUrlObj;
+                QString updateVersion;
 
                 reader.extractSafe("",
                     std::make_pair("update-message-" + QString::number(higher), &updateMessage),
+                    std::make_pair("update-version-name", &updateVersion),
                     std::make_pair("update-url-page", &updateUrlObj)
                 );
 
-                QMessageBox::information(this, "New Update!", updateMessage);
-                QDesktopServices::openUrl(updateUrlObj);
+                m_smbxConfig->m_hasUpdate = true;
+                m_smbxConfig->m_updateMessage = updateMessage;
+                m_smbxConfig->m_updateLink = updateUrlObj;
+                m_smbxConfig->m_updateVersion = updateVersion;
+                m_smbxConfig->m_updateType = higher;
+                //This message box is incredibly obnoxious, so let's use something neater instead...
+                //QMessageBox::information(this, "New Update!", updateMessage);
+                //QDesktopServices::openUrl(updateUrlObj);
             } else {
                 qDebug() << "No new updates, skipping notification...";
             }
@@ -433,6 +445,8 @@ void MainLauncherWindow::checkForUpdates()
             QDesktopServices::openUrl(urlOfErrorPage);
         }
     }
+
+    emit m_smbxConfig->UpdateVersionUpdated();
 }
 
 

@@ -14,6 +14,10 @@ class SMBXConfig : public QObject
     Q_OBJECT
     Q_PROPERTY(AutostartConfig* Autostart READ Autostart NOTIFY AutostartUpdated)
     Q_PROPERTY(ControlConfig* Controls READ Controls NOTIFY ControlsUpdated)
+    Q_PROPERTY(bool hasUpdate READ HasUpdate NOTIFY UpdateVersionUpdated)
+    Q_PROPERTY(QString updateVersionName READ UpdateVersionName NOTIFY UpdateVersionUpdated)
+    Q_PROPERTY(QString updateMessage READ UpdateMessage NOTIFY UpdateVersionUpdated)
+    Q_PROPERTY(int updateLevel READ UpdateLevel NOTIFY UpdateVersionUpdated)
 public:
     explicit SMBXConfig(QObject *parent = 0);
 
@@ -27,7 +31,33 @@ public:
         return m_Controls.data();
     }
 
+    bool HasUpdate() const
+    {
+        return m_hasUpdate;
+    }
+
+    QString UpdateVersionName() const
+    {
+        return m_updateVersion;
+    }
+
+    QString UpdateMessage() const
+    {
+        return m_updateMessage;
+    }
+
+    int UpdateLevel() const
+    {
+        return m_updateType;
+    }
+
     void pollControls();
+
+    bool m_hasUpdate;
+    int m_updateType;
+    QString m_updateVersion;
+    QString m_updateMessage;
+    QUrl m_updateLink;
 
 private:
     QVariant getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
@@ -40,6 +70,7 @@ public slots:
     QVariantList getSaveInfo(const QString& directoryName);
     void deleteSaveSlot(const QString& directoryName, int slot);
     void openLevelDialog();
+    void openUpdateWindow();
 
     void runSMBX();
     void runSMBXEditor();
@@ -58,6 +89,7 @@ signals:
 
     void AutostartUpdated();
     void ControlsUpdated();
+    void UpdateVersionUpdated();
 
     void ControllerButtonPress(int buttonId, const QString& controllerName);
 
