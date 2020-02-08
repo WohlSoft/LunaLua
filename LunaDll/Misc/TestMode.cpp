@@ -385,7 +385,14 @@ json IPCTestLevel(const json& params)
             {
                 if (!characterIt.value().is_number_integer()) throw IPCInvalidParams();
                 short characterInt = static_cast<short>(characterIt.value());
-                playerSettings.identity = static_cast<Characters>(characterInt);
+                if (characterInt >= 1)
+                {
+                    playerSettings.identity = static_cast<Characters>(characterInt);
+                }
+                else if (playerSettings.identity <= 0)
+                {
+                    playerSettings.identity = static_cast<Characters>(1);
+                }
             }
 
             // Set powerup
@@ -393,7 +400,15 @@ json IPCTestLevel(const json& params)
             if (powerupIt != player.cend())
             {
                 if (!powerupIt.value().is_number_integer()) throw IPCInvalidParams();
-                playerSettings.powerup = static_cast<short>(powerupIt.value());
+                short powerupInt = static_cast<short>(powerupIt.value());
+                if (powerupInt >= 1)
+                {
+                    playerSettings.powerup = powerupInt;
+                }
+                else if (playerSettings.powerup <= 0)
+                {
+                    playerSettings.powerup = 1;
+                }
             }
 
             // Set mountType
@@ -401,7 +416,15 @@ json IPCTestLevel(const json& params)
             if (mountTypeIt != player.cend())
             {
                 if (!mountTypeIt.value().is_number_integer()) throw IPCInvalidParams();
-                playerSettings.mountType = static_cast<short>(mountTypeIt.value());
+                short mountTypeInt = static_cast<short>(mountTypeIt.value());
+                if (mountTypeInt >= 0)
+                {
+                    playerSettings.mountType = mountTypeInt;
+                }
+                else if (playerSettings.mountType < 0)
+                {
+                    playerSettings.mountType = 0;
+                }
             }
 
             // Set mountColor
@@ -409,7 +432,15 @@ json IPCTestLevel(const json& params)
             if (mountColorIt != player.cend())
             {
                 if (!mountColorIt.value().is_number_integer()) throw IPCInvalidParams();
-                playerSettings.mountColor = static_cast<short>(mountColorIt.value());
+                short mountColorInt = static_cast<short>(mountColorIt.value());
+                if (mountColorInt >= 0)
+                {
+                    playerSettings.mountColor = mountColorInt;
+                }
+                else if (playerSettings.mountColor < 0)
+                {
+                    playerSettings.mountColor = 0;
+                }
             }
         }
     }
