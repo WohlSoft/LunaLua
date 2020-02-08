@@ -204,7 +204,7 @@ void ConfigPackMiniManager::loadStore(EntryType type,
         dst.extra_settings_files.clear();
         ListResourceFilesFromDir(Str2WStr(dst.extra_settings_root), dst.extra_settings_files);
     }
-    
+
     // Load global seta settings for this
     ResourceFileInfo global_layout_file = getGlobalExtraSettingsFile(type);
     if (global_layout_file != dst.default_global_extra_settings_fileinfo)
@@ -609,16 +609,15 @@ static void read_layout_branches(nlohmann::json &typetree,
         }
         else if(SDL_strncasecmp(control.c_str(), "spinbox", 8) == 0)
         {
-            if(entry.find("value-default") == entry.end())
-                continue; // invalid entry: missing required key
-
             std::string type = "int";
             if(entry.find("type") == entry.end())
                 type = entry["type"];
 
             if(type == "int")
             {
-                int v = entry["value-default"];
+                int v = 0;
+                if(entry.find("value-default") != entry.end())
+                    v = entry["value-default"];
                 if(entry.find("value-min") != entry.end() &&
                    entry.find("value-max") != entry.end())
                 {
@@ -633,7 +632,9 @@ static void read_layout_branches(nlohmann::json &typetree,
             }
             else if(type == "double")
             {
-                double v = entry["value-default"];
+                double v = 0;
+                if(entry.find("value-default") != entry.end())
+                    v = entry["value-default"];
                 if(entry.find("value-min") != entry.end() &&
                    entry.find("value-max") != entry.end())
                 {
@@ -682,11 +683,41 @@ static void read_layout_branches(nlohmann::json &typetree,
             dst[name] = v;
             append_type_entry(typetree, path_arr, "flags", name);
         }
+        else if(SDL_strncasecmp(control.c_str(), "description", 12) == 0)
+        {
+            continue; // This entry doesn't ships a valie
+        }
         else if(SDL_strncasecmp(control.c_str(), "lineedit", 9) == 0)
         {
-            if(entry.find("value-default") == entry.end())
+            std::string v;
+            if(entry.find("value-default") != entry.end())
+                v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "multilineedit", 14) == 0)
+        {
+            std::string v;
+            if(entry.find("value-default") != entry.end())
+                v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "file", 5) == 0 ||
+                SDL_strncasecmp(control.c_str(), "musicfile", 10) == 0 ||
+                SDL_strncasecmp(control.c_str(), "soundfile", 10) == 0 ||
+                SDL_strncasecmp(control.c_str(), "levelfile", 10) == 0)
+        {
+            std::string v;
+            if(entry.find("value-default") != entry.end())
+                v = entry["value-default"];
+            dst[name] = v;
+        }
+        else if(SDL_strncasecmp(control.c_str(), "itemselect", 11) == 0)
+        {
+            int v = 0;
+            if(entry.find("type") == entry.end())
                 continue; // invalid entry: missing required key
-            std::string v = entry["value-default"];
+            if(entry.find("value-default") != entry.end())
+                v = entry["value-default"];
             dst[name] = v;
         }
         else if(SDL_strncasecmp(control.c_str(), "sizebox", 8) == 0)
