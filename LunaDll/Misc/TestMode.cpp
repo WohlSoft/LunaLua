@@ -26,7 +26,14 @@ using json = nlohmann::json;
 //============ GLOBAL VARIABLES ============//
 //////////////////////////////////////////////
 static std::mutex g_testModeMutex;
+static struct {
+    volatile bool requestFlag;
+    STestModeSettings settings;
+} g_testModeIPCRequest = { false, {} };
 static volatile bool g_testModePendingLoad = false;
+
+static STestModeSettings testModeSettings;
+static STestModeData     testModeData;
 
 ///////////////////////////////////////////////
 //============== UTILITY PATCH ==============//
@@ -54,6 +61,7 @@ void STestModeSettings::ResetToDefault(void)
 {
     enabled = false;
     levelPath = L"";
+    rawData = "";
     playerCount = 1;
     showFPS = false;
     godMode = false;
@@ -67,9 +75,6 @@ void STestModeSettings::ResetToDefault(void)
     players[1].mountColor = 0;
     entranceIndex = 0;
 }
-
-static STestModeSettings testModeSettings;
-static STestModeData     testModeData;
 
 STestModeSettings getTestModeSettings()
 {
@@ -297,7 +302,7 @@ static void __stdcall playerDeathTestModeHook(void)
     testModePauseMenu(false);
 }
 
-bool testModeEnable(const STestModeSettings& settings, const std::string &newLevelData)
+bool testModeEnable(const STestModeSettings& settings)
 {
     // Get the full path if necessary
     std::wstring path = settings.levelPath;
@@ -309,6 +314,8 @@ bool testModeEnable(const STestModeSettings& settings, const std::string &newLev
     {
         fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
     }
+
+    const std::string &newLevelData = settings.rawData;
 
     // Check that the file exists, but only if we don't have raw level data
     if (newLevelData.empty() && (FileExists(fullPath.c_str()) == 0))
@@ -345,22 +352,17 @@ void testModeDisable(void)
 // IPC Command
 json IPCTestLevel(const json& params)
 {
-    std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
-
-    // Skip if already pending
-    if (g_testModePendingLoad || LunaLoadScreenIsActive())
-    {
-        return true;
-    }
-
     if (!params.is_object()) throw IPCInvalidParams();
     json::const_iterator filenameIt = params.find("filename");
     if ((filenameIt == params.cend()) || (!filenameIt.value().is_string())) throw IPCInvalidParams();
 
     // Default to the last settings for characters, if not changed by IPC
     // command
-    STestModeSettings settings = testModeSettings;
-    std::string       rawData;
+    STestModeSettings settings;
+    {
+        std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+        settings = testModeSettings;
+    }
     settings.enabled = true;
     settings.levelPath = Str2WStr(filenameIt.value());
 
@@ -449,7 +451,11 @@ json IPCTestLevel(const json& params)
     if (levelDataIt != params.cend() && !levelDataIt.value().is_null())
     {
         if (!levelDataIt.value().is_string()) throw IPCInvalidParams();
-        rawData = static_cast<const std::string&>(levelDataIt.value());
+        settings.rawData = static_cast<const std::string&>(levelDataIt.value());
+    }
+    else
+    {
+        settings.rawData = "";
     }
 
     // Set godMode flag
@@ -468,38 +474,56 @@ json IPCTestLevel(const json& params)
         settings.showFPS = static_cast<bool>(showFpsFlag.value());
     }
 
-    // Before checking for tick end... bring to top if we need to
-    HWND hWindow = gMainWindowHwnd;
-    if (hWindow)
+    // Copy to pending request
     {
-        ShowWindow(hWindow, SW_SHOW);
-
-        SetWindowPos(hWindow, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
-        SetWindowPos(hWindow, HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
-
-        BringWindowToTop(hWindow);
-        SetForegroundWindow(hWindow);
-        SetFocus(hWindow);
+        std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+        g_testModeIPCRequest.settings = settings;
+        g_testModeIPCRequest.requestFlag = true;
     }
 
+    return true;
+}
+
+void TestModeCheckPendingIPCRequest()
+{
+    // Copy to pending request
+    if (g_testModeIPCRequest.requestFlag)
     {
-        // Make sure we're at a tick end
-        WaitForTickEnd tickEndLock;
+        STestModeSettings settings;
+        {
+            std::lock_guard<std::mutex> testModeLock(g_testModeMutex);
+            if (!g_testModeIPCRequest.requestFlag) return;
+            settings = g_testModeIPCRequest.settings;
+            g_testModeIPCRequest.requestFlag = false;
+        }
 
         // Attempt to enable the test
-        if (!testModeEnable(settings, rawData))
+        if (!testModeEnable(settings))
         {
             std::wstring path = L"SMBX received no level data from the editor. Please try again.";
             MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
             _exit(1);
-            return false;
+            return;
         }
         testModeRestartLevel();
 
         // If we were waiting on IPC, stop waiting
         gStartupSettings.currentlyWaitingForIPC = false;
+
+        // Bring to top if we need to
+        HWND hWindow = gMainWindowHwnd;
+        if (hWindow)
+        {
+            ShowWindow(hWindow, SW_SHOW);
+
+            SetWindowPos(hWindow, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+            SetWindowPos(hWindow, HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
+
+            BringWindowToTop(hWindow);
+            SetForegroundWindow(hWindow);
+            SetFocus(hWindow);
+        }
     }
-    return true;
 }
 
 bool TestModeCheckHideWindow(void)

@@ -802,7 +802,7 @@ bool g_ResetFrameTiming = false;
 
 extern void __stdcall FrameTimingHookQPC()
 {
-    WaitForTickEnd::RunQueued();
+    TestModeCheckPendingIPCRequest();
     g_PerfTracker.endFrame();
     static int64_t lastFrameTime = 0;
     static double frameError = 0.0;
@@ -890,7 +890,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
     if (GM_MAX_FPS_MODE)
     {
-        WaitForTickEnd::RunQueued();
+        TestModeCheckPendingIPCRequest();
         return;
     }
 
@@ -900,7 +900,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
 
 extern void __stdcall FrameTimingHook()
 {
-    WaitForTickEnd::RunQueued();
+    TestModeCheckPendingIPCRequest();
     g_PerfTracker.endFrame();
     static double lastFrameTime = 0.0;
     double nextFrameTime = lastFrameTime;
@@ -968,7 +968,7 @@ extern void __stdcall FrameTimingMaxFPSHook()
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
     if (GM_MAX_FPS_MODE)
     {
-        WaitForTickEnd::RunQueued();
+        TestModeCheckPendingIPCRequest();
         return;
     }
 

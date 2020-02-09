@@ -165,6 +165,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
         {
             STestModeSettings settings;
             settings.levelPath = arg.substr(12);
+            settings.rawData = "";
             if (!testModeEnable(settings))
             {
                 // Invalid level name

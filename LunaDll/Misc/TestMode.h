@@ -31,6 +31,8 @@ struct STestModeSettings
     bool enabled;
     //! Path to actual level file to try open it when raw data wasn't sent
     std::wstring levelPath;
+    //! Raw level data
+    std::string rawData;
     //! Count of players
     int playerCount;
     //! Turn on FPS counter printing
@@ -49,7 +51,7 @@ struct STestModeSettings
     void ResetToDefault(void);
 };
 
-bool testModeEnable(const STestModeSettings& settings, const std::string &newLevelData = std::string());
+bool testModeEnable(const STestModeSettings& settings);
 void testModeDisable(void);
 void testModeRestartLevel(void);
 
@@ -70,5 +72,7 @@ bool TestModeIsLoadPending(void);
 // The following function decleration is not included in this header, to
 // avoid applying a json.hpp dependency to this header.
 //   json IPCTestLevel(const json& params)
+
+void TestModeCheckPendingIPCRequest(void);
 
 #endif
