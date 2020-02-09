@@ -301,7 +301,8 @@ void PGE_MusPlayer::MUS_StartDeferring()
     if (musicGotDeferred)
     {
         musicDeferredFadeIn = -1;
-        MUS_pauseMusic();
+        MUS_pauseMusic(); // This will unset musicGotDeferred, so this this right after
+        musicGotDeferred = true;
     }
     deferringMusic = true;
 }
