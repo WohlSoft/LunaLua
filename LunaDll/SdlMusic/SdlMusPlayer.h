@@ -53,7 +53,7 @@ private:
     static void MUS_StartDeferring();
     static void MUS_StopDeferring();
 public:
-    static class DeferralLock
+    class DeferralLock
     {
     private:
         static unsigned __int64 lockCount;
