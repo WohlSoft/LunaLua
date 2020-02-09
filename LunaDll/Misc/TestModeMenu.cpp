@@ -76,8 +76,8 @@ void testModePauseMenu(bool allowContinue)
         // Handle un-focused state
         if (!gMainWindowFocused)
         {
-            // Pause music if it was playing
-            PGE_MusPlayer::MUS_StartDeferring();
+            // During this block of code, pause music if it was playing
+            PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
             // Wait for focus
             while (!gMainWindowFocused && keepRunningPauseMenu && !GM_EPISODE_MODE)
@@ -85,9 +85,6 @@ void testModePauseMenu(bool allowContinue)
                 WaitMessage();
                 LunaDllWaitFrame(false);
             }
-
-            // Start music again
-            PGE_MusPlayer::MUS_StopDeferring();
 
             if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
         }

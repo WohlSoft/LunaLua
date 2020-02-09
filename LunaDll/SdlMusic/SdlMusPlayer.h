@@ -49,8 +49,22 @@ public:
     static unsigned __int64 sampleCount();
     static unsigned __int64 MUS_sampleCount();
 
+private:
     static void MUS_StartDeferring();
     static void MUS_StopDeferring();
+public:
+    static class DeferralLock
+    {
+    private:
+        static unsigned __int64 lockCount;
+        bool isLocked;
+    public:
+        // Note: Not thread safe, though that applies to all of PGE_MusPlayer really, but making special note anyway
+        DeferralLock(bool startLocked = false);
+        ~DeferralLock();
+        void Lock();
+        void Unlock();
+    };
 private:
     static Mix_Music *play_mus;
     static bool deferringMusic;

@@ -123,11 +123,7 @@ void EventStateMachine::hookLevelRenderFirstCameraStart(void) {
 
 void EventStateMachine::hookLevelRenderEnd(void) {
     if (m_onDrawEndReady) {
-        if (m_MusicDeferred)
-        {
-            m_MusicDeferred = false;
-            PGE_MusPlayer::MUS_StopDeferring();
-        }
+        m_loadTimeMusicDeferral.Unlock();
         sendOnDrawEnd();
     }
 }
@@ -141,19 +137,14 @@ void EventStateMachine::hookWorldRenderStart(void) {
 }
 void EventStateMachine::hookWorldRenderEnd(void) {
     if (m_onDrawEndReady) {
-        if (m_MusicDeferred)
-        {
-            m_MusicDeferred = false;
-            PGE_MusPlayer::MUS_StopDeferring();
-        }
+        m_loadTimeMusicDeferral.Unlock();
         sendOnDrawEnd();
     }
 }
 
 void EventStateMachine::loadTimeDeferMusic(void)
 {
-    PGE_MusPlayer::MUS_StartDeferring();
-    m_MusicDeferred = true;
+    m_loadTimeMusicDeferral.Lock();
 }
 
 // Private methods (Outgoing events)
@@ -230,8 +221,8 @@ void EventStateMachine::runPause(void) {
         // Handle un-focused state
         if (!gMainWindowFocused)
         {
-            // Pause music if it was playing
-            PGE_MusPlayer::MUS_StartDeferring();
+            // During this block of code, pause music if it was playing
+            PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
             // Wait for focus
             while (!gMainWindowFocused && !m_RequestUnpause)
@@ -239,9 +230,6 @@ void EventStateMachine::runPause(void) {
                 WaitMessage();
                 LunaDllWaitFrame(false);
             }
-
-            // Start music again
-            PGE_MusPlayer::MUS_StopDeferring();
 
             if (m_RequestUnpause) break;
         }

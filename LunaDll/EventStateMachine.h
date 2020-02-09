@@ -1,6 +1,8 @@
 #ifndef EventStateMachine_Hhh
 #define EventStateMachine_Hhh
 
+#include "../../SdlMusic/SdlMusPlayer.h"
+
 class EventStateMachine {
 // Member variables
 private:
@@ -12,11 +14,11 @@ private:
     bool m_RequestUnpause;
     bool m_IsPaused;
 
-    bool m_MusicDeferred;
+    PGE_MusPlayer::DeferralLock m_loadTimeMusicDeferral;
 
 // Constructor and Destructor
 public:
-    EventStateMachine() { m_MusicDeferred = false; reset(); }
+    EventStateMachine() : m_loadTimeMusicDeferral() { reset(); }
     ~EventStateMachine() { }
 
 // Public methods (Notifications of State)

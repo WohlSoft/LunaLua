@@ -326,6 +326,43 @@ void PGE_MusPlayer::MUS_StopDeferring()
     }
 }
 
+
+unsigned __int64 PGE_MusPlayer::DeferralLock::lockCount = 0;
+PGE_MusPlayer::DeferralLock::DeferralLock(bool startLocked) :
+    isLocked(false)
+{
+    if (startLocked)
+    {
+        Lock();
+    }
+}
+
+PGE_MusPlayer::DeferralLock::~DeferralLock()
+{
+    Unlock();
+}
+
+void PGE_MusPlayer::DeferralLock::Lock()
+{
+    if (isLocked) return;
+    isLocked = true;
+    if (++lockCount == 1)
+    {
+        MUS_StartDeferring();
+    }
+}
+
+void PGE_MusPlayer::DeferralLock::Unlock()
+{
+    if (!isLocked) return;
+    isLocked = false;
+    if (--lockCount == 0)
+    {
+        MUS_StopDeferring();
+    }
+}
+
+
 /***********************************PGE_Sounds********************************************/
 
 std::string PGE_Sounds::lastError = "";

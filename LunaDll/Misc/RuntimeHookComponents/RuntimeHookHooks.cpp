@@ -2722,8 +2722,8 @@ void __stdcall runtimeHookCheckWindowFocus()
 {
     if (!gMainWindowFocused)
     {
-        // Pause music if it was playing
-        PGE_MusPlayer::MUS_StartDeferring();
+        // During this block of code, pause music if it was playing
+        PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
         // Wait for focus
         while (!gMainWindowFocused)
@@ -2731,8 +2731,5 @@ void __stdcall runtimeHookCheckWindowFocus()
             WaitMessage();
             LunaDllWaitFrame(false);
         }
-
-        // Start music again
-        PGE_MusPlayer::MUS_StopDeferring();
     }
 }
