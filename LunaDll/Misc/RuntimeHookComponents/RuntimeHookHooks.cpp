@@ -2733,3 +2733,103 @@ void __stdcall runtimeHookCheckWindowFocus()
         }
     }
 }
+
+extern std::string g_SecDefaultMusicPaths[21];
+static void __stdcall runtimeHookResetSectionMusic(unsigned int sec1, unsigned int sec2)
+{
+    // Note: sec1 and sec2 are always expected to be the same
+    if ((sec1 >= 21) || (sec2 >= 21)) return;
+
+    GM_SEC_MUSIC_TBL[sec2] = GM_SEC_DEFAULT_MUSIC_TBL[sec1];
+    GM_MUSIC_PATHS_PTR[sec2] = g_SecDefaultMusicPaths[sec1];
+}
+
+_declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapper8EB370(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push esi
+        push edi
+        call runtimeHookResetSectionMusic
+        pop edx
+        pop ecx
+        pop eax
+        push 0x8EB383
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapper8EBA87(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push esi
+        push edi
+        call runtimeHookResetSectionMusic
+        pop edx
+        pop ecx
+        pop eax
+        push 0x8EBA9A
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperA3576F(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push dword ptr ss : [ebp - 0x324]
+        push dword ptr ss : [ebp - 0x328]
+        call runtimeHookResetSectionMusic
+        pop edx
+        pop ecx
+        pop eax
+        push 0xA3578F
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperA35E9B(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push ebx
+        push dword ptr ss : [ebp - 0x328]
+        call runtimeHookResetSectionMusic
+        pop edx
+        pop ecx
+        pop eax
+        push 0xA35EB5
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+
+        push ebx
+        push dword ptr ss : [ebp - 0x100]
+        call runtimeHookResetSectionMusic
+        pop edx
+        pop ecx
+        pop eax
+        push 0xAA44A0
+        ret
+    }
+}

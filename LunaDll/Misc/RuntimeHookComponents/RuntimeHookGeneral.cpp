@@ -900,7 +900,15 @@ void TrySkipPatch()
     // Hook to make sure we catch which custom music path is active
     PATCH(0xA61EDA).JMP(runtimeHookStoreCustomMusicPathWrapper).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hook for replacing window focus check code
     PATCH(0x8E6F70).JMP(runtimeHookCheckWindowFocus).Apply();
+
+    // Hooks for extending the "reset section music to default" to also reset the custom music path
+    PATCH(0x8EB370).JMP(runtimeHookResetSectionMusicWrapper8EB370).NOP_PAD_TO_SIZE<19>().Apply();
+    PATCH(0x8EBA87).JMP(runtimeHookResetSectionMusicWrapper8EBA87).NOP_PAD_TO_SIZE<19>().Apply();
+    PATCH(0xA3576F).JMP(runtimeHookResetSectionMusicWrapperA3576F).NOP_PAD_TO_SIZE<32>().Apply();
+    PATCH(0xA35E9B).JMP(runtimeHookResetSectionMusicWrapperA35E9B).NOP_PAD_TO_SIZE<26>().Apply();
+    PATCH(0xAA4486).JMP(runtimeHookResetSectionMusicWrapperAA4486).NOP_PAD_TO_SIZE<26>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

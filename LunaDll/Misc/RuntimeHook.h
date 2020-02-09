@@ -433,5 +433,11 @@ void __stdcall runtimeHookStoreCustomMusicPathWrapper(void);
 
 void __stdcall runtimeHookCheckWindowFocus(void);
 
+void __stdcall runtimeHookResetSectionMusicWrapper8EB370(void);
+void __stdcall runtimeHookResetSectionMusicWrapper8EBA87(void);
+void __stdcall runtimeHookResetSectionMusicWrapperA3576F(void);
+void __stdcall runtimeHookResetSectionMusicWrapperA35E9B(void);
+void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void);
+
 #endif
 

@@ -35,6 +35,11 @@
 #define LIMIT_EVENTS   255
 #define LIMIT_SECTIONS 21
 
+// Array to store default music path by section to allow "reset to default" to work with it.
+// Normal 1.3 didn't need to store this because the custom music path couldn't ever change
+// but Audio.MusicChange now exists.
+std::string g_SecDefaultMusicPaths[21];
+
 void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isValid)
 {
     if (fullPath.empty())
@@ -152,6 +157,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         GM_SEC_NOTURNBACK[i] = COMBOOL(nextDataLevelSection.lock_left_scroll);
         GM_SEC_OFFSCREEN[i] = COMBOOL(nextDataLevelSection.OffScreenEn);
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
+        g_SecDefaultMusicPaths[i] = nextDataLevelSection.music_file;
 
         nextDataLevelSection.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::X_SECTIONS, 0, nextDataLevelSection.custom_params);
         // Store custom params
@@ -170,6 +176,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         GM_SEC_NOTURNBACK[i] = -1;
         GM_SEC_OFFSCREEN[i] = -1;
         GM_MUSIC_PATHS_PTR[i] = "";
+        g_SecDefaultMusicPaths[i] = "";
     }
 
     // Copy initial values for events
