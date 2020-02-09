@@ -96,7 +96,9 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
     switch (event.type)
     {
         case SDL_JOYDEVICEADDED:
-            if (strcmp(SDL_JoystickNameForIndex(event.jdevice.which), "Nintendo Switch Pro Controller") == 0)
+        {
+            const char* joyName = SDL_JoystickNameForIndex(event.jdevice.which);
+            if (joyName && (strcmp(joyName, "Nintendo Switch Pro Controller") == 0))
             {
                 reconnectTimeout = SDL_GetTicks() + 4000;
                 reconnectFlag = true;
@@ -104,6 +106,7 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
             }
             addJoystickEvent(event.jdevice.which);
             break;
+        }
         case SDL_JOYDEVICEREMOVED:
             removeJoystickEvent(event.jdevice.which);
             break;
@@ -503,26 +506,24 @@ void LunaGameControllerManager::addJoystickEvent(int joyIdx)
     SDL_Joystick* joyPtr = nullptr;
     SDL_GameController* ctrlPtr = nullptr;
 
+    // Get joystick ID
+    SDL_JoystickID joyId = SDL_JoystickGetDeviceInstanceID(joyIdx);
+    if ((joyId < 0) || (controllerMap.find(joyId) != controllerMap.end()))
+    {
+        // Failure to get ID or duplicate
+        return;
+    }
+    
     // Open as joystick
     joyPtr = SDL_JoystickOpen(joyIdx);
     if (joyPtr == nullptr)
     {
-        // Failure to open joystick
         return;
     }
 
-    // Get joystick ID
-    SDL_JoystickID joyId = SDL_JoystickInstanceID(joyPtr);
-    if ((joyId < 0) || (controllerMap.find(joyId) != controllerMap.end()))
-    {
-        // Failure to get ID or duplicate
-        SDL_JoystickClose(joyPtr);
-        return;
-    }
-
-    // Open as game controller
     if (SDL_IsGameController(joyIdx))
     {
+        // Open as game controller
         ctrlPtr = SDL_GameControllerOpen(joyIdx);
     }
 
