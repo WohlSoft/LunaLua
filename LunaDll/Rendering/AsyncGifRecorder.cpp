@@ -68,6 +68,9 @@ void AsyncGifRecorder::exitWorkerThread()
 
 void AsyncGifRecorder::workerFunc()
 {
+    // Use low priority for GIF encoding, to not impact gameplay
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+
     while (true) {
         GifRecorderCMDItem nextData = nextFrames.pop();
         

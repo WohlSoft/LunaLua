@@ -302,8 +302,8 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
         skipFrame = true;
     }
 
-    // Don't allow more than 4 seconds of raw buffered footage
-    if (mGifRecorder.bufferLen() > 4 * 32)
+    // Don't allow more than 10 seconds of raw buffered footage
+    if (mGifRecorder.bufferLen() > 10 * 32)
     {
         return;
     }
