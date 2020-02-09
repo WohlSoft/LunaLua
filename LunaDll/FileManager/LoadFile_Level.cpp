@@ -148,6 +148,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         GM_SEC_ISUNDERWATER[i] = COMBOOL(nextDataLevelSection.underwater);
         GM_SEC_ISWARP[i] = COMBOOL(nextDataLevelSection.wrap_h);
         GM_SEC_MUSIC_TBL[i] = nextDataLevelSection.music_id;
+        GM_SEC_DEFAULT_MUSIC_TBL[i] = nextDataLevelSection.music_id;
         GM_SEC_NOTURNBACK[i] = COMBOOL(nextDataLevelSection.lock_left_scroll);
         GM_SEC_OFFSCREEN[i] = COMBOOL(nextDataLevelSection.OffScreenEn);
         GM_MUSIC_PATHS_PTR[i] = nextDataLevelSection.music_file;
@@ -165,6 +166,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         GM_SEC_ISUNDERWATER[i] = -1;
         GM_SEC_ISWARP[i] = -1;
         GM_SEC_MUSIC_TBL[i] = 0;
+        GM_SEC_DEFAULT_MUSIC_TBL[i] = 0;
         GM_SEC_NOTURNBACK[i] = -1;
         GM_SEC_OFFSCREEN[i] = -1;
         GM_MUSIC_PATHS_PTR[i] = "";

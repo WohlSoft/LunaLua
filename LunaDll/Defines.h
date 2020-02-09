@@ -365,9 +365,10 @@ DEFMEM(GM_MUSICBOX_PTR,     void*,  0x00B25974);
 
 
 // Sound
-DEFMEM(GM_MUSIC_PATHS_PTR,  VB6StrPtr*, 0x00B257B8);
-DEFMEM(GM_SEC_MUSIC_TBL,    short*, 0x00B25828);     // 21 shorts containing music # for each section
-DEFMEM(GM_MUSIC_RESTORE_PL, WORD, 0x00B2C630); // If pswitch is active, then the music of the section of the player index is restored.
+DEFMEM(GM_MUSIC_PATHS_PTR,   VB6StrPtr*, 0x00B257B8);
+DEFMEM(GM_SEC_MUSIC_TBL,         short*, 0x00B25828); // 21 shorts containing music # for each section
+DEFMEM(GM_SEC_DEFAULT_MUSIC_TBL, short*, 0x00B25844);
+DEFMEM(GM_MUSIC_RESTORE_PL,        WORD, 0x00B2C630); // If pswitch is active, then the music of the section of the player index is restored.
 
 
 // Input
