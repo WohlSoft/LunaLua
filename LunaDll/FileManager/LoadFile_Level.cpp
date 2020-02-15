@@ -66,7 +66,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     replaceSubStr(customFolderU8, "/", "\\");
     customFolder = Str2WStr(customFolderU8);
 
-    *(DWORD*)0xB2B9E4 = 0; // Unknown
+    *(DWORD*)0xB2B9E4 = 0; // qScreen
     native_cleanupLevel();
     native_setupSFX();
     GM_FREEZWITCH_ACTIV = 0;
@@ -381,8 +381,8 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         const LevelDoor& nextDataLevelDoor = outData.doors[i];
         if (nextDataLevelDoor.two_way)
             twoWayWarps.push_back(nextDoor);
-        nextDoor->unknown_0E = -1;
-        nextDoor->unknown_10 = -1;
+        nextDoor->unknown_0E = -1; // PlacedEnt, bool
+        nextDoor->unknown_10 = -1; // PlacedExit, bool
         nextDoor->entrance.x = static_cast<double>(nextDataLevelDoor.ix);
         nextDoor->entrance.y = static_cast<double>(nextDataLevelDoor.iy);
         nextDoor->exit.x = static_cast<double>(nextDataLevelDoor.ox);
@@ -464,11 +464,11 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     }
     for (int i = numOfLayers; i < LIMIT_LAYERS; i++) {
         LayerControl* nextLayer = LayerControl::Get(i);
-        nextLayer->IsStopped = 0;
-        nextLayer->Unknown1 = 0;
+        nextLayer->IsStopped = 0; // EffectStop
+        nextLayer->Unknown1 = 0; // Padding
         nextLayer->ptLayerName = L"";
         nextLayer->isHidden = 0;
-        nextLayer->unknown = 0;
+        nextLayer->unknown = 0; // Padding
         nextLayer->xSpeed = 0.0f;
         nextLayer->ySpeed = 0.0f;
     }
@@ -571,9 +571,9 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         // Skip this shit
     }
 
-    native_unkDoorsCount();
+    native_unkDoorsCount(); // "Find Stars"
 
-    GM_WINNING = 0;
+    GM_WINNING = 0; // "Level Macro"
 
     /* Put here extra BGOs */
 
@@ -632,14 +632,17 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     /* Finalizing crap */
 
     //*(_WORD *)(unkSoundVolume + 24) = 100;
+    // "SoundPause" - Sound play blocking timeout (how many frames wait until PlaySound(13) will work again)
     GM_UNK_SOUND_VOLUME[12] = 100;//*(WORD*)(0x00B2C590 + 24) = 100;
                                   //*(_QWORD *)&dbl_B2C690 = 0i64;
-    *(double*)(0x00B2C690) = 0;
+    *(double*)(0x00B2C690) = 0; // Overtime
     //local_getTicksCount_v346 = DeclareKernel32_GetTickCount();
-    int ticks = GetTickCount() + 1000;
+    int ticks = GetTickCount() + 1000; // GoalTime
     //*(_QWORD *)&dbl_B2C67C = 0i64;
+    // FPS count
     GM_ACTIVE_FRAMECT = 0; //*(double*)(0x00B2C67C) = 0;
                            //g_transFrameCounter = 0;
+    // FPS time
     GM_TRANS_FRAMECT = 0;
     //*(_QWORD *)&dbl_B2D72C = 0i64;
     GM_LAST_FRAME_TIME = 0;//*(double*)(0x00B2D72C) = 0;
