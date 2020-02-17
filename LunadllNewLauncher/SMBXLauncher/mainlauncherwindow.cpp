@@ -355,6 +355,10 @@ void MainLauncherWindow::runSMBXLevel(const QString& file)
 
 void MainLauncherWindow::checkForUpdates()
 {
+    m_smbxConfig->m_hasUpdate = false;
+    m_smbxConfig->m_hasInternetAccess = true;
+    emit m_smbxConfig->UpdateVersionUpdated();
+    emit m_smbxConfig->InternetAccessUpdated();
     if(!m_launcherSettings->hasValidUpdateSite()) {
         qWarning() << "Invalid update-check-website for launcher configuration";
         return;
@@ -362,14 +366,17 @@ void MainLauncherWindow::checkForUpdates()
 
     try {
         if(!NetworkUtils::checkInternetConnection(4000))
+            m_smbxConfig->m_hasInternetAccess = false;
+             emit m_smbxConfig->InternetAccessUpdated();
             return;
     } catch (const QNetworkReplyException& ex) {
-        warnError("Failed to check internet connection: " + ex.errorString() + "\nSkipping update check...");
+        m_smbxConfig->m_hasInternetAccess = false;
+        emit m_smbxConfig->InternetAccessUpdated();
+        qWarning() << "Failed to check internet connection: " << ex.errorString() << "\nSkipping update check...";
         return;
     }
 
     qDebug() << "Checking launcher updates...";
-    m_smbxConfig->m_hasUpdate = false;
     try {
         try {
             ExtendedQJsonReader reader(m_launcherSettings->checkForUpdate());
@@ -439,11 +446,14 @@ void MainLauncherWindow::checkForUpdates()
             throw;
         }
     } catch(...) {
-        warnError(m_launcherSettings->getErrConnectionMsg());
+        qWarning() << m_launcherSettings->getErrConnectionMsg();
+
+        /*
         QUrl urlOfErrorPage(m_launcherSettings->getErrConnectionUrl());
         if(urlOfErrorPage.isValid()){
             QDesktopServices::openUrl(urlOfErrorPage);
         }
+        */
     }
 
     emit m_smbxConfig->UpdateVersionUpdated();

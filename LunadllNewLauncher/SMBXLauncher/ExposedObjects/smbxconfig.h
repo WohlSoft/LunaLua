@@ -14,6 +14,7 @@ class SMBXConfig : public QObject
     Q_OBJECT
     Q_PROPERTY(AutostartConfig* Autostart READ Autostart NOTIFY AutostartUpdated)
     Q_PROPERTY(ControlConfig* Controls READ Controls NOTIFY ControlsUpdated)
+    Q_PROPERTY(bool hasInternetAccess READ HasInternet NOTIFY InternetAccessUpdated)
     Q_PROPERTY(bool hasUpdate READ HasUpdate NOTIFY UpdateVersionUpdated)
     Q_PROPERTY(QString updateVersionName READ UpdateVersionName NOTIFY UpdateVersionUpdated)
     Q_PROPERTY(QString updateMessage READ UpdateMessage NOTIFY UpdateVersionUpdated)
@@ -36,6 +37,11 @@ public:
         return m_hasUpdate;
     }
 
+    bool HasInternet() const
+    {
+        return m_hasInternetAccess;
+    }
+
     QString UpdateVersionName() const
     {
         return m_updateVersion;
@@ -53,6 +59,7 @@ public:
 
     void pollControls();
 
+    bool m_hasInternetAccess;
     bool m_hasUpdate;
     int m_updateType;
     QString m_updateVersion;
@@ -90,6 +97,7 @@ signals:
     void AutostartUpdated();
     void ControlsUpdated();
     void UpdateVersionUpdated();
+    void InternetAccessUpdated();
 
     void ControllerButtonPress(int buttonId, const QString& controllerName);
 
