@@ -2117,8 +2117,11 @@ void __stdcall runtimeHookInitGameHDC(void)
 
 void __stdcall runtimeHookInitGameWindow(void)
 {
-    auto initGameWindow = (void(__stdcall *)(void)) (void*)0x96AD80;
-    initGameWindow();
+    // This is for changing fullscreen in the way that 1.3 handled it.
+    // We don't want to be using this code, because it just causes problems.
+    // Maximizing/restoring the window does plenty well for full-screen handling.
+    //auto initGameWindow = (void(__stdcall *)(void)) (void*)0x96AD80;
+    //initGameWindow();
 }
 
 void __stdcall runtimeHookLoadDefaultGraphics(void)

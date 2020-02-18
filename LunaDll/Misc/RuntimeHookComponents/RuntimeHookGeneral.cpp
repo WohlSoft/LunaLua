@@ -910,6 +910,9 @@ void TrySkipPatch()
     PATCH(0xA35E9B).JMP(runtimeHookResetSectionMusicWrapperA35E9B).NOP_PAD_TO_SIZE<26>().Apply();
     PATCH(0xAA4486).JMP(runtimeHookResetSectionMusicWrapperAA4486).NOP_PAD_TO_SIZE<26>().Apply();
 
+    // Disable some built-in key press handling code that we don't want to do things
+    PATCH(0x8BD952).JMP(0x8BD9B6).Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
