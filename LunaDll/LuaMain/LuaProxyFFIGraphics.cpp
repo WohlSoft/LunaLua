@@ -5,6 +5,7 @@
 
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
+#include "../Rendering/GL/GLContextManager.h"
 #include "../Rendering/Rendering.h"
 #include "../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
@@ -484,4 +485,9 @@ FFI_EXPORT void __fastcall FFI_GraphicsGetFrameStats(GLEngineProxy::FrameStatStr
 {
     CLunaFFILock ffiLock(__FUNCTION__);
     *frameStats = g_GLEngine.GetFrameStats();
+}
+
+FFI_EXPORT const GLContextManager::GLConstants* __fastcall FFI_GraphicsGetConstants()
+{
+    return &g_GLContextManager.Constants();
 }
