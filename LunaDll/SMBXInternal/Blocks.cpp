@@ -152,12 +152,12 @@ void Blocks::InitProperties() {
 
 bool Blocks::GetBlockBumpable(int id) {
     if ((id < 1) || (id > Block::MAX_ID)) return false;
-    return (blockprop_bumpable[id - 1] != 0);
+    return (blockprop_bumpable[id] != 0);
 }
 
 void Blocks::SetBlockBumpable(int id, bool bumpable) {
     if ((id < 1) || (id > Block::MAX_ID)) return;
-    blockprop_bumpable[id - 1] = bumpable ? -1 : 0;
+    blockprop_bumpable[id] = bumpable ? -1 : 0;
 }
 
 short Blocks::GetBlockPlayerFilter(int id)
