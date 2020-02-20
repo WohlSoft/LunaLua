@@ -655,7 +655,8 @@ void CLunaLua::bindAll()
                 def("__enablePerfTracker", &LuaProxy::Misc::__enablePerfTracker),
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
-                def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress)
+                def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
+                def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress)
             ],
 
             namespace_("FileFormats")[

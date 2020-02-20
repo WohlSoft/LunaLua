@@ -61,9 +61,17 @@ public:
         mStoredTemplate.MountColor = 0;
         mStoredTemplate.Hearts = 1;
         memset(mHitbox, 0, 10*sizeof(CharacterHitBoxData));
+        if (mFilterBlock != 0)
+        {
+            Blocks::SetBlockPlayerFilter(mFilterBlock, mId);
+        }
     }
     ~CharacterDataStruct()
     {
+        if (mFilterBlock != 0)
+        {
+            Blocks::SetBlockPlayerFilter(mFilterBlock, 0);
+        }
         for (int powerupId = 1; powerupId <= 10; powerupId++)
         {
             ImageLoader::UnregisterExtraGfx(mName + "-" + std::to_string(powerupId));
@@ -1191,7 +1199,6 @@ static auto patch_animate_hook_0x9E1CA9 = PATCH(0x9E1CA9).CALL(HOOK_0x9E1CA9);
 // Check to allow player to pass through their own filter block type
 __declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
     __asm {
-        pushf
         push ecx
         push edx
         push esi // Args #2
@@ -1200,12 +1207,10 @@ __declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
         and dword ptr ds:[ebp-0x54], eax
         pop edx
         pop ecx
-        popf
-        mov eax, dword ptr ds : [0xB25A04]
         ret
     }
 }
-static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).CALL(HOOK_0x9A3CC5);
+static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).CALL(HOOK_0x9A3CC5).JMP(0x9A3DD2).NOP_PAD_TO_SIZE<269>();
 
 // Check if this is a hittable switch block... 
 __declspec(naked) static void  __stdcall HOOK_0x9DA747() {
@@ -2252,19 +2257,19 @@ static void __stdcall runtimeHookCharacterIdAnimateBlocks(void)
 
 static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx)
 {
-    short characterId = (short)player->Identity;
-    if (characterId >= 1 && characterId <= 5)
+    short blockId = Block::GetRaw(blockIdx)->BlockType;
+    short characterFilter = Blocks::GetBlockPlayerFilter(blockId);
+
+    // -1 means allow all characters
+    if (characterFilter == -1)
     {
-        return -1;
+        return 0;
     }
 
-    auto it = runtimeHookCharacterIdMap.find(characterId);
-    if (it != runtimeHookCharacterIdMap.end())
+    short characterId = (short)player->Identity;
+    if (characterFilter == characterId)
     {
-        short filterBlockId = it->second->mFilterBlock;
-        if ((filterBlockId != 0) && (filterBlockId == Block::GetRaw(blockIdx)->BlockType)) {
-            return 0;
-        }
+        return 0;
     }
 
     return -1;

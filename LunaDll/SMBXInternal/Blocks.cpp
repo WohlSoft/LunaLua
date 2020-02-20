@@ -111,11 +111,14 @@ void Blocks::HideAll(int type) {
     }
 }
 
-static bool isBlockBumpable[Block::MAX_ID] = {false};
+static int16_t blockprop_bumpable[Block::MAX_ID + 1] = { 0 };
+static int16_t blockprop_playerfilter[Block::MAX_ID + 1] = { 0 };
+
 void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
     {
         SetBlockBumpable(id, false);
+        SetBlockPlayerFilter(id, 0);
     }
 
     // Default game config
@@ -139,14 +142,49 @@ void Blocks::InitProperties() {
     {
         SetBlockBumpable(id, true);
     }
+
+    SetBlockPlayerFilter(626, 1);
+    SetBlockPlayerFilter(627, 2);
+    SetBlockPlayerFilter(628, 3);
+    SetBlockPlayerFilter(629, 4);
+    SetBlockPlayerFilter(632, 5);
 }
 
 bool Blocks::GetBlockBumpable(int id) {
     if ((id < 1) || (id > Block::MAX_ID)) return false;
-    return isBlockBumpable[id - 1];
+    return (blockprop_bumpable[id - 1] != 0);
 }
 
 void Blocks::SetBlockBumpable(int id, bool bumpable) {
     if ((id < 1) || (id > Block::MAX_ID)) return;
-    isBlockBumpable[id - 1] = bumpable;
+    blockprop_bumpable[id - 1] = bumpable ? -1 : 0;
+}
+
+short Blocks::GetBlockPlayerFilter(int id)
+{
+    if ((id < 1) || (id > Block::MAX_ID)) return 0;
+    return blockprop_playerfilter[id];
+}
+
+void Blocks::SetBlockPlayerFilter(int id, short characterId)
+{
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_playerfilter[id] = characterId;
+}
+
+// Getter for address of Block property arrays
+uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
+{
+    if (s == "bumpable")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_bumpable);
+    }
+    else if (s == "playerfilter")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_playerfilter);
+    }
+    else
+    {
+        return 0;
+    }
 }

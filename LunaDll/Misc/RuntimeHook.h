@@ -439,5 +439,7 @@ void __stdcall runtimeHookResetSectionMusicWrapperA3576F(void);
 void __stdcall runtimeHookResetSectionMusicWrapperA35E9B(void);
 void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void);
 
+void __stdcall runtimeHookPlayerBouncePushCheckWrapper(void);
+
 #endif
 

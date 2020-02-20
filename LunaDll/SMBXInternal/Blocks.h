@@ -71,6 +71,10 @@ namespace Blocks {
     void InitProperties();
     bool GetBlockBumpable(int id);
     void SetBlockBumpable(int id, bool bumpable);
+    short GetBlockPlayerFilter(int id);
+    void SetBlockPlayerFilter(int id, short characterId);
+
+    uintptr_t GetPropertyTableAddress(const std::string& s);
 }
 
 

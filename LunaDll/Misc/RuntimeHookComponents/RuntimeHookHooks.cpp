@@ -2836,3 +2836,42 @@ _declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void)
         ret
     }
 }
+
+static int __stdcall runtimeHookPlayerBouncePushCheck(unsigned int blockId, PlayerMOB* player)
+{
+    short characterFilter = Blocks::GetBlockPlayerFilter(blockId);
+
+    // -1 means allow all characters
+    if (characterFilter == -1)
+    {
+        return -1; // No collision
+    }
+
+    short characterId = (short)player->Identity;
+    if (characterFilter == characterId)
+    {
+        return -1; // No collision
+    }
+
+    return 0; // Allow collision
+}
+
+_declspec(naked) void __stdcall runtimeHookPlayerBouncePushCheckWrapper(void)
+{
+    // Overwrites 009C0B3E jne smbx.9C0C19
+    __asm {
+        jne disallowCollide
+        push edx
+        push ebx // player
+        push edi // blockId
+        call runtimeHookPlayerBouncePushCheck
+        pop edx
+        cmp eax, 0
+        jne disallowCollide
+        push 0x9C0B44
+        ret
+    disallowCollide :
+        push 0x9C0C19
+        ret
+    }
+}
