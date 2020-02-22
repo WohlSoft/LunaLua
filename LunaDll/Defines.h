@@ -575,10 +575,11 @@ DEFMEM_PTR(npcdef_nofireball,       short, 0x00B2B210);
 DEFMEM_PTR(npcdef_noiceball,        short, 0x00B2B46A);
 DEFMEM_PTR(npcdef_nogravity,        short, 0x00B2B6C4);
 
-
 DEFMEM(blockdef_isResizeableBlock, short*, 0x00B2B930);
-DEFMEM(blockdef_width, short*, 0x00B2B9F8);
-DEFMEM(blockdef_height, short*, 0x00B2BA14);
+DEFMEM(blockdef_width,             short*, 0x00B2B9F8);
+DEFMEM(blockdef_height,            short*, 0x00B2BA14);
+DEFMEM(blockdef_floorslope,        short*, 0x00B2B94C);
+DEFMEM(blockdef_ceilingslope,      short*, 0x00B2B968);
 
 DEFMEM(bgodef_width, WORD*, 0x00B2CCF4);
 DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);

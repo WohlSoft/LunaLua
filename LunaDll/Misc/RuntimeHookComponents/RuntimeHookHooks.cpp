@@ -2875,3 +2875,138 @@ _declspec(naked) void __stdcall runtimeHookPlayerBouncePushCheckWrapper(void)
         ret
     }
 }
+
+static inline double blockGetTopYTouching(Block& block, Momentum& loc)
+{
+    // Get slope type
+    short blockType = block.BlockType;
+    short slopeDirection;
+    if ((blockType >= 1) && (blockType <= Block::MAX_ID))
+    {
+        slopeDirection = blockdef_floorslope[blockType];
+    }
+    else
+    {
+        slopeDirection = 0;
+    }
+
+    // The simple case, no slope
+    if (slopeDirection == 0)
+    {
+        return block.momentum.y;
+    }
+
+    // The degenerate case, no width
+    if (block.momentum.width <= 0)
+    {
+        return block.momentum.y;
+    }
+
+    // The following uses a slope calculation like 1.3 does
+
+    // Get right or left x coordinate as relevant for the slope direction
+    double refX = loc.x;
+    if (slopeDirection > 0) refX += loc.width;
+
+    // Get how far along the slope we are in the x direction
+    double slope = (refX - block.momentum.x) / block.momentum.width;
+    if (slopeDirection > 0) slope = 1.0 - slope;
+    if (slope < 0.0) slope = 0.0;
+    if (slope > 1.0) slope = 1.0;
+
+    // Determine the y coordinate
+    return block.momentum.y + block.momentum.height - (block.momentum.height * slope);
+}
+
+static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsigned int newBlockIdx, Momentum* referenceLoc)
+{
+    if (oldBlockIdx > GM_BLOCK_COUNT) return 0;
+	if (newBlockIdx > GM_BLOCK_COUNT) return 0;
+	Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
+	Block& newBlock = Blocks::GetBase()[newBlockIdx];
+	
+	double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
+	double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
+	
+	if (newBlockY < oldBlockY)
+	{
+		// New block is higher, replace
+		return -1;
+	}
+	else if (newBlockY > oldBlockY)
+	{
+		// New block is lower, don't replace
+		return 0;
+	}
+
+    // Break tie based on if one is moving upward faster
+    double newBlockSpeedY = newBlock.momentum.speedY;
+    double oldBlockSpeedY = oldBlock.momentum.speedY;
+    if (newBlockSpeedY < oldBlockSpeedY)
+    {
+        // New block is moving more upward, replace
+        return -1;
+    }
+    else if (newBlockSpeedY > oldBlockSpeedY)
+    {
+        // New block is moving more downward, don't replace
+        return 0;
+    }
+
+	// Break tie based on x-proximity
+    double refX = referenceLoc->x + referenceLoc->width * 0.5;
+    double newBlockDist = abs((newBlock.momentum.x + newBlock.momentum.width * 0.5) - refX);
+    double oldBlockDist = abs((oldBlock.momentum.x + oldBlock.momentum.width * 0.5) - refX);
+    if (newBlockDist < oldBlockDist)
+    {
+        // New block is closer, replace
+        return -1;
+    }
+    if (newBlockDist > oldBlockDist)
+    {
+        // New block further, don't replace
+        return 0;
+    }
+
+    // Break tie based on narrower width (more specific match)
+    double newBlockWidth = newBlock.momentum.width;
+    double oldBlockWidth = oldBlock.momentum.width;
+    if (newBlockWidth < oldBlockWidth)
+    {
+        // New block is narrower, replace
+        return -1;
+    }
+    if (newBlockWidth > oldBlockWidth)
+    {
+        // New block wider, don't replace
+        return 0;
+    }
+
+    // Still tied? Let's just not replace
+	return 0;
+}
+
+_declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void)
+{
+    // JMP from 009A3FD3
+    __asm {
+		// eax, ecx, edx are all free for use here
+	
+		lea   edx,word ptr ss:[ebx+0xC0]
+		movsx ecx,word ptr ss:[ebp-0x120]
+		movsx eax,word ptr ss:[ebp-0xF8]
+		push edx
+		push ecx
+		push eax
+		call runtimeHookCompareWalkBlock
+		
+		cmp eax, 0
+		jne blockIsHigher
+
+		push 0x9A4319 // Block is not higher
+        ret
+	blockIsHigher:
+		push 0x9A42DC // Block is higher
+        ret
+    }
+}

@@ -916,6 +916,9 @@ void TrySkipPatch()
     // Hook to fix player bounce push not properly ignoring character filter blocks
     PATCH(0x9C0B3E).JMP(runtimeHookPlayerBouncePushCheckWrapper).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hook to fix the player-clips-into-floor-when-on-something-moving-down bug
+    PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

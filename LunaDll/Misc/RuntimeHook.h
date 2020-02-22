@@ -441,5 +441,7 @@ void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void);
 
 void __stdcall runtimeHookPlayerBouncePushCheckWrapper(void);
 
+void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void);
+
 #endif
 
