@@ -919,6 +919,17 @@ void TrySkipPatch()
     // Hook to fix the player-clips-into-floor-when-on-something-moving-down bug
     PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>().Apply();
 
+    // Hooks to fix the npc-clips-into-floor-when-on-something-moving-down bug
+    PATCH(0xA14BA6).JMP(runtimeHookPreserveNPCWalkBlock).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>().Apply();
+    PATCH(0xA0C8D4).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
+    // 0xA15728 already does it right
+    PATCH(0xA15988).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
+    PATCH(0xA15A35).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
+    PATCH(0xA15F48).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
+    PATCH(0xA1BB3A).JMP(runtimeHookNPCWalkFixTempHitConditional).NOP_PAD_TO_SIZE<23>().Apply();
+    PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

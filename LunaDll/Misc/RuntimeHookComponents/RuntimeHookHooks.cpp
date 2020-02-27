@@ -3010,3 +3010,153 @@ _declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void
         ret
     }
 }
+
+// Note, the following assume no recursion of the NPC physics processing loop, which is a safe assumption but worth noting
+static unsigned int g_npcTempHitBlock;
+static double g_npcTempHit;
+static short g_npcTempHitBlockIsSlope;
+
+_declspec(naked) void __stdcall runtimeHookPreserveNPCWalkBlock()
+{
+    // Patches over 00A14BA6 | jne 0xA15F7C
+    // eax, ecx, and edx are free for use at this point
+    __asm {
+        movsx eax, word ptr ss : [ebp - 0x178]
+        mov g_npcTempHitBlock, eax
+        fld qword ptr ss : [ebp - 0x100]
+        fstp g_npcTempHit
+        jne otherHitspot
+        push 0xA14BAC // HitSpot 1
+        ret
+    otherHitspot :
+        push 0xA15F7C // Not HitSpot 1
+        ret
+    }
+}
+
+static void __stdcall runtimeHookCompareNPCWalkBlockInternal(short& tempHitBlock, double& tempHit, NPCMOB& npc)
+{
+    unsigned int oldBlockIdx  = g_npcTempHitBlock;
+    unsigned int newBlockIdx  = tempHitBlock;
+    Momentum&    referenceLoc = npc.momentum;
+
+    // If no temp block was already set, just exit
+    if (g_npcTempHitBlock == 0)
+    {
+        // tempHitBlock is set, don't revert
+        g_npcTempHitBlockIsSlope = 0;
+        if (npc.unknown_22 && (npc.unknown_22 != newBlockIdx))
+        {
+            if (runtimeHookCompareWalkBlock(npc.unknown_22, newBlockIdx, &referenceLoc) != 0)
+            {
+                npc.unknown_22 = 0;
+            }
+        }
+        return;
+    }
+
+    // Compare blocks
+    int compareResult = runtimeHookCompareWalkBlock(oldBlockIdx, newBlockIdx, &referenceLoc);
+
+    // Revert to the old block if the comparison says we shouldn't replace
+    if (compareResult == 0)
+    {
+        // We shouldn't replace, so revert variables
+        tempHitBlock = g_npcTempHitBlock;
+        tempHit = g_npcTempHit;
+    }
+    else
+    {
+        // tempHitBlock is set, don't revert
+        g_npcTempHitBlockIsSlope = 0;
+        if (npc.unknown_22 && (npc.unknown_22 != newBlockIdx))
+        {
+            if (runtimeHookCompareWalkBlock(npc.unknown_22, newBlockIdx, &referenceLoc) != 0)
+            {
+                npc.unknown_22 = 0;
+            }
+        }
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookCompareNPCWalkBlock()
+{
+    // Patches over 00A16B82 | cmp word ptr ds : [esi + 0x136], 0
+    // eax, ecx, and edx are free for use at this point
+    __asm {
+        mov eax, g_npcTempHitBlock
+        cmp word ptr ss:[ebp - 0x178], ax
+        je tempHitBlockUnchanged
+
+        // Pass to C++ code for behaviour
+        lea ecx, ss:[ebp - 0x100]
+        lea edx, ss:[ebp - 0x178]
+        push esi // *referenceLoc
+        push ecx // *tempHit
+        push edx // *tempHitBlock
+        call runtimeHookCompareNPCWalkBlockInternal
+
+    tempHitBlockUnchanged:
+        // Original code
+        cmp word ptr ds : [esi + 136], 0
+        push 0xA16B8A
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCWalkFixClearTemp()
+{
+    // Patches over 00A0C8D4 | mov dword ptr ss:[ebp-0x100],edx
+    //              00A0C8DA | mov dword ptr ss:[ebp-0xFC],edx
+    // and similar
+    __asm {
+        push eax
+        xor eax, eax
+        mov dword ptr ss : [ebp - 0x100], eax
+        mov dword ptr ss : [ebp - 0xFC], eax
+        mov dword ptr ss : [ebp - 0x178], eax
+        pop eax
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCWalkFixTempHitConditional()
+{
+    // Patches over comparison of tempHit from 00A1BB3A to 00A1BB4B
+    __asm {
+        cmp dword ptr ss : [ebp - 0x178], 0
+        je noWalk
+        cmp g_npcTempHitBlockIsSlope, 0
+        jne noWalk
+        push 0xA1BB51
+        ret
+    noWalk:
+        push 0xA1D38C
+        ret
+    }
+}
+
+static void __stdcall runtimeHookNPCWalkFixSlopeInternal(short& blockIdx, short& tempHitBlock, double& tempHit, Momentum& referenceLoc)
+{
+    // Do nothing for this case anymore, this is otherwise handled?
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
+{
+    // Patches over slope walk invalidation from 0xA13188 through 0xA1322F
+    // eax, ecx, and edx are free for use at this point
+    __asm {
+        // Pass to C++ code for behaviour
+        lea ecx, ss : [ebp - 0x100]
+        lea edx, ss : [ebp - 0x178]
+        lea eax, ss : [ebp - 0x188]
+        push esi // *referenceLoc
+        push ecx // *tempHit
+        push edx // *tempHitBlock
+        push eax // *blockIdx
+        call runtimeHookNPCWalkFixSlopeInternal
+
+        push 0xA1322F
+        ret
+    }
+}

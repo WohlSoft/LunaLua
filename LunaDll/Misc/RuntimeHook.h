@@ -443,5 +443,11 @@ void __stdcall runtimeHookPlayerBouncePushCheckWrapper(void);
 
 void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void);
 
+void __stdcall runtimeHookPreserveNPCWalkBlock();
+void __stdcall runtimeHookCompareNPCWalkBlock();
+void __stdcall runtimeHookNPCWalkFixClearTemp();
+void __stdcall runtimeHookNPCWalkFixTempHitConditional();
+void __stdcall runtimeHookNPCWalkFixSlope();
+
 #endif
 
