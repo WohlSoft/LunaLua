@@ -3019,12 +3019,14 @@ static short g_npcTempHitBlockIsSlope;
 _declspec(naked) void __stdcall runtimeHookPreserveNPCWalkBlock()
 {
     // Patches over 00A14BA6 | jne 0xA15F7C
-    // eax, ecx, and edx are free for use at this point
+    // edx is free for use at this point
     __asm {
-        movsx eax, word ptr ss : [ebp - 0x178]
-        mov g_npcTempHitBlock, eax
+        pushf
+        movsx edx, word ptr ss : [ebp - 0x178]
+        mov g_npcTempHitBlock, edx
         fld qword ptr ss : [ebp - 0x100]
         fstp g_npcTempHit
+        popf
         jne otherHitspot
         push 0xA14BAC // HitSpot 1
         ret
