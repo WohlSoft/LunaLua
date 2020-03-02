@@ -3100,7 +3100,7 @@ _declspec(naked) void __stdcall runtimeHookCompareNPCWalkBlock()
 
     tempHitBlockUnchanged:
         // Original code
-        cmp word ptr ds : [esi + 136], 0
+        cmp word ptr ds : [esi + 0x136], 0
         push 0xA16B8A
         ret
     }
