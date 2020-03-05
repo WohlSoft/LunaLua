@@ -1029,6 +1029,7 @@ void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
 
     if (!isCancelled)
     {
+        Renderer::QueueStateStacker renderStack;
         msgbox_OrigFunc(pPlayerIdx);
     }
 }

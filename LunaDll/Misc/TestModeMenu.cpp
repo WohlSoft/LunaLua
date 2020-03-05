@@ -47,6 +47,8 @@ void testModeCheckTriggers()
 
 void testModePauseMenu(bool allowContinue)
 {
+    Renderer::QueueStateStacker renderStack;
+
     gIsTestModePauseActive = true;
 
     keepRunningPauseMenu = true;

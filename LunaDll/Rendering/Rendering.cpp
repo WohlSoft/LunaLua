@@ -54,13 +54,8 @@ bool Renderer::IsAltThreadActive()
 
 // CTOR
 Renderer::Renderer() :
-    m_InFrameRender(false),
-    m_curCamIdx(1),
-    m_renderOpsSortedCount(0),
-    m_renderOpsProcessedCount(0),
-    m_currentRenderOps(),
-    m_legacyResourceCodeImages(),
-    m_debugMessages()
+    m_queueState(),
+    m_legacyResourceCodeImages()
 {
 }
 
@@ -174,9 +169,9 @@ void Renderer::AddOp(RenderOp* op) {
     {
         // If the rendering operation was created in the middle of handling a
         // camera's rendering, lock the rendering operation to that camera.
-        op->m_selectedCamera = m_curCamIdx;
+        op->m_selectedCamera = m_queueState.m_curCamIdx;
     }
-    this->m_currentRenderOps.push_back(op);
+    this->m_queueState.m_currentRenderOps.push_back(op);
 }
 
 // GL Engine OP
@@ -188,7 +183,7 @@ void Renderer::GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPrior
 
 // DRAW OP -- Process a render operation, draw
 void Renderer::DrawOp(RenderOp& op) {
-    if ((op.m_selectedCamera == 0 || op.m_selectedCamera == m_curCamIdx) && (op.m_FramesLeft >= 1))
+    if ((op.m_selectedCamera == 0 || op.m_selectedCamera == m_queueState.m_curCamIdx) && (op.m_FramesLeft >= 1))
     {
         op.Draw(this);
     }
@@ -201,7 +196,7 @@ static bool CompareRenderPriority(const RenderOp* lhs, const RenderOp* rhs)
 
 // RENDER ALL
 void Renderer::RenderBelowPriority(double maxPriority) {
-    if (!m_InFrameRender) return;
+    if (!m_queueState.m_InFrameRender) return;
 
     if (this == &sLunaRender)
     {
@@ -209,52 +204,52 @@ void Renderer::RenderBelowPriority(double maxPriority) {
         LunaLoadScreenKill();
     }
 
-    auto& ops = m_currentRenderOps;
-    if (ops.size() <= m_renderOpsProcessedCount) return;
+    auto& ops = m_queueState.m_currentRenderOps;
+    if (ops.size() <= m_queueState.m_renderOpsProcessedCount) return;
 
     // Flush pending BltBlt
     g_BitBltEmulation.flushPendingBlt();
 
     // Assume operations already processed were already sorted
-    if (m_renderOpsSortedCount == 0)
+    if (m_queueState.m_renderOpsSortedCount == 0)
     {
         std::stable_sort(ops.begin(), ops.end(), CompareRenderPriority);
-        m_renderOpsSortedCount = ops.size();
+        m_queueState.m_renderOpsSortedCount = ops.size();
     }
-    else if (m_renderOpsSortedCount < ops.size())
+    else if (m_queueState.m_renderOpsSortedCount < ops.size())
     {
         // Sort the new operations
-        std::stable_sort(ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
+        std::stable_sort(ops.begin() + m_queueState.m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
 
         // Render things as many of the new items as we should before merging the sorted lists
         double maxPassPriority = maxPriority;
-        if (m_renderOpsSortedCount > m_renderOpsProcessedCount)
+        if (m_queueState.m_renderOpsSortedCount > m_queueState.m_renderOpsProcessedCount)
         {
-            double nextPriorityInOldList = ops[m_renderOpsProcessedCount]->m_renderPriority;
+            double nextPriorityInOldList = ops[m_queueState.m_renderOpsProcessedCount]->m_renderPriority;
             if (nextPriorityInOldList < maxPassPriority)
             {
                 maxPassPriority = nextPriorityInOldList;
             }
         }
-        for (auto iter = ops.cbegin() + m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
+        for (auto iter = ops.cbegin() + m_queueState.m_renderOpsSortedCount, end = ops.cend(); iter != end; ++iter)
         {
             RenderOp& op = **iter;
             if (op.m_renderPriority >= maxPassPriority) break;
             DrawOp(op);
-            m_renderOpsProcessedCount++;
+            m_queueState.m_renderOpsProcessedCount++;
         }
 
         // Merge sorted list sections (note, std::inplace_merge is a stable sort)
-        std::inplace_merge(ops.begin(), ops.begin() + m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
-        m_renderOpsSortedCount = ops.size();
+        std::inplace_merge(ops.begin(), ops.begin() + m_queueState.m_renderOpsSortedCount, ops.end(), CompareRenderPriority);
+        m_queueState.m_renderOpsSortedCount = ops.size();
     }
 
     // Render other operations
-    for (auto iter = ops.cbegin() + m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter) {
+    for (auto iter = ops.cbegin() + m_queueState.m_renderOpsProcessedCount, end = ops.cend(); iter != end; ++iter) {
         RenderOp& op = **iter;
         if (op.m_renderPriority >= maxPriority) break;
         DrawOp(op);
-        m_renderOpsProcessedCount++;
+        m_queueState.m_renderOpsProcessedCount++;
     }
 
     if (maxPriority >= DBL_MAX)
@@ -262,7 +257,7 @@ void Renderer::RenderBelowPriority(double maxPriority) {
         // Format debug messages and enter them into renderstring list
         int dbg_x = 325;
         int dbg_y = 160;
-        for (auto it = m_debugMessages.begin(); it != m_debugMessages.end(); it++)
+        for (auto it = m_queueState.m_debugMessages.begin(); it != m_queueState.m_debugMessages.end(); it++)
         {
             std::wstring dbg = *it;
             RenderStringOp(dbg, 4, (float)dbg_x, (float)dbg_y).Draw(this);
@@ -272,34 +267,34 @@ void Renderer::RenderBelowPriority(double maxPriority) {
                 dbg_x += 190;
             }
         }
-        this->m_debugMessages.clear();
+        this->m_queueState.m_debugMessages.clear();
     }
 }
 
 // CLEAR ALL
 void Renderer::ClearAllDebugMessages() {
-    this->m_debugMessages.clear();
+    this->m_queueState.m_debugMessages.clear();
 }
 
 // DEBUG PRINT
 void Renderer::DebugPrint(std::wstring message) {
-    this->m_debugMessages.push_back(message);
+    this->m_queueState.m_debugMessages.push_back(message);
 }
 
 void Renderer::DebugPrint(std::wstring message, double val) {
-    this->m_debugMessages.push_back(message + L" " + to_wstring((long long)val));
+    this->m_queueState.m_debugMessages.push_back(message + L" " + to_wstring((long long)val));
 }
 
 void Renderer::StartFrameRender()
 {
-    m_curCamIdx = 0;
-    m_InFrameRender = true;
+    m_queueState.m_curCamIdx = 0;
+    m_queueState.m_InFrameRender = true;
 }
 
 void Renderer::StartCameraRender(int idx)
 {
-    m_curCamIdx = idx;
-    m_renderOpsProcessedCount = 0;
+    m_queueState.m_curCamIdx = idx;
+    m_queueState.m_renderOpsProcessedCount = 0;
 }
 
 void Renderer::StoreCameraPosition(int idx)
@@ -315,13 +310,13 @@ void Renderer::StoreCameraPosition(int idx)
 
 void Renderer::EndFrameRender()
 {
-    if (!m_InFrameRender) return;
+    if (!m_queueState.m_InFrameRender) return;
 
-    m_curCamIdx = 0;
+    m_queueState.m_curCamIdx = 0;
 
     // Remove cleared operations
     std::vector<RenderOp*> nonExpiredOps;
-    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+    for (auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter) {
         RenderOp* pOp = *iter;
         pOp->m_FramesLeft--;
         if (pOp->m_FramesLeft <= 0)
@@ -334,22 +329,22 @@ void Renderer::EndFrameRender()
             nonExpiredOps.push_back(pOp);
         }
     }
-    m_currentRenderOps.swap(nonExpiredOps);
-    m_renderOpsProcessedCount = 0;
-    m_renderOpsSortedCount = m_currentRenderOps.size();
-    m_InFrameRender = false;
+    m_queueState.m_currentRenderOps.swap(nonExpiredOps);
+    m_queueState.m_renderOpsProcessedCount = 0;
+    m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
+    m_queueState.m_InFrameRender = false;
 }
 
 void Renderer::ClearQueue()
 {
-    m_curCamIdx = 0;
-    for (auto iter = m_currentRenderOps.begin(), end = m_currentRenderOps.end(); iter != end; ++iter) {
+    m_queueState.m_curCamIdx = 0;
+    for (auto iter = m_queueState.m_currentRenderOps.begin(), end = m_queueState.m_currentRenderOps.end(); iter != end; ++iter) {
         delete *iter;
     }
-    m_currentRenderOps.clear();
-    m_renderOpsProcessedCount = 0;
-    m_renderOpsSortedCount = 0;
-    m_InFrameRender = false;
+    m_queueState.m_currentRenderOps.clear();
+    m_queueState.m_renderOpsProcessedCount = 0;
+    m_queueState.m_renderOpsSortedCount = 0;
+    m_queueState.m_InFrameRender = false;
 }
 
 
@@ -378,3 +373,5 @@ void Render::CalcCameraPos(double* ret_x, double* ret_y) {
         }
     }
 }
+
+
