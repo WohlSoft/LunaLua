@@ -140,7 +140,8 @@ public:
         CONTROLLER_BUTTON_RIGHTSTICK = 9,
         CONTROLLER_BUTTON_TRIGGERLEFT  = 10,
         CONTROLLER_BUTTON_TRIGGERRIGHT = 11,
-        CONTROLLER_BUTTON_GUIDE = 12
+        CONTROLLER_BUTTON_GUIDE = 12,
+        CONTROLLER_BUTTON_JOY0 = 13
     }; // Translated values from SDL_GameControllerButton
 
     static const int axisThresholdOn = (30 * 0x7FFF) / 100;
@@ -158,6 +159,7 @@ private:
     unsigned int padState;
     unsigned int buttonState;
     bool activeFlag;
+    std::vector<int> joyButtonMap;
 };
 
 #endif
