@@ -887,6 +887,18 @@ void TrySkipPatch()
     PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0xA75726).CALL(runtimeHookJoyGetPosExNull).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0xA756CD).CALL(runtimeHookJoyGetDevCapsA).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA74A6D).CALL(runtimeHookUpdateJoystick).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8D010E).CALL(runtimeHookUpdateJoystick).NOP_PAD_TO_SIZE<5>().Apply();
+
+    // Max controller button idx patch
+    PATCH(0x8D0130).byte(0x2f).Apply();
+    PATCH(0x8D01D4).byte(0x2f).Apply();
+    PATCH(0xA74CF2).byte(0x2f).Apply();
+    PATCH(0xA74D2C).byte(0x2f).Apply();
+    PATCH(0xA74D66).byte(0x2f).Apply();
+    PATCH(0xA74DA0).byte(0x2f).Apply();
+    PATCH(0xA74DDA).byte(0x2f).Apply();
+    PATCH(0xA74E14).byte(0x2f).Apply();
 
     // Hook for explosions
     PATCH(0xA3BA90).JMP(runtimeHookDoExplosionInternal).NOP_PAD_TO_SIZE<6>().Apply();

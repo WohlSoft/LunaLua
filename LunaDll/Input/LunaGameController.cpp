@@ -352,7 +352,7 @@ void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
     }
 
     // Copy button state
-    player.buttonState = controller->getButtonState() & 0x7FFF;
+    player.buttonState = controller->getButtonState();
 }
 #endif // !defined(BUILDING_SMBXLAUNCHER)
 

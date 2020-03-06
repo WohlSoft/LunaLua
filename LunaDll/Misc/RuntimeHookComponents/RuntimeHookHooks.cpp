@@ -2608,6 +2608,28 @@ MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT c
     return MMSYSERR_NODRIVER;
 }
 
+void __stdcall runtimeHookUpdateJoystick()
+{
+    static unsigned short runtimeHookJoystick[15 + 32] = { 0 };
+    *(unsigned short**)0xB2DBD4 = runtimeHookJoystick;
+
+    JOYINFOEX ji = { 0 };
+    ji.dwSize = sizeof(JOYINFOEX);
+
+    UINT uJoyID = *(unsigned int*)0xB2D878;
+
+    gLunaGameControllerManager.emulatedJoyGetPosEx(uJoyID, &ji);
+
+    for (int i = 0; i < 32; i++)
+    {
+        runtimeHookJoystick[i + 15] = COMBOOL(ji.dwButtons & (1UL << i));
+    }
+
+    *(int*)0xB2DBE0 = ji.dwXpos;
+    *(int*)0xB2DBE4 = ji.dwYpos;
+    *(int*)0xB2DBE8 = ji.dwPOV;
+}
+
 static _declspec(naked) void __stdcall runtimeHookDoExplosion_OrigFunc(Momentum* coor, short* bombType, short* playerIdx)
 {
     __asm {
