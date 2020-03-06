@@ -3113,12 +3113,14 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixClearTemp()
     //              00A0C8DA | mov dword ptr ss:[ebp-0xFC],edx
     // and similar
     __asm {
+        pushfd
         push eax
         xor eax, eax
         mov dword ptr ss : [ebp - 0x100], eax
         mov dword ptr ss : [ebp - 0xFC], eax
         mov dword ptr ss : [ebp - 0x178], eax
         pop eax
+        popfd
         ret
     }
 }
