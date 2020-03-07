@@ -8,7 +8,7 @@
 #include <vector>
 #include "LunaLoaderPatch.h"
 
-#define ErrorBox(msg, title) MessageBoxW(NULL, msg, title, MB_ICONERROR)
+#define ErrorBox(msg, title) MessageBoxW(NULL, (msg), (title), MB_ICONERROR)
 
 std::vector<std::wstring> splitCmdArgs(const std::wstring &str)
 {
@@ -84,28 +84,25 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
 
     LunaLoaderResult ret = LunaLoaderRun(pathToSMBX.c_str(), newCmdLine.c_str(), curPath.c_str());
 
+    std::wstring errMsg;
     switch(ret)
     {
     case LUNALOADER_OK:
         return 0;
     case LUNALOADER_CREATEPROCESS_FAIL:
-#ifdef LUNALOADER_EXEC
-        ErrorBox(L"Error: Couldn't run SMBX",
-                 L"Couldn't run SMBX");
-#else
-        ErrorBox(L"Error: Couldn't run SMBX\n"
-                 "However you can try to drag and drop the SMBX exe file to LunaLoader.exe\n"
-                 "If this doesn't work then ask on the forums.",
-                 L"Couldn't run SMBX");
-#endif
+        errMsg = L"Error: Couldn't run SMBX\r\n\r\n";
+        errMsg += LunaLoaderGetLastError();
+        ErrorBox(errMsg.c_str(), L"LunaLoader Error");
         return 1;
     case LUNALOADER_PATCH_FAIL:
-        ErrorBox(L"Error: Failed to patch SMBX",
-                 L"Failed to patch SMBX");
+        errMsg = L"Error: Failed to patch SMBX\r\n\r\n";
+        errMsg += LunaLoaderGetLastError();
+        ErrorBox(errMsg.c_str(), L"LunaLoader Error");
         return 2;
     default:
-        ErrorBox(L"Unknown Error in LunaLoader.",
-                 L"Unknown Error");
+        errMsg = L"Unknown Error in LunaLoader.\r\n\r\n";
+        errMsg += LunaLoaderGetLastError();
+        ErrorBox(errMsg.c_str(), L"LunaLoader Error");
         return 3;
     }
 }

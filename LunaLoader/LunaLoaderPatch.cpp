@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "LunaLoaderPatch.h"
 
+static std::wstring lunaLoaderError;
 
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
 std::wstring GetLastErrorAsString()
@@ -23,6 +24,11 @@ std::wstring GetLastErrorAsString()
     LocalFree(messageBuffer);
 
     return message;
+}
+
+const wchar_t* LunaLoaderGetLastError()
+{
+    return lunaLoaderError.c_str();
 }
 
 #if 0 // unused
@@ -80,6 +86,8 @@ static int patchUStr(HANDLE f, unsigned int at, char* str, unsigned int maxlen)
 
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLineArgs, const wchar_t *workingDir)
 {
+    lunaLoaderError = L"Unknown";
+
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
 #ifdef LUNALOADER_EXEC
@@ -135,63 +143,34 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         &pi)              // Pointer to PROCESS_INFORMATION structure
         )
     {
+        lunaLoaderError = L"Error during CreateProcessW:\r\n" + GetLastErrorAsString();
         free(cmdLine); cmdLine = NULL;
         return LUNALOADER_CREATEPROCESS_FAIL;
     }
     free(cmdLine);
     cmdLine = NULL;
 
+    // Test that the main thread is suspended, just in case
+    if (SuspendThread(pi.hThread) < 1)
+    {
+        lunaLoaderError = L"Main thread did not start suspended!";
+        ResumeThread(pi.hThread);
+        CloseHandle(pi.hThread);
+        TerminateProcess(pi.hProcess, 0);
+        CloseHandle(pi.hProcess);
+        return LUNALOADER_PATCH_FAIL;
+    }
+    ResumeThread(pi.hThread);
+
 #if 1// Remote thread way
     std::wstring dllname = L"nothing";
     int          dllname_size = 1024;
 
-    HMODULE msvbvm = LoadLibraryW(L"msvbvm60.dll");
-    if(!msvbvm)
-    {
-        std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"msvbvm60 Error!", MB_ICONERROR);
-        return LUNALOADER_PATCH_FAIL;
-    }
-
-    /*
-    HMODULE lunadlldll = LoadLibraryW(L"lunadll.dll");
-    if(!lunadlldll)
-    {
-        std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"lunadll Error!", MB_ICONERROR);
-        return LUNALOADER_PATCH_FAIL;
-    }*/
-
-    PWSTR pszLibFileRemote = (PWSTR)VirtualAllocEx(pi.hProcess, NULL, dllname_size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    PWSTR pszLibFileRemote = (PWSTR)VirtualAllocEx(pi.hProcess, NULL, dllname_size, MEM_COMMIT, PAGE_READWRITE);
     LPTHREAD_START_ROUTINE pfnThreadRtn =
             (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "LoadLibraryW");
-            //(LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleW(L"user32.dll"), "MessageBoxA");
 
-    HANDLE hThread = NULL;
-
-    dllname = L"msvbvm60.dll";
-    if(WriteProcessMemory(pi.hProcess,
-                          (void*)pszLibFileRemote,
-                          (void*)dllname.c_str(),
-                          (dllname.size()+1) * sizeof(wchar_t),
-                          NULL) == 0)
-    {
-        return LUNALOADER_PATCH_FAIL;
-    }
-    hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
-    if(!hThread)
-    {
-        if(hThread != NULL)
-            CloseHandle(hThread);
-        return LUNALOADER_PATCH_FAIL;
-    }
-
-    // Wait for the remote thread to terminate
-    WaitForSingleObject(hThread, INFINITE);
-    if(hThread != NULL)
-        CloseHandle(hThread);
-
-
+    // Load LunaDll.dll into the process
     dllname = L"LunaDll.dll";
     if(WriteProcessMemory(pi.hProcess,
                           (void*)pszLibFileRemote,
@@ -199,21 +178,25 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
                           (dllname.size()+1) * sizeof(wchar_t),
                           NULL) == 0)
     {
-        if(hThread != NULL)
-            CloseHandle(hThread);
+        lunaLoaderError = L"Error during WriteProcessMemory:\r\n" + GetLastErrorAsString();
+        CloseHandle(pi.hThread);
+        TerminateProcess(pi.hProcess, 0);
+        CloseHandle(pi.hProcess);
         return LUNALOADER_PATCH_FAIL;
     }
-    hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
+    HANDLE hThread = CreateRemoteThread(pi.hProcess, NULL, 0, pfnThreadRtn, pszLibFileRemote, 0, NULL);
     if(!hThread)
     {
-        if(hThread != NULL)
-            CloseHandle(hThread);
+        // Couldn't start thread
+        lunaLoaderError = L"Error during CreateRemoteThread:\r\n" + GetLastErrorAsString();
+        CloseHandle(pi.hThread);
+        TerminateProcess(pi.hProcess, 0);
+        CloseHandle(pi.hProcess);
         return LUNALOADER_PATCH_FAIL;
     }
     // Wait for the remote thread to terminate
     WaitForSingleObject(hThread, INFINITE);
-    if(hThread != NULL)
-        CloseHandle(hThread);
+    CloseHandle(hThread);
 
 //    patchUStr(pi.hProcess, 0x27614, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 124);
 //    patchAStr(pi.hProcess, 0x67F6A, (char*)"LunaLUA-SMBX Version 1.3.0.2 http://wohlsoft.ru", 63);
@@ -292,6 +275,18 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
         return LUNALOADER_PATCH_FAIL;
     }
 #endif
+
+    // Just before we resume the main thread, make sure it stayed suspended up till now
+    if (SuspendThread(pi.hThread) < 1)
+    {
+        lunaLoaderError = L"Main thread did not stay suspended!";
+        ResumeThread(pi.hThread);
+        CloseHandle(pi.hThread);
+        TerminateProcess(pi.hProcess, 0);
+        CloseHandle(pi.hProcess);
+        return LUNALOADER_PATCH_FAIL;
+    }
+    ResumeThread(pi.hThread);
 
     // Resume the main program thread
     ResumeThread(pi.hThread);
