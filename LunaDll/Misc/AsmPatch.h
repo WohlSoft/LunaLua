@@ -148,10 +148,10 @@ public:
     inline AsmPatch<Size + 1> POP_R32(AsmConsts::R32 arg) const {
         return byte(0x58 | arg);
     }
-    inline AsmPatch<Size + 1> PUSHF() const {
+    inline AsmPatch<Size + 1> PUSHFD() const {
         return byte(0x9C);
     }
-    inline AsmPatch<Size + 1> POPF() const {
+    inline AsmPatch<Size + 1> POPFD() const {
         return byte(0x9D);
     }
 
@@ -291,7 +291,7 @@ public:
     inline AsmPatch<Size + 13> SAFE_CALL(void* func) const { return SAFE_CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 13> SAFE_CALL(std::uintptr_t func) const {
         return (
-            PUSHF().
+            PUSHFD().
             PUSH_EAX().
             PUSH_ECX().
             PUSH_EDX().
@@ -299,7 +299,7 @@ public:
             POP_EDX().
             POP_ECX().
             POP_EAX().
-            POPF()
+            POPFD()
         );
     }
 

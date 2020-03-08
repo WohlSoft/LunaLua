@@ -1511,8 +1511,7 @@ extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) 
 _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
 {
     __asm {
-        PUSHF
-        SUB ESP, 2
+        PUSHFD
         PUSH EAX
         PUSH DWORD PTR DS : [EBP + 0xC] // objType
         PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
@@ -1520,8 +1519,7 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
         MOV DX, AX
         XOR ECX, ECX
         POP EAX
-        ADD ESP, 2
-        POPF
+        POPFD
         CMP DX, CX
         RET
     }
@@ -1647,7 +1645,7 @@ static void runtimeHookSmbxChangeModeHook(void)
 __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
 {
     __asm {
-        pushf
+        pushfd
             push eax
             push ecx
             push edx
@@ -1657,7 +1655,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
         pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             or ebx, 0xFFFFFFFF
             cmp word ptr ds : [0xB2C620], bx
             ret
@@ -1768,7 +1766,7 @@ static void __stdcall runtimeHookSmbxCheckWindowed(void)
 __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1778,7 +1776,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         cmp word ptr ds : [0xB250D8], 0xFFFFFFFF
         ret
     }
@@ -1853,7 +1851,7 @@ static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *har
 __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1866,7 +1864,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         mov eax, dword ptr ds : [0xB25D14]
         push 0xA28FE8
         ret
@@ -1874,7 +1872,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         mov edi, dword ptr ds : [ebp + 0xC]
         mov ax, word ptr ds : [edi]
         movsx edi, word ptr ds : [esi + 0xE2]
@@ -1896,7 +1894,7 @@ static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
 __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1908,14 +1906,14 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0x9AA9EA
         ret
     alternate_exit :
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0x9AA365
         ret
     }
@@ -1937,7 +1935,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
     // 00A0A997
     __asm {
         jle early_exit
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1948,14 +1946,14 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0xA0A997
         ret
     alternate_exit :
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
     early_exit :
         push 0xA0AB20
         ret
@@ -2069,7 +2067,7 @@ static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -2079,7 +2077,7 @@ __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         or edi, 0xFFFFFFFF
         cmp word ptr ds : [ebx + 0x4], di
         push 0xA75080
@@ -2096,7 +2094,7 @@ static void __stdcall runtimeHookSetHDC(HDC newHDC)
 __declspec(naked) void __stdcall runtimeHookSetHDCRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -2105,7 +2103,7 @@ __declspec(naked) void __stdcall runtimeHookSetHDCRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         ret
     }
 }
@@ -2301,8 +2299,7 @@ static void __stdcall runtimeHookColorSwitch(unsigned int color)
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2311,8 +2308,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2321,8 +2317,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2331,8 +2326,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2341,8 +2335,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2351,8 +2344,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2361,8 +2353,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2371,8 +2362,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2381,8 +2371,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2391,8 +2380,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB424
         ret
     }
@@ -2401,8 +2389,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2411,8 +2398,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB5BF
         ret
     }
@@ -2421,8 +2407,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2431,8 +2416,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB75F
         ret
     }
@@ -2441,8 +2425,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2451,8 +2434,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB8FA
         ret
     }
@@ -3044,12 +3026,12 @@ _declspec(naked) void __stdcall runtimeHookPreserveNPCWalkBlock()
     // Patches over 00A14BA6 | jne 0xA15F7C
     // edx is free for use at this point
     __asm {
-        pushf
+        pushfd
         movsx edx, word ptr ss : [ebp - 0x178]
         mov g_npcTempHitBlock, edx
         fld qword ptr ss : [ebp - 0x100]
         fstp g_npcTempHit
-        popf
+        popfd
         jne otherHitspot
         push 0xA14BAC // HitSpot 1
         ret

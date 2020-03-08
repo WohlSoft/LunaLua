@@ -163,7 +163,7 @@ void fixup_RenderPlayerJiterX();
 template <int priority>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -173,7 +173,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         ret
     }
 }
@@ -185,7 +185,7 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
 template <int priority, unsigned int skipTargetAddr, bool* skipAddr>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -198,7 +198,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
             pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             ret
         }
     }
@@ -208,7 +208,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
             pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             add esp, 4
             push skipTargetAddrTmp
             ret

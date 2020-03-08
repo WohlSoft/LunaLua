@@ -94,7 +94,7 @@ static std::unordered_map<short, std::unique_ptr<CharacterDataStruct>> runtimeHo
 static bool runtimeHookCharacterIdApplied = false;
 
 // Declare assembly snippets
-#define ASM_ARG(ARGUMENT) __asm { __asm pushf __asm push eax __asm push ecx __asm push edx __asm lea eax, dword ptr ds : [ ARGUMENT ] __asm push eax __asm call runtimeHookCharacterIdTranslateHook }
+#define ASM_ARG(ARGUMENT) __asm { __asm pushfd __asm push eax __asm push ecx __asm push edx __asm lea eax, dword ptr ds : [ ARGUMENT ] __asm push eax __asm call runtimeHookCharacterIdTranslateHook }
 //lea eax, dword ptr ds : [eax + F0]
 //lea eax, dword ptr ds : [ebx + F0]
 //lea eax, dword ptr ds : [ecx + F0]
@@ -111,7 +111,7 @@ static bool runtimeHookCharacterIdApplied = false;
 //lea eax, dword ptr ds : [edx + ecx * 4 + F0]
 //lea eax, dword ptr ds : [eax + ecx * 4 + 0xF0]
 
-#define ASM_TAIL_CMP(ARG) __asm { __asm pop edx __asm pop ecx __asm cmp ax, ARG __asm pop eax __asm lea esp, dword ptr ds : [esp + 2] __asm ret }
+#define ASM_TAIL_CMP(ARG) __asm { __asm pop edx __asm pop ecx __asm cmp ax, ARG __asm pop eax __asm lea esp, dword ptr ds : [esp + 4] __asm ret }
 #define ASM_TAIL_CMP_0() ASM_TAIL_CMP(0)
 #define ASM_TAIL_CMP_1() ASM_TAIL_CMP(1)
 #define ASM_TAIL_CMP_2() ASM_TAIL_CMP(2)
@@ -119,21 +119,21 @@ static bool runtimeHookCharacterIdApplied = false;
 #define ASM_TAIL_CMP_4() ASM_TAIL_CMP(4)
 #define ASM_TAIL_CMP_5() ASM_TAIL_CMP(5)
 #define ASM_TAIL_CMP_6() ASM_TAIL_CMP(6)
-#define ASM_TAIL_CMP_ax() __asm { __asm pop edx __asm pop ecx __asm cmp eax, dword ptr ss:[esp] __asm pop eax __asm lea esp, dword ptr ds : [esp + 2] __asm ret }
+#define ASM_TAIL_CMP_ax() __asm { __asm pop edx __asm pop ecx __asm cmp eax, dword ptr ss:[esp] __asm pop eax __asm lea esp, dword ptr ds : [esp + 4] __asm ret }
 #define ASM_TAIL_CMP_cx() ASM_TAIL_CMP(cx)
 #define ASM_TAIL_CMP_di() ASM_TAIL_CMP(di)
 #define ASM_TAIL_CMP_dx() ASM_TAIL_CMP(dx)
 #define ASM_TAIL_CMP_si() ASM_TAIL_CMP(si)
-#define ASM_TAIL_CMP_dx_ax() __asm { __asm pop edx __asm pop ecx __asm cmp dx, ax __asm pop eax __asm lea esp, dword ptr ds : [esp + 2] __asm ret }
-#define ASM_TAIL_MOV_ax() __asm { __asm pop edx __asm pop ecx __asm add esp, 4 __asm popf __asm ret }
-#define ASM_TAIL_MOV_cx() __asm { __asm pop edx __asm pop ecx __asm mov cx, ax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_dx() __asm { __asm pop edx __asm pop ecx __asm mov dx, ax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_eax() __asm { __asm pop edx __asm pop ecx __asm add esp, 4 __asm popf __asm ret }
-#define ASM_TAIL_MOV_ebx() __asm { __asm pop edx __asm pop ecx __asm mov ebx, eax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_ecx() __asm { __asm pop edx __asm pop ecx __asm mov ecx, eax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_edi() __asm { __asm pop edx __asm pop ecx __asm mov edi, eax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_edx() __asm { __asm pop edx __asm pop ecx __asm mov edx, eax __asm pop eax __asm popf __asm ret }
-#define ASM_TAIL_MOV_esi() __asm { __asm pop edx __asm pop ecx __asm mov esi, eax __asm pop eax __asm popf __asm ret }
+#define ASM_TAIL_CMP_dx_ax() __asm { __asm pop edx __asm pop ecx __asm cmp dx, ax __asm pop eax __asm lea esp, dword ptr ds : [esp + 4] __asm ret }
+#define ASM_TAIL_MOV_ax() __asm { __asm pop edx __asm pop ecx __asm add esp, 4 __asm popfd __asm ret }
+#define ASM_TAIL_MOV_cx() __asm { __asm pop edx __asm pop ecx __asm mov cx, ax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_dx() __asm { __asm pop edx __asm pop ecx __asm mov dx, ax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_eax() __asm { __asm pop edx __asm pop ecx __asm add esp, 4 __asm popfd __asm ret }
+#define ASM_TAIL_MOV_ebx() __asm { __asm pop edx __asm pop ecx __asm mov ebx, eax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_ecx() __asm { __asm pop edx __asm pop ecx __asm mov ecx, eax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_edi() __asm { __asm pop edx __asm pop ecx __asm mov edi, eax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_edx() __asm { __asm pop edx __asm pop ecx __asm mov edx, eax __asm pop eax __asm popfd __asm ret }
+#define ASM_TAIL_MOV_esi() __asm { __asm pop edx __asm pop ecx __asm mov esi, eax __asm pop eax __asm popfd __asm ret }
 
 #define DECL_HOOK(FUNCNAME, ARG, TAIL) __declspec(naked) static void  __stdcall FUNCNAME() { ASM_ARG(ARG); ASM_TAIL_##TAIL(); }
 
@@ -1145,52 +1145,52 @@ static auto patch_0xA60BE3 = PATCH(0xA60BE3).CALL(HOOK_0xA60BE3).NOP_PAD_TO_SIZE
 
 // Player template patches
 static auto patch_play2temp_0x8E485F = PATCH(0x8E485F)
-    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSHFD().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
     .PUSH_ESI().PUSH_EDI() // Arguments
     .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
-    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .POP_EDX().POP_ECX().POP_EAX().POPFD() // Safety
     .JMP(0x8E4897)
     .NOP_PAD_TO_SIZE<56>();
 static auto patch_play2temp_0x8E555F = PATCH(0x8E555F)
-    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSHFD().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
     .PUSH_ESI().PUSH_EDI() // Arguments
     .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
-    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .POP_EDX().POP_ECX().POP_EAX().POPFD() // Safety
     .JMP(0x8E5597)
     .NOP_PAD_TO_SIZE<56>();
 static auto patch_play2temp_0x9DA7D2 = PATCH(0x9DA7D2)
-    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSHFD().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
     .PUSH_EDI().PUSH_ESI() // Arguments
     .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
-    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .POP_EDX().POP_ECX().POP_EAX().POPFD() // Safety
     .JMP(0x9DA808)
     .NOP_PAD_TO_SIZE<54>();
 static auto patch_temp2play_0x9DAAAA = PATCH(0x9DAAAA)
-    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSHFD().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
     .PUSH_EDI().PUSH_EBX() // Arguments
     .CALL(runtimeHookCharacterIdCopyTemplateToPlayer)
-    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .POP_EDX().POP_ECX().POP_EAX().POPFD() // Safety
     .JMP(0x9DACC0)
     .NOP_PAD_TO_SIZE<534>();
 static auto patch_play2temp_0xA028F9 = PATCH(0xA028F9)
-    .PUSHF().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
+    .PUSHFD().PUSH_EAX().PUSH_ECX().PUSH_EDX() // Safety
     .PUSH_ESI().PUSH_EDI() // Arguments
     .CALL(runtimeHookCharacterIdCopyPlayerToTemplate)
-    .POP_EDX().POP_ECX().POP_EAX().POPF() // Safety
+    .POP_EDX().POP_ECX().POP_EAX().POPFD() // Safety
     .JMP(0xA02933)
     .NOP_PAD_TO_SIZE<58>();
 
 // Animation hook, a bit messy, but ehh
 __declspec(naked) static void  __stdcall HOOK_0x9E1CA9() {
     __asm {
-        pushf
+        pushfd
         push ecx
         push edx
         call runtimeHookCharacterIdAnimateBlocks
         mov eax, dword ptr ds : [0xB2BEA0]
         pop edx
         pop ecx
-        popf
+        popfd
         ret
     }
 }
@@ -1416,7 +1416,7 @@ __declspec(naked) static void __stdcall EffectUpdateRawHook() {
     // 009E4C2B | 66 8B 0E | mov cx, word ptr ds : [esi] |
     // 009E4C2E | DF E0 | fnstsw ax |
     __asm {
-        pushf
+        pushfd
         push eax
         push edx
         push esi // Attach effect argument
@@ -1424,7 +1424,7 @@ __declspec(naked) static void __stdcall EffectUpdateRawHook() {
         mov cx, ax
         pop edx
         pop eax
-        popf
+        popfd
         fnstsw ax
         ret
     }
@@ -1435,7 +1435,7 @@ __declspec(naked) static void __stdcall RunEffectRawHook() {
     // 009E73C9 | 33 C0 | xor eax, eax |
     // 009E73CB | 66 8B 3B | mov di, word ptr ds : [ebx] |
     __asm {
-        pushf
+        pushfd
         push ecx
         push edx
         push ebx // Attach effect argument
@@ -1443,7 +1443,7 @@ __declspec(naked) static void __stdcall RunEffectRawHook() {
         mov di, ax
         pop edx
         pop ecx
-        popf
+        popfd
         xor eax, eax
         ret
     }
