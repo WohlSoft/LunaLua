@@ -63,6 +63,8 @@ extern void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, boo
 
 void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outData)
 {
+    LUNALOG("Loading level from file");
+
     FileFormats::CreateLevelData(outData);
     m_isValid = true; // Ensure that we are not valid right now
     std::wstring filePath = fullPath;

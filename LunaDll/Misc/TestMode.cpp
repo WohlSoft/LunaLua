@@ -137,23 +137,40 @@ void testModeRestartLevel(void)
 static bool testModeSetupForLoading()
 {
     const std::wstring& path = testModeSettings.levelPath;
+    LUNALOG("Running testModeSetupForLoading");
+
+    LUNALOG(std::string("\t levelRawData.size() == ") + std::to_string(testModeData.levelRawData.size()));
+    LUNALOG(std::wstring(L"\t path == ") + path);
+    BOOL fExists = FileExists(path.c_str());
+    DWORD fErr = GetLastError();
+    LUNALOG(std::wstring(L"\t FileExists(path.c_str()) == ") + std::to_wstring(fExists));
+    if (fExists == 0)
+    {
+        LUNALOG(std::wstring(L"\t GetLastError() == ") + std::to_wstring(fErr));
+    }
 
     // Check that the file exists, but only if we don't have raw level data
     if ((testModeData.levelRawData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
+        LUNALOG("\tNo data and file doesn't exist!");
+        LUNALOG("Done testModeSetupForLoading");
         return false;
     }
 
     // Start by stopping any Lua things
+    LUNALOG("\tstopping Lua...");
     gLunaLua.exitContext();
 
     // Stop music if any is still going
+    LUNALOG("\tstopping music...");
     native_stopMusic();
 
     // Cleanup custom level resources
+    LUNALOG("\tcleaning up level resources...");
     native_cleanupLevel();
 
     // Reset character templates
+    LUNALOG("\treset character templates...");
     for (int i = 1; i <= 5; i++)
     {
         PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[i];
@@ -164,10 +181,12 @@ static bool testModeSetupForLoading()
     }
 
     // Zero the whole players data structure
+    LUNALOG("\tzero players data structure...");
     GM_PLAYERS_COUNT = 0;
     memset(GM_PLAYERS_PTR, 0, sizeof(PlayerMOB) * 201);
 
     // Initialize Players
+    LUNALOG("\tinitialize players data structure...");
     GM_PLAYERS_COUNT = testModeSettings.playerCount;
     for (int i = 1; i <= testModeSettings.playerCount; i++) {
         PlayerMOB* player = Player::Get(i);
@@ -183,6 +202,7 @@ static bool testModeSetupForLoading()
     }
 
     // Overwrite episode list data
+    LUNALOG("\toverwrite episode list data...");
     size_t pos = path.find_last_of(L"/\\");
     GM_EP_LIST_COUNT = 1;
     EpisodeListItem* ep = EpisodeListItem::GetRaw(0);
@@ -194,8 +214,10 @@ static bool testModeSetupForLoading()
     ep->unknown_14 = "";
 
     // Set episode path...
+    LUNALOG("\tset episode path...");
     GM_FULLDIR = path.substr(0, pos + 1);
 
+    LUNALOG("\tset other parameters...");
     // God Mode cheat code
     GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);
 
@@ -235,11 +257,17 @@ static bool testModeSetupForLoading()
     GM_EPISODE_MODE = -1;
     GM_IS_EDITOR_TESTING_NON_FULLSCREEN = 0;
 
+    LUNALOG("\tunapply exit pause patch...");
+
     // Unapply exit pause patch
     exitPausePatch.Unapply();
 
+    LUNALOG("\tstart load screen...");
+    //LUNALOG("\t\t(Except not, because that's commented for this build?)");
     // Make sure load screen is started
     LunaLoadScreenStart();
+
+    LUNALOG("Done testModeSetupForLoading");
 
     return true;
 }
@@ -259,6 +287,7 @@ bool testModeLoadLevelHook(VB6StrPtr* filename)
     // If the filename matches the one we're testing, and we have raw level data, let's use it
     if (*filename == testModeSettings.levelPath && testModeData.levelRawData.size() > 0)
     {
+        LUNALOG("Loading level from data passed by IPC");
         SMBXLevelFileBase base;
         base.ReadFileMem(testModeData.levelRawData, getCurrentLevelData(), testModeSettings.levelPath);
         return true;
@@ -269,8 +298,15 @@ bool testModeLoadLevelHook(VB6StrPtr* filename)
 
 void testModeSmbxChangeModeHook(void)
 {
+    LUNALOG("Running testModeSmbxChangeModeHook");
+
     // Skip if not enabled
-    if (!testModeSettings.enabled) return;
+    if (!testModeSettings.enabled)
+    {
+        LUNALOG("test mode not enabled");
+        LUNALOG("Done testModeSmbxChangeModeHook");
+        return;
+    }
 
     if (GM_ISLEVELEDITORMODE || GM_CREDITS_MODE || GM_LEVEL_MODE ||
         (GM_EPISODE_MODE && (GM_NEXT_LEVEL_FILENAME.length() == 0)))
@@ -278,6 +314,12 @@ void testModeSmbxChangeModeHook(void)
         // Preprate to load/reload
         testModeSetupForLoading();
     }
+    else
+    {
+        LUNALOG("test mode is enabled but mode is not suitable for loading");
+    }
+
+    LUNALOG("Done testModeSmbxChangeModeHook");
 }
 
 static AsmPatch<10U> shortenReloadPatch =
@@ -315,11 +357,14 @@ bool testModeEnable(const STestModeSettings& settings)
         fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
     }
 
+    LUNALOG(std::wstring(L"Trying testModeEnable for ") + fullPath);
+
     const std::string &newLevelData = settings.rawData;
 
     // Check that the file exists, but only if we don't have raw level data
     if (newLevelData.empty() && (FileExists(fullPath.c_str()) == 0))
     {
+        LUNALOG("No level exists for testModeEnable to use!");
         return false;
     }
 
@@ -333,6 +378,8 @@ bool testModeEnable(const STestModeSettings& settings)
     //shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
+
+    LUNALOG("testModeEnable was successful");
 
     return true;
 }

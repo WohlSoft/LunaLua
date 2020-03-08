@@ -84,9 +84,14 @@ void IPCPipeServer::AttachStdinStdout() {
     // If we have an input stream, start the thread
     if (mInFD != -1)
     {
+        LUNALOG("starting IPC pipe server thread");
         std::thread* readThread = new std::thread([this]() {
             this->ReadThread();
         });
+    }
+    else
+    {
+        LUNALOG("no pipe, so not starting IPC server");
     }
 }
 
@@ -132,11 +137,13 @@ void IPCPipeServer::ReadThread()
         // See if we have a callback for the method...
         const auto it = mCallbacks.find(pktMethod);
         if (it != mCallbacks.cend()) {
+            LUNALOG("handling IPC method: " + pktMethod);
             IPCCallback cb = (*it).second;
             RunCallback(cb, pktParams, pktId);
             continue;
         }
 
+        LUNALOG("could not find IPC method: " + pktMethod);
         SendJsonError(-32601, "Method not found", pktId);
     }
 

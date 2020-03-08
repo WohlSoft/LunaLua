@@ -160,5 +160,6 @@ return;
         return;\
     }
 
+#include "LunaLog.h"
 
 #endif

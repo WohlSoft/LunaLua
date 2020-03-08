@@ -392,6 +392,56 @@ void initAppPaths()
     FILE *mainexe=fopen(apath.c_str(), "r");
     removeFilePathW(fullPath, count);
 
+    LunaLog::StartLog(fullPath);
+    LUNALOG(std::wstring(L"Starting SMBX2 in ") + fullPath);
+    LUNALOG(std::string("Executable paths seems ") + (mainexe ? "valid" : "INVALID") + ".");
+
+    LUNALOG(std::string("IsDebuggerPresent returned ") + (IsDebuggerPresent() ? "TRUE" : "false") + ".");
+
+    DWORD dwVersion = GetVersion();
+    DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+    DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+    DWORD dwBuild = 0;
+    if (dwVersion < 0x80000000)
+        dwBuild = (DWORD)(HIWORD(dwVersion));
+    LUNALOG(std::string("Windows reports version ") + std::to_string(dwMajorVersion) + "." + std::to_string(dwMinorVersion) + " (" + std::to_string(dwBuild) + ")");
+    
+    int cpuInfo[4] = { -1 };
+    char cpuName[0x40];
+    __cpuid(cpuInfo, 0);
+    memcpy(&cpuName[0], &cpuInfo[1], 4);
+    memcpy(&cpuName[4], &cpuInfo[3], 4);
+    memcpy(&cpuName[8], &cpuInfo[2], 4);
+    cpuName[12] = '\0';
+    LUNALOG(std::string("Processor manufacturer is ") + cpuName);
+
+    __cpuid(cpuInfo, 0x80000000);
+    if (cpuInfo[0] >= 0x80000004)
+    {
+        memset(cpuName, 0, sizeof(cpuName));
+        __cpuid(cpuInfo, 0x80000002);
+        memcpy(cpuName, cpuInfo, sizeof(cpuInfo));
+        __cpuid(cpuInfo, 0x80000003);
+        memcpy(cpuName + 16, cpuInfo, sizeof(cpuInfo));
+        __cpuid(cpuInfo, 0x80000004);
+        memcpy(cpuName + 32, cpuInfo, sizeof(cpuInfo));
+    }
+    else
+    {
+        strcpy(cpuName, "UNKNOWN");
+    }
+    LUNALOG(std::string("Processor is ") + cpuName);
+
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+    LUNALOG(std::string("Logical processor count is ") + std::to_string(sysInfo.dwNumberOfProcessors));
+    ULONGLONG totalMem = 0;
+    GetPhysicallyInstalledSystemMemory(&totalMem);
+    LUNALOG(std::string("Installed physical memory is ") + std::to_string(totalMem / 1024) + " MB");
+
+    LUNALOG(std::string("C Local is ") + std::setlocale(LC_ALL, NULL));
+    LUNALOG(std::string("User Default LCID is ") + std::to_string(GetUserDefaultLCID()));
+
     if(!mainexe)
     {
         std::wstringstream msg;
@@ -414,6 +464,7 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
+    LUNALOG("Running InitGlobals.");
 
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
@@ -450,6 +501,7 @@ void InitGlobals()
         CreateDirectoryW(configFolderPath.c_str(), NULL);
     }
 
+    LUNALOG("Done InitGlobals.");
 }
 
 /// CLEAN UP

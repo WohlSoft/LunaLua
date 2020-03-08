@@ -697,6 +697,7 @@
     <ClInclude Include="Input\LunaGameController.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="LunaLog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1307,6 +1308,7 @@
     <ClCompile Include="Input\LunaGameController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="LunaLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

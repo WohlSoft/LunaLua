@@ -45,7 +45,8 @@ void SetupThunRTMainHook()
 {
     // Remove protection on smbx.text section
     DWORD oldprotect;
-    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
+    BOOL ret = VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
+    LUNALOG(std::string("Making SMBX memory writable: ") + (ret ? "success" : "FAILED") + ".");
 
     // Set up hook that will launch LunaDLLInit
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
@@ -83,6 +84,8 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             LPCSTR winName = createData->lpszName;
             if ((gMainWindowHwnd == NULL) && (winName != NULL) && (strncmp("- Version 1.2.2 -", &winName[20], 17) == 0))
             {
+                LUNALOG("Storing main window handle.");
+
                 // Store main window handle
                 gMainWindowHwnd = wData->hwnd;
             }
@@ -127,6 +130,12 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 void ParseArgs(const std::vector<std::wstring>& args)
 {
+    LUNALOG("Getting arguments...");
+    for (auto& arg : args)
+    {
+        LUNALOG(L"\tARG: " + arg);
+    }
+    LUNALOG("End of arguments.");
 
     if (vecStrFind(args, L"--patch"))
         gStartupSettings.patch = true;
@@ -163,11 +172,14 @@ void ParseArgs(const std::vector<std::wstring>& args)
         const std::wstring& arg = args[i];
         if (arg.find(L"--testLevel=") == 0)
         {
+            LUNALOG("Handling --testLevel argument");
             STestModeSettings settings;
             settings.levelPath = arg.substr(12);
             settings.rawData = "";
             if (!testModeEnable(settings))
             {
+                LUNALOG("Couldn't open level file");
+
                 // Invalid level name
                 std::wstring path = L"SMBX could not open \"" + settings.levelPath + L"\"";
                 MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
@@ -180,6 +192,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
 
     if (vecStrFind(args, L"--waitForIPC"))
     {
+        LUNALOG("Handling --waitForIPC argument");
         gStartupSettings.waitForIPC = true;
         gStartupSettings.currentlyWaitingForIPC = true;
         gStartupSettings.patch = true;
@@ -187,6 +200,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
 
     if (vecStrFind(args, L"--hideOnCloseIPC"))
     {
+        LUNALOG("Handling --hideOnCloseIPC argument");
         gStartupSettings.currentlyWaitingForIPC = true;
         gStartupSettings.waitForIPC = true;
         gStartupSettings.patch = true;
@@ -210,6 +224,8 @@ void ParseArgs(const std::vector<std::wstring>& args)
 
 static unsigned int __stdcall LatePatch(void)
 {
+    LUNALOG("Running LatePatch.");
+
     /************************************************************************/
     /* Engine Limit patches                                                 */
     /************************************************************************/
@@ -248,6 +264,8 @@ static unsigned int __stdcall LatePatch(void)
     // Init controller support
     gLunaGameControllerManager.init();
 
+    LUNALOG("Done LatePatch.");
+
     /* Do what the place we patched this in is supposed to do: */
     /* 008BEC61 | mov eax,dword ptr ds:[B2D788] */
     return *((unsigned int*)(0xB2D788));
@@ -256,6 +274,8 @@ static unsigned int __stdcall LatePatch(void)
 static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
+    LUNALOG("Running TrySkipPatch.");
+
     // If we have stdin/stdout, attach to the IPC server
     ipcServer.AttachStdinStdout();
 
@@ -277,6 +297,7 @@ void TrySkipPatch()
     HardcodedGraphicsManager::loadGraphics();
 
     //game.ini reader
+    LUNALOG("Reading game.ini");
     GameConfiguration::runPatchByIni(IniProcessing(WStr2Str(getLatestConfigFile(L"game.ini"))));
 
     /************************************************************************/
@@ -949,5 +970,7 @@ void TrySkipPatch()
     *(void**)0x00401124 = (void*)&vbaR4VarHook;
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
+
+    LUNALOG("Done TrySkipPatch.");
 }
 

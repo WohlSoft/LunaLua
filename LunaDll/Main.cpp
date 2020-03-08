@@ -58,6 +58,7 @@ BOOL WINAPI DllMain(HANDLE hinstDLL, DWORD dwReason, LPVOID /*lpvReserved*/)
     case DLL_THREAD_DETACH:
         break;
     case DLL_PROCESS_DETACH:
+        LUNALOG("Detach DLL!");
         timeEndPeriod(1);
         CleanUp();
         break;
@@ -81,6 +82,8 @@ static DWORD __stdcall GetCurrentProcessorNumberXP(void)
 // SetupLunaDLLInitHook that runs from DLL_PROCESS_ATTACH
 void LunaDLLInit()
 {
+    LUNALOG(L"Running LunaDLLInit");
+
     InitGlobals();
 
     //Check for arguments and write them in gStartupSettings
@@ -88,6 +91,7 @@ void LunaDLLInit()
 
     // Load Luna Config
     // Either in root or in config folder. The config folder is recommended however.
+    LUNALOG("Reading luna.ini");
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
     gGeneralConfig.loadOrDefault();
 
@@ -170,10 +174,14 @@ void LunaDLLInit()
     ULONG_PTR m_gdiplusToken;   // class member
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+
+    LUNALOG(L"Done LunaDLLInit");
 }
 
 // *EXPORT* On Level Load -- Run once as a level is loaded (including title screen level)
 int OnLvlLoad() {
+
+    LUNALOG(L"Running OnLvlLoad");
 
     // Restore some code the hook overwrote
     *(DWORD*)0x00B25958 = 0;
@@ -253,6 +261,8 @@ int OnLvlLoad() {
     //PGE DBG STUFF
     //readAndWriteNPCSettings();
     //overwriteFunc();
+
+    LUNALOG(L"Done OnLvlLoad");
 
     return 0;
 }
@@ -386,6 +396,8 @@ void LevelFrameCode() {
 //				Also put init code in here if you want.
 void InitLevel() {
 
+    LUNALOG(L"Running InitLevel");
+
     // Reset some variables
     gFrames = 0;
     gLevelEnum = Invalid;
@@ -459,6 +471,8 @@ void InitLevel() {
         Player::FilterReservePowerup(Player::Get(1));
         Player::Get(1)->Identity = CHARACTER_MARIO;
     }
+
+    LUNALOG(L"Done InitLevel");
 
 }
 

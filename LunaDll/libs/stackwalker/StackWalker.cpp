@@ -89,6 +89,8 @@
 #include "StackWalker.h"
 #include <string>
 
+#define STACKWALKER_OUTPUT_LIBRARY_INFORMATION
+
 // If VC7 and later, then use the shipped 'dbghelp.h'-file
 #pragma pack(push,8)
 #if _MSC_VER >= 1300

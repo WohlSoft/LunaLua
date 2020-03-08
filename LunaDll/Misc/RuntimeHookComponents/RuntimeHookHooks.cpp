@@ -41,17 +41,31 @@
 
 extern HHOOK HookWnd;
 extern HHOOK KeyHookWnd;
+#include "../../Misc/ErrorReporter.h"
 
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
+    LUNALOG("Running ThunRTMainHook");
+
+    // List things
+    ErrorReport::CustomStackTracer cst;
+    cst.ShowCallstack(GetCurrentThread());
+    LUNALOG(cst.theOutput.str());
+
+
     LunaDLLInit();
 
+    LUNALOG("Running native_ThunRTMain");
     native_ThunRTMain(arg1);
+
+    LUNALOG("Done ThunRTMainHook");
 }
 
 extern void __stdcall InitHook()
 {
+    LUNALOG("Running InitHook.");
+
     if (gStartupSettings.newLauncher){
         typedef bool(*RunProc)(void);
         typedef void(*GetPromptResultProc)(void*);
@@ -125,6 +139,8 @@ extern void __stdcall InitHook()
     /*void (*exitCall)(void);
     exitCall = (void(*)(void))0x8D6BB0;
     exitCall();*/
+
+    LUNALOG("Done InitHook.");
 }
 
 extern void __stdcall forceTermination()
@@ -134,6 +150,8 @@ extern void __stdcall forceTermination()
 
 extern int __stdcall LoadWorld()
 {
+    LUNALOG("Running LoadWorld");
+
     // We want to make sure we init the renderer before we start LunaLua when
     // entering levels...
     GLEngineProxy::CheckRendererInit();
@@ -174,6 +192,8 @@ extern int __stdcall LoadWorld()
         g_GLEngine.SetFirstFramePending();
     }
 
+    LUNALOG("Done LoadWorld");
+
     short plValue = GM_PLAYERS_COUNT;
 #ifndef __MINGW32__
     __asm {
@@ -192,14 +212,17 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
+    LUNALOG("Running LoadIntro.");
 
     if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
         gAutostartRan = true;
         std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
+        LUNALOG("Checking for autostart.ini");
         if (file_existsX(autostartFile))
         {
+            LUNALOG("Parsing autostart.ini");
             IniProcessing autostartConfig(autostartFile);
             if (autostartConfig.beginGroup("autostart"))
             {
@@ -207,6 +230,8 @@ extern int __stdcall LoadIntro()
                 autostartConfig.endGroup();
                 if (doAutostart)
                 {
+                    LUNALOG("Applying autostart");
+
                     // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
                     GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
                     autostarter.applyAutostart();
@@ -223,6 +248,7 @@ extern int __stdcall LoadIntro()
         }
     }
 
+    LUNALOG("Done LoadIntro.");
 
 #pragma warning(suppress: 28159)
     return GetTickCount();
@@ -1634,6 +1660,8 @@ extern void __stdcall RenderWorldHook()
 
 static void runtimeHookSmbxChangeModeHook(void)
 {
+    LUNALOG("Running changeModeHook");
+
     while (gStartupSettings.currentlyWaitingForIPC)
     {
         WaitMessage();
@@ -1642,6 +1670,8 @@ static void runtimeHookSmbxChangeModeHook(void)
 
     // Handler for test mode if it's enabled
     testModeSmbxChangeModeHook();
+
+    LUNALOG("Done changeModeHook");
 }
 
 __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
@@ -1677,6 +1707,9 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
+    LUNALOG("Running runtimeHookLoadLevel");
+    LUNALOG(std::wstring(L"Loading Level: ") + std::wstring(*filename));
+
     // Shut down Lua stuff before level loading just in case
     gLunaLua.exitContext();
 
@@ -1696,6 +1729,7 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             base.ReadFile(static_cast<std::wstring>(*filename), getCurrentLevelData());
         }
     }
+    LUNALOG("Done runtimeHookLoadLevel");
 }
 
 void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename)
@@ -2127,6 +2161,8 @@ void __stdcall runtimeHookInitGameWindow(void)
 
 void __stdcall runtimeHookLoadDefaultGraphics(void)
 {
+    LUNALOG("Running runtimeHookLoadDefaultGraphics");
+
     bool initDone = false;
     if (!initDone)
     {
@@ -2134,6 +2170,8 @@ void __stdcall runtimeHookLoadDefaultGraphics(void)
         ImageLoader::Run(true);
         initDone = true;
     }
+
+    LUNALOG("Done runtimeHookLoadDefaultGraphics");
 }
 
 static _declspec(naked) void __stdcall saveGame_OrigFunc()
@@ -2173,10 +2211,14 @@ static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
 
 void __stdcall runtimeHookCleanupLevel()
 {
+    LUNALOG("Running runtimeHookCleanupLevel");
+
     // Shut down Lua stuff before level cleanup
     gLunaLua.exitContext();
 
     cleanupLevel_OrigFunc();
+
+    LUNALOG("Done runtimeHookCleanupLevel");
 }
 
 static _declspec(naked) void __stdcall exitMainGame_OrigFunc()
@@ -2208,6 +2250,8 @@ static _declspec(naked) void __stdcall loadWorld_OrigFunc(VB6StrPtr* filename)
 
 void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
 {
+    LUNALOG(std::wstring(L"Loading world file:") + std::wstring(*filename));
+
     // This only occurs when first loading the episode...
     // this isn't repeated later on
 
@@ -2215,6 +2259,8 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
     GameAutostart::ClearAutostartPatch();
 
     loadWorld_OrigFunc(filename);
+
+    LUNALOG(L"Done loading world file.");
 }
 
 static _declspec(naked) void __stdcall cleanupWorld_OrigFunc()
@@ -2230,10 +2276,14 @@ static _declspec(naked) void __stdcall cleanupWorld_OrigFunc()
 
 void __stdcall runtimeHookCleanupWorld()
 {
+    LUNALOG("Running runtimeHookCleanupWorld");
+
     // Shut down Lua stuff before world cleanup
     gLunaLua.exitContext();
 
     cleanupWorld_OrigFunc();
+
+    LUNALOG("Done runtimeHookCleanupWorld");
 }
 
 static const float runtimeHookPiranahDivByZeroConst = 512.0f;
@@ -2498,11 +2548,15 @@ static void drawReplacementSplashScreen(void)
 
 void __stdcall runtimeHookLoadDefaultControls(void)
 {
+    LUNALOG("Running runtimeHookLoadDefaultControls");
+
     // Draw replacement splash screen if we have one
     drawReplacementSplashScreen();
 
     // Run the regular load default controls...
     native_loadDefaultControls();
+
+    LUNALOG("Done runtimeHookLoadDefaultControls");
 }
 
 static _declspec(naked) void __stdcall runtimeHookRunAnim_OrigFunc(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask)

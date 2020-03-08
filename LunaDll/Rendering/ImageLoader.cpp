@@ -312,6 +312,7 @@ static ImageLoaderCategory* smbxImageLoaderCategories[] = {
 
 void ImageLoader::Run(bool initialLoad)
 {
+    LUNALOG("Running ImageLoader::Run");
 
     static std::unordered_map<std::wstring, ResourceFileInfo>* lastResources = nullptr;
     std::unordered_map<std::wstring, ResourceFileInfo>* foundResources = nullptr;
@@ -347,6 +348,11 @@ void ImageLoader::Run(bool initialLoad)
         levelGfxDir = normalizePathSlashes(getCustomFolderPath());
     }
     
+    LUNALOG(std::wstring(L"\tappGfxDir: ") + appGfxDir);
+    LUNALOG(std::wstring(L"\tepisodePath: ") + episodePath);
+    LUNALOG(std::wstring(L"\tepisodeGfxDir: ") + episodeGfxDir);
+    LUNALOG(std::wstring(L"\tlevelGfxDir: ") + levelGfxDir);
+
     // Done figuring out our paths!
 
     // Read level directory listing
@@ -423,6 +429,8 @@ void ImageLoader::Run(bool initialLoad)
 
     delete lastResources;
     lastResources = foundResources;
+
+    LUNALOG("Done ImageLoader::Run");
 }
 
 void ImageLoader::ResolveHardcodedGfx(const std::wstring& appGfxDir, const std::wstring& episodeGfxDir, const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles, const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles, std::unordered_map<std::wstring, ResourceFileInfo>& outData)

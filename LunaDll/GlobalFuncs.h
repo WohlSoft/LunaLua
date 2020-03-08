@@ -104,4 +104,6 @@ void InitDebugConsole();
 int DebugPrint(const char * format, ...);
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
+#include "LunaLog.h"
+
 #endif
