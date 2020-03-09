@@ -450,5 +450,9 @@ void __stdcall runtimeHookNPCWalkFixClearTemp();
 void __stdcall runtimeHookNPCWalkFixTempHitConditional();
 void __stdcall runtimeHookNPCWalkFixSlope();
 
+void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
+void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);
+void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void);
+
 #endif
 

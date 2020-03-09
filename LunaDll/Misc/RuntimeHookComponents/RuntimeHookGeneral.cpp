@@ -942,6 +942,11 @@ void TrySkipPatch()
     PATCH(0xA1BB3A).JMP(runtimeHookNPCWalkFixTempHitConditional).NOP_PAD_TO_SIZE<23>().Apply();
     PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>().Apply();
 
+    // Patch to handle block reorder after p-switch handling
+    PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
+    PATCH(0x9E3D30).JMP(runtimeHookPSwitchStartRemoveBlockWrapper).NOP_PAD_TO_SIZE<110>().Apply();
+    PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

@@ -3169,3 +3169,105 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
         ret
     }
 }
+
+static void markBlocksUnsorted()
+{
+    // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already set, to make sure the max
+    //       lookup value is updated based on block count, since that for some reason seems
+    //       necessary.
+    WORD blockCount = GM_BLOCK_COUNT;
+    GM_BLOCKS_SORTED = -1;
+    for (int i = 0; i <= 16000; i++)
+    {
+        GM_BLOCK_LOOKUP_MIN[i] = 1;
+        GM_BLOCK_LOOKUP_MAX[i] = blockCount;
+    }
+}
+
+static void __stdcall runtimeHookAfterPSwitchBlocksReordered(void)
+{
+    markBlocksUnsorted();
+}
+
+_declspec(naked) void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        call runtimeHookAfterPSwitchBlocksReordered
+        pop edx
+        pop ecx
+        pop eax
+        mov edi, 1
+        push 0x009E450C
+        ret
+    }
+}
+
+static const std::wstring destroyedPSwitchBlockLayerName(L"Destroyed PSwitch Blocks");
+
+static void __stdcall runtimeHookPSwitchStartRemoveBlock(unsigned int blockIdx)
+{
+    Block& b = *Block::GetRaw(blockIdx);
+
+    b.BlockType = 0;
+    b.IsHidden = -1;
+    b.pLayerName = destroyedPSwitchBlockLayerName;
+}
+
+_declspec(naked) void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        push edi // Arg 1
+        call runtimeHookPSwitchStartRemoveBlock
+        pop edx
+        pop ecx
+        pop eax
+        push 0x009E3D9E
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPSwitchGetNewBlockAtEnd(unsigned int blockIdx)
+{
+    unsigned int blockCount = GM_BLOCK_COUNT;
+
+    // TODO: This could be faster if it mattered, and maybe share block reusing with Lua block spawning?
+    for (unsigned int i = 0; i < blockCount; i++)
+    {
+        Block& b = *Block::GetRaw(i);
+        if (b.pLayerName == destroyedPSwitchBlockLayerName)
+        {
+            if (gLunaLua.isValid()) {
+                std::shared_ptr<Event> blockInvalidateEvent = std::make_shared<Event>("onBlockInvalidateForReuseInternal", false);
+                blockInvalidateEvent->setDirectEventName("onBlockInvalidateForReuseInternal");
+                blockInvalidateEvent->setLoopable(false);
+                gLunaLua.callEvent(blockInvalidateEvent, i);
+            }
+
+            return i;
+        }
+    }
+
+    blockCount++;
+    GM_BLOCK_COUNT = blockCount;
+    return blockCount;
+}
+
+_declspec(naked) void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void)
+{
+    __asm {
+        push ecx
+        push edx
+        call runtimeHookPSwitchGetNewBlockAtEnd
+        pop edx
+        pop ecx
+        mov esi, eax
+        push 0x009E3E71
+        ret
+    }
+}
