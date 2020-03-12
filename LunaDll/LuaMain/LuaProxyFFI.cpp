@@ -10,6 +10,7 @@
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
 #include "../Rendering/GL/GLTextureStore.h"
+#include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SMBXInternal/Layer.h"
 #include "../SdlMusic/SdlMusPlayer.h"
@@ -383,5 +384,19 @@ extern "C" {
     FFI_EXPORT(void) LunaLuaRumbleSelectedController(int playerNum, int ms, float strength)
     {
         gLunaGameControllerManager.rumbleSelectedController(playerNum, ms, strength);
+    }
+
+    FFI_EXPORT(ExtendedNPCFields*) LunaLuaGetNPCExtendedFieldsArray()
+    {
+        return NPC::GetRawExtended(0);
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetNPCextendedFieldsStruct()
+    {
+        return "\
+typedef struct ExtendedNPCFields_\
+{\
+    bool noblockcollision;\
+} ExtendedNPCFields;";
     }
 }

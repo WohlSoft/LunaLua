@@ -555,6 +555,13 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
         short newIdx = npcIdx - 1;    // 0 based
         short oldIdx = GM_NPCS_COUNT; // 0 based
 
+        // Update extended NPC fields
+        if (newIdx != oldIdx)
+        {
+            *NPC::GetRawExtended(newIdx) = *NPC::GetRawExtended(oldIdx);
+        }
+        NPC::GetRawExtended(oldIdx)->Reset();
+
         // The NPC was indeed removed
         if (gLunaLua.isValid() && (newIdx >= 0) && (oldIdx >= 0)) {
             std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onPostNPCRearrangeInternal", false);
@@ -1919,11 +1926,21 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
     }
 }
 
-static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
+static int __stdcall runtimeHookNPCNoWaterPhysics(unsigned int npcIdx)
 {
-    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
+    NPCMOB* npc = NPC::GetRaw(npcIdx);
+    ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+    if (npc != nullptr)
     {
-        return -1;
+        if (NPC::GetNoWaterPhysics(npc->id))
+        {
+            return -1;
+        }
+
+        if (ext->noblockcollision)
+        {
+            return -1;
+        }
     }
 
     return 0;
@@ -1939,7 +1956,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
         push eax
         push ecx
         push edx
-        push esi // Args #1
+        push dword ptr ss:[ebp-0x180] // Args #1
         call runtimeHookNPCNoWaterPhysics
         cmp eax, 0
         jne alternate_exit
@@ -3268,6 +3285,221 @@ _declspec(naked) void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void)
         pop ecx
         mov esi, eax
         push 0x009E3E71
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookNPCNoBlockCollisionTest(unsigned int npcIdx)
+{
+    ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+    if (ext != nullptr)
+    {
+        if (ext->noblockcollision)
+        {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
+{
+	// Death by block bump
+    // 009E2AD0 | jne smbx.9E2EB6
+    __asm {
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [esp + 0x28]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA089C9
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0x9E2EB6
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
+{
+	// ???
+    // 00A089C3 | jne smbx.A08CA5
+    __asm {
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x188]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA089C9
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA08CA5
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
+{
+	// Main Block Collision
+    // 00A10EAA | cmp word ptr ds:[ecx+edi*2],0
+    __asm {
+		cmp word ptr ds:[ecx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA10EBB
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA10EB1
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
+{
+	// ???
+    // 00A113B0 | cmp word ptr ds:[ecx+edi*2],0
+    __asm {
+		cmp word ptr ds:[ecx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA113B7
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA11414
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
+{
+	// Beltspeed
+    // 00A1760E | cmp word ptr ds:[edx+edi*2],0
+    __asm {
+		cmp word ptr ds:[edx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA17619
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA17BDA
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
+{
+	// Bounce off NPCs
+    // 00A1B33F | cmp word ptr ds:[eax+edi*2],0
+    __asm {
+		cmp word ptr ds:[eax+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+		movsx eax, word ptr ss : [ebp - 0x188]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA1B346
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA1B386
         ret
     }
 }

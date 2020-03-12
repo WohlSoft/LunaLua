@@ -454,5 +454,12 @@ void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
 void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);
 void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void);
 
+void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
+
 #endif
 

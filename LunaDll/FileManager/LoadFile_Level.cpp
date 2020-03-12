@@ -80,6 +80,9 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     GM_WATER_AREA_COUNT = 0;
     GM_ANIM_COUNT = 0;
 
+    // Clear extended fields
+    NPC::ClearExtendedFields();
+
     // We should clear the anim array apparently though
     memset(GM_ANIM_PTR, 0, 1000*sizeof(SMBXAnimation));
 

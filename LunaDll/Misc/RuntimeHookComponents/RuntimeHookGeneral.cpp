@@ -656,6 +656,15 @@ void TrySkipPatch()
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
+    // Hooks for per-npc noblockcollision
+    PATCH(0x9E2AD0).JMP(runtimeHookNPCNoBlockCollision9E2AD0).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA089C3).JMP(runtimeHookNPCNoBlockCollisionA089C3).NOP_PAD_TO_SIZE<6>().Apply();
+    // Note that the runtimeHookNPCNoWaterPhysicsRaw hook is also relevant
+    PATCH(0xA10EAA).JMP(runtimeHookNPCNoBlockCollisionA10EAA).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA113B0).JMP(runtimeHookNPCNoBlockCollisionA113B0).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA1760E).JMP(runtimeHookNPCNoBlockCollisionA1760E).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA1B33F).JMP(runtimeHookNPCNoBlockCollisionA1B33F).NOP_PAD_TO_SIZE<5>().Apply();
+
     //-----------------------------------------------------------------------//
     // In general, we want to disable default graphics loading code, which   //
     // means nop-ing out the calls except for ones we want to hook.          //

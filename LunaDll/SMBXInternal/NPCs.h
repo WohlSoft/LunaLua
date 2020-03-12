@@ -474,8 +474,25 @@ struct NPCMOB {
 static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 #endif
 
-namespace NPC {
+// Extra NPC fields
+struct ExtendedNPCFields
+{
+    bool noblockcollision;
 
+    // Constructor
+    ExtendedNPCFields()
+    {
+        Reset();
+    }
+
+    // Reset function
+    void Reset()
+    {
+        noblockcollision = false;
+    }
+};
+
+namespace NPC {
     /// Player functions ///
 
     // NPC ACCESS
@@ -483,6 +500,9 @@ namespace NPC {
     NPCMOB* GetRaw(int index);
     NPCMOB* GetDummyNPC();
     NPCMOB* GetFirstMatch(int ID, int section); // Get first NPC found with the set ID and section, or 0 if no matches. -1 for ANY
+
+    ExtendedNPCFields* GetRawExtended(int index);
+    void ClearExtendedFields();
 
     void FindAll(int target, int internal_section, std::list<NPCMOB*>* return_list);
 
