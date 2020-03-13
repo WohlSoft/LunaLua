@@ -3322,7 +3322,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
         pop ecx
         pop eax
         popfd
-        push 0xA089C9
+        push 0x9E2AD6
         ret
     alternate_exit :
         pop edx
