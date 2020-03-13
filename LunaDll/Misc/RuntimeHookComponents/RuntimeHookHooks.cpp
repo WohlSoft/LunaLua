@@ -3503,3 +3503,40 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
         ret
     }
 }
+
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx)
+{
+    // If already not hitting, ignore
+    if (hitSpot == 0) return 0;
+
+    Block* block = Block::GetRaw(blockIdx);
+    if (block)
+    {
+        short npcFilter = Blocks::GetBlockNPCFilter(block->BlockType);
+        if ((npcFilter != 0) && ((npcFilter == -1) || (npcFilter == npc->id)))
+        {
+            // The filter was a non-zero and matched, so no collision
+            return 0;
+        }
+    }
+
+    return hitSpot;
+}
+
+__declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
+{
+    // 00A11B76 | mov ax, word ptr ds : [esi + 0xE2]
+    // eax, ecx, edx and flags are free for use at this point
+    __asm {
+        movsx eax, word ptr ss:[ebp-0x188]   // blockIdx
+        push eax
+        push esi                             // npc
+        push dword ptr ss:[ebp-0x14]         // hitSpot
+        call runtimeHookBlockNPCFilterInternal
+        mov dword ptr ss : [ebp - 0x14], eax // store return back to hitSpot
+
+        mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
+        push 0xA11B7D
+        ret
+    }
+}

@@ -73,6 +73,8 @@ namespace Blocks {
     void SetBlockBumpable(int id, bool bumpable);
     short GetBlockPlayerFilter(int id);
     void SetBlockPlayerFilter(int id, short characterId);
+    short GetBlockNPCFilter(int id);
+    void SetBlockNPCFilter(int id, short npcId);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 }

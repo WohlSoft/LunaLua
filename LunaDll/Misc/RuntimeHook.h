@@ -461,5 +461,7 @@ void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void);
 void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void);
 void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
 
+void __stdcall runtimeHookBlockNPCFilter(void);
+
 #endif
 
