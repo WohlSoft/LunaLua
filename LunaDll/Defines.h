@@ -590,6 +590,9 @@ DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);
 DEFMEM(effectdef_width, short*, 0x00B2BA68);
 DEFMEM(effectdef_height, short*, 0x00B2BA84);
 
+DEFMEM(tiledef_height, short*, 0X00B2BF84);
+DEFMEM(tiledef_width, short*, 0X00B2BF68);
+
 // Frame timing related references
 DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
 DEFMEM(GM_CURRENT_TIME,    double, 0x00B2D738);
