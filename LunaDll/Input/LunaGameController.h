@@ -127,7 +127,7 @@ public:
         CONTROLLER_PAD_RIGHT_MASK = (1UL << CONTROLLER_PAD_RIGHT)
     };
 
-    enum ECtrlButtons{
+    enum ECtrlButtons {
         CONTROLLER_BUTTON_A = 0,
         CONTROLLER_BUTTON_B = 1,
         CONTROLLER_BUTTON_Y = 2,
@@ -141,7 +141,11 @@ public:
         CONTROLLER_BUTTON_TRIGGERLEFT  = 10,
         CONTROLLER_BUTTON_TRIGGERRIGHT = 11,
         CONTROLLER_BUTTON_GUIDE = 12,
-        CONTROLLER_BUTTON_JOY0 = 13
+        CONTROLLER_BUTTON_DPAD_UP = 13,
+        CONTROLLER_BUTTON_DPAD_DOWN = 14,
+        CONTROLLER_BUTTON_DPAD_LEFT = 15,
+        CONTROLLER_BUTTON_DPAD_RIGHT = 16,
+        CONTROLLER_BUTTON_JOY0 = 17
     }; // Translated values from SDL_GameControllerButton
 
     static const int axisThresholdOn = (30 * 0x7FFF) / 100;
