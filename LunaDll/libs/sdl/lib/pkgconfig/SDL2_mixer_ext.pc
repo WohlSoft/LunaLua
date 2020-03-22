@@ -1,0 +1,12 @@
+prefix=C:/projects/sdl-mixer-x/build-MSVC15-Release-Win32-SDL-2.0.12/SDL-Mixer-X
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: SDL2_mixer_ext
+Description: SDL Mixer X, a fork of SDL_mixer, a mixer library for Simple DirectMedia Layer
+Version: 2.5.0.0
+Requires: sdl2 >= 
+Libs: -L${libdir} -lSDL2_mixer_ext
+Cflags: -I${includedir}/SDL2
+
