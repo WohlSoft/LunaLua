@@ -74,6 +74,7 @@ public:
     }
 
     void Apply() {
+        if (mIsPatched) return;
         if (Size == 0) return;
         for (std::uintptr_t i = 0; i < Size; i++) {
             ((uint8_t*)mAddr)[i] = mPatchBytes[i];
@@ -82,6 +83,7 @@ public:
     }
 
     void Unapply() {
+        if (!mIsPatched) return;
         if (Size == 0) return;
         for (std::uintptr_t i = 0; i < Size; i++) {
             ((uint8_t*)mAddr)[i] = mOrigBytes[i];

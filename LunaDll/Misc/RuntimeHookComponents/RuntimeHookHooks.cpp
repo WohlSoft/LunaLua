@@ -2861,6 +2861,8 @@ _declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void)
 
 static int __stdcall runtimeHookPlayerBouncePushCheck(unsigned int blockId, PlayerMOB* player)
 {
+    if (gDisablePlayerFilterBounceFix) return 0; // Allow collision
+
     short characterFilter = Blocks::GetBlockPlayerFilter(blockId);
 
     // -1 means allow all characters

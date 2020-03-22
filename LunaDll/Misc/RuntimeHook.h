@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "../Defines.h"
+#include "AsmPatch.h"
 
 struct SMBX_Warp;
 
@@ -29,6 +30,14 @@ extern bool episodeStarted;
 void SetupThunRTMainHook();
 void ParseArgs(const std::vector<std::wstring>& args);
 void TrySkipPatch();
+
+/************************************************************************/
+/* Global Patch Variables                                               */
+/************************************************************************/
+extern AsmPatch<777> gDisablePlayerDownwardClipFix;
+extern AsmPatch<8> gDisableNPCDownwardClipFix;
+extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
+
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */

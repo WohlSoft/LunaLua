@@ -17,6 +17,7 @@
 #include "../FileManager/CustomParamStore.h"
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
+#include "../Misc/RuntimeHook.h"
 #include "LunaLuaMain.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
@@ -398,5 +399,36 @@ typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
 } ExtendedNPCFields;";
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
+    {
+        gDisablePlayerFilterBounceFix = !enable;
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPlayerDownwardClipFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisablePlayerDownwardClipFix.Apply();
+        }
+        else
+        {
+            gDisablePlayerDownwardClipFix.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCDownwardClipFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisableNPCDownwardClipFix.Apply();
+            //gDisableNPCDownwardClipFixSlope.Apply();
+        }
+        else
+        {
+            gDisableNPCDownwardClipFix.Unapply();
+            //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
     }
 }

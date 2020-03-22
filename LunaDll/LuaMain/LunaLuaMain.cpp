@@ -24,6 +24,7 @@
 #include "../SdlMusic/MusicManager.h"
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/ImageLoader.h"
+#include "../Misc/RuntimeHook.h"
 
 #include "../Misc/LoadScreen.h"
 
@@ -107,6 +108,10 @@ bool CLunaLua::shutdown()
     // Unset flags of things Lua code was processing
     gRenderBGOFlag = true;
     gRenderSizableFlag = true;
+    gDisablePlayerFilterBounceFix = false;
+    gDisablePlayerDownwardClipFix.Apply();
+    gDisableNPCDownwardClipFix.Apply();
+    gDisableNPCDownwardClipFixSlope.Apply();
 
     // Request cached images be held onto for now
     LunaImage::holdCachedImages();

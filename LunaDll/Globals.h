@@ -74,6 +74,9 @@ extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
 
+// Settings for glitch fixes
+extern bool            gDisablePlayerFilterBounceFix;
+
 extern startUpSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

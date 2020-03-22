@@ -253,6 +253,11 @@ static unsigned int __stdcall LatePatch(void)
     return *((unsigned int*)(0xB2D788));
 }
 
+// Some patches that can be swapped on/off
+AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
+AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
+AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
+
 static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
@@ -938,18 +943,21 @@ void TrySkipPatch()
     PATCH(0x9C0B3E).JMP(runtimeHookPlayerBouncePushCheckWrapper).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hook to fix the player-clips-into-floor-when-on-something-moving-down bug
-    PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>().Apply();
+    // PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>()
+    gDisablePlayerDownwardClipFix.Apply();
 
     // Hooks to fix the npc-clips-into-floor-when-on-something-moving-down bug
     PATCH(0xA14BA6).JMP(runtimeHookPreserveNPCWalkBlock).NOP_PAD_TO_SIZE<6>().Apply();
-    PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>().Apply();
+    // PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>()
+    gDisableNPCDownwardClipFix.Apply();
     PATCH(0xA0C8D4).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     // 0xA15728 already does it right
     PATCH(0xA15988).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA15A35).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA15F48).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA1BB3A).JMP(runtimeHookNPCWalkFixTempHitConditional).NOP_PAD_TO_SIZE<23>().Apply();
-    PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>().Apply();
+    // PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>()
+    gDisableNPCDownwardClipFixSlope.Apply();
 
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
