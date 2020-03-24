@@ -54,29 +54,68 @@ private:
     
 
     // Members //
+public:
+    class QueueState
+    {
+    public:
+        bool m_InFrameRender;
+        int m_curCamIdx; // Camera state
+
+        std::size_t m_renderOpsSortedCount;
+        std::size_t m_renderOpsProcessedCount;
+        std::vector<RenderOp*> m_currentRenderOps;  // render operations to be performed
+
+        std::list<std::wstring> m_debugMessages;    // Debug message to be printed
+    public:
+        QueueState() : 
+            m_InFrameRender(false),
+            m_curCamIdx(1),
+            m_renderOpsSortedCount(0),
+            m_renderOpsProcessedCount(0),
+            m_currentRenderOps(),
+            m_debugMessages()
+        {
+        }
+    };
+
 private:
-    bool m_InFrameRender;
-    int m_curCamIdx; // Camera state
-    
-    std::size_t m_renderOpsSortedCount;
-    std::size_t m_renderOpsProcessedCount;
-    std::vector<RenderOp*> m_currentRenderOps;  // render operations to be performed
+    QueueState m_queueState;
 
     std::map<int, std::shared_ptr<LunaImage>> m_legacyResourceCodeImages;  // loaded image resources
 
-    std::list<std::wstring> m_debugMessages;                // Debug message to be printed
-
     // Simple getters //
 public:
-    int GetCameraIdx() { return m_curCamIdx; }
+    int GetCameraIdx() { return m_queueState.m_curCamIdx; }
     HDC GetScreenDC() { return (HDC)GM_SCRN_HDC; }
+
+    class QueueStateStacker {
+    private:
+        Renderer& m_renderer;
+        QueueState m_savedState;
+    public:
+        QueueStateStacker() :
+            m_renderer(Renderer::Get())
+        {
+            m_savedState = m_renderer.m_queueState;
+            // Don't use m_renderer.ClearQueue() for this because we're effectively moving things and ClearQueue frees some pointers
+            m_renderer.m_queueState.m_InFrameRender = false;
+            m_renderer.m_queueState.m_curCamIdx = 1;
+            m_renderer.m_queueState.m_renderOpsSortedCount = 0;
+            m_renderer.m_queueState.m_renderOpsProcessedCount = 0;
+            m_renderer.m_queueState.m_currentRenderOps.clear();
+            m_renderer.m_queueState.m_debugMessages.clear();
+        }
+        ~QueueStateStacker()
+        {
+            m_renderer.ClearQueue();
+            m_renderer.m_queueState = m_savedState;
+        }
+    };
 };
 
 namespace Render{
     bool IsOnScreen(double x, double y, double w, double h); // Returns whether or not the digven rectangle is on screen this frame
     void CalcCameraPos(double* p_X, double* p_Y);            // Tries to read smbx memory to return the camera coords in the 2 passed args
-
-    
 }
 
 #endif

@@ -113,6 +113,7 @@ void Blocks::HideAll(int type) {
 
 static int16_t blockprop_bumpable[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_playerfilter[Block::MAX_ID + 1] = { 0 };
+static int16_t blockprop_npcfilter[Block::MAX_ID + 1] = { 0 };
 
 void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
@@ -172,6 +173,18 @@ void Blocks::SetBlockPlayerFilter(int id, short characterId)
     blockprop_playerfilter[id] = characterId;
 }
 
+short Blocks::GetBlockNPCFilter(int id)
+{
+    if ((id < 1) || (id > Block::MAX_ID)) return 0;
+    return blockprop_npcfilter[id];
+}
+
+void Blocks::SetBlockNPCFilter(int id, short npcId)
+{
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_npcfilter[id] = npcId;
+}
+
 // Getter for address of Block property arrays
 uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
 {
@@ -182,6 +195,10 @@ uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
     else if (s == "playerfilter")
     {
         return reinterpret_cast<uintptr_t>(blockprop_playerfilter);
+    }
+    else if (s == "npcfilter")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_npcfilter);
     }
     else
     {

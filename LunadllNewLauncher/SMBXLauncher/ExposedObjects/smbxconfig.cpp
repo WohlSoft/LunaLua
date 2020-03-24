@@ -70,10 +70,10 @@ QVariant SMBXConfig::getJSONForEpisode(const QString& episodeDirPath, const QStr
 
 QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName)
 {
+
     QStringList wldFileFilter;
     wldFileFilter << "*.wld" << "*.wldx";
     QDir episodeDir(episodeDirPath);
-    QFileInfo episodeDirFile(episodeDirPath);
     QMap<QString, QVariant> ret;
     WorldData worldData;
     FileFormats::CreateWorldData(worldData);
@@ -97,7 +97,7 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
         return QVariant();
     }
 
-    ret.insert("directoryName", episodeDirFile.baseName());
+    ret.insert("directoryName", episodeDir.dirName());
     ret.insert("title", worldData.EpisodeTitle);
     ret.insert("__rawtitle", worldData.EpisodeTitle);
     ret.insert("credits", worldData.authors);

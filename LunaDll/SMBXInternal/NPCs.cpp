@@ -42,6 +42,24 @@ NPCMOB* NPC::GetFirstMatch(int ID, int section) {
     return NULL; //not matched
 }
 
+static ExtendedNPCFields g_extendedNPCFields[5001];
+
+ExtendedNPCFields* NPC::GetRawExtended(int index)
+{
+    if (index < 0 || index > GM_NPCS_COUNT)
+        return nullptr;
+
+    return &g_extendedNPCFields[index];
+}
+
+void NPC::ClearExtendedFields()
+{
+    for (int i = 0; i < 5001; i++)
+    {
+        g_extendedNPCFields[i].Reset();
+    }
+}
+
 // FIND ALL
 void NPC::FindAll(int ID, int section, std::list<NPCMOB*>* return_list) {
     bool anyID = (ID == -1 ? true : false);

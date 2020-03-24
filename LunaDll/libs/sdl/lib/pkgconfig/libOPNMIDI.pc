@@ -1,0 +1,10 @@
+prefix=C:/projects/sdl-mixer-x/build-MSVC15-Release-Win32-SDL-2.0.12
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libOPNMIDI
+Description: A MIDI playback library with OPN2 (YM2612) emulator
+Version: 1.4.0
+Libs: -L${libdir} -lOPNMIDI
+Cflags: -I${includedir}

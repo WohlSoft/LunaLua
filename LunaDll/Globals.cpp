@@ -29,6 +29,9 @@ bool gRenderBGOFlag = true;
 bool gRenderSizableFlag = true;
 std::atomic<uint32_t> gMainWindowSize = 0; // Low word is width, height word is height
 
+// Settings for glitch fixes
+bool gDisablePlayerFilterBounceFix = false;
+
 // Global variables
 int	gFrames;
 

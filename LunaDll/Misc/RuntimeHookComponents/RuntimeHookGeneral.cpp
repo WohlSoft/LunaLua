@@ -253,6 +253,11 @@ static unsigned int __stdcall LatePatch(void)
     return *((unsigned int*)(0xB2D788));
 }
 
+// Some patches that can be swapped on/off
+AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
+AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
+AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
+
 static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
@@ -656,6 +661,15 @@ void TrySkipPatch()
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
+    // Hooks for per-npc noblockcollision
+    PATCH(0x9E2AD0).JMP(runtimeHookNPCNoBlockCollision9E2AD0).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA089C3).JMP(runtimeHookNPCNoBlockCollisionA089C3).NOP_PAD_TO_SIZE<6>().Apply();
+    // Note that the runtimeHookNPCNoWaterPhysicsRaw hook is also relevant
+    PATCH(0xA10EAA).JMP(runtimeHookNPCNoBlockCollisionA10EAA).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA113B0).JMP(runtimeHookNPCNoBlockCollisionA113B0).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA1760E).JMP(runtimeHookNPCNoBlockCollisionA1760E).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA1B33F).JMP(runtimeHookNPCNoBlockCollisionA1B33F).NOP_PAD_TO_SIZE<5>().Apply();
+
     //-----------------------------------------------------------------------//
     // In general, we want to disable default graphics loading code, which   //
     // means nop-ing out the calls except for ones we want to hook.          //
@@ -887,6 +901,18 @@ void TrySkipPatch()
     PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0xA75726).CALL(runtimeHookJoyGetPosExNull).NOP_PAD_TO_SIZE<5>().Apply();
     PATCH(0xA756CD).CALL(runtimeHookJoyGetDevCapsA).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0xA74A6D).CALL(runtimeHookUpdateJoystick).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x8D010E).CALL(runtimeHookUpdateJoystick).NOP_PAD_TO_SIZE<5>().Apply();
+
+    // Max controller button idx patch
+    PATCH(0x8D0130).byte(0x2f).Apply();
+    PATCH(0x8D01D4).byte(0x2f).Apply();
+    PATCH(0xA74CF2).byte(0x2f).Apply();
+    PATCH(0xA74D2C).byte(0x2f).Apply();
+    PATCH(0xA74D66).byte(0x2f).Apply();
+    PATCH(0xA74DA0).byte(0x2f).Apply();
+    PATCH(0xA74DDA).byte(0x2f).Apply();
+    PATCH(0xA74E14).byte(0x2f).Apply();
 
     // Hook for explosions
     PATCH(0xA3BA90).JMP(runtimeHookDoExplosionInternal).NOP_PAD_TO_SIZE<6>().Apply();
@@ -917,18 +943,29 @@ void TrySkipPatch()
     PATCH(0x9C0B3E).JMP(runtimeHookPlayerBouncePushCheckWrapper).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hook to fix the player-clips-into-floor-when-on-something-moving-down bug
-    PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>().Apply();
+    // PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>()
+    gDisablePlayerDownwardClipFix.Apply();
 
     // Hooks to fix the npc-clips-into-floor-when-on-something-moving-down bug
     PATCH(0xA14BA6).JMP(runtimeHookPreserveNPCWalkBlock).NOP_PAD_TO_SIZE<6>().Apply();
-    PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>().Apply();
+    // PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>()
+    gDisableNPCDownwardClipFix.Apply();
     PATCH(0xA0C8D4).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     // 0xA15728 already does it right
     PATCH(0xA15988).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA15A35).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA15F48).CALL(runtimeHookNPCWalkFixClearTemp).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0xA1BB3A).JMP(runtimeHookNPCWalkFixTempHitConditional).NOP_PAD_TO_SIZE<23>().Apply();
-    PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>().Apply();
+    // PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>()
+    gDisableNPCDownwardClipFixSlope.Apply();
+
+    // Patch to handle block reorder after p-switch handling
+    PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
+    PATCH(0x9E3D30).JMP(runtimeHookPSwitchStartRemoveBlockWrapper).NOP_PAD_TO_SIZE<110>().Apply();
+    PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
+
+    // Patch to handle blocks that allow NPCs to pass through
+    PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

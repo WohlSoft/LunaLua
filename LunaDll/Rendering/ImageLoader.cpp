@@ -421,6 +421,25 @@ void ImageLoader::Run(bool initialLoad)
         effectdef_height[i] = (int)((double)GM_GFX_EFFECTS_H_PTR[i] / effectFrameCounts[i] + 0.5);
     }
 
+    // Set tile sizes automatically
+    for (int i = 0; i < SMBXTile::MAX_ID; i++)
+    {
+        int frameCount = 1;
+        switch (i+1)
+        {
+            case 14:
+            case 27:
+            case 241:
+                frameCount = 4;
+                break;
+            default:
+                frameCount = 1;
+                break;
+        }
+        tiledef_width[i] = GM_GFX_TILES_W_PTR[i];
+        tiledef_height[i] = GM_GFX_TILES_H_PTR[i] / frameCount;
+    }
+
     delete lastResources;
     lastResources = foundResources;
 }

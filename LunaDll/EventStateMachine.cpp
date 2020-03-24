@@ -216,6 +216,7 @@ void EventStateMachine::checkPause(void) {
 }
 
 void EventStateMachine::runPause(void) {
+    Renderer::QueueStateStacker renderStack;
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Handle un-focused state

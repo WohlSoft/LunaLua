@@ -80,6 +80,9 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     GM_WATER_AREA_COUNT = 0;
     GM_ANIM_COUNT = 0;
 
+    // Clear extended fields
+    NPC::ClearExtendedFields();
+
     // We should clear the anim array apparently though
     memset(GM_ANIM_PTR, 0, 1000*sizeof(SMBXAnimation));
 
@@ -268,6 +271,11 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         LevelNPC& nextDataLevelNPC = outData.npc[i];
         nextNPC->momentum.x = static_cast<double>(nextDataLevelNPC.x);
         nextNPC->momentum.y = static_cast<double>(nextDataLevelNPC.y);
+        if (outData.meta.RecentFormat == LevelData::SMBX64)
+        {
+            // When loading .lvl files, subtract -0.01px from the y-coordinate as per SMBX 1.3 behaviour.
+            nextNPC->momentum.y -= 0.01;
+        }
         nextNPC->directionFaced = static_cast<float>(nextDataLevelNPC.direct);
 
         uint64_t npcID = nextDataLevelNPC.id;

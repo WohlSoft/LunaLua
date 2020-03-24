@@ -555,6 +555,13 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
         short newIdx = npcIdx - 1;    // 0 based
         short oldIdx = GM_NPCS_COUNT; // 0 based
 
+        // Update extended NPC fields
+        if (newIdx != oldIdx)
+        {
+            *NPC::GetRawExtended(newIdx) = *NPC::GetRawExtended(oldIdx);
+        }
+        NPC::GetRawExtended(oldIdx)->Reset();
+
         // The NPC was indeed removed
         if (gLunaLua.isValid() && (newIdx >= 0) && (oldIdx >= 0)) {
             std::shared_ptr<Event> npcKillEvent = std::make_shared<Event>("onPostNPCRearrangeInternal", false);
@@ -1029,6 +1036,7 @@ void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
 
     if (!isCancelled)
     {
+        Renderer::QueueStateStacker renderStack;
         msgbox_OrigFunc(pPlayerIdx);
     }
 }
@@ -1510,8 +1518,7 @@ extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) 
 _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
 {
     __asm {
-        PUSHF
-        SUB ESP, 2
+        PUSHFD
         PUSH EAX
         PUSH DWORD PTR DS : [EBP + 0xC] // objType
         PUSH DWORD PTR DS : [EBP + 0x8] // npcIndex
@@ -1519,8 +1526,7 @@ _declspec(naked) extern void IsNPCCollidesWithVeggiHook_Wrapper()
         MOV DX, AX
         XOR ECX, ECX
         POP EAX
-        ADD ESP, 2
-        POPF
+        POPFD
         CMP DX, CX
         RET
     }
@@ -1646,7 +1652,7 @@ static void runtimeHookSmbxChangeModeHook(void)
 __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
 {
     __asm {
-        pushf
+        pushfd
             push eax
             push ecx
             push edx
@@ -1656,7 +1662,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
         pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             or ebx, 0xFFFFFFFF
             cmp word ptr ds : [0xB2C620], bx
             ret
@@ -1767,7 +1773,7 @@ static void __stdcall runtimeHookSmbxCheckWindowed(void)
 __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1777,7 +1783,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         cmp word ptr ds : [0xB250D8], 0xFFFFFFFF
         ret
     }
@@ -1852,7 +1858,7 @@ static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *har
 __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1865,7 +1871,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         mov eax, dword ptr ds : [0xB25D14]
         push 0xA28FE8
         ret
@@ -1873,7 +1879,7 @@ __declspec(naked) void __stdcall runtimeHookNPCVulnerabilityRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         mov edi, dword ptr ds : [ebp + 0xC]
         mov ax, word ptr ds : [edi]
         movsx edi, word ptr ds : [esi + 0xE2]
@@ -1895,7 +1901,7 @@ static int __stdcall runtimeHookNPCSpinjumpSafe(NPCMOB* npc)
 __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -1907,24 +1913,34 @@ __declspec(naked) void __stdcall runtimeHookNPCSpinjumpSafeRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0x9AA9EA
         ret
     alternate_exit :
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0x9AA365
         ret
     }
 }
 
-static int __stdcall runtimeHookNPCNoWaterPhysics(NPCMOB* npc)
+static int __stdcall runtimeHookNPCNoWaterPhysics(unsigned int npcIdx)
 {
-    if ((npc != nullptr) && NPC::GetNoWaterPhysics(npc->id))
+    NPCMOB* npc = NPC::GetRaw(npcIdx);
+    ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+    if (npc != nullptr)
     {
-        return -1;
+        if (NPC::GetNoWaterPhysics(npc->id))
+        {
+            return -1;
+        }
+
+        if (ext->noblockcollision)
+        {
+            return -1;
+        }
     }
 
     return 0;
@@ -1936,25 +1952,25 @@ __declspec(naked) void __stdcall runtimeHookNPCNoWaterPhysicsRaw(void)
     // 00A0A997
     __asm {
         jle early_exit
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
-        push esi // Args #1
+        push dword ptr ss:[ebp-0x180] // Args #1
         call runtimeHookNPCNoWaterPhysics
         cmp eax, 0
         jne alternate_exit
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         push 0xA0A997
         ret
     alternate_exit :
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
     early_exit :
         push 0xA0AB20
         ret
@@ -2068,7 +2084,7 @@ static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -2078,7 +2094,7 @@ __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         or edi, 0xFFFFFFFF
         cmp word ptr ds : [ebx + 0x4], di
         push 0xA75080
@@ -2095,7 +2111,7 @@ static void __stdcall runtimeHookSetHDC(HDC newHDC)
 __declspec(naked) void __stdcall runtimeHookSetHDCRaw(void)
 {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -2104,7 +2120,7 @@ __declspec(naked) void __stdcall runtimeHookSetHDCRaw(void)
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         ret
     }
 }
@@ -2300,8 +2316,7 @@ static void __stdcall runtimeHookColorSwitch(unsigned int color)
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2310,8 +2325,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2320,8 +2334,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2330,8 +2343,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2340,8 +2352,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2350,8 +2361,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2360,8 +2370,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2370,8 +2379,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0xA32558
         ret
     }
@@ -2380,8 +2388,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowNpc(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2390,8 +2397,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB424
         ret
     }
@@ -2400,8 +2406,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchYellowBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2410,8 +2415,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB5BF
         ret
     }
@@ -2420,8 +2424,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchBlueBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2430,8 +2433,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB75F
         ret
     }
@@ -2440,8 +2442,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchGreenBlock(void)
 _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
 {
     __asm {
-        pushf
-        sub esp, 2
+        pushfd
         push eax
         push ecx
         push edx
@@ -2450,8 +2451,7 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
         pop edx
         pop ecx
         pop eax
-        add esp, 2
-        popf
+        popfd
         push 0x9DB8FA
         ret
     }
@@ -2605,6 +2605,28 @@ MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT c
         return JOYERR_NOERROR;
     }
     return MMSYSERR_NODRIVER;
+}
+
+void __stdcall runtimeHookUpdateJoystick()
+{
+    static unsigned short runtimeHookJoystick[15 + 32] = { 0 };
+    *(unsigned short**)0xB2DBD4 = runtimeHookJoystick;
+
+    JOYINFOEX ji = { 0 };
+    ji.dwSize = sizeof(JOYINFOEX);
+
+    UINT uJoyID = *(unsigned int*)0xB2D878;
+
+    gLunaGameControllerManager.emulatedJoyGetPosEx(uJoyID, &ji);
+
+    for (int i = 0; i < 32; i++)
+    {
+        runtimeHookJoystick[i + 15] = COMBOOL(ji.dwButtons & (1UL << i));
+    }
+
+    *(int*)0xB2DBE0 = ji.dwXpos;
+    *(int*)0xB2DBE4 = ji.dwYpos;
+    *(int*)0xB2DBE8 = ji.dwPOV;
 }
 
 static _declspec(naked) void __stdcall runtimeHookDoExplosion_OrigFunc(Momentum* coor, short* bombType, short* playerIdx)
@@ -2839,6 +2861,8 @@ _declspec(naked) void __stdcall runtimeHookResetSectionMusicWrapperAA4486(void)
 
 static int __stdcall runtimeHookPlayerBouncePushCheck(unsigned int blockId, PlayerMOB* player)
 {
+    if (gDisablePlayerFilterBounceFix) return 0; // Allow collision
+
     short characterFilter = Blocks::GetBlockPlayerFilter(blockId);
 
     // -1 means allow all characters
@@ -3021,12 +3045,12 @@ _declspec(naked) void __stdcall runtimeHookPreserveNPCWalkBlock()
     // Patches over 00A14BA6 | jne 0xA15F7C
     // edx is free for use at this point
     __asm {
-        pushf
+        pushfd
         movsx edx, word ptr ss : [ebp - 0x178]
         mov g_npcTempHitBlock, edx
         fld qword ptr ss : [ebp - 0x100]
         fstp g_npcTempHit
-        popf
+        popfd
         jne otherHitspot
         push 0xA14BAC // HitSpot 1
         ret
@@ -3100,7 +3124,7 @@ _declspec(naked) void __stdcall runtimeHookCompareNPCWalkBlock()
 
     tempHitBlockUnchanged:
         // Original code
-        cmp word ptr ds : [esi + 136], 0
+        cmp word ptr ds : [esi + 0x136], 0
         push 0xA16B8A
         ret
     }
@@ -3112,12 +3136,14 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixClearTemp()
     //              00A0C8DA | mov dword ptr ss:[ebp-0xFC],edx
     // and similar
     __asm {
+        pushfd
         push eax
         xor eax, eax
         mov dword ptr ss : [ebp - 0x100], eax
         mov dword ptr ss : [ebp - 0xFC], eax
         mov dword ptr ss : [ebp - 0x178], eax
         pop eax
+        popfd
         ret
     }
 }
@@ -3159,6 +3185,360 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
         call runtimeHookNPCWalkFixSlopeInternal
 
         push 0xA1322F
+        ret
+    }
+}
+
+static void markBlocksUnsorted()
+{
+    // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already set, to make sure the max
+    //       lookup value is updated based on block count, since that for some reason seems
+    //       necessary.
+    WORD blockCount = GM_BLOCK_COUNT;
+    GM_BLOCKS_SORTED = -1;
+    for (int i = 0; i <= 16000; i++)
+    {
+        GM_BLOCK_LOOKUP_MIN[i] = 1;
+        GM_BLOCK_LOOKUP_MAX[i] = blockCount;
+    }
+}
+
+static void __stdcall runtimeHookAfterPSwitchBlocksReordered(void)
+{
+    markBlocksUnsorted();
+}
+
+_declspec(naked) void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        call runtimeHookAfterPSwitchBlocksReordered
+        pop edx
+        pop ecx
+        pop eax
+        mov edi, 1
+        push 0x009E450C
+        ret
+    }
+}
+
+static const std::wstring destroyedPSwitchBlockLayerName(L"Destroyed PSwitch Blocks");
+
+static void __stdcall runtimeHookPSwitchStartRemoveBlock(unsigned int blockIdx)
+{
+    Block& b = *Block::GetRaw(blockIdx);
+
+    b.BlockType = 0;
+    b.IsHidden = -1;
+    b.pLayerName = destroyedPSwitchBlockLayerName;
+}
+
+_declspec(naked) void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        push edi // Arg 1
+        call runtimeHookPSwitchStartRemoveBlock
+        pop edx
+        pop ecx
+        pop eax
+        push 0x009E3D9E
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPSwitchGetNewBlockAtEnd(unsigned int blockIdx)
+{
+    unsigned int blockCount = GM_BLOCK_COUNT;
+
+    // TODO: This could be faster if it mattered, and maybe share block reusing with Lua block spawning?
+    for (unsigned int i = 0; i < blockCount; i++)
+    {
+        Block& b = *Block::GetRaw(i);
+        if (b.pLayerName == destroyedPSwitchBlockLayerName)
+        {
+            if (gLunaLua.isValid()) {
+                std::shared_ptr<Event> blockInvalidateEvent = std::make_shared<Event>("onBlockInvalidateForReuseInternal", false);
+                blockInvalidateEvent->setDirectEventName("onBlockInvalidateForReuseInternal");
+                blockInvalidateEvent->setLoopable(false);
+                gLunaLua.callEvent(blockInvalidateEvent, i);
+            }
+
+            return i;
+        }
+    }
+
+    blockCount++;
+    GM_BLOCK_COUNT = blockCount;
+    return blockCount;
+}
+
+_declspec(naked) void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void)
+{
+    __asm {
+        push ecx
+        push edx
+        call runtimeHookPSwitchGetNewBlockAtEnd
+        pop edx
+        pop ecx
+        mov esi, eax
+        push 0x009E3E71
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookNPCNoBlockCollisionTest(unsigned int npcIdx)
+{
+    ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+    if (ext != nullptr)
+    {
+        if (ext->noblockcollision)
+        {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
+{
+	// Death by block bump
+    // 009E2AD0 | jne smbx.9E2EB6
+    __asm {
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [esp + 0x28]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0x9E2AD6
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0x9E2EB6
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
+{
+	// ???
+    // 00A089C3 | jne smbx.A08CA5
+    __asm {
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x188]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA089C9
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA08CA5
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
+{
+	// Main Block Collision
+    // 00A10EAA | cmp word ptr ds:[ecx+edi*2],0
+    __asm {
+		cmp word ptr ds:[ecx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA10EBB
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA10EB1
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
+{
+	// ???
+    // 00A113B0 | cmp word ptr ds:[ecx+edi*2],0
+    __asm {
+		cmp word ptr ds:[ecx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA113B7
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA11414
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
+{
+	// Beltspeed
+    // 00A1760E | cmp word ptr ds:[edx+edi*2],0
+    __asm {
+		cmp word ptr ds:[edx+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA17619
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA17BDA
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
+{
+	// Bounce off NPCs
+    // 00A1B33F | cmp word ptr ds:[eax+edi*2],0
+    __asm {
+		cmp word ptr ds:[eax+edi*2],0
+        jne early_exit
+        pushfd
+        push eax
+        push ecx
+        push edx
+		movsx eax, word ptr ss : [ebp - 0x180]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+		movsx eax, word ptr ss : [ebp - 0x188]
+        push eax // Args #1
+        call runtimeHookNPCNoBlockCollisionTest
+        cmp eax, 0
+        jne alternate_exit
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA1B346
+        ret
+    alternate_exit :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+    early_exit :
+        push 0xA1B386
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx)
+{
+    // If already not hitting, ignore
+    if (hitSpot == 0) return 0;
+
+    Block* block = Block::GetRaw(blockIdx);
+    if (block)
+    {
+        short npcFilter = Blocks::GetBlockNPCFilter(block->BlockType);
+        if ((npcFilter != 0) && ((npcFilter == -1) || (npcFilter == npc->id)))
+        {
+            // The filter was a non-zero and matched, so no collision
+            return 0;
+        }
+    }
+
+    return hitSpot;
+}
+
+__declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
+{
+    // 00A11B76 | mov ax, word ptr ds : [esi + 0xE2]
+    // eax, ecx, edx and flags are free for use at this point
+    __asm {
+        movsx eax, word ptr ss:[ebp-0x188]   // blockIdx
+        push eax
+        push esi                             // npc
+        push dword ptr ss:[ebp-0x14]         // hitSpot
+        call runtimeHookBlockNPCFilterInternal
+        mov dword ptr ss : [ebp - 0x14], eax // store return back to hitSpot
+
+        mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
+        push 0xA11B7D
         ret
     }
 }

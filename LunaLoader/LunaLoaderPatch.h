@@ -9,4 +9,6 @@ enum LunaLoaderResult {
 
 LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine, const wchar_t *workingDir = NULL);
 
+const wchar_t* LunaLoaderGetLastError();
+
 #endif

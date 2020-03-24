@@ -352,7 +352,7 @@ void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
     }
 
     // Copy button state
-    player.buttonState = controller->getButtonState() & 0x7FFF;
+    player.buttonState = controller->getButtonState();
 }
 #endif // !defined(BUILDING_SMBXLAUNCHER)
 
@@ -627,7 +627,8 @@ LunaGameController::LunaGameController(LunaGameControllerManager* _managerPtr, S
     axisPadState(0),
     padState(0),
     buttonState(0),
-    activeFlag(false)
+    activeFlag(false),
+    joyButtonMap()
 {
     // Open for haptic feedback if possible, because at least checking sometimes this helps keep a controller awake (really?)
     if (joyPtr && SDL_JoystickIsHaptic(joyPtr))
@@ -650,6 +651,67 @@ LunaGameController::LunaGameController(LunaGameControllerManager* _managerPtr, S
         namePtr = "<NULL>";
     }
     name = namePtr;
+
+    // Get buttom mapping
+    if (joyPtr)
+    {
+        int buttonCount = SDL_JoystickNumButtons(joyPtr);
+        joyButtonMap.resize(buttonCount);
+
+        if (ctrlPtr)
+        {
+            // Detected as gamepad, so need to see if we have unbound buttons to map to extra button numbers
+
+            // Clear values
+            for (int i = 0; i < buttonCount; i++)
+            {
+                joyButtonMap[i] = 0;
+            }
+
+            // Set values to -1 when they're already handled with a gamepad binding
+            for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+            {
+                SDL_GameControllerButtonBind bind = SDL_GameControllerGetBindForButton(ctrlPtr, (SDL_GameControllerButton)i);
+                if ((bind.bindType == SDL_CONTROLLER_BINDTYPE_BUTTON) && (bind.value.button < buttonCount))
+                {
+                    joyButtonMap[bind.value.button] = -1;
+                }
+            }
+
+            // Set new indicies for buttons that aren't flagged with -1
+            int nextJoyButtonIdx = CONTROLLER_BUTTON_JOY0;
+            for (int i = 0; i < buttonCount; i++)
+            {
+                if (joyButtonMap[i] == 0)
+                {
+                    joyButtonMap[i] = nextJoyButtonIdx;
+                    nextJoyButtonIdx++;
+                }
+            }
+        }
+        else
+        {
+            // Plain joystick, use unity mapping
+            for (int i = 0; i < buttonCount; i++)
+            {
+                joyButtonMap[i] = i;
+            }
+        }
+
+        #if defined(CONTROLLER_DEBUG)
+            // Dump for testing
+            printf("==== UNBOUND CONTROLS FOR %s ====\n", namePtr);
+            for (int i = 0; i < buttonCount; i++)
+            {
+                printf(": %d%s\n", joyButtonMap[i], (joyButtonMap[i] >= CONTROLLER_BUTTON_JOY0) ? "****" : "");
+            }
+            printf("====\n");
+        #endif
+    }
+    else
+    {
+        joyButtonMap.clear();
+    }
 
     #if defined(CONTROLLER_DEBUG)
         printf("Added controller: %s\n", name.c_str());
@@ -679,6 +741,7 @@ LunaGameController::LunaGameController(LunaGameController &&other)
     padState        = other.padState;
     buttonState     = other.buttonState;
     activeFlag      = other.activeFlag;
+    joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
     other.ctrlPtr   = nullptr;
     other.hapticPtr = nullptr;
@@ -700,6 +763,7 @@ LunaGameController & LunaGameController::operator=(LunaGameController &&other)
     padState        = other.padState;
     buttonState     = other.buttonState;
     activeFlag      = other.activeFlag;
+    joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
     other.ctrlPtr   = nullptr;
     other.hapticPtr = nullptr;
@@ -731,15 +795,21 @@ void LunaGameController::close()
 void LunaGameController::joyButtonEvent(const SDL_JoyButtonEvent& event, bool down)
 {
     // Ignore if this is not a joy-only device
-    if ((joyPtr == nullptr) || (ctrlPtr != nullptr)) return;
+    if (joyPtr == nullptr) return;
 
     #if defined(CONTROLLER_DEBUG_LOWLEVEL)
         printf("JoyButton%s %s, %d\n", down ? "Down" : "Up", name.c_str(), (int)event.button);
     #endif
     
-    if (event.button < 32)
+    // Ignore if out of range
+    if (event.button >= joyButtonMap.size()) return;
+
+    // Get mapping
+    int idx = joyButtonMap[event.button];
+
+    if (idx >= 0)
     {
-        buttonEvent(event.button, down);
+        buttonEvent(idx, down);
     }
 }
 
@@ -977,6 +1047,9 @@ void LunaGameController::directionalEvent(int which, bool newState, bool fromAna
 
 void LunaGameController::buttonEvent(int which, bool newState)
 {
+    // Up to 32 buttons supported currently
+    if (which >= 32) return;
+
     if (newState)
     {
         buttonState |= (1UL << which);

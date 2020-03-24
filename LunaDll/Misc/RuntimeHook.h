@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "../Defines.h"
+#include "AsmPatch.h"
 
 struct SMBX_Warp;
 
@@ -29,6 +30,14 @@ extern bool episodeStarted;
 void SetupThunRTMainHook();
 void ParseArgs(const std::vector<std::wstring>& args);
 void TrySkipPatch();
+
+/************************************************************************/
+/* Global Patch Variables                                               */
+/************************************************************************/
+extern AsmPatch<777> gDisablePlayerDownwardClipFix;
+extern AsmPatch<8> gDisableNPCDownwardClipFix;
+extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
+
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
@@ -163,7 +172,7 @@ void fixup_RenderPlayerJiterX();
 template <int priority>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -173,7 +182,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         pop edx
         pop ecx
         pop eax
-        popf
+        popfd
         ret
     }
 }
@@ -185,7 +194,7 @@ static inline constexpr void* GetRenderBelowPriorityHook(void) {
 template <int priority, unsigned int skipTargetAddr, bool* skipAddr>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
     __asm {
-        pushf
+        pushfd
         push eax
         push ecx
         push edx
@@ -198,7 +207,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
             pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             ret
         }
     }
@@ -208,7 +217,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
             pop edx
             pop ecx
             pop eax
-            popf
+            popfd
             add esp, 4
             push skipTargetAddrTmp
             ret
@@ -422,6 +431,7 @@ void __stdcall runtimeHookSemisolidInteractionHook_Raw();
 MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
 MMRESULT __stdcall runtimeHookJoyGetPosExNull(UINT uJoyID, LPJOYINFOEX pji);
 MMRESULT __stdcall runtimeHookJoyGetDevCapsA(UINT uJoyID, LPJOYCAPSA pjc, UINT cbjc);
+void __stdcall runtimeHookUpdateJoystick();
 
 void __stdcall runtimeHookDoExplosionInternal(Momentum* coor, short* bombType, short* playerIdx);
 
@@ -448,6 +458,19 @@ void __stdcall runtimeHookCompareNPCWalkBlock();
 void __stdcall runtimeHookNPCWalkFixClearTemp();
 void __stdcall runtimeHookNPCWalkFixTempHitConditional();
 void __stdcall runtimeHookNPCWalkFixSlope();
+
+void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
+void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);
+void __stdcall runtimeHookPSwitchGetNewBlockAtEndWrapper(void);
+
+void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void);
+void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
+
+void __stdcall runtimeHookBlockNPCFilter(void);
 
 #endif
 

@@ -10,12 +10,14 @@
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
 #include "../Rendering/GL/GLTextureStore.h"
+#include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SMBXInternal/Layer.h"
 #include "../SdlMusic/SdlMusPlayer.h"
 #include "../FileManager/CustomParamStore.h"
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
+#include "../Misc/RuntimeHook.h"
 #include "LunaLuaMain.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
@@ -383,5 +385,50 @@ extern "C" {
     FFI_EXPORT(void) LunaLuaRumbleSelectedController(int playerNum, int ms, float strength)
     {
         gLunaGameControllerManager.rumbleSelectedController(playerNum, ms, strength);
+    }
+
+    FFI_EXPORT(ExtendedNPCFields*) LunaLuaGetNPCExtendedFieldsArray()
+    {
+        return NPC::GetRawExtended(0);
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetNPCextendedFieldsStruct()
+    {
+        return "\
+typedef struct ExtendedNPCFields_\
+{\
+    bool noblockcollision;\
+} ExtendedNPCFields;";
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
+    {
+        gDisablePlayerFilterBounceFix = !enable;
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPlayerDownwardClipFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisablePlayerDownwardClipFix.Apply();
+        }
+        else
+        {
+            gDisablePlayerDownwardClipFix.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCDownwardClipFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisableNPCDownwardClipFix.Apply();
+            //gDisableNPCDownwardClipFixSlope.Apply();
+        }
+        else
+        {
+            gDisableNPCDownwardClipFix.Unapply();
+            //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
     }
 }

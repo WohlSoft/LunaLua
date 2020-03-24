@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2019 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2020 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -96,7 +96,10 @@
 /* #undef HAVE_WCSLEN */
 /* #undef HAVE_WCSLCPY */
 /* #undef HAVE_WCSLCAT */
+/* #undef HAVE_WCSDUP */
+/* #undef HAVE_WCSSTR */
 /* #undef HAVE_WCSCMP */
+/* #undef HAVE_WCSNCMP */
 /* #undef HAVE_STRLEN */
 /* #undef HAVE_STRLCPY */
 /* #undef HAVE_STRLCAT */
@@ -108,6 +111,8 @@
 /* #undef HAVE_STRCHR */
 /* #undef HAVE_STRRCHR */
 /* #undef HAVE_STRSTR */
+/* #undef HAVE_STRTOK_R */
+/* #undef HAVE_STRTOK_S */
 /* #undef HAVE_ITOA */
 /* #undef HAVE__LTOA */
 /* #undef HAVE__UITOA */
@@ -127,6 +132,7 @@
 /* #undef HAVE_STRCASECMP */
 /* #undef HAVE__STRNICMP */
 /* #undef HAVE_STRNCASECMP */
+/* #undef HAVE_SSCANF */
 /* #undef HAVE_VSSCANF */
 /* #undef HAVE_VSNPRINTF */
 /* #undef HAVE_M_PI */
@@ -204,14 +210,13 @@
 /* #undef HAVE_LIBUDEV_H */
 
 #define HAVE_D3D_H 1
-#define HAVE_D3D11_H 1
+/* #undef HAVE_D3D11_H */
 #define HAVE_DDRAW_H 1
 #define HAVE_DSOUND_H 1
 #define HAVE_DINPUT_H 1
 #define HAVE_XINPUT_H 1
 #define HAVE_DXGI_H 1
 
-#define HAVE_ENDPOINTVOLUME_H 1
 #define HAVE_MMDEVICEAPI_H 1
 #define HAVE_AUDIOCLIENT_H 1
 
@@ -268,7 +273,7 @@
 /* #undef SDL_AUDIO_DRIVER_SNDIO */
 /* #undef SDL_AUDIO_DRIVER_SNDIO_DYNAMIC */
 /* #undef SDL_AUDIO_DRIVER_SUNAUDIO */
-/* #undef SDL_AUDIO_DRIVER_WASAPI */
+#define SDL_AUDIO_DRIVER_WASAPI 1
 #define SDL_AUDIO_DRIVER_WINMM 1
 
 /* Enable various input drivers */
@@ -294,9 +299,11 @@
 #define SDL_HAPTIC_DINPUT 1
 #define SDL_HAPTIC_XINPUT 1
 /* #undef SDL_HAPTIC_ANDROID */
+/* #undef SDL_LIBUSB_DYNAMIC */
 
 /* Enable various sensor drivers */
 /* #undef SDL_SENSOR_ANDROID */
+/* #undef SDL_SENSOR_COREMOTION */
 #define SDL_SENSOR_DUMMY 1
 
 /* Enable various shared object loading systems */
@@ -322,9 +329,11 @@
 /* #undef SDL_VIDEO_DRIVER_ANDROID */
 /* #undef SDL_VIDEO_DRIVER_HAIKU */
 /* #undef SDL_VIDEO_DRIVER_COCOA */
+/* #undef SDL_VIDEO_DRIVER_UIKIT */
 /* #undef SDL_VIDEO_DRIVER_DIRECTFB */
 /* #undef SDL_VIDEO_DRIVER_DIRECTFB_DYNAMIC */
 #define SDL_VIDEO_DRIVER_DUMMY 1
+/* #undef SDL_VIDEO_DRIVER_OFFSCREEN */
 #define SDL_VIDEO_DRIVER_WINDOWS 1
 /* #undef SDL_VIDEO_DRIVER_WAYLAND */
 /* #undef SDL_VIDEO_DRIVER_RPI */
@@ -365,7 +374,7 @@
 /* #undef SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM */
 
 #define SDL_VIDEO_RENDER_D3D 1
-#define SDL_VIDEO_RENDER_D3D11 1
+/* #undef SDL_VIDEO_RENDER_D3D11 */
 #define SDL_VIDEO_RENDER_OGL 1
 /* #undef SDL_VIDEO_RENDER_OGL_ES */
 #define SDL_VIDEO_RENDER_OGL_ES2 1
@@ -387,11 +396,15 @@
 /* Enable Vulkan support */
 #define SDL_VIDEO_VULKAN 1
 
+/* Enable Metal support */
+/* #undef SDL_VIDEO_METAL */
+
 /* Enable system power support */
 /* #undef SDL_POWER_ANDROID */
 /* #undef SDL_POWER_LINUX */
 #define SDL_POWER_WINDOWS 1
 /* #undef SDL_POWER_MACOSX */
+/* #undef SDL_POWER_UIKIT */
 /* #undef SDL_POWER_HAIKU */
 /* #undef SDL_POWER_EMSCRIPTEN */
 /* #undef SDL_POWER_HARDWIRED */
@@ -408,11 +421,16 @@
 /* Enable assembly routines */
 #define SDL_ASSEMBLY_ROUTINES 1
 /* #undef SDL_ALTIVEC_BLITTERS */
+/* #undef SDL_ARM_SIMD_BLITTERS */
+/* #undef SDL_ARM_NEON_BLITTERS */
 
 /* Enable dynamic libsamplerate support */
 /* #undef SDL_LIBSAMPLERATE_DYNAMIC */
 
 /* Platform specific definitions */
+/* #undef SDL_IPHONE_KEYBOARD */
+/* #undef SDL_IPHONE_LAUNCHSCREEN */
+
 #if !defined(__WIN32__)
 #  if !defined(_STDINT_H_) && !defined(_STDINT_H) && !defined(HAVE_STDINT_H) && !defined(_HAVE_STDINT_H)
 typedef unsigned int size_t;

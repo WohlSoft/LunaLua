@@ -335,6 +335,9 @@ DEFMEM(GM_EVENT_COUNT,      WORD,  0x00B2D710);
 // Blocks
 DEFMEM(GM_BLOCK_COUNT,      WORD,  0x00B25956);
 DEFMEM(GM_BLOCKS_PTR,       void*, 0x00B25A04);
+DEFMEM(GM_BLOCKS_SORTED,    WORD,  0x00B2C894);
+DEFMEM(GM_BLOCK_LOOKUP_MIN, WORD*, 0x00B25758);
+DEFMEM(GM_BLOCK_LOOKUP_MAX, WORD*, 0x00B25774);
 
 // Backgrounds
 DEFMEM(GM_SEC_BG_ID,     short*,  0x00B258B8); //Define for sections background id
@@ -586,6 +589,9 @@ DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);
 
 DEFMEM(effectdef_width, short*, 0x00B2BA68);
 DEFMEM(effectdef_height, short*, 0x00B2BA84);
+
+DEFMEM(tiledef_height, short*, 0X00B2BF84);
+DEFMEM(tiledef_width, short*, 0X00B2BF68);
 
 // Frame timing related references
 DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
