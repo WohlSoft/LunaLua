@@ -3191,11 +3191,11 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
 
 static void markBlocksUnsorted()
 {
-    // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already set, to make sure the max
+    // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already cleared, to make sure the max
     //       lookup value is updated based on block count, since that for some reason seems
     //       necessary.
     WORD blockCount = GM_BLOCK_COUNT;
-    GM_BLOCKS_SORTED = -1;
+    GM_BLOCKS_SORTED = 0;
     for (int i = 0; i <= 16000; i++)
     {
         GM_BLOCK_LOOKUP_MIN[i] = 1;
