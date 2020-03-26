@@ -1373,7 +1373,7 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if (virtKey == VK_ESCAPE)
+        if ((virtKey == VK_ESCAPE) && plainPress)
         {
             gEscPressed = true;
         }
