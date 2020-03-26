@@ -47,6 +47,9 @@ void testModeCheckTriggers()
 
 void testModePauseMenu(bool allowContinue)
 {
+    // Skip if already active, don't activate recursively
+    if (gIsTestModePauseActive) return;
+
     Renderer::QueueStateStacker renderStack;
 
     gIsTestModePauseActive = true;

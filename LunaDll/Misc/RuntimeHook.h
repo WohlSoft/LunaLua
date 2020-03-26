@@ -472,5 +472,7 @@ void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
 
 void __stdcall runtimeHookBlockNPCFilter(void);
 
+void __stdcall runtimeHookLevelPauseCheck(void);
+
 #endif
 

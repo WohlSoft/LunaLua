@@ -967,6 +967,9 @@ void TrySkipPatch()
     // Patch to handle blocks that allow NPCs to pass through
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
 
+    // Replace pause button detection code to avoid re-triggering when held
+    PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

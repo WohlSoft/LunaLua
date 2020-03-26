@@ -61,6 +61,9 @@ LvlEnum gLevelEnum;
 // Last two array entries are copies of the above for last tick
 KeyMap gRawKeymap[4] = {0};
 
+bool gEscPressed = false;
+bool gEscPressedRegistered = false;
+
 bool gIsTestModePauseActive;
 
 // Global obj

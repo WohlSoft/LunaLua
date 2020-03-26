@@ -111,6 +111,10 @@ extern short	gNumpad6;
 // Raw player keymap
 extern KeyMap   gRawKeymap[4];
 
+// Esc pressed tracking for runtimeHookLevelPauseCheck
+extern bool     gEscPressed;
+extern bool     gEscPressedRegistered;
+
 // Test mode pause note
 extern bool     gIsTestModePauseActive;
 

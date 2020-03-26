@@ -779,6 +779,8 @@ extern void __stdcall UpdateInputHook()
 {
     gLunaGameControllerManager.pollInputs();
     g_EventHandler.hookInputUpdate();
+    gEscPressedRegistered = gEscPressed;
+    gEscPressed = false;
 }
 
 extern void __stdcall WindowInactiveHook()
@@ -1371,6 +1373,10 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             }
         }
 
+        if (virtKey == VK_ESCAPE)
+        {
+            gEscPressed = true;
+        }
         if (virtKey == VK_F12)
         {
             if (plainPress && g_GLEngine.IsEnabled())
@@ -3539,6 +3545,33 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
 
         mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
         push 0xA11B7D
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookLevelPauseCheckInternal(void)
+{
+    if (gEscPressedRegistered)
+    {
+        // ESC key pressed before more recent updateInput
+        return 0x8CA40B; // Pause button pressed
+    }
+
+    if ((gRawKeymap[0].pauseKeyState != 0) && ((gRawKeymap[2].pauseKeyState == 0)) && (Player::Get(1)->keymap.pauseKeyState != 0))
+    {
+        // Pause key from player 1
+        return 0x8CA40B; // Pause button pressed
+    }
+
+    return 0x8CA5A6; // Pause button not pressed
+}
+
+__declspec(naked) void __stdcall runtimeHookLevelPauseCheck(void)
+{
+    // 008CA405 | 0F84 9B010000              | je smbx.8CA5A6
+    __asm {
+        call runtimeHookLevelPauseCheckInternal
+        push eax
         ret
     }
 }
