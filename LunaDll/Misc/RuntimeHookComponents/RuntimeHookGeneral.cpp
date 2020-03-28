@@ -93,7 +93,10 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
             // Our main window was destroyed? Clear hwnd and mark as unfocused
             gMainWindowHwnd = NULL;
-            gMainWindowFocused = false;
+            if (!gStartupSettings.runWhenUnfocused)
+            {
+                gMainWindowFocused = false;
+            }
             gMainWindowSize = 0;
         }
         break;
@@ -108,7 +111,10 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
         {
             // Our main window lost focus? Keep track of that.
-            gMainWindowFocused = false;
+            if (!gStartupSettings.runWhenUnfocused)
+            {
+                gMainWindowFocused = false;
+            }
         }
         break;
     case WM_SIZE:
@@ -205,6 +211,12 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--forceHardGL"))
     {
         gStartupSettings.forceHardGL = true;
+    }
+
+    if (vecStrFind(args, L"--runWhenUnfocused"))
+    {
+        gStartupSettings.runWhenUnfocused = true;
+        gMainWindowFocused = true;
     }
 }
 

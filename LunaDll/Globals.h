@@ -48,6 +48,7 @@ struct startUpSettings{
     bool oldLvlLoader;
     bool softwareGL;
     bool forceHardGL;
+    bool runWhenUnfocused;
 };
 
 struct SMBXHUDSettings {
