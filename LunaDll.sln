@@ -26,8 +26,8 @@ Global
 		{099C1297-C201-4ACC-925E-0E88DE47CB57}.Debug|Win32.Build.0 = Debug|Win32
 		{099C1297-C201-4ACC-925E-0E88DE47CB57}.LunaLoader-exec|Win32.ActiveCfg = LunaLoader-exec|Win32
 		{099C1297-C201-4ACC-925E-0E88DE47CB57}.LunaLoader-exec|Win32.Build.0 = LunaLoader-exec|Win32
-		{099C1297-C201-4ACC-925E-0E88DE47CB57}.Release|Win32.ActiveCfg = Debug|Win32
-		{099C1297-C201-4ACC-925E-0E88DE47CB57}.Release|Win32.Build.0 = Debug|Win32
+		{099C1297-C201-4ACC-925E-0E88DE47CB57}.Release|Win32.ActiveCfg = Release|Win32
+		{099C1297-C201-4ACC-925E-0E88DE47CB57}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
