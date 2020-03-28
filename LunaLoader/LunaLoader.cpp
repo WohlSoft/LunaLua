@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "LunaLoaderPatch.h"
 
 #define ErrorBox(msg, title) MessageBoxW(NULL, (msg), (title), MB_ICONERROR)
@@ -19,6 +20,36 @@ std::vector<std::wstring> splitCmdArgs(const std::wstring &str)
     for(int i = 0; i < argc; i++)
         args.push_back(argvW[i]);
     return args;
+}
+
+std::wstring escapeArg(const std::wstring &str)
+{
+    if ((str.find_first_of(L" \t\n\v\"") == str.npos) &&
+        (str.find(L"\\\\") == str.npos) &&
+        (str.find(L"\\\"") == str.npos)
+        )
+    {
+        // No escaping needed
+        return str;
+    }
+
+    std::wstring out = L"\"";
+    for (wchar_t c : str)
+    {
+        switch (c)
+        {
+        case L'\\':
+            out += L"\\\\";
+            break;
+        case L'"':
+            out += L"\\\"";
+            break;
+        default:
+            out += c;
+        }
+    }
+    out += L"\"";
+    return out;
 }
 
 std::wstring dirnameOf(const std::wstring& fname)
@@ -48,24 +79,36 @@ int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /
     if(pathToSMBX == fulPath_s) // If LunaLoader.exe renamed into "SMBX.exe"
         pathToSMBX = curPath + L"\\smbx.legacy";
 
-    if (cmdArgs.size() > 1)
-    { //if more than one arg then possible of a smbx path
-        if (cmdArgs[1].find(L"--") == std::wstring::npos)
-        { //if the first arg starting with "--" then no smbx path --> just starting with argument
-            pathToSMBX = cmdArgs[1];
-            newCmdLine = L""; //reset the arg path
-            if (cmdArgs.size() > 1)
-            { //strip the smbx-path from the arguments
-                for (unsigned int i = 1; i < cmdArgs.size(); ++i)
-                {
-                    newCmdLine += cmdArgs[i] + std::wstring(L" ");
-                    if (i == cmdArgs.size() - 1)
-                    { //if the last argument of the args list then remove the last space.
-                        std::wstring::iterator it = newCmdLine.end();
-                        newCmdLine.erase(--it);
-                    }
-                }
-            }
+    // Strip first arg which is just our own path
+    if (cmdArgs.size() > 0)
+    {
+        cmdArgs.erase(cmdArgs.begin());
+    }
+
+    // If the first arg starting with "--" and contains .exe then no smbx path --> just starting with argument
+    if ((cmdArgs.size() > 0) && (cmdArgs[0].find(L"--") == std::wstring::npos))
+    {
+        std::wstring tmpArg = cmdArgs[0];
+        std::transform(tmpArg.begin(), tmpArg.end(), tmpArg.begin(), ::towlower);
+        bool isExeFile = ((tmpArg.rfind(L".exe") == (tmpArg.size() - 4)) ||
+                          (tmpArg.rfind(L".exe.legacy") == (tmpArg.size() - 11)));
+
+        // Only interpret this as the smbx executable if this ends in .exe
+        if (isExeFile)
+        {
+            pathToSMBX = cmdArgs[0];
+            cmdArgs.erase(cmdArgs.begin());
+        }
+    }
+
+    // Re-generate arg string from list
+    newCmdLine = L"";
+    for (unsigned int i = 0; i < cmdArgs.size(); ++i)
+    {
+        newCmdLine += escapeArg(cmdArgs[i]);
+        if (i != cmdArgs.size() - 1)
+        {
+            newCmdLine += L" ";
         }
     }
 
