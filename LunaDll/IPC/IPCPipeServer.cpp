@@ -23,6 +23,7 @@ json IPCGetWindowHandle(const json& params);      // Fetch HWND of SMBX game win
 json IPCSetCheckPoint(const json& params);        // Set custom checkpoint, start position, warp entrance/exit
 json IPCResetCheckPoint(const json& params);      // Clear checkpoint
 json IPCGetSupportedFeatures(const json& params); // Get a supported features table
+json IPCQuit(const json& params);                 // Quit the game
 
 
 
@@ -34,6 +35,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
     RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
     RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
+    RegisterMethod("quit", IPCQuit);
 }
 
 IPCPipeServer::~IPCPipeServer()
@@ -300,4 +302,23 @@ json IPCGetSupportedFeatures(const json& params)
     return {
         {"LVLX", true}
     };
+}
+
+//=============================================================================
+
+static bool gIPCQuitRequested = false;
+
+json IPCQuit(const json& params)
+{
+    gIPCQuitRequested = true;
+    return true;
+}
+
+void CheckIPCQuitRequest()
+{
+    if (gIPCQuitRequested)
+    {
+        Sleep(10);
+        _exit(0);
+    }
 }

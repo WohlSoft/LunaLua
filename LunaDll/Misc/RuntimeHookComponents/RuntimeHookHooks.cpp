@@ -39,6 +39,8 @@
 
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
+void CheckIPCQuitRequest();
+
 extern HHOOK HookWnd;
 extern HHOOK KeyHookWnd;
 
@@ -811,6 +813,7 @@ bool g_ResetFrameTiming = false;
 
 extern void __stdcall FrameTimingHookQPC()
 {
+    CheckIPCQuitRequest();
     TestModeCheckPendingIPCRequest();
     g_PerfTracker.endFrame();
     static int64_t lastFrameTime = 0;
@@ -899,6 +902,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
     if (GM_MAX_FPS_MODE)
     {
+        CheckIPCQuitRequest();
         TestModeCheckPendingIPCRequest();
         return;
     }
@@ -909,6 +913,7 @@ extern void __stdcall FrameTimingMaxFPSHookQPC()
 
 extern void __stdcall FrameTimingHook()
 {
+    CheckIPCQuitRequest();
     TestModeCheckPendingIPCRequest();
     g_PerfTracker.endFrame();
     static double lastFrameTime = 0.0;
@@ -977,6 +982,7 @@ extern void __stdcall FrameTimingMaxFPSHook()
     // If we're in "max FPS" mode (either via cheat code or editor menu), bypass frame timing
     if (GM_MAX_FPS_MODE)
     {
+        CheckIPCQuitRequest();
         TestModeCheckPendingIPCRequest();
         return;
     }
