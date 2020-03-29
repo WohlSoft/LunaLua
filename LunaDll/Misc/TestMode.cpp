@@ -308,11 +308,22 @@ bool testModeEnable(const STestModeSettings& settings)
     std::wstring path = settings.levelPath;
     std::wstring fullPath;
     if (isAbsolutePath(path)) {
-        fullPath = path;
+        fullPath = normalizePathSlashes(path);
+        replaceSubStrW(fullPath, L"/", L"\\");
     }
     else
     {
-        fullPath = gAppPathWCHAR + L"\\worlds\\" + path;
+        fullPath = normalizePathSlashes(gCwdPathWCHAR + L"\\" + path);
+        replaceSubStrW(fullPath, L"/", L"\\");
+        if (!fileExists(fullPath))
+        {
+            std::wstring worldsPath = normalizePathSlashes(gAppPathWCHAR + L"\\worlds\\" + path);
+            replaceSubStrW(worldsPath, L"/", L"\\");
+            if (fileExists(worldsPath))
+            {
+                fullPath = worldsPath;
+            }
+        }
     }
 
     const std::string &newLevelData = settings.rawData;

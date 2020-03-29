@@ -142,6 +142,9 @@ extern FILE* conout;
 extern std::string  gAppPathANSI;
 extern std::string  gAppPathUTF8;
 extern std::wstring gAppPathWCHAR;
+extern std::string  gCwdPathANSI;
+extern std::string  gCwdPathUTF8;
+extern std::wstring gCwdPathWCHAR;
 
 // Message boxes with printf-like syntax
 void printBoxA(const char *fmt, ...);

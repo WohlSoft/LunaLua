@@ -97,10 +97,11 @@ FILE* conout = nullptr;
 
 // Paths
 std::string  gAppPathANSI;
-
 std::string  gAppPathUTF8;
-
 std::wstring gAppPathWCHAR;
+std::string  gCwdPathANSI;
+std::string  gCwdPathUTF8;
+std::wstring gCwdPathWCHAR;
 
 // Printf-like message boxes
 void printBoxW(const wchar_t *fmt, ...)

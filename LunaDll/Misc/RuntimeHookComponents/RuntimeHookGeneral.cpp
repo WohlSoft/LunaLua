@@ -167,10 +167,29 @@ void ParseArgs(const std::vector<std::wstring>& args)
     for (unsigned int i = 0; i < args.size(); i++)
     {
         const std::wstring& arg = args[i];
-        if (arg.find(L"--testLevel=") == 0)
+        std::wstring levelPath;
+        if ((arg.length() > 0) && (arg[0] == L'-'))
+        {
+            if (arg.find(L"--testLevel=") == 0)
+            {
+                levelPath = arg.substr(12);
+            }
+        }
+        else
+        {
+            std::wstring lowerArg = arg;
+            std::transform(lowerArg.begin(), lowerArg.end(), lowerArg.begin(), towlower);
+            if ((lowerArg.rfind(L".lvl") == (lowerArg.size() - 4)) ||
+                (lowerArg.rfind(L".lvlx") == (lowerArg.size() - 5)))
+            {
+                levelPath = arg;
+            }
+        }
+
+        if (levelPath.length() > 0)
         {
             STestModeSettings settings;
-            settings.levelPath = arg.substr(12);
+            settings.levelPath = levelPath;
             settings.rawData = "";
             if (!testModeEnable(settings))
             {

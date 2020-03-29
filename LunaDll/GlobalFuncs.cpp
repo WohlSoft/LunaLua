@@ -408,6 +408,18 @@ void initAppPaths()
     gAppPathWCHAR = fullPath;
     gAppPathUTF8 = WStr2Str(fullPath);
     gAppPathANSI = WStr2StrA(fullPath);
+
+    // Store intial cwd
+    DWORD cwdLen = GetCurrentDirectoryW(0, NULL);
+    wchar_t* cwdPath = new wchar_t[cwdLen + 1];
+    GetCurrentDirectoryW(cwdLen + 1, cwdPath);
+    gCwdPathWCHAR = cwdPath;
+    gCwdPathUTF8 = WStr2Str(cwdPath);
+    gCwdPathANSI = WStr2StrA(cwdPath);
+    delete[] cwdPath;
+
+    // Set cwd to app path
+    SetCurrentDirectoryW(gAppPathWCHAR.c_str());
 }
 
 /// INIT GLOBALS
