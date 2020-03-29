@@ -386,7 +386,7 @@ struct NPCMOB {
     short unknown_1E;                       //+0x1E
     short unknown_20;                       //+0x20
     short unknown_22;                       //+0x22
-    short unknown_24;                       //+0x24
+    short scoreMultiplier;                  //+0x24
     short invincibilityToSword;             //+0x26
     short isMaskOnly;                       //+0x28
     short unknown_2A;                       //+0x2A
@@ -517,6 +517,9 @@ namespace NPC {
     // ITERATORS
     void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits
     void AllFace(int identity, int section, double x);	// All specified NPCs face the supplied x/y point
+
+    short HarmCombo(short npcIdx, short harmType, short multiplier);
+    short HarmComboWithDamage(short npcIdx, short harmType, short multiplier, float damage);
 
     void InitProperties();
     uint32_t GetVulnerableHarmTypes(int id);

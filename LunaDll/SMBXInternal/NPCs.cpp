@@ -1,5 +1,7 @@
 #include "NPCs.h"
 #include "../Misc/MiscFuncs.h"
+#include "../Misc/AsmPatch.h"
+#include "../Misc/SafeFPUControl.h"
 #include <list>
 #include <unordered_map>
 
@@ -141,6 +143,114 @@ void NPC::AllFace(int identity, int section, double x) {
             }
         }
     }	
+}
+
+short NPC::HarmCombo(short npcIdx, short harmType, short multiplier)
+{
+    // Get dummy NPC, make note of it's old ID so we can restore it afterward
+    NPCMOB* dummy = ::NPC::GetDummyNPC();
+    short oldDummyId = dummy->id;
+    short oldScoreMultiplier = dummy->scoreMultiplier;
+    Momentum oldDummyLocation = dummy->momentum;
+    dummy->scoreMultiplier = multiplier;
+    dummy->momentum = ::NPC::Get(npcIdx)->momentum;
+
+    short indexCollideWith = 0;
+    short targetIndex = npcIdx + 1;
+
+    switch (harmType) {
+    case HARM_TYPE_JUMP:      // other is 'player index'. Triggered for jumping on NPC
+    case HARM_TYPE_TAIL:      // other is 'player index'. Triggered for being hit by tail
+    case HARM_TYPE_SPINJUMP:  // other is 'player index'. Triggered for spinjump or statue
+    case HARM_TYPE_SWORD:    // other is 'player index'. Triggered for sword or sword-beam
+        indexCollideWith = 0; // Dummy player?
+        break;
+    case HARM_TYPE_NPC:       // other is 'npc index'. Triggered for thrown NPCS, bomb explosions, shells, etc
+    case HARM_TYPE_PROJECTILE_USED: // other is 'npc index'. Triggered on a projectile once it hits something, in case the projectile should be destroyed
+    case HARM_TYPE_HELD:      // other is 'npc index'. Triggered by colliding with held NPCs or kicked gloombas
+        indexCollideWith = 0; // Dummy NPC?
+        break;
+    case HARM_TYPE_FROMBELOW: // other is 'block index'. Triggered for hit from below or pow
+    case HARM_TYPE_LAVA:      // other is 'block index'. Triggered for being hit by lava
+        indexCollideWith = 0; // Dummy block?
+        break;
+    case HARM_TYPE_OFFSCREEN: // other is 0. Triggered when timing out offscreen
+        indexCollideWith = 0; // Nothing
+        break;
+    case HARM_TYPE_EXT_FIRE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERFIREBALL;
+        break;
+    case HARM_TYPE_EXT_ICE:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERICEBALL;
+        break;
+    case HARM_TYPE_EXT_HAMMER:
+        indexCollideWith = 0; // Dummy NPC?
+        harmType = HARM_TYPE_NPC;
+        dummy->id = NPCID_PLAYERHAMMER;
+        break;
+    default:
+        return multiplier;
+    }
+
+    // Call native_collideNPC for the type of harm we wish to do
+    SafeFPUControl::clear();
+    native_collideNPC(&targetIndex, (CollidersType*)&harmType, &indexCollideWith);
+
+    // Restore dummy NPC ID, in case we changed it
+    short newMultiplier = dummy->scoreMultiplier;
+    dummy->id = oldDummyId;
+    dummy->scoreMultiplier = oldScoreMultiplier;
+    dummy->momentum = oldDummyLocation;
+
+    return newMultiplier;
+}
+
+short NPC::HarmComboWithDamage(short npcIdx, short harmType, short multiplier, float damage)
+{
+    // Patch all instructions which add a damage amount to the NPC
+    auto patchSet = PatchCollection(
+        PATCH(0xA2A2D1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A418 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A45C + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5C5 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A5CD + 2).dword((DWORD)&damage),
+        PATCH(0xA2A62F + 2).dword((DWORD)&damage),
+        PATCH(0xA2A745 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A766 + 2).dword((DWORD)&damage),
+        PATCH(0xA2A7AB + 2).dword((DWORD)&damage),
+        PATCH(0xA2A94E + 2).dword((DWORD)&damage),
+        PATCH(0xA2A9FC + 2).dword((DWORD)&damage),
+        PATCH(0xA2AA3C + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB08 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AB63 + 2).dword((DWORD)&damage),
+        PATCH(0xA2AD8E + 2).dword((DWORD)&damage),
+        PATCH(0xA2C124 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C164 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C5B9 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C672 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C6CC + 2).dword((DWORD)&damage),
+        PATCH(0xA2C7B7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2C826 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E1B1 + 2).dword((DWORD)&damage),
+        PATCH(0xA2E20E + 2).dword((DWORD)&damage),
+        PATCH(0xA2E280 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FE7F + 2).dword((DWORD)&damage),
+        PATCH(0xA2FEC7 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FF01 + 2).dword((DWORD)&damage),
+        PATCH(0xA2FFA7 + 2).dword((DWORD)&damage),
+        PATCH(0xA300B2 + 2).dword((DWORD)&damage),
+        PATCH(0xA300FA + 2).dword((DWORD)&damage),
+        PATCH(0xA30134 + 2).dword((DWORD)&damage)
+    );
+
+    patchSet.Apply();
+    multiplier = HarmCombo(npcIdx, harmType, multiplier);
+    patchSet.Unapply();
+    return multiplier;
 }
 
 // Declerations of inbuilt NPC property arrays

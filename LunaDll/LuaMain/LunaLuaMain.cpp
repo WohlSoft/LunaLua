@@ -1146,7 +1146,9 @@ void CLunaLua::bindAll()
                     def("doPSwitch", (void(*)())&LuaProxy::Misc::doPSwitch),
                     def("doPSwitch", (void(*)(bool))&LuaProxy::Misc::doPSwitch),
                     def("doBombExplosion", (void(*)(double, double, short))&LuaProxy::Misc::doBombExplosion),
-                    def("_setSemisolidCollidingFlyType", &NPC::SetSemisolidCollidingFlyType)
+                    def("_setSemisolidCollidingFlyType", &NPC::SetSemisolidCollidingFlyType),
+                    def("_npcHarmCombo", NPC::HarmCombo),
+                    def("_npcHarmComboWithDamage", NPC::HarmComboWithDamage)
                     //def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
                 ],
 
@@ -1271,6 +1273,8 @@ void CLunaLua::bindAll()
                 .def("harm", static_cast<void (LuaProxy::NPC::*)(lua_State*)>(&LuaProxy::NPC::harm))
                 .def("harm", static_cast<void (LuaProxy::NPC::*)(short, lua_State*)>(&LuaProxy::NPC::harm))
                 .def("harm", static_cast<void (LuaProxy::NPC::*)(short, float, lua_State*)>(&LuaProxy::NPC::harm))
+                .def("harmCombo", static_cast<short (LuaProxy::NPC::*)(short, short, lua_State*)>(&LuaProxy::NPC::harmCombo))
+                .def("harmCombo", static_cast<short (LuaProxy::NPC::*)(short, short, float, lua_State*)>(&LuaProxy::NPC::harmCombo))
                 .property("idx", &LuaProxy::NPC::idx)
                 .property("id", &LuaProxy::NPC::id, &LuaProxy::NPC::setId)
                 .property("isHidden", &LuaProxy::NPC::isHidden, &LuaProxy::NPC::setIsHidden)
