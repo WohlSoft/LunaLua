@@ -374,9 +374,12 @@ void MainLauncherWindow::checkForUpdates()
 
     try {
         if(!NetworkUtils::checkInternetConnection(4000))
+        {
             m_smbxConfig->m_hasInternetAccess = false;
-             emit m_smbxConfig->InternetAccessUpdated();
+            emit m_smbxConfig->InternetAccessUpdated();
+            qWarning() << "Failed to check internet connection: Connection timeout\nSkipping update check...";
             return;
+        }
     } catch (const QNetworkReplyException& ex) {
         m_smbxConfig->m_hasInternetAccess = false;
         emit m_smbxConfig->InternetAccessUpdated();
