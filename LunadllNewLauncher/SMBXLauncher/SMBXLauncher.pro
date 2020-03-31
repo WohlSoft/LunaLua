@@ -13,7 +13,10 @@ DEFINES -= QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_INFO_OUTPUT
 
 TARGET = SMBXLauncher
 TEMPLATE = app
-LIBS += User32.lib -L$$PWD/../../LunaDll/libs/sdl/lib/ -lSDL2 -lSDL2main
+win32: LIBS += User32.lib -L$$PWD/../../LunaDll/libs/sdl/lib/ -lSDL2 -lSDL2main
+LIBS +=  -lSDL2
+
+linux: LIBS += -no-pie
 
 SOURCES += main.cpp\
     ../../LunaDll/Input/LunaGameController.cpp \
@@ -65,7 +68,8 @@ HEADERS  += mainlauncherwindow.h \
 # win32: SOURCES += ../../LunaLoader/LunaLoaderPatch.cpp
 
 # PGE File Library
-INCLUDEPATH += $$PWD/../../LunaDll/libs $$PWD/../../LunaDll/libs/sdl/include
+win32: INCLUDEPATH += $$PWD/../../LunaDll/libs/sdl/include
+INCLUDEPATH += $$PWD/../../LunaDll/libs
 SOURCES += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.cpp)
 SOURCES += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.c)
 HEADERS += $$files($$PWD/../../LunaDll/libs/PGE_File_Formats/*.h)

@@ -20,4 +20,9 @@ bool LauncherCustomWebPage::acceptNavigationRequest(const QUrl &url, QWebEngineP
 }
 
 void LauncherCustomWebPage::javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID)
-{}
+{
+    Q_UNUSED(level)
+    Q_UNUSED(message)
+    Q_UNUSED(lineNumber)
+    Q_UNUSED(sourceID)
+}

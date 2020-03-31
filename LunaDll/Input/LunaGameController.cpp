@@ -513,7 +513,7 @@ void LunaGameControllerManager::addJoystickEvent(int joyIdx)
         // Failure to get ID or duplicate
         return;
     }
-    
+
     // Open as joystick
     joyPtr = SDL_JoystickOpen(joyIdx);
     if (joyPtr == nullptr)
@@ -800,7 +800,7 @@ void LunaGameController::joyButtonEvent(const SDL_JoyButtonEvent& event, bool do
     #if defined(CONTROLLER_DEBUG_LOWLEVEL)
         printf("JoyButton%s %s, %d\n", down ? "Down" : "Up", name.c_str(), (int)event.button);
     #endif
-    
+
     // Ignore if out of range
     if (event.button >= joyButtonMap.size()) return;
 
@@ -1019,6 +1019,7 @@ void LunaGameController::rumble(int ms, float strength)
     int intStrength = (int)(0xFFFF * strength + 0.5f);
     if (intStrength > 0xFFFF) intStrength = 0xFFFF;
     if (intStrength < 0) intStrength = 0;
+#if SDL_VERSION_ATLEAST(2, 0, 12)
     if (ctrlPtr)
     {
         if (SDL_GameControllerRumble(ctrlPtr, intStrength, intStrength, ms) == 0) return;
@@ -1027,6 +1028,7 @@ void LunaGameController::rumble(int ms, float strength)
     {
         SDL_JoystickRumble(joyPtr, intStrength, intStrength, ms);
     }
+#endif
 }
 
 void LunaGameController::directionalEvent(int which, bool newState, bool fromAnalog)

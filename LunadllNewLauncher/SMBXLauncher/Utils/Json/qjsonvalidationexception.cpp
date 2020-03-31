@@ -2,7 +2,7 @@
 
 
 QJsonValidationException::QJsonValidationException(const QString &fieldName, QJsonValidationException::ValidationError errorType) :
-    std::exception("validation error"),
+    std::logic_error("validation error"),
     m_fieldName(fieldName),
     m_errorType(errorType)
 {}

@@ -1,5 +1,6 @@
 #include "qjsonfileopenexception.h"
+#include <exception>
 
 QJsonFileOpenException::QJsonFileOpenException() :
-    std::exception("file open error")
+    std::logic_error("file open error")
 {}

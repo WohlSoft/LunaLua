@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 struct joyinfoex_tag;
-class LunaGameController;
+class LunaGameControllerManager;
 
 class LunaGameControllerPlayer
 {
@@ -26,57 +26,6 @@ public:
         yAxis(0x7FFF),
         buttonState(0)
     {}
-};
-
-class LunaGameControllerManager
-{
-public:
-    const static int CONTROLLER_MAX_PLAYERS = 2;
-private:
-    bool initDone;
-    std::unordered_map<SDL_JoystickID, LunaGameController> controllerMap;
-
-    LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
-
-    std::vector<std::pair<SDL_JoystickID, int>> pressQueue;
-
-    unsigned int reconnectTimeout;
-    bool reconnectFlag;
-public:
-    LunaGameControllerManager();
-    ~LunaGameControllerManager();
-    LunaGameControllerManager(const LunaGameControllerManager&) = delete;
-    LunaGameControllerManager& operator=(const LunaGameControllerManager&) = delete;
-    void init();
-    void pollInputs();
-    void processSDLEvent(const SDL_Event& event);
-#if !defined(BUILDING_SMBXLAUNCHER)
-public:
-    void handleInputs();
-private:
-    void handleInputsForPlayer(int playerNum);
-public:
-    unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
-    void notifyKeyboardPress(int keycode);
-    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
-#endif // !define(BUILDING_SMBXLAUNCHER)
-public:
-    SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
-    std::string getSelectedControllerName(int playerNum);
-    void rumbleSelectedController(int playerNum, int ms, float strength);
-    LunaGameController* getController(int playerNum);
-private:
-    void addJoystickEvent(int joyIdx);
-    void removeJoystickEvent(SDL_JoystickID joyId);
-    void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
-    void controllerButtonEvent(const SDL_ControllerButtonEvent& event, bool down);
-    void joyAxisEvent(const SDL_JoyAxisEvent& event);
-    void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
-public:
-    inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }
-    inline const std::vector<std::pair<SDL_JoystickID, int>>& getPressQueue() { return pressQueue; }
-    inline void clearPressQueue() { pressQueue.clear(); }
-    std::string getControllerName(SDL_JoystickID joyId);
 };
 
 class LunaGameController
@@ -164,6 +113,58 @@ private:
     unsigned int buttonState;
     bool activeFlag;
     std::vector<int> joyButtonMap;
+};
+
+
+class LunaGameControllerManager
+{
+public:
+    const static int CONTROLLER_MAX_PLAYERS = 2;
+private:
+    bool initDone;
+    std::unordered_map<SDL_JoystickID, LunaGameController> controllerMap;
+
+    LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
+
+    std::vector<std::pair<SDL_JoystickID, int>> pressQueue;
+
+    unsigned int reconnectTimeout;
+    bool reconnectFlag;
+public:
+    LunaGameControllerManager();
+    ~LunaGameControllerManager();
+    LunaGameControllerManager(const LunaGameControllerManager&) = delete;
+    LunaGameControllerManager& operator=(const LunaGameControllerManager&) = delete;
+    void init();
+    void pollInputs();
+    void processSDLEvent(const SDL_Event& event);
+#if !defined(BUILDING_SMBXLAUNCHER)
+public:
+    void handleInputs();
+private:
+    void handleInputsForPlayer(int playerNum);
+public:
+    unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
+    void notifyKeyboardPress(int keycode);
+    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
+#endif // !define(BUILDING_SMBXLAUNCHER)
+public:
+    SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
+    std::string getSelectedControllerName(int playerNum);
+    void rumbleSelectedController(int playerNum, int ms, float strength);
+    LunaGameController* getController(int playerNum);
+private:
+    void addJoystickEvent(int joyIdx);
+    void removeJoystickEvent(SDL_JoystickID joyId);
+    void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
+    void controllerButtonEvent(const SDL_ControllerButtonEvent& event, bool down);
+    void joyAxisEvent(const SDL_JoyAxisEvent& event);
+    void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
+public:
+    inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }
+    inline const std::vector<std::pair<SDL_JoystickID, int>>& getPressQueue() { return pressQueue; }
+    inline void clearPressQueue() { pressQueue.clear(); }
+    std::string getControllerName(SDL_JoystickID joyId);
 };
 
 #endif

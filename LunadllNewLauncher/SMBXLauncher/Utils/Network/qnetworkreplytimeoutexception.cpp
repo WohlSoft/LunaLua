@@ -1,5 +1,5 @@
 #include "qnetworkreplytimeoutexception.h"
 
 QNetworkReplyTimeoutException::QNetworkReplyTimeoutException() :
-    std::exception("network request timeout")
+    std::logic_error("network request timeout")
 {}

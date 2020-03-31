@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <QString>
 
-class QJsonValidationException : public std::exception
+class QJsonValidationException : public std::logic_error
 {
 public:
     enum class ValidationError {

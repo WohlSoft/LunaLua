@@ -17,5 +17,9 @@ DevToolsDialog::~DevToolsDialog()
 
 void DevToolsDialog::AssociateWithPage(QWebEnginePage *page)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
     ui->widget->page()->setInspectedPage(page);
+#else
+    Q_UNUSED(page)
+#endif
 }

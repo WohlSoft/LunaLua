@@ -84,7 +84,7 @@ void MainLauncherWindow::pollControlTimeout()
     m_smbxConfig->pollControls();
 }
 
-void MainLauncherWindow::closeEvent(QCloseEvent *event)
+void MainLauncherWindow::closeEvent(QCloseEvent *)
 {
     if (devDialogPtr != nullptr)
     {
@@ -329,8 +329,16 @@ void MainLauncherWindow::runSMBXEditor()
 
 void MainLauncherWindow::runPGEEditor()
 {
-    if (m_pgeExe.length() > 0) {
+    if(m_pgeExe.length() > 0)
+    {
+#ifdef _WIN32
         QProcess::startDetached(m_pgeExe);
+#else
+        if(m_pgeExe.endsWith(".exe"))
+            QProcess::startDetached("wine", {m_pgeExe});
+        else
+            QProcess::startDetached(m_pgeExe);
+#endif
         close();
     }
 }
@@ -518,7 +526,13 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
         LunaLoaderRun(smbxExeFile.toStdWString().c_str(), argString.toStdWString().c_str());
         */
     }
-    else {
+    else
+    {
+#ifdef _WIN32
         QProcess::startDetached(smbxExeFile, runArgs);
+#else
+        runArgs.push_front(smbxExeFile);
+        QProcess::startDetached("wine", runArgs);
+#endif
     }
 }
