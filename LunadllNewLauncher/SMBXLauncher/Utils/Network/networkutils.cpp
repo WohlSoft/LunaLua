@@ -3,8 +3,10 @@
 #include "qnetworkreplytimeoutexception.h"
 #include "qnetworkreplyexception.h"
 #include "../Common/qurlinvalidexception.h"
+#include <QEventLoop>
 
 Q_CONSTEXPR char timeoutURL[] = "http://google.com";
+
 
 QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
 {
@@ -18,14 +20,11 @@ QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
     QNetworkReply* reply = downloader.get(QNetworkRequest(url));
     QReplyTimeout* timeoutControl = new QReplyTimeout(reply, timeout);
 
-    bool replyFinished = false;
-    QObject::connect(&downloader, &QNetworkAccessManager::finished,
-                     [&replyFinished](QNetworkReply *){
-        replyFinished = true;
-    });
+    QEventLoop e;
+    QObject::connect(&downloader, &QNetworkAccessManager::finished, &e, &QEventLoop::quit);
+    e.exec();
 
-    while(!replyFinished)
-        qApp->processEvents();
+    qDebug() << "Error output: " << reply->error() << reply->errorString();
 
     reply->deleteLater();
     if(timeoutControl->isAborted())
