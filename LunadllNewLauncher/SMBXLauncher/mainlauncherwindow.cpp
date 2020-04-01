@@ -212,11 +212,13 @@ void MainLauncherWindow::autoSize()
 
 void MainLauncherWindow::initSize()
 {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    const QRect dg = screen ? screen->geometry() : qApp->desktop()->availableGeometry();
+    const QSize dw = dg.size();
+
     //Corrects maximum sizes to account for taskbars and the like - has to be done after the show()
     if(m_initWidth > 0 && m_initHeight > 0)
     {
-        QSize dw = QGuiApplication::primaryScreen()->availableSize();
-
         QSize frameSize = this->frameGeometry().size();
         QSize winSize = this->geometry().size();
 
@@ -226,8 +228,6 @@ void MainLauncherWindow::initSize()
         this->resize(m_initWidth, m_initHeight);
     }
 
-    QScreen *screen = QGuiApplication::primaryScreen();
-    QRect dg = screen ? screen->geometry() : qApp->desktop()->availableGeometry();
     QRect s = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), dg);
     this->move(s.x(), s.y());
 }
