@@ -516,7 +516,12 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
         QString loader = qApp->applicationDirPath() + "/LunaLoader.exe";
         runArgs.push_front(smbxExeFile);
 
+#ifdef _WIN32
         QProcess::startDetached(loader, runArgs);
+#else
+        runArgs.push_front(loader);
+        QProcess::startDetached("wine", runArgs);
+#endif
 
         /*
         QString argString;
