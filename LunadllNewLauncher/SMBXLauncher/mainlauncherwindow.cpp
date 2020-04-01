@@ -46,26 +46,6 @@ static QString pathUnixToWine(const QString &unixPath)
 }
 #endif
 
-static QRect getScreenGeometry(int screenIndex = 0)
-{
-    QScreen *screen = QGuiApplication::primaryScreen();
-    if(screenIndex < 0)
-        return screen ? screen->geometry() : qApp->desktop()->geometry();
-    else
-    {
-        QList<QScreen*> screens = QGuiApplication::screens();
-        if(screenIndex >= screens.size())
-            return qApp->desktop()->geometry();
-        else
-            return screens[screenIndex]->geometry();
-    }
-}
-
-static QRect alignToScreenCenter(const QSize size)
-{
-    return QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, getScreenGeometry());
-}
-
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
     m_smbxConfig(new SMBXConfig()),
@@ -246,7 +226,9 @@ void MainLauncherWindow::initSize()
         this->resize(m_initWidth, m_initHeight);
     }
 
-    QRect s = alignToScreenCenter(size());
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect dg = screen ? screen->geometry() : qApp->desktop()->availableGeometry();
+    QRect s = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), dg);
     this->move(s.x(), s.y());
 }
 
