@@ -16,8 +16,11 @@ QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
     QNetworkAccessManager downloader;
     downloader.setNetworkAccessible(QNetworkAccessManager::Accessible);
 
-    // TODO: is safe?
-    QNetworkReply* reply = downloader.get(QNetworkRequest(url));
+    QNetworkRequest req(url);
+    req.setRawHeader("User-Agent" , "SMBX Launcher");
+
+    QNetworkReply* reply = downloader.get(req);
+
     QReplyTimeout* timeoutControl = new QReplyTimeout(reply, timeout);
 
     QEventLoop e;
