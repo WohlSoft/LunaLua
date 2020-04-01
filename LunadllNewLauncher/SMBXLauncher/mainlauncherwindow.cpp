@@ -24,6 +24,27 @@
 
 static DevToolsDialog* devDialogPtr = nullptr;
 
+#ifndef _WIN32
+static QString pathUnixToWine(const QString &unixPath)
+{
+    QProcess winePath;
+    QStringList args;
+    // Ask for in-Wine Windows path from in-UNIX native path
+    args << "--windows" << unixPath;
+    // Use wine custom environment
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+//    for(auto it = m_wineEnv.begin(); it != m_wineEnv.end(); it++)
+//        env.insert(it.key(), it.value());
+    winePath.setProcessEnvironment(env);
+    // Start winepath
+    winePath.start(/*m_wineBinDir +*/ "winepath", args);
+    winePath.waitForFinished();
+    // Retrieve converted path
+    QString windowsPath = winePath.readAllStandardOutput();
+    return windowsPath.trimmed();
+}
+#endif
+
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
     m_smbxConfig(new SMBXConfig()),
@@ -357,7 +378,16 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::runSMBXLevel(const QString& file)
 {
-    internalRunSMBX(m_smbxExe, {"--testLevel="+file});
+    QString filePath;
+
+#ifdef _WIN32
+    filePath = file;
+#else
+     // convert path into Wine-friendly
+    filePath = pathUnixToWine(file);
+#endif
+
+    internalRunSMBX(m_smbxExe, {"--testLevel=" + filePath});
     close();
 }
 
