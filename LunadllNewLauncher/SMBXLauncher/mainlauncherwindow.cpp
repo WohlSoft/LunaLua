@@ -214,7 +214,6 @@ void MainLauncherWindow::initSize()
 {
     QScreen *screen = QGuiApplication::primaryScreen();
     const QRect dg = screen ? screen->geometry() : qApp->desktop()->availableGeometry();
-    const QSize dw = dg.size();
 
     //Corrects maximum sizes to account for taskbars and the like - has to be done after the show()
     if(m_initWidth > 0 && m_initHeight > 0)
@@ -222,8 +221,8 @@ void MainLauncherWindow::initSize()
         QSize frameSize = this->frameGeometry().size();
         QSize winSize = this->geometry().size();
 
-        m_initWidth = std::min(m_initWidth, dw.width() - frameSize.width() + winSize.width());
-        m_initHeight = std::min(m_initHeight, dw.height() - frameSize.height() + winSize.height());
+        m_initWidth = std::min(m_initWidth, dg.width() - frameSize.width() + winSize.width());
+        m_initHeight = std::min(m_initHeight, dg.height() - frameSize.height() + winSize.height());
 
         this->resize(m_initWidth, m_initHeight);
     }
