@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QScreen>
 
 static DevToolsDialog* devDialogPtr = nullptr;
 
@@ -44,6 +45,26 @@ static QString pathUnixToWine(const QString &unixPath)
     return windowsPath.trimmed();
 }
 #endif
+
+static QRect getScreenGeometry(int screenIndex = 0)
+{
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if(screenIndex < 0)
+        return screen ? screen->geometry() : qApp->desktop()->geometry();
+    else
+    {
+        QList<QScreen*> screens = QGuiApplication::screens();
+        if(screenIndex >= screens.size())
+            return qApp->desktop()->geometry();
+        else
+            return screens[screenIndex]->geometry();
+    }
+}
+
+static QRect alignToScreenCenter(const QSize size)
+{
+    return QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, getScreenGeometry());
+}
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -70,21 +91,23 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     {
         devDialogPtr = new DevToolsDialog(this);
     }
+
     devDialogPtr->AssociateWithPage(page);
 
     // Enable inspect element
     page->action(QWebEnginePage::InspectElement)->setEnabled(true);
-    connect(page->action(QWebEnginePage::InspectElement), &QAction::triggered, [this]() {
-        if (devDialogPtr != nullptr)
+    connect(page->action(QWebEnginePage::InspectElement), &QAction::triggered, []()
+    {
+        if(devDialogPtr != nullptr)
         {
             devDialogPtr->show();
         }
     });
 
-
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
-            [this](bool ok){
+    [this](bool ok)
+    {
         if(ok)
         {
             this->loadJavascriptBridge();
@@ -180,7 +203,7 @@ void MainLauncherWindow::loadDefaultWebpage()
 void MainLauncherWindow::autoSize()
 {
     QSize dw = QGuiApplication::primaryScreen()->availableSize();
-    float baseSize = dw.height() * 0.6;
+    float baseSize = dw.height() * 0.6f;
     if (baseSize > 1080) {
         baseSize = 1080;
     } else if (baseSize > 640) {
@@ -189,8 +212,9 @@ void MainLauncherWindow::autoSize()
 
     baseSize = baseSize / 9;
 
-    if (dw.width()/16 < dw.height()/9) {
-        baseSize = dw.width() * 0.6;
+    if (dw.width()/16 < dw.height() / 9)
+    {
+        baseSize = dw.width() * 0.6f;
 
         if (baseSize > 1920) {
             baseSize = 1920;
@@ -203,14 +227,14 @@ void MainLauncherWindow::autoSize()
 
     m_initWidth = 0;
     m_initHeight = 0;
-    this->resize(baseSize * 16, baseSize * 9);
+    this->resize(int(baseSize * 16), int(baseSize * 9));
 }
 
 void MainLauncherWindow::initSize()
 {
     //Corrects maximum sizes to account for taskbars and the like - has to be done after the show()
-    if(m_initWidth > 0 && m_initHeight > 0){
-
+    if(m_initWidth > 0 && m_initHeight > 0)
+    {
         QSize dw = QGuiApplication::primaryScreen()->availableSize();
 
         QSize frameSize = this->frameGeometry().size();
@@ -221,6 +245,9 @@ void MainLauncherWindow::initSize()
 
         this->resize(m_initWidth, m_initHeight);
     }
+
+    QRect s = alignToScreenCenter(size());
+    this->move(s.x(), s.y());
 }
 
 void MainLauncherWindow::init(const QString &configName)
