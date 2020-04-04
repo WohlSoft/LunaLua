@@ -530,6 +530,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Changelog.txt" />
+    <Text Include="FeatureJSONResource.txt" />
     <Text Include="libs\PGE_File_Formats\Readme.txt" />
     <Text Include="SMBXInternal\Reconstructed\about.txt" />
   </ItemGroup>
