@@ -705,3 +705,25 @@ void LunaImage::notifyTextureified()
     }
 }
 
+void LunaImage::makeColorTransparent(unsigned int rgb)
+{
+    std::lock_guard<std::mutex> lock(mut);
+
+    // Try to get the data pointer
+    unsigned int* dataAsU32 = (unsigned int*)getDataPtr();
+
+    // If no data pointer, we can't do anything
+    if (dataAsU32 == nullptr) return;
+
+    // Convert the color argument to what we must look for (note, the input RGB is big endian, and our target BGRA is taken to be little endian)
+    unsigned int bgra = (rgb & 0xFFFFFF) | (255 << 24);
+
+    unsigned int pixelCount = w*h;
+    for (unsigned int idx = 0; idx < pixelCount; idx++)
+    {
+        if (dataAsU32[idx] == bgra)
+        {
+            dataAsU32[idx] = 0;
+        }
+    }
+}

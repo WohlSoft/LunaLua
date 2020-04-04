@@ -70,7 +70,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code, int 
         auto it = m_legacyResourceCodeImages.find(resource_code);
         if (it != m_legacyResourceCodeImages.end()) {
             
-            //it->second->MakeColorTransparent(transparency_color);
+            it->second->makeColorTransparent(transparency_color);
 
             // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
         }

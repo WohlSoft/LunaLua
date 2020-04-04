@@ -84,6 +84,9 @@ public:
     // mask, but only if it's completely safe to do so without inaccuracy.
     bool tryMaskToRGBA();
 
+    // Function to make a color transparent, for old-style BMP loading things
+    void makeColorTransparent(unsigned int rgb);
+
     // Basic draw operation
     void draw(int dx, int dy, int w, int h, int sx, int sy, bool drawMask = true, bool drawMain = true, float opacity = 1.0f);
 
