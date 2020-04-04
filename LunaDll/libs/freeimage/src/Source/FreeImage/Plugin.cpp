@@ -238,8 +238,8 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 			*/
 			s_plugins->AddNode(InitBMP);
 			s_plugins->AddNode(InitICO);
-        #ifndef FREEIMAGE_LITE //Don't include those fomrmats into "LITE" assembly
 			s_plugins->AddNode(InitJPEG);
+        #ifndef FREEIMAGE_LITE //Don't include those fomrmats into "LITE" assembly
 			s_plugins->AddNode(InitJNG);
 			s_plugins->AddNode(InitKOALA);
 			s_plugins->AddNode(InitIFF);

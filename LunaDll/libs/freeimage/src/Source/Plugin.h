@@ -114,7 +114,9 @@ void DLL_CALLCONV InitCUT(Plugin *plugin, int format_id);
 void DLL_CALLCONV InitICO(Plugin *plugin, int format_id);
 #ifndef FREEIMAGE_LITE //Don't include those fomrmats into "LITE" assembly
 void DLL_CALLCONV InitIFF(Plugin *plugin, int format_id);
+#endif
 void DLL_CALLCONV InitJPEG(Plugin *plugin, int format_id);
+#ifndef FREEIMAGE_LITE //Don't include those fomrmats into "LITE" assembly
 void DLL_CALLCONV InitKOALA(Plugin *plugin, int format_id);
 void DLL_CALLCONV InitLBM(Plugin *plugin, int format_id);
 void DLL_CALLCONV InitMNG(Plugin *plugin, int format_id);

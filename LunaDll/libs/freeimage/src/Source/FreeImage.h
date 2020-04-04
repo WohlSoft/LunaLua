@@ -384,8 +384,8 @@ FI_ENUM(FREE_IMAGE_FORMAT) {
 	FIF_UNKNOWN = -1,
 	FIF_BMP		= 0,
 	FIF_ICO		= 1,
+    FIF_JPEG    = 2,
 #ifndef FREEIMAGE_LITE //Don't include those fomrmats into "LITE" assembly
-	FIF_JPEG	= 2,
 	FIF_JNG		= 3,
 	FIF_KOALA	= 4,
 	FIF_LBM		= 5,
@@ -422,8 +422,8 @@ FI_ENUM(FREE_IMAGE_FORMAT) {
 	FIF_WEBP	= 35,
 	FIF_JXR		= 36
 #else
-    FIF_PNG		= 2,
-    FIF_GIF     = 3
+    FIF_PNG		= 3,
+    FIF_GIF     = 4
 #endif
 };
 
