@@ -521,18 +521,19 @@ void TestModeCheckPendingIPCRequest()
         // If we were waiting on IPC, stop waiting
         gStartupSettings.currentlyWaitingForIPC = false;
 
-        // Bring to top if we need to
+        // Show and bring to top if we need to
         HWND hWindow = gMainWindowHwnd;
         if (hWindow)
         {
-            ShowWindow(hWindow, SW_SHOW);
-
-            SetWindowPos(hWindow, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
-            SetWindowPos(hWindow, HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE);
-
+            if (IsIconic(hWindow))
+            {
+                ShowWindow(hWindow, SW_RESTORE);
+            }
+            else
+            {
+                ShowWindow(hWindow, SW_SHOW);
+            }
             BringWindowToTop(hWindow);
-            SetForegroundWindow(hWindow);
-            SetFocus(hWindow);
         }
     }
 }

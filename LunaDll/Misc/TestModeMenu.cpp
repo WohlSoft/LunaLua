@@ -11,7 +11,7 @@
 #include "../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../SMBXInternal/CustomGraphics.h"
 #include "../SdlMusic/SdlMusPlayer.h"
-
+#include "LoadScreen.h"
 #include "TestMode.h"
 #include "TestModeMenu.h"
 
@@ -79,13 +79,13 @@ void testModePauseMenu(bool allowContinue)
     while (keepRunningPauseMenu)
     {
         // Handle un-focused state
-        if (!gMainWindowFocused)
+        if (!gMainWindowFocused && !LunaLoadScreenIsActive())
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
             // Wait for focus
-            while (!gMainWindowFocused && keepRunningPauseMenu && !GM_EPISODE_MODE)
+            while (!gMainWindowFocused && !LunaLoadScreenIsActive() && keepRunningPauseMenu && !GM_EPISODE_MODE)
             {
                 WaitMessage();
                 LunaDllWaitFrame(false);

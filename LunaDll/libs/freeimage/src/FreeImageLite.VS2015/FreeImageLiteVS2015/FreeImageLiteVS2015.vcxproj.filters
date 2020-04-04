@@ -49,6 +49,12 @@
     <Filter Include="Файлы исходного кода\ZLib">
       <UniqueIdentifier>{fa7699e8-0b67-43d6-bc8d-0cd615eed4bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Заголовочные файлы\LibJPEG">
+      <UniqueIdentifier>{eba1276f-d2f9-45a4-a12c-30fbccc876c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы исходного кода\LibJPEG">
+      <UniqueIdentifier>{d0e4898e-89e7-4c9e-85aa-00507f978ffa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\DeprecationManager\DeprecationMgr.h">
@@ -152,6 +158,42 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\ZLib\inffixed.h">
       <Filter>Заголовочные файлы\ZLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\cderror.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\cdjpeg.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jconfig.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jdct.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jerror.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jinclude.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jmemsys.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jmorecfg.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jpegint.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jpeglib.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\jversion.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\LibJPEG\transupp.h">
+      <Filter>Заголовочные файлы\LibJPEG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -350,9 +392,6 @@
     <ClCompile Include="..\..\Source\LibPNG\pngset.c">
       <Filter>Файлы исходного кода\LibPNG</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\LibPNG\pngtest.c">
-      <Filter>Файлы исходного кода\LibPNG</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\LibPNG\pngtrans.c">
       <Filter>Файлы исходного кода\LibPNG</Filter>
     </ClCompile>
@@ -418,6 +457,198 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\ZLib\gzread.c">
       <Filter>Файлы исходного кода\ZLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FreeImage\PluginJPEG.cpp">
+      <Filter>Файлы исходного кода\FreeImage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\cdjpeg.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\djpeg.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\example.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jaricom.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcapimin.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcapistd.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcarith.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jccoefct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jccolor.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcdctmgr.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jchuff.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcinit.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcmainct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcmarker.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcmaster.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcomapi.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcparam.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcprepct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jcsample.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jctrans.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdapimin.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdapistd.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdarith.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdatadst.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdatasrc.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdcoefct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdcolor.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jddctmgr.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdhuff.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdinput.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdmainct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdmarker.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdmaster.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdmerge.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdpostct.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdsample.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jdtrans.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jerror.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jfdctflt.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jfdctfst.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jfdctint.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jidctflt.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jidctfst.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jidctint.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jmemmgr.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jmemnobs.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jquant1.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jquant2.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\jutils.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdbmp.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdcolmap.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdgif.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdppm.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdrle.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdswitch.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\rdtarga.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\transupp.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\wrbmp.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\wrgif.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\wrppm.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\wrrle.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LibJPEG\wrtarga.c">
+      <Filter>Файлы исходного кода\LibJPEG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Metadata\Exif.cpp">
+      <Filter>Файлы исходного кода\Metadata</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

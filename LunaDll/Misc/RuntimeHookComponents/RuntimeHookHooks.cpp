@@ -2757,13 +2757,13 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
 
 void __stdcall runtimeHookCheckWindowFocus()
 {
-    if (!gMainWindowFocused)
+    if (!gMainWindowFocused && !LunaLoadScreenIsActive())
     {
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
         // Wait for focus
-        while (!gMainWindowFocused)
+        while (!gMainWindowFocused && !LunaLoadScreenIsActive())
         {
             WaitMessage();
             LunaDllWaitFrame(false);

@@ -384,10 +384,10 @@ FI_ENUM(FREE_IMAGE_FORMAT) {
 	FIF_UNKNOWN = -1,
 	FIF_BMP		= 0,
 	FIF_ICO		= 1,
-    FIF_PNG		= 2,
-    FIF_GIF     = 3
+    FIF_JPEG	= 2,
+    FIF_PNG		= 3,
+    FIF_GIF     = 4
     /* //Removed from a lite version (those formats are not needed)
-	FIF_JPEG	= 2,
 	FIF_JNG		= 3,
 	FIF_KOALA	= 4,
 	FIF_LBM		= 5,

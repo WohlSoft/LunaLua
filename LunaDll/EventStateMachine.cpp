@@ -3,6 +3,7 @@
 #include "EventStateMachine.h"
 #include "Misc/RuntimeHook.h"
 #include "Misc/TestMode.h"
+#include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
 
@@ -220,13 +221,13 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Handle un-focused state
-        if (!gMainWindowFocused)
+        if (!gMainWindowFocused && !LunaLoadScreenIsActive())
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
             // Wait for focus
-            while (!gMainWindowFocused && !m_RequestUnpause)
+            while (!gMainWindowFocused && !LunaLoadScreenIsActive() && !m_RequestUnpause)
             {
                 WaitMessage();
                 LunaDllWaitFrame(false);
