@@ -104,4 +104,7 @@ void InitDebugConsole();
 int DebugPrint(const char * format, ...);
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
+// Window Helper Funcs
+void ShowAndFocusWindow(HWND hWindow);
+
 #endif

@@ -1653,7 +1653,7 @@ static void runtimeHookSmbxChangeModeHook(void)
 {
     while (gStartupSettings.currentlyWaitingForIPC)
     {
-        WaitMessage();
+        Sleep(100);
         LunaDllWaitFrame(false);
     }
 
@@ -2765,7 +2765,7 @@ void __stdcall runtimeHookCheckWindowFocus()
         // Wait for focus
         while (!gMainWindowFocused && !LunaLoadScreenIsActive())
         {
-            WaitMessage();
+            Sleep(100);
             LunaDllWaitFrame(false);
         }
     }

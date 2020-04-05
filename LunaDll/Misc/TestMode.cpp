@@ -521,20 +521,8 @@ void TestModeCheckPendingIPCRequest()
         // If we were waiting on IPC, stop waiting
         gStartupSettings.currentlyWaitingForIPC = false;
 
-        // Show and bring to top if we need to
-        HWND hWindow = gMainWindowHwnd;
-        if (hWindow)
-        {
-            if (IsIconic(hWindow))
-            {
-                ShowWindow(hWindow, SW_RESTORE);
-            }
-            else
-            {
-                ShowWindow(hWindow, SW_SHOW);
-            }
-            BringWindowToTop(hWindow);
-        }
+        // Show and bring to top when we start loading in test mode
+        ShowAndFocusWindow(gMainWindowHwnd);
     }
 }
 
@@ -573,7 +561,7 @@ bool TestModeCheckHideWindow(void)
 
         while (gStartupSettings.currentlyWaitingForIPC)
         {
-            WaitMessage();
+            Sleep(100);
             LunaDllWaitFrame(false);
         }
 

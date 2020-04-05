@@ -229,7 +229,7 @@ void EventStateMachine::runPause(void) {
             // Wait for focus
             while (!gMainWindowFocused && !LunaLoadScreenIsActive() && !m_RequestUnpause)
             {
-                WaitMessage();
+                Sleep(100);
                 LunaDllWaitFrame(false);
             }
 
