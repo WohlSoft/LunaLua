@@ -242,37 +242,8 @@ void LunaLoadScreenKill()
 
     // At end of load screen, make sure we're properly focused
     native_rtcDoEvents();
-    HWND hWindow = gMainWindowHwnd;
-    if (hWindow && !gMainWindowFocused)
-    {
-        DWORD otherProcessId = 0;
-        DWORD otherThreadId = GetWindowThreadProcessId(GetForegroundWindow(), &otherProcessId);
-        DWORD thisProcessId = 0;
-        DWORD thisThreadId = GetWindowThreadProcessId(hWindow, &thisProcessId);
-
-        if (thisThreadId != otherThreadId)
-        {
-            AttachThreadInput(otherThreadId, thisThreadId, TRUE);
-            SetForegroundWindow(hWindow);
-            AttachThreadInput(otherThreadId, thisThreadId, FALSE);
-        }
-        else
-        {
-            SetForegroundWindow(hWindow);
-        }
-
-
-        if (IsIconic(hWindow))
-        {
-            ShowWindow(hWindow, SW_RESTORE);
-        }
-        else
-        {
-            ShowWindow(hWindow, SW_SHOW);
-        }
-        
-        BringWindowToTop(hWindow);
-    }
+    ShowAndFocusWindow(gMainWindowHwnd);
+    native_rtcDoEvents();
 }
 
 void LunaLoadScreenSetEnable(bool skip)

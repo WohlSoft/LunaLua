@@ -87,7 +87,7 @@ void testModePauseMenu(bool allowContinue)
             // Wait for focus
             while (!gMainWindowFocused && !LunaLoadScreenIsActive() && keepRunningPauseMenu && !GM_EPISODE_MODE)
             {
-                WaitMessage();
+                Sleep(100);
                 LunaDllWaitFrame(false);
             }
 

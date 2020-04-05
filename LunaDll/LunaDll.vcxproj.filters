@@ -1327,5 +1327,6 @@
     </Text>
     <Text Include="Changelog.txt" />
     <Text Include="libs\PGE_File_Formats\Readme.txt" />
+    <Text Include="FeatureJSONResource.txt" />
   </ItemGroup>
 </Project>
