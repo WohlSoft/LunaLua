@@ -21,8 +21,30 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QScreen>
 
 static DevToolsDialog* devDialogPtr = nullptr;
+
+#ifndef _WIN32
+static QString pathUnixToWine(const QString &unixPath)
+{
+    QProcess winePath;
+    QStringList args;
+    // Ask for in-Wine Windows path from in-UNIX native path
+    args << "--windows" << unixPath;
+    // Use wine custom environment
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+//    for(auto it = m_wineEnv.begin(); it != m_wineEnv.end(); it++)
+//        env.insert(it.key(), it.value());
+    winePath.setProcessEnvironment(env);
+    // Start winepath
+    winePath.start(/*m_wineBinDir +*/ "winepath", args);
+    winePath.waitForFinished();
+    // Retrieve converted path
+    QString windowsPath = winePath.readAllStandardOutput();
+    return windowsPath.trimmed();
+}
+#endif
 
 MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -49,21 +71,23 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
     {
         devDialogPtr = new DevToolsDialog(this);
     }
+
     devDialogPtr->AssociateWithPage(page);
 
     // Enable inspect element
     page->action(QWebEnginePage::InspectElement)->setEnabled(true);
-    connect(page->action(QWebEnginePage::InspectElement), &QAction::triggered, [this]() {
-        if (devDialogPtr != nullptr)
+    connect(page->action(QWebEnginePage::InspectElement), &QAction::triggered, []()
+    {
+        if(devDialogPtr != nullptr)
         {
             devDialogPtr->show();
         }
     });
 
-
     // Only load the javascript bridge when the website has correctly loaded
     connect(ui->webLauncherPage->page(), &QWebEnginePage::loadFinished,
-            [this](bool ok){
+    [this](bool ok)
+    {
         if(ok)
         {
             this->loadJavascriptBridge();
@@ -84,7 +108,7 @@ void MainLauncherWindow::pollControlTimeout()
     m_smbxConfig->pollControls();
 }
 
-void MainLauncherWindow::closeEvent(QCloseEvent *event)
+void MainLauncherWindow::closeEvent(QCloseEvent *)
 {
     if (devDialogPtr != nullptr)
     {
@@ -159,7 +183,7 @@ void MainLauncherWindow::loadDefaultWebpage()
 void MainLauncherWindow::autoSize()
 {
     QSize dw = QGuiApplication::primaryScreen()->availableSize();
-    float baseSize = dw.height() * 0.6;
+    float baseSize = dw.height() * 0.6f;
     if (baseSize > 1080) {
         baseSize = 1080;
     } else if (baseSize > 640) {
@@ -168,8 +192,9 @@ void MainLauncherWindow::autoSize()
 
     baseSize = baseSize / 9;
 
-    if (dw.width()/16 < dw.height()/9) {
-        baseSize = dw.width() * 0.6;
+    if (dw.width()/16 < dw.height() / 9)
+    {
+        baseSize = dw.width() * 0.6f;
 
         if (baseSize > 1920) {
             baseSize = 1920;
@@ -182,24 +207,28 @@ void MainLauncherWindow::autoSize()
 
     m_initWidth = 0;
     m_initHeight = 0;
-    this->resize(baseSize * 16, baseSize * 9);
+    this->resize(int(baseSize * 16), int(baseSize * 9));
 }
 
 void MainLauncherWindow::initSize()
 {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    const QRect dg = screen ? screen->geometry() : qApp->desktop()->availableGeometry();
+
     //Corrects maximum sizes to account for taskbars and the like - has to be done after the show()
-    if(m_initWidth > 0 && m_initHeight > 0){
-
-        QSize dw = QGuiApplication::primaryScreen()->availableSize();
-
+    if(m_initWidth > 0 && m_initHeight > 0)
+    {
         QSize frameSize = this->frameGeometry().size();
         QSize winSize = this->geometry().size();
 
-        m_initWidth = std::min(m_initWidth, dw.width() - frameSize.width() + winSize.width());
-        m_initHeight = std::min(m_initHeight, dw.height() - frameSize.height() + winSize.height());
+        m_initWidth = std::min(m_initWidth, dg.width() - frameSize.width() + winSize.width());
+        m_initHeight = std::min(m_initHeight, dg.height() - frameSize.height() + winSize.height());
 
         this->resize(m_initWidth, m_initHeight);
     }
+
+    QRect s = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), dg);
+    this->move(s.x(), s.y());
 }
 
 void MainLauncherWindow::init(const QString &configName)
@@ -329,8 +358,16 @@ void MainLauncherWindow::runSMBXEditor()
 
 void MainLauncherWindow::runPGEEditor()
 {
-    if (m_pgeExe.length() > 0) {
+    if(m_pgeExe.length() > 0)
+    {
+#ifdef _WIN32
         QProcess::startDetached(m_pgeExe);
+#else
+        if(m_pgeExe.endsWith(".exe"))
+            QProcess::startDetached("wine", {m_pgeExe});
+        else
+            QProcess::startDetached(m_pgeExe);
+#endif
         close();
     }
 }
@@ -349,7 +386,16 @@ void MainLauncherWindow::loadEpisodeWebpage(const QString &file)
 
 void MainLauncherWindow::runSMBXLevel(const QString& file)
 {
-    internalRunSMBX(m_smbxExe, {"--testLevel="+file});
+    QString filePath;
+
+#ifdef _WIN32
+    filePath = file;
+#else
+     // convert path into Wine-friendly
+    filePath = pathUnixToWine(file);
+#endif
+
+    internalRunSMBX(m_smbxExe, {"--testLevel=" + filePath});
     close();
 }
 
@@ -366,9 +412,12 @@ void MainLauncherWindow::checkForUpdates()
 
     try {
         if(!NetworkUtils::checkInternetConnection(4000))
+        {
             m_smbxConfig->m_hasInternetAccess = false;
-             emit m_smbxConfig->InternetAccessUpdated();
+            emit m_smbxConfig->InternetAccessUpdated();
+            qWarning() << "Failed to check internet connection: Connection timeout\nSkipping update check...";
             return;
+        }
     } catch (const QNetworkReplyException& ex) {
         m_smbxConfig->m_hasInternetAccess = false;
         emit m_smbxConfig->InternetAccessUpdated();
@@ -505,7 +554,12 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
         QString loader = qApp->applicationDirPath() + "/LunaLoader.exe";
         runArgs.push_front(smbxExeFile);
 
+#ifdef _WIN32
         QProcess::startDetached(loader, runArgs);
+#else
+        runArgs.push_front(loader);
+        QProcess::startDetached("wine", runArgs);
+#endif
 
         /*
         QString argString;
@@ -518,7 +572,13 @@ void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList
         LunaLoaderRun(smbxExeFile.toStdWString().c_str(), argString.toStdWString().c_str());
         */
     }
-    else {
+    else
+    {
+#ifdef _WIN32
         QProcess::startDetached(smbxExeFile, runArgs);
+#else
+        runArgs.push_front(smbxExeFile);
+        QProcess::startDetached("wine", runArgs);
+#endif
     }
 }

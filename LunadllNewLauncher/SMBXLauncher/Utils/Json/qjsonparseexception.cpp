@@ -6,6 +6,6 @@ QJsonParseError QJsonParseException::getParseError() const
 }
 
 QJsonParseException::QJsonParseException(const QJsonParseError &err) :
-    std::exception("parse error"),
+    std::logic_error("parse error"),
     m_err(err)
 {}

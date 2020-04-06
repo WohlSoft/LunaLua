@@ -1,7 +1,7 @@
 #include "qnetworkreplyexception.h"
 
 QNetworkReplyException::QNetworkReplyException(QNetworkReply::NetworkError replyError, QString replyErrorString) :
-    std::exception("network reply error"),
+    std::logic_error("network reply error"),
     m_replyError(replyError),
     m_replyErrorString(replyErrorString)
 {}

@@ -19,8 +19,8 @@ class MainLauncherWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainLauncherWindow(QWidget *parent = 0);
-    ~MainLauncherWindow();
+    explicit MainLauncherWindow(QWidget *parent = nullptr);
+    ~MainLauncherWindow() override;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

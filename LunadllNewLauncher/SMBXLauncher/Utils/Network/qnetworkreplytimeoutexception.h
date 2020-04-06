@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-class QNetworkReplyTimeoutException : public std::exception
+class QNetworkReplyTimeoutException : public std::logic_error
 {
 public:
     QNetworkReplyTimeoutException();

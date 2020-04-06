@@ -3,7 +3,7 @@
 
 #include <QNetworkReply>
 
-class QNetworkReplyException : public std::exception
+class QNetworkReplyException : public std::logic_error
 {
     QNetworkReply::NetworkError m_replyError;
     QString m_replyErrorString;

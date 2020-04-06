@@ -6,8 +6,10 @@
 
 static QPointer<QWebEngineView> internal_used_view;
 
-void hybridLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+static void hybridLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context)
+
     auto formatMessage = [&msg](const QString& name) -> QString {
         return QString("Native - [%1]: %2").arg(name, msg);
     };

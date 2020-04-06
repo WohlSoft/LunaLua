@@ -6,7 +6,7 @@
 #include <QJsonParseError>
 
 
-class QJsonParseException : public std::exception
+class QJsonParseException : public std::logic_error
 {
     QJsonParseError m_err;
 public:

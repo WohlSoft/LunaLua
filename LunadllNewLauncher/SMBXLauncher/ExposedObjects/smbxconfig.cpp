@@ -217,8 +217,8 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
     QDir directory(episodeDir.canonicalPath());
     QStringList files = directory.entryList(QStringList() << "*.sav" << "*.SAV", QDir::Files);
     foreach(QString filename, files) {
-        if (filename != "save0.sav") {   
-            std::regex rgx("^save(-?[0-9]+)\.sav$", std::regex_constants::icase);
+        if (filename != "save0.sav") {
+            std::regex rgx("^save(-?[0-9]+)\\.sav$", std::regex_constants::icase);
 
             std::smatch match;
             const std::string fname = filename.toUtf8().constData();
@@ -242,11 +242,11 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                 if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     QTextStream in(&ext);
                     in.setCodec("UTF-8");
-                    
+
                     QString line("");
                     std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
                     std::regex savename("^\\s*\\[\\s*\"__savefilename\"\\s*\\]\\s*=\\s*\"(.*)\"\\s*,?\\s*$");
-                    
+
                     int count = 0;
 
                     while (!in.atEnd() && QString::compare(line, "},") != 0 && QString::compare(line, "}") != 0) {
@@ -273,7 +273,7 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                             }
                         }
                     }
-                    
+
                     ext.close();
                 }
 

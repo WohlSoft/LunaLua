@@ -1,7 +1,7 @@
 
 call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
 
-set QT_PATH=C:\Qt\5.13.2\msvc2017\bin\
+set QT_PATH=C:\Qt\5.12\msvc2017\bin\
 set JOM=C:\Qt\Tools\QtCreator\bin\jom
 
 if not exist build-smbx-launcher\NUL md build-smbx-launcher
@@ -35,7 +35,7 @@ del imageformats\qtiff.dll
 del imageformats\qwbmp.dll
 del imageformats\qwebp.dll
 rem D3D Compiler is unneeded, it's already in a system
-del D3Dcompiler_*.dll 
+del D3Dcompiler_*.dll
 rem Serial port is unused
 del Qt5SerialPort.dll
 rem SVG for Qt itself is unused

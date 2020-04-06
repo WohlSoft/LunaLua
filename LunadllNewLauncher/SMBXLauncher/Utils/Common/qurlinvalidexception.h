@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <QUrl>
 
-class QUrlInvalidException : public std::exception
+class QUrlInvalidException : public std::logic_error
 {
     QUrl m_errorUrl;
 public:

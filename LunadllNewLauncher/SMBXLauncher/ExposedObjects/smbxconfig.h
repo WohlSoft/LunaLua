@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVariant>
 #include <QPointer>
+#include <QUrl>
 
 #include "autostartconfig.h"
 #include "controlconfig.h"
@@ -20,7 +21,7 @@ class SMBXConfig : public QObject
     Q_PROPERTY(QString updateMessage READ UpdateMessage NOTIFY UpdateVersionUpdated)
     Q_PROPERTY(int updateLevel READ UpdateLevel NOTIFY UpdateVersionUpdated)
 public:
-    explicit SMBXConfig(QObject *parent = 0);
+    explicit SMBXConfig(QObject *parent = nullptr);
 
     AutostartConfig* Autostart() const
     {

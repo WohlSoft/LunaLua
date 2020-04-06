@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-class QJsonFileOpenException : public std::exception
+class QJsonFileOpenException : public std::logic_error
 {
 public:
     QJsonFileOpenException();

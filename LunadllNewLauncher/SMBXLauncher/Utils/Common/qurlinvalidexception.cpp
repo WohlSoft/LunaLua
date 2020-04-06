@@ -1,7 +1,7 @@
 #include "qurlinvalidexception.h"
 
 QUrlInvalidException::QUrlInvalidException(const QUrl &errorUrl) :
-    std::exception("invalid url"),
+    std::logic_error("invalid url"),
     m_errorUrl(errorUrl)
 {}
 
