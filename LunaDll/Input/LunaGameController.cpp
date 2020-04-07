@@ -52,6 +52,9 @@ void LunaGameControllerManager::init()
         return;
     }
 
+    // Attempt to load extra controller mappings
+    SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+
     // Enable events
     SDL_JoystickEventState(SDL_ENABLE);
     SDL_GameControllerEventState(SDL_ENABLE);
