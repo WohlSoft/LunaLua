@@ -372,7 +372,11 @@ extern "C" {
 
     FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(int playerNum)
     {
-        return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel(playerNum);
+        if (gGeneralConfig.getControllerBatteryReporting())
+        {
+            return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel(playerNum);
+        }
+        return (int)SDL_JOYSTICK_POWER_UNKNOWN;
     }
 
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
@@ -384,7 +388,10 @@ extern "C" {
 
     FFI_EXPORT(void) LunaLuaRumbleSelectedController(int playerNum, int ms, float strength)
     {
-        gLunaGameControllerManager.rumbleSelectedController(playerNum, ms, strength);
+        if (gGeneralConfig.getControllerRumbleEnabled())
+        {
+            gLunaGameControllerManager.rumbleSelectedController(playerNum, ms, strength);
+        }
     }
 
     FFI_EXPORT(ExtendedNPCFields*) LunaLuaGetNPCExtendedFieldsArray()

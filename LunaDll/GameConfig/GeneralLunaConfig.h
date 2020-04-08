@@ -28,6 +28,8 @@ private:
     int         m_audio_samplerate;
     int         m_audio_bufferlen;
     std::string m_audio_driver;
+    bool        m_controller_battery_reporting;
+    bool        m_controller_rumble_enabled;
     bool        m_lua_enable_http;
 
     std::wstring m_settingFilename;
@@ -53,6 +55,8 @@ public:
     inline int getAudioSampleRate() const { return m_audio_samplerate; }
     inline int getAudioBufferLength() const { return m_audio_bufferlen; }
     inline std::string getAudioDriver() const { return m_audio_driver; }
+    inline bool getControllerBatteryReporting() const { return m_controller_battery_reporting; }
+    inline bool getControllerRumbleEnabled() const { return m_controller_rumble_enabled; }
     bool getLuaEnableHTTP() const { return m_lua_enable_http; }
     void getLuaEnableHTTP(bool val) { m_lua_enable_http = val; }
 };

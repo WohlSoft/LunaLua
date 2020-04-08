@@ -20,6 +20,8 @@ void GeneralLunaConfig::doDefaults()
     m_audio_samplerate = 44100;
     m_audio_bufferlen = 2048;
     m_audio_driver = "default";
+    m_controller_battery_reporting = true;
+    m_controller_rumble_enabled = true;
     m_lua_enable_http = false;
 }
 
@@ -56,6 +58,10 @@ bool GeneralLunaConfig::save()
     generalConfig.SetLongValue(L"Audio", L"buffer_length", m_audio_bufferlen, L"# Audio buffer length. Default is 2048. Smaller may be lower latency but carries risk of audio issues.");
 
     generalConfig.SetValue(L"Audio", L"driver", Str2WStr(m_audio_driver).c_str(), L"# Audio driver. Valid options are 'default', 'directsound', 'winmm' and 'wasapi'");
+
+    generalConfig.SetBoolValue(L"Controller", L"battery_reporting", m_controller_battery_reporting, L"# Set to false to disable controller battery reporting. True by default.", true);
+
+    generalConfig.SetBoolValue(L"Controller", L"rumble_enabled", m_controller_rumble_enabled, L"# Set to false to disable controller rumble support. True by default.", true);
 
     generalConfig.SetBoolValue(L"Lua", L"enable-http", m_lua_enable_http, L"# Set to true if you want to have the HTTP API enabled. This might be a security risk, only activate if you trust the episode/api.", true);
 
@@ -107,6 +113,8 @@ bool GeneralLunaConfig::load()
     m_audio_samplerate = configToLoad.GetLongValue(L"Audio", L"sample_rate", 44100);
     m_audio_bufferlen = configToLoad.GetLongValue(L"Audio", L"buffer_length", 2048);
     m_audio_driver = WStr2Str(configToLoad.GetValue(L"Audio", L"driver", L"default"));
+    m_controller_battery_reporting = configToLoad.GetBoolValue(L"Controller", L"battery_reporting", true);
+    m_controller_rumble_enabled = configToLoad.GetBoolValue(L"Controller", L"rumble_enabled", true);
     m_lua_enable_http = configToLoad.GetBoolValue(L"Lua", L"enable-http", false);
 
     save();
