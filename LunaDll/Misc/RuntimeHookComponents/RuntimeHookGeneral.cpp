@@ -403,8 +403,8 @@ void TrySkipPatch()
         .NOP()
         .Apply();
 
-    PATCH(0xA755D2).CALL(&UpdateInputHook_Wrapper).Apply();
-
+    PATCH(0xA755D2).CALL(&UpdateInputFinishHook_Wrapper).Apply();
+    PATCH(0xA74910).JMP(&runtimeHookUpdateInput).Apply();
 
     PATCH(0x902D3D).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902DFC).CALL(&WorldOverlayHUDBitBltHook).Apply();

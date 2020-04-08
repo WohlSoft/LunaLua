@@ -766,23 +766,36 @@ int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2) {
     return wcscmp(arg1, arg2);
 }
 
+static void __stdcall UpdateInputFinishHook()
+{
+    g_EventHandler.hookInputUpdate();
+}
 
-
-__declspec(naked) void UpdateInputHook_Wrapper()
+__declspec(naked) void UpdateInputFinishHook_Wrapper()
 {
     __asm {
         MOV EBX, 1
-        JMP UpdateInputHook
+        JMP UpdateInputFinishHook
     }
 }
 
+static __declspec(naked) void updateInput_Orig()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP,8
+        PUSH 0xA74916
+        RET
+    }
+}
 
-extern void __stdcall UpdateInputHook()
+extern void __stdcall runtimeHookUpdateInput()
 {
     gLunaGameControllerManager.pollInputs();
-    g_EventHandler.hookInputUpdate();
     gEscPressedRegistered = gEscPressed;
     gEscPressed = false;
+    updateInput_Orig();
 }
 
 extern void __stdcall WindowInactiveHook()
