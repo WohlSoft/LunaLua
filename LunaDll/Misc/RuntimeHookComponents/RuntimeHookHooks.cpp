@@ -2097,9 +2097,10 @@ _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
     }
 }
 
-static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
+static void __stdcall runtimeHookCheckInput(int playerNum, int playerIdx, KeyMap* keymap)
 {
-    if (playerIdx >= 0 && playerIdx <= 1)
+    // Test that player index is in range, and that it matches the true player number (ignore clones)
+    if ((playerIdx >= 0 && playerIdx <= 1) && ((playerIdx + 1) == playerNum))
     {
         gRawKeymap[playerIdx+2] = gRawKeymap[playerIdx]; // Update prev values
         gRawKeymap[playerIdx] = *keymap; // Set new values
@@ -2108,13 +2109,15 @@ static void __stdcall runtimeHookCheckInput(int playerIdx, KeyMap* keymap)
 
 __declspec(naked) void __stdcall runtimeHookCheckInputRaw(void)
 {
+    // TODO: The loop this hook runs inside seems to never use the true player number? Ths loop should probably be limited to player 1 and 2...
     __asm {
         pushfd
         push eax
         push ecx
         push edx
-        push ebx // Args #2 (keymap ptr)
-        push esi // Args #1 (player idx)
+        push ebx                     // Args #3 (keymap ptr)
+        push esi                     // Args #2 (player idx we're reading for)
+        push dword ptr ss:[ebp-0x18] // Args #1 (true player number)
         call runtimeHookCheckInput
         pop edx
         pop ecx
