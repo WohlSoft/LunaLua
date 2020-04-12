@@ -22,9 +22,10 @@ AsyncGifRecorder::AsyncGifRecorder() :
 
 AsyncGifRecorder::~AsyncGifRecorder()
 {
-    if (m_workerThread->joinable()){
+    if (m_workerThread && m_workerThread->joinable()){
         exitWorkerThread();
         m_workerThread->join();
+        m_workerThread = nullptr;
     }
     delete m_gifWriter;
     m_gifWriter = nullptr;
