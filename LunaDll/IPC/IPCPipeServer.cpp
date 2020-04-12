@@ -99,6 +99,14 @@ void IPCPipeServer::RegisterMethod(std::string str, IPCCallback cb)
 
 void IPCPipeServer::ReadThread()
 {
+    if (gStartupSettings.sendIPCReady)
+    {
+        SendMsg({
+            { "jsonrpc", "2.0" },
+            { "method", "startedNotification" }
+        });
+    }
+
     while (1)
     {
         // Read a string packet

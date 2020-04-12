@@ -49,6 +49,7 @@ struct startUpSettings{
     bool softwareGL;
     bool forceHardGL;
     bool runWhenUnfocused;
+    bool sendIPCReady;
 };
 
 struct SMBXHUDSettings {

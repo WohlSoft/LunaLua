@@ -237,6 +237,14 @@ void ParseArgs(const std::vector<std::wstring>& args)
         gStartupSettings.runWhenUnfocused = true;
         gMainWindowFocused = true;
     }
+
+    if (vecStrFind(args, L"--sendIPCReady"))
+    {
+        // NOTE: This probably shouldn't be used. Using it is a cludge because
+        //       you can send to stdin/stdout pipes as soon as the process is
+        //       started which can be detected without this.
+        gStartupSettings.sendIPCReady = true;
+    }
 }
 
 static unsigned int __stdcall LatePatch(void)
