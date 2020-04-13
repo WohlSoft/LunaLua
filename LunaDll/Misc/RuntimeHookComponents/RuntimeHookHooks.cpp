@@ -2779,11 +2779,13 @@ void __stdcall runtimeHookCheckWindowFocus()
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
         // Wait for focus
+        TestModeSendNotification("suspendWhileUnfocusedNotification");
         while (!gMainWindowFocused && !LunaLoadScreenIsActive())
         {
             Sleep(100);
             LunaDllWaitFrame(false);
         }
+        TestModeSendNotification("resumeAfterUnfocusedNotification");
     }
 }
 

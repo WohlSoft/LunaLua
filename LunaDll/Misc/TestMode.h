@@ -75,4 +75,6 @@ bool TestModeIsLoadPending(void);
 
 void TestModeCheckPendingIPCRequest(void);
 
+void TestModeSendNotification(const std::string& notificationCmd);
+
 #endif

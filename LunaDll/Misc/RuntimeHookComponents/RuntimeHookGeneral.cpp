@@ -292,11 +292,10 @@ AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCom
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
 
-static IPCPipeServer ipcServer;
 void TrySkipPatch()
 {
     // If we have stdin/stdout, attach to the IPC server
-    ipcServer.AttachStdinStdout();
+    gIPCServer.AttachStdinStdout();
 
     // Init debug console as early as it can be (must be after IPC)
     if (gStartupSettings.console)

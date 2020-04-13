@@ -11,6 +11,9 @@
 
 using json = nlohmann::json;
 
+// Instance
+IPCPipeServer gIPCServer;
+
 // Example test method
 static json echoMethod(const json& params)
 {
@@ -28,7 +31,8 @@ json IPCQuit(const json& params);                 // Quit the game
 
 
 IPCPipeServer::IPCPipeServer() :
-    mOutFD(-1), mInFD(-1)
+    mOutFD(-1), mInFD(-1),
+    mCallbacks(), mSendMutex()
 {
     RegisterMethod("echo", echoMethod);
     RegisterMethod("testLevel", IPCTestLevel);
@@ -101,10 +105,7 @@ void IPCPipeServer::ReadThread()
 {
     if (gStartupSettings.sendIPCReady)
     {
-        SendMsg({
-            { "jsonrpc", "2.0" },
-            { "method", "startedNotification" }
-        });
+        SendSimpleNotification("startedNotification");
     }
 
     while (1)
@@ -209,7 +210,10 @@ void IPCPipeServer::SendMsgString(const std::string& pkt)
     pktStringStream << pkt.length() << ":" << pkt << ",";
 
     std::string pktString = pktStringStream.str();
-    write(mOutFD, pktString.c_str(), pktString.length());
+    {
+        std::unique_lock<std::mutex> lock(mSendMutex); // Probably not necessary, but just in case
+        write(mOutFD, pktString.c_str(), pktString.length());
+    }
 }
 
 // Recieves a string message from the pipe, in "netstring" encoding as defined http://cr.yp.to/proto/netstrings.txt
@@ -309,7 +313,8 @@ json IPCGetSupportedFeatures(const json& params)
 {
     return {
         {"LVLX", true},
-        {"SelfForegrounding", true}
+        {"SelfForegrounding", true},
+        {"HideShowNotifications", true}
     };
 }
 
@@ -330,4 +335,15 @@ void CheckIPCQuitRequest()
         Sleep(10);
         _exit(0);
     }
+}
+
+//=============================================================================
+
+void IPCPipeServer::SendSimpleNotification(const std::string& notificationCmd)
+{
+    if (mOutFD == -1) return;
+    SendMsg({
+        { "jsonrpc", "2.0" },
+        { "method", notificationCmd }
+    });
 }

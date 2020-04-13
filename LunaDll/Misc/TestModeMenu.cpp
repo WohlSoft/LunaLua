@@ -85,11 +85,13 @@ void testModePauseMenu(bool allowContinue)
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
             // Wait for focus
+            TestModeSendNotification("suspendWhileUnfocusedNotification");
             while (!gMainWindowFocused && !LunaLoadScreenIsActive() && keepRunningPauseMenu && !GM_EPISODE_MODE)
             {
                 Sleep(100);
                 LunaDllWaitFrame(false);
             }
+            TestModeSendNotification("resumeAfterUnfocusedNotification");
 
             if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
         }

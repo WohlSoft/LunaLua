@@ -559,11 +559,13 @@ bool TestModeCheckHideWindow(void)
             }
         }
 
+        TestModeSendNotification("closedToBackgroundNotification");
         while (gStartupSettings.currentlyWaitingForIPC)
         {
             Sleep(100);
             LunaDllWaitFrame(false);
         }
+        TestModeSendNotification("showFromBackgroundNotification");
 
         return true;
     }
@@ -601,4 +603,9 @@ json IPCGetWindowHandle(const json& /*params*/)
 {
     unsigned long ptr = ULONG_PTR(gMainWindowHwnd);
     return ptr;
+}
+
+void TestModeSendNotification(const std::string& notificationCmd)
+{
+    gIPCServer.SendSimpleNotification(notificationCmd);
 }
