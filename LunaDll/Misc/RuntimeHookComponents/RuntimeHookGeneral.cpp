@@ -279,11 +279,6 @@ static unsigned int __stdcall LatePatch(void)
     // Be sure that all values are init.
     ResetLunaModule();
 
-    if (gStartupSettings.console)
-    {
-        InitDebugConsole();
-    }
-
     // Init controller support
     gLunaGameControllerManager.init();
 
@@ -302,6 +297,12 @@ void TrySkipPatch()
 {
     // If we have stdin/stdout, attach to the IPC server
     ipcServer.AttachStdinStdout();
+
+    // Init debug console as early as it can be (must be after IPC)
+    if (gStartupSettings.console)
+    {
+        InitDebugConsole();
+    }
 
     if (gStartupSettings.patch){
         PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
