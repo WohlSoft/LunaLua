@@ -78,7 +78,7 @@ SavedVariableBank gSavedVarBank;
 
 MciEmulator gMciEmulator;
 
-startUpSettings gStartupSettings;
+StartupSettings gStartupSettings;
 
 HardcodedGraphicsManager gGraphManager;
 

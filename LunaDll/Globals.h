@@ -7,6 +7,7 @@
 #pragma warning(disable: 4800)
 #pragma warning(disable: 4996) //localtime
 #endif
+#include <string>
 #include <atomic>
 #include <cstdint>
 #include "LevelCodes/LevelCodes.h"
@@ -33,7 +34,24 @@ class RenderOverrideManager;
 #pragma comment (lib, "Msimg32.lib")
 #endif
 
-struct startUpSettings{
+struct StartupEpisodeSettings
+{
+    bool enabled;
+    std::wstring wldPath;
+    int players;
+    int character1;
+    int character2;
+    int saveSlot;
+
+    StartupEpisodeSettings() :
+        enabled(false), wldPath(), players(1),
+        character1(1), character2(2), saveSlot(0)
+    {
+    }
+};
+
+struct StartupSettings
+{
     bool patch;
     bool game;
     bool lvlEditor;
@@ -50,6 +68,15 @@ struct startUpSettings{
     bool forceHardGL;
     bool runWhenUnfocused;
     bool sendIPCReady;
+    StartupEpisodeSettings epSettings;
+
+    StartupSettings() :
+        patch(false), game(false), lvlEditor(false), frameskip(false), noSound(false), debugger(false),
+        logger(false), newLauncher(false), console(false), waitForIPC(false), currentlyWaitingForIPC(false),
+        oldLvlLoader(false), softwareGL(false), forceHardGL(false), runWhenUnfocused(false), sendIPCReady(false),
+        epSettings()
+    {
+    }
 };
 
 struct SMBXHUDSettings {
@@ -79,7 +106,7 @@ extern bool            gRenderSizableFlag;
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
 
-extern startUpSettings gStartupSettings;
+extern StartupSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///
 extern int		gFrames;

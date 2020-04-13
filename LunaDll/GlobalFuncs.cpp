@@ -429,9 +429,6 @@ void InitGlobals()
 
     gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
-    //startup settings default
-    memset(&gStartupSettings, 0, sizeof(gStartupSettings));
-
     srand((int)time(NULL));
 
     // Get compatible handle for screen
@@ -636,6 +633,34 @@ bool isAbsolutePath(const std::wstring& path)
 bool isAbsolutePath(const std::string& path)
 {
     return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
+}
+
+std::wstring resolveCwdOrWorldsPath(const std::wstring& path)
+{
+    std::wstring fullPath;
+    if (isAbsolutePath(path)) {
+        fullPath = normalizePathSlashes(path);
+        replaceSubStrW(fullPath, L"/", L"\\");
+    }
+    else
+    {
+        fullPath = normalizePathSlashes(gCwdPathWCHAR + L"\\" + path);
+        replaceSubStrW(fullPath, L"/", L"\\");
+        if (!fileExists(fullPath))
+        {
+            std::wstring worldsPath = normalizePathSlashes(gAppPathWCHAR + L"\\worlds\\" + path);
+            replaceSubStrW(worldsPath, L"/", L"\\");
+            if (fileExists(worldsPath))
+            {
+                fullPath = worldsPath;
+            }
+        }
+    }
+    if (!fileExists(fullPath))
+    {
+        return L"";
+    }
+    return fullPath;
 }
 
 std::wstring resolveIfNotAbsolutePath(std::wstring filename)

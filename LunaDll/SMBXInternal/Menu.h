@@ -12,7 +12,7 @@ struct EpisodeListItem : SMBX_FullBaseItemArray<EpisodeListItem, -1, GM_EP_LIST_
     VB6StrPtr episodeWorldFile;
     DWORD unknown_C;
     DWORD unknown_10;
-    VB6StrPtr unknown_14;
+    DWORD unknown_14;
 
     static inline std::vector<EpisodeListItem*> GetAll(){
         std::vector<EpisodeListItem*> allEpisodes;
@@ -23,7 +23,7 @@ struct EpisodeListItem : SMBX_FullBaseItemArray<EpisodeListItem, -1, GM_EP_LIST_
     }
 };
 
-static_assert(sizeof(EpisodeListItem) == 0x18, "sizeof(SMBX_BGO) must be 0x24");
+static_assert(sizeof(EpisodeListItem) == 0x18, "sizeof(EpisodeListItem) must be 0x18");
 
 
 #endif

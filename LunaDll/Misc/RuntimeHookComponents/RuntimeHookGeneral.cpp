@@ -203,6 +203,52 @@ void ParseArgs(const std::vector<std::wstring>& args)
         }
     }
 
+    // Check for .wld filename
+    for (unsigned int i = 0; i < args.size(); i++)
+    {
+        const std::wstring& arg = args[i];
+        std::wstring wldPath;
+        if ((arg.length() > 0) && (arg[0] == L'-'))
+        {
+            if (arg.find(L"--loadWorld=") == 0)
+            {
+                wldPath = arg.substr(12);
+            }
+            else if (arg.find(L"--num-players=") == 0)
+            {
+                gStartupSettings.epSettings.players = atoi(WStr2Str(arg.substr(14)).c_str());
+            }
+            else if (arg.find(L"--p1c=") == 0)
+            {
+                gStartupSettings.epSettings.character1 = atoi(WStr2Str(arg.substr(6)).c_str());
+            }
+            else if (arg.find(L"--p2c=") == 0)
+            {
+                gStartupSettings.epSettings.character2 = atoi(WStr2Str(arg.substr(6)).c_str());
+            }
+            else if (arg.find(L"--saveslot=") == 0)
+            {
+                gStartupSettings.epSettings.saveSlot = atoi(WStr2Str(arg.substr(11)).c_str());
+            }
+        }
+        else
+        {
+            std::wstring lowerArg = arg;
+            std::transform(lowerArg.begin(), lowerArg.end(), lowerArg.begin(), towlower);
+            if (lowerArg.rfind(L".wld") == (lowerArg.size() - 4))
+            {
+                wldPath = arg;
+            }
+        }
+
+        if (wldPath.length() > 0)
+        {
+            gStartupSettings.epSettings.wldPath = wldPath;
+            gStartupSettings.epSettings.enabled = true;
+            gStartupSettings.patch = true;
+        }
+    }
+
     if (vecStrFind(args, L"--waitForIPC"))
     {
         gStartupSettings.waitForIPC = true;

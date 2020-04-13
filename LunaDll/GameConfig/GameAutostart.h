@@ -5,11 +5,14 @@
 #include <IniProcessor/ini_processing.h>
 #include <memory>
 
+struct StartupEpisodeSettings;
+
 class GameAutostart
 {
 private:
     //Settings
     std::string selectedEpisode;
+    std::wstring selectedWldPath;
     bool singleplayer;
     Characters firstCharacter;
     Characters secondCharacter;
@@ -19,17 +22,10 @@ public:
     GameAutostart();
     ~GameAutostart();
     static GameAutostart createGameAutostartByIniConfig(IniProcessing& reader);
+    static GameAutostart createGameAutostartByStartupEpisodeSettings(const StartupEpisodeSettings& settings);
     static void ClearAutostartPatch();
 
-    std::string getSelectedEpisode() const { return selectedEpisode; }
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
-    bool getSingleplayer() const { return singleplayer; }
-    void setSingleplayer(bool val) { singleplayer = val; }
-    Characters getFirstCharacter() const { return firstCharacter; }
-    void setFirstCharacter(Characters val) { firstCharacter = val; }
-    Characters getSecondCharacter() const { return secondCharacter; }
-    void setSecondCharacter(Characters val) { secondCharacter = val; }
-    int getSaveSlot() const { return saveSlot; }
     void setSaveSlot(int val) { saveSlot = val; }
 
     bool applyAutostart();

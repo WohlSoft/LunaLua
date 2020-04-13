@@ -1,8 +1,18 @@
 #include "GameAutostart.h"
 #include "../Misc/AsmPatch.h"
+#include "../Globals.h"
+#include "../GlobalFuncs.h"
+#include "../Misc/MiscFuncs.h"
 
 // Patch for making introLoop skip to the right place
 static auto skipIntoPatch = PATCH(0x8CA6A4).JMP(0x8CD13C).NOP_PAD_TO_SIZE<7>();
+
+static bool wstrEqualIgnoreCase(std::wstring a1, std::wstring a2)
+{
+    std::transform(a1.begin(), a1.end(), a1.begin(), towlower);
+    std::transform(a2.begin(), a2.end(), a2.begin(), towlower);
+    return a1 == a2;
+}
 
 GameAutostart::GameAutostart() :
     selectedEpisode(""),
@@ -17,40 +27,108 @@ GameAutostart::~GameAutostart() {}
 
 bool GameAutostart::applyAutostart()
 {
-    if (selectedEpisode == "")
+    if ((selectedEpisode == "") && (selectedWldPath == L""))
         return false;
+
+    // If we have a selected wld path, get the path and filename seperately
+    bool usingWldPath = false;
+    std::wstring wldPath = L"";
+    std::wstring wldFile = L"";
+    if (selectedWldPath != L"")
+    {
+        // Get the full path if necessary
+        std::wstring fullPath = resolveCwdOrWorldsPath(selectedWldPath);
+        if (fullPath.length() == 0)
+        {
+            // Invalid level name
+            std::wstring path = L"SMBX could not open \"" + selectedWldPath + L"\"";
+            MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+            _exit(1);
+        }
+
+        std::wstring::size_type lastSlash = fullPath.rfind(L'\\');
+        if (lastSlash != std::wstring::npos)
+        {
+            wldPath = fullPath.substr(0, lastSlash+1);
+            wldFile = fullPath.substr(lastSlash+1);
+            usingWldPath = true;
+        }
+    }
 
     //load all episodes
     native_loadWorldList();
     VB6StrPtr toSearchItem = selectedEpisode;
     std::vector<EpisodeListItem*> allEpisodes = EpisodeListItem::GetAll();
-    for (unsigned int i = 0; i < allEpisodes.size(); ++i){
+    bool foundEpisode = false;
+    unsigned int epIdx = 0;
+    for (unsigned int i = 0; i < allEpisodes.size(); ++i) {
         EpisodeListItem* item = allEpisodes[i];
-        if (item->episodeName == toSearchItem) {
-            //Slot selection/Singleplayer
-            GM_CUR_MENUTYPE = (singleplayer ? 10 : 20);
-            //first Character
-            GM_CUR_MENUPLAYER1 = static_cast<int>(firstCharacter);
-            //second Character
-            GM_CUR_MENUPLAYER2 = static_cast<int>(secondCharacter);
-            //Load the selected episode
-            GM_CUR_MENULEVEL = i + 1;
 
-            //Load save states
-            native_loadSaveStates();
+        // Match by name
+        if (!usingWldPath && (item->episodeName == toSearchItem))
+        {
+            epIdx = i;
+            foundEpisode = true;
+            break;
+        }
 
-            //First save slot
-            GM_CUR_MENUCHOICE = saveSlot - 1;
-
-            GM_FULLDIR = item->episodePath;
-
-            // Apply patch to make introLoop immediately skip to loading the episode
-            skipIntoPatch.Apply();
-
-            //We're done here
-            return true;
+        // Match by filename
+        if (usingWldPath &&
+            wstrEqualIgnoreCase(item->episodePath, wldPath) &&
+            wstrEqualIgnoreCase(item->episodeWorldFile, wldFile)
+            )
+        {
+            epIdx = i;
+            foundEpisode = true;
+            break;
         }
     }
+
+    // Make new entry if needed
+    if (!foundEpisode && usingWldPath)
+    {
+        epIdx = GM_EP_LIST_COUNT;
+        GM_EP_LIST_COUNT++;
+        EpisodeListItem* item = EpisodeListItem::Get(epIdx);
+
+        item->episodeName = L"External Episode";
+        item->episodePath = wldPath;
+        item->episodeWorldFile = wldFile;
+        item->unknown_C = 0;
+        item->unknown_10 = 0;
+        item->unknown_14 = 0;
+
+        foundEpisode = true;
+    }
+
+    if (foundEpisode)
+    {
+        EpisodeListItem* item = EpisodeListItem::Get(epIdx);
+
+        //Slot selection/Singleplayer
+        GM_CUR_MENUTYPE = (singleplayer ? 10 : 20);
+        //first Character
+        GM_CUR_MENUPLAYER1 = static_cast<int>(firstCharacter);
+        //second Character
+        GM_CUR_MENUPLAYER2 = static_cast<int>(secondCharacter);
+        //Load the selected episode
+        GM_CUR_MENULEVEL = epIdx + 1;
+
+        //Load save states
+        native_loadSaveStates();
+
+        //First save slot
+        GM_CUR_MENUCHOICE = saveSlot - 1;
+
+        GM_FULLDIR = item->episodePath;
+
+        // Apply patch to make introLoop immediately skip to loading the episode
+        skipIntoPatch.Apply();
+
+        //We're done here
+        return true;
+    }
+
     return false;
 }
 
@@ -58,12 +136,25 @@ GameAutostart GameAutostart::createGameAutostartByIniConfig(IniProcessing &reade
 {
     GameAutostart autostarter;
     reader.beginGroup("autostart");
-    autostarter.setSelectedEpisode(reader.value("episode-name", "").toString());
-    autostarter.setSingleplayer(reader.value("singleplayer", true).toBool());
-    autostarter.setFirstCharacter(static_cast<Characters>(reader.value("character-player1", 1).toInt()));
-    autostarter.setSecondCharacter(static_cast<Characters>(reader.value("character-player2", 2).toInt()));
-    autostarter.setSaveSlot(reader.value("save-slot", 1).toInt());
+    autostarter.selectedWldPath = L"";
+    autostarter.selectedEpisode = reader.value("episode-name", "").toString();
+    autostarter.singleplayer    = reader.value("singleplayer", true).toBool();
+    autostarter.firstCharacter  = static_cast<Characters>(reader.value("character-player1", 1).toInt());
+    autostarter.secondCharacter = static_cast<Characters>(reader.value("character-player2", 2).toInt());
+    autostarter.saveSlot        = reader.value("save-slot", 1).toInt();
     reader.endGroup();
+    return autostarter;
+}
+
+GameAutostart GameAutostart::createGameAutostartByStartupEpisodeSettings(const StartupEpisodeSettings& settings)
+{
+    GameAutostart autostarter;
+    autostarter.selectedWldPath = settings.wldPath;
+    autostarter.selectedEpisode = "";
+    autostarter.singleplayer = (settings.players == 1);
+    autostarter.firstCharacter = static_cast<Characters>(settings.character1);
+    autostarter.secondCharacter = static_cast<Characters>(settings.character2);
+    autostarter.saveSlot = settings.saveSlot;
     return autostarter;
 }
 

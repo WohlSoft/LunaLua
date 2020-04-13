@@ -198,30 +198,38 @@ extern int __stdcall LoadIntro()
     if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
         gAutostartRan = true;
-        std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
 
-        if (file_existsX(autostartFile))
+        if (gStartupSettings.epSettings.enabled)
         {
-            IniProcessing autostartConfig(autostartFile);
-            if (autostartConfig.beginGroup("autostart"))
+            GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
+            autostarter.applyAutostart();
+        }
+        else
+        {
+            std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+            if (file_existsX(autostartFile))
             {
-                bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
-                autostartConfig.endGroup();
-                if (doAutostart)
+                IniProcessing autostartConfig(autostartFile);
+                if (autostartConfig.beginGroup("autostart"))
                 {
-                    // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
-                    GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-                    autostarter.applyAutostart();
-
-                    autostartConfig.beginGroup("autostart");
-                    if (autostartConfig.value("transient", false).toBool())
-                    {
-                        remove(autostartFile.c_str());
-                    }
+                    bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
                     autostartConfig.endGroup();
+                    if (doAutostart)
+                    {
+                        // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                        GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                        autostarter.applyAutostart();
+
+                        autostartConfig.beginGroup("autostart");
+                        if (autostartConfig.value("transient", false).toBool())
+                        {
+                            remove(autostartFile.c_str());
+                        }
+                        autostartConfig.endGroup();
+                    }
                 }
+                autostartConfig.endGroup();
             }
-            autostartConfig.endGroup();
         }
     }
 

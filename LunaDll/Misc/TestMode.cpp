@@ -191,7 +191,7 @@ static bool testModeSetupForLoading()
     ep->episodeWorldFile = "";
     ep->unknown_C = 0;
     ep->unknown_10 = 0;
-    ep->unknown_14 = "";
+    ep->unknown_14 = 0;
 
     // Set episode path...
     GM_FULLDIR = path.substr(0, pos + 1);
@@ -305,26 +305,7 @@ static void __stdcall playerDeathTestModeHook(void)
 bool testModeEnable(const STestModeSettings& settings)
 {
     // Get the full path if necessary
-    std::wstring path = settings.levelPath;
-    std::wstring fullPath;
-    if (isAbsolutePath(path)) {
-        fullPath = normalizePathSlashes(path);
-        replaceSubStrW(fullPath, L"/", L"\\");
-    }
-    else
-    {
-        fullPath = normalizePathSlashes(gCwdPathWCHAR + L"\\" + path);
-        replaceSubStrW(fullPath, L"/", L"\\");
-        if (!fileExists(fullPath))
-        {
-            std::wstring worldsPath = normalizePathSlashes(gAppPathWCHAR + L"\\worlds\\" + path);
-            replaceSubStrW(worldsPath, L"/", L"\\");
-            if (fileExists(worldsPath))
-            {
-                fullPath = worldsPath;
-            }
-        }
-    }
+    std::wstring fullPath = resolveCwdOrWorldsPath(settings.levelPath);
 
     const std::string &newLevelData = settings.rawData;
 
