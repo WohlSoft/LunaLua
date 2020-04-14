@@ -72,23 +72,30 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
 {
 
     QStringList wldFileFilter;
-    wldFileFilter << "*.wld" << "*.wldx";
+    // Note: For now we don't support wldx, but when we do add << "*.wldx" below
+    wldFileFilter << "*.wld";
     QDir episodeDir(episodeDirPath);
     QMap<QString, QVariant> ret;
     WorldData worldData;
     FileFormats::CreateWorldData(worldData);
     worldData.meta.ReadFileValid = false;
 
+    QString wldPath;
     foreach (QFileInfo fileInfo, episodeDir.entryInfoList(wldFileFilter, QDir::Files))
     {
+        QString thisPath = fileInfo.canonicalFilePath();
         if (fileInfo.suffix().toLower() == "wldx") {
-            FileFormats::ReadExtendedWldFileHeader(fileInfo.canonicalFilePath(), worldData);
+            FileFormats::ReadExtendedWldFileHeader(thisPath, worldData);
         } else {
-            FileFormats::ReadSMBX64WldFileHeader(fileInfo.canonicalFilePath(), worldData);
+            FileFormats::ReadSMBX64WldFileHeader(thisPath, worldData);
         }
 
         // Break upon first valid world file
-        if (worldData.meta.ReadFileValid) break;
+        if (worldData.meta.ReadFileValid)
+        {
+            wldPath = thisPath;
+            break;
+        }
     }
 
     // If we didn't get valid data, return null
@@ -98,6 +105,7 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
     }
 
     ret.insert("directoryName", episodeDir.dirName());
+    ret.insert("wldpath", wldPath);
     ret.insert("title", worldData.EpisodeTitle);
     ret.insert("__rawtitle", worldData.EpisodeTitle);
     ret.insert("credits", worldData.authors);

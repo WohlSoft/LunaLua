@@ -7,7 +7,7 @@ class AutostartConfig : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool useAutostart READ useAutostart WRITE setUseAutostart NOTIFY useAutostartUpdated)
-    Q_PROPERTY(QString episodeName READ episodeName WRITE setEpisodeName NOTIFY episodeNameUpdated)
+    Q_PROPERTY(QString wldPath READ wldPath WRITE setWldPath NOTIFY wldPathUpdated)
     Q_PROPERTY(bool singleplayer READ singleplayer WRITE setSingleplayer NOTIFY singleplayerUpdated)
     Q_PROPERTY(int character1 READ character1 WRITE setCharacter1 NOTIFY character1Updated)
     Q_PROPERTY(int character2 READ character2 WRITE setCharacter2 NOTIFY character2Updated)
@@ -21,9 +21,9 @@ public:
         return m_useAutostart;
     }
 
-    QString episodeName() const
+    QString wldPath() const
     {
-        return m_episodeName;
+        return m_wldPath;
     }
 
     bool singleplayer() const
@@ -52,10 +52,10 @@ public slots:
         m_useAutostart = arg;
         emit useAutostartUpdated();
     }
-    void setEpisodeName(QString arg)
+    void setWldPath(QString arg)
     {
-        m_episodeName = arg;
-        emit episodeNameUpdated();
+        m_wldPath = arg;
+        emit wldPathUpdated();
     }
     void setSingleplayer(bool arg)
     {
@@ -83,7 +83,7 @@ public slots:
 
 signals:
     void useAutostartUpdated();
-    void episodeNameUpdated();
+    void wldPathUpdated();
     void singleplayerUpdated();
     void character1Updated();
     void character2Updated();
@@ -91,7 +91,7 @@ signals:
 
 private:
     bool m_useAutostart;
-    QString m_episodeName;
+    QString m_wldPath;
     bool m_singleplayer;
     int m_character1;
     int m_character2;

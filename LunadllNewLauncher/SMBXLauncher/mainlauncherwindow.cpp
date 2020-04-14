@@ -344,8 +344,24 @@ void MainLauncherWindow::init(const QString &configName)
 
 void MainLauncherWindow::runSMBX()
 {
-    writeLunaConfig();
-    internalRunSMBX(m_smbxExe, {"--game"});
+    AutostartConfig& config = *m_smbxConfig->Autostart();
+    QList<QString> argList = {"--game"};
+
+    QString wldPath = config.wldPath();
+#ifndef _WIN32
+    // Convert path for Wine-friendly use
+    wldPath = pathUnixToWine(wldPath);
+#endif
+    argList << ("--loadWorld=" + wldPath);
+    argList << QString("--num-players=%1").arg(config.singleplayer() ? 1 : 2);
+    argList << QString("--p1c=%1").arg(config.character1());
+    if (!config.singleplayer())
+    {
+        argList << QString("--p2c=%1").arg(config.character2());
+    }
+    argList << QString("--saveslot=%1").arg(config.saveSlot());
+
+    internalRunSMBX(m_smbxExe, argList);
     close();
 }
 
@@ -512,30 +528,6 @@ void MainLauncherWindow::checkForUpdates()
 void MainLauncherWindow::warnError(const QString &msg)
 {
     QMessageBox::warning(this, "Error", msg);
-}
-
-void MainLauncherWindow::writeLunaConfig()
-{
-    AutostartConfig& config = *m_smbxConfig->Autostart();
-    if(config.useAutostart()){
-        {
-            QFile autostartFile("autostart.ini");
-            if(autostartFile.exists()){
-                autostartFile.remove();
-            }
-        }
-        QSettings autostartINI("autostart.ini", QSettings::IniFormat);
-        autostartINI.beginGroup("autostart");
-        autostartINI.setValue("do-autostart", config.useAutostart());
-        autostartINI.setValue("episode-name", config.episodeName());
-        autostartINI.setValue("singleplayer", config.singleplayer());
-        autostartINI.setValue("character-player1", config.character1());
-        autostartINI.setValue("character-player2", config.character2());
-        autostartINI.setValue("save-slot", config.saveSlot());
-        autostartINI.setValue("transient", true);
-        autostartINI.endGroup();
-
-    }
 }
 
 void MainLauncherWindow::internalRunSMBX(const QString &smbxExeFile, const QList<QString> &args)

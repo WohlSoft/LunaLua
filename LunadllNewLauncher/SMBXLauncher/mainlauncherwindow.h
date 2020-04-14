@@ -47,7 +47,6 @@ public slots:
     //Error handlers
     void warnError(const QString& msg);
 private:
-    void writeLunaConfig();
     void internalRunSMBX(const QString& smbxExeFile, const QList<QString>& args);
 
     QScopedPointer<SMBXConfig> m_smbxConfig;
