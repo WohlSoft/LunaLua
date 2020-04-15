@@ -41,26 +41,6 @@ void Input::CheckSpecialCheats() {
         ClearInputStringBuffer();
         return;
     }
-
-    //11teleport
-    static bool hyperModeEnabled = false;
-    org_len = curbuf.length();
-    sought_len = wcslen(HYPER_MODE_CHT);
-    if (org_len >= sought_len && curbuf.substr(org_len - sought_len, sought_len) == HYPER_MODE_CHT) {
-        hyperModeEnabled = !hyperModeEnabled;
-        if (hyperModeEnabled)
-        {
-            // Enable
-            SMBXSound::PlaySFX(51);
-            SetSMBXFrameTiming(15.600 / 3.500); // 3.5x speed
-        } else {
-            // Disable
-            SMBXSound::PlaySFX(49);
-            SetSMBXFrameTiming(15.600); // normal speed
-        }
-        ClearInputStringBuffer();
-        return;
-    }
 }
 
 // UPDATE INPUT TASKS -- Update key presses, etc

@@ -824,10 +824,21 @@ extern void __stdcall WindowInactiveHook()
  * enough that we trust QueryPerformanceCounter.
  **/
 //#define ENABLE_FRAME_TIMING_BENCHMARK
-static double FRAME_TIMING_MS = 15.600;
+static const double DEFAULT_FRAME_TIMING_MS = 15.600;
+static double FRAME_TIMING_MS = DEFAULT_FRAME_TIMING_MS;
 extern void SetSMBXFrameTiming(double ms)
 {
     FRAME_TIMING_MS = ms;
+}
+
+extern void SetSMBXFrameTimingDefault()
+{
+    SetSMBXFrameTiming(DEFAULT_FRAME_TIMING_MS);
+}
+
+extern double GetSMBXFrameTiming()
+{
+    return FRAME_TIMING_MS;
 }
 
 bool g_ResetFrameTiming = false;

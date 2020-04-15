@@ -106,6 +106,7 @@ bool CLunaLua::shutdown()
     LunaLoadScreenKill();
 
     // Unset flags of things Lua code was processing
+    SetSMBXFrameTimingDefault();
     gRenderBGOFlag = true;
     gRenderSizableFlag = true;
     gDisablePlayerFilterBounceFix = false;

@@ -89,6 +89,8 @@ extern void UpdateInputFinishHook_Wrapper();
 extern void __stdcall runtimeHookUpdateInput();
 extern void __stdcall WindowInactiveHook();
 extern void SetSMBXFrameTiming(double ms);
+extern void SetSMBXFrameTimingDefault();
+extern double GetSMBXFrameTiming();
 extern void __stdcall FrameTimingHook();
 extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();

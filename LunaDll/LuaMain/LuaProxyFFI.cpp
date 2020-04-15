@@ -438,4 +438,14 @@ typedef struct ExtendedNPCFields_\
             //gDisableNPCDownwardClipFixSlope.Unapply();
         }
     }
+
+    FFI_EXPORT(void) LunaLuaSetFrameTiming(double value)
+    {
+        return SetSMBXFrameTiming(value);
+    }
+
+    FFI_EXPORT(double) LunaLuaGetFrameTiming()
+    {
+        return GetSMBXFrameTiming();
+    }
 }
