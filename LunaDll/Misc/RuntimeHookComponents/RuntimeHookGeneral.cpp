@@ -349,10 +349,10 @@ void TrySkipPatch()
         InitDebugConsole();
     }
 
-    if (gStartupSettings.patch){
+    // This used to check gStartupSettings.patch but now we always nop out the loader code. We don't use it.
+    {
         PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
         *(WORD*)(0xB25046) = -1; //set run to true
-
         PATCH(0x8BED00).CALL(&InitHook).Apply();
     }
 
