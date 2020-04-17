@@ -656,10 +656,6 @@ std::wstring resolveCwdOrWorldsPath(const std::wstring& path)
             }
         }
     }
-    if (!fileExists(fullPath))
-    {
-        return L"";
-    }
     return fullPath;
 }
 

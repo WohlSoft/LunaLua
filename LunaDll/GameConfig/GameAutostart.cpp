@@ -38,6 +38,10 @@ bool GameAutostart::applyAutostart()
     {
         // Get the full path if necessary
         std::wstring fullPath = resolveCwdOrWorldsPath(selectedWldPath);
+        if (!fileExists(fullPath))
+        {
+            fullPath = L"";
+        }
         if (fullPath.length() == 0)
         {
             // Invalid level name
