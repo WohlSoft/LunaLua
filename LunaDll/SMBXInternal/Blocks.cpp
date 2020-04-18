@@ -120,6 +120,7 @@ void Blocks::InitProperties() {
     {
         SetBlockBumpable(id, false);
         SetBlockPlayerFilter(id, 0);
+        SetBlockNPCFilter(id, 0);
     }
 
     // Default game config
