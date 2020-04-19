@@ -476,5 +476,8 @@ void __stdcall runtimeHookBlockNPCFilter(void);
 
 void __stdcall runtimeHookLevelPauseCheck(void);
 
+void __stdcall runtimeHookPlayerHarm(void);
+void __stdcall runtimeHookPlayerKill(short* playerIdxPtr);
+
 #endif
 

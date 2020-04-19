@@ -1055,6 +1055,12 @@ void TrySkipPatch()
     // Replace pause button detection code to avoid re-triggering when held
     PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hook for onPlayerHarm
+    PATCH(0x9B52FC).JMP(runtimeHookPlayerHarm).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Hook for onPlayerKill
+    PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

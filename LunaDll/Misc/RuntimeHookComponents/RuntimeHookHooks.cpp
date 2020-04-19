@@ -3618,3 +3618,76 @@ __declspec(naked) void __stdcall runtimeHookLevelPauseCheck(void)
         ret
     }
 }
+
+static int __stdcall runtimeHookPlayerHarmInternal(short* playerIdxPtr)
+{
+    bool playerHarmCancelled = false;
+
+    if (gLunaLua.isValid() && (GM_WINNING == 0)) {
+        std::shared_ptr<Event> playerHarmEvent = std::make_shared<Event>("onPlayerHarm", true);
+        playerHarmEvent->setDirectEventName("onPlayerHarm");
+        playerHarmEvent->setLoopable(false);
+        gLunaLua.callEvent(playerHarmEvent, *playerIdxPtr);
+
+        playerHarmCancelled = playerHarmEvent->native_cancelled();
+    }
+
+    return playerHarmCancelled ? -1 : 0;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerHarm(void)
+{
+    // 009B52FC | 0F8F 550B0000              | jg smbx.9B5E57
+    __asm {
+        jg cancelPlayerHarm
+        push eax
+        push ecx
+        push edx
+        push dword ptr ss:[ebp+8]
+        call runtimeHookPlayerHarmInternal
+        cmp eax, 0
+        jne cancelPlayerHarm
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9B5302
+        ret
+    cancelPlayerHarm:
+        pop edx
+        pop ecx
+        pop eax
+    wasntPlayerHarm:
+        push 0x9B5E57
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall killPlayer_OrigFunc(short* playerIdxPtr)
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp, 0x8
+        push 0x9B66D6
+        ret
+    }
+}
+
+void __stdcall runtimeHookPlayerKill(short* playerIdxPtr)
+{
+    bool playerKillCancelled = false;
+
+    if (gLunaLua.isValid() && (GM_WINNING == 0)) {
+        std::shared_ptr<Event> playerKillEvent = std::make_shared<Event>("onPlayerKill", true);
+        playerKillEvent->setDirectEventName("onPlayerKill");
+        playerKillEvent->setLoopable(false);
+        gLunaLua.callEvent(playerKillEvent, *playerIdxPtr);
+
+        playerKillCancelled = playerKillEvent->native_cancelled();
+    }
+
+    if (!playerKillCancelled)
+    {
+        killPlayer_OrigFunc(playerIdxPtr);
+    }
+}
