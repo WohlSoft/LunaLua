@@ -45,6 +45,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     if (fullPath.empty())
         fullPath = gAppPathWCHAR + L"/untitled.lvlx";
 
+    bool isIncompatible = false;
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
     if(outData.meta.RecentFormat == LevelData::SMBX64)
@@ -53,6 +54,21 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         FileFormats::smbx2bLevelSortBGOs(outData);
 
     size_t findLastSlash = fullPath.find_last_of(L"/\\");
+
+    if(outData.meta.RecentFormat == LevelData::SMBX38A)
+        isIncompatible = true;
+    if(!outData.variables.empty())
+        isIncompatible = true;
+    if(!outData.arrays.empty())
+        isIncompatible = true;
+    if(!outData.scripts.empty())
+        isIncompatible = true;
+    if(!outData.custom38A_configs.empty())
+        isIncompatible = true;
+    if(!outData.music_overrides.empty())
+        isIncompatible = true;
+    if(!outData.sound_overrides.empty())
+        isIncompatible = true;
 
     std::wstring dir = fullPath.substr(0U, findLastSlash);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
@@ -235,6 +251,13 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextDataLevelBlock.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BLOCKS, nextDataLevelBlock.id, nextDataLevelBlock.meta.custom_params);
         // Store custom params
         g_BlockCustomParams.setData(i, nextDataLevelBlock.meta.custom_params);
+
+        // SMBX-38A features are not supported here
+        if(nextDataLevelBlock.gfx_dx > 0 ||
+           nextDataLevelBlock.gfx_dy > 0 ||
+          !nextDataLevelBlock.event_on_screen.empty()) {
+            isIncompatible = true;
+        }
     }
 
     int numOfBGO = outData.bgo.size();
@@ -259,6 +282,12 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextDataLevelBGO.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::BGO, nextDataLevelBGO.id, nextDataLevelBGO.meta.custom_params);
         // Store custom params
         g_BgoCustomParams.setData(i, nextDataLevelBGO.meta.custom_params);
+
+        // SMBX-38A features are not supported here
+        if(nextDataLevelBGO.gfx_dx > 0 ||
+           nextDataLevelBGO.gfx_dy > 0) {
+            isIncompatible = true;
+        }
     }
 
     int numOfNPC = outData.npc.size();
@@ -375,6 +404,17 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextDataLevelNPC.meta.custom_params = g_configManager.mergeExtraSettings(ConfigPackMiniManager::NPC, (size_t)nextDataLevelNPC.id, nextDataLevelNPC.meta.custom_params);
         // Store custom params
         g_NpcCustomParams.setData(i, nextDataLevelNPC.meta.custom_params);
+
+        // SMBX-38A features are not supported here
+        if(nextDataLevelNPC.gfx_dx > 0 ||
+           nextDataLevelNPC.gfx_dy > 0 ||
+           nextDataLevelNPC.wings_style > 0 ||
+           !nextDataLevelNPC.event_grab.empty() ||
+           !nextDataLevelNPC.event_nextframe.empty() ||
+           !nextDataLevelNPC.event_touch.empty() ||
+           !nextDataLevelNPC.send_id_to_variable.empty()) {
+            isIncompatible = true;
+        }
     }
 
     unsigned int numOfDoors = outData.doors.size();
@@ -414,6 +454,20 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextDoor->entrance.height = 32.0;
         nextDoor->exit.width = 32.0;
         nextDoor->exit.height = 32.0;
+
+        // SMBX-38A features are not supported here
+        if(nextDataLevelDoor.allownpc_interlevel ||
+           nextDataLevelDoor.hide_entering_scene ||
+           nextDataLevelDoor.cannon_exit ||
+           nextDataLevelDoor.star_num_hide ||
+           nextDataLevelDoor.need_a_bomb ||
+           nextDataLevelDoor.special_state_required ||
+           nextDataLevelDoor.stood_state_required ||
+           nextDataLevelDoor.transition_effect > 0 ||
+           !nextDataLevelDoor.event_enter.empty() ||
+           !nextDataLevelDoor.stars_msg.empty()) {
+            isIncompatible = true;
+        }
     }
 
     if (!twoWayWarps.empty())
@@ -455,6 +509,11 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         nextWater->buoy = nextLevelPhysEnv.buoy;
         nextWater->isQuicksand = COMBOOL(nextLevelPhysEnv.env_type);
         nextWater->ptLayerName = nextLevelPhysEnv.layer;
+        // SMBX-38A specific features are not supported here
+        if(nextLevelPhysEnv.env_type > 1 ||
+           !nextLevelPhysEnv.touch_event.empty()) {
+            isIncompatible = true;
+        }
     }
 
     int numOfLayers = outData.layers.size();
@@ -654,4 +713,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     GM_TRANS_FRAMECT = 0;
     //*(_QWORD *)&dbl_B2D72C = 0i64;
     GM_LAST_FRAME_TIME = 0;//*(double*)(0x00B2D72C) = 0;
+
+    if(isIncompatible)
+    {
+        MessageBoxW(gMainWindowHwnd,
+                    L"This level was saved in an incompatible format, it may not work properly. "
+                    "SMBX-38A specific features such as TeaScript are not supported here. "
+                    "Please use SMBX-38A to play this level.",
+                    L"Incompatible level",
+                    MB_ICONWARNING|MB_OK);
+    }
 }
