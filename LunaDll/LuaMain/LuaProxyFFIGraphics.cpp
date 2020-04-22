@@ -125,6 +125,12 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
 
+    // Ensure we have something for a sampler to sample
+    if ((!obj->mImg) && (!obj->mCapBuff))
+    {
+        obj->mImg = LunaImage::getBlank();
+    }
+
     // If we have vertex colors, multiply it with the other color
     if ((obj->mVertColor != nullptr) &&
         (

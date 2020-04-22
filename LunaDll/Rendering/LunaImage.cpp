@@ -76,6 +76,17 @@ std::shared_ptr<LunaImage> LunaImage::fromData(int width, int height, const uint
     return img;
 }
 
+std::shared_ptr<LunaImage> LunaImage::getBlank()
+{
+    static const unsigned int blankPixel = 0xFFFFFFFF;
+    static std::shared_ptr<LunaImage> cachedBlank = nullptr;
+    if (!cachedBlank)
+    {
+        cachedBlank = fromData(1, 1, (const uint8_t*)&blankPixel);
+    }
+    return cachedBlank;
+}
+
 std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
 {
     if (hdc == nullptr) return nullptr;
