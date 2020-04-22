@@ -494,7 +494,7 @@ void SpriteFunc::TriggerLunaEvent(CSprite* me, SpriteComponent* obj) {
 // HARM PLAYER
 void SpriteFunc::HarmPlayer(CSprite* me, SpriteComponent* obj) {	
     short player = 1;
-    Player::Harm(&player);
+    Player::Harm(player);
 }
 
 // GENERATE IN RADIUS

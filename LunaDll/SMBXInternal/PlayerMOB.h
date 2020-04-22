@@ -430,8 +430,8 @@ namespace Player {
     void SetHearts(PlayerMOB* player, int new_hearts);
 
     // ACTIONS
-    void Harm(short* index);
-    void Kill(short* index);
+    void Harm(short index);
+    void Kill(short index);
 
     RECT GetScreenPosition(PlayerMOB* player);
 };

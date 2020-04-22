@@ -179,12 +179,12 @@ void Player::SetHearts(PlayerMOB* player, int new_hearts) {
 
 
 // ACTIONS
-void Player::Kill(short* pIndex) {
-    native_killPlayer(pIndex);
+void Player::Kill(short pIndex) {
+    native_killPlayer(&pIndex);
 }
 
-void Player::Harm(short* pIndex) {
-    native_harmPlayer(pIndex);
+void Player::Harm(short pIndex) {
+    native_harmPlayer(&pIndex);
 }
 
 

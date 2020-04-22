@@ -13,7 +13,7 @@ void EuroShellRandDCode() {
     //	// Kill if timer up
     //	if(gpFreeGlob[0] == 0 && demo->DeathTimer == 0) {
     //		int pIndex = 1;
-    //		Player::Kill(&pIndex);
+    //		Player::Kill(pIndex);
     //		return;
     //	}
 

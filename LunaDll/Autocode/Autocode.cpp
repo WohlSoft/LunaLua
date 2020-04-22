@@ -848,7 +848,7 @@ void Autocode::Do(bool init) {
         case AT_Hurt: {
             short tempint = 1;
             if(Target == 0)
-                Player::Harm(&tempint);
+                Player::Harm(tempint);
                 RunSelfOption();
             break;
                     }
@@ -856,7 +856,7 @@ void Autocode::Do(bool init) {
         case AT_Kill: {
             short tempint = 1;
             if(Target == 0)
-                Player::Kill(&tempint);
+                Player::Kill(tempint);
                 RunSelfOption();
             break;
                     }
@@ -1055,10 +1055,10 @@ void Autocode::DoPredicate(int target, int predicate) {
 
     // DEATH PREDICATE
     case AP_Hurt:
-            Player::Harm(&tempint);
+            Player::Harm(tempint);
             break;
     case AP_Death:
-            Player::Kill(&tempint);
+            Player::Kill(tempint);
             break;
 
     default:
