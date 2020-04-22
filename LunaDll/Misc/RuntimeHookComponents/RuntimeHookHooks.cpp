@@ -3639,7 +3639,7 @@ __declspec(naked) void __stdcall runtimeHookPlayerHarm(void)
 {
     // 009B52FC | 0F8F 550B0000              | jg smbx.9B5E57
     __asm {
-        jg cancelPlayerHarm
+        jg wasntPlayerHarm
         push eax
         push ecx
         push edx
