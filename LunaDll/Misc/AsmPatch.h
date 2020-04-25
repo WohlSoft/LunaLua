@@ -321,7 +321,7 @@ public:
             ret.mPatchBytes[i] = 0x90;
         }
         for (std::uintptr_t i = Size; i < PadSize; i++) {
-            ret.mOrigBytes[Size] = ((std::uint8_t*)mAddr)[i];
+            ret.mOrigBytes[i] = ((std::uint8_t*)mAddr)[i];
         }
         return ret;
     }
