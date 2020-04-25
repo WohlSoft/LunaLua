@@ -474,7 +474,7 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
     {
     case BLOCKS:
     {
-        if (id <= m_blocks.data.size())
+        if ((id >= 1) && (id <= m_blocks.data.size()))
         {
             return mergeJsonSettingsLG(m_blocks.default_global_extra_settings,
                 m_blocks.data[id - 1].default_extra_settings,
@@ -486,7 +486,7 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
 
     case BGO:
     {
-        if (id <= m_bgo.data.size())
+        if ((id >= 1) && (id <= m_bgo.data.size()))
         {
             return mergeJsonSettingsLG(m_bgo.default_global_extra_settings,
                 m_bgo.data[id - 1].default_extra_settings,
@@ -498,7 +498,7 @@ std::string ConfigPackMiniManager::mergeExtraSettings(ConfigPackMiniManager::Ent
 
     case NPC:
     {
-        if (id <= m_npc.data.size())
+        if ((id >= 1) && (id <= m_npc.data.size()))
         {
             return mergeJsonSettingsLG(m_npc.default_global_extra_settings,
                 m_npc.data[id - 1].default_extra_settings,
