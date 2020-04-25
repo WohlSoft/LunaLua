@@ -44,6 +44,7 @@ public:
     void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
     void controllerButtonEvent(const SDL_ControllerButtonEvent& event, bool down);
     void joyAxisEvent(const SDL_JoyAxisEvent& event);
+    void joyHatEvent(const SDL_JoyHatEvent& event);
     void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
 
     inline std::string getName() const { return name; }
@@ -159,6 +160,7 @@ private:
     void joyButtonEvent(const SDL_JoyButtonEvent& event, bool down);
     void controllerButtonEvent(const SDL_ControllerButtonEvent& event, bool down);
     void joyAxisEvent(const SDL_JoyAxisEvent& event);
+    void joyHatEvent(const SDL_JoyHatEvent& event);
     void controllerAxisEvent(const SDL_ControllerAxisEvent& event);
 public:
     inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }

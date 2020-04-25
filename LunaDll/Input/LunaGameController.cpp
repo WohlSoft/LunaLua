@@ -122,6 +122,9 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
         case SDL_JOYAXISMOTION:
             joyAxisEvent(event.jaxis);
             break;
+        case SDL_JOYHATMOTION:
+            joyHatEvent(event.jhat);
+            break;
         case SDL_CONTROLLERBUTTONDOWN:
             controllerButtonEvent(event.cbutton, true);
             break;
@@ -598,6 +601,15 @@ void LunaGameControllerManager::joyAxisEvent(const SDL_JoyAxisEvent& event)
     }
 }
 
+void LunaGameControllerManager::joyHatEvent(const SDL_JoyHatEvent& event)
+{
+    auto it = controllerMap.find(event.which);
+    if (it != controllerMap.end())
+    {
+        it->second.joyHatEvent(event);
+    }
+}
+
 void LunaGameControllerManager::controllerAxisEvent(const SDL_ControllerAxisEvent& event)
 {
     auto it = controllerMap.find(event.which);
@@ -910,6 +922,24 @@ void LunaGameController::joyAxisEvent(const SDL_JoyAxisEvent& event)
     translateFromAxis(false, axisAsDirectional, posPadNumber, negPadNumber, event.value);
 }
 
+void LunaGameController::joyHatEvent(const SDL_JoyHatEvent& event)
+{
+    // Ignore if this is not a joy-only device
+    if ((joyPtr == nullptr) || (ctrlPtr != nullptr)) return;
+
+#if defined(CONTROLLER_DEBUG_LOWLEVEL)
+    printf("JoyHat %s, idx=%d, %d\n", name.c_str(), (int)event.hat, (int)event.value);
+#endif
+
+    // Ignore any hat except hat 0 for now (in the future could map these to buttons maybe?)
+    if (event.hat != 0) return;
+
+    directionalEvent(CONTROLLER_PAD_UP,    event.value & SDL_HAT_UP,    false);
+    directionalEvent(CONTROLLER_PAD_DOWN,  event.value & SDL_HAT_DOWN,  false);
+    directionalEvent(CONTROLLER_PAD_LEFT,  event.value & SDL_HAT_LEFT,  false);
+    directionalEvent(CONTROLLER_PAD_RIGHT, event.value & SDL_HAT_RIGHT, false);
+}
+
 void LunaGameController::controllerAxisEvent(const SDL_ControllerAxisEvent& event)
 {
     // Ignore if this is not a controller device
@@ -1037,17 +1067,23 @@ void LunaGameController::rumble(int ms, float strength)
 void LunaGameController::directionalEvent(int which, bool newState, bool fromAnalog)
 {
     unsigned int* maskPtr = fromAnalog ? &axisPadState : &dirPadState;
+
+    unsigned int mask = *maskPtr;
     if (newState)
     {
-        *maskPtr |= (1UL << which);
+        mask |= (1UL << which);
     }
     else
     {
-        *maskPtr &= 0xFFFFFFFF ^ (1UL << which);
+        mask &= 0xFFFFFFFF ^ (1UL << which);
     }
 
-    padState = *maskPtr; // Assign current source of pad state
-    activeFlag = activeFlag || newState;
+    if (*maskPtr != mask)
+    {
+        *maskPtr = mask;
+        padState = mask; // Assign current source of pad state
+        activeFlag = activeFlag || newState;
+    }
 }
 
 void LunaGameController::buttonEvent(int which, bool newState)
