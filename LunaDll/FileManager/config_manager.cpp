@@ -109,16 +109,13 @@ void ConfigPackMiniManager::loadConfigPack(const std::string &config_dir)
     m_cp_root_path = confDir.absolutePath() + "/";
 
     // Get config pack files
-    m_cp_files.clear();
-    ListResourceFilesFromDir(Str2WStr(m_cp_root_path), m_cp_files);
+    m_cp_files = gCachedFileMetadata.listResourceFilesFromDir(Str2WStr(m_cp_root_path));
 
     // Get episode files
-    m_episode_files.clear();
-    ListResourceFilesFromDir(Str2WStr(m_episode_path), m_episode_files);
+    m_episode_files = gCachedFileMetadata.listResourceFilesFromDir(Str2WStr(m_episode_path));
 
     // Get custom files
-    m_custom_files.clear();
-    ListResourceFilesFromDir(Str2WStr(m_custom_path), m_custom_files);
+    m_custom_files = gCachedFileMetadata.listResourceFilesFromDir(Str2WStr(m_custom_path));
 
     ResourceFileInfo sections_file = getGlobalExtraSettingsFile(X_SECTIONS);
     if (sections_file != m_sections_ex_fileinfo)
@@ -190,8 +187,7 @@ void ConfigPackMiniManager::loadStore(EntryType type,
     removeDoubleSlash(dst.extra_settings_root);
 
     // Get file list for setup_root
-    dst.setup_files.clear();
-    ListResourceFilesFromDir(Str2WStr(dst.setup_root), dst.setup_files);
+    dst.setup_files = gCachedFileMetadata.listResourceFilesFromDir(Str2WStr(dst.setup_root));
 
     // Get file list for extra_settings_root
     if (dst.setup_root == dst.extra_settings_root)
@@ -201,8 +197,7 @@ void ConfigPackMiniManager::loadStore(EntryType type,
     }
     else
     {
-        dst.extra_settings_files.clear();
-        ListResourceFilesFromDir(Str2WStr(dst.extra_settings_root), dst.extra_settings_files);
+        dst.extra_settings_files = gCachedFileMetadata.listResourceFilesFromDir(Str2WStr(dst.extra_settings_root));
     }
 
     // Load global seta settings for this
@@ -546,15 +541,15 @@ ResourceFileInfo ConfigPackMiniManager::findFileInSubfolder(const std::string &f
 {
     ResourceFileInfo info;
 
-    info = GetResourceFileInfo(Str2WStr(m_custom_path + filename));
+    info = gCachedFileMetadata.getResourceFileInfo(Str2WStr(m_custom_path + filename));
     if (info.done)
         return info;
 
-    info = GetResourceFileInfo(Str2WStr(m_episode_path + filename));
+    info = gCachedFileMetadata.getResourceFileInfo(Str2WStr(m_episode_path + filename));
     if (info.done)
         return info;
 
-    info = GetResourceFileInfo(Str2WStr(root_path + filename));
+    info = gCachedFileMetadata.getResourceFileInfo(Str2WStr(root_path + filename));
     return info;
 }
 

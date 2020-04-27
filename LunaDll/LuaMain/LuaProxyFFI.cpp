@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include <unordered_set>
 #include <memory>
 #include <vector>
 #include <cstring>
@@ -7,6 +8,7 @@
 #include <Psapi.h>
 
 #include "../Globals.h"
+#include "../GlobalFuncs.h"
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
 #include "../Rendering/GL/GLTextureStore.h"
@@ -448,4 +450,90 @@ typedef struct ExtendedNPCFields_\
     {
         return GetSMBXFrameTiming();
     }
+
+    typedef struct
+    {
+        int len;
+        char data[1];
+    } ReadFileStruct;
+    static CachedFileDataWeakPtr<std::vector<char>> g_lunaFileCache;
+    static std::unordered_set<std::shared_ptr<std::vector<char>>> g_lunaFileCacheSet;
+    static std::mutex readFileMutex;
+    FFI_EXPORT(ReadFileStruct*) LunaLuaCachedReadFile(const char* path)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        std::unique_lock<std::mutex> lck(readFileMutex);
+
+        std::wstring wpath = Str2WStr(path);
+        CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
+        if (cacheEntry == nullptr)
+        {
+            return nullptr;
+        }
+
+        std::shared_ptr<std::vector<char>> data = cacheEntry->data.lock();
+
+        if (!data)
+        {
+            // No data, try to read the file
+            FILE* f = _wfopen(wpath.c_str(), L"rb");
+            if (!f)
+            {
+                return nullptr;
+            }
+            fseek(f, 0, SEEK_END);
+            size_t len = ftell(f);
+            rewind(f);
+
+            data = std::make_shared<std::vector<char>>();
+            if (len > 0)
+            {
+                data->resize(len);
+                fread(&((*data)[0]), 1, len, f);
+            }
+            fclose(f);
+            cacheEntry->data = data;
+        }
+        g_lunaFileCacheSet.insert(data);
+
+        ReadFileStruct* cpy = (ReadFileStruct*)malloc(data->size() + sizeof(int));
+        cpy->len = data->size();
+        ::memcpy(cpy->data, &((*data)[0]), data->size());
+        return cpy;
+    }
+
+    FFI_EXPORT(void) LunaLuaFreeCachedReadFileData(ReadFileStruct* cpy)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        if (cpy == nullptr)
+        {
+            return;
+        }
+        free(cpy);
+    }
+
+    FFI_EXPORT(bool) LunaLuaCachedExists(const char* path)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        std::wstring wpath = Str2WStr(path);
+        return gCachedFileMetadata.exists(wpath);
+    }
+}
+
+void CachedReadFile::clearData()
+{
+    std::unique_lock<std::mutex> lck(readFileMutex);
+    g_lunaFileCacheSet.clear();
+}
+
+void CachedReadFile::holdCached(bool isWorld)
+{
+    std::unique_lock<std::mutex> lck(readFileMutex);
+    g_lunaFileCache.hold(isWorld);
+}
+
+void CachedReadFile::releaseCached(bool isWorld)
+{
+    std::unique_lock<std::mutex> lck(readFileMutex);
+    g_lunaFileCache.release(isWorld);
 }

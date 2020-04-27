@@ -7,7 +7,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer_ext.h>
 #undef main
-#include <map>
+#include <unordered_map>
+#include <memory>
 #include <string>
 #include <atomic>
 
@@ -90,6 +91,8 @@ public:
     static bool SND_PlaySnd(const char *sndFile);
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
+    static void holdCached(bool isWorld);
+    static void releaseCached(bool isWorld);
     static bool playOverrideForAlias(const std::string& alias, int ch);
     static void setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk);
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
@@ -97,12 +100,36 @@ public:
     static bool getMuteForAlias(const std::string& alias);
 public:
     static uint32_t GetMemUsage();
+public:
+    class ChunkStorage {
+    public:
+        Mix_Chunk* mChunk;
+
+        ChunkStorage(Mix_Chunk* chunk) :
+            mChunk(chunk)
+        {
+            // Only increment memory usage if we successfully opened something
+            if (chunk) {
+                PGE_Sounds::memUsage += chunk->alen;
+            }
+        }
+
+        ~ChunkStorage()
+        {
+            // NOTE: This should only be destructed when it's certain the sound couldn't be playing
+            if (mChunk)
+            {
+                PGE_Sounds::memUsage -= mChunk->alen;
+                Mix_FreeChunk(mChunk);
+                mChunk = nullptr;
+            }
+        }
+    };
 private:
     struct ChunkOverrideSettings {
         Mix_Chunk* chunk;
         bool muted;
     };
-    static std::map<std::string, Mix_Chunk* > chunksBuffer;
     static char *current;
     static bool overrideArrayIsUsed;
     static std::map<std::string, ChunkOverrideSettings > overrideSettings;

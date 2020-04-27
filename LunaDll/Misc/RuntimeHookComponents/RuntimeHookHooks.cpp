@@ -1728,6 +1728,7 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
     // Shut down Lua stuff before level loading just in case
     gLunaLua.exitContext();
+    gCachedFileMetadata.purge();
 
     if (testModeLoadLevelHook(filename))
     {
@@ -2237,6 +2238,7 @@ void __stdcall runtimeHookCleanupLevel()
 {
     // Shut down Lua stuff before level cleanup
     gLunaLua.exitContext();
+    gCachedFileMetadata.purge();
 
     cleanupLevel_OrigFunc();
 }
@@ -2294,6 +2296,7 @@ void __stdcall runtimeHookCleanupWorld()
 {
     // Shut down Lua stuff before world cleanup
     gLunaLua.exitContext();
+    gCachedFileMetadata.purge();
 
     cleanupWorld_OrigFunc();
 }

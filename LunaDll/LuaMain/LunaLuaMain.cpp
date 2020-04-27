@@ -114,8 +114,10 @@ bool CLunaLua::shutdown()
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
 
-    // Request cached images be held onto for now
-    LunaImage::holdCachedImages();
+    // Request cached images/sounds/files be held onto for now
+    LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
+    PGE_Sounds::holdCached(m_type == LUNALUA_WORLD);
+    CachedReadFile::holdCached(m_type == LUNALUA_WORLD);
 
     // Clear image override map
     ImageLoader::ClearOverrides();
@@ -133,6 +135,9 @@ bool CLunaLua::shutdown()
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
+
+    CachedReadFile::clearData();
+
     return true;
 }
 
@@ -240,7 +245,9 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     }
 
     // Request cached images be held onto for now
-    LunaImage::releaseCachedImages();
+    LunaImage::releaseCachedImages(m_type == LUNALUA_WORLD);
+    PGE_Sounds::releaseCached(m_type == LUNALUA_WORLD);
+    CachedReadFile::releaseCached(m_type == LUNALUA_WORLD);
 }
 
 //Setup default constants

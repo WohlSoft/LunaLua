@@ -27,8 +27,8 @@ public:
     static std::shared_ptr<LunaImage> fromHDC(HDC hdc);
     static std::shared_ptr<LunaImage> fromFile(const wchar_t* filename, const ResourceFileInfo* metadata=nullptr);
 public:
-    static void holdCachedImages();
-    static void releaseCachedImages();
+    static void holdCachedImages(bool isWorld);
+    static void releaseCachedImages(bool isWorld);
 private:
     static uint64_t getNewUID();
 private:
@@ -38,7 +38,6 @@ private:
     uint32_t   w;    // Image width
     uint32_t   h;    // Image height
     HBITMAP    hbmp; // Cached HBITMAP if this
-    ResourceFileInfo fileMetadata;
 private:
     // Pointer to an associated mask image
     std::shared_ptr<LunaImage> mask;

@@ -1,9 +1,12 @@
 #ifndef NO_SDL
 
+#include <unordered_set>
+#include <unordered_map>
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "SdlMusPlayer.h"
 #include "MusicManager.h"
+#include "../Misc/ResourceFileMapper.h"
 
 /***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
@@ -368,7 +371,8 @@ void PGE_MusPlayer::DeferralLock::Unlock()
 std::string PGE_Sounds::lastError = "";
 char *PGE_Sounds::current = "";
 
-std::map<std::string, Mix_Chunk* > PGE_Sounds::chunksBuffer;
+static CachedFileDataWeakPtr<PGE_Sounds::ChunkStorage> g_chunkCache;
+static std::unordered_set<std::shared_ptr<PGE_Sounds::ChunkStorage>> g_chunkStorage;
 bool PGE_Sounds::overrideArrayIsUsed=false;
 std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
 uint32_t PGE_Sounds::memUsage = 0;
@@ -382,32 +386,50 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
 {
     PGE_SDL_Manager::initSDL();
     std::string filePath = sndFile;
-    std::map<std::string, Mix_Chunk* >::iterator it = chunksBuffer.find(filePath);
-    Mix_Chunk* chunk = NULL;
-    if(it == chunksBuffer.end())
+    
+    CachedFileDataWeakPtr<ChunkStorage>::Entry* cacheEntry = g_chunkCache.get(Str2WStr(filePath));
+    if (cacheEntry == nullptr)
+    {
+        // No file
+        PGE_Sounds::lastError = "Could not open ";
+        PGE_Sounds::lastError += filePath;
+        return nullptr;
+    }
+
+    Mix_Chunk* chunk = nullptr;
+    std::shared_ptr<ChunkStorage> cachePtr = cacheEntry->data.lock();
+    if (cachePtr)
+    {
+        // Use cache entry
+        chunk = cachePtr->mChunk;
+    }
+    else
     {
         chunk = Mix_LoadWAV( sndFile );
 
         // Cache the result regardless of if null or not, so we don't waste time re-reading things we can't read
-        chunksBuffer[filePath] = chunk;
-
-        // Only increment memory usage if we successfully opened something
-        if(chunk) {
-            PGE_Sounds::memUsage += chunk->alen;
-        }
+        cachePtr = std::make_shared<ChunkStorage>(chunk);
+        cacheEntry->data = cachePtr;
     }
-    else
-    {
-        chunk = chunksBuffer[filePath];
-    }
+    g_chunkStorage.insert(cachePtr);
 
-    if (!chunk)
+    if (chunk == nullptr)
     {
         PGE_Sounds::lastError = "Could not read ";
         PGE_Sounds::lastError += filePath;
     }
 
     return chunk;
+}
+
+void PGE_Sounds::holdCached(bool isWorld)
+{
+    g_chunkCache.hold(isWorld);
+}
+
+void PGE_Sounds::releaseCached(bool isWorld)
+{
+    g_chunkCache.release(isWorld);
 }
 
 bool PGE_Sounds::SND_PlaySnd(const char *sndFile)
@@ -431,15 +453,7 @@ void PGE_Sounds::clearSoundBuffer()
     Mix_HaltChannel(-1);
     overrideSettings.clear();
     overrideArrayIsUsed=false;
-    for (std::map<std::string, Mix_Chunk* >::iterator it=chunksBuffer.begin(); it!=chunksBuffer.end(); ++it)
-    {
-        if (it->second)
-        {
-            PGE_Sounds::memUsage -= it->second->alen;
-            Mix_FreeChunk(it->second);
-        }
-    }
-    chunksBuffer.clear();
+    g_chunkStorage.clear();
 }
 
 void PGE_Sounds::setOverrideForAlias(const std::string& alias, Mix_Chunk* chunk)

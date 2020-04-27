@@ -81,16 +81,16 @@ static void resolveImageResource(
             if (episodeGfxTypeDir.length() > 0)
             {
                 if (resource.path.length() == 0)
-                    resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+                    resource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".png");
                 if (resource.path.length() == 0)
-                    resource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"gif");
+                    resource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".gif");
             }
             if (appGfxTypeDir.length() > 0)
             {
                 if (resource.path.length() == 0)
-                    resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+                    resource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L".png");
                 if (resource.path.length() == 0)
-                    resource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"gif");
+                    resource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L".gif");
             }
         }
 
@@ -133,16 +133,16 @@ static void resolveImageResource(
             if (episodeGfxTypeDir.length() > 0)
             {
                 if (maskResource.path.length() == 0)
-                    maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m", L"gif");
+                    maskResource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m.gif");
                 if (maskResource.path.length() == 0)
-                    maskResource = GetResourceFileInfo(episodeGfxTypeDir, fileRoot, L"png");
+                    maskResource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".png");
             }
             if (appGfxTypeDir.length() > 0)
             {
                 if (maskResource.path.length() == 0)
-                    maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot + L"m", L"gif");
+                    maskResource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L"m.gif");
                 if (maskResource.path.length() == 0)
-                    maskResource = GetResourceFileInfo(appGfxTypeDir, fileRoot, L"png");
+                    maskResource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L".png");
             }
         }
         if (maskResource.path.length() > 0) {
@@ -312,7 +312,6 @@ static ImageLoaderCategory* smbxImageLoaderCategories[] = {
 
 void ImageLoader::Run(bool initialLoad)
 {
-
     static std::unordered_map<std::wstring, ResourceFileInfo>* lastResources = nullptr;
     std::unordered_map<std::wstring, ResourceFileInfo>* foundResources = nullptr;
     foundResources = new std::unordered_map<std::wstring, ResourceFileInfo>();
@@ -353,14 +352,14 @@ void ImageLoader::Run(bool initialLoad)
     std::unordered_map<std::wstring, ResourceFileInfo> levelFiles;
     if (levelGfxDir.length() > 0)
     {
-        ListResourceFilesFromDir(levelGfxDir.c_str(), levelFiles);
+        levelFiles = gCachedFileMetadata.listResourceFilesFromDir(levelGfxDir);
     }
 
     // Read episode directory listing
     std::unordered_map<std::wstring, ResourceFileInfo> episodeFiles;
     if (episodePath.length() > 0)
     {
-        ListResourceFilesFromDir(episodePath.c_str(), episodeFiles);
+        episodeFiles = gCachedFileMetadata.listResourceFilesFromDir(episodePath);
     }
 
     // Resolve correct resource file info for each category

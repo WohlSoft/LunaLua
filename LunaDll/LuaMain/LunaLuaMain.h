@@ -171,5 +171,10 @@ private:
     bool m_onStartRan;
 };
 
+namespace CachedReadFile {
+    void clearData();
+    void holdCached(bool isWorld);
+    void releaseCached(bool isWorld);
+};
 
 #endif

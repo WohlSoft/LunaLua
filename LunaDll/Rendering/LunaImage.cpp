@@ -9,45 +9,22 @@
 #include "GL/GLEngineProxy.h"
 #include "../Misc/ResourceFileMapper.h"
 
-static std::unordered_map<std::wstring, std::weak_ptr<LunaImage>> g_lunaImageCache;
-static std::vector<std::shared_ptr<LunaImage>> g_lunaImageHolder;
+static CachedFileDataWeakPtr<LunaImage> g_lunaImageCache;
+static std::mutex g_lunaImageCacheMutex;
 
 std::atomic<uint32_t> LunaImage::totalRawMem = 0;
 std::atomic<uint32_t> LunaImage::totalCompMem = 0;
 
-void LunaImage::holdCachedImages()
+void LunaImage::holdCachedImages(bool isWorld)
 {
-    g_lunaImageHolder.clear();
-    for (auto cacheEntry = g_lunaImageCache.begin(); cacheEntry != g_lunaImageCache.end();)
-    {
-        std::shared_ptr<LunaImage> cachePtr = cacheEntry->second.lock();
-        if (cachePtr)
-        {
-            g_lunaImageHolder.push_back(std::move(cachePtr));
-            cacheEntry++;
-        }
-        else
-        {
-            g_lunaImageCache.erase(cacheEntry++);
-        }
-    }
+    std::unique_lock<std::mutex> lck(g_lunaImageCacheMutex);
+    g_lunaImageCache.hold(isWorld);
 }
 
-void LunaImage::releaseCachedImages()
+void LunaImage::releaseCachedImages(bool isWorld)
 {
-    g_lunaImageHolder.clear();
-    for (auto cacheEntry = g_lunaImageCache.begin(); cacheEntry != g_lunaImageCache.end();)
-    {
-        std::shared_ptr<LunaImage> cachePtr = cacheEntry->second.lock();
-        if (cachePtr)
-        {
-            cacheEntry++;
-        }
-        else
-        {
-            g_lunaImageCache.erase(cacheEntry++);
-        }
-    }
+    std::unique_lock<std::mutex> lck(g_lunaImageCacheMutex);
+    g_lunaImageCache.release(isWorld);
 }
 
 uint64_t LunaImage::getNewUID()
@@ -122,36 +99,22 @@ std::shared_ptr<LunaImage> LunaImage::fromHDC(HDC hdc)
 std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename, const ResourceFileInfo* metadata)
 {
     if ((filename == nullptr) || (filename[0] == L'\0')) return nullptr;
+    std::unique_lock<std::mutex> lck(g_lunaImageCacheMutex);
 
-    // If we have no file metadata, try to get some
-    ResourceFileInfo localMetadata;
-    if ((metadata != nullptr) && (!metadata->done))
+    // Get a cache entry pointer
+    CachedFileDataWeakPtr<LunaImage>::Entry* cacheEntry = g_lunaImageCache.get(filename);
+    if (cacheEntry == nullptr)
     {
-        metadata = nullptr;
-    }
-    if (metadata == nullptr) {
-        localMetadata = GetResourceFileInfo(filename);
-        if (localMetadata.done)
-        {
-            metadata = &localMetadata;
-        }
-    }
-    if (metadata == nullptr)
-    {
+        // No file
         return nullptr;
     }
 
-    auto cacheSearchResult = g_lunaImageCache.find(filename);
-    if (cacheSearchResult != g_lunaImageCache.end())
+    // Check if the cache entry contains data we should use
     {
-        std::shared_ptr<LunaImage> cachePtr = cacheSearchResult->second.lock();
-        if (cachePtr && (cachePtr->fileMetadata == *metadata))
+        std::shared_ptr<LunaImage> cachePtr = cacheEntry->data.lock();
+        if (cachePtr)
         {
             return std::move(cachePtr);
-        }
-        else
-        {
-            g_lunaImageCache.erase(cacheSearchResult);
         }
     }
 
@@ -159,11 +122,13 @@ std::shared_ptr<LunaImage> LunaImage::fromFile(const wchar_t* filename, const Re
     img->load(filename);
     if ((img->getW() == 0) && (img->getH() == 0))
     {
+        // Mark as unusable in cache
+        cacheEntry->metadata.done = false;
         return nullptr;
     }
-    img->fileMetadata = *metadata;
 
-    g_lunaImageCache[filename] = img;
+    // Store pointer to data in the cache
+    cacheEntry->data = img;
 
     return std::move(img);
 }
