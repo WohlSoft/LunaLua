@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <string> 
 #include "ResourceFileMapper.h"
+#include "../GlobalFuncs.h"
 #include <Windows.h>
 
 static void ListResourceFilesFromDir(const std::wstring& searchPath, ResourceFileMap& outData)
@@ -81,8 +82,9 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     return getResourceFileInfo(path, fileName);
 }
 
-const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstring& path, const std::wstring& fileName)
+const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstring& _path, const std::wstring& fileName)
 {
+    std::wstring path = normalizePathSlashes(_path);
     std::wstring lpath = path;
     std::wstring lfile = fileName;
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
@@ -116,9 +118,10 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     return fileIt->second;
 }
 
-ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const std::wstring& searchPath)
+ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const std::wstring& _path)
 {
-    std::wstring lpath = searchPath;
+    std::wstring path = normalizePathSlashes(_path);
+    std::wstring lpath = path;
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
 
@@ -134,7 +137,7 @@ ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const std::wstring&
             return std::move(ResourceFileMap());
         }
         it = emplaceRet.first;
-        ListResourceFilesFromDir(searchPath, it->second);
+        ListResourceFilesFromDir(path, it->second);
     }
 
     return it->second;
