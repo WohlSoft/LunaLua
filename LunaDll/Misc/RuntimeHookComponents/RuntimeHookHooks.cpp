@@ -2316,8 +2316,10 @@ static _declspec(naked) void __stdcall runtimeHookPiranahDivByZeroTrigger()
 _declspec(naked) void __stdcall runtimeHookPiranahDivByZero()
 {
     __asm {
-        JNE runtimeHookPiranahDivByZeroTrigger
+        JNE runtimeHookPiranahDivByZeroTriggerLabel
         RET
+    runtimeHookPiranahDivByZeroTriggerLabel:
+        JMP runtimeHookPiranahDivByZeroTrigger
     }
 }
 
