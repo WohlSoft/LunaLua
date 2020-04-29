@@ -406,8 +406,8 @@ void initAppPaths()
     }
 
     gAppPathWCHAR = fullPath;
-    gAppPathUTF8 = WStr2Str(fullPath);
-    gAppPathANSI = WStr2StrA(fullPath);
+    gAppPathUTF8 = WStr2Str(gAppPathWCHAR);
+    gAppPathANSI = WStr2StrA(gAppPathWCHAR);
 
     // Store intial cwd
     DWORD cwdLen = GetCurrentDirectoryW(0, NULL);

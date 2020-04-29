@@ -28,6 +28,8 @@
 
 #include "../Misc/LoadScreen.h"
 
+#include "LunaPathValidator.h"
+
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
 const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
@@ -147,6 +149,9 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Just to be safe
     shutdown();
+
+    gLunaPathValidator.SetPaths();
+
     //Open up a new Lua State
     L = luaL_newstate();
     //Open all luabind functions

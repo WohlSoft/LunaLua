@@ -6,7 +6,7 @@
 
 static void ListResourceFilesFromDir(const std::wstring& searchPath, ResourceFileMap& outData)
 {
-    std::wstring searchPattern = searchPath + L"/*";
+    std::wstring searchPattern = searchPath + L"\\*";
 
     HANDLE dir;
     WIN32_FIND_DATAW fileData;
@@ -64,15 +64,15 @@ void CachedFileMetadata::purge()
     mSearchPaths.clear();
 }
 
-const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstring& filePath)
+const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const NormalizedPath<std::wstring>& filePath)
 {
     std::wstring path = L"";
     std::wstring fileName = L"";
-    std::wstring::size_type pathIdx = filePath.find_last_of(L"/\\");
+    std::wstring::size_type pathIdx = filePath.str().rfind(L'\\');
     if (pathIdx != std::wstring::npos)
     {
-        path = filePath.substr(0, pathIdx);
-        fileName = filePath.substr(pathIdx + 1);
+        path = filePath.str().substr(0, pathIdx);
+        fileName = filePath.str().substr(pathIdx + 1);
     }
     else
     {
@@ -82,11 +82,10 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     return getResourceFileInfo(path, fileName);
 }
 
-const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstring& _path, const std::wstring& fileName)
+const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstring& path, const std::wstring& file)
 {
-    std::wstring path = normalizePathSlashes(_path);
     std::wstring lpath = path;
-    std::wstring lfile = fileName;
+    std::wstring lfile = file;
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
     std::transform(lfile.begin(), lfile.end(), lfile.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
@@ -118,9 +117,8 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     return fileIt->second;
 }
 
-ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const std::wstring& _path)
+ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const NormalizedPath<std::wstring>& path)
 {
-    std::wstring path = normalizePathSlashes(_path);
     std::wstring lpath = path;
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
@@ -143,7 +141,7 @@ ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const std::wstring&
     return it->second;
 }
 
-bool CachedFileMetadata::checkUpdateFile(const std::wstring& filePath, ResourceFileInfo& fileInfo)
+bool CachedFileMetadata::checkUpdateFile(const NormalizedPath<std::wstring>& filePath, ResourceFileInfo& fileInfo)
 {
     const ResourceFileInfo newInfo = getResourceFileInfo(filePath);
 
@@ -156,7 +154,7 @@ bool CachedFileMetadata::checkUpdateFile(const std::wstring& filePath, ResourceF
     return false;
 }
 
-bool CachedFileMetadata::exists(const std::wstring& filePath)
+bool CachedFileMetadata::exists(const NormalizedPath<std::wstring>& filePath)
 {
     const ResourceFileInfo newInfo = getResourceFileInfo(filePath);
     return newInfo.done;

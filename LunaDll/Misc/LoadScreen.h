@@ -5,5 +5,6 @@ void LunaLoadScreenStart();
 void LunaLoadScreenKill();
 void LunaLoadScreenSetEnable(bool skip);
 bool LunaLoadScreenIsActive();
+bool LunaLoadScreenIsCurrentThread();
 
 #endif

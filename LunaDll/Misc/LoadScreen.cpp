@@ -9,6 +9,7 @@
 #include "../Rendering/Rendering.h"
 #include <lua.hpp>
 #include "LoadScreen.h"
+#include "../LuaMain/LunaPathValidator.h"
 
 static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
@@ -209,6 +210,9 @@ void LunaLoadScreenStart()
     // point is probably good enough.
     g_GLEngine.ClearTextures();
 
+    // Set path validator paths
+    gLunaPathValidatorLoadscreen.SetPaths();
+
     killThreadFlag = false;
     loadThread = new std::thread(LoadThread);
 }
@@ -284,4 +288,10 @@ void LunaLoadScreenSetEnable(bool skip)
             patches[idx]->Unapply();
         }
     }
+}
+
+bool LunaLoadScreenIsCurrentThread()
+{
+    if (!loadThread) return false;
+    return (loadThread->get_id() == std::this_thread::get_id());
 }

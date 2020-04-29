@@ -40,8 +40,8 @@ static bool checkDirectoryExistance(const std::wstring& path)
 }
 
 static void resolveImageResource(
-    const std::wstring& appGfxTypeDir,
-    const std::wstring& episodeGfxTypeDir,
+    const NormalizedPath<std::wstring>& appGfxTypeDir,
+    const NormalizedPath<std::wstring>& episodeGfxTypeDir,
     const std::wstring& fileRoot,
     const std::unordered_map<std::wstring, ResourceFileInfo>& levelFiles,
     const std::unordered_map<std::wstring, ResourceFileInfo>& episodeFiles,
@@ -78,14 +78,14 @@ static void resolveImageResource(
         }
         else
         {
-            if (episodeGfxTypeDir.length() > 0)
+            if (episodeGfxTypeDir.str().length() > 0)
             {
                 if (resource.path.length() == 0)
                     resource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".png");
                 if (resource.path.length() == 0)
                     resource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".gif");
             }
-            if (appGfxTypeDir.length() > 0)
+            if (appGfxTypeDir.str().length() > 0)
             {
                 if (resource.path.length() == 0)
                     resource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L".png");
@@ -130,14 +130,14 @@ static void resolveImageResource(
         }
         else
         {
-            if (episodeGfxTypeDir.length() > 0)
+            if (episodeGfxTypeDir.str().length() > 0)
             {
                 if (maskResource.path.length() == 0)
                     maskResource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L"m.gif");
                 if (maskResource.path.length() == 0)
                     maskResource = gCachedFileMetadata.getResourceFileInfo(episodeGfxTypeDir, fileRoot + L".png");
             }
-            if (appGfxTypeDir.length() > 0)
+            if (appGfxTypeDir.str().length() > 0)
             {
                 if (maskResource.path.length() == 0)
                     maskResource = gCachedFileMetadata.getResourceFileInfo(appGfxTypeDir, fileRoot + L"m.gif");
@@ -163,8 +163,8 @@ void ImageLoaderCategory::resolveResources(
     std::wstring prefix = m_Category.getPrefix();
 
     std::wstring gfxTypeSubdir = std::wstring(m_Category.getFolderPrefix());
-    std::wstring appGfxTypeDir = (appGfxDir.length() > 0) ? appGfxDir + L"/" + gfxTypeSubdir : L"";
-    std::wstring episodeGfxTypeDir = (episodeGfxDir.length() > 0) ? episodeGfxDir + L"/" + gfxTypeSubdir : L"";
+    NormalizedPath<std::wstring> appGfxTypeDir = (appGfxDir.length() > 0) ? appGfxDir + L"/" + gfxTypeSubdir : L"";
+    NormalizedPath<std::wstring> episodeGfxTypeDir = (episodeGfxDir.length() > 0) ? episodeGfxDir + L"/" + gfxTypeSubdir : L"";
 
     for (uint32_t idx = firstIdx; idx <= lastIdx; idx++)
     {

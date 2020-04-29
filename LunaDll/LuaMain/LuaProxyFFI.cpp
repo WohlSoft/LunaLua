@@ -21,6 +21,7 @@
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
 #include "LunaLuaMain.h"
+#include "LunaPathValidator.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -464,6 +465,10 @@ typedef struct ExtendedNPCFields_\
         CLunaFFILock ffiLock(__FUNCTION__);
         std::unique_lock<std::mutex> lck(readFileMutex);
 
+        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
+        if (!ptr) return nullptr;
+        path = ptr->path;
+
         std::wstring wpath = Str2WStr(path);
         CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
         if (cacheEntry == nullptr)
@@ -515,6 +520,10 @@ typedef struct ExtendedNPCFields_\
     FFI_EXPORT(bool) LunaLuaCachedExists(const char* path)
     {
         CLunaFFILock ffiLock(__FUNCTION__);
+
+        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
+        if (!ptr) return false;
+
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
     }
@@ -536,4 +545,11 @@ void CachedReadFile::releaseCached(bool isWorld)
 {
     std::unique_lock<std::mutex> lck(readFileMutex);
     g_lunaFileCache.release(isWorld);
+}
+
+extern "C" {
+    FFI_EXPORT(LunaPathValidator::Result*) LunaLuaMakeSafeAbsolutePath(const char* path)
+    {
+        return LunaPathValidator::GetForThread().CheckPath(path);
+    }
 }

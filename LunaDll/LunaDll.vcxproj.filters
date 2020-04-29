@@ -697,6 +697,9 @@
     <ClInclude Include="Input\LunaGameController.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="LuaMain\LunaPathValidator.h">
+      <Filter>LuaMain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1306,6 +1309,9 @@
     </ClCompile>
     <ClCompile Include="Input\LunaGameController.cpp">
       <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMain\LunaPathValidator.cpp">
+      <Filter>LuaMain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

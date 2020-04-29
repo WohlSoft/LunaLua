@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <mutex>
+#include "../GlobalFuncs.h"
 
 class ResourceFileInfo {
 public:
@@ -47,11 +48,11 @@ public:
     CachedFileMetadata();
     ~CachedFileMetadata();
     void purge();
-    const ResourceFileInfo getResourceFileInfo(const std::wstring& filePath);
+    const ResourceFileInfo getResourceFileInfo(const NormalizedPath<std::wstring>& filePath);
     const ResourceFileInfo getResourceFileInfo(const std::wstring& path, const std::wstring& fileName);
-    ResourceFileMap listResourceFilesFromDir(const std::wstring& searchPath);
-    bool checkUpdateFile(const std::wstring& filePath, ResourceFileInfo& fileInfo);
-    bool exists(const std::wstring& filePath);
+    ResourceFileMap listResourceFilesFromDir(const NormalizedPath<std::wstring>& searchPath);
+    bool checkUpdateFile(const NormalizedPath<std::wstring>& filePath, ResourceFileInfo& fileInfo);
+    bool exists(const NormalizedPath<std::wstring>& filePath);
 };
 
 // Global instance
@@ -126,12 +127,9 @@ public:
         }
     }
 
-    Entry* CachedFileDataWeakPtr::get(const std::wstring& filePath)
+    Entry* CachedFileDataWeakPtr::get(const NormalizedPath<std::wstring>& filePath)
     {
-        std::wstring lpath = filePath;
-        std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
-
-        auto& it = mCache.find(lpath);
+        auto& it = mCache.find(filePath);
 
         if (it == mCache.end())
         {
@@ -145,7 +143,7 @@ public:
             }
 
             // Add an entry
-            auto emplaceRet = mCache.emplace(lpath, fileInfo);
+            auto emplaceRet = mCache.emplace(filePath, fileInfo);
             if (!emplaceRet.second)
             {
                 return nullptr;
