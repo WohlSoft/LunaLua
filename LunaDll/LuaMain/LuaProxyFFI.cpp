@@ -550,6 +550,7 @@ void CachedReadFile::releaseCached(bool isWorld)
 extern "C" {
     FFI_EXPORT(LunaPathValidator::Result*) LunaLuaMakeSafeAbsolutePath(const char* path)
     {
+        if (!path) return nullptr;
         return LunaPathValidator::GetForThread().CheckPath(path);
     }
 }
