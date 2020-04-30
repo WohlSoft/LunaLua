@@ -56,12 +56,16 @@ CachedFileMetadata::CachedFileMetadata() :
 
 CachedFileMetadata::~CachedFileMetadata()
 {
+    for (auto& it : mSearchPaths)
+    {
+        FindCloseChangeNotification(it.second.changeHandle);
+        it.second.changeHandle = INVALID_HANDLE_VALUE;
+    }
 }
 
 void CachedFileMetadata::purge()
 {
-    std::unique_lock<std::mutex> lck(mMutex);
-    mSearchPaths.clear();
+    // Nothing to do here now, we listen for filesystem metadata updates
 }
 
 const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const NormalizedPath<std::wstring>& filePath)
@@ -95,17 +99,40 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     if (it == mSearchPaths.end())
     {
         // Don't have this search path searched yet, so search it
-        auto emplaceRet = mSearchPaths.emplace(lpath, ResourceFileMap());
+        // Get change notification handle
+        HANDLE changeHandle = FindFirstChangeNotificationW(path.c_str(), FALSE, (
+            FILE_NOTIFY_CHANGE_FILE_NAME |
+            FILE_NOTIFY_CHANGE_SIZE |
+            FILE_NOTIFY_CHANGE_LAST_WRITE
+            ));
+        if (changeHandle == INVALID_HANDLE_VALUE)
+        {
+            // Couldn't get change handle
+            return emptyFileInfo;
+        }
+
+        auto emplaceRet = mSearchPaths.emplace(lpath, changeHandle);
         if (!emplaceRet.second)
         {
             // Couldn't insert
+            FindCloseChangeNotification(changeHandle);
             return emptyFileInfo;
         }
         it = emplaceRet.first;
-        ListResourceFilesFromDir(path, it->second);
+        ListResourceFilesFromDir(path, it->second.map);
+    }
+    else
+    {
+        // Check if there's an update in the directory?
+        if (WaitForSingleObject(it->second.changeHandle, 0) == WAIT_OBJECT_0)
+        {
+            FindNextChangeNotification(it->second.changeHandle);
+            it->second.map.clear();
+            ListResourceFilesFromDir(path, it->second.map);
+        }
     }
 
-    const ResourceFileMap& fileMap = it->second;
+    const ResourceFileMap& fileMap = it->second.map;
     auto& fileIt = fileMap.find(lfile);
 
     if (fileIt == fileMap.end())
@@ -117,8 +144,13 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     return fileIt->second;
 }
 
-ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const NormalizedPath<std::wstring>& path)
+ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const NormalizedPath<std::wstring>& _path)
 {
+    std::wstring path = _path;
+    while ((path.length() > 0) && (path[path.length() - 1] == L'\\'))
+    {
+        path.resize(path.length() - 1);
+    }
     std::wstring lpath = path;
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
@@ -128,17 +160,40 @@ ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const NormalizedPat
     if (it == mSearchPaths.end())
     {
         // Don't have this search path searched yet, so search it
-        auto emplaceRet = mSearchPaths.emplace(lpath, ResourceFileMap());
+        // Get change notification handle
+        HANDLE changeHandle = FindFirstChangeNotificationW(path.c_str(), FALSE, (
+            FILE_NOTIFY_CHANGE_FILE_NAME |
+            FILE_NOTIFY_CHANGE_SIZE |
+            FILE_NOTIFY_CHANGE_LAST_WRITE
+            ));
+        if (changeHandle == INVALID_HANDLE_VALUE)
+        {
+            // Couldn't get change handle
+            return std::move(ResourceFileMap());;
+        }
+
+        auto emplaceRet = mSearchPaths.emplace(lpath, changeHandle);
         if (!emplaceRet.second)
         {
             // Couldn't insert
+            FindCloseChangeNotification(changeHandle);
             return std::move(ResourceFileMap());
         }
         it = emplaceRet.first;
-        ListResourceFilesFromDir(path, it->second);
+        ListResourceFilesFromDir(path, it->second.map);
+    }
+    else
+    {
+        // Check if there's an update in the directory?
+        if (WaitForSingleObject(it->second.changeHandle, 0) == WAIT_OBJECT_0)
+        {
+            FindNextChangeNotification(it->second.changeHandle);
+            it->second.map.clear();
+            ListResourceFilesFromDir(path, it->second.map);
+        }
     }
 
-    return it->second;
+    return it->second.map;
 }
 
 bool CachedFileMetadata::checkUpdateFile(const NormalizedPath<std::wstring>& filePath, ResourceFileInfo& fileInfo)

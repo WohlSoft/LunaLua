@@ -42,8 +42,18 @@ typedef std::unordered_map<std::wstring, ResourceFileInfo> ResourceFileMap;
 class CachedFileMetadata
 {
 private:
+    struct DirEntry
+    {
+        HANDLE changeHandle;
+        ResourceFileMap map;
+        DirEntry(HANDLE _changeHandle) :
+            changeHandle(_changeHandle), map()
+        {
+        }
+    };
+
     std::mutex mMutex;
-    std::unordered_map<std::wstring, ResourceFileMap> mSearchPaths;
+    std::unordered_map<std::wstring, DirEntry> mSearchPaths;
 public:
     CachedFileMetadata();
     ~CachedFileMetadata();
