@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL, true);
     QApplication a(argc, argv);
     MainLauncherWindow w;
-    w.init("launcher.ini");
+    w.init("config/launcher.ini");
     w.show();
     w.initSize();
 
