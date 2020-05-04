@@ -116,8 +116,9 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
         // Init Config-Txt
         VB6StrPtr customFolderVB6 = customFolder;
-        /* TODO: Implement custom NPCtxt parser over PGE File Library */
-        native_loadNPCConfig(&customFolderVB6);
+        
+        // Lua code reads npc-*.txt files now, no longer need this
+        //native_loadNPCConfig(&customFolderVB6);
     }
 
     // Load Episode GFX
