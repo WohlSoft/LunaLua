@@ -1801,19 +1801,12 @@ void __stdcall runtimeHookCloseWindow(void)
 
 void __stdcall runtimeHookChangeResolution(void* arg1, void* arg2, void* arg3, void* arg4)
 {
-    if (!gGeneralConfig.getForceDisableFullscreen())
-    {
-        native_applyFullscreen(arg1, arg2, arg3, arg4);
-    }
-    return;
+    native_applyFullscreen(arg1, arg2, arg3, arg4);
 }
 
 static void __stdcall runtimeHookSmbxCheckWindowed(void)
 {
-    if (gGeneralConfig.getForceDisableFullscreen())
-    {
-        GM_UNK_WINDOWED = COMBOOL(true);
-    }
+    GM_UNK_WINDOWED = COMBOOL(true);
 }
 __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
 {

@@ -16,7 +16,6 @@ void GeneralLunaConfig::doDefaults()
     m_renderer_opengl = GLModeAuto;
     m_renderer_vsync = VSyncModeOff;
     m_renderer_useLetterbox = true;
-    m_renderer_forceDisableFullscreen = false;
     m_audio_samplerate = 44100;
     m_audio_bufferlen = 2048;
     m_audio_driver = "default";
@@ -51,8 +50,6 @@ bool GeneralLunaConfig::save()
 
     generalConfig.SetBoolValue(L"Renderer", L"use_letterbox", m_renderer_useLetterbox, L"# Choose true if you want to use forced 4:3. Otherwise it will use the default scretch mode.", true);
     
-    generalConfig.SetBoolValue(L"Renderer", L"force_disable_fullscreen", m_renderer_forceDisableFullscreen, L"# Choose true to disable the engine's fullscreen feature, in case it's acting up.", true);
-
     generalConfig.SetLongValue(L"Audio", L"sample_rate", m_audio_samplerate, L"# Native audio sample rate for the engine. Default is 44100Hz");
 
     generalConfig.SetLongValue(L"Audio", L"buffer_length", m_audio_bufferlen, L"# Audio buffer length. Default is 2048. Smaller may be lower latency but carries risk of audio issues.");
@@ -109,7 +106,6 @@ bool GeneralLunaConfig::load()
     }
 
     m_renderer_useLetterbox = configToLoad.GetBoolValue(L"Renderer", L"use_letterbox", true);
-    m_renderer_forceDisableFullscreen = configToLoad.GetBoolValue(L"Renderer", L"force_disable_fullscreen", false);
     m_audio_samplerate = configToLoad.GetLongValue(L"Audio", L"sample_rate", 44100);
     m_audio_bufferlen = configToLoad.GetLongValue(L"Audio", L"buffer_length", 2048);
     m_audio_driver = WStr2Str(configToLoad.GetValue(L"Audio", L"driver", L"default"));

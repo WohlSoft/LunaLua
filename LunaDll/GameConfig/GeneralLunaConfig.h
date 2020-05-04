@@ -24,7 +24,6 @@ private:
     GLMode      m_renderer_opengl;
     VSyncMode   m_renderer_vsync;
     bool        m_renderer_useLetterbox;
-    bool        m_renderer_forceDisableFullscreen;
     int         m_audio_samplerate;
     int         m_audio_bufferlen;
     std::string m_audio_driver;
@@ -50,8 +49,6 @@ public:
     inline VSyncMode getRendererVSync() const { return m_renderer_vsync; }
     inline void setRendererUseLetterbox(bool rendererUseLetterbox) { m_renderer_useLetterbox = rendererUseLetterbox; }
     inline bool getRendererUseLetterbox() const { return m_renderer_useLetterbox; }
-    inline void setForceDisableFullscreen(bool forceDisableFullscreen) { m_renderer_forceDisableFullscreen = forceDisableFullscreen; }
-    inline bool getForceDisableFullscreen() const { return m_renderer_forceDisableFullscreen; }
     inline int getAudioSampleRate() const { return m_audio_samplerate; }
     inline int getAudioBufferLength() const { return m_audio_bufferlen; }
     inline std::string getAudioDriver() const { return m_audio_driver; }
