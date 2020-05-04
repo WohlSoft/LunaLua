@@ -110,7 +110,7 @@ T normalizeToBackslashAndResolvePath(const T& path)
             )
         {
             // Remove the prior segment from output
-            outIdx -= 2;
+            outIdx -= 3;
             for (; outIdx > 0; outIdx--)
             {
                 if (ret[outIdx - 1] == '\\') break;
