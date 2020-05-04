@@ -661,23 +661,50 @@ std::wstring resolveCwdOrWorldsPath(const std::wstring& path)
 
 std::wstring resolveIfNotAbsolutePath(std::wstring filename)
 {
-    if (!isAbsolutePath(filename)) {
-        return getCustomFolderPath() + filename;
-    }
-    else
-    {
+    if (isAbsolutePath(filename)) {
         return filename;
     }
+
+    std::vector<std::wstring> paths = {
+        getCustomFolderPath(),
+        GM_FULLDIR,
+        gAppPathWCHAR + L"\\scripts\\",
+        gAppPathWCHAR
+    };
+
+    for (std::wstring nextSearchPath : paths) {
+        std::wstring nextEntry = nextSearchPath + filename;
+        DWORD objectAttributes = GetFileAttributesW(nextEntry.c_str());
+        if (objectAttributes == INVALID_FILE_ATTRIBUTES) continue;
+        if (objectAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+        return nextEntry;
+    }
+
+    return filename;
 }
 
 std::string resolveIfNotAbsolutePath(std::string filename) {
-    if (!isAbsolutePath(filename)) {
-        return WStr2Str(getCustomFolderPath()) + filename;
-    }
-    else
-    {
+    if (isAbsolutePath(filename)) {
         return filename;
     }
+
+    std::vector<std::wstring> paths = {
+        getCustomFolderPath(),
+        GM_FULLDIR,
+        gAppPathWCHAR + L"\\scripts\\",
+        gAppPathWCHAR
+    };
+
+    std::wstring wFilename = Str2WStr(filename);
+    for (std::wstring nextSearchPath : paths) {
+        std::wstring nextEntry = nextSearchPath + wFilename;
+        DWORD objectAttributes = GetFileAttributesW(nextEntry.c_str());
+        if (objectAttributes == INVALID_FILE_ATTRIBUTES) continue;
+        if (objectAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
+        return WStr2Str(nextEntry);
+    }
+
+    return filename;
 }
 
 
