@@ -863,10 +863,17 @@ std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 
 std::wstring getLatestConfigFile(const std::wstring& configname)
 {
-    return getLatestFile({
+    std::wstring ret = getLatestFile({
         gAppPathWCHAR + L"/" + configname,
         gAppPathWCHAR + L"/config/" + configname
     });
+    
+    if (ret.empty())
+    {
+        ret = gAppPathWCHAR + L"/config/" + configname;
+    }
+
+    return ret;
 }
 
 void InitDebugConsole()

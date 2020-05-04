@@ -68,7 +68,10 @@ bool GeneralLunaConfig::save()
 void GeneralLunaConfig::loadOrDefault()
 {
     if (!load())
+    {
         doDefaults();
+        save();
+    }
 }
 
 bool GeneralLunaConfig::load()
