@@ -46,6 +46,8 @@ std::string WStr2StrA(const std::wstring &wstr);
  */
 std::wstring StrA2WStr(const std::string &str);
 
+std::wstring GetNonANSICharsFromWStr(const std::wstring& wstr);
+
 std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen);
 std::string ConvertBSTRToMBS(BSTR bstr);
 BSTR ConvertMBSToBSTR(const std::string & str);

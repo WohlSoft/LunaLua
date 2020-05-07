@@ -141,7 +141,20 @@ static bool testModeSetupForLoading()
     // Check that the file exists, but only if we don't have raw level data
     if ((testModeData.levelRawData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
-        return false;
+        std::wstring path = L"Could not find level file.\n\nPath:\n" + path;
+        MessageBoxW(0, path.c_str(), L"SMBX could not read level file", MB_ICONERROR);
+        _exit(1);
+    }
+
+    // Check episode path
+    size_t pos = path.find_last_of(L"/\\");
+    std::wstring episodePath = path.substr(0, pos + 1);
+    std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(episodePath);
+    if (!nonAnsiCharsEpisode.empty())
+    {
+        std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + episodePath;
+        MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
+        _exit(1);
     }
 
     // Start by stopping any Lua things
@@ -183,18 +196,17 @@ static bool testModeSetupForLoading()
     }
 
     // Overwrite episode list data
-    size_t pos = path.find_last_of(L"/\\");
     GM_EP_LIST_COUNT = 1;
     EpisodeListItem* ep = EpisodeListItem::GetRaw(0);
     ep->episodeName = "Test Mode";
-    ep->episodePath = path.substr(0, pos+1);
+    ep->episodePath = episodePath;
     ep->episodeWorldFile = "";
     ep->unknown_C = 0;
     ep->unknown_10 = 0;
     ep->unknown_14 = 0;
 
     // Set episode path...
-    GM_FULLDIR = path.substr(0, pos + 1);
+    GM_FULLDIR = episodePath;
 
     // God Mode cheat code
     GM_PLAYER_INVULN = COMBOOL(testModeSettings.godMode);

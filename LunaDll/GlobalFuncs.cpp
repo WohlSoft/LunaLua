@@ -207,6 +207,22 @@ std::wstring StrA2WStr(const std::string &str)
     return dest;
 }
 
+std::wstring GetNonANSICharsFromWStr(const std::wstring& wstr)
+{
+    std::wstring ansi = StrA2WStr(WStr2StrA(wstr));
+    std::wstring mismatches;
+
+    for (int i = 0; (i < wstr.size()) && (i < ansi.size()); i++)
+    {
+        if (wstr[i] != ansi[i])
+        {
+            mismatches += wstr[i];
+        }
+    }
+
+    return mismatches;
+}
+
 std::string ConvertWCSToMBS(const wchar_t * pstr, long wslen)
 {
     int len = ::WideCharToMultiByte(CP_ACP, 0, pstr, wslen, NULL, 0, NULL, NULL);
@@ -386,23 +402,15 @@ void initAppPaths()
     HMODULE hModule = GetModuleHandleW(NULL);
     wchar_t fullPath[MAX_PATH];
     int count = GetModuleFileNameW(hModule, fullPath, MAX_PATH);
-
-    //Check is path has a mixed charsets
-    std::string apath=WStr2StrA(fullPath);
-    FILE *mainexe=fopen(apath.c_str(), "r");
     removeFilePathW(fullPath, count);
 
-    if(!mainexe)
+    // Check for path having characters which are not compatible with the system default Windows ANSI code page
+    std::wstring nonAnsiChars = GetNonANSICharsFromWStr(fullPath);
+    if (!nonAnsiChars.empty())
     {
-        std::wstringstream msg;
-        msg << L"LunaLUA is located in a path which contains mixed charsets (for example, your locale is configured to Europan, "
-            << L"but in the path are Cyrillic or Chinese characters which are not fits into your local charset). "
-            << L"SMBX will crash if you will continue running of it.\n\nPlease move SMBX folder into path which has "
-            << L" only characters of your current locale or ASCII-only to avoid this warning message.\n\nDetected full path:\n"
-            << fullPath;
-        MessageBoxW(NULL, msg.str().c_str(), L"Mixed charsets in path has been detected", MB_OK|MB_ICONWARNING);
-    } else {
-        fclose(mainexe);
+        std::wstring path = L"SMBX2 has been installed in a path with characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please install SMBX2 in a location without unsupported characters.\n\nUnsupported characters: " + nonAnsiChars + L"\n\nPath:\n" + fullPath;
+        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        _exit(1);
     }
 
     gAppPathWCHAR = fullPath;
