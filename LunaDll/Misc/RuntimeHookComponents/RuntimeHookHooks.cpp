@@ -3689,3 +3689,11 @@ void __stdcall runtimeHookPlayerKill(short* playerIdxPtr)
         killPlayer_OrigFunc(playerIdxPtr);
     }
 }
+
+void __stdcall runtimeHookDrawBackground(short* section, short* camera)
+{
+    if (gRenderBackgroundFlag)
+    {
+        native_drawBackground(section, camera);
+    }
+}

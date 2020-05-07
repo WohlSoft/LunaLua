@@ -168,6 +168,12 @@ extern "C" {
         gRenderSizableFlag = val;
     }
 
+    FFI_EXPORT(void) LunaLuaSetBackgroundRenderFlag(bool val)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        gRenderBackgroundFlag = val;
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetLevelCustomParams(void)
     {
         CLunaFFILock ffiLock(__FUNCTION__);

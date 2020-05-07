@@ -111,6 +111,7 @@ bool CLunaLua::shutdown()
     SetSMBXFrameTimingDefault();
     gRenderBGOFlag = true;
     gRenderSizableFlag = true;
+    gRenderBackgroundFlag = true;
     gDisablePlayerFilterBounceFix = false;
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();

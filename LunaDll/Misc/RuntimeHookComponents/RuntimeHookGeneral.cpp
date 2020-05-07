@@ -657,7 +657,7 @@ void TrySkipPatch()
     PATCH(0xA53053).NOPS<5>().Apply(); // Link shield case
 
     // Level rendering layering hooks
-
+    PATCH(0x90D70D).CALL(runtimeHookDrawBackground).Apply();
     //PATCH(0x90C856).NOP().NOP().CALL(GetRenderBelowPriorityHook<-95>()).Apply();
     //-100: Level Background
     PATCH(0x90F4FA).NOP().NOP().CALL(GetRenderBelowPriorityHookWithSkip<-95, 0x910433, &gRenderBGOFlag>()).Apply();

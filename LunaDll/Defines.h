@@ -820,6 +820,8 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 
 #define GF_LOAD_DEFAULT_CONTROLS 0x008E6700
 
+#define GF_DRAW_BACKGROUND 0x00954F50
+
 DEFMEM(GF_RTC_DO_EVENTS, void*, 0x004010B8);
 
 static const auto native_initStaticVals = (void(__stdcall *)())GF_INIT_STATIC_VALS;
@@ -911,6 +913,8 @@ static const auto native_applyFullscreen = (void(__stdcall *)(void* arg1, void* 
 static const auto native_loadDefaultControls = (void(__stdcall *)(void))GF_LOAD_DEFAULT_CONTROLS;
 
 static const auto native_initNPC = (int(__stdcall *)(short* npcId, float* dir, void* arg3))GF_INIT_NPC;
+
+static const auto native_drawBackground = (void(__stdcall *)(short* section, short* camera))GF_DRAW_BACKGROUND;
 
 /*
 Function name

@@ -102,6 +102,7 @@ extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
+extern bool            gRenderBackgroundFlag;
 
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;

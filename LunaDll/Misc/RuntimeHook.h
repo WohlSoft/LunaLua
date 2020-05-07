@@ -479,5 +479,7 @@ void __stdcall runtimeHookLevelPauseCheck(void);
 void __stdcall runtimeHookPlayerHarm(void);
 void __stdcall runtimeHookPlayerKill(short* playerIdxPtr);
 
+void __stdcall runtimeHookDrawBackground(short* section, short* camera);
+
 #endif
 
