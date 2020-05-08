@@ -4,6 +4,7 @@
 #include "../GlobalFuncs.h"
 #include "../Misc/MiscFuncs.h"
 #include "../FileManager/SMBXFileManager.h"
+#include "../libs/PGE_File_Formats/file_formats.h"
 
 // Patch for making introLoop skip to the right place
 static auto skipIntoPatch = PATCH(0x8CA6A4).JMP(0x8CD13C).NOP_PAD_TO_SIZE<7>();
@@ -71,6 +72,21 @@ bool GameAutostart::applyAutostart()
         if (!nonAnsiCharsFullPath.empty())
         {
             std::wstring path = L"The world map filename has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename your world map file.\n\nUnsupported characters: " + nonAnsiCharsFullPath + L"\n\nPath:\n" + fullPath;
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
+
+        WorldData wldData;
+        if (!FileFormats::OpenWorldFileHeader(WStr2Str(fullPath), wldData) || !wldData.meta.ReadFileValid)
+        {
+            std::wstring path = L"The world map file header cannot be parsed.\n\nPath:\n" + fullPath;
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
+
+        if (wldData.meta.RecentFormat != WorldData::SMBX64)
+        {
+            std::wstring path = L"The world map file is in the wrong format. It must be saved in SMBX64 format.\n\nPath:\n" + fullPath;
             MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
