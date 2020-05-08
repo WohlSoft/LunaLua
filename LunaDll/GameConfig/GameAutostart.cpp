@@ -3,6 +3,7 @@
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../Misc/MiscFuncs.h"
+#include "../FileManager/SMBXFileManager.h"
 
 // Patch for making introLoop skip to the right place
 static auto skipIntoPatch = PATCH(0x8CA6A4).JMP(0x8CD13C).NOP_PAD_TO_SIZE<7>();
@@ -76,7 +77,7 @@ bool GameAutostart::applyAutostart()
     }
 
     //load all episodes
-    native_loadWorldList();
+    SMBXWorldFileBase::PopulateEpisodeList();
     VB6StrPtr toSearchItem = selectedEpisode;
     std::vector<EpisodeListItem*> allEpisodes = EpisodeListItem::GetAll();
     bool foundEpisode = false;
@@ -114,9 +115,11 @@ bool GameAutostart::applyAutostart()
         item->episodeName = L"External Episode";
         item->episodePath = wldPath;
         item->episodeWorldFile = wldFile;
-        item->unknown_C = 0;
-        item->unknown_10 = 0;
-        item->unknown_14 = 0;
+        for (int i = 0; i < 5; i++)
+        {
+            item->blockChar[i] = 0;
+        }
+        item->padding_16 = 0;
 
         foundEpisode = true;
     }

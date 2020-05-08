@@ -3,6 +3,7 @@
 #include "SMBXFileManager.h"
 #include "../Misc/MiscFuncs.h"
 #include "../Main.h"
+#include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../Defines.h"
 #include "../Rendering/ImageLoader.h"
@@ -21,6 +22,7 @@
 #include "../SMBXInternal/Layer.h"
 #include "../SMBXInternal/SMBXEvents.h"
 
+#include <DirManager/dirman.h>
 
 SMBXLevelFileBase::SMBXLevelFileBase() :
     m_isValid(false)
@@ -146,3 +148,83 @@ void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, LevelData &outData, c
     LunaLua_loadLevelFile(outData, fakePath, m_isValid);
 }
 
+void SMBXWorldFileBase::PopulateEpisodeList()
+{
+    static const std::vector<std::string> wldExtensions({".wld", ".wldx"});
+    std::string worldsPath = normalizeToBackslashAndResolvePath<std::string>(gAppPathUTF8 + "\\worlds");
+    DirMan worldDir(worldsPath);
+
+    // Reset episode count
+    GM_EP_LIST_COUNT = 0;
+
+    // Get list of (potential) episode folders
+    std::vector<std::string> episodeDirs;
+    if (!worldDir.getListOfFolders(episodeDirs))
+    {
+        // Couldn't read dir
+        return;
+    }
+
+    // Walk all (potential) episode folders
+    for (const std::string& epDirName : episodeDirs)
+    {
+        std::string epPath = worldsPath + "\\" + epDirName;
+        DirMan epDir(epPath);
+        std::vector<std::string> wldFiles;
+        if (!epDir.getListOfFiles(wldFiles, wldExtensions))
+        {
+            // Couldn't read dir
+            continue;
+        }
+
+        // Walk all *.wld files in episode folder
+        for (const std::string& wldName : wldFiles)
+        {
+            std::string wldPath = epPath + "\\" + wldName;
+            WorldData wldData;
+
+            if (!FileFormats::OpenWorldFileHeader(wldPath, wldData) || !wldData.meta.ReadFileValid)
+            {
+                // Couldn't read file
+                continue;
+            }
+
+            if (wldData.meta.RecentFormat != WorldData::SMBX64)
+            {
+                // Wrong .wld format, we don't handle it right now
+                continue;
+            }
+
+            // Make sure the .wld path is something we can handle
+            std::wstring nonAnsiCharsFullPath = GetNonANSICharsFromWStr(Str2WStr(wldPath));
+            if (!nonAnsiCharsFullPath.empty())
+            {
+                // The .wld path contains characters we can't currently deal with
+                continue;
+            }
+
+            // Make new episode list entry
+            int newIdx = GM_EP_LIST_COUNT;
+            GM_EP_LIST_COUNT++;
+            EpisodeListItem* ep = EpisodeListItem::GetRaw(newIdx);
+            ep->episodeName = wldData.EpisodeTitle;
+            ep->episodePath = epPath + "\\";
+            ep->episodeWorldFile = wldName;
+            for (int i = 0; i < 5; i++)
+            {
+                if (i < wldData.nocharacter.size())
+                {
+                    ep->blockChar[i] = COMBOOL(wldData.nocharacter[i]);
+                }
+                else
+                {
+                    ep->blockChar[i] = 0;
+                }
+            }
+            ep->padding_16 = 0;
+
+            // We're done after we get our first success per episode folder
+            break;
+        }
+    }
+}

@@ -38,5 +38,9 @@ protected:
     bool m_isValid;
 };
 
+class SMBXWorldFileBase {
+public:
+    static void PopulateEpisodeList();
+};
 
 #endif

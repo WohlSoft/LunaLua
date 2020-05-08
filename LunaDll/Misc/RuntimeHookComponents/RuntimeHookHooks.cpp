@@ -3697,3 +3697,8 @@ void __stdcall runtimeHookDrawBackground(short* section, short* camera)
         native_drawBackground(section, camera);
     }
 }
+
+void __stdcall runtimeHookLoadWorldList(void)
+{
+    SMBXWorldFileBase::PopulateEpisodeList();
+}

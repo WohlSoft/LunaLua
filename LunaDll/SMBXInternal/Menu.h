@@ -10,9 +10,8 @@ struct EpisodeListItem : SMBX_FullBaseItemArray<EpisodeListItem, -1, GM_EP_LIST_
     VB6StrPtr episodeName;
     VB6StrPtr episodePath;
     VB6StrPtr episodeWorldFile;
-    DWORD unknown_C;
-    DWORD unknown_10;
-    DWORD unknown_14;
+    WORD blockChar[5];
+    WORD padding_16;
 
     static inline std::vector<EpisodeListItem*> GetAll(){
         std::vector<EpisodeListItem*> allEpisodes;

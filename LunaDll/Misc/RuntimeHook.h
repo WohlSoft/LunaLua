@@ -481,5 +481,7 @@ void __stdcall runtimeHookPlayerKill(short* playerIdxPtr);
 
 void __stdcall runtimeHookDrawBackground(short* section, short* camera);
 
+void __stdcall runtimeHookLoadWorldList(void);
+
 #endif
 

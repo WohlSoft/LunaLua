@@ -201,9 +201,11 @@ static bool testModeSetupForLoading()
     ep->episodeName = "Test Mode";
     ep->episodePath = episodePath;
     ep->episodeWorldFile = "";
-    ep->unknown_C = 0;
-    ep->unknown_10 = 0;
-    ep->unknown_14 = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        ep->blockChar[i] = 0;
+    }
+    ep->padding_16 = 0;
 
     // Set episode path...
     GM_FULLDIR = episodePath;
