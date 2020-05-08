@@ -413,6 +413,29 @@ void initAppPaths()
         _exit(1);
     }
 
+    // Check for UNC path
+    if ((fullPath[0] == L'\\') && (fullPath[1] == L'\\'))
+    {
+        std::wstring path = L"SMBX2 cannot be run from a UNC path (starting with \\\\). Please install SMBX2 elsewhere or map the network drive to a drive letter.\n\nPath:\n" + std::wstring(fullPath);
+        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        _exit(1);
+    }
+
+    // Check for path that might otherwise cause weird problems
+    if (!(
+        (
+            ((fullPath[0] >= L'A') && (fullPath[0] <= L'Z')) ||
+            ((fullPath[0] >= L'a') && (fullPath[0] <= L'z'))
+        ) &&
+        (fullPath[1] == L':') &&
+        (fullPath[2] == L'\\')
+        ))
+    {
+        std::wstring path = L"The SMBX2 installation path is not recognized as having a normal drive letter.\n\nPath:\n" + std::wstring(fullPath);
+        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        _exit(1);
+    }
+
     gAppPathWCHAR = fullPath;
     gAppPathUTF8 = WStr2Str(gAppPathWCHAR);
     gAppPathANSI = WStr2StrA(gAppPathWCHAR);
