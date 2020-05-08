@@ -212,11 +212,19 @@ std::wstring GetNonANSICharsFromWStr(const std::wstring& wstr)
     std::wstring ansi = StrA2WStr(WStr2StrA(wstr));
     std::wstring mismatches;
 
-    for (int i = 0; (i < wstr.size()) && (i < ansi.size()); i++)
+    for (int i = 0, j = 0; (i < wstr.size()) && (j < ansi.size()); i++)
     {
-        if (wstr[i] != ansi[i])
+        if (wstr[i] != ansi[j])
         {
             mismatches += wstr[i];
+            if (ansi[j] == L'\xFFFD')
+            {
+                j++;
+            }
+        }
+        else
+        {
+            j++;
         }
     }
 
