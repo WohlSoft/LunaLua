@@ -78,7 +78,14 @@ void CLunaLua::exitContext()
                 std::shared_ptr<Event> shutdownSpecificEvent = std::make_shared<Event>(shutdownSpecificName, false);
                 shutdownSpecificEvent->setDirectEventName(shutdownSpecificName);
                 shutdownSpecificEvent->setLoopable(false);
-                callEvent(shutdownSpecificEvent);
+                if (m_type == LUNALUA_LEVEL)
+                {
+                    callEvent(shutdownSpecificEvent, GM_LEVEL_EXIT_TYPE);
+                }
+                else
+                {
+                    callEvent(shutdownSpecificEvent);
+                }
             }
 
             std::shared_ptr<Event> shutdownEvent = std::make_shared<Event>("onExit", false);

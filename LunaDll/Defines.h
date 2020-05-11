@@ -404,6 +404,8 @@ DEFMEM(GM_WINS_T,           WORD,  0x00B2D762);      // 0 = default, if higher t
 
 DEFMEM(GM_WINNING,          WORD,  0x00B2C59E);      // 0 = not winning, if higher than 0 then winning by this win-type
 
+DEFMEM(GM_LEVEL_EXIT_TYPE,  WORD,  0x00B2C5D4);      // 0 = didn't win, if higher then this represents exit type as saved in the world map
+
 DEFMEM(GM_PSWITCH_COUNTER,  WORD,  0x00B2C62C);
 DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
