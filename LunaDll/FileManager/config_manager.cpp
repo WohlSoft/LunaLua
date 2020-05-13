@@ -605,7 +605,7 @@ static void read_layout_branches(nlohmann::json &typetree,
         else if(SDL_strncasecmp(control.c_str(), "spinbox", 8) == 0)
         {
             std::string type = "int";
-            if(entry.find("type") == entry.end())
+            if(entry.find("type") != entry.end())
                 type = entry["type"];
 
             if(type == "int")
