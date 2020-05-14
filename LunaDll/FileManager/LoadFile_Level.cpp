@@ -45,7 +45,8 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     if (fullPath.empty())
         fullPath = gAppPathWCHAR + L"/untitled.lvlx";
 
-    bool isIncompatible = false;
+    bool is38AFormat = false;
+    bool uses38AFeatures = false;
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
     if(outData.meta.RecentFormat == LevelData::SMBX64)
@@ -56,19 +57,19 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     size_t findLastSlash = fullPath.find_last_of(L"/\\");
 
     if(outData.meta.RecentFormat == LevelData::SMBX38A)
-        isIncompatible = true;
+        is38AFormat = true;
     if(!outData.variables.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
     if(!outData.arrays.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
     if(!outData.scripts.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
     if(!outData.custom38A_configs.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
     if(!outData.music_overrides.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
     if(!outData.sound_overrides.empty())
-        isIncompatible = true;
+        uses38AFeatures = true;
 
     std::wstring dir = fullPath.substr(0U, findLastSlash);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
@@ -257,7 +258,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         if(nextDataLevelBlock.gfx_dx > 0 ||
            nextDataLevelBlock.gfx_dy > 0 ||
           !nextDataLevelBlock.event_on_screen.empty()) {
-            isIncompatible = true;
+            uses38AFeatures = true;
         }
     }
 
@@ -287,7 +288,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         // SMBX-38A features are not supported here
         if(nextDataLevelBGO.gfx_dx > 0 ||
            nextDataLevelBGO.gfx_dy > 0) {
-            isIncompatible = true;
+            uses38AFeatures = true;
         }
     }
 
@@ -414,7 +415,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
            !nextDataLevelNPC.event_nextframe.empty() ||
            !nextDataLevelNPC.event_touch.empty() ||
            !nextDataLevelNPC.send_id_to_variable.empty()) {
-            isIncompatible = true;
+            uses38AFeatures = true;
         }
     }
 
@@ -465,9 +466,9 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
            nextDataLevelDoor.special_state_required ||
            nextDataLevelDoor.stood_state_required ||
            nextDataLevelDoor.transition_effect > 0 ||
-           !nextDataLevelDoor.event_enter.empty() ||
+           (!nextDataLevelDoor.event_enter.empty() && (nextDataLevelDoor.event_enter != "[None]")) ||
            !nextDataLevelDoor.stars_msg.empty()) {
-            isIncompatible = true;
+            uses38AFeatures = true;
         }
     }
 
@@ -513,7 +514,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         // SMBX-38A specific features are not supported here
         if(nextLevelPhysEnv.env_type > 1 ||
            !nextLevelPhysEnv.touch_event.empty()) {
-            isIncompatible = true;
+            uses38AFeatures = true;
         }
     }
 
@@ -715,7 +716,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     //*(_QWORD *)&dbl_B2D72C = 0i64;
     GM_LAST_FRAME_TIME = 0;//*(double*)(0x00B2D72C) = 0;
 
-    if(isIncompatible)
+    if(is38AFormat)
     {
         MessageBoxW(gMainWindowHwnd,
                     L"This level was saved in an incompatible format, it may not work properly. "
@@ -723,5 +724,15 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                     "Please use SMBX-38A to play this level.",
                     L"Incompatible level",
                     MB_ICONWARNING|MB_OK);
+    }
+    else if (uses38AFeatures)
+    {
+        MessageBoxW(gMainWindowHwnd,
+                    L"This level uses some incompatible 38A features, it may not work properly. "
+                    "SMBX-38A specific features such as TeaScript are not supported here. "
+                    "Either this level had incompatible fields set with an old version of the "
+                    "editor, or this level is made for use with SMBX-38A.",
+                    L"Incompatible level",
+                    MB_ICONWARNING | MB_OK);
     }
 }
