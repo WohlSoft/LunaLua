@@ -88,6 +88,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     native_setupSFX();
     GM_FREEZWITCH_ACTIV = 0;
     GM_CHEAT_MONEYTREE_HAVEMONEY = 0;
+    GM_LEVEL_EXIT_TYPE = 0;
 
     // Reset counters (values where reset by native_cleanupLevel)
     GM_BLOCK_COUNT = 0;
