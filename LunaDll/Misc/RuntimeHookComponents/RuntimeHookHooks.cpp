@@ -1238,10 +1238,12 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
     Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
+        short oldRenderDoneCameraUpdate = g_renderDoneCameraUpdate;
         std::shared_ptr<Event> cameraUpdateEvent = std::make_shared<Event>("onCameraUpdate", false);
         cameraUpdateEvent->setDirectEventName("onCameraUpdate");
         cameraUpdateEvent->setLoopable(false);
         gLunaLua.callEvent(cameraUpdateEvent, cameraIdx);
+        g_renderDoneCameraUpdate = oldRenderDoneCameraUpdate;
     }
 }
 
@@ -1276,7 +1278,9 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
         }
 
         Renderer::Get().StartFrameRender();
+        short oldRenderDoneCameraUpdate = g_renderDoneCameraUpdate;
         g_EventHandler.hookLevelRenderFirstCameraStart();
+        g_renderDoneCameraUpdate = oldRenderDoneCameraUpdate;
     }
 
     // Send camera position to GLEngine
@@ -1292,10 +1296,14 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
         SMBX_CameraInfo *cameraPtr = SMBX_CameraInfo::Get(cameraIdx);
         memcpy(&cameraData, cameraPtr, sizeof(SMBX_CameraInfo));
 
+        short oldRenderDoneCameraUpdate = g_renderDoneCameraUpdate;
+
         std::shared_ptr<Event> cameraDrawEvent = std::make_shared<Event>("onCameraDraw", false);
         cameraDrawEvent->setDirectEventName("onCameraDraw");
         cameraDrawEvent->setLoopable(false);
         gLunaLua.callEvent(cameraDrawEvent, cameraIdx, maxCameraIdx);
+
+        g_renderDoneCameraUpdate = oldRenderDoneCameraUpdate;
 
         // Disallow changes to this camera's settings in onCameraDraw, for reasons.
         memcpy(cameraPtr, &cameraData, sizeof(SMBX_CameraInfo));
@@ -1603,14 +1611,9 @@ extern void __stdcall RenderLevelHook()
     g_EventHandler.hookLevelRenderStart();
 
     short oldRenderDoneCameraUpdate = g_renderDoneCameraUpdate;
-    bool oldRanOnDrawThisFrame = g_ranOnDrawThisFrame;
     g_renderDoneCameraUpdate = 0;
-    g_ranOnDrawThisFrame = false;
-    
     RenderLevelReal();
-
     g_renderDoneCameraUpdate = oldRenderDoneCameraUpdate;
-    g_ranOnDrawThisFrame = oldRanOnDrawThisFrame;
 
     if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
@@ -1629,6 +1632,7 @@ void __declspec(naked) __stdcall runtimeHookRestartCameraLoop()
         TEST AX, AX
         JNE runtimeHookRestartCameraLoopExitLoop
         MOV g_renderDoneCameraUpdate, -1
+        MOV g_ranOnDrawThisFrame, 0
         PUSH 0x90C61D // Restart loop
         RET
     runtimeHookRestartCameraLoopExitLoop:
