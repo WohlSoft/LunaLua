@@ -3302,7 +3302,7 @@ _declspec(naked) void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookPSwitchGetNewBlockAtEnd(unsigned int blockIdx)
+static unsigned int __stdcall runtimeHookPSwitchGetNewBlockAtEnd()
 {
     unsigned int blockCount = GM_BLOCK_COUNT;
 
