@@ -11,6 +11,7 @@ private:
     bool m_onDrawEndReady;
 
     bool m_RequestPause;
+    bool m_RequestPauseAtFrameEnd;
     bool m_RequestUnpause;
     bool m_IsPaused;
 
@@ -45,7 +46,7 @@ private:
 
 // Public methods (pause requests)
 public:
-    void requestPause(void);
+    void requestPause(bool atFrameEnd);
     void requestUnpause(void);
     bool isPaused(void);
     void checkPause(void);

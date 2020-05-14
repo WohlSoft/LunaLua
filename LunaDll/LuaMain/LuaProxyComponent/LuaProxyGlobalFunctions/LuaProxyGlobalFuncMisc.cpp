@@ -232,7 +232,12 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 
 void LuaProxy::Misc::pause()
 {
-    g_EventHandler.requestPause();
+    g_EventHandler.requestPause(false);
+}
+
+void LuaProxy::Misc::pause(bool atFrameEnd)
+{
+    g_EventHandler.requestPause(atFrameEnd);
 }
 
 void LuaProxy::Misc::unpause()

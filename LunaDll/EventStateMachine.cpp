@@ -71,6 +71,7 @@ void EventStateMachine::reset(void) {
     m_onTickEndReady = false;
     m_onDrawEndReady = false;
     m_RequestPause = false;
+    m_RequestPauseAtFrameEnd = false;
     m_RequestUnpause = false;
     m_IsPaused = false;
 }
@@ -187,12 +188,25 @@ void EventStateMachine::sendOnDrawEnd(void) {
     m_onDrawEndReady = false;
 
     sendSimpleLuaEvent("onDrawEnd");
+
+    if (!m_IsPaused && m_RequestPauseAtFrameEnd) {
+        m_RequestPauseAtFrameEnd = false;
+        runPause();
+    }
 }
 
 // Public methods (pause requests)
-void EventStateMachine::requestPause(void) {
+void EventStateMachine::requestPause(bool atFrameEnd) {
     if (!m_IsPaused) {
-        m_RequestPause = true;
+        if (atFrameEnd)
+        {
+            m_RequestPauseAtFrameEnd = true;
+        }
+        else
+        {
+            m_RequestPause = true;
+        }
+
     }
     m_RequestUnpause = false;
 }
@@ -202,6 +216,7 @@ void EventStateMachine::requestUnpause(void) {
         m_RequestUnpause = true;
     }
     m_RequestPause = false;
+    m_RequestPauseAtFrameEnd = false;
 }
 
 bool EventStateMachine::isPaused(void) {

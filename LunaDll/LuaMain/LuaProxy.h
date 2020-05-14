@@ -931,6 +931,7 @@ namespace LuaProxy {
         void exitGame();
         bool loadEpisode(const std::string& episodeName);
         void pause();
+        void pause(bool atFrameEnd);
         void unpause();
         bool isPausedByLua();
         void warning(const std::string& str);
