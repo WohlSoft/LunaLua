@@ -291,16 +291,7 @@ bool GLEngine::GifRecorderToggle()
 void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
     // Skip every second frame
-    static bool skipFrame = false;
-    if (skipFrame)
-    {
-        skipFrame = false;
-        return;
-    }
-    else
-    {
-        skipFrame = true;
-    }
+    static DWORD lastTime = 0;
 
     // Don't allow more than 10 seconds of raw buffered footage
     if (mGifRecorder.bufferLen() > 10 * 32)
@@ -308,9 +299,16 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
         return;
     }
 
-    BYTE* pixData = new BYTE[w * (h + 1) * 4];
-
+    // Record no more than 1 frame per 30ms
     DWORD timestamp = GetTickCount();
+    DWORD timeDiff = timestamp - lastTime;
+    if (timeDiff < 30)
+    {
+        return;
+    }
+    lastTime = timestamp;
+
+    BYTE* pixData = new BYTE[w * (h + 1) * 4];
 
     // Read pixels
     glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixData);
