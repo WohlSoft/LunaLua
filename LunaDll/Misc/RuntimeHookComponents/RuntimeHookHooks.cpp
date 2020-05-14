@@ -562,15 +562,15 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
 
     if (npcRemovalConfirmed != 0)
     {
-        short newIdx = npcIdx - 1;    // 0 based
-        short oldIdx = GM_NPCS_COUNT; // 0 based
+        short newIdx = npcIdx - 1;    // 0 based not including dummy
+        short oldIdx = GM_NPCS_COUNT; // 0 based not including dummy
 
         // Update extended NPC fields
         if (newIdx != oldIdx)
         {
-            *NPC::GetRawExtended(newIdx) = *NPC::GetRawExtended(oldIdx);
+            *NPC::GetRawExtended(newIdx+1) = *NPC::GetRawExtended(oldIdx+1);
         }
-        NPC::GetRawExtended(oldIdx)->Reset();
+        NPC::GetRawExtended(oldIdx+1)->Reset();
 
         // The NPC was indeed removed
         if (gLunaLua.isValid() && (newIdx >= 0) && (oldIdx >= 0)) {

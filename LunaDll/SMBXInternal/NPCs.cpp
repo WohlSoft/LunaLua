@@ -48,7 +48,7 @@ static ExtendedNPCFields g_extendedNPCFields[5001];
 
 ExtendedNPCFields* NPC::GetRawExtended(int index)
 {
-    if (index < 0 || index > GM_NPCS_COUNT)
+    if (index < 0 || index >= 5001)
         return nullptr;
 
     return &g_extendedNPCFields[index];
