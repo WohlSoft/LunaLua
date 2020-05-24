@@ -54,7 +54,7 @@ bool GeneralLunaConfig::save()
 
     generalConfig.SetLongValue(L"Audio", L"buffer_length", m_audio_bufferlen, L"# Audio buffer length. Default is 2048. Smaller may be lower latency but carries risk of audio issues.");
 
-    generalConfig.SetValue(L"Audio", L"driver", Str2WStr(m_audio_driver).c_str(), L"# Audio driver. Valid options are 'default', 'directsound', 'winmm' and 'wasapi'");
+    generalConfig.SetValue(L"Audio", L"driver", Str2WStr(m_audio_driver).c_str(), L"# Audio driver, may be comma seperated for a list to try in priority order. Valid options are 'default', 'wasapi', 'directsound', 'winmm' and 'dummy'.");
 
     generalConfig.SetBoolValue(L"Controller", L"battery_reporting", m_controller_battery_reporting, L"# Set to false to disable controller battery reporting. True by default.", true);
 

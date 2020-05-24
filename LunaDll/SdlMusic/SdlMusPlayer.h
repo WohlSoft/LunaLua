@@ -39,7 +39,7 @@ public:
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);
-    static void setSampleRate(int sampleRate);
+    static bool setSampleRate(int sampleRate);
     static int sampleRate();
     static int MUS_currentVolume();
 

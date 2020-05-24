@@ -7,6 +7,7 @@
 #include "SdlMusPlayer.h"
 #include "MusicManager.h"
 #include "../Misc/ResourceFileMapper.h"
+#include "Utils/strings.h"
 
 /***********************************PGE_SDL_Manager********************************************/
 bool PGE_SDL_Manager::isInit=false;
@@ -16,27 +17,85 @@ void PGE_SDL_Manager::initSDL()
 {
     if(!isInit)
     {
-        // Allow driver override
-        std::string driver = gGeneralConfig.getAudioDriver();
-        if (driver != "default")
-        {
-            SDL_setenv("SDL_AUDIODRIVER", driver.c_str(), 1);
-        }
-
-        int ret = SDL_Init(SDL_INIT_AUDIO);
+        int ret = SDL_Init(0);
         if (ret != 0)
         {
-            std::string msg = "Could not initialize audio subsystem.\r\n";
+            std::string msg = "Could not initialize SDL.\r\n";
             msg += SDL_GetError();
             MessageBoxA(0, msg.c_str(), "Error", MB_ICONERROR);
             _exit(1);
         }
 
-        isInit=true;
-        PGE_MusPlayer::setSampleRate(gGeneralConfig.getAudioSampleRate());
+        // Allow driver override
+        std::string driverString = gGeneralConfig.getAudioDriver();
+        int sampleRate = gGeneralConfig.getAudioSampleRate();
+        if (driverString == "default")
+        {
+            // Check if SDL_AUDIODRIVER is set for 'default' case, otherwise use full fallback list.
+            char* driverEnv = getenv("SDL_AUDIODRIVER");
+            if ((driverEnv != nullptr) && (driverEnv[0] != '\0'))
+            {
+                driverString = driverEnv;
+            }
+            else
+            {
+                driverString = "wasapi,directsound,winmm,dummy";
+            }
+        }
+
+        // Make driver list, always include dummy
+        std::vector<std::string> driverList = Strings::split(driverString, ',');
+        bool haveDummy = false;
+        for (auto& driver : driverList)
+        {
+            Strings::doTrim(driver);
+            std::transform(driver.begin(), driver.end(), driver.begin(), tolower);
+            if (driver == "dummy")
+            {
+                haveDummy = true;
+            }
+        }
+        if (!haveDummy)
+        {
+            driverList.push_back("dummy");
+        }
+
+        // Loop over driver list
+        std::string selectedDriver = "";
+        for (auto& driver : driverList)
+        {
+            SDL_setenv("SDL_AUDIODRIVER", driver.c_str(), 1);
+            int ret = SDL_InitSubSystem(SDL_INIT_AUDIO);
+            if (ret != 0)
+            {
+                // SDL_InitSubSystem failed, can't use that driver
+                continue;
+            }
+
+            bool bRet = PGE_MusPlayer::setSampleRate(sampleRate);
+            if (!bRet)
+            {
+                // Couldn't open audio device, can't use that driver
+                SDL_QuitSubSystem(SDL_INIT_AUDIO);
+                continue;
+            }
+
+            selectedDriver = driver;
+            break;
+        }
+
+        if (selectedDriver == "")
+        {
+            MessageBoxA(0, "Could not initialize audio subsystem.", "Error", MB_ICONERROR);
+            _exit(1);
+        }
+        else if ((selectedDriver == "dummy") && (driverList.size() > 1))
+        {
+            MessageBoxA(0, "No selected audio driver could open.\r\nNo sound will be played.", "Warning", MB_ICONWARNING);
+        }
+
+        isInit = true;
         PGE_MusPlayer::MUS_changeVolume(51);
-        //std::wstring smbxPath = gAppPathWCHAR;
-        //smbxPath = smbxPath.append(L"\\");
         appPath = gAppPathUTF8;
         appPath.append("\\");
     }
@@ -211,17 +270,23 @@ bool PGE_MusPlayer::MUS_IsFading()
     return (Mix_FadingMusic()==1);
 }
 
-void PGE_MusPlayer::setSampleRate(int sampleRate=44100)
+bool PGE_MusPlayer::setSampleRate(int sampleRate=44100)
 {
     sRate=sampleRate;
     Mix_CloseAudio();
-    Mix_OpenAudio(sRate, AUDIO_S16, 2, gGeneralConfig.getAudioBufferLength());
+    if (Mix_OpenAudio(sRate, AUDIO_S16, 2, gGeneralConfig.getAudioBufferLength()) != 0)
+    {
+        return false;
+    }
+
     Mix_AllocateChannels(32);
 
     // Reset music sample count
     sCount.store(0);
     musSCount.store(0);
     Mix_SetPostMix(postMixCallback, NULL);
+
+    return true;
 }
 
 int PGE_MusPlayer::sampleRate()
