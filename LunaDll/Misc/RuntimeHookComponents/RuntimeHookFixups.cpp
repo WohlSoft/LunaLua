@@ -225,6 +225,19 @@ void fixup_EventLimit()
     *((unsigned int*)triggerEventLoopCountAddr) = newEventLimit-1; // -1 because this is the max index
 }
 
+static __declspec(naked) void layerLimit1ByteLoopReturn()
+{
+    __asm {
+        CMP BX, 254
+        JLE loop_continue
+        PUSH 0xAA7D38
+        RET
+    loop_continue:
+        PUSH 0xAA7C83
+        RET
+    }
+}
+
 void fixup_LayerLimit()
 {
     unsigned int newLayerLimit = 255;
@@ -255,11 +268,6 @@ void fixup_LayerLimit()
         0x000000
     };
 
-    static const unsigned int loop1Addresses[] = {
-        0xaa7d31,
-        0x000000
-    };
-
     // Allocate new layer array memory, each element is 0x14
     // Note: We don't try to de-allocate the old array because we don't
     //       know how the VB runtime allocated that in the first place
@@ -281,10 +289,8 @@ void fixup_LayerLimit()
         *((unsigned short*)loop2Addresses[i]) = newLayerLimit - 1;
     }
 
-    for (int i = 0; loop1Addresses[i] != 0x000000; i++)
-    {
-        *((unsigned char*)loop1Addresses[i]) = newLayerLimit - 1;
-    }
+    // Patch 1-byte loop literal, too small to store 0x55 since that would be considered signed
+    PATCH(0xAA7D2E).JMP(layerLimit1ByteLoopReturn).NOP_PAD_TO_SIZE<10>().Apply();
 }
 
 void fixup_WebBox()
