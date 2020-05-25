@@ -144,6 +144,7 @@ void Blocks::InitProperties() {
     {
         SetBlockBumpable(id, true);
     }
+    SetBlockBumpable(0x277, true);
 
     SetBlockPlayerFilter(626, 1);
     SetBlockPlayerFilter(627, 2);
