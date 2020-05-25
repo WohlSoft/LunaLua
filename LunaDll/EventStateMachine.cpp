@@ -3,6 +3,7 @@
 #include "EventStateMachine.h"
 #include "Misc/RuntimeHook.h"
 #include "Misc/TestMode.h"
+#include "Misc/TestModeMenu.h"
 #include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
@@ -193,6 +194,9 @@ void EventStateMachine::sendOnDrawEnd(void) {
         m_RequestPauseAtFrameEnd = false;
         runPause();
     }
+
+    // Check to see if the test mode menu needs to be re-opened after a skipped tick
+    testModeMenuCheckOpenAfterSkipTick();
 }
 
 // Public methods (pause requests)

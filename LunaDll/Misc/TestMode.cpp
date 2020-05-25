@@ -305,7 +305,7 @@ static void __stdcall pauseTestModeHook(short* pPlayer);
 static AsmPatch<5U> pauseOverridePatch = PATCH(0x8CA597).CALL(pauseTestModeHook);
 static void __stdcall pauseTestModeHook(short* pPlayer)
 {
-    testModePauseMenu(true);
+    testModePauseMenu(true, false);
 }
 
 // 008C23C6 | E8 B5 53 0F 00 | call <smbx.doPlayerDeadCode>
@@ -313,7 +313,7 @@ static void __stdcall playerDeathTestModeHook(void);
 static AsmPatch<5U> playerDeathOverridePatch = PATCH(0x8C23C6).CALL(playerDeathTestModeHook);
 static void __stdcall playerDeathTestModeHook(void)
 {
-    testModePauseMenu(false);
+    testModePauseMenu(false, false);
 }
 
 bool testModeEnable(const STestModeSettings& settings)

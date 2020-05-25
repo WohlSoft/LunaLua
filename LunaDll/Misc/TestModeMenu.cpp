@@ -22,12 +22,39 @@
 static bool keepRunningPauseMenu = false;
 static bool restartTrigger = false;
 static bool exitTrigger = false;
+static bool skipTrigger = false;
 
 void testModeClosePauseMenu(bool restart, bool exit)
 {
     keepRunningPauseMenu = false;
     restartTrigger = restart;
     exitTrigger = exit;
+    skipTrigger = false;
+}
+
+void testModeMenuSkipTick()
+{
+    if (keepRunningPauseMenu)
+    {
+        skipTrigger = true;
+        restartTrigger = false;
+        exitTrigger = false;
+        keepRunningPauseMenu = false;
+    }
+}
+
+bool testModeMenuIsSkipTickPending()
+{
+    return skipTrigger && !gIsTestModePauseActive;
+}
+
+void testModeMenuCheckOpenAfterSkipTick()
+{
+    if (!skipTrigger) return;
+    if (gIsTestModePauseActive) return;
+
+    skipTrigger = false;
+    testModePauseMenu(true, true);
 }
 
 void testModeCheckTriggers()
@@ -45,10 +72,19 @@ void testModeCheckTriggers()
     }
 }
 
-void testModePauseMenu(bool allowContinue)
+void testModePauseMenu(bool allowContinue, bool skipEnded)
 {
     // Skip if already active, don't activate recursively
     if (gIsTestModePauseActive) return;
+
+    // If we're not allowing continue, skip frame needs to be cancelled
+    if (!allowContinue)
+    {
+        skipTrigger = false;
+    }
+
+    // Don't re-trigger in this way if skip frame is pending
+    if (skipTrigger) return;
 
     Renderer::QueueStateStacker renderStack;
 
@@ -68,7 +104,7 @@ void testModePauseMenu(bool allowContinue)
         std::shared_ptr<Event> inputEvent = std::make_shared<Event>("onStartTestModeMenu", false);
         inputEvent->setDirectEventName("onStartTestModeMenu");
         inputEvent->setLoopable(false);
-        gLunaLua.callEvent(inputEvent, allowContinue);
+        gLunaLua.callEvent(inputEvent, allowContinue, skipEnded);
     }
     else
     {

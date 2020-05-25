@@ -303,6 +303,12 @@ extern "C" {
         testModeClosePauseMenu(false, false);
     }
 
+    FFI_EXPORT(void) LunaLuaTestModeSkip(void)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+        testModeMenuSkipTick();
+    }
+
     FFI_EXPORT(KeyMap*) LunaLuaGetRawKeymapArray(void)
     {
         CLunaFFILock ffiLock(__FUNCTION__);

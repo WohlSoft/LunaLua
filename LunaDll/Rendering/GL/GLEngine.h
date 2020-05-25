@@ -33,7 +33,7 @@ public:
     BOOL RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
         HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
         DWORD dwRop);
-    void EndFrame(HDC hdcDest);
+    void EndFrame(HDC hdcDest, bool skipFlipToScreen);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };

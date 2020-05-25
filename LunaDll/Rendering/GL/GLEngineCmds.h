@@ -75,6 +75,7 @@ class GLEngineCmd_EndFrame : public GLEngineCmd {
 public:
     HDC mHdcDest;
     bool mIsFirstFrame;
+    bool mForceSkip;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
     virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame; }

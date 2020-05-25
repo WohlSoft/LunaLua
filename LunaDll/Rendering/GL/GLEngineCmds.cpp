@@ -26,7 +26,7 @@ void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
 }
 
 void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
-    glEngine.EndFrame(mHdcDest);
+    glEngine.EndFrame(mHdcDest, mForceSkip);
 }
 
 void GLEngineCmd_InitForHDC::run(GLEngine& glEngine) const {

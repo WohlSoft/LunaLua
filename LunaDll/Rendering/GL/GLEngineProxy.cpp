@@ -2,6 +2,7 @@
 #include <memory>
 #include "../../Defines.h"
 #include "../../Misc/ThreadedCmdQueue.h"
+#include "../../Misc/TestModeMenu.h"
 #include "GLEngineProxy.h"
 #include "GLEngineCmds.h"
 #include "GLContextManager.h"
@@ -168,12 +169,21 @@ void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
+
     if (isLoadScreen)
     {
+        obj->mForceSkip = false;
+        obj->mIsFirstFrame = false;
+    }
+    else if (testModeMenuIsSkipTickPending())
+    {
+        // In test mode, force the flip of the frame to be skipped
+        obj->mForceSkip = true;
         obj->mIsFirstFrame = false;
     }
     else
     {
+        obj->mForceSkip = false;
         obj->mIsFirstFrame = mFirstFramePending;
         mFirstFramePending = false;
     }
