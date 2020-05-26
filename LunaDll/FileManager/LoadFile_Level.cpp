@@ -4,6 +4,7 @@
 #include "../Defines.h"
 #include "../Main.h"
 #include "../Misc/MiscFuncs.h"
+#include "../Misc/TestMode.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include "../Rendering/ImageLoader.h"
@@ -47,6 +48,8 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     bool is38AFormat = false;
     bool uses38AFeatures = false;
+    std::vector<std::string> limitWarnings;
+    std::vector<std::string> nearLimitWarnings;
     FileFormats::smbx64LevelPrepare(outData);
     FileFormats::smbx64LevelSortBlocks(outData);
     if(outData.meta.RecentFormat == LevelData::SMBX64)
@@ -162,7 +165,10 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfSections = outData.sections.size();
     if (numOfSections > LIMIT_SECTIONS)
+    {
+        limitWarnings.push_back(std::to_string(numOfSections) + "/" + std::to_string(LIMIT_SECTIONS) + " sections");
         numOfSections = LIMIT_SECTIONS;
+    }
     for (int i = 0; i < numOfSections; i++)
     {
         LevelSection& nextDataLevelSection = outData.sections[i];
@@ -229,7 +235,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfBlocks = outData.blocks.size();
     if (numOfBlocks > LIMIT_BLOCKS)
+    {
+        limitWarnings.push_back(std::to_string(numOfBlocks) + "/" + std::to_string(LIMIT_BLOCKS) + " blocks");
         numOfBlocks = LIMIT_BLOCKS;
+    }
+    else if ((numOfBlocks + outData.npc.size()) > (LIMIT_BLOCKS - LIMIT_BLOCKS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfBlocks) + "/" + std::to_string(LIMIT_BLOCKS) + " blocks");
+    }
     GM_BLOCK_COUNT = numOfBlocks;
     for (int i = 0; i < numOfBlocks; i++)
     {
@@ -265,7 +278,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfBGO = outData.bgo.size();
     if (numOfBGO > LIMIT_BGOS)
+    {
+        limitWarnings.push_back(std::to_string(numOfBGO) + "/" + std::to_string(LIMIT_BGOS) + " BGOs");
         numOfBGO = LIMIT_BGOS;
+    }
+    else if (numOfBGO > (LIMIT_BGOS - LIMIT_BGOS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfBGO) + "/" + std::to_string(LIMIT_BGOS) + " BGOs");
+    }
     GM_BGO_COUNT = numOfBGO;
     for (int i = 0; i < numOfBGO; i++) {
         SMBX_BGO* nextBGO = SMBX_BGO::Get(i);
@@ -295,7 +315,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfNPC = outData.npc.size();
     if (numOfNPC > LIMIT_NPCS)
+    {
+        limitWarnings.push_back(std::to_string(numOfNPC) + "/" + std::to_string(LIMIT_NPCS) + " NPCs");
         numOfNPC = LIMIT_NPCS;
+    }
+    else if (numOfNPC > (LIMIT_NPCS - LIMIT_NPCS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfNPC) + "/" + std::to_string(LIMIT_NPCS) + " NPCs");
+    }
     GM_NPCS_COUNT = numOfNPC;
     for (int i = 0; i < numOfNPC; i++) {
         NPCMOB* nextNPC = NPC::Get(i);
@@ -421,8 +448,27 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     }
 
     unsigned int numOfDoors = outData.doors.size();
+    unsigned int numOfDoorsWithTwoWay = numOfDoors;
+    for (unsigned int i = 0; i < numOfDoors; i++) {
+        const LevelDoor& nextDataLevelDoor = outData.doors[i];
+        if (nextDataLevelDoor.two_way)
+        {
+            numOfDoorsWithTwoWay++;
+        }
+    }
+    if (numOfDoorsWithTwoWay > LIMIT_WARPS)
+    {
+        limitWarnings.push_back(std::to_string(numOfDoorsWithTwoWay) + "/" + std::to_string(LIMIT_WARPS) + " warps");
+    }
+    else if (numOfDoorsWithTwoWay > (LIMIT_WARPS - LIMIT_WARPS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfDoorsWithTwoWay) + "/" + std::to_string(LIMIT_WARPS) + " warps");
+    }
+
     if (numOfDoors > LIMIT_WARPS)
+    {
         numOfDoors = LIMIT_WARPS;
+    }
     GM_WARP_COUNT = numOfDoors;
 
     std::vector<SMBX_Warp*> twoWayWarps;
@@ -499,7 +545,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfWater = outData.physez.size();
     if (numOfWater > LIMIT_PHYSENV)
+    {
+        limitWarnings.push_back(std::to_string(numOfWater) + "/" + std::to_string(LIMIT_PHYSENV) + " water/quicksand zones");
         numOfWater = LIMIT_PHYSENV;
+    }
+    else if (numOfWater > (LIMIT_PHYSENV - LIMIT_PHYSENV / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfWater) + "/" + std::to_string(LIMIT_PHYSENV) + " water/quicksand zones");
+    }
     GM_WATER_AREA_COUNT = numOfWater;
     for (int i = 0; i < numOfWater; i++) {
         SMBX_Water* nextWater = SMBX_Water::Get(i);
@@ -521,7 +574,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfLayers = outData.layers.size();
     if (numOfLayers > LIMIT_LAYERS)
+    {
+        limitWarnings.push_back(std::to_string(numOfLayers) + "/" + std::to_string(LIMIT_LAYERS) + " layers");
         numOfLayers = LIMIT_LAYERS;
+    }
+    else if (numOfLayers > (LIMIT_LAYERS - LIMIT_LAYERS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfLayers) + "/" + std::to_string(LIMIT_LAYERS) + " layers");
+    }
     for (int i = 0; i < numOfLayers; i++) {
         LayerControl* nextLayer = LayerControl::Get(i);
         const LevelLayer& nextDataLevelLayer = outData.layers[i];
@@ -545,7 +605,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     int numOfEvents = outData.events.size();
     if (numOfEvents > LIMIT_EVENTS)
+    {
+        limitWarnings.push_back(std::to_string(numOfEvents) + "/" + std::to_string(LIMIT_EVENTS) + " events");
         numOfEvents = LIMIT_EVENTS;
+    }
+    else if (numOfEvents > (LIMIT_EVENTS - LIMIT_EVENTS / 20))
+    {
+        nearLimitWarnings.push_back(std::to_string(numOfEvents) + "/" + std::to_string(LIMIT_EVENTS) + " events");
+    }
     memset(GM_EVENTS_PTR, 0, sizeof(SMBXEvent) * LIMIT_EVENTS);
     for (int i = 0; i < numOfEvents; i++) {
 
@@ -735,5 +802,46 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                     "editor, or this level is made for use with SMBX-38A.",
                     L"Incompatible level",
                     MB_ICONWARNING | MB_OK);
+    }
+
+    std::string msg;
+    if (limitWarnings.size() > 0)
+    {
+        msg += "This level has too many objects of the following types:\r\n";
+        for (const auto& limitMsg : limitWarnings)
+        {
+            msg += "\t";
+            msg += limitMsg;
+            msg += "\r\n";
+        }
+        msg += "\r\nExcess objects will be ignored.";
+        if (nearLimitWarnings.size() > 0)
+        {
+            msg += "\r\n\r\n";
+        }
+    }
+    if ((nearLimitWarnings.size() > 0) && (
+            (msg.size() > 0) ||
+            (TestModeIsEnabled())
+       ))
+    {
+        msg += "This level is approaching the limit for objects of the following types:\r\n";
+        for (const auto& limitMsg : nearLimitWarnings)
+        {
+            msg += "\t";
+            msg += limitMsg;
+            msg += "\r\n";
+        }
+        msg += "\r\n";
+    }
+
+    // If there's an object count warning, make it so
+    if (msg.size() > 0)
+    {
+        msg += "Note that the game may crash if the limits are exceeded at runtime. Also note that most block-like NPCs can use up extra block count at runtime.";
+        MessageBoxA(gMainWindowHwnd,
+            msg.c_str(),
+            "Level Object Count Warning",
+            MB_ICONWARNING | MB_OK);
     }
 }
