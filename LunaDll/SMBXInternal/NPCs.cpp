@@ -281,6 +281,7 @@ void NPC::InitProperties() {
         npcprop_linkshieldable[i] = 0;
         npcprop_noshieldfireeffect[i] = 0;
         npcprop_notcointransformable[i] = 0;
+        npcprop_staticdirection[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
