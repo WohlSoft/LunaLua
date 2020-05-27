@@ -1064,6 +1064,10 @@ void TrySkipPatch()
     // Hooks for populating world map
     PATCH(0x8E35E0).JMP(runtimeHookLoadWorldList).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hooks for disabling 1.3 speed config handling for an NPC type
+    PATCH(0xA0A383).JMP(runtimeHookSpeedOverride).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA15613).JMP(runtimeHookSpeedOverrideBelt).NOP_PAD_TO_SIZE<5>().Apply();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

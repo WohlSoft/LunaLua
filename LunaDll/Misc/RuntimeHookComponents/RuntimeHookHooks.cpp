@@ -3706,3 +3706,69 @@ void __stdcall runtimeHookLoadWorldList(void)
 {
     SMBXWorldFileBase::PopulateEpisodeList();
 }
+
+static bool __stdcall runtimeHookSpeedOverrideCheck(unsigned int id)
+{
+    return NPC::GetLuaHandlesSpeed(id);
+}
+
+__declspec(naked) void __stdcall runtimeHookSpeedOverride(void)
+{
+    // 00A0A383 | mov edx,dword ptr ds:[<npc_speed>]
+    __asm {
+        pushfd
+        push eax
+        push ecx
+
+        push edi
+        call runtimeHookSpeedOverrideCheck
+        cmp ax, 0
+        jne ignorespeed
+        
+        pop ecx
+        pop eax
+        popfd
+        mov edx, dword ptr ds:[0xB25C18]
+        push 0xA0A389
+        ret
+    ignorespeed:
+        pop ecx
+        pop eax
+        popfd
+        push 0xA0A39C
+        ret
+    }
+}
+
+// void __stdcall runtimeHookSpeedOverrideBelt(void);
+__declspec(naked) void __stdcall runtimeHookSpeedOverrideBelt(void)
+{
+    // 00A15613 | fmul st(0),dword ptr ds:[eax+edi*4]
+    // 00A15616 | jmp smbx.A1563E
+    __asm {
+        pushfd
+        push eax
+        push ecx
+        push edx
+
+        push edi
+        call runtimeHookSpeedOverrideCheck
+        cmp ax, 0
+        jne ignorespeed
+
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        fmul dword ptr ds : [eax + edi * 4]
+        push 0xA1563E
+        ret
+    ignorespeed :
+        pop edx
+        pop ecx
+        pop eax
+        popfd
+        push 0xA1563E
+        ret
+    }
+}

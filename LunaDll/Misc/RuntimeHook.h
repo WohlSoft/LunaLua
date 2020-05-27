@@ -483,5 +483,8 @@ void __stdcall runtimeHookDrawBackground(short* section, short* camera);
 
 void __stdcall runtimeHookLoadWorldList(void);
 
+void __stdcall runtimeHookSpeedOverride(void);
+void __stdcall runtimeHookSpeedOverrideBelt(void);
+
 #endif
 

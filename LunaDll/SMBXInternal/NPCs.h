@@ -532,6 +532,7 @@ namespace NPC {
     bool GetNoShieldFireEffect(int id);
     bool GetNotCoinTransformable(int id);
     bool GetStaticDirection(int id);
+    bool GetLuaHandlesSpeed(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
