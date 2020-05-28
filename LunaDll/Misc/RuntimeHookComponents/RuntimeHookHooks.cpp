@@ -3707,9 +3707,9 @@ void __stdcall runtimeHookLoadWorldList(void)
     SMBXWorldFileBase::PopulateEpisodeList();
 }
 
-static bool __stdcall runtimeHookSpeedOverrideCheck(unsigned int id)
+static unsigned int __stdcall runtimeHookSpeedOverrideCheck(unsigned int id)
 {
-    return NPC::GetLuaHandlesSpeed(id);
+    return NPC::GetLuaHandlesSpeed(id) ? -1 : 0;
 }
 
 __declspec(naked) void __stdcall runtimeHookSpeedOverride(void)
@@ -3722,7 +3722,7 @@ __declspec(naked) void __stdcall runtimeHookSpeedOverride(void)
 
         push edi
         call runtimeHookSpeedOverrideCheck
-        cmp ax, 0
+        cmp eax, 0
         jne ignorespeed
         
         pop ecx
@@ -3753,7 +3753,7 @@ __declspec(naked) void __stdcall runtimeHookSpeedOverrideBelt(void)
 
         push edi
         call runtimeHookSpeedOverrideCheck
-        cmp ax, 0
+        cmp eax, 0
         jne ignorespeed
 
         pop edx
