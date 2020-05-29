@@ -24,10 +24,22 @@ LunaPathValidator::~LunaPathValidator()
 
 void LunaPathValidator::SetPaths()
 {
-    mEnginePath = NormalizedPath<std::string>(gAppPathUTF8 + "\\");
-    mMatchingEnginePath = NormalizedPath<std::wstring>(gAppPathWCHAR + L"\\");
+    mEnginePath = NormalizedPath<std::string>(gAppPathUTF8);
+    if ((mEnginePath.size() > 0) && (mEnginePath[mEnginePath.size() - 1] != '\\'))
+    {
+        mEnginePath += "\\";
+    }
+    mMatchingEnginePath = NormalizedPath<std::wstring>(gAppPathWCHAR);
+    if ((mMatchingEnginePath.size() > 0) && (mMatchingEnginePath[mMatchingEnginePath.size() - 1] != L'\\'))
+    {
+        mMatchingEnginePath += L"\\";
+    }
     std::transform(mMatchingEnginePath.begin(), mMatchingEnginePath.end(), mMatchingEnginePath.begin(), towlower);
-    mMatchingEpisodePath = NormalizedPath<std::wstring>(GM_FULLDIR + L"\\");
+    mMatchingEpisodePath = NormalizedPath<std::wstring>(GM_FULLDIR);
+    if ((mMatchingEpisodePath.size() > 0) && (mMatchingEpisodePath[mMatchingEpisodePath.size() - 1] != L'\\'))
+    {
+        mMatchingEpisodePath += L"\\";
+    }
     std::transform(mMatchingEpisodePath.begin(), mMatchingEpisodePath.end(), mMatchingEpisodePath.begin(), towlower);
 }
 
@@ -55,12 +67,12 @@ LunaPathValidator::Result* LunaPathValidator::CheckPath(const char* path)
     std::wstring wNormalPath = Str2WStr(mNormalPath);
     std::transform(wNormalPath.begin(), wNormalPath.end(), wNormalPath.begin(), towlower);
 
-    if (mMatchingEpisodePath == wNormalPath.substr(0, mMatchingEpisodePath.size()))
+    if ((mMatchingEpisodePath.size() > 0) && (mMatchingEpisodePath == wNormalPath.substr(0, mMatchingEpisodePath.size())))
     {
         // If episode path matches
         mResult = { mNormalPath.c_str(), mNormalPath.length(), true };
     }
-    else if (mMatchingEnginePath == wNormalPath.substr(0, mMatchingEnginePath.size()))
+    else if ((mMatchingEnginePath.size() > 0) && (mMatchingEnginePath == wNormalPath.substr(0, mMatchingEnginePath.size())))
     {
         // If engine path matches
         bool canWrite = (wNormalPath.substr(mMatchingEnginePath.size(), 5) == L"logs\\");
