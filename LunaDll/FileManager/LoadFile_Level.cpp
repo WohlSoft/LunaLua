@@ -1,6 +1,8 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <fmt/fmt_format.h>
+
 #include "../Defines.h"
 #include "../Main.h"
 #include "../Misc/MiscFuncs.h"
@@ -25,6 +27,15 @@
 
 #include "CustomParamStore.h"
 
+static bool verifyCompatibility(const std::string &fileId, const std::string &configId)
+{
+    if(fileId.empty() || configId.empty())
+        return false; // Nothing to check
+    if(fileId == configId)
+        return false; // Compatibility is valid
+    return true; // incompatibility detected!
+}
+
 #define LIMIT_BLOCKS   20000
 #define LIMIT_BGOS     8000
 #define LIMIT_NPCS     5000
@@ -48,6 +59,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     bool is38AFormat = false;
     bool uses38AFeatures = false;
+    bool hasUnrecognizedConfigPack = false;
     std::vector<std::string> limitWarnings;
     std::vector<std::string> nearLimitWarnings;
     FileFormats::smbx64LevelPrepare(outData);
@@ -73,6 +85,8 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         uses38AFeatures = true;
     if(!outData.sound_overrides.empty())
         uses38AFeatures = true;
+
+    hasUnrecognizedConfigPack = verifyCompatibility(outData.meta.configPackId, "SMBX2");
 
     std::wstring dir = fullPath.substr(0U, findLastSlash);
     std::wstring filename = fullPath.substr(findLastSlash + 1);
@@ -800,6 +814,22 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                     "SMBX-38A specific features such as TeaScript are not supported here. "
                     "Either this level had incompatible fields set with an old version of the "
                     "editor, or this level is made for use with SMBX-38A.",
+                    L"Incompatible level",
+                    MB_ICONWARNING | MB_OK);
+    }
+    else if(hasUnrecognizedConfigPack)
+    {
+        std::wstring m = fmt::format(L"This level file was created in an editor that was using an unrecognized config pack. "
+                                     L"This most likely means this level was designed to be used with a different engine rather than SMBX2. "
+                                     L"It is likely that some blocks/NPCs/scripts/etc will not be compatible, "
+                                     L"and may cause unexpected gameplay results or errors.\n\n"
+                                     L"Filename: {0}\n"
+                                     L"Level's config pack ID: {1}\n"
+                                     L"Expected config pack ID: SMBX2",
+                                     filename,
+                                     outData.meta.configPackId);
+        MessageBoxW(gMainWindowHwnd,
+                    m.c_str(),
                     L"Incompatible level",
                     MB_ICONWARNING | MB_OK);
     }
