@@ -112,7 +112,7 @@ void MusicManager::initAudioEngine()
         initArrays();
         defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
         defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
-        loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+        loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
         loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
         rebuildSoundCache();
     }
@@ -382,6 +382,25 @@ void MusicManager::loadSounds(std::string path, std::string root)
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
 
+        // If no extension...
+        size_t findLastSlash = fileName.find_last_of("/\\");
+        size_t findLastDot = fileName.find_last_of(".", findLastSlash);
+
+        // Append missing extension
+        if (findLastDot == std::wstring::npos)
+        {
+            static const char* extensionOptions[] = { ".ogg", ".mp3", ".wav", ".voc", ".flac", ".spc" };
+            for (int j=0; j < (sizeof(extensionOptions) / sizeof(extensionOptions[0])); j++)
+            {
+                std::string possibleName = fileName + extensionOptions[j];
+                if (file_existsX(root + possibleName))
+                {
+                    fileName = possibleName;
+                    break;
+                }
+            }
+        }
+
         if(file_existsX(root + fileName))
         {
             sounds[i].setPath(root + fileName.c_str());
@@ -501,7 +520,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCustomPath)
 {
     initArrays();
-    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
     loadSounds(episodePath+"\\sounds.ini", episodePath);
     if(!levelCustomPath.empty())
         loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath);
