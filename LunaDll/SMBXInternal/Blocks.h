@@ -50,11 +50,39 @@ struct Block : SMBX_FullBaseItemArray<Block, 2000, GM_BLOCK_COUNT_CONSTPTR, GM_B
 static_assert(sizeof(Block) == 0x68, "sizeof(Block) must be 0x68");
 #endif
 
+// Extra NPC fields
+struct ExtendedBlockFields
+{
+    double layerSpeedX;
+    double layerSpeedY;
+    double extraSpeedX;
+    double extraSpeedY;
+
+    // Constructor
+    ExtendedBlockFields()
+    {
+        Reset();
+    }
+
+    // Reset function
+    void Reset()
+    {
+        layerSpeedX = 0.0;
+        layerSpeedY = 0.0;
+        extraSpeedX = 0.0;
+        extraSpeedY = 0.0;
+    }
+};
+
 namespace Blocks {
 
     Block* Get(int index);			// Get ptr to a block
     inline Block* GetBase();		// Get base of block array
     inline short Count();			// Get block count
+
+    ExtendedBlockFields* GetRawExtended(int index);
+    void ClearExtendedFields();
+
     int TestCollision(PlayerMOB* pMobPOS, Block* pBlockPOS);
 
     void SetAll(int type1, int type2);  // Set ID of all blocks of type 1 to type 2

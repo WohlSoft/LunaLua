@@ -486,5 +486,10 @@ void __stdcall runtimeHookLoadWorldList(void);
 void __stdcall runtimeHookSpeedOverride(void);
 void __stdcall runtimeHookSpeedOverrideBelt(void);
 
+void __stdcall runtimeHookBlockSpeedSet_FSTP_ECX_EAX_ESI(void);
+void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void);
+void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
+void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
+
 #endif
 

@@ -11,6 +11,24 @@ Block* Blocks::Get(int index) {
     }
 }
 
+static ExtendedBlockFields g_extendedBlockFields[20001];
+
+ExtendedBlockFields* Blocks::GetRawExtended(int index)
+{
+    if (index < 0 || index >= 20001)
+        return nullptr;
+
+    return &g_extendedBlockFields[index];
+}
+
+void Blocks::ClearExtendedFields()
+{
+    for (int i = 0; i < 20001; i++)
+    {
+        g_extendedBlockFields[i].Reset();
+    }
+}
+
 bool Blocks::IsPlayerTouchingType(int type, int sought, PlayerMOB* demo) {	
     Block* blocks = Blocks::GetBase();
     Block* block = 0;

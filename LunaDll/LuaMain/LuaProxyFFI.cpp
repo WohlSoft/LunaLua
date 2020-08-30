@@ -423,6 +423,23 @@ typedef struct ExtendedNPCFields_\
 } ExtendedNPCFields;";
     }
 
+    FFI_EXPORT(ExtendedBlockFields*) LunaLuaGetBlockExtendedFieldsArray()
+    {
+        return Blocks::GetRawExtended(0);
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetBlockExtendedFieldsStruct()
+    {
+        return "\
+typedef struct ExtendedBlockFields_\
+{\
+    double layerSpeedX;\
+    double layerSpeedY;\
+    double extraSpeedX;\
+    double extraSpeedY;\
+} ExtendedBlockFields;";
+    }
+
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
     {
         gDisablePlayerFilterBounceFix = !enable;

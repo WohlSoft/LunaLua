@@ -1068,6 +1068,14 @@ void TrySkipPatch()
     PATCH(0xA0A383).JMP(runtimeHookSpeedOverride).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xA15613).JMP(runtimeHookSpeedOverrideBelt).NOP_PAD_TO_SIZE<5>().Apply();
 
+    // Hooks for catching when 1.3 code is writing layer speed to blocks
+    PATCH(0xAA5897).CALL(runtimeHookBlockSpeedSet_FSTP_ECX_EAX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xAA6944).CALL(runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI).NOP_PAD_TO_SIZE<10>().Apply();
+    PATCH(0xAA6AF7).CALL(runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI).NOP_PAD_TO_SIZE<10>().Apply();
+    PATCH(0xAA6DD7).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
+    PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
+    
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

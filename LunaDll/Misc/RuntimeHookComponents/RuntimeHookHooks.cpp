@@ -3312,6 +3312,9 @@ static unsigned int __stdcall runtimeHookPSwitchGetNewBlockAtEnd()
         Block& b = *Block::GetRaw(i);
         if (b.pLayerName == destroyedPSwitchBlockLayerName)
         {
+            // Reset extended properties
+            Blocks::GetRawExtended(i)->Reset();
+
             if (gLunaLua.isValid()) {
                 std::shared_ptr<Event> blockInvalidateEvent = std::make_shared<Event>("onBlockInvalidateForReuseInternal", false);
                 blockInvalidateEvent->setDirectEventName("onBlockInvalidateForReuseInternal");
@@ -3769,6 +3772,114 @@ __declspec(naked) void __stdcall runtimeHookSpeedOverrideBelt(void)
         pop eax
         popfd
         push 0xA1563E
+        ret
+    }
+}
+
+static void __stdcall runtimeHookBlockSpeedSet(int blockIdx)
+{
+    // Store layer-assigned block speed, and add extra speed
+    Block&               block = *Block::GetRaw(blockIdx);
+    ExtendedBlockFields& ext   = *Blocks::GetRawExtended(blockIdx);
+    ext.layerSpeedX = block.momentum.speedX;
+    ext.layerSpeedY = block.momentum.speedY;
+    block.momentum.speedX = ext.layerSpeedX + ext.extraSpeedX;
+    block.momentum.speedY = ext.layerSpeedY + ext.extraSpeedY;
+}
+
+_declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_ECX_EAX_ESI(void)
+{
+    // 00AA5897 | 8D0496 | lea eax, dword ptr ds : [esi + edx * 4] |
+    // 00AA589A | DD5CC1 48 | fstp qword ptr ds : [ecx + eax * 8 + 48], st(0) |
+    __asm {
+        lea eax, dword ptr ds : [esi + edx * 4]
+        fstp qword ptr ds : [ecx + eax * 8 + 0x48]
+
+        push eax
+        push ecx
+        push edx
+
+        push esi
+        call runtimeHookBlockSpeedSet
+
+        pop edx
+        pop ecx
+        pop eax
+
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void)
+{
+    // 00AA6944 | 8B0D 045AB200 | mov ecx, dword ptr ds : [<GM_BLOCKS_PTR>] | (CAN IGNORE)
+    // 00AA694A | 8944D1 4C | mov dword ptr ds : [ecx + edx * 8 + 4C], eax |
+    // or
+    // 00AA6AF7 | 8B0D 045AB200 | mov ecx, dword ptr ds : [<GM_BLOCKS_PTR>] | (CAN IGNORE)
+    // 00AA6AFD | 8944D1 4C | mov dword ptr ds : [ecx + edx * 8 + 4C], eax |
+    __asm {
+        mov dword ptr ds : [ecx + edx * 8 + 0x4C], eax
+
+        push eax
+        push ecx
+        push edx
+
+        push esi
+        call runtimeHookBlockSpeedSet
+
+        pop edx
+        pop ecx
+        pop eax
+
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void)
+{
+    // 00AA6DD7 | 8D148E | lea edx, dword ptr ds : [esi + ecx * 4] |
+    // 00AA6DDA | DD5CD0 48 | fstp qword ptr ds : [eax + edx * 8 + 48], st(0) |
+    // or
+    // 009D1221 | 8D148E | lea edx, dword ptr ds : [esi + ecx * 4] |
+    // 009D1224 | DD5CD0 48 | fstp qword ptr ds : [eax + edx * 8 + 48], st(0) |
+    __asm {
+        lea edx, dword ptr ds : [esi + ecx * 4]
+        fstp qword ptr ds : [eax + edx * 8 + 0x48]
+
+        push eax
+        push ecx
+        push edx
+
+        push esi
+        call runtimeHookBlockSpeedSet
+
+        pop edx
+        pop ecx
+        pop eax
+
+        ret
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void)
+{
+    // 00A22E69 | 8D148F | lea edx, dword ptr ds : [edi + ecx * 4] |
+    // 00A22E6C | DD5CD0 48 | fstp qword ptr ds : [eax + edx * 8 + 48], st(0) |
+    __asm {
+        lea edx, dword ptr ds : [edi + ecx * 4]
+        fstp qword ptr ds : [eax + edx * 8 + 0x48]
+
+        push eax
+        push ecx
+        push edx
+
+        push edi
+        call runtimeHookBlockSpeedSet
+
+        pop edx
+        pop ecx
+        pop eax
+
         ret
     }
 }
