@@ -115,6 +115,16 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     GM_WATER_AREA_COUNT = 0;
     GM_ANIM_COUNT = 0;
 
+    // Clear block frames
+    for (int i = 0; i < Block::MAX_ID; i++)
+    {
+        GM_BLOCK_ANIM_FRAME[i] = 0;
+    }
+    for (int i = 0; i < Block::MAX_ID; i++)
+    {
+        GM_BLOCK_ANIM_TIMER[i] = 0;
+    }
+
     // Clear extended fields
     NPC::ClearExtendedFields();
     Blocks::ClearExtendedFields();
