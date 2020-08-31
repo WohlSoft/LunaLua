@@ -124,8 +124,17 @@ bool GameAutostart::applyAutostart()
     // Make new entry if needed
     if (!foundEpisode && usingWldPath)
     {
-        epIdx = GM_EP_LIST_COUNT;
-        GM_EP_LIST_COUNT++;
+        if (GM_EP_LIST_COUNT < 100)
+        {
+            // We can add an entry at the end
+            epIdx = GM_EP_LIST_COUNT;
+            GM_EP_LIST_COUNT++;
+        }
+        else
+        {
+            // We have to overwite and entry
+            epIdx = 0;
+        }
         EpisodeListItem* item = EpisodeListItem::Get(epIdx);
 
         item->episodeName = L"External Episode";

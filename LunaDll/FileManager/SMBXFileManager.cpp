@@ -168,6 +168,12 @@ void SMBXWorldFileBase::PopulateEpisodeList()
     // Walk all (potential) episode folders
     for (const std::string& epDirName : episodeDirs)
     {
+        if (GM_EP_LIST_COUNT >= 100)
+        {
+            // Only fill up to episode 100 to avoid crashing.
+            break;
+        }
+
         std::string epPath = worldsPath + "\\" + epDirName;
         DirMan epDir(epPath);
         std::vector<std::string> wldFiles;
