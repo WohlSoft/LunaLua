@@ -818,6 +818,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                     L"Incompatible level",
                     MB_ICONWARNING|MB_OK);
     }
+#if defined(ENABLE_38A_FEATURE_WARNING)
     else if (uses38AFeatures)
     {
         MessageBoxW(gMainWindowHwnd,
@@ -828,6 +829,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                     L"Incompatible level",
                     MB_ICONWARNING | MB_OK);
     }
+#endif
     else if(hasUnrecognizedConfigPack)
     {
         std::wstring m = fmt::format(L"This level file was created in an editor that was using an unrecognized config pack. "
