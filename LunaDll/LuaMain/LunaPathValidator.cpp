@@ -75,7 +75,8 @@ LunaPathValidator::Result* LunaPathValidator::CheckPath(const char* path)
     else if ((mMatchingEnginePath.size() > 0) && (mMatchingEnginePath == wNormalPath.substr(0, mMatchingEnginePath.size())))
     {
         // If engine path matches
-        bool canWrite = (wNormalPath.substr(mMatchingEnginePath.size(), 5) == L"logs\\");
+        bool canWrite = ((wNormalPath.substr(mMatchingEnginePath.size(), 5) == L"logs\\") ||
+                         (wNormalPath.substr(mMatchingEnginePath.size(), std::wstring::npos) == L"worlds\\mario challenge\\data.json"));
         mResult = { mNormalPath.c_str(), mNormalPath.length(), canWrite };
     }
     else
