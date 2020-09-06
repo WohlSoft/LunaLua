@@ -2,6 +2,12 @@
 #include "../../../Defines.h"
 #include "../../../GlobalFuncs.h"
 
+void LuaProxy::Level::exit(int levelExitType)
+{
+    GM_LEVEL_EXIT_TYPE = levelExitType;
+    LuaProxy::Level::exit();
+}
+
 void LuaProxy::Level::exit()
 {
     GM_EPISODE_MODE = 0xFFFF;
