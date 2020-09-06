@@ -930,6 +930,7 @@ namespace LuaProxy {
         void openPauseMenu();
         void saveGame();
         void exitGame();
+        void exitEngine();
         bool loadEpisode(const std::string& episodeName);
         void pause();
         void pause(bool atFrameEnd);

@@ -220,6 +220,11 @@ void LuaProxy::Misc::exitGame()
     GM_CUR_MENUTYPE = 0;
 }
 
+void LuaProxy::Misc::exitEngine()
+{
+    _exit(0);
+}
+
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 {
     GameAutostart autoStartEpisode;

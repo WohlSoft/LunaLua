@@ -669,6 +669,7 @@ void CLunaLua::bindAll()
                 def("openPauseMenu", &LuaProxy::Misc::openPauseMenu),
                 def("saveGame", &LuaProxy::Misc::saveGame),
                 def("exitGame", &LuaProxy::Misc::exitGame),
+                def("exitEngine", &LuaProxy::Misc::exitEngine),
                 def("loadEpisode", &LuaProxy::Misc::loadEpisode),
                 def("pause", (void(*)(void))&LuaProxy::Misc::pause),
                 def("pause", (void(*)(bool))&LuaProxy::Misc::pause),
