@@ -217,6 +217,7 @@ void LuaProxy::Misc::exitGame()
 {
     GM_EPISODE_MODE = 0;
     GM_LEVEL_MODE = 0xFFFF;
+    GM_CUR_MENUTYPE = 0;
 }
 
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
