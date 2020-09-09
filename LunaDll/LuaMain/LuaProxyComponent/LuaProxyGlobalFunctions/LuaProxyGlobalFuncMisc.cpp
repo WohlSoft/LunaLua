@@ -232,7 +232,10 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
     autoStartEpisode.setSaveSlot(GM_CUR_SAVE_SLOT);
     bool success = autoStartEpisode.applyAutostart();
     if (success)
-        exitGame();
+    {
+        GM_EPISODE_MODE = 0;
+        GM_LEVEL_MODE = 0xFFFF;
+    }
     return success;
 }
 
