@@ -33,6 +33,7 @@ struct FFI_GL_Draw_Cmd
     uint32_t mCount;
     bool mSceneCoords;
     bool mDepthTest;
+	bool mLinearFiltered;
     const float* mVert;
     const float* mTex;
     const float* mVertColor;

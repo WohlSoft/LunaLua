@@ -178,6 +178,12 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         g_GLDraw.UnbindTexture();
     }
 
+	if (mLinearFiltered)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
 
@@ -226,6 +232,15 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
     glDrawArrays(mType, 0, mCount);
     GLERRORCHECK();
+
+	if (mLinearFiltered)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (!mCapBuff)
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		}
+	}
 
     if (mTex == NULL) {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
