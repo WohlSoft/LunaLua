@@ -7,6 +7,8 @@
 #include "GLCompat.h"
 #include "../../Misc/SRect.h"
 
+class GLShader;
+
 class GLDraw {
 private:
     GLuint mLastTexName;
@@ -102,7 +104,7 @@ public:
 
     void DrawSprite(const SRect<double>& dest, const Texture* tex, const SRect<double>& src, float opacity, RenderMode mode);
     void DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight);
-    void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity);
+    void DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity, GLShader* upscaleShader);
 };
 
 // Instance

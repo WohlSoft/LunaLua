@@ -8,6 +8,7 @@
 #include "GLDraw.h"
 #include "../AsyncGifRecorder.h"
 
+class GLShader;
 typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
 
 class GLEngine {
@@ -22,6 +23,8 @@ private:
     AsyncGifRecorder mGifRecorder;
 
     double mCameraX, mCameraY;
+
+	GLShader* mpUpscaleShader;
 
 public:
     GLEngine();

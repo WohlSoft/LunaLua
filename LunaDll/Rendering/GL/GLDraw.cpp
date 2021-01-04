@@ -3,6 +3,7 @@
 #include "../../Defines.h"
 #include "GLDraw.h"
 #include "GLCompat.h"
+#include "../Shaders/GLShader.h"
 
 // Instance
 GLDraw g_GLDraw;
@@ -154,10 +155,8 @@ void GLDraw::DrawRectangle(int nXDest, int nYDest, int nWidth, int nHeight)
 }
 
 
-void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity)
+void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, const Texture* tex, int nXSrc, int nYSrc, int nSrcWidth, int nSrcHeight, float opacity, GLShader* upscaleShader)
 {
-    // Bind Post-Processing Shader here
-
     // Generate our floating point coordinates
     float texw = (float)tex->pw;
     float texh = (float)tex->ph;
@@ -179,7 +178,55 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     BindTexture(tex);
     GLERRORCHECK();
     
-    // Set Post-Processing uniforms/attributes here
+	// Bind Post-Processing Shader here
+	if (upscaleShader)
+	{
+		upscaleShader->clearSamplers();
+
+		upscaleShader->bind();
+
+		for (auto& uniformInfo : upscaleShader->getAllUniforms())
+		{
+			if (uniformInfo.getName() == "inputSize")
+			{
+				double inputW = tex->pw;
+				double inputH = tex->ph;
+				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
+				{
+					double textureSizeArr[2] = { inputW, inputH };
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
+					upscaleShader->applyUniform(uniformEntry);
+				}
+				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
+				{
+					float textureSizeArr[2] = { inputW, inputH };
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
+					upscaleShader->applyUniform(uniformEntry);
+				}
+			}
+			if (uniformInfo.getName() == "crispScale")
+			{
+				double scaleX = double(nWidth) / nSrcWidth;
+				double scaleY = double(nHeight) / nSrcHeight;
+				if (scaleX < 1.0) scaleX = 1.0;
+				if (scaleY < 1.0) scaleY = 1.0;
+				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
+				{
+					double textureSizeArr[2] = { scaleX, scaleY };
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
+					upscaleShader->applyUniform(uniformEntry);
+				}
+				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
+				{
+					float textureSizeArr[2] = { scaleX, scaleY };
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
+					upscaleShader->applyUniform(uniformEntry);
+				}
+			}
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 
     GLfloat Vertices[] = {
         x1, y1, 0,
@@ -210,7 +257,13 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     GLERRORCHECK();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
     GLERRORCHECK();
-    // Unbind Post-Processing Shader here
+
+	// Unbind Post-Processing Shader here
+	if (upscaleShader)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		upscaleShader->unbind();
+	}
 }
 
 
