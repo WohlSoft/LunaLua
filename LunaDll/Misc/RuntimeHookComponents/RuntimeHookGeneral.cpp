@@ -51,6 +51,174 @@ void SetupThunRTMainHook()
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
 }
 
+static WNDPROC gMainWindowProc;
+LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (hwnd == gMainWindowHwnd)
+	{
+		switch (uMsg)
+		{
+			case WM_GETMINMAXINFO:
+			{
+				RECT rc;
+				rc.left = 0;
+				rc.top = 0;
+				rc.right = 400;
+				rc.bottom = 300;
+				AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+					GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+
+				// Restrict main window size
+				LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+				lpMMI->ptMinTrackSize.x = rc.right - rc.left;
+				lpMMI->ptMinTrackSize.y = rc.bottom - rc.top;
+				return TRUE;
+			}
+			case WM_SIZING:
+			{
+				// Allow free sizing when CTRL is held
+				if ((gKeyState[VK_CONTROL] & 0x80) != 0)
+				{
+					break;
+				}
+
+				RECT rc;
+				rc.left = 0;
+				rc.top = 0;
+				rc.right = 800;
+				rc.bottom = 600;
+				AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+					GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+				int wPad = rc.right - rc.left - 800;
+				int hPad = rc.bottom - rc.top - 600;
+
+				LPRECT lpRect = (LPRECT)lParam;
+				int w = lpRect->right - lpRect->left - wPad;
+				int h = lpRect->bottom - lpRect->top - hPad;
+				double relS;
+				switch (wParam)
+				{
+					default:
+					case WMSZ_BOTTOMLEFT:
+					case WMSZ_BOTTOMRIGHT:
+					case WMSZ_TOPLEFT:
+					case WMSZ_TOPRIGHT:
+						// Corners
+						relS = 0.5 * (w / 800.0 + h / 600.0);
+						break;
+					case WMSZ_TOP:
+					case WMSZ_BOTTOM:
+						// Vertical resize only
+						relS = h / 600.0;
+						break;
+					case WMSZ_LEFT:
+					case WMSZ_RIGHT:
+						// Vertical resize only
+						relS = w / 800.0;
+						break;
+				}
+
+				// Cap size >= 50%
+				if (relS < 0.5)
+				{
+					relS = 0.5;
+				}
+
+				// Snap size
+				if ((relS > 0.95) && (relS < 1.05))
+				{
+					relS = 1.0;
+				}
+
+				// New Size
+				w = (int)floor(relS * 800 + 0.5) + wPad;
+				h = (int)floor(relS * 600 + 0.5) + hPad;
+
+				// Fine tune size
+				switch (wParam)
+				{
+					case WMSZ_TOP:
+					case WMSZ_BOTTOM:
+						// Force even width for centering
+						w -= w % 2;
+						relS = (w - wPad) / 800.0;
+						h = (int)floor(relS * 600 + 0.5) + hPad;
+						break;
+					case WMSZ_LEFT:
+					case WMSZ_RIGHT:
+						// Force even height for centering
+						h -= h % 2;
+						relS = (h - hPad) / 600.0;
+						w = (int)floor(relS * 800 + 0.5) + wPad;
+						break;
+				}
+
+				// Adjust left/right
+				switch (wParam)
+				{
+					case WMSZ_TOPLEFT:
+					case WMSZ_LEFT:
+					case WMSZ_BOTTOMLEFT:
+					{
+						// Dragging left, leave right alone
+						lpRect->left = lpRect->right - w;
+						break;
+					}
+					case WMSZ_TOPRIGHT:
+					case WMSZ_RIGHT:
+					case WMSZ_BOTTOMRIGHT:
+					{
+						// Dragging right, leave left alone
+						lpRect->right = lpRect->left + w;
+						break;
+					}
+					case WMSZ_TOP:
+					case WMSZ_BOTTOM:
+					{
+						// Dragging top/bottom, leave keep centered
+						lpRect->left = (lpRect->right + lpRect->left - w) / 2;
+						lpRect->right = lpRect->left + w;
+						break;
+					}
+				}
+
+				// Adjust top/bottom
+				switch (wParam)
+				{
+					case WMSZ_TOPLEFT:
+					case WMSZ_TOP:
+					case WMSZ_TOPRIGHT:
+					{
+						// Dragging top, leave bottom alone
+						lpRect->top = lpRect->bottom - h;
+						break;
+					}
+					case WMSZ_BOTTOMLEFT:
+					case WMSZ_BOTTOM:
+					case WMSZ_BOTTOMRIGHT:
+					{
+						// Dragging right, leave left alone
+						lpRect->bottom = lpRect->top + h;
+						break;
+					}
+					case WMSZ_LEFT:
+					case WMSZ_RIGHT:
+					{
+						// Dragging top/bottom, leave keep centered
+						lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
+						lpRect->bottom = lpRect->top + h;
+						break;
+					}
+				}
+
+				return TRUE;
+			}
+		}
+	}
+
+	return CallWindowProc(gMainWindowProc, hwnd, uMsg, wParam, lParam);
+}
+
 LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode < 0){
@@ -85,6 +253,9 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             {
                 // Store main window handle
                 gMainWindowHwnd = wData->hwnd;
+
+				// Override window proc
+				gMainWindowProc = (WNDPROC)SetWindowLongPtrA(gMainWindowHwnd, GWLP_WNDPROC, (LONG_PTR)HandleWndProc);
             }
         }
         break;
