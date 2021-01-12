@@ -11,6 +11,8 @@ CONFIG += c++11
 DEFINES += PGE_FILES_QT BUILDING_SMBXLAUNCHER
 DEFINES -= QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_INFO_OUTPUT
 
+linux: QMAKE_CXXFLAGS += -Wno-deprecated-copy
+
 TARGET = SMBXLauncher
 TEMPLATE = app
 win32: LIBS += User32.lib -L$$PWD/../../LunaDll/libs/sdl/lib/ -lSDL2 -lSDL2main
