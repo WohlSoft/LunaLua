@@ -8,6 +8,7 @@ if not exist build-smbx-launcher\NUL md build-smbx-launcher
 cd build-smbx-launcher
 %QT_PATH%\qmake -spec win32-msvc CONFIG+=Win32 CONFIG+=release CONFIG-=debug ../LunadllNewLauncher/SMBXLauncher/SMBXLauncher.pro
 %JOM% /J 4
+if errorlevel 1 exit 1
 
 if exist build-smbx-launcher\NUL rd /S /Q deploy
 md deploy
