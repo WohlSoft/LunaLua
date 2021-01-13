@@ -416,7 +416,7 @@ void MainLauncherWindow::runPGEEditor()
         }
         else // Try detect 32-bit Editor
         {
-            if(QFile::exist(m_editorExe32bit)) // Run 32-bit Editor
+            if(QFile::exists(m_editorExe32bit)) // Run 32-bit Editor
             {
                 QProcess::startDetached(m_editorExe32bit);
             }
