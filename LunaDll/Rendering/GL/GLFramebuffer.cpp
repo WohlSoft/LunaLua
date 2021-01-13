@@ -70,7 +70,9 @@ GLFramebuffer::~GLFramebuffer()
     GLERRORCHECK();
 
     // Unbind texture just in case
-    g_GLDraw.UnbindTexture();
+	if (mBufTex.name && (mBufTex.name == g_GLDraw.GetCurrentTexName())) {
+		g_GLDraw.UnbindTexture();
+	}
 
     // Delete framebuffer
     if (mFB) {
