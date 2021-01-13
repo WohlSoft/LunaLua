@@ -52,7 +52,9 @@ private:
     QScopedPointer<SMBXConfig> m_smbxConfig;
     QScopedPointer<LauncherConfiguration> m_launcherSettings;
     QString m_smbxExe;
-    QString m_pgeExe;
+    QString m_editorExe;
+    QString m_editorExe32bit;
+    QString m_editorBootstrap32;
     bool m_ApplyLunaLoaderPatch;
     bool m_jsBridgeAlreadInit;
     int m_initWidth;

@@ -1,3 +1,8 @@
+#if defined(_WIN32) && !defined(_WIN64)
+#include <windows.h>
+#define WIN_CHECK_FOR_64BIT_CPU
+#endif
+
 #include "mainlauncherwindow.h"
 #include "ui_mainlauncherwindow.h"
 //#include "../../LunaLoader/LunaLoaderPatch.h"
@@ -43,6 +48,26 @@ static QString pathUnixToWine(const QString &unixPath)
     // Retrieve converted path
     QString windowsPath = winePath.readAllStandardOutput();
     return windowsPath.trimmed();
+}
+#endif
+
+#ifdef WIN_CHECK_FOR_64BIT_CPU
+typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+
+static BOOL s_isWow64()
+{
+    BOOL bIsWow64 = FALSE;
+
+    auto h = GetModuleHandleW(L"kernel32");
+    LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(h, "IsWow64Process");
+
+    if(NULL != fnIsWow64Process)
+    {
+        if(!fnIsWow64Process(GetCurrentProcess(), &bIsWow64))
+            qWarning() << "Error has occurred while calling the IsWow64Process() function";
+    }
+
+    return bIsWow64;
 }
 #endif
 
@@ -287,7 +312,10 @@ void MainLauncherWindow::init(const QString &configName)
     // Load launcher settings
     if(QFile::exists(configName)){
         m_smbxExe = settingFile.value("smbx-exe", "smbx.exe").toString();
-        m_pgeExe = settingFile.value("pge-exe", "PGE/pge_editor.exe").toString();
+        m_editorExe = settingFile.value("editor-exe-64", "PGE/pge_editor.exe").toString();
+        m_editorExe = settingFile.value("pge-exe", m_editorExe).toString(); // Deprecated alias
+        m_editorExe32bit = settingFile.value("editor-exe-32", QString()).toString();
+        m_editorBootstrap32 = settingFile.value("devkit-bootstrap-32", "PGEx32/generate-build.bat").toString();
 
         QString wintitle = settingFile.value("title", "SMBX Launcher").toString();
         m_autoWindowTitle = wintitle == "auto";
@@ -335,7 +363,7 @@ void MainLauncherWindow::init(const QString &configName)
         m_ApplyLunaLoaderPatch = (settingFile.value("apply-lunaloader-patch", "false").toString() == "true");
     }else{
         autoSize();
-        m_pgeExe = "PGE/pge_editor.exe";
+        m_editorExe = "PGE/pge_editor.exe";
         ui->mainWindowWidget->setWindowTitle("SMBX Launcher");
         m_ApplyLunaLoaderPatch = false;
         loadDefaultWebpage();
@@ -374,15 +402,68 @@ void MainLauncherWindow::runSMBXEditor()
 
 void MainLauncherWindow::runPGEEditor()
 {
-    if(m_pgeExe.length() > 0)
+    if(m_editorExe.length() > 0)
     {
 #ifdef _WIN32
-        QProcess::startDetached(m_pgeExe);
+        if(m_editorExe32bit.isEmpty()) // Run default Editor copy if no 32-bit Editor specified
+        {
+            QProcess::startDetached(m_editorExe);
+        }
+#   ifdef WIN_CHECK_FOR_64BIT_CPU
+        else if(QSysInfo::WindowsVersion >= QSysInfo::WV_WINDOWS7 && s_isWow64()) // Run 64-bit Editor
+        {
+            QProcess::startDetached(m_editorExe);
+        }
+        else // Try detect 32-bit Editor
+        {
+            if(QFile::exist(m_editorExe32bit)) // Run 32-bit Editor
+            {
+                QProcess::startDetached(m_editorExe32bit);
+            }
+            else // Otherwise, run the bootstrum script to download it
+            {
+                int q = QMessageBox::question(this,
+                                              tr("Legacy platform detected"),
+                                              tr("A legacy 32-bit operating system is running. The current version of the editor can't run on this platform. Do you want to download the compatible version now?"),
+                                              QMessageBox::Yes|QMessageBox::No);
+                if(q == QMessageBox::Yes)
+                {
+                    QFileInfo f(m_editorBootstrap32);
+                    QProcess::startDetached("cmd", {"/k", f.fileName(), "--no-splash"}, f.absoluteDir().absolutePath());
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+#   else
+        QProcess::startDetached(m_editorExe);
+#   endif // WIN_CHECK_FOR_64BIT_CPU
 #else
-        if(m_pgeExe.endsWith(".exe"))
-            QProcess::startDetached("wine", {m_pgeExe});
+
+#if 0 // TEST CODE to try the feature on Linux
+        int q = QMessageBox::question(this,
+                                      tr("Legacy platform detected"),
+                                      tr("A legacy 32-bit operating system is running. The current version of the editor can't run on this platform. Do you want to download the compatible version now?"),
+                                      QMessageBox::Yes|QMessageBox::No);
+        if(q == QMessageBox::Yes)
+        {
+            QFileInfo f(m_editorBootstrap32);
+            QProcess::startDetached("gnome-terminal", {"--", "bash", f.fileName()}, f.absoluteDir().absolutePath());
+            close();
+            return;
+        }
         else
-            QProcess::startDetached(m_pgeExe);
+        {
+            return;
+        }
+#endif
+
+        if(m_editorExe.endsWith(".exe"))
+            QProcess::startDetached("wine", {m_editorExe});
+        else
+            QProcess::startDetached(m_editorExe);
 #endif
         close();
     }
