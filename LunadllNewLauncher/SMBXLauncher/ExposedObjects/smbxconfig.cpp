@@ -236,8 +236,10 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                 try {
                     index = std::stoi(match[1]);
                 } catch (std::invalid_argument const &e) {
+                    Q_UNUSED(e)
                     index = 0;
                 } catch (std::out_of_range const &e) {
+                    Q_UNUSED(e)
                     index = 0;
                 }
             }
@@ -264,8 +266,10 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                             try {
                                 progress = std::stod(match[1]);
                             } catch (std::invalid_argument const &e) {
+                                Q_UNUSED(e)
                                 progress = 0;
                             } catch (std::out_of_range const &e) {
+                                Q_UNUSED(e)
                                 progress = 0;
                             }
                             count++;

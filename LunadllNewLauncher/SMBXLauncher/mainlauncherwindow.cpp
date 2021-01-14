@@ -416,7 +416,7 @@ void MainLauncherWindow::runPGEEditor()
         }
         else // Try detect 32-bit Editor
         {
-            if(QFile::exist(m_editorExe32bit)) // Run 32-bit Editor
+            if(QFile::exists(m_editorExe32bit)) // Run 32-bit Editor
             {
                 QProcess::startDetached(m_editorExe32bit);
             }
@@ -429,7 +429,15 @@ void MainLauncherWindow::runPGEEditor()
                 if(q == QMessageBox::Yes)
                 {
                     QFileInfo f(m_editorBootstrap32);
-                    QProcess::startDetached("cmd", {"/k", f.fileName(), "--no-splash"}, f.absoluteDir().absolutePath());
+                    QProcess p;
+                    p.setProgram("cmd.exe");
+                    p.setArguments({"/k", f.fileName(), "--no-splash"});
+                    p.setWorkingDirectory(f.absoluteDir().absolutePath());
+                    p.setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
+                    {
+                        args->flags &= ~CREATE_NO_WINDOW;
+                    });
+                    p.startDetached();
                 }
                 else
                 {
