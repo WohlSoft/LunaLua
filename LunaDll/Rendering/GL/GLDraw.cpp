@@ -174,16 +174,15 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     GLERRORCHECK();
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
-
-    BindTexture(tex);
-    GLERRORCHECK();
     
 	// Bind Post-Processing Shader here
 	if (upscaleShader)
 	{
 		upscaleShader->clearSamplers();
+		GLERRORCHECK();
 
 		upscaleShader->bind();
+		GLERRORCHECK();
 
 		for (auto& uniformInfo : upscaleShader->getAllUniforms())
 		{
@@ -196,12 +195,14 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 					double textureSizeArr[2] = { inputW, inputH };
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
+					GLERRORCHECK();
 				}
 				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
 				{
-					float textureSizeArr[2] = { inputW, inputH };
+					float textureSizeArr[2] = { (float)inputW, (float)inputH };
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
+					GLERRORCHECK();
 				}
 			}
 			if (uniformInfo.getName() == "crispScale")
@@ -215,17 +216,26 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 					double textureSizeArr[2] = { scaleX, scaleY };
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
+					GLERRORCHECK();
 				}
 				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
 				{
-					float textureSizeArr[2] = { scaleX, scaleY };
+					float textureSizeArr[2] = { (float)scaleX, (float)scaleY };
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
+					GLERRORCHECK();
 				}
 			}
 		}
+	}
 
+	BindTexture(tex);
+	GLERRORCHECK();
+
+	if (upscaleShader)
+	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		GLERRORCHECK();
 	}
 
     GLfloat Vertices[] = {
@@ -262,7 +272,9 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 	if (upscaleShader)
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		GLERRORCHECK();
 		upscaleShader->unbind();
+		GLERRORCHECK();
 	}
 }
 

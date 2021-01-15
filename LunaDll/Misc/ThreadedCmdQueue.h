@@ -25,7 +25,6 @@ public:
     }
 
     inline T peek() {
-        T cmd;
         std::unique_lock<std::mutex> lck(mMutex);
 
         while (mQueue.empty()) mCond.wait(lck);

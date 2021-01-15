@@ -8,10 +8,11 @@ GLShaderVariableInfo::GLShaderVariableInfo(GLShaderVariableType varType, GLint i
     m_arrayCount(arrayCount),
     m_type(type),
     m_name(name),
+	m_rawName(name),
     m_arrayDepth(0u)
 {
     // Calculate array depth
-    std::regex indexMatcher("\\[\\d*\\]", std::regex_constants::ECMAScript);
+    static std::regex indexMatcher("\\[\\d*\\]", std::regex_constants::ECMAScript);
     m_arrayDepth = std::distance(std::sregex_iterator(name.begin(), name.end(), indexMatcher), std::sregex_iterator());
 
     if (m_arrayDepth < 1) {
