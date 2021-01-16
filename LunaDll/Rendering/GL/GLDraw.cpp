@@ -192,14 +192,18 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 				double inputH = tex->ph;
 				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
 				{
-					double textureSizeArr[2] = { inputW, inputH };
+					double* textureSizeArr = (double*)std::malloc(sizeof(double) * 2);
+					textureSizeArr[0] = inputW;
+					textureSizeArr[1] = inputH;
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
 					GLERRORCHECK();
 				}
 				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
 				{
-					float textureSizeArr[2] = { (float)inputW, (float)inputH };
+					float* textureSizeArr = (float*)std::malloc(sizeof(float) * 2);
+					textureSizeArr[0] = (float)inputW;
+					textureSizeArr[1] = (float)inputH;
 					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
 					upscaleShader->applyUniform(uniformEntry);
 					GLERRORCHECK();
@@ -213,15 +217,19 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
 				if (scaleY < 1.0) scaleY = 1.0;
 				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
 				{
-					double textureSizeArr[2] = { scaleX, scaleY };
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
+					double* scaleArr = (double*)std::malloc(sizeof(double) * 2);
+					scaleArr[0] = scaleX;
+					scaleArr[1] = scaleY;
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, scaleArr);
 					upscaleShader->applyUniform(uniformEntry);
 					GLERRORCHECK();
 				}
 				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
 				{
-					float textureSizeArr[2] = { (float)scaleX, (float)scaleY };
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
+					float* scaleArr = (float*)std::malloc(sizeof(float) * 2);
+					scaleArr[0] = (float)scaleX;
+					scaleArr[1] = (float)scaleY;
+					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, scaleArr);
 					upscaleShader->applyUniform(uniformEntry);
 					GLERRORCHECK();
 				}
