@@ -38,8 +38,6 @@ FFI_EXPORT LunaImageRef* __fastcall FFI_ImageLoad(const char* filename, uint32_t
         full_path = Str2WStr(filename);
     }
 
-	HandleEventsWhileLoading();
-
     std::shared_ptr<LunaImage> img = LunaImage::fromFile(full_path.c_str());
     if (img)
     {
