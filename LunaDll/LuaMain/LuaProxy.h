@@ -902,12 +902,8 @@ namespace LuaProxy {
     }
     //General functions
     namespace Level{
-        void exit();
-        void exit(int levelExitType);
         std::string filename();
         std::string name();
-        unsigned short winState();
-        void winState(unsigned short value);
     }
 
     namespace Misc{

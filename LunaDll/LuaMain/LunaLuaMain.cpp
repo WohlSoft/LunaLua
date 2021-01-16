@@ -1178,11 +1178,6 @@ void CLunaLua::bindAll()
                 ],
 
                 namespace_("Level")[
-                    def("exit", (void(*)(int))&LuaProxy::Level::exit),
-                    def("exit", (void(*)())&LuaProxy::Level::exit),
-                    def("exitLevel", (void(*)())&LuaProxy::Level::exit), // Supposed to be 'exit' but one release had Level.exitLevel, so let that work too.
-                    def("winState", (unsigned short(*)())&LuaProxy::Level::winState),
-                    def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState),
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
                     // This isn't just useful in level situation... it is useful for overworld too, so, there's a copy in Misc too
@@ -1442,9 +1437,6 @@ void CLunaLua::bindAllDeprecated()
                 def("blocks", &LuaProxy::blocks),   //DONE
                 def("findblocks", &LuaProxy::findblocks),   //DONE
                 def("findlayer", &LuaProxy::findlayer),     //DONE
-                def("exitLevel", (void(*)())&LuaProxy::Level::exit), //DONE
-                def("winState", (unsigned short(*)())&LuaProxy::Level::winState), //DONE
-                def("winState", (void(*)(unsigned short))&LuaProxy::Level::winState), //DONE
                 def("animations", &LuaProxy::animations), //DONE
                 def("getInput", &LuaProxy::getInput), //DONE
                 def("hud", &LuaProxy::Graphics::activateHud), //DONE
