@@ -494,6 +494,8 @@ typedef struct ExtendedBlockFields_\
         CLunaFFILock ffiLock(__FUNCTION__);
         std::unique_lock<std::mutex> lck(readFileMutex);
 
+		HandleEventsWhileLoading();
+
         LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
         if (!ptr) return nullptr;
         path = ptr->path;
@@ -549,6 +551,8 @@ typedef struct ExtendedBlockFields_\
     FFI_EXPORT(bool) LunaLuaCachedExists(const char* path)
     {
         CLunaFFILock ffiLock(__FUNCTION__);
+
+		HandleEventsWhileLoading();
 
         LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
         if (!ptr) return false;

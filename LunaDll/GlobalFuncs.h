@@ -230,4 +230,7 @@ void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 // Window Helper Funcs
 void ShowAndFocusWindow(HWND hWindow);
 
+// Handle WIN32 events when loading
+void HandleEventsWhileLoading();
+
 #endif

@@ -1044,3 +1044,16 @@ void ShowAndFocusWindow(HWND hWindow)
 
     BringWindowToTop(hWindow);
 }
+
+void HandleEventsWhileLoading()
+{
+	static DWORD lastTime = 0;
+	DWORD thisTime = GetTickCount();
+	DWORD elapsedTime = thisTime - lastTime;
+	if (elapsedTime > 100)
+	{
+		// Run if >100ms has elapsed since last event handling
+		native_rtcDoEvents();
+		lastTime = thisTime;
+	}
+}

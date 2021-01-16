@@ -195,6 +195,8 @@ void ImageLoaderCategory::updateLoadedImages(const std::unordered_map<std::wstri
     std::wstring prefix = m_Category.getPrefix();
     for (uint32_t i = firstIdx; i <= lastIdx; i++)
     {
+		HandleEventsWhileLoading();
+
         std::wstring imageName = prefix + L"-" + std::to_wstring(i);
         ResourceFileInfo newMain, newMask;
         ResourceFileInfo oldMain, oldMask;
@@ -481,6 +483,8 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
 {
     for (int idx1 = 1; idx1 <= HardcodedGraphicsItem::Size(); idx1++)
     {
+		HandleEventsWhileLoading();
+
         HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(idx1);
         
         // No processing invalid or mask items here
@@ -491,6 +495,8 @@ void ImageLoader::LoadHardcodedGfx(const std::unordered_map<std::wstring, Resour
         int maxItem = hItemInfo.isArray() ? hItemInfo.maxItem : -1;
         for (int idx2 = minItem; idx2 <= maxItem; idx2++)
         {
+			HandleEventsWhileLoading();
+
             if (hItemInfo.isArray() && !hItemInfo.isValidArrayIndex(idx2))
             {
                 // If this index isn't valid, skip it
