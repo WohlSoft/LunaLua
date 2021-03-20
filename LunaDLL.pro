@@ -42,6 +42,8 @@ SOURCES += \
     LunaDll/CustomSprites/SpriteComponent.cpp \
     LunaDll/DeathCounter/DeathCounter.cpp \
     LunaDll/DeathCounter/DeathRecord.cpp \
+    LunaDll/FileManager/CustomParamStore.cpp \
+    LunaDll/FileManager/config_manager.cpp \
     LunaDll/GameConfig/GameAutostart.cpp \
     LunaDll/GameConfig/GameConfiguration.cpp \
     LunaDll/GameConfig/GeneralLunaConfig.cpp \
@@ -49,6 +51,7 @@ SOURCES += \
     LunaDll/HardcodedGraphics/HardocodeGFXMap.cpp \
     LunaDll/Input/Input.cpp \
     LunaDll/IPC/IPCPipeServer.cpp \
+    LunaDll/Input/LunaGameController.cpp \
     LunaDll/LevelCodes/dlltestlvlCode.cpp \
     LunaDll/LevelCodes/Docopoper-AbstractAssault.lvl.cpp \
     LunaDll/LevelCodes/Docopoper-Calleoca.cpp \
@@ -60,6 +63,8 @@ SOURCES += \
     LunaDll/LevelCodes/SAJewers-QraestoliaCaverns.lvl.cpp \
     LunaDll/LevelCodes/SAJewers-Snowboardin.cpp \
     LunaDll/LevelCodes/Talkhaus-Science_Final_Battle.cpp \
+    LunaDll/LuaMain/LunaPathValidator.cpp \
+    LunaDll/Misc/RuntimeHookComponents/RuntimeHookNpcHarm.cpp \
     LunaDll/libs/ini-reader/INIReader.cpp \
     LunaDll/libs/luabind-src/class.cpp \
     LunaDll/libs/luabind-src/class_info.cpp \
@@ -394,13 +399,16 @@ HEADERS += \
     LunaDll/CustomSprites/CSprite.h \
     LunaDll/CustomSprites/CSpriteManager.h \
     LunaDll/CustomSprites/SpriteComponent.h \
+    LunaDll/FileManager/CustomParamStore.h \
     LunaDll/FileManager/SMBXFileManager.h \
+    LunaDll/FileManager/config_manager.h \
     LunaDll/GameConfig/GameAutostart.h \
     LunaDll/GameConfig/GameConfiguration.h \
     LunaDll/GameConfig/GeneralLunaConfig.h \
     LunaDll/HardcodedGraphics/HardcodedGraphicsManager.h \
     LunaDll/Input/Input.h \
     LunaDll/IPC/IPCPipeServer.h \
+    LunaDll/Input/LunaGameController.h \
     LunaDll/LevelCodes/LevelCodes.h \
     LunaDll/LuaMain/LuaProxyComponent/LuaProxyAudio.h \
     LunaDll/LuaMain/LuabindIncludes.h \
@@ -409,6 +417,7 @@ HEADERS += \
     LunaDll/LuaMain/LuaProxyFFIGraphics.h \
     LunaDll/LuaMain/LuaSharedProxy.h \
     LunaDll/LuaMain/LunaLuaMain.h \
+    LunaDll/LuaMain/LunaPathValidator.h \
     LunaDll/MciEmulator/mciEmulator.h \
     LunaDll/Minigames/CGUI/CGUI.h \
     LunaDll/Minigames/GameboyRPG.h \
