@@ -2,10 +2,12 @@
 #include <memory>
 #include "LunaGameController.h"
 #if !defined(BUILDING_SMBXLAUNCHER)
-    #include <Windows.h>
-    #include "../LuaMain/LunaLuaMain.h"
-    #include "../SMBXInternal/NativeInput.h"
-    #include "../Globals.h"
+#   ifdef _WIN32
+#       include <windows.h>
+#   endif
+#   include "../LuaMain/LunaLuaMain.h"
+#   include "../SMBXInternal/NativeInput.h"
+#   include "../Globals.h"
 #endif
 
 //#define CONTROLLER_DEBUG
