@@ -516,7 +516,7 @@ void MainLauncherWindow::checkForUpdates()
     }
 
     try {
-        if(!NetworkUtils::checkInternetConnection(4000))
+        if(!NetworkUtils::checkInternetConnection(1000))
         {
             m_smbxConfig->m_hasInternetAccess = false;
             emit m_smbxConfig->InternetAccessUpdated();

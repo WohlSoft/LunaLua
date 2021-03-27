@@ -5,7 +5,16 @@
 #include "../Common/qurlinvalidexception.h"
 #include <QEventLoop>
 
-Q_CONSTEXPR char timeoutURL[] = "http://google.com";
+Q_CONSTEXPR const char* const timeoutURLs[] =
+{
+    "https://codehaus.moe",
+    "https://codehaus.wohlsoft.ru",
+    "http://codehaus.moe",
+    "http://codehaus.wohlsoft.ru",
+    "http://google.com",
+    "http://baidu.com",
+    NULL
+};
 
 
 QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
@@ -48,12 +57,24 @@ QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
 
 bool NetworkUtils::checkInternetConnection(int timeout)
 {
-    try {
-        getString(QUrl(timeoutURL), timeout);
-    } catch (const QNetworkReplyTimeoutException&) {
-        return false;
+    const char * const* it = timeoutURLs;
+
+    while(*it != NULL)
+    {
+        const char *s = *it;
+        try
+        {
+            getString(QUrl(s), timeout);
+            return true;
+        }
+        catch (const QNetworkReplyTimeoutException&)
+        {
+            qWarning() << "Connection check to " << s << "was failed";
+        }
+
+        it++;
+        continue;
     }
-    return true;
+
+    return false;
 }
-
-
