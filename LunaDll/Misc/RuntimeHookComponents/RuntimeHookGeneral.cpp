@@ -1247,6 +1247,9 @@ void TrySkipPatch()
     PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
     
+	// Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
+	runtimeHookCharacterIdApplyPatch();
+
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

@@ -2408,7 +2408,7 @@ static int __stdcall EffectUpdateHook(short* effectId)
 // Management code //
 /////////////////////
 
-static void runtimeHookCharacterIdApplyPatch(void)
+void runtimeHookCharacterIdApplyPatch(void)
 {
     if (runtimeHookCharacterIdApplied) return;
     for (unsigned int i = 0; runtimeHookCharacterIdPatchList[i] != nullptr; i++)
@@ -2418,7 +2418,7 @@ static void runtimeHookCharacterIdApplyPatch(void)
     runtimeHookCharacterIdApplied = true;
 }
 
-static void runtimeHookCharacterIdUnpplyPatch(void)
+void runtimeHookCharacterIdUnpplyPatch(void)
 {
     if (!runtimeHookCharacterIdApplied) return;
     for (unsigned int i = 0; runtimeHookCharacterIdPatchList[i] != nullptr; i++)
@@ -2469,7 +2469,8 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
 
     runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect);
-    runtimeHookCharacterIdApplyPatch();
+	// Note: No longer applied on-demand. Always have these patches in place for consistency
+    // runtimeHookCharacterIdApplyPatch();
 }
 
 void runtimeHookCharacterIdUnregister(short id)
@@ -2477,14 +2478,16 @@ void runtimeHookCharacterIdUnregister(short id)
     runtimeHookCharacterIdMap.erase(id);
     if (runtimeHookCharacterIdMap.size() == 0)
     {
-        runtimeHookCharacterIdUnpplyPatch();
+		// Note: No longer undo character ID patches, at this point it's safer to leave them in place
+        // runtimeHookCharacterIdUnpplyPatch();
     }
 }
 
 void runtimeHookCharacterIdReset()
 {
     runtimeHookCharacterIdMap.clear();
-    runtimeHookCharacterIdUnpplyPatch();
+	// Note: No longer undo character ID patches, at this point it's safer to leave them in place
+    // runtimeHookCharacterIdUnpplyPatch();
 }
 
 CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId)
