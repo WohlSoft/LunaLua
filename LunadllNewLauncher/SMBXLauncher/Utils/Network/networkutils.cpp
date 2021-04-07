@@ -5,10 +5,8 @@
 #include "../Common/qurlinvalidexception.h"
 #include <QEventLoop>
 
-Q_CONSTEXPR const char* const timeoutURLs[] =
+static const char* timeoutURLs[] =
 {
-    "https://codehaus.moe",
-    "https://codehaus.wohlsoft.ru",
     "http://codehaus.moe",
     "http://codehaus.wohlsoft.ru",
     "http://google.com",
@@ -57,9 +55,9 @@ QByteArray NetworkUtils::getString(const QUrl &url, int timeout)
 
 bool NetworkUtils::checkInternetConnection(int timeout)
 {
-    const char * const* it = timeoutURLs;
+    const char ** it = timeoutURLs;
 
-    while(*it != NULL)
+    while(*it != nullptr)
     {
         const char *s = *it;
         try
