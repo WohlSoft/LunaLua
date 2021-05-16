@@ -336,28 +336,28 @@ namespace GIF_H
 	}
 
 	// Finds all pixels that have changed from the previous image and
-	// moves them to the front of the buffer.
+	// makes a new buffer with them at the front.
 	// This allows us to build a palette optimized for the colors of the
 	// changed pixels only.
-	static int GifPickChangedPixels(const uint8_t* lastFrame, uint8_t* frame, int numPixels)
+	static int GifPickChangedPixels(const uint8_t* lastFrame, uint8_t* out, const uint8_t* nextFrame, int numPixels)
 	{
 		int numChanged = 0;
-		uint8_t* writeIter = frame;
+		uint8_t* writeIter = out;
 
 		for (int ii = 0; ii<numPixels; ++ii)
 		{
-			if (lastFrame[0] != frame[0] ||
-				lastFrame[1] != frame[1] ||
-				lastFrame[2] != frame[2])
+			if (lastFrame[0] != nextFrame[0] ||
+				lastFrame[1] != nextFrame[1] ||
+				lastFrame[2] != nextFrame[2])
 			{
-				writeIter[0] = frame[0];
-				writeIter[1] = frame[1];
-				writeIter[2] = frame[2];
+				writeIter[0] = nextFrame[0];
+				writeIter[1] = nextFrame[1];
+				writeIter[2] = nextFrame[2];
 				++numChanged;
 				writeIter += 4;
 			}
 			lastFrame += 4;
-			frame += 4;
+			nextFrame += 4;
 		}
 
 		return numChanged;
@@ -373,11 +373,16 @@ namespace GIF_H
 		// we must create a copy of the image for it to destroy
 		int imageSize = width*height * 4 * sizeof(uint8_t);
 		uint8_t* destroyableImage = writer->tempImage;
-		memcpy(destroyableImage, nextFrame, imageSize);
 
 		int numPixels = width*height;
 		if (lastFrame)
-			numPixels = GifPickChangedPixels(lastFrame, destroyableImage, numPixels);
+		{
+			numPixels = GifPickChangedPixels(lastFrame, destroyableImage, nextFrame, numPixels);
+		}
+		else
+		{
+			memcpy(destroyableImage, nextFrame, imageSize);
+		}
 
 		const int lastElt = 1 << bitDepth;
 		const int splitElt = lastElt / 2;
