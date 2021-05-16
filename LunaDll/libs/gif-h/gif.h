@@ -365,14 +365,14 @@ namespace GIF_H
 
 	// Creates a palette by placing all the image pixels in a k-d tree and then averaging the blocks at the bottom.
 	// This is known as the "modified median split" technique
-	static void GifMakePalette(const uint8_t* lastFrame, const uint8_t* nextFrame, uint32_t width, uint32_t height, int bitDepth, bool buildForDither, GifPalette* pPal)
+	static void GifMakePalette(const GifWriter* writer, const uint8_t* lastFrame, const uint8_t* nextFrame, uint32_t width, uint32_t height, int bitDepth, bool buildForDither, GifPalette* pPal)
 	{
 		pPal->bitDepth = bitDepth;
 
 		// SplitPalette is destructive (it sorts the pixels by color) so
 		// we must create a copy of the image for it to destroy
 		int imageSize = width*height * 4 * sizeof(uint8_t);
-		uint8_t* destroyableImage = (uint8_t*)GIF_TEMP_MALLOC(imageSize);
+		uint8_t* destroyableImage = writer->tempImage;
 		memcpy(destroyableImage, nextFrame, imageSize);
 
 		int numPixels = width*height;
@@ -385,7 +385,7 @@ namespace GIF_H
 
 		GifSplitPalette(destroyableImage, numPixels, 1, lastElt, splitElt, splitDist, 1, buildForDither, pPal);
 
-		GIF_TEMP_FREE(destroyableImage);
+		// now done with destroyableImage
 
 		// add the bottom node for the transparency index
 		pPal->nodes[1 << (bitDepth - 1)].treeSplit = 0;
@@ -621,8 +621,12 @@ namespace GIF_H
 	// this is one node
 	struct GifLzwNode
 	{
+
 		uint16_t m_next[256];
 	};
+
+	// Code tree length to allocate
+	static const int kGifLzwNodeCount = 4096;
 
 	// write a 256-color (8-bit) image palette to the file
 	static void GifWritePalette(const GifPalette* pPal, FILE* f)
@@ -644,14 +648,17 @@ namespace GIF_H
 	}
 
 	// write the image header, LZW-compress and write out the image
-	static void GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t top, uint32_t width, uint32_t height, uint32_t delay, GifPalette* pPal, long int *delaypos)
+	static void GifWriteLzwImage(GifWriter* writer, uint32_t left, uint32_t top, uint32_t width, uint32_t height, uint32_t delay, GifPalette* pPal)
 	{
+		FILE * const          f     = writer->f;
+		const uint8_t * const image = writer->oldImage; // Note: not actually old currently, just the image with palette applied
+
 		// graphics control extension
 		fputc(0x21, f);
 		fputc(0xf9, f);
 		fputc(0x04, f);
 		fputc(0x05, f); // leave prev frame in place, this frame has transparency
-		if (delaypos) *delaypos = ftell(f);
+		writer->delaypos = ftell(f);
 		fputc(delay & 0xff, f);
 		fputc((delay >> 8) & 0xff, f);
 		fputc(kGifTransIndex, f); // transparent color index
@@ -680,9 +687,9 @@ namespace GIF_H
 
 		fputc(minCodeSize, f); // min code size 8 bits
 
-		GifLzwNode* codetree = (GifLzwNode*)GIF_TEMP_MALLOC(sizeof(GifLzwNode) * 4096);
+		GifLzwNode* codetree = writer->tempCodetree;
 
-		memset(codetree, 0, sizeof(GifLzwNode) * 4096);
+		memset(codetree, 0, sizeof(GifLzwNode) * kGifLzwNodeCount);
 		int32_t curCode = -1;
 		uint32_t codeSize = minCodeSize + 1;
 		uint32_t maxCode = clearCode + 1;
@@ -728,12 +735,12 @@ namespace GIF_H
 						// we need more bits for codes
 						codeSize++;
 					}
-					if (maxCode == 4095)
+					if (maxCode == (kGifLzwNodeCount-1))
 					{
 						// the dictionary is full, clear it out and begin anew
 						GifWriteCode(f, stat, clearCode, codeSize); // clear tree
 
-						memset(codetree, 0, sizeof(GifLzwNode) * 4096);
+						memset(codetree, 0, sizeof(GifLzwNode) * kGifLzwNodeCount);
 						curCode = -1;
 						codeSize = minCodeSize + 1;
 						maxCode = clearCode + 1;
@@ -754,8 +761,6 @@ namespace GIF_H
 		if (stat.chunkIndex) GifWriteChunk(f, stat);
 
 		fputc(0, f); // image block terminator
-
-		GIF_TEMP_FREE(codetree);
 	}
 
 
@@ -771,11 +776,15 @@ namespace GIF_H
 		writer->f = file;
 		if (!writer->f) return false;
 
+		writer->height = height;
+		writer->width = width;
 		writer->firstFrame = true;
 		writer->delaypos = -1;
 
 		// allocate 
 		writer->oldImage = (uint8_t*)GIF_MALLOC(width*height * 4);
+		writer->tempImage = (uint8_t*)GIF_MALLOC(width*height * 4);
+		writer->tempCodetree = (GifLzwNode*)GIF_MALLOC(sizeof(GifLzwNode) * kGifLzwNodeCount);
 
 		fputs("GIF89a", writer->f);
 
@@ -826,18 +835,31 @@ namespace GIF_H
 	{
 		if (!writer->f) return false;
 
+		// If size differs, reallocate and don't use transparency? This would make a weird gif but let's not crash.
+		if ((width != writer->width) || (height != writer->height))
+		{
+			writer->firstFrame = true;
+			writer->width = width;
+			writer->height = height;
+			GIF_FREE(writer->oldImage);
+			writer->oldImage = (uint8_t*)GIF_MALLOC(width*height * 4);
+			GIF_FREE(writer->tempImage);
+			writer->tempImage = (uint8_t*)GIF_MALLOC(width*height * 4);
+		}
+
 		const uint8_t* oldImage = writer->firstFrame ? NULL : writer->oldImage;
 		writer->firstFrame = false;
 
 		GifPalette pal;
-		GifMakePalette((dither ? NULL : oldImage), image, width, height, bitDepth, dither, &pal);
+		GifMakePalette(writer, (dither ? NULL : oldImage), image, width, height, bitDepth, dither, &pal);
 
 		if (dither)
 			GifDitherImage(oldImage, image, writer->oldImage, width, height, &pal);
 		else
 			GifThresholdImage(oldImage, image, writer->oldImage, width, height, &pal);
 
-		GifWriteLzwImage(writer->f, writer->oldImage, 0, 0, width, height, delay, &pal, &writer->delaypos);
+		// NOTE: For the following call, writer->oldImage is no longer 'old', it now refers to the image after applying the palette
+		GifWriteLzwImage(writer, 0, 0, width, height, delay, &pal);
 
 		return true;
 	}
@@ -864,6 +886,8 @@ namespace GIF_H
 		fputc(0x3b, writer->f); // end of file
 		fclose(writer->f);
 		GIF_FREE(writer->oldImage);
+		GIF_FREE(writer->tempImage);
+		GIF_FREE(writer->tempCodetree);
 
 		writer->f = NULL;
 		writer->oldImage = NULL;
