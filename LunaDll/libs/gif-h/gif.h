@@ -64,17 +64,25 @@ namespace GIF_H
 
 	struct GifPalette
 	{
-		int bitDepth;
-
-		uint8_t r[256];
-		uint8_t g[256];
-		uint8_t b[256];
-
 		// k-d tree over RGB space, organized in heap fashion
 		// i.e. left child of node i is node i*2, right child is node i*2+1
 		// nodes 256-511 are implicitly the leaves, containing a color
-		uint8_t treeSplitElt[256];
-		uint8_t treeSplit[256];
+		struct Node
+		{
+			uint8_t treeSplitElt;
+			uint8_t treeSplit;
+		};
+		Node nodes[256];
+
+		struct Entry
+		{
+			uint8_t r;
+			uint8_t g;
+			uint8_t b;
+		};
+		Entry entries[256];
+
+		int bitDepth;
 	};
 
 	// max, min, and abs functions
@@ -97,9 +105,9 @@ namespace GIF_H
 			if (ind == kGifTransIndex) return;
 
 			// check whether this color is better than the current winner
-			int r_err = r - ((int32_t)pPal->r[ind]);
-			int g_err = g - ((int32_t)pPal->g[ind]);
-			int b_err = b - ((int32_t)pPal->b[ind]);
+			int r_err = r - ((int32_t)pPal->entries[ind].r);
+			int g_err = g - ((int32_t)pPal->entries[ind].g);
+			int b_err = b - ((int32_t)pPal->entries[ind].b);
 			// RED: Increase green importance
 			int diff = colorDimScales[0] * GifIAbs(r_err) + colorDimScales[1] * GifIAbs(g_err) + colorDimScales[2] * GifIAbs(b_err);
 
@@ -114,10 +122,10 @@ namespace GIF_H
 
 		// take the appropriate color (r, g, or b) for this node of the k-d tree
 		int comps[3]; comps[0] = r; comps[1] = g; comps[2] = b;
-		int splitComp = comps[pPal->treeSplitElt[treeRoot]];
-		int dimScale = colorDimScales[pPal->treeSplitElt[treeRoot]];
+		int splitComp = comps[pPal->nodes[treeRoot].treeSplitElt];
+		int dimScale = colorDimScales[pPal->nodes[treeRoot].treeSplitElt];
 
-		int splitPos = pPal->treeSplit[treeRoot];
+		int splitPos = pPal->nodes[treeRoot].treeSplit;
 		if (splitPos > splitComp)
 		{
 			// check the left subtree
@@ -233,9 +241,9 @@ namespace GIF_H
 						b = GifIMin(b, image[ii * 4 + 2]);
 					}
 
-					pal->r[firstElt] = r;
-					pal->g[firstElt] = g;
-					pal->b[firstElt] = b;
+					pal->entries[firstElt].r = r;
+					pal->entries[firstElt].g = g;
+					pal->entries[firstElt].b = b;
 
 					return;
 				}
@@ -251,9 +259,9 @@ namespace GIF_H
 						b = GifIMax(b, image[ii * 4 + 2]);
 					}
 
-					pal->r[firstElt] = r;
-					pal->g[firstElt] = g;
-					pal->b[firstElt] = b;
+					pal->entries[firstElt].r = r;
+					pal->entries[firstElt].g = g;
+					pal->entries[firstElt].b = b;
 
 					return;
 				}
@@ -276,9 +284,9 @@ namespace GIF_H
 			g /= numPixels;
 			b /= numPixels;
 
-			pal->r[firstElt] = (uint8_t)r;
-			pal->g[firstElt] = (uint8_t)g;
-			pal->b[firstElt] = (uint8_t)b;
+			pal->entries[firstElt].r = (uint8_t)r;
+			pal->entries[firstElt].g = (uint8_t)g;
+			pal->entries[firstElt].b = (uint8_t)b;
 
 			return;
 		}
@@ -320,15 +328,15 @@ namespace GIF_H
 
 		GifPartitionByMedian(image, 0, numPixels, splitCom, subPixelsA);
 
-		pal->treeSplitElt[treeNode] = splitCom;
-		pal->treeSplit[treeNode] = image[subPixelsA * 4 + splitCom];
+		pal->nodes[treeNode].treeSplitElt = splitCom;
+		pal->nodes[treeNode].treeSplit = image[subPixelsA * 4 + splitCom];
 
 		GifSplitPalette(image, subPixelsA, firstElt, splitElt, splitElt - splitDist, splitDist / 2, treeNode * 2, buildForDither, pal);
 		GifSplitPalette(image + subPixelsA * 4, subPixelsB, splitElt, lastElt, splitElt + splitDist, splitDist / 2, treeNode * 2 + 1, buildForDither, pal);
 	}
 
 	// Finds all pixels that have changed from the previous image and
-	// moves them to the fromt of th buffer.
+	// moves them to the front of the buffer.
 	// This allows us to build a palette optimized for the colors of the
 	// changed pixels only.
 	static int GifPickChangedPixels(const uint8_t* lastFrame, uint8_t* frame, int numPixels)
@@ -380,10 +388,11 @@ namespace GIF_H
 		GIF_TEMP_FREE(destroyableImage);
 
 		// add the bottom node for the transparency index
-		pPal->treeSplit[1 << (bitDepth - 1)] = 0;
-		pPal->treeSplitElt[1 << (bitDepth - 1)] = 0;
-
-		pPal->r[0] = pPal->g[0] = pPal->b[0] = 0;
+		pPal->nodes[1 << (bitDepth - 1)].treeSplit = 0;
+		pPal->nodes[1 << (bitDepth - 1)].treeSplitElt = 0;
+		pPal->entries[0].r = 0;
+		pPal->entries[0].g = 0;
+		pPal->entries[0].b = 0;
 	}
 
 	// Implements Floyd-Steinberg dithering, writes palette value to alpha
@@ -436,13 +445,13 @@ namespace GIF_H
 				GifGetClosestPaletteColor(pPal, rr, gg, bb, bestInd, bestDiff);
 
 				// Write the result to the temp buffer
-				int32_t r_err = nextPix[0] - int32_t(pPal->r[bestInd]) * 256;
-				int32_t g_err = nextPix[1] - int32_t(pPal->g[bestInd]) * 256;
-				int32_t b_err = nextPix[2] - int32_t(pPal->b[bestInd]) * 256;
+				int32_t r_err = nextPix[0] - int32_t(pPal->entries[bestInd].r) * 256;
+				int32_t g_err = nextPix[1] - int32_t(pPal->entries[bestInd].g) * 256;
+				int32_t b_err = nextPix[2] - int32_t(pPal->entries[bestInd].b) * 256;
 
-				nextPix[0] = pPal->r[bestInd];
-				nextPix[1] = pPal->g[bestInd];
-				nextPix[2] = pPal->b[bestInd];
+				nextPix[0] = pPal->entries[bestInd].r;
+				nextPix[1] = pPal->entries[bestInd].g;
+				nextPix[2] = pPal->entries[bestInd].b;
 				nextPix[3] = bestInd;
 
 				// Propagate the error to the four adjacent locations
@@ -541,9 +550,9 @@ namespace GIF_H
 				if (!usedOld)
 				{
 					// Write the resulting color to the output buffer
-					outFrame[0] = pPal->r[bestInd];
-					outFrame[1] = pPal->g[bestInd];
-					outFrame[2] = pPal->b[bestInd];
+					outFrame[0] = pPal->entries[bestInd].r;
+					outFrame[1] = pPal->entries[bestInd].g;
+					outFrame[2] = pPal->entries[bestInd].b;
 					outFrame[3] = bestInd;
 				}
 			}
@@ -624,9 +633,9 @@ namespace GIF_H
 
 		for (int ii = 1; ii<(1 << pPal->bitDepth); ++ii)
 		{
-			uint32_t r = pPal->r[ii];
-			uint32_t g = pPal->g[ii];
-			uint32_t b = pPal->b[ii];
+			uint32_t r = pPal->entries[ii].r;
+			uint32_t g = pPal->entries[ii].g;
+			uint32_t b = pPal->entries[ii].b;
 
 			fputc(r, f);
 			fputc(g, f);
