@@ -345,8 +345,10 @@ namespace GIF_H
 			subPixelsA = 1;
 			subPixelsB = 0;
 		}
-
-		GifPartitionByMedian(image, 0, numPixels, splitCom, subPixelsA);
+		else
+		{
+			GifPartitionByMedian(image, 0, numPixels, splitCom, subPixelsA);
+		}
 
 		pal->nodes[treeNode].treeSplitElt = splitCom;
 		pal->nodes[treeNode].treeSplit = image[subPixelsA * 4 + splitCom];
