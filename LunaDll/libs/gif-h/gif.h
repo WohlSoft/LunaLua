@@ -71,6 +71,7 @@ namespace GIF_H
 		{
 			uint8_t treeSplitElt;
 			uint8_t treeSplit;
+			int     splitRange;
 		};
 		Node nodes[256];
 
@@ -120,28 +121,37 @@ namespace GIF_H
 			return;
 		}
 
-		// take the appropriate color (r, g, or b) for this node of the k-d tree
-		int comps[3]; comps[0] = r; comps[1] = g; comps[2] = b;
-		int splitComp = comps[pPal->nodes[treeRoot].treeSplitElt];
-		int dimScale = colorDimScales[pPal->nodes[treeRoot].treeSplitElt];
-
-		int splitPos = pPal->nodes[treeRoot].treeSplit;
-		if (splitPos > splitComp)
+		if (pPal->nodes[treeRoot].splitRange == 0)
 		{
-			// check the left subtree
+			// Degenerate case, no split
 			GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2);
-			if (bestDiff > dimScale*(splitPos - splitComp))
-			{
-				// cannot prove there's not a better value in the right subtree, check that too
-				GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2 + 1);
-			}
 		}
 		else
 		{
-			GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2 + 1);
-			if (bestDiff > dimScale*(splitComp - splitPos))
+			// take the appropriate color (r, g, or b) for this node of the k-d tree
+			int comps[3]; comps[0] = r; comps[1] = g; comps[2] = b;
+			int splitComp = comps[pPal->nodes[treeRoot].treeSplitElt];
+			int dimScale = colorDimScales[pPal->nodes[treeRoot].treeSplitElt];
+
+			int splitPos = pPal->nodes[treeRoot].treeSplit;
+
+			if (splitPos > splitComp)
 			{
+				// check the left subtree
 				GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2);
+				if (bestDiff > dimScale*(splitPos - splitComp))
+				{
+					// cannot prove there's not a better value in the right subtree, check that too
+					GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2 + 1);
+				}
+			}
+			else
+			{
+				GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2 + 1);
+				if (bestDiff > dimScale*(splitComp - splitPos))
+				{
+					GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2);
+				}
 			}
 		}
 	}
@@ -311,25 +321,36 @@ namespace GIF_H
 			if (b < minB) minB = b;
 		}
 
-		int rRange = maxR - minR;
-		int gRange = maxG - minG;
-		int bRange = maxB - minB;
-		rRange *= colorDimScales[0];
-		gRange *= colorDimScales[1]; // RED: Modification to increase green importance
-		bRange *= colorDimScales[2];
+		int ranges[3];
+		ranges[0] = (maxR - minR) * colorDimScales[0];
+		ranges[1] = (maxG - minG) * colorDimScales[1];
+		ranges[2] = (maxB - minB) * colorDimScales[2];
 
 		// and split along that axis. (incidentally, this means this isn't a "proper" k-d tree but I don't know what else to call it)
-		int splitCom = 1;
-		if (bRange > gRange) splitCom = 2;
-		if (rRange > bRange && rRange > gRange) splitCom = 0;
+		int splitCom = 0;
+		for (int i = 1; i < 3; i++)
+		{
+			if (ranges[i] > ranges[splitCom])
+			{
+				splitCom = i;
+			}
+		}
 
 		int subPixelsA = numPixels * (splitElt - firstElt) / (lastElt - firstElt);
 		int subPixelsB = numPixels - subPixelsA;
+
+		// If it's all the same, stop averaging more than we need to
+		if (ranges[splitCom] == 0)
+		{
+			subPixelsA = 1;
+			subPixelsB = 0;
+		}
 
 		GifPartitionByMedian(image, 0, numPixels, splitCom, subPixelsA);
 
 		pal->nodes[treeNode].treeSplitElt = splitCom;
 		pal->nodes[treeNode].treeSplit = image[subPixelsA * 4 + splitCom];
+		pal->nodes[treeNode].splitRange = ranges[splitCom];
 
 		GifSplitPalette(image, subPixelsA, firstElt, splitElt, splitElt - splitDist, splitDist / 2, treeNode * 2, buildForDither, pal);
 		GifSplitPalette(image + subPixelsA * 4, subPixelsB, splitElt, lastElt, splitElt + splitDist, splitDist / 2, treeNode * 2 + 1, buildForDither, pal);
@@ -395,6 +416,7 @@ namespace GIF_H
 		// add the bottom node for the transparency index
 		pPal->nodes[1 << (bitDepth - 1)].treeSplit = 0;
 		pPal->nodes[1 << (bitDepth - 1)].treeSplitElt = 0;
+		pPal->nodes[1 << (bitDepth - 1)].splitRange = 0;
 		pPal->entries[0].r = 0;
 		pPal->entries[0].g = 0;
 		pPal->entries[0].b = 0;
