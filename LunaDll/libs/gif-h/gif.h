@@ -135,7 +135,7 @@ namespace GIF_H
 
 			int splitPos = pPal->nodes[treeRoot].treeSplit;
 
-			if (splitPos > splitComp)
+			if (splitPos >= splitComp)
 			{
 				// check the left subtree
 				GifGetClosestPaletteColor(pPal, r, g, b, bestInd, bestDiff, treeRoot * 2);
@@ -339,15 +339,26 @@ namespace GIF_H
 		int subPixelsA = numPixels * (splitElt - firstElt) / (lastElt - firstElt);
 		int subPixelsB = numPixels - subPixelsA;
 
-		// If it's all the same, stop averaging more than we need to
 		if (ranges[splitCom] == 0)
 		{
+			// If it's all the same, stop averaging more than we need to
 			subPixelsA = 1;
 			subPixelsB = 0;
 		}
 		else
 		{
+			// Partition the pixels across the median
 			GifPartitionByMedian(image, 0, numPixels, splitCom, subPixelsA);
+
+			// Shift ties to the left when it's trivial
+			uint8_t splitValue = image[subPixelsA * 4 + splitCom];
+			for (; subPixelsA < numPixels; subPixelsB--, subPixelsA++)
+			{
+				if (splitValue != image[subPixelsA * 4 + splitCom])
+				{
+					break;
+				}
+			}
 		}
 
 		pal->nodes[treeNode].treeSplitElt = splitCom;
