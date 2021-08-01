@@ -776,13 +776,13 @@ int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2) {
 
 static void __stdcall UpdateInputFinishHook()
 {
-	//https://github.com/smbx/smbx-legacy-source/blob/4a7ff946da8924d2268f6ee8d824034f3a7d7658/modPlayer.bas#L5959
-	int playerCount = GM_PLAYERS_COUNT;
-	if (playerCount > 2 && GM_LEVEL_MODE == 0 && GM_WINNING == 0 && GM_UNK_IS_CONNECTED == 0) {
-		for (int playerIdx = 2; playerIdx <= playerCount; playerIdx++) {
-			Player::Get(playerIdx)->keymap = Player::Get(1)->keymap;
-		}
-	}
+    //https://github.com/smbx/smbx-legacy-source/blob/4a7ff946da8924d2268f6ee8d824034f3a7d7658/modPlayer.bas#L5959
+    int playerCount = GM_PLAYERS_COUNT;
+    if (playerCount > 2 && GM_LEVEL_MODE == 0 && GM_WINNING == 0 && GM_UNK_IS_CONNECTED == 0) {
+        for (int playerIdx = 2; playerIdx <= playerCount; playerIdx++) {
+            Player::Get(playerIdx)->keymap = Player::Get(1)->keymap;
+        }
+    }
 
     g_EventHandler.hookInputUpdate();
 }
