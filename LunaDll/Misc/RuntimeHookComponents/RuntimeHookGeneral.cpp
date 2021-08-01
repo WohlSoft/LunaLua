@@ -630,6 +630,7 @@ void TrySkipPatch()
 
     PATCH(0xA755D2).CALL(&UpdateInputFinishHook_Wrapper).Apply();
     PATCH(0xA74910).JMP(&runtimeHookUpdateInput).Apply();
+    PATCH(0x9C4ADA).JMP(0x9C4B37).Apply(); //So the controls of cloned players can be modified during onInputUpdate
 
     PATCH(0x902D3D).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902DFC).CALL(&WorldOverlayHUDBitBltHook).Apply();
