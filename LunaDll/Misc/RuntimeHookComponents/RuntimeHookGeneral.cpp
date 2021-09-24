@@ -298,7 +298,7 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     default:
         break;
     }
-    
+
     return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
 
@@ -508,6 +508,38 @@ static unsigned int __stdcall LatePatch(void)
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
+
+AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
+    .PUSH_EBX()
+    .PUSH_IMM32(0x99A850)
+    .JMP(runtimeHookSetPlayerFenceSpeed);
+
+AsmPatch<14> gFenceFix_9A78A8 = PATCH(0x9A78A8)
+    .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
+    .bytes(0xD9, 0xE0) // fchs
+    .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
+    .bytes(0x0F, 0x1F, 0x00); // nop
+
+AsmPatch<19> gFenceFix_9B8A4C = PATCH(0x9B8A4C)
+    .PUSH_ESI()
+    .CALL(runtimeHookIncreaseFenceFrameCondition)
+    .bytes(0x84, 0xC0) // test al, al
+    .JZ(0x9B8B5D)
+    .JMP(0x9B8AF0);
+
+AsmPatch<10> gFenceFix_AA6E78 = PATCH(0xAA6E78)
+    .PUSH_EBP()
+    .PUSH_ESI()
+    .CALL(runtimeHookUpdateBGOMomentum)
+    .bytes(0x0F, 0x1F, 0x00); // nop
+
+Patchable *gFenceFixes[] = {
+    &gFenceFix_99933C,
+    &gFenceFix_9A78A8,
+    &gFenceFix_9B8A4C,
+    &gFenceFix_AA6E78,
+    nullptr
+};
 
 void TrySkipPatch()
 {
@@ -1246,9 +1278,14 @@ void TrySkipPatch()
     PATCH(0xAA6DD7).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
-    
+
 	// Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
 	runtimeHookCharacterIdApplyPatch();
+
+    //Fence bug fixes
+    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+        gFenceFixes[i]->Apply();
+    }
 
     /************************************************************************/
     /* Import Table Patch                                                   */
@@ -1258,4 +1295,3 @@ void TrySkipPatch()
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
 }
-
