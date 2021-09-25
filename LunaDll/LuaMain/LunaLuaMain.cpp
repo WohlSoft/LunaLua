@@ -123,6 +123,9 @@ bool CLunaLua::shutdown()
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
+    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+        gFenceFixes[i]->Apply();
+    }
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
