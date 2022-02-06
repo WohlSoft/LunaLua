@@ -1298,7 +1298,7 @@ void TrySkipPatch()
 
     // Fix intro level not loading when the save slot number is greater than 3.
     PATCH(0x8CDE97)
-        .bytes(0x68, 0xC7, 0xDE, 0x8C, 0x00) // push 0x8CDEC7
+        .PUSH_IMM32(0x8CDEC7)
         .JMP(saveFileExists)
         .Apply();
 
