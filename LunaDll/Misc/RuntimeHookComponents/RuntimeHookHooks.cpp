@@ -3892,6 +3892,15 @@ _declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void)
     }
 }
 
+bool __stdcall saveFileExists() {
+    std::wstring saveFilePath = GM_FULLDIR;
+    saveFilePath += L"save";
+    saveFilePath += std::to_wstring(GM_CUR_SAVE_SLOT);
+    saveFilePath += L".sav";
+
+    return fileExists(saveFilePath);
+}
+
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
     int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
 

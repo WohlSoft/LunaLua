@@ -1295,4 +1295,15 @@ void TrySkipPatch()
     *(void**)0x00401124 = (void*)&vbaR4VarHook;
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
+
+    // Fix intro level not loading when the save slot number is greater than 3.
+    PATCH(0x8CDE97)
+        .PUSH_IMM32(0x8CDEC7)
+        .JMP(saveFileExists)
+        .Apply();
+
+    PATCH(0x8CDEC7)
+        .bytes(0x84, 0xC0) // test al, al
+        .bytes(0x74, 0x35) // jz 0x8CDF00
+        .Apply();
 }

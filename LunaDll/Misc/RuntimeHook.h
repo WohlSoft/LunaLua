@@ -494,6 +494,8 @@ void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
 
+bool __stdcall saveFileExists();
+
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player);
 bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);
 void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
