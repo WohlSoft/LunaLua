@@ -492,5 +492,6 @@ void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
 
-#endif
+bool __stdcall saveFileExists();
 
+#endif

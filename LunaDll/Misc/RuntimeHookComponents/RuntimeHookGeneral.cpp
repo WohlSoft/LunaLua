@@ -298,7 +298,7 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     default:
         break;
     }
-    
+
     return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
 
@@ -1246,7 +1246,7 @@ void TrySkipPatch()
     PATCH(0xAA6DD7).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
-    
+
 	// Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
 	runtimeHookCharacterIdApplyPatch();
 
@@ -1257,5 +1257,15 @@ void TrySkipPatch()
     *(void**)0x00401124 = (void*)&vbaR4VarHook;
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
-}
 
+    // Fix intro level not loading when the save slot number is greater than 3.
+    PATCH(0x8CDE97)
+        .bytes(0x68, 0xC7, 0xDE, 0x8C, 0x00) // push 0x8CDEC7
+        .JMP(saveFileExists)
+        .Apply();
+
+    PATCH(0x8CDEC7)
+        .bytes(0x84, 0xC0) // test al, al
+        .bytes(0x74, 0x35) // jz 0x8CDF00
+        .Apply();
+}

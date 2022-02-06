@@ -2755,7 +2755,7 @@ _declspec(naked) void __stdcall runtimeHookStaticDirectionWrapper(void)
         push edx
 
         movzx eax, ax
-        push eax // eax = NPC ID 
+        push eax // eax = NPC ID
         call runtimeHookStaticDirection
 
         pop edx
@@ -2999,10 +2999,10 @@ static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsig
 	if (newBlockIdx > GM_BLOCK_COUNT) return 0;
 	Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
 	Block& newBlock = Blocks::GetBase()[newBlockIdx];
-	
+
 	double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
 	double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
-	
+
 	if (newBlockY < oldBlockY)
 	{
 		// New block is higher, replace
@@ -3066,7 +3066,7 @@ _declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void
     // JMP from 009A3FD3
     __asm {
 		// eax, ecx, edx are all free for use here
-	
+
 		lea   edx,word ptr ss:[ebx+0xC0]
 		movsx ecx,word ptr ss:[ebp-0x120]
 		movsx eax,word ptr ss:[ebp-0xF8]
@@ -3074,7 +3074,7 @@ _declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void
 		push ecx
 		push eax
 		call runtimeHookCompareWalkBlock
-		
+
 		cmp eax, 0
 		jne blockIsHigher
 
@@ -3727,7 +3727,7 @@ __declspec(naked) void __stdcall runtimeHookSpeedOverride(void)
         call runtimeHookSpeedOverrideCheck
         cmp eax, 0
         jne ignorespeed
-        
+
         pop ecx
         pop eax
         popfd
@@ -3882,4 +3882,13 @@ _declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void)
 
         ret
     }
+}
+
+bool __stdcall saveFileExists() {
+    std::wstring saveFilePath = GM_FULLDIR;
+    saveFilePath += L"save";
+    saveFilePath += std::to_wstring(GM_CUR_SAVE_SLOT);
+    saveFilePath += L".sav";
+
+    return fileExists(saveFilePath);
 }
