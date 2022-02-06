@@ -3899,6 +3899,7 @@ bool __stdcall saveFileExists() {
     saveFilePath += L".sav";
 
     return fileExists(saveFilePath);
+}
 
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
     int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
