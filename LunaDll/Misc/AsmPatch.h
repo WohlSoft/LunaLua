@@ -150,6 +150,9 @@ public:
     inline AsmPatch<Size + 1> POP_R32(AsmConsts::R32 arg) const {
         return byte(0x58 | arg);
     }
+    inline AsmPatch<Size + 5> PUSH_IMM32(std::uint32_t newDWord) const {
+        return byte(0x68).dword(newDWord);
+    }
     inline AsmPatch<Size + 1> PUSHFD() const {
         return byte(0x9C);
     }

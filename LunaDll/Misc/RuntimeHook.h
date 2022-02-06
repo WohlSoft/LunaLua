@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "../Defines.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "AsmPatch.h"
 
 struct SMBX_Warp;
@@ -37,6 +38,7 @@ void TrySkipPatch();
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
+extern Patchable *gFenceFixes[];
 
 
 /************************************************************************/
@@ -493,5 +495,9 @@ void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
 
 bool __stdcall saveFileExists();
+
+void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player);
+bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);
+void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
 #endif

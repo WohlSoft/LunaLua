@@ -776,6 +776,14 @@ int __stdcall replacement_VbaStrCmp(BSTR arg1, BSTR arg2) {
 
 static void __stdcall UpdateInputFinishHook()
 {
+    //https://github.com/smbx/smbx-legacy-source/blob/4a7ff946da8924d2268f6ee8d824034f3a7d7658/modPlayer.bas#L5959
+    int playerCount = GM_PLAYERS_COUNT;
+    if (playerCount > 2 && GM_LEVEL_MODE == 0 && GM_WINNING == 0 && GM_UNK_IS_CONNECTED == 0) {
+        for (int playerIdx = 2; playerIdx <= playerCount; playerIdx++) {
+            Player::Get(playerIdx)->keymap = Player::Get(1)->keymap;
+        }
+    }
+
     g_EventHandler.hookInputUpdate();
 }
 
@@ -3891,4 +3899,50 @@ bool __stdcall saveFileExists() {
     saveFilePath += L".sav";
 
     return fileExists(saveFilePath);
+
+void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
+    int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
+
+    if (climbingNPC >= 0) {
+        if (climbingNPC > 5000) {
+            emulateVB6Error(9);
+        }
+
+        player->momentum.speedX += NPC::GetRaw(climbingNPC)->momentum.speedX;
+        player->momentum.speedY += NPC::GetRaw(climbingNPC)->momentum.speedY;
+    } else {
+        int climbingBGO = -climbingNPC-1;
+
+        if (climbingBGO > 8000) {
+            emulateVB6Error(9);
+        }
+
+        player->momentum.speedX += SMBX_BGO::GetRaw(climbingBGO)->momentum.speedX;
+        player->momentum.speedY += SMBX_BGO::GetRaw(climbingBGO)->momentum.speedY;
+    }
+}
+
+bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
+    int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
+
+    if (climbingNPC >= 0) {
+        if (climbingNPC > 5000) {
+            emulateVB6Error(9);
+        }
+
+        return player->momentum.speedX != NPC::GetRaw(climbingNPC)->momentum.speedX || player->momentum.speedY < NPC::GetRaw(climbingNPC)->momentum.speedY - 0.1;
+    } else {
+        int climbingBGO = -climbingNPC-1;
+
+        if (climbingBGO > 8000) {
+            emulateVB6Error(9);
+        }
+
+        return player->momentum.speedX != SMBX_BGO::GetRaw(climbingBGO)->momentum.speedX || player->momentum.speedY < SMBX_BGO::GetRaw(climbingBGO)->momentum.speedY - 0.1;
+    }
+}
+
+void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId) {
+    SMBX_BGO::GetRaw(bgoId)->momentum.speedX = Layer::Get(layerId)->xSpeed;
+    SMBX_BGO::GetRaw(bgoId)->momentum.speedY = Layer::Get(layerId)->ySpeed;
 }

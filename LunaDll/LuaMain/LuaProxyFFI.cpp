@@ -471,6 +471,18 @@ typedef struct ExtendedBlockFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
+        if (enable) {
+            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+                gFenceFixes[i]->Apply();
+            }
+        } else {
+            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+                gFenceFixes[i]->Unapply();
+            }
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetFrameTiming(double value)
     {
         return SetSMBXFrameTiming(value);
