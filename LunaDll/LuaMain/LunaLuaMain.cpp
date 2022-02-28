@@ -232,6 +232,20 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     bindAll();
     bindAllDeprecated();
 
+    // type.lua support
+    luabind::detail::class_registry *registry = luabind::detail::class_registry::get_registry(L);
+
+    lua_rawgeti(L, LUA_REGISTRYINDEX, registry->lua_instance()); // No need to handle registry->cpp_instance() since it's equal to registry->lua_instance(). See luabind's class_registry.hpp
+    luabind::object instanceMetatable(luabind::from_stack(L, -1));
+
+    instanceMetatable["__type"] = make_function(L, static_cast<luabind::object(*)(luabind::object, lua_State*)>([] (luabind::object value, lua_State* L) -> luabind::object {
+        if (luabind::type(value) == LUA_TUSERDATA && luabind::type(value["__type"]) != LUA_TNIL) {
+            return value["__type"];
+        }
+
+        return luabind::object(L, lua_typename(L, luabind::type(value)));
+    }));
+
     //Setup default contants
     setupDefaults();
 
