@@ -21,6 +21,7 @@
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
 #include "LunaLuaMain.h"
+#include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
@@ -567,6 +568,79 @@ typedef struct ExtendedBlockFields_\
 
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
+    }
+
+    FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
+    {
+        // Add "Software Rendered" if using it, like the normal window name code does
+        std::string fullName = newName;
+        if (gStartupSettings.softwareGL)
+        {
+            fullName += " (Software Renderer)";
+        }
+
+        // Convert the string to the required format
+        // From: https://stackoverflow.com/questions/27220/how-to-convert-stdstring-to-lpcwstr-in-c-unicode
+        // (Not compatible with UTF8? But not sure how easy that'd be to fix or if it's very relevant.)
+        std::wstring stemp = std::wstring(fullName.begin(), fullName.end());
+        LPCWSTR converted = stemp.c_str();
+
+        // Main bit for setting window name
+        SetWindowTextW(gMainWindowHwnd,converted);
+
+        // ... But we also set these three VB-related ones, since otherwise
+        // they seem to cause a weird issue where it can sometimes (and
+        // only sometimes) get reset after refocusing the window.
+        GM_GAMETITLE_1 = fullName;
+        GM_GAMETITLE_2 = fullName;
+        GM_GAMETITLE_3 = fullName;
+    }
+
+    static HICON lastSmallIcon = NULL;
+    static HICON lastBigIcon = NULL;
+
+    FFI_EXPORT(void) LunaLuaSetWindowIcon(LunaImageRef* img, int iconType)
+    {
+        // Convert passed image to a HBITMAP
+        HBITMAP asBitmap = (*img)->asHBITMAP();
+
+        if (asBitmap != nullptr)
+        {
+            // Create an icon out of the image
+            ICONINFO iconInfo;
+
+            iconInfo.fIcon = TRUE;
+            iconInfo.hbmColor = asBitmap;
+            iconInfo.hbmMask = asBitmap;
+            iconInfo.xHotspot = 0;
+            iconInfo.yHotspot = 0;
+
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+
+            // Apply it to the window
+            LPARAM asParam = LPARAM(asIcon);
+
+            if (iconType == 0 || iconType == 1) // Small icon
+            {
+                if (lastSmallIcon) // If we were already using a custom icon, delete it, to avoid memory leaks
+                {
+                    DestroyIcon(lastSmallIcon);
+                }
+
+                SendMessage(gMainWindowHwnd,WM_SETICON,ICON_SMALL,asParam);
+                lastSmallIcon = asIcon;
+            }
+            if (iconType == 0 || iconType == 2) // Big icon
+            {
+                if (lastBigIcon) // If we were already using a custom icon, delete it, to avoid memory leaks
+                {
+                    DestroyIcon(lastBigIcon);
+                }
+
+                SendMessage(gMainWindowHwnd,WM_SETICON,ICON_BIG,asParam);
+                lastBigIcon = asIcon;
+            }
+        }
     }
 }
 
