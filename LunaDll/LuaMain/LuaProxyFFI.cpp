@@ -579,14 +579,9 @@ typedef struct ExtendedBlockFields_\
             fullName += " (Software Renderer)";
         }
 
-        // Convert the string to the required format
-        // From: https://stackoverflow.com/questions/27220/how-to-convert-stdstring-to-lpcwstr-in-c-unicode
-        // (Not compatible with UTF8? But not sure how easy that'd be to fix or if it's very relevant.)
-        std::wstring stemp = std::wstring(fullName.begin(), fullName.end());
-        LPCWSTR converted = stemp.c_str();
-
         // Main bit for setting window name
-        SetWindowTextW(gMainWindowHwnd,converted);
+        SetWindowLongW(gMainWindowHwnd,GWL_WNDPROC,GetWindowLongA(gMainWindowHwnd,GWL_WNDPROC));
+        SetWindowTextW(gMainWindowHwnd,Str2WStr(fullName).c_str());
 
         // ... But we also set these three VB-related ones, since otherwise
         // they seem to cause a weird issue where it can sometimes (and
@@ -601,45 +596,45 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(void) LunaLuaSetWindowIcon(LunaImageRef* img, int iconType)
     {
+        if (iconType < 0 || iconType > 2) return; // Invalid icon type
+
         // Convert passed image to a HBITMAP
         HBITMAP asBitmap = (*img)->asHBITMAP();
 
-        if (asBitmap != nullptr)
+        if (asBitmap == nullptr) return;
+
+        // Create an icon out of the image
+        ICONINFO iconInfo;
+
+        iconInfo.fIcon = TRUE;
+        iconInfo.hbmColor = asBitmap;
+        iconInfo.hbmMask = asBitmap;
+        iconInfo.xHotspot = 0;
+        iconInfo.yHotspot = 0;
+
+        // Apply it to the window
+        if (iconType == 0 || iconType == 1) // Small icon
         {
-            // Create an icon out of the image
-            ICONINFO iconInfo;
-
-            iconInfo.fIcon = TRUE;
-            iconInfo.hbmColor = asBitmap;
-            iconInfo.hbmMask = asBitmap;
-            iconInfo.xHotspot = 0;
-            iconInfo.yHotspot = 0;
-
             HICON asIcon = CreateIconIndirect(&iconInfo);
-
-            // Apply it to the window
             LPARAM asParam = LPARAM(asIcon);
 
-            if (iconType == 0 || iconType == 1) // Small icon
-            {
-                if (lastSmallIcon) // If we were already using a custom icon, delete it, to avoid memory leaks
-                {
-                    DestroyIcon(lastSmallIcon);
-                }
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_SMALL,asParam);
 
-                SendMessage(gMainWindowHwnd,WM_SETICON,ICON_SMALL,asParam);
-                lastSmallIcon = asIcon;
-            }
-            if (iconType == 0 || iconType == 2) // Big icon
-            {
-                if (lastBigIcon) // If we were already using a custom icon, delete it, to avoid memory leaks
-                {
-                    DestroyIcon(lastBigIcon);
-                }
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastSmallIcon) DestroyIcon(lastSmallIcon);
+            lastSmallIcon = asIcon;
+        }
+        
+        if (iconType == 0 || iconType == 2) // Big icon
+        {
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+            LPARAM asParam = LPARAM(asIcon);
+            
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_BIG,asParam);
 
-                SendMessage(gMainWindowHwnd,WM_SETICON,ICON_BIG,asParam);
-                lastBigIcon = asIcon;
-            }
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastBigIcon) DestroyIcon(lastBigIcon);
+            lastBigIcon = asIcon;
         }
     }
 }
