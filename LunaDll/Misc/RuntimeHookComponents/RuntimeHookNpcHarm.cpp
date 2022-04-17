@@ -2675,6 +2675,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d79f(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7a5
         ret
@@ -2708,6 +2710,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d7ae(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7b4
         ret
