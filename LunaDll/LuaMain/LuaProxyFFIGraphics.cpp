@@ -498,3 +498,16 @@ FFI_EXPORT const GLContextManager::GLConstants* __fastcall FFI_GraphicsGetConsta
 {
     return &g_GLContextManager.Constants();
 }
+
+// Main framebuffer control
+FFI_EXPORT const void FFI_GraphicsSetMainFramebufferSize(int width, int height)
+{
+	CLunaFFILock ffiLock(__FUNCTION__);
+	std::lock_guard<std::mutex> graphicsLock(g_graphicsMutex);
+
+	auto obj = std::make_shared<GLEngineCmd_SetFramebufferSize>();
+	obj->mWidth = width;
+	obj->mHeight = height;
+
+	g_GLEngine.QueueCmd(obj);
+}
