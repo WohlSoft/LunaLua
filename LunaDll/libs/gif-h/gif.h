@@ -28,8 +28,6 @@
 #include <stdio.h>   // for FILE*
 #include <string.h>  // for memcpy and bzero
 #include <stdint.h>  // for integer typedefs
-#include <vector>
-#include <algorithm>
 
 // Define these macros to hook into a custom memory allocator.
 // TEMP_MALLOC and TEMP_FREE will only be called in stack fashion - frees in the reverse order of mallocs
@@ -63,6 +61,30 @@ namespace GIF_H
 {
 
 	static const int kGifTransIndex = 0;
+
+	struct GifPalette
+	{
+		// k-d tree over RGB space, organized in heap fashion
+		// i.e. left child of node i is node i*2, right child is node i*2+1
+		// nodes 256-511 are implicitly the leaves, containing a color
+		struct Node
+		{
+			uint8_t treeSplitElt;
+			uint8_t treeSplit;
+			int     splitRange;
+		};
+		Node nodes[256];
+
+		struct Entry
+		{
+			uint8_t r;
+			uint8_t g;
+			uint8_t b;
+		};
+		Entry entries[256];
+
+		int bitDepth;
+	};
 
 	// max, min, and abs functions
 	static int GifIMax(int l, int r) { return l>r ? l : r; }
@@ -375,28 +397,11 @@ namespace GIF_H
 		return numChanged;
 	}
 
-	struct DistanceComparableRGB
-	{
-		uint16_t dist;
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-
-		DistanceComparableRGB(int _dist, uint8_t _r, uint8_t _g, uint8_t _b) :
-			dist(_dist), r(_r), g(_g), b(_b)
-		{
-		}
-
-		bool operator <(const DistanceComparableRGB& o)
-		{
-			return dist < o.dist;
-		}
-	};
-
 	// Creates a palette by placing all the image pixels in a k-d tree and then averaging the blocks at the bottom.
 	// This is known as the "modified median split" technique
 	static void GifMakePalette(const GifWriter* writer, const uint8_t* lastFrame, const uint8_t* nextFrame, uint32_t width, uint32_t height, int bitDepth, bool buildForDither, GifPalette* pPal)
 	{
+		pPal->bitDepth = bitDepth;
 
 		// SplitPalette is destructive (it sorts the pixels by color) so
 		// we must create a copy of the image for it to destroy
@@ -406,56 +411,7 @@ namespace GIF_H
 		int numPixels = width*height;
 		if (lastFrame)
 		{
-			// Get best 1024 different-from-last colors to pass on to tree-generation
-			std::vector<DistanceComparableRGB> queue;
-			queue.reserve(numPixels);
-			for (int i = 0; i < numPixels; i++)
-			{
-				uint8_t r = nextFrame[i * 4 + 0];
-				uint8_t g = nextFrame[i * 4 + 1];
-				uint8_t b = nextFrame[i * 4 + 2];
-				uint8_t or = lastFrame[i * 4 + 0];
-				uint8_t og = lastFrame[i * 4 + 1];
-				uint8_t ob = lastFrame[i * 4 + 2];
-				uint16_t dist = (
-					colorDimScales[0] * GifIAbs(r - or) +
-					colorDimScales[1] * GifIAbs(g - og) +
-					colorDimScales[2] * GifIAbs(b - ob));
-				if (dist > 0)
-				{
-					// Check if the exact color was in the last palette? If so amplify distance
-					// This encourages consistent colors
-					int bestDiff = 1;
-					int bestInd = kGifTransIndex;
-					GifGetClosestPaletteColor(pPal, r, g, b, bestInd/*modified*/, bestDiff/*modified*/);
-					if (bestDiff == 0)
-					{
-						dist *= 4;
-						dist += 1000;
-					}
-
-					queue.emplace_back(dist, r, g, b);
-				}
-			}
-			std::make_heap(queue.begin(), queue.end());
-			uint8_t used[32][32][32] = {0};
-			//memset(used, 0, 32 * 32 * 32);
-			numPixels = 0;
-			for (numPixels = 0; numPixels < 1024;)
-			{
-				DistanceComparableRGB& elem = queue.front();
-				if (used[elem.r/8][elem.g/8][elem.b/8] < 4)
-				{
-					destroyableImage[numPixels * 4 + 0] = elem.r;
-					destroyableImage[numPixels * 4 + 1] = elem.g;
-					destroyableImage[numPixels * 4 + 2] = elem.b;
-					used[elem.r/8][elem.g/8][elem.b/8]++;
-					numPixels++;
-				}
-				std::pop_heap(queue.begin(), queue.end()); queue.pop_back();
-			}
-
-			//numPixels = GifPickChangedPixels(lastFrame, destroyableImage, nextFrame, numPixels);
+			numPixels = GifPickChangedPixels(lastFrame, destroyableImage, nextFrame, numPixels);
 		}
 		else
 		{
@@ -465,7 +421,7 @@ namespace GIF_H
 		const int lastElt = 1 << bitDepth;
 		const int splitElt = lastElt / 2;
 		const int splitDist = splitElt / 2;
-		pPal->bitDepth = bitDepth;
+
 		GifSplitPalette(destroyableImage, numPixels, 1, lastElt, splitElt, splitDist, 1, buildForDither, pPal);
 
 		// now done with destroyableImage
@@ -934,15 +890,16 @@ namespace GIF_H
 		const uint8_t* oldImage = writer->firstFrame ? NULL : writer->oldImage;
 		writer->firstFrame = false;
 
-		GifMakePalette(writer, (dither ? NULL : oldImage), image, width, height, bitDepth, dither, &writer->pal);
+		GifPalette pal;
+		GifMakePalette(writer, (dither ? NULL : oldImage), image, width, height, bitDepth, dither, &pal);
 
 		if (dither)
-			GifDitherImage(oldImage, image, writer->oldImage, width, height, &writer->pal);
+			GifDitherImage(oldImage, image, writer->oldImage, width, height, &pal);
 		else
-			GifThresholdImage(oldImage, image, writer->oldImage, width, height, &writer->pal);
+			GifThresholdImage(oldImage, image, writer->oldImage, width, height, &pal);
 
 		// NOTE: For the following call, writer->oldImage is no longer 'old', it now refers to the image after applying the palette
-		GifWriteLzwImage(writer, 0, 0, width, height, delay, &writer->pal);
+		GifWriteLzwImage(writer, 0, 0, width, height, delay, &pal);
 
 		return true;
 	}
