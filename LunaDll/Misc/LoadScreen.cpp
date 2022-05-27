@@ -39,10 +39,10 @@ static bool checkElapsedTime(lua_State* L, DWORD loadScreenStartTick)
     return true;
 }
 
-static void setFinishedFlag(lua_State* L)
+static void updateFinishedFlag(lua_State* L)
 {
     lua_pushboolean(L, killThreadFlag);
-    lua_setglobal(L, "_loadScreenFinished");
+    lua_setglobal(L, "_loadingFinished");
 }
 
 
@@ -103,7 +103,7 @@ static void LoadThread(void)
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");
-        setFinishedFlag(L);
+        updateFinishedFlag(L);
 
         luasetconst(L, "FIELD_BYTE", 1);
         luasetconst(L, "FIELD_WORD", 2);
@@ -170,7 +170,7 @@ static void LoadThread(void)
 
     
     do {
-        setFinishedFlag(L);
+        updateFinishedFlag(L);
         
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
