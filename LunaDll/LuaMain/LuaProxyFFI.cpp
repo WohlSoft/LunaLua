@@ -568,6 +568,23 @@ typedef struct ExtendedBlockFields_\
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
     }
+	FFI_EXPORT(void) LunaLuaSetWindowPosition(int x, int y)
+    {
+        // Main bit for setting window position
+		SetWindowPos(gMainWindowHwnd, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+	FFI_EXPORT(void) LunaLuaToggleWindowFocus(bool enable)
+    {
+        // Setting the focus to the window
+		if (enable) {
+			gStartupSettings.runWhenUnfocused = true;
+            gMainWindowFocused = true;
+        } else {
+			gStartupSettings.runWhenUnfocused = false;
+            gMainWindowFocused = true;
+        }
+		
+    }
 }
 
 void CachedReadFile::clearData()
