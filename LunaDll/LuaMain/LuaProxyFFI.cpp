@@ -585,6 +585,20 @@ typedef struct ExtendedBlockFields_\
         }
 		
     }
+	FFI_EXPORT(void) LunaLuaCenterWindow()
+    {
+		// This will center the window to the screen that it detects. Useful for auto-moving the window for misc reasons
+		RECT rectClient, rectWindow;
+		HWND hWnd = gMainWindowHwnd;
+		GetClientRect(hWnd, &rectClient);
+		GetWindowRect(hWnd, &rectWindow);
+		int posx, posy;
+		posx = GetSystemMetrics(SM_CXSCREEN) / 2 - (rectWindow.right - rectWindow.left) / 2,
+		posy = GetSystemMetrics(SM_CYSCREEN) / 2 - (rectWindow.bottom - rectWindow.top) / 2,
+
+		// When getting everything set, center the window!
+		SetWindowPos(hWnd, NULL, posx, posy, 800, 600, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    }
 }
 
 void CachedReadFile::clearData()
