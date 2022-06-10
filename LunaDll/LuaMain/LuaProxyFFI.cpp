@@ -629,6 +629,47 @@ typedef struct ExtendedBlockFields_\
             lastBigIcon = asIcon;
         }
     }
+
+    FFI_EXPORT(void) LunaLuaSetWindowSize(int width, int height)
+    {
+        RECT clientRect;
+        clientRect.left = 0;
+        clientRect.top = 0;
+        clientRect.right = width;
+        clientRect.bottom = height;
+
+        AdjustWindowRectEx(&clientRect, GetWindowLong(gMainWindowHwnd, GWL_STYLE),GetMenu(gMainWindowHwnd) != 0,GetWindowLong(gMainWindowHwnd, GWL_EXSTYLE));
+
+        RECT windowRect;
+        GetWindowRect(gMainWindowHwnd, &windowRect);
+
+        int fullWidth = (clientRect.right - clientRect.left);
+        int fullHeight = (clientRect.bottom - clientRect.top);
+
+        int x = (int)((windowRect.left + windowRect.right  - fullWidth )*0.5);
+        int y = (int)((windowRect.top  + windowRect.bottom - fullHeight)*0.5);
+
+        SetWindowPos(gMainWindowHwnd, NULL, x, y, fullWidth, fullHeight, SWP_NOZORDER | SWP_FRAMECHANGED);
+
+        //gMainWindowSize = width;
+        //gMainWindowSize |= height << 16;
+    }
+
+    FFI_EXPORT(int) LunaLuaGetWindowWidth()
+    {
+        RECT clientRect;
+        GetClientRect(gMainWindowHwnd, &clientRect);
+
+        return (clientRect.right - clientRect.left);
+    }
+
+    FFI_EXPORT(int) LunaLuaGetWindowHeight()
+    {
+        RECT clientRect;
+        GetClientRect(gMainWindowHwnd, &clientRect);
+
+        return (clientRect.bottom - clientRect.top);
+    }
 }
 
 void CachedReadFile::clearData()
