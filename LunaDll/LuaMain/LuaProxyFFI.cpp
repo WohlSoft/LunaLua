@@ -580,15 +580,7 @@ typedef struct ExtendedBlockFields_\
         }
 
         // Main bit for setting window name
-        SetWindowLongW(gMainWindowHwnd,GWL_WNDPROC,GetWindowLongA(gMainWindowHwnd,GWL_WNDPROC));
         SetWindowTextW(gMainWindowHwnd,Str2WStr(fullName).c_str());
-
-        // ... But we also set these three VB-related ones, since otherwise
-        // they seem to cause a weird issue where it can sometimes (and
-        // only sometimes) get reset after refocusing the window.
-        GM_GAMETITLE_1 = fullName;
-        GM_GAMETITLE_2 = fullName;
-        GM_GAMETITLE_3 = fullName;
     }
 
     static HICON lastSmallIcon = NULL;
