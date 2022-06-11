@@ -187,6 +187,272 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
     }
 }
 
+static void ProcessPasteKeystroke()
+{
+    // Ctrl-V
+    if (OpenClipboard(nullptr) == 0)
+    {
+        // Couldn't open clipboard
+        return;
+    }
+
+    // Get unicode text handle
+    bool textIsUnicode = true;
+    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+    if (hData == nullptr)
+    {
+        // Couldn't get text handle, try non-unicode
+        hData = GetClipboardData(CF_TEXT);
+        textIsUnicode = false;
+        if (hData == nullptr)
+        {
+            // Couldn't get any text
+            CloseClipboard();
+            return;
+        }
+    }
+
+    // Lock data
+    void* dataPtr = GlobalLock(hData);
+    if (dataPtr == nullptr)
+    {
+        // Couldn't get pointer
+        GlobalUnlock(hData);
+        CloseClipboard();
+    }
+
+    // Convert to std::string
+    std::string pastedText = textIsUnicode ? WStr2Str(static_cast<const wchar_t*>(dataPtr)) : std::string(static_cast<const char*>(dataPtr));
+
+    // Unlock Data and close clipboard
+    GlobalUnlock(hData);
+    CloseClipboard();
+
+    // Call event
+    if ((pastedText.length() > 0) && gLunaLua.isValid()) {
+        std::shared_ptr<Event> pasteTextEvent = std::make_shared<Event>("onPasteText", false);
+        pasteTextEvent->setDirectEventName("onPasteText");
+        pasteTextEvent->setLoopable(false);
+        gLunaLua.callEvent(pasteTextEvent, pastedText);
+    }
+}
+
+static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeated)
+{
+    static WCHAR unicodeData[32] = { 0 };
+    bool ctrlPressed = (gKeyState[VK_CONTROL] & 0x80) != 0;
+    bool altPressed = (gKeyState[VK_MENU] & 0x80) != 0;
+    bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+    
+    // Notify game controller manager
+    if (!repeated)
+    {
+        gLunaGameControllerManager.notifyKeyboardPress(virtKey);
+    }
+
+    // Notify Lua code
+    // But don't pass keystrokes with ctrl or alt as a keypress
+    if (gLunaLua.isValid() &&
+        (!ctrlPressed || (virtKey == VK_LCONTROL) || (virtKey == VK_RCONTROL)) &&
+        (!altPressed || (virtKey == VK_LMENU) || (virtKey == VK_RMENU))
+        ) {
+        std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+
+        int unicodeRet = ToUnicode(virtKey, scanCode, gKeyState, unicodeData, 32, 0);
+        if (unicodeRet > 0)
+        {
+            std::string charStr = WStr2Str(std::wstring(unicodeData, unicodeRet));
+            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, charStr);
+        }
+        else
+        {
+            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+        }
+    }
+
+    // Process Ctrl-V to call onPasteText
+    if ((virtKey == 0x56) && ctrlPressed && !altPressed)
+    {
+        ProcessPasteKeystroke();
+    }
+
+    // Process Alt-Enter for fullscreen
+    if ((virtKey == VK_RETURN) && altPressed && !ctrlPressed && !repeated)
+    {
+        if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                if (wndpl.showCmd == SW_MAXIMIZE)
+                {
+                    ShowWindow(gMainWindowHwnd, SW_RESTORE);
+                }
+                else
+                {
+                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+                }
+            }
+        }
+    }
+
+    // Process F12 key for screenshot to file
+    if ((virtKey == VK_F12) && plainPress && g_GLEngine.IsEnabled())
+    {
+        short screenshotSoundID = 12;
+        native_playSFX(&screenshotSoundID);
+        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+                CreateDirectoryW(screenshotPath.c_str(), NULL);
+            }
+            screenshotPath += L"\\";
+            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+
+            ::GenerateScreenshot(screenshotPath, *header, pData);
+            GlobalFree(globalMem);
+            return true;
+        });
+    }
+
+    // Process F11 key for GIF recorder toggle
+    if ((virtKey == VK_F11) && plainPress && g_GLEngine.IsEnabled())
+    {
+        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+        native_playSFX(&gifRecSoundID);
+    }
+
+    // Process F4 key for letterbox toggle
+    if ((virtKey == VK_F4) && plainPress && g_GLEngine.IsEnabled())
+    {
+        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+        gGeneralConfig.save();
+    }
+}
+
+static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
+{
+    // Buffer memory 
+    static std::vector<BYTE> rawBuffer(sizeof(RAWINPUT));
+
+    // Read raw input structure
+    UINT dwSize;
+    GetRawInputData(hRawInput, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+    if (dwSize > rawBuffer.size())
+    {
+        rawBuffer.resize(dwSize);
+    }
+    if (GetRawInputData(hRawInput, RID_INPUT, rawBuffer.data(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+    {
+        // Unexpected size
+        return;
+    }
+    const RAWINPUT& rawInput = *reinterpret_cast<const RAWINPUT*>(rawBuffer.data());
+
+    // Ignore non-keyboard input
+    if (rawInput.header.dwType != RIM_TYPEKEYBOARD)
+    {
+        return;
+    }
+
+    // Handle keyboard input
+    const RAWKEYBOARD& rawKbd = rawInput.data.keyboard;
+    uint16_t vkey = rawKbd.VKey;
+    uint16_t scanCode = rawKbd.MakeCode;
+    uint8_t prefixFlag = (rawKbd.Flags & (RI_KEY_E0 | RI_KEY_E1));
+    bool keyDown = ((rawKbd.Flags & RI_KEY_BREAK) == 0);
+
+    // Out of range
+    if (vkey > 0xFF)
+    {
+        return;
+    }
+
+    // Handle left/right keys
+    // We get passed them with the non-distinct virtual key code
+    // So let's make it distinct
+    switch (vkey)
+    {
+        case VK_CONTROL:
+            if (prefixFlag == 0)
+            {
+                vkey = VK_LCONTROL;
+            }
+            else if (prefixFlag == RI_KEY_E0)
+            {
+                vkey = VK_RCONTROL;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        case VK_MENU:
+            if (prefixFlag == 0)
+            {
+                vkey = VK_LMENU;
+            }
+            else if (prefixFlag == RI_KEY_E0)
+            {
+                vkey = VK_RMENU;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        case VK_SHIFT:
+            if ((scanCode == 0x2a) && (prefixFlag == 0))
+            {
+                vkey = VK_LSHIFT;
+            }
+            else if ((scanCode == 0x36) && (prefixFlag == 0))
+            {
+                vkey = VK_RSHIFT;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        default:
+            break;
+    }
+
+    // Update key state
+    bool keyWasDown = (gKeyState[vkey] & 0x80) != 0;
+    bool repeated = keyDown && keyWasDown;
+
+    // Update key state
+    gKeyState[vkey] = keyDown ? 0x80 : 0x00;
+
+    // For key states that should or together left and right, handle that
+    switch (vkey)
+    {
+        case VK_LCONTROL:
+        case VK_RCONTROL:
+            gKeyState[VK_CONTROL] = gKeyState[VK_LCONTROL] | gKeyState[VK_RCONTROL];
+            break;
+        case VK_LMENU:
+        case VK_RMENU:
+            gKeyState[VK_MENU] = gKeyState[VK_LMENU] | gKeyState[VK_RMENU];
+            break;
+        case VK_LSHIFT:
+        case VK_RSHIFT:
+            gKeyState[VK_SHIFT] = gKeyState[VK_LSHIFT] | gKeyState[VK_RSHIFT];
+            break;
+        default:
+            break;
+    }
+
+    // If window is focused, and key is down, run keypress handling
+    if (haveFocus && keyDown)
+    {
+        ProcessRawKeyPress(vkey, scanCode, repeated);
+    }
+}
+
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -283,6 +549,23 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     });
                 }
                 return FALSE;
+            case WM_NCACTIVATE:
+                wParam = FALSE;
+                break;
+            case WM_INPUT:
+            {
+                bool haveFocus = (wParam == RIM_INPUT);
+
+                // Process the raw input
+                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), haveFocus);
+
+                // If we have focus, return via DefWindowProcW
+                if (haveFocus)
+                {
+                    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+                }
+                return 0;
+            }
         }
     }
 
@@ -318,6 +601,14 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
                 // Override window proc
                 gMainWindowProc = (WNDPROC)SetWindowLongPtrW(gMainWindowHwnd, GWLP_WNDPROC, (LONG_PTR)HandleWndProc);
+
+                // Register for the raw input API for keyboard
+                RAWINPUTDEVICE rid;
+                rid.usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+                rid.usUsage = 0x06; // HID_USAGE_GENERIC_KEYBOARD
+                rid.dwFlags = RIDEV_INPUTSINK;
+                rid.hwndTarget = gMainWindowHwnd;
+                RegisterRawInputDevices(&rid, 1, sizeof(rid));
 
                 // Set initial window title right away, since we blocked what was causing VB to set it
                 SetWindowTextW(gMainWindowHwnd, GM_GAMETITLE_1.ptr);
@@ -623,15 +914,6 @@ void TrySkipPatch()
     /************************************************************************/
     HookWnd = SetWindowsHookExW(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
     if (!HookWnd){
-        DWORD errCode = GetLastError();
-        std::string errCmd = "Failed to Hook";
-        errCmd += "\nErr-Code: ";
-        errCmd += std::to_string((long long)errCode);
-        MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
-    }
-
-    KeyHookWnd = SetWindowsHookExA(WH_KEYBOARD, KeyHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
-    if (!KeyHookWnd){
         DWORD errCode = GetLastError();
         std::string errCmd = "Failed to Hook";
         errCmd += "\nErr-Code: ";
