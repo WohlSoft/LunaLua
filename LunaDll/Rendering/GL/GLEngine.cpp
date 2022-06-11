@@ -81,8 +81,8 @@ void GLEngine::InitForHDC(HDC hdcDest)
             mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
-            RenderCameraToScreen(hdcDest, 0, 0, 800, 600,
-                hdcDest, 0, 0, 800, 600, 0);
+            RenderCameraToScreen(hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(),
+                hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), 0);
             EndFrame(hdcDest, false);
         }
     }
@@ -127,23 +127,38 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     // Unbind the texture from the framebuffer (Bind screen)
     g_GLContextManager.BindScreen();
 
+	int fbWidth = g_GLContextManager.GetMainFBWidth();
+	int fbHeight = g_GLContextManager.GetMainFBHeight();
+
+	// TMP
+	//nWidthDest = fbWidth;
+	//nHeightDest = fbHeight;
+	//nWidthSrc = fbWidth;
+	//nHeightSrc = fbHeight;
+
     // Implement letterboxing correction
-    float scaledWidth = windowWidth / 800.0f;
-    float scaledHeight = windowHeight / 600.0f;
+    float scaledWidth = windowWidth / static_cast<float>(fbWidth);
+    float scaledHeight = windowHeight / static_cast<float>(fbHeight);
     float xScale = 1.0f;
     float yScale = 1.0f;
 
     if (gGeneralConfig.getRendererUseLetterbox()) {
         if (scaledWidth > scaledHeight) {
             xScale = scaledHeight / scaledWidth;
+			nWidthDest = nWidthSrc * scaledHeight;
+			nHeightDest = nHeightSrc * scaledHeight;
         }
         else if (scaledWidth < scaledHeight) {
             yScale = scaledWidth / scaledHeight;
+			nWidthDest = nWidthSrc * scaledWidth;
+			nHeightDest = nHeightSrc * scaledWidth;
         }
     }
 
-    float xOffset = (windowWidth / xScale - windowWidth) * 0.5f;
-    float yOffset = (windowHeight / yScale - windowHeight) * 0.5f;
+	float xOffset = (windowWidth - nWidthDest) * 0.5f;// (windowWidth / xScale - windowWidth) * 0.5f;
+	float yOffset = (windowHeight - nHeightDest) * 0.5;// (windowHeight / yScale - windowHeight) * 0.5f;
+
+	printf(">> %d,%d,%d,%d | %f,%f | %f,%f,%f,%f\n", nWidthDest, nHeightDest, nWidthSrc, nHeightSrc, xScale, yScale, -xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset);
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
@@ -151,7 +166,7 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
-    glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
+    glOrtho(0/*-xOffset*/, (float)windowWidth/* + xOffset*/, (float)windowHeight /*+ yOffset*/, 0/*-yOffset*/, -1.0f, 1.0f);
     GLERRORCHECK();
 
     // Use upscaling shader if we're upscaling and it compiled right
@@ -162,7 +177,7 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     }
 
     // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
+    g_GLDraw.DrawStretched(nXOriginDest + xOffset, nYOriginDest + yOffset, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
     GLERRORCHECK();
     glFlush();
     GLERRORCHECK();
