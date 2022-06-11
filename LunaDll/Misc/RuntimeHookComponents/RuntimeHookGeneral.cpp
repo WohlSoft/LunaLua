@@ -10,8 +10,6 @@
 #include "../../Globals.h"
 #include "../AsmPatch.h"
 
-#include "../SHMemServer.h"
-
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
@@ -242,21 +240,6 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     switch (wData->message)
     {
-    case WM_COPYDATA:
-        {
-            PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
-            if (pcds->cbData == 1) {
-                if (pcds->dwData == 0xDEADC0DE) {
-                    std::wstring lvlName = gShMemServer.read();
-                    if (!lvlName.empty()) {
-                        GM_FULLPATH = lvlName;
-                    }
-                    gHook_SkipTestMsgBox = true;
-                    ((void(*)())0x00A02220)();
-                }
-            }
-        }
-        break;
     case WM_CREATE:
         if (wData->lParam != NULL)
         {

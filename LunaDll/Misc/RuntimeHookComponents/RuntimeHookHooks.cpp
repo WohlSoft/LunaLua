@@ -10,7 +10,6 @@
 #include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 
-#include "../SHMemServer.h"
 #include "../AsmPatch.h"
 
 #include "../../Rendering/GL/GLEngine.h"

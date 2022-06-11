@@ -83,8 +83,6 @@ StartupSettings gStartupSettings;
 
 HardcodedGraphicsManager gGraphManager;
 
-SHMemServer gShMemServer;
-
 FreeImageInit        gFreeImgInit;
 
 GeneralLunaConfig    gGeneralConfig;

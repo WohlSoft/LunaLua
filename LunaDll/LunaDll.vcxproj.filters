@@ -256,9 +256,6 @@
     <ClInclude Include="Minigames\GameboyRPG.h">
       <Filter>Minigames</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\SHMemServer.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="LuaMain\LuabindIncludes.h">
       <Filter>LuaMain</Filter>
     </ClInclude>
@@ -890,9 +887,6 @@
     </ClCompile>
     <ClCompile Include="Minigames\Minigames.cpp">
       <Filter>Minigames</Filter>
-    </ClCompile>
-    <ClCompile Include="Misc\SHMemServer.cpp">
-      <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp">
       <Filter>HardcodedGraphics</Filter>
