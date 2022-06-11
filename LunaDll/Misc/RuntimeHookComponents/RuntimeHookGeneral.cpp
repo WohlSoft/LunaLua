@@ -49,6 +49,143 @@ void SetupThunRTMainHook()
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
 }
 
+// Function to get the size of padding/frame around a window
+static void getWindowFramePadding(HWND hwnd, int &wPadOut, int &hPadOut)
+{
+    // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
+    RECT rc;
+    rc.left = 0;
+    rc.top = 0;
+    rc.right = 800;
+    rc.bottom = 600;
+    AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+        GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+    wPadOut = rc.right - rc.left - 800;
+    hPadOut = rc.bottom - rc.top - 600;
+}
+
+// Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
+static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wPad, int hPad, double nominalW, double nominalH)
+{
+    int w = lpRect->right - lpRect->left - wPad;
+    int h = lpRect->bottom - lpRect->top - hPad;
+    double relS;
+    switch (dragCorner)
+    {
+        default:
+        case WMSZ_BOTTOMLEFT:
+        case WMSZ_BOTTOMRIGHT:
+        case WMSZ_TOPLEFT:
+        case WMSZ_TOPRIGHT:
+            // Corners
+            relS = 0.5 * (w / nominalW + h / nominalH);
+            break;
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+            // Vertical resize only
+            relS = h / nominalH;
+            break;
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+            // Vertical resize only
+            relS = w / nominalW;
+            break;
+    }
+
+    // Cap size >= 50%
+    if (relS < 0.5)
+    {
+        relS = 0.5;
+    }
+
+    // Snap size
+    if ((relS > 0.95) && (relS < 1.05))
+    {
+        relS = 1.0;
+    }
+
+    // New Size
+    w = (int)floor(relS * nominalW + 0.5) + wPad;
+    h = (int)floor(relS * nominalH + 0.5) + hPad;
+
+    // Fine tune size
+    switch (dragCorner)
+    {
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+            // Force even width for centering
+            w -= w % 2;
+            relS = (w - wPad) / nominalW;
+            h = (int)floor(relS * nominalH + 0.5) + hPad;
+            break;
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+            // Force even height for centering
+            h -= h % 2;
+            relS = (h - hPad) / nominalH;
+            w = (int)floor(relS * nominalW + 0.5) + wPad;
+            break;
+    }
+
+    // Adjust left/right
+    switch (dragCorner)
+    {
+        case WMSZ_TOPLEFT:
+        case WMSZ_LEFT:
+        case WMSZ_BOTTOMLEFT:
+        {
+            // Dragging left, leave right alone
+            lpRect->left = lpRect->right - w;
+            break;
+        }
+        case WMSZ_TOPRIGHT:
+        case WMSZ_RIGHT:
+        case WMSZ_BOTTOMRIGHT:
+        {
+            // Dragging right, leave left alone
+            lpRect->right = lpRect->left + w;
+            break;
+        }
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+        {
+            // Dragging top/bottom, leave keep centered
+            lpRect->left = (lpRect->right + lpRect->left - w) / 2;
+            lpRect->right = lpRect->left + w;
+            break;
+        }
+    }
+
+    // Adjust top/bottom
+    switch (dragCorner)
+    {
+        case WMSZ_TOPLEFT:
+        case WMSZ_TOP:
+        case WMSZ_TOPRIGHT:
+        {
+            // Dragging top, leave bottom alone
+            lpRect->top = lpRect->bottom - h;
+            break;
+        }
+        case WMSZ_BOTTOMLEFT:
+        case WMSZ_BOTTOM:
+        case WMSZ_BOTTOMRIGHT:
+        {
+            // Dragging right, leave left alone
+            lpRect->bottom = lpRect->top + h;
+            break;
+        }
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+        {
+            // Dragging top/bottom, leave keep centered
+            lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
+            lpRect->bottom = lpRect->top + h;
+            break;
+        }
+    }
+}
+
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -68,6 +205,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_GETMINMAXINFO:
             {
+                // Get the size of a 400x300 window, plus whatever frame windows puts around it
                 RECT rc;
                 rc.left = 0;
                 rc.top = 0;
@@ -90,134 +228,13 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     break;
                 }
 
-                RECT rc;
-                rc.left = 0;
-                rc.top = 0;
-                rc.right = 800;
-                rc.bottom = 600;
-                AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-                    GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
-                int wPad = rc.right - rc.left - 800;
-                int hPad = rc.bottom - rc.top - 600;
+                // Get padding overhead
+                int wPad, hPad;
+                getWindowFramePadding(hwnd, wPad/*out*/, hPad/*out*/);
 
+                // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                int w = lpRect->right - lpRect->left - wPad;
-                int h = lpRect->bottom - lpRect->top - hPad;
-                double relS;
-                switch (wParam)
-                {
-                    default:
-                    case WMSZ_BOTTOMLEFT:
-                    case WMSZ_BOTTOMRIGHT:
-                    case WMSZ_TOPLEFT:
-                    case WMSZ_TOPRIGHT:
-                        // Corners
-                        relS = 0.5 * (w / 800.0 + h / 600.0);
-                        break;
-                    case WMSZ_TOP:
-                    case WMSZ_BOTTOM:
-                        // Vertical resize only
-                        relS = h / 600.0;
-                        break;
-                    case WMSZ_LEFT:
-                    case WMSZ_RIGHT:
-                        // Vertical resize only
-                        relS = w / 800.0;
-                        break;
-                }
-
-                // Cap size >= 50%
-                if (relS < 0.5)
-                {
-                    relS = 0.5;
-                }
-
-                // Snap size
-                if ((relS > 0.95) && (relS < 1.05))
-                {
-                    relS = 1.0;
-                }
-
-                // New Size
-                w = (int)floor(relS * 800 + 0.5) + wPad;
-                h = (int)floor(relS * 600 + 0.5) + hPad;
-
-                // Fine tune size
-                switch (wParam)
-                {
-                    case WMSZ_TOP:
-                    case WMSZ_BOTTOM:
-                        // Force even width for centering
-                        w -= w % 2;
-                        relS = (w - wPad) / 800.0;
-                        h = (int)floor(relS * 600 + 0.5) + hPad;
-                        break;
-                    case WMSZ_LEFT:
-                    case WMSZ_RIGHT:
-                        // Force even height for centering
-                        h -= h % 2;
-                        relS = (h - hPad) / 600.0;
-                        w = (int)floor(relS * 800 + 0.5) + wPad;
-                        break;
-                }
-
-                // Adjust left/right
-                switch (wParam)
-                {
-                    case WMSZ_TOPLEFT:
-                    case WMSZ_LEFT:
-                    case WMSZ_BOTTOMLEFT:
-                    {
-                        // Dragging left, leave right alone
-                        lpRect->left = lpRect->right - w;
-                        break;
-                    }
-                    case WMSZ_TOPRIGHT:
-                    case WMSZ_RIGHT:
-                    case WMSZ_BOTTOMRIGHT:
-                    {
-                        // Dragging right, leave left alone
-                        lpRect->right = lpRect->left + w;
-                        break;
-                    }
-                    case WMSZ_TOP:
-                    case WMSZ_BOTTOM:
-                    {
-                        // Dragging top/bottom, leave keep centered
-                        lpRect->left = (lpRect->right + lpRect->left - w) / 2;
-                        lpRect->right = lpRect->left + w;
-                        break;
-                    }
-                }
-
-                // Adjust top/bottom
-                switch (wParam)
-                {
-                    case WMSZ_TOPLEFT:
-                    case WMSZ_TOP:
-                    case WMSZ_TOPRIGHT:
-                    {
-                        // Dragging top, leave bottom alone
-                        lpRect->top = lpRect->bottom - h;
-                        break;
-                    }
-                    case WMSZ_BOTTOMLEFT:
-                    case WMSZ_BOTTOM:
-                    case WMSZ_BOTTOMRIGHT:
-                    {
-                        // Dragging right, leave left alone
-                        lpRect->bottom = lpRect->top + h;
-                        break;
-                    }
-                    case WMSZ_LEFT:
-                    case WMSZ_RIGHT:
-                    {
-                        // Dragging top/bottom, leave keep centered
-                        lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
-                        lpRect->bottom = lpRect->top + h;
-                        break;
-                    }
-                }
+                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, 800.0, 600.0);
 
                 return TRUE;
             }
