@@ -130,35 +130,25 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 	int fbWidth = g_GLContextManager.GetMainFBWidth();
 	int fbHeight = g_GLContextManager.GetMainFBHeight();
 
-	// TMP
-	//nWidthDest = fbWidth;
-	//nHeightDest = fbHeight;
-	//nWidthSrc = fbWidth;
-	//nHeightSrc = fbHeight;
-
     // Implement letterboxing correction
     float scaledWidth = windowWidth / static_cast<float>(fbWidth);
     float scaledHeight = windowHeight / static_cast<float>(fbHeight);
-    float xScale = 1.0f;
-    float yScale = 1.0f;
 
     if (gGeneralConfig.getRendererUseLetterbox()) {
         if (scaledWidth > scaledHeight) {
-            xScale = scaledHeight / scaledWidth;
-			nWidthDest = nWidthSrc * scaledHeight;
-			nHeightDest = nHeightSrc * scaledHeight;
+			nWidthDest = static_cast<int>(floor(nWidthSrc * scaledHeight + 0.5));
+			nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
+        } else {
+			nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
+			nHeightDest = static_cast<int>(floor(nHeightSrc * scaledWidth + 0.5));
         }
-        else if (scaledWidth < scaledHeight) {
-            yScale = scaledWidth / scaledHeight;
-			nWidthDest = nWidthSrc * scaledWidth;
-			nHeightDest = nHeightSrc * scaledWidth;
-        }
+    } else {
+        nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
+        nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
     }
 
-	float xOffset = (windowWidth - nWidthDest) * 0.5f;// (windowWidth / xScale - windowWidth) * 0.5f;
-	float yOffset = (windowHeight - nHeightDest) * 0.5;// (windowHeight / yScale - windowHeight) * 0.5f;
-
-	printf(">> %d,%d,%d,%d | %f,%f | %f,%f,%f,%f\n", nWidthDest, nHeightDest, nWidthSrc, nHeightSrc, xScale, yScale, -xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset);
+	int xOffset = ((windowWidth - nWidthDest) + 1) / 2;
+	int yOffset = ((windowHeight - nHeightDest) + 1) / 2;
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
