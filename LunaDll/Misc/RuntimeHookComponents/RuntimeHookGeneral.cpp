@@ -549,9 +549,6 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     });
                 }
                 return FALSE;
-            case WM_NCACTIVATE:
-                wParam = FALSE;
-                break;
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);
