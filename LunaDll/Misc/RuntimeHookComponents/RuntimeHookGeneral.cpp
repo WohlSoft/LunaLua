@@ -200,6 +200,9 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_SIZE:
             {
+                // Store size of main window (low word is width, high word is height)
+                gMainWindowSize = lParam;
+
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
@@ -238,6 +241,26 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 return TRUE;
             }
+            case WM_DESTROY:
+                // Our main window was destroyed? Clear hwnd and mark as unfocused
+                gMainWindowHwnd = NULL;
+                if (!gStartupSettings.runWhenUnfocused)
+                {
+                    gMainWindowFocused = false;
+                }
+                gMainWindowSize = 0;
+                break;
+            case WM_SETFOCUS:
+                // Our main window gained focus? Keep track of that.
+                gMainWindowFocused = true;
+                break;
+            case WM_KILLFOCUS:
+                // Our main window lost focus? Keep track of that.
+                if (!gStartupSettings.runWhenUnfocused)
+                {
+                    gMainWindowFocused = false;
+                }
+                break;
         }
     }
 
@@ -264,6 +287,10 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
             LPCWSTR winName = createData->lpszName;
             if ((gMainWindowHwnd == NULL) && (winName != NULL) && (memcmp(L"- Version 1.2.2 -", &winName[20], 17*2) == 0))
             {
+                // Remove hook, since we no longer need it
+                UnhookWindowsHookEx(HookWnd);
+                HookWnd = NULL;
+
                 // Store main window handle
                 gMainWindowHwnd = wData->hwnd;
 
@@ -273,42 +300,6 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
                 // Set initial window title right away, since we blocked what was causing VB to set it
                 SetWindowTextW(gMainWindowHwnd, GM_GAMETITLE_1.ptr);
             }
-        }
-        break;
-    case WM_DESTROY:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window was destroyed? Clear hwnd and mark as unfocused
-            gMainWindowHwnd = NULL;
-            if (!gStartupSettings.runWhenUnfocused)
-            {
-                gMainWindowFocused = false;
-            }
-            gMainWindowSize = 0;
-        }
-        break;
-    case WM_SETFOCUS:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window gained focus? Keep track of that.
-            gMainWindowFocused = true;
-        }
-        break;
-    case WM_KILLFOCUS:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window lost focus? Keep track of that.
-            if (!gStartupSettings.runWhenUnfocused)
-            {
-                gMainWindowFocused = false;
-            }
-        }
-        break;
-    case WM_SIZE:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Store size of main window (low word is width, high word is height)
-            gMainWindowSize = wData->lParam;
         }
         break;
     default:
