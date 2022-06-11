@@ -13,6 +13,7 @@
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
+#include "../../Rendering/GL/GLEngineProxy.h"
 
 #include "../NpcIdExtender.h"
 
@@ -241,8 +242,26 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 return TRUE;
             }
+            case WM_SETFOCUS:
+                // Register VK_SNAPSHOT hotkey handling when in focus
+                RegisterHotKey(hwnd, VK_SNAPSHOT, MOD_NOREPEAT, VK_SNAPSHOT);
+
+                // Our main window gained focus? Keep track of that.
+                gMainWindowFocused = true;
+                break;
+            case WM_KILLFOCUS:
+                // Unregister VK_SNAPSHOT hotkey handling when out of focus
+                UnregisterHotKey(hwnd, VK_SNAPSHOT);
+
+                // Our main window lost focus? Keep track of that.
+                if (!gStartupSettings.runWhenUnfocused)
+                {
+                    gMainWindowFocused = false;
+                }
+                break;
             case WM_DESTROY:
                 // Our main window was destroyed? Clear hwnd and mark as unfocused
+                UnregisterHotKey(hwnd, VK_SNAPSHOT);
                 gMainWindowHwnd = NULL;
                 if (!gStartupSettings.runWhenUnfocused)
                 {
@@ -250,17 +269,20 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 }
                 gMainWindowSize = 0;
                 break;
-            case WM_SETFOCUS:
-                // Our main window gained focus? Keep track of that.
-                gMainWindowFocused = true;
-                break;
-            case WM_KILLFOCUS:
-                // Our main window lost focus? Keep track of that.
-                if (!gStartupSettings.runWhenUnfocused)
+            case WM_HOTKEY:
+                if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
                 {
-                    gMainWindowFocused = false;
+                    g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+                        GlobalUnlock(&globalMem);
+                        // Write to clipboard
+                        OpenClipboard(curHwnd);
+                        EmptyClipboard();
+                        SetClipboardData(CF_DIB, globalMem);
+                        CloseClipboard();
+                        return false;
+                    });
                 }
-                break;
+                return FALSE;
         }
     }
 

@@ -1541,24 +1541,6 @@ LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
     } // keyDown
 
-    // Hook print screen key
-    if ((virtKey == VK_SNAPSHOT) && gMainWindowFocused)
-    {
-        if (g_GLEngine.IsEnabled())
-        {
-            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-                GlobalUnlock(&globalMem);
-                // Write to clipboard
-                OpenClipboard(curHwnd);
-                EmptyClipboard();
-                SetClipboardData(CF_DIB, globalMem);
-                CloseClipboard();
-                return false;
-            });
-        }
-        return 1;
-    }
-
     return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
 
