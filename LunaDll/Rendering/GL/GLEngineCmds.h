@@ -148,7 +148,7 @@ public:
     uint32_t mCount;
     bool mSceneCoords;
     bool mDepthTest;
-	bool mLinearFiltered;
+    bool mLinearFiltered;
 
     GLEngineCmd_LuaDraw() :
         mTarget(nullptr),
@@ -165,7 +165,7 @@ public:
         mCount(0),
         mSceneCoords(false),
         mDepthTest(false),
-		mLinearFiltered(false)
+        mLinearFiltered(false)
     {}
 
     virtual void run(GLEngine& glEngine) const;

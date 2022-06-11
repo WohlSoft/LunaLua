@@ -8,7 +8,7 @@ GLShaderVariableInfo::GLShaderVariableInfo(GLShaderVariableType varType, GLint i
     m_arrayCount(arrayCount),
     m_type(type),
     m_name(name),
-	m_rawName(name),
+    m_rawName(name),
     m_arrayDepth(0u)
 {
     // Calculate array depth

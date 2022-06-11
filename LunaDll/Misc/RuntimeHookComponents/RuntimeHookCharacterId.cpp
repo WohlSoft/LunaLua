@@ -2469,7 +2469,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
 
     runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect);
-	// Note: No longer applied on-demand. Always have these patches in place for consistency
+    // Note: No longer applied on-demand. Always have these patches in place for consistency
     // runtimeHookCharacterIdApplyPatch();
 }
 
@@ -2478,7 +2478,7 @@ void runtimeHookCharacterIdUnregister(short id)
     runtimeHookCharacterIdMap.erase(id);
     if (runtimeHookCharacterIdMap.size() == 0)
     {
-		// Note: No longer undo character ID patches, at this point it's safer to leave them in place
+        // Note: No longer undo character ID patches, at this point it's safer to leave them in place
         // runtimeHookCharacterIdUnpplyPatch();
     }
 }
@@ -2486,7 +2486,7 @@ void runtimeHookCharacterIdUnregister(short id)
 void runtimeHookCharacterIdReset()
 {
     runtimeHookCharacterIdMap.clear();
-	// Note: No longer undo character ID patches, at this point it's safer to leave them in place
+    // Note: No longer undo character ID patches, at this point it's safer to leave them in place
     // runtimeHookCharacterIdUnpplyPatch();
 }
 

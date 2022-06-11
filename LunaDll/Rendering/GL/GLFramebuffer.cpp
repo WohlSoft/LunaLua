@@ -65,16 +65,16 @@ GLFramebuffer::GLFramebuffer(int w, int h, bool haveAlpha) :
 
 GLFramebuffer::~GLFramebuffer()
 {
-	// Unbind framebuffer (if currently bound)
-	if (g_GLContextManager.GetCurrentFB() == this)
-	{
-		g_GLContextManager.BindScreen();
-	}
+    // Unbind framebuffer (if currently bound)
+    if (g_GLContextManager.GetCurrentFB() == this)
+    {
+        g_GLContextManager.BindScreen();
+    }
 
     // Unbind texture just in case
-	if (mBufTex.name && (mBufTex.name == g_GLDraw.GetCurrentTexName())) {
-		g_GLDraw.UnbindTexture();
-	}
+    if (mBufTex.name && (mBufTex.name == g_GLDraw.GetCurrentTexName())) {
+        g_GLDraw.UnbindTexture();
+    }
 
     // Delete framebuffer
     if (mFB) {

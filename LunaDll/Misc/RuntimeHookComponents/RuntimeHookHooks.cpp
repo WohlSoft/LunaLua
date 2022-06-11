@@ -3004,23 +3004,23 @@ static inline double blockGetTopYTouching(Block& block, Momentum& loc)
 static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsigned int newBlockIdx, Momentum* referenceLoc)
 {
     if (oldBlockIdx > GM_BLOCK_COUNT) return 0;
-	if (newBlockIdx > GM_BLOCK_COUNT) return 0;
-	Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
-	Block& newBlock = Blocks::GetBase()[newBlockIdx];
+    if (newBlockIdx > GM_BLOCK_COUNT) return 0;
+    Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
+    Block& newBlock = Blocks::GetBase()[newBlockIdx];
 
-	double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
-	double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
+    double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
+    double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
 
-	if (newBlockY < oldBlockY)
-	{
-		// New block is higher, replace
-		return -1;
-	}
-	else if (newBlockY > oldBlockY)
-	{
-		// New block is lower, don't replace
-		return 0;
-	}
+    if (newBlockY < oldBlockY)
+    {
+        // New block is higher, replace
+        return -1;
+    }
+    else if (newBlockY > oldBlockY)
+    {
+        // New block is lower, don't replace
+        return 0;
+    }
 
     // Break tie based on if one is moving upward faster
     double newBlockSpeedY = newBlock.momentum.speedY;
@@ -3036,7 +3036,7 @@ static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsig
         return 0;
     }
 
-	// Break tie based on x-proximity
+    // Break tie based on x-proximity
     double refX = referenceLoc->x + referenceLoc->width * 0.5;
     double newBlockDist = abs((newBlock.momentum.x + newBlock.momentum.width * 0.5) - refX);
     double oldBlockDist = abs((oldBlock.momentum.x + oldBlock.momentum.width * 0.5) - refX);
@@ -3066,30 +3066,30 @@ static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsig
     }
 
     // Still tied? Let's just not replace
-	return 0;
+    return 0;
 }
 
 _declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void)
 {
     // JMP from 009A3FD3
     __asm {
-		// eax, ecx, edx are all free for use here
+        // eax, ecx, edx are all free for use here
 
-		lea   edx,word ptr ss:[ebx+0xC0]
-		movsx ecx,word ptr ss:[ebp-0x120]
-		movsx eax,word ptr ss:[ebp-0xF8]
-		push edx
-		push ecx
-		push eax
-		call runtimeHookCompareWalkBlock
+        lea   edx,word ptr ss:[ebx+0xC0]
+        movsx ecx,word ptr ss:[ebp-0x120]
+        movsx eax,word ptr ss:[ebp-0xF8]
+        push edx
+        push ecx
+        push eax
+        call runtimeHookCompareWalkBlock
 
-		cmp eax, 0
-		jne blockIsHigher
+        cmp eax, 0
+        jne blockIsHigher
 
-		push 0x9A4319 // Block is not higher
+        push 0x9A4319 // Block is not higher
         ret
-	blockIsHigher:
-		push 0x9A42DC // Block is higher
+    blockIsHigher:
+        push 0x9A42DC // Block is higher
         ret
     }
 }
@@ -3369,7 +3369,7 @@ static unsigned int __stdcall runtimeHookNPCNoBlockCollisionTest(unsigned int np
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
 {
-	// Death by block bump
+    // Death by block bump
     // 009E2AD0 | jne smbx.9E2EB6
     __asm {
         jne early_exit
@@ -3377,7 +3377,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [esp + 0x28]
+        movsx eax, word ptr ss : [esp + 0x28]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3401,7 +3401,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
 {
-	// ???
+    // ???
     // 00A089C3 | jne smbx.A08CA5
     __asm {
         jne early_exit
@@ -3409,7 +3409,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x188]
+        movsx eax, word ptr ss : [ebp - 0x188]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3433,16 +3433,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
 {
-	// Main Block Collision
+    // Main Block Collision
     // 00A10EAA | cmp word ptr ds:[ecx+edi*2],0
     __asm {
-		cmp word ptr ds:[ecx+edi*2],0
+        cmp word ptr ds:[ecx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3466,16 +3466,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
 {
-	// ???
+    // ???
     // 00A113B0 | cmp word ptr ds:[ecx+edi*2],0
     __asm {
-		cmp word ptr ds:[ecx+edi*2],0
+        cmp word ptr ds:[ecx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3499,16 +3499,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
 {
-	// Beltspeed
+    // Beltspeed
     // 00A1760E | cmp word ptr ds:[edx+edi*2],0
     __asm {
-		cmp word ptr ds:[edx+edi*2],0
+        cmp word ptr ds:[edx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3532,21 +3532,21 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
 {
-	// Bounce off NPCs
+    // Bounce off NPCs
     // 00A1B33F | cmp word ptr ds:[eax+edi*2],0
     __asm {
-		cmp word ptr ds:[eax+edi*2],0
+        cmp word ptr ds:[eax+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
         jne alternate_exit
-		movsx eax, word ptr ss : [ebp - 0x188]
+        movsx eax, word ptr ss : [ebp - 0x188]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0

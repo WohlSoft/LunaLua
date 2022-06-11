@@ -577,25 +577,25 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
 
 //HMODULE getModule(std::string moduleName)
 //{
-//	HMODULE ret = 0;
-//	if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
-//		ret = LoadLibraryA(moduleName.c_str());
-//	}
-//	return ret;
+//    HMODULE ret = 0;
+//    if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
+//        ret = LoadLibraryA(moduleName.c_str());
+//    }
+//    return ret;
 //}
 
 //std::wstring getModulePath()
 //{
-//	HMODULE hModule = GetModuleHandleW(NULL);
-//	WCHAR path[MAX_PATH];
-//	int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-//	for(int i = count; i > 3; i--) {
-//		if(path[i] == L'\\') {
-//			path[i] = 0;
-//			break;
-//		}
-//	}
-//	return std::wstring(path);
+//    HMODULE hModule = GetModuleHandleW(NULL);
+//    WCHAR path[MAX_PATH];
+//    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
+//    for(int i = count; i > 3; i--) {
+//        if(path[i] == L'\\') {
+//            path[i] = 0;
+//            break;
+//        }
+//    }
+//    return std::wstring(path);
 //}
 
 // Function to normalize a path, in such a way that all slashes become forward
@@ -1047,13 +1047,13 @@ void ShowAndFocusWindow(HWND hWindow)
 
 void HandleEventsWhileLoading()
 {
-	static DWORD lastTime = 0;
-	DWORD thisTime = GetTickCount();
-	DWORD elapsedTime = thisTime - lastTime;
-	if (elapsedTime > 100)
-	{
-		// Run if >100ms has elapsed since last event handling
-		native_rtcDoEvents();
-		lastTime = thisTime;
-	}
+    static DWORD lastTime = 0;
+    DWORD thisTime = GetTickCount();
+    DWORD elapsedTime = thisTime - lastTime;
+    if (elapsedTime > 100)
+    {
+        // Run if >100ms has elapsed since last event handling
+        native_rtcDoEvents();
+        lastTime = thisTime;
+    }
 }

@@ -24,7 +24,7 @@ private:
 
     double mCameraX, mCameraY;
 
-	GLShader* mpUpscaleShader;
+    GLShader* mpUpscaleShader;
 
 public:
     GLEngine();

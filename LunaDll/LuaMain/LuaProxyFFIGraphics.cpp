@@ -124,7 +124,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mCount = cmd->mCount;
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
-	obj->mLinearFiltered = cmd->mLinearFiltered;
+    obj->mLinearFiltered = cmd->mLinearFiltered;
 
     // Ensure we have something for a sampler to sample
     if ((!obj->mImg) && (!obj->mCapBuff))

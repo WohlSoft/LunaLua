@@ -86,8 +86,8 @@ void Player::CycleRight(PlayerMOB* pPlayer) {
 
     // Check mount stuff for safe cycle
     //if(pPlayer->MountType != 0) {
-    //	if(pPlayer->Identity > 1)
-    //		return false; // fail to cycle because next character can't be mounted
+    //    if(pPlayer->Identity > 1)
+    //        return false; // fail to cycle because next character can't be mounted
     //}
 
     int playerID = static_cast<int>(pPlayer->Identity);

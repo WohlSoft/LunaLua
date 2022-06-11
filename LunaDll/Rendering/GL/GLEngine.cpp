@@ -24,11 +24,11 @@ varying vec2 crispTexel;\n\
 \n\
 void main()\n\
 {\n\
-	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;\n\
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n\
-	gl_FrontColor = gl_Color;\n\
-	\n\
-	crispTexel = gl_TexCoord[0].xy * inputSize.xy;\n\
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;\n\
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n\
+    gl_FrontColor = gl_Color;\n\
+    \n\
+    crispTexel = gl_TexCoord[0].xy * inputSize.xy;\n\
 }\n";
 static const char* upscaleShaderFragSrc = "#version 120\n\
 uniform sampler2D iChannel0;\n\
@@ -38,18 +38,18 @@ varying vec2 crispTexel;\n\
 \n\
 void main()\n\
 {\n\
-	vec2 texel = crispTexel;\n\
-	vec2 scale = crispScale;\n\
-	vec2 texelFloor = floor(texel);\n\
-	vec2 texelFrac = fract(texel);\n\
-	vec2 range = 0.5 - 0.5 / scale;\n\
-	vec2 centerDist = texelFrac - 0.5;\n\
-	vec2 newFrac = (centerDist - clamp(centerDist, -range, range)) * scale + 0.5;\n\
-	vec2 newTexel = texelFloor + newFrac;\n\
+    vec2 texel = crispTexel;\n\
+    vec2 scale = crispScale;\n\
+    vec2 texelFloor = floor(texel);\n\
+    vec2 texelFrac = fract(texel);\n\
+    vec2 range = 0.5 - 0.5 / scale;\n\
+    vec2 centerDist = texelFrac - 0.5;\n\
+    vec2 newFrac = (centerDist - clamp(centerDist, -range, range)) * scale + 0.5;\n\
+    vec2 newTexel = texelFloor + newFrac;\n\
 \n\
-	vec4 c = texture2D(iChannel0, newTexel / inputSize);\n\
-	\n\
-	gl_FragColor = c*gl_Color;\n\
+    vec4 c = texture2D(iChannel0, newTexel / inputSize);\n\
+    \n\
+    gl_FragColor = c*gl_Color;\n\
 }\n";
 
 GLEngine::GLEngine() :
@@ -57,7 +57,7 @@ GLEngine::GLEngine() :
     mHwnd(NULL),
     mScreenshot(false),
     mCameraX(0.0), mCameraY(0.0),
-	mpUpscaleShader(nullptr)
+    mpUpscaleShader(nullptr)
 {
 }
 
@@ -77,8 +77,8 @@ void GLEngine::InitForHDC(HDC hdcDest)
             runOnce = false;
             mGifRecorder.init();
 
-			// Try to build the upscale shader
-			mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
+            // Try to build the upscale shader
+            mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
             RenderCameraToScreen(hdcDest, 0, 0, 800, 600,
@@ -154,12 +154,12 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
     GLERRORCHECK();
 
-	// Use upscaling shader if we're upscaling and it compiled right
-	GLShader* upscaleShader = nullptr;
-	if (mpUpscaleShader->isValid() && ((scaledWidth > 1.0f) || (scaledHeight > 1.0f)))
-	{
-		upscaleShader = mpUpscaleShader;
-	}
+    // Use upscaling shader if we're upscaling and it compiled right
+    GLShader* upscaleShader = nullptr;
+    if (mpUpscaleShader->isValid() && ((scaledWidth > 1.0f) || (scaledHeight > 1.0f)))
+    {
+        upscaleShader = mpUpscaleShader;
+    }
 
     // Draw the buffer, flipped/stretched as appropriate
     g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
