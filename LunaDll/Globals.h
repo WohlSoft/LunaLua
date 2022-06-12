@@ -131,6 +131,9 @@ extern HDC		ghMemDC;		// General-use screen-compatible DC
 extern HBITMAP	ghGeneralDIB;	// General-use screen-sized DIB
 extern DWORD*	gpScreenBits;	// Pointer to screen bits for general use DIB
 
+// Mouse cursor
+extern HCURSOR  gCustomCursor;
+
 // Key status
 extern short	gNumpad4;
 extern short	gNumpad8;

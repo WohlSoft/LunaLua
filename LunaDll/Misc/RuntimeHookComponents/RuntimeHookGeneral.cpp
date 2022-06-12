@@ -549,6 +549,19 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     });
                 }
                 return FALSE;
+            case WM_SETCURSOR:
+                if (LOWORD(lParam) == HTCLIENT)
+                {
+                    HCURSOR activeCursor = gCustomCursor;
+                    if (activeCursor == nullptr)
+                    {
+                        static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+                        activeCursor = defaultCursor;
+                    }
+                    SetCursor(activeCursor);
+                    return TRUE;
+                }
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);

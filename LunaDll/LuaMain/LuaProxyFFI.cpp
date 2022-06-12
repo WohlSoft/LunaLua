@@ -629,6 +629,77 @@ typedef struct ExtendedBlockFields_\
             lastBigIcon = asIcon;
         }
     }
+
+    FFI_EXPORT(void) LunaLuaSetCursor(LunaImageRef* img, uint32_t xHotspot, uint32_t yHotspot)
+    {
+        HCURSOR asCursor = nullptr;
+
+        // Convert if what is passed in is not null
+        if ((img != nullptr) && (*img != nullptr))
+        {
+            // Convert passed image to a HBITMAP
+            HBITMAP asBitmap = (*img)->asHBITMAP();
+
+            if (asBitmap == nullptr) return;
+
+            // Limit hotspot location
+            uint32_t imgW = (*img)->getW();
+            uint32_t imgH = (*img)->getH();
+            if (xHotspot > imgW) xHotspot = imgW;
+            if (yHotspot > imgH) yHotspot = imgH;
+
+            // Create a cursor out of the image
+            ICONINFO cursorInfo;
+
+            cursorInfo.fIcon = FALSE;
+            cursorInfo.hbmColor = asBitmap;
+            cursorInfo.hbmMask = asBitmap;
+            cursorInfo.xHotspot = xHotspot;
+            cursorInfo.yHotspot = yHotspot;
+
+            asCursor = CreateIconIndirect(&cursorInfo);
+        }
+
+        // Store new cursor setting
+        HCURSOR lastCursor = gCustomCursor;
+        gCustomCursor = asCursor;
+
+        // Get actual cursor to use if we need one now
+        // (translate null to the default cursor)
+        HCURSOR activeCursor = asCursor;
+        if (activeCursor == nullptr)
+        {
+            static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+            activeCursor = defaultCursor;
+        }
+
+        // If the previous cursor was set, deallocate it
+        // Deallocate the old cursor
+        if (lastCursor)
+        {
+            if (GetCursor() == lastCursor)
+            {
+                // If the last cursor was in use
+                SetCursor(activeCursor);
+            }
+            DestroyIcon(lastCursor);
+        }
+
+        // Set immediately if in main window client area
+        if (gMainWindowHwnd)
+        {
+            POINT cursorPoint;
+            RECT clientRect;
+            if ((GetCursorPos(&cursorPoint) != 0) &&
+                (ScreenToClient(gMainWindowHwnd, &cursorPoint) != 0) &&
+                (GetClientRect(gMainWindowHwnd, &clientRect) != 0) &&
+                (PtInRect(&clientRect, cursorPoint) != 0)
+                )
+            {
+                SetCursor(activeCursor);
+            }
+        }
+    }
 }
 
 void CachedReadFile::clearData()
