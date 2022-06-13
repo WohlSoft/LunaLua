@@ -553,7 +553,11 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 if (LOWORD(lParam) == HTCLIENT)
                 {
                     HCURSOR activeCursor = gCustomCursor;
-                    if (activeCursor == nullptr)
+                    if (gCustomCursorHide)
+                    {
+                        activeCursor = nullptr;
+                    }
+                    else if (activeCursor == nullptr)
                     {
                         static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
                         activeCursor = defaultCursor;

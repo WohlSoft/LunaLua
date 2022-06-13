@@ -630,6 +630,19 @@ typedef struct ExtendedBlockFields_\
         }
     }
 
+    // Utility function to check if the cursor is in the client area
+    static bool IsCursorInClientArea(HWND hwnd)
+    {
+        POINT cursorPoint;
+        RECT clientRect;
+        return ((hwnd != nullptr) &&
+                (GetCursorPos(&cursorPoint) != 0) &&
+                (ScreenToClient(gMainWindowHwnd, &cursorPoint) != 0) &&
+                (GetClientRect(gMainWindowHwnd, &clientRect) != 0) &&
+                (PtInRect(&clientRect, cursorPoint) != 0)
+               );
+    }
+
     FFI_EXPORT(void) LunaLuaSetCursor(LunaImageRef* img, uint32_t xHotspot, uint32_t yHotspot)
     {
         HCURSOR asCursor = nullptr;
@@ -663,6 +676,7 @@ typedef struct ExtendedBlockFields_\
         // Store new cursor setting
         HCURSOR lastCursor = gCustomCursor;
         gCustomCursor = asCursor;
+        gCustomCursorHide = false;
 
         // Get actual cursor to use if we need one now
         // (translate null to the default cursor)
@@ -686,18 +700,20 @@ typedef struct ExtendedBlockFields_\
         }
 
         // Set immediately if in main window client area
-        if (gMainWindowHwnd)
+        if (IsCursorInClientArea(gMainWindowHwnd))
         {
-            POINT cursorPoint;
-            RECT clientRect;
-            if ((GetCursorPos(&cursorPoint) != 0) &&
-                (ScreenToClient(gMainWindowHwnd, &cursorPoint) != 0) &&
-                (GetClientRect(gMainWindowHwnd, &clientRect) != 0) &&
-                (PtInRect(&clientRect, cursorPoint) != 0)
-                )
-            {
-                SetCursor(activeCursor);
-            }
+            SetCursor(activeCursor);
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetCursorHide(void)
+    {
+        gCustomCursorHide = true;
+
+        // Set immediately if in main window client area
+        if (IsCursorInClientArea(gMainWindowHwnd))
+        {
+            SetCursor(nullptr);
         }
     }
 }

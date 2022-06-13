@@ -133,6 +133,7 @@ extern DWORD*	gpScreenBits;	// Pointer to screen bits for general use DIB
 
 // Mouse cursor
 extern HCURSOR  gCustomCursor;
+extern bool     gCustomCursorHide;
 
 // Key status
 extern short	gNumpad4;
