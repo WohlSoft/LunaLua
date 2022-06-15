@@ -21,6 +21,7 @@
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
 #include "LunaLuaMain.h"
+#include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
@@ -567,6 +568,66 @@ typedef struct ExtendedBlockFields_\
 
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
+    }
+
+    FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
+    {
+        // Add "Software Rendered" if using it, like the normal window name code does
+        std::string fullName = newName;
+        if (gStartupSettings.softwareGL)
+        {
+            fullName += " (Software Renderer)";
+        }
+
+        // Main bit for setting window name
+        SetWindowTextW(gMainWindowHwnd,Str2WStr(fullName).c_str());
+    }
+
+    static HICON lastSmallIcon = NULL;
+    static HICON lastBigIcon = NULL;
+
+    FFI_EXPORT(void) LunaLuaSetWindowIcon(LunaImageRef* img, int iconType)
+    {
+        if (iconType < 0 || iconType > 2) return; // Invalid icon type
+
+        // Convert passed image to a HBITMAP
+        HBITMAP asBitmap = (*img)->asHBITMAP();
+
+        if (asBitmap == nullptr) return;
+
+        // Create an icon out of the image
+        ICONINFO iconInfo;
+
+        iconInfo.fIcon = TRUE;
+        iconInfo.hbmColor = asBitmap;
+        iconInfo.hbmMask = asBitmap;
+        iconInfo.xHotspot = 0;
+        iconInfo.yHotspot = 0;
+
+        // Apply it to the window
+        if (iconType == 0 || iconType == 1) // Small icon
+        {
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+            LPARAM asParam = LPARAM(asIcon);
+
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_SMALL,asParam);
+
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastSmallIcon) DestroyIcon(lastSmallIcon);
+            lastSmallIcon = asIcon;
+        }
+        
+        if (iconType == 0 || iconType == 2) // Big icon
+        {
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+            LPARAM asParam = LPARAM(asIcon);
+            
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_BIG,asParam);
+
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastBigIcon) DestroyIcon(lastBigIcon);
+            lastBigIcon = asIcon;
+        }
     }
 }
 

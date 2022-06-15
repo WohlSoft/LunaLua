@@ -112,7 +112,6 @@ extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDes
 extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* momentumObj);
 
 extern void __stdcall GenerateScreenshotHook();
-extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // Hooks which are helping fixups
 extern void IsNPCCollidesWithVeggiHook_Wrapper();
@@ -493,6 +492,8 @@ void __stdcall runtimeHookBlockSpeedSet_FSTP_ECX_EAX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
+
+bool __stdcall saveFileExists();
 
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player);
 bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);

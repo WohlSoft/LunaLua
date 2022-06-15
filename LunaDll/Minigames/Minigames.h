@@ -20,7 +20,7 @@ class Minigame {
 };
 
 //class MinigameController {
-//	queue<Minigame*> m_Games;
+//    queue<Minigame*> m_Games;
 //};
 
 #endif

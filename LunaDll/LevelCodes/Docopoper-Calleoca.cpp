@@ -240,7 +240,7 @@ void Phase4()
         fishingboo_ferocity += 0.0002;
     }
 
-    calleoca_x = Clamp<double>(calleoca_x, demo->momentum.x - 512, demo->momentum.y + 464);
+    calleoca_x = Clamp<double>(calleoca_x, demo->momentum.x - 512, demo->momentum.x + 464);
 }
 
 void CalleocaCode()

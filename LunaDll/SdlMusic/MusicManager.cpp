@@ -362,7 +362,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
     curRoot = root;
     for(int i = 0; i < 91; i++)
     {
-		HandleEventsWhileLoading();
+        HandleEventsWhileLoading();
 
         std::string head = "sound-"+i2str(i+1);
         std::string fileName;

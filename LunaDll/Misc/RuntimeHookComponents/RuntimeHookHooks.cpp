@@ -10,7 +10,6 @@
 #include "../../HardcodedGraphics/HardcodedGraphicsManager.h"
 #include "../ErrorReporter.h"
 
-#include "../SHMemServer.h"
 #include "../AsmPatch.h"
 
 #include "../../Rendering/GL/GLEngine.h"
@@ -1375,192 +1374,6 @@ extern void __stdcall GenerateScreenshotHook()
         return true;
     });
     */
-}
-
-
-LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    static WCHAR unicodeData[32] = { 0 };
-
-    if (nCode != 0){
-        return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
-    }
-
-    bool repeated = (lParam & 0x80000000) != (lParam & 0x40000000);
-    bool altPressed = ((lParam & 0x20000000) == 0x20000000);
-    bool keyDown = ((lParam & 0x80000000) == 0x0);
-    bool keyUp = ((lParam & 0x80000000) == 0x80000000);
-    unsigned int virtKey = wParam;
-    unsigned int scanCode = (lParam >> 16) & 0xFF;
-
-    if (virtKey < 256)
-    {
-        gKeyState[virtKey] = keyDown ? 0x80 : 0x00;
-        if (virtKey == VK_CAPITAL)
-        {
-            gKeyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
-        }
-    }
-
-    bool ctrlPressed = ((gKeyState[VK_CONTROL] & 0x80) != 0) && (virtKey != VK_CONTROL);
-    bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
-
-    if (keyDown && gMainWindowFocused) {
-        // Notify game controller manager
-        if (!repeated)
-        {
-            gLunaGameControllerManager.notifyKeyboardPress(virtKey);
-        }
-
-        if (gLunaLua.isValid() && !ctrlPressed) {
-            std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
-
-            int unicodeRet = ToUnicode(virtKey, scanCode, gKeyState, unicodeData, 32, 0);
-            if (unicodeRet > 0)
-            {
-                std::string charStr = WStr2Str(std::wstring(unicodeData, unicodeRet));
-                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, charStr);
-            }
-            else
-            {
-                gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
-            }
-        }
-
-        if ((virtKey == VK_ESCAPE) && plainPress)
-        {
-            gEscPressed = true;
-        }
-        if (virtKey == VK_F12)
-        {
-            if (plainPress && g_GLEngine.IsEnabled())
-            {
-                short screenshotSoundID = 12;
-                native_playSFX(&screenshotSoundID);
-                g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-                    std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
-                    if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
-                        CreateDirectoryW(screenshotPath.c_str(), NULL);
-                    }
-                    screenshotPath += L"\\";
-                    screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
-
-                    ::GenerateScreenshot(screenshotPath, *header, pData);
-                    GlobalFree(globalMem);
-                    return true;
-                });
-            }
-            return 1;
-        }
-        if (virtKey == VK_F11)
-        {
-            if (plainPress && g_GLEngine.IsEnabled())
-            {
-                short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
-                native_playSFX(&gifRecSoundID);
-            }
-            return 1;
-        }
-        if ((virtKey == VK_F4) && !altPressed)
-        {
-            if (plainPress && g_GLEngine.IsEnabled())
-            {
-                gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
-                gGeneralConfig.save();
-            }
-            return 1;
-        }
-        if ((virtKey == 0x56) && ctrlPressed)
-        {
-            // Ctrl-V
-            if (OpenClipboard(nullptr) == 0)
-            {
-                // Couldn't open clipboard
-                return 1;
-            }
-
-            // Get unicode text handle
-            bool textIsUnicode = true;
-            HANDLE hData = GetClipboardData(CF_UNICODETEXT);
-            if (hData == nullptr)
-            {
-                // Couldn't get text handle, try non-unicode
-                hData = GetClipboardData(CF_TEXT);
-                textIsUnicode = false;
-                if (hData == nullptr)
-                {
-                    // Couldn't get any text
-                    CloseClipboard();
-                    return 1;
-                }
-            }
-
-            // Lock data
-            void* dataPtr = GlobalLock(hData);
-            if (dataPtr == nullptr)
-            {
-                // Couldn't get pointer
-                GlobalUnlock(hData);
-                CloseClipboard();
-            }
-
-            // Convert to std::string
-            std::string pastedText = textIsUnicode ? WStr2Str(static_cast<const wchar_t*>(dataPtr)) : std::string(static_cast<const char*>(dataPtr));
-
-            // Unlock Data and close clipboard
-            GlobalUnlock(hData);
-            CloseClipboard();
-
-            // Call event
-            if ((pastedText.length() > 0) && gLunaLua.isValid()) {
-                std::shared_ptr<Event> pasteTextEvent = std::make_shared<Event>("onPasteText", false);
-                pasteTextEvent->setDirectEventName("onPasteText");
-                pasteTextEvent->setLoopable(false);
-                gLunaLua.callEvent(pasteTextEvent, pastedText);
-            }
-        }
-
-        if ((virtKey == VK_RETURN) && altPressed)
-        {
-            if (gMainWindowHwnd != NULL)
-            {
-                WINDOWPLACEMENT wndpl;
-                wndpl.length = sizeof(WINDOWPLACEMENT);
-                if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
-                {
-                    if (wndpl.showCmd == SW_MAXIMIZE)
-                    {
-                        ShowWindow(gMainWindowHwnd, SW_RESTORE);
-                    }
-                    else
-                    {
-                        ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
-                    }
-                }
-            }
-            return 1;
-        }
-    } // keyDown
-
-    // Hook print screen key
-    if ((virtKey == VK_SNAPSHOT) && gMainWindowFocused)
-    {
-        if (g_GLEngine.IsEnabled())
-        {
-            g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
-                GlobalUnlock(&globalMem);
-                // Write to clipboard
-                OpenClipboard(curHwnd);
-                EmptyClipboard();
-                SetClipboardData(CF_DIB, globalMem);
-                CloseClipboard();
-                return false;
-            });
-        }
-        return 1;
-    }
-
-    return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
 }
 
 extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
@@ -3004,23 +2817,23 @@ static inline double blockGetTopYTouching(Block& block, Momentum& loc)
 static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsigned int newBlockIdx, Momentum* referenceLoc)
 {
     if (oldBlockIdx > GM_BLOCK_COUNT) return 0;
-	if (newBlockIdx > GM_BLOCK_COUNT) return 0;
-	Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
-	Block& newBlock = Blocks::GetBase()[newBlockIdx];
+    if (newBlockIdx > GM_BLOCK_COUNT) return 0;
+    Block& oldBlock = Blocks::GetBase()[oldBlockIdx];
+    Block& newBlock = Blocks::GetBase()[newBlockIdx];
 
-	double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
-	double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
+    double newBlockY = blockGetTopYTouching(newBlock, *referenceLoc);
+    double oldBlockY = blockGetTopYTouching(oldBlock, *referenceLoc);
 
-	if (newBlockY < oldBlockY)
-	{
-		// New block is higher, replace
-		return -1;
-	}
-	else if (newBlockY > oldBlockY)
-	{
-		// New block is lower, don't replace
-		return 0;
-	}
+    if (newBlockY < oldBlockY)
+    {
+        // New block is higher, replace
+        return -1;
+    }
+    else if (newBlockY > oldBlockY)
+    {
+        // New block is lower, don't replace
+        return 0;
+    }
 
     // Break tie based on if one is moving upward faster
     double newBlockSpeedY = newBlock.momentum.speedY;
@@ -3036,7 +2849,7 @@ static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsig
         return 0;
     }
 
-	// Break tie based on x-proximity
+    // Break tie based on x-proximity
     double refX = referenceLoc->x + referenceLoc->width * 0.5;
     double newBlockDist = abs((newBlock.momentum.x + newBlock.momentum.width * 0.5) - refX);
     double oldBlockDist = abs((oldBlock.momentum.x + oldBlock.momentum.width * 0.5) - refX);
@@ -3066,30 +2879,30 @@ static int __stdcall runtimeHookCompareWalkBlock(unsigned int oldBlockIdx, unsig
     }
 
     // Still tied? Let's just not replace
-	return 0;
+    return 0;
 }
 
 _declspec(naked) void __stdcall runtimeHookCompareWalkBlockForPlayerWrapper(void)
 {
     // JMP from 009A3FD3
     __asm {
-		// eax, ecx, edx are all free for use here
+        // eax, ecx, edx are all free for use here
 
-		lea   edx,word ptr ss:[ebx+0xC0]
-		movsx ecx,word ptr ss:[ebp-0x120]
-		movsx eax,word ptr ss:[ebp-0xF8]
-		push edx
-		push ecx
-		push eax
-		call runtimeHookCompareWalkBlock
+        lea   edx,word ptr ss:[ebx+0xC0]
+        movsx ecx,word ptr ss:[ebp-0x120]
+        movsx eax,word ptr ss:[ebp-0xF8]
+        push edx
+        push ecx
+        push eax
+        call runtimeHookCompareWalkBlock
 
-		cmp eax, 0
-		jne blockIsHigher
+        cmp eax, 0
+        jne blockIsHigher
 
-		push 0x9A4319 // Block is not higher
+        push 0x9A4319 // Block is not higher
         ret
-	blockIsHigher:
-		push 0x9A42DC // Block is higher
+    blockIsHigher:
+        push 0x9A42DC // Block is higher
         ret
     }
 }
@@ -3369,7 +3182,7 @@ static unsigned int __stdcall runtimeHookNPCNoBlockCollisionTest(unsigned int np
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
 {
-	// Death by block bump
+    // Death by block bump
     // 009E2AD0 | jne smbx.9E2EB6
     __asm {
         jne early_exit
@@ -3377,7 +3190,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [esp + 0x28]
+        movsx eax, word ptr ss : [esp + 0x28]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3401,7 +3214,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollision9E2AD0(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
 {
-	// ???
+    // ???
     // 00A089C3 | jne smbx.A08CA5
     __asm {
         jne early_exit
@@ -3409,7 +3222,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x188]
+        movsx eax, word ptr ss : [ebp - 0x188]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3433,16 +3246,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA089C3(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
 {
-	// Main Block Collision
+    // Main Block Collision
     // 00A10EAA | cmp word ptr ds:[ecx+edi*2],0
     __asm {
-		cmp word ptr ds:[ecx+edi*2],0
+        cmp word ptr ds:[ecx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3466,16 +3279,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA10EAA(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
 {
-	// ???
+    // ???
     // 00A113B0 | cmp word ptr ds:[ecx+edi*2],0
     __asm {
-		cmp word ptr ds:[ecx+edi*2],0
+        cmp word ptr ds:[ecx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3499,16 +3312,16 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA113B0(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
 {
-	// Beltspeed
+    // Beltspeed
     // 00A1760E | cmp word ptr ds:[edx+edi*2],0
     __asm {
-		cmp word ptr ds:[edx+edi*2],0
+        cmp word ptr ds:[edx+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3532,21 +3345,21 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void)
 
 __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
 {
-	// Bounce off NPCs
+    // Bounce off NPCs
     // 00A1B33F | cmp word ptr ds:[eax+edi*2],0
     __asm {
-		cmp word ptr ds:[eax+edi*2],0
+        cmp word ptr ds:[eax+edi*2],0
         jne early_exit
         pushfd
         push eax
         push ecx
         push edx
-		movsx eax, word ptr ss : [ebp - 0x180]
+        movsx eax, word ptr ss : [ebp - 0x180]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
         jne alternate_exit
-		movsx eax, word ptr ss : [ebp - 0x188]
+        movsx eax, word ptr ss : [ebp - 0x188]
         push eax // Args #1
         call runtimeHookNPCNoBlockCollisionTest
         cmp eax, 0
@@ -3890,6 +3703,15 @@ _declspec(naked) void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void)
 
         ret
     }
+}
+
+bool __stdcall saveFileExists() {
+    std::wstring saveFilePath = GM_FULLDIR;
+    saveFilePath += L"save";
+    saveFilePath += std::to_wstring(GM_CUR_SAVE_SLOT);
+    saveFilePath += L".sav";
+
+    return fileExists(saveFilePath);
 }
 
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {

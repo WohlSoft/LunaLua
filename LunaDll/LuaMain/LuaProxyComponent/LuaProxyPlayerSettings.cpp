@@ -175,7 +175,7 @@ bool LuaProxy::PlayerSettings::isValid_throw(lua_State* L) const
         luaL_error(L, "Invalid character id %d!", m_character);
         return false;
     }
-    if ((int)m_powerupID < PLAYER_SMALL || (int)m_powerupID > PLAYER_ICE){
+    if ((int)m_powerupID < 1 || (int)m_powerupID > 10){
         luaL_error(L, "Invalid powerup id %d!", m_powerupID);
         return false;
     }
