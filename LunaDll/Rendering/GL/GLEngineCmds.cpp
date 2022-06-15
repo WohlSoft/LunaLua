@@ -318,5 +318,5 @@ void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
 
 void GLEngineCmd_SetFramebufferSize::run(GLEngine& glEngine) const
 {
-	g_GLContextManager.SetMainFramebufferSize(mWidth, mHeight);
+    g_GLContextManager.SetMainFramebufferSize(mWidth, mHeight);
 }

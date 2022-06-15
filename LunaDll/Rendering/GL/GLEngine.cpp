@@ -127,8 +127,8 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     // Unbind the texture from the framebuffer (Bind screen)
     g_GLContextManager.BindScreen();
 
-	int fbWidth = g_GLContextManager.GetMainFBWidth();
-	int fbHeight = g_GLContextManager.GetMainFBHeight();
+    int fbWidth = g_GLContextManager.GetMainFBWidth();
+    int fbHeight = g_GLContextManager.GetMainFBHeight();
 
     // Implement letterboxing correction
     float scaledWidth = windowWidth / static_cast<float>(fbWidth);
@@ -136,19 +136,19 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 
     if (gGeneralConfig.getRendererUseLetterbox()) {
         if (scaledWidth > scaledHeight) {
-			nWidthDest = static_cast<int>(floor(nWidthSrc * scaledHeight + 0.5));
-			nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
+            nWidthDest = static_cast<int>(floor(nWidthSrc * scaledHeight + 0.5));
+            nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
         } else {
-			nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
-			nHeightDest = static_cast<int>(floor(nHeightSrc * scaledWidth + 0.5));
+            nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
+            nHeightDest = static_cast<int>(floor(nHeightSrc * scaledWidth + 0.5));
         }
     } else {
         nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
         nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
     }
 
-	int xOffset = ((windowWidth - nWidthDest) + 1) / 2;
-	int yOffset = ((windowHeight - nHeightDest) + 1) / 2;
+    int xOffset = ((windowWidth - nWidthDest) + 1) / 2;
+    int yOffset = ((windowHeight - nHeightDest) + 1) / 2;
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);

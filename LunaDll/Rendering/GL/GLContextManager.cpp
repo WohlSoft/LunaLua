@@ -12,7 +12,7 @@ GLContextManager g_GLContextManager;
 GLContextManager::GLContextManager() :
     hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
     mInitialized(false), mHadError(false), mMainThreadCTXApplied(false),
-	mMainFBWidth(800), mMainFBHeight(600),
+    mMainFBWidth(800), mMainFBHeight(600),
     mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr),
     mConstants()
 {
@@ -218,7 +218,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
         return false;
     }
 
-	glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
     glColor3f(1, 1, 1);
@@ -321,18 +321,18 @@ void GLContextManager::ReleaseContext() {
 
 void GLContextManager::SetMainFramebufferSize(int width, int height)
 {
-	mMainFBWidth = width;
-	mMainFBHeight = height;
-	if (!mInitialized) return;
+    mMainFBWidth = width;
+    mMainFBHeight = height;
+    if (!mInitialized) return;
 
-	// Adjust screen projection
-	BindScreen();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
+    // Adjust screen projection
+    BindScreen();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
 
-	ReleaseFramebuffer();
-	InitFramebuffer();
-	BindAndClearFramebuffer();
-	InitProjectionAndState();
+    ReleaseFramebuffer();
+    InitFramebuffer();
+    BindAndClearFramebuffer();
+    InitProjectionAndState();
 }

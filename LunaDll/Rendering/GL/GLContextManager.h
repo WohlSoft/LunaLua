@@ -123,8 +123,8 @@ private:
     bool  mInitialized;
     bool  mHadError;
     bool  mMainThreadCTXApplied;  // Whether wglMakeCurrent has been called for the main thread or not
-	int   mMainFBWidth;
-	int   mMainFBHeight;
+    int   mMainFBWidth;
+    int   mMainFBHeight;
 
     // Context variables
     int   mOldPixelFormat;
@@ -149,11 +149,11 @@ private:
     void ReleaseFramebuffer();
 
 public:
-	// Framebuffer config
-	void SetMainFramebufferSize(int width, int height);
+    // Framebuffer config
+    void SetMainFramebufferSize(int width, int height);
 
-	inline int GetMainFBWidth() { return mMainFBWidth; }
-	inline int GetMainFBHeight() { return mMainFBHeight; }
+    inline int GetMainFBWidth() { return mMainFBWidth; }
+    inline int GetMainFBHeight() { return mMainFBHeight; }
 };
 
 // Instance

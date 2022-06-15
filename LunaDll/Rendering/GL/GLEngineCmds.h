@@ -205,11 +205,11 @@ public:
 
 class GLEngineCmd_SetFramebufferSize : public GLEngineCmd {
 public:
-	int mWidth;
-	int mHeight;
-	virtual void run(GLEngine& glEngine) const;
-	virtual bool isSkippable(void) const { return false; }
-	virtual bool shouldBeSynchronous(void) const { return true; }
+    int mWidth;
+    int mHeight;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return false; }
+    virtual bool shouldBeSynchronous(void) const { return true; }
 };
 
 #endif
