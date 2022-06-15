@@ -14,6 +14,7 @@
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
 #include "../../Rendering/GL/GLEngineProxy.h"
+#include "../../Rendering/GL/GLContextManager.h"
 
 #include "../NpcIdExtender.h"
 
@@ -515,12 +516,13 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_GETMINMAXINFO:
             {
-                // Get the size of a 400x300 window, plus whatever frame windows puts around it
+                // Set the minimum window size for resizing to 50% of framebuffer size
+                // TODO: Add special cases if framebuffer size is unusually large. Maybe pick a different integer divisor than 2?
                 RECT rc;
                 rc.left = 0;
                 rc.top = 0;
-                rc.right = 400;
-                rc.bottom = 300;
+                rc.right = g_GLContextManager.GetMainFBWidth() / 2;
+                rc.bottom = g_GLContextManager.GetMainFBHeight() / 2;
                 AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
                     GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
 
@@ -544,7 +546,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, 800.0, 600.0);
+                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
 
                 return TRUE;
             }
