@@ -470,6 +470,46 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 // Store size of main window (low word is width, high word is height)
                 gMainWindowSize = lParam;
 
+                // Maximize makes for fullscreen
+                static bool antiRecursionLock = false;
+                if (!antiRecursionLock && ((wParam & SIZE_MINIMIZED) == 0))
+                {
+                    antiRecursionLock = true;
+                    static WPARAM prevWParam = wParam;
+                    static LONG restore_style = 0;
+                    static LONG restore_ex_style = 0;
+
+                    if (((wParam & SIZE_MAXIMIZED) != 0) && ((prevWParam & SIZE_MAXIMIZED) == 0))
+                    {
+                        // Maximized state, make it borderless
+                        restore_style = GetWindowLongW(hwnd, GWL_STYLE);
+                        restore_ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+                        SetWindowLongW(hwnd, GWL_STYLE, restore_style & ~(WS_CAPTION | WS_THICKFRAME));
+                        SetWindowLongW(hwnd, GWL_EXSTYLE, restore_ex_style & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+                        MONITORINFO monitor_info;
+                        monitor_info.cbSize = sizeof(monitor_info);
+                        GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &monitor_info);
+                        LONG x = monitor_info.rcMonitor.left;
+                        LONG y = monitor_info.rcMonitor.top;
+                        LONG w = monitor_info.rcMonitor.right - x;
+                        LONG h = monitor_info.rcMonitor.bottom - y;
+                        SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+                    }
+                    else if (((wParam & SIZE_MAXIMIZED) == 0) && ((prevWParam & SIZE_MAXIMIZED) != 0))
+                    {
+                        // Non-maximized state
+                        SetWindowLongW(hwnd, GWL_STYLE, restore_style & ~(WS_MAXIMIZE));
+                        SetWindowLongW(hwnd, GWL_EXSTYLE, restore_ex_style);
+                        SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+                    }
+
+                    prevWParam = wParam;
+                    antiRecursionLock = false;
+                }
+
+                // In case something in recursion altered things
+                lParam = gMainWindowSize;
+
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
