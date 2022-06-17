@@ -130,25 +130,30 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     int fbWidth = g_GLContextManager.GetMainFBWidth();
     int fbHeight = g_GLContextManager.GetMainFBHeight();
 
-    // Implement letterboxing correction
-    float scaledWidth = windowWidth / static_cast<float>(fbWidth);
-    float scaledHeight = windowHeight / static_cast<float>(fbHeight);
+    // Compute x/y scale of window relative to framebuffer
+    float scaleX = windowWidth / static_cast<float>(fbWidth);
+    float scaleY = windowHeight / static_cast<float>(fbHeight);
 
+    // Adjust scale and offsets for letterboxing
+    int xOffset = 0;
+    int yOffset = 0;
     if (gGeneralConfig.getRendererUseLetterbox()) {
-        if (scaledWidth > scaledHeight) {
-            nWidthDest = static_cast<int>(floor(nWidthSrc * scaledHeight + 0.5));
-            nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
+        if (scaleX > scaleY) {
+            scaleX = scaleY;
+            xOffset = static_cast<int>(floor((windowWidth - scaleX * fbWidth) * 0.5 + 0.5));
         } else {
-            nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
-            nHeightDest = static_cast<int>(floor(nHeightSrc * scaledWidth + 0.5));
+            scaleY = scaleX;
+            yOffset = static_cast<int>(floor((windowHeight - scaleY * fbHeight) * 0.5 + 0.5));
         }
-    } else {
-        nWidthDest = static_cast<int>(floor(nWidthSrc * scaledWidth + 0.5));
-        nHeightDest = static_cast<int>(floor(nHeightSrc * scaledHeight + 0.5));
     }
 
-    int xOffset = ((windowWidth - nWidthDest) + 1) / 2;
-    int yOffset = ((windowHeight - nHeightDest) + 1) / 2;
+    // Re-derive expected destination coordinates
+    float assumedXScale = static_cast<float>(nWidthDest) / static_cast<float>(nWidthSrc);
+    float assumedYScale = static_cast<float>(nHeightDest) / static_cast<float>(nHeightSrc);
+    nXOriginDest = static_cast<int>(floor(nXOriginDest * (scaleX / assumedXScale) + 0.5)) + xOffset;
+    nYOriginDest = static_cast<int>(floor(nYOriginDest * (scaleY / assumedYScale) + 0.5)) + yOffset;
+    nWidthDest = static_cast<int>(floor(nWidthSrc * scaleX + 0.5));
+    nHeightDest = static_cast<int>(floor(nHeightSrc * scaleY + 0.5));
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
@@ -161,13 +166,13 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
 
     // Use upscaling shader if we're upscaling and it compiled right
     GLShader* upscaleShader = nullptr;
-    if (mpUpscaleShader->isValid() && ((scaledWidth > 1.0f) || (scaledHeight > 1.0f)))
+    if (mpUpscaleShader->isValid() && ((scaleX > 1.0f) || (scaleY > 1.0f)))
     {
         upscaleShader = mpUpscaleShader;
     }
 
     // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest + xOffset, nYOriginDest + yOffset, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
+    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
     GLERRORCHECK();
     glFlush();
     GLERRORCHECK();
