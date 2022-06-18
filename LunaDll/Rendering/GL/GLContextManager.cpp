@@ -2,6 +2,7 @@
 #include <gl/glew.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
+#include "../WindowSizeHandler.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
 
@@ -323,6 +324,7 @@ void GLContextManager::SetMainFramebufferSize(int width, int height)
 {
     mMainFBWidth = width;
     mMainFBHeight = height;
+    gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
     if (!mInitialized) return;
 
     // Adjust screen projection

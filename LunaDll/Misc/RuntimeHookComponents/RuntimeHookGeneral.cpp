@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <windowsx.h>
 #include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
@@ -15,6 +17,7 @@
 #include "../../Rendering/ImageLoader.h"
 #include "../../Rendering/GL/GLEngineProxy.h"
 #include "../../Rendering/GL/GLContextManager.h"
+#include "../../Rendering/WindowSizeHandler.h"
 
 #include "../NpcIdExtender.h"
 
@@ -328,6 +331,7 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     if ((virtKey == VK_F4) && plainPress && g_GLEngine.IsEnabled())
     {
         gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+        gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
         gGeneralConfig.save();
     }
 }
@@ -469,7 +473,8 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_SIZE:
             {
                 // Store size of main window (low word is width, high word is height)
-                gMainWindowSize = lParam;
+                static LPARAM latestLParam;
+                latestLParam = lParam;
 
                 // Maximize makes for fullscreen
                 static bool antiRecursionLock = false;
@@ -508,8 +513,14 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     antiRecursionLock = false;
                 }
 
-                // In case something in recursion altered things
-                lParam = gMainWindowSize;
+                // Update window size (but only if not in the middle of the above-noted recursion)
+                if (!antiRecursionLock)
+                {
+                    gWindowSizeHandler.SetWindowSize(
+                        latestLParam & 0xFFFF,
+                        (latestLParam >> 16) & 0xFFFF
+                    );
+                }
 
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
@@ -575,7 +586,6 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 {
                     gMainWindowFocused = false;
                 }
-                gMainWindowSize = 0;
                 break;
             case WM_HOTKEY:
                 if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
