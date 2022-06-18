@@ -89,7 +89,6 @@ extern HINSTANCE	gHInstance;
 /// Global main window state
 extern HWND gMainWindowHwnd;
 extern bool gMainWindowFocused;
-extern std::atomic<uint32_t> gMainWindowSize; // Low word is width, height word is height
 
 /// Global settings
 extern bool            gLunaEnabled;

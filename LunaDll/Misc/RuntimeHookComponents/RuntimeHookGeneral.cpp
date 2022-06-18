@@ -1,3 +1,5 @@
+#include <windows.h>
+#include <windowsx.h>
 #include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
@@ -14,6 +16,8 @@
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
 #include "../../Rendering/GL/GLEngineProxy.h"
+#include "../../Rendering/GL/GLContextManager.h"
+#include "../../Rendering/WindowSizeHandler.h"
 
 #include "../NpcIdExtender.h"
 
@@ -327,6 +331,7 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     if ((virtKey == VK_F4) && plainPress && g_GLEngine.IsEnabled())
     {
         gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+        gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
         gGeneralConfig.save();
     }
 }
@@ -468,7 +473,8 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_SIZE:
             {
                 // Store size of main window (low word is width, high word is height)
-                gMainWindowSize = lParam;
+                static LPARAM latestLParam;
+                latestLParam = lParam;
 
                 // Maximize makes for fullscreen
                 static bool antiRecursionLock = false;
@@ -507,20 +513,27 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     antiRecursionLock = false;
                 }
 
-                // In case something in recursion altered things
-                lParam = gMainWindowSize;
+                // Update window size (but only if not in the middle of the above-noted recursion)
+                if (!antiRecursionLock)
+                {
+                    gWindowSizeHandler.SetWindowSize(
+                        latestLParam & 0xFFFF,
+                        (latestLParam >> 16) & 0xFFFF
+                    );
+                }
 
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
             case WM_GETMINMAXINFO:
             {
-                // Get the size of a 400x300 window, plus whatever frame windows puts around it
+                // Set the minimum window size for resizing to 50% of framebuffer size
+                // TODO: Add special cases if framebuffer size is unusually large. Maybe pick a different integer divisor than 2?
                 RECT rc;
                 rc.left = 0;
                 rc.top = 0;
-                rc.right = 400;
-                rc.bottom = 300;
+                rc.right = g_GLContextManager.GetMainFBWidth() / 2;
+                rc.bottom = g_GLContextManager.GetMainFBHeight() / 2;
                 AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
                     GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
 
@@ -544,7 +557,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, 800.0, 600.0);
+                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
 
                 return TRUE;
             }
@@ -573,7 +586,6 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 {
                     gMainWindowFocused = false;
                 }
-                gMainWindowSize = 0;
                 break;
             case WM_HOTKEY:
                 if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())

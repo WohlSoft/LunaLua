@@ -9,6 +9,7 @@
 #include "GLContextManager.h"
 #include "GLEngine.h"
 #include "../Shaders/GLShader.h"
+#include "../WindowSizeHandler.h"
 
 #include "../LunaImage.h"
 #include "../AsyncGifRecorderImgs.h"
@@ -81,8 +82,8 @@ void GLEngine::InitForHDC(HDC hdcDest)
             mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
-            RenderCameraToScreen(hdcDest, 0, 0, 800, 600,
-                hdcDest, 0, 0, 800, 600, 0);
+            RenderCameraToScreen(hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(),
+                hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), 0);
             EndFrame(hdcDest, false);
         }
     }
@@ -117,33 +118,26 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     if (!g_GLContextManager.IsInitialized()) return FALSE;
 
     // Get window size
-    uint32_t windowSize = gMainWindowSize;
-    if (windowSize == 0) return FALSE;
-    int32_t windowWidth = windowSize & 0xFFFF;
-    int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
+    const auto winState = gWindowSizeHandler.getStateThreadSafe();
+    const int32_t& windowWidth = winState.windowSize.x;
+    const int32_t& windowHeight = winState.windowSize.y;
+    const double& xOffset = winState.fbOffset.x;
+    const double& yOffset = winState.fbOffset.y;
+    const double& xScale = winState.fbScale.x;
+    const double& yScale = winState.fbScale.y;
 
     g_GLDraw.UnbindTexture();
 
     // Unbind the texture from the framebuffer (Bind screen)
     g_GLContextManager.BindScreen();
-
-    // Implement letterboxing correction
-    float scaledWidth = windowWidth / 800.0f;
-    float scaledHeight = windowHeight / 600.0f;
-    float xScale = 1.0f;
-    float yScale = 1.0f;
-
-    if (gGeneralConfig.getRendererUseLetterbox()) {
-        if (scaledWidth > scaledHeight) {
-            xScale = scaledHeight / scaledWidth;
-        }
-        else if (scaledWidth < scaledHeight) {
-            yScale = scaledWidth / scaledHeight;
-        }
-    }
-
-    float xOffset = (windowWidth / xScale - windowWidth) * 0.5f;
-    float yOffset = (windowHeight / yScale - windowHeight) * 0.5f;
+    
+    // Re-derive expected destination coordinates
+    double assumedXScale = nWidthDest / static_cast<double>(nWidthSrc);
+    double assumedYScale = nHeightDest / static_cast<double>(nHeightSrc);
+    nXOriginDest = static_cast<int>(std::round(nXOriginDest * (xScale / assumedXScale) + xOffset));
+    nYOriginDest = static_cast<int>(std::round(nYOriginDest * (yScale / assumedYScale) + yOffset));
+    nWidthDest = static_cast<int>(std::round(nWidthSrc * xScale));
+    nHeightDest = static_cast<int>(std::round(nHeightSrc * yScale));
 
     // Set viewport for window size
     glViewport(0, 0, windowWidth, windowHeight);
@@ -151,12 +145,12 @@ BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginD
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
-    glOrtho(-xOffset, (float)windowWidth + xOffset, (float)windowHeight + yOffset, -yOffset, -1.0f, 1.0f);
+    glOrtho(0, static_cast<GLdouble>(windowWidth), static_cast<GLdouble>(windowHeight), 0, -1.0f, 1.0f);
     GLERRORCHECK();
 
     // Use upscaling shader if we're upscaling and it compiled right
     GLShader* upscaleShader = nullptr;
-    if (mpUpscaleShader->isValid() && ((scaledWidth > 1.0f) || (scaledHeight > 1.0f)))
+    if (mpUpscaleShader->isValid() && ((xScale > 1.0f) || (yScale > 1.0f)))
     {
         upscaleShader = mpUpscaleShader;
     }
@@ -200,62 +194,52 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
 
         // Generate screenshot...
         if (mScreenshot) {
-            // Get window size
-            uint32_t windowSize = gMainWindowSize;
-            if (windowSize != 0)
-            {
-                int32_t windowWidth = windowSize & 0xFFFF;
-                int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
-                GenerateScreenshot(0, 0, windowWidth, windowHeight);
-            }
+            const auto winState = gWindowSizeHandler.getStateThreadSafe();
+            const int32_t& windowWidth = winState.windowSize.x;
+            const int32_t& windowHeight = winState.windowSize.y;
+            GenerateScreenshot(0, 0, windowWidth, windowHeight);
         }
 
         if (mGifRecorder.isRunning())
         {
             // Get window size
-            uint32_t windowSize = gMainWindowSize;
-            if (windowSize != 0)
-            {
-                int32_t windowWidth = windowSize & 0xFFFF;
-                int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
-                GifRecorderNextFrame(0, 0, windowWidth, windowHeight);
+            const auto winState = gWindowSizeHandler.getStateThreadSafe();
+            const int32_t& windowWidth = winState.windowSize.x;
+            const int32_t& windowHeight = winState.windowSize.y;
+            GifRecorderNextFrame(0, 0, windowWidth, windowHeight);
 
-                GLEngineCmd_DrawSprite cmd;
-                cmd.mXDest = 10;
-                cmd.mYDest = windowHeight - (10 + recImage->getH());
-                cmd.mWidthDest = recImage->getW();
-                cmd.mHeightDest = recImage->getH();
-                cmd.mXSrc = 0;
-                cmd.mYSrc = 0;
-                cmd.mWidthSrc = recImage->getW();
-                cmd.mHeightSrc = recImage->getH();
-                cmd.mImg = recImage;
-                cmd.mOpacity = 1.0;
-                cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-                cmd.run(*this);
-            }
+            GLEngineCmd_DrawSprite cmd;
+            cmd.mXDest = 10;
+            cmd.mYDest = windowHeight - (10 + recImage->getH());
+            cmd.mWidthDest = recImage->getW();
+            cmd.mHeightDest = recImage->getH();
+            cmd.mXSrc = 0;
+            cmd.mYSrc = 0;
+            cmd.mWidthSrc = recImage->getW();
+            cmd.mHeightSrc = recImage->getH();
+            cmd.mImg = recImage;
+            cmd.mOpacity = 1.0;
+            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+            cmd.run(*this);
         }
         else if (mGifRecorder.isEncoding())
         {
-            uint32_t windowSize = gMainWindowSize;
-            if (windowSize != 0)
-            {
-                int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
+            const auto winState = gWindowSizeHandler.getStateThreadSafe();
+            const int32_t& windowHeight = winState.windowSize.y;
 
-                GLEngineCmd_DrawSprite cmd;
-                cmd.mXDest = 10;
-                cmd.mYDest = windowHeight - (10 + encImage->getH());
-                cmd.mWidthDest = encImage->getW();
-                cmd.mHeightDest = encImage->getH();
-                cmd.mXSrc = 0;
-                cmd.mYSrc = 0;
-                cmd.mWidthSrc = encImage->getW();
-                cmd.mHeightSrc = encImage->getH();
-                cmd.mImg = encImage;
-                cmd.mOpacity = 1.0;
-                cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-                cmd.run(*this);
-            }
+            GLEngineCmd_DrawSprite cmd;
+            cmd.mXDest = 10;
+            cmd.mYDest = windowHeight - (10 + encImage->getH());
+            cmd.mWidthDest = encImage->getW();
+            cmd.mHeightDest = encImage->getH();
+            cmd.mXSrc = 0;
+            cmd.mYSrc = 0;
+            cmd.mWidthSrc = encImage->getW();
+            cmd.mHeightSrc = encImage->getH();
+            cmd.mImg = encImage;
+            cmd.mOpacity = 1.0;
+            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
+            cmd.run(*this);
         }
 
         // Display Frame

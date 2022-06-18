@@ -315,3 +315,8 @@ void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
     mShaderObj->mAttributeInfo = mShaderObj->mShader->getAllAttributes();
     mShaderObj->mUniformInfo = mShaderObj->mShader->getAllUniforms();
 }
+
+void GLEngineCmd_SetFramebufferSize::run(GLEngine& glEngine) const
+{
+    g_GLContextManager.SetMainFramebufferSize(mWidth, mHeight);
+}
