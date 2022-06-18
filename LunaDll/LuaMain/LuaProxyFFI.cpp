@@ -20,6 +20,7 @@
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
+#include "../Input/MouseHandler.h"
 #include "LunaLuaMain.h"
 #include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
@@ -715,6 +716,21 @@ typedef struct ExtendedBlockFields_\
         {
             SetCursor(nullptr);
         }
+    }
+
+    FFI_EXPORT(bool) LunaLuaGetMouseButtonState(int button)
+    {
+        return gMouseHandler.GetButtonState(static_cast<MouseHandler::ButtonEnum>(button));
+    }
+
+    struct MousePos
+    {
+        double x;
+        double y;
+    };
+    FFI_EXPORT(MousePos) LunaLuaGetMousePosition()
+    {
+        return {gMouseHandler.GetX(), gMouseHandler.GetY()};
     }
 }
 

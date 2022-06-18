@@ -700,6 +700,9 @@
     <ClInclude Include="Rendering\WindowSizeHandler.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Input\MouseHandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1312,6 +1315,9 @@
     </ClCompile>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\MouseHandler.cpp">
+      <Filter>Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
