@@ -6,7 +6,9 @@
 #include "../GlobalFuncs.h"
 #include "AsmPatch.h"
 #include "../Rendering/GL/GLEngine.h"
+#include "../Rendering/GL/GLContextManager.h"
 #include "../Rendering/Rendering.h"
+#include "../Rendering/WindowSizeHandler.h"
 #include <lua.hpp>
 #include "LoadScreen.h"
 #include "../LuaMain/LunaPathValidator.h"
@@ -183,16 +185,11 @@ static void LoadThread(void)
         Renderer::Get().RenderBelowPriority(DBL_MAX);
 
         // Get window size
-        uint32_t windowSize = gMainWindowSize;
-        int32_t windowWidth = windowSize & 0xFFFF;
-        int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
-        if (windowSize == 0)
-        {
-            windowWidth = 800;
-            windowHeight = 600;
-        }
+        const auto winState = gWindowSizeHandler.getStateThreadSafe();
+        const int32_t& windowWidth = winState.windowSize.x;
+        const int32_t& windowHeight = winState.windowSize.y;
 
-        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, 800, 600, 0);
+        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), 0);
 
         g_GLEngine.EndFrame(NULL, true);
 
