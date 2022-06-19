@@ -1,4 +1,5 @@
 #include <comutil.h>
+#include "string.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
@@ -3381,7 +3382,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx)
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx)
 {
     // If already not hitting, ignore
     if (hitSpot == 0) return 0;
@@ -3395,6 +3396,26 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
             // The filter was a non-zero and matched, so no collision
             return 0;
         }
+
+        ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+
+        if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
+        {
+            if (block->OwnerNPCID != 0) // Belongs to an NPC
+            {
+                ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
+
+                if (strcmp(ext->collisionGroup,ownerExt->collisionGroup) == 0) // Matching collision groups
+                    return 0;
+            }
+            else
+            {
+                ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+
+                if (strcmp(ext->collisionGroup,blockExt->collisionGroup) == 0) // Matching collision groups
+                    return 0;
+            }
+        }
     }
 
     return hitSpot;
@@ -3405,13 +3426,14 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
     // 00A11B76 | mov ax, word ptr ds : [esi + 0xE2]
     // eax, ecx, edx and flags are free for use at this point
     __asm {
+        movsx eax, word ptr ss:[ebp-0x180]   // npcIdx
+        push eax
         movsx eax, word ptr ss:[ebp-0x188]   // blockIdx
         push eax
-        push esi                             // npc
+        push esi                             // npc pointer
         push dword ptr ss:[ebp-0x14]         // hitSpot
         call runtimeHookBlockNPCFilterInternal
         mov dword ptr ss : [ebp - 0x14], eax // store return back to hitSpot
-
         mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
         push 0xA11B7D
         ret

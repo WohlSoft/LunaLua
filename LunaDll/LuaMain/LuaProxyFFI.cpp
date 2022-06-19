@@ -421,6 +421,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
+    char* collisionGroup;\
 } ExtendedNPCFields;";
     }
 
@@ -438,6 +439,7 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
+    char* collisionGroup;\
 } ExtendedBlockFields;";
     }
 
