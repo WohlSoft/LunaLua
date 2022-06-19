@@ -24,7 +24,7 @@ private:
 
     double mCameraX, mCameraY;
 
-	GLShader* mpUpscaleShader;
+    GLShader* mpUpscaleShader;
 
 public:
     GLEngine();
@@ -51,6 +51,8 @@ public:
 
     inline void SetCamera(double x, double y) { mCameraX = x; mCameraY = y; }
     inline void GetCamera(double &x, double &y) { x = mCameraX; y = mCameraY; }
+
+    void SetFramebufferSize();
 };
 
 #include "GLEngineProxy.h"

@@ -74,9 +74,9 @@ MCIERROR MciEmulator::mciEmulate(__in LPCSTR lpstrCommand, __out_ecount_opt(uRet
         }else if(spCmd[0] == "play" && spCmd[2] == "from") {
             //play code
             MusicManager::play(spCmd[1]);
-//			std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
+//            std::map<std::string, regSoundFile>::iterator it = registeredFiles.find(spCmd[1]);
 //            if(it != registeredFiles.end()) {
-//			}
+//            }
         }
     } else if(spCmd.size() == 5) {
         if(spCmd[0] == "setaudio" && spCmd[2] == "volume" && spCmd[3] == "to"){

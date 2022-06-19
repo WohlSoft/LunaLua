@@ -2,6 +2,7 @@
 #include <gl/glew.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
+#include "../WindowSizeHandler.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
 
@@ -11,7 +12,8 @@ GLContextManager g_GLContextManager;
 // Constructor
 GLContextManager::GLContextManager() :
     hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
-    mInitialized(false), mHadError(false), mMainThreadCTXApplied(false), 
+    mInitialized(false), mHadError(false), mMainThreadCTXApplied(false),
+    mMainFBWidth(800), mMainFBHeight(600),
     mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr),
     mConstants()
 {
@@ -217,8 +219,9 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
         return false;
     }
 
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
+    glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
     glColor3f(1, 1, 1);
     glDisable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
@@ -248,7 +251,7 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 bool GLContextManager::InitFramebuffer() {
     try
     {
-        mFramebuffer = new GLFramebuffer(800, 600, false);
+        mFramebuffer = new GLFramebuffer(mMainFBWidth, mMainFBHeight, false);
     }
     catch(...)
     {
@@ -315,4 +318,23 @@ void GLContextManager::ReleaseContext() {
 
     // Clear hDC
     hDC = nullptr;
+}
+
+void GLContextManager::SetMainFramebufferSize(int width, int height)
+{
+    mMainFBWidth = width;
+    mMainFBHeight = height;
+    gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
+    if (!mInitialized) return;
+
+    // Adjust screen projection
+    BindScreen();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
+
+    ReleaseFramebuffer();
+    InitFramebuffer();
+    BindAndClearFramebuffer();
+    InitProjectionAndState();
 }

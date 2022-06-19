@@ -256,9 +256,6 @@
     <ClInclude Include="Minigames\GameboyRPG.h">
       <Filter>Minigames</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\SHMemServer.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="LuaMain\LuabindIncludes.h">
       <Filter>LuaMain</Filter>
     </ClInclude>
@@ -700,6 +697,9 @@
     <ClInclude Include="LuaMain\LunaPathValidator.h">
       <Filter>LuaMain</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\WindowSizeHandler.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -890,9 +890,6 @@
     </ClCompile>
     <ClCompile Include="Minigames\Minigames.cpp">
       <Filter>Minigames</Filter>
-    </ClCompile>
-    <ClCompile Include="Misc\SHMemServer.cpp">
-      <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedGraphics\HardocodeGFXMap.cpp">
       <Filter>HardcodedGraphics</Filter>
@@ -1312,6 +1309,9 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LunaPathValidator.cpp">
       <Filter>LuaMain</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\WindowSizeHandler.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

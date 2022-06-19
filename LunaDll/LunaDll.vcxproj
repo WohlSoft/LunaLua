@@ -190,6 +190,7 @@
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="Rendering\SMBXImageCategories.h" />
+    <ClInclude Include="Rendering\WindowSizeHandler.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -268,7 +269,6 @@
     <ClInclude Include="CustomSprites\CSpriteManager.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Minigames\GameboyRPG.h" />
-    <ClInclude Include="Misc\SHMemServer.h" />
     <ClInclude Include="Misc\VB6StrPtr.h" />
     <ClInclude Include="Misc\Playground.h" />
     <ClInclude Include="GlobalFuncs.h" />
@@ -407,6 +407,7 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
+    <ClCompile Include="Rendering\WindowSizeHandler.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
@@ -476,7 +477,6 @@
     <ClCompile Include="Minigames\Minigames.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookFixups.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookGeneral.cpp" />
-    <ClCompile Include="Misc\SHMemServer.cpp" />
     <ClCompile Include="Misc\VB6StrPtr.cpp" />
     <ClCompile Include="Misc\Playground.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />

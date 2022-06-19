@@ -18,7 +18,6 @@
 #include "UserSaves/UserSaving.h"
 #include "MciEmulator/mciEmulator.h"
 #include "HardcodedGraphics/HardcodedGraphicsManager.h"
-#include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
 #include "Misc/FreeImageUtils/FreeImageInit.h"
@@ -90,7 +89,6 @@ extern HINSTANCE	gHInstance;
 /// Global main window state
 extern HWND gMainWindowHwnd;
 extern bool gMainWindowFocused;
-extern std::atomic<uint32_t> gMainWindowSize; // Low word is width, height word is height
 
 /// Global settings
 extern bool            gLunaEnabled;
@@ -158,7 +156,6 @@ extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
-extern SHMemServer			gShMemServer;
 extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
 extern LunaGameControllerManager gLunaGameControllerManager;

@@ -8,7 +8,7 @@
 #endif
 
 // STATIC DRAW - Simply draw the sprite at its absolute screen coordinates
-//				 by registering a new bitmap render operation
+//                 by registering a new bitmap render operation
 void SpriteFunc::StaticDraw(CSprite* me) {	
     if(me != NULL && me->m_Visible) {
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size()) { // Frame should be less than size of GfxRect container
@@ -32,7 +32,7 @@ void SpriteFunc::StaticDraw(CSprite* me) {
 }
 
 // RELATIVE DRAW - Calculate sprite position inside level and draw relative 
-//				   to camera position by registering new bitmap render operation
+//                   to camera position by registering new bitmap render operation
 void SpriteFunc::RelativeDraw(CSprite* me) {
     if(me != NULL && me->m_Visible) {
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size()) {

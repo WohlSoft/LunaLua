@@ -175,76 +175,76 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     GLERRORCHECK();
     
-	// Bind Post-Processing Shader here
-	if (upscaleShader)
-	{
-		upscaleShader->clearSamplers();
-		GLERRORCHECK();
+    // Bind Post-Processing Shader here
+    if (upscaleShader)
+    {
+        upscaleShader->clearSamplers();
+        GLERRORCHECK();
 
-		upscaleShader->bind();
-		GLERRORCHECK();
+        upscaleShader->bind();
+        GLERRORCHECK();
 
-		for (auto& uniformInfo : upscaleShader->getAllUniforms())
-		{
-			if (uniformInfo.getName() == "inputSize")
-			{
-				double inputW = tex->pw;
-				double inputH = tex->ph;
-				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
-				{
-					double* textureSizeArr = (double*)std::malloc(sizeof(double) * 2);
-					textureSizeArr[0] = inputW;
-					textureSizeArr[1] = inputH;
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
-					upscaleShader->applyUniform(uniformEntry);
-					GLERRORCHECK();
-				}
-				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
-				{
-					float* textureSizeArr = (float*)std::malloc(sizeof(float) * 2);
-					textureSizeArr[0] = (float)inputW;
-					textureSizeArr[1] = (float)inputH;
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
-					upscaleShader->applyUniform(uniformEntry);
-					GLERRORCHECK();
-				}
-			}
-			if (uniformInfo.getName() == "crispScale")
-			{
-				double scaleX = double(nWidth) / nSrcWidth;
-				double scaleY = double(nHeight) / nSrcHeight;
-				if (scaleX < 1.0) scaleX = 1.0;
-				if (scaleY < 1.0) scaleY = 1.0;
-				if (uniformInfo.getType() == GL_DOUBLE_VEC2)
-				{
-					double* scaleArr = (double*)std::malloc(sizeof(double) * 2);
-					scaleArr[0] = scaleX;
-					scaleArr[1] = scaleY;
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, scaleArr);
-					upscaleShader->applyUniform(uniformEntry);
-					GLERRORCHECK();
-				}
-				else if (uniformInfo.getType() == GL_FLOAT_VEC2)
-				{
-					float* scaleArr = (float*)std::malloc(sizeof(float) * 2);
-					scaleArr[0] = (float)scaleX;
-					scaleArr[1] = (float)scaleY;
-					GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, scaleArr);
-					upscaleShader->applyUniform(uniformEntry);
-					GLERRORCHECK();
-				}
-			}
-		}
-	}
+        for (auto& uniformInfo : upscaleShader->getAllUniforms())
+        {
+            if (uniformInfo.getName() == "inputSize")
+            {
+                double inputW = tex->pw;
+                double inputH = tex->ph;
+                if (uniformInfo.getType() == GL_DOUBLE_VEC2)
+                {
+                    double* textureSizeArr = (double*)std::malloc(sizeof(double) * 2);
+                    textureSizeArr[0] = inputW;
+                    textureSizeArr[1] = inputH;
+                    GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, textureSizeArr);
+                    upscaleShader->applyUniform(uniformEntry);
+                    GLERRORCHECK();
+                }
+                else if (uniformInfo.getType() == GL_FLOAT_VEC2)
+                {
+                    float* textureSizeArr = (float*)std::malloc(sizeof(float) * 2);
+                    textureSizeArr[0] = (float)inputW;
+                    textureSizeArr[1] = (float)inputH;
+                    GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, textureSizeArr);
+                    upscaleShader->applyUniform(uniformEntry);
+                    GLERRORCHECK();
+                }
+            }
+            if (uniformInfo.getName() == "crispScale")
+            {
+                double scaleX = double(nWidth) / nSrcWidth;
+                double scaleY = double(nHeight) / nSrcHeight;
+                if (scaleX < 1.0) scaleX = 1.0;
+                if (scaleY < 1.0) scaleY = 1.0;
+                if (uniformInfo.getType() == GL_DOUBLE_VEC2)
+                {
+                    double* scaleArr = (double*)std::malloc(sizeof(double) * 2);
+                    scaleArr[0] = scaleX;
+                    scaleArr[1] = scaleY;
+                    GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_DOUBLE_VEC2, 1, scaleArr);
+                    upscaleShader->applyUniform(uniformEntry);
+                    GLERRORCHECK();
+                }
+                else if (uniformInfo.getType() == GL_FLOAT_VEC2)
+                {
+                    float* scaleArr = (float*)std::malloc(sizeof(float) * 2);
+                    scaleArr[0] = (float)scaleX;
+                    scaleArr[1] = (float)scaleY;
+                    GLShaderVariableEntry uniformEntry(GLShaderVariableType::Uniform, uniformInfo.getId(), GL_FLOAT_VEC2, 1, scaleArr);
+                    upscaleShader->applyUniform(uniformEntry);
+                    GLERRORCHECK();
+                }
+            }
+        }
+    }
 
-	BindTexture(tex);
-	GLERRORCHECK();
+    BindTexture(tex);
+    GLERRORCHECK();
 
-	if (upscaleShader)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		GLERRORCHECK();
-	}
+    if (upscaleShader)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLERRORCHECK();
+    }
 
     GLfloat Vertices[] = {
         x1, y1, 0,
@@ -276,14 +276,14 @@ void GLDraw::DrawStretched(int nXDest, int nYDest, int nWidth, int nHeight, cons
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
     GLERRORCHECK();
 
-	// Unbind Post-Processing Shader here
-	if (upscaleShader)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLERRORCHECK();
-		upscaleShader->unbind();
-		GLERRORCHECK();
-	}
+    // Unbind Post-Processing Shader here
+    if (upscaleShader)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        GLERRORCHECK();
+        upscaleShader->unbind();
+        GLERRORCHECK();
+    }
 }
 
 

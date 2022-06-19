@@ -148,7 +148,7 @@ public:
     uint32_t mCount;
     bool mSceneCoords;
     bool mDepthTest;
-	bool mLinearFiltered;
+    bool mLinearFiltered;
 
     GLEngineCmd_LuaDraw() :
         mTarget(nullptr),
@@ -165,7 +165,7 @@ public:
         mCount(0),
         mSceneCoords(false),
         mDepthTest(false),
-		mLinearFiltered(false)
+        mLinearFiltered(false)
     {}
 
     virtual void run(GLEngine& glEngine) const;
@@ -200,6 +200,15 @@ class GLEngineCmd_CompileShaderObj : public GLEngineCmd {
 public:
     std::shared_ptr<FFI_ShaderObj> mShaderObj;
     virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+};
+
+class GLEngineCmd_SetFramebufferSize : public GLEngineCmd {
+public:
+    int mWidth;
+    int mHeight;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return false; }
     virtual bool shouldBeSynchronous(void) const { return true; }
 };
 
