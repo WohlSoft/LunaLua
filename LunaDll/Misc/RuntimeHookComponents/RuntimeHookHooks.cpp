@@ -3399,7 +3399,6 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
         ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
 
-        // FIXME: Crashes on level reload. Probably just lacking a sanity check
         if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
         {
             if (block->OwnerNPCID != 0) // Belongs to an NPC
@@ -3444,9 +3443,11 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
 
 static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(unsigned int npcAIdx, unsigned int npcBIdx)
 {
+    if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
+        return 0; // Collision cancelled
+    
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
 
-    // FIXME: Crashes on level reload. Probably just lacking a sanity check
     if (extA->collisionGroup[0] != 0) // Collision group string isn't empty
     {
         ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
