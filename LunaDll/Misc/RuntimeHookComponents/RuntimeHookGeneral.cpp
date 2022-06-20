@@ -1614,7 +1614,11 @@ void TrySkipPatch()
     PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
+    // Also handles collisionGroup for NPC-to-solid interactions now
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
+
+    // Patch to handle collisionGroup for NPC-to-NPC interactions
+    PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Replace pause button detection code to avoid re-triggering when held
     PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();

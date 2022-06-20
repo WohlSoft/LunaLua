@@ -3399,6 +3399,7 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
         ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
 
+        // FIXME: Crashes on level reload. Probably just lacking a sanity check
         if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
         {
             if (block->OwnerNPCID != 0) // Belongs to an NPC
@@ -3434,8 +3435,45 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
         push dword ptr ss:[ebp-0x14]         // hitSpot
         call runtimeHookBlockNPCFilterInternal
         mov dword ptr ss : [ebp - 0x14], eax // store return back to hitSpot
+
         mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
         push 0xA11B7D
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(unsigned int npcAIdx, unsigned int npcBIdx)
+{
+    ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+
+    // FIXME: Crashes on level reload. Probably just lacking a sanity check
+    if (extA->collisionGroup[0] != 0) // Collision group string isn't empty
+    {
+        ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
+
+        if (strcmp(extA->collisionGroup,extB->collisionGroup) == 0) // Matching collision groups
+            return 0; // Collision cancelled
+    }
+
+    return -1; // Collision goes ahead
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
+{
+    __asm {
+        movsx eax, word ptr ss:[ebp-0x188]   // npcBIdx
+        push eax
+        movsx eax, word ptr ss:[ebp-0x180]   // npcAIdx
+        push eax
+        call runtimeHookNPCCollisionGroupInternal
+        cmp eax, 0                           // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        push 0xA181B3
+        ret
+    cancel_collision:
+        push 0xA1BAD5
         ret
     }
 }

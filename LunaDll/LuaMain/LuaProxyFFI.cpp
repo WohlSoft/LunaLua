@@ -421,7 +421,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
-    char* collisionGroup;\
+    char collisionGroup[32];\
 } ExtendedNPCFields;";
     }
 
@@ -439,8 +439,13 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char* collisionGroup;\
+    char collisionGroup[32];\
 } ExtendedBlockFields;";
+    }
+
+    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    {
+        return 32;
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
