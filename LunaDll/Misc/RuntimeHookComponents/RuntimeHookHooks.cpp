@@ -3441,7 +3441,7 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(unsigned int npcAIdx, unsigned int npcBIdx)
+static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, int npcBIdx)
 {
     if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
         return 0; // Collision cancelled
@@ -3462,7 +3462,10 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(unsigned int 
 __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
 {
     __asm {
-        movsx eax, word ptr ss:[ebp-0x188]   // npcBIdx
+        push eax
+        push ecx
+        push edx
+        mov eax, dword ptr ss:[ebp-0x188]   // npcBIdx
         push eax
         movsx eax, word ptr ss:[ebp-0x180]   // npcAIdx
         push eax
@@ -3471,9 +3474,15 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
         jne continue_collision
         jmp cancel_collision
     continue_collision:
+        pop edx
+        pop ecx
+        pop eax
         push 0xA181B3
         ret
     cancel_collision:
+        pop edx
+        pop ecx
+        pop eax
         push 0xA1BAD5
         ret
     }

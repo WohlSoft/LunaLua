@@ -72,7 +72,7 @@ struct ExtendedBlockFields
         layerSpeedY = 0.0;
         extraSpeedX = 0.0;
         extraSpeedY = 0.0;
-        collisionGroup[0] = 0;
+        collisionGroup[0] = '\0';
     }
 };
 

@@ -532,7 +532,7 @@ struct ExtendedNPCFields
     void Reset()
     {
         noblockcollision = false;
-        collisionGroup[0] = 0;
+        collisionGroup[0] = '\0';
     }
 };
 
