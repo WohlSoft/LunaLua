@@ -1,6 +1,7 @@
 #include "WindowSizeHandler.h"
 #include "GL/GLContextManager.h"
 #include "../Globals.h"
+#include "../Input/MouseHandler.h"
 
 // Global instance
 WindowSizeHandler gWindowSizeHandler(800, 600);
@@ -48,4 +49,7 @@ void WindowSizeHandler::RecalculateInteral()
     mState.fbOffset.y = yOffset;
     mState.fbScale.x = xScale;
     mState.fbScale.y = yScale;
+
+    // Recalculate framebutton position to match
+    gMouseHandler.Recalculate();
 }

@@ -18,6 +18,7 @@
 #include "../../Rendering/GL/GLEngineProxy.h"
 #include "../../Rendering/GL/GLContextManager.h"
 #include "../../Rendering/WindowSizeHandler.h"
+#include "../../Input/MouseHandler.h"
 
 #include "../NpcIdExtender.h"
 
@@ -601,6 +602,23 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     });
                 }
                 return FALSE;
+            case WM_SETCURSOR:
+                if (LOWORD(lParam) == HTCLIENT)
+                {
+                    HCURSOR activeCursor = gCustomCursor;
+                    if (gCustomCursorHide)
+                    {
+                        activeCursor = nullptr;
+                    }
+                    else if (activeCursor == nullptr)
+                    {
+                        static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+                        activeCursor = defaultCursor;
+                    }
+                    SetCursor(activeCursor);
+                    return TRUE;
+                }
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);
@@ -615,6 +633,56 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 }
                 return 0;
             }
+            case WM_MOUSEMOVE:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                break;
+            case WM_MOUSELEAVE:
+                gMouseHandler.OnMouseLeave();
+                break;
+            case WM_LBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DOWN);
+                break;
+            case WM_LBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_UP);
+                break;
+            case WM_LBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DBL);
+                break;
+            case WM_RBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DOWN);
+                break;
+            case WM_RBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_UP);
+                break;
+            case WM_RBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DBL);
+                break;
+            case WM_MBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DOWN);
+                break;
+            case WM_MBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_UP);
+                break;
+            case WM_MBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DBL);
+                break;
+            case WM_MOUSEWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_V, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
+            case WM_MOUSEHWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_H, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
         }
     }
 
