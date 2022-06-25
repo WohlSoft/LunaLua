@@ -15,14 +15,23 @@ void GLEngineCmd_ClearTextures::run(GLEngine& glEngine) const {
     g_GLTextureStore.ClearLunaImageTextures();
 }
 void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
+    const GLDraw::Texture& tex = g_GLContextManager.GetCameraFBTex(mCamIdx);
+    g_GLContextManager.BindPrimaryFB();
+    g_GLDraw.DrawSprite(
+        { mRenderX, mRenderY, mRenderX + mWidth, mRenderY + mHeight },
+        &tex,
+        { 0.0, 0.0, mWidth, mHeight },
+        1.0f, GLDraw::RENDER_MODE_ALPHA);
+    /*
     glEngine.RenderCameraToScreen(
-        mHdcDest,
-        mXDest, mYDest,
-        mWidthDest, mHeightDest,
-        mHdcSrc,
-        mXSrc, mYSrc,
-        mWidthSrc, mHeightSrc,
-        mRop);
+        nullptr,
+        mRenderX, mRenderY,
+        mWidth, mHeight,
+        nullptr,
+        0, 0,
+        mWidth, mHeight,
+        0);
+    */
 }
 
 void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
@@ -284,14 +293,17 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         if (mTarget->mFramebuffer != nullptr)
         {
             // Bind old framebuffer
-            g_GLContextManager.BindFramebuffer();
+            g_GLContextManager.BindCameraFB();
         }
     }
 }
 
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
-    glEngine.SetCamera(mX, mY);
+    g_GLContextManager.SetActiveCamera(mIdx);
+    g_GLContextManager.BindCameraFB();
+    g_GLContextManager.GetCurrentFB()->Clear();
+    glEngine.SetCameraPositionInScene(mX, mY);
 }
 
 void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const

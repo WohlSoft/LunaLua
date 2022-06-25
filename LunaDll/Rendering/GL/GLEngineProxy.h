@@ -56,9 +56,7 @@ public:
     // Convenience command functions
     void ClearTextures();
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
-    void RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-        DWORD dwRop);
+    void RenderCameraToScreen(int camIdx, double renderX, double renderY, double height, double width);
     void EndFrame(HDC hdcDest, bool isLoadScreen=false);
     void InitForHDC(HDC hdcDest);
 

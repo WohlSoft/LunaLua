@@ -98,26 +98,48 @@ public:
         int iMAX_ELEMENT_INDEX;
     };
 public:
+    static const int MAX_CAMERAS = 2;
+
     GLContextManager();
     bool Init(HDC hDC);
     bool IsInitialized();
 
     void BindScreen();
-    void BindAndClearFramebuffer();
-    void BindFramebuffer();
-    inline const GLDraw::Texture& GetBufTex()
+    void BindPrimaryFB();
+    void BindCameraFB();
+    inline const GLDraw::Texture& GetPrimaryFBTex()
     {
-        static GLDraw::Texture nullTex(0, 0, 0);
-        if (mFramebuffer == nullptr)
+        static const GLDraw::Texture nullTex(0, 0, 0);
+        if (mPrimaryFB == nullptr)
         {
             return nullTex;
         }
-        return mFramebuffer->AsTexture();
+        return mPrimaryFB->AsTexture();
+    }
+    inline const GLDraw::Texture& GetCurrentCameraFBTex()
+    {
+        static const GLDraw::Texture nullTex(0, 0, 0);
+        if (mCurrentCameraFB == nullptr)
+        {
+            return nullTex;
+        }
+        return mCurrentCameraFB->AsTexture();
+    }
+    inline const GLDraw::Texture& GetCameraFBTex(int cameraIdx)
+    {
+        static const GLDraw::Texture nullTex(0, 0, 0);
+        if ((cameraIdx < 1) || (cameraIdx > MAX_CAMERAS) || (mCameraFramebuffers[cameraIdx-1] == nullptr))
+        {
+            return nullTex;
+        }
+        return mCameraFramebuffers[cameraIdx - 1]->AsTexture();
     }
     inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
     inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
     void EnsureMainThreadCTXApplied();
     inline const GLConstants& Constants() { return mConstants; }
+
+    void SetActiveCamera(int cameraIdx);
 
 private:
     bool  mInitialized;
@@ -134,7 +156,10 @@ private:
 
     // Framebuffer variables
     GLFramebuffer* mCurrentFB;
-    GLFramebuffer* mFramebuffer;
+    GLFramebuffer* mPrimaryFB;
+    GLFramebuffer* mCurrentCameraFB;
+    int            mCurrentCameraIdx;
+    GLFramebuffer* mCameraFramebuffers[MAX_CAMERAS];
 
     // Constants list
     GLConstants mConstants;

@@ -145,23 +145,14 @@ void GLEngineProxy::EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeig
     obj->mRop = dwRop;
     QueueCmd(obj);
 }
-void GLEngineProxy::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-    DWORD dwRop)
+void GLEngineProxy::RenderCameraToScreen(int camIdx, double renderX, double renderY, double width, double height)
 {
     auto obj = std::make_shared<GLEngineCmd_RenderCameraToScreen>();
-    obj->mXDest = nXOriginDest;
-    obj->mYDest = nYOriginDest;
-    obj->mWidthDest = nWidthDest;
-    obj->mHeightDest = nHeightDest;
-    obj->mXSrc = nXOriginSrc;
-    obj->mYSrc = nYOriginSrc;
-    obj->mWidthSrc = nWidthSrc;
-    obj->mHeightSrc = nHeightSrc;
-
-    obj->mHdcDest = hdcDest;
-    obj->mHdcSrc = hdcSrc;
-    obj->mRop = dwRop;
+    obj->mCamIdx = camIdx;
+    obj->mRenderX = renderX;
+    obj->mRenderY = renderY;
+    obj->mHeight = height;
+    obj->mWidth = width;
     QueueCmd(obj);
 }
 

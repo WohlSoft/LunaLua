@@ -44,7 +44,6 @@ struct Renderer {
 
     // Calls from hooks
     void StartCameraRender(int idx);
-    void StoreCameraPosition(int idx);
     void StartFrameRender();
     void EndFrameRender();
 

@@ -759,7 +759,12 @@ extern BOOL __stdcall StretchBltHook(
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
-        g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+
+        int cameraIdx = Renderer::Get().GetCameraIdx();
+        SMBX_CameraInfo* cam = SMBX_CameraInfo::Get(cameraIdx);
+        if (cam == NULL) return FALSE;
+
+        g_GLEngine.RenderCameraToScreen(cameraIdx, cam->renderX, cam->renderY, cam->width, cam->height);
 
         return TRUE;
     }
@@ -1294,7 +1299,14 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
     // Send camera position to GLEngine
     SMBX_CameraInfo::setCameraX(cameraIdx, cameraPos[cameraIdx][0]);
     SMBX_CameraInfo::setCameraY(cameraIdx, cameraPos[cameraIdx][1]);
-    Renderer::Get().StoreCameraPosition(cameraIdx);
+    if (g_GLEngine.IsEnabled())
+    {
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = cameraIdx;
+        cmd->mX = SMBX_CameraInfo::getCameraX(cameraIdx);
+        cmd->mY = SMBX_CameraInfo::getCameraY(cameraIdx);
+        g_GLEngine.QueueCmd(cmd);
+    }
 
     // Start camera render for this camera
     Renderer::Get().StartCameraRender(cameraIdx);

@@ -64,11 +64,13 @@ public:
     DWORD mRop;
     virtual void run(GLEngine& glEngine) const;
 };
-class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd, public GLBitmapRenderCoords {
+class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd {
 public:
-    HDC mHdcDest;
-    HDC mHdcSrc;
-    DWORD mRop;
+    int mCamIdx;
+    double mRenderX;
+    double mRenderY;
+    double mHeight;
+    double mWidth;
     virtual void run(GLEngine& glEngine) const;
 };
 class GLEngineCmd_EndFrame : public GLEngineCmd {
@@ -192,6 +194,7 @@ public:
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {
 public:
+    int mIdx;
     double mX, mY;
     virtual void run(GLEngine& glEngine) const;
 };
