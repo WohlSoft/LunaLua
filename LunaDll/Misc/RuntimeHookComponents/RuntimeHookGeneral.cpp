@@ -462,10 +462,18 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static bool inSizeMoveModal = false;
+
     if (hwnd == gMainWindowHwnd)
     {
         switch (uMsg)
         {
+            case WM_ENTERSIZEMOVE:
+                inSizeMoveModal = true;
+                break;
+            case WM_EXITSIZEMOVE:
+                inSizeMoveModal = false;
+                break;
             case WM_SETTEXT:
             {
                 // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
@@ -521,11 +529,23 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                         latestLParam & 0xFFFF,
                         (latestLParam >> 16) & 0xFFFF
                     );
+
+                    // Redraw
+                    if (inSizeMoveModal)
+                    {
+                        g_GLEngine.EndFrame(nullptr, false, true);
+                    }
                 }
 
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
+            case WM_PAINT:
+                if (inSizeMoveModal)
+                {
+                    g_GLEngine.EndFrame(nullptr, false, true);
+                }
+                break;
             case WM_GETMINMAXINFO:
             {
                 // Set the minimum window size for resizing to 50% of framebuffer size

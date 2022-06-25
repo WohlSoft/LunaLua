@@ -82,14 +82,13 @@ void GLEngine::InitForHDC(HDC hdcDest)
             mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
-            EndFrame(hdcDest, false);
+            EndFrame(hdcDest, false, true);
         }
     }
 }
 
-void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
+void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly)
 {
-
     static HDC cachedHDC = NULL;
     if (hdcDest == NULL)
     {
@@ -115,30 +114,33 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
         // Primary FB for screenshot and gif recorder purposes
         g_GLContextManager.BindPrimaryFB();
 
-        // Generate screenshot...
-        if (mScreenshot) {
-            GenerateScreenshot(0, 0, fbWidth, fbHeight);
-        }
-
-        if (mGifRecorder.isRunning())
+        if (!redrawOnly)
         {
-            // Record next frame
-            GifRecorderNextFrame(0, 0, fbWidth, fbHeight);
-
-            const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(recImage);
-            if (sprite)
-            {
-                const GLDraw::Texture tex(sprite->GetTexId(), recImage->getW(), recImage->getH());
-                g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+            // Generate screenshot...
+            if (mScreenshot) {
+                GenerateScreenshot(0, 0, fbWidth, fbHeight);
             }
-        }
-        else if (mGifRecorder.isEncoding())
-        {
-            const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(encImage);
-            if (sprite)
+
+            if (mGifRecorder.isRunning())
             {
-                const GLDraw::Texture tex(sprite->GetTexId(), encImage->getW(), encImage->getH());
-                g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+                // Record next frame
+                GifRecorderNextFrame(0, 0, fbWidth, fbHeight);
+
+                const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(recImage);
+                if (sprite)
+                {
+                    const GLDraw::Texture tex(sprite->GetTexId(), recImage->getW(), recImage->getH());
+                    g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+                }
+            }
+            else if (mGifRecorder.isEncoding())
+            {
+                const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(encImage);
+                if (sprite)
+                {
+                    const GLDraw::Texture tex(sprite->GetTexId(), encImage->getW(), encImage->getH());
+                    g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+                }
             }
         }
 
@@ -193,11 +195,6 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GLERRORCHECK();
     }
-
-    // Bind primary framebuffer
-    g_GLContextManager.BindPrimaryFB();
-    GLFramebuffer* fb = g_GLContextManager.GetCurrentFB();
-    if (fb) fb->Clear();
 }
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {

@@ -33,7 +33,7 @@ public:
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 
     void InitForHDC(HDC hdcDest);
-    void EndFrame(HDC hdcDest, bool skipFlipToScreen);
+    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };

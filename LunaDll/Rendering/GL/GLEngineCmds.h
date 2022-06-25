@@ -78,11 +78,12 @@ public:
     HDC mHdcDest;
     bool mIsFirstFrame;
     bool mForceSkip;
+    bool mRedrawOnly;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
-    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame; }
-    virtual bool isSkippable(void) const { return !mIsFirstFrame; }
-    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame; }
+    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool isSkippable(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame || mRedrawOnly; }
 };
 class GLEngineCmd_InitForHDC : public GLEngineCmd {
 public:

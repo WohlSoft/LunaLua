@@ -1279,6 +1279,16 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
     {
         g_ranOnDrawThisFrame = true;
 
+        // Clear primary framebuffer
+        if (g_GLEngine.IsEnabled())
+        {
+            std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+            cmd->mIdx = 0;
+            cmd->mX = 0;
+            cmd->mY = 0;
+            g_GLEngine.QueueCmd(cmd);
+        }
+
         // Store camera states
         for (int i=1; i<=maxCameraIdx; i++)
         {
