@@ -177,6 +177,13 @@ static void LoadThread(void)
         Renderer::Get().StartFrameRender();
         Renderer::Get().StartCameraRender(1);
 
+        // Set camera 0 (primary framebuffer)
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = 0;
+        cmd->mX = 0;
+        cmd->mY = 0;
+        g_GLEngine.QueueCmd(cmd);
+
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
         {
@@ -184,8 +191,6 @@ static void LoadThread(void)
         }
 
         Renderer::Get().RenderBelowPriority(DBL_MAX);
-
-        g_GLEngine.RenderCameraToScreen(1, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
 
         g_GLEngine.EndFrame(NULL, true);
 

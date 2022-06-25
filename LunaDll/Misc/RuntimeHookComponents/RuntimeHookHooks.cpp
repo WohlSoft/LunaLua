@@ -1509,6 +1509,15 @@ extern void __stdcall RenderWorldHook()
     LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        // Set camera 0 (primary framebuffer)
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = 0;
+        cmd->mX = 0;
+        cmd->mY = 0;
+        g_GLEngine.QueueCmd(cmd);
+    }
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())

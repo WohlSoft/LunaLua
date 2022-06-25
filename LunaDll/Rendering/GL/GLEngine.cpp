@@ -194,8 +194,8 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
         GLERRORCHECK();
     }
 
-    // Bind framebuffer
-    g_GLContextManager.BindCameraFB();
+    // Bind primary framebuffer
+    g_GLContextManager.BindPrimaryFB();
     GLFramebuffer* fb = g_GLContextManager.GetCurrentFB();
     if (fb) fb->Clear();
 }

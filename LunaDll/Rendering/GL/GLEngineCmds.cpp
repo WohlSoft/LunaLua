@@ -22,16 +22,6 @@ void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
         &tex,
         { 0.0, 0.0, mWidth, mHeight },
         1.0f, GLDraw::RENDER_MODE_ALPHA);
-    /*
-    glEngine.RenderCameraToScreen(
-        nullptr,
-        mRenderX, mRenderY,
-        mWidth, mHeight,
-        nullptr,
-        0, 0,
-        mWidth, mHeight,
-        0);
-    */
 }
 
 void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
@@ -300,8 +290,15 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
-    g_GLContextManager.SetActiveCamera(mIdx);
-    g_GLContextManager.BindCameraFB();
+    if (mIdx == 0)
+    {
+        g_GLContextManager.BindPrimaryFB();
+    }
+    else
+    {
+        g_GLContextManager.SetActiveCamera(mIdx);
+        g_GLContextManager.BindCameraFB();
+    }
     g_GLContextManager.GetCurrentFB()->Clear();
     glEngine.SetCameraPositionInScene(mX, mY);
 }
