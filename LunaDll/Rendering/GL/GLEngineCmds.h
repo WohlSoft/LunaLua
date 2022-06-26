@@ -79,6 +79,7 @@ public:
     bool mIsFirstFrame;
     bool mForceSkip;
     bool mRedrawOnly;
+    bool mResizeOverlay;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
     virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly; }

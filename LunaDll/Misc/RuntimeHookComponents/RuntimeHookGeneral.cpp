@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <windowsx.h>
+#include <dwmapi.h>
 #include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
@@ -56,23 +57,78 @@ void SetupThunRTMainHook()
 }
 
 // Function to get the size of padding/frame around a window
-static void getWindowFramePadding(HWND hwnd, int &wPadOut, int &hPadOut)
+struct FramePaddingInfo
+{
+    // Padding on each side
+    int lPad;
+    int rPad;
+    int tPad;
+    int bPad;
+
+    // How much of the padding is from WM_SIZBOX?
+    int lPadSz;
+    int rPadSz;
+    int tPadSz;
+    int bPadSz;
+};
+static FramePaddingInfo getWindowFramePadding(HWND hwnd)
 {
     // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
-    RECT rc;
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = 800;
-    rc.bottom = 600;
-    AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-        GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
-    wPadOut = rc.right - rc.left - 800;
-    hPadOut = rc.bottom - rc.top - 600;
+    FramePaddingInfo out;
+    {
+        RECT rc;
+        rc.left = 0;
+        rc.top = 0;
+        rc.right = 800;
+        rc.bottom = 600;
+        AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+            GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        out.lPad = -rc.left;
+        out.rPad = rc.right - 800;
+        out.tPad = -rc.top;
+        out.bPad = rc.bottom - 600;
+    }
+
+    // Get excess border
+    {
+        out.lPadSz = 0;
+        out.rPadSz = 0;
+        out.tPadSz = 0;
+        out.bPadSz = 0;
+        if (gIsWindowsVistaOrNewer)
+        {
+            static HMODULE dwmModule = LoadLibraryA("Dwmapi.dll");
+            if (dwmModule != nullptr)
+            {
+                typedef HRESULT __stdcall dwm_call_t(HWND, DWORD, PVOID, DWORD);
+                static dwm_call_t* dwmGetWindowsAttribute = reinterpret_cast<dwm_call_t*>(GetProcAddress(dwmModule, "DwmGetWindowAttribute"));
+                if (dwmGetWindowsAttribute != nullptr)
+                {
+                    RECT rc1, rc2;
+                    GetWindowRect(hwnd, &rc1);
+                    if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
+                    {
+                        out.lPadSz = rc2.left - rc1.left;
+                        out.rPadSz = rc1.right - rc2.right;
+                        out.tPadSz = rc2.top - rc1.top;
+                        out.bPadSz = rc1.bottom - rc2.bottom;
+                    }
+                }
+            }
+        }
+    }
+
+    return std::move(out);
 }
 
 // Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
-static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wPad, int hPad, double nominalW, double nominalH)
+static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH)
 {
+    // Get padding overhead
+    FramePaddingInfo pad = getWindowFramePadding(hwnd);
+    int wPad = pad.lPad + pad.rPad;
+    int hPad = pad.tPad + pad.bPad;
+
     int w = lpRect->right - lpRect->left - wPad;
     int h = lpRect->bottom - lpRect->top - hPad;
     double relS;
@@ -111,8 +167,8 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
     }
 
     // New Size
-    w = (int)floor(relS * nominalW + 0.5) + wPad;
-    h = (int)floor(relS * nominalH + 0.5) + hPad;
+    w = (int)round(relS * nominalW);
+    h = (int)round(relS * nominalH);
 
     // Fine tune size
     switch (dragCorner)
@@ -121,17 +177,21 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_BOTTOM:
             // Force even width for centering
             w -= w % 2;
-            relS = (w - wPad) / nominalW;
-            h = (int)floor(relS * nominalH + 0.5) + hPad;
+            relS = w / nominalW;
+            h = (int)round(relS * nominalH);
             break;
         case WMSZ_LEFT:
         case WMSZ_RIGHT:
             // Force even height for centering
             h -= h % 2;
-            relS = (h - hPad) / nominalH;
-            w = (int)floor(relS * nominalW + 0.5) + wPad;
+            relS = h / nominalH;
+            w = (int)round(relS * nominalW);
             break;
     }
+
+    // Add padding
+    w += wPad;
+    h += hPad;
 
     // Adjust left/right
     switch (dragCorner)
@@ -156,8 +216,38 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_BOTTOM:
         {
             // Dragging top/bottom, leave keep centered
-            lpRect->left = (lpRect->right + lpRect->left - w) / 2;
+            lpRect->left = ((lpRect->right - pad.rPad) + (lpRect->left + pad.lPad) - (w - wPad)) / 2 - pad.lPad;
             lpRect->right = lpRect->left + w;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left   -= pad.lPadSz;
+            workRect.right  += pad.rPadSz;
+            workRect.top    -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorW = (workRect.right - workRect.left);
+            if (w > monitorW)
+            {
+                w = monitorW;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.left > lpRect->left)
+            {
+                lpRect->left = workRect.left;
+                lpRect->right = lpRect->left + w;
+            }
+            else if (workRect.right < lpRect->right)
+            {
+                lpRect->right = workRect.right;
+                lpRect->left = lpRect->right - w;
+            }
+
             break;
         }
     }
@@ -185,8 +275,38 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_RIGHT:
         {
             // Dragging top/bottom, leave keep centered
-            lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
+            lpRect->top = ((lpRect->top + pad.tPad) + (lpRect->bottom - pad.bPad) - (h - hPad)) / 2 - pad.tPad;
             lpRect->bottom = lpRect->top + h;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left -= pad.lPadSz;
+            workRect.right += pad.rPadSz;
+            workRect.top -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorH = (workRect.bottom - workRect.top);
+            if (h > monitorH)
+            {
+                h = monitorH;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.top > lpRect->top)
+            {
+                lpRect->top = workRect.top;
+                lpRect->bottom = lpRect->top + h;
+            }
+            else if (workRect.bottom < lpRect->bottom)
+            {
+                lpRect->bottom = workRect.bottom;
+                lpRect->top = lpRect->bottom - h;
+            }
+
             break;
         }
     }
@@ -463,6 +583,7 @@ static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool inSizeMoveModal = false;
+    static bool inSizeModal = false;
 
     if (hwnd == gMainWindowHwnd)
     {
@@ -473,6 +594,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 break;
             case WM_EXITSIZEMOVE:
                 inSizeMoveModal = false;
+                inSizeModal = false;
                 break;
             case WM_SETTEXT:
             {
@@ -533,7 +655,8 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     // Redraw
                     if (inSizeMoveModal)
                     {
-                        g_GLEngine.EndFrame(nullptr, false, true);
+                        inSizeModal = true;
+                        g_GLEngine.EndFrame(nullptr, false, true, true);
                     }
                 }
 
@@ -541,11 +664,12 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
             case WM_PAINT:
+                CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
                 if (inSizeMoveModal)
                 {
-                    g_GLEngine.EndFrame(nullptr, false, true);
+                    g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                 }
-                break;
+                return 0;
             case WM_GETMINMAXINFO:
             {
                 // Set the minimum window size for resizing to 50% of framebuffer size
@@ -572,13 +696,9 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     break;
                 }
 
-                // Get padding overhead
-                int wPad, hPad;
-                getWindowFramePadding(hwnd, wPad/*out*/, hPad/*out*/);
-
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
+                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
 
                 return TRUE;
             }

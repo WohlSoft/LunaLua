@@ -83,6 +83,21 @@ void LunaDLLInit()
 {
     InitGlobals();
 
+    // Be sure we don't get flagged as DPI unaware
+    if (gIsWindowsVistaOrNewer)
+    {
+        HMODULE user32Module = LoadLibraryA("User32.dll");
+        if (user32Module != nullptr)
+        {
+            typedef BOOL __stdcall setProcessDPIAware_t();
+            setProcessDPIAware_t* setProcessDPIAware = reinterpret_cast<setProcessDPIAware_t*>(GetProcAddress(user32Module, "SetProcessDPIAware"));
+            if (setProcessDPIAware != nullptr)
+            {
+                setProcessDPIAware();
+            }
+        }
+    }
+
     //Check for arguments and write them in gStartupSettings
     ParseArgs(splitCmdArgsW(std::wstring(GetCommandLineW())));
 
