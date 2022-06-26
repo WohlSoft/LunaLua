@@ -1237,52 +1237,53 @@ void TrySkipPatch()
     PATCH(0x902EBB).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902F80).CALL(&WorldOverlayHUDBitBltHook).Apply();
 
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9030F2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+
 
 
     PATCH(0x9000B2).CALL(&WorldHUDIsOnCameraHook).Apply();
