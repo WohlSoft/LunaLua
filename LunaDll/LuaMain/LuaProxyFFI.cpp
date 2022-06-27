@@ -739,10 +739,10 @@ typedef struct ExtendedBlockFields_\
     {
         return {gMouseHandler.GetX(), gMouseHandler.GetY()};
     }
-	FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
+    FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
     {
         // Toggling fullscreen without maximizing the window/double clicking the window.
-		if (gMainWindowHwnd != NULL)
+        if (gMainWindowHwnd != NULL)
         {
             WINDOWPLACEMENT wndpl;
             wndpl.length = sizeof(WINDOWPLACEMENT);
@@ -751,10 +751,8 @@ typedef struct ExtendedBlockFields_\
                 if ((wndpl.showCmd == SW_MAXIMIZE) && (enable == false))
                 {
                     ShowWindow(gMainWindowHwnd, SW_RESTORE);
-                } else {
-					if (enable == true) {
-						ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
-					}
+                } else if (enable == true) {
+                        ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
                 }
             }
         }
@@ -762,27 +760,27 @@ typedef struct ExtendedBlockFields_\
 	FFI_EXPORT(void) LunaLuaToggleWindowFocus(bool enable)
     {
         // Setting the focus to the window
-		if (enable) {
-			gStartupSettings.runWhenUnfocused = true;
-        } else {
-			gStartupSettings.runWhenUnfocused = false;
+        if ((enable == true) && (gMainWindowFocused || gStartupSettings.runWhenUnfocused)) {
+            gStartupSettings.runWhenUnfocused = true;
+        } else if ((enable == false) && (gMainWindowFocused || gStartupSettings.runWhenUnfocused)) {
+            gStartupSettings.runWhenUnfocused = false;
         }
     }
-	FFI_EXPORT(bool) LunaLuaIsFullscreen()
+    FFI_EXPORT(bool) LunaLuaIsFullscreen()
     {
-		if (gMainWindowHwnd != NULL)
+        if (gMainWindowHwnd != NULL)
         {
             WINDOWPLACEMENT wndpl;
             wndpl.length = sizeof(WINDOWPLACEMENT);
             if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
             {
-				if (wndpl.showCmd == SW_MAXIMIZE) {
-					return (bool)true;
-				} else {
-					return (bool)false;
-				}
-			}
-		}
+                if (wndpl.showCmd == SW_MAXIMIZE) {
+                    return (bool)true;
+                } else {
+                    return (bool)false;
+                }
+            }
+        }
     }
 }
 
