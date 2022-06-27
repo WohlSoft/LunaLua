@@ -739,20 +739,26 @@ typedef struct ExtendedBlockFields_\
     {
         return {gMouseHandler.GetX(), gMouseHandler.GetY()};
     }
-	FFI_EXPORT(void) LunaLuaToggleFullscreen(bool enable)
-	{
-		// Toggling fullscreen without maximizing the window/double clicking the window.
+	FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
+    {
+        // Toggling fullscreen without maximizing the window/double clicking the window.
 		if (gMainWindowHwnd != NULL)
-		{
-			WINDOWPLACEMENT wndpl;
-			wndpl.length = sizeof(WINDOWPLACEMENT);
-			if (enable){
-				ShowWindow(gMainWindowHwnd, SW_RESTORE);
-			} else {
-				ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
-			}
-		}
-	}
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                if ((wndpl.showCmd == SW_MAXIMIZE) && (enable))
+                {
+                    ShowWindow(gMainWindowHwnd, SW_RESTORE);
+                }
+                else
+                {
+                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+                }
+            }
+        }
+    }
 	FFI_EXPORT(void) LunaLuaToggleWindowFocus(bool enable)
     {
         // Setting the focus to the window
