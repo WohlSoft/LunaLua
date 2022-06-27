@@ -748,13 +748,13 @@ typedef struct ExtendedBlockFields_\
             wndpl.length = sizeof(WINDOWPLACEMENT);
             if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
             {
-                if ((wndpl.showCmd == SW_MAXIMIZE) && (enable))
+                if ((wndpl.showCmd == SW_MAXIMIZE) && (enable == false))
                 {
                     ShowWindow(gMainWindowHwnd, SW_RESTORE);
-                }
-                else
-                {
-                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+                } else {
+					if (enable == true) {
+						ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+					}
                 }
             }
         }
@@ -767,7 +767,6 @@ typedef struct ExtendedBlockFields_\
         } else {
 			gStartupSettings.runWhenUnfocused = false;
         }
-		
     }
 }
 
