@@ -768,6 +768,22 @@ typedef struct ExtendedBlockFields_\
 			gStartupSettings.runWhenUnfocused = false;
         }
     }
+	FFI_EXPORT(bool) LunaLuaIsFullscreen()
+    {
+		if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+				if (wndpl.showCmd == SW_MAXIMIZE) {
+					return (bool)true;
+				} else {
+					return (bool)false;
+				}
+			}
+		}
+    }
 }
 
 void CachedReadFile::clearData()
