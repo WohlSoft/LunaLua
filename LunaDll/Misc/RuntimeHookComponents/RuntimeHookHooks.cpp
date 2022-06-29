@@ -1,4 +1,5 @@
 #include <comutil.h>
+#include "string.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
 #include "../../LuaMain/LunaLuaMain.h"
@@ -758,7 +759,12 @@ extern BOOL __stdcall StretchBltHook(
     // If we're copying from our rendering screen, we're done with the frame
     if (hdcSrc == (HDC)GM_SCRN_HDC && g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
-        g_GLEngine.RenderCameraToScreen(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
+
+        int cameraIdx = Renderer::Get().GetCameraIdx();
+        SMBX_CameraInfo* cam = SMBX_CameraInfo::Get(cameraIdx);
+        if (cam == NULL) return FALSE;
+
+        g_GLEngine.RenderCameraToScreen(cameraIdx, cam->renderX, cam->renderY, cam->width, cam->height);
 
         return TRUE;
     }
@@ -1273,6 +1279,16 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
     {
         g_ranOnDrawThisFrame = true;
 
+        // Clear primary framebuffer
+        if (g_GLEngine.IsEnabled())
+        {
+            std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+            cmd->mIdx = 0;
+            cmd->mX = 0;
+            cmd->mY = 0;
+            g_GLEngine.QueueCmd(cmd);
+        }
+
         // Store camera states
         for (int i=1; i<=maxCameraIdx; i++)
         {
@@ -1293,7 +1309,14 @@ static void __stdcall PostCameraUpdateHook(int cameraIdx, int maxCameraIdx)
     // Send camera position to GLEngine
     SMBX_CameraInfo::setCameraX(cameraIdx, cameraPos[cameraIdx][0]);
     SMBX_CameraInfo::setCameraY(cameraIdx, cameraPos[cameraIdx][1]);
-    Renderer::Get().StoreCameraPosition(cameraIdx);
+    if (g_GLEngine.IsEnabled())
+    {
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = cameraIdx;
+        cmd->mX = SMBX_CameraInfo::getCameraX(cameraIdx);
+        cmd->mY = SMBX_CameraInfo::getCameraY(cameraIdx);
+        g_GLEngine.QueueCmd(cmd);
+    }
 
     // Start camera render for this camera
     Renderer::Get().StartCameraRender(cameraIdx);
@@ -1496,6 +1519,15 @@ extern void __stdcall RenderWorldHook()
     LunaLoadScreenKill();
     PerfTrackerState state(PerfTracker::PERF_DRAWING);
     Renderer::Get().StartFrameRender();
+    if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
+    {
+        // Set camera 0 (primary framebuffer)
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = 0;
+        cmd->mX = 0;
+        cmd->mY = 0;
+        g_GLEngine.QueueCmd(cmd);
+    }
     g_EventHandler.hookWorldRenderStart();
     RenderWorldReal();
     if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
@@ -3381,7 +3413,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx)
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx)
 {
     // If already not hitting, ignore
     if (hitSpot == 0) return 0;
@@ -3395,6 +3427,26 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
             // The filter was a non-zero and matched, so no collision
             return 0;
         }
+
+        ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+
+        if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
+        {
+            if (block->OwnerNPCID != 0) // Belongs to an NPC
+            {
+                ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
+
+                if (strcmp(ext->collisionGroup,ownerExt->collisionGroup) == 0) // Matching collision groups
+                    return 0;
+            }
+            else
+            {
+                ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+
+                if (strcmp(ext->collisionGroup,blockExt->collisionGroup) == 0) // Matching collision groups
+                    return 0;
+            }
+        }
     }
 
     return hitSpot;
@@ -3405,15 +3457,64 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
     // 00A11B76 | mov ax, word ptr ds : [esi + 0xE2]
     // eax, ecx, edx and flags are free for use at this point
     __asm {
+        movsx eax, word ptr ss:[ebp-0x180]   // npcIdx
+        push eax
         movsx eax, word ptr ss:[ebp-0x188]   // blockIdx
         push eax
-        push esi                             // npc
+        push esi                             // npc pointer
         push dword ptr ss:[ebp-0x14]         // hitSpot
         call runtimeHookBlockNPCFilterInternal
         mov dword ptr ss : [ebp - 0x14], eax // store return back to hitSpot
 
         mov ax, word ptr ds : [esi + 0xE2] // The code we're replacing
         push 0xA11B7D
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, int npcBIdx)
+{
+    if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
+        return 0; // Collision cancelled
+    
+    ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+
+    if (extA->collisionGroup[0] != 0) // Collision group string isn't empty
+    {
+        ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
+
+        if (strcmp(extA->collisionGroup,extB->collisionGroup) == 0) // Matching collision groups
+            return 0; // Collision cancelled
+    }
+
+    return -1; // Collision goes ahead
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
+{
+    __asm {
+        push eax
+        push ecx
+        push edx
+        mov eax, dword ptr ss:[ebp-0x188]   // npcBIdx
+        push eax
+        movsx eax, word ptr ss:[ebp-0x180]   // npcAIdx
+        push eax
+        call runtimeHookNPCCollisionGroupInternal
+        cmp eax, 0                           // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop edx
+        pop ecx
+        pop eax
+        push 0xA181B3
+        ret
+    cancel_collision:
+        pop edx
+        pop ecx
+        pop eax
+        push 0xA1BAD5
         ret
     }
 }

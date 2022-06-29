@@ -26,10 +26,10 @@ public:
             // Bind framebuffer
             fb->Bind();
 
-            g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetBufTex(), 0, 0, w, h, 1.0f, nullptr);
+            g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetCurrentCameraFBTex(), 0, 0, w, h, 1.0f, nullptr);
 
             // Bind old framebuffer
-            g_GLContextManager.BindFramebuffer();
+            g_GLContextManager.BindCameraFB();
         }
     }
 

@@ -82,94 +82,13 @@ void GLEngine::InitForHDC(HDC hdcDest)
             mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
-            RenderCameraToScreen(hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(),
-                hdcDest, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), 0);
-            EndFrame(hdcDest, false);
+            EndFrame(hdcDest, false, true, false);
         }
     }
 }
 
-BOOL GLEngine::RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-    HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-    DWORD dwRop)
+void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay)
 {
-    // Load Post-Processing Shader somewhere here
-
-    static HDC cachedHDC = NULL;
-    if (hdcDest == NULL)
-    {
-        if (cachedHDC != NULL)
-        {
-            hdcDest = cachedHDC;
-        }
-        else
-        {
-            return FALSE;
-        }
-    }
-    else
-    {
-        cachedHDC = hdcDest;
-    }
-
-
-    InitForHDC(hdcDest);
-
-    if (!g_GLContextManager.IsInitialized()) return FALSE;
-
-    // Get window size
-    const auto winState = gWindowSizeHandler.getStateThreadSafe();
-    const int32_t& windowWidth = winState.windowSize.x;
-    const int32_t& windowHeight = winState.windowSize.y;
-    const double& xOffset = winState.fbOffset.x;
-    const double& yOffset = winState.fbOffset.y;
-    const double& xScale = winState.fbScale.x;
-    const double& yScale = winState.fbScale.y;
-
-    g_GLDraw.UnbindTexture();
-
-    // Unbind the texture from the framebuffer (Bind screen)
-    g_GLContextManager.BindScreen();
-    
-    // Re-derive expected destination coordinates
-    double assumedXScale = nWidthDest / static_cast<double>(nWidthSrc);
-    double assumedYScale = nHeightDest / static_cast<double>(nHeightSrc);
-    nXOriginDest = static_cast<int>(std::round(nXOriginDest * (xScale / assumedXScale) + xOffset));
-    nYOriginDest = static_cast<int>(std::round(nYOriginDest * (yScale / assumedYScale) + yOffset));
-    nWidthDest = static_cast<int>(std::round(nWidthSrc * xScale));
-    nHeightDest = static_cast<int>(std::round(nHeightSrc * yScale));
-
-    // Set viewport for window size
-    glViewport(0, 0, windowWidth, windowHeight);
-    GLERRORCHECK();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    GLERRORCHECK();
-    glOrtho(0, static_cast<GLdouble>(windowWidth), static_cast<GLdouble>(windowHeight), 0, -1.0f, 1.0f);
-    GLERRORCHECK();
-
-    // Use upscaling shader if we're upscaling and it compiled right
-    GLShader* upscaleShader = nullptr;
-    if (mpUpscaleShader->isValid() && ((xScale > 1.0f) || (yScale > 1.0f)))
-    {
-        upscaleShader = mpUpscaleShader;
-    }
-
-    // Draw the buffer, flipped/stretched as appropriate
-    g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetBufTex(), nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, 1.0f, upscaleShader);
-    GLERRORCHECK();
-    glFlush();
-    GLERRORCHECK();
-
-    // Get ready to draw some more
-    g_GLContextManager.BindAndClearFramebuffer();
-
-    return TRUE;
-}
-
-void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
-{
-
     static HDC cachedHDC = NULL;
     if (hdcDest == NULL)
     {
@@ -189,57 +108,110 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
 
     if (!skipFlipToScreen)
     {
+        int fbWidth = g_GLContextManager.GetMainFBWidth();
+        int fbHeight = g_GLContextManager.GetMainFBHeight();
+
+        // Primary FB for screenshot and gif recorder purposes
+        g_GLContextManager.BindPrimaryFB();
+
+        if (!redrawOnly)
+        {
+            // Generate screenshot...
+            if (mScreenshot) {
+                GenerateScreenshot(0, 0, fbWidth, fbHeight);
+            }
+
+            if (mGifRecorder.isRunning())
+            {
+                // Record next frame
+                GifRecorderNextFrame(0, 0, fbWidth, fbHeight);
+
+                const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(recImage);
+                if (sprite)
+                {
+                    const GLDraw::Texture tex(sprite->GetTexId(), recImage->getW(), recImage->getH());
+                    g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+                }
+            }
+            else if (mGifRecorder.isEncoding())
+            {
+                const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(encImage);
+                if (sprite)
+                {
+                    const GLDraw::Texture tex(sprite->GetTexId(), encImage->getW(), encImage->getH());
+                    g_GLDraw.DrawStretched(10, 10, tex.w, tex.h, &tex, 0, tex.h, tex.w, -tex.h, 1.0f, nullptr);
+                }
+            }
+        }
+
         // Bind screen
         g_GLContextManager.BindScreen();
 
-        // Generate screenshot...
-        if (mScreenshot) {
-            const auto winState = gWindowSizeHandler.getStateThreadSafe();
-            const int32_t& windowWidth = winState.windowSize.x;
-            const int32_t& windowHeight = winState.windowSize.y;
-            GenerateScreenshot(0, 0, windowWidth, windowHeight);
+        // Get window size
+        const auto winState = gWindowSizeHandler.getStateThreadSafe();
+        const int32_t& windowWidth = winState.windowSize.x;
+        const int32_t& windowHeight = winState.windowSize.y;
+        const double& xOffset = winState.fbOffset.x;
+        const double& yOffset = winState.fbOffset.y;
+        const double& xScale = winState.fbScale.x;
+        const double& yScale = winState.fbScale.y;
+
+        // Derive expected destination coordinates
+        int nXOriginDest = static_cast<int>(std::round(xOffset));
+        int nYOriginDest = static_cast<int>(std::round(yOffset));
+        int nWidthDest = static_cast<int>(std::round(fbWidth * xScale));
+        int nHeightDest = static_cast<int>(std::round(fbHeight * yScale));
+
+        // Set viewport for window size
+        glViewport(0, 0, windowWidth, windowHeight);
+        GLERRORCHECK();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        GLERRORCHECK();
+        glOrtho(0, static_cast<GLdouble>(windowWidth), static_cast<GLdouble>(windowHeight), 0, -1.0f, 1.0f);
+        GLERRORCHECK();
+
+        // Use upscaling shader if we're upscaling and it compiled right
+        GLShader* upscaleShader = nullptr;
+        if (mpUpscaleShader->isValid() && ((xScale > 1.0f) || (yScale > 1.0f)))
+        {
+            upscaleShader = mpUpscaleShader;
         }
 
-        if (mGifRecorder.isRunning())
-        {
-            // Get window size
-            const auto winState = gWindowSizeHandler.getStateThreadSafe();
-            const int32_t& windowWidth = winState.windowSize.x;
-            const int32_t& windowHeight = winState.windowSize.y;
-            GifRecorderNextFrame(0, 0, windowWidth, windowHeight);
+        // Draw the buffer, flipped/stretched as appropriate
+        g_GLDraw.DrawStretched(nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, &g_GLContextManager.GetPrimaryFBTex(), 0, 0, fbWidth, fbHeight, 1.0f, upscaleShader);
+        GLERRORCHECK();
+        glFlush();
+        GLERRORCHECK();
 
-            GLEngineCmd_DrawSprite cmd;
-            cmd.mXDest = 10;
-            cmd.mYDest = windowHeight - (10 + recImage->getH());
-            cmd.mWidthDest = recImage->getW();
-            cmd.mHeightDest = recImage->getH();
-            cmd.mXSrc = 0;
-            cmd.mYSrc = 0;
-            cmd.mWidthSrc = recImage->getW();
-            cmd.mHeightSrc = recImage->getH();
-            cmd.mImg = recImage;
-            cmd.mOpacity = 1.0;
-            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-            cmd.run(*this);
-        }
-        else if (mGifRecorder.isEncoding())
+        // Overlay for rescaling window manually
+        if (resizeOverlay)
         {
-            const auto winState = gWindowSizeHandler.getStateThreadSafe();
-            const int32_t& windowHeight = winState.windowSize.y;
+            std::string overlayString = std::to_string(windowWidth) + "x" + std::to_string(windowHeight);
 
-            GLEngineCmd_DrawSprite cmd;
-            cmd.mXDest = 10;
-            cmd.mYDest = windowHeight - (10 + encImage->getH());
-            cmd.mWidthDest = encImage->getW();
-            cmd.mHeightDest = encImage->getH();
-            cmd.mXSrc = 0;
-            cmd.mYSrc = 0;
-            cmd.mWidthSrc = encImage->getW();
-            cmd.mHeightSrc = encImage->getH();
-            cmd.mImg = encImage;
-            cmd.mOpacity = 1.0;
-            cmd.mMode = GLDraw::RENDER_MODE_ALPHA;
-            cmd.run(*this);
+            // GDI for text rendering is a bit of a hack, but good enough for now here.
+            HDC gdiDC = CreateCompatibleDC(hdcDest);
+            SIZE stringSize;
+            GetTextExtentPoint32A(gdiDC, overlayString.c_str(), overlayString.length(), &stringSize);
+            HBITMAP gdiBMP = CreateCompatibleBitmap(gdiDC, stringSize.cx, stringSize.cy);
+            SelectObject(gdiDC, gdiBMP);
+            TextOutA(gdiDC, 0, 0, overlayString.c_str(), overlayString.length());
+            
+            std::shared_ptr<LunaImage> img = LunaImage::fromHDC(gdiDC);
+
+            DeleteObject(gdiBMP);
+            DeleteDC(gdiDC);
+
+            const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(img);
+            double winW = static_cast<double>(windowWidth);
+            double winH = static_cast<double>(windowHeight);
+            double strW = static_cast<double>(stringSize.cx);
+            double strH = static_cast<double>(stringSize.cy);
+            double offX = round((winW - strW*2)*0.5);
+            double offY = round((winH - strH*2)*0.5);
+            sprite->Draw({ offX, offY, offX+strW*2, offY+strH*2 }, { 0, 0, strW, strH }, 0.75, GLDraw::RENDER_MODE_ALPHA);
+
+            g_GLTextureStore.ClearLunaImageTexture(img->getUID());
         }
 
         // Display Frame
@@ -253,9 +225,6 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GLERRORCHECK();
     }
-
-    // Bind framebuffer
-    g_GLContextManager.BindAndClearFramebuffer();
 }
 
 bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
@@ -292,6 +261,20 @@ bool GLEngine::GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h
         return false;
     }
 
+    // Flip pixels
+    int wBytes = 3 * static_cast<int>(w);
+    for (int y = 0; y < static_cast<int>(h) / 2; y++)
+    {
+        int y2 = h - 1 - y;
+        BYTE* row1 = &pPixelData[y * w * 3];
+        BYTE* row2 = &pPixelData[y2 * w * 3];
+        for (int i = 0; i < wBytes; i++)
+        {
+            BYTE tmp = row1[i];
+            row1[i] = row2[i];
+            row2[i] = tmp;
+        }
+    }
 
     bool releaseMem = true;
     if (mScreenshotCallback) {
@@ -350,16 +333,6 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
     if (glGetError() != GL_NO_ERROR) {
         delete pixData;
         return;
-    }
-
-    // Flip pixels
-    BYTE* tmpRow = &pixData[w * h * 4];
-    for (int y = 0; y < static_cast<int>(h) / 2; y++)
-    {
-        int y2 = h - 1 - y;
-        memcpy(tmpRow, &pixData[y2 * w * 4], w*4);
-        memcpy(&pixData[y2 * w * 4], &pixData[y * w * 4], w * 4);
-        memcpy(&pixData[y * w * 4], tmpRow, w * 4);
     }
 
     mGifRecorder.addNextFrameToProcess(w, h, pixData, timestamp);

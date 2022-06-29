@@ -64,11 +64,13 @@ public:
     DWORD mRop;
     virtual void run(GLEngine& glEngine) const;
 };
-class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd, public GLBitmapRenderCoords {
+class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd {
 public:
-    HDC mHdcDest;
-    HDC mHdcSrc;
-    DWORD mRop;
+    int mCamIdx;
+    double mRenderX;
+    double mRenderY;
+    double mHeight;
+    double mWidth;
     virtual void run(GLEngine& glEngine) const;
 };
 class GLEngineCmd_EndFrame : public GLEngineCmd {
@@ -76,11 +78,13 @@ public:
     HDC mHdcDest;
     bool mIsFirstFrame;
     bool mForceSkip;
+    bool mRedrawOnly;
+    bool mResizeOverlay;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
-    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame; }
-    virtual bool isSkippable(void) const { return !mIsFirstFrame; }
-    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame; }
+    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool isSkippable(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame || mRedrawOnly; }
 };
 class GLEngineCmd_InitForHDC : public GLEngineCmd {
 public:
@@ -192,6 +196,7 @@ public:
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {
 public:
+    int mIdx;
     double mX, mY;
     virtual void run(GLEngine& glEngine) const;
 };

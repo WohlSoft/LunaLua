@@ -100,6 +100,8 @@ GLFramebuffer::~GLFramebuffer()
 
 void GLFramebuffer::Bind()
 {
+    if (g_GLContextManager.GetCurrentFB() == this) return;
+
     glBindFramebufferANY(GL_FRAMEBUFFER_EXT, mFB);
     GLERRORCHECK();
 

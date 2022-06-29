@@ -174,22 +174,23 @@ static void LoadThread(void)
     do {
         updateFinishedFlag(L);
         
+        Renderer::Get().StartFrameRender();
+        Renderer::Get().StartCameraRender(1);
+
+        // Set camera 0 (primary framebuffer)
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = 0;
+        cmd->mX = 0;
+        cmd->mY = 0;
+        g_GLEngine.QueueCmd(cmd);
+
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
         {
             MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
         }
 
-        Renderer::Get().StartFrameRender();
-
         Renderer::Get().RenderBelowPriority(DBL_MAX);
-
-        // Get window size
-        const auto winState = gWindowSizeHandler.getStateThreadSafe();
-        const int32_t& windowWidth = winState.windowSize.x;
-        const int32_t& windowHeight = winState.windowSize.y;
-
-        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), 0);
 
         g_GLEngine.EndFrame(NULL, true);
 

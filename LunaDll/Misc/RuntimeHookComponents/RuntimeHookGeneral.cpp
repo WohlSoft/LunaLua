@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <windowsx.h>
+#include <dwmapi.h>
 #include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
@@ -18,6 +19,7 @@
 #include "../../Rendering/GL/GLEngineProxy.h"
 #include "../../Rendering/GL/GLContextManager.h"
 #include "../../Rendering/WindowSizeHandler.h"
+#include "../../Input/MouseHandler.h"
 
 #include "../NpcIdExtender.h"
 
@@ -55,23 +57,78 @@ void SetupThunRTMainHook()
 }
 
 // Function to get the size of padding/frame around a window
-static void getWindowFramePadding(HWND hwnd, int &wPadOut, int &hPadOut)
+struct FramePaddingInfo
+{
+    // Padding on each side
+    int lPad;
+    int rPad;
+    int tPad;
+    int bPad;
+
+    // How much of the padding is from WM_SIZBOX?
+    int lPadSz;
+    int rPadSz;
+    int tPadSz;
+    int bPadSz;
+};
+static FramePaddingInfo getWindowFramePadding(HWND hwnd)
 {
     // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
-    RECT rc;
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = 800;
-    rc.bottom = 600;
-    AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-        GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
-    wPadOut = rc.right - rc.left - 800;
-    hPadOut = rc.bottom - rc.top - 600;
+    FramePaddingInfo out;
+    {
+        RECT rc;
+        rc.left = 0;
+        rc.top = 0;
+        rc.right = 800;
+        rc.bottom = 600;
+        AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+            GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        out.lPad = -rc.left;
+        out.rPad = rc.right - 800;
+        out.tPad = -rc.top;
+        out.bPad = rc.bottom - 600;
+    }
+
+    // Get excess border
+    {
+        out.lPadSz = 0;
+        out.rPadSz = 0;
+        out.tPadSz = 0;
+        out.bPadSz = 0;
+        if (gIsWindowsVistaOrNewer)
+        {
+            static HMODULE dwmModule = LoadLibraryA("Dwmapi.dll");
+            if (dwmModule != nullptr)
+            {
+                typedef HRESULT __stdcall dwm_call_t(HWND, DWORD, PVOID, DWORD);
+                static dwm_call_t* dwmGetWindowsAttribute = reinterpret_cast<dwm_call_t*>(GetProcAddress(dwmModule, "DwmGetWindowAttribute"));
+                if (dwmGetWindowsAttribute != nullptr)
+                {
+                    RECT rc1, rc2;
+                    GetWindowRect(hwnd, &rc1);
+                    if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
+                    {
+                        out.lPadSz = rc2.left - rc1.left;
+                        out.rPadSz = rc1.right - rc2.right;
+                        out.tPadSz = rc2.top - rc1.top;
+                        out.bPadSz = rc1.bottom - rc2.bottom;
+                    }
+                }
+            }
+        }
+    }
+
+    return std::move(out);
 }
 
 // Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
-static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wPad, int hPad, double nominalW, double nominalH)
+static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH)
 {
+    // Get padding overhead
+    FramePaddingInfo pad = getWindowFramePadding(hwnd);
+    int wPad = pad.lPad + pad.rPad;
+    int hPad = pad.tPad + pad.bPad;
+
     int w = lpRect->right - lpRect->left - wPad;
     int h = lpRect->bottom - lpRect->top - hPad;
     double relS;
@@ -110,8 +167,8 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
     }
 
     // New Size
-    w = (int)floor(relS * nominalW + 0.5) + wPad;
-    h = (int)floor(relS * nominalH + 0.5) + hPad;
+    w = (int)round(relS * nominalW);
+    h = (int)round(relS * nominalH);
 
     // Fine tune size
     switch (dragCorner)
@@ -120,17 +177,21 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_BOTTOM:
             // Force even width for centering
             w -= w % 2;
-            relS = (w - wPad) / nominalW;
-            h = (int)floor(relS * nominalH + 0.5) + hPad;
+            relS = w / nominalW;
+            h = (int)round(relS * nominalH);
             break;
         case WMSZ_LEFT:
         case WMSZ_RIGHT:
             // Force even height for centering
             h -= h % 2;
-            relS = (h - hPad) / nominalH;
-            w = (int)floor(relS * nominalW + 0.5) + wPad;
+            relS = h / nominalH;
+            w = (int)round(relS * nominalW);
             break;
     }
+
+    // Add padding
+    w += wPad;
+    h += hPad;
 
     // Adjust left/right
     switch (dragCorner)
@@ -155,8 +216,38 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_BOTTOM:
         {
             // Dragging top/bottom, leave keep centered
-            lpRect->left = (lpRect->right + lpRect->left - w) / 2;
+            lpRect->left = ((lpRect->right - pad.rPad) + (lpRect->left + pad.lPad) - (w - wPad)) / 2 - pad.lPad;
             lpRect->right = lpRect->left + w;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left   -= pad.lPadSz;
+            workRect.right  += pad.rPadSz;
+            workRect.top    -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorW = (workRect.right - workRect.left);
+            if (w > monitorW)
+            {
+                w = monitorW;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.left > lpRect->left)
+            {
+                lpRect->left = workRect.left;
+                lpRect->right = lpRect->left + w;
+            }
+            else if (workRect.right < lpRect->right)
+            {
+                lpRect->right = workRect.right;
+                lpRect->left = lpRect->right - w;
+            }
+
             break;
         }
     }
@@ -184,8 +275,38 @@ static void CalculateWindowSizeAdjusted(LPRECT lpRect, WPARAM dragCorner, int wP
         case WMSZ_RIGHT:
         {
             // Dragging top/bottom, leave keep centered
-            lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
+            lpRect->top = ((lpRect->top + pad.tPad) + (lpRect->bottom - pad.bPad) - (h - hPad)) / 2 - pad.tPad;
             lpRect->bottom = lpRect->top + h;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left -= pad.lPadSz;
+            workRect.right += pad.rPadSz;
+            workRect.top -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorH = (workRect.bottom - workRect.top);
+            if (h > monitorH)
+            {
+                h = monitorH;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.top > lpRect->top)
+            {
+                lpRect->top = workRect.top;
+                lpRect->bottom = lpRect->top + h;
+            }
+            else if (workRect.bottom < lpRect->bottom)
+            {
+                lpRect->bottom = workRect.bottom;
+                lpRect->top = lpRect->bottom - h;
+            }
+
             break;
         }
     }
@@ -461,10 +582,20 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static bool inSizeMoveModal = false;
+    static bool inSizeModal = false;
+
     if (hwnd == gMainWindowHwnd)
     {
         switch (uMsg)
         {
+            case WM_ENTERSIZEMOVE:
+                inSizeMoveModal = true;
+                break;
+            case WM_EXITSIZEMOVE:
+                inSizeMoveModal = false;
+                inSizeModal = false;
+                break;
             case WM_SETTEXT:
             {
                 // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
@@ -520,11 +651,25 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                         latestLParam & 0xFFFF,
                         (latestLParam >> 16) & 0xFFFF
                     );
+
+                    // Redraw
+                    if (inSizeMoveModal)
+                    {
+                        inSizeModal = true;
+                        g_GLEngine.EndFrame(nullptr, false, true, true);
+                    }
                 }
 
                 // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
+            case WM_PAINT:
+                CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
+                if (inSizeMoveModal)
+                {
+                    g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
+                }
+                return 0;
             case WM_GETMINMAXINFO:
             {
                 // Set the minimum window size for resizing to 50% of framebuffer size
@@ -551,13 +696,9 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     break;
                 }
 
-                // Get padding overhead
-                int wPad, hPad;
-                getWindowFramePadding(hwnd, wPad/*out*/, hPad/*out*/);
-
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(lpRect, wParam, wPad, hPad, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
+                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
 
                 return TRUE;
             }
@@ -601,6 +742,23 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     });
                 }
                 return FALSE;
+            case WM_SETCURSOR:
+                if (LOWORD(lParam) == HTCLIENT)
+                {
+                    HCURSOR activeCursor = gCustomCursor;
+                    if (gCustomCursorHide)
+                    {
+                        activeCursor = nullptr;
+                    }
+                    else if (activeCursor == nullptr)
+                    {
+                        static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+                        activeCursor = defaultCursor;
+                    }
+                    SetCursor(activeCursor);
+                    return TRUE;
+                }
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);
@@ -615,6 +773,56 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 }
                 return 0;
             }
+            case WM_MOUSEMOVE:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                break;
+            case WM_MOUSELEAVE:
+                gMouseHandler.OnMouseLeave();
+                break;
+            case WM_LBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DOWN);
+                break;
+            case WM_LBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_UP);
+                break;
+            case WM_LBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DBL);
+                break;
+            case WM_RBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DOWN);
+                break;
+            case WM_RBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_UP);
+                break;
+            case WM_RBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DBL);
+                break;
+            case WM_MBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DOWN);
+                break;
+            case WM_MBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_UP);
+                break;
+            case WM_MBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DBL);
+                break;
+            case WM_MOUSEWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_V, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
+            case WM_MOUSEHWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_H, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
         }
     }
 
@@ -1029,52 +1237,53 @@ void TrySkipPatch()
     PATCH(0x902EBB).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902F80).CALL(&WorldOverlayHUDBitBltHook).Apply();
 
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9030F2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+
 
 
     PATCH(0x9000B2).CALL(&WorldHUDIsOnCameraHook).Apply();
@@ -1614,7 +1823,11 @@ void TrySkipPatch()
     PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
+    // Also handles collisionGroup for NPC-to-solid interactions now
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
+
+    // Patch to handle collisionGroup for NPC-to-NPC interactions
+    PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Replace pause button detection code to avoid re-triggering when held
     PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();

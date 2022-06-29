@@ -55,6 +55,10 @@ HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
+// Mouse cursor
+HCURSOR  gCustomCursor = nullptr;
+bool     gCustomCursorHide = false;
+
 LvlEnum gLevelEnum;
 
 // First two array entries are players 1+2

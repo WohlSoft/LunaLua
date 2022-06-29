@@ -30,6 +30,12 @@ static BOOL __stdcall PlayerBitBltHook(
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     );
 
+static BOOL __stdcall OwPlayerBitBltHook(
+    PlayerMOB* player,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+    );
+
 static BOOL __stdcall OwSpriteBitBltHook(
     HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
@@ -1369,29 +1375,29 @@ static auto patch_player_bitblt_0x945B10 = PATCH(0x945B10).CALL(PlayerBitBltRawH
 static auto patch_player_bitblt_0x945D4D = PATCH(0x945D4D).CALL(PlayerBitBltRawHook_Editor);
 static auto patch_player_bitblt_0x945F30 = PATCH(0x945F30).CALL(PlayerBitBltRawHook_Editor);
 
-__declspec(naked) static BOOL  __stdcall PlayerOwBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+__declspec(naked) static BOOL  __stdcall OwPlayerBitBltRawHook(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
     __asm {
         pop eax
         push esi // Attach player argument
         push eax
-        jmp PlayerBitBltHook
+        jmp OwPlayerBitBltHook
     }
 }
-static auto patch_player_bitblt_0x9034E7 = PATCH(0x9034E7).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x9036BC = PATCH(0x9036BC).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x903D66 = PATCH(0x903D66).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x90411B = PATCH(0x90411B).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x9042F0 = PATCH(0x9042F0).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x90499A = PATCH(0x90499A).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x904D4F = PATCH(0x904D4F).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x904F24 = PATCH(0x904F24).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x9055CE = PATCH(0x9055CE).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x905990 = PATCH(0x905990).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x905D29 = PATCH(0x905D29).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x905F00 = PATCH(0x905F00).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x9065DE = PATCH(0x9065DE).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x906973 = PATCH(0x906973).CALL(PlayerOwBitBltRawHook);
-static auto patch_player_bitblt_0x906B31 = PATCH(0x906B31).CALL(PlayerOwBitBltRawHook);
+static auto patch_player_bitblt_0x9034E7 = PATCH(0x9034E7).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x9036BC = PATCH(0x9036BC).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x903D66 = PATCH(0x903D66).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x90411B = PATCH(0x90411B).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x9042F0 = PATCH(0x9042F0).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x90499A = PATCH(0x90499A).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x904D4F = PATCH(0x904D4F).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x904F24 = PATCH(0x904F24).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x9055CE = PATCH(0x9055CE).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x905990 = PATCH(0x905990).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x905D29 = PATCH(0x905D29).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x905F00 = PATCH(0x905F00).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x9065DE = PATCH(0x9065DE).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x906973 = PATCH(0x906973).CALL(OwPlayerBitBltRawHook);
+static auto patch_player_bitblt_0x906B31 = PATCH(0x906B31).CALL(OwPlayerBitBltRawHook);
 
 // Patch overworld sprite rendering
 static auto patch_owsprite_bitblt_0x902BA4 = PATCH(0x902BA4).CALL(OwSpriteBitBltHook);
@@ -2331,6 +2337,19 @@ static BOOL __stdcall PlayerBitBltHook(
 
     return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight,
         hdcSrc, nXSrc, nYSrc, dwRop);
+}
+
+
+static BOOL __stdcall OwPlayerBitBltHook(
+    PlayerMOB* player,
+    HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight,
+    HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
+)
+{
+    if (gSMBXHUDSettings.overworldHudState == WHUD_NONE || gSMBXHUDSettings.overworldHudState == WHUD_ONLY_OVERLAY)
+        return -1;
+
+    return PlayerBitBltHook(player, hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
 static BOOL __stdcall OwSpriteBitBltHook(
