@@ -97,22 +97,17 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
         out.bPadSz = 0;
         if (Luna_IsWindowsVistaOrNewer())
         {
-            static HMODULE dwmModule = LoadLibraryA("Dwmapi.dll");
-            if (dwmModule != nullptr)
+            static auto dwmGetWindowsAttribute = Luna_GetProc<HRESULT (__stdcall *)(HWND, DWORD, PVOID, DWORD)>("Dwmapi.dll", "DwmGetWindowAttribute");
+            if (dwmGetWindowsAttribute != nullptr)
             {
-                typedef HRESULT __stdcall dwm_call_t(HWND, DWORD, PVOID, DWORD);
-                static dwm_call_t* dwmGetWindowsAttribute = reinterpret_cast<dwm_call_t*>(GetProcAddress(dwmModule, "DwmGetWindowAttribute"));
-                if (dwmGetWindowsAttribute != nullptr)
+                RECT rc1, rc2;
+                GetWindowRect(hwnd, &rc1);
+                if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
                 {
-                    RECT rc1, rc2;
-                    GetWindowRect(hwnd, &rc1);
-                    if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
-                    {
-                        out.lPadSz = rc2.left - rc1.left;
-                        out.rPadSz = rc1.right - rc2.right;
-                        out.tPadSz = rc2.top - rc1.top;
-                        out.bPadSz = rc1.bottom - rc2.bottom;
-                    }
+                    out.lPadSz = rc2.left - rc1.left;
+                    out.rPadSz = rc1.right - rc2.right;
+                    out.tPadSz = rc2.top - rc1.top;
+                    out.bPadSz = rc1.bottom - rc2.bottom;
                 }
             }
         }
@@ -584,6 +579,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 {
     static bool inSizeMoveModal = false;
     static bool inSizeModal = false;
+    static bool gotFirstSize = false;
 
     if (hwnd == gMainWindowHwnd)
     {
@@ -601,8 +597,24 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
+            case WM_SHOWWINDOW:
+            {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
+            }
             case WM_SIZE:
             {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
+
                 // Store size of main window (low word is width, high word is height)
                 static LPARAM latestLParam;
                 latestLParam = lParam;

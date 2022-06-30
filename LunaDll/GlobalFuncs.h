@@ -87,6 +87,20 @@ inline bool Luna_IsWindowsWin8OrNewer()
     return ret;
 }
 
+// Helper function to load functions from DLLs
+// NOTE: Calling this increments the module reference counter each time and isn't so fast
+//       so the result should be cached.
+//       Static variables are potentially a good enough way to cache this result.
+// NOTE: The template argument allows you to avoid reinterpret_cast boilerplate and storing
+//       this in an 'auto' variable.
+FARPROC Luna_GetProc_impl(const char* libFilename, const char* procName);
+template <typename T>
+T Luna_GetProc(const char* libFilename, const char* procName)
+{
+    return reinterpret_cast<T>(Luna_GetProc_impl(libFilename, procName));
+}
+
+
 /// HELPER FUNCTIONS ///
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);

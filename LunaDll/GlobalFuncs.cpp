@@ -399,6 +399,14 @@ bool IsWindowsVersionOrNewer(DWORD major, DWORD minor)
         conditionMask);
 }
 
+FARPROC Luna_GetProc_impl(const char* libFilename, const char* procName)
+{
+    HMODULE mod = LoadLibraryA(libFilename);
+    if (mod == nullptr) return nullptr;
+
+    return GetProcAddress(mod, procName);
+}
+
 /*!
  * \brief Initializes game root folder variables
  */
@@ -569,29 +577,6 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
     }
     return false;
 }
-
-//HMODULE getModule(std::string moduleName)
-//{
-//    HMODULE ret = 0;
-//    if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
-//        ret = LoadLibraryA(moduleName.c_str());
-//    }
-//    return ret;
-//}
-
-//std::wstring getModulePath()
-//{
-//    HMODULE hModule = GetModuleHandleW(NULL);
-//    WCHAR path[MAX_PATH];
-//    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-//    for(int i = count; i > 3; i--) {
-//        if(path[i] == L'\\') {
-//            path[i] = 0;
-//            break;
-//        }
-//    }
-//    return std::wstring(path);
-//}
 
 // Function to normalize a path, in such a way that all slashes become forward
 // slashes, duplicate consecutive slashes are removed, and trailing slashes are
