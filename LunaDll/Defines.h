@@ -181,9 +181,15 @@ enum CollidersType : short {
 #define GM_PLAYER_KEY_SEL   8
 #define GM_PLAYER_KEY_STR   9
 
+#if defined(_MSC_VER ) && !defined(__clang__)
+#define constexpr_fold(x) (x)
+#else
+#define constexpr_fold(x) (__builtin_constant_p(x) ? (x) : (x))
+#endif
 #define DEFMEM(name, type, addr) static auto& name = *(type*)(addr); \
-    static constexpr auto name ## _CONSTPTR = (type*)(addr)
-#define DEFMEM_PTR(name, type, addr) static constexpr auto name = (const type*)(addr)
+    static const auto name ## _CONSTPTR = constexpr_fold((type*)(addr)); \
+    static constexpr uintptr_t name ## _ADDR = (static_cast<uintptr_t>(addr))
+#define DEFMEM_PTR(name, type, addr) static const auto name = constexpr_fold((type*)(addr))
 
 // General
 DEFMEM(GM_SCRN_HDC,         HDC,   0x00B25028);

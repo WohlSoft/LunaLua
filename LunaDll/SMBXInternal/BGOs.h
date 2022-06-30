@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct SMBX_BGO : SMBX_FullBaseItemArray<SMBX_BGO, 1000, GM_BGO_COUNT_CONSTPTR, GM_BGOS_PTR_CONSTPTR> {				// Length should be 0x38
+struct SMBX_BGO : SMBX_FullBaseItemArray<SMBX_BGO, 1000, GM_BGO_COUNT_ADDR, GM_BGOS_PTR_ADDR> {				// Length should be 0x38
     VB6StrPtr	ptLayerName;	// +0x00
     short		isHidden;		// +0x04
     short		id;				// +0x06
@@ -16,7 +16,7 @@ struct SMBX_BGO : SMBX_FullBaseItemArray<SMBX_BGO, 1000, GM_BGO_COUNT_CONSTPTR, 
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBX_BGO) == 0x38, "sizeof(SMBX_BGO) must be 0x38");
 #endif
 

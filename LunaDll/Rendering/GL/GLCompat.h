@@ -1,7 +1,7 @@
 ﻿#ifndef GLCompat_hhhh
 #define GLCompat_hhhh
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "../../Defines.h"
 #include <sstream>
 #include <ios>

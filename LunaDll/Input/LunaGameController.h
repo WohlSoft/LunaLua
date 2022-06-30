@@ -147,7 +147,7 @@ private:
 public:
     unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
     void notifyKeyboardPress(int keycode);
-    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
+    void sendSelectedController(const std::string& name, int playerNum);
 #endif // !define(BUILDING_SMBXLAUNCHER)
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);

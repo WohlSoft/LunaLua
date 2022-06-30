@@ -583,6 +583,8 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::NPC, NPC);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Block, Block);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Audio::PlayingSfxInstance, PlayingSfxInstance);
 
+template <typename... T>
+using joined = typename luabind::meta::join<T...>::type;
 
 // LUAHELPER_DEF_CLASS(LuaImageResource)
 
@@ -592,9 +594,6 @@ void CLunaLua::bindAll()
     //Bind stuff for world and level
     module(L)
         [
-            def("mem", (void(*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)) &LuaProxy::mem),
-            def("mem", (luabind::object(*)(int, LuaProxy::L_FIELDTYPE, lua_State*)) &LuaProxy::mem),
-
             namespace_("Native")[
                 def("getSMBXPath", &LuaProxy::Native::getSMBXPath),
                 def("getEpisodePath", &LuaProxy::Native::getEpisodePath),
@@ -622,7 +621,7 @@ void CLunaLua::bindAll()
                     .def("captureAt", &CaptureBuffer::CaptureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (std::shared_ptr<LunaImage>(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage),
-                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
+                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, joined<pure_out_value<2>>()),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
@@ -631,7 +630,7 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::placeSprite),
                 def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img))&LuaProxy::Graphics::unplaceSprites),
                 def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::unplaceSprites),
-                def("getPixelData", &LuaProxy::Graphics::getPixelData, pure_out_value(_2) + pure_out_value(_3)),
+                def("getPixelData", &LuaProxy::Graphics::getPixelData, joined<pure_out_value<2>, pure_out_value<3>>()),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImage),

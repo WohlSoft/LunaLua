@@ -6,7 +6,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 100, GM_LEVEL_COUNT_CONSTPTR, GM_LEVEL_BASE_CONSTPTR>
+struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 100, GM_LEVEL_COUNT_ADDR, GM_LEVEL_BASE_ADDR>
 {
     Momentum momentum;
     short id;
@@ -31,7 +31,7 @@ struct WorldLevel : SMBX_FullBaseItemArray<WorldLevel, 100, GM_LEVEL_COUNT_CONST
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(WorldLevel) == 0x64, "sizeof(WorldLevel) must be 0x64");
 #endif
 

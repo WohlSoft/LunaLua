@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecord, -1, GM_STAR_COUNT_CONSTPTR, GM_STARS_PTR_CONSTPTR>
+struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecord, -1, GM_STAR_COUNT_ADDR, GM_STARS_PTR_ADDR>
 {
     VB6StrPtr levelFileName; //0x00
     short     section;       //0x04
@@ -16,7 +16,7 @@ struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecor
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBX_CollectedStarRecord) == 0x08, "sizeof(SMBX_CollectedStarRecord) must be 0x08");
 #endif
 

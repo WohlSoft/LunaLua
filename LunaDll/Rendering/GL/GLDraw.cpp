@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "../../Defines.h"
 #include "GLDraw.h"
 #include "GLCompat.h"

@@ -7,7 +7,7 @@
 struct PlayerMOB;
 
 #pragma pack(push, 4)
-struct Block : SMBX_FullBaseItemArray<Block, 2000, GM_BLOCK_COUNT_CONSTPTR, GM_BLOCKS_PTR_CONSTPTR> {
+struct Block : SMBX_FullBaseItemArray<Block, 2000, GM_BLOCK_COUNT_ADDR, GM_BLOCKS_PTR_ADDR> {
 
     short               Slippery;                           // 0x00 0xFFFF = yes
     short               Unknown02;                          // 0x02
@@ -46,7 +46,7 @@ struct Block : SMBX_FullBaseItemArray<Block, 2000, GM_BLOCK_COUNT_CONSTPTR, GM_B
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(Block) == 0x68, "sizeof(Block) must be 0x68");
 #endif
 

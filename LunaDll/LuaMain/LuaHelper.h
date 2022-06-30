@@ -80,6 +80,7 @@ namespace LuaHelper {
 
 // Original Posting: http://stackoverflow.com/questions/15037955/luabind-cant-return-shared-ptr
 // We need to add this, in order to use std::shared_ptr
+/*
 #include <boost/version.hpp>
 #if BOOST_VERSION >= 105300
 #include <boost/get_pointer.hpp>
@@ -105,7 +106,7 @@ namespace std {
 #endif
 } // namespace std
 #endif // if BOOST_VERSION < 105300
-
+*/
 
 
 

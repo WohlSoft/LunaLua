@@ -56,7 +56,7 @@ public:
 };
 #pragma pack(pop)
 
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBX_CameraInfo) == 0x38, "sizeof(SMBX_CameraInfo) must be 0x38");
 #endif
 

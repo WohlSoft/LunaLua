@@ -5,7 +5,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBXTile : SMBX_FullBaseItemArray<SMBXTile, 400, GM_TILE_COUNT_CONSTPTR, GM_TILE_PTR_CONSTPTR>
+struct SMBXTile : SMBX_FullBaseItemArray<SMBXTile, 400, GM_TILE_COUNT_ADDR, GM_TILE_PTR_ADDR>
 {
     Momentum momentum;
     short id;
@@ -14,7 +14,7 @@ struct SMBXTile : SMBX_FullBaseItemArray<SMBXTile, 400, GM_TILE_COUNT_CONSTPTR, 
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBXTile) == 0x34, "sizeof(SMBXTile) must be 0x34");
 #endif
 

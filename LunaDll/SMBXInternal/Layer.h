@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 255, GM_LAYER_ARRAY_PTR_CONSTPTR> {
+struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 255, GM_LAYER_ARRAY_PTR_ADDR> {
     short       IsStopped;		// 0x00 0xFFFF when moving, event ended?
     short       Unknown1;       // 0x02
     VB6StrPtr	ptLayerName;	// 0x04 ptr to double zero terminated 2byte wide char string
@@ -20,7 +20,7 @@ struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 255, GM_LAYER_ARRAY
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(LayerControl) == 0x14, "sizeof(LayerControl) must be 0x14");
 #endif
 

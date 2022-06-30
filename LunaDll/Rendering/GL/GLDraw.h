@@ -2,7 +2,7 @@
 #define GLDraw_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <cstdint>
 #include "GLCompat.h"
 #include "../../Misc/SRect.h"

@@ -178,12 +178,17 @@ void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &
     case LFT_FLOAT:
     case LFT_DFLOAT:
     {
-        boost::optional<double> opt_obj = luabind::object_cast_nothrow<double>(value);
-        if (opt_obj == boost::none) {
+        double obj;
+        try
+        {
+            obj = luabind::object_cast<double>(value);
+        }
+        catch(...)
+        {
             luaL_error(L, "Cannot interpret field as number");
             break;
         }
-        MemAssign((int)ptr, *opt_obj, OP_Assign, (FIELDTYPE)ftype);
+        MemAssign((int)ptr, obj, OP_Assign, (FIELDTYPE)ftype);
         break;
     }
     case LFT_STRING:
@@ -193,13 +198,18 @@ void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &
     }
     case LFT_BOOL:
     {
-        boost::optional<bool> opt_obj = luabind::object_cast_nothrow<bool>(value);
-        if (opt_obj == boost::none) {
+        bool obj;
+        try
+        {
+            obj = luabind::object_cast<bool>(value);
+        }
+        catch(...)
+        {
             luaL_error(L, "Cannot interpret field as boolean");
             break;
         }
         void* ptr = ((&(*(byte*)mem)));
-        *((short*)ptr) = COMBOOL(*opt_obj);
+        *((short*)ptr) = COMBOOL(obj);
         break;
     }
     default:

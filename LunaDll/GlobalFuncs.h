@@ -123,7 +123,7 @@ T normalizeToBackslashAndResolvePath(const T& path)
         // End of string
         if (idx >= len) break;
 
-        T::value_type c = path[idx];
+        typename T::value_type c = path[idx];
         if (c == '/')
         {
             c = '\\';
@@ -211,7 +211,6 @@ public:
     // Other string-like operators
     const typename T::value_type* c_str() const { return mData.c_str(); }
     const T& str() const { return mData; }
-    const T& str_lower() const { return mDataLower; }
 };
 
 // Time Helper Funcs

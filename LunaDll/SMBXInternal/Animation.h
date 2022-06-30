@@ -158,7 +158,7 @@ enum EffectID : short
 
 
 #pragma pack(push, 4)
-struct SMBXAnimation : SMBX_FullBaseItemArray<SMBXAnimation, 200, GM_ANIM_COUNT_CONSTPTR, GM_ANIM_PTR_CONSTPTR> {
+struct SMBXAnimation : SMBX_FullBaseItemArray<SMBXAnimation, 200, GM_ANIM_COUNT_ADDR, GM_ANIM_PTR_ADDR> {
     EffectID AnimationID;
     short unknown02;
     Momentum momentum;
@@ -173,7 +173,7 @@ struct SMBXAnimation : SMBX_FullBaseItemArray<SMBXAnimation, 200, GM_ANIM_COUNT_
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBXAnimation) == 0x44, "sizeof(SMBXAnimation) must be 0x44");
 #endif
 

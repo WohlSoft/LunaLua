@@ -27,7 +27,7 @@ enum SMBX_WarpType : short {
 };
 
 #pragma pack(push, 1)
-struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_CONSTPTR, GM_WARPS_PTR_CONSTPTR>
+struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_ADDR, GM_WARPS_PTR_ADDR>
 {
     short isLocked;                         //0x00
     short allowCarryNPC;                    //0x02
@@ -57,7 +57,7 @@ struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_CONSTPTR,
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBX_Warp) == 0x90, "sizeof(SMBX_Warp) must be 0x90");
 #endif
 

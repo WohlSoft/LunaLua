@@ -377,7 +377,7 @@ struct PlayerMOB {
 
 /* Verify struct is correctly sized, and also verify that a sampling of fields
  * that errors in would indicate a problem */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(&((PlayerMOB*)0x0)->ItemPullupTimer == (void*)0x26, "ItemPullupTimer must be at at 0x26");
 static_assert(&((PlayerMOB*)0x0)->HasJumped == (void*)0x60, "HasJumped must be at at 0x60");
 static_assert(&((PlayerMOB*)0x0)->momentum.x == (void*)0xC0, "momentum.x must be at at 0xC0");

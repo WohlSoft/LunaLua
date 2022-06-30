@@ -18,14 +18,17 @@ bool LuaHelper::is_function(lua_State *luaState, const char *fname)
 void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L)
 {
     // Copy from native Lua string
-    boost::optional<std::string const> opt_str = luabind::object_cast_nothrow<std::string const>(value);
-    if (opt_str != boost::none)
+    std::string str;
+    try
     {
-        *ptr = *opt_str;
+        str = luabind::object_cast<std::string const>(value);
+    }
+    catch (...)
+    {
+        luaL_error(L, "Cannot cast to string");
         return;
     }
-
-    luaL_error(L, "Cannot cast to string");
+    *ptr = str;
 }
 
 bool* LuaHelper::generateFilterTable(lua_State* L, luabind::object theFilter, int maxVal, int minVal /*= 1*/)

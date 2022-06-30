@@ -5,7 +5,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBXScenery : SMBX_FullBaseItemArray<SMBXScenery, 100, GM_SCENERY_COUNT_CONSTPTR, GM_SCENERY_PTR_CONSTPTR>
+struct SMBXScenery : SMBX_FullBaseItemArray<SMBXScenery, 100, GM_SCENERY_COUNT_ADDR, GM_SCENERY_PTR_ADDR>
 {
     Momentum momentum;
     short id;
@@ -14,7 +14,7 @@ struct SMBXScenery : SMBX_FullBaseItemArray<SMBXScenery, 100, GM_SCENERY_COUNT_C
 #pragma pack(pop)
 
 /* Verify struct is correctly sized */
-#ifndef __INTELLISENSE__
+#if !defined(__INTELLISENSE__) && !defined(__clang__)
 static_assert(sizeof(SMBXScenery) == 0x34, "sizeof(SMBXScenery) must be 0x34");
 #endif
 
