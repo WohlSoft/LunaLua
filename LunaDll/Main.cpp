@@ -84,7 +84,7 @@ void LunaDLLInit()
     InitGlobals();
 
     // Be sure we don't get flagged as DPI unaware
-    if (gIsWindowsVistaOrNewer)
+    if (Luna_IsWindowsVistaOrNewer())
     {
         HMODULE user32Module = LoadLibraryA("User32.dll");
         if (user32Module != nullptr)

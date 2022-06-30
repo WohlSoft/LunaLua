@@ -1,5 +1,6 @@
 #include <string>
 #include "Globals.h"
+#include "GlobalFuncs.h"
 #include "EventStateMachine.h"
 #include "Misc/RuntimeHook.h"
 #include "Misc/TestMode.h"
@@ -46,7 +47,7 @@ void LunaDllWaitFrame(bool allowMaxFPS)
 
     if (allowMaxFPS)
     {
-        if (gIsWindowsVistaOrNewer) {
+        if (Luna_IsWindowsVistaOrNewer()) {
             FrameTimingMaxFPSHookQPC();
         }
         else {
@@ -55,7 +56,7 @@ void LunaDllWaitFrame(bool allowMaxFPS)
     }
     else
     {
-        if (gIsWindowsVistaOrNewer) {
+        if (Luna_IsWindowsVistaOrNewer()) {
             FrameTimingHookQPC();
         }
         else {

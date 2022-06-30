@@ -73,6 +73,20 @@ void InitGlobals();
 void ResetFreeGlob();
 void CleanUp();
 
+// Windows version checks
+bool IsWindowsVersionOrNewer(DWORD major, DWORD minor);
+
+inline bool Luna_IsWindowsVistaOrNewer()
+{
+    static bool ret = IsWindowsVersionOrNewer(6, 0);
+    return ret;
+}
+inline bool Luna_IsWindowsWin8OrNewer()
+{
+    static bool ret = IsWindowsVersionOrNewer(6, 2);
+    return ret;
+}
+
 /// HELPER FUNCTIONS ///
 std::vector<std::wstring> wsplit( std::wstring str, wchar_t delimiter);
 std::vector<std::string> split( std::string str, char delimiter);

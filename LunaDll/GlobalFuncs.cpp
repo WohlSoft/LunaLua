@@ -380,22 +380,19 @@ void ResetLunaModule()
     native_initDefVals();
 }
 
-static bool IsWindowsVistaOrNewer() {
-    OSVERSIONINFOEX osVersionInfo;
+bool IsWindowsVersionOrNewer(DWORD major, DWORD minor)
+{
+    OSVERSIONINFOEXA osVersionInfo;
     DWORDLONG conditionMask = 0;
 
-    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
-    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    osVersionInfo.dwMajorVersion = 6;
-    osVersionInfo.dwMinorVersion = 0;
-    osVersionInfo.wServicePackMajor = 0;
-    osVersionInfo.wServicePackMinor = 0;
+    memset(&osVersionInfo, 0, sizeof(osVersionInfo));
+    osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
+    osVersionInfo.dwMajorVersion = major;
+    osVersionInfo.dwMinorVersion = minor;
     VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
     VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
 
-    return VerifyVersionInfo(
+    return VerifyVersionInfoA(
         &osVersionInfo,
         VER_MAJORVERSION | VER_MINORVERSION |
         VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
@@ -465,8 +462,6 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
-
-    gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
     srand((int)time(NULL));
 

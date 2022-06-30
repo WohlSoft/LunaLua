@@ -95,7 +95,7 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
         out.rPadSz = 0;
         out.tPadSz = 0;
         out.bPadSz = 0;
-        if (gIsWindowsVistaOrNewer)
+        if (Luna_IsWindowsVistaOrNewer())
         {
             static HMODULE dwmModule = LoadLibraryA("Dwmapi.dll");
             if (dwmModule != nullptr)
@@ -1399,7 +1399,7 @@ void TrySkipPatch()
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;
-    if (gIsWindowsVistaOrNewer) {
+    if (Luna_IsWindowsVistaOrNewer()) {
         frameTimingHookPtr = (void*)&FrameTimingHookQPC;
         frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
     }

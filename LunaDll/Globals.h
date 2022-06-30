@@ -96,7 +96,6 @@ extern bool            gPrintErrorsToScreen;
 extern bool            gIsOverworld;
 extern bool            gHook_SkipTestMsgBox;
 extern bool            gAutostartRan;
-extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
