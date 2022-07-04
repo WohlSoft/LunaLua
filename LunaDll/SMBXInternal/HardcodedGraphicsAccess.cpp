@@ -1,4 +1,6 @@
 #include "HardcodedGraphicsAccess.h"
+#include "../Rendering/ImageLoader.h"
+#include "../Rendering/LunaImage.h"
 
 // Values for index and array-index: https://gist.github.com/KevinW1998/49417ab8b94712bee39c
 std::array<HardcodedGraphicsItem, 51> HardcodedGraphics =
@@ -104,11 +106,58 @@ bool HardcodedGraphicsItem::getHDC(int arrayIndex, HDC* colorHDC, HDC* maskHDC)
     }
 
     // 3.4 Now finally get the HDC
-    auto _IPictureBox_getHDC = (void(__stdcall *)(void*, HDC*)) *(void**)(*(int32_t*)pictureBox + 0xE0);
+    auto _IPictureBox_getHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)pictureBox + 0xE0);
     if(pictureBox != nullptr)
         _IPictureBox_getHDC(pictureBox, colorHDC);
     if (pictureBoxMask != nullptr && hasMask())
         _IPictureBox_getHDC(pictureBoxMask, maskHDC);
+
+    // 3.5 Patch ScaleWidth/ScaleHeight getters to get pixel size of the image we're using (fixes DPI awareness incompatibility, so long as we have our own images)
+    auto ptr_getScaleWidth = (HRESULT(__stdcall **)(void*, float*)) (void**)(*(uintptr_t*)pictureBox + 0x108);
+    auto ptr_getScaleHeight = (HRESULT(__stdcall **)(void*, float*)) (void**)(*(uintptr_t*)pictureBox + 0x110);
+    static auto orig_getScaleWidth = *ptr_getScaleWidth;
+    static auto orig_getScaleHeight = *ptr_getScaleHeight;
+
+    static auto new_getScaleWidth = [](void* pictureBox, float* out) -> HRESULT
+    {
+        auto getHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)pictureBox + 0xE0);
+        HDC hdc = nullptr;
+        getHDC(pictureBox, &hdc);
+        if (hdc != nullptr)
+        {
+            auto img = ImageLoader::GetByHDC(hdc);
+            if (img)
+            {
+                *out = static_cast<float>(img->getW());
+                return 0;
+            }
+        }
+
+        return orig_getScaleWidth(pictureBox, out);
+    };
+
+    static auto new_getScaleHeight = [](void* pictureBox, float* out) -> HRESULT
+    {
+        auto getHDC = (HRESULT(__stdcall *)(void*, HDC*)) *(void**)(*(uintptr_t*)pictureBox + 0xE0);
+        HDC hdc = nullptr;
+        getHDC(pictureBox, &hdc);
+        if (hdc != nullptr)
+        {
+            auto img = ImageLoader::GetByHDC(hdc);
+            if (img)
+            {
+                *out = static_cast<float>(img->getH());
+                return 0;
+            }
+        }
+
+        return orig_getScaleHeight(pictureBox, out);
+    };
+
+    // Overwrite method pointer
+    *ptr_getScaleWidth = new_getScaleWidth;
+    *ptr_getScaleHeight = new_getScaleHeight;
+
     return true;
 }
 
