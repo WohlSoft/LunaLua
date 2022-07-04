@@ -60,7 +60,8 @@ public:
     void Recalculate();
 
     // DPI Awareness functions
-    void SetInitialWindowSize();
+    // SetInitialWindowSize returns the DPI
+    int SetInitialWindowSize();
 };
 
 // Global instance

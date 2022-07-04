@@ -65,13 +65,13 @@ struct FramePaddingInfo
     int tPad;
     int bPad;
 
-    // How much of the padding is from WM_SIZBOX?
+    // How much of the padding is from WM_SIZEBOX?
     int lPadSz;
     int rPadSz;
     int tPadSz;
     int bPadSz;
 };
-static FramePaddingInfo getWindowFramePadding(HWND hwnd)
+static FramePaddingInfo getWindowFramePadding(HWND hwnd, int dpi)
 {
     // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
     FramePaddingInfo out;
@@ -81,8 +81,17 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
         rc.top = 0;
         rc.right = 800;
         rc.bottom = 600;
-        AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-            GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+        if (adjustWindowRectExForDpi)
+        {
+            adjustWindowRectExForDpi(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE), dpi);
+        }
+        else
+        {
+            AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        }
         out.lPad = -rc.left;
         out.rPad = rc.right - 800;
         out.tPad = -rc.top;
@@ -117,10 +126,10 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
 }
 
 // Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
-static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH)
+static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH, int dpi)
 {
     // Get padding overhead
-    FramePaddingInfo pad = getWindowFramePadding(hwnd);
+    FramePaddingInfo pad = getWindowFramePadding(hwnd, dpi);
     int wPad = pad.lPad + pad.rPad;
     int hPad = pad.tPad + pad.bPad;
 
@@ -576,12 +585,62 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
     }
 }
 
+static int UpdateWindowSizeForDPI(int currentDpi, int newDpi, SIZE* pSize)
+{
+    auto currentSize = gWindowSizeHandler.getWindowSize();
+
+    // Compute new desired window client size
+    int newW = (currentSize.x * newDpi) / currentDpi;
+    int newH = (currentSize.y * newDpi) / currentDpi;
+
+    // Get FB size
+    int fbW = g_GLContextManager.GetMainFBWidth();
+    int fbH = g_GLContextManager.GetMainFBHeight();
+
+    // If new desired size is near a multiple of half the framebuffer size, round to that.
+    double scaleW = static_cast<double>(newW) / fbW;
+    double scaleH = static_cast<double>(newH) / fbH;
+    double nearScaleW = round(scaleW * 2) * 0.5;
+    double nearScaleH = round(scaleH * 2) * 0.5;
+    double errW = abs(scaleW - nearScaleW);
+    double errH = abs(scaleW - nearScaleW);
+    if ((errW <= 0.05) && (errH <= 0.05))
+    {
+        newW = static_cast<int>(round(fbW * nearScaleW));
+        newH = static_cast<int>(round(fbH * nearScaleH));
+    }
+
+    // Get window size
+    RECT newRect;
+    newRect.left = 0;
+    newRect.top = 0;
+    newRect.right = newW;
+    newRect.bottom = newH;
+    static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+    if (adjustWindowRectExForDpi == nullptr) return 0;
+    adjustWindowRectExForDpi(&newRect, GetWindowLong(gMainWindowHwnd, GWL_STYLE),
+        GetMenu(gMainWindowHwnd) != 0, GetWindowLong(gMainWindowHwnd, GWL_EXSTYLE), newDpi);
+    int winW = newRect.right - newRect.left;
+    int winH = newRect.bottom - newRect.top;
+
+    if (pSize)
+    {
+        pSize->cx = winW;
+        pSize->cy = winH;
+    }
+
+    return newDpi;
+}
+
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool inSizeMoveModal = false;
     static bool inSizeModal = false;
     static bool gotFirstSize = false;
+    static bool dpiChangeComputed = false;
+    static bool isResizeFromDpiChange = false;
+    static int currentDpi = 0;
 
     if (hwnd == gMainWindowHwnd)
     {
@@ -599,12 +658,47 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
+            case 0x02E4: // WM_GETDPISCALEDSIZE
+            {
+                int newDpi = wParam;
+                SIZE* pSize = reinterpret_cast<SIZE*>(lParam);
+                currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, pSize);
+                dpiChangeComputed = true;
+                return TRUE;
+            }
+            case 0x02E0: // WM_DPICHANGED
+            {
+                int dpiX = HIWORD(wParam);
+                int dpiY = LOWORD(wParam);
+                int newDpi = (dpiX + dpiY) / 2;
+                RECT* suggestedRect = reinterpret_cast<RECT*>(lParam);
+
+                if (dpiChangeComputed)
+                {
+                    // Case where DPI change was computed by WM_GETDPISCALEDSIZE
+                    dpiChangeComputed = false;
+                }
+                else
+                {
+                    // Case where WM_GETDPISCALEDSIZE was not called
+                    SIZE sz;
+                    currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, &sz);
+                    suggestedRect->left = (suggestedRect->left + suggestedRect->right - sz.cx) / 2;
+                    suggestedRect->right = suggestedRect->left + sz.cx;
+                    suggestedRect->bottom = suggestedRect->top + sz.cx;
+                }
+
+                // Update window size/position
+                isResizeFromDpiChange = true; // <- Trigger repaint
+                SetWindowPos(gMainWindowHwnd, nullptr, suggestedRect->left, suggestedRect->top, suggestedRect->right - suggestedRect->left, suggestedRect->bottom - suggestedRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+                return 0;
+            }
             case WM_SHOWWINDOW:
             {
                 if (!gotFirstSize)
                 {
                     gotFirstSize = true;
-                    gWindowSizeHandler.SetInitialWindowSize();
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
                     return 0;
                 }
             }
@@ -613,7 +707,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 if (!gotFirstSize)
                 {
                     gotFirstSize = true;
-                    gWindowSizeHandler.SetInitialWindowSize();
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
                     return 0;
                 }
 
@@ -667,10 +761,11 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     );
 
                     // Redraw
-                    if (inSizeMoveModal)
+                    if (inSizeMoveModal || isResizeFromDpiChange)
                     {
-                        inSizeModal = true;
-                        g_GLEngine.EndFrame(nullptr, false, true, true);
+                        inSizeModal = inSizeMoveModal;
+                        isResizeFromDpiChange = false;
+                        g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                     }
                 }
 
@@ -712,7 +807,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
+                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), currentDpi);
 
                 return TRUE;
             }

@@ -207,10 +207,10 @@ void WindowSizeHandler::InitDPIAwareness()
     mDpiAwarenessState = SetDpiAwareness_impl();
 }
 
-void WindowSizeHandler::SetInitialWindowSize()
+int WindowSizeHandler::SetInitialWindowSize()
 {
     // Only do this when we can tell the OS that we have DPI awareness
-    if (mDpiAwarenessState <= 0) return;
+    if (mDpiAwarenessState <= 0) return 96;
 
     // Get initial client size we'll be modifying
     // NOTE: GL won't actually be set up now normally... but we can still get the default FB size just fine.
@@ -250,4 +250,6 @@ void WindowSizeHandler::SetInitialWindowSize()
 
     // Adjust the window size
     SetWindowPos(gMainWindowHwnd, nullptr, newX, newY, newW, newH, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
+
+    return dpi;
 }
