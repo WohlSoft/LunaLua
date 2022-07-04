@@ -21,6 +21,7 @@
 #include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
+#include "../../Rendering/WindowSizeHandler.h"
 
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Blocks.h"
@@ -2382,8 +2383,11 @@ static void drawReplacementSplashScreen(void)
     if (!splashHDC) return;
     SelectObject(splashHDC, splashBMP);
 
+    // Get window size
+    auto windowSize = gWindowSizeHandler.getWindowSize();
+
     // Clear HDC...
-    BitBlt(frmHDC, 0, 0, 800, 600, frmHDC, 0, 0, WHITENESS);
+    BitBlt(frmHDC, 0, 0, windowSize.x, windowSize.y, frmHDC, 0, 0, WHITENESS);
 
     // Draw with respecting alpha channel
     BLENDFUNCTION bf;
@@ -2391,7 +2395,7 @@ static void drawReplacementSplashScreen(void)
     bf.BlendFlags = 0;
     bf.AlphaFormat = AC_SRC_ALPHA;
     bf.SourceConstantAlpha = 0xff;
-    AlphaBlend(frmHDC, 0, 0, 800, 600, splashHDC, 0, 0, 800, 600, bf);
+    AlphaBlend(frmHDC, 0, 0, windowSize.x, windowSize.y, splashHDC, 0, 0, 800, 600, bf);
 
     // Cleanup
     DeleteDC(splashHDC);
