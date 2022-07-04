@@ -156,9 +156,11 @@ static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCor
     }
 
     // Snap size
-    if ((relS > 0.95) && (relS < 1.05))
+    double nearS = round(relS * 2) * 0.5;
+    double errS = abs(relS - nearS);
+    if (errS <= 0.05)
     {
-        relS = 1.0;
+        relS = nearS;
     }
 
     // New Size
