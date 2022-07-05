@@ -660,6 +660,14 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case 0x02E4: // WM_GETDPISCALEDSIZE
             {
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized
+                    return TRUE;
+                }
+
                 int newDpi = wParam;
                 SIZE* pSize = reinterpret_cast<SIZE*>(lParam);
                 currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, pSize);
@@ -672,6 +680,15 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 int dpiY = LOWORD(wParam);
                 int newDpi = (dpiX + dpiY) / 2;
                 RECT* suggestedRect = reinterpret_cast<RECT*>(lParam);
+
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized (but store the new DPI)
+                    currentDpi = newDpi;
+                    return TRUE;
+                }
 
                 if (dpiChangeComputed)
                 {
@@ -774,7 +791,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_PAINT:
                 CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
-                if (inSizeMoveModal)
+                if (inSizeMoveModal || !gMainWindowFocused)
                 {
                     g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                 }
