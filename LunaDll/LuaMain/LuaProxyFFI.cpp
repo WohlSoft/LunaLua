@@ -94,6 +94,13 @@ extern "C" {
         }
     }
 
+    FFI_EXPORT(void) LunaLuaNPCCollect(short npcIdx, short playerIdx)
+    {
+        short targetIndex = npcIdx + 1;
+
+        native_collectNPC(&playerIdx, &targetIndex);
+    }
+
     #pragma comment(lib, "psapi.lib")
     struct LunaLuaMemUsageData
     {
