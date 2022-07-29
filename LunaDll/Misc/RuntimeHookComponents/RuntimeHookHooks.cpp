@@ -2225,7 +2225,7 @@ void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEff
         std::shared_ptr<Event> blockRemoveEvent = std::make_shared<Event>("onBlockRemove", true);
         blockRemoveEvent->setDirectEventName("onBlockRemove");
         blockRemoveEvent->setLoopable(false);
-        gLunaLua.callEvent(blockRemoveEvent, *blockIndex, *makeEffects != 0);
+        gLunaLua.callEvent(blockRemoveEvent, *blockIndex, *makeEffects != 0, false);
         isCancelled = blockRemoveEvent->native_cancelled();
     }
 
