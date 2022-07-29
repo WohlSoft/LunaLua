@@ -488,8 +488,8 @@ struct NPCMOB {
     short offscreenFlag2;                   //+0x128
     short offscreenCountdownTimer;          //+0x12A
     short grabbingPlayerIndex;              //+0x12C
-    short grabTimer;                        //+0x12E
-    short unknown_130;                      //+0x130
+    short cantHurtTimer;                    //+0x12E
+    short cantHurtPlayerIndex;              //+0x130
     short unknown_132;                      //+0x132
     short unknown_134;                      //+0x134
     short collidesWithNPC;                  //+0x136

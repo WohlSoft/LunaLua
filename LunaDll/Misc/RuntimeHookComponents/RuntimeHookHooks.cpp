@@ -2403,20 +2403,33 @@ static _declspec(naked) void __stdcall collectNPC_OrigFunc(short* playerIdx, sho
 
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx)
 {
+    PlayerMOB* player = Player::Get(*playerIdx);
+    NPCMOB* npc = NPC::Get(*npcIdx - 1);
+
+    // Duplicate of logic in TouchBonus
+    if (npc->cantHurtPlayerIndex == *playerIdx && !(isCoin_ptr[npc->id] && player->HeldNPCIndex != *npcIdx && npc->killFlag == 0))
+        return;
+
+    // Obscure case of touching a fairy pendant in a clown car.
+    // This is the only case outside of what's above where the NPC won't die.
+    if (npc->id == 254 && player->MountType == 2)
+        return;
+
+    // Call onNPCCollect
     bool isCancelled = false;
 
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid())
+    {
         std::shared_ptr<Event> npcCollectEvent = std::make_shared<Event>("onNPCCollect", true);
         npcCollectEvent->setDirectEventName("onNPCCollect");
         npcCollectEvent->setLoopable(false);
         gLunaLua.callEvent(npcCollectEvent, *npcIdx, *playerIdx);
-        isCancelled = npcCollectEvent->native_cancelled();
+        
+        if (npcCollectEvent->native_cancelled())
+            return;
     }
 
-    if (!isCancelled)
-    {
-        collectNPC_OrigFunc(playerIdx, npcIdx);
-    }
+    collectNPC_OrigFunc(playerIdx, npcIdx);
 }
 
 
