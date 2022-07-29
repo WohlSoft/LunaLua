@@ -774,7 +774,7 @@ typedef struct ExtendedBlockFields_\
             {
                 if (wndpl.showCmd == SW_MAXIMIZE) {
                     return (bool)true;
-                } else {
+                } else if (wndpl.showCmd == SW_RESTORE) {
                     return (bool)false;
                 }
             }
