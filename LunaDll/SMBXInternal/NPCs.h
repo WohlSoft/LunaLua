@@ -565,6 +565,8 @@ namespace NPC {
     short HarmCombo(short npcIdx, short harmType, short multiplier);
     short HarmComboWithDamage(short npcIdx, short harmType, short multiplier, float damage);
 
+    void Collect(short npcIdx, short playerIdx);
+
     void InitProperties();
     uint32_t GetVulnerableHarmTypes(int id);
     bool GetSpinjumpSafe(int id);

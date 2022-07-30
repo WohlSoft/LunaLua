@@ -2404,7 +2404,7 @@ static _declspec(naked) void __stdcall collectNPC_OrigFunc(short* playerIdx, sho
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx)
 {
     PlayerMOB* player = Player::Get(*playerIdx);
-    NPCMOB* npc = NPC::Get(*npcIdx - 1);
+    NPCMOB* npc = NPC::GetRaw(*npcIdx);
 
     // Duplicate of logic in TouchBonus
     if (npc->cantHurtPlayerIndex == *playerIdx && !(isCoin_ptr[npc->id] && player->HeldNPCIndex != *npcIdx && npc->killFlag == 0))
