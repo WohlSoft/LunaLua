@@ -1402,7 +1402,7 @@ extern void __stdcall GenerateScreenshotHook()
 
 extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
     NPCMOB* npcObj = ::NPC::Get(*npcIndex - 1);
-    if (isVegetableNPC_ptr[npcObj->id]) {
+    if (npcObj && (npcObj->id >= 0) && (npcObj->id <= NPC::MAX_ID) && isVegetableNPC_ptr[npcObj->id]) {
         if (*objType == 6) {
             npcObj->killFlag = 6;
             return 0xFFFF; // Don't handle extra code
