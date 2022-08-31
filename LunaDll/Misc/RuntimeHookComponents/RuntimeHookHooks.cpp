@@ -3523,6 +3523,68 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* player, int blockIdx)
+{
+    Block* block = Block::GetRaw(blockIdx);
+
+    // IsHidden flag, which is what the code we're replacing checks for
+    if (block->IsHidden)
+    {
+        return 0;
+    }
+
+    short characterFilter = Blocks::GetBlockPlayerFilter(block->BlockType);
+
+    // -1 means allow all characters
+    if (characterFilter == -1)
+    {
+        return 0;
+    }
+
+    // Matching characters, cancel collision
+    short characterId = (short)player->Identity;
+    if (characterFilter == characterId)
+    {
+        return 0;
+    }
+
+    // No filter needed, carry on
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
+{
+    __asm {
+        push eax                // push these to make sure they're safe after the function call
+        push ecx
+        push edx
+        push esi
+
+        movsx ecx, word ptr ss:[ebp-0x120]
+        push ecx                // Block index
+        push ebx                // Player pointer
+        call runtimeHookBlockPlayerFilterInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop esi                 // we can pop these again
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9A16F4
+        ret
+    cancel_collision:
+        pop esi                 // we can pop these again
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9A4FE9
+        ret
+    }
+}
+
 static unsigned int __stdcall runtimeHookLevelPauseCheckInternal(void)
 {
     if (gEscPressedRegistered)
