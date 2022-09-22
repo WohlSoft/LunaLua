@@ -114,10 +114,9 @@ object make_function(lua_State* L, F f, Signature, Policies)
 template <class F>
 object make_function(lua_State* L, F f)
 {
-    return make_function(L, detail::deduce_signature(f), detail::null_type());
+    return make_function(L, f, detail::deduce_signature(f), detail::null_type()); // https://stackoverflow.com/a/17729743
 }
 
 } // namespace luabind
 
 #endif // LUABIND_MAKE_FUNCTION_081014_HPP
-
