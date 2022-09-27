@@ -113,6 +113,7 @@ set(LunaLua_Sources
     HardcodedGraphics/HardocodeGFXMap.cpp
     Input/Input.cpp
     Input/LunaGameController.cpp
+    Input/MouseHandler.cpp
     IPC/IPCPipeServer.cpp
     LevelCodes/dlltestlvlCode.cpp
     LevelCodes/Docopoper-AbstractAssault.lvl.cpp
@@ -192,7 +193,6 @@ set(LunaLua_Sources
     Misc/RuntimeHookManagers/LevelHUDController.cpp
     Misc/RuntimeHookUtils/APIHook.cpp
     Misc/SafeFPUControl.cpp
-    Misc/SHMemServer.cpp
     Misc/TestMode.cpp
     Misc/TestModeMenu.cpp
     Misc/TypeLib.cpp
@@ -227,6 +227,7 @@ set(LunaLua_Sources
     Rendering/Shaders/GLShaderUniformInfo.cpp
     Rendering/Shaders/GLShaderVariableEntry.cpp
     Rendering/Shaders/GLShaderVariableInfo.cpp
+    Rendering/WindowSizeHandler.cpp
     SdlMusic/MusicDefList.cpp
     SdlMusic/MusicManager.cpp
     SdlMusic/SdlMusPlayer.cpp
