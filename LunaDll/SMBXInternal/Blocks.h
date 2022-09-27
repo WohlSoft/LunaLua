@@ -35,12 +35,12 @@ struct Block : SMBX_FullBaseItemArray<Block, 2000, GM_BLOCK_COUNT_ADDR, GM_BLOCK
     short               Unknown58;                          // 0x58
     short               IsInvisible2;                       // 0x5A
     unsigned short      IsInvisible3;                       // 0x5C (todo: verify!)
-    short               Unknown5E;                          // 0x5E
-    short               Unknown60;                          // 0x60
 
+    short               OwnerPlayerIdx;                     // 0x5E For temporary player blocks (clown cars)
+    short               OwnerNPCID;                         // 0x60 For temporary NPC blocks
     short               Unknown62;                          // 0x62
     short               Unknown64;                          // 0x64
-    short               Unknown66;                          // 0x66
+    short               OwnerNPCIdx;                        // 0x66 For temporary NPC blocks
 
 };
 #pragma pack(pop)
@@ -57,6 +57,7 @@ struct ExtendedBlockFields
     double layerSpeedY;
     double extraSpeedX;
     double extraSpeedY;
+    char collisionGroup[32];
 
     // Constructor
     ExtendedBlockFields()
@@ -71,6 +72,7 @@ struct ExtendedBlockFields
         layerSpeedY = 0.0;
         extraSpeedX = 0.0;
         extraSpeedY = 0.0;
+        collisionGroup[0] = '\0';
     }
 };
 

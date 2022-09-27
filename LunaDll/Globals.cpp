@@ -19,7 +19,6 @@ bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
 bool gAutostartRan = false;
-bool gIsWindowsVistaOrNewer = false;
 SMBXHUDSettings gSMBXHUDSettings = {
     false,    // skip
     WHUD_ALL, // overworldHudControlFlag
@@ -28,7 +27,6 @@ SMBXHUDSettings gSMBXHUDSettings = {
 bool gRenderBGOFlag = true;
 bool gRenderSizableFlag = true;
 bool gRenderBackgroundFlag = true;
-std::atomic<uint32_t> gMainWindowSize(0); // Low word is width, height word is height
 
 // Settings for glitch fixes
 bool gDisablePlayerFilterBounceFix = false;
@@ -56,6 +54,10 @@ HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
 
+// Mouse cursor
+HCURSOR  gCustomCursor = nullptr;
+bool     gCustomCursorHide = false;
+
 LvlEnum gLevelEnum;
 
 // First two array entries are players 1+2
@@ -82,8 +84,6 @@ MciEmulator gMciEmulator;
 StartupSettings gStartupSettings;
 
 HardcodedGraphicsManager gGraphManager;
-
-SHMemServer gShMemServer;
 
 FreeImageInit        gFreeImgInit;
 

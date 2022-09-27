@@ -25,6 +25,7 @@
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/ImageLoader.h"
 #include "../Misc/RuntimeHook.h"
+#include "../Input/MouseHandler.h"
 
 #include "../Misc/LoadScreen.h"
 
@@ -123,6 +124,9 @@ bool CLunaLua::shutdown()
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
+    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+        gFenceFixes[i]->Apply();
+    }
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
@@ -526,6 +530,15 @@ void CLunaLua::setupDefaults()
         LUAHELPER_DEF_CONST(_G, RTYPE_IMAGE);
         LUAHELPER_DEF_CONST(_G, RTYPE_TEXT);
     }
+
+    _G["MOUSE_BUTTON_L"] = MouseHandler::BUTTON_L;
+    _G["MOUSE_BUTTON_R"] = MouseHandler::BUTTON_R;
+    _G["MOUSE_BUTTON_M"] = MouseHandler::BUTTON_M;
+    _G["MOUSE_EVT_UP"]   = MouseHandler::EVT_UP;
+    _G["MOUSE_EVT_DOWN"] = MouseHandler::EVT_DOWN;
+    _G["MOUSE_EVT_DBL"]  = MouseHandler::EVT_DBL;
+    _G["MOUSE_WHEEL_V"]  = MouseHandler::WHEEL_V;
+    _G["MOUSE_WHEEL_H"]  = MouseHandler::WHEEL_H;
 
     _G["ODIR_UP"] = 1;
     _G["ODIR_LEFT"] = 2;

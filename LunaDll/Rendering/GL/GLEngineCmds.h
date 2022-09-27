@@ -64,11 +64,13 @@ public:
     DWORD mRop;
     virtual void run(GLEngine& glEngine) const;
 };
-class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd, public GLBitmapRenderCoords {
+class GLEngineCmd_RenderCameraToScreen : public GLEngineCmd {
 public:
-    HDC mHdcDest;
-    HDC mHdcSrc;
-    DWORD mRop;
+    int mCamIdx;
+    double mRenderX;
+    double mRenderY;
+    double mHeight;
+    double mWidth;
     virtual void run(GLEngine& glEngine) const;
 };
 class GLEngineCmd_EndFrame : public GLEngineCmd {
@@ -76,11 +78,13 @@ public:
     HDC mHdcDest;
     bool mIsFirstFrame;
     bool mForceSkip;
+    bool mRedrawOnly;
+    bool mResizeOverlay;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
-    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame; }
-    virtual bool isSkippable(void) const { return !mIsFirstFrame; }
-    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame; }
+    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool isSkippable(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame || mRedrawOnly; }
 };
 class GLEngineCmd_InitForHDC : public GLEngineCmd {
 public:
@@ -148,7 +152,7 @@ public:
     uint32_t mCount;
     bool mSceneCoords;
     bool mDepthTest;
-	bool mLinearFiltered;
+    bool mLinearFiltered;
 
     GLEngineCmd_LuaDraw() :
         mTarget(nullptr),
@@ -165,7 +169,7 @@ public:
         mCount(0),
         mSceneCoords(false),
         mDepthTest(false),
-		mLinearFiltered(false)
+        mLinearFiltered(false)
     {}
 
     virtual void run(GLEngine& glEngine) const;
@@ -192,6 +196,7 @@ public:
 
 class GLEngineCmd_SetCamera : public GLEngineCmd {
 public:
+    int mIdx;
     double mX, mY;
     virtual void run(GLEngine& glEngine) const;
 };
@@ -200,6 +205,15 @@ class GLEngineCmd_CompileShaderObj : public GLEngineCmd {
 public:
     std::shared_ptr<FFI_ShaderObj> mShaderObj;
     virtual void run(GLEngine& glEngine) const;
+    virtual bool shouldBeSynchronous(void) const { return true; }
+};
+
+class GLEngineCmd_SetFramebufferSize : public GLEngineCmd {
+public:
+    int mWidth;
+    int mHeight;
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return false; }
     virtual bool shouldBeSynchronous(void) const { return true; }
 };
 

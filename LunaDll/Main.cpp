@@ -31,6 +31,7 @@ using std::max;
 #include "Misc/Playground.h"
 #include "Rendering/GL/GLEngine.h"
 #include "Rendering/GL/GLInitTest.h"
+#include "Rendering/WindowSizeHandler.h"
 #include "Misc/AsmPatch.h"
 #include "Misc/LoadScreen.h"
 #include "../LunaLoader/LunaLoaderPatch.h"
@@ -317,7 +318,7 @@ void TestFrameCode() {
 
     //- Uncomment to test variable bank
     //for each(pair<wstring, double> kvp in gSavedVarBank.m_VarBank) {
-    //	Renderer::Get().DebugPrint(kvp.first, kvp.second);
+    //    Renderer::Get().DebugPrint(kvp.first, kvp.second);
     //}
 
     //static double bgX = 0;
@@ -383,7 +384,7 @@ void LevelFrameCode() {
 }
 
 // INIT LEVEL - This should be called during the level load hook function. It'll also figure out which level is being played.
-//				Also put init code in here if you want.
+//                Also put init code in here if you want.
 void InitLevel() {
 
     // Reset some variables

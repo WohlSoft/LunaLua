@@ -605,6 +605,11 @@ DEFMEM(GM_MAX_FPS_MODE,    short,  0x00B2C8BE);
 // VB6 GUI
 DEFMEM(GM_FORM_GFX,        IDispatch*,      0x00B2D7C4);
 
+// VB6 Window Names
+DEFMEM(GM_GAMETITLE_1, VB6StrPtr, 0x8BD869);
+DEFMEM(GM_GAMETITLE_2, VB6StrPtr, 0x8BE25A);
+DEFMEM(GM_GAMETITLE_3, VB6StrPtr, 0x96AF26);
+
 
 /////////////////////
 ///  -Assembly-   ///

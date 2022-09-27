@@ -1,3 +1,6 @@
+#include <windows.h>
+#include <windowsx.h>
+#include <dwmapi.h>
 #include "../../Main.h"
 #include "../RuntimeHook.h"
 #include <comutil.h>
@@ -10,11 +13,13 @@
 #include "../../Globals.h"
 #include "../AsmPatch.h"
 
-#include "../SHMemServer.h"
-
 #include "../TestMode.h"
 #include "../../IPC/IPCPipeServer.h"
 #include "../../Rendering/ImageLoader.h"
+#include "../../Rendering/GL/GLEngineProxy.h"
+#include "../../Rendering/GL/GLContextManager.h"
+#include "../../Rendering/WindowSizeHandler.h"
+#include "../../Input/MouseHandler.h"
 
 #include "../NpcIdExtender.h"
 
@@ -51,172 +56,906 @@ void SetupThunRTMainHook()
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
 }
 
+// Function to get the size of padding/frame around a window
+struct FramePaddingInfo
+{
+    // Padding on each side
+    int lPad;
+    int rPad;
+    int tPad;
+    int bPad;
+
+    // How much of the padding is from WM_SIZEBOX?
+    int lPadSz;
+    int rPadSz;
+    int tPadSz;
+    int bPadSz;
+};
+static FramePaddingInfo getWindowFramePadding(HWND hwnd, int dpi)
+{
+    // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
+    FramePaddingInfo out;
+    {
+        RECT rc;
+        rc.left = 0;
+        rc.top = 0;
+        rc.right = 800;
+        rc.bottom = 600;
+        static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+        if (adjustWindowRectExForDpi)
+        {
+            adjustWindowRectExForDpi(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE), dpi);
+        }
+        else
+        {
+            AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        }
+        out.lPad = -rc.left;
+        out.rPad = rc.right - 800;
+        out.tPad = -rc.top;
+        out.bPad = rc.bottom - 600;
+    }
+
+    // Get excess border
+    {
+        out.lPadSz = 0;
+        out.rPadSz = 0;
+        out.tPadSz = 0;
+        out.bPadSz = 0;
+        if (Luna_IsWindowsVistaOrNewer())
+        {
+            static auto dwmGetWindowsAttribute = Luna_GetProc<HRESULT (__stdcall *)(HWND, DWORD, PVOID, DWORD)>("Dwmapi.dll", "DwmGetWindowAttribute");
+            if (dwmGetWindowsAttribute != nullptr)
+            {
+                RECT rc1, rc2;
+                GetWindowRect(hwnd, &rc1);
+                if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
+                {
+                    out.lPadSz = rc2.left - rc1.left;
+                    out.rPadSz = rc1.right - rc2.right;
+                    out.tPadSz = rc2.top - rc1.top;
+                    out.bPadSz = rc1.bottom - rc2.bottom;
+                }
+            }
+        }
+    }
+
+    return std::move(out);
+}
+
+// Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
+static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH, int dpi)
+{
+    // Get padding overhead
+    FramePaddingInfo pad = getWindowFramePadding(hwnd, dpi);
+    int wPad = pad.lPad + pad.rPad;
+    int hPad = pad.tPad + pad.bPad;
+
+    int w = lpRect->right - lpRect->left - wPad;
+    int h = lpRect->bottom - lpRect->top - hPad;
+    double relS;
+    switch (dragCorner)
+    {
+        default:
+        case WMSZ_BOTTOMLEFT:
+        case WMSZ_BOTTOMRIGHT:
+        case WMSZ_TOPLEFT:
+        case WMSZ_TOPRIGHT:
+            // Corners
+            relS = 0.5 * (w / nominalW + h / nominalH);
+            break;
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+            // Vertical resize only
+            relS = h / nominalH;
+            break;
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+            // Vertical resize only
+            relS = w / nominalW;
+            break;
+    }
+
+    // Cap size >= 50%
+    if (relS < 0.5)
+    {
+        relS = 0.5;
+    }
+
+    // Snap size
+    double nearS = round(relS * 2) * 0.5;
+    double errS = abs(relS - nearS);
+    if (errS <= 0.05)
+    {
+        relS = nearS;
+    }
+
+    // New Size
+    w = (int)round(relS * nominalW);
+    h = (int)round(relS * nominalH);
+
+    // Fine tune size
+    switch (dragCorner)
+    {
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+            // Force even width for centering
+            w -= w % 2;
+            relS = w / nominalW;
+            h = (int)round(relS * nominalH);
+            break;
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+            // Force even height for centering
+            h -= h % 2;
+            relS = h / nominalH;
+            w = (int)round(relS * nominalW);
+            break;
+    }
+
+    // Add padding
+    w += wPad;
+    h += hPad;
+
+    // Adjust left/right
+    switch (dragCorner)
+    {
+        case WMSZ_TOPLEFT:
+        case WMSZ_LEFT:
+        case WMSZ_BOTTOMLEFT:
+        {
+            // Dragging left, leave right alone
+            lpRect->left = lpRect->right - w;
+            break;
+        }
+        case WMSZ_TOPRIGHT:
+        case WMSZ_RIGHT:
+        case WMSZ_BOTTOMRIGHT:
+        {
+            // Dragging right, leave left alone
+            lpRect->right = lpRect->left + w;
+            break;
+        }
+        case WMSZ_TOP:
+        case WMSZ_BOTTOM:
+        {
+            // Dragging top/bottom, leave keep centered
+            lpRect->left = ((lpRect->right - pad.rPad) + (lpRect->left + pad.lPad) - (w - wPad)) / 2 - pad.lPad;
+            lpRect->right = lpRect->left + w;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left   -= pad.lPadSz;
+            workRect.right  += pad.rPadSz;
+            workRect.top    -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorW = (workRect.right - workRect.left);
+            if (w > monitorW)
+            {
+                w = monitorW;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.left > lpRect->left)
+            {
+                lpRect->left = workRect.left;
+                lpRect->right = lpRect->left + w;
+            }
+            else if (workRect.right < lpRect->right)
+            {
+                lpRect->right = workRect.right;
+                lpRect->left = lpRect->right - w;
+            }
+
+            break;
+        }
+    }
+
+    // Adjust top/bottom
+    switch (dragCorner)
+    {
+        case WMSZ_TOPLEFT:
+        case WMSZ_TOP:
+        case WMSZ_TOPRIGHT:
+        {
+            // Dragging top, leave bottom alone
+            lpRect->top = lpRect->bottom - h;
+            break;
+        }
+        case WMSZ_BOTTOMLEFT:
+        case WMSZ_BOTTOM:
+        case WMSZ_BOTTOMRIGHT:
+        {
+            // Dragging right, leave left alone
+            lpRect->bottom = lpRect->top + h;
+            break;
+        }
+        case WMSZ_LEFT:
+        case WMSZ_RIGHT:
+        {
+            // Dragging top/bottom, leave keep centered
+            lpRect->top = ((lpRect->top + pad.tPad) + (lpRect->bottom - pad.bPad) - (h - hPad)) / 2 - pad.tPad;
+            lpRect->bottom = lpRect->top + h;
+
+            // Get valid region based on monitor
+            MONITORINFO monitorInfo;
+            monitorInfo.cbSize = sizeof(monitorInfo);
+            GetMonitorInfo(MonitorFromRect(lpRect, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+            RECT& workRect = monitorInfo.rcWork;
+            workRect.left -= pad.lPadSz;
+            workRect.right += pad.rPadSz;
+            workRect.top -= pad.tPadSz;
+            workRect.bottom += pad.bPadSz;
+
+            // Limit size in other axis by work area
+            int monitorH = (workRect.bottom - workRect.top);
+            if (h > monitorH)
+            {
+                h = monitorH;
+            }
+
+            // Limit positioning by monitor work area
+            if (workRect.top > lpRect->top)
+            {
+                lpRect->top = workRect.top;
+                lpRect->bottom = lpRect->top + h;
+            }
+            else if (workRect.bottom < lpRect->bottom)
+            {
+                lpRect->bottom = workRect.bottom;
+                lpRect->top = lpRect->bottom - h;
+            }
+
+            break;
+        }
+    }
+}
+
+static void ProcessPasteKeystroke()
+{
+    // Ctrl-V
+    if (OpenClipboard(nullptr) == 0)
+    {
+        // Couldn't open clipboard
+        return;
+    }
+
+    // Get unicode text handle
+    bool textIsUnicode = true;
+    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+    if (hData == nullptr)
+    {
+        // Couldn't get text handle, try non-unicode
+        hData = GetClipboardData(CF_TEXT);
+        textIsUnicode = false;
+        if (hData == nullptr)
+        {
+            // Couldn't get any text
+            CloseClipboard();
+            return;
+        }
+    }
+
+    // Lock data
+    void* dataPtr = GlobalLock(hData);
+    if (dataPtr == nullptr)
+    {
+        // Couldn't get pointer
+        GlobalUnlock(hData);
+        CloseClipboard();
+    }
+
+    // Convert to std::string
+    std::string pastedText = textIsUnicode ? WStr2Str(static_cast<const wchar_t*>(dataPtr)) : std::string(static_cast<const char*>(dataPtr));
+
+    // Unlock Data and close clipboard
+    GlobalUnlock(hData);
+    CloseClipboard();
+
+    // Call event
+    if ((pastedText.length() > 0) && gLunaLua.isValid()) {
+        std::shared_ptr<Event> pasteTextEvent = std::make_shared<Event>("onPasteText", false);
+        pasteTextEvent->setDirectEventName("onPasteText");
+        pasteTextEvent->setLoopable(false);
+        gLunaLua.callEvent(pasteTextEvent, pastedText);
+    }
+}
+
+static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeated)
+{
+    static WCHAR unicodeData[32] = { 0 };
+    bool ctrlPressed = (gKeyState[VK_CONTROL] & 0x80) != 0;
+    bool altPressed = (gKeyState[VK_MENU] & 0x80) != 0;
+    bool plainPress = (!repeated) && (!altPressed) && (!ctrlPressed);
+    
+    // Notify game controller manager
+    if (!repeated)
+    {
+        gLunaGameControllerManager.notifyKeyboardPress(virtKey);
+    }
+
+    // Notify Lua code
+    // But don't pass keystrokes with ctrl or alt as a keypress
+    if (gLunaLua.isValid() &&
+        (!ctrlPressed || (virtKey == VK_LCONTROL) || (virtKey == VK_RCONTROL)) &&
+        (!altPressed || (virtKey == VK_LMENU) || (virtKey == VK_RMENU))
+        ) {
+        std::shared_ptr<Event> keyboardPressEvent = std::make_shared<Event>("onKeyboardPress", false);
+
+        int unicodeRet = ToUnicode(virtKey, scanCode, gKeyState, unicodeData, 32, 0);
+        if (unicodeRet > 0)
+        {
+            std::string charStr = WStr2Str(std::wstring(unicodeData, unicodeRet));
+            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated, charStr);
+        }
+        else
+        {
+            gLunaLua.callEvent(keyboardPressEvent, static_cast<int>(virtKey), repeated);
+        }
+    }
+
+    // Process Ctrl-V to call onPasteText
+    if ((virtKey == 0x56) && ctrlPressed && !altPressed)
+    {
+        ProcessPasteKeystroke();
+    }
+
+    // Process Alt-Enter for fullscreen
+    if ((virtKey == VK_RETURN) && altPressed && !ctrlPressed && !repeated)
+    {
+        if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                if (wndpl.showCmd == SW_MAXIMIZE)
+                {
+                    ShowWindow(gMainWindowHwnd, SW_RESTORE);
+                }
+                else
+                {
+                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+                }
+            }
+        }
+    }
+
+    // Process F12 key for screenshot to file
+    if ((virtKey == VK_F12) && plainPress && g_GLEngine.IsEnabled())
+    {
+        short screenshotSoundID = 12;
+        native_playSFX(&screenshotSoundID);
+        g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+            std::wstring screenshotPath = gAppPathWCHAR + std::wstring(L"\\screenshots");
+            if (GetFileAttributesW(screenshotPath.c_str()) & INVALID_FILE_ATTRIBUTES) {
+                CreateDirectoryW(screenshotPath.c_str(), NULL);
+            }
+            screenshotPath += L"\\";
+            screenshotPath += Str2WStr(generateTimestampForFilename()) + std::wstring(L".png");
+
+            ::GenerateScreenshot(screenshotPath, *header, pData);
+            GlobalFree(globalMem);
+            return true;
+        });
+    }
+
+    // Process F11 key for GIF recorder toggle
+    if ((virtKey == VK_F11) && plainPress && g_GLEngine.IsEnabled())
+    {
+        short gifRecSoundID = (g_GLEngine.GifRecorderToggle() ? 24 : 12);
+        native_playSFX(&gifRecSoundID);
+    }
+
+    // Process F4 key for letterbox toggle
+    if ((virtKey == VK_F4) && plainPress && g_GLEngine.IsEnabled())
+    {
+        gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
+        gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
+        gGeneralConfig.save();
+    }
+}
+
+static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
+{
+    // Buffer memory 
+    static std::vector<BYTE> rawBuffer(sizeof(RAWINPUT));
+
+    // Read raw input structure
+    UINT dwSize;
+    GetRawInputData(hRawInput, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+    if (dwSize > rawBuffer.size())
+    {
+        rawBuffer.resize(dwSize);
+    }
+    if (GetRawInputData(hRawInput, RID_INPUT, rawBuffer.data(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+    {
+        // Unexpected size
+        return;
+    }
+    const RAWINPUT& rawInput = *reinterpret_cast<const RAWINPUT*>(rawBuffer.data());
+
+    // Ignore non-keyboard input
+    if (rawInput.header.dwType != RIM_TYPEKEYBOARD)
+    {
+        return;
+    }
+
+    // Handle keyboard input
+    const RAWKEYBOARD& rawKbd = rawInput.data.keyboard;
+    uint16_t vkey = rawKbd.VKey;
+    uint16_t scanCode = rawKbd.MakeCode;
+    uint8_t prefixFlag = (rawKbd.Flags & (RI_KEY_E0 | RI_KEY_E1));
+    bool keyDown = ((rawKbd.Flags & RI_KEY_BREAK) == 0);
+
+    // Out of range
+    if (vkey > 0xFF)
+    {
+        return;
+    }
+
+    // Handle left/right keys
+    // We get passed them with the non-distinct virtual key code
+    // So let's make it distinct
+    switch (vkey)
+    {
+        case VK_CONTROL:
+            if (prefixFlag == 0)
+            {
+                vkey = VK_LCONTROL;
+            }
+            else if (prefixFlag == RI_KEY_E0)
+            {
+                vkey = VK_RCONTROL;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        case VK_MENU:
+            if (prefixFlag == 0)
+            {
+                vkey = VK_LMENU;
+            }
+            else if (prefixFlag == RI_KEY_E0)
+            {
+                vkey = VK_RMENU;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        case VK_SHIFT:
+            if ((scanCode == 0x2a) && (prefixFlag == 0))
+            {
+                vkey = VK_LSHIFT;
+            }
+            else if ((scanCode == 0x36) && (prefixFlag == 0))
+            {
+                vkey = VK_RSHIFT;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        default:
+            break;
+    }
+
+    // Update key state
+    bool keyWasDown = (gKeyState[vkey] & 0x80) != 0;
+    bool repeated = keyDown && keyWasDown;
+
+    // Update key state
+    gKeyState[vkey] = keyDown ? 0x80 : 0x00;
+
+    // For key states that should or together left and right, handle that
+    switch (vkey)
+    {
+        case VK_LCONTROL:
+        case VK_RCONTROL:
+            gKeyState[VK_CONTROL] = gKeyState[VK_LCONTROL] | gKeyState[VK_RCONTROL];
+            break;
+        case VK_LMENU:
+        case VK_RMENU:
+            gKeyState[VK_MENU] = gKeyState[VK_LMENU] | gKeyState[VK_RMENU];
+            break;
+        case VK_LSHIFT:
+        case VK_RSHIFT:
+            gKeyState[VK_SHIFT] = gKeyState[VK_LSHIFT] | gKeyState[VK_RSHIFT];
+            break;
+        default:
+            break;
+    }
+
+    // If window is focused, and key is down, run keypress handling
+    if (haveFocus && keyDown)
+    {
+        ProcessRawKeyPress(vkey, scanCode, repeated);
+    }
+}
+
+static int UpdateWindowSizeForDPI(int currentDpi, int newDpi, SIZE* pSize)
+{
+    auto currentSize = gWindowSizeHandler.getWindowSize();
+
+    // Compute new desired window client size
+    int newW = (currentSize.x * newDpi) / currentDpi;
+    int newH = (currentSize.y * newDpi) / currentDpi;
+
+    // Get FB size
+    int fbW = g_GLContextManager.GetMainFBWidth();
+    int fbH = g_GLContextManager.GetMainFBHeight();
+
+    // If new desired size is near a multiple of half the framebuffer size, round to that.
+    double scaleW = static_cast<double>(newW) / fbW;
+    double scaleH = static_cast<double>(newH) / fbH;
+    double nearScaleW = round(scaleW * 2) * 0.5;
+    double nearScaleH = round(scaleH * 2) * 0.5;
+    double errW = abs(scaleW - nearScaleW);
+    double errH = abs(scaleW - nearScaleW);
+    if ((errW <= 0.05) && (errH <= 0.05))
+    {
+        newW = static_cast<int>(round(fbW * nearScaleW));
+        newH = static_cast<int>(round(fbH * nearScaleH));
+    }
+
+    // Get window size
+    RECT newRect;
+    newRect.left = 0;
+    newRect.top = 0;
+    newRect.right = newW;
+    newRect.bottom = newH;
+    static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+    if (adjustWindowRectExForDpi == nullptr) return 0;
+    adjustWindowRectExForDpi(&newRect, GetWindowLong(gMainWindowHwnd, GWL_STYLE),
+        GetMenu(gMainWindowHwnd) != 0, GetWindowLong(gMainWindowHwnd, GWL_EXSTYLE), newDpi);
+    int winW = newRect.right - newRect.left;
+    int winH = newRect.bottom - newRect.top;
+
+    if (pSize)
+    {
+        pSize->cx = winW;
+        pSize->cy = winH;
+    }
+
+    return newDpi;
+}
+
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (hwnd == gMainWindowHwnd)
-	{
-		switch (uMsg)
-		{
-			case WM_GETMINMAXINFO:
-			{
-				RECT rc;
-				rc.left = 0;
-				rc.top = 0;
-				rc.right = 400;
-				rc.bottom = 300;
-				AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-					GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+    static bool inSizeMoveModal = false;
+    static bool inSizeModal = false;
+    static bool gotFirstSize = false;
+    static bool dpiChangeComputed = false;
+    static bool isResizeFromDpiChange = false;
+    static int currentDpi = 0;
 
-				// Restrict main window size
-				LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-				lpMMI->ptMinTrackSize.x = rc.right - rc.left;
-				lpMMI->ptMinTrackSize.y = rc.bottom - rc.top;
-				return TRUE;
-			}
-			case WM_SIZING:
-			{
-				// Allow free sizing when CTRL is held
-				if ((gKeyState[VK_CONTROL] & 0x80) != 0)
-				{
-					break;
-				}
+    if (hwnd == gMainWindowHwnd)
+    {
+        switch (uMsg)
+        {
+            case WM_ENTERSIZEMOVE:
+                inSizeMoveModal = true;
+                break;
+            case WM_EXITSIZEMOVE:
+                inSizeMoveModal = false;
+                inSizeModal = false;
+                break;
+            case WM_SETTEXT:
+            {
+                // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+            }
+            case 0x02E4: // WM_GETDPISCALEDSIZE
+            {
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized
+                    return TRUE;
+                }
 
-				RECT rc;
-				rc.left = 0;
-				rc.top = 0;
-				rc.right = 800;
-				rc.bottom = 600;
-				AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-					GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
-				int wPad = rc.right - rc.left - 800;
-				int hPad = rc.bottom - rc.top - 600;
+                int newDpi = wParam;
+                SIZE* pSize = reinterpret_cast<SIZE*>(lParam);
+                currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, pSize);
+                dpiChangeComputed = true;
+                return TRUE;
+            }
+            case 0x02E0: // WM_DPICHANGED
+            {
+                int dpiX = HIWORD(wParam);
+                int dpiY = LOWORD(wParam);
+                int newDpi = (dpiX + dpiY) / 2;
+                RECT* suggestedRect = reinterpret_cast<RECT*>(lParam);
 
-				LPRECT lpRect = (LPRECT)lParam;
-				int w = lpRect->right - lpRect->left - wPad;
-				int h = lpRect->bottom - lpRect->top - hPad;
-				double relS;
-				switch (wParam)
-				{
-					default:
-					case WMSZ_BOTTOMLEFT:
-					case WMSZ_BOTTOMRIGHT:
-					case WMSZ_TOPLEFT:
-					case WMSZ_TOPRIGHT:
-						// Corners
-						relS = 0.5 * (w / 800.0 + h / 600.0);
-						break;
-					case WMSZ_TOP:
-					case WMSZ_BOTTOM:
-						// Vertical resize only
-						relS = h / 600.0;
-						break;
-					case WMSZ_LEFT:
-					case WMSZ_RIGHT:
-						// Vertical resize only
-						relS = w / 800.0;
-						break;
-				}
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized (but store the new DPI)
+                    currentDpi = newDpi;
+                    return TRUE;
+                }
 
-				// Cap size >= 50%
-				if (relS < 0.5)
-				{
-					relS = 0.5;
-				}
+                if (dpiChangeComputed)
+                {
+                    // Case where DPI change was computed by WM_GETDPISCALEDSIZE
+                    dpiChangeComputed = false;
+                }
+                else
+                {
+                    // Case where WM_GETDPISCALEDSIZE was not called
+                    SIZE sz;
+                    currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, &sz);
+                    suggestedRect->left = (suggestedRect->left + suggestedRect->right - sz.cx) / 2;
+                    suggestedRect->right = suggestedRect->left + sz.cx;
+                    suggestedRect->bottom = suggestedRect->top + sz.cx;
+                }
 
-				// Snap size
-				if ((relS > 0.95) && (relS < 1.05))
-				{
-					relS = 1.0;
-				}
+                // Update window size/position
+                isResizeFromDpiChange = true; // <- Trigger repaint
+                SetWindowPos(gMainWindowHwnd, nullptr, suggestedRect->left, suggestedRect->top, suggestedRect->right - suggestedRect->left, suggestedRect->bottom - suggestedRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+                return 0;
+            }
+            case WM_SHOWWINDOW:
+            {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
+            }
+            case WM_SIZE:
+            {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
 
-				// New Size
-				w = (int)floor(relS * 800 + 0.5) + wPad;
-				h = (int)floor(relS * 600 + 0.5) + hPad;
+                // Store size of main window (low word is width, high word is height)
+                static LPARAM latestLParam;
+                latestLParam = lParam;
 
-				// Fine tune size
-				switch (wParam)
-				{
-					case WMSZ_TOP:
-					case WMSZ_BOTTOM:
-						// Force even width for centering
-						w -= w % 2;
-						relS = (w - wPad) / 800.0;
-						h = (int)floor(relS * 600 + 0.5) + hPad;
-						break;
-					case WMSZ_LEFT:
-					case WMSZ_RIGHT:
-						// Force even height for centering
-						h -= h % 2;
-						relS = (h - hPad) / 600.0;
-						w = (int)floor(relS * 800 + 0.5) + wPad;
-						break;
-				}
+                // Maximize makes for fullscreen
+                static bool antiRecursionLock = false;
+                if (!antiRecursionLock && ((wParam & SIZE_MINIMIZED) == 0))
+                {
+                    antiRecursionLock = true;
+                    static WPARAM prevWParam = wParam;
+                    static LONG restore_style = 0;
+                    static LONG restore_ex_style = 0;
 
-				// Adjust left/right
-				switch (wParam)
-				{
-					case WMSZ_TOPLEFT:
-					case WMSZ_LEFT:
-					case WMSZ_BOTTOMLEFT:
-					{
-						// Dragging left, leave right alone
-						lpRect->left = lpRect->right - w;
-						break;
-					}
-					case WMSZ_TOPRIGHT:
-					case WMSZ_RIGHT:
-					case WMSZ_BOTTOMRIGHT:
-					{
-						// Dragging right, leave left alone
-						lpRect->right = lpRect->left + w;
-						break;
-					}
-					case WMSZ_TOP:
-					case WMSZ_BOTTOM:
-					{
-						// Dragging top/bottom, leave keep centered
-						lpRect->left = (lpRect->right + lpRect->left - w) / 2;
-						lpRect->right = lpRect->left + w;
-						break;
-					}
-				}
+                    if (((wParam & SIZE_MAXIMIZED) != 0) && ((prevWParam & SIZE_MAXIMIZED) == 0))
+                    {
+                        // Maximized state, make it borderless
+                        restore_style = GetWindowLongW(hwnd, GWL_STYLE);
+                        restore_ex_style = GetWindowLongW(hwnd, GWL_EXSTYLE);
+                        SetWindowLongW(hwnd, GWL_STYLE, restore_style & ~(WS_CAPTION | WS_THICKFRAME));
+                        SetWindowLongW(hwnd, GWL_EXSTYLE, restore_ex_style & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+                        MONITORINFO monitor_info;
+                        monitor_info.cbSize = sizeof(monitor_info);
+                        GetMonitorInfo(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &monitor_info);
+                        LONG x = monitor_info.rcMonitor.left;
+                        LONG y = monitor_info.rcMonitor.top;
+                        LONG w = monitor_info.rcMonitor.right - x;
+                        LONG h = monitor_info.rcMonitor.bottom - y;
+                        SetWindowPos(hwnd, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+                    }
+                    else if (((wParam & SIZE_MAXIMIZED) == 0) && ((prevWParam & SIZE_MAXIMIZED) != 0))
+                    {
+                        // Non-maximized state
+                        SetWindowLongW(hwnd, GWL_STYLE, restore_style & ~(WS_MAXIMIZE));
+                        SetWindowLongW(hwnd, GWL_EXSTYLE, restore_ex_style);
+                        SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+                    }
 
-				// Adjust top/bottom
-				switch (wParam)
-				{
-					case WMSZ_TOPLEFT:
-					case WMSZ_TOP:
-					case WMSZ_TOPRIGHT:
-					{
-						// Dragging top, leave bottom alone
-						lpRect->top = lpRect->bottom - h;
-						break;
-					}
-					case WMSZ_BOTTOMLEFT:
-					case WMSZ_BOTTOM:
-					case WMSZ_BOTTOMRIGHT:
-					{
-						// Dragging right, leave left alone
-						lpRect->bottom = lpRect->top + h;
-						break;
-					}
-					case WMSZ_LEFT:
-					case WMSZ_RIGHT:
-					{
-						// Dragging top/bottom, leave keep centered
-						lpRect->top = (lpRect->top + lpRect->bottom - h) / 2;
-						lpRect->bottom = lpRect->top + h;
-						break;
-					}
-				}
+                    prevWParam = wParam;
+                    antiRecursionLock = false;
+                }
 
-				return TRUE;
-			}
-		}
-	}
+                // Update window size (but only if not in the middle of the above-noted recursion)
+                if (!antiRecursionLock)
+                {
+                    gWindowSizeHandler.SetWindowSize(
+                        latestLParam & 0xFFFF,
+                        (latestLParam >> 16) & 0xFFFF
+                    );
 
-	return CallWindowProc(gMainWindowProc, hwnd, uMsg, wParam, lParam);
+                    // Redraw
+                    if (inSizeMoveModal || isResizeFromDpiChange)
+                    {
+                        inSizeModal = inSizeMoveModal;
+                        isResizeFromDpiChange = false;
+                        g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
+                    }
+                }
+
+                // Using DefWindowProcW here because allowing the VB code to run for this causes reset of title for some reason
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+            }
+            case WM_PAINT:
+                CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
+                if (inSizeMoveModal || !gMainWindowFocused)
+                {
+                    g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
+                }
+                return 0;
+            case WM_GETMINMAXINFO:
+            {
+                // Set the minimum window size for resizing to 50% of framebuffer size
+                // TODO: Add special cases if framebuffer size is unusually large. Maybe pick a different integer divisor than 2?
+                RECT rc;
+                rc.left = 0;
+                rc.top = 0;
+                rc.right = g_GLContextManager.GetMainFBWidth() / 2;
+                rc.bottom = g_GLContextManager.GetMainFBHeight() / 2;
+                AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                    GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+
+                // Restrict main window size
+                LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+                lpMMI->ptMinTrackSize.x = rc.right - rc.left;
+                lpMMI->ptMinTrackSize.y = rc.bottom - rc.top;
+                return TRUE;
+            }
+            case WM_SIZING:
+            {
+                // Allow free sizing when CTRL is held
+                if ((gKeyState[VK_CONTROL] & 0x80) != 0)
+                {
+                    break;
+                }
+
+                // Adjust the requested resizing of the window
+                LPRECT lpRect = (LPRECT)lParam;
+                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), currentDpi);
+
+                return TRUE;
+            }
+            case WM_SETFOCUS:
+                // Register VK_SNAPSHOT hotkey handling when in focus
+                RegisterHotKey(hwnd, VK_SNAPSHOT, MOD_NOREPEAT, VK_SNAPSHOT);
+
+                // Our main window gained focus? Keep track of that.
+                gMainWindowFocused = true;
+                break;
+            case WM_KILLFOCUS:
+                // Unregister VK_SNAPSHOT hotkey handling when out of focus
+                UnregisterHotKey(hwnd, VK_SNAPSHOT);
+
+                // Our main window lost focus? Keep track of that.
+                if (!gStartupSettings.runWhenUnfocused)
+                {
+                    gMainWindowFocused = false;
+                }
+                break;
+            case WM_DESTROY:
+                // Our main window was destroyed? Clear hwnd and mark as unfocused
+                UnregisterHotKey(hwnd, VK_SNAPSHOT);
+                gMainWindowHwnd = NULL;
+                if (!gStartupSettings.runWhenUnfocused)
+                {
+                    gMainWindowFocused = false;
+                }
+                break;
+            case WM_HOTKEY:
+                if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
+                {
+                    g_GLEngine.TriggerScreenshot([](HGLOBAL globalMem, const BITMAPINFOHEADER* header, void* pData, HWND curHwnd) {
+                        GlobalUnlock(&globalMem);
+                        // Write to clipboard
+                        OpenClipboard(curHwnd);
+                        EmptyClipboard();
+                        SetClipboardData(CF_DIB, globalMem);
+                        CloseClipboard();
+                        return false;
+                    });
+                }
+                return FALSE;
+            case WM_SETCURSOR:
+                if (LOWORD(lParam) == HTCLIENT)
+                {
+                    HCURSOR activeCursor = gCustomCursor;
+                    if (gCustomCursorHide)
+                    {
+                        activeCursor = nullptr;
+                    }
+                    else if (activeCursor == nullptr)
+                    {
+                        static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+                        activeCursor = defaultCursor;
+                    }
+                    SetCursor(activeCursor);
+                    return TRUE;
+                }
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+            case WM_INPUT:
+            {
+                bool haveFocus = (wParam == RIM_INPUT);
+
+                // Process the raw input
+                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), haveFocus);
+
+                // If we have focus, return via DefWindowProcW
+                if (haveFocus)
+                {
+                    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+                }
+                return 0;
+            }
+            case WM_MOUSEMOVE:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                break;
+            case WM_MOUSELEAVE:
+                gMouseHandler.OnMouseLeave();
+                break;
+            case WM_LBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DOWN);
+                break;
+            case WM_LBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_UP);
+                break;
+            case WM_LBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_L, MouseHandler::EVT_DBL);
+                break;
+            case WM_RBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DOWN);
+                break;
+            case WM_RBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_UP);
+                break;
+            case WM_RBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DBL);
+                break;
+            case WM_MBUTTONDOWN:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DOWN);
+                break;
+            case WM_MBUTTONUP:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_UP);
+                break;
+            case WM_MBUTTONDBLCLK:
+                gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+                gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_M, MouseHandler::EVT_DBL);
+                break;
+            case WM_MOUSEWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_V, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
+            case WM_MOUSEHWHEEL:
+                // Don't call OnMouseMove because lParam is screen coords rather than client coords, so probably not suitable
+                gMouseHandler.OnMouseWheelEvent(MouseHandler::WHEEL_H, GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
+        }
+    }
+
+    // (Note, CallWindowProcW does Unicode to ASCII conversion for
+    //  messages that get passed through to it, since the original
+    //  handler is ASCII)
+    return CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -229,76 +968,40 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     switch (wData->message)
     {
-    case WM_COPYDATA:
-        {
-            PCOPYDATASTRUCT pcds = reinterpret_cast<PCOPYDATASTRUCT>(wData->lParam);
-            if (pcds->cbData == 1) {
-                if (pcds->dwData == 0xDEADC0DE) {
-                    std::wstring lvlName = gShMemServer.read();
-                    if (!lvlName.empty()) {
-                        GM_FULLPATH = lvlName;
-                    }
-                    gHook_SkipTestMsgBox = true;
-                    ((void(*)())0x00A02220)();
-                }
-            }
-        }
-        break;
     case WM_CREATE:
         if (wData->lParam != NULL)
         {
-            CREATESTRUCTA* createData = reinterpret_cast<CREATESTRUCTA*>(wData->lParam);
-            LPCSTR winName = createData->lpszName;
-            if ((gMainWindowHwnd == NULL) && (winName != NULL) && (strncmp("- Version 1.2.2 -", &winName[20], 17) == 0))
+            CREATESTRUCTW* createData = reinterpret_cast<CREATESTRUCTW*>(wData->lParam);
+            LPCWSTR winName = createData->lpszName;
+            if ((gMainWindowHwnd == NULL) && (winName != NULL) && (memcmp(L"- Version 1.2.2 -", &winName[20], 17*2) == 0))
             {
+                // Remove hook, since we no longer need it
+                UnhookWindowsHookEx(HookWnd);
+                HookWnd = NULL;
+
                 // Store main window handle
                 gMainWindowHwnd = wData->hwnd;
 
-				// Override window proc
-				gMainWindowProc = (WNDPROC)SetWindowLongPtrA(gMainWindowHwnd, GWLP_WNDPROC, (LONG_PTR)HandleWndProc);
+                // Override window proc
+                gMainWindowProc = (WNDPROC)SetWindowLongPtrW(gMainWindowHwnd, GWLP_WNDPROC, (LONG_PTR)HandleWndProc);
+
+                // Register for the raw input API for keyboard
+                RAWINPUTDEVICE rid;
+                rid.usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+                rid.usUsage = 0x06; // HID_USAGE_GENERIC_KEYBOARD
+                rid.dwFlags = RIDEV_INPUTSINK;
+                rid.hwndTarget = gMainWindowHwnd;
+                RegisterRawInputDevices(&rid, 1, sizeof(rid));
+
+                // Set initial window title right away, since we blocked what was causing VB to set it
+                SetWindowTextW(gMainWindowHwnd, GM_GAMETITLE_1.ptr);
             }
-        }
-        break;
-    case WM_DESTROY:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window was destroyed? Clear hwnd and mark as unfocused
-            gMainWindowHwnd = NULL;
-            if (!gStartupSettings.runWhenUnfocused)
-            {
-                gMainWindowFocused = false;
-            }
-            gMainWindowSize = 0;
-        }
-        break;
-    case WM_SETFOCUS:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window gained focus? Keep track of that.
-            gMainWindowFocused = true;
-        }
-        break;
-    case WM_KILLFOCUS:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Our main window lost focus? Keep track of that.
-            if (!gStartupSettings.runWhenUnfocused)
-            {
-                gMainWindowFocused = false;
-            }
-        }
-        break;
-    case WM_SIZE:
-        if ((gMainWindowHwnd != NULL) && (gMainWindowHwnd == wData->hwnd))
-        {
-            // Store size of main window (low word is width, high word is height)
-            gMainWindowSize = wData->lParam;
         }
         break;
     default:
         break;
     }
-    
+
     return CallNextHookEx(HookWnd, nCode, wParam, lParam);
 }
 
@@ -509,6 +1212,38 @@ AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCom
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
 
+AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
+    .PUSH_EBX()
+    .PUSH_IMM32(0x99A850)
+    .JMP(runtimeHookSetPlayerFenceSpeed);
+
+AsmPatch<14> gFenceFix_9A78A8 = PATCH(0x9A78A8)
+    .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
+    .bytes(0xD9, 0xE0) // fchs
+    .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
+    .bytes(0x0F, 0x1F, 0x00); // nop
+
+AsmPatch<19> gFenceFix_9B8A4C = PATCH(0x9B8A4C)
+    .PUSH_ESI()
+    .CALL(runtimeHookIncreaseFenceFrameCondition)
+    .bytes(0x84, 0xC0) // test al, al
+    .JZ(0x9B8B5D)
+    .JMP(0x9B8AF0);
+
+AsmPatch<10> gFenceFix_AA6E78 = PATCH(0xAA6E78)
+    .PUSH_EBP()
+    .PUSH_ESI()
+    .CALL(runtimeHookUpdateBGOMomentum)
+    .bytes(0x0F, 0x1F, 0x00); // nop
+
+Patchable *gFenceFixes[] = {
+    &gFenceFix_99933C,
+    &gFenceFix_9A78A8,
+    &gFenceFix_9B8A4C,
+    &gFenceFix_AA6E78,
+    nullptr
+};
+
 void TrySkipPatch()
 {
     // If we have stdin/stdout, attach to the IPC server
@@ -560,17 +1295,8 @@ void TrySkipPatch()
     /************************************************************************/
     /* Set Hook                                                             */
     /************************************************************************/
-    HookWnd = SetWindowsHookExA(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
+    HookWnd = SetWindowsHookExW(WH_CALLWNDPROC, MsgHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
     if (!HookWnd){
-        DWORD errCode = GetLastError();
-        std::string errCmd = "Failed to Hook";
-        errCmd += "\nErr-Code: ";
-        errCmd += std::to_string((long long)errCode);
-        MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
-    }
-
-    KeyHookWnd = SetWindowsHookExA(WH_KEYBOARD, KeyHOOKProc, (HINSTANCE)NULL, GetCurrentThreadId());
-    if (!KeyHookWnd){
         DWORD errCode = GetLastError();
         std::string errCmd = "Failed to Hook";
         errCmd += "\nErr-Code: ";
@@ -630,58 +1356,60 @@ void TrySkipPatch()
 
     PATCH(0xA755D2).CALL(&UpdateInputFinishHook_Wrapper).Apply();
     PATCH(0xA74910).JMP(&runtimeHookUpdateInput).Apply();
+    PATCH(0x9C4ADA).JMP(0x9C4B37).Apply(); //So the controls of cloned players can be modified during onInputUpdate
 
     PATCH(0x902D3D).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902DFC).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902EBB).CALL(&WorldOverlayHUDBitBltHook).Apply();
     PATCH(0x902F80).CALL(&WorldOverlayHUDBitBltHook).Apply();
 
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9030F2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90319F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90323D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9032E9).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9034E7).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9036BC).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x9037ED).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90393F).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x903A9C).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x903D66).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x90411B).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x9042F0).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x904421).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x904573).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9046D0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x90499A).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904D4F).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x904F24).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x905055).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9051A7).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x905304).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9055CE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905990).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905D29).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x905F00).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906031).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x906183).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9062E0).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9063FF).CALL(&WorldIconsHUDBitBltHook).Apply();
+    //PATCH(0x9065DE).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906973).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    //PATCH(0x906B31).CALL(&WorldIconsHUDBitBltHook).Apply(); Handled by RuntimeHookCharacterId.cpp
+    PATCH(0x906DB2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x90702D).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9072B2).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907537).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9077FD).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907B4E).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907D3B).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x907F28).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908115).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
+
 
 
     PATCH(0x9000B2).CALL(&WorldHUDIsOnCameraHook).Apply();
@@ -797,7 +1525,7 @@ void TrySkipPatch()
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;
-    if (gIsWindowsVistaOrNewer) {
+    if (Luna_IsWindowsVistaOrNewer()) {
         frameTimingHookPtr = (void*)&FrameTimingHookQPC;
         frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
     }
@@ -1221,7 +1949,11 @@ void TrySkipPatch()
     PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
+    // Also handles collisionGroup for NPC-to-solid interactions now
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
+
+    // Patch to handle collisionGroup for NPC-to-NPC interactions
+    PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Replace pause button detection code to avoid re-triggering when held
     PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();
@@ -1246,9 +1978,14 @@ void TrySkipPatch()
     PATCH(0xAA6DD7).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
-    
-	// Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
-	runtimeHookCharacterIdApplyPatch();
+
+    // Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
+    runtimeHookCharacterIdApplyPatch();
+
+    //Fence bug fixes
+    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+        gFenceFixes[i]->Apply();
+    }
 
     /************************************************************************/
     /* Import Table Patch                                                   */
@@ -1257,5 +1994,15 @@ void TrySkipPatch()
     *(void**)0x00401124 = (void*)&vbaR4VarHook;
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
-}
 
+    // Fix intro level not loading when the save slot number is greater than 3.
+    PATCH(0x8CDE97)
+        .PUSH_IMM32(0x8CDEC7)
+        .JMP(saveFileExists)
+        .Apply();
+
+    PATCH(0x8CDEC7)
+        .bytes(0x84, 0xC0) // test al, al
+        .bytes(0x74, 0x35) // jz 0x8CDF00
+        .Apply();
+}

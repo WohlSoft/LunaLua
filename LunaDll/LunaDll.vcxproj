@@ -128,6 +128,7 @@
     <ClInclude Include="FileManager\CustomParamStore.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
     <ClInclude Include="Input\LunaGameController.h" />
+    <ClInclude Include="Input\MouseHandler.h" />
     <ClInclude Include="libs\DirManager\dirman.h" />
     <ClInclude Include="libs\DirManager\dirman_private.h" />
     <ClInclude Include="libs\fmt\fmt_container.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Rendering\FrameCapture.h" />
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="Rendering\SMBXImageCategories.h" />
+    <ClInclude Include="Rendering\WindowSizeHandler.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
@@ -268,7 +270,6 @@
     <ClInclude Include="CustomSprites\CSpriteManager.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Minigames\GameboyRPG.h" />
-    <ClInclude Include="Misc\SHMemServer.h" />
     <ClInclude Include="Misc\VB6StrPtr.h" />
     <ClInclude Include="Misc\Playground.h" />
     <ClInclude Include="GlobalFuncs.h" />
@@ -323,6 +324,7 @@
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
     <ClCompile Include="Input\LunaGameController.cpp" />
+    <ClCompile Include="Input\MouseHandler.cpp" />
     <ClCompile Include="libs\DirManager\dirman.cpp" />
     <ClCompile Include="libs\DirManager\dirman_winapi.cpp" />
     <ClCompile Include="libs\fmt\fmt_format.cpp" />
@@ -428,6 +430,7 @@
     <ClCompile Include="Rendering\GL\GLFramebuffer.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShader.cpp" />
     <ClCompile Include="Misc\SafeFPUControl.cpp" />
+    <ClCompile Include="Rendering\WindowSizeHandler.cpp" />
     <ClCompile Include="SMBXInternal\CustomGraphics.cpp" />
     <ClCompile Include="GameConfig\GameAutostart.cpp" />
     <ClCompile Include="GameConfig\GameConfiguration.cpp" />
@@ -497,7 +500,6 @@
     <ClCompile Include="Minigames\Minigames.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookFixups.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookGeneral.cpp" />
-    <ClCompile Include="Misc\SHMemServer.cpp" />
     <ClCompile Include="Misc\VB6StrPtr.cpp" />
     <ClCompile Include="Misc\Playground.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />

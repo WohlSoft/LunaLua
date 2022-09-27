@@ -124,7 +124,7 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mCount = cmd->mCount;
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
-	obj->mLinearFiltered = cmd->mLinearFiltered;
+    obj->mLinearFiltered = cmd->mLinearFiltered;
 
     // Ensure we have something for a sampler to sample
     if ((!obj->mImg) && (!obj->mCapBuff))
@@ -497,4 +497,31 @@ FFI_EXPORT void __fastcall FFI_GraphicsGetFrameStats(GLEngineProxy::FrameStatStr
 FFI_EXPORT const GLContextManager::GLConstants* __fastcall FFI_GraphicsGetConstants()
 {
     return &g_GLContextManager.Constants();
+}
+
+// Main framebuffer control
+FFI_EXPORT void FFI_GraphicsSetMainFramebufferSize(int width, int height)
+{
+    CLunaFFILock ffiLock(__FUNCTION__);
+    std::lock_guard<std::mutex> graphicsLock(g_graphicsMutex);
+
+    auto obj = std::make_shared<GLEngineCmd_SetFramebufferSize>();
+    obj->mWidth = width;
+    obj->mHeight = height;
+
+    // NOTE: This command is processed synchronously, avoiding the potential
+    //       for race conditions.
+    //       This does however mean that switching framebuffer size may cause
+    //       a momentary hitch.
+    g_GLEngine.QueueCmd(obj);
+}
+
+struct FBSize {
+    int w;
+    int h;
+};
+FFI_EXPORT FBSize FFI_GraphicsGetMainFramebufferSize()
+{
+    // Return struct by value
+    return { g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight() };
 }

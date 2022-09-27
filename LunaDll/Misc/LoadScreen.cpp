@@ -6,7 +6,9 @@
 #include "../GlobalFuncs.h"
 #include "AsmPatch.h"
 #include "../Rendering/GL/GLEngine.h"
+#include "../Rendering/GL/GLContextManager.h"
 #include "../Rendering/Rendering.h"
+#include "../Rendering/WindowSizeHandler.h"
 #include <lua.hpp>
 #include "LoadScreen.h"
 #include "../LuaMain/LunaPathValidator.h"
@@ -38,6 +40,13 @@ static bool checkElapsedTime(lua_State* L, DWORD loadScreenStartTick)
 
     return true;
 }
+
+static void updateFinishedFlag(lua_State* L)
+{
+    lua_pushboolean(L, killThreadFlag);
+    lua_setglobal(L, "_loadingFinished");
+}
+
 
 static void LoadThread(void)
 {
@@ -96,6 +105,7 @@ static void LoadThread(void)
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");
+        updateFinishedFlag(L);
 
         luasetconst(L, "FIELD_BYTE", 1);
         luasetconst(L, "FIELD_WORD", 2);
@@ -162,27 +172,25 @@ static void LoadThread(void)
 
     
     do {
+        updateFinishedFlag(L);
+        
+        Renderer::Get().StartFrameRender();
+        Renderer::Get().StartCameraRender(1);
+
+        // Set camera 0 (primary framebuffer)
+        std::shared_ptr<GLEngineCmd_SetCamera> cmd = std::make_shared<GLEngineCmd_SetCamera>();
+        cmd->mIdx = 0;
+        cmd->mX = 0;
+        cmd->mY = 0;
+        g_GLEngine.QueueCmd(cmd);
+
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
         {
             MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
         }
 
-        Renderer::Get().StartFrameRender();
-
         Renderer::Get().RenderBelowPriority(DBL_MAX);
-
-        // Get window size
-        uint32_t windowSize = gMainWindowSize;
-        int32_t windowWidth = windowSize & 0xFFFF;
-        int32_t windowHeight = (windowSize >> 16) & 0xFFFF;
-        if (windowSize == 0)
-        {
-            windowWidth = 800;
-            windowHeight = 600;
-        }
-
-        g_GLEngine.RenderCameraToScreen(NULL, 0, 0, windowWidth, windowHeight, NULL, 0, 0, 800, 600, 0);
 
         g_GLEngine.EndFrame(NULL, true);
 

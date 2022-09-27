@@ -134,7 +134,7 @@
 //+0x11E	w	= Holding jump button
 //+0x120	w	= Holding spinjump button
 //+0x122	w	= Forced animation state	(1 = powerup, 2 = powerdown, 3 = entering pipe, 4 = getting fire flower,
-//											 7 = entering door, 8 = invisible/immobile/intangible state (during fairy or character change poof),
+//                                           7 = entering door, 8 = invisible/immobile/intangible state (during fairy or character change poof),
 //                                           500 = tanooki statue poof state)
 //+0x124	qw	= Forced Animation Timer
 //+0x12C	w	= Down button mirror (redundant?)

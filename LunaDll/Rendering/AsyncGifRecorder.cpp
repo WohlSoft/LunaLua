@@ -114,8 +114,17 @@ void AsyncGifRecorder::workerFunc()
 
             if ((!m_opened) && (!m_error))
             {
-                m_opened = GIF_H::GifBegin(m_gifWriter, WStr2Str(m_fileName).c_str(), nextData.width, nextData.height, 3, 8, false);
-                m_error = !m_opened;
+                FILE *pFile = _wfopen(m_fileName.c_str(), L"wb");
+                if (pFile)
+                {
+                    m_opened = GIF_H::GifBegin(m_gifWriter, pFile, nextData.width, nextData.height, 3, 8, false);
+                    m_error = !m_opened;
+                }
+                else
+                {
+                    m_opened = false;
+                    m_error = true;
+                }
                 mLastTimestamp = nextData.timestamp;
             }
             else if (!m_error)

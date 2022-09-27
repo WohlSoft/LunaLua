@@ -15,18 +15,17 @@ void GLEngineCmd_ClearTextures::run(GLEngine& glEngine) const {
     g_GLTextureStore.ClearLunaImageTextures();
 }
 void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
-    glEngine.RenderCameraToScreen(
-        mHdcDest,
-        mXDest, mYDest,
-        mWidthDest, mHeightDest,
-        mHdcSrc,
-        mXSrc, mYSrc,
-        mWidthSrc, mHeightSrc,
-        mRop);
+    const GLDraw::Texture& tex = g_GLContextManager.GetCameraFBTex(mCamIdx);
+    g_GLContextManager.BindPrimaryFB();
+    g_GLDraw.DrawSprite(
+        { mRenderX, mRenderY, mRenderX + mWidth, mRenderY + mHeight },
+        &tex,
+        { 0.0, 0.0, mWidth, mHeight },
+        1.0f, GLDraw::RENDER_MODE_ALPHA);
 }
 
 void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
-    glEngine.EndFrame(mHdcDest, mForceSkip);
+    glEngine.EndFrame(mHdcDest, mForceSkip, mRedrawOnly, mResizeOverlay);
 }
 
 void GLEngineCmd_InitForHDC::run(GLEngine& glEngine) const {
@@ -178,11 +177,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         g_GLDraw.UnbindTexture();
     }
 
-	if (mLinearFiltered)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
+    if (mLinearFiltered)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
 
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
@@ -233,14 +232,14 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     glDrawArrays(mType, 0, mCount);
     GLERRORCHECK();
 
-	if (mLinearFiltered)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		if (!mCapBuff)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		}
-	}
+    if (mLinearFiltered)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (!mCapBuff)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+    }
 
     if (mTex == NULL) {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -284,14 +283,24 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         if (mTarget->mFramebuffer != nullptr)
         {
             // Bind old framebuffer
-            g_GLContextManager.BindFramebuffer();
+            g_GLContextManager.BindCameraFB();
         }
     }
 }
 
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
-    glEngine.SetCamera(mX, mY);
+    if (mIdx == 0)
+    {
+        g_GLContextManager.BindPrimaryFB();
+    }
+    else
+    {
+        g_GLContextManager.SetActiveCamera(mIdx);
+        g_GLContextManager.BindCameraFB();
+    }
+    g_GLContextManager.GetCurrentFB()->Clear();
+    glEngine.SetCameraPositionInScene(mX, mY);
 }
 
 void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
@@ -314,4 +323,9 @@ void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
     // Get attribute/uniform metadata
     mShaderObj->mAttributeInfo = mShaderObj->mShader->getAllAttributes();
     mShaderObj->mUniformInfo = mShaderObj->mShader->getAllUniforms();
+}
+
+void GLEngineCmd_SetFramebufferSize::run(GLEngine& glEngine) const
+{
+    g_GLContextManager.SetMainFramebufferSize(mWidth, mHeight);
 }

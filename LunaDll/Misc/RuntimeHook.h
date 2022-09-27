@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "../Defines.h"
+#include "../SMBXInternal/PlayerMOB.h"
 #include "AsmPatch.h"
 #include "../GlobalFuncs.h"
 
@@ -38,6 +39,7 @@ void TrySkipPatch();
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
+extern Patchable *gFenceFixes[];
 
 
 /************************************************************************/
@@ -111,7 +113,6 @@ extern BOOL __stdcall WorldIconsHUDBitBltHook(HDC hdcDest, int nXDest, int nYDes
 extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* momentumObj);
 
 extern void __stdcall GenerateScreenshotHook();
-extern LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // Hooks which are helping fixups
 extern void IsNPCCollidesWithVeggiHook_Wrapper();
@@ -578,6 +579,7 @@ void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void);
 void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
 
 void __stdcall runtimeHookBlockNPCFilter(void);
+void __stdcall runtimeHookNPCCollisionGroup(void);
 
 void __stdcall runtimeHookLevelPauseCheck(void);
 
@@ -596,5 +598,10 @@ void __stdcall runtimeHookBlockSpeedSet_MOV_ECX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI(void);
 void __stdcall runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI(void);
 
-#endif
+bool __stdcall saveFileExists();
 
+void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player);
+bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);
+void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
+
+#endif

@@ -24,7 +24,7 @@ private:
 
     double mCameraX, mCameraY;
 
-	GLShader* mpUpscaleShader;
+    GLShader* mpUpscaleShader;
 
 public:
     GLEngine();
@@ -33,10 +33,7 @@ public:
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 
     void InitForHDC(HDC hdcDest);
-    BOOL RenderCameraToScreen(HDC hdcDest, int nXOriginDest, int nYOriginDest, int nWidthDest, int nHeightDest,
-        HDC hdcSrc, int nXOriginSrc, int nYOriginSrc, int nWidthSrc, int nHeightSrc,
-        DWORD dwRop);
-    void EndFrame(HDC hdcDest, bool skipFlipToScreen);
+    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };
@@ -49,8 +46,10 @@ public:
     bool GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     void GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
-    inline void SetCamera(double x, double y) { mCameraX = x; mCameraY = y; }
+    inline void SetCameraPositionInScene(double x, double y) { mCameraX = x; mCameraY = y; }
     inline void GetCamera(double &x, double &y) { x = mCameraX; y = mCameraY; }
+
+    void SetFramebufferSize();
 };
 
 #include "GLEngineProxy.h"

@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
+#include "../WindowSizeHandler.h"
 #include "GLContextManager.h"
 #include "GLCompat.h"
 
@@ -11,8 +12,10 @@ GLContextManager g_GLContextManager;
 // Constructor
 GLContextManager::GLContextManager() :
     hDC(nullptr), hQueueThreadCTX(nullptr), hMainThreadCTX(nullptr),
-    mInitialized(false), mHadError(false), mMainThreadCTXApplied(false), 
-    mOldPixelFormat(0), mCurrentFB(nullptr), mFramebuffer(nullptr),
+    mInitialized(false), mHadError(false), mMainThreadCTXApplied(false),
+    mMainFBWidth(800), mMainFBHeight(600),
+    mOldPixelFormat(0), mCurrentFB(nullptr), mPrimaryFB(nullptr),
+    mCurrentCameraFB(nullptr), mCurrentCameraIdx(0), mCameraFramebuffers(),
     mConstants()
 {
 }
@@ -143,11 +146,18 @@ void GLContextManager::BindScreen() {
     GLERRORCHECK();
 }
 
-void GLContextManager::BindFramebuffer() {
-    if (mFramebuffer == nullptr) return;
+void GLContextManager::BindPrimaryFB() {
+    if (mPrimaryFB == nullptr) return;
 
-    // Bind the main screen framebuffer
-    mFramebuffer->Bind();
+    // Bind the primary framebuffer
+    mPrimaryFB->Bind();
+}
+
+void GLContextManager::BindCameraFB() {
+    if (mCurrentCameraFB == nullptr) return;
+
+    // Bind the current camera framebuffer
+    mCurrentCameraFB->Bind();
 }
 
 void GLContextManager::EnsureMainThreadCTXApplied()
@@ -159,12 +169,27 @@ void GLContextManager::EnsureMainThreadCTXApplied()
     }
 }
 
-void GLContextManager::BindAndClearFramebuffer() {
-    if (mFramebuffer == nullptr) return;
+void GLContextManager::SetActiveCamera(int cameraIdx)
+{
+    if ((cameraIdx < 1) || (cameraIdx > MAX_CAMERAS))
+    {
+        // Invalid index
+        return;
+    }
 
-    // Bind the main screen framebuffer and clear it
-    mFramebuffer->Bind();
-    mFramebuffer->Clear();
+    // Change to 0-based index
+    cameraIdx--;
+
+    bool isCameraBufferBound = (mCurrentCameraFB == mCurrentFB);
+    if (mCurrentCameraIdx != cameraIdx)
+    {
+        mCurrentCameraIdx = cameraIdx;
+        mCurrentCameraFB = mCameraFramebuffers[cameraIdx];
+        if (isCameraBufferBound)
+        {
+            BindCameraFB();
+        }
+    }
 }
 
 // Set up a new context from a HDC
@@ -217,8 +242,9 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
         return false;
     }
 
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glOrtho(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
+    glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
     glColor3f(1, 1, 1);
     glDisable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
@@ -248,26 +274,28 @@ bool GLContextManager::InitContextFromHDC(HDC hDC) {
 bool GLContextManager::InitFramebuffer() {
     try
     {
-        mFramebuffer = new GLFramebuffer(800, 600, false);
+        mPrimaryFB = new GLFramebuffer(mMainFBWidth, mMainFBHeight, false);
+        for (int i = 0; i < MAX_CAMERAS; i++)
+        {
+            mCameraFramebuffers[i] = new GLFramebuffer(mMainFBWidth, mMainFBHeight, false);
+        }
+        mCurrentCameraFB = mCameraFramebuffers[mCurrentCameraIdx];
     }
-    catch(...)
+    catch (...)
     {
-        mFramebuffer = nullptr;
+        ReleaseFramebuffer();
         return false;
     }
     return true;
 }
 
 bool GLContextManager::InitProjectionAndState() {
-    if (mFramebuffer == nullptr) return false;
-    
-    const GLDraw::Texture& tex = mFramebuffer->AsTexture();
-
     // Set projection
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     GLERRORCHECK();
-    glOrtho(0.0f, (float)tex.pw, 0.0f, (float)tex.ph, -1.0f, 1.0f);
+    glOrtho(0.0f, (float)mMainFBWidth, 0.0f, (float)mMainFBHeight, -1.0f, 1.0f);
     GLERRORCHECK();
     glColor3f(1, 1, 1);
     GLERRORCHECK();
@@ -288,14 +316,20 @@ bool GLContextManager::InitProjectionAndState() {
     GLERRORCHECK();
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     GLERRORCHECK();
-
+    
     return true;
 }
 
 
 void GLContextManager::ReleaseFramebuffer() {
-    delete mFramebuffer;
-    mFramebuffer = nullptr;
+    if (mPrimaryFB) delete mPrimaryFB;
+    mPrimaryFB = nullptr;
+    for (int i = 0; i < MAX_CAMERAS; i++)
+    {
+        if (mCameraFramebuffers[i]) delete mCameraFramebuffers[i];
+        mCameraFramebuffers[i] = nullptr;
+    }
+    mCurrentCameraFB = nullptr;
 }
 
 void GLContextManager::ReleaseContext() {
@@ -315,4 +349,30 @@ void GLContextManager::ReleaseContext() {
 
     // Clear hDC
     hDC = nullptr;
+}
+
+void GLContextManager::SetMainFramebufferSize(int width, int height)
+{
+    mMainFBWidth = width;
+    mMainFBHeight = height;
+    gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
+    if (!mInitialized) return;
+
+    // Adjust screen projection
+    BindScreen();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glOrtho(0.0f, mMainFBWidth, 0.0f, mMainFBHeight, -100.0f, 100.0f);
+
+    // Delete and re-init framebuffer
+    ReleaseFramebuffer();
+    InitFramebuffer();
+
+    // Bind camera framebuffer and clear
+    g_GLContextManager.BindCameraFB();
+    GLFramebuffer* fb = g_GLContextManager.GetCurrentFB();
+    if (fb) fb->Clear();
+
+    // Re-init some state just in case
+    InitProjectionAndState();
 }

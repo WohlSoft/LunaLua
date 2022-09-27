@@ -7,8 +7,8 @@
 class SMBX_CameraInfo
 {
 public:
-    double x;                       //+0x00
-    double y;                       //+0x08
+    double renderX;                 //+0x00
+    double renderY;                 //+0x08
     double width;                   //+0x10
     double height;                  //+0x18
     short unkIsSplitScreen;         //+0x20

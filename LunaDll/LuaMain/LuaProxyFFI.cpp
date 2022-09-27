@@ -20,7 +20,9 @@
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
+#include "../Input/MouseHandler.h"
 #include "LunaLuaMain.h"
+#include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
@@ -420,6 +422,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
+    char collisionGroup[32];\
 } ExtendedNPCFields;";
     }
 
@@ -437,7 +440,13 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
+    char collisionGroup[32];\
 } ExtendedBlockFields;";
+    }
+
+    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    {
+        return 32;
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
@@ -468,6 +477,18 @@ typedef struct ExtendedBlockFields_\
         {
             gDisableNPCDownwardClipFix.Unapply();
             //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
+        if (enable) {
+            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+                gFenceFixes[i]->Apply();
+            }
+        } else {
+            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
+                gFenceFixes[i]->Unapply();
+            }
         }
     }
 
@@ -555,6 +576,168 @@ typedef struct ExtendedBlockFields_\
 
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
+    }
+
+    FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
+    {
+        // Add "Software Rendered" if using it, like the normal window name code does
+        std::string fullName = newName;
+        if (gStartupSettings.softwareGL)
+        {
+            fullName += " (Software Renderer)";
+        }
+
+        // Main bit for setting window name
+        SetWindowTextW(gMainWindowHwnd,Str2WStr(fullName).c_str());
+    }
+
+    static HICON lastSmallIcon = NULL;
+    static HICON lastBigIcon = NULL;
+
+    FFI_EXPORT(void) LunaLuaSetWindowIcon(LunaImageRef* img, int iconType)
+    {
+        if (iconType < 0 || iconType > 2) return; // Invalid icon type
+
+        // Convert passed image to a HBITMAP
+        HBITMAP asBitmap = (*img)->asHBITMAP();
+
+        if (asBitmap == nullptr) return;
+
+        // Create an icon out of the image
+        ICONINFO iconInfo;
+
+        iconInfo.fIcon = TRUE;
+        iconInfo.hbmColor = asBitmap;
+        iconInfo.hbmMask = asBitmap;
+        iconInfo.xHotspot = 0;
+        iconInfo.yHotspot = 0;
+
+        // Apply it to the window
+        if (iconType == 0 || iconType == 1) // Small icon
+        {
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+            LPARAM asParam = LPARAM(asIcon);
+
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_SMALL,asParam);
+
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastSmallIcon) DestroyIcon(lastSmallIcon);
+            lastSmallIcon = asIcon;
+        }
+        
+        if (iconType == 0 || iconType == 2) // Big icon
+        {
+            HICON asIcon = CreateIconIndirect(&iconInfo);
+            LPARAM asParam = LPARAM(asIcon);
+            
+            SendMessage(gMainWindowHwnd,WM_SETICON,ICON_BIG,asParam);
+
+            // If we were already using a custom icon, delete it, to avoid memory leaks
+            if (lastBigIcon) DestroyIcon(lastBigIcon);
+            lastBigIcon = asIcon;
+        }
+    }
+
+    // Utility function to check if the cursor is in the client area
+    static bool IsCursorInClientArea(HWND hwnd)
+    {
+        POINT cursorPoint;
+        RECT clientRect;
+        return ((hwnd != nullptr) &&
+                (GetCursorPos(&cursorPoint) != 0) &&
+                (ScreenToClient(gMainWindowHwnd, &cursorPoint) != 0) &&
+                (GetClientRect(gMainWindowHwnd, &clientRect) != 0) &&
+                (PtInRect(&clientRect, cursorPoint) != 0)
+               );
+    }
+
+    FFI_EXPORT(void) LunaLuaSetCursor(LunaImageRef* img, uint32_t xHotspot, uint32_t yHotspot)
+    {
+        HCURSOR asCursor = nullptr;
+
+        // Convert if what is passed in is not null
+        if ((img != nullptr) && (*img != nullptr))
+        {
+            // Convert passed image to a HBITMAP
+            HBITMAP asBitmap = (*img)->asHBITMAP();
+
+            if (asBitmap == nullptr) return;
+
+            // Limit hotspot location
+            uint32_t imgW = (*img)->getW();
+            uint32_t imgH = (*img)->getH();
+            if (xHotspot > imgW) xHotspot = imgW;
+            if (yHotspot > imgH) yHotspot = imgH;
+
+            // Create a cursor out of the image
+            ICONINFO cursorInfo;
+
+            cursorInfo.fIcon = FALSE;
+            cursorInfo.hbmColor = asBitmap;
+            cursorInfo.hbmMask = asBitmap;
+            cursorInfo.xHotspot = xHotspot;
+            cursorInfo.yHotspot = yHotspot;
+
+            asCursor = CreateIconIndirect(&cursorInfo);
+        }
+
+        // Store new cursor setting
+        HCURSOR lastCursor = gCustomCursor;
+        gCustomCursor = asCursor;
+        gCustomCursorHide = false;
+
+        // Get actual cursor to use if we need one now
+        // (translate null to the default cursor)
+        HCURSOR activeCursor = asCursor;
+        if (activeCursor == nullptr)
+        {
+            static HCURSOR defaultCursor = LoadCursor(nullptr, IDC_ARROW);
+            activeCursor = defaultCursor;
+        }
+
+        // If the previous cursor was set, deallocate it
+        // Deallocate the old cursor
+        if (lastCursor)
+        {
+            if (GetCursor() == lastCursor)
+            {
+                // If the last cursor was in use
+                SetCursor(activeCursor);
+            }
+            DestroyIcon(lastCursor);
+        }
+
+        // Set immediately if in main window client area
+        if (IsCursorInClientArea(gMainWindowHwnd))
+        {
+            SetCursor(activeCursor);
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetCursorHide(void)
+    {
+        gCustomCursorHide = true;
+
+        // Set immediately if in main window client area
+        if (IsCursorInClientArea(gMainWindowHwnd))
+        {
+            SetCursor(nullptr);
+        }
+    }
+
+    FFI_EXPORT(bool) LunaLuaGetMouseButtonState(int button)
+    {
+        return gMouseHandler.GetButtonState(static_cast<MouseHandler::ButtonEnum>(button));
+    }
+
+    struct MousePos
+    {
+        double x;
+        double y;
+    };
+    FFI_EXPORT(MousePos) LunaLuaGetMousePosition()
+    {
+        return {gMouseHandler.GetX(), gMouseHandler.GetY()};
     }
 }
 

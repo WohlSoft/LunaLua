@@ -18,7 +18,6 @@
 #include "UserSaves/UserSaving.h"
 #include "MciEmulator/mciEmulator.h"
 #include "HardcodedGraphics/HardcodedGraphicsManager.h"
-#include "Misc/SHMemServer.h"
 #include "LuaMain/LunaLuaMain.h"
 #include "GameConfig/GameAutostart.h"
 #include "Misc/FreeImageUtils/FreeImageInit.h"
@@ -90,7 +89,6 @@ extern HINSTANCE	gHInstance;
 /// Global main window state
 extern HWND gMainWindowHwnd;
 extern bool gMainWindowFocused;
-extern std::atomic<uint32_t> gMainWindowSize; // Low word is width, height word is height
 
 /// Global settings
 extern bool            gLunaEnabled;
@@ -98,7 +96,6 @@ extern bool            gPrintErrorsToScreen;
 extern bool            gIsOverworld;
 extern bool            gHook_SkipTestMsgBox;
 extern bool            gAutostartRan;
-extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
@@ -132,6 +129,10 @@ extern HDC		ghMemDC;		// General-use screen-compatible DC
 extern HBITMAP	ghGeneralDIB;	// General-use screen-sized DIB
 extern DWORD*	gpScreenBits;	// Pointer to screen bits for general use DIB
 
+// Mouse cursor
+extern HCURSOR  gCustomCursor;
+extern bool     gCustomCursorHide;
+
 // Key status
 extern short	gNumpad4;
 extern short	gNumpad8;
@@ -158,7 +159,6 @@ extern CellManager			gCellMan;
 extern SavedVariableBank	gSavedVarBank;
 extern MciEmulator			gMciEmulator;
 extern HardcodedGraphicsManager gGraphManager;
-extern SHMemServer			gShMemServer;
 extern FreeImageInit        gFreeImgInit;
 extern GeneralLunaConfig    gGeneralConfig;
 extern LunaGameControllerManager gLunaGameControllerManager;

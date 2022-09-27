@@ -218,7 +218,7 @@ void ConfigPackMiniManager::loadStore(EntryType type,
     dst.data.resize(total);
     for(size_t it = 1; it <= total; it++)
     {
-		HandleEventsWhileLoading();
+        HandleEventsWhileLoading();
 
         std::string fname = fmt::format("{0}-{1}.ini", item_head, it);
         std::wstring wfname = Str2WStr(fname);
