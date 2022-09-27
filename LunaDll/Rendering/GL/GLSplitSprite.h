@@ -2,7 +2,7 @@
 #define GLSplitSprite_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <stdint.h>
 #include <vector>
 #include "GLDraw.h"

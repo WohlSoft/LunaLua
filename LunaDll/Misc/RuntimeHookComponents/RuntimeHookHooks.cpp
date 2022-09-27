@@ -1701,19 +1701,17 @@ __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
 {
     __asm {
         pushfd
-            push eax
-            push ecx
-            push edx
-    }
-    runtimeHookSmbxChangeModeHook();
-    __asm {
+        push eax
+        push ecx
+        push edx
+        call runtimeHookSmbxChangeModeHook
         pop edx
-            pop ecx
-            pop eax
-            popfd
-            or ebx, 0xFFFFFFFF
-            cmp word ptr ds : [0xB2C620], bx
-            ret
+        pop ecx
+        pop eax
+        popfd
+        or ebx, 0xFFFFFFFF
+        cmp word ptr ds : [0xB2C620], bx
+        ret
     }
 }
 
@@ -1819,9 +1817,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         push eax
         push ecx
         push edx
-    }
-    runtimeHookSmbxCheckWindowed();
-    __asm {
+        call runtimeHookSmbxCheckWindowed
         pop edx
         pop ecx
         pop eax

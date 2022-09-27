@@ -30,25 +30,15 @@ namespace LuaProxy {
 
     template<typename T>
     bool luaUserdataCompare(const luabind::object& arg1, const luabind::object& arg2, lua_State* L) {
-        boost::optional<T*> arg1Casted = luabind::object_cast_nothrow<T*>(arg1);
-        boost::optional<T*> arg2Casted = luabind::object_cast_nothrow<T*>(arg2);
+        T* rawArg1 = luabind::object_cast_nothrow<T*>(arg1, static_cast<T*>(nullptr));
+        T* rawArg2 = luabind::object_cast_nothrow<T*>(arg2, static_cast<T*>(nullptr));
 
-        T* rawArg1 = nullptr;
-        T* rawArg2 = nullptr;
-        if (arg1Casted != boost::none)
-        {
-            rawArg1 = arg1Casted.get();
-        }
-        else
+        if (rawArg1 == nullptr)
         {
             luaL_error(L, "Failed to compare %s == %s:\nLeft compare argument is not %s", typeid(T).name(), typeid(T).name(), typeid(T).name());
             return false;
         }
-        if (arg2Casted != boost::none)
-        {
-            rawArg2 = arg2Casted.get();
-        }
-        else
+        if (rawArg2 == nullptr)
         {
             luaL_error(L, "Failed to compare %s == %s:\nRight compare argument is not %s", typeid(T).name(), typeid(T).name(), typeid(T).name());
             return false;
@@ -61,25 +51,15 @@ namespace LuaProxy {
     bool luaUserdataIndexCompare(const luabind::object& arg1, const luabind::object& arg2, lua_State* L){
         static_assert(std::is_integral<IndexType>::value, "Data member type must be integral!");
 
-        boost::optional<C*> arg1Casted = luabind::object_cast_nothrow<C*>(arg1);
-        boost::optional<C*> arg2Casted = luabind::object_cast_nothrow<C*>(arg2);
+        C* rawArg1 = luabind::object_cast_nothrow<C*>(arg1, static_cast<C*>(nullptr));
+        C* rawArg2 = luabind::object_cast_nothrow<C*>(arg2, static_cast<C*>(nullptr));
 
-        C* rawArg1 = nullptr;
-        C* rawArg2 = nullptr;
-        if (arg1Casted != boost::none)
-        {
-            rawArg1 = arg1Casted.get();
-        }
-        else
+        if (rawArg1 == nullptr)
         {
             luaL_error(L, "Failed to compare %s == %s:\nLeft compare argument is not %s", typeid(C).name(), typeid(C).name(), typeid(C).name());
             return false;
         }
-        if (arg2Casted != boost::none)
-        {
-            rawArg2 = arg2Casted.get();
-        }
-        else
+        if (rawArg2 == nullptr)
         {
             luaL_error(L, "Failed to compare %s == %s:\nRight compare argument is not %s", typeid(C).name(), typeid(C).name(), typeid(C).name());
             return false;
@@ -88,7 +68,7 @@ namespace LuaProxy {
         return rawArg1->*Index == rawArg2->*Index;
     };
 
-#define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( ## def_class ## :: ## def_datamember ## ), & ## def_class ## :: ## def_datamember ## >
+#define LUAPROXY_DEFUSERDATAINEDXCOMPARE(def_class, def_datamember) &LuaProxy::luaUserdataIndexCompare<def_class, decltype( def_class :: def_datamember ), & def_class :: def_datamember >
 
 
     template<typename ConvertedType>

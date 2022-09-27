@@ -3,6 +3,7 @@
 #define PlayerMob_hhhhh
 #include "../Defines.h"
 #include "BaseItemArray.h"
+#include <cstddef>
 
 #ifndef __MINGW32__
 #pragma region Lookup
@@ -378,10 +379,10 @@ struct PlayerMOB {
 /* Verify struct is correctly sized, and also verify that a sampling of fields
  * that errors in would indicate a problem */
 #ifndef __INTELLISENSE__
-static_assert(&((PlayerMOB*)0x0)->ItemPullupTimer == (void*)0x26, "ItemPullupTimer must be at at 0x26");
-static_assert(&((PlayerMOB*)0x0)->HasJumped == (void*)0x60, "HasJumped must be at at 0x60");
-static_assert(&((PlayerMOB*)0x0)->momentum.x == (void*)0xC0, "momentum.x must be at at 0xC0");
-static_assert(&((PlayerMOB*)0x0)->Unknown166 == (void*)0x166, "Unknown166 must be at at 0x166");
+static_assert(offsetof(PlayerMOB, ItemPullupTimer) == 0x26, "ItemPullupTimer must be at at 0x26");
+static_assert(offsetof(PlayerMOB, HasJumped) == 0x60, "HasJumped must be at at 0x60");
+static_assert(offsetof(PlayerMOB, momentum.x) == 0xC0, "momentum.x must be at at 0xC0");
+static_assert(offsetof(PlayerMOB, Unknown166) == 0x166, "Unknown166 must be at at 0x166");
 static_assert(sizeof(PlayerMOB) == 0x184, "sizeof(PlayerMOB) must be 0x184");
 #endif
 

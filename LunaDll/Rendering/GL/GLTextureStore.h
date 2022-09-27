@@ -2,7 +2,7 @@
 #define GLTextureStore_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <vector>
 #include <unordered_map>
 #include <cstdint>

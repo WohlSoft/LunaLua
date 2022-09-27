@@ -31,7 +31,7 @@ class RenderOverrideManager;
 #include "Defines.h"
 
 #ifndef __MINGW32__
-#pragma comment (lib, "Msimg32.lib")
+#pragma comment (lib, "msimg32.lib")
 #endif
 
 struct StartupEpisodeSettings

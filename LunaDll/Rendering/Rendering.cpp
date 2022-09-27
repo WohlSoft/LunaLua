@@ -24,7 +24,7 @@ using namespace std;
 static Renderer sLunaRender;
 static Renderer sAltLunaRender;
 static DWORD altLunaRenderThread = 0;
-static std::atomic<bool> altLunaRenderThreadValid = false;
+static std::atomic<bool> altLunaRenderThreadValid(false);
 
 Renderer& Renderer::Get()
 {

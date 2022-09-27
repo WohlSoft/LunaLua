@@ -56,18 +56,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-deboostified;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-include;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\boost;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs;$(MSBuildProjectDirectory)\libs\luabind-deboostified;$(MSBuildProjectDirectory)\libs\lua\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(MSBuildProjectDirectory)\libs\glew\include;$(MSBuildProjectDirectory)\libs\freeimage;$(IncludePath)</IncludePath>
+    <LibraryPath>$(MSBuildProjectDirectory)\libs\lua\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(MSBuildProjectDirectory)\libs\glew\lib\Release\Win32;$(MSBuildProjectDirectory)\libs\freeimage;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release without SDL|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-include;$(ProgramFiles)\Lua\5.1\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(MSBuildProjectDirectory)\libs\luabind-lib;$(ProgramFiles)\Lua\5.1\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory)\libs\luabind-deboostified;$(ProgramFiles)\Lua\5.1\include;$(MSBuildProjectDirectory)\libs\sdl\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProgramFiles)\Lua\5.1\lib;$(MSBuildProjectDirectory)\libs\sdl\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -76,14 +76,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;NDEBUG;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LUA_DEV);$(MSBuildProjectDirectory)\libs\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LUA_DEV)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;shlwapi.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;setupapi.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;shlwapi.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;setupapi.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,7 +101,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <MinimalRebuild>false</MinimalRebuild>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\libs\boost;$(LUA_DEV)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LUA_DEV)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -111,7 +111,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;shlwapi.lib;libluabind.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;setupapi.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;gdiplus.lib;FreeImageLite.lib;version.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;shlwapi.lib;lua51.lib;Dbghelp.lib;Ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;setupapi.lib;comsuppw.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ForceFileOutput>
       </ForceFileOutput>
       <GenerateMapFile>true</GenerateMapFile>
@@ -370,6 +370,27 @@
     <ClCompile Include="libs\PGE_File_Formats\smbx64.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\smbx64_cnf_filedata.cpp" />
     <ClCompile Include="libs\PGE_File_Formats\wld_filedata.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\class.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\class_info.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\class_registry.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\class_rep.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\create_class.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\error.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\exception_handler.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\function.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\function_introspection.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\headertest.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\inheritance.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\link_compatibility.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\object_rep.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\open.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\operator.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\pcall.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\scope.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\set_package_preload.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\stack_content_by_name.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\weak_ref.cpp" />
+    <ClCompile Include="libs\luabind-deboostified\src\wrapper_base.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFI.cpp" />
     <ClCompile Include="Misc\Gui\RichTextDialog.cpp" />
     <ClCompile Include="Misc\PGEEditorCmdSender.cpp" />

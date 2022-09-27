@@ -76,7 +76,7 @@ void AsyncHTTPClient::asyncSendWorker()
     }
 
     if (SUCCEEDED(hr)) {
-        _bstr_t method(method.c_str());
+        _bstr_t method_bstr(method.c_str());
         _bstr_t url;
         if (m_method == HTTP_GET) {
             url = ((m_url + (fullArgList.empty() ? "" : "?") + fullArgList).c_str());
@@ -85,7 +85,7 @@ void AsyncHTTPClient::asyncSendWorker()
         {
             url = m_url.c_str();
         }
-        hr = pIWinHttpRequest->Open(method, url, varFalse);
+        hr = pIWinHttpRequest->Open(method_bstr, url, varFalse);
     }
 
     if (m_method == HTTP_POST) {

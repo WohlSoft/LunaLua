@@ -2,7 +2,7 @@
 #define GLContextManager_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "GLTextureStore.h"
 #include "GLFramebuffer.h"
 
