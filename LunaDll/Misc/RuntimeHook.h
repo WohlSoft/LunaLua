@@ -187,20 +187,6 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
 
         "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
         "mov ecx, eax\n" // The pointer to this is stored in ecx in the __thiscall convention
-        
-        /*
-        ".if %c[priorityAbove100]\n"
-            "push 0x7FEFFFFF\n" // Push most significant dword of DBL_MAX
-            "push 0xFFFFFFFF\n" // Push least significant dword of DBL_MAX
-        ".else\n"
-            "push eax\n" // Allocate the first 4 bytes on the stack for the priority argument of Renderer::RenderBelowPriority, the next four bytes will be allocated by push priority.
-
-            // The following 3 instructions are for converting priority to a dfloat.
-            "push %c[priorityValue]\n"
-            "fild dword ptr [esp]\n"
-            "fstp qword ptr [esp]\n"
-        ".endif\n"
-        */
 
         "push %c[PriorityMostSignificantDWord]\n" // Push most significant dword of priority
         "push %c[PriorityLeastSignificantDWord]\n" // Push least significant dword of priority
@@ -214,9 +200,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         "ret\n"
         ".att_syntax\n"
         :
-        : //[priorityAbove100] "i" (priority >= 100),
-          //[priorityValue] "i" (priority),
-          [PriorityMostSignificantDWord] "i" (DoubleMostSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
+        : [PriorityMostSignificantDWord] "i" (DoubleMostSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [PriorityLeastSignificantDWord] "i" (DoubleLeastSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [getRenderer] "i" (&Renderer::Get),
           [RenderBelowPriority] "i" (&Renderer::RenderBelowPriority)
@@ -258,20 +242,6 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
         "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
         "mov ecx, eax\n" // The pointer to this is stored in ecx in the __thiscall convention
 
-        /*
-        ".if %c[priorityAbove100]\n"
-            "push 0x7FEFFFFF\n" // Push most significant dword of DBL_MAX
-            "push 0xFFFFFFFF\n" // Push least significant dword of DBL_MAX
-        ".else\n"
-            "push eax\n" // Allocate the first 4 bytes on the stack for the priority argument of Renderer::RenderBelowPriority, the next four bytes will be allocated by push priority.
-
-            // The following 3 instructions are for converting priority to a dfloat.
-            "push %c[priorityValue]\n"
-            "fild dword ptr [esp]\n"
-            "fstp qword ptr [esp]\n"
-        ".endif\n"
-        */
-
         "push %c[PriorityMostSignificantDWord]\n" // Push most significant dword of priority
         "push %c[PriorityLeastSignificantDWord]\n" // Push least significant dword of priority
 
@@ -289,9 +259,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
         "ret\n"
         ".att_syntax\n"
         :
-        : //[priorityAbove100] "i" (priority >= 100),
-          //[priorityValue] "i" (priority),
-          [PriorityMostSignificantDWord] "i" (DoubleMostSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
+        : [PriorityMostSignificantDWord] "i" (DoubleMostSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [PriorityLeastSignificantDWord] "i" (DoubleLeastSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [skipTargetAddrValue] "i" (skipTargetAddr),
           [skipAddrValue] "i" (skipAddr),
