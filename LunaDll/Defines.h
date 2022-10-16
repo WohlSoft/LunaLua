@@ -719,6 +719,10 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg3 = short* The Object Index
 #define GF_NPC_COLLIDES     0x00A281B0
 
+//      Arg1 = short* The index of the player collecting it
+//      Arg2 = short* The index of the NPC collected
+#define GF_NPC_COLLECT      0x00A24CD0
+
 //      Arg1 = Momentum* The location for the bomb explosion
 //      Arg2 = short* Bomb explosion type
 //      Arg3 = short* Player index
@@ -858,6 +862,8 @@ static const auto native_setupSFX       = (void(__stdcall *)())GM_SETUP_SFX;
 static const auto native_cleanupKillNPC = (void(__stdcall *)(short* /**/, short* /**/))GF_NPC_CLEANUP;
 
 static const auto native_collideNPC     = (void(__stdcall *)(short* /*npcIndexToCollide*/, CollidersType* /*typeOfObject*/, short* /*objectIndex*/))GF_NPC_COLLIDES;
+
+static const auto native_collectNPC     = (void(__stdcall *)(short* /*playerIdx*/, short* /*npcIdx*/))GF_NPC_COLLECT;
 
 static const auto native_doBomb         = (void(__stdcall *)(Momentum* /*position*/, short* /*bombType*/, short* /*player index*/))GF_DO_BOMB;
 static const auto native_npcToCoins     = (void(__stdcall *)())GF_NPC_TO_COINS;

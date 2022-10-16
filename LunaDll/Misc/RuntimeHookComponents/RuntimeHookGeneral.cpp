@@ -1705,6 +1705,10 @@ void TrySkipPatch()
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9E0D50).JMP(&runtimeHookRemoveBlock).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Hook for onNPCCollect
+    PATCH(0xA24CD0).JMP(&runtimeHookCollectNPC).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(

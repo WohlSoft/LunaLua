@@ -1185,6 +1185,7 @@ void CLunaLua::bindAll()
                     def("_setSemisolidCollidingFlyType", &NPC::SetSemisolidCollidingFlyType),
                     def("_npcHarmCombo", NPC::HarmCombo),
                     def("_npcHarmComboWithDamage", NPC::HarmComboWithDamage),
+                    def("_npcCollect", NPC::Collect),
                     def("_playerHarm", Player::Harm),
                     def("_playerKill", Player::Kill)
                     //def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)
