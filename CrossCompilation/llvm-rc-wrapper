@@ -1,0 +1,77 @@
+#! /bin/bash
+
+shopt -s nocasematch
+
+llvm_rc_args=()
+while [ $# -gt 1 ]; do
+  param=$1
+  shift
+  case "$param" in
+    -c*|/c*)
+      if [ "${#param}" -eq 2 ]; then
+        llvm_rc_args+=("/C" "$1")
+        shift
+      else
+        llvm_rc_args+=("/C" "${param:2}")
+      fi
+      ;;
+    -d*|/d*)
+      if [ "${#param}" -eq 2 ]; then
+        llvm_rc_args+=("/D" "$1")
+        shift
+      else
+        llvm_rc_args+=("/D" "${param:2}")
+      fi
+      ;;
+    -fo*|/fo*)
+      if [ "${#param}" -eq 3 ]; then
+        llvm_rc_args+=("/FO" "$1")
+        shift
+      else
+        llvm_rc_args+=("/FO" "${param:3}")
+      fi
+      ;;
+    -i*|/i*)
+      if [ "${#param}" -eq 2 ]; then
+        llvm_rc_args+=("/I" "$1")
+        shift
+      else
+        llvm_rc_args+=("/I" "${param:2}")
+      fi
+      ;;
+    -ln*|/ln*)
+      if [ "${#param}" -eq 3 ]; then
+        llvm_rc_args+=("/LN" "$1")
+        shift
+      else
+        llvm_rc_args+=("/LN" "${param:3}")
+      fi
+      ;;
+    -l*|/l*)
+      if [ "${#param}" -eq 2 ]; then
+        llvm_rc_args+=("/l" "$1")
+        shift
+      else
+        llvm_rc_args+=("/l" "${param:2}")
+      fi
+      ;;
+    -u*|/u*)
+      if [ "${#param}" -eq 2 ]; then
+        llvm_rc_args+=("/U" "$1")
+        shift
+      else
+        llvm_rc_args+=("/U" "${param:2}")
+      fi
+      ;;
+    *) llvm_rc_args+=("$param");;
+  esac
+done
+
+rc_file=$1
+# Fix: llvm-rc: Error in VERSIONINFO statement (ID 1): 
+#      Non-ASCII 8-bit codepoint (169) can't occur in a non-Unicode string
+sed -i "s/\xa9/(C)/g;s/\\\\xa9/(C)/g" "$rc_file"
+
+llvm_rc_args+=("$rc_file")
+echo llvm-rc "${llvm_rc_args[@]}"
+llvm-rc "${llvm_rc_args[@]}"

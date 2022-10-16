@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 3.7.2)
 project(LunaLua C CXX)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${LunaLua_BINARY_DIR}")
-
 if(NOT MSVC)
     message(FATAL_ERROR "NON-Microsoft Compilers are not supported right now")
 endif()
@@ -11,9 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-# /Fd\"Release\\vc140.pdb\"
-set(CMAKE_CXX_FLAGS "" CACHE
-    STRING "compiler flags" FORCE)
+
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/Zi /Gm- /O2 /Zc:inline /fp:precise /errorReport:prompt /WX- /Zc:forScope /Gd /Oy- /Oi /MT /EHsc /nologo /FAcs /Ot" CACHE
     STRING "compiler flags" FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
@@ -23,8 +19,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE
     STRING "compiler flags" FORCE)
 
-set(CMAKE_C_FLAGS "" CACHE
-    STRING "compiler flags" FORCE)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "/Zi /Gm- /O2 /Zc:inline /fp:precise /errorReport:prompt /WX- /Zc:forScope /Gd /Oy- /Oi /MT /EHsc /nologo /FAcs /Ot" CACHE
     STRING "compiler flags" FORCE)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
@@ -34,9 +28,6 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
 set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE
     STRING "compiler flags" FORCE)
 
-# /PDB:"C:\Repos\LunaLUA\Release\LunaDll.pdb"
-set(CMAKE_SHARED_LINKER_FLAGS "" CACHE
-    STRING "compiler flags" FORCE)
 set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "/NXCOMPAT /DYNAMICBASE /MAPINFO:EXPORTS /DEBUG /DLL /MACHINE:X86 /OPT:REF /SAFESEH:NO /INCREMENTAL:NO /SUBSYSTEM:WINDOWS\",5.01\" /MANIFESTUAC:\"level='asInvoker' uiAccess='false'\" /MAP /OPT:ICF /ERRORREPORT:PROMPT /NOLOGO /TLBID:1" CACHE
     STRING "compiler flags" FORCE)
 set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}" CACHE

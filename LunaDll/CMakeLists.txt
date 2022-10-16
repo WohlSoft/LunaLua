@@ -14,8 +14,7 @@ include(libs/PGE_File_Formats/pge_file_library.cmake)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/boost
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-deboostified
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/glew/include
@@ -23,7 +22,6 @@ include_directories(
 )
 
 link_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-lib
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/glew/lib/Release/Win32
@@ -37,6 +35,7 @@ set(LunaLua_LibsSources
     libs/DirManager/dirman_winapi.cpp
 
     libs/Utils/files.cpp
+    libs/Utils/strings.cpp
 
     libs/fmt/fmt_format.cpp
     libs/fmt/fmt_ostream.cpp
@@ -59,6 +58,31 @@ set(LunaLua_LibsSources
     libs/luasocket/timeout.c
     libs/luasocket/udp.c
     libs/luasocket/wsocket.c
+
+    libs/luabind-deboostified/src/class.cpp
+    libs/luabind-deboostified/src/class_info.cpp
+    libs/luabind-deboostified/src/class_registry.cpp
+    libs/luabind-deboostified/src/class_rep.cpp
+    libs/luabind-deboostified/src/CMakeLists.txt
+    libs/luabind-deboostified/src/create_class.cpp
+    libs/luabind-deboostified/src/error.cpp
+    libs/luabind-deboostified/src/exception_handler.cpp
+    libs/luabind-deboostified/src/function.cpp
+    libs/luabind-deboostified/src/function_introspection.cpp
+    libs/luabind-deboostified/src/headertest.cpp
+    libs/luabind-deboostified/src/inheritance.cpp
+    libs/luabind-deboostified/src/link_compatibility.cpp
+    libs/luabind-deboostified/src/object_rep.cpp
+    libs/luabind-deboostified/src/open.cpp
+    libs/luabind-deboostified/src/operator.cpp
+    libs/luabind-deboostified/src/pcall.cpp
+    libs/luabind-deboostified/src/scope.cpp
+    libs/luabind-deboostified/src/set_package_preload.cpp
+    libs/luabind-deboostified/src/stack_content_by_name.cpp
+    libs/luabind-deboostified/src/weak_ref.cpp
+    libs/luabind-deboostified/src/wrapper_base.cpp
+
+    ../LunaLoader/LunaLoaderPatch.cpp
 )
 
 set(LunaLua_Sources
@@ -88,6 +112,8 @@ set(LunaLua_Sources
     HardcodedGraphics/HardcodedGraphicsManager.cpp
     HardcodedGraphics/HardocodeGFXMap.cpp
     Input/Input.cpp
+    Input/LunaGameController.cpp
+    Input/MouseHandler.cpp
     IPC/IPCPipeServer.cpp
     LevelCodes/dlltestlvlCode.cpp
     LevelCodes/Docopoper-AbstractAssault.lvl.cpp
@@ -101,6 +127,7 @@ set(LunaLua_Sources
     LevelCodes/SAJewers-Snowboardin.cpp
     LevelCodes/Talkhaus-Science_Final_Battle.cpp
     LuaMain/LuaHelper.cpp
+    LuaMain/LunaPathValidator.cpp
     LuaMain/LuaProxyComponent/LuaProxyAnimation.cpp
     LuaMain/LuaProxyComponent/LuaProxyAsyncHTTPRequest.cpp
     LuaMain/LuaProxyComponent/LuaProxyAudio.cpp
@@ -166,7 +193,6 @@ set(LunaLua_Sources
     Misc/RuntimeHookManagers/LevelHUDController.cpp
     Misc/RuntimeHookUtils/APIHook.cpp
     Misc/SafeFPUControl.cpp
-    Misc/SHMemServer.cpp
     Misc/TestMode.cpp
     Misc/TestModeMenu.cpp
     Misc/TypeLib.cpp
@@ -201,6 +227,7 @@ set(LunaLua_Sources
     Rendering/Shaders/GLShaderUniformInfo.cpp
     Rendering/Shaders/GLShaderVariableEntry.cpp
     Rendering/Shaders/GLShaderVariableInfo.cpp
+    Rendering/WindowSizeHandler.cpp
     SdlMusic/MusicDefList.cpp
     SdlMusic/MusicManager.cpp
     SdlMusic/SdlMusPlayer.cpp
@@ -231,10 +258,10 @@ add_library(LunaLuaLibShared MODULE
 set_target_properties(LunaLuaLibShared PROPERTIES
     OUTPUT_NAME LunaDll
     MSVC_RUNTIME_LIBRARY "MultiThreaded"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:>"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:>"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:>"
-    PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:>"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib/$<$<CONFIG:Debug>:>"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/bin/$<$<CONFIG:Debug>:>"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/bin/$<$<CONFIG:Debug>:>"
+    PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/pdb/$<$<CONFIG:Debug>:>"
 )
 
 target_compile_definitions(LunaLuaLibShared PRIVATE
@@ -270,11 +297,11 @@ target_link_libraries(LunaLuaLibShared
     odbccp32
     winmm
     shlwapi
-    libluabind
     lua51
-    Dbghelp
-    Ws2_32
+    dbghelp
+    ws2_32
     setupapi
     comsuppw
     opengl32
+    delayimp
 )

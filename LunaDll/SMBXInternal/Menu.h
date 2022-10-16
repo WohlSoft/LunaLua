@@ -5,7 +5,7 @@
 #include "../Defines.h"
 #include "BaseItemArray.h"
 
-struct EpisodeListItem : SMBX_FullBaseItemArray<EpisodeListItem, -1, GM_EP_LIST_COUNT_CONSTPTR, GM_EP_LIST_PTR_CONSTPTR>
+struct EpisodeListItem : SMBX_FullBaseItemArray<EpisodeListItem, -1, GM_EP_LIST_COUNT_ADDR, GM_EP_LIST_PTR_ADDR>
 {
     VB6StrPtr episodeName;
     VB6StrPtr episodePath;

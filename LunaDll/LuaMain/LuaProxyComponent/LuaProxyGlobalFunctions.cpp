@@ -21,7 +21,6 @@
 #include <sstream>
 #include "../../Misc/SafeFPUControl.h"
 
-
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
 void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
@@ -178,12 +177,12 @@ void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &
     case LFT_FLOAT:
     case LFT_DFLOAT:
     {
-        boost::optional<double> opt_obj = luabind::object_cast_nothrow<double>(value);
-        if (opt_obj == boost::none) {
-            luaL_error(L, "Cannot interpret field as number");
-            break;
+        try {
+            MemAssign((int)ptr, luabind::object_cast<double>(value), OP_Assign, (FIELDTYPE)ftype);
         }
-        MemAssign((int)ptr, *opt_obj, OP_Assign, (FIELDTYPE)ftype);
+        catch (luabind::cast_failed) {
+            luaL_error(L, "Cannot interpret field as number");
+        }
         break;
     }
     case LFT_STRING:
@@ -193,13 +192,15 @@ void LuaProxy::mem(int mem, LuaProxy::L_FIELDTYPE ftype, const luabind::object &
     }
     case LFT_BOOL:
     {
-        boost::optional<bool> opt_obj = luabind::object_cast_nothrow<bool>(value);
-        if (opt_obj == boost::none) {
+        bool obj;
+        try {
+            obj = luabind::object_cast<bool>(value);
+        } catch (luabind::cast_failed) {
             luaL_error(L, "Cannot interpret field as boolean");
             break;
         }
         void* ptr = ((&(*(byte*)mem)));
-        *((short*)ptr) = COMBOOL(*opt_obj);
+        *((short*)ptr) = COMBOOL(obj);
         break;
     }
     default:

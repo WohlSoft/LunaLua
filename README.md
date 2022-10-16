@@ -23,8 +23,26 @@ Quick Overview
 
 Requirements to build LunaLua yourself
 ------
-Visual Studio 2015 (msvc140 compiler)
+Visual Studio 2015 (msvc140 compiler) or Clang
 
+Building LunaLua on Linux
+------
+
+The `CrossCompilation` folder is a modified version of https://github.com/Nemirtingas/clang-msvc-sdk.
+
+### Setting up headers and libs
+* Install Visual C++ build tools 2015 and Windows SDK v7.1A (either on Windows or on Wine)
+* Copy all files and folders from `Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/` to `CrossCompilation/msvc/include/`
+* Copy all files and folders from `Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt/` to `CrossCompilation/winsdk/Include/v7.1A/ucrt/`
+* Copy all files and folders from `Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Include/` to `CrossCompilation/winsdk/Include/v7.1A/um/`
+* Copy all files from `Program Files (x86)/Microsoft Visual Studio 14.0/VC/lib/` to `CrossCompilation/msvc/lib/x86/`
+* Copy all files from `Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt/x86/` to `CrossCompilation/winsdk/Lib/v7.1A/ucrt/x86/`
+* Copy all files from `Program Files (x86)/Microsoft SDKs/Windows/v7.1A/Lib/` to `CrossCompilation/winsdk/Lib/v7.1A/um/x86/`
+
+### Compiling the project
+Just run `make` in the `CrossCompilation` folder
+
+NB: If you're using clangd and only want to generate compile commands, run `make compile_commands.json` in the `CrossCompilation` folder.
 
 Note for Qt Creator IDE
 ------

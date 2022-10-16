@@ -27,7 +27,7 @@ enum SMBX_WarpType : short {
 };
 
 #pragma pack(push, 1)
-struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_CONSTPTR, GM_WARPS_PTR_CONSTPTR>
+struct SMBX_Warp : SMBX_FullBaseItemArray<SMBX_Warp, -1, GM_WARP_COUNT_ADDR, GM_WARPS_PTR_ADDR>
 {
     short isLocked;                         //0x00
     short allowCarryNPC;                    //0x02

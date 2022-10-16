@@ -4,7 +4,7 @@
 
 #include "CmnHdr.h"
 #include "ImageHlp.h"
-#pragma comment(lib, "ImageHlp")
+#pragma comment(lib, "imagehlp")
 
 #include "APIHook.h"
 #include "Toolhelp.h"
@@ -40,7 +40,7 @@ CAPIHook::CAPIHook(PSTR pszCalleeModName, PSTR pszFuncName, PROC pfnHook,
         GetModuleHandleA(pszCalleeModName), m_pszFuncName);
     chASSERT(m_pfnOrig != NULL);  // Function doesn't exist
 
-    if (m_pfnOrig > sm_pvMaxAppAddr) {
+    if (static_cast<void*>(m_pfnOrig) > sm_pvMaxAppAddr) {
         // The address is in a shared DLL; the address needs fixing up 
         PBYTE pb = (PBYTE)m_pfnOrig;
         if (pb[0] == cPushOpCode) {
@@ -151,7 +151,7 @@ void CAPIHook::ReplaceIATEntryInOneMod(PCSTR pszCalleeModName,
                 // Is this the function we're looking for?
                 BOOL fFound = (*ppfn == pfnCurrent);
 
-                if (!fFound && (*ppfn > sm_pvMaxAppAddr)) {
+                if (!fFound && (static_cast<void*>(*ppfn) > sm_pvMaxAppAddr)) {
 
                     // If this is not the function and the address is in a shared DLL, 
                     // then maybe we're running under a debugger on Windows 98. In this 

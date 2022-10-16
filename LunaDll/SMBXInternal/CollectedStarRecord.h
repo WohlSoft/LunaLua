@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 1)
-struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecord, -1, GM_STAR_COUNT_CONSTPTR, GM_STARS_PTR_CONSTPTR>
+struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecord, -1, GM_STAR_COUNT_ADDR, GM_STARS_PTR_ADDR>
 {
     VB6StrPtr levelFileName; //0x00
     short     section;       //0x04

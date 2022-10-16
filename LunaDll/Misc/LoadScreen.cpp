@@ -15,7 +15,7 @@
 
 static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
-static std::atomic<bool> killThreadFlag = false;
+static std::atomic<bool> killThreadFlag(false);
 
 static void luasetconst(lua_State* L, const char* name, lua_Number number)
 {

@@ -2,7 +2,7 @@
 #define GLSprite_hhhh
 
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include <stdint.h>
 #include "GLDraw.h"
 

@@ -261,4 +261,19 @@ void ShowAndFocusWindow(HWND hWindow);
 // Handle WIN32 events when loading
 void HandleEventsWhileLoading();
 
+// Float/double manipulation
+#ifdef __clang__
+constexpr std::uint32_t FloatToDWord(float f) {
+    return __builtin_bit_cast(std::uint32_t, f);
+}
+
+constexpr std::uint32_t DoubleLeastSignificantDWord(double d) {
+    return static_cast<std::uint32_t>(__builtin_bit_cast(std::uint64_t, d) & 0xFFFFFFFFL);
+}
+
+constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
+    return static_cast<std::uint32_t>(__builtin_bit_cast(std::uint64_t, d) >> 32);
+}
+#endif
+
 #endif
