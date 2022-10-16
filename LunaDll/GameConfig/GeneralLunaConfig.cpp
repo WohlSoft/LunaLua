@@ -29,7 +29,7 @@ bool GeneralLunaConfig::save()
 {
     CSimpleIniW generalConfig;
 
-    generalConfig.SetBoolValue(L"General", L"run_when_unfocused", m_general_runWhenUnfocused, L"# Set to true if you want the game to run while the window is unfocused. Fixes a bug with wine >= 7.16. False by default.", false);
+    generalConfig.SetBoolValue(L"General", L"run_when_unfocused", m_general_runWhenUnfocused, L"# Set to true if you want the game to run while the window is unfocused. Fixes a bug with wine >= 7.16. False by default.", true);
 
     const wchar_t* openglValueStr;
     switch (m_renderer_opengl)
