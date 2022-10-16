@@ -21,6 +21,7 @@ public:
     };
 
 private:
+    bool        m_general_runWhenUnfocused;
     GLMode      m_renderer_opengl;
     VSyncMode   m_renderer_vsync;
     bool        m_renderer_useLetterbox;
@@ -45,6 +46,7 @@ public:
     inline void setFilename(const std::wstring& filename) { m_settingFilename = filename; }
     inline std::wstring filename() const { return m_settingFilename; }
 
+    inline bool getGeneralRunWhenUnfocused() const { return m_general_runWhenUnfocused; }
     inline GLMode getRendererOpenGL() const { return m_renderer_opengl; }
     inline VSyncMode getRendererVSync() const { return m_renderer_vsync; }
     inline void setRendererUseLetterbox(bool rendererUseLetterbox) { m_renderer_useLetterbox = rendererUseLetterbox; }

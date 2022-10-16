@@ -92,6 +92,11 @@ void LunaDLLInit()
     gGeneralConfig.setFilename(getLatestConfigFile(L"luna.ini"));
     gGeneralConfig.loadOrDefault();
 
+    // Bypass the --runWhenUnfocused command line argument if run-when-unfocused is set to true in the config file.
+    if (gGeneralConfig.getGeneralRunWhenUnfocused()) {
+        gStartupSettings.runWhenUnfocused = true;
+    }
+
     // If command line arguments did not specify a mode, see if the config file specifies
     if (!gStartupSettings.softwareGL && !gStartupSettings.forceHardGL)
     {
