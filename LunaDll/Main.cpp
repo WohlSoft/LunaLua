@@ -95,6 +95,7 @@ void LunaDLLInit()
     // Bypass the --runWhenUnfocused command line argument if run-when-unfocused is set to true in the config file.
     if (gGeneralConfig.getGeneralRunWhenUnfocused()) {
         gStartupSettings.runWhenUnfocused = true;
+        gMainWindowFocused = true;
     }
 
     // If command line arguments did not specify a mode, see if the config file specifies

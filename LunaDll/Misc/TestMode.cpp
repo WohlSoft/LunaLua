@@ -548,7 +548,7 @@ bool TestModeCheckHideWindow(void)
             // waiting for IPC again.
             gStartupSettings.currentlyWaitingForIPC = true;
             HWND hWindow = gMainWindowHwnd;
-            if (hWindow)
+            if (hWindow && gGeneralConfig.getGeneralHideWindowAfterTesting())
             {
                 ShowWindow(hWindow, SW_HIDE);
             }

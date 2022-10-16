@@ -14,6 +14,7 @@ GeneralLunaConfig::~GeneralLunaConfig()
 void GeneralLunaConfig::doDefaults()
 {
     m_general_runWhenUnfocused = false;
+    m_general_hideWindowAfterTesting = true;
     m_renderer_opengl = GLModeAuto;
     m_renderer_vsync = VSyncModeOff;
     m_renderer_useLetterbox = true;
@@ -29,7 +30,9 @@ bool GeneralLunaConfig::save()
 {
     CSimpleIniW generalConfig;
 
-    generalConfig.SetBoolValue(L"General", L"run_when_unfocused", m_general_runWhenUnfocused, L"# Set to true if you want the game to run while the window is unfocused. Fixes a bug with wine >= 7.16. False by default.", true);
+    generalConfig.SetBoolValue(L"General", L"run_when_unfocused", m_general_runWhenUnfocused, L"# Set to true if you want the game to run while the window is unfocused. Fixes a bug with wine. False by default.", true);
+    
+    generalConfig.SetBoolValue(L"General", L"hide_window_after_testing", m_general_hideWindowAfterTesting, L"# Set to false if you want the game window to stay visible after finishing a test session. Fixes a bug with wine. True by default.", true);
 
     const wchar_t* openglValueStr;
     switch (m_renderer_opengl)
@@ -84,6 +87,7 @@ bool GeneralLunaConfig::load()
         return false;
     
     m_general_runWhenUnfocused = configToLoad.GetBoolValue(L"General", L"run_when_unfocused", false);
+    m_general_hideWindowAfterTesting = configToLoad.GetBoolValue(L"General", L"hide_window_after_testing", true);
 
     const wchar_t* openglValueStr = configToLoad.GetValue(L"Renderer", L"opengl", L"auto");
     if (_wcsicmp(openglValueStr, L"hard") == 0)

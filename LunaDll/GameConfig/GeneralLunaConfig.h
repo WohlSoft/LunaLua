@@ -22,6 +22,7 @@ public:
 
 private:
     bool        m_general_runWhenUnfocused;
+    bool        m_general_hideWindowAfterTesting;
     GLMode      m_renderer_opengl;
     VSyncMode   m_renderer_vsync;
     bool        m_renderer_useLetterbox;
@@ -47,6 +48,7 @@ public:
     inline std::wstring filename() const { return m_settingFilename; }
 
     inline bool getGeneralRunWhenUnfocused() const { return m_general_runWhenUnfocused; }
+    inline bool getGeneralHideWindowAfterTesting() const { return m_general_hideWindowAfterTesting; }
     inline GLMode getRendererOpenGL() const { return m_renderer_opengl; }
     inline VSyncMode getRendererVSync() const { return m_renderer_vsync; }
     inline void setRendererUseLetterbox(bool rendererUseLetterbox) { m_renderer_useLetterbox = rendererUseLetterbox; }
