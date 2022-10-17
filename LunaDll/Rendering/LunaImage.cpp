@@ -12,8 +12,8 @@
 static CachedFileDataWeakPtr<LunaImage> g_lunaImageCache;
 static std::mutex g_lunaImageCacheMutex;
 
-std::atomic<uint32_t> LunaImage::totalRawMem = 0;
-std::atomic<uint32_t> LunaImage::totalCompMem = 0;
+std::atomic<uint32_t> LunaImage::totalRawMem(0);
+std::atomic<uint32_t> LunaImage::totalCompMem(0);
 
 void LunaImage::holdCachedImages(bool isWorld)
 {
@@ -29,7 +29,7 @@ void LunaImage::releaseCachedImages(bool isWorld)
 
 uint64_t LunaImage::getNewUID()
 {
-    static std::atomic<uint64_t> uidCounter = 1;
+    static std::atomic<uint64_t> uidCounter(1);
     return uidCounter.fetch_add(1, std::memory_order_relaxed);
 }
 

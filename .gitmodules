@@ -4,3 +4,6 @@
 [submodule "LunaDll/libs/PGE_File_Formats"]
 	path = LunaDll/libs/PGE_File_Formats
 	url = https://github.com/WohlSoft/PGE-File-Library-STL
+[submodule "LunaDll/libs/luabind-deboostified"]
+	path = LunaDll/libs/luabind-deboostified
+	url = https://github.com/WohlSoft/luabind-deboostified

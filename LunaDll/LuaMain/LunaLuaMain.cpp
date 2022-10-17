@@ -622,7 +622,7 @@ void CLunaLua::bindAll()
                     .def("captureAt", &CaptureBuffer::CaptureAt),
                 def("loadImage", (bool(*)(const std::string&, int, int))&LuaProxy::Graphics::loadImage),
                 def("loadImage", (std::shared_ptr<LunaImage>(*)(const std::string&, lua_State*))&LuaProxy::Graphics::loadImage),
-                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value(_2)),
+                def("loadAnimatedImage", &LuaProxy::Graphics::loadAnimatedImage, pure_out_value<2>()),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&, int))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int, const std::string&))&LuaProxy::Graphics::placeSprite),
                 def("placeSprite", (void(*)(int, int, int, int))&LuaProxy::Graphics::placeSprite),
@@ -631,7 +631,7 @@ void CLunaLua::bindAll()
                 def("placeSprite", (void(*)(int, const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::placeSprite),
                 def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img))&LuaProxy::Graphics::unplaceSprites),
                 def("unplaceSprites", (void(*)(const std::shared_ptr<LunaImage>&  img, int, int))&LuaProxy::Graphics::unplaceSprites),
-                def("getPixelData", &LuaProxy::Graphics::getPixelData, pure_out_value(_2) + pure_out_value(_3)),
+                def("getPixelData", &LuaProxy::Graphics::getPixelData, meta::join<pure_out_value<2>, pure_out_value<3>>::type()),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, float, lua_State*))&LuaProxy::Graphics::drawImage),
                 def("drawImage", (void(*)(const std::shared_ptr<LunaImage>& , double, double, double, double, double, double, lua_State*))&LuaProxy::Graphics::drawImage),
@@ -1185,6 +1185,7 @@ void CLunaLua::bindAll()
                     def("_setSemisolidCollidingFlyType", &NPC::SetSemisolidCollidingFlyType),
                     def("_npcHarmCombo", NPC::HarmCombo),
                     def("_npcHarmComboWithDamage", NPC::HarmComboWithDamage),
+                    def("_npcCollect", NPC::Collect),
                     def("_playerHarm", Player::Harm),
                     def("_playerKill", Player::Kill)
                     //def("doBombExplosion", (void(*)(double, double, short, const LuaProxy::Player&))&LuaProxy::Misc::doBombExplosion)

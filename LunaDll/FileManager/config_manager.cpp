@@ -226,19 +226,19 @@ void ConfigPackMiniManager::loadStore(EntryType type,
         // idx 0=setup, 1=episode, 2=custom
         ResourceFileInfo iniFiles[3];
 
-        auto& setup_files_it = dst.setup_files.find(wfname);
+        auto&& setup_files_it = dst.setup_files.find(wfname);
         if (setup_files_it != dst.setup_files.end())
         {
             iniFiles[0] = setup_files_it->second;
         }
 
-        auto& episode_files_it = m_episode_files.find(wfname);
+        auto&& episode_files_it = m_episode_files.find(wfname);
         if (episode_files_it != m_episode_files.end())
         {
             iniFiles[1] = episode_files_it->second;
         }
 
-        auto& custom_files_it = m_custom_files.find(wfname);
+        auto&& custom_files_it = m_custom_files.find(wfname);
         if (custom_files_it != m_custom_files.end())
         {
             iniFiles[2] = custom_files_it->second;
@@ -524,15 +524,15 @@ ResourceFileInfo ConfigPackMiniManager::findFile(const std::string &filename, co
 {
     std::wstring wFilename = Str2WStr(filename);
 
-    auto& custom_it = m_custom_files.find(wFilename);
+    auto&& custom_it = m_custom_files.find(wFilename);
     if (custom_it != m_custom_files.end())
         return custom_it->second;
 
-    auto& episode_it = m_episode_files.find(wFilename);
+    auto&& episode_it = m_episode_files.find(wFilename);
     if (episode_it != m_episode_files.end())
         return episode_it->second;
 
-    auto& cp_it = root_files.find(wFilename);
+    auto&& cp_it = root_files.find(wFilename);
     if (cp_it != root_files.end())
         return cp_it->second;
 
@@ -580,12 +580,12 @@ static void read_layout_branches(nlohmann::json &typetree,
         if(entry.find("control") == entry.end())
             control = "invalid";
         else
-            control = entry["control"];
+            control = entry["control"].get<std::string>();
 
         if(entry.find("name") == entry.end())
             name = control;
         else
-            name = entry["name"];
+            name = entry["name"].get<std::string>();
 
         if(SDL_strncasecmp(control.c_str(), "group", 6) == 0)
         {
@@ -608,7 +608,7 @@ static void read_layout_branches(nlohmann::json &typetree,
         {
             std::string type = "int";
             if(entry.find("type") != entry.end())
-                type = entry["type"];
+                type = entry["type"].get<std::string>();
 
             if(type == "int")
             {
@@ -688,14 +688,14 @@ static void read_layout_branches(nlohmann::json &typetree,
         {
             std::string v;
             if(entry.find("value-default") != entry.end())
-                v = entry["value-default"];
+                v = entry["value-default"].get<std::string>();
             dst[name] = v;
         }
         else if(SDL_strncasecmp(control.c_str(), "multilineedit", 14) == 0)
         {
             std::string v;
             if(entry.find("value-default") != entry.end())
-                v = entry["value-default"];
+                v = entry["value-default"].get<std::string>();
             dst[name] = v;
         }
         else if(SDL_strncasecmp(control.c_str(), "file", 5) == 0 ||
@@ -705,7 +705,7 @@ static void read_layout_branches(nlohmann::json &typetree,
         {
             std::string v;
             if(entry.find("value-default") != entry.end())
-                v = entry["value-default"];
+                v = entry["value-default"].get<std::string>();
             dst[name] = v;
         }
         else if(SDL_strncasecmp(control.c_str(), "itemselect", 11) == 0)
@@ -724,7 +724,7 @@ static void read_layout_branches(nlohmann::json &typetree,
 
             std::string type = "int";
             if(entry.find("type") != entry.end())
-                type = entry["type"];
+                type = entry["type"].get<std::string>();
 
             nlohmann::json v = entry["value-default"];
             if(v.find("w") != v.end() && v.find("h") != v.end())
@@ -763,7 +763,7 @@ static void read_layout_branches(nlohmann::json &typetree,
 
             std::string type = "int";
             if(entry.find("type") != entry.end())
-                type = entry["type"];
+                type = entry["type"].get<std::string>();
 
             nlohmann::json v = entry["value-default"];
             if(v.find("x") != v.end() && v.find("y") != v.end())
@@ -802,7 +802,7 @@ static void read_layout_branches(nlohmann::json &typetree,
 
             std::string type = "int";
             if(entry.find("type") != entry.end())
-                type = entry["type"];
+                type = entry["type"].get<std::string>();
 
             nlohmann::json v = entry["value-default"];
             if(v.find("x") != v.end() && v.find("y") != v.end() &&

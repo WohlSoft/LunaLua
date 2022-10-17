@@ -1,5 +1,5 @@
 #include <windows.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "../../Defines.h"
 #include "../RenderUtils.h"
 #include "GLTextureStore.h"
@@ -8,7 +8,7 @@
 // Instance
 GLTextureStore g_GLTextureStore;
 
-std::atomic<uint64_t> GLTextureStore::totalMem = 0;
+std::atomic<uint64_t> GLTextureStore::totalMem(0);
 
 // Constructor
 GLTextureStore::GLTextureStore() {

@@ -138,7 +138,7 @@ extern "C" {
             return nullptr;
         }
 
-        tmp = *((VB6StrPtr*)ptr);
+        tmp = static_cast<std::string>(*((VB6StrPtr*)ptr));
         return tmp.c_str();
     }
 

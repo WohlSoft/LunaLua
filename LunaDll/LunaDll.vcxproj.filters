@@ -134,6 +134,10 @@
     <Filter Include="libs\json">
       <UniqueIdentifier>{35f2e9ba-fba0-48ac-ae82-40ba81b273f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libs\luabind-deboostified">
+    </Filter>
+    <Filter Include="libs\luabind-deboostified\src">
+    </Filter>
     <Filter Include="LunaLoader">
       <UniqueIdentifier>{bfb6190e-4738-4465-8020-4a003075249a}</UniqueIdentifier>
     </Filter>
@@ -1313,6 +1317,68 @@
     <ClCompile Include="LuaMain\LunaPathValidator.cpp">
       <Filter>LuaMain</Filter>
     </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>

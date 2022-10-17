@@ -1705,6 +1705,10 @@ void TrySkipPatch()
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9E0D50).JMP(&runtimeHookRemoveBlock).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Hook for onNPCCollect
+    PATCH(0xA24CD0).JMP(&runtimeHookCollectNPC).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(
@@ -1947,6 +1951,10 @@ void TrySkipPatch()
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
     PATCH(0x9E3D30).JMP(runtimeHookPSwitchStartRemoveBlockWrapper).NOP_PAD_TO_SIZE<110>().Apply();
     PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
+
+    // Patch to handle blocks that allow players to pass through
+    // Moved from where the original code does it to allow player passthrough slopes
+    PATCH(0x9A16E8).JMP(runtimeHookBlockPlayerFilter).NOP_PAD_TO_SIZE<12>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
     // Also handles collisionGroup for NPC-to-solid interactions now

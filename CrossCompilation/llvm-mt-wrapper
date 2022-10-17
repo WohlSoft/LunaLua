@@ -1,0 +1,28 @@
+#! /bin/bash
+
+#dummy_manifest="<?xml version=\"1.0\" standalone=\"yes\"?>
+#<assembly xmlns=\"urn:schemas-microsoft-com:asm.v1\"
+#          manifestVersion=\"1.0\">
+#  <trustInfo>
+#    <security>
+#      <requestedPrivileges>
+#         <requestedExecutionLevel level='asInvoker' uiAccess='false'/>
+#      </requestedPrivileges>
+#    </security>
+#  </trustInfo>
+#</assembly>"
+
+echo "${0}: ${@}"
+
+output="$("llvm-mt" "${@}" 2>&1)"
+res=$?
+
+if [ "$res" -ne 0 ]; then
+  if echo "$output" | grep -q "no libxml2"; then
+    echo "llvm-mt not compiled with libxml2, skipping manifest."
+    exit 0
+  fi
+  echo "$output"
+fi
+
+exit "$res"

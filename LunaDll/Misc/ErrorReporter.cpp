@@ -102,6 +102,9 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 
     fullErrorDescription << "== Crash Summary ==\n";
     fullErrorDescription << "LunaLua Version: " + std::string(LUNALUA_VERSION) + "\n";
+#ifdef __clang__
+    fullErrorDescription << "This LunaLua build has been compiled with Clang. Support for this compiler is still experimental so errors might happen.\n";
+#endif
     fullErrorDescription << "Exception Code: 0x" << std::hex << exception->ExceptionCode;
 
     switch (exception->ExceptionCode)

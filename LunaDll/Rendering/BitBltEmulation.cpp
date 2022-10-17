@@ -2,7 +2,7 @@
 #include "../Globals.h"
 #include "../Rendering/GL/GLEngineProxy.h"
 #include "LunaImage.h"
-#include "Imageloader.h"
+#include "ImageLoader.h"
 #include "BitBltEmulation.h"
 #include "../Rendering/Rendering.h"
 
