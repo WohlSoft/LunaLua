@@ -3097,6 +3097,67 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
     }
 }
 
+void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
+{
+    NPCMOB* npc = NPC::GetRaw(*npcIdx);
+    Momentum momentum = npc->momentum;
+
+    // Skip if in the main menu
+    if (GM_LEVEL_MODE == -1)
+    {
+        return;
+    }
+
+    // Held NPC behaviour
+    if (npc->grabbingPlayerIndex > 0)
+    {
+        // Don't let it despawn
+        if (npc->offscreenCountdownTimer < 10)
+            npc->offscreenCountdownTimer = 10;
+        
+        // Match the player's section
+        npc->currentSection = Player::Get(npc->grabbingPlayerIndex)->CurrentSection;
+
+        return;
+    }
+
+    // Is it in the bounds of a section? If so, choose it
+    for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
+    {
+        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+
+        if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
+        {
+            npc->currentSection = sectionIdx;
+            return;
+        }
+    }
+
+    // Out of bounds, so find the closest section
+    double closestSectionDist = 0;
+    short closestSection = -1;
+
+    for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
+    {
+        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+
+        double distLeft = abs(bounds.left - (momentum.x + momentum.width));
+        double distRight = abs(bounds.right - (momentum.x));
+        double distTop = abs(bounds.top - (momentum.y + momentum.height));
+        double distBottom = abs(bounds.bottom - (momentum.y));
+
+        double dist = std::min(std::min(std::min(distLeft, distRight), distTop), distBottom);
+
+        if (closestSection == -1 || dist < closestSectionDist)
+        {
+            closestSectionDist = dist;
+            closestSection = sectionIdx;
+        }
+    }
+
+    npc->currentSection = closestSection;
+}
+
 static void markBlocksUnsorted()
 {
     // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already cleared, to make sure the max

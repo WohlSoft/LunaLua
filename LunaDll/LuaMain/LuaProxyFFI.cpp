@@ -480,6 +480,18 @@ typedef struct ExtendedBlockFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetNPCSectionFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisableNPCSectionFix.Apply();
+        }
+        else
+        {
+            gDisableNPCSectionFix.Unapply();
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             for (int i = 0; gFenceFixes[i] != nullptr; i++) {
