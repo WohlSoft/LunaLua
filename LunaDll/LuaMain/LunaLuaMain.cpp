@@ -124,6 +124,7 @@ bool CLunaLua::shutdown()
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
+    gDisableNPCSectionFix.Apply();
     for (int i = 0; gFenceFixes[i] != nullptr; i++) {
         gFenceFixes[i]->Apply();
     }
