@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 255, GM_LAYER_ARRAY_PTR_CONSTPTR> {
+struct LayerControl : SMBX_StaticBaseItemArray<LayerControl, 255, GM_LAYER_ARRAY_PTR_ADDR> {
     short       IsStopped;		// 0x00 0xFFFF when moving, event ended?
     short       Unknown1;       // 0x02
     VB6StrPtr	ptLayerName;	// 0x04 ptr to double zero terminated 2byte wide char string

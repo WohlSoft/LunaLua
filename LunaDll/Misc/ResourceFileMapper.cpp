@@ -94,7 +94,7 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     std::transform(lfile.begin(), lfile.end(), lfile.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
 
-    auto& it = mSearchPaths.find(lpath);
+    auto&& it = mSearchPaths.find(lpath);
 
     if (it == mSearchPaths.end())
     {
@@ -133,7 +133,7 @@ const ResourceFileInfo CachedFileMetadata::getResourceFileInfo(const std::wstrin
     }
 
     const ResourceFileMap& fileMap = it->second.map;
-    auto& fileIt = fileMap.find(lfile);
+    auto&& fileIt = fileMap.find(lfile);
 
     if (fileIt == fileMap.end())
     {
@@ -155,7 +155,7 @@ ResourceFileMap CachedFileMetadata::listResourceFilesFromDir(const NormalizedPat
     std::transform(lpath.begin(), lpath.end(), lpath.begin(), ::towlower);
     std::unique_lock<std::mutex> lck(mMutex);
 
-    auto& it = mSearchPaths.find(lpath);
+    auto&& it = mSearchPaths.find(lpath);
 
     if (it == mSearchPaths.end())
     {

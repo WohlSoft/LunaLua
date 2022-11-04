@@ -33,7 +33,7 @@ namespace general {
     VB6StrPtr& gameTitle_3 = *(VB6StrPtr*)0x96AF26;
 }
 
-void GameConfiguration::runPatchByIni(IniProcessing &reader)
+void GameConfiguration::runPatchByIni(IniProcessing &&reader)
 {
     if (!reader.isOpened())
         return;
@@ -68,6 +68,10 @@ void GameConfiguration::runPatchByIni(IniProcessing &reader)
     {
         gameTitleSuffix = " (Software Renderer)";
     }
+
+#ifdef __clang__
+    gameTitleSuffix += " (Clang)";
+#endif
 
     // References the same string memory, so do not destruct those.
     reader.beginGroup("general");

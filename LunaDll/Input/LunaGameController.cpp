@@ -149,7 +149,7 @@ void LunaGameControllerManager::handleInputs()
 
         // Get selected controller and whether it was active
         LunaGameController* selectedController = getController(1);
-        bool wasSelectedActive = (selectedController != nullptr) ? selectedController->isActive() : selectedController;
+        bool wasSelectedActive = (selectedController != nullptr) ? selectedController->isActive() : false;
 
         // Get active controller and clear flags
         LunaGameController* activeController = nullptr;
@@ -273,7 +273,7 @@ void LunaGameControllerManager::handleInputs()
         SDL_JoystickID joyId = press.first;
         int which = press.second;
 
-        auto& it = controllerMap.find(joyId);
+        auto&& it = controllerMap.find(joyId);
         if (it != controllerMap.end())
         {
             if (gLunaLua.isValid()) {

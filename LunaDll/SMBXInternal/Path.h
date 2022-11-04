@@ -4,7 +4,7 @@
 #include "../Defines.h"
 
 #pragma pack(push, 1)
-struct SMBXPath : SMBX_FullBaseItemArray<SMBXPath, 100, GM_PATH_COUNT_CONSTPTR, GM_PATH_PTR_CONSTPTR>
+struct SMBXPath : SMBX_FullBaseItemArray<SMBXPath, 100, GM_PATH_COUNT_ADDR, GM_PATH_PTR_ADDR>
 {
     Momentum momentum;
     short visible;

@@ -7,7 +7,7 @@
 #include "BaseItemArray.h"
 
 #pragma pack(push, 4)
-struct SMBX_Water : SMBX_FullBaseItemArray<SMBX_Water, -1, GM_WATER_AREA_COUNT_CONSTPTR, GM_WATER_AREAS_PTR_CONSTPTR, 1> // Length should be 0x40
+struct SMBX_Water : SMBX_FullBaseItemArray<SMBX_Water, -1, GM_WATER_AREA_COUNT_ADDR, GM_WATER_AREAS_PTR_ADDR, 1> // Length should be 0x40
 {
     VB6StrPtr ptLayerName;          // +0x00
     short isHidden;                 // +0x04 // boolean

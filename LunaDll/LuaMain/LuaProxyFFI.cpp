@@ -138,7 +138,7 @@ extern "C" {
             return nullptr;
         }
 
-        tmp = *((VB6StrPtr*)ptr);
+        tmp = static_cast<std::string>(*((VB6StrPtr*)ptr));
         return tmp.c_str();
     }
 
@@ -477,6 +477,18 @@ typedef struct ExtendedBlockFields_\
         {
             gDisableNPCDownwardClipFix.Unapply();
             //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCSectionFix(bool enable)
+    {
+        if (enable)
+        {
+            gDisableNPCSectionFix.Apply();
+        }
+        else
+        {
+            gDisableNPCSectionFix.Unapply();
         }
     }
 

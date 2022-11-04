@@ -17,7 +17,7 @@ void LuaProxy::Shader::compileFromSource(const std::string& vertexSource, const 
     m_internalShader = g_GLEngine.CreateNewShader(vertexSource, fragmentSource);
     
     if (!m_internalShader->isValid()) {
-        luaL_error(L, "Failed to compile shader: \n%s", m_internalShader->getLastErrorMsg());
+        luaL_error(L, "Failed to compile shader: \n%s", m_internalShader->getLastErrorMsg().c_str());
         return;
     }
 

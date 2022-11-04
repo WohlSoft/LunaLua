@@ -21,14 +21,18 @@ public:
 private:
     State mState;
     std::mutex mMutex;
+    int mDpiAwarenessState;
 
     void RecalculateInteral();
+    void InitDPIAwareness();
 
 public:
     WindowSizeHandler(int defaultW, int defaultH) :
         mState{ {defaultW, defaultH}, {0.0, 0.0}, {1.0, 1.0} },
-        mMutex()
+        mMutex(),
+        mDpiAwarenessState()
     {
+        InitDPIAwareness();
     }
 
     // Getters by value (only use from main thread)
@@ -54,6 +58,10 @@ public:
     // Functions to set window (thread safe)
     void SetWindowSize(int w, int h);
     void Recalculate();
+
+    // DPI Awareness functions
+    // SetInitialWindowSize returns the DPI
+    int SetInitialWindowSize();
 };
 
 // Global instance

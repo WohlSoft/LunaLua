@@ -112,8 +112,8 @@ std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::sRate=44100;
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
-std::atomic<unsigned __int64> PGE_MusPlayer::sCount = 0;
-std::atomic<unsigned __int64> PGE_MusPlayer::musSCount = 0;
+std::atomic<unsigned __int64> PGE_MusPlayer::sCount(0);
+std::atomic<unsigned __int64> PGE_MusPlayer::musSCount(0);
 
 Mix_Music *PGE_MusPlayer::currentMusic()
 {

@@ -21,6 +21,7 @@
 #include "../../Rendering/BitBltEmulation.h"
 #include "../../Rendering/RenderUtils.h"
 #include "../../Rendering/RenderOps/RenderStringOp.h"
+#include "../../Rendering/WindowSizeHandler.h"
 
 #include "../../SMBXInternal/NPCs.h"
 #include "../../SMBXInternal/Blocks.h"
@@ -1401,7 +1402,7 @@ extern void __stdcall GenerateScreenshotHook()
 
 extern WORD __stdcall IsNPCCollidesWithVeggiHook(WORD* npcIndex, WORD* objType) {
     NPCMOB* npcObj = ::NPC::Get(*npcIndex - 1);
-    if (isVegetableNPC_ptr[npcObj->id]) {
+    if (npcObj && (npcObj->id >= 0) && (npcObj->id <= NPC::MAX_ID) && isVegetableNPC_ptr[npcObj->id]) {
         if (*objType == 6) {
             npcObj->killFlag = 6;
             return 0xFFFF; // Don't handle extra code
@@ -1554,19 +1555,17 @@ __declspec(naked) void __stdcall runtimeHookSmbxChangeModeHookRaw(void)
 {
     __asm {
         pushfd
-            push eax
-            push ecx
-            push edx
-    }
-    runtimeHookSmbxChangeModeHook();
-    __asm {
+        push eax
+        push ecx
+        push edx
+        call runtimeHookSmbxChangeModeHook
         pop edx
-            pop ecx
-            pop eax
-            popfd
-            or ebx, 0xFFFFFFFF
-            cmp word ptr ds : [0xB2C620], bx
-            ret
+        pop ecx
+        pop eax
+        popfd
+        or ebx, 0xFFFFFFFF
+        cmp word ptr ds : [0xB2C620], bx
+        ret
     }
 }
 
@@ -1672,9 +1671,7 @@ __declspec(naked) void __stdcall runtimeHookSmbxCheckWindowedRaw(void)
         push eax
         push ecx
         push edx
-    }
-    runtimeHookSmbxCheckWindowed();
-    __asm {
+        call runtimeHookSmbxCheckWindowed
         pop edx
         pop ecx
         pop eax
@@ -2205,6 +2202,35 @@ void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide
     }
 }
 
+static _declspec(naked) void __stdcall removeBlock_OrigFunc(unsigned short* blockIndex, short* makeEffects)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x9E0D56
+        RET
+    }
+}
+
+void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects)
+{
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> blockRemoveEvent = std::make_shared<Event>("onBlockRemove", true);
+        blockRemoveEvent->setDirectEventName("onBlockRemove");
+        blockRemoveEvent->setLoopable(false);
+        gLunaLua.callEvent(blockRemoveEvent, *blockIndex, *makeEffects != 0, false);
+        isCancelled = blockRemoveEvent->native_cancelled();
+    }
+
+    if (!isCancelled)
+    {
+        removeBlock_OrigFunc(blockIndex, makeEffects);
+    }
+}
+
 static void __stdcall runtimeHookColorSwitch(unsigned int color)
 {
     if (gLunaLua.isValid()) {
@@ -2359,6 +2385,50 @@ _declspec(naked) void __stdcall runtimeHookColorSwitchRedBlock(void)
     }
 }
 
+
+static _declspec(naked) void __stdcall collectNPC_OrigFunc(short* playerIdx, short* npcIdx)
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0xA24CD6
+        RET
+    }
+}
+
+void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx)
+{
+    PlayerMOB* player = Player::Get(*playerIdx);
+    NPCMOB* npc = NPC::GetRaw(*npcIdx);
+
+    // Duplicate of logic in TouchBonus
+    if (npc->cantHurtPlayerIndex == *playerIdx && !(isCoin_ptr[npc->id] && player->HeldNPCIndex != *npcIdx && npc->killFlag == 0))
+        return;
+
+    // Obscure case of touching a fairy pendant in a clown car.
+    // This is the only case outside of what's above where the NPC won't die.
+    if (npc->id == 254 && player->MountType == 2)
+        return;
+
+    // Call onNPCCollect
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid())
+    {
+        std::shared_ptr<Event> npcCollectEvent = std::make_shared<Event>("onNPCCollect", true);
+        npcCollectEvent->setDirectEventName("onNPCCollect");
+        npcCollectEvent->setLoopable(false);
+        gLunaLua.callEvent(npcCollectEvent, *npcIdx, *playerIdx);
+        
+        if (npcCollectEvent->native_cancelled())
+            return;
+    }
+
+    collectNPC_OrigFunc(playerIdx, npcIdx);
+}
+
+
 static void drawReplacementSplashScreen(void)
 {
     // Get form to draw on
@@ -2382,8 +2452,11 @@ static void drawReplacementSplashScreen(void)
     if (!splashHDC) return;
     SelectObject(splashHDC, splashBMP);
 
+    // Get window size
+    auto windowSize = gWindowSizeHandler.getWindowSize();
+
     // Clear HDC...
-    BitBlt(frmHDC, 0, 0, 800, 600, frmHDC, 0, 0, WHITENESS);
+    BitBlt(frmHDC, 0, 0, windowSize.x, windowSize.y, frmHDC, 0, 0, WHITENESS);
 
     // Draw with respecting alpha channel
     BLENDFUNCTION bf;
@@ -2391,7 +2464,7 @@ static void drawReplacementSplashScreen(void)
     bf.BlendFlags = 0;
     bf.AlphaFormat = AC_SRC_ALPHA;
     bf.SourceConstantAlpha = 0xff;
-    AlphaBlend(frmHDC, 0, 0, 800, 600, splashHDC, 0, 0, 800, 600, bf);
+    AlphaBlend(frmHDC, 0, 0, windowSize.x, windowSize.y, splashHDC, 0, 0, 800, 600, bf);
 
     // Cleanup
     DeleteDC(splashHDC);
@@ -3093,6 +3166,67 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
     }
 }
 
+void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
+{
+    NPCMOB* npc = NPC::GetRaw(*npcIdx);
+    Momentum momentum = npc->momentum;
+
+    // Skip if in the main menu
+    if (GM_LEVEL_MODE == -1)
+    {
+        return;
+    }
+
+    // Held NPC behaviour
+    if (npc->grabbingPlayerIndex > 0)
+    {
+        // Don't let it despawn
+        if (npc->offscreenCountdownTimer < 10)
+            npc->offscreenCountdownTimer = 10;
+        
+        // Match the player's section
+        npc->currentSection = Player::Get(npc->grabbingPlayerIndex)->CurrentSection;
+
+        return;
+    }
+
+    // Is it in the bounds of a section? If so, choose it
+    for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
+    {
+        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+
+        if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
+        {
+            npc->currentSection = sectionIdx;
+            return;
+        }
+    }
+
+    // Out of bounds, so find the closest section
+    double closestSectionDist = 0;
+    short closestSection = -1;
+
+    for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
+    {
+        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+
+        double distLeft = abs(bounds.left - (momentum.x + momentum.width));
+        double distRight = abs(bounds.right - (momentum.x));
+        double distTop = abs(bounds.top - (momentum.y + momentum.height));
+        double distBottom = abs(bounds.bottom - (momentum.y));
+
+        double dist = std::min(std::min(std::min(distLeft, distRight), distTop), distBottom);
+
+        if (closestSection == -1 || dist < closestSectionDist)
+        {
+            closestSectionDist = dist;
+            closestSection = sectionIdx;
+        }
+    }
+
+    npc->currentSection = closestSection;
+}
+
 static void markBlocksUnsorted()
 {
     // NOTE: We re-run this anyway even if GM_BLOCKS_SORTED is already cleared, to make sure the max
@@ -3515,6 +3649,68 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
         pop ecx
         pop eax
         push 0xA1BAD5
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* player, int blockIdx)
+{
+    Block* block = Block::GetRaw(blockIdx);
+
+    // IsHidden flag, which is what the code we're replacing checks for
+    if (block->IsHidden)
+    {
+        return 0;
+    }
+
+    short characterFilter = Blocks::GetBlockPlayerFilter(block->BlockType);
+
+    // -1 means allow all characters
+    if (characterFilter == -1)
+    {
+        return 0;
+    }
+
+    // Matching characters, cancel collision
+    short characterId = (short)player->Identity;
+    if (characterFilter == characterId)
+    {
+        return 0;
+    }
+
+    // No filter needed, carry on
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
+{
+    __asm {
+        push eax                // push these to make sure they're safe after the function call
+        push ecx
+        push edx
+        push esi
+
+        movsx ecx, word ptr ss:[ebp-0x120]
+        push ecx                // Block index
+        push ebx                // Player pointer
+        call runtimeHookBlockPlayerFilterInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop esi                 // we can pop these again
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9A16F4
+        ret
+    cancel_collision:
+        pop esi                 // we can pop these again
+        pop edx
+        pop ecx
+        pop eax
+        push 0x9A4FE9
         ret
     }
 }

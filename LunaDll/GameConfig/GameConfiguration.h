@@ -7,7 +7,7 @@ class GameConfiguration
 {
 public:
 
-    static void runPatchByIni(IniProcessing& reader);
+    static void runPatchByIni(IniProcessing&& reader);
 };
 
 #endif

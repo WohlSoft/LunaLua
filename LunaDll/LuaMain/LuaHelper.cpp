@@ -2,6 +2,7 @@
 #include "LunaLuaMain.h"
 #include "../Misc/VB6StrPtr.h"
 #include "LuaProxy.h"
+#include <string>
 
 bool LuaHelper::is_function(lua_State *luaState, const char *fname)
 {
@@ -18,14 +19,11 @@ bool LuaHelper::is_function(lua_State *luaState, const char *fname)
 void LuaHelper::assignVB6StrPtr(VB6StrPtr* ptr, const luabind::object &value, lua_State* L)
 {
     // Copy from native Lua string
-    boost::optional<std::string const> opt_str = luabind::object_cast_nothrow<std::string const>(value);
-    if (opt_str != boost::none)
-    {
-        *ptr = *opt_str;
-        return;
-    }
-
-    luaL_error(L, "Cannot cast to string");
+    try {
+        *ptr = luabind::object_cast<std::string>(value);
+    } catch (luabind::cast_failed) {
+        luaL_error(L, "Cannot cast to string");
+    }    
 }
 
 bool* LuaHelper::generateFilterTable(lua_State* L, luabind::object theFilter, int maxVal, int minVal /*= 1*/)

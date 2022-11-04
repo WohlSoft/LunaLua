@@ -19,7 +19,7 @@ static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
 static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdAnimateBlocks(void);
-static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx);
+//static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx);
 static int __stdcall runtimeHookCharacterIdSwitchBlockCheck(int blockId);
 static void __stdcall runtimeHookCharacterIdSwitchBlockTransform(int playerIdx, Block* block);
 
@@ -1203,7 +1203,7 @@ __declspec(naked) static void  __stdcall HOOK_0x9E1CA9() {
 static auto patch_animate_hook_0x9E1CA9 = PATCH(0x9E1CA9).CALL(HOOK_0x9E1CA9);
 
 // Check to allow player to pass through their own filter block type
-__declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
+/*__declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
     __asm {
         push ecx
         push edx
@@ -1216,7 +1216,8 @@ __declspec(naked) static void  __stdcall HOOK_0x9A3CC5() {
         ret
     }
 }
-static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).CALL(HOOK_0x9A3CC5).JMP(0x9A3DD2).NOP_PAD_TO_SIZE<269>();
+static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).CALL(HOOK_0x9A3CC5).JMP(0x9A3DD2).NOP_PAD_TO_SIZE<269>();*/
+static auto patch_block_passthrough_0x9A3CC5 = PATCH(0x9A3CC5).NOP_PAD_TO_SIZE<269>();
 
 // Check if this is a hittable switch block... 
 __declspec(naked) static void  __stdcall HOOK_0x9DA747() {
@@ -2261,7 +2262,7 @@ static void __stdcall runtimeHookCharacterIdAnimateBlocks(void)
     }
 }
 
-static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx)
+/*static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx)
 {
     short blockId = Block::GetRaw(blockIdx)->BlockType;
     short characterFilter = Blocks::GetBlockPlayerFilter(blockId);
@@ -2279,7 +2280,7 @@ static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, i
     }
 
     return -1;
-}
+}*/
 
 static int __stdcall runtimeHookCharacterIdSwitchBlockCheck(int blockId)
 {

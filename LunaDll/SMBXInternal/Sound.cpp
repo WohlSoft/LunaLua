@@ -53,7 +53,7 @@ static std::wstring g_LastActiveCustomMusicPath = L"";
 
 void SMBXSound::StoreActiveCustomMusicPath(unsigned int section)
 {
-    g_LastActiveCustomMusicPath = GM_MUSIC_PATHS_PTR[section];
+    g_LastActiveCustomMusicPath = static_cast<std::wstring>(GM_MUSIC_PATHS_PTR[section]);
 }
 
 std::wstring SMBXSound::GetActiveCustomMusicPath()

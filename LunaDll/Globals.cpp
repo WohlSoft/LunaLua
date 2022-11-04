@@ -19,7 +19,6 @@ bool gPrintErrorsToScreen;
 bool gIsOverworld;
 bool gHook_SkipTestMsgBox;
 bool gAutostartRan = false;
-bool gIsWindowsVistaOrNewer = false;
 SMBXHUDSettings gSMBXHUDSettings = {
     false,    // skip
     WHUD_ALL, // overworldHudControlFlag

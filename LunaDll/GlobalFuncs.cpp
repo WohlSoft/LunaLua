@@ -380,26 +380,31 @@ void ResetLunaModule()
     native_initDefVals();
 }
 
-static bool IsWindowsVistaOrNewer() {
-    OSVERSIONINFOEX osVersionInfo;
+bool IsWindowsVersionOrNewer(DWORD major, DWORD minor)
+{
+    OSVERSIONINFOEXA osVersionInfo;
     DWORDLONG conditionMask = 0;
 
-    memset(&osVersionInfo, 0, sizeof(OSVERSIONINFOEX));
-    osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    osVersionInfo.dwMajorVersion = 6;
-    osVersionInfo.dwMinorVersion = 0;
-    osVersionInfo.wServicePackMajor = 0;
-    osVersionInfo.wServicePackMinor = 0;
+    memset(&osVersionInfo, 0, sizeof(osVersionInfo));
+    osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
+    osVersionInfo.dwMajorVersion = major;
+    osVersionInfo.dwMinorVersion = minor;
     VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
     VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-    VER_SET_CONDITION(conditionMask, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
 
-    return VerifyVersionInfo(
+    return VerifyVersionInfoA(
         &osVersionInfo,
         VER_MAJORVERSION | VER_MINORVERSION |
         VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR,
         conditionMask);
+}
+
+FARPROC Luna_GetProc_impl(const char* libFilename, const char* procName)
+{
+    HMODULE mod = LoadLibraryA(libFilename);
+    if (mod == nullptr) return nullptr;
+
+    return GetProcAddress(mod, procName);
 }
 
 /*!
@@ -465,8 +470,6 @@ void initAppPaths()
 void InitGlobals()
 {
     //char* dbg = "GLOBAL INIT DBG";
-
-    gIsWindowsVistaOrNewer = IsWindowsVistaOrNewer();
 
     srand((int)time(NULL));
 
@@ -574,29 +577,6 @@ bool vecStrFind(const std::vector<std::wstring>& vecStr, const std::wstring& fin
     }
     return false;
 }
-
-//HMODULE getModule(std::string moduleName)
-//{
-//    HMODULE ret = 0;
-//    if( !(ret = GetModuleHandleA(moduleName.c_str())) ){
-//        ret = LoadLibraryA(moduleName.c_str());
-//    }
-//    return ret;
-//}
-
-//std::wstring getModulePath()
-//{
-//    HMODULE hModule = GetModuleHandleW(NULL);
-//    WCHAR path[MAX_PATH];
-//    int count = GetModuleFileNameW(hModule, path, MAX_PATH);
-//    for(int i = count; i > 3; i--) {
-//        if(path[i] == L'\\') {
-//            path[i] = 0;
-//            break;
-//        }
-//    }
-//    return std::wstring(path);
-//}
 
 // Function to normalize a path, in such a way that all slashes become forward
 // slashes, duplicate consecutive slashes are removed, and trailing slashes are

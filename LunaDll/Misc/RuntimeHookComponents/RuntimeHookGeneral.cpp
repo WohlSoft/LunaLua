@@ -65,13 +65,13 @@ struct FramePaddingInfo
     int tPad;
     int bPad;
 
-    // How much of the padding is from WM_SIZBOX?
+    // How much of the padding is from WM_SIZEBOX?
     int lPadSz;
     int rPadSz;
     int tPadSz;
     int bPadSz;
 };
-static FramePaddingInfo getWindowFramePadding(HWND hwnd)
+static FramePaddingInfo getWindowFramePadding(HWND hwnd, int dpi)
 {
     // The choice of 800x600 is here pretty arbitrary, and was just chosen to be typical of this program
     FramePaddingInfo out;
@@ -81,8 +81,17 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
         rc.top = 0;
         rc.right = 800;
         rc.bottom = 600;
-        AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
-            GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+        if (adjustWindowRectExForDpi)
+        {
+            adjustWindowRectExForDpi(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE), dpi);
+        }
+        else
+        {
+            AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE),
+                GetMenu(hwnd) != 0, GetWindowLong(hwnd, GWL_EXSTYLE));
+        }
         out.lPad = -rc.left;
         out.rPad = rc.right - 800;
         out.tPad = -rc.top;
@@ -95,24 +104,19 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
         out.rPadSz = 0;
         out.tPadSz = 0;
         out.bPadSz = 0;
-        if (gIsWindowsVistaOrNewer)
+        if (Luna_IsWindowsVistaOrNewer())
         {
-            static HMODULE dwmModule = LoadLibraryA("Dwmapi.dll");
-            if (dwmModule != nullptr)
+            static auto dwmGetWindowsAttribute = Luna_GetProc<HRESULT (__stdcall *)(HWND, DWORD, PVOID, DWORD)>("Dwmapi.dll", "DwmGetWindowAttribute");
+            if (dwmGetWindowsAttribute != nullptr)
             {
-                typedef HRESULT __stdcall dwm_call_t(HWND, DWORD, PVOID, DWORD);
-                static dwm_call_t* dwmGetWindowsAttribute = reinterpret_cast<dwm_call_t*>(GetProcAddress(dwmModule, "DwmGetWindowAttribute"));
-                if (dwmGetWindowsAttribute != nullptr)
+                RECT rc1, rc2;
+                GetWindowRect(hwnd, &rc1);
+                if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
                 {
-                    RECT rc1, rc2;
-                    GetWindowRect(hwnd, &rc1);
-                    if (dwmGetWindowsAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rc2, sizeof(rc2)) == S_OK)
-                    {
-                        out.lPadSz = rc2.left - rc1.left;
-                        out.rPadSz = rc1.right - rc2.right;
-                        out.tPadSz = rc2.top - rc1.top;
-                        out.bPadSz = rc1.bottom - rc2.bottom;
-                    }
+                    out.lPadSz = rc2.left - rc1.left;
+                    out.rPadSz = rc1.right - rc2.right;
+                    out.tPadSz = rc2.top - rc1.top;
+                    out.bPadSz = rc1.bottom - rc2.bottom;
                 }
             }
         }
@@ -122,10 +126,10 @@ static FramePaddingInfo getWindowFramePadding(HWND hwnd)
 }
 
 // Function to calculate a corrected window size/position to maintain aspect ratio, and potentially snap near a nominal size
-static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH)
+static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCorner, double nominalW, double nominalH, int dpi)
 {
     // Get padding overhead
-    FramePaddingInfo pad = getWindowFramePadding(hwnd);
+    FramePaddingInfo pad = getWindowFramePadding(hwnd, dpi);
     int wPad = pad.lPad + pad.rPad;
     int hPad = pad.tPad + pad.bPad;
 
@@ -161,9 +165,11 @@ static void CalculateWindowSizeAdjusted(HWND hwnd, LPRECT lpRect, WPARAM dragCor
     }
 
     // Snap size
-    if ((relS > 0.95) && (relS < 1.05))
+    double nearS = round(relS * 2) * 0.5;
+    double errS = abs(relS - nearS);
+    if (errS <= 0.05)
     {
-        relS = 1.0;
+        relS = nearS;
     }
 
     // New Size
@@ -579,11 +585,62 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
     }
 }
 
+static int UpdateWindowSizeForDPI(int currentDpi, int newDpi, SIZE* pSize)
+{
+    auto currentSize = gWindowSizeHandler.getWindowSize();
+
+    // Compute new desired window client size
+    int newW = (currentSize.x * newDpi) / currentDpi;
+    int newH = (currentSize.y * newDpi) / currentDpi;
+
+    // Get FB size
+    int fbW = g_GLContextManager.GetMainFBWidth();
+    int fbH = g_GLContextManager.GetMainFBHeight();
+
+    // If new desired size is near a multiple of half the framebuffer size, round to that.
+    double scaleW = static_cast<double>(newW) / fbW;
+    double scaleH = static_cast<double>(newH) / fbH;
+    double nearScaleW = round(scaleW * 2) * 0.5;
+    double nearScaleH = round(scaleH * 2) * 0.5;
+    double errW = abs(scaleW - nearScaleW);
+    double errH = abs(scaleW - nearScaleW);
+    if ((errW <= 0.05) && (errH <= 0.05))
+    {
+        newW = static_cast<int>(round(fbW * nearScaleW));
+        newH = static_cast<int>(round(fbH * nearScaleH));
+    }
+
+    // Get window size
+    RECT newRect;
+    newRect.left = 0;
+    newRect.top = 0;
+    newRect.right = newW;
+    newRect.bottom = newH;
+    static auto adjustWindowRectExForDpi = Luna_GetProc<BOOL(__stdcall *)(LPRECT, DWORD, BOOL, DWORD, UINT)>("User32.dll", "AdjustWindowRectExForDpi");
+    if (adjustWindowRectExForDpi == nullptr) return 0;
+    adjustWindowRectExForDpi(&newRect, GetWindowLong(gMainWindowHwnd, GWL_STYLE),
+        GetMenu(gMainWindowHwnd) != 0, GetWindowLong(gMainWindowHwnd, GWL_EXSTYLE), newDpi);
+    int winW = newRect.right - newRect.left;
+    int winH = newRect.bottom - newRect.top;
+
+    if (pSize)
+    {
+        pSize->cx = winW;
+        pSize->cy = winH;
+    }
+
+    return newDpi;
+}
+
 static WNDPROC gMainWindowProc;
 LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static bool inSizeMoveModal = false;
     static bool inSizeModal = false;
+    static bool gotFirstSize = false;
+    static bool dpiChangeComputed = false;
+    static bool isResizeFromDpiChange = false;
+    static int currentDpi = 0;
 
     if (hwnd == gMainWindowHwnd)
     {
@@ -601,8 +658,76 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 // Calling DefWindowProcW here is a hack to allow unicode window titles, by redirecting to the unicode DefWindowProcW
                 return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
+            case 0x02E4: // WM_GETDPISCALEDSIZE
+            {
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized
+                    return TRUE;
+                }
+
+                int newDpi = wParam;
+                SIZE* pSize = reinterpret_cast<SIZE*>(lParam);
+                currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, pSize);
+                dpiChangeComputed = true;
+                return TRUE;
+            }
+            case 0x02E0: // WM_DPICHANGED
+            {
+                int dpiX = HIWORD(wParam);
+                int dpiY = LOWORD(wParam);
+                int newDpi = (dpiX + dpiY) / 2;
+                RECT* suggestedRect = reinterpret_cast<RECT*>(lParam);
+
+                WINDOWPLACEMENT wndpl;
+                wndpl.length = sizeof(WINDOWPLACEMENT);
+                if (GetWindowPlacement(gMainWindowHwnd, &wndpl) && (wndpl.showCmd == SW_MAXIMIZE))
+                {
+                    // Ignore if maximized (but store the new DPI)
+                    currentDpi = newDpi;
+                    return TRUE;
+                }
+
+                if (dpiChangeComputed)
+                {
+                    // Case where DPI change was computed by WM_GETDPISCALEDSIZE
+                    dpiChangeComputed = false;
+                }
+                else
+                {
+                    // Case where WM_GETDPISCALEDSIZE was not called
+                    SIZE sz;
+                    currentDpi = UpdateWindowSizeForDPI(currentDpi, newDpi, &sz);
+                    suggestedRect->left = (suggestedRect->left + suggestedRect->right - sz.cx) / 2;
+                    suggestedRect->right = suggestedRect->left + sz.cx;
+                    suggestedRect->bottom = suggestedRect->top + sz.cx;
+                }
+
+                // Update window size/position
+                isResizeFromDpiChange = true; // <- Trigger repaint
+                SetWindowPos(gMainWindowHwnd, nullptr, suggestedRect->left, suggestedRect->top, suggestedRect->right - suggestedRect->left, suggestedRect->bottom - suggestedRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+                return 0;
+            }
+            case WM_SHOWWINDOW:
+            {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
+            }
             case WM_SIZE:
             {
+                if (!gotFirstSize)
+                {
+                    gotFirstSize = true;
+                    currentDpi = gWindowSizeHandler.SetInitialWindowSize();
+                    return 0;
+                }
+
                 // Store size of main window (low word is width, high word is height)
                 static LPARAM latestLParam;
                 latestLParam = lParam;
@@ -653,10 +778,11 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     );
 
                     // Redraw
-                    if (inSizeMoveModal)
+                    if (inSizeMoveModal || isResizeFromDpiChange)
                     {
-                        inSizeModal = true;
-                        g_GLEngine.EndFrame(nullptr, false, true, true);
+                        inSizeModal = inSizeMoveModal;
+                        isResizeFromDpiChange = false;
+                        g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                     }
                 }
 
@@ -665,7 +791,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_PAINT:
                 CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
-                if (inSizeMoveModal)
+                if (inSizeMoveModal || !gMainWindowFocused)
                 {
                     g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                 }
@@ -698,7 +824,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Adjust the requested resizing of the window
                 LPRECT lpRect = (LPRECT)lParam;
-                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight());
+                CalculateWindowSizeAdjusted(hwnd, lpRect, wParam, g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight(), currentDpi);
 
                 return TRUE;
             }
@@ -1085,6 +1211,7 @@ static unsigned int __stdcall LatePatch(void)
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
+AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
 
 AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
     .PUSH_EBX()
@@ -1399,7 +1526,7 @@ void TrySkipPatch()
     // Don't trust QPC as much on WinXP
     void* frameTimingHookPtr;
     void* frameTimingMaxFPSHookPtr;
-    if (gIsWindowsVistaOrNewer) {
+    if (Luna_IsWindowsVistaOrNewer()) {
         frameTimingHookPtr = (void*)&FrameTimingHookQPC;
         frameTimingMaxFPSHookPtr = (void*)&FrameTimingMaxFPSHookQPC;
     }
@@ -1579,6 +1706,10 @@ void TrySkipPatch()
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9E0D50).JMP(&runtimeHookRemoveBlock).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Hook for onNPCCollect
+    PATCH(0xA24CD0).JMP(&runtimeHookCollectNPC).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch 16384 block bug
     PATCH(0xA98936).bytes(
@@ -1817,10 +1948,17 @@ void TrySkipPatch()
     // PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>()
     gDisableNPCDownwardClipFixSlope.Apply();
 
+    // Hook to fix an NPC's section property when it spawn out of bounds
+    gDisableNPCSectionFix.Apply();
+
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
     PATCH(0x9E3D30).JMP(runtimeHookPSwitchStartRemoveBlockWrapper).NOP_PAD_TO_SIZE<110>().Apply();
     PATCH(0x9E3E54).JMP(runtimeHookPSwitchGetNewBlockAtEndWrapper).NOP_PAD_TO_SIZE<29>().Apply();
+
+    // Patch to handle blocks that allow players to pass through
+    // Moved from where the original code does it to allow player passthrough slopes
+    PATCH(0x9A16E8).JMP(runtimeHookBlockPlayerFilter).NOP_PAD_TO_SIZE<12>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
     // Also handles collisionGroup for NPC-to-solid interactions now

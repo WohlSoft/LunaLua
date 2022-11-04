@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include <gl/glew.h>
+#include <GL/glew.h>
 #include "GLShaderVariableType.h"
 
 

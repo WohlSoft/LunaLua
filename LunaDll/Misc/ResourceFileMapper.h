@@ -100,7 +100,7 @@ public:
     {
         std::vector<std::shared_ptr<T>>* pCacheHolder = isWorld ? &mWorldCacheHolder : &mCacheHolder;
         pCacheHolder->clear();
-        for (auto& cacheEntry = mCache.begin(); cacheEntry != mCache.end();)
+        for (auto&& cacheEntry = mCache.begin(); cacheEntry != mCache.end();)
         {
             std::shared_ptr<T> cachePtr = cacheEntry->second.data.lock();
             if (cachePtr)
@@ -123,7 +123,7 @@ public:
     {
         std::vector<std::shared_ptr<T>>* pCacheHolder = isWorld ? &mWorldCacheHolder : &mCacheHolder;
         pCacheHolder->clear();
-        for (auto& cacheEntry = mCache.begin(); cacheEntry != mCache.end();)
+        for (auto&& cacheEntry = mCache.begin(); cacheEntry != mCache.end();)
         {
             std::shared_ptr<T> cachePtr = cacheEntry->second.data.lock();
             if (!cachePtr)
@@ -139,7 +139,7 @@ public:
 
     Entry* CachedFileDataWeakPtr::get(const NormalizedPath<std::wstring>& filePath)
     {
-        auto& it = mCache.find(filePath);
+        auto&& it = mCache.find(filePath);
 
         if (it == mCache.end())
         {

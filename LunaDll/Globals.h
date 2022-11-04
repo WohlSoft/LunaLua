@@ -30,7 +30,7 @@ class RenderOverrideManager;
 #include "Defines.h"
 
 #ifndef __MINGW32__
-#pragma comment (lib, "Msimg32.lib")
+#pragma comment (lib, "msimg32.lib")
 #endif
 
 struct StartupEpisodeSettings
@@ -96,7 +96,6 @@ extern bool            gPrintErrorsToScreen;
 extern bool            gIsOverworld;
 extern bool            gHook_SkipTestMsgBox;
 extern bool            gAutostartRan;
-extern bool            gIsWindowsVistaOrNewer;
 extern SMBXHUDSettings gSMBXHUDSettings;
 extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;

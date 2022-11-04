@@ -253,6 +253,14 @@ short NPC::HarmComboWithDamage(short npcIdx, short harmType, short multiplier, f
     return multiplier;
 }
 
+void NPC::Collect(short npcIdx, short playerIdx)
+{
+    // Collect an NPC as if a player had touched it
+    short targetIndex = npcIdx + 1;
+
+    native_collectNPC(&playerIdx, &targetIndex);
+}
+
 // Declerations of inbuilt NPC property arrays
 static uint32_t npcprop_vulnerableharmtypes[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_spinjumpsafe[NPC::MAX_ID+1] = { 0 };
