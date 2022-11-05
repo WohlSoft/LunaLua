@@ -3815,6 +3815,151 @@ void __stdcall runtimeHookPlayerKill(short* playerIdxPtr)
     }
 }
 
+static int __stdcall runtimeHookWarpEnterInternal(short* playerIdx, int warpIdx)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> warpEvent = std::make_shared<Event>("onWarpEnter", true);
+        warpEvent->setDirectEventName("onWarpEnter");
+        warpEvent->setLoopable(false);
+        gLunaLua.callEvent(warpEvent, warpIdx, *playerIdx);
+
+        if (warpEvent->native_cancelled())
+        {
+            // Cancel warp
+            return 0;
+        }
+    }
+
+    // Continue warp
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookWarpEnter(void)
+{
+    // 009CA0D5 | 66:837D EC FF                  | cmp word ptr ss:[ebp-14],FFFF                        |
+    __asm {
+        push ebp
+        push edi
+        push eax
+
+        cmp word ptr ss:[ebp-0x14],0xFFFF // if 'canWarp' isn't true, cancel immediately...
+        jne cancel_warp                   // that's what the code this replaces does!
+
+        movsx eax, word ptr ss:[ebp-0x18] // warp index
+        push eax
+        mov eax, dword ptr ss:[ebp+0x8]   // player index
+        push eax
+
+        call runtimeHookWarpEnterInternal // call function to decide if we cancel
+
+        cmp eax,0                         // if 0 was returned, cancel
+        jne continue_warp
+        jmp cancel_warp
+    continue_warp:
+        pop eax
+        pop edi
+        pop ebp
+        push 0x9CA0E0
+        ret
+    cancel_warp:
+        pop eax
+        pop edi
+        pop ebp
+        push 0x9CA62A
+        ret
+    }
+}
+
+void __stdcall runtimeHookWarpInstantInternal(short* playerIdx, int warpIdx)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> warpEvent = std::make_shared<Event>("onWarp", false);
+        warpEvent->setDirectEventName("onWarp");
+        warpEvent->setLoopable(false);
+        gLunaLua.callEvent(warpEvent, warpIdx, *playerIdx);
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookWarpInstant(void)
+{
+    // 009CAE34 | 66:C781 5C010000 3200        | mov word ptr ds:[ecx+15C],32                         | 32:'2'
+    // Note: the code this returns to just immediately leaves the sub,
+    //       so we don't need to push and pop any registers.
+    __asm {
+        mov word ptr ds:[ecx+0x15C],0x32    // set warp cooldown to 50 (what the original code does)
+
+        movsx eax, word ptr ss:[ebp-0x18]   // warp index
+        push eax
+        mov eax, dword ptr ss:[ebp+0x8]     // (pointer to) player index
+        push eax
+
+        call runtimeHookWarpInstantInternal // call function to run lunalua event
+
+        push 0x9CAE9E                       // return to original code
+        ret
+    }
+}
+
+void __stdcall runtimeHookWarpPipeDoorInternal(short* playerIdx)
+{
+    // (Shared by both pipe and door hooks)
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> warpEvent = std::make_shared<Event>("onWarp", false);
+        warpEvent->setDirectEventName("onWarp");
+        warpEvent->setLoopable(false);
+        gLunaLua.callEvent(warpEvent, Player::Get(*playerIdx)->TargetWarpIndex, *playerIdx);
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookWarpPipe(void)
+{
+    // Placed in 3 spots:
+    // 009D55CD | E9 AADFFFFF                  | jmp smbx.9D357C                                      |
+    // 009D55F1 | 0F85 85DFFFFF                | jne smbx.9D357C                                      |
+    // 009D5614 | E9 63DFFFFF                  | jmp smbx.9D357C                                      |
+    __asm {
+        push esi
+        push ebx
+        push ebp
+
+        mov esi,dword ptr ss:[ebp+0x8]       // (pointer to) player index
+        push esi
+
+        call runtimeHookWarpPipeDoorInternal // call function to run lunalua event
+
+        pop ebp
+        pop ebx
+        pop esi
+
+        push 0x9D357C
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookWarpDoor(void)
+{
+    // 009D7037 | 66:A1 5E59B200               | mov ax,word ptr ds:[B2595E]                          |
+    __asm {
+        push esi
+        push ebx
+        push ebp
+
+        mov esi,dword ptr ss:[ebp+0x8]       // (pointer to) player index
+        push esi
+
+        call runtimeHookWarpPipeDoorInternal // call function to run lunalua event
+
+        pop ebp
+        pop ebx
+        pop esi
+
+        mov ax, word ptr ds:[0xB2595E]       // load player count (this is what the code we're replacing does)
+
+        push 0x9D703D
+        ret
+    }
+}
+
 void __stdcall runtimeHookDrawBackground(short* section, short* camera)
 {
     if (gRenderBackgroundFlag)

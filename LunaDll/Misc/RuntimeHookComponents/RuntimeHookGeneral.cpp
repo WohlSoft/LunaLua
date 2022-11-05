@@ -1976,6 +1976,15 @@ void TrySkipPatch()
     // Hook for onPlayerKill
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hooks for onWarpEnter/onWarp
+    PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();
+    
+    PATCH(0x9CAE34).JMP(runtimeHookWarpInstant).NOP_PAD_TO_SIZE<11>().Apply();
+    PATCH(0x9D55CD).JMP(runtimeHookWarpPipe).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x9D55F1).JNE(runtimeHookWarpPipe).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9D5614).JMP(runtimeHookWarpPipe).NOP_PAD_TO_SIZE<5>().Apply();
+    PATCH(0x9D7037).JMP(runtimeHookWarpDoor).NOP_PAD_TO_SIZE<6>().Apply();
+
     // Hooks for populating world map
     PATCH(0x8E35E0).JMP(runtimeHookLoadWorldList).NOP_PAD_TO_SIZE<6>().Apply();
 
