@@ -567,6 +567,11 @@ void __stdcall runtimeHookLevelPauseCheck(void);
 void __stdcall runtimeHookPlayerHarm(void);
 void __stdcall runtimeHookPlayerKill(short* playerIdxPtr);
 
+void __stdcall runtimeHookWarpEnter(void);
+void __stdcall runtimeHookWarpInstant(void);
+void __stdcall runtimeHookWarpPipe(void);
+void __stdcall runtimeHookWarpDoor(void);
+
 void __stdcall runtimeHookDrawBackground(short* section, short* camera);
 
 void __stdcall runtimeHookLoadWorldList(void);
