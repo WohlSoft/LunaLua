@@ -373,7 +373,7 @@ DEFMEM(GM_MUSIC_PATHS_PTR,   VB6StrPtr*, 0x00B257B8);
 DEFMEM(GM_SEC_MUSIC_TBL,         short*, 0x00B25828); // 21 shorts containing music # for each section
 DEFMEM(GM_SEC_DEFAULT_MUSIC_TBL, short*, 0x00B25844);
 DEFMEM(GM_MUSIC_RESTORE_PL,        WORD, 0x00B2C630); // If pswitch is active, then the music of the section of the player index is restored.
-
+DEFMEM(GM_WORLD_CURRENT_MUSIC,     WORD, 0x00B2C5D8); // The ID of the music currently playing on the world map. Written to save to properly restore music when the player resumes playing.
 
 // Input
 DEFMEM(GM_VKEY_TABLE_PTR,   void*,  0x00B25068);
