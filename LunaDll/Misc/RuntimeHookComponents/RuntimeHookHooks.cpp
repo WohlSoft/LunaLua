@@ -4067,7 +4067,6 @@ static void __stdcall runtimeHookHandleMapMusicBoxCollisionInternal(int musicBox
     SMBXMusicbox* musicBox = SMBXMusicbox::GetRaw(musicBoxIdx);
     if (GM_WORLD_CURRENT_MUSIC != musicBox->id) {
         native_playMusic(&(musicBox->id)); // sets GM_WORLD_CURRENT_MUSIC
-        GM_PLAYER_LIVES = musicBoxIdx;
     }
 }
 
