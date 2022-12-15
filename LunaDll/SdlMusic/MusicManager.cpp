@@ -1,6 +1,7 @@
 #ifndef NO_SDL
 
 #include "MusicManager.h"
+#include "../MciEmulator/mciEmulator.h"
 #include "../Globals.h"
 #include "../GlobalFuncs.h"
 #include <math.h>
@@ -88,11 +89,13 @@ void MusicEntry::play()
     PGE_MusPlayer::MUS_playMusic();
 }
 
-
+int MusicManager::max_lvl_music_id = 0;
+int MusicManager::max_wld_music_id = 0;
 ChunkEntry MusicManager::sounds[91];
-MusicEntry MusicManager::music_lvl[57];
-MusicEntry MusicManager::music_wld[16];
 MusicEntry MusicManager::music_spc[4];
+//These arrays are created in resizeMusicArrays
+MusicEntry* MusicManager::music_lvl = NULL;
+MusicEntry* MusicManager::music_wld = NULL;
 
 std::unordered_map<std::string, musicFile > MusicManager::registredFiles;
 std::unordered_map<std::string, chunkFile > MusicManager::chunksBuffer;
@@ -109,11 +112,12 @@ void MusicManager::initAudioEngine()
     PGE_SDL_Manager::initSDL();
     if(firstRun)
     {
-        initArrays();
+        initArraysSound();
+        resizeMusicArrays(MusicManager::defaultMusCountLvl, MusicManager::defaultMusCountWld);
         defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
         defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
         loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
-        loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
+        loadMusics(defaultMusINI, PGE_SDL_Manager::appPath, true);
         rebuildSoundCache();
     }
 }
@@ -256,14 +260,14 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
             } else if(alias.substr(0, 6) == "wmusic") {
                 std::string musIDs = alias.substr(6);
                 int musID = std::atoi(musIDs.c_str()) - 1;
-                if(musID>=0 && musID<16)
+                if(musID>=0 && musID<max_wld_music_id)
                 {
                     music_wld[musID].play();
                 }
             } else if(alias.substr(0, 5) == "music") {
                 std::string musIDs = alias.substr(5);
                 int musID = std::atoi(musIDs.c_str()) - 1;
-                if(musID>=0 && musID<56)
+                if(musID>=0 && musID<max_lvl_music_id)
                 {
                     music_lvl[musID].play();
                 }
@@ -430,7 +434,7 @@ static std::string clearTrackNumber(std::string in)
     return in;
 }
 
-void MusicManager::loadMusics(std::string path, std::string root)
+void MusicManager::loadMusics(std::string path, std::string root, bool is_first_run)
 {
     if(!file_existsX(path))
         return;
@@ -445,10 +449,26 @@ void MusicManager::loadMusics(std::string path, std::string root)
     curRoot = root;
     int i = 0;
 
-    //World music
-    for(int j = 1; (j <= 16) && (i < 74); i++, j++)
+    //ONLY if this is the first time loading music (loading from basegame music ini),
+    //Handle changing max music count
+    if (is_first_run)
     {
-        std::string head = "world-music-" + i2str(j);
+        //Read total count of world and level music
+        int new_max_lvl_music_id = MusicManager::defaultMusCountLvl;
+        int new_max_wld_music_id = MusicManager::defaultMusCountWld;
+        if (musicList.beginGroup("music-main"))
+        {
+            //Read new max values from ini, if defined
+            musicList.read("total-level", new_max_lvl_music_id, new_max_lvl_music_id);
+            musicList.read("total-world", new_max_wld_music_id, new_max_wld_music_id);
+        }
+        resizeMusicArrays(new_max_lvl_music_id, new_max_wld_music_id);
+    }
+
+    //World music
+    for(int i = 1; i <= max_wld_music_id; i++)
+    {
+        std::string head = "world-music-" + i2str(i);
         std::string fileName;
 
         if(!musicList.beginGroup(head))
@@ -465,14 +485,14 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
-            music_wld[j-1].setPath(root + fileName);
+            music_wld[i-1].setPath(root + fileName);
         }
     }
 
     //Special music
-    for(int j = 1; (j <= 3) && (i < 74); i++, j++)
+    for(int i = 1; i <= MusicManager::defaultMusCountSpc; i++)
     {
-        std::string head = "special-music-"+i2str(j);
+        std::string head = "special-music-"+i2str(i);
         std::string fileName;
 
         if(!musicList.beginGroup(head))
@@ -489,15 +509,20 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            music_spc[j-1].setPath(root + fileName);
+            music_spc[i-1].setPath(root + fileName);
         }
     }
 
     //Level music
-    for(int j=1; (j<=56) && (i<74); i++, j++)
+    for(int i = 1; i <= max_lvl_music_id; i++)
     {
-        if(j==24) j++;
-        std::string head = "level-music-"+i2str(j);
+        if (i == 24)
+        {
+            // Skip loading audio for custom music index
+            continue;
+        }
+
+        std::string head = "level-music-"+i2str(i);
         std::string fileName;
 
         if(!musicList.beginGroup(head))
@@ -514,36 +539,38 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
-            music_lvl[j-1].setPath(root + fileName);
+            music_lvl[i - 1].setPath(root + fileName);
         }
     }
 }
 
 void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCustomPath)
 {
-    initArrays();
+    initArraysSound();
+    initArraysMusic();
     loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
     loadSounds(episodePath+"\\sounds.ini", episodePath);
     if(!levelCustomPath.empty())
         loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath);
-    loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
-    loadMusics(episodePath+"\\music.ini", episodePath);
+    loadMusics(defaultMusINI, PGE_SDL_Manager::appPath, false);
+    loadMusics(episodePath+"\\music.ini", episodePath, false);
     if(!levelCustomPath.empty())
-        loadMusics(levelCustomPath+"\\music.ini", levelCustomPath);
+        loadMusics(levelCustomPath+"\\music.ini", levelCustomPath, false);
     rebuildSoundCache();
 }
 
 
 void MusicManager::resetSoundsToDefault()
 {
-    initArrays();
+    initArraysSound();
+    initArraysMusic();
     loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
-    loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
+    loadMusics(defaultMusINI, PGE_SDL_Manager::appPath, false);
     rebuildSoundCache();
 }
 
 
-void MusicManager::initArrays()
+void MusicManager::initArraysSound()
 {
     curRoot = PGE_SDL_Manager::appPath;
     for(int i=0; i<91; i++)
@@ -552,32 +579,68 @@ void MusicManager::initArrays()
         sounds[i].setPath(PGE_SDL_Manager::appPath+defaultChunksList[i]);
         sounds[i].channel=chunksChannelsList[i];
     }
-    for(int i=0, j=0, k=MusicEntry::MUS_WORLD; i<74; i++, j++)
+}
+
+void MusicManager::resizeMusicArrays(int new_max_lvl_music_id, int new_max_wld_music_id) {
+    bool any_change = false;
+    if (new_max_lvl_music_id != max_lvl_music_id)
     {
-        switch(k)
+        //Free old level music array and create a new one
+        if (music_lvl != NULL)
+        {
+            delete[] music_lvl;
+        }
+        max_lvl_music_id = new_max_lvl_music_id;
+        music_lvl = new MusicEntry[new_max_lvl_music_id];
+    }
+    if (new_max_wld_music_id != max_wld_music_id)
+    {
+        //Free old level music array and create a new one
+        if (music_wld != NULL)
+        {
+            delete[] music_wld;
+        }
+        max_wld_music_id = new_max_lvl_music_id;
+        music_wld = new MusicEntry[new_max_wld_music_id];
+    }
+    if (any_change)
+    {
+        //Force re-populate music if the size of either array changed
+        initArraysMusic();
+    }
+}
+
+void MusicManager::initArraysMusic()
+{
+    curRoot = PGE_SDL_Manager::appPath;
+    for (int i = 0, j = 0, k = MusicEntry::MUS_WORLD; i < MusicManager::defaultMusCount; i++, j++)
+    {
+        switch (k)
         {
         case MusicEntry::MUS_WORLD:
-            music_wld[j].type=k;
-            music_wld[j].id=j+1;
-            music_wld[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
-            if(j>=15)
+            music_wld[j].type = k;
+            music_wld[j].id = j + 1;
+            music_wld[j].setPath(PGE_SDL_Manager::appPath + defaultMusList[i]);
+            if (j >= MusicManager::defaultMusCountWld - 1)
             {
-                j=0; j++;
+                j = -1; // next category
+                k = MusicEntry::MUS_SPECIAL;
             }
             break;
         case MusicEntry::MUS_SPECIAL:
-            music_spc[j].type=k;
-            music_spc[j].id=j+1;
-            music_spc[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
-            if(j>=3)
+            music_spc[j].type = k;
+            music_spc[j].id = j + 1;
+            music_spc[j].setPath(PGE_SDL_Manager::appPath + defaultMusList[i]);
+            if (j >= MusicManager::defaultMusCountSpc - 1)
             {
-                j=0; j++;
+                j = -1; // next category
+                k = MusicEntry::MUS_LEVEL;
             }
             break;
         case MusicEntry::MUS_LEVEL:
-            music_spc[j].type=k;
-            music_spc[j].id=j+1;
-            music_spc[j].setPath(PGE_SDL_Manager::appPath+defaultMusList[i]);
+            music_lvl[j].type = k;
+            music_lvl[j].id = j + 1;
+            music_lvl[j].setPath(PGE_SDL_Manager::appPath + defaultMusList[i]);
             break;
         }
     }

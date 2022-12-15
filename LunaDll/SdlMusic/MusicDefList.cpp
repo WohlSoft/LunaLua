@@ -2,7 +2,7 @@
 
 #ifndef NO_SDL
 
-std::string MusicManager::musAliasesList[75]=
+std::string MusicManager::musAliasesList[MusicManager::defaultMusCount]=
 {
     "wmusic1",//0
     "wmusic2",
@@ -20,9 +20,11 @@ std::string MusicManager::musAliasesList[75]=
     "wmusic14",
     "wmusic15",
     "wmusic16",//15
+   
     "smusic",  //16
     "stmusic",
     "tmusic",  //18
+
     "music1",  //19
     "music2",
     "music3",
@@ -78,7 +80,7 @@ std::string MusicManager::musAliasesList[75]=
     "music53",
     "music54",
     "music55",
-    "music56"  //73
+    "music56"  //75
 };
 
 std::string MusicManager::chunksAliasesList[91]=
@@ -176,7 +178,7 @@ std::string MusicManager::chunksAliasesList[91]=
     "sound91"
 };
 
-std::string MusicManager::defaultMusList[75]=
+std::string MusicManager::defaultMusList[MusicManager::defaultMusCount]=
 {
     "music\\smb3-world1.ogg",
     "music\\smb3-world4.ogg",
@@ -194,9 +196,11 @@ std::string MusicManager::defaultMusList[75]=
     "music\\smw-starroad.ogg",
     "music\\smw-yoshisisland.ogg",
     "music\\smw-vanilladome.ogg",
+
     "music\\smw-switch.ogg",
     "music\\smb3-switch.ogg",
     "music\\smg-title.ogg",
+    
     "music\\smb3-overworld.ogg",
     "music\\smb3-sky.ogg",
     "music\\smb3-castle.ogg",
