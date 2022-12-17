@@ -88,9 +88,26 @@ static void GLPlaceAttributes(std::vector<GLShaderVariableEntry>& out, GLShaderV
             auto data = new GLShaderVariableEntry::SamplerVector();
             for (unsigned int j = 0; j < unif.mCount; j++)
             {
-                auto img = (LunaImageRef*)rawData[2*j + 0];
-                auto cap = (CaptureBufferRef*)rawData[2*j + 1];
-                data->emplace_back(img ? *img : nullptr, cap ? *cap : nullptr);
+                typedef GLShaderVariableEntry::SamplerVectorEntry::SamplerType SamplerType;
+                SamplerType type = static_cast<SamplerType>(reinterpret_cast<int>(rawData[2 * j + 0]));
+                switch (type)
+                {
+                    case SamplerType::ELunaImage:
+                    {
+                        auto img = (LunaImageRef*)rawData[2 * j + 1];
+                        data->emplace_back(type, img ? *img : nullptr, nullptr);
+                    } break;
+                    case SamplerType::ECaptureBuffer:
+                    case SamplerType::EDepthBuffer:
+                    {
+                        auto cap = (CaptureBufferRef*)rawData[2 * j + 1];
+                        data->emplace_back(type, nullptr, cap ? *cap : nullptr);
+                    } break;
+                    default:
+                    {
+                        data->emplace_back(type, nullptr, nullptr);
+                    } break;
+                }
             }
             free(unif.mData);
 
@@ -125,6 +142,14 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
     obj->mLinearFiltered = cmd->mLinearFiltered;
+    if (cmd->mEnClipPlane0)
+    {
+        obj->mClipPlane0[0] = cmd->mColor[0];
+        obj->mClipPlane0[1] = cmd->mColor[1];
+        obj->mClipPlane0[2] = cmd->mColor[2];
+        obj->mClipPlane0[3] = cmd->mColor[3];
+        obj->mEnClipPlane0 = true;
+    }
 
     // Ensure we have something for a sampler to sample
     if ((!obj->mImg) && (!obj->mCapBuff))

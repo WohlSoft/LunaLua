@@ -154,6 +154,9 @@ public:
     bool mDepthTest;
     bool mLinearFiltered;
 
+    double mClipPlane0[4];
+    bool mEnClipPlane0;
+
     GLEngineCmd_LuaDraw() :
         mTarget(nullptr),
         mImg(nullptr),
@@ -169,7 +172,8 @@ public:
         mCount(0),
         mSceneCoords(false),
         mDepthTest(false),
-        mLinearFiltered(false)
+        mLinearFiltered(false),
+        mClipPlane0(), mEnClipPlane0(false)
     {}
 
     virtual void run(GLEngine& glEngine) const;

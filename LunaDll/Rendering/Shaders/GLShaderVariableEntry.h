@@ -19,7 +19,25 @@ class GLShaderVariableEntry
     void* m_data;
     void* m_imgs;
 public:
-    typedef std::vector<std::pair<std::shared_ptr<LunaImage>, std::shared_ptr<CaptureBuffer>>> SamplerVector;
+    struct SamplerVectorEntry
+    {
+        enum SamplerType {
+            ENone = 0,
+            ELunaImage = 1,
+            ECaptureBuffer = 2,
+            EDepthBuffer = 3
+        };
+        SamplerType type;
+        std::shared_ptr<LunaImage> img;
+        std::shared_ptr<CaptureBuffer> cap;
+
+        SamplerVectorEntry(SamplerType _type, std::shared_ptr<LunaImage> _img, std::shared_ptr<CaptureBuffer> _cap) :
+            type(_type),
+            img(_img),
+            cap(_cap)
+        {}
+    };
+    typedef std::vector<SamplerVectorEntry> SamplerVector;
     
     GLShaderVariableEntry(GLShaderVariableType type, GLuint location, GLenum typeData, size_t m_count, void* data, void* imgs=nullptr);
     GLShaderVariableEntry(const GLShaderVariableEntry& other) = delete; // To prevent double-freeing

@@ -2,8 +2,9 @@
 #include "GLContextManager.h"
 
 GLFramebuffer::GLFramebuffer(int w, int h, bool haveAlpha) :
-    mFB(0), mDepthRB(0),
-    mBufTex(0, w, h)
+    mFB(0),
+    mBufTex(0, w, h),
+    mDepthTex(0, w, h)
 {
     GLint glFormat = haveAlpha ? GL_RGBA : GL_RGB;
 
@@ -28,16 +29,25 @@ GLFramebuffer::GLFramebuffer(int w, int h, bool haveAlpha) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     GLERRORCHECK();
 
-    glGenRenderbuffersANY(1, &mDepthRB);
-    GLERRORCHECK();
-    glBindRenderbufferANY(GL_RENDERBUFFER_EXT, mDepthRB);
-    GLERRORCHECK();
-    glRenderbufferStorageANY(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mBufTex.pw, mBufTex.ph);
-    GLERRORCHECK();
-    glFramebufferRenderbufferANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mDepthRB);
+    glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
     GLERRORCHECK();
 
-    glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, mBufTex.name, 0);
+    glGenTextures(1, &mDepthTex.name);
+    GLERRORCHECK();
+    g_GLDraw.BindTexture(&mDepthTex);
+    GLERRORCHECK();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, mDepthTex.pw, mDepthTex.ph, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    GLERRORCHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    GLERRORCHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    GLERRORCHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    GLERRORCHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GLERRORCHECK();
+
+    glFramebufferTexture2DANY(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, mDepthTex.name, 0);
     GLERRORCHECK();
 
     GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0_EXT };
@@ -83,11 +93,11 @@ GLFramebuffer::~GLFramebuffer()
         mFB = 0;
     }
 
-    // Delete depth renderbuffer
-    if (mDepthRB) {
-        glDeleteRenderbuffersANY(1, &mDepthRB);
+    // Delete depth texture
+    if (mDepthTex.name) {
+        glDeleteTextures(1, &mDepthTex.name);
         GLERRORCHECK();
-        mDepthRB = 0;
+        mDepthTex.name = 0;
     }
 
     // Delete texture

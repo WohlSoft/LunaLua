@@ -14,12 +14,13 @@ public:
     void Clear();
     void Clear(const GLclampf color[4]);
     inline const GLDraw::Texture& AsTexture() const { return mBufTex; }
+    inline const GLDraw::Texture& AsDepthTexture() const { return mDepthTex; }
 
 private:
     // Framebuffer variables
     GLuint mFB;
-    GLuint mDepthRB;
     GLDraw::Texture mBufTex;
+    GLDraw::Texture mDepthTex;
 };
 
 #endif

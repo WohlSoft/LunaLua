@@ -183,6 +183,12 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
 
+    if (mEnClipPlane0)
+    {
+        glEnable(GL_CLIP_PLANE0);
+        glClipPlane(GL_CLIP_PLANE0, mClipPlane0);
+    }
+
     glColor4f(mColor[0] * mColor[3], mColor[1] * mColor[3], mColor[2] * mColor[3], mColor[3]);
     GLERRORCHECK();
 
@@ -231,6 +237,11 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
 
     glDrawArrays(mType, 0, mCount);
     GLERRORCHECK();
+
+    if (mEnClipPlane0)
+    {
+        glDisable(GL_CLIP_PLANE0);
+    }
 
     if (mLinearFiltered)
     {

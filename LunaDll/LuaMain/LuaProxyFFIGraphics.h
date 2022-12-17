@@ -43,6 +43,8 @@ struct FFI_GL_Draw_Cmd
     unsigned int mUnifCount;
     FFI_GL_Draw_Var* mUnifs;
     double mPriority;
+    double mClipPlane0[4];
+    bool mEnClipPlane0;
 };
 
 struct FFI_ShaderObj

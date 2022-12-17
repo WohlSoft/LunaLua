@@ -100,15 +100,16 @@ int* GLShaderVariableEntry::getTexPtr(GLShader& shader) const
 
         for (unsigned int i = 0; i < m_count; i++)
         {
+            typedef GLShaderVariableEntry::SamplerVectorEntry::SamplerType SamplerType;
             const GLSprite* sprite = nullptr;
             const GLFramebuffer* fb = nullptr;
-            if (imgs[i].first)
+            if (imgs[i].type == SamplerType::ELunaImage)
             {
-                sprite = g_GLTextureStore.SpriteFromLunaImage(imgs[i].first);
+                sprite = g_GLTextureStore.SpriteFromLunaImage(imgs[i].img);
             }
-            else if (imgs[i].second)
+            else if ((imgs[i].type == SamplerType::ECaptureBuffer) && (imgs[i].type == SamplerType::EDepthBuffer))
             {
-                fb = imgs[i].second->mFramebuffer;
+                fb = imgs[i].cap->mFramebuffer;
             }
 
             if (sprite != nullptr)
@@ -117,7 +118,14 @@ int* GLShaderVariableEntry::getTexPtr(GLShader& shader) const
             }
             else if (fb != nullptr)
             {
-                texPtr[i] = shader.getSamplerForTexture(fb->AsTexture().name);
+                if (imgs[i].type == SamplerType::EDepthBuffer)
+                {
+                    texPtr[i] = shader.getSamplerForTexture(fb->AsDepthTexture().name);
+                }
+                else
+                {
+                    texPtr[i] = shader.getSamplerForTexture(fb->AsTexture().name);
+                }
             }
             else
             {
