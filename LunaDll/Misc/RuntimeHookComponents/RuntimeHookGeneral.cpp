@@ -1976,6 +1976,63 @@ void TrySkipPatch()
     // Hook for onPlayerKill
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
+
+
+
+    // Hook to overwrite PlayerEffects
+    PATCH(GF_HANDLE_PLAYER_FORCED_STATE).JMP(runtimeHookPlayerEffects).NOP().Apply();
+    // Hook to overwrite SizeCheck
+    PATCH(GF_PLAYER_SIZE_UPDATE).JMP(runtimeHookPlayerSizeCheck).NOP().Apply();
+    // Hook to overwrite UnDuck
+    PATCH(GF_PLAYER_UN_DUCK).JMP(runtimeHookPlayerUnDuck).NOP().Apply();
+    // Hook to overwrite StealBonus
+    PATCH(GF_PLAYER_COOP_STEAL_BONUS).JMP(runtimeHookCoopStealBonus).NOP().Apply();
+    // Hook to overwrite YoshiSpit
+    PATCH(GF_PLAYER_YOSHI_SPIT).JMP(runtimeHookPlayerYoshiSpit).NOP().Apply();
+    // Hook to overwrite KillPlayer
+    PATCH(GF_PLAYER_DEATH_RELATED).JMP(runtimeHookPlayerDiedKillPlayerLate).NOP().Apply();
+    // overwrite mount dismount code
+    PATCH(0x0099801D).CALL(runtimeHookDismountClowncarOverride).JMP(0x99A850).Apply(); // Dismount from clown car
+    PATCH(0x0099CF8C).CALL(runtimeHookDismountClowncarOverride).JMP(0x99D44F).Apply(); // Dismount from yoshi
+    PATCH(0x0099CAD0).CALL(runtimeHookDismountClowncarOverride).JMP(0x99D44F).Apply(); // Dismount from boot
+    PATCH(0x0099BC1D).CALL(runtimeHookDismountClowncarOverride).JMP(0x99C061).Apply(); // Dismount from yoshi underwater
+    PATCH(0x0099B76B).CALL(runtimeHookDismountClowncarOverride).JMP(0x99C061).Apply(); // Dismount from boot underwater
+    // overwrite mounting yoshi/boot
+    PATCH(0x009ABEFC).JMP(runtimeHookMounted).Apply();
+    // overwrite changing hitbox size when hitting a character switch block
+    // NOTE: this is not *exactly* the same behaviour is the original game (that just set height directly) but it should work functionally the same in this context
+    PATCH(0x009DAD0B).CALL(runtimeHookCharacterBlockHitboxChange_callSizeCheck).NOP_PAD_TO_SIZE<110>().Apply();
+    // overwrite hitbox set size set when initializing the level
+    // THIS IS NOT THE SAME AS VANILLA SMBX - if there are any issues on stage load this is why
+    // all this does is set a REASONABLE default size (small mario-ish) which will immediately be overwritten in normal conditions anyways
+    // // this is broken right now ;-;
+    //PATCH(0x00994AEF).CALL(runtimeHookPlayerInit_setDefaultSize).NOP_PAD_TO_SIZE<179>().Apply();
+    // patch out the index loads in-place instead
+    PATCH(0x00994AEF) // overwrite first player load to force it to mario
+        .bytes(0xBB, 0x00, 0x00, 0x00, 0x00) // mov ebx, 0
+        .bytes(0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90) // nop nop etc
+        .Apply();
+    PATCH(0x00994AFB) // overwrite first powerup load to force it to 'small'
+        .bytes(0xBF, 0x01, 0x00, 0x00, 0x00) // mov edi, 1
+        .bytes(0x90, 0x90) // nop nop
+        .Apply();
+    PATCH(0x00994B2D) // overwrite second player load to force it to mario
+        .bytes(0xBB, 0x01, 0x00, 0x00, 0x00) // mov ebx, 1
+        .bytes(0x90, 0x90) // nop nop
+        .Apply();
+    PATCH(0x00994B40) // overwrite second powerup load to force it to 'small'
+        .bytes(0xBF, 0x01, 0x00, 0x00, 0x00) // mov edi, 1
+        .bytes(0x90, 0x90) // nop nop
+        .Apply();
+    // Ducking related
+    PATCH(0x00999513).CALL(runtimeHookHandlePlayerDuck).JMP(0x9999E5).Apply(); // Tried ducking, set hitbox
+    PATCH(0x009A0480).CALL(runtimeHookPlayerDuckForced_linkJump).JMP(0x9A0531).Apply(); // Link jumping, force duck
+    PATCH(0x009A5031).CALL(runtimeHookPlayerDuckForced_linkJump).JMP(0x9A50C6).Apply(); // Forces link's hitbox as long as he's ducking
+    
+
+
+
+        
     // Hooks for populating world map
     PATCH(0x8E35E0).JMP(runtimeHookLoadWorldList).NOP_PAD_TO_SIZE<6>().Apply();
 

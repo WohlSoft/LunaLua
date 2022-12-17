@@ -582,4 +582,21 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
 void __stdcall runtimeHookHandleMapMusicBoxCollision(void);
 
+// PLAYER LUA REIMPLMENETAITON CALLBACKS
+void __stdcall runtimeHookPlayerEffects(int* playerIdx);
+void __stdcall runtimeHookPlayerSizeCheck(int* playerIdx);
+void __stdcall runtimeHookPlayerUnDuck(int* playerIdx);
+void __stdcall runtimeHookCoopStealBonus(void);
+void __stdcall runtimeHookPlayerYoshiSpit(int* playerIdx);
+void __stdcall runtimeHookPlayerDiedKillPlayerLate(int* playerIdx);
+// mount related
+void __stdcall runtimeHookDismountClowncarOverride(void);
+void __stdcall runtimeHookMounted(void);
+// various misc hitbox change locations
+void __stdcall runtimeHookCharacterBlockHitboxChange_callSizeCheck();
+void __stdcall runtimeHookPlayerInit_setDefaultSize();
+// ducking related stuff
+void __stdcall runtimeHookHandlePlayerDuck();
+void __stdcall runtimeHookPlayerDuckForced_linkJump();
+
 #endif

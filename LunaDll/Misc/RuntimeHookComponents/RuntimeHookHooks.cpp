@@ -3756,7 +3756,15 @@ static int __stdcall runtimeHookPlayerHarmInternal(short* playerIdxPtr)
         playerHarmCancelled = playerHarmEvent->native_cancelled();
     }
 
-    return playerHarmCancelled ? -1 : 0;
+    if (!playerHarmCancelled) {
+        // call lua implementation
+        std::shared_ptr<Event> playerHarmEvent = std::make_shared<Event>("onHandlePlayerHarmEvent", false);
+        playerHarmEvent->setDirectEventName("onHandlePlayerHarmEvent");
+        playerHarmEvent->setLoopable(false);
+        gLunaLua.callEvent(playerHarmEvent, *playerIdxPtr);
+    }
+
+    return -1; //playerHarmCancelled ? -1 : 0;
 }
 
 __declspec(naked) void __stdcall runtimeHookPlayerHarm(void)
@@ -3812,7 +3820,14 @@ void __stdcall runtimeHookPlayerKill(short* playerIdxPtr)
 
     if (!playerKillCancelled)
     {
-        killPlayer_OrigFunc(playerIdxPtr);
+        // call lua implementation
+        std::shared_ptr<Event> e = std::make_shared<Event>("onHandlePlayerKilledEvent", false);
+        e->setDirectEventName("onHandlePlayerKilledEvent");
+        e->setLoopable(false);
+        gLunaLua.callEvent(e, *playerIdxPtr);
+
+        // original smbx implmentation
+        //killPlayer_OrigFunc(playerIdxPtr);
     }
 }
 
@@ -4085,6 +4100,192 @@ __declspec(naked) void __stdcall runtimeHookHandleMapMusicBoxCollision(void)
         pop edx
         pop ecx
         pop eax
+        ret
+    }
+}
+
+
+void triggerPlayerSubOverrideEvent(int* playerIdxPtr, const char* name)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> onHandlePlayerEffectsEvent = std::make_shared<Event>(name, false);
+        onHandlePlayerEffectsEvent->setDirectEventName(name);
+        onHandlePlayerEffectsEvent->setLoopable(false);
+
+        gLunaLua.callEvent(onHandlePlayerEffectsEvent, *playerIdxPtr);
+    }
+}
+void __stdcall runtimeHookPlayerEffects(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerEffectsEvent");
+}
+void __stdcall runtimeHookPlayerSizeCheck(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerSizeCheckEvent");
+}
+void __stdcall runtimeHookPlayerUnDuck(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerUnDuckEvent");
+}
+void __stdcall runtimeHookCoopStealBonus(void)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> e = std::make_shared<Event>("onHandleCoopStealBonusEvent", false);
+        e->setDirectEventName("onHandleCoopStealBonusEvent");
+        e->setLoopable(false);
+        gLunaLua.callEvent(e);
+    }
+}
+void __stdcall runtimeHookPlayerYoshiSpit(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerYoshiSpitEvent");
+}
+
+void __stdcall runtimeHookPlayerDiedKillPlayerLate(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerDiedKillPlayerLateEvent");
+}
+
+
+// convert a pointer to a player object to the player index
+int placeholder_PlayerMOBToIDX(PlayerMOB* player)
+{
+    int playerIdx = -1;
+    // iterate through players to figure out the index of this player
+    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+        if (PlayerMOB::Get(i) == player) {
+            playerIdx = i;
+            break;
+        }
+    }
+    return playerIdx;
+}
+
+// DISMOUNTING-------
+void __stdcall runtimeHookDismountInternal(PlayerMOB* player)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+    triggerPlayerSubOverrideEvent(&(playerIdx), "onHandlePlayerDismountEvent");
+}
+__declspec(naked) void __stdcall runtimeHookDismountClowncarOverride(void)
+{
+    __asm {
+
+        push ebx // Address of player
+        call runtimeHookDismountInternal
+
+        ret
+    }
+}
+// MOUNTING YOSHI AND BOOT---------
+void __stdcall runtimeHookMountedInternal(PlayerMOB* player, unsigned int npcIdx)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> e = std::make_shared<Event>("onHandlePlayerMountedEvent", false);
+        e->setDirectEventName("onHandlePlayerMountedEvent");
+        e->setLoopable(false);
+
+        gLunaLua.callEvent(e, playerIdx, npcIdx);
+    }
+}
+// location in main player code to jump back to once the hook finishes
+static const auto runtimeHookMounted_exit_addr = (void(__stdcall*)())(0x9ADCDB);
+// called when jumping on a yoshi or boot
+__declspec(naked) void __stdcall runtimeHookMounted(void)
+{
+    __asm {
+        movsx esi, word ptr ss : [ebp - 0x120]
+        push esi // Index of NPC
+        push eax // Address of player
+        call runtimeHookMountedInternal
+        jmp runtimeHookMounted_exit_addr
+    }
+}
+
+
+// hitbox size change when hitting a character switch block
+void __stdcall runtimeHookCharacterBlockHitboxChange_callSizeCheckInternal(PlayerMOB* player)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+    triggerPlayerSubOverrideEvent(&(playerIdx), "onHandlePlayerSizeCheckEvent");
+}
+__declspec(naked) void __stdcall runtimeHookCharacterBlockHitboxChange_callSizeCheck(void)
+{
+    __asm {
+
+        push esi // Address of player
+        call runtimeHookCharacterBlockHitboxChange_callSizeCheckInternal
+
+        ret
+    }
+}
+
+
+void __stdcall runtimeHookPlayerInit_setDefaultSizeInternal(PlayerMOB* player)
+{
+    // this just sets a default size
+    // THIS DOES NOT MATCH VANILLA SMBX:
+    // the player's size may be incorrect for the first frame!
+    player->momentum.width = 22;
+    player->momentum.height = 26;
+    MessageBoxA(NULL, "Called setdefaultsize", "Error", NULL);
+}
+__declspec(naked) void __stdcall runtimeHookPlayerInit_setDefaultSize(void)
+{
+    __asm {
+
+
+        pushfd
+        push eax
+        push ebx
+        push ecx
+        push edx
+
+        push esi // Address of player
+        call runtimeHookPlayerInit_setDefaultSizeInternal
+
+
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+        popfd
+
+        ret
+    }
+}
+
+
+// handles the player trying to duck
+void __stdcall runtimeHookHandlePlayerDuckInternal(PlayerMOB* player)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+    triggerPlayerSubOverrideEvent(&(playerIdx), "onHandlePlayerDuckEvent");
+}
+__declspec(naked) void __stdcall runtimeHookHandlePlayerDuck(void)
+{
+    __asm {
+        push ebx // Address of player
+        call runtimeHookHandlePlayerDuckInternal
+
+        ret
+    }
+}
+
+// forces the player to duck
+void __stdcall runtimeHookPlayerDuckForcedInternal(PlayerMOB* player)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+    triggerPlayerSubOverrideEvent(&(playerIdx), "onHandlePlayerDuckForcedEvent");
+}
+__declspec(naked) void __stdcall runtimeHookPlayerDuckForced_linkJump(void)
+{
+    __asm {
+        push ebx // Address of player
+        call runtimeHookPlayerDuckForcedInternal
+
         ret
     }
 }

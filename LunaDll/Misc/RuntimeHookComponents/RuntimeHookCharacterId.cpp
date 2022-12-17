@@ -259,7 +259,8 @@ DECL_HOOK(HOOK_0x994A24, esi + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x994A78, esi + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x994AD7, esi + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x994AE8, esi + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x994B2D, esi + 0xF0, MOV_ebx);
+//spawn hitbox related, commented out as it conflicts with the player hitbox hooks
+//DECL_HOOK(HOOK_0x994B2D, esi + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x994D83, esi + 0xF0, CMP_ax);
 DECL_HOOK(HOOK_0x994F4C, esi + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x9953AC, ecx + eax * 4 + 0xF0, MOV_dx);
@@ -762,7 +763,8 @@ static auto patch_0x994A24 = PATCH(0x994A24).CALL(HOOK_0x994A24).NOP_PAD_TO_SIZE
 static auto patch_0x994A78 = PATCH(0x994A78).CALL(HOOK_0x994A78).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x994AD7 = PATCH(0x994AD7).CALL(HOOK_0x994AD7).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x994AE8 = PATCH(0x994AE8).CALL(HOOK_0x994AE8).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x994B2D = PATCH(0x994B2D).CALL(HOOK_0x994B2D).NOP_PAD_TO_SIZE<7>();
+//spawn hitbox related, commented out as it conflicts with the player hitbox hooks
+//static auto patch_0x994B2D = PATCH(0x994B2D).CALL(HOOK_0x994B2D).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x994D83 = PATCH(0x994D83).CALL(HOOK_0x994D83).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x994F4C = PATCH(0x994F4C).CALL(HOOK_0x994F4C).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9953AC = PATCH(0x9953AC).CALL(HOOK_0x9953AC).NOP_PAD_TO_SIZE<8>();
@@ -1664,7 +1666,8 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x994A78,
     &patch_0x994AD7,
     &patch_0x994AE8,
-    &patch_0x994B2D,
+    //spawn hitbox related, commented out as it conflicts with the player hitbox hooks
+    //&patch_0x994B2D,
     &patch_0x994D83,
     &patch_0x994F4C,
     &patch_0x9953AC,

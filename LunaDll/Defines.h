@@ -664,6 +664,24 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg1 = int* Index of player
 #define GF_HARM_PLAYER      0x009B51E0
 
+//      Arg1 = int* Index of player
+//      'PlayerEffects' in the VB source
+#define GF_HANDLE_PLAYER_FORCED_STATE  0x009D1E80
+//      Arg1 = int* Index of player
+//      'SizeCheck' in the VB source
+#define GF_PLAYER_SIZE_UPDATE  0x009C0C50
+//      Arg1 = int* Index of player
+//      'UnDuck' in the VB source
+#define GF_PLAYER_UN_DUCK  0x009B7BF0
+//      'StealBonus' in the VB source
+#define GF_PLAYER_COOP_STEAL_BONUS  0x009C46C0
+//      Arg1 = int* Index of player
+//      'YoshiSpit' in the VB source
+#define GF_PLAYER_YOSHI_SPIT  0x009BE6D0
+//      Arg1 = int* Index of player
+//      'KillPlayer' in the VB source
+#define GF_PLAYER_DEATH_RELATED  0x009B6EC0
+
 //      Arg1 = int* Sprite ID
 //      Arg2 = int* Unk flags
 //      Arg3 = int* Unk
