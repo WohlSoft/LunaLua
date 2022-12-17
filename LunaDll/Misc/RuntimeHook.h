@@ -589,6 +589,7 @@ void __stdcall runtimeHookPlayerUnDuck(int* playerIdx);
 void __stdcall runtimeHookCoopStealBonus(void);
 void __stdcall runtimeHookPlayerYoshiSpit(int* playerIdx);
 void __stdcall runtimeHookPlayerDiedKillPlayerLate(int* playerIdx);
+void __stdcall runtimeHookPlayerPowerUps(int* playerIdx);
 // mount related
 void __stdcall runtimeHookDismountClowncarOverride(void);
 void __stdcall runtimeHookMounted(void);
@@ -598,5 +599,7 @@ void __stdcall runtimeHookPlayerInit_setDefaultSize();
 // ducking related stuff
 void __stdcall runtimeHookHandlePlayerDuck();
 void __stdcall runtimeHookPlayerDuckForced_linkJump();
+void __stdcall runtimeHookPlayerSolidNPCCollisionDuckRelated();
+void __stdcall runtimeHookPlayerSetHeldObjectPosition();
 
 #endif

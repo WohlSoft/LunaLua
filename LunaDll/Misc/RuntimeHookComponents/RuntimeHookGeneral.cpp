@@ -1991,6 +1991,8 @@ void TrySkipPatch()
     PATCH(GF_PLAYER_YOSHI_SPIT).JMP(runtimeHookPlayerYoshiSpit).NOP().Apply();
     // Hook to overwrite KillPlayer
     PATCH(GF_PLAYER_DEATH_RELATED).JMP(runtimeHookPlayerDiedKillPlayerLate).NOP().Apply();
+    // Hook to overwrite PowerUps
+    PATCH(GF_PLAYER_POWERUP_LOGIC).JMP(runtimeHookPlayerPowerUps).NOP().Apply();
     // overwrite mount dismount code
     PATCH(0x0099801D).CALL(runtimeHookDismountClowncarOverride).JMP(0x99A850).Apply(); // Dismount from clown car
     PATCH(0x0099CF8C).CALL(runtimeHookDismountClowncarOverride).JMP(0x99D44F).Apply(); // Dismount from yoshi
@@ -2028,9 +2030,15 @@ void TrySkipPatch()
     PATCH(0x00999513).CALL(runtimeHookHandlePlayerDuck).JMP(0x9999E5).Apply(); // Tried ducking, set hitbox
     PATCH(0x009A0480).CALL(runtimeHookPlayerDuckForced_linkJump).JMP(0x9A0531).Apply(); // Link jumping, force duck
     PATCH(0x009A5031).CALL(runtimeHookPlayerDuckForced_linkJump).JMP(0x9A50C6).Apply(); // Forces link's hitbox as long as he's ducking
-    
-
-
+    // Get the player's ducking height, something to do with colliding with solid NPCs when unducking.
+        // NOP-out the character and powerup bounds checks associated with the hook
+        PATCH(0x009AEA14).NOP_PAD_TO_SIZE<37>().Apply();
+        // NOP-out the instruction 'lea edx, dword ptr ds:[ecx+edi*4]' used in calculating the player duck hitbox address
+        PATCH(0x009AEA81).NOP_PAD_TO_SIZE<3>().Apply();
+        // Call the hook itself to store the hitbox height into ecx
+        PATCH(0x009AEA8A).JMP(runtimeHookPlayerSolidNPCCollisionDuckRelated).NOP_PAD_TO_SIZE<10>().Apply();
+    // Position held object
+    PATCH(0x009D0409).CALL(runtimeHookPlayerSetHeldObjectPosition).JMP(0x9D0B95).Apply();
 
         
     // Hooks for populating world map

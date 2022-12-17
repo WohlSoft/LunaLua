@@ -681,6 +681,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg1 = int* Index of player
 //      'KillPlayer' in the VB source
 #define GF_PLAYER_DEATH_RELATED  0x009B6EC0
+//      Arg1 = int* Index of player
+//      'PowerUps' in the VB source
+#define GF_PLAYER_POWERUP_LOGIC  0x009C6600
 
 //      Arg1 = int* Sprite ID
 //      Arg2 = int* Unk flags

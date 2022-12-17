@@ -4146,6 +4146,11 @@ void __stdcall runtimeHookPlayerDiedKillPlayerLate(int* playerIdxPtr)
     triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerDiedKillPlayerLateEvent");
 }
 
+void __stdcall runtimeHookPlayerPowerUps(int* playerIdxPtr)
+{
+    triggerPlayerSubOverrideEvent(playerIdxPtr, "onHandlePlayerPowerUpsCodeEvent");
+}
+
 
 // convert a pointer to a player object to the player index
 int placeholder_PlayerMOBToIDX(PlayerMOB* player)
@@ -4285,6 +4290,37 @@ __declspec(naked) void __stdcall runtimeHookPlayerDuckForced_linkJump(void)
     __asm {
         push ebx // Address of player
         call runtimeHookPlayerDuckForcedInternal
+
+        ret
+    }
+}
+
+// store the player duck height in ecx
+// movsx ecx,word ptr ds:[edi*2+<GM_HITBOX_H_D_PTR>]                       | NPC Crush Hitbox Height Check}
+// location in main player code to jump back to once the hook finishes
+static const auto runtimeHookPlayerSolidNPCCollisionDuckRelated_exit_addr = (void(__stdcall*)())(0x009AEA94);
+__declspec(naked) void __stdcall runtimeHookPlayerSolidNPCCollisionDuckRelated(void)
+{
+    __asm {
+        //push eax // Address of player
+        // TODO: make this actually call lua to return the value when i know how we return values from lua lol
+        mov ecx, 30
+        jmp runtimeHookPlayerSolidNPCCollisionDuckRelated_exit_addr
+    }
+}
+
+// SET HELD OBJECT POSITION---
+void __stdcall runtimeHookPlayerSetHeldObjectPositionInternal(PlayerMOB* player)
+{
+    int playerIdx = placeholder_PlayerMOBToIDX(player);
+    triggerPlayerSubOverrideEvent(&(playerIdx), "onHandlePlayerSetHeldObjectPositionEvent");
+}
+__declspec(naked) void __stdcall runtimeHookPlayerSetHeldObjectPosition(void)
+{
+    __asm {
+
+        push ebx // Address of player
+        call runtimeHookPlayerSetHeldObjectPositionInternal
 
         ret
     }
