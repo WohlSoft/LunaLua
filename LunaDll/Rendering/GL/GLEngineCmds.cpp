@@ -136,8 +136,10 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     // Render Target
+    GLFramebuffer* oldFB = nullptr;
     if (mTarget)
     {
+        oldFB = g_GLContextManager.GetCurrentFB();
         mTarget->EnsureFramebufferExists();
         if (mTarget->mFramebuffer != nullptr)
         {
@@ -289,27 +291,18 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     // Render Target Time
-    if (mTarget)
+    if (oldFB)
     {
-        if (mTarget->mFramebuffer != nullptr)
-        {
-            // Bind old framebuffer
-            g_GLContextManager.BindCameraFB();
-        }
+        oldFB->Bind();
     }
 }
 
 void GLEngineCmd_SetCamera::run(GLEngine& glEngine) const
 {
-    if (mIdx == 0)
-    {
-        g_GLContextManager.BindPrimaryFB();
-    }
-    else
-    {
-        g_GLContextManager.SetActiveCamera(mIdx);
-        g_GLContextManager.BindCameraFB();
-    }
+    // Note, mIdx==0 is primary framebuffer. Per-camera framebuffers start index 1.
+    // The primary framebuffer can still be considered the current camera for purposes of GLContextManager
+    g_GLContextManager.SetActiveCamera(mIdx);
+    g_GLContextManager.BindCameraFB();
     g_GLContextManager.GetCurrentFB()->Clear();
     glEngine.SetCameraPositionInScene(mX, mY);
 }

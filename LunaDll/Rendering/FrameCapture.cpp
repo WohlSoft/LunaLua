@@ -24,12 +24,13 @@ public:
             int w = mBuff->mW, h = mBuff->mH;
 
             // Bind framebuffer
+            GLFramebuffer* oldFB = g_GLContextManager.GetCurrentFB();
             fb->Bind();
 
             g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetCurrentCameraFBTex(), 0, 0, w, h, 1.0f, nullptr);
 
             // Bind old framebuffer
-            g_GLContextManager.BindCameraFB();
+            oldFB->Bind();
         }
     }
 
