@@ -171,14 +171,11 @@ void GLContextManager::EnsureMainThreadCTXApplied()
 
 void GLContextManager::SetActiveCamera(int cameraIdx)
 {
-    if ((cameraIdx < 1) || (cameraIdx > MAX_CAMERAS))
+    if ((cameraIdx < 0) || (cameraIdx > MAX_CAMERAS))
     {
         // Invalid index
         return;
     }
-
-    // Change to 0-based index
-    cameraIdx--;
 
     bool isCameraBufferBound = (mCurrentCameraFB == mCurrentFB);
     if (mCurrentCameraIdx != cameraIdx)
@@ -275,7 +272,8 @@ bool GLContextManager::InitFramebuffer() {
     try
     {
         mPrimaryFB = new GLFramebuffer(mMainFBWidth, mMainFBHeight, false);
-        for (int i = 0; i < MAX_CAMERAS; i++)
+        mCameraFramebuffers[0] = mPrimaryFB;
+        for (int i = 1; i <= MAX_CAMERAS; i++)
         {
             mCameraFramebuffers[i] = new GLFramebuffer(mMainFBWidth, mMainFBHeight, false);
         }
@@ -324,7 +322,7 @@ bool GLContextManager::InitProjectionAndState() {
 void GLContextManager::ReleaseFramebuffer() {
     if (mPrimaryFB) delete mPrimaryFB;
     mPrimaryFB = nullptr;
-    for (int i = 0; i < MAX_CAMERAS; i++)
+    for (int i = 1; i <= MAX_CAMERAS; i++)
     {
         if (mCameraFramebuffers[i]) delete mCameraFramebuffers[i];
         mCameraFramebuffers[i] = nullptr;

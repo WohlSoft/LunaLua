@@ -128,11 +128,11 @@ public:
     inline const GLDraw::Texture& GetCameraFBTex(int cameraIdx)
     {
         static const GLDraw::Texture nullTex(0, 0, 0);
-        if ((cameraIdx < 1) || (cameraIdx > MAX_CAMERAS) || (mCameraFramebuffers[cameraIdx-1] == nullptr))
+        if ((cameraIdx < 0) || (cameraIdx > MAX_CAMERAS) || (mCameraFramebuffers[cameraIdx] == nullptr))
         {
             return nullTex;
         }
-        return mCameraFramebuffers[cameraIdx - 1]->AsTexture();
+        return mCameraFramebuffers[cameraIdx]->AsTexture();
     }
     inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
     inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
@@ -159,7 +159,7 @@ private:
     GLFramebuffer* mPrimaryFB;
     GLFramebuffer* mCurrentCameraFB;
     int            mCurrentCameraIdx;
-    GLFramebuffer* mCameraFramebuffers[MAX_CAMERAS];
+    GLFramebuffer* mCameraFramebuffers[MAX_CAMERAS+1];
 
     // Constants list
     GLConstants mConstants;
