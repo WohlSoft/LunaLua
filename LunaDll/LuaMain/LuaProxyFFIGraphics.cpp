@@ -142,13 +142,16 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mSceneCoords = cmd->mSceneCoords;
     obj->mDepthTest = cmd->mDepthTest;
     obj->mLinearFiltered = cmd->mLinearFiltered;
-    if (cmd->mEnClipPlane0)
+    if ((cmd->mNumClipPlane) > 0 && (cmd->mNumClipPlane <= 6))
     {
-        obj->mClipPlane0[0] = cmd->mClipPlane0[0];
-        obj->mClipPlane0[1] = cmd->mClipPlane0[1];
-        obj->mClipPlane0[2] = cmd->mClipPlane0[2];
-        obj->mClipPlane0[3] = cmd->mClipPlane0[3];
-        obj->mEnClipPlane0 = true;
+        obj->mNumClipPlane = cmd->mNumClipPlane;
+        for (uint8_t idx = 0; idx < obj->mNumClipPlane; idx++)
+        {
+            obj->mClipPlane[idx][0] = cmd->mClipPlane[idx][0];
+            obj->mClipPlane[idx][1] = cmd->mClipPlane[idx][1];
+            obj->mClipPlane[idx][2] = cmd->mClipPlane[idx][2];
+            obj->mClipPlane[idx][3] = cmd->mClipPlane[idx][3];
+        }
     }
 
     // Ensure we have something for a sampler to sample
