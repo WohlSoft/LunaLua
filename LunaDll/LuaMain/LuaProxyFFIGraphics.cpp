@@ -144,10 +144,10 @@ FFI_EXPORT void __fastcall FFI_GLDraw(const FFI_GL_Draw_Cmd* cmd)
     obj->mLinearFiltered = cmd->mLinearFiltered;
     if (cmd->mEnClipPlane0)
     {
-        obj->mClipPlane0[0] = cmd->mColor[0];
-        obj->mClipPlane0[1] = cmd->mColor[1];
-        obj->mClipPlane0[2] = cmd->mColor[2];
-        obj->mClipPlane0[3] = cmd->mColor[3];
+        obj->mClipPlane0[0] = cmd->mClipPlane0[0];
+        obj->mClipPlane0[1] = cmd->mClipPlane0[1];
+        obj->mClipPlane0[2] = cmd->mClipPlane0[2];
+        obj->mClipPlane0[3] = cmd->mClipPlane0[3];
         obj->mEnClipPlane0 = true;
     }
 

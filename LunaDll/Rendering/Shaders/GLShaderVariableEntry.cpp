@@ -107,7 +107,7 @@ int* GLShaderVariableEntry::getTexPtr(GLShader& shader) const
             {
                 sprite = g_GLTextureStore.SpriteFromLunaImage(imgs[i].img);
             }
-            else if ((imgs[i].type == SamplerType::ECaptureBuffer) && (imgs[i].type == SamplerType::EDepthBuffer))
+            else if ((imgs[i].type == SamplerType::ECaptureBuffer) || (imgs[i].type == SamplerType::EDepthBuffer))
             {
                 fb = imgs[i].cap->mFramebuffer;
             }
