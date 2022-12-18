@@ -751,6 +751,37 @@ typedef struct ExtendedBlockFields_\
     {
         return {gMouseHandler.GetX(), gMouseHandler.GetY()};
     }
+
+    // functions for calling smbx internal player subs
+    FFI_EXPORT(void) LunaLuaCallPlayerTailSwipe(short playerIdx, bool hitBlocks, bool isStab, short stabDirection)
+    {
+        // TailSwipe
+        short hitBlocksB = COMBOOL(hitBlocks);
+        short isStabB    = COMBOOL(isStab);
+        return native_playerDoTailSwipe(&playerIdx, &hitBlocksB, &isStabB, &stabDirection);
+    }
+    FFI_EXPORT(void) LunaLuaCallPlayerGrabCode(short playerIdx, bool dontResetGrabTime)
+    {
+        // GrabCode
+        short dontResetGrabTimeB = COMBOOL(dontResetGrabTime);
+        return native_playerGrabCode(&playerIdx, &dontResetGrabTimeB);
+    }
+    FFI_EXPORT(void) LunaLuaCallPlayerUpdateFrame(short playerIdx)
+    {
+        // PlayerFrame
+        return native_playerUpdateFrame(&playerIdx);
+    }
+    FFI_EXPORT(void) LunaLuaCallPlayerCheckSection(short playerIdx)
+    {
+        // CheckSection
+        return native_playerCheckSection(&playerIdx);
+    }
+    FFI_EXPORT(void) LunaLuaCallNPCCheckSection(short npcIdx)
+    {
+        // CheckSectionNPC
+        return native_updateNPC(&npcIdx);
+    }
+
 }
 
 void CachedReadFile::clearData()

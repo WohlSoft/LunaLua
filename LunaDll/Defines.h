@@ -665,6 +665,27 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_HARM_PLAYER      0x009B51E0
 
 //      Arg1 = int* Index of player
+//      Arg2 = short* [VB6 Bool] canHitBlocks
+//      Arg2 = short* [VB6 Bool] isLinkStab
+//      Arg2 = int* "stabDir"
+#define GF_PLAYER_DO_TAIL_SWIPE 0x009BB490
+
+//      Arg1 = int* Index of player
+//      Arg2 = short* [VB6 Bool] DontResetGrabTime
+// 'PlayerGrabCode' in the SMBX source
+#define GF_PLAYER_GRABCODE      0x009CC2B0
+
+//      Arg1 = int* Index of player
+// 'PlayerFrame' in the SMBX source
+#define GF_PLAYER_UPDATE_FRAME  0x009B8620
+
+//      Arg1 = int* Index of player
+// 'CheckSection' in the SMBX source
+#define GF_PLAYER_CHECK_SECTION 0x009B7E10
+
+
+// these are all functions that get overridden by lua code
+//      Arg1 = int* Index of player
 //      'PlayerEffects' in the VB source
 #define GF_HANDLE_PLAYER_FORCED_STATE  0x009D1E80
 //      Arg1 = int* Index of player
@@ -873,8 +894,13 @@ static const auto native_isOnWCamera    = (short(__stdcall *)(unsigned int* /*ca
 static const auto native_initLevelEnv   = (void(__stdcall *)())GF_INIT_LEVEL_ENVIR;
 
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
-static const auto native_harmPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_HARM_PLAYER;
+static const auto native_harmPlayer     = (void(__stdcall*)(short* /*playerIndex*/))GF_HARM_PLAYER;
+static const auto native_playerDoTailSwipe = (void(__stdcall *)(short* /*playerIndex*/, short* /*canHitBlocks [vb6 bool]*/, short* /*isLinkStab [vb6 bool]*/, short* /*stabDirection*/))GF_PLAYER_DO_TAIL_SWIPE;
+static const auto native_playerUpdateFrame = (void(__stdcall*)(short* /*playerIndex*/))GF_PLAYER_UPDATE_FRAME;
+static const auto native_playerCheckSection = (void(__stdcall*)(short* /*playerIndex*/))GF_PLAYER_CHECK_SECTION;
+static const auto native_playerGrabCode = (void(__stdcall*)(short* /*playerIndex*/, short* /*DontResetGrabTime [vb6 bool]*/))GF_PLAYER_GRABCODE;
 static const auto native_updateNPC      = (void(__stdcall *)(short* /*npcID*/))GF_UPDATE_NPC;
+
 
 static const auto native_playMusic      = (void(__stdcall *)(short* /*section*/))GF_PLAY_MUSIC;
 static const auto native_stopMusic      = (void(__stdcall *)())GF_STOP_MUSIC;
