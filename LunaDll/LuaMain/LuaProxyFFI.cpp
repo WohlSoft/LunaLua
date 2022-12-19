@@ -24,6 +24,7 @@
 #include "LunaLuaMain.h"
 #include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
+#include "../LuaPlayerCallback.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -791,6 +792,24 @@ typedef struct ExtendedBlockFields_\
         // PlayerPush
         return native_playerPush(&playerIdx, &hitSpot);
     }
+
+    // Expose callback setters
+    #define PLAYER_CALLBACK_EXPORT(EXPORTED_NAME, SET, TYPE) FFI_EXPORT(void) EXPORTED_NAME(LuaPlayerCallback :: TYPE cb) {LuaPlayerCallback :: SET(cb); }
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerSizeCheck    , Set_PlayerSizeCheck    , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerUnDuck       , Set_PlayerUnDuck       , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerYoshiSpit    , Set_PlayerYoshiSpit    , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerHarm         , Set_PlayerHarm         , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerDiedKillLate , Set_PlayerDiedKillLate , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerKilled       , Set_PlayerKilled       , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerDucked       , Set_PlayerDucked       , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerDuckForced   , Set_PlayerDuckForced   , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerPowerUpCode  , Set_PlayerPowerUpCode  , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerSetHeldNPCPos, Set_PlayerSetHeldNPCPos, Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerDismount     , Set_PlayerDismount     , Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerMounted      , Set_PlayerMounted      , Callback_PlayerNPC);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackCoopStealBonus     , Set_CoopStealBonus     , Callback_Void);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerForcedStateCode, Set_PlayerForcedStateCode, Callback_Player);
+    #undef PLAYER_CALLBACK_EXPORT
 
 }
 

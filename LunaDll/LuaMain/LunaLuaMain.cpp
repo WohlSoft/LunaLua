@@ -30,6 +30,7 @@
 #include "../Misc/LoadScreen.h"
 
 #include "LunaPathValidator.h"
+#include "../LuaPlayerCallback.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -139,6 +140,9 @@ bool CLunaLua::shutdown()
 
     // Clear lua-based extra gfx
     ImageLoader::LuaUnregisterAllExtraGfx();
+
+    // Clear references to lua callbacks
+    LuaPlayerCallback::Reset();
 
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
