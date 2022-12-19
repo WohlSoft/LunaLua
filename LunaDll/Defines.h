@@ -683,6 +683,13 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 // 'CheckSection' in the SMBX source
 #define GF_PLAYER_CHECK_SECTION 0x009B7E10
 
+//      Arg1 = int* Index of player
+//      Arg2 = int* "HitSpot"
+// 'PlayerPush' in the SMBX source
+#define GF_PLAYER_PUSH 0x009C0800
+
+// 'SwapCoop' in the SMBX source
+#define GF_SWAP_COOP_PLAYER 0x009C0040
 
 // these are all functions that get overridden by lua code
 //      Arg1 = int* Index of player
@@ -896,9 +903,11 @@ static const auto native_initLevelEnv   = (void(__stdcall *)())GF_INIT_LEVEL_ENV
 static const auto native_killPlayer     = (void(__stdcall *)(short* /*playerIndex*/))GF_KILL_PLAYER;
 static const auto native_harmPlayer     = (void(__stdcall*)(short* /*playerIndex*/))GF_HARM_PLAYER;
 static const auto native_playerDoTailSwipe = (void(__stdcall *)(short* /*playerIndex*/, short* /*canHitBlocks [vb6 bool]*/, short* /*isLinkStab [vb6 bool]*/, short* /*stabDirection*/))GF_PLAYER_DO_TAIL_SWIPE;
-static const auto native_playerUpdateFrame = (void(__stdcall*)(short* /*playerIndex*/))GF_PLAYER_UPDATE_FRAME;
-static const auto native_playerCheckSection = (void(__stdcall*)(short* /*playerIndex*/))GF_PLAYER_CHECK_SECTION;
-static const auto native_playerGrabCode = (void(__stdcall*)(short* /*playerIndex*/, short* /*DontResetGrabTime [vb6 bool]*/))GF_PLAYER_GRABCODE;
+static const auto native_playerUpdateFrame = (void(__stdcall *)(short* /*playerIndex*/))GF_PLAYER_UPDATE_FRAME;
+static const auto native_playerCheckSection = (void(__stdcall *)(short* /*playerIndex*/))GF_PLAYER_CHECK_SECTION;
+static const auto native_playerGrabCode = (void(__stdcall *)(short* /*playerIndex*/, short* /*DontResetGrabTime [vb6 bool]*/))GF_PLAYER_GRABCODE;
+static const auto native_playerPush     = (void(__stdcall*)(short* /*playerIndex*/, short* /*hitSpot*/))GF_PLAYER_PUSH;
+static const auto native_swapCoopPlayer = (void(__stdcall*)())GF_SWAP_COOP_PLAYER;
 static const auto native_updateNPC      = (void(__stdcall *)(short* /*npcID*/))GF_UPDATE_NPC;
 
 

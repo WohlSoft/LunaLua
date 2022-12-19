@@ -781,6 +781,16 @@ typedef struct ExtendedBlockFields_\
         // CheckSectionNPC
         return native_updateNPC(&npcIdx);
     }
+    FFI_EXPORT(void) LunaLuaCallSwapCoopPlayer()
+    {
+        // SwapCoop
+        return native_swapCoopPlayer();
+    }
+    FFI_EXPORT(void) LunaLuaCallPlayerPush(short playerIdx, short hitSpot)
+    {
+        // PlayerPush
+        return native_playerPush(&playerIdx, &hitSpot);
+    }
 
 }
 
