@@ -3210,12 +3210,14 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
     {
         Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
 
-        double distLeft = abs(bounds.left - (momentum.x + momentum.width));
-        double distRight = abs(bounds.right - (momentum.x));
-        double distTop = abs(bounds.top - (momentum.y + momentum.height));
-        double distBottom = abs(bounds.bottom - (momentum.y));
+        double distLeft = (bounds.left - (momentum.x + momentum.width));
+        double distRight = (momentum.x - bounds.right);
+        double distX = std::min(distLeft, distRight);
+        double distTop = (bounds.top - (momentum.y + momentum.height));
+        double distBottom = (momentum.y - bounds.bottom);
+        double distY = std::min(distTop, distBottom);
 
-        double dist = std::min(std::min(std::min(distLeft, distRight), distTop), distBottom);
+        double dist = std::max(distX, distY);
 
         if (closestSection == -1 || dist < closestSectionDist)
         {
