@@ -3169,7 +3169,7 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
 void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 {
     NPCMOB* npc = NPC::GetRaw(*npcIdx);
-    Momentum momentum = npc->momentum;
+    const Momentum& momentum = npc->momentum;
 
     // Skip if in the main menu
     if (GM_LEVEL_MODE == -1)
@@ -3193,7 +3193,7 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
     // Is it in the bounds of a section? If so, choose it
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
-        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+        const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
 
         if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
         {
@@ -3208,18 +3208,17 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
-        Bounds bounds = GM_LVL_BOUNDARIES[sectionIdx];
+        const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
 
         double distLeft = (bounds.left - (momentum.x + momentum.width));
         double distRight = (momentum.x - bounds.right);
-        double distX = std::min(distLeft, distRight);
+        double distX = std::max(distLeft, distRight);
         double distTop = (bounds.top - (momentum.y + momentum.height));
         double distBottom = (momentum.y - bounds.bottom);
-        double distY = std::min(distTop, distBottom);
+        double distY = std::max(distTop, distBottom);
 
         double dist = std::max(distX, distY);
-
-        if (closestSection == -1 || dist < closestSectionDist)
+        if ((closestSection == -1) || (dist < closestSectionDist))
         {
             closestSectionDist = dist;
             closestSection = sectionIdx;
