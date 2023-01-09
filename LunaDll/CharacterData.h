@@ -14,6 +14,7 @@ namespace ExtraCharacterData {
     _CHARACTERDATA_DEFINE(bool, false, mCanSlide,     canSlideGet,     canSlideSet    );
     _CHARACTERDATA_DEFINE(bool, false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
     _CHARACTERDATA_DEFINE(bool, false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
+    _CHARACTERDATA_DEFINE(bool, false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
 }
 #undef _CHARACTERDATA_DEFINE
 

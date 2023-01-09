@@ -190,6 +190,7 @@ bool LuaProxy::PlayerSettings::isValid_throw(lua_State* L) const
 _DEFINE_CHARACTERPROPERTIES(bool, getCanSlide,     setCanSlide,     ExtraCharacterData::canSlideGet,     ExtraCharacterData::canSlideSet    );
 _DEFINE_CHARACTERPROPERTIES(bool, getCanRideYoshi, setCanRideYoshi, ExtraCharacterData::canRideYoshiGet, ExtraCharacterData::canRideYoshiSet);
 _DEFINE_CHARACTERPROPERTIES(bool, getCanRideBoot,  setCanRideBoot,  ExtraCharacterData::canRideBootGet,  ExtraCharacterData::canRideBootSet );
+_DEFINE_CHARACTERPROPERTIES(bool, getCanSpinJump,  setCanSpinJump,  ExtraCharacterData::canSpinJumpGet,  ExtraCharacterData::canSpinJumpSet );
 #undef _DEFINE_CHARACTERPROPERTIES
 
 LuaProxy::PlayerSettingsCharacterProperties LuaProxy::PlayerSettings::getCharacterProperties(Characters character, lua_State* L)

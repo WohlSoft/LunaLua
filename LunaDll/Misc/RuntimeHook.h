@@ -606,5 +606,7 @@ void __stdcall runtimeHookPlayerSetHeldObjectPosition();
 void __stdcall runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowed(void);
 void __stdcall runtimeHookIsPlayerAllowedToSlide(void);
 void __stdcall runtimeHookIsPlayerAllowedToSlideForAnimationFrame(void);
+void __stdcall runtimeHookIsPlayerAllowedToSpinJump(void); // spinjump character id check
+void __stdcall runtimeHookIsPlayerNotAllowedToSpinJump(void);
 
 #endif

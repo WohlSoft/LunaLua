@@ -15,6 +15,7 @@ public:
         mCanSlide     = (base == CHARACTER_MARIO || base == CHARACTER_LUIGI);
         mCanRideYoshi = mCanSlide;
         mCanRideBoot  = (base != CHARACTER_LINK);
+        mCanSpinJump  = (base != CHARACTER_PEACH && base != CHARACTER_LINK);
     }
     ~ExtraCharacterDataStruct()
     {
@@ -25,6 +26,7 @@ public:
     bool mCanSlide;
     bool mCanRideYoshi;
     bool mCanRideBoot;
+    bool mCanSpinJump;
 };
 
 
@@ -63,5 +65,6 @@ namespace ExtraCharacterData {
     _CHARACTERDATA_DEFINE(bool, false, mCanSlide,     canSlideGet,     canSlideSet    );
     _CHARACTERDATA_DEFINE(bool, false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
     _CHARACTERDATA_DEFINE(bool, false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
+    _CHARACTERDATA_DEFINE(bool, false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
 }
 #undef _CHARACTERDATA_DEFINE

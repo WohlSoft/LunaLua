@@ -4342,7 +4342,7 @@ _declspec(naked) void __stdcall runtimeHookIsPlayerAllowedToSlide(void)
 
         allowedToSlide :
         push 0x997946 // is allowed to slide
-            ret
+        ret
     }
 }
 // called when setting the player's animation frame if they are sliding
@@ -4360,6 +4360,68 @@ _declspec(naked) void __stdcall runtimeHookIsPlayerAllowedToSlideForAnimationFra
 
         allowedToSlide :
         push 0x9B88EA // is allowed to slide
-            ret
+        ret
+    }
+}
+
+int __stdcall runtimeHookIsPlayerAllowedToSpinJumpInternal(PlayerMOB* player) {
+    return ExtraCharacterData::canSpinJumpGet(player->Identity) ? 1 : 0;
+}
+// called to check if the character can spinjump
+_declspec(naked) void __stdcall runtimeHookIsPlayerAllowedToSpinJump(void)
+{
+    __asm {
+        push eax
+        push ebx
+        push ecx
+        push edx
+
+        push ebx
+        call runtimeHookIsPlayerAllowedToSpinJumpInternal
+
+        cmp eax, 0
+        
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+
+        jne allowedToSpin
+
+        push 0x99E82B // not allowed to spin
+        ret
+
+        allowedToSpin :
+        push 0x99E282 // is allowed to spin
+        ret
+    }
+}
+// called to check if the character CANT spinjump, in which case do a normal jump instead
+_declspec(naked) void __stdcall runtimeHookIsPlayerNotAllowedToSpinJump(void)
+{
+    __asm {
+        push eax
+        push ebx
+        push ecx
+        push edx
+
+        push ebx
+        call runtimeHookIsPlayerAllowedToSpinJumpInternal
+
+        cmp eax, 0
+
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+
+        jne allowedToSpin
+
+        push 0x99D4C6 // not allowed to spin
+        ret
+
+        allowedToSpin :
+        push 0x99D4C0 // is allowed to spin
+        ret
     }
 }

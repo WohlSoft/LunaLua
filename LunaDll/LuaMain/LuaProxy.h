@@ -521,6 +521,8 @@ namespace LuaProxy {
         bool getCanRideYoshi(lua_State* L);
         void setCanRideBoot(bool value, lua_State* L);
         bool getCanRideBoot(lua_State* L);
+        void setCanSpinJump(bool value, lua_State* L);
+        bool getCanSpinJump(lua_State* L);
 
     private:
         Characters m_character;

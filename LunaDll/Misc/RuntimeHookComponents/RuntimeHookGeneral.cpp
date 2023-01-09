@@ -2048,7 +2048,10 @@ void TrySkipPatch()
     PATCH(0x99792D).JMP(runtimeHookIsPlayerAllowedToSlide).NOP_PAD_TO_SIZE<25>().Apply();
     // Patch check for character ID when setting sliding animation frame
     PATCH(0x9B88DA).JMP(runtimeHookIsPlayerAllowedToSlideForAnimationFrame).NOP_PAD_TO_SIZE<16>().Apply();
-
+    // Patch check for character ID when detecting whether the player can spinjump
+    PATCH(0x99E265).JMP(runtimeHookIsPlayerAllowedToSpinJump).NOP_PAD_TO_SIZE<29>().Apply();
+    // Patch check for character ID when detecting whether the player should do a normal jump instead of a spinjump
+    PATCH(0x99D4AD).JMP(runtimeHookIsPlayerNotAllowedToSpinJump).NOP_PAD_TO_SIZE<19>().Apply();
 
         
     // Hooks for populating world map

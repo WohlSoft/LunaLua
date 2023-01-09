@@ -327,12 +327,14 @@ DECL_HOOK(HOOK_0x99CB3B, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99CEED, ebx + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0x99D00C, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99D40A, ebx + 0xF0, MOV_esi);
-DECL_HOOK(HOOK_0x99D4AD, ebx + 0xF0, MOV_ax);
+// conflicts with character properties spinjump patch
+//DECL_HOOK(HOOK_0x99D4AD, ebx + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x99D70E, ebx + 0xF0, CMP_4);
 DECL_HOOK(HOOK_0x99D736, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99D83D, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99D882, ebx + 0xF0, MOV_ax);
-DECL_HOOK(HOOK_0x99E265, ebx + 0xF0, MOV_ax);
+// conflicts with character properties spinjump patch
+//DECL_HOOK(HOOK_0x99E265, ebx + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x99E33A, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99E6AC, ebx + 0xF0, CMP_2);
 DECL_HOOK(HOOK_0x99EB43, ebx + 0xF0, CMP_2);
@@ -832,12 +834,14 @@ static auto patch_0x99CB3B = PATCH(0x99CB3B).CALL(HOOK_0x99CB3B).NOP_PAD_TO_SIZE
 static auto patch_0x99CEED = PATCH(0x99CEED).CALL(HOOK_0x99CEED).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x99D00C = PATCH(0x99D00C).CALL(HOOK_0x99D00C).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99D40A = PATCH(0x99D40A).CALL(HOOK_0x99D40A).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x99D4AD = PATCH(0x99D4AD).CALL(HOOK_0x99D4AD).NOP_PAD_TO_SIZE<7>();
+// conflicts with character properties spinjump patch
+//static auto patch_0x99D4AD = PATCH(0x99D4AD).CALL(HOOK_0x99D4AD).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x99D70E = PATCH(0x99D70E).CALL(HOOK_0x99D70E).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99D736 = PATCH(0x99D736).CALL(HOOK_0x99D736).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99D83D = PATCH(0x99D83D).CALL(HOOK_0x99D83D).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99D882 = PATCH(0x99D882).CALL(HOOK_0x99D882).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x99E265 = PATCH(0x99E265).CALL(HOOK_0x99E265).NOP_PAD_TO_SIZE<7>();
+// conflicts with character properties spinjump patch
+//static auto patch_0x99E265 = PATCH(0x99E265).CALL(HOOK_0x99E265).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x99E33A = PATCH(0x99E33A).CALL(HOOK_0x99E33A).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99E6AC = PATCH(0x99E6AC).CALL(HOOK_0x99E6AC).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x99EB43 = PATCH(0x99EB43).CALL(HOOK_0x99EB43).NOP_PAD_TO_SIZE<8>();
@@ -1736,12 +1740,14 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x99CEED,
     &patch_0x99D00C,
     &patch_0x99D40A,
-    &patch_0x99D4AD,
+    // conflicts with character properties spinjump patch
+    //&patch_0x99D4AD,
     &patch_0x99D70E,
     &patch_0x99D736,
     &patch_0x99D83D,
     &patch_0x99D882,
-    &patch_0x99E265,
+    // conflicts with character properties spinjump patch
+    //&patch_0x99E265,
     &patch_0x99E33A,
     &patch_0x99E6AC,
     &patch_0x99EB43,
