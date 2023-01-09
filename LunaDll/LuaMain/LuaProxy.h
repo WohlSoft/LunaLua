@@ -512,10 +512,25 @@ namespace LuaProxy {
         int m_index;
     };
 
+    class PlayerSettingsCharacterProperties {
+    public:
+        PlayerSettingsCharacterProperties(Characters character) : m_character(character) {}
+        void setCanSlide(bool value, lua_State* L);
+        bool getCanSlide(lua_State* L);
+        void setCanRideYoshi(bool value, lua_State* L);
+        bool getCanRideYoshi(lua_State* L);
+        void setCanRideBoot(bool value, lua_State* L);
+        bool getCanRideBoot(lua_State* L);
+
+    private:
+        Characters m_character;
+    };
     class PlayerSettings {
     public:
         static PlayerSettings get(Characters character, PowerupID powerupID, lua_State* L);
         PlayerSettings(Characters character, PowerupID powerupID) : m_powerupID(powerupID), m_character(character) {}
+
+        static PlayerSettingsCharacterProperties getCharacterProperties(Characters character, lua_State* L);
 
         int getHitboxWidth(lua_State* L);
         void setHitboxWidth(int width, lua_State* L);

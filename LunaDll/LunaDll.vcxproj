@@ -75,7 +75,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LUNADLL_EXPORTS;NDEBUG;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NOMINMAX;LUNADLL_EXPORTS;NDEBUG;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(LUA_DEV)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\LunaLoader\LunaLoaderPatch.h" />
+    <ClInclude Include="CharacterData.h" />
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
@@ -319,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\LunaLoader\LunaLoaderPatch.cpp" />
+    <ClCompile Include="CharacterData.cpp" />
     <ClCompile Include="EventStateMachine.cpp" />
     <ClCompile Include="FileManager\config_manager.cpp" />
     <ClCompile Include="FileManager\CustomParamStore.cpp" />

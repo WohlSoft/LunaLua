@@ -12,6 +12,7 @@
 #include "../../Rendering/RenderOps/RenderBitmapOp.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
+#include "../CharacterData.h"
 
 
 // Prototype
@@ -264,7 +265,8 @@ DECL_HOOK(HOOK_0x994AE8, esi + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x994D83, esi + 0xF0, CMP_ax);
 DECL_HOOK(HOOK_0x994F4C, esi + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x9953AC, ecx + eax * 4 + 0xF0, MOV_dx);
-DECL_HOOK(HOOK_0x99792D, ebx + 0xF0, MOV_ax);
+//player sliding related, commented out as it conflicts with character abilitiy hooks
+//DECL_HOOK(HOOK_0x99792D, ebx + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x99799D, ebx + 0xF0, MOV_ax);
 DECL_HOOK(HOOK_0x997CA1, ebx + 0xF0, MOV_cx);
 DECL_HOOK(HOOK_0x998040, ebx + 0xF0, MOV_edi);
@@ -768,7 +770,8 @@ static auto patch_0x994AE8 = PATCH(0x994AE8).CALL(HOOK_0x994AE8).NOP_PAD_TO_SIZE
 static auto patch_0x994D83 = PATCH(0x994D83).CALL(HOOK_0x994D83).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x994F4C = PATCH(0x994F4C).CALL(HOOK_0x994F4C).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9953AC = PATCH(0x9953AC).CALL(HOOK_0x9953AC).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x99792D = PATCH(0x99792D).CALL(HOOK_0x99792D).NOP_PAD_TO_SIZE<7>();
+//player sliding related, commented out as it conflicts with character abilitiy hooks
+//static auto patch_0x99792D = PATCH(0x99792D).CALL(HOOK_0x99792D).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x99799D = PATCH(0x99799D).CALL(HOOK_0x99799D).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x997CA1 = PATCH(0x997CA1).CALL(HOOK_0x997CA1).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x998040 = PATCH(0x998040).CALL(HOOK_0x998040).NOP_PAD_TO_SIZE<7>();
@@ -1671,7 +1674,8 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x994D83,
     &patch_0x994F4C,
     &patch_0x9953AC,
-    &patch_0x99792D,
+    //player sliding related, commented out as it conflicts with character abilitiy hooks
+    //&patch_0x99792D,
     &patch_0x99799D,
     &patch_0x997CA1,
     &patch_0x998040,
@@ -2490,6 +2494,9 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
 
     // Switch blocks are generally bumpable
     if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
+
+    // Initialize extended character data
+    extraCharacterDataRegister(id, base);
 
     runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect);
     // Note: No longer applied on-demand. Always have these patches in place for consistency

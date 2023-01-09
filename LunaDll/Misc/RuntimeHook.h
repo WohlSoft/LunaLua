@@ -602,4 +602,9 @@ void __stdcall runtimeHookPlayerDuckForced_linkJump();
 void __stdcall runtimeHookPlayerSolidNPCCollisionDuckRelated();
 void __stdcall runtimeHookPlayerSetHeldObjectPosition();
 
+// CHARACTER SPECIFIC ABILITIES (riding yoshi, sliding) RELATED
+void __stdcall runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowed(void);
+void __stdcall runtimeHookIsPlayerAllowedToSlide(void);
+void __stdcall runtimeHookIsPlayerAllowedToSlideForAnimationFrame(void);
+
 #endif

@@ -1,5 +1,6 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/CustomGraphics.h"
+#include "../../CharacterData.h"
 
 LuaProxy::PlayerSettings LuaProxy::PlayerSettings::get(Characters character, PowerupID powerupID, lua_State* L)
 {
@@ -180,4 +181,18 @@ bool LuaProxy::PlayerSettings::isValid_throw(lua_State* L) const
         return false;
     }
     return true;
+}
+
+// PlayerSettingsCharacterProperties
+#define _DEFINE_CHARACTERPROPERTIES(TYPE, GET, SET, NATIVE_GET, NATIVE_SET) \
+    TYPE LuaProxy::PlayerSettingsCharacterProperties::GET(lua_State* L) { return NATIVE_GET(m_character); } \
+    void LuaProxy::PlayerSettingsCharacterProperties::SET(TYPE value, lua_State* L) { NATIVE_SET(m_character, value); }
+_DEFINE_CHARACTERPROPERTIES(bool, getCanSlide,     setCanSlide,     ExtraCharacterData::canSlideGet,     ExtraCharacterData::canSlideSet    );
+_DEFINE_CHARACTERPROPERTIES(bool, getCanRideYoshi, setCanRideYoshi, ExtraCharacterData::canRideYoshiGet, ExtraCharacterData::canRideYoshiSet);
+_DEFINE_CHARACTERPROPERTIES(bool, getCanRideBoot,  setCanRideBoot,  ExtraCharacterData::canRideBootGet,  ExtraCharacterData::canRideBootSet );
+#undef _DEFINE_CHARACTERPROPERTIES
+
+LuaProxy::PlayerSettingsCharacterProperties LuaProxy::PlayerSettings::getCharacterProperties(Characters character, lua_State* L)
+{
+    return PlayerSettingsCharacterProperties(character);
 }

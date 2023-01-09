@@ -574,6 +574,7 @@ LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Shader, Shader);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Data, Data);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::AsyncHTTPRequest, AsyncHTTPRequest);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettings, PlayerSettings);
+LUAHELPER_DEF_CLASS_HELPER(LuaProxy::PlayerSettingsCharacterProperties, PlayerSettingsCharacterProperties);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::World, World);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Tile, Tile);
 LUAHELPER_DEF_CLASS_HELPER(LuaProxy::Scenery, Scenery);
@@ -1014,9 +1015,15 @@ void CLunaLua::bindAll()
             .property("responseText", &LuaProxy::AsyncHTTPRequest::responseText)
             .property("statusCode", &LuaProxy::AsyncHTTPRequest::statusCode),
 
+            LUAHELPER_DEF_CLASS(PlayerSettingsCharacterProperties)
+            .property("canSlide",     &LuaProxy::PlayerSettingsCharacterProperties::getCanSlide    , &LuaProxy::PlayerSettingsCharacterProperties::setCanSlide    )
+            .property("canRideYoshi", &LuaProxy::PlayerSettingsCharacterProperties::getCanRideYoshi, &LuaProxy::PlayerSettingsCharacterProperties::setCanRideYoshi)
+            .property("CanRideBoot",  &LuaProxy::PlayerSettingsCharacterProperties::getCanRideBoot , &LuaProxy::PlayerSettingsCharacterProperties::setCanRideBoot ),
+            
             LUAHELPER_DEF_CLASS(PlayerSettings)
             .scope[
-                def("get", &LuaProxy::PlayerSettings::get)
+                def("get", &LuaProxy::PlayerSettings::get),
+                def("getCharacterProperties", &LuaProxy::PlayerSettings::getCharacterProperties)
             ]
             .property("hitboxWidth", &LuaProxy::PlayerSettings::getHitboxWidth, &LuaProxy::PlayerSettings::setHitboxWidth)
             .property("hitboxHeight", &LuaProxy::PlayerSettings::getHitboxHeight, &LuaProxy::PlayerSettings::setHitboxHeight)

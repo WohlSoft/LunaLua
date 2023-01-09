@@ -792,6 +792,11 @@ typedef struct ExtendedBlockFields_\
         // PlayerPush
         return native_playerPush(&playerIdx, &hitSpot);
     }
+    FFI_EXPORT(void) LunaLuaCallNativeStopMusic()
+    {
+        // StopMusic
+        native_stopMusic();
+    }
 
     // Expose callback setters
     #define PLAYER_CALLBACK_EXPORT(EXPORTED_NAME, SET, TYPE) FFI_EXPORT(void) EXPORTED_NAME(LuaPlayerCallback :: TYPE cb) {LuaPlayerCallback :: SET(cb); }

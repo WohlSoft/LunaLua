@@ -25,6 +25,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "CharacterData.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -368,6 +369,7 @@ void ResetLunaModule()
     Input::ResetAll();
 
     runtimeHookCharacterIdReset();
+    extraCharacterDataReset();
 
     gHook_SkipTestMsgBox = false;
 

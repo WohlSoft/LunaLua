@@ -2040,6 +2040,16 @@ void TrySkipPatch()
     // Position held object
     PATCH(0x009D0409).CALL(runtimeHookPlayerSetHeldObjectPosition).JMP(0x9D0B95).Apply();
 
+
+    // Hooks to override character-specific player abilities
+    // Patch out forced yoshi dismount and sliding disable for non-plumber characters
+    PATCH(0x99F59E).CALL(runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowed).NOP_PAD_TO_SIZE<39>().Apply();
+    // Patch check for whether a given character is allowed to start sliding
+    PATCH(0x99792D).JMP(runtimeHookIsPlayerAllowedToSlide).NOP_PAD_TO_SIZE<25>().Apply();
+    // Patch check for character ID when setting sliding animation frame
+    PATCH(0x9B88DA).JMP(runtimeHookIsPlayerAllowedToSlideForAnimationFrame).NOP_PAD_TO_SIZE<16>().Apply();
+
+
         
     // Hooks for populating world map
     PATCH(0x8E35E0).JMP(runtimeHookLoadWorldList).NOP_PAD_TO_SIZE<6>().Apply();

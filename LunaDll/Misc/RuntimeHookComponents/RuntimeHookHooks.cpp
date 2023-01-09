@@ -42,6 +42,7 @@
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
 #include "../../LuaPlayerCallback.h"
+#include "../CharacterData.h"
 
 void CheckIPCQuitRequest();
 
@@ -4287,5 +4288,78 @@ __declspec(naked) void __stdcall runtimeHookPlayerSetHeldObjectPosition(void)
         call runtimeHookPlayerSetHeldObjectPositionInternal
 
         ret
+    }
+}
+
+
+/// PLAYER CHARACTER ABILITIES RELATED
+void __stdcall runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowedInternal(PlayerMOB* player) {
+    // Called for non-plumber based player characters each frame,
+    
+    // if riding a yoshi,
+    if (player->MountType == 3) {
+        // harm the pllayer and force mount to 0 (as is 1.3 behaviour) if their character is not allowed to ride yoshi
+        if (!ExtraCharacterData::canRideYoshiGet(player->Identity)) {
+            short playerIDX = placeholder_PlayerMOBToIDX(player);
+            native_harmPlayer(&playerIDX);
+            player->MountType = 0;
+        }
+    }
+
+    // if sliding is true,
+    if (player->SlidingState == COMBOOL(true)) {
+        // force it back to false (as is 1.3 behaviour) if their character is not set to be allowed to slide
+        if (!ExtraCharacterData::canSlideGet(player->Identity)) {
+            player->SlidingState = COMBOOL(false);
+        }
+    }
+}
+__declspec(naked) void __stdcall runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowed(void)
+{
+    __asm {
+        push ebx // Address of player
+        call runtimeHookPlayerForceStopSlidingOrDismountYoshiIfNotAllowedInternal
+
+        ret
+    }
+}
+
+int __stdcall runtimeHookIsPlayerAllowedToSlideInternal(PlayerMOB* player) {
+    return ExtraCharacterData::canSlideGet(player->Identity) ? 1 : 0;
+}
+// called when checking if a character may begin sliding
+_declspec(naked) void __stdcall runtimeHookIsPlayerAllowedToSlide(void)
+{
+    __asm {
+        push ebx
+        call runtimeHookIsPlayerAllowedToSlideInternal
+
+        cmp eax, 0
+        jne allowedToSlide
+
+        push 0x997967 // not allowed to slide
+        ret
+
+        allowedToSlide :
+        push 0x997946 // is allowed to slide
+            ret
+    }
+}
+// called when setting the player's animation frame if they are sliding
+_declspec(naked) void __stdcall runtimeHookIsPlayerAllowedToSlideForAnimationFrame(void)
+{
+    __asm {
+        push esi
+        call runtimeHookIsPlayerAllowedToSlideInternal
+
+        cmp eax, 0
+        jne allowedToSlide
+
+        push 0x9B8A42 // not allowed to slide
+        ret
+
+        allowedToSlide :
+        push 0x9B88EA // is allowed to slide
+            ret
     }
 }
