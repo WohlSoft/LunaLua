@@ -199,6 +199,7 @@ set(LunaLua_Sources
     Misc/UniPath.cpp
     Misc/VariantHelper.cpp
     Misc/VB6StrPtr.cpp
+    Misc/VB6RNG.cpp
     Misc/WaitForTickEnd.cpp
     Misc/win32_Unicode.cpp
     Rendering/AsyncGifRecorder.cpp
