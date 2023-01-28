@@ -42,9 +42,6 @@ static float rtcRandomNext_args[256] {
     -3.50324616e-44,-1.54142831e-43,-2.73253201e-43,-3.36311631e-44,-1.52741533e-43,-2.71851902e-43,-3.22298647e-44,-1.51340234e-43
 };
 
-static VARIANTARG const zero_f = {.vt = VT_R4, .fltVal = 0.0f};
-static VARIANTARG const one_f = {.vt = VT_R4, .fltVal = 1.0f};
-
 // Gets the current value of the seed as a zero-extended 24bit integer
 std::uint32_t VB6RNG::getSeed() {
     return 16777216 * getLastGeneratedNumber();
@@ -80,10 +77,20 @@ void VB6RNG::setSeed(std::uint32_t newSeed) {
 
 // Returns the last generated random number. Equivalent to calling Rnd(0) in VB6.
 float VB6RNG::getLastGeneratedNumber() {
-    return rtcRandomNext(&zero_f);
+    VARIANTARG arg;
+
+    arg.vt = VT_R4;
+    arg.fltVal = 0.0f;
+
+    return rtcRandomNext(&arg);
 }
 
 // Generates a uniformly distributed random number. Equivalent to calling Rnd() in VB6.
 float VB6RNG::generateNumber() {
-    return rtcRandomNext(&one_f);
+    VARIANTARG arg;
+
+    arg.vt = VT_R4;
+    arg.fltVal = 1.0f;
+
+    return rtcRandomNext(&arg);
 }
