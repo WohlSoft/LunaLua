@@ -1,11 +1,10 @@
 #include <unordered_map>
 #include <memory>
-#include "CharacterData.h"
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../Defines.h"
 #include "../../Globals.h"
 #include "../../GlobalFuncs.h"
-
+#include "CharacterData.h"
 
 // Data structures
 struct ExtraCharacterDataStruct {
@@ -16,17 +15,22 @@ public:
         mCanRideYoshi = mCanSlide;
         mCanRideBoot  = (base != CHARACTER_LINK);
         mCanSpinJump  = (base != CHARACTER_PEACH && base != CHARACTER_LINK);
+
+        memset(mHitbox, 0, PowerupState::MAX_ID * sizeof(CharacterHitBoxData));
     }
     ~ExtraCharacterDataStruct()
     {
     }
 
-public:
+    // hitboxes
+    CharacterHitBoxData mHitbox[PowerupState::MAX_ID];
+
     // extra data
     bool mCanSlide;
     bool mCanRideYoshi;
     bool mCanRideBoot;
     bool mCanSpinJump;
+
 };
 
 
@@ -49,6 +53,19 @@ void extraCharacterDataReset()
         extraCharacterDataRegister(i, i);
     }
 }
+CharacterHitBoxData* characterDataGetHitboxes(short characterId, short powerupId)
+{
+    if (powerupId < 1 || powerupId > PowerupState::MAX_ID) {
+        return nullptr;
+    }
+    auto it = extraCharacteDataMap.find(characterId);
+    if (it != extraCharacteDataMap.end())
+    {
+        return &(it->second->mHitbox[powerupId-1]);
+    }
+    return nullptr;
+}
+
 
 // macro to define getter / setter funcs for data fields
 #define _CHARACTERDATA_DEFINE(TYPE, DEFAULT, PROPERTY, GET, SET) \

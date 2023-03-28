@@ -13,6 +13,7 @@
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/BGOs.h"
 #include "../SMBXInternal/Animation.h"
+#include "../CharacterData.h"
 
 #include "../Rendering/FrameCapture.h"
 
@@ -330,6 +331,7 @@ void CLunaLua::setupDefaults()
     _G["BLOCK_MAX_ID"] = Block::MAX_ID;
     _G["BGO_MAX_ID"] = SMBX_BGO::MAX_ID;
     _G["ANIMATION_MAX_ID"] = SMBXAnimation::MAX_ID;
+    _G["POWERUP_MAX_ID"] = PowerupState::MAX_ID;
 
     LUAHELPER_DEF_CONST(_G, VK_LBUTTON);
     LUAHELPER_DEF_CONST(_G, VK_RBUTTON);
@@ -697,7 +699,7 @@ void CLunaLua::bindAll()
                 def("warning", &LuaProxy::Misc::warning),
                 def("registerCharacterId", &LuaProxy::Misc::registerCharacterId),
                 // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
-                def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
+                def("loadCharacterHitBoxes", &LuaProxy::loadHitboxes),
                 def("showRichDialog", &LuaProxy::Misc::showRichDialog),
                 def("__enablePerfTracker", &LuaProxy::Misc::__enablePerfTracker),
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
@@ -1208,7 +1210,7 @@ void CLunaLua::bindAll()
                     def("filename", &LuaProxy::Level::filename),
                     def("name", &LuaProxy::Level::name),
                     // This isn't just useful in level situation... it is useful for overworld too, so, there's a copy in Misc too
-                    def("loadPlayerHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes)
+                    def("loadPlayerHitBoxes", &LuaProxy::loadHitboxes)
                 ],
 
                 namespace_("Graphics")[
@@ -1448,7 +1450,7 @@ void CLunaLua::bindAllDeprecated()
                 def("findnpcs", &LuaProxy::findNPCs), //New version working = DONE
                 def("triggerEvent", &LuaProxy::triggerEvent), //In next version event namespace
                 def("playMusic", &LuaProxy::playMusic), //DONE
-                def("loadHitboxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
+                def("loadHitboxes", &LuaProxy::loadHitboxes),
                 def("gravity", (unsigned short(*)())&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("gravity", (void(*)(unsigned short))&LuaProxy::gravity), //DONE [DEPRECATED]
                 def("earthquake", (unsigned short(*)())&LuaProxy::earthquake), //DONE [DEPRECATED]

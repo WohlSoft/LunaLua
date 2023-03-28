@@ -1,10 +1,16 @@
 #ifndef CharacterData_hhh
 #define CharacterData_hhh
 
+namespace PowerupState {
+    const int MAX_ID = 30;
+}
+
 // Resets extended character data, leaving only the 5 base chars
 void extraCharacterDataReset();
 void extraCharacterDataRegister(short id, short base);
 void extraCharacterDataUnregister(short id);
+// Returns hitbox data for the specified character/powerup
+CharacterHitBoxData* characterDataGetHitboxes(short characterId, short powerupId);
 
 // macro to define getter / setter funcs for data fields
 #define _CHARACTERDATA_DEFINE(TYPE, DEFAULT, PROPERTY, GET, SET) \

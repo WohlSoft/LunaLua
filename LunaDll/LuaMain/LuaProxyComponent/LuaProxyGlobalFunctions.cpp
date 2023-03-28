@@ -12,6 +12,7 @@
 #include "../../SMBXInternal/WorldLevel.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/CustomGraphics.h"
+#include "../CharacterData.h"
 #include "../../GlobalFuncs.h"
 #include "../../Misc/MiscFuncs.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
@@ -23,20 +24,18 @@
 
 //type - Player's state/powerup
 //ini_file - path to INI-file which contains the hitbox redefinations
-void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
+//this used to return void and error if the load failed, now it just returns 'false' if the file is missing.
+bool LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L)
 {
-    if((_powerup < 1) || (_powerup>10))
+    if((_powerup < 1) || (_powerup>PowerupState::MAX_ID))
     {
         luaL_error(L, "Powerup ID must be from 1 to 10.");
-        return;
+        return false;
     }
-    if ((_character < 1) || (_character > 5))
+    if (runtimeHookGetCharacterHitBoxData(_character, _powerup) == nullptr)
     {
-        if (runtimeHookGetExtCharacterHitBoxData(_character, _powerup) == nullptr)
-        {
-            luaL_error(L, "Invalid character ID.");
-            return;
-        }
+        luaL_error(L, "Invalid character ID.");
+        return false;
     }
 
     std::string full_path = resolveIfNotAbsolutePath(ini_file);
@@ -44,8 +43,8 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
     IniProcessing hitBoxFile(full_path);
     if(!hitBoxFile.isOpened())
     {
-        luaL_error(L, ("Failed to read an INI file: " + full_path).c_str());
-        return;
+        //luaL_error(L, ("Failed to read an INI file: " + full_path).c_str());
+        return false;
     }
 
     //Parser of hitbox properties from PGE Calibrator INI File
@@ -126,6 +125,8 @@ void LuaProxy::loadHitboxes(int _character, int _powerup, const std::string& ini
         SMBX_CustomGraphics::setPlayerGrabOffsetX((PowerupID)_powerup, (Characters)_character, grab_offset_x);
     if(grab_offset_y != UNDEFINED)
         SMBX_CustomGraphics::setPlayerGrabOffsetY((PowerupID)_powerup, (Characters)_character, grab_offset_y);
+
+    return true;
 }
 
 

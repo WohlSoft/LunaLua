@@ -1025,7 +1025,7 @@ namespace LuaProxy {
     Animation spawnEffect(short effectID, double x, double y, lua_State* L);
     Animation spawnEffect(short effectID, double x, double y, float animationFrame, lua_State* L);
 
-    void loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L);
+    bool loadHitboxes(int _character, int _powerup, const std::string& ini_file, lua_State* L);
 
     std::string getInput();
 

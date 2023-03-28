@@ -168,7 +168,7 @@ void LuaProxy::PlayerSettings::setCharacter(Characters val, lua_State* L)
 
 bool LuaProxy::PlayerSettings::isValid_throw(lua_State* L) const
 {
-    if (runtimeHookGetExtCharacterHitBoxData(m_character, m_powerupID) != nullptr)
+    if (runtimeHookGetCharacterHitBoxData(m_character, m_powerupID) != nullptr)
     {
         return true;
     }

@@ -67,7 +67,6 @@ public:
         mStoredTemplate.MountType = 0;
         mStoredTemplate.MountColor = 0;
         mStoredTemplate.Hearts = 1;
-        memset(mHitbox, 0, 10*sizeof(CharacterHitBoxData));
         if (mFilterBlock != 0)
         {
             Blocks::SetBlockPlayerFilter(mFilterBlock, mId);
@@ -93,7 +92,6 @@ public:
     short mSwitchBlock;
     short mDeathEffect;
     PlayerMOB mStoredTemplate;
-    CharacterHitBoxData mHitbox[10];
 };
 
 // Static Data
@@ -2526,23 +2524,11 @@ void runtimeHookCharacterIdReset()
     // runtimeHookCharacterIdUnpplyPatch();
 }
 
-CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId)
+CharacterHitBoxData* runtimeHookGetCharacterHitBoxData(short characterId, short powerupId)
 {
-    if (characterId >= 1 && characterId <= 5)
+    if (powerupId < 1 || powerupId > PowerupState::MAX_ID)
     {
         return nullptr;
     }
-
-    if (powerupId < 1 || characterId > 10)
-    {
-        return nullptr;
-    }
-
-    auto it = runtimeHookCharacterIdMap.find(characterId);
-    if (it != runtimeHookCharacterIdMap.end())
-    {
-        return &it->second->mHitbox[powerupId];
-    }
-
-    return nullptr;
+    return characterDataGetHitboxes(characterId, powerupId);
 }
