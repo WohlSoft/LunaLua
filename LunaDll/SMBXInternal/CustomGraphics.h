@@ -11,22 +11,37 @@ public:
     SMBX_CustomGraphics(SMBX_CustomGraphics& other) = delete;
 
     static inline void setPlayerHitboxWidth(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID >= 1 && characterID <= 5 && powerupID >= 1 && powerupID <= 7) { // overwrite 1.3 memory
+            (&GM_HITBOX_W_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        }
         CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
         if (hitbox) hitbox->hitbox_w = value;
     }
     static inline void setPlayerHitboxHeight(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID >= 1 && characterID <= 5 && powerupID >= 1 && powerupID <= 7) { // overwrite 1.3 memory
+            (&GM_HITBOX_H_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        }
         CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
         if (hitbox) hitbox->hitbox_h = value;
     }
     static inline void setPlayerHitboxDuckHeight(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID >= 1 && characterID <= 5 && powerupID >= 1 && powerupID <= 7) { // overwrite 1.3 memory
+            (&GM_HITBOX_H_D_PTR)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        }
         CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
         if (hitbox) hitbox->hitbox_h_d = value;
     }
     static inline void setPlayerGrabOffsetX(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID >= 1 && characterID <= 5 && powerupID >= 1 && powerupID <= 7) { // overwrite 1.3 memory
+            (&GM_HITBOX_GRABOFF_X)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        }
         CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
         if (hitbox) hitbox->hitbox_graboff_x = value;
     }
     static inline void setPlayerGrabOffsetY(PowerupID powerupID, Characters characterID, int value) {
+        if (characterID >= 1 && characterID <= 5 && powerupID >= 1 && powerupID <= 7) { // overwrite 1.3 memory
+            (&GM_HITBOX_GRABOFF_Y)[((int)powerupID - 1) * 5 + ((int)characterID - 1)] = value;
+        }
         CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
         if (hitbox) hitbox->hitbox_graboff_y = value;
     }
