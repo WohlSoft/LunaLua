@@ -814,6 +814,7 @@ typedef struct ExtendedBlockFields_\
     PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerMounted      , Set_PlayerMounted      , Callback_PlayerNPC);
     PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackCoopStealBonus     , Set_CoopStealBonus     , Callback_Void);
     PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerForcedStateCode, Set_PlayerForcedStateCode, Callback_Player);
+    PLAYER_CALLBACK_EXPORT(LunaLuaSetCallbackPlayerRender       , Set_PlayerRender       , Callback_Player);
     #undef PLAYER_CALLBACK_EXPORT
 
 }

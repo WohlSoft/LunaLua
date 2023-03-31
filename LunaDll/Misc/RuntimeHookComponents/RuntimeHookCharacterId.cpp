@@ -78,7 +78,7 @@ public:
         {
             Blocks::SetBlockPlayerFilter(mFilterBlock, 0);
         }
-        for (int powerupId = 1; powerupId <= 10; powerupId++)
+        for (int powerupId = 1; powerupId <= PowerupState::MAX_ID; powerupId++)
         {
             ImageLoader::UnregisterExtraGfx(mName + "-" + std::to_string(powerupId));
         }
@@ -2464,7 +2464,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
     // Load Sprites
     if (name.size() > 0)
     {
-        for (int powerupId = 1; powerupId <= 10; powerupId++)
+        for (int powerupId = 1; powerupId <= PowerupState::MAX_ID; powerupId++)
         {
             ImageLoader::RegisterExtraGfx(name, name + "-" + std::to_string(powerupId));
         }

@@ -34,6 +34,7 @@ namespace LuaPlayerCallback {
 	_PLAYERCALLBACK_DEFINE( 11, Callback_PlayerNPC, Set_PlayerMounted   , PlayerMounted       );
 	_PLAYERCALLBACK_DEFINE( 12, Callback_Void  , Set_CoopStealBonus     , CoopStealBonus      );
 	_PLAYERCALLBACK_DEFINE( 13, Callback_Player, Set_PlayerForcedStateCode, PlayerForcedStateCode);
+	_PLAYERCALLBACK_DEFINE( 14, Callback_Player, Set_PlayerRender       , PlayerRender        );
 }
 
 #undef _PLAYERCALLBACK_DEFINE

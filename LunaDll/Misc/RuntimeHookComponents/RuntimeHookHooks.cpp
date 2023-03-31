@@ -4100,6 +4100,20 @@ __declspec(naked) void __stdcall runtimeHookHandleMapMusicBoxCollision(void)
     }
 }
 
+// convert a pointer to a player object to the player index
+int placeholder_PlayerMOBToIDX(PlayerMOB* player)
+{
+    int playerIdx = -1;
+    // iterate through players to figure out the index of this player
+    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+        if (PlayerMOB::Get(i) == player) {
+            playerIdx = i;
+            break;
+        }
+    }
+    return playerIdx;
+}
+
 void __stdcall runtimeHookPlayerEffects(int* playerIdxPtr)
 {
     PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerForcedStateCode(), *playerIdxPtr);
@@ -4128,21 +4142,17 @@ void __stdcall runtimeHookPlayerPowerUps(int* playerIdxPtr)
 {
     PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerPowerUpCode(), *playerIdxPtr);
 }
-
-
-// convert a pointer to a player object to the player index
-int placeholder_PlayerMOBToIDX(PlayerMOB* player)
+void __stdcall runtimeHookPlayerRender(int* playerIdxPtr)
 {
-    int playerIdx = -1;
-    // iterate through players to figure out the index of this player
-    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
-        if (PlayerMOB::Get(i) == player) {
-            playerIdx = i;
-            break;
-        }
-    }
-    return playerIdx;
+    PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerRender(), *playerIdxPtr);
+    Renderer::Get().RenderBelowPriority(-25);
 }
+void __stdcall runtimeHookPlayerRenderBehind(PlayerMOB* player) // when the player is in a pipe
+{
+    PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerRender(), placeholder_PlayerMOBToIDX(player));
+    Renderer::Get().RenderBelowPriority(-70);
+}
+
 
 // DISMOUNTING-------
 void __stdcall runtimeHookDismountInternal(PlayerMOB* player)

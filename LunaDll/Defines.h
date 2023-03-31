@@ -712,6 +712,10 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg1 = int* Index of player
 //      'PowerUps' in the VB source
 #define GF_PLAYER_POWERUP_LOGIC  0x009C6600
+//      Arg1 = int* Index of player
+//      Arg1 = int* Index of camera
+//      'DrawPlayer' in the VB source
+#define GF_PLAYER_RENDER  0x00988E10
 
 //      Arg1 = int* Sprite ID
 //      Arg2 = int* Unk flags

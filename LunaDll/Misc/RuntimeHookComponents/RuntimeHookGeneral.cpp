@@ -1993,6 +1993,22 @@ void TrySkipPatch()
     PATCH(GF_PLAYER_DEATH_RELATED).JMP(runtimeHookPlayerDiedKillPlayerLate).NOP().Apply();
     // Hook to overwrite PowerUps
     PATCH(GF_PLAYER_POWERUP_LOGIC).JMP(runtimeHookPlayerPowerUps).NOP().Apply();
+    // Hook to overwrite DrawPlayer
+    // This hook is placed in the function after the basegame rendering preconditions are satisfied.
+    PATCH(0x00988F4E)
+        .bytes(0x8B, 0x45, 0x08) // mov eax, dword ptr ss : [ebp + 8] - puts the player argument in eax
+        .PUSH_EAX()
+        .CALL(runtimeHookPlayerRender)
+        .JMP(0x0098FBDF) // This jumps to a check which re-renders held objects for toad and peach, which we want to maintain
+        .Apply();
+    PATCH(0x009909C5).JMP(0x00991869).Apply(); // Patch DrawPlayer to exit early, after the above mentioned toad/peach check
+    PATCH(0x0092378D).JMP(0x00927F21).Apply(); // Skip vanilla clowncar player render code.
+    PATCH(0x00916343) // Overwrite player in pipe rendering
+        .PUSH_ECX()
+        .CALL(runtimeHookPlayerRenderBehind)
+        .JMP(0x0091C4ED)
+        .Apply();
+    PATCH(0x00903034).JMP(0x00906B3C).Apply(); // Skip overworld player rendering
     // overwrite mount dismount code
     PATCH(0x0099801D).CALL(runtimeHookDismountClowncarOverride).JMP(0x99A850).Apply(); // Dismount from clown car
     PATCH(0x0099CF8C).CALL(runtimeHookDismountClowncarOverride).JMP(0x99D44F).Apply(); // Dismount from yoshi

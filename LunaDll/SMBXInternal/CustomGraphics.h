@@ -110,31 +110,10 @@ public:
         if (retSuccess)
             *retSuccess = 0;
 
-        switch (characterID)
+        CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
+        if (hitbox)
         {
-        case CHARACTER_MARIO:
-            offsetVal = GM_GFXOFFSET_MARIO_X[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_LUIGI:
-            offsetVal = GM_GFXOFFSET_LUIGI_X[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_PEACH:
-            offsetVal = GM_GFXOFFSET_PEACH_X[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_TOAD:
-            offsetVal = GM_GFXOFFSET_TOAD_X[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_LINK:
-            offsetVal = GM_GFXOFFSET_LINK_X[spriteIndex + ((int)powerupID * 100)];
-            break;
-        default:
-            {
-                CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
-                if (hitbox)
-                {
-                    offsetVal = hitbox->gfxoffset_x[spriteIndex+49];
-                }
-            } break;
+            offsetVal = hitbox->gfxoffset_x[spriteIndex+49];
         }
         return offsetVal;
     }
@@ -151,31 +130,10 @@ public:
         if (retSuccess)
             *retSuccess = 0;
         
-        switch (characterID)
+        CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
+        if (hitbox)
         {
-        case CHARACTER_MARIO:
-            offsetVal = GM_GFXOFFSET_MARIO_Y[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_LUIGI:
-            offsetVal = GM_GFXOFFSET_LUIGI_Y[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_PEACH:
-            offsetVal = GM_GFXOFFSET_PEACH_Y[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_TOAD:
-            offsetVal = GM_GFXOFFSET_TOAD_Y[spriteIndex + ((int)powerupID * 100)];
-            break;
-        case CHARACTER_LINK:
-            offsetVal = GM_GFXOFFSET_LINK_Y[spriteIndex + ((int)powerupID * 100)];
-            break;
-        default:
-            {
-                CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
-                if (hitbox)
-                {
-                    offsetVal = hitbox->gfxoffset_y[spriteIndex + 49];
-                }
-            } break;
+            offsetVal = hitbox->gfxoffset_y[spriteIndex + 49];
         }
         return offsetVal;
     }
@@ -208,14 +166,11 @@ public:
         case CHARACTER_LINK:
             GM_GFXOFFSET_LINK_X[spriteIndex + ((int)powerupID * 100)] = value;
             break;
-        default:
-            {
-                CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
-                if (hitbox)
-                {
-                    hitbox->gfxoffset_x[spriteIndex + 49] = value;
-                }
-            } break;
+        }
+        CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
+        if (hitbox)
+        {
+            hitbox->gfxoffset_x[spriteIndex + 49] = value;
         }
     }
 
@@ -247,14 +202,11 @@ public:
         case CHARACTER_LINK:
             GM_GFXOFFSET_LINK_Y[spriteIndex + ((int)powerupID * 100)] = value;
             break;
-        default:
-            {
-                CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
-                if (hitbox)
-                {
-                    hitbox->gfxoffset_y[spriteIndex + 49] = value;
-                }
-            } break;
+        }
+        CharacterHitBoxData* hitbox = runtimeHookGetCharacterHitBoxData(characterID, powerupID);
+        if (hitbox)
+        {
+            hitbox->gfxoffset_y[spriteIndex + 49] = value;
         }
     }
 };

@@ -590,6 +590,8 @@ void __stdcall runtimeHookCoopStealBonus(void);
 void __stdcall runtimeHookPlayerYoshiSpit(int* playerIdx);
 void __stdcall runtimeHookPlayerDiedKillPlayerLate(int* playerIdx);
 void __stdcall runtimeHookPlayerPowerUps(int* playerIdx);
+void __stdcall runtimeHookPlayerRender(int* playerIdx);
+void __stdcall runtimeHookPlayerRenderBehind(PlayerMOB* player);
 // mount related
 void __stdcall runtimeHookDismountClowncarOverride(void);
 void __stdcall runtimeHookMounted(void);
