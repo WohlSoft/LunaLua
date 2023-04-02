@@ -4156,6 +4156,14 @@ void __stdcall runtimeHookPlayerUpdateReserveItem(int* playerIdxPtr, int* npcIDP
 {
     PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerUpdateReserveItem(), *playerIdxPtr, *npcIDPtr);
 }
+void __stdcall runtimeHookTranslateBlockContents(int* playerIdxPtr, int npcID)
+{
+    // set the newly spawned NPC to a dummy value, just in case
+    NPC::GetRaw(GM_NPCS_COUNT)->id = 1;
+    if (LuaPlayerCallback::TranslateBlockContents() != 0) {
+        (LuaPlayerCallback::TranslateBlockContents())(*playerIdxPtr, npcID);
+    }
+}
 
 
 // DISMOUNTING-------

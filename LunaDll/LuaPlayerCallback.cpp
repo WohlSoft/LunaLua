@@ -5,7 +5,7 @@
 	void SET (TYPE cb) { callbacks[INDEX] = cb; };
 
 namespace LuaPlayerCallback {
-	const int numCallbacks = 16; // The total number of callbacks
+	const int numCallbacks = 17; // The total number of callbacks
 	void* callbacks[numCallbacks];
 
 	void Reset() {
@@ -30,6 +30,7 @@ namespace LuaPlayerCallback {
 	_PLAYERCALLBACK_DEFINE( 13, Callback_Player, Set_PlayerForcedStateCode, PlayerForcedStateCode);
 	_PLAYERCALLBACK_DEFINE( 14, Callback_Player, Set_PlayerRender       , PlayerRender        );
 	_PLAYERCALLBACK_DEFINE( 15, Callback_PlayerNPCID, Set_PlayerUpdateReserveItem, PlayerUpdateReserveItem);
+	_PLAYERCALLBACK_DEFINE( 16, Callback_PlayerNPCID, Set_TranslateBlockContents, TranslateBlockContents);
 }
 
 #undef _PLAYERCALLBACK_DEFINE

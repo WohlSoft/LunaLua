@@ -593,6 +593,7 @@ void __stdcall runtimeHookPlayerPowerUps(int* playerIdx);
 void __stdcall runtimeHookPlayerRender(int* playerIdx);
 void __stdcall runtimeHookPlayerRenderBehind(PlayerMOB* player);
 void __stdcall runtimeHookPlayerUpdateReserveItem(int* playerIdx, int* npcID);
+void __stdcall runtimeHookTranslateBlockContents(int* playerIdx, int npcID);
 // mount related
 void __stdcall runtimeHookDismountClowncarOverride(void);
 void __stdcall runtimeHookMounted(void);

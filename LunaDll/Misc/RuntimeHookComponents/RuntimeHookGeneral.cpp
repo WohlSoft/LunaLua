@@ -2011,6 +2011,18 @@ void TrySkipPatch()
         .JMP(0x0091C4ED)
         .Apply();
     PATCH(0x00903034).JMP(0x00906B3C).Apply(); // Skip overworld player rendering
+    // overwrite (non-yoshi) vanilla block hit powerup npc id translation code
+    PATCH(0x009DCB69)
+        .bytes(0x33, 0xD2) // initialize edx to 0
+        .bytes(0x66, 0x8B, 0x95, 0x70, 0xFF, 0xFF, 0xFF) // mov dx, word ptr ss : [ebp - 90]
+        .PUSH_EDX() // push NPC ID
+        .bytes(0x8B, 0x5D, 0x10) // mov ebx, dword ptr ss : [ebp + 10]  Set EBX to player index address
+        .PUSH_EBX() // push player index pointer
+        .CALL(runtimeHookTranslateBlockContents)
+        .JMP(0x009DD0AB) // skip over the code which TranslateBlockContents replaces
+        .Apply();
+    // patch yoshi block content translation code to skip over overwritten logic
+    PATCH(0x009DCB64).JMP(0x009DD0AB).Apply();
     // overwrite mount dismount code
     PATCH(0x0099801D).CALL(runtimeHookDismountClowncarOverride).JMP(0x99A850).Apply(); // Dismount from clown car
     PATCH(0x0099CF8C).CALL(runtimeHookDismountClowncarOverride).JMP(0x99D44F).Apply(); // Dismount from yoshi
