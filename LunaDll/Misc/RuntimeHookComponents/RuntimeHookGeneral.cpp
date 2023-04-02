@@ -1993,6 +1993,8 @@ void TrySkipPatch()
     PATCH(GF_PLAYER_DEATH_RELATED).JMP(runtimeHookPlayerDiedKillPlayerLate).NOP().Apply();
     // Hook to overwrite PowerUps
     PATCH(GF_PLAYER_POWERUP_LOGIC).JMP(runtimeHookPlayerPowerUps).NOP().Apply();
+    // Hook to overwrite UpdatePlayerBonus
+    PATCH(GF_PLAYER_UPDATE_RESERVE_ITEM).JMP(runtimeHookPlayerUpdateReserveItem).NOP().Apply();
     // Hook to overwrite DrawPlayer
     // This hook is placed in the function after the basegame rendering preconditions are satisfied.
     PATCH(0x00988F4E)

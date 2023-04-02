@@ -671,6 +671,11 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_PLAYER_DO_TAIL_SWIPE 0x009BB490
 
 //      Arg1 = int* Index of player
+//      Arg2 = int* ID of collected powerup NPC
+// 'UpdatePlayerBonus' in SMBX source
+#define GF_PLAYER_UPDATE_RESERVE_ITEM 0x009BB2B0
+
+//      Arg1 = int* Index of player
 //      Arg2 = short* [VB6 Bool] DontResetGrabTime
 // 'PlayerGrabCode' in the SMBX source
 #define GF_PLAYER_GRABCODE      0x009CC2B0

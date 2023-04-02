@@ -18,6 +18,7 @@ namespace LuaPlayerCallback {
 	typedef void (*Callback_Void)();
 	typedef void (*Callback_Player)(short playerIdx);
 	typedef void (*Callback_PlayerNPC)(short playerIdx, short npcIdx);
+	typedef void (*Callback_PlayerNPCID)(short playerIdx, short npcId);
 
 	// Don't forgot to update LuaPlayerCallback.cpp and LuaProxyFFI too
 	_PLAYERCALLBACK_DEFINE( 0 , Callback_Player, Set_PlayerSizeCheck    , PlayerSizeCheck     );
@@ -35,6 +36,7 @@ namespace LuaPlayerCallback {
 	_PLAYERCALLBACK_DEFINE( 12, Callback_Void  , Set_CoopStealBonus     , CoopStealBonus      );
 	_PLAYERCALLBACK_DEFINE( 13, Callback_Player, Set_PlayerForcedStateCode, PlayerForcedStateCode);
 	_PLAYERCALLBACK_DEFINE( 14, Callback_Player, Set_PlayerRender       , PlayerRender        );
+	_PLAYERCALLBACK_DEFINE( 15, Callback_PlayerNPCID, Set_PlayerUpdateReserveItem, PlayerUpdateReserveItem);
 }
 
 #undef _PLAYERCALLBACK_DEFINE

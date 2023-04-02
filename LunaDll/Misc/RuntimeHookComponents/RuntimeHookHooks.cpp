@@ -4152,6 +4152,10 @@ void __stdcall runtimeHookPlayerRenderBehind(PlayerMOB* player) // when the play
     PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerRender(), placeholder_PlayerMOBToIDX(player));
     Renderer::Get().RenderBelowPriority(-70);
 }
+void __stdcall runtimeHookPlayerUpdateReserveItem(int* playerIdxPtr, int* npcIDPtr)
+{
+    PLAYERCALLBACK_CALL(LuaPlayerCallback::PlayerUpdateReserveItem(), *playerIdxPtr, *npcIDPtr);
+}
 
 
 // DISMOUNTING-------
