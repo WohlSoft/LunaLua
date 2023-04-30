@@ -971,9 +971,18 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         if (wData->lParam != NULL)
         {
-            CREATESTRUCTW* createData = reinterpret_cast<CREATESTRUCTW*>(wData->lParam);
-            LPCWSTR winName = createData->lpszName;
-            if ((gMainWindowHwnd == NULL) && (winName != NULL) && (memcmp(L"- Version 1.2.2 -", &winName[20], 17*2) == 0))
+            CREATESTRUCTW* createDataW = reinterpret_cast<CREATESTRUCTW*>(wData->lParam);
+            LPCWSTR winNameW = createDataW ? createDataW->lpszName : NULL;
+            CREATESTRUCTA* createDataA = reinterpret_cast<CREATESTRUCTA*>(wData->lParam);
+            LPCSTR winNameA = createDataA ? createDataA->lpszName : NULL;
+
+            bool isOurWindow = false;
+            if(winNameW && memcmp(winNameW, L"Su", 4) == 0)
+                isOurWindow = memcmp(L"- Version 1.2.2 -", &winNameW[20], 17 * 2) == 0;
+            else if(winNameA && memcmp(winNameA, "Supe", 4) == 0)
+                isOurWindow = strncmp("- Version 1.2.2 -", &winNameA[20], 17) == 0;
+
+            if ((gMainWindowHwnd == NULL) && isOurWindow)
             {
                 // Remove hook, since we no longer need it
                 UnhookWindowsHookEx(HookWnd);
