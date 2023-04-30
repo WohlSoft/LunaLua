@@ -971,6 +971,12 @@ LRESULT CALLBACK MsgHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         if (wData->lParam != NULL)
         {
+            // NOTE: On real Windows, handlers of the SetWindowsHookExW hook will get WM_CREATE
+            //       translated to the unicode version regardless of how the window is created,
+            //       so we will receive a CREATESTRUCTW structure with unicode strings.
+            //       Current verisons of Wine however have a bug where the translation is not
+            //       performed, resulting in recieving a CREATESTRUCTA structure with ASCII
+            //       strings instead.
             CREATESTRUCTW* createDataW = reinterpret_cast<CREATESTRUCTW*>(wData->lParam);
             LPCWSTR winNameW = createDataW ? createDataW->lpszName : NULL;
             CREATESTRUCTA* createDataA = reinterpret_cast<CREATESTRUCTA*>(wData->lParam);
