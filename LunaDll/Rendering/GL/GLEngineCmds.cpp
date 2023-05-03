@@ -291,9 +291,18 @@ void GLEngineCmd_LuaDraw::run(GLEngine& glEngine) const {
     }
 
     // Render Target Time
-    if (oldFB)
+    if (mTarget)
     {
-        oldFB->Bind();
+        if (oldFB)
+        {
+            // A framebuffer object was bound, restore it
+            oldFB->Bind();
+        }
+        else
+        {
+            // oldFB was null, meaning the screen was bound, restore that instead
+            g_GLContextManager.BindScreen();
+        }
     }
 }
 
