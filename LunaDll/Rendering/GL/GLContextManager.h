@@ -141,6 +141,10 @@ public:
 
     void SetActiveCamera(int cameraIdx);
 
+    // Function to set the bound framebuffer based on what GetCurrentFB returned.
+    // This is significant because if it returned null, this should bind the screen.
+    void RestoreBoundFB(GLFramebuffer* fb);
+
 private:
     bool  mInitialized;
     bool  mHadError;

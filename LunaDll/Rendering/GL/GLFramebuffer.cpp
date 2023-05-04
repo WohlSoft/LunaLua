@@ -152,12 +152,9 @@ void GLFramebuffer::Clear(const GLclampf color[4])
     GLERRORCHECK();
 
     // Bind what was bound before
-    if (oldFB == nullptr)
+    if (oldFB != this)
     {
-        g_GLContextManager.BindScreen();
-    }
-    else if (oldFB != this)
-    {
-        oldFB->Bind();
+        // Restore the old bound FB (if null, bind screen)
+        g_GLContextManager.RestoreBoundFB(oldFB);
     }
 }

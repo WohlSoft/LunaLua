@@ -189,6 +189,20 @@ void GLContextManager::SetActiveCamera(int cameraIdx)
     }
 }
 
+void GLContextManager::RestoreBoundFB(GLFramebuffer* fb)
+{
+    if (fb)
+    {
+        // A framebuffer object was bound, restore it
+        fb->Bind();
+    }
+    else
+    {
+        // fb was null, meaning the screen was bound, restore that instead
+        g_GLContextManager.BindScreen();
+    }
+}
+
 // Set up a new context from a HDC
 bool GLContextManager::InitContextFromHDC(HDC hDC) {
     PIXELFORMATDESCRIPTOR pfd;

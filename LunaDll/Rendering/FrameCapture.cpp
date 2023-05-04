@@ -29,8 +29,8 @@ public:
 
             g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetCurrentCameraFBTex(), 0, 0, w, h, 1.0f, nullptr);
 
-            // Bind old framebuffer
-            oldFB->Bind();
+            // Restore the old bound FB (if null, bind screen)
+            g_GLContextManager.RestoreBoundFB(oldFB);
         }
     }
 
