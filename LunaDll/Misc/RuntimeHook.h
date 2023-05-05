@@ -155,6 +155,11 @@ struct resultStruct{
 extern float (*__vbaR4Var)(VARIANTARG*);
 extern int (__stdcall *rtcMsgBox)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD);
 
+/************************************************************************/
+/* VB6 RNG Procs                                                        */
+/************************************************************************/
+extern void (__stdcall *rtcRandomize)(VARIANTARG const* arg);
+extern float (__stdcall *rtcRandomNext)(VARIANTARG const* arg);
 
 
 //Fixup errors

@@ -2022,6 +2022,9 @@ void TrySkipPatch()
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
     *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
 
+    rtcRandomize = (void(__stdcall *)(VARIANTARG const*))(*(void**)0x0040109C);
+    rtcRandomNext = (float(__stdcall *)(VARIANTARG const*))(*(void**)0x00401090);
+
     // Fix intro level not loading when the save slot number is greater than 3.
     PATCH(0x8CDE97)
         .PUSH_IMM32(0x8CDEC7)

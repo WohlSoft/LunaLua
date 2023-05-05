@@ -271,6 +271,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Minigames\GameboyRPG.h" />
     <ClInclude Include="Misc\VB6StrPtr.h" />
+    <ClInclude Include="Misc\VB6RNG.h" />
     <ClInclude Include="Misc\Playground.h" />
     <ClInclude Include="GlobalFuncs.h" />
     <ClInclude Include="Globals.h" />
@@ -501,6 +502,7 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookFixups.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookGeneral.cpp" />
     <ClCompile Include="Misc\VB6StrPtr.cpp" />
+    <ClCompile Include="Misc\VB6RNG.cpp" />
     <ClCompile Include="Misc\Playground.cpp" />
     <ClCompile Include="Autocode\Commands\GenComp.cpp" />
     <ClCompile Include="GlobalFuncs.cpp" />

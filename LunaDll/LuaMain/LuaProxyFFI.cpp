@@ -20,6 +20,7 @@
 #include "../Misc/TestMode.h"
 #include "../Misc/TestModeMenu.h"
 #include "../Misc/RuntimeHook.h"
+#include "../Misc/VB6RNG.h"
 #include "../Input/MouseHandler.h"
 #include "LunaLuaMain.h"
 #include "LuaProxyFFIGraphics.h"
@@ -750,6 +751,22 @@ typedef struct ExtendedBlockFields_\
     FFI_EXPORT(MousePos) LunaLuaGetMousePosition()
     {
         return {gMouseHandler.GetX(), gMouseHandler.GetY()};
+    }
+
+    FFI_EXPORT(unsigned int) LunaLuaLegacyRNGGetSeed() {
+        return VB6RNG::getSeed();
+    }
+
+    FFI_EXPORT(void) LunaLuaLegacyRNGSetSeed(unsigned int newSeed) {
+        VB6RNG::setSeed(newSeed);
+    }
+
+    FFI_EXPORT(float) LunaLuaLegacyRNGGetLastGeneratedNumber() {
+        return VB6RNG::getLastGeneratedNumber();
+    }
+
+    FFI_EXPORT(float) LunaLuaLegacyRNGGenerateNumber() {
+        return VB6RNG::generateNumber();
     }
 }
 
