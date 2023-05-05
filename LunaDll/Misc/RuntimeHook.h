@@ -358,6 +358,8 @@ void __stdcall runtimeHookPiranahDivByZero();
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
 
+void __stdcall runtimeHookPOW();
+
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
