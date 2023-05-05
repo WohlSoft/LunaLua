@@ -2234,31 +2234,31 @@ void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEff
 
 static _declspec(naked) void __stdcall doPOW_OrigFunc()
 {
-	__asm {
-		PUSH EBP
-		MOV EBP, ESP
-		SUB ESP, 0x8
-		PUSH 0x9E4606
-		RET
-	}
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x9E4606
+        RET
+    }
 }
 
 void __stdcall runtimeHookPOW()
 {
-	bool isCancelled = false;
+    bool isCancelled = false;
 
-	if (gLunaLua.isValid()) {
-		std::shared_ptr<Event> POWEvent = std::make_shared<Event>("onPOW", true);
-		POWEvent->setDirectEventName("onPOW");
-		POWEvent->setLoopable(false);
-		gLunaLua.callEvent(POWEvent);
-		isCancelled = POWEvent->native_cancelled();
-	}
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> POWEvent = std::make_shared<Event>("onPOW", true);
+        POWEvent->setDirectEventName("onPOW");
+        POWEvent->setLoopable(false);
+        gLunaLua.callEvent(POWEvent);
+        isCancelled = POWEvent->native_cancelled();
+    }
 
-	if (!isCancelled)
-	{
-		doPOW_OrigFunc();
-	}
+    if (!isCancelled)
+    {
+        doPOW_OrigFunc();
+    }
 }
 
 static void __stdcall runtimeHookColorSwitch(unsigned int color)
