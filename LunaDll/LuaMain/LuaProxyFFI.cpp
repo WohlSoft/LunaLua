@@ -26,6 +26,9 @@
 #include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
 
+#include "../Rendering/GL/GLEngine.h"
+#include "../Rendering/GL/GLEngineProxy.h"
+
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
 // Prototypes from RuntimeHookCharacterId.cpp
@@ -767,6 +770,50 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(float) LunaLuaLegacyRNGGenerateNumber() {
         return VB6RNG::generateNumber();
+    }
+
+    FFI_EXPORT(bool) LunaLuaIsRecordingGIF()
+    {
+        if (g_GLEngine.GifRecorderIsRunning())
+        {
+            return (bool)true;
+        } else {
+            return (bool)false;
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
+    {
+        // Toggling fullscreen without maximizing the window/double clicking the window.
+        if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                if ((wndpl.showCmd == SW_MAXIMIZE) && !enable)
+                    ShowWindow(gMainWindowHwnd, SW_RESTORE);
+                else if (enable)
+                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+            }
+        }
+    }
+
+    FFI_EXPORT(bool) LunaLuaIsFullscreen()
+    {
+        if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                if (wndpl.showCmd == SW_MAXIMIZE) {
+                    return (bool)true;
+                } else {
+                    return (bool)false;
+                }
+            }
+        }
     }
 }
 
