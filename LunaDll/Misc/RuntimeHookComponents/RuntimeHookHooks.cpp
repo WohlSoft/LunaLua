@@ -40,6 +40,8 @@
 
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
+#include "../../Misc/VB6RNG.h"
+
 void CheckIPCQuitRequest();
 
 extern HHOOK HookWnd;
@@ -765,7 +767,15 @@ extern BOOL __stdcall StretchBltHook(
         SMBX_CameraInfo* cam = SMBX_CameraInfo::Get(cameraIdx);
         if (cam == NULL) return FALSE;
 
-        g_GLEngine.RenderCameraToScreen(cameraIdx, cam->renderX, cam->renderY, cam->width, cam->height);
+        int xOff = 0;
+        int yOff = 0;
+        if (GM_EARTHQUAKE)
+        {
+            xOff = static_cast<int>(VB6RNG::generateNumber() * GM_EARTHQUAKE * 4) - GM_EARTHQUAKE * 2;
+            yOff = static_cast<int>(VB6RNG::generateNumber() * GM_EARTHQUAKE * 4) - GM_EARTHQUAKE * 2;
+        }
+
+        g_GLEngine.RenderCameraToScreen(cameraIdx, cam->renderX + xOff, cam->renderY + yOff, cam->width, cam->height);
 
         return TRUE;
     }
