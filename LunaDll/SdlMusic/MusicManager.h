@@ -68,7 +68,7 @@ public:
     
     static void loadCustomSounds(std::string episodePath, std::string levelCustomPath="");
     static void resetSoundsToDefault();
-    static void loadSounds(std::string path, std::string root);
+    static void loadSounds(std::string path, std::string root, bool is_first_run);
     static void loadMusics(std::string path, std::string root);
     static std::string SndRoot();
 
@@ -92,10 +92,15 @@ private:
     static std::string musAliasesList[75];//List of reserved aliases for sound effects
 
     //SFX
-    static ChunkEntry sounds[91];
-    static std::string defaultChunksList[91];//List of system default files
-    static std::string chunksAliasesList[91];//List of reserved aliases for sound effects
-    static int chunksChannelsList[91];//List of channel reservation by some files (-1 is allowing mixed playback)
+    static int max_soundeffect_count; // Size of sound effect array
+    static const int defaultSoundCount = 91; // Total number of sound effects in smbx 1.3
+    static ChunkEntry *sounds;
+    static std::string defaultChunksList[defaultSoundCount];//List of system default files
+    static std::string chunksAliasesList[defaultSoundCount];//List of reserved aliases for sound effects
+    static int chunksChannelsList[defaultSoundCount];//List of channel reservation by some files (-1 is allowing mixed playback)
+    
+    static void resizeSoundArrays(int new_max_sound_id); // Change size of sound ids
+    static void initArraysSound();//Populate sound array based on default values
 
     static void initArrays();//Fill chinks and musics list with system default files
     
