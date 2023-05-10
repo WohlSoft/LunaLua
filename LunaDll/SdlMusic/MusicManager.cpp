@@ -365,7 +365,7 @@ void MusicManager::loadSounds(std::string path, std::string root, bool is_first_
 
     curRoot = root;
 
-    //ONLY if this is the first time loading sound effects (loading from basegame music ini),
+    //ONLY if this is the first time loading sound effects (loading from basegame sounds ini),
     //Handle changing max sound count
     if (is_first_run)
     {
@@ -568,7 +568,7 @@ void MusicManager::resizeSoundArrays(int new_max_sound_id) {
     bool any_change = false;
     if (new_max_sound_id != max_soundeffect_count)
     {
-        //Free old level music array and create a new one
+        //Free old sound effect array and create a new one
         if (sounds != NULL)
         {
             delete[] sounds;
@@ -578,7 +578,7 @@ void MusicManager::resizeSoundArrays(int new_max_sound_id) {
     }
     if (any_change)
     {
-        //Force re-populate music if the size of either array changed
+        //Force re-populate sound effects if the size of either array changed
         initArraysSound();
     }
 }
