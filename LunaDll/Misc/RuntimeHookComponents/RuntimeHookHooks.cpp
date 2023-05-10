@@ -1396,6 +1396,20 @@ extern short __stdcall WorldHUDIsOnCameraHook(unsigned int* camIndex, Momentum* 
     return native_isOnWCamera(camIndex, momentumObj);
 }
 
+LRESULT CALLBACK KeyHOOKProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    unsigned int virtKey = wParam;
+
+    if (virtKey < 256)
+    {
+        if (virtKey == VK_CAPITAL)
+        {
+            gKeyState[virtKey] |= GetKeyState(VK_CAPITAL) & 0x1;
+        }
+    }
+    
+    return CallNextHookEx(KeyHookWnd, nCode, wParam, lParam);
+}
 
 extern void __stdcall GenerateScreenshotHook()
 {
