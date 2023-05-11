@@ -774,31 +774,9 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(bool) LunaLuaIsRecordingGIF()
     {
-        if (g_GLEngine.GifRecorderIsRunning())
-        {
-            return (bool)true;
-        } else {
-            return (bool)false;
-        }
+        return g_GLEngine.GifRecorderIsRunning();
     }
-
-    FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
-    {
-        // Toggling fullscreen without maximizing the window/double clicking the window.
-        if (gMainWindowHwnd != NULL)
-        {
-            WINDOWPLACEMENT wndpl;
-            wndpl.length = sizeof(WINDOWPLACEMENT);
-            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
-            {
-                if ((wndpl.showCmd == SW_MAXIMIZE) && !enable)
-                    ShowWindow(gMainWindowHwnd, SW_RESTORE);
-                else if (enable)
-                    ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
-            }
-        }
-    }
-
+    
     FFI_EXPORT(bool) LunaLuaIsFullscreen()
     {
         if (gMainWindowHwnd != NULL)
@@ -813,6 +791,19 @@ typedef struct ExtendedBlockFields_\
                     return (bool)false;
                 }
             }
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
+    {
+        // Toggling fullscreen without maximizing the window/double clicking the window.
+        if (LunaLuaIsFullscreen() && !enable)
+        {
+            ShowWindow(gMainWindowHwnd, SW_RESTORE);
+        }
+        else if (!LunaLuaIsFullscreen() && enable)
+        {
+            ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
         }
     }
 }
