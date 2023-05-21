@@ -785,11 +785,7 @@ typedef struct ExtendedBlockFields_\
             wndpl.length = sizeof(WINDOWPLACEMENT);
             if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
             {
-                if (wndpl.showCmd == SW_MAXIMIZE) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return (wndpl.showCmd == SW_MAXIMIZE)
             }
         }
     }
