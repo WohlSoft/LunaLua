@@ -26,6 +26,9 @@
 #include "LuaProxyFFIGraphics.h"
 #include "LunaPathValidator.h"
 
+#include "../Rendering/GL/GLEngine.h"
+#include "../Rendering/GL/GLEngineProxy.h"
+
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
 // Prototypes from RuntimeHookCharacterId.cpp
@@ -767,6 +770,37 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(float) LunaLuaLegacyRNGGenerateNumber() {
         return VB6RNG::generateNumber();
+    }
+
+    FFI_EXPORT(bool) LunaLuaIsRecordingGIF()
+    {
+        return g_GLEngine.GifRecorderIsRunning();
+    }
+    
+    FFI_EXPORT(bool) LunaLuaIsFullscreen()
+    {
+        if (gMainWindowHwnd != NULL)
+        {
+            WINDOWPLACEMENT wndpl;
+            wndpl.length = sizeof(WINDOWPLACEMENT);
+            if (GetWindowPlacement(gMainWindowHwnd, &wndpl))
+            {
+                return (wndpl.showCmd == SW_MAXIMIZE);
+            }
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
+    {
+        // Toggling fullscreen without maximizing the window/double clicking the window.
+        if (LunaLuaIsFullscreen() && !enable)
+        {
+            ShowWindow(gMainWindowHwnd, SW_RESTORE);
+        }
+        else if (!LunaLuaIsFullscreen() && enable)
+        {
+            ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+        }
     }
 }
 
