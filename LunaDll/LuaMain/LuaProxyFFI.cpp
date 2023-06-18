@@ -788,6 +788,7 @@ typedef struct ExtendedBlockFields_\
                 return (wndpl.showCmd == SW_MAXIMIZE);
             }
         }
+        return false;
     }
 
     FFI_EXPORT(void) LunaLuaSetFullscreen(bool enable)
