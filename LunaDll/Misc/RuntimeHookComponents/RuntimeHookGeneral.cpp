@@ -716,8 +716,9 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 {
                     gotFirstSize = true;
                     currentDpi = gWindowSizeHandler.SetInitialWindowSize();
-                    return 0;
                 }
+                // Use default window procedure for WM_SHOWWINDOW
+                return DefWindowProcW(hwnd, uMsg, wParam, lParam);
             }
             case WM_SIZE:
             {
