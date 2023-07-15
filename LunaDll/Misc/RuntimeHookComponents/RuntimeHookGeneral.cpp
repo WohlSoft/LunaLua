@@ -1995,6 +1995,11 @@ void TrySkipPatch()
     // Hook for onPlayerKill
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hooks for lava-related calls to onPlayerKill
+    PATCH(0x9A394D).JMP(0x9A3A36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9A5010).JMP(runtimeHookPlayerKillLavaSolidExit).Apply();
+    PATCH(0x9A20F1).CALL(runtimeHookPlayerKillLava).Apply();
+
     // Hooks for onWarpEnter/onWarp
     PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();
     

@@ -830,3 +830,14 @@ extern "C" {
         return LunaPathValidator::GetForThread().CheckPath(path);
     }
 }
+
+extern "C" {
+    FFI_EXPORT(void) LunaLuaSetWeakLava(bool value)
+    {
+        gLavaIsWeak = value;
+    }
+    FFI_EXPORT(bool) LunaLuaGetWeakLava()
+    {
+        return gLavaIsWeak;
+    }
+}
