@@ -23,7 +23,7 @@ Quick Overview
 
 Requirements to build LunaLua yourself
 ------
-Visual Studio 2015 (msvc140 compiler) or Clang
+Visual Studio 2015 (msvc140 compiler) or Clang 14
 
 Building LunaLua on Linux
 ------
