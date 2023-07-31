@@ -103,6 +103,7 @@ extern bool            gRenderBackgroundFlag;
 
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
+extern bool            gDisableNPCRespawnBugFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
@@ -111,6 +112,8 @@ extern StartupSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///
 extern int		gFrames;
+
+extern bool		gCamerasInitialised;
 
 extern int		gLastDownPress;
 extern int		gDownTapped;
