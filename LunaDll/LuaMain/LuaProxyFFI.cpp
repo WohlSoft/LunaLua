@@ -776,7 +776,7 @@ typedef struct ExtendedBlockFields_\
     {
         return g_GLEngine.GifRecorderIsRunning();
     }
-    
+
     FFI_EXPORT(bool) LunaLuaIsFullscreen()
     {
         if (gMainWindowHwnd != NULL)
@@ -801,6 +801,19 @@ typedef struct ExtendedBlockFields_\
         else if (!LunaLuaIsFullscreen() && enable)
         {
             ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetRightClickPasteSetting(bool enable)
+    {
+        // This will let the user alternatively paste content via right clicking, similar to using the command prompt. Useful for repl
+        if (!enable)
+        {
+            rightClickPasteEnabled = false;
+        }
+        else if (enable)
+        {
+            rightClickPasteEnabled = true;
         }
     }
 }

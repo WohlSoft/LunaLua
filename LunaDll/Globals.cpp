@@ -72,6 +72,8 @@ bool gEscPressedRegistered = false;
 
 bool gIsTestModePauseActive;
 
+bool rightClickPasteEnabled = false;
+
 // Global obj
 
 AutocodeManager gAutoMan;

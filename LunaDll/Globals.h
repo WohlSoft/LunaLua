@@ -152,6 +152,9 @@ extern bool     gEscPressedRegistered;
 // Test mode pause note
 extern bool     gIsTestModePauseActive;
 
+//Right click pasting
+extern bool     rightClickPasteEnabled;
+
 // Level init
 extern LvlEnum	gLevelEnum;
 

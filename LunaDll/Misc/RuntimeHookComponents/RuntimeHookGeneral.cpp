@@ -929,6 +929,11 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_RBUTTONDBLCLK:
                 gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
                 gMouseHandler.OnMouseButtonEvent(MouseHandler::BUTTON_R, MouseHandler::EVT_DBL);
+                
+                if(rightClickPasteEnabled) {
+                    ProcessPasteKeystroke();
+                }
+                
                 break;
             case WM_MBUTTONDOWN:
                 gMouseHandler.OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
