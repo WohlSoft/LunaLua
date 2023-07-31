@@ -66,6 +66,7 @@ public:
     inline void TriggerScreenshot() { mInternalGLEngine.TriggerScreenshot(); }
     inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& func) { mInternalGLEngine.TriggerScreenshot(func); }
     inline bool GifRecorderToggle() { return mInternalGLEngine.GifRecorderToggle(); }
+    inline bool GifRecorderIsRunning() { return mInternalGLEngine.GifRecorderIsRunning(); }
 
     // Stuff that run at the main thread:
     // Functions which run on the main thread, but needs to access GL resources

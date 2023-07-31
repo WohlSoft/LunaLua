@@ -4243,3 +4243,71 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId) {
     SMBX_BGO::GetRaw(bgoId)->momentum.speedX = Layer::Get(layerId)->xSpeed;
     SMBX_BGO::GetRaw(bgoId)->momentum.speedY = Layer::Get(layerId)->ySpeed;
 }
+
+void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
+{
+    if (gLavaIsWeak)
+    {
+        native_harmPlayer(playerIdxPtr);
+    }
+    else
+    {
+        native_killPlayer(playerIdxPtr);
+    }
+}
+
+static bool __stdcall runtimeHookPlayerKillLavaSolidExitImpl(int hitSpot, int blockIdx, short* playerIdxPtr)
+{
+    auto& player = *Player::Get(*playerIdxPtr);
+    auto& block = *Block::GetRaw(blockIdx);
+    if (!gLavaIsWeak)
+    {
+        if ((!((player.MountType == 1) && (player.MountColor == 2))) &&
+            ((block.BlockType > Block::MAX_ID) || (blockdef_floorslope[block.BlockType] == 0))
+            )
+        {
+            // Conditions are met for the check that makes lava 'generous'
+            if ((player.momentum.y + player.momentum.height) < (block.momentum.y + 6))
+            {
+                return false;
+            }
+        }
+        native_killPlayer(playerIdxPtr);
+        return false;
+    }
+    else
+    {
+        // For weak lava, avoid top touches (hitSpot == 1) counting unless either:
+        //   1) the entire bottom of the player is over the block
+        //   or
+        //   2) the entire top of the block is under the player
+        if ((hitSpot != 1) ||
+            (
+                (player.momentum.x > block.momentum.x)
+                ==
+                ((player.momentum.x + player.momentum.width) < (block.momentum.x + block.momentum.width))
+            ))
+        {
+            native_harmPlayer(playerIdxPtr);
+        }
+        return true; // Treat weak lava as solid
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr)
+{
+    __asm {
+        movsx esi, word ptr ss : [ebp - 0x120]
+        push esi // Block index
+        movsx esi, word ptr ss : [ebp - 0x54]
+        push esi // HitSpot
+        call runtimeHookPlayerKillLavaSolidExitImpl
+        cmp al, 0 // Check if return value is false
+        je runtimeHookPlayerKillLavaSolidExit_IsFalse
+        push 0x9A3BDD // Return address for a execution path that makes it so the lava is treated as solid
+        ret
+    runtimeHookPlayerKillLavaSolidExit_IsFalse:
+        push 0x9A5015 // Normal return address, treats lava that would harm as passthrough
+        ret
+    }
+}

@@ -104,6 +104,9 @@ extern bool            gRenderBackgroundFlag;
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
 
+// Other gameplay settings
+extern bool            gLavaIsWeak;
+
 extern StartupSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

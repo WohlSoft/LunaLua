@@ -31,6 +31,9 @@ bool gRenderBackgroundFlag = true;
 // Settings for glitch fixes
 bool gDisablePlayerFilterBounceFix = false;
 
+// Other gameplay settings
+bool gLavaIsWeak = false;
+
 // Global variables
 int	gFrames;
 
