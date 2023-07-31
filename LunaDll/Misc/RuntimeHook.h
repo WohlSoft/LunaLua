@@ -593,4 +593,7 @@ void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player);
 bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);
 void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
+void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
+
 #endif

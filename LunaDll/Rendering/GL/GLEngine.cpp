@@ -306,6 +306,11 @@ bool GLEngine::GifRecorderToggle()
 
 }
 
+bool GLEngine::GifRecorderIsRunning()
+{
+    return mGifRecorder.isRunning();
+}
+
 void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
     // Skip every second frame

@@ -42,6 +42,7 @@ public:
     inline void TriggerScreenshot() { mScreenshot = true; mScreenshotCallback = nullptr;  }
     inline void TriggerScreenshot(const SCREENSHOT_CALLBACK& screenshotCallback) { mScreenshot = true; mScreenshotCallback = screenshotCallback; }
     bool GifRecorderToggle();
+    bool GifRecorderIsRunning();
 
     bool GenerateScreenshot(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
     void GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t h);

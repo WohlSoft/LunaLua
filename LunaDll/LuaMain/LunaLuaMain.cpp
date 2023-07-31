@@ -121,6 +121,7 @@ bool CLunaLua::shutdown()
     gRenderSizableFlag = true;
     gRenderBackgroundFlag = true;
     gDisablePlayerFilterBounceFix = false;
+    gLavaIsWeak = false;
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
