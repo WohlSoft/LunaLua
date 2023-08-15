@@ -552,12 +552,24 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
-    // Update key state
+    // Generate previous key state and repeat flags
     bool keyWasDown = (gKeyState[vkey] & 0x80) != 0;
     bool repeated = keyDown && keyWasDown;
 
     // Update key state
-    gKeyState[vkey] = keyDown ? 0x80 : 0x00;
+    uint8_t u8NewState = keyDown ? 0x80 : 0x00;
+    if ((vkey == VK_CAPITAL) || (vkey == VK_NUMLOCK) || (vkey == VK_SCROLL))
+    {
+        // Special case to keep track of toggle state
+        // Note: Theoretically we should be able to use gKeyState[vkey] instead of
+        //       GetKeyState(vkey) as long as we initilize the toggle state when first running
+        //       however let's just use GetKeyState(vkey) to avoid needing to do that and maybe
+        //       avoid a risk of getting out of sync (though I don't think it'd be possible)
+        u8NewState |= (GetKeyState(vkey) & 1);
+        // Compensate for how this runs before the GetKeyState state is updated
+        u8NewState ^= (keyDown && !repeated) ? 0x01 : 0x00;
+    }
+    gKeyState[vkey] = u8NewState;
 
     // For key states that should or together left and right, handle that
     switch (vkey)
