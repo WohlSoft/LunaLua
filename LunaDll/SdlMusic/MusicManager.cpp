@@ -590,8 +590,15 @@ void MusicManager::initArraysSound()
     {
         sounds[i].id=i+1;
         sounds[i].setPath(PGE_SDL_Manager::appPath+defaultChunksList[i]);
-        sounds[i].channel=chunksChannelsList[i];
-        break;
+        if(i <= 91)
+        {
+            sounds[i].channel=chunksChannelsList[i];
+        }
+        else if(i > 91)
+        {
+            int channelID = -1;
+            sounds[i].channel=channelID;
+        }
     }
 }
 
