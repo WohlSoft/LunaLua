@@ -1485,6 +1485,11 @@ void CLunaLua::triggerOnStart()
     }
 
     if (!m_onStartRan) {
+        // manually flag all players to have onSectionChange called following onStart
+        for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+            gLunaLua.queuePlayerSectionChangeEvent(i);
+        }
+        // execute onStart event
         std::shared_ptr<Event> onStartEvent = std::make_shared<Event>("onStart", false);
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
@@ -1553,4 +1558,19 @@ void CLunaLua::setWarning(const std::string& str)
     {
         m_warningList.push_back(str);
     }
+}
+
+
+void CLunaLua::queuePlayerSectionChangeEvent(int playerIdx) {
+    // queue up an onSectionChange event to be called for this player at the end of the current event
+    // if we aren't currently accepting additional events being queued (currently in the process of executing them), exit
+    if (m_disableSectionChangeEvent) return;
+    // check if the specified player is already queued for the event to be executed
+    for (int i = 0; i < m_playerSectionChangeList.size(); i++) {
+        // if we found a match in the list, exit
+        if (m_playerSectionChangeList[i] == playerIdx) return;
+    }
+    // push the player index and set flag to execute event
+    m_playerSectionChangeList.push_back(playerIdx);
+    m_executeSectionChangeFlag = true;
 }

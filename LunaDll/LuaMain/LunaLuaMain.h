@@ -90,6 +90,10 @@ public:
 
     LuaLunaType getType() const { return m_type; }
 
+    // Used for queueing up players to run the onSectionChange event
+    void queuePlayerSectionChangeEvent(int playerIdx);
+
+
     template<typename... Args>
     bool callLuaFunction(Args... args){
         if (!isValid())
@@ -144,6 +148,25 @@ public:
             }
 
             callLuaFunction(L, "__callEvent", e, args...);
+
+            // If a player changed sections,
+            if (m_executeSectionChangeFlag)
+            {
+                // execute onSectionChange
+                m_executeSectionChangeFlag = false;
+                // disable writing to playerSectionChangeList while iterating over to execute events 
+                m_disableSectionChangeEvent = true;
+                for (int i = 0; i < m_playerSectionChangeList.size(); i++) {
+                    int playerIdx = m_playerSectionChangeList[i]; // player who changed sections
+                    std::shared_ptr<Event> sectionChangeEvent = std::make_shared<Event>("onSectionChange", false);
+                    sectionChangeEvent->setDirectEventName("onSectionChange");
+                    sectionChangeEvent->setLoopable(false);
+                    gLunaLua.callEvent(sectionChangeEvent, (int)(Player::Get(playerIdx)->CurrentSection), playerIdx);
+                }
+                // allow future sectionChange events
+                m_disableSectionChangeEvent = false;
+                m_playerSectionChangeList.clear();
+            }
         }
     }
 
@@ -169,6 +192,11 @@ private:
     lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
     bool m_onStartRan;
+
+    bool m_disableSectionChangeEvent; // set to true while calling queued onSectionChange events - prevents it from trying to call again mid-loop
+    bool m_executeSectionChangeFlag; // whether to execute section change at the end of the next event called
+    std::vector<int> m_playerSectionChangeList; // list of player indexes who changed sections
+
 };
 
 namespace CachedReadFile {
