@@ -390,6 +390,10 @@ extern "C" {
         free(cpy);
     }
 
+    FFI_EXPORT(void) LunaLuaQueuePlayerSectionChangedEvent(short playerIndex)
+    {
+        gLunaLua.queuePlayerSectionChangeEvent(playerIndex);
+    }
 
     FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(int playerNum)
     {
