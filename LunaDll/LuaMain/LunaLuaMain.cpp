@@ -1021,7 +1021,8 @@ void CLunaLua::bindAll()
             .property("canSlide",     &LuaProxy::PlayerSettingsCharacterProperties::getCanSlide    , &LuaProxy::PlayerSettingsCharacterProperties::setCanSlide    )
             .property("canRideYoshi", &LuaProxy::PlayerSettingsCharacterProperties::getCanRideYoshi, &LuaProxy::PlayerSettingsCharacterProperties::setCanRideYoshi)
             .property("canRideBoot",  &LuaProxy::PlayerSettingsCharacterProperties::getCanRideBoot , &LuaProxy::PlayerSettingsCharacterProperties::setCanRideBoot )
-            .property("canSpinJump",  &LuaProxy::PlayerSettingsCharacterProperties::getCanSpinJump , &LuaProxy::PlayerSettingsCharacterProperties::setCanSpinJump ),
+            .property("canSpinJump",  &LuaProxy::PlayerSettingsCharacterProperties::getCanSpinJump , &LuaProxy::PlayerSettingsCharacterProperties::setCanSpinJump )
+            .property("deathEffect",  &LuaProxy::PlayerSettingsCharacterProperties::getDeathEffect , &LuaProxy::PlayerSettingsCharacterProperties::setDeathEffect ),
             
             LUAHELPER_DEF_CLASS(PlayerSettings)
             .scope[

@@ -42,24 +42,19 @@ static BOOL __stdcall OwSpriteBitBltHook(
     HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop
     );
 
-static void __stdcall PlayerDeathAnimationHook(
-    PlayerMOB* player,
-    short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask
-    );
 
 static int __stdcall EffectUpdateHook(short* effectId);
 
 // Data structures
 struct CharacterDataStruct {
 public:
-    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect)
+    CharacterDataStruct(short id, const std::string& name, short base, short filterBlock, short switchBlock)
     {
         mId = id;
         mName = name;
         mBaseCharacter = base;
         mFilterBlock = filterBlock;
         mSwitchBlock = switchBlock;
-        mDeathEffect = deathEffect;
         memset(&mStoredTemplate, 0, sizeof(PlayerMOB));
         mStoredTemplate.Identity = (Characters)id;
         mStoredTemplate.CurrentPowerup = 1;
@@ -90,7 +85,6 @@ public:
     short mBaseCharacter;
     short mFilterBlock;
     short mSwitchBlock;
-    short mDeathEffect;
     PlayerMOB mStoredTemplate;
 };
 
@@ -1411,22 +1405,8 @@ static auto patch_player_bitblt_0x906B31 = PATCH(0x906B31).CALL(OwPlayerBitBltRa
 static auto patch_owsprite_bitblt_0x902BA4 = PATCH(0x902BA4).CALL(OwSpriteBitBltHook);
 static auto patch_owsprite_bitblt_0x902C86 = PATCH(0x902C86).CALL(OwSpriteBitBltHook);
 
-// Patch player death animations
-__declspec(naked) static void __stdcall PlayerDeathAnimationRawHook(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask) {
-    __asm {
-        pop eax
-        push edi // Attach player argument
-        push eax
-        jmp PlayerDeathAnimationHook
-    }
-}
-static auto patch_player_death_effect_0x9B6C9B = PATCH(0x9B6C9B).CALL(PlayerDeathAnimationRawHook);
-static auto patch_player_death_effect_0x9B6CE6 = PATCH(0x9B6CE6).CALL(PlayerDeathAnimationRawHook);
-static auto patch_player_death_effect_0x9B6D31 = PATCH(0x9B6D31).CALL(PlayerDeathAnimationRawHook);
-static auto patch_player_death_effect_0x9B6D7C = PATCH(0x9B6D7C).CALL(PlayerDeathAnimationRawHook);
-static auto patch_player_death_effect_0x9B6DDA = PATCH(0x9B6DDA).CALL(PlayerDeathAnimationRawHook);
 
-__declspec(naked) static void __stdcall EffectUpdateRawHook() {
+/*__declspec(naked) static void __stdcall EffectUpdateRawHook() {
     // 009E4C2B | 66 8B 0E | mov cx, word ptr ds : [esi] |
     // 009E4C2E | DF E0 | fnstsw ax |
     __asm {
@@ -1443,9 +1423,9 @@ __declspec(naked) static void __stdcall EffectUpdateRawHook() {
         ret
     }
 }
-static auto patch_variant_effect_0x9E4C2B = PATCH(0x9E4C2B).CALL(EffectUpdateRawHook);
+static auto patch_variant_effect_0x9E4C2B = PATCH(0x9E4C2B).CALL(EffectUpdateRawHook);*/
 
-__declspec(naked) static void __stdcall RunEffectRawHook() {
+/*__declspec(naked) static void __stdcall RunEffectRawHook() {
     // 009E73C9 | 33 C0 | xor eax, eax |
     // 009E73CB | 66 8B 3B | mov di, word ptr ds : [ebx] |
     __asm {
@@ -1462,7 +1442,7 @@ __declspec(naked) static void __stdcall RunEffectRawHook() {
         ret
     }
 }
-static auto patch_variant_effect_0x9E73C9 = PATCH(0x9E73C9).CALL(RunEffectRawHook);
+static auto patch_variant_effect_0x9E73C9 = PATCH(0x9E73C9).CALL(RunEffectRawHook);*/
 
 // Patch list
 static Patchable* runtimeHookCharacterIdPatchList[] = {
@@ -1810,11 +1790,11 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9B6222,
     &patch_0x9B68C9,
     &patch_0x9B6C34,
-    &patch_player_death_effect_0x9B6C9B,
-    &patch_player_death_effect_0x9B6CE6,
-    &patch_player_death_effect_0x9B6D31,
-    &patch_player_death_effect_0x9B6D7C,
-    &patch_player_death_effect_0x9B6DDA,
+    //&patch_player_death_effect_0x9B6C9B,
+    //&patch_player_death_effect_0x9B6CE6,
+    //&patch_player_death_effect_0x9B6D31,
+    //&patch_player_death_effect_0x9B6D7C,
+    //&patch_player_death_effect_0x9B6DDA,
     &patch_0x9B6F12,
     &patch_0x9B6FD4,
     &patch_0x9B71D3,
@@ -2040,8 +2020,8 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 //    &patch_0x9E1BD6,
 //    &patch_0x9E1BF9,
     &patch_animate_hook_0x9E1CA9,
-    &patch_variant_effect_0x9E4C2B,
-    &patch_variant_effect_0x9E73C9,
+    //&patch_variant_effect_0x9E4C2B,
+    //&patch_variant_effect_0x9E73C9,
     &patch_0xA02866,
     &patch_0xA02899,
 //    &patch_0xA028F1,
@@ -2395,33 +2375,7 @@ static BOOL __stdcall OwSpriteBitBltHook(
         hdcSrc, nXSrc, nYSrc, dwRop);
 }
 
-static void __stdcall PlayerDeathAnimationHook(
-    PlayerMOB* player,
-    short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask
-    )
-{
-    short newEffectId;
-    short characterId = player->Identity;
-
-    if (!(characterId >= 1 && characterId <= 5))
-    {
-        auto it = runtimeHookCharacterIdMap.find(characterId);
-        if (it != runtimeHookCharacterIdMap.end())
-        {
-            // If we have a custom character with this character ID...
-            newEffectId = it->second->mDeathEffect;
-            if (newEffectId > 0)
-            {
-                native_runEffect(&newEffectId, coor, effectFrame, npcID, showOnlyMask);
-                return;
-            }
-        }
-    }
-
-    native_runEffect(effectID, coor, effectFrame, npcID, showOnlyMask);
-}
-
-static int __stdcall EffectUpdateHook(short* effectId)
+/*static int __stdcall EffectUpdateHook(short* effectId)
 {
     for (auto it = runtimeHookCharacterIdMap.cbegin(); it != runtimeHookCharacterIdMap.cend(); it++) {
         if (it->second->mDeathEffect == 0) continue;
@@ -2433,7 +2387,7 @@ static int __stdcall EffectUpdateHook(short* effectId)
     }
     
     return *effectId;
-}
+}*/
 
 /////////////////////
 // Management code //
@@ -2459,7 +2413,7 @@ void runtimeHookCharacterIdUnpplyPatch(void)
     runtimeHookCharacterIdApplied = false;
 }
 
-void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect)
+void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock)
 {
     // Load Sprites
     if (name.size() > 0)
@@ -2476,33 +2430,13 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
         ImageLoader::RegisterExtraGfx("player", "player-" + std::to_string(id));
     }
 
-    // Set death effect size based on death effect image
-    if (deathEffect > 0) {
-        std::shared_ptr<LunaImage> deathImage = ImageLoader::GetByName("effect-" + std::to_string(deathEffect));
-        if (deathImage)
-        {
-            int w, h;
-            w = deathImage->getW();
-            h = deathImage->getH();
-
-            // If the base character is 5, there are left/right frames
-            if (base == 5)
-            {
-                h /= 2;
-            }
-
-            effectdef_width[deathEffect - 1] = w;
-            effectdef_height[deathEffect - 1] = h;
-        }
-    }
-
     // Switch blocks are generally bumpable
     if (switchBlock) Blocks::SetBlockBumpable(switchBlock, true);
 
     // Initialize extended character data
     extraCharacterDataRegister(id, base);
 
-    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock, deathEffect);
+    runtimeHookCharacterIdMap[id] = std::make_unique<CharacterDataStruct>(id, name, base, filterBlock, switchBlock);
     // Note: No longer applied on-demand. Always have these patches in place for consistency
     // runtimeHookCharacterIdApplyPatch();
 }

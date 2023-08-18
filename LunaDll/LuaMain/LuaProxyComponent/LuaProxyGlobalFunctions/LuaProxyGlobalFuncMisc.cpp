@@ -8,6 +8,7 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
+#include "../CharacterData.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -292,7 +293,8 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
         return;
     }
 
-    runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock, deathEffect);
+    runtimeHookCharacterIdRegister(id, name, base, filterBlock, switchBlock);
+    ExtraCharacterData::deathEffectSet(id, deathEffect);
 }
 
 std::string LuaProxy::Misc::showRichDialog(const std::string& title, const std::string& rtfText, bool isReadOnly)

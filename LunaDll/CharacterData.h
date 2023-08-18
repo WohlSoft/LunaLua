@@ -17,10 +17,11 @@ CharacterHitBoxData* characterDataGetHitboxes(short characterId, short powerupId
     TYPE GET(short id); \
     void SET(short id, TYPE value);
 namespace ExtraCharacterData {
-    _CHARACTERDATA_DEFINE(bool, false, mCanSlide,     canSlideGet,     canSlideSet    );
-    _CHARACTERDATA_DEFINE(bool, false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
-    _CHARACTERDATA_DEFINE(bool, false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
-    _CHARACTERDATA_DEFINE(bool, false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
+    _CHARACTERDATA_DEFINE(bool , false, mCanSlide,     canSlideGet,     canSlideSet    );
+    _CHARACTERDATA_DEFINE(bool , false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
+    _CHARACTERDATA_DEFINE(bool , false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
+    _CHARACTERDATA_DEFINE(bool , false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
+    _CHARACTERDATA_DEFINE(short, 3    , mDeathEffect,  deathEffectGet,  deathEffectSet );
 }
 #undef _CHARACTERDATA_DEFINE
 

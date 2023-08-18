@@ -15,6 +15,23 @@ public:
         mCanRideYoshi = mCanSlide;
         mCanRideBoot  = (base != CHARACTER_LINK);
         mCanSpinJump  = (base != CHARACTER_PEACH && base != CHARACTER_LINK);
+        switch (base) {
+        case CHARACTER_MARIO:
+            mDeathEffect = 3;
+            break;
+        case CHARACTER_LUIGI:
+            mDeathEffect = 5;
+            break;
+        case CHARACTER_PEACH:
+            mDeathEffect = 129;
+            break;
+        case CHARACTER_TOAD:
+            mDeathEffect = 130;
+            break;
+        case CHARACTER_LINK:
+            mDeathEffect = 134;
+            break;
+        }
 
         memset(mHitbox, 0, PowerupState::MAX_ID * sizeof(CharacterHitBoxData));
     }
@@ -30,6 +47,7 @@ public:
     bool mCanRideYoshi;
     bool mCanRideBoot;
     bool mCanSpinJump;
+    short mDeathEffect;
 
 };
 
@@ -79,9 +97,10 @@ CharacterHitBoxData* characterDataGetHitboxes(short characterId, short powerupId
         if (it != extraCharacteDataMap.end()) { it->second->PROPERTY = value; } \
     }
 namespace ExtraCharacterData {
-    _CHARACTERDATA_DEFINE(bool, false, mCanSlide,     canSlideGet,     canSlideSet    );
-    _CHARACTERDATA_DEFINE(bool, false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
-    _CHARACTERDATA_DEFINE(bool, false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
-    _CHARACTERDATA_DEFINE(bool, false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
+    _CHARACTERDATA_DEFINE(bool , false, mCanSlide,     canSlideGet,     canSlideSet    );
+    _CHARACTERDATA_DEFINE(bool , false, mCanRideYoshi, canRideYoshiGet, canRideYoshiSet);
+    _CHARACTERDATA_DEFINE(bool , false, mCanRideBoot,  canRideBootGet,  canRideBootSet );
+    _CHARACTERDATA_DEFINE(bool , false, mCanSpinJump,  canSpinJumpGet,  canSpinJumpSet );
+    _CHARACTERDATA_DEFINE(short, 3    , mDeathEffect,  deathEffectGet,  deathEffectSet );
 }
 #undef _CHARACTERDATA_DEFINE

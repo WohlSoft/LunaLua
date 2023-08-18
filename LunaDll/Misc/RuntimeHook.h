@@ -307,7 +307,7 @@ static inline constexpr void* GetRenderBelowPriorityHookWithSkip(void) {
 
 // Extended Character Id Support
 void runtimeHookCharacterIdApplyPatch();
-void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlock, short deathEffect);
+void runtimeHookCharacterIdRegister(short id, const std::string& name, short base, short filterBlock, short switchBlockt);
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 CharacterHitBoxData* runtimeHookGetCharacterHitBoxData(short characterId, short powerupId);
