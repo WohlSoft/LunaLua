@@ -156,7 +156,7 @@ public:
                 m_executeSectionChangeFlag = false;
                 // disable writing to playerSectionChangeList while iterating over to execute events 
                 m_disableSectionChangeEvent = true;
-                for (int i = 0; i < m_playerSectionChangeList.size(); i++) {
+                for (size_t i = 0; i < m_playerSectionChangeList.size(); i++) {
                     int playerIdx = m_playerSectionChangeList[i]; // player who changed sections
                     std::shared_ptr<Event> sectionChangeEvent = std::make_shared<Event>("onSectionChange", false);
                     sectionChangeEvent->setDirectEventName("onSectionChange");

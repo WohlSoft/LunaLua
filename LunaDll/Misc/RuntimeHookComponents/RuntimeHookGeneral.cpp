@@ -901,9 +901,10 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);
-
+                
                 // Process the raw input
-                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), haveFocus);
+                bool mainWindowFocus = haveFocus && gMainWindowFocused;
+                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), mainWindowFocus);
 
                 // If we have focus, return via DefWindowProcW
                 if (haveFocus)

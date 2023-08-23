@@ -76,6 +76,10 @@ GLFramebuffer::GLFramebuffer(int w, int h, bool haveAlpha) :
 GLFramebuffer::~GLFramebuffer()
 {
     // Unbind framebuffer (if currently bound)
+    if (g_GLContextManager.GetCurrentCameraFB() == this)
+    {
+        g_GLContextManager.RedirectCameraFB(nullptr);
+    }
     if (g_GLContextManager.GetCurrentFB() == this)
     {
         g_GLContextManager.BindScreen();
