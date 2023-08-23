@@ -297,6 +297,12 @@ void LuaProxy::Misc::registerCharacterId(const luabind::object& namedArgs, lua_S
 
 std::string LuaProxy::Misc::showRichDialog(const std::string& title, const std::string& rtfText, bool isReadOnly)
 {
+    // Avoid pending keyboard events impacting this
+    MSG msg;
+    while (PeekMessageA(&msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE | PM_NOYIELD | PM_QS_INPUT) != 0)
+    {
+    }
+
     RichTextDialog dialog(title, rtfText, isReadOnly);
     dialog.show();
     return dialog.getRtfText();

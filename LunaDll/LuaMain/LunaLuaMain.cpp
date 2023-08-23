@@ -1566,7 +1566,7 @@ void CLunaLua::queuePlayerSectionChangeEvent(int playerIdx) {
     // if we aren't currently accepting additional events being queued (currently in the process of executing them), exit
     if (m_disableSectionChangeEvent) return;
     // check if the specified player is already queued for the event to be executed
-    for (int i = 0; i < m_playerSectionChangeList.size(); i++) {
+    for (size_t i = 0; i < m_playerSectionChangeList.size(); i++) {
         // if we found a match in the list, exit
         if (m_playerSectionChangeList[i] == playerIdx) return;
     }
