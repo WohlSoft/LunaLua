@@ -221,4 +221,15 @@ public:
     virtual bool shouldBeSynchronous(void) const { return true; }
 };
 
+class GLEngineCmd_RedirectCameraFB : public GLEngineCmd {
+public:
+    std::shared_ptr<CaptureBuffer> mBuff;
+    GLEngineCmd_RedirectCameraFB() :
+        mBuff(), GLEngineCmd()
+    {}
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return (!mBuff) || (!mBuff->mNonskippable); }
+    virtual bool isFrameSkippable(void) const { return (!mBuff) || (!mBuff->mNonskippable); }
+};
+
 #endif

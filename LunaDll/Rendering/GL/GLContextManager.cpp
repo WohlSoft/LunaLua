@@ -189,6 +189,30 @@ void GLContextManager::SetActiveCamera(int cameraIdx)
     }
 }
 
+void GLContextManager::RedirectCameraFB(GLFramebuffer* target)
+{
+    // Make note of if the currently set camera FB was already bound
+    bool isCameraBufferBound = (mCurrentCameraFB == mCurrentFB);
+
+    // If the target is null, set it back to default
+    if ((target == nullptr) && (mCurrentCameraIdx >= 0) && (mCurrentCameraIdx <= MAX_CAMERAS))
+    {
+        target = mCameraFramebuffers[mCurrentCameraIdx];
+    }
+
+    if (mCurrentCameraFB != target)
+    {
+        // Set camera FB
+        mCurrentCameraFB = target;
+
+        // If the camera buffer was bound, bind the newly set buffer
+        if (isCameraBufferBound)
+        {
+            BindCameraFB();
+        }
+    }
+}
+
 void GLContextManager::RestoreBoundFB(GLFramebuffer* fb)
 {
     if (fb)
