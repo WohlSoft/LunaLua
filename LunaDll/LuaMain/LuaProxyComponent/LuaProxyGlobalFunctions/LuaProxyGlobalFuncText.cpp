@@ -5,8 +5,20 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Rendering/RenderOps/RenderStringOp.h"
 
+// Function to clear pending keyboard events before creating a dialog box
+// This is to prevent a pending keyboard event from affecting the message box
+static void clearKeyboardEvents()
+{
+    MSG msg;
+    while (PeekMessageA(&msg, NULL, WM_KEYFIRST, WM_KEYLAST, PM_REMOVE | PM_NOYIELD | PM_QS_INPUT) != 0)
+    {
+    }
+}
+
 void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 {
+    clearKeyboardEvents();
+
     int resultCode = MessageBoxA(0, debugText.c_str(), "Debug", MB_OKCANCEL);
     if (resultCode == IDCANCEL)
         luaL_error(L, "Pressed cancel on windowDebug!");
@@ -14,6 +26,8 @@ void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 
 void LuaProxy::Text::windowDebugSimple(const std::string& debugText)
 {
+    clearKeyboardEvents();
+
     MessageBoxA(0, debugText.c_str(), "Debug", MB_OK);
 }
 
