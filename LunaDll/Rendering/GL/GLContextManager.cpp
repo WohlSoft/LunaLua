@@ -16,6 +16,7 @@ GLContextManager::GLContextManager() :
     mMainFBWidth(800), mMainFBHeight(600),
     mOldPixelFormat(0), mCurrentFB(nullptr), mPrimaryFB(nullptr),
     mCurrentCameraFB(nullptr), mCurrentCameraIdx(0), mCameraFramebuffers(),
+    mActiveRedirects(),
     mConstants()
 {
 }
@@ -182,6 +183,7 @@ void GLContextManager::SetActiveCamera(int cameraIdx)
     {
         mCurrentCameraIdx = cameraIdx;
         mCurrentCameraFB = mCameraFramebuffers[cameraIdx];
+        mActiveRedirects.clear();
         if (isCameraBufferBound)
         {
             BindCameraFB();
@@ -189,12 +191,14 @@ void GLContextManager::SetActiveCamera(int cameraIdx)
     }
 }
 
-void GLContextManager::RedirectCameraFB(GLFramebuffer* target)
+void GLContextManager::RedirectCameraFB(const GLEngineCmd_RedirectCameraFB* cmd)
 {
+    GLFramebuffer* target = cmd->getFB();
+
     // Make note of if the currently set camera FB was already bound
     bool isCameraBufferBound = (mCurrentCameraFB == mCurrentFB);
 
-    // If the target is null, set it back to default
+    // If the target is null, treat that as setting back to the default
     if ((target == nullptr) && (mCurrentCameraIdx >= 0) && (mCurrentCameraIdx <= MAX_CAMERAS))
     {
         target = mCameraFramebuffers[mCurrentCameraIdx];
@@ -210,6 +214,51 @@ void GLContextManager::RedirectCameraFB(GLFramebuffer* target)
         {
             BindCameraFB();
         }
+    }
+
+    // Append to the stack of active redirects
+    // Note: We use pointers to the original redirect command both as a 'handle' for the redirect
+    //       that we can compare, as well as storing a reference to a framebuffer we might need to
+    //       switch back if the redirects become nested.
+    mActiveRedirects.push_back(cmd);
+}
+
+void GLContextManager::UnRedirectCameraFB(const GLEngineCmd_RedirectCameraFB* startCmd)
+{
+    if ((mActiveRedirects.size() > 0) && (mActiveRedirects.back() == startCmd))
+    {
+        // For the case that we're undoing the redirect that is active
+        mActiveRedirects.pop_back();
+
+        // Make note of if the currently set camera FB was already bound
+        bool isCameraBufferBound = (mCurrentCameraFB == mCurrentFB);
+
+        if (mActiveRedirects.size() > 0)
+        {
+            // If there was some other redirect active, switch back to that
+            mCurrentCameraFB = mActiveRedirects.back()->getFB();
+        }
+        else if ((mCurrentCameraIdx >= 0) && (mCurrentCameraIdx <= MAX_CAMERAS))
+        {
+            // Otherwise, switch back to the normal camera buffer
+            mCurrentCameraFB = mCameraFramebuffers[mCurrentCameraIdx];
+        }
+        else
+        {
+            // If the camera index is invalid?
+            mCurrentCameraFB = nullptr;
+        }
+
+        // If the camera buffer was bound, bind the newly set buffer
+        if (isCameraBufferBound)
+        {
+            BindCameraFB();
+        }
+    }
+    else
+    {
+        // We're ending some other redirect that wasn't active... meaning just remove it from the list
+        mActiveRedirects.erase(std::remove(mActiveRedirects.begin(), mActiveRedirects.end(), startCmd), mActiveRedirects.end());
     }
 }
 
