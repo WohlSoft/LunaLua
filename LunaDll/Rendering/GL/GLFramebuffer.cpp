@@ -78,7 +78,8 @@ GLFramebuffer::~GLFramebuffer()
     // Unbind framebuffer (if currently bound)
     if (g_GLContextManager.GetCurrentCameraFB() == this)
     {
-        g_GLContextManager.RedirectCameraFB(nullptr);
+        // If this the current camera FB, make sure it's not set as a redirect
+        g_GLContextManager.UnRedirectCameraFB(nullptr);
     }
     if (g_GLContextManager.GetCurrentFB() == this)
     {
