@@ -193,6 +193,13 @@ void GLContextManager::SetActiveCamera(int cameraIdx)
 
 void GLContextManager::RedirectCameraFB(const GLEngineCmd_RedirectCameraFB* cmd)
 {
+    if (cmd == nullptr)
+    {
+        // If cmd is nullptr, interpret this as removing the current redirect
+        UnRedirectCameraFB(nullptr);
+        return;
+    }
+
     GLFramebuffer* target = cmd->getFB();
 
     // Make note of if the currently set camera FB was already bound
@@ -225,7 +232,18 @@ void GLContextManager::RedirectCameraFB(const GLEngineCmd_RedirectCameraFB* cmd)
 
 void GLContextManager::UnRedirectCameraFB(const GLEngineCmd_RedirectCameraFB* startCmd)
 {
-    if ((mActiveRedirects.size() > 0) && (mActiveRedirects.back() == startCmd))
+    if (startCmd == nullptr)
+    {
+        // If startCmd is nullptr, interpret this as removing the current redirect
+        if (mActiveRedirects.empty())
+        {
+            // Abort if there's no redirect
+            return;
+        }
+        startCmd = mActiveRedirects.back();
+    }
+
+    if ((!mActiveRedirects.empty()) && (mActiveRedirects.back() == startCmd))
     {
         // For the case that we're undoing the redirect that is active
         mActiveRedirects.pop_back();
@@ -411,10 +429,16 @@ void GLContextManager::ReleaseFramebuffer() {
     mPrimaryFB = nullptr;
     for (int i = 1; i <= MAX_CAMERAS; i++)
     {
-        if (mCameraFramebuffers[i]) delete mCameraFramebuffers[i];
-        mCameraFramebuffers[i] = nullptr;
+        if (mCameraFramebuffers[i])
+        {
+            if (mCameraFramebuffers[i] == mCurrentCameraFB)
+            {
+                mCurrentCameraFB = nullptr;
+            }
+            delete mCameraFramebuffers[i];
+            mCameraFramebuffers[i] = nullptr;
+        }
     }
-    mCurrentCameraFB = nullptr;
 }
 
 void GLContextManager::ReleaseContext() {
