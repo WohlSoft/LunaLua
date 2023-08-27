@@ -55,6 +55,10 @@ public:
     // Copy whole state (thread safe)
     inline State getStateThreadSafe() { std::lock_guard<std::mutex> lock(mMutex); return mState; }
 
+    // Window size setting for FFI
+    void SetNewWindowScale(double scale);
+    void GetDPIScaledWindowSize(int& w, int& h);
+
     // Functions to set window (thread safe)
     void SetWindowSize(int w, int h);
     void Recalculate();

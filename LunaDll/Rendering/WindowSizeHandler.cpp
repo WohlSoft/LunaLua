@@ -253,3 +253,65 @@ int WindowSizeHandler::SetInitialWindowSize()
 
     return dpi;
 }
+
+void WindowSizeHandler::SetNewWindowScale(double scale)
+{
+    // Get current window/client area
+    RECT windowRect;
+    RECT clientRect;
+
+    GetWindowRect(gMainWindowHwnd, &windowRect);
+    GetClientRect(gMainWindowHwnd, &clientRect);
+
+    // Find the new scale to use, given the provided scale argument and the DPI scale
+    double dpiScale = static_cast<double>(GetDpi_impl()) / 96.0;
+
+    clientRect.left = 0;
+    clientRect.top = 0;
+    clientRect.right = static_cast<LONG>(::round(g_GLContextManager.GetMainFBWidth() * scale * dpiScale));
+    clientRect.bottom = static_cast<LONG>(::round(g_GLContextManager.GetMainFBHeight() * scale * dpiScale));
+
+    AdjustWindowRectEx(&clientRect, GetWindowLong(gMainWindowHwnd, GWL_STYLE),
+        GetMenu(gMainWindowHwnd) != 0, GetWindowLong(gMainWindowHwnd, GWL_EXSTYLE));
+
+    // Find new position for the window
+    int newW = (clientRect.right - clientRect.left);
+    int newH = (clientRect.bottom - clientRect.top);
+    int newX = (windowRect.left + windowRect.right - newW) / 2;
+    int newY = (windowRect.top + windowRect.bottom - newH) / 2;
+
+    // Clamp it based on monitor size
+    MONITORINFO monitorInfo;
+    monitorInfo.cbSize = sizeof(monitorInfo);
+    GetMonitorInfo(MonitorFromWindow(gMainWindowHwnd, MONITOR_DEFAULTTONEAREST), &monitorInfo);
+    RECT& workRect = monitorInfo.rcWork;
+
+    if (newX < workRect.left)
+    {
+        newX = workRect.left;
+    }
+    else if ((newX + newW) > workRect.right)
+    {
+        newX = workRect.right - newW;
+    }
+
+    if (newY < workRect.top)
+    {
+        newY = workRect.top;
+    }
+    else if ((newY + newH) > workRect.bottom)
+    {
+        newY = workRect.bottom - newH;
+    }
+
+    SetWindowPos(gMainWindowHwnd, nullptr, newX, newY, newW, newH, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
+}
+
+void WindowSizeHandler::GetDPIScaledWindowSize(int& w, int& h)
+{
+    // Take the window's current size, scaling down using the DPI scale
+    double dpiScale = static_cast<double>(GetDpi_impl()) / 96.0;
+
+    w = static_cast<int>(::round(mState.windowSize.x / dpiScale));
+    h = static_cast<int>(::round(mState.windowSize.y / dpiScale));
+}

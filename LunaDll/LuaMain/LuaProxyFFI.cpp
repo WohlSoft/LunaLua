@@ -12,6 +12,7 @@
 #include "../Rendering/LunaImage.h"
 #include "../Rendering/FrameCapture.h"
 #include "../Rendering/GL/GLTextureStore.h"
+#include "../Rendering/WindowSizeHandler.h"
 #include "../SMBXInternal/NPCs.h"
 #include "../SMBXInternal/Blocks.h"
 #include "../SMBXInternal/Layer.h"
@@ -806,6 +807,29 @@ typedef struct ExtendedBlockFields_\
         {
             ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetWindowScale(double scale)
+    {
+        if (LunaLuaIsFullscreen()) return;
+        
+        gWindowSizeHandler.SetNewWindowScale(scale);
+        gWindowSizeHandler.Recalculate();
+    }
+
+    struct WindowSize
+    {
+        int w;
+        int h;
+    };
+    FFI_EXPORT(WindowSize) LunaLuaGetWindowSize()
+    {
+        int w;
+        int h;
+
+        gWindowSizeHandler.GetDPIScaledWindowSize(w, h);
+
+        return {w, h};
     }
 }
 
