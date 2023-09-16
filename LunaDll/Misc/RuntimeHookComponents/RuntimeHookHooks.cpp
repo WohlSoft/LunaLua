@@ -47,6 +47,10 @@ void CheckIPCQuitRequest();
 extern HHOOK HookWnd;
 extern HHOOK KeyHookWnd;
 
+// compared against between onWarpEnter and onWarp hooks -
+// used to detect player changing sections
+int warpHookRefSection;
+
 // Simple init hook to run the main LunaDLL initialization
 void __stdcall ThunRTMainHook(void* arg1)
 {
@@ -3869,6 +3873,9 @@ static int __stdcall runtimeHookWarpEnterInternal(short* playerIdx, int warpIdx)
             // Cancel warp
             return 0;
         }
+
+        // Store section to detect if player has changed sections in onWarp
+        warpHookRefSection = Player::Get(*playerIdx)->CurrentSection;
     }
 
     // Continue warp
@@ -3914,6 +3921,12 @@ __declspec(naked) void __stdcall runtimeHookWarpEnter(void)
 void __stdcall runtimeHookWarpInstantInternal(short* playerIdx, int warpIdx)
 {
     if (gLunaLua.isValid()) {
+        // Detect if player changed sections
+        if (warpHookRefSection != Player::Get(*playerIdx)->CurrentSection) {
+            // Queue onSectionChange event to execute
+            gLunaLua.queuePlayerSectionChangeEvent(*playerIdx);
+        }
+
         std::shared_ptr<Event> warpEvent = std::make_shared<Event>("onWarp", false);
         warpEvent->setDirectEventName("onWarp");
         warpEvent->setLoopable(false);
@@ -3945,6 +3958,12 @@ void __stdcall runtimeHookWarpPipeDoorInternal(short* playerIdx)
 {
     // (Shared by both pipe and door hooks)
     if (gLunaLua.isValid()) {
+        // Detect if player changed sections
+        if (warpHookRefSection != Player::Get(*playerIdx)->CurrentSection) {
+            // Queue onSectionChange event to execute
+            gLunaLua.queuePlayerSectionChangeEvent(*playerIdx);
+        }
+
         std::shared_ptr<Event> warpEvent = std::make_shared<Event>("onWarp", false);
         warpEvent->setDirectEventName("onWarp");
         warpEvent->setLoopable(false);

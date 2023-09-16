@@ -6,6 +6,8 @@
 #include "GLTextureStore.h"
 #include "GLFramebuffer.h"
 
+class GLEngineCmd_RedirectCameraFB;
+
 class GLContextManager {
 public:
     struct GLConstants
@@ -107,6 +109,8 @@ public:
     void BindScreen();
     void BindPrimaryFB();
     void BindCameraFB();
+    void RedirectCameraFB(const GLEngineCmd_RedirectCameraFB* cmd);
+    void UnRedirectCameraFB(const GLEngineCmd_RedirectCameraFB* startCmd);
     inline const GLDraw::Texture& GetPrimaryFBTex()
     {
         static const GLDraw::Texture nullTex(0, 0, 0);
@@ -135,6 +139,7 @@ public:
         return mCameraFramebuffers[cameraIdx]->AsTexture();
     }
     inline GLFramebuffer* GetCurrentFB() { return mCurrentFB; }
+    inline GLFramebuffer* GetCurrentCameraFB() { return mCurrentCameraFB; }
     inline void SetCurrentFB(GLFramebuffer* fb) { mCurrentFB = fb; }
     void EnsureMainThreadCTXApplied();
     inline const GLConstants& Constants() { return mConstants; }
@@ -164,6 +169,7 @@ private:
     GLFramebuffer* mCurrentCameraFB;
     int            mCurrentCameraIdx;
     GLFramebuffer* mCameraFramebuffers[MAX_CAMERAS+1];
+    std::vector<const GLEngineCmd_RedirectCameraFB*> mActiveRedirects;
 
     // Constants list
     GLConstants mConstants;
