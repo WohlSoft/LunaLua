@@ -850,6 +850,7 @@ static void read_layout_branches(nlohmann::json &typetree,
 
             // list-type properties don't currently support a default value. it always defaults to an empty table. maybe changed in the future
 			append_type_entry(typetree, path_arr, "list", name);
+        }
         else
         {
             dst[name] = "<unknown entry type>";
