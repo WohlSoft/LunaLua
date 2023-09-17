@@ -843,6 +843,13 @@ static void read_layout_branches(nlohmann::json &typetree,
                 dst[name] = "<invalid value format>";
             }
         }
+		else if (SDL_strncasecmp(control.c_str(), "listGroup", 9) == 0)
+		{
+			if (entry.find("children") == entry.end())
+				continue; // invalid entry: missing required key
+
+            // list-type properties don't currently support a default value. it always defaults to an empty table. maybe changed in the future
+			append_type_entry(typetree, path_arr, "list", name);
         else
         {
             dst[name] = "<unknown entry type>";
