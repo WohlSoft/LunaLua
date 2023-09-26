@@ -173,6 +173,62 @@ double LuaProxy::Audio::MusicGetLoopLength()
     return Mix_GetMusicLoopLengthTime(PGE_MusPlayer::currentMusic());
 }
 
+
+
+void LuaProxy::Audio::MusicRewind()
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::MUS_rewindMusic();
+#endif
+}
+
+double LuaProxy::Audio::MusicGetTracks()
+{
+    return (double)Mix_GetMusicTracks(PGE_MusPlayer::currentMusic());
+}
+
+void LuaProxy::Audio::MusicMuteTrackLayer(int trackNumber)
+{
+    Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 1);
+}
+
+void LuaProxy::Audio::MusicUnmuteTrackLayer(int trackNumber)
+{
+    Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 0);
+}
+
+void LuaProxy::Audio::MusicSetTempo(double tempo)
+{
+    Mix_SetMusicTempo(PGE_MusPlayer::currentMusic(), tempo);
+}
+
+void LuaProxy::Audio::MusicSetPitch(double pitch)
+{
+    Mix_SetMusicPitch(PGE_MusPlayer::currentMusic(), pitch);
+}
+
+void LuaProxy::Audio::MusicSetSpeed(double speed)
+{
+    Mix_SetMusicSpeed(PGE_MusPlayer::currentMusic(), speed);
+}
+
+double LuaProxy::Audio::MusicGetTempo()
+{
+    return Mix_GetMusicTempo(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetPitch()
+{
+    return Mix_GetMusicPitch(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetSpeed()
+{
+    return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
+}
+
+
+
 void LuaProxy::Audio::seizeStream(int section)
 {
     MusicManager::setSeized(section, true);

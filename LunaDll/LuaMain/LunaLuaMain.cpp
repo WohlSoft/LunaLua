@@ -872,6 +872,17 @@ void CLunaLua::bindAll()
                 def("MusicChange", (void(*)(int, int, int))&LuaProxy::Audio::changeMusic),
                 def("MusicChange", (void(*)(int, const std::string&, int))&LuaProxy::Audio::changeMusic),
                 def("MusicFadeOut", (void(*)(int, int))&LuaProxy::Audio::musicFadeOut),
+                
+                def("MusicReset", (void(*)())&LuaProxy::Audio::MusicRewind),
+                def("MusicTrackGet", (double(*)())&LuaProxy::Audio::MusicGetTracks),
+                def("MusicTrackMute", (void(*)(int))&LuaProxy::Audio::MusicMuteTrackLayer),
+                def("MusicTrackUnmute", (void(*)(int))&LuaProxy::Audio::MusicUnmuteTrackLayer),
+                def("MusicSetTempo", (void(*)(double))&LuaProxy::Audio::MusicSetTempo),
+                def("MusicSetPitch", (void(*)(double))&LuaProxy::Audio::MusicSetPitch),
+                def("MusicSetSpeed", (void(*)(double))&LuaProxy::Audio::MusicSetSpeed),
+                def("MusicGetTempo", (double(*)())&LuaProxy::Audio::MusicGetTempo),
+                def("MusicGetPitch", (double(*)())&LuaProxy::Audio::MusicGetPitch),
+                def("MusicGetSpeed", (double(*)())&LuaProxy::Audio::MusicGetSpeed),
 
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
