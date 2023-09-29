@@ -4373,3 +4373,39 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformRandomVeggie()
     }
 }
 
+void __stdcall runtimeHookNPCTransformSprout_internal(short* pNpcIdx)
+{
+    // replicate the basegame code that this hook overwrites
+    native_setNPCFrame(pNpcIdx);
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, (int)*pNpcIdx, 91);
+    }
+}
+const static int _transformSprouteJmpDestination = 0x9CCB46;
+_declspec(naked) void __stdcall runtimeHookNPCTransformSprout()
+{
+    __asm {
+        pushfd
+        push eax
+        push ebx
+        push ecx
+        push edx
+        push esi
+        push ecx // pointer to npc index
+        call runtimeHookNPCTransformSprout_internal
+        pop esi
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+        popfd
+
+        jmp _transformSprouteJmpDestination
+    }
+}
+

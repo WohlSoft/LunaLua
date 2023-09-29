@@ -363,6 +363,7 @@ void __stdcall runtimeHookPOW();
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx);
 
 void __stdcall runtimeHookNPCTransformRandomVeggie(void);
+void __stdcall runtimeHookNPCTransformSprout(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);

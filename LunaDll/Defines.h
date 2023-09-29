@@ -669,6 +669,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg3 = int* Unk
 #define GF_INIT_NPC         0x00A03630
 
+//      Arg1 = int* Index of NPC
+#define GF_NPC_FRAME        0x00A3C990
+
 //      Arg1 = int* Index of NPC in NPC list
 #define GF_UPDATE_NPC       0x00A3B680
 
@@ -930,6 +933,7 @@ static const auto native_initNPC = (int(__stdcall *)(short* npcId, float* dir, v
 
 static const auto native_drawBackground = (void(__stdcall *)(short* section, short* camera))GF_DRAW_BACKGROUND;
 
+static const auto native_setNPCFrame = (void(__stdcall*)(short* npcidx))GF_NPC_FRAME;
 /*
 Function name
                                            Segment Start    Length   Locals   Arguments
