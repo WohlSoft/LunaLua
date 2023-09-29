@@ -4330,3 +4330,46 @@ _declspec(naked) void __stdcall runtimeHookPlayerKillLavaSolidExit(short* player
         ret
     }
 }
+
+void __stdcall runtimeHookNPCTransformRandomVeggie_internal(NPCMOB* npc)
+{
+    // update size and position of the transformed NPC, to match basegame code overwritten by this patch
+    npc->momentum.x = npc->momentum.x + npc->momentum.width / 2.0;
+    npc->momentum.y = npc->momentum.y + npc->momentum.height / 2.0;
+    npc->momentum.width = npc_width[npc->id];
+    npc->momentum.height = npc_height[npc->id];
+    npc->momentum.x = npc->momentum.x - npc->momentum.width / 2.0;
+    npc->momentum.y = npc->momentum.y - npc->momentum.height / 2.0;
+
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc-GM_NPCS_PTR)-128), 147);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformRandomVeggie()
+{
+    __asm {
+        // call function to handle transformation
+        pushfd
+        push eax
+        push ebx
+        push ecx
+        push edx
+        push esi
+        push esi // pointer to the npc struct
+        call runtimeHookNPCTransformRandomVeggie_internal
+        pop esi
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+        popfd
+        // jump to end position
+        push 0xA0AE01
+        ret
+    }
+}
+
