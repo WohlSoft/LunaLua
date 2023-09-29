@@ -1763,6 +1763,8 @@ void TrySkipPatch()
     PATCH(0xA0ACBC).JMP(&runtimeHookNPCTransformRandomVeggie).NOP().NOP().Apply(); // When the randomized veggie spawns
     PATCH(0x9CCB40).JMP(&runtimeHookNPCTransformSprout).NOP_PAD_TO_SIZE<6>().Apply(); // When pulling a sprout from the ground
     PATCH(0xA45556).JMP(&runtimeHookNPCTransformRandomBonus).NOP_PAD_TO_SIZE<9>().Apply(); // Random powerup NPC
+    PATCH(0xA6133A).JMP(&runtimeHookNPCTransformMushToHeart).NOP_PAD_TO_SIZE<10>().Apply(); // Link mushrooms to hearts
+    PATCH(0xA6101C).JMP(&runtimeHookNPCTransformCoinToRupee).NOP_PAD_TO_SIZE<10>().Apply(); // Link coins to rupees
 
     // Hooks for onNPCHarm support
     PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform

@@ -4449,4 +4449,95 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformRandomBonus()
         jmp _transformRandomBonusJmpDestination
     }
 }
+
+
+
+void __stdcall runtimeHookNPCTransformMushToHeart_internal(int npcIdx)
+{
+    npcIdx -= 129;
+    NPCMOB* npc = NPC::Get(npcIdx);
+    // store previous ID to pass to event
+    int oldID = npc->id;
+    // replicate the basegame code that this hook overwrites
+    npc->animationFrame = 0;
+    npc->id = 250;
+    npc->momentum.speedX = 0;
+    npc->momentum.y += npc->momentum.height - npc_height[250] - 1;
+    npc->momentum.x += npc->momentum.width / 2 - npc_width[250] / 2;
+    npc->momentum.width = npc_width[250];
+    npc->momentum.height = npc_height[250];
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, npcIdx+1, oldID);
+    }
+}
+const static int _transformMushToHeartJmpDestination = 0xA615F5;
+_declspec(naked) void __stdcall runtimeHookNPCTransformMushToHeart()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC IDX
+        call runtimeHookNPCTransformMushToHeart_internal
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        jmp _transformMushToHeartJmpDestination
+    }
+}
+
+
+
+void __stdcall runtimeHookNPCTransformCoinToRupee_internal(int npcIdx)
+{
+    npcIdx -= 129;
+    NPCMOB* npc = NPC::Get(npcIdx);
+    // store previous ID to pass to event
+    int oldID = npc->id;
+    // replicate the basegame code that this hook overwrites
+    if (npc->id == 258) {
+        npc->id = 252;
+    } else {
+        npc->id = 251;
+    }
+    npc->momentum.y += npc->momentum.height - npc_height[npc->id];
+    npc->momentum.x += npc->momentum.width / 2 - npc_width[npc->id] / 2;
+    npc->momentum.width = npc_width[npc->id];
+    npc->momentum.height = npc_height[npc->id];
+    npc->animationFrame = 0;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, npcIdx + 1, oldID);
+    }
+}
+const static int _transformCoinToRupeeJmpDestination = 0xA61335;
+_declspec(naked) void __stdcall runtimeHookNPCTransformCoinToRupee()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC IDX
+        call runtimeHookNPCTransformCoinToRupee_internal
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        jmp _transformCoinToRupeeJmpDestination
+    }
+}
 //////////////////////////////////////////////////////// onNPCTransform end
