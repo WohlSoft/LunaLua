@@ -4580,4 +4580,37 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin()
         jmp _transformSnifitBulletToSMB2CoinJmpDestination
     }
 }
+
+
+
+void __stdcall runtimeHookNPCTransformHeldYoshiToEgg_internal(NPCMOB* npc)
+{
+    // store previous ID to pass to event
+    int oldID = npc->id;
+    // replicate the basegame code that this hook overwrites
+    npc->ai1 = npc->id;
+    npc->id = 96;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), oldID);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformHeldYoshiToEgg()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformHeldYoshiToEgg_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
 //////////////////////////////////////////////////////// onNPCTransform end
