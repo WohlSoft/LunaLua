@@ -4331,6 +4331,8 @@ _declspec(naked) void __stdcall runtimeHookPlayerKillLavaSolidExit(short* player
     }
 }
 
+//////////////////////////////////////////////////////// onNPCTransform
+
 void __stdcall runtimeHookNPCTransformRandomVeggie_internal(NPCMOB* npc)
 {
     // update size and position of the transformed NPC, to match basegame code overwritten by this patch
@@ -4409,3 +4411,42 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSprout()
     }
 }
 
+
+
+void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, int newType)
+{
+    // replicate the basegame code that this hook overwrites
+    npc->id = newType;
+
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 287);
+    }
+}
+const static int _transformRandomBonusJmpDestination = 0xA4555F;
+_declspec(naked) void __stdcall runtimeHookNPCTransformRandomBonus()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push edx
+        push esi
+        push eax // new NPC type
+        push esi // address of the NPC in memory
+        call runtimeHookNPCTransformRandomBonus_internal
+        pop esi
+        pop edx
+        pop ecx
+        pop ebx
+        popfd
+
+        lea ecx, dword ptr ss:[ebp-0x1EC] // instruction overwritten by this code
+        jmp _transformRandomBonusJmpDestination
+    }
+}
+//////////////////////////////////////////////////////// onNPCTransform end
