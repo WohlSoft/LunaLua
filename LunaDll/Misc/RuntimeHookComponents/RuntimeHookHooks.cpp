@@ -4540,4 +4540,44 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformCoinToRupee()
         jmp _transformCoinToRupeeJmpDestination
     }
 }
+
+
+
+void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal(NPCMOB* npc)
+{
+    // replicate the basegame code that this hook overwrites
+    npc->momentum.x += npc->momentum.width / 2;
+    npc->momentum.y += npc->momentum.height / 2;
+    npc->id = 138;
+    npc->momentum.width = npc_width[138];
+    npc->momentum.height = npc_height[138];
+    npc->momentum.x -= npc->momentum.width / 2;
+    npc->momentum.y -= npc->momentum.height / 2;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 133);
+    }
+}
+const static int _transformSnifitBulletToSMB2CoinJmpDestination = 0xA0B875;
+_declspec(naked) void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        jmp _transformSnifitBulletToSMB2CoinJmpDestination
+    }
+}
 //////////////////////////////////////////////////////// onNPCTransform end

@@ -1765,6 +1765,7 @@ void TrySkipPatch()
     PATCH(0xA45556).JMP(&runtimeHookNPCTransformRandomBonus).NOP_PAD_TO_SIZE<9>().Apply(); // Random powerup NPC
     PATCH(0xA6133A).JMP(&runtimeHookNPCTransformMushToHeart).NOP_PAD_TO_SIZE<10>().Apply(); // Link mushrooms to hearts
     PATCH(0xA6101C).JMP(&runtimeHookNPCTransformCoinToRupee).NOP_PAD_TO_SIZE<10>().Apply(); // Link coins to rupees
+    PATCH(0xA0B719).JMP(&runtimeHookNPCTransformSnifitBulletToSMB2Coin).NOP_PAD_TO_SIZE<6>().Apply(); // Snifit bulllet to coin when held
 
     // Hooks for onNPCHarm support
     PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
