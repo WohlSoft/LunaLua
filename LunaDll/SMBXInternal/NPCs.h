@@ -495,10 +495,11 @@ struct NPCMOB {
     short collidesWithNPC;                  //+0x136
     short containedWithin;                  //+0x138
     short unknown_13A;                      //+0x13A
-    short unknown_13C;                      //+0x13C
-    short unknown_13E;                      //+0x13E
-    short unknown_140;                      //+0x140
-    short unknown_142;                      //+0x142
+    double effect2;                         //+0x13c-142
+    //short unknown_13C;                      //+0x13C
+    //short unknown_13E;                      //+0x13E
+    //short unknown_140;                      //+0x140
+    //short unknown_142;                      //+0x142
     short unknown_144;                      //+0x144
     short currentSection;                   //+0x146
     float hitCount;                         //+0x148

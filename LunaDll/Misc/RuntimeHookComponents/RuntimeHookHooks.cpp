@@ -4613,4 +4613,184 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformHeldYoshiToEgg()
         ret
     }
 }
+
+
+void __stdcall runtimeHookNPCTransformBubblePopped_internal(NPCMOB* npc)
+{
+    // replicate the basegame code that this hook overwrites
+    if (npc->id == 134) {
+        // if it's a bomb, set projectile flag
+        npc->collidesWithNPC = -1;
+    }
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 283);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformBubblePopped()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformBubblePopped_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
+
+
+void __stdcall runtimeHookNPCTransformSMWSpinyEgg_internal(NPCMOB* npc)
+{
+    // replicate the basegame code that this hook overwrites
+    npc->momentum.speedX = GM_NPC_WALKSPEED * npc->directionFaced;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 286);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformSMWSpinyEgg()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformSMWSpinyEgg_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
+
+
+
+void __stdcall runtimeHookNPCTransformLudwigShell_internal(NPCMOB* npc)
+{
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 280);
+    }
+}
+const static int _transformLudwigShellJmpDestination = 0xA5211F;
+_declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformLudwigShell_internal
+        pop esi
+        pop ecx
+        pop ebx
+
+        jmp _transformLudwigShellJmpDestination
+    }
+}
+
+
+
+void __stdcall runtimeHookNPCTransformKoopalingUnshell_internal(NPCMOB* npc)
+{
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), npc->id+1);
+    }
+}
+const static int _transformKoopalingUnshellJmpDestination = 0xA52B74;
+_declspec(naked) void __stdcall runtimeHookNPCTransformKoopalingUnshell()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformKoopalingUnshell_internal
+        pop esi
+        pop ecx
+        pop ebx
+
+        jmp _transformKoopalingUnshellJmpDestination
+    }
+}
+
+
+void __stdcall runtimeHookNPCTransformPotionToDoor_internal(NPCMOB* npc)
+{
+    // replicate the basegame code that this hook overwrites
+    npc->effect2 = 16;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 288);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformPotionToDoor()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformPotionToDoor_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
+
+
+void __stdcall runtimeHookNPCTransformGaloombaUnflip_internal(NPCMOB* npc)
+{
+    // replicate the basegame code that this hook overwrites
+    npc->momentum.y -= 1;
+    // invoke transformation event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 166);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC ptr
+        call runtimeHookNPCTransformGaloombaUnflip_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
+
 //////////////////////////////////////////////////////// onNPCTransform end

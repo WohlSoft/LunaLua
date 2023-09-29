@@ -369,6 +369,12 @@ void __stdcall runtimeHookNPCTransformMushToHeart(void);
 void __stdcall runtimeHookNPCTransformCoinToRupee(void);
 void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin(void);
 void __stdcall runtimeHookNPCTransformHeldYoshiToEgg(void);
+void __stdcall runtimeHookNPCTransformBubblePopped(void);
+void __stdcall runtimeHookNPCTransformKoopalingUnshell(void);
+void __stdcall runtimeHookNPCTransformGaloombaUnflip(void);
+void __stdcall runtimeHookNPCTransformPotionToDoor(void);
+void __stdcall runtimeHookNPCTransformLudwigShell(void);
+void __stdcall runtimeHookNPCTransformSMWSpinyEgg(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);

@@ -412,6 +412,8 @@ DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
+DEFMEM(GM_NPC_WALKSPEED,    float, 0x00B2C86C);
+
 //Hitbox
 DEFMEM(GM_HITBOX_H_PTR,     short,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
 DEFMEM(GM_HITBOX_H_D_PTR,   short,0x00B2C742);      // player hitbox heights while ducking
