@@ -380,8 +380,9 @@ void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins(void);
 void __stdcall runtimeHookNPCTransformHeldSproutA(void);
 void __stdcall runtimeHookNPCTransformHeldSproutB(void);
 void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell(void);
-
+void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie(void);
 void __stdcall runtimeHookYoshiEatPossibleNPCTransform(void);
+void __stdcall runtimeHookYoshiEatExit(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
