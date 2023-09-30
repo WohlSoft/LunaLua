@@ -164,6 +164,19 @@ enum CollidersType : short {
     HARM_TYPE_EXT_HAMMER = -3,
 };
 
+// value passed to onNPCTransform
+enum NPCTransformationCause {
+    NPC_TFCAUSE_UNKNOWN = 0,
+    NPC_TFCAUSE_HIT = 1,
+    NPC_TFCAUSE_DESPAWN = 2,
+    NPC_TFCAUSE_CONTAINER = 3,
+    NPC_TFCAUSE_AI = 4,
+    NPC_TFCAUSE_EATEN = 5,
+    NPC_TFCAUSE_LINK = 6,
+    NPC_TFCAUSE_SWITCH = 7,
+};
+
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 
@@ -411,6 +424,8 @@ DEFMEM(GM_PSWITCH_COUNTER,  WORD,  0x00B2C62C);
 DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
+
+DEFMEM(GM_NPC_WALKSPEED,    float, 0x00B2C86C);
 
 //Hitbox
 DEFMEM(GM_HITBOX_H_PTR,     short,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
@@ -668,6 +683,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg2 = int* Unk flags
 //      Arg3 = int* Unk
 #define GF_INIT_NPC         0x00A03630
+
+//      Arg1 = int* Index of NPC
+#define GF_NPC_FRAME        0x00A3C990
 
 //      Arg1 = int* Index of NPC in NPC list
 #define GF_UPDATE_NPC       0x00A3B680
@@ -930,6 +948,7 @@ static const auto native_initNPC = (int(__stdcall *)(short* npcId, float* dir, v
 
 static const auto native_drawBackground = (void(__stdcall *)(short* section, short* camera))GF_DRAW_BACKGROUND;
 
+static const auto native_setNPCFrame = (void(__stdcall*)(short* npcidx))GF_NPC_FRAME;
 /*
 Function name
                                            Segment Start    Length   Locals   Arguments

@@ -362,8 +362,31 @@ void __stdcall runtimeHookPOW();
 
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx);
 
+void __stdcall runtimeHookNPCTransformRandomVeggie(void);
+void __stdcall runtimeHookNPCTransformSprout(void);
+void __stdcall runtimeHookNPCTransformRandomBonus(void);
+void __stdcall runtimeHookNPCTransformMushToHeart(void);
+void __stdcall runtimeHookNPCTransformCoinToRupee(void);
+void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin(void);
+void __stdcall runtimeHookNPCTransformHeldYoshiToEgg(void);
+void __stdcall runtimeHookNPCTransformBubblePopped(void);
+void __stdcall runtimeHookNPCTransformKoopalingUnshell(void);
+void __stdcall runtimeHookNPCTransformGaloombaUnflip(void);
+void __stdcall runtimeHookNPCTransformPotionToDoor(void);
+void __stdcall runtimeHookNPCTransformLudwigShell(void);
+void __stdcall runtimeHookNPCTransformSMWSpinyEgg(void);
+void __stdcall runtimeHookNPCTransformDespawned(void);
+void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins(void);
+void __stdcall runtimeHookNPCTransformHeldSproutA(void);
+void __stdcall runtimeHookNPCTransformHeldSproutB(void);
+void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell(void);
+void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie(void);
+void __stdcall runtimeHookYoshiEatPossibleNPCTransform(void);
+void __stdcall runtimeHookYoshiEatExit(void);
+
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
+void __stdcall runtimeHookCollideNpcEnd(void);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);
 void __stdcall runtimeHookNpcHarmRaw_a293ee(void);
