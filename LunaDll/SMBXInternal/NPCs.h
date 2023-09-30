@@ -420,7 +420,7 @@ struct NPCMOB {
     short collidesLeft;                     //+0x0C
     short collidesAbove;                    //+0x0E
     short collidesRight;                    //+0x10
-    short unknown_12;                       //+0x12
+    short crushPinched;                     //+0x12
     short unknown_14;                       //+0x14
     short unknown_16;                       //+0x16
     float unknown_18;                       //+0x18 NPC x-axis movement related, maybe temporary?
@@ -447,7 +447,7 @@ struct NPCMOB {
     short unknown_50;                       //+0x50
     short unknown_52;                       //+0x52
     short unknown_54;                       //+0x54
-    short unknown_56;                       //+0x56
+    short crushMovingPinched;               //+0x56
     short unknown_58;                       //+0x58
     short unknown_5A;                       //+0x5A
     short unknown_5C;                       //+0x5C
@@ -495,10 +495,11 @@ struct NPCMOB {
     short collidesWithNPC;                  //+0x136
     short containedWithin;                  //+0x138
     short unknown_13A;                      //+0x13A
-    short unknown_13C;                      //+0x13C
-    short unknown_13E;                      //+0x13E
-    short unknown_140;                      //+0x140
-    short unknown_142;                      //+0x142
+    double effect2;                         //+0x13c-142
+    //short unknown_13C;                      //+0x13C
+    //short unknown_13E;                      //+0x13E
+    //short unknown_140;                      //+0x140
+    //short unknown_142;                      //+0x142
     short unknown_144;                      //+0x144
     short currentSection;                   //+0x146
     float hitCount;                         //+0x148

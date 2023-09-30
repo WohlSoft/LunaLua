@@ -269,7 +269,7 @@ struct PlayerMOB {
     short Unknown6E;
     short Unknown70;                    // +0x70
     short Unknown72;
-    short Unknown74;
+    short YoshiTFrameCount;
     short Unknown76;
     short Unknown78;
     short MountAnimationFrame;
