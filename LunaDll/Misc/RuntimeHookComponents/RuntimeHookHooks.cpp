@@ -4778,6 +4778,7 @@ void __stdcall runtimeHookNPCTransformGaloombaUnflip_internal(NPCMOB* npc)
         gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 166);
     }
 }
+const static int _transformGaloombaUnflipJmpDestination = 0xA5C14E;
 _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
 {
     __asm {
@@ -4789,6 +4790,199 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
         pop esi
         pop ecx
         pop ebx
+        jmp _transformGaloombaUnflipJmpDestination
+    }
+}
+
+
+
+
+
+// this is kind of janky but the way it works is as follows:
+// at the start of the code that may transform the npc, we store the current id for the npc held by yoshi
+// at the end of the function, if that value was set, we check and execute the event if needed
+void __stdcall runtimeHookYoshiEatPossibleNPCTransform_internal(PlayerMOB* player)
+{
+    // this statement is overwritten by a call to this code
+    player->YoshiTFrameCount = 1;
+}
+_declspec(naked) void __stdcall runtimeHookYoshiEatPossibleNPCTransform()
+{
+    __asm {
+        push ebx
+        push ecx
+        push esi
+        push esi // player ptr
+        call runtimeHookYoshiEatPossibleNPCTransform_internal
+        pop esi
+        pop ecx
+        pop ebx
+        ret
+    }
+}
+
+
+
+
+void __stdcall runtimeHookNPCTransformDespawned_internal(NPCMOB* npc)
+{
+    npc->crushPinched = 0;
+    npc->crushMovingPinched = 0;
+    if (npc->id != npc->spawnID) {
+        // if the npc id changed during its life, change it back
+        int oldID = npc->id;
+        npc->id = npc->spawnID;
+        // and invoke lua event
+        if (gLunaLua.isValid()) {
+            // dispatch transform event
+            std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+            npcTransformEvent->setDirectEventName("onNPCTransform");
+            npcTransformEvent->setLoopable(false);
+            gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), oldID);
+        }
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformDespawned()
+{
+    __asm {
+        push ecx
+        push esi // npc ptr
+        call runtimeHookNPCTransformDespawned_internal
+        pop ebx
+        ret
+    }
+}
+
+
+
+
+void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins_internal(int npcIdx)
+{
+    npcIdx -= 129;
+    NPCMOB* npc = NPC::Get(npcIdx);
+    if (npc->id != npc->spawnID) {
+        int oldID = npc->id;
+        npc->id = npc->spawnID;
+        // and invoke lua event
+        if (gLunaLua.isValid()) {
+            // dispatch transform event
+            std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+            npcTransformEvent->setDirectEventName("onNPCTransform");
+            npcTransformEvent->setLoopable(false);
+            gLunaLua.callEvent(npcTransformEvent, npcIdx + 1, oldID);
+        }
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push edi
+        push edi // npc idx
+        call runtimeHookNPCTransformPSwitchResetRupeeCoins_internal
+        pop edi
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        ret
+    }
+}
+
+
+
+void __stdcall runtimeHookNPCTransformHeldSprout_internal(NPCMOB* npc)
+{
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, ((int)(npc - GM_NPCS_PTR) - 128), 91);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformHeldSproutA()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push edi
+        push esi // npc ptr
+        call runtimeHookNPCTransformHeldSprout_internal
+        pop edi
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        push 0xA0B6EC
+        ret
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformHeldSproutB()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push edi
+        push esi // npc ptr
+        call runtimeHookNPCTransformHeldSprout_internal
+        pop edi
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
+        ret
+    }
+}
+
+
+
+void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell_internal(int npcIdx)
+{
+    npcIdx -= 129;
+
+    // determine the old id from the current id
+    NPCMOB* npc = NPC::Get(npcIdx);
+    int oldID = npc->id + 4;
+    if (npc->id == 194) {
+        oldID = 116;
+    }
+
+    // and invoke lua event
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, npcIdx + 1, oldID);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell()
+{
+    __asm {
+        pushfd
+        push ebx
+        push ecx
+        push esi
+        push edi
+        push edi // npc idx
+        call runtimeHookNPCTransformSMWKoopaEnterShell_internal
+        pop edi
+        pop esi
+        pop ecx
+        pop ebx
+        popfd
+
         ret
     }
 }

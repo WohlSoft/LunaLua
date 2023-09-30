@@ -375,6 +375,13 @@ void __stdcall runtimeHookNPCTransformGaloombaUnflip(void);
 void __stdcall runtimeHookNPCTransformPotionToDoor(void);
 void __stdcall runtimeHookNPCTransformLudwigShell(void);
 void __stdcall runtimeHookNPCTransformSMWSpinyEgg(void);
+void __stdcall runtimeHookNPCTransformDespawned(void);
+void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins(void);
+void __stdcall runtimeHookNPCTransformHeldSproutA(void);
+void __stdcall runtimeHookNPCTransformHeldSproutB(void);
+void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell(void);
+
+void __stdcall runtimeHookYoshiEatPossibleNPCTransform(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
