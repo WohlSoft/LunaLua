@@ -1775,16 +1775,17 @@ void TrySkipPatch()
     PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<11>().Apply(); // Galoomba unflipped
     PATCH(0x9E3632).CALL(&runtimeHookNPCTransformPSwitchResetRupeeCoins).NOP_PAD_TO_SIZE<8>().Apply(); // When pressing a p switch, rupees transformed by link are turned back into coins
     PATCH(0xA19B1E).CALL(&runtimeHookNPCTransformSMWKoopaEnterShell).NOP_PAD_TO_SIZE<8>().Apply(); // SMW koopa entering shell, overwrites a bounds check
+    PATCH(0x9BE698).CALL(&runtimeHookNPCTransformYoshiEatRandomVeggie).NOP_PAD_TO_SIZE<7>().Apply(); // Incredibly niche code path for Yoshi eating a randomized veggie
     // patch despawn transformation
     PATCH(0xA3B95B).NOP_PAD_TO_SIZE<7>().Apply(); // Patch out original .Type = .DefaultType
     PATCH(0xA3BA2F).CALL(&runtimeHookNPCTransformDespawned).NOP_PAD_TO_SIZE<8>().Apply(); // Overwrite final 2 statements with call to our own code where we'll handle resetting the type
     // patch niche code for holding plants
     PATCH(0xA0B529).JNE(&runtimeHookNPCTransformHeldSproutA).NOP_PAD_TO_SIZE<6>().Apply(); // replace JNE to 0xA0B6EC with a jump into our own code, this is the branch which ISN'T if the contents is a random veggies
     PATCH(0xA0B6E4).CALL(&runtimeHookNPCTransformHeldSproutB).NOP_PAD_TO_SIZE<8>().Apply(); // replace a floating point error check with a call to our own code, branch occurs if the content IS a random veggie
-
-
-    PATCH(0x9C3036).CALL(&runtimeHookYoshiEatPossibleNPCTransform).NOP_PAD_TO_SIZE<6>().Apply(); // NPC on yoshi's tongue, store ID to see if it changed later
-
+    // patch code for yoshi eating stuff
+    PATCH(0x9C3042).CALL(&runtimeHookYoshiEatPossibleNPCTransform).NOP_PAD_TO_SIZE<8>().Apply(); // NPC on yoshi's tongue, store ID to see if it changed later
+    PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
+    
     // Hooks for onNPCHarm support
     PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();

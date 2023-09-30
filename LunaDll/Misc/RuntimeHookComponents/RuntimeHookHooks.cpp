@@ -4801,22 +4801,68 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
 // this is kind of janky but the way it works is as follows:
 // at the start of the code that may transform the npc, we store the current id for the npc held by yoshi
 // at the end of the function, if that value was set, we check and execute the event if needed
-void __stdcall runtimeHookYoshiEatPossibleNPCTransform_internal(PlayerMOB* player)
+int previousNPCID = -1;
+int npcCheckIdx = -1;
+void __stdcall runtimeHookYoshiEatPossibleNPCTransform_internal(int npcIdx)
 {
-    // this statement is overwritten by a call to this code
-    player->YoshiTFrameCount = 1;
+    npcIdx -= 129;
+    NPCMOB* npc = NPC::Get(npcIdx);
+    previousNPCID = npc->id;
+    npcCheckIdx = npcIdx;
 }
 _declspec(naked) void __stdcall runtimeHookYoshiEatPossibleNPCTransform()
 {
     __asm {
+        push eax
         push ebx
         push ecx
         push esi
-        push esi // player ptr
+        push ebx //npc idx
         call runtimeHookYoshiEatPossibleNPCTransform_internal
         pop esi
         pop ecx
         pop ebx
+        pop eax
+        ret
+    }
+}
+// called when the above hooked function exits
+void __stdcall runtimeHookYoshiEatExit_internal()
+{
+    if (npcCheckIdx != -1 && previousNPCID != -1)
+    {
+        NPCMOB* npc = NPC::Get(npcCheckIdx);
+        if (npc->id != previousNPCID) {
+            // NPC ID changed during yoshi mouth code
+            // invoke transformation event
+            if (gLunaLua.isValid()) {
+                // dispatch transform event
+                std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+                npcTransformEvent->setDirectEventName("onNPCTransform");
+                npcTransformEvent->setLoopable(false);
+                gLunaLua.callEvent(npcTransformEvent, npcCheckIdx+1, previousNPCID);
+            }
+        }
+        npcCheckIdx = -1;
+        previousNPCID = -1;
+    }
+}
+_declspec(naked) void __stdcall runtimeHookYoshiEatExit()
+{
+    __asm {
+
+        push eax
+        push ebx
+        push ecx
+        push esi
+        call runtimeHookYoshiEatExit_internal
+        pop esi
+        pop ecx
+        pop ebx
+        pop eax
+
+        // instruction overwritten by this hook
+        mov dword ptr fs : [0] , ecx
         ret
     }
 }
@@ -4987,4 +5033,32 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell()
     }
 }
 
+
+void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie_internal(int npcIdx)
+{
+    npcIdx -= 129;
+    if (gLunaLua.isValid()) {
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, npcIdx + 1, 147);
+    }
+}
+_declspec(naked) void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie()
+{
+    __asm {
+        push eax
+        push ebx
+        push ecx
+        push esi
+        push esi // NPC idx
+        call runtimeHookNPCTransformYoshiEatRandomVeggie_internal
+        pop esi
+        pop ecx
+        pop ebx
+        pop eax
+        ret
+    }
+}
 //////////////////////////////////////////////////////// onNPCTransform end
