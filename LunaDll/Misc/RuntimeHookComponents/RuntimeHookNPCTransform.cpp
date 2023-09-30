@@ -71,7 +71,7 @@ void __stdcall runtimeHookNPCTransformRandomVeggie_internal(NPCMOB* npc)
     npc->momentum.height = npc_height[npc->id];
     npc->momentum.x = npc->momentum.x - npc->momentum.width / 2.0;
     npc->momentum.y = npc->momentum.y - npc->momentum.height / 2.0;
-    executeOnNPCTransformPtr(npc, 147, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 147, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformRandomVeggie()
 {
@@ -102,7 +102,7 @@ void __stdcall runtimeHookNPCTransformSprout_internal(short* pNpcIdx)
     // replicate the basegame code that this hook overwrites
     native_setNPCFrame(pNpcIdx);
     // invoke transformation event
-    executeOnNPCTransformIdx((int)*pNpcIdx, 91, NPC_TRANSFORMATION_CAUSE_CONTAINER);
+    executeOnNPCTransformIdx((int)*pNpcIdx, 91, NPC_TFCAUSE_CONTAINER);
 }
 const static int _transformSprouteJmpDestination = 0x9CCB46;
 _declspec(naked) void __stdcall runtimeHookNPCTransformSprout()
@@ -133,7 +133,7 @@ void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, int newT
 {
     // replicate the basegame code that this hook overwrites
     npc->id = newType;
-    executeOnNPCTransformPtr(npc, 287, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 287, NPC_TFCAUSE_AI);
 }
 const static int _transformRandomBonusJmpDestination = 0xA4555F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformRandomBonus()
@@ -175,7 +175,7 @@ void __stdcall runtimeHookNPCTransformMushToHeart_internal(int npcIdx)
     npc->momentum.width = npc_width[250];
     npc->momentum.height = npc_height[250];
     // invoke transformation event
-    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TRANSFORMATION_CAUSE_LINK);
+    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
 const static int _transformMushToHeartJmpDestination = 0xA615F5;
 _declspec(naked) void __stdcall runtimeHookNPCTransformMushToHeart()
@@ -217,7 +217,7 @@ void __stdcall runtimeHookNPCTransformCoinToRupee_internal(int npcIdx)
     npc->momentum.height = npc_height[npc->id];
     npc->animationFrame = 0;
     // invoke transformation event
-    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TRANSFORMATION_CAUSE_LINK);
+    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
 const static int _transformCoinToRupeeJmpDestination = 0xA61335;
 _declspec(naked) void __stdcall runtimeHookNPCTransformCoinToRupee()
@@ -250,7 +250,7 @@ void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal(NPCMOB* np
     npc->momentum.height = npc_height[138];
     npc->momentum.x -= npc->momentum.width / 2;
     npc->momentum.y -= npc->momentum.height / 2;
-    executeOnNPCTransformPtr(npc, 133, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 133, NPC_TFCAUSE_AI);
 }
 const static int _transformSnifitBulletToSMB2CoinJmpDestination = 0xA0B875;
 _declspec(naked) void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin()
@@ -280,7 +280,7 @@ void __stdcall runtimeHookNPCTransformHeldYoshiToEgg_internal(NPCMOB* npc)
     // replicate the basegame code that this hook overwrites
     npc->ai1 = npc->id;
     npc->id = 96;
-    executeOnNPCTransformPtr(npc, oldID, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, oldID, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformHeldYoshiToEgg()
 {
@@ -305,7 +305,7 @@ void __stdcall runtimeHookNPCTransformBubblePopped_internal(NPCMOB* npc)
         // if it's a bomb, set projectile flag
         npc->collidesWithNPC = -1;
     }
-    executeOnNPCTransformPtr(npc, 283, NPC_TRANSFORMATION_CAUSE_CONTAINER);
+    executeOnNPCTransformPtr(npc, 283, NPC_TFCAUSE_CONTAINER);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformBubblePopped()
 {
@@ -327,7 +327,7 @@ void __stdcall runtimeHookNPCTransformSMWSpinyEgg_internal(NPCMOB* npc)
 {
     // replicate the basegame code that this hook overwrites
     npc->momentum.speedX = GM_NPC_WALKSPEED * npc->directionFaced;
-    executeOnNPCTransformPtr(npc, 286, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 286, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformSMWSpinyEgg()
 {
@@ -348,7 +348,7 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSMWSpinyEgg()
 
 void __stdcall runtimeHookNPCTransformLudwigShell_internal(NPCMOB* npc)
 {
-    executeOnNPCTransformPtr(npc, 280, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 280, NPC_TFCAUSE_AI);
 }
 const static int _transformLudwigShellJmpDestination = 0xA5211F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
@@ -371,7 +371,7 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
 
 void __stdcall runtimeHookNPCTransformKoopalingUnshell_internal(NPCMOB* npc)
 {
-    executeOnNPCTransformPtr(npc, npc->id + 1, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, npc->id + 1, NPC_TFCAUSE_AI);
 }
 const static int _transformKoopalingUnshellJmpDestination = 0xA52B74;
 _declspec(naked) void __stdcall runtimeHookNPCTransformKoopalingUnshell()
@@ -396,7 +396,7 @@ void __stdcall runtimeHookNPCTransformPotionToDoor_internal(NPCMOB* npc)
     // replicate the basegame code that this hook overwrites
     npc->effect2 = 16;
     // invoke transformation event
-    executeOnNPCTransformPtr(npc, 288, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 288, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformPotionToDoor()
 {
@@ -419,7 +419,7 @@ void __stdcall runtimeHookNPCTransformGaloombaUnflip_internal(NPCMOB* npc)
     // replicate the basegame code that this hook overwrites
     npc->momentum.y -= 1;
     // invoke transformation event
-    executeOnNPCTransformPtr(npc, 166, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformPtr(npc, 166, NPC_TFCAUSE_AI);
 }
 const static int _transformGaloombaUnflipJmpDestination = 0xA5C14E;
 _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
@@ -478,7 +478,7 @@ void __stdcall runtimeHookYoshiEatExit_internal()
         if (npc->id != previousNPCID) {
             // NPC ID changed during yoshi mouth code
             // invoke transformation event
-            executeOnNPCTransformIdx(npcCheckIdx + 1, previousNPCID, NPC_TRANSFORMATION_CAUSE_EATEN);
+            executeOnNPCTransformIdx(npcCheckIdx + 1, previousNPCID, NPC_TFCAUSE_EATEN);
         }
         npcCheckIdx = -1;
         previousNPCID = -1;
@@ -517,7 +517,7 @@ void __stdcall runtimeHookNPCTransformDespawned_internal(NPCMOB* npc)
         npc->id = npc->spawnID;
 
         // invoke transformation event
-        executeOnNPCTransformPtr(npc, oldID, NPC_TRANSFORMATION_CAUSE_DESPAWN);
+        executeOnNPCTransformPtr(npc, oldID, NPC_TFCAUSE_DESPAWN);
     }
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformDespawned()
@@ -543,7 +543,7 @@ void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins_internal(int npcIdx
         int oldID = npc->id;
         npc->id = npc->spawnID;
         // and invoke lua event
-        executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TRANSFORMATION_CAUSE_SWITCH);
+        executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_SWITCH);
     }
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins()
@@ -570,7 +570,7 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformPSwitchResetRupeeCoins()
 
 void __stdcall runtimeHookNPCTransformHeldSprout_internal(NPCMOB* npc)
 {
-    executeOnNPCTransformPtr(npc, 91, NPC_TRANSFORMATION_CAUSE_CONTAINER);
+    executeOnNPCTransformPtr(npc, 91, NPC_TFCAUSE_CONTAINER);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformHeldSproutA()
 {
@@ -626,7 +626,7 @@ void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell_internal(int npcIdx)
     }
 
     // and invoke lua event
-    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell()
 {
@@ -652,7 +652,7 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSMWKoopaEnterShell()
 void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie_internal(int npcIdx)
 {
     npcIdx -= 129;
-    executeOnNPCTransformIdx(npcIdx + 1, 147, NPC_TRANSFORMATION_CAUSE_AI);
+    executeOnNPCTransformIdx(npcIdx + 1, 147, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformYoshiEatRandomVeggie()
 {
