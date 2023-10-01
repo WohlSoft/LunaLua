@@ -164,6 +164,19 @@ enum CollidersType : short {
     HARM_TYPE_EXT_HAMMER = -3,
 };
 
+// value passed to onNPCTransform
+enum NPCTransformationCause {
+    NPC_TFCAUSE_UNKNOWN = 0,
+    NPC_TFCAUSE_HIT = 1,
+    NPC_TFCAUSE_DESPAWN = 2,
+    NPC_TFCAUSE_CONTAINER = 3,
+    NPC_TFCAUSE_AI = 4,
+    NPC_TFCAUSE_EATEN = 5,
+    NPC_TFCAUSE_LINK = 6,
+    NPC_TFCAUSE_SWITCH = 7,
+};
+
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 

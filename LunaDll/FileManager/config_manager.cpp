@@ -566,6 +566,23 @@ static void append_type_entry(nlohmann::json &typetree,
     typetree[type].push_back(path);
 }
 
+static void make_list_defaults_numeric_list(nlohmann::json& dst, nlohmann::json& src) {
+    for (auto& kvp : src.items())
+    {
+        nlohmann::json entry = nlohmann::json();
+        entry["k"] = kvp.key();
+        if (kvp.value().is_object() || kvp.value().is_array()) {
+            nlohmann::json& childObj = nlohmann::json();
+            make_list_defaults_numeric_list(childObj, kvp.value());
+            entry["v"] = childObj;
+        }
+        else {
+            entry["v"] = kvp.value();
+        }
+        dst.push_back(entry);
+    }
+}
+
 static void read_layout_branches(nlohmann::json &typetree,
                                  nlohmann::json &dst,
                                  nlohmann::json &src,
@@ -842,6 +859,27 @@ static void read_layout_branches(nlohmann::json &typetree,
             {
                 dst[name] = "<invalid value format>";
             }
+        }
+        else if (SDL_strncasecmp(control.c_str(), "listGroup", 9) == 0)
+        {
+            if (entry.find("children") == entry.end())
+                continue; // invalid entry: missing required key
+
+            append_type_entry(typetree, path_arr, "list", name);
+
+            nlohmann::json path_arr_next = path_arr;
+            nlohmann::json fields = nlohmann::json();
+
+            // Store the default values for the children
+            path_arr_next.push_back(name);
+            read_layout_branches(typetree, fields, entry["children"], path_arr_next);
+
+            nlohmann::json fieldsList = nlohmann::json();
+            // Prevent a pairs call in the lua code by getting a numeric list here
+            make_list_defaults_numeric_list(fieldsList, fields);
+            dst[name]["defaults"] = fieldsList;
+            dst[name]["count"] = 0;
+            dst[name]["items"] = nlohmann::json::object(); // TODO: In a future version, allow for adding some list elements by default.
         }
         else
         {
