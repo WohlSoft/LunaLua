@@ -2,7 +2,7 @@
 
 md __temp
 
-set MIXERX_URL=https://wohlsoft.ru/docs/_laboratory/_Builds/win32/SDL-Mixer-X-MSVC15-Release-Win32-SDL-2.0.12.7z
+set MIXERX_URL=https://wohlsoft.ru/docs/_laboratory/_Builds/win32/SDL-Mixer-X-MSVC15-Release-Win32.7z
 set SEVENZIP="%ProgramFiles%\7-Zip\7z.exe"
 
 echo - Downloading MixerX...
