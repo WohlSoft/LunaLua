@@ -1978,6 +1978,27 @@ _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
     }
 }
 
+static void __stdcall runtimeHookNPCTerminalVelocity(NPCMOB* npc)
+{
+    // Reimplement the NPC terminal velocity behaviour
+    if (npc->momentum.speedY > 8 && !NPC::GetNoTerminalVelocity(npc->id))
+    {
+        npc->momentum.speedY = 8;
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCTerminalVelocityRaw()
+{
+    __asm {
+        push esi // Arg #1 (pointer to NPC)
+
+        call runtimeHookNPCTerminalVelocity
+
+        push 0xA10170
+        ret
+    }
+}
+
 static void __stdcall runtimeHookCheckInput(int playerNum, int playerIdx, KeyMap* keymap)
 {
     // Test that player index is in range, and that it matches the true player number (ignore clones)
