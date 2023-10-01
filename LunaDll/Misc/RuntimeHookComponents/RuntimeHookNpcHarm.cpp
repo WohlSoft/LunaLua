@@ -65,7 +65,7 @@ static void __stdcall runtimeHookCollideNpcEnd_internal(short* pNpcIdx)
         std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
         npcTransformEvent->setDirectEventName("onNPCTransform");
         npcTransformEvent->setLoopable(false);
-        gLunaLua.callEvent(npcTransformEvent, (int)*pNpcIdx, previous);
+        gLunaLua.callEvent(npcTransformEvent, (int)*pNpcIdx, previous, NPC_TFCAUSE_HIT);
     }
 }
 _declspec(naked) void __stdcall runtimeHookCollideNpcEnd()
