@@ -1981,9 +1981,11 @@ _declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
 static void __stdcall runtimeHookNPCTerminalVelocity(NPCMOB* npc)
 {
     // Reimplement the NPC terminal velocity behaviour
-    if (npc->momentum.speedY > 8 && !NPC::GetNoTerminalVelocity(npc->id))
+    double terminalVelocity = NPC::GetTerminalVelocity(npc->id);
+
+    if ((terminalVelocity >= 0) && (npc->momentum.speedY > terminalVelocity))
     {
-        npc->momentum.speedY = 8;
+        npc->momentum.speedY = terminalVelocity;
     }
 }
 
