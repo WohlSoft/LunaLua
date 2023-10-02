@@ -872,7 +872,6 @@ void CLunaLua::bindAll()
                 def("MusicChange", (void(*)(int, int, int))&LuaProxy::Audio::changeMusic),
                 def("MusicChange", (void(*)(int, const std::string&, int))&LuaProxy::Audio::changeMusic),
                 def("MusicFadeOut", (void(*)(int, int))&LuaProxy::Audio::musicFadeOut),
-                
                 def("MusicRestart", (void(*)())&LuaProxy::Audio::MusicRestart),
                 def("MusicGetChannelCount", (double(*)())&LuaProxy::Audio::MusicGetChannelCount),
                 def("MusicChannelMute", (void(*)(int))&LuaProxy::Audio::MusicChannelMute),
