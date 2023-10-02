@@ -43,11 +43,10 @@ namespace LuaProxy
         void changeMusic(int section, int musicId, int fadeInDelayMs);
         void musicFadeOut(int section, int fadeInDelayMs);
         
-        void    MusicRewind();
-        double  MusicGetTracks();
-        void    MusicMuteTrackLayer(int trackNumber);
-        void    MusicUnmuteTrackLayer(int trackNumber);
-        void    MusicSetPosition(double seconds);
+        void    MusicRestart();
+        double  MusicGetChannelCount();
+        void    MusicChannelMute(int trackNumber);
+        void    MusicChannelUnmute(int trackNumber);
         void    MusicSetTempo(double tempo);
         void    MusicSetPitch(double pitch);
         void    MusicSetSpeed(double speed);

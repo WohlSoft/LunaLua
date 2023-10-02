@@ -175,24 +175,24 @@ double LuaProxy::Audio::MusicGetLoopLength()
 
 
 
-void LuaProxy::Audio::MusicRewind()
+void LuaProxy::Audio::MusicRestart()
 {
 #ifndef NO_SDL
     PGE_MusPlayer::MUS_rewindMusic();
 #endif
 }
 
-double LuaProxy::Audio::MusicGetTracks()
+double LuaProxy::Audio::MusicGetChannelCount()
 {
     return (double)Mix_GetMusicTracks(PGE_MusPlayer::currentMusic());
 }
 
-void LuaProxy::Audio::MusicMuteTrackLayer(int trackNumber)
+void LuaProxy::Audio::MusicChannelMute(int trackNumber)
 {
     Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 1);
 }
 
-void LuaProxy::Audio::MusicUnmuteTrackLayer(int trackNumber)
+void LuaProxy::Audio::MusicChannelUnmute(int trackNumber)
 {
     Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 0);
 }
