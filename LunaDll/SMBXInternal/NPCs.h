@@ -580,6 +580,7 @@ namespace NPC {
     bool GetNotCoinTransformable(int id);
     bool GetStaticDirection(int id);
     bool GetLuaHandlesSpeed(int id);
+    double GetTerminalVelocity(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
