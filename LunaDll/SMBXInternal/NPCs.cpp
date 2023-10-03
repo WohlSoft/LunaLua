@@ -273,6 +273,7 @@ static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_luahandlesspeed[NPC::MAX_ID + 1] = { 0 };
+static double npcprop_terminalvelocity[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
 static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
@@ -292,6 +293,7 @@ void NPC::InitProperties() {
         npcprop_notcointransformable[i] = 0;
         npcprop_staticdirection[i] = 0;
         npcprop_luahandlesspeed[i] = 0;
+        npcprop_terminalvelocity[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -498,6 +500,10 @@ void NPC::InitProperties() {
     npcprop_staticdirection[181] = -1;
     npcprop_staticdirection[212] = -1;
 
+    // Default terminal velocity values
+    npcprop_terminalvelocity[259] = -1;
+    npcprop_terminalvelocity[260] = -1;
+
     npc_semisolidCollidingFlyTypeMap.clear();
     npc_semisolidCollidingFlyTypeMap[1] = true;
 }
@@ -558,6 +564,17 @@ bool NPC::GetLuaHandlesSpeed(int id) {
     return (npcprop_luahandlesspeed[id] != 0);
 }
 
+double NPC::GetTerminalVelocity(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID) || (npcprop_terminalvelocity[id] == 0))
+    {
+        // Default terminal velocity
+        return 8;
+    }
+    
+    // Custom terminal velocity
+    return npcprop_terminalvelocity[id];
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -604,6 +621,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "luahandlesspeed")
     {
         return reinterpret_cast<uintptr_t>(npcprop_luahandlesspeed);
+    }
+    else if (s == "terminalvelocity")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_terminalvelocity);
     }
     else
     {
