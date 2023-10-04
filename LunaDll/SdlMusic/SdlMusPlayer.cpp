@@ -182,6 +182,11 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
     }
 }
 
+void PGE_MusPlayer::MUS_rewindMusic()
+{
+    return Mix_RewindMusic();
+}
+
 void PGE_MusPlayer::MUS_pauseMusic()
 {
     if(!PGE_SDL_Manager::isInit) return;
