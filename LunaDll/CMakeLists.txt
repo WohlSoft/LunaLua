@@ -189,6 +189,7 @@ set(LunaLua_Sources
     Misc/RuntimeHookComponents/RuntimeHookGeneral.cpp
     Misc/RuntimeHookComponents/RuntimeHookHooks.cpp
     Misc/RuntimeHookComponents/RuntimeHookNpcHarm.cpp
+    Misc/RuntimeHookComponents/RuntimeHookNPCTransform.cpp
     Misc/RuntimeHookComponents/RuntimeHookPublicFunctions.cpp
     Misc/RuntimeHook.cpp
     Misc/RuntimeHookManagers/LevelHUDController.cpp
