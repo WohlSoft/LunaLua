@@ -28,6 +28,7 @@
 
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "Misc/CollisionMatrix.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -430,7 +431,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
-    char collisionGroup[32];\
+    char collisionGroup[" STRINGIFY(COLLISION_GROUP_STRING_LENGTH) "];\
 } ExtendedNPCFields;";
     }
 
@@ -448,13 +449,23 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char collisionGroup[32];\
+    char collisionGroup[" STRINGIFY(COLLISION_GROUP_STRING_LENGTH) "];\
 } ExtendedBlockFields;";
     }
 
     FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
     {
-        return 32;
+        return collisionGroupStringLength;
+    }
+
+    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetGroupsCollide(char const* first, char const* second, bool collide)
+    {
+        gCollisionMatrix.setGroupsCollide(first, second, collide);
+    }
+
+    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetGroupsCollide(char const* first, char const* second) 
+    {
+        gCollisionMatrix.getGroupsCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)

@@ -1,4 +1,5 @@
 #include <comutil.h>
+#include "Misc/CollisionMatrix.h"
 #include "string.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
@@ -3632,22 +3633,19 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
         ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
 
-        if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
+        if (block->OwnerNPCID != 0) // Belongs to an NPC
         {
-            if (block->OwnerNPCID != 0) // Belongs to an NPC
-            {
-                ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
+            ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
 
-                if (strcmp(ext->collisionGroup,ownerExt->collisionGroup) == 0) // Matching collision groups
-                    return 0;
-            }
-            else
-            {
-                ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
+                return 0;
+        }
+        else
+        {
+            ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
 
-                if (strcmp(ext->collisionGroup,blockExt->collisionGroup) == 0) // Matching collision groups
-                    return 0;
-            }
+            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+                return 0;
         }
     }
 
@@ -3680,14 +3678,10 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
         return 0; // Collision cancelled
     
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+    ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (extA->collisionGroup[0] != 0) // Collision group string isn't empty
-    {
-        ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
-
-        if (strcmp(extA->collisionGroup,extB->collisionGroup) == 0) // Matching collision groups
-            return 0; // Collision cancelled
-    }
+    if (!gCollisionMatrix.getGroupsCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+        return 0; // Collision cancelled
 
     return -1; // Collision goes ahead
 }

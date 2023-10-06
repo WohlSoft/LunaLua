@@ -4,6 +4,7 @@
 #include "BaseItemArray.h"
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "Misc/CollisionMatrix.h"
 struct PlayerMOB;
 
 #pragma pack(push, 4)
@@ -57,7 +58,7 @@ struct ExtendedBlockFields
     double layerSpeedY;
     double extraSpeedX;
     double extraSpeedY;
-    char collisionGroup[32];
+    char collisionGroup[collisionGroupStringLength];
 
     // Constructor
     ExtendedBlockFields()

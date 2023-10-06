@@ -218,6 +218,9 @@
     <ClInclude Include="Misc\RuntimeHook.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\CollisionMatrix.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
     <ClInclude Include="SMBXInternal\NPCs.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
@@ -832,6 +835,9 @@
       <Filter>Minigames\CGUI</Filter>
     </ClCompile>
     <ClCompile Include="Misc\MiscFuncs.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\CollisionMatrix.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHook.cpp">
