@@ -1037,3 +1037,15 @@ void HandleEventsWhileLoading()
         lastTime = thisTime;
     }
 }
+
+std::string GetEditorPlacedItem()
+{
+    if(editorPlacedItem != "nil")
+    {
+        return (std::string)editorPlacedItem;
+    }
+    else if(editorPlacedItem == "nil")
+    {
+        return (std::string)"nil";
+    }
+}

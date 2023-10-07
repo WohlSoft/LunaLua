@@ -205,3 +205,5 @@ return;
 
 
 #endif
+
+extern std::string editorPlacedItem;

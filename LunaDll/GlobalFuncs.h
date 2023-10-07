@@ -277,3 +277,5 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 #endif
 
 #endif
+
+std::string GetEditorPlacedItem();
