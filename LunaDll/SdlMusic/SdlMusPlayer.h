@@ -29,6 +29,7 @@ public:
     static void MUS_playMusic();
     static void MUS_playMusicFadeIn(int ms);
     static void MUS_pauseMusic();
+    static void MUS_rewindMusic();
     static void MUS_stopMusic();
     static void MUS_stopMusicFadeOut(int ms);
     static std::string MUS_MusicTitle();
