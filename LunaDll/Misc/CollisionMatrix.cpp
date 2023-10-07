@@ -31,7 +31,7 @@ bool CollisionMatrix::getGroupsCollide(char const firstGroup[collisionGroupStrin
     auto search = matrix.find(pair);
 
     // If there's already a value corresponding to the pair in our hashmap, return it.
-    if (search == matrix.end()) {
+    if (search != matrix.end()) {
         return search->second;
     }
 
