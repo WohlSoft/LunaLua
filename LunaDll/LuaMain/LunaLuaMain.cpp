@@ -30,7 +30,7 @@
 #include "../Misc/LoadScreen.h"
 
 #include "LunaPathValidator.h"
-#include "Misc/CollisionMatrix.h"
+#include "../Misc/CollisionMatrix.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 

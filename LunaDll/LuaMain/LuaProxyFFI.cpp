@@ -28,7 +28,7 @@
 
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
-#include "Misc/CollisionMatrix.h"
+#include "../Misc/CollisionMatrix.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 

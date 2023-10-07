@@ -4,7 +4,7 @@
 #include "BaseItemArray.h"
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
-#include "Misc/CollisionMatrix.h"
+#include "../Misc/CollisionMatrix.h"
 struct PlayerMOB;
 
 #pragma pack(push, 4)

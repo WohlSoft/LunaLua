@@ -7,7 +7,7 @@
 #include <string>
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
-#include "Misc/CollisionMatrix.h"
+#include "../Misc/CollisionMatrix.h"
 
 
 enum NPCID : short
