@@ -465,7 +465,7 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetGroupsCollide(char const* first, char const* second) 
     {
-        gCollisionMatrix.getGroupsCollide(first, second);
+        return gCollisionMatrix.getGroupsCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
