@@ -13,7 +13,6 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
 include(libs/PGE_File_Formats/pge_file_library.cmake)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-deboostified
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl/include

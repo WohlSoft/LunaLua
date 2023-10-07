@@ -1,7 +1,7 @@
 #include "CollisionMatrix.h"
 #include <windows.h>
 #include <cstring>
-#include "GlobalFuncs.h"
+#include "../GlobalFuncs.h"
 #include <algorithm>
 
 CollisionMatrix gCollisionMatrix;
