@@ -18,6 +18,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <mutex>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -25,6 +26,8 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+
+static std::mutex g_editorIPCMutex;
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -1040,12 +1043,6 @@ void HandleEventsWhileLoading()
 
 std::string GetEditorPlacedItem()
 {
-    if(editorPlacedItem != "nil")
-    {
-        return (std::string)editorPlacedItem;
-    }
-    else if(editorPlacedItem == "nil")
-    {
-        return (std::string)"nil";
-    }
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    return (std::string)gEditorPlacedItem;
 }

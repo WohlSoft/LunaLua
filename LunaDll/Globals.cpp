@@ -128,4 +128,4 @@ void printBoxA(const char *fmt, ...)
     dbgboxA(buf);
 }
 
-std::string editorPlacedItem = "nil";
+std::string gEditorPlacedItem = "nil";

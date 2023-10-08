@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
+#include <mutex>
 #include "../Defines.h"
 #include "../Globals.h"
 #include "IPCPipeServer.h"
@@ -26,6 +27,7 @@ json IPCGetWindowHandle(const json& params);      // Fetch HWND of SMBX game win
 json IPCSetCheckPoint(const json& params);        // Set custom checkpoint, start position, warp entrance/exit
 json IPCResetCheckPoint(const json& params);      // Clear checkpoint
 json IPCGetSupportedFeatures(const json& params); // Get a supported features table
+json IPCSendItemPlacing(const json& params);      // Gets an editor entity from the editor
 json IPCQuit(const json& params);                 // Quit the game
 
 
@@ -39,6 +41,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
     RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
     RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
+    RegisterMethod("sendItemPlacing", IPCSendItemPlacing);
     RegisterMethod("quit", IPCQuit);
 }
 
@@ -139,12 +142,6 @@ void IPCPipeServer::ReadThread()
         std::string pktMethod = pkt["method"];
         json pktId = pkt["id"];
         json pktParams = pkt["params"];
-        
-        if(pktMethod == "sendItemPlacing")
-        {
-            std::string result = pkt["params"].dump();
-            editorPlacedItem = result;
-        }
 
         // See if we have a callback for the method...
         const auto it = mCallbacks.find(pktMethod);
@@ -154,10 +151,7 @@ void IPCPipeServer::ReadThread()
             continue;
         }
         
-        if(pktMethod != "sendItemPlacing")
-        {
-            SendJsonError(-32601, "Method not found", pktId);
-        }
+        SendJsonError(-32601, "Method not found", pktId);
     }
 
     // If we get here, the IPC pipe has been broken, which means we know the parent process has exited
@@ -323,9 +317,17 @@ json IPCGetSupportedFeatures(const json& params)
     return {
         {"LVLX", true},
         {"SelfForegrounding", true},
-        {"HideShowNotifications", true},
-        {"sendItemPlacing", true}
+        {"HideShowNotifications", true}
     };
+}
+
+static std::mutex g_editorIPCMutex;
+
+json IPCSendItemPlacing(const json& params)
+{
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    gEditorPlacedItem = params.dump();
+    return true;
 }
 
 //=============================================================================
