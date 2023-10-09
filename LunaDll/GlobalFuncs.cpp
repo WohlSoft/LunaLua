@@ -27,8 +27,6 @@
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
 
-static std::mutex g_editorIPCMutex;
-
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
     dest.clear();
@@ -1040,6 +1038,8 @@ void HandleEventsWhileLoading()
         lastTime = thisTime;
     }
 }
+
+std::mutex g_editorIPCMutex;
 
 std::string GetEditorPlacedItem()
 {

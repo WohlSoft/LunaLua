@@ -7,6 +7,7 @@
 #include <mutex>
 #include "../Defines.h"
 #include "../Globals.h"
+#include "../GlobalFuncs.h"
 #include "IPCPipeServer.h"
 #include "../libs/json/json.hpp"
 
@@ -320,8 +321,6 @@ json IPCGetSupportedFeatures(const json& params)
         {"HideShowNotifications", true}
     };
 }
-
-static std::mutex g_editorIPCMutex;
 
 json IPCSendItemPlacing(const json& params)
 {

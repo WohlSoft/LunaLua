@@ -6,6 +6,7 @@
 #include <vector>
 #include <wchar.h>
 #include <string.h>
+#include <mutex>
 
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
@@ -278,4 +279,5 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 
 #endif
 
+extern std::mutex g_editorIPCMutex;
 std::string GetEditorPlacedItem();
