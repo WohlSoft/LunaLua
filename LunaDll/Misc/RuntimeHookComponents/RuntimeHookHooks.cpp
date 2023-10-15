@@ -573,6 +573,9 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
         short newIdx = npcIdx - 1;    // 0 based not including dummy
         short oldIdx = GM_NPCS_COUNT; // 0 based not including dummy
 
+        // Decrement the reference count of the removed NPC's collision group
+        gCollisionMatrix.decrementReferenceCount(NPC::GetRawExtended(newIdx+1)->collisionGroup);
+
         // Update extended NPC fields
         if (newIdx != oldIdx)
         {
@@ -3637,14 +3640,14 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
         {
             ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
 
-            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
+            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
                 return 0;
         }
         else
         {
             ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
 
-            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
                 return 0;
         }
     }
@@ -3680,7 +3683,7 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (!gCollisionMatrix.getGroupsCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
 
     return -1; // Collision goes ahead

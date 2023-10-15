@@ -431,7 +431,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
-    char collisionGroup[" STRINGIFY(COLLISION_GROUP_STRING_LENGTH) "];\
+    unsigned int collisionGroup;\
 } ExtendedNPCFields;";
     }
 
@@ -449,23 +449,33 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char collisionGroup[" STRINGIFY(COLLISION_GROUP_STRING_LENGTH) "];\
+    unsigned int collisionGroup;\
 } ExtendedBlockFields;";
     }
 
-    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAllocateIndex()
     {
-        return collisionGroupStringLength;
+        return gCollisionMatrix.allocateIndex();
     }
 
-    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetGroupsCollide(char const* first, char const* second, bool collide)
+    FFI_EXPORT(void) LunaLuaCollisionMatrixIncrementReferenceCount(unsigned int group)
     {
-        gCollisionMatrix.setGroupsCollide(first, second, collide);
+        gCollisionMatrix.incrementReferenceCount(group);
     }
 
-    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetGroupsCollide(char const* first, char const* second) 
+    FFI_EXPORT(void) LunaLuaCollisionMatrixDecrementReferenceCount(unsigned int group)
     {
-        return gCollisionMatrix.getGroupsCollide(first, second);
+        gCollisionMatrix.decrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetIndicesCollide(unsigned int first, unsigned int second, bool collide)
+    {
+        gCollisionMatrix.setIndicesCollide(first, second, collide);
+    }
+
+    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetIndicesCollide(unsigned int first, unsigned int second) 
+    {
+        return gCollisionMatrix.getIndicesCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)

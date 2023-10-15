@@ -1,52 +1,39 @@
 #ifndef CollisionMatrix_hhh
 #define CollisionMatrix_hhh
 
-#include <unordered_map>
-
-#define COLLISION_GROUP_STRING_LENGTH 32
-constexpr std::size_t collisionGroupStringLength = COLLISION_GROUP_STRING_LENGTH;
-
-class GroupPair {
-    char firstGroup[collisionGroupStringLength];
-    char secondGroup[collisionGroupStringLength];
-
-public:
-    GroupPair(char const first[collisionGroupStringLength], char const second[collisionGroupStringLength]);
-
-    constexpr char const* first() const {
-        return firstGroup;
-    }
-
-    constexpr char const* second() const {
-        return secondGroup;
-    }
-
-    bool operator==(GroupPair const& that) const;
-    
-    inline bool operator!=(GroupPair const& that) const {
-        return !(*this == that);
-    }
-};
-
-namespace std {
-    template<>
-    struct hash<GroupPair> {
-        std::size_t operator()(GroupPair const& value) const;
-    };
-}
+#include <functional>
+#include <queue>
+#include <unordered_set>
 
 class CollisionMatrix {
-    std::unordered_map<GroupPair, bool> matrix;
+    using fun_type = bool (*)(unsigned int i, unsigned int j);
+    using queue_type = std::priority_queue<unsigned int, std::priority_queue<unsigned int>::container_type, std::greater<unsigned int>>;
+
+    std::vector<std::unordered_set<unsigned int>> matrix; // The collision matrix itself. matrix[j].count(i) == 1 if getGroupsCollide(i, j) != default_behavior(i, j).
+
+    queue_type deallocated_groups; // Contains all currently deallocated groups
+    unsigned int next_group; // The next group to be allocated if deallocated_groups is empty
+
+    std::vector<unsigned int> reference_count; // How many references to the group exist. Index 0 corresponds to group 1
+
+    bool (*default_behavior)(unsigned int i, unsigned int j); // The default behavior of the collision matrix
+
+    char const* deallocation_event_name; // The lunalua event which is called whenever a group is deallocated
+    
+    void cleanupMatrix(); // Removes all trailing empty sets from the collision matrix
+    void deallocateGroup(unsigned int group); // Deallocates a collision group
 
 public:
-    CollisionMatrix() = default;
+    CollisionMatrix() = delete;
+    CollisionMatrix(fun_type default_behavior, char const* deallocation_event_name);
 
-    inline void clear() {
-        matrix.clear();
-    }
+    void clear(); // Resets this collision matrix
+    unsigned int allocateIndex(); // Allocates a new collision group index
+    void incrementReferenceCount(unsigned int group); // Increments the reference count of a group index
+    void decrementReferenceCount(unsigned int group); // Decrements the reference count of a group index
+    bool getIndicesCollide(unsigned int i, unsigned int j); // Reads the collision matrix
+    void setIndicesCollide(unsigned int i, unsigned int j, bool collide); // Writes to the collision matrix
 
-    bool getGroupsCollide(char const firstGroup[collisionGroupStringLength], char const secondGroup[collisionGroupStringLength]);
-    void setGroupsCollide(char const firstGroup[collisionGroupStringLength], char const secondGroup[collisionGroupStringLength], bool collide);
 };
 
 extern CollisionMatrix gCollisionMatrix;

@@ -58,7 +58,7 @@ struct ExtendedBlockFields
     double layerSpeedY;
     double extraSpeedX;
     double extraSpeedY;
-    char collisionGroup[collisionGroupStringLength];
+    unsigned int collisionGroup;
 
     // Constructor
     ExtendedBlockFields()
@@ -73,7 +73,7 @@ struct ExtendedBlockFields
         layerSpeedY = 0.0;
         extraSpeedX = 0.0;
         extraSpeedY = 0.0;
-        collisionGroup[0] = '\0';
+        collisionGroup = 0u;
     }
 };
 

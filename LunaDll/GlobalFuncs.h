@@ -276,14 +276,4 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 }
 #endif
 
-// Hash a null-terminated c string without having to create a std::string
-std::size_t hashString(char const* string);
-
-// Combine two hash values together
-std::size_t combineHash(std::size_t firstHash, std::size_t secondHash);
-
-// Stringify int literals
-#define STRINGIFY(x) STRINGIFY2(x)
-#define STRINGIFY2(x) #x
-
 #endif

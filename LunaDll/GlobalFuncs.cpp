@@ -1037,19 +1037,3 @@ void HandleEventsWhileLoading()
         lastTime = thisTime;
     }
 }
-
-// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
-std::size_t hashString(char const* string) {
-    std::size_t hash = 0x811c9dc5;
-
-    for(; *string != '\0'; string++) {
-        hash = (hash * 0x01000193) ^ ((unsigned char) *string);
-    }
-
-    return hash;
-}
-
-// Uses boost's implementation of boost::hash_combine
-std::size_t combineHash(std::size_t firstHash, std::size_t secondHash) {
-    return secondHash + 0x9e3779b9 + (firstHash << 6) + (firstHash >> 2);
-}

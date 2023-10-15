@@ -522,7 +522,7 @@ static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 struct ExtendedNPCFields
 {
     bool noblockcollision;
-    char collisionGroup[collisionGroupStringLength];
+    unsigned int collisionGroup;
 
     // Constructor
     ExtendedNPCFields()
@@ -534,7 +534,7 @@ struct ExtendedNPCFields
     void Reset()
     {
         noblockcollision = false;
-        collisionGroup[0] = '\0';
+        collisionGroup = 0u;
     }
 };
 
