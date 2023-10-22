@@ -151,7 +151,7 @@ void IPCPipeServer::ReadThread()
             RunCallback(cb, pktParams, pktId);
             continue;
         }
-        
+
         SendJsonError(-32601, "Method not found", pktId);
     }
 
