@@ -1789,7 +1789,6 @@ void TrySkipPatch()
     PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
     
     // Hooks for onNPCHarm support
-    PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
     PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();

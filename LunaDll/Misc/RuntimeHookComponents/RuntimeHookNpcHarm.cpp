@@ -6,9 +6,6 @@
 
 static bool npcHarmCancelled = false;
 static bool npcHarmResultSet = false;
-// NPC ID is pushed at the start of NPCHit sub,
-// Stack is used because Lua code seemingly may invoke NPCHit while it is already in progress
-static std::stack<int> npcHarmInitialNPCID;
 
 // Stub to execute the original npc collision function
 _declspec(naked) static void __stdcall runtimeHookCollideNpc_OrigFunc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
@@ -29,13 +26,36 @@ void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersTyp
     runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
 }
 
+void collideNPCPost(short npcIdx, short npcIdInitial) {
+    NPCMOB* npc = NPC::Get(npcIdx - 1);
+    if (npc->id != npcIdInitial) {
+        // id changed during harm!
+        // dispatch transform event
+        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
+        npcTransformEvent->setDirectEventName("onNPCTransform");
+        npcTransformEvent->setLoopable(false);
+        gLunaLua.callEvent(npcTransformEvent, (int)npcIdx, (int)npcIdInitial, NPC_TFCAUSE_HIT);
+    }
+}
+
 // Hook for the start of the original npc collision function
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
-    NPCMOB* npc = NPC::Get((*pNpcIdx) - 1);
-    npcHarmInitialNPCID.push(npc->id);
     npcHarmResultSet = false;
+    
+    short npcIdx = *pNpcIdx;
+    short npcIdInitial = -1;
+    // execute post-hit call ONLY if this is a valid npc index
+    if (npcIdx > 0) {
+        // prepare npc id on stack for post-hit call
+        NPCMOB* npc = NPC::Get(npcIdx - 1);
+        npcIdInitial = npc->id;
+    }
     runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+    // call post-hit function to handle onNPCTransform call
+    if (npcIdx > 0) {
+        collideNPCPost(npcIdx, npcIdInitial);
+    }
 }
 
 // Hook to catch when NPC harm is about to occur
@@ -53,44 +73,6 @@ static unsigned int __stdcall runtimeHookNpcHarm(short* pNpcIdx, CollidersType* 
 
     return npcHarmCancelled ? -1 : 0;
 }
-
-// Hook called at the end of the npc collision function
-static void __stdcall runtimeHookCollideNpcEnd_internal(short* pNpcIdx)
-{
-    int previous = npcHarmInitialNPCID.top(); npcHarmInitialNPCID.pop();
-    NPCMOB* npc = NPC::Get((*pNpcIdx)-1);
-    if (previous != npc->id && gLunaLua.isValid()) {
-        // id changed during harm!
-        // dispatch transform event
-        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
-        npcTransformEvent->setDirectEventName("onNPCTransform");
-        npcTransformEvent->setLoopable(false);
-        gLunaLua.callEvent(npcTransformEvent, (int)*pNpcIdx, previous, NPC_TFCAUSE_HIT);
-    }
-}
-_declspec(naked) void __stdcall runtimeHookCollideNpcEnd()
-{
-    __asm {
-        // call function to handle event end
-        pushfd
-        push eax
-        push ecx
-        push edx
-        push dword ptr[ebp + 0x8]
-        call runtimeHookCollideNpcEnd_internal
-        pop edx
-        pop ecx
-        pop eax
-        popfd
-
-        // original end of function
-        pop ebx
-        mov esp, ebp
-        pop ebp
-        retn 0x0C
-    }
-}
-
 
 __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a291d8(void)
 {

@@ -387,7 +387,6 @@ void __stdcall runtimeHookYoshiEatExit(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
-void __stdcall runtimeHookCollideNpcEnd(void);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);
 void __stdcall runtimeHookNpcHarmRaw_a293ee(void);
