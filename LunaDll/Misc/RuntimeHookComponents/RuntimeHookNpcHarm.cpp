@@ -26,35 +26,50 @@ void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersTyp
     runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
 }
 
-void collideNPCPost(short npcIdx, short npcIdInitial) {
-    NPCMOB* npc = NPC::Get(npcIdx - 1);
-    if (npc->id != npcIdInitial) {
-        // id changed during harm!
-        // dispatch transform event
-        std::shared_ptr<Event> npcTransformEvent = std::make_shared<Event>("onNPCTransform", false);
-        npcTransformEvent->setDirectEventName("onNPCTransform");
-        npcTransformEvent->setLoopable(false);
-        gLunaLua.callEvent(npcTransformEvent, (int)npcIdx, (int)npcIdInitial, NPC_TFCAUSE_HIT);
+
+
+// npc array idx, initial npc id
+std::vector<std::pair<short,short>> processingNPCInfoForIDChangeDetection;
+// prevent onNPCTransform event from being executed twice in situations where we're already listening for ID changes
+// called by npc::transform
+void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID) {
+    for (int i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
+        // if the listening info matches the NPC that was transformed,
+        if (processingNPCInfoForIDChangeDetection[i].first == npcIdx && processingNPCInfoForIDChangeDetection[i].second == oldID) {
+            // update the info to reflect the new ID
+            processingNPCInfoForIDChangeDetection[i].second = newID;
+        }
     }
 }
+// defined in RuntimeHookNPCTransform.cpp
+void executeOnNPCTransformIdx(int npcIdx, int oldID, NPCTransformationCause cause);
 
 // Hook for the start of the original npc collision function
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
     npcHarmResultSet = false;
-    
-    short npcIdx = *pNpcIdx;
-    short npcIdInitial = -1;
+
+    NPCMOB* npc = NULL;
+    bool isValidProcessingNPC = false;
     // execute post-hit call ONLY if this is a valid npc index
-    if (npcIdx > 0) {
+    if (*pNpcIdx > 0) {
         // prepare npc id on stack for post-hit call
-        NPCMOB* npc = NPC::Get(npcIdx - 1);
-        npcIdInitial = npc->id;
+        npc = NPC::Get(*pNpcIdx - 1);
+        // store info to detect if the ID was changed
+        isValidProcessingNPC = true;
+        processingNPCInfoForIDChangeDetection.push_back({*pNpcIdx, npc->id});
     }
     runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
     // call post-hit function to handle onNPCTransform call
-    if (npcIdx > 0) {
-        collideNPCPost(npcIdx, npcIdInitial);
+    if (isValidProcessingNPC) {
+        // compare the current ID of the npc to the previously stored one...
+        auto info = processingNPCInfoForIDChangeDetection.back();
+        processingNPCInfoForIDChangeDetection.pop_back();
+        // if the NPC's ID changed..
+        if (info.second != npc->id) {
+            // execute onNPCTransform event
+            executeOnNPCTransformIdx(*pNpcIdx, info.second, NPC_TFCAUSE_HIT);
+        }
     }
 }
 
