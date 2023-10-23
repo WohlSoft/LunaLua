@@ -16,7 +16,7 @@ class CollisionMatrix {
 
     std::vector<unsigned int> reference_count; // How many references to the group exist. Index 0 corresponds to group 1
 
-    bool (*default_behavior)(unsigned int i, unsigned int j); // The default behavior of the collision matrix
+    fun_type default_behavior; // The default behavior of the collision matrix
 
     char const* deallocation_event_name; // The lunalua event which is called whenever a group is deallocated
     
