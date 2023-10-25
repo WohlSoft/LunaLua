@@ -342,11 +342,7 @@ void ImageLoader::Run(bool initialLoad)
         }
     }
 
-    // If not in the overworld, we have a level path, right?
-    if (!gIsOverworld)
-    {
-        levelGfxDir = normalizePathSlashes(getCustomFolderPath());
-    }
+    levelGfxDir = normalizePathSlashes(getCustomFolderPath());
     
     // Done figuring out our paths!
 
@@ -356,6 +352,7 @@ void ImageLoader::Run(bool initialLoad)
     {
         levelFiles = gCachedFileMetadata.listResourceFilesFromDir(levelGfxDir);
     }
+
 
     // Read episode directory listing
     std::unordered_map<std::wstring, ResourceFileInfo> episodeFiles;
@@ -629,8 +626,7 @@ void ImageLoader::RegisterExtraGfx(const std::string& folderName, const std::str
     std::wstring wFolderName = Str2WStr(folderName);
     std::wstring wName = Str2WStr(name);
     std::vector<std::wstring> searchPath;
-    if (!gIsOverworld)
-        searchPath.push_back(normalizePathSlashes(getCustomFolderPath())); // Check custom folder
+    searchPath.push_back(normalizePathSlashes(getCustomFolderPath())); // Check custom folder
     searchPath.push_back(normalizePathSlashes(GM_FULLDIR)); // Check episode dir
     searchPath.push_back(normalizePathSlashes(GM_FULLDIR) + L"/graphics/" + wFolderName); // Check episode dir
     searchPath.push_back(normalizePathSlashes(gAppPathWCHAR) + L"/graphics/" + wFolderName); // Check base game
