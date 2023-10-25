@@ -9,7 +9,7 @@ struct SMBXScenery : SMBX_FullBaseItemArray<SMBXScenery, 100, GM_SCENERY_COUNT_A
 {
     Momentum momentum;
     short id;
-    short field_32;
+    short visible;
 };
 #pragma pack(pop)
 

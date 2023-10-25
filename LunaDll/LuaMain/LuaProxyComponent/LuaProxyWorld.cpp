@@ -79,6 +79,16 @@ void LuaProxy::World::setCurrentWalkingTimer(short currentWalkingTimer)
     SMBXOverworld::get()->currentWalkingTimer = currentWalkingTimer;
 }
 
+bool LuaProxy::World::justFinishedWalking() const
+{
+    return 0 != SMBXOverworld::get()->isCurrentlyWalking;
+}
+
+void LuaProxy::World::setJustFinishedWalking(bool justFinishedWalking)
+{
+    SMBXOverworld::get()->isCurrentlyWalking = COMBOOL(justFinishedWalking);
+}
+
 bool LuaProxy::World::playerIsCurrentWalking() const
 {
     return (SMBXOverworld::get()->currentWalkingDirection || SMBXOverworld::get()->isCurrentlyWalking ? true : false);

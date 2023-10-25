@@ -138,6 +138,20 @@ void LuaProxy::Scenery::setHeight(double height, lua_State* L)
     SMBXScenery::Get(m_index)->momentum.height = height;
 }
 
+bool LuaProxy::Scenery::visible(lua_State* L) const
+{
+    if (!isValid_throw(L))
+        return 0;
+    return 0 != SMBXScenery::Get(m_index)->visible;
+}
+
+void LuaProxy::Scenery::setVisible(bool visible, lua_State* L)
+{
+    if (!isValid_throw(L))
+        return;
+    SMBXScenery::Get(m_index)->visible = COMBOOL(visible);
+}
+
 bool LuaProxy::Scenery::isValid() const
 {
     return (m_index < ::SMBXScenery::Count());

@@ -28,6 +28,8 @@
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/Sound.h"
 
+#include "../../WorldMap.h"
+
 #include "../PerfTracker.h"
 
 #include "../../Misc/TestMode.h"
@@ -783,7 +785,7 @@ extern BOOL __stdcall StretchBltHook(
 
         return TRUE;
     }
-
+    
     return StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop);
 }
 
@@ -1544,7 +1546,26 @@ extern void __stdcall RenderWorldHook()
         g_GLEngine.QueueCmd(cmd);
     }
     g_EventHandler.hookWorldRenderStart();
-    RenderWorldReal();
+
+    if (WorldMap::GetWorldMapOverrideEnabled())
+    {
+        // allow lua to do world map rendering
+        if (gLunaLua.isValid()) {
+            std::shared_ptr<Event> worldDrawEvent = std::make_shared<Event>("onOverworldSystemDraw", false);
+            worldDrawEvent->setDirectEventName("onOverworldSystemDraw");
+            worldDrawEvent->setLoopable(false);
+            gLunaLua.callEvent(worldDrawEvent);
+        }
+        WorldRender();
+        g_BitBltEmulation.flushPendingBlt();
+    }
+    else
+    {
+        // call original RenderWorld function
+        RenderWorldReal();
+    }
+
+
     if (g_GLEngine.IsEnabled() && !Renderer::IsAltThreadActive())
     {
         g_GLEngine.EndFrame(g_GLEngine.GetHDC());

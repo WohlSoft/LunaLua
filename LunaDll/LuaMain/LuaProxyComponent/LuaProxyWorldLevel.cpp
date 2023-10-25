@@ -44,6 +44,23 @@ luabind::object LuaProxy::LevelObject::get(luabind::object idFilter, lua_State* 
 }
 
 
+luabind::object LuaProxy::LevelObject::getIntersecting(double x1, double y1, double x2, double y2, lua_State* L)
+{
+    return LuaHelper::getObjList(
+        ::WorldLevel::Count(),
+        [](unsigned short i) { return LuaProxy::LevelObject(i); },
+        [x1, y1, x2, y2](unsigned short i) {
+            ::WorldLevel* obj = ::WorldLevel::Get(i);
+    if (obj == NULL) return false;
+    if (x2 <= obj->momentum.x) return false;
+    if (y2 <= obj->momentum.y) return false;
+    if (obj->momentum.x + obj->momentum.width <= x1) return false;
+    if (obj->momentum.y + obj->momentum.height <= y1) return false;
+    return true;
+        }, L);
+}
+
+
 luabind::object LuaProxy::LevelObject::getByName(const std::string& levelName, lua_State* L)
 {
     for (int i = 0; i < ::WorldLevel::Count(); ++i){
@@ -155,6 +172,48 @@ void LuaProxy::LevelObject::setY(double y)
     SMBXLevel::get(m_index)->momentum.y = y;
 }
 
+double LuaProxy::LevelObject::width() const
+{
+    if (!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->momentum.width;
+}
+
+void LuaProxy::LevelObject::setWidth(double width)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->momentum.width = width;
+}
+
+double LuaProxy::LevelObject::height() const
+{
+    if (!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->momentum.height;
+}
+
+void LuaProxy::LevelObject::setHeight(double height)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->momentum.height = height;
+}
+
+
+short LuaProxy::LevelObject::id() const
+{
+    if (!isValid())
+        return 0;
+    return SMBXLevel::get(m_index)->id;
+}
+
+void LuaProxy::LevelObject::setId(short id)
+{
+    if (!isValid())
+        return;
+    SMBXLevel::get(m_index)->id = id;
+}
 
 double LuaProxy::LevelObject::goToX()
 {

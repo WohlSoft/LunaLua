@@ -357,10 +357,17 @@ bool LuaProxy::MusicIsFading()
 #endif
 }
 
-
+// depending on whether or not we're on the world map, native playMusic behaves differently
 void LuaProxy::playMusic(int section)
 {
+    if (GM_EPISODE_MODE) return;
     SMBXSound::PlayMusic(section, false);
+}
+void LuaProxy::overworldStartMusic(int index)
+{
+    if (!GM_EPISODE_MODE) return;
+    short sIndex = index;
+    native_playMusic(&sIndex);
 }
 
 unsigned short LuaProxy::gravity()

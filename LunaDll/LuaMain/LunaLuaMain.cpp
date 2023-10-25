@@ -26,6 +26,7 @@
 #include "../Rendering/ImageLoader.h"
 #include "../Misc/RuntimeHook.h"
 #include "../Input/MouseHandler.h"
+#include "../WorldMap.h"
 
 #include "../Misc/LoadScreen.h"
 
@@ -140,6 +141,9 @@ bool CLunaLua::shutdown()
 
     // Clear lua-based extra gfx
     ImageLoader::LuaUnregisterAllExtraGfx();
+
+    // Disable world map override
+    //WorldMap::SetWorldMapOverrideEnabled(false); // TODO: this can't be set to false on shutdown, otherwise level loading on the updated map doesn't behave properly
 
     // Don't be paused by Lua
     g_EventHandler.requestUnpause();
@@ -708,7 +712,9 @@ void CLunaLua::bindAll()
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
-                def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress)
+                def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress),
+                def("setNewWorldMapSystemEnabled", &WorldMap::SetWorldMapOverrideEnabled),
+                def("getNewWorldMapSystemEnabled", &WorldMap::GetWorldMapOverrideEnabled)
             ],
 
             namespace_("FileFormats")[
@@ -1078,13 +1084,15 @@ void CLunaLua::bindAll()
                 .property("playerWalkingTimer", &LuaProxy::World::currentWalkingTimer, &LuaProxy::World::setCurrentWalkingTimer)
                 .property("playerWalkingFrame", &LuaProxy::World::currentWalkingFrame, &LuaProxy::World::setCurrentWalkingFrame)
                 .property("playerWalkingFrameTimer", &LuaProxy::World::currentWalkingFrameTimer, &LuaProxy::World::setCurrentWalkingFrameTimer)
+                .property("playerJustFinishedWalking", &LuaProxy::World::justFinishedWalking, &LuaProxy::World::setJustFinishedWalking)
                 .property("playerIsCurrentWalking", &LuaProxy::World::playerIsCurrentWalking)
                 .property("levelTitle", &LuaProxy::World::levelTitle)
                 .property("levelObj", &LuaProxy::World::levelObj)
                 .property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
                 .property("playerPowerup", &LuaProxy::World::playerPowerup, &LuaProxy::World::setPlayerPowerup)
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
-                .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
+                .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem))
+                .def("playMusic", &LuaProxy::overworldStartMusic),
 
                 LUAHELPER_DEF_CLASS(Tile)
                 .scope[ //static functions
@@ -1118,6 +1126,7 @@ void CLunaLua::bindAll()
                 .property("y", &LuaProxy::Scenery::y, &LuaProxy::Scenery::setY)
                 .property("width", &LuaProxy::Scenery::width, &LuaProxy::Scenery::setWidth)
                 .property("height", &LuaProxy::Scenery::height, &LuaProxy::Scenery::setHeight)
+                .property("visible", &LuaProxy::Scenery::visible, &LuaProxy::Scenery::setVisible)
                 .property("isValid", &LuaProxy::Scenery::isValid),
 
                 LUAHELPER_DEF_CLASS(Path)
@@ -1163,14 +1172,18 @@ void CLunaLua::bindAll()
                         def("getByName", &LuaProxy::LevelObject::getByName),
                         def("getByFilename", &LuaProxy::LevelObject::getByFilename),
                         def("findByName", &LuaProxy::LevelObject::findByName),
-                        def("findByFilename", &LuaProxy::LevelObject::findByFilename)
+                        def("findByFilename", &LuaProxy::LevelObject::findByFilename),
+                        def("getIntersecting", &LuaProxy::LevelObject::getIntersecting)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::LevelObject, m_index))
                 .property("idx", &LuaProxy::LevelObject::idx)
                 .property("x", &LuaProxy::LevelObject::x, &LuaProxy::LevelObject::setX)
                 .property("y", &LuaProxy::LevelObject::y, &LuaProxy::LevelObject::setY)
+                .property("width", &LuaProxy::LevelObject::width, &LuaProxy::LevelObject::setWidth)
+                .property("height", &LuaProxy::LevelObject::height, &LuaProxy::LevelObject::setHeight)
                 .property("goToX", &LuaProxy::LevelObject::goToX, &LuaProxy::LevelObject::setGoToX)
                 .property("goToY", &LuaProxy::LevelObject::goToY, &LuaProxy::LevelObject::setGoToY)
+                .property("id", &LuaProxy::LevelObject::id, &LuaProxy::LevelObject::setId)
                 .property("topExitType", &LuaProxy::LevelObject::topExitType, &LuaProxy::LevelObject::setTopExitType)
                 .property("leftExitType", &LuaProxy::LevelObject::leftExitType, &LuaProxy::LevelObject::setLeftExitType)
                 .property("bottomExitType", &LuaProxy::LevelObject::bottomExitType, &LuaProxy::LevelObject::setBottomExitType)
