@@ -387,7 +387,6 @@ void __stdcall runtimeHookYoshiEatExit(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
-void __stdcall runtimeHookCollideNpcEnd(void);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);
 void __stdcall runtimeHookNpcHarmRaw_a293ee(void);
@@ -618,5 +617,7 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerBlockCollisionEnd(void);
 
 #endif
