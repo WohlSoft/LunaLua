@@ -1575,6 +1575,7 @@ void TrySkipPatch()
     PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8DE435).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<116>().Apply(); // Keyhole exit, usually uses a different frame timing code
 
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
@@ -1789,7 +1790,6 @@ void TrySkipPatch()
     PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
     
     // Hooks for onNPCHarm support
-    PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
     PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
@@ -2039,9 +2039,10 @@ void TrySkipPatch()
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hooks for lava-related calls to onPlayerKill
-    PATCH(0x9A394D).JMP(0x9A3A36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9A394D).CALL(runtimeHookPlayerCountCollisionsForWeakLava).JMP(0x9A3A36).NOP_PAD_TO_SIZE<14>().Apply();
     PATCH(0x9A5010).JMP(runtimeHookPlayerKillLavaSolidExit).Apply();
     PATCH(0x9A20F1).CALL(runtimeHookPlayerKillLava).Apply();
+    PATCH(0x9A5015).CALL(runtimeHookPlayerBlockCollisionEnd).NOP_PAD_TO_SIZE<8>().Apply();
 
     // Hooks for onWarpEnter/onWarp
     PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();

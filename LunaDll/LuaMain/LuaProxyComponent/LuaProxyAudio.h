@@ -42,6 +42,17 @@ namespace LuaProxy
         void changeMusic(int section, const std::string &filename, int fadeInDelayMs);
         void changeMusic(int section, int musicId, int fadeInDelayMs);
         void musicFadeOut(int section, int fadeInDelayMs);
+        
+        void    MusicRewind();
+        double  MusicGetInstChannelCount();
+        void    MusicInstChannelMute(int trackNumber);
+        void    MusicInstChannelUnmute(int trackNumber);
+        void    MusicSetTempo(double tempo);
+        void    MusicSetPitch(double pitch);
+        void    MusicSetSpeed(double speed);
+        double  MusicGetTempo();
+        double  MusicGetPitch();
+        double  MusicGetSpeed();
 
         //SFX
         Mix_Chunk* newMix_Chunk();
