@@ -1575,6 +1575,7 @@ void TrySkipPatch()
     PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8DE435).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<116>().Apply(); // Keyhole exit, usually uses a different frame timing code
 
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
