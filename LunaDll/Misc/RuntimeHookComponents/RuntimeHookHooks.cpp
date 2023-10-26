@@ -4319,6 +4319,10 @@ void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
     }
 }
 
+// variables used for counting collisions for weak_lava harm detection
+int weakLavaTotalCollisions = 0; // total number of hitspot = 1 collisions
+int weakLavaLavaCollisions = 0; // total nunmber of lava hitspot = 1 collisions
+
 static bool __stdcall runtimeHookPlayerKillLavaSolidExitImpl(int hitSpot, int blockIdx, short* playerIdxPtr)
 {
     auto& player = *Player::Get(*playerIdxPtr);
@@ -4340,16 +4344,15 @@ static bool __stdcall runtimeHookPlayerKillLavaSolidExitImpl(int hitSpot, int bl
     }
     else
     {
-        // For weak lava, avoid top touches (hitSpot == 1) counting unless either:
-        //   1) the entire bottom of the player is over the block
-        //   or
-        //   2) the entire top of the block is under the player
-        if ((hitSpot != 1) ||
-            (
-                (player.momentum.x > block.momentum.x)
-                ==
-                ((player.momentum.x + player.momentum.width) < (block.momentum.x + block.momentum.width))
-            ))
+        // Weak lava
+        if (hitSpot == 1)
+        {
+            // Count top collisions,
+            // we only hurt the player if the number of lava collisions equals the total number of top collisions
+            // otherwise, the player would be harmed in cases where they are also standing on another block, which is not desirable!
+            weakLavaLavaCollisions += 1;
+        }
+        else
         {
             native_harmPlayer(playerIdxPtr);
         }
@@ -4371,6 +4374,76 @@ _declspec(naked) void __stdcall runtimeHookPlayerKillLavaSolidExit(short* player
         ret
     runtimeHookPlayerKillLavaSolidExit_IsFalse:
         push 0x9A5015 // Normal return address, treats lava that would harm as passthrough
+        ret
+    }
+}
+
+
+_declspec(naked) void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr)
+{
+    __asm {
+        push eax
+        movsx eax, word ptr ss : [ebp - 0x54] // Get hitspot
+        cmp ax, 1 // Check if hit from above
+        jne runtimeHookPlayerCountCollisionsForWeakLava_NotHitSpot1 // skip if not hitspot 1
+        // if it's hitspot 1, increment our total collision counter
+        inc weakLavaTotalCollisions
+        // clean up
+    runtimeHookPlayerCountCollisionsForWeakLava_NotHitSpot1:
+        pop eax
+        ret
+    }
+}
+
+
+int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
+static void __stdcall runtimeHookPlayerBlockCollisionEndInternal(PlayerMOB* player)
+{
+    // if weak lava is enabled
+    if (gLavaIsWeak)
+    {
+        // detect if the player is ONLY standing on lava, by counting all blocks stood on
+        if (weakLavaLavaCollisions > 0 && weakLavaLavaCollisions >= weakLavaTotalCollisions)
+        {
+            // UGLY!!!!!!!! NEVER DO THIS!
+            // convert the player back to its array index
+            short playerIdx = ((int)(player - (PlayerMOB*)GM_PLAYERS_PTR));
+            // harm player
+            native_harmPlayer(&playerIdx);
+        }
+    }
+    // reset counters for next collision loop
+    weakLavaLavaCollisions = 0;
+    weakLavaTotalCollisions = 0;
+}
+// ran post-block-collision-loop
+// ALSO HANDLES CHARACTER ID TRANSLATION for link ducking check.
+_declspec(naked) void __stdcall runtimeHookPlayerBlockCollisionEnd()
+{
+    // most of the anatomy of this hook is copied from RuntimeHookCharacterId.cpp
+    __asm {
+        // ASM_ARG(ebx + 0xF0)
+        pushfd // set up ...
+        push eax
+        push ecx
+        push edx
+
+        // CODE FOR WEAK LAVA CHECK ////////////////////////////////
+        push ebx // pointer to player object
+        call runtimeHookPlayerBlockCollisionEndInternal
+        ///////////////////////////////////////////////////////////
+        
+        // call the normal characterIdTranslateHook
+        lea eax, dword ptr ds : [ebx + 0xF0]
+        push eax
+        call runtimeHookCharacterIdTranslateHook
+        
+        // ASM_TAIL_CMP_5
+        pop edx // clean up...
+        pop ecx
+        cmp ax, 5
+        pop eax
+        lea esp, dword ptr ds : [esp + 4] 
         ret
     }
 }
