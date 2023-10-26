@@ -617,5 +617,7 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerBlockCollisionEnd(void);
 
 #endif
