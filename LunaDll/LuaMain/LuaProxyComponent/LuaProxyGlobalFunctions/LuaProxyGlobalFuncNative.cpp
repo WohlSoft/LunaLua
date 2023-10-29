@@ -14,6 +14,12 @@ std::string LuaProxy::Native::getEpisodePath()
     return GM_FULLDIR;
 }
 
+std::string GetSavesPath(); // from LoadFile_Save.cpp
+std::string LuaProxy::Native::getSavesPath()
+{
+    return GetSavesPath();
+}
+
 void LuaProxy::Native::simulateError(short errcode)
 {
     emulateVB6Error((int)errcode);

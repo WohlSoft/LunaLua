@@ -2114,18 +2114,50 @@ static _declspec(naked) void __stdcall saveGame_OrigFunc()
         RET
     }
 }
-
+extern void LunaLua_writeSaveFile_savx();
 void __stdcall runtimeHookSaveGame()
 {
     // Hook for saving the game
-    if (gLunaLua.isValid()) {
+    if (!GM_CHEATED && gLunaLua.isValid()) {
         std::shared_ptr<Event> saveGameEvent = std::make_shared<Event>("onSaveGame", false);
         saveGameEvent->setDirectEventName("onSaveGame");
         saveGameEvent->setLoopable(false);
         gLunaLua.callEvent(saveGameEvent);
     }
 
-    saveGame_OrigFunc();
+    if (gUseSavX) {
+        LunaLua_writeSaveFile_savx();
+    } else {
+        saveGame_OrigFunc();
+    }
+}
+
+static _declspec(naked) void __stdcall loadGame_OrigFunc()
+{
+    __asm {
+        PUSH EBP
+        MOV EBP, ESP
+        SUB ESP, 0x8
+        PUSH 0x8E4E06
+        RET
+    }
+}
+extern bool LunaLua_loadSaveFile_savx();
+extern void LunaLua_preLoadSaveFile();
+void __stdcall runtimeHookLoadGame()
+{
+    // Hook for saving the game
+    bool loadedSavX = false;
+    // clean up data from previously loaded save file
+    LunaLua_preLoadSaveFile();
+    if (gUseSavX) {
+        // if savx files are enabled, try loading
+        loadedSavX = LunaLua_loadSaveFile_savx();
+    }
+    if (!loadedSavX) {
+        // call original function if savx wasn't loaded
+        loadGame_OrigFunc();
+    }
 }
 
 static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()

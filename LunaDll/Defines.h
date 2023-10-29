@@ -228,7 +228,7 @@ DEFMEM(GM_CLEAR_LEVEL_CHECKPOINT, WORD, 0x00B2C59C);
 DEFMEM(GM_UNK_B2B9E4,       WORD,  0x00B2B9E4);
 DEFMEM(GM_UNK_B2C5A0,       WORD,  0x00B2C5A0);
 DEFMEM(GM_UNK_B2C6DA,       WORD,  0x00B2C6DA);
-DEFMEM(GM_UNK_B2C8E4,       WORD,  0x00B2C8E4);
+DEFMEM(GM_SCORE,            WORD,  0x00B2C8E4);
 DEFMEM(GM_UNK_B2D742,       WORD,  0x00B2D742);
 DEFMEM(GM_UNK_WINDOWED,     WORD,  0x00B250D8);
 
@@ -303,6 +303,10 @@ DEFMEM(GM_OVERWORLD_PTR,    void*, 0x00B2C5C8);
 DEFMEM(GM_LEVEL_COUNT,      WORD,  0x00B25960);
 DEFMEM(GM_LEVEL_BASE,       void*, 0x00B25994);
 
+// Previously playing music on the world map
+DEFMEM(GM_CURRENT_WORLD_MUSIC, WORD, 0x00B2C5D8);
+// Whether the player beat the game
+DEFMEM(GM_BEAT_THE_GAME,       WORD, 0x00B2C66E)
 
 // Level related memory
 DEFMEM(GM_LVLFILENAME_PTR,  VB6StrPtr, 0x00B2C5A4);   // Lvl filename
@@ -668,6 +672,7 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_INIT_DEF_VALS    0x008C2720
 
 #define GF_SAVE_GAME        0x008E47D0
+#define GF_LOAD_GAME        0x008E4E00
 
 //      No args
 #define GF_INIT_LEVEL_ENVIR 0x009944F0
@@ -860,6 +865,7 @@ static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_saveGame       = (void(__stdcall *)())GF_SAVE_GAME;
+static const auto native_loadGame       = (void(__stdcall *)())GF_LOAD_GAME;
 
 static const auto native_spritesheetX   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_X;
 static const auto native_spritesheetY   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_Y;

@@ -107,6 +107,9 @@ extern bool            gDisablePlayerFilterBounceFix;
 // Other gameplay settings
 extern bool            gLavaIsWeak;
 
+// Whether to use savx format
+extern bool            gUseSavX;
+
 extern StartupSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

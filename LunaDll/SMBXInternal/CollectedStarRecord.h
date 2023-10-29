@@ -11,7 +11,7 @@ struct SMBX_CollectedStarRecord : SMBX_FullBaseItemArray<SMBX_CollectedStarRecor
 {
     VB6StrPtr levelFileName; //0x00
     short     section;       //0x04
-    short     unknown_06;    //0x06
+    short     unknown_06;    //0x06 padding
 };
 #pragma pack(pop)
 

@@ -34,6 +34,9 @@ bool gDisablePlayerFilterBounceFix = false;
 // Other gameplay settings
 bool gLavaIsWeak = false;
 
+// Whether to use savx format
+bool gUseSavX = true;
+
 // Global variables
 int	gFrames;
 

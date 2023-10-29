@@ -1645,6 +1645,8 @@ void TrySkipPatch()
 
     // Save game hook
     PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
+    // Load game hook
+    PATCH(0x8E4E00).JMP(runtimeHookLoadGame).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
 

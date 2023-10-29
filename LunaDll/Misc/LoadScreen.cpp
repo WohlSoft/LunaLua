@@ -48,6 +48,8 @@ static void updateFinishedFlag(lua_State* L)
 }
 
 
+std::string GetSavesPath(); // from LoadFile_Save.cpp
+
 static void LoadThread(void)
 {
     DWORD loadScreenStartTick = GetTickCount();
@@ -102,6 +104,8 @@ static void LoadThread(void)
         lua_setglobal(L, "_smbxPath");
         lua_pushstring(L, ((std::string)GM_FULLDIR).c_str());
         lua_setglobal(L, "_episodePath");
+        lua_pushstring(L, (GetSavesPath()).c_str() );
+        lua_setglobal(L, "_savesPath");
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");

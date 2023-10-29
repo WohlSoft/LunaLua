@@ -14,7 +14,7 @@ static std::unordered_set<std::wstring> naughtyExtensionMap(
 
 
 LunaPathValidator::LunaPathValidator() :
-    mEnginePath(), mMatchingEnginePath(), mMatchingEpisodePath()
+    mEnginePath(), mMatchingEnginePath(), mMatchingEpisodePath(), mMatchingSavesPath()
 {
 }
 
@@ -22,6 +22,7 @@ LunaPathValidator::~LunaPathValidator()
 {
 }
 
+std::wstring get_save_directory(bool ensurePath); // from LoadFile_Save.cpp
 void LunaPathValidator::SetPaths()
 {
     mEnginePath = NormalizedPath<std::string>(gAppPathUTF8);
@@ -41,6 +42,12 @@ void LunaPathValidator::SetPaths()
         mMatchingEpisodePath += L"\\";
     }
     std::transform(mMatchingEpisodePath.begin(), mMatchingEpisodePath.end(), mMatchingEpisodePath.begin(), towlower);
+    mMatchingSavesPath = NormalizedPath<std::wstring>(get_save_directory(false));
+    if ((mMatchingSavesPath.size() > 0) && (mMatchingSavesPath[mMatchingSavesPath.size() - 1] != L'\\'))
+    {
+        mMatchingSavesPath += L"\\";
+    }
+    std::transform(mMatchingSavesPath.begin(), mMatchingSavesPath.end(), mMatchingSavesPath.begin(), towlower);
 }
 
 LunaPathValidator::Result* LunaPathValidator::CheckPath(const char* path)
@@ -70,6 +77,11 @@ LunaPathValidator::Result* LunaPathValidator::CheckPath(const char* path)
     if ((mMatchingEpisodePath.size() > 0) && (mMatchingEpisodePath == wNormalPath.substr(0, mMatchingEpisodePath.size())))
     {
         // If episode path matches
+        mResult = { mNormalPath.c_str(), mNormalPath.length(), true };
+    }
+    else if ((mMatchingSavesPath.size() > 0) && (mMatchingSavesPath == wNormalPath.substr(0, mMatchingSavesPath.size())))
+    {
+        // If saves path matches
         mResult = { mNormalPath.c_str(), mNormalPath.length(), true };
     }
     else if ((mMatchingEnginePath.size() > 0) && (mMatchingEnginePath == wNormalPath.substr(0, mMatchingEnginePath.size())))
