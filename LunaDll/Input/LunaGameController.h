@@ -17,10 +17,13 @@ public:
     unsigned int xAxis;
     unsigned int yAxis;
     unsigned int buttonState;
+    // true between the controller disconnecting and a new input device being picked up
+    bool controllerJustDisconnected;
 public:
     inline LunaGameControllerPlayer() :
         haveKeyboard(false),
         haveController(false),
+        controllerJustDisconnected(false),
         joyId(0),
         xAxis(0x7FFF),
         yAxis(0x7FFF),
@@ -128,6 +131,7 @@ private:
     LunaGameControllerPlayer players[CONTROLLER_MAX_PLAYERS];
 
     std::vector<std::pair<SDL_JoystickID, int>> pressQueue;
+    std::vector<std::pair<SDL_JoystickID, int>> releaseQueue;
 
     unsigned int reconnectTimeout;
     bool reconnectFlag;
@@ -147,7 +151,7 @@ private:
 public:
     unsigned int emulatedJoyGetPosEx(unsigned int uJoyID, struct joyinfoex_tag* pji);
     void notifyKeyboardPress(int keycode);
-    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum);
+    void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum, bool changeTriggeredByDisconnect);
 #endif // !define(BUILDING_SMBXLAUNCHER)
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
@@ -166,6 +170,9 @@ public:
     inline void storePressEvent(SDL_JoystickID joyId, int which) { pressQueue.emplace_back(joyId, which); }
     inline const std::vector<std::pair<SDL_JoystickID, int>>& getPressQueue() { return pressQueue; }
     inline void clearPressQueue() { pressQueue.clear(); }
+    inline void storeReleaseEvent(SDL_JoystickID joyId, int which) { releaseQueue.emplace_back(joyId, which); }
+    inline const std::vector<std::pair<SDL_JoystickID, int>>& getReleaseQueue() { return releaseQueue; }
+    inline void clearReleaseQueue() { releaseQueue.clear(); }
     std::string getControllerName(SDL_JoystickID joyId);
 };
 
