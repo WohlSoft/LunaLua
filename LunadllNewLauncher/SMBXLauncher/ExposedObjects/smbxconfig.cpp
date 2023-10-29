@@ -72,8 +72,7 @@ QVariant SMBXConfig::getDataForEpisode(const QString& episodeDirPath, const QStr
 {
 
     QStringList wldFileFilter;
-    // Note: For now we don't support wldx, but when we do add << "*.wldx" below
-    wldFileFilter << "*.wld";
+    wldFileFilter << "*.wld" << "*.wldx";
     QDir episodeDir(episodeDirPath);
     QMap<QString, QVariant> ret;
     WorldData worldData;
@@ -208,25 +207,13 @@ bool SMBXConfig::sortSaveSlots(const QVariant slot1, const QVariant slot2)
     return slot1.toMap().value("id").toInt() < slot2.toMap().value("id").toInt();
 }
 
-QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
-{
-    QDir episodeDir = QDir::current();
-
-    if(!episodeDir.cd("worlds")){
-        return QVariantList();
-    }
-
-    if(!episodeDir.cd(directoryName)){
-        return QVariantList();
-    }
-
-
+QVariantList SMBXConfig::readSavesInPath(const QString& episodeDirPath, QList<int> *foundSlots) {
     QVariantList ret;
-    QDir directory(episodeDir.canonicalPath());
-    QStringList files = directory.entryList(QStringList() << "*.sav" << "*.SAV", QDir::Files);
+    QDir directory(episodeDirPath);
+    QStringList files = directory.entryList(QStringList() << "*.sav" << "*.SAV" << "*.savx" << ".SAVX", QDir::Files);
     foreach(QString filename, files) {
-        if (filename != "save0.sav") {
-            std::regex rgx("^save(-?[0-9]+)\\.sav$", std::regex_constants::icase);
+        if (filename.toLower() != "save0.sav" && filename.toLower() != "save0.savx") {
+            std::regex rgx("^save(-?[0-9]+)\\.sav[x]*$", std::regex_constants::icase);
 
             std::smatch match;
             const std::string fname = filename.toUtf8().constData();
@@ -244,55 +231,110 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
                 }
             }
 
+            if (foundSlots->contains(index)) {
+                continue;
+            }
+
+            foundSlots->append(index);
+
             if (index != 0 && index <= 32767 && index >= -32768) {
-
-                QFile ext(episodeDir.canonicalPath() + "/save" + QString::number(index) + "-ext.dat");
-                double progress = 0;
-                QString savefilename = "";
-                if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                    QTextStream in(&ext);
-                    in.setCodec("UTF-8");
-
-                    QString line("");
-                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
-                    std::regex savename("^\\s*\\[\\s*\"__savefilename\"\\s*\\]\\s*=\\s*\"(.*)\"\\s*,?\\s*$");
-
-                    int count = 0;
-
-                    while (!in.atEnd() && QString::compare(line, "},") != 0 && QString::compare(line, "}") != 0) {
-                        line = in.readLine();
-                        const std::string ln = line.toUtf8().constData();
-                        if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
-                            try {
-                                progress = std::stod(match[1]);
-                            } catch (std::invalid_argument const &e) {
-                                Q_UNUSED(e)
-                                progress = 0;
-                            } catch (std::out_of_range const &e) {
-                                Q_UNUSED(e)
-                                progress = 0;
-                            }
-                            count++;
-                            if (count >= 2) {
-                                break;
-                            }
-                        } else if (std::regex_search(ln.begin(), ln.end(), match, savename)) {
-                            savefilename = QString::fromStdString(match[1]);
-
-                            count++;
-                            if (count >= 2) {
-                                break;
-                            }
-                        }
-                    }
-
-                    ext.close();
-                }
-
-
                 GamesaveData data;
                 QMap<QString, QVariant> map;
-                FileFormats::ReadSMBX64SavFileF(episodeDir.canonicalPath() + "/" + filename, data);
+                double progress = 0;
+                QString savefilename = "";
+                if (filename.endsWith(".savx")) {
+                    FileFormats::ReadExtendedSaveFileF(episodeDirPath + "/" + filename, data);
+                    // try reading out SaveData string
+                    for (int i = 0; i < data.userData.store.size(); i++) {
+                        auto item = data.userData.store[i];
+                        if (item.location == saveUserData::DataLocation::DATA_GLOBAL && item.name == "LuaSaveData") {
+                            for (int j = 0; j < item.data.size(); j++) {
+                                auto entry = item.data[j];
+                                if (entry.key == "chunk") {
+                                    QString chunk = entry.value;
+                                    QTextStream in(&chunk);
+                                    // chunk is the save data
+                                    QString line("");
+                                    std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
+                                    std::regex savename("^\\s*\\[\\s*\"__savefilename\"\\s*\\]\\s*=\\s*\"(.*)\"\\s*,?\\s*$");
+
+                                    int count = 0;
+
+                                    while (!in.atEnd() && QString::compare(line, "},") != 0 && QString::compare(line, "}") != 0) {
+                                        line = in.readLine();
+                                        const std::string ln = line.toUtf8().constData();
+                                        if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
+                                            try {
+                                                progress = std::stod(match[1]);
+                                            } catch (std::invalid_argument const &e) {
+                                                Q_UNUSED(e)
+                                                progress = 0;
+                                            } catch (std::out_of_range const &e) {
+                                                Q_UNUSED(e)
+                                                progress = 0;
+                                            }
+                                            count++;
+                                            if (count >= 2) {
+                                                break;
+                                            }
+                                        } else if (std::regex_search(ln.begin(), ln.end(), match, savename)) {
+                                            savefilename = QString::fromStdString(match[1]);
+
+                                            count++;
+                                            if (count >= 2) {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    FileFormats::ReadSMBX64SavFileF(episodeDirPath + "/" + filename, data);
+                    QFile ext(episodeDirPath + "/save" + QString::number(index) + "-ext.dat");
+                    if (ext.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                        QTextStream in(&ext);
+                        in.setCodec("UTF-8");
+
+                        QString line("");
+                        std::regex prog("^\\s*\\[\\s*\"__progress\"\\s*\\]\\s*=\\s*(.*)\\s*,?\\s*$");
+                        std::regex savename("^\\s*\\[\\s*\"__savefilename\"\\s*\\]\\s*=\\s*\"(.*)\"\\s*,?\\s*$");
+
+                        int count = 0;
+
+                        while (!in.atEnd() && QString::compare(line, "},") != 0 && QString::compare(line, "}") != 0) {
+                            line = in.readLine();
+                            const std::string ln = line.toUtf8().constData();
+                            if (std::regex_search(ln.begin(), ln.end(), match, prog)) {
+                                try {
+                                    progress = std::stod(match[1]);
+                                } catch (std::invalid_argument const &e) {
+                                    Q_UNUSED(e)
+                                    progress = 0;
+                                } catch (std::out_of_range const &e) {
+                                    Q_UNUSED(e)
+                                    progress = 0;
+                                }
+                                count++;
+                                if (count >= 2) {
+                                    break;
+                                }
+                            } else if (std::regex_search(ln.begin(), ln.end(), match, savename)) {
+                                savefilename = QString::fromStdString(match[1]);
+
+                                count++;
+                                if (count >= 2) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        ext.close();
+                    }
+                }
 
                 if (data.meta.ReadFileValid) {
                     map.insert("id", index);
@@ -306,66 +348,77 @@ QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
             }
         }
     }
-
-    qSort(ret.begin(), ret.end(), sortSaveSlots);
-    /*
-    // For each possible savefile
-    QVariantList ret;
-    for (int i=1; i<=255; i++) {
-        QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(i) + ".sav";
-        GamesaveData data;
-        QMap<QString, QVariant> map;
-        FileFormats::ReadSMBX64SavFileF(saveFilePath, data);
-
-        map.insert("isPresent", data.meta.ReadFileValid);
-        if (data.meta.ReadFileValid) {
-            map.insert("starCount", data.gottenStars.length());
-            map.insert("gameCompleted", data.gameCompleted);
-            map.insert("coinCount", data.coins);
-        }
-        ret << map;
-    }
-    */
     return ret;
+}
+
+QVariantList SMBXConfig::getSaveInfo(const QString& directoryName)
+{
+    QVariantList files;
+
+    QDir episodeDir = QDir::current();
+    QList<int> foundSlots;
+
+    if(episodeDir.cd("saves") && episodeDir.cd(directoryName)){
+        QVariantList savesFolderFiles = SMBXConfig::readSavesInPath(episodeDir.canonicalPath(), &foundSlots);
+        files.append(savesFolderFiles);
+    }
+
+    episodeDir = QDir::current();
+
+    if(episodeDir.cd("worlds") && episodeDir.cd(directoryName)){
+        QVariantList worldsFolderFiles = SMBXConfig::readSavesInPath(episodeDir.canonicalPath(), &foundSlots);
+        files.append(worldsFolderFiles);
+    }
+
+    qSort(files.begin(), files.end(), sortSaveSlots);
+    return files;
 }
 
 void SMBXConfig::deleteSaveSlot(const QString& directoryName, int slot)
 {
-    if (slot < 1 || slot > 255) return;
+    if (slot != 0 && slot <= 32767 && slot >= -32768) {
 
-    QDir episodeDir = QDir::current();
 
-    if(!episodeDir.cd("worlds")){
-        return;
-    }
+        QMessageBox reply;
+        reply.setWindowTitle("Confirm Save Slot Deletion");
+        reply.setText("Are you sure you want to permanently delete this save slot?");
+        reply.setStandardButtons(QMessageBox::Yes);
+        reply.addButton(QMessageBox::Cancel);
+        reply.setDefaultButton(QMessageBox::Cancel);
 
-    if(!episodeDir.cd(directoryName)){
-        return;
-    }
-
-    QMessageBox reply;
-    reply.setWindowTitle("Confirm Save Slot Deletion");
-    reply.setText("Are you sure you want to permanently delete this save slot?");
-    reply.setStandardButtons(QMessageBox::Yes);
-    reply.addButton(QMessageBox::Cancel);
-    reply.setDefaultButton(QMessageBox::Cancel);
-
-    if (reply.exec() == QMessageBox::Yes) {
-        QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".sav";
-        QFile saveFile(saveFilePath);
-        if (saveFile.exists()){
-            saveFile.remove();
-        }
-        //Extended save files, likely temporary
-        QString tmpSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".tmp";
-        QFile tmpSaveFile(tmpSavePath);
-        if (tmpSaveFile.exists()){
-            tmpSaveFile.remove();
-        }
-        QString extSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + "-ext.dat";
-        QFile extSaveFile(extSavePath);
-        if (extSaveFile.exists()){
-            extSaveFile.remove();
+        if (reply.exec() == QMessageBox::Yes) {
+            QDir episodeDir = QDir::current();
+            QDir savesDir = QDir::current();
+            if (episodeDir.cd("worlds") && episodeDir.cd(directoryName)) {
+                QString saveFilePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".sav";
+                QFile saveFile(saveFilePath);
+                if (saveFile.exists()){
+                    saveFile.remove();
+                }
+                QString saveFilePath2= episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".savx";
+                QFile saveFile2(saveFilePath2);
+                if (saveFile2.exists()){
+                    saveFile2.remove();
+                }
+                //Extended save files, likely temporary
+                QString tmpSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".tmp";
+                QFile tmpSaveFile(tmpSavePath);
+                if (tmpSaveFile.exists()){
+                    tmpSaveFile.remove();
+                }
+                QString extSavePath = episodeDir.canonicalPath() + "/save" + QString::number(slot) + "-ext.dat";
+                QFile extSaveFile(extSavePath);
+                if (extSaveFile.exists()){
+                    extSaveFile.remove();
+                }
+            }
+            if (savesDir.cd("saves") && savesDir.cd(directoryName)) {
+                QString saveFilePath2= episodeDir.canonicalPath() + "/save" + QString::number(slot) + ".savx";
+                QFile saveFile2(saveFilePath2);
+                if (saveFile2.exists()){
+                    saveFile2.remove();
+                }
+            }
         }
     }
 }
