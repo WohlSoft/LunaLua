@@ -6,14 +6,13 @@
 #include <tuple>
 #include "../../Globals.h"
 
-CollisionMatrix gCollisionMatrix([] (unsigned int i, unsigned int j) { return i == 0 || i != j; }, "onGroupDeallocationInternal");
+CollisionMatrix gCollisionMatrix("onGroupDeallocationInternal");
 
-CollisionMatrix::CollisionMatrix(fun_type f, char const* ev) :
+CollisionMatrix::CollisionMatrix(char const* ev) :
     matrix(),
     deallocated_groups(),
     next_group(1),
     reference_count(),
-    default_behavior(f),
     deallocation_event_name(ev)
 {}
 
@@ -71,7 +70,7 @@ bool CollisionMatrix::getIndicesCollide(unsigned int i, unsigned int j) {
     std::tie(min, max) = std::minmax(i, j);
 
     // If matrix[max] contains min, returns !default_behavior(min, max). Otherwise, return default_behavior(min, max).
-    return (max < matrix.size() && matrix[max].count(min) == 1) != default_behavior(min, max);
+    return (max < matrix.size() && matrix[max].count(min) == 1) != defaultBehavior(min, max);
 }
 
 void CollisionMatrix::setIndicesCollide(unsigned int i, unsigned int j, bool collide) {
@@ -79,7 +78,7 @@ void CollisionMatrix::setIndicesCollide(unsigned int i, unsigned int j, bool col
     std::tie(min, max) = std::minmax(i, j);
 
     if (max >= matrix.size()) { // If the matrix is too small to contain (min, max)
-        if (collide != default_behavior(min, max)) { // If element (min, max) of the matrix is modified
+        if (collide != defaultBehavior(min, max)) { // If element (min, max) of the matrix is modified
             // Resize the matrix
             matrix.resize(max + 1);
 
@@ -93,7 +92,7 @@ void CollisionMatrix::setIndicesCollide(unsigned int i, unsigned int j, bool col
     } else {
         auto current_collide_iter = matrix[max].find(min); // Search collision group index min in set max
         bool contains = current_collide_iter != matrix[max].end(); // Check whether the previous search has succeeded or not
-        bool default_collide = default_behavior(min, max); // Get default behavior
+        bool default_collide = defaultBehavior(min, max); // Get default behavior
 
         if (contains && (collide == default_collide)) { // If we have to remove collision group index min from set max
             // Remove it
@@ -136,4 +135,8 @@ void CollisionMatrix::deallocateGroup(unsigned int group) {
 
     // Put group index in deallocated group indices
     deallocated_groups.push(group);
+}
+
+bool CollisionMatrix::defaultBehavior(unsigned int i, unsigned int j) const {
+    return i == 0 || i != j;
 }
