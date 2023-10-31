@@ -1138,7 +1138,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
         {
             std::wstring lowerArg = arg;
             std::transform(lowerArg.begin(), lowerArg.end(), lowerArg.begin(), towlower);
-            if (lowerArg.rfind(L".wld") == (lowerArg.size() - 4))
+            if (lowerArg.rfind(L".wld") == (lowerArg.size() - 4) || lowerArg.rfind(L".wldx") == (lowerArg.size() - 5))
             {
                 wldPath = arg;
             }

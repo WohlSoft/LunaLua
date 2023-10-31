@@ -148,6 +148,80 @@ void  SMBXLevelFileBase::ReadFileMem(std::string &rawData, LevelData &outData, c
     LunaLua_loadLevelFile(outData, fakePath, m_isValid);
 }
 
+static void makeErrorWorld(WorldData& outData, const std::string& msg)
+{
+    // TODO
+    dbgboxA(msg.c_str());
+    GM_CHEATED = true; // prevent accidental save file destruction
+}
+void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isValid);
+void SMBXWorldFileBase::ReadFile(const std::wstring& fullPath, WorldData& outData)
+{
+    FileFormats::CreateWorldData(outData);
+    m_isValid = true; // Ensure that we are not valid right now
+    std::wstring filePath = fullPath;
+    std::replace(filePath.begin(), filePath.end(), L'/', L'\\');
+
+    size_t findLastSlash = filePath.find_last_of(L"/\\");
+
+    // Check if path has slash, if not then invalid
+    if (m_isValid && (findLastSlash == std::wstring::npos))
+    {
+        m_isValid = false;
+        makeErrorWorld(outData, "Can't load this world,    "
+            "because there is no slash "
+            "in the full path.");
+    }
+
+    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
+    // Append missing extension
+    if (m_isValid && (findLastDot == std::wstring::npos))
+    {
+        if (!hasSuffix(filePath, L".wldx") && !hasSuffix(filePath, L".wld"))
+            filePath.append(L".wldx");
+    }
+
+    if (!fileExists(filePath))
+    {
+        m_isValid = false;
+        std::string msg = "Can't load this world,     "
+            "because the file does not  "
+            "exist:                     ";
+        for (unsigned int i = 0; i < filePath.length(); i += 26)
+        {
+            msg += WStr2Str(filePath.substr(i, 26)) + " ";
+        }
+        makeErrorWorld(outData, msg);
+    }
+
+    // Check if Attributes is valid
+    if (m_isValid && GetFileAttributesW(filePath.c_str()) == INVALID_FILE_ATTRIBUTES)
+    {
+        m_isValid = false;
+        std::string msg = "Can't load this world,     "
+            "because the file cannot be "
+            "opened:                    ";
+        for (unsigned int i = 0; i < filePath.length(); i += 26)
+        {
+            msg += WStr2Str(filePath.substr(i, 26)) + " ";
+        }
+        makeErrorWorld(outData, msg);
+    }
+
+    if (m_isValid && !FileFormats::OpenWorldFile(utf8_encode(filePath), outData))
+    {
+        m_isValid = false;
+        makeErrorWorld(outData, (" There was an error while  "
+            "  parsing the world file!  "
+            "                           ") +
+            outData.meta.ERROR_info + " at line " +
+            std::to_string(outData.meta.ERROR_linenum));
+    }
+
+    LunaLua_loadWorldFile(outData, filePath, m_isValid);
+}
+
+
 void SMBXWorldFileBase::PopulateEpisodeList()
 {
     static const std::vector<std::string> wldExtensions({".wld", ".wldx"});
@@ -195,7 +269,7 @@ void SMBXWorldFileBase::PopulateEpisodeList()
                 continue;
             }
 
-            if (wldData.meta.RecentFormat != WorldData::SMBX64)
+            if (wldData.meta.RecentFormat != WorldData::SMBX64 && wldData.meta.RecentFormat != WorldData::SMBX38A)
             {
                 // Wrong .wld format, we don't handle it right now
                 continue;

@@ -1460,6 +1460,9 @@
     <ClCompile Include="Misc\SaveData.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="FileManager\LoadFile_World.cpp">
+      <Filter>FileManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

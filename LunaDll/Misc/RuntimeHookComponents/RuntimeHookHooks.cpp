@@ -44,6 +44,7 @@
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
 #include "../../Misc/VB6RNG.h"
+#include "../WorldMap.h"
 
 void CheckIPCQuitRequest();
 
@@ -2213,7 +2214,26 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
     // Clear the autostart patch at this point
     GameAutostart::ClearAutostartPatch();
 
-    loadWorld_OrigFunc(filename);
+    // check if we're loading into a wldx file...
+    std::wstring lowerName = *filename;
+    std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), towlower);
+    bool loadWldX = (lowerName.rfind(L".wldx") == (lowerName.size() - 5));
+    
+    if (loadWldX)
+    {
+        // wldx format
+        WorldMap::SetWorldMapOverrideEnabled(true); // activate new map system by default
+
+        SMBXWorldFileBase base;
+        WorldData tempWorldData;
+        base.ReadFile(static_cast<std::wstring>(*filename), tempWorldData);
+    }
+    else
+    {
+        // wld format
+        WorldMap::SetWorldMapOverrideEnabled(false); // disable new map system, if it was active
+        loadWorld_OrigFunc(filename);
+    }
 }
 
 static _declspec(naked) void __stdcall cleanupWorld_OrigFunc()

@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../libs/PGE_File_Formats/lvl_filedata.h"
+#include "../libs/PGE_File_Formats/wld_filedata.h"
 
 // This interface is the bridge which manages our data
 struct SMBXDataInterface {
@@ -41,6 +42,12 @@ protected:
 class SMBXWorldFileBase {
 public:
     static void PopulateEpisodeList();
+    void ReadFile(const std::wstring& path, WorldData& outData);
+    // Status
+    inline bool isValid() const { return m_isValid; }
+
+protected:
+    bool m_isValid;
 };
 
 #endif

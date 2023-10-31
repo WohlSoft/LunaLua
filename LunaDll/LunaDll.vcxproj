@@ -326,6 +326,7 @@
     <ClCompile Include="FileManager\config_manager.cpp" />
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
+    <ClCompile Include="FileManager\LoadFile_World.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
     <ClCompile Include="Input\LunaGameController.cpp" />
     <ClCompile Include="Input\MouseHandler.cpp" />

@@ -427,7 +427,12 @@ DEFMEM(GM_LEVEL_EXIT_TYPE,  WORD,  0x00B2C5D4);      // 0 = didn't win, if highe
 DEFMEM(GM_PSWITCH_COUNTER,  WORD,  0x00B2C62C);
 DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
-DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
+DEFMEM(GM_WORLD_LOCKED_CHARACTERS_PTR, short*,0x00B25164); // pointer to array of locked character IDs
+DEFMEM(GM_WORLD_AUTOSTART_LVLNAME_PTR, VB6StrPtr, 0xB25724);
+DEFMEM(GM_WORLD_IS_HUB_EPISODE, WORD, 0xB25728);
+DEFMEM(GM_WORLD_RESTART_LVL_ON_DEATH, WORD, 0xB2572A);
+DEFMEM(GM_WORLD_TOTAL_STARS, WORD, 0xB2C906);
+DEFMEM(GM_WORLD_CREDITS_ARRAY, VB6StrPtr*, 0xB2C8D8);
 
 DEFMEM(GM_NPC_WALKSPEED,    float, 0x00B2C86C);
 
@@ -614,6 +619,9 @@ DEFMEM(effectdef_height, short*, 0x00B2BA84);
 
 DEFMEM(tiledef_height, short*, 0X00B2BF84);
 DEFMEM(tiledef_width, short*, 0X00B2BF68);
+
+DEFMEM(scenerydef_height, short*, 0x00B2BDDC)
+DEFMEM(scenerydef_width, short*, 0x00B2BDC0)
 
 // Frame timing related references
 DEFMEM(GM_LAST_FRAME_TIME, double, 0x00B2D72C);
@@ -841,6 +849,7 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_UPDATE_BLOCK_ANIM 0x009E14B0
 
 #define GF_CLEANUP_LEVEL    0x008DC6E0
+#define GF_CLEANUP_WORLD    0x008E2E40
 #define GF_LOAD_LEVEL       0x008D8F40
 #define GF_INIT_CAMERA      0x009502E0
 #define GF_RENDER_INIT_SCREEN 0x00987DE0
@@ -935,6 +944,7 @@ static const auto native_renderLevel    = (void(__stdcall *)(void))GF_RENDER_LEV
 static const auto native_updateBlockAnim = (void(__stdcall *)(void))GF_UPDATE_BLOCK_ANIM;
 
 static const auto native_cleanupLevel   = (void(__stdcall *)(void))GF_CLEANUP_LEVEL;
+static const auto native_cleanupWorld   = (void(__stdcall *)(void))GF_CLEANUP_WORLD;
 static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_LEVEL;
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;
