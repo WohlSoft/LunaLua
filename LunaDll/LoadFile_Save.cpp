@@ -38,6 +38,10 @@ static void copyTemplateToPlayer(int characterId, int playerIdx)
 bool LunaLua_loadSaveFileFromPath_savx(std::wstring fullPath);
 void LunaLua_writeSaveFileFromPath_savx(std::wstring fullPath);
 
+// returns TRUE if twe should have a valid save slot here
+bool EpisodeHasValidSavesPath() {
+    return GM_CUR_SAVE_SLOT != 0;
+}
 
 std::wstring getLastDirectory(const std::wstring& fname) {
     size_t pos = fname.find_last_of(L"\\/");
@@ -45,6 +49,11 @@ std::wstring getLastDirectory(const std::wstring& fname) {
 }
 // returns the saves folder, eg. data/saves/the invasion 2/
 std::wstring get_save_directory(bool ensurePath) {
+    if (!EpisodeHasValidSavesPath())
+    {
+        return L"";
+    }
+
     std::wstring savesDirectory = gAppPathWCHAR + L"\\saves";
 
     if (ensurePath) {
@@ -53,7 +62,9 @@ std::wstring get_save_directory(bool ensurePath) {
             CreateDirectoryW(savesDirectory.c_str(), NULL);
         }
     }
+
     // trim trailing slash of episode path and get episode name
+
     std::wstring episodeName = getLastDirectory(std::wstring(GM_FULLDIR).substr(0, std::wstring(GM_FULLDIR).length() - 1));
     savesDirectory += L"\\" + episodeName;
     if (ensurePath) {
@@ -66,26 +77,49 @@ std::wstring get_save_directory(bool ensurePath) {
 }
 // returns save file path, eg. data/saves/the invasion 2/save1.savx
 std::wstring get_save_file_path(bool ensurePath) {
-    return get_save_directory(ensurePath) + L"\\save" + Str2WStr(i2str(GM_CUR_SAVE_SLOT).c_str()) + L".savx";
+    auto dir = get_save_directory(ensurePath);
+    if (dir.size() == 0)
+    {
+        return L"";
+    }
+    return dir + L"\\save" + Str2WStr(i2str(GM_CUR_SAVE_SLOT).c_str()) + L".savx";
 }
 
 std::string GetSavesPath() {
     return WStr2Str(get_save_directory(false));
 }
+std::wstring GetSavesPathW() {
+    return get_save_directory(false);
+}
+
+void InitializeSavePath() {
+    // make sure the save data directory is created
+    get_save_directory(true);
+}
 
 
 void LunaLua_writeSaveFile_savx() {
     if (GM_CHEATED) return;
-    if (GM_CUR_SAVE_SLOT <= 0) return;
+    if (!EpisodeHasValidSavesPath()) return;
     std::wstring savePath = get_save_file_path(true);
-    LunaLua_writeSaveFileFromPath_savx(savePath);
+    if (savePath.size() > 0)
+    {
+        LunaLua_writeSaveFileFromPath_savx(savePath);
+    }
 }
 
 // returns false if failed to load / doesn't exist - in which case, try to load legacy save
 bool LunaLua_loadSaveFile_savx() {
-    if (GM_CUR_SAVE_SLOT <= 0) return false;
+    if (!EpisodeHasValidSavesPath()) return false;
     std::wstring savePath = get_save_file_path(false);
-    return LunaLua_loadSaveFileFromPath_savx(savePath);
+    if (savePath.size() == 0)
+    {
+        return false; // no save path
+    }
+    else
+    {
+        return LunaLua_loadSaveFileFromPath_savx(savePath);
+    }
 }
 
 // handles some internal logic that isn't called when overriding base smbx' SaveGame

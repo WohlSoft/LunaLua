@@ -718,6 +718,9 @@
     <ClInclude Include="Misc\SaveData.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="FileManager\LoadFile_Save.h">
+      <Filter>FileManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1327,9 +1330,6 @@
     </ClCompile>
     <ClCompile Include="LuaMain\LunaPathValidator.cpp">
       <Filter>LuaMain</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
     </ClCompile>
     <ClCompile Include="libs\luabind-deboostified\src$filename">
       <Filter>libs\luabind-deboostified</Filter>

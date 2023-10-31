@@ -34,6 +34,8 @@
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
+void InitializeSavePath();
+
 const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
 using namespace luabind;
 
@@ -167,6 +169,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Just to be safe
     shutdown();
+    //Make sure save folder exists
+    InitializeSavePath();
 
     gLunaPathValidator.SetPaths();
 

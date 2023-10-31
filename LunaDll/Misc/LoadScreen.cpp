@@ -12,6 +12,7 @@
 #include <lua.hpp>
 #include "LoadScreen.h"
 #include "../LuaMain/LunaPathValidator.h"
+#include "../../../FileManager/LoadFile_Save.h"
 
 static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
@@ -46,9 +47,6 @@ static void updateFinishedFlag(lua_State* L)
     lua_pushboolean(L, killThreadFlag);
     lua_setglobal(L, "_loadingFinished");
 }
-
-
-std::string GetSavesPath(); // from LoadFile_Save.cpp
 
 static void LoadThread(void)
 {

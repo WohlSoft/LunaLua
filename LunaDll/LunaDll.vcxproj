@@ -126,6 +126,7 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
+    <ClInclude Include="FileManager\LoadFile_Save.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
     <ClInclude Include="Input\LunaGameController.h" />
     <ClInclude Include="Input\MouseHandler.h" />

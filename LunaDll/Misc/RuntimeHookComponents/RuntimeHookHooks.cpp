@@ -36,6 +36,7 @@
 #include "../../Misc/WaitForTickEnd.h"
 #include "../../Rendering/ImageLoader.h"
 #include "../../Misc/LoadScreen.h"
+#include "../../../FileManager/LoadFile_Save.h"
 
 #include "../../SMBXInternal/HardcodedGraphicsAccess.h"
 #include "../../Rendering/LunaImage.h"
@@ -2114,7 +2115,6 @@ static _declspec(naked) void __stdcall saveGame_OrigFunc()
         RET
     }
 }
-extern void LunaLua_writeSaveFile_savx();
 void __stdcall runtimeHookSaveGame()
 {
     // Hook for saving the game
@@ -2142,8 +2142,6 @@ static _declspec(naked) void __stdcall loadGame_OrigFunc()
         RET
     }
 }
-extern bool LunaLua_loadSaveFile_savx();
-extern void LunaLua_preLoadSaveFile();
 void __stdcall runtimeHookLoadGame()
 {
     // Hook for saving the game

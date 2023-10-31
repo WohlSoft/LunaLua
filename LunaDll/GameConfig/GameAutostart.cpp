@@ -5,6 +5,7 @@
 #include "../Misc/MiscFuncs.h"
 #include "../FileManager/SMBXFileManager.h"
 #include "../libs/PGE_File_Formats/file_formats.h"
+#include "../FileManager/LoadFile_Save.h"
 
 // Patch for making introLoop skip to the right place
 static auto skipIntoPatch = PATCH(0x8CA6A4).JMP(0x8CD13C).NOP_PAD_TO_SIZE<7>();
@@ -169,6 +170,8 @@ bool GameAutostart::applyAutostart()
         GM_CUR_MENUCHOICE = saveSlot - 1;
 
         GM_FULLDIR = item->episodePath;
+
+        InitializeSavePath();
 
         // Apply patch to make introLoop immediately skip to loading the episode
         skipIntoPatch.Apply();

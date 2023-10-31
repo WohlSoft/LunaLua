@@ -2,6 +2,7 @@
 #include "LunaPathValidator.h"
 #include "../Globals.h"
 #include "../Misc/LoadScreen.h"
+#include "../../../FileManager/LoadFile_Save.h"
 
 // Instances
 LunaPathValidator gLunaPathValidator;
@@ -22,7 +23,6 @@ LunaPathValidator::~LunaPathValidator()
 {
 }
 
-std::wstring get_save_directory(bool ensurePath); // from LoadFile_Save.cpp
 void LunaPathValidator::SetPaths()
 {
     mEnginePath = NormalizedPath<std::string>(gAppPathUTF8);
@@ -42,12 +42,16 @@ void LunaPathValidator::SetPaths()
         mMatchingEpisodePath += L"\\";
     }
     std::transform(mMatchingEpisodePath.begin(), mMatchingEpisodePath.end(), mMatchingEpisodePath.begin(), towlower);
-    mMatchingSavesPath = NormalizedPath<std::wstring>(get_save_directory(false));
-    if ((mMatchingSavesPath.size() > 0) && (mMatchingSavesPath[mMatchingSavesPath.size() - 1] != L'\\'))
+    mMatchingSavesPath = GetSavesPathW();
+    if (mMatchingSavesPath.size() > 0)
     {
-        mMatchingSavesPath += L"\\";
+        mMatchingSavesPath = NormalizedPath<std::wstring>(mMatchingSavesPath);
+        if ((mMatchingSavesPath.size() > 0) && (mMatchingSavesPath[mMatchingSavesPath.size() - 1] != L'\\'))
+        {
+            mMatchingSavesPath += L"\\";
+        }
+        std::transform(mMatchingSavesPath.begin(), mMatchingSavesPath.end(), mMatchingSavesPath.begin(), towlower);
     }
-    std::transform(mMatchingSavesPath.begin(), mMatchingSavesPath.end(), mMatchingSavesPath.begin(), towlower);
 }
 
 LunaPathValidator::Result* LunaPathValidator::CheckPath(const char* path)
