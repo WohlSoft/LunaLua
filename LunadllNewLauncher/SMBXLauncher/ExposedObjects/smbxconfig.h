@@ -70,6 +70,7 @@ public:
 private:
     QVariant getJSONForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
     QVariant getDataForEpisode(const QString& episodeDirPath, const QString& jsonSubDirPerEpisode, const QString& jsonFileName);
+    QVariantList readSavesInPath(const QString& episodeDirPath, QList<int>* foundSlots);
     static bool sortSaveSlots(const QVariant slot1, const QVariant slot2);
 
 public slots:
