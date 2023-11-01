@@ -4426,3 +4426,31 @@ _declspec(naked) void __stdcall runtimeHookPlayerBlockCollisionEnd()
         ret
     }
 }
+
+// fixes a crash when holding duck and releasing a veggie into a ? block whose idx exceeded the range of the npc array
+_declspec(naked) void __stdcall runtimeHookFixVeggieBlockCrash()
+{
+    __asm {
+        // instructions this hook overwrites:
+        cmp word ptr ds : [ecx], ax
+        je __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck
+
+        // move harm reason into ax register
+        push eax // store eax register temporarily
+        mov eax, dword ptr ss : [ebp + 0xC]
+        mov ax, word ptr ds : [eax]
+        // check if harm reason 4..
+        cmp ax, 4
+        pop eax // restore eax
+        jne __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck // jump to exit early if not reason 4
+
+        // otherwise continue execution as normal if reason = 4
+        push 0xA2B22E
+        ret
+
+        // short-circuit the check
+    __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck:
+        push 0xA2B26E
+        ret
+    }
+}

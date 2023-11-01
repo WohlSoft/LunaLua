@@ -356,6 +356,7 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename);
 void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
+void __stdcall runtimeHookFixVeggieBlockCrash();
 
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
