@@ -2116,8 +2116,9 @@ void TrySkipPatch()
         .JMP(saveFileExists)
         .Apply();
 
-    PATCH(0x8CDEC7)
+    // this conflicts with patches for loading savx!
+    /*PATCH(0x8CDEC7)
         .bytes(0x84, 0xC0) // test al, al
         .bytes(0x74, 0x35) // jz 0x8CDF00
-        .Apply();
+        .Apply();*/
 }
