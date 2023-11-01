@@ -358,6 +358,11 @@ void __stdcall runtimeHookCleanupWorld(void);
 void __stdcall runtimeHookPiranahDivByZero();
 void __stdcall runtimeHookFixVeggieBlockCrash();
 
+void __stdcall runtimeHookFixLinkFairyClowncar1();
+void __stdcall runtimeHookFixLinkFairyClowncar2();
+void __stdcall runtimeHookFixLinkFairyClowncar3();
+
+
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
 

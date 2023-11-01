@@ -1756,6 +1756,10 @@ void TrySkipPatch()
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
     // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
     PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
+    // Patch link being able to kill himself by turning into a fairy in clowncar
+    PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>().Apply(); // ..when using tanookie/leaf powerup
+    PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>().Apply(); // ..when climbing an npc
+    PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>().Apply(); // also climbing npc related
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();

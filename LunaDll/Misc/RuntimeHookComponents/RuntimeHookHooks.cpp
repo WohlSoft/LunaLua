@@ -4454,3 +4454,71 @@ _declspec(naked) void __stdcall runtimeHookFixVeggieBlockCrash()
         ret
     }
 }
+
+
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for leaf powerup
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar1()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0x34], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x99F6F0
+        ret
+
+    __runtimeHookFixLinkFairyClowncar1_checkFailedRet:
+        // resume code execution where the check would fail to
+        push 0x99F7B1
+        ret
+    }
+}
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for climbing npcs
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar2()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ecx + 0x140], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ecx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9AAFA8
+        ret
+
+        __runtimeHookFixLinkFairyClowncar2_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9AB2FF
+            ret
+    }
+}
+// ALSO climbing npc related
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0xF2], ax
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9A75D2
+        ret
+
+        __runtimeHookFixLinkFairyClowncar3_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9A78B6
+            ret
+    }
+}
+
+
+
