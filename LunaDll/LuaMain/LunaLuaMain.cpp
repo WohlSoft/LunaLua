@@ -837,6 +837,7 @@ void CLunaLua::bindAll()
                 def("getLevelData", &LuaProxy::Formats::getLevelData),
                 def("openWorld", &LuaProxy::Formats::openWorld),
                 def("openWorldHeader", &LuaProxy::Formats::openWorldHeader),
+                def("getWorldData", &LuaProxy::Formats::getWorldData),
                 def("openNpcConfig", &LuaProxy::Formats::openNpcConfig)
             ],
             /*************************FileFormats*end*************************/

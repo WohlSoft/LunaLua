@@ -2206,6 +2206,7 @@ static _declspec(naked) void __stdcall loadWorld_OrigFunc(VB6StrPtr* filename)
     }
 }
 
+WorldData& getCurrentWorldData();
 void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
 {
     // This only occurs when first loading the episode...
@@ -2225,8 +2226,7 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
         WorldMap::SetWorldMapOverrideEnabled(true); // activate new map system by default
 
         SMBXWorldFileBase base;
-        WorldData tempWorldData;
-        base.ReadFile(static_cast<std::wstring>(*filename), tempWorldData);
+        base.ReadFile(static_cast<std::wstring>(*filename), getCurrentWorldData());
     }
     else
     {

@@ -757,13 +757,8 @@ luabind::object LuaProxy::Formats::openWorldHeader(const std::string &filePath, 
     return outData;
 }
 
-
-luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_State *L)
+static luabind::object openWorldInternal(const WorldData& data, lua_State* L)
 {
-    WorldData data;
-    std::string full_path = getFullPath(filePath);
-    FileFormats::OpenWorldFile(full_path, data);
-
     luabind::object outData = luabind::newtable(L);
     outData["meta"] = getMeta(data.meta, L);
 
@@ -790,7 +785,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         size_t counter = 0;
         luabind::object sets = luabind::newtable(L);
-        for(PGESTRING &cheat : data.cheatsList)
+        for(const PGESTRING &cheat : data.cheatsList)
         {
             sets[++counter] = cheat;
         }
@@ -813,7 +808,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(WorldTerrainTile & terra : data.tiles)
+        for(const WorldTerrainTile & terra : data.tiles)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = terra.x;
@@ -832,7 +827,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(WorldScenery & scene : data.scenery)
+        for(const WorldScenery & scene : data.scenery)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = scene.x;
@@ -851,7 +846,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(WorldPathTile & path : data.paths)
+        for(const WorldPathTile & path : data.paths)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = path.x;
@@ -870,7 +865,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(WorldLevelTile & path : data.levels)
+        for(const WorldLevelTile & path : data.levels)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = path.x;
@@ -891,7 +886,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
             e["pathBigBg"]      = path.bigpathbg;
             e["isGameStartPoint"] = path.gamestart;
             e["isForceStart"] = path.forceStart;
-            e["disableStartCoinsCount"] = path.disableStarCoinsCount;
+            e["disableStarCoinsCount"] = path.disableStarCoinsCount;
             e["destroyOnCompleting"] = path.destroyOnCompleting;
 
             e["goToX"] = path.gotox;
@@ -908,7 +903,7 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     {
         luabind::object arr = luabind::newtable(L);
         size_t counter = 0;
-        for(WorldMusicBox & musicBox : data.music)
+        for(const WorldMusicBox & musicBox : data.music)
         {
             luabind::object e = luabind::newtable(L);
             e["x"]         = musicBox.x;
@@ -925,6 +920,19 @@ luabind::object LuaProxy::Formats::openWorld(const std::string &filePath, lua_St
     return outData;
 }
 
+luabind::object LuaProxy::Formats::openWorld(const std::string& filePath, lua_State* L)
+{
+    WorldData data;
+    std::string full_path = getFullPath(filePath);
+    FileFormats::OpenWorldFile(full_path, data);
+    return openWorldInternal(data, L);
+}
+
+WorldData& getCurrentWorldData();
+luabind::object LuaProxy::Formats::getWorldData(lua_State* L)
+{
+    return openWorldInternal(getCurrentWorldData(), L);
+}
 
 luabind::object LuaProxy::Formats::openNpcConfig(const std::string &filePath, lua_State *L)
 {

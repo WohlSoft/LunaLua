@@ -19,6 +19,18 @@
 
 #include "CustomParamStore.h"
 
+
+WorldData worldData;
+WorldData& getCurrentWorldData() {
+    return worldData;
+}
+
+#define LIMIT_TILES     20000
+#define LIMIT_SCENES    5000
+#define LIMIT_PATHS     2000
+#define LIMIT_MUSIC     1000
+#define LIMIT_LEVELS    400
+
 // used to open up initial path upon starting the world
 void setPathsToVisible(Momentum* loc) {
     // in each direction...
@@ -82,16 +94,28 @@ void setPathsToVisible(Momentum* loc) {
     }
 }
 
+static bool verifyCompatibility(const std::string& fileId, const std::string& configId)
+{
+    if (fileId.empty() || configId.empty())
+        return false; // Nothing to check
+    if (fileId == configId)
+        return false; // Compatibility is valid
+    return true; // incompatibility detected!
+}
+
 void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isValid)
 {
     std::vector<std::string> limitWarnings;
     std::vector<std::string> nearLimitWarnings;
+    bool hasUnrecognizedConfigPack = false;
 
     native_cleanupWorld();
 
     size_t slashPos = fullPath.find_last_of(L"\\/");
     GM_FULLDIR = fullPath.substr(0, slashPos + 1);
     GM_LVLFILENAME_PTR = fullPath.substr(slashPos + 1, fullPath.length()-(slashPos+1));
+
+    hasUnrecognizedConfigPack = verifyCompatibility(outData.meta.configPackId, "SMBX2");
 
     //ImageLoader::Run(); also called later
 
@@ -127,15 +151,15 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
 
     // LOAD TILES /////////////////////////////////////////
     int numTiles = outData.tiles.size();
-    /*if (numTiles > SMBXTile::MAX_ID)
+    if (numTiles > LIMIT_TILES)
     {
-        limitWarnings.push_back(std::to_string(numTiles) + "/" + std::to_string(SMBXTile::MAX_ID) + " tiles");
-        numTiles = SMBXTile::MAX_ID;
+        limitWarnings.push_back(std::to_string(numTiles) + "/" + std::to_string(LIMIT_TILES) + " tiles");
+        numTiles = LIMIT_TILES;
     }
-    else if (numTiles > (SMBXTile::MAX_ID - SMBXTile::MAX_ID / 20))
+    else if (numTiles > (LIMIT_TILES - LIMIT_TILES / 20))
     {
-        nearLimitWarnings.push_back(std::to_string(numTiles) + "/" + std::to_string(SMBXTile::MAX_ID) + " tiles");
-    }*/
+        nearLimitWarnings.push_back(std::to_string(numTiles) + "/" + std::to_string(LIMIT_TILES) + " tiles");
+    }
     GM_TILE_COUNT = numTiles;
     for (int i = 0; i < numTiles; i++) {
         auto tile = outData.tiles[i];
@@ -149,15 +173,15 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
 
     // LOAD SCENES /////////////////////////////////////////
     int numScenes = outData.scenery.size();
-    /*if (numScenes > SMBXScenery::MAX_ID)
+    if (numScenes > LIMIT_SCENES)
     {
-        limitWarnings.push_back(std::to_string(numScenes) + "/" + std::to_string(SMBXScenery::MAX_ID) + " scenery");
-        numScenes = SMBXScenery::MAX_ID;
+        limitWarnings.push_back(std::to_string(numScenes) + "/" + std::to_string(LIMIT_SCENES) + " scenery");
+        numScenes = LIMIT_SCENES;
     }
-    else if (numScenes > (SMBXScenery::MAX_ID - SMBXScenery::MAX_ID / 20))
+    else if (numScenes > (LIMIT_SCENES - LIMIT_SCENES / 20))
     {
-        nearLimitWarnings.push_back(std::to_string(numScenes) + "/" + std::to_string(SMBXScenery::MAX_ID) + " scenery");
-    }*/
+        nearLimitWarnings.push_back(std::to_string(numScenes) + "/" + std::to_string(LIMIT_SCENES) + " scenery");
+    }
     GM_SCENERY_COUNT = numScenes;
     for (int i = 0; i < numScenes; i++) {
         auto scene = outData.scenery[i];
@@ -172,15 +196,15 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
 
     // LOAD PATHS /////////////////////////////////////////
     int numPath = outData.paths.size();
-    /*if (numPath > SMBXPath::MAX_ID)
+    if (numPath > LIMIT_PATHS)
     {
-        limitWarnings.push_back(std::to_string(numPath) + "/" + std::to_string(SMBXPath::MAX_ID) + " paths");
-        numPath = SMBXPath::MAX_ID;
+        limitWarnings.push_back(std::to_string(numPath) + "/" + std::to_string(LIMIT_PATHS) + " paths");
+        numPath = LIMIT_PATHS;
     }
-    else if (numPath > (SMBXPath::MAX_ID - SMBXPath::MAX_ID / 20))
+    else if (numPath > (LIMIT_PATHS - LIMIT_PATHS / 20))
     {
-        nearLimitWarnings.push_back(std::to_string(numPath) + "/" + std::to_string(SMBXPath::MAX_ID) + " paths");
-    }*/
+        nearLimitWarnings.push_back(std::to_string(numPath) + "/" + std::to_string(LIMIT_PATHS) + " paths");
+    }
     GM_PATH_COUNT = numPath;
     for (int i = 0; i < numPath; i++) {
         auto path = outData.paths[i];
@@ -194,15 +218,15 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
 
     // LOAD LEVELS /////////////////////////////////////////
     int numLevel = outData.levels.size();
-    /*if (numLevel > WorldLevel::MAX_ID)
+    if (numLevel > LIMIT_LEVELS)
     {
-        limitWarnings.push_back(std::to_string(numLevel) + "/" + std::to_string(WorldLevel::MAX_ID) + " levels");
-        numLevel = WorldLevel::MAX_ID;
+        limitWarnings.push_back(std::to_string(numLevel) + "/" + std::to_string(LIMIT_LEVELS) + " levels");
+        numLevel = LIMIT_LEVELS;
     }
-    else if (numLevel > (WorldLevel::MAX_ID - WorldLevel::MAX_ID / 20))
+    else if (numLevel > (LIMIT_LEVELS - LIMIT_LEVELS / 20))
     {
-        nearLimitWarnings.push_back(std::to_string(numLevel) + "/" + std::to_string(WorldLevel::MAX_ID) + " levels");
-    }*/
+        nearLimitWarnings.push_back(std::to_string(numLevel) + "/" + std::to_string(LIMIT_LEVELS) + " levels");
+    }
     GM_LEVEL_COUNT = numLevel;
     for (int i = 0; i < numLevel; i++) {
         auto level = outData.levels[i];
@@ -230,15 +254,15 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
 
     // LOAD MUSIC /////////////////////////////////////////
     int numMusic = outData.music.size();
-    /*if (numMusic > WorldMusicBox::MAX_ID)
+    if (numMusic > LIMIT_MUSIC)
     {
-        limitWarnings.push_back(std::to_string(numMusic) + "/" + std::to_string(WorldLevel::MAX_ID) + " music boxes");
-        numMusic = WorldLevel::MAX_ID;
+        limitWarnings.push_back(std::to_string(numMusic) + "/" + std::to_string(LIMIT_MUSIC) + " music boxes");
+        numMusic = LIMIT_MUSIC;
     }
-    else if (numMusic > (WorldLevel::MAX_ID - WorldLevel::MAX_ID / 20))
+    else if (numMusic > (LIMIT_MUSIC - LIMIT_MUSIC / 20))
     {
-        nearLimitWarnings.push_back(std::to_string(numMusic) + "/" + std::to_string(WorldLevel::MAX_ID) + " music boxes");
-    }*/
+        nearLimitWarnings.push_back(std::to_string(numMusic) + "/" + std::to_string(LIMIT_MUSIC) + " music boxes");
+    }
     GM_MUSICBOX_COUNT = numMusic;
     for (int i = 0; i < numMusic; i++) {
         auto music = outData.music[i];
@@ -286,5 +310,58 @@ void LunaLua_loadWorldFile(WorldData& outData, std::wstring fullPath, bool isVal
             setPathsToVisible(&(level->momentum));
         }
 
+    }
+
+    if (hasUnrecognizedConfigPack)
+    {
+        std::wstring m = fmt::format(L"This world file was created in an editor that was using an unrecognized config pack. "
+            L"This most likely means this world was designed to be used with a different engine rather than SMBX2. "
+            L"It is likely that some features will not be compatible, "
+            L"and may cause unexpected gameplay results or errors.\n\n"
+            L"World's config pack ID: {0}\n"
+            L"Expected config pack ID: SMBX2",
+            outData.meta.configPackId);
+        MessageBoxW(gMainWindowHwnd,
+            m.c_str(),
+            L"Incompatible world",
+            MB_ICONWARNING | MB_OK);
+    }
+
+    // show warnings /////////////////////////////////////////////////////////////////////////////////////////////
+    std::string msg;
+    if (limitWarnings.size() > 0)
+    {
+        msg += "This world has too many objects of the following types:\r\n";
+        for (const auto& limitMsg : limitWarnings)
+        {
+            msg += "\t";
+            msg += limitMsg;
+            msg += "\r\n";
+        }
+        msg += "\r\nExcess objects will be ignored.";
+        if (nearLimitWarnings.size() > 0)
+        {
+            msg += "\r\n\r\n";
+        }
+    }
+    if ((nearLimitWarnings.size() > 0) && ((msg.size() > 0)))
+    {
+        msg += "This world is approaching the limit for objects of the following types:\r\n";
+        for (const auto& limitMsg : nearLimitWarnings)
+        {
+            msg += "\t";
+            msg += limitMsg;
+            msg += "\r\n";
+        }
+        msg += "\r\n";
+    }
+
+    // If there's an object count warning, make it so
+    if (msg.size() > 0)
+    {
+        MessageBoxA(gMainWindowHwnd,
+            msg.c_str(),
+            "World Map Object Count Warning",
+            MB_ICONWARNING | MB_OK);
     }
 }
