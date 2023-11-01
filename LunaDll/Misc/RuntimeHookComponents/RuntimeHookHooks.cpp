@@ -2146,16 +2146,27 @@ static _declspec(naked) void __stdcall loadGame_OrigFunc()
 void __stdcall runtimeHookLoadGame()
 {
     // Hook for saving the game
-    bool loadedSavX = false;
+    bool loadedSaveFile = false;
     // clean up data from previously loaded save file
     LunaLua_preLoadSaveFile();
     if (gUseSavX) {
-        // if savx files are enabled, try loading
-        loadedSavX = LunaLua_loadSaveFile_savx();
+        // if savx files are enabled, try loading it 
+        loadedSaveFile = LunaLua_loadSaveFile_savx();
     }
-    if (!loadedSavX) {
-        // call original function if savx wasn't loaded
-        loadGame_OrigFunc();
+    if (!loadedSaveFile) {
+        // call original function if a save exists and savx wasn't loaded
+        if (fileExists(std::wstring(GM_FULLDIR) + L"save" + Str2WStr(i2str(GM_CUR_SAVE_SLOT).c_str()) + L".sav")) {
+            loadGame_OrigFunc();
+            loadedSaveFile = true;
+        }
+    }
+    // replaces some surrounding code that was nop'd out:
+    // if any save was loaded
+    if (loadedSaveFile) {
+        // clear autostart level name
+        if (!GM_WORLD_IS_HUB_EPISODE) {
+            GM_WORLD_AUTOSTART_LVLNAME_PTR = "";
+        }
     }
 }
 
@@ -2231,7 +2242,7 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename)
     else
     {
         // wld format
-        WorldMap::SetWorldMapOverrideEnabled(false); // disable new map system, if it was active
+        WorldMap::SetWorldMapOverrideEnabled(false); // disable new map system, if it was active*/
         loadWorld_OrigFunc(filename);
     }
 }

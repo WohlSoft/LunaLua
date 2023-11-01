@@ -236,23 +236,24 @@ bool LunaLua_loadSaveFileFromPath_savx(std::wstring fullPath) {
         GM_BEAT_THE_GAME = COMBOOL(s.gameCompleted);
         // TODO: musicFile, once custom map music is implemented
         
+        int visLevels = 0;
         // VISIBLE LEVELS: ////////////////////////////
         for (int i = 0; i < s.visibleLevels.size(); i++) {
             auto t = s.visibleLevels[i];
             auto obj = WorldLevel::Get(t.first);
-            if (obj != NULL) obj->visible = t.second;
+            if (obj != NULL) obj->visible = COMBOOL(t.second);
         }
         // VISIBLE SCENES: ////////////////////////////
         for (int i = 0; i < s.visibleScenery.size(); i++) {
             auto t = s.visibleScenery[i];
             auto obj = SMBXScenery::Get(t.first);
-            if (obj != NULL) obj->visible = t.second;
+            if (obj != NULL) obj->visible = COMBOOL(t.second);
         }
         // VISIBLE PATHS: ////////////////////////////
         for (int i = 0; i < s.visiblePaths.size(); i++) {
             auto t = s.visiblePaths[i];
             auto obj = SMBXPath::Get(t.first);
-            if (obj != NULL) obj->visible = t.second;
+            if (obj != NULL) obj->visible = COMBOOL(t.second);
         }
         
         // COLLECTED STARS: //////////////////////////
@@ -302,6 +303,7 @@ bool LunaLua_loadSaveFileFromPath_savx(std::wstring fullPath) {
             copyTemplateToPlayer(Player::Get(i)->Identity, i);
         }
     }
+
     return success;
 }
 void LunaLua_preLoadSaveFile() {

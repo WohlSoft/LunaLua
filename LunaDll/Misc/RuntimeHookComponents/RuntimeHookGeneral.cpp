@@ -1666,6 +1666,8 @@ void TrySkipPatch()
     PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
     // Load game hook
     PATCH(0x8E4E00).JMP(runtimeHookLoadGame).NOP_PAD_TO_SIZE<6>().Apply();
+    // NOP-out some logic around loadgame being called, since we want to handle that ourselves now
+    PATCH(0x8CDEC4).NOP_PAD_TO_SIZE<55>().Apply();
 
     PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
 
