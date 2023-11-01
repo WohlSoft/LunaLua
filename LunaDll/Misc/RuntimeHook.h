@@ -175,6 +175,7 @@ void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 void fixup_RenderPlayerJiterX();
+void fixup_NPCSortedBlockArrayBoundsCrash();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */

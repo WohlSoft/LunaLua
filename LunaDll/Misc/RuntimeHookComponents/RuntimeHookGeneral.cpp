@@ -1334,6 +1334,7 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
