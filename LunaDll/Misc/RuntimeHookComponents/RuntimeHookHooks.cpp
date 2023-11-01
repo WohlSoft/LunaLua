@@ -1069,7 +1069,7 @@ extern void __stdcall InitLevelEnvironmentHook()
     }
 }
 
-static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
+static _declspec(naked) void __stdcall msgbox_OrigFunc(short* pPlayerIdx)
 {
     __asm {
         PUSH EBP
@@ -1080,7 +1080,7 @@ static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
     }
 }
 
-void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
+void __stdcall runtimeHookMsgbox(short* pPlayerIdx)
 {
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
                               // A note here: If the message is set, then the message box will called
@@ -1113,7 +1113,7 @@ void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
     }
 }
 
-static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsigned int* pPlayerIdx)
+static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, short* pPlayerIdx)
 {
     unsigned int npcIdx = npcIdxWithOffset - 128;
 
@@ -1133,7 +1133,7 @@ static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsign
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx)
+_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(short* pPlayerIdx)
 {
     __asm {
         POP ECX

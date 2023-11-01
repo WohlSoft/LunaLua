@@ -463,6 +463,19 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     }
 }
 
+static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
+        auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
+        if (cKey != 0) {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey), std::string(1, cKey & 0b01111111));
+        } else {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey));
+        }
+    }
+}
+
 static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 {
     // Buffer memory 
@@ -590,10 +603,15 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
+    // Send lua onRawKeyPress/Release events
+    if (!repeated) {
+        SendLuaRawKeyEvent(vkey, keyDown);
+    }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus && keyDown)
-    {
-        ProcessRawKeyPress(vkey, scanCode, repeated);
+    if (haveFocus) {
+        if (keyDown) {
+            ProcessRawKeyPress(vkey, scanCode, repeated);
+        }
     }
 }
 
@@ -1316,6 +1334,7 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
 
     /************************************************************************/
     /* Replaced Imports                                                     */

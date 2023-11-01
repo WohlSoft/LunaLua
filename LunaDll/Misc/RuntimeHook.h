@@ -100,8 +100,8 @@ extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
-extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
-extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookMsgbox(short* pPlayerIdx);
+extern void __stdcall runtimeHookNpcMsgbox_Wrapper(short* pPlayerIdx);
 extern void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper();
 extern void __stdcall runtimeHookLinkShieldable_Wrapper();
 extern void __stdcall runtimeHookNoShieldFireEffect_Wrapper();
@@ -175,6 +175,7 @@ void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 void fixup_RenderPlayerJiterX();
+void fixup_NPCSortedBlockArrayBoundsCrash();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */
