@@ -4521,4 +4521,10 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
 }
 
 
-
+// close the game
+// don't bother with preserving cpu state or anything, since we'll never return from here...
+_declspec(naked) void __stdcall runtimeHookCloseGame()
+{
+    gIsShuttingDown = true;
+    std::exit(0);
+}

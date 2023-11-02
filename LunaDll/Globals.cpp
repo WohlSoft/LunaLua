@@ -37,6 +37,8 @@ bool gLavaIsWeak = false;
 // Global variables
 int	gFrames;
 
+bool gIsShuttingDown = false;
+
 int gLastDownPress;
 int gDownTapped;
 int gLastUpPress;

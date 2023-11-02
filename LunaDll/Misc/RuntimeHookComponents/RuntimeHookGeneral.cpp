@@ -1772,6 +1772,10 @@ void TrySkipPatch()
         gLinkFairyClowncarFixes[i]->Apply();
     }
 
+    // Hooks to close the game instead of returning to titlescreen
+    PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
+    PATCH(0x8E62F8).NOP_PAD_TO_SIZE<289>().Apply(); // remove black screen when pressing save & exit
+
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0x9E0D50).JMP(&runtimeHookRemoveBlock).NOP_PAD_TO_SIZE<6>().Apply();

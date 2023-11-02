@@ -56,7 +56,7 @@ CLunaLua::CLunaLua() :
 CLunaLua::~CLunaLua()
 {
     //Just to be safe
-    shutdown();
+    if (!gIsShuttingDown) shutdown();
 }
 
 void CLunaLua::exitContext()
