@@ -463,6 +463,19 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     }
 }
 
+static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
+        auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
+        if (cKey != 0) {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey), std::string(1, cKey & 0b01111111));
+        } else {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey));
+        }
+    }
+}
+
 static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 {
     // Buffer memory 
@@ -590,10 +603,15 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
+    // Send lua onRawKeyPress/Release events
+    if (!repeated) {
+        SendLuaRawKeyEvent(vkey, keyDown);
+    }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus && keyDown)
-    {
-        ProcessRawKeyPress(vkey, scanCode, repeated);
+    if (haveFocus) {
+        if (keyDown) {
+            ProcessRawKeyPress(vkey, scanCode, repeated);
+        }
     }
 }
 
@@ -1242,6 +1260,17 @@ AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareN
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
 AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
 
+// these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
+AsmPatch<10> gLinkFairyClowncarFix1 = PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(); // ..when using tanookie/leaf powerup
+AsmPatch<14> gLinkFairyClowncarFix2 = PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(); // ..when climbing an npc
+AsmPatch<13> gLinkFairyClowncarFix3 = PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>(); // also climbing npc related
+Patchable* gLinkFairyClowncarFixes[] = {
+    &gLinkFairyClowncarFix1,
+    &gLinkFairyClowncarFix2,
+    &gLinkFairyClowncarFix3,
+    nullptr
+};
+
 AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
     .PUSH_EBX()
     .PUSH_IMM32(0x99A850)
@@ -1316,6 +1345,7 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
@@ -1735,6 +1765,16 @@ void TrySkipPatch()
 
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+    // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
+    PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
+    // Patch link being able to kill himself by turning into a fairy in clowncar
+    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+        gLinkFairyClowncarFixes[i]->Apply();
+    }
+
+    // Hooks to close the game instead of returning to titlescreen
+    PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
+    PATCH(0x8E62F8).NOP_PAD_TO_SIZE<289>().Apply(); // remove black screen when pressing save & exit
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
