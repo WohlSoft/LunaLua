@@ -1065,7 +1065,7 @@ extern void __stdcall InitLevelEnvironmentHook()
     }
 }
 
-static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
+static _declspec(naked) void __stdcall msgbox_OrigFunc(short* pPlayerIdx)
 {
     __asm {
         PUSH EBP
@@ -1076,7 +1076,7 @@ static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
     }
 }
 
-void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
+void __stdcall runtimeHookMsgbox(short* pPlayerIdx)
 {
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
                               // A note here: If the message is set, then the message box will called
@@ -1109,7 +1109,7 @@ void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
     }
 }
 
-static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsigned int* pPlayerIdx)
+static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, short* pPlayerIdx)
 {
     unsigned int npcIdx = npcIdxWithOffset - 128;
 
@@ -1129,7 +1129,7 @@ static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsign
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx)
+_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(short* pPlayerIdx)
 {
     __asm {
         POP ECX
@@ -4425,4 +4425,106 @@ _declspec(naked) void __stdcall runtimeHookPlayerBlockCollisionEnd()
         lea esp, dword ptr ds : [esp + 4] 
         ret
     }
+}
+
+// fixes a crash when holding duck and releasing a veggie into a ? block whose idx exceeded the range of the npc array
+_declspec(naked) void __stdcall runtimeHookFixVeggieBlockCrash()
+{
+    __asm {
+        // instructions this hook overwrites:
+        cmp word ptr ds : [ecx], ax
+        je __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck
+
+        // move harm reason into ax register
+        push eax // store eax register temporarily
+        mov eax, dword ptr ss : [ebp + 0xC]
+        mov ax, word ptr ds : [eax]
+        // check if harm reason 4..
+        cmp ax, 4
+        pop eax // restore eax
+        jne __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck // jump to exit early if not reason 4
+
+        // otherwise continue execution as normal if reason = 4
+        push 0xA2B22E
+        ret
+
+        // short-circuit the check
+    __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck:
+        push 0xA2B26E
+        ret
+    }
+}
+
+
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for leaf powerup
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar1()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0x34], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x99F6F0
+        ret
+
+    __runtimeHookFixLinkFairyClowncar1_checkFailedRet:
+        // resume code execution where the check would fail to
+        push 0x99F7B1
+        ret
+    }
+}
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for climbing npcs
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar2()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ecx + 0x140], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ecx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9AAFA8
+        ret
+
+        __runtimeHookFixLinkFairyClowncar2_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9AB2FF
+            ret
+    }
+}
+// ALSO climbing npc related
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0xF2], ax
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9A75D2
+        ret
+
+        __runtimeHookFixLinkFairyClowncar3_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9A78B6
+            ret
+    }
+}
+
+
+// close the game
+// don't bother with preserving cpu state or anything, since we'll never return from here...
+_declspec(naked) void __stdcall runtimeHookCloseGame()
+{
+    gIsShuttingDown = true;
+    std::exit(0);
 }
