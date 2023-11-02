@@ -502,6 +502,22 @@ typedef struct ExtendedBlockFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetLinkClowncarFairyFix(bool enable)
+    {
+        if (enable)
+        {
+            for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+                gLinkFairyClowncarFixes[i]->Apply();
+            }
+        }
+        else
+        {
+            for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+                gLinkFairyClowncarFixes[i]->Unapply();
+            }
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             for (int i = 0; gFenceFixes[i] != nullptr; i++) {

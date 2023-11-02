@@ -129,6 +129,9 @@ bool CLunaLua::shutdown()
     for (int i = 0; gFenceFixes[i] != nullptr; i++) {
         gFenceFixes[i]->Apply();
     }
+    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+        gLinkFairyClowncarFixes[i]->Apply();
+    }
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);

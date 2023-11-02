@@ -41,7 +41,7 @@ extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
 extern AsmPatch<502> gDisableNPCSectionFix;
 extern Patchable *gFenceFixes[];
-
+extern Patchable *gLinkFairyClowncarFixes[];
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
