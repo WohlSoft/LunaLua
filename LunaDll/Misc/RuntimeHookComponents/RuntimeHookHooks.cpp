@@ -4523,8 +4523,15 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
 
 // close the game
 // don't bother with preserving cpu state or anything, since we'll never return from here...
-_declspec(naked) void __stdcall runtimeHookCloseGame()
+void __stdcall runtimeHookCloseGame()
 {
     gIsShuttingDown = true;
     std::exit(0);
+}
+
+// run standard lunadll loop stuff from credits
+static const auto native_OutroLoop = (void(__stdcall *)())0x8F6D20;
+void __stdcall runtimeHookCreditsLoop() {
+    TestFunc();
+    native_OutroLoop();
 }
