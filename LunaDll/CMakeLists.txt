@@ -184,6 +184,7 @@ set(LunaLua_Sources
     Misc/Playground.cpp
     Misc/ResourceFileMapper.cpp
     Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp
+    Misc/RuntimeHookComponents/RuntimeHookDefines.cpp
     Misc/RuntimeHookComponents/RuntimeHookFixups.cpp
     Misc/RuntimeHookComponents/RuntimeHookGeneral.cpp
     Misc/RuntimeHookComponents/RuntimeHookHooks.cpp
