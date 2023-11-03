@@ -1382,6 +1382,12 @@ void TrySkipPatch()
         .CALL(&LevelHUDHook)
         .Apply();
 
+    // run onLoop from credits
+    PATCH(0x8C04CD).CALL(&runtimeHookCreditsLoop).Apply();
+    // fixes a credits bug that causes toad (or any otherwise shoe wearing player) to constantly hold jump,
+    // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
+    PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
+
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
     PATCH(0x8D6BB6).CALL(&forceTermination).Apply();

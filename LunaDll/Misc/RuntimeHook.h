@@ -118,7 +118,7 @@ extern void __stdcall GenerateScreenshotHook();
 // Hooks which are helping fixups
 extern void IsNPCCollidesWithVeggiHook_Wrapper();
 
-
+extern void __stdcall runtimeHookCreditsLoop();
 
 /************************************************************************/
 /* Hooks for some rendering purposes                                    */
