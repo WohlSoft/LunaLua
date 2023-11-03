@@ -101,6 +101,8 @@ extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
 extern bool            gRenderBackgroundFlag;
 
+extern bool gIsShuttingDown;
+
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
 

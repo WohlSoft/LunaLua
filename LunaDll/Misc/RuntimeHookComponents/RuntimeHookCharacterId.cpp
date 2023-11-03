@@ -15,7 +15,7 @@
 
 
 // Prototype
-static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
+int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
 static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdAnimateBlocks(void);
@@ -353,7 +353,8 @@ DECL_HOOK(HOOK_0x9A32CB, ebx + 0xF0, CMP_2);
 // DECL_HOOK(HOOK_0x9A3D4D, ebx + 0xF0, CMP_3);
 // DECL_HOOK(HOOK_0x9A3D87, ebx + 0xF0, CMP_4);
 // DECL_HOOK(HOOK_0x9A3DC1, ebx + 0xF0, CMP_5);
-DECL_HOOK(HOOK_0x9A5015, ebx + 0xF0, CMP_5);
+// runs after collision loop, duplicated by runtimeHookPlayerBlockCollisionEnd
+//DECL_HOOK(HOOK_0x9A5015, ebx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x9A504D, ebx + 0xF0, MOV_esi);
 DECL_HOOK(HOOK_0x9A5367, ebx + 0xF0, CMP_3);
 DECL_HOOK(HOOK_0x9A5377, ebx + 0xF0, CMP_3);
@@ -856,7 +857,8 @@ static auto patch_0x9A32CB = PATCH(0x9A32CB).CALL(HOOK_0x9A32CB).NOP_PAD_TO_SIZE
 // static auto patch_0x9A3D4D = PATCH(0x9A3D4D).CALL(HOOK_0x9A3D4D).NOP_PAD_TO_SIZE<8>();
 // static auto patch_0x9A3D87 = PATCH(0x9A3D87).CALL(HOOK_0x9A3D87).NOP_PAD_TO_SIZE<8>();
 // static auto patch_0x9A3DC1 = PATCH(0x9A3DC1).CALL(HOOK_0x9A3DC1).NOP_PAD_TO_SIZE<8>();
-static auto patch_0x9A5015 = PATCH(0x9A5015).CALL(HOOK_0x9A5015).NOP_PAD_TO_SIZE<8>();
+// runs after collision loop, duplicated by runtimeHookPlayerBlockCollisionEnd
+//static auto patch_0x9A5015 = PATCH(0x9A5015).CALL(HOOK_0x9A5015).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9A504D = PATCH(0x9A504D).CALL(HOOK_0x9A504D).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x9A5367 = PATCH(0x9A5367).CALL(HOOK_0x9A5367).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x9A5377 = PATCH(0x9A5377).CALL(HOOK_0x9A5377).NOP_PAD_TO_SIZE<8>();
@@ -1759,7 +1761,8 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
 //    &patch_0x9A3D4D,
 //    &patch_0x9A3D87,
 //    &patch_0x9A3DC1,
-    &patch_0x9A5015,
+// runs after collision loop, duplicated by runtimeHookPlayerBlockCollisionEnd
+//    &patch_0x9A5015,
     &patch_0x9A504D,
     &patch_0x9A5367,
     &patch_0x9A5377,
@@ -1784,7 +1787,7 @@ static Patchable* runtimeHookCharacterIdPatchList[] = {
     &patch_0x9AD6FB,
     &patch_0x9ADAC0,
     &patch_0x9AEA0D,
-    &patch_0x9AEB73,
+    &patch_0x9AEB73, 
     &patch_0x9B081A,
     &patch_0x9B0863,
     &patch_0x9B08F3,
@@ -2149,7 +2152,7 @@ static PlayerMOB* getTemplateForCharacterWithDummyFallback(int id)
 // Hook support code //
 ///////////////////////
 
-static int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
+int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
 {
     short characterId = *idPtr;
 

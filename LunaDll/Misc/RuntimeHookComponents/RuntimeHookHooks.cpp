@@ -1069,7 +1069,7 @@ extern void __stdcall InitLevelEnvironmentHook()
     }
 }
 
-static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
+static _declspec(naked) void __stdcall msgbox_OrigFunc(short* pPlayerIdx)
 {
     __asm {
         PUSH EBP
@@ -1080,7 +1080,7 @@ static _declspec(naked) void __stdcall msgbox_OrigFunc(unsigned int* pPlayerIdx)
     }
 }
 
-void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
+void __stdcall runtimeHookMsgbox(short* pPlayerIdx)
 {
     bool isCancelled = false; // We want to be sure that it doesn't return on the normal menu
                               // A note here: If the message is set, then the message box will called
@@ -1113,7 +1113,7 @@ void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx)
     }
 }
 
-static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsigned int* pPlayerIdx)
+static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, short* pPlayerIdx)
 {
     unsigned int npcIdx = npcIdxWithOffset - 128;
 
@@ -1133,7 +1133,7 @@ static void __stdcall runtimeHookNpcMsgbox(unsigned int npcIdxWithOffset, unsign
     }
 }
 
-_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx)
+_declspec(naked) void __stdcall runtimeHookNpcMsgbox_Wrapper(short* pPlayerIdx)
 {
     __asm {
         POP ECX
@@ -4295,6 +4295,10 @@ void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
     }
 }
 
+// variables used for counting collisions for weak_lava harm detection
+int weakLavaTotalCollisions = 0; // total number of hitspot = 1 collisions
+int weakLavaLavaCollisions = 0; // total nunmber of lava hitspot = 1 collisions
+
 static bool __stdcall runtimeHookPlayerKillLavaSolidExitImpl(int hitSpot, int blockIdx, short* playerIdxPtr)
 {
     auto& player = *Player::Get(*playerIdxPtr);
@@ -4316,16 +4320,15 @@ static bool __stdcall runtimeHookPlayerKillLavaSolidExitImpl(int hitSpot, int bl
     }
     else
     {
-        // For weak lava, avoid top touches (hitSpot == 1) counting unless either:
-        //   1) the entire bottom of the player is over the block
-        //   or
-        //   2) the entire top of the block is under the player
-        if ((hitSpot != 1) ||
-            (
-                (player.momentum.x > block.momentum.x)
-                ==
-                ((player.momentum.x + player.momentum.width) < (block.momentum.x + block.momentum.width))
-            ))
+        // Weak lava
+        if (hitSpot == 1)
+        {
+            // Count top collisions,
+            // we only hurt the player if the number of lava collisions equals the total number of top collisions
+            // otherwise, the player would be harmed in cases where they are also standing on another block, which is not desirable!
+            weakLavaLavaCollisions += 1;
+        }
+        else
         {
             native_harmPlayer(playerIdxPtr);
         }
@@ -4349,4 +4352,183 @@ _declspec(naked) void __stdcall runtimeHookPlayerKillLavaSolidExit(short* player
         push 0x9A5015 // Normal return address, treats lava that would harm as passthrough
         ret
     }
+}
+
+
+_declspec(naked) void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr)
+{
+    __asm {
+        push eax
+        movsx eax, word ptr ss : [ebp - 0x54] // Get hitspot
+        cmp ax, 1 // Check if hit from above
+        jne runtimeHookPlayerCountCollisionsForWeakLava_NotHitSpot1 // skip if not hitspot 1
+        // if it's hitspot 1, increment our total collision counter
+        inc weakLavaTotalCollisions
+        // clean up
+    runtimeHookPlayerCountCollisionsForWeakLava_NotHitSpot1:
+        pop eax
+        ret
+    }
+}
+
+
+int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
+static void __stdcall runtimeHookPlayerBlockCollisionEndInternal(PlayerMOB* player)
+{
+    // if weak lava is enabled
+    if (gLavaIsWeak)
+    {
+        // detect if the player is ONLY standing on lava, by counting all blocks stood on
+        if (weakLavaLavaCollisions > 0 && weakLavaLavaCollisions >= weakLavaTotalCollisions)
+        {
+            // UGLY!!!!!!!! NEVER DO THIS!
+            // convert the player back to its array index
+            short playerIdx = ((int)(player - (PlayerMOB*)GM_PLAYERS_PTR));
+            // harm player
+            native_harmPlayer(&playerIdx);
+        }
+    }
+    // reset counters for next collision loop
+    weakLavaLavaCollisions = 0;
+    weakLavaTotalCollisions = 0;
+}
+// ran post-block-collision-loop
+// ALSO HANDLES CHARACTER ID TRANSLATION for link ducking check.
+_declspec(naked) void __stdcall runtimeHookPlayerBlockCollisionEnd()
+{
+    // most of the anatomy of this hook is copied from RuntimeHookCharacterId.cpp
+    __asm {
+        // ASM_ARG(ebx + 0xF0)
+        pushfd // set up ...
+        push eax
+        push ecx
+        push edx
+
+        // CODE FOR WEAK LAVA CHECK ////////////////////////////////
+        push ebx // pointer to player object
+        call runtimeHookPlayerBlockCollisionEndInternal
+        ///////////////////////////////////////////////////////////
+        
+        // call the normal characterIdTranslateHook
+        lea eax, dword ptr ds : [ebx + 0xF0]
+        push eax
+        call runtimeHookCharacterIdTranslateHook
+        
+        // ASM_TAIL_CMP_5
+        pop edx // clean up...
+        pop ecx
+        cmp ax, 5
+        pop eax
+        lea esp, dword ptr ds : [esp + 4] 
+        ret
+    }
+}
+
+// fixes a crash when holding duck and releasing a veggie into a ? block whose idx exceeded the range of the npc array
+_declspec(naked) void __stdcall runtimeHookFixVeggieBlockCrash()
+{
+    __asm {
+        // instructions this hook overwrites:
+        cmp word ptr ds : [ecx], ax
+        je __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck
+
+        // move harm reason into ax register
+        push eax // store eax register temporarily
+        mov eax, dword ptr ss : [ebp + 0xC]
+        mov ax, word ptr ds : [eax]
+        // check if harm reason 4..
+        cmp ax, 4
+        pop eax // restore eax
+        jne __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck // jump to exit early if not reason 4
+
+        // otherwise continue execution as normal if reason = 4
+        push 0xA2B22E
+        ret
+
+        // short-circuit the check
+    __runtimeHookFixVeggieBlockCrash_skipNPCIDCheck:
+        push 0xA2B26E
+        ret
+    }
+}
+
+
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for leaf powerup
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar1()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0x34], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], si
+        jne __runtimeHookFixLinkFairyClowncar1_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x99F6F0
+        ret
+
+    __runtimeHookFixLinkFairyClowncar1_checkFailedRet:
+        // resume code execution where the check would fail to
+        push 0x99F7B1
+        ret
+    }
+}
+// fix link being allowed to turn into a fairy while in clowncar, killing him instantly - for climbing npcs
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar2()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ecx + 0x140], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ecx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar2_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9AAFA8
+        ret
+
+        __runtimeHookFixLinkFairyClowncar2_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9AB2FF
+            ret
+    }
+}
+// ALSO climbing npc related
+_declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
+{
+    __asm {
+        // this check is overwritten by this hook
+        cmp word ptr ds : [ebx + 0xF2], ax
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+        // check mount == 0
+        cmp word ptr ds : [ebx + 0x108], 0
+        jne __runtimeHookFixLinkFairyClowncar3_checkFailedRet
+
+        // if both checks succeed, resume code execution at normal address
+        push 0x9A75D2
+        ret
+
+        __runtimeHookFixLinkFairyClowncar3_checkFailedRet :
+        // resume code execution where the check would fail to
+        push 0x9A78B6
+            ret
+    }
+}
+
+
+// close the game
+// don't bother with preserving cpu state or anything, since we'll never return from here...
+void __stdcall runtimeHookCloseGame()
+{
+    gIsShuttingDown = true;
+    std::exit(0);
+}
+
+// run standard lunadll loop stuff from credits
+static const auto native_OutroLoop = (void(__stdcall *)())0x8F6D20;
+void __stdcall runtimeHookCreditsLoop() {
+    TestFunc();
+    native_OutroLoop();
 }

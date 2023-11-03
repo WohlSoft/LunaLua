@@ -57,7 +57,7 @@ CLunaLua::CLunaLua() :
 CLunaLua::~CLunaLua()
 {
     //Just to be safe
-    shutdown();
+    if (!gIsShuttingDown) shutdown();
 }
 
 void CLunaLua::exitContext()
@@ -131,6 +131,9 @@ bool CLunaLua::shutdown()
         gFenceFixes[i]->Apply();
     }
     gCollisionMatrix.clear();
+    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+        gLinkFairyClowncarFixes[i]->Apply();
+    }
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
