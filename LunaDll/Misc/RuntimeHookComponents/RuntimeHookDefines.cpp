@@ -157,7 +157,7 @@ DEFINES_FFI_EXPORT(bool) LunaLua_Defines__pswitch_music__get() {
 }
 
 // path that disables the explosion effect for the zoomer, i guess?
-auto patch_effect_Zoomer_killEffectEnabled = PATCH(0x00A33160).byte(0xFFFF);
+auto patch_effect_Zoomer_killEffectEnabled = PATCH(0x00A33160).word(0xFFFF);
 DEFINES_FFI_EXPORT(void) LunaLua_Defines__effect_Zoomer_killEffectEnabled__set(bool value) {
     if (value) {
         patch_effect_Zoomer_killEffectEnabled.Unapply();
