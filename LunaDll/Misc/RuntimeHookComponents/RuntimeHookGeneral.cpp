@@ -1387,6 +1387,8 @@ void TrySkipPatch()
     // fixes a credits bug that causes toad (or any otherwise shoe wearing player) to constantly hold jump,
     // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
     PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
+    
+    PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
