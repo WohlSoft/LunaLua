@@ -340,6 +340,7 @@
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
     <ClCompile Include="LuaMain\LunaPathValidator.cpp" />
     <ClCompile Include="Misc\CollisionMatrix.cpp" />
+    <ClCompile Include="Misc\Gameover.cpp" />
     <ClCompile Include="Misc\LoadScreen.cpp" />
     <ClCompile Include="Misc\NpcIdExtender.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />

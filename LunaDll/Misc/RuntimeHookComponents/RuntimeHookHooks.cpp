@@ -1598,8 +1598,19 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
     }
 }
 
+Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };
+
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
+    if (!GM_CREDITS_MODE)
+    {
+        for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
+            // store player characters at the time of level load,
+            // these are used to restore the character if the episode has to be reloaded
+            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+        }
+    }
+    
     // Shut down Lua stuff before level loading just in case
     gLunaLua.exitContext();
     gCachedFileMetadata.purge();
@@ -4522,8 +4533,47 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
 // don't bother with preserving cpu state or anything, since we'll never return from here...
 void __stdcall runtimeHookCloseGame()
 {
-    gIsShuttingDown = true;
-    std::exit(0);
+    _exit(0);
+}
+
+extern PlayerMOB* getTemplateForCharacter(int id);
+extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
+static void LunaLuaResetEpisode() {
+    // show loadscreen while re-loading everything
+    LunaLoadScreenStart();
+    // re-load world
+    auto ep = EpisodeListItem::Get(GM_CUR_MENULEVEL - 1);
+    VB6StrPtr pathVb6 = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
+    native_loadWorld(&pathVb6);
+    // re-load save
+    if (saveFileExists())
+    {
+        native_loadGame();
+    }
+    // put the player back on the world map
+    GM_EPISODE_MODE = COMBOOL(true);
+    GM_TITLE_INTRO_MODE = COMBOOL(false);
+    GM_LEVEL_MODE = COMBOOL(false);
+    // reset checkpoints
+    GM_STR_CHECKPOINT = "";
+    // set flag for lua read
+    gDidGameOver = true;
+    // clear gamedata
+    LunaLuaSetGameData(0, 0);
+    // restore players' characters
+    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+        auto p = Player::Get(i);
+        // restore this player's character
+        p->Identity = playerStoredCharacters[min(i, 4)-1];
+        // apply saved template
+        auto t = getTemplateForCharacter(p->Identity);
+        if (t != nullptr) {
+            memcpy(p, t, sizeof(PlayerMOB));
+        }
+    }
+
+    // hide loadscreen
+    LunaLoadScreenKill();
 }
 
 // run standard lunadll loop stuff from credits
@@ -4531,4 +4581,16 @@ static const auto native_OutroLoop = (void(__stdcall *)())0x8F6D20;
 void __stdcall runtimeHookCreditsLoop() {
     TestFunc();
     native_OutroLoop();
+    if (GM_CREDITS_MODE == 0)
+    {
+        // finished credits!
+        LunaLuaResetEpisode();
+    }
+}
+
+// ran when gameover occurs
+extern void LunaLuaGameoverScreenRun();
+void __stdcall runtimeHookGameover() {
+    LunaLuaGameoverScreenRun();
+    LunaLuaResetEpisode();
 }

@@ -34,6 +34,8 @@
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
+extern bool luaDidGameOverFlag;
+
 const std::wstring CLunaLua::LuaLibsPath = L"\\scripts\\base\\engine\\main.lua";
 using namespace luabind;
 
@@ -57,7 +59,7 @@ CLunaLua::CLunaLua() :
 CLunaLua::~CLunaLua()
 {
     //Just to be safe
-    if (!gIsShuttingDown) shutdown();
+    shutdown();
 }
 
 void CLunaLua::exitContext()
@@ -239,6 +241,10 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
     //Bind all functions, propeties ect...
     bindAll();
     bindAllDeprecated();
+
+    // Store flags for stuff lua will read
+    luaDidGameOverFlag = gDidGameOver;
+    gDidGameOver = false;
 
     //Setup default contants
     setupDefaults();
@@ -699,6 +705,7 @@ void CLunaLua::bindAll()
                 def("saveGame", &LuaProxy::Misc::saveGame),
                 def("exitGame", &LuaProxy::Misc::exitGame),
                 def("exitEngine", &LuaProxy::Misc::exitEngine),
+                def("didGameOver", &LuaProxy::Misc::didGameOver),
                 def("loadEpisode", &LuaProxy::Misc::loadEpisode),
                 def("pause", (void(*)(void))&LuaProxy::Misc::pause),
                 def("pause", (void(*)(bool))&LuaProxy::Misc::pause),

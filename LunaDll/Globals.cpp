@@ -34,10 +34,11 @@ bool gDisablePlayerFilterBounceFix = false;
 // Other gameplay settings
 bool gLavaIsWeak = false;
 
+// Flag for returning from gameover screen
+bool gDidGameOver = false;
+
 // Global variables
 int	gFrames;
-
-bool gIsShuttingDown = false;
 
 int gLastDownPress;
 int gDownTapped;
