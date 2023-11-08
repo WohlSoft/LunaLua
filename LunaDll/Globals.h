@@ -101,13 +101,14 @@ extern bool            gRenderBGOFlag;
 extern bool            gRenderSizableFlag;
 extern bool            gRenderBackgroundFlag;
 
-extern bool gIsShuttingDown;
-
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
+
+// Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
+extern bool            gDidGameOver;
 
 extern StartupSettings gStartupSettings;
 

@@ -1454,6 +1454,9 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\Gameover.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scratch.txt">

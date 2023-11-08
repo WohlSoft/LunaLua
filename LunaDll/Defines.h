@@ -207,6 +207,7 @@ DEFMEM(GM_DO_SCREENSHOT,    short, 0x00B2504C);
 DEFMEM(GM_CREDITS_MODE,     WORD,  0x00B2C89C);
 DEFMEM(GM_EPISODE_MODE,     WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
 DEFMEM(GM_LEVEL_MODE,       WORD,  0x00B2C620);
+DEFMEM(GM_TITLE_INTRO_MODE, WORD,  0x00B2C620)
 /*
 The modes work as followed:
 GM_CREDITS_MODE == -1                        --> Credits
@@ -668,6 +669,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_INIT_DEF_VALS    0x008C2720
 
 #define GF_SAVE_GAME        0x008E47D0
+#define GF_LOAD_GAME        0x008E4E00
+
+#define GF_LOAD_WORLD       0x008DF5B0
 
 //      No args
 #define GF_INIT_LEVEL_ENVIR 0x009944F0
@@ -860,6 +864,9 @@ static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_saveGame       = (void(__stdcall *)())GF_SAVE_GAME;
+static const auto native_loadGame       = (void(__stdcall *)())GF_LOAD_GAME;
+
+static const auto native_loadWorld      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_WORLD;
 
 static const auto native_spritesheetX   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_X;
 static const auto native_spritesheetY   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_Y;
