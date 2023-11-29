@@ -2145,4 +2145,10 @@ void TrySkipPatch()
         .bytes(0x84, 0xC0) // test al, al
         .bytes(0x74, 0x35) // jz 0x8CDF00
         .Apply();
+    
+    // Add a space between /s and the argument
+    static wchar_t const fixed_regsvr32_string[] = L"regsvr32 /s ";
+    PATCH(0x8BEAE9)
+        .PUSH_IMM32((std::uint32_t) &fixed_regsvr32_string)
+        .Apply();
 }
