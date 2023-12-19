@@ -30,6 +30,7 @@ private:
     bool        m_controller_battery_reporting;
     bool        m_controller_rumble_enabled;
     bool        m_lua_enable_http;
+    bool        m_engine_cpu_lock_affinity;
 
     std::wstring m_settingFilename;
 public:
@@ -55,7 +56,7 @@ public:
     inline bool getControllerBatteryReporting() const { return m_controller_battery_reporting; }
     inline bool getControllerRumbleEnabled() const { return m_controller_rumble_enabled; }
     bool getLuaEnableHTTP() const { return m_lua_enable_http; }
-    void getLuaEnableHTTP(bool val) { m_lua_enable_http = val; }
+    inline bool getEngineCpuLockAffinity() const { return m_engine_cpu_lock_affinity; }
 };
 
 #endif
