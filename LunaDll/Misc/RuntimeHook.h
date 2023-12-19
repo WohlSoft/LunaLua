@@ -41,7 +41,7 @@ extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
 extern AsmPatch<502> gDisableNPCSectionFix;
 extern Patchable *gFenceFixes[];
-
+extern Patchable *gLinkFairyClowncarFixes[];
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
@@ -100,8 +100,8 @@ extern void __stdcall FrameTimingMaxFPSHook();
 extern void __stdcall FrameTimingHookQPC();
 extern void __stdcall FrameTimingMaxFPSHookQPC();
 extern void __stdcall InitLevelEnvironmentHook();
-extern void __stdcall runtimeHookMsgbox(unsigned int* pPlayerIdx);
-extern void __stdcall runtimeHookNpcMsgbox_Wrapper(unsigned int* pPlayerIdx);
+extern void __stdcall runtimeHookMsgbox(short* pPlayerIdx);
+extern void __stdcall runtimeHookNpcMsgbox_Wrapper(short* pPlayerIdx);
 extern void __stdcall runtimeHookIgnoreThrownNPCs_Wrapper();
 extern void __stdcall runtimeHookLinkShieldable_Wrapper();
 extern void __stdcall runtimeHookNoShieldFireEffect_Wrapper();
@@ -119,6 +119,9 @@ extern void __stdcall GenerateScreenshotHook();
 extern void IsNPCCollidesWithVeggiHook_Wrapper();
 
 
+
+extern void __stdcall runtimeHookCreditsLoop();
+extern void __stdcall runtimeHookGameover();
 
 /************************************************************************/
 /* Hooks for some rendering purposes                                    */
@@ -175,6 +178,7 @@ void fixup_Veggibug();
 void fixup_NativeFuncs();
 void fixup_BGODepletion();
 void fixup_RenderPlayerJiterX();
+void fixup_NPCSortedBlockArrayBoundsCrash();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */
@@ -355,6 +359,14 @@ void __stdcall runtimeHookLoadWorld(VB6StrPtr* filename);
 void __stdcall runtimeHookCleanupWorld(void);
 
 void __stdcall runtimeHookPiranahDivByZero();
+void __stdcall runtimeHookFixVeggieBlockCrash();
+
+void __stdcall runtimeHookFixLinkFairyClowncar1();
+void __stdcall runtimeHookFixLinkFairyClowncar2();
+void __stdcall runtimeHookFixLinkFairyClowncar3();
+
+// hooks for closing the game instaed of returning to titlescreen
+void __stdcall runtimeHookCloseGame();
 
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
@@ -387,7 +399,6 @@ void __stdcall runtimeHookYoshiEatExit(void);
 
 void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx);
-void __stdcall runtimeHookCollideNpcEnd(void);
 void __stdcall runtimeHookNpcHarmRaw_a291d8(void);
 void __stdcall runtimeHookNpcHarmRaw_a29272(void);
 void __stdcall runtimeHookNpcHarmRaw_a293ee(void);
@@ -618,5 +629,7 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr);
+void __stdcall runtimeHookPlayerBlockCollisionEnd(void);
 
 #endif

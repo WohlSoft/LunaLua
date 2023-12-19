@@ -107,6 +107,9 @@ extern bool            gDisablePlayerFilterBounceFix;
 // Other gameplay settings
 extern bool            gLavaIsWeak;
 
+// Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
+extern bool            gDidGameOver;
+
 extern StartupSettings gStartupSettings;
 
 /// General use globals - These are all defined in Globals.cpp ///

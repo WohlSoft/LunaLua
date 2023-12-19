@@ -431,3 +431,44 @@ void fixup_RenderPlayerJiterX()
     PATCH(0x99167E).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0x991833).NOP_PAD_TO_SIZE<6>().Apply();
 }
+
+void fixup_NPCSortedBlockArrayBoundsCrash() {
+    // fixes a crash when an npc goes really far away (often due to a certain buggy airship piece) -
+    // when accessing the FirstBlock/LastBlock array, if the array index would be out of bounds, just reset it to 0 instead
+    PATCH(0xA11056).bytes(0x33, 0xFF).Apply(); // call ebx -> xor edi, edi
+    PATCH(0xA1111F).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1A507).bytes(0x33, 0xFF).Apply(); // call ebx -> xor edi, edi
+    PATCH(0xA1A5C0).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C193).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C1F7).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C7A2).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C805).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1CB48).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1CBAC).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1EF2B).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1EF8B).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+    PATCH(0xA22274).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA222D4).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4F813).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4F892).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4FBFE).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4FC7D).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA500C9).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA5014B).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA5044A).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA504CC).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50898).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50916).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50C6D).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50CEB).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA510E6).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA51165).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA514B3).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA51532).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA524F7).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA52575).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA99113).bytes(0x33, 0xF6).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor esi, esi
+    PATCH(0xA9925F).bytes(0x33, 0xF6).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor esi, esi
+    PATCH(0xAA6C94).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+    PATCH(0xAA6CAE).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+}

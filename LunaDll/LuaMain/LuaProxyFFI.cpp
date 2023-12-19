@@ -34,6 +34,8 @@
 // Prototypes from RuntimeHookCharacterId.cpp
 short* getValidCharacterIDArray();
 PlayerMOB* getTemplateForCharacter(int id);
+// Defined in RuntimeHookNpcHarm.cpp
+void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID);
 
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
@@ -500,6 +502,22 @@ typedef struct ExtendedBlockFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetLinkClowncarFairyFix(bool enable)
+    {
+        if (enable)
+        {
+            for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+                gLinkFairyClowncarFixes[i]->Apply();
+            }
+        }
+        else
+        {
+            for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+                gLinkFairyClowncarFixes[i]->Unapply();
+            }
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             for (int i = 0; gFenceFixes[i] != nullptr; i++) {
@@ -806,6 +824,11 @@ typedef struct ExtendedBlockFields_\
         {
             ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaMarkNPCTransformationAsHandledByLua(int npcIdx, int oldID, int newID)
+    {
+        markNPCTransformationAsHandledByLua(npcIdx, oldID, newID);
     }
 }
 

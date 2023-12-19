@@ -463,6 +463,19 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     }
 }
 
+static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
+        auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
+        if (cKey != 0) {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey), std::string(1, cKey & 0b01111111));
+        } else {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey));
+        }
+    }
+}
+
 static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 {
     // Buffer memory 
@@ -590,10 +603,15 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
+    // Send lua onRawKeyPress/Release events
+    if (!repeated) {
+        SendLuaRawKeyEvent(vkey, keyDown);
+    }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus && keyDown)
-    {
-        ProcessRawKeyPress(vkey, scanCode, repeated);
+    if (haveFocus) {
+        if (keyDown) {
+            ProcessRawKeyPress(vkey, scanCode, repeated);
+        }
     }
 }
 
@@ -1242,6 +1260,17 @@ AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareN
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
 AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
 
+// these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
+AsmPatch<10> gLinkFairyClowncarFix1 = PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(); // ..when using tanookie/leaf powerup
+AsmPatch<14> gLinkFairyClowncarFix2 = PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(); // ..when climbing an npc
+AsmPatch<13> gLinkFairyClowncarFix3 = PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>(); // also climbing npc related
+Patchable* gLinkFairyClowncarFixes[] = {
+    &gLinkFairyClowncarFix1,
+    &gLinkFairyClowncarFix2,
+    &gLinkFairyClowncarFix3,
+    nullptr
+};
+
 AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
     .PUSH_EBX()
     .PUSH_IMM32(0x99A850)
@@ -1316,6 +1345,7 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
@@ -1351,6 +1381,14 @@ void TrySkipPatch()
     PATCH(0x92EC24)
         .CALL(&LevelHUDHook)
         .Apply();
+
+    // run onLoop from credits
+    PATCH(0x8C04CD).CALL(&runtimeHookCreditsLoop).Apply();
+    // fixes a credits bug that causes toad (or any otherwise shoe wearing player) to constantly hold jump,
+    // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
+    PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
+    
+    PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
@@ -1575,6 +1613,7 @@ void TrySkipPatch()
     PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8DE435).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<116>().Apply(); // Keyhole exit, usually uses a different frame timing code
 
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
@@ -1734,6 +1773,16 @@ void TrySkipPatch()
 
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+    // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
+    PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
+    // Patch link being able to kill himself by turning into a fairy in clowncar
+    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
+        gLinkFairyClowncarFixes[i]->Apply();
+    }
+
+    // Hooks to close the game instead of returning to titlescreen
+    PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
+    PATCH(0x8E62F8).NOP_PAD_TO_SIZE<289>().Apply(); // remove black screen when pressing save & exit
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
@@ -1789,7 +1838,6 @@ void TrySkipPatch()
     PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
     
     // Hooks for onNPCHarm support
-    PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
     PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
@@ -2039,9 +2087,10 @@ void TrySkipPatch()
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hooks for lava-related calls to onPlayerKill
-    PATCH(0x9A394D).JMP(0x9A3A36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9A394D).CALL(runtimeHookPlayerCountCollisionsForWeakLava).JMP(0x9A3A36).NOP_PAD_TO_SIZE<14>().Apply();
     PATCH(0x9A5010).JMP(runtimeHookPlayerKillLavaSolidExit).Apply();
     PATCH(0x9A20F1).CALL(runtimeHookPlayerKillLava).Apply();
+    PATCH(0x9A5015).CALL(runtimeHookPlayerBlockCollisionEnd).NOP_PAD_TO_SIZE<8>().Apply();
 
     // Hooks for onWarpEnter/onWarp
     PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();
