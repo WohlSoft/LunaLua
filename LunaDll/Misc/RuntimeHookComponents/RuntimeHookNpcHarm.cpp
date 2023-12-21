@@ -33,7 +33,7 @@ std::vector<std::pair<short,short>> processingNPCInfoForIDChangeDetection;
 // prevent onNPCTransform event from being executed twice in situations where we're already listening for ID changes
 // called by npc::transform
 void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID) {
-    for (int i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
+    for (size_t i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
         // if the listening info matches the NPC that was transformed,
         if (processingNPCInfoForIDChangeDetection[i].first == npcIdx && processingNPCInfoForIDChangeDetection[i].second == oldID) {
             // update the info to reflect the new ID
