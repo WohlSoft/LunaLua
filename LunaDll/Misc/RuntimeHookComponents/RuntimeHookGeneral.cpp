@@ -1265,47 +1265,39 @@ static auto npcSectionFixImpl = PatchCollection(
 Patchable& gNPCSectionFix = npcSectionFixImpl;
 
 // these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
-AsmPatch<10> gLinkFairyClowncarFix1 = PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(); // ..when using tanookie/leaf powerup
-AsmPatch<14> gLinkFairyClowncarFix2 = PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(); // ..when climbing an npc
-AsmPatch<13> gLinkFairyClowncarFix3 = PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>(); // also climbing npc related
-Patchable* gLinkFairyClowncarFixes[] = {
-    &gLinkFairyClowncarFix1,
-    &gLinkFairyClowncarFix2,
-    &gLinkFairyClowncarFix3,
-    nullptr
-};
+static auto linkFairyClowncarFixesImpl = PatchCollection(
+    PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(), // ..when using tanookie/leaf powerup
+    PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(), // ..when climbing an npc
+    PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>()  // also climbing npc related
+);
+Patchable& gLinkFairyClowncarFixes = linkFairyClowncarFixesImpl;
 
-AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
+static auto fenceFixesImpl = PatchCollection(
+    PATCH(0x99933C)
     .PUSH_EBX()
     .PUSH_IMM32(0x99A850)
-    .JMP(runtimeHookSetPlayerFenceSpeed);
+    .JMP(runtimeHookSetPlayerFenceSpeed),
 
-AsmPatch<14> gFenceFix_9A78A8 = PATCH(0x9A78A8)
+    PATCH(0x9A78A8)
     .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
     .bytes(0xD9, 0xE0) // fchs
     .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
-    .bytes(0x0F, 0x1F, 0x00); // nop
+    .bytes(0x0F, 0x1F, 0x00), // nop
 
-AsmPatch<19> gFenceFix_9B8A4C = PATCH(0x9B8A4C)
+    PATCH(0x9B8A4C)
     .PUSH_ESI()
     .CALL(runtimeHookIncreaseFenceFrameCondition)
     .bytes(0x84, 0xC0) // test al, al
     .JZ(0x9B8B5D)
-    .JMP(0x9B8AF0);
+    .JMP(0x9B8AF0),
 
-AsmPatch<10> gFenceFix_AA6E78 = PATCH(0xAA6E78)
+    PATCH(0xAA6E78)
     .PUSH_EBP()
     .PUSH_ESI()
     .CALL(runtimeHookUpdateBGOMomentum)
-    .bytes(0x0F, 0x1F, 0x00); // nop
-
-Patchable *gFenceFixes[] = {
-    &gFenceFix_99933C,
-    &gFenceFix_9A78A8,
-    &gFenceFix_9B8A4C,
-    &gFenceFix_AA6E78,
-    nullptr
-};
+    .bytes(0x0F, 0x1F, 0x00) // nop
+);
+Patchable& gFenceFixes = fenceFixesImpl;
 
 void TrySkipPatch()
 {
@@ -1780,9 +1772,7 @@ void TrySkipPatch()
     // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
     PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
     // Patch link being able to kill himself by turning into a fairy in clowncar
-    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
-        gLinkFairyClowncarFixes[i]->Apply();
-    }
+    gLinkFairyClowncarFixes.Apply();
 
     // Hooks to close the game instead of returning to titlescreen
     PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
@@ -2124,9 +2114,7 @@ void TrySkipPatch()
     runtimeHookCharacterIdApplyPatch();
 
     //Fence bug fixes
-    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-        gFenceFixes[i]->Apply();
-    }
+    gFenceFixes.Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */

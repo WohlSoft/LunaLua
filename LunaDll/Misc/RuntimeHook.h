@@ -40,8 +40,8 @@ extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
 extern Patchable& gNPCSectionFix;
-extern Patchable *gFenceFixes[];
-extern Patchable *gLinkFairyClowncarFixes[];
+extern Patchable& gFenceFixes;
+extern Patchable& gLinkFairyClowncarFixes;
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
