@@ -494,11 +494,11 @@ typedef struct ExtendedBlockFields_\
     {
         if (enable)
         {
-            gDisableNPCSectionFix.Apply();
+            gNPCSectionFix.Apply();
         }
         else
         {
-            gDisableNPCSectionFix.Unapply();
+            gNPCSectionFix.Unapply();
         }
     }
 

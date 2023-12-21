@@ -1258,7 +1258,11 @@ static unsigned int __stdcall LatePatch(void)
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
-AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
+static auto npcSectionFixImpl = PatchCollection(
+    PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>(),
+    PATCH(0xA0C931).JMP(&runtimeHookNPCSectionWrap).NOP_PAD_TO_SIZE<194>()
+);
+Patchable& gNPCSectionFix = npcSectionFixImpl;
 
 // these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
 AsmPatch<10> gLinkFairyClowncarFix1 = PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(); // ..when using tanookie/leaf powerup
@@ -2059,7 +2063,7 @@ void TrySkipPatch()
     gDisableNPCDownwardClipFixSlope.Apply();
 
     // Hook to fix an NPC's section property when it spawn out of bounds
-    gDisableNPCSectionFix.Apply();
+    gNPCSectionFix.Apply();
 
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
