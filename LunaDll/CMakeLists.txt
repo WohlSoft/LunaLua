@@ -167,11 +167,13 @@ set(LunaLua_Sources
     Minigames/GameboyRPG.cpp
     Minigames/Minigames.cpp
     Misc/AsyncHTTPClient.cpp
+    Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
     Misc/FreeImageUtils/FreeImageData.cpp
     Misc/FreeImageUtils/FreeImageGifData.cpp
     Misc/FreeImageUtils/FreeImageHelper.cpp
     Misc/FreeImageUtils/FreeImageInit.cpp
+    Misc/Gameover.cpp
     Misc/Gui/GuiCrashNotify.cpp
     Misc/Gui/RichTextDialog.cpp
     Misc/LoadScreen.cpp

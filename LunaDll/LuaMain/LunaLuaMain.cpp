@@ -30,6 +30,7 @@
 #include "../Misc/LoadScreen.h"
 
 #include "LunaPathValidator.h"
+#include "../Misc/CollisionMatrix.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -130,6 +131,7 @@ bool CLunaLua::shutdown()
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
     gLinkFairyClowncarFixes.Apply();
+    gCollisionMatrix.clear();
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);

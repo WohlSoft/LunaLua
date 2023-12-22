@@ -7,6 +7,7 @@
 #include <string>
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "../Misc/CollisionMatrix.h"
 
 
 enum NPCID : short
@@ -522,7 +523,7 @@ struct ExtendedNPCFields
 {
     bool noblockcollision;
     short fullyInsideSection;
-    char collisionGroup[32];
+    unsigned int collisionGroup;
 
     // Constructor
     ExtendedNPCFields()
@@ -535,7 +536,7 @@ struct ExtendedNPCFields
     {
         noblockcollision = false;
         fullyInsideSection = -1;
-        collisionGroup[0] = '\0';
+        collisionGroup = 0u;
     }
 };
 

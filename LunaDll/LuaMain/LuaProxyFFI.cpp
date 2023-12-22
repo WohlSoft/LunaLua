@@ -28,6 +28,7 @@
 
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "../Misc/CollisionMatrix.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -433,7 +434,7 @@ typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
     short fullyInsideSection;\
-    char collisionGroup[32];\
+    unsigned int collisionGroup;\
 } ExtendedNPCFields;";
     }
 
@@ -451,13 +452,33 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char collisionGroup[32];\
+    unsigned int collisionGroup;\
 } ExtendedBlockFields;";
     }
 
-    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAllocateIndex()
     {
-        return 32;
+        return gCollisionMatrix.allocateIndex();
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixIncrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.incrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixDecrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.decrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetIndicesCollide(unsigned int first, unsigned int second, bool collide)
+    {
+        gCollisionMatrix.setIndicesCollide(first, second, collide);
+    }
+
+    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetIndicesCollide(unsigned int first, unsigned int second) 
+    {
+        return gCollisionMatrix.getIndicesCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
