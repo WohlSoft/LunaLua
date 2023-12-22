@@ -432,6 +432,8 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
+    bool inSectionBounds;\
+    bool wasInSectionBounds;\
     char collisionGroup[32];\
 } ExtendedNPCFields;";
     }
