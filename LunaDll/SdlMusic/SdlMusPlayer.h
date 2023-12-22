@@ -74,6 +74,9 @@ private:
     static int musicDeferredFadeIn;
 
     static int sRate;
+    static Uint16 sdlFormat;
+    static int bytesPerSampleAllChan; // Bytes per sample, all channels
+    static int bytesPerSample; //Bytes per sample for 1 channel
     static bool showMsg;
     static std::string showMsg_for;
 
