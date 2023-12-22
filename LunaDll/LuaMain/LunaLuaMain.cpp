@@ -920,6 +920,9 @@ void CLunaLua::bindAll()
                 def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
                 def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
 
+                def("MixedSfxVolume", &LuaProxy::Audio::GetMixedSfxVolume),
+                def("MixedSfxVolume", &LuaProxy::Audio::SetMixedSfxVolume),
+
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(PlayingSfxInstance, std::shared_ptr)
                     .def("Pause", &LuaProxy::Audio::PlayingSfxInstance::Pause)
                     .def("Resume", &LuaProxy::Audio::PlayingSfxInstance::Resume)
