@@ -3248,6 +3248,33 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
     }
 }
 
+
+static double findMomentumToBoundaryDistance(const Momentum& momentum, const Bounds& bounds)
+{
+    double distX = 0;
+    double distY = 0;
+
+    if ((momentum.x + momentum.width) < bounds.left)
+    {
+        distX = momentum.x + momentum.width - bounds.left;
+    }
+    else if (momentum.x > bounds.right)
+    {
+        distX = bounds.right - momentum.x;
+    }
+
+    if ((momentum.y + momentum.height) < bounds.top)
+    {
+        distY = momentum.y + momentum.height - bounds.top;
+    }
+    else if (momentum.y > bounds.bottom)
+    {
+        distY = bounds.bottom - momentum.y;
+    }
+
+    return sqrt(distX*distX + distY*distY);
+}
+
 void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 {
     NPCMOB* npc = NPC::GetRaw(*npcIdx);
@@ -3273,9 +3300,29 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
         return;
     }
 
+    // Is it still within the bounds of the current section?
+    const Bounds& bounds = GM_LVL_BOUNDARIES[npc->currentSection];
+
+    if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
+    {
+        ext->fullyInsideSection = npc->currentSection;
+        return;
+    }
+    else if (momentum.x-32 <= bounds.right && momentum.y-32 <= bounds.bottom && momentum.x+momentum.width+32 >= bounds.left && momentum.y+momentum.height+32 >= bounds.top)
+    {
+        // If just barely outside, no need to check the section again
+        // This is particularly important for older levels with very close sections
+        return;
+    }
+    
     // Is it in the bounds of a section? If so, choose it
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
+        if (sectionIdx == npc->currentSection)
+        {
+            continue;
+        }
+
         const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
 
         if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
@@ -3292,17 +3339,13 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
-        const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
+        // Find the distance to the section's boundaries or original boundaries - whichever is closest
+        double distToOriginalBounds = findMomentumToBoundaryDistance(momentum, GM_ORIG_LVL_BOUNDS[sectionIdx]);
+        double distToBounds = findMomentumToBoundaryDistance(momentum, GM_LVL_BOUNDARIES[sectionIdx]);
 
-        double distLeft = (bounds.left - (momentum.x + momentum.width));
-        double distRight = (momentum.x - bounds.right);
-        double distX = std::max(distLeft, distRight);
-        double distTop = (bounds.top - (momentum.y + momentum.height));
-        double distBottom = (momentum.y - bounds.bottom);
-        double distY = std::max(distTop, distBottom);
+        double dist = std::min(distToBounds,distToOriginalBounds);
 
-        double dist = std::max(distX, distY);
-        if ((closestSection == -1) || (dist < closestSectionDist))
+        if (closestSection == -1 || dist < closestSectionDist)
         {
             closestSectionDist = dist;
             closestSection = sectionIdx;
