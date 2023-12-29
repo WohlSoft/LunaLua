@@ -641,7 +641,7 @@ LuaProxy::NPC LuaProxy::spawnNPC(short npcid, double x, double y, short section,
     npc->id = npcid;
 
     npc->offscreenCountdownTimer = 180;
-    npc->unknown_124 = -1;
+    npc->activeFlag = -1;
     npc->currentSection = section;
 
     ++(GM_NPCS_COUNT);
