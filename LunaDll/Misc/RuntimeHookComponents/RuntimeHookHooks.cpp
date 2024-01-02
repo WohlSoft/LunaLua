@@ -3955,7 +3955,7 @@ __declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9ABC0B(void)
         push 0x9ABC11
         ret
     cancel_collision:
-        push 0x9ADCDB
+        push 0x9AD246 // jumps to code for handling other hit spots
         ret
     }
 }
