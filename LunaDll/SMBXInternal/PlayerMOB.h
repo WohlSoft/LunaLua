@@ -392,7 +392,7 @@ struct ExtendedPlayerFields
     bool noblockcollision;
     bool nonpcinteraction;
     bool noplayerinteraction;
-    char collisionGroup[32];
+    unsigned int collisionGroup;
 
     // Constructor
     ExtendedPlayerFields()
@@ -406,7 +406,7 @@ struct ExtendedPlayerFields
         noblockcollision = false;
         nonpcinteraction = false;
         noplayerinteraction = false;
-        collisionGroup[0] = '\0';
+        collisionGroup = 0u;
     }
 };
 

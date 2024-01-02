@@ -469,7 +469,7 @@ typedef struct ExtendedPlayerFields_\
     bool noblockcollision;\
     bool nonpcinteraction;\
     bool noplayerinteraction;\
-    char collisionGroup[32];\
+    unsigned int collisionGroup;\
 } ExtendedPlayerFields;";
     }
 

@@ -3804,7 +3804,12 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerI
     }
     
     // Collision groups
-    // PLACEHOLDER
+    ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
 
     // No filter needed, carry on
     return -1;
@@ -3855,7 +3860,12 @@ static unsigned int __stdcall runtimeHookPlayerNPCInteractionCheckInternal(short
     }
 
     // Collision groups
-    // PLACEHOLDER
+    ExtendedNPCFields* npcExt = NPC::GetRawExtended(npcIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,npcExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
 
     return -1;
 }
@@ -3952,15 +3962,17 @@ __declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9ABC0B(void)
 
 static unsigned int __stdcall runtimeHookPlayerPlayerInteractionInternal(short* playerAIdxPtr, short playerBIdx)
 {
-    // Don't interact if it's the same NPC
+    // Don't interact if it's the same player
     // This hook replaces the code that would normally handle this
-    if (*playerAIdxPtr == playerBIdx)
+    short playerAIdx = *playerAIdxPtr;
+
+    if (playerAIdx == playerBIdx)
     {
         return 0;
     }
 
     // noplayerinteraction flag
-    ExtendedPlayerFields* extA = Player::GetExtended(*playerAIdxPtr);
+    ExtendedPlayerFields* extA = Player::GetExtended(playerAIdx);
     ExtendedPlayerFields* extB = Player::GetExtended(playerBIdx);
 
     if (extA->noplayerinteraction || extB->noplayerinteraction)
@@ -3969,7 +3981,10 @@ static unsigned int __stdcall runtimeHookPlayerPlayerInteractionInternal(short* 
     }
 
     // Collision groups
-    // PLACEHOLDER
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
 
     return -1;
 }
