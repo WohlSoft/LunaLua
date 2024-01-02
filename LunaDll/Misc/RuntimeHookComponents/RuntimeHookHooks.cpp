@@ -3907,6 +3907,9 @@ __declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9AE8FA(void)
 {
     // Handles collision from the sides/bottom
     __asm {
+        cmp word ptr ds:[edx+ecx*0x8 + 0x136], 0   // check the projectile flag (this is what the code that this replaces does)
+        jne cancel_collision
+
         movsx eax, word ptr ss:[ebp-0x114]
         push eax                // Player index
 
