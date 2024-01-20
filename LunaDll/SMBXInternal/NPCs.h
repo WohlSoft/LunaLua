@@ -7,6 +7,7 @@
 #include <string>
 #include "../Defines.h"
 #include "../Misc/VB6StrPtr.h"
+#include "../Misc/CollisionMatrix.h"
 
 
 enum NPCID : short
@@ -521,7 +522,8 @@ static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 struct ExtendedNPCFields
 {
     bool noblockcollision;
-    char collisionGroup[32];
+    short fullyInsideSection;
+    unsigned int collisionGroup;
 
     // Constructor
     ExtendedNPCFields()
@@ -533,7 +535,8 @@ struct ExtendedNPCFields
     void Reset()
     {
         noblockcollision = false;
-        collisionGroup[0] = '\0';
+        fullyInsideSection = -1;
+        collisionGroup = 0u;
     }
 };
 

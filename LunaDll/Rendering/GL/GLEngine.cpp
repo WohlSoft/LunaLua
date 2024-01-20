@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <chrono>
 #include <GL/glew.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
@@ -58,7 +59,13 @@ GLEngine::GLEngine() :
     mHwnd(NULL),
     mScreenshot(false),
     mCameraX(0.0), mCameraY(0.0),
-    mpUpscaleShader(nullptr)
+    mpUpscaleShader(nullptr),
+    mFrameTimeInit(false),
+    mFrameTimeTimestamp(),
+    mFrameTimeMutex(),
+    mFrameTimeIdx(0),
+    mFrameTimeBuffer(),
+    mFrameTimeCopy()
 {
 }
 
@@ -217,6 +224,9 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, boo
         // Display Frame
         SwapBuffers(hdcDest);
 
+        // Record frame time till end of SwapBuffers
+        RecordFrameTime();
+
         // Clear screen backbuffer
         GLERRORCHECK();
         glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -341,4 +351,31 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
     }
 
     mGifRecorder.addNextFrameToProcess(w, h, pixData, timestamp);
+}
+
+void GLEngine::RecordFrameTime()
+{
+    std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+    
+    if (mFrameTimeInit) {
+        float frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - mFrameTimeTimestamp).count() * 1.0e-6f;
+        std::lock_guard<std::mutex> mLock(mFrameTimeMutex);
+        mFrameTimeBuffer[mFrameTimeIdx] = frameTime;
+        mFrameTimeIdx = (mFrameTimeIdx + 1) % mFrameTimeLen;
+    }
+    else
+    {
+        mFrameTimeInit = true;
+    }
+    mFrameTimeTimestamp = currentTime;
+}
+
+const GLEngine::frameTimes_t& GLEngine::GetFrameTimes()
+{
+    std::lock_guard<std::mutex> mLock(mFrameTimeMutex);
+    for (int i = 0; i < mFrameTimeLen; i++)
+    {
+        mFrameTimeCopy[i] = mFrameTimeBuffer[(mFrameTimeIdx + 1 + i) % mFrameTimeLen];
+    }
+    return mFrameTimeCopy;
 }

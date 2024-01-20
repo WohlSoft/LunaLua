@@ -13,7 +13,6 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
 include(libs/PGE_File_Formats/pge_file_library.cmake)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-deboostified
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl/include
@@ -168,11 +167,13 @@ set(LunaLua_Sources
     Minigames/GameboyRPG.cpp
     Minigames/Minigames.cpp
     Misc/AsyncHTTPClient.cpp
+    Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
     Misc/FreeImageUtils/FreeImageData.cpp
     Misc/FreeImageUtils/FreeImageGifData.cpp
     Misc/FreeImageUtils/FreeImageHelper.cpp
     Misc/FreeImageUtils/FreeImageInit.cpp
+    Misc/Gameover.cpp
     Misc/Gui/GuiCrashNotify.cpp
     Misc/Gui/RichTextDialog.cpp
     Misc/LoadScreen.cpp
@@ -184,10 +185,12 @@ set(LunaLua_Sources
     Misc/Playground.cpp
     Misc/ResourceFileMapper.cpp
     Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp
+    Misc/RuntimeHookComponents/RuntimeHookDefines.cpp
     Misc/RuntimeHookComponents/RuntimeHookFixups.cpp
     Misc/RuntimeHookComponents/RuntimeHookGeneral.cpp
     Misc/RuntimeHookComponents/RuntimeHookHooks.cpp
     Misc/RuntimeHookComponents/RuntimeHookNpcHarm.cpp
+    Misc/RuntimeHookComponents/RuntimeHookNPCTransform.cpp
     Misc/RuntimeHookComponents/RuntimeHookPublicFunctions.cpp
     Misc/RuntimeHook.cpp
     Misc/RuntimeHookManagers/LevelHUDController.cpp

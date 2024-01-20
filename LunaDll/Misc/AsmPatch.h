@@ -355,7 +355,7 @@ static inline AsmPatch<0> PATCH(void* addr) {
 /********************/
 
 template <typename... Ts>
-class PatchCollectionImpl : Patchable {
+class PatchCollectionImpl : public Patchable {
 private:
     std::tuple<Ts...> items;
 
