@@ -33,7 +33,7 @@ std::vector<std::pair<short,short>> processingNPCInfoForIDChangeDetection;
 // prevent onNPCTransform event from being executed twice in situations where we're already listening for ID changes
 // called by npc::transform
 void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID) {
-    for (int i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
+    for (size_t i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
         // if the listening info matches the NPC that was transformed,
         if (processingNPCInfoForIDChangeDetection[i].first == npcIdx && processingNPCInfoForIDChangeDetection[i].second == oldID) {
             // update the info to reflect the new ID
@@ -2717,6 +2717,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d79f(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7a5
         ret
@@ -2750,6 +2752,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d7ae(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7b4
         ret
@@ -4008,6 +4012,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2fb29(void)
         pop ecx
         pop eax
         popfd
+        push 0xa3037e
+        ret
     safe:
         push 0xa2fb2f
         ret
@@ -4041,6 +4047,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2fb34(void)
         pop ecx
         pop eax
         popfd
+        push 0xa3037e
+        ret
     safe:
         push 0xa2fb3a
         ret

@@ -572,7 +572,7 @@ static void make_list_defaults_numeric_list(nlohmann::json& dst, nlohmann::json&
         nlohmann::json entry = nlohmann::json();
         entry["k"] = kvp.key();
         if (kvp.value().is_object() || kvp.value().is_array()) {
-            nlohmann::json& childObj = nlohmann::json();
+            nlohmann::json&& childObj = nlohmann::json();
             make_list_defaults_numeric_list(childObj, kvp.value());
             entry["v"] = childObj;
         }
