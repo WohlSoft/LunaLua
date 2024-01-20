@@ -1299,7 +1299,7 @@ static auto fenceFixesImpl = PatchCollection(
 
     PATCH(0x9A74CB)
     .bytes(0x66, 0x39, 0x74, 0xCA, 0x04) // cmp word ptr [edx + ecx * 8 + 0x4], si ; compare isHidden to the si register, which is equal to COMBOOL(true)
-    .bytes(0x0F, 0x84, 0xE0, 0x03, 0x00, 0x00) // je 0x9A78B6 ; skip the current iteration if the layer is invisible
+    .JE(0x9A78B6) // skip the current iteration if the layer is invisible
     .bytes(0x0F, 0x1F, 0x00) // nop
 );
 Patchable& gFenceFixes = fenceFixesImpl;
