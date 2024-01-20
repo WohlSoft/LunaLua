@@ -163,9 +163,12 @@ void LunaDLLInit()
     TrySkipPatch();
 
     // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
-    DWORD curProcessor = GetCurrentProcessorNumberXP();
-    SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    if (gGeneralConfig.getEngineCpuLockAffinity())
+    {
+        DWORD curProcessor = GetCurrentProcessorNumberXP();
+        SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    }
 
     // Initialize GDI+ so we can make use of it
     ULONG_PTR m_gdiplusToken;   // class member

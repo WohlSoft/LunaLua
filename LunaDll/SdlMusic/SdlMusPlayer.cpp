@@ -110,6 +110,9 @@ bool PGE_MusPlayer::musicGotDeferred = false;
 int PGE_MusPlayer::musicDeferredFadeIn = -1;
 std::string PGE_MusPlayer::currentTrack="";
 int PGE_MusPlayer::sRate=44100;
+Uint16 PGE_MusPlayer::sdlFormat = AUDIO_U16;
+int PGE_MusPlayer::bytesPerSampleAllChan = 4; // Bytes per sample, all channels
+int PGE_MusPlayer::bytesPerSample = 2; //Bytes per sample for 1 channel
 bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
 std::atomic<unsigned __int64> PGE_MusPlayer::sCount(0);
@@ -284,6 +287,17 @@ bool PGE_MusPlayer::setSampleRate(int sampleRate=44100)
         return false;
     }
 
+    {
+        int frequency;
+        int channels;
+        if (Mix_QuerySpec(&frequency, &sdlFormat, &channels))
+        {
+            sRate = frequency;
+            bytesPerSample = SDL_AUDIO_BITSIZE(sdlFormat) / 8;
+            bytesPerSampleAllChan = bytesPerSample * channels;
+        }
+    }
+
     Mix_AllocateChannels(32);
 
     // Reset music sample count
@@ -346,13 +360,15 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
 
 void PGE_MusPlayer::postMixCallback(void *udata, Uint8 *stream, int len)
 {
+    int samples = len / bytesPerSampleAllChan;
+
     // This post mix callback has a simple purpose: count audio samples.
-    sCount += len/4;
+    sCount += samples;
 
     // (Approximate) sample count for only when music is playing
     if ((Mix_PlayingMusic() == 1) && (Mix_PausedMusic() == 0))
     {
-        musSCount += len/4;
+        musSCount += samples;
     }
 }
 

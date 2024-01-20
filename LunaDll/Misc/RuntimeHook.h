@@ -39,9 +39,9 @@ void TrySkipPatch();
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
-extern AsmPatch<502> gDisableNPCSectionFix;
-extern Patchable *gFenceFixes[];
-extern Patchable *gLinkFairyClowncarFixes[];
+extern Patchable& gNPCSectionFix;
+extern Patchable& gFenceFixes;
+extern Patchable& gLinkFairyClowncarFixes;
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
@@ -582,6 +582,7 @@ void __stdcall runtimeHookNPCWalkFixTempHitConditional();
 void __stdcall runtimeHookNPCWalkFixSlope();
 
 void __stdcall runtimeHookNPCSectionFix(short* npcIndex);
+void __stdcall runtimeHookNPCSectionWrap(void);
 
 void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
 void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);
