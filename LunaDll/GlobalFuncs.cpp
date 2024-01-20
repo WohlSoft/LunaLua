@@ -1039,8 +1039,6 @@ void HandleEventsWhileLoading()
     }
 }
 
-std::mutex g_editorIPCMutex;
-
 std::string GetEditorPlacedItem()
 {
     std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);

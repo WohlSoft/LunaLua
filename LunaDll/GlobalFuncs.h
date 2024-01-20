@@ -279,5 +279,4 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 
 #endif
 
-extern std::mutex g_editorIPCMutex;
 std::string GetEditorPlacedItem();

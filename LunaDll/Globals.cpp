@@ -2,6 +2,7 @@
 #include <time.h>
 #include <cctype>
 #include <cstdarg>
+#include <mutex>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "Shlwapi.h"
@@ -132,3 +133,4 @@ void printBoxA(const char *fmt, ...)
 }
 
 std::string gEditorPlacedItem = "nil";
+std::mutex g_editorIPCMutex;
