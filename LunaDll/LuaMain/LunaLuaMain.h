@@ -205,4 +205,6 @@ namespace CachedReadFile {
     void releaseCached(bool isWorld);
 };
 
+extern void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter);
+
 #endif

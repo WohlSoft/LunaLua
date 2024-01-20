@@ -131,6 +131,21 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     // We should clear the anim array apparently though
     memset(GM_ANIM_PTR, 0, 1000*sizeof(SMBXAnimation));
+    
+    //Now, if the legacy title screen is yet to boot, prevent that and go straight to loading the episode
+    std::string dir2 = WStr2Str(dir);
+    if(outData.meta.filename == "intro" && dir2 == gAppPathUTF8 + "\\")
+    {
+        GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
+        if(autostarter.selectedWldPath == L"")
+        {
+            std::string msg = "There is no world file loaded upon starting. This means that you booted upon LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level upon starting SMBX2 by loading the X2 launcher instead.";
+            MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
+            _exit(0);
+        }
+        LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+        return;
+    }
 
     // If we are successful then set the variables
     GM_LVLFILENAME_PTR = filename;

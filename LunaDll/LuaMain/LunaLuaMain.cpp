@@ -1603,3 +1603,52 @@ void CLunaLua::queuePlayerSectionChangeEvent(int playerIdx) {
     m_playerSectionChangeList.push_back(playerIdx);
     m_executeSectionChangeFlag = true;
 }
+
+extern PlayerMOB* getTemplateForCharacter(int id);
+void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
+{
+    // show loadscreen while re-loading everything
+    LunaLoadScreenStart();
+
+    // re-load world
+    std::wstring fullPath = resolveCwdOrWorldsPath(wldPath);
+    VB6StrPtr pathVb6 = WStr2Str(fullPath);
+    GM_CUR_SAVE_SLOT = saveSlot;
+    native_loadWorld(&pathVb6);
+
+    // re-load save
+    if (saveFileExists())
+    {
+        native_loadGame();
+    }
+
+    // put the player on the world map
+    GM_EPISODE_MODE = COMBOOL(true);
+    GM_TITLE_INTRO_MODE = COMBOOL(false);
+    GM_LEVEL_MODE = COMBOOL(false);
+
+    // reset checkpoints
+    GM_STR_CHECKPOINT = "";
+    
+    // restore players' characters
+    auto p = Player::Get(1);
+    // restore the 1st player's character
+    p->Identity = firstCharacter;
+    if(!singleplayer && GM_PLAYERS_COUNT >= 2)
+    {
+        auto p2 = Player::Get(2);
+        // restore the 2nd player's character
+        p2->Identity = secondCharacter;
+    }
+
+    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+        // apply saved template
+        auto t = getTemplateForCharacter(p->Identity);
+        if (t != nullptr) {
+            memcpy(p, t, sizeof(PlayerMOB));
+        }
+    }
+
+    // hide loadscreen
+    LunaLoadScreenKill();
+}
