@@ -897,9 +897,11 @@ std::wstring getLatestConfigFile(const std::wstring& configname)
 
 void InitDebugConsole()
 {
+
+    CONSOLE_SCREEN_BUFFER_INFO coninfo;
+
     // allocate a console for this app
     AllocConsole();
-    CONSOLE_SCREEN_BUFFER_INFO coninfo;
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
     freopen("CONOUT$", "w", stderr);
