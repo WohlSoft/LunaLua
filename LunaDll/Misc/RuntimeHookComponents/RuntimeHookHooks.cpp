@@ -3812,8 +3812,9 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* player, int blockIdx)
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx)
 {
+    PlayerMOB* player = Player::Get(playerIdx);
     Block* block = Block::GetRaw(blockIdx);
 
     // IsHidden flag, which is what the code we're replacing checks for
@@ -3837,6 +3838,22 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* pl
         return 0;
     }
 
+    // Player's noblockcollision flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->noblockcollision)
+    {
+        return 0;
+    }
+    
+    // Collision groups
+    ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
     // No filter needed, carry on
     return -1;
 }
@@ -3851,7 +3868,8 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
 
         movsx ecx, word ptr ss:[ebp-0x120]
         push ecx                // Block index
-        push ebx                // Player pointer
+        movsx ecx, word ptr ss:[ebp-0x114]
+        push ecx                // Player index
         call runtimeHookBlockPlayerFilterInternal
 
         cmp eax, 0 // return value
@@ -3870,6 +3888,173 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
         pop ecx
         pop eax
         push 0x9A4FE9
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerNPCInteractionCheckInternal(short playerIdx, short npcIdx)
+{
+    // Player's nonpcinteraction flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->nonpcinteraction)
+    {
+        return 0;
+    }
+
+    // Collision groups
+    ExtendedNPCFields* npcExt = NPC::GetRawExtended(npcIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,npcExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCInteractionCheck(void)
+{
+    __asm {
+        push eax
+
+        push eax                // NPC index
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCInteractionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop eax
+
+        movsx edi,ax
+        add edi,0x80
+
+        push 0x9A79F8
+        ret
+    cancel_collision:
+        pop eax
+
+        push 0x9ADCDB
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerNPCCollisionCheckInternal(short playerIdx)
+{
+    // Player's noblockcollision flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->noblockcollision)
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9AE8FA(void)
+{
+    // Handles collision from the sides/bottom
+    __asm {
+        cmp word ptr ds:[edx+ecx*0x8 + 0x136], 0   // check the projectile flag (this is what the code that this replaces does)
+        jne cancel_collision
+
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCCollisionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        push 0x9AE909
+        ret
+    cancel_collision:
+        push 0x9ADCDB
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9ABC0B(void)
+{
+    // Handles collision from the top
+    __asm {
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCCollisionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        mov ecx, dword ptr ss:[ebp-0xB4] // original code
+
+        push 0x9ABC11
+        ret
+    cancel_collision:
+        push 0x9AD246 // jumps to code for handling other hit spots
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerPlayerInteractionInternal(short* playerAIdxPtr, short playerBIdx)
+{
+    // Don't interact if it's the same player
+    // This hook replaces the code that would normally handle this
+    short playerAIdx = *playerAIdxPtr;
+
+    if (playerAIdx == playerBIdx)
+    {
+        return 0;
+    }
+
+    // noplayerinteraction flag
+    ExtendedPlayerFields* extA = Player::GetExtended(playerAIdx);
+    ExtendedPlayerFields* extB = Player::GetExtended(playerBIdx);
+
+    if (extA->noplayerinteraction || extB->noplayerinteraction)
+    {
+        return 0;
+    }
+
+    // Collision groups
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerPlayerInteraction(void)
+{
+    __asm {
+        push eax
+
+        push eax                // Player B's index
+        mov eax, dword ptr ss:[ebp+8]
+        push eax                // (Pointer to) player A's index
+
+        call runtimeHookPlayerPlayerInteractionInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop eax
+
+        push 0x9CAFD0
+        ret
+    cancel_collision:
+        pop eax
+
+        push 0x9CC25D
         ret
     }
 }
