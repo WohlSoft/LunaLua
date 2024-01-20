@@ -171,6 +171,7 @@ extern LunaGameControllerManager gLunaGameControllerManager;
 
 extern CLunaLua				gLunaLua;
 
+extern CONSOLE_SCREEN_BUFFER_INFO coninfo;
 extern FILE* conout;
 
 // Paths

@@ -1073,6 +1073,7 @@ void CLunaLua::bindAll()
             class_<LuaProxy::Console>("Console")
             .def("print", &LuaProxy::Console::print)
             .def("println", &LuaProxy::Console::println)
+            .def("clear", &LuaProxy::Console::clear)
         ];
     if(m_type == LUNALUA_WORLD){
         module(L)

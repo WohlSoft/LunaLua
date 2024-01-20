@@ -99,6 +99,7 @@ LunaGameControllerManager gLunaGameControllerManager;
 
 CLunaLua gLunaLua;
 
+CONSOLE_SCREEN_BUFFER_INFO coninfo;
 FILE* conout = nullptr;
 
 
