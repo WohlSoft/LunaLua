@@ -899,6 +899,7 @@ void InitDebugConsole()
 {
     // allocate a console for this app
     AllocConsole();
+    CONSOLE_SCREEN_BUFFER_INFO coninfo;
     freopen("CONOUT$", "w", stdout);
     freopen("CONIN$", "r", stdin);
     freopen("CONOUT$", "w", stderr);
@@ -929,6 +930,7 @@ void DebugClear(HANDLE hConsole)
 {
     if (conout)
     {
+        CONSOLE_SCREEN_BUFFER_INFO coninfo;
         SMALL_RECT scrollRect;
         COORD scrollTarget;
         CHAR_INFO fill;
