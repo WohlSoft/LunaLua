@@ -881,6 +881,44 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
     return id;
 }
 
+std::string findEpisodeWorldPathFromName(std::string name)
+{
+    std::string finalWldPath;
+    for (int i = 1; i <= 100; i++) {
+        auto ep = EpisodeListItem::Get(i - 1);
+        if(name == std::string(ep->episodeName))
+        {
+            finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
+            break;
+        }
+    }
+    return finalWldPath;
+}
+
+bool isBootingSinglePlayer(int playerCount)
+{
+    if(playerCount > 1)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+int getPlayer2Character()
+{
+    if(GM_PLAYERS_COUNT > 1)
+    {
+        return Player::Get(2)->Identity;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 {
     FILETIME newest = { 0 };

@@ -236,15 +236,7 @@ bool LuaProxy::Misc::didGameOver()
 
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 {
-    GameAutostart autoStartEpisode;
-    autoStartEpisode.setSelectedEpisode(episodeName);
-    autoStartEpisode.setSaveSlot(GM_CUR_SAVE_SLOT);
-    bool success = autoStartEpisode.applyAutostart();
-    if (success)
-    {
-        GM_EPISODE_MODE = 0;
-        GM_LEVEL_MODE = 0xFFFF;
-    }
+    LaunchEpisode(findEpisodeWorldPathFromName(episodeName), GM_CUR_SAVE_SLOT, isBootingSinglePlayer(GM_PLAYERS_COUNT), Player::Get(1)->Identity, getPlayer2Character());
     return success;
 }
 
