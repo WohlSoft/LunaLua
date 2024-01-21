@@ -907,7 +907,7 @@ bool isBootingSinglePlayer(int playerCount)
     }
 }
 
-int getPlayer2Character(void)
+int getPlayer2Character()
 {
     if(GM_PLAYERS_COUNT > 1)
     {
