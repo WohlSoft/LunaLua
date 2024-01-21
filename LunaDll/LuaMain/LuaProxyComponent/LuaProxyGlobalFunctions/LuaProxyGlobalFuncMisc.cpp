@@ -236,7 +236,8 @@ bool LuaProxy::Misc::didGameOver()
 
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 {
-    LaunchEpisode(findEpisodeWorldPathFromName(episodeName), GM_CUR_SAVE_SLOT, isBootingSinglePlayer(GM_PLAYERS_COUNT), Player::Get(1)->Identity, getPlayer2Character());
+    bool success = true;
+    LaunchEpisode(Str2WStr(findEpisodeWorldPathFromName(episodeName)), GM_CUR_SAVE_SLOT, isBootingSinglePlayer(GM_PLAYERS_COUNT), Player::Get(1)->Identity, static_cast<Characters>(getPlayer2Character()));
     return success;
 }
 
