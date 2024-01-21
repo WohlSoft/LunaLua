@@ -15,3 +15,9 @@ void LuaProxy::Console::println(const std::string& outText)
     DebugPrint("%s\n", outText.c_str());
 }
 
+void LuaProxy::Console::clear()
+{
+    HANDLE hStdout;
+    hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    DebugClear(hStdout);
+}

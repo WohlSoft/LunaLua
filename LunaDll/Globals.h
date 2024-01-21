@@ -10,6 +10,7 @@
 #include <string>
 #include <atomic>
 #include <cstdint>
+#include <mutex>
 #include "LevelCodes/LevelCodes.h"
 #include "Rendering/Rendering.h"
 #include "Autocode/AutocodeManager.h"
@@ -106,6 +107,9 @@ extern bool            gDisablePlayerFilterBounceFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
+
+// Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
+extern bool            gDidGameOver;
 
 extern StartupSettings gStartupSettings;
 
@@ -208,3 +212,6 @@ return;
 
 
 #endif
+
+extern std::string gEditorPlacedItem;
+extern std::mutex g_editorIPCMutex;

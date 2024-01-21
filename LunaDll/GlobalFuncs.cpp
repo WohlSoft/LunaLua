@@ -18,6 +18,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <mutex>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -897,6 +898,7 @@ std::wstring getLatestConfigFile(const std::wstring& configname)
 
 void InitDebugConsole()
 {
+
     CONSOLE_SCREEN_BUFFER_INFO coninfo;
 
     // allocate a console for this app
@@ -925,6 +927,46 @@ int DebugPrint(const char * format, ...)
         return ret;
     }
     return 0;
+}
+
+void DebugClear(HANDLE hConsole)
+{
+    if (conout)
+    {
+        CONSOLE_SCREEN_BUFFER_INFO coninfo;
+        SMALL_RECT scrollRect;
+        COORD scrollTarget;
+        CHAR_INFO fill;
+
+        // Get the number of character cells in the current buffer.
+        if (!GetConsoleScreenBufferInfo(hConsole, &coninfo))
+        {
+            return;
+        }
+
+        // Scroll the rectangle of the entire buffer.
+        scrollRect.Left = 0;
+        scrollRect.Top = 0;
+        scrollRect.Right = coninfo.dwSize.X;
+        scrollRect.Bottom = coninfo.dwSize.Y;
+
+        // Scroll it upwards off the top of the buffer with a magnitude of the entire height.
+        scrollTarget.X = 0;
+        scrollTarget.Y = (SHORT)(0 - coninfo.dwSize.Y);
+
+        // Fill with empty spaces with the buffer's default text attribute.
+        fill.Char.UnicodeChar = TEXT(' ');
+        fill.Attributes = coninfo.wAttributes;
+
+        // Do the scroll
+        ScrollConsoleScreenBuffer(hConsole, &scrollRect, NULL, scrollTarget, &fill);
+
+        // Move the cursor to the top left corner too.
+        coninfo.dwCursorPosition.X = 0;
+        coninfo.dwCursorPosition.Y = 0;
+
+        SetConsoleCursorPosition(hConsole, coninfo.dwCursorPosition);
+    }
 }
 
 #ifdef BUILD_WITH_ATL_STUFF
@@ -1036,4 +1078,10 @@ void HandleEventsWhileLoading()
         native_rtcDoEvents();
         lastTime = thisTime;
     }
+}
+
+std::string GetEditorPlacedItem()
+{
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    return (std::string)gEditorPlacedItem;
 }

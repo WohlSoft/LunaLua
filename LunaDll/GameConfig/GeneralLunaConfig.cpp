@@ -22,6 +22,7 @@ void GeneralLunaConfig::doDefaults()
     m_controller_battery_reporting = true;
     m_controller_rumble_enabled = true;
     m_lua_enable_http = false;
+    m_engine_cpu_lock_affinity = false;
 }
 
 bool GeneralLunaConfig::save()
@@ -61,6 +62,8 @@ bool GeneralLunaConfig::save()
     generalConfig.SetBoolValue(L"Controller", L"rumble_enabled", m_controller_rumble_enabled, L"# Set to false to disable controller rumble support. True by default.", true);
 
     generalConfig.SetBoolValue(L"Lua", L"enable-http", m_lua_enable_http, L"# Set to true if you want to have the HTTP API enabled. This might be a security risk, only activate if you trust the episode/api.", true);
+
+    generalConfig.SetBoolValue(L"Engine", L"cpu_lock_affinity", m_engine_cpu_lock_affinity, L"# Set to true if you want the main thread to be locked to one CPU core at startup.", true);
 
     return generalConfig.SaveFile(m_settingFilename.c_str(), true) == SI_OK;
 }
@@ -115,6 +118,7 @@ bool GeneralLunaConfig::load()
     m_controller_battery_reporting = configToLoad.GetBoolValue(L"Controller", L"battery_reporting", true);
     m_controller_rumble_enabled = configToLoad.GetBoolValue(L"Controller", L"rumble_enabled", true);
     m_lua_enable_http = configToLoad.GetBoolValue(L"Lua", L"enable-http", false);
+    m_engine_cpu_lock_affinity = configToLoad.GetBoolValue(L"Engine", L"cpu_lock_affinity", false);
 
     save();
     return true;

@@ -147,6 +147,7 @@
     <ClInclude Include="libs\Utils\vptrlist.h" />
     <ClInclude Include="LuaMain\LuaProxyFFIGraphics.h" />
     <ClInclude Include="LuaMain\LunaPathValidator.h" />
+    <ClInclude Include="Misc\CollisionMatrix.h" />
     <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
@@ -338,9 +339,12 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyFileFormats.cpp" />
     <ClCompile Include="LuaMain\LuaProxyFFIGraphics.cpp" />
     <ClCompile Include="LuaMain\LunaPathValidator.cpp" />
+    <ClCompile Include="Misc\CollisionMatrix.cpp" />
+    <ClCompile Include="Misc\Gameover.cpp" />
     <ClCompile Include="Misc\LoadScreen.cpp" />
     <ClCompile Include="Misc\NpcIdExtender.cpp" />
     <ClCompile Include="Misc\ResourceFileMapper.cpp" />
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNPCTransform.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />

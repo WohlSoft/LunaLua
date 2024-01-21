@@ -218,6 +218,9 @@
     <ClInclude Include="Misc\RuntimeHook.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\CollisionMatrix.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
     <ClInclude Include="SMBXInternal\NPCs.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
@@ -834,6 +837,9 @@
     <ClCompile Include="Misc\MiscFuncs.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\CollisionMatrix.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
     <ClCompile Include="Misc\RuntimeHook.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
@@ -1376,9 +1382,6 @@
     <ClCompile Include="libs\luabind-deboostified\src$filename">
       <Filter>libs\luabind-deboostified</Filter>
     </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1453,6 +1456,12 @@
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNPCTransform.cpp">
       <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Gameover.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

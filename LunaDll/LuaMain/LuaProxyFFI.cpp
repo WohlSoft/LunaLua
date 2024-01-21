@@ -28,12 +28,15 @@
 
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "../Misc/CollisionMatrix.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
 // Prototypes from RuntimeHookCharacterId.cpp
 short* getValidCharacterIDArray();
 PlayerMOB* getTemplateForCharacter(int id);
+// Defined in RuntimeHookNpcHarm.cpp
+void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID);
 
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
@@ -430,7 +433,8 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
-    char collisionGroup[32];\
+    short fullyInsideSection;\
+    unsigned int collisionGroup;\
 } ExtendedNPCFields;";
     }
 
@@ -448,13 +452,50 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char collisionGroup[32];\
+    unsigned int collisionGroup;\
 } ExtendedBlockFields;";
     }
 
-    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    FFI_EXPORT(ExtendedPlayerFields*) LunaLuaGetPlayerExtendedFieldsArray()
     {
-        return 32;
+        return Player::GetExtended(0);
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetPlayerExtendedFieldsStruct()
+    {
+        return "\
+typedef struct ExtendedPlayerFields_\
+{\
+    bool noblockcollision;\
+    bool nonpcinteraction;\
+    bool noplayerinteraction;\
+    unsigned int collisionGroup;\
+} ExtendedPlayerFields;";
+    }
+
+    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAllocateIndex()
+    {
+        return gCollisionMatrix.allocateIndex();
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixIncrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.incrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixDecrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.decrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetIndicesCollide(unsigned int first, unsigned int second, bool collide)
+    {
+        gCollisionMatrix.setIndicesCollide(first, second, collide);
+    }
+
+    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetIndicesCollide(unsigned int first, unsigned int second) 
+    {
+        return gCollisionMatrix.getIndicesCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
@@ -492,23 +533,31 @@ typedef struct ExtendedBlockFields_\
     {
         if (enable)
         {
-            gDisableNPCSectionFix.Apply();
+            gNPCSectionFix.Apply();
         }
         else
         {
-            gDisableNPCSectionFix.Unapply();
+            gNPCSectionFix.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetLinkClowncarFairyFix(bool enable)
+    {
+        if (enable)
+        {
+            gLinkFairyClowncarFixes.Apply();
+        }
+        else
+        {
+            gLinkFairyClowncarFixes.Unapply();
         }
     }
 
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
-            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-                gFenceFixes[i]->Apply();
-            }
+            gFenceFixes.Apply();
         } else {
-            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-                gFenceFixes[i]->Unapply();
-            }
+            gFenceFixes.Unapply();
         }
     }
 
@@ -807,18 +856,9 @@ typedef struct ExtendedBlockFields_\
             ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
         }
     }
-
-    FFI_EXPORT(void) LunaLuaSetRightClickPasteSetting(bool enable)
+    FFI_EXPORT(void) LunaLuaMarkNPCTransformationAsHandledByLua(int npcIdx, int oldID, int newID)
     {
-        // This will let the user alternatively paste content via right clicking, similar to using the command prompt. Useful for repl
-        if (!enable)
-        {
-            rightClickPasteEnabled = false;
-        }
-        else if (enable)
-        {
-            rightClickPasteEnabled = true;
-        }
+        markNPCTransformationAsHandledByLua(npcIdx, oldID, newID);
     }
 }
 
@@ -856,5 +896,19 @@ extern "C" {
     FFI_EXPORT(bool) LunaLuaGetWeakLava()
     {
         return gLavaIsWeak;
+    }
+}
+
+extern "C" {
+    FFI_EXPORT(void) LunaLuaSetRightClickPasteSetting(bool enable)
+    {
+    // This will let the user alternatively paste content via right clicking, similar to using the command prompt. Useful for repl
+    if (!enable)
+    {
+        rightClickPasteEnabled = false;
+    }
+    else if (enable)
+    {
+        rightClickPasteEnabled = true;
     }
 }

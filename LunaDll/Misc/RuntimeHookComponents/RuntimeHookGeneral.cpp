@@ -463,6 +463,19 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
     }
 }
 
+static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
+{
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
+        auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
+        if (cKey != 0) {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey), std::string(1, cKey & 0b01111111));
+        } else {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey));
+        }
+    }
+}
+
 static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
 {
     // Buffer memory 
@@ -590,10 +603,15 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
+    // Send lua onRawKeyPress/Release events
+    if (!repeated) {
+        SendLuaRawKeyEvent(vkey, keyDown);
+    }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus && keyDown)
-    {
-        ProcessRawKeyPress(vkey, scanCode, repeated);
+    if (haveFocus) {
+        if (keyDown) {
+            ProcessRawKeyPress(vkey, scanCode, repeated);
+        }
     }
 }
 
@@ -1245,39 +1263,51 @@ static unsigned int __stdcall LatePatch(void)
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
-AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
+static auto npcSectionFixImpl = PatchCollection(
+    PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>(),
+    PATCH(0xA0C931).JMP(&runtimeHookNPCSectionWrap).NOP_PAD_TO_SIZE<194>()
+);
+Patchable& gNPCSectionFix = npcSectionFixImpl;
 
-AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
+// these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
+static auto linkFairyClowncarFixesImpl = PatchCollection(
+    PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(), // ..when using tanookie/leaf powerup
+    PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(), // ..when climbing an npc
+    PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>()  // also climbing npc related
+);
+Patchable& gLinkFairyClowncarFixes = linkFairyClowncarFixesImpl;
+
+static auto fenceFixesImpl = PatchCollection(
+    PATCH(0x99933C)
     .PUSH_EBX()
     .PUSH_IMM32(0x99A850)
-    .JMP(runtimeHookSetPlayerFenceSpeed);
+    .JMP(runtimeHookSetPlayerFenceSpeed),
 
-AsmPatch<14> gFenceFix_9A78A8 = PATCH(0x9A78A8)
+    PATCH(0x9A78A8)
     .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
     .bytes(0xD9, 0xE0) // fchs
     .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
-    .bytes(0x0F, 0x1F, 0x00); // nop
+    .bytes(0x0F, 0x1F, 0x00), // nop
 
-AsmPatch<19> gFenceFix_9B8A4C = PATCH(0x9B8A4C)
+    PATCH(0x9B8A4C)
     .PUSH_ESI()
     .CALL(runtimeHookIncreaseFenceFrameCondition)
     .bytes(0x84, 0xC0) // test al, al
     .JZ(0x9B8B5D)
-    .JMP(0x9B8AF0);
+    .JMP(0x9B8AF0),
 
-AsmPatch<10> gFenceFix_AA6E78 = PATCH(0xAA6E78)
+    PATCH(0xAA6E78)
     .PUSH_EBP()
     .PUSH_ESI()
     .CALL(runtimeHookUpdateBGOMomentum)
-    .bytes(0x0F, 0x1F, 0x00); // nop
+    .bytes(0x0F, 0x1F, 0x00), // nop
 
-Patchable *gFenceFixes[] = {
-    &gFenceFix_99933C,
-    &gFenceFix_9A78A8,
-    &gFenceFix_9B8A4C,
-    &gFenceFix_AA6E78,
-    nullptr
-};
+    PATCH(0x9A74CB)
+    .bytes(0x66, 0x39, 0x74, 0xCA, 0x04) // cmp word ptr [edx + ecx * 8 + 0x4], si ; compare isHidden to the si register, which is equal to COMBOOL(true)
+    .JE(0x9A78B6) // skip the current iteration if the layer is invisible
+    .bytes(0x0F, 0x1F, 0x00) // nop
+);
+Patchable& gFenceFixes = fenceFixesImpl;
 
 void TrySkipPatch()
 {
@@ -1321,6 +1351,7 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
@@ -1356,6 +1387,14 @@ void TrySkipPatch()
     PATCH(0x92EC24)
         .CALL(&LevelHUDHook)
         .Apply();
+
+    // run onLoop from credits
+    PATCH(0x8C04CD).CALL(&runtimeHookCreditsLoop).Apply();
+    // fixes a credits bug that causes toad (or any otherwise shoe wearing player) to constantly hold jump,
+    // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
+    PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
+    
+    PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();
 
     *(void**)0xB2F244 = (void*)&mciSendStringHookA;
 
@@ -1580,6 +1619,7 @@ void TrySkipPatch()
     PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8DE435).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<116>().Apply(); // Keyhole exit, usually uses a different frame timing code
 
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
@@ -1739,6 +1779,14 @@ void TrySkipPatch()
 
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+    // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
+    PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
+    // Patch link being able to kill himself by turning into a fairy in clowncar
+    gLinkFairyClowncarFixes.Apply();
+
+    // Hooks to close the game instead of returning to titlescreen
+    PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
+    PATCH(0x8E62F8).NOP_PAD_TO_SIZE<289>().Apply(); // remove black screen when pressing save & exit
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
@@ -1794,7 +1842,6 @@ void TrySkipPatch()
     PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
     
     // Hooks for onNPCHarm support
-    PATCH(0xA3158D).JMP(&runtimeHookCollideNpcEnd).NOP_PAD_TO_SIZE<7>().Apply(); // onNPCTransform
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
     PATCH(0xa29272).JMP(&runtimeHookNpcHarmRaw_a29272).NOP_PAD_TO_SIZE<6>().Apply();
@@ -2016,7 +2063,7 @@ void TrySkipPatch()
     gDisableNPCDownwardClipFixSlope.Apply();
 
     // Hook to fix an NPC's section property when it spawn out of bounds
-    gDisableNPCSectionFix.Apply();
+    gNPCSectionFix.Apply();
 
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
@@ -2025,7 +2072,16 @@ void TrySkipPatch()
 
     // Patch to handle blocks that allow players to pass through
     // Moved from where the original code does it to allow player passthrough slopes
+    // Also handles collision groups
     PATCH(0x9A16E8).JMP(runtimeHookBlockPlayerFilter).NOP_PAD_TO_SIZE<12>().Apply();
+
+    // Collision group handling for player-to-NPC collision
+    PATCH(0x9A79EF).JMP(runtimeHookPlayerNPCInteractionCheck).NOP_PAD_TO_SIZE<9>().Apply();
+    PATCH(0x9AE8FA).JMP(runtimeHookPlayerNPCCollisionCheck9AE8FA).NOP_PAD_TO_SIZE<15>().Apply();
+    PATCH(0x9ABC0B).JMP(runtimeHookPlayerNPCCollisionCheck9ABC0B).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Collision group handling for player-to-player collision
+    PATCH(0x9CAFC4).JMP(runtimeHookPlayerPlayerInteraction).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
     // Also handles collisionGroup for NPC-to-solid interactions now
@@ -2044,9 +2100,10 @@ void TrySkipPatch()
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hooks for lava-related calls to onPlayerKill
-    PATCH(0x9A394D).JMP(0x9A3A36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9A394D).CALL(runtimeHookPlayerCountCollisionsForWeakLava).JMP(0x9A3A36).NOP_PAD_TO_SIZE<14>().Apply();
     PATCH(0x9A5010).JMP(runtimeHookPlayerKillLavaSolidExit).Apply();
     PATCH(0x9A20F1).CALL(runtimeHookPlayerKillLava).Apply();
+    PATCH(0x9A5015).CALL(runtimeHookPlayerBlockCollisionEnd).NOP_PAD_TO_SIZE<8>().Apply();
 
     // Hooks for onWarpEnter/onWarp
     PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();
@@ -2076,9 +2133,7 @@ void TrySkipPatch()
     runtimeHookCharacterIdApplyPatch();
 
     //Fence bug fixes
-    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-        gFenceFixes[i]->Apply();
-    }
+    gFenceFixes.Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
@@ -2100,5 +2155,10 @@ void TrySkipPatch()
     PATCH(0x8CDEC7)
         .bytes(0x84, 0xC0) // test al, al
         .bytes(0x74, 0x35) // jz 0x8CDF00
+        .Apply();
+    
+    // Add a space between /s and the argument
+    PATCH(0x8BEAE9)
+        .PUSH_IMM32((std::uint32_t) L"regsvr32 /s ")
         .Apply();
 }

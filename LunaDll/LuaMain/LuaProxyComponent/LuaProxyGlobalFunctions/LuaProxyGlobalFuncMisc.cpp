@@ -215,14 +215,23 @@ void LuaProxy::Misc::saveGame()
 
 void LuaProxy::Misc::exitGame()
 {
+    /* no more titlescreen, sorry!
     GM_EPISODE_MODE = 0;
     GM_LEVEL_MODE = 0xFFFF;
     GM_CUR_MENUTYPE = 0;
+    */
+    _exit(0);
 }
 
 void LuaProxy::Misc::exitEngine()
 {
     _exit(0);
+}
+
+bool luaDidGameOverFlag = false;
+bool LuaProxy::Misc::didGameOver()
+{
+    return luaDidGameOverFlag;
 }
 
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)

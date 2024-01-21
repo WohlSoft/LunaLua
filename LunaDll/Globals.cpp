@@ -2,6 +2,7 @@
 #include <time.h>
 #include <cctype>
 #include <cstdarg>
+#include <mutex>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "Shlwapi.h"
@@ -33,6 +34,9 @@ bool gDisablePlayerFilterBounceFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
+
+// Flag for returning from gameover screen
+bool gDidGameOver = false;
 
 // Global variables
 int	gFrames;
@@ -129,3 +133,6 @@ void printBoxA(const char *fmt, ...)
     va_end(ap);
     dbgboxA(buf);
 }
+
+std::string gEditorPlacedItem = "nil";
+std::mutex g_editorIPCMutex;

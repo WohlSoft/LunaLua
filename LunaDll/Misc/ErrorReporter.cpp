@@ -133,7 +133,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
     fullErrorDescription << "* http://wohlsoft.ru/forum/ or\n";
-    fullErrorDescription << "* http://www.supermariobrosx.org/forums/viewforum.php?f=35 or\n";
+    fullErrorDescription << "* https://www.smbxgame.com/forums/viewforum.php?f=35 or\n";
     fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
 

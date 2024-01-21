@@ -274,6 +274,7 @@ namespace LuaProxy {
 
         void print(const std::string& outText);
         void println(const std::string& outText);
+        void clear();
     private:
         bool m_isDefaultConsole;
     };
@@ -907,6 +908,7 @@ namespace LuaProxy {
         void saveGame();
         void exitGame();
         void exitEngine();
+        bool didGameOver();
         bool loadEpisode(const std::string& episodeName);
         void pause();
         void pause(bool atFrameEnd);
