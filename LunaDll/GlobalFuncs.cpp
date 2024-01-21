@@ -18,6 +18,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <mutex>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -1077,4 +1078,10 @@ void HandleEventsWhileLoading()
         native_rtcDoEvents();
         lastTime = thisTime;
     }
+}
+
+std::string GetEditorPlacedItem()
+{
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    return (std::string)gEditorPlacedItem;
 }
