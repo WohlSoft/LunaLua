@@ -236,19 +236,21 @@ bool LuaProxy::Misc::didGameOver()
 
 bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 {
-    bool success = true;
+    bool success = false;
 
     Characters storedIdentity1 = Player::Get(1)->Identity;
-    std::wstring worldPth = Str2WStr(findEpisodeWorldPathFromName(episodeName));
+    std::string worldPth = findEpisodeWorldPathFromName(episodeName);
     
-    if(worldPth.empty())
+    if(!worldPth.empty() || worldPth == "")
     {
-        success = false;
+        success = true;
     }
+    
+    std::wstring finalWorldPth = Str2WStr(worldPth);
 
     if(success)
     {
-        LaunchEpisode(worldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, static_cast<Characters>(getPlayer2Character()));
+        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, static_cast<Characters>(getPlayer2Character()));
     }
 
     return success;
