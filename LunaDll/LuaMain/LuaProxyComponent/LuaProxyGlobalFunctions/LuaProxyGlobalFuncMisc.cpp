@@ -236,14 +236,14 @@ bool LuaProxy::Misc::didGameOver()
 
 bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 {
-    bool success = true;
+    bool success = false;
 
     Characters storedIdentity1 = Player::Get(1)->Identity;
     std::wstring worldPth = Str2WStr(findEpisodeWorldPathFromName(episodeName));
 
-    if(worldPth ~= "")
+    if(worldPth)
     {
-        success = false;
+        success = true;
     }
 
     if(success)
