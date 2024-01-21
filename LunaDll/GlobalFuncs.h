@@ -253,6 +253,7 @@ void sendPUTRequest(const std::string& server, const std::string& data);
 // Debug stuff
 void InitDebugConsole();
 int DebugPrint(const char * format, ...);
+void DebugClear(HANDLE hConsole);
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 // Window Helper Funcs
