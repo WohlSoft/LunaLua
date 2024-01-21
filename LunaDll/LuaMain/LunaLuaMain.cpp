@@ -1686,7 +1686,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     {
         for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
             auto p = Player::Get(i);
-            if(GM_PLAYERS_COUNT >= 3)
+            if(!episodeLoadedOnboot)
             {
                 p->Identity = firstCharacter;
             }
@@ -1700,6 +1700,12 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
         if (t != nullptr) {
             memcpy(p, t, sizeof(PlayerMOB));
         }
+    }
+
+    // make sure that lunadll knows the game loaded on boot, so that loadEpisode can know
+    if(!episodeLoadedOnboot)
+    {
+        episodeLoadedOnboot = true;
     }
 
     // hide loadscreen

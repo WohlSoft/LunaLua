@@ -897,13 +897,13 @@ std::string findEpisodeWorldPathFromName(std::string name)
 
 bool isBootingSinglePlayer(int playerCount)
 {
-    if(playerCount > 1)
-    {
-        return false;
-    }
-    else
+    if(playerCount <= 1)
     {
         return true;
+    }
+    else if(playerCount > 1)
+    {
+        return false;
     }
 }
 

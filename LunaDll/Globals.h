@@ -212,3 +212,5 @@ return;
 
 extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
+
+extern bool episodeLoadedOnboot;
