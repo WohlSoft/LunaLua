@@ -909,7 +909,7 @@ namespace LuaProxy {
         void exitGame();
         void exitEngine();
         bool didGameOver();
-        bool loadEpisode(const std::string& episodeName);
+        bool loadEpisode(std::string episodeName);
         void pause();
         void pause(bool atFrameEnd);
         void unpause();
