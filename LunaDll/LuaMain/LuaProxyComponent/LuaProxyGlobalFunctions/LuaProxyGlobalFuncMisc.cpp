@@ -239,16 +239,22 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
     bool success = false;
 
     Characters storedIdentity1 = Player::Get(1)->Identity;
-    std::wstring worldPth = Str2WStr(findEpisodeWorldPathFromName(episodeName));
-
-    if(worldPth)
+    std::string wldPath = findEpisodeWorldPathFromName(episodeName);
+    std::wstring worldPth;
+    
+    if(wldPath.empty())
     {
-        success = true;
+        success = false;
+    }
+    
+    if(!wldPath.empty())
+    {
+        worldPth = Str2WStr(wldPath);
     }
 
     if(success)
     {
-        LaunchEpisode(worldPth), GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, static_cast<Characters>(getPlayer2Character()));
+        LaunchEpisode(worldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, static_cast<Characters>(getPlayer2Character()));
     }
 
     return success;
