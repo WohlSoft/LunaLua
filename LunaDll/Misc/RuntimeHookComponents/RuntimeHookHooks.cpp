@@ -1602,6 +1602,27 @@ Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
+    std::wstring filenameWS = static_cast<std::wstring>(*filename);
+    size_t findLastSlash = filenameWS.find_last_of(L"/\\");
+    std::wstring dirWS = filenameWS.substr(0U, findLastSlash);
+    std::wstring nameWS = filenameWS.substr(findLastSlash + 1);
+    std::string dirST = WStr2Str(dirWS);
+    std::string nameST = WStr2Str(nameWS);
+
+    //If the legacy title screen is about to boot, prevent that and go straight to loading the episode
+    if(nameST == "intro.lvl" && dirST == gAppPathUTF8)
+    {
+        GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
+        if(autostarter.selectedWldPath == L"")
+        {
+            std::string msg = "There is no world file loaded on starting the engine. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level with SMBX2 by loading the X2 launcher instead.";
+            MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
+            _exit(0);
+        }
+        LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+        return;
+    }
+
     if (!GM_CREDITS_MODE)
     {
         for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {

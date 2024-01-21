@@ -61,6 +61,8 @@ bool isAbsolutePath(const std::string& path);
 std::wstring resolveCwdOrWorldsPath(const std::wstring& path);
 std::wstring resolveIfNotAbsolutePath(std::wstring filename);
 std::string resolveIfNotAbsolutePath(std::string filename);
+std::string splitPathFromFilename(std::string str);
+std::string splitFilenameFromPath(std::string str);
 
 extern void removeFilePathW(std::wstring &path);
 extern void removeFilePathW(wchar_t*path, int length);
@@ -122,6 +124,7 @@ std::wstring getEpisodeFolderPath();
 std::wstring getCustomFolderPath();
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths);
 std::wstring getLatestConfigFile(const std::wstring& configname);
+int findEpisodeIDFromWorldFileAndPath(std::string worldName);
 
 template <typename T>
 T normalizeToBackslashAndResolvePath(const T& path)

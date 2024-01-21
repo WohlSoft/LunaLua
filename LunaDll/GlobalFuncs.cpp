@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <mutex>
+#include <cstddef>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -727,6 +728,20 @@ std::string resolveIfNotAbsolutePath(std::string filename) {
     return filename;
 }
 
+std::string splitPathFromFilename(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
+    return finalStr;
+}
+
+std::string splitFilenameFromPath(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    std::string finalStr = str.substr(0, str.find_last_of("/\\"));
+    return finalStr;
+}
+
 
 std::string generateTimestamp(std::string format)
 {
@@ -850,6 +865,20 @@ std::wstring getCustomFolderPath()
         full_path = full_path.append(L"\\"); // < path into level folder
     }
     return full_path;
+}
+
+int findEpisodeIDFromWorldFileAndPath(std::string worldName)
+{
+    int id = 0;
+    for (int i = 1; i <= 100; i++) {
+        auto ep = EpisodeListItem::Get(i - 1);
+        if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+        {
+            id = i;
+            break;
+        }
+    }
+    return id;
 }
 
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)

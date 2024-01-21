@@ -32,6 +32,8 @@
 #include "LunaPathValidator.h"
 #include "../Misc/CollisionMatrix.h"
 
+#include "../FileManager/SMBXFileManager.h"
+
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
 extern bool luaDidGameOverFlag;
@@ -1608,18 +1610,53 @@ void CLunaLua::queuePlayerSectionChangeEvent(int playerIdx) {
 }
 
 extern PlayerMOB* getTemplateForCharacter(int id);
+extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
+
 void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
 {
-    // show loadscreen while re-loading everything
+    // show loadscreen while loading everything
     LunaLoadScreenStart();
 
-    // re-load world
+    // Cleanup the level and setup the SFX
+    native_cleanupLevel();
+    native_setupSFX();
+
+    // clear gamedata
+    LunaLuaSetGameData(0, 0);
+
+    // put the world together
     std::wstring fullPath = resolveCwdOrWorldsPath(wldPath);
+    
+    // make sure we also get the path without the wld file
+    std::string fullPathStr = WStr2Str(fullPath);
+    std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
+    std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
+
     VB6StrPtr pathVb6 = WStr2Str(fullPath);
+    VB6StrPtr pathNoWldVb6 = Str2WStr(fullPathNoWorldPthWithEndSlash);
+
+    // specify the save slot, the fulldir, and the menu level for the wld file
+    SMBXWorldFileBase::PopulateEpisodeList();
+    GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPath));
     GM_CUR_SAVE_SLOT = saveSlot;
+    GM_FULLDIR = pathNoWldVb6;
+    
+    // implement player count if it's 0
+    if(GM_PLAYERS_COUNT == 0)
+    {
+        if(singleplayer)
+        {
+            GM_PLAYERS_COUNT = 1;
+        }
+        else if(!singleplayer)
+        {
+            GM_PLAYERS_COUNT = 2;
+        }
+    }
+
     native_loadWorld(&pathVb6);
 
-    // re-load save
+    // load save
     if (saveFileExists())
     {
         native_loadGame();
@@ -1633,19 +1670,29 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     // reset checkpoints
     GM_STR_CHECKPOINT = "";
     
-    // restore players' characters
+    // add players' characters
     auto p = Player::Get(1);
-    // restore the 1st player's character
+    // implement the 1st player's character
     p->Identity = firstCharacter;
+    // implement the 2nd player's character
     if(!singleplayer && GM_PLAYERS_COUNT >= 2)
     {
         auto p2 = Player::Get(2);
-        // restore the 2nd player's character
         p2->Identity = secondCharacter;
     }
 
+    // unlikely that we'll get more than 3 players loading on boot, but Misc.loadEpisode exists, so this check needs to exist
+    for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
+        auto p = Player::Get(i);
+        if(GM_PLAYERS_COUNT >= 3)
+        {
+            p->Identity = firstCharacter;
+        }
+    }
+
+    // apply templates
     for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
-        // apply saved template
+        
         auto t = getTemplateForCharacter(p->Identity);
         if (t != nullptr) {
             memcpy(p, t, sizeof(PlayerMOB));
