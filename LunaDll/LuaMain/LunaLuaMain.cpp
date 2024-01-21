@@ -1648,7 +1648,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     GM_FULLDIR = pathNoWldVb6;
     
     // implement player count if it's 0
-    if(GM_PLAYERS_COUNT == 0 && !episodeLoadedOnboot)
+    if(GM_PLAYERS_COUNT == 0)
     {
         if(singleplayer)
         {
