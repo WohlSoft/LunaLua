@@ -1614,6 +1614,12 @@ extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
 void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
 {
+    // make sure the game unpauses before starting after the episode has loaded successfully after boot
+    if(episodeLoadedOnboot)
+    {
+        g_EventHandler.requestUnpause();
+    }
+
     // show loadscreen while loading everything
     LunaLoadScreenStart();
 
@@ -1642,7 +1648,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     GM_FULLDIR = pathNoWldVb6;
     
     // implement player count if it's 0
-    if(GM_PLAYERS_COUNT == 0)
+    if(GM_PLAYERS_COUNT == 0 && !episodeLoadedOnboot)
     {
         if(singleplayer)
         {
@@ -1682,14 +1688,11 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // unlikely that we'll get more than 3 players loading on boot, but Misc.loadEpisode exists, so this check needs to exist
-    if(GM_PLAYERS_COUNT > 2)
+    if(GM_PLAYERS_COUNT > 2 && !episodeLoadedOnboot)
     {
         for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
             auto p = Player::Get(i);
-            if(!episodeLoadedOnboot)
-            {
-                p->Identity = firstCharacter;
-            }
+            p->Identity = firstCharacter;
         }
     }
 

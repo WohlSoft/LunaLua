@@ -883,7 +883,7 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 
 std::string findEpisodeWorldPathFromName(std::string name)
 {
-    std::string finalWldPath;
+    std::string finalWldPath = "";
     for (int i = 1; i <= 100; i++) {
         auto ep = EpisodeListItem::Get(i - 1);
         if(name == std::string(ep->episodeName))
