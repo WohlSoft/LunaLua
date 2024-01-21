@@ -126,7 +126,7 @@ std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths);
 std::wstring getLatestConfigFile(const std::wstring& configname);
 int findEpisodeIDFromWorldFileAndPath(std::string worldName);
 std::string findEpisodeWorldPathFromName(std::string name);
-bool isBootingSinglePlayer(int playerCount);
+bool isBootingSinglePlayer();
 int getPlayer2Character();
 
 template <typename T>

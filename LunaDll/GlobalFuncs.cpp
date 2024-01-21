@@ -895,13 +895,13 @@ std::string findEpisodeWorldPathFromName(std::string name)
     return finalWldPath;
 }
 
-bool isBootingSinglePlayer(int playerCount)
+bool isBootingSinglePlayer()
 {
-    if(playerCount <= 1)
+    if(GM_PLAYERS_COUNT <= 1)
     {
         return true;
     }
-    else if(playerCount > 1)
+    else if(GM_PLAYERS_COUNT > 1)
     {
         return false;
     }
