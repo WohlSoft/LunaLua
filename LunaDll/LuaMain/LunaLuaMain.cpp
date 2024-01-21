@@ -1682,11 +1682,14 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // unlikely that we'll get more than 3 players loading on boot, but Misc.loadEpisode exists, so this check needs to exist
-    for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
-        auto p = Player::Get(i);
-        if(GM_PLAYERS_COUNT >= 3)
-        {
-            p->Identity = firstCharacter;
+    if(GM_PLAYERS_COUNT > 2)
+    {
+        for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
+            auto p = Player::Get(i);
+            if(GM_PLAYERS_COUNT >= 3)
+            {
+                p->Identity = firstCharacter;
+            }
         }
     }
 
