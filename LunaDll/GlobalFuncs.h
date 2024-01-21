@@ -6,6 +6,7 @@
 #include <vector>
 #include <wchar.h>
 #include <string.h>
+#include <mutex>
 
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
@@ -253,6 +254,7 @@ void sendPUTRequest(const std::string& server, const std::string& data);
 // Debug stuff
 void InitDebugConsole();
 int DebugPrint(const char * format, ...);
+void DebugClear(HANDLE hConsole);
 void dumpTypeLibrary(IDispatch* dispatchToDump, std::wostream& toOutput);
 
 // Window Helper Funcs
@@ -277,3 +279,5 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 #endif
 
 #endif
+
+std::string GetEditorPlacedItem();

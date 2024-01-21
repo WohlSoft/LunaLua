@@ -596,6 +596,10 @@ void __stdcall runtimeHookNPCNoBlockCollisionA1760E(void);
 void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void);
 
 void __stdcall runtimeHookBlockPlayerFilter(void);
+void __stdcall runtimeHookPlayerNPCInteractionCheck(void);
+void __stdcall runtimeHookPlayerNPCCollisionCheck9AE8FA(void);
+void __stdcall runtimeHookPlayerNPCCollisionCheck9ABC0B(void);
+void __stdcall runtimeHookPlayerPlayerInteraction(void);
 
 void __stdcall runtimeHookBlockNPCFilter(void);
 void __stdcall runtimeHookNPCCollisionGroup(void);

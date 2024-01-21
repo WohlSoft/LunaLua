@@ -4,8 +4,10 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
+#include <mutex>
 #include "../Defines.h"
 #include "../Globals.h"
+#include "../GlobalFuncs.h"
 #include "IPCPipeServer.h"
 #include "../libs/json/json.hpp"
 
@@ -26,6 +28,7 @@ json IPCGetWindowHandle(const json& params);      // Fetch HWND of SMBX game win
 json IPCSetCheckPoint(const json& params);        // Set custom checkpoint, start position, warp entrance/exit
 json IPCResetCheckPoint(const json& params);      // Clear checkpoint
 json IPCGetSupportedFeatures(const json& params); // Get a supported features table
+json IPCSendItemPlacing(const json& params);      // Gets an editor entity from the editor
 json IPCQuit(const json& params);                 // Quit the game
 
 
@@ -39,6 +42,7 @@ IPCPipeServer::IPCPipeServer() :
     RegisterMethod("getWindowHandle", IPCGetWindowHandle);
     RegisterMethod("resetCheckPoints", IPCResetCheckPoint);
     RegisterMethod("getSupportedFeatures", IPCGetSupportedFeatures);
+    RegisterMethod("sendItemPlacing", IPCSendItemPlacing);
     RegisterMethod("quit", IPCQuit);
 }
 
@@ -316,6 +320,13 @@ json IPCGetSupportedFeatures(const json& params)
         {"SelfForegrounding", true},
         {"HideShowNotifications", true}
     };
+}
+
+json IPCSendItemPlacing(const json& params)
+{
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    gEditorPlacedItem = params.dump();
+    return true;
 }
 
 //=============================================================================

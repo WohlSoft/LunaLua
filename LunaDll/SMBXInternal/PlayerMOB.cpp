@@ -9,6 +9,25 @@ PlayerMOB* Player::Get(int index) {
 }
 
 
+static ExtendedPlayerFields g_extendedPlayerFields[201];
+
+ExtendedPlayerFields* Player::GetExtended(int index)
+{
+    if (index < 0 || index >= 201)
+        return nullptr;
+
+    return &g_extendedPlayerFields[index];
+}
+
+void Player::ClearExtendedFields()
+{
+    for (int i = 0; i < 201; i++)
+    {
+        g_extendedPlayerFields[i].Reset();
+    }
+}
+
+
 // MANAGEMENT
 bool Player::InternalSwap(int player1, int player2) {
     char temp[500];

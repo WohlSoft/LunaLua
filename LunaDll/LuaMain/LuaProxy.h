@@ -274,6 +274,7 @@ namespace LuaProxy {
 
         void print(const std::string& outText);
         void println(const std::string& outText);
+        void clear();
     private:
         bool m_isDefaultConsole;
     };

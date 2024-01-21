@@ -128,6 +128,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     // Clear extended fields
     NPC::ClearExtendedFields();
     Blocks::ClearExtendedFields();
+    Player::ClearExtendedFields();
 
     // We should clear the anim array apparently though
     memset(GM_ANIM_PTR, 0, 1000*sizeof(SMBXAnimation));
