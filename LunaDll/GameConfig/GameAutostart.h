@@ -14,6 +14,7 @@ public:
     ~GameAutostart();
     static GameAutostart createGameAutostartByIniConfig(IniProcessing& reader);
     static GameAutostart createGameAutostartByStartupEpisodeSettings(const StartupEpisodeSettings& settings);
+    static GameAutostart createGameAutostartByManualSettings(std::wstring wldPath, int players, int character1, int character2, int saveSlot);
     static void ClearAutostartPatch();
 
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }

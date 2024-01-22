@@ -621,6 +621,7 @@ namespace LuaProxy {
         short getCurrentDirection() const;
         short playerPowerup() const;
         void setPlayerPowerup(short playerPowerup);
+        luabind::object getEpisodeList(lua_State *L);
     };
 
     class Tile

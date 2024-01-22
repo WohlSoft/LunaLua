@@ -870,7 +870,7 @@ std::wstring getCustomFolderPath()
 int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 {
     int id = 0;
-    for (int i = 1; i <= 100; i++) {
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
         auto ep = EpisodeListItem::Get(i - 1);
         if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
         {
@@ -888,7 +888,7 @@ std::string findEpisodeWorldPathFromName(std::string name)
         return "";
     }
     std::string finalWldPath;
-    for (int i = 1; i <= 100; i++) {
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
         auto ep = EpisodeListItem::Get(i - 1);
         if(name == std::string(ep->episodeName))
         {

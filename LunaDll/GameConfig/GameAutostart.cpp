@@ -206,6 +206,18 @@ GameAutostart GameAutostart::createGameAutostartByStartupEpisodeSettings(const S
     return autostarter;
 }
 
+GameAutostart GameAutostart::createGameAutostartByManualSettings(std::wstring wldPath, int players, int character1, int character2, int saveSlot)
+{
+    GameAutostart autostarter;
+    autostarter.selectedWldPath = wldPath;
+    autostarter.selectedEpisode = "";
+    autostarter.singleplayer = (players == 1);
+    autostarter.firstCharacter = static_cast<Characters>(character1);
+    autostarter.secondCharacter = static_cast<Characters>(character2);
+    autostarter.saveSlot = saveSlot;
+    return autostarter;
+}
+
 /*static*/ void GameAutostart::ClearAutostartPatch()
 {
     skipIntoPatch.Unapply();

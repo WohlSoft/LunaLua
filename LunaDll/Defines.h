@@ -626,6 +626,11 @@ DEFMEM(GM_GAMETITLE_1, VB6StrPtr, 0x8BD869);
 DEFMEM(GM_GAMETITLE_2, VB6StrPtr, 0x8BE25A);
 DEFMEM(GM_GAMETITLE_3, VB6StrPtr, 0x96AF26);
 
+// World Stuff
+DEFMEM(GM_WORLD_INTRO_FILENAME, VB6StrPtr, 0x00B25724);
+DEFMEM(GM_HUB_STYLED_EPISODE,   WORD,      0x00B25728);
+DEFMEM(GM_RESTART_ON_DEATH,     WORD,      0x00B2572A);
+
 
 /////////////////////
 ///  -Assembly-   ///
@@ -840,6 +845,7 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_UPDATE_BLOCK_ANIM 0x009E14B0
 
 #define GF_CLEANUP_LEVEL    0x008DC6E0
+#define GF_CLEANUP_WORLD    0x008E2E40
 #define GF_LOAD_LEVEL       0x008D8F40
 #define GF_INIT_CAMERA      0x009502E0
 #define GF_RENDER_INIT_SCREEN 0x00987DE0
@@ -936,6 +942,7 @@ static const auto native_renderLevel    = (void(__stdcall *)(void))GF_RENDER_LEV
 static const auto native_updateBlockAnim = (void(__stdcall *)(void))GF_UPDATE_BLOCK_ANIM;
 
 static const auto native_cleanupLevel   = (void(__stdcall *)(void))GF_CLEANUP_LEVEL;
+static const auto native_cleanupWorld   = (void(__stdcall *)(void))GF_CLEANUP_WORLD;
 static const auto native_loadLevel      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_LEVEL;
 static const auto native_initCamera     = (void(__stdcall *)(void))GF_INIT_CAMERA;
 static const auto native_renderInitScreen = (void(__stdcall *)(void))GF_RENDER_INIT_SCREEN;

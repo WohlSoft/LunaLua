@@ -841,6 +841,8 @@ void CLunaLua::bindAll()
             ],
             /*************************FileFormats*end*************************/
 
+            /*************************Episodes*end*************************/
+
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure
                 LUAHELPER_DEF_CLASS(Mix_Chunk)
@@ -1098,6 +1100,7 @@ void CLunaLua::bindAll()
                 .property("levelObj", &LuaProxy::World::levelObj)
                 .property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
                 .property("playerPowerup", &LuaProxy::World::playerPowerup, &LuaProxy::World::setPlayerPowerup)
+                .property("getEpisodeList", &LuaProxy::World::getEpisodeList)
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
@@ -1618,28 +1621,30 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     if(episodeLoadedOnBoot)
     {
         g_EventHandler.requestUnpause();
-
-        gLunaLua.exitContext();
-        gCachedFileMetadata.purge();
     }
 
+    // cleanup either the level or world, depending on where we are at
     if(!episodeLoadedOnBoot)
     {
-        // cleanup the level
+        // cleanup on boot
         native_cleanupLevel();
+        native_cleanupWorld();
     }
-
     if(episodeLoadedOnBoot)
     {
-        // cleanup either the level or world, depending on where we are at
-        if(GM_EPISODE_MODE && GM_LEVEL_MODE) // level
+        // cleanup on Misc.loadEpisode
+        if(GM_EPISODE_MODE == COMBOOL(true) && GM_LEVEL_MODE == COMBOOL(true)) // level
         {
+            gLunaLua.exitContext();
+            gCachedFileMetadata.purge();
             native_cleanupLevel();
         }
 
-        if(GM_EPISODE_MODE && !GM_LEVEL_MODE) // world
+        if(GM_EPISODE_MODE == COMBOOL(true) && GM_LEVEL_MODE == COMBOOL(false)) // world
         {
-            runtimeHookCleanupWorld();
+            gLunaLua.exitContext();
+            gCachedFileMetadata.purge();
+            native_cleanupWorld();
         }
     }
 
@@ -1684,16 +1689,16 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
 
     native_loadWorld(&pathVb6);
 
-    // load save
+    // load game
     if (saveFileExists())
     {
         native_loadGame();
     }
 
-    // put the player on the world map
     GM_EPISODE_MODE = COMBOOL(true);
     GM_TITLE_INTRO_MODE = COMBOOL(false);
     GM_LEVEL_MODE = COMBOOL(false);
+    GM_CHEATED = 0;
 
     // reset checkpoints
     GM_STR_CHECKPOINT = "";

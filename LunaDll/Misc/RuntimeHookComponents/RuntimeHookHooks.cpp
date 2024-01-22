@@ -203,7 +203,7 @@ extern int __stdcall LoadWorld()
 extern int __stdcall LoadIntro()
 {
 
-    if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
+    /*if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
         gAutostartRan = true;
 
@@ -239,7 +239,7 @@ extern int __stdcall LoadIntro()
                 autostartConfig.endGroup();
             }
         }
-    }
+    }*/
 
 
 #pragma warning(suppress: 28159)
@@ -1612,15 +1612,48 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
     //If the legacy title screen is about to boot, prevent that and go straight to loading the episode
     if(nameST == "intro.lvl" && dirST == gAppPathUTF8)
     {
-        GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
-        if(autostarter.selectedWldPath == L"")
+        if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
         {
+            gAutostartRan = true;
+
+            if (gStartupSettings.epSettings.enabled)
+            {
+                GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
+                LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+                return;
+            }
+            else
+            {
+                std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+                if (file_existsX(autostartFile))
+                {
+                    IniProcessing autostartConfig(autostartFile);
+                    if (autostartConfig.beginGroup("autostart"))
+                    {
+                        bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
+                        autostartConfig.endGroup();
+                        if (doAutostart)
+                        {
+                            // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                            GameAutostart autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+                            LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+
+                            autostartConfig.beginGroup("autostart");
+                            if (autostartConfig.value("transient", false).toBool())
+                            {
+                                remove(autostartFile.c_str());
+                            }
+                            autostartConfig.endGroup();
+                        }
+                    }
+                    autostartConfig.endGroup();
+                }
+                return;
+            }
             std::string msg = "There is no world file loaded on starting the engine. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level with SMBX2 by loading the X2 launcher instead.";
             MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
             _exit(0);
         }
-        LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
-        return;
     }
 
     if (!GM_CREDITS_MODE)
