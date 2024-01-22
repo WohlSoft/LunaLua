@@ -878,7 +878,7 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
             break;
         }
     }
-    return id;
+    return id - 1;
 }
 
 std::string findEpisodeWorldPathFromName(std::string name)
@@ -915,11 +915,11 @@ int getPlayer2Character()
 {
     if(GM_PLAYERS_COUNT > 1)
     {
-        return Player::Get(2)->Identity;
+        return static_cast<int>(Player::Get(2)->Identity);
     }
     else
     {
-        return 1;
+        return 0;
     }
 }
 

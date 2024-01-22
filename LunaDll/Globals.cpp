@@ -135,4 +135,4 @@ void printBoxA(const char *fmt, ...)
 std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
 
-bool episodeLoadedOnboot = false;
+bool episodeLoadedOnBoot = false;

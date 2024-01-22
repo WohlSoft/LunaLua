@@ -239,9 +239,20 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
     bool success = false;
 
     Characters storedIdentity1 = Player::Get(1)->Identity;
+    Characters storedIdentity2;
+
+    if(GM_PLAYERS_COUNT > 1)
+    {
+        storedIdentity2 = Player::Get(2)->Identity;
+    }
+    else if(GM_PLAYERS_COUNT <= 1)
+    {
+        storedIdentity2 = static_cast<Characters>(0);
+    }
+
     std::string worldPth = findEpisodeWorldPathFromName(episodeName);
     
-    if(!worldPth.empty() || worldPth == "")
+    if(!worldPth.empty() || worldPth != "")
     {
         success = true;
     }
@@ -250,7 +261,7 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 
     if(success)
     {
-        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, static_cast<Characters>(getPlayer2Character()));
+        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, storedIdentity2);
     }
 
     return success;

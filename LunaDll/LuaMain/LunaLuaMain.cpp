@@ -1614,18 +1614,40 @@ extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
 void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
 {
-    // make sure the game unpauses before starting after the episode has loaded successfully after boot
-    if(episodeLoadedOnboot)
+    // make sure the game unpauses and Lua is gone before starting after the episode has loaded successfully after boot
+    if(episodeLoadedOnBoot)
     {
         g_EventHandler.requestUnpause();
+
+        gLunaLua.exitContext();
+        gCachedFileMetadata.purge();
     }
 
+    if(!episodeLoadedOnBoot)
+    {
+        // cleanup the level
+        native_cleanupLevel();
+    }
+
+    if(episodeLoadedOnBoot)
+    {
+        // cleanup either the level or world, depending on where we are at
+        if(GM_EPISODE_MODE && GM_LEVEL_MODE) // level
+        {
+            native_cleanupLevel();
+        }
+
+        if(GM_EPISODE_MODE && !GM_LEVEL_MODE) // world
+        {
+            runtimeHookCleanupWorld();
+        }
+    }
+
+    // setup SFXs
+    native_setupSFX();
+    
     // show loadscreen while loading everything
     LunaLoadScreenStart();
-
-    // Cleanup the level and setup the SFX
-    native_cleanupLevel();
-    native_setupSFX();
 
     // clear gamedata
     LunaLuaSetGameData(0, 0);
@@ -1684,11 +1706,18 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     if(!singleplayer && GM_PLAYERS_COUNT >= 2)
     {
         auto p2 = Player::Get(2);
-        p2->Identity = secondCharacter;
+        if(secondCharacter != static_cast<Characters>(0))
+        {
+            p2->Identity = secondCharacter;
+        }
+        else
+        {
+            p2->Identity = static_cast<Characters>(1);
+        }
     }
 
     // unlikely that we'll get more than 3 players loading on boot, but Misc.loadEpisode exists, so this check needs to exist
-    if(GM_PLAYERS_COUNT > 2 && !episodeLoadedOnboot)
+    if(GM_PLAYERS_COUNT > 2)
     {
         for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
             auto p = Player::Get(i);
@@ -1697,18 +1726,21 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // apply templates
-    for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
-        
-        auto t = getTemplateForCharacter(p->Identity);
-        if (t != nullptr) {
-            memcpy(p, t, sizeof(PlayerMOB));
+    if(!episodeLoadedOnBoot)
+    {
+        for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+            
+            auto t = getTemplateForCharacter(p->Identity);
+            if (t != nullptr) {
+                memcpy(p, t, sizeof(PlayerMOB));
+            }
         }
     }
 
     // make sure that lunadll knows the game loaded on boot, so that loadEpisode can know
-    if(!episodeLoadedOnboot)
+    if(!episodeLoadedOnBoot)
     {
-        episodeLoadedOnboot = true;
+        episodeLoadedOnBoot = true;
     }
 
     // hide loadscreen
