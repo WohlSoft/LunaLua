@@ -1628,7 +1628,6 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     {
         // cleanup on boot
         native_cleanupLevel();
-        native_cleanupWorld();
     }
     if(episodeLoadedOnBoot)
     {
@@ -1690,13 +1689,12 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     native_loadWorld(&pathVb6);
 
     // load game
-    if (saveFileExists())
+    if (GM_CUR_SAVE_SLOT >= 0)
     {
         native_loadGame();
     }
 
     GM_EPISODE_MODE = COMBOOL(true);
-    GM_TITLE_INTRO_MODE = COMBOOL(false);
     GM_LEVEL_MODE = COMBOOL(false);
     GM_CHEATED = 0;
 
@@ -1722,7 +1720,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // unlikely that we'll get more than 3 players loading on boot, but Misc.loadEpisode exists, so this check needs to exist
-    if(GM_PLAYERS_COUNT > 2)
+    if(GM_PLAYERS_COUNT >= 3)
     {
         for (int i = 3; i <= GM_PLAYERS_COUNT; i++) {
             auto p = Player::Get(i);
