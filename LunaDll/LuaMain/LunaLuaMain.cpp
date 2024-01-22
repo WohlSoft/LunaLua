@@ -1662,12 +1662,12 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     if(episodeLoadedOnBoot)
     {
         // cleanup on Misc.loadEpisode
-        if(GM_EPISODE_MODE == COMBOOL(true) && GM_LEVEL_MODE == COMBOOL(true)) // level
+        if(GM_EPISODE_MODE == -1 && GM_LEVEL_MODE == -1) // level
         {
             native_cleanupLevel();
         }
 
-        if(GM_EPISODE_MODE == COMBOOL(true) && GM_LEVEL_MODE == COMBOOL(false)) // world
+        if(GM_EPISODE_MODE == -1 && GM_LEVEL_MODE == 0) // world
         {
             native_cleanupWorld();
         }
