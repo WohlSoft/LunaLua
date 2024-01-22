@@ -1619,14 +1619,6 @@ extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
 void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
 {
-    // make sure the game unpauses and Lua is gone before starting after the episode has loaded successfully after boot
-    if(episodeLoadedOnBoot)
-    {
-        g_EventHandler.requestUnpause();
-        gLunaLua.exitContext();
-        gCachedFileMetadata.purge();
-    }
-
     // put the world together
     std::wstring fullPath = resolveCwdOrWorldsPath(wldPath);
 
@@ -1635,12 +1627,38 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
     std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
 
-    // cleanup either the level or world, depending on where we are at
+    // check to see if non-default Windows ANSI code page stuff is there, otherwise don't load the entire episode if booting, else if after booted, continue the game like usual
+    std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(Str2WStr(fullPathNoWorldPthWithEndSlash));
+    if (!nonAnsiCharsEpisode.empty())
+    {
+        std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + fullPath;
+        MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
+        if(!episodeLoadedOnBoot)
+        {
+            _exit(1);
+        }
+        else if(episodeLoadedOnBoot)
+        {
+            return;
+        }
+    }
+
+    // make sure the game unpauses and Lua is gone before starting after the episode has loaded successfully after boot
+    if(episodeLoadedOnBoot)
+    {
+        g_EventHandler.requestUnpause();
+        gLunaLua.exitContext();
+        gCachedFileMetadata.purge();
+    }
+
+    // cleanup the level, on boot
     if(!episodeLoadedOnBoot)
     {
         // cleanup on boot
         native_cleanupLevel();
     }
+
+    // cleanup either the level or world after boot, depending on where we are at
     if(episodeLoadedOnBoot)
     {
         // cleanup on Misc.loadEpisode
@@ -1665,20 +1683,21 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     // setup SFXs
     native_setupSFX();
 
-    // show loadscreen while loading everything
-    LunaLoadScreenStart();
-
-    // clear gamedata
-    LunaLuaSetGameData(0, 0);
-
+    // setup the vb6 world strings
     VB6StrPtr pathVb6 = WStr2Str(fullPath);
     VB6StrPtr pathNoWldVb6 = Str2WStr(fullPathNoWorldPthWithEndSlash);
-
+    
     // specify the save slot, the fulldir, and the menu level for the wld file
     SMBXWorldFileBase::PopulateEpisodeList();
     GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPath));
     GM_CUR_SAVE_SLOT = saveSlot;
     GM_FULLDIR = pathNoWldVb6;
+
+    // show loadscreen while loading everything
+    LunaLoadScreenStart();
+
+    // clear gamedata
+    LunaLuaSetGameData(0, 0);
     
     // implement player count if it's 0
     if(GM_PLAYERS_COUNT == 0)
@@ -1721,7 +1740,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
         }
     }
 
-    // else just use the characte variables that were specified
+    // else just use the character variables that were specified
     if(!episodeLoadedOnBoot)
     {
         // add players' characters
