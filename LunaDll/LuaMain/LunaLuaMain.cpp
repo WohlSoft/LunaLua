@@ -1654,7 +1654,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
             native_cleanupWorld();
         }
         
-        std::string worldName = findNameFromEpisodeWorldPath(wldPath);
+        std::string worldName = findNameFromEpisodeWorldPath(WStr2Str(wldPath));
 
         GameAutostart autoStartEpisode;
         autoStartEpisode.setSelectedEpisode(worldName);
