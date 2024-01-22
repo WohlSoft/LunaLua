@@ -262,6 +262,10 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 
     if(success)
     {
+        GameAutostart autoStartEpisode;
+        autoStartEpisode.setSelectedEpisode(episodeName);
+        autoStartEpisode.setSaveSlot(saveSlot);
+
         LaunchEpisode(finalWorldPth, saveSlot);
     }
 
