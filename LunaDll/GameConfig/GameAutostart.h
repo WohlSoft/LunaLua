@@ -18,6 +18,7 @@ public:
     static void ClearAutostartPatch();
 
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
+    void setSelectedEpisodePath(std::wstring val) { selectedWldPath = val; }
     void setSaveSlot(int val) { saveSlot = val; }
 
     bool applyAutostart();
