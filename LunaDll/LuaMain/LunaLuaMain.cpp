@@ -841,7 +841,10 @@ void CLunaLua::bindAll()
             ],
             /*************************FileFormats*end*************************/
 
-            /*************************Episodes*end*************************/
+            LUAHELPER_DEF_CLASS(World)
+                .property("getEpisodeList", &LuaProxy::World::getEpisodeList),
+
+            /*************************World*end*************************/
 
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure
@@ -1100,7 +1103,6 @@ void CLunaLua::bindAll()
                 .property("levelObj", &LuaProxy::World::levelObj)
                 .property("playerCurrentDirection", &LuaProxy::World::getCurrentDirection)
                 .property("playerPowerup", &LuaProxy::World::playerPowerup, &LuaProxy::World::setPlayerPowerup)
-                .property("getEpisodeList", &LuaProxy::World::getEpisodeList)
                 .def("mem", static_cast<void (LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::World::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::World::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::World::mem)),
 
