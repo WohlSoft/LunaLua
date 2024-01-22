@@ -2804,17 +2804,51 @@ void __stdcall runtimeHookCheckWindowFocus()
 {
     if (!gMainWindowFocused && !LunaLoadScreenIsActive())
     {
-        // During this block of code, pause music if it was playing
-        PGE_MusPlayer::DeferralLock musicPauseLock(true);
-
-        // Wait for focus
-        TestModeSendNotification("suspendWhileUnfocusedNotification");
-        while (!gMainWindowFocused && !LunaLoadScreenIsActive())
+        if(gUnfocusTimer > 0)
         {
-            Sleep(100);
-            LunaDllWaitFrame(false);
+            gUnfocusTimer--
         }
-        TestModeSendNotification("resumeAfterUnfocusedNotification");
+        if(gUnfocusTimer == 1)
+        {
+            gFocusTimer = 2;
+            if (gLunaLua.isValid()) {
+                std::shared_ptr<Event> unfocusedEvent = std::make_shared<Event>("onUnfocusWindow", false);
+                unfocusedEvent->setDirectEventName("onUnfocusWindow");
+                unfocusedEvent->setLoopable(false);
+                gLunaLua.callEvent(unfocusedEvent);
+            }
+        }
+        else if(gUnfocusTimer <= 0)
+        {
+            // During this block of code, pause music if it was playing
+            PGE_MusPlayer::DeferralLock musicPauseLock(true);
+
+            // Wait for focus
+            TestModeSendNotification("suspendWhileUnfocusedNotification");
+            while (!gMainWindowFocused && !LunaLoadScreenIsActive())
+            {
+                Sleep(100);
+                LunaDllWaitFrame(false);
+            }
+            TestModeSendNotification("resumeAfterUnfocusedNotification");
+        }
+    }
+    else if (gMainWindowFocused && !LunaLoadScreenIsActive())
+    {
+        if(gFocusTimer > 0)
+        {
+            gFocusTimer--
+        }
+        if(gFocusTimer == 1)
+        {
+            gUnfocusTimer = 2;
+            if (gLunaLua.isValid()) {
+                std::shared_ptr<Event> focusedEvent = std::make_shared<Event>("onFocusWindow", false);
+                focusedEvent->setDirectEventName("onFocusWindow");
+                focusedEvent->setLoopable(false);
+                gLunaLua.callEvent(focusedEvent);
+            }
+        }
     }
 }
 

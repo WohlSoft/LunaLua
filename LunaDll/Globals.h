@@ -212,3 +212,6 @@ return;
 
 extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
+
+extern int gUnfocusTimer;
+extern int gFocusTimer;

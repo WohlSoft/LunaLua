@@ -134,3 +134,6 @@ void printBoxA(const char *fmt, ...)
 
 std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
+
+int gUnfocusTimer = 2;
+int gFocusTimer = 2;
