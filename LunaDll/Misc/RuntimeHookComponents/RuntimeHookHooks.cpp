@@ -1620,10 +1620,10 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
     if(nameST == "intro.lvl" && dirST == gAppPathUTF8)
     {
         std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+        GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
         if(!gStartupSettings.epSettings.enabled && file_existsX(autostartFile))
         {
             // Try reading the autostart.ini file first if there's no settings available
-            GameAutostart autostarter;
             IniProcessing autostartConfig(autostartFile);
             if (autostartConfig.beginGroup("autostart"))
             {
@@ -1646,14 +1646,13 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
             return;
         }
-        else if(gStartupSettings.epSettings.enabled && autostartFile.selectedWldPath != L"")
+        else if(gStartupSettings.epSettings.enabled && autostarter.selectedWldPath != L"")
         {
             // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
-            GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
             LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
             return;
         }
-        else if(!gStartupSettings.epSettings.enabled && autostartFile.selectedWldPath == L"")
+        else if(!gStartupSettings.epSettings.enabled && autostarter.selectedWldPath == L"")
         {
             // If there's still nothing, we don't have any settings so we shouldn't continue booting LunaDLL
             std::string msg = "There is no world file specified on starting LunaLua. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level starting SMBX2 by loading the X2 launcher (Or Command Prompt) instead.";
