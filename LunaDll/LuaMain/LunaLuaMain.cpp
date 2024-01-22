@@ -1627,6 +1627,14 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
         gCachedFileMetadata.purge();
     }
 
+    // put the world together
+    std::wstring fullPath = resolveCwdOrWorldsPath(wldPath);
+
+    // make sure we also get the path without the wld file
+    std::string fullPathStr = WStr2Str(fullPath);
+    std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
+    std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
+
     // cleanup either the level or world, depending on where we are at
     if(!episodeLoadedOnBoot)
     {
@@ -1645,24 +1653,23 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
         {
             native_cleanupWorld();
         }
+        
+        std::string worldName = findNameFromEpisodeWorldPath(wldPath);
+
+        GameAutostart autoStartEpisode;
+        autoStartEpisode.setSelectedEpisode(worldName);
+        autoStartEpisode.setSelectedEpisodePath(fullPath);
+        autoStartEpisode.setSaveSlot(saveSlot);
     }
 
     // setup SFXs
     native_setupSFX();
-    
+
     // show loadscreen while loading everything
     LunaLoadScreenStart();
 
     // clear gamedata
     LunaLuaSetGameData(0, 0);
-
-    // put the world together
-    std::wstring fullPath = resolveCwdOrWorldsPath(wldPath);
-    
-    // make sure we also get the path without the wld file
-    std::string fullPathStr = WStr2Str(fullPath);
-    std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
-    std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
 
     VB6StrPtr pathVb6 = WStr2Str(fullPath);
     VB6StrPtr pathNoWldVb6 = Str2WStr(fullPathNoWorldPthWithEndSlash);

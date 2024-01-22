@@ -124,8 +124,6 @@ std::wstring getEpisodeFolderPath();
 std::wstring getCustomFolderPath();
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths);
 std::wstring getLatestConfigFile(const std::wstring& configname);
-int findEpisodeIDFromWorldFileAndPath(std::string worldName);
-std::string findEpisodeWorldPathFromName(std::string name);
 
 template <typename T>
 T normalizeToBackslashAndResolvePath(const T& path)
@@ -285,3 +283,8 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 #endif
 
 std::string GetEditorPlacedItem();
+
+// World-related functions
+int findEpisodeIDFromWorldFileAndPath(std::string worldName);
+std::string findEpisodeWorldPathFromName(std::string name);
+std::string findNameFromEpisodeWorldPath(std::string wldPath);

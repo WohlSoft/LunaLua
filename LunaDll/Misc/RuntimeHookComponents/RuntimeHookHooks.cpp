@@ -153,15 +153,6 @@ extern int __stdcall LoadWorld()
     ResetLunaModule();
     gIsOverworld = true;
 
-    if (!GM_CREDITS_MODE)
-    {
-        for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
-            // store player characters at the time of level load,
-            // these are used to restore the character if the episode has to be reloaded
-            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
-        }
-    }
-
 #ifndef NO_SDL
     if (!episodeStarted)
     {
@@ -191,6 +182,15 @@ extern int __stdcall LoadWorld()
 
         // Mark next render frame as the 'first'
         g_GLEngine.SetFirstFramePending();
+    }
+
+    if (!GM_CREDITS_MODE)
+    {
+        for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
+            // store player characters at the time of level load,
+            // these are used to restore the character if the episode has to be reloaded, or another episode was launched
+            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+        }
     }
 
     short plValue = GM_PLAYERS_COUNT;

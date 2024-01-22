@@ -867,38 +867,6 @@ std::wstring getCustomFolderPath()
     return full_path;
 }
 
-int findEpisodeIDFromWorldFileAndPath(std::string worldName)
-{
-    int id = 0;
-    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i - 1);
-        if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
-        {
-            id = i;
-            break;
-        }
-    }
-    return id - 1;
-}
-
-std::string findEpisodeWorldPathFromName(std::string name)
-{
-    if(name.empty())
-    {
-        return "";
-    }
-    std::string finalWldPath;
-    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i - 1);
-        if(name == std::string(ep->episodeName))
-        {
-            finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
-            break;
-        }
-    }
-    return finalWldPath;
-}
-
 
 
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
@@ -1133,4 +1101,56 @@ std::string GetEditorPlacedItem()
 {
     std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
     return (std::string)gEditorPlacedItem;
+}
+
+
+
+int findEpisodeIDFromWorldFileAndPath(std::string worldName)
+{
+    int id = 0;
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i - 1);
+        if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+        {
+            id = i;
+            break;
+        }
+    }
+    return id - 1;
+}
+
+std::string findEpisodeWorldPathFromName(std::string name)
+{
+    if(name.empty())
+    {
+        return "";
+    }
+    std::string finalWldPath;
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i - 1);
+        if(name == std::string(ep->episodeName))
+        {
+            finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
+            break;
+        }
+    }
+    return finalWldPath;
+}
+
+std::string findNameFromEpisodeWorldPath(std::string wldPath)
+{
+    if(wldPath.empty())
+    {
+        return "";
+    }
+    std::string finalName;
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i - 1);
+        if(wldPath == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+        {
+            finalName = std::string(ep->episodeName);
+            break;
+        }
+    }
+    return finalName;
 }
