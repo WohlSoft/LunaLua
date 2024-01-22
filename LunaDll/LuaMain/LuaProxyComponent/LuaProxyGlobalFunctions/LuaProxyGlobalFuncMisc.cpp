@@ -247,7 +247,7 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
     }
     else if(GM_PLAYERS_COUNT <= 1)
     {
-        storedIdentity2 = static_cast<Characters>(0);
+        storedIdentity2 = static_cast<Characters>(1);
     }
 
     std::string worldPth = findEpisodeWorldPathFromName(episodeName);
@@ -261,7 +261,7 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 
     if(success)
     {
-        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, isBootingSinglePlayer(), storedIdentity1, storedIdentity2);
+        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, (GM_PLAYERS_COUNT == 1), storedIdentity1, storedIdentity2);
     }
 
     return success;

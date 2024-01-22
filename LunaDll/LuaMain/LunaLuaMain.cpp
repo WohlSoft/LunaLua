@@ -1621,6 +1621,8 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     if(episodeLoadedOnBoot)
     {
         g_EventHandler.requestUnpause();
+        gLunaLua.exitContext();
+        gCachedFileMetadata.purge();
     }
 
     // cleanup either the level or world, depending on where we are at
