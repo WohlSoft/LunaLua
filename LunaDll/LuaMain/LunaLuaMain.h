@@ -206,5 +206,6 @@ namespace CachedReadFile {
 };
 
 extern void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter);
+extern void LaunchEpisode(std::wstring wldPath, int saveSlot);
 
 #endif

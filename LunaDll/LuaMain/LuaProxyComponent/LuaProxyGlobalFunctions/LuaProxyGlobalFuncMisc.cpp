@@ -258,10 +258,11 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
     }
     
     std::wstring finalWorldPth = Str2WStr(worldPth);
+    int saveSlot = GM_CUR_SAVE_SLOT;
 
     if(success)
     {
-        LaunchEpisode(finalWorldPth, GM_CUR_SAVE_SLOT, (GM_PLAYERS_COUNT == 1), storedIdentity1, storedIdentity2);
+        LaunchEpisode(finalWorldPth, saveSlot);
     }
 
     return success;

@@ -153,6 +153,15 @@ extern int __stdcall LoadWorld()
     ResetLunaModule();
     gIsOverworld = true;
 
+    if (!GM_CREDITS_MODE)
+    {
+        for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
+            // store player characters at the time of level load,
+            // these are used to restore the character if the episode has to be reloaded
+            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+        }
+    }
+
 #ifndef NO_SDL
     if (!episodeStarted)
     {
@@ -1597,8 +1606,6 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
         RET
     }
 }
-
-Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {

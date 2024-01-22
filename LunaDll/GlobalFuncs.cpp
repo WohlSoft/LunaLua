@@ -899,29 +899,7 @@ std::string findEpisodeWorldPathFromName(std::string name)
     return finalWldPath;
 }
 
-bool isBootingSinglePlayer()
-{
-    if(GM_PLAYERS_COUNT <= 1)
-    {
-        return true;
-    }
-    else if(GM_PLAYERS_COUNT > 1)
-    {
-        return false;
-    }
-}
 
-int getPlayer2Character()
-{
-    if(GM_PLAYERS_COUNT > 1)
-    {
-        return static_cast<int>(Player::Get(2)->Identity);
-    }
-    else
-    {
-        return 0;
-    }
-}
 
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 {
