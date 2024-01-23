@@ -210,8 +210,10 @@ return;
 
 #endif
 
+// Editor IPC Entities
 extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
 
-extern bool episodeLoadedOnBoot;
+// Episode loading
 extern Characters playerStoredCharacters[];
+extern bool gEpisodeLoadedOnBoot;

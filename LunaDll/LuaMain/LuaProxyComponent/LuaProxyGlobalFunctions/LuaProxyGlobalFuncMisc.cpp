@@ -250,21 +250,25 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
         storedIdentity2 = static_cast<Characters>(1);
     }
 
+    // We're checking to see if the world path exists, and if it does, we can go through to load the episode
     std::string worldPth = findEpisodeWorldPathFromName(episodeName);
     
     if(!worldPth.empty() || worldPth != "")
     {
         success = true;
     }
-    
-    std::wstring finalWorldPth = Str2WStr(worldPth);
-    int saveSlot = GM_CUR_SAVE_SLOT;
 
     if(success)
     {
-        LaunchEpisode(finalWorldPth, saveSlot);
-    }
+        GameAutostart autoStartEpisode;
+        autoStartEpisode.setSelectedEpisode(episodeName);
+        autoStartEpisode.setSelectedEpisodePath(Str2WStr(worldPth));
 
+        GM_EPISODE_MODE = COMBOOL(false);
+        GM_CREDITS_MODE = COMBOOL(false);
+        GM_LEVEL_MODE = COMBOOL(true);
+    }
+    
     return success;
 }
 

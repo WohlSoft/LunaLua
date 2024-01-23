@@ -168,7 +168,6 @@ void EventStateMachine::sendOnTick(void) {
     m_onTickReady = false;
 
     sendSimpleLuaEvent("onTick");
-
     m_onTickEndReady = true;
 }
 

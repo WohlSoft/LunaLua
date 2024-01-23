@@ -704,7 +704,8 @@ void CLunaLua::bindAll()
                 def("exitGame", &LuaProxy::Misc::exitGame),
                 def("exitEngine", &LuaProxy::Misc::exitEngine),
                 def("didGameOver", &LuaProxy::Misc::didGameOver),
-                def("loadEpisode", &LuaProxy::Misc::loadEpisode),
+                def("loadEpisode", (bool(*)(std::string))&LuaProxy::Misc::loadEpisode),
+                def("loadEpisode", (bool(*)(std::string, std::string))&LuaProxy::Misc::loadEpisode),
                 def("pause", (void(*)(void))&LuaProxy::Misc::pause),
                 def("pause", (void(*)(bool))&LuaProxy::Misc::pause),
                 def("unpause", &LuaProxy::Misc::unpause),
@@ -1617,6 +1618,11 @@ void CLunaLua::queuePlayerSectionChangeEvent(int playerIdx) {
 extern PlayerMOB* getTemplateForCharacter(int id);
 extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
+// Patch to allow exiting the pause menu. Apply when the vanilla pause/textbox
+// should be instantly exited always. Unapply when this should not be the case.
+static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
+
+// The big one. This will load an episode anywhere in the engine. This is also used when booting the engine.
 void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Characters firstCharacter, Characters secondCharacter)
 {
     // put the world together
@@ -1633,33 +1639,27 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     {
         std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + fullPath;
         MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
-        if(!episodeLoadedOnBoot)
-        {
-            _exit(1);
-        }
-        else if(episodeLoadedOnBoot)
-        {
-            return;
-        }
+        _exit(1);
     }
 
     // make sure the game unpauses and Lua is gone before starting after the episode has loaded successfully after boot
-    if(episodeLoadedOnBoot)
+    if(gEpisodeLoadedOnBoot)
     {
-        g_EventHandler.requestUnpause();
         gLunaLua.exitContext();
+        exitPausePatch.Apply();
+
         gCachedFileMetadata.purge();
     }
 
     // cleanup the level, on boot
-    if(!episodeLoadedOnBoot)
+    if(!gEpisodeLoadedOnBoot)
     {
         // cleanup on boot
         native_cleanupLevel();
     }
 
     // cleanup either the level or world after boot, depending on where we are at
-    if(episodeLoadedOnBoot)
+    if(gEpisodeLoadedOnBoot)
     {
         // cleanup on Misc.loadEpisode
         if(GM_EPISODE_MODE == -1 && GM_LEVEL_MODE == -1) // level
@@ -1673,12 +1673,15 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
         }
         
         std::string worldName = findNameFromEpisodeWorldPath(WStr2Str(wldPath));
-
+        
         GameAutostart autoStartEpisode;
         autoStartEpisode.setSelectedEpisode(worldName);
         autoStartEpisode.setSelectedEpisodePath(fullPath);
         autoStartEpisode.setSaveSlot(saveSlot);
     }
+
+    // show loadscreen
+    LunaLoadScreenStart();
 
     // setup SFXs
     native_setupSFX();
@@ -1693,12 +1696,9 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     GM_CUR_SAVE_SLOT = saveSlot;
     GM_FULLDIR = pathNoWldVb6;
 
-    // show loadscreen while loading everything
-    LunaLoadScreenStart();
-
     // clear gamedata
     LunaLuaSetGameData(0, 0);
-    
+
     // implement player count if it's 0
     if(GM_PLAYERS_COUNT == 0)
     {
@@ -1711,27 +1711,9 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
             GM_PLAYERS_COUNT = 2;
         }
     }
-
-    native_loadWorld(&pathVb6);
-
-    // load game
-    if (GM_CUR_SAVE_SLOT >= 0)
-    {
-        native_loadGame();
-    }
-
-    // set the game to load the map
-    GM_EPISODE_MODE = COMBOOL(true);
-    GM_LEVEL_MODE = COMBOOL(false);
-
-    // reset cheat status
-    GM_CHEATED = 0;
-
-    // reset checkpoints
-    GM_STR_CHECKPOINT = "";
-
+    
     // restore characters if booted already
-    if(episodeLoadedOnBoot)
+    if(gEpisodeLoadedOnBoot)
     {
         for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
             auto p = Player::Get(i);
@@ -1741,7 +1723,7 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // else just use the character variables that were specified
-    if(!episodeLoadedOnBoot)
+    if(!gEpisodeLoadedOnBoot)
     {
         // add players' characters
         auto p = Player::Get(1);
@@ -1761,6 +1743,22 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
             }
         }
 
+        // implement missing player values before loading the save file
+        for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
+            auto p = Player::Get(i);
+
+            p->CurrentPowerup = 1;
+            p->MountType = 0;
+            p->PowerupBoxContents = 0;
+            p->TakeoffSpeed = 0;
+            p->CanFly = 0;
+            p->TailswipeTimer = 0;
+            p->YoshiHasEarthquake = 0;
+            p->YoshiHasFireBreath = 0;
+            p->YoshiHasFlight = 0;
+            p->Hearts = 0;
+        }
+
         // unlikely that we'll get more than 3 players loading on boot, but oh well, this needs to exist anyway
         if(GM_PLAYERS_COUNT >= 3)
         {
@@ -1770,6 +1768,41 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
             }
         }
     }
+
+    // implement missing values before loading the save file
+    GM_STAR_COUNT = 0;
+    GM_COINS = 0;
+    GM_UNK_B2C8E4 = 0;
+    GM_PLAYER_LIVES = 3;
+
+    native_loadWorld(&pathVb6);
+
+    // load game
+    if (GM_CUR_SAVE_SLOT >= 0)
+    {
+        native_loadGame();
+    }
+
+    if((GM_WORLD_INTRO_FILENAME != GM_STR_NULL && !saveFileExists()) || (GM_HUB_STYLED_EPISODE == -1))
+    {
+        // load the autoboot level from the episode if we're starting it for the first time, or the hub level if it's a hub-styled episode
+        std::string fullPathAndAutobootLvl = fullPathNoWorldPthWithEndSlash + (std::string)GM_WORLD_INTRO_FILENAME;
+        VB6StrPtr fullPathAndAutobootLvlVB6 = fullPathAndAutobootLvl;
+        GM_EPISODE_MODE = COMBOOL(false);
+        native_loadLevel(&fullPathAndAutobootLvlVB6);
+    }
+    else
+    {
+        // or just set the game to load the map
+        GM_EPISODE_MODE = COMBOOL(true);
+        GM_LEVEL_MODE = COMBOOL(false);
+    }
+
+    // reset cheat status
+    GM_CHEATED = COMBOOL(false);
+
+    // reset checkpoints
+    GM_STR_CHECKPOINT = "";
 
     // apply templates
     for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
@@ -1781,17 +1814,13 @@ void LaunchEpisode(std::wstring wldPath, int saveSlot, bool singleplayer, Charac
     }
 
     // make sure that lunadll knows the game loaded on boot, so that loadEpisode can know
-    if(!episodeLoadedOnBoot)
+    if(!gEpisodeLoadedOnBoot)
     {
-        episodeLoadedOnBoot = true;
+        gEpisodeLoadedOnBoot = true;
     }
+
+    exitPausePatch.Unapply();
 
     // hide loadscreen
     LunaLoadScreenKill();
-}
-
-// used for after boot
-void LaunchEpisode(std::wstring wldPath, int saveSlot)
-{
-    LaunchEpisode(wldPath, saveSlot, (GM_PLAYERS_COUNT == 1), static_cast<Characters>(1), static_cast<Characters>(2));
 }

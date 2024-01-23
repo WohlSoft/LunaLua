@@ -144,10 +144,11 @@ static bool runtimeHookCharacterIdApplied = false;
 #define DECL_HOOK(FUNCNAME, ARG, TAIL) __declspec(naked) static void  __stdcall FUNCNAME() { ASM_ARG(ARG); ASM_TAIL_##TAIL(); }
 
 // Declare hook functions
-DECL_HOOK(HOOK_0x8C0329, esi + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x8C0362, esi + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x8C0B35, edi + 0xF0, MOV_ebx);
-DECL_HOOK(HOOK_0x8C0B6E, edi + 0xF0, MOV_ebx);
+// Some hooks are no longer needed due to the new way to load episodes on boot
+//DECL_HOOK(HOOK_0x8C0329, esi + 0xF0, MOV_ebx);
+//DECL_HOOK(HOOK_0x8C0362, esi + 0xF0, MOV_ebx);
+//DECL_HOOK(HOOK_0x8C0B35, edi + 0xF0, MOV_ebx);
+//DECL_HOOK(HOOK_0x8C0B6E, edi + 0xF0, MOV_ebx);
 DECL_HOOK(HOOK_0x8D22B3, ecx + 0xF0, CMP_5);
 DECL_HOOK(HOOK_0x8D376C, edx + 0xF0, MOV_eax);
 DECL_HOOK(HOOK_0x8D3812, ecx + 0xF0, MOV_edx);
@@ -648,10 +649,10 @@ DECL_HOOK(HOOK_0xA60BB9, ecx + eax * 4 + 0xF0, CMP_4);
 DECL_HOOK(HOOK_0xA60BE3, eax + edx * 4 + 0xF0, CMP_5);
 
 // Patches
-static auto patch_0x8C0329 = PATCH(0x8C0329).CALL(HOOK_0x8C0329).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x8C0362 = PATCH(0x8C0362).CALL(HOOK_0x8C0362).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x8C0B35 = PATCH(0x8C0B35).CALL(HOOK_0x8C0B35).NOP_PAD_TO_SIZE<7>();
-static auto patch_0x8C0B6E = PATCH(0x8C0B6E).CALL(HOOK_0x8C0B6E).NOP_PAD_TO_SIZE<7>();
+//static auto patch_0x8C0329 = PATCH(0x8C0329).CALL(HOOK_0x8C0329).NOP_PAD_TO_SIZE<7>();
+//static auto patch_0x8C0362 = PATCH(0x8C0362).CALL(HOOK_0x8C0362).NOP_PAD_TO_SIZE<7>();
+//static auto patch_0x8C0B35 = PATCH(0x8C0B35).CALL(HOOK_0x8C0B35).NOP_PAD_TO_SIZE<7>();
+//static auto patch_0x8C0B6E = PATCH(0x8C0B6E).CALL(HOOK_0x8C0B6E).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x8D22B3 = PATCH(0x8D22B3).CALL(HOOK_0x8D22B3).NOP_PAD_TO_SIZE<8>();
 static auto patch_0x8D376C = PATCH(0x8D376C).CALL(HOOK_0x8D376C).NOP_PAD_TO_SIZE<7>();
 static auto patch_0x8D3812 = PATCH(0x8D3812).CALL(HOOK_0x8D3812).NOP_PAD_TO_SIZE<7>();
@@ -1461,10 +1462,10 @@ static auto patch_variant_effect_0x9E73C9 = PATCH(0x9E73C9).CALL(RunEffectRawHoo
 
 // Patch list
 static Patchable* runtimeHookCharacterIdPatchList[] = {
-    &patch_0x8C0329,
-    &patch_0x8C0362,
-    &patch_0x8C0B35,
-    &patch_0x8C0B6E,
+    //&patch_0x8C0329,
+    //&patch_0x8C0362,
+    //&patch_0x8C0B35,
+    //&patch_0x8C0B6E,
     &patch_0x8D22B3,
     &patch_0x8D376C,
     &patch_0x8D3812,

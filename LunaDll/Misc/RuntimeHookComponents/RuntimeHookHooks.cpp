@@ -211,7 +211,6 @@ extern int __stdcall LoadWorld()
 
 extern int __stdcall LoadIntro()
 {
-
     if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
         gAutostartRan = true;
@@ -1607,50 +1606,46 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
     }
 }
 
-void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
+//If the legacy title screen is about to boot, prevent that and go straight to loading the episode
+void __stdcall runtimeHookGameMenu()
 {
-    std::wstring filenameWS = static_cast<std::wstring>(*filename);
-    size_t findLastSlash = filenameWS.find_last_of(L"/\\");
-    std::wstring dirWS = filenameWS.substr(0U, findLastSlash);
-    std::wstring nameWS = filenameWS.substr(findLastSlash + 1);
-    std::string dirST = WStr2Str(dirWS);
-    std::string nameST = WStr2Str(nameWS);
-
-    //If the legacy title screen is about to boot, prevent that and go straight to loading the episode
-    if(nameST == "intro.lvl" && dirST == gAppPathUTF8)
+    GM_LEVEL_MODE = 0; // Set this to prevent multiple loops
+    // Check to see if IPC is not waiting and Test Mode isn't enabled. If so, continue.
+    if(!gEpisodeLoadedOnBoot)
     {
-        std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
         GameAutostart autostarter = GameAutostart::createGameAutostartByStartupEpisodeSettings(gStartupSettings.epSettings);
-        if(!gStartupSettings.epSettings.enabled && file_existsX(autostartFile))
+        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled() && gEpisodeLoadedOnBoot)
         {
-            // Try reading the autostart.ini file first if there's no settings available
-            IniProcessing autostartConfig(autostartFile);
-            if (autostartConfig.beginGroup("autostart"))
+            std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+            if(!gStartupSettings.epSettings.enabled && file_existsX(autostartFile))
             {
-                bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
-                autostartConfig.endGroup();
-                if (doAutostart)
+                // Try reading the autostart.ini file first if there's no settings available
+                IniProcessing autostartConfig(autostartFile);
+                if (autostartConfig.beginGroup("autostart"))
                 {
-                    // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
-                    autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
-
-                    autostartConfig.beginGroup("autostart");
-                    if (autostartConfig.value("transient", false).toBool())
-                    {
-                        remove(autostartFile.c_str());
-                    }
+                    bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
                     autostartConfig.endGroup();
+                    if (doAutostart)
+                    {
+                        // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                        autostarter = GameAutostart::createGameAutostartByIniConfig(autostartConfig);
+
+                        autostartConfig.beginGroup("autostart");
+                        if (autostartConfig.value("transient", false).toBool())
+                        {
+                            remove(autostartFile.c_str());
+                        }
+                        autostartConfig.endGroup();
+                    }
                 }
+                autostartConfig.endGroup();
+                LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
             }
-            autostartConfig.endGroup();
-            LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
-            return;
         }
         else if(gStartupSettings.epSettings.enabled && autostarter.selectedWldPath != L"")
         {
             // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
             LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
-            return;
         }
         else if(!gStartupSettings.epSettings.enabled && autostarter.selectedWldPath == L"")
         {
@@ -1658,10 +1653,20 @@ void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
             std::string msg = "There is no world file specified on starting LunaLua. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level starting SMBX2 by loading the X2 launcher (Or Command Prompt) instead.";
             MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
             _exit(0);
-            return;
         }
     }
+    else if(gEpisodeLoadedOnBoot)
+    {
+        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled() && gEpisodeLoadedOnBoot)
+        {
+            GameAutostart autostarter;
+            LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+        }
+    }
+}
 
+void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
+{
     if (!GM_CREDITS_MODE)
     {
         for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {

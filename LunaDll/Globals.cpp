@@ -135,5 +135,5 @@ void printBoxA(const char *fmt, ...)
 std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
 
-bool episodeLoadedOnBoot = false;
+bool gEpisodeLoadedOnBoot = false;
 Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };
