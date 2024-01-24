@@ -1697,12 +1697,6 @@ void __stdcall runtimeHookGameMenu()
     }
 }
 
-void __stdcall runtimeHookWorldMap()
-{
-    EpisodeMain mainEpisodeFunc;
-    mainEpisodeFunc.StartWorldMap();
-}
-
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
     if (GM_CREDITS_MODE == 0)
