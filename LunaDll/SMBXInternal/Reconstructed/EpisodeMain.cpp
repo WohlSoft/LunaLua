@@ -43,8 +43,7 @@ extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
 
 EpisodeMain::EpisodeMain() :
-    canExecuteViaLua(false),
-    currentOverworldLvl(0)
+    canExecuteViaLua(false)
 {}
 
 EpisodeMain::~EpisodeMain() {}
