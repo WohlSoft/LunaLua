@@ -136,4 +136,4 @@ std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
 
 bool gEpisodeLoadedOnBoot = false;
-Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };
+Characters gPlayerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };

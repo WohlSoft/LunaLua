@@ -215,5 +215,5 @@ extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
 
 // Episode loading
-extern Characters playerStoredCharacters[];
+extern Characters gPlayerStoredCharacters[];
 extern bool gEpisodeLoadedOnBoot;

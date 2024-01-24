@@ -9,6 +9,8 @@
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
 
+#include "../../../SMBXInternal/Reconstructed/EpisodeMain.h"
+
 void LuaProxy::Misc::npcToCoins()
 {
     native_npcToCoins();
@@ -263,6 +265,7 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
         GameAutostart autoStartEpisode;
         autoStartEpisode.setSelectedEpisode(episodeName);
         autoStartEpisode.setSelectedEpisodePath(Str2WStr(worldPth));
+        autoStartEpisode.setPlayerCount(GM_PLAYERS_COUNT);
 
         GM_EPISODE_MODE = COMBOOL(false);
         GM_CREDITS_MODE = COMBOOL(false);

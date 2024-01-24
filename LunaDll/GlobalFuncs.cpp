@@ -27,6 +27,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Defines.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -1153,4 +1154,45 @@ std::string findNameFromEpisodeWorldPath(std::string wldPath)
         }
     }
     return finalName;
+}
+
+int getUnblockedCharacterFromWorld(int curWorldID)
+{
+    int identity = 1;
+    EpisodeListItem* ep = EpisodeListItem::GetRaw(curWorldID);
+    for (int i = 1; i <= 5; i++)
+    {
+        if(ep->blockChar[i - 1] == 0)
+        {
+            identity = i;
+            break;
+        }
+    }
+    return identity;
+}
+
+
+
+void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
+{
+    for (size_t i = 0; i < 5; i++)
+    {
+        auto p = Player::Get(playerID);
+        EpisodeListItem* ep = EpisodeListItem::GetRaw(GM_CUR_MENULEVEL);
+        if(ep->blockChar[i] == -1 && p->Identity == static_cast<Characters>(i + 1))
+        {
+            // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked
+            p->Identity = static_cast<Characters>(getUnblockedCharacterFromWorld(GM_CUR_MENULEVEL));
+        }
+    }
+}
+
+
+
+bool CheckCollision(Momentum momentumA, Momentum momentumB)
+{
+    return  ((momentumA.y + momentumA.height >= momentumB.y) &&
+            (momentumA.y <= momentumB.y + momentumB.height) &&
+            (momentumA.x <= momentumB.x + momentumB.width) &&
+            (momentumA.x + momentumA.width >= momentumB.x));
 }

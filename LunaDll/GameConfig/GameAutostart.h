@@ -20,6 +20,7 @@ public:
     void setSelectedEpisode(std::string val) { selectedEpisode = val; }
     void setSelectedEpisodePath(std::wstring val) { selectedWldPath = val; }
     void setSaveSlot(int val) { saveSlot = val; }
+    void setPlayerCount(int val) { playerCount = val; }
 
     bool applyAutostart();
     
@@ -27,6 +28,7 @@ public:
     std::string selectedEpisode;
     std::wstring selectedWldPath;
     bool singleplayer;
+    int playerCount;
     Characters firstCharacter;
     Characters secondCharacter;
     int saveSlot;

@@ -304,6 +304,7 @@
     <ClInclude Include="Misc\RuntimeHook.h" />
     <ClInclude Include="SdlMusic\MusicManager.h" />
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
+    <ClInclude Include="SMBXInternal\Reconstructed\EpisodeMain.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\ReconstructedDefines.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h" />
     <ClInclude Include="SMBXInternal\Scenery.h" />
@@ -542,6 +543,7 @@
     <ClCompile Include="SdlMusic\MusicDefList.cpp" />
     <ClCompile Include="SdlMusic\MusicManager.cpp" />
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
+    <ClCompile Include="SMBXInternal\Reconstructed\EpisodeMain.cpp" />
     <ClCompile Include="SMBXInternal\Reconstructed\Util\NpcToCoins.cpp" />
     <ClCompile Include="SMBXInternal\SMBXEvents.cpp" />
     <ClCompile Include="SMBXInternal\Sound.cpp" />

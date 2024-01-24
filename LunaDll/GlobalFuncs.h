@@ -8,6 +8,8 @@
 #include <string.h>
 #include <mutex>
 
+#include "Defines.h"
+
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
@@ -284,7 +286,14 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 
 std::string GetEditorPlacedItem();
 
-// World-related functions
+// World finding value functions
 int findEpisodeIDFromWorldFileAndPath(std::string worldName);
 std::string findEpisodeWorldPathFromName(std::string name);
 std::string findNameFromEpisodeWorldPath(std::string wldPath);
+
+// Blocked character world functions
+int getUnblockedCharacterFromWorld(int curWorldID);
+void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID);
+
+// Collision functions
+bool CheckCollision(Momentum momentumA, Momentum momentumB);

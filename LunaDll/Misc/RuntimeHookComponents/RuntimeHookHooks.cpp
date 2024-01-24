@@ -43,6 +43,8 @@
 
 #include "../../Misc/VB6RNG.h"
 
+#include "../../SMBXInternal/Reconstructed/EpisodeMain.h"
+
 void CheckIPCQuitRequest();
 
 extern HHOOK HookWnd;
@@ -189,7 +191,7 @@ extern int __stdcall LoadWorld()
         for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
             // store player characters at the time of level load,
             // these are used to restore the character if the episode has to be reloaded, or another episode was launched
-            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+            gPlayerStoredCharacters[i-1] = Player::Get(i)->Identity;
         }
     }
 
@@ -1639,13 +1641,15 @@ void __stdcall runtimeHookGameMenu()
                     }
                 }
                 autostartConfig.endGroup();
-                LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+                EpisodeMain mainEpisodeFunc;
+                mainEpisodeFunc.LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.playerCount, autostarter.firstCharacter, autostarter.secondCharacter, false);
             }
         }
         else if(gStartupSettings.epSettings.enabled && autostarter.selectedWldPath != L"")
         {
             // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
-            LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+            EpisodeMain mainEpisodeFunc;
+            mainEpisodeFunc.LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.playerCount, autostarter.firstCharacter, autostarter.secondCharacter, false);
         }
         else if(!gStartupSettings.epSettings.enabled && autostarter.selectedWldPath == L"")
         {
@@ -1660,19 +1664,26 @@ void __stdcall runtimeHookGameMenu()
         if(!gStartupSettings.waitForIPC && !TestModeIsEnabled() && gEpisodeLoadedOnBoot)
         {
             GameAutostart autostarter;
-            LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.singleplayer, autostarter.firstCharacter, autostarter.secondCharacter);
+            EpisodeMain mainEpisodeFunc;
+            mainEpisodeFunc.LaunchEpisode(autostarter.selectedWldPath, autostarter.saveSlot, autostarter.playerCount, autostarter.firstCharacter, autostarter.secondCharacter, true);
         }
     }
 }
 
+void __stdcall runtimeHookWorldMap()
+{
+    EpisodeMain mainEpisodeFunc;
+    mainEpisodeFunc.StartWorldMap();
+}
+
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
-    if (!GM_CREDITS_MODE)
+    if (GM_CREDITS_MODE == 0)
     {
         for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
             // store player characters at the time of level load,
             // these are used to restore the character if the episode has to be reloaded
-            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+            gPlayerStoredCharacters[i-1] = Player::Get(i)->Identity;
         }
     }
     
@@ -4897,7 +4908,7 @@ static void LunaLuaResetEpisode() {
     for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
         auto p = Player::Get(i);
         // restore this player's character
-        p->Identity = playerStoredCharacters[min(i, 4)-1];
+        p->Identity = gPlayerStoredCharacters[min(i, 4)-1];
         // apply saved template
         auto t = getTemplateForCharacter(p->Identity);
         if (t != nullptr) {
