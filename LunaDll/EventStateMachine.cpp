@@ -8,6 +8,7 @@
 #include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
+#include "SMBXInternal/Reconstructed/EpisodeMain.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -117,6 +118,8 @@ void EventStateMachine::hookInputUpdate(void) {
 
 void EventStateMachine::hookLevelRenderStart(void) {
     if (m_onTickEndReady) {
+        EpisodeMain episodeMainFunc;
+        episodeMainFunc.canExecuteViaLua = true;
         sendOnTickEnd();
     }
 }
@@ -172,8 +175,10 @@ void EventStateMachine::sendOnTick(void) {
 }
 
 void EventStateMachine::sendOnTickEnd(void) {
+    EpisodeMain episodeMainFunc;
     m_onTickEndReady = false;
 
+    episodeMainFunc.canExecuteViaLua = false;
     sendSimpleLuaEvent("onTickEnd");
 }
 

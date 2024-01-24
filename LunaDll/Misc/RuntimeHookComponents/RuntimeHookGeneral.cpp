@@ -1389,8 +1389,7 @@ void TrySkipPatch()
     // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
     PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
 
-    PATCH(0x8C0756).PUSH_IMM32(0x8C11B1).JMP(&runtimeHookGameMenu).Apply(); // The Game Menu
-    
+    PATCH(0x8C0763).SAFE_CALL(&runtimeHookGameMenu).JMP(0x8C11B1).Apply(); // The Game Menu
     //PATCH(0x8C11B1).PUSH_IMM32(0x8C1867).JMP(&runtimeHookWorldMap).Apply(); // World Map
 
     PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();

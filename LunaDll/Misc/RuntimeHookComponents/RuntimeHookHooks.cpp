@@ -44,6 +44,7 @@
 #include "../../Misc/VB6RNG.h"
 
 #include "../../SMBXInternal/Reconstructed/EpisodeMain.h"
+#include "../../SMBXInternal/Overworld.h"
 
 void CheckIPCQuitRequest();
 
@@ -268,6 +269,32 @@ extern DWORD __stdcall WorldLoop()
     g_EventHandler.hookWorldLoop();
 
     gSavedVarBank.SaveIfNeeded();
+    
+    if(GM_PAUSE_OPEN == 0 || !g_EventHandler.isPaused())
+    {
+        Momentum tempMomentum;
+        if(SMBXOverworld::get()->currentWalkingDirection == 0)
+        {
+            tempMomentum.x = SMBXOverworld::get()->momentum.x + 4;
+            tempMomentum.y = SMBXOverworld::get()->momentum.y + 4;
+            tempMomentum.width = SMBXOverworld::get()->momentum.width - 8;
+            tempMomentum.height = SMBXOverworld::get()->momentum.height - 8;
+        }
+            
+        auto p = Player::Get(1);
+        if(p->keymap.jumpKeyState != 0 && p->Unknown17A == -1)
+        {
+            For(i, 1, GM_LEVEL_COUNT)
+            {
+                if(CheckCollision(tempMomentum, WorldLevel::Get(i)->momentum) && SMBXOverworld::get()->currentWalkingDirection == 0)
+                {
+                    EpisodeMain episodeMainFunc;
+                    episodeMainFunc.loadLevelFromLevelTile((std::string)WorldLevel::Get(i)->levelFileName, i);
+                    break;
+                }
+            }
+        }
+    }
 
 #pragma warning(suppress: 28159)
     return GetTickCount();
