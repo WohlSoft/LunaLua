@@ -105,13 +105,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
 
     //--BEGIN MAIN RECODE--
 
-    // play the world loading sfx if suppressSound is false
-    if(!suppressSound)
-    {
-        short soundID = 28;
-        native_playSFX(&soundID); //--PlaySound 29 (line 4946) [i modified it to play 28 instead, which is the level select SFX]--
-    }
-
     // implement player count
     GM_PLAYERS_COUNT = playerCount; //--numPlayers = MenuMode / 10 (line 4947)--
     
@@ -256,20 +249,27 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     // load the world data
     native_loadWorld(&pathVb6); //--OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile (line 4995)--
 
+    // play the world loaded sfx if suppressSound is false
+    if(!suppressSound)
+    {
+        if(gStartupSettings.epSettings.canPlaySFXOnStartup)
+        {
+            short soundID = 28;
+            native_playSFX(&soundID); //--PlaySound 29 (line 4946) [i modified it to play 28 instead, which is the level select SFX]--
+        }
+    }
+
     // load the save file data
-    if (GM_CUR_SAVE_SLOT >= 0) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
+    if (GM_CUR_SAVE_SLOT >= 0 && saveFileExists()) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
     {
         // blank out intro filename if the episode already has a save file and the intro was already played
-        if(GM_HUB_STYLED_EPISODE == 0 && saveFileExists()) //--If NoMap = False Then StartLevel = "" (line 4997)--
+        if(GM_HUB_STYLED_EPISODE == 0) //--If NoMap = False Then StartLevel = "" (line 4997)--
         {
             GM_WORLD_INTRO_FILENAME = "";
         }
 
         native_loadGame(); //--LoadGame (line 4998)--
     }
-
-    // just in case
-    native_loadSaveStates();
 
     // get if the illparkwhereiwant cheat is active
     if(GM_WORLD_UNLOCK == -1) //--If WorldUnlock = True Then (line 5000)--

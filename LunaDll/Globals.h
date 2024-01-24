@@ -42,10 +42,12 @@ struct StartupEpisodeSettings
     int character1;
     int character2;
     int saveSlot;
+    bool canPlaySFXOnStartup;
 
     StartupEpisodeSettings() :
         enabled(false), wldPath(), players(1),
-        character1(1), character2(2), saveSlot(0)
+        character1(1), character2(2), saveSlot(0),
+        canPlaySFXOnStartup(false)
     {
     }
 };
