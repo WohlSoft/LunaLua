@@ -257,10 +257,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     native_loadWorld(&pathVb6); //--OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile (line 4995)--
 
     // load the save file data
-    if (saveFileExists() && GM_CUR_SAVE_SLOT >= 0) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
+    if (GM_CUR_SAVE_SLOT >= 0) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
     {
         // blank out intro filename if the episode already has a save file and the intro was already played
-        if(GM_HUB_STYLED_EPISODE == 0) //--If NoMap = False Then StartLevel = "" (line 4997)--
+        if(GM_HUB_STYLED_EPISODE == 0 && saveFileExists()) //--If NoMap = False Then StartLevel = "" (line 4997)--
         {
             GM_WORLD_INTRO_FILENAME = "";
         }
@@ -354,117 +354,4 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     //--End If (line 5031)--
 
     //--END MAIN RECODE--
-}
-
-void EpisodeMain::loadWorldMap(std::string worldPathAndFile)
-{
-    //--ElseIf LevelSelect = True Then 'World Map (line 1630)--
-    //--BEGIN MAIN RECODE--
-
-    // clear the cheat buffer
-    GM_INPUTSTR_BUF_PTR = ""; //--CheatString = "" (line 1631)--
-
-    For(i, 1, GM_PLAYERS_COUNT) //--For A = 1 To numPlayers (line 1632)--
-    {
-        
-    }
-}
-
-// This will load a level from the current episode anywhere in the engine (Even the world map!)
-void EpisodeMain::loadLevel(std::string levelName, int warpIdx, bool suppressSound)
-{
-    EpisodeMain episodeMainFunc;
-    // get the full dir as a string, combine the level name and directory, and turn the other string into a VB6StrPtr, for later
-    std::string fullDir = (std::string)GM_FULLDIR;
-    std::string fullDirWithFilename = fullDir + levelName;
-    VB6StrPtr fullDirWithFilenameVB6 = fullDirWithFilename;
-
-    // make sure it knows the file exists
-    if(fileExists(Str2WStr(fullDirWithFilename))) //--If Dir(SelectWorld(selWorld).WorldPath & WorldLevel(A).FileName) <> "" Then (line 7263)--
-    {
-        // skip to line 7262, the parts before that pertain to warps...
-        if(levelName != "" && levelName != ".lvl" && levelName != ".lvlx") //--If WorldLevel(A).FileName <> "" And WorldLevel(A).FileName <> ".lvl" Then (line 7262)--
-        {
-            // make sure the game unpauses and Lua is gone before starting a level
-            exitPausePatch.Apply();
-
-            gLunaLua.exitContext();
-            gCachedFileMetadata.purge();
-
-            // start with WorldLoop on modMain.bas, line 7244
-
-            // show loadscreen
-            LunaLoadScreenStart();
-            
-            // if warpIdx is greater than or equal to 0, apply the warp idx
-            if(warpIdx >= 0)
-            {
-                GM_NEXT_LEVEL_WARPIDX = warpIdx; //--StartWarp = WorldLevel(A).StartWarp (line 7264)--
-            }
-
-            // stop the music
-            native_stopMusic(); //--StopMusic (line 7265)--
-
-            if(gIsOverworld)
-            {
-                //cleanup world
-                native_cleanupWorld();
-            }
-
-            // play the sound if not suppressed
-            if(!suppressSound)
-            {
-                short soundID = 28;
-                native_playSFX(&soundID); //--PlaySound 28 (line 7266)--
-            }
-            
-            if(gIsOverworld)
-            {
-                if(episodeMainFunc.currentOverworldLvl >= 1)
-                {
-                    GM_OVERWORLD_CUR_LVL = episodeMainFunc.currentOverworldLvl;
-                }
-                else
-                {
-                    GM_OVERWORLD_CUR_LVL = 1;
-                }
-
-                episodeMainFunc.currentOverworldLvl = 0;
-            }
-
-            // make the world map false
-            GM_EPISODE_MODE = COMBOOL(false); //--LevelSelect = False (line 7269)--
-
-            // clean up the level
-            native_cleanupLevel(); //--ClearLevel (line 7271)--
-
-            // make sure we aren't in overworld anymore if we were
-            if(gIsOverworld)
-            {
-                gIsOverworld = false;
-            }
-            
-            // apply the dir and filename, and load it!
-            native_loadLevel(&fullDirWithFilenameVB6); //--OpenLevel SelectWorld(selWorld).WorldPath & WorldLevel(A).FileName (line 7273)--
-            
-            // unapply force pause-exit patch
-            exitPausePatch.Unapply();
-
-            // hide loadscreen
-            LunaLoadScreenKill();
-            
-            // Make sure this is false
-            episodeMainFunc.canExecuteViaLua = false;
-
-        } //--End If (line 7275)--
-        // that's the end of WorldLoop.bas stuff
-    }
-}
-
-void EpisodeMain::loadLevelFromLevelTile(std::string levelName, int currentOverworldLvl)
-{
-    EpisodeMain episodeMainFunc;
-    episodeMainFunc.currentOverworldLvl = currentOverworldLvl;
-    short levelWarpID = WorldLevel::Get(currentOverworldLvl)->levelWarpNumber;
-    episodeMainFunc.loadLevel(levelName, levelWarpID, false);
 }

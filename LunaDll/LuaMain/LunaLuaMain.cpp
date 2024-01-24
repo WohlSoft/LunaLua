@@ -1184,9 +1184,7 @@ void CLunaLua::bindAll()
                         def("getByName", &LuaProxy::LevelObject::getByName),
                         def("getByFilename", &LuaProxy::LevelObject::getByFilename),
                         def("findByName", &LuaProxy::LevelObject::findByName),
-                        def("findByFilename", &LuaProxy::LevelObject::findByFilename),
-                        def("load", (void(*)(std::string, int))&LuaProxy::Level::load),
-                        def("load", (void(*)(std::string))&LuaProxy::Level::load)
+                        def("findByFilename", &LuaProxy::LevelObject::findByFilename)
                 ]
                 .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::LevelObject, m_index))
                 .property("idx", &LuaProxy::LevelObject::idx)
