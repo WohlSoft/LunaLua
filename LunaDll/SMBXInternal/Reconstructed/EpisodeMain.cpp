@@ -61,6 +61,13 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
     std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
 
+    // setup the world to load for later in this function
+    VB6StrPtr fullPathVB6 = WStr2Str(fullPath);
+    VB6StrPtr fullPathNoWorldPthWithEndSlashVB6 = fullPathNoWorldPthWithEndSlash;
+
+    // create a tempLocation
+    Momentum tempLocation;
+
     // check to see if non-default Windows ANSI code page stuff is there, otherwise don't load the entire episode if booting, else if after booted, continue the game like usual
     std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(Str2WStr(fullPathNoWorldPthWithEndSlash));
     if (!nonAnsiCharsEpisode.empty())
@@ -86,14 +93,14 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         autoStartEpisode.setSaveSlot(saveSlot);
     }
 
+    // set GM_FULLPATH, otherwise the Loadscreen won't have write access to the episode we're loading to
+    GM_FULLDIR = fullPathNoWorldPthWithEndSlashVB6; 
+
     // show loadscreen
     LunaLoadScreenStart();
 
     // setup SFXs
     native_setupSFX();
-
-    // setup the world to load for later in this function
-    VB6StrPtr pathVb6 = WStr2Str(fullPath);
     
     // specify the save slot, the fulldir, and the menu level for the wld file
     SMBXWorldFileBase::PopulateEpisodeList();
@@ -106,35 +113,11 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
 
     // implement player count
     GM_PLAYERS_COUNT = playerCount; //--numPlayers = MenuMode / 10 (line 4947)--
-    
-    // apply templates
-
-    /*
-        --
-            For A = 1 To numCharacters (line 4948)
-                SavedChar(A) = blankPlayer (line 4949)
-                SavedChar(A).Character = A (line 4950)
-                SavedChar(A).State = 1 (line 4951)
-            Next A
-        --
-    */
-
-    For(i, 1, GM_PLAYERS_COUNT)
-    {
-        auto p = Player::Get(i);
-        auto t = getTemplateForCharacterWithDummyFallback(static_cast<int>(p->Identity));
-        if (t != nullptr) {
-            memcpy(p, t, sizeof(PlayerMOB));
-        }
-    }
 
     // use the character variables that were specified
     For(i, 1, GM_PLAYERS_COUNT)
     {
         auto p = Player::Get(i);
-
-        // if we have any blocked characters, don't use them and instead specify whatever is not blocked (Not compatible with X2 characters, but they're a mess in basegame so oh well)
-        checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(i);
 
         // implement missing player values before loading-- the save file
         p->CurrentPowerup = 1; //--Player(1/2).State (line 4953/4964)--
@@ -150,7 +133,29 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         p->Hearts = 0; //--Player(1/2).Hearts = 0 (line 4963/4974)--
     }
 
+    // get the first player only
     auto p1 = Player::Get(1);
+
+    // apply templates
+
+    /*
+        --
+            For A = 1 To numCharacters (line 4948)
+                SavedChar(A) = blankPlayer (line 4949)
+                SavedChar(A).Character = A (line 4950)
+                SavedChar(A).State = 1 (line 4951)
+            Next A
+        --
+    */
+
+    For(i, 1, GM_PLAYERS_COUNT)
+    {
+        auto p = Player::Get(i);
+        auto t = getTemplateForCharacterWithDummyFallback(static_cast<int>(p1->Identity));
+        if (t != nullptr) {
+            memcpy(p, t, sizeof(PlayerMOB));
+        }
+    }
 
     // implement the 1st player's character
     if(GM_PLAYERS_COUNT >= 1)
@@ -205,11 +210,11 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
 
             // restore this player's character
             p->Identity = gPlayerStoredCharacters[min(i, 4)-1];
-
-            // if we have any blocked characters, don't use them and instead specify whatever is not blocked (Not compatible with X2 characters, but they're a mess in basegame so oh well)
-            checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(i);
         }
     }
+
+    // if we have any blocked characters, don't use them and instead specify whatever is not blocked (Not compatible with X2 characters, but they're a mess in basegame so oh well)
+    checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(i);
 
     // replicating code from 1.3 cause why not
     GM_CUR_MENUCHOICE = saveSlot - 1;
@@ -230,7 +235,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         --
     */
     
-    //load the map
+    // set that we're on map
     GM_EPISODE_MODE = COMBOOL(true); //--LevelSelect = True (line 4988)--
     GM_LEVEL_MODE = COMBOOL(false); //--GameMenu = False (line 4989)--
 
@@ -245,8 +250,8 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
             Sleep 500 (line 4994)
         --
     */
-    // load the world data
-    native_loadWorld(&pathVb6); //--OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile (line 4995)--
+    // load the world
+    native_loadWorld(&fullPathVB6); //--OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile (line 4995)--
 
     // play the world loaded sfx if suppressSound is false
     if(!suppressSound)
@@ -276,6 +281,8 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         // get all paths
         For(i, 1, GM_PATH_COUNT) //--For A = 1 To numWorldPaths (line 5001)--
         {
+            tempLocation = SMBXPath::Get(i)->momentum; //--tempLocation = WorldPath(A).Location (line 5002)--
+
             /*
                 --
                     With tempLocation (line 5003)
@@ -286,10 +293,11 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
                     End With (line 5008)
                 --
             */
-            SMBXPath::Get(i)->momentum.x = SMBXPath::Get(i)->momentum.x + 4;
-            SMBXPath::Get(i)->momentum.y = SMBXPath::Get(i)->momentum.y + 4;
-            SMBXPath::Get(i)->momentum.width = SMBXPath::Get(i)->momentum.width - 8;
-            SMBXPath::Get(i)->momentum.height = SMBXPath::Get(i)->momentum.height - 8;
+
+            tempLocation.x = tempLocation.x + 4;
+            tempLocation.y = tempLocation.y + 4;
+            tempLocation.width = tempLocation.width - 8;
+            tempLocation.height = tempLocation.height - 8;
 
             // set to active
             SMBXPath::Get(i)->visible = COMBOOL(true); //--WorldPath(A).Active = True (line 5009)--
@@ -298,7 +306,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
             For(j, 1, GM_SCENERY_COUNT) //--For B = 1 To numScenes (line 5010)--
             {
                 // check the collision of paths and sceneries
-                if(CheckCollision(SMBXPath::Get(i)->momentum, SMBXScenery::Get(j)->momentum)) //--If CheckCollision(tempLocation, Scene(B).Location) Then Scene(B).Active = False (line 5011)--
+                if(CheckCollision(tempLocation, SMBXScenery::Get(j)->momentum)) //--If CheckCollision(tempLocation, Scene(B).Location) Then Scene(B).Active = False (line 5011)--
                 {
                     // make any scenery if collided invisible if true
                     SMBXScenery::Get(j)->field_32 = COMBOOL(false);
