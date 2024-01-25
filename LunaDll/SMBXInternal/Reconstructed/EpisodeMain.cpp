@@ -58,23 +58,78 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
 
     // make sure we also get the path without the wld file
     std::string fullPathStr = WStr2Str(fullPath);
-    std::string fullPathNoWorldPth = splitFilenameFromPath(fullPathStr);
-    std::string fullPathNoWorldPthWithEndSlash = fullPathNoWorldPth + "\\";
+    std::string fullPthNoWorldFile = splitFilenameFromPath(fullPathStr);
+    std::string fullWorldFileNoPth = splitPathFromFilename(fullPathStr);
+    std::string fullPthNoWorldFileWithEndSlash = fullPthNoWorldFile + "\\";
+
+    std::wstring fullPthNoWorldFileWS = Str2WStr(fullPthNoWorldFile);
+    std::wstring fullWorldFileNoPthWS = Str2WStr(fullWorldFileNoPth);
 
     // setup the world to load for later in this function
     VB6StrPtr fullPathVB6 = WStr2Str(fullPath);
-    VB6StrPtr fullPathNoWorldPthWithEndSlashVB6 = fullPathNoWorldPthWithEndSlash;
+    VB6StrPtr fullPthNoWorldFileWithEndSlashVB6 = fullPthNoWorldFileWithEndSlash;
+    
+    bool usingWldPath = false;
+    std::wstring wldPath = L"";
+    std::wstring wldFile = L"";
 
     // create a tempLocation
     Momentum tempLocation;
 
-    // check to see if non-default Windows ANSI code page stuff is there, otherwise don't load the entire episode if booting, else if after booted, continue the game like usual
-    std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(Str2WStr(fullPathNoWorldPthWithEndSlash));
-    if (!nonAnsiCharsEpisode.empty())
+    // check to see if the wld file is valid, otherwise don't load the entire episode if booting
+    if (fullPath != L"")
     {
-        std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + fullPath;
-        MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
-        _exit(1);
+        // Get the full path if necessary
+        if (!fileExists(fullPath))
+        {
+            fullPath = L"";
+        }
+        if (fullPath.length() == 0)
+        {
+            // Invalid level name
+            std::wstring path = L"SMBX could not find the world map file \"" + selectedWldPath + L"\"";
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
+
+        std::wstring::size_type lastSlash = fullPath.rfind(L'\\');
+        if (lastSlash != std::wstring::npos)
+        {
+            wldPath = fullPthNoWorldFileWS;
+            wldFile = fullFileNoWorldPthWS;
+            usingWldPath = true;
+        }
+
+        std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(wldPath);
+        if (!nonAnsiCharsEpisode.empty())
+        {
+            std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + wldPath;
+            MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
+            _exit(1);
+        }
+
+        std::wstring nonAnsiCharsFullPath = GetNonANSICharsFromWStr(fullPath);
+        if (!nonAnsiCharsFullPath.empty())
+        {
+            std::wstring path = L"The world map filename has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename your world map file.\n\nUnsupported characters: " + nonAnsiCharsFullPath + L"\n\nPath:\n" + fullPath;
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
+
+        WorldData wldData;
+        if (!FileFormats::OpenWorldFileHeader(WStr2Str(fullPath), wldData) || !wldData.meta.ReadFileValid)
+        {
+            std::wstring path = L"The world map file header cannot be parsed.\n\nPath:\n" + fullPath;
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
+
+        if (wldData.meta.RecentFormat != WorldData::SMBX64)
+        {
+            std::wstring path = L"The world map file is in the wrong format. It must be saved in SMBX64 format.\n\nPath:\n" + fullPath;
+            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            _exit(1);
+        }
     }
 
     // make sure the game unpauses and Lua is gone before starting after the episode has loaded successfully after boot
@@ -94,7 +149,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     }
 
     // set GM_FULLPATH, otherwise the Loadscreen won't have write access to the episode we're loading to
-    GM_FULLDIR = fullPathNoWorldPthWithEndSlashVB6; 
+    GM_FULLDIR = fullPthNoWorldFileWithEndSlashVB6; 
 
     // show loadscreen
     LunaLoadScreenStart();
@@ -102,8 +157,8 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     // setup SFXs
     native_setupSFX();
     
-    // specify the save slot, the fulldir, and the menu level for the wld file
-    SMBXWorldFileBase::PopulateEpisodeList();
+    // specify the save slot, the menu level, and find the specific save slot for the wld file
+    SMBXWorldFileBase::PopulateEpisodeList(saveSlot);
     GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPath)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
 
     // clear gamedata
@@ -256,7 +311,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     }
 
     // load the save file data
-    if (GM_CUR_SAVE_SLOT >= 0 && saveFileExists()) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
+    if (saveFileExists()) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
     {
         // blank out intro filename if the episode already has a save file and the intro was already played
         if(GM_HUB_STYLED_EPISODE == 0) //--If NoMap = False Then StartLevel = "" (line 4997)--
@@ -327,7 +382,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     if((GM_WORLD_INTRO_FILENAME != GM_STR_NULL && !saveFileExists()) || (GM_HUB_STYLED_EPISODE == -1)) //--If StartLevel <> "" Then-- (line 5019)
     {
         // load the autoboot level from the episode if we're starting it for the first time, or the hub level if it's a hub-styled episode
-        std::string fullPathAndAutobootLvl = fullPathNoWorldPthWithEndSlash + (std::string)GM_WORLD_INTRO_FILENAME;
+        std::string fullPathAndAutobootLvl = fullPthNoWorldFileWithEndSlash + (std::string)GM_WORLD_INTRO_FILENAME;
         VB6StrPtr fullPathAndAutobootLvlVB6 = fullPathAndAutobootLvl;
         GM_EPISODE_MODE = COMBOOL(false); //--LevelSelect = False (line 5022)--
         native_loadLevel(&fullPathAndAutobootLvlVB6); //--OpenLevel SelectWorld(selWorld).WorldPath & StartLevel (line 5028)
