@@ -17,6 +17,7 @@
 #include "../../SMBXInternal/Overworld.h"
 
 #include "../../Rendering/FrameCapture.h"
+#include "../libs/PGE_File_Formats/file_formats.h"
 
 #include "../../LuaMain/LuaHelper.h"
 #include "../../LuaMain/LuaProxy.h"
@@ -70,8 +71,8 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     VB6StrPtr fullPthNoWorldFileWithEndSlashVB6 = fullPthNoWorldFileWithEndSlash;
     
     bool usingWldPath = false;
-    std::wstring wldPath = L"";
-    std::wstring wldFile = L"";
+    std::wstring wldPathCheck = L"";
+    std::wstring wldFileCheck = L"";
 
     // create a tempLocation
     Momentum tempLocation;
@@ -87,7 +88,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         if (fullPath.length() == 0)
         {
             // Invalid level name
-            std::wstring path = L"SMBX could not find the world map file \"" + selectedWldPath + L"\"";
+            std::wstring path = L"SMBX could not find the world map file \"" + fullPthNoWorldFileWS + L"\"";
             MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
@@ -95,15 +96,15 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         std::wstring::size_type lastSlash = fullPath.rfind(L'\\');
         if (lastSlash != std::wstring::npos)
         {
-            wldPath = fullPthNoWorldFileWS;
-            wldFile = fullFileNoWorldPthWS;
+            wldPathCheck = fullPthNoWorldFileWS;
+            wldFileCheck = fullWorldFileNoPthWS;
             usingWldPath = true;
         }
 
-        std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(wldPath);
+        std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(wldPathCheck);
         if (!nonAnsiCharsEpisode.empty())
         {
-            std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + wldPath;
+            std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + wldPathCheck;
             MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
             _exit(1);
         }
@@ -158,7 +159,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     native_setupSFX();
     
     // specify the save slot, the menu level, and find the specific save slot for the wld file
-    SMBXWorldFileBase::PopulateEpisodeList(saveSlot);
+    SMBXWorldFileBase::PopulateEpisodeList();
     GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPath)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
 
     // clear gamedata
