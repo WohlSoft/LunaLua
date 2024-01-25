@@ -114,6 +114,16 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     // implement player count
     GM_PLAYERS_COUNT = playerCount; //--numPlayers = MenuMode / 10 (line 4947)--
 
+    // apply templates (SavedChar)
+    For(i, 1, GM_MAX_CHARACTERS) // For A = 1 To numCharacters (line 4948)
+    {
+        PlayerMOB* playerTemplate = &((PlayerMOB*)GM_PLAYERS_TEMPLATE)[i]; // SavedChar(A) = blankPlayer (line 4949)
+        memset(playerTemplate, 0, sizeof(PlayerMOB));
+
+        playerTemplate->Identity = (Characters)i; // SavedChar(A).Character = A (line 4950)
+        playerTemplate->CurrentPowerup = 1; // SavedChar(A).State = 1 (line 4951)
+    }
+
     // use the character variables that were specified
     For(i, 1, GM_PLAYERS_COUNT)
     {
@@ -136,28 +146,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     // get the first player only
     auto p1 = Player::Get(1);
 
-    // apply templates
-
-    /*
-        --
-            For A = 1 To numCharacters (line 4948)
-                SavedChar(A) = blankPlayer (line 4949)
-                SavedChar(A).Character = A (line 4950)
-                SavedChar(A).State = 1 (line 4951)
-            Next A
-        --
-    */
-
-    For(i, 1, GM_PLAYERS_COUNT)
-    {
-        auto p = Player::Get(i);
-        auto t = getTemplateForCharacterWithDummyFallback(static_cast<int>(p1->Identity));
-        if (t != nullptr) {
-            memcpy(p, t, sizeof(PlayerMOB));
-        }
-    }
-
-    // implement the 1st player's character
+    // implement the 1st player's character (lines 4975-4978)
     if(GM_PLAYERS_COUNT >= 1)
     {
         // checks to make sure that the character can be selected or not
@@ -171,7 +160,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         }
     }
 
-    // implement the 2nd player's character
+    // implement the 2nd player's character (lines 4979-4982)
     if(GM_PLAYERS_COUNT >= 2)
     {
         For(i, 2, GM_PLAYERS_COUNT)
@@ -191,10 +180,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
         }
     }
 
-    // we'll probably get more than 3 players loading on boot if specified on the command prompt, so this needs to exist
+    // we'll probably get more than 3 players loading on boot if specified on the command prompt, so this needs to exist (index starts at 2 on the for loop to simulate supermario# cheats)
     if(GM_PLAYERS_COUNT >= 3)
     {
-        For(i, 3, GM_PLAYERS_COUNT)
+        For(i, 2, GM_PLAYERS_COUNT)
         {
             auto p = Player::Get(i);
             p->Identity = Player::Get(1)->Identity;
@@ -261,8 +250,8 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     {
         if(gStartupSettings.epSettings.canPlaySFXOnStartup)
         {
-            short soundID = 28;
-            native_playSFX(&soundID); //--PlaySound 29 (line 4946) [i modified it to play 28 instead, which is the level select SFX]--
+            short soundID = 29;
+            native_playSFX(&soundID); //--PlaySound 29 (line 4946)--
         }
     }
 
