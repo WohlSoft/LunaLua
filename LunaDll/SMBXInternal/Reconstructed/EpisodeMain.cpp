@@ -214,7 +214,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCo
     }
 
     // if we have any blocked characters, don't use them and instead specify whatever is not blocked (Not compatible with X2 characters, but they're a mess in basegame so oh well)
-    checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(i);
+    For(i, 1, GM_PLAYERS_COUNT)
+    {
+        checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(i);
+    }
 
     // replicating code from 1.3 cause why not
     GM_CUR_MENUCHOICE = saveSlot - 1;
