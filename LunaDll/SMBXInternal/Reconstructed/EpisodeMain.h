@@ -12,7 +12,8 @@ class EpisodeMain {
         EpisodeMain();
         ~EpisodeMain();
 
-        void LaunchEpisode(std::wstring wldPath, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter, bool suppressSound);
+        void LaunchEpisode(std::wstring wldPathWS, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter, bool suppressSound);
+        int FindSaves(std::string worldPathS, int saveSlot);
 
         bool canExecuteViaLua;
 };

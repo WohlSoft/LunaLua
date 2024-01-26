@@ -63,8 +63,10 @@ bool isAbsolutePath(const std::string& path);
 std::wstring resolveCwdOrWorldsPath(const std::wstring& path);
 std::wstring resolveIfNotAbsolutePath(std::wstring filename);
 std::string resolveIfNotAbsolutePath(std::string filename);
+
 std::string splitPathFromFilename(std::string str);
 std::string splitFilenameFromPath(std::string str);
+bool checkIfWorldIsInAppPath(std::string worldPath, std::string appPath);
 
 extern void removeFilePathW(std::wstring &path);
 extern void removeFilePathW(wchar_t*path, int length);

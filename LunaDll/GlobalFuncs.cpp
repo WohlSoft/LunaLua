@@ -743,6 +743,12 @@ std::string splitFilenameFromPath(std::string str)
     return finalStr;
 }
 
+bool checkIfWorldIsInAppPath(std::string worldPath, std::string appPath)
+{
+    replaceSubStr(worldPath, "/", "\\");
+    return (worldPath.find("\\worlds\\"));
+}
+
 
 std::string generateTimestamp(std::string format)
 {
