@@ -134,14 +134,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // check to see if the wld file is valid, otherwise don't load the entire episode if booting
     if (fileExists(fullPathWS))
     {
-        if (fullPathWS.length() == 0)
-        {
-            std::wstring path = L"SMBX could not find the world map file \"" + fullPthNoWorldFileWS + L"\"";
-            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
-            _exit(1);
-        }
-
-        std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(fullPthNoWorldFileWS);
+        std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(fullPathWS);
         if (!nonAnsiCharsEpisode.empty())
         {
             std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + fullPthNoWorldFileWS;
@@ -173,7 +166,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     }
     else
     {
-        std::wstring path = L"SMBX could not find the world map file \"" + fullPthNoWorldFileWS + L"\"";
+        std::wstring path = L"SMBX could not find the world map file \"" + fullPathWS + L"\"";
         MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
         _exit(1);
     }
