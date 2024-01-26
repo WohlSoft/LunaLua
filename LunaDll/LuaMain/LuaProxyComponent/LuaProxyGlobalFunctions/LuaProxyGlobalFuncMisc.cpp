@@ -264,9 +264,13 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
     if(success)
     {
         GameAutostart autoStartEpisode;
-        autoStartEpisode.setSelectedEpisode(episodeName);
-        autoStartEpisode.setSelectedEpisodePath(Str2WStr(worldPth));
-        autoStartEpisode.setPlayerCount(GM_PLAYERS_COUNT);
+
+        std::string selectedEpisode = "";
+        gStartupSettings.epSettings.wldPath = Str2WStr(worldPth);
+        gStartupSettings.epSettings.players = GM_PLAYERS_COUNT;
+        gStartupSettings.epSettings.character1 = static_cast<int>(storedIdentity1);
+        gStartupSettings.epSettings.character2 = static_cast<int>(storedIdentity2);
+        gStartupSettings.epSettings.saveSlot = GM_CUR_SAVE_SLOT;
 
         GM_EPISODE_MODE = COMBOOL(false);
         GM_CREDITS_MODE = COMBOOL(false);

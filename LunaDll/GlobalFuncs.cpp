@@ -743,6 +743,12 @@ std::string splitFilenameFromPath(std::string str)
     return finalStr;
 }
 
+std::string replaceFowardSlashesWithBackSlashes(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    return str;
+}
+
 bool checkIfWorldIsInAppPath(std::string worldPath, std::string appPath)
 {
     replaceSubStr(worldPath, "/", "\\");

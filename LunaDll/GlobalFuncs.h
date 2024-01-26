@@ -66,6 +66,7 @@ std::string resolveIfNotAbsolutePath(std::string filename);
 
 std::string splitPathFromFilename(std::string str);
 std::string splitFilenameFromPath(std::string str);
+std::string replaceFowardSlashesWithBackSlashes(std::string str);
 bool checkIfWorldIsInAppPath(std::string worldPath, std::string appPath);
 
 extern void removeFilePathW(std::wstring &path);

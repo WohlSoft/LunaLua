@@ -17,13 +17,42 @@ public:
     static GameAutostart createGameAutostartByManualSettings(std::wstring wldPath, int players, int character1, int character2, int saveSlot);
     static void ClearAutostartPatch();
 
-    void setSelectedEpisode(std::string val) { selectedEpisode = val; }
-    void setSelectedEpisodePath(std::wstring val) { selectedWldPath = val; }
-    void setSaveSlot(int val) { saveSlot = val; }
-    void setPlayerCount(int val) { playerCount = val; }
+    void setSelectedEpisode(std::string val)
+    {
+        selectedEpisode = val;
+    }
+    void setSelectedEpisodePath(std::wstring val)
+    {
+        selectedWldPath = val;
+    }
+    void setPlayerCount(int val)
+    {
+        playerCount = val;
+        if(val >= 2)
+        {
+            singleplayer = false;
+        }
+        else if(val <= 1)
+        {
+            singleplayer = true;
+        }
+    }
+    void setFirstCharacter(int val)
+    {
+        firstCharacter = (Characters)val;
+    }
+    void setSecondCharacter(int val)
+    {
+        secondCharacter = (Characters)val;
+    }
+    void setSaveSlot(int val)
+    {
+        saveSlot = val;
+    }
 
     bool applyAutostart();
-    
+
+private:
     //Settings
     std::string selectedEpisode;
     std::wstring selectedWldPath;
