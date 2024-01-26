@@ -43,19 +43,6 @@
 extern PlayerMOB* getTemplateForCharacterWithDummyFallback(int id);
 extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
-// these static void functions are used for FindSaves, and aren't global
-static void Input(int lineNumber, std::string line, std::string resultToAddTo)
-{
-    resultToAddTo = line;
-    lineNumber = lineNumber + 1;
-}
-
-static void Input(int lineNumber, std::string line, int resultToAddTo)
-{
-    resultToAddTo = std::stoi(line);
-    lineNumber = lineNumber + 1;
-}
-
 // Patch to allow exiting the pause menu. Apply when the vanilla pause/textbox
 // should be instantly exited always. Unapply when this should not be the case.
 static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
@@ -132,10 +119,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     Momentum tempLocation;
 
     // check to see if the wld file is valid, otherwise don't load the entire episode if booting
-    if (fileExists(fullPathWS))
+    if(fileExists(Str2WStr(fullPthNoWorldFileWithEndSlashS + fullWorldFileNoPthS)))
     {
         std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(fullPathWS);
-        if (!nonAnsiCharsEpisode.empty())
+        if(!nonAnsiCharsEpisode.empty())
         {
             std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + fullPthNoWorldFileWS;
             MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
@@ -143,21 +130,21 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
         }
 
         std::wstring nonAnsiCharsFullPath = GetNonANSICharsFromWStr(fullPathWS);
-        if (!nonAnsiCharsFullPath.empty())
+        if(!nonAnsiCharsFullPath.empty())
         {
             std::wstring path = L"The world map filename has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename your world map file.\n\nUnsupported characters: " + nonAnsiCharsFullPath + L"\n\nPath:\n" + fullPathWS;
             MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
 
-        if (!FileFormats::OpenWorldFileHeader(fullPathS, wldData) || !wldData.meta.ReadFileValid)
+        if(!FileFormats::OpenWorldFileHeader(fullPathS, wldData) || !wldData.meta.ReadFileValid)
         {
             std::wstring path = L"The world map file header cannot be parsed.\n\nPath:\n" + fullPathWS;
             MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
 
-        if (wldData.meta.RecentFormat != WorldData::SMBX64)
+        if(wldData.meta.RecentFormat != WorldData::SMBX64)
         {
             std::wstring path = L"The world map file is in the wrong format. It must be saved in SMBX64 format.\n\nPath:\n" + fullPathWS;
             MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
@@ -549,10 +536,6 @@ int EpisodeMain::FindSaves(std::string worldPathS, int saveSlot)
 
             // how many stars are collected
             maxActive += (int(saveData.totalStars) * 4);
-
-            // we'll need this to calculate the star collection
-            memset(GM_STARS_PTR, 0, sizeof(SMBX_CollectedStarRecord) * int(saveData.gottenStars.size())); //info.Stars = int(f.gottenStars.size()), as seen on TheXTech
-
             curActive += (int(saveData.gottenStars.size()) * 4);
 
             // calculate the progress number

@@ -10,6 +10,7 @@
 #include "../../../Misc/PerfTracker.h"
 
 #include "../../../SMBXInternal/Reconstructed/EpisodeMain.h"
+#include "../../../FileManager/SMBXFileManager.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
