@@ -8,7 +8,7 @@ MouseHandler gMouseHandler;
 
 void MouseHandler::OnMouseMove(int x, int y, uint8_t buttonState)
 {
-    if (mInClientArea && (mClientX == x) && (mClientY == y))
+    if (mInClientArea && (mClientX == x) && (mClientY == y) && !gMainWindowInBackground)
     {
         // No change.
         return;
@@ -34,16 +34,19 @@ void MouseHandler::OnMouseMove(int x, int y, uint8_t buttonState)
 
 void MouseHandler::OnMouseLeave()
 {
-    if (mInClientArea)
+    if(!gMainWindowInBackground)
     {
-        mInClientArea = false;
-        Recalculate();
+        if (mInClientArea)
+        {
+            mInClientArea = false;
+            Recalculate();
+        }
     }
 }
 
 void MouseHandler::OnMouseButtonEvent(ButtonEnum button, ButtonEvtEnum state)
 {
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid() && !gMainWindowInBackground) {
         std::shared_ptr<Event> event = std::make_shared<Event>("onMouseButtonEvent", false);
         event->setDirectEventName("onMouseButtonEvent");
         event->setLoopable(false);
@@ -53,7 +56,7 @@ void MouseHandler::OnMouseButtonEvent(ButtonEnum button, ButtonEvtEnum state)
 
 void MouseHandler::OnMouseWheelEvent(WheelEnum wheel, int delta)
 {
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid() && !gMainWindowInBackground) {
         std::shared_ptr<Event> event = std::make_shared<Event>("onMouseWheelEvent", false);
         event->setDirectEventName("onMouseWheelEvent");
         event->setLoopable(false);
@@ -64,17 +67,20 @@ void MouseHandler::OnMouseWheelEvent(WheelEnum wheel, int delta)
 // Recalculate FB coordinates
 void MouseHandler::Recalculate()
 {
-    if (mInClientArea)
+    if(!gMainWindowInBackground)
     {
-        double newX = mClientX;
-        double newY = mClientY;
-        gWindowSizeHandler.WindowToFramebuffer(newX, newY);
-        mFramebufferX = newX;
-        mFramebufferY = newY;
-    }
-    else
-    {
-        mFramebufferX = NAN;
-        mFramebufferY = NAN;
+        if (mInClientArea)
+        {
+            double newX = mClientX;
+            double newY = mClientY;
+            gWindowSizeHandler.WindowToFramebuffer(newX, newY);
+            mFramebufferX = newX;
+            mFramebufferY = newY;
+        }
+        else
+        {
+            mFramebufferX = NAN;
+            mFramebufferY = NAN;
+        }
     }
 }
