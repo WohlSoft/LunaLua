@@ -705,7 +705,6 @@ void CLunaLua::bindAll()
                 def("exitEngine", &LuaProxy::Misc::exitEngine),
                 def("didGameOver", &LuaProxy::Misc::didGameOver),
                 def("loadEpisode", (bool(*)(std::string))&LuaProxy::Misc::loadEpisode),
-                def("loadEpisode", (bool(*)(std::string, std::string))&LuaProxy::Misc::loadEpisode),
                 def("pause", (void(*)(void))&LuaProxy::Misc::pause),
                 def("pause", (void(*)(bool))&LuaProxy::Misc::pause),
                 def("unpause", &LuaProxy::Misc::unpause),
