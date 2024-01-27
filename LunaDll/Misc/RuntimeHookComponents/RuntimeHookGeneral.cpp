@@ -1994,6 +1994,8 @@ void TrySkipPatch()
     // PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA12050).JMP(runtimeHookSemisolidInteractionHook_Raw).NOP_PAD_TO_SIZE<69>().Apply();
+    // Patch to prevent NPCs from disabling collision against semisolid slopes
+    PATCH(0xA1202B).JMP(runtimeHookNPCSemisolidSlopeCollisionHook).NOP_PAD_TO_SIZE<13>().Apply();
 
     // Hook for controller handling
     PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();

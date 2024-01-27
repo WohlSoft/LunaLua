@@ -602,6 +602,7 @@ DEFMEM(blockdef_width,             short*, 0x00B2B9F8);
 DEFMEM(blockdef_height,            short*, 0x00B2BA14);
 DEFMEM(blockdef_floorslope,        short*, 0x00B2B94C);
 DEFMEM(blockdef_ceilingslope,      short*, 0x00B2B968);
+DEFMEM(blockdef_semisolid,         short*, 0x00B2C048);
 
 DEFMEM(bgodef_width, WORD*, 0x00B2CCF4);
 DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);

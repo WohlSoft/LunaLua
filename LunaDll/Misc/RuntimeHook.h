@@ -549,6 +549,7 @@ void __stdcall runtimeHookLoadDefaultControls(void);
 void __stdcall runtimeHookRunAnimInternal(short* effectID, Momentum* coor, float* effectFrame, short* npcID, short* showOnlyMask);
 
 void __stdcall runtimeHookSemisolidInteractionHook_Raw();
+void __stdcall runtimeHookNPCSemisolidSlopeCollisionHook();
 
 MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
 MMRESULT __stdcall runtimeHookJoyGetPosExNull(UINT uJoyID, LPJOYINFOEX pji);
