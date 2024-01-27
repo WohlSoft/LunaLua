@@ -1,5 +1,6 @@
 #include "Blocks.h"
 #include "PlayerMOB.h"
+#include <algorithm>
 
 bool isBlocksSortingRequired = false;
 
@@ -132,6 +133,7 @@ void Blocks::HideAll(int type) {
 static int16_t blockprop_bumpable[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_playerfilter[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_npcfilter[Block::MAX_ID + 1] = { 0 };
+static int16_t blockprop_walkpaststair[Block::MAX_ID + 1] = { 0 }; // whether to walk past semisolid slopes (like ghost house stairs)
 
 void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
@@ -139,6 +141,7 @@ void Blocks::InitProperties() {
         SetBlockBumpable(id, false);
         SetBlockPlayerFilter(id, 0);
         SetBlockNPCFilter(id, 0);
+        SetBlockWalkPastStair(id, false);
     }
 
     // Default game config
@@ -205,6 +208,16 @@ void Blocks::SetBlockNPCFilter(int id, short npcId)
     blockprop_npcfilter[id] = npcId;
 }
 
+bool Blocks::GetBlockWalkPastStair(int id) {
+    if ((id < 1) || (id > Block::MAX_ID)) return false;
+    return (blockprop_walkpaststair[id] != 0);
+}
+
+void Blocks::SetBlockWalkPastStair(int id, bool walkpaststair) {
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_walkpaststair[id] = walkpaststair ? -1 : 0;
+}
+
 // Getter for address of Block property arrays
 uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
 {
@@ -220,8 +233,111 @@ uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(blockprop_npcfilter);
     }
+    else if (s == "walkpaststair")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_walkpaststair);
+    }
     else
     {
         return 0;
     }
+}
+
+
+// used in NPC and player collision hooks to handle collision against slopes when flagged as semisolid.
+// returns whether the collision should be allowed
+bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockIdx, int entityBottomCollisionTimer)
+{
+
+    Block* block = Block::GetRaw(blockIdx);
+
+    // check for slopes we can walk past, like stairs
+    if (Blocks::GetBlockWalkPastStair(block->BlockType)) {
+        // if our feet our at the bottom of the stair, and we're standing on something that isn't a slope
+        if (entityMomentum->y + entityMomentum->height >= block->momentum.y + block->momentum.height - 1 && entityBottomCollisionTimer != 0 && entityMomentum->speedY >= 0) {
+            // cancel collision, allow walking past the slope
+            return false;
+        }
+    }
+
+    short floorslope = blockdef_floorslope[block->BlockType];
+
+    double playerRefX = entityMomentum->x;
+    if (floorslope == -1) {
+        // use player right edge for slopes going down left
+        playerRefX += entityMomentum->width;
+    }
+    double blockCollisionPercent = (playerRefX - block->momentum.x) / block->momentum.width;
+    if (floorslope == -1) {
+        // reverse direction for slopes going down left
+        blockCollisionPercent = 1.0 - blockCollisionPercent;
+    }
+    // Use whichever is more likely to put us on the slope:
+    // our current horizontal position, OR an estimated previous horizontal position
+    {
+        double altBlockCollisionPercent = ((playerRefX - entityMomentum->speedX * 2.0) - block->momentum.x) / block->momentum.width;
+        if (floorslope == -1) {
+            altBlockCollisionPercent = 1.0 - altBlockCollisionPercent;
+        }
+        blockCollisionPercent = std::max(blockCollisionPercent, altBlockCollisionPercent);
+    }
+    // if the object is colliding above the top edge of the slope
+    if (blockCollisionPercent < 0.0) {
+        // check if it's a top slope!!!!!!!
+        // detect slopes ABOVE and aligned to the edge of the slope
+        bool isTopSlope = true;
+        {
+            // ref position for a block above
+            double refX = block->momentum.x;
+            if (floorslope == -1) {
+                refX = refX + block->momentum.width;
+            }
+            double refY = block->momentum.y;
+
+            // 
+            int fblock = GM_BLOCK_LOOKUP_MIN[std::min(std::max((int)floor((refX - 2) / 32 + 8000), 0), 16000)];
+            int lblock = GM_BLOCK_LOOKUP_MAX[std::min(std::max((int)floor((refX + 2) / 32 + 8000), 0), 16000)];
+
+            for (int i = fblock; i <= lblock; i++) {
+                auto b = Block::GetRaw(i);
+                // if this is a semisolid slope of the same type
+                if (abs(b->momentum.y + b->momentum.height - refY) <= 2.0 && !b->IsHidden && blockdef_semisolid[b->BlockType] && blockdef_floorslope[b->BlockType] == floorslope) {
+                    // for some reason, these 2 checks require a bit of additional leniancy for 2 tile wide slopes in particular
+                    // if the edge is aligned at the correct position
+                    if (floorslope == -1) {
+                        // left slope
+                        if (abs(b->momentum.x - refX) > 2.0) { continue; }
+                    }
+                    else {
+                        // right slope
+                        if (abs(b->momentum.x + b->momentum.width - refX) > 2.0) { continue; }
+                    }
+
+                    // found a matching semisolid above!
+                    // this is NOT a top slope
+                    isTopSlope = false;
+                    break;
+                }
+            }
+        }
+        // if this is a top slope,
+        if (isTopSlope) {
+            // clamp percent so player can stand at top edge
+            blockCollisionPercent = 0.0;
+        }
+    }
+
+    // check whether the player is sufficiently above the slope,
+    double offset = 0;
+    if (entityMomentum->speedY > -1) {
+        // if moving downwards, add some extra leniency to collision
+        offset = 4.0;
+    }
+    double playerFootY = entityMomentum->y + entityMomentum->height;
+    double blockCollisionBottom = block->momentum.y + blockCollisionPercent * block->momentum.height;
+    if (playerFootY > blockCollisionBottom + entityMomentum->speedY + offset) {
+        // foot is too far below to consider collision, cancel
+        return false;
+    }
+    return true;
 }
