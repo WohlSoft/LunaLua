@@ -2624,6 +2624,36 @@ _declspec(naked) void __stdcall runtimeHookSemisolidInteractionHook_Raw()
     }
 }
 
+// checks if the block EDI is a semisolid BUT not a slope
+// this patch is right above runtimeHookSemisolidInteractionHook in the assmebly
+_declspec(naked) void __stdcall runtimeHookNPCSemisolidSlopeCollisionHook()
+{
+    __asm {
+        xor ecx, ecx
+
+        // check if slope
+        mov edx, dword ptr ds:[0x00B2B94C] // blockdef_floorslope_ADDR
+        cmp word ptr ds:[edx+edi*2], 0
+        // exit early if the block IS a slope
+        jne __runtimeHookNPCSemisolidSlopeCollisionHook_exit
+
+        // check semisolid
+        mov edx, dword ptr ds:[0x00B2C048] // blockdef_semisolid_ADDR
+        cmp word ptr ds:[edx+edi*2], 0xFFFF
+        // exit to original return addr
+        push 0x00A12038
+        ret
+
+    __runtimeHookNPCSemisolidSlopeCollisionHook_exit:
+        // early exit for slope
+        xor edx, edx // done to make cpu state consistent, probably not really necessary
+        cmp edx, 1
+        push 0x00A12038
+        ret
+
+    }
+}
+
 MMRESULT __stdcall runtimeHookJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji)
 {
     return gLunaGameControllerManager.emulatedJoyGetPosEx(uJoyID, pji);
@@ -3713,7 +3743,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx)
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx, unsigned int oldSlope)
 {
     // If already not hitting, ignore
     if (hitSpot == 0) return 0;
@@ -3726,6 +3756,30 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
         {
             // The filter was a non-zero and matched, so no collision
             return 0;
+        }
+
+        // if this is a semisolid slope
+        if (blockdef_semisolid[block->BlockType] && blockdef_floorslope[block->BlockType] != 0)
+        {
+            // stop appropriate flying npcs from colliding with semisolid slopes
+            if (npc_isflying[npc->id] != 0) {
+                if (!NPC::CheckSemisolidCollidingFlyType((unsigned int)npc->ai1)) {
+                    return 0;
+                }
+            }
+            // check semisolid slope collision
+            int collidesBelow = npc->collidesBelow;
+            if (oldSlope != 0) {
+                // unlike players, npcs set their bottom collision timer when standing on slopes
+                // because of this, we have to check if a slope was stood on previously and cancel the bottom timer out
+                collidesBelow = 0;
+            }
+            if (!Blocks::FilterSemisolidSlopeCollision(&npc->momentum, blockIdx, collidesBelow)) {
+                return 0;
+            } else {
+                // change hitSpot to always act as top collision
+                hitSpot = 1;
+            }
         }
 
         ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
@@ -3744,6 +3798,8 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
             if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
                 return 0;
         }
+
+
     }
 
     return hitSpot;
@@ -3754,6 +3810,8 @@ __declspec(naked) void __stdcall runtimeHookBlockNPCFilter(void)
     // 00A11B76 | mov ax, word ptr ds : [esi + 0xE2]
     // eax, ecx, edx and flags are free for use at this point
     __asm {
+        movsx eax, word ptr ss:[ebp-0x104] // oldSlope (for semisolid slope check)
+        push eax
         movsx eax, word ptr ss:[ebp-0x180]   // npcIdx
         push eax
         movsx eax, word ptr ss:[ebp-0x188]   // blockIdx
@@ -3836,6 +3894,15 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerI
     if (characterFilter == characterId)
     {
         return 0;
+    }
+    
+    // if this is a semisolid slope
+    if (blockdef_semisolid[block->BlockType] && blockdef_floorslope[block->BlockType] != 0)
+    {
+        // check semisolid slope collision
+        if (!Blocks::FilterSemisolidSlopeCollision(&player->momentum, blockIdx, player->LayerStateStanding)) {
+            return 0;
+        }
     }
 
     // Player's noblockcollision flag
