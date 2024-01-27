@@ -1,4 +1,5 @@
 #include <comutil.h>
+#include "../../Misc/CollisionMatrix.h"
 #include "string.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
@@ -571,6 +572,9 @@ extern void __stdcall NPCKillHook(short* npcIndex_ptr, short* killReason)
     {
         short newIdx = npcIdx - 1;    // 0 based not including dummy
         short oldIdx = GM_NPCS_COUNT; // 0 based not including dummy
+
+        // Decrement the reference count of the removed NPC's collision group
+        gCollisionMatrix.decrementReferenceCount(NPC::GetRawExtended(newIdx+1)->collisionGroup);
 
         // Update extended NPC fields
         if (newIdx != oldIdx)
@@ -3274,14 +3278,43 @@ _declspec(naked) void __stdcall runtimeHookNPCWalkFixSlope()
     }
 }
 
+
+static double findMomentumToBoundaryDistance(const Momentum& momentum, const Bounds& bounds)
+{
+    double distX = 0;
+    double distY = 0;
+
+    if ((momentum.x + momentum.width) < bounds.left)
+    {
+        distX = momentum.x + momentum.width - bounds.left;
+    }
+    else if (momentum.x > bounds.right)
+    {
+        distX = bounds.right - momentum.x;
+    }
+
+    if ((momentum.y + momentum.height) < bounds.top)
+    {
+        distY = momentum.y + momentum.height - bounds.top;
+    }
+    else if (momentum.y > bounds.bottom)
+    {
+        distY = bounds.bottom - momentum.y;
+    }
+
+    return sqrt(distX*distX + distY*distY);
+}
+
 void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 {
     NPCMOB* npc = NPC::GetRaw(*npcIdx);
+    ExtendedNPCFields* ext = NPC::GetRawExtended(*npcIdx);
     const Momentum& momentum = npc->momentum;
 
     // Skip if in the main menu
     if (GM_LEVEL_MODE == -1)
     {
+        ext->fullyInsideSection = npc->currentSection;
         return;
     }
 
@@ -3294,18 +3327,38 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
         
         // Match the player's section
         npc->currentSection = Player::Get(npc->grabbingPlayerIndex)->CurrentSection;
-
         return;
     }
 
+    // Is it still within the bounds of the current section?
+    const Bounds& bounds = GM_LVL_BOUNDARIES[npc->currentSection];
+
+    if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
+    {
+        ext->fullyInsideSection = npc->currentSection;
+        return;
+    }
+    else if (momentum.x-32 <= bounds.right && momentum.y-32 <= bounds.bottom && momentum.x+momentum.width+32 >= bounds.left && momentum.y+momentum.height+32 >= bounds.top)
+    {
+        // If just barely outside, no need to check the section again
+        // This is particularly important for older levels with very close sections
+        return;
+    }
+    
     // Is it in the bounds of a section? If so, choose it
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
+        if (sectionIdx == npc->currentSection)
+        {
+            continue;
+        }
+
         const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
 
         if (momentum.x <= bounds.right && momentum.y <= bounds.bottom && momentum.x+momentum.width >= bounds.left && momentum.y+momentum.height >= bounds.top)
         {
             npc->currentSection = sectionIdx;
+            ext->fullyInsideSection = sectionIdx;
             return;
         }
     }
@@ -3316,17 +3369,13 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 
     for (short sectionIdx = 0; sectionIdx <= 20; sectionIdx++)
     {
-        const Bounds& bounds = GM_LVL_BOUNDARIES[sectionIdx];
+        // Find the distance to the section's boundaries or original boundaries - whichever is closest
+        double distToOriginalBounds = findMomentumToBoundaryDistance(momentum, GM_ORIG_LVL_BOUNDS[sectionIdx]);
+        double distToBounds = findMomentumToBoundaryDistance(momentum, GM_LVL_BOUNDARIES[sectionIdx]);
 
-        double distLeft = (bounds.left - (momentum.x + momentum.width));
-        double distRight = (momentum.x - bounds.right);
-        double distX = std::max(distLeft, distRight);
-        double distTop = (bounds.top - (momentum.y + momentum.height));
-        double distBottom = (momentum.y - bounds.bottom);
-        double distY = std::max(distTop, distBottom);
+        double dist = std::min(distToBounds,distToOriginalBounds);
 
-        double dist = std::max(distX, distY);
-        if ((closestSection == -1) || (dist < closestSectionDist))
+        if (closestSection == -1 || dist < closestSectionDist)
         {
             closestSectionDist = dist;
             closestSection = sectionIdx;
@@ -3335,6 +3384,44 @@ void __stdcall runtimeHookNPCSectionFix(short* npcIdx)
 
     npc->currentSection = closestSection;
 }
+
+
+static void __stdcall runtimeHookNPCSectionWrapInternal(unsigned int npcIdx, unsigned int section)
+{
+    // At this point, we've passed the normal checks for if NPC level wraparound should apply
+    // aside from checking the coordinates
+    NPCMOB* npc = NPC::GetRaw(npcIdx);
+    ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
+    Momentum& momentum = npc->momentum;
+
+    // If not _actually_ in section bounds beforehand, don't wrap
+    if (npc->currentSection != ext->fullyInsideSection) return;
+
+    // Perform the normal section wrap logic
+    auto& bounds = GM_LVL_BOUNDARIES[section];
+    if ((momentum.x + momentum.width) < bounds.left)
+    {
+        momentum.x = bounds.right - 1.0;
+    }
+    else if (momentum.x > bounds.right)
+    {
+        momentum.x = bounds.left - momentum.width + 1.0;
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookNPCSectionWrap(void)
+{
+    // 00A0C931 | movsx edi,word ptr ds:[esi+146]
+    // eax, ecx, edx and flags are free for use at this point
+    __asm {
+        push edi                          // section
+        movsx eax, word ptr ss : [ebp - 0x180]
+        push eax                          // npc index
+        push 0xA0C9F3                     // return address
+        jmp runtimeHookNPCSectionWrapInternal
+    }
+}
+
 
 static void markBlocksUnsorted()
 {
@@ -3697,22 +3784,19 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
         ExtendedNPCFields* ext = NPC::GetRawExtended(npcIdx);
 
-        if (ext->collisionGroup[0] != 0) // Collision group string isn't empty
+        if (block->OwnerNPCID != 0) // Belongs to an NPC
         {
-            if (block->OwnerNPCID != 0) // Belongs to an NPC
-            {
-                ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
+            ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
 
-                if (strcmp(ext->collisionGroup,ownerExt->collisionGroup) == 0) // Matching collision groups
-                    return 0;
-            }
-            else
-            {
-                ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
+                return 0;
+        }
+        else
+        {
+            ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
 
-                if (strcmp(ext->collisionGroup,blockExt->collisionGroup) == 0) // Matching collision groups
-                    return 0;
-            }
+            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+                return 0;
         }
 
 
@@ -3749,14 +3833,10 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
         return 0; // Collision cancelled
     
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+    ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (extA->collisionGroup[0] != 0) // Collision group string isn't empty
-    {
-        ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
-
-        if (strcmp(extA->collisionGroup,extB->collisionGroup) == 0) // Matching collision groups
-            return 0; // Collision cancelled
-    }
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+        return 0; // Collision cancelled
 
     return -1; // Collision goes ahead
 }
@@ -3790,8 +3870,9 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* player, int blockIdx)
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx)
 {
+    PlayerMOB* player = Player::Get(playerIdx);
     Block* block = Block::GetRaw(blockIdx);
 
     // IsHidden flag, which is what the code we're replacing checks for
@@ -3824,6 +3905,22 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(PlayerMOB* pl
         }
     }
 
+    // Player's noblockcollision flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->noblockcollision)
+    {
+        return 0;
+    }
+    
+    // Collision groups
+    ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
     // No filter needed, carry on
     return -1;
 }
@@ -3838,7 +3935,8 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
 
         movsx ecx, word ptr ss:[ebp-0x120]
         push ecx                // Block index
-        push ebx                // Player pointer
+        movsx ecx, word ptr ss:[ebp-0x114]
+        push ecx                // Player index
         call runtimeHookBlockPlayerFilterInternal
 
         cmp eax, 0 // return value
@@ -3857,6 +3955,173 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
         pop ecx
         pop eax
         push 0x9A4FE9
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerNPCInteractionCheckInternal(short playerIdx, short npcIdx)
+{
+    // Player's nonpcinteraction flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->nonpcinteraction)
+    {
+        return 0;
+    }
+
+    // Collision groups
+    ExtendedNPCFields* npcExt = NPC::GetRawExtended(npcIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,npcExt->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCInteractionCheck(void)
+{
+    __asm {
+        push eax
+
+        push eax                // NPC index
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCInteractionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop eax
+
+        movsx edi,ax
+        add edi,0x80
+
+        push 0x9A79F8
+        ret
+    cancel_collision:
+        pop eax
+
+        push 0x9ADCDB
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerNPCCollisionCheckInternal(short playerIdx)
+{
+    // Player's noblockcollision flag
+    ExtendedPlayerFields* playerExt = Player::GetExtended(playerIdx);
+
+    if (playerExt->noblockcollision)
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9AE8FA(void)
+{
+    // Handles collision from the sides/bottom
+    __asm {
+        cmp word ptr ds:[edx+ecx*0x8 + 0x136], 0   // check the projectile flag (this is what the code that this replaces does)
+        jne cancel_collision
+
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCCollisionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        push 0x9AE909
+        ret
+    cancel_collision:
+        push 0x9ADCDB
+        ret
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerNPCCollisionCheck9ABC0B(void)
+{
+    // Handles collision from the top
+    __asm {
+        movsx eax, word ptr ss:[ebp-0x114]
+        push eax                // Player index
+
+        call runtimeHookPlayerNPCCollisionCheckInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        mov ecx, dword ptr ss:[ebp-0xB4] // original code
+
+        push 0x9ABC11
+        ret
+    cancel_collision:
+        push 0x9AD246 // jumps to code for handling other hit spots
+        ret
+    }
+}
+
+static unsigned int __stdcall runtimeHookPlayerPlayerInteractionInternal(short* playerAIdxPtr, short playerBIdx)
+{
+    // Don't interact if it's the same player
+    // This hook replaces the code that would normally handle this
+    short playerAIdx = *playerAIdxPtr;
+
+    if (playerAIdx == playerBIdx)
+    {
+        return 0;
+    }
+
+    // noplayerinteraction flag
+    ExtendedPlayerFields* extA = Player::GetExtended(playerAIdx);
+    ExtendedPlayerFields* extB = Player::GetExtended(playerBIdx);
+
+    if (extA->noplayerinteraction || extB->noplayerinteraction)
+    {
+        return 0;
+    }
+
+    // Collision groups
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    {
+        return 0;
+    }
+
+    return -1;
+}
+
+__declspec(naked) void __stdcall runtimeHookPlayerPlayerInteraction(void)
+{
+    __asm {
+        push eax
+
+        push eax                // Player B's index
+        mov eax, dword ptr ss:[ebp+8]
+        push eax                // (Pointer to) player A's index
+
+        call runtimeHookPlayerPlayerInteractionInternal
+
+        cmp eax, 0 // return value
+        jne continue_collision
+        jmp cancel_collision
+    continue_collision:
+        pop eax
+
+        push 0x9CAFD0
+        ret
+    cancel_collision:
+        pop eax
+
+        push 0x9CC25D
         ret
     }
 }

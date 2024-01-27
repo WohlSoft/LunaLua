@@ -567,3 +567,8 @@ FFI_EXPORT void __fastcall FFI_RedirectCameraFB(CaptureBufferRef* fb, double sta
     endCmd->mStartCmd = startCmd;
     Renderer::Get().GLCmd(endCmd, endPriority);
 }
+
+FFI_EXPORT const float* FFI_GetFrameTimes()
+{
+    return g_GLEngine.mInternalGLEngine.GetFrameTimes();
+}

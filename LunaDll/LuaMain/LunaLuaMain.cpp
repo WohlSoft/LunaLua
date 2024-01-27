@@ -30,6 +30,7 @@
 #include "../Misc/LoadScreen.h"
 
 #include "LunaPathValidator.h"
+#include "../Misc/CollisionMatrix.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -127,13 +128,10 @@ bool CLunaLua::shutdown()
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
-    gDisableNPCSectionFix.Apply();
-    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-        gFenceFixes[i]->Apply();
-    }
-    for (int i = 0; gLinkFairyClowncarFixes[i] != nullptr; i++) {
-        gLinkFairyClowncarFixes[i]->Apply();
-    }
+    gNPCSectionFix.Apply();
+    gFenceFixes.Apply();
+    gLinkFairyClowncarFixes.Apply();
+    gCollisionMatrix.clear();
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
@@ -718,7 +716,8 @@ void CLunaLua::bindAll()
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
-                def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress)
+                def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress),
+                def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem)
             ],
 
             namespace_("FileFormats")[
@@ -922,6 +921,9 @@ void CLunaLua::bindAll()
                 def("SfxSet3DPosition", (int(*)(int, int, int))&LuaProxy::Audio::SfxSet3DPosition),
                 def("SfxReverseStereo", (int(*)(int, int))&LuaProxy::Audio::SfxReverseStereo),
 
+                def("MixedSfxVolume", &LuaProxy::Audio::GetMixedSfxVolume),
+                def("MixedSfxVolume", &LuaProxy::Audio::SetMixedSfxVolume),
+
                 LUAHELPER_DEF_CLASS_SMART_PTR_SHARED(PlayingSfxInstance, std::shared_ptr)
                     .def("Pause", &LuaProxy::Audio::PlayingSfxInstance::Pause)
                     .def("Resume", &LuaProxy::Audio::PlayingSfxInstance::Resume)
@@ -1072,6 +1074,7 @@ void CLunaLua::bindAll()
             class_<LuaProxy::Console>("Console")
             .def("print", &LuaProxy::Console::print)
             .def("println", &LuaProxy::Console::println)
+            .def("clear", &LuaProxy::Console::clear)
         ];
     if(m_type == LUNALUA_WORLD){
         module(L)
