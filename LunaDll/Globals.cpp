@@ -13,6 +13,7 @@ HINSTANCE gHInstance;
 
 HWND gMainWindowHwnd = NULL;
 bool gMainWindowFocused = false;
+bool gMainWindowInBackground = false;
 
 // Global settings
 bool gLunaEnabled;

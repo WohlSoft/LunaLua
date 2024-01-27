@@ -91,9 +91,12 @@ void LunaGameControllerManager::pollInputs()
         processSDLEvent(event);
     }
 
-    #if !defined(BUILDING_SMBXLAUNCHER)
+#if !defined(BUILDING_SMBXLAUNCHER)
+    if(!gMainWindowInBackground)
+    {
         handleInputs();
-    #endif // !defined(BUILDING_SMBXLAUNCHER)
+    }
+#endif // !defined(BUILDING_SMBXLAUNCHER)
 }
 
 // Function to process an SDL event that is incoming

@@ -865,6 +865,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Our main window gained focus? Keep track of that.
                 gMainWindowFocused = true;
+                gMainWindowInBackground = false;
                 break;
             case WM_KILLFOCUS:
                 // Unregister VK_SNAPSHOT hotkey handling when out of focus
@@ -875,6 +876,10 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 {
                     gMainWindowFocused = false;
                 }
+                else
+                {
+                    gMainWindowInBackground = true;
+                }
                 break;
             case WM_DESTROY:
                 // Our main window was destroyed? Clear hwnd and mark as unfocused
@@ -883,6 +888,10 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 if (!gStartupSettings.runWhenUnfocused)
                 {
                     gMainWindowFocused = false;
+                }
+                else
+                {
+                    gMainWindowInBackground = true;
                 }
                 break;
             case WM_HOTKEY:
@@ -921,7 +930,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 bool haveFocus = (wParam == RIM_INPUT);
                 
                 // Process the raw input
-                bool mainWindowFocus = haveFocus && gMainWindowFocused;
+                bool mainWindowFocus = haveFocus && gMainWindowFocused && !gMainWindowInBackground;
                 ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), mainWindowFocus);
 
                 // If we have focus, return via DefWindowProcW
