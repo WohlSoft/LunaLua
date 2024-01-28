@@ -47,8 +47,7 @@ extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 // should be instantly exited always. Unapply when this should not be the case.
 static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
 
-EpisodeMain::EpisodeMain() :
-    canExecuteViaLua(false)
+EpisodeMain::EpisodeMain()
 {}
 
 EpisodeMain::~EpisodeMain() {}
