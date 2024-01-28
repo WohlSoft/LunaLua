@@ -426,8 +426,8 @@ void MusicManager::loadSounds(std::string path, std::string root, bool is_first_
 
         if(file_existsX(root + fileName))
         {
-            sounds[i].setPath(root + fileName.c_str());
             gSoundEffectCount++;
+            sounds[i].setPath(root + fileName.c_str());
             if(reserveChannel != 0)
                 sounds[i].channel = 0;
             else
