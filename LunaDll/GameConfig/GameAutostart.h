@@ -9,6 +9,16 @@ struct StartupEpisodeSettings;
 
 class GameAutostart
 {
+private:
+    //Settings
+    std::string selectedEpisode;
+    std::wstring selectedWldPath;
+    bool singleplayer;
+    int playerCount;
+    Characters firstCharacter;
+    Characters secondCharacter;
+    int saveSlot;
+
 public:
     GameAutostart();
     ~GameAutostart();
@@ -51,16 +61,6 @@ public:
     }
 
     bool applyAutostart();
-
-private:
-    //Settings
-    std::string selectedEpisode;
-    std::wstring selectedWldPath;
-    bool singleplayer;
-    int playerCount;
-    Characters firstCharacter;
-    Characters secondCharacter;
-    int saveSlot;
 };
 
 #endif
