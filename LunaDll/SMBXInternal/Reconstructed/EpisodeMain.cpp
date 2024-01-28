@@ -256,7 +256,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     if(GM_PLAYERS_COUNT >= 1)
     {
         // checks to make sure that the character can be selected or not
-        if(firstCharacter != static_cast<Characters>(0) && firstCharacter <= static_cast<Characters>(5))
+        if(firstCharacter >= static_cast<Characters>(1) && firstCharacter <= static_cast<Characters>(GM_MAX_CHARACTERS))
         {
             p1->Identity = firstCharacter;
         }
@@ -275,7 +275,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
             auto p2 = Player::Get(i);
 
             // checks to make sure that the character can be selected or not
-            if(secondCharacter != static_cast<Characters>(0) && secondCharacter <= static_cast<Characters>(5))
+            if(secondCharacter >= static_cast<Characters>(1) && secondCharacter <= static_cast<Characters>(GM_MAX_CHARACTERS))
             {
                 p2->Identity = secondCharacter;
             }
