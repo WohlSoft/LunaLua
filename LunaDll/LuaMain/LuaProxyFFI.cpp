@@ -905,7 +905,7 @@ extern "C" {
     {
         gRunWhenUnfocused = value;
     }
-    FFI_EXPORT(void) LunaLuaIsRunningWhenUnfocused(bool value)
+    FFI_EXPORT(bool) LunaLuaIsRunningWhenUnfocused(bool value)
     {
         return gRunWhenUnfocused;
     }
