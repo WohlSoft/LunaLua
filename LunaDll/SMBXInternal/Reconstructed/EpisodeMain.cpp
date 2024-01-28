@@ -196,9 +196,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // setup SFXs
     native_setupSFX();
     
-    // specify the save slot, the menu level, and find the specific save slot for the wld file
+    // specify the save slot
     SMBXWorldFileBase::PopulateEpisodeList();
-    
+
+    // specify the menu level
     GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPathWS)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
 
     // clear gamedata
@@ -234,7 +235,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     {
         auto p = Player::Get(i);
 
-        // implement missing player values before loading-- the save file
+        // implement missing player values before loading the save file
         p->CurrentPowerup = 1; //--Player(1/2).State (line 4953/4964)--
         p->MountType = 0; //--Player(1/2).Mount (line 4954/4965)--
         p->Identity = static_cast<Characters>(1); //--Player(1/2).Character = 1 (line 4955/4966)--
