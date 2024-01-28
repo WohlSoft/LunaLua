@@ -33,6 +33,7 @@ bool gRenderBackgroundFlag = true;
 bool gDisablePlayerFilterBounceFix = false;
 
 // Other gameplay settings
+bool gRightClickPaste = false;
 bool gLavaIsWeak = false;
 
 // Flag for returning from gameover screen
@@ -75,8 +76,6 @@ bool gEscPressed = false;
 bool gEscPressedRegistered = false;
 
 bool gIsTestModePauseActive;
-
-bool rightClickPasteEnabled = false;
 
 // Global obj
 

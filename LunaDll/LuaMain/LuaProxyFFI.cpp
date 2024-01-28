@@ -902,13 +902,11 @@ extern "C" {
 extern "C" {
     FFI_EXPORT(void) LunaLuaSetRightClickPasteSetting(bool enable)
     {
-    // This will let the user alternatively paste content via right clicking, similar to using the command prompt. Useful for repl
-    if (!enable)
-    {
-        rightClickPasteEnabled = false;
+        // This will let the user alternatively paste content via right clicking, similar to using the command prompt. Useful for repl
+        gRightClickPaste = enable;
     }
-    else if (enable)
+    FFI_EXPORT(bool) LunaLuaSetIsRightClickPasteSettingEnabled()
     {
-        rightClickPasteEnabled = true;
+        return gRightClickPaste;
     }
 }
