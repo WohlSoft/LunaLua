@@ -1129,7 +1129,7 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
             break;
         }
     }
-    return id - 1;
+    return id;
 }
 
 std::string findEpisodeWorldPathFromName(std::string name)
