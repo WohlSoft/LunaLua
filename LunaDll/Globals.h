@@ -106,6 +106,7 @@ extern bool            gRenderBackgroundFlag;
 extern bool            gDisablePlayerFilterBounceFix;
 
 // Other gameplay settings
+extern bool            gRightClickPaste;
 extern bool            gLavaIsWeak;
 
 // Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
@@ -155,9 +156,6 @@ extern bool     gEscPressedRegistered;
 
 // Test mode pause note
 extern bool     gIsTestModePauseActive;
-
-//Right click pasting
-extern bool     rightClickPasteEnabled;
 
 // Level init
 extern LvlEnum	gLevelEnum;
