@@ -126,29 +126,3 @@ void LuaProxy::World::setPlayerPowerup(short playerPowerup)
 {
     SMBXOverworld::get()->currentPowerup = playerPowerup;
 }
-
-static luabind::object getAllEpisodes(lua_State *L)
-{
-    luabind::object outData = luabind::newtable(L);
-    {
-        size_t counter = 0;
-
-        for (int i = 1; i <= GM_EP_LIST_COUNT; i++)
-        {
-            luabind::object e = luabind::newtable(L);
-            auto ep = EpisodeListItem::Get(i - 1);
-            e["episodeName"] = std::string(ep->episodeName);
-            e["episodePath"] = std::string(ep->episodePath);
-            e["episodeWorldFile"] = std::string(ep->episodeWorldFile);
-            outData[++counter] = e;
-        }
-    }
-    
-    return outData;
-}
-
-luabind::object LuaProxy::World::getEpisodeList(lua_State *L)
-{
-    return getAllEpisodes(L);
-}
-

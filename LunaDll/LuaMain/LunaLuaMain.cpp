@@ -719,7 +719,8 @@ void CLunaLua::bindAll()
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
                 def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress),
-                def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem)
+                def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem),
+                def("getEpisodeList", &LuaProxy::Misc::getEpisodeList)
             ],
 
             namespace_("FileFormats")[
@@ -840,11 +841,6 @@ void CLunaLua::bindAll()
                 def("openNpcConfig", &LuaProxy::Formats::openNpcConfig)
             ],
             /*************************FileFormats*end*************************/
-
-            LUAHELPER_DEF_CLASS(World)
-                .property("getEpisodeList", &LuaProxy::World::getEpisodeList),
-
-            /*************************World*end*************************/
 
             namespace_("Audio")[
                 //SDL_Mixer's Mix_Chunk structure

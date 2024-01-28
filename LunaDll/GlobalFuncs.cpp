@@ -1190,7 +1190,7 @@ void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
     for (size_t i = 0; i < 5; i++)
     {
         auto p = Player::Get(playerID);
-        EpisodeListItem* ep = EpisodeListItem::GetRaw(GM_CUR_MENULEVEL);
+        EpisodeListItem* ep = EpisodeListItem::Get(GM_CUR_MENULEVEL);
         if(ep->blockChar[i] == -1 && p->Identity == static_cast<Characters>(i + 1))
         {
             // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked

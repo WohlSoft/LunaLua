@@ -1617,9 +1617,10 @@ void __stdcall runtimeHookGameMenu()
     if(!gEpisodeLoadedOnBoot)
     {
         GameAutostart autostarter;
-        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled() && !gStartupSettings.epSettings.enabled)
+        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled())
         {
             std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+
             if(!gStartupSettings.epSettings.enabled && file_existsX(autostartFile))
             {
                 // Try reading the autostart.ini file first if there's no settings available
@@ -1654,29 +1655,29 @@ void __stdcall runtimeHookGameMenu()
                 }
                 autostartConfig.endGroup();
             }
-        }
-        else if(gStartupSettings.epSettings.enabled && gStartupSettings.epSettings.wldPath != L"")
-        {
-            // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
-            EpisodeMain mainEpisodeFunc;
-            
-            std::string selectedEpisode = "";
-            std::wstring selectedEpisodePath = gStartupSettings.epSettings.wldPath;
-            int playerCount = gStartupSettings.epSettings.players;
-            Characters firstCharacter = static_cast<Characters>(gStartupSettings.epSettings.character1);
-            Characters secondCharacter = static_cast<Characters>(gStartupSettings.epSettings.character2);
-            int saveSlot = gStartupSettings.epSettings.saveSlot;
+            else if(gStartupSettings.epSettings.enabled && gStartupSettings.epSettings.wldPath != L"")
+            {
+                // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
+                EpisodeMain mainEpisodeFunc;
+                
+                std::string selectedEpisode = "";
+                std::wstring selectedEpisodePath = gStartupSettings.epSettings.wldPath;
+                int playerCount = gStartupSettings.epSettings.players;
+                Characters firstCharacter = static_cast<Characters>(gStartupSettings.epSettings.character1);
+                Characters secondCharacter = static_cast<Characters>(gStartupSettings.epSettings.character2);
+                int saveSlot = gStartupSettings.epSettings.saveSlot;
 
-            autostarter.setSelectedEpisode(selectedEpisode);
-            
-            mainEpisodeFunc.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter, false);
-        }
-        else if(!gStartupSettings.epSettings.enabled && gStartupSettings.epSettings.wldPath == L"")
-        {
-            // If there's still nothing, we don't have any settings so we shouldn't continue booting LunaDLL
-            std::string msg = "There is no world file specified on starting LunaLua. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level starting SMBX2 by loading the X2 launcher (Or Command Prompt) instead.";
-            MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
-            _exit(0);
+                autostarter.setSelectedEpisode(selectedEpisode);
+                
+                mainEpisodeFunc.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter, false);
+            }
+            else
+            {
+                // If there's still nothing, we don't have any settings so we shouldn't continue booting LunaDLL
+                std::string msg = "There is no world file specified on starting LunaLua. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level starting SMBX2 by loading the X2 launcher (Or Command Prompt) instead.";
+                MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
+                _exit(0);
+            }
         }
     }
     else if(gEpisodeLoadedOnBoot)
