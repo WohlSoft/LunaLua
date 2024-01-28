@@ -340,7 +340,14 @@ void __stdcall runtimeHookNPCTerminalVelocityRaw(void);
 
 void __stdcall runtimeHookNPCHarmlessGrabRaw(void);
 void __stdcall runtimeHookNPCHarmlessThrownRaw(void);
+
+void __stdcall runtimeHookLegacyTitleScreenMouseUp(void);
+void __stdcall runtimeHookLegacyTitleScreenMouseDown(void);
+void __stdcall runtimeHookLegacyTitleScreenMouseMove(void);
+
+void __stdcall runtimeHookDoInput(void);
 void __stdcall runtimeHookCheckInputRaw(void);
+
 void __stdcall runtimeHookSetHDCRaw(void);
 
 void __stdcall runtimeHookInitGameHDC(void);

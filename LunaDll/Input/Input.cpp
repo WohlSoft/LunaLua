@@ -80,6 +80,12 @@ void Input::ResetAll() {
 void Input::UpdateKeyRecords(PlayerMOB* pPlayer) {
     if(pPlayer == 0)
         return;
+    
+    if(!gMainWindowInBackground)
+    {
+        // the window is in the background, so return it
+        return;
+    }
 
     //wchar_t* dbg = L"Update keys debug";
 

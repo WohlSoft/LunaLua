@@ -90,6 +90,7 @@ extern HINSTANCE	gHInstance;
 /// Global main window state
 extern HWND gMainWindowHwnd;
 extern bool gMainWindowFocused;
+extern bool gMainWindowInBackground;
 
 /// Global settings
 extern bool            gLunaEnabled;
@@ -107,6 +108,7 @@ extern bool            gDisablePlayerFilterBounceFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
+extern bool            gRunWhenUnfocused;
 
 // Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
 extern bool            gDidGameOver;
@@ -212,3 +214,6 @@ return;
 
 extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
+
+extern int gUnfocusTimer;
+extern int gFocusTimer;

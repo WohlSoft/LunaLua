@@ -604,11 +604,11 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
     }
 
     // Send lua onRawKeyPress/Release events
-    if (!repeated) {
+    if (!repeated && !gMainWindowInBackground) {
         SendLuaRawKeyEvent(vkey, keyDown);
     }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus) {
+    if (haveFocus && !gMainWindowInBackground) {
         if (keyDown) {
             ProcessRawKeyPress(vkey, scanCode, repeated);
         }
@@ -865,25 +865,28 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
                 // Our main window gained focus? Keep track of that.
                 gMainWindowFocused = true;
+                gMainWindowInBackground = false;
                 break;
             case WM_KILLFOCUS:
                 // Unregister VK_SNAPSHOT hotkey handling when out of focus
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
 
                 // Our main window lost focus? Keep track of that.
-                if (!gStartupSettings.runWhenUnfocused)
+                if (!gRunWhenUnfocused)
                 {
                     gMainWindowFocused = false;
                 }
+                gMainWindowInBackground = true;
                 break;
             case WM_DESTROY:
                 // Our main window was destroyed? Clear hwnd and mark as unfocused
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
                 gMainWindowHwnd = NULL;
-                if (!gStartupSettings.runWhenUnfocused)
+                if (!gRunWhenUnfocused)
                 {
                     gMainWindowFocused = false;
                 }
+                gMainWindowInBackground = true;
                 break;
             case WM_HOTKEY:
                 if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
@@ -922,10 +925,13 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 
                 // Process the raw input
                 bool mainWindowFocus = haveFocus && gMainWindowFocused;
-                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), mainWindowFocus);
+                if(!gMainWindowInBackground)
+                {
+                    ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), mainWindowFocus);
+                }
 
                 // If we have focus, return via DefWindowProcW
-                if (haveFocus)
+                if (haveFocus && !gMainWindowInBackground)
                 {
                     return DefWindowProcW(hwnd, uMsg, wParam, lParam);
                 }
@@ -1202,6 +1208,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--runWhenUnfocused"))
     {
         gStartupSettings.runWhenUnfocused = true;
+        gRunWhenUnfocused = true;
         gMainWindowFocused = true;
     }
 
@@ -1715,6 +1722,9 @@ void TrySkipPatch()
 
     PATCH(0xA10136).JMP(runtimeHookNPCTerminalVelocityRaw).NOP_PAD_TO_SIZE<58>().Apply();
 
+    PATCH(0x8BDE80).JMP(runtimeHookLegacyTitleScreenMouseDown).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0xA74910).JMP(runtimeHookDoInput).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
     // Hooks for per-npc noblockcollision

@@ -8,7 +8,7 @@ MouseHandler gMouseHandler;
 
 void MouseHandler::OnMouseMove(int x, int y, uint8_t buttonState)
 {
-    if (mInClientArea && (mClientX == x) && (mClientY == y))
+    if (mInClientArea && (mClientX == x) && (mClientY == y) && !gMainWindowInBackground)
     {
         // No change.
         return;
@@ -43,7 +43,7 @@ void MouseHandler::OnMouseLeave()
 
 void MouseHandler::OnMouseButtonEvent(ButtonEnum button, ButtonEvtEnum state)
 {
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid() && !gMainWindowInBackground) {
         std::shared_ptr<Event> event = std::make_shared<Event>("onMouseButtonEvent", false);
         event->setDirectEventName("onMouseButtonEvent");
         event->setLoopable(false);
@@ -53,7 +53,7 @@ void MouseHandler::OnMouseButtonEvent(ButtonEnum button, ButtonEvtEnum state)
 
 void MouseHandler::OnMouseWheelEvent(WheelEnum wheel, int delta)
 {
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid() && !gMainWindowInBackground) {
         std::shared_ptr<Event> event = std::make_shared<Event>("onMouseWheelEvent", false);
         event->setDirectEventName("onMouseWheelEvent");
         event->setLoopable(false);

@@ -13,6 +13,7 @@ HINSTANCE gHInstance;
 
 HWND gMainWindowHwnd = NULL;
 bool gMainWindowFocused = false;
+bool gMainWindowInBackground = false;
 
 // Global settings
 bool gLunaEnabled;
@@ -34,6 +35,7 @@ bool gDisablePlayerFilterBounceFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
+bool gRunWhenUnfocused = false;
 
 // Flag for returning from gameover screen
 bool gDidGameOver = false;
@@ -134,3 +136,6 @@ void printBoxA(const char *fmt, ...)
 
 std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
+
+int gUnfocusTimer = 2;
+int gFocusTimer = 2;
