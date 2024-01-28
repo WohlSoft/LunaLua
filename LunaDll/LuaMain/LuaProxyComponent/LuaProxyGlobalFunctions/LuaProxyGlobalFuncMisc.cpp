@@ -232,30 +232,36 @@ void LuaProxy::Misc::exitEngine()
 }
 
 bool luaDidGameOverFlag = false;
+
 bool LuaProxy::Misc::didGameOver()
 {
     return luaDidGameOverFlag;
 }
 
-bool LuaProxy::Misc::loadEpisode(std::string episodeName)
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numPlayers, int playerIDForOtherPlayers)
 {
     bool success = false;
 
     Characters storedIdentity1 = Player::Get(1)->Identity;
     Characters storedIdentity2;
 
-    if(GM_PLAYERS_COUNT > 1)
+    if(numPlayers > 1 && playerIDForOtherPlayers <= 0)
     {
         storedIdentity2 = Player::Get(2)->Identity;
     }
-    else if(GM_PLAYERS_COUNT <= 1)
+    else if(numPlayers <= 1)
     {
         storedIdentity2 = static_cast<Characters>(1);
     }
 
+    if(playerIDForOtherPlayers > 0)
+    {
+        storedIdentity2 = static_cast<Characters>(playerIDForOtherPlayers);
+    }
+
     // We're checking to see if the world path exists, and if it does, we can go through to load the episode
     std::string worldPth = findEpisodeWorldPathFromName(episodeName);
-    
+
     if(!worldPth.empty() || worldPth != "")
     {
         success = true;
@@ -267,17 +273,33 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 
         std::string selectedEpisode = "";
         gStartupSettings.epSettings.wldPath = Str2WStr(worldPth);
-        gStartupSettings.epSettings.players = GM_PLAYERS_COUNT;
+        gStartupSettings.epSettings.players = numPlayers;
         gStartupSettings.epSettings.character1 = static_cast<int>(storedIdentity1);
         gStartupSettings.epSettings.character2 = static_cast<int>(storedIdentity2);
-        gStartupSettings.epSettings.saveSlot = GM_CUR_SAVE_SLOT;
+        gStartupSettings.epSettings.saveSlot = saveSlot;
 
         GM_EPISODE_MODE = COMBOOL(false);
         GM_CREDITS_MODE = COMBOOL(false);
         GM_LEVEL_MODE = COMBOOL(true);
     }
-    
+
     return success;
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numPlayers)
+{
+    // default player id is 1 in this case
+    return LuaProxy::Misc::loadEpisode(episodeName, saveSlot, numPlayers, 1);
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot)
+{
+    return LuaProxy::Misc::loadEpisode(episodeName, saveSlot, GM_PLAYERS_COUNT, 0);
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName)
+{
+    return LuaProxy::Misc::loadEpisode(episodeName, GM_CUR_SAVE_SLOT, GM_PLAYERS_COUNT, 0);
 }
 
 void LuaProxy::Misc::pause()
