@@ -2016,10 +2016,90 @@ _declspec(naked) void __stdcall runtimeHookNPCTerminalVelocityRaw()
     }
 }
 
+__declspec(naked) void __stdcall legacyMouseUp_OrigFunc()
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp,0x0C
+        push 0x8BE086
+        ret
+    }
+}
+
+void __stdcall runtimeHookLegacyTitleScreenMouseUp()
+{
+    // Make sure that the mouse from the legacy title screen doesn't do anything when the window is in the background. This is used for running the game when unfocused.
+    if(!gMainWindowInBackground)
+    {
+        legacyMouseUp_OrigFunc();
+    }
+}
+
+__declspec(naked) void __stdcall legacyMouseDown_OrigFunc()
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp,0x0C
+        push 0x8BDE86
+        ret
+    }
+}
+
+void __stdcall runtimeHookLegacyTitleScreenMouseDown()
+{
+    // Make sure that the mouse from the legacy title screen doesn't do anything when the window is in the background. This is used for running the game when unfocused.
+    if(!gMainWindowInBackground)
+    {
+        legacyMouseDown_OrigFunc();
+    }
+}
+
+__declspec(naked) void __stdcall legacyMouseMove_OrigFunc()
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp,0x0C
+        push 0x8BDF16
+        ret
+    }
+}
+
+void __stdcall runtimeHookLegacyTitleScreenMouseMove()
+{
+    // Make sure that the mouse from the legacy title screen doesn't do anything when the window is in the background. This is used for running the game when unfocused.
+    if(!gMainWindowInBackground)
+    {
+        legacyMouseMove_OrigFunc();
+    }
+}
+
+__declspec(naked) void __stdcall startInput_OrigFunc()
+{
+    __asm {
+        push ebp
+        mov ebp, esp
+        sub esp, 0x8
+        push 0xA74916
+        ret
+    }
+}
+
+void __stdcall runtimeHookDoInput()
+{
+    // Make sure that inputs don't do anything when the window is in the background. This is used for running the game when unfocused.
+    if(!gMainWindowInBackground)
+    {
+        startInput_OrigFunc();
+    }
+}
+
 static void __stdcall runtimeHookCheckInput(int playerNum, int playerIdx, KeyMap* keymap)
 {
     // Test that player index is in range, and that it matches the true player number (ignore clones)
-    if ((playerIdx >= 0 && playerIdx <= 1) && ((playerIdx + 1) == playerNum))
+    if (((playerIdx >= 0 && playerIdx <= 1) && ((playerIdx + 1) == playerNum)))
     {
         gRawKeymap[playerIdx+2] = gRawKeymap[playerIdx]; // Update prev values
         gRawKeymap[playerIdx] = *keymap; // Set new values
@@ -2836,7 +2916,7 @@ void __stdcall runtimeHookCheckWindowFocus()
     {
         if(gUnfocusTimer > 0)
         {
-            gUnfocusTimer--
+            gUnfocusTimer--;
         }
         if(gUnfocusTimer == 1)
         {
@@ -2867,7 +2947,7 @@ void __stdcall runtimeHookCheckWindowFocus()
     {
         if(gFocusTimer > 0)
         {
-            gFocusTimer--
+            gFocusTimer--;
         }
         if(gFocusTimer == 1)
         {

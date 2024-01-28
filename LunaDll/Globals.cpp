@@ -35,6 +35,7 @@ bool gDisablePlayerFilterBounceFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
+bool gRunWhenUnfocused = false;
 
 // Flag for returning from gameover screen
 bool gDidGameOver = false;

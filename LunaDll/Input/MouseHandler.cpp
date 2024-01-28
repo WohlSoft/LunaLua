@@ -34,13 +34,10 @@ void MouseHandler::OnMouseMove(int x, int y, uint8_t buttonState)
 
 void MouseHandler::OnMouseLeave()
 {
-    if(!gMainWindowInBackground)
+    if (mInClientArea)
     {
-        if (mInClientArea)
-        {
-            mInClientArea = false;
-            Recalculate();
-        }
+        mInClientArea = false;
+        Recalculate();
     }
 }
 
@@ -67,20 +64,17 @@ void MouseHandler::OnMouseWheelEvent(WheelEnum wheel, int delta)
 // Recalculate FB coordinates
 void MouseHandler::Recalculate()
 {
-    if(!gMainWindowInBackground)
+    if (mInClientArea)
     {
-        if (mInClientArea)
-        {
-            double newX = mClientX;
-            double newY = mClientY;
-            gWindowSizeHandler.WindowToFramebuffer(newX, newY);
-            mFramebufferX = newX;
-            mFramebufferY = newY;
-        }
-        else
-        {
-            mFramebufferX = NAN;
-            mFramebufferY = NAN;
-        }
+        double newX = mClientX;
+        double newY = mClientY;
+        gWindowSizeHandler.WindowToFramebuffer(newX, newY);
+        mFramebufferX = newX;
+        mFramebufferY = newY;
+    }
+    else
+    {
+        mFramebufferX = NAN;
+        mFramebufferY = NAN;
     }
 }

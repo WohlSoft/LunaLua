@@ -899,3 +899,14 @@ extern "C" {
         return gLavaIsWeak;
     }
 }
+
+extern "C" {
+    FFI_EXPORT(void) LunaLuaRunWhenUnfocused(bool value)
+    {
+        gRunWhenUnfocused = value;
+    }
+    FFI_EXPORT(void) LunaLuaIsRunningWhenUnfocused(bool value)
+    {
+        return gRunWhenUnfocused;
+    }
+}

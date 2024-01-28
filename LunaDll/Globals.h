@@ -108,6 +108,7 @@ extern bool            gDisablePlayerFilterBounceFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
+extern bool            gRunWhenUnfocused;
 
 // Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
 extern bool            gDidGameOver;
