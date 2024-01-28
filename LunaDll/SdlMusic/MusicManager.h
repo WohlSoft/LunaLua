@@ -90,19 +90,19 @@ private:
     static MusicEntry music_spc[4];
     static std::string defaultMusList[75];//List of system default files
     static std::string musAliasesList[75];//List of reserved aliases for sound effects
-
-    //SFX
-    static int max_soundeffect_count; // Size of sound effect array
-    static const int defaultSoundCount = 91; // Total number of sound effects in smbx 1.3
-    static ChunkEntry *sounds;
-    static std::string defaultChunksList[defaultSoundCount];//List of system default files
-    static std::string chunksAliasesList[defaultSoundCount];//List of reserved aliases for sound effects
-    static int chunksChannelsList[defaultSoundCount];//List of channel reservation by some files (-1 is allowing mixed playback)
     
     static void resizeSoundArrays(int new_max_sound_id); // Change size of sound ids
     static void initArraysSound();//Populate sound array based on default values
 
     static void initArrays();//Fill chinks and musics list with system default files
+    
+    //SFXs
+    static ChunkEntry *sounds;
+    static int max_soundeffect_count; // Size of sound effect array
+    static const int defaultSoundCount = 91; // Total number of sound effects in smbx 1.3
+    static std::string defaultChunksList[defaultSoundCount];//List of system default files
+    static std::string chunksAliasesList[defaultSoundCount];//List of reserved aliases for sound effects
+    static int chunksChannelsList[defaultSoundCount];//List of channel reservation by some files (-1 is allowing mixed playback)
     
     //INI Paths
     static std::string defaultSndINI;//Full path to global sounds.ini file

@@ -28,10 +28,10 @@ ChunkEntry::~ChunkEntry()
 
 void ChunkEntry::setPath(std::string path)
 {
-    if(fullPath!=path)
+    if(fullPath != path)
     {
-        needReload=true;
-        fullPath=path;
+        needReload = true;
+        fullPath = path;
     }
 }
 
@@ -365,6 +365,8 @@ void MusicManager::loadSounds(std::string path, std::string root, bool is_first_
 
     curRoot = root;
 
+    gSoundEffectCount = 0;
+
     //ONLY if this is the first time loading sound effects (loading from basegame sounds ini),
     //Handle changing max sound count
     if (is_first_run)
@@ -376,7 +378,6 @@ void MusicManager::loadSounds(std::string path, std::string root, bool is_first_
             //Read new max values from ini, if defined
             soundsList.read("total", new_max_sound_id, new_max_sound_id);
         }
-
         resizeSoundArrays(new_max_sound_id);
     }
 
@@ -426,6 +427,7 @@ void MusicManager::loadSounds(std::string path, std::string root, bool is_first_
         if(file_existsX(root + fileName))
         {
             sounds[i].setPath(root + fileName.c_str());
+            gSoundEffectCount++;
             if(reserveChannel != 0)
                 sounds[i].channel = 0;
             else
@@ -465,6 +467,10 @@ void MusicManager::loadMusics(std::string path, std::string root)
     curRoot = root;
     int i = 0;
 
+    gLevelMusicCount = 0;
+    gOverworldMusicCount = 0;
+    gSpecialMusicCount = 0;
+
     //World music
     for(int j = 1; (j <= 16) && (i < 74); i++, j++)
     {
@@ -485,6 +491,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
+            gOverworldMusicCount++;
             music_wld[j-1].setPath(root + fileName);
         }
     }
@@ -509,6 +516,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
+            gSpecialMusicCount++;
             music_spc[j-1].setPath(root + fileName);
         }
     }
@@ -534,6 +542,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
+            gLevelMusicCount++;
             music_lvl[j-1].setPath(root + fileName);
         }
     }
@@ -589,16 +598,9 @@ void MusicManager::initArraysSound()
     for(int i = 0; i < max_soundeffect_count; i++)
     {
         sounds[i].id=i+1;
-        if(i <= 90)
-        {
-            sounds[i].channel=chunksChannelsList[i];
-            sounds[i].setPath(PGE_SDL_Manager::appPath+defaultChunksList[i]);
-        }
-        else if(i > 90)
-        {
-            int channelID = -1;
-            sounds[i].channel=channelID;
-        }
+        sounds[i].setPath(curRoot + defaultChunksList[i]);
+        sounds[i].channel = chunksChannelsList[i];
+        break;
     }
 }
 
