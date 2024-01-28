@@ -244,21 +244,18 @@ uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
 }
 
 
+// returns the range of block indexes to iterate over using the block lookup table
+void BlockLookupQuery(double x1, double x2, int* outF, int* outL) {
+    *outF = GM_BLOCK_LOOKUP_MIN[std::min(std::max((int)floor((x1) / 32 + 8000), 0), 16000)];
+    *outL = GM_BLOCK_LOOKUP_MAX[std::min(std::max((int)floor((x2) / 32 + 8000), 0), 16000)];
+}
+
 // used in NPC and player collision hooks to handle collision against slopes when flagged as semisolid.
 // returns whether the collision should be allowed
 bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockIdx, int entityBottomCollisionTimer)
 {
 
     Block* block = Block::GetRaw(blockIdx);
-
-    // check for slopes we can walk past, like stairs
-    if (Blocks::GetBlockWalkPastStair(block->BlockType)) {
-        // if our feet our at the bottom of the stair, and we're standing on something that isn't a slope
-        if (entityMomentum->y + entityMomentum->height >= block->momentum.y + block->momentum.height - 1 && entityBottomCollisionTimer != 0 && entityMomentum->speedY >= 0) {
-            // cancel collision, allow walking past the slope
-            return false;
-        }
-    }
 
     short floorslope = blockdef_floorslope[block->BlockType];
 
@@ -267,7 +264,7 @@ bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockId
         // use player right edge for slopes going down left
         playerRefX += entityMomentum->width;
     }
-    double blockCollisionPercent = (playerRefX - block->momentum.x) / block->momentum.width;
+    double blockCollisionPercent = ((playerRefX + entityMomentum->speedX * 2.0) - block->momentum.x) / block->momentum.width;
     if (floorslope == -1) {
         // reverse direction for slopes going down left
         blockCollisionPercent = 1.0 - blockCollisionPercent;
@@ -295,14 +292,13 @@ bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockId
             double refY = block->momentum.y;
 
             // 
-            int fblock = GM_BLOCK_LOOKUP_MIN[std::min(std::max((int)floor((refX - 2) / 32 + 8000), 0), 16000)];
-            int lblock = GM_BLOCK_LOOKUP_MAX[std::min(std::max((int)floor((refX + 2) / 32 + 8000), 0), 16000)];
+            int fblock, lblock;
+            BlockLookupQuery(refX - 2, refX + 2, &fblock, &lblock);
 
             for (int i = fblock; i <= lblock; i++) {
                 auto b = Block::GetRaw(i);
                 // if this is a semisolid slope of the same type
-                if (abs(b->momentum.y + b->momentum.height - refY) <= 2.0 && !b->IsHidden && blockdef_semisolid[b->BlockType] && blockdef_floorslope[b->BlockType] == floorslope) {
-                    // for some reason, these 2 checks require a bit of additional leniancy for 2 tile wide slopes in particular
+                if (abs(b->momentum.y + b->momentum.height - refY) <= 2.0 && !b->IsHidden && !b->IsInvisible2 && blockdef_semisolid[b->BlockType] && blockdef_floorslope[b->BlockType] == floorslope) {
                     // if the edge is aligned at the correct position
                     if (floorslope == -1) {
                         // left slope
@@ -331,13 +327,68 @@ bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockId
     double offset = 0;
     if (entityMomentum->speedY > -1) {
         // if moving downwards, add some extra leniency to collision
-        offset = 4.0;
+        offset = 4 + entityMomentum->speedY * 2;
     }
     double playerFootY = entityMomentum->y + entityMomentum->height;
     double blockCollisionBottom = block->momentum.y + blockCollisionPercent * block->momentum.height;
-    if (playerFootY > blockCollisionBottom + entityMomentum->speedY + offset) {
+    if (playerFootY > blockCollisionBottom + offset) {
         // foot is too far below to consider collision, cancel
         return false;
     }
+
+    // check for slopes we can walk past, like stairs
+    if (Blocks::GetBlockWalkPastStair(block->BlockType)) {
+        // if our feet our at the bottom of the stair, and we're standing on something that isn't a slope
+        if (entityMomentum->y + entityMomentum->height >= block->momentum.y + block->momentum.height - 1 && entityBottomCollisionTimer != 0 && entityMomentum->speedY >= 0) {
+
+            // Check that there's not a platform BELOW the slope, in which case we want the entity to step up onto it anyways
+            bool isEdgeSlope = true;
+            {
+                double x1;
+                if (floorslope == -1) {
+                    // Down left slope, check according to left edge
+                    x1 = block->momentum.x;
+                } else {
+                    // Down right slope, check according to right edge
+                    x1 = block->momentum.x + block->momentum.width - 32;
+                }
+                double x2 = x1 + 32;
+                double refY = block->momentum.y + block->momentum.height;
+                x1 += 1;
+                x2 -= 1;
+
+                int fblock, lblock;
+                BlockLookupQuery(x1, x2, &fblock, &lblock);
+
+                for (int i = fblock; i <= lblock; i++) {
+                    auto b = Block::GetRaw(i);
+
+                    if (abs(b->momentum.y - refY) <= 2.0) {
+                        // if the block is below the slope
+                        if (b->momentum.x > x2 || b->momentum.x + b->momentum.width < x1) {
+                            // the block does not 'collide' horizontally
+                            continue;
+                        }
+
+                        if (!b->IsHidden && !b->IsInvisible2 && blockdef_floorslope[b->BlockType] == 0 && blockdef_passthrough[b->BlockType] == 0) {
+                            // found a matching solid below!
+                            // this is NOT an edge slope
+                            isEdgeSlope = false;
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+            // if this slope ISN'T at the edge of a platform
+            if (!isEdgeSlope) {
+                // cancel collision, allow walking past the slope
+                return false;
+            }
+        }
+
+    }
+
     return true;
 }
