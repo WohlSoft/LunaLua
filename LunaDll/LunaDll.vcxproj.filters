@@ -1379,9 +1379,6 @@
     <ClCompile Include="libs\luabind-deboostified\src$filename">
       <Filter>libs\luabind-deboostified</Filter>
     </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1461,6 +1458,9 @@
       <Filter>Misc\RuntimeHookComponents</Filter>
     </ClCompile>
     <ClCompile Include="Misc\Gameover.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\AsmPatch.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>

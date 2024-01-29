@@ -45,6 +45,45 @@ struct AsmPatchNoCondtionalJump : std::exception {
     const char* what() const { return "No conditional jump at detected"; }
 };
 
+// Class to temporarily unlock memory
+class MemoryUnlock {
+    private:
+        void* const mAddr;
+        const std::size_t mSize;
+        unsigned long mOldProtect;
+        const bool mSuccess;
+
+        static bool UnProtect(void* addr, std::size_t size, unsigned long* oldFlags);
+        static void ReProtect(void* addr, std::size_t size, unsigned long flags);
+
+    public:
+        MemoryUnlock(std::uintptr_t addr, std::size_t size) :
+            MemoryUnlock(reinterpret_cast<void*>(addr), size)
+        {}
+
+        MemoryUnlock::MemoryUnlock(void* addr, std::size_t size) :
+            mAddr(addr),
+            mSize(size),
+            mOldProtect(0),
+            mSuccess(UnProtect(mAddr, mSize, &mOldProtect))
+        {}
+
+        MemoryUnlock::~MemoryUnlock()
+        {
+            if (mSuccess)
+            {
+                ReProtect(mAddr, mSize, mOldProtect);
+            }
+        }
+
+        bool IsValid() const { return mSuccess; }
+
+        MemoryUnlock(const MemoryUnlock&) = delete;
+        MemoryUnlock& operator= (const MemoryUnlock&) = delete;
+
+        static bool Memcpy(void* dest, const void* src, std::size_t count);
+};
+
 template <std::uintptr_t Size>
 struct AsmPatch : public Patchable {
     /********************
@@ -76,8 +115,12 @@ public:
     void Apply() {
         if (mIsPatched) return;
         if (Size == 0) return;
-        for (std::uintptr_t i = 0; i < Size; i++) {
-            ((uint8_t*)mAddr)[i] = mPatchBytes[i];
+        {
+            MemoryUnlock lock(mAddr, Size);
+            if (!lock.IsValid()) return;
+            for (std::uintptr_t i = 0; i < Size; i++) {
+                ((uint8_t*)mAddr)[i] = mPatchBytes[i];
+            }
         }
         mIsPatched = true;
     }
@@ -85,8 +128,12 @@ public:
     void Unapply() {
         if (!mIsPatched) return;
         if (Size == 0) return;
-        for (std::uintptr_t i = 0; i < Size; i++) {
-            ((uint8_t*)mAddr)[i] = mOrigBytes[i];
+        {
+            MemoryUnlock lock(mAddr, Size);
+            if (!lock.IsValid()) return;
+            for (std::uintptr_t i = 0; i < Size; i++) {
+                ((uint8_t*)mAddr)[i] = mOrigBytes[i];
+            }
         }
         mIsPatched = false;
     }
@@ -121,7 +168,7 @@ public:
         return bytes(newByte);
     }
 
-    inline AsmPatch<Size + 2> word(std::uint32_t newWord) const {
+    inline AsmPatch<Size + 2> word(std::uint16_t newWord) const {
         const std::uint8_t* data = (const std::uint8_t*)&newWord;
         return bytes(data[0], data[1]);
     }

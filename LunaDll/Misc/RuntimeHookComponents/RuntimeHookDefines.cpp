@@ -170,4 +170,114 @@ DEFINES_FFI_EXPORT(bool) LunaLua_Defines__effect_Zoomer_killEffectEnabled__get()
     return !patch_effect_Zoomer_killEffectEnabled.IsPatched();
 }
 
+// The effect ID of the npc-to-coins function (default is the coinflip effect)
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__effect_NpcToCoin__set(uint8_t value) {
+    PATCH(0x00A3C86E).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__effect_NpcToCoin__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A3C86E);
+}
+
+// The sound ID of the npc - to - coins function(default is the coin sound).
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__sound_NpcToCoin__set(uint8_t value) {
+    PATCH(0x00A3C87F).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__sound_NpcToCoin__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A3C87F);
+}
+
+// The coin-value for every destroyed npc in the npc-to-coins function.
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__npcToCoinValue__set(uint8_t value) {
+    PATCH(0x00A3C891).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__npcToCoinValue__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A3C891);
+}
+
+// How many coins get subtracted from the coin-value when the coin value hits 100 coins.
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__npcToCoinValueReset__set(uint8_t value) {
+    PATCH(0x00A3C8EE).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__npcToCoinValueReset__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A3C8EE);
+}
+
+// The score values of smb3 roulette
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__smb3RouletteScoreValueStar__set(uint32_t value) {
+    PATCH(0x00A266AC).dword(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint32_t) LunaLua_Defines__smb3RouletteScoreValueStar__get() {
+    return *reinterpret_cast<const uint32_t*>(0x00A266AC);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__smb3RouletteScoreValueMushroom__set(uint32_t value) {
+    PATCH(0x00A26719).dword(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint32_t) LunaLua_Defines__smb3RouletteScoreValueMushroom__get() {
+    return *reinterpret_cast<const uint32_t*>(0x00A26719);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__smb3RouletteScoreValueFlower__set(uint32_t value) {
+    PATCH(0x00A2677E).dword(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint32_t) LunaLua_Defines__smb3RouletteScoreValueFlower__get() {
+    return *reinterpret_cast<const uint32_t*>(0x00A2677E);
+}
+
+// How much a coin npc is worth as coins.
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__coinValue__set(uint8_t value) {
+    PATCH(0x00A262BD).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__coinValue__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A262BD);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__coin5Value__set(uint8_t value) {
+    PATCH(0x00A262C9).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__coin5Value__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A262C9);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__coin20Value__set(uint8_t value) {
+    PATCH(0x00A262B7).byte(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__coin20Value__get() {
+    return *reinterpret_cast<const uint8_t*>(0x00A262B7);
+}
+
+// Rupee stuff
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__block_hit_link_rupeeID1__set(uint16_t value) {
+    PATCH(0x009DBD9A).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__block_hit_link_rupeeID1__get() {
+    return *reinterpret_cast<const uint16_t*>(0x009DBD9A);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__block_hit_link_rupeeID2__set(uint16_t value) {
+    PATCH(0x009DBDFF).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__block_hit_link_rupeeID2__get() {
+    return *reinterpret_cast<const uint16_t*>(0x009DBDFF);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__block_hit_link_rupeeID3__set(uint16_t value) {
+    PATCH(0x009DBE64).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__block_hit_link_rupeeID3__get() {
+    return *reinterpret_cast<const uint16_t*>(0x009DBE64);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__kill_drop_link_rupeeID1__set(uint16_t value) {
+    PATCH(0x00A32943).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__kill_drop_link_rupeeID1__get() {
+    return *reinterpret_cast<const uint16_t*>(0x00A32943);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__kill_drop_link_rupeeID2__set(uint16_t value) {
+    PATCH(0x00A329D5).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__kill_drop_link_rupeeID2__get() {
+    return *reinterpret_cast<const uint16_t*>(0x00A329D5);
+}
+DEFINES_FFI_EXPORT(void) LunaLua_Defines__kill_drop_link_rupeeID3__set(uint16_t value) {
+    PATCH(0x00A32A6F).word(value).Apply();
+}
+DEFINES_FFI_EXPORT(uint16_t) LunaLua_Defines__kill_drop_link_rupeeID3__get() {
+    return *reinterpret_cast<const uint16_t*>(0x00A32A6F);
+}
+
 #undef DEFINES_FFI_EXPORT

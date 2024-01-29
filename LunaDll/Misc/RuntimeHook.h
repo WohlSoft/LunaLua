@@ -179,6 +179,7 @@ void fixup_NativeFuncs();
 void fixup_BGODepletion();
 void fixup_RenderPlayerJiterX();
 void fixup_NPCSortedBlockArrayBoundsCrash();
+void fixup_SectionSizePatch();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */

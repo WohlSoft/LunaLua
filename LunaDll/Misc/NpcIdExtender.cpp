@@ -46,7 +46,7 @@ public:
         {
             for (uint32_t i = 0; m_ptrsList[i] != 0; i++)
             {
-                *((void**)m_ptrsList[i]) = newArray;
+                PATCH(m_ptrsList[i]).dword(reinterpret_cast<uintptr_t>(newArray)).Apply();
             }
         }
         m_size = size;
@@ -54,7 +54,7 @@ public:
         // Apply patches
         for (uint32_t i = 0; m_patches[i] != 0; i++)
         {
-            *((uint32_t*)m_patches[i]) = size;
+            PATCH(m_patches[i]).dword(size).Apply();
         }
     }
 

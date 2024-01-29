@@ -48,9 +48,9 @@ static unsigned int __stdcall LatePatch(void);
 
 void SetupThunRTMainHook()
 {
-    // Remove protection on smbx.text section
+    // Make sure smbx.text section is protected by default, in case a loader did something
     DWORD oldprotect;
-    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
+    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READ, &oldprotect);
 
     // Set up hook that will launch LunaDLLInit
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
@@ -1347,11 +1347,18 @@ void TrySkipPatch()
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
     fixup_NPCSortedBlockArrayBoundsCrash();
+    fixup_SectionSizePatch();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
     /************************************************************************/
-    IMP_vbaStrCmp = &replacement_VbaStrCmp;
+    {
+        MemoryUnlock lock(&IMP_vbaStrCmp, sizeof(IMP_vbaStrCmp));
+        if (lock.IsValid())
+        {
+            IMP_vbaStrCmp = &replacement_VbaStrCmp;
+        }
+    }
 
     /************************************************************************/
     /* Set Hook                                                             */
@@ -1391,7 +1398,7 @@ void TrySkipPatch()
     
     PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();
 
-    *(void**)0xB2F244 = (void*)&mciSendStringHookA;
+    PATCH(0xB2F244).dword(reinterpret_cast<uintptr_t>(&mciSendStringHookA)).Apply();
 
     PATCH(0x8D6BB6).CALL(&forceTermination).Apply();
 
@@ -2136,9 +2143,9 @@ void TrySkipPatch()
     /* Import Table Patch                                                   */
     /************************************************************************/
     __vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
-    *(void**)0x00401124 = (void*)&vbaR4VarHook;
+    PATCH(0x00401124).dword(reinterpret_cast<uintptr_t>(&vbaR4VarHook)).Apply();
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
-    *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
+    PATCH(0x004010A8).dword(reinterpret_cast<uintptr_t>(&rtcMsgBoxHook)).Apply();
 
     rtcRandomize = (void(__stdcall *)(VARIANTARG const*))(*(void**)0x0040109C);
     rtcRandomNext = (float(__stdcall *)(VARIANTARG const*))(*(void**)0x00401090);
