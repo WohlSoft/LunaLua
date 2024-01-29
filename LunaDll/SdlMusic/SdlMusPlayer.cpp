@@ -117,6 +117,8 @@ bool PGE_MusPlayer::showMsg=true;
 std::string PGE_MusPlayer::showMsg_for="";
 std::atomic<unsigned __int64> PGE_MusPlayer::sCount(0);
 std::atomic<unsigned __int64> PGE_MusPlayer::musSCount(0);
+bool PGE_MusPlayer::overrideArrayIsUsed=false;
+std::map<std::string, PGE_MusPlayer::MusicOverrideSettings > PGE_MusPlayer::overrideSettings;
 
 Mix_Music *PGE_MusPlayer::currentMusic()
 {
@@ -449,6 +451,59 @@ void PGE_MusPlayer::DeferralLock::Unlock()
     {
         MUS_StopDeferring();
     }
+}
+
+void PGE_MusPlayer::setOverrideForMusicAlias(const std::string& alias, std::string chunk)
+{
+    MusicOverrideSettings settings = { "" };
+    if(overrideArrayIsUsed)
+    {
+        auto it = overrideSettings.find(alias);
+        if (it != overrideSettings.end())
+        {
+            settings = it->second;
+        }
+    }
+    settings.fullPath = chunk;
+    overrideSettings[alias] = settings;
+    overrideArrayIsUsed=true;
+}
+
+std::string PGE_MusPlayer::getMusicForAlias(const std::string& alias, int type)
+{
+    if (overrideArrayIsUsed)
+    {
+        auto it = overrideSettings.find(alias);
+        if (it != overrideSettings.end() && it->second.fullPath != "")
+        {
+            return it->second.fullPath;
+        }
+    }
+    return MusicManager::getMusicForAlias(alias, type);
+}
+
+bool PGE_MusPlayer::playOverrideForMusicAlias(const std::string& alias)
+{
+    if(!overrideArrayIsUsed)
+        return false;//Don't wait if overriding array is empty
+
+    auto it = overrideSettings.find(alias);
+    if (it != overrideSettings.end())
+    {
+        MusicOverrideSettings settings = it->second;
+        if(settings.fullPath == "") return false;
+        
+        std::string musFileS = settings.fullPath;
+        const char *musFileMix = musFileS.c_str();
+        Mix_Music *new_mus = Mix_LoadMUS(musFileMix);
+        play_mus = new_mus;
+        if(play_mus)
+        {
+            MUS_playMusic();
+            return true;
+        }
+    }
+    return false;
 }
 
 

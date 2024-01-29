@@ -4,6 +4,10 @@
 
 #include <string>
 #include <memory>
+
+#include "../../SdlMusic/MusicManager.h"
+#include "../../SdlMusic/SdlMusPlayer.h"
+
 struct Mix_Chunk;
 class MciEmulator;
 struct lua_State;
@@ -53,6 +57,9 @@ namespace LuaProxy
         double  MusicGetTempo();
         double  MusicGetPitch();
         double  MusicGetSpeed();
+
+        void __setOverrideForMusicAlias(const std::string& alias, std::string chunk);
+        std::string __getMusicForAlias(const std::string& alias, int type);
 
         //SFX
         Mix_Chunk* newMix_Chunk();

@@ -75,7 +75,8 @@ public:
     static void resetSeizes();
     static void setSeized(int section, bool state);
     static void setCurrentSection(int section);
-
+    
+    static std::string getMusicForAlias(const std::string& alias, int type);
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
 
 private:

@@ -227,7 +227,6 @@ void MusicManager::setCurrentSection(int section)
     curSection = section;
 }
 
-
 void MusicManager::play(std::string alias) //Chunk will be played once, stream will be played with loop
 {
     bool isChunk = alias.substr(0, 5) == "sound";
@@ -248,24 +247,39 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
         if (!seizedSections[curSection])
         {
             if(alias=="smusic") {
-                music_spc[0].play();
+                if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
+                {
+                    music_spc[0].play();
+                }
             } else if(alias=="stmusic") {
-                music_spc[1].play();
+                if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
+                {
+                    music_spc[1].play();
+                }
             } else if(alias=="tmusic") {
-                music_spc[2].play();
+                if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
+                {
+                    music_spc[2].play();
+                }
             } else if(alias.substr(0, 6) == "wmusic") {
                 std::string musIDs = alias.substr(6);
                 int musID = std::atoi(musIDs.c_str()) - 1;
                 if(musID>=0 && musID<16)
                 {
-                    music_wld[musID].play();
+                    if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
+                    {
+                        music_wld[musID].play();
+                    }
                 }
             } else if(alias.substr(0, 5) == "music") {
                 std::string musIDs = alias.substr(5);
                 int musID = std::atoi(musIDs.c_str()) - 1;
-                if(musID>=0 && musID<56)
+                if(musID>=0 && musID<57)
                 {
-                    music_lvl[musID].play();
+                    if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
+                    {
+                        music_lvl[musID].play();
+                    }
                 }
             }
             pausedNatively = false;
@@ -602,6 +616,128 @@ Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
         }
     }
     return nullptr;
+}
+
+std::string MusicManager::getMusicForAlias(const std::string& alias, int type)
+{
+    if(alias != "")
+    {
+        bool isMusic = false;
+
+        int startingPoint = 0;
+        int startAt = 0;
+        int endAt = 0;
+        int betweenCount = 0;
+        int foundID = 0;
+
+        std::string typeMusic = "";
+        int specialIdx = 0;
+
+        if(type == 3) // level music, from Lua
+        {
+            startingPoint = 5;
+            isMusic = alias.substr(0, startingPoint) == "music";
+            typeMusic = "music";
+        }
+        else if(type == 2) // world music, from Lua
+        {
+            startingPoint = 6;
+            isMusic = alias.substr(0, startingPoint) == "wmusic";
+            typeMusic = "wmusic";
+        }
+        else if(type == 1) // special music, from Lua
+        {
+            if(alias == "smusic")
+            {
+                startingPoint = 6;
+                isMusic = true;
+                typeMusic = "smusic";
+            }
+            if(alias == "stmusic")
+            {
+                startingPoint = 7;
+                isMusic = true;
+                typeMusic = "stmusic";
+            }
+            if(alias == "tmusic")
+            {
+                startingPoint = 6;
+                isMusic = true;
+                typeMusic = "tmusic";
+            }
+        }
+        
+        bool isSpecial = (typeMusic == "smusic" || typeMusic == "stmusic" || typeMusic == "tmusic");
+
+        if (isMusic)
+        {
+            if(typeMusic == "music")
+            {
+                startAt = 19;
+                endAt = 75;
+            }
+            else if(typeMusic == "wmusic")
+            {
+                startAt = 0;
+                endAt = 15;
+            }
+            
+            if(typeMusic == "smusic")
+            {
+                startAt = 16;
+                specialIdx = 0;
+            }
+            else if(typeMusic == "stmusic")
+            {
+                startAt = 17;
+                specialIdx = 1;
+            }
+            else if(typeMusic == "tmusic")
+            {
+                startAt = 18;
+                specialIdx = 2;
+            }
+            
+            if(typeMusic != "" && !isSpecial)
+            {
+                for(int i = startAt; i < endAt; i++)
+                {
+                    betweenCount = betweenCount + 1;
+                    std::size_t exactChanID = musAliasesList[i].find(alias);
+                    if(exactChanID!=std::string::npos)
+                    {
+                        foundID = i;
+                        break;
+                    }
+                    else
+                    {
+                        foundID = -1;
+                        betweenCount = -1;
+                        break;
+                    }
+                }
+            }
+
+            //Detect out-of-bounds chanID
+            if(betweenCount > 0 && typeMusic == "music" && !isSpecial)
+            {
+                return music_lvl[betweenCount - 1].fullPath;
+            }
+            else if(betweenCount > 0 && isSpecial)
+            {
+                return music_spc[specialIdx].fullPath;
+            }
+            else if(betweenCount > 0 && typeMusic == "wmusic" && !isSpecial)
+            {
+                return music_wld[betweenCount - 1].fullPath;
+            }
+        }
+        return "";
+    }
+    else
+    {
+        return "";
+    }
 }
 
 #endif

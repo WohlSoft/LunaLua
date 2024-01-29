@@ -25,7 +25,7 @@ class PGE_MusPlayer
 {
 public:
     static std::string currentTrack;
-    static Mix_Music* currentMusic();
+    static Mix_Music *currentMusic();
     static void MUS_playMusic();
     static void MUS_playMusicFadeIn(int ms);
     static void MUS_pauseMusic();
@@ -50,6 +50,10 @@ public:
 
     static unsigned __int64 sampleCount();
     static unsigned __int64 MUS_sampleCount();
+
+    static void setOverrideForMusicAlias(const std::string& alias, std::string chunk);
+    static std::string getMusicForAlias(const std::string& alias, int type);
+    static bool playOverrideForMusicAlias(const std::string& alias);
 
 private:
     static void MUS_StartDeferring();
@@ -83,6 +87,12 @@ private:
     static std::atomic<unsigned __int64> sCount;
     static std::atomic<unsigned __int64> musSCount;
     static void postMixCallback(void *udata, Uint8 *stream, int len);
+
+    struct MusicOverrideSettings {
+        std::string fullPath;
+    };
+    static bool overrideArrayIsUsed;
+    static std::map<std::string, MusicOverrideSettings > overrideSettings;
 };
 
 
