@@ -55,10 +55,13 @@ public:
         Chunk
     };
     static void initAudioEngine();
+    static void setMusicAlias(std::string alias);
+    static void setSfxAlias(std::string alias);
     static void rebuildSoundCache();
     static void addSound(std::string alias, std::string fileName);
     static void close();
     static void play(std::string alias); //Chunk will be played once, stream will be played with loop
+    static void update();
     static void pause();
     static void stop(std::string alias);
     static void setVolume(int _volume);
@@ -75,15 +78,26 @@ public:
     static void resetSeizes();
     static void setSeized(int section, bool state);
     static void setCurrentSection(int section);
+    static std::string getCurrentMusic();
+    static int getCurrentSfx();
     
     static std::string getMusicForAlias(const std::string& alias, int type);
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
+
+    static bool setToChangeMusicAlias;
+
+    static std::string curMusicAlias; //Current music alias
+    static int currentMusicID; //Currently playing music ID
+    
+    static std::string curSfxAlias; //Current SFX alias
+    static int currentSfxID; //Currently playing SFX ID. 0 is nothing is playing
 
 private:
     static std::unordered_map<std::string, musicFile > registredFiles;
     static std::unordered_map<std::string, chunkFile > chunksBuffer;
 
     static std::string curRoot;//Current rood directory (episode or application dir)
+    static int sfxTimer;
 
     //Musics
     static MusicEntry music_lvl[57];

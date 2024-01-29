@@ -102,6 +102,14 @@ std::string MusicManager::defaultMusINI="";
 
 std::string MusicManager::curRoot="";
 
+bool MusicManager::setToChangeMusicAlias = false;
+std::string MusicManager::curMusicAlias = "";
+int MusicManager::currentMusicID = -1;
+
+std::string MusicManager::curSfxAlias = "";
+int MusicManager::currentSfxID = 0;
+int MusicManager::sfxTimer = 0;
+
 
 void MusicManager::initAudioEngine()
 {
@@ -116,6 +124,16 @@ void MusicManager::initAudioEngine()
         loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
         rebuildSoundCache();
     }
+}
+
+void MusicManager::setMusicAlias(std::string alias)
+{
+    curMusicAlias = alias;
+}
+
+void MusicManager::setSfxAlias(std::string alias)
+{
+    curSfxAlias = alias;
 }
 
 
@@ -240,23 +258,33 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
             if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
             {
                 //Play it!
+                setSfxAlias(alias);
+                currentSfxID = chanID;
+                sfxTimer = 1;
                 sounds[chanID].play();
             }
         }
     } else {
         if (!seizedSections[curSection])
         {
+            if(!setToChangeMusicAlias)
+            {
+                setMusicAlias(alias);
+            }
             if(alias=="smusic") {
+                currentMusicID = 1;
                 if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
                 {
                     music_spc[0].play();
                 }
             } else if(alias=="stmusic") {
+                currentMusicID = 2;
                 if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
                 {
                     music_spc[1].play();
                 }
             } else if(alias=="tmusic") {
+                currentMusicID = 3;
                 if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
                 {
                     music_spc[2].play();
@@ -264,6 +292,7 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
             } else if(alias.substr(0, 6) == "wmusic") {
                 std::string musIDs = alias.substr(6);
                 int musID = std::atoi(musIDs.c_str()) - 1;
+                currentMusicID = musID;
                 if(musID>=0 && musID<16)
                 {
                     if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
@@ -274,6 +303,7 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
             } else if(alias.substr(0, 5) == "music") {
                 std::string musIDs = alias.substr(5);
                 int musID = std::atoi(musIDs.c_str()) - 1;
+                currentMusicID = musID;
                 if(musID>=0 && musID<57)
                 {
                     if(!PGE_MusPlayer::playOverrideForMusicAlias(alias))
@@ -322,7 +352,101 @@ void MusicManager::stop(std::string alias)
         if(!seizedSections[curSection])
         {
             PGE_MusPlayer::MUS_stopMusic();
+            currentMusicID = 0;
             pausedNatively = false;
+        }
+    }
+}
+
+std::string MusicManager::getCurrentMusic()
+{
+    bool isSpecial = (curMusicAlias == "smusic" || curMusicAlias == "stmusic" || curMusicAlias == "tmusic");
+    bool isLevel = (curMusicAlias.substr(0, 5) == "music");
+    bool isOverworld = (curMusicAlias.substr(0, 6) == "wmusic");
+
+    if(isSpecial)
+    {
+        return music_spc[currentMusicID].fullPath;
+    }
+    else if(isOverworld)
+    {
+        return music_wld[currentMusicID].fullPath;
+    }
+    else if(isLevel)
+    {
+        return music_lvl[currentMusicID].fullPath;
+    }
+    else
+    {
+        return "";
+    }
+}
+
+int MusicManager::getCurrentSfx()
+{
+    return currentSfxID;
+}
+
+void MusicManager::update()
+{
+    bool isChunk = curSfxAlias.substr(0, 5) == "sound";
+    if(isChunk && currentSfxID > 0)
+    {
+        if(sfxTimer > 0)
+        {
+            sfxTimer--;
+        }
+        if(sfxTimer == 0)
+        {
+            currentSfxID = 0;
+            curSfxAlias = "";
+        }
+    }
+    if(setToChangeMusicAlias)
+    {
+        if (!seizedSections[curSection])
+        {
+            int substrateCount = 0;
+            std::string chanIDs = "";
+            int chanID = 0;
+
+            bool isSpecial = (curMusicAlias == "smusic" || curMusicAlias == "stmusic" || curMusicAlias == "tmusic");
+            bool isLevel = (curMusicAlias.substr(0, 5) == "music");
+            bool isOverworld = (curMusicAlias.substr(0, 6) == "wmusic");
+
+            if(isLevel)
+            {
+                // get the music ID
+                substrateCount = 5;
+                chanIDs = curMusicAlias.substr(substrateCount);
+                chanID = std::atoi(chanIDs.c_str()) - 1;
+            }
+            else if(isOverworld)
+            {
+                // get the world ID
+                substrateCount = 6;
+
+                chanIDs = curMusicAlias.substr(substrateCount);
+                chanID = std::atoi(chanIDs.c_str()) - 1;
+            }
+            else
+            {
+                // restart the music regardless of section
+                stop(curMusicAlias);
+                play(curMusicAlias);
+                setToChangeMusicAlias = false;
+            }
+            
+            if(!isSpecial)
+            {
+                // restart the music that is currently being played
+                if(chanID == currentMusicID)
+                {
+                    stop(curMusicAlias);
+                    play(curMusicAlias);
+                    setToChangeMusicAlias = false;
+                }
+            }
         }
     }
 }

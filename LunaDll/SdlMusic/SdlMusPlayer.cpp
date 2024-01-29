@@ -192,6 +192,20 @@ void PGE_MusPlayer::MUS_rewindMusic()
     return Mix_RewindMusic();
 }
 
+std::string PGE_MusPlayer::MUS_get()
+{
+    if (overrideArrayIsUsed)
+    {
+        std::string alias = MusicManager::curMusicAlias;
+        auto it = overrideSettings.find(alias);
+        if (it != overrideSettings.end() && it->second.fullPath != "")
+        {
+            return it->second.fullPath;
+        }
+    }
+    return MusicManager::getCurrentMusic();
+}
+
 void PGE_MusPlayer::MUS_pauseMusic()
 {
     if(!PGE_SDL_Manager::isInit) return;
@@ -467,6 +481,7 @@ void PGE_MusPlayer::setOverrideForMusicAlias(const std::string& alias, std::stri
     settings.fullPath = chunk;
     overrideSettings[alias] = settings;
     overrideArrayIsUsed=true;
+    MusicManager::setToChangeMusicAlias = true;
 }
 
 std::string PGE_MusPlayer::getMusicForAlias(const std::string& alias, int type)
@@ -485,7 +500,7 @@ std::string PGE_MusPlayer::getMusicForAlias(const std::string& alias, int type)
 bool PGE_MusPlayer::playOverrideForMusicAlias(const std::string& alias)
 {
     if(!overrideArrayIsUsed)
-        return false;//Don't wait if overriding array is empty
+        return false; //Don't wait if overriding array is empty
 
     auto it = overrideSettings.find(alias);
     if (it != overrideSettings.end())
@@ -561,6 +576,11 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
     }
 
     return chunk;
+}
+
+int PGE_Sounds::SND_Get()
+{
+    return MusicManager::getCurrentSfx();
 }
 
 void PGE_Sounds::holdCached(bool isWorld)

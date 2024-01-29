@@ -291,6 +291,7 @@ int TestFunc()
     }
 
     Blocks::DoSortingIfRequired();
+
     return 0;
 }
 

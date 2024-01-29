@@ -37,6 +37,7 @@ public:
     static std::string MUS_MusicArtistTag();
     static std::string MUS_MusicAlbumTag();
     static std::string MUS_MusicCopyrightTag();
+    static std::string MUS_get();
 
     static void MUS_changeVolume(int vlm);
     static void MUS_openFile(const char *musFile);
@@ -103,6 +104,7 @@ private:
 public:
     static const char* SND_getLastError() { return lastError.c_str(); }
     static bool SND_PlaySnd(const char *sndFile);
+    static int SND_Get();
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
     static void holdCached(bool isWorld);

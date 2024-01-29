@@ -227,6 +227,15 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
+std::string LuaProxy::Audio::MusicGet()
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_get();
+#else
+    return "";
+#endif
+}
+
 
 
 void LuaProxy::Audio::seizeStream(int section)
@@ -589,6 +598,11 @@ bool LuaProxy::Audio::__getMuteForAlias(const std::string& alias)
 #else
     return false;
 #endif
+}
+
+int LuaProxy::Audio::SfxGet()
+{
+    return PGE_Sounds::SND_Get();
 }
 
 // Mutex for making sure this is safely handled
