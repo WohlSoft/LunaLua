@@ -52,6 +52,9 @@ void SetupThunRTMainHook()
     DWORD oldprotect;
     VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READ, &oldprotect);
 
+    // Try to opt into DEP for this process
+    SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
+
     // Set up hook that will launch LunaDLLInit
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
 }
