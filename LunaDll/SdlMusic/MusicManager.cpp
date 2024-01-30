@@ -106,11 +106,6 @@ bool MusicManager::setToChangeMusicAlias = false;
 std::string MusicManager::curMusicAlias = "";
 int MusicManager::currentMusicID = -1;
 
-std::string MusicManager::curSfxAlias = "";
-int MusicManager::currentSfxID = 0;
-int MusicManager::sfxTimer = 0;
-std::string MusicManager::currentSfxPath = "";
-
 
 void MusicManager::initAudioEngine()
 {
@@ -130,11 +125,6 @@ void MusicManager::initAudioEngine()
 void MusicManager::setMusicAlias(std::string alias)
 {
     curMusicAlias = alias;
-}
-
-void MusicManager::setSfxAlias(std::string alias)
-{
-    curSfxAlias = alias;
 }
 
 
@@ -263,18 +253,7 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
                 if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
                 {
                     //Play it!
-                    setSfxAlias(alias);
-                    currentSfxID = realID;
-                    currentSfxPath = sounds[chanID].fullPath;
-                    sfxTimer = 2;
                     sounds[chanID].play();
-                }
-                else
-                {
-                    setSfxAlias(alias);
-                    currentSfxID = realID;
-                    currentSfxPath = sounds[chanID].fullPath;
-                    sfxTimer = 2;
                 }
             }
         }
@@ -396,32 +375,8 @@ std::string MusicManager::getCurrentMusic()
     }
 }
 
-int MusicManager::getCurrentSfxID()
-{
-    return currentSfxID;
-}
-
-std::string MusicManager::getCurrentSfxPath()
-{
-    return currentSfxPath;
-}
-
 void MusicManager::update()
 {
-    bool isChunk = curSfxAlias.substr(0, 5) == "sound";
-    if(isChunk && currentSfxID > 0)
-    {
-        if(sfxTimer > 0)
-        {
-            sfxTimer--;
-        }
-        if(sfxTimer == 0)
-        {
-            currentSfxID = 0;
-            currentSfxPath = "";
-            curSfxAlias = "";
-        }
-    }
     if(setToChangeMusicAlias)
     {
         if (!seizedSections[curSection])

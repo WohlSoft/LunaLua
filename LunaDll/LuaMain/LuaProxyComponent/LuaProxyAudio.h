@@ -103,9 +103,6 @@ namespace LuaProxy
         Mix_Chunk* __getChunkForAlias(const std::string& alias);
         void __setMuteForAlias(const std::string& alias, bool muted);
         bool __getMuteForAlias(const std::string& alias);
-        
-        int SfxGet();
-        std::string SfxGetPath();
 
         class PlayingSfxInstance {
         private:

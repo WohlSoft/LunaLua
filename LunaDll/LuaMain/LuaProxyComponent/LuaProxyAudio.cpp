@@ -601,16 +601,6 @@ bool LuaProxy::Audio::__getMuteForAlias(const std::string& alias)
 #endif
 }
 
-int LuaProxy::Audio::SfxGet()
-{
-    return PGE_Sounds::SND_Get();
-}
-
-std::string LuaProxy::Audio::SfxGetPath()
-{
-    return PGE_Sounds::SND_GetPath();
-}
-
 // Mutex for making sure this is safely handled
 static std::mutex g_SfxPlayObjMutex;
 

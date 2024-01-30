@@ -578,16 +578,6 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
     return chunk;
 }
 
-int PGE_Sounds::SND_Get()
-{
-    return MusicManager::getCurrentSfxID();
-}
-
-std::string PGE_Sounds::SND_GetPath()
-{
-    return MusicManager::getCurrentSfxPath();
-}
-
 void PGE_Sounds::holdCached(bool isWorld)
 {
     g_chunkCache.hold(isWorld);
