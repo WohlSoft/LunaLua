@@ -12,6 +12,8 @@
 #include <string>
 #include <atomic>
 
+#include "../Misc/ResourceFileMapper.h"
+
 class PGE_SDL_Manager
 {
 public:

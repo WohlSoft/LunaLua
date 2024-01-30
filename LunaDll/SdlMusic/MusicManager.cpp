@@ -91,34 +91,10 @@ void MusicEntry::play()
 CustomSoundEntry::CustomSoundEntry()
 {
     fullPath = "";
-    chunk = nullptr;
 }
 
 CustomSoundEntry::~CustomSoundEntry()
-{
-    if (chunk)
-    {
-        PGE_Sounds::memUsage -= chunk->alen;
-        Mix_FreeChunk(chunk);
-    }
-    chunk = nullptr;
-}
-
-void CustomSoundEntry::setChunk(Mix_Chunk* chunkDraft)
-{
-    if(chunkDraft)
-    {
-        chunk = chunkDraft;
-    }
-}
-
-Mix_Chunk* CustomSoundEntry::getChunk()
-{
-    if(chunk)
-    {
-        return chunk;
-    }
-}
+{}
 
 void CustomSoundEntry::setPath(std::string path)
 {
@@ -153,7 +129,7 @@ int MusicManager::currentSfxID = 0;
 int MusicManager::sfxTimer = 0;
 
 int MusicManager::fullCustomSFXCount = 0;
-CustomSoundEntry* MusicManager::custom_sfxs = NULL;
+CustomSoundEntry MusicManager::custom_sfxs[10];
 
 
 void MusicManager::initAudioEngine()

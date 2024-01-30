@@ -527,7 +527,7 @@ bool PGE_MusPlayer::playOverrideForMusicAlias(const std::string& alias)
 std::string PGE_Sounds::lastError = "";
 char *PGE_Sounds::current = "";
 
-static CachedFileDataWeakPtr<PGE_Sounds::ChunkStorage> g_chunkCache;
+CachedFileDataWeakPtr<PGE_Sounds::ChunkStorage> g_chunkCache;
 static std::unordered_set<std::shared_ptr<PGE_Sounds::ChunkStorage>> g_chunkStorage;
 bool PGE_Sounds::overrideArrayIsUsed=false;
 std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
@@ -575,16 +575,13 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
         PGE_Sounds::lastError += filePath;
     }
     
-    if (chunk != nullptr && gOnStartRan)
+    if(!filePath.empty())
     {
-        if(MusicManager::fullCustomSFXCount > 500 && MusicManager::custom_sfxs != NULL)
+        if(MusicManager::fullCustomSFXCount > 10)
         {
-            delete[] MusicManager::custom_sfxs;
             MusicManager::fullCustomSFXCount = 0;
         }
-        MusicManager::custom_sfxs = new CustomSoundEntry[MusicManager::fullCustomSFXCount];
         MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].setPath(filePath);
-        MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].setChunk(chunk);
         MusicManager::fullCustomSFXCount++;
     }
 
@@ -674,9 +671,17 @@ bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
 
         for(int i = 0; i < MusicManager::fullCustomSFXCount; i++)
         {
-            if(MusicManager::custom_sfxs[i].chunk == it->second.chunk)
+            Mix_Chunk* checkedChunk = nullptr;
+            checkedChunk = Mix_LoadWAV( MusicManager::custom_sfxs[i].fullPath.c_str() );
+
+            if(checkedChunk == it->second.chunk)
             {
-                fullPath = MusicManager::custom_sfxs[i].fullPath;
+                Mix_FreeChunk(checkedChunk);
+                fullPath = MusicManager::custom_sfxs[i].getPath();
+            }
+            else
+            {
+                Mix_FreeChunk(checkedChunk);
             }
         }
 

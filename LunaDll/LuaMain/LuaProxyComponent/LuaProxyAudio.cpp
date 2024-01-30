@@ -9,6 +9,7 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/Sound.h"
+#include "../../Misc/ResourceFileMapper.h"
 
 #include <memory>
 #include <mutex>
@@ -381,10 +382,17 @@ static bool createSFXStartLuaEventFromChunk(Mix_Chunk *chunk)
 {
     for(int i = 0; i < MusicManager::fullCustomSFXCount; i++)
     {
-        Mix_Chunk* checkedChunk = MusicManager::custom_sfxs[i].getChunk();
+        Mix_Chunk* checkedChunk = nullptr;
+        checkedChunk = Mix_LoadWAV( MusicManager::custom_sfxs[i].fullPath.c_str() );
+
         if(checkedChunk == chunk)
         {
+            Mix_FreeChunk(checkedChunk);
             return createSFXStartLuaEvent(-1, MusicManager::custom_sfxs[i].getPath());
+        }
+        else
+        {
+            Mix_FreeChunk(checkedChunk);
         }
     }
     return false;

@@ -52,12 +52,9 @@ struct CustomSoundEntry
     ~CustomSoundEntry();
     
     void setPath(std::string path);
-    void setChunk(Mix_Chunk* chunkDraft);
-    Mix_Chunk* getChunk();
     std::string getPath();
 
     std::string fullPath;
-    Mix_Chunk* chunk;
 };
 
 class MusicManager
@@ -108,7 +105,7 @@ public:
     static int sfxTimer; //Used for getting the SFX before clearing it out
     
     static int fullCustomSFXCount;
-    static CustomSoundEntry *custom_sfxs;
+    static CustomSoundEntry custom_sfxs[10];
 
 private:
     static std::unordered_map<std::string, musicFile > registredFiles;
