@@ -88,24 +88,6 @@ void MusicEntry::play()
     PGE_MusPlayer::MUS_playMusic();
 }
 
-CustomSoundEntry::CustomSoundEntry()
-{
-    fullPath = "";
-}
-
-CustomSoundEntry::~CustomSoundEntry()
-{}
-
-void CustomSoundEntry::setPath(std::string path)
-{
-    fullPath = path;
-}
-
-std::string CustomSoundEntry::getPath()
-{
-    return fullPath;
-}
-
 
 ChunkEntry MusicManager::sounds[91];
 MusicEntry MusicManager::music_lvl[57];
@@ -127,9 +109,7 @@ int MusicManager::currentMusicID = -1;
 std::string MusicManager::curSfxAlias = "";
 int MusicManager::currentSfxID = 0;
 int MusicManager::sfxTimer = 0;
-
-int MusicManager::fullCustomSFXCount = 0;
-CustomSoundEntry MusicManager::custom_sfxs[10];
+std::string MusicManager::currentSfxPath = "";
 
 
 void MusicManager::initAudioEngine()
@@ -278,21 +258,29 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
         {
             if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
             {
-                bool cancelled = createSFXStartLuaEvent(chanID, sounds[chanID].fullPath);
-                if(!cancelled)
+                int realID = chanID + 1;
+                bool isCancelled = createSFXStartLuaEvent(realID, sounds[chanID].fullPath);
+                if(!isCancelled)
                 {
                     //Play it!
                     setSfxAlias(alias);
-                    currentSfxID = chanID;
+                    currentSfxID = chanID + 1;
+                    currentSfxPath = sounds[chanID].fullPath;
                     sfxTimer = 2;
                     sounds[chanID].play();
                 }
             }
             else
             {
-                setSfxAlias(alias);
-                currentSfxID = chanID;
-                sfxTimer = 2;
+                int realID = chanID + 1;
+                bool isCancelled = createSFXStartLuaEvent(realID, sounds[chanID].fullPath);
+                if(!isCancelled)
+                {
+                    setSfxAlias(alias);
+                    currentSfxID = chanID + 1;
+                    currentSfxPath = sounds[chanID].fullPath;
+                    sfxTimer = 2;
+                }
             }
         }
     } else {
@@ -413,9 +401,14 @@ std::string MusicManager::getCurrentMusic()
     }
 }
 
-int MusicManager::getCurrentSfx()
+int MusicManager::getCurrentSfxID()
 {
     return currentSfxID;
+}
+
+std::string MusicManager::getCurrentSfxPath()
+{
+    return currentSfxPath;
 }
 
 void MusicManager::update()
@@ -430,6 +423,7 @@ void MusicManager::update()
         if(sfxTimer == 0)
         {
             currentSfxID = 0;
+            currentSfxPath = "";
             curSfxAlias = "";
         }
     }

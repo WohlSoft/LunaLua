@@ -46,17 +46,6 @@ struct MusicEntry
     std::string fullPath;
 };
 
-struct CustomSoundEntry
-{
-    CustomSoundEntry();
-    ~CustomSoundEntry();
-    
-    void setPath(std::string path);
-    std::string getPath();
-
-    std::string fullPath;
-};
-
 class MusicManager
 {
 public:
@@ -90,7 +79,8 @@ public:
     static void setSeized(int section, bool state);
     static void setCurrentSection(int section);
     static std::string getCurrentMusic();
-    static int getCurrentSfx();
+    static int getCurrentSfxID();
+    static std::string getCurrentSfxPath();
     
     static std::string getMusicForAlias(const std::string& alias, int type);
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
@@ -102,10 +92,8 @@ public:
     
     static std::string curSfxAlias; //Current SFX alias
     static int currentSfxID; //Currently playing SFX ID. 0 is nothing is playing
+    static std::string currentSfxPath; //Currently playing SFX Path. Blank string is nothing is playing
     static int sfxTimer; //Used for getting the SFX before clearing it out
-    
-    static int fullCustomSFXCount;
-    static CustomSoundEntry custom_sfxs[10];
 
 private:
     static std::unordered_map<std::string, musicFile > registredFiles;

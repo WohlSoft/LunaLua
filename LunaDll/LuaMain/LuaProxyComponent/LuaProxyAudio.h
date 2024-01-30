@@ -105,6 +105,7 @@ namespace LuaProxy
         bool __getMuteForAlias(const std::string& alias);
         
         int SfxGet();
+        std::string SfxGetPath();
 
         class PlayingSfxInstance {
         private:

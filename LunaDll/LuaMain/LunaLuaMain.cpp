@@ -921,6 +921,7 @@ void CLunaLua::bindAll()
                 def("SfxIsFading", (int(*)(int))&LuaProxy::Audio::SfxIsFading),
                 def("SfxVolume", (int(*)(int, int))&LuaProxy::Audio::SfxVolume),
                 def("SfxGet", (int(*)())&LuaProxy::Audio::SfxGet),
+                def("SfxGetPath", (std::string(*)())&LuaProxy::Audio::SfxGetPath),
 
                 def("SfxSetPanning", (int(*)(int, int, int))&LuaProxy::Audio::SfxSetPanning),
                 def("SfxSetDistance", (int(*)(int, int))&LuaProxy::Audio::SfxSetDistance),

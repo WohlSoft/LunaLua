@@ -527,7 +527,7 @@ bool PGE_MusPlayer::playOverrideForMusicAlias(const std::string& alias)
 std::string PGE_Sounds::lastError = "";
 char *PGE_Sounds::current = "";
 
-CachedFileDataWeakPtr<PGE_Sounds::ChunkStorage> g_chunkCache;
+static CachedFileDataWeakPtr<PGE_Sounds::ChunkStorage> g_chunkCache;
 static std::unordered_set<std::shared_ptr<PGE_Sounds::ChunkStorage>> g_chunkStorage;
 bool PGE_Sounds::overrideArrayIsUsed=false;
 std::map<std::string, PGE_Sounds::ChunkOverrideSettings > PGE_Sounds::overrideSettings;
@@ -574,23 +574,18 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
         PGE_Sounds::lastError = "Could not read ";
         PGE_Sounds::lastError += filePath;
     }
-    
-    if(!filePath.empty())
-    {
-        if(MusicManager::fullCustomSFXCount > 10)
-        {
-            MusicManager::fullCustomSFXCount = 0;
-        }
-        MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].setPath(filePath);
-        MusicManager::fullCustomSFXCount++;
-    }
 
     return chunk;
 }
 
 int PGE_Sounds::SND_Get()
 {
-    return MusicManager::getCurrentSfx();
+    return MusicManager::getCurrentSfxID();
+}
+
+std::string PGE_Sounds::SND_GetPath()
+{
+    return MusicManager::getCurrentSfxPath();
 }
 
 void PGE_Sounds::holdCached(bool isWorld)
@@ -667,40 +662,14 @@ bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
         if (it->second.muted) return true;
         if (it->second.chunk == nullptr) return false;
 
-        std::string fullPath = "";
-
-        for(int i = 0; i < MusicManager::fullCustomSFXCount; i++)
+        if (ch != -1)
+            Mix_HaltChannel(ch);
+        if (Mix_PlayChannelTimedVolume(ch, it->second.chunk, 0, -1, MIX_MAX_VOLUME) == -1)
         {
-            Mix_Chunk* checkedChunk = nullptr;
-            checkedChunk = Mix_LoadWAV( MusicManager::custom_sfxs[i].fullPath.c_str() );
-
-            if(checkedChunk == it->second.chunk)
-            {
-                Mix_FreeChunk(checkedChunk);
-                fullPath = MusicManager::custom_sfxs[i].getPath();
-            }
-            else
-            {
-                Mix_FreeChunk(checkedChunk);
-            }
+            if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
+                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
         }
-
-        bool cancelled = createSFXStartLuaEvent(ch, fullPath);
-        if(!cancelled)
-        {
-            if (ch != -1)
-                Mix_HaltChannel(ch);
-            if (Mix_PlayChannelTimedVolume(ch, it->second.chunk, 0, -1, MIX_MAX_VOLUME) == -1)
-            {
-                if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-                    MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
-            }
-            return true;
-        }
-        else
-        {
-            return true;
-        }
+        return true;
     }
     return false;
 }

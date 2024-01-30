@@ -107,6 +107,7 @@ public:
     static const char* SND_getLastError() { return lastError.c_str(); }
     static bool SND_PlaySnd(const char *sndFile);
     static int SND_Get();
+    static std::string SND_GetPath();
     static void clearSoundBuffer();
     static Mix_Chunk *SND_OpenSnd(const char *sndFile);
     static void holdCached(bool isWorld);
