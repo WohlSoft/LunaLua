@@ -381,11 +381,13 @@ static bool createSFXStartLuaEventFromChunk(Mix_Chunk *chunk)
 {
     for(int i = 0; i < MusicManager::fullCustomSFXCount; i++)
     {
-        if(MusicManager::custom_sfxs[i].chunk == chunk)
+        Mix_Chunk* checkedChunk = MusicManager::custom_sfxs[i].getChunk();
+        if(checkedChunk == chunk)
         {
-            return createSFXStartLuaEvent(-1, MusicManager::custom_sfxs[i].fullPath);
+            return createSFXStartLuaEvent(-1, MusicManager::custom_sfxs[i].getPath());
         }
     }
+    return false;
 }
 
 
@@ -421,15 +423,6 @@ Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
         // If error, pass to Lua
         luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
     }
-    
-    MusicManager::fullCustomSFXCount = MusicManager::fullCustomSFXCount + 1;
-    if(MusicManager::fullCustomSFXCount > MAX_SAVED_CUSTOM_SOUNDS)
-    {
-        delete[] MusicManager::custom_sfxs;
-    }
-    MusicManager::custom_sfxs = new CustomSoundEntry[MusicManager::fullCustomSFXCount];
-    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].fullPath = (std::string)filename;
-    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].chunk = chunk;
     
     return chunk;
 }

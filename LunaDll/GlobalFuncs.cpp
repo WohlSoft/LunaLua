@@ -1084,8 +1084,9 @@ bool createSFXStartLuaEvent(int id, std::string path)
 {
     bool isCancelled = false;
 
-    if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> SFXStartEvent = std::make_shared<Event>("onSFXStart", false);
+    if (gLunaLua.isValid())
+    {
+        std::shared_ptr<Event> SFXStartEvent = std::make_shared<Event>("onSFXStart", true);
         SFXStartEvent->setDirectEventName("onSFXStart");
         SFXStartEvent->setLoopable(false);
         gLunaLua.callEvent(SFXStartEvent, id, path);

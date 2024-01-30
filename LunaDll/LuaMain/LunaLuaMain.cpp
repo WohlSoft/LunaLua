@@ -151,6 +151,7 @@ bool CLunaLua::shutdown()
 
     m_ready = false;
     m_onStartRan = false;
+    gOnStartRan = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -1531,6 +1532,7 @@ void CLunaLua::triggerOnStart()
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
         m_onStartRan = true;
+        gOnStartRan = true;
         callEvent(onStartEvent);
     }
 }

@@ -14,7 +14,7 @@ extern const char* GAME_ENGINE;
 #define COMPILE_PLAYGROUND  0 //See Misc/Playground.cpp
 #define COMBOOL(b) (b ? -1 : 0)
 
-#define MAX_SAVED_CUSTOM_SOUNDS   5000
+#define MAX_SAVED_CUSTOM_SOUNDS   500
 
 enum FIELDTYPE {
     FT_INVALID = 0,

@@ -50,6 +50,11 @@ struct CustomSoundEntry
 {
     CustomSoundEntry();
     ~CustomSoundEntry();
+    
+    void setPath(std::string path);
+    void setChunk(Mix_Chunk* chunkDraft);
+    Mix_Chunk* getChunk();
+    std::string getPath();
 
     std::string fullPath;
     Mix_Chunk* chunk;

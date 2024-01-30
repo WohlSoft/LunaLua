@@ -575,14 +575,18 @@ Mix_Chunk *PGE_Sounds::SND_OpenSnd(const char *sndFile)
         PGE_Sounds::lastError += filePath;
     }
     
-    MusicManager::fullCustomSFXCount = MusicManager::fullCustomSFXCount + 1;
-    if(MusicManager::fullCustomSFXCount > MAX_SAVED_CUSTOM_SOUNDS)
+    if (chunk != nullptr && gOnStartRan)
     {
-        delete[] MusicManager::custom_sfxs;
+        if(MusicManager::fullCustomSFXCount > 500 && MusicManager::custom_sfxs != NULL)
+        {
+            delete[] MusicManager::custom_sfxs;
+            MusicManager::fullCustomSFXCount = 0;
+        }
+        MusicManager::custom_sfxs = new CustomSoundEntry[MusicManager::fullCustomSFXCount];
+        MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].setPath(filePath);
+        MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].setChunk(chunk);
+        MusicManager::fullCustomSFXCount++;
     }
-    MusicManager::custom_sfxs = new CustomSoundEntry[MusicManager::fullCustomSFXCount];
-    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].fullPath = filePath;
-    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].chunk = chunk;
 
     return chunk;
 }
