@@ -178,8 +178,9 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
         gCachedFileMetadata.purge();
     }
     
-    // make a worldName string
+    // make a worldName string and VB6StrPtr
     std::string worldNameS = "";
+    VB6StrPtr worldNameVB6 = worldNameS;
     
     // make an idx int variable
     int externalEpisodeIdx = 0;
@@ -199,7 +200,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 
         // make the episode name the episode's actual name
         worldNameS = wldData.EpisodeTitle;
-        VB6StrPtr worldNameVB6 = worldNameS;
+        worldNameVB6 = worldNameS;
 
         // this code, from here, sets the new episode
         externalEpisodeIdx = episodeMainFunc.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, true);
@@ -223,7 +224,16 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // specify the menu level
     if(!externalEpisode)
     {
-        GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(fullPathS); // this NEEDS to be set, otherwise the engine will just crash loading the episode
+        if(GM_EP_LIST_COUNT < 100)
+        {
+            GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(fullPathS); // this NEEDS to be set, otherwise the engine will just crash loading the episode
+        }
+        else
+        {
+            int additionalEpIdx = 0;
+            additionalEpIdx = episodeMainFunc.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, false);
+            GM_CUR_MENULEVEL = additionalEpIdx;
+        }
     }
     else if(externalEpisode)
     {
