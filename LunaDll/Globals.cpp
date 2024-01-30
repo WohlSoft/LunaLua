@@ -28,6 +28,7 @@ SMBXHUDSettings gSMBXHUDSettings = {
 bool gRenderBGOFlag = true;
 bool gRenderSizableFlag = true;
 bool gRenderBackgroundFlag = true;
+bool gOnStartRan = false;
 
 // Settings for glitch fixes
 bool gDisablePlayerFilterBounceFix = false;

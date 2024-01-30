@@ -281,3 +281,4 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 #endif
 
 std::string GetEditorPlacedItem();
+bool createSFXStartLuaEvent(int id, std::string path);

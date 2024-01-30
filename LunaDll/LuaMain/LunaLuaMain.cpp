@@ -151,6 +151,7 @@ bool CLunaLua::shutdown()
 
     m_ready = false;
     m_onStartRan = false;
+    gOnStartRan = false;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -891,6 +892,10 @@ void CLunaLua::bindAll()
                 def("MusicGetTempo", (double(*)())&LuaProxy::Audio::MusicGetTempo),
                 def("MusicGetPitch", (double(*)())&LuaProxy::Audio::MusicGetPitch),
                 def("MusicGetSpeed", (double(*)())&LuaProxy::Audio::MusicGetSpeed),
+                def("MusicGet", (std::string(*)())&LuaProxy::Audio::MusicGet),
+
+                def("__setOverrideForMusicAlias", LuaProxy::Audio::__setOverrideForMusicAlias),
+                def("__getMusicForAlias", LuaProxy::Audio::__getMusicForAlias),
 
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
@@ -1526,6 +1531,7 @@ void CLunaLua::triggerOnStart()
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
         m_onStartRan = true;
+        gOnStartRan = true;
         callEvent(onStartEvent);
     }
 }

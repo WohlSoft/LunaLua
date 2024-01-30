@@ -9,6 +9,7 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/Sound.h"
+#include "../../Misc/ResourceFileMapper.h"
 
 #include <memory>
 #include <mutex>
@@ -227,6 +228,15 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
+std::string LuaProxy::Audio::MusicGet()
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::MUS_get();
+#else
+    return "";
+#endif
+}
+
 
 
 void LuaProxy::Audio::seizeStream(int section)
@@ -345,6 +355,22 @@ Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
     return NULL;
 }
 
+void LuaProxy::Audio::__setOverrideForMusicAlias(const std::string& alias, std::string chunk)
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::setOverrideForMusicAlias(alias, chunk);
+#endif
+}
+
+std::string LuaProxy::Audio::__getMusicForAlias(const std::string& alias, int type)
+{
+#ifndef NO_SDL
+    return PGE_MusPlayer::getMusicForAlias(alias, type);
+#else
+    return "";
+#endif
+}
+
 
 
 void LuaProxy::Audio::clearSFXBuffer()
@@ -377,7 +403,7 @@ Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
         // If error, pass to Lua
         luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
     }
-
+    
     return chunk;
 }
 
