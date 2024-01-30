@@ -68,6 +68,7 @@ std::string splitPathFromFilename(std::string str);
 std::string splitFilenameFromPath(std::string str);
 std::string replaceFowardSlashesWithBackSlashes(std::string str);
 bool checkIfWorldIsInAppPath(std::string worldPath);
+bool checkIfWorldIsInWorldPath(std::string worldPath);
 
 extern void removeFilePathW(std::wstring &path);
 extern void removeFilePathW(wchar_t*path, int length);

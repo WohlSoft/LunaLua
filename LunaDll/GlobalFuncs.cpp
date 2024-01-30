@@ -731,14 +731,12 @@ std::string resolveIfNotAbsolutePath(std::string filename) {
 
 std::string splitPathFromFilename(std::string str)
 {
-    replaceSubStr(str, "/", "\\");
     std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
     return finalStr;
 }
 
 std::string splitFilenameFromPath(std::string str)
 {
-    replaceSubStr(str, "/", "\\");
     std::string finalStr = str.substr(0, str.find_last_of("/\\"));
     return finalStr;
 }
@@ -751,9 +749,21 @@ std::string replaceFowardSlashesWithBackSlashes(std::string str)
 
 bool checkIfWorldIsInAppPath(std::string worldPath)
 {
-    replaceSubStr(worldPath, "/", "\\");
     std::string appPath = WStr2Str(gAppPathWCHAR);
-    if(!worldPath.find(appPath)) // this is apparently backwards for some reason...
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool checkIfWorldIsInWorldPath(std::string worldPath)
+{
+    std::string appPath = WStr2Str(gAppPathWCHAR) + "\\worlds";
+    if(!worldPath.find(appPath))
     {
         return true;
     }
@@ -1142,11 +1152,7 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 
 std::string findEpisodeWorldPathFromName(std::string name)
 {
-    if(name.empty())
-    {
-        return "";
-    }
-    std::string finalWldPath;
+    std::string finalWldPath = "";
     for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
         auto ep = EpisodeListItem::Get(i - 1);
         if(name == std::string(ep->episodeName))
@@ -1154,23 +1160,27 @@ std::string findEpisodeWorldPathFromName(std::string name)
             finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
             break;
         }
+        else
+        {
+            finalWldPath = "";
+        }
     }
     return finalWldPath;
 }
 
 std::string findNameFromEpisodeWorldPath(std::string wldPath)
 {
-    if(wldPath.empty())
-    {
-        return "";
-    }
-    std::string finalName;
+    std::string finalName = "";
     for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
         auto ep = EpisodeListItem::Get(i - 1);
         if(wldPath == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
         {
             finalName = std::string(ep->episodeName);
             break;
+        }
+        else
+        {
+            finalName = "";
         }
     }
     return finalName;

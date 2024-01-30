@@ -8,6 +8,7 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
+#include "../../../Misc/MiscFuncs.h"
 
 #include "../../../SMBXInternal/Reconstructed/EpisodeMain.h"
 #include "../../../FileManager/SMBXFileManager.h"
@@ -262,14 +263,14 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numP
     // We're checking to see if the world path exists, and if it does, we can go through to load the episode
     std::string worldPth = "";
     
-    worldPth = findEpisodeWorldPathFromName(episodeName);
-    if(worldPth != "")
-    {
-        success = true;
-    }
-    else // or it's probably an external wld file, so boot that instead
+    if(fileExists(Str2WStr(episodeName)))
     {
         worldPth = episodeName;
+        success = true;
+    }
+    else
+    {
+        worldPth = findEpisodeWorldPathFromName(episodeName);
         success = true;
     }
 

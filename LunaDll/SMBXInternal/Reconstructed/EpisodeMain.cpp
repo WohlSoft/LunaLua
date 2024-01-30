@@ -57,14 +57,17 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 {
     //--ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then (line 4945)--
 
+    // replace all the forward slashes with backward slashes
+    replaceSubStrW(wldPathWS, L"/", L"\\");
+
     // this is used for the FindSaves function
     EpisodeMain episodeMainFunc;
 
     // this is used for setting up loadEpisode from lua after first booting an episode
     GameAutostart GameAutostartFunc;
 
-    // wstring reference for below
-    std::wstring fullPathWS = resolveCwdOrWorldsPath(wldPathWS);
+    // this needs to be set already so we can convert it to a std::string
+    std::wstring fullPathWS = wldPathWS;
 
     /*
     --
@@ -104,14 +107,16 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
         **visual basic 6 string ptr references**
     
         - world path with world file
+        - world file with no path
         - path with no world file, ending with a slash
     --
     */ 
 
-    VB6StrPtr fullPathVB6 = WStr2Str(fullPathWS);
+    VB6StrPtr fullPathVB6 = fullPathS;
+    VB6StrPtr fullWorldFileNoPthVB6 = fullWorldFileNoPthS;
     VB6StrPtr fullPthNoWorldFileWithEndSlashVB6 = fullPthNoWorldFileWithEndSlashS;
 
-    // FileFormats WorldData, saved for the FindSaves function
+    // FileFormats WorldData, saved for the FindSaves function and the world intro filename
     WorldData wldData;
 
     // create a tempLocation
@@ -121,7 +126,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     bool externalEpisode = false;
 
     // check to see if the wld file is valid, otherwise don't load the entire episode if booting
-    if(fileExists(Str2WStr(fullPthNoWorldFileWithEndSlashS + fullWorldFileNoPthS)))
+    if(fileExists(fullPathWS))
     {
         std::wstring nonAnsiCharsEpisode = GetNonANSICharsFromWStr(fullPathWS);
         if(!nonAnsiCharsEpisode.empty())
@@ -174,44 +179,55 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     }
     
     // make a worldName string
-    std::string worldNameS;
+    std::string worldNameS = "";
+    
+    // make an idx int variable
+    int externalEpisodeIdx = 0;
+
+    // build the episode list
+    SMBXWorldFileBase::PopulateEpisodeList();
     
     // check to see if the episode is external. if so, we'll need to change some things.
-    if(checkIfWorldIsInAppPath(fullPthNoWorldFileS))
+    if(checkIfWorldIsInWorldPath(fullPathS))
     {
         worldNameS = findNameFromEpisodeWorldPath(wldPathS);
     }
     else
     {
+        // toggle this on
         externalEpisode = true;
-        worldNameS = "External Episode";
-        EpisodeListItem* item = EpisodeListItem::Get(0);
 
-        item->episodeName = Str2WStr(worldNameS);
-        item->episodePath = fullPthNoWorldFileWS;
-        item->episodeWorldFile = fullWorldFileNoPthWS;
+        // make the episode name the episode's actual name
+        worldNameS = wldData.EpisodeTitle;
+        VB6StrPtr worldNameVB6 = worldNameS;
+
+        // this code, from here, sets the new episode
+        externalEpisodeIdx = episodeMainFunc.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, true);
     }
 
-    // set GM_FULLPATH, otherwise the Loadscreen won't have write access to the episode we're loading to
-    GM_FULLDIR = fullPthNoWorldFileWithEndSlashVB6; 
+    // reset cheat status
+    GM_CHEATED = COMBOOL(false);
+
+    // reset checkpoints
+    GM_STR_CHECKPOINT = "";
+
+    // set GM_FULLDIR, otherwise the Loadscreen won't have write access to the episode we're loading to
+    GM_FULLDIR = fullPthNoWorldFileWithEndSlashWS;
 
     // show loadscreen
     LunaLoadScreenStart();
 
     // setup SFXs
     native_setupSFX();
-    
-    // specify the save slot
-    SMBXWorldFileBase::PopulateEpisodeList();
 
     // specify the menu level
     if(!externalEpisode)
     {
-        GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPathWS)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
+        GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(fullPathS); // this NEEDS to be set, otherwise the engine will just crash loading the episode
     }
-    else
+    else if(externalEpisode)
     {
-        GM_CUR_MENULEVEL = 0;
+        GM_CUR_MENULEVEL = externalEpisodeIdx;
     }
 
     // clear gamedata
@@ -414,25 +430,20 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     } //--End If (line 5017)--
 
     // init SetupPlayers
-    if(!externalEpisode)
-    {
-        native_initLevelEnv(); //--SetupPlayers (line 5018)--
-    }
+    native_initLevelEnv(); //--SetupPlayers (line 5018)--
 
+    // load the autoboot level if there's no save file, or the hub level if set
     if((GM_WORLD_INTRO_FILENAME != GM_STR_NULL && !saveFileExists()) || (GM_HUB_STYLED_EPISODE == -1)) //--If StartLevel <> "" Then-- (line 5019)
     {
-        // load the autoboot level from the episode if we're starting it for the first time, or the hub level if it's a hub-styled episode
-
-        // make the strings, wstrings, and visual basic 6 string ptr's
+        // make the strings, wstrings, and visual basic 6 string ptr's for the world intro filename
         std::string fullPathAndAutobootLvlS = fullPthNoWorldFileWithEndSlashS + (std::string)GM_WORLD_INTRO_FILENAME;
-
         std::wstring fullPathAndAutobootLvlWS = Str2WStr(fullPathAndAutobootLvlS);
-
         VB6StrPtr fullPathAndAutobootLvlVB6 = fullPathAndAutobootLvlS;
 
         // check to see if the autoboot level exists
-        if(fileExists(fullPathAndAutobootLvlWS))
+        if(fileExists(fullPathAndAutobootLvlS))
         {
+            // load the autoboot level from the episode if we're starting it for the first time, or the hub level if it's a hub-styled episode
             //--PlaySound 28 (line 5020)--
             //--SoundPause(26) = 200 (line 5021)--
             GM_EPISODE_MODE = COMBOOL(false); //--LevelSelect = False (line 5022)--
@@ -448,21 +459,23 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
             native_loadLevel(&fullPathAndAutobootLvlVB6); //--OpenLevel SelectWorld(selWorld).WorldPath & StartLevel (line 5028)
         } //--End If (line 5029)--
         //--Exit Sub (line 5030)--
-        else
+        // if it doesn't exist and there's no hub, error and boot the map instead after clicking "OK"
+        else if(!fileExists(fullPathAndAutobootLvlS) && GM_HUB_STYLED_EPISODE == 0)
         {
             std::wstring path = L"The level autoboot file can not be loaded. Does it even exist?\n\nAutoboot level:\n" + fullPathWS;
             MessageBoxW(0, path.c_str(), L"SMBX could not load the autoboot level", MB_ICONERROR);
 
-            // boot the map instead after clicking "OK"
+            // boot the map
             GM_EPISODE_MODE = COMBOOL(true);
         }
+        // else if it doesn't exist and there IS a hub, error and exit instead after clicking "OK"
+        else if(!fileExists(fullPathAndAutobootLvlS) && GM_HUB_STYLED_EPISODE == -1)
+        {
+            std::wstring path = L"The level hub file can not be loaded. Does it even exist?\n\nAutoboot level:\n" + fullPathWS + L"\n\nBecause there is no hub level, the game will now close after clicking OK. Please put in a valid hub level file in the episode before loading it.";
+            MessageBoxW(0, path.c_str(), L"SMBX could not load the hub level", MB_ICONERROR);
+            _exit(1);
+        }
     }
-
-    // reset cheat status
-    GM_CHEATED = COMBOOL(false);
-
-    // reset checkpoints
-    GM_STR_CHECKPOINT = "";
 
     // make sure that lunadll knows the game loaded on boot, so that loadEpisode can know
     if(!gEpisodeLoadedOnBoot)
@@ -516,7 +529,7 @@ int EpisodeMain::FindSaves(std::string worldPathS, int saveSlot)
         std::wstring saveFileXtraWS = Str2WStr(saveFileXtraS);
 
         // if the .sav file exists, and FileFormats successfully reads the sav file as a SMBX 1.3 save file, continue
-        if(fileExists(saveFileWS) && FileFormats::ReadSMBX64SavFileF(saveFileS, saveData)) //--Open SelectWorld(selWorld).WorldPath & "save" & A & ".sav" For Input As #1 (line 7701)--
+        if(fileExists(saveFileS) && FileFormats::ReadSMBX64SavFileF(saveFileS, saveData)) //--Open SelectWorld(selWorld).WorldPath & "save" & A & ".sav" For Input As #1 (line 7701)--
         {
             // so basically the original FindSaves loops all over the save files reading things in a way that is only supported on VB6, but since we've got FileFormats we can breeze through this without relying on old methods of reading save files!
             int curActive = 0;
@@ -564,7 +577,7 @@ int EpisodeMain::FindSaves(std::string worldPathS, int saveSlot)
             }
         }
         // we don't support savx files yet, so this part will be commented out
-        /*else if(fileExists(saveFileXtraWS) && FileFormats::ReadExtendedSaveFileF(saveFileXtraS, saveData))
+        /*else if(fileExists(saveFileXtraS) && FileFormats::ReadExtendedSaveFileF(saveFileXtraS, saveData))
         {
             
         }*/
@@ -583,4 +596,36 @@ int EpisodeMain::FindSaves(std::string worldPathS, int saveSlot)
     //--End If (line 7763)--
 
     //--END MAIN RECODE--
+}
+
+int EpisodeMain::WriteEpisodeEntry(VB6StrPtr worldNameVB6, VB6StrPtr worldPathVB6, VB6StrPtr worldFileVB6, WorldData wldData, bool isNewEpisode)
+{
+    int newIdx = 0;
+    if(GM_EP_LIST_COUNT < 100)
+    {
+        if(isNewEpisode)
+        {
+            GM_EP_LIST_COUNT++;
+            newIdx = GM_EP_LIST_COUNT - 1;
+        }
+    }
+    EpisodeListItem* item = EpisodeListItem::GetRaw(newIdx);
+    item->episodeName = worldNameVB6;
+    item->episodePath = worldPathVB6;
+    item->episodeWorldFile = worldFileVB6;
+    
+    for (size_t i = 0; i < 5; i++)
+    {
+        if (i < wldData.nocharacter.size())
+        {
+            item->blockChar[i] = COMBOOL(wldData.nocharacter[i]);
+        }
+        else
+        {
+            item->blockChar[i] = 0;
+        }
+    }
+    item->padding_16 = 0;
+
+    return newIdx;
 }
