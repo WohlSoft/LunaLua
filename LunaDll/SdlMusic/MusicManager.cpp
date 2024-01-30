@@ -88,6 +88,15 @@ void MusicEntry::play()
     PGE_MusPlayer::MUS_playMusic();
 }
 
+CustomSoundEntry::CustomSoundEntry()
+{
+    fullPath = "";
+    chunk = NULL;
+}
+
+CustomSoundEntry::~CustomSoundEntry()
+{}
+
 
 ChunkEntry MusicManager::sounds[91];
 MusicEntry MusicManager::music_lvl[57];
@@ -109,6 +118,9 @@ int MusicManager::currentMusicID = -1;
 std::string MusicManager::curSfxAlias = "";
 int MusicManager::currentSfxID = 0;
 int MusicManager::sfxTimer = 0;
+
+int MusicManager::fullCustomSFXCount = 0;
+CustomSoundEntry* MusicManager::custom_sfxs = NULL;
 
 
 void MusicManager::initAudioEngine()
@@ -257,11 +269,21 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
         {
             if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
             {
-                //Play it!
+                bool cancelled = createSFXStartLuaEvent(chanID, sounds[chanID].fullPath);
+                if(!cancelled)
+                {
+                    //Play it!
+                    setSfxAlias(alias);
+                    currentSfxID = chanID;
+                    sfxTimer = 2;
+                    sounds[chanID].play();
+                }
+            }
+            else
+            {
                 setSfxAlias(alias);
                 currentSfxID = chanID;
-                sfxTimer = 1;
-                sounds[chanID].play();
+                sfxTimer = 2;
             }
         }
     } else {

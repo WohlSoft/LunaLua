@@ -7,6 +7,7 @@
 
 #include "../../SdlMusic/MusicManager.h"
 #include "../../SdlMusic/SdlMusPlayer.h"
+#include "../../Defines.h"
 
 struct Mix_Chunk;
 class MciEmulator;

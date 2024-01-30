@@ -1080,6 +1080,21 @@ void HandleEventsWhileLoading()
     }
 }
 
+bool createSFXStartLuaEvent(int id, std::string path)
+{
+    bool isCancelled = false;
+
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> SFXStartEvent = std::make_shared<Event>("onSFXStart", false);
+        SFXStartEvent->setDirectEventName("onSFXStart");
+        SFXStartEvent->setLoopable(false);
+        gLunaLua.callEvent(SFXStartEvent, id, path);
+        isCancelled = SFXStartEvent->native_cancelled();
+    }
+
+    return isCancelled;
+}
+
 std::string GetEditorPlacedItem()
 {
     std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);

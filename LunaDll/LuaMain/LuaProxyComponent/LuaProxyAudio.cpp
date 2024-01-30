@@ -377,18 +377,37 @@ void LuaProxy::Audio::clearSFXBuffer()
     PGE_Sounds::clearSoundBuffer();
 }
 
+static bool createSFXStartLuaEventFromChunk(Mix_Chunk *chunk)
+{
+    for(int i = 0; i < MusicManager::fullCustomSFXCount; i++)
+    {
+        if(MusicManager::custom_sfxs[i].chunk == chunk)
+        {
+            return createSFXStartLuaEvent(-1, MusicManager::custom_sfxs[i].fullPath);
+        }
+    }
+}
+
 
 void LuaProxy::Audio::playSFX(const std::string& filename, lua_State* L)
 {
 #ifndef NO_SDL
     std::string full_paths = getSfxPath(filename);
-    if (!PGE_Sounds::SND_PlaySnd(full_paths.c_str()))
+    bool cancelled = createSFXStartLuaEvent(-1, (std::string)filename);
+    if(!cancelled)
     {
-        // If error, pass to Lua
-        luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
+        if (!PGE_Sounds::SND_PlaySnd(full_paths.c_str()))
+        {
+            // If error, pass to Lua
+            luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
+        }
     }
 #else
-    ::LuaProxy::playSFX(filename);
+    bool cancelled = createSFXStartLuaEvent(-1, (std::string)filename);
+    if(!cancelled)
+    {
+        ::LuaProxy::playSFX(filename);
+    }
 #endif
 }
 
@@ -402,49 +421,122 @@ Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
         // If error, pass to Lua
         luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
     }
-
+    
+    MusicManager::fullCustomSFXCount = MusicManager::fullCustomSFXCount + 1;
+    if(MusicManager::fullCustomSFXCount > MAX_SAVED_CUSTOM_SOUNDS)
+    {
+        delete[] MusicManager::custom_sfxs;
+    }
+    MusicManager::custom_sfxs = new CustomSoundEntry[MusicManager::fullCustomSFXCount];
+    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].fullPath = (std::string)filename;
+    MusicManager::custom_sfxs[MusicManager::fullCustomSFXCount].chunk = chunk;
+    
     return chunk;
 }
 
 
 int LuaProxy::Audio::SfxPlayCh(int channel, Mix_Chunk *chunk, int loops)
 {
-    return Mix_PlayChannelVol(channel, chunk, loops, MIX_MAX_VOLUME);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_PlayChannelVol(channel, chunk, loops, MIX_MAX_VOLUME);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxPlayChVol(int channel, Mix_Chunk *chunk, int loops, int volume)
 {
-    return Mix_PlayChannelVol(channel, chunk, loops, volume);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_PlayChannelVol(channel, chunk, loops, volume);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxPlayChTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
 {
-    return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, MIX_MAX_VOLUME);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, MIX_MAX_VOLUME);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxPlayChTimedVol(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
 {
-    return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, volume);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, volume);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxFadeInCh(int channel, Mix_Chunk *chunk, int loops, int ms)
 {
-    return Mix_FadeInChannelVolume(channel, chunk, loops, ms, MIX_MAX_VOLUME);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_FadeInChannelVolume(channel, chunk, loops, ms, MIX_MAX_VOLUME);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxFadeInChVol(int channel, Mix_Chunk *chunk, int loops, int ms, int volume)
 {
-    return Mix_FadeInChannelVolume(channel, chunk, loops, ms, volume);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_FadeInChannelVolume(channel, chunk, loops, ms, volume);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxFadeInChTimed(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks)
 {
-    return Mix_FadeInChannelTimed(channel, chunk, loops, ms, ticks);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_FadeInChannelTimed(channel, chunk, loops, ms, ticks);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int LuaProxy::Audio::SfxFadeInChTimedVol(int channel, Mix_Chunk *chunk, int loops, int ms, int ticks, int volume)
 {
-    return Mix_FadeInChannelTimedVolume(channel, chunk, loops, ms, ticks, volume);
+    bool cancelled = createSFXStartLuaEventFromChunk(chunk);
+    if(!cancelled)
+    {
+        return Mix_FadeInChannelTimedVolume(channel, chunk, loops, ms, ticks, volume);
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
