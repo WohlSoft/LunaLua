@@ -749,10 +749,18 @@ std::string replaceFowardSlashesWithBackSlashes(std::string str)
     return str;
 }
 
-bool checkIfWorldIsInAppPath(std::string worldPath, std::string appPath)
+bool checkIfWorldIsInAppPath(std::string worldPath)
 {
     replaceSubStr(worldPath, "/", "\\");
-    return (worldPath.find("\\worlds\\"));
+    std::string appPath = WStr2Str(gAppPathWCHAR);
+    if(!worldPath.find(appPath)) // this is apparently backwards for some reason...
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 

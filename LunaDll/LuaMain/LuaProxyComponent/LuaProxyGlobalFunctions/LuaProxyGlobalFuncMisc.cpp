@@ -260,18 +260,28 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numP
     }
 
     // We're checking to see if the world path exists, and if it does, we can go through to load the episode
-    std::string worldPth = findEpisodeWorldPathFromName(episodeName);
-
-    if(!worldPth.empty() || worldPth != "")
+    std::string worldPth = "";
+    
+    // We assume this may be a wld file, so instead of the episode name just boot the wld file
+    if(episodeName.find(".wld"))
     {
-        success = true;
+        worldPth = episodeName;
+        if(!worldPth.empty() || worldPth != "")
+        {
+            success = true;
+        }
+    }
+    else // Or if not, it's an episode name, so boot that instead
+    {
+        worldPth = findEpisodeWorldPathFromName(episodeName);
+        if(!worldPth.empty() || worldPth != "")
+        {
+            success = true;
+        }
     }
 
     if(success)
     {
-        GameAutostart autoStartEpisode;
-
-        std::string selectedEpisode = "";
         gStartupSettings.epSettings.wldPath = Str2WStr(worldPth);
         gStartupSettings.epSettings.players = numPlayers;
         gStartupSettings.epSettings.character1 = static_cast<int>(storedIdentity1);

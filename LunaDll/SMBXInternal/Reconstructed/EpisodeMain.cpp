@@ -116,6 +116,9 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 
     // create a tempLocation
     Momentum tempLocation;
+    
+    // make a bool for external episodes
+    bool externalEpisode = false;
 
     // check to see if the wld file is valid, otherwise don't load the entire episode if booting
     if(fileExists(Str2WStr(fullPthNoWorldFileWithEndSlashS + fullWorldFileNoPthS)))
@@ -160,9 +163,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // when the episode has loaded successfully after boot, we'll need to do some extra things in order for this to work
     if(gEpisodeLoadedOnBoot)
     {
-        // make a worldName string
-        std::string worldNameS;
-
         // force-unpause the game
         exitPausePatch.Apply();
 
@@ -171,20 +171,25 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 
         // get rid of any additional custom graphics loaded
         gCachedFileMetadata.purge();
+    }
+    
+    // make a worldName string
+    std::string worldNameS;
+    
+    // check to see if the episode is external. if so, we'll need to change some things.
+    if(checkIfWorldIsInAppPath(fullPthNoWorldFileS))
+    {
+        worldNameS = findNameFromEpisodeWorldPath(wldPathS);
+    }
+    else
+    {
+        externalEpisode = true;
+        worldNameS = "External Episode";
+        EpisodeListItem* item = EpisodeListItem::Get(0);
 
-        // find the world name
-        if(checkIfWorldIsInAppPath(fullPthNoWorldFileWithEndSlashS, gAppPathUTF8))
-        {
-            worldNameS = findNameFromEpisodeWorldPath(wldPathS);
-        }
-        else
-        {
-            worldNameS = "External Episode";
-        }
-
-        GameAutostartFunc.setSelectedEpisode(worldNameS);
-        GameAutostartFunc.setSelectedEpisodePath(fullPathWS);
-        GameAutostartFunc.setSaveSlot(saveSlot);
+        item->episodeName = Str2WStr(worldNameS);
+        item->episodePath = fullPthNoWorldFileWS;
+        item->episodeWorldFile = fullWorldFileNoPthWS;
     }
 
     // set GM_FULLPATH, otherwise the Loadscreen won't have write access to the episode we're loading to
@@ -200,7 +205,14 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     SMBXWorldFileBase::PopulateEpisodeList();
 
     // specify the menu level
-    GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPathWS)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
+    if(!externalEpisode)
+    {
+        GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(WStr2Str(fullPathWS)); // this NEEDS to be set, otherwise the engine will just crash loading the episode
+    }
+    else
+    {
+        GM_CUR_MENULEVEL = 0;
+    }
 
     // clear gamedata
     LunaLuaSetGameData(0, 0);
@@ -402,7 +414,10 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     } //--End If (line 5017)--
 
     // init SetupPlayers
-    native_initLevelEnv(); //--SetupPlayers (line 5018)--
+    if(!externalEpisode)
+    {
+        native_initLevelEnv(); //--SetupPlayers (line 5018)--
+    }
 
     if((GM_WORLD_INTRO_FILENAME != GM_STR_NULL && !saveFileExists()) || (GM_HUB_STYLED_EPISODE == -1)) //--If StartLevel <> "" Then-- (line 5019)
     {
