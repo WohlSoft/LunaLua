@@ -270,7 +270,7 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numP
     else // or it's probably an external wld file, so boot that instead
     {
         worldPth = episodeName;
-        success = true
+        success = true;
     }
 
     if(success)
