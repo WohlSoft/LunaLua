@@ -156,12 +156,13 @@ void GLEngineProxy::RenderCameraToScreen(int camIdx, double renderX, double rend
     QueueCmd(obj);
 }
 
-void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen, bool redrawOnly, bool resizeOverlay)
+void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen, bool redrawOnly, bool resizeOverlay, bool pauseOverlay)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
     obj->mRedrawOnly = redrawOnly;
     obj->mResizeOverlay = resizeOverlay;
+    obj->mPauseOverlay = pauseOverlay;
 
     if (isLoadScreen || redrawOnly)
     {

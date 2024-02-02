@@ -2840,6 +2840,9 @@ void __stdcall runtimeHookCheckWindowFocus()
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
 
+        // Show pause overlay
+        g_GLEngine.EndFrame(nullptr, false, true, false, true);
+
         // Wait for focus
         TestModeSendNotification("suspendWhileUnfocusedNotification");
         while (!gMainWindowFocused && !LunaLoadScreenIsActive())
