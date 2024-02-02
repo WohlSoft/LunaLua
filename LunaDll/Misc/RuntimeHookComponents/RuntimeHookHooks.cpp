@@ -2832,7 +2832,7 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
 
 void __stdcall runtimeHookCheckWindowFocus()
 {
-    if (!gMainWindowFocused && !LunaLoadScreenIsActive())
+    if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
     {
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);

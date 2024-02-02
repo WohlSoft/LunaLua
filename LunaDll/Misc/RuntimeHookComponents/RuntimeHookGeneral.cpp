@@ -825,7 +825,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_PAINT:
                 CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
-                if (inSizeMoveModal || !gMainWindowFocused)
+                if (inSizeMoveModal || (!gMainWindowFocused && !gStartupSettings.runWhenUnfocused))
                 {
                     g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                 }
@@ -874,19 +874,14 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
 
                 // Our main window lost focus? Keep track of that.
-                if (!gStartupSettings.runWhenUnfocused)
-                {
-                    gMainWindowFocused = false;
-                }
+                gMainWindowFocused = false;
+
                 break;
             case WM_DESTROY:
                 // Our main window was destroyed? Clear hwnd and mark as unfocused
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
                 gMainWindowHwnd = NULL;
-                if (!gStartupSettings.runWhenUnfocused)
-                {
-                    gMainWindowFocused = false;
-                }
+                gMainWindowFocused = false;
                 break;
             case WM_HOTKEY:
                 if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
@@ -1205,7 +1200,6 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--runWhenUnfocused"))
     {
         gStartupSettings.runWhenUnfocused = true;
-        gMainWindowFocused = true;
     }
 
     if (vecStrFind(args, L"--sendIPCReady"))

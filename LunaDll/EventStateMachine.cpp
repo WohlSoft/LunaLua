@@ -241,7 +241,7 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Handle un-focused state
-        if (!gMainWindowFocused && !LunaLoadScreenIsActive())
+        if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
