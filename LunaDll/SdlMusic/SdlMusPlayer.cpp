@@ -393,12 +393,19 @@ void PGE_MusPlayer::MUS_StartDeferring()
         MUS_pauseMusic(); // This will unset musicGotDeferred, so this this right after
         musicGotDeferred = true;
     }
+
+    // Also freezea all sounds when we pause music this way
+    Mix_PauseAudio(1);
+
     deferringMusic = true;
 }
 
 void PGE_MusPlayer::MUS_StopDeferring()
 {
     if (!deferringMusic) return;
+
+    // Resume all audio at this point too
+    Mix_PauseAudio(0);
 
     deferringMusic = false;
     if (musicGotDeferred)
