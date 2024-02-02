@@ -26,6 +26,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Misc/LoadScreen.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -1072,11 +1073,19 @@ void HandleEventsWhileLoading()
     static DWORD lastTime = 0;
     DWORD thisTime = GetTickCount();
     DWORD elapsedTime = thisTime - lastTime;
-    if (elapsedTime > 100)
+    if (elapsedTime > 30)
     {
-        // Run if >100ms has elapsed since last event handling
+        // Run if >30ms has elapsed since last event handling
         native_rtcDoEvents();
         lastTime = thisTime;
+    }
+}
+
+void HandleEventsWhileLoadscreenOnly()
+{
+    if (LunaLoadScreenIsActive() && !LunaLoadScreenIsCurrentThread())
+    {
+        HandleEventsWhileLoading();
     }
 }
 
