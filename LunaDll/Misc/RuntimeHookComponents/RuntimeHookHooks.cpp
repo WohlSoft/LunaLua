@@ -832,10 +832,13 @@ static __declspec(naked) void updateInput_Orig()
 
 extern void __stdcall runtimeHookUpdateInput()
 {
-    gLunaGameControllerManager.pollInputs();
-    gEscPressedRegistered = gEscPressed;
-    gEscPressed = false;
-    updateInput_Orig();
+    if (gMainWindowFocused)
+    {
+        gLunaGameControllerManager.pollInputs();
+        gEscPressedRegistered = gEscPressed;
+        gEscPressed = false;
+        updateInput_Orig();
+    }
 }
 
 extern void __stdcall WindowInactiveHook()
