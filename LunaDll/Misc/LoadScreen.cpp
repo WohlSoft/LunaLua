@@ -258,9 +258,7 @@ void LunaLoadScreenKill()
     loadThread = nullptr;
     g_ResetFrameTiming = true;
 
-    // At end of load screen, make sure we're properly focused
-    native_rtcDoEvents();
-    ShowAndFocusWindow(gMainWindowHwnd);
+    // We used to grab focus after the load screen, but that seems kinda rude and unnecessary?
     native_rtcDoEvents();
 }
 
