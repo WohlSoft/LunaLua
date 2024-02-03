@@ -125,7 +125,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
     fullErrorDescription << "* The Codehaus Discord server or\n";
     fullErrorDescription << "* https://www.smbxgame.com/forums/viewforum.php?f=35 or\n";
-    fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
+    fullErrorDescription << "* https://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
 
     lastErrDesc = fullErrorDescription.str();
