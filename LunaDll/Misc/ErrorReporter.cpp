@@ -78,17 +78,8 @@ void ErrorReport::manageErrorReport(const std::string &url, std::string &errText
     GuiCrashNotify notifier(errText);
     notifier.show();
 
-    const std::string& username = notifier.getUsername();
-    const std::string& usercomment = notifier.getUsercomment();
-
-    errText += "\n\n\nUSERNAME: \n";
-    errText += (username.length() == 0 ? "(NONE)" : username);
-    errText += "\n\n\nUSERCOMMENT: \n";
-    errText += (usercomment.length() == 0 ? "(NONE)" : usercomment);
-    errText += "\n";
-
     if (notifier.shouldSend()){
-        sendPUTRequest(url, errText);
+        // sendPUTRequest(url, errText);
     }
 }
 
@@ -132,7 +123,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 
     fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
-    fullErrorDescription << "* http://wohlsoft.ru/forum/ or\n";
+    fullErrorDescription << "* The Codehaus Discord server or\n";
     fullErrorDescription << "* https://www.smbxgame.com/forums/viewforum.php?f=35 or\n";
     fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
