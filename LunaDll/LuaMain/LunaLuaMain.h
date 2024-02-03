@@ -176,6 +176,8 @@ public:
         return luabind::newtable(L);
     }
 
+    bool didOnStartRun() { return m_onStartRan; }
+
 private:
     LuaLunaType m_type;
     std::string m_luaEventTableName;

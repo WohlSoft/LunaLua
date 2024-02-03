@@ -71,5 +71,10 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
 
 void LuaProxy::Text::showMessageBox(const std::string &text)
 {
+    if (!gLunaLua.didOnStartRun())
+    {
+        // Not valid before onStart
+        return;
+    }
     showSMBXMessageBox(text);
 }
