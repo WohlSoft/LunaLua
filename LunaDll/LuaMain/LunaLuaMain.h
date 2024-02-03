@@ -135,7 +135,7 @@ public:
 
     template<typename... Args>
     void callEvent(const std::shared_ptr<Event>& e, Args... args){
-        if (m_ready) {
+        if (m_ready && m_onStartRan) {
             const char* currentFFIFunc = CLunaFFILock::getCurrentFuncName();
             if (currentFFIFunc != nullptr)
             {
