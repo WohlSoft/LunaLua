@@ -92,13 +92,14 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     std::wstring filename = fullPath.substr(findLastSlash + 1);
     std::wstring levelname = RemoveExtension(filename);
     std::wstring customFolder = dir + levelname;
-
+    
     dir = utf8_decode(outData.meta.path + "/");
     replaceSubStrW(dir, L"/", L"\\");
     levelname = utf8_decode(outData.meta.filename);
     std::string customFolderU8 = outData.meta.path + "/" + outData.meta.filename + "/";
     replaceSubStr(customFolderU8, "/", "\\");
     customFolder = Str2WStr(customFolderU8);
+    std::wstring displayname = utf8_decode(outData.LevelName);
 
     *(DWORD*)0xB2B9E4 = 0; // qScreen
     native_cleanupLevel();
@@ -135,7 +136,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     // If we are successful then set the variables
     GM_LVLFILENAME_PTR = filename;
-    GM_LVLNAME_PTR = levelname;
+    GM_LVLNAME_PTR = displayname;
     GM_FULLPATH = fullPath;
     GM_FULLDIR = dir;
 
