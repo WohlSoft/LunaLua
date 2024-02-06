@@ -39,6 +39,20 @@ typedef struct _SEH_CHAIN_RECORD {
     SEH_HANDLER* handler;
 } SEH_CHAIN_RECORD;
 
+#include "../ErrorReporter.h"
+
+// Better stack traces for "Subscript out of range" errors
+static void __stdcall VB_SubscriptOutOfRange()
+{
+    recordVBErrCode(9);
+    EXCEPTION_RECORD ex = {0};
+    ex.ExceptionCode = EXCEPTION_FLT_INEXACT_RESULT;
+    ErrorReport::SnapshotError(&ex, nullptr);
+    ErrorReport::report();
+
+    _exit(0);
+}
+
 void fixup_ErrorReporting()
 {
     HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
@@ -64,6 +78,9 @@ void fixup_ErrorReporting()
     // Substitute that exception handler with our own.
     LunaDLLOriginalExceptionHandler = seh->handler;
     seh->handler = LunaDLLCustomExceptionHandler;
+
+    // Better stack traces for "Subscript out of range" errors than relying on the SEH handling
+    PATCH(0x4010F4).dword(reinterpret_cast<uintptr_t>(&VB_SubscriptOutOfRange)).Apply();
 }
 
 
