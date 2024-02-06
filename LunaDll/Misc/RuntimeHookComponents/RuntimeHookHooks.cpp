@@ -1956,46 +1956,6 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
     }
 }
 
-static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
-{
-    NPCMOB* npc = NPC::GetRaw(npcIdx);
-    if (npc != nullptr)
-    {
-        return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
-    }
-    return 0;
-}
-
-_declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
-{
-    __asm {
-        je harmlessRet
-
-        push eax
-        push ecx
-        push edx
-
-        movsx eax, word ptr ds:[ebp-0x180]
-        push eax // Arg #1
-        call runtimeHookNPCHarmlessThrown
-        cmp eax, 0
-        jne harmlessRestoreRet
-
-        pop edx
-        pop ecx
-        pop eax
-        push 0xA181B3
-        ret
-    harmlessRestoreRet:
-        pop edx
-        pop ecx
-        pop eax
-    harmlessRet:
-        push 0xA1BAD5
-        ret
-    }
-}
-
 static void __stdcall runtimeHookNPCTerminalVelocity(NPCMOB* npc)
 {
     // Reimplement the NPC terminal velocity behaviour
@@ -3837,6 +3797,17 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
 {
     if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
         return 0; // Collision cancelled
+
+    // Check harmlessthrown flag
+
+    NPCMOB* npc = NPC::GetRaw(npcAIdx);
+    if (npc != nullptr)
+    {
+        if (NPC::GetHarmlessThrown(npc->id)) // If harmlessthrown is set
+            return 0; // Collision cancelled
+    }
+
+    // Check collision group
     
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);

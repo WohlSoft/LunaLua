@@ -1715,7 +1715,6 @@ void TrySkipPatch()
     PATCH(0xA0A6FB).CALL(runtimeHookNPCWaterSplashAnimRaw).Apply();
 
     PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
-    PATCH(0xA181AD).JMP(runtimeHookNPCHarmlessThrownRaw).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA10136).JMP(runtimeHookNPCTerminalVelocityRaw).NOP_PAD_TO_SIZE<58>().Apply();
 
@@ -2088,7 +2087,7 @@ void TrySkipPatch()
     // Also handles collisionGroup for NPC-to-solid interactions now
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
 
-    // Patch to handle collisionGroup for NPC-to-NPC interactions
+    // Patch to handle collisionGroup for NPC-to-NPC interactions, and harmlessthrown flag
     PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Replace pause button detection code to avoid re-triggering when held
