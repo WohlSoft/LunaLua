@@ -1399,7 +1399,7 @@ void TrySkipPatch()
 
     PATCH(0x8D6BB6).CALL(&forceTermination).Apply();
 
-    PATCH(0x8C11D5).CALL(&LoadWorld).Apply();
+    PATCH(0x8C11D5).CALL(&LoadWorldHook).Apply();
 
     PATCH(0x8C16F7).CALL(&WorldLoop).Apply();
 

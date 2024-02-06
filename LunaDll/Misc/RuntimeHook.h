@@ -59,7 +59,7 @@ extern void __stdcall InitHook();
 //Force Termination when SMBX runs the end code.
 //Without this code, there is a chance of "zombie"-processes.
 extern void __stdcall forceTermination();
-extern int __stdcall LoadWorld();     //The World Load Code
+extern void __stdcall LoadWorldHook(void);     //The World Load Code
 extern DWORD __stdcall WorldLoop();       //The World Loop Code
 extern void* __stdcall WorldRender();     //The World Render Code
 extern int __stdcall LoadIntro();       // Load Intro Code (Autostart)

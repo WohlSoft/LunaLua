@@ -184,20 +184,18 @@ extern int __stdcall LoadWorld()
         g_GLEngine.SetFirstFramePending();
     }
 
-    short plValue = GM_PLAYERS_COUNT;
-#ifndef __MINGW32__
-    __asm {
-        MOV EAX, 1
-            MOV CX, plValue
-    }
-#else
-    asm(".intel_syntax noprefix\n"
-        "mov eax, 1\n"
-        "mov cx, %0\n"
-        ".att_syntax\n": "=r" (plValue));
-    //".intel_syntax prefix" :: [plValue] "g" (plValue) : "edx");
+    return GM_PLAYERS_COUNT;
+}
 
-#endif
+__declspec(naked) void __stdcall LoadWorldHook(void)
+{
+    __asm {
+        call LoadWorld
+        // set up a following loop
+        mov ecx, eax // move player count into ecx
+        mov eax, 1 // move 1 into eax
+        ret
+    }
 }
 
 extern int __stdcall LoadIntro()
