@@ -393,6 +393,8 @@ struct ExtendedPlayerFields
     bool nonpcinteraction;
     bool noplayerinteraction;
     unsigned int collisionGroup;
+    // used for fixing a 1.3 slope bug
+    int slidingTimeSinceOnSlope;
 
     // Constructor
     ExtendedPlayerFields()
@@ -407,6 +409,8 @@ struct ExtendedPlayerFields
         nonpcinteraction = false;
         noplayerinteraction = false;
         collisionGroup = 0u;
+
+        slidingTimeSinceOnSlope = 0;
     }
 };
 

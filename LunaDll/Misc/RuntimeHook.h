@@ -42,6 +42,7 @@ extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
 extern Patchable& gNPCSectionFix;
 extern Patchable& gFenceFixes;
 extern Patchable& gLinkFairyClowncarFixes;
+extern bool gSlideJumpFixIsEnabled;
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
@@ -584,6 +585,8 @@ void __stdcall runtimeHookNPCWalkFixSlope();
 
 void __stdcall runtimeHookNPCSectionFix(short* npcIndex);
 void __stdcall runtimeHookNPCSectionWrap(void);
+
+void __stdcall runtimeHookJumpSlideFix(void);
 
 void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
 void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);

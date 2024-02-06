@@ -3386,6 +3386,59 @@ __declspec(naked) void __stdcall runtimeHookNPCSectionWrap(void)
     }
 }
 
+static void __stdcall runtimeHookJumpSlideFixInternal(short playerIdx) {
+    PlayerMOB* player = PlayerMOB::Get(playerIdx);
+    auto extended = Player::GetExtended(playerIdx);
+
+    if (player->SlopeRelated != 0) {
+        extended->slidingTimeSinceOnSlope = 0;
+    } else {
+        extended->slidingTimeSinceOnSlope += 1;
+    }
+
+    if (gSlideJumpFixIsEnabled) {
+        // fixed check:
+        if (player->UpwardJumpingForce != 0) {
+            // if the player started jumping for real
+            player->SlidingState = 0;
+        } else if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+            // if the player pressed jump *and* has been disconnected from a slope for a couple frames
+            if (extended->slidingTimeSinceOnSlope >= 2) {
+                player->SlidingState = 0;
+            }
+        }
+    } else {
+        // redigit's check:
+        if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+            player->SlidingState = 0; // super jank town activate
+        }
+    }
+
+}
+
+__declspec(naked) void __stdcall runtimeHookJumpSlideFix(void)
+{
+    // eax, ecx, edx and flags are free for use at this point
+    __asm {
+
+        push eax
+        push edx
+        push ecx
+
+        movsx edx, word ptr ss : [ebp-0x114]
+        push edx  // Player index
+        call runtimeHookJumpSlideFixInternal
+
+        pop ecx
+        pop edx
+        pop eax
+        
+
+        push 0x99A850
+        ret
+    }
+}
+
 
 static void markBlocksUnsorted()
 {
