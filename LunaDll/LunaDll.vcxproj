@@ -193,6 +193,7 @@
     <ClInclude Include="Rendering\GL\GLFramebuffer.h" />
     <ClInclude Include="Rendering\SMBXImageCategories.h" />
     <ClInclude Include="Rendering\WindowSizeHandler.h" />
+    <ClInclude Include="SMBXInternal\Functions.h" />
     <ClInclude Include="SMBXInternal\HardcodedGraphicsAccess.h" />
     <ClInclude Include="Rendering\BitBltEmulation.h" />
     <ClInclude Include="Misc\PerfTracker.h" />
