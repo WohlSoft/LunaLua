@@ -643,7 +643,7 @@ EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
 {
     // For VB error code 40040, defer to the original handler
     bool isVB6Exception = (ExceptionRecord->ExceptionCode == 0xc000008f);
-    if (isVB6Exception && lastVB6ErrCode == 40040) {
+    if (isVB6Exception && ErrorReportVars::lastVB6ErrCode == 40040) {
         return LunaDLLOriginalExceptionHandler(ExceptionRecord, EstablisherFrame, ContextRecord, DispatcherContext);
     }
 
@@ -660,18 +660,14 @@ EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
 
 extern void __stdcall recordVBErrCode(int errCode)
 {
-    // Running the whole stack trace now is *far* too slow and can make the
-    // editor grind to a halt in some situations due to exceptions which are
-    // caught in the VB code.
-
-    // Instead... just capture a nice lightweight context. We can pass this
-    // to StackWalker later.
-    RtlCaptureContext(&lastVB6ErrContext);
-
     // Also record the VB6 error code, because this is simpler than fetching
     // VB6's "error" object that stores this internally (would involve calling
     // rtcErrObj)
-    lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+    ErrorReportVars::lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+
+    // Pass through pending context flags
+    ErrorReportVars::activeVB6ErrContext = ErrorReportVars::pendingVB6ErrContext;
+    ErrorReportVars::pendingVB6ErrContext = false;
 
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{

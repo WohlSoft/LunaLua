@@ -7,9 +7,14 @@
 #include <array>
 #include "Gui/GuiCrashNotify.h"
 
-std::string lastErrDesc;
-ErrorReport::VB6ErrorCode lastVB6ErrCode;
-CONTEXT lastVB6ErrContext;
+namespace ErrorReportVars
+{
+    std::string lastErrDesc;
+    ErrorReport::VB6ErrorCode lastVB6ErrCode;
+    CONTEXT lastVB6ErrContext;
+    bool pendingVB6ErrContext = false;
+    bool activeVB6ErrContext = false;
+}
 
 std::string ErrorReport::generateStackTrace(CONTEXT* context)
 {
@@ -88,7 +93,10 @@ static_assert(EXCEPTION_FLT_INEXACT_RESULT == 0xc000008f, "BOO");
 void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 {
     bool isVB6Exception = (exception->ExceptionCode == EXCEPTION_FLT_INEXACT_RESULT);
-    std::string stackTrace = generateStackTrace(isVB6Exception ? &lastVB6ErrContext : context);
+    std::string stackTrace = generateStackTrace(
+        (isVB6Exception && ErrorReportVars::activeVB6ErrContext) ? 
+            &ErrorReportVars::lastVB6ErrContext :
+            context);
     std::stringstream fullErrorDescription;
 
     fullErrorDescription << "== Crash Summary ==\n";
@@ -115,7 +123,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     }
 
     if (isVB6Exception) {
-        fullErrorDescription << getCustomVB6ErrorDescription(lastVB6ErrCode);
+        fullErrorDescription << getCustomVB6ErrorDescription(ErrorReportVars::lastVB6ErrCode);
     }
 
     fullErrorDescription << "\n== Stack Trace ==\n";
@@ -128,11 +136,11 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     fullErrorDescription << "* https://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
 
-    lastErrDesc = fullErrorDescription.str();
+    ErrorReportVars::lastErrDesc = fullErrorDescription.str();
 }
 
 void ErrorReport::report()
 {
-    manageErrorReport("http://wohlsoft.ru/LunaLuaErrorReport/index.php", lastErrDesc);
-    writeErrorLog(lastErrDesc);
+    manageErrorReport("http://wohlsoft.ru/LunaLuaErrorReport/index.php", ErrorReportVars::lastErrDesc);
+    writeErrorLog(ErrorReportVars::lastErrDesc);
 }
