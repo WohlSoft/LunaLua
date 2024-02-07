@@ -50,10 +50,14 @@ std::wstring CLunaLua::getLuaLibsPath()
 CLunaLua::CLunaLua() :
         m_type(CLunaLua::LUNALUA_LEVEL),
         m_luaEventTableName(""),
+        m_warningList(),
         L(0),
         m_ready(false),
         m_onStartRan(false),
-        m_warningList()
+        m_disableSectionChangeEvent(false),
+        m_executeSectionChangeFlag(false),
+        m_playerSectionChangeList(),
+        m_luaCallDepth(0)
 {}
 
 CLunaLua::~CLunaLua()
@@ -151,6 +155,7 @@ bool CLunaLua::shutdown()
 
     m_ready = false;
     m_onStartRan = false;
+    m_luaCallDepth = 0;
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -247,14 +252,17 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Load the Lua API
     bool errLapi = false;
-    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
-    if(!(lapierrcode == 0)){
-        object error_msg(from_stack(L, -1));
-        MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
-        errLapi = true;
-    }
     {
-        errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+        CCallDepthCounter callDepth(*this);
+        int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
+        if (!(lapierrcode == 0)) {
+            object error_msg(from_stack(L, -1));
+            MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
+            errLapi = true;
+        }
+        {
+            errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+        }
     }
 
 

@@ -109,6 +109,7 @@ public:
         {
             PerfTrackerState perfState(PerfTracker::PERF_LUA);
             SafeFPUControl noFPUExecptions;
+            CCallDepthCounter callDepth(*this);
             luabind::call_function<void>(args...);
         }
         catch (luabind::error& /*e*/)
@@ -117,10 +118,17 @@ public:
         }
         err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
 
-        // If there was an error, shut down Lua
+        // If there was an error, shut down Lua, unless we're in a nested Lua call, in which case we can't safely
         if (err)
         {
-            shutdown();
+            if (m_luaCallDepth == 0)
+            {
+                shutdown();
+            }
+            else
+            {
+                luaL_error(L, "Nested unhandled Lua error");
+            }
         }
         
         // If there was no error, allow a Lua-based game pause to take effect if pending
@@ -199,6 +207,25 @@ private:
     bool m_executeSectionChangeFlag; // whether to execute section change at the end of the next event called
     std::vector<int> m_playerSectionChangeList; // list of player indexes who changed sections
 
+    uintptr_t m_luaCallDepth;
+
+    class CCallDepthCounter
+    {
+    private:
+        CLunaLua& m_parent;
+
+    public:
+        CCallDepthCounter(CLunaLua& parent) :
+            m_parent(parent)
+        {
+            m_parent.m_luaCallDepth++;
+        }
+
+        ~CCallDepthCounter()
+        {
+            m_parent.m_luaCallDepth--;
+        }
+    };
 };
 
 namespace CachedReadFile {
