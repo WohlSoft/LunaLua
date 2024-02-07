@@ -3760,7 +3760,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx, unsigned int oldSlope)
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx, int oldSlope)
 {
     // If already not hitting, ignore
     if (hitSpot == 0) return 0;
@@ -3791,7 +3791,7 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
                 // because of this, we have to check if a slope was stood on previously and cancel the bottom timer out
                 collidesBelow = 0;
             }
-            if (!Blocks::FilterSemisolidSlopeCollision(&npc->momentum, blockIdx, collidesBelow)) {
+            if (!Blocks::FilterSemisolidSlopeCollision(&npc->momentum, &npc->momentum, blockIdx, collidesBelow, (oldSlope != 0 || npc->unknown_22 != 0))) {
                 return 0;
             } else {
                 // change hitSpot to always act as top collision
@@ -3898,7 +3898,7 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx)
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx, int oldSlope)
 {
     PlayerMOB* player = Player::Get(playerIdx);
     Block* block = Block::GetRaw(blockIdx);
@@ -3928,7 +3928,15 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerI
     if (blockdef_semisolid[block->BlockType] && blockdef_floorslope[block->BlockType] != 0)
     {
         // check semisolid slope collision
-        if (!Blocks::FilterSemisolidSlopeCollision(&player->momentum, blockIdx, player->LayerStateStanding)) {
+        bool onSlope = (player->SlopeRelated != 0 || oldSlope != 0);
+        if (player->SlidingState && !onSlope) {
+            onSlope = Player::GetExtended(playerIdx)->slidingTimeSinceOnSlope < 2;
+        }
+        Momentum* speedMomentum = &(player->momentum);
+        if (player->NPCBeingStoodOnIndex > 0 && player->NPCBeingStoodOnIndex <= GM_NPCS_COUNT) {
+            speedMomentum = &(NPC::Get(player->NPCBeingStoodOnIndex-1)->momentum);
+        }
+        if (!Blocks::FilterSemisolidSlopeCollision(&player->momentum, speedMomentum, blockIdx, player->LayerStateStanding, onSlope)) {
             return 0;
         }
     }
@@ -3961,6 +3969,8 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
         push edx
         push esi
 
+        movsx ecx, word ptr ss:[ebp-0x104]
+        push ecx                // oldSlope (for semisolid slope check)
         movsx ecx, word ptr ss:[ebp-0x120]
         push ecx                // Block index
         movsx ecx, word ptr ss:[ebp-0x114]
