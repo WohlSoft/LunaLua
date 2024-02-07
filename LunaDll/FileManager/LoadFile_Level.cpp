@@ -813,7 +813,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 
     if(is38AFormat)
     {
-        MessageBoxW(gMainWindowHwnd,
+        LunaMsgBox::ShowW(gMainWindowHwnd,
                     L"This level was saved in an incompatible format, it may not work properly. "
                     "SMBX-38A specific features such as TeaScript are not supported here. "
                     "Please use SMBX-38A to play this level.",
@@ -823,7 +823,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
 #if defined(ENABLE_38A_FEATURE_WARNING)
     else if (uses38AFeatures)
     {
-        MessageBoxW(gMainWindowHwnd,
+        LunaMsgBox::ShowW(gMainWindowHwnd,
                     L"This level uses some incompatible 38A features, it may not work properly. "
                     "SMBX-38A specific features such as TeaScript are not supported here. "
                     "Either this level had incompatible fields set with an old version of the "
@@ -843,7 +843,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
                                      L"Expected config pack ID: SMBX2",
                                      filename,
                                      outData.meta.configPackId);
-        MessageBoxW(gMainWindowHwnd,
+        LunaMsgBox::ShowW(gMainWindowHwnd,
                     m.c_str(),
                     L"Incompatible level",
                     MB_ICONWARNING | MB_OK);
@@ -884,7 +884,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
     if (msg.size() > 0)
     {
         msg += "Note that the game may crash if the limits are exceeded at runtime. Also note that most block-like NPCs can use up extra block count at runtime.";
-        MessageBoxA(gMainWindowHwnd,
+        LunaMsgBox::ShowA(gMainWindowHwnd,
             msg.c_str(),
             "Level Object Count Warning",
             MB_ICONWARNING | MB_OK);

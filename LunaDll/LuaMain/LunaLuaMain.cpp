@@ -171,6 +171,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Just to be safe
     shutdown();
+    m_luaCallDepth = 0;
 
     gLunaPathValidator.SetPaths();
 
@@ -257,7 +258,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
         if (!(lapierrcode == 0)) {
             object error_msg(from_stack(L, -1));
-            MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
+            LunaMsgBox::ShowA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
             errLapi = true;
         }
         {
@@ -1585,7 +1586,7 @@ void CLunaLua::checkWarnings()
         {
             message << L" - " << Str2WStr(*iter) << L"\r\n";
         }
-        MessageBoxW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
     }
 
     m_warningList.clear();

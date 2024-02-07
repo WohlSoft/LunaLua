@@ -424,7 +424,7 @@ void initAppPaths()
     if (!nonAnsiChars.empty())
     {
         std::wstring path = L"SMBX2 has been installed in a path with characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please install SMBX2 in a location without unsupported characters.\n\nUnsupported characters: " + nonAnsiChars + L"\n\nPath:\n" + fullPath;
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -432,7 +432,7 @@ void initAppPaths()
     if ((fullPath[0] == L'\\') && (fullPath[1] == L'\\'))
     {
         std::wstring path = L"SMBX2 cannot be run from a UNC path (starting with \\\\). Please install SMBX2 elsewhere or map the network drive to a drive letter.\n\nPath:\n" + std::wstring(fullPath);
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -447,7 +447,7 @@ void initAppPaths()
         ))
     {
         std::wstring path = L"The SMBX2 installation path is not recognized as having a normal drive letter.\n\nPath:\n" + std::wstring(fullPath);
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -615,7 +615,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
     if(!theFile.is_open()){
         theFile.close();
         if(!errMsg.empty())
-            MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
+            LunaMsgBox::ShowW(NULL, errMsg.c_str(), L"Error", NULL);
         return false;
     }
 
@@ -630,7 +630,7 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
     if(!theFile)
     {
         if (!errMsg.empty())
-            MessageBoxA(nullptr, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(nullptr, errMsg.c_str(), "Error", 0);
         return false;
     }
     fseek(theFile, 0, SEEK_END);
@@ -1093,4 +1093,30 @@ std::string GetEditorPlacedItem()
 {
     std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
     return (std::string)gEditorPlacedItem;
+}
+
+namespace LunaMsgBox
+{
+    static thread_local volatile uintptr_t s_activeCount = 0;
+
+    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxA(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxW(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    bool IsActive()
+    {
+        return (s_activeCount != 0);
+    }
 }

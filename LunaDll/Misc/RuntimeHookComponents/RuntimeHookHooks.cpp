@@ -70,7 +70,7 @@ extern void __stdcall InitHook()
         if (!newLauncherLib){
             std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
             errMsg += std::to_string((long long)GetLastError());
-            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", 0);
             return;
         }
         RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
@@ -106,7 +106,7 @@ extern void __stdcall InitHook()
         if (!newDebugger){
             std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
             errMsg += std::to_string((long long)GetLastError());
-            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", 0);
             newDebugger = NULL;
             return;
         }

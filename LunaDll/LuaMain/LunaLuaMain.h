@@ -11,6 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../EventStateMachine.h"
 #include "../Misc/PerfTracker.h"
+#include "../GlobalFuncs.h"
 
 #include <luabind/adopt_policy.hpp>
 
@@ -151,7 +152,7 @@ public:
                 errMsg += e->eventName();
                 errMsg += " was called during ";
                 errMsg += currentFFIFunc;
-                MessageBoxA(0, errMsg.c_str(), "Error", MB_ICONWARNING | MB_TASKMODAL);
+                LunaMsgBox::ShowA(0, errMsg.c_str(), "Error", MB_ICONWARNING | MB_TASKMODAL);
                 _exit(1);
             }
 

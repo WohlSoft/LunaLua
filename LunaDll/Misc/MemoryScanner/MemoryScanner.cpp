@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "../VB6StrPtr.h"
+#include "../../GlobalFuncs.h"
 
 #define _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES 1
 
@@ -48,7 +49,7 @@ void MemoryScanner::serverThreadMain()
     if (theResultCode != 0) {
         char msg[300];
         sprintf_s(msg, "WSAStartup failed with error: %d\n", theResultCode);
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         return;
     }
 
@@ -66,7 +67,7 @@ void MemoryScanner::serverThreadMain()
     if (theResultCode != 0) {
         char msg[300];
         sprintf_s(msg, "getaddrinfo failed with error: %d\n", theResultCode);
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         WSACleanup();
         return;
     }
@@ -76,7 +77,7 @@ void MemoryScanner::serverThreadMain()
     if (ListenSocket == INVALID_SOCKET) {
         char msg[300];
         sprintf_s(msg, "socket failed with error: %ld\n", WSAGetLastError());
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         freeaddrinfo(outputResult);
         WSACleanup();
         return;
@@ -88,7 +89,7 @@ void MemoryScanner::serverThreadMain()
     if (theResultCode == SOCKET_ERROR) {
         char msg[300];
         sprintf_s(msg, "bind failed with error: %d\n", WSAGetLastError());
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         freeaddrinfo(outputResult);
         closesocket(ListenSocket);
         WSACleanup();
@@ -102,7 +103,7 @@ void MemoryScanner::serverThreadMain()
     if (theResultCode == SOCKET_ERROR) {
         char msg[300];
         sprintf_s(msg, "listen failed with error: %d\n", WSAGetLastError());
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         closesocket(ListenSocket);
         WSACleanup();
         return;
@@ -115,7 +116,7 @@ void MemoryScanner::serverThreadMain()
     if (ClientSocket == INVALID_SOCKET) {
         char msg[300];
         sprintf_s(msg, "accept failed with error: %d\n", WSAGetLastError());
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         closesocket(ListenSocket);
         WSACleanup();
         return;
@@ -197,7 +198,7 @@ void MemoryScanner::serverThreadMain()
             if (theResultCode == SOCKET_ERROR) {
                 char msg[300];
                 sprintf_s(msg, "send failed with error: %d\n", WSAGetLastError());
-                MessageBoxA(NULL, msg, "Error", NULL);
+                LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
                 closesocket(ClientSocket);
                 WSACleanup();
                 return;
@@ -247,7 +248,7 @@ void MemoryScanner::serverThreadMain()
     if (theResultCode == SOCKET_ERROR) {
         char msg[300];
         sprintf_s(msg, "shutdown failed with error: %d\n", WSAGetLastError());
-        MessageBoxA(NULL, msg, "Error", NULL);
+        LunaMsgBox::ShowA(NULL, msg, "Error", NULL);
         closesocket(ClientSocket);
         WSACleanup();
         return;
