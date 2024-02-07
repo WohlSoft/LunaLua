@@ -718,6 +718,9 @@
     <ClInclude Include="SMBXInternal\Functions.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\modMain.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
