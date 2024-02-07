@@ -2133,6 +2133,20 @@ void TrySkipPatch()
     PATCH(0x9D1221).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_ESI).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA22E69).CALL(runtimeHookBlockSpeedSet_FSTP_EAX_EDX_EDI).NOP_PAD_TO_SIZE<7>().Apply();
 
+    // hooks for supporting new mount colours
+    PATCH(0x98AFF6).CALL(runtimeHookBootGfx).NOP_PAD_TO_SIZE<6>().Apply(); // change function to load boot gfx (mario)
+    PATCH(0x98B146).CALL(runtimeHookBootBitBlt).NOP_PAD_TO_SIZE<5>().Apply(); // change function to render boot (mario)
+    PATCH(0x98B174).JMP(0x98B3A5).Apply(); // skip boot second time (mario) (jne->jmp)
+    PATCH(0x98C5F6).CALL(runtimeHookBootGfx).NOP_PAD_TO_SIZE<6>().Apply(); // change function to load boot gfx (luigi)
+    PATCH(0x98C747).CALL(runtimeHookBootBitBlt).NOP_PAD_TO_SIZE<5>().Apply(); // change function to render boot (luigi)
+    PATCH(0x98C775).JMP(0x98C9A6).Apply(); // skip boot second time (luigi) (jne->jmp)
+    PATCH(0x98DBAC).CALL(runtimeHookBootGfx).NOP_PAD_TO_SIZE<6>().Apply(); // change function to load boot gfx (peach)
+    PATCH(0x98DCFC).CALL(runtimeHookBootBitBlt).NOP_PAD_TO_SIZE<5>().Apply(); // change function to render boot (peach)
+    PATCH(0x98DD2A).JMP(0x98DF5C).Apply(); // skip boot second time (peach) (jne->jmp)
+    PATCH(0x98F2F2).CALL(runtimeHookBootGfx).NOP_PAD_TO_SIZE<6>().Apply(); // change function to load boot gfx (toad)
+    PATCH(0x98F443).CALL(runtimeHookBootBitBlt).NOP_PAD_TO_SIZE<5>().Apply(); // change function to render boot (toad)
+    PATCH(0x98F471).JMP(0x98F6A2).Apply(); // skip boot second time (toad) (jne->jmp)
+
     // Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
     runtimeHookCharacterIdApplyPatch();
 
@@ -2165,4 +2179,5 @@ void TrySkipPatch()
     PATCH(0x8BEAE9)
         .PUSH_IMM32((std::uint32_t) L"regsvr32 /s ")
         .Apply();
+
 }

@@ -3418,7 +3418,6 @@ static void __stdcall runtimeHookJumpSlideFixInternal(short playerIdx) {
 
 __declspec(naked) void __stdcall runtimeHookJumpSlideFix(void)
 {
-    // eax, ecx, edx and flags are free for use at this point
     __asm {
 
         push eax
@@ -4967,3 +4966,65 @@ void __stdcall runtimeHookGameover() {
     LunaLuaGameoverScreenRun();
     LunaLuaResetEpisode();
 }
+
+
+// patch over some parts of player rendering to support custom mounts
+HDC __stdcall runtimeHookBootGfxInternal(PlayerMOB* player) {
+    if (player->MountColor >= 1 && player->MountColor <= 3) {
+        // 1.3 gfx
+        HDC hdc, mask_unused;
+        HardcodedGraphicsItem& hItemInfo = HardcodedGraphicsItem::Get(25);
+        hItemInfo.getHDC(player->MountColor, &hdc, &mask_unused);
+        return hdc;
+    } else {
+        // extended gfx
+        return (HDC)0xFFFF;
+    }
+}
+__declspec(naked) void __stdcall runtimeHookBootGfx(void)
+{
+    __asm {
+
+        push ecx
+        push edx
+
+        mov eax, ss:[ebp-0x74]
+        push eax // player object
+        call runtimeHookBootGfxInternal
+        mov ss:[ebp-0x48], eax // store the result
+
+        pop edx
+        pop ecx
+
+        // shuffle return address and original function args around
+        pop eax // return addr
+        add esp, 8 // kill original function args
+        push eax
+        mov eax, 1 // used for a validity check
+        ret
+    }
+}
+
+BOOL __stdcall runtimeHookBootBitBltInternal(PlayerMOB* player, HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    if ((int)hdcSrc == 0xFFFF) {
+        // custom image
+        auto img = ImageLoader::GetByName(std::string("hardcoded-25-") + i2str(player->MountColor), false);
+        if (img != nullptr) {
+            img->draw(nXDest, nYDest, nWidth, nHeight, nXSrc, nYSrc);
+        }
+        return -1;
+    }
+    return BitBltHook(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop);
+}
+__declspec(naked) BOOL __stdcall runtimeHookBootBitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop) {
+    __asm {
+        pop ecx // store return address
+        mov eax, ss: [ebp - 0x74]
+        push eax // add player object arg
+        push ecx // restore return address
+        jmp runtimeHookBootBitBltInternal
+    }
+}
+
+
+

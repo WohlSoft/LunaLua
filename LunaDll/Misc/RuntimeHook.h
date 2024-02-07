@@ -641,4 +641,7 @@ void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerCountCollisionsForWeakLava(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerBlockCollisionEnd(void);
 
+void __stdcall runtimeHookBootGfx(void);
+BOOL __stdcall runtimeHookBootBitBlt(HDC hdcDest, int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
+
 #endif
