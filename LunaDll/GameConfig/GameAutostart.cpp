@@ -48,7 +48,7 @@ bool GameAutostart::applyAutostart()
         {
             // Invalid level name
             std::wstring path = L"SMBX could not find the world map file \"" + selectedWldPath + L"\"";
-            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
 
@@ -64,7 +64,7 @@ bool GameAutostart::applyAutostart()
         if (!nonAnsiCharsEpisode.empty())
         {
             std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + wldPath;
-            MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
             _exit(1);
         }
 
@@ -72,7 +72,7 @@ bool GameAutostart::applyAutostart()
         if (!nonAnsiCharsFullPath.empty())
         {
             std::wstring path = L"The world map filename has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename your world map file.\n\nUnsupported characters: " + nonAnsiCharsFullPath + L"\n\nPath:\n" + fullPath;
-            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
 
@@ -80,14 +80,14 @@ bool GameAutostart::applyAutostart()
         if (!FileFormats::OpenWorldFileHeader(WStr2Str(fullPath), wldData) || !wldData.meta.ReadFileValid)
         {
             std::wstring path = L"The world map file header cannot be parsed.\n\nPath:\n" + fullPath;
-            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
 
         if (wldData.meta.RecentFormat != WorldData::SMBX64)
         {
             std::wstring path = L"The world map file is in the wrong format. It must be saved in SMBX64 format.\n\nPath:\n" + fullPath;
-            MessageBoxW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"SMBX could not load world map", MB_ICONERROR);
             _exit(1);
         }
     }

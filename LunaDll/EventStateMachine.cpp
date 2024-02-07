@@ -8,6 +8,7 @@
 #include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
+#include "SMBXInternal/modMain.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -37,6 +38,17 @@ void LunaDllRenderAndWaitFrame(void)
 
     // Audio management...
     native_audioManagement();
+
+    // Dummy out some variables, some of which need to be reset each tick
+    // SMBX 1.3 use these for tracking frame timing
+    // They're incremented in the above rendering functions, and if we let them
+    // grow forever there's an overflow error in some cases.
+    SMBX13::modMain.overTime = 0;
+    SMBX13::modMain.GoalTime = GetTickCount() + 1000;
+    SMBX13::modMain.fpsCount = 0;
+    SMBX13::modMain.cycleCount = 0;
+    SMBX13::modMain.gameTime = 0;
+    SMBX13::modMain.fpsTime = 0;
 
     LunaDllWaitFrame();
 }

@@ -386,7 +386,7 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
 
     // Notify Lua code
     // But don't pass keystrokes with ctrl or alt as a keypress
-    if (gLunaLua.isValid() &&
+    if (gLunaLua.isValid() && !LunaMsgBox::IsActive() &&
         (!ctrlPressed || (virtKey == VK_LCONTROL) || (virtKey == VK_RCONTROL)) &&
         (!altPressed || (virtKey == VK_LMENU) || (virtKey == VK_RMENU))
         ) {
@@ -468,7 +468,7 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
 
 static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
 {
-    if (gLunaLua.isValid()) {
+    if (gLunaLua.isValid() && !LunaMsgBox::IsActive()) {
         std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
         auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
         if (cKey != 0) {
@@ -1114,7 +1114,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
             {
                 // Invalid level name
                 std::wstring path = L"SMBX could not open \"" + settings.levelPath + L"\"";
-                MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+                LunaMsgBox::ShowW(0, path.c_str(), L"Error", MB_ICONERROR);
                 _exit(1);
             }
             gStartupSettings.patch = true;
@@ -1367,7 +1367,7 @@ void TrySkipPatch()
         std::string errCmd = "Failed to Hook";
         errCmd += "\nErr-Code: ";
         errCmd += std::to_string((long long)errCode);
-        MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
+        LunaMsgBox::ShowA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
     }
 
     /************************************************************************/

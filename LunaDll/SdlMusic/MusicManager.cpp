@@ -157,7 +157,7 @@ void MusicManager::rebuildSoundCache()
     if(!failedSounds.empty())
     {
         std::string errorMsg = "Some audio files failed to load:\n" + failedSounds;
-        MessageBoxA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK | MB_ICONWARNING);
     }
 }
 
@@ -355,7 +355,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
     IniProcessing soundsList(path);
     if(!soundsList.isOpened())
     {
-        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 
@@ -438,7 +438,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
     IniProcessing musicList(path);
     if (!musicList.isOpened())
     {
-        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 

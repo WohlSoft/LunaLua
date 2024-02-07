@@ -159,12 +159,12 @@ static void LoadThread(void)
 
         if (luaL_loadbuffer(L, mainCode.c_str(), mainCode.length(), "=loadscreen.lua"))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Syntax Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Syntax Error", MB_OK | MB_ICONWARNING);
             return;
         }
         if (lua_pcall(L, 0, 0, 0))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Critical Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Critical Error", MB_OK | MB_ICONWARNING);
             return;
         }
     }
@@ -173,7 +173,7 @@ static void LoadThread(void)
     lua_getglobal(L, "init");
     if (lua_pcall(L, 0, 0, 0))
     {
-        MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
     }
 
     
@@ -193,7 +193,7 @@ static void LoadThread(void)
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
         }
 
         Renderer::Get().RenderBelowPriority(DBL_MAX);

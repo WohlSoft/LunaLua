@@ -282,3 +282,10 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 #endif
 
 std::string GetEditorPlacedItem();
+
+namespace LunaMsgBox
+{
+    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);
+    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+    bool IsActive();
+}

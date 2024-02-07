@@ -340,6 +340,11 @@ public:
     template<typename T>
     inline AsmPatch<Size + 6> JNLE(T addr) const { return JG(addr); }
 
+    inline AsmPatch<Size + 6> JO(void* addr) const { return JO((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JO(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x80).dword(addr - cursor() - 6);
+    }
+
     inline AsmPatch<Size + 13> SAFE_CALL(void* func) const { return SAFE_CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 13> SAFE_CALL(std::uintptr_t func) const {
         return (

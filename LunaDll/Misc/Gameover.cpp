@@ -56,12 +56,12 @@ static lua_State* gameoverGetLuaState()
 
         if (luaL_loadbuffer(L, mainCode.c_str(), mainCode.length(), "=gameover.lua"))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Syntax Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Syntax Error", MB_OK | MB_ICONWARNING);
             return nullptr;
         }
         if (lua_pcall(L, 0, 0, 0))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Critical Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Critical Error", MB_OK | MB_ICONWARNING);
             return nullptr;
         }
     }
@@ -73,7 +73,7 @@ static lua_State* gameoverGetLuaState()
     lua_getglobal(L, "init");
     if (lua_pcall(L, 0, 0, 0))
     {
-        MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Error", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Error", MB_OK | MB_ICONWARNING);
     }
 
     return L;
@@ -134,7 +134,7 @@ void LunaLuaGameoverScreenRun() {
             lua_getglobal(L, "onDraw");
             if (lua_pcall(L, 0, 0, 0))
             {
-                MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Error", MB_OK | MB_ICONWARNING);
+                LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua Gameover Screen Error", MB_OK | MB_ICONWARNING);
                 done = true;
             }
             lua_getglobal(L, "_gameoverComplete");
