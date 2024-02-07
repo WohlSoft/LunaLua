@@ -1260,6 +1260,7 @@ static auto npcSectionFixImpl = PatchCollection(
     PATCH(0xA0C931).JMP(&runtimeHookNPCSectionWrap).NOP_PAD_TO_SIZE<194>()
 );
 Patchable& gNPCSectionFix = npcSectionFixImpl;
+bool gSlideJumpFixIsEnabled;
 
 // these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
 static auto linkFairyClowncarFixesImpl = PatchCollection(
@@ -1781,6 +1782,9 @@ void TrySkipPatch()
     PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
     // Patch link being able to kill himself by turning into a fairy in clowncar
     gLinkFairyClowncarFixes.Apply();
+    // Patch weird behaviour when sliding while holding jump
+    PATCH(0x997FC2).JMP(&runtimeHookJumpSlideFix).NOP_PAD_TO_SIZE<24>().Apply();
+    gSlideJumpFixIsEnabled = true;
 
     // Hooks to close the game instead of returning to titlescreen
     PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu

@@ -470,6 +470,7 @@ typedef struct ExtendedPlayerFields_\
     bool nonpcinteraction;\
     bool noplayerinteraction;\
     unsigned int collisionGroup;\
+    int slidingTimeSinceOnSlope;\
 } ExtendedPlayerFields;";
     }
 
@@ -551,6 +552,11 @@ typedef struct ExtendedPlayerFields_\
         {
             gLinkFairyClowncarFixes.Unapply();
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetSlideJumpFix(bool enable)
+    {
+        gSlideJumpFixIsEnabled = enable;
     }
 
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
