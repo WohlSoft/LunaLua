@@ -33,6 +33,7 @@ bool gRenderBackgroundFlag = true;
 bool gDisablePlayerFilterBounceFix = false;
 
 // Other gameplay settings
+bool gRightClickPaste = false;
 bool gLavaIsWeak = false;
 
 // Flag for returning from gameover screen
