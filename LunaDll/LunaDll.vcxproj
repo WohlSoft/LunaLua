@@ -280,7 +280,8 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
-    <ClInclude Include="SMBXInternal\modMain.h" />
+    <ClInclude Include="SMBXInternal\Types.h" />
+    <ClInclude Include="SMBXInternal\Variables.h" />
     <ClInclude Include="SMBXInternal\Musicbox.h" />
     <ClInclude Include="SMBXInternal\NativeInput.h" />
     <ClInclude Include="SMBXInternal\Layer.h" />
