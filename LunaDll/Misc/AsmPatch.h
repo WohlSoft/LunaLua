@@ -5,6 +5,7 @@
 #include <exception>
 #include <type_traits>
 #include <tuple>
+#include <map>
 
 template<void* TARGETADDR>
 _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
@@ -81,7 +82,105 @@ class MemoryUnlock {
         MemoryUnlock(const MemoryUnlock&) = delete;
         MemoryUnlock& operator= (const MemoryUnlock&) = delete;
 
-        static bool Memcpy(void* dest, const void* src, std::size_t count);
+        static bool Memcpy(void* dest, const void* src, std::size_t count, const char* lineNum);
+};
+
+// Alias for MemoryUnlock::Memcpy with tracking
+#define MemoryUnlock_Memcpy(dest, src, size) MemoryUnlock::Memcpy(dest, src, size, __FILE__ ":" PATCH__STRINGIZE(__LINE__))
+
+// Structure for detecting conflicts
+struct AsmRange;
+struct AsmRange
+{
+    static std::map<std::pair<const char*, uintptr_t>, AsmRange*> mCache;
+    static AsmRange* mFirst;
+    const char* mLineNum;
+    const std::uintptr_t mAddr;
+    std::uintptr_t mSize;
+    AsmRange* mNext;
+    bool mCollided;
+
+    static AsmRange* getInst(const char* lineNum, std::uintptr_t addr, std::uintptr_t size = 0)
+    {
+        auto key = std::pair<const char*, uintptr_t>(lineNum, addr);
+        auto cursor = mCache.find(key);
+        if (cursor == mCache.end())
+        {
+            // New copy needed
+            AsmRange* ret = new AsmRange(lineNum, addr, size);
+            mCache[key] = ret;
+            return ret;
+        }
+        else
+        {
+            // Reuse existing copy
+            AsmRange* ret = cursor->second;
+            ret->SetSize(size);
+            return ret;
+        }
+    }
+
+    void SetSize(std::uintptr_t size)
+    {
+        if (size > mSize)
+        {
+            mSize = size;
+            CheckCollision();
+        }
+    }
+
+private:
+    AsmRange(const char* lineNum, std::uintptr_t addr, std::uintptr_t size=0) :
+        mLineNum(lineNum), mAddr(addr), mSize(0), mNext(nullptr), mCollided(false)
+    {
+        if (mFirst == nullptr)
+        {
+            // First entry
+            mFirst = this;
+            SetSize(size);
+        }
+        else
+        {
+            // Subsequent entry
+            AsmRange* mCursor = mFirst;
+            AsmRange* mPrev = nullptr;
+            while (mCursor && (mCursor->mAddr < mAddr))
+            {
+                mPrev = mCursor;
+                mCursor = mCursor->mNext;
+            }
+
+            if (mPrev == nullptr)
+            {
+                // Replacing first element
+                mFirst = this;
+            }
+            else
+            {
+                // Replacing later element
+                mPrev->mNext = this;
+            }
+            // Set next chain entry
+            mNext = mCursor;
+            SetSize(size);
+
+            if (mPrev != nullptr)
+            {
+                mPrev->CheckCollision();
+            }
+        }
+    }
+
+    void CheckCollision()
+    {
+        if (mCollided) return;
+
+        if (mNext && ((mAddr + mSize) > mNext->mAddr))
+        {
+            mCollided = true;
+            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s\n\t%s\n", mAddr, mNext->mAddr, mLineNum, mNext->mLineNum);
+        }
+    }
 };
 
 template <std::uintptr_t Size>
@@ -94,15 +193,29 @@ public:
     std::uint8_t mPatchBytes[Size ? Size : 1];
     std::uint8_t mOrigBytes[Size ? Size : 1];
     bool mIsPatched;
+    AsmRange* const mRangeTrack;
 
     /***********************************
      * Constructor and utility methods *
      ***********************************/
 public:
-    AsmPatch(std::uintptr_t addr) :
+    AsmPatch(std::uintptr_t addr, const char* lineNum) :
         mAddr(addr),
-        mIsPatched(false)
+        mIsPatched(false),
+        mRangeTrack(AsmRange::getInst(lineNum, addr, Size))
     {}
+
+    template <std::uintptr_t OldSize>
+    AsmPatch(std::uintptr_t addr, const AsmPatch<OldSize>& old) :
+        mAddr(addr),
+        mIsPatched(false),
+        mRangeTrack(old.mRangeTrack)
+    {
+        if (mRangeTrack)
+        {
+            mRangeTrack->SetSize(Size);
+        }
+    }
 
     std::uintptr_t size() const {
         return Size;
@@ -152,7 +265,7 @@ public:
 
     template <typename... Ts>
     inline AsmPatch<Size + 1 + sizeof...(Ts)> bytes(std::uint8_t newByte, Ts... params) const {
-        AsmPatch<Size + 1> ret(mAddr);
+        AsmPatch<Size + 1> ret(mAddr, *this);
         for (std::uintptr_t i = 0; i < Size; i++) {
             ret.mPatchBytes[i] = mPatchBytes[i];
         }
@@ -364,7 +477,7 @@ public:
     inline AsmPatch<PadSize> NOP_PAD_TO_SIZE() const {
         static_assert(PadSize >= Size, "Cannot pad smaller than old size");
 
-        AsmPatch<PadSize> ret(mAddr);
+        AsmPatch<PadSize> ret(mAddr, *this);
         for (std::uintptr_t i = 0; i < Size; i++) {
             ret.mPatchBytes[i] = mPatchBytes[i];
         }
@@ -395,12 +508,16 @@ public:
     }
 };
 
-static inline AsmPatch<0> PATCH(std::uintptr_t addr) {
-    return AsmPatch<0>(addr);
+static inline AsmPatch<0> PATCH_impl(std::uintptr_t addr, const char* lineNum) {
+    return AsmPatch<0>(addr, lineNum);
 }
-static inline AsmPatch<0> PATCH(void* addr) {
-    return PATCH((std::uintptr_t)addr);
+static inline AsmPatch<0> PATCH_impl(void* addr, const char* lineNum) {
+    return PATCH_impl((std::uintptr_t)addr, lineNum);
 }
+
+#define PATCH__STRINGIZE2(x) #x
+#define PATCH__STRINGIZE(x) PATCH__STRINGIZE2(x)
+#define PATCH(x) PATCH_impl(x, __FILE__ ":" PATCH__STRINGIZE(__LINE__))
 
 /********************/
 /* Patch colleciton */

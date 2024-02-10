@@ -1351,11 +1351,7 @@ void TrySkipPatch()
     /* Replaced Imports                                                     */
     /************************************************************************/
     {
-        MemoryUnlock lock(&IMP_vbaStrCmp, sizeof(IMP_vbaStrCmp));
-        if (lock.IsValid())
-        {
-            IMP_vbaStrCmp = &replacement_VbaStrCmp;
-        }
+        PATCH(&IMP_vbaStrCmp).dword(reinterpret_cast<uintptr_t>(&replacement_VbaStrCmp)).Apply();
     }
 
     /************************************************************************/
