@@ -521,11 +521,13 @@ typedef struct ExtendedPlayerFields_\
         if (enable)
         {
             gDisableNPCDownwardClipFix.Apply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Apply();
         }
         else
         {
             gDisableNPCDownwardClipFix.Unapply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Unapply();
         }
     }

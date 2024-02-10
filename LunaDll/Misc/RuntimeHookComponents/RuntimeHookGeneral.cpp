@@ -1254,7 +1254,11 @@ static unsigned int __stdcall LatePatch(void)
 // Some patches that can be swapped on/off
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
-AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
+
+// NOTE: This patch replaces a section 167 bytes long from 0xA13188 to 0xA1322E, but we don't NOP out the whole thing
+//       since that would conflict with NpcIdExtender, and this patch may be turned on/off at runtime.
+AsmPatch<6> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<6>();
+
 static auto npcSectionFixImpl = PatchCollection(
     PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>(),
     PATCH(0xA0C931).JMP(&runtimeHookNPCSectionWrap).NOP_PAD_TO_SIZE<194>()
@@ -1315,9 +1319,14 @@ void TrySkipPatch()
 
     // This used to check gStartupSettings.patch but now we always nop out the loader code. We don't use it.
     {
-        PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
+        //nop out the loader code and a hook
+        PATCH(0x8BECF2)
+            .NOP_PAD_TO_SIZE<0xE>()
+            .CALL(&InitHook)
+            .NOP_PAD_TO_SIZE<0x1B5>()
+            .Apply();
+
         *(WORD*)(0xB25046) = -1; //set run to true
-        PATCH(0x8BED00).CALL(&InitHook).Apply();
     }
 
     // Init freeimage:
@@ -1477,7 +1486,6 @@ void TrySkipPatch()
     PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
 
 
@@ -1769,7 +1777,7 @@ void TrySkipPatch()
     PATCH(0x8E6C75).CALL(&runtimeHookInitGameWindow).Apply();
     PATCH(0xA02AEE).CALL(&runtimeHookInitGameWindow).Apply();
 
-    //Shorten reload thingy? TEMP
+    // Shorten reload patch
     PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>().Apply();
 
     // Patch piranah divide by zero bug

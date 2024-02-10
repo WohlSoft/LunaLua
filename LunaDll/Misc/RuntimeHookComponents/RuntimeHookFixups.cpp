@@ -336,8 +336,6 @@ void fixup_Credits()
     const unsigned char line3_redigit[] = { 0xBA, 0xAC, 0xA6, 0x42, 0x00 };
 
     MemoryUnlock_Memcpy((void*)0x008F72D0, nullStrMove, sizeof(nullStrMove));  //Sorry Redigit, but I need that space
-    MemoryUnlock_Memcpy((void*)0x008F7300, nullStrMove, sizeof(nullStrMove));
-    MemoryUnlock_Memcpy((void*)0x008F7318, nullStrMove, sizeof(nullStrMove));
 
 
     MemoryUnlock_Memcpy((void*)0x008F7288, line1_createdBy, sizeof(line1_createdBy)); //Still give you the "king" position
@@ -350,6 +348,7 @@ void fixup_Credits()
     VB6StrPtr* text_Rednaxela = new VB6StrPtr(std::string("Rednaxela"));
     VB6StrPtr* text_Kil = new VB6StrPtr(std::string("Kil"));
     VB6StrPtr* text_Wohlstand = new VB6StrPtr(std::string("Wohlstand"));
+
 
     MemoryUnlock_Memcpy((void*)0x008F7301, text_HackedBy, 4);
     MemoryUnlock_Memcpy((void*)0x008F7319, text_Kevsoft, 4);

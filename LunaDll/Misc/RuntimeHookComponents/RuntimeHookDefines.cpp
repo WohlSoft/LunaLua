@@ -4,6 +4,7 @@
 #include "../AsmPatch.h"
 #include "../../Main.h"
 #include "../MiscFuncs.h"
+#include "../../SMBXInternal/Reconstructed/Util/NpcToCoins.h"
 
 #define DEFINES_FFI_EXPORT(sig) extern "C" __declspec(dllexport) sig __cdecl
 
@@ -172,34 +173,46 @@ DEFINES_FFI_EXPORT(bool) LunaLua_Defines__effect_Zoomer_killEffectEnabled__get()
 
 // The effect ID of the npc-to-coins function (default is the coinflip effect)
 DEFINES_FFI_EXPORT(void) LunaLua_Defines__effect_NpcToCoin__set(uint8_t value) {
-    PATCH(0x00A3C86E).byte(value).Apply();
+    // This _would_ be what we'd patch, but fixup_NativeFuncs replaced this
+    // PATCH(0x00A3C86E).byte(value).Apply();
+
+    Reconstructed::Util::npcToCoinEffect = static_cast<EffectID>(value);
 }
 DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__effect_NpcToCoin__get() {
-    return *reinterpret_cast<const uint8_t*>(0x00A3C86E);
+    return Reconstructed::Util::npcToCoinEffect;
 }
 
 // The sound ID of the npc - to - coins function(default is the coin sound).
 DEFINES_FFI_EXPORT(void) LunaLua_Defines__sound_NpcToCoin__set(uint8_t value) {
-    PATCH(0x00A3C87F).byte(value).Apply();
+    // This _would_ be what we'd patch, but fixup_NativeFuncs replaced this
+    // PATCH(0x00A3C87F).byte(value).Apply();
+
+    Reconstructed::Util::npcToCoinSound = value;
 }
 DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__sound_NpcToCoin__get() {
-    return *reinterpret_cast<const uint8_t*>(0x00A3C87F);
+    return static_cast<uint8_t>(Reconstructed::Util::npcToCoinSound);
 }
 
 // The coin-value for every destroyed npc in the npc-to-coins function.
 DEFINES_FFI_EXPORT(void) LunaLua_Defines__npcToCoinValue__set(uint8_t value) {
-    PATCH(0x00A3C891).byte(value).Apply();
+    // This _would_ be what we'd patch, but fixup_NativeFuncs replaced this
+    // PATCH(0x00A3C891).byte(value).Apply();
+
+    Reconstructed::Util::npcToCoinValue = value;
 }
 DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__npcToCoinValue__get() {
-    return *reinterpret_cast<const uint8_t*>(0x00A3C891);
+    return static_cast<uint8_t>(Reconstructed::Util::npcToCoinValue);
 }
 
 // How many coins get subtracted from the coin-value when the coin value hits 100 coins.
 DEFINES_FFI_EXPORT(void) LunaLua_Defines__npcToCoinValueReset__set(uint8_t value) {
-    PATCH(0x00A3C8EE).byte(value).Apply();
+    // This _would_ be what we'd patch, but fixup_NativeFuncs replaced this
+    // PATCH(0x00A3C8EE).byte(value).Apply();
+
+    Reconstructed::Util::npcToCoinValueReset = value;
 }
 DEFINES_FFI_EXPORT(uint8_t) LunaLua_Defines__npcToCoinValueReset__get() {
-    return *reinterpret_cast<const uint8_t*>(0x00A3C8EE);
+    return static_cast<uint8_t>(Reconstructed::Util::npcToCoinValueReset);
 }
 
 // The score values of smb3 roulette
