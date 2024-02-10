@@ -132,5 +132,11 @@ void printBoxA(const char *fmt, ...)
     dbgboxA(buf);
 }
 
+// Music and SFX helpers
+int gSoundEffectCount = 0;
+int gSpecialMusicCount = 0;
+int gOverworldMusicCount = 0;
+int gLevelMusicCount = 0;
+
 std::string gEditorPlacedItem = "nil";
 std::mutex g_editorIPCMutex;
