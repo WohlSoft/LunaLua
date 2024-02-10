@@ -907,3 +907,25 @@ extern "C" {
         return gLavaIsWeak;
     }
 }
+
+extern "C" {
+    // Debug function to dump patched ranges
+    FFI_EXPORT(const char*) LunaLuaGetPatchedRange(int i)
+    {
+        static std::string strRet;
+
+        std::stringstream strBuild;
+        for (AsmRange* cursor = AsmRange::mFirst; cursor; cursor = cursor->mNext)
+        {
+            if (i == 0)
+            {
+                strBuild << std::hex << "0x" << cursor->mAddr << "\t0x" << cursor->mSize << "\t" << cursor->mLineNum;
+                break;
+            }
+            i--;
+        }
+
+        strRet = strBuild.str();
+        return strRet.c_str();
+    }
+}
