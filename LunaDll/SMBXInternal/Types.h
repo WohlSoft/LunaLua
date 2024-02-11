@@ -8,11 +8,15 @@
 
 #pragma pack(push, 1)
 namespace SMBX13 {
-    static constexpr ptrdiff_t maxNPCType        = 1000; // Patched by NpcIdExtender.cpp, was 300
-    static constexpr ptrdiff_t maxBackgroundType = 1000; // Patched by NpcIdExtender.cpp, was 200
-    static constexpr ptrdiff_t maxBlockType      = 2000; // Patched by NpcIdExtender.cpp, was 700
-
     namespace Types {
+        // Type related constants
+        static constexpr ptrdiff_t maxBlockType      = 2000; // Patched by NpcIdExtender.cpp, was 700.
+        static constexpr ptrdiff_t maxBackgroundType = 1000; // Patched by NpcIdExtender.cpp, was 200.
+        static constexpr ptrdiff_t maxNPCType        = 1000; // Patched by NpcIdExtender.cpp, was 300.
+        static constexpr ptrdiff_t maxWarps          = 2000; // Patched by RuntimeHookFixups.cpp, was 200.
+        static constexpr ptrdiff_t maxLayers         = 255;  // Patched by RuntimeHookFixups.cpp, was 100. Note that the array is 0-indexed and this is the count. Note that "maxLayers" wasn't in the VB code.
+        static constexpr ptrdiff_t maxEvents         = 255;  // Patched by RuntimeHookFixups.cpp, was 100. Note that the array is 0-indexed and this is the count. Note that "maxEvents" wasn't in the VB code.
+
         struct StdPicture_t;
 
         struct Controls_t {
@@ -813,7 +817,7 @@ namespace SMBX13 {
             VB6ArrayRef<WorldPath_t, 1, 2000>               WorldPath;            // 0xB258D4
             int16_t                                         numWorldPaths;        // 0xB258E0
             int16_t                                         numWarps;             // 0xB258E2
-            VB6ArrayRef<Warp_t, 1, 200>                     Warp;                 // 0xB258F4
+            VB6ArrayRef<Warp_t, 1, maxWarps>                Warp;                 // 0xB258F4
             VB6ArrayRef<Tile_t, 1, 20000>                   Tile;                 // 0xB25910
             VB6ArrayRef<Scene_t, 1, 5000>                   Scene;                // 0xB2592C
             VB6ArrayRef<CreditLine_t, 1, 200>               Credit;               // 0xB25948
@@ -987,8 +991,8 @@ namespace SMBX13 {
             int16_t                                         minShow;              // 0xB2C69A
             int16_t                                         maxShow;              // 0xB2C69C
             int16_t                                         _padding24_;          // 0xB2C69E
-            VB6ArrayRef<Layer_t, 0, 100>                    Layer;                // 0xB2C6B0
-            VB6ArrayRef<Events_t, 0, 100>                   Events;               // 0xB2C6CC
+            VB6ArrayRef<Layer_t, 0, maxLayers-1>            Layer;                // 0xB2C6B0
+            VB6ArrayRef<Events_t, 0, maxEvents-1>           Events;               // 0xB2C6CC
             int16_t                                         ReturnWarp;           // 0xB2C6D8
             int16_t                                         StartWarp;            // 0xB2C6DA
             Physics_t                                       Physics;              // 0xB2C6DC
