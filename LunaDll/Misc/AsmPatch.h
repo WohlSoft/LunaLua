@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <tuple>
 #include <map>
+#include <vector>
 
 template<void* TARGETADDR>
 _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
@@ -92,31 +93,34 @@ class MemoryUnlock {
 struct AsmRange;
 struct AsmRange
 {
-    static std::map<std::pair<const char*, uintptr_t>, AsmRange*> mCache;
-    static AsmRange* mFirst;
+    static std::vector<AsmRange> mAlloc;
+    static std::map<std::pair<const char*, uintptr_t>, std::intptr_t> mCache;
+    static std::intptr_t mFirstIdx;
+    std::intptr_t mIdx;
     const char* mLineNum;
-    const std::uintptr_t mAddr;
+    std::uintptr_t mAddr;
     std::uintptr_t mSize;
-    AsmRange* mNext;
+    std::intptr_t mNextIdx;
     bool mCollided;
 
-    static AsmRange* getInst(const char* lineNum, std::uintptr_t addr, std::uintptr_t size = 0)
+    static std::intptr_t getInst(const char* lineNum, std::uintptr_t addr, std::uintptr_t size = 0)
     {
         auto key = std::pair<const char*, uintptr_t>(lineNum, addr);
         auto cursor = mCache.find(key);
         if (cursor == mCache.end())
         {
             // New copy needed
-            AsmRange* ret = new AsmRange(lineNum, addr, size);
-            mCache[key] = ret;
-            return ret;
+            std::intptr_t idx = mAlloc.size();
+            mAlloc.emplace_back(idx, lineNum, addr, size);
+            mCache[key] = idx;
+            return idx;
         }
         else
         {
             // Reuse existing copy
-            AsmRange* ret = cursor->second;
-            ret->SetSize(size);
-            return ret;
+            std::intptr_t idx = cursor->second;
+            mAlloc[idx].SetSize(size);
+            return idx;
         }
     }
 
@@ -129,56 +133,69 @@ struct AsmRange
         }
     }
 
-private:
-    AsmRange(const char* lineNum, std::uintptr_t addr, std::uintptr_t size=0) :
-        mLineNum(lineNum), mAddr(addr), mSize(0), mNext(nullptr), mCollided(false)
+    static void UpdateSize(std::intptr_t idx, std::uintptr_t size)
     {
-        if (mFirst == nullptr)
+        if (idx >= 0)
+        {
+            mAlloc[idx].SetSize(size);
+        }
+    }
+
+    //AsmRange(const AsmRange& other) :
+    //    mIdx(other.mIdx), mLineNum(other.mLineNum), mAddr(other.mAddr), mSize(other.mSize), mNextIdx(other.mNextIdx), mCollided(other.mCollided)
+    //{
+    //}
+
+    AsmRange(std::intptr_t idx, const char* lineNum, std::uintptr_t addr, std::uintptr_t size) :
+        mIdx(idx), mLineNum(lineNum), mAddr(addr), mSize(0), mNextIdx(-1), mCollided(false)
+    {
+        if (mFirstIdx < 0)
         {
             // First entry
-            mFirst = this;
+            mFirstIdx = mIdx;
             SetSize(size);
         }
         else
         {
             // Subsequent entry
-            AsmRange* mCursor = mFirst;
-            AsmRange* mPrev = nullptr;
-            while (mCursor && (mCursor->mAddr < mAddr))
+            std::intptr_t mCursor = mFirstIdx;
+            std::intptr_t mPrev = -1;
+            while ((mCursor >= 0) && (mAlloc[mCursor].mAddr < mAddr))
             {
                 mPrev = mCursor;
-                mCursor = mCursor->mNext;
+                mCursor = mAlloc[mCursor].mNextIdx;
             }
 
-            if (mPrev == nullptr)
+            if (mPrev < 0)
             {
                 // Replacing first element
-                mFirst = this;
+                mFirstIdx = mIdx;
             }
             else
             {
                 // Replacing later element
-                mPrev->mNext = this;
+                mAlloc[mPrev].mNextIdx = mIdx;
             }
             // Set next chain entry
-            mNext = mCursor;
+            mNextIdx = mCursor;
             SetSize(size);
 
-            if (mPrev != nullptr)
+            if (mPrev >= 0)
             {
-                mPrev->CheckCollision();
+                mAlloc[mPrev].CheckCollision();
             }
         }
     }
 
+private:
     void CheckCollision()
     {
         if (mCollided) return;
 
-        if (mNext && ((mAddr + mSize) > mNext->mAddr))
+        if ((mNextIdx >= 0) && ((mAddr + mSize) > mAlloc[mNextIdx].mAddr))
         {
             mCollided = true;
-            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s\n\t%s\n", mAddr, mNext->mAddr, mLineNum, mNext->mLineNum);
+            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s\n\t%s\n", mAddr, mAlloc[mNextIdx].mAddr, mLineNum, mAlloc[mNextIdx].mLineNum);
         }
     }
 };
@@ -193,7 +210,7 @@ public:
     std::uint8_t mPatchBytes[Size ? Size : 1];
     std::uint8_t mOrigBytes[Size ? Size : 1];
     bool mIsPatched;
-    AsmRange* const mRangeTrack;
+    intptr_t const mRangeTrackIdx;
 
     /***********************************
      * Constructor and utility methods *
@@ -202,18 +219,18 @@ public:
     AsmPatch(std::uintptr_t addr, const char* lineNum) :
         mAddr(addr),
         mIsPatched(false),
-        mRangeTrack(AsmRange::getInst(lineNum, addr, Size))
+        mRangeTrackIdx(AsmRange::getInst(lineNum, addr, Size))
     {}
 
     template <std::uintptr_t OldSize>
     AsmPatch(std::uintptr_t addr, const AsmPatch<OldSize>& old) :
         mAddr(addr),
         mIsPatched(false),
-        mRangeTrack(old.mRangeTrack)
+        mRangeTrackIdx(old.mRangeTrackIdx)
     {
-        if (mRangeTrack)
+        if (mRangeTrackIdx >= 0)
         {
-            mRangeTrack->SetSize(Size);
+            AsmRange::UpdateSize(mRangeTrackIdx, Size);
         }
     }
 

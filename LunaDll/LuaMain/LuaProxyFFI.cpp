@@ -915,11 +915,13 @@ extern "C" {
         static std::string strRet;
 
         std::stringstream strBuild;
-        for (AsmRange* cursor = AsmRange::mFirst; cursor; cursor = cursor->mNext)
+        for (std::intptr_t cursor = AsmRange::mFirstIdx; cursor <= 0; cursor = AsmRange::mAlloc[cursor].mNextIdx)
         {
-            if (i == 0)
+            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate.
+            if (i <= 0)
             {
-                strBuild << std::hex << "0x" << cursor->mAddr << "\t0x" << cursor->mSize << "\t" << cursor->mLineNum;
+                const AsmRange& range = AsmRange::mAlloc[cursor];
+                strBuild << std::hex << "0x" << range.mAddr << "\t0x" << range.mSize << "\t" << range.mLineNum;
                 break;
             }
             i--;
