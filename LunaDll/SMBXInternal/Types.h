@@ -10,12 +10,35 @@
 namespace SMBX13 {
     namespace Types {
         // Type related constants
+        static constexpr ptrdiff_t maxBlocks         = 20000;
+        static constexpr ptrdiff_t maxPlayers        = 200;
+        static constexpr ptrdiff_t maxEffects        = 1000;
+        static constexpr ptrdiff_t maxNPCs           = 5000;
+        static constexpr ptrdiff_t maxBackgrounds    = 8000;
+        static constexpr ptrdiff_t maxPlayerFrames   = 750;
         static constexpr ptrdiff_t maxBlockType      = 2000; // Patched by NpcIdExtender.cpp, was 700.
         static constexpr ptrdiff_t maxBackgroundType = 1000; // Patched by NpcIdExtender.cpp, was 200.
+        static constexpr ptrdiff_t maxSceneType      = 100;
         static constexpr ptrdiff_t maxNPCType        = 1000; // Patched by NpcIdExtender.cpp, was 300.
+        static constexpr ptrdiff_t maxEffectType     = 200;
         static constexpr ptrdiff_t maxWarps          = 2000; // Patched by RuntimeHookFixups.cpp, was 200.
-        static constexpr ptrdiff_t maxLayers         = 255;  // Patched by RuntimeHookFixups.cpp, was 100. Note that the array is 0-indexed and this is the count. Note that "maxLayers" wasn't in the VB code.
-        static constexpr ptrdiff_t maxEvents         = 255;  // Patched by RuntimeHookFixups.cpp, was 100. Note that the array is 0-indexed and this is the count. Note that "maxEvents" wasn't in the VB code.
+        static constexpr ptrdiff_t numBackground2    = 100;
+        static constexpr ptrdiff_t numCharacters     = 5;
+        static constexpr ptrdiff_t numStates         = 7;
+        static constexpr ptrdiff_t maxWater          = 1000;
+        static constexpr ptrdiff_t maxWorldLevels    = 400;
+        static constexpr ptrdiff_t maxWorldPaths     = 2000;
+        static constexpr ptrdiff_t maxWorldMusic     = 1000;
+        static constexpr ptrdiff_t numSounds         = 100;
+        static constexpr ptrdiff_t maxSections       = 20;
+        static constexpr ptrdiff_t maxTileType       = 400;
+        static constexpr ptrdiff_t maxLevelType      = 100;
+        static constexpr ptrdiff_t maxPathType       = 100;
+        static constexpr ptrdiff_t maxTiles          = 20000;
+        static constexpr ptrdiff_t maxScenes         = 5000;
+        static constexpr ptrdiff_t FLBlocks          = 8000;
+        static constexpr ptrdiff_t maxLayers         = 255;  // Patched by RuntimeHookFixups.cpp, was 101. Note that the array is 0-indexed and this is the count. Note that "maxLayers" wasn't in the VB code.
+        static constexpr ptrdiff_t maxEvents         = 255;  // Patched by RuntimeHookFixups.cpp, was 101. Note that the array is 0-indexed and this is the count. Note that "maxEvents" wasn't in the VB code.
 
         struct StdPicture_t;
 
@@ -591,11 +614,11 @@ namespace SMBX13 {
 #endif
 
         struct SelectWorld_t {
-            VB6StrPtr               WorldName;  // 0x0
-            VB6StrPtr               WorldPath;  // 0x4
-            VB6StrPtr               WorldFile;  // 0x8
-            VB6Array<VB6Bool, 1, 5> blockChar;  // 0xC
-            int16_t                 _padding1_; // 0x16
+            VB6StrPtr                           WorldName;  // 0x0
+            VB6StrPtr                           WorldPath;  // 0x4
+            VB6StrPtr                           WorldFile;  // 0x8
+            VB6Array<VB6Bool, 1, numCharacters> blockChar;  // 0xC
+            int16_t                             _padding1_; // 0x16
         };
 #if !defined(__INTELLISENSE__)
         static_assert(sizeof(SelectWorld_t) == 0x18, "sizeof(SelectWorld_t) must be 0x18");
@@ -656,73 +679,73 @@ namespace SMBX13 {
 #endif
 
         struct EffectDefaults_t {
-            VB6Array<int16_t, 1, 200> EffectWidth;  // 0x0
-            VB6Array<int16_t, 1, 200> EffectHeight; // 0x190
+            VB6Array<int16_t, 1, maxEffectType> EffectWidth;  // 0x0
+            VB6Array<int16_t, 1, maxEffectType> EffectHeight; // 0x190
         };
 #if !defined(__INTELLISENSE__)
         static_assert(sizeof(EffectDefaults_t) == 0x320, "sizeof(EffectDefaults_t) must be 0x320");
 #endif
 
         struct Physics_t {
-            int16_t                         PlayerJumpHeight;       // 0x0
-            int16_t                         PlayerBlockJumpHeight;  // 0x2
-            int16_t                         PlayerHeadJumpHeight;   // 0x4
-            int16_t                         PlayerNPCJumpHeight;    // 0x6
-            int16_t                         PlayerSpringJumpHeight; // 0x8
-            int16_t                         _padding1_;             // 0xA
-            float                           PlayerJumpVelocity;     // 0xC
-            float                           PlayerRunSpeed;         // 0x10
-            float                           PlayerWalkSpeed;        // 0x14
-            int16_t                         PlayerTerminalVelocity; // 0x18
-            int16_t                         _padding2_;             // 0x1A
-            float                           PlayerGravity;          // 0x1C
-            VB6Array2D<int16_t, 1, 5, 1, 7> PlayerHeight;           // 0x20
-            VB6Array2D<int16_t, 1, 5, 1, 7> PlayerDuckHeight;       // 0x66
-            VB6Array2D<int16_t, 1, 5, 1, 7> PlayerWidth;            // 0xAC
-            VB6Array2D<int16_t, 1, 5, 1, 7> PlayerGrabSpotX;        // 0xF2
-            VB6Array2D<int16_t, 1, 5, 1, 7> PlayerGrabSpotY;        // 0x138
-            int16_t                         NPCTimeOffScreen;       // 0x17E
-            int16_t                         NPCCanHurtWait;         // 0x180
-            int16_t                         _padding3_;             // 0x182
-            float                           NPCShellSpeed;          // 0x184
-            float                           NPCShellSpeedY;         // 0x188
-            float                           NPCWalkingSpeed;        // 0x18C
-            float                           NPCWalkingOnSpeed;      // 0x190
-            float                           NPCMushroomSpeed;       // 0x194
-            float                           NPCGravity;             // 0x198
-            float                           NPCGravityReal;         // 0x19C
-            int16_t                         NPCPSwitch;             // 0x1A0
-            int16_t                         _padding4_;             // 0x1A2
+            int16_t                                             PlayerJumpHeight;       // 0x0
+            int16_t                                             PlayerBlockJumpHeight;  // 0x2
+            int16_t                                             PlayerHeadJumpHeight;   // 0x4
+            int16_t                                             PlayerNPCJumpHeight;    // 0x6
+            int16_t                                             PlayerSpringJumpHeight; // 0x8
+            int16_t                                             _padding1_;             // 0xA
+            float                                               PlayerJumpVelocity;     // 0xC
+            float                                               PlayerRunSpeed;         // 0x10
+            float                                               PlayerWalkSpeed;        // 0x14
+            int16_t                                             PlayerTerminalVelocity; // 0x18
+            int16_t                                             _padding2_;             // 0x1A
+            float                                               PlayerGravity;          // 0x1C
+            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerHeight;           // 0x20
+            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerDuckHeight;       // 0x66
+            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerWidth;            // 0xAC
+            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerGrabSpotX;        // 0xF2
+            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerGrabSpotY;        // 0x138
+            int16_t                                             NPCTimeOffScreen;       // 0x17E
+            int16_t                                             NPCCanHurtWait;         // 0x180
+            int16_t                                             _padding3_;             // 0x182
+            float                                               NPCShellSpeed;          // 0x184
+            float                                               NPCShellSpeedY;         // 0x188
+            float                                               NPCWalkingSpeed;        // 0x18C
+            float                                               NPCWalkingOnSpeed;      // 0x190
+            float                                               NPCMushroomSpeed;       // 0x194
+            float                                               NPCGravity;             // 0x198
+            float                                               NPCGravityReal;         // 0x19C
+            int16_t                                             NPCPSwitch;             // 0x1A0
+            int16_t                                             _padding4_;             // 0x1A2
         };
 #if !defined(__INTELLISENSE__)
         static_assert(sizeof(Physics_t) == 0x1A4, "sizeof(Physics_t) must be 0x1A4");
 #endif
 
         struct Events_t {
-            VB6StrPtr                   addSavedEvent;    // 0x0
-            VB6StrPtr                   RemoveSavedEvent; // 0x4
-            VB6Bool                     LayerSmoke;       // 0x8
-            int16_t                     Sound;            // 0xA
-            VB6StrPtr                   Name;             // 0xC
-            VB6StrPtr                   Text;             // 0x10
-            VB6Array<VB6StrPtr, 0, 20>  HideLayer;        // 0x14
-            VB6Array<VB6StrPtr, 0, 20>  ShowLayer;        // 0x68
-            VB6Array<VB6StrPtr, 0, 20>  ToggleLayer;      // 0xBC
-            VB6Array<int16_t, 0, 20>    Music;            // 0x110
-            VB6Array<int16_t, 0, 20>    Background;       // 0x13A
-            VB6Array<Location_t, 0, 20> level;            // 0x164
-            int16_t                     EndGame;          // 0x554
-            int16_t                     _padding1_;       // 0x556
-            VB6StrPtr                   TriggerEvent;     // 0x558
-            double                      TriggerDelay;     // 0x55C
-            Controls_t                  Controls;         // 0x564
-            VB6StrPtr                   MoveLayer;        // 0x578
-            float                       SpeedX;           // 0x57C
-            float                       SpeedY;           // 0x580
-            float                       AutoX;            // 0x584
-            float                       AutoY;            // 0x588
-            int16_t                     AutoSection;      // 0x58C
-            VB6Bool                     AutoStart;        // 0x58E
+            VB6StrPtr                            addSavedEvent;    // 0x0
+            VB6StrPtr                            RemoveSavedEvent; // 0x4
+            VB6Bool                              LayerSmoke;       // 0x8
+            int16_t                              Sound;            // 0xA
+            VB6StrPtr                            Name;             // 0xC
+            VB6StrPtr                            Text;             // 0x10
+            VB6Array<VB6StrPtr, 0, 20>           HideLayer;        // 0x14
+            VB6Array<VB6StrPtr, 0, 20>           ShowLayer;        // 0x68
+            VB6Array<VB6StrPtr, 0, 20>           ToggleLayer;      // 0xBC
+            VB6Array<int16_t, 0, maxSections>    Music;            // 0x110
+            VB6Array<int16_t, 0, maxSections>    Background;       // 0x13A
+            VB6Array<Location_t, 0, maxSections> level;            // 0x164
+            int16_t                              EndGame;          // 0x554
+            int16_t                              _padding1_;       // 0x556
+            VB6StrPtr                            TriggerEvent;     // 0x558
+            double                               TriggerDelay;     // 0x55C
+            Controls_t                           Controls;         // 0x564
+            VB6StrPtr                            MoveLayer;        // 0x578
+            float                                SpeedX;           // 0x57C
+            float                                SpeedY;           // 0x580
+            float                                AutoX;            // 0x584
+            float                                AutoY;            // 0x588
+            int16_t                              AutoSection;      // 0x58C
+            VB6Bool                              AutoStart;        // 0x58E
         };
 #if !defined(__INTELLISENSE__)
         static_assert(sizeof(Events_t) == 0x590, "sizeof(Events_t) must be 0x590");
@@ -777,14 +800,14 @@ namespace SMBX13 {
             VB6Bool                                         WorldEditor;          // 0xB25136
             VB6ArrayRef<Location_t, 1, 2>                   PlayerStart;          // 0xB25148
             VB6ArrayRef<VB6Bool, 0, 20>                     blockCharacter;       // 0xB25164
-            VB6ArrayRef<int16_t, 0, 200>                    OwedMount;            // 0xB25180
-            VB6ArrayRef<int16_t, 0, 200>                    OwedMountType;        // 0xB2519C
-            VB6ArrayRef<float, 0, 20>                       AutoX;                // 0xB251B8
-            VB6ArrayRef<float, 0, 20>                       AutoY;                // 0xB251D4
+            VB6ArrayRef<int16_t, 0, maxPlayers>             OwedMount;            // 0xB25180
+            VB6ArrayRef<int16_t, 0, maxPlayers>             OwedMountType;        // 0xB2519C
+            VB6ArrayRef<float, 0, maxSections>              AutoX;                // 0xB251B8
+            VB6ArrayRef<float, 0, maxSections>              AutoY;                // 0xB251D4
             int16_t                                         numStars;             // 0xB251E0
             int16_t                                         _padding8_;           // 0xB251E2
             nPlay_t                                         nPlay;                // 0xB251E4
-            VB6ArrayRef<Water_t, 0, 1000>                   Water;                // 0xB256F4
+            VB6ArrayRef<Water_t, 0, maxWater>               Water;                // 0xB256F4
             int16_t                                         numWater;             // 0xB25700
             int16_t                                         _padding9_;           // 0xB25702
             VB6ArrayRef<Star_t, 1, 1000>                    Star;                 // 0xB25714
@@ -792,34 +815,34 @@ namespace SMBX13 {
             VB6StrPtr                                       StartLevel;           // 0xB25724
             VB6Bool                                         NoMap;                // 0xB25728
             VB6Bool                                         RestartLevel;         // 0xB2572A
-            VB6ArrayRef<float, 0, 20>                       LevelChop;            // 0xB2573C
-            VB6ArrayRef<int16_t, -8000, 8000>               FirstBlock;           // 0xB25758
-            VB6ArrayRef<int16_t, -8000, 8000>               LastBlock;            // 0xB25774
+            VB6ArrayRef<float, 0, maxSections>              LevelChop;            // 0xB2573C
+            VB6ArrayRef<int16_t, -FLBlocks, FLBlocks>       FirstBlock;           // 0xB25758
+            VB6ArrayRef<int16_t, -FLBlocks, FLBlocks>       LastBlock;            // 0xB25774
             int16_t                                         MidBackground;        // 0xB25780
             int16_t                                         LastBackground;       // 0xB25782
             int16_t                                         iBlocks;              // 0xB25784
             int16_t                                         _padding10_;          // 0xB25786
-            VB6ArrayRef<int16_t, 0, 20000>                  iBlock;               // 0xB25798
+            VB6ArrayRef<int16_t, 0, maxBlocks>              iBlock;               // 0xB25798
             int16_t                                         numTiles;             // 0xB257A4
             int16_t                                         numScenes;            // 0xB257A6
-            VB6ArrayRef<VB6StrPtr, 0, 20>                   CustomMusic;          // 0xB257B8
-            VB6ArrayRef<Location_t, 0, 20>                  level;                // 0xB257D4
-            VB6ArrayRef<VB6Bool, 0, 20>                     LevelWrap;            // 0xB257F0
-            VB6ArrayRef<VB6Bool, 0, 20>                     OffScreenExit;        // 0xB2580C
-            VB6ArrayRef<int16_t, 0, 20>                     bgMusic;              // 0xB25828
-            VB6ArrayRef<int16_t, 0, 20>                     bgMusicREAL;          // 0xB25844
-            VB6ArrayRef<int16_t, 0, 20>                     Background2REAL;      // 0xB25860
-            VB6ArrayRef<Location_t, 0, 20>                  LevelREAL;            // 0xB2587C
+            VB6ArrayRef<VB6StrPtr, 0, maxSections>          CustomMusic;          // 0xB257B8
+            VB6ArrayRef<Location_t, 0, maxSections>         level;                // 0xB257D4
+            VB6ArrayRef<VB6Bool, 0, maxSections>            LevelWrap;            // 0xB257F0
+            VB6ArrayRef<VB6Bool, 0, maxSections>            OffScreenExit;        // 0xB2580C
+            VB6ArrayRef<int16_t, 0, maxSections>            bgMusic;              // 0xB25828
+            VB6ArrayRef<int16_t, 0, maxSections>            bgMusicREAL;          // 0xB25844
+            VB6ArrayRef<int16_t, 0, maxSections>            Background2REAL;      // 0xB25860
+            VB6ArrayRef<Location_t, 0, maxSections>         LevelREAL;            // 0xB2587C
             int16_t                                         curMusic;             // 0xB25888
             int16_t                                         _padding11_;          // 0xB2588A
-            VB6ArrayRef<int32_t, 0, 20>                     bgColor;              // 0xB2589C
-            VB6ArrayRef<int16_t, 0, 20>                     Background2;          // 0xB258B8
-            VB6ArrayRef<WorldPath_t, 1, 2000>               WorldPath;            // 0xB258D4
+            VB6ArrayRef<int32_t, 0, maxSections>            bgColor;              // 0xB2589C
+            VB6ArrayRef<int16_t, 0, maxSections>            Background2;          // 0xB258B8
+            VB6ArrayRef<WorldPath_t, 1, maxWorldPaths>      WorldPath;            // 0xB258D4
             int16_t                                         numWorldPaths;        // 0xB258E0
             int16_t                                         numWarps;             // 0xB258E2
             VB6ArrayRef<Warp_t, 1, maxWarps>                Warp;                 // 0xB258F4
-            VB6ArrayRef<Tile_t, 1, 20000>                   Tile;                 // 0xB25910
-            VB6ArrayRef<Scene_t, 1, 5000>                   Scene;                // 0xB2592C
+            VB6ArrayRef<Tile_t, 1, maxTiles>                Tile;                 // 0xB25910
+            VB6ArrayRef<Scene_t, 1, maxScenes>              Scene;                // 0xB2592C
             VB6ArrayRef<CreditLine_t, 1, 200>               Credit;               // 0xB25948
             int16_t                                         numCredits;           // 0xB25954
             int16_t                                         numBlock;             // 0xB25956
@@ -829,25 +852,25 @@ namespace SMBX13 {
             int16_t                                         numPlayers;           // 0xB2595E
             int16_t                                         numWorldLevels;       // 0xB25960
             int16_t                                         _padding12_;          // 0xB25962
-            VB6ArrayRef<WorldMusic_t, 1, 1000>              WorldMusic;           // 0xB25974
+            VB6ArrayRef<WorldMusic_t, 1, maxWorldMusic>     WorldMusic;           // 0xB25974
             int16_t                                         numWorldMusic;        // 0xB25980
             int16_t                                         _padding13_;          // 0xB25982
-            VB6ArrayRef<WorldLevel_t, 1, 400>               WorldLevel;           // 0xB25994
-            VB6ArrayRef<Background_t, 1, 8000>              Background;           // 0xB259B0
-            VB6ArrayRef<Effect_t, 1, 1000>                  Effect;               // 0xB259CC
-            VB6ArrayRef<NPC_t, -128, 5000>                  NPC;                  // 0xB259E8
-            VB6ArrayRef<Block_t, 0, 20000>                  Block;                // 0xB25A04
-            VB6ArrayRef<Player_t, 0, 200>                   Player;               // 0xB25A20
-            VB6ArrayRef<int16_t, 0, 750>                    MarioFrameX;          // 0xB25A3C
-            VB6ArrayRef<int16_t, 0, 750>                    MarioFrameY;          // 0xB25A58
-            VB6ArrayRef<int16_t, 0, 750>                    LuigiFrameX;          // 0xB25A74
-            VB6ArrayRef<int16_t, 0, 750>                    LuigiFrameY;          // 0xB25A90
-            VB6ArrayRef<int16_t, 0, 750>                    PeachFrameX;          // 0xB25AAC
-            VB6ArrayRef<int16_t, 0, 750>                    PeachFrameY;          // 0xB25AC8
-            VB6ArrayRef<int16_t, 0, 750>                    ToadFrameX;           // 0xB25AE4
-            VB6ArrayRef<int16_t, 0, 750>                    ToadFrameY;           // 0xB25B00
-            VB6ArrayRef<int16_t, 0, 750>                    LinkFrameX;           // 0xB25B1C
-            VB6ArrayRef<int16_t, 0, 750>                    LinkFrameY;           // 0xB25B38
+            VB6ArrayRef<WorldLevel_t, 1, maxWorldLevels>    WorldLevel;           // 0xB25994
+            VB6ArrayRef<Background_t, 1, maxBackgrounds>    Background;           // 0xB259B0
+            VB6ArrayRef<Effect_t, 1, maxEffects>            Effect;               // 0xB259CC
+            VB6ArrayRef<NPC_t, -128, maxNPCs>               NPC;                  // 0xB259E8
+            VB6ArrayRef<Block_t, 0, maxBlocks>              Block;                // 0xB25A04
+            VB6ArrayRef<Player_t, 0, maxPlayers>            Player;               // 0xB25A20
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        MarioFrameX;          // 0xB25A3C
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        MarioFrameY;          // 0xB25A58
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        LuigiFrameX;          // 0xB25A74
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        LuigiFrameY;          // 0xB25A90
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        PeachFrameX;          // 0xB25AAC
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        PeachFrameY;          // 0xB25AC8
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        ToadFrameX;           // 0xB25AE4
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        ToadFrameY;           // 0xB25B00
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        LinkFrameX;           // 0xB25B1C
+            VB6ArrayRef<int16_t, 0, maxPlayerFrames>        LinkFrameY;           // 0xB25B38
             VB6ArrayRef<VB6Bool, 0, maxBackgroundType>      BackgroundFence;      // 0xB25B54
             VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameOffsetX;      // 0xB25B70
             VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameOffsetY;      // 0xB25B8C
@@ -893,40 +916,40 @@ namespace SMBX13 {
             VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockIsSizable;       // 0xB2B930
             VB6ArrayRef<int16_t, 0, maxBlockType>           BlockSlope;           // 0xB2B94C
             VB6ArrayRef<int16_t, 0, maxBlockType>           BlockSlope2;          // 0xB2B968
-            VB6ArrayRef<double, 0, 200>                     vScreenX;             // 0xB2B984
-            VB6ArrayRef<double, 0, 200>                     vScreenY;             // 0xB2B9A0
-            VB6ArrayRef<double, 1, 200>                     qScreenX;             // 0xB2B9BC
-            VB6ArrayRef<double, 1, 200>                     qScreenY;             // 0xB2B9D8
+            VB6ArrayRef<double, 0, maxPlayers>              vScreenX;             // 0xB2B984
+            VB6ArrayRef<double, 0, maxPlayers>              vScreenY;             // 0xB2B9A0
+            VB6ArrayRef<double, 1, maxPlayers>              qScreenX;             // 0xB2B9BC
+            VB6ArrayRef<double, 1, maxPlayers>              qScreenY;             // 0xB2B9D8
             VB6Bool                                         qScreen;              // 0xB2B9E4
             int16_t                                         _padding14_;          // 0xB2B9E6
             VB6ArrayRef<int16_t, 0, maxBlockType>           BlockWidth;           // 0xB2B9F8
             VB6ArrayRef<int16_t, 0, maxBlockType>           BlockHeight;          // 0xB2BA14
             VB6ArrayRef<int16_t, 1, 100>                    BonusWidth;           // 0xB2BA30
             VB6ArrayRef<int16_t, 1, 100>                    BonusHeight;          // 0xB2BA4C
-            VB6ArrayRef<int16_t, 1, 200>                    EffectWidth;          // 0xB2BA68
-            VB6ArrayRef<int16_t, 1, 200>                    EffectHeight;         // 0xB2BA84
+            VB6ArrayRef<int16_t, 1, maxEffectType>          EffectWidth;          // 0xB2BA68
+            VB6ArrayRef<int16_t, 1, maxEffectType>          EffectHeight;         // 0xB2BA84
             EffectDefaults_t                                EffectDefaults;       // 0xB2BA90
             VB6ArrayRef<int16_t, 1, 100>                    SceneWidth;           // 0xB2BDC0
             VB6ArrayRef<int16_t, 1, 100>                    SceneHeight;          // 0xB2BDDC
-            VB6ArrayRef<VB6Bool, 1, 200>                    BackgroundHasNoMask;  // 0xB2BDF8 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
+            VB6ArrayRef<VB6Bool, 1, 200>                    BackgroundHasNoMask;  // 0xB2BDF8 (NOTE: using 'maxBackgroundType' because rsizing missed by NpcIdExtender. Doesn't seem to matter though?)
             VB6ArrayRef<VB6Bool, 0, maxBackgroundType>      Foreground;           // 0xB2BE14
             VB6ArrayRef<int16_t, 1, maxBackgroundType>      BackgroundWidth;      // 0xB2BE30
             VB6ArrayRef<int16_t, 1, maxBackgroundType>      BackgroundHeight;     // 0xB2BE4C
-            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrame;      // 0xB2BE68 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
-            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrameCount; // 0xB2BE84 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
+            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrame;      // 0xB2BE68 (NOTE: using 'maxBackgroundType' because rsizing missed by NpcIdExtender. Doesn't seem to matter though?)
+            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrameCount; // 0xB2BE84 (NOTE: using 'maxBackgroundType' because rsizing missed by NpcIdExtender. Doesn't seem to matter though?)
             VB6ArrayRef<int16_t, 1, maxBlockType>           BlockFrame;           // 0xB2BEA0
             VB6ArrayRef<int16_t, 1, maxBlockType>           BlockFrame2;          // 0xB2BEBC
             VB6ArrayRef<int16_t, 1, 1000>                   sBlockArray;          // 0xB2BED8
             int16_t                                         sBlockNum;            // 0xB2BEE4
             int16_t                                         _padding15_;          // 0xB2BEE6
-            VB6ArrayRef<int16_t, 1, 100>                    SceneFrame;           // 0xB2BEF8
-            VB6ArrayRef<int16_t, 1, 100>                    SceneFrame2;          // 0xB2BF14
+            VB6ArrayRef<int16_t, 1, maxSceneType>           SceneFrame;           // 0xB2BEF8
+            VB6ArrayRef<int16_t, 1, maxSceneType>           SceneFrame2;          // 0xB2BF14
             VB6ArrayRef<int16_t, 0, 100>                    SpecialFrame;         // 0xB2BF30
             VB6ArrayRef<float, 0, 100>                      SpecialFrameCount;    // 0xB2BF4C
-            VB6ArrayRef<int16_t, 1, 400>                    TileWidth;            // 0xB2BF68
-            VB6ArrayRef<int16_t, 1, 400>                    TileHeight;           // 0xB2BF84
-            VB6ArrayRef<int16_t, 1, 400>                    TileFrame;            // 0xB2BFA0
-            VB6ArrayRef<int16_t, 1, 400>                    TileFrame2;           // 0xB2BFBC
+            VB6ArrayRef<int16_t, 1, maxTileType>            TileWidth;            // 0xB2BF68
+            VB6ArrayRef<int16_t, 1, maxTileType>            TileHeight;           // 0xB2BF84
+            VB6ArrayRef<int16_t, 1, maxTileType>            TileFrame;            // 0xB2BFA0
+            VB6ArrayRef<int16_t, 1, maxTileType>            TileFrame2;           // 0xB2BFBC
             VB6ArrayRef<int16_t, 1, 100>                    LevelFrame;           // 0xB2BFD8
             VB6ArrayRef<int16_t, 1, 100>                    LevelFrame2;          // 0xB2BFF4
             VB6ArrayRef<VB6Bool, 1, maxBlockType>           BlockHasNoMask;       // 0xB2C010
@@ -941,8 +964,8 @@ namespace SMBX13 {
             VB6ArrayRef<int16_t, 1, 10>                     CoinFrame2;           // 0xB2C10C
             EditorCursor_t                                  EditorCursor;         // 0xB2C118
             EditorControls_t                                EditorControls;       // 0xB2C558
-            VB6ArrayRef<int16_t, 1, 100>                    Sound;                // 0xB2C574
-            VB6ArrayRef<int16_t, 1, 100>                    SoundPause;           // 0xB2C590
+            VB6ArrayRef<int16_t, 1, numSounds>              Sound;                // 0xB2C574
+            VB6ArrayRef<int16_t, 1, numSounds>              SoundPause;           // 0xB2C590
             VB6Bool                                         EndLevel;             // 0xB2C59C
             int16_t                                         LevelMacro;           // 0xB2C59E
             int16_t                                         LevelMacroCounter;    // 0xB2C5A0
@@ -960,8 +983,8 @@ namespace SMBX13 {
             int16_t                                         curWorldLevel;        // 0xB2C5D6
             int16_t                                         curWorldMusic;        // 0xB2C5D8
             int16_t                                         _padding18_;          // 0xB2C5DA
-            VB6ArrayRef<VB6Bool, 0, 20>                     NoTurnBack;           // 0xB2C5EC
-            VB6ArrayRef<VB6Bool, 0, 20>                     UnderWater;           // 0xB2C608
+            VB6ArrayRef<VB6Bool, 0, maxSections>            NoTurnBack;           // 0xB2C5EC
+            VB6ArrayRef<VB6Bool, 0, maxSections>            UnderWater;           // 0xB2C608
             VB6Bool                                         TestLevel;            // 0xB2C614
             int16_t                                         _padding19_;          // 0xB2C616
             VB6StrPtr                                       FullFileName;         // 0xB2C618
@@ -1046,11 +1069,11 @@ namespace SMBX13 {
             VB6ArrayRef<int32_t, 1, maxBlockType>           GFXBlockMask;         // 0xB2C978
             VB6ArrayRef<StdPicture_t, 1, maxBlockType>      GFXBlockBMP;          // 0xB2C9A0
             VB6ArrayRef<StdPicture_t, 1, maxBlockType>      GFXBlockMaskBMP;      // 0xB2C9C8
-            VB6ArrayRef<VB6Bool, 1, 100>                    GFXBackground2Custom; // 0xB2C9E4
-            VB6ArrayRef<int32_t, 1, 100>                    GFXBackground2;       // 0xB2CA00
-            VB6ArrayRef<StdPicture_t, 1, 100>               GFXBackground2BMP;    // 0xB2CA28
-            VB6ArrayRef<int16_t, 1, 100>                    GFXBackground2Height; // 0xB2CA44
-            VB6ArrayRef<int16_t, 1, 100>                    GFXBackground2Width;  // 0xB2CA60
+            VB6ArrayRef<VB6Bool, 1, numBackground2>         GFXBackground2Custom; // 0xB2C9E4
+            VB6ArrayRef<int32_t, 1, numBackground2>         GFXBackground2;       // 0xB2CA00
+            VB6ArrayRef<StdPicture_t, 1, numBackground2>    GFXBackground2BMP;    // 0xB2CA28
+            VB6ArrayRef<int16_t, 1, numBackground2>         GFXBackground2Height; // 0xB2CA44
+            VB6ArrayRef<int16_t, 1, numBackground2>         GFXBackground2Width;  // 0xB2CA60
             VB6ArrayRef<VB6Bool, 1, maxNPCType>             GFXNPCCustom;         // 0xB2CA7C
             VB6ArrayRef<int32_t, 1, maxNPCType>             GFXNPC;               // 0xB2CA98
             VB6ArrayRef<int32_t, 1, maxNPCType>             GFXNPCMask;           // 0xB2CAB4
@@ -1058,13 +1081,13 @@ namespace SMBX13 {
             VB6ArrayRef<StdPicture_t, 1, maxNPCType>        GFXNPCMaskBMP;        // 0xB2CB04
             VB6ArrayRef<int16_t, 1, maxNPCType>             GFXNPCHeight;         // 0xB2CB20
             VB6ArrayRef<int16_t, 1, maxNPCType>             GFXNPCWidth;          // 0xB2CB3C
-            VB6ArrayRef<VB6Bool, 1, 200>                    GFXEffectCustom;      // 0xB2CB58
-            VB6ArrayRef<int32_t, 1, 200>                    GFXEffect;            // 0xB2CB74
-            VB6ArrayRef<int32_t, 1, 200>                    GFXEffectMask;        // 0xB2CB90
-            VB6ArrayRef<StdPicture_t, 1, 200>               GFXEffectBMP;         // 0xB2CBB8
-            VB6ArrayRef<StdPicture_t, 1, 200>               GFXEffectMaskBMP;     // 0xB2CBE0
-            VB6ArrayRef<int16_t, 1, 200>                    GFXEffectHeight;      // 0xB2CBFC
-            VB6ArrayRef<int16_t, 1, 200>                    GFXEffectWidth;       // 0xB2CC18
+            VB6ArrayRef<VB6Bool, 1, maxEffectType>          GFXEffectCustom;      // 0xB2CB58
+            VB6ArrayRef<int32_t, 1, maxEffectType>          GFXEffect;            // 0xB2CB74
+            VB6ArrayRef<int32_t, 1, maxEffectType>          GFXEffectMask;        // 0xB2CB90
+            VB6ArrayRef<StdPicture_t, 1, maxEffectType>     GFXEffectBMP;         // 0xB2CBB8
+            VB6ArrayRef<StdPicture_t, 1, maxEffectType>     GFXEffectMaskBMP;     // 0xB2CBE0
+            VB6ArrayRef<int16_t, 1, maxEffectType>          GFXEffectHeight;      // 0xB2CBFC
+            VB6ArrayRef<int16_t, 1, maxEffectType>          GFXEffectWidth;       // 0xB2CC18
             VB6ArrayRef<VB6Bool, 1, maxBackgroundType>      GFXBackgroundCustom;  // 0xB2CC34
             VB6ArrayRef<int32_t, 1, maxBackgroundType>      GFXBackground;        // 0xB2CC50
             VB6ArrayRef<int32_t, 1, maxBackgroundType>      GFXBackgroundMask;    // 0xB2CC6C
@@ -1117,40 +1140,40 @@ namespace SMBX13 {
             VB6ArrayRef<int32_t, 1, 10>                     GFXYoshiTMask;        // 0xB2D238
             VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiTBMP;         // 0xB2D260
             VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiTMaskBMP;     // 0xB2D288
-            VB6ArrayRef<int32_t, 1, 400>                    GFXTileCustom;        // 0xB2D2A4
-            VB6ArrayRef<int32_t, 1, 400>                    GFXTile;              // 0xB2D2C0
-            VB6ArrayRef<StdPicture_t, 1, 400>               GFXTileBMP;           // 0xB2D2E8
-            VB6ArrayRef<int16_t, 1, 400>                    GFXTileHeight;        // 0xB2D304
-            VB6ArrayRef<int16_t, 1, 400>                    GFXTileWidth;         // 0xB2D320
-            VB6ArrayRef<int32_t, 0, 100>                    GFXLevelCustom;       // 0xB2D33C
-            VB6ArrayRef<int32_t, 0, 100>                    GFXLevel;             // 0xB2D358
-            VB6ArrayRef<int32_t, 0, 100>                    GFXLevelMask;         // 0xB2D374
-            VB6ArrayRef<StdPicture_t, 0, 100>               GFXLevelBMP;          // 0xB2D39C
-            VB6ArrayRef<StdPicture_t, 0, 100>               GFXLevelMaskBMP;      // 0xB2D3C4
-            VB6ArrayRef<int16_t, 0, 100>                    GFXLevelHeight;       // 0xB2D3E0
-            VB6ArrayRef<int16_t, 0, 100>                    GFXLevelWidth;        // 0xB2D3FC
-            VB6ArrayRef<VB6Bool, 0, 100>                    GFXLevelBig;          // 0xB2D418
-            VB6ArrayRef<int32_t, 1, 100>                    GFXSceneCustom;       // 0xB2D434
-            VB6ArrayRef<int32_t, 1, 100>                    GFXScene;             // 0xB2D450
-            VB6ArrayRef<int32_t, 1, 100>                    GFXSceneMask;         // 0xB2D46C
-            VB6ArrayRef<StdPicture_t, 1, 100>               GFXSceneBMP;          // 0xB2D494
-            VB6ArrayRef<StdPicture_t, 1, 100>               GFXSceneMaskBMP;      // 0xB2D4BC
-            VB6ArrayRef<int16_t, 1, 100>                    GFXSceneHeight;       // 0xB2D4D8
-            VB6ArrayRef<int16_t, 1, 100>                    GFXSceneWidth;        // 0xB2D4F4
-            VB6ArrayRef<int32_t, 1, 100>                    GFXPathCustom;        // 0xB2D510
-            VB6ArrayRef<int32_t, 1, 100>                    GFXPath;              // 0xB2D52C
-            VB6ArrayRef<int32_t, 1, 100>                    GFXPathMask;          // 0xB2D548
-            VB6ArrayRef<StdPicture_t, 1, 100>               GFXPathBMP;           // 0xB2D570
-            VB6ArrayRef<StdPicture_t, 1, 100>               GFXPathMaskBMP;       // 0xB2D598
-            VB6ArrayRef<int16_t, 1, 100>                    GFXPathHeight;        // 0xB2D5B4
-            VB6ArrayRef<int16_t, 1, 100>                    GFXPathWidth;         // 0xB2D5D0
-            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayerCustom;      // 0xB2D5EC
-            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayer;            // 0xB2D608
-            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayerMask;        // 0xB2D624
-            VB6ArrayRef<StdPicture_t, 1, 5>                 GFXPlayerBMP;         // 0xB2D64C
-            VB6ArrayRef<StdPicture_t, 1, 5>                 GFXPlayerMaskBMP;     // 0xB2D674
-            VB6ArrayRef<int16_t, 1, 5>                      GFXPlayerHeight;      // 0xB2D690
-            VB6ArrayRef<int16_t, 1, 5>                      GFXPlayerWidth;       // 0xB2D6AC
+            VB6ArrayRef<int32_t, 1, maxTileType>            GFXTileCustom;        // 0xB2D2A4
+            VB6ArrayRef<int32_t, 1, maxTileType>            GFXTile;              // 0xB2D2C0
+            VB6ArrayRef<StdPicture_t, 1, maxTileType>       GFXTileBMP;           // 0xB2D2E8
+            VB6ArrayRef<int16_t, 1, maxTileType>            GFXTileHeight;        // 0xB2D304
+            VB6ArrayRef<int16_t, 1, maxTileType>            GFXTileWidth;         // 0xB2D320
+            VB6ArrayRef<int32_t, 0, maxLevelType>           GFXLevelCustom;       // 0xB2D33C
+            VB6ArrayRef<int32_t, 0, maxLevelType>           GFXLevel;             // 0xB2D358
+            VB6ArrayRef<int32_t, 0, maxLevelType>           GFXLevelMask;         // 0xB2D374
+            VB6ArrayRef<StdPicture_t, 0, maxLevelType>      GFXLevelBMP;          // 0xB2D39C
+            VB6ArrayRef<StdPicture_t, 0, maxLevelType>      GFXLevelMaskBMP;      // 0xB2D3C4
+            VB6ArrayRef<int16_t, 0, maxLevelType>           GFXLevelHeight;       // 0xB2D3E0
+            VB6ArrayRef<int16_t, 0, maxLevelType>           GFXLevelWidth;        // 0xB2D3FC
+            VB6ArrayRef<VB6Bool, 0, maxLevelType>           GFXLevelBig;          // 0xB2D418
+            VB6ArrayRef<int32_t, 1, maxSceneType>           GFXSceneCustom;       // 0xB2D434
+            VB6ArrayRef<int32_t, 1, maxSceneType>           GFXScene;             // 0xB2D450
+            VB6ArrayRef<int32_t, 1, maxSceneType>           GFXSceneMask;         // 0xB2D46C
+            VB6ArrayRef<StdPicture_t, 1, maxSceneType>      GFXSceneBMP;          // 0xB2D494
+            VB6ArrayRef<StdPicture_t, 1, maxSceneType>      GFXSceneMaskBMP;      // 0xB2D4BC
+            VB6ArrayRef<int16_t, 1, maxSceneType>           GFXSceneHeight;       // 0xB2D4D8
+            VB6ArrayRef<int16_t, 1, maxSceneType>           GFXSceneWidth;        // 0xB2D4F4
+            VB6ArrayRef<int32_t, 1, maxPathType>            GFXPathCustom;        // 0xB2D510
+            VB6ArrayRef<int32_t, 1, maxPathType>            GFXPath;              // 0xB2D52C
+            VB6ArrayRef<int32_t, 1, maxPathType>            GFXPathMask;          // 0xB2D548
+            VB6ArrayRef<StdPicture_t, 1, maxPathType>       GFXPathBMP;           // 0xB2D570
+            VB6ArrayRef<StdPicture_t, 1, maxPathType>       GFXPathMaskBMP;       // 0xB2D598
+            VB6ArrayRef<int16_t, 1, maxPathType>            GFXPathHeight;        // 0xB2D5B4
+            VB6ArrayRef<int16_t, 1, maxPathType>            GFXPathWidth;         // 0xB2D5D0
+            VB6ArrayRef<int32_t, 1, numCharacters>          GFXPlayerCustom;      // 0xB2D5EC
+            VB6ArrayRef<int32_t, 1, numCharacters>          GFXPlayer;            // 0xB2D608
+            VB6ArrayRef<int32_t, 1, numCharacters>          GFXPlayerMask;        // 0xB2D624
+            VB6ArrayRef<StdPicture_t, 1, numCharacters>     GFXPlayerBMP;         // 0xB2D64C
+            VB6ArrayRef<StdPicture_t, 1, numCharacters>     GFXPlayerMaskBMP;     // 0xB2D674
+            VB6ArrayRef<int16_t, 1, numCharacters>          GFXPlayerHeight;      // 0xB2D690
+            VB6ArrayRef<int16_t, 1, numCharacters>          GFXPlayerWidth;       // 0xB2D6AC
             int16_t                                         PlayerCharacter;      // 0xB2D6B8
             int16_t                                         PlayerCharacter2;     // 0xB2D6BA
             double                                          MenuMouseX;           // 0xB2D6BC
@@ -1174,7 +1197,7 @@ namespace SMBX13 {
             double                                          tempTime;             // 0xB2D738
             VB6Bool                                         BattleMode;           // 0xB2D740
             int16_t                                         BattleWinner;         // 0xB2D742
-            VB6ArrayRef<int16_t, 1, 200>                    BattleLives;          // 0xB2D754
+            VB6ArrayRef<int16_t, 1, maxPlayers>             BattleLives;          // 0xB2D754
             int16_t                                         BattleIntro;          // 0xB2D760
             int16_t                                         BattleOutro;          // 0xB2D762
             VB6StrPtr                                       LevelName;            // 0xB2D764
