@@ -587,6 +587,9 @@ namespace NPC {
 	int16_t GetMountColor(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
+    void UpdateNPCMountSetting(short npcID, const std::string& propname, short value);
+    short GetYoshiNPC(short color);
+    short GetShoeNPC(short color);
 
     bool CheckSemisolidCollidingFlyType(unsigned int flyType);
     void SetSemisolidCollidingFlyType(unsigned int flyType, bool shouldCollide);

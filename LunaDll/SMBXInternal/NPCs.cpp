@@ -278,6 +278,9 @@ static int16_t npcprop_mountcolor[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
 static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
+// Mount colour -> yoshi/boot npc id, assigned automatically when mountcolor/isyoshi/isshoe changes
+static std::unordered_map<unsigned int, unsigned int> npc_mountColorYoshiNPCMap = {  };
+static std::unordered_map<unsigned int, unsigned int> npc_mountColorBootNPCMap = {  };
 
 // Initialization of inbuilt NPC property arrays
 void NPC::InitProperties() {
@@ -507,17 +510,30 @@ void NPC::InitProperties() {
     npcprop_terminalvelocity[260] = -1;
 
 	// Set built-in boot / yoshi colors
-	npcprop_mountcolor[0x23] = 1;
-	npcprop_mountcolor[0xBF] = 2;
-	npcprop_mountcolor[0xC1] = 3;
-	npcprop_mountcolor[0x5F] = 1;
+    npc_mountColorBootNPCMap.clear();
+    npc_mountColorYoshiNPCMap.clear();
+    npcprop_mountcolor[0x23] = 1;
+    npcprop_mountcolor[0xBF] = 2;
+    npcprop_mountcolor[0xC1] = 3;
+    npc_mountColorBootNPCMap[1] = 0x23;
+    npc_mountColorBootNPCMap[2] = 0xBF;
+    npc_mountColorBootNPCMap[3] = 0xC1;
+    npcprop_mountcolor[0x5F] = 1;
 	npcprop_mountcolor[0x62] = 2;
-	npcprop_mountcolor[0x63] = 3;
-	npcprop_mountcolor[0x64] = 4;
-	npcprop_mountcolor[0x94] = 5;
-	npcprop_mountcolor[0x95] = 6;
-	npcprop_mountcolor[0x96] = 7;
-	npcprop_mountcolor[0xE4] = 8;
+    npcprop_mountcolor[0x63] = 3;
+    npcprop_mountcolor[0x64] = 4;
+    npcprop_mountcolor[0x94] = 5;
+    npcprop_mountcolor[0x95] = 6;
+    npcprop_mountcolor[0x96] = 7;
+    npcprop_mountcolor[0xE4] = 8;
+    npc_mountColorYoshiNPCMap[1] = 0x5F;
+    npc_mountColorYoshiNPCMap[2] = 0x62;
+    npc_mountColorYoshiNPCMap[3] = 0x63;
+    npc_mountColorYoshiNPCMap[4] = 0x64;
+    npc_mountColorYoshiNPCMap[5] = 0x94;
+    npc_mountColorYoshiNPCMap[6] = 0x95;
+    npc_mountColorYoshiNPCMap[7] = 0x96;
+    npc_mountColorYoshiNPCMap[8] = 0xE4;
 
     npc_semisolidCollidingFlyTypeMap.clear();
     npc_semisolidCollidingFlyTypeMap[1] = true;
@@ -593,6 +609,65 @@ double NPC::GetTerminalVelocity(int id) {
     
     // Custom terminal velocity
     return npcprop_terminalvelocity[id];
+}
+
+// Called when changing isshoe/isyoshi/mountcolor
+void NPC::UpdateNPCMountSetting(short npcID, const std::string& propname, short value) {
+    // deregister old mount config
+    if (npcprop_mountcolor[npcID] != 0) {
+        if (isShoeNPC_ptr[npcID] != 0) {
+            // check to deregister shoe colour
+            auto it = npc_mountColorBootNPCMap.find(npcprop_mountcolor[npcID]);
+            if (it != npc_mountColorBootNPCMap.end() && it->second == npcID) {
+                // deregister boot colour
+                npc_mountColorBootNPCMap.erase(npcprop_mountcolor[npcID]);
+            }
+        }
+        if (isYoshiNPC_ptr[npcID] != 0) {
+            // check to deregister yoshi colour
+            auto it = npc_mountColorYoshiNPCMap.find(npcprop_mountcolor[npcID]);
+            if (it != npc_mountColorYoshiNPCMap.end() && it->second == npcID) {
+                // deregister boot colour
+                npc_mountColorYoshiNPCMap.erase(npcprop_mountcolor[npcID]);
+            }
+        }
+    }
+    // update settings
+    if (propname == "mountcolor") {
+        npcprop_mountcolor[npcID] = value;
+    } else if (propname == "isshoe") {
+        isShoeNPC_ptr[npcID] = COMBOOL(value);
+    } else if (propname == "isyoshi") {
+        isYoshiNPC_ptr[npcID] = COMBOOL(value);
+    }
+
+    if (npcprop_mountcolor[npcID] != 0) {
+        // register new config
+        if (isShoeNPC_ptr[npcID] != 0) {
+            // register shoe colour
+            npc_mountColorBootNPCMap[npcprop_mountcolor[npcID]] = npcID;
+        }
+        if (npcdef_isYoshiNPC[npcID] != 0) {
+            // register yoshi colour
+            npc_mountColorYoshiNPCMap[npcprop_mountcolor[npcID]] = npcID;
+        }
+    }
+}
+// return the NPC ID for the yoshi colour
+short NPC::GetYoshiNPC(short color) {
+    auto it = npc_mountColorYoshiNPCMap.find(color);
+    if (it != npc_mountColorYoshiNPCMap.end()) {
+        return it->second;
+    }
+    return -1;
+}
+// return the NPC ID for the boot colour
+short NPC::GetShoeNPC(short color) {
+    auto it = npc_mountColorBootNPCMap.find(color);
+    if (it != npc_mountColorBootNPCMap.end()) {
+        return it->second;
+    }
+    return -1;
 }
 
 // Getter for address of NPC property arrays

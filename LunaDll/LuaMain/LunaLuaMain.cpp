@@ -725,6 +725,7 @@ void CLunaLua::bindAll()
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
+                def("__updateNPCMountSetting", &NPC::UpdateNPCMountSetting),
                 def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress),
                 def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem)
             ],

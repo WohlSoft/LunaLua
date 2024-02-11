@@ -1290,54 +1290,41 @@ static void __stdcall runtimeHookDismount(PlayerMOB* player, int mountType, bool
 {
 	int npcID = -1;
 
-	switch (mountType) {
-	case 1:
-		// if here to stop the compiler from complaining that effectID isn't defined in the lower part of the code
-		if (true) {
-			short effectID = -1;
+	if (mountType == 1) { 
 
-			// Default boots
-			switch (player->MountColor) {
-				case 1: npcID = 35; effectID = 26; break;
-				case 2: npcID = 191; effectID = 101; break;
-				case 3: npcID = 193; effectID = 102; break;
-			}
+		short effectID = -1;
 
-			if (fromDamage && effectID != -1) {
-				// Play effect
-				Momentum coor = { 0 };
-				coor.x = player->momentum.x + player->momentum.width / 2;
-				coor.y = player->momentum.y + player->momentum.height / 2;
-				coor.speedX = -5 * player->FacingDirection;
-				coor.speedY = -11;
-				short npcID = 0;
-				float animationFrame = 0;
-				short showOnlyMask = COMBOOL(false);
-				native_runEffect(&effectID, &coor, &animationFrame, &npcID, &showOnlyMask);
-			}
-		}
-
-		break;
-	case 3:
-		// Default yoshis
+		// Default boots
 		switch (player->MountColor) {
-			case 1: npcID = 95; break;
-			case 2: npcID = 98; break;
-			case 3: npcID = 99; break;
-			case 4: npcID = 100; break;
-			case 5: npcID = 148; break;
-			case 6: npcID = 149; break;
-			case 7: npcID = 150; break;
-			case 8: npcID = 228; break;
+			case 1: effectID = 26; break;
+			case 2: effectID = 101; break;
+			case 3: effectID = 102; break;
 		}
+
+        npcID = NPC::GetShoeNPC(player->MountColor);
+
+		if (fromDamage && effectID != -1) {
+			// Play effect
+			Momentum coor = { 0 };
+			coor.x = player->momentum.x + player->momentum.width / 2;
+			coor.y = player->momentum.y + player->momentum.height / 2;
+			coor.speedX = -5 * player->FacingDirection;
+			coor.speedY = -11;
+			short npcID = 0;
+			float animationFrame = 0;
+			short showOnlyMask = COMBOOL(false);
+			native_runEffect(&effectID, &coor, &animationFrame, &npcID, &showOnlyMask);
+		}
+
+    } else if (mountType == 3) {
+        npcID = NPC::GetYoshiNPC(player->MountColor);
 
 		if (npc != NULL && fromDamage) {
 			// Running away flag
 			npc->ai1 = 1;
 		}
 
-		break;
-	}
+    }
 
 	if (npc != NULL && npcID >= 1 && npcID <= NPC::MAX_ID) {
 		npc->id = npcID;
