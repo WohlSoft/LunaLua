@@ -341,6 +341,8 @@ void __stdcall runtimeHookNPCWaterSplashAnimRaw(short* effectID, Momentum* coor,
 void __stdcall runtimeHookNPCTerminalVelocityRaw(void);
 
 void __stdcall runtimeHookNPCHarmlessGrabRaw(void);
+void __stdcall runtimeHookGrabbedNPCCollisionGroup(void);
+
 void __stdcall runtimeHookCheckInputRaw(void);
 void __stdcall runtimeHookSetHDCRaw(void);
 

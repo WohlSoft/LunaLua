@@ -1720,6 +1720,7 @@ void TrySkipPatch()
     PATCH(0xA0A6FB).CALL(runtimeHookNPCWaterSplashAnimRaw).Apply();
 
     PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
+    PATCH(0xA0C425).JMP(runtimeHookGrabbedNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA10136).JMP(runtimeHookNPCTerminalVelocityRaw).NOP_PAD_TO_SIZE<58>().Apply();
 

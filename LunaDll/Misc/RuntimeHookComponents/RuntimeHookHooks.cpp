@@ -1950,6 +1950,38 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
     }
 }
 
+static unsigned int __stdcall runtimeHookGrabbedNPCCollisionGroupInternal(int npcAIdx, int npcBIdx)
+{
+    // Check collision group
+    ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+    ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup, extB->collisionGroup)) // Check collision matrix
+        return 0; // Collision cancelled
+
+    return -1; // Collision goes ahead
+}
+
+__declspec(naked) void __stdcall runtimeHookGrabbedNPCCollisionGroup(void)
+{
+    __asm {
+        mov eax, dword ptr ss : [ebp - 0x188] // npcBIdx
+        push eax
+        movsx eax, word ptr ss : [ebp - 0x180] // npcAIdx
+        push eax
+        call runtimeHookGrabbedNPCCollisionGroupInternal
+
+        cmp eax, 0 // return value
+        je cancel_collision
+        lea eax, dword ptr ss : [ebp - 180] // Replace what we're patching over
+        push 0xA0C42B
+        ret
+        cancel_collision :
+        push 0xA0C40A
+        ret
+    }
+}
+
 static void __stdcall runtimeHookNPCTerminalVelocity(NPCMOB* npc)
 {
     // Reimplement the NPC terminal velocity behaviour
