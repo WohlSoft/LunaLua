@@ -96,6 +96,7 @@ struct AsmRange
     static std::vector<AsmRange> mAlloc;
     static std::map<std::pair<const char*, uintptr_t>, std::intptr_t> mCache;
     static std::intptr_t mFirstIdx;
+    static bool mStartChecks;
     std::intptr_t mIdx;
     const char* mLineNum;
     std::uintptr_t mAddr;
@@ -187,9 +188,24 @@ struct AsmRange
         }
     }
 
+    // Don't actually start checking ranges until this.
+    // This is needed since we might not have allocated a console we we started keeping track of
+    // patched ranges.
+    static void StartChecking()
+    {
+        mStartChecks = true;
+        
+        // Check any data we've already recorded
+        for (std::intptr_t cursor = mFirstIdx; cursor <= 0; cursor = mAlloc[cursor].mNextIdx)
+        {
+            mAlloc[cursor].CheckCollision();
+        }
+    }
+
 private:
     void CheckCollision()
     {
+        if (!mStartChecks) return;
         if (mCollided) return;
 
         if ((mNextIdx >= 0) && ((mAddr + mSize) > mAlloc[mNextIdx].mAddr))

@@ -1315,6 +1315,7 @@ void TrySkipPatch()
     if (gStartupSettings.console)
     {
         InitDebugConsole();
+        AsmRange::StartChecking();
     }
 
     // This used to check gStartupSettings.patch but now we always nop out the loader code. We don't use it.
