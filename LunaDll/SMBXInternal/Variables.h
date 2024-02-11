@@ -156,7 +156,7 @@ namespace SMBX13 {
         static auto& NPCFrame = SMBX13::vars.NPCFrame;
         static auto& NPCFrameSpeed = SMBX13::vars.NPCFrameSpeed;
         static auto& NPCFrameStyle = SMBX13::vars.NPCFrameStyle;
-        static auto& NPCDefaults = SMBX13::vars.NPCDefaults;
+        static auto& _DONTUSE_NPCDefaults = SMBX13::vars._DONTUSE_NPCDefaults; // NOTE: Do not use this. This is fixed-size, and the arrays from it get replaced in NpcIdExtender.cpp
         static auto& BlockIsSizable = SMBX13::vars.BlockIsSizable;
         static auto& BlockSlope = SMBX13::vars.BlockSlope;
         static auto& BlockSlope2 = SMBX13::vars.BlockSlope2;

@@ -8,6 +8,10 @@
 
 #pragma pack(push, 1)
 namespace SMBX13 {
+    static constexpr ptrdiff_t maxNPCType        = 1000; // Patched by NpcIdExtender.cpp, was 300
+    static constexpr ptrdiff_t maxBackgroundType = 1000; // Patched by NpcIdExtender.cpp, was 200
+    static constexpr ptrdiff_t maxBlockType      = 2000; // Patched by NpcIdExtender.cpp, was 700
+
     namespace Types {
         struct StdPicture_t;
 
@@ -721,455 +725,455 @@ namespace SMBX13 {
 #endif
 
         struct modMain_t {
-            int32_t                            myBackBuffer;         // 0xB25028
-            int32_t                            myBufferBMP;          // 0xB2502C
-            int16_t                            AllCharBlock;         // 0xB25030
-            int16_t                            _padding1_;           // 0xB25032
-            VB6StrPtr                          LocalNick;            // 0xB25034
-            int16_t                            LocalCursor;          // 0xB25038
-            int16_t                            _padding2_;           // 0xB2503A
-            VB6StrPtr                          ClientPassword;       // 0xB2503C
-            VB6StrPtr                          ServerPassword;       // 0xB25040
-            VB6Bool                            ServerClear;          // 0xB25044
-            VB6Bool                            StartMenu;            // 0xB25046
-            int16_t                            BlockFlash;           // 0xB25048
-            VB6Bool                            ScrollRelease;        // 0xB2504A
-            VB6Bool                            TakeScreen;           // 0xB2504C
-            int16_t                            _padding3_;           // 0xB2504E
-            VB6StrPtr                          LB;                   // 0xB25050
-            VB6StrPtr                          EoT;                  // 0xB25054
-            VB6ArrayRef<conKeyboard_t, 1, 2>   conKeyboard;          // 0xB25068
-            VB6ArrayRef<conJoystick_t, 1, 2>   conJoystick;          // 0xB25084
-            VB6ArrayRef<int16_t, 1, 2>         useJoystick;          // 0xB250A0
-            int16_t                            ScreenShake;          // 0xB250AC
-            int16_t                            _padding4_;           // 0xB250AE
-            VB6StrPtr                          Checkpoint;           // 0xB250B0
-            VB6Bool                            MagicHand;            // 0xB250B4
-            int16_t                            _padding5_;           // 0xB250B6
-            VB6ArrayRef<Player_t, 1, 2>        testPlayer;           // 0xB250C8
-            VB6Bool                            ClearBuffer;          // 0xB250D4
-            int16_t                            numLocked;            // 0xB250D6
-            VB6Bool                            resChanged;           // 0xB250D8
-            int16_t                            inputKey;             // 0xB250DA
-            VB6Bool                            getNewKeyboard;       // 0xB250DC
-            VB6Bool                            getNewJoystick;       // 0xB250DE
-            int16_t                            lastJoyButton;        // 0xB250E0
-            VB6Bool                            GamePaused;           // 0xB250E2
-            VB6StrPtr                          MessageText;          // 0xB250E4
-            int16_t                            NumSelectWorld;       // 0xB250E8
-            int16_t                            _padding6_;           // 0xB250EA
-            VB6ArrayRef<SelectWorld_t, 1, 100> SelectWorld;          // 0xB250FC
-            VB6Bool                            ShowFPS;              // 0xB25108
-            int16_t                            _padding7_;           // 0xB2510A
-            double                             PrintFPS;             // 0xB2510C
-            VB6ArrayRef<vScreen_t, 0, 2>       vScreen;              // 0xB25124
-            int16_t                            ScreenType;           // 0xB25130
-            int16_t                            DScreenType;          // 0xB25132
-            VB6Bool                            LevelEditor;          // 0xB25134
-            VB6Bool                            WorldEditor;          // 0xB25136
-            VB6ArrayRef<Location_t, 1, 2>      PlayerStart;          // 0xB25148
-            VB6ArrayRef<VB6Bool, 0, 20>        blockCharacter;       // 0xB25164
-            VB6ArrayRef<int16_t, 0, 200>       OwedMount;            // 0xB25180
-            VB6ArrayRef<int16_t, 0, 200>       OwedMountType;        // 0xB2519C
-            VB6ArrayRef<float, 0, 20>          AutoX;                // 0xB251B8
-            VB6ArrayRef<float, 0, 20>          AutoY;                // 0xB251D4
-            int16_t                            numStars;             // 0xB251E0
-            int16_t                            _padding8_;           // 0xB251E2
-            nPlay_t                            nPlay;                // 0xB251E4
-            VB6ArrayRef<Water_t, 0, 1000>      Water;                // 0xB256F4
-            int16_t                            numWater;             // 0xB25700
-            int16_t                            _padding9_;           // 0xB25702
-            VB6ArrayRef<Star_t, 1, 1000>       Star;                 // 0xB25714
-            VB6StrPtr                          GoToLevel;            // 0xB25720
-            VB6StrPtr                          StartLevel;           // 0xB25724
-            VB6Bool                            NoMap;                // 0xB25728
-            VB6Bool                            RestartLevel;         // 0xB2572A
-            VB6ArrayRef<float, 0, 20>          LevelChop;            // 0xB2573C
-            VB6ArrayRef<int16_t, -8000, 8000>  FirstBlock;           // 0xB25758
-            VB6ArrayRef<int16_t, -8000, 8000>  LastBlock;            // 0xB25774
-            int16_t                            MidBackground;        // 0xB25780
-            int16_t                            LastBackground;       // 0xB25782
-            int16_t                            iBlocks;              // 0xB25784
-            int16_t                            _padding10_;          // 0xB25786
-            VB6ArrayRef<int16_t, 0, 20000>     iBlock;               // 0xB25798
-            int16_t                            numTiles;             // 0xB257A4
-            int16_t                            numScenes;            // 0xB257A6
-            VB6ArrayRef<VB6StrPtr, 0, 20>      CustomMusic;          // 0xB257B8
-            VB6ArrayRef<Location_t, 0, 20>     level;                // 0xB257D4
-            VB6ArrayRef<VB6Bool, 0, 20>        LevelWrap;            // 0xB257F0
-            VB6ArrayRef<VB6Bool, 0, 20>        OffScreenExit;        // 0xB2580C
-            VB6ArrayRef<int16_t, 0, 20>        bgMusic;              // 0xB25828
-            VB6ArrayRef<int16_t, 0, 20>        bgMusicREAL;          // 0xB25844
-            VB6ArrayRef<int16_t, 0, 20>        Background2REAL;      // 0xB25860
-            VB6ArrayRef<Location_t, 0, 20>     LevelREAL;            // 0xB2587C
-            int16_t                            curMusic;             // 0xB25888
-            int16_t                            _padding11_;          // 0xB2588A
-            VB6ArrayRef<int32_t, 0, 20>        bgColor;              // 0xB2589C
-            VB6ArrayRef<int16_t, 0, 20>        Background2;          // 0xB258B8
-            VB6ArrayRef<WorldPath_t, 1, 2000>  WorldPath;            // 0xB258D4
-            int16_t                            numWorldPaths;        // 0xB258E0
-            int16_t                            numWarps;             // 0xB258E2
-            VB6ArrayRef<Warp_t, 1, 200>        Warp;                 // 0xB258F4
-            VB6ArrayRef<Tile_t, 1, 20000>      Tile;                 // 0xB25910
-            VB6ArrayRef<Scene_t, 1, 5000>      Scene;                // 0xB2592C
-            VB6ArrayRef<CreditLine_t, 1, 200>  Credit;               // 0xB25948
-            int16_t                            numCredits;           // 0xB25954
-            int16_t                            numBlock;             // 0xB25956
-            int16_t                            numBackground;        // 0xB25958
-            int16_t                            numNPCs;              // 0xB2595A
-            int16_t                            numEffects;           // 0xB2595C
-            int16_t                            numPlayers;           // 0xB2595E
-            int16_t                            numWorldLevels;       // 0xB25960
-            int16_t                            _padding12_;          // 0xB25962
-            VB6ArrayRef<WorldMusic_t, 1, 1000> WorldMusic;           // 0xB25974
-            int16_t                            numWorldMusic;        // 0xB25980
-            int16_t                            _padding13_;          // 0xB25982
-            VB6ArrayRef<WorldLevel_t, 1, 400>  WorldLevel;           // 0xB25994
-            VB6ArrayRef<Background_t, 1, 8000> Background;           // 0xB259B0
-            VB6ArrayRef<Effect_t, 1, 1000>     Effect;               // 0xB259CC
-            VB6ArrayRef<NPC_t, -128, 5000>     NPC;                  // 0xB259E8
-            VB6ArrayRef<Block_t, 0, 20000>     Block;                // 0xB25A04
-            VB6ArrayRef<Player_t, 0, 200>      Player;               // 0xB25A20
-            VB6ArrayRef<int16_t, 0, 750>       MarioFrameX;          // 0xB25A3C
-            VB6ArrayRef<int16_t, 0, 750>       MarioFrameY;          // 0xB25A58
-            VB6ArrayRef<int16_t, 0, 750>       LuigiFrameX;          // 0xB25A74
-            VB6ArrayRef<int16_t, 0, 750>       LuigiFrameY;          // 0xB25A90
-            VB6ArrayRef<int16_t, 0, 750>       PeachFrameX;          // 0xB25AAC
-            VB6ArrayRef<int16_t, 0, 750>       PeachFrameY;          // 0xB25AC8
-            VB6ArrayRef<int16_t, 0, 750>       ToadFrameX;           // 0xB25AE4
-            VB6ArrayRef<int16_t, 0, 750>       ToadFrameY;           // 0xB25B00
-            VB6ArrayRef<int16_t, 0, 750>       LinkFrameX;           // 0xB25B1C
-            VB6ArrayRef<int16_t, 0, 750>       LinkFrameY;           // 0xB25B38
-            VB6ArrayRef<VB6Bool, 0, 200>       BackgroundFence;      // 0xB25B54
-            VB6ArrayRef<int16_t, 0, 300>       NPCFrameOffsetX;      // 0xB25B70
-            VB6ArrayRef<int16_t, 0, 300>       NPCFrameOffsetY;      // 0xB25B8C
-            VB6ArrayRef<int16_t, 0, 300>       NPCWidth;             // 0xB25BA8
-            VB6ArrayRef<int16_t, 0, 300>       NPCHeight;            // 0xB25BC4
-            VB6ArrayRef<int16_t, 0, 300>       NPCWidthGFX;          // 0xB25BE0
-            VB6ArrayRef<int16_t, 0, 300>       NPCHeightGFX;         // 0xB25BFC
-            VB6ArrayRef<float, 0, 300>         NPCSpeedvar;          // 0xB25C18
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsAShell;          // 0xB25C34
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsABlock;          // 0xB25C50
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsAHit1Block;      // 0xB25C6C
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsABonus;          // 0xB25C88
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsACoin;           // 0xB25CA4
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsAVine;           // 0xB25CC0
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsAnExit;          // 0xB25CDC
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsAParaTroopa;     // 0xB25CF8
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsCheep;           // 0xB25D14
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCJumpHurt;          // 0xB25D30
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCNoClipping;        // 0xB25D4C
-            VB6ArrayRef<int16_t, 0, 300>       NPCScore;             // 0xB25D68
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCCanWalkOn;         // 0xB25D84
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCGrabFromTop;       // 0xB25DA0
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCTurnsAtCliffs;     // 0xB25DBC
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCWontHurt;          // 0xB25DD8
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCMovesPlayer;       // 0xB25DF4
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCStandsOnPlayer;    // 0xB25E10
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsGrabbable;       // 0xB25E2C
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsBoot;            // 0xB25E48
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsYoshi;           // 0xB25E64
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsToad;            // 0xB25E80
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCNoYoshi;           // 0xB25E9C
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCForeground;        // 0xB25EB8
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsABot;            // 0xB25ED4
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCDefaultMovement;   // 0xB25EF0
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCIsVeggie;          // 0xB25F0C
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCNoFireBall;        // 0xB25F28
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCNoIceBall;         // 0xB25F44
-            VB6ArrayRef<VB6Bool, 0, 300>       NPCNoGravity;         // 0xB25F60
-            VB6ArrayRef<int16_t, 0, 300>       NPCFrame;             // 0xB25F7C
-            VB6ArrayRef<int16_t, 0, 300>       NPCFrameSpeed;        // 0xB25F98
-            VB6ArrayRef<int16_t, 0, 300>       NPCFrameStyle;        // 0xB25FB4
-            NPCDefaults_t                      NPCDefaults;          // 0xB25FC0
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockIsSizable;       // 0xB2B930
-            VB6ArrayRef<int16_t, 0, 700>       BlockSlope;           // 0xB2B94C
-            VB6ArrayRef<int16_t, 0, 700>       BlockSlope2;          // 0xB2B968
-            VB6ArrayRef<double, 0, 200>        vScreenX;             // 0xB2B984
-            VB6ArrayRef<double, 0, 200>        vScreenY;             // 0xB2B9A0
-            VB6ArrayRef<double, 1, 200>        qScreenX;             // 0xB2B9BC
-            VB6ArrayRef<double, 1, 200>        qScreenY;             // 0xB2B9D8
-            VB6Bool                            qScreen;              // 0xB2B9E4
-            int16_t                            _padding14_;          // 0xB2B9E6
-            VB6ArrayRef<int16_t, 0, 700>       BlockWidth;           // 0xB2B9F8
-            VB6ArrayRef<int16_t, 0, 700>       BlockHeight;          // 0xB2BA14
-            VB6ArrayRef<int16_t, 1, 100>       BonusWidth;           // 0xB2BA30
-            VB6ArrayRef<int16_t, 1, 100>       BonusHeight;          // 0xB2BA4C
-            VB6ArrayRef<int16_t, 1, 200>       EffectWidth;          // 0xB2BA68
-            VB6ArrayRef<int16_t, 1, 200>       EffectHeight;         // 0xB2BA84
-            EffectDefaults_t                   EffectDefaults;       // 0xB2BA90
-            VB6ArrayRef<int16_t, 1, 100>       SceneWidth;           // 0xB2BDC0
-            VB6ArrayRef<int16_t, 1, 100>       SceneHeight;          // 0xB2BDDC
-            VB6ArrayRef<VB6Bool, 1, 200>       BackgroundHasNoMask;  // 0xB2BDF8
-            VB6ArrayRef<VB6Bool, 0, 200>       Foreground;           // 0xB2BE14
-            VB6ArrayRef<int16_t, 1, 200>       BackgroundWidth;      // 0xB2BE30
-            VB6ArrayRef<int16_t, 1, 200>       BackgroundHeight;     // 0xB2BE4C
-            VB6ArrayRef<int16_t, 1, 200>       BackgroundFrame;      // 0xB2BE68
-            VB6ArrayRef<int16_t, 1, 200>       BackgroundFrameCount; // 0xB2BE84
-            VB6ArrayRef<int16_t, 1, 700>       BlockFrame;           // 0xB2BEA0
-            VB6ArrayRef<int16_t, 1, 700>       BlockFrame2;          // 0xB2BEBC
-            VB6ArrayRef<int16_t, 1, 1000>      sBlockArray;          // 0xB2BED8
-            int16_t                            sBlockNum;            // 0xB2BEE4
-            int16_t                            _padding15_;          // 0xB2BEE6
-            VB6ArrayRef<int16_t, 1, 100>       SceneFrame;           // 0xB2BEF8
-            VB6ArrayRef<int16_t, 1, 100>       SceneFrame2;          // 0xB2BF14
-            VB6ArrayRef<int16_t, 0, 100>       SpecialFrame;         // 0xB2BF30
-            VB6ArrayRef<float, 0, 100>         SpecialFrameCount;    // 0xB2BF4C
-            VB6ArrayRef<int16_t, 1, 400>       TileWidth;            // 0xB2BF68
-            VB6ArrayRef<int16_t, 1, 400>       TileHeight;           // 0xB2BF84
-            VB6ArrayRef<int16_t, 1, 400>       TileFrame;            // 0xB2BFA0
-            VB6ArrayRef<int16_t, 1, 400>       TileFrame2;           // 0xB2BFBC
-            VB6ArrayRef<int16_t, 1, 100>       LevelFrame;           // 0xB2BFD8
-            VB6ArrayRef<int16_t, 1, 100>       LevelFrame2;          // 0xB2BFF4
-            VB6ArrayRef<VB6Bool, 1, 700>       BlockHasNoMask;       // 0xB2C010
-            VB6ArrayRef<VB6Bool, 1, 100>       LevelHasNoMask;       // 0xB2C02C
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockOnlyHitspot1;    // 0xB2C048
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockKills;           // 0xB2C064
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockKills2;          // 0xB2C080
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockHurts;           // 0xB2C09C
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockPSwitch;         // 0xB2C0B8
-            VB6ArrayRef<VB6Bool, 0, 700>       BlockNoClipping;      // 0xB2C0D4
-            VB6ArrayRef<int16_t, 1, 10>        CoinFrame;            // 0xB2C0F0
-            VB6ArrayRef<int16_t, 1, 10>        CoinFrame2;           // 0xB2C10C
-            EditorCursor_t                     EditorCursor;         // 0xB2C118
-            EditorControls_t                   EditorControls;       // 0xB2C558
-            VB6ArrayRef<int16_t, 1, 100>       Sound;                // 0xB2C574
-            VB6ArrayRef<int16_t, 1, 100>       SoundPause;           // 0xB2C590
-            VB6Bool                            EndLevel;             // 0xB2C59C
-            int16_t                            LevelMacro;           // 0xB2C59E
-            int16_t                            LevelMacroCounter;    // 0xB2C5A0
-            int16_t                            numJoysticks;         // 0xB2C5A2
-            VB6StrPtr                          FileName;             // 0xB2C5A4
-            int16_t                            Coins;                // 0xB2C5A8
-            int16_t                            _padding16_;          // 0xB2C5AA
-            float                              Lives;                // 0xB2C5AC
-            VB6Bool                            EndIntro;             // 0xB2C5B0
-            VB6Bool                            ExitMenu;             // 0xB2C5B2
-            VB6Bool                            LevelSelect;          // 0xB2C5B4
-            int16_t                            _padding17_;          // 0xB2C5B6
-            VB6ArrayRef<WorldPlayer_t, 0, 1>   WorldPlayer;          // 0xB2C5C8
-            int16_t                            LevelBeatCode;        // 0xB2C5D4
-            int16_t                            curWorldLevel;        // 0xB2C5D6
-            int16_t                            curWorldMusic;        // 0xB2C5D8
-            int16_t                            _padding18_;          // 0xB2C5DA
-            VB6ArrayRef<VB6Bool, 0, 20>        NoTurnBack;           // 0xB2C5EC
-            VB6ArrayRef<VB6Bool, 0, 20>        UnderWater;           // 0xB2C608
-            VB6Bool                            TestLevel;            // 0xB2C614
-            int16_t                            _padding19_;          // 0xB2C616
-            VB6StrPtr                          FullFileName;         // 0xB2C618
-            VB6StrPtr                          FileNamePath;         // 0xB2C61C
-            VB6Bool                            GameMenu;             // 0xB2C620
-            int16_t                            _padding20_;          // 0xB2C622
-            VB6StrPtr                          WorldName;            // 0xB2C624
-            int16_t                            selWorld;             // 0xB2C628
-            int16_t                            selSave;              // 0xB2C62A
-            int16_t                            PSwitchTime;          // 0xB2C62C
-            int16_t                            PSwitchStop;          // 0xB2C62E
-            int16_t                            PSwitchPlayer;        // 0xB2C630
-            int16_t                            _padding21_;          // 0xB2C632
-            VB6ArrayRef<int16_t, 1, 3>         SaveSlot;             // 0xB2C644
-            VB6ArrayRef<int16_t, 1, 3>         SaveStars;            // 0xB2C660
-            int16_t                            BeltDirection;        // 0xB2C66C
-            VB6Bool                            BeatTheGame;          // 0xB2C66E
-            int16_t                            cycleCount;           // 0xB2C670
-            int16_t                            _padding22_;          // 0xB2C672
-            double                             fpsTime;              // 0xB2C674
-            double                             fpsCount;             // 0xB2C67C
-            VB6Bool                            FrameSkip;            // 0xB2C684
-            int16_t                            _padding23_;          // 0xB2C686
-            double                             GoalTime;             // 0xB2C688
-            double                             overTime;             // 0xB2C690
-            int16_t                            worldCurs;            // 0xB2C698
-            int16_t                            minShow;              // 0xB2C69A
-            int16_t                            maxShow;              // 0xB2C69C
-            int16_t                            _padding24_;          // 0xB2C69E
-            VB6ArrayRef<Layer_t, 0, 100>       Layer;                // 0xB2C6B0
-            VB6ArrayRef<Events_t, 0, 100>      Events;               // 0xB2C6CC
-            int16_t                            ReturnWarp;           // 0xB2C6D8
-            int16_t                            StartWarp;            // 0xB2C6DA
-            Physics_t                          Physics;              // 0xB2C6DC
-            int16_t                            MenuCursor;           // 0xB2C880
-            int16_t                            MenuMode;             // 0xB2C882
-            VB6Bool                            MenuCursorCanMove;    // 0xB2C884
-            VB6Bool                            MenuCursorCanMove2;   // 0xB2C886
-            VB6Bool                            NextFrame;            // 0xB2C888
-            int16_t                            StopHit;              // 0xB2C88A
-            VB6Bool                            MouseRelease;         // 0xB2C88C
-            VB6Bool                            TestFullscreen;       // 0xB2C88E
-            VB6Bool                            keyDownAlt;           // 0xB2C890
-            VB6Bool                            keyDownEnter;         // 0xB2C892
-            VB6Bool                            BlocksSorted;         // 0xB2C894
-            int16_t                            SingleCoop;           // 0xB2C896
-            VB6StrPtr                          CheatString;          // 0xB2C898
-            VB6Bool                            GameOutro;            // 0xB2C89C
-            int16_t                            _padding25_;          // 0xB2C89E
-            float                              CreditChop;           // 0xB2C8A0
-            int16_t                            EndCredits;           // 0xB2C8A4
-            int16_t                            curStars;             // 0xB2C8A6
-            int16_t                            maxStars;             // 0xB2C8A8
-            VB6Bool                            ShadowMode;           // 0xB2C8AA
-            VB6Bool                            MultiHop;             // 0xB2C8AC
-            VB6Bool                            SuperSpeed;           // 0xB2C8AE
-            VB6Bool                            WalkAnywhere;         // 0xB2C8B0
-            VB6Bool                            FlyForever;           // 0xB2C8B2
-            VB6Bool                            FreezeNPCs;           // 0xB2C8B4
-            VB6Bool                            CaptainN;             // 0xB2C8B6
-            VB6Bool                            FlameThrower;         // 0xB2C8B8
-            VB6Bool                            CoinMode;             // 0xB2C8BA
-            VB6Bool                            WorldUnlock;          // 0xB2C8BC
-            VB6Bool                            MaxFPS;               // 0xB2C8BE
-            VB6Bool                            GodMode;              // 0xB2C8C0
-            VB6Bool                            GrabAll;              // 0xB2C8C2
-            VB6Bool                            Cheater;              // 0xB2C8C4
-            int16_t                            _padding26_;          // 0xB2C8C6
-            VB6ArrayRef<VB6StrPtr, 1, 5>       WorldCredits;         // 0xB2C8D8
-            int32_t                            Score;                // 0xB2C8E4
-            VB6ArrayRef<int16_t, 1, 13>        Points;               // 0xB2C8F8
-            int16_t                            oldJumpJoy;           // 0xB2C904
-            int16_t                            MaxWorldStars;        // 0xB2C906
-            VB6Bool                            Debugger;             // 0xB2C908
-            int16_t                            _padding27_;          // 0xB2C90A
-            VB6ArrayRef<Player_t, 0, 10>       SavedChar;            // 0xB2C91C
-            int16_t                            LoadCoins;            // 0xB2C928
-            int16_t                            _padding28_;          // 0xB2C92A
-            float                              LoadCoinsT;           // 0xB2C92C
-            VB6ArrayRef<VB6Bool, 1, 700>       GFXBlockCustom;       // 0xB2C940
-            VB6ArrayRef<int32_t, 1, 700>       GFXBlock;             // 0xB2C95C
-            VB6ArrayRef<int32_t, 1, 700>       GFXBlockMask;         // 0xB2C978
-            VB6ArrayRef<StdPicture_t, 1, 700>  GFXBlockBMP;          // 0xB2C9A0
-            VB6ArrayRef<StdPicture_t, 1, 700>  GFXBlockMaskBMP;      // 0xB2C9C8
-            VB6ArrayRef<VB6Bool, 1, 100>       GFXBackground2Custom; // 0xB2C9E4
-            VB6ArrayRef<int32_t, 1, 100>       GFXBackground2;       // 0xB2CA00
-            VB6ArrayRef<StdPicture_t, 1, 100>  GFXBackground2BMP;    // 0xB2CA28
-            VB6ArrayRef<int16_t, 1, 100>       GFXBackground2Height; // 0xB2CA44
-            VB6ArrayRef<int16_t, 1, 100>       GFXBackground2Width;  // 0xB2CA60
-            VB6ArrayRef<VB6Bool, 1, 300>       GFXNPCCustom;         // 0xB2CA7C
-            VB6ArrayRef<int32_t, 1, 300>       GFXNPC;               // 0xB2CA98
-            VB6ArrayRef<int32_t, 1, 300>       GFXNPCMask;           // 0xB2CAB4
-            VB6ArrayRef<StdPicture_t, 1, 300>  GFXNPCBMP;            // 0xB2CADC
-            VB6ArrayRef<StdPicture_t, 1, 300>  GFXNPCMaskBMP;        // 0xB2CB04
-            VB6ArrayRef<int16_t, 1, 300>       GFXNPCHeight;         // 0xB2CB20
-            VB6ArrayRef<int16_t, 1, 300>       GFXNPCWidth;          // 0xB2CB3C
-            VB6ArrayRef<VB6Bool, 1, 200>       GFXEffectCustom;      // 0xB2CB58
-            VB6ArrayRef<int32_t, 1, 200>       GFXEffect;            // 0xB2CB74
-            VB6ArrayRef<int32_t, 1, 200>       GFXEffectMask;        // 0xB2CB90
-            VB6ArrayRef<StdPicture_t, 1, 200>  GFXEffectBMP;         // 0xB2CBB8
-            VB6ArrayRef<StdPicture_t, 1, 200>  GFXEffectMaskBMP;     // 0xB2CBE0
-            VB6ArrayRef<int16_t, 1, 200>       GFXEffectHeight;      // 0xB2CBFC
-            VB6ArrayRef<int16_t, 1, 200>       GFXEffectWidth;       // 0xB2CC18
-            VB6ArrayRef<VB6Bool, 1, 200>       GFXBackgroundCustom;  // 0xB2CC34
-            VB6ArrayRef<int32_t, 1, 200>       GFXBackground;        // 0xB2CC50
-            VB6ArrayRef<int32_t, 1, 200>       GFXBackgroundMask;    // 0xB2CC6C
-            VB6ArrayRef<StdPicture_t, 1, 200>  GFXBackgroundBMP;     // 0xB2CC94
-            VB6ArrayRef<StdPicture_t, 1, 200>  GFXBackgroundMaskBMP; // 0xB2CCBC
-            VB6ArrayRef<int16_t, 1, 200>       GFXBackgroundHeight;  // 0xB2CCD8
-            VB6ArrayRef<int16_t, 1, 200>       GFXBackgroundWidth;   // 0xB2CCF4
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXMarioCustom;       // 0xB2CD10
-            VB6ArrayRef<int32_t, 1, 10>        GFXMario;             // 0xB2CD2C
-            VB6ArrayRef<int32_t, 1, 10>        GFXMarioMask;         // 0xB2CD48
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXMarioBMP;          // 0xB2CD70
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXMarioMaskBMP;      // 0xB2CD98
-            VB6ArrayRef<int16_t, 1, 10>        GFXMarioHeight;       // 0xB2CDB4
-            VB6ArrayRef<int16_t, 1, 10>        GFXMarioWidth;        // 0xB2CDD0
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXLuigiCustom;       // 0xB2CDEC
-            VB6ArrayRef<int32_t, 1, 10>        GFXLuigi;             // 0xB2CE08
-            VB6ArrayRef<int32_t, 1, 10>        GFXLuigiMask;         // 0xB2CE24
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXLuigiBMP;          // 0xB2CE4C
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXLuigiMaskBMP;      // 0xB2CE74
-            VB6ArrayRef<int16_t, 1, 10>        GFXLuigiHeight;       // 0xB2CE90
-            VB6ArrayRef<int16_t, 1, 10>        GFXLuigiWidth;        // 0xB2CEAC
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXPeachCustom;       // 0xB2CEC8
-            VB6ArrayRef<int32_t, 1, 10>        GFXPeach;             // 0xB2CEE4
-            VB6ArrayRef<int32_t, 1, 10>        GFXPeachMask;         // 0xB2CF00
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXPeachBMP;          // 0xB2CF28
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXPeachMaskBMP;      // 0xB2CF50
-            VB6ArrayRef<int16_t, 1, 10>        GFXPeachHeight;       // 0xB2CF6C
-            VB6ArrayRef<int16_t, 1, 10>        GFXPeachWidth;        // 0xB2CF88
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXToadCustom;        // 0xB2CFA4
-            VB6ArrayRef<int32_t, 1, 10>        GFXToad;              // 0xB2CFC0
-            VB6ArrayRef<int32_t, 1, 10>        GFXToadMask;          // 0xB2CFDC
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXToadBMP;           // 0xB2D004
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXToadMaskBMP;       // 0xB2D02C
-            VB6ArrayRef<int16_t, 1, 10>        GFXToadHeight;        // 0xB2D048
-            VB6ArrayRef<int16_t, 1, 10>        GFXToadWidth;         // 0xB2D064
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXLinkCustom;        // 0xB2D080
-            VB6ArrayRef<int32_t, 1, 10>        GFXLink;              // 0xB2D09C
-            VB6ArrayRef<int32_t, 1, 10>        GFXLinkMask;          // 0xB2D0B8
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXLinkBMP;           // 0xB2D0E0
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXLinkMaskBMP;       // 0xB2D108
-            VB6ArrayRef<int16_t, 1, 10>        GFXLinkHeight;        // 0xB2D124
-            VB6ArrayRef<int16_t, 1, 10>        GFXLinkWidth;         // 0xB2D140
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXYoshiBCustom;      // 0xB2D15C
-            VB6ArrayRef<int32_t, 1, 10>        GFXYoshiB;            // 0xB2D178
-            VB6ArrayRef<int32_t, 1, 10>        GFXYoshiBMask;        // 0xB2D194
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXYoshiBBMP;         // 0xB2D1BC
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXYoshiBMaskBMP;     // 0xB2D1E4
-            VB6ArrayRef<VB6Bool, 1, 10>        GFXYoshiTCustom;      // 0xB2D200
-            VB6ArrayRef<int32_t, 1, 10>        GFXYoshiT;            // 0xB2D21C
-            VB6ArrayRef<int32_t, 1, 10>        GFXYoshiTMask;        // 0xB2D238
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXYoshiTBMP;         // 0xB2D260
-            VB6ArrayRef<StdPicture_t, 1, 10>   GFXYoshiTMaskBMP;     // 0xB2D288
-            VB6ArrayRef<int32_t, 1, 400>       GFXTileCustom;        // 0xB2D2A4
-            VB6ArrayRef<int32_t, 1, 400>       GFXTile;              // 0xB2D2C0
-            VB6ArrayRef<StdPicture_t, 1, 400>  GFXTileBMP;           // 0xB2D2E8
-            VB6ArrayRef<int16_t, 1, 400>       GFXTileHeight;        // 0xB2D304
-            VB6ArrayRef<int16_t, 1, 400>       GFXTileWidth;         // 0xB2D320
-            VB6ArrayRef<int32_t, 0, 100>       GFXLevelCustom;       // 0xB2D33C
-            VB6ArrayRef<int32_t, 0, 100>       GFXLevel;             // 0xB2D358
-            VB6ArrayRef<int32_t, 0, 100>       GFXLevelMask;         // 0xB2D374
-            VB6ArrayRef<StdPicture_t, 0, 100>  GFXLevelBMP;          // 0xB2D39C
-            VB6ArrayRef<StdPicture_t, 0, 100>  GFXLevelMaskBMP;      // 0xB2D3C4
-            VB6ArrayRef<int16_t, 0, 100>       GFXLevelHeight;       // 0xB2D3E0
-            VB6ArrayRef<int16_t, 0, 100>       GFXLevelWidth;        // 0xB2D3FC
-            VB6ArrayRef<VB6Bool, 0, 100>       GFXLevelBig;          // 0xB2D418
-            VB6ArrayRef<int32_t, 1, 100>       GFXSceneCustom;       // 0xB2D434
-            VB6ArrayRef<int32_t, 1, 100>       GFXScene;             // 0xB2D450
-            VB6ArrayRef<int32_t, 1, 100>       GFXSceneMask;         // 0xB2D46C
-            VB6ArrayRef<StdPicture_t, 1, 100>  GFXSceneBMP;          // 0xB2D494
-            VB6ArrayRef<StdPicture_t, 1, 100>  GFXSceneMaskBMP;      // 0xB2D4BC
-            VB6ArrayRef<int16_t, 1, 100>       GFXSceneHeight;       // 0xB2D4D8
-            VB6ArrayRef<int16_t, 1, 100>       GFXSceneWidth;        // 0xB2D4F4
-            VB6ArrayRef<int32_t, 1, 100>       GFXPathCustom;        // 0xB2D510
-            VB6ArrayRef<int32_t, 1, 100>       GFXPath;              // 0xB2D52C
-            VB6ArrayRef<int32_t, 1, 100>       GFXPathMask;          // 0xB2D548
-            VB6ArrayRef<StdPicture_t, 1, 100>  GFXPathBMP;           // 0xB2D570
-            VB6ArrayRef<StdPicture_t, 1, 100>  GFXPathMaskBMP;       // 0xB2D598
-            VB6ArrayRef<int16_t, 1, 100>       GFXPathHeight;        // 0xB2D5B4
-            VB6ArrayRef<int16_t, 1, 100>       GFXPathWidth;         // 0xB2D5D0
-            VB6ArrayRef<int32_t, 1, 5>         GFXPlayerCustom;      // 0xB2D5EC
-            VB6ArrayRef<int32_t, 1, 5>         GFXPlayer;            // 0xB2D608
-            VB6ArrayRef<int32_t, 1, 5>         GFXPlayerMask;        // 0xB2D624
-            VB6ArrayRef<StdPicture_t, 1, 5>    GFXPlayerBMP;         // 0xB2D64C
-            VB6ArrayRef<StdPicture_t, 1, 5>    GFXPlayerMaskBMP;     // 0xB2D674
-            VB6ArrayRef<int16_t, 1, 5>         GFXPlayerHeight;      // 0xB2D690
-            VB6ArrayRef<int16_t, 1, 5>         GFXPlayerWidth;       // 0xB2D6AC
-            int16_t                            PlayerCharacter;      // 0xB2D6B8
-            int16_t                            PlayerCharacter2;     // 0xB2D6BA
-            double                             MenuMouseX;           // 0xB2D6BC
-            double                             MenuMouseY;           // 0xB2D6C4
-            VB6Bool                            MenuMouseDown;        // 0xB2D6CC
-            VB6Bool                            MenuMouseBack;        // 0xB2D6CE
-            VB6Bool                            MenuMouseRelease;     // 0xB2D6D0
-            VB6Bool                            MenuMouseMove;        // 0xB2D6D2
-            VB6Bool                            MenuMouseClick;       // 0xB2D6D4
-            int16_t                            _padding29_;          // 0xB2D6D6
-            VB6ArrayRef<VB6StrPtr, 1, 100>     NewEvent;             // 0xB2D6E8
-            VB6ArrayRef<int16_t, 1, 100>       newEventDelay;        // 0xB2D704
-            int16_t                            newEventNum;          // 0xB2D710
-            VB6Bool                            ForcedControls;       // 0xB2D712
-            Controls_t                         ForcedControl;        // 0xB2D714
-            int16_t                            SyncCount;            // 0xB2D728
-            VB6Bool                            noUpdate;             // 0xB2D72A
-            double                             gameTime;             // 0xB2D72C
-            VB6Bool                            noSound;              // 0xB2D734
-            int16_t                            _padding30_;          // 0xB2D736
-            double                             tempTime;             // 0xB2D738
-            VB6Bool                            BattleMode;           // 0xB2D740
-            int16_t                            BattleWinner;         // 0xB2D742
-            VB6ArrayRef<int16_t, 1, 200>       BattleLives;          // 0xB2D754
-            int16_t                            BattleIntro;          // 0xB2D760
-            int16_t                            BattleOutro;          // 0xB2D762
-            VB6StrPtr                          LevelName;            // 0xB2D764
+            int32_t                                         myBackBuffer;         // 0xB25028
+            int32_t                                         myBufferBMP;          // 0xB2502C
+            int16_t                                         AllCharBlock;         // 0xB25030
+            int16_t                                         _padding1_;           // 0xB25032
+            VB6StrPtr                                       LocalNick;            // 0xB25034
+            int16_t                                         LocalCursor;          // 0xB25038
+            int16_t                                         _padding2_;           // 0xB2503A
+            VB6StrPtr                                       ClientPassword;       // 0xB2503C
+            VB6StrPtr                                       ServerPassword;       // 0xB25040
+            VB6Bool                                         ServerClear;          // 0xB25044
+            VB6Bool                                         StartMenu;            // 0xB25046
+            int16_t                                         BlockFlash;           // 0xB25048
+            VB6Bool                                         ScrollRelease;        // 0xB2504A
+            VB6Bool                                         TakeScreen;           // 0xB2504C
+            int16_t                                         _padding3_;           // 0xB2504E
+            VB6StrPtr                                       LB;                   // 0xB25050
+            VB6StrPtr                                       EoT;                  // 0xB25054
+            VB6ArrayRef<conKeyboard_t, 1, 2>                conKeyboard;          // 0xB25068
+            VB6ArrayRef<conJoystick_t, 1, 2>                conJoystick;          // 0xB25084
+            VB6ArrayRef<int16_t, 1, 2>                      useJoystick;          // 0xB250A0
+            int16_t                                         ScreenShake;          // 0xB250AC
+            int16_t                                         _padding4_;           // 0xB250AE
+            VB6StrPtr                                       Checkpoint;           // 0xB250B0
+            VB6Bool                                         MagicHand;            // 0xB250B4
+            int16_t                                         _padding5_;           // 0xB250B6
+            VB6ArrayRef<Player_t, 1, 2>                     testPlayer;           // 0xB250C8
+            VB6Bool                                         ClearBuffer;          // 0xB250D4
+            int16_t                                         numLocked;            // 0xB250D6
+            VB6Bool                                         resChanged;           // 0xB250D8
+            int16_t                                         inputKey;             // 0xB250DA
+            VB6Bool                                         getNewKeyboard;       // 0xB250DC
+            VB6Bool                                         getNewJoystick;       // 0xB250DE
+            int16_t                                         lastJoyButton;        // 0xB250E0
+            VB6Bool                                         GamePaused;           // 0xB250E2
+            VB6StrPtr                                       MessageText;          // 0xB250E4
+            int16_t                                         NumSelectWorld;       // 0xB250E8
+            int16_t                                         _padding6_;           // 0xB250EA
+            VB6ArrayRef<SelectWorld_t, 1, 100>              SelectWorld;          // 0xB250FC
+            VB6Bool                                         ShowFPS;              // 0xB25108
+            int16_t                                         _padding7_;           // 0xB2510A
+            double                                          PrintFPS;             // 0xB2510C
+            VB6ArrayRef<vScreen_t, 0, 2>                    vScreen;              // 0xB25124
+            int16_t                                         ScreenType;           // 0xB25130
+            int16_t                                         DScreenType;          // 0xB25132
+            VB6Bool                                         LevelEditor;          // 0xB25134
+            VB6Bool                                         WorldEditor;          // 0xB25136
+            VB6ArrayRef<Location_t, 1, 2>                   PlayerStart;          // 0xB25148
+            VB6ArrayRef<VB6Bool, 0, 20>                     blockCharacter;       // 0xB25164
+            VB6ArrayRef<int16_t, 0, 200>                    OwedMount;            // 0xB25180
+            VB6ArrayRef<int16_t, 0, 200>                    OwedMountType;        // 0xB2519C
+            VB6ArrayRef<float, 0, 20>                       AutoX;                // 0xB251B8
+            VB6ArrayRef<float, 0, 20>                       AutoY;                // 0xB251D4
+            int16_t                                         numStars;             // 0xB251E0
+            int16_t                                         _padding8_;           // 0xB251E2
+            nPlay_t                                         nPlay;                // 0xB251E4
+            VB6ArrayRef<Water_t, 0, 1000>                   Water;                // 0xB256F4
+            int16_t                                         numWater;             // 0xB25700
+            int16_t                                         _padding9_;           // 0xB25702
+            VB6ArrayRef<Star_t, 1, 1000>                    Star;                 // 0xB25714
+            VB6StrPtr                                       GoToLevel;            // 0xB25720
+            VB6StrPtr                                       StartLevel;           // 0xB25724
+            VB6Bool                                         NoMap;                // 0xB25728
+            VB6Bool                                         RestartLevel;         // 0xB2572A
+            VB6ArrayRef<float, 0, 20>                       LevelChop;            // 0xB2573C
+            VB6ArrayRef<int16_t, -8000, 8000>               FirstBlock;           // 0xB25758
+            VB6ArrayRef<int16_t, -8000, 8000>               LastBlock;            // 0xB25774
+            int16_t                                         MidBackground;        // 0xB25780
+            int16_t                                         LastBackground;       // 0xB25782
+            int16_t                                         iBlocks;              // 0xB25784
+            int16_t                                         _padding10_;          // 0xB25786
+            VB6ArrayRef<int16_t, 0, 20000>                  iBlock;               // 0xB25798
+            int16_t                                         numTiles;             // 0xB257A4
+            int16_t                                         numScenes;            // 0xB257A6
+            VB6ArrayRef<VB6StrPtr, 0, 20>                   CustomMusic;          // 0xB257B8
+            VB6ArrayRef<Location_t, 0, 20>                  level;                // 0xB257D4
+            VB6ArrayRef<VB6Bool, 0, 20>                     LevelWrap;            // 0xB257F0
+            VB6ArrayRef<VB6Bool, 0, 20>                     OffScreenExit;        // 0xB2580C
+            VB6ArrayRef<int16_t, 0, 20>                     bgMusic;              // 0xB25828
+            VB6ArrayRef<int16_t, 0, 20>                     bgMusicREAL;          // 0xB25844
+            VB6ArrayRef<int16_t, 0, 20>                     Background2REAL;      // 0xB25860
+            VB6ArrayRef<Location_t, 0, 20>                  LevelREAL;            // 0xB2587C
+            int16_t                                         curMusic;             // 0xB25888
+            int16_t                                         _padding11_;          // 0xB2588A
+            VB6ArrayRef<int32_t, 0, 20>                     bgColor;              // 0xB2589C
+            VB6ArrayRef<int16_t, 0, 20>                     Background2;          // 0xB258B8
+            VB6ArrayRef<WorldPath_t, 1, 2000>               WorldPath;            // 0xB258D4
+            int16_t                                         numWorldPaths;        // 0xB258E0
+            int16_t                                         numWarps;             // 0xB258E2
+            VB6ArrayRef<Warp_t, 1, 200>                     Warp;                 // 0xB258F4
+            VB6ArrayRef<Tile_t, 1, 20000>                   Tile;                 // 0xB25910
+            VB6ArrayRef<Scene_t, 1, 5000>                   Scene;                // 0xB2592C
+            VB6ArrayRef<CreditLine_t, 1, 200>               Credit;               // 0xB25948
+            int16_t                                         numCredits;           // 0xB25954
+            int16_t                                         numBlock;             // 0xB25956
+            int16_t                                         numBackground;        // 0xB25958
+            int16_t                                         numNPCs;              // 0xB2595A
+            int16_t                                         numEffects;           // 0xB2595C
+            int16_t                                         numPlayers;           // 0xB2595E
+            int16_t                                         numWorldLevels;       // 0xB25960
+            int16_t                                         _padding12_;          // 0xB25962
+            VB6ArrayRef<WorldMusic_t, 1, 1000>              WorldMusic;           // 0xB25974
+            int16_t                                         numWorldMusic;        // 0xB25980
+            int16_t                                         _padding13_;          // 0xB25982
+            VB6ArrayRef<WorldLevel_t, 1, 400>               WorldLevel;           // 0xB25994
+            VB6ArrayRef<Background_t, 1, 8000>              Background;           // 0xB259B0
+            VB6ArrayRef<Effect_t, 1, 1000>                  Effect;               // 0xB259CC
+            VB6ArrayRef<NPC_t, -128, 5000>                  NPC;                  // 0xB259E8
+            VB6ArrayRef<Block_t, 0, 20000>                  Block;                // 0xB25A04
+            VB6ArrayRef<Player_t, 0, 200>                   Player;               // 0xB25A20
+            VB6ArrayRef<int16_t, 0, 750>                    MarioFrameX;          // 0xB25A3C
+            VB6ArrayRef<int16_t, 0, 750>                    MarioFrameY;          // 0xB25A58
+            VB6ArrayRef<int16_t, 0, 750>                    LuigiFrameX;          // 0xB25A74
+            VB6ArrayRef<int16_t, 0, 750>                    LuigiFrameY;          // 0xB25A90
+            VB6ArrayRef<int16_t, 0, 750>                    PeachFrameX;          // 0xB25AAC
+            VB6ArrayRef<int16_t, 0, 750>                    PeachFrameY;          // 0xB25AC8
+            VB6ArrayRef<int16_t, 0, 750>                    ToadFrameX;           // 0xB25AE4
+            VB6ArrayRef<int16_t, 0, 750>                    ToadFrameY;           // 0xB25B00
+            VB6ArrayRef<int16_t, 0, 750>                    LinkFrameX;           // 0xB25B1C
+            VB6ArrayRef<int16_t, 0, 750>                    LinkFrameY;           // 0xB25B38
+            VB6ArrayRef<VB6Bool, 0, maxBackgroundType>      BackgroundFence;      // 0xB25B54
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameOffsetX;      // 0xB25B70
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameOffsetY;      // 0xB25B8C
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCWidth;             // 0xB25BA8
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCHeight;            // 0xB25BC4
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCWidthGFX;          // 0xB25BE0
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCHeightGFX;         // 0xB25BFC
+            VB6ArrayRef<float, 0, maxNPCType>               NPCSpeedvar;          // 0xB25C18
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsAShell;          // 0xB25C34
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsABlock;          // 0xB25C50
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsAHit1Block;      // 0xB25C6C
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsABonus;          // 0xB25C88
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsACoin;           // 0xB25CA4
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsAVine;           // 0xB25CC0
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsAnExit;          // 0xB25CDC
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsAParaTroopa;     // 0xB25CF8
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsCheep;           // 0xB25D14
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCJumpHurt;          // 0xB25D30
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCNoClipping;        // 0xB25D4C
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCScore;             // 0xB25D68
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCCanWalkOn;         // 0xB25D84
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCGrabFromTop;       // 0xB25DA0
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCTurnsAtCliffs;     // 0xB25DBC
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCWontHurt;          // 0xB25DD8
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCMovesPlayer;       // 0xB25DF4
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCStandsOnPlayer;    // 0xB25E10
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsGrabbable;       // 0xB25E2C
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsBoot;            // 0xB25E48
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsYoshi;           // 0xB25E64
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsToad;            // 0xB25E80
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCNoYoshi;           // 0xB25E9C
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCForeground;        // 0xB25EB8
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsABot;            // 0xB25ED4
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCDefaultMovement;   // 0xB25EF0
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCIsVeggie;          // 0xB25F0C
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCNoFireBall;        // 0xB25F28
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCNoIceBall;         // 0xB25F44
+            VB6ArrayRef<VB6Bool, 0, maxNPCType>             NPCNoGravity;         // 0xB25F60
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrame;             // 0xB25F7C
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameSpeed;        // 0xB25F98
+            VB6ArrayRef<int16_t, 0, maxNPCType>             NPCFrameStyle;        // 0xB25FB4
+            NPCDefaults_t                                   _DONTUSE_NPCDefaults; // 0xB25FC0 NOTE: Do not use this. This is fixed-size, and the arrays from it get replaced in NpcIdExtender.cpp
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockIsSizable;       // 0xB2B930
+            VB6ArrayRef<int16_t, 0, maxBlockType>           BlockSlope;           // 0xB2B94C
+            VB6ArrayRef<int16_t, 0, maxBlockType>           BlockSlope2;          // 0xB2B968
+            VB6ArrayRef<double, 0, 200>                     vScreenX;             // 0xB2B984
+            VB6ArrayRef<double, 0, 200>                     vScreenY;             // 0xB2B9A0
+            VB6ArrayRef<double, 1, 200>                     qScreenX;             // 0xB2B9BC
+            VB6ArrayRef<double, 1, 200>                     qScreenY;             // 0xB2B9D8
+            VB6Bool                                         qScreen;              // 0xB2B9E4
+            int16_t                                         _padding14_;          // 0xB2B9E6
+            VB6ArrayRef<int16_t, 0, maxBlockType>           BlockWidth;           // 0xB2B9F8
+            VB6ArrayRef<int16_t, 0, maxBlockType>           BlockHeight;          // 0xB2BA14
+            VB6ArrayRef<int16_t, 1, 100>                    BonusWidth;           // 0xB2BA30
+            VB6ArrayRef<int16_t, 1, 100>                    BonusHeight;          // 0xB2BA4C
+            VB6ArrayRef<int16_t, 1, 200>                    EffectWidth;          // 0xB2BA68
+            VB6ArrayRef<int16_t, 1, 200>                    EffectHeight;         // 0xB2BA84
+            EffectDefaults_t                                EffectDefaults;       // 0xB2BA90
+            VB6ArrayRef<int16_t, 1, 100>                    SceneWidth;           // 0xB2BDC0
+            VB6ArrayRef<int16_t, 1, 100>                    SceneHeight;          // 0xB2BDDC
+            VB6ArrayRef<VB6Bool, 1, 200>                    BackgroundHasNoMask;  // 0xB2BDF8 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
+            VB6ArrayRef<VB6Bool, 0, maxBackgroundType>      Foreground;           // 0xB2BE14
+            VB6ArrayRef<int16_t, 1, maxBackgroundType>      BackgroundWidth;      // 0xB2BE30
+            VB6ArrayRef<int16_t, 1, maxBackgroundType>      BackgroundHeight;     // 0xB2BE4C
+            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrame;      // 0xB2BE68 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
+            VB6ArrayRef<int16_t, 1, 200>                    BackgroundFrameCount; // 0xB2BE84 (Resizing missed by NpcIdExtender? Doesn't seem to matter though)
+            VB6ArrayRef<int16_t, 1, maxBlockType>           BlockFrame;           // 0xB2BEA0
+            VB6ArrayRef<int16_t, 1, maxBlockType>           BlockFrame2;          // 0xB2BEBC
+            VB6ArrayRef<int16_t, 1, 1000>                   sBlockArray;          // 0xB2BED8
+            int16_t                                         sBlockNum;            // 0xB2BEE4
+            int16_t                                         _padding15_;          // 0xB2BEE6
+            VB6ArrayRef<int16_t, 1, 100>                    SceneFrame;           // 0xB2BEF8
+            VB6ArrayRef<int16_t, 1, 100>                    SceneFrame2;          // 0xB2BF14
+            VB6ArrayRef<int16_t, 0, 100>                    SpecialFrame;         // 0xB2BF30
+            VB6ArrayRef<float, 0, 100>                      SpecialFrameCount;    // 0xB2BF4C
+            VB6ArrayRef<int16_t, 1, 400>                    TileWidth;            // 0xB2BF68
+            VB6ArrayRef<int16_t, 1, 400>                    TileHeight;           // 0xB2BF84
+            VB6ArrayRef<int16_t, 1, 400>                    TileFrame;            // 0xB2BFA0
+            VB6ArrayRef<int16_t, 1, 400>                    TileFrame2;           // 0xB2BFBC
+            VB6ArrayRef<int16_t, 1, 100>                    LevelFrame;           // 0xB2BFD8
+            VB6ArrayRef<int16_t, 1, 100>                    LevelFrame2;          // 0xB2BFF4
+            VB6ArrayRef<VB6Bool, 1, maxBlockType>           BlockHasNoMask;       // 0xB2C010
+            VB6ArrayRef<VB6Bool, 1, 100>                    LevelHasNoMask;       // 0xB2C02C
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockOnlyHitspot1;    // 0xB2C048
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockKills;           // 0xB2C064
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockKills2;          // 0xB2C080
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockHurts;           // 0xB2C09C
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockPSwitch;         // 0xB2C0B8
+            VB6ArrayRef<VB6Bool, 0, maxBlockType>           BlockNoClipping;      // 0xB2C0D4
+            VB6ArrayRef<int16_t, 1, 10>                     CoinFrame;            // 0xB2C0F0
+            VB6ArrayRef<int16_t, 1, 10>                     CoinFrame2;           // 0xB2C10C
+            EditorCursor_t                                  EditorCursor;         // 0xB2C118
+            EditorControls_t                                EditorControls;       // 0xB2C558
+            VB6ArrayRef<int16_t, 1, 100>                    Sound;                // 0xB2C574
+            VB6ArrayRef<int16_t, 1, 100>                    SoundPause;           // 0xB2C590
+            VB6Bool                                         EndLevel;             // 0xB2C59C
+            int16_t                                         LevelMacro;           // 0xB2C59E
+            int16_t                                         LevelMacroCounter;    // 0xB2C5A0
+            int16_t                                         numJoysticks;         // 0xB2C5A2
+            VB6StrPtr                                       FileName;             // 0xB2C5A4
+            int16_t                                         Coins;                // 0xB2C5A8
+            int16_t                                         _padding16_;          // 0xB2C5AA
+            float                                           Lives;                // 0xB2C5AC
+            VB6Bool                                         EndIntro;             // 0xB2C5B0
+            VB6Bool                                         ExitMenu;             // 0xB2C5B2
+            VB6Bool                                         LevelSelect;          // 0xB2C5B4
+            int16_t                                         _padding17_;          // 0xB2C5B6
+            VB6ArrayRef<WorldPlayer_t, 0, 1>                WorldPlayer;          // 0xB2C5C8
+            int16_t                                         LevelBeatCode;        // 0xB2C5D4
+            int16_t                                         curWorldLevel;        // 0xB2C5D6
+            int16_t                                         curWorldMusic;        // 0xB2C5D8
+            int16_t                                         _padding18_;          // 0xB2C5DA
+            VB6ArrayRef<VB6Bool, 0, 20>                     NoTurnBack;           // 0xB2C5EC
+            VB6ArrayRef<VB6Bool, 0, 20>                     UnderWater;           // 0xB2C608
+            VB6Bool                                         TestLevel;            // 0xB2C614
+            int16_t                                         _padding19_;          // 0xB2C616
+            VB6StrPtr                                       FullFileName;         // 0xB2C618
+            VB6StrPtr                                       FileNamePath;         // 0xB2C61C
+            VB6Bool                                         GameMenu;             // 0xB2C620
+            int16_t                                         _padding20_;          // 0xB2C622
+            VB6StrPtr                                       WorldName;            // 0xB2C624
+            int16_t                                         selWorld;             // 0xB2C628
+            int16_t                                         selSave;              // 0xB2C62A
+            int16_t                                         PSwitchTime;          // 0xB2C62C
+            int16_t                                         PSwitchStop;          // 0xB2C62E
+            int16_t                                         PSwitchPlayer;        // 0xB2C630
+            int16_t                                         _padding21_;          // 0xB2C632
+            VB6ArrayRef<int16_t, 1, 3>                      SaveSlot;             // 0xB2C644
+            VB6ArrayRef<int16_t, 1, 3>                      SaveStars;            // 0xB2C660
+            int16_t                                         BeltDirection;        // 0xB2C66C
+            VB6Bool                                         BeatTheGame;          // 0xB2C66E
+            int16_t                                         cycleCount;           // 0xB2C670
+            int16_t                                         _padding22_;          // 0xB2C672
+            double                                          fpsTime;              // 0xB2C674
+            double                                          fpsCount;             // 0xB2C67C
+            VB6Bool                                         FrameSkip;            // 0xB2C684
+            int16_t                                         _padding23_;          // 0xB2C686
+            double                                          GoalTime;             // 0xB2C688
+            double                                          overTime;             // 0xB2C690
+            int16_t                                         worldCurs;            // 0xB2C698
+            int16_t                                         minShow;              // 0xB2C69A
+            int16_t                                         maxShow;              // 0xB2C69C
+            int16_t                                         _padding24_;          // 0xB2C69E
+            VB6ArrayRef<Layer_t, 0, 100>                    Layer;                // 0xB2C6B0
+            VB6ArrayRef<Events_t, 0, 100>                   Events;               // 0xB2C6CC
+            int16_t                                         ReturnWarp;           // 0xB2C6D8
+            int16_t                                         StartWarp;            // 0xB2C6DA
+            Physics_t                                       Physics;              // 0xB2C6DC
+            int16_t                                         MenuCursor;           // 0xB2C880
+            int16_t                                         MenuMode;             // 0xB2C882
+            VB6Bool                                         MenuCursorCanMove;    // 0xB2C884
+            VB6Bool                                         MenuCursorCanMove2;   // 0xB2C886
+            VB6Bool                                         NextFrame;            // 0xB2C888
+            int16_t                                         StopHit;              // 0xB2C88A
+            VB6Bool                                         MouseRelease;         // 0xB2C88C
+            VB6Bool                                         TestFullscreen;       // 0xB2C88E
+            VB6Bool                                         keyDownAlt;           // 0xB2C890
+            VB6Bool                                         keyDownEnter;         // 0xB2C892
+            VB6Bool                                         BlocksSorted;         // 0xB2C894
+            int16_t                                         SingleCoop;           // 0xB2C896
+            VB6StrPtr                                       CheatString;          // 0xB2C898
+            VB6Bool                                         GameOutro;            // 0xB2C89C
+            int16_t                                         _padding25_;          // 0xB2C89E
+            float                                           CreditChop;           // 0xB2C8A0
+            int16_t                                         EndCredits;           // 0xB2C8A4
+            int16_t                                         curStars;             // 0xB2C8A6
+            int16_t                                         maxStars;             // 0xB2C8A8
+            VB6Bool                                         ShadowMode;           // 0xB2C8AA
+            VB6Bool                                         MultiHop;             // 0xB2C8AC
+            VB6Bool                                         SuperSpeed;           // 0xB2C8AE
+            VB6Bool                                         WalkAnywhere;         // 0xB2C8B0
+            VB6Bool                                         FlyForever;           // 0xB2C8B2
+            VB6Bool                                         FreezeNPCs;           // 0xB2C8B4
+            VB6Bool                                         CaptainN;             // 0xB2C8B6
+            VB6Bool                                         FlameThrower;         // 0xB2C8B8
+            VB6Bool                                         CoinMode;             // 0xB2C8BA
+            VB6Bool                                         WorldUnlock;          // 0xB2C8BC
+            VB6Bool                                         MaxFPS;               // 0xB2C8BE
+            VB6Bool                                         GodMode;              // 0xB2C8C0
+            VB6Bool                                         GrabAll;              // 0xB2C8C2
+            VB6Bool                                         Cheater;              // 0xB2C8C4
+            int16_t                                         _padding26_;          // 0xB2C8C6
+            VB6ArrayRef<VB6StrPtr, 1, 5>                    WorldCredits;         // 0xB2C8D8
+            int32_t                                         Score;                // 0xB2C8E4
+            VB6ArrayRef<int16_t, 1, 13>                     Points;               // 0xB2C8F8
+            int16_t                                         oldJumpJoy;           // 0xB2C904
+            int16_t                                         MaxWorldStars;        // 0xB2C906
+            VB6Bool                                         Debugger;             // 0xB2C908
+            int16_t                                         _padding27_;          // 0xB2C90A
+            VB6ArrayRef<Player_t, 0, 10>                    SavedChar;            // 0xB2C91C
+            int16_t                                         LoadCoins;            // 0xB2C928
+            int16_t                                         _padding28_;          // 0xB2C92A
+            float                                           LoadCoinsT;           // 0xB2C92C
+            VB6ArrayRef<VB6Bool, 1, maxBlockType>           GFXBlockCustom;       // 0xB2C940
+            VB6ArrayRef<int32_t, 1, maxBlockType>           GFXBlock;             // 0xB2C95C
+            VB6ArrayRef<int32_t, 1, maxBlockType>           GFXBlockMask;         // 0xB2C978
+            VB6ArrayRef<StdPicture_t, 1, maxBlockType>      GFXBlockBMP;          // 0xB2C9A0
+            VB6ArrayRef<StdPicture_t, 1, maxBlockType>      GFXBlockMaskBMP;      // 0xB2C9C8
+            VB6ArrayRef<VB6Bool, 1, 100>                    GFXBackground2Custom; // 0xB2C9E4
+            VB6ArrayRef<int32_t, 1, 100>                    GFXBackground2;       // 0xB2CA00
+            VB6ArrayRef<StdPicture_t, 1, 100>               GFXBackground2BMP;    // 0xB2CA28
+            VB6ArrayRef<int16_t, 1, 100>                    GFXBackground2Height; // 0xB2CA44
+            VB6ArrayRef<int16_t, 1, 100>                    GFXBackground2Width;  // 0xB2CA60
+            VB6ArrayRef<VB6Bool, 1, maxNPCType>             GFXNPCCustom;         // 0xB2CA7C
+            VB6ArrayRef<int32_t, 1, maxNPCType>             GFXNPC;               // 0xB2CA98
+            VB6ArrayRef<int32_t, 1, maxNPCType>             GFXNPCMask;           // 0xB2CAB4
+            VB6ArrayRef<StdPicture_t, 1, maxNPCType>        GFXNPCBMP;            // 0xB2CADC
+            VB6ArrayRef<StdPicture_t, 1, maxNPCType>        GFXNPCMaskBMP;        // 0xB2CB04
+            VB6ArrayRef<int16_t, 1, maxNPCType>             GFXNPCHeight;         // 0xB2CB20
+            VB6ArrayRef<int16_t, 1, maxNPCType>             GFXNPCWidth;          // 0xB2CB3C
+            VB6ArrayRef<VB6Bool, 1, 200>                    GFXEffectCustom;      // 0xB2CB58
+            VB6ArrayRef<int32_t, 1, 200>                    GFXEffect;            // 0xB2CB74
+            VB6ArrayRef<int32_t, 1, 200>                    GFXEffectMask;        // 0xB2CB90
+            VB6ArrayRef<StdPicture_t, 1, 200>               GFXEffectBMP;         // 0xB2CBB8
+            VB6ArrayRef<StdPicture_t, 1, 200>               GFXEffectMaskBMP;     // 0xB2CBE0
+            VB6ArrayRef<int16_t, 1, 200>                    GFXEffectHeight;      // 0xB2CBFC
+            VB6ArrayRef<int16_t, 1, 200>                    GFXEffectWidth;       // 0xB2CC18
+            VB6ArrayRef<VB6Bool, 1, maxBackgroundType>      GFXBackgroundCustom;  // 0xB2CC34
+            VB6ArrayRef<int32_t, 1, maxBackgroundType>      GFXBackground;        // 0xB2CC50
+            VB6ArrayRef<int32_t, 1, maxBackgroundType>      GFXBackgroundMask;    // 0xB2CC6C
+            VB6ArrayRef<StdPicture_t, 1, maxBackgroundType> GFXBackgroundBMP;     // 0xB2CC94
+            VB6ArrayRef<StdPicture_t, 1, maxBackgroundType> GFXBackgroundMaskBMP; // 0xB2CCBC
+            VB6ArrayRef<int16_t, 1, maxBackgroundType>      GFXBackgroundHeight;  // 0xB2CCD8
+            VB6ArrayRef<int16_t, 1, maxBackgroundType>      GFXBackgroundWidth;   // 0xB2CCF4
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXMarioCustom;       // 0xB2CD10
+            VB6ArrayRef<int32_t, 1, 10>                     GFXMario;             // 0xB2CD2C
+            VB6ArrayRef<int32_t, 1, 10>                     GFXMarioMask;         // 0xB2CD48
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXMarioBMP;          // 0xB2CD70
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXMarioMaskBMP;      // 0xB2CD98
+            VB6ArrayRef<int16_t, 1, 10>                     GFXMarioHeight;       // 0xB2CDB4
+            VB6ArrayRef<int16_t, 1, 10>                     GFXMarioWidth;        // 0xB2CDD0
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXLuigiCustom;       // 0xB2CDEC
+            VB6ArrayRef<int32_t, 1, 10>                     GFXLuigi;             // 0xB2CE08
+            VB6ArrayRef<int32_t, 1, 10>                     GFXLuigiMask;         // 0xB2CE24
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXLuigiBMP;          // 0xB2CE4C
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXLuigiMaskBMP;      // 0xB2CE74
+            VB6ArrayRef<int16_t, 1, 10>                     GFXLuigiHeight;       // 0xB2CE90
+            VB6ArrayRef<int16_t, 1, 10>                     GFXLuigiWidth;        // 0xB2CEAC
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXPeachCustom;       // 0xB2CEC8
+            VB6ArrayRef<int32_t, 1, 10>                     GFXPeach;             // 0xB2CEE4
+            VB6ArrayRef<int32_t, 1, 10>                     GFXPeachMask;         // 0xB2CF00
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXPeachBMP;          // 0xB2CF28
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXPeachMaskBMP;      // 0xB2CF50
+            VB6ArrayRef<int16_t, 1, 10>                     GFXPeachHeight;       // 0xB2CF6C
+            VB6ArrayRef<int16_t, 1, 10>                     GFXPeachWidth;        // 0xB2CF88
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXToadCustom;        // 0xB2CFA4
+            VB6ArrayRef<int32_t, 1, 10>                     GFXToad;              // 0xB2CFC0
+            VB6ArrayRef<int32_t, 1, 10>                     GFXToadMask;          // 0xB2CFDC
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXToadBMP;           // 0xB2D004
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXToadMaskBMP;       // 0xB2D02C
+            VB6ArrayRef<int16_t, 1, 10>                     GFXToadHeight;        // 0xB2D048
+            VB6ArrayRef<int16_t, 1, 10>                     GFXToadWidth;         // 0xB2D064
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXLinkCustom;        // 0xB2D080
+            VB6ArrayRef<int32_t, 1, 10>                     GFXLink;              // 0xB2D09C
+            VB6ArrayRef<int32_t, 1, 10>                     GFXLinkMask;          // 0xB2D0B8
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXLinkBMP;           // 0xB2D0E0
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXLinkMaskBMP;       // 0xB2D108
+            VB6ArrayRef<int16_t, 1, 10>                     GFXLinkHeight;        // 0xB2D124
+            VB6ArrayRef<int16_t, 1, 10>                     GFXLinkWidth;         // 0xB2D140
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXYoshiBCustom;      // 0xB2D15C
+            VB6ArrayRef<int32_t, 1, 10>                     GFXYoshiB;            // 0xB2D178
+            VB6ArrayRef<int32_t, 1, 10>                     GFXYoshiBMask;        // 0xB2D194
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiBBMP;         // 0xB2D1BC
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiBMaskBMP;     // 0xB2D1E4
+            VB6ArrayRef<VB6Bool, 1, 10>                     GFXYoshiTCustom;      // 0xB2D200
+            VB6ArrayRef<int32_t, 1, 10>                     GFXYoshiT;            // 0xB2D21C
+            VB6ArrayRef<int32_t, 1, 10>                     GFXYoshiTMask;        // 0xB2D238
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiTBMP;         // 0xB2D260
+            VB6ArrayRef<StdPicture_t, 1, 10>                GFXYoshiTMaskBMP;     // 0xB2D288
+            VB6ArrayRef<int32_t, 1, 400>                    GFXTileCustom;        // 0xB2D2A4
+            VB6ArrayRef<int32_t, 1, 400>                    GFXTile;              // 0xB2D2C0
+            VB6ArrayRef<StdPicture_t, 1, 400>               GFXTileBMP;           // 0xB2D2E8
+            VB6ArrayRef<int16_t, 1, 400>                    GFXTileHeight;        // 0xB2D304
+            VB6ArrayRef<int16_t, 1, 400>                    GFXTileWidth;         // 0xB2D320
+            VB6ArrayRef<int32_t, 0, 100>                    GFXLevelCustom;       // 0xB2D33C
+            VB6ArrayRef<int32_t, 0, 100>                    GFXLevel;             // 0xB2D358
+            VB6ArrayRef<int32_t, 0, 100>                    GFXLevelMask;         // 0xB2D374
+            VB6ArrayRef<StdPicture_t, 0, 100>               GFXLevelBMP;          // 0xB2D39C
+            VB6ArrayRef<StdPicture_t, 0, 100>               GFXLevelMaskBMP;      // 0xB2D3C4
+            VB6ArrayRef<int16_t, 0, 100>                    GFXLevelHeight;       // 0xB2D3E0
+            VB6ArrayRef<int16_t, 0, 100>                    GFXLevelWidth;        // 0xB2D3FC
+            VB6ArrayRef<VB6Bool, 0, 100>                    GFXLevelBig;          // 0xB2D418
+            VB6ArrayRef<int32_t, 1, 100>                    GFXSceneCustom;       // 0xB2D434
+            VB6ArrayRef<int32_t, 1, 100>                    GFXScene;             // 0xB2D450
+            VB6ArrayRef<int32_t, 1, 100>                    GFXSceneMask;         // 0xB2D46C
+            VB6ArrayRef<StdPicture_t, 1, 100>               GFXSceneBMP;          // 0xB2D494
+            VB6ArrayRef<StdPicture_t, 1, 100>               GFXSceneMaskBMP;      // 0xB2D4BC
+            VB6ArrayRef<int16_t, 1, 100>                    GFXSceneHeight;       // 0xB2D4D8
+            VB6ArrayRef<int16_t, 1, 100>                    GFXSceneWidth;        // 0xB2D4F4
+            VB6ArrayRef<int32_t, 1, 100>                    GFXPathCustom;        // 0xB2D510
+            VB6ArrayRef<int32_t, 1, 100>                    GFXPath;              // 0xB2D52C
+            VB6ArrayRef<int32_t, 1, 100>                    GFXPathMask;          // 0xB2D548
+            VB6ArrayRef<StdPicture_t, 1, 100>               GFXPathBMP;           // 0xB2D570
+            VB6ArrayRef<StdPicture_t, 1, 100>               GFXPathMaskBMP;       // 0xB2D598
+            VB6ArrayRef<int16_t, 1, 100>                    GFXPathHeight;        // 0xB2D5B4
+            VB6ArrayRef<int16_t, 1, 100>                    GFXPathWidth;         // 0xB2D5D0
+            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayerCustom;      // 0xB2D5EC
+            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayer;            // 0xB2D608
+            VB6ArrayRef<int32_t, 1, 5>                      GFXPlayerMask;        // 0xB2D624
+            VB6ArrayRef<StdPicture_t, 1, 5>                 GFXPlayerBMP;         // 0xB2D64C
+            VB6ArrayRef<StdPicture_t, 1, 5>                 GFXPlayerMaskBMP;     // 0xB2D674
+            VB6ArrayRef<int16_t, 1, 5>                      GFXPlayerHeight;      // 0xB2D690
+            VB6ArrayRef<int16_t, 1, 5>                      GFXPlayerWidth;       // 0xB2D6AC
+            int16_t                                         PlayerCharacter;      // 0xB2D6B8
+            int16_t                                         PlayerCharacter2;     // 0xB2D6BA
+            double                                          MenuMouseX;           // 0xB2D6BC
+            double                                          MenuMouseY;           // 0xB2D6C4
+            VB6Bool                                         MenuMouseDown;        // 0xB2D6CC
+            VB6Bool                                         MenuMouseBack;        // 0xB2D6CE
+            VB6Bool                                         MenuMouseRelease;     // 0xB2D6D0
+            VB6Bool                                         MenuMouseMove;        // 0xB2D6D2
+            VB6Bool                                         MenuMouseClick;       // 0xB2D6D4
+            int16_t                                         _padding29_;          // 0xB2D6D6
+            VB6ArrayRef<VB6StrPtr, 1, 100>                  NewEvent;             // 0xB2D6E8
+            VB6ArrayRef<int16_t, 1, 100>                    newEventDelay;        // 0xB2D704
+            int16_t                                         newEventNum;          // 0xB2D710
+            VB6Bool                                         ForcedControls;       // 0xB2D712
+            Controls_t                                      ForcedControl;        // 0xB2D714
+            int16_t                                         SyncCount;            // 0xB2D728
+            VB6Bool                                         noUpdate;             // 0xB2D72A
+            double                                          gameTime;             // 0xB2D72C
+            VB6Bool                                         noSound;              // 0xB2D734
+            int16_t                                         _padding30_;          // 0xB2D736
+            double                                          tempTime;             // 0xB2D738
+            VB6Bool                                         BattleMode;           // 0xB2D740
+            int16_t                                         BattleWinner;         // 0xB2D742
+            VB6ArrayRef<int16_t, 1, 200>                    BattleLives;          // 0xB2D754
+            int16_t                                         BattleIntro;          // 0xB2D760
+            int16_t                                         BattleOutro;          // 0xB2D762
+            VB6StrPtr                                       LevelName;            // 0xB2D764
         };
 #if !defined(__INTELLISENSE__)
         static_assert(sizeof(SMBX13::Types::modMain_t) == 0x8740, "sizeof(SMBX13::Types::modMain_t) must be 0x8740");
