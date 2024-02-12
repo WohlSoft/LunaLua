@@ -210,7 +210,7 @@ bool VB6StrPtr::operator==(const std::string &other) const
 // Equality operator for const wchar_t*
 bool VB6StrPtr::operator==(const wchar_t* other) const
 {
-    bool otherIsEmpty = (other == nullptr) || (other[0] != L'\0');
+    bool otherIsEmpty = (other == nullptr) || (other[0] == L'\0');
     if (length() == 0) return otherIsEmpty; // Shortcut
     if (otherIsEmpty) return false;
     return std::wcscmp(ptr, other) == 0;
