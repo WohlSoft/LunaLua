@@ -320,16 +320,16 @@ namespace SMBX13 {
             int16_t    NoPlayerCol;          // 0xBE
             Location_t Location;             // 0xC0
             int16_t    Character;            // 0xF0
-            int16_t    _padding3_;           // 0xF2
-            Controls_t Controls;             // 0xF4
-            int16_t    Direction;            // 0x108
-            int16_t    Mount;                // 0x10A
-            int16_t    MountType;            // 0x10C
-            int16_t    MountSpecial;         // 0x10E
-            int16_t    MountOffsetY;         // 0x110
-            int16_t    MountFrame;           // 0x112
-            int16_t    State;                // 0x114
-            int16_t    Frame;                // 0x116
+            Controls_t Controls;             // 0xF2
+            int16_t    Direction;            // 0x106
+            int16_t    Mount;                // 0x108
+            int16_t    MountType;            // 0x10A
+            int16_t    MountSpecial;         // 0x10C
+            int16_t    MountOffsetY;         // 0x10E
+            int16_t    MountFrame;           // 0x110
+            int16_t    State;                // 0x112
+            int16_t    Frame;                // 0x114
+            int16_t    _padding3_;           // 0x116
             float      FrameCount;           // 0x118
             int16_t    Jump;                 // 0x11C
             VB6Bool    CanJump;              // 0x11E
