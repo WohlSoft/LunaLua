@@ -54,10 +54,10 @@ namespace SMBX13 {
             VB6Bool Drop;    // 0x10
             VB6Bool Start;   // 0x12
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Controls_t) == 0x14, "sizeof(Controls_t) must be 0x14");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Controls_t) == 0x14, "sizeof(Controls_t) must be 0x14");
+        #endif
+        
         struct nPlayer_t {
             Controls_t Controls;   // 0x0
             int16_t    Cursor;     // 0x14
@@ -68,10 +68,10 @@ namespace SMBX13 {
             double     ECurserX;   // 0x20
             double     ECurserY;   // 0x28
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(nPlayer_t) == 0x30, "sizeof(nPlayer_t) must be 0x30");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(nPlayer_t) == 0x30, "sizeof(nPlayer_t) must be 0x30");
+        #endif
+        
         struct nPlay_t {
             VB6Bool                    Allow;           // 0x0
             int16_t                    Mode;            // 0x2
@@ -100,10 +100,10 @@ namespace SMBX13 {
             int16_t                    _padding4_;      // 0x4FA
             float                      NPCWaitCount;    // 0x4FC
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(nPlay_t) == 0x500, "sizeof(nPlay_t) must be 0x500");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(nPlay_t) == 0x500, "sizeof(nPlay_t) must be 0x500");
+        #endif
+        
         struct Location_t {
             double X;      // 0x0
             double Y;      // 0x8
@@ -112,10 +112,10 @@ namespace SMBX13 {
             double SpeedX; // 0x20
             double SpeedY; // 0x28
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Location_t) == 0x30, "sizeof(Location_t) must be 0x30");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Location_t) == 0x30, "sizeof(Location_t) must be 0x30");
+        #endif
+        
         struct EditorControls_t {
             VB6Bool Up;         // 0x0
             VB6Bool Down;       // 0x2
@@ -124,10 +124,10 @@ namespace SMBX13 {
             VB6Bool Mouse1;     // 0x8
             int16_t _padding1_; // 0xA
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(EditorControls_t) == 0xC, "sizeof(EditorControls_t) must be 0xC");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(EditorControls_t) == 0xC, "sizeof(EditorControls_t) must be 0xC");
+        #endif
+        
         struct conKeyboard_t {
             int16_t Up;      // 0x0
             int16_t Down;    // 0x2
@@ -140,10 +140,10 @@ namespace SMBX13 {
             int16_t AltJump; // 0x10
             int16_t AltRun;  // 0x12
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(conKeyboard_t) == 0x14, "sizeof(conKeyboard_t) must be 0x14");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(conKeyboard_t) == 0x14, "sizeof(conKeyboard_t) must be 0x14");
+        #endif
+        
         struct conJoystick_t {
             int16_t Jump;    // 0x0
             int16_t Run;     // 0x2
@@ -152,10 +152,10 @@ namespace SMBX13 {
             int16_t AltJump; // 0x8
             int16_t AltRun;  // 0xA
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(conJoystick_t) == 0xC, "sizeof(conJoystick_t) must be 0xC");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(conJoystick_t) == 0xC, "sizeof(conJoystick_t) must be 0xC");
+        #endif
+        
         struct NPC_t {
             VB6StrPtr               AttLayer;           // 0x0
             int16_t                 Quicksand;          // 0x4
@@ -246,10 +246,10 @@ namespace SMBX13 {
             VB6Bool                 TurnBackWipe;       // 0x154
             int16_t                 Immune;             // 0x156
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(NPC_t) == 0x158, "sizeof(NPC_t) must be 0x158");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(NPC_t) == 0x158, "sizeof(NPC_t) must be 0x158");
+        #endif
+        
         struct Player_t {
             VB6Bool    DoubleJump;           // 0x0
             VB6Bool    FlySparks;            // 0x2
@@ -376,20 +376,20 @@ namespace SMBX13 {
             float      mountBump;            // 0x17C
             float      SpeedFixY;            // 0x180
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Player_t) == 0x184, "sizeof(Player_t) must be 0x184");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Player_t) == 0x184, "sizeof(Player_t) must be 0x184");
+        #endif
+        
         struct Background_t {
             VB6StrPtr  Layer;    // 0x0
             VB6Bool    Hidden;   // 0x4
             int16_t    Type;     // 0x6
             Location_t Location; // 0x8
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Background_t) == 0x38, "sizeof(Background_t) must be 0x38");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Background_t) == 0x38, "sizeof(Background_t) must be 0x38");
+        #endif
+        
         struct Water_t {
             VB6StrPtr  Layer;      // 0x0
             VB6Bool    Hidden;     // 0x4
@@ -399,10 +399,10 @@ namespace SMBX13 {
             int16_t    _padding2_; // 0xE
             Location_t Location;   // 0x10
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Water_t) == 0x40, "sizeof(Water_t) must be 0x40");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Water_t) == 0x40, "sizeof(Water_t) must be 0x40");
+        #endif
+        
         struct Block_t {
             VB6Bool    Slippy;            // 0x0
             int16_t    RespawnDelay;      // 0x2
@@ -430,10 +430,10 @@ namespace SMBX13 {
             VB6Bool    noProjClipping;    // 0x64
             int16_t    IsReally;          // 0x66
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Block_t) == 0x68, "sizeof(Block_t) must be 0x68");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Block_t) == 0x68, "sizeof(Block_t) must be 0x68");
+        #endif
+        
         struct Effect_t {
             int16_t    Type;       // 0x0
             int16_t    _padding1_; // 0x2
@@ -446,10 +446,10 @@ namespace SMBX13 {
             VB6Bool    Shadow;     // 0x40
             int16_t    _padding3_; // 0x42
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Effect_t) == 0x44, "sizeof(Effect_t) must be 0x44");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Effect_t) == 0x44, "sizeof(Effect_t) must be 0x44");
+        #endif
+        
         struct vScreen_t {
             double  Left;       // 0x0
             double  Top;        // 0x8
@@ -462,10 +462,10 @@ namespace SMBX13 {
             int16_t TempDelay;  // 0x34
             int16_t _padding2_; // 0x36
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(vScreen_t) == 0x38, "sizeof(vScreen_t) must be 0x38");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(vScreen_t) == 0x38, "sizeof(vScreen_t) must be 0x38");
+        #endif
+        
         struct WorldLevel_t {
             Location_t              Location;   // 0x0
             int16_t                 Type;       // 0x30
@@ -484,10 +484,10 @@ namespace SMBX13 {
             VB6Bool                 Start;      // 0x60
             VB6Bool                 Visible;    // 0x62
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(WorldLevel_t) == 0x64, "sizeof(WorldLevel_t) must be 0x64");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(WorldLevel_t) == 0x64, "sizeof(WorldLevel_t) must be 0x64");
+        #endif
+        
         struct Warp_t {
             VB6Bool    Locked;     // 0x0
             VB6Bool    WarpNPC;    // 0x2
@@ -514,46 +514,46 @@ namespace SMBX13 {
             int16_t    maxStars;   // 0x8C
             int16_t    _padding3_; // 0x8E
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Warp_t) == 0x90, "sizeof(Warp_t) must be 0x90");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Warp_t) == 0x90, "sizeof(Warp_t) must be 0x90");
+        #endif
+        
         struct Tile_t {
             Location_t Location;   // 0x0
             int16_t    Type;       // 0x30
             int16_t    _padding1_; // 0x32
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Tile_t) == 0x34, "sizeof(Tile_t) must be 0x34");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Tile_t) == 0x34, "sizeof(Tile_t) must be 0x34");
+        #endif
+        
         struct Scene_t {
             Location_t Location; // 0x0
             int16_t    Type;     // 0x30
             VB6Bool    Active;   // 0x32
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Scene_t) == 0x34, "sizeof(Scene_t) must be 0x34");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Scene_t) == 0x34, "sizeof(Scene_t) must be 0x34");
+        #endif
+        
         struct WorldPath_t {
             Location_t Location; // 0x0
             VB6Bool    Active;   // 0x30
             int16_t    Type;     // 0x32
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(WorldPath_t) == 0x34, "sizeof(WorldPath_t) must be 0x34");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(WorldPath_t) == 0x34, "sizeof(WorldPath_t) must be 0x34");
+        #endif
+        
         struct WorldMusic_t {
             Location_t Location;   // 0x0
             int16_t    Type;       // 0x30
             int16_t    _padding1_; // 0x32
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(WorldMusic_t) == 0x34, "sizeof(WorldMusic_t) must be 0x34");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(WorldMusic_t) == 0x34, "sizeof(WorldMusic_t) must be 0x34");
+        #endif
+        
         struct EditorCursor_t {
             float        X;            // 0x0
             float        Y;            // 0x4
@@ -574,10 +574,10 @@ namespace SMBX13 {
             WorldPath_t  WorldPath;    // 0x3D8
             WorldMusic_t WorldMusic;   // 0x40C
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(EditorCursor_t) == 0x440, "sizeof(EditorCursor_t) must be 0x440");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(EditorCursor_t) == 0x440, "sizeof(EditorCursor_t) must be 0x440");
+        #endif
+        
         struct WorldPlayer_t {
             Location_t Location;  // 0x0
             int16_t    Type;      // 0x30
@@ -588,10 +588,10 @@ namespace SMBX13 {
             VB6Bool    Move3;     // 0x3A
             VB6StrPtr  LevelName; // 0x3C
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(WorldPlayer_t) == 0x40, "sizeof(WorldPlayer_t) must be 0x40");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(WorldPlayer_t) == 0x40, "sizeof(WorldPlayer_t) must be 0x40");
+        #endif
+        
         struct Layer_t {
             VB6Bool   EffectStop; // 0x0
             int16_t   _padding1_; // 0x2
@@ -601,18 +601,18 @@ namespace SMBX13 {
             float     SpeedX;     // 0xC
             float     SpeedY;     // 0x10
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Layer_t) == 0x14, "sizeof(Layer_t) must be 0x14");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Layer_t) == 0x14, "sizeof(Layer_t) must be 0x14");
+        #endif
+        
         struct CreditLine_t {
             Location_t Location; // 0x0
             VB6StrPtr  Text;     // 0x30
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(CreditLine_t) == 0x34, "sizeof(CreditLine_t) must be 0x34");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(CreditLine_t) == 0x34, "sizeof(CreditLine_t) must be 0x34");
+        #endif
+        
         struct SelectWorld_t {
             VB6StrPtr                           WorldName;  // 0x0
             VB6StrPtr                           WorldPath;  // 0x4
@@ -620,19 +620,19 @@ namespace SMBX13 {
             VB6Array<VB6Bool, 1, numCharacters> blockChar;  // 0xC
             int16_t                             _padding1_; // 0x16
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(SelectWorld_t) == 0x18, "sizeof(SelectWorld_t) must be 0x18");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(SelectWorld_t) == 0x18, "sizeof(SelectWorld_t) must be 0x18");
+        #endif
+        
         struct Star_t {
             VB6StrPtr level;      // 0x0
             int16_t   Section;    // 0x4
             int16_t   _padding1_; // 0x6
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Star_t) == 0x8, "sizeof(Star_t) must be 0x8");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Star_t) == 0x8, "sizeof(Star_t) must be 0x8");
+        #endif
+        
         struct NPCDefaults_t {
             VB6Array<int16_t, 0, 300> NPCFrameOffsetX;    // 0x0
             VB6Array<int16_t, 0, 300> NPCFrameOffsetY;    // 0x25A
@@ -674,18 +674,18 @@ namespace SMBX13 {
             VB6Array<VB6Bool, 0, 300> NPCNoGravity;       // 0x5704
             int16_t                   _padding2_;         // 0x595E
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(NPCDefaults_t) == 0x5960, "sizeof(NPCDefaults_t) must be 0x5960");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(NPCDefaults_t) == 0x5960, "sizeof(NPCDefaults_t) must be 0x5960");
+        #endif
+        
         struct EffectDefaults_t {
             VB6Array<int16_t, 1, maxEffectType> EffectWidth;  // 0x0
             VB6Array<int16_t, 1, maxEffectType> EffectHeight; // 0x190
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(EffectDefaults_t) == 0x320, "sizeof(EffectDefaults_t) must be 0x320");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(EffectDefaults_t) == 0x320, "sizeof(EffectDefaults_t) must be 0x320");
+        #endif
+        
         struct Physics_t {
             int16_t                                             PlayerJumpHeight;       // 0x0
             int16_t                                             PlayerBlockJumpHeight;  // 0x2
@@ -717,10 +717,10 @@ namespace SMBX13 {
             int16_t                                             NPCPSwitch;             // 0x1A0
             int16_t                                             _padding4_;             // 0x1A2
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Physics_t) == 0x1A4, "sizeof(Physics_t) must be 0x1A4");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Physics_t) == 0x1A4, "sizeof(Physics_t) must be 0x1A4");
+        #endif
+        
         struct Events_t {
             VB6StrPtr                            addSavedEvent;    // 0x0
             VB6StrPtr                            RemoveSavedEvent; // 0x4
@@ -747,10 +747,10 @@ namespace SMBX13 {
             int16_t                              AutoSection;      // 0x58C
             VB6Bool                              AutoStart;        // 0x58E
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(Events_t) == 0x590, "sizeof(Events_t) must be 0x590");
-#endif
-
+        #if !defined(__INTELLISENSE__)
+            static_assert(sizeof(Events_t) == 0x590, "sizeof(Events_t) must be 0x590");
+        #endif
+        
         struct modMain_t {
             int32_t                                         myBackBuffer;         // 0xB25028
             int32_t                                         myBufferBMP;          // 0xB2502C
@@ -1202,11 +1202,12 @@ namespace SMBX13 {
             int16_t                                         BattleOutro;          // 0xB2D762
             VB6StrPtr                                       LevelName;            // 0xB2D764
         };
-#if !defined(__INTELLISENSE__)
-        static_assert(sizeof(SMBX13::Types::modMain_t) == 0x8740, "sizeof(SMBX13::Types::modMain_t) must be 0x8740");
-#endif
+        #if !defined(__INTELLISENSE__)
+                static_assert(sizeof(SMBX13::Types::modMain_t) == 0x8740, "sizeof(SMBX13::Types::modMain_t) must be 0x8740");
+        #endif
 
     }
+
 }
 #pragma pack(pop)
 
