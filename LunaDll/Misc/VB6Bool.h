@@ -15,14 +15,11 @@ public:
     VB6Bool(const VB6Bool &other) :
         raw(other.raw)
     {}
-    VB6Bool(const bool &other) :
-        raw(other ? -1 : 0)
-    {}
     void operator=(const VB6Bool &other)
     {
         raw = other.raw;
     }
-    void operator=(const bool &other)
+    void operator=(const bool other)
     {
         raw = (other ? -1 : 0);
     }

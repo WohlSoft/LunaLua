@@ -1208,6 +1208,6 @@ namespace SMBX13 {
 
     }
 }
-#pragma pack(pop, 1)
+#pragma pack(pop)
 
 #endif // !defined(SMBXINTERNAL_TYPES_H)
