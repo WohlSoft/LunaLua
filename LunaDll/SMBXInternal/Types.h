@@ -699,11 +699,11 @@ namespace SMBX13 {
             int16_t                                             PlayerTerminalVelocity; // 0x18
             int16_t                                             _padding2_;             // 0x1A
             float                                               PlayerGravity;          // 0x1C
-            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerHeight;           // 0x20
-            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerDuckHeight;       // 0x66
-            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerWidth;            // 0xAC
-            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerGrabSpotX;        // 0xF2
-            VB6Array2D<int16_t, 1, numCharacters, 1, numStates> PlayerGrabSpotY;        // 0x138
+            VB6Array2D<int16_t, 1, numStates, 1, numCharacters> PlayerHeight;           // 0x20
+            VB6Array2D<int16_t, 1, numStates, 1, numCharacters> PlayerDuckHeight;       // 0x66
+            VB6Array2D<int16_t, 1, numStates, 1, numCharacters> PlayerWidth;            // 0xAC
+            VB6Array2D<int16_t, 1, numStates, 1, numCharacters> PlayerGrabSpotX;        // 0xF2
+            VB6Array2D<int16_t, 1, numStates, 1, numCharacters> PlayerGrabSpotY;        // 0x138
             int16_t                                             NPCTimeOffScreen;       // 0x17E
             int16_t                                             NPCCanHurtWait;         // 0x180
             int16_t                                             _padding3_;             // 0x182
