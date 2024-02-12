@@ -166,6 +166,7 @@ set(LunaLua_Sources
     Minigames/CGUI/CGUIContainer.cpp
     Minigames/GameboyRPG.cpp
     Minigames/Minigames.cpp
+    Misc/AsmPatch.cpp
     Misc/AsyncHTTPClient.cpp
     Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
