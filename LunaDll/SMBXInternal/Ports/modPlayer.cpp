@@ -6,12 +6,13 @@
 #include "../../Misc/VB6Logic.h"
 #include "../../Misc/RuntimeHookComponents/CharacterIdExtension.h"
 
+// Forward declare a hook we use, don't want the whole header
+void __stdcall runtimeHookWarpPipeDoorInternal(short* playerIdx);
+
 // This is an automatically translated copy of PlayerEffects(A) from modPlayer.bas
 // It contains few manual alterations or edits. It currently has been edited to:
 //  1) Account for character ID extension
-// It is known to be missing hooks for:
-//  1) Hooks at 0x9D55CD, 0x9D55F1 and 0x9D5614 for runtimeHookWarpPipe
-//  2) Hook at 0x9D7037 for runtimeHookWarpDoor
+//  2) Include the required hooks for "onWarp" events
 void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
     using namespace SMBX13::Types;
     using namespace SMBX13::Vars;
@@ -402,6 +403,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     _.Effect = 8;
                     _.Effect2 = 2970;
                 }
+                runtimeHookWarpPipeDoorInternal(&A); // Hook for onWarp event (was at 0x9D55CD, 0x9D55F1 and 0x9D5614 )
             }
             else if (_.Effect2 >= 100) {
                 _.Effect2 = (_.Effect2 + 1);
@@ -609,6 +611,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     _.Effect = 8;
                     _.Effect2 = 2970;
                 }
+                runtimeHookWarpPipeDoorInternal(&A); // Hook for onWarp event (was at 0x9D7037)
                 if ((numPlayers > 2) && (nPlay.Online == false)) {
                     for (B = 1; B <= numPlayers; B++) {
                         if (B != A) {
