@@ -4,13 +4,14 @@
 #include "../Ports.h"
 #include "../../Misc/VB6RNG.h"
 #include "../../Misc/VB6Logic.h"
+#include "../../Misc/RuntimeHookComponents/CharacterIdExtension.h"
 
 // This is an automatically translated copy of PlayerEffects(A) from modPlayer.bas
-// It contains no manual alterations or edits, and is straight from the parser.
+// It contains few manual alterations or edits. It currently has been edited to:
+//  1) Account for character ID extension
 // It is known to be missing hooks for:
-//  1) Character ID extension
-//  2) Hooks at 0x9D55CD, 0x9D55F1 and 0x9D5614 for runtimeHookWarpPipe
-//  3) Hook at 0x9D7037 for runtimeHookWarpDoor
+//  1) Hooks at 0x9D55CD, 0x9D55F1 and 0x9D5614 for runtimeHookWarpPipe
+//  2) Hook at 0x9D7037 for runtimeHookWarpDoor
 void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
     using namespace SMBX13::Types;
     using namespace SMBX13::Vars;
@@ -41,6 +42,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.RunCount = 0;
         }
         _.Immune2 = false;
+        int16_t BaseCharacter = CharacterIdTranslate(_.Character);
         // Player growing effect
         if (_.Effect == 1) {
             _.Frame = 1;
@@ -49,31 +51,31 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if (_.State == 1) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
-                    else if ((_.Character == 2) && (_.Mount != 2)) {
+                    else if ((BaseCharacter == 2) && (_.Mount != 2)) {
                         _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                 }
                 else {
                     _.State = 1;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][_.Character] * 0.5)) + (Physics.PlayerWidth[2][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][_.Character]) + Physics.PlayerHeight[2][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[1][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
-                    else if ((_.Character == 2) && (_.Mount != 2)) {
+                    else if ((BaseCharacter == 2) && (_.Mount != 2)) {
                         _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][1]) + Physics.PlayerHeight[2][2]);
                         _.Location.Height = Physics.PlayerHeight[2][1];
                     }
@@ -93,8 +95,8 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 // Fixes a block collision bug
                 _.StandUp = true;
                 _.Duck = false;
-                _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
-                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][_.Character]) + Physics.PlayerDuckHeight[_.State][_.Character]);
+                _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][BaseCharacter]) + Physics.PlayerDuckHeight[_.State][BaseCharacter]);
             }
             _.Frame = 1;
             _.Effect2 = (_.Effect2 + 1);
@@ -105,10 +107,10 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         YoshiHeight(A);
                     }
                     else if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                 }
                 else {
@@ -117,10 +119,10 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         YoshiHeight(A);
                     }
                     else if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][_.Character] * 0.5)) + (Physics.PlayerWidth[2][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][_.Character]) + Physics.PlayerHeight[2][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[1][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
                     }
                 }
             }
@@ -128,10 +130,10 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if (_.State == 2) {
                     _.State = 1;
                     if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][_.Character] * 0.5)) + (Physics.PlayerWidth[2][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][_.Character]) + Physics.PlayerHeight[2][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                 }
                 _.Immune = 150;
@@ -146,8 +148,8 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 // Fixes a block collision bug
                 _.StandUp = true;
                 _.Duck = false;
-                _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
-                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][_.Character]) + Physics.PlayerDuckHeight[_.State][_.Character]);
+                _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][BaseCharacter]) + Physics.PlayerDuckHeight[_.State][BaseCharacter]);
             }
             _.Frame = 1;
             _.Effect2 = (_.Effect2 + 1);
@@ -175,8 +177,8 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 // Fixes a block collision bug
                 _.StandUp = true;
                 _.Duck = false;
-                _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
-                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][_.Character]) + Physics.PlayerDuckHeight[_.State][_.Character]);
+                _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[_.State][BaseCharacter]) + Physics.PlayerDuckHeight[_.State][BaseCharacter]);
             }
             _.Frame = 1;
             _.Effect2 = (_.Effect2 + 1);
@@ -212,7 +214,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     }
                     if (_.Mount == 0) { _.Frame = 15; }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                 }
@@ -223,7 +225,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         _.Effect2 = 1;
                     }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                     if (_.Mount == 0) { _.Frame = 15; }
@@ -240,12 +242,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         _.Effect2 = 1;
                     }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         if (_.Direction > 0) {
-                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                         }
                         else {
-                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                         }
                     }
                     _.Location.SpeedX = -0.5;
@@ -264,12 +266,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         _.Effect2 = 1;
                     }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         if (_.Direction > 0) {
-                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                         }
                         else {
-                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                         }
                     }
                     _.Location.SpeedX = 0.5;
@@ -294,7 +296,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     _.Location.Y = ((Warp[_.Warp].Exit.Y - _.Location.Height) - 8);
                     if (_.Mount == 0) { _.Frame = 15; }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                 }
@@ -303,7 +305,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     _.Location.Y = ((Warp[_.Warp].Exit.Y + Warp[_.Warp].Exit.Height) + 8);
                     if (_.Mount == 0) { _.Frame = 15; }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                 }
@@ -323,13 +325,13 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         else {
                             _.Frame = 8;
                         }
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         _.Direction = -1;
                         if (_.Direction > 0) {
-                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                         }
                         else {
-                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                         }
                     }
                 }
@@ -350,12 +352,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                             _.Frame = 8;
                         }
                         _.Direction = 1;
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         if (_.Direction > 0) {
-                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                            NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                         }
                         else {
-                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                            NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                         }
                     }
                 }
@@ -415,7 +417,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         _.Effect2 = 3;
                     }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                     if (_.Mount == 0) { _.Frame = 15; }
@@ -426,7 +428,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         _.Effect2 = 3;
                     }
                     if (_.HoldingNPC > 0) {
-                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                        NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                         NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
                     }
                     if (_.Mount == 0) { _.Frame = 15; }
@@ -439,15 +441,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     }
                     if (_.HoldingNPC > 0) {
                         // peach/toad leaving a pipe
-                        if (_.Character >= 3) {
+                        if (BaseCharacter >= 3) {
                             _.Location.SpeedX = 1;
                             PlayerFrame(A);
-                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                             if (_.Direction < 0) {
-                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                             }
                             else {
-                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                             }
                         }
                         else {
@@ -458,12 +460,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                             else {
                                 _.Frame = 8;
                             }
-                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                             if (_.Direction > 0) {
-                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                             }
                             else {
-                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                             }
                         }
                     }
@@ -481,15 +483,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                     }
                     if (_.HoldingNPC > 0) {
                         // peach/toad leaving a pipe
-                        if (_.Character >= 3) {
+                        if (BaseCharacter >= 3) {
                             _.Location.SpeedX = 1;
                             PlayerFrame(A);
-                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                             if (_.Direction < 0) {
-                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                             }
                             else {
-                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                             }
                         }
                         else {
@@ -500,12 +502,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                             else {
                                 _.Frame = 8;
                             }
-                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                            NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                             if (_.Direction > 0) {
-                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                                NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                             }
                             else {
-                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                                NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                             }
                         }
                     }
@@ -568,12 +570,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
         // Door effect
         else if (_.Effect == 7) {
             if (_.HoldingNPC > 0) {
-                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                 NPC[_.HoldingNPC].Location.X = ((_.Location.X + (_.Location.Width / 2)) - (NPC[_.HoldingNPC].Location.Width / 2));
             }
             _.Effect2 = (_.Effect2 + 1);
-            if ((_.Mount == 0) && (_.Character != 5)) { _.Frame = 13; }
-            if (_.Character == 5) { _.Frame = 1; }
+            if ((_.Mount == 0) && (BaseCharacter != 5)) { _.Frame = 13; }
+            if (BaseCharacter == 5) { _.Frame = 1; }
             if (_.Effect2 >= 30) {
                 if (Warp[_.Warp].NoYoshi == true) {
                     if (((OwedMount[A] == 0) && (_.Mount > 0)) && (_.Mount != 2)) {
@@ -615,13 +617,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                             Player[B].Location.SpeedY = ((VB6RNG::generateNumber() * 24) - 12);
                             CheckSection(B);
                             if (Player[B].HoldingNPC > 0) {
+                                int16_t PlayerB_BaseCharacter = CharacterIdTranslate(Player[B].Character);
                                 if (Player[B].Direction > 0) {
-                                    NPC[Player[B].HoldingNPC].Location.X = (Player[B].Location.X + Physics.PlayerGrabSpotX[Player[B].State][Player[B].Character]);
+                                    NPC[Player[B].HoldingNPC].Location.X = (Player[B].Location.X + Physics.PlayerGrabSpotX[Player[B].State][PlayerB_BaseCharacter]);
                                 }
                                 else {
-                                    NPC[Player[B].HoldingNPC].Location.X = (((Player[B].Location.X + Player[B].Location.Width) - Physics.PlayerGrabSpotX[Player[B].State][Player[B].Character]) - NPC[_.HoldingNPC].Location.Width);
+                                    NPC[Player[B].HoldingNPC].Location.X = (((Player[B].Location.X + Player[B].Location.Width) - Physics.PlayerGrabSpotX[Player[B].State][PlayerB_BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                                 }
-                                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                                BaseCharacter = CharacterIdTranslate(_.Character); // Update just in case
+                                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
                                 NPC[Player[B].HoldingNPC].Section = Player[B].Section;
                             }
                         }
@@ -746,26 +750,26 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
         }
         // Player got fire power
         else if (_.Effect == 4) {
-            if ((_.Duck == true) && (_.Character != 5)) {
+            if ((_.Duck == true) && (BaseCharacter != 5)) {
                 UnDuck(A);
                 _.Frame = 1;
             }
             _.Effect2 = (_.Effect2 + 1);
             if ((_.Effect2 / 5) == ::floor((_.Effect2 / 5))) {
-                if ((_.State == 1) && (_.Character != 5)) {
+                if ((_.State == 1) && (BaseCharacter != 5)) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
-                    else if ((_.Character == 2) && (_.Mount != 2)) {
+                    else if ((BaseCharacter == 2) && (_.Mount != 2)) {
                         _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                 }
                 else if (!(_.State == 3)) {
@@ -788,26 +792,26 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
         }
         // Player got ice power
         else if (_.Effect == 41) {
-            if ((_.Duck == true) && (_.Character != 5)) {
+            if ((_.Duck == true) && (BaseCharacter != 5)) {
                 UnDuck(A);
                 _.Frame = 1;
             }
             _.Effect2 = (_.Effect2 + 1);
             if ((_.Effect2 / 5) == ::floor((_.Effect2 / 5))) {
-                if ((_.State == 1) && (_.Character != 5)) {
+                if ((_.State == 1) && (BaseCharacter != 5)) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
-                    else if ((_.Character == 2) && (_.Mount != 2)) {
+                    else if ((BaseCharacter == 2) && (_.Mount != 2)) {
                         _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                     }
                 }
                 else if (!(_.State == 7)) {
@@ -833,18 +837,18 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Frame = 1;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
+                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
                     _.State = 4;
-                    _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                    _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
-                else if (((_.Character == 2) && (_.State == 1)) && (_.Mount == 1)) {
+                else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
                     _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[4][_.Character];
+                    _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
                 }
                 _.State = 4;
                 tempLocation.Width = 32;
@@ -868,18 +872,18 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Immune2 = true;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
+                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
                     _.State = 5;
-                    _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                    _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
-                else if (((_.Character == 2) && (_.State == 1)) && (_.Mount == 1)) {
+                else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
                     _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[4][_.Character];
+                    _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
                 }
                 _.State = 5;
                 tempLocation.Width = 32;
@@ -903,18 +907,18 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Immune2 = true;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][_.Character] * 0.5)) + (Physics.PlayerWidth[1][_.Character] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][_.Character]) + Physics.PlayerHeight[1][_.Character]);
+                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
                     _.State = 5;
-                    _.Location.Width = Physics.PlayerWidth[_.State][_.Character];
-                    _.Location.Height = Physics.PlayerHeight[_.State][_.Character];
+                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
-                else if (((_.Character == 2) && (_.State == 1)) && (_.Mount == 1)) {
+                else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
                     _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[6][_.Character];
+                    _.Location.Height = Physics.PlayerHeight[6][BaseCharacter];
                 }
                 _.State = 6;
                 tempLocation.Width = 32;
@@ -978,12 +982,12 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 NPC[_.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
                 NPC[_.HoldingNPC].CantHurtPlayer = A;
                 if (_.Direction > 0) {
-                    NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][_.Character]);
+                    NPC[_.HoldingNPC].Location.X = (_.Location.X + Physics.PlayerGrabSpotX[_.State][BaseCharacter]);
                 }
                 else {
-                    NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][_.Character]) - NPC[_.HoldingNPC].Location.Width);
+                    NPC[_.HoldingNPC].Location.X = (((_.Location.X + _.Location.Width) - Physics.PlayerGrabSpotX[_.State][BaseCharacter]) - NPC[_.HoldingNPC].Location.Width);
                 }
-                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][_.Character]) + 32) - NPC[_.HoldingNPC].Location.Height);
+                NPC[_.HoldingNPC].Location.Y = (((_.Location.Y + Physics.PlayerGrabSpotY[_.State][BaseCharacter]) + 32) - NPC[_.HoldingNPC].Location.Height);
             }
             _.MountSpecial = 0;
             _.YoshiTongueLength = 0;

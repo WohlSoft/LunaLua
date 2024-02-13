@@ -151,6 +151,7 @@
     <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
+    <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h" />
     <ClInclude Include="Misc\SRect.h" />
     <ClInclude Include="Misc\VB6Array.h" />
     <ClInclude Include="Misc\VB6Logic.h" />
