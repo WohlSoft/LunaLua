@@ -2,6 +2,7 @@
 #define SMBXINTERNAL_FUNCTIONS_H
 
 #include <cstdint>
+#include "Types.h"
 #include "../Misc/VB6StrPtr.h"
 #include "../Misc/VB6Bool.h"
 

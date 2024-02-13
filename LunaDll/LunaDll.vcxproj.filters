@@ -724,6 +724,9 @@
     <ClInclude Include="SMBXInternal\Types.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\VB6Array.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
