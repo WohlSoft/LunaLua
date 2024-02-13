@@ -25,6 +25,9 @@
 
 #include "../../Misc/LoadScreen.h"
 
+#include "../../SMBXInternal/Ports.h"
+#include "../../SMBXInternal/Functions.h"
+
 #ifndef NO_SDL
 bool episodeStarted = false;
 #endif
@@ -2144,6 +2147,9 @@ void TrySkipPatch()
 
     //Fence bug fixes
     gFenceFixes.Apply();
+
+    // Replace PlayerEffects function
+    PATCH(SMBX13::modPlayer_Private::_PlayerEffects_ptr).JMP(&SMBX13::Ports::PlayerEffects).NOP_PAD_TO_SIZE<6>().Apply();
 
     /************************************************************************/
     /* Import Table Patch                                                   */
