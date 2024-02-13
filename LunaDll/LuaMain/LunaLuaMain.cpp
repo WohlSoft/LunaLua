@@ -31,6 +31,7 @@
 
 #include "LunaPathValidator.h"
 #include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -135,7 +136,10 @@ bool CLunaLua::shutdown()
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
     gLinkFairyClowncarFixes.Apply();
+    gSlideJumpFixIsEnabled = true;
+    SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;
     gCollisionMatrix.clear();
+
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);

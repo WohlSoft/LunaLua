@@ -5,6 +5,8 @@
 
 namespace SMBX13 {
     namespace Ports {
+        extern bool _enablePowerupPowerdownPositionFixes;
+
         void __stdcall PlayerEffects(int16_t& A);
     }
 }

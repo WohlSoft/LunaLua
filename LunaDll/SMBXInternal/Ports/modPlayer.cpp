@@ -9,6 +9,32 @@
 // Forward declare a hook we use, don't want the whole header
 void __stdcall runtimeHookWarpPipeDoorInternal(short* playerIdx);
 
+// Fix enablement
+bool SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;
+
+// Function to update player location based on a change in state
+static void UpdatePlayerPositionForStateChange(SMBX13::Types::Player_t& _)
+{
+    using namespace SMBX13::Vars;
+    int16_t BaseCharacter = CharacterIdTranslate(_.Character);
+    int16_t newState = _.State;
+    double oldWidth = _.Location.Width;
+    double newWidth = Physics.PlayerWidth[newState][BaseCharacter];
+    _.Location.X = ((_.Location.X - (newWidth * 0.5)) + (_.Location.Width * 0.5));
+    _.Location.Width = newWidth;
+    if (newWidth > oldWidth)
+    {
+        // TODO: Consider if we want block collision here to avoid some more glitches?
+    }
+    if (_.Duck) {
+        _.Location.Y = ((_.Location.Y - Physics.PlayerDuckHeight[newState][BaseCharacter]) + _.Location.Height);
+        _.Location.Height = Physics.PlayerDuckHeight[newState][BaseCharacter];
+    } else {
+        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[newState][BaseCharacter]) + _.Location.Height);
+        _.Location.Height = Physics.PlayerHeight[newState][BaseCharacter];
+    }
+}
+
 // This is an automatically translated copy of PlayerEffects(A) from modPlayer.bas
 // It contains few manual alterations or edits. It currently has been edited to:
 //  1) Account for character ID extension
@@ -52,33 +78,53 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if (_.State == 1) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
                     else if ((BaseCharacter == 2) && (_.Mount != 2)) {
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                 }
                 else {
                     _.State = 1;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
+                        }
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
                     else if ((BaseCharacter == 2) && (_.Mount != 2)) {
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][1]) + Physics.PlayerHeight[2][2]);
-                        _.Location.Height = Physics.PlayerHeight[2][1];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][1]) + Physics.PlayerHeight[2][2]);
+                            _.Location.Height = Physics.PlayerHeight[2][1];
+                        }
                     }
                 }
             }
@@ -108,10 +154,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         YoshiHeight(A);
                     }
                     else if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                 }
                 else {
@@ -120,10 +171,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                         YoshiHeight(A);
                     }
                     else if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[1][BaseCharacter];
+                        }
                     }
                 }
             }
@@ -131,10 +187,15 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if (_.State == 2) {
                     _.State = 1;
                     if (!(_.Mount == 2)) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[1][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[2][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[1][BaseCharacter]) + Physics.PlayerHeight[2][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                 }
                 _.Immune = 150;
@@ -762,17 +823,27 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if ((_.State == 1) && (BaseCharacter != 5)) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
                     else if ((BaseCharacter == 2) && (_.Mount != 2)) {
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                 }
                 else if (!(_.State == 3)) {
@@ -804,17 +875,27 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
                 if ((_.State == 1) && (BaseCharacter != 5)) {
                     _.State = 2;
                     if (_.Mount == 0) {
-                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                            _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                     else if (_.Mount == 3) {
                         YoshiHeight(A);
                     }
                     else if ((BaseCharacter == 2) && (_.Mount != 2)) {
-                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                            UpdatePlayerPositionForStateChange(_);
+                        }
+                        else {
+                            _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                            _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                        }
                     }
                 }
                 else if (!(_.State == 7)) {
@@ -840,18 +921,30 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Frame = 1;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                    _.State = 4;
-                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 4;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.State = 4;
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    }
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
                 else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 4;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                        _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
+                    }
                 }
                 _.State = 4;
                 tempLocation.Width = 32;
@@ -875,18 +968,30 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Immune2 = true;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                    _.State = 5;
-                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 5;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.State = 5;
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    }
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
                 else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 5;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                        _.Location.Height = Physics.PlayerHeight[4][BaseCharacter];
+                    }
                 }
                 _.State = 5;
                 tempLocation.Width = 32;
@@ -910,18 +1015,30 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
             _.Immune2 = true;
             if (_.Effect2 == 0) {
                 if ((_.State == 1) && (_.Mount == 0)) {
-                    _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
-                    _.State = 5;
-                    _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
-                    _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 6;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.X = ((_.Location.X - (Physics.PlayerWidth[2][BaseCharacter] * 0.5)) + (Physics.PlayerWidth[1][BaseCharacter] * 0.5));
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][BaseCharacter]) + Physics.PlayerHeight[1][BaseCharacter]);
+                        _.State = 5;
+                        _.Location.Width = Physics.PlayerWidth[_.State][BaseCharacter];
+                        _.Location.Height = Physics.PlayerHeight[_.State][BaseCharacter];
+                    }
                 }
                 else if (_.Mount == 3) {
                     YoshiHeight(A);
                 }
                 else if (((BaseCharacter == 2) && (_.State == 1)) && (_.Mount == 1)) {
-                    _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
-                    _.Location.Height = Physics.PlayerHeight[6][BaseCharacter];
+                    if (SMBX13::Ports::_enablePowerupPowerdownPositionFixes) {
+                        _.State = 6;
+                        UpdatePlayerPositionForStateChange(_);
+                    }
+                    else {
+                        _.Location.Y = ((_.Location.Y - Physics.PlayerHeight[2][2]) + Physics.PlayerHeight[2][1]);
+                        _.Location.Height = Physics.PlayerHeight[6][BaseCharacter];
+                    }
                 }
                 _.State = 6;
                 tempLocation.Width = 32;
