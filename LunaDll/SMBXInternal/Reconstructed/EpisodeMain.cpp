@@ -42,7 +42,7 @@
 
 #include "../Functions.h"
 #include "../Types.h"
-#include "../Vars.h"
+#include "../Variables.h"
 
 extern PlayerMOB* getTemplateForCharacterWithDummyFallback(int id);
 extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
