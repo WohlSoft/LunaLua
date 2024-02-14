@@ -7,9 +7,14 @@
 #include <array>
 #include "Gui/GuiCrashNotify.h"
 
-std::string lastErrDesc;
-ErrorReport::VB6ErrorCode lastVB6ErrCode;
-CONTEXT lastVB6ErrContext;
+namespace ErrorReportVars
+{
+    std::string lastErrDesc;
+    ErrorReport::VB6ErrorCode lastVB6ErrCode;
+    CONTEXT lastVB6ErrContext;
+    bool pendingVB6ErrContext = false;
+    bool activeVB6ErrContext = false;
+}
 
 std::string ErrorReport::generateStackTrace(CONTEXT* context)
 {
@@ -78,17 +83,8 @@ void ErrorReport::manageErrorReport(const std::string &url, std::string &errText
     GuiCrashNotify notifier(errText);
     notifier.show();
 
-    const std::string& username = notifier.getUsername();
-    const std::string& usercomment = notifier.getUsercomment();
-
-    errText += "\n\n\nUSERNAME: \n";
-    errText += (username.length() == 0 ? "(NONE)" : username);
-    errText += "\n\n\nUSERCOMMENT: \n";
-    errText += (usercomment.length() == 0 ? "(NONE)" : usercomment);
-    errText += "\n";
-
     if (notifier.shouldSend()){
-        sendPUTRequest(url, errText);
+        // sendPUTRequest(url, errText);
     }
 }
 
@@ -97,7 +93,10 @@ static_assert(EXCEPTION_FLT_INEXACT_RESULT == 0xc000008f, "BOO");
 void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 {
     bool isVB6Exception = (exception->ExceptionCode == EXCEPTION_FLT_INEXACT_RESULT);
-    std::string stackTrace = generateStackTrace(isVB6Exception ? &lastVB6ErrContext : context);
+    std::string stackTrace = generateStackTrace(
+        (isVB6Exception && ErrorReportVars::activeVB6ErrContext) ? 
+            &ErrorReportVars::lastVB6ErrContext :
+            context);
     std::stringstream fullErrorDescription;
 
     fullErrorDescription << "== Crash Summary ==\n";
@@ -124,7 +123,7 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
     }
 
     if (isVB6Exception) {
-        fullErrorDescription << getCustomVB6ErrorDescription(lastVB6ErrCode);
+        fullErrorDescription << getCustomVB6ErrorDescription(ErrorReportVars::lastVB6ErrCode);
     }
 
     fullErrorDescription << "\n== Stack Trace ==\n";
@@ -132,16 +131,16 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
 
     fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
-    fullErrorDescription << "* http://wohlsoft.ru/forum/ or\n";
+    fullErrorDescription << "* The Codehaus Discord server or\n";
     fullErrorDescription << "* https://www.smbxgame.com/forums/viewforum.php?f=35 or\n";
-    fullErrorDescription << "* http://talkhaus.raocow.com/viewforum.php?f=36\n";
+    fullErrorDescription << "* https://talkhaus.raocow.com/viewforum.php?f=36\n";
     fullErrorDescription << "\n";
 
-    lastErrDesc = fullErrorDescription.str();
+    ErrorReportVars::lastErrDesc = fullErrorDescription.str();
 }
 
 void ErrorReport::report()
 {
-    manageErrorReport("http://wohlsoft.ru/LunaLuaErrorReport/index.php", lastErrDesc);
-    writeErrorLog(lastErrDesc);
+    manageErrorReport("http://wohlsoft.ru/LunaLuaErrorReport/index.php", ErrorReportVars::lastErrDesc);
+    writeErrorLog(ErrorReportVars::lastErrDesc);
 }

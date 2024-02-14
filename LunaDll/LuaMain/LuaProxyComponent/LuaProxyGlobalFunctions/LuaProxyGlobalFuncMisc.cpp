@@ -308,11 +308,16 @@ bool LuaProxy::Misc::loadEpisode(std::string episodeName)
 
 void LuaProxy::Misc::pause()
 {
-    g_EventHandler.requestPause(false);
+    pause(false);
 }
 
 void LuaProxy::Misc::pause(bool atFrameEnd)
 {
+    if (!gLunaLua.didOnStartRun())
+    {
+        // Not valid before onStart unless delayed to end of frame
+        atFrameEnd = true;
+    }
     g_EventHandler.requestPause(atFrameEnd);
 }
 

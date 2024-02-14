@@ -110,7 +110,7 @@ namespace Blocks {
     void SetBlockWalkPastStair(int id, bool walkpaststair);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
-    bool FilterSemisolidSlopeCollision(Momentum* entityMomentum, int blockIdx, int entityBottomCollisionTimer);
+    bool FilterSemisolidSlopeCollision(Momentum* entityMomentum, Momentum* speed, int blockIdx, int entityBottomCollisionTimer, bool standingOnSlope);
 
 }
 

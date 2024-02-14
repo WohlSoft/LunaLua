@@ -73,7 +73,7 @@ extern void __stdcall InitHook()
         if (!newLauncherLib){
             std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
             errMsg += std::to_string((long long)GetLastError());
-            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", 0);
             return;
         }
         RunProc hRunProc = (RunProc)GetProcAddress(newLauncherLib, "run");
@@ -109,7 +109,7 @@ extern void __stdcall InitHook()
         if (!newDebugger){
             std::string errMsg = "Failed to load the new Launcher D:!\nLunadllNewLauncher.dll is missing?\nError Code: ";
             errMsg += std::to_string((long long)GetLastError());
-            MessageBoxA(NULL, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", 0);
             newDebugger = NULL;
             return;
         }
@@ -196,20 +196,18 @@ extern int __stdcall LoadWorld()
         }
     }
 
-    short plValue = GM_PLAYERS_COUNT;
-#ifndef __MINGW32__
-    __asm {
-        MOV EAX, 1
-            MOV CX, plValue
-    }
-#else
-    asm(".intel_syntax noprefix\n"
-        "mov eax, 1\n"
-        "mov cx, %0\n"
-        ".att_syntax\n": "=r" (plValue));
-    //".intel_syntax prefix" :: [plValue] "g" (plValue) : "edx");
+    return GM_PLAYERS_COUNT;
+}
 
-#endif
+__declspec(naked) void __stdcall LoadWorldHook(void)
+{
+    __asm {
+        call LoadWorld
+        // set up a following loop
+        mov ecx, eax // move player count into ecx
+        mov eax, 1 // move 1 into eax
+        ret
+    }
 }
 
 extern int __stdcall LoadIntro()
@@ -656,7 +654,7 @@ EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
 {
     // For VB error code 40040, defer to the original handler
     bool isVB6Exception = (ExceptionRecord->ExceptionCode == 0xc000008f);
-    if (isVB6Exception && lastVB6ErrCode == 40040) {
+    if (isVB6Exception && ErrorReportVars::lastVB6ErrCode == 40040) {
         return LunaDLLOriginalExceptionHandler(ExceptionRecord, EstablisherFrame, ContextRecord, DispatcherContext);
     }
 
@@ -673,18 +671,14 @@ EXCEPTION_DISPOSITION __cdecl LunaDLLCustomExceptionHandler(
 
 extern void __stdcall recordVBErrCode(int errCode)
 {
-    // Running the whole stack trace now is *far* too slow and can make the
-    // editor grind to a halt in some situations due to exceptions which are
-    // caught in the VB code.
-
-    // Instead... just capture a nice lightweight context. We can pass this
-    // to StackWalker later.
-    RtlCaptureContext(&lastVB6ErrContext);
-
     // Also record the VB6 error code, because this is simpler than fetching
     // VB6's "error" object that stores this internally (would involve calling
     // rtcErrObj)
-    lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+    ErrorReportVars::lastVB6ErrCode = (ErrorReport::VB6ErrorCode)errCode;
+
+    // Pass through pending context flags
+    ErrorReportVars::activeVB6ErrContext = ErrorReportVars::pendingVB6ErrContext;
+    ErrorReportVars::pendingVB6ErrContext = false;
 
     //HERE NEED ESI CMP CODE (ORIGINAL CODE)
     __asm{
@@ -843,10 +837,13 @@ static __declspec(naked) void updateInput_Orig()
 
 extern void __stdcall runtimeHookUpdateInput()
 {
-    gLunaGameControllerManager.pollInputs();
-    gEscPressedRegistered = gEscPressed;
-    gEscPressed = false;
-    updateInput_Orig();
+    if (gMainWindowFocused)
+    {
+        gLunaGameControllerManager.pollInputs();
+        gEscPressedRegistered = gEscPressed;
+        gEscPressed = false;
+        updateInput_Orig();
+    }
 }
 
 extern void __stdcall WindowInactiveHook()
@@ -2049,42 +2046,34 @@ __declspec(naked) void __stdcall runtimeHookNPCHarmlessGrabRaw(void)
     }
 }
 
-static int __stdcall runtimeHookNPCHarmlessThrown(unsigned int npcIdx)
+static unsigned int __stdcall runtimeHookGrabbedNPCCollisionGroupInternal(int npcAIdx, int npcBIdx)
 {
-    NPCMOB* npc = NPC::GetRaw(npcIdx);
-    if (npc != nullptr)
-    {
-        return NPC::GetHarmlessThrown(npc->id) ? -1 : 0;
-    }
-    return 0;
+    // Check collision group
+    ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
+    ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
+
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup, extB->collisionGroup)) // Check collision matrix
+        return 0; // Collision cancelled
+
+    return -1; // Collision goes ahead
 }
 
-_declspec(naked) void __stdcall runtimeHookNPCHarmlessThrownRaw()
+__declspec(naked) void __stdcall runtimeHookGrabbedNPCCollisionGroup(void)
 {
     __asm {
-        je harmlessRet
-
+        mov eax, dword ptr ss : [ebp - 0x188] // npcBIdx
         push eax
-        push ecx
-        push edx
+        movsx eax, word ptr ss : [ebp - 0x180] // npcAIdx
+        push eax
+        call runtimeHookGrabbedNPCCollisionGroupInternal
 
-        movsx eax, word ptr ds:[ebp-0x180]
-        push eax // Arg #1
-        call runtimeHookNPCHarmlessThrown
-        cmp eax, 0
-        jne harmlessRestoreRet
-
-        pop edx
-        pop ecx
-        pop eax
-        push 0xA181B3
+        cmp eax, 0 // return value
+        je cancel_collision
+        lea eax, dword ptr ss : [ebp - 180] // Replace what we're patching over
+        push 0xA0C42B
         ret
-    harmlessRestoreRet:
-        pop edx
-        pop ecx
-        pop eax
-    harmlessRet:
-        push 0xA1BAD5
+        cancel_collision :
+        push 0xA0C40A
         ret
     }
 }
@@ -2928,10 +2917,13 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
 
 void __stdcall runtimeHookCheckWindowFocus()
 {
-    if (!gMainWindowFocused && !LunaLoadScreenIsActive())
+    if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
     {
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
+
+        // Show pause overlay
+        g_GLEngine.EndFrame(nullptr, false, true, false, true);
 
         // Wait for focus
         TestModeSendNotification("suspendWhileUnfocusedNotification");
@@ -3518,6 +3510,59 @@ __declspec(naked) void __stdcall runtimeHookNPCSectionWrap(void)
     }
 }
 
+static void __stdcall runtimeHookJumpSlideFixInternal(short playerIdx) {
+    PlayerMOB* player = PlayerMOB::Get(playerIdx);
+    auto extended = Player::GetExtended(playerIdx);
+
+    if (player->SlopeRelated != 0) {
+        extended->slidingTimeSinceOnSlope = 0;
+    } else {
+        extended->slidingTimeSinceOnSlope += 1;
+    }
+
+    if (gSlideJumpFixIsEnabled) {
+        // fixed check:
+        if (player->UpwardJumpingForce != 0) {
+            // if the player started jumping for real
+            player->SlidingState = 0;
+        } else if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+            // if the player pressed jump *and* has been disconnected from a slope for a couple frames
+            if (extended->slidingTimeSinceOnSlope >= 2) {
+                player->SlidingState = 0;
+            }
+        }
+    } else {
+        // redigit's check:
+        if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+            player->SlidingState = 0; // super jank town activate
+        }
+    }
+
+}
+
+__declspec(naked) void __stdcall runtimeHookJumpSlideFix(void)
+{
+    // eax, ecx, edx and flags are free for use at this point
+    __asm {
+
+        push eax
+        push edx
+        push ecx
+
+        movsx edx, word ptr ss : [ebp-0x114]
+        push edx  // Player index
+        call runtimeHookJumpSlideFixInternal
+
+        pop ecx
+        pop edx
+        pop eax
+        
+
+        push 0x99A850
+        ret
+    }
+}
+
 
 static void markBlocksUnsorted()
 {
@@ -3839,7 +3884,7 @@ __declspec(naked) void __stdcall runtimeHookNPCNoBlockCollisionA1B33F(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx, unsigned int oldSlope)
+static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hitSpot, NPCMOB* npc, unsigned int blockIdx, unsigned int npcIdx, int oldSlope)
 {
     // If already not hitting, ignore
     if (hitSpot == 0) return 0;
@@ -3870,7 +3915,7 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
                 // because of this, we have to check if a slope was stood on previously and cancel the bottom timer out
                 collidesBelow = 0;
             }
-            if (!Blocks::FilterSemisolidSlopeCollision(&npc->momentum, blockIdx, collidesBelow)) {
+            if (!Blocks::FilterSemisolidSlopeCollision(&npc->momentum, &npc->momentum, blockIdx, collidesBelow, (oldSlope != 0 || npc->unknown_22 != 0))) {
                 return 0;
             } else {
                 // change hitSpot to always act as top collision
@@ -3927,6 +3972,17 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
 {
     if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
         return 0; // Collision cancelled
+
+    // Check harmlessthrown flag
+
+    NPCMOB* npc = NPC::GetRaw(npcAIdx);
+    if (npc != nullptr)
+    {
+        if (NPC::GetHarmlessThrown(npc->id)) // If harmlessthrown is set
+            return 0; // Collision cancelled
+    }
+
+    // Check collision group
     
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
@@ -3966,7 +4022,7 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
-static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx)
+static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx, int oldSlope)
 {
     PlayerMOB* player = Player::Get(playerIdx);
     Block* block = Block::GetRaw(blockIdx);
@@ -3996,7 +4052,15 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerI
     if (blockdef_semisolid[block->BlockType] && blockdef_floorslope[block->BlockType] != 0)
     {
         // check semisolid slope collision
-        if (!Blocks::FilterSemisolidSlopeCollision(&player->momentum, blockIdx, player->LayerStateStanding)) {
+        bool onSlope = (player->SlopeRelated != 0 || oldSlope != 0);
+        if (player->SlidingState && !onSlope) {
+            onSlope = Player::GetExtended(playerIdx)->slidingTimeSinceOnSlope < 2;
+        }
+        Momentum* speedMomentum = &(player->momentum);
+        if (player->NPCBeingStoodOnIndex > 0 && player->NPCBeingStoodOnIndex <= GM_NPCS_COUNT) {
+            speedMomentum = &(NPC::Get(player->NPCBeingStoodOnIndex-1)->momentum);
+        }
+        if (!Blocks::FilterSemisolidSlopeCollision(&player->momentum, speedMomentum, blockIdx, player->LayerStateStanding, onSlope)) {
             return 0;
         }
     }
@@ -4029,6 +4093,8 @@ __declspec(naked) void __stdcall runtimeHookBlockPlayerFilter(void)
         push edx
         push esi
 
+        movsx ecx, word ptr ss:[ebp-0x104]
+        push ecx                // oldSlope (for semisolid slope check)
         movsx ecx, word ptr ss:[ebp-0x120]
         push ecx                // Block index
         movsx ecx, word ptr ss:[ebp-0x114]

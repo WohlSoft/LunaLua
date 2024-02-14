@@ -22,7 +22,7 @@ void PGE_SDL_Manager::initSDL()
         {
             std::string msg = "Could not initialize SDL.\r\n";
             msg += SDL_GetError();
-            MessageBoxA(0, msg.c_str(), "Error", MB_ICONERROR);
+            LunaMsgBox::ShowA(0, msg.c_str(), "Error", MB_ICONERROR);
             _exit(1);
         }
 
@@ -86,12 +86,12 @@ void PGE_SDL_Manager::initSDL()
 
         if (selectedDriver == "")
         {
-            MessageBoxA(0, "Could not initialize audio subsystem.", "Error", MB_ICONERROR);
+            LunaMsgBox::ShowA(0, "Could not initialize audio subsystem.", "Error", MB_ICONERROR);
             _exit(1);
         }
         else if ((selectedDriver == "dummy") && (driverList.size() > 1))
         {
-            MessageBoxA(0, "No selected audio driver could open.\r\nNo sound will be played.", "Warning", MB_ICONWARNING);
+            LunaMsgBox::ShowA(0, "No selected audio driver could open.\r\nNo sound will be played.", "Warning", MB_ICONWARNING);
         }
 
         isInit = true;
@@ -147,7 +147,7 @@ void PGE_MusPlayer::MUS_playMusic()
     }
     else
     {
-        //MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+        //LunaMsgBox::ShowA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
     }
 }
 
@@ -170,7 +170,7 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
             if(Mix_FadingMusic()!=MIX_FADING_IN)
                 if(Mix_FadeInMusic(play_mus, -1, ms)==-1)
                 {
-                    MessageBoxA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+                    LunaMsgBox::ShowA(0, std::string(std::string("Mix_FadeInMusic:")+std::string(Mix_GetError())).c_str(), "Error", 0);
                 }
         }
         else
@@ -181,7 +181,7 @@ void  PGE_MusPlayer::MUS_playMusicFadeIn(int ms)
     }
     else
     {
-        MessageBoxA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(std::string("Play nothing:")+std::string(Mix_GetError())).c_str(), "Error", 0);
     }
 }
 
@@ -344,7 +344,7 @@ void PGE_MusPlayer::MUS_openFile(const char *musFile)
             showMsg=true;
         if(showMsg)
         {
-            MessageBoxA(0, std::string(std::string("Mix_LoadMUS: ")
+            LunaMsgBox::ShowA(0, std::string(std::string("Mix_LoadMUS: ")
             +std::string(musFile)+"\n"
             +std::string(Mix_GetError())).c_str(), "Error", 0);
             showMsg_for = std::string(musFile);
@@ -393,12 +393,19 @@ void PGE_MusPlayer::MUS_StartDeferring()
         MUS_pauseMusic(); // This will unset musicGotDeferred, so this this right after
         musicGotDeferred = true;
     }
+
+    // Also freezea all sounds when we pause music this way
+    Mix_PauseAudio(1);
+
     deferringMusic = true;
 }
 
 void PGE_MusPlayer::MUS_StopDeferring()
 {
     if (!deferringMusic) return;
+
+    // Resume all audio at this point too
+    Mix_PauseAudio(0);
 
     deferringMusic = false;
     if (musicGotDeferred)
@@ -587,7 +594,7 @@ bool PGE_Sounds::playOverrideForAlias(const std::string& alias, int ch)
         if (Mix_PlayChannelTimedVolume(ch, it->second.chunk, 0, -1, MIX_MAX_VOLUME) == -1)
         {
             if (std::string(Mix_GetError()) != "No free channels available")//Don't show overflow messagebox
-                MessageBoxA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
+                LunaMsgBox::ShowA(0, std::string(std::string("Mix_PlayChannel: ") + std::string(Mix_GetError())).c_str(), "Error", 0);
         }
         return true;
     }

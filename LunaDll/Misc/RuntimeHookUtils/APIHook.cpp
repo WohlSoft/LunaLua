@@ -179,7 +179,8 @@ void CAPIHook::ReplaceIATEntryInOneMod(PCSTR pszCalleeModName,
                             // The addresses match, change the import section address
                             WriteProcessMemory(GetCurrentProcess(), ppfn, &pfnNew, sizeof(pfnNew), NULL);
 
-                            VirtualProtect(ppfn, sizeof(DWORD), dwOLD, 0);
+                            DWORD dwOLD2;
+                            VirtualProtect(ppfn, sizeof(DWORD), dwOLD, &dwOLD2);
                         }
 
                     }

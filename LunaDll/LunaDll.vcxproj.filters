@@ -141,6 +141,9 @@
     <Filter Include="LunaLoader">
       <UniqueIdentifier>{bfb6190e-4738-4465-8020-4a003075249a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SMBXInternal\Ports">
+      <UniqueIdentifier>{35e43447-c308-4ec8-88b4-4a39a45a3489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -717,6 +720,27 @@
     </ClInclude>
     <ClInclude Include="SMBXInternal\Reconstructed\EpisodeMain.h">
       <Filter>SMBXInternal\Reconstructed</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Functions.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Variables.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Types.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\VB6Logic.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Ports.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\VB6Array.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h">
+      <Filter>Misc\RuntimeHookComponents</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1465,6 +1489,12 @@
     </ClCompile>
     <ClCompile Include="SMBXInternal\Reconstructed\EpisodeMain.cpp">
       <Filter>SMBXInternal\Reconstructed</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\AsmPatch.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp">
+      <Filter>SMBXInternal\Ports</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,7 @@
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
 #include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -470,6 +471,7 @@ typedef struct ExtendedPlayerFields_\
     bool nonpcinteraction;\
     bool noplayerinteraction;\
     unsigned int collisionGroup;\
+    int slidingTimeSinceOnSlope;\
 } ExtendedPlayerFields;";
     }
 
@@ -520,11 +522,13 @@ typedef struct ExtendedPlayerFields_\
         if (enable)
         {
             gDisableNPCDownwardClipFix.Apply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Apply();
         }
         else
         {
             gDisableNPCDownwardClipFix.Unapply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Unapply();
         }
     }
@@ -553,12 +557,22 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetSlideJumpFix(bool enable)
+    {
+        gSlideJumpFixIsEnabled = enable;
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             gFenceFixes.Apply();
         } else {
             gFenceFixes.Unapply();
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPowerupPowerdownPositionFix(bool enable)
+    {
+        SMBX13::Ports::_enablePowerupPowerdownPositionFixes = enable;
     }
 
     FFI_EXPORT(void) LunaLuaSetFrameTiming(double value)
@@ -897,5 +911,29 @@ extern "C" {
     FFI_EXPORT(bool) LunaLuaGetWeakLava()
     {
         return gLavaIsWeak;
+    }
+}
+
+extern "C" {
+    // Debug function to dump patched ranges
+    FFI_EXPORT(const char*) LunaLuaGetPatchedRange(int i)
+    {
+        static std::string strRet;
+
+        std::stringstream strBuild;
+        for (std::intptr_t cursor = AsmRange::mFirstIdx; cursor <= 0; cursor = AsmRange::mAlloc[cursor].mNextIdx)
+        {
+            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate.
+            if (i <= 0)
+            {
+                const AsmRange& range = AsmRange::mAlloc[cursor];
+                strBuild << std::hex << "0x" << range.mAddr << "\t0x" << range.mSize << "\t" << range.mLineNum;
+                break;
+            }
+            i--;
+        }
+
+        strRet = strBuild.str();
+        return strRet.c_str();
     }
 }

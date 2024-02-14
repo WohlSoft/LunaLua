@@ -57,7 +57,7 @@ public:
     void ClearTextures();
     void EmulatedBitBlt(int nXDest, int nYDest, int nWidth, int nHeight, HDC hdcSrc, int nXSrc, int nYSrc, DWORD dwRop);
     void RenderCameraToScreen(int camIdx, double renderX, double renderY, double height, double width);
-    void EndFrame(HDC hdcDest, bool isLoadScreen=false, bool redrawOnly=false, bool resizeOverlay=false);
+    void EndFrame(HDC hdcDest, bool isLoadScreen=false, bool redrawOnly=false, bool resizeOverlay=false, bool pauseOverlay=false);
     void InitForHDC(HDC hdcDest);
 
     inline bool IsEnabled() { return mInternalGLEngine.IsEnabled(); };

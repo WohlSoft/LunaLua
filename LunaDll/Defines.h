@@ -1537,8 +1537,8 @@ _O_Pub_Obj_Inf31_Event0x6                    .text 00B23F40 000000A7 0000000C 00
 */
 
 //DEBUG:
-#define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
-#define dbgboxA(msg) MessageBoxA(NULL, msg, "Dbg", NULL);
+#define dbgbox(msg) LunaMsgBox::ShowW(NULL, msg, L"Dbg", NULL);
+#define dbgboxA(msg) LunaMsgBox::ShowA(NULL, msg, "Dbg", NULL);
 
 //Easier for loops
 #define For(A, From, To) for(int A = From; A <= To; ++A)

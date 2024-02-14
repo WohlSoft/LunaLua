@@ -9,6 +9,7 @@
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
 #include "SMBXInternal/Reconstructed/EpisodeMain.h"
+#include "SMBXInternal/Variables.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -38,6 +39,17 @@ void LunaDllRenderAndWaitFrame(void)
 
     // Audio management...
     native_audioManagement();
+
+    // Dummy out some variables, some of which need to be reset each tick
+    // SMBX 1.3 use these for tracking frame timing
+    // They're incremented in the above rendering functions, and if we let them
+    // grow forever there's an overflow error in some cases.
+    SMBX13::Vars::overTime = 0;
+    SMBX13::Vars::GoalTime = GetTickCount() + 1000;
+    SMBX13::Vars::fpsCount = 0;
+    SMBX13::Vars::cycleCount = 0;
+    SMBX13::Vars::gameTime = 0;
+    SMBX13::Vars::fpsTime = 0;
 
     LunaDllWaitFrame();
 }
@@ -241,7 +253,7 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Handle un-focused state
-        if (!gMainWindowFocused && !LunaLoadScreenIsActive())
+        if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);

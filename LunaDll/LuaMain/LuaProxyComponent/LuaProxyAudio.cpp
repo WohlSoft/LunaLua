@@ -370,6 +370,7 @@ void LuaProxy::Audio::playSFX(const std::string& filename, lua_State* L)
 
 Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
 {
+    HandleEventsWhileLoadscreenOnly();
     std::string full_paths = getSfxPath(filename);
     Mix_Chunk* chunk = PGE_Sounds::SND_OpenSnd(full_paths.c_str());
     if (!chunk)

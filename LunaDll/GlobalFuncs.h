@@ -270,6 +270,7 @@ void ShowAndFocusWindow(HWND hWindow);
 
 // Handle WIN32 events when loading
 void HandleEventsWhileLoading();
+void HandleEventsWhileLoadscreenOnly();
 
 // Float/double manipulation
 #ifdef __clang__
@@ -301,3 +302,10 @@ void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID);
 
 // Collision functions
 bool CheckCollision(Momentum momentumA, Momentum momentumB);
+
+namespace LunaMsgBox
+{
+    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);
+    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+    bool IsActive();
+}

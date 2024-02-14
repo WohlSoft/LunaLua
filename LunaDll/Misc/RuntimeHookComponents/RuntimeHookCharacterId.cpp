@@ -2153,10 +2153,8 @@ PlayerMOB* getTemplateForCharacterWithDummyFallback(int id)
 // Hook support code //
 ///////////////////////
 
-int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
+int16_t CharacterIdTranslate(int16_t characterId)
 {
-    short characterId = *idPtr;
-
     // Vanilla ones are always unchanged
     if (characterId <= 5)
     {
@@ -2171,6 +2169,11 @@ int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
     }
 
     return 0;
+}
+
+int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
+{
+    return CharacterIdTranslate(*idPtr);
 }
 
 ///////////

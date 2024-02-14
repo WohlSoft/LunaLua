@@ -47,7 +47,12 @@ namespace ErrorReport{
 
 }
 
-extern std::string lastErrDesc;
-extern ErrorReport::VB6ErrorCode lastVB6ErrCode;
-extern CONTEXT lastVB6ErrContext;
+namespace ErrorReportVars
+{
+    extern std::string lastErrDesc;
+    extern ErrorReport::VB6ErrorCode lastVB6ErrCode;
+    extern CONTEXT lastVB6ErrContext;
+    extern bool pendingVB6ErrContext;
+    extern bool activeVB6ErrContext;
+}
 #endif
