@@ -434,6 +434,12 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
         }
     }
 
+    // Process ESC key press
+    if ((virtKey == VK_ESCAPE) && plainPress)
+    {
+        gEscPressed = true;
+    }
+
     // Process F12 key for screenshot to file
     if ((virtKey == VK_F12) && plainPress && g_GLEngine.IsEnabled())
     {
@@ -2151,6 +2157,28 @@ void TrySkipPatch()
     // Replace PlayerEffects function
     PATCH(SMBX13::modPlayer_Private::_PlayerEffects_ptr).JMP(&SMBX13::Ports::PlayerEffects).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Restore GetKeyState for some pause related calls
+    // GameLoop:
+    PATCH(0x8CA3D4).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8CA45D).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // WorldLoop:
+    PATCH(0x8E0E2C).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // PauseGame:
+    PATCH(0x8E5AA6).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AB8).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AC3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ACE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ADA).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5B25).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5BD0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5C1F).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61E7).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61F3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64DE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64F0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64FB).CALL(runtimeHookGetKeyStateRetore).Apply();
+
+    
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

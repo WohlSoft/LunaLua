@@ -371,6 +371,8 @@ void __stdcall runtimeHookFixLinkFairyClowncar3();
 // hooks for closing the game instaed of returning to titlescreen
 void __stdcall runtimeHookCloseGame();
 
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk);
+
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
 

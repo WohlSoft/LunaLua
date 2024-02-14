@@ -4929,6 +4929,11 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
     }
 }
 
+// Function to retore GeyKeyState call to functionality if it's one we care about
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk)
+{
+    return (gKeyState[vk] & 0x80) ? 0xF000 : 0;
+}
 
 // close the game
 // don't bother with preserving cpu state or anything, since we'll never return from here...
