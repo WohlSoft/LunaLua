@@ -1140,7 +1140,7 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 {
     int id = 0;
     for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i - 1);
+        auto ep = EpisodeListItem::Get(i);
         if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
         {
             id = i;
@@ -1154,7 +1154,7 @@ std::string findEpisodeWorldPathFromName(std::string name)
 {
     std::string finalWldPath = "";
     for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i - 1);
+        auto ep = EpisodeListItem::Get(i);
         if(name == std::string(ep->episodeName))
         {
             finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
@@ -1172,7 +1172,7 @@ std::string findNameFromEpisodeWorldPath(std::string wldPath)
 {
     std::string finalName = "";
     for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i - 1);
+        auto ep = EpisodeListItem::Get(i);
         if(wldPath == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
         {
             finalName = std::string(ep->episodeName);

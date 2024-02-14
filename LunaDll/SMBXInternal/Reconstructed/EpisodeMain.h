@@ -13,9 +13,11 @@ class EpisodeMain {
         EpisodeMain();
         ~EpisodeMain();
 
-        void LaunchEpisode(std::wstring wldPathWS, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter, bool suppressSound);
+        void LaunchEpisode(std::wstring wldPathWS, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter);
         int FindSaves(std::string worldPathS, int saveSlot);
         int WriteEpisodeEntry(VB6StrPtr worldNameVB6, VB6StrPtr worldPathVB6, VB6StrPtr worldFileVB6, WorldData wldData, bool isNewEpisode);
 };
+
+extern EpisodeMain gEpisodeMain;
 
 #endif

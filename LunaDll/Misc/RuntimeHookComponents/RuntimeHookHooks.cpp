@@ -1632,7 +1632,6 @@ void __stdcall runtimeHookGameMenu()
                     if (doAutostart)
                     {
                         // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
-                        EpisodeMain mainEpisodeFunc;
                         autostartConfig.beginGroup("autostart");
 
                         std::string selectedEpisode = autostartConfig.value("episode-name", "").toString();
@@ -1644,7 +1643,7 @@ void __stdcall runtimeHookGameMenu()
 
                         autostarter.setSelectedEpisode(selectedEpisode);
 
-                        mainEpisodeFunc.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter, false);
+                        gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
 
                         if (autostartConfig.value("transient", false).toBool())
                         {
@@ -1658,8 +1657,6 @@ void __stdcall runtimeHookGameMenu()
             else if(gStartupSettings.epSettings.enabled && gStartupSettings.epSettings.wldPath != L"")
             {
                 // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
-                EpisodeMain mainEpisodeFunc;
-                
                 std::string selectedEpisode = "";
                 std::wstring selectedEpisodePath = gStartupSettings.epSettings.wldPath;
                 int playerCount = gStartupSettings.epSettings.players;
@@ -1669,7 +1666,7 @@ void __stdcall runtimeHookGameMenu()
 
                 autostarter.setSelectedEpisode(selectedEpisode);
                 
-                mainEpisodeFunc.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter, false);
+                gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
             }
             else
             {
@@ -1694,8 +1691,7 @@ void __stdcall runtimeHookGameMenu()
 
             autostarter.setSelectedEpisode(selectedEpisode);
 
-            EpisodeMain mainEpisodeFunc;
-            mainEpisodeFunc.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter, true);
+            gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
         }
     }
 }

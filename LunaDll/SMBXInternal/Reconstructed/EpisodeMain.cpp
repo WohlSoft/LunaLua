@@ -40,12 +40,14 @@
 #include "../../Misc/CollisionMatrix.h"
 #include "../../FileManager/SMBXFileManager.h"
 
+#include "../Functions.h"
+#include "../Types.h"
+#include "../Vars.h"
+
 extern PlayerMOB* getTemplateForCharacterWithDummyFallback(int id);
 extern "C" void __cdecl LunaLuaSetGameData(const char* dataPtr, int dataLen);
 
-// Patch to allow exiting the pause menu. Apply when the vanilla pause/textbox
-// should be instantly exited always. Unapply when this should not be the case.
-static auto exitPausePatch = PATCH(0x8E6564).NOP().NOP().NOP().NOP().NOP().NOP();
+EpisodeMain gEpisodeMain;
 
 EpisodeMain::EpisodeMain()
 {}
@@ -53,15 +55,12 @@ EpisodeMain::EpisodeMain()
 EpisodeMain::~EpisodeMain() {}
 
 // The big one. This will load an episode anywhere in the engine. This is also used when booting the engine.
-void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter, bool suppressSound)
+void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int playerCount, Characters firstCharacter, Characters secondCharacter)
 {
     //--ElseIf .Jump = True Or .Start = True Or (GetKeyState(vbKeySpace) And KEY_PRESSED) Or (GetKeyState(vbKeyReturn) And KEY_PRESSED) Or MenuMouseClick = True Then (line 4945)--
 
     // replace all the forward slashes with backward slashes
     replaceSubStrW(wldPathWS, L"/", L"\\");
-
-    // this is used for the FindSaves function
-    EpisodeMain episodeMainFunc;
 
     // this is used for setting up loadEpisode from lua after first booting an episode
     GameAutostart GameAutostartFunc;
@@ -93,13 +92,11 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 
         - resolved world path with world file (see above)
         - path with no world file
-        - world file with no path
         - path with no world file, ending with a slash
     --
     */ 
 
     std::wstring fullPthNoWorldFileWS = Str2WStr(fullPthNoWorldFileS);
-    std::wstring fullWorldFileNoPthWS = Str2WStr(fullWorldFileNoPthS);
     std::wstring fullPthNoWorldFileWithEndSlashWS = Str2WStr(fullPthNoWorldFileWithEndSlashS);
 
     /*
@@ -168,9 +165,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // when the episode has loaded successfully after boot, we'll need to do some extra things in order for this to work
     if(gEpisodeLoadedOnBoot)
     {
-        // force-unpause the game
-        exitPausePatch.Apply();
-
         // exit lua
         gLunaLua.exitContext();
 
@@ -203,7 +197,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
         worldNameVB6 = worldNameS;
 
         // this code, from here, sets the new episode
-        externalEpisodeIdx = episodeMainFunc.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, true);
+        externalEpisodeIdx = gEpisodeMain.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, true);
     }
 
     // reset cheat status
@@ -224,14 +218,14 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     // specify the menu level
     if(!externalEpisode)
     {
-        if(GM_EP_LIST_COUNT < 100)
+        if(GM_EP_LIST_COUNT <= 100)
         {
             GM_CUR_MENULEVEL = findEpisodeIDFromWorldFileAndPath(fullPathS); // this NEEDS to be set, otherwise the engine will just crash loading the episode
         }
         else
         {
             int additionalEpIdx = 0;
-            additionalEpIdx = episodeMainFunc.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, false);
+            additionalEpIdx = gEpisodeMain.WriteEpisodeEntry(worldNameVB6, fullPthNoWorldFileWithEndSlashVB6, fullWorldFileNoPthVB6, wldData, false);
             GM_CUR_MENULEVEL = additionalEpIdx;
         }
     }
@@ -244,16 +238,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     LunaLuaSetGameData(0, 0);
 
     //--BEGIN MAIN RECODE--
-
-    // play the world loaded sfx if suppressSound is false
-    if(!suppressSound)
-    {
-        if(gStartupSettings.epSettings.canPlaySFXOnStartup)
-        {
-            short soundID = 29;
-            native_playSFX(&soundID); //--PlaySound 29 (line 4946)--
-        }
-    }
 
     // implement player count
     GM_PLAYERS_COUNT = playerCount; //--numPlayers = MenuMode / 10 (line 4947)--
@@ -390,7 +374,7 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
     native_loadWorld(&fullPathVB6); //--OpenWorld SelectWorld(selWorld).WorldPath & SelectWorld(selWorld).WorldFile (line 4995)--
 
     // load the save file data
-    if (episodeMainFunc.FindSaves(fullPthNoWorldFileWithEndSlashS, GM_CUR_SAVE_SLOT) >= 0) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
+    if (gEpisodeMain.FindSaves(fullPthNoWorldFileWithEndSlashS, GM_CUR_SAVE_SLOT) >= 0) //--If SaveSlot(selSave) >= 0 Then (line 4996)--
     {
         // blank out intro filename if the episode already has a save file and the intro was already played
         if(GM_HUB_STYLED_EPISODE == 0) //--If NoMap = False Then StartLevel = "" (line 4997)--
@@ -493,8 +477,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
         gEpisodeLoadedOnBoot = true;
     }
 
-    exitPausePatch.Unapply();
-
     // hide loadscreen
     LunaLoadScreenKill();
     
@@ -505,9 +487,6 @@ void EpisodeMain::LaunchEpisode(std::wstring wldPathWS, int saveSlot, int player
 
 int EpisodeMain::FindSaves(std::string worldPathS, int saveSlot)
 {
-    // this is used for this function
-    EpisodeMain episodeMainFunc;
-
     // FileFormats SaveData, used for getting the save slot data
     GamesaveData saveData;
     

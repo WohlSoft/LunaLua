@@ -1169,11 +1169,6 @@ void ParseArgs(const std::vector<std::wstring>& args)
             gStartupSettings.patch = true;
         }
     }
-    
-    if (vecStrFind(args, L"--playSfxOnStartup"))
-    {
-        gStartupSettings.epSettings.canPlaySFXOnStartup = true;
-    }
 
     if (vecStrFind(args, L"--waitForIPC"))
     {
