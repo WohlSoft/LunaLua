@@ -921,13 +921,12 @@ extern "C" {
         static std::string strRet;
 
         std::stringstream strBuild;
-        for (std::intptr_t cursor = AsmRange::mFirstIdx; cursor <= 0; cursor = AsmRange::mAlloc[cursor].mNextIdx)
+        for (AsmRange* cursor = AsmRange::getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
         {
-            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate.
+            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate to avoid making a gigantic string.
             if (i <= 0)
             {
-                const AsmRange& range = AsmRange::mAlloc[cursor];
-                strBuild << std::hex << "0x" << range.mAddr << "\t0x" << range.mSize << "\t" << range.mLineNum;
+                strBuild << std::hex << "0x" << cursor->getAddr() << "\t0x" << cursor->getSize() << "\t" << cursor->getFile() << ":" << std::dec << cursor->getLine();
                 break;
             }
             i--;
