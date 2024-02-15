@@ -40,6 +40,7 @@ BOOL FileExists(LPCTSTR szPath);
 BOOL DirectoryExists(LPCTSTR szPath);
 
 bool fileExists(const std::wstring &szPath);
+bool fileExists(std::string szPath);
 bool directoryExists(const std::wstring &szPath);
 
 bool hasSuffix(const std::string &path, const std::string &suffix);

@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <mutex>
+#include <cstddef>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -26,6 +27,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Defines.h"
 #include "Misc/LoadScreen.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
@@ -728,6 +730,50 @@ std::string resolveIfNotAbsolutePath(std::string filename) {
     return filename;
 }
 
+std::string splitPathFromFilename(std::string str)
+{
+    std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
+    return finalStr;
+}
+
+std::string splitFilenameFromPath(std::string str)
+{
+    std::string finalStr = str.substr(0, str.find_last_of("/\\"));
+    return finalStr;
+}
+
+std::string replaceFowardSlashesWithBackSlashes(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    return str;
+}
+
+bool checkIfWorldIsInAppPath(std::string worldPath)
+{
+    std::string appPath = WStr2Str(gAppPathWCHAR);
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool checkIfWorldIsInWorldPath(std::string worldPath)
+{
+    std::string appPath = WStr2Str(gAppPathWCHAR) + "\\worlds";
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 
 std::string generateTimestamp(std::string format)
 {
@@ -852,6 +898,8 @@ std::wstring getCustomFolderPath()
     }
     return full_path;
 }
+
+
 
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 {
@@ -1094,6 +1142,99 @@ std::string GetEditorPlacedItem()
     std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
     return (std::string)gEditorPlacedItem;
 }
+
+
+int findEpisodeIDFromWorldFileAndPath(std::string worldName)
+{
+    int id = 0;
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i);
+        if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+        {
+            id = i;
+            break;
+        }
+    }
+    return id;
+}
+
+std::string findEpisodeWorldPathFromName(std::string name)
+{
+    std::string finalWldPath = "";
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i);
+        if(name == std::string(ep->episodeName))
+        {
+            finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
+            break;
+        }
+        else
+        {
+            finalWldPath = "";
+        }
+    }
+    return finalWldPath;
+}
+
+std::string findNameFromEpisodeWorldPath(std::string wldPath)
+{
+    std::string finalName = "";
+    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
+        auto ep = EpisodeListItem::Get(i);
+        if(wldPath == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+        {
+            finalName = std::string(ep->episodeName);
+            break;
+        }
+        else
+        {
+            finalName = "";
+        }
+    }
+    return finalName;
+}
+
+int getUnblockedCharacterFromWorld(int curWorldID)
+{
+    int identity = 1;
+    EpisodeListItem* ep = EpisodeListItem::GetRaw(curWorldID);
+    for (int i = 1; i <= 5; i++)
+    {
+        if(ep->blockChar[i - 1] == 0)
+        {
+            identity = i;
+            break;
+        }
+    }
+    return identity;
+}
+
+
+
+void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
+{
+    for (size_t i = 0; i < 5; i++)
+    {
+        auto p = Player::Get(playerID);
+        EpisodeListItem* ep = EpisodeListItem::Get(GM_CUR_MENULEVEL);
+        if(ep->blockChar[i] == -1 && p->Identity == static_cast<Characters>(i + 1))
+        {
+            // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked
+            p->Identity = static_cast<Characters>(getUnblockedCharacterFromWorld(GM_CUR_MENULEVEL));
+        }
+    }
+}
+
+
+
+bool CheckCollision(Momentum momentumA, Momentum momentumB)
+{
+    return  ((momentumA.y + momentumA.height >= momentumB.y) &&
+            (momentumA.y <= momentumB.y + momentumB.height) &&
+            (momentumA.x <= momentumB.x + momentumB.width) &&
+            (momentumA.x + momentumA.width >= momentumB.x));
+}
+
 
 namespace LunaMsgBox
 {

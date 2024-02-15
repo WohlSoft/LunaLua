@@ -718,6 +718,9 @@
     <ClInclude Include="Misc\Gui\GuiUtils.h">
       <Filter>Misc\Gui</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\Reconstructed\EpisodeMain.h">
+      <Filter>SMBXInternal\Reconstructed</Filter>
+    </ClInclude>
     <ClInclude Include="SMBXInternal\Functions.h">
       <Filter>SMBXInternal</Filter>
     </ClInclude>
@@ -1400,6 +1403,9 @@
     <ClCompile Include="libs\luabind-deboostified\src$filename">
       <Filter>libs\luabind-deboostified</Filter>
     </ClCompile>
+    <ClCompile Include="libs\luabind-deboostified\src$filename">
+      <Filter>libs\luabind-deboostified</Filter>
+    </ClCompile>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1480,6 +1486,9 @@
     </ClCompile>
     <ClCompile Include="Misc\Gameover.cpp">
       <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\Reconstructed\EpisodeMain.cpp">
+      <Filter>SMBXInternal\Reconstructed</Filter>
     </ClCompile>
     <ClCompile Include="Misc\AsmPatch.cpp">
       <Filter>Misc</Filter>

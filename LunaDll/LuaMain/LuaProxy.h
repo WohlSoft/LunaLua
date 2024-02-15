@@ -909,7 +909,10 @@ namespace LuaProxy {
         void exitGame();
         void exitEngine();
         bool didGameOver();
-        bool loadEpisode(const std::string& episodeName);
+        bool loadEpisode(std::string episodeName, int saveSlot, int numPlayers, int playerIDForOtherPlayers);
+        bool loadEpisode(std::string episodeName, int saveSlot, int numPlayers);
+        bool loadEpisode(std::string episodeName, int saveSlot);
+        bool loadEpisode(std::string episodeName);
         void pause();
         void pause(bool atFrameEnd);
         void unpause();
@@ -917,6 +920,7 @@ namespace LuaProxy {
         void warning(const std::string& str);
         void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
         std::string showRichDialog(const std::string& title, const std::string& rtfText, bool isReadOnly);
+        luabind::object getEpisodeList(lua_State *L);
 
         // Internal use profiler functions
         void __enablePerfTracker();

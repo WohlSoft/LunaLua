@@ -124,6 +124,8 @@ extern void IsNPCCollidesWithVeggiHook_Wrapper();
 extern void __stdcall runtimeHookCreditsLoop();
 extern void __stdcall runtimeHookGameover();
 
+extern void __stdcall runtimeHookGameMenu();
+
 /************************************************************************/
 /* Hooks for some rendering purposes                                    */
 /************************************************************************/

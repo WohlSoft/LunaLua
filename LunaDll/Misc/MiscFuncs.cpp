@@ -9,6 +9,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../SMBXInternal/Layer.h"
 #include "../Rendering/RenderOps/RenderStringOp.h"
+#include "../GlobalFuncs.h"
 
 #ifdef __MINGW32__
 std::wstring std::to_wstring(long long src)
@@ -53,6 +54,12 @@ BOOL DirectoryExists(LPCTSTR szPath)
 bool fileExists(const std::wstring &szPath)
 {
     return (FileExists(szPath.c_str()) != FALSE);
+}
+
+bool fileExists(std::string szPath)
+{
+    const std::wstring &szPathFinal = Str2WStr(szPath);
+    return (FileExists(szPathFinal.c_str()) != FALSE);
 }
 
 bool directoryExists(const std::wstring &szPath)
