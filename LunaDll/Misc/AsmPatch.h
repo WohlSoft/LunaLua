@@ -136,9 +136,9 @@ private:
             mStartChecks = true;
 
             // Check any data we've already recorded
-            for (std::intptr_t cursor = mFirstIdx; cursor <= 0; cursor = mAlloc[cursor].mNextIdx)
+            for (AsmRange* cursor = getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
             {
-                mAlloc[cursor].checkCollision();
+                cursor->checkCollision();
             }
         }
 
