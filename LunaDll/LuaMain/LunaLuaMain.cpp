@@ -229,8 +229,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         osTable["execute"] = object();
         osTable["exit"] = object();
         //osTable["getenv"] = object();
-        osTable["remove"] = object();
-        osTable["rename"] = object();
+        //osTable["remove"] = object();
+        //osTable["rename"] = object();
         osTable["setlocal"] = object();
         osTable["tmpname"] = object();
     }
