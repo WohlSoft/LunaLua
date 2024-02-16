@@ -154,6 +154,7 @@
     <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h" />
     <ClInclude Include="Misc\SRect.h" />
     <ClInclude Include="Misc\VB6Array.h" />
+    <ClInclude Include="Misc\VB6Bool.h" />
     <ClInclude Include="Misc\VB6Logic.h" />
     <ClInclude Include="Rendering\AsyncGifRecorderImgs.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
