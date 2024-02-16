@@ -826,12 +826,18 @@ static __declspec(naked) void updateInput_Orig()
 
 extern void __stdcall runtimeHookUpdateInput()
 {
-    if (gMainWindowFocused)
+    gLunaGameControllerManager.pollInputs();
+    gEscPressedRegistered = gEscPressed;
+    gEscPressed = false;
+    if (gMainWindowFocused || !gStartupSettings.runWhenUnfocused)
     {
-        gLunaGameControllerManager.pollInputs();
-        gEscPressedRegistered = gEscPressed;
-        gEscPressed = false;
+        // Only run player input update if focused, if we're able to run at all when unfocused
         updateInput_Orig();
+    }
+    else
+    {
+        // But if we're not running input update code, we still need to let Lua code act normal anyway
+        g_EventHandler.hookInputUpdate();
     }
 }
 
