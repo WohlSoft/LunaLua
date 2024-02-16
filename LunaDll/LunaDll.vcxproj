@@ -156,6 +156,7 @@
     <ClInclude Include="Misc\VB6Array.h" />
     <ClInclude Include="Misc\VB6Bool.h" />
     <ClInclude Include="Misc\VB6Logic.h" />
+    <ClInclude Include="Misc\Win32PathUtils.h" />
     <ClInclude Include="Rendering\AsyncGifRecorderImgs.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
     <ClInclude Include="Rendering\LunaImage.h" />
@@ -356,6 +357,7 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNPCTransform.cpp" />
+    <ClCompile Include="Misc\Win32PathUtils.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
     <ClCompile Include="Rendering\LunaImage.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp" />

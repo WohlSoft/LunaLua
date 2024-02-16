@@ -742,6 +742,9 @@
     <ClInclude Include="Misc\VB6Bool.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\Win32PathUtils.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1489,6 +1492,9 @@
     </ClCompile>
     <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp">
       <Filter>SMBXInternal\Ports</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Win32PathUtils.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
