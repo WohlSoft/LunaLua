@@ -132,4 +132,10 @@ extern void removeFilePathW(wchar_t*path, int length);
 void removeFilePathA(std::string &path);
 void removeFilePathA(char*path, int length);
 
+std::wstring GetWin32LongPath(const char* path);
+std::wstring GetWin32LongPath(const std::string& path);
+std::wstring GetWin32LongPath(const std::wstring& path);
+
+bool writeFileAtomic(const std::string& path, const void* data, ptrdiff_t dataLen);
+
 #endif // !defined(_MISC_WIN32PATHUTILS_H_)

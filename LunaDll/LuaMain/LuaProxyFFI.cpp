@@ -661,6 +661,45 @@ typedef struct ExtendedPlayerFields_\
         return gCachedFileMetadata.exists(wpath);
     }
 
+    FFI_EXPORT(bool) LunaLuaWriteFile(const char* path, const char* data, size_t dataLen)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+
+        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
+        if (!ptr) return false;
+        if (!ptr->canWrite) return false;
+        path = ptr->path;
+
+        // Try to write file
+        bool ret = writeFileAtomic(path, data, dataLen);
+
+        // If successful, update cache, if cached
+        std::wstring wpath = Str2WStr(path);
+        CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
+        if (cacheEntry == nullptr)
+        {
+            // Not cached, don't bother keeping
+            return ret;
+        }
+
+        // Replace cache entry
+        std::shared_ptr<std::vector<char>> cacheData = cacheEntry->data.lock();
+        if (cacheData)
+        {
+            g_lunaFileCacheSet.erase(cacheData);
+            cacheData = std::make_shared<std::vector<char>>();
+            if (dataLen > 0)
+            {
+                cacheData->resize(dataLen);
+                memcpy(&((*cacheData)[0]), data, dataLen);
+            }
+            cacheEntry->data = cacheData;
+            g_lunaFileCacheSet.insert(cacheData);
+        }
+
+        return ret;
+    }
+
     FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
     {
         // Add "Software Rendered" if using it, like the normal window name code does
