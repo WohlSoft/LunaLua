@@ -137,5 +137,9 @@ std::wstring GetWin32LongPath(const std::string& path);
 std::wstring GetWin32LongPath(const std::wstring& path);
 
 bool writeFileAtomic(const std::string& path, const void* data, ptrdiff_t dataLen);
+bool writeFileAtomic(const std::wstring& path, const void* data, ptrdiff_t dataLen);
+
+bool readFileToStr(const std::string& path, std::string& out);
+bool readFileToStr(const std::wstring& path, std::string& out);
 
 #endif // !defined(_MISC_WIN32PATHUTILS_H_)

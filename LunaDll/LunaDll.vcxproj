@@ -126,6 +126,7 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
+    <ClInclude Include="FileManager\SaveFile.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
     <ClInclude Include="Input\LunaGameController.h" />
     <ClInclude Include="Input\MouseHandler.h" />
@@ -333,6 +334,7 @@
     <ClCompile Include="FileManager\config_manager.cpp" />
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
+    <ClCompile Include="FileManager\SaveFile.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
     <ClCompile Include="Input\LunaGameController.cpp" />
     <ClCompile Include="Input\MouseHandler.cpp" />

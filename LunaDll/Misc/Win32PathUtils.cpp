@@ -110,6 +110,12 @@ static uint32_t getRandomU32()
 // Function to write data to a file, making repalcement as close to atomic as Windows seems to allow
 bool writeFileAtomic(const std::string& path, const void* data, ptrdiff_t dataLen)
 {
+    return writeFileAtomic(Str2WStr(path), data, dataLen);
+}
+
+// Function to write data to a file, making repalcement as close to atomic as Windows seems to allow
+bool writeFileAtomic(const std::wstring& path, const void* data, ptrdiff_t dataLen)
+{
     std::wstring pathW = GetWin32LongPath(path);
     if ((pathW.size() <= 0) || (pathW[pathW.size() - 1] == L'\\'))
     {
@@ -186,4 +192,49 @@ bool writeFileAtomic(const std::string& path, const void* data, ptrdiff_t dataLe
     // DEBUG: wprintf(L"Failed to write to %s\n", pathW.c_str());
     DeleteFileW(tmpPath.c_str());
     return false;
+}
+
+bool readFileToStr(const std::string& path, std::string& out)
+{
+    return readFileToStr(Str2WStr(path), out);
+}
+
+bool readFileToStr(const std::wstring& path, std::string& out)
+{
+    // Get long path
+    std::wstring pathW = GetWin32LongPath(path);
+
+    HANDLE hwnd = CreateFileW(pathW.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    if (hwnd == INVALID_HANDLE_VALUE)
+    {
+        return false;
+    }
+
+    // Get size
+    DWORD sizeHigh = 0;
+    DWORD sizeLow = GetFileSize(hwnd, &sizeHigh);
+    
+    // Proceed reading if size
+    if (sizeLow > 0)
+    {
+        std::vector<char> data;
+        data.resize(sizeLow);
+        DWORD bytesRead = 0;
+        if ((ReadFile(hwnd, &data[0], sizeLow, &bytesRead, NULL) == 0) || (bytesRead != sizeLow))
+        {
+            // Read not successful
+            CloseHandle(hwnd);
+            return false;
+        }
+        CloseHandle(hwnd);
+        // Copy to string
+        out = std::string(&data[0], sizeLow);
+    }
+    else
+    {
+        CloseHandle(hwnd);
+        out.clear();
+    }
+
+    return true;
 }

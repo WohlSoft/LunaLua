@@ -2104,19 +2104,6 @@ static _declspec(naked) void __stdcall saveGame_OrigFunc()
     }
 }
 
-void __stdcall runtimeHookSaveGame()
-{
-    // Hook for saving the game
-    if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> saveGameEvent = std::make_shared<Event>("onSaveGame", false);
-        saveGameEvent->setDirectEventName("onSaveGame");
-        saveGameEvent->setLoopable(false);
-        gLunaLua.callEvent(saveGameEvent);
-    }
-
-    saveGame_OrigFunc();
-}
-
 static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
 {
     __asm {
