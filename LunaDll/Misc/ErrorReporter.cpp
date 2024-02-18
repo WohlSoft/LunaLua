@@ -6,6 +6,9 @@
 #include "../Defines.h"
 #include <array>
 #include "Gui/GuiCrashNotify.h"
+#include "../SMBXInternal/Variables.h"
+
+/*static*/ ErrorReport::CrashContext* volatile ErrorReport::CrashContext::m_curContext = nullptr;
 
 namespace ErrorReportVars
 {
@@ -126,8 +129,25 @@ void ErrorReport::SnapshotError(EXCEPTION_RECORD* exception, CONTEXT* context)
         fullErrorDescription << getCustomVB6ErrorDescription(ErrorReportVars::lastVB6ErrCode);
     }
 
+    CrashContext* ctx = CrashContext::Get();
+    if (ctx)
+    {
+        fullErrorDescription << "Context: " << ctx->asText() << "\n";
+    }
+
     fullErrorDescription << "\n== Stack Trace ==\n";
     fullErrorDescription << stackTrace;
+
+    fullErrorDescription << "\n== Counts ==\n";
+    fullErrorDescription << std::dec;
+    fullErrorDescription << "numWater=" << SMBX13::Vars::numWater << "\n";
+    fullErrorDescription << "numWarps=" << SMBX13::Vars::numWarps << "\n";
+    fullErrorDescription << "numBlock=" << SMBX13::Vars::numBlock << "\n";
+    fullErrorDescription << "numBackground=" << SMBX13::Vars::numBackground << "\n";
+    fullErrorDescription << "numNPCs=" << SMBX13::Vars::numNPCs << "\n";
+    fullErrorDescription << "numEffects=" << SMBX13::Vars::numEffects << "\n";
+    fullErrorDescription << "numPlayers =" << SMBX13::Vars::numPlayers << "\n";
+    fullErrorDescription << std::hex;
 
     fullErrorDescription << "\n== Reporting ==\n";
     fullErrorDescription << "If you like to help us finding the error then please post this log at:\n";
