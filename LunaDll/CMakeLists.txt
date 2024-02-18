@@ -102,6 +102,7 @@ set(LunaLua_Sources
     FileManager/config_manager.cpp
     FileManager/CustomParamStore.cpp
     FileManager/LoadFile_Level.cpp
+    FileManager/SaveFile.cpp
     FileManager/SMBXFileManager.cpp
     GameConfig/GameAutostart.cpp
     GameConfig/GameConfiguration.cpp
@@ -206,6 +207,7 @@ set(LunaLua_Sources
     Misc/VB6RNG.cpp
     Misc/WaitForTickEnd.cpp
     Misc/win32_Unicode.cpp
+    Misc/Win32PathUtils.cpp
     Rendering/AsyncGifRecorder.cpp
     Rendering/BitBltEmulation.cpp
     Rendering/FrameCapture.cpp
@@ -245,6 +247,7 @@ set(LunaLua_Sources
     SMBXInternal/NPCs.cpp
     SMBXInternal/Overworld.cpp
     SMBXInternal/PlayerMOB.cpp
+    SMBXInternal/Ports/modPlayer.cpp
     SMBXInternal/Reconstructed/Util/NpcToCoins.cpp
     SMBXInternal/SMBXEvents.cpp
     SMBXInternal/Sound.cpp
