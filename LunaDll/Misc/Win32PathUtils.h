@@ -29,6 +29,15 @@ T normalizeToBackslashAndResolvePath(const T& path)
             }
             idx++;
         }
+        // Detect if we're now ending a . segment
+        else if ((outIdx >= 2) && ((idx >= len) || ((idx < len) && ((path[idx] == '\\') || (path[idx] == '/')))) &&
+            (ret[outIdx - 2] == '\\') &&
+            (ret[outIdx - 1] == '.')
+            )
+        {
+            // Remove the .\ from the output
+            outIdx -= 2;
+        }
 
         // End of string
         if (idx >= len) break;
