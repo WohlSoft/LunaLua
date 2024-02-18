@@ -826,12 +826,18 @@ static __declspec(naked) void updateInput_Orig()
 
 extern void __stdcall runtimeHookUpdateInput()
 {
-    if (gMainWindowFocused)
+    gLunaGameControllerManager.pollInputs();
+    gEscPressedRegistered = gEscPressed;
+    gEscPressed = false;
+    if (gMainWindowFocused || !gStartupSettings.runWhenUnfocused)
     {
-        gLunaGameControllerManager.pollInputs();
-        gEscPressedRegistered = gEscPressed;
-        gEscPressed = false;
+        // Only run player input update if focused, if we're able to run at all when unfocused
         updateInput_Orig();
+    }
+    else
+    {
+        // But if we're not running input update code, we still need to let Lua code act normal anyway
+        g_EventHandler.hookInputUpdate();
     }
 }
 
@@ -2098,19 +2104,6 @@ static _declspec(naked) void __stdcall saveGame_OrigFunc()
     }
 }
 
-void __stdcall runtimeHookSaveGame()
-{
-    // Hook for saving the game
-    if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> saveGameEvent = std::make_shared<Event>("onSaveGame", false);
-        saveGameEvent->setDirectEventName("onSaveGame");
-        saveGameEvent->setLoopable(false);
-        gLunaLua.callEvent(saveGameEvent);
-    }
-
-    saveGame_OrigFunc();
-}
-
 static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
 {
     __asm {
@@ -2821,13 +2814,10 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
 
 void __stdcall runtimeHookCheckWindowFocus()
 {
-    if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
+    if (gMainWindowUnfocusPending)
     {
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
-
-        // Show pause overlay
-        g_GLEngine.EndFrame(nullptr, false, true, false, true);
 
         // Wait for focus
         TestModeSendNotification("suspendWhileUnfocusedNotification");
@@ -2837,6 +2827,7 @@ void __stdcall runtimeHookCheckWindowFocus()
             LunaDllWaitFrame(false);
         }
         TestModeSendNotification("resumeAfterUnfocusedNotification");
+        gMainWindowUnfocusPending = false;
     }
 }
 
@@ -4929,6 +4920,11 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
     }
 }
 
+// Function to retore GeyKeyState call to functionality if it's one we care about
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk)
+{
+    return (gKeyState[vk] & 0x80) ? 0xF000 : 0;
+}
 
 // close the game
 // don't bother with preserving cpu state or anything, since we'll never return from here...

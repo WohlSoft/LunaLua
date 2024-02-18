@@ -115,7 +115,7 @@ void testModePauseMenu(bool allowContinue, bool skipEnded)
     while (keepRunningPauseMenu)
     {
         // Handle un-focused state
-        if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
+        if (gMainWindowUnfocusPending)
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
@@ -128,6 +128,7 @@ void testModePauseMenu(bool allowContinue, bool skipEnded)
                 LunaDllWaitFrame(false);
             }
             TestModeSendNotification("resumeAfterUnfocusedNotification");
+            gMainWindowUnfocusPending = false;
 
             if (!keepRunningPauseMenu || GM_EPISODE_MODE) break;
         }

@@ -83,108 +83,201 @@ class MemoryUnlock {
         MemoryUnlock(const MemoryUnlock&) = delete;
         MemoryUnlock& operator= (const MemoryUnlock&) = delete;
 
-        static bool Memcpy(void* dest, const void* src, std::size_t count, const char* lineNum);
+        static bool Memcpy(void* dest, const void* src, std::size_t count, const char* srcFile, int srcLine);
 };
 
 // Alias for MemoryUnlock::Memcpy with tracking
-#define MemoryUnlock_Memcpy(dest, src, size) MemoryUnlock::Memcpy(dest, src, size, __FILE__ ":" PATCH__STRINGIZE(__LINE__))
+#define MemoryUnlock_Memcpy(dest, src, size) MemoryUnlock::Memcpy(dest, src, size, __FILE__, __LINE__)
 
 // Structure for detecting conflicts
-struct AsmRange;
-struct AsmRange
+class AsmRange
 {
-    static std::vector<AsmRange> mAlloc;
-    static std::map<std::pair<const char*, uintptr_t>, std::intptr_t> mCache;
-    static std::intptr_t mFirstIdx;
-    static bool mStartChecks;
-    std::intptr_t mIdx;
-    const char* mLineNum;
-    std::uintptr_t mAddr;
-    std::uintptr_t mSize;
-    std::intptr_t mNextIdx;
-    bool mCollided;
+public:
+    // We uniquely identify patches with a tuple of address, source file, and source line
+    // This also serves a purpose for debug output
+    typedef const std::tuple<uintptr_t, const char*, int> PatchId_t;
 
-    static std::intptr_t getInst(const char* lineNum, std::uintptr_t addr, std::uintptr_t size = 0)
+    // Patches AsmRanges also have an index based on allocation order
+    typedef std::intptr_t PatchIdx_t;
+
+private:
+    // Class to hold static data for AsmRange
+    // We use this instead of static members because we cannot guarantee when global init of the
+    // static members occurs.
+    struct GlobalState
     {
-        auto key = std::pair<const char*, uintptr_t>(lineNum, addr);
-        auto cursor = mCache.find(key);
-        if (cursor == mCache.end())
+    private:
+        GlobalState() :
+            mAlloc(),
+            mCache(),
+            mFirstIdx(-1),
+            mStartChecks(false)
+        {}
+        std::vector<AsmRange> mAlloc;
+        std::map<PatchId_t, PatchIdx_t> mCache;
+        PatchIdx_t mFirstIdx;
+        bool mStartChecks;
+
+    public:
+        static GlobalState& get()
         {
-            // New copy needed
-            std::intptr_t idx = mAlloc.size();
-            mAlloc.emplace_back(idx, lineNum, addr, size);
-            mCache[key] = idx;
-            return idx;
+            // Yup, it's singleton pattern
+            static GlobalState inst;
+            return inst;
         }
-        else
+
+        bool getStartChecks()
         {
-            // Reuse existing copy
-            std::intptr_t idx = cursor->second;
-            mAlloc[idx].SetSize(size);
-            return idx;
+            return mStartChecks;
         }
-    }
+
+        void triggerStartChecks()
+        {
+            mStartChecks = true;
+
+            // Check any data we've already recorded
+            for (AsmRange* cursor = getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
+            {
+                cursor->checkCollision();
+            }
+        }
+
+        AsmRange& operator[] (PatchIdx_t idx)
+        {
+            return mAlloc[idx];
+        }
+
+        AsmRange* getFirstPtr()
+        {
+            if (mFirstIdx < 0)
+            {
+                return nullptr;
+            }
+            return &mAlloc[mFirstIdx];
+        }
+
+        PatchIdx_t getIdxById(PatchId_t id)
+        {
+            auto cursor = mCache.find(id);
+            if (cursor == mCache.end())
+            {
+                // New copy needed
+                std::intptr_t idx = mAlloc.size();
+                mAlloc.emplace_back(idx, id);
+                mCache[id] = idx;
+                AsmRange& newRange = mAlloc[idx];
+
+                // Insert in linked list
+                if (mFirstIdx < 0)
+                {
+                    // First entry
+                    mFirstIdx = idx;
+                }
+                else
+                {
+                    // Subsequent entry
+                    PatchIdx_t mCursor = mFirstIdx;
+                    PatchIdx_t mPrev = -1;
+                    while ((mCursor >= 0) && (mAlloc[mCursor].getAddr() < newRange.getAddr()))
+                    {
+                        mPrev = mCursor;
+                        mCursor = mAlloc[mCursor].mNextIdx;
+                    }
+
+                    if (mPrev < 0)
+                    {
+                        // Replacing first element
+                        mFirstIdx = idx;
+                    }
+                    else
+                    {
+                        // Replacing later element
+                        mAlloc[mPrev].mNextIdx = idx;
+                    }
+                    // Set next chain entry
+                    newRange.mNextIdx = mCursor;
+
+                    if (mPrev >= 0)
+                    {
+                        mAlloc[mPrev].checkCollision();
+                    }
+                }
+
+                return idx;
+            }
+            else
+            {
+                // Reuse existing copy
+                std::intptr_t idx = cursor->second;
+                return idx;
+            }
+        }
+    };
+
+    // Variables tracked for each patch range
+    PatchIdx_t mSelfIdx;
+    PatchIdx_t mNextIdx;
+    PatchId_t mId;
+    std::uintptr_t mSize;
+    bool mCollided;
 
     void SetSize(std::uintptr_t size)
     {
         if (size > mSize)
         {
             mSize = size;
-            CheckCollision();
+            checkCollision();
         }
     }
 
-    static void UpdateSize(std::intptr_t idx, std::uintptr_t size)
+    void checkCollision()
     {
+        GlobalState& global = GlobalState::get();
+        if (!global.getStartChecks()) return;
+        if (mCollided) return;
+
+        if ((mNextIdx >= 0) && ((getAddr() + mSize) > global[mNextIdx].getAddr()))
+        {
+            mCollided = true;
+            const AsmRange& next = global[mNextIdx];
+            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s:%d\n\t%s:%d\n",
+                getAddr(), next.getAddr(),
+                getFile(), getLine(),
+                next.getFile(), next.getLine()
+                );
+        }
+    }
+
+public:
+    AsmRange(std::intptr_t idx, PatchId_t id) :
+        mSelfIdx(idx), mNextIdx(-1), mId(id), mSize(0), mCollided(false)
+    {
+    }
+
+    std::uintptr_t getAddr() const { return std::get<0>(mId); }
+    const char* getFile() const { return std::get<1>(mId); }
+    int getLine() const { return std::get<2>(mId); }
+    std::uintptr_t getSize() { return mSize; }
+    static AsmRange* getFirstPtr() { return GlobalState::get().getFirstPtr(); }
+    AsmRange* getNextPtr() { return (mNextIdx >= 0) ? &GlobalState::get()[mNextIdx] : nullptr; }
+
+    static PatchIdx_t getInst(std::uintptr_t addr, const char* srcFile, int lineNum, std::uintptr_t size = 0)
+    {
+        GlobalState& global = GlobalState::get();
+        PatchIdx_t idx = global.getIdxById({addr, srcFile, lineNum});
+        if (size > 0)
+        {
+            updateSize(idx, size);
+        }
+        return idx;
+    }
+
+    static void updateSize(std::intptr_t idx, std::uintptr_t size)
+    {
+        GlobalState& global = GlobalState::get();
         if (idx >= 0)
         {
-            mAlloc[idx].SetSize(size);
-        }
-    }
-
-    //AsmRange(const AsmRange& other) :
-    //    mIdx(other.mIdx), mLineNum(other.mLineNum), mAddr(other.mAddr), mSize(other.mSize), mNextIdx(other.mNextIdx), mCollided(other.mCollided)
-    //{
-    //}
-
-    AsmRange(std::intptr_t idx, const char* lineNum, std::uintptr_t addr, std::uintptr_t size) :
-        mIdx(idx), mLineNum(lineNum), mAddr(addr), mSize(0), mNextIdx(-1), mCollided(false)
-    {
-        if (mFirstIdx < 0)
-        {
-            // First entry
-            mFirstIdx = mIdx;
-            SetSize(size);
-        }
-        else
-        {
-            // Subsequent entry
-            std::intptr_t mCursor = mFirstIdx;
-            std::intptr_t mPrev = -1;
-            while ((mCursor >= 0) && (mAlloc[mCursor].mAddr < mAddr))
-            {
-                mPrev = mCursor;
-                mCursor = mAlloc[mCursor].mNextIdx;
-            }
-
-            if (mPrev < 0)
-            {
-                // Replacing first element
-                mFirstIdx = mIdx;
-            }
-            else
-            {
-                // Replacing later element
-                mAlloc[mPrev].mNextIdx = mIdx;
-            }
-            // Set next chain entry
-            mNextIdx = mCursor;
-            SetSize(size);
-
-            if (mPrev >= 0)
-            {
-                mAlloc[mPrev].CheckCollision();
-            }
+            global[idx].SetSize(size);
         }
     }
 
@@ -193,26 +286,7 @@ struct AsmRange
     // patched ranges.
     static void StartChecking()
     {
-        mStartChecks = true;
-        
-        // Check any data we've already recorded
-        for (std::intptr_t cursor = mFirstIdx; cursor <= 0; cursor = mAlloc[cursor].mNextIdx)
-        {
-            mAlloc[cursor].CheckCollision();
-        }
-    }
-
-private:
-    void CheckCollision()
-    {
-        if (!mStartChecks) return;
-        if (mCollided) return;
-
-        if ((mNextIdx >= 0) && ((mAddr + mSize) > mAlloc[mNextIdx].mAddr))
-        {
-            mCollided = true;
-            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s\n\t%s\n", mAddr, mAlloc[mNextIdx].mAddr, mLineNum, mAlloc[mNextIdx].mLineNum);
-        }
+        GlobalState::get().triggerStartChecks();
     }
 };
 
@@ -232,10 +306,10 @@ public:
      * Constructor and utility methods *
      ***********************************/
 public:
-    AsmPatch(std::uintptr_t addr, const char* lineNum) :
+    AsmPatch(std::uintptr_t addr, const char* srcFile, int srcLine) :
         mAddr(addr),
         mIsPatched(false),
-        mRangeTrackIdx(AsmRange::getInst(lineNum, addr, Size))
+        mRangeTrackIdx(AsmRange::getInst(addr, srcFile, srcLine, Size))
     {}
 
     template <std::uintptr_t OldSize>
@@ -246,7 +320,7 @@ public:
     {
         if (mRangeTrackIdx >= 0)
         {
-            AsmRange::UpdateSize(mRangeTrackIdx, Size);
+            AsmRange::updateSize(mRangeTrackIdx, Size);
         }
     }
 
@@ -541,16 +615,14 @@ public:
     }
 };
 
-static inline AsmPatch<0> PATCH_impl(std::uintptr_t addr, const char* lineNum) {
-    return AsmPatch<0>(addr, lineNum);
+static inline AsmPatch<0> PATCH_impl(std::uintptr_t addr, const char* srcFile, int srcLine) {
+    return AsmPatch<0>(addr, srcFile, srcLine);
 }
-static inline AsmPatch<0> PATCH_impl(void* addr, const char* lineNum) {
-    return PATCH_impl((std::uintptr_t)addr, lineNum);
+static inline AsmPatch<0> PATCH_impl(void* addr, const char* srcFile, int srcLine) {
+    return PATCH_impl((std::uintptr_t)addr, srcFile, srcLine);
 }
 
-#define PATCH__STRINGIZE2(x) #x
-#define PATCH__STRINGIZE(x) PATCH__STRINGIZE2(x)
-#define PATCH(x) PATCH_impl(x, __FILE__ ":" PATCH__STRINGIZE(__LINE__))
+#define PATCH(x) PATCH_impl(x, __FILE__, __LINE__)
 
 /********************/
 /* Patch colleciton */

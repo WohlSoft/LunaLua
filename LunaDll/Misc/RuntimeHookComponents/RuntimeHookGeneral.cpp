@@ -25,6 +25,11 @@
 
 #include "../../Misc/LoadScreen.h"
 
+#include "../../SMBXInternal/Ports.h"
+#include "../../SMBXInternal/Functions.h"
+
+#include "../../FileManager/SaveFile.h"
+
 #ifndef NO_SDL
 bool episodeStarted = false;
 #endif
@@ -429,6 +434,12 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
                 }
             }
         }
+    }
+
+    // Process ESC key press
+    if ((virtKey == VK_ESCAPE) && plainPress)
+    {
+        gEscPressed = true;
     }
 
     // Process F12 key for screenshot to file
@@ -1692,9 +1703,6 @@ void TrySkipPatch()
     PATCH(0x8F7E8E).PUSH_EBX().CALL(runtimeHookLoadLevelHeader).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0x8F7EA3).JMP(0x8F7EDB).NOP_PAD_TO_SIZE<56>().Apply();
 
-    // Save game hook
-    PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
-
     PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0x8D6BB0).JMP(runtimeHookExitMainGame).NOP_PAD_TO_SIZE<6>().Apply();
@@ -2145,6 +2153,34 @@ void TrySkipPatch()
     //Fence bug fixes
     gFenceFixes.Apply();
 
+    // Replace PlayerEffects function
+    PATCH(SMBX13::modPlayer_Private::_PlayerEffects_ptr).JMP(&SMBX13::Ports::PlayerEffects).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Replace SaveGame function
+    PATCH(SMBX13::modMain::_SaveGame_ptr).JMP(&SMBXSaveFile::Save).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Restore GetKeyState for some pause related calls
+    // GameLoop:
+    PATCH(0x8CA3D4).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8CA45D).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // WorldLoop:
+    PATCH(0x8E0E2C).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // PauseGame:
+    PATCH(0x8E5AA6).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AB8).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AC3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ACE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ADA).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5B25).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5BD0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5C1F).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61E7).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61F3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64DE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64F0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64FB).CALL(runtimeHookGetKeyStateRetore).Apply();
+
+    
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/

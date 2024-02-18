@@ -31,6 +31,7 @@
 
 #include "LunaPathValidator.h"
 #include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -135,7 +136,10 @@ bool CLunaLua::shutdown()
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
     gLinkFairyClowncarFixes.Apply();
+    gSlideJumpFixIsEnabled = true;
+    SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;
     gCollisionMatrix.clear();
+
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
@@ -225,8 +229,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         osTable["execute"] = object();
         osTable["exit"] = object();
         //osTable["getenv"] = object();
-        osTable["remove"] = object();
-        osTable["rename"] = object();
+        //osTable["remove"] = object();
+        //osTable["rename"] = object();
         osTable["setlocal"] = object();
         osTable["tmpname"] = object();
     }

@@ -126,6 +126,7 @@
     <ClInclude Include="EventStateMachine.h" />
     <ClInclude Include="FileManager\config_manager.h" />
     <ClInclude Include="FileManager\CustomParamStore.h" />
+    <ClInclude Include="FileManager\SaveFile.h" />
     <ClInclude Include="FileManager\SMBXFileManager.h" />
     <ClInclude Include="Input\LunaGameController.h" />
     <ClInclude Include="Input\MouseHandler.h" />
@@ -151,7 +152,12 @@
     <ClInclude Include="Misc\LoadScreen.h" />
     <ClInclude Include="Misc\NpcIdExtender.h" />
     <ClInclude Include="Misc\ResourceFileMapper.h" />
+    <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h" />
     <ClInclude Include="Misc\SRect.h" />
+    <ClInclude Include="Misc\VB6Array.h" />
+    <ClInclude Include="Misc\VB6Bool.h" />
+    <ClInclude Include="Misc\VB6Logic.h" />
+    <ClInclude Include="Misc\Win32PathUtils.h" />
     <ClInclude Include="Rendering\AsyncGifRecorderImgs.h" />
     <ClInclude Include="Rendering\ImageLoader.h" />
     <ClInclude Include="Rendering\LunaImage.h" />
@@ -280,6 +286,7 @@
     <ClInclude Include="HardcodedGraphics\HardcodedGraphicsManager.h" />
     <ClInclude Include="CustomSprites\Hitbox\Hitbox.h" />
     <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="SMBXInternal\Ports.h" />
     <ClInclude Include="SMBXInternal\Types.h" />
     <ClInclude Include="SMBXInternal\Variables.h" />
     <ClInclude Include="SMBXInternal\Musicbox.h" />
@@ -327,6 +334,7 @@
     <ClCompile Include="FileManager\config_manager.cpp" />
     <ClCompile Include="FileManager\CustomParamStore.cpp" />
     <ClCompile Include="FileManager\LoadFile_Level.cpp" />
+    <ClCompile Include="FileManager\SaveFile.cpp" />
     <ClCompile Include="FileManager\SMBXFileManager.cpp" />
     <ClCompile Include="Input\LunaGameController.cpp" />
     <ClCompile Include="Input\MouseHandler.cpp" />
@@ -351,6 +359,7 @@
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNpcHarm.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNPCTransform.cpp" />
+    <ClCompile Include="Misc\Win32PathUtils.cpp" />
     <ClCompile Include="Rendering\ImageLoader.cpp" />
     <ClCompile Include="Rendering\LunaImage.cpp" />
     <ClCompile Include="Rendering\Shaders\GLShaderVariableEntry.cpp" />
@@ -546,6 +555,7 @@
     <ClCompile Include="SdlMusic\MusicDefList.cpp" />
     <ClCompile Include="SdlMusic\MusicManager.cpp" />
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
+    <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp" />
     <ClCompile Include="SMBXInternal\Reconstructed\Util\NpcToCoins.cpp" />
     <ClCompile Include="SMBXInternal\SMBXEvents.cpp" />
     <ClCompile Include="SMBXInternal\Sound.cpp" />

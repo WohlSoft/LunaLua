@@ -322,6 +322,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId);
+void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
@@ -351,8 +352,6 @@ void __stdcall runtimeHookInitGameWindow(void);
 
 void __stdcall runtimeHookLoadDefaultGraphics(void);
 
-void __stdcall runtimeHookSaveGame(void);
-
 void __stdcall runtimeHookCleanupLevel(void);
 
 void __stdcall runtimeHookExitMainGame(void);
@@ -370,6 +369,8 @@ void __stdcall runtimeHookFixLinkFairyClowncar3();
 
 // hooks for closing the game instaed of returning to titlescreen
 void __stdcall runtimeHookCloseGame();
+
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk);
 
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
