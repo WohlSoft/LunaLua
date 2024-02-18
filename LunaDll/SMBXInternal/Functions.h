@@ -332,8 +332,8 @@ namespace SMBX13 {
     namespace modEffect {
         static const auto _UpdateEffects_ptr = reinterpret_cast<void(__stdcall *)()>(0x009E4900);
         inline void UpdateEffects() { SafeFPUControl::clear(); _UpdateEffects_ptr(); }
-        static const auto _NewEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, SMBX13::Types::Location_t& Location, float& Direction, int16_t& NewNpc, VB6Bool& Shadow)>(0x009E7380);
-        inline void NewEffect(int16_t A, SMBX13::Types::Location_t& Location, float Direction=1, int16_t NewNpc=0, VB6Bool Shadow=false) { SafeFPUControl::clear(); _NewEffect_ptr(A, Location, Direction, NewNpc, Shadow); }
+        static const auto _NewEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, SMBX13::Types::Location_t const& Location, float& Direction, int16_t& NewNpc, VB6Bool& Shadow)>(0x009E7380);
+        inline void NewEffect(int16_t A, SMBX13::Types::Location_t const& Location, float Direction=1, int16_t NewNpc=0, VB6Bool Shadow=false) { SafeFPUControl::clear(); _NewEffect_ptr(A, Location, Direction, NewNpc, Shadow); }
         static const auto _KillEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009EC150);
         inline void KillEffect(int16_t A) { SafeFPUControl::clear(); _KillEffect_ptr(A); }
     }
