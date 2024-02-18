@@ -191,7 +191,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
 #ifdef __clang__
     // NB: I'm using %c modifiers for PriorityMostSignificantDWord and PriorityLeastSignificantDWord because of a clang bug: https://bugs.llvm.org/show_bug.cgi?id=24232
     __asm__ volatile (
-        ".intel_syntax\n"
+        ".intel_syntax noprefix\n"
         "pushfd\n"
         "push eax\n"
         "push ecx\n"
@@ -245,7 +245,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
 #ifdef __clang__
     // NB: I'm using %c modifiers for PriorityMostSignificantDWord, PriorityLeastSignificantDWord, skipTargetAddrValue and skipTargetAddrValue because of a clang bug: https://bugs.llvm.org/show_bug.cgi?id=24232
     __asm__ volatile (
-        ".intel_syntax\n"
+        ".intel_syntax noprefix\n"
         "pushfd\n"
         "push eax\n"
         "push ecx\n"
