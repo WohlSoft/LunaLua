@@ -68,10 +68,10 @@ namespace SMBX13 {
         inline void OpenWorld(VB6StrPtr FilePath) { SafeFPUControl::clear(); _OpenWorld_ptr(FilePath); }
         static const auto _WorldLoop_ptr = reinterpret_cast<void(__stdcall *)()>(0x008E06B0);
         inline void WorldLoop() { SafeFPUControl::clear(); _WorldLoop_ptr(); }
-        static const auto _LevelPath_ptr = reinterpret_cast<void(__stdcall *)(int16_t& Lvl, int16_t& Direction, VB6Bool& Skp)>(0x008E1DF0);
-        inline void LevelPath(int16_t Lvl, int16_t Direction, VB6Bool Skp=false) { SafeFPUControl::clear(); _LevelPath_ptr(Lvl, Direction, Skp); }
-        static const auto _PathPath_ptr = reinterpret_cast<void(__stdcall *)(int16_t& Pth, VB6Bool& Skp)>(0x008E2350);
-        inline void PathPath(int16_t Pth, VB6Bool Skp=false) { SafeFPUControl::clear(); _PathPath_ptr(Pth, Skp); }
+        static const auto _LevelPath_ptr = reinterpret_cast<void(__stdcall *)(int16_t& Lvl, int16_t& Direction, VB6BoolVal& Skp)>(0x008E1DF0);
+        inline void LevelPath(int16_t Lvl, int16_t Direction, VB6BoolVal Skp=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _LevelPath_ptr(Lvl, Direction, Skp); }
+        static const auto _PathPath_ptr = reinterpret_cast<void(__stdcall *)(int16_t& Pth, VB6BoolVal& Skp)>(0x008E2350);
+        inline void PathPath(int16_t Pth, VB6BoolVal Skp=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _PathPath_ptr(Pth, Skp); }
         static const auto _PathWait_ptr = reinterpret_cast<void(__stdcall *)()>(0x008E2A40);
         inline void PathWait() { SafeFPUControl::clear(); _PathWait_ptr(); }
         static const auto _ClearWorld_ptr = reinterpret_cast<void(__stdcall *)()>(0x008E2E40);
@@ -194,40 +194,40 @@ namespace SMBX13 {
     }
 
     namespace modCollision {
-        static const auto _CheckCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00992F50);
-        inline VB6Bool CheckCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _CheckCollision_ptr(Loc1, Loc2); }
-        static const auto _n00bCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00992FE0);
-        inline VB6Bool n00bCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _n00bCollision_ptr(Loc1, Loc2); }
-        static const auto _WarpCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, int16_t& A)>(0x009931D0);
-        inline VB6Bool WarpCollision(SMBX13::Types::Location_t& Loc1, int16_t A) { SafeFPUControl::clear(); return _WarpCollision_ptr(Loc1, A); }
+        static const auto _CheckCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00992F50);
+        inline bool CheckCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_CheckCollision_ptr(Loc1, Loc2)); }
+        static const auto _n00bCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00992FE0);
+        inline bool n00bCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_n00bCollision_ptr(Loc1, Loc2)); }
+        static const auto _WarpCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, int16_t& A)>(0x009931D0);
+        inline bool WarpCollision(SMBX13::Types::Location_t& Loc1, int16_t A) { SafeFPUControl::clear(); return FromVB6BoolVal(_WarpCollision_ptr(Loc1, A)); }
         static const auto _FindCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00993330);
         inline int16_t FindCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _FindCollision_ptr(Loc1, Loc2); }
         static const auto _FindCollisionBelt_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float& BeltSpeed)>(0x00993470);
         inline int16_t FindCollisionBelt(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float BeltSpeed) { SafeFPUControl::clear(); return _FindCollisionBelt_ptr(Loc1, Loc2, BeltSpeed); }
         static const auto _NPCFindCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x009935C0);
         inline int16_t NPCFindCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _NPCFindCollision_ptr(Loc1, Loc2); }
-        static const auto _EasyModeCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6Bool& StandOn)>(0x00993700);
-        inline int16_t EasyModeCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6Bool StandOn=false) { SafeFPUControl::clear(); return _EasyModeCollision_ptr(Loc1, Loc2, StandOn); }
-        static const auto _BootCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6Bool& StandOn)>(0x00993970);
-        inline int16_t BootCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6Bool StandOn=false) { SafeFPUControl::clear(); return _BootCollision_ptr(Loc1, Loc2, StandOn); }
-        static const auto _CursorCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00993BE0);
-        inline VB6Bool CursorCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _CursorCollision_ptr(Loc1, Loc2); }
-        static const auto _ShakeCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, int16_t& ShakeY3)>(0x00993CD0);
-        inline VB6Bool ShakeCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, int16_t ShakeY3) { SafeFPUControl::clear(); return _ShakeCollision_ptr(Loc1, Loc2, ShakeY3); }
-        static const auto _vScreenCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(int16_t& A, SMBX13::Types::Location_t& Loc2)>(0x00993DE0);
-        inline VB6Bool vScreenCollision(int16_t A, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _vScreenCollision_ptr(A, Loc2); }
-        static const auto _vScreenCollision2_ptr = reinterpret_cast<VB6Bool(__stdcall *)(int16_t& A, SMBX13::Types::Location_t& Loc2)>(0x00993F90);
-        inline VB6Bool vScreenCollision2(int16_t A, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _vScreenCollision2_ptr(A, Loc2); }
-        static const auto _WalkingCollision_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994130);
-        inline VB6Bool WalkingCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _WalkingCollision_ptr(Loc1, Loc2); }
-        static const auto _WalkingCollision3_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float& BeltSpeed)>(0x009941B0);
-        inline VB6Bool WalkingCollision3(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float BeltSpeed) { SafeFPUControl::clear(); return _WalkingCollision3_ptr(Loc1, Loc2, BeltSpeed); }
+        static const auto _EasyModeCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6BoolVal& StandOn)>(0x00993700);
+        inline int16_t EasyModeCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6BoolVal StandOn=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); return _EasyModeCollision_ptr(Loc1, Loc2, StandOn); }
+        static const auto _BootCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6BoolVal& StandOn)>(0x00993970);
+        inline int16_t BootCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, VB6BoolVal StandOn=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); return _BootCollision_ptr(Loc1, Loc2, StandOn); }
+        static const auto _CursorCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00993BE0);
+        inline bool CursorCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_CursorCollision_ptr(Loc1, Loc2)); }
+        static const auto _ShakeCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, int16_t& ShakeY3)>(0x00993CD0);
+        inline bool ShakeCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, int16_t ShakeY3) { SafeFPUControl::clear(); return FromVB6BoolVal(_ShakeCollision_ptr(Loc1, Loc2, ShakeY3)); }
+        static const auto _vScreenCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(int16_t& A, SMBX13::Types::Location_t& Loc2)>(0x00993DE0);
+        inline bool vScreenCollision(int16_t A, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_vScreenCollision_ptr(A, Loc2)); }
+        static const auto _vScreenCollision2_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(int16_t& A, SMBX13::Types::Location_t& Loc2)>(0x00993F90);
+        inline bool vScreenCollision2(int16_t A, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_vScreenCollision2_ptr(A, Loc2)); }
+        static const auto _WalkingCollision_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994130);
+        inline bool WalkingCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_WalkingCollision_ptr(Loc1, Loc2)); }
+        static const auto _WalkingCollision3_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float& BeltSpeed)>(0x009941B0);
+        inline bool WalkingCollision3(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2, float BeltSpeed) { SafeFPUControl::clear(); return FromVB6BoolVal(_WalkingCollision3_ptr(Loc1, Loc2, BeltSpeed)); }
         static const auto _FindRunningCollision_ptr = reinterpret_cast<int16_t(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994250);
         inline int16_t FindRunningCollision(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _FindRunningCollision_ptr(Loc1, Loc2); }
-        static const auto _CanComeOut_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994390);
-        inline VB6Bool CanComeOut(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _CanComeOut_ptr(Loc1, Loc2); }
-        static const auto _CheckHitSpot1_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994480);
-        inline VB6Bool CheckHitSpot1(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _CheckHitSpot1_ptr(Loc1, Loc2); }
+        static const auto _CanComeOut_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994390);
+        inline bool CanComeOut(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_CanComeOut_ptr(Loc1, Loc2)); }
+        static const auto _CheckHitSpot1_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00994480);
+        inline bool CheckHitSpot1(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_CheckHitSpot1_ptr(Loc1, Loc2)); }
     }
 
     namespace modPlayer {
@@ -245,8 +245,8 @@ namespace SMBX13 {
         inline int16_t CheckDead() { SafeFPUControl::clear(); return _CheckDead_ptr(); }
         static const auto _CheckLiving_ptr = reinterpret_cast<int16_t(__stdcall *)()>(0x009B7680);
         inline int16_t CheckLiving() { SafeFPUControl::clear(); return _CheckLiving_ptr(); }
-        static const auto _LivingPlayers_ptr = reinterpret_cast<VB6Bool(__stdcall *)()>(0x009B7710);
-        inline VB6Bool LivingPlayers() { SafeFPUControl::clear(); return _LivingPlayers_ptr(); }
+        static const auto _LivingPlayers_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)()>(0x009B7710);
+        inline bool LivingPlayers() { SafeFPUControl::clear(); return FromVB6BoolVal(_LivingPlayers_ptr()); }
         static const auto _EveryonesDead_ptr = reinterpret_cast<void(__stdcall *)()>(0x009B7780);
         inline void EveryonesDead() { SafeFPUControl::clear(); _EveryonesDead_ptr(); }
         static const auto _UnDuck_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009B7BF0);
@@ -257,16 +257,16 @@ namespace SMBX13 {
         inline void PlayerFrame(int16_t A) { SafeFPUControl::clear(); _PlayerFrame_ptr(A); }
         static const auto _UpdatePlayerBonus_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, int16_t& B)>(0x009BB2B0);
         inline void UpdatePlayerBonus(int16_t A, int16_t B) { SafeFPUControl::clear(); _UpdatePlayerBonus_ptr(A, B); }
-        static const auto _TailSwipe_ptr = reinterpret_cast<void(__stdcall *)(int16_t& plr, VB6Bool& bool_, VB6Bool& Stab, int16_t& StabDir)>(0x009BB490);
-        inline void TailSwipe(int16_t plr, VB6Bool bool_=false, VB6Bool Stab=false, int16_t StabDir=0) { SafeFPUControl::clear(); _TailSwipe_ptr(plr, bool_, Stab, StabDir); }
+        static const auto _TailSwipe_ptr = reinterpret_cast<void(__stdcall *)(int16_t& plr, VB6BoolVal& bool_, VB6BoolVal& Stab, int16_t& StabDir)>(0x009BB490);
+        inline void TailSwipe(int16_t plr, VB6BoolVal bool_=VB6BoolVal::VB_FALSE, VB6BoolVal Stab=VB6BoolVal::VB_FALSE, int16_t StabDir=0) { SafeFPUControl::clear(); _TailSwipe_ptr(plr, bool_, Stab, StabDir); }
         static const auto _YoshiHeight_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009BD560);
         inline void YoshiHeight(int16_t A) { SafeFPUControl::clear(); _YoshiHeight_ptr(A); }
         static const auto _YoshiEat_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009BD610);
         inline void YoshiEat(int16_t A) { SafeFPUControl::clear(); _YoshiEat_ptr(A); }
         static const auto _YoshiSpit_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009BE6D0);
         inline void YoshiSpit(int16_t A) { SafeFPUControl::clear(); _YoshiSpit_ptr(A); }
-        static const auto _YoshiPound_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, int16_t& C, VB6Bool& BreakBlocks)>(0x009C0040);
-        inline void YoshiPound(int16_t A, int16_t C, VB6Bool BreakBlocks=false) { SafeFPUControl::clear(); _YoshiPound_ptr(A, C, BreakBlocks); }
+        static const auto _YoshiPound_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, int16_t& C, VB6BoolVal& BreakBlocks)>(0x009C0040);
+        inline void YoshiPound(int16_t A, int16_t C, VB6BoolVal BreakBlocks=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _YoshiPound_ptr(A, C, BreakBlocks); }
         static const auto _SwapCoop_ptr = reinterpret_cast<void(__stdcall *)()>(0x009C06A0);
         inline void SwapCoop() { SafeFPUControl::clear(); _SwapCoop_ptr(); }
         static const auto _PlayerPush_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, int16_t& HitSpot)>(0x009C0800);
@@ -295,8 +295,8 @@ namespace SMBX13 {
     }
 
     namespace modPlayer {
-        static const auto _PlayerGrabCode_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6Bool& DontResetGrabTime)>(0x009CC2B0);
-        inline void PlayerGrabCode(int16_t A, VB6Bool DontResetGrabTime=false) { SafeFPUControl::clear(); _PlayerGrabCode_ptr(A, DontResetGrabTime); }
+        static const auto _PlayerGrabCode_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6BoolVal& DontResetGrabTime)>(0x009CC2B0);
+        inline void PlayerGrabCode(int16_t A, VB6BoolVal DontResetGrabTime=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _PlayerGrabCode_ptr(A, DontResetGrabTime); }
         static const auto _LinkFrame_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009D1480);
         inline void LinkFrame(int16_t A) { SafeFPUControl::clear(); _LinkFrame_ptr(A); }
     }
@@ -307,8 +307,8 @@ namespace SMBX13 {
     }
 
     namespace modBlocks {
-        static const auto _BlockHit_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6Bool& HitDown, int16_t& whatPlayer)>(0x009DA620);
-        inline void BlockHit(int16_t A, VB6Bool HitDown=false, int16_t whatPlayer=0) { SafeFPUControl::clear(); _BlockHit_ptr(A, HitDown, whatPlayer); }
+        static const auto _BlockHit_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6BoolVal& HitDown, int16_t& whatPlayer)>(0x009DA620);
+        inline void BlockHit(int16_t A, VB6BoolVal HitDown=VB6BoolVal::VB_FALSE, int16_t whatPlayer=0) { SafeFPUControl::clear(); _BlockHit_ptr(A, HitDown, whatPlayer); }
         static const auto _BlockShakeUp_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009E0940);
         inline void BlockShakeUp(int16_t A) { SafeFPUControl::clear(); _BlockShakeUp_ptr(A); }
         static const auto _BlockShakeUpPow_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009E0A00);
@@ -317,14 +317,14 @@ namespace SMBX13 {
         inline void BlockShakeDown(int16_t A) { SafeFPUControl::clear(); _BlockShakeDown_ptr(A); }
         static const auto _BlockHitHard_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009E0B80);
         inline void BlockHitHard(int16_t A) { SafeFPUControl::clear(); _BlockHitHard_ptr(A); }
-        static const auto _KillBlock_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6Bool& Splode)>(0x009E0D50);
-        inline void KillBlock(int16_t A, VB6Bool Splode=true) { SafeFPUControl::clear(); _KillBlock_ptr(A, Splode); }
+        static const auto _KillBlock_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, VB6BoolVal& Splode)>(0x009E0D50);
+        inline void KillBlock(int16_t A, VB6BoolVal Splode=VB6BoolVal::VB_TRUE) { SafeFPUControl::clear(); _KillBlock_ptr(A, Splode); }
         static const auto _BlockFrames_ptr = reinterpret_cast<void(__stdcall *)()>(0x009E14B0);
         inline void BlockFrames() { SafeFPUControl::clear(); _BlockFrames_ptr(); }
         static const auto _UpdateBlocks_ptr = reinterpret_cast<void(__stdcall *)()>(0x009E2090);
         inline void UpdateBlocks() { SafeFPUControl::clear(); _UpdateBlocks_ptr(); }
-        static const auto _PSwitch_ptr = reinterpret_cast<void(__stdcall *)(VB6Bool& bool_)>(0x009E33B0);
-        inline void PSwitch(VB6Bool bool_) { SafeFPUControl::clear(); _PSwitch_ptr(bool_); }
+        static const auto _PSwitch_ptr = reinterpret_cast<void(__stdcall *)(VB6BoolVal& bool_)>(0x009E33B0);
+        inline void PSwitch(VB6BoolVal bool_) { SafeFPUControl::clear(); _PSwitch_ptr(bool_); }
         static const auto _PowBlock_ptr = reinterpret_cast<void(__stdcall *)()>(0x009E4600);
         inline void PowBlock() { SafeFPUControl::clear(); _PowBlock_ptr(); }
     }
@@ -332,8 +332,8 @@ namespace SMBX13 {
     namespace modEffect {
         static const auto _UpdateEffects_ptr = reinterpret_cast<void(__stdcall *)()>(0x009E4900);
         inline void UpdateEffects() { SafeFPUControl::clear(); _UpdateEffects_ptr(); }
-        static const auto _NewEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, SMBX13::Types::Location_t const& Location, float& Direction, int16_t& NewNpc, VB6Bool& Shadow)>(0x009E7380);
-        inline void NewEffect(int16_t A, SMBX13::Types::Location_t const& Location, float Direction=1, int16_t NewNpc=0, VB6Bool Shadow=false) { SafeFPUControl::clear(); _NewEffect_ptr(A, Location, Direction, NewNpc, Shadow); }
+        static const auto _NewEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A, SMBX13::Types::Location_t const& Location, float& Direction, int16_t& NewNpc, VB6BoolVal& Shadow)>(0x009E7380);
+        inline void NewEffect(int16_t A, SMBX13::Types::Location_t const& Location, float Direction=1, int16_t NewNpc=0, VB6BoolVal Shadow=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _NewEffect_ptr(A, Location, Direction, NewNpc, Shadow); }
         static const auto _KillEffect_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x009EC150);
         inline void KillEffect(int16_t A) { SafeFPUControl::clear(); _KillEffect_ptr(A); }
     }
@@ -355,8 +355,8 @@ namespace SMBX13 {
         inline void zTestLevel() { SafeFPUControl::clear(); _zTestLevel_ptr(); }
         static const auto _EditorNPCFrame_ptr = reinterpret_cast<int16_t(__stdcall *)(int16_t& A, float& C, int16_t& N)>(0x00A03630);
         inline int16_t EditorNPCFrame(int16_t A, float C, int16_t N) { SafeFPUControl::clear(); return _EditorNPCFrame_ptr(A, C, N); }
-        static const auto _MouseMove_ptr = reinterpret_cast<void(__stdcall *)(float& X, float& Y, VB6Bool& nCur)>(0x00A041D0);
-        inline void MouseMove(float X, float Y, VB6Bool nCur=false) { SafeFPUControl::clear(); _MouseMove_ptr(X, Y, nCur); }
+        static const auto _MouseMove_ptr = reinterpret_cast<void(__stdcall *)(float& X, float& Y, VB6BoolVal& nCur)>(0x00A041D0);
+        inline void MouseMove(float X, float Y, VB6BoolVal nCur=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _MouseMove_ptr(X, Y, nCur); }
         static const auto _ResetNPC_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x00A05C40);
         inline void ResetNPC(int16_t A) { SafeFPUControl::clear(); _ResetNPC_ptr(A); }
         static const auto _BlockFill_ptr = reinterpret_cast<void(__stdcall *)(SMBX13::Types::Location_t& Loc)>(0x00A05D20);
@@ -390,8 +390,8 @@ namespace SMBX13 {
         inline void NPCSpecial(int16_t A) { SafeFPUControl::clear(); _NPCSpecial_ptr(A); }
         static const auto _SpecialNPC_ptr = reinterpret_cast<void(__stdcall *)(int16_t& A)>(0x00A52BB0);
         inline void SpecialNPC(int16_t A) { SafeFPUControl::clear(); _SpecialNPC_ptr(A); }
-        static const auto _CharStuff_ptr = reinterpret_cast<void(__stdcall *)(int16_t& WhatNPC, VB6Bool& CheckEggs)>(0x00A60AF0);
-        inline void CharStuff(int16_t WhatNPC=0, VB6Bool CheckEggs=false) { SafeFPUControl::clear(); _CharStuff_ptr(WhatNPC, CheckEggs); }
+        static const auto _CharStuff_ptr = reinterpret_cast<void(__stdcall *)(int16_t& WhatNPC, VB6BoolVal& CheckEggs)>(0x00A60AF0);
+        inline void CharStuff(int16_t WhatNPC=0, VB6BoolVal CheckEggs=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _CharStuff_ptr(WhatNPC, CheckEggs); }
         static const auto _RandomBonus_ptr = reinterpret_cast<void(__stdcall *)()>(0x00A61A00);
         inline void RandomBonus() { SafeFPUControl::clear(); _RandomBonus_ptr(); }
     }
@@ -414,8 +414,8 @@ namespace SMBX13 {
     namespace modJoystick {
         static const auto _UpdateControls_ptr = reinterpret_cast<void(__stdcall *)()>(0x00A74910);
         inline void UpdateControls() { SafeFPUControl::clear(); _UpdateControls_ptr(); }
-        static const auto _StartJoystick_ptr = reinterpret_cast<VB6Bool(__stdcall *)(int16_t JoystickNumber)>(0x00A75680);
-        inline VB6Bool StartJoystick(int16_t JoystickNumber=0) { SafeFPUControl::clear(); return _StartJoystick_ptr(JoystickNumber); }
+        static const auto _StartJoystick_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(int16_t JoystickNumber)>(0x00A75680);
+        inline bool StartJoystick(int16_t JoystickNumber=0) { SafeFPUControl::clear(); return FromVB6BoolVal(_StartJoystick_ptr(JoystickNumber)); }
         static const auto _PollJoystick_ptr = reinterpret_cast<void(__stdcall *)()>(0x00A75820);
         inline void PollJoystick() { SafeFPUControl::clear(); _PollJoystick_ptr(); }
     }
@@ -895,12 +895,12 @@ namespace SMBX13 {
     }
 
     namespace modLayers {
-        static const auto _ShowLayer_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& LayerName, VB6Bool& NoEffect)>(0x00AA2760);
-        inline void ShowLayer(VB6StrPtr LayerName, VB6Bool NoEffect=false) { SafeFPUControl::clear(); _ShowLayer_ptr(LayerName, NoEffect); }
-        static const auto _HideLayer_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& LayerName, VB6Bool& NoEffect)>(0x00AA3730);
-        inline void HideLayer(VB6StrPtr LayerName, VB6Bool NoEffect=false) { SafeFPUControl::clear(); _HideLayer_ptr(LayerName, NoEffect); }
-        static const auto _ProcEvent_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& EventName, VB6Bool& NoEffect)>(0x00AA42D0);
-        inline void ProcEvent(VB6StrPtr EventName, VB6Bool NoEffect=false) { SafeFPUControl::clear(); _ProcEvent_ptr(EventName, NoEffect); }
+        static const auto _ShowLayer_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& LayerName, VB6BoolVal& NoEffect)>(0x00AA2760);
+        inline void ShowLayer(VB6StrPtr LayerName, VB6BoolVal NoEffect=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _ShowLayer_ptr(LayerName, NoEffect); }
+        static const auto _HideLayer_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& LayerName, VB6BoolVal& NoEffect)>(0x00AA3730);
+        inline void HideLayer(VB6StrPtr LayerName, VB6BoolVal NoEffect=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _HideLayer_ptr(LayerName, NoEffect); }
+        static const auto _ProcEvent_ptr = reinterpret_cast<void(__stdcall *)(VB6StrPtr& EventName, VB6BoolVal& NoEffect)>(0x00AA42D0);
+        inline void ProcEvent(VB6StrPtr EventName, VB6BoolVal NoEffect=VB6BoolVal::VB_FALSE) { SafeFPUControl::clear(); _ProcEvent_ptr(EventName, NoEffect); }
         static const auto _UpdateEvents_ptr = reinterpret_cast<void(__stdcall *)()>(0x00AA60E0);
         inline void UpdateEvents() { SafeFPUControl::clear(); _UpdateEvents_ptr(); }
         static const auto _UpdateLayers_ptr = reinterpret_cast<void(__stdcall *)()>(0x00AA6710);
@@ -1291,8 +1291,8 @@ namespace SMBX13 {
     }
 
     namespace frmLevelAdv_Private {
-        static const auto _CloneLoc_ptr = reinterpret_cast<VB6Bool(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00B23F40);
-        inline VB6Bool CloneLoc(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return _CloneLoc_ptr(Loc1, Loc2); }
+        static const auto _CloneLoc_ptr = reinterpret_cast<VB6BoolVal(__stdcall *)(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2)>(0x00B23F40);
+        inline bool CloneLoc(SMBX13::Types::Location_t& Loc1, SMBX13::Types::Location_t& Loc2) { SafeFPUControl::clear(); return FromVB6BoolVal(_CloneLoc_ptr(Loc1, Loc2)); }
     }
 
     // All public functions
