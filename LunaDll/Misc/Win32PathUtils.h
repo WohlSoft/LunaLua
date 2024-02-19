@@ -133,6 +133,26 @@ public:
     const T& str_lower() const { return mDataLower; }
 };
 
+template <typename... T>
+std::basic_string<T...> getExtension(const std::basic_string<T...>& str)
+{
+    size_t idx = str.size();
+    if (idx == 0) return str.substr(0,0);
+    idx--;
+    for (; idx >= 0; idx--)
+    {
+        if (str[idx] == '.')
+        {
+            return str.substr(idx);
+        }
+        if ((str[idx] == '/') || (str[idx] == '\\') || (idx == 0))
+        {
+            break;
+        }
+    }
+    return str.substr(0, 0);
+}
+
 bool isAbsolutePath(const std::wstring& path);
 bool isAbsolutePath(const std::string& path);
 

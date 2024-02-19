@@ -384,12 +384,9 @@ void MusicManager::loadSounds(std::string path, std::string root)
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
 
-        // If no extension...
-        size_t findLastSlash = fileName.find_last_of("/\\");
-        size_t findLastDot = fileName.find_last_of(".", findLastSlash);
-
-        // Append missing extension
-        if (findLastDot == std::wstring::npos)
+        // If no extension... append missing extension
+        std::string ext = getExtension(fileName);
+        if (ext.size() == 0)
         {
             static const char* extensionOptions[] = { ".ogg", ".mp3", ".wav", ".voc", ".flac", ".spc" };
             for (int j=0; j < (sizeof(extensionOptions) / sizeof(extensionOptions[0])); j++)

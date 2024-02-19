@@ -1661,11 +1661,11 @@ void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename)
     }
 
     // Append missing extension
-    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
-    if (findLastDot == std::wstring::npos)
+    // Note: 1.3 always added .lvl if it didn't end with .lvl or .dat (though I've never seen a .dat level)
+    std::wstring ext = getExtension(filePath);
+    if ((ext != L".lvlx") && (ext != L".lvl") && (ext != L".dat"))
     {
-        if (!hasSuffix(filePath, L".lvl") && !hasSuffix(filePath, L".lvlx"))
-            filePath.append(L".lvl");
+        filePath.append(L".lvl");
     }
 
     if (!FileFormats::OpenLevelFileHeader(utf8_encode(filePath), levelData))
