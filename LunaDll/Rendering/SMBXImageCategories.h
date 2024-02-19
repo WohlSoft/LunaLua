@@ -83,7 +83,7 @@ public:
 
 static const SMBXImageCategory smbxImageCategoryBlock =       { L"block",                 Block::MAX_ID, GM_GFX_BLOCKS_PTR_POINTER, GM_GFX_BLOCKS_MASK_PTR_POINTER, nullptr, nullptr, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryBackground2 = { L"background2",                     100, GM_GFX_BACKGROUND2_PTR_POINTER, nullptr, GM_GFX_BACKGROUND2_W_PTR_POINTER, GM_GFX_BACKGROUND2_H_PTR_POINTER, nullptr, 1 };
-static const SMBXImageCategory smbxImageCategoryNpc =         { L"npc",                     NPC::MAX_ID, GM_GFX_NPC_PTR_POINTER, GM_GFX_NPC_MASK_PTR_POINTER, nullptr, nullptr, nullptr, 1 };
+static const SMBXImageCategory smbxImageCategoryNpc =         { L"npc",                     NPC::MAX_ID, GM_GFX_NPC_PTR_POINTER, GM_GFX_NPC_MASK_PTR_POINTER, GM_GFX_NPC_W_PTR_POINTER, GM_GFX_NPC_H_PTR_POINTER, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryEffect =      { L"effect",        SMBXAnimation::MAX_ID, GM_GFX_EFFECTS_PTR_POINTER, GM_GFX_EFFECTS_MASK_PTR_POINTER, GM_GFX_EFFECTS_W_PTR_POINTER, GM_GFX_EFFECTS_H_PTR_POINTER, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryBackground =  { L"background",         SMBX_BGO::MAX_ID, GM_GFX_BACKGROUND_PTR_POINTER, GM_GFX_BACKGROUND_MASK_PTR_POINTER, GM_GFX_BACKGROUND_W_PTR_POINTER, GM_GFX_BACKGROUND_H_PTR_POINTER, nullptr, 1 };
 static const SMBXImageCategory smbxImageCategoryMario =       { L"mario",                            10, GM_GFX_MARIO_PTR_POINTER, GM_GFX_MARIO_MASK_PTR_POINTER, GM_GFX_MARIO_W_PTR_POINTER, GM_GFX_MARIO_H_PTR_POINTER, nullptr, 1 };
