@@ -108,6 +108,10 @@ namespace Blocks {
     void SetBlockNPCFilter(int id, short npcId);
     bool GetBlockWalkPastStair(int id);
     void SetBlockWalkPastStair(int id, bool walkpaststair);
+    unsigned char GetBlockHurtSide(int id);
+    void SetBlockHurtSide(int id, unsigned char options);
+    bool GetBlockSwordBounce(int id);
+    void SetBlockSwordBounce(int id, bool mountsafe);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
     bool FilterSemisolidSlopeCollision(Momentum* entityMomentum, Momentum* speed, int blockIdx, int entityBottomCollisionTimer, bool standingOnSlope);

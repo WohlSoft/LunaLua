@@ -134,6 +134,8 @@ static int16_t blockprop_bumpable[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_playerfilter[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_npcfilter[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_walkpaststair[Block::MAX_ID + 1] = { 0 }; // whether to walk past semisolid slopes (like ghost house stairs)
+static int16_t blockprop_swordbounce[Block::MAX_ID + 1] = { 0 };
+static uint8_t blockprop_hurtside[Block::MAX_ID + 1] = { 0 };
 
 void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
@@ -142,6 +144,8 @@ void Blocks::InitProperties() {
         SetBlockPlayerFilter(id, 0);
         SetBlockNPCFilter(id, 0);
         SetBlockWalkPastStair(id, false);
+        SetBlockHurtSide(id, 0x00);
+        SetBlockSwordBounce(id, false);
     }
 
     // Default game config
@@ -172,6 +176,34 @@ void Blocks::InitProperties() {
     SetBlockPlayerFilter(628, 3);
     SetBlockPlayerFilter(629, 4);
     SetBlockPlayerFilter(632, 5);
+
+    SetBlockHurtSide(109, (0x80 | 0x40));
+    SetBlockHurtSide(110, (0x80 | 0x02));
+    SetBlockHurtSide(267, (0x80 | 0x04));
+    SetBlockHurtSide(268, (0x80 | 0x08));
+    SetBlockHurtSide(269, (0x80 | 0x10));
+    SetBlockHurtSide(407, (0x80 | 0x08));
+    SetBlockHurtSide(408, (0x80 | 0x02));
+    SetBlockHurtSide(428, (0x80 | 0x04));
+    SetBlockHurtSide(429, (0x80 | 0x10));
+    SetBlockHurtSide(430, (0x80 | 0x02));
+    SetBlockHurtSide(431, (0x80 | 0x08));
+    SetBlockHurtSide(511, (0x80 | 0x02));
+    SetBlockHurtSide(598, 0x40);
+
+    SetBlockSwordBounce(109, true);
+    SetBlockSwordBounce(110, true);
+    SetBlockSwordBounce(267, true);
+    SetBlockSwordBounce(268, true);
+    SetBlockSwordBounce(269, true);
+    SetBlockSwordBounce(407, true);
+    SetBlockSwordBounce(408, true);
+    SetBlockSwordBounce(428, true);
+    SetBlockSwordBounce(429, true);
+    SetBlockSwordBounce(430, true);
+    SetBlockSwordBounce(431, true);
+    SetBlockSwordBounce(511, true);
+    SetBlockSwordBounce(598, true);
 }
 
 bool Blocks::GetBlockBumpable(int id) {
@@ -218,6 +250,26 @@ void Blocks::SetBlockWalkPastStair(int id, bool walkpaststair) {
     blockprop_walkpaststair[id] = walkpaststair ? -1 : 0;
 }
 
+unsigned char Blocks::GetBlockHurtSide(int id) {
+    if ((id < 1) || (id > Block::MAX_ID)) return false;
+    return blockprop_hurtside[id];
+}
+
+void Blocks::SetBlockHurtSide(int id, unsigned char options) {
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_hurtside[id] = options;
+}
+
+bool Blocks::GetBlockSwordBounce(int id) {
+    if ((id < 1) || (id > Block::MAX_ID)) return false;
+    return (blockprop_swordbounce[id] != 0);
+}
+
+void Blocks::SetBlockSwordBounce(int id, bool swordbounce) {
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_swordbounce[id] = swordbounce ? -1 : 0;
+}
+
 // Getter for address of Block property arrays
 uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
 {
@@ -236,6 +288,14 @@ uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
     else if (s == "walkpaststair")
     {
         return reinterpret_cast<uintptr_t>(blockprop_walkpaststair);
+    }
+    else if (s == "hurtside")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_hurtside);
+    }
+    else if (s == "swordbounce")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_swordbounce);
     }
     else
     {
