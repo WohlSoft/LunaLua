@@ -1979,7 +1979,7 @@ __declspec(naked) void __stdcall runtimeHookGrabbedNPCCollisionGroup(void)
 
         cmp eax, 0 // return value
         je cancel_collision
-        lea eax, dword ptr ss : [ebp - 180] // Replace what we're patching over
+        lea eax, dword ptr ss : [ebp - 0x180] // Replace what we're patching over
         push 0xA0C42B
         ret
         cancel_collision :
