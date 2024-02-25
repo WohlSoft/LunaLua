@@ -39,6 +39,7 @@ void TrySkipPatch();
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<6> gDisableNPCDownwardClipFixSlope;
+extern AsmPatch<21> gNPCCeilingBugFix;
 extern Patchable& gNPCSectionFix;
 extern Patchable& gFenceFixes;
 extern Patchable& gLinkFairyClowncarFixes;

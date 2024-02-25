@@ -1266,6 +1266,8 @@ static unsigned int __stdcall LatePatch(void)
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
 
+AsmPatch<21> gNPCCeilingBugFix = PATCH(0xA17155).NOP_PAD_TO_SIZE<21>();
+
 // NOTE: This patch replaces a section 167 bytes long from 0xA13188 to 0xA1322E, but we don't NOP out the whole thing
 //       since that would conflict with NpcIdExtender, and this patch may be turned on/off at runtime.
 AsmPatch<6> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<6>();
@@ -2082,6 +2084,9 @@ void TrySkipPatch()
 
     // Hook to fix an NPC's section property when it spawn out of bounds
     gNPCSectionFix.Apply();
+
+    // Hook to fix erroneous Y speed after an NPC hits a ceiling
+    gNPCCeilingBugFix.Apply(); 
 
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
