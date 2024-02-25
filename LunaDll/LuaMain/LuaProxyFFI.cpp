@@ -534,6 +534,18 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetNPCCeilingBugFix(bool enable)
+    {
+        if (enable)
+        {
+            gNPCCeilingBugFix.Apply();
+        }
+        else
+        {
+            gNPCCeilingBugFix.Unapply();
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetNPCSectionFix(bool enable)
     {
         if (enable)
