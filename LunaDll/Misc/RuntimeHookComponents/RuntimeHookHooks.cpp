@@ -3885,6 +3885,11 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
     if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
 
+    // Check noNPCCollision
+    if (extA->nonpccollision || extB->nonpccollision) {
+        return 0; // Collision cancelled
+    }
+
     return -1; // Collision goes ahead
 }
 
