@@ -408,6 +408,16 @@ extern "C" {
         return (int)SDL_JOYSTICK_POWER_UNKNOWN;
     }
 
+    struct StickPos
+    {
+        int x;
+        int y;
+    };
+    FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
+    {
+        return {gLunaGameControllerManager.getSelectedControllerStickX(playerNum), gLunaGameControllerManager.getSelectedControllerStickY(playerNum)};
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
     {
         static std::string name;
