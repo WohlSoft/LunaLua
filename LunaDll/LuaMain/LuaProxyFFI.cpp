@@ -415,7 +415,9 @@ extern "C" {
     };
     FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
     {
-        return {gLunaGameControllerManager.getSelectedControllerStickX(playerNum), gLunaGameControllerManager.getSelectedControllerStickY(playerNum)};
+        const auto stickPos = gLunaGameControllerManager.getSelectedControllerStickPosition(playerNum);
+
+        return {std::get<0>(stickPos), std::get<1>(stickPos)};
     }
 
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
