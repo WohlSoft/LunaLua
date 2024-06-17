@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <memory>
+#include <tuple>
 #include "LunaGameController.h"
 #if !defined(BUILDING_SMBXLAUNCHER)
 #   ifdef _WIN32
@@ -486,24 +487,14 @@ std::string LunaGameControllerManager::getSelectedControllerName(int playerNum)
     return "Keyboard";
 }
 
-int LunaGameControllerManager::getSelectedControllerStickX(int playerNum)
+std::tuple<int, int> LunaGameControllerManager::getSelectedControllerStickPosition(int playerNum)
 {
     LunaGameController* controller = getController(playerNum);
     if (controller != nullptr)
     {
-        return controller->getStickX();
+        return controller->getStickPosition();
     }
-    return 0;
-}
-
-int LunaGameControllerManager::getSelectedControllerStickY(int playerNum)
-{
-    LunaGameController* controller = getController(playerNum);
-    if (controller != nullptr)
-    {
-        return controller->getStickY();
-    }
-    return 0;
+    return {0, 0};
 }
 
 void LunaGameControllerManager::rumbleSelectedController(int playerNum, int ms, float strength)
