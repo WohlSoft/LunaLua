@@ -55,6 +55,8 @@ public:
     inline void clearActive() { activeFlag = false; }
     inline unsigned int getPadState() const { return padState; }
     inline unsigned int getButtonState() const { return buttonState; }
+    inline int getStickX() const { return static_cast<int>(xAxis); }
+    inline int getStickY() const { return static_cast<int>(yAxis); }
 
     SDL_JoystickPowerLevel getPowerLevel();
 
@@ -115,6 +117,8 @@ private:
     unsigned int axisPadState;
     unsigned int padState;
     unsigned int buttonState;
+    unsigned int xAxis;
+    unsigned int yAxis;
     bool activeFlag;
     std::vector<int> joyButtonMap;
 };
@@ -156,6 +160,8 @@ public:
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
     std::string getSelectedControllerName(int playerNum);
+    int getSelectedControllerStickX(int playerNum);
+    int getSelectedControllerStickY(int playerNum);
     void rumbleSelectedController(int playerNum, int ms, float strength);
     LunaGameController* getController(int playerNum);
 private:

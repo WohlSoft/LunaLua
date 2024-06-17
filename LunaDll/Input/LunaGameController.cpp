@@ -486,6 +486,26 @@ std::string LunaGameControllerManager::getSelectedControllerName(int playerNum)
     return "Keyboard";
 }
 
+int LunaGameControllerManager::getSelectedControllerStickX(int playerNum)
+{
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
+    {
+        return controller->getStickX();
+    }
+    return 0;
+}
+
+int LunaGameControllerManager::getSelectedControllerStickY(int playerNum)
+{
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
+    {
+        return controller->getStickY();
+    }
+    return 0;
+}
+
 void LunaGameControllerManager::rumbleSelectedController(int playerNum, int ms, float strength)
 {
     LunaGameController* controller = getController(playerNum);
@@ -660,6 +680,8 @@ LunaGameController::LunaGameController(LunaGameControllerManager* _managerPtr, S
     axisPadState(0),
     padState(0),
     buttonState(0),
+    xAxis(0),
+    yAxis(0),
     activeFlag(false),
     joyButtonMap()
 {
@@ -773,6 +795,8 @@ LunaGameController::LunaGameController(LunaGameController &&other)
     axisPadState    = other.axisPadState;
     padState        = other.padState;
     buttonState     = other.buttonState;
+    xAxis           = other.xAxis;
+    yAxis           = other.yAxis;
     activeFlag      = other.activeFlag;
     joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
@@ -795,6 +819,8 @@ LunaGameController & LunaGameController::operator=(LunaGameController &&other)
     axisPadState    = other.axisPadState;
     padState        = other.padState;
     buttonState     = other.buttonState;
+    xAxis           = other.xAxis;
+    yAxis           = other.yAxis;
     activeFlag      = other.activeFlag;
     joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
@@ -986,11 +1012,13 @@ void LunaGameController::controllerAxisEvent(const SDL_ControllerAxisEvent& even
         axisAsDirectional = true;
         posPadNumber = CONTROLLER_PAD_RIGHT;
         negPadNumber = CONTROLLER_PAD_LEFT;
+        xAxis = (int)event.value;
         break;
     case SDL_CONTROLLER_AXIS_LEFTY:
         axisAsDirectional = true;
         posPadNumber = CONTROLLER_PAD_DOWN;
         negPadNumber = CONTROLLER_PAD_UP;
+        yAxis = (int)event.value;
         break;
     default:
         break;
