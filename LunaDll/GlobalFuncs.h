@@ -165,5 +165,3 @@ namespace LunaMsgBox
     int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
     bool IsActive();
 }
-
-bool createSFXStartLuaEvent(int id, std::string path);

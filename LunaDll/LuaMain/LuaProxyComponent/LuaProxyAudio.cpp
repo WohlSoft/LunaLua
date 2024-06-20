@@ -228,15 +228,6 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
-std::string LuaProxy::Audio::MusicGet()
-{
-#ifndef NO_SDL
-    return PGE_MusPlayer::MUS_get();
-#else
-    return "";
-#endif
-}
-
 
 
 void LuaProxy::Audio::seizeStream(int section)
