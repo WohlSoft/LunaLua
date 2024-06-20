@@ -476,6 +476,7 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncMisc.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncNative.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEpisode.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
     <ClCompile Include="Rendering\GL\GLContextManager.cpp" />
     <ClCompile Include="Rendering\GL\GLDraw.cpp" />

@@ -996,6 +996,9 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncGraphics.cpp">
       <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
     </ClCompile>
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEpisode.cpp">
+      <Filter>LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions</Filter>
+    </ClCompile>
     <ClCompile Include="Misc\Gui\GuiCrashNotify.cpp">
       <Filter>Misc\Gui</Filter>
     </ClCompile>

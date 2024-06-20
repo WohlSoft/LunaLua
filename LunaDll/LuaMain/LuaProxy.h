@@ -920,7 +920,6 @@ namespace LuaProxy {
         void warning(const std::string& str);
         void registerCharacterId(const luabind::object& namedArgs, lua_State* L);
         std::string showRichDialog(const std::string& title, const std::string& rtfText, bool isReadOnly);
-        luabind::object getEpisodeList(lua_State *L);
 
         // Internal use profiler functions
         void __enablePerfTracker();
@@ -997,6 +996,14 @@ namespace LuaProxy {
         luabind::object openWorld(const std::string &filePath, lua_State *L);
         //luabind::object getWorldData(lua_State *L); // TODO: Implement this once PGEFL will handle WorldMap reading
         luabind::object openNpcConfig(const std::string &filePath, lua_State *L);
+    }
+    
+    namespace Episode{
+        luabind::object list(lua_State *L);
+        int id();
+        std::string name();
+        std::string path();
+        std::string filename();
     }
 
     //Non-Member-Constructors:

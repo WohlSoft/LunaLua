@@ -30,6 +30,10 @@
 #include "Defines.h"
 #include "Misc/LoadScreen.h"
 
+#include "SMBXInternal/Types.h"
+#include "SMBXInternal/Variables.h"
+#include "SMBXInternal/Functions.h"
+
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
     dest.clear();
@@ -1094,8 +1098,7 @@ std::string replaceFowardSlashesWithBackSlashes(std::string str)
 
 bool checkIfWorldIsInAppPath(std::string worldPath)
 {
-    std::string appPath = WStr2Str(gAppPathWCHAR);
-    if(!worldPath.find(appPath))
+    if(!worldPath.find(gAppPathUTF8))
     {
         return true;
     }
@@ -1107,7 +1110,7 @@ bool checkIfWorldIsInAppPath(std::string worldPath)
 
 bool checkIfWorldIsInWorldPath(std::string worldPath)
 {
-    std::string appPath = WStr2Str(gAppPathWCHAR) + "\\worlds";
+    std::string appPath = gAppPathUTF8 + "\\worlds";
     if(!worldPath.find(appPath))
     {
         return true;
@@ -1118,22 +1121,17 @@ bool checkIfWorldIsInWorldPath(std::string worldPath)
     }
 }
 
-bool CheckCollision(Momentum momentumA, Momentum momentumB)
-{
-    return  ((momentumA.y + momentumA.height >= momentumB.y) &&
-            (momentumA.y <= momentumB.y + momentumB.height) &&
-            (momentumA.x <= momentumB.x + momentumB.width) &&
-            (momentumA.x + momentumA.width >= momentumB.x));
-}
-
 int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 {
+    using namespace SMBX13;
+
     int id = 0;
-    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i);
-        if(worldName == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(worldName == std::string(ep.WorldPath) + std::string(ep.WorldFile))
         {
-            id = i;
+            id = i + 1;
             break;
         }
     }
@@ -1142,12 +1140,16 @@ int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 
 std::string findEpisodeWorldPathFromName(std::string name)
 {
+    using namespace SMBX13;
+
     std::string finalWldPath = "";
-    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i);
-        if(name == std::string(ep->episodeName))
+
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(name == std::string(ep.WorldName))
         {
-            finalWldPath = std::string(ep->episodePath) + std::string(ep->episodeWorldFile);
+            finalWldPath = std::string(ep.WorldPath) + std::string(ep.WorldFile);
             break;
         }
         else
@@ -1160,12 +1162,16 @@ std::string findEpisodeWorldPathFromName(std::string name)
 
 std::string findNameFromEpisodeWorldPath(std::string wldPath)
 {
+    using namespace SMBX13;
+
     std::string finalName = "";
-    for (int i = 1; i <= GM_EP_LIST_COUNT; i++) {
-        auto ep = EpisodeListItem::Get(i);
-        if(wldPath == std::string(ep->episodePath) + std::string(ep->episodeWorldFile))
+
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(wldPath == std::string(ep.WorldPath) + std::string(ep.WorldFile))
         {
-            finalName = std::string(ep->episodeName);
+            finalName = std::string(ep.WorldName);
             break;
         }
         else
@@ -1178,11 +1184,15 @@ std::string findNameFromEpisodeWorldPath(std::string wldPath)
 
 int getUnblockedCharacterFromWorld(int curWorldID)
 {
+    using namespace SMBX13;
+
     int identity = 1;
-    EpisodeListItem* ep = EpisodeListItem::GetRaw(curWorldID);
+
+    auto& ep = Vars::SelectWorld[curWorldID];
+
     for (int i = 1; i <= 5; i++)
     {
-        if(ep->blockChar[i - 1] == 0)
+        if(!ep.blockChar[i])
         {
             identity = i;
             break;
@@ -1195,14 +1205,17 @@ int getUnblockedCharacterFromWorld(int curWorldID)
 
 void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
 {
-    for (size_t i = 0; i < 5; i++)
+    using namespace SMBX13;
+
+    for (int i = 1; i <= 5; i++)
     {
-        auto p = Player::Get(playerID);
-        EpisodeListItem* ep = EpisodeListItem::Get(GM_CUR_MENULEVEL);
-        if(ep->blockChar[i] == -1 && p->Identity == static_cast<Characters>(i + 1))
+        auto& p = Vars::Player[playerID];
+        auto& ep = Vars::SelectWorld[Vars::selWorld];
+
+        if(ep.blockChar[i] && p.Character == i)
         {
             // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked
-            p->Identity = static_cast<Characters>(getUnblockedCharacterFromWorld(GM_CUR_MENULEVEL));
+            p.Character = getUnblockedCharacterFromWorld(Vars::selWorld);
         }
     }
 }

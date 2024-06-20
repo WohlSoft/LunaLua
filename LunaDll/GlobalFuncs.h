@@ -170,9 +170,6 @@ std::string findNameFromEpisodeWorldPath(std::string wldPath);
 int getUnblockedCharacterFromWorld(int curWorldID);
 void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID);
 
-// Collision functions
-bool CheckCollision(Momentum momentumA, Momentum momentumB);
-
 namespace LunaMsgBox
 {
     int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);

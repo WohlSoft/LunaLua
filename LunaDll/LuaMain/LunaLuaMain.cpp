@@ -740,8 +740,7 @@ void CLunaLua::bindAll()
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),
                 def("__getNPCPropertyTableAddress", &NPC::GetPropertyTableAddress),
                 def("__getBlockPropertyTableAddress", &Blocks::GetPropertyTableAddress),
-                def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem),
-                def("getEpisodeList", &LuaProxy::Misc::getEpisodeList)
+                def("getEditorPlacedItem",(std::string(*)())&GetEditorPlacedItem)
             ],
 
             namespace_("FileFormats")[
@@ -982,6 +981,16 @@ void CLunaLua::bindAll()
                 def("__getMuteForAlias", LuaProxy::Audio::__getMuteForAlias)
             ],
             /*************************Audio*end*************************/
+            
+            namespace_("Episode")[
+                def("list", &LuaProxy::Episode::list),
+                def("id", (int(*)())&LuaProxy::Episode::id),
+
+                def("name", (std::string(*)())&LuaProxy::Episode::name),
+                def("path", (std::string(*)())&LuaProxy::Episode::path),
+                def("filename", (std::string(*)())&LuaProxy::Episode::filename)
+                
+            ],
 
             LUAHELPER_DEF_CLASS(NativeInputConfig)
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
