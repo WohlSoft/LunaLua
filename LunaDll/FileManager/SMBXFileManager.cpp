@@ -83,12 +83,12 @@ void SMBXLevelFileBase::ReadFile(const std::wstring& fullPath, LevelData &outDat
                                 "in the full path.");
     }
 
-    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
     // Append missing extension
-    if (m_isValid && (findLastDot == std::wstring::npos))
+    // Note: 1.3 always added .lvl if it didn't end with .lvl or .dat (though I've never seen a .dat level)
+    std::wstring ext = getExtension(filePath);
+    if (m_isValid && (ext != L".lvlx") && (ext != L".lvl") && (ext != L".dat"))
     {
-        if(!hasSuffix(filePath, L".lvl") && !hasSuffix(filePath, L".lvlx"))
-            filePath.append(L".lvl");
+        filePath.append(L".lvl");
     }
 
     if (!fileExists(filePath))

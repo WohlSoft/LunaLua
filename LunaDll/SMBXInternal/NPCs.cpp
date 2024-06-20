@@ -273,6 +273,7 @@ static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_luahandlesspeed[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_walkpastnpcs[NPC::MAX_ID + 1] = { 0 };
 static double npcprop_terminalvelocity[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
@@ -294,6 +295,7 @@ void NPC::InitProperties() {
         npcprop_staticdirection[i] = 0;
         npcprop_luahandlesspeed[i] = 0;
         npcprop_terminalvelocity[i] = 0;
+        npcprop_walkpastnpcs[i] = 0;
     }
 
     // Set built-in spinjump safe IDs
@@ -564,6 +566,12 @@ bool NPC::GetLuaHandlesSpeed(int id) {
     return (npcprop_luahandlesspeed[id] != 0);
 }
 
+bool NPC::GetWalkPastNPCs(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_walkpastnpcs[id] != 0);
+}
+
+
 double NPC::GetTerminalVelocity(int id) {
     if ((id < 1) || (id > NPC::MAX_ID) || (npcprop_terminalvelocity[id] == 0))
     {
@@ -625,6 +633,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "terminalvelocity")
     {
         return reinterpret_cast<uintptr_t>(npcprop_terminalvelocity);
+    }
+    else if (s == "walkpastnpcs")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_walkpastnpcs);
     }
     else
     {

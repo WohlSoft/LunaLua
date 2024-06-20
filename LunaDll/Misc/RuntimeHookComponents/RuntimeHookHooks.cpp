@@ -837,12 +837,18 @@ static __declspec(naked) void updateInput_Orig()
 
 extern void __stdcall runtimeHookUpdateInput()
 {
-    if (gMainWindowFocused)
+    gLunaGameControllerManager.pollInputs();
+    gEscPressedRegistered = gEscPressed;
+    gEscPressed = false;
+    if (gMainWindowFocused || !gStartupSettings.runWhenUnfocused)
     {
-        gLunaGameControllerManager.pollInputs();
-        gEscPressedRegistered = gEscPressed;
-        gEscPressed = false;
+        // Only run player input update if focused, if we're able to run at all when unfocused
         updateInput_Orig();
+    }
+    else
+    {
+        // But if we're not running input update code, we still need to let Lua code act normal anyway
+        g_EventHandler.hookInputUpdate();
     }
 }
 
@@ -1751,11 +1757,11 @@ void __stdcall runtimeHookLoadLevelHeader(SMBX_Warp* warp, wchar_t* filename)
     }
 
     // Append missing extension
-    size_t findLastDot = filePath.find_last_of(L".", findLastSlash);
-    if (findLastDot == std::wstring::npos)
+    // Note: 1.3 always added .lvl if it didn't end with .lvl or .dat (though I've never seen a .dat level)
+    std::wstring ext = getExtension(filePath);
+    if ((ext != L".lvlx") && (ext != L".lvl") && (ext != L".dat"))
     {
-        if (!hasSuffix(filePath, L".lvl") && !hasSuffix(filePath, L".lvlx"))
-            filePath.append(L".lvl");
+        filePath.append(L".lvl");
     }
 
     if (!FileFormats::OpenLevelFileHeader(utf8_encode(filePath), levelData))
@@ -2069,7 +2075,7 @@ __declspec(naked) void __stdcall runtimeHookGrabbedNPCCollisionGroup(void)
 
         cmp eax, 0 // return value
         je cancel_collision
-        lea eax, dword ptr ss : [ebp - 180] // Replace what we're patching over
+        lea eax, dword ptr ss : [ebp - 0x180] // Replace what we're patching over
         push 0xA0C42B
         ret
         cancel_collision :
@@ -2192,19 +2198,6 @@ static _declspec(naked) void __stdcall saveGame_OrigFunc()
         PUSH 0x8E47D6
         RET
     }
-}
-
-void __stdcall runtimeHookSaveGame()
-{
-    // Hook for saving the game
-    if (gLunaLua.isValid()) {
-        std::shared_ptr<Event> saveGameEvent = std::make_shared<Event>("onSaveGame", false);
-        saveGameEvent->setDirectEventName("onSaveGame");
-        saveGameEvent->setLoopable(false);
-        gLunaLua.callEvent(saveGameEvent);
-    }
-
-    saveGame_OrigFunc();
 }
 
 static _declspec(naked) void __stdcall cleanupLevel_OrigFunc()
@@ -2917,13 +2910,10 @@ _declspec(naked) void __stdcall runtimeHookStoreCustomMusicPathWrapper(void)
 
 void __stdcall runtimeHookCheckWindowFocus()
 {
-    if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
+    if (gMainWindowUnfocusPending)
     {
         // During this block of code, pause music if it was playing
         PGE_MusPlayer::DeferralLock musicPauseLock(true);
-
-        // Show pause overlay
-        g_GLEngine.EndFrame(nullptr, false, true, false, true);
 
         // Wait for focus
         TestModeSendNotification("suspendWhileUnfocusedNotification");
@@ -2933,6 +2923,7 @@ void __stdcall runtimeHookCheckWindowFocus()
             LunaDllWaitFrame(false);
         }
         TestModeSendNotification("resumeAfterUnfocusedNotification");
+        gMainWindowUnfocusPending = false;
     }
 }
 
@@ -3520,20 +3511,20 @@ static void __stdcall runtimeHookJumpSlideFixInternal(short playerIdx) {
         extended->slidingTimeSinceOnSlope += 1;
     }
 
-    if (gSlideJumpFixIsEnabled) {
-        // fixed check:
-        if (player->UpwardJumpingForce != 0) {
-            // if the player started jumping for real
-            player->SlidingState = 0;
-        } else if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
-            // if the player pressed jump *and* has been disconnected from a slope for a couple frames
-            if (extended->slidingTimeSinceOnSlope >= 2) {
+    if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+        if (gSlideJumpFixIsEnabled) {
+            // fixed check:
+            if (player->UpwardJumpingForce != 0) {
+                // if the player started jumping for real
+                player->SlidingState = 0;
+            }
+            else if (extended->slidingTimeSinceOnSlope >= 2) {
+                // if the player pressed jump *and* has been disconnected from a slope for a couple frames
                 player->SlidingState = 0;
             }
         }
-    } else {
-        // redigit's check:
-        if (player->keymap.jumpKeyState != 0 || player->keymap.altJumpKeyState != 0) {
+        else {
+            // redigit's check:
             player->SlidingState = 0; // super jank town activate
         }
     }
@@ -3989,6 +3980,24 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
 
     if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
+
+    // Check noNPCCollision
+    if (extA->nonpccollision || extB->nonpccollision) {
+        return 0; // Collision cancelled
+    }
+
+    // check walkThroughNPCs
+    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
+    if (NPC::GetWalkPastNPCs(npc->id)) {
+        if (!npc_npcblock[npcB->id] && !npc_npcblocktop[npcB->id]) {
+            return 0; // Cancelled
+        }
+    }
+    if (NPC::GetWalkPastNPCs(npcB->id)) {
+        if (!npc_npcblock[npc->id] && !npc_npcblocktop[npc->id]) {
+            return 0; // Cancelled
+        }
+    }
 
     return -1; // Collision goes ahead
 }
@@ -5025,6 +5034,11 @@ _declspec(naked) void __stdcall runtimeHookFixLinkFairyClowncar3()
     }
 }
 
+// Function to retore GeyKeyState call to functionality if it's one we care about
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk)
+{
+    return (gKeyState[vk] & 0x80) ? 0xF000 : 0;
+}
 
 // close the game
 // don't bother with preserving cpu state or anything, since we'll never return from here...

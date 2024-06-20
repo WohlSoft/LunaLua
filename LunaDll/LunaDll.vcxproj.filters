@@ -742,6 +742,15 @@
     <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h">
       <Filter>Misc\RuntimeHookComponents</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\VB6Bool.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Win32PathUtils.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager\SaveFile.h">
+      <Filter>FileManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1495,6 +1504,12 @@
     </ClCompile>
     <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp">
       <Filter>SMBXInternal\Ports</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Win32PathUtils.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\SaveFile.cpp">
+      <Filter>FileManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

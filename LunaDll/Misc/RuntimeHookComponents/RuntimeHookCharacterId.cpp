@@ -16,7 +16,6 @@
 
 // Prototype
 int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr);
-static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdCopyTemplateToPlayer(int characterId, int playerIdx);
 static void __stdcall runtimeHookCharacterIdAnimateBlocks(void);
 //static int __stdcall runtimeHookCharacterIdBlockPlayerCheck(PlayerMOB* player, int blockIdx);
@@ -2180,7 +2179,7 @@ int __stdcall runtimeHookCharacterIdTranslateHook(short* idPtr)
 // Hooks //
 ///////////
 
-static void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx)
+void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx)
 {
     PlayerMOB* temp = getTemplateForCharacterWithDummyFallback(characterId);
     PlayerMOB* player = &((PlayerMOB*)GM_PLAYERS_PTR)[playerIdx];

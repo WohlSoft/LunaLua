@@ -522,6 +522,7 @@ static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 struct ExtendedNPCFields
 {
     bool noblockcollision;
+    bool nonpccollision;
     short fullyInsideSection;
     unsigned int collisionGroup;
 
@@ -537,6 +538,7 @@ struct ExtendedNPCFields
         noblockcollision = false;
         fullyInsideSection = -1;
         collisionGroup = 0u;
+        nonpccollision = false;
     }
 };
 
@@ -583,6 +585,7 @@ namespace NPC {
     bool GetNotCoinTransformable(int id);
     bool GetStaticDirection(int id);
     bool GetLuaHandlesSpeed(int id);
+    bool GetWalkPastNPCs(int id);
     double GetTerminalVelocity(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);

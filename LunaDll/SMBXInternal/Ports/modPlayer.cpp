@@ -5,6 +5,7 @@
 #include "../../Misc/VB6RNG.h"
 #include "../../Misc/VB6Logic.h"
 #include "../../Misc/RuntimeHookComponents/CharacterIdExtension.h"
+#include "../../Misc/SafeFPUControl.h"
 
 // Forward declare a hook we use, don't want the whole header
 void __stdcall runtimeHookWarpPipeDoorInternal(short* playerIdx);
@@ -43,6 +44,7 @@ void __stdcall SMBX13::Ports::PlayerEffects(int16_t& A) {
     using namespace SMBX13::Types;
     using namespace SMBX13::Vars;
     using namespace SMBX13::Functions;
+    SafeFPUControl fpuExceptionClear; // Make sure FPU exceptions are cleared when the function exits
     #pragma warning( push )
     #pragma warning( disable: 4244 ) // Disable loss of precision warning
     int16_t B = 0;

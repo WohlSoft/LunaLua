@@ -9,6 +9,79 @@
 
 namespace ErrorReport{
 
+    class CrashContext
+    {
+    private:
+        static CrashContext* volatile m_curContext;
+        CrashContext* m_prevContext;
+
+    public:
+        CrashContext(const CrashContext&) = delete;
+        CrashContext& operator=(const CrashContext&) = delete;
+        CrashContext(CrashContext&&) = default;
+        CrashContext& operator=(CrashContext&&) = default;
+
+        static CrashContext* Get()
+        {
+            return m_curContext;
+        }
+
+        CrashContext() : 
+            m_prevContext(m_curContext)
+        {
+            // Set current crash context object
+            m_curContext = this;
+        }
+
+        ~CrashContext()
+        {
+            // Destruct current crash context object
+            m_curContext = m_prevContext;
+        }
+
+        virtual std::string asText() = 0;
+    };
+
+    template <typename... Types>
+    class CrashContextGeneric : public CrashContext
+    {
+    private:
+        std::tuple<Types...> m_values;
+
+        template<size_t i>
+        void fillArgs(std::stringstream& stream)
+        {
+            fillArgs<i - 1>(stream);
+            stream << ", " << std::get<i-1>(m_values);
+        }
+
+        template<>
+        void fillArgs<1>(std::stringstream& stream)
+        {
+            stream << std::get<0>(m_values);
+        }
+
+        template<>
+        void fillArgs<0>(std::stringstream& stream)
+        {
+        }
+
+    public:
+        template <typename... Types>
+        CrashContextGeneric(std::tuple<Types...> val) :
+            CrashContext(),
+            m_values(val)
+        {
+        }
+        ~CrashContextGeneric() {}
+        virtual std::string asText()
+        {
+            std::stringstream stream;
+            fillArgs<std::tuple_size<std::tuple<Types...>>::value>(stream);
+            return stream.str();
+        }
+    };
+
     class CustomStackTracer : public StackWalker 
     {
     public:

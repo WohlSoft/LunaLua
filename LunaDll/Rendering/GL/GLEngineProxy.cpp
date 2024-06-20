@@ -1,6 +1,7 @@
 #include <thread>
 #include <memory>
 #include "../../Defines.h"
+#include "../../Globals.h"
 #include "../../Misc/ThreadedCmdQueue.h"
 #include "../../Misc/TestModeMenu.h"
 #include "GLEngineProxy.h"
@@ -156,13 +157,17 @@ void GLEngineProxy::RenderCameraToScreen(int camIdx, double renderX, double rend
     QueueCmd(obj);
 }
 
-void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen, bool redrawOnly, bool resizeOverlay, bool pauseOverlay)
+void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen, bool redrawOnly, bool resizeOverlay)
 {
     auto obj = std::make_shared<GLEngineCmd_EndFrame>();
     obj->mHdcDest = hdcDest;
     obj->mRedrawOnly = redrawOnly;
     obj->mResizeOverlay = resizeOverlay;
-    obj->mPauseOverlay = pauseOverlay;
+    obj->mPauseOverlay = gMainWindowUnfocusOverlay;
+    gMainWindowUnfocusOverlay = false;
+
+    // If we're about to unfocus, force the frame to be rendered
+    obj->mForceDraw = gMainWindowUnfocusPending;
 
     if (isLoadScreen || redrawOnly)
     {

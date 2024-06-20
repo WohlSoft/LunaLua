@@ -200,7 +200,7 @@ static bool ReadPNGImageSize(const unsigned char* data, uint32_t len, uint32_t s
 
 void* CopyPNGAndGetMetadata(const wchar_t* filename, uint32_t sizeOut[2], uint32_t* fileSizeOut)
 {
-    HANDLE hFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileW(GetWin32LongPath(filename).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
         return nullptr;
 
