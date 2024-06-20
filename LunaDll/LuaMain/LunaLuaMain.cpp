@@ -31,6 +31,7 @@
 
 #include "LunaPathValidator.h"
 #include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
@@ -50,10 +51,14 @@ std::wstring CLunaLua::getLuaLibsPath()
 CLunaLua::CLunaLua() :
         m_type(CLunaLua::LUNALUA_LEVEL),
         m_luaEventTableName(""),
+        m_warningList(),
         L(0),
         m_ready(false),
         m_onStartRan(false),
-        m_warningList()
+        m_disableSectionChangeEvent(false),
+        m_executeSectionChangeFlag(false),
+        m_playerSectionChangeList(),
+        m_luaCallDepth(0)
 {}
 
 CLunaLua::~CLunaLua()
@@ -131,7 +136,10 @@ bool CLunaLua::shutdown()
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
     gLinkFairyClowncarFixes.Apply();
+    gSlideJumpFixIsEnabled = true;
+    SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;
     gCollisionMatrix.clear();
+
 
     // Request cached images/sounds/files be held onto for now
     LunaImage::holdCachedImages(m_type == LUNALUA_WORLD);
@@ -151,7 +159,8 @@ bool CLunaLua::shutdown()
 
     m_ready = false;
     m_onStartRan = false;
-    gOnStartRan = false;
+    m_luaCallDepth = 0;
+
     LuaProxy::Audio::resetMciSections();
     lua_close(L);
     L = NULL;
@@ -167,6 +176,7 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Just to be safe
     shutdown();
+    m_luaCallDepth = 0;
 
     gLunaPathValidator.SetPaths();
 
@@ -220,8 +230,8 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
         osTable["execute"] = object();
         osTable["exit"] = object();
         //osTable["getenv"] = object();
-        osTable["remove"] = object();
-        osTable["rename"] = object();
+        //osTable["remove"] = object();
+        //osTable["rename"] = object();
         osTable["setlocal"] = object();
         osTable["tmpname"] = object();
     }
@@ -248,14 +258,17 @@ void CLunaLua::init(LuaLunaType type, std::wstring codePath, std::wstring levelP
 
     //Load the Lua API
     bool errLapi = false;
-    int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
-    if(!(lapierrcode == 0)){
-        object error_msg(from_stack(L, -1));
-        MessageBoxA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
-        errLapi = true;
-    }
     {
-        errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+        CCallDepthCounter callDepth(*this);
+        int lapierrcode = luaL_loadbuffer(L, LuaCode.c_str(), LuaCode.length(), "=main.lua") || lua_pcall(L, 0, LUA_MULTRET, 0);
+        if (!(lapierrcode == 0)) {
+            object error_msg(from_stack(L, -1));
+            LunaMsgBox::ShowA(0, object_cast<const char*>(error_msg), "Error", MB_ICONWARNING);
+            errLapi = true;
+        }
+        {
+            errLapi = errLapi || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
+        }
     }
 
 
@@ -1531,7 +1544,6 @@ void CLunaLua::triggerOnStart()
         onStartEvent->setLoopable(false);
         onStartEvent->setDirectEventName("onStart");
         m_onStartRan = true;
-        gOnStartRan = true;
         callEvent(onStartEvent);
     }
 }
@@ -1583,7 +1595,7 @@ void CLunaLua::checkWarnings()
         {
             message << L" - " << Str2WStr(*iter) << L"\r\n";
         }
-        MessageBoxW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowW(NULL, message.str().c_str(), L"LunaLua Warnings", MB_OK | MB_ICONWARNING);
     }
 
     m_warningList.clear();

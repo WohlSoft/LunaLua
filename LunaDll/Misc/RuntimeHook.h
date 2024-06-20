@@ -38,10 +38,11 @@ void TrySkipPatch();
 /************************************************************************/
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
-extern AsmPatch<167> gDisableNPCDownwardClipFixSlope;
+extern AsmPatch<6> gDisableNPCDownwardClipFixSlope;
 extern Patchable& gNPCSectionFix;
 extern Patchable& gFenceFixes;
 extern Patchable& gLinkFairyClowncarFixes;
+extern bool gSlideJumpFixIsEnabled;
 
 /************************************************************************/
 /* Runtime Patch Public Functions                                       */
@@ -59,7 +60,7 @@ extern void __stdcall InitHook();
 //Force Termination when SMBX runs the end code.
 //Without this code, there is a chance of "zombie"-processes.
 extern void __stdcall forceTermination();
-extern int __stdcall LoadWorld();     //The World Load Code
+extern void __stdcall LoadWorldHook(void);     //The World Load Code
 extern DWORD __stdcall WorldLoop();       //The World Loop Code
 extern void* __stdcall WorldRender();     //The World Render Code
 extern int __stdcall LoadIntro();       // Load Intro Code (Autostart)
@@ -179,6 +180,7 @@ void fixup_NativeFuncs();
 void fixup_BGODepletion();
 void fixup_RenderPlayerJiterX();
 void fixup_NPCSortedBlockArrayBoundsCrash();
+void fixup_SectionSizePatch();
 
 /************************************************************************/
 /* Render Priority Hooks                                                */
@@ -189,7 +191,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
 #ifdef __clang__
     // NB: I'm using %c modifiers for PriorityMostSignificantDWord and PriorityLeastSignificantDWord because of a clang bug: https://bugs.llvm.org/show_bug.cgi?id=24232
     __asm__ volatile (
-        ".intel_syntax\n"
+        ".intel_syntax noprefix\n"
         "pushfd\n"
         "push eax\n"
         "push ecx\n"
@@ -243,7 +245,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
 #ifdef __clang__
     // NB: I'm using %c modifiers for PriorityMostSignificantDWord, PriorityLeastSignificantDWord, skipTargetAddrValue and skipTargetAddrValue because of a clang bug: https://bugs.llvm.org/show_bug.cgi?id=24232
     __asm__ volatile (
-        ".intel_syntax\n"
+        ".intel_syntax noprefix\n"
         "pushfd\n"
         "push eax\n"
         "push ecx\n"
@@ -320,6 +322,7 @@ void runtimeHookCharacterIdRegister(short id, const std::string& name, short bas
 void runtimeHookCharacterIdUnregister(short id);
 void runtimeHookCharacterIdReset();
 CharacterHitBoxData* runtimeHookGetExtCharacterHitBoxData(short characterId, short powerupId);
+void __stdcall runtimeHookCharacterIdCopyPlayerToTemplate(int characterId, int playerIdx);
 
 // Game Mode Handling
 void __stdcall runtimeHookSmbxChangeModeHookRaw(void);
@@ -339,7 +342,8 @@ void __stdcall runtimeHookNPCWaterSplashAnimRaw(short* effectID, Momentum* coor,
 void __stdcall runtimeHookNPCTerminalVelocityRaw(void);
 
 void __stdcall runtimeHookNPCHarmlessGrabRaw(void);
-void __stdcall runtimeHookNPCHarmlessThrownRaw(void);
+void __stdcall runtimeHookGrabbedNPCCollisionGroup(void);
+
 void __stdcall runtimeHookCheckInputRaw(void);
 void __stdcall runtimeHookSetHDCRaw(void);
 
@@ -347,8 +351,6 @@ void __stdcall runtimeHookInitGameHDC(void);
 void __stdcall runtimeHookInitGameWindow(void);
 
 void __stdcall runtimeHookLoadDefaultGraphics(void);
-
-void __stdcall runtimeHookSaveGame(void);
 
 void __stdcall runtimeHookCleanupLevel(void);
 
@@ -367,6 +369,8 @@ void __stdcall runtimeHookFixLinkFairyClowncar3();
 
 // hooks for closing the game instaed of returning to titlescreen
 void __stdcall runtimeHookCloseGame();
+
+SHORT __stdcall runtimeHookGetKeyStateRetore(int vk);
 
 void __stdcall runtimeHookHitBlock(unsigned short* blockIndex, short* fromUpSide, unsigned short* playerIdx);
 void __stdcall runtimeHookRemoveBlock(unsigned short* blockIndex, short* makeEffects);
@@ -584,6 +588,8 @@ void __stdcall runtimeHookNPCWalkFixSlope();
 
 void __stdcall runtimeHookNPCSectionFix(short* npcIndex);
 void __stdcall runtimeHookNPCSectionWrap(void);
+
+void __stdcall runtimeHookJumpSlideFix(void);
 
 void __stdcall runtimeHookAfterPSwitchBlocksReorderedWrapper(void);
 void __stdcall runtimeHookPSwitchStartRemoveBlockWrapper(void);

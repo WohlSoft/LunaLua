@@ -115,7 +115,7 @@ void LunaDLLInit()
     {
         if (!haveSoftwareGLSupport)
         {
-            MessageBoxA(0, "Missing DLL for Software GL support", "Error", 0);
+            LunaMsgBox::ShowA(0, "Missing DLL for Software GL support", "Error", 0);
             exit(1);
         }
         SetDllDirectoryA("softgl");
@@ -156,7 +156,7 @@ void LunaDLLInit()
         {
             errmsg += "\n(Error using software renderer)";
         }
-        MessageBoxA(0, errmsg.c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, errmsg.c_str(), "Error", 0);
         exit(1);
     }
 

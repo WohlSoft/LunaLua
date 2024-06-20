@@ -142,7 +142,7 @@ static bool testModeSetupForLoading()
     if ((testModeData.levelRawData.size() == 0) && (FileExists(path.c_str()) == 0))
     {
         std::wstring path = L"Could not find level file.\n\nPath:\n" + path;
-        MessageBoxW(0, path.c_str(), L"SMBX could not read level file", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"SMBX could not read level file", MB_ICONERROR);
         _exit(1);
     }
 
@@ -153,7 +153,7 @@ static bool testModeSetupForLoading()
     if (!nonAnsiCharsEpisode.empty())
     {
         std::wstring path = L"The episode path has characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please rename or move your episode folder.\n\nUnsupported characters: " + nonAnsiCharsEpisode + L"\n\nPath:\n" + episodePath;
-        MessageBoxW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"SMBX does not support episode path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -294,15 +294,13 @@ void testModeSmbxChangeModeHook(void)
     }
 }
 
-static AsmPatch<10U> shortenReloadPatch =
-    PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>();
-
 // 008CA487 | E8 34 B0 01 00 | call <smbx.GF_MSGBOX>
 // 008CA597 | E8 24 AF 01 00 | call <smbx.GF_MSGBOX>
-// TODO: Figure out if 0x8CA597 is the right only place, or if others should be patched
-//    TESTED: patching of the 0x8CA487 causes crash on loading
 static void __stdcall pauseTestModeHook(short* pPlayer);
-static AsmPatch<5U> pauseOverridePatch = PATCH(0x8CA597).CALL(pauseTestModeHook);
+static auto pauseOverridePatch = PatchCollection(
+    PATCH(0x8CA487).CALL(pauseTestModeHook),
+    PATCH(0x8CA597).CALL(pauseTestModeHook)
+);
 static void __stdcall pauseTestModeHook(short* pPlayer)
 {
     testModePauseMenu(true, false);
@@ -336,7 +334,6 @@ bool testModeEnable(const STestModeSettings& settings)
     testModeSettings.enabled = true;
     testModeSettings.levelPath = fullPath;
 
-    //shortenReloadPatch.Apply();
     playerDeathOverridePatch.Apply();
     pauseOverridePatch.Apply();
 
@@ -349,7 +346,6 @@ void testModeDisable(void)
     testModeSettings.ResetToDefault();
     testModeSettings.enabled = false;
 
-    //shortenReloadPatch.Unapply();
     playerDeathOverridePatch.Unapply();
     pauseOverridePatch.Unapply();
     exitPausePatch.Unapply();
@@ -507,7 +503,7 @@ void TestModeCheckPendingIPCRequest()
         if (!testModeEnable(settings))
         {
             std::wstring path = L"SMBX received no level data from the editor. Please try again.";
-            MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+            LunaMsgBox::ShowW(0, path.c_str(), L"Error", MB_ICONERROR);
             _exit(1);
             return;
         }

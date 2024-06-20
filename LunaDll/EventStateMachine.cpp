@@ -8,6 +8,7 @@
 #include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
+#include "SMBXInternal/Variables.h"
 
 // Global instance
 EventStateMachine g_EventHandler;
@@ -21,6 +22,19 @@ static inline void sendSimpleLuaEvent(const std::string& eventName, Ts&&... args
         inputEvent->setLoopable(false);
         gLunaLua.callEvent(inputEvent, std::forward<Ts>(args)...);
     }
+}
+
+template <typename... Ts>
+static inline bool sendSimpleCancellableLuaEvent(const std::string& eventName, Ts&&... args) {
+    bool cancelled = false;
+    if (gLunaLua.isValid()) {
+        std::shared_ptr<Event> inputEvent = std::make_shared<Event>(eventName, true);
+        inputEvent->setDirectEventName(eventName);
+        inputEvent->setLoopable(false);
+        gLunaLua.callEvent(inputEvent, std::forward<Ts>(args)...);
+        cancelled = inputEvent->native_cancelled();
+    }
+    return cancelled;
 }
 
 void LunaDllRenderAndWaitFrame(void)
@@ -37,6 +51,17 @@ void LunaDllRenderAndWaitFrame(void)
 
     // Audio management...
     native_audioManagement();
+
+    // Dummy out some variables, some of which need to be reset each tick
+    // SMBX 1.3 use these for tracking frame timing
+    // They're incremented in the above rendering functions, and if we let them
+    // grow forever there's an overflow error in some cases.
+    SMBX13::Vars::overTime = 0;
+    SMBX13::Vars::GoalTime = GetTickCount() + 1000;
+    SMBX13::Vars::fpsCount = 0;
+    SMBX13::Vars::cycleCount = 0;
+    SMBX13::Vars::gameTime = 0;
+    SMBX13::Vars::fpsTime = 0;
 
     LunaDllWaitFrame();
 }
@@ -180,7 +205,24 @@ void EventStateMachine::sendOnTickEnd(void) {
 
 void EventStateMachine::sendOnDraw(void) {
     GLEngineProxy::CheckRendererInit();
+
+    // Before onDraw, check if we're about to pause due to lack of focus
+    // We do this here so we can ensure one final frame is not skipped.
+    if (!gMainWindowFocused && !LunaLoadScreenIsActive() && !gStartupSettings.runWhenUnfocused)
+    {
+        gMainWindowUnfocusPending = true;
+    }
+
     sendSimpleLuaEvent("onDraw");
+
+    // Check if we need the overlay
+    if (gMainWindowUnfocusPending)
+    {
+        if (!sendSimpleCancellableLuaEvent("onDrawUnfocusOverlay"))
+        {
+            gMainWindowUnfocusOverlay = true;
+        }
+    }
 
     m_onDrawEndReady = true;
 }
@@ -241,7 +283,7 @@ void EventStateMachine::runPause(void) {
     m_IsPaused = true;
     while (!m_RequestUnpause) {
         // Handle un-focused state
-        if (!gMainWindowFocused && !LunaLoadScreenIsActive())
+        if (gMainWindowUnfocusPending)
         {
             // During this block of code, pause music if it was playing
             PGE_MusPlayer::DeferralLock musicPauseLock(true);
@@ -254,6 +296,7 @@ void EventStateMachine::runPause(void) {
                 LunaDllWaitFrame(false);
             }
             TestModeSendNotification("resumeAfterUnfocusedNotification");
+            gMainWindowUnfocusPending = false;
 
             if (m_RequestUnpause) break;
         }

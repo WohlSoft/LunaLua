@@ -118,7 +118,7 @@ void HardcodedGraphicsManager::loadGraphics()
     IniProcessing graphicsINI(ttscrpath);
     if(!graphicsINI.isOpened())
     {
-        MessageBoxA(0, std::string(ttscrpath + "\n\nError of read INI file").c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(ttscrpath + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 

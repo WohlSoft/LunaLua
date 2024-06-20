@@ -44,6 +44,8 @@ void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID)
 // defined in RuntimeHookNPCTransform.cpp
 void executeOnNPCTransformIdx(int npcIdx, int oldID, NPCTransformationCause cause);
 
+#include "../ErrorReporter.h"
+
 // Hook for the start of the original npc collision function
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
@@ -59,7 +61,15 @@ void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, sh
         isValidProcessingNPC = true;
         processingNPCInfoForIDChangeDetection.push_back({*pNpcIdx, npc->id});
     }
-    runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+    {
+        ErrorReport::CrashContextGeneric<const char*, short, short, short> crashContext(std::make_tuple<const char*, short, short, short>(
+            (const char*)__FUNCTION__,
+            pNpcIdx ? *pNpcIdx : 0,
+            pObjType ? static_cast<short>(*pObjType) : -1,
+            pObjIdx ? *pObjIdx : 0
+            ));
+        runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+    }
     // call post-hit function to handle onNPCTransform call
     if (isValidProcessingNPC) {
         // compare the current ID of the npc to the previously stored one...

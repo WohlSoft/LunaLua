@@ -948,7 +948,7 @@ void Autocode::Do(bool init) {
                              }
 
         case AT_DebugWindow: {
-            MessageBox(0, MyString.c_str(), L"LunaDLL debug message", 0);
+            LunaMsgBox::ShowW(0, MyString.c_str(), L"LunaDLL debug message", 0);
             break;
                              }
 

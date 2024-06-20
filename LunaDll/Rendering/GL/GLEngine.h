@@ -46,7 +46,8 @@ public:
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 
     void InitForHDC(HDC hdcDest);
-    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay);
+    void RenderBasicOverlayText(const std::string& str, HDC hdcDest, const int32_t& windowWidth, const int32_t& windowHeight);
+    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay, bool pauseOverlay);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };
