@@ -676,51 +676,6 @@ std::string resolveIfNotAbsolutePath(std::string filename) {
     return filename;
 }
 
-std::string splitPathFromFilename(std::string str)
-{
-    std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
-    return finalStr;
-}
-
-std::string splitFilenameFromPath(std::string str)
-{
-    std::string finalStr = str.substr(0, str.find_last_of("/\\"));
-    return finalStr;
-}
-
-std::string replaceFowardSlashesWithBackSlashes(std::string str)
-{
-    replaceSubStr(str, "/", "\\");
-    return str;
-}
-
-bool checkIfWorldIsInAppPath(std::string worldPath)
-{
-    std::string appPath = WStr2Str(gAppPathWCHAR);
-    if(!worldPath.find(appPath))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-bool checkIfWorldIsInWorldPath(std::string worldPath)
-{
-    std::string appPath = WStr2Str(gAppPathWCHAR) + "\\worlds";
-    if(!worldPath.find(appPath))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-
 std::string generateTimestamp(std::string format)
 {
     std::time_t t = std::time(NULL);
@@ -1090,6 +1045,87 @@ std::string GetEditorPlacedItem()
 }
 
 
+namespace LunaMsgBox
+{
+    static thread_local volatile uintptr_t s_activeCount = 0;
+
+    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxA(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxW(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    bool IsActive()
+    {
+        return (s_activeCount != 0);
+    }
+}
+
+
+
+
+std::string splitPathFromFilename(std::string str)
+{
+    std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
+    return finalStr;
+}
+
+std::string splitFilenameFromPath(std::string str)
+{
+    std::string finalStr = str.substr(0, str.find_last_of("/\\"));
+    return finalStr;
+}
+
+std::string replaceFowardSlashesWithBackSlashes(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    return str;
+}
+
+bool checkIfWorldIsInAppPath(std::string worldPath)
+{
+    std::string appPath = WStr2Str(gAppPathWCHAR);
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool checkIfWorldIsInWorldPath(std::string worldPath)
+{
+    std::string appPath = WStr2Str(gAppPathWCHAR) + "\\worlds";
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CheckCollision(Momentum momentumA, Momentum momentumB)
+{
+    return  ((momentumA.y + momentumA.height >= momentumB.y) &&
+            (momentumA.y <= momentumB.y + momentumB.height) &&
+            (momentumA.x <= momentumB.x + momentumB.width) &&
+            (momentumA.x + momentumA.width >= momentumB.x));
+}
+
 int findEpisodeIDFromWorldFileAndPath(std::string worldName)
 {
     int id = 0;
@@ -1168,42 +1204,5 @@ void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
             // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked
             p->Identity = static_cast<Characters>(getUnblockedCharacterFromWorld(GM_CUR_MENULEVEL));
         }
-    }
-}
-
-
-
-bool CheckCollision(Momentum momentumA, Momentum momentumB)
-{
-    return  ((momentumA.y + momentumA.height >= momentumB.y) &&
-            (momentumA.y <= momentumB.y + momentumB.height) &&
-            (momentumA.x <= momentumB.x + momentumB.width) &&
-            (momentumA.x + momentumA.width >= momentumB.x));
-}
-
-
-namespace LunaMsgBox
-{
-    static thread_local volatile uintptr_t s_activeCount = 0;
-
-    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
-    {
-        s_activeCount++;
-        int ret = MessageBoxA(hWnd, lpText, lpCaption, uType);
-        s_activeCount--;
-        return ret;
-    }
-
-    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
-    {
-        s_activeCount++;
-        int ret = MessageBoxW(hWnd, lpText, lpCaption, uType);
-        s_activeCount--;
-        return ret;
-    }
-
-    bool IsActive()
-    {
-        return (s_activeCount != 0);
     }
 }
