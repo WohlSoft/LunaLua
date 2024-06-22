@@ -61,7 +61,6 @@ public:
     static void addSound(std::string alias, std::string fileName);
     static void close();
     static void play(std::string alias); //Chunk will be played once, stream will be played with loop
-    static void update();
     static void pause();
     static void stop(std::string alias);
     static void setVolume(int _volume);
@@ -79,11 +78,8 @@ public:
     static void setSeized(int section, bool state);
     static void setCurrentSection(int section);
     static std::string getCurrentMusic();
-    
-    static std::string getMusicForAlias(const std::string& alias, int type);
-    static Mix_Chunk *getChunkForAlias(const std::string& alias);
 
-    static bool setToChangeMusicAlias;
+    static Mix_Chunk *getChunkForAlias(const std::string& alias);
 
     static std::string curMusicAlias; //Current music alias
     static int currentMusicID; //Currently playing music ID

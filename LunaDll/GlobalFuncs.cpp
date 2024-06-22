@@ -1066,19 +1066,3 @@ namespace LunaMsgBox
         return (s_activeCount != 0);
     }
 }
-
-bool createSFXStartLuaEvent(int id, std::string path)
-{
-    bool isCancelled = false;
-
-    if (gLunaLua.isValid())
-    {
-        std::shared_ptr<Event> SFXStartEvent = std::make_shared<Event>("onSFXStart", true);
-        SFXStartEvent->setDirectEventName("onSFXStart");
-        SFXStartEvent->setLoopable(false);
-        gLunaLua.callEvent(SFXStartEvent, id, path);
-        isCancelled = SFXStartEvent->native_cancelled();
-    }
-
-    return isCancelled;
-}

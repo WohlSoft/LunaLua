@@ -228,7 +228,7 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
-std::string LuaProxy::Audio::MusicGet()
+std::string LuaProxy::Audio::MusicGetFilepath()
 {
 #ifndef NO_SDL
     return PGE_MusPlayer::MUS_get();
@@ -355,21 +355,6 @@ Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
     return NULL;
 }
 
-void LuaProxy::Audio::__setOverrideForMusicAlias(const std::string& alias, std::string chunk)
-{
-#ifndef NO_SDL
-    PGE_MusPlayer::setOverrideForMusicAlias(alias, chunk);
-#endif
-}
-
-std::string LuaProxy::Audio::__getMusicForAlias(const std::string& alias, int type)
-{
-#ifndef NO_SDL
-    return PGE_MusPlayer::getMusicForAlias(alias, type);
-#else
-    return "";
-#endif
-}
 
 
 

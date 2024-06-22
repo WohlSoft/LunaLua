@@ -905,10 +905,7 @@ void CLunaLua::bindAll()
                 def("MusicGetTempo", (double(*)())&LuaProxy::Audio::MusicGetTempo),
                 def("MusicGetPitch", (double(*)())&LuaProxy::Audio::MusicGetPitch),
                 def("MusicGetSpeed", (double(*)())&LuaProxy::Audio::MusicGetSpeed),
-                def("MusicGet", (std::string(*)())&LuaProxy::Audio::MusicGet),
-
-                def("__setOverrideForMusicAlias", LuaProxy::Audio::__setOverrideForMusicAlias),
-                def("__getMusicForAlias", LuaProxy::Audio::__getMusicForAlias),
+                def("MusicGetFilepath", (std::string(*)())&LuaProxy::Audio::MusicGetFilepath),
 
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
