@@ -228,10 +228,42 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
-std::string LuaProxy::Audio::MusicGetFilepath()
+std::string LuaProxy::Audio::MusicGetFilepathArguments()
+{
+    std::string musicGet = PGE_MusPlayer::MUS_get();
+    std::string argumentsOnly = musicGet.substr(musicGet.find_last_of("|") - 1);
+    if (argumentsOnly)
+    {
+        return argumentsOnly;
+    }
+    else
+    {
+        return "";
+    }
+    return "";
+}
+
+std::string LuaProxy::Audio::MusicGetFilepath(bool withArguments)
 {
 #ifndef NO_SDL
-    return PGE_MusPlayer::MUS_get();
+    std::string musicGet = PGE_MusPlayer::MUS_get();
+    if (!withArguments)
+    {
+        std::string musicGetAndArguments = musicGet.substr(0, musicGet.find("|"));
+        if (musicGetAndArguments)
+        {
+            return musicGetAndArguments;
+        }
+        else
+        {
+            return "";
+        }
+    }
+    else
+    {
+        return musicGet;
+    }
+    return "";
 #else
     return "";
 #endif
