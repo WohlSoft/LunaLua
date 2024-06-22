@@ -231,7 +231,7 @@ double LuaProxy::Audio::MusicGetSpeed()
 std::string LuaProxy::Audio::MusicGetFilepathArguments()
 {
     std::string musicGet = PGE_MusPlayer::MUS_get();
-    return musicGet.substr(musicGet.find_last_of("|") - 1);
+    return musicGet.substr(musicGet.find_last_of("|"));
 }
 
 std::string LuaProxy::Audio::MusicGetFilepath(bool withArguments)
