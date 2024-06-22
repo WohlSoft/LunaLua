@@ -718,7 +718,7 @@ Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
 
 std::string MusicManager::getMusicForAlias(const std::string& alias, int type)
 {
-    if(alias != "")
+    if(alias != "" && curMusicAlias != "cmusic")
     {
         bool isMusic = false;
 
@@ -831,6 +831,10 @@ std::string MusicManager::getMusicForAlias(const std::string& alias, int type)
             }
         }
         return "";
+    }
+    else if(alias != "" && curMusicAlias == "cmusic")
+    {
+        return PGE_MusPlayer::currentTrack;
     }
     else
     {
