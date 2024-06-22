@@ -906,7 +906,7 @@ void CLunaLua::bindAll()
                 def("MusicGetPitch", (double(*)())&LuaProxy::Audio::MusicGetPitch),
                 def("MusicGetSpeed", (double(*)())&LuaProxy::Audio::MusicGetSpeed),
                 def("MusicGetFilepath", (std::string(*)(bool))&LuaProxy::Audio::MusicGetFilepath),
-                def("MusicGetFilepathArguments", (std::string(*)(bool))&LuaProxy::Audio::MusicGetFilepathArguments),
+                def("MusicGetFilepathArguments", (std::string(*)())&LuaProxy::Audio::MusicGetFilepathArguments),
 
                 //SFX
                 def("newMix_Chunk", (Mix_Chunk*(*)())&LuaProxy::Audio::newMix_Chunk),
