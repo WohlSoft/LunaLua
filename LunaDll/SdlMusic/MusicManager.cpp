@@ -307,6 +307,7 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
         {
             PGE_MusPlayer::MUS_playMusic();
             pausedNatively = false;
+            curMusicAlias = "cmusic";
         }
     }
 }
@@ -352,18 +353,23 @@ std::string MusicManager::getCurrentMusic()
     bool isSpecial = (curMusicAlias == "smusic" || curMusicAlias == "stmusic" || curMusicAlias == "tmusic");
     bool isLevel = (curMusicAlias.substr(0, 5) == "music");
     bool isOverworld = (curMusicAlias.substr(0, 6) == "wmusic");
+    bool isCustom = (curMusicAlias == "cmusic");
 
-    if(isSpecial)
+    if (isSpecial)
     {
         return music_spc[currentMusicID].fullPath;
     }
-    else if(isOverworld)
+    else if (isOverworld)
     {
         return music_wld[currentMusicID].fullPath;
     }
-    else if(isLevel)
+    else if (isLevel)
     {
         return music_lvl[currentMusicID].fullPath;
+    }
+    else if (isCustom)
+    {
+        return PGE_MusPlayer::currentTrack;
     }
     else
     {

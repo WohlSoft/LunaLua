@@ -192,6 +192,7 @@ void PGE_MusPlayer::MUS_rewindMusic()
     return Mix_RewindMusic();
 }
 
+// This is still needed for music overriding support for another pull request ( https://github.com/WohlSoft/LunaLua/pull/72 ), so if the devs can merge this PR somehow with the overrideArrayIsUsed boolean stuff, then goodie
 std::string PGE_MusPlayer::MUS_get()
 {
     if (overrideArrayIsUsed)
