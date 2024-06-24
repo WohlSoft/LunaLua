@@ -51,7 +51,7 @@ If you wish you edit code via Qt Creator, you still must have Visual Studio beca
 * Open project and configure it
 * Go to the "Projects" tab
 * Disable shadow build for both Debug and Release
-* remove ALL items from "Building" and "Cenaring" sections
+* remove ALL items from "Building" and "Cleaning" sections
 * Add into "Building" a special item with:
  ** Command "build.bat"
  ** Argument "Debug" for debug build and "Release" argument for release build
