@@ -4,6 +4,9 @@
 
 #include <string>
 #include <memory>
+
+#include "../../Defines.h"
+
 struct Mix_Chunk;
 class MciEmulator;
 struct lua_State;
@@ -53,6 +56,9 @@ namespace LuaProxy
         double  MusicGetTempo();
         double  MusicGetPitch();
         double  MusicGetSpeed();
+        std::string MusicGetFilepath();
+        std::string MusicGetFilepath(bool withArguments);
+        std::string MusicGetFilepathArguments();
 
         //SFX
         Mix_Chunk* newMix_Chunk();

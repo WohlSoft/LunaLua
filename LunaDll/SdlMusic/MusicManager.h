@@ -55,6 +55,8 @@ public:
         Chunk
     };
     static void initAudioEngine();
+    static void setMusicAlias(std::string alias);
+    static void setSfxAlias(std::string alias);
     static void rebuildSoundCache();
     static void addSound(std::string alias, std::string fileName);
     static void close();
@@ -75,8 +77,12 @@ public:
     static void resetSeizes();
     static void setSeized(int section, bool state);
     static void setCurrentSection(int section);
+    static std::string getCurrentMusic();
 
     static Mix_Chunk *getChunkForAlias(const std::string& alias);
+
+    static std::string curMusicAlias; //Current music alias
+    static int currentMusicID; //Currently playing music ID
 
 private:
     static std::unordered_map<std::string, musicFile > registredFiles;

@@ -9,6 +9,7 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/Sound.h"
+#include "../../Misc/ResourceFileMapper.h"
 
 #include <memory>
 #include <mutex>
@@ -227,6 +228,52 @@ double LuaProxy::Audio::MusicGetSpeed()
     return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
 }
 
+std::string LuaProxy::Audio::MusicGetFilepath()
+{
+#ifndef NO_SDL
+    std::string musicGet = PGE_MusPlayer::MUS_get();
+    if (musicGet.find("|"))
+    {
+        return musicGet.substr(0, musicGet.find("|"));
+    }
+    else
+    {
+        return musicGet;
+    }
+    return "";
+#else
+    return "";
+#endif
+}
+
+std::string LuaProxy::Audio::MusicGetFilepath(bool withArguments)
+{
+#ifndef NO_SDL
+    std::string musicGet = PGE_MusPlayer::MUS_get();
+    if (!withArguments && musicGet.find("|"))
+    {
+        return musicGet.substr(0, musicGet.find("|"));
+    }
+    else if (!withArguments && !musicGet.find("|"))
+    {
+        return musicGet;
+    }
+    else
+    {
+        return musicGet;
+    }
+    return "";
+#else
+    return "";
+#endif
+}
+
+std::string LuaProxy::Audio::MusicGetFilepathArguments()
+{
+    std::string musicGet = PGE_MusPlayer::MUS_get();
+    return musicGet.substr(musicGet.find_last_of("|" + 1));
+}
+
 
 
 void LuaProxy::Audio::seizeStream(int section)
@@ -347,6 +394,7 @@ Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
 
 
 
+
 void LuaProxy::Audio::clearSFXBuffer()
 {
     PGE_Sounds::clearSoundBuffer();
@@ -378,7 +426,7 @@ Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
         // If error, pass to Lua
         luaL_error(L, "%s", PGE_Sounds::SND_getLastError());
     }
-
+    
     return chunk;
 }
 
