@@ -8,6 +8,10 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
+#include "../../../Misc/MiscFuncs.h"
+
+#include "../../../SMBXInternal/Reconstructed/EpisodeMain.h"
+#include "../../../FileManager/SMBXFileManager.h"
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -229,23 +233,77 @@ void LuaProxy::Misc::exitEngine()
 }
 
 bool luaDidGameOverFlag = false;
+
 bool LuaProxy::Misc::didGameOver()
 {
     return luaDidGameOverFlag;
 }
 
-bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numPlayers, int playerIDForOtherPlayers)
 {
-    GameAutostart autoStartEpisode;
-    autoStartEpisode.setSelectedEpisode(episodeName);
-    autoStartEpisode.setSaveSlot(GM_CUR_SAVE_SLOT);
-    bool success = autoStartEpisode.applyAutostart();
-    if (success)
+    bool success = false;
+
+    Characters storedIdentity1 = Player::Get(1)->Identity;
+    Characters storedIdentity2;
+
+    if(numPlayers > 1 && playerIDForOtherPlayers <= 0)
     {
-        GM_EPISODE_MODE = 0;
-        GM_LEVEL_MODE = 0xFFFF;
+        storedIdentity2 = Player::Get(2)->Identity;
     }
+    else if(numPlayers <= 1)
+    {
+        storedIdentity2 = static_cast<Characters>(1);
+    }
+
+    if(playerIDForOtherPlayers > 0)
+    {
+        storedIdentity2 = static_cast<Characters>(playerIDForOtherPlayers);
+    }
+
+    // We're checking to see if the world path exists, and if it does, we can go through to load the episode
+    std::string worldPth = "";
+    
+    if(fileExists(Str2WStr(episodeName)))
+    {
+        worldPth = episodeName;
+        success = true;
+    }
+    else
+    {
+        worldPth = findEpisodeWorldPathFromName(episodeName);
+        success = true;
+    }
+
+    if(success)
+    {
+        gStartupSettings.epSettings.wldPath = Str2WStr(worldPth);
+        gStartupSettings.epSettings.players = numPlayers;
+        gStartupSettings.epSettings.character1 = static_cast<int>(storedIdentity1);
+        gStartupSettings.epSettings.character2 = static_cast<int>(storedIdentity2);
+        gStartupSettings.epSettings.saveSlot = saveSlot;
+
+        GM_EPISODE_MODE = COMBOOL(false);
+        GM_CREDITS_MODE = COMBOOL(false);
+        GM_LEVEL_MODE = COMBOOL(true);
+    }
+
     return success;
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot, int numPlayers)
+{
+    // default player id is 1 in this case
+    return LuaProxy::Misc::loadEpisode(episodeName, saveSlot, numPlayers, 1);
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName, int saveSlot)
+{
+    return LuaProxy::Misc::loadEpisode(episodeName, saveSlot, GM_PLAYERS_COUNT, 0);
+}
+
+bool LuaProxy::Misc::loadEpisode(std::string episodeName)
+{
+    return LuaProxy::Misc::loadEpisode(episodeName, GM_CUR_SAVE_SLOT, GM_PLAYERS_COUNT, 0);
 }
 
 void LuaProxy::Misc::pause()
@@ -350,4 +408,3 @@ luabind::object LuaProxy::Misc::__getPerfTrackerData(lua_State* L)
     }
     return retTable;
 }
-

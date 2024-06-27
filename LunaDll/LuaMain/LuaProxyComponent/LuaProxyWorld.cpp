@@ -1,6 +1,7 @@
 #include "../LuaProxy.h"
 #include "../../SMBXInternal/Overworld.h"
 #include "../../Misc/MiscFuncs.h"
+#include "../../SMBXInternal/Menu.h"
 
 LuaProxy::World::World()
 {}
@@ -125,4 +126,3 @@ void LuaProxy::World::setPlayerPowerup(short playerPowerup)
 {
     SMBXOverworld::get()->currentPowerup = playerPowerup;
 }
-

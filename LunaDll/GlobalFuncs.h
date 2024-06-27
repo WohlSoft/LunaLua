@@ -8,6 +8,8 @@
 #include <string.h>
 #include <mutex>
 
+#include "Defines.h"
+
 //String manupulation things
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator);
 void replaceSubStr(std::string& str, const std::string& from, const std::string& to);
@@ -159,9 +161,29 @@ constexpr std::uint32_t DoubleMostSignificantDWord(double d) {
 
 std::string GetEditorPlacedItem();
 
+// World finding value functions
+int findEpisodeIDFromWorldFileAndPath(std::string worldName);
+std::string findEpisodeWorldPathFromName(std::string name);
+std::string findNameFromEpisodeWorldPath(std::string wldPath);
+
+// Blocked character world functions
+int getUnblockedCharacterFromWorld(int curWorldID);
+void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID);
+
 namespace LunaMsgBox
 {
     int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);
     int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
     bool IsActive();
 }
+
+std::string splitPathFromFilename(std::string str);
+std::string splitFilenameFromPath(std::string str);
+std::string replaceFowardSlashesWithBackSlashes(std::string str);
+bool checkIfWorldIsInAppPath(std::string worldPath);
+bool checkIfWorldIsInWorldPath(std::string worldPath);
+
+extern void removeFilePathW(std::wstring &path);
+extern void removeFilePathW(wchar_t*path, int length);
+void removeFilePathA(std::string &path);
+void removeFilePathA(char*path, int length);
