@@ -3890,19 +3890,6 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
         return 0; // Collision cancelled
     }
 
-    // check walkThroughNPCs
-    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
-    if (NPC::GetWalkPastNPCs(npc->id)) {
-        if (!npc_npcblock[npcB->id] && !npc_npcblocktop[npcB->id]) {
-            return 0; // Cancelled
-        }
-    }
-    if (NPC::GetWalkPastNPCs(npcB->id)) {
-        if (!npc_npcblock[npc->id] && !npc_npcblocktop[npc->id]) {
-            return 0; // Cancelled
-        }
-    }
-
     return -1; // Collision goes ahead
 }
 
