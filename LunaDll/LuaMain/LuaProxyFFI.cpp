@@ -408,6 +408,18 @@ extern "C" {
         return (int)SDL_JOYSTICK_POWER_UNKNOWN;
     }
 
+    struct StickPos
+    {
+        int x;
+        int y;
+    };
+    FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
+    {
+        const auto stickPos = gLunaGameControllerManager.getSelectedControllerStickPosition(playerNum);
+
+        return {std::get<0>(stickPos), std::get<1>(stickPos)};
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
     {
         static std::string name;
@@ -531,6 +543,18 @@ typedef struct ExtendedPlayerFields_\
             gDisableNPCDownwardClipFix.Unapply();
             // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCCeilingBugFix(bool enable)
+    {
+        if (enable)
+        {
+            gNPCCeilingBugFix.Apply();
+        }
+        else
+        {
+            gNPCCeilingBugFix.Unapply();
         }
     }
 
