@@ -314,6 +314,7 @@
     <ClInclude Include="Misc\RuntimeHook.h" />
     <ClInclude Include="SdlMusic\MusicManager.h" />
     <ClInclude Include="SdlMusic\SdlMusPlayer.h" />
+    <ClInclude Include="SMBXInternal\Reconstructed\EpisodeMain.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\ReconstructedDefines.h" />
     <ClInclude Include="SMBXInternal\Reconstructed\Util\NpcToCoins.h" />
     <ClInclude Include="SMBXInternal\Scenery.h" />
@@ -475,6 +476,7 @@
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncMisc.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncText.cpp" />
     <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncNative.cpp" />
+    <ClCompile Include="LuaMain\LuaProxyComponent\LuaProxyGlobalFunctions\LuaProxyGlobalFuncEpisode.cpp" />
     <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookPublicFunctions.cpp" />
     <ClCompile Include="Rendering\GL\GLContextManager.cpp" />
     <ClCompile Include="Rendering\GL\GLDraw.cpp" />
@@ -555,6 +557,7 @@
     <ClCompile Include="SdlMusic\MusicDefList.cpp" />
     <ClCompile Include="SdlMusic\MusicManager.cpp" />
     <ClCompile Include="SdlMusic\SdlMusPlayer.cpp" />
+    <ClCompile Include="SMBXInternal\Reconstructed\EpisodeMain.cpp" />
     <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp" />
     <ClCompile Include="SMBXInternal\Reconstructed\Util\NpcToCoins.cpp" />
     <ClCompile Include="SMBXInternal\SMBXEvents.cpp" />
