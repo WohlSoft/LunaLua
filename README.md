@@ -2,8 +2,8 @@ LunaLua
 =======
 [![Build status](https://ci.appveyor.com/api/projects/status/72ttgr33ggar3x21?svg=true)](https://ci.appveyor.com/project/Wohlstand/lunadll)
 
-LunaLua - LunaDLL with Lua is a free extension for SMBX game engine
-This version is based on LunaDLL ver. 8 with Lua Support.
+LunaLua (a.k.a. LunaDLL with Lua) -  is a free extension for SMBX game engine.
+This version is based on LunaDLL ver. 8 with Lua Support. After the release of 0.7.3.1, LunaLua is being developed as a core part of the [SMBX2 project](https://codehaus.moe).
 
 Quick Overview
 -------
@@ -14,12 +14,17 @@ Quick Overview
  * npc-*.txt with decimal numbers will no more crash SMBX with "runtime error 13"
  * fixes a random crash caused by contacting of the mushrooms with a lava blocks
 * OpenGL render support
-* SMBX's audio engine has been replaced with the better and more flexible SDL2_mixer library which also gives to SMBX the internal support of a [lots of additional music formats](http://wohlsoft.ru/pgewiki/SDL2_mixer#Music_Formats)
-* Added PGE's [sounds.ini](http://wohlsoft.ru/pgewiki/Game_Configuration_Pack_References#sounds.ini) and [music.ini](http://wohlsoft.ru/pgewiki/Game_Configuration_Pack_References#music.ini) support which gives ability to have custom musics (include world map musics!) and custom sound effects per episode.
+* SMBX's audio engine has been replaced with the better and more flexible `SDL2_mixer` (Later its fork called `SDL2 Mixer X` or just `MixerX`) library which also gives to SMBX the internal support of a [lots of additional music formats](https://wohlsoft.ru/pgewiki/SDL_Mixer_X#Music_Formats)
+* Added Moondust's [sounds.ini](https://wohlsoft.ru/pgewiki/Sounds.ini_(Episode)) and [music.ini](https://wohlsoft.ru/pgewiki/Music.ini_(Episode)) support which gives ability to have custom musics (include world map musics!) and custom sound effects per episode.
+* And more other stuff...
 
 **Download links**
-* [Download LunaLua](http://wohlsoft.ru/LunaLua/)
-* [LunaLua Documenation](http://wohlsoft.ru/pgewiki/Category:LunaLua_API)
+* [Download SMBX2 game](https://codehaus.moe/) - The mainstream game based on the LunaLua.
+* [SMBX2 Documentation](https://docs.codehaus.moe/) - The most current documentation for the LunaLua API.
+
+**Old downloads**
+* [Download old releases of LunaLua](https://wohlsoft.ru/projects/LunaLua/) - Legacy standalone LunaLua releases.
+* [Legacy LunaLua Documenation](https://wohlsoft.ru/pgewiki/Category:LunaLua_API) - The documentation mostly for old versions of LunaLua.
 
 Requirements to build LunaLua yourself
 ------
@@ -51,7 +56,7 @@ If you wish you edit code via Qt Creator, you still must have Visual Studio beca
 * Open project and configure it
 * Go to the "Projects" tab
 * Disable shadow build for both Debug and Release
-* remove ALL items from "Building" and "Cenaring" sections
+* remove ALL items from "Building" and "Cleaning" sections
 * Add into "Building" a special item with:
  ** Command "build.bat"
  ** Argument "Debug" for debug build and "Release" argument for release build

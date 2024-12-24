@@ -14,6 +14,11 @@ It is mostly used by the ending function (if the Player hits the exit)
 #include "../../Defines.h"
 #include "../../Animation.h"
 
+EffectID Reconstructed::Util::npcToCoinEffect = EFFECTID_KICKED_COIN;
+short Reconstructed::Util::npcToCoinSound = 14;
+short Reconstructed::Util::npcToCoinValue = 1;
+short Reconstructed::Util::npcToCoinValueReset = 100;
+
 void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
 {
     if (mob->unknown_124 && !mob->isGenerator) {
@@ -36,14 +41,15 @@ void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
                 short mask = 0;
                 short npcID = 0;
                 float animationFrame = 1.0;
-                EffectID effectID = EFFECTID_KICKED_COIN;
+                EffectID effectID = npcToCoinEffect;
                 //run the "kicked coin" effect with the new positioned (y + 32) npc. 
                 native_runEffect((short*)&effectID, &mob->momentum, &animationFrame, &npcID, &mask);
                 //play the "got coin" sound
-                short soundID_GotCoin = 14;
+                short soundID_GotCoin = npcToCoinSound;
                 native_playSFX(&soundID_GotCoin);
                 //if more than 100 coins then add a life
-                if (++(GM_COINS) >= 100) {
+                GM_COINS += npcToCoinValue;
+                if (GM_COINS >= 100) {
                     //if live more than 99 then reset to 99 coins anyway
                     if (GM_PLAYER_LIVES >= 99) {
                         GM_COINS = 99;
@@ -54,7 +60,7 @@ void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
                         //And play the sound for it
                         native_playSFX(&soundID_GotLife);
                         (GM_PLAYER_LIVES)++;
-                        (GM_COINS) -= 100; //and really, really remove those 100 coins.
+                        (GM_COINS) -= npcToCoinValueReset; //and really, really remove those 100 coins.
                     }
                 }
                 //Now put up the kill flags for the transformed npcs

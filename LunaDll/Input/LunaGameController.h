@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 
 struct joyinfoex_tag;
@@ -55,6 +56,7 @@ public:
     inline void clearActive() { activeFlag = false; }
     inline unsigned int getPadState() const { return padState; }
     inline unsigned int getButtonState() const { return buttonState; }
+    inline std::tuple<int, int> getStickPosition() const { return {xAxis, yAxis}; }
 
     SDL_JoystickPowerLevel getPowerLevel();
 
@@ -115,6 +117,8 @@ private:
     unsigned int axisPadState;
     unsigned int padState;
     unsigned int buttonState;
+    int xAxis;
+    int yAxis;
     bool activeFlag;
     std::vector<int> joyButtonMap;
 };
@@ -156,6 +160,7 @@ public:
 public:
     SDL_JoystickPowerLevel getSelectedControllerPowerLevel(int playerNum);
     std::string getSelectedControllerName(int playerNum);
+    std::tuple<int, int> getSelectedControllerStickPosition(int playerNum);
     void rumbleSelectedController(int playerNum, int ms, float strength);
     LunaGameController* getController(int playerNum);
 private:

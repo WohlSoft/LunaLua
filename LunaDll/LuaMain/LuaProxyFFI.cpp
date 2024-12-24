@@ -29,6 +29,7 @@
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
 #include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
@@ -407,6 +408,18 @@ extern "C" {
         return (int)SDL_JOYSTICK_POWER_UNKNOWN;
     }
 
+    struct StickPos
+    {
+        int x;
+        int y;
+    };
+    FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
+    {
+        const auto stickPos = gLunaGameControllerManager.getSelectedControllerStickPosition(playerNum);
+
+        return {std::get<0>(stickPos), std::get<1>(stickPos)};
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
     {
         static std::string name;
@@ -433,6 +446,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
+    bool nonpccollision;\
     short fullyInsideSection;\
     unsigned int collisionGroup;\
 } ExtendedNPCFields;";
@@ -470,6 +484,7 @@ typedef struct ExtendedPlayerFields_\
     bool nonpcinteraction;\
     bool noplayerinteraction;\
     unsigned int collisionGroup;\
+    int slidingTimeSinceOnSlope;\
 } ExtendedPlayerFields;";
     }
 
@@ -520,12 +535,26 @@ typedef struct ExtendedPlayerFields_\
         if (enable)
         {
             gDisableNPCDownwardClipFix.Apply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Apply();
         }
         else
         {
             gDisableNPCDownwardClipFix.Unapply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCCeilingBugFix(bool enable)
+    {
+        if (enable)
+        {
+            gNPCCeilingBugFix.Apply();
+        }
+        else
+        {
+            gNPCCeilingBugFix.Unapply();
         }
     }
 
@@ -553,12 +582,22 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetSlideJumpFix(bool enable)
+    {
+        gSlideJumpFixIsEnabled = enable;
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             gFenceFixes.Apply();
         } else {
             gFenceFixes.Unapply();
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPowerupPowerdownPositionFix(bool enable)
+    {
+        SMBX13::Ports::_enablePowerupPowerdownPositionFixes = enable;
     }
 
     FFI_EXPORT(void) LunaLuaSetFrameTiming(double value)
@@ -645,6 +684,45 @@ typedef struct ExtendedPlayerFields_\
 
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
+    }
+
+    FFI_EXPORT(bool) LunaLuaWriteFile(const char* path, const char* data, size_t dataLen)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+
+        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
+        if (!ptr) return false;
+        if (!ptr->canWrite) return false;
+        path = ptr->path;
+
+        // Try to write file
+        bool ret = writeFileAtomic(path, data, dataLen);
+
+        // If successful, update cache, if cached
+        std::wstring wpath = Str2WStr(path);
+        CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
+        if (cacheEntry == nullptr)
+        {
+            // Not cached, don't bother keeping
+            return ret;
+        }
+
+        // Replace cache entry
+        std::shared_ptr<std::vector<char>> cacheData = cacheEntry->data.lock();
+        if (cacheData)
+        {
+            g_lunaFileCacheSet.erase(cacheData);
+            cacheData = std::make_shared<std::vector<char>>();
+            if (dataLen > 0)
+            {
+                cacheData->resize(dataLen);
+                memcpy(&((*cacheData)[0]), data, dataLen);
+            }
+            cacheEntry->data = cacheData;
+            g_lunaFileCacheSet.insert(cacheData);
+        }
+
+        return ret;
     }
 
     FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
@@ -908,5 +986,28 @@ extern "C" {
     FFI_EXPORT(bool) LunaLuaSetIsRightClickPasteSettingEnabled()
     {
         return gRightClickPaste;
+    }
+}
+
+extern "C" {
+    // Debug function to dump patched ranges
+    FFI_EXPORT(const char*) LunaLuaGetPatchedRange(int i)
+    {
+        static std::string strRet;
+
+        std::stringstream strBuild;
+        for (AsmRange* cursor = AsmRange::getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
+        {
+            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate to avoid making a gigantic string.
+            if (i <= 0)
+            {
+                strBuild << std::hex << "0x" << cursor->getAddr() << "\t0x" << cursor->getSize() << "\t" << cursor->getFile() << ":" << std::dec << cursor->getLine();
+                break;
+            }
+            i--;
+        }
+
+        strRet = strBuild.str();
+        return strRet.c_str();
     }
 }

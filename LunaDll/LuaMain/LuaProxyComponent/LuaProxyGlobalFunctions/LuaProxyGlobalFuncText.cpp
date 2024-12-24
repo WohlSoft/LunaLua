@@ -19,7 +19,7 @@ void LuaProxy::Text::windowDebug(const std::string& debugText, lua_State* L)
 {
     clearKeyboardEvents();
 
-    int resultCode = MessageBoxA(0, debugText.c_str(), "Debug", MB_OKCANCEL);
+    int resultCode = LunaMsgBox::ShowA(0, debugText.c_str(), "Debug", MB_OKCANCEL);
     if (resultCode == IDCANCEL)
         luaL_error(L, "Pressed cancel on windowDebug!");
 }
@@ -28,7 +28,7 @@ void LuaProxy::Text::windowDebugSimple(const std::string& debugText)
 {
     clearKeyboardEvents();
 
-    MessageBoxA(0, debugText.c_str(), "Debug", MB_OK);
+    LunaMsgBox::ShowA(0, debugText.c_str(), "Debug", MB_OK);
 }
 
 
@@ -71,5 +71,10 @@ void LuaProxy::Text::printWP(const luabind::object & toPrint, int type, int x, i
 
 void LuaProxy::Text::showMessageBox(const std::string &text)
 {
+    if (!gLunaLua.didOnStartRun())
+    {
+        // Not valid before onStart
+        return;
+    }
     showSMBXMessageBox(text);
 }

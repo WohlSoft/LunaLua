@@ -6,7 +6,7 @@
 
 static void ListResourceFilesFromDir(const std::wstring& searchPath, ResourceFileMap& outData)
 {
-    std::wstring searchPattern = searchPath + L"\\*";
+    std::wstring searchPattern = GetWin32LongPath(searchPath) + L"\\*";
 
     HANDLE dir;
     WIN32_FIND_DATAW fileData;
@@ -23,11 +23,7 @@ static void ListResourceFilesFromDir(const std::wstring& searchPath, ResourceFil
         std::transform(fileName.begin(), fileName.end(), fileName.begin(), ::towlower);
 
         size_t sepIdx = fileName.find_last_of(L'.');
-        if (sepIdx == std::wstring::npos)
-        {
-            continue;
-        }
-        std::wstring fileExt = fileName.substr(sepIdx + 1);
+        std::wstring fileExt = (sepIdx != std::wstring::npos) ? fileName.substr(sepIdx + 1) : L"";
         
         ResourceFileInfo entry;
         entry.done = true;

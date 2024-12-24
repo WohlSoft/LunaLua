@@ -174,9 +174,9 @@ luabind::object LuaProxy::Misc::resolveGraphicsFile(const std::string& file, lua
 
 bool LuaProxy::Misc::isSamePath(const std::string first, const std::string second) 
 {
-    HANDLE hFileFirst = CreateFileW(Str2WStr(first).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileFirst = CreateFileW(GetWin32LongPath(first).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileFirst == INVALID_HANDLE_VALUE) return false;
-    HANDLE hFileSecond = CreateFileW(Str2WStr(second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
+    HANDLE hFileSecond = CreateFileW(GetWin32LongPath(second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
     if (hFileSecond == INVALID_HANDLE_VALUE) {
         CloseHandle(hFileFirst);
         return false;
@@ -250,11 +250,16 @@ bool LuaProxy::Misc::loadEpisode(const std::string& episodeName)
 
 void LuaProxy::Misc::pause()
 {
-    g_EventHandler.requestPause(false);
+    pause(false);
 }
 
 void LuaProxy::Misc::pause(bool atFrameEnd)
 {
+    if (!gLunaLua.didOnStartRun())
+    {
+        // Not valid before onStart unless delayed to end of frame
+        atFrameEnd = true;
+    }
     g_EventHandler.requestPause(atFrameEnd);
 }
 

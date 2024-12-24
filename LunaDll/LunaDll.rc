@@ -18,28 +18,23 @@
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_CRASHDIALOG DIALOGEX 0, 0, 501, 305
+IDD_CRASHDIALOG DIALOGEX 0, 0, 365, 305
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "SMBX has crashed D:"
+CAPTION "SMBX2 has crashed D:"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    PUSHBUTTON      "Send to Server",IDC_BNT_SEND,5,289,232,14
-    PUSHBUTTON      "Don't send to Server",IDC_BNT_NOSEND,254,289,233,14
-    CONTROL         "Don't ask again (only for this session)",IDC_CHECK_NOASK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,259,262,10
-    LTEXT           "It seems that SMBX has crashed. See the crash log below.",IDC_STATICTEXT_CRASHMSG,5,2,256,10
-    EDITTEXT        IDC_EDITTEXT_CRASHMSG,5,12,491,150,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL
-    LTEXT           "You can however help the development of LunaDll/LunaLua if you send this log to our server:",IDC_STATICTEXT_SENDTOSERVER,5,276,320,8
-    EDITTEXT        IDC_EDITTEXT_WHATDIDYOUDO,5,204,491,49,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
-    LTEXT           "What did you do? (Optional) [max. 500 characters]",IDC_STATICTEXT_WHATDIDYOUDO,5,193,250,8
-    EDITTEXT        IDC_EDITTEXT_YOURNAME,5,174,491,13,ES_AUTOHSCROLL
-    LTEXT           "Your username and forum website (Optional) [max. 100 characters]",IDC_STATICTEXT_YOURNAME,5,164,300,8
+    PUSHBUTTON      "Close",IDC_BNT_NOSEND,5,287,353,14
+    LTEXT           "It seems that SMBX2 has crashed. See the crash log below.",IDC_STATICTEXT_CRASHMSG,5,2,256,10
+    EDITTEXT        IDC_EDITTEXT_CRASHMSG,5,12,353,233,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL
+    LTEXT           "This crash log will be saved to the ""logs"" folder. It could be caused by anything ranging from level design, to custom Lua scripts, to a bug in the engine.",IDC_STATICTEXT_SENDTOSERVER,5,247,320,18
+    LTEXT           "If you believe it may be a bug in the engine, feel free to report this in the SMBX forums or Codehaus Discord Server.",IDC_STATICTEXT_SENDTOSERVER2,5,265,320,19
 END
 
 
@@ -54,12 +49,22 @@ BEGIN
     IDD_CRASHDIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 5
-        RIGHTMARGIN, 494
+        RIGHTMARGIN, 358
         TOPMARGIN, 7
-        BOTTOMMARGIN, 309
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CRASHDIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -70,6 +75,7 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEA)
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_AUSTRIAN
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -111,19 +117,19 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""winres.h""\r\n"
     "#include ""version.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -190,13 +196,14 @@ END
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENC)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_CAN
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// FeatureJSON
+// FEATUREJSON
 //
 
-IDR_FEATUREJSON1        FeatureJSON             "FeatureJSONResource.txt"
+IDR_FEATUREJSON1        FEATUREJSON             "FeatureJSONResource.txt"
 
 #endif    // English (Canada) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -212,5 +219,4 @@ IDR_FEATUREJSON1        FeatureJSON             "FeatureJSONResource.txt"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
 
