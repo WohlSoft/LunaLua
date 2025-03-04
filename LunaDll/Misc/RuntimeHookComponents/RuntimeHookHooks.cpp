@@ -3446,15 +3446,22 @@ static bool momentumIsOnScreen(Momentum& momentum)
 
     // Determine the number of active cameras
     int cameraType = GM_CAMERA_CONTROL;
-    int activeCameraCount = 1;
 
-    if (cameraType == 1 || cameraType == 4 || (cameraType == 5 && SMBX_CameraInfo::Get(2)->unkIsSplitScreen))
+    int startCameraIdx = 1;
+    int endCameraIdx = 1;
+
+    if (GM_SUPERMARIO2_PLAYER_IDX > 0) {
+        // For the supermario2 cheat, just use the camera of the active player
+        startCameraIdx = GM_SUPERMARIO2_PLAYER_IDX;
+        endCameraIdx = startCameraIdx;
+    }
+    else if (cameraType == 1 || cameraType == 4 || (cameraType == 5 && SMBX_CameraInfo::Get(2)->unkIsSplitScreen))
     {
-        activeCameraCount = 2;
+        endCameraIdx = 2;
     }
 
     // Check the box against each of the active cameras
-    for (int cameraIdx = 1; cameraIdx <= activeCameraCount; cameraIdx++)
+    for (int cameraIdx = startCameraIdx; cameraIdx <= endCameraIdx; cameraIdx++)
     {
         SMBX_CameraInfo* camInfo = SMBX_CameraInfo::Get(cameraIdx);
 
