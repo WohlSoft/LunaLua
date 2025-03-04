@@ -3485,7 +3485,7 @@ static void __stdcall runtimeHookNPCRespawnBugFixInternal(NPCMOB* npc)
     // This checks if the NPC is off screen, and if so, sets some flags to let it respawn.
     // Minor note: this runs before most of the NPC's values are reset.
 
-    if (!gDisableNPCRespawnBugFix && !momentumIsOnScreen(npc->spawnMomentum))
+    if (!gDisableNPCRespawnBugFix && !GM_FREEZWITCH_ACTIV && !momentumIsOnScreen(npc->spawnMomentum))
     {
         npc->offscreenFlag1 = -1;
         npc->offscreenFlag2 = -1;
