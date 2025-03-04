@@ -28,12 +28,16 @@
 
 #include "../Rendering/GL/GLEngine.h"
 #include "../Rendering/GL/GLEngineProxy.h"
+#include "../Misc/CollisionMatrix.h"
+#include "../SMBXInternal/Ports.h"
 
 #define FFI_EXPORT(sig) __declspec(dllexport) sig __cdecl
 
 // Prototypes from RuntimeHookCharacterId.cpp
 short* getValidCharacterIDArray();
 PlayerMOB* getTemplateForCharacter(int id);
+// Defined in RuntimeHookNpcHarm.cpp
+void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID);
 
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
@@ -390,6 +394,10 @@ extern "C" {
         free(cpy);
     }
 
+    FFI_EXPORT(void) LunaLuaQueuePlayerSectionChangedEvent(short playerIndex)
+    {
+        gLunaLua.queuePlayerSectionChangeEvent(playerIndex);
+    }
 
     FFI_EXPORT(int) LunaLuaGetSelectedControllerPowerLevel(int playerNum)
     {
@@ -398,6 +406,18 @@ extern "C" {
             return (int)gLunaGameControllerManager.getSelectedControllerPowerLevel(playerNum);
         }
         return (int)SDL_JOYSTICK_POWER_UNKNOWN;
+    }
+
+    struct StickPos
+    {
+        int x;
+        int y;
+    };
+    FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
+    {
+        const auto stickPos = gLunaGameControllerManager.getSelectedControllerStickPosition(playerNum);
+
+        return {std::get<0>(stickPos), std::get<1>(stickPos)};
     }
 
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
@@ -426,7 +446,9 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
-    char collisionGroup[32];\
+    bool nonpccollision;\
+    short fullyInsideSection;\
+    unsigned int collisionGroup;\
 } ExtendedNPCFields;";
     }
 
@@ -444,13 +466,51 @@ typedef struct ExtendedBlockFields_\
     double layerSpeedY;\
     double extraSpeedX;\
     double extraSpeedY;\
-    char collisionGroup[32];\
+    unsigned int collisionGroup;\
 } ExtendedBlockFields;";
     }
 
-    FFI_EXPORT(int) LunaLuaGetCollisionGroupStringLength()
+    FFI_EXPORT(ExtendedPlayerFields*) LunaLuaGetPlayerExtendedFieldsArray()
     {
-        return 32;
+        return Player::GetExtended(0);
+    }
+
+    FFI_EXPORT(const char*) LunaLuaGetPlayerExtendedFieldsStruct()
+    {
+        return "\
+typedef struct ExtendedPlayerFields_\
+{\
+    bool noblockcollision;\
+    bool nonpcinteraction;\
+    bool noplayerinteraction;\
+    unsigned int collisionGroup;\
+    int slidingTimeSinceOnSlope;\
+} ExtendedPlayerFields;";
+    }
+
+    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAllocateIndex()
+    {
+        return gCollisionMatrix.allocateIndex();
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixIncrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.incrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixDecrementReferenceCount(unsigned int group)
+    {
+        gCollisionMatrix.decrementReferenceCount(group);
+    }
+
+    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetIndicesCollide(unsigned int first, unsigned int second, bool collide)
+    {
+        gCollisionMatrix.setIndicesCollide(first, second, collide);
+    }
+
+    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetIndicesCollide(unsigned int first, unsigned int second) 
+    {
+        return gCollisionMatrix.getIndicesCollide(first, second);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
@@ -475,12 +535,26 @@ typedef struct ExtendedBlockFields_\
         if (enable)
         {
             gDisableNPCDownwardClipFix.Apply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Apply();
         }
         else
         {
             gDisableNPCDownwardClipFix.Unapply();
+            // Question to my past self: Why was the following line commented out? Way later I noticed this patch used to conflict with NpcIdExtender so perhaps that's why?
             //gDisableNPCDownwardClipFixSlope.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCCeilingBugFix(bool enable)
+    {
+        if (enable)
+        {
+            gNPCCeilingBugFix.Apply();
+        }
+        else
+        {
+            gNPCCeilingBugFix.Unapply();
         }
     }
 
@@ -488,12 +562,34 @@ typedef struct ExtendedBlockFields_\
     {
         if (enable)
         {
-            gDisableNPCSectionFix.Apply();
+            gNPCSectionFix.Apply();
         }
         else
         {
-            gDisableNPCSectionFix.Unapply();
+            gNPCSectionFix.Unapply();
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetLinkClowncarFairyFix(bool enable)
+    {
+        if (enable)
+        {
+            gLinkFairyClowncarFixes.Apply();
+        }
+        else
+        {
+            gLinkFairyClowncarFixes.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetSlideJumpFix(bool enable)
+    {
+        gSlideJumpFixIsEnabled = enable;
+    }
+
+    FFI_EXPORT(void) LunaLuaSetNPCRespawnBugFix(bool enable)
+    {
+        gDisableNPCRespawnBugFix = !enable;
     }
 
     FFI_EXPORT(void) LunaLuaSetNPCRespawnBugFix(bool enable)
@@ -503,14 +599,15 @@ typedef struct ExtendedBlockFields_\
 
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
-            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-                gFenceFixes[i]->Apply();
-            }
+            gFenceFixes.Apply();
         } else {
-            for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-                gFenceFixes[i]->Unapply();
-            }
+            gFenceFixes.Unapply();
         }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetPowerupPowerdownPositionFix(bool enable)
+    {
+        SMBX13::Ports::_enablePowerupPowerdownPositionFixes = enable;
     }
 
     FFI_EXPORT(void) LunaLuaSetFrameTiming(double value)
@@ -597,6 +694,45 @@ typedef struct ExtendedBlockFields_\
 
         std::wstring wpath = Str2WStr(path);
         return gCachedFileMetadata.exists(wpath);
+    }
+
+    FFI_EXPORT(bool) LunaLuaWriteFile(const char* path, const char* data, size_t dataLen)
+    {
+        CLunaFFILock ffiLock(__FUNCTION__);
+
+        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
+        if (!ptr) return false;
+        if (!ptr->canWrite) return false;
+        path = ptr->path;
+
+        // Try to write file
+        bool ret = writeFileAtomic(path, data, dataLen);
+
+        // If successful, update cache, if cached
+        std::wstring wpath = Str2WStr(path);
+        CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
+        if (cacheEntry == nullptr)
+        {
+            // Not cached, don't bother keeping
+            return ret;
+        }
+
+        // Replace cache entry
+        std::shared_ptr<std::vector<char>> cacheData = cacheEntry->data.lock();
+        if (cacheData)
+        {
+            g_lunaFileCacheSet.erase(cacheData);
+            cacheData = std::make_shared<std::vector<char>>();
+            if (dataLen > 0)
+            {
+                cacheData->resize(dataLen);
+                memcpy(&((*cacheData)[0]), data, dataLen);
+            }
+            cacheEntry->data = cacheData;
+            g_lunaFileCacheSet.insert(cacheData);
+        }
+
+        return ret;
     }
 
     FFI_EXPORT(void) LunaLuaSetWindowTitle(const char* newName)
@@ -808,6 +944,11 @@ typedef struct ExtendedBlockFields_\
             ShowWindow(gMainWindowHwnd, SW_MAXIMIZE);
         }
     }
+
+    FFI_EXPORT(void) LunaLuaMarkNPCTransformationAsHandledByLua(int npcIdx, int oldID, int newID)
+    {
+        markNPCTransformationAsHandledByLua(npcIdx, oldID, newID);
+    }
 }
 
 void CachedReadFile::clearData()
@@ -844,5 +985,28 @@ extern "C" {
     FFI_EXPORT(bool) LunaLuaGetWeakLava()
     {
         return gLavaIsWeak;
+    }
+}
+
+extern "C" {
+    // Debug function to dump patched ranges
+    FFI_EXPORT(const char*) LunaLuaGetPatchedRange(int i)
+    {
+        static std::string strRet;
+
+        std::stringstream strBuild;
+        for (AsmRange* cursor = AsmRange::getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
+        {
+            // Yes, this is brute force and inefficient, O(n^2) and all that, but for debug/development purposes, it's adaquate to avoid making a gigantic string.
+            if (i <= 0)
+            {
+                strBuild << std::hex << "0x" << cursor->getAddr() << "\t0x" << cursor->getSize() << "\t" << cursor->getFile() << ":" << std::dec << cursor->getLine();
+                break;
+            }
+            i--;
+        }
+
+        strRet = strBuild.str();
+        return strRet.c_str();
     }
 }

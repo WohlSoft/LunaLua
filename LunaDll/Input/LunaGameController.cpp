@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <memory>
+#include <tuple>
 #include "LunaGameController.h"
 #if !defined(BUILDING_SMBXLAUNCHER)
 #   ifdef _WIN32
@@ -21,6 +22,7 @@ LunaGameControllerManager::LunaGameControllerManager() :
     controllerMap(),
     players(),
     pressQueue(),
+    releaseQueue(),
     reconnectTimeout(0),
     reconnectFlag(false)
 {
@@ -139,6 +141,7 @@ void LunaGameControllerManager::processSDLEvent(const SDL_Event& event)
     }
 }
 
+
 #if !defined(BUILDING_SMBXLAUNCHER)
 void LunaGameControllerManager::handleInputs()
 {
@@ -178,7 +181,7 @@ void LunaGameControllerManager::handleInputs()
                 printf("Selected controller: %s\n", selectedController->getName().c_str());
             #endif
 
-            sendSelectedController(selectedController->getName(), 1);
+            sendSelectedController(selectedController->getName(), 1, false);
         }
 
         // Nothing for further players
@@ -239,7 +242,7 @@ void LunaGameControllerManager::handleInputs()
                     printf("Selected controller: %s\n", selectedController->getName().c_str());
                 #endif
 
-                sendSelectedController(selectedController->getName(), playerNum);
+                sendSelectedController(selectedController->getName(), playerNum, false);
             }
         }
 
@@ -267,38 +270,46 @@ void LunaGameControllerManager::handleInputs()
         handleInputsForPlayer(playerNum);
     }
 
-    // Send button press events
-    for (auto& press : pressQueue)
+    // Send button press/release events
+    for (int queueToSend = 0; queueToSend <= 1; queueToSend++)
     {
-        SDL_JoystickID joyId = press.first;
-        int which = press.second;
-
-        auto&& it = controllerMap.find(joyId);
-        if (it != controllerMap.end())
+        // send press events first, then release events
+        auto theQueue = queueToSend ? releaseQueue : pressQueue;
+        const char* eventName = queueToSend ? "onControllerButtonRelease" : "onControllerButtonPress";
+        //
+        for (auto& stateChange : theQueue)
         {
-            if (gLunaLua.isValid()) {
-                // Get associated playerNum, or 0 if unassociated
-                int playerNum;
-                for (playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
-                {
-                    if (players[playerNum - 1].haveController && (players[playerNum - 1].joyId == joyId))
-                    {
-                        break;
-                    }
-                }
-                if (playerNum > LunaGameControllerManager::CONTROLLER_MAX_PLAYERS)
-                {
-                    playerNum = 0;
-                }
+            SDL_JoystickID joyId = stateChange.first;
+            int which = stateChange.second;
 
-                std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onControllerButtonPress", false);
-                changeControllerEvent->setDirectEventName("onControllerButtonPress");
-                changeControllerEvent->setLoopable(false);
-                gLunaLua.callEvent(changeControllerEvent, which, playerNum, it->second.getName());
+            auto&& it = controllerMap.find(joyId);
+            if (it != controllerMap.end())
+            {
+                if (gLunaLua.isValid()) {
+                    // Get associated playerNum, or 0 if unassociated
+                    int playerNum;
+                    for (playerNum = 1; playerNum <= LunaGameControllerManager::CONTROLLER_MAX_PLAYERS; playerNum++)
+                    {
+                        if (players[playerNum - 1].haveController && (players[playerNum - 1].joyId == joyId))
+                        {
+                            break;
+                        }
+                    }
+                    if (playerNum > LunaGameControllerManager::CONTROLLER_MAX_PLAYERS)
+                    {
+                        playerNum = 0;
+                    }
+
+                    std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>(eventName, false);
+                    changeControllerEvent->setDirectEventName(eventName);
+                    changeControllerEvent->setLoopable(false);
+                    gLunaLua.callEvent(changeControllerEvent, which, playerNum, it->second.getName());
+                }
             }
         }
     }
     pressQueue.clear();
+    releaseQueue.clear();
 }
 #endif // !defined(BUILDING_SMBXLAUNCHER)
 
@@ -325,8 +336,9 @@ void LunaGameControllerManager::handleInputsForPlayer(int playerNum)
             #if defined(CONTROLLER_DEBUG)
                 printf("Selected controller: Keyboard\n");
             #endif
-            sendSelectedController("Keyboard", playerNum);
+            sendSelectedController("Keyboard", playerNum, player.controllerJustDisconnected);
         }
+        player.controllerJustDisconnected = false;
         return;
     }
 
@@ -438,12 +450,13 @@ void LunaGameControllerManager::notifyKeyboardPress(int keycode)
                     // Clear selected flag if set
                     players[playerNum - 1].haveKeyboard = true;
                     players[playerNum - 1].haveController = false;
+                    players[playerNum - 1].controllerJustDisconnected = false;
 
                     SMBXInput::setPlayerInputType(playerNum, 0); // Set player 1 input type to 'keyboard'
                     #if defined(CONTROLLER_DEBUG)
                         printf("Selected controller: Keyboard\n");
                     #endif
-                    sendSelectedController("Keyboard", playerNum);
+                    sendSelectedController("Keyboard", playerNum, false);
                 }
             }
 
@@ -474,6 +487,16 @@ std::string LunaGameControllerManager::getSelectedControllerName(int playerNum)
     return "Keyboard";
 }
 
+std::tuple<int, int> LunaGameControllerManager::getSelectedControllerStickPosition(int playerNum)
+{
+    LunaGameController* controller = getController(playerNum);
+    if (controller != nullptr)
+    {
+        return controller->getStickPosition();
+    }
+    return {0, 0};
+}
+
 void LunaGameControllerManager::rumbleSelectedController(int playerNum, int ms, float strength)
 {
     LunaGameController* controller = getController(playerNum);
@@ -497,13 +520,13 @@ LunaGameController* LunaGameControllerManager::getController(int playerNum)
 }
 
 #if !defined(BUILDING_SMBXLAUNCHER)
-void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum)
+void LunaGameControllerManager::sendSelectedController(const std::string& name, int playerNum, bool changeTriggeredByDisconnect)
 {
     if (gLunaLua.isValid()) {
         std::shared_ptr<Event> changeControllerEvent = std::make_shared<Event>("onChangeController", false);
         changeControllerEvent->setDirectEventName("onChangeController");
         changeControllerEvent->setLoopable(false);
-        gLunaLua.callEvent(changeControllerEvent, name, playerNum);
+        gLunaLua.callEvent(changeControllerEvent, name, playerNum, changeTriggeredByDisconnect);
     }
 }
 #endif
@@ -547,17 +570,21 @@ void LunaGameControllerManager::removeJoystickEvent(SDL_JoystickID joyId)
         {
             players[playerNum - 1].haveController = false;
             players[playerNum - 1].joyId = 0;
+            players[playerNum - 1].controllerJustDisconnected = true;
         }
     }
 
     // Remove pending presses associated with this joyId
-    {
-        auto it = pressQueue.begin();
-        while (it != pressQueue.end())
+    for (int queueToClear = 0; queueToClear <= 1; queueToClear++) {
+        // which queue to clear?
+        auto theQueue = queueToClear ? releaseQueue : pressQueue;
+        // remove presses from the queue
+        auto it = theQueue.begin();
+        while (it != theQueue.end())
         {
             if (it->first == joyId)
             {
-                it = pressQueue.erase(it);
+                it = theQueue.erase(it);
             }
             else
             {
@@ -644,6 +671,8 @@ LunaGameController::LunaGameController(LunaGameControllerManager* _managerPtr, S
     axisPadState(0),
     padState(0),
     buttonState(0),
+    xAxis(0),
+    yAxis(0),
     activeFlag(false),
     joyButtonMap()
 {
@@ -757,6 +786,8 @@ LunaGameController::LunaGameController(LunaGameController &&other)
     axisPadState    = other.axisPadState;
     padState        = other.padState;
     buttonState     = other.buttonState;
+    xAxis           = other.xAxis;
+    yAxis           = other.yAxis;
     activeFlag      = other.activeFlag;
     joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
@@ -779,6 +810,8 @@ LunaGameController & LunaGameController::operator=(LunaGameController &&other)
     axisPadState    = other.axisPadState;
     padState        = other.padState;
     buttonState     = other.buttonState;
+    xAxis           = other.xAxis;
+    yAxis           = other.yAxis;
     activeFlag      = other.activeFlag;
     joyButtonMap    = other.joyButtonMap;
     other.joyPtr    = nullptr;
@@ -970,11 +1003,13 @@ void LunaGameController::controllerAxisEvent(const SDL_ControllerAxisEvent& even
         axisAsDirectional = true;
         posPadNumber = CONTROLLER_PAD_RIGHT;
         negPadNumber = CONTROLLER_PAD_LEFT;
+        xAxis = (int)event.value;
         break;
     case SDL_CONTROLLER_AXIS_LEFTY:
         axisAsDirectional = true;
         posPadNumber = CONTROLLER_PAD_DOWN;
         negPadNumber = CONTROLLER_PAD_UP;
+        yAxis = (int)event.value;
         break;
     default:
         break;
@@ -1107,6 +1142,10 @@ void LunaGameController::buttonEvent(int which, bool newState)
     if (newState)
     {
         managerPtr->storePressEvent(joyId, which);
+    }
+    else
+    {
+        managerPtr->storeReleaseEvent(joyId, which);
     }
 }
 

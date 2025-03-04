@@ -2,6 +2,7 @@
 #include <time.h>
 #include <cctype>
 #include <cstdarg>
+#include <mutex>
 #include "Globals.h"
 #include "LevelCodes/LevelCodes.h"
 #include "Shlwapi.h"
@@ -12,6 +13,8 @@ HINSTANCE gHInstance;
 
 HWND gMainWindowHwnd = NULL;
 bool gMainWindowFocused = false;
+bool gMainWindowUnfocusPending = false;
+bool gMainWindowUnfocusOverlay = false;
 
 // Global settings
 bool gLunaEnabled;
@@ -34,6 +37,9 @@ bool gDisableNPCRespawnBugFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
+
+// Flag for returning from gameover screen
+bool gDidGameOver = false;
 
 // Global variables
 int	gFrames;
@@ -130,3 +136,6 @@ void printBoxA(const char *fmt, ...)
     va_end(ap);
     dbgboxA(buf);
 }
+
+std::string gEditorPlacedItem = "nil";
+std::mutex g_editorIPCMutex;

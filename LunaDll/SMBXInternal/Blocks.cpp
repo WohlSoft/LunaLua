@@ -1,5 +1,6 @@
 #include "Blocks.h"
 #include "PlayerMOB.h"
+#include <algorithm>
 
 bool isBlocksSortingRequired = false;
 
@@ -132,6 +133,7 @@ void Blocks::HideAll(int type) {
 static int16_t blockprop_bumpable[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_playerfilter[Block::MAX_ID + 1] = { 0 };
 static int16_t blockprop_npcfilter[Block::MAX_ID + 1] = { 0 };
+static int16_t blockprop_walkpaststair[Block::MAX_ID + 1] = { 0 }; // whether to walk past semisolid slopes (like ghost house stairs)
 
 void Blocks::InitProperties() {
     for (int id = 1; id <= Block::MAX_ID; id++)
@@ -139,6 +141,7 @@ void Blocks::InitProperties() {
         SetBlockBumpable(id, false);
         SetBlockPlayerFilter(id, 0);
         SetBlockNPCFilter(id, 0);
+        SetBlockWalkPastStair(id, false);
     }
 
     // Default game config
@@ -205,6 +208,16 @@ void Blocks::SetBlockNPCFilter(int id, short npcId)
     blockprop_npcfilter[id] = npcId;
 }
 
+bool Blocks::GetBlockWalkPastStair(int id) {
+    if ((id < 1) || (id > Block::MAX_ID)) return false;
+    return (blockprop_walkpaststair[id] != 0);
+}
+
+void Blocks::SetBlockWalkPastStair(int id, bool walkpaststair) {
+    if ((id < 1) || (id > Block::MAX_ID)) return;
+    blockprop_walkpaststair[id] = walkpaststair ? -1 : 0;
+}
+
 // Getter for address of Block property arrays
 uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
 {
@@ -220,8 +233,184 @@ uintptr_t Blocks::GetPropertyTableAddress(const std::string& s)
     {
         return reinterpret_cast<uintptr_t>(blockprop_npcfilter);
     }
+    else if (s == "walkpaststair")
+    {
+        return reinterpret_cast<uintptr_t>(blockprop_walkpaststair);
+    }
     else
     {
         return 0;
     }
+}
+
+
+// returns the range of block indexes to iterate over using the block lookup table
+void BlockLookupQuery(double x1, double x2, int* outF, int* outL) {
+    *outF = GM_BLOCK_LOOKUP_MIN[std::min(std::max((int)floor((x1) / 32 + 8000), 0), 16000)];
+    *outL = GM_BLOCK_LOOKUP_MAX[std::min(std::max((int)floor((x2) / 32 + 8000), 0), 16000)];
+}
+
+
+double calculateSlopeAt(double refX, double offsX, Momentum* blockMomentum, short floorslope) {
+    double blockCollisionPercent = ((refX + offsX) - blockMomentum->x) / blockMomentum->width;
+    if (floorslope == -1) {
+        // reverse direction for slopes going down left
+        blockCollisionPercent = 1.0 - blockCollisionPercent;
+    }
+    return blockCollisionPercent;
+}
+
+// used in NPC and player collision hooks to handle collision against slopes when flagged as semisolid.
+// returns whether the collision should be allowed
+bool Blocks::FilterSemisolidSlopeCollision(Momentum* entityMomentum, Momentum* speed, int blockIdx, int entityBottomCollisionTimer, bool standingOnSlope)
+{
+    Block* block = Block::GetRaw(blockIdx);
+
+    short floorslope = blockdef_floorslope[block->BlockType];
+
+    if (speed->speedY < 0 && !standingOnSlope) {
+        // if moving upwards
+        if (speed->speedX == 0 || floorslope != (speed->speedX < 0 ? 1 : -1)) {
+            // moving into the slope in the same direction of its upwards facing face:
+            // collision should never be considered in this case
+            return false;
+        } else {
+            // moving into the slope *opposite* the direction of its upwards face,
+            // in this case, if the slope of our movement vector is pointed MORE upwards then the slope of the slope,
+            // we shouldn't consider collisions
+
+            if (((-speed->speedY) / speed->speedX) < (block->momentum.height / block->momentum.width)) {
+                return false;
+            }
+        }
+    }
+
+    double playerRefX = entityMomentum->x;
+    if (floorslope == -1) {
+        // use player right edge for slopes going down left
+        playerRefX += entityMomentum->width;
+    }
+    // Use whichever is more likely to put us on the slope:
+    // our current position - speed, OR current position + speed
+    double slopeAtA = calculateSlopeAt(playerRefX, speed->speedX *  4.0, &block->momentum, floorslope);
+    double slopeAtB = calculateSlopeAt(playerRefX, speed->speedX * -4.0, &block->momentum, floorslope);
+    double blockCollisionPercent = std::max(slopeAtA, slopeAtB);
+
+    // if the object is colliding above the top edge of the slope
+    if (blockCollisionPercent < 0.0) {
+        // check if it's a top slope!!!!!!!
+        // detect slopes ABOVE and aligned to the edge of the slope
+        bool isTopSlope = true;
+        {
+            // ref position for a block above
+            double refX = block->momentum.x;
+            if (floorslope == -1) {
+                refX = refX + block->momentum.width;
+            }
+            double refY = block->momentum.y;
+
+            // 
+            int fblock, lblock;
+            BlockLookupQuery(refX - 2, refX + 2, &fblock, &lblock);
+
+            for (int i = fblock; i <= lblock; i++) {
+                auto b = Block::GetRaw(i);
+                // if this is a semisolid slope of the same type
+                if (abs(b->momentum.y + b->momentum.height - refY) <= 2.0 && !b->IsHidden && !b->IsInvisible2 && blockdef_semisolid[b->BlockType] && blockdef_floorslope[b->BlockType] == floorslope) {
+                    // if the edge is aligned at the correct position
+                    if (floorslope == -1) {
+                        // left slope
+                        if (abs(b->momentum.x - refX) > 2.0) { continue; }
+                    }
+                    else {
+                        // right slope
+                        if (abs(b->momentum.x + b->momentum.width - refX) > 2.0) { continue; }
+                    }
+
+                    // found a matching semisolid above!
+                    // this is NOT a top slope
+                    isTopSlope = false;
+                    break;
+                }
+            }
+        }
+        // if this is a top slope,
+        if (isTopSlope) {
+            // clamp percent so player can stand at top edge
+            blockCollisionPercent = 0.0;
+        }
+    }
+
+    // check whether the player is sufficiently above the slope,
+    double offset = 2;
+    if (speed->speedY > 0) {
+        // if moving downwards, add some extra leniency to collision
+        offset += speed->speedY;
+    }
+    if (standingOnSlope || speed->speedY > 0) {
+        // if already standing on a slope, make it more lenient to help stick to the slope
+        offset += 4;
+    }
+    double playerFootY = entityMomentum->y + entityMomentum->height;
+    double blockCollisionBottom = block->momentum.y + blockCollisionPercent * block->momentum.height;
+    if (playerFootY > blockCollisionBottom + offset) {
+        // foot is too far below to consider collision, cancel
+        return false;
+    }
+
+    // check for slopes we can walk past, like stairs
+    if (Blocks::GetBlockWalkPastStair(block->BlockType)) {
+        // if our feet our at the bottom of the stair, and we're standing on something that isn't a slope
+        if (entityMomentum->y + entityMomentum->height >= block->momentum.y + block->momentum.height - 1 && entityBottomCollisionTimer != 0 && speed->speedY >= 0) {
+
+            // Check that there's not a platform BELOW the slope, in which case we want the entity to step up onto it anyways
+            bool isEdgeSlope = true;
+            {
+                double x1;
+                if (floorslope == -1) {
+                    // Down left slope, check according to left edge
+                    x1 = block->momentum.x;
+                } else {
+                    // Down right slope, check according to right edge
+                    x1 = block->momentum.x + block->momentum.width - 32;
+                }
+                double x2 = x1 + 32;
+                double refY = block->momentum.y + block->momentum.height;
+                x1 += 1;
+                x2 -= 1;
+
+                int fblock, lblock;
+                BlockLookupQuery(x1, x2, &fblock, &lblock);
+
+                for (int i = fblock; i <= lblock; i++) {
+                    auto b = Block::GetRaw(i);
+
+                    if (abs(b->momentum.y - refY) <= 2.0) {
+                        // if the block is below the slope
+                        if (b->momentum.x > x2 || b->momentum.x + b->momentum.width < x1) {
+                            // the block does not 'collide' horizontally
+                            continue;
+                        }
+
+                        if (!b->IsHidden && !b->IsInvisible2 && blockdef_floorslope[b->BlockType] == 0 && blockdef_passthrough[b->BlockType] == 0) {
+                            // found a matching solid below!
+                            // this is NOT an edge slope
+                            isEdgeSlope = false;
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+            // if this slope ISN'T at the edge of a platform
+            if (!isEdgeSlope) {
+                // cancel collision, allow walking past the slope
+                return false;
+            }
+        }
+
+    }
+
+    return true;
 }

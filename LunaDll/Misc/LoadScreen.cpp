@@ -48,6 +48,77 @@ static void updateFinishedFlag(lua_State* L)
 }
 
 
+// also used by Gameover.cpp
+void InitMinimalLuaState(lua_State* L) {
+    lua_pushcfunction(L, luaopen_base);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_math);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_string);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_table);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_bit);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_package);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_io);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_ffi);
+    lua_call(L, 0, 0);
+    lua_pushcfunction(L, luaopen_jit);
+    lua_call(L, 0, 0);
+
+    lua_pushstring(L, WStr2Str(gAppPathWCHAR).c_str());
+    lua_setglobal(L, "_smbxPath");
+    lua_pushstring(L, ((std::string)GM_FULLDIR).c_str());
+    lua_setglobal(L, "_episodePath");
+
+    luasetconst(L, "FIELD_BYTE", 1);
+    luasetconst(L, "FIELD_WORD", 2);
+    luasetconst(L, "FIELD_DWORD", 3);
+    luasetconst(L, "FIELD_FLOAT", 4);
+    luasetconst(L, "FIELD_DFLOAT", 5);
+    luasetconst(L, "FIELD_STRING", 6);
+    luasetconst(L, "FIELD_BOOL", 7);
+
+    DEF_CONST(L, GL_FLOAT);
+    DEF_CONST(L, GL_FLOAT_VEC2);
+    DEF_CONST(L, GL_FLOAT_VEC3);
+    DEF_CONST(L, GL_FLOAT_VEC4);
+    DEF_CONST(L, GL_FLOAT_MAT2);
+    DEF_CONST(L, GL_FLOAT_MAT3);
+    DEF_CONST(L, GL_FLOAT_MAT4);
+    DEF_CONST(L, GL_FLOAT_MAT2x3);
+    DEF_CONST(L, GL_FLOAT_MAT2x4);
+    DEF_CONST(L, GL_FLOAT_MAT3x2);
+    DEF_CONST(L, GL_FLOAT_MAT3x4);
+    DEF_CONST(L, GL_FLOAT_MAT4x2);
+    DEF_CONST(L, GL_FLOAT_MAT4x3);
+    DEF_CONST(L, GL_INT);
+    DEF_CONST(L, GL_INT_VEC2);
+    DEF_CONST(L, GL_INT_VEC3);
+    DEF_CONST(L, GL_INT_VEC4);
+    DEF_CONST(L, GL_UNSIGNED_INT);
+    DEF_CONST(L, GL_UNSIGNED_INT_VEC2);
+    DEF_CONST(L, GL_UNSIGNED_INT_VEC3);
+    DEF_CONST(L, GL_UNSIGNED_INT_VEC4);
+    DEF_CONST(L, GL_DOUBLE);
+    DEF_CONST(L, GL_DOUBLE_VEC2);
+    DEF_CONST(L, GL_DOUBLE_VEC3);
+    DEF_CONST(L, GL_DOUBLE_VEC4);
+    DEF_CONST(L, GL_DOUBLE_MAT2);
+    DEF_CONST(L, GL_DOUBLE_MAT3);
+    DEF_CONST(L, GL_DOUBLE_MAT4);
+    DEF_CONST(L, GL_DOUBLE_MAT2x3);
+    DEF_CONST(L, GL_DOUBLE_MAT2x4);
+    DEF_CONST(L, GL_DOUBLE_MAT3x2);
+    DEF_CONST(L, GL_DOUBLE_MAT3x4);
+    DEF_CONST(L, GL_DOUBLE_MAT4x2);
+    DEF_CONST(L, GL_DOUBLE_MAT4x3);
+    DEF_CONST(L, GL_SAMPLER_2D);
+}
+
 static void LoadThread(void)
 {
     DWORD loadScreenStartTick = GetTickCount();
@@ -79,86 +150,21 @@ static void LoadThread(void)
     if (L == nullptr)
     {
         L = luaL_newstate();
-        lua_pushcfunction(L, luaopen_base);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_math);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_string);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_table);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_bit);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_package);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_io);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_ffi);
-        lua_call(L, 0, 0);
-        lua_pushcfunction(L, luaopen_jit);
-        lua_call(L, 0, 0);
 
-        lua_pushstring(L, WStr2Str(gAppPathWCHAR).c_str());
-        lua_setglobal(L, "_smbxPath");
-        lua_pushstring(L, ((std::string)GM_FULLDIR).c_str());
-        lua_setglobal(L, "_episodePath");
+        InitMinimalLuaState(L);
 
         lua_pushnumber(L, 0.0);
         lua_setglobal(L, "_loadScreenTimeout");
         updateFinishedFlag(L);
 
-        luasetconst(L, "FIELD_BYTE", 1);
-        luasetconst(L, "FIELD_WORD", 2);
-        luasetconst(L, "FIELD_DWORD", 3);
-        luasetconst(L, "FIELD_FLOAT", 4);
-        luasetconst(L, "FIELD_DFLOAT", 5);
-        luasetconst(L, "FIELD_STRING", 6);
-        luasetconst(L, "FIELD_BOOL", 7);
-
-        DEF_CONST(L, GL_FLOAT);
-        DEF_CONST(L, GL_FLOAT_VEC2);
-        DEF_CONST(L, GL_FLOAT_VEC3);
-        DEF_CONST(L, GL_FLOAT_VEC4);
-        DEF_CONST(L, GL_FLOAT_MAT2);
-        DEF_CONST(L, GL_FLOAT_MAT3);
-        DEF_CONST(L, GL_FLOAT_MAT4);
-        DEF_CONST(L, GL_FLOAT_MAT2x3);
-        DEF_CONST(L, GL_FLOAT_MAT2x4);
-        DEF_CONST(L, GL_FLOAT_MAT3x2);
-        DEF_CONST(L, GL_FLOAT_MAT3x4);
-        DEF_CONST(L, GL_FLOAT_MAT4x2);
-        DEF_CONST(L, GL_FLOAT_MAT4x3);
-        DEF_CONST(L, GL_INT);
-        DEF_CONST(L, GL_INT_VEC2);
-        DEF_CONST(L, GL_INT_VEC3);
-        DEF_CONST(L, GL_INT_VEC4);
-        DEF_CONST(L, GL_UNSIGNED_INT);
-        DEF_CONST(L, GL_UNSIGNED_INT_VEC2);
-        DEF_CONST(L, GL_UNSIGNED_INT_VEC3);
-        DEF_CONST(L, GL_UNSIGNED_INT_VEC4);
-        DEF_CONST(L, GL_DOUBLE);
-        DEF_CONST(L, GL_DOUBLE_VEC2);
-        DEF_CONST(L, GL_DOUBLE_VEC3);
-        DEF_CONST(L, GL_DOUBLE_VEC4);
-        DEF_CONST(L, GL_DOUBLE_MAT2);
-        DEF_CONST(L, GL_DOUBLE_MAT3);
-        DEF_CONST(L, GL_DOUBLE_MAT4);
-        DEF_CONST(L, GL_DOUBLE_MAT2x3);
-        DEF_CONST(L, GL_DOUBLE_MAT2x4);
-        DEF_CONST(L, GL_DOUBLE_MAT3x2);
-        DEF_CONST(L, GL_DOUBLE_MAT3x4);
-        DEF_CONST(L, GL_DOUBLE_MAT4x2);
-        DEF_CONST(L, GL_DOUBLE_MAT4x3);
-        DEF_CONST(L, GL_SAMPLER_2D);
-
         if (luaL_loadbuffer(L, mainCode.c_str(), mainCode.length(), "=loadscreen.lua"))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Syntax Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Syntax Error", MB_OK | MB_ICONWARNING);
             return;
         }
         if (lua_pcall(L, 0, 0, 0))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Critical Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Critical Error", MB_OK | MB_ICONWARNING);
             return;
         }
     }
@@ -167,7 +173,7 @@ static void LoadThread(void)
     lua_getglobal(L, "init");
     if (lua_pcall(L, 0, 0, 0))
     {
-        MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
     }
 
     
@@ -187,7 +193,7 @@ static void LoadThread(void)
         lua_getglobal(L, "onDraw");
         if (lua_pcall(L, 0, 0, 0))
         {
-            MessageBoxA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
+            LunaMsgBox::ShowA(NULL, lua_tostring(L, -1), "LunaLua LoadScreen Error", MB_OK | MB_ICONWARNING);
         }
 
         Renderer::Get().RenderBelowPriority(DBL_MAX);
@@ -252,9 +258,7 @@ void LunaLoadScreenKill()
     loadThread = nullptr;
     g_ResetFrameTiming = true;
 
-    // At end of load screen, make sure we're properly focused
-    native_rtcDoEvents();
-    ShowAndFocusWindow(gMainWindowHwnd);
+    // We used to grab focus after the load screen, but that seems kinda rude and unnecessary?
     native_rtcDoEvents();
 }
 

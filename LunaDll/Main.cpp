@@ -115,7 +115,7 @@ void LunaDLLInit()
     {
         if (!haveSoftwareGLSupport)
         {
-            MessageBoxA(0, "Missing DLL for Software GL support", "Error", 0);
+            LunaMsgBox::ShowA(0, "Missing DLL for Software GL support", "Error", 0);
             exit(1);
         }
         SetDllDirectoryA("softgl");
@@ -156,16 +156,19 @@ void LunaDLLInit()
         {
             errmsg += "\n(Error using software renderer)";
         }
-        MessageBoxA(0, errmsg.c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, errmsg.c_str(), "Error", 0);
         exit(1);
     }
 
     TrySkipPatch();
 
     // Set processor affinity for the main thread. Switching cores is bad for stable frame rate
-    DWORD curProcessor = GetCurrentProcessorNumberXP();
-    SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    if (gGeneralConfig.getEngineCpuLockAffinity())
+    {
+        DWORD curProcessor = GetCurrentProcessorNumberXP();
+        SetThreadAffinityMask(GetCurrentThread(), 1 << curProcessor);
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+    }
 
     // Initialize GDI+ so we can make use of it
     ULONG_PTR m_gdiplusToken;   // class member

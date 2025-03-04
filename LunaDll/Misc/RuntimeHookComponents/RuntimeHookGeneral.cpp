@@ -25,6 +25,11 @@
 
 #include "../../Misc/LoadScreen.h"
 
+#include "../../SMBXInternal/Ports.h"
+#include "../../SMBXInternal/Functions.h"
+
+#include "../../FileManager/SaveFile.h"
+
 #ifndef NO_SDL
 bool episodeStarted = false;
 #endif
@@ -48,9 +53,12 @@ static unsigned int __stdcall LatePatch(void);
 
 void SetupThunRTMainHook()
 {
-    // Remove protection on smbx.text section
+    // Make sure smbx.text section is protected by default, in case a loader did something
     DWORD oldprotect;
-    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READWRITE, &oldprotect);
+    VirtualProtect((void*)0x401000, 0x724000, PAGE_EXECUTE_READ, &oldprotect);
+
+    // Try to opt into DEP for this process
+    SetProcessDEPPolicy(PROCESS_DEP_ENABLE);
 
     // Set up hook that will launch LunaDLLInit
     PATCH(0x40BDDD).CALL(&ThunRTMainHook).Apply();
@@ -383,7 +391,7 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
 
     // Notify Lua code
     // But don't pass keystrokes with ctrl or alt as a keypress
-    if (gLunaLua.isValid() &&
+    if (gLunaLua.isValid() && !LunaMsgBox::IsActive() &&
         (!ctrlPressed || (virtKey == VK_LCONTROL) || (virtKey == VK_RCONTROL)) &&
         (!altPressed || (virtKey == VK_LMENU) || (virtKey == VK_RMENU))
         ) {
@@ -428,6 +436,12 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
         }
     }
 
+    // Process ESC key press
+    if ((virtKey == VK_ESCAPE) && plainPress)
+    {
+        gEscPressed = true;
+    }
+
     // Process F12 key for screenshot to file
     if ((virtKey == VK_F12) && plainPress && g_GLEngine.IsEnabled())
     {
@@ -460,6 +474,19 @@ static void ProcessRawKeyPress(uint32_t virtKey, uint32_t scanCode, bool repeate
         gGeneralConfig.setRendererUseLetterbox(!gGeneralConfig.getRendererUseLetterbox());
         gWindowSizeHandler.Recalculate(); // Recalculate framebuffer position in window
         gGeneralConfig.save();
+    }
+}
+
+static void SendLuaRawKeyEvent(uint32_t virtKey, bool isDown)
+{
+    if (gLunaLua.isValid() && !LunaMsgBox::IsActive()) {
+        std::shared_ptr<Event> keyboardReleaseEvent = std::make_shared<Event>(isDown ? "onKeyboardKeyPress" : "onKeyboardKeyRelease", false);
+        auto cKey = MapVirtualKeyA(virtKey, MAPVK_VK_TO_CHAR);
+        if (cKey != 0) {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey), std::string(1, cKey & 0b01111111));
+        } else {
+            gLunaLua.callEvent(keyboardReleaseEvent, static_cast<int>(virtKey));
+        }
     }
 }
 
@@ -552,12 +579,24 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
-    // Update key state
+    // Generate previous key state and repeat flags
     bool keyWasDown = (gKeyState[vkey] & 0x80) != 0;
     bool repeated = keyDown && keyWasDown;
 
     // Update key state
-    gKeyState[vkey] = keyDown ? 0x80 : 0x00;
+    uint8_t u8NewState = keyDown ? 0x80 : 0x00;
+    if ((vkey == VK_CAPITAL) || (vkey == VK_NUMLOCK) || (vkey == VK_SCROLL))
+    {
+        // Special case to keep track of toggle state
+        // Note: Theoretically we should be able to use gKeyState[vkey] instead of
+        //       GetKeyState(vkey) as long as we initilize the toggle state when first running
+        //       however let's just use GetKeyState(vkey) to avoid needing to do that and maybe
+        //       avoid a risk of getting out of sync (though I don't think it'd be possible)
+        u8NewState |= (GetKeyState(vkey) & 1);
+        // Compensate for how this runs before the GetKeyState state is updated
+        u8NewState ^= (keyDown && !repeated) ? 0x01 : 0x00;
+    }
+    gKeyState[vkey] = u8NewState;
 
     // For key states that should or together left and right, handle that
     switch (vkey)
@@ -578,10 +617,15 @@ static void ProcessRawInput(HWND hwnd, HRAWINPUT hRawInput, bool haveFocus)
             break;
     }
 
+    // Send lua onRawKeyPress/Release events
+    if (!repeated) {
+        SendLuaRawKeyEvent(vkey, keyDown);
+    }
     // If window is focused, and key is down, run keypress handling
-    if (haveFocus && keyDown)
-    {
-        ProcessRawKeyPress(vkey, scanCode, repeated);
+    if (haveFocus) {
+        if (keyDown) {
+            ProcessRawKeyPress(vkey, scanCode, repeated);
+        }
     }
 }
 
@@ -792,7 +836,7 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             }
             case WM_PAINT:
                 CallWindowProcW(gMainWindowProc, hwnd, uMsg, wParam, lParam);
-                if (inSizeMoveModal || !gMainWindowFocused)
+                if (inSizeMoveModal || (!gMainWindowFocused && !gStartupSettings.runWhenUnfocused))
                 {
                     g_GLEngine.EndFrame(nullptr, false, true, inSizeModal);
                 }
@@ -841,19 +885,14 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
 
                 // Our main window lost focus? Keep track of that.
-                if (!gStartupSettings.runWhenUnfocused)
-                {
-                    gMainWindowFocused = false;
-                }
+                gMainWindowFocused = false;
+
                 break;
             case WM_DESTROY:
                 // Our main window was destroyed? Clear hwnd and mark as unfocused
                 UnregisterHotKey(hwnd, VK_SNAPSHOT);
                 gMainWindowHwnd = NULL;
-                if (!gStartupSettings.runWhenUnfocused)
-                {
-                    gMainWindowFocused = false;
-                }
+                gMainWindowFocused = false;
                 break;
             case WM_HOTKEY:
                 if ((wParam == VK_SNAPSHOT) && g_GLEngine.IsEnabled())
@@ -889,9 +928,10 @@ LRESULT CALLBACK HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
             case WM_INPUT:
             {
                 bool haveFocus = (wParam == RIM_INPUT);
-
+                
                 // Process the raw input
-                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), haveFocus);
+                bool mainWindowFocus = haveFocus && gMainWindowFocused;
+                ProcessRawInput(hwnd, reinterpret_cast<HRAWINPUT>(lParam), mainWindowFocus);
 
                 // If we have focus, return via DefWindowProcW
                 if (haveFocus)
@@ -1085,7 +1125,7 @@ void ParseArgs(const std::vector<std::wstring>& args)
             {
                 // Invalid level name
                 std::wstring path = L"SMBX could not open \"" + settings.levelPath + L"\"";
-                MessageBoxW(0, path.c_str(), L"Error", MB_ICONERROR);
+                LunaMsgBox::ShowW(0, path.c_str(), L"Error", MB_ICONERROR);
                 _exit(1);
             }
             gStartupSettings.patch = true;
@@ -1171,7 +1211,6 @@ void ParseArgs(const std::vector<std::wstring>& args)
     if (vecStrFind(args, L"--runWhenUnfocused"))
     {
         gStartupSettings.runWhenUnfocused = true;
-        gMainWindowFocused = true;
     }
 
     if (vecStrFind(args, L"--sendIPCReady"))
@@ -1226,40 +1265,59 @@ static unsigned int __stdcall LatePatch(void)
 // Some patches that can be swapped on/off
 AsmPatch<777> gDisablePlayerDownwardClipFix = PATCH(0x9A3FD3).JMP(runtimeHookCompareWalkBlockForPlayerWrapper).NOP_PAD_TO_SIZE<777>();
 AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareNPCWalkBlock).NOP_PAD_TO_SIZE<8>();
-AsmPatch<167> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>();
-AsmPatch<502> gDisableNPCSectionFix = PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>();
 
-AsmPatch<11> gFenceFix_99933C = PATCH(0x99933C)
+AsmPatch<21> gNPCCeilingBugFix = PATCH(0xA17155).NOP_PAD_TO_SIZE<21>();
+
+// NOTE: This patch replaces a section 167 bytes long from 0xA13188 to 0xA1322E, but we don't NOP out the whole thing
+//       since that would conflict with NpcIdExtender, and this patch may be turned on/off at runtime.
+AsmPatch<6> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<6>();
+
+static auto npcSectionFixImpl = PatchCollection(
+    PATCH(0xA3B680).JMP(&runtimeHookNPCSectionFix).NOP_PAD_TO_SIZE<502>(),
+    PATCH(0xA0C931).JMP(&runtimeHookNPCSectionWrap).NOP_PAD_TO_SIZE<194>()
+);
+Patchable& gNPCSectionFix = npcSectionFixImpl;
+bool gSlideJumpFixIsEnabled;
+
+// these 3 are responsible for fixing link being able to turn into a fairy wihle in clowncar
+static auto linkFairyClowncarFixesImpl = PatchCollection(
+    PATCH(0x99F6E6).JMP(&runtimeHookFixLinkFairyClowncar1).NOP_PAD_TO_SIZE<10>(), // ..when using tanookie/leaf powerup
+    PATCH(0x9AAF9A).JMP(&runtimeHookFixLinkFairyClowncar2).NOP_PAD_TO_SIZE<14>(), // ..when climbing an npc
+    PATCH(0x9A75C5).JMP(&runtimeHookFixLinkFairyClowncar3).NOP_PAD_TO_SIZE<13>()  // also climbing npc related
+);
+Patchable& gLinkFairyClowncarFixes = linkFairyClowncarFixesImpl;
+
+static auto fenceFixesImpl = PatchCollection(
+    PATCH(0x99933C)
     .PUSH_EBX()
     .PUSH_IMM32(0x99A850)
-    .JMP(runtimeHookSetPlayerFenceSpeed);
+    .JMP(runtimeHookSetPlayerFenceSpeed),
 
-AsmPatch<14> gFenceFix_9A78A8 = PATCH(0x9A78A8)
+    PATCH(0x9A78A8)
     .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
     .bytes(0xD9, 0xE0) // fchs
     .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
-    .bytes(0x0F, 0x1F, 0x00); // nop
+    .bytes(0x0F, 0x1F, 0x00), // nop
 
-AsmPatch<19> gFenceFix_9B8A4C = PATCH(0x9B8A4C)
+    PATCH(0x9B8A4C)
     .PUSH_ESI()
     .CALL(runtimeHookIncreaseFenceFrameCondition)
     .bytes(0x84, 0xC0) // test al, al
     .JZ(0x9B8B5D)
-    .JMP(0x9B8AF0);
+    .JMP(0x9B8AF0),
 
-AsmPatch<10> gFenceFix_AA6E78 = PATCH(0xAA6E78)
+    PATCH(0xAA6E78)
     .PUSH_EBP()
     .PUSH_ESI()
     .CALL(runtimeHookUpdateBGOMomentum)
-    .bytes(0x0F, 0x1F, 0x00); // nop
+    .bytes(0x0F, 0x1F, 0x00), // nop
 
-Patchable *gFenceFixes[] = {
-    &gFenceFix_99933C,
-    &gFenceFix_9A78A8,
-    &gFenceFix_9B8A4C,
-    &gFenceFix_AA6E78,
-    nullptr
-};
+    PATCH(0x9A74CB)
+    .bytes(0x66, 0x39, 0x74, 0xCA, 0x04) // cmp word ptr [edx + ecx * 8 + 0x4], si ; compare isHidden to the si register, which is equal to COMBOOL(true)
+    .JE(0x9A78B6) // skip the current iteration if the layer is invisible
+    .bytes(0x0F, 0x1F, 0x00) // nop
+);
+Patchable& gFenceFixes = fenceFixesImpl;
 
 void TrySkipPatch()
 {
@@ -1270,13 +1328,19 @@ void TrySkipPatch()
     if (gStartupSettings.console)
     {
         InitDebugConsole();
+        AsmRange::StartChecking();
     }
 
     // This used to check gStartupSettings.patch but now we always nop out the loader code. We don't use it.
     {
-        PATCH(0x8BECF2).NOP_PAD_TO_SIZE<0x1B5>().Apply(); //nop out the loader code
+        //nop out the loader code and a hook
+        PATCH(0x8BECF2)
+            .NOP_PAD_TO_SIZE<0xE>()
+            .CALL(&InitHook)
+            .NOP_PAD_TO_SIZE<0x1B5>()
+            .Apply();
+
         *(WORD*)(0xB25046) = -1; //set run to true
-        PATCH(0x8BED00).CALL(&InitHook).Apply();
     }
 
     // Init freeimage:
@@ -1303,11 +1367,15 @@ void TrySkipPatch()
     fixup_NativeFuncs();
     fixup_BGODepletion();
     fixup_RenderPlayerJiterX();
+    fixup_NPCSortedBlockArrayBoundsCrash();
+    fixup_SectionSizePatch();
 
     /************************************************************************/
     /* Replaced Imports                                                     */
     /************************************************************************/
-    IMP_vbaStrCmp = &replacement_VbaStrCmp;
+    {
+        PATCH(&IMP_vbaStrCmp).dword(reinterpret_cast<uintptr_t>(&replacement_VbaStrCmp)).Apply();
+    }
 
     /************************************************************************/
     /* Set Hook                                                             */
@@ -1318,7 +1386,7 @@ void TrySkipPatch()
         std::string errCmd = "Failed to Hook";
         errCmd += "\nErr-Code: ";
         errCmd += std::to_string((long long)errCode);
-        MessageBoxA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
+        LunaMsgBox::ShowA(NULL, errCmd.c_str(), "Failed to Hook", NULL);
     }
 
     /************************************************************************/
@@ -1339,11 +1407,19 @@ void TrySkipPatch()
         .CALL(&LevelHUDHook)
         .Apply();
 
-    *(void**)0xB2F244 = (void*)&mciSendStringHookA;
+    // run onLoop from credits
+    PATCH(0x8C04CD).CALL(&runtimeHookCreditsLoop).Apply();
+    // fixes a credits bug that causes toad (or any otherwise shoe wearing player) to constantly hold jump,
+    // related to some (typically unused?) logic that makes players jump in the credits, but the range is too low when hopping in shoe for some reason that doesn't matter in the base game
+    PATCH(0x8F6E11).NOP_PAD_TO_SIZE<4>().Apply(); // effectively comments out line 9624 in modMain.bas, effectively increasing the range that blocks are checked for
+    
+    PATCH(0x9B7B80).CALL(&runtimeHookGameover).NOP_PAD_TO_SIZE<28>().Apply();
+
+    PATCH(0xB2F244).dword(reinterpret_cast<uintptr_t>(&mciSendStringHookA)).Apply();
 
     PATCH(0x8D6BB6).CALL(&forceTermination).Apply();
 
-    PATCH(0x8C11D5).CALL(&LoadWorld).Apply();
+    PATCH(0x8C11D5).CALL(&LoadWorldHook).Apply();
 
     PATCH(0x8C16F7).CALL(&WorldLoop).Apply();
 
@@ -1424,7 +1500,6 @@ void TrySkipPatch()
     PATCH(0x9083CE).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9085BB).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x9087A8).CALL(&WorldIconsHUDBitBltHook).Apply();
-    PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
     PATCH(0x908995).CALL(&WorldIconsHUDBitBltHook).Apply();
 
 
@@ -1562,6 +1637,7 @@ void TrySkipPatch()
     PATCH(0x8C20FC).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E2AED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
     PATCH(0x8E56ED).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<0x4A>().Apply();
+    PATCH(0x8DE435).SAFE_CALL(frameTimingMaxFPSHookPtr).NOP_PAD_TO_SIZE<116>().Apply(); // Keyhole exit, usually uses a different frame timing code
 
     // Level and world render hooks
     PATCH(0x909290).JMP(RenderLevelHook).NOP().Apply();
@@ -1629,9 +1705,6 @@ void TrySkipPatch()
     PATCH(0x8F7E8E).PUSH_EBX().CALL(runtimeHookLoadLevelHeader).NOP_PAD_TO_SIZE<12>().Apply();
     PATCH(0x8F7EA3).JMP(0x8F7EDB).NOP_PAD_TO_SIZE<56>().Apply();
 
-    // Save game hook
-    PATCH(0x8E47D0).JMP(runtimeHookSaveGame).NOP_PAD_TO_SIZE<6>().Apply();
-
     PATCH(0x8DC6E0).JMP(runtimeHookCleanupLevel).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0x8D6BB0).JMP(runtimeHookExitMainGame).NOP_PAD_TO_SIZE<6>().Apply();
@@ -1658,7 +1731,9 @@ void TrySkipPatch()
     PATCH(0xA0A6FB).CALL(runtimeHookNPCWaterSplashAnimRaw).Apply();
 
     PATCH(0xA0B969).JMP(runtimeHookNPCHarmlessGrabRaw).NOP_PAD_TO_SIZE<183>().Apply();
-    PATCH(0xA181AD).JMP(runtimeHookNPCHarmlessThrownRaw).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0xA0C425).JMP(runtimeHookGrabbedNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
+
+    PATCH(0xA10136).JMP(runtimeHookNPCTerminalVelocityRaw).NOP_PAD_TO_SIZE<58>().Apply();
 
     PATCH(0xA75079).JMP(runtimeHookCheckInputRaw).NOP_PAD_TO_SIZE<7>().Apply();
 
@@ -1714,11 +1789,22 @@ void TrySkipPatch()
     PATCH(0x8E6C75).CALL(&runtimeHookInitGameWindow).Apply();
     PATCH(0xA02AEE).CALL(&runtimeHookInitGameWindow).Apply();
 
-    //Shorten reload thingy? TEMP
+    // Shorten reload patch
     PATCH(0x8C142B).NOP_PAD_TO_SIZE<10>().Apply();
 
     // Patch piranah divide by zero bug
     PATCH(0xA55FB3).CALL(&runtimeHookPiranahDivByZero).NOP_PAD_TO_SIZE<6>().Apply();
+    // Patch veggie being released into a block crashing the game if the idx of the block was outside the range of the npc array
+    PATCH(0xA2B229).JMP(&runtimeHookFixVeggieBlockCrash).NOP_PAD_TO_SIZE<5>().Apply();
+    // Patch link being able to kill himself by turning into a fairy in clowncar
+    gLinkFairyClowncarFixes.Apply();
+    // Patch weird behaviour when sliding while holding jump
+    PATCH(0x997FC2).JMP(&runtimeHookJumpSlideFix).NOP_PAD_TO_SIZE<24>().Apply();
+    gSlideJumpFixIsEnabled = true;
+
+    // Hooks to close the game instead of returning to titlescreen
+    PATCH(0x8E642C).CALL(runtimeHookCloseGame).NOP_PAD_TO_SIZE<10>().Apply(); // quit when pressing save & exit in menu
+    PATCH(0x8E62F8).NOP_PAD_TO_SIZE<289>().Apply(); // remove black screen when pressing save & exit
 
     // Hook block hits
     PATCH(0x9DA620).JMP(&runtimeHookHitBlock).NOP_PAD_TO_SIZE<6>().Apply();
@@ -1746,6 +1832,33 @@ void TrySkipPatch()
     // Logging for NPC collisions
     //PATCH(0xa281b0).JMP(GET_RETADDR_TRACE_HOOK<&runtimeHookLogCollideNpc>()).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Hooks for onNPCTransform support
+    PATCH(0xA0ACBC).JMP(&runtimeHookNPCTransformRandomVeggie).NOP().NOP().Apply(); // When the randomized veggie spawns
+    PATCH(0x9CCB40).JMP(&runtimeHookNPCTransformSprout).NOP_PAD_TO_SIZE<6>().Apply(); // When pulling a sprout from the ground
+    PATCH(0xA45556).JMP(&runtimeHookNPCTransformRandomBonus).NOP_PAD_TO_SIZE<9>().Apply(); // Random powerup NPC
+    PATCH(0xA6133A).JMP(&runtimeHookNPCTransformMushToHeart).NOP_PAD_TO_SIZE<10>().Apply(); // Link mushrooms to hearts
+    PATCH(0xA6101C).JMP(&runtimeHookNPCTransformCoinToRupee).NOP_PAD_TO_SIZE<10>().Apply(); // Link coins to rupees
+    PATCH(0xA0B719).JMP(&runtimeHookNPCTransformSnifitBulletToSMB2Coin).NOP_PAD_TO_SIZE<6>().Apply(); // Snifit bulllet to coin when held
+    PATCH(0xA0B38D).CALL(&runtimeHookNPCTransformHeldYoshiToEgg).NOP_PAD_TO_SIZE<34>().Apply(); // Yoshis to eggs when held
+    PATCH(0xA45E0A).CALL(&runtimeHookNPCTransformBubblePopped).NOP_PAD_TO_SIZE<24>().Apply(); // Bubble popped, transformed to contents
+    PATCH(0xA45954).CALL(&runtimeHookNPCTransformSMWSpinyEgg).NOP_PAD_TO_SIZE<28>().Apply(); // SMW spiny egg landed
+    PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell
+    PATCH(0xA5217F).JMP(&runtimeHookNPCTransformKoopalingUnshell).NOP_PAD_TO_SIZE<5>().Apply(); // Koopaling leave shell
+    PATCH(0xA55500).CALL(&runtimeHookNPCTransformPotionToDoor).NOP_PAD_TO_SIZE<16>().Apply(); // Potion transform to door
+    PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<11>().Apply(); // Galoomba unflipped
+    PATCH(0x9E3632).CALL(&runtimeHookNPCTransformPSwitchResetRupeeCoins).NOP_PAD_TO_SIZE<8>().Apply(); // When pressing a p switch, rupees transformed by link are turned back into coins
+    PATCH(0xA19B1E).CALL(&runtimeHookNPCTransformSMWKoopaEnterShell).NOP_PAD_TO_SIZE<8>().Apply(); // SMW koopa entering shell, overwrites a bounds check
+    PATCH(0x9BE698).CALL(&runtimeHookNPCTransformYoshiEatRandomVeggie).NOP_PAD_TO_SIZE<7>().Apply(); // Incredibly niche code path for Yoshi eating a randomized veggie
+    // patch despawn transformation
+    PATCH(0xA3B95B).NOP_PAD_TO_SIZE<7>().Apply(); // Patch out original .Type = .DefaultType
+    PATCH(0xA3BA2F).CALL(&runtimeHookNPCTransformDespawned).NOP_PAD_TO_SIZE<8>().Apply(); // Overwrite final 2 statements with call to our own code where we'll handle resetting the type
+    // patch niche code for holding plants
+    PATCH(0xA0B529).JNE(&runtimeHookNPCTransformHeldSproutA).NOP_PAD_TO_SIZE<6>().Apply(); // replace JNE to 0xA0B6EC with a jump into our own code, this is the branch which ISN'T if the contents is a random veggies
+    PATCH(0xA0B6E4).CALL(&runtimeHookNPCTransformHeldSproutB).NOP_PAD_TO_SIZE<8>().Apply(); // replace a floating point error check with a call to our own code, branch occurs if the content IS a random veggie
+    // patch code for yoshi eating stuff
+    PATCH(0x9C3042).CALL(&runtimeHookYoshiEatPossibleNPCTransform).NOP_PAD_TO_SIZE<8>().Apply(); // NPC on yoshi's tongue, store ID to see if it changed later
+    PATCH(0x9C469B).CALL(&runtimeHookYoshiEatExit).NOP_PAD_TO_SIZE<7>().Apply(); // After yoshi tongue code, check if the stored NPC changed
+    
     // Hooks for onNPCHarm support
     PATCH(0xa281b0).JMP(&runtimeHookCollideNpc).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0xa291d2).JMP(&runtimeHookNpcHarmRaw_a291d8).NOP_PAD_TO_SIZE<8>().Apply();
@@ -1904,6 +2017,8 @@ void TrySkipPatch()
     // PATCH(0x9E7380).JMP(runtimeHookRunAnimInternal).NOP_PAD_TO_SIZE<6>().Apply();
 
     PATCH(0xA12050).JMP(runtimeHookSemisolidInteractionHook_Raw).NOP_PAD_TO_SIZE<69>().Apply();
+    // Patch to prevent NPCs from disabling collision against semisolid slopes
+    PATCH(0xA1202B).JMP(runtimeHookNPCSemisolidSlopeCollisionHook).NOP_PAD_TO_SIZE<13>().Apply();
 
     // Hook for controller handling
     PATCH(0xA75855).CALL(runtimeHookJoyGetPosEx).NOP_PAD_TO_SIZE<5>().Apply();
@@ -1974,7 +2089,10 @@ void TrySkipPatch()
     PATCH(0xA3B9AA).NOP_PAD_TO_SIZE<14>().Apply();
 
     // Hook to fix an NPC's section property when it spawn out of bounds
-    gDisableNPCSectionFix.Apply();
+    gNPCSectionFix.Apply();
+
+    // Hook to fix erroneous Y speed after an NPC hits a ceiling
+    gNPCCeilingBugFix.Apply(); 
 
     // Patch to handle block reorder after p-switch handling
     PATCH(0x9E441A).JMP(runtimeHookAfterPSwitchBlocksReorderedWrapper).NOP_PAD_TO_SIZE<242>().Apply();
@@ -1983,13 +2101,22 @@ void TrySkipPatch()
 
     // Patch to handle blocks that allow players to pass through
     // Moved from where the original code does it to allow player passthrough slopes
+    // Also handles collision groups
     PATCH(0x9A16E8).JMP(runtimeHookBlockPlayerFilter).NOP_PAD_TO_SIZE<12>().Apply();
+
+    // Collision group handling for player-to-NPC collision
+    PATCH(0x9A79EF).JMP(runtimeHookPlayerNPCInteractionCheck).NOP_PAD_TO_SIZE<9>().Apply();
+    PATCH(0x9AE8FA).JMP(runtimeHookPlayerNPCCollisionCheck9AE8FA).NOP_PAD_TO_SIZE<15>().Apply();
+    PATCH(0x9ABC0B).JMP(runtimeHookPlayerNPCCollisionCheck9ABC0B).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Collision group handling for player-to-player collision
+    PATCH(0x9CAFC4).JMP(runtimeHookPlayerPlayerInteraction).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Patch to handle blocks that allow NPCs to pass through
     // Also handles collisionGroup for NPC-to-solid interactions now
     PATCH(0xA11B76).JMP(runtimeHookBlockNPCFilter).NOP_PAD_TO_SIZE<7>().Apply();
 
-    // Patch to handle collisionGroup for NPC-to-NPC interactions
+    // Patch to handle collisionGroup for NPC-to-NPC interactions, and harmlessthrown flag
     PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Replace pause button detection code to avoid re-triggering when held
@@ -2002,9 +2129,10 @@ void TrySkipPatch()
     PATCH(0x9B66D0).JMP(runtimeHookPlayerKill).NOP_PAD_TO_SIZE<6>().Apply();
 
     // Hooks for lava-related calls to onPlayerKill
-    PATCH(0x9A394D).JMP(0x9A3A36).NOP_PAD_TO_SIZE<6>().Apply();
+    PATCH(0x9A394D).CALL(runtimeHookPlayerCountCollisionsForWeakLava).JMP(0x9A3A36).NOP_PAD_TO_SIZE<14>().Apply();
     PATCH(0x9A5010).JMP(runtimeHookPlayerKillLavaSolidExit).Apply();
     PATCH(0x9A20F1).CALL(runtimeHookPlayerKillLava).Apply();
+    PATCH(0x9A5015).CALL(runtimeHookPlayerBlockCollisionEnd).NOP_PAD_TO_SIZE<8>().Apply();
 
     // Hooks for onWarpEnter/onWarp
     PATCH(0x9CA0D5).JMP(runtimeHookWarpEnter).NOP_PAD_TO_SIZE<11>().Apply();
@@ -2034,17 +2162,43 @@ void TrySkipPatch()
     runtimeHookCharacterIdApplyPatch();
 
     //Fence bug fixes
-    for (int i = 0; gFenceFixes[i] != nullptr; i++) {
-        gFenceFixes[i]->Apply();
-    }
+    gFenceFixes.Apply();
 
+    // Replace PlayerEffects function
+    PATCH(SMBX13::modPlayer_Private::_PlayerEffects_ptr).JMP(&SMBX13::Ports::PlayerEffects).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Replace SaveGame function
+    PATCH(SMBX13::modMain::_SaveGame_ptr).JMP(&SMBXSaveFile::Save).NOP_PAD_TO_SIZE<6>().Apply();
+
+    // Restore GetKeyState for some pause related calls
+    // GameLoop:
+    PATCH(0x8CA3D4).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8CA45D).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // WorldLoop:
+    PATCH(0x8E0E2C).CALL(runtimeHookGetKeyStateRetore).Apply();
+    // PauseGame:
+    PATCH(0x8E5AA6).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AB8).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5AC3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ACE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5ADA).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5B25).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5BD0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E5C1F).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61E7).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E61F3).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64DE).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64F0).CALL(runtimeHookGetKeyStateRetore).Apply();
+    PATCH(0x8E64FB).CALL(runtimeHookGetKeyStateRetore).Apply();
+
+    
     /************************************************************************/
     /* Import Table Patch                                                   */
     /************************************************************************/
     __vbaR4Var = (float(*)(VARIANTARG*))0x00401124;
-    *(void**)0x00401124 = (void*)&vbaR4VarHook;
+    PATCH(0x00401124).dword(reinterpret_cast<uintptr_t>(&vbaR4VarHook)).Apply();
     rtcMsgBox = (int(__stdcall *)(VARIANTARG*, DWORD, DWORD, DWORD, DWORD))(*(void**)0x004010A8);
-    *(void**)0x004010A8 = (void*)&rtcMsgBoxHook;
+    PATCH(0x004010A8).dword(reinterpret_cast<uintptr_t>(&rtcMsgBoxHook)).Apply();
 
     rtcRandomize = (void(__stdcall *)(VARIANTARG const*))(*(void**)0x0040109C);
     rtcRandomNext = (float(__stdcall *)(VARIANTARG const*))(*(void**)0x00401090);
@@ -2058,5 +2212,10 @@ void TrySkipPatch()
     PATCH(0x8CDEC7)
         .bytes(0x84, 0xC0) // test al, al
         .bytes(0x74, 0x35) // jz 0x8CDF00
+        .Apply();
+    
+    // Add a space between /s and the argument
+    PATCH(0x8BEAE9)
+        .PUSH_IMM32((std::uint32_t) L"regsvr32 /s ")
         .Apply();
 }

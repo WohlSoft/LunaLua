@@ -25,7 +25,7 @@ void GLEngineCmd_RenderCameraToScreen::run(GLEngine& glEngine) const {
 }
 
 void GLEngineCmd_EndFrame::run(GLEngine& glEngine) const {
-    glEngine.EndFrame(mHdcDest, mForceSkip, mRedrawOnly, mResizeOverlay);
+    glEngine.EndFrame(mHdcDest, mForceSkip, mRedrawOnly, mResizeOverlay, mPauseOverlay);
 }
 
 void GLEngineCmd_InitForHDC::run(GLEngine& glEngine) const {
@@ -333,4 +333,32 @@ void GLEngineCmd_CompileShaderObj::run(GLEngine& glEngine) const
 void GLEngineCmd_SetFramebufferSize::run(GLEngine& glEngine) const
 {
     g_GLContextManager.SetMainFramebufferSize(mWidth, mHeight);
+}
+
+void GLEngineCmd_RedirectCameraFB::run(GLEngine& glEngine) const
+{
+    if (!g_GLContextManager.IsInitialized()) return;
+
+    // Redirect camera to it
+    g_GLContextManager.RedirectCameraFB(this);
+}
+
+GLFramebuffer* GLEngineCmd_RedirectCameraFB::getFB() const
+{
+    if (mBuff)
+    {
+        // Create framebuffer if not yet existing
+        mBuff->EnsureFramebufferExists();
+
+        return mBuff->mFramebuffer;
+    }
+    return nullptr;
+}
+
+void GLEngineCmd_UnRedirectCameraFB::run(GLEngine& glEngine) const
+{
+    if (!g_GLContextManager.IsInitialized()) return;
+
+    // Undo redirection of camera to it
+    g_GLContextManager.UnRedirectCameraFB(mStartCmd.get());
 }

@@ -13,7 +13,6 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
 include(libs/PGE_File_Formats/pge_file_library.cmake)
 
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/luabind-deboostified
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/include
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/sdl/include
@@ -103,6 +102,7 @@ set(LunaLua_Sources
     FileManager/config_manager.cpp
     FileManager/CustomParamStore.cpp
     FileManager/LoadFile_Level.cpp
+    FileManager/SaveFile.cpp
     FileManager/SMBXFileManager.cpp
     GameConfig/GameAutostart.cpp
     GameConfig/GameConfiguration.cpp
@@ -167,12 +167,15 @@ set(LunaLua_Sources
     Minigames/CGUI/CGUIContainer.cpp
     Minigames/GameboyRPG.cpp
     Minigames/Minigames.cpp
+    Misc/AsmPatch.cpp
     Misc/AsyncHTTPClient.cpp
+    Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
     Misc/FreeImageUtils/FreeImageData.cpp
     Misc/FreeImageUtils/FreeImageGifData.cpp
     Misc/FreeImageUtils/FreeImageHelper.cpp
     Misc/FreeImageUtils/FreeImageInit.cpp
+    Misc/Gameover.cpp
     Misc/Gui/GuiCrashNotify.cpp
     Misc/Gui/RichTextDialog.cpp
     Misc/LoadScreen.cpp
@@ -184,10 +187,12 @@ set(LunaLua_Sources
     Misc/Playground.cpp
     Misc/ResourceFileMapper.cpp
     Misc/RuntimeHookComponents/RuntimeHookCharacterId.cpp
+    Misc/RuntimeHookComponents/RuntimeHookDefines.cpp
     Misc/RuntimeHookComponents/RuntimeHookFixups.cpp
     Misc/RuntimeHookComponents/RuntimeHookGeneral.cpp
     Misc/RuntimeHookComponents/RuntimeHookHooks.cpp
     Misc/RuntimeHookComponents/RuntimeHookNpcHarm.cpp
+    Misc/RuntimeHookComponents/RuntimeHookNPCTransform.cpp
     Misc/RuntimeHookComponents/RuntimeHookPublicFunctions.cpp
     Misc/RuntimeHook.cpp
     Misc/RuntimeHookManagers/LevelHUDController.cpp
@@ -202,6 +207,7 @@ set(LunaLua_Sources
     Misc/VB6RNG.cpp
     Misc/WaitForTickEnd.cpp
     Misc/win32_Unicode.cpp
+    Misc/Win32PathUtils.cpp
     Rendering/AsyncGifRecorder.cpp
     Rendering/BitBltEmulation.cpp
     Rendering/FrameCapture.cpp
@@ -241,6 +247,7 @@ set(LunaLua_Sources
     SMBXInternal/NPCs.cpp
     SMBXInternal/Overworld.cpp
     SMBXInternal/PlayerMOB.cpp
+    SMBXInternal/Ports/modPlayer.cpp
     SMBXInternal/Reconstructed/Util/NpcToCoins.cpp
     SMBXInternal/SMBXEvents.cpp
     SMBXInternal/Sound.cpp

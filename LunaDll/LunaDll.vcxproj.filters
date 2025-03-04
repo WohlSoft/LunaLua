@@ -141,6 +141,9 @@
     <Filter Include="LunaLoader">
       <UniqueIdentifier>{bfb6190e-4738-4465-8020-4a003075249a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SMBXInternal\Ports">
+      <UniqueIdentifier>{35e43447-c308-4ec8-88b4-4a39a45a3489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaMain\LuaHelper.h">
@@ -216,6 +219,9 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="Misc\RuntimeHook.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\CollisionMatrix.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="SMBXInternal\NPCs.h">
@@ -712,6 +718,36 @@
     <ClInclude Include="Misc\Gui\GuiUtils.h">
       <Filter>Misc\Gui</Filter>
     </ClInclude>
+    <ClInclude Include="SMBXInternal\Functions.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Variables.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Types.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\VB6Logic.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="SMBXInternal\Ports.h">
+      <Filter>SMBXInternal</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\VB6Array.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RuntimeHookComponents\CharacterIdExtension.h">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\VB6Bool.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Win32PathUtils.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager\SaveFile.h">
+      <Filter>FileManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -832,6 +868,9 @@
       <Filter>Minigames\CGUI</Filter>
     </ClCompile>
     <ClCompile Include="Misc\MiscFuncs.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\CollisionMatrix.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="Misc\RuntimeHook.cpp">
@@ -1370,18 +1409,6 @@
     <ClCompile Include="libs\luabind-deboostified\src$filename">
       <Filter>libs\luabind-deboostified</Filter>
     </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
-    <ClCompile Include="libs\luabind-deboostified\src$filename">
-      <Filter>libs\luabind-deboostified</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\WindowSizeHandler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1453,6 +1480,27 @@
     </ClCompile>
     <ClCompile Include="libs\luabind-deboostified\src\headertest.cpp">
       <Filter>libs\luabind-deboostified\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookNPCTransform.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\RuntimeHookComponents\RuntimeHookDefines.cpp">
+      <Filter>Misc\RuntimeHookComponents</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Gameover.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\AsmPatch.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="SMBXInternal\Ports\modPlayer.cpp">
+      <Filter>SMBXInternal\Ports</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Win32PathUtils.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager\SaveFile.cpp">
+      <Filter>FileManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

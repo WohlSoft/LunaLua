@@ -11,6 +11,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "../EventStateMachine.h"
 #include "../Misc/PerfTracker.h"
+#include "../GlobalFuncs.h"
 
 #include <luabind/adopt_policy.hpp>
 
@@ -90,6 +91,10 @@ public:
 
     LuaLunaType getType() const { return m_type; }
 
+    // Used for queueing up players to run the onSectionChange event
+    void queuePlayerSectionChangeEvent(int playerIdx);
+
+
     template<typename... Args>
     bool callLuaFunction(Args... args){
         if (!isValid())
@@ -105,6 +110,7 @@ public:
         {
             PerfTrackerState perfState(PerfTracker::PERF_LUA);
             SafeFPUControl noFPUExecptions;
+            CCallDepthCounter callDepth(*this);
             luabind::call_function<void>(args...);
         }
         catch (luabind::error& /*e*/)
@@ -113,10 +119,17 @@ public:
         }
         err = err || luabind::object_cast<bool>(luabind::globals(L)["__isLuaError"]);
 
-        // If there was an error, shut down Lua
+        // If there was an error, shut down Lua, unless we're in a nested Lua call, in which case we can't safely
         if (err)
         {
-            shutdown();
+            if (m_luaCallDepth == 0)
+            {
+                shutdown();
+            }
+            else
+            {
+                luaL_error(L, "Nested unhandled Lua error");
+            }
         }
         
         // If there was no error, allow a Lua-based game pause to take effect if pending
@@ -131,7 +144,7 @@ public:
 
     template<typename... Args>
     void callEvent(const std::shared_ptr<Event>& e, Args... args){
-        if (m_ready) {
+        if (m_ready && m_onStartRan) {
             const char* currentFFIFunc = CLunaFFILock::getCurrentFuncName();
             if (currentFFIFunc != nullptr)
             {
@@ -139,11 +152,30 @@ public:
                 errMsg += e->eventName();
                 errMsg += " was called during ";
                 errMsg += currentFFIFunc;
-                MessageBoxA(0, errMsg.c_str(), "Error", MB_ICONWARNING | MB_TASKMODAL);
+                LunaMsgBox::ShowA(0, errMsg.c_str(), "Error", MB_ICONWARNING | MB_TASKMODAL);
                 _exit(1);
             }
 
             callLuaFunction(L, "__callEvent", e, args...);
+
+            // If a player changed sections,
+            if (m_executeSectionChangeFlag)
+            {
+                // execute onSectionChange
+                m_executeSectionChangeFlag = false;
+                // disable writing to playerSectionChangeList while iterating over to execute events 
+                m_disableSectionChangeEvent = true;
+                for (size_t i = 0; i < m_playerSectionChangeList.size(); i++) {
+                    int playerIdx = m_playerSectionChangeList[i]; // player who changed sections
+                    std::shared_ptr<Event> sectionChangeEvent = std::make_shared<Event>("onSectionChange", false);
+                    sectionChangeEvent->setDirectEventName("onSectionChange");
+                    sectionChangeEvent->setLoopable(false);
+                    gLunaLua.callEvent(sectionChangeEvent, (int)(Player::Get(playerIdx)->CurrentSection), playerIdx);
+                }
+                // allow future sectionChange events
+                m_disableSectionChangeEvent = false;
+                m_playerSectionChangeList.clear();
+            }
         }
     }
 
@@ -152,6 +184,8 @@ public:
         if (!m_ready) return luabind::object();
         return luabind::newtable(L);
     }
+
+    bool didOnStartRun() { return m_onStartRan; }
 
 private:
     LuaLunaType m_type;
@@ -169,6 +203,30 @@ private:
     lua_State *L;
     bool m_ready; //This should prevent executing the event loop and catching events if SMBX is not ready.
     bool m_onStartRan;
+
+    bool m_disableSectionChangeEvent; // set to true while calling queued onSectionChange events - prevents it from trying to call again mid-loop
+    bool m_executeSectionChangeFlag; // whether to execute section change at the end of the next event called
+    std::vector<int> m_playerSectionChangeList; // list of player indexes who changed sections
+
+    uintptr_t m_luaCallDepth;
+
+    class CCallDepthCounter
+    {
+    private:
+        CLunaLua& m_parent;
+
+    public:
+        CCallDepthCounter(CLunaLua& parent) :
+            m_parent(parent)
+        {
+            m_parent.m_luaCallDepth++;
+        }
+
+        ~CCallDepthCounter()
+        {
+            m_parent.m_luaCallDepth--;
+        }
+    };
 };
 
 namespace CachedReadFile {

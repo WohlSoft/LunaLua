@@ -78,12 +78,14 @@ public:
     HDC mHdcDest;
     bool mIsFirstFrame;
     bool mForceSkip;
+    bool mForceDraw;
     bool mRedrawOnly;
     bool mResizeOverlay;
+    bool mPauseOverlay;
     virtual void run(GLEngine& glEngine) const;
     virtual bool isFrameEnd(void) const { return true; }
-    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly; }
-    virtual bool isSkippable(void) const { return !mIsFirstFrame && !mRedrawOnly; }
+    virtual bool allowFrameSkippability(void) const { return !mIsFirstFrame && !mRedrawOnly && !mForceDraw; }
+    virtual bool isSkippable(void) const { return !mIsFirstFrame && !mRedrawOnly && !mForceDraw; }
     virtual bool shouldBeSynchronous(void) const { return mIsFirstFrame || mRedrawOnly; }
 };
 class GLEngineCmd_InitForHDC : public GLEngineCmd {
@@ -219,6 +221,29 @@ public:
     virtual void run(GLEngine& glEngine) const;
     virtual bool isSkippable(void) const { return false; }
     virtual bool shouldBeSynchronous(void) const { return true; }
+};
+
+class GLEngineCmd_RedirectCameraFB : public GLEngineCmd {
+public:
+    std::shared_ptr<CaptureBuffer> mBuff;
+    GLEngineCmd_RedirectCameraFB() :
+        mBuff(), GLEngineCmd()
+    {}
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return (!mBuff) || (!mBuff->mNonskippable); }
+    virtual bool isFrameSkippable(void) const { return (!mBuff) || (!mBuff->mNonskippable); }
+    GLFramebuffer* getFB(void) const;
+};
+
+class GLEngineCmd_UnRedirectCameraFB : public GLEngineCmd {
+public:
+    std::shared_ptr<const GLEngineCmd_RedirectCameraFB> mStartCmd;
+    GLEngineCmd_UnRedirectCameraFB() :
+        mStartCmd(), GLEngineCmd()
+    {}
+    virtual void run(GLEngine& glEngine) const;
+    virtual bool isSkippable(void) const { return mStartCmd->isSkippable();  }
+    virtual bool isFrameSkippable(void) const { return mStartCmd->isFrameSkippable(); }
 };
 
 #endif

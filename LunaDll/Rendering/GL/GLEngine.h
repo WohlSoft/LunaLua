@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <unordered_map>
 #include <functional>
+#include <mutex>
+#include <chrono>
 #include "GLDraw.h"
 #include "../AsyncGifRecorder.h"
 
@@ -12,6 +14,10 @@ class GLShader;
 typedef std::function<bool(HGLOBAL /*globalMem*/, const BITMAPINFOHEADER* /*header*/, void* /*pData*/, HWND /*curHwnd*/)> SCREENSHOT_CALLBACK;
 
 class GLEngine {
+public:
+    static constexpr int mFrameTimeLen = 128;
+    typedef float frameTimes_t[mFrameTimeLen];
+
 private:
     bool mEnabled;
     bool mBitwiseCompat;
@@ -26,6 +32,13 @@ private:
 
     GLShader* mpUpscaleShader;
 
+    bool mFrameTimeInit;
+    std::chrono::high_resolution_clock::time_point mFrameTimeTimestamp;
+    std::mutex mFrameTimeMutex;
+    int mFrameTimeIdx;
+    frameTimes_t mFrameTimeBuffer;
+    frameTimes_t mFrameTimeCopy;
+
 public:
     GLEngine();
     ~GLEngine();
@@ -33,7 +46,8 @@ public:
     inline bool IsBitwiseCompatEnabled() { return mBitwiseCompat; };
 
     void InitForHDC(HDC hdcDest);
-    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay);
+    void RenderBasicOverlayText(const std::string& str, HDC hdcDest, const int32_t& windowWidth, const int32_t& windowHeight);
+    void EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay, bool pauseOverlay);
 
     // External commands
     inline bool IsEnabled() { return mEnabled; };
@@ -50,7 +64,8 @@ public:
     inline void SetCameraPositionInScene(double x, double y) { mCameraX = x; mCameraY = y; }
     inline void GetCamera(double &x, double &y) { x = mCameraX; y = mCameraY; }
 
-    void SetFramebufferSize();
+    void RecordFrameTime();
+    const frameTimes_t& GetFrameTimes();
 };
 
 #include "GLEngineProxy.h"

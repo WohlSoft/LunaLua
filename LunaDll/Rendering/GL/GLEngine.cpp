@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <chrono>
 #include <GL/glew.h>
 #include "../../Defines.h"
 #include "../../Globals.h"
@@ -58,7 +59,13 @@ GLEngine::GLEngine() :
     mHwnd(NULL),
     mScreenshot(false),
     mCameraX(0.0), mCameraY(0.0),
-    mpUpscaleShader(nullptr)
+    mpUpscaleShader(nullptr),
+    mFrameTimeInit(false),
+    mFrameTimeTimestamp(),
+    mFrameTimeMutex(),
+    mFrameTimeIdx(0),
+    mFrameTimeBuffer(),
+    mFrameTimeCopy()
 {
 }
 
@@ -82,12 +89,39 @@ void GLEngine::InitForHDC(HDC hdcDest)
             mpUpscaleShader = new GLShader(upscaleShaderVertSrc, upscaleShaderFragSrc);
 
             // A little trick to ensure early rendering works
-            EndFrame(hdcDest, false, true, false);
+            EndFrame(hdcDest, false, true, false, false);
         }
     }
 }
 
-void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay)
+void GLEngine::RenderBasicOverlayText(const std::string& overlayString, HDC hdcDest, const int32_t& windowWidth, const int32_t& windowHeight)
+{
+    // GDI for text rendering is a bit of a hack, but good enough for now here.
+    HDC gdiDC = CreateCompatibleDC(hdcDest);
+    SIZE stringSize;
+    GetTextExtentPoint32A(gdiDC, overlayString.c_str(), overlayString.length(), &stringSize);
+    HBITMAP gdiBMP = CreateCompatibleBitmap(gdiDC, stringSize.cx, stringSize.cy);
+    SelectObject(gdiDC, gdiBMP);
+    TextOutA(gdiDC, 0, 0, overlayString.c_str(), overlayString.length());
+
+    std::shared_ptr<LunaImage> img = LunaImage::fromHDC(gdiDC);
+
+    DeleteObject(gdiBMP);
+    DeleteDC(gdiDC);
+
+    const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(img);
+    double winW = static_cast<double>(windowWidth);
+    double winH = static_cast<double>(windowHeight);
+    double strW = static_cast<double>(stringSize.cx);
+    double strH = static_cast<double>(stringSize.cy);
+    double offX = round((winW - strW * 2)*0.5);
+    double offY = round((winH - strH * 2)*0.5);
+    sprite->Draw({ offX, offY, offX + strW * 2, offY + strH * 2 }, { 0, 0, strW, strH }, 0.75, GLDraw::RENDER_MODE_ALPHA);
+
+    g_GLTextureStore.ClearLunaImageTexture(img->getUID());
+}
+
+void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, bool resizeOverlay, bool pauseOverlay)
 {
     static HDC cachedHDC = NULL;
     if (hdcDest == NULL)
@@ -187,35 +221,20 @@ void GLEngine::EndFrame(HDC hdcDest, bool skipFlipToScreen, bool redrawOnly, boo
         // Overlay for rescaling window manually
         if (resizeOverlay)
         {
-            std::string overlayString = std::to_string(windowWidth) + "x" + std::to_string(windowHeight);
-
-            // GDI for text rendering is a bit of a hack, but good enough for now here.
-            HDC gdiDC = CreateCompatibleDC(hdcDest);
-            SIZE stringSize;
-            GetTextExtentPoint32A(gdiDC, overlayString.c_str(), overlayString.length(), &stringSize);
-            HBITMAP gdiBMP = CreateCompatibleBitmap(gdiDC, stringSize.cx, stringSize.cy);
-            SelectObject(gdiDC, gdiBMP);
-            TextOutA(gdiDC, 0, 0, overlayString.c_str(), overlayString.length());
-            
-            std::shared_ptr<LunaImage> img = LunaImage::fromHDC(gdiDC);
-
-            DeleteObject(gdiBMP);
-            DeleteDC(gdiDC);
-
-            const GLSprite* sprite = g_GLTextureStore.SpriteFromLunaImage(img);
-            double winW = static_cast<double>(windowWidth);
-            double winH = static_cast<double>(windowHeight);
-            double strW = static_cast<double>(stringSize.cx);
-            double strH = static_cast<double>(stringSize.cy);
-            double offX = round((winW - strW*2)*0.5);
-            double offY = round((winH - strH*2)*0.5);
-            sprite->Draw({ offX, offY, offX+strW*2, offY+strH*2 }, { 0, 0, strW, strH }, 0.75, GLDraw::RENDER_MODE_ALPHA);
-
-            g_GLTextureStore.ClearLunaImageTexture(img->getUID());
+            // Overlay width/height text
+            RenderBasicOverlayText(std::to_string(windowWidth) + "x" + std::to_string(windowHeight), hdcDest, windowWidth, windowHeight);
+        }
+        else if (pauseOverlay)
+        {
+            // Overlay "paused" text
+            RenderBasicOverlayText("Paused", hdcDest, windowWidth, windowHeight);
         }
 
         // Display Frame
         SwapBuffers(hdcDest);
+
+        // Record frame time till end of SwapBuffers
+        RecordFrameTime();
 
         // Clear screen backbuffer
         GLERRORCHECK();
@@ -341,4 +360,31 @@ void GLEngine::GifRecorderNextFrame(uint32_t x, uint32_t y, uint32_t w, uint32_t
     }
 
     mGifRecorder.addNextFrameToProcess(w, h, pixData, timestamp);
+}
+
+void GLEngine::RecordFrameTime()
+{
+    std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+    
+    if (mFrameTimeInit) {
+        float frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(currentTime - mFrameTimeTimestamp).count() * 1.0e-6f;
+        std::lock_guard<std::mutex> mLock(mFrameTimeMutex);
+        mFrameTimeBuffer[mFrameTimeIdx] = frameTime;
+        mFrameTimeIdx = (mFrameTimeIdx + 1) % mFrameTimeLen;
+    }
+    else
+    {
+        mFrameTimeInit = true;
+    }
+    mFrameTimeTimestamp = currentTime;
+}
+
+const GLEngine::frameTimes_t& GLEngine::GetFrameTimes()
+{
+    std::lock_guard<std::mutex> mLock(mFrameTimeMutex);
+    for (int i = 0; i < mFrameTimeLen; i++)
+    {
+        mFrameTimeCopy[i] = mFrameTimeBuffer[(mFrameTimeIdx + 1 + i) % mFrameTimeLen];
+    }
+    return mFrameTimeCopy;
 }

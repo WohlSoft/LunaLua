@@ -1,6 +1,8 @@
 #include "../../Defines.h"
 #include "../../Globals.h"
 #include "../RuntimeHook.h"
+#include <stack>
+#include "../SMBXInternal/NPCs.h"
 
 static bool npcHarmCancelled = false;
 static bool npcHarmResultSet = false;
@@ -24,11 +26,61 @@ void __stdcall runtimeHookLogCollideNpc(DWORD addr, short* pNpcIdx, CollidersTyp
     runtimeHookCollideNpc(pNpcIdx, pObjType, pObjIdx);
 }
 
+
+
+// npc array idx, initial npc id
+std::vector<std::pair<short,short>> processingNPCInfoForIDChangeDetection;
+// prevent onNPCTransform event from being executed twice in situations where we're already listening for ID changes
+// called by npc::transform
+void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID) {
+    for (size_t i = 0; i < processingNPCInfoForIDChangeDetection.size(); i++) {
+        // if the listening info matches the NPC that was transformed,
+        if (processingNPCInfoForIDChangeDetection[i].first == npcIdx && processingNPCInfoForIDChangeDetection[i].second == oldID) {
+            // update the info to reflect the new ID
+            processingNPCInfoForIDChangeDetection[i].second = newID;
+        }
+    }
+}
+// defined in RuntimeHookNPCTransform.cpp
+void executeOnNPCTransformIdx(int npcIdx, int oldID, NPCTransformationCause cause);
+
+#include "../ErrorReporter.h"
+
 // Hook for the start of the original npc collision function
 void __stdcall runtimeHookCollideNpc(short* pNpcIdx, CollidersType* pObjType, short* pObjIdx)
 {
     npcHarmResultSet = false;
-    runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+
+    NPCMOB* npc = NULL;
+    bool isValidProcessingNPC = false;
+    // execute post-hit call ONLY if this is a valid npc index
+    if (*pNpcIdx > 0) {
+        // prepare npc id on stack for post-hit call
+        npc = NPC::Get(*pNpcIdx - 1);
+        // store info to detect if the ID was changed
+        isValidProcessingNPC = true;
+        processingNPCInfoForIDChangeDetection.push_back({*pNpcIdx, npc->id});
+    }
+    {
+        ErrorReport::CrashContextGeneric<const char*, short, short, short> crashContext(std::make_tuple<const char*, short, short, short>(
+            (const char*)__FUNCTION__,
+            pNpcIdx ? *pNpcIdx : 0,
+            pObjType ? static_cast<short>(*pObjType) : -1,
+            pObjIdx ? *pObjIdx : 0
+            ));
+        runtimeHookCollideNpc_OrigFunc(pNpcIdx, pObjType, pObjIdx);
+    }
+    // call post-hit function to handle onNPCTransform call
+    if (isValidProcessingNPC) {
+        // compare the current ID of the npc to the previously stored one...
+        auto info = processingNPCInfoForIDChangeDetection.back();
+        processingNPCInfoForIDChangeDetection.pop_back();
+        // if the NPC's ID changed..
+        if (info.second != npc->id) {
+            // execute onNPCTransform event
+            executeOnNPCTransformIdx(*pNpcIdx, info.second, NPC_TFCAUSE_HIT);
+        }
+    }
 }
 
 // Hook to catch when NPC harm is about to occur
@@ -2675,6 +2727,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d79f(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7a5
         ret
@@ -2708,6 +2762,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2d7ae(void)
         pop ecx
         pop eax
         popfd
+        push 0xa2d917
+        ret
     safe:
         push 0xa2d7b4
         ret
@@ -3966,6 +4022,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2fb29(void)
         pop ecx
         pop eax
         popfd
+        push 0xa3037e
+        ret
     safe:
         push 0xa2fb2f
         ret
@@ -3999,6 +4057,8 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2fb34(void)
         pop ecx
         pop eax
         popfd
+        push 0xa3037e
+        ret
     safe:
         push 0xa2fb3a
         ret

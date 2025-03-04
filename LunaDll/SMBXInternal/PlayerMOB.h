@@ -269,7 +269,7 @@ struct PlayerMOB {
     short Unknown6E;
     short Unknown70;                    // +0x70
     short Unknown72;
-    short Unknown74;
+    short YoshiTFrameCount;
     short Unknown76;
     short Unknown78;
     short MountAnimationFrame;
@@ -386,12 +386,43 @@ static_assert(offsetof(PlayerMOB, Unknown166) == 0x166, "Unknown166 must be at a
 static_assert(sizeof(PlayerMOB) == 0x184, "sizeof(PlayerMOB) must be 0x184");
 #endif
 
+// Extra player fields
+struct ExtendedPlayerFields
+{
+    bool noblockcollision;
+    bool nonpcinteraction;
+    bool noplayerinteraction;
+    unsigned int collisionGroup;
+    // used for fixing a 1.3 slope bug
+    int slidingTimeSinceOnSlope;
+
+    // Constructor
+    ExtendedPlayerFields()
+    {
+        Reset();
+    }
+
+    // Reset function
+    void Reset()
+    {
+        noblockcollision = false;
+        nonpcinteraction = false;
+        noplayerinteraction = false;
+        collisionGroup = 0u;
+
+        slidingTimeSinceOnSlope = 0;
+    }
+};
+
 namespace Player {
 
     /// Player functions ///
 
     // PLAYER ACCESS -- (Currently only returns the ptr to the main player)
     PlayerMOB* Get(int player);
+
+    ExtendedPlayerFields* GetExtended(int index);
+    void ClearExtendedFields();
 
     // PLAYER MANAGEMENT
     bool InternalSwap(int player1, int player2); // swaps position of two players in the object list

@@ -1,0 +1,714 @@
+Address	SMBX 1.3 File	Type	Function Name	Arguments
+0040BA60		vb_jmp_tbl	__vbaChkstk	
+0040BA66		vb_jmp_tbl	__vbaExceptHandler	
+0040BA6C		vb_jmp_tbl	__vbaFPException	
+0040BA72		vb_jmp_tbl	_adj_fdiv_m16i	
+0040BA78		vb_jmp_tbl	_adj_fdiv_m32	
+0040BA7E		vb_jmp_tbl	_adj_fdiv_m32i	
+0040BA84		vb_jmp_tbl	_adj_fdiv_m64	
+0040BA8A		vb_jmp_tbl	_adj_fdiv_r	
+0040BA90		vb_jmp_tbl	_adj_fdivr_m16i	
+0040BA96		vb_jmp_tbl	_adj_fdivr_m32	
+0040BA9C		vb_jmp_tbl	_adj_fdivr_m32i	
+0040BAA2		vb_jmp_tbl	_adj_fdivr_m64	
+0040BAA8		vb_jmp_tbl	_adj_fpatan	
+0040BAAE		vb_jmp_tbl	_adj_fprem	
+0040BAB4		vb_jmp_tbl	_adj_fprem1	
+0040BABA		vb_jmp_tbl	_adj_fptan	
+0040BAC0		vb_jmp_tbl	_CIatan	
+0040BAC6		vb_jmp_tbl	_CIcos	
+0040BACC		vb_jmp_tbl	_CIexp	
+0040BAD2		vb_jmp_tbl	_CIlog	
+0040BAD8		vb_jmp_tbl	_CIsin	
+0040BADE		vb_jmp_tbl	_CIsqrt	
+0040BAE4		vb_jmp_tbl	_CItan	
+0040BAEA		vb_jmp_tbl	_allmul	
+0040BAF0		vb_jmp_tbl	DllFunctionCall	
+0040BAF6		vb_jmp_tbl	__vbaFreeVar	
+0040BAFC		vb_jmp_tbl	__vbaSetSystemError	
+0040BB02		vb_jmp_tbl	__vbaFPInt	
+0040BB08		vb_jmp_tbl	__vbaNew2	
+0040BB0E		vb_jmp_tbl	__vbaFreeStr	
+0040BB14		vb_jmp_tbl	rtcVarBstrFromAnsi	
+0040BB1A		vb_jmp_tbl	__vbaStrVarMove	
+0040BB20		vb_jmp_tbl	__vbaStrMove	
+0040BB26		vb_jmp_tbl	rtcDoEvents	
+0040BB2C		vb_jmp_tbl	__vbaHresultCheckObj	
+0040BB32		vb_jmp_tbl	__vbaVarMove	
+0040BB38		vb_jmp_tbl	__vbaBoolStr	
+0040BB3E		vb_jmp_tbl	__vbaI2Str	
+0040BB44		vb_jmp_tbl	__vbaR8IntI2	
+0040BB4A		vb_jmp_tbl	__vbaAryDestruct	
+0040BB50		vb_jmp_tbl	rtcGetFileAttr	
+0040BB56		vb_jmp_tbl	__vbaAryConstruct2	
+0040BB5C		vb_jmp_tbl	__vbaR8Str	
+0040BB62		vb_jmp_tbl	rtcEndOfFile	
+0040BB68		vb_jmp_tbl	__vbaVarDup	
+0040BB6E		vb_jmp_tbl	rtcMsgBox	
+0040BB74		vb_jmp_tbl	__vbaInputFile	
+0040BB7A		vb_jmp_tbl	__vbaVarCmpNe	
+0040BB80		vb_jmp_tbl	__vbaVarAnd	
+0040BB86		vb_jmp_tbl	__vbaRecDestruct	
+0040BB8C		vb_jmp_tbl	rtcDir	
+0040BB92		vb_jmp_tbl	__vbaFileClose	
+0040BB98		vb_jmp_tbl	__vbaWriteFile	
+0040BB9E		vb_jmp_tbl	__vbaFileOpen	
+0040BBA4		vb_jmp_tbl	rtcLeftCharVar	
+0040BBAA		vb_jmp_tbl	rtcMidCharVar	
+0040BBB0		vb_jmp_tbl	__vbaVarCmpEq	
+0040BBB6		vb_jmp_tbl	__vbaVarOr	
+0040BBBC		vb_jmp_tbl	__vbaBoolVarNull	
+0040BBC2		vb_jmp_tbl	__vbaEnd	
+0040BBC8		vb_jmp_tbl	__vbaRecAssign	
+0040BBCE		vb_jmp_tbl	__vbaFpR4	
+0040BBD4		vb_jmp_tbl	rtcAnsiValueBstr	
+0040BBDA		vb_jmp_tbl	__vbaFpI4	
+0040BBE0		vb_jmp_tbl	__vbaI2I4	
+0040BBE6		vb_jmp_tbl	__vbaOnError	
+0040BBEC		vb_jmp_tbl	__vbaErrorOverflow	
+0040BBF2		vb_jmp_tbl	rtcRightCharVar	
+0040BBF8		vb_jmp_tbl	rtcLowerCaseVar	
+0040BBFE		vb_jmp_tbl	__vbaVarTstEq	
+0040BC04		vb_jmp_tbl	__vbaLenBstr	
+0040BC0A		vb_jmp_tbl	__vbaStrCmp	
+0040BC10		vb_jmp_tbl	rtcRandomNext	
+0040BC16		vb_jmp_tbl	__vbaFpI2	
+0040BC1C		vb_jmp_tbl	__vbaCopyBytes	
+0040BC22		vb_jmp_tbl	__vbaStrR8	
+0040BC28		vb_jmp_tbl	__vbaFpR8	
+0040BC2E		vb_jmp_tbl	__vbaFreeObjList	
+0040BC34		vb_jmp_tbl	__vbaStrVarVal	
+0040BC3A		vb_jmp_tbl	__vbaStrI2	
+0040BC40		vb_jmp_tbl	__vbaStrToAnsi	
+0040BC46		vb_jmp_tbl	__vbaObjSetAddref	
+0040BC4C		vb_jmp_tbl	__vbaObjSet	
+0040BC52		vb_jmp_tbl	rtcGetTimer	
+0040BC58		vb_jmp_tbl	rtcRandomize	
+0040BC5E		vb_jmp_tbl	__vbaStrCopy	
+0040BC64		vb_jmp_tbl	__vbaFreeVarList	
+0040BC6A		vb_jmp_tbl	__vbaVarCat	
+0040BC70		vb_jmp_tbl	__vbaFreeObj	
+0040BC76		vb_jmp_tbl	__vbaFreeStrList	
+0040BC7C		vb_jmp_tbl	rtcBstrFromAnsi	
+0040BC82		vb_jmp_tbl	__vbaStrCat	
+0040BC88		vb_jmp_tbl	rtcShell	
+0040BC8E		vb_jmp_tbl	__vbaGenerateBoundsError	
+0040BC94		vb_jmp_tbl	__vbaLenVar	
+0040BC9A		vb_jmp_tbl	__vbaVarMul	
+0040BCA0		vb_jmp_tbl	__vbaVarSub	
+0040BCA6		vb_jmp_tbl	__vbaVarAdd	
+0040BCAC		vb_jmp_tbl	__vbaR4Var	
+0040BCB2		vb_jmp_tbl	__vbaVarVargNofree	
+0040BCB8		vb_jmp_tbl	__vbaFpCSngR8	
+0040BCBE		vb_jmp_tbl	__vbaI2Var	
+0040BCC4		vb_jmp_tbl	__vbaVarTstNe	
+0040BCCA		vb_jmp_tbl	rtcUpperCaseVar	
+0040BCD0		vb_jmp_tbl	rtcVarStrFromVar	
+0040BCD6		vb_jmp_tbl	__vbaStrR4	
+0040BCDC		vb_jmp_tbl	rtcSqr	
+0040BCE2		vb_jmp_tbl	__vbaStrBool	
+0040BCE8		vb_jmp_tbl	rtcR8ValFromBstr	
+0040BCEE		vb_jmp_tbl	__vbaPowerR8	
+0040BCF4		vb_jmp_tbl	__vbaR8Var	
+0040BCFA		vb_jmp_tbl	__vbaLsetFixstr	
+0040BD00		vb_jmp_tbl	__vbaI4Var	
+0040BD06		vb_jmp_tbl	rtcLeftCharBstr	
+0040BD0C		vb_jmp_tbl	__vbaInStr	
+0040BD12		vb_jmp_tbl	__vbaFixstrConstruct	
+0040BD18		vb_jmp_tbl	__vbaStrToUnicode	
+0040BD1E		vb_jmp_tbl	__vbaVarForNext	
+0040BD24		vb_jmp_tbl	__vbaVarTstLe	
+0040BD2A		vb_jmp_tbl	__vbaVarForInit	
+0040BD30		vb_jmp_tbl	__vbaRecAnsiToUni	
+0040BD36		vb_jmp_tbl	__vbaRecUniToAnsi	
+0040BD3C		vb_jmp_tbl	__vbaExitProc	
+0040BD42		vb_jmp_tbl	__vbaVarLateMemSt	
+0040BD48		vb_jmp_tbl	__vbaLateMemCall	
+0040BD4E		vb_jmp_tbl	__vbaObjVar	
+0040BD54		vb_jmp_tbl	__vbaStopExe	
+0040BD5A		vb_jmp_tbl	__vbaR8ForNextCheck	
+0040BD60		vb_jmp_tbl	__vbaVarTstLt	
+0040BD66		vb_jmp_tbl	__vbaVarTstGe	
+0040BD6C		vb_jmp_tbl	__vbaVarLateMemCallLd	
+0040BD72		vb_jmp_tbl	__vbaLateIdCallLd	
+0040BD78		vb_jmp_tbl	__vbaBoolVar	
+0040BD7E		vb_jmp_tbl	__vbaI4Str	
+0040BD84		vb_jmp_tbl	__vbaR4Str	
+0040BD8A		vb_jmp_tbl	__vbaLateIdSt	
+0040BD90		vb_jmp_tbl	rtcRightCharBstr	
+0040BD96		vb_jmp_tbl	rtcCharValueBstr	
+0040BD9C		vb_jmp_tbl	rtcMidCharBstr	
+0040BDA2		vb_jmp_tbl	rtcInStrRev	
+0040BDA8		vb_jmp_tbl	__vbaLenBstrB	
+0040BDAE		vb_jmp_tbl	__vbaLateIdCall	
+0040BDB4		vb_jmp_tbl	EVENT_SINK_QueryInterface	
+0040BDBA		vb_jmp_tbl	EVENT_SINK_AddRef	
+0040BDC0		vb_jmp_tbl	EVENT_SINK_Release	
+0040BDC6		vb_jmp_tbl	GetMem2	
+0040BDCC		vb_jmp_tbl	PutMem2	
+0040BDD2		vb_jmp_tbl	ThunRTMain	
+0040BDD8		runtime	EntryPoint	
+004240B4		vb_import_kernel32	Sleep	
+004242D0		vb_import_gdi32	BitBlt	
+00424314		vb_import_gdi32	StretchBlt	
+00424364		vb_import_gdi32	CreateCompatibleBitmap	
+004243B0		vb_import_gdi32	CreateCompatibleDC	
+004243FC		vb_import_user32	GetDC	
+00424444		vb_import_gdi32	SelectObject	
+00424498		vb_import_gdi32	DeleteObject	
+004244DC		vb_import_gdi32	DeleteDC	
+00424520		vb_import_user32	GetKeyState	
+00424578		vb_import_winmm	mciSendStringA	
+004245C0		vb_import_user32	SetCursorPos	
+00424608		vb_import_user32	SetWindowPos	
+00424660		vb_import_kernel32	GetSystemDirectoryA	
+004246BC		vb_import_user32	GetDesktopWindow	
+00424700		vb_import_user32	GetWindowDC	
+00424748		vb_import_user32	GetActiveWindow	
+00424790		vb_import_kernel32	GetTickCount	
+004276BC		vb_import_user32	ShowCursor	
+0042854C		vb_import_wsock32	setsockopt	
+00428590		vb_import_wsock32	getsockopt	
+00428848		vb_import_winmm	joyGetPosEx	
+00428890		vb_import_winmm	joyGetDevCapsA	
+00428A18		vb_import_user32	GetCursorPos	
+00428E18		vb_import_user32	ChangeDisplaySettingsExA	
+00428E68		vb_import_user32	EnumDisplaySettingsA	
+008BD770	frmMain.frm	Private Sub	Form_DblClick	()
+008BD900	frmMain.frm	Private Sub	Form_KeyDown	(KeyCode As Integer, Shift As Integer)
+008BD9E0	frmMain.frm	Private Sub	Form_KeyPress	(KeyAscii As Integer)
+008BDAB0	frmMain.frm	Private Sub	Form_KeyUp	(KeyCode As Integer, Shift As Integer)
+008BDB40	frmMain.frm	Private Sub	Form_Load	()
+008BDE80	frmMain.frm	Private Sub	Form_MouseDown	(Button As Integer, Shift As Integer, X As Single, Y As Single)
+008BDF10	frmMain.frm	Private Sub	Form_MouseMove	(Button As Integer, Shift As Integer, X As Single, Y As Single)
+008BE080	frmMain.frm	Private Sub	Form_MouseUp	(Button As Integer, Shift As Integer, X As Single, Y As Single)
+008BE100	frmMain.frm	Private Sub	Form_QueryUnload	(Cancel As Integer, UnloadMode As Integer)
+008BE1A0	frmMain.frm	Private Sub	Form_Resize	()
+008BE360	frmMain.frm	Private Sub	Form_Unload	(Cancel As Integer)
+008BE410	modMain.bas	Public Sub	SetupPhysics	()
+008BE9C0	modMain.bas	Sub	Main	()
+008C2720	modMain.bas	Public Sub	SetupVars	()
+008CA210	modMain.bas	Public Sub	GameLoop	()
+008CA650	modMain.bas	Public Sub	MenuLoop	()
+008D6B80	modMain.bas	Public Sub	EditorLoop	()
+008D6BB0	modMain.bas	Public Sub	KillIt	()
+008D6CF0	modMain.bas	Public Sub	SaveLevel	(FilePath As String)
+008D8F40	modMain.bas	Public Sub	OpenLevel	(FilePath As String)
+008DC6E0	modMain.bas	Public Sub	ClearLevel	()
+008DDE30	modMain.bas	Public Sub	NextLevel	()
+008DE080	modMain.bas	Public Sub	UpdateMacro	()
+008DEB60	modMain.bas	Public Sub	SaveWorld	(FilePath As String)
+008DF5B0	modMain.bas	Public Sub	OpenWorld	(FilePath As String)
+008E06B0	modMain.bas	Public Sub	WorldLoop	()
+008E1DF0	modMain.bas	Public Sub	LevelPath	(Lvl As Integer, Direction As Integer, Optional Skp As Boolean = False)
+008E2350	modMain.bas	Public Sub	PathPath	(Pth As Integer, Optional Skp As Boolean = False)
+008E2A40	modMain.bas	Public Sub	PathWait	()
+008E2E40	modMain.bas	Public Sub	ClearWorld	()
+008E35E0	modMain.bas	Public Sub	FindWorlds	()
+008E3D10	modMain.bas	Public Sub	FindLevels	()
+008E41D0	modMain.bas	Public Sub	FindSaves	()
+008E47D0	modMain.bas	Public Sub	SaveGame	()
+008E4E00	modMain.bas	Public Sub	LoadGame	()
+008E54C0	modMain.bas	Public Sub	PauseGame	(plr As Integer)
+008E6700	modMain.bas	Public Sub	InitControls	()
+008E6910	modMain.bas	Public Sub	OpenConfig	()
+008E6CC0	modMain.bas	Public Sub	SaveConfig	()
+UNUSED	modMain.bas	Public Sub	NPCyFix	()
+008E6F70	modMain.bas	Private Sub	CheckActive	()
+008E7490	modMain.bas	Public Sub	CheatCode	(NewKey As String)
+008F6D20	modMain.bas	Public Sub	OutroLoop	()
+008F7200	modMain.bas	Public Sub	SetupCredits	()
+008F7D70	modMain.bas	Public Sub	FindStars	()
+008F8000	modMain.bas	Public Sub	AddCredit	(newCredit As String)
+008F8050	modMain.bas	Public Function	newLoc	(X As Double, Y As Double, Optional Width As Double = 0, Optional Height As Double = 0) As Location
+008F80C0	modMain.bas	Public Sub	MoreScore	(addScore As Integer, Loc As Location, Optional Multiplier As Integer = 0)
+008F8260	modMain.bas	Public Sub	SetupPlayerFrames	()
+008FE2A0	modMain.bas	Private Sub	SizableBlocks	()
+008FE440	modMain.bas	Public Sub	StartBattleMode	()
+008FE930	modMain.bas	Public Function	FixComma	(newStr As String) As String
+008FEB10	modGraphics.bas	Public Sub	UpdateGraphics2	()
+00909290	modGraphics.bas	Public Sub	UpdateGraphics	()
+0094DF20	modGraphics.bas	Public Sub	GetvScreen	(A As Integer)
+0094EEE0	modGraphics.bas	Public Sub	GetvScreenAverage	()
+0094F440	modGraphics.bas	Public Sub	GetvScreenAverage2	()
+0094F680	modGraphics.bas	Public Sub	SetupGraphics	()
+0094F8D0	modGraphics.bas	Public Sub	SetupEditorGraphics	()
+009502E0	modGraphics.bas	Public Sub	SetupScreens	()
+00950770	modGraphics.bas	Public Sub	DynamicScreen	()
+00951F50	modGraphics.bas	Public Sub	SuperPrint	(SuperWords As String, Font As Integer, X As Single, Y As Single)
+00954240	modGraphics.bas	Public Sub	SetRes	()
+009542C0	modGraphics.bas	Public Function	CheckKey	(newStrizzle As String) As String
+00954AC0	modGraphics.bas	Private Sub	SpecialFrames	()
+00954F50	modGraphics.bas	Public Sub	DrawBackground	(S As Integer, Z As Integer)
+00969C00	modGraphics.bas	Public Sub	PlayerWarpGFX	(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
+0096A2F0	modGraphics.bas	Public Sub	NPCWarpGFX	(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
+0096AD80	modGraphics.bas	Public Sub	ChangeScreen	()
+0096B640	modGraphics.bas	Public Sub	GetvScreenCredits	()
+0096BAF0	modGraphics.bas	Public Sub	DoCredits	()
+0096BF20	modGraphics.bas	Public Sub	DrawInterface	(Z As Integer, numScreens)
+00987CE0	modGraphics.bas	Public Function	pfrX	(plrFrame As Integer) As Integer
+00987D90	modGraphics.bas	Public Function	pfrY	(plrFrame As Integer) As Integer
+00987DE0	modGraphics.bas	Public Sub	GameThing	()
+00988E10	modGraphics.bas	Public Sub	DrawPlayer	(A As Integer, Z As Integer)
+009918C0	modGraphics.bas	Public Sub	ScreenShot	()
+009920D0	modGraphics.bas	Public Sub	DrawFrozenNPC	(Z As Integer, A As Integer)
+00992F50	modCollision.bas	Public Function	CheckCollision	(Loc1 As Location, Loc2 As Location) As Boolean
+00992FE0	modCollision.bas	Public Function	n00bCollision	(Loc1 As Location, Loc2 As Location) As Boolean
+UNUSED	modCollision.bas	Public Function	NPCStartCollision	(Loc1 As Location, Loc2 As Location) As Boolean
+009931D0	modCollision.bas	Public Function	WarpCollision	(Loc1 As Location, A As Integer) As Boolean
+00993330	modCollision.bas	Public Function	FindCollision	(Loc1 As Location, Loc2 As Location) As Integer
+00993470	modCollision.bas	Public Function	FindCollisionBelt	(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Integer
+009935C0	modCollision.bas	Public Function	NPCFindCollision	(Loc1 As Location, Loc2 As Location) As Integer
+00993700	modCollision.bas	Public Function	EasyModeCollision	(Loc1 As Location, Loc2 As Location, Optional StandOn As Boolean = False) As Integer
+00993970	modCollision.bas	Public Function	BootCollision	(Loc1 As Location, Loc2 As Location, Optional StandOn As Boolean = False) As Integer
+00993BE0	modCollision.bas	Public Function	CursorCollision	(Loc1 As Location, Loc2 As Location) As Boolean
+00993CD0	modCollision.bas	Public Function	ShakeCollision	(Loc1 As Location, Loc2 As Location, ShakeY3 As Integer) As Boolean
+00993DE0	modCollision.bas	Public Function	vScreenCollision	(A As Integer, Loc2 As Location) As Boolean
+00993F90	modCollision.bas	Public Function	vScreenCollision2	(A As Integer, Loc2 As Location) As Boolean
+00994130	modCollision.bas	Public Function	WalkingCollision	(Loc1 As Location, Loc2 As Location) As Boolean
+UNUSED	modCollision.bas	Public Function	WalkingCollision2	(Loc1 As Location, Loc2 As Location) As Boolean
+009941B0	modCollision.bas	Public Function	WalkingCollision3	(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Boolean
+00994250	modCollision.bas	Public Function	FindRunningCollision	(Loc1 As Location, Loc2 As Location) As Integer
+UNUSED	modCollision.bas	Public Function	ShouldTurnAround	(Loc1 As Location, Loc2 As Location, Direction As Single) As Boolean
+00994390	modCollision.bas	Public Function	CanComeOut	(Loc1 As Location, Loc2 As Location) As Boolean
+00994480	modCollision.bas	Public Function	CheckHitSpot1	(Loc1 As Location, Loc2 As Location) As Boolean
+009944F0	modPlayer.bas	Public Sub	SetupPlayers	()
+00995A20	modPlayer.bas	Public Sub	UpdatePlayer	()
+009B51E0	modPlayer.bas	Public Sub	PlayerHurt	(A As Integer)
+009B66D0	modPlayer.bas	Public Sub	PlayerDead	(A As Integer)
+009B6EC0	modPlayer.bas	Public Sub	KillPlayer	(A As Integer)
+009B7590	modPlayer.bas	Public Function	CheckDead	() As Integer
+009B7680	modPlayer.bas	Public Function	CheckLiving	() As Integer
+009B7710	modPlayer.bas	Public Function	LivingPlayers	() As Boolean
+009B7780	modPlayer.bas	Public Sub	EveryonesDead	()
+009B7BF0	modPlayer.bas	Public Sub	UnDuck	(A As Integer)
+009B7E10	modPlayer.bas	Public Sub	CheckSection	(A As Integer)
+009B8620	modPlayer.bas	Public Sub	PlayerFrame	(A As Integer)
+009BB2B0	modPlayer.bas	Public Sub	UpdatePlayerBonus	(A As Integer, B As Integer)
+009BB490	modPlayer.bas	Public Sub	TailSwipe	(plr As Integer, Optional bool As Boolean = False, Optional Stab As Boolean = False, Optional StabDir As Integer = 0)
+009BD560	modPlayer.bas	Public Sub	YoshiHeight	(A As Integer)
+009BD610	modPlayer.bas	Public Sub	YoshiEat	(A As Integer)
+009BE6D0	modPlayer.bas	Public Sub	YoshiSpit	(A As Integer)
+009C0040	modPlayer.bas	Public Sub	YoshiPound	(A As Integer, C As Integer, Optional BreakBlocks As Boolean = False)
+009C06A0	modPlayer.bas	Public Sub	SwapCoop	()
+009C0800	modPlayer.bas	Public Sub	PlayerPush	(A As Integer, HitSpot As Integer)
+009C0C50	modPlayer.bas	Public Sub	SizeCheck	(A As Integer)
+009C1D90	modPlayer.bas	Public Sub	YoshiEatCode	(A As Integer)
+009C46C0	modPlayer.bas	Public Sub	StealBonus	()
+009C4A70	modPlayer.bas	Public Sub	ClownCar	()
+009C5AC0	modPlayer.bas	Private Sub	WaterCheck	(A As Integer)
+009C6430	modPlayer.bas	Private Sub	Tanooki	(A As Integer)
+009C6600	modPlayer.bas	Private Sub	PowerUps	(A As Integer)
+009C9740	modPlayer.bas	Private Sub	SuperWarp	(A As Integer)
+009CAEC0	modPlayer.bas	Private Sub	PlayerCollide	(A As Integer)
+009CC2B0	modPlayer.bas	Public Sub	PlayerGrabCode	(A As Integer, Optional DontResetGrabTime As Boolean = False)
+009D1480	modPlayer.bas	Public Sub	LinkFrame	(A As Integer)
+009D1E80	modPlayer.bas	Private Sub	PlayerEffects	(A As Integer)
+009DA620	modBlocks.bas	Public Sub	BlockHit	(A As Integer, Optional HitDown As Boolean = False, Optional whatPlayer As Integer = 0)
+009E0940	modBlocks.bas	Public Sub	BlockShakeUp	(A As Integer)
+009E0A00	modBlocks.bas	Public Sub	BlockShakeUpPow	(A As Integer)
+009E0AC0	modBlocks.bas	Public Sub	BlockShakeDown	(A As Integer)
+009E0B80	modBlocks.bas	Public Sub	BlockHitHard	(A As Integer)
+009E0D50	modBlocks.bas	Public Sub	KillBlock	(A As Integer, Optional Splode As Boolean = True)
+009E14B0	modBlocks.bas	Public Sub	BlockFrames	()
+009E2090	modBlocks.bas	Public Sub	UpdateBlocks	()
+009E33B0	modBlocks.bas	Public Sub	PSwitch	(bool As Boolean)
+009E4600	modBlocks.bas	Public Sub	PowBlock	()
+009E4900	modEffect.bas	Public Sub	UpdateEffects	()
+009E7380	modEffect.bas	Public Sub	NewEffect	(A As Integer, Location As Location, Optional Direction As Single = 1, Optional NewNpc As Integer = 0, Optional Shadow As Boolean = False)
+009EC150	modEffect.bas	Public Sub	KillEffect	(A As Integer)
+009EC200	modEditor.bas	Public Sub	UpdateEditor	()
+009FCD10	modEditor.bas	Public Sub	GetEditorControls	()
+009FCDA0	modEditor.bas	Public Sub	SetCursor	()
+00A00C50	modEditor.bas	Public Sub	PositionCursor	()
+00A02090	modEditor.bas	Public Sub	HideCursor	()
+00A02120	modEditor.bas	Public Sub	KillWarp	(A As Integer)
+00A02220	modEditor.bas	Public Sub	zTestLevel	()
+00A03630	modEditor.bas	Public Function	EditorNPCFrame	(A As Integer, C As Single, Optional N As Integer) As Integer
+00A041D0	modEditor.bas	Public Sub	MouseMove	(X As Single, Y As Single, Optional nCur As Boolean = False)
+00A05C40	modEditor.bas	Public Sub	ResetNPC	(A As Integer)
+00A05D20	modEditor.bas	Public Sub	BlockFill	(Loc As Location)
+00A06090	modNPC.bas	Public Sub	UpdateNPCs	()
+00A24310	modNPC.bas	Public Sub	DropBonus	(A As Integer)
+00A24CD0	modNPC.bas	Public Sub	TouchBonus	(A As Integer, B As Integer)
+00A281B0	modNPC.bas	Public Sub	NPCHit	(A As Integer, B As Integer, Optional C As Integer = 0)
+00A315A0	modNPC.bas	Public Sub	KillNPC	(A As Integer, B As Integer)
+00A3B680	modNPC.bas	Public Sub	CheckSectionNPC	(A As Integer)
+00A3B880	modNPC.bas	Public Sub	Deactivate	(A As Integer)
+00A3BA90	modNPC.bas	Public Sub	Bomb	(Location As Location, Game As Integer, Optional ImmunePlayer As Integer = 0)
+UNUSED	modNPC.bas	Public Sub	DropNPC	(A As Integer, NPCType As Integer)
+00A3C580	modNPC.bas	Public Sub	TurnNPCsIntoCoins	()
+00A3C990	modNPC.bas	Public Sub	NPCFrames	(A As Integer)
+00A446A0	modNPC.bas	Public Sub	SkullRide	(A As Integer)
+00A448D0	modNPC.bas	Public Sub	NPCSpecial	(A As Integer)
+00A52BB0	modNPC.bas	Public Sub	SpecialNPC	(A As Integer)
+00A60AF0	modNPC.bas	Public Sub	CharStuff	(Optional WhatNPC As Integer = 0, Optional CheckEggs As Boolean = False)
+00A61A00	modNPC.bas	Public Function	RandomBonus	()
+00A61B40	modSound.bas	Public Sub	StartMusic	(A As Integer)
+00A621A0	modSound.bas	Public Sub	StopMusic	()
+00A624D0	modSound.bas	Public Sub	InitSound	()
+00A73FD0	modSound.bas	Public Sub	PlaySound	(A As Integer)
+00A74420	modSound.bas	Public Sub	BlockSound	()
+00A74460	modSound.bas	Public Sub	UpdateSound	()
+00A74910	modJoystick.bas	Public Sub	UpdateControls	()
+00A75680	modJoystick.bas	Public Function	StartJoystick	(Optional ByVal JoystickNumber As Integer = 0) As Boolean
+00A75820	modJoystick.bas	Public Sub	PollJoystick	()
+00A75970	frmOpen.frm	Private Sub	cmdCancel_Click	()
+00A75A40	frmOpen.frm	Private Sub	cmdOpen_Click	()
+00A75AB0	frmOpen.frm	Private Sub	Dir1_Change	()
+00A75BE0	frmOpen.frm	Private Sub	Drive1_Change	()
+00A75D10	frmOpen.frm	Private Sub	File1_DblClick	()
+00A75D80	frmOpen.frm	Private Sub	File1_KeyPress	(KeyAscii As Integer)
+00A75E00	frmOpen.frm	Private Sub	Form_Load	()
+00A76100	frmOpen.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A761B0	frmOpen.frm	Private Sub	OpenIt	()
+00A76A80	frmSave.frm	Private Sub	cmdCancel_Click	()
+00A76B50	frmSave.frm	Private Sub	cmdSave_Click	()
+00A76BC0	frmSave.frm	Private Sub	Dir1_Change	()
+00A76CF0	frmSave.frm	Private Sub	Drive1_Change	()
+00A76E90	frmSave.frm	Private Sub	File1_Click	()
+00A77060	frmSave.frm	Private Sub	Form_Load	()
+00A773D0	frmSave.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A77480	frmSave.frm	Private Sub	txtFileName_KeyDown	(KeyCode As Integer, Shift As Integer)
+00A77500	frmSave.frm	Private Sub	SaveIt	()
+00A77F30	frmLevelEditor.frm	Private Sub	chkAlign_Click	()
+00A78050	frmLevelEditor.frm	Private Sub	chkAlign2_Click	()
+00A78170	frmLevelEditor.frm	Private Sub	MDIForm_Load	()
+00A7C7B0	frmLevelEditor.frm	Private Sub	MDIForm_QueryUnload	(Cancel As Integer, UnloadMode As Integer)
+00A7C820	frmLevelEditor.frm	Private Sub	MDIForm_Unload	(Cancel As Integer)
+00A7C890	frmLevelEditor.frm	Private Sub	menHelp_Click	()
+00A7CB40	frmLevelEditor.frm	Private Sub	menuGameplay_Click	()
+00A7CDF0	frmLevelEditor.frm	Private Sub	menuLevelDebugger_Click	()
+00A7CEE0	frmLevelEditor.frm	Private Sub	menuEvents_Click	()
+00A7D0D0	frmLevelEditor.frm	Private Sub	menuFileExit_Click	()
+00A7D140	frmLevelEditor.frm	Private Sub	menuFileNew_Click	()
+00A7D570	frmLevelEditor.frm	Private Sub	menuFileOpen_Click	()
+00A7D680	frmLevelEditor.frm	Private Sub	menuFileSave_Click	()
+00A7D790	frmLevelEditor.frm	Private Sub	menuLayers_Click	()
+00A7D980	frmLevelEditor.frm	Private Sub	menuNetplay_Click	()
+00A7DBE0	frmLevelEditor.frm	Private Sub	menureset_Click	()
+00A7DC70	frmLevelEditor.frm	Private Sub	menuStatus_Click	()
+00A7DCE0	frmLevelEditor.frm	Private Sub	menuTestLevel_Click	()
+00A7DE00	frmLevelEditor.frm	Private Sub	menuTestLevel128_Click	()
+00A7DE80	frmLevelEditor.frm	Private Sub	menuTestLevel16_Click	()
+00A7DF00	frmLevelEditor.frm	Private Sub	menuTestLevel2_Click	()
+00A7E020	frmLevelEditor.frm	Private Sub	menuTestLevel32_Click	()
+00A7E0A0	frmLevelEditor.frm	Private Sub	menuTestLevel4_Click	()
+00A7E120	frmLevelEditor.frm	Private Sub	menuTestLevel64_Click	()
+00A7E1A0	frmLevelEditor.frm	Private Sub	menuTestLevel8_Click	()
+00A7E220	frmLevelEditor.frm	Private Sub	MenuTestLevelBattle_Click	()
+00A7E2B0	frmLevelEditor.frm	Private Sub	menuTestLevelTwo_Click	()
+00A7E330	frmLevelEditor.frm	Private Sub	mnuChat_Click	()
+00A7E420	frmLevelEditor.frm	Private Sub	mnuLevelEditor_Click	()
+00A7E8C0	frmLevelEditor.frm	Private Sub	mnuTestSetting_Click	()
+00A7E9B0	frmLevelEditor.frm	Private Sub	mnuWorldEditor_Click	()
+00A7EF10	frmLevelEditor.frm	Private Sub	optCursor_Click	(Index As Integer)
+00A814C0	frmLevelWindow.frm	Private Sub	Form_KeyPress	(KeyAscii As Integer)
+00A81530	frmLevelWindow.frm	Private Sub	Form_Load	()
+00A81E20	frmLevelWindow.frm	Private Sub	Form_LostFocus	()
+00A81E90	frmLevelWindow.frm	Private Sub	Form_Resize	()
+00A82050	frmLevelWindow.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A820C0	frmLevelWindow.frm	Private Sub	vScreen_KeyDown	(Index As Integer, KeyCode As Integer, Shift As Integer)
+00A82140	frmLevelWindow.frm	Private Sub	vScreen_KeyPress	(Index As Integer, KeyAscii As Integer)
+00A82210	frmLevelWindow.frm	Private Sub	vScreen_LostFocus	(Index As Integer)
+00A82280	frmLevelWindow.frm	Private Sub	vScreen_MouseDown	(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
+00A824E0	frmLevelWindow.frm	Private Sub	vScreen_MouseMove	(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
+00A829E0	frmLevelWindow.frm	Private Sub	vScreen_MouseUp	(Index As Integer, Button As Integer, Shift As Integer, X As Single, Y As Single)
+00A82A60	frmLevelSettings.frm	Private Sub	cmdAdvanced_Click	()
+00A82EC0	frmLevelSettings.frm	Private Sub	cmdExit_Click	()
+00A83300	frmLevelSettings.frm	Private Sub	cmdNoTurnBack_Click	()
+00A83740	frmLevelSettings.frm	Private Sub	cmdWater_Click	()
+00A83B80	frmLevelSettings.frm	Private Sub	cmdWrap_Click	()
+00A83FC0	frmLevelSettings.frm	Private Sub	Form_Load	()
+00A84280	frmLevelSettings.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A843A0	frmLevelSettings.frm	Private Sub	optBackground_Click	(Index As Integer)
+00A84840	frmLevelSettings.frm	Private Sub	optBackgroundColor_Click	(Index As Integer)
+00A84A00	frmLevelSettings.frm	Private Sub	optGame_Click	(Index As Integer)
+00A84DC0	frmLevelSettings.frm	Private Sub	optLevel_Click	(Index As Integer)
+00A850C0	frmLevelSettings.frm	Private Sub	optMusic_Click	(Index As Integer)
+00A85590	frmLevelSettings.frm	Private Sub	optSection_Click	(Index As Integer)
+00A86D30	frmLevelSettings.frm	Private Sub	txtMusic_Change	()
+00A86F50	frmBlocks.frm	Private Sub	Block_Click	(Index As Integer)
+00A87790	frmBlocks.frm	Private Sub	BlockH_Change	()
+00A87900	frmBlocks.frm	Private Sub	BlockR_Click	()
+00A87B40	frmBlocks.frm	Private Sub	BlockW_Change	()
+00A87CB0	frmBlocks.frm	Private Sub	cmdAdvanced_Click	()
+00A87EA0	frmBlocks.frm	Private Sub	cmdInvis_Click	()
+00A87FF0	frmBlocks.frm	Private Sub	cmdSlip_Click	()
+00A88140	frmBlocks.frm	Private Sub	Form_Load	()
+00A89250	frmBlocks.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A89370	frmBlocks.frm	Private Sub	optBlockS_Change	()
+00A89520	frmBlocks.frm	Private Sub	optBlockS_Scroll	()
+00A896D0	frmBlocks.frm	Private Sub	optBlockSpecial_Click	(Index As Integer)
+00A89840	frmBlocks.frm	Private Sub	optGame_Click	(Index As Integer)
+00A89C00	frmBlocks.frm	Private Sub	optMisc_Click	(Index As Integer)
+00A89FC0	frmBlocks.frm	Private Sub	optSMW_Click	(Index As Integer)
+00A8A380	frmBlocks.frm	Private Sub	optSMB3_Click	(Index As Integer)
+00A8A740	frmBlocks.frm	Private Sub	optSMB2_Click	(Index As Integer)
+00A8AB00	frmBlocks.frm	Private Sub	optSMB1_Click	(Index As Integer)
+00A8AEC0	frmBlocks.frm	Private Sub	qBlockS_Click	(Index As Integer)
+00A8B0A0	frmBlocks.frm	Private Sub	qCoin_Click	(Index As Integer)
+00A8B150	frmBlocks.frm	Public Sub	CheckBlock	()
+00A8D850	frmNPCs.frm	Private Sub	Bubble_Click	()
+00A8DD40	frmNPCs.frm	Private Sub	Buried_Click	()
+00A8E300	frmNPCs.frm	Private Sub	chkMessage_Click	()
+00A8E5B0	frmNPCs.frm	Private Sub	cmdAdvanced_Click	()
+00A8E7A0	frmNPCs.frm	Private Sub	cmdEvents_Click	()
+00A8E990	frmNPCs.frm	Private Sub	cmdGenerator_Click	()
+00A8EB80	frmNPCs.frm	Private Sub	DontMove_Click	()
+00A8EE60	frmNPCs.frm	Private Sub	Egg_Click	()
+00A8F420	frmNPCs.frm	Private Sub	Form_Load	()
+00A8F950	frmNPCs.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A8FA70	frmNPCs.frm	Private Sub	Friendly_Click	()
+00A8FD50	frmNPCs.frm	Private Sub	Lakitu_Click	()
+00A90310	frmNPCs.frm	Private Sub	NPC_Click	(Index As Integer)
+00A93770	frmNPCs.frm	Private Sub	NPCText_Change	()
+00A93830	frmNPCs.frm	Private Sub	optEffect_Click	(Index As Integer)
+00A93970	frmNPCs.frm	Private Sub	optGame_Click	(Index As Integer)
+00A94050	frmNPCs.frm	Private Sub	optNPCDirection_Click	(Index As Integer)
+00A941D0	frmNPCs.frm	Public Sub	ShowLak	()
+00A943F0	frmBackgrounds.frm	Private Sub	Background_Click	(Index As Integer)
+00A946F0	frmBackgrounds.frm	Private Sub	Form_Load	()
+00A94AF0	frmBackgrounds.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A94C10	frmBackgrounds.frm	Private Sub	optGame_Click	(Index As Integer)
+00A94FD0	frmWarp.frm	Private Sub	chkEntrance_Click	()
+00A95140	frmWarp.frm	Private Sub	chkMapWarp_Click	()
+00A952B0	frmWarp.frm	Private Sub	cmdLocked_Click	()
+00A95590	frmWarp.frm	Private Sub	cmdNPC_Click	()
+00A95870	frmWarp.frm	Private Sub	cmdYoshi_Click	()
+00A95B50	frmWarp.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A95C70	frmWarp.frm	Private Sub	optDirection_Click	(Index As Integer)
+00A95DE0	frmWarp.frm	Private Sub	optDirection2_Click	(Index As Integer)
+00A95F50	frmWarp.frm	Private Sub	optE_Click	(Index As Integer)
+00A960C0	frmWarp.frm	Private Sub	optEffect_Click	(Index As Integer)
+00A966B0	frmWarp.frm	Private Sub	scrWarp_Change	()
+00A96A40	frmTiles.frm	Private Sub	Form_Load	()
+00A96D60	frmTiles.frm	Private Sub	optGame_Click	(Index As Integer)
+00A97140	frmTiles.frm	Private Sub	Tile_Click	(Index As Integer)
+00A97440	frmScene.frm	Private Sub	Scene_Click	(Index As Integer)
+00A975B0	frmLevels.frm	Private Sub	cmbExit_Change	(Index As Integer)
+00A97720	frmLevels.frm	Private Sub	cmbExit_Click	(Index As Integer)
+00A97890	frmLevels.frm	Private Sub	scrWarp_Change	()
+00A97C20	frmLevels.frm	Private Sub	WorldLevel_Click	(Index As Integer)
+00A97D90	frmPaths.frm	Private Sub	WorldPath_Click	(Index As Integer)
+00A97F00	frmMusic.frm	Private Sub	optMusic_Click	(Index As Integer)
+00A98070	modChangeRes.bas	Public Sub	GetCurrentRes	()
+00A98150	modChangeRes.bas	Public Sub	SetOrigRes	()
+00A98190	modChangeRes.bas	Public Sub	ChangeRes	(ScreenX As Integer, ScreenY As Integer, ScreenColor As Integer, ScreenFreq As Integer)
+00A984A0	modChangeRes.bas	Private Sub	SaveIt	(ScX As Integer, ScY As Integer, ScC As Integer, ScF As Integer, ScreenChanged As String)
+00A985A0	modSorting.bas	Public Sub	qSortBlocksY	(min As Integer, max As Integer)
+00A988E0	modSorting.bas	Public Sub	qSortBlocksX	(min As Integer, max As Integer)
+00A98C20	modSorting.bas	Public Sub	qSortBackgrounds	(min As Integer, max As Integer)
+00A98FE0	modSorting.bas	Public Sub	FindBlocks	()
+UNUSED	modSorting.bas	Public Sub	BlockSort	()
+UNUSED	modSorting.bas	Public Sub	BlockSort2	()
+UNUSED	modSorting.bas	Public Sub	BackgroundSort	()
+00A992C0	modSorting.bas	Public Function	BackGroundPri	(A As Integer) As Double
+00A99620	modSorting.bas	Public Sub	NPCSort	()
+00A99870	modSorting.bas	Public Sub	FindSBlocks	()
+00A99930	modSorting.bas	Public Sub	qSortSBlocks	(min As Integer, max As Integer)
+00A99C10	modSorting.bas	Public Sub	qSortNPCsY	(min As Integer, max As Integer)
+00A9A000	modSorting.bas	Public Sub	UpdateBackgrounds	()
+UNUSED	modSorting.bas	Public Sub	qSortTempBlocksX	(min As Integer, max As Integer)
+00A9A1E0	frmWorld.frm	Private Sub	chkChar_Click	(Index As Integer)
+00A9A430	frmWorld.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A9A4C0	frmWorld.frm	Private Sub	txtStars_Change	()
+00A9A680	frmTestSettings.frm	Private Sub	chkFullscreen_Click	()
+00A9A760	frmTestSettings.frm	Private Sub	chkGodMode_Click	()
+00A9A840	frmTestSettings.frm	Private Sub	chkGrabAll_Click	()
+00A9A920	frmTestSettings.frm	Private Sub	chkMaxFPS_Click	()
+00A9AA00	frmTestSettings.frm	Private Sub	chkShowFPS_Click	()
+00A9AAE0	frmTestSettings.frm	Private Sub	cmdClose_Click	()
+00A9AB70	frmTestSettings.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A9AC00	frmTestSettings.frm	Private Sub	optBlackYoshi_Click	(Index As Integer)
+00A9ACC0	frmTestSettings.frm	Private Sub	optBlueBoot_Click	(Index As Integer)
+00A9AD80	frmTestSettings.frm	Private Sub	optBlueYoshi_Click	(Index As Integer)
+00A9AE40	frmTestSettings.frm	Private Sub	optBoot_Click	(Index As Integer)
+00A9AF00	frmTestSettings.frm	Private Sub	optChrLink_Click	(Index As Integer)
+00A9B850	frmTestSettings.frm	Private Sub	optChrLuigi_Click	(Index As Integer)
+00A9BCF0	frmTestSettings.frm	Private Sub	optChrMario_Click	(Index As Integer)
+00A9C190	frmTestSettings.frm	Private Sub	optChrPeach_Click	(Index As Integer)
+00A9C980	frmTestSettings.frm	Private Sub	optChrToad_Click	(Index As Integer)
+00A9D170	frmTestSettings.frm	Private Sub	optFireMario_Click	(Index As Integer)
+00A9D200	frmTestSettings.frm	Private Sub	optGreenYoshi_Click	(Index As Integer)
+00A9D2C0	frmTestSettings.frm	Private Sub	optKoopaClownCar_Click	(Index As Integer)
+00A9D300	frmTestSettings.frm	Private Sub	optHammerMario_Click	(Index As Integer)
+00A9D390	frmTestSettings.frm	Private Sub	optIceMario_Click	(Index As Integer)
+00A9D420	frmTestSettings.frm	Private Sub	optIceYoshi_Click	(Index As Integer)
+00A9D4E0	frmTestSettings.frm	Private Sub	optMario_Click	(Index As Integer)
+00A9D570	frmTestSettings.frm	Private Sub	optMarioC_Click	(Index As Integer)
+00A9D590	frmTestSettings.frm	Private Sub	optNoMount_Click	(Index As Integer)
+00A9D620	frmTestSettings.frm	Private Sub	optPinkYoshi_Click	(Index As Integer)
+00A9D6E0	frmTestSettings.frm	Private Sub	optPurpleYoshi_Click	(Index As Integer)
+00A9D7A0	frmTestSettings.frm	Private Sub	optRacoonMario_Click	(Index As Integer)
+00A9D830	frmTestSettings.frm	Private Sub	optRedBoot_Click	(Index As Integer)
+00A9D8F0	frmTestSettings.frm	Private Sub	optRedYoshi_Click	(Index As Integer)
+00A9D9B0	frmTestSettings.frm	Private Sub	optSuperMario_Click	(Index As Integer)
+00A9DA40	frmTestSettings.frm	Private Sub	optTanookiMario_Click	(Index As Integer)
+00A9DAD0	frmTestSettings.frm	Private Sub	optYellowYoshi_Click	(Index As Integer)
+00A9DB90	frmTestSettings.frm	Private Sub	ShowAll	(Index As Integer)
+00A9E440	frmAdvanced.frm	Private Sub	cmbPara_Click	()
+00A9E7D0	frmAdvanced.frm	Private Sub	Form_Load	()
+00A9E910	frmAdvanced.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A9E9A0	frmLayers.frm	Private Sub	cmdAdd_Click	()
+00A9F260	frmLayers.frm	Private Sub	cmdDelete_Click	()
+00A9FE00	frmLayers.frm	Private Sub	Form_Load	()
+00A9FF10	frmLayers.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00A9FFA0	frmLayers.frm	Private Sub	lstLayer_Click	()
+00AA0F20	frmLayers.frm	Private Sub	lstLayer_DblClick	()
+00AA1250	frmLayers.frm	Private Sub	txtLayer_KeyPress	(KeyAscii As Integer)
+00AA2160	frmLayers.frm	Public Sub	UpdateLayers	()
+00AA2760	modLayers.bas	Public Sub	ShowLayer	(LayerName As String, Optional NoEffect As Boolean = False)
+00AA3730	modLayers.bas	Public Sub	HideLayer	(LayerName As String, Optional NoEffect As Boolean = False)
+UNUSED	modLayers.bas	Public Sub	SetLayer	(LayerName As String)
+00AA42D0	modLayers.bas	Public Sub	ProcEvent	(EventName As String, Optional NoEffect As Boolean = False)
+00AA60E0	modLayers.bas	Public Sub	UpdateEvents	()
+00AA6710	modLayers.bas	Public Sub	UpdateLayers	()
+UNUSED	frmEvents.frm	Private Sub	addSavedEvent_Change	()
+00AA7F30	frmEvents.frm	Private Sub	AutoSection_Change	()
+00AA8410	frmEvents.frm	Private Sub	cAltJump_Click	()
+00AA87A0	frmEvents.frm	Private Sub	cAltRun_Click	()
+00AA8B30	frmEvents.frm	Private Sub	cDown_Click	()
+00AA8EC0	frmEvents.frm	Private Sub	cDrop_Click	()
+00AA9250	frmEvents.frm	Private Sub	chkSmoke_Click	()
+00AA96A0	frmEvents.frm	Private Sub	chkStart_Click	()
+00AA9AF0	frmEvents.frm	Private Sub	cJump_Click	()
+00AA9E80	frmEvents.frm	Private Sub	cLeft_Click	()
+00AAA210	frmEvents.frm	Private Sub	cmbEndGame_Click	()
+00AAA560	frmEvents.frm	Private Sub	cmbLayerMove_Click	()
+00AAA970	frmEvents.frm	Private Sub	cmbSound_Click	()
+00AAADE0	frmEvents.frm	Private Sub	cmdAdd_Click	()
+00AAB770	frmEvents.frm	Private Sub	cmdBackground_Click	(Index As Integer)
+00AABDD0	frmEvents.frm	Private Sub	cmdDelete_Click	()
+00AAD210	frmEvents.frm	Private Sub	cmdDupe_Click	()
+00AADD30	frmEvents.frm	Private Sub	cmdHideAdd_Click	()
+00AAE1F0	frmEvents.frm	Private Sub	cmdHideRemove_Click	()
+00AAE660	frmEvents.frm	Private Sub	cmdMusic_Click	(Index As Integer)
+00AAECC0	frmEvents.frm	Private Sub	cmdPosition_Click	(Index As Integer)
+00AAF5C0	frmEvents.frm	Private Sub	cmdShowAdd_Click	()
+00AAFA80	frmEvents.frm	Private Sub	cmdShowRemove_Click	()
+00AAFEF0	frmEvents.frm	Private Sub	cmdToggleAdd_Click	()
+00AB03C0	frmEvents.frm	Private Sub	cmdToggleRemove_Click	()
+00AB0840	frmEvents.frm	Private Sub	cRight_Click	()
+00AB0BD0	frmEvents.frm	Private Sub	cRun_Click	()
+00AB0F60	frmEvents.frm	Private Sub	cStart_Click	()
+00AB12F0	frmEvents.frm	Private Sub	cUp_Click	()
+UNUSED	frmEvents.frm	Private Sub	delSavedEvent_Change	()
+00AB1680	frmEvents.frm	Private Sub	EventText_Change	()
+00AB1D30	frmEvents.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00AB1DC0	frmEvents.frm	Private Sub	lstEvent_Click	()
+00AB2110	frmEvents.frm	Private Sub	lstLayers_Click	()
+00AB2250	frmEvents.frm	Private Sub	scrDelay_Change	()
+00AB28E0	frmEvents.frm	Private Sub	scrX_Change	()
+00AB2D00	frmEvents.frm	Private Sub	scrY_Change	()
+00AB3120	frmEvents.frm	Private Sub	TriggerEvent_Click	()
+00AB3490	frmEvents.frm	Private Sub	txtEvent_KeyPress	(KeyAscii As Integer)
+00AB4A70	frmEvents.frm	Public Sub	RefreshEvents	()
+00AB92B0	frmEvents.frm	Private Sub	txtX_Change	()
+00AB96D0	frmEvents.frm	Private Sub	txtY_Change	()
+00AB9AF0	frmAdvancedBlock.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00AB9B80	frmSplash.frm	Private Sub	Form_Load	()
+00ABA390	modLoadGFX.bas	Public Sub	LoadGFX	()
+00ACB440	modLoadGFX.bas	Public Sub	UnloadGFX	()
+00ACD220	modLoadGFX.bas	Public Sub	LoadCustomGFX	()
+00AD3420	modLoadGFX.bas	Public Sub	UnloadCustomGFX	()
+00AD9DC0	modLoadGFX.bas	Public Sub	LoadCustomGFX2	(GFXFilePath As String)
+00ADFF90	modLoadGFX.bas	Public Sub	LoadWorldCustomGFX	()
+00AE2630	modLoadGFX.bas	Public Sub	UnloadWorldCustomGFX	()
+00AE5250	modLoadGFX.bas	Private Sub	cBlockGFX	(A As Integer)
+00AE57E0	modLoadGFX.bas	Private Sub	cNPCGFX	(A As Integer)
+00AE65E0	modLoadGFX.bas	Private Sub	cBackgroundGFX	(A As Integer)
+00AE6B70	modLoadGFX.bas	Private Sub	cTileGFX	(A As Integer)
+00AE7100	modLoadGFX.bas	Private Sub	cSceneGFX	(A As Integer)
+00AE7680	modLoadGFX.bas	Private Sub	cLevelGFX	(A As Integer)
+00AE7D20	modLoadGFX.bas	Private Sub	cPathGFX	(A As Integer)
+00AE8110	modLoadGFX.bas	Public Sub	UpdateLoad	()
+00AE8B30	frmLevelDebugger.frm	Private Sub	cmdSortBlocks_Click	()
+00AE8C70	frmLevelDebugger.frm	Private Sub	cmdSwap_Click	()
+00AE90D0	frmLevelDebugger.frm	Private Sub	Form_Load	()
+00AE91D0	frmLevelDebugger.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00AE9240	frmLevelDebugger.frm	Public Sub	UpdateDisplay	()
+00AEA740	frmLevelDebugger.frm	Private Sub	plrSprites_Click	()
+00AEAB70	frmGenerator.frm	Private Sub	Form_Load	()
+00AEAC00	frmGenerator.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00AEACF0	frmGenerator.frm	Private Sub	optEffect_Click	(Index As Integer)
+00AEAE60	frmGenerator.frm	Private Sub	Spawn_Click	()
+00AEB180	frmGenerator.frm	Public Sub	CheckSpawn	()
+00AEB9E0	frmGenerator.frm	Private Sub	optSpawnDirection_Click	(Index As Integer)
+00AEBB50	frmGenerator.frm	Private Sub	scrDelay_Change	()
+00AEC010	frmNPCAdvanced.frm	Private Sub	Form_Load	()
+00AEC1C0	frmNPCAdvanced.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00AEC250	frmNPCAdvanced.frm	Private Sub	Legacy_Click	()
+00AEC530	frmNPCAdvanced.frm	Private Sub	scrFire_Change	()
+00AEC690	frmWater.frm	Private Sub	Quicksand_Click	()
+00AEC970	frmWater.frm	Private Sub	WaterH_Change	()
+00AECAE0	frmWater.frm	Private Sub	WaterR_Click	()
+00AECD20	frmWater.frm	Private Sub	WaterW_Change	()
+00AECE90	frmSprites.frm	Private Sub	Form_Resize	()
+00AED060	Netplay.frm	Private Sub	nClient_Close	()
+00AED320	Netplay.frm	Private Sub	nClient_Connect	()
+00AEDAC0	Netplay.frm	Private Sub	nClient_DataArrival	(ByVal bytesTotal As Long)
+00AEE490	Netplay.frm	Private Sub	nServer_Close	(Index As Integer)
+00AEE8B0	Netplay.frm	Private Sub	nServer_ConnectionRequest	(Index As Integer, ByVal requestID As Long)
+00AEEFE0	Netplay.frm	Private Sub	nServer_DataArrival	(Index As Integer, ByVal bytesTotal As Long)
+00AEFA60	Netplay.frm	Public Sub	newData	(newStr As String, Action As String, Index As Integer)
+00B0C0B0	Netplay.frm	Public Sub	sendData	(newStr As String, Optional exServer As Integer = 0)
+00B0C4B0	Netplay.frm	Public Sub	ModPlayer	(newStr As String)
+00B0EB70	Netplay.frm	Public Sub	ModNPC	(newStr As String)
+00B0F2A0	Netplay.frm	Public Sub	ModBlock	(newStr As String)
+00B0F4B0	Netplay.frm	Public Function	AddBlock	(A As Integer) As String
+00B0FB00	Netplay.frm	Public Function	EraseBlock	(A As Integer, Optional noEffects As Integer = 0) As String
+00B0FEF0	Netplay.frm	Public Function	EraseNPC	(A As Integer, Optional noEffects As Integer = 0) As String
+00B10250	Netplay.frm	Public Function	EraseBackground	(A As Integer, Optional noEffects As Integer = 0) As String
+00B10580	Netplay.frm	Public Function	AddBackground	(A As Integer) As String
+00B10890	Netplay.frm	Public Function	AddNPC	(A As Integer) As String
+00B113E0	Netplay.frm	Public Function	AddWater	(A As Integer) As String
+00B11740	Netplay.frm	Public Function	AddWarp	(A As Integer) As String
+00B121B0	Netplay.frm	Public Function	ModSection	(A As Integer) As String
+00B12420	Netplay.frm	Public Function	ModLayer	(A As Integer) As String
+00B12690	Netplay.frm	Public Function	ModEvent	(A As Integer) As String
+00B137F0	Netplay.frm	Public Function	SyncNum	() As String
+00B13980	Netplay.frm	Public Function	PutPlayerControls	(A As Integer)
+00B145C0	Netplay.frm	Public Function	PutPlayerLoc	(A As Integer)
+00B14980	Netplay.frm	Public Sub	GetPlayerControls	(newStr As String)
+00B15680	Netplay.frm	Public Sub	GetPlayerLoc	(newStr As String)
+00B15B20	Netplay.frm	Public Sub	InitSync	(Index As Integer)
+00B17480	Netplay.frm	Private Sub	tmrCheckPorts_Timer	()
+00B17890	Netplay.frm	Private Sub	tmrConnect_Timer	()
+00B17970	Netplay.frm	Private Sub	tmrPing_Timer	()
+00B17AA0	Netplay.frm	Private Sub	tmrPingC_Timer	()
+00B18270	Netplay.frm	Private Sub	tmrPort_Timer	()
+00B18500	Netplay.frm	Private Sub	tmrTimeout_Timer	(Index As Integer)
+00B18980	Netplay.frm	Private Sub	UpdateEvents	(newStr As String)
+00B1A060	Netplay.frm	Public Sub	DropClient	(Index As Integer)
+00B1AD90	Netplay.frm	Public Sub	DropServer	()
+00B1B430	Netplay.frm	Private Sub	tmrTimeoutC_Timer	()
+00B1B6F0	frmNetplay.frm	Private Sub	cmdClearLevel_Click	()
+00B1B960	frmNetplay.frm	Private Sub	cmdGo_Click	()
+00B1D740	frmNetplay.frm	Private Sub	cPassword_Change	()
+00B1D820	frmNetplay.frm	Private Sub	Cursor_Click	(Index As Integer)
+00B1D9A0	frmNetplay.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00B1DA30	frmNetplay.frm	Private Sub	optMode_Click	(Index As Integer)
+00B1DC20	frmNetplay.frm	Private Sub	optPlayer_Click	(Index As Integer)
+00B1DD90	frmNetplay.frm	Private Sub	sPassword_Change	()
+00B1DE70	frmNetplay.frm	Private Sub	txtNick_Change	()
+00B1E510	frmChat.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00B1E5A0	frmChat.frm	Private Sub	txtSay_KeyPress	(KeyAscii As Integer)
+00B1F790	frmLoading.frm	Private Sub	cmdGo_Click	()
+00B1FAE0	frmLoading.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00B1FDF0	frmLoading.frm	Private Sub	tmrLoad_Timer	()
+00B20000	frmLoader.frm	Private Sub	cmdEditor_Click	()
+00B20080	frmLoader.frm	Private Sub	cmdExit_Click	()
+00B200F0	frmLoader.frm	Private Sub	cmdGame_Click	()
+00B20160	frmLoader.frm	Private Sub	Form_Load	()
+00B20230	frmLoader.frm	Private Sub	Form_Unload	(Cancel As Integer)
+00B202B0	modCustom.bas	Public Sub	SaveNPCDefaults	()
+00B20870	modCustom.bas	Public Sub	LoadNPCDefaults	()
+00B20E50	modCustom.bas	Public Sub	FindCustomNPCs	(Optional cFilePath As String = "")
+00B21200	modCustom.bas	Private Sub	LoadCustomNPC	(A As Integer, cFileName As String)
+00B22900	frmLevelAdv.frm	Public Sub	RefreshFields	()
+00B229C0	frmLevelAdv.frm	Private Sub	cmdClone_Click	()
+00B22B20	frmLevelAdv.frm	Private Sub	Form_Load	()
+00B22DB0	frmLevelAdv.frm	Private Sub	txtLevelName_Change	()
+00B22E90	frmLevelAdv.frm	Public Sub	CloneSection	(SectionS As Integer, SectionT As Integer)
+00B23F40	frmLevelAdv.frm	Private Function	CloneLoc	(Loc1 As Location, Loc2 As Location) As Boolean

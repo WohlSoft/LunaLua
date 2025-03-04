@@ -95,7 +95,7 @@ bool Renderer::LoadBitmapResource(std::wstring filename, int resource_code) {
         full_path = filename;
     }
 
-    //MessageBoxW(NULL, full_path.c_str(), L"Dbg", NULL);
+    //LunaMsgBox::ShowW(NULL, full_path.c_str(), L"Dbg", NULL);
     // Create and store the image resource
     std::shared_ptr<LunaImage> pNewbox = LunaImage::fromFile(full_path.c_str());
     if (!pNewbox) {

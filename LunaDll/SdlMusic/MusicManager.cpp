@@ -157,7 +157,7 @@ void MusicManager::rebuildSoundCache()
     if(!failedSounds.empty())
     {
         std::string errorMsg = "Some audio files failed to load:\n" + failedSounds;
-        MessageBoxA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK | MB_ICONWARNING);
+        LunaMsgBox::ShowA(0, errorMsg.c_str(), "Errors while loading sound files", MB_OK | MB_ICONWARNING);
     }
 }
 
@@ -355,7 +355,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
     IniProcessing soundsList(path);
     if(!soundsList.isOpened())
     {
-        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 
@@ -384,12 +384,9 @@ void MusicManager::loadSounds(std::string path, std::string root)
         replaceSubStr(fileName, "\\\\",  "\\");
         replaceSubStr(fileName, "/",  "\\");
 
-        // If no extension...
-        size_t findLastSlash = fileName.find_last_of("/\\");
-        size_t findLastDot = fileName.find_last_of(".", findLastSlash);
-
-        // Append missing extension
-        if (findLastDot == std::wstring::npos)
+        // If no extension... append missing extension
+        std::string ext = getExtension(fileName);
+        if (ext.size() == 0)
         {
             static const char* extensionOptions[] = { ".ogg", ".mp3", ".wav", ".voc", ".flac", ".spc" };
             for (int j=0; j < (sizeof(extensionOptions) / sizeof(extensionOptions[0])); j++)
@@ -438,7 +435,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
     IniProcessing musicList(path);
     if (!musicList.isOpened())
     {
-        MessageBoxA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
+        LunaMsgBox::ShowA(0, std::string(path + "\n\nError of read INI file").c_str(), "Error", 0);
         return;
     }
 

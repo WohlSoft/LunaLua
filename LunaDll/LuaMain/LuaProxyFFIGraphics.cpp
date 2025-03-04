@@ -553,3 +553,22 @@ FFI_EXPORT FBSize FFI_GraphicsGetMainFramebufferSize()
     // Return struct by value
     return { g_GLContextManager.GetMainFBWidth(), g_GLContextManager.GetMainFBHeight() };
 }
+
+FFI_EXPORT void __fastcall FFI_RedirectCameraFB(CaptureBufferRef* fb, double startPriority, double endPriority)
+{
+    CLunaFFILock ffiLock(__FUNCTION__);
+    std::lock_guard<std::mutex> graphicsLock(g_graphicsMutex);
+
+    auto startCmd = std::make_shared<GLEngineCmd_RedirectCameraFB>();
+    startCmd->mBuff = fb ? *fb : nullptr;
+    Renderer::Get().GLCmd(startCmd, startPriority);
+
+    auto endCmd = std::make_shared<GLEngineCmd_UnRedirectCameraFB>();
+    endCmd->mStartCmd = startCmd;
+    Renderer::Get().GLCmd(endCmd, endPriority);
+}
+
+FFI_EXPORT const float* FFI_GetFrameTimes()
+{
+    return g_GLEngine.mInternalGLEngine.GetFrameTimes();
+}

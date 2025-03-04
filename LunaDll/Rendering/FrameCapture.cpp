@@ -27,6 +27,8 @@ public:
             GLFramebuffer* oldFB = g_GLContextManager.GetCurrentFB();
             fb->Bind();
 
+            static const GLclampf colorTrans[] = { 0.0, 0.0, 0.0, 0.0 };
+            fb->Clear(colorTrans);
             g_GLDraw.DrawStretched(0, 0, w, h, &g_GLContextManager.GetCurrentCameraFBTex(), 0, 0, w, h, 1.0f, nullptr);
 
             // Restore the old bound FB (if null, bind screen)

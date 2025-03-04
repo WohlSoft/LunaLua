@@ -164,6 +164,19 @@ enum CollidersType : short {
     HARM_TYPE_EXT_HAMMER = -3,
 };
 
+// value passed to onNPCTransform
+enum NPCTransformationCause {
+    NPC_TFCAUSE_UNKNOWN = 0,
+    NPC_TFCAUSE_HIT = 1,
+    NPC_TFCAUSE_DESPAWN = 2,
+    NPC_TFCAUSE_CONTAINER = 3,
+    NPC_TFCAUSE_AI = 4,
+    NPC_TFCAUSE_EATEN = 5,
+    NPC_TFCAUSE_LINK = 6,
+    NPC_TFCAUSE_SWITCH = 7,
+};
+
+
 #define GM_BASE             0x00B25000
 #define GM_END              0x00B2E000
 
@@ -194,6 +207,7 @@ DEFMEM(GM_DO_SCREENSHOT,    short, 0x00B2504C);
 DEFMEM(GM_CREDITS_MODE,     WORD,  0x00B2C89C);
 DEFMEM(GM_EPISODE_MODE,     WORD,  0x00B2C5B4);      // 0xFFFF = leave current level
 DEFMEM(GM_LEVEL_MODE,       WORD,  0x00B2C620);
+DEFMEM(GM_TITLE_INTRO_MODE, WORD,  0x00B2C620)
 /*
 The modes work as followed:
 GM_CREDITS_MODE == -1                        --> Credits
@@ -412,6 +426,8 @@ DEFMEM(GM_PSWITCH_LENGTH,   WORD,  0x00B2C87C);
 
 DEFMEM(GM_UNK_OV_DATABLOCK, short*,0x00B25164);     // Pointer to some kind of overworld data block involving locked character selection (not 100% sure)
 
+DEFMEM(GM_NPC_WALKSPEED,    float, 0x00B2C86C);
+
 //Hitbox
 DEFMEM(GM_HITBOX_H_PTR,     short,0x00B2C6FC);      // player hitbox height for each character/power-up state (starts with small mario through small link, then cycles same way through each power up)
 DEFMEM(GM_HITBOX_H_D_PTR,   short,0x00B2C742);      // player hitbox heights while ducking
@@ -586,6 +602,8 @@ DEFMEM(blockdef_width,             short*, 0x00B2B9F8);
 DEFMEM(blockdef_height,            short*, 0x00B2BA14);
 DEFMEM(blockdef_floorslope,        short*, 0x00B2B94C);
 DEFMEM(blockdef_ceilingslope,      short*, 0x00B2B968);
+DEFMEM(blockdef_semisolid,         short*, 0x00B2C048);
+DEFMEM(blockdef_passthrough,       short*, 0x00b2c0d4);
 
 DEFMEM(bgodef_width, WORD*, 0x00B2CCF4);
 DEFMEM(bgodef_height, WORD*, 0x00B2BE4C);
@@ -653,6 +671,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 #define GF_INIT_DEF_VALS    0x008C2720
 
 #define GF_SAVE_GAME        0x008E47D0
+#define GF_LOAD_GAME        0x008E4E00
+
+#define GF_LOAD_WORLD       0x008DF5B0
 
 //      No args
 #define GF_INIT_LEVEL_ENVIR 0x009944F0
@@ -668,6 +689,9 @@ DEFMEM(IMP_vbaInputFile, void*, 0x00401158); // Ptr to __cdecl
 //      Arg2 = int* Unk flags
 //      Arg3 = int* Unk
 #define GF_INIT_NPC         0x00A03630
+
+//      Arg1 = int* Index of NPC
+#define GF_NPC_FRAME        0x00A3C990
 
 //      Arg1 = int* Index of NPC in NPC list
 #define GF_UPDATE_NPC       0x00A3B680
@@ -842,6 +866,9 @@ static const auto native_initDefVals    = (void(__stdcall *)())GF_INIT_DEF_VALS;
 static const auto native_print          = (void(__stdcall *)(VB6StrPtr* /*Text*/, short* /*fonttype*/, float* /*x*/, float* /*y*/))GF_PRINT;
 
 static const auto native_saveGame       = (void(__stdcall *)())GF_SAVE_GAME;
+static const auto native_loadGame       = (void(__stdcall *)())GF_LOAD_GAME;
+
+static const auto native_loadWorld      = (void(__stdcall *)(VB6StrPtr* /*path*/))GF_LOAD_WORLD;
 
 static const auto native_spritesheetX   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_X;
 static const auto native_spritesheetY   = (short(__stdcall *)(int* /*spriteIndex*/))GF_SPRITESHEET_Y;
@@ -930,6 +957,7 @@ static const auto native_initNPC = (int(__stdcall *)(short* npcId, float* dir, v
 
 static const auto native_drawBackground = (void(__stdcall *)(short* section, short* camera))GF_DRAW_BACKGROUND;
 
+static const auto native_setNPCFrame = (void(__stdcall*)(short* npcidx))GF_NPC_FRAME;
 /*
 Function name
                                            Segment Start    Length   Locals   Arguments
@@ -1490,8 +1518,8 @@ _O_Pub_Obj_Inf31_Event0x6                    .text 00B23F40 000000A7 0000000C 00
 */
 
 //DEBUG:
-#define dbgbox(msg) MessageBoxW(NULL, msg, L"Dbg", NULL);
-#define dbgboxA(msg) MessageBoxA(NULL, msg, "Dbg", NULL);
+#define dbgbox(msg) LunaMsgBox::ShowW(NULL, msg, L"Dbg", NULL);
+#define dbgboxA(msg) LunaMsgBox::ShowA(NULL, msg, "Dbg", NULL);
 
 #endif
 

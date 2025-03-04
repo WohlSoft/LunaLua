@@ -173,6 +173,62 @@ double LuaProxy::Audio::MusicGetLoopLength()
     return Mix_GetMusicLoopLengthTime(PGE_MusPlayer::currentMusic());
 }
 
+
+
+void LuaProxy::Audio::MusicRewind()
+{
+#ifndef NO_SDL
+    PGE_MusPlayer::MUS_rewindMusic();
+#endif
+}
+
+double LuaProxy::Audio::MusicGetInstChannelCount()
+{
+    return (double)Mix_GetMusicTracks(PGE_MusPlayer::currentMusic());
+}
+
+void LuaProxy::Audio::MusicInstChannelMute(int trackNumber)
+{
+    Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 1);
+}
+
+void LuaProxy::Audio::MusicInstChannelUnmute(int trackNumber)
+{
+    Mix_SetMusicTrackMute(PGE_MusPlayer::currentMusic(), trackNumber, 0);
+}
+
+void LuaProxy::Audio::MusicSetTempo(double tempo)
+{
+    Mix_SetMusicTempo(PGE_MusPlayer::currentMusic(), tempo);
+}
+
+void LuaProxy::Audio::MusicSetPitch(double pitch)
+{
+    Mix_SetMusicPitch(PGE_MusPlayer::currentMusic(), pitch);
+}
+
+void LuaProxy::Audio::MusicSetSpeed(double speed)
+{
+    Mix_SetMusicSpeed(PGE_MusPlayer::currentMusic(), speed);
+}
+
+double LuaProxy::Audio::MusicGetTempo()
+{
+    return Mix_GetMusicTempo(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetPitch()
+{
+    return Mix_GetMusicPitch(PGE_MusPlayer::currentMusic());
+}
+
+double LuaProxy::Audio::MusicGetSpeed()
+{
+    return Mix_GetMusicSpeed(PGE_MusPlayer::currentMusic());
+}
+
+
+
 void LuaProxy::Audio::seizeStream(int section)
 {
     MusicManager::setSeized(section, true);
@@ -314,6 +370,7 @@ void LuaProxy::Audio::playSFX(const std::string& filename, lua_State* L)
 
 Mix_Chunk *LuaProxy::Audio::SfxOpen(const std::string& filename, lua_State* L)
 {
+    HandleEventsWhileLoadscreenOnly();
     std::string full_paths = getSfxPath(filename);
     Mix_Chunk* chunk = PGE_Sounds::SND_OpenSnd(full_paths.c_str());
     if (!chunk)
@@ -432,7 +489,6 @@ int LuaProxy::Audio::SfxVolume(int channel, int vlm)
     return Mix_Volume(channel, vlm);
 }
 
-
 int LuaProxy::Audio::SfxIsFading(int channel)
 {
     if(channel<0) channel=1;//Anti-crash protection
@@ -458,6 +514,16 @@ int LuaProxy::Audio::SfxSet3DPosition(int channel, int angle, int distance)
 int LuaProxy::Audio::SfxReverseStereo(int channel, int flip)
 {
     return Mix_SetReverseStereo(channel, flip);
+}
+
+int LuaProxy::Audio::GetMixedSfxVolume()
+{
+    return Mix_MasterVolume(-1);
+}
+
+int LuaProxy::Audio::SetMixedSfxVolume(int vlm)
+{
+    return Mix_MasterVolume(vlm);
 }
 
 double LuaProxy::Audio::AudioClock()

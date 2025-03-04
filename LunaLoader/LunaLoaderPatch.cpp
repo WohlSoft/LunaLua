@@ -53,7 +53,7 @@ static int patchAStr(HANDLE f, unsigned int at, char *str, unsigned int maxlen)
     if(res == 0)
     {
         std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+        LunaMsgBox::ShowW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
     }
     return bytes;
 }
@@ -76,7 +76,7 @@ static int patchUStr(HANDLE f, unsigned int at, char *str, unsigned int maxlen)
     if(res == 0)
     {
         std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+        LunaMsgBox::ShowW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
     }
     return bytes;
 }
@@ -256,7 +256,7 @@ LunaLoaderResult LunaLoaderRun(const wchar_t *pathToSMBX, const wchar_t *cmdLine
        WriteProcessMemory(pi.hProcess, (void *)LoaderPatchAddr2, LoaderPatch2, sizeof(LoaderPatch2), NULL) == 0)
     {
         std::wstring msg = GetLastErrorAsString();
-        MessageBoxW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
+        LunaMsgBox::ShowW(NULL, msg.c_str(), L"Error!", MB_ICONERROR);
         return LUNALOADER_PATCH_FAIL;
     }
     // Change Patch2 memory protection type

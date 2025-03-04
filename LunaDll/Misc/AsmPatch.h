@@ -5,6 +5,8 @@
 #include <exception>
 #include <type_traits>
 #include <tuple>
+#include <map>
+#include <vector>
 
 template<void* TARGETADDR>
 _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
@@ -45,6 +47,249 @@ struct AsmPatchNoCondtionalJump : std::exception {
     const char* what() const { return "No conditional jump at detected"; }
 };
 
+// Class to temporarily unlock memory
+class MemoryUnlock {
+    private:
+        void* const mAddr;
+        const std::size_t mSize;
+        unsigned long mOldProtect;
+        const bool mSuccess;
+
+        static bool UnProtect(void* addr, std::size_t size, unsigned long* oldFlags);
+        static void ReProtect(void* addr, std::size_t size, unsigned long flags);
+
+    public:
+        MemoryUnlock(std::uintptr_t addr, std::size_t size) :
+            MemoryUnlock(reinterpret_cast<void*>(addr), size)
+        {}
+
+        MemoryUnlock::MemoryUnlock(void* addr, std::size_t size) :
+            mAddr(addr),
+            mSize(size),
+            mOldProtect(0),
+            mSuccess(UnProtect(mAddr, mSize, &mOldProtect))
+        {}
+
+        MemoryUnlock::~MemoryUnlock()
+        {
+            if (mSuccess)
+            {
+                ReProtect(mAddr, mSize, mOldProtect);
+            }
+        }
+
+        bool IsValid() const { return mSuccess; }
+
+        MemoryUnlock(const MemoryUnlock&) = delete;
+        MemoryUnlock& operator= (const MemoryUnlock&) = delete;
+
+        static bool Memcpy(void* dest, const void* src, std::size_t count, const char* srcFile, int srcLine);
+};
+
+// Alias for MemoryUnlock::Memcpy with tracking
+#define MemoryUnlock_Memcpy(dest, src, size) MemoryUnlock::Memcpy(dest, src, size, __FILE__, __LINE__)
+
+// Structure for detecting conflicts
+class AsmRange
+{
+public:
+    // We uniquely identify patches with a tuple of address, source file, and source line
+    // This also serves a purpose for debug output
+    typedef const std::tuple<uintptr_t, const char*, int> PatchId_t;
+
+    // Patches AsmRanges also have an index based on allocation order
+    typedef std::intptr_t PatchIdx_t;
+
+private:
+    // Class to hold static data for AsmRange
+    // We use this instead of static members because we cannot guarantee when global init of the
+    // static members occurs.
+    struct GlobalState
+    {
+    private:
+        GlobalState() :
+            mAlloc(),
+            mCache(),
+            mFirstIdx(-1),
+            mStartChecks(false)
+        {}
+        std::vector<AsmRange> mAlloc;
+        std::map<PatchId_t, PatchIdx_t> mCache;
+        PatchIdx_t mFirstIdx;
+        bool mStartChecks;
+
+    public:
+        static GlobalState& get()
+        {
+            // Yup, it's singleton pattern
+            static GlobalState inst;
+            return inst;
+        }
+
+        bool getStartChecks()
+        {
+            return mStartChecks;
+        }
+
+        void triggerStartChecks()
+        {
+            mStartChecks = true;
+
+            // Check any data we've already recorded
+            for (AsmRange* cursor = getFirstPtr(); cursor != nullptr; cursor = cursor->getNextPtr())
+            {
+                cursor->checkCollision();
+            }
+        }
+
+        AsmRange& operator[] (PatchIdx_t idx)
+        {
+            return mAlloc[idx];
+        }
+
+        AsmRange* getFirstPtr()
+        {
+            if (mFirstIdx < 0)
+            {
+                return nullptr;
+            }
+            return &mAlloc[mFirstIdx];
+        }
+
+        PatchIdx_t getIdxById(PatchId_t id)
+        {
+            auto cursor = mCache.find(id);
+            if (cursor == mCache.end())
+            {
+                // New copy needed
+                std::intptr_t idx = mAlloc.size();
+                mAlloc.emplace_back(idx, id);
+                mCache[id] = idx;
+                AsmRange& newRange = mAlloc[idx];
+
+                // Insert in linked list
+                if (mFirstIdx < 0)
+                {
+                    // First entry
+                    mFirstIdx = idx;
+                }
+                else
+                {
+                    // Subsequent entry
+                    PatchIdx_t mCursor = mFirstIdx;
+                    PatchIdx_t mPrev = -1;
+                    while ((mCursor >= 0) && (mAlloc[mCursor].getAddr() < newRange.getAddr()))
+                    {
+                        mPrev = mCursor;
+                        mCursor = mAlloc[mCursor].mNextIdx;
+                    }
+
+                    if (mPrev < 0)
+                    {
+                        // Replacing first element
+                        mFirstIdx = idx;
+                    }
+                    else
+                    {
+                        // Replacing later element
+                        mAlloc[mPrev].mNextIdx = idx;
+                    }
+                    // Set next chain entry
+                    newRange.mNextIdx = mCursor;
+
+                    if (mPrev >= 0)
+                    {
+                        mAlloc[mPrev].checkCollision();
+                    }
+                }
+
+                return idx;
+            }
+            else
+            {
+                // Reuse existing copy
+                std::intptr_t idx = cursor->second;
+                return idx;
+            }
+        }
+    };
+
+    // Variables tracked for each patch range
+    PatchIdx_t mSelfIdx;
+    PatchIdx_t mNextIdx;
+    PatchId_t mId;
+    std::uintptr_t mSize;
+    bool mCollided;
+
+    void SetSize(std::uintptr_t size)
+    {
+        if (size > mSize)
+        {
+            mSize = size;
+            checkCollision();
+        }
+    }
+
+    void checkCollision()
+    {
+        GlobalState& global = GlobalState::get();
+        if (!global.getStartChecks()) return;
+        if (mCollided) return;
+
+        if ((mNextIdx >= 0) && ((getAddr() + mSize) > global[mNextIdx].getAddr()))
+        {
+            mCollided = true;
+            const AsmRange& next = global[mNextIdx];
+            printf("WARNING: Conflict between 0x%X and 0x%X\n\t%s:%d\n\t%s:%d\n",
+                getAddr(), next.getAddr(),
+                getFile(), getLine(),
+                next.getFile(), next.getLine()
+                );
+        }
+    }
+
+public:
+    AsmRange(std::intptr_t idx, PatchId_t id) :
+        mSelfIdx(idx), mNextIdx(-1), mId(id), mSize(0), mCollided(false)
+    {
+    }
+
+    std::uintptr_t getAddr() const { return std::get<0>(mId); }
+    const char* getFile() const { return std::get<1>(mId); }
+    int getLine() const { return std::get<2>(mId); }
+    std::uintptr_t getSize() { return mSize; }
+    static AsmRange* getFirstPtr() { return GlobalState::get().getFirstPtr(); }
+    AsmRange* getNextPtr() { return (mNextIdx >= 0) ? &GlobalState::get()[mNextIdx] : nullptr; }
+
+    static PatchIdx_t getInst(std::uintptr_t addr, const char* srcFile, int lineNum, std::uintptr_t size = 0)
+    {
+        GlobalState& global = GlobalState::get();
+        PatchIdx_t idx = global.getIdxById({addr, srcFile, lineNum});
+        if (size > 0)
+        {
+            updateSize(idx, size);
+        }
+        return idx;
+    }
+
+    static void updateSize(std::intptr_t idx, std::uintptr_t size)
+    {
+        GlobalState& global = GlobalState::get();
+        if (idx >= 0)
+        {
+            global[idx].SetSize(size);
+        }
+    }
+
+    // Don't actually start checking ranges until this.
+    // This is needed since we might not have allocated a console we we started keeping track of
+    // patched ranges.
+    static void StartChecking()
+    {
+        GlobalState::get().triggerStartChecks();
+    }
+};
+
 template <std::uintptr_t Size>
 struct AsmPatch : public Patchable {
     /********************
@@ -55,15 +300,29 @@ public:
     std::uint8_t mPatchBytes[Size ? Size : 1];
     std::uint8_t mOrigBytes[Size ? Size : 1];
     bool mIsPatched;
+    intptr_t const mRangeTrackIdx;
 
     /***********************************
      * Constructor and utility methods *
      ***********************************/
 public:
-    AsmPatch(std::uintptr_t addr) :
+    AsmPatch(std::uintptr_t addr, const char* srcFile, int srcLine) :
         mAddr(addr),
-        mIsPatched(false)
+        mIsPatched(false),
+        mRangeTrackIdx(AsmRange::getInst(addr, srcFile, srcLine, Size))
     {}
+
+    template <std::uintptr_t OldSize>
+    AsmPatch(std::uintptr_t addr, const AsmPatch<OldSize>& old) :
+        mAddr(addr),
+        mIsPatched(false),
+        mRangeTrackIdx(old.mRangeTrackIdx)
+    {
+        if (mRangeTrackIdx >= 0)
+        {
+            AsmRange::updateSize(mRangeTrackIdx, Size);
+        }
+    }
 
     std::uintptr_t size() const {
         return Size;
@@ -76,8 +335,12 @@ public:
     void Apply() {
         if (mIsPatched) return;
         if (Size == 0) return;
-        for (std::uintptr_t i = 0; i < Size; i++) {
-            ((uint8_t*)mAddr)[i] = mPatchBytes[i];
+        {
+            MemoryUnlock lock(mAddr, Size);
+            if (!lock.IsValid()) return;
+            for (std::uintptr_t i = 0; i < Size; i++) {
+                ((uint8_t*)mAddr)[i] = mPatchBytes[i];
+            }
         }
         mIsPatched = true;
     }
@@ -85,8 +348,12 @@ public:
     void Unapply() {
         if (!mIsPatched) return;
         if (Size == 0) return;
-        for (std::uintptr_t i = 0; i < Size; i++) {
-            ((uint8_t*)mAddr)[i] = mOrigBytes[i];
+        {
+            MemoryUnlock lock(mAddr, Size);
+            if (!lock.IsValid()) return;
+            for (std::uintptr_t i = 0; i < Size; i++) {
+                ((uint8_t*)mAddr)[i] = mOrigBytes[i];
+            }
         }
         mIsPatched = false;
     }
@@ -105,7 +372,7 @@ public:
 
     template <typename... Ts>
     inline AsmPatch<Size + 1 + sizeof...(Ts)> bytes(std::uint8_t newByte, Ts... params) const {
-        AsmPatch<Size + 1> ret(mAddr);
+        AsmPatch<Size + 1> ret(mAddr, *this);
         for (std::uintptr_t i = 0; i < Size; i++) {
             ret.mPatchBytes[i] = mPatchBytes[i];
         }
@@ -121,7 +388,7 @@ public:
         return bytes(newByte);
     }
 
-    inline AsmPatch<Size + 2> word(std::uint32_t newWord) const {
+    inline AsmPatch<Size + 2> word(std::uint16_t newWord) const {
         const std::uint8_t* data = (const std::uint8_t*)&newWord;
         return bytes(data[0], data[1]);
     }
@@ -293,6 +560,11 @@ public:
     template<typename T>
     inline AsmPatch<Size + 6> JNLE(T addr) const { return JG(addr); }
 
+    inline AsmPatch<Size + 6> JO(void* addr) const { return JO((std::uintptr_t)addr); }
+    inline AsmPatch<Size + 6> JO(std::uintptr_t addr) const {
+        return bytes(0x0F, 0x80).dword(addr - cursor() - 6);
+    }
+
     inline AsmPatch<Size + 13> SAFE_CALL(void* func) const { return SAFE_CALL((std::uintptr_t)func); }
     inline AsmPatch<Size + 13> SAFE_CALL(std::uintptr_t func) const {
         return (
@@ -312,7 +584,7 @@ public:
     inline AsmPatch<PadSize> NOP_PAD_TO_SIZE() const {
         static_assert(PadSize >= Size, "Cannot pad smaller than old size");
 
-        AsmPatch<PadSize> ret(mAddr);
+        AsmPatch<PadSize> ret(mAddr, *this);
         for (std::uintptr_t i = 0; i < Size; i++) {
             ret.mPatchBytes[i] = mPatchBytes[i];
         }
@@ -343,19 +615,21 @@ public:
     }
 };
 
-static inline AsmPatch<0> PATCH(std::uintptr_t addr) {
-    return AsmPatch<0>(addr);
+static inline AsmPatch<0> PATCH_impl(std::uintptr_t addr, const char* srcFile, int srcLine) {
+    return AsmPatch<0>(addr, srcFile, srcLine);
 }
-static inline AsmPatch<0> PATCH(void* addr) {
-    return PATCH((std::uintptr_t)addr);
+static inline AsmPatch<0> PATCH_impl(void* addr, const char* srcFile, int srcLine) {
+    return PATCH_impl((std::uintptr_t)addr, srcFile, srcLine);
 }
+
+#define PATCH(x) PATCH_impl(x, __FILE__, __LINE__)
 
 /********************/
 /* Patch colleciton */
 /********************/
 
 template <typename... Ts>
-class PatchCollectionImpl : Patchable {
+class PatchCollectionImpl : public Patchable {
 private:
     std::tuple<Ts...> items;
 

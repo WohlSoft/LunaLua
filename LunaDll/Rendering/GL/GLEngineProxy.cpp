@@ -1,6 +1,7 @@
 #include <thread>
 #include <memory>
 #include "../../Defines.h"
+#include "../../Globals.h"
 #include "../../Misc/ThreadedCmdQueue.h"
 #include "../../Misc/TestModeMenu.h"
 #include "GLEngineProxy.h"
@@ -162,6 +163,11 @@ void GLEngineProxy::EndFrame(HDC hdcDest, bool isLoadScreen, bool redrawOnly, bo
     obj->mHdcDest = hdcDest;
     obj->mRedrawOnly = redrawOnly;
     obj->mResizeOverlay = resizeOverlay;
+    obj->mPauseOverlay = gMainWindowUnfocusOverlay;
+    gMainWindowUnfocusOverlay = false;
+
+    // If we're about to unfocus, force the frame to be rendered
+    obj->mForceDraw = gMainWindowUnfocusPending;
 
     if (isLoadScreen || redrawOnly)
     {

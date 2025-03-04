@@ -39,6 +39,24 @@ typedef struct _SEH_CHAIN_RECORD {
     SEH_HANDLER* handler;
 } SEH_CHAIN_RECORD;
 
+#include "../ErrorReporter.h"
+
+// Better stack traces
+static void(__stdcall *origSubscriptOutOfRange)() = nullptr;
+static void __stdcall VB_SubscriptOutOfRange()
+{
+    RtlCaptureContext(&ErrorReportVars::lastVB6ErrContext);
+    ErrorReportVars::pendingVB6ErrContext = true;
+    origSubscriptOutOfRange();
+}
+static void(__stdcall *origOverflow)() = nullptr;
+static void __stdcall VB_Overflow()
+{
+    RtlCaptureContext(&ErrorReportVars::lastVB6ErrContext);
+    ErrorReportVars::pendingVB6ErrContext = true;
+    origOverflow();
+}
+
 void fixup_ErrorReporting()
 {
     HMODULE vmVB6Lib = GetModuleHandleA("msvbvm60.dll");
@@ -49,16 +67,9 @@ void fixup_ErrorReporting()
         BYTE* internalRaiseErrorFunc = tracedownAddress(overflowFuncAddr + 2);
 
         BYTE* toPatch = internalRaiseErrorFunc + 20;
-        DWORD oldprotect;
-        if (VirtualProtect((void*)toPatch, 10, PAGE_EXECUTE_READWRITE, &oldprotect)){
 
-            // Apply patch to call recordVBErrCode with ESI as an argument
-            PATCH(toPatch).PUSH_ESI().CALL(&recordVBErrCode).Apply();
-                //NOP
-
-            // Now get the protection back
-            VirtualProtect((void*)toPatch, 10, oldprotect, &oldprotect);
-        }
+        // Apply patch to call recordVBErrCode with ESI as an argument
+        PATCH(toPatch).PUSH_ESI().CALL(&recordVBErrCode).Apply();
     }
 
     // Find the first link of the SEH chain which is *not* smbx.__vbaExceptHandler
@@ -70,6 +81,12 @@ void fixup_ErrorReporting()
     // Substitute that exception handler with our own.
     LunaDLLOriginalExceptionHandler = seh->handler;
     seh->handler = LunaDLLCustomExceptionHandler;
+
+    // Better stack traces for some errors
+    origSubscriptOutOfRange = *reinterpret_cast<void(__stdcall **)()>(0x4010F4);
+    PATCH(0x4010F4).dword(reinterpret_cast<uintptr_t>(&VB_SubscriptOutOfRange)).Apply();
+    origOverflow = *reinterpret_cast<void(__stdcall **)()>(0x401190);
+    PATCH(0x401190).dword(reinterpret_cast<uintptr_t>(&VB_Overflow)).Apply();
 }
 
 
@@ -157,19 +174,19 @@ void fixup_WarpLimit()
     // Patch offset 1 addresses
     for (int i = 0; offset1Addresses[i] != 0x000000; i++)
     {
-        *(unsigned int*)(offset1Addresses[i] + 1) = newWarpLimit;
+        PATCH(offset1Addresses[i] + 1).dword(newWarpLimit).Apply();
     }
 
     // Patch offset 2 addresses
     for (int i = 0; offset2Addresses[i] != 0x000000; i++)
     {
-        *(unsigned int*)(offset2Addresses[i] + 2) = newWarpLimit;
+        PATCH(offset2Addresses[i] + 2).dword(newWarpLimit).Apply();
     }
 
     // Patch offset 6 addresses
     for (int i = 0; offset6Addresses[i] != 0x000000; i++)
     {
-        *(unsigned int*)(offset6Addresses[i] + 6) = newWarpLimit;
+        PATCH(offset6Addresses[i] + 6).dword(newWarpLimit).Apply();
     }
 }
 
@@ -218,11 +235,11 @@ void fixup_EventLimit()
     // Update all limits
     for (int i = 0; limitAddresses[i] != 0x000000; i++)
     {
-        *((unsigned char*)limitAddresses[i]) = newEventLimit;
+        PATCH(limitAddresses[i]).byte(newEventLimit).Apply();
     }
 
-    static const unsigned int triggerEventLoopCountAddr = 0xAA437D;
-    *((unsigned int*)triggerEventLoopCountAddr) = newEventLimit-1; // -1 because this is the max index
+    constexpr unsigned int triggerEventLoopCountAddr = 0xAA437D;
+    PATCH(triggerEventLoopCountAddr).dword(newEventLimit - 1).Apply(); // -1 because this is the max index
 }
 
 static __declspec(naked) void layerLimit1ByteLoopReturn()
@@ -276,17 +293,17 @@ void fixup_LayerLimit()
     // Update all limits
     for (int i = 0; limitAddresses[i] != 0x000000; i++)
     {
-        *((unsigned char*)limitAddresses[i]) = newLayerLimit;
+        PATCH(limitAddresses[i]).byte(newLayerLimit).Apply();
     }
 
     for (int i = 0; loop4Addresses[i] != 0x000000; i++)
     {
-        *((unsigned int*)loop4Addresses[i]) = newLayerLimit - 1;
+        PATCH(loop4Addresses[i]).dword(newLayerLimit - 1).Apply();
     }
 
     for (int i = 0; loop2Addresses[i] != 0x000000; i++)
     {
-        *((unsigned short*)loop2Addresses[i]) = newLayerLimit - 1;
+        PATCH(loop2Addresses[i]).word(newLayerLimit - 1).Apply();
     }
 
     // Patch 1-byte loop literal, too small to store 0x55 since that would be considered signed
@@ -298,8 +315,8 @@ void fixup_WebBox()
     const wchar_t* aboutBlank = L"about:blank";
     const wchar_t* webBoxTitle = L"LunaLua-SMBX";
 
-    memcpy((void*)0x00431A34, aboutBlank, sizeof(wchar_t) * lstrlenW(aboutBlank) + 2);
-    memcpy((void*)0x00427614, webBoxTitle, sizeof(wchar_t) * lstrlenW(webBoxTitle) + 2);
+    MemoryUnlock_Memcpy((void*)0x00431A34, aboutBlank, sizeof(wchar_t) * lstrlenW(aboutBlank) + 2);
+    MemoryUnlock_Memcpy((void*)0x00427614, webBoxTitle, sizeof(wchar_t) * lstrlenW(webBoxTitle) + 2);
 
     //const unsigned char nullStrMove[] = { 0xBA, 0x00, 0x3D, 0x42, 0x00 };
     //memcpy((void*)0x00B201AA, nullStrMove, sizeof(nullStrMove));//Heck off, WebBox!
@@ -318,14 +335,12 @@ void fixup_Credits()
     const unsigned char line2_andrewSpinks[] = { 0xBA, 0x8C, 0xA6, 0x42, 0x00 };
     const unsigned char line3_redigit[] = { 0xBA, 0xAC, 0xA6, 0x42, 0x00 };
 
-    memcpy((void*)0x008F72D0, nullStrMove, sizeof(nullStrMove));  //Sorry Redigit, but I need that space
-    memcpy((void*)0x008F7300, nullStrMove, sizeof(nullStrMove));
-    memcpy((void*)0x008F7318, nullStrMove, sizeof(nullStrMove));
+    MemoryUnlock_Memcpy((void*)0x008F72D0, nullStrMove, sizeof(nullStrMove));  //Sorry Redigit, but I need that space
 
 
-    memcpy((void*)0x008F7288, line1_createdBy, sizeof(line1_createdBy)); //Still give you the "king" position
-    memcpy((void*)0x008F72A0, line2_andrewSpinks, sizeof(line2_andrewSpinks));
-    memcpy((void*)0x008F72B8, line3_redigit, sizeof(line3_redigit));
+    MemoryUnlock_Memcpy((void*)0x008F7288, line1_createdBy, sizeof(line1_createdBy)); //Still give you the "king" position
+    MemoryUnlock_Memcpy((void*)0x008F72A0, line2_andrewSpinks, sizeof(line2_andrewSpinks));
+    MemoryUnlock_Memcpy((void*)0x008F72B8, line3_redigit, sizeof(line3_redigit));
 
 
     VB6StrPtr* text_HackedBy = new VB6StrPtr(std::string("Hacked By [LunaDll]: "));
@@ -334,11 +349,12 @@ void fixup_Credits()
     VB6StrPtr* text_Kil = new VB6StrPtr(std::string("Kil"));
     VB6StrPtr* text_Wohlstand = new VB6StrPtr(std::string("Wohlstand"));
 
-    memcpy((void*)0x008F7301, text_HackedBy, 4);
-    memcpy((void*)0x008F7319, text_Kevsoft, 4);
-    memcpy((void*)0x008F7331, text_Rednaxela, 4);
-    memcpy((void*)0x008F7349, text_Kil, 4);
-    memcpy((void*)0x008F7361, text_Wohlstand, 4);
+
+    MemoryUnlock_Memcpy((void*)0x008F7301, text_HackedBy, 4);
+    MemoryUnlock_Memcpy((void*)0x008F7319, text_Kevsoft, 4);
+    MemoryUnlock_Memcpy((void*)0x008F7331, text_Rednaxela, 4);
+    MemoryUnlock_Memcpy((void*)0x008F7349, text_Kil, 4);
+    MemoryUnlock_Memcpy((void*)0x008F7361, text_Wohlstand, 4);
 }
 
 void fixup_Mushbug()
@@ -350,7 +366,7 @@ void fixup_Mushbug()
         0x33, 0xc9,                              // 0x00a2d098 xor ecx, ecx
         0x0f, 0x1f, 0x80, 0x00, 0x00, 0x00, 0x00 // 0x00a2d09a nop (7-byte version)
     };
-    memcpy((void*)0x00a2d08b, mushbugPatch, sizeof(mushbugPatch));
+    MemoryUnlock_Memcpy((void*)0x00a2d08b, mushbugPatch, sizeof(mushbugPatch));
 }
 
 void fixup_Veggibug()
@@ -430,4 +446,50 @@ void fixup_RenderPlayerJiterX()
     PATCH(0x9914DA).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0x99167E).NOP_PAD_TO_SIZE<6>().Apply();
     PATCH(0x991833).NOP_PAD_TO_SIZE<6>().Apply();
+}
+
+void fixup_NPCSortedBlockArrayBoundsCrash() {
+    // fixes a crash when an npc goes really far away (often due to a certain buggy airship piece) -
+    // when accessing the FirstBlock/LastBlock array, if the array index would be out of bounds, just reset it to 0 instead
+    PATCH(0xA11056).bytes(0x33, 0xFF).Apply(); // call ebx -> xor edi, edi
+    PATCH(0xA1111F).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1A507).bytes(0x33, 0xFF).Apply(); // call ebx -> xor edi, edi
+    PATCH(0xA1A5C0).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C193).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C1F7).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C7A2).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1C805).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1CB48).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1CBAC).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1EF2B).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA1EF8B).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+    PATCH(0xA22274).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA222D4).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4F813).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4F892).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4FBFE).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA4FC7D).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA500C9).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA5014B).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA5044A).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA504CC).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50898).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50916).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50C6D).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA50CEB).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA510E6).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA51165).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA514B3).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA51532).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA524F7).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA52575).bytes(0x33, 0xFF).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor edi, edi
+    PATCH(0xA99113).bytes(0x33, 0xF6).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor esi, esi
+    PATCH(0xA9925F).bytes(0x33, 0xF6).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor esi, esi
+    PATCH(0xAA6C94).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+    PATCH(0xAA6CAE).bytes(0x33, 0xDB).NOP_PAD_TO_SIZE<6>().Apply(); // call vbaGenerateBoundsError -> xor ebx, ebx
+}
+
+void fixup_SectionSizePatch() {
+    // This patch was in Lua code for a while
+    PATCH(0x95796B).bytes(0x0F, 0xBF, 0x51, 0x14, 0x8D, 0x0C, 0xFD, 0x00, 0x00, 0x00, 0x00, 0x0F, 0xBF, 0x44, 0x24, 0x1C, 0x0F, 0xAF, 0xC2, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90).Apply();
 }

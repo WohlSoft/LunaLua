@@ -10,6 +10,7 @@
 #include <string>
 #include <atomic>
 #include <cstdint>
+#include <mutex>
 #include "LevelCodes/LevelCodes.h"
 #include "Rendering/Rendering.h"
 #include "Autocode/AutocodeManager.h"
@@ -89,6 +90,8 @@ extern HINSTANCE	gHInstance;
 /// Global main window state
 extern HWND gMainWindowHwnd;
 extern bool gMainWindowFocused;
+extern bool gMainWindowUnfocusPending;
+extern bool gMainWindowUnfocusOverlay;
 
 /// Global settings
 extern bool            gLunaEnabled;
@@ -107,6 +110,9 @@ extern bool            gDisableNPCRespawnBugFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
+
+// Set to true when returning from gameover screen, read by lua to handle gameover-related stuff
+extern bool            gDidGameOver;
 
 extern StartupSettings gStartupSettings;
 
@@ -190,7 +196,7 @@ void printBoxW(const wchar_t *fmt, ...);
 if(!hRunProc){
 std::string errMsg = "Failed to load 'run' in the Launcher dll D:!\nIs Lunadll.dll or LunadllNewLauncher.dll different versions?\nError code:";
 errMsg += std::to_string((long long)GetLastError());
-MessageBoxA(NULL, errMsg.c_str(), "Error", NULL);
+LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", NULL);
 FreeLibrary(newLauncherLib);
 newLauncherLib = NULL;
 return;
@@ -200,7 +206,7 @@ return;
     if(!procHandle){\
         std::string errMsg = "Failed to load 'procName' in moduleName D:!\nIs Lunadll.dll or moduleName different versions?\nError code:";\
         errMsg += std::to_string((long long)GetLastError());\
-        MessageBoxA(NULL, errMsg.c_str(), "Error", 0);\
+        LunaMsgBox::ShowA(NULL, errMsg.c_str(), "Error", 0);\
         FreeLibrary(moduleHandle);\
         moduleHandle = NULL;\
         return;\
@@ -208,3 +214,6 @@ return;
 
 
 #endif
+
+extern std::string gEditorPlacedItem;
+extern std::mutex g_editorIPCMutex;

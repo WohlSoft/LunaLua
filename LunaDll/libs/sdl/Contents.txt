@@ -1,7 +1,2 @@
 SDL2
 SDL2_mixer
-mikmod
-mad
-ogg
-vorbis
-flac

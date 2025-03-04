@@ -43,8 +43,8 @@ void dlltestlvlCode() {
     //    return;
 
     //if(PlayerSpinjumping(demo)) {
-    //    MessageBox(0, L"Runtime error '9': \n\r Subscript out of Range", L"Super Mario Bros. X", MB_ICONWARNING | MB_TASKMODAL);
-    //    MessageBox(0, L"PSYCHE", L"Luna.dll", MB_ICONWARNING | MB_TASKMODAL);
+    //    LunaMsgBox::ShowW(0, L"Runtime error '9': \n\r Subscript out of Range", L"Super Mario Bros. X", MB_ICONWARNING | MB_TASKMODAL);
+    //    LunaMsgBox::ShowW(0, L"PSYCHE", L"Luna.dll", MB_ICONWARNING | MB_TASKMODAL);
     //    short* lvlname = (short*)GM_LVLNAME_PTR;
     //    lvlname[1] = 0x0000;
     //}

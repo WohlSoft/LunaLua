@@ -18,6 +18,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <mutex>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -25,6 +26,7 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Misc/LoadScreen.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -288,50 +290,6 @@ bool file_existsX(const std::string& name)
     }
 }
 
-void removeFilePathW(std::wstring &path)
-{
-    for(int i = path.size(); i > 3; i--) {
-        if((path[i] == L'\\')||(path[i] == L'/'))
-        {
-            path.resize(i);
-            break;
-        }
-    }
-}
-
-void removeFilePathW(wchar_t*path, int length)
-{
-    for(int i = length; i > 3; i--) {
-        if((path[i] == L'\\')||(path[i] == L'/'))
-        {
-            path[i] = 0;
-            break;
-        }
-    }
-}
-
-void removeFilePathA(std::string &path)
-{
-    for(int i = path.size(); i > 3; i--) {
-        if((path[i] == '\\')||(path[i] == '/'))
-        {
-            path.resize(i);
-            break;
-        }
-    }
-}
-
-void removeFilePathA(char*path, int length)
-{
-    for(int i = length; i > 3; i--) {
-        if((path[i] == '\\')||(path[i] == '/'))
-        {
-            path[i] = 0;
-            break;
-        }
-    }
-}
-
 void ResetLunaModule()
 {
     gLunaEnabled = true;
@@ -422,7 +380,7 @@ void initAppPaths()
     if (!nonAnsiChars.empty())
     {
         std::wstring path = L"SMBX2 has been installed in a path with characters which are not compatible with the system default Windows ANSI code page. This is not currently supported. Please install SMBX2 in a location without unsupported characters.\n\nUnsupported characters: " + nonAnsiChars + L"\n\nPath:\n" + fullPath;
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -430,7 +388,7 @@ void initAppPaths()
     if ((fullPath[0] == L'\\') && (fullPath[1] == L'\\'))
     {
         std::wstring path = L"SMBX2 cannot be run from a UNC path (starting with \\\\). Please install SMBX2 elsewhere or map the network drive to a drive letter.\n\nPath:\n" + std::wstring(fullPath);
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -445,7 +403,7 @@ void initAppPaths()
         ))
     {
         std::wstring path = L"The SMBX2 installation path is not recognized as having a normal drive letter.\n\nPath:\n" + std::wstring(fullPath);
-        MessageBoxW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
+        LunaMsgBox::ShowW(0, path.c_str(), L"Invalid SMBX Installation Path", MB_ICONERROR);
         _exit(1);
     }
 
@@ -613,7 +571,7 @@ bool readFile(std::wstring &content, std::wstring path, std::wstring errMsg /*= 
     if(!theFile.is_open()){
         theFile.close();
         if(!errMsg.empty())
-            MessageBoxW(NULL, errMsg.c_str(), L"Error", NULL);
+            LunaMsgBox::ShowW(NULL, errMsg.c_str(), L"Error", NULL);
         return false;
     }
 
@@ -628,7 +586,7 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
     if(!theFile)
     {
         if (!errMsg.empty())
-            MessageBoxA(nullptr, errMsg.c_str(), "Error", 0);
+            LunaMsgBox::ShowA(nullptr, errMsg.c_str(), "Error", 0);
         return false;
     }
     fseek(theFile, 0, SEEK_END);
@@ -642,16 +600,6 @@ bool readFile(std::string &content, std::string path, std::string errMsg /*= std
     fclose(theFile);
 
     return true;
-}
-
-bool isAbsolutePath(const std::wstring& path)
-{
-    return std::iswalpha(path[0]) && path[1] == L':' && ((path[2] == L'\\') || (path[2] == L'/'));
-}
-
-bool isAbsolutePath(const std::string& path)
-{
-    return std::isalpha(path[0], std::locale("C")) && path[1] == L':' && ((path[2] == '\\') || (path[2] == '/'));
 }
 
 std::wstring resolveCwdOrWorldsPath(const std::wstring& path)
@@ -897,6 +845,7 @@ std::wstring getLatestConfigFile(const std::wstring& configname)
 
 void InitDebugConsole()
 {
+
     CONSOLE_SCREEN_BUFFER_INFO coninfo;
 
     // allocate a console for this app
@@ -925,6 +874,46 @@ int DebugPrint(const char * format, ...)
         return ret;
     }
     return 0;
+}
+
+void DebugClear(HANDLE hConsole)
+{
+    if (conout)
+    {
+        CONSOLE_SCREEN_BUFFER_INFO coninfo;
+        SMALL_RECT scrollRect;
+        COORD scrollTarget;
+        CHAR_INFO fill;
+
+        // Get the number of character cells in the current buffer.
+        if (!GetConsoleScreenBufferInfo(hConsole, &coninfo))
+        {
+            return;
+        }
+
+        // Scroll the rectangle of the entire buffer.
+        scrollRect.Left = 0;
+        scrollRect.Top = 0;
+        scrollRect.Right = coninfo.dwSize.X;
+        scrollRect.Bottom = coninfo.dwSize.Y;
+
+        // Scroll it upwards off the top of the buffer with a magnitude of the entire height.
+        scrollTarget.X = 0;
+        scrollTarget.Y = (SHORT)(0 - coninfo.dwSize.Y);
+
+        // Fill with empty spaces with the buffer's default text attribute.
+        fill.Char.UnicodeChar = TEXT(' ');
+        fill.Attributes = coninfo.wAttributes;
+
+        // Do the scroll
+        ScrollConsoleScreenBuffer(hConsole, &scrollRect, NULL, scrollTarget, &fill);
+
+        // Move the cursor to the top left corner too.
+        coninfo.dwCursorPosition.X = 0;
+        coninfo.dwCursorPosition.Y = 0;
+
+        SetConsoleCursorPosition(hConsole, coninfo.dwCursorPosition);
+    }
 }
 
 #ifdef BUILD_WITH_ATL_STUFF
@@ -1030,10 +1019,50 @@ void HandleEventsWhileLoading()
     static DWORD lastTime = 0;
     DWORD thisTime = GetTickCount();
     DWORD elapsedTime = thisTime - lastTime;
-    if (elapsedTime > 100)
+    if (elapsedTime > 30)
     {
-        // Run if >100ms has elapsed since last event handling
+        // Run if >30ms has elapsed since last event handling
         native_rtcDoEvents();
         lastTime = thisTime;
+    }
+}
+
+void HandleEventsWhileLoadscreenOnly()
+{
+    if (LunaLoadScreenIsActive() && !LunaLoadScreenIsCurrentThread())
+    {
+        HandleEventsWhileLoading();
+    }
+}
+
+std::string GetEditorPlacedItem()
+{
+    std::lock_guard<std::mutex> editorEntityIPCLock(g_editorIPCMutex);
+    return (std::string)gEditorPlacedItem;
+}
+
+namespace LunaMsgBox
+{
+    static thread_local volatile uintptr_t s_activeCount = 0;
+
+    int ShowA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxA(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    int ShowW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType)
+    {
+        s_activeCount++;
+        int ret = MessageBoxW(hWnd, lpText, lpCaption, uType);
+        s_activeCount--;
+        return ret;
+    }
+
+    bool IsActive()
+    {
+        return (s_activeCount != 0);
     }
 }
