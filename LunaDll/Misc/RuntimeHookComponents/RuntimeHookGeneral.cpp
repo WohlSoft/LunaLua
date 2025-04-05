@@ -2218,7 +2218,6 @@ void TrySkipPatch()
     // For example, eax, which contains the address of the NPC array, and edx, which contains the NPC idx multiplied by 43,
     // already contain the correct values, therefore the code between 0xA244F8 and 0xA2450B is useless and can be removed,
     // same for the instruction at 0xA24513, which just stores the address of the NPC array to ecx.
-    // todo: 54 bytes   
     PATCH(0xA244F8)
         .bytes(0x8B, 0x0D, 0xC4, 0x5B, 0xB2, 0x00)              // mov ecx, dword ptr [npc_height]              ; Load the address of the npc height array
         .bytes(0x0F, 0xBF, 0x9C, 0xD0, 0xE2, 0x00, 0x00, 0x00)  // movsx ebx, word ptr [eax + edx * 8 + 0xE2]   ; Store the id of the current NPC to ebx. We know ebx contains zero so we don't need to save its value.
