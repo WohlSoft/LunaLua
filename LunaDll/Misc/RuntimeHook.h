@@ -42,6 +42,7 @@ extern AsmPatch<6> gDisableNPCDownwardClipFixSlope;
 extern AsmPatch<21> gNPCCeilingBugFix;
 extern Patchable& gNPCSectionFix;
 extern Patchable& gFenceFixes;
+extern Patchable& gDroppedItemFix;
 extern Patchable& gLinkFairyClowncarFixes;
 extern bool gSlideJumpFixIsEnabled;
 
