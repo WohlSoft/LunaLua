@@ -600,6 +600,14 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetDroppedItemFix(bool enable) {
+        if (enable) {
+            gDroppedItemFix.Apply();
+        } else {
+            gDroppedItemFix.Unapply();
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetPowerupPowerdownPositionFix(bool enable)
     {
         SMBX13::Ports::_enablePowerupPowerdownPositionFixes = enable;
