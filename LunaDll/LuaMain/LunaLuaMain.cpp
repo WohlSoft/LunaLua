@@ -136,6 +136,7 @@ bool CLunaLua::shutdown()
     gNPCCeilingBugFix.Apply();
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
+    gDroppedItemFix.Apply();
     gLinkFairyClowncarFixes.Apply();
     gSlideJumpFixIsEnabled = true;
     SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;
