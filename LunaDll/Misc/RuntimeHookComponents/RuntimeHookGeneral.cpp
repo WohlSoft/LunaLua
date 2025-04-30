@@ -1319,6 +1319,24 @@ static auto fenceFixesImpl = PatchCollection(
 );
 Patchable& gFenceFixes = fenceFixesImpl;
 
+/*
+ * Fix dropped item height
+ * NB: This patch overwrites addresses from 0xA244F8 to 0xA24523 (included). A lot of the code here is redundant.
+ * For example, eax, which contains the address of the NPC array, and edx, which contains the NPC idx multiplied by 43,
+ * already contain the correct values, therefore the code between 0xA244F8 and 0xA2450B is useless and can be removed,
+ * same for the instruction at 0xA24513, which just stores the address of the NPC array to ecx.
+ */
+static auto droppedItemFixImpl = PATCH(0xA244F8)
+    .bytes(0x8B, 0x0D, 0xC4, 0x5B, 0xB2, 0x00)              // mov ecx, dword ptr [npc_height]              ; Load the address of the npc height array
+    .bytes(0x0F, 0xBF, 0x9C, 0xD0, 0xE2, 0x00, 0x00, 0x00)  // movsx ebx, word ptr [eax + edx * 8 + 0xE2]   ; Store the id of the current NPC to ebx. We know ebx contains zero so we don't need to save its value.
+    .bytes(0xDF, 0x04, 0x59)                                // fild word ptr [ecx + ebx * 2]                ; Retrieve the correct npc weight and convert it to a long double
+    .bytes(0xDD, 0x9C, 0xD0, 0x88, 0x00, 0x00, 0x00)        // fstp qword ptr [eax + edx * 8 + 0x88]        ; Update the height of the NPC
+    .bytes(0x31, 0xDB)                                      // xor ebx, ebx                                 ; restore the value of ebx
+    .bytes(0x0F, 0x1F, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00)  // nop
+    .bytes(0x0F, 0x1F, 0x80, 0x00, 0x00, 0x00, 0x00)        // nop
+    .bytes(0x0F, 0x1F, 0x00);                               // nop
+Patchable& gDroppedItemFix = droppedItemFixImpl;
+
 void TrySkipPatch()
 {
     // If we have stdin/stdout, attach to the IPC server
@@ -2157,6 +2175,9 @@ void TrySkipPatch()
 
     //Fence bug fixes
     gFenceFixes.Apply();
+
+    // Fix dropped items having an incorrect height
+    gDroppedItemFix.Apply();
 
     // Replace PlayerEffects function
     PATCH(SMBX13::modPlayer_Private::_PlayerEffects_ptr).JMP(&SMBX13::Ports::PlayerEffects).NOP_PAD_TO_SIZE<6>().Apply();
