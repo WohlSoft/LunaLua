@@ -2202,10 +2202,21 @@ void TrySkipPatch()
      * Set the speed of all BGOs to 0 when the time is frozen between lines 448 and 449 of modLayers.bas
      * The patched code is a mov instruction which is restored in runtimeHookUpdateLayersOnFreeze
      */
-     PATCH(0xAA6A53)
+    PATCH(0xAA6A53)
         .CALL(runtimeHookUpdateLayersOnFreeze)
         .bytes(0x66, 0x90) // nop
         .Apply();
+
+    /*
+     * Set the speed of all BGOs to 0 when a player is in a screen-freezing forced state (ex: player taking damage)
+     * between lines 442 and 443 of modLayers.bas
+     * The patched code is a mov instruction which is restored in runtimeHookUpdateLayersDuringEffect
+     */
+    PATCH(0xAA68A8)
+        .CALL(runtimeHookUpdateLayersDuringEffect)
+        .NOP()
+        .Apply();
+    
 
     // Fix dropped items having an incorrect height
     gDroppedItemFix.Apply();

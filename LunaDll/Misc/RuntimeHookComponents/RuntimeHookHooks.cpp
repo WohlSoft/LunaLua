@@ -4869,6 +4869,14 @@ _declspec(naked) void __stdcall runtimeHookUpdateLayersOnFreeze() {
     }
 }
 
+_declspec(naked) void __stdcall runtimeHookUpdateLayersDuringEffect() {
+    __asm {
+        call runtimeHookStopAllBgos
+        mov ax, word ptr [0xB25956] // Overwritten instruction
+        ret
+    }
+}
+
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
 {
     if (gLavaIsWeak)
