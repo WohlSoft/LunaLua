@@ -1270,6 +1270,9 @@ static void __stdcall CameraUpdateHook(int cameraIdx)
     SMBX_CameraInfo::setCameraX(cameraIdx, std::round(SMBX_CameraInfo::getCameraX(cameraIdx)));
     SMBX_CameraInfo::setCameraY(cameraIdx, std::round(SMBX_CameraInfo::getCameraY(cameraIdx)));
 
+    // Set flag to know that cameras have been initialised
+    gCamerasInitialised = true;
+
     Renderer::Get().StartCameraRender(cameraIdx);
 
     if (gLunaLua.isValid()) {
@@ -3402,6 +3405,117 @@ __declspec(naked) void __stdcall runtimeHookNPCSectionWrap(void)
         push eax                          // npc index
         push 0xA0C9F3                     // return address
         jmp runtimeHookNPCSectionWrapInternal
+    }
+}
+
+static void __stdcall runtimeHookNPCDespawnTimerFixInternal(NPCMOB* npc)
+{
+    // Fixes an obscure bug of unknown cause where despawn timer can be positive while
+    // the NPC isn't active, causing the despawn timer to never decrement.
+    if (!npc->activeFlag && npc->offscreenCountdownTimer > 0)
+    {
+        npc->offscreenCountdownTimer = -1;
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCDespawnTimerFix()
+{
+    __asm {
+        push ebx // save for later
+        push esi
+
+        push esi // pointer to NPC
+        call runtimeHookNPCDespawnTimerFixInternal
+
+        pop esi
+        pop ebx
+
+        movsx edi, word ptr ds:[esi+0xE2] // this is what the code that this replaces does
+        push 0xA0A0C2 // return to original code
+        ret
+    }
+}
+
+static bool momentumIsOnScreen(Momentum& momentum)
+{
+    // If cameras haven't been initialised, we can't say
+    if (!gCamerasInitialised)
+    {
+        return false;
+    }
+
+    // Determine the number of active cameras
+    int cameraType = GM_CAMERA_CONTROL;
+
+    int startCameraIdx = 1;
+    int endCameraIdx = 1;
+
+    if (GM_SUPERMARIO2_PLAYER_IDX > 0) {
+        // For the supermario2 cheat, just use the camera of the active player
+        startCameraIdx = GM_SUPERMARIO2_PLAYER_IDX;
+        endCameraIdx = startCameraIdx;
+    }
+    else if (cameraType == 1 || cameraType == 4 || (cameraType == 5 && SMBX_CameraInfo::Get(2)->unkIsSplitScreen))
+    {
+        endCameraIdx = 2;
+    }
+
+    // Check the box against each of the active cameras
+    for (int cameraIdx = startCameraIdx; cameraIdx <= endCameraIdx; cameraIdx++)
+    {
+        SMBX_CameraInfo* camInfo = SMBX_CameraInfo::Get(cameraIdx);
+
+        double cameraX1 = SMBX_CameraInfo::getCameraX(cameraIdx);
+        double cameraY1 = SMBX_CameraInfo::getCameraY(cameraIdx);
+        double cameraX2 = cameraX1 + camInfo->width;
+        double cameraY2 = cameraY1 + camInfo->height;
+
+        if (momentum.x <= cameraX2 && momentum.y <= cameraY2 && (momentum.x + momentum.width) >= cameraX1 && (momentum.y + momentum.height) >= cameraY1)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void __stdcall runtimeHookNPCRespawnBugFixInternal(NPCMOB* npc)
+{
+    // Fixes the frame-perfect despawn bug.
+    // This checks if the NPC is off screen, and if so, sets some flags to let it respawn.
+    // Minor note: this runs before most of the NPC's values are reset.
+
+    if (!gDisableNPCRespawnBugFix && !GM_FREEZWITCH_ACTIV && !momentumIsOnScreen(npc->spawnMomentum))
+    {
+        npc->offscreenFlag1 = -1;
+        npc->offscreenFlag2 = -1;
+    }
+    else
+    {
+        npc->offscreenFlag1 = 0;
+        npc->offscreenFlag2 = 0;
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookNPCRespawnBugFix()
+{
+    __asm {
+        push esi
+        push edi
+
+        push esi // NPC's pointer
+
+        call runtimeHookNPCRespawnBugFixInternal
+
+        pop edi
+        pop esi
+
+        // this is what the code that this replaces does
+        lea edx, ds:[esi+0xA8]
+        lea eax, ds:[esi+0x78]
+
+        push 0xA3B927 // return to original code
+        ret
     }
 }
 

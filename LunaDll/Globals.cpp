@@ -33,6 +33,7 @@ bool gRenderBackgroundFlag = true;
 
 // Settings for glitch fixes
 bool gDisablePlayerFilterBounceFix = false;
+bool gDisableNPCRespawnBugFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
@@ -42,6 +43,8 @@ bool gDidGameOver = false;
 
 // Global variables
 int	gFrames;
+
+bool gCamerasInitialised = false;
 
 int gLastDownPress;
 int gDownTapped;
