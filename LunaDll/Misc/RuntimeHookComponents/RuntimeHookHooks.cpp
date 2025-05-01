@@ -4877,6 +4877,26 @@ _declspec(naked) void __stdcall runtimeHookUpdateLayersDuringEffect() {
     }
 }
 
+void __stdcall runtimeHookOnLayerStop(int currentLayerId) {
+    // Get the current layer object
+    LayerControl* currentLayer = Layer::Get(currentLayerId);
+
+    // Overwritten instruction
+    currentLayer->IsStopped = COMBOOL(false);
+
+    for (short bgoId = 1; bgoId <= GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
+        // Get the BGO object
+        SMBX_BGO* bgoObj = SMBX_BGO::GetRaw(bgoId);
+
+        // If the bgo belongs to the current layer
+        if (bgoObj->ptLayerName == currentLayer->ptLayerName) {
+            // Stop it
+            bgoObj->momentum.speedX = 0;
+            bgoObj->momentum.speedY = 0;
+        }
+    }
+}
+
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
 {
     if (gLavaIsWeak)

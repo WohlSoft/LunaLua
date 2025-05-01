@@ -2217,6 +2217,15 @@ void TrySkipPatch()
         .NOP()
         .Apply();
     
+    /*
+     * Set the speed of all BGOs whose layer was stopped to 0 at line 303 of modLayers.bas
+     * The patched code is `Layer(B).EffectStop = False`, which is restored in runtimeHookOnLayerStop
+     */
+    PATCH(0xAA57C4)
+        .PUSH_ESI()
+        .CALL(runtimeHookOnLayerStop)
+        .Apply();
+    
 
     // Fix dropped items having an incorrect height
     gDroppedItemFix.Apply();

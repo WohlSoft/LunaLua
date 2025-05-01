@@ -646,6 +646,7 @@ bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player);
 void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId);
 void __stdcall runtimeHookUpdateLayersOnFreeze();
 void __stdcall runtimeHookUpdateLayersDuringEffect();
+void __stdcall runtimeHookOnLayerStop(int currentLayerId);
 
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr);
 void __stdcall runtimeHookPlayerKillLavaSolidExit(short* playerIdxPtr);
