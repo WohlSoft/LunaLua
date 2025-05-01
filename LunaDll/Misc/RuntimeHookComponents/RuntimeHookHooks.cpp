@@ -4850,6 +4850,25 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId) {
     bgoObj->momentum.speedY = layerObj->ySpeed;
 }
 
+static void __stdcall runtimeHookStopAllBgos() {
+    for (short bgoId = 1; bgoId <= GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
+        // Get the BGO object
+        SMBX_BGO* bgoObj = SMBX_BGO::GetRaw(bgoId);
+
+        // Set its speed to 0
+        bgoObj->momentum.speedX = 0;
+        bgoObj->momentum.speedY = 0;
+    }
+}
+
+_declspec(naked) void __stdcall runtimeHookUpdateLayersOnFreeze() {
+    __asm {
+        call runtimeHookStopAllBgos
+        mov bp, word ptr [0xB25956] // Overwritten instruction
+        ret
+    }
+}
+
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
 {
     if (gLavaIsWeak)

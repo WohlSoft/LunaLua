@@ -2198,6 +2198,15 @@ void TrySkipPatch()
         .bytes(0x0F, 0x1F, 0x00) // nop
         .Apply();
 
+    /*
+     * Set the speed of all BGOs to 0 when the time is frozen between lines 448 and 449 of modLayers.bas
+     * The patched code is a mov instruction which is restored in runtimeHookUpdateLayersOnFreeze
+     */
+     PATCH(0xAA6A53)
+        .CALL(runtimeHookUpdateLayersOnFreeze)
+        .bytes(0x66, 0x90) // nop
+        .Apply();
+
     // Fix dropped items having an incorrect height
     gDroppedItemFix.Apply();
 
