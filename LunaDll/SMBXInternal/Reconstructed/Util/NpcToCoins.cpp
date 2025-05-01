@@ -21,7 +21,7 @@ short Reconstructed::Util::npcToCoinValueReset = 100;
 
 void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
 {
-    if (mob->unknown_124 && !mob->isGenerator) {
+    if (mob->activeFlag && !mob->isGenerator) {
         //Get the id of the npc, we want to check if it is on the list of "non-transformable" npcs
         int id = mob->id;
         if (!mob->isHidden // (probably isHidden-Field)
@@ -32,7 +32,7 @@ void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
                 if (id == NPCID_GOALTAPE //If it is NOT transformable then check for these special npcs
                     || id == NPCID_FIREBAR
                     || id == NPCID_ROTODISK)
-                    mob->unknown_124 = 0; //and set this unknown field to 0
+                    mob->activeFlag = 0; //and set this unknown field to 0
             }
             else {
                 //If it is a transformable npc:
@@ -66,7 +66,7 @@ void __stdcall Reconstructed::Util::npcToCoin(NPCMOB * mob)
                 //Now put up the kill flags for the transformed npcs
                 mob->killFlag = 9; // 9 = vanish
                 mob->momentum.height = 0.0;
-                mob->unknown_124 = 0;
+                mob->activeFlag = 0;
             }
         }
     }
