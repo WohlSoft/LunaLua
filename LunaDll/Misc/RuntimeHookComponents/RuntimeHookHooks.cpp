@@ -4758,51 +4758,96 @@ bool __stdcall saveFileExists() {
     return fileExists(saveFilePath);
 }
 
-void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
-    int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
+/*
+ * If the fence fixes are disabled, we mimic the legacy behavior,
+ * when the player is climbing a BGO, we set its speed to that of NPC -1.
+ */
+static NPCMOB* getClimbedNPC(int idx) {
+    if (idx < 0) { // If we're climbing a BGO...
+        // ...use NPC -1 instead
+        return NPC::GetFenceDummyNPC();
+    } else { // If we're climbing a NPC...
+        // ...Get the NPC object
+        return NPC::GetRaw(idx);
+    }
+}
 
-    if (climbingNPC >= 0) {
+void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
+    // Retrieve which NPC/BGO the player is climbing
+    int climbingNPC = (int) player->ClimbingNPCOrBGO;
+
+    if (climbingNPC >= 0 || !gMovingFenceFixIsEnabled) { // If the player is climbing a NPC or the fence fix is disabled
+        // Check if we're out of bounds
         if (climbingNPC > 5000) {
             emulateVB6Error(9);
         }
 
-        player->momentum.speedX += NPC::GetRaw(climbingNPC)->momentum.speedX;
-        player->momentum.speedY += NPC::GetRaw(climbingNPC)->momentum.speedY;
-    } else {
+        // Get the NPC object
+        NPCMOB* climbingNPCObj = getClimbedNPC(climbingNPC);
+        
+        // Set the player speed to that of the NPC
+        player->momentum.speedX += climbingNPCObj->momentum.speedX;
+        player->momentum.speedY += climbingNPCObj->momentum.speedY;
+    } else { // If the player is climbing a BGO
+        // Compute the BGO idx
         int climbingBGO = -climbingNPC-1;
 
+        // Get the BGO object
+        SMBX_BGO* climbingBGOObj = SMBX_BGO::GetRaw(climbingBGO);
+
+        // Check if we're out of bounds
         if (climbingBGO > 8000) {
             emulateVB6Error(9);
         }
 
-        player->momentum.speedX += SMBX_BGO::GetRaw(climbingBGO)->momentum.speedX;
-        player->momentum.speedY += SMBX_BGO::GetRaw(climbingBGO)->momentum.speedY;
+        // Set the player speed to that of the BGO
+        player->momentum.speedX += climbingBGOObj->momentum.speedX;
+        player->momentum.speedY += climbingBGOObj->momentum.speedY;
     }
 }
 
 bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
-    int climbingNPC = (int) *((double*) (((char*) player) + 0x2C));
+    // Retrieve which NPC/BGO the player is climbing
+    int climbingNPC = (int) player->ClimbingNPCOrBGO;
 
-    if (climbingNPC >= 0) {
+    if (climbingNPC >= 0 || !gMovingFenceFixIsEnabled) { // If the player is climbing a NPC or the fence fix is disabled
+        // Check if we're out of bounds
         if (climbingNPC > 5000) {
             emulateVB6Error(9);
         }
 
-        return player->momentum.speedX != NPC::GetRaw(climbingNPC)->momentum.speedX || player->momentum.speedY < NPC::GetRaw(climbingNPC)->momentum.speedY - 0.1;
-    } else {
+        // Get the NPC object
+        NPCMOB* climbingNPCObj = getClimbedNPC(climbingNPC);
+
+        // Return whether we should be playing the climbing animation or not
+        return player->momentum.speedX != climbingNPCObj->momentum.speedX || player->momentum.speedY < climbingNPCObj->momentum.speedY - 0.1;
+    } else { // If the player is climbing a BGO
+        // Compute the BGO idx
         int climbingBGO = -climbingNPC-1;
 
+        // Check if we're out of bounds
         if (climbingBGO > 8000) {
             emulateVB6Error(9);
         }
 
-        return player->momentum.speedX != SMBX_BGO::GetRaw(climbingBGO)->momentum.speedX || player->momentum.speedY < SMBX_BGO::GetRaw(climbingBGO)->momentum.speedY - 0.1;
+        // Get the BGO object
+        SMBX_BGO* climbingBGOObj = SMBX_BGO::GetRaw(climbingBGO);
+
+        // Return whether we should be playing the climbing animation or not
+        return player->momentum.speedX != climbingBGOObj->momentum.speedX || player->momentum.speedY < climbingBGOObj->momentum.speedY - 0.1;
     }
 }
 
 void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId) {
-    SMBX_BGO::GetRaw(bgoId)->momentum.speedX = Layer::Get(layerId)->xSpeed;
-    SMBX_BGO::GetRaw(bgoId)->momentum.speedY = Layer::Get(layerId)->ySpeed;
+    // Get the BGO object
+    SMBX_BGO* bgoObj = SMBX_BGO::GetRaw(bgoId);
+
+    // Get the layer object
+    LayerControl* layerObj = Layer::Get(layerId);
+
+    // Update BGO speed
+    bgoObj->momentum.speedX = layerObj->xSpeed;
+    bgoObj->momentum.speedY = layerObj->ySpeed;
 }
 
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)

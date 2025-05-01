@@ -137,7 +137,8 @@ bool CLunaLua::shutdown()
     gDisableNPCDownwardClipFixSlope.Apply();
     gNPCCeilingBugFix.Apply();
     gNPCSectionFix.Apply();
-    gFenceFixes.Apply();
+    gMovingFenceFixIsEnabled = true;
+    gInvisibleFenceFix.Apply();
     gDroppedItemFix.Apply();
     gLinkFairyClowncarFixes.Apply();
     gSlideJumpFixIsEnabled = true;

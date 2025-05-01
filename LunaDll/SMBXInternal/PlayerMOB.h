@@ -223,11 +223,7 @@ struct PlayerMOB {
     short ItemPullupTimer;              // +0x26
     float ItemPullupMomentumSave;       // +0x28
 
-    short Unused2;                      // +0x2C
-
-    short UnkClimbing1;                 // +0x2E
-    short UnkClimbing2;                 // +0x30
-    short UnkClimbing3;
+    double ClimbingNPCOrBGO;            // +0x2C
 
     short WaterOrQuicksandState;
     short IsInWater;

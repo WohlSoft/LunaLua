@@ -27,6 +27,12 @@ NPCMOB * NPC::GetDummyNPC()
     return &((NPCMOB*)GM_NPCS_PTR)[128];
 }
 
+NPCMOB* NPC::GetFenceDummyNPC()
+{
+    return &((NPCMOB*)GM_NPCS_PTR)[127];
+}
+
+
 // GET FIRST MATCH
 NPCMOB* NPC::GetFirstMatch(int ID, int section) {
     bool anyID = (ID == -1 ? true : false);

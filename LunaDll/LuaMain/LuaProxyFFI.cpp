@@ -592,11 +592,19 @@ typedef struct ExtendedPlayerFields_\
         gDisableNPCRespawnBugFix = !enable;
     }
 
-    FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
+    FFI_EXPORT(void) LunaLuaSetMovingFenceBugFix(bool enable) {
         if (enable) {
-            gFenceFixes.Apply();
+            gMovingFenceFixIsEnabled = true;
         } else {
-            gFenceFixes.Unapply();
+            gMovingFenceFixIsEnabled = false;
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetInvisibleFenceBugFix(bool enable) {
+        if (enable) {
+            gInvisibleFenceFix.Apply();
+        } else {
+            gInvisibleFenceFix.Unapply();
         }
     }
 
