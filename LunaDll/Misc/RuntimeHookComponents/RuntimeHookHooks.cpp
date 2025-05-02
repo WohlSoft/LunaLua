@@ -4772,6 +4772,18 @@ static NPCMOB* getClimbedNPC(int idx) {
     }
 }
 
+// Is there a player in a screen-freezing forced state?
+static bool anyPlayerInScreenFreezingForcedState() {
+    for (short playerId = 1; playerId <= GM_PLAYERS_COUNT; playerId++) {
+        PlayerMOB* checkedPlayer = Player::Get(playerId);
+
+        if (Player::IsInScreenFreezingForcedState(checkedPlayer)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
     // Retrieve which NPC/BGO the player is climbing
     int climbingNPC = (int) player->ClimbingNPCOrBGO;
@@ -4785,9 +4797,11 @@ void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
         // Get the NPC object
         NPCMOB* climbingNPCObj = getClimbedNPC(climbingNPC);
         
-        // Set the player speed to that of the NPC
-        player->momentum.speedX += climbingNPCObj->momentum.speedX;
-        player->momentum.speedY += climbingNPCObj->momentum.speedY;
+        // Set the player speed to that of the NPC if the screen isn't frozen
+        if (!gMovingVineFixIsEnabled || (!anyPlayerInScreenFreezingForcedState() && !GM_FREEZWITCH_ACTIV)) {
+            player->momentum.speedX += climbingNPCObj->momentum.speedX;
+            player->momentum.speedY += climbingNPCObj->momentum.speedY;
+        }
     } else { // If the player is climbing a BGO
         // Compute the BGO idx
         int climbingBGO = -climbingNPC-1;
@@ -4820,7 +4834,11 @@ bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
         NPCMOB* climbingNPCObj = getClimbedNPC(climbingNPC);
 
         // Return whether we should be playing the climbing animation or not
-        return player->momentum.speedX != climbingNPCObj->momentum.speedX || player->momentum.speedY < climbingNPCObj->momentum.speedY - 0.1;
+        if (!gMovingVineFixIsEnabled || (!anyPlayerInScreenFreezingForcedState() && !GM_FREEZWITCH_ACTIV)) {
+            return player->momentum.speedX != climbingNPCObj->momentum.speedX || player->momentum.speedY < climbingNPCObj->momentum.speedY - 0.1;
+        } else {
+            return player->momentum.speedX != 0 || player->momentum.speedY < -0.1;
+        }
     } else { // If the player is climbing a BGO
         // Compute the BGO idx
         int climbingBGO = -climbingNPC-1;

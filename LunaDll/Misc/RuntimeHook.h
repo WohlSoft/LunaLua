@@ -43,6 +43,7 @@ extern AsmPatch<21> gNPCCeilingBugFix;
 extern Patchable& gNPCSectionFix;
 extern bool gMovingFenceFixIsEnabled;
 extern Patchable& gInvisibleFenceFix;
+extern bool gMovingVineFixIsEnabled;
 extern Patchable& gDroppedItemFix;
 extern Patchable& gLinkFairyClowncarFixes;
 extern bool gSlideJumpFixIsEnabled;

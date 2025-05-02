@@ -1299,6 +1299,8 @@ static auto invisibleFenceFixImpl = PATCH(0x9A74CB)
    .bytes(0x0F, 0x1F, 0x00); // nop
 Patchable& gInvisibleFenceFix = invisibleFenceFixImpl;
 
+bool gMovingVineFixIsEnabled;
+
 /*
  * Fix dropped item height
  * NB: This patch overwrites addresses from 0xA244F8 to 0xA24523 (included). A lot of the code here is redundant.
@@ -2162,6 +2164,7 @@ void TrySkipPatch()
     // Fence bug fixes
     gMovingFenceFixIsEnabled = true;
     gInvisibleFenceFix.Apply();
+    gMovingVineFixIsEnabled = true;
 
     // Patch modPlayer.bas lines 754 and 755 to take into account the fact that a player can climb a BGO when updating its speed while climbing
     PATCH(0x99933C)

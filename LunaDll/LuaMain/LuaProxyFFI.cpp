@@ -608,6 +608,14 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetMovingVineBugFix(bool enable) {
+        if (enable) {
+            gMovingVineFixIsEnabled = true;
+        } else {
+            gMovingVineFixIsEnabled = false;
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetDroppedItemFix(bool enable) {
         if (enable) {
             gDroppedItemFix.Apply();

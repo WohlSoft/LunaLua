@@ -444,6 +444,7 @@ namespace Player {
     bool UsesHearts(PlayerMOB* players);
     bool IsSpinjumping(PlayerMOB* player);
     bool IsInForcedAnimation(PlayerMOB* player);
+    bool IsInScreenFreezingForcedState(PlayerMOB* player);
     bool IsHoldingSpriteType(PlayerMOB* player, int NPC_ID);
     int	IsStandingOnNPC(PlayerMOB* player); // Returns the index of the NPC being stood on, or 0 if not standing on one
 
