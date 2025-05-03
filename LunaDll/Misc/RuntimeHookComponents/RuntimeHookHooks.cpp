@@ -42,6 +42,7 @@
 #include "../../libs/PGE_File_Formats/file_formats.h"
 
 #include "../../Misc/VB6RNG.h"
+#include "../../SMBXInternal/Types.h"
 
 void CheckIPCQuitRequest();
 
@@ -4790,7 +4791,7 @@ void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
 
     if (climbingNPC >= 0 || !gMovingFenceFixIsEnabled) { // If the player is climbing a NPC or the fence fix is disabled
         // Check if we're out of bounds
-        if (climbingNPC > 5000) {
+        if (climbingNPC > SMBX13::Types::maxNPCs) {
             emulateVB6Error(9);
         }
 
@@ -4810,7 +4811,7 @@ void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
         SMBX_BGO* climbingBGOObj = SMBX_BGO::GetRaw(climbingBGO);
 
         // Check if we're out of bounds
-        if (climbingBGO > 8000) {
+        if (climbingBGO > SMBX13::Types::maxBackgrounds) {
             emulateVB6Error(9);
         }
 
@@ -4826,7 +4827,7 @@ bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
 
     if (climbingNPC >= 0 || !gMovingFenceFixIsEnabled) { // If the player is climbing a NPC or the fence fix is disabled
         // Check if we're out of bounds
-        if (climbingNPC > 5000) {
+        if (climbingNPC > SMBX13::Types::maxNPCs) {
             emulateVB6Error(9);
         }
 
@@ -4844,7 +4845,7 @@ bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
         int climbingBGO = -climbingNPC-1;
 
         // Check if we're out of bounds
-        if (climbingBGO > 8000) {
+        if (climbingBGO > SMBX13::Types::maxBackgrounds) {
             emulateVB6Error(9);
         }
 
