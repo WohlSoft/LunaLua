@@ -36,6 +36,7 @@ bool gDisablePlayerFilterBounceFix = false;
 bool gDisableNPCRespawnBugFix = false;
 
 // Other gameplay settings
+bool gRightClickPaste = false;
 bool gLavaIsWeak = false;
 
 // Flag for returning from gameover screen
