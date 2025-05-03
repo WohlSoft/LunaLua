@@ -4915,6 +4915,23 @@ void __stdcall runtimeHookOnLayerStop(int currentLayerId) {
     }
 }
 
+static bool __stdcall runtimeHookGetOffVineConditionImpl(PlayerMOB* player, int stompedId) {
+    NPCMOB* stomped = NPC::GetRaw(stompedId);
+
+    return player->ClimbingState > 0 && NPC::GetFallOffVineOnStomp(stomped->id);
+}
+
+_declspec(naked) bool __stdcall runtimeHookGetOffVineCondition() {
+    __asm {
+        movsx ecx, cx // expand stomped NPC idx to 32 bits
+        push ecx // push stomped NPC idx
+        push edi // push pointer to player
+        call runtimeHookGetOffVineConditionImpl
+        test al, al
+        ret
+    }
+}
+
 void __stdcall runtimeHookPlayerKillLava(short* playerIdxPtr)
 {
     if (gLavaIsWeak)

@@ -2229,6 +2229,12 @@ void TrySkipPatch()
         .CALL(runtimeHookOnLayerStop)
         .Apply();
     
+    // Modify the condition at line 3191 of modPlayer.bas to take into account the falloffvineonstomp npc config field
+    PATCH(0x9AD193)
+        .CALL(runtimeHookGetOffVineCondition)
+        .bytes(0x74, 0x0f) // jz 0x9AD1A9 ; don't get off vine if runtimeHookGetOffVineCondition returns false
+        .Apply();
+    
 
     // Fix dropped items having an incorrect height
     gDroppedItemFix.Apply();

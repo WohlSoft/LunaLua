@@ -587,6 +587,7 @@ namespace NPC {
     bool GetStaticDirection(int id);
     bool GetLuaHandlesSpeed(int id);
     double GetTerminalVelocity(int id);
+    bool GetFallOffVineOnStomp(int id);
 
     uintptr_t GetPropertyTableAddress(const std::string& s);
 
