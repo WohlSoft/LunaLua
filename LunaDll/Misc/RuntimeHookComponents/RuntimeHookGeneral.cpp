@@ -2175,7 +2175,7 @@ void TrySkipPatch()
 
     // Patch modPlayer.bas line 2767 to store -bgo.idx instead of -1 to player mem offset 0x2C if the player is climbing a BGO
     PATCH(0x9A78A8)
-        .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
+        .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120] ; one-based BGO idx
         .bytes(0xD9, 0xE0) // fchs
         .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
         .bytes(0x0F, 0x1F, 0x00) // nop
@@ -2195,8 +2195,8 @@ void TrySkipPatch()
      * The patched code is a redundant out of bounds check for the BGO idx
      */ 
     PATCH(0xAA6E78)
-        .PUSH_EBP()
-        .PUSH_ESI()
+        .PUSH_EBP() // layer idx
+        .PUSH_ESI() // zero-based BGO idx
         .CALL(runtimeHookUpdateBGOMomentum)
         .bytes(0x0F, 0x1F, 0x00) // nop
         .Apply();

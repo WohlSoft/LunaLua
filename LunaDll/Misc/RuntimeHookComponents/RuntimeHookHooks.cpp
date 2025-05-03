@@ -4811,7 +4811,7 @@ void __stdcall runtimeHookSetPlayerFenceSpeed(PlayerMOB *player) {
         SMBX_BGO* climbingBGOObj = SMBX_BGO::GetRaw(climbingBGO);
 
         // Check if we're out of bounds
-        if (climbingBGO > SMBX13::Types::maxBackgrounds) {
+        if (climbingBGO >= SMBX13::Types::maxBackgrounds) {
             emulateVB6Error(9);
         }
 
@@ -4845,7 +4845,7 @@ bool __stdcall runtimeHookIncreaseFenceFrameCondition(PlayerMOB *player) {
         int climbingBGO = -climbingNPC-1;
 
         // Check if we're out of bounds
-        if (climbingBGO > SMBX13::Types::maxBackgrounds) {
+        if (climbingBGO >= SMBX13::Types::maxBackgrounds) {
             emulateVB6Error(9);
         }
 
@@ -4870,7 +4870,7 @@ void __stdcall runtimeHookUpdateBGOMomentum(int bgoId, int layerId) {
 }
 
 static void __stdcall runtimeHookStopAllBgos() {
-    for (short bgoId = 1; bgoId <= GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
+    for (short bgoId = 0; bgoId < GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
         // Get the BGO object
         SMBX_BGO* bgoObj = SMBX_BGO::GetRaw(bgoId);
 
@@ -4903,7 +4903,7 @@ void __stdcall runtimeHookOnLayerStop(int currentLayerId) {
     // Overwritten instruction
     currentLayer->IsStopped = COMBOOL(false);
 
-    for (short bgoId = 1; bgoId <= GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
+    for (short bgoId = 0; bgoId < GM_BGO_COUNT + GM_BGO_LOCKS_COUNT; bgoId++) {
         // Get the BGO object
         SMBX_BGO* bgoObj = SMBX_BGO::GetRaw(bgoId);
 
