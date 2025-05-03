@@ -215,5 +215,10 @@ return;
 
 #endif
 
+extern int gSoundEffectCount;
+extern int gSpecialMusicCount;
+extern int gOverworldMusicCount;
+extern int gLevelMusicCount;
+
 extern std::string gEditorPlacedItem;
 extern std::mutex g_editorIPCMutex;
