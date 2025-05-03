@@ -1287,37 +1287,19 @@ static auto linkFairyClowncarFixesImpl = PatchCollection(
 );
 Patchable& gLinkFairyClowncarFixes = linkFairyClowncarFixesImpl;
 
-static auto fenceFixesImpl = PatchCollection(
-    PATCH(0x99933C)
-    .PUSH_EBX()
-    .PUSH_IMM32(0x99A850)
-    .JMP(runtimeHookSetPlayerFenceSpeed),
+bool gMovingFenceFixIsEnabled;
 
-    PATCH(0x9A78A8)
-    .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120]
-    .bytes(0xD9, 0xE0) // fchs
-    .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
-    .bytes(0x0F, 0x1F, 0x00), // nop
+/*
+ * Check whether the current BGO is invisible or not between lines 2735 and 2736 of modPlayer.bas and skip the current iteration if it is
+ * The patched code is a redundant out of bounds check for the BGO idx
+ */
+static auto invisibleFenceFixImpl = PATCH(0x9A74CB)
+   .bytes(0x66, 0x39, 0x74, 0xCA, 0x04) // cmp word ptr [edx + ecx * 8 + 0x4], si ; compare isHidden to the si register, which is equal to COMBOOL(true)
+   .JE(0x9A78B6) // skip the current iteration if the layer is invisible
+   .bytes(0x0F, 0x1F, 0x00); // nop
+Patchable& gInvisibleFenceFix = invisibleFenceFixImpl;
 
-    PATCH(0x9B8A4C)
-    .PUSH_ESI()
-    .CALL(runtimeHookIncreaseFenceFrameCondition)
-    .bytes(0x84, 0xC0) // test al, al
-    .JZ(0x9B8B5D)
-    .JMP(0x9B8AF0),
-
-    PATCH(0xAA6E78)
-    .PUSH_EBP()
-    .PUSH_ESI()
-    .CALL(runtimeHookUpdateBGOMomentum)
-    .bytes(0x0F, 0x1F, 0x00), // nop
-
-    PATCH(0x9A74CB)
-    .bytes(0x66, 0x39, 0x74, 0xCA, 0x04) // cmp word ptr [edx + ecx * 8 + 0x4], si ; compare isHidden to the si register, which is equal to COMBOOL(true)
-    .JE(0x9A78B6) // skip the current iteration if the layer is invisible
-    .bytes(0x0F, 0x1F, 0x00) // nop
-);
-Patchable& gFenceFixes = fenceFixesImpl;
+bool gMovingVineFixIsEnabled;
 
 /*
  * Fix dropped item height
@@ -2179,8 +2161,80 @@ void TrySkipPatch()
     // Apply character ID patches (used to be applied/unapplied when registering characters and clearing this, but at this point safer to always have applied)
     runtimeHookCharacterIdApplyPatch();
 
-    //Fence bug fixes
-    gFenceFixes.Apply();
+    // Fence bug fixes
+    gMovingFenceFixIsEnabled = true;
+    gInvisibleFenceFix.Apply();
+    gMovingVineFixIsEnabled = true;
+
+    // Patch modPlayer.bas lines 754 and 755 to take into account the fact that a player can climb a BGO when updating its speed while climbing
+    PATCH(0x99933C)
+        .PUSH_EBX()
+        .PUSH_IMM32(0x99A850)
+        .JMP(runtimeHookSetPlayerFenceSpeed)
+        .Apply();
+
+    // Patch modPlayer.bas line 2767 to store -bgo.idx instead of -1 to player mem offset 0x2C if the player is climbing a BGO
+    PATCH(0x9A78A8)
+        .bytes(0xDF, 0x85, 0xE0, 0xFE, 0xFF, 0xFF) // fild dword ptr [ebp - 0x120] ; one-based BGO idx
+        .bytes(0xD9, 0xE0) // fchs
+        .bytes(0xDD, 0x5B, 0x2C) // fstp qword ptr [ebx + 0x2c]
+        .bytes(0x0F, 0x1F, 0x00) // nop
+        .Apply();
+
+    // Patch the boolean condition at modPlayer.bas line 4398 to handle player animation when they're climbing a BGO
+    PATCH(0x9B8A4C)
+        .PUSH_ESI()
+        .CALL(runtimeHookIncreaseFenceFrameCondition)
+        .bytes(0x84, 0xC0) // test al, al
+        .JZ(0x9B8B5D)
+        .JMP(0x9B8AF0)
+        .Apply();
+
+    /*
+     * Update the BGO speed to that of its layer between lines 476 and 477 of modLayers.bas
+     * The patched code is a redundant out of bounds check for the BGO idx
+     */ 
+    PATCH(0xAA6E78)
+        .PUSH_EBP() // layer idx
+        .PUSH_ESI() // zero-based BGO idx
+        .CALL(runtimeHookUpdateBGOMomentum)
+        .bytes(0x0F, 0x1F, 0x00) // nop
+        .Apply();
+
+    /*
+     * Set the speed of all BGOs to 0 when the time is frozen between lines 448 and 449 of modLayers.bas
+     * The patched code is a mov instruction which is restored in runtimeHookUpdateLayersOnFreeze
+     */
+    PATCH(0xAA6A53)
+        .CALL(runtimeHookUpdateLayersOnFreeze)
+        .bytes(0x66, 0x90) // nop
+        .Apply();
+
+    /*
+     * Set the speed of all BGOs to 0 when a player is in a screen-freezing forced state (ex: player taking damage)
+     * between lines 442 and 443 of modLayers.bas
+     * The patched code is a mov instruction which is restored in runtimeHookUpdateLayersDuringEffect
+     */
+    PATCH(0xAA68A8)
+        .CALL(runtimeHookUpdateLayersDuringEffect)
+        .NOP()
+        .Apply();
+    
+    /*
+     * Set the speed of all BGOs whose layer was stopped to 0 at line 303 of modLayers.bas
+     * The patched code is `Layer(B).EffectStop = False`, which is restored in runtimeHookOnLayerStop
+     */
+    PATCH(0xAA57C4)
+        .PUSH_ESI()
+        .CALL(runtimeHookOnLayerStop)
+        .Apply();
+    
+    // Modify the condition at line 3191 of modPlayer.bas to take into account the falloffvineonstomp npc config field
+    PATCH(0x9AD193)
+        .CALL(runtimeHookGetOffVineCondition)
+        .bytes(0x74, 0x0f) // jz 0x9AD1A9 ; don't get off vine if runtimeHookGetOffVineCondition returns false
+        .Apply();
+    
 
     // Fix dropped items having an incorrect height
     gDroppedItemFix.Apply();

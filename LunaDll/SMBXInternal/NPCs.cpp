@@ -2,6 +2,7 @@
 #include "../Misc/MiscFuncs.h"
 #include "../Misc/AsmPatch.h"
 #include "../Misc/SafeFPUControl.h"
+#include <cstdint>
 #include <list>
 #include <unordered_map>
 
@@ -26,6 +27,12 @@ NPCMOB * NPC::GetDummyNPC()
 {
     return &((NPCMOB*)GM_NPCS_PTR)[128];
 }
+
+NPCMOB* NPC::GetFenceDummyNPC()
+{
+    return &((NPCMOB*)GM_NPCS_PTR)[127];
+}
+
 
 // GET FIRST MATCH
 NPCMOB* NPC::GetFirstMatch(int ID, int section) {
@@ -274,6 +281,7 @@ static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_luahandlesspeed[NPC::MAX_ID + 1] = { 0 };
 static double npcprop_terminalvelocity[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_falloffvineonstomp[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
 static std::unordered_map<unsigned int, bool> npc_semisolidCollidingFlyTypeMap = { { 1, true } };
@@ -294,6 +302,7 @@ void NPC::InitProperties() {
         npcprop_staticdirection[i] = 0;
         npcprop_luahandlesspeed[i] = 0;
         npcprop_terminalvelocity[i] = 0;
+        npcprop_falloffvineonstomp[i] = COMBOOL(true);
     }
 
     // Set built-in spinjump safe IDs
@@ -575,6 +584,11 @@ double NPC::GetTerminalVelocity(int id) {
     return npcprop_terminalvelocity[id];
 }
 
+bool NPC::GetFallOffVineOnStomp(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return true;
+    return (npcprop_falloffvineonstomp[id] != 0);
+}
+
 // Getter for address of NPC property arrays
 uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
 {
@@ -625,6 +639,10 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "terminalvelocity")
     {
         return reinterpret_cast<uintptr_t>(npcprop_terminalvelocity);
+    }
+    else if (s == "falloffvineonstomp")
+    {
+        return reinterpret_cast<uintptr_t>(npcprop_falloffvineonstomp);
     }
     else
     {

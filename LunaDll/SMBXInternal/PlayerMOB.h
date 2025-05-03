@@ -223,11 +223,7 @@ struct PlayerMOB {
     short ItemPullupTimer;              // +0x26
     float ItemPullupMomentumSave;       // +0x28
 
-    short Unused2;                      // +0x2C
-
-    short UnkClimbing1;                 // +0x2E
-    short UnkClimbing2;                 // +0x30
-    short UnkClimbing3;
+    double ClimbingNPCOrBGO;            // +0x2C
 
     short WaterOrQuicksandState;
     short IsInWater;
@@ -448,6 +444,7 @@ namespace Player {
     bool UsesHearts(PlayerMOB* players);
     bool IsSpinjumping(PlayerMOB* player);
     bool IsInForcedAnimation(PlayerMOB* player);
+    bool IsInScreenFreezingForcedState(PlayerMOB* player);
     bool IsHoldingSpriteType(PlayerMOB* player, int NPC_ID);
     int	IsStandingOnNPC(PlayerMOB* player); // Returns the index of the NPC being stood on, or 0 if not standing on one
 
