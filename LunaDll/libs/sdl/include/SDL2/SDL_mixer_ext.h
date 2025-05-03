@@ -1,9 +1,9 @@
 /*
   SDL Mixer X:  An extended audio mixer library, forked from SDL_mixer
-  Copyright (C) 2014-2023 Vitaly Novichkov <admin@wohlnet.ru>
+  Copyright (C) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
 
   SDL_mixer:  An audio mixer library based on the SDL library
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -110,20 +110,20 @@ extern "C" {
 
 #if SDL_MIXER_MAJOR_VERSION < 3 && SDL_MAJOR_VERSION < 3
 /**
- *  This is the version number macro for the current SDL_mixer version.
+ * This is the version number macro for the current SDL_mixer version.
  *
- *  In versions higher than 2.9.0, the minor version overflows into
- *  the thousands digit: for example, 2.23.0 is encoded as 4300.
- *  This macro will not be available in SDL 3.x or SDL_mixer 3.x.
+ * In versions higher than 2.9.0, the minor version overflows into the
+ * thousands digit: for example, 2.23.0 is encoded as 4300. This macro will
+ * not be available in SDL 3.x or SDL_mixer 3.x.
  *
- *  Deprecated, use SDL_MIXER_VERSION_ATLEAST or SDL_MIXER_VERSION instead.
+ * Deprecated, use SDL_MIXER_VERSION_ATLEAST or SDL_MIXER_VERSION instead.
  */
 #define SDL_MIXER_COMPILEDVERSION \
     SDL_VERSIONNUM(SDL_MIXER_MAJOR_VERSION, SDL_MIXER_MINOR_VERSION, SDL_MIXER_PATCHLEVEL)
 #endif /* SDL_MIXER_MAJOR_VERSION < 3 && SDL_MAJOR_VERSION < 3 */
 
 /**
- *  This macro will evaluate to true if compiled with SDL_mixer at least X.Y.Z.
+ * This macro will evaluate to true if compiled with SDL_mixer at least X.Y.Z.
  */
 #define SDL_MIXER_VERSION_ATLEAST(X, Y, Z) \
     ((SDL_MIXER_MAJOR_VERSION >= X) && \
@@ -148,7 +148,7 @@ extern DECLSPEC const SDL_version * MIXCALL Mix_Linked_Version(void);
 /**
  * Initialization flags
  */
-typedef enum
+typedef enum MIX_InitFlags
 {
     MIX_INIT_FLAC   = 0x00000001,
     MIX_INIT_MOD    = 0x00000002,
@@ -400,7 +400,12 @@ typedef enum {
 /**
  * The internal format for a music chunk interpreted via codecs
  */
-typedef struct _Mix_Music Mix_Music;
+typedef struct Mix_Music Mix_Music;
+
+/**
+ * The type of a RWFromFile callback
+ */
+typedef SDL_RWops* (*Mix_RWFromFile_cb)(const char *file, const char *mode);
 
 /**
  * Open the default audio device for playback.
@@ -429,7 +434,7 @@ typedef struct _Mix_Music Mix_Music;
  * it to the correct format on demand.
  *
  * That being said, if you have control of your audio data and you know its
- * format ahead of time, you can save CPU time by opening the audio device in
+ * format ahead of time, you may save CPU time by opening the audio device in
  * that exact format so SDL_mixer does not have to spend time converting
  * anything behind the scenes, and can just pass the data straight through to
  * the hardware. On some platforms, where the hardware only supports specific
@@ -1638,16 +1643,16 @@ typedef void (SDLCALL *Mix_EffectFunc_t)(int chan, void *stream, int len, void *
 /**
  * This is the internal mixer callback format:
  *
- *   mixer(void *stream, int len, void *udata);
+ * mixer(void *stream, int len, void *udata);
  *
- *  (udata) is a user-defined bit of data, which you pass as the last arg of
- *  Mix_RegisterEffect(), and is passed back unmolested to your callback.
- *  Your effect changes the contents of (stream) based on whatever parameters
- *  are significant, or just leaves it be, if you prefer. You can do whatever
- *  you like to the buffer, though, and it will continue in its changed state
- *  down the mixing pipeline, through any other effect functions, then finally
- *  to be mixed with the rest of the channels and music for the final output
- *  stream.
+ * (udata) is a user-defined bit of data, which you pass as the last arg of
+ * Mix_RegisterEffect(), and is passed back unmolested to your callback.
+ * Your effect changes the contents of (stream) based on whatever parameters
+ * are significant, or just leaves it be, if you prefer. You can do whatever
+ * you like to the buffer, though, and it will continue in its changed state
+ * down the mixing pipeline, through any other effect functions, then finally
+ * o be mixed with the rest of the channels and music for the final output
+ * stream.
  *
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
@@ -1655,10 +1660,10 @@ typedef void (SDLCALL *Mix_CommonMixer_t)(void *udata, Uint8 *stream, int len);
 
 /**
  * This is a callback that signifies that a channel has finished all its
- *  loops and has completed playback. This gets called if the buffer
- *  plays out normally, or if you call Mix_HaltChannel(), implicitly stop
- *  a channel via Mix_AllocateChannels(), or unregister a callback while
- *  it's still playing.
+ * loops and has completed playback. This gets called if the buffer
+ * plays out normally, or if you call Mix_HaltChannel(), implicitly stop
+ * a channel via Mix_AllocateChannels(), or unregister a callback while
+ * it's still playing.
  *
  * DO NOT EVER call SDL_LockAudio() from your callback function!
  */
@@ -1752,8 +1757,8 @@ typedef void (SDLCALL *Mix_MusicEffectDone_t)(Mix_Music *mus, void *udata); /*MI
  * \param chan the channel to register an effect to, or MIX_CHANNEL_POST.
  * \param f effect the callback to run when more of this channel is to be
  *          mixed.
- * \param d effect done callback
- * \param arg argument
+ * \param d effect done callback.
+ * \param arg argument.
  * \returns zero if error (no such channel), nonzero if added. Error messages
  *          can be retrieved from Mix_GetError().
  *
@@ -1803,7 +1808,8 @@ extern DECLSPEC int MIXCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f
  * zero if there's an error, not on success. We apologize for the API design
  * inconsistency here.
  *
- * \param chan the channel to unregister all effects on, or MIX_CHANNEL_POST.
+ * \param channel the channel to unregister all effects on, or
+ *                MIX_CHANNEL_POST.
  * \returns zero if error (no such channel), nonzero if all effects removed.
  *          Error messages can be retrieved from Mix_GetError().
  *
@@ -1929,7 +1935,7 @@ extern DECLSPEC int MIXCALL Mix_SetPanning(int channel, Uint8 left, Uint8 right)
  * Set the position of a channel.
  *
  * `angle` is an integer from 0 to 360, that specifies the location of the
- * sound in relation to the listener. `angle` will be reduced as neccesary
+ * sound in relation to the listener. `angle` will be reduced as necessary
  * (540 becomes 180 degrees, -100 becomes 260). Angle 0 is due north, and
  * rotates clockwise as the value increases. For efficiency, the precision of
  * this effect may be limited (angles 1 through 7 might all produce the same
@@ -2318,8 +2324,8 @@ extern DECLSPEC int MIXCALL Mix_GroupNewer(int tag);
  *
  * \param channel the channel on which to play the new chunk.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \returns which channel was used to play the sound, or -1 if sound could not
  *          be played.
  *
@@ -2350,8 +2356,8 @@ extern DECLSPEC int MIXCALL Mix_PlayChannel(int channel, Mix_Chunk *chunk, int l
  *
  * \param channel the channel on which to play the new chunk.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ticks the maximum number of milliseconds of this chunk to mix for
  *              playback.
  * \returns which channel was used to play the sound, or -1 if sound could not
@@ -2443,8 +2449,8 @@ extern DECLSPEC Mix_CommonMixer_t MIXCALL Mix_GetGeneralMixer(void);
  * Mix_VolumeMusic() on fading music).
  *
  * \param music the new music object to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \returns zero on success, -1 on error.
  *
@@ -2480,8 +2486,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusic(Mix_Music *music, int loops, int ms)
  * To convert from milliseconds, divide by 1000.0.
  *
  * \param music the new music object to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \param position the start position within the music, in seconds, where
  *                 playback should start.
@@ -2521,8 +2527,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInMusicPos(Mix_Music *music, int loops, int 
  * \param channel the channel on which to play the new chunk, or -1 to find
  *                any available.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \returns which channel was used to play the sound, or -1 if sound could not
  *          be played.
@@ -2564,8 +2570,8 @@ extern DECLSPEC int MIXCALL Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int
  * \param channel the channel on which to play the new chunk, or -1 to find
  *                any available.
  * \param chunk the new chunk to play.
- * \param loop the number of times the chunk should loop, -1 to loop (not
- *             actually) infinitely.
+ * \param loops the number of times the chunk should loop, -1 to loop (not
+ *              actually) infinitely.
  * \param ms the number of milliseconds to spend fading in.
  * \param ticks the maximum number of milliseconds of this chunk to mix for
  *              playback.
@@ -2807,8 +2813,8 @@ extern DECLSPEC int MIXCALL Mix_HaltChannel(int channel);
  * This will stop further playback on all channels with a specific tag, until
  * a new chunk is started there.
  *
- * A tag is an arbitary number that can be assigned to several mixer channels,
- * to form groups of channels.
+ * A tag is an arbitrary number that can be assigned to several mixer
+ * channels, to form groups of channels.
  *
  * The default tag for a channel is -1.
  *
@@ -2917,8 +2923,8 @@ extern DECLSPEC int MIXCALL Mix_FadeOutChannel(int which, int ms);
  * current volumes to silence over `ms` milliseconds. After that time, those
  * channels are halted.
  *
- * A tag is an arbitary number that can be assigned to several mixer channels,
- * to form groups of channels.
+ * A tag is an arbitrary number that can be assigned to several mixer
+ * channels, to form groups of channels.
  *
  * The default tag for a channel is -1.
  *
@@ -3227,7 +3233,7 @@ extern DECLSPEC int MIXCALL Mix_PausedMusic(void);
  *
  * This only applies to MOD music formats.
  *
- * \param order order
+ * \param order order.
  * \returns 0 if successful, or -1 if failed or isn't implemented.
  *
  * \since This function is available since SDL_mixer 2.6.0.
@@ -3235,13 +3241,42 @@ extern DECLSPEC int MIXCALL Mix_PausedMusic(void);
 extern DECLSPEC int MIXCALL Mix_ModMusicJumpToOrder(int order);
 
 /**
- * TODO: Describe this
- * This is the MixerX fork exclusive function.
+ * Jump to a given order in mod music by music context directly.
+ *
+ * This only applies to MOD music formats.
+ *
+ * \param music Loaded music context.
+ * \param order order.
+ * \returns 0 if successful, or -1 if failed or isn't implemented.
+ *
+ * \since This function is exclusive for the MixerX fork
  */
 extern DECLSPEC int MIXCALL Mix_ModMusicStreamJumpToOrder(Mix_Music *music, int order);/*MixerX*/
 
-/* Tracks */
+/**
+ * Start a track in music object.
+ *
+ * This only applies to GME music formats.
+ *
+ * \param music the music object.
+ * \param track the track number to play. 0 is the first track.
+ * \returns 0 if successful, or -1 if failed or isn't implemented.
+ *
+ * \since This function is available since SDL_mixer 2.8.0.
+ */
 extern DECLSPEC int MIXCALL Mix_StartTrack(Mix_Music *music, int track);
+
+/**
+ * Get number of tracks in music object.
+ *
+ * This only applies to GME music formats.
+ *
+ * \param music the music object.
+ * \returns number of tracks if successful, or -1 if failed or isn't
+ *          implemented.
+ *
+ * \since This function is available since SDL_mixer 2.8.0.
+ */
 extern DECLSPEC int MIXCALL Mix_GetNumTracks(Mix_Music *music);
 
 /**
@@ -3687,6 +3722,14 @@ extern DECLSPEC int MIXCALL Mix_InitMixer(const SDL_AudioSpec *spec, SDL_bool sk
 extern DECLSPEC void MIXCALL Mix_FreeMixer(void);/*MixerX*/
 
 /**
+ * Set a function that MixerX will use to open RWops handles from file paths,
+ * or pass NULL to use the default SDL_RWFromFile.
+ *
+ * This is the MixerX fork exclusive function.
+ */
+extern DECLSPEC void MIXCALL Mix_SetRWFromFile(Mix_RWFromFile_cb cb);/*MixerX*/
+
+/**
  * Close the mixer, halting all playing audio.
  *
  * Any halted channels will have any currently-registered effects
@@ -3769,7 +3812,7 @@ extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getFullRangeBrightness(void);/*MixerX*/
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setFullRangeBrightness(int frb);/*MixerX*/
 /* Get the automatic arpeggio enabled or disabled setting */
-extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getAutoArpeggio();/*MixerX*/
+extern DECLSPEC int  MIXCALL Mix_ADLMIDI_getAutoArpeggio(void);/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_ADLMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
 /* Get channel allocation mode */
@@ -3805,7 +3848,7 @@ extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getFullRangeBrightness(void);/*MixerX*/
 /* Set full range mode for CC74-Brightness controller */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setFullRangeBrightness(int frb);/*MixerX*/
 /* Get the automatic arpeggio enabled or disabled setting */
-extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getAutoArpeggio();/*MixerX*/
+extern DECLSPEC int  MIXCALL Mix_OPNMIDI_getAutoArpeggio(void);/*MixerX*/
 /* Set the automatic arpeggio enabled or disabled */
 extern DECLSPEC void MIXCALL Mix_OPNMIDI_setAutoArpeggio(int aa_en);/*MixerX*/
 /* Get channel allocation mode */
@@ -3901,5 +3944,3 @@ extern DECLSPEC int  MIXCALL Mix_SetMidiDevice(int player);/*MixerX*/
 #include "close_code.h"
 
 #endif /* SDL_MIXER_H_ */
-
-/* vi: set ts=4 sw=4 expandtab: */

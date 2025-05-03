@@ -129,12 +129,16 @@ bool CLunaLua::shutdown()
     gRenderSizableFlag = true;
     gRenderBackgroundFlag = true;
     gDisablePlayerFilterBounceFix = false;
+    gDisableNPCRespawnBugFix = false;
     gLavaIsWeak = false;
+    gCamerasInitialised = false;
     gDisablePlayerDownwardClipFix.Apply();
     gDisableNPCDownwardClipFix.Apply();
     gDisableNPCDownwardClipFixSlope.Apply();
+    gNPCCeilingBugFix.Apply();
     gNPCSectionFix.Apply();
     gFenceFixes.Apply();
+    gDroppedItemFix.Apply();
     gLinkFairyClowncarFixes.Apply();
     gSlideJumpFixIsEnabled = true;
     SMBX13::Ports::_enablePowerupPowerdownPositionFixes = true;

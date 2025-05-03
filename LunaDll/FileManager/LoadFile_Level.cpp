@@ -428,7 +428,7 @@ void LunaLua_loadLevelFile(LevelData &outData, std::wstring fullPath, bool isVal
         memcpy(&nextNPC->spawnMomentum, &nextNPC->momentum, sizeof(Momentum));
         nextNPC->spawnDirection = nextNPC->directionFaced;
         nextNPC->offscreenCountdownTimer = 1;
-        nextNPC->unknown_124 = -1;
+        nextNPC->activeFlag = -1;
         nextNPC->unknown_14C = 1;
 
         short curI = static_cast<short>(i + 1);

@@ -461,7 +461,7 @@ struct NPCMOB {
     float generatorDelayCountdown;          //+0x6C
     short directionToGenerate;              //+0x70
     short generatorType;                    //+0x72
-    short offscreenFlag;                    //+0x74
+    short generatorActiveFlag;              //+0x74
     short unknown_76;                       //+0x76
     Momentum momentum;                      //+0x78
     Momentum spawnMomentum;                 //+0xA8
@@ -484,8 +484,8 @@ struct NPCMOB {
     short unknown_11E;                      //+0x11E
     short bounceOffBlock;                   //+0x120
     short killFlag;                         //+0x122
-    short unknown_124;                      //+0x124  Note: Must be set to -1 when spawning a new NPC
-    short unknown_126;                      //+0x126
+    short activeFlag;                       //+0x124  Note: Must be set to -1 when spawning a new NPC
+    short offscreenFlag1;                   //+0x126
     short offscreenFlag2;                   //+0x128
     short offscreenCountdownTimer;          //+0x12A
     short grabbingPlayerIndex;              //+0x12C
@@ -522,6 +522,7 @@ static_assert(sizeof(NPCMOB) == 0x158, "sizeof(NPCMOB) must be 0x158");
 struct ExtendedNPCFields
 {
     bool noblockcollision;
+    bool nonpccollision;
     short fullyInsideSection;
     unsigned int collisionGroup;
 
@@ -537,6 +538,7 @@ struct ExtendedNPCFields
         noblockcollision = false;
         fullyInsideSection = -1;
         collisionGroup = 0u;
+        nonpccollision = false;
     }
 };
 

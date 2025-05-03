@@ -39,8 +39,10 @@ void TrySkipPatch();
 extern AsmPatch<777> gDisablePlayerDownwardClipFix;
 extern AsmPatch<8> gDisableNPCDownwardClipFix;
 extern AsmPatch<6> gDisableNPCDownwardClipFixSlope;
+extern AsmPatch<21> gNPCCeilingBugFix;
 extern Patchable& gNPCSectionFix;
 extern Patchable& gFenceFixes;
+extern Patchable& gDroppedItemFix;
 extern Patchable& gLinkFairyClowncarFixes;
 extern bool gSlideJumpFixIsEnabled;
 
@@ -592,6 +594,9 @@ void __stdcall runtimeHookCompareNPCWalkBlock();
 void __stdcall runtimeHookNPCWalkFixClearTemp();
 void __stdcall runtimeHookNPCWalkFixTempHitConditional();
 void __stdcall runtimeHookNPCWalkFixSlope();
+
+void __stdcall runtimeHookNPCDespawnTimerFix();
+void __stdcall runtimeHookNPCRespawnBugFix();
 
 void __stdcall runtimeHookNPCSectionFix(short* npcIndex);
 void __stdcall runtimeHookNPCSectionWrap(void);

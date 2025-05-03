@@ -408,6 +408,18 @@ extern "C" {
         return (int)SDL_JOYSTICK_POWER_UNKNOWN;
     }
 
+    struct StickPos
+    {
+        int x;
+        int y;
+    };
+    FFI_EXPORT(StickPos) LunaLuaGetSelectedControllerStickPosition(int playerNum)
+    {
+        const auto stickPos = gLunaGameControllerManager.getSelectedControllerStickPosition(playerNum);
+
+        return {std::get<0>(stickPos), std::get<1>(stickPos)};
+    }
+
     FFI_EXPORT(const char*) LunaLuaGetSelectedControllerName(int playerNum)
     {
         static std::string name;
@@ -434,6 +446,7 @@ extern "C" {
 typedef struct ExtendedNPCFields_\
 {\
     bool noblockcollision;\
+    bool nonpccollision;\
     short fullyInsideSection;\
     unsigned int collisionGroup;\
 } ExtendedNPCFields;";
@@ -533,6 +546,18 @@ typedef struct ExtendedPlayerFields_\
         }
     }
 
+    FFI_EXPORT(void) LunaLuaSetNPCCeilingBugFix(bool enable)
+    {
+        if (enable)
+        {
+            gNPCCeilingBugFix.Apply();
+        }
+        else
+        {
+            gNPCCeilingBugFix.Unapply();
+        }
+    }
+
     FFI_EXPORT(void) LunaLuaSetNPCSectionFix(bool enable)
     {
         if (enable)
@@ -562,11 +587,24 @@ typedef struct ExtendedPlayerFields_\
         gSlideJumpFixIsEnabled = enable;
     }
 
+    FFI_EXPORT(void) LunaLuaSetNPCRespawnBugFix(bool enable)
+    {
+        gDisableNPCRespawnBugFix = !enable;
+    }
+
     FFI_EXPORT(void) LunaLuaSetFenceBugFix(bool enable) {
         if (enable) {
             gFenceFixes.Apply();
         } else {
             gFenceFixes.Unapply();
+        }
+    }
+
+    FFI_EXPORT(void) LunaLuaSetDroppedItemFix(bool enable) {
+        if (enable) {
+            gDroppedItemFix.Apply();
+        } else {
+            gDroppedItemFix.Unapply();
         }
     }
 
