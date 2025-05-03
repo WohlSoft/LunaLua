@@ -190,6 +190,11 @@ void PGE_MusPlayer::MUS_rewindMusic()
     return Mix_RewindMusic();
 }
 
+std::string PGE_MusPlayer::MUS_get()
+{
+    return MusicManager::getCurrentMusic();
+}
+
 void PGE_MusPlayer::MUS_pauseMusic()
 {
     if(!PGE_SDL_Manager::isInit) return;
@@ -457,7 +462,6 @@ void PGE_MusPlayer::DeferralLock::Unlock()
         MUS_StopDeferring();
     }
 }
-
 
 /***********************************PGE_Sounds********************************************/
 

@@ -78,7 +78,7 @@ std::string MusicManager::musAliasesList[75]=
     "music53",
     "music54",
     "music55",
-    "music56"  //73
+    "music56"  //75
 };
 
 std::string MusicManager::chunksAliasesList[91]=
