@@ -33,6 +33,8 @@
 #include "../Misc/CollisionMatrix.h"
 #include "../SMBXInternal/Ports.h"
 
+#include "../FileManager/SMBXFileManager.h"
+
 /*static*/ DWORD CLunaFFILock::currentLockTlsIdx = TlsAlloc();
 
 extern bool luaDidGameOverFlag;
@@ -719,7 +721,15 @@ void CLunaLua::bindAll()
                 def("exitGame", &LuaProxy::Misc::exitGame),
                 def("exitEngine", &LuaProxy::Misc::exitEngine),
                 def("didGameOver", &LuaProxy::Misc::didGameOver),
-                def("loadEpisode", &LuaProxy::Misc::loadEpisode),
+                // Misc.loadEpisode
+                // Episode name only
+                def("loadEpisode", (bool(*)(std::string))&LuaProxy::Misc::loadEpisode),
+                // Episode name and save slot
+                def("loadEpisode", (bool(*)(std::string, int))&LuaProxy::Misc::loadEpisode),
+                // Episode name, save slot, and number of players
+                def("loadEpisode", (bool(*)(std::string, int, int))&LuaProxy::Misc::loadEpisode),
+                // Episode name, save slot, number of players, and other player IDs in case
+                def("loadEpisode", (bool(*)(std::string, int, int, int))&LuaProxy::Misc::loadEpisode),
                 def("pause", (void(*)(void))&LuaProxy::Misc::pause),
                 def("pause", (void(*)(bool))&LuaProxy::Misc::pause),
                 def("unpause", &LuaProxy::Misc::unpause),
@@ -975,6 +985,16 @@ void CLunaLua::bindAll()
                 def("__getMuteForAlias", LuaProxy::Audio::__getMuteForAlias)
             ],
             /*************************Audio*end*************************/
+            
+            namespace_("Episode")[
+                def("list", &LuaProxy::Episode::list),
+                def("id", (int(*)())&LuaProxy::Episode::id),
+
+                def("name", (std::string(*)())&LuaProxy::Episode::name),
+                def("path", (std::string(*)())&LuaProxy::Episode::path),
+                def("filename", (std::string(*)())&LuaProxy::Episode::filename)
+                
+            ],
 
             LUAHELPER_DEF_CLASS(NativeInputConfig)
             .def("__eq", LUAPROXY_DEFUSERDATAINEDXCOMPARE(LuaProxy::InputConfig, m_index))
@@ -1215,7 +1235,6 @@ void CLunaLua::bindAll()
                 .property("filename", &LuaProxy::LevelObject::filename)
                 .def("mem", static_cast<void (LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, const luabind::object &, lua_State*)>(&LuaProxy::LevelObject::mem))
                 .def("mem", static_cast<luabind::object(LuaProxy::LevelObject::*)(int, LuaProxy::L_FIELDTYPE, lua_State*) const>(&LuaProxy::LevelObject::mem))
-
             ];
     }
 

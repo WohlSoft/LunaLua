@@ -909,7 +909,10 @@ namespace LuaProxy {
         void exitGame();
         void exitEngine();
         bool didGameOver();
-        bool loadEpisode(const std::string& episodeName);
+        bool loadEpisode(std::string episodeName, int saveSlot, int numPlayers, int playerIDForOtherPlayers);
+        bool loadEpisode(std::string episodeName, int saveSlot, int numPlayers);
+        bool loadEpisode(std::string episodeName, int saveSlot);
+        bool loadEpisode(std::string episodeName);
         void pause();
         void pause(bool atFrameEnd);
         void unpause();
@@ -993,6 +996,14 @@ namespace LuaProxy {
         luabind::object openWorld(const std::string &filePath, lua_State *L);
         //luabind::object getWorldData(lua_State *L); // TODO: Implement this once PGEFL will handle WorldMap reading
         luabind::object openNpcConfig(const std::string &filePath, lua_State *L);
+    }
+    
+    namespace Episode{
+        luabind::object list(lua_State *L);
+        int id();
+        std::string name();
+        std::string path();
+        std::string filename();
     }
 
     //Non-Member-Constructors:

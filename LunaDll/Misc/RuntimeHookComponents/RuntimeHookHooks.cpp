@@ -43,6 +43,9 @@
 
 #include "../../Misc/VB6RNG.h"
 
+#include "../../SMBXInternal/Reconstructed/EpisodeMain.h"
+#include "../../SMBXInternal/Overworld.h"
+
 void CheckIPCQuitRequest();
 
 extern HHOOK HookWnd;
@@ -184,6 +187,15 @@ extern int __stdcall LoadWorld()
         g_GLEngine.SetFirstFramePending();
     }
 
+    if (!GM_CREDITS_MODE)
+    {
+        for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
+            // store player characters at the time of level load,
+            // these are used to restore the character if the episode has to be reloaded, or another episode was launched
+            gPlayerStoredCharacters[i-1] = Player::Get(i)->Identity;
+        }
+    }
+
     return GM_PLAYERS_COUNT;
 }
 
@@ -200,7 +212,6 @@ __declspec(naked) void __stdcall LoadWorldHook(void)
 
 extern int __stdcall LoadIntro()
 {
-
     if (!gAutostartRan && !gStartupSettings.waitForIPC && !TestModeIsEnabled())
     {
         gAutostartRan = true;
@@ -1604,16 +1615,101 @@ _declspec(naked) void __stdcall loadLevel_OrigFunc(VB6StrPtr* filename)
     }
 }
 
-Characters playerStoredCharacters[] = {CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO,CHARACTER_MARIO };
+//If the legacy title screen is about to boot, prevent that and go straight to loading the episode
+void __stdcall runtimeHookGameMenu()
+{
+    GM_LEVEL_MODE = 0; // Set this to prevent multiple loops
+    // Check to see if IPC is not waiting and Test Mode isn't enabled. If so, continue.
+    if(!gEpisodeLoadedOnBoot)
+    {
+        GameAutostart autostarter;
+        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled())
+        {
+            std::string autostartFile = WStr2Str(getLatestConfigFile(L"autostart.ini"));
+
+            if(!gStartupSettings.epSettings.enabled && file_existsX(autostartFile))
+            {
+                // Try reading the autostart.ini file first if there's no settings available
+                IniProcessing autostartConfig(autostartFile);
+                if (autostartConfig.beginGroup("autostart"))
+                {
+                    bool doAutostart = autostartConfig.value("do-autostart", false).toBool();
+                    autostartConfig.endGroup();
+                    if (doAutostart)
+                    {
+                        // Note: Internally this uses beginGroup and endGroup, so the group won't be open after it
+                        autostartConfig.beginGroup("autostart");
+
+                        std::string selectedEpisode = autostartConfig.value("episode-name", "").toString();
+                        std::wstring selectedEpisodePath = Str2WStr(autostartConfig.value("episode-wld-file", "").toString());
+                        int playerCount = autostartConfig.value("players", 1).toInt();
+                        Characters firstCharacter = static_cast<Characters>(autostartConfig.value("character-player1", 1).toInt());
+                        Characters secondCharacter = static_cast<Characters>(autostartConfig.value("character-player2", 2).toInt());
+                        int saveSlot = autostartConfig.value("save-slot", 1).toInt();
+
+                        autostarter.setSelectedEpisode(selectedEpisode);
+
+                        gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
+
+                        if (autostartConfig.value("transient", false).toBool())
+                        {
+                            remove(autostartFile.c_str());
+                        }
+                        autostartConfig.endGroup();
+                    }
+                }
+                autostartConfig.endGroup();
+            }
+            else if(gStartupSettings.epSettings.enabled && gStartupSettings.epSettings.wldPath != L"")
+            {
+                // If there's no autostart file but the command prompt gives out a world path and some other things, we will then boot to the episode from there
+                std::string selectedEpisode = "";
+                std::wstring selectedEpisodePath = gStartupSettings.epSettings.wldPath;
+                int playerCount = gStartupSettings.epSettings.players;
+                Characters firstCharacter = static_cast<Characters>(gStartupSettings.epSettings.character1);
+                Characters secondCharacter = static_cast<Characters>(gStartupSettings.epSettings.character2);
+                int saveSlot = gStartupSettings.epSettings.saveSlot;
+
+                autostarter.setSelectedEpisode(selectedEpisode);
+                
+                gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
+            }
+            else
+            {
+                // If there's still nothing, we don't have any settings so we shouldn't continue booting LunaDLL
+                std::string msg = "There is no world file specified on starting LunaLua. This means that you booted LunaLoader.exe with no arguments regarding selecting a world or level. Please load a world or level starting SMBX2 by loading the X2 launcher (Or Command Prompt) instead.";
+                MessageBoxA(gMainWindowHwnd, msg.c_str(), "Error", MB_ICONWARNING | MB_OK);
+                _exit(0);
+            }
+        }
+    }
+    else if(gEpisodeLoadedOnBoot)
+    {
+        GameAutostart autostarter;
+        if(!gStartupSettings.waitForIPC && !TestModeIsEnabled() && gEpisodeLoadedOnBoot)
+        {
+            std::string selectedEpisode = "";
+            std::wstring selectedEpisodePath = gStartupSettings.epSettings.wldPath;
+            int playerCount = gStartupSettings.epSettings.players;
+            Characters firstCharacter = static_cast<Characters>(gStartupSettings.epSettings.character1);
+            Characters secondCharacter = static_cast<Characters>(gStartupSettings.epSettings.character2);
+            int saveSlot = gStartupSettings.epSettings.saveSlot;
+
+            autostarter.setSelectedEpisode(selectedEpisode);
+
+            gEpisodeMain.LaunchEpisode(selectedEpisodePath, saveSlot, playerCount, firstCharacter, secondCharacter);
+        }
+    }
+}
 
 void __stdcall runtimeHookLoadLevel(VB6StrPtr* filename)
 {
-    if (!GM_CREDITS_MODE)
+    if (GM_CREDITS_MODE == 0)
     {
         for (int i = 1; i <= min(GM_PLAYERS_COUNT, (WORD)4); i++) {
             // store player characters at the time of level load,
             // these are used to restore the character if the episode has to be reloaded
-            playerStoredCharacters[i-1] = Player::Get(i)->Identity;
+            gPlayerStoredCharacters[i-1] = Player::Get(i)->Identity;
         }
     }
     
@@ -5080,7 +5176,7 @@ static void LunaLuaResetEpisode() {
     for (int i = 1; i <= GM_PLAYERS_COUNT; i++) {
         auto p = Player::Get(i);
         // restore this player's character
-        p->Identity = playerStoredCharacters[min(i, 4)-1];
+        p->Identity = gPlayerStoredCharacters[min(i, 4)-1];
         // apply saved template
         auto t = getTemplateForCharacter(p->Identity);
         if (t != nullptr) {
