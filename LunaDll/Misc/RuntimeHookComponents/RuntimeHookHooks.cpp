@@ -1748,58 +1748,84 @@ __declspec(naked) void __stdcall runtimeHookBlockBumpableRaw(void)
     }
 }
 
-static void __stdcall runtimeHookHurtfulBlocksInternal(int hitSpot, short playerIdx, int blockIdx, const double& slope)
+static void __stdcall runtimeHookHurtfulBlocks_9A1843(int hitspot)
+{
+    gHurtBlockHitspot = hitspot;
+}
+
+
+__declspec(naked) void __stdcall runtimeHookHurtfulBlocksRaw_9A1843(void)
+{
+    __asm {
+
+        push ecx
+
+        movsx ecx, word ptr ss : [ebp - 0x54]
+        push ecx               // hitSpot
+        call runtimeHookHurtfulBlocks_9A1843
+
+        pop ecx
+        push 0x9A1BDA
+        ret
+    }
+}
+
+static void __stdcall runtimeHookHurtfulBlocksInternal(short playerIdx, int blockIdx, const double& slope)
 {
     PlayerMOB* player = Player::Get(playerIdx);
     Block* block = Block::GetRaw(blockIdx);
+    int hitSpot = gHurtBlockHitspot;
 
     // don't worry about lava
     if (SMBX13::Vars::BlockHurts[block->BlockType] && !SMBX13::Vars::BlockKills[block->BlockType])
     {
         short floorSlope = SMBX13::Vars::BlockSlope[block->BlockType];
+        short ceilingSlope = SMBX13::Vars::BlockSlope2[block->BlockType];
         unsigned char flags = Blocks::GetBlockHurtSide(block->BlockType);
         bool tempBool = false;
+        // if we're on a slope, we haven't actually hit anything
+        if (floorSlope != 0 || ceilingSlope != 0) hitSpot = 0;
 
         // stop if we shouldn't be hurt
-        if (player->MountType == 2 || ((hitSpot == 1 || floorSlope != 0 && player->SlopeRelated == blockIdx) && player->MountType != 0) && (flags & 0x80) != 0) return;
+        if (player->MountType == 2 || ((hitSpot == 1 || floorSlope != 0 && player->SlopeRelated == blockIdx) && player->MountType != 0) && (flags & 0x40) != 0) return;
 
         // check hitspot & collision config for blocks and hurt as needed
         switch (hitSpot) {
         case 0: // cancelled (slopes, sizables, semi solids)
-            tempBool = ((flags & 0x01) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x01) != 0 );
             break;
         case 1: // top
-            tempBool = ((flags & 0x02) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x02) != 0);
             break;
         case 2: // right
-            tempBool = ((flags & 0x04) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x04) != 0);
             break;
         case 3: // bottom
-            tempBool = ((flags & 0x08) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x08) != 0);
             break;
         case 4: // left
-            tempBool = ((flags & 0x10) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x10) != 0);
             break;
         case 5: // inside/zipping
-            tempBool = ((flags & 0x20) != 0 || (flags & 0x40) != 0);
+            tempBool = ((flags & 0x20) != 0);
             break;
         }
 
         // floor slope should harm 
-        if ((floorSlope != 0 && ((flags & 0x02) != 0 || (flags & 0x40) != 0) && player->SlopeRelated == blockIdx)) tempBool = true;
+        if ((floorSlope != 0 && ((flags & 0x02) != 0) && player->SlopeRelated == blockIdx)) tempBool = true;
 
         // ceiling slope should harm
-        if ((SMBX13::Vars::BlockSlope2[block->BlockType] && ((flags & 0x08) != 0 || (flags & 0x40) != 0) && player->momentum.y <= block->momentum.y + block->momentum.height - (block->momentum.height * slope)))
+        if ((ceilingSlope != 0 && ((flags & 0x08) != 0) && player->momentum.y <= block->momentum.y + block->momentum.height - (block->momentum.height * slope)))
         {
             tempBool = true;
         }
 
         // if set as invisible, don't harm (potential compatibility break)
-        if (block->IsInvisible2) tempBool = false;
+        if (block->IsInvisible2 && !gDisableInvisibleHurtBlockBugFix) tempBool = false;
 
         if (tempBool)
         {
-            if ((player->MountType > 0 && hitSpot == 1))
+            if ((player->MountType > 0 && hitSpot == 1)) // fixes yoshi clipping into the block if not mount safe and colliding from above
             {
                 double tempY = player->momentum.y + player->momentum.height;
                 player->momentum.y = block->momentum.y - player->momentum.height;
@@ -1815,8 +1841,7 @@ __declspec(naked) void __stdcall runtimeHookHurtfulBlocksRaw(void)
 {
     __asm {
         //009A391A | 0FBF74CA 1E              | movsx esi,word ptr ds:[edx+ecx*8+1E]
-        push esi    // push these to make sure they're safe after the function call
-        push eax                
+        push eax               // push these to make sure they're safe after the function call
         push ecx
         push edx
 
@@ -1826,17 +1851,13 @@ __declspec(naked) void __stdcall runtimeHookHurtfulBlocksRaw(void)
         push ecx               // Block Index
         movsx ecx, word ptr ss : [ebp - 0x114]
         push ecx               // Player Index
-        movsx ecx, word ptr ss : [ebp - 0x54]
-        push ecx               // hitSpot
         call runtimeHookHurtfulBlocksInternal
 
         pop edx                 // we can pop these again
         pop ecx
         pop eax
-        pop esi
 
         movsx esi, word ptr ds : [edx + ecx * 0x8 + 0x1E] // recreates the instruction we are replacing
-        push 0x9A391F
         ret
     }
 }
@@ -1891,9 +1912,6 @@ __declspec(naked) void __stdcall runtimeHookTailSwipeRaw_9bb9c6(void)
     __asm {
         //009BB9C6 | A1 30B9B200              | mov eax,dword ptr ds:[<blockdef_isResizeableBlock>]
         push eax    // push these to make sure they're safe after the function call
-        push ecx
-        push ebx
-        push edx
 
         lea ecx, dword ptr ss : [ebp - 0x20C]
         push ecx            // tail
@@ -1911,16 +1929,10 @@ __declspec(naked) void __stdcall runtimeHookTailSwipeRaw_9bb9c6(void)
         cmp eax, 0
         jne alternate_exit
 
-        pop edx     // put these back in place
-        pop ebx
-        pop ecx
         pop eax
         push 0x9BBA39
         ret
         alternate_exit :
-        pop edx     // put these back in place
-            pop ebx
-            pop ecx
             pop eax
             push 0x9BBFB5
             ret
@@ -1962,56 +1974,9 @@ __declspec(naked) void __stdcall runtimeHookTailSwipeRaw_9bba74(void)
     }
 }
 
-static int __stdcall runtimeHookTailSwipe_9bbd03(int id)
+int __stdcall runtimeHookSwordBounceable(int id)
 {
     return Blocks::GetBlockSwordBounce(id) ? -1 : 0;
-}
-
-__declspec(naked) void __stdcall runtimeHookTailSwipeRaw_9bbd03(void)
-{
-    __asm {
-        //009BBD03 | 8B0D 9CC0B200            | mov ecx,dword ptr ds:[B2C09C]
-        push eax    // push this to make sure it's safe after the function call
-
-        push esi            // block id
-        call runtimeHookTailSwipe_9bbd03
-        cmp eax, 0
-        jne alternate_exit
-
-        pop eax    //we can pop this again
-        push 0x9BBD10
-        ret
-        alternate_exit :
-        pop eax    //we can pop this again
-            push 0x9BBD40
-            ret
-    }
-}
-
-static int __stdcall runtimeHookTailSwipe_9bbd52(int id)
-{
-    return Blocks::GetBlockSwordBounce(id) ? -1 : 0;
-}
-
-__declspec(naked) void __stdcall runtimeHookTailSwipeRaw_9bbd52(void)
-{
-    __asm {
-        //009BBD52 | 8B15 9CC0B200 | mov edx, dword ptr ds : [B2C09C]
-        push eax    // push this to make sure it's safe after the function call
-
-        push esi // block id
-        call runtimeHookTailSwipe_9bbd52
-        cmp eax, 0
-        je alternate_exit
-
-        pop eax    //we can pop this again
-        push 0x9BBD5F
-        ret
-        alternate_exit :
-        pop eax    //we can pop this again
-            push 0x9BBD75
-            ret
-    }
 }
 
 static int __stdcall runtimeHookNPCVulnerability(NPCMOB* npc, CollidersType *harmType, short* otherIdx)

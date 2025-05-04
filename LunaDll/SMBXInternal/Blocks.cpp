@@ -177,19 +177,19 @@ void Blocks::InitProperties() {
     SetBlockPlayerFilter(629, 4);
     SetBlockPlayerFilter(632, 5);
 
-    SetBlockHurtSide(109, (0x80 | 0x40));
-    SetBlockHurtSide(110, (0x80 | 0x02));
-    SetBlockHurtSide(267, (0x80 | 0x04));
-    SetBlockHurtSide(268, (0x80 | 0x08));
-    SetBlockHurtSide(269, (0x80 | 0x10));
-    SetBlockHurtSide(407, (0x80 | 0x08));
-    SetBlockHurtSide(408, (0x80 | 0x02));
-    SetBlockHurtSide(428, (0x80 | 0x04));
-    SetBlockHurtSide(429, (0x80 | 0x10));
-    SetBlockHurtSide(430, (0x80 | 0x02));
-    SetBlockHurtSide(431, (0x80 | 0x08));
-    SetBlockHurtSide(511, (0x80 | 0x02));
-    SetBlockHurtSide(598, 0x40);
+    SetBlockHurtSide(109, (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));
+    SetBlockHurtSide(110, (0x02 | 0x40));
+    SetBlockHurtSide(267, (0x04 | 0x40));
+    SetBlockHurtSide(268, (0x08 | 0x40));
+    SetBlockHurtSide(269, (0x10 | 0x40));
+    SetBlockHurtSide(407, (0x08 | 0x40));
+    SetBlockHurtSide(408, (0x02 | 0x40));
+    SetBlockHurtSide(428, (0x04 | 0x40));
+    SetBlockHurtSide(429, (0x10 | 0x40));
+    SetBlockHurtSide(430, (0x02 | 0x40));
+    SetBlockHurtSide(431, (0x08 | 0x40));
+    SetBlockHurtSide(511, (0x02 | 0x40));
+    SetBlockHurtSide(598, (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20));
 
     SetBlockSwordBounce(109, true);
     SetBlockSwordBounce(110, true);

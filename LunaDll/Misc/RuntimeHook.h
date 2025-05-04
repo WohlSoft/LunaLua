@@ -339,10 +339,11 @@ void __stdcall runtimeHookSmbxCheckWindowedRaw(void);
 void __stdcall runtimeHookBlockBumpableRaw(void);
 
 void __stdcall runtimeHookHurtfulBlocksRaw(void);
+void __stdcall runtimeHookHurtfulBlocks_9A1843(int hitspot);
+void __stdcall runtimeHookHurtfulBlocksRaw_9A1843(void);
 void __stdcall runtimeHookTailSwipeRaw_9bb9c6(void);
 void __stdcall runtimeHookTailSwipeRaw_9bba74(void);
-void __stdcall runtimeHookTailSwipeRaw_9bbd03(void);
-void __stdcall runtimeHookTailSwipeRaw_9bbd52(void);
+int __stdcall runtimeHookSwordBounceable(int id);
 
 void __stdcall runtimeHookNPCVulnerabilityRaw(void);
 void __stdcall runtimeHookNPCSpinjumpSafeRaw(void);

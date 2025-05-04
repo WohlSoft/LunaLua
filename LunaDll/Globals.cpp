@@ -34,6 +34,7 @@ bool gRenderBackgroundFlag = true;
 // Settings for glitch fixes
 bool gDisablePlayerFilterBounceFix = false;
 bool gDisableNPCRespawnBugFix = false;
+bool gDisableInvisibleHurtBlockBugFix = false;
 
 // Other gameplay settings
 bool gLavaIsWeak = false;
@@ -65,6 +66,8 @@ BYTE gKeyState[256] = { 0 };
 HDC	ghMemDC;			// General use screen-compatible DC
 HBITMAP	ghGeneralDIB;	// General use screen-sized DIB
 DWORD* gpScreenBits;	// Pointer to screen bits for general use DIB
+
+int gHurtBlockHitspot;
 
 // Mouse cursor
 HCURSOR  gCustomCursor = nullptr;

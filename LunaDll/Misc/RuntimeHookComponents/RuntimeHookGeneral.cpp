@@ -1741,13 +1741,23 @@ void TrySkipPatch()
     PATCH(0x96ADD7).CALL(runtimeHookSmbxCheckWindowedRaw).NOP_PAD_TO_SIZE<8>().Apply();
 
     PATCH(0x9DB1D8).JMP(runtimeHookBlockBumpableRaw).NOP_PAD_TO_SIZE<6>().Apply();
-    // Hurtful Blocks Hook
-    PATCH(0x9A1843).JMP(0x9A1BDA).NOP_PAD_TO_SIZE<919>().Apply();
-    PATCH(0x9A391A).JMP(runtimeHookHurtfulBlocksRaw).Apply();
-    PATCH(0x9BB9C6).JMP(runtimeHookTailSwipeRaw_9bb9c6).NOP_PAD_TO_SIZE<115>().Apply();
-    PATCH(0x9BBA74).JMP(runtimeHookTailSwipeRaw_9bba74).Apply();
-    PATCH(0x9BBD03).JMP(runtimeHookTailSwipeRaw_9bbd03).NOP_PAD_TO_SIZE<13>().Apply();
-    PATCH(0x9BBD52).JMP(runtimeHookTailSwipeRaw_9bbd52).NOP_PAD_TO_SIZE<13>().Apply();
+    // Hurtful Blocks Hooks
+    PATCH(0x9A1843).JMP(runtimeHookHurtfulBlocksRaw_9A1843).NOP_PAD_TO_SIZE<919>().Apply(); // grabs the hit spot from the check for hurtful blocks at line 2036 of modPlayer.bas and jumps to line 2058, nop'ing the lines
+    PATCH(0x9A391A).CALL(runtimeHookHurtfulBlocksRaw).Apply(); // function to replace the check at line 2036, put at line 2231
+    PATCH(0x9BB9C6).JMP(runtimeHookTailSwipeRaw_9bb9c6).NOP_PAD_TO_SIZE<115>().Apply(); // replaces the condition in modPlayer.bas line 5103
+    PATCH(0x9BBA74).JMP(runtimeHookTailSwipeRaw_9bba74).Apply(); // inserts a check between lines 5105 and 5106 of modPlayer.bas, if the stabbed/tailed block is sizeable, goto line 5117
+    PATCH(0x9BBD03) // replaces the BlockHurts check at line 5126 by a Blocks::GetBlockSwordBounce check
+        .PUSH_ESI()
+        .CALL(runtimeHookSwordBounceable)
+        .bytes(0x85, 0xC0) // test eax, eax
+        .bytes(0x0F, 0x1F, 0x00) // nop
+        .Apply();
+    PATCH(0x9BBD52) // replaces the BlockHurts check at line 5127 by a Blocks::GetBlockSwordBounce check
+        .PUSH_ESI()
+        .CALL(runtimeHookSwordBounceable)
+        .bytes(0x85, 0xC0) // test eax, eax
+        .bytes(0x0F, 0x1F, 0x00) // nop
+        .Apply();
 
     PATCH(0xA28FE3).JMP(runtimeHookNPCVulnerabilityRaw).Apply();
 
