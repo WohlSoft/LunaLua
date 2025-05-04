@@ -316,6 +316,8 @@ void ResetLunaModule()
     gLastRunPress = 0;
     gRunTapped = 0;
 
+    gHurtBlockHitspot = 0;
+
     gLevelEnum = Invalid;
 
     g_EventHandler.reset();
