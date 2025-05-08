@@ -104,7 +104,7 @@ void EventStateMachine::reset(void) {
 }
 
 void EventStateMachine::hookLevelLoop(void) {
-    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_LEVEL))
+    if (gLunaLua.isValid() && (gLunaLua.getType() == CLunaLua::LUNALUA_LEVEL) && !SMBX13::Vars::qScreen)
     {
         // Check if we should pause
         checkPause();
