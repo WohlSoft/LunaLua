@@ -329,20 +329,12 @@ void __stdcall runtimeHookNPCTransformKoopalingUnshell_internal(NPCMOB* npc)
 {
     executeOnNPCTransformPtr(npc, npc->id + 1, NPC_TFCAUSE_AI);
 }
-const static int _transformKoopalingUnshellJmpDestination = 0xA52B74;
 _declspec(naked) void __stdcall runtimeHookNPCTransformKoopalingUnshell()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformKoopalingUnshell_internal
-        pop esi
-        pop ecx
-        pop ebx
-
-        jmp _transformKoopalingUnshellJmpDestination
+        push 0xA52B74 // Return address
+        jmp runtimeHookNPCTransformKoopalingUnshell_internal
     }
 }
 
