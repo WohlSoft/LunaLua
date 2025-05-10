@@ -198,22 +198,12 @@ void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal(NPCMOB* np
     npc->momentum.y -= npc->momentum.height / 2;
     executeOnNPCTransformPtr(npc, 133, NPC_TFCAUSE_AI);
 }
-const static int _transformSnifitBulletToSMB2CoinJmpDestination = 0xA0B875;
 _declspec(naked) void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformSnifitBulletToSMB2CoinJmpDestination
+        push 0xA0B875 // Return address
+        jmp runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal
     }
 }
 
