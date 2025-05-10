@@ -382,7 +382,7 @@ void __stdcall runtimeHookPOW();
 void __stdcall runtimeHookCollectNPC(short* playerIdx, short* npcIdx);
 
 void __stdcall runtimeHookNPCTransformRandomVeggie(void);
-void __stdcall runtimeHookNPCTransformSprout(void);
+void __stdcall runtimeHookNPCTransformSprout(short* pNpcIdx);
 void __stdcall runtimeHookNPCTransformRandomBonus(void);
 void __stdcall runtimeHookNPCTransformMushToHeart(void);
 void __stdcall runtimeHookNPCTransformCoinToRupee(void);

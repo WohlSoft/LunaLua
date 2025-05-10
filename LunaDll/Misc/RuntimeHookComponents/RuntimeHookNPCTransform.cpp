@@ -97,37 +97,13 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformRandomVeggie()
     }
 }
 
-void __stdcall runtimeHookNPCTransformSprout_internal(short* pNpcIdx)
+void __stdcall runtimeHookNPCTransformSprout(short* pNpcIdx)
 {
     // replicate the basegame code that this hook overwrites
     native_setNPCFrame(pNpcIdx);
     // invoke transformation event
     executeOnNPCTransformIdx((int)*pNpcIdx, 91, NPC_TFCAUSE_CONTAINER);
 }
-const static int _transformSprouteJmpDestination = 0x9CCB46;
-_declspec(naked) void __stdcall runtimeHookNPCTransformSprout()
-{
-    __asm {
-        pushfd
-        push eax
-        push ebx
-        push ecx
-        push edx
-        push esi
-        push ecx // pointer to npc index
-        call runtimeHookNPCTransformSprout_internal
-        pop esi
-        pop edx
-        pop ecx
-        pop ebx
-        pop eax
-        popfd
-
-        jmp _transformSprouteJmpDestination
-    }
-}
-
-
 
 void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, int newType)
 {
