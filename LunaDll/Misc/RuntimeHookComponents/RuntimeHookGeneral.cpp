@@ -1860,7 +1860,7 @@ void TrySkipPatch()
     PATCH(0xA0B38D).CALL(&runtimeHookNPCTransformHeldYoshiToEgg).NOP_PAD_TO_SIZE<34>().Apply(); // Yoshis to eggs when held
     PATCH(0xA45E0A).CALL(&runtimeHookNPCTransformBubblePopped).NOP_PAD_TO_SIZE<24>().Apply(); // Bubble popped, transformed to contents
     PATCH(0xA45954).CALL(&runtimeHookNPCTransformSMWSpinyEgg).NOP_PAD_TO_SIZE<28>().Apply(); // SMW spiny egg landed
-    PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell
+    PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell (modNpc.bas line 9465)
     PATCH(0xA5217F).JMP(&runtimeHookNPCTransformKoopalingUnshell).NOP_PAD_TO_SIZE<5>().Apply(); // Koopaling leave shell
     PATCH(0xA55500).CALL(&runtimeHookNPCTransformPotionToDoor).NOP_PAD_TO_SIZE<16>().Apply(); // Potion transform to door
     PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<11>().Apply(); // Galoomba unflipped

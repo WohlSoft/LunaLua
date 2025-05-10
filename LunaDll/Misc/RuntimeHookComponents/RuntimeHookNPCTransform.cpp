@@ -56,7 +56,7 @@ void executeOnNPCTransformIdx(int npcIdx, int oldID, NPCTransformationCause caus
 }
 // invoke the event using the NPCMOB* pointer
 // kind of ugly but it works
-void executeOnNPCTransformPtr(NPCMOB* npc, int oldID, NPCTransformationCause cause)
+void __stdcall  executeOnNPCTransformPtr(NPCMOB* npc, int oldID, NPCTransformationCause cause)
 {
     executeOnNPCTransformIdx(((int)(npc - (NPCMOB*)GM_NPCS_PTR) - 128), oldID, cause);
 }
@@ -312,24 +312,14 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSMWSpinyEgg()
 
 
 
-void __stdcall runtimeHookNPCTransformLudwigShell_internal(NPCMOB* npc)
-{
-    executeOnNPCTransformPtr(npc, 280, NPC_TFCAUSE_AI);
-}
-const static int _transformLudwigShellJmpDestination = 0xA5211F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
+        push NPC_TFCAUSE_AI // Transformation cause
+        push 280 // Old ID
         push esi // NPC ptr
-        call runtimeHookNPCTransformLudwigShell_internal
-        pop esi
-        pop ecx
-        pop ebx
-
-        jmp _transformLudwigShellJmpDestination
+        push 0xA5211F // Return address
+        jmp executeOnNPCTransformPtr
     }
 }
 
