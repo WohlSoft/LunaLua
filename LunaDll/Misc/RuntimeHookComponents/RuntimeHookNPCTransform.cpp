@@ -175,22 +175,12 @@ void __stdcall runtimeHookNPCTransformCoinToRupee_internal(int npcIdx)
     // invoke transformation event
     executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
-const static int _transformCoinToRupeeJmpDestination = 0xA61335;
 _declspec(naked) void __stdcall runtimeHookNPCTransformCoinToRupee()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC IDX
-        call runtimeHookNPCTransformCoinToRupee_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformCoinToRupeeJmpDestination
+        push 0xA615F5 // Return address
+        jmp runtimeHookNPCTransformCoinToRupee_internal
     }
 }
 
