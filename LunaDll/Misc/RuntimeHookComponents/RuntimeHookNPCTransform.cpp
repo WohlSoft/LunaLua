@@ -369,19 +369,12 @@ void __stdcall runtimeHookNPCTransformGaloombaUnflip_internal(NPCMOB* npc)
     // invoke transformation event
     executeOnNPCTransformPtr(npc, 166, NPC_TFCAUSE_AI);
 }
-const static int _transformGaloombaUnflipJmpDestination = 0xA5C14E;
 _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformGaloombaUnflip_internal
-        pop esi
-        pop ecx
-        pop ebx
-        jmp _transformGaloombaUnflipJmpDestination
+        push 0xA5C14E // Return address
+        jmp runtimeHookNPCTransformGaloombaUnflip_internal
     }
 }
 

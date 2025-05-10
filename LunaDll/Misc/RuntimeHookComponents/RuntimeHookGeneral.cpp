@@ -1863,7 +1863,7 @@ void TrySkipPatch()
     PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell (modNpc.bas line 9465)
     PATCH(0xA5217F).JMP(&runtimeHookNPCTransformKoopalingUnshell).NOP_PAD_TO_SIZE<5>().Apply(); // Koopaling leave shell
     PATCH(0xA55500).CALL(&runtimeHookNPCTransformPotionToDoor).NOP_PAD_TO_SIZE<16>().Apply(); // Potion transform to door
-    PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<11>().Apply(); // Galoomba unflipped
+    PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<17>().Apply(); // Galoomba unflipped
     PATCH(0x9E3632).CALL(&runtimeHookNPCTransformPSwitchResetRupeeCoins).NOP_PAD_TO_SIZE<8>().Apply(); // When pressing a p switch, rupees transformed by link are turned back into coins
     PATCH(0xA19B1E).CALL(&runtimeHookNPCTransformSMWKoopaEnterShell).NOP_PAD_TO_SIZE<8>().Apply(); // SMW koopa entering shell, overwrites a bounds check
     PATCH(0x9BE698).CALL(&runtimeHookNPCTransformYoshiEatRandomVeggie).NOP_PAD_TO_SIZE<7>().Apply(); // Incredibly niche code path for Yoshi eating a randomized veggie
