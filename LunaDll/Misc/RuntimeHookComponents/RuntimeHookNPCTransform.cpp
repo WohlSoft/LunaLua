@@ -143,22 +143,12 @@ void __stdcall runtimeHookNPCTransformMushToHeart_internal(int npcIdx)
     // invoke transformation event
     executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
-const static int _transformMushToHeartJmpDestination = 0xA615F5;
 _declspec(naked) void __stdcall runtimeHookNPCTransformMushToHeart()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC IDX
-        call runtimeHookNPCTransformMushToHeart_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformMushToHeartJmpDestination
+        push 0xA615F5 // Return address
+        jmp runtimeHookNPCTransformMushToHeart_internal
     }
 }
 
