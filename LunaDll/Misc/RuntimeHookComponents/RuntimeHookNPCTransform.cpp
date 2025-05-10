@@ -105,7 +105,7 @@ void __stdcall runtimeHookNPCTransformSprout(short* pNpcIdx)
     executeOnNPCTransformIdx((int)*pNpcIdx, 91, NPC_TFCAUSE_CONTAINER);
 }
 
-void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, int newType)
+void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, short newType)
 {
     // replicate the basegame code that this hook overwrites
     npc->id = newType;
@@ -115,22 +115,12 @@ const static int _transformRandomBonusJmpDestination = 0xA4555F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformRandomBonus()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push edx
-        push esi
         push eax // new NPC type
         push esi // address of the NPC in memory
         call runtimeHookNPCTransformRandomBonus_internal
-        pop esi
-        pop edx
-        pop ecx
-        pop ebx
-        popfd
 
         lea ecx, dword ptr ss : [ebp - 0x1EC] // instruction overwritten by this code
-        jmp _transformRandomBonusJmpDestination
+        ret
     }
 }
 
