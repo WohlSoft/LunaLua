@@ -11,11 +11,22 @@
 template<void* TARGETADDR>
 _declspec(naked) static void __stdcall RETADDR_TRACE_HOOK_IMPL(void)
 {
+#ifdef __clang__
+    __asm__ volatile (
+        ".intel_syntax noprefix\n"
+        "push dword ptr [ds : esp]\n"
+        "jmp %c[thisPtr]"
+        ".att_syntax\n"
+        :
+        : [thisPtr] "i" (TARGETADDR)
+    );
+#else
     static const void* thisPtr = TARGETADDR;
     __asm {
         PUSH DWORD PTR DS : [esp]
         JMP thisPtr
     }
+#endif
 }
 
 template<void* TARGETADDR>
