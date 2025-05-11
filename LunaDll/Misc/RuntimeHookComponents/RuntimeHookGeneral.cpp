@@ -1852,18 +1852,18 @@ void TrySkipPatch()
 
     // Hooks for onNPCTransform support
     PATCH(0xA0ACBC).JMP(&runtimeHookNPCTransformRandomVeggie).NOP().NOP().Apply(); // When the randomized veggie spawns
-    PATCH(0x9CCB40).JMP(&runtimeHookNPCTransformSprout).NOP_PAD_TO_SIZE<6>().Apply(); // When pulling a sprout from the ground
-    PATCH(0xA45556).JMP(&runtimeHookNPCTransformRandomBonus).NOP_PAD_TO_SIZE<9>().Apply(); // Random powerup NPC
+    PATCH(0x9CCB41).CALL(&runtimeHookNPCTransformSprout).Apply(); // When pulling a sprout from the ground
+    PATCH(0xA45556).CALL(&runtimeHookNPCTransformRandomBonus).bytes(0x0F, 0x1F, 0x40, 0x00 /* nop */).Apply(); // Random powerup NPC
     PATCH(0xA6133A).JMP(&runtimeHookNPCTransformMushToHeart).NOP_PAD_TO_SIZE<10>().Apply(); // Link mushrooms to hearts
     PATCH(0xA6101C).JMP(&runtimeHookNPCTransformCoinToRupee).NOP_PAD_TO_SIZE<10>().Apply(); // Link coins to rupees
     PATCH(0xA0B719).JMP(&runtimeHookNPCTransformSnifitBulletToSMB2Coin).NOP_PAD_TO_SIZE<6>().Apply(); // Snifit bulllet to coin when held
     PATCH(0xA0B38D).CALL(&runtimeHookNPCTransformHeldYoshiToEgg).NOP_PAD_TO_SIZE<34>().Apply(); // Yoshis to eggs when held
     PATCH(0xA45E0A).CALL(&runtimeHookNPCTransformBubblePopped).NOP_PAD_TO_SIZE<24>().Apply(); // Bubble popped, transformed to contents
     PATCH(0xA45954).CALL(&runtimeHookNPCTransformSMWSpinyEgg).NOP_PAD_TO_SIZE<28>().Apply(); // SMW spiny egg landed
-    PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell
-    PATCH(0xA5217F).JMP(&runtimeHookNPCTransformKoopalingUnshell).NOP_PAD_TO_SIZE<5>().Apply(); // Koopaling leave shell
+    PATCH(0xA483C3).JMP(&runtimeHookNPCTransformLudwigShell).NOP_PAD_TO_SIZE<5>().Apply(); // Ludwig enter shell (modNpc.bas line 9465)
+    PATCH(0xA5205C).JMP(&runtimeHookNPCTransformKoopalingUnshell).NOP_PAD_TO_SIZE<6>().Apply(); // Koopaling leave shell (modNpc.bas line 9253)
     PATCH(0xA55500).CALL(&runtimeHookNPCTransformPotionToDoor).NOP_PAD_TO_SIZE<16>().Apply(); // Potion transform to door
-    PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<11>().Apply(); // Galoomba unflipped
+    PATCH(0xA5B77E).JMP(&runtimeHookNPCTransformGaloombaUnflip).NOP_PAD_TO_SIZE<17>().Apply(); // Galoomba unflipped
     PATCH(0x9E3632).CALL(&runtimeHookNPCTransformPSwitchResetRupeeCoins).NOP_PAD_TO_SIZE<8>().Apply(); // When pressing a p switch, rupees transformed by link are turned back into coins
     PATCH(0xA19B1E).CALL(&runtimeHookNPCTransformSMWKoopaEnterShell).NOP_PAD_TO_SIZE<8>().Apply(); // SMW koopa entering shell, overwrites a bounds check
     PATCH(0x9BE698).CALL(&runtimeHookNPCTransformYoshiEatRandomVeggie).NOP_PAD_TO_SIZE<7>().Apply(); // Incredibly niche code path for Yoshi eating a randomized veggie

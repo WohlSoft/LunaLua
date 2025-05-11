@@ -56,7 +56,7 @@ void executeOnNPCTransformIdx(int npcIdx, int oldID, NPCTransformationCause caus
 }
 // invoke the event using the NPCMOB* pointer
 // kind of ugly but it works
-void executeOnNPCTransformPtr(NPCMOB* npc, int oldID, NPCTransformationCause cause)
+void __stdcall  executeOnNPCTransformPtr(NPCMOB* npc, int oldID, NPCTransformationCause cause)
 {
     executeOnNPCTransformIdx(((int)(npc - (NPCMOB*)GM_NPCS_PTR) - 128), oldID, cause);
 }
@@ -97,39 +97,15 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformRandomVeggie()
     }
 }
 
-void __stdcall runtimeHookNPCTransformSprout_internal(short* pNpcIdx)
+void __stdcall runtimeHookNPCTransformSprout(short* pNpcIdx)
 {
     // replicate the basegame code that this hook overwrites
     native_setNPCFrame(pNpcIdx);
     // invoke transformation event
     executeOnNPCTransformIdx((int)*pNpcIdx, 91, NPC_TFCAUSE_CONTAINER);
 }
-const static int _transformSprouteJmpDestination = 0x9CCB46;
-_declspec(naked) void __stdcall runtimeHookNPCTransformSprout()
-{
-    __asm {
-        pushfd
-        push eax
-        push ebx
-        push ecx
-        push edx
-        push esi
-        push ecx // pointer to npc index
-        call runtimeHookNPCTransformSprout_internal
-        pop esi
-        pop edx
-        pop ecx
-        pop ebx
-        pop eax
-        popfd
 
-        jmp _transformSprouteJmpDestination
-    }
-}
-
-
-
-void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, int newType)
+void __stdcall runtimeHookNPCTransformRandomBonus_internal(NPCMOB* npc, short newType)
 {
     // replicate the basegame code that this hook overwrites
     npc->id = newType;
@@ -139,22 +115,12 @@ const static int _transformRandomBonusJmpDestination = 0xA4555F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformRandomBonus()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push edx
-        push esi
         push eax // new NPC type
         push esi // address of the NPC in memory
         call runtimeHookNPCTransformRandomBonus_internal
-        pop esi
-        pop edx
-        pop ecx
-        pop ebx
-        popfd
 
         lea ecx, dword ptr ss : [ebp - 0x1EC] // instruction overwritten by this code
-        jmp _transformRandomBonusJmpDestination
+        ret
     }
 }
 
@@ -177,22 +143,12 @@ void __stdcall runtimeHookNPCTransformMushToHeart_internal(int npcIdx)
     // invoke transformation event
     executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
-const static int _transformMushToHeartJmpDestination = 0xA615F5;
 _declspec(naked) void __stdcall runtimeHookNPCTransformMushToHeart()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC IDX
-        call runtimeHookNPCTransformMushToHeart_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformMushToHeartJmpDestination
+        push 0xA615F5 // Return address
+        jmp runtimeHookNPCTransformMushToHeart_internal
     }
 }
 
@@ -219,22 +175,12 @@ void __stdcall runtimeHookNPCTransformCoinToRupee_internal(int npcIdx)
     // invoke transformation event
     executeOnNPCTransformIdx(npcIdx + 1, oldID, NPC_TFCAUSE_LINK);
 }
-const static int _transformCoinToRupeeJmpDestination = 0xA61335;
 _declspec(naked) void __stdcall runtimeHookNPCTransformCoinToRupee()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC IDX
-        call runtimeHookNPCTransformCoinToRupee_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformCoinToRupeeJmpDestination
+        push 0xA615F5 // Return address
+        jmp runtimeHookNPCTransformCoinToRupee_internal
     }
 }
 
@@ -252,22 +198,12 @@ void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal(NPCMOB* np
     npc->momentum.y -= npc->momentum.height / 2;
     executeOnNPCTransformPtr(npc, 133, NPC_TFCAUSE_AI);
 }
-const static int _transformSnifitBulletToSMB2CoinJmpDestination = 0xA0B875;
 _declspec(naked) void __stdcall runtimeHookNPCTransformSnifitBulletToSMB2Coin()
 {
     __asm {
-        pushfd
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal
-        pop esi
-        pop ecx
-        pop ebx
-        popfd
-
-        jmp _transformSnifitBulletToSMB2CoinJmpDestination
+        push 0xA0B875 // Return address
+        jmp runtimeHookNPCTransformSnifitBulletToSMB2Coin_internal
     }
 }
 
@@ -346,24 +282,14 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformSMWSpinyEgg()
 
 
 
-void __stdcall runtimeHookNPCTransformLudwigShell_internal(NPCMOB* npc)
-{
-    executeOnNPCTransformPtr(npc, 280, NPC_TFCAUSE_AI);
-}
-const static int _transformLudwigShellJmpDestination = 0xA5211F;
 _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
+        push NPC_TFCAUSE_AI // Transformation cause
+        push 280 // Old ID
         push esi // NPC ptr
-        call runtimeHookNPCTransformLudwigShell_internal
-        pop esi
-        pop ecx
-        pop ebx
-
-        jmp _transformLudwigShellJmpDestination
+        push 0xA5211F // Return address
+        jmp executeOnNPCTransformPtr
     }
 }
 
@@ -371,22 +297,24 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
 
 void __stdcall runtimeHookNPCTransformKoopalingUnshell_internal(NPCMOB* npc)
 {
-    executeOnNPCTransformPtr(npc, npc->id + 1, NPC_TFCAUSE_AI);
+    short oldId = npc->id;
+
+    // replicate the basegame code that this hook overwrites
+    npc->momentum.x += npc->momentum.width / 2;
+    npc->momentum.y += npc->momentum.height;
+    npc->id--;
+    npc->momentum.width = npc_width[npc->id];
+    npc->momentum.height = npc_height[npc->id];
+    npc->momentum.x -= npc->momentum.width / 2;
+    npc->momentum.y -= npc->momentum.height;
+    executeOnNPCTransformPtr(npc, oldId, NPC_TFCAUSE_AI);
 }
-const static int _transformKoopalingUnshellJmpDestination = 0xA52B74;
 _declspec(naked) void __stdcall runtimeHookNPCTransformKoopalingUnshell()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformKoopalingUnshell_internal
-        pop esi
-        pop ecx
-        pop ebx
-
-        jmp _transformKoopalingUnshellJmpDestination
+        push 0xA52179 // Return address
+        jmp runtimeHookNPCTransformKoopalingUnshell_internal
     }
 }
 
@@ -421,19 +349,12 @@ void __stdcall runtimeHookNPCTransformGaloombaUnflip_internal(NPCMOB* npc)
     // invoke transformation event
     executeOnNPCTransformPtr(npc, 166, NPC_TFCAUSE_AI);
 }
-const static int _transformGaloombaUnflipJmpDestination = 0xA5C14E;
 _declspec(naked) void __stdcall runtimeHookNPCTransformGaloombaUnflip()
 {
     __asm {
-        push ebx
-        push ecx
-        push esi
         push esi // NPC ptr
-        call runtimeHookNPCTransformGaloombaUnflip_internal
-        pop esi
-        pop ecx
-        pop ebx
-        jmp _transformGaloombaUnflipJmpDestination
+        push 0xA5C14E // Return address
+        jmp runtimeHookNPCTransformGaloombaUnflip_internal
     }
 }
 
