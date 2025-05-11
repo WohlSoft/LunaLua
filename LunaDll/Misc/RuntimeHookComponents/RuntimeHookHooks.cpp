@@ -4048,6 +4048,78 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
     }
 }
 
+static void __stdcall runtimeHookWalkPastNPCsInternal(int npcAIdx, int npcBIdx)
+{
+    // C++ side reimplementation of the original turning code
+    NPCMOB* npcA = NPC::GetRaw(npcAIdx);
+    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
+
+    int16_t walkPastA = NPC::GetWalkPastNPCs(npcA->id);
+    int16_t walkPastB = NPC::GetWalkPastNPCs(npcB->id);
+
+    // walkpastnpcs value of 2; ignore the bump entirely
+    if (walkPastA == 2 || walkPastB == 2)
+    {
+        return;
+    }
+
+
+    npcA->npcCollisionFlag = -1;
+
+    if (npcA->directionFaced == npcB->directionFaced)
+    {
+        // In cases where the directions of both NPCs matches, only the one with the lower speed should turn around
+        double relativeSpeedA = npcA->momentum.speedX * npcA->directionFaced;
+        double relativeSpeedB = npcB->momentum.speedX * npcB->directionFaced;
+
+        if (relativeSpeedA > relativeSpeedB)
+        {
+            if (walkPastA == 0)
+                npcA->bounceOffBlock = -1;
+        }
+        else if (relativeSpeedA < relativeSpeedB)
+        {
+            if (walkPastB == 0)
+                npcB->bounceOffBlock = -1;
+        }
+        else
+        {
+            npcA->bounceOffBlock = -1;
+            npcB->bounceOffBlock = -1;
+        }
+    }
+    else
+    {
+        // If the directions don't match, both should turn around
+        if (walkPastA == 0)
+            npcA->bounceOffBlock = -1;
+
+        if (walkPastB == 0)
+            npcB->bounceOffBlock = -1;
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookWalkPastNPCs(void)
+{
+    // 00A1B801 | 66:81BE E2000000 B300    | cmp word ptr ds:[esi+E2],B3             |
+    // https://github.com/smbx/smbx-legacy-source/blob/master/modNPC.bas#L2475
+
+    __asm {
+        push esi
+
+        mov eax, dword ptr ss:[ebp-0x188]   // npcBIdx
+        push eax
+        movsx eax, word ptr ss:[ebp-0x180]   // npcAIdx
+        push eax
+
+        call runtimeHookWalkPastNPCsInternal
+
+        pop esi
+        push 0xA1BAD5
+        ret
+    }
+}
+
 static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerIdx, int blockIdx, int oldSlope)
 {
     PlayerMOB* player = Player::Get(playerIdx);

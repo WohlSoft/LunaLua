@@ -2137,6 +2137,9 @@ void TrySkipPatch()
     // Patch to handle collisionGroup for NPC-to-NPC interactions, and harmlessthrown flag
     PATCH(0xA181AD).JMP(runtimeHookNPCCollisionGroup).NOP_PAD_TO_SIZE<6>().Apply();
 
+    // Patch to handle walkpastnpcs config for NPCs
+    PATCH(0xA1B801).JMP(runtimeHookWalkPastNPCs).NOP_PAD_TO_SIZE<724>().Apply();
+
     // Replace pause button detection code to avoid re-triggering when held
     PATCH(0x8CA405).JMP(runtimeHookLevelPauseCheck).NOP_PAD_TO_SIZE<6>().Apply();
 
