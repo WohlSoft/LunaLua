@@ -297,13 +297,23 @@ _declspec(naked) void __stdcall runtimeHookNPCTransformLudwigShell()
 
 void __stdcall runtimeHookNPCTransformKoopalingUnshell_internal(NPCMOB* npc)
 {
-    executeOnNPCTransformPtr(npc, npc->id + 1, NPC_TFCAUSE_AI);
+    short oldId = npc->id;
+
+    // replicate the basegame code that this hook overwrites
+    npc->momentum.x += npc->momentum.width / 2;
+    npc->momentum.y += npc->momentum.height;
+    npc->id--;
+    npc->momentum.width = npc_width[npc->id];
+    npc->momentum.height = npc_height[npc->id];
+    npc->momentum.x -= npc->momentum.width / 2;
+    npc->momentum.y -= npc->momentum.height;
+    executeOnNPCTransformPtr(npc, oldId, NPC_TFCAUSE_AI);
 }
 _declspec(naked) void __stdcall runtimeHookNPCTransformKoopalingUnshell()
 {
     __asm {
         push esi // NPC ptr
-        push 0xA52B74 // Return address
+        push 0xA52179 // Return address
         jmp runtimeHookNPCTransformKoopalingUnshell_internal
     }
 }
