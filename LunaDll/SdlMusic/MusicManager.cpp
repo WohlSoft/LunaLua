@@ -28,10 +28,10 @@ ChunkEntry::~ChunkEntry()
 
 void ChunkEntry::setPath(std::string path)
 {
-    if(fullPath!=path)
+    if(fullPath != path)
     {
-        needReload=true;
-        fullPath=path;
+        needReload = true;
+        fullPath = path;
     }
 }
 
@@ -88,8 +88,10 @@ void MusicEntry::play()
     PGE_MusPlayer::MUS_playMusic();
 }
 
+int MusicManager::max_soundeffect_count = 0;
 
-ChunkEntry MusicManager::sounds[91];
+ChunkEntry* MusicManager::sounds = NULL;
+
 MusicEntry MusicManager::music_lvl[57];
 MusicEntry MusicManager::music_wld[16];
 MusicEntry MusicManager::music_spc[4];
@@ -109,10 +111,12 @@ void MusicManager::initAudioEngine()
     PGE_SDL_Manager::initSDL();
     if(firstRun)
     {
+        initArraysSound();
         initArrays();
+        resizeSoundArrays(MusicManager::defaultSoundCount);
         defaultSndINI=PGE_SDL_Manager::appPath+"sounds.ini";
         defaultMusINI=PGE_SDL_Manager::appPath+"music.ini";
-        loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
+        loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\", true);
         loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
         rebuildSoundCache();
     }
@@ -129,7 +133,7 @@ void MusicManager::rebuildSoundCache()
     int countOfFailedSounds = 0;
     constexpr static int MaxFailedSoundToDisplay = 15;
 
-    for(int i=0; i<91; i++)
+    for(int i=0; i<max_soundeffect_count; i++)
     {
         if(sounds[i].channel != -1)
         {
@@ -236,7 +240,7 @@ void MusicManager::play(std::string alias) //Chunk will be played once, stream w
         std::string chanIDs = alias.substr(5);
         int chanID = std::atoi(chanIDs.c_str()) - 1;
         //Detect out-of-bounds chanID
-        if((chanID >= 0)&&(chanID <91))
+        if((chanID >= 0)&&(chanID <max_soundeffect_count))
         {
             if(!PGE_Sounds::playOverrideForAlias(alias, sounds[chanID].channel))
             {
@@ -296,7 +300,7 @@ void MusicManager::stop(std::string alias)
         std::string chanIDs = alias.substr(5);
         int chanID = std::atoi(chanIDs.c_str()) - 1;
         //Detect out-of-bounds chanID
-        if((chanID < 0) || (chanID >= 91))
+        if((chanID < 0) || (chanID >= max_soundeffect_count))
         {
             chanID = 0;
         } else {
@@ -347,7 +351,7 @@ std::string MusicManager::position()
     return t;
 }
 
-void MusicManager::loadSounds(std::string path, std::string root)
+void MusicManager::loadSounds(std::string path, std::string root, bool is_first_run)
 {
     if(!file_existsX(path))
         return;
@@ -360,7 +364,24 @@ void MusicManager::loadSounds(std::string path, std::string root)
     }
 
     curRoot = root;
-    for(int i = 0; i < 91; i++)
+
+    gSoundEffectCount = 0;
+
+    //ONLY if this is the first time loading sound effects (loading from basegame sounds ini),
+    //Handle changing max sound count
+    if (is_first_run)
+    {
+        //Read total count of sound effects
+        int new_max_sound_id = MusicManager::defaultSoundCount;
+        if (soundsList.beginGroup("sound-main"))
+        {
+            //Read new max values from ini, if defined
+            soundsList.read("total", new_max_sound_id, new_max_sound_id);
+        }
+        resizeSoundArrays(new_max_sound_id);
+    }
+
+    for(int i = 0; i < max_soundeffect_count; i++)
     {
         HandleEventsWhileLoading();
 
@@ -402,6 +423,7 @@ void MusicManager::loadSounds(std::string path, std::string root)
 
         if(file_existsX(root + fileName))
         {
+            gSoundEffectCount++;
             sounds[i].setPath(root + fileName.c_str());
             if(reserveChannel != 0)
                 sounds[i].channel = 0;
@@ -442,6 +464,10 @@ void MusicManager::loadMusics(std::string path, std::string root)
     curRoot = root;
     int i = 0;
 
+    gLevelMusicCount = 0;
+    gOverworldMusicCount = 0;
+    gSpecialMusicCount = 0;
+
     //World music
     for(int j = 1; (j <= 16) && (i < 74); i++, j++)
     {
@@ -462,6 +488,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName) ))
         {
+            gOverworldMusicCount++;
             music_wld[j-1].setPath(root + fileName);
         }
     }
@@ -486,6 +513,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
+            gSpecialMusicCount++;
             music_spc[j-1].setPath(root + fileName);
         }
     }
@@ -511,6 +539,7 @@ void MusicManager::loadMusics(std::string path, std::string root)
 
         if (file_existsX(root + clearTrackNumber(fileName)))
         {
+            gLevelMusicCount++;
             music_lvl[j-1].setPath(root + fileName);
         }
     }
@@ -519,10 +548,11 @@ void MusicManager::loadMusics(std::string path, std::string root)
 void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCustomPath)
 {
     initArrays();
-    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\");
-    loadSounds(episodePath+"\\sounds.ini", episodePath);
+    initArraysSound();
+    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath + "sound\\", false);
+    loadSounds(episodePath+"\\sounds.ini", episodePath, false);
     if(!levelCustomPath.empty())
-        loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath);
+        loadSounds(levelCustomPath+"\\sounds.ini", levelCustomPath, false);
     loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
     loadMusics(episodePath+"\\music.ini", episodePath);
     if(!levelCustomPath.empty())
@@ -534,21 +564,46 @@ void MusicManager::loadCustomSounds(std::string episodePath, std::string levelCu
 void MusicManager::resetSoundsToDefault()
 {
     initArrays();
-    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath);
+    initArraysSound();
+    loadSounds(defaultSndINI, PGE_SDL_Manager::appPath, false);
     loadMusics(defaultMusINI, PGE_SDL_Manager::appPath);
     rebuildSoundCache();
 }
 
+void MusicManager::resizeSoundArrays(int new_max_sound_id) {
+    bool any_change = false;
+    if (new_max_sound_id != max_soundeffect_count)
+    {
+        //Free old sound effect array and create a new one
+        if (sounds != NULL)
+        {
+            delete[] sounds;
+        }
+        max_soundeffect_count = new_max_sound_id;
+        sounds = new ChunkEntry[new_max_sound_id];
+    }
+    if (any_change)
+    {
+        //Force re-populate sound effects if the size of either array changed
+        initArraysSound();
+    }
+}
+
+void MusicManager::initArraysSound()
+{
+    curRoot = PGE_SDL_Manager::appPath;
+    for(int i = 0; i < max_soundeffect_count; i++)
+    {
+        sounds[i].id=i+1;
+        sounds[i].setPath(curRoot + defaultChunksList[i]);
+        sounds[i].channel = chunksChannelsList[i];
+        break;
+    }
+}
 
 void MusicManager::initArrays()
 {
     curRoot = PGE_SDL_Manager::appPath;
-    for(int i=0; i<91; i++)
-    {
-        sounds[i].id=i+1;
-        sounds[i].setPath(PGE_SDL_Manager::appPath+defaultChunksList[i]);
-        sounds[i].channel=chunksChannelsList[i];
-    }
     for(int i=0, j=0, k=MusicEntry::MUS_WORLD; i<74; i++, j++)
     {
         switch(k)
@@ -593,7 +648,7 @@ Mix_Chunk *MusicManager::getChunkForAlias(const std::string& alias)
         std::string chanIDs = alias.substr(5);
         int chanID = std::atoi(chanIDs.c_str()) - 1;
         //Detect out-of-bounds chanID
-        if((chanID >= 0)&&(chanID <91))
+        if((chanID >= 0)&&(chanID < max_soundeffect_count))
         {
             return sounds[chanID].chunk;
         }

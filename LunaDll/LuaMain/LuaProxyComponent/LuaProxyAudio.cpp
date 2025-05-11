@@ -9,6 +9,7 @@
 #include "../../SMBXInternal/PlayerMOB.h"
 #include "../../SMBXInternal/Level.h"
 #include "../../SMBXInternal/Sound.h"
+#include "../../Globals.h"
 
 #include <memory>
 #include <mutex>
@@ -339,6 +340,21 @@ void LuaProxy::Audio::musicFadeOut(int section, int fadeInDelayMs)
     changeMusic(section, 0, fadeInDelayMs);
 }
 
+static luabind::object musicCountInternal(lua_State *L)
+{
+    luabind::object outData = luabind::newtable(L);
+    outData["level"] = gLevelMusicCount;
+    outData["overworld"] = gOverworldMusicCount;
+    outData["special"] = gSpecialMusicCount;
+
+    return outData;
+}
+
+luabind::object LuaProxy::Audio::MusicCount(lua_State *L)
+{
+    return musicCountInternal(L);
+}
+
 
 Mix_Chunk* LuaProxy::Audio::newMix_Chunk()
 {
@@ -462,6 +478,11 @@ int LuaProxy::Audio::SfxIsPlaying(int channel)
 int LuaProxy::Audio::SfxIsPaused(int channel)
 {
     return Mix_Paused(channel);
+}
+
+int LuaProxy::Audio::SfxCount()
+{
+    return gSoundEffectCount;
 }
 
 
