@@ -3940,6 +3940,15 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
             if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
                 return 0;
+            
+            // Check noNPCInteraction
+            if (ext->nonpcinteraction || ownerExt->nonpcinteraction)
+                return 0; // Collision cancelled
+
+            NPCMOB* ownerNPC = NPC::GetRaw(npcIdx);
+
+            if (NPC::GetNoNPCInteraction(npc->id) || NPC::GetNoNPCInteraction(ownerNPC->id))
+                return 0; // Collision cancelled
         }
         else
         {
@@ -3982,27 +3991,30 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
     if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
         return 0; // Collision cancelled
 
+    NPCMOB* npcA = NPC::GetRaw(npcAIdx);
+    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
+
+    if (npcA == nullptr || npcB == nullptr)
+        return 0;
+
     // Check harmlessthrown flag
+    if (NPC::GetHarmlessThrown(npcA->id)) // If harmlessthrown is set
+        return 0; // Collision cancelled
 
-    NPCMOB* npc = NPC::GetRaw(npcAIdx);
-    if (npc != nullptr)
-    {
-        if (NPC::GetHarmlessThrown(npc->id)) // If harmlessthrown is set
-            return 0; // Collision cancelled
-    }
+    // Check noNPCInteraction config
+    if (NPC::GetNoNPCInteraction(npcA->id) || NPC::GetNoNPCInteraction(npcB->id))
+        return 0; // Collision cancelled
 
-    // Check collision group
-    
+    // Check noNPCInteraction field
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    if (extA->nonpcinteraction || extB->nonpcinteraction)
         return 0; // Collision cancelled
 
-    // Check noNPCCollision
-    if (extA->nonpccollision || extB->nonpccollision) {
+    // Check collision group
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
-    }
 
     return -1; // Collision goes ahead
 }
