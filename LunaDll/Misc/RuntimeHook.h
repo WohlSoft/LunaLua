@@ -615,6 +615,7 @@ void __stdcall runtimeHookPlayerPlayerInteraction(void);
 
 void __stdcall runtimeHookBlockNPCFilter(void);
 void __stdcall runtimeHookNPCCollisionGroup(void);
+void __stdcall runtimeHookWalkPastNPCs(void);
 
 void __stdcall runtimeHookLevelPauseCheck(void);
 

@@ -3940,6 +3940,15 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
 
             if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
                 return 0;
+            
+            // Check noNPCInteraction
+            if (ext->nonpcinteraction || ownerExt->nonpcinteraction)
+                return 0; // Collision cancelled
+
+            NPCMOB* ownerNPC = NPC::GetRaw(npcIdx);
+
+            if (NPC::GetNoNPCInteraction(npc->id) || NPC::GetNoNPCInteraction(ownerNPC->id))
+                return 0; // Collision cancelled
         }
         else
         {
@@ -3982,27 +3991,30 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
     if (npcAIdx == npcBIdx) // Don't collide if it's the same NPC - this is what the code we're replacing does!
         return 0; // Collision cancelled
 
+    NPCMOB* npcA = NPC::GetRaw(npcAIdx);
+    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
+
+    if (npcA == nullptr || npcB == nullptr)
+        return 0;
+
     // Check harmlessthrown flag
+    if (NPC::GetHarmlessThrown(npcA->id)) // If harmlessthrown is set
+        return 0; // Collision cancelled
 
-    NPCMOB* npc = NPC::GetRaw(npcAIdx);
-    if (npc != nullptr)
-    {
-        if (NPC::GetHarmlessThrown(npc->id)) // If harmlessthrown is set
-            return 0; // Collision cancelled
-    }
+    // Check noNPCInteraction config
+    if (NPC::GetNoNPCInteraction(npcA->id) || NPC::GetNoNPCInteraction(npcB->id))
+        return 0; // Collision cancelled
 
-    // Check collision group
-    
+    // Check noNPCInteraction field
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    if (extA->nonpcinteraction || extB->nonpcinteraction)
         return 0; // Collision cancelled
 
-    // Check noNPCCollision
-    if (extA->nonpccollision || extB->nonpccollision) {
+    // Check collision group
+    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
-    }
 
     return -1; // Collision goes ahead
 }
@@ -4031,6 +4043,78 @@ __declspec(naked) void __stdcall runtimeHookNPCCollisionGroup(void)
         pop edx
         pop ecx
         pop eax
+        push 0xA1BAD5
+        ret
+    }
+}
+
+static void __stdcall runtimeHookWalkPastNPCsInternal(int npcAIdx, int npcBIdx)
+{
+    // C++ side reimplementation of the original turning code
+    NPCMOB* npcA = NPC::GetRaw(npcAIdx);
+    NPCMOB* npcB = NPC::GetRaw(npcBIdx);
+
+    int16_t walkPastA = NPC::GetWalkPastNPCs(npcA->id);
+    int16_t walkPastB = NPC::GetWalkPastNPCs(npcB->id);
+
+    // walkpastnpcs value of 2; ignore the bump entirely
+    if (walkPastA == 2 || walkPastB == 2)
+    {
+        return;
+    }
+
+
+    npcA->npcCollisionFlag = -1;
+
+    if (npcA->directionFaced == npcB->directionFaced)
+    {
+        // In cases where the directions of both NPCs matches, only the one with the lower speed should turn around
+        double relativeSpeedA = npcA->momentum.speedX * npcA->directionFaced;
+        double relativeSpeedB = npcB->momentum.speedX * npcB->directionFaced;
+
+        if (relativeSpeedA > relativeSpeedB)
+        {
+            if (walkPastA == 0)
+                npcA->bounceOffBlock = -1;
+        }
+        else if (relativeSpeedA < relativeSpeedB)
+        {
+            if (walkPastB == 0)
+                npcB->bounceOffBlock = -1;
+        }
+        else
+        {
+            npcA->bounceOffBlock = -1;
+            npcB->bounceOffBlock = -1;
+        }
+    }
+    else
+    {
+        // If the directions don't match, both should turn around
+        if (walkPastA == 0)
+            npcA->bounceOffBlock = -1;
+
+        if (walkPastB == 0)
+            npcB->bounceOffBlock = -1;
+    }
+}
+
+__declspec(naked) void __stdcall runtimeHookWalkPastNPCs(void)
+{
+    // 00A1B801 | 66:81BE E2000000 B300    | cmp word ptr ds:[esi+E2],B3             |
+    // https://github.com/smbx/smbx-legacy-source/blob/master/modNPC.bas#L2475
+
+    __asm {
+        push esi
+
+        mov eax, dword ptr ss:[ebp-0x188]   // npcBIdx
+        push eax
+        movsx eax, word ptr ss:[ebp-0x180]   // npcAIdx
+        push eax
+
+        call runtimeHookWalkPastNPCsInternal
+
+        pop esi
         push 0xA1BAD5
         ret
     }

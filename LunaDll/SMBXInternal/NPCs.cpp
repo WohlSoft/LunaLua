@@ -273,6 +273,8 @@ static int16_t npcprop_noshieldfireeffect[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_notcointransformable[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_staticdirection[NPC::MAX_ID + 1] = { 0 };
 static int16_t npcprop_luahandlesspeed[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_nonpcinteraction[NPC::MAX_ID + 1] = { 0 };
+static int16_t npcprop_walkpastnpcs[NPC::MAX_ID + 1] = { 0 };
 static double npcprop_terminalvelocity[NPC::MAX_ID + 1] = { 0 };
 
 // Other NPC-related config data, not by ID
@@ -293,6 +295,8 @@ void NPC::InitProperties() {
         npcprop_notcointransformable[i] = 0;
         npcprop_staticdirection[i] = 0;
         npcprop_luahandlesspeed[i] = 0;
+        npcprop_nonpcinteraction[i] = 0;
+        npcprop_walkpastnpcs[i] = 0;
         npcprop_terminalvelocity[i] = 0;
     }
 
@@ -500,6 +504,12 @@ void NPC::InitProperties() {
     npcprop_staticdirection[181] = -1;
     npcprop_staticdirection[212] = -1;
 
+    // Default walkpastnpcs values
+    npcprop_walkpastnpcs[13] = 1;
+    npcprop_walkpastnpcs[17] = 1;
+    npcprop_walkpastnpcs[265] = 1;
+    npcprop_walkpastnpcs[179] = 2;
+
     // Default terminal velocity values
     npcprop_terminalvelocity[259] = -1;
     npcprop_terminalvelocity[260] = -1;
@@ -564,6 +574,16 @@ bool NPC::GetLuaHandlesSpeed(int id) {
     return (npcprop_luahandlesspeed[id] != 0);
 }
 
+bool NPC::GetNoNPCInteraction(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return false;
+    return (npcprop_nonpcinteraction[id] != 0);
+}
+
+int16_t NPC::GetWalkPastNPCs(int id) {
+    if ((id < 1) || (id > NPC::MAX_ID)) return 0;
+    return npcprop_walkpastnpcs[id];
+}
+
 double NPC::GetTerminalVelocity(int id) {
     if ((id < 1) || (id > NPC::MAX_ID) || (npcprop_terminalvelocity[id] == 0))
     {
@@ -621,6 +641,12 @@ uintptr_t NPC::GetPropertyTableAddress(const std::string& s)
     else if (s == "luahandlesspeed")
     {
         return reinterpret_cast<uintptr_t>(npcprop_luahandlesspeed);
+    }
+    else if (s == "nonpcinteraction") {
+        return reinterpret_cast<uintptr_t>(npcprop_nonpcinteraction);
+    }
+    else if (s == "walkpastnpcs") {
+        return reinterpret_cast<uintptr_t>(npcprop_walkpastnpcs);
     }
     else if (s == "terminalvelocity")
     {
