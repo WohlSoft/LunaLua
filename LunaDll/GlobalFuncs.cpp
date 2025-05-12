@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <fstream>
 #include <mutex>
+#include <cstddef>
 
 #include "Misc/MiscFuncs.h"
 #include "Input/Input.h"
@@ -26,7 +27,12 @@
 #include "SMBXInternal/Blocks.h"
 #include "SMBXInternal/NPCs.h"
 #include "Misc/RuntimeHook.h"
+#include "Defines.h"
 #include "Misc/LoadScreen.h"
+
+#include "SMBXInternal/Types.h"
+#include "SMBXInternal/Variables.h"
+#include "SMBXInternal/Functions.h"
 
 void splitStr(std::vector<std::string>& dest, const std::string& str, const char* separator)
 {
@@ -674,7 +680,6 @@ std::string resolveIfNotAbsolutePath(std::string filename) {
     return filename;
 }
 
-
 std::string generateTimestamp(std::string format)
 {
     std::time_t t = std::time(NULL);
@@ -798,6 +803,8 @@ std::wstring getCustomFolderPath()
     }
     return full_path;
 }
+
+
 
 std::wstring getLatestFile(const std::initializer_list<std::wstring>& paths)
 {
@@ -1041,6 +1048,7 @@ std::string GetEditorPlacedItem()
     return (std::string)gEditorPlacedItem;
 }
 
+
 namespace LunaMsgBox
 {
     static thread_local volatile uintptr_t s_activeCount = 0;
@@ -1064,5 +1072,150 @@ namespace LunaMsgBox
     bool IsActive()
     {
         return (s_activeCount != 0);
+    }
+}
+
+
+
+
+std::string splitPathFromFilename(std::string str)
+{
+    std::string finalStr = str.substr(str.find_last_of("/\\") + 1);
+    return finalStr;
+}
+
+std::string splitFilenameFromPath(std::string str)
+{
+    std::string finalStr = str.substr(0, str.find_last_of("/\\"));
+    return finalStr;
+}
+
+std::string replaceFowardSlashesWithBackSlashes(std::string str)
+{
+    replaceSubStr(str, "/", "\\");
+    return str;
+}
+
+bool checkIfWorldIsInAppPath(std::string worldPath)
+{
+    if(!worldPath.find(gAppPathUTF8))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool checkIfWorldIsInWorldPath(std::string worldPath)
+{
+    std::string appPath = gAppPathUTF8 + "\\worlds";
+    if(!worldPath.find(appPath))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int findEpisodeIDFromWorldFileAndPath(std::string worldName)
+{
+    using namespace SMBX13;
+
+    int id = 0;
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(worldName == std::string(ep.WorldPath) + std::string(ep.WorldFile))
+        {
+            id = i + 1;
+            break;
+        }
+    }
+    return id;
+}
+
+std::string findEpisodeWorldPathFromName(std::string name)
+{
+    using namespace SMBX13;
+
+    std::string finalWldPath = "";
+
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(name == std::string(ep.WorldName))
+        {
+            finalWldPath = std::string(ep.WorldPath) + std::string(ep.WorldFile);
+            break;
+        }
+        else
+        {
+            finalWldPath = "";
+        }
+    }
+    return finalWldPath;
+}
+
+std::string findNameFromEpisodeWorldPath(std::string wldPath)
+{
+    using namespace SMBX13;
+
+    std::string finalName = "";
+
+    for (int i = 0; i <= Vars::NumSelectWorld; i++)
+    {
+        auto& ep = Vars::SelectWorld[i + 1];
+        if(wldPath == std::string(ep.WorldPath) + std::string(ep.WorldFile))
+        {
+            finalName = std::string(ep.WorldName);
+            break;
+        }
+        else
+        {
+            finalName = "";
+        }
+    }
+    return finalName;
+}
+
+int getUnblockedCharacterFromWorld(int curWorldID)
+{
+    using namespace SMBX13;
+
+    int identity = 1;
+
+    auto& ep = Vars::SelectWorld[curWorldID];
+
+    for (int i = 1; i <= 5; i++)
+    {
+        if(!ep.blockChar[i])
+        {
+            identity = i;
+            break;
+        }
+    }
+    return identity;
+}
+
+
+
+void checkBlockedCharacterFromWorldAndReplaceCharacterIfSo(int playerID)
+{
+    using namespace SMBX13;
+
+    for (int i = 1; i <= 5; i++)
+    {
+        auto& p = Vars::Player[playerID];
+        auto& ep = Vars::SelectWorld[Vars::selWorld];
+
+        if(ep.blockChar[i] && p.Character == i)
+        {
+            // if Player 1's character that was specified is blocked from the new episode, use the first character that isn't blocked
+            p.Character = getUnblockedCharacterFromWorld(Vars::selWorld);
+        }
     }
 }

@@ -187,6 +187,7 @@ GameAutostart GameAutostart::createGameAutostartByIniConfig(IniProcessing &reade
     autostarter.selectedWldPath = L"";
     autostarter.selectedEpisode = reader.value("episode-name", "").toString();
     autostarter.singleplayer    = reader.value("singleplayer", true).toBool();
+    autostarter.playerCount     = reader.value("players", 1).toInt();
     autostarter.firstCharacter  = static_cast<Characters>(reader.value("character-player1", 1).toInt());
     autostarter.secondCharacter = static_cast<Characters>(reader.value("character-player2", 2).toInt());
     autostarter.saveSlot        = reader.value("save-slot", 1).toInt();
@@ -200,9 +201,23 @@ GameAutostart GameAutostart::createGameAutostartByStartupEpisodeSettings(const S
     autostarter.selectedWldPath = settings.wldPath;
     autostarter.selectedEpisode = "";
     autostarter.singleplayer = (settings.players == 1);
+    autostarter.playerCount = settings.players;
     autostarter.firstCharacter = static_cast<Characters>(settings.character1);
     autostarter.secondCharacter = static_cast<Characters>(settings.character2);
     autostarter.saveSlot = settings.saveSlot;
+    return autostarter;
+}
+
+GameAutostart GameAutostart::createGameAutostartByManualSettings(std::wstring wldPath, int players, int character1, int character2, int saveSlot)
+{
+    GameAutostart autostarter;
+    autostarter.selectedWldPath = wldPath;
+    autostarter.selectedEpisode = "";
+    autostarter.singleplayer = (players == 1);
+    autostarter.playerCount = players;
+    autostarter.firstCharacter = static_cast<Characters>(character1);
+    autostarter.secondCharacter = static_cast<Characters>(character2);
+    autostarter.saveSlot = saveSlot;
     return autostarter;
 }
 

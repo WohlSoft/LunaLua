@@ -2,6 +2,8 @@
 #include "../../../Defines.h"
 #include "../../../GlobalFuncs.h"
 
+#include "../../../SMBXInternal/Reconstructed/EpisodeMain.h"
+
 std::string LuaProxy::Level::filename()
 {
     return (std::string)GM_LVLFILENAME_PTR;

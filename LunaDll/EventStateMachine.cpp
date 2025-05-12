@@ -8,6 +8,7 @@
 #include "Misc/LoadScreen.h"
 #include "Rendering/GL/GLEngineProxy.h"
 #include "SdlMusic/SdlMusPlayer.h"
+#include "SMBXInternal/Reconstructed/EpisodeMain.h"
 #include "SMBXInternal/Variables.h"
 
 // Global instance
@@ -193,7 +194,6 @@ void EventStateMachine::sendOnTick(void) {
     m_onTickReady = false;
 
     sendSimpleLuaEvent("onTick");
-
     m_onTickEndReady = true;
 }
 
