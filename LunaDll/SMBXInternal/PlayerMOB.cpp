@@ -146,6 +146,11 @@ bool Player::IsInForcedAnimation(PlayerMOB* player) {
     return false;
 }
 
+bool Player::IsInScreenFreezingForcedState(PlayerMOB* player) {
+    short state = player->ForcedAnimationState;
+    return !(state == 0 || state == 3 || state == 9 || state == 10);
+}
+
 bool Player::IsHoldingSpriteType(PlayerMOB* player, int NPC_ID) {
     if(player->HeldNPCIndex != 0) {
         NPCMOB* npc = NPC::Get(player->HeldNPCIndex);
