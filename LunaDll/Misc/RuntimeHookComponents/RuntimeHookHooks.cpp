@@ -3409,34 +3409,6 @@ __declspec(naked) void __stdcall runtimeHookNPCSectionWrap(void)
     }
 }
 
-static void __stdcall runtimeHookNPCDespawnTimerFixInternal(NPCMOB* npc)
-{
-    // Fixes an obscure bug of unknown cause where despawn timer can be positive while
-    // the NPC isn't active, causing the despawn timer to never decrement.
-    if (!npc->activeFlag && npc->offscreenCountdownTimer > 0)
-    {
-        npc->offscreenCountdownTimer = -1;
-    }
-}
-
-_declspec(naked) void __stdcall runtimeHookNPCDespawnTimerFix()
-{
-    __asm {
-        push ebx // save for later
-        push esi
-
-        push esi // pointer to NPC
-        call runtimeHookNPCDespawnTimerFixInternal
-
-        pop esi
-        pop ebx
-
-        movsx edi, word ptr ds:[esi+0xE2] // this is what the code that this replaces does
-        push 0xA0A0C2 // return to original code
-        ret
-    }
-}
-
 static bool momentumIsOnScreen(Momentum& momentum)
 {
     // If cameras haven't been initialised, we can't say
@@ -3486,7 +3458,7 @@ static void __stdcall runtimeHookNPCRespawnBugFixInternal(NPCMOB* npc)
     // This checks if the NPC is off screen, and if so, sets some flags to let it respawn.
     // Minor note: this runs before most of the NPC's values are reset.
 
-    if (!gDisableNPCRespawnBugFix && !GM_FREEZWITCH_ACTIV && !momentumIsOnScreen(npc->spawnMomentum))
+    if (!gDisableNPCRespawnBugFix && gCamerasInitialised && !GM_FREEZWITCH_ACTIV && !momentumIsOnScreen(npc->spawnMomentum))
     {
         npc->offscreenFlag1 = -1;
         npc->offscreenFlag2 = -1;

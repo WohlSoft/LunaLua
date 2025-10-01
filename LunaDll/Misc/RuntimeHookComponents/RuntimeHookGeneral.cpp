@@ -2083,7 +2083,6 @@ void TrySkipPatch()
     gDisableNPCDownwardClipFixSlope.Apply();
 
     // Fixes for NPC spawning bugs
-    PATCH(0xA0A0BB).JMP(runtimeHookNPCDespawnTimerFix).NOP_PAD_TO_SIZE<7>().Apply();
     PATCH(0xA3B91E).JMP(runtimeHookNPCRespawnBugFix).NOP_PAD_TO_SIZE<9>().Apply();
 
     PATCH(0xA3B9AA).NOP_PAD_TO_SIZE<14>().Apply();

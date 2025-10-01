@@ -590,7 +590,6 @@ void __stdcall runtimeHookNPCWalkFixClearTemp();
 void __stdcall runtimeHookNPCWalkFixTempHitConditional();
 void __stdcall runtimeHookNPCWalkFixSlope();
 
-void __stdcall runtimeHookNPCDespawnTimerFix();
 void __stdcall runtimeHookNPCRespawnBugFix();
 
 void __stdcall runtimeHookNPCSectionFix(short* npcIndex);
