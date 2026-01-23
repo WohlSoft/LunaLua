@@ -3457,8 +3457,7 @@ static void __stdcall runtimeHookNPCRespawnBugFixInternal(NPCMOB* npc)
     // Fixes the frame-perfect despawn bug.
     // This checks if the NPC is off screen, and if so, sets some flags to let it respawn.
     // Minor note: this runs before most of the NPC's values are reset.
-
-    if (!gDisableNPCRespawnBugFix && gCamerasInitialised && !GM_FREEZWITCH_ACTIV && !momentumIsOnScreen(npc->spawnMomentum))
+    if (gCamerasInitialised && !GM_FREEZWITCH_ACTIV && npc->isHidden == 0 && !momentumIsOnScreen(npc->spawnMomentum))
     {
         npc->offscreenFlag1 = -1;
         npc->offscreenFlag2 = -1;

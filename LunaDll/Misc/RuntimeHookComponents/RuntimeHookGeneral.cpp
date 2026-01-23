@@ -1268,6 +1268,12 @@ AsmPatch<8> gDisableNPCDownwardClipFix = PATCH(0xA16B82).JMP(runtimeHookCompareN
 
 AsmPatch<21> gNPCCeilingBugFix = PATCH(0xA17155).NOP_PAD_TO_SIZE<21>();
 
+static auto npcDespawnFixImpl = PatchCollection(
+    PATCH(0xA3B91E).JMP(runtimeHookNPCRespawnBugFix).NOP_PAD_TO_SIZE<9>(),
+    PATCH(0xA3B9AA).NOP_PAD_TO_SIZE<14>()
+);
+Patchable& gNPCDespawnFix = npcDespawnFixImpl;
+
 // NOTE: This patch replaces a section 167 bytes long from 0xA13188 to 0xA1322E, but we don't NOP out the whole thing
 //       since that would conflict with NpcIdExtender, and this patch may be turned on/off at runtime.
 AsmPatch<6> gDisableNPCDownwardClipFixSlope = PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<6>();
@@ -2082,10 +2088,9 @@ void TrySkipPatch()
     // PATCH(0xA13188).JMP(runtimeHookNPCWalkFixSlope).NOP_PAD_TO_SIZE<167>()
     gDisableNPCDownwardClipFixSlope.Apply();
 
-    // Fixes for NPC spawning bugs
-    PATCH(0xA3B91E).JMP(runtimeHookNPCRespawnBugFix).NOP_PAD_TO_SIZE<9>().Apply();
-
-    PATCH(0xA3B9AA).NOP_PAD_TO_SIZE<14>().Apply();
+    // Fix for the frame-perfect NPC despawn bug
+    // Disabled for the time being dued to needing further testing - if you're changing that, make sure to update it in LunaLuaMain.cpp too
+    //gNPCDespawnFix.Apply();
 
     // Hook to fix an NPC's section property when it spawn out of bounds
     gNPCSectionFix.Apply();

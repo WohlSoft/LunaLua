@@ -106,7 +106,6 @@ extern bool            gRenderBackgroundFlag;
 
 // Settings for glitch fixes
 extern bool            gDisablePlayerFilterBounceFix;
-extern bool            gDisableNPCRespawnBugFix;
 
 // Other gameplay settings
 extern bool            gLavaIsWeak;
