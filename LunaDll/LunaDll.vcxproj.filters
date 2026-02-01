@@ -748,6 +748,18 @@
     <ClInclude Include="FileManager\SaveFile.h">
       <Filter>FileManager</Filter>
     </ClInclude>
+    <ClInclude Include="Misc\DeclareCall.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\FileUtils.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\RAIIHandle.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\Syscalls.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaMain\LuaHelper.cpp">
@@ -1501,6 +1513,12 @@
     </ClCompile>
     <ClCompile Include="FileManager\SaveFile.cpp">
       <Filter>FileManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\FileUtils.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\Syscalls.cpp">
+      <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
