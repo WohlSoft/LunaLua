@@ -496,29 +496,35 @@ typedef struct ExtendedPlayerFields_\
 } ExtendedPlayerFields;";
     }
 
-    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAllocateIndex()
+    FFI_EXPORT(FFIString*) LunaLuaCollisionMatrixGetGroupFromIndex(unsigned int groupIndex)
     {
-        return gCollisionMatrix.allocateIndex();
+        std::string const& collisionGroup = gCollisionMatrix.getGroupFromIndex(groupIndex);
+
+        static FFIString collisionGroupFFI;
+        collisionGroupFFI.buf = collisionGroup.c_str();
+        collisionGroupFFI.size = collisionGroup.size();
+
+        return &collisionGroupFFI;
     }
 
-    FFI_EXPORT(void) LunaLuaCollisionMatrixIncrementReferenceCount(unsigned int group)
-    {
-        gCollisionMatrix.incrementReferenceCount(group);
+    FFI_EXPORT(unsigned int) LunaLuaCollisionMatrixAssignGroup(unsigned int previousGroupIndex, char const* newGroup) {
+        return gCollisionMatrix.assignGroup(previousGroupIndex, newGroup);
     }
 
-    FFI_EXPORT(void) LunaLuaCollisionMatrixDecrementReferenceCount(unsigned int group)
-    {
-        gCollisionMatrix.decrementReferenceCount(group);
+    FFI_EXPORT(bool) LunaLuaCollisionMatrixGetGroupsCollide(char const* i, char const* j) {
+        return gCollisionMatrix.getGroupsCollide(i, j);
     }
 
-    FFI_EXPORT(void) LunaLuaGlobalCollisionMatrixSetIndicesCollide(unsigned int first, unsigned int second, bool collide)
-    {
-        gCollisionMatrix.setIndicesCollide(first, second, collide);
+    FFI_EXPORT(bool) LunaLuaCollisionMatrixGetGroupIndexCollidesWithGroup(unsigned int i, char const* j) {
+        return gCollisionMatrix.getGroupsCollide(i, j);
     }
 
-    FFI_EXPORT(bool) LunaLuaGlobalCollisionMatrixGetIndicesCollide(unsigned int first, unsigned int second) 
-    {
-        return gCollisionMatrix.getIndicesCollide(first, second);
+    FFI_EXPORT(bool) LunaLuaCollisionMatrixGetGroupIndicesCollide(unsigned int i, unsigned int j) {
+        return gCollisionMatrix.getGroupsCollide(i, j);
+    }
+
+    FFI_EXPORT(void) LunaLuaCollisionMatrixSetGroupsCollide(char const* i, char const* j, bool collides) {
+        return gCollisionMatrix.setGroupsCollide(i, j, collides);
     }
 
     FFI_EXPORT(void) LunaLuaSetPlayerFilterBounceFix(bool enable)
