@@ -8,13 +8,10 @@ LauncherCustomWebPage::LauncherCustomWebPage(QObject *parent) :
 
 bool LauncherCustomWebPage::acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame)
 {
-    if (type == QWebEnginePage::NavigationTypeLinkClicked)
-    {
-        qDebug() << url;
-        if(!url.isLocalFile()) {
-            QDesktopServices::openUrl(url);
-            return false;
-        }
+    qDebug() << "Entering acceptNavigationRequest(url = " << url << ", type = " << type << ", isMainFrame = " << isMainFrame << ")";
+    if(!url.isLocalFile()) {
+        QDesktopServices::openUrl(url);
+        return false;
     }
     return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
 }
