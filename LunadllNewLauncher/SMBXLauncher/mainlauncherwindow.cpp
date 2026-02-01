@@ -1,3 +1,5 @@
+#include "launcherurlrequestinterceptor.h"
+#include <qdir.h>
 #if defined(_WIN32) && !defined(_WIN64)
 #include <windows.h>
 #define WIN_CHECK_FOR_64BIT_CPU
@@ -90,6 +92,9 @@ MainLauncherWindow::MainLauncherWindow(QWidget *parent) :
 
     ui->webLauncherPage->setPage(new LauncherCustomWebPage(ui->webLauncherPage));
     QWebEnginePage* page = ui->webLauncherPage->page();
+
+    LauncherUrlRequestInterceptor* interceptor = new LauncherUrlRequestInterceptor(this, QDir::current());
+    page->profile()->setRequestInterceptor(interceptor);
 
     // Set up the development tools dialog
     if (devDialogPtr == nullptr)
