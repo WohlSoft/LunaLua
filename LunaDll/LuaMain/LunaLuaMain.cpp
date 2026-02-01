@@ -731,6 +731,7 @@ void CLunaLua::bindAll()
                 // This used to be Level.loadPlayerHitBoxes, but it needs to be in a namespace that's usable from the overworld.
                 def("loadCharacterHitBoxes", (void(*)(int, int, const std::string&))&LuaProxy::loadHitboxes),
                 def("showRichDialog", &LuaProxy::Misc::showRichDialog),
+                def("__getLuaFileFromCFile", &LuaProxy::Misc::__getLuaFileFromCFile),
                 def("__enablePerfTracker", &LuaProxy::Misc::__enablePerfTracker),
                 def("__disablePerfTracker", &LuaProxy::Misc::__disablePerfTracker),
                 def("__getPerfTrackerData", &LuaProxy::Misc::__getPerfTrackerData),

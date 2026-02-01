@@ -171,6 +171,7 @@ set(LunaLua_Sources
     Misc/AsyncHTTPClient.cpp
     Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
+    Misc/FileUtils.cpp
     Misc/FreeImageUtils/FreeImageData.cpp
     Misc/FreeImageUtils/FreeImageGifData.cpp
     Misc/FreeImageUtils/FreeImageHelper.cpp
@@ -198,6 +199,7 @@ set(LunaLua_Sources
     Misc/RuntimeHookManagers/LevelHUDController.cpp
     Misc/RuntimeHookUtils/APIHook.cpp
     Misc/SafeFPUControl.cpp
+    Misc/Syscalls.cpp
     Misc/TestMode.cpp
     Misc/TestModeMenu.cpp
     Misc/TypeLib.cpp

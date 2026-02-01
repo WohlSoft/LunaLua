@@ -1,4 +1,5 @@
 
+#include <cstdint>
 #include <cstdlib>
 #include <unordered_set>
 #include <memory>
@@ -38,6 +39,14 @@ short* getValidCharacterIDArray();
 PlayerMOB* getTemplateForCharacter(int id);
 // Defined in RuntimeHookNpcHarm.cpp
 void markNPCTransformationAsHandledByLua(short npcIdx, short oldID, short newID);
+
+extern "C" {
+    // For exposing strings to lua
+    struct FFIString {
+        char const* buf;
+        std::size_t size;
+    };
+}
 
 extern "C" {
     FFI_EXPORT(void*) LunaLuaAlloc(size_t size) {
@@ -652,14 +661,14 @@ typedef struct ExtendedPlayerFields_\
         CLunaFFILock ffiLock(__FUNCTION__);
         std::unique_lock<std::mutex> lck(readFileMutex);
 
-        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
-        if (!ptr) return nullptr;
-        path = ptr->path;
+        FILE* f = LunaPathValidator::GetForThread().OpenFile(path, "rb");
+        if (!f) return nullptr;
 
-        std::wstring wpath = Str2WStr(path);
+        std::wstring wpath = LunaPathValidator::GetForThread().LastPath();
         CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
         if (cacheEntry == nullptr)
         {
+            fclose(f);
             return nullptr;
         }
 
@@ -668,11 +677,6 @@ typedef struct ExtendedPlayerFields_\
         if (!data)
         {
             // No data, try to read the file
-            FILE* f = _wfopen(wpath.c_str(), L"rb");
-            if (!f)
-            {
-                return nullptr;
-            }
             fseek(f, 0, SEEK_END);
             size_t len = ftell(f);
             rewind(f);
@@ -683,9 +687,9 @@ typedef struct ExtendedPlayerFields_\
                 data->resize(len);
                 fread(&((*data)[0]), 1, len, f);
             }
-            fclose(f);
             cacheEntry->data = data;
         }
+        fclose(f);
         g_lunaFileCacheSet.insert(data);
 
         ReadFileStruct* cpy = (ReadFileStruct*)malloc(data->size() + sizeof(int));
@@ -708,10 +712,11 @@ typedef struct ExtendedPlayerFields_\
     {
         CLunaFFILock ffiLock(__FUNCTION__);
 
-        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
-        if (!ptr) return false;
+        FILE* f = LunaPathValidator::GetForThread().OpenFile(path, "r");
+        if (!f) return false;
+        fclose(f);
 
-        std::wstring wpath = Str2WStr(path);
+        std::wstring wpath = LunaPathValidator::GetForThread().LastPath();
         return gCachedFileMetadata.exists(wpath);
     }
 
@@ -719,16 +724,15 @@ typedef struct ExtendedPlayerFields_\
     {
         CLunaFFILock ffiLock(__FUNCTION__);
 
-        LunaPathValidator::Result* ptr = LunaPathValidator::GetForThread().CheckPath(path);
-        if (!ptr) return false;
-        if (!ptr->canWrite) return false;
-        path = ptr->path;
-
         // Try to write file
-        bool ret = writeFileAtomic(path, data, dataLen);
+        bool ret = LunaPathValidator::GetForThread().WriteFileAtomic(path, data, dataLen);
+
+        if (!ret) {
+            return false;
+        }
 
         // If successful, update cache, if cached
-        std::wstring wpath = Str2WStr(path);
+        std::wstring wpath = LunaPathValidator::GetForThread().LastPath();
         CachedFileDataWeakPtr<std::vector<char>>::Entry* cacheEntry = g_lunaFileCache.get(wpath);
         if (cacheEntry == nullptr)
         {
@@ -988,13 +992,22 @@ void CachedReadFile::releaseCached(bool isWorld)
     g_lunaFileCache.release(isWorld);
 }
 
+
 extern "C" {
-    FFI_EXPORT(LunaPathValidator::Result*) LunaLuaMakeSafeAbsolutePath(const char* path)
-    {
-        if (!path) return nullptr;
-        return LunaPathValidator::GetForThread().CheckPath(path);
+    FFI_EXPORT(std::uintptr_t) LunaLuaOpenFileSafe(const char* path, const char* mode) {
+        return (std::uintptr_t) LunaPathValidator::GetForThread().OpenFile(path, mode);
+    }
+
+    FFI_EXPORT(FFIString const*) LunaLuaGetPathValidatorLastErrorMessage(void) {
+        std::string const& lastError = LunaPathValidator::GetForThread().ErrorMessage();
+        static FFIString lastErrorFFI;
+        lastErrorFFI.buf = lastError.c_str();
+        lastErrorFFI.size = lastError.length();
+
+        return &lastErrorFFI;
     }
 }
+
 
 extern "C" {
     FFI_EXPORT(void) LunaLuaSetWeakLava(bool value)
