@@ -8,4 +8,8 @@
 //    return strTo;
 //}
 
-
+#ifdef __clang__
+void __stdcall RenderBelowPriorityClang(Renderer* renderer, double maxPriority) {
+    renderer->RenderBelowPriority(maxPriority);
+}
+#endif

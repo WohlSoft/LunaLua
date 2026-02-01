@@ -283,6 +283,8 @@ target_compile_definitions(LunaLuaLibShared PRIVATE
     -D_CRT_SECURE_NO_WARNINGS
     -D_WINSOCK_DEPRECATED_NO_WARNINGS
     -DGLEW_STATIC
+    -D__PRFCHWINTRIN_H # Fix compilation with Clang >= 21.1.0
+    -DSDL_DISABLE_MM3DNOW_H # 3DNow is deprecated
 )
 
 target_link_libraries(LunaLuaLibShared

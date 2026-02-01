@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <unordered_map>
+#include <string>
 
 struct joyinfoex_tag;
 class LunaGameControllerManager;
