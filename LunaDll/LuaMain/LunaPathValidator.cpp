@@ -1,4 +1,6 @@
+#include <fcntl.h>
 #include <random>
+#include <stdio.h>
 #include <string>
 #include <windows.h>
 #include <WinBase.h>
@@ -421,6 +423,17 @@ std::FILE* LunaPathValidator::OpenFile(std::wstring const& path, const char* mod
         mLastError.type = ErrorType::FILE_OBJECT_CREATION_ERROR;
         mLastError.errorCode = _doserrno;
         _close(fd);
+        return nullptr;
+    }
+
+    // Truncate file if needed since _open_osfhandle and _fdopen don't do it automatically
+    if (modeInfo.flags & _O_TRUNC) {
+        if (_chsize(fd, 0) != 0) {
+            mLastError.type = ErrorType::TRUNCATE_ERROR;
+            mLastError.errorCode = _doserrno;
+            std::fclose(fileObject);
+            return nullptr;
+        }
     }
 
     return fileObject;
@@ -872,6 +885,11 @@ std::string LunaPathValidator::ErrorMessage() {
             errorMessage += "Error while listing the contents of directory ";
             errorMessage += mLastError.pathOrMode;
             break;
+
+        case ErrorType::TRUNCATE_ERROR:
+            errorMessage += "Couldn't truncate the file opened with 'w'";
+            break;
+
         };
 
     if (
