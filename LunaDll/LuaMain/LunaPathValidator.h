@@ -28,6 +28,7 @@ public:
         FILE_REPLACE_ERROR,
         UNAUTHORIZED_FOLDER_LIST,
         FOLDER_LIST_ERROR,
+        TRUNCATE_ERROR
     };
 
     struct Error {
