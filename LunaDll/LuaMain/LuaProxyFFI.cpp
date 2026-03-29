@@ -1018,6 +1018,10 @@ extern "C" {
 
         return &lastErrorFFI;
     }
+
+    FFI_EXPORT(int) LunaLuaGetPathValidatorLastErrno(void) {
+        return LunaPathValidator::GetForThread().LastErrno();
+    }
 }
 
 
