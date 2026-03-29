@@ -113,6 +113,23 @@ static DWORD getDirectoryFinalPath(wchar_t const* path, std::wstring& finalPath)
     return getHandleFinalPath(directoryHandle.borrow(), finalPath, true);
 }
 
+// removeFilePathW doesn't correctly handle files at the root of a drive
+void computeParentFolder(std::wstring &path)
+{
+    for (int i = path.size(); i >= 2; i--) {
+        if ((path[i] == L'\\') || (path[i] == L'/'))
+        {
+            if (path[i - 1] == L':') {
+                path.resize(i + 1);
+            } else {
+                path.resize(i);
+            }
+            
+            break;
+        }
+    }
+}
+
 // Instances
 LunaPathValidator gLunaPathValidator;
 LunaPathValidator gLunaPathValidatorLoadscreen;
@@ -311,7 +328,7 @@ std::FILE* LunaPathValidator::OpenFile(std::wstring const& path, const char* mod
 
         // Get the path of the parent folder
         std::wstring parentFolder = wNormalPath;
-        removeFilePathW(parentFolder);
+        computeParentFolder(parentFolder);
         std::wstring longParentFolder = L"\\\\?\\";
         longParentFolder += parentFolder;
 
@@ -556,7 +573,7 @@ bool LunaPathValidator::WriteFileAtomic(std::wstring const& path, const void* da
 
     // Get the path of the parent folder
     std::wstring parentFolder = wNormalPath;
-    removeFilePathW(parentFolder);
+    computeParentFolder(parentFolder);
     std::wstring longParentFolder = L"\\\\?\\";
     longParentFolder += parentFolder;
 
