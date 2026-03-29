@@ -34,6 +34,7 @@ public:
     struct Error {
         ErrorType type;
         DWORD errorCode;
+        int cErrorCode;
         std::string pathOrMode;
     };
 private:
@@ -81,6 +82,9 @@ public:
 
     // If the previous call to OpenFile, WriteFileAtomic or ListOfDir failed, return the last error message, otherwise, return an unspecified value
     std::string ErrorMessage();
+
+    // If the previous call to OpenFile, WriteFileAtomic or ListOfDir failed, return the last C error number
+    int LastErrno();
 public:
     static LunaPathValidator& GetForThread();
 };

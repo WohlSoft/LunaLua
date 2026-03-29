@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <fcntl.h>
 #include <random>
 #include <stdio.h>
@@ -422,6 +423,7 @@ std::FILE* LunaPathValidator::OpenFile(std::wstring const& path, const char* mod
     if (!fileObject) {
         mLastError.type = ErrorType::FILE_OBJECT_CREATION_ERROR;
         mLastError.errorCode = _doserrno;
+        mLastError.cErrorCode = errno;
         _close(fd);
         return nullptr;
     }
@@ -431,6 +433,7 @@ std::FILE* LunaPathValidator::OpenFile(std::wstring const& path, const char* mod
         if (_chsize(fd, 0) != 0) {
             mLastError.type = ErrorType::TRUNCATE_ERROR;
             mLastError.errorCode = _doserrno;
+            mLastError.cErrorCode = errno;
             std::fclose(fileObject);
             return nullptr;
         }
@@ -923,6 +926,111 @@ std::string LunaPathValidator::ErrorMessage() {
     }
 
     return errorMessage;
+}
+
+// Taken from https://gitlab.winehq.org/wine/wine/-/blob/53d513e626205d5506b7e959bf73b22fd1c17908/dlls/msvcrt/errno.c
+static int DosErrnoToCErrno(DWORD dosErrno) {
+    switch (dosErrno) {
+    case ERROR_ACCESS_DENIED:
+    case ERROR_NETWORK_ACCESS_DENIED:
+    case ERROR_CANNOT_MAKE:
+    case ERROR_SEEK_ON_DEVICE:
+    case ERROR_LOCK_FAILED:
+    case ERROR_FAIL_I24:
+    case ERROR_CURRENT_DIRECTORY:
+    case ERROR_DRIVE_LOCKED:
+    case ERROR_NOT_LOCKED:
+    case ERROR_INVALID_ACCESS:
+    case ERROR_SHARING_VIOLATION:
+    case ERROR_LOCK_VIOLATION:
+        return EACCES;
+
+    case ERROR_FILE_NOT_FOUND:
+    case ERROR_NO_MORE_FILES:
+    case ERROR_BAD_PATHNAME:
+    case ERROR_BAD_NETPATH:
+    case ERROR_INVALID_DRIVE:
+    case ERROR_BAD_NET_NAME:
+    case ERROR_FILENAME_EXCED_RANGE:
+    case ERROR_PATH_NOT_FOUND:
+        return ENOENT;
+
+    case ERROR_IO_DEVICE:
+        return EIO;
+
+    case ERROR_BAD_FORMAT:
+        return ENOEXEC;
+
+    case ERROR_INVALID_HANDLE:
+        return EBADF;
+
+    case ERROR_OUTOFMEMORY:
+    case ERROR_INVALID_BLOCK:
+    case ERROR_NOT_ENOUGH_QUOTA:
+    case ERROR_ARENA_TRASHED:
+        return ENOMEM;
+
+    case ERROR_BUSY:
+        return EBUSY;
+
+    case ERROR_ALREADY_EXISTS:
+    case ERROR_FILE_EXISTS:
+        return EEXIST;
+
+    case ERROR_BAD_DEVICE:
+        return ENODEV;
+
+    case ERROR_TOO_MANY_OPEN_FILES:
+        return EMFILE;
+
+    case ERROR_DISK_FULL:
+        return ENOSPC;
+
+    case ERROR_BROKEN_PIPE:
+        return EPIPE;
+
+    case ERROR_POSSIBLE_DEADLOCK:
+        return EDEADLK;
+
+    case ERROR_DIR_NOT_EMPTY:
+        return ENOTEMPTY;
+
+    case ERROR_BAD_ENVIRONMENT:
+        return E2BIG;
+
+    case ERROR_WAIT_NO_CHILDREN:
+    case ERROR_CHILD_NOT_COMPLETE:
+        return ECHILD;
+
+    case ERROR_NO_PROC_SLOTS:
+    case ERROR_MAX_THRDS_REACHED:
+    case ERROR_NESTING_NOT_ALLOWED:
+        return EAGAIN;
+
+    default:
+        return EINVAL;
+    }
+}
+
+int LunaPathValidator::LastErrno() {
+    switch (mLastError.type) {
+    case ErrorType::TRUNCATE_ERROR:
+    case ErrorType::FILE_OBJECT_CREATION_ERROR:
+        return mLastError.cErrorCode;
+    
+    case ErrorType::MODE_PARSING_ERROR:
+    case ErrorType::NULL_PATH:
+        return EINVAL;
+
+    case ErrorType::DESCRIPTOR_CREATION_ERROR:
+        return EMFILE;
+        
+    case ErrorType::TEMP_FILE_INCOMPLETE_WRITE:
+        return EIO;
+
+    default:
+        return DosErrnoToCErrno(mLastError.errorCode);
+    }
 }
 
 LunaPathValidator& LunaPathValidator::GetForThread()
