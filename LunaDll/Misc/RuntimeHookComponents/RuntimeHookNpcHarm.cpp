@@ -1764,18 +1764,20 @@ __declspec(naked) void __stdcall runtimeHookNpcHarmRaw_a2bdeb(void)
         push dword ptr [ebp + 0x8]
         call runtimeHookNpcHarm
         cmp eax, 0
-        jne restoresafe
+        jne cancelled
         pop edx
         pop ecx
         pop eax
         popfd
         push 0xa2fbbb
         ret
-    restoresafe:
+    cancelled:
         pop edx
         pop ecx
         pop eax
         popfd
+        push 0xa3037e
+        ret
     safe:
         push 0xa2bdf1
         ret
