@@ -12,6 +12,7 @@
 #include <lua.hpp>
 #include "LoadScreen.h"
 #include "../LuaMain/LunaPathValidator.h"
+#include "../LuaMain/LuaProxy.h"
 
 static bool lunaLoadScreenEnabled = false;
 static std::thread* loadThread = nullptr;
@@ -117,6 +118,13 @@ void InitMinimalLuaState(lua_State* L) {
     DEF_CONST(L, GL_DOUBLE_MAT4x2);
     DEF_CONST(L, GL_DOUBLE_MAT4x3);
     DEF_CONST(L, GL_SAMPLER_2D);
+
+    // Bind Misc.__getLuaFileFromCFile, needed for lockdown.lua and gameover.lua
+    luabind::module(L) [
+        luabind::namespace_("Misc") [
+            luabind::def("__getLuaFileFromCFile", &LuaProxy::Misc::__getLuaFileFromCFile)
+        ]
+    ];
 }
 
 static void LoadThread(void)

@@ -171,6 +171,7 @@ set(LunaLua_Sources
     Misc/AsyncHTTPClient.cpp
     Misc/CollisionMatrix.cpp
     Misc/ErrorReporter.cpp
+    Misc/FileUtils.cpp
     Misc/FreeImageUtils/FreeImageData.cpp
     Misc/FreeImageUtils/FreeImageGifData.cpp
     Misc/FreeImageUtils/FreeImageHelper.cpp
@@ -198,6 +199,7 @@ set(LunaLua_Sources
     Misc/RuntimeHookManagers/LevelHUDController.cpp
     Misc/RuntimeHookUtils/APIHook.cpp
     Misc/SafeFPUControl.cpp
+    Misc/Syscalls.cpp
     Misc/TestMode.cpp
     Misc/TestModeMenu.cpp
     Misc/TypeLib.cpp
@@ -281,6 +283,8 @@ target_compile_definitions(LunaLuaLibShared PRIVATE
     -D_CRT_SECURE_NO_WARNINGS
     -D_WINSOCK_DEPRECATED_NO_WARNINGS
     -DGLEW_STATIC
+    -D__PRFCHWINTRIN_H # Fix compilation with Clang >= 21.1.0
+    -DSDL_DISABLE_MM3DNOW_H # 3DNow is deprecated
 )
 
 target_link_libraries(LunaLuaLibShared

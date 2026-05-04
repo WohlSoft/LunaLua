@@ -1,0 +1,40 @@
+#!/bin/bash
+
+CURRENT_DIR="$(dirname "$0")"
+ARGS=( )
+LIST_MODE=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o) # Output path
+            WIN_OUTPUT_PATH="$(winepath -w "$2")"
+            ARGS+=("-o" "$WIN_OUTPUT_PATH")
+            shift
+            shift
+        ;;
+        --list) # List
+            LIST_MODE=true
+            ARGS+=("$1")
+            shift
+        ;;
+        -*) # Default option
+            ARGS+=("$1")
+            shift
+        ;;
+        *) # Path argument
+            PATH_ARG="$(winepath -w "$1")"
+            ARGS+=("$PATH_ARG")
+            shift
+        ;;
+    esac
+done
+
+if $LIST_MODE; then
+    wine "$CURRENT_DIR/qt-win32/bin/rcc.exe" "${ARGS[@]}" | while read -r RESOURCE_FILE; do
+        winepath -u "$RESOURCE_FILE"
+
+    done
+else
+    wine "$CURRENT_DIR/qt-win32/bin/rcc.exe" "${ARGS[@]}"
+fi

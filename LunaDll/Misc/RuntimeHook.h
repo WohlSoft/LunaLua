@@ -7,6 +7,7 @@
 #include "../SMBXInternal/PlayerMOB.h"
 #include "AsmPatch.h"
 #include "../GlobalFuncs.h"
+#include "../Rendering/Rendering.h"
 
 struct SMBX_Warp;
 
@@ -190,6 +191,11 @@ void fixup_SectionSizePatch();
 /* Render Priority Hooks                                                */
 /************************************************************************/
 
+#ifdef __clang__
+// Needed for Clang versions of _RenderBelowPriorityHookImpl and _RenderBelowPriorityHookWithSkipImpl since we can't use pointers to member functions in inline assembly
+void __stdcall RenderBelowPriorityClang(Renderer* renderer, double maxPriority);
+#endif
+
 template <int priority>
 _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
 #ifdef __clang__
@@ -201,11 +207,11 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         "push ecx\n"
         "push edx\n"
 
-        "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
-        "mov ecx, eax\n" // The pointer to this is stored in ecx in the __thiscall convention
-
         "push %c[PriorityMostSignificantDWord]\n" // Push most significant dword of priority
         "push %c[PriorityLeastSignificantDWord]\n" // Push least significant dword of priority
+
+        "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
+        "push eax\n" // Push pointer to the renderer
 
         "call %P[RenderBelowPriority]\n"
         
@@ -219,7 +225,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookImpl() {
         : [PriorityMostSignificantDWord] "i" (DoubleMostSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [PriorityLeastSignificantDWord] "i" (DoubleLeastSignificantDWord(priority >= 100 ? DBL_MAX : priority)),
           [getRenderer] "i" (&Renderer::Get),
-          [RenderBelowPriority] "i" (&Renderer::RenderBelowPriority)
+          [RenderBelowPriority] "i" (&RenderBelowPriorityClang)
 
     );
 #else
@@ -255,11 +261,11 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
         "push ecx\n"
         "push edx\n"
 
-        "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
-        "mov ecx, eax\n" // The pointer to this is stored in ecx in the __thiscall convention
-
         "push %c[PriorityMostSignificantDWord]\n" // Push most significant dword of priority
         "push %c[PriorityLeastSignificantDWord]\n" // Push least significant dword of priority
+
+        "call %P[getRenderer]\n" // Pointer to the renderer is put in eax
+        "push eax\n" // Push pointer to the renderer
 
         "call %P[RenderBelowPriority]\n"
 
@@ -280,7 +286,7 @@ _declspec(naked) static void __stdcall _RenderBelowPriorityHookWithSkipImpl() {
           [skipTargetAddrValue] "i" (skipTargetAddr),
           [skipAddrValue] "i" (skipAddr),
           [getRenderer] "i" (&Renderer::Get),
-          [RenderBelowPriority] "i" (&Renderer::RenderBelowPriority)
+          [RenderBelowPriority] "i" (&RenderBelowPriorityClang)
     );
 #else
     __asm {

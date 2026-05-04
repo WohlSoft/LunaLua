@@ -113,10 +113,10 @@ if(NOT MSVC_VER)
   set(MSVC_VER 19.11)
 endif()
 
-set(MSVC_INCLUDE "${MSVC_BASE}/include")
-set(MSVC_LIB "${MSVC_BASE}/lib")
-set(WINSDK_INCLUDE "${WINSDK_BASE}/Include/${WINSDK_VER}")
-set(WINSDK_LIB "${WINSDK_BASE}/Lib/${WINSDK_VER}")
+set(MSVC_INCLUDE "${MSVC_BASE}/${MSVC_VER}/include")
+set(MSVC_LIB "${MSVC_BASE}/${MSVC_VER}/lib")
+set(WINSDK_INCLUDE "${WINSDK_BASE}/${WINSDK_VER}/Include")
+set(WINSDK_LIB "${WINSDK_BASE}/${WINSDK_VER}/Lib")
 
 if(NOT EXISTS "${MSVC_BASE}" OR
    NOT EXISTS "${MSVC_INCLUDE}" OR
@@ -234,7 +234,7 @@ if(case_sensitive_filesystem)
   init_user_prop(winsdk_vfs_overlay_path)
   if(NOT winsdk_vfs_overlay_path)
     set(winsdk_vfs_overlay_path "${CMAKE_BINARY_DIR}/winsdk_vfs_overlay.yaml")
-    generate_winsdk_vfs_overlay("${WINSDK_BASE}/Include/${WINSDK_VER}" "${winsdk_vfs_overlay_path}")
+    generate_winsdk_vfs_overlay("${WINSDK_BASE}/${WINSDK_VER}/Include" "${winsdk_vfs_overlay_path}")
     init_user_prop(winsdk_vfs_overlay_path)
   endif()
   list(APPEND COMPILE_FLAGS
@@ -278,13 +278,13 @@ if(case_sensitive_filesystem)
   init_user_prop(winsdk_lib_symlinks_dir)
   if(NOT winsdk_lib_symlinks_dir)
     set(winsdk_lib_symlinks_dir "${CMAKE_BINARY_DIR}/winsdk_lib_symlinks")
-    generate_winsdk_lib_symlinks("${WINSDK_BASE}/Lib/${WINSDK_VER}/um/${WINSDK_ARCH}" "${winsdk_lib_symlinks_dir}")
+    generate_winsdk_lib_symlinks("${WINSDK_BASE}/${WINSDK_VER}/Lib/um/${WINSDK_ARCH}" "${winsdk_lib_symlinks_dir}")
     init_user_prop(winsdk_lib_symlinks_dir)
   endif()
   init_user_prop(defaultlib_symlinks_dir)
   if(NOT defaultlib_symlinks_dir)
     set(defaultlib_symlinks_dir "${CMAKE_BINARY_DIR}/defaultlib_symlinks")
-    generate_defaultlib_symlinks("${MSVC_BASE}/lib/${WINSDK_ARCH}" "${defaultlib_symlinks_dir}")
+    generate_defaultlib_symlinks("${MSVC_BASE}/${MSVC_VER}/lib/${WINSDK_ARCH}" "${defaultlib_symlinks_dir}")
     init_user_prop(defaultlib_symlinks_dir)
   endif()
   list(APPEND LINK_FLAGS
@@ -314,3 +314,23 @@ if(NOT $ENV{VCPKG_TOOLCHAIN} STREQUAL "")
   message(STATUS "Included VCPKG: $ENV{VCPKG_TOOLCHAIN}")
   include($ENV{VCPKG_TOOLCHAIN})
 endif()
+
+# Use wrapper for moc
+if (NOT TARGET Qt5::moc)
+    add_executable(Qt5::moc IMPORTED)
+endif()
+set_target_properties(Qt5::moc PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/wine-moc-wrapper")
+# For CMake automoc feature
+get_target_property(QT_MOC_EXECUTABLE Qt5::moc LOCATION)
+
+# Use wrapper for uic
+if (NOT TARGET Qt5::uic)
+    add_executable(Qt5::uic IMPORTED)
+endif()
+set_target_properties(Qt5::uic PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/wine-uic-wrapper")
+
+# Use wrapper for rcc
+if (NOT TARGET Qt5::rcc)
+    add_executable(Qt5::rcc IMPORTED)
+endif()
+set_target_properties(Qt5::rcc PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_LIST_DIR}/wine-rcc-wrapper")

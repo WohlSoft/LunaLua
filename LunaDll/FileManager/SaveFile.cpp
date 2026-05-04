@@ -107,11 +107,8 @@ void __stdcall SMBXSaveFile::Save()
     // Write data to file in atomic fashion
     std::wstring worldPath = SMBX13::Vars::SelectWorld[SMBX13::Vars::selWorld].WorldPath;
     std::wstring saveFilePath = worldPath + L"save" + std::to_wstring(SMBX13::Vars::selSave) + L".sav";
-    LunaPathValidator::Result* ret = LunaPathValidator::GetForThread().CheckPath(WStr2Str(saveFilePath).c_str());
-    if (ret && ret->canWrite)
-    {
-        writeFileAtomic(saveFilePath, rawStr.c_str(), rawStr.size());
-    }
+
+    LunaPathValidator::GetForThread().WriteFileAtomic(saveFilePath, rawStr.c_str(), rawStr.size());
 }
 
 //void __stdcall SMBXSaveFile::Load()

@@ -266,18 +266,14 @@ compile_commands.json
 
 # cmake
 /CrossCompilation/build/
+/CrossCompilation/out/
 
 # Windows SDK
-/CrossCompilation/msvc/include/**
-/CrossCompilation/msvc/lib/x86/**
-/CrossCompilation/winsdk/Include/v7.1A/ucrt/**
-/CrossCompilation/winsdk/Include/v7.1A/um/**
-/CrossCompilation/winsdk/Lib/v7.1A/ucrt/x86/**
-/CrossCompilation/winsdk/Lib/v7.1A/um/x86/**
+/CrossCompilation/msvc/
+/CrossCompilation/winsdk/
 
-!/CrossCompilation/msvc/include/.gitkeep
-!/CrossCompilation/msvc/lib/x86/.gitkeep
-!/CrossCompilation/winsdk/Include/v7.1A/ucrt/.gitkeep
-!/CrossCompilation/winsdk/Include/v7.1A/um/.gitkeep
-!/CrossCompilation/winsdk/Lib/v7.1A/ucrt/x86/.gitkeep
-!/CrossCompilation/winsdk/Lib/v7.1A/um/x86/.gitkeep
+# Windows Qt
+/CrossCompilation/qt-win32/
+
+# Python
+__pycache__

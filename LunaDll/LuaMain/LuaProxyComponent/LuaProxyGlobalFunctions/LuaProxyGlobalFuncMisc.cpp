@@ -8,6 +8,10 @@
 #include "../../../Misc/RuntimeHook.h"
 #include "../../../Misc/Gui/RichTextDialog.h"
 #include "../../../Misc/PerfTracker.h"
+#include "../../../Misc/FileUtils.h"
+#include "../../LunaPathValidator.h"
+#include "lauxlib.h"
+#include <cstdint>
 
 void LuaProxy::Misc::npcToCoins()
 {
@@ -70,20 +74,17 @@ void LuaProxy::Misc::cheatBuffer(const luabind::object &value, lua_State* L)
 }
 
 
-luabind::object listByAttributes(const std::string& path, DWORD attributes, lua_State* L) 
+luabind::object listByAttributes(const std::string& path, DWORD attributes, lua_State* L)
 {
     luabind::object theList = luabind::newtable(L);
-    std::string modulePath = path;
-    if (!isAbsolutePath(path))
-    {
-        modulePath = gAppPathUTF8;
-        modulePath += "\\";
-        modulePath += path;
+    std::vector<std::string> listedFiles;
+
+    if (LunaPathValidator::GetForThread().ListOfDir(path, attributes, listedFiles)) {
+        for (unsigned int i = 0; i < listedFiles.size(); ++i) {
+            theList[i + 1] = listedFiles[i];
+        }
     }
-    std::vector<std::string> listedFiles = listOfDir(path, attributes);
-    for (unsigned int i = 0; i < listedFiles.size(); ++i) {
-        theList[i + 1] = listedFiles[i];
-    }
+
     return theList;
 }
 
@@ -320,6 +321,10 @@ std::string LuaProxy::Misc::showRichDialog(const std::string& title, const std::
     RichTextDialog dialog(title, rtfText, isReadOnly);
     dialog.show();
     return dialog.getRtfText();
+}
+
+luabind::object LuaProxy::Misc::__getLuaFileFromCFile(std::uintptr_t address, bool forIoLines, lua_State* L) {
+    return FileUtils::CFileToLua(L, (std::FILE*) address, forIoLines);
 }
 
 // Internal use profiler functions

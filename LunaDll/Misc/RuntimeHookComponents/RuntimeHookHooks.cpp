@@ -1966,7 +1966,7 @@ static unsigned int __stdcall runtimeHookGrabbedNPCCollisionGroupInternal(int np
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup, extB->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getGroupsCollide(extA->collisionGroup, extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
 
     return -1; // Collision goes ahead
@@ -3939,14 +3939,14 @@ static unsigned int __stdcall runtimeHookBlockNPCFilterInternal(unsigned int hit
         {
             ExtendedNPCFields* ownerExt = NPC::GetRawExtended(block->OwnerNPCIdx);
 
-            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
+            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,ownerExt->collisionGroup)) // Check collision matrix
                 return 0;
         }
         else
         {
             ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
 
-            if (!gCollisionMatrix.getIndicesCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+            if (!gCollisionMatrix.getGroupsCollide(ext->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
                 return 0;
         }
 
@@ -3997,7 +3997,7 @@ static unsigned int __stdcall runtimeHookNPCCollisionGroupInternal(int npcAIdx, 
     ExtendedNPCFields* extA = NPC::GetRawExtended(npcAIdx);
     ExtendedNPCFields* extB = NPC::GetRawExtended(npcBIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getGroupsCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
         return 0; // Collision cancelled
 
     // Check noNPCCollision
@@ -4091,7 +4091,7 @@ static unsigned int __stdcall runtimeHookBlockPlayerFilterInternal(short playerI
     // Collision groups
     ExtendedBlockFields* blockExt = Blocks::GetRawExtended(blockIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getGroupsCollide(playerExt->collisionGroup,blockExt->collisionGroup)) // Check collision matrix
     {
         return 0;
     }
@@ -4149,7 +4149,7 @@ static unsigned int __stdcall runtimeHookPlayerNPCInteractionCheckInternal(short
     // Collision groups
     ExtendedNPCFields* npcExt = NPC::GetRawExtended(npcIdx);
 
-    if (!gCollisionMatrix.getIndicesCollide(playerExt->collisionGroup,npcExt->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getGroupsCollide(playerExt->collisionGroup,npcExt->collisionGroup)) // Check collision matrix
     {
         return 0;
     }
@@ -4268,7 +4268,7 @@ static unsigned int __stdcall runtimeHookPlayerPlayerInteractionInternal(short* 
     }
 
     // Collision groups
-    if (!gCollisionMatrix.getIndicesCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
+    if (!gCollisionMatrix.getGroupsCollide(extA->collisionGroup,extB->collisionGroup)) // Check collision matrix
     {
         return 0;
     }

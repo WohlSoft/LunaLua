@@ -26,10 +26,4 @@ END
 #endif // APSTUDIO_INVOKED
 #endif
 
-#ifdef _MSC_VER
-#ifdef APSTUDIO_INVOKED
 IDI_APPICON  ICON   "LunaLoaderIcon.ico"
-#endif
-#else
-IDI_APPICON  ICON   "LunaLoaderIcon.ico"
-#endif
