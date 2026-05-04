@@ -454,6 +454,13 @@ void __stdcall runtimeHookYoshiEatPossibleNPCTransform_internal(int npcIdx)
 {
     npcIdx -= 129;
     NPCMOB* npc = NPC::Get(npcIdx);
+
+    // Return if the NPC index is invalid
+    // Fixes a crash when the NPC in yoshi's mouth and the previous one in the NPC array die during the same tick
+    if (!npc) {
+        return;
+    }
+
     previousNPCID = npc->id;
     npcCheckIdx = npcIdx;
 }

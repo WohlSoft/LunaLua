@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     Utils/Json/qjsonurlvalidationexception.cpp \
     launchercustomwebpage.cpp \
     hybridlogger.cpp \
-    devtoolsdialog.cpp
+    devtoolsdialog.cpp \
+    launcherurlrequestinterceptor.cpp
 
 HEADERS  += mainlauncherwindow.h \
     ../../LunaDll/Input/LunaGameController.h \
@@ -64,7 +65,8 @@ HEADERS  += mainlauncherwindow.h \
     Utils/Json/qjsonurlvalidationexception.h \
     launchercustomwebpage.h \
     hybridlogger.h \
-    devtoolsdialog.h
+    devtoolsdialog.h \
+    launcherurlrequestinterceptor.h
 
 # LunaLoader
 # win32: SOURCES += ../../LunaLoader/LunaLoaderPatch.cpp

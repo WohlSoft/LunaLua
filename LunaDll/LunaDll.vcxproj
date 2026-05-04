@@ -327,6 +327,10 @@
     <ClInclude Include="UserSaves\UserSaving.h" />
     <ClInclude Include="SMBXInternal\WorldLevel.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="Misc\DeclareCall.h" />
+    <ClInclude Include="Misc\FileUtils.h" />
+    <ClInclude Include="Misc\RAIIHandle.h" />
+    <ClInclude Include="Misc\Syscalls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\LunaLoader\LunaLoaderPatch.cpp" />
@@ -566,6 +570,8 @@
     <ClCompile Include="UserSaves\UserSaving.cpp" />
     <ClCompile Include="SMBXInternal\WorldLevel.cpp" />
     <ClCompile Include="VersionString.cpp" />
+    <ClCompile Include="Misc\FileUtils.cpp" />
+    <ClCompile Include="Misc\Syscalls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Misc\scrappedcode.txt" />
