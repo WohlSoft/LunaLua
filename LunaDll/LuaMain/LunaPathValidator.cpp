@@ -207,7 +207,8 @@ DWORD LunaPathValidator::CheckPath(std::wstring const& pathArg, bool requestWrit
         if ((mFinalEnginePath.size() > 0) && (mFinalEnginePath == path.substr(0, mFinalEnginePath.size()))) {
             // If engine path matches, check for write protection
             bool canWrite = ((path.substr(mFinalEnginePath.size(), 5) == L"logs\\") ||
-                            (path.substr(mFinalEnginePath.size(), std::wstring::npos) == L"worlds\\mario challenge\\data.json"));
+                            (path.substr(mFinalEnginePath.size(), std::wstring::npos) == L"worlds\\mario challenge\\data.json") ||
+                            (path.substr(mFinalEnginePath.size(), std::wstring::npos) == L"worlds\\mario challenge\\"));
             
             if (requestWrite && !canWrite) {
                 return ERROR_WRITE_PROTECT;
